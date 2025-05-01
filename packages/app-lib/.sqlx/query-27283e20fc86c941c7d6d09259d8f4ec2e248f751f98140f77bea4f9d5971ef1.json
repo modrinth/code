@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            INSERT INTO profiles (\n                path, install_stage, name, icon_path,\n                game_version, mod_loader, mod_loader_version,\n                groups,\n                linked_project_id, linked_version_id, locked,\n                created, modified, last_played,\n                submitted_time_played, recent_time_played,\n                override_java_path, override_extra_launch_args, override_custom_env_vars,\n                override_mc_memory_max, override_mc_force_fullscreen, override_mc_game_resolution_x, override_mc_game_resolution_y,\n                override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit,\n                protocol_version, launcher_feature_version\n            )\n            VALUES (\n                $1, $2, $3, $4,\n                $5, $6, $7,\n                jsonb($8),\n                $9, $10, $11,\n                $12, $13, $14,\n                $15, $16,\n                $17, jsonb($18), jsonb($19),\n                $20, $21, $22, $23,\n                $24, $25, $26,\n                $27, $28\n            )\n            ON CONFLICT (path) DO UPDATE SET\n                install_stage = $2,\n                name = $3,\n                icon_path = $4,\n\n                game_version = $5,\n                mod_loader = $6,\n                mod_loader_version = $7,\n\n                groups = jsonb($8),\n\n                linked_project_id = $9,\n                linked_version_id = $10,\n                locked = $11,\n\n                created = $12,\n                modified = $13,\n                last_played = $14,\n\n                submitted_time_played = $15,\n                recent_time_played = $16,\n\n                override_java_path = $17,\n                override_extra_launch_args = jsonb($18),\n                override_custom_env_vars = jsonb($19),\n                override_mc_memory_max = $20,\n                override_mc_force_fullscreen = $21,\n                override_mc_game_resolution_x = $22,\n                override_mc_game_resolution_y = $23,\n\n                override_hook_pre_launch = $24,\n                override_hook_wrapper = $25,\n                override_hook_post_exit = $26,\n\n                protocol_version = $27,\n                launcher_feature_version = $28\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 28
+    },
+    "nullable": []
+  },
+  "hash": "27283e20fc86c941c7d6d09259d8f4ec2e248f751f98140f77bea4f9d5971ef1"
+}

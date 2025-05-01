@@ -248,6 +248,7 @@ fn main() {
                         "get_recent_worlds",
                         "get_profile_worlds",
                         "get_singleplayer_world",
+                        "set_world_display_status",
                         "rename_world",
                         "reset_world_icon",
                         "backup_world",

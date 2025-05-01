@@ -710,10 +710,8 @@ pub async fn project_edit(
                         ));
                     }
 
-                    let ids_to_delete = links
-                        .iter()
-                        .map(|(name, _)| name.clone())
-                        .collect::<Vec<String>>();
+                    let ids_to_delete =
+                        links.keys().cloned().collect::<Vec<String>>();
                     // Deletes all links from hashmap- either will be deleted or be replaced
                     sqlx::query!(
                         "
@@ -1270,10 +1268,7 @@ pub async fn projects_edit(
         .await?;
 
         if let Some(links) = &bulk_edit_project.link_urls {
-            let ids_to_delete = links
-                .iter()
-                .map(|(name, _)| name.clone())
-                .collect::<Vec<String>>();
+            let ids_to_delete = links.keys().cloned().collect::<Vec<String>>();
             // Deletes all links from hashmap- either will be deleted or be replaced
             sqlx::query!(
                 "
@@ -1482,7 +1477,7 @@ pub async fn project_icon_edit(
 
     let project_id: ProjectId = project_item.inner.id.into();
     let upload_result = upload_image_optimized(
-        &format!("data/{}", project_id),
+        &format!("data/{project_id}"),
         bytes.freeze(),
         &ext.ext,
         Some(96),
@@ -1700,7 +1695,7 @@ pub async fn add_gallery_item(
 
     let id: ProjectId = project_item.inner.id.into();
     let upload_result = upload_image_optimized(
-        &format!("data/{}/images", id),
+        &format!("data/{id}/images"),
         bytes.freeze(),
         &ext.ext,
         Some(350),

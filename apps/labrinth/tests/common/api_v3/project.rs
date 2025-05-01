@@ -53,7 +53,7 @@ impl ApiProject for ApiV3 {
 
         // Approve as a moderator.
         let req = TestRequest::patch()
-            .uri(&format!("/v3/project/{}", slug))
+            .uri(&format!("/v3/project/{slug}"))
             .append_pat(MOD_USER_PAT)
             .set_json(json!(
                 {
@@ -69,7 +69,7 @@ impl ApiProject for ApiV3 {
 
         // Get project's versions
         let req = TestRequest::get()
-            .uri(&format!("/v3/project/{}/version", slug))
+            .uri(&format!("/v3/project/{slug}/version"))
             .append_pat(pat)
             .to_request();
         let resp = self.call(req).await;
@@ -172,7 +172,7 @@ impl ApiProject for ApiV3 {
         pat: Option<&str>,
     ) -> ServiceResponse {
         let req = test::TestRequest::get()
-            .uri(&format!("/v3/user/{}/projects", user_id_or_username))
+            .uri(&format!("/v3/user/{user_id_or_username}/projects"))
             .append_pat(pat)
             .to_request();
         self.call(req).await
@@ -215,7 +215,7 @@ impl ApiProject for ApiV3 {
     ) -> ServiceResponse {
         let projects_str = ids_or_slugs
             .iter()
-            .map(|s| format!("\"{}\"", s))
+            .map(|s| format!("\"{s}\""))
             .collect::<Vec<_>>()
             .join(",");
         let req = test::TestRequest::patch()
@@ -363,13 +363,13 @@ impl ApiProject for ApiV3 {
             featured = featured
         );
         if let Some(title) = title {
-            url.push_str(&format!("&title={}", title));
+            url.push_str(&format!("&title={title}"));
         }
         if let Some(description) = description {
-            url.push_str(&format!("&description={}", description));
+            url.push_str(&format!("&description={description}"));
         }
         if let Some(ordering) = ordering {
-            url.push_str(&format!("&ordering={}", ordering));
+            url.push_str(&format!("&ordering={ordering}"));
         }
 
         let req = test::TestRequest::post()
@@ -416,10 +416,7 @@ impl ApiProject for ApiV3 {
         pat: Option<&str>,
     ) -> ServiceResponse {
         let req = test::TestRequest::delete()
-            .uri(&format!(
-                "/v3/project/{id_or_slug}/gallery?url={url}",
-                url = url
-            ))
+            .uri(&format!("/v3/project/{id_or_slug}/gallery?url={url}"))
             .append_pat(pat)
             .to_request();
 
@@ -562,7 +559,7 @@ impl ApiV3 {
         };
 
         let req = test::TestRequest::get()
-            .uri(&format!("/v3/search?{}{}", query_field, facets_field))
+            .uri(&format!("/v3/search?{query_field}{facets_field}"))
             .append_pat(pat)
             .to_request();
         let resp = self.call(req).await;
@@ -583,12 +580,12 @@ impl ApiV3 {
             let version_string: String =
                 serde_json::to_string(&id_or_slugs).unwrap();
             let version_string = urlencoding::encode(&version_string);
-            format!("version_ids={}", version_string)
+            format!("version_ids={version_string}")
         } else {
             let projects_string: String =
                 serde_json::to_string(&id_or_slugs).unwrap();
             let projects_string = urlencoding::encode(&projects_string);
-            format!("project_ids={}", projects_string)
+            format!("project_ids={projects_string}")
         };
 
         let mut extra_args = String::new();
@@ -605,10 +602,8 @@ impl ApiV3 {
             extra_args.push_str(&format!("&end_date={end_date}"));
         }
         if let Some(resolution_minutes) = resolution_minutes {
-            extra_args.push_str(&format!(
-                "&resolution_minutes={}",
-                resolution_minutes
-            ));
+            extra_args
+                .push_str(&format!("&resolution_minutes={resolution_minutes}"));
         }
 
         let req = test::TestRequest::get()

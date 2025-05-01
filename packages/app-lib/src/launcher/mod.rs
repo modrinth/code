@@ -297,8 +297,7 @@ pub async fn install_minecraft(
         .await?
         .ok_or_else(|| {
             crate::ErrorKind::LauncherError(format!(
-                "Java path invalid or non-functional: {:?}",
-                java_version
+                "Java path invalid or non-functional: {java_version:?}"
             ))
         })?;
 
@@ -406,8 +405,7 @@ pub async fn install_minecraft(
                     &loading_bar,
                     30.0 / total_length as f64,
                     Some(&format!(
-                        "Running forge processor {}/{}",
-                        index, total_length
+                        "Running forge processor {index}/{total_length}"
                     )),
                 )?;
             }
@@ -679,10 +677,10 @@ pub async fn launch_minecraft(
             // check if the regex exists in the file
             if !re.is_match(&options_string) {
                 // The key was not found in the file, so append it
-                options_string.push_str(&format!("\n{}:{}", key, value));
+                options_string.push_str(&format!("\n{key}:{value}"));
             } else {
                 let replaced_string = re
-                    .replace_all(&options_string, &format!("{}:{}", key, value))
+                    .replace_all(&options_string, &format!("{key}:{value}"))
                     .to_string();
                 options_string = replaced_string;
             }
@@ -700,12 +698,10 @@ pub async fn launch_minecraft(
 
     let mut censor_strings = HashMap::new();
     let username = whoami::username();
+    censor_strings
+        .insert(format!("/{username}/"), "/{COMPUTER_USERNAME}/".to_string());
     censor_strings.insert(
-        format!("/{}/", username),
-        "/{COMPUTER_USERNAME}/".to_string(),
-    );
-    censor_strings.insert(
-        format!("\\{}\\", username),
+        format!("\\{username}\\"),
         "\\{COMPUTER_USERNAME}\\".to_string(),
     );
     censor_strings.insert(

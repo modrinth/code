@@ -113,7 +113,7 @@ pub async fn create_pat(
         .take(60)
         .map(char::from)
         .collect::<String>();
-    let token = format!("mrp_{}", token);
+    let token = format!("mrp_{token}");
 
     let name = info.name.clone();
     database::models::pat_item::PersonalAccessToken {

@@ -1,4 +1,4 @@
-import { useTheming } from './theme'
+import { useTheming } from './theme.ts'
 import { useBreadcrumbs } from './breadcrumbs'
 import { useLoading } from './loading'
 import { useNotifications, handleError } from './notifications'

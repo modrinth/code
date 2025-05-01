@@ -1,27 +1,15 @@
-<script setup>
+<script setup lang="ts" generic="T extends string">
 import { MoonIcon, RadioButtonCheckedIcon, RadioButtonIcon, SunIcon } from '@modrinth/assets'
-import { useVIntl, defineMessages } from '@vintl/vintl'
+import { defineMessages, useVIntl } from '@vintl/vintl'
 
 const { formatMessage } = useVIntl()
 
-defineProps({
-  updateColorTheme: {
-    type: Function,
-    required: true,
-  },
-  currentTheme: {
-    type: String,
-    required: true,
-  },
-  themeOptions: {
-    type: Array,
-    required: true,
-  },
-  systemThemeColor: {
-    type: String,
-    required: true,
-  },
-})
+defineProps<{
+  updateColorTheme: (theme: T) => void
+  currentTheme: T
+  themeOptions: readonly T[]
+  systemThemeColor: T
+}>()
 
 const colorTheme = defineMessages({
   title: {
@@ -61,6 +49,10 @@ const colorTheme = defineMessages({
     defaultMessage: 'Preferred dark theme',
   },
 })
+
+function asString(theme: T): string {
+  return theme
+}
 </script>
 
 <template>
@@ -82,7 +74,7 @@ const colorTheme = defineMessages({
       <div class="label">
         <RadioButtonCheckedIcon v-if="currentTheme === option" class="radio" />
         <RadioButtonIcon v-else class="radio" />
-        {{ colorTheme[option] ? formatMessage(colorTheme[option]) : option }}
+        {{ colorTheme[asString(option)] ? formatMessage(colorTheme[asString(option)]) : option }}
         <SunIcon
           v-if="'light' === option"
           v-tooltip="formatMessage(colorTheme.preferredLight)"

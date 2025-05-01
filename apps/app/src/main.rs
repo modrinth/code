@@ -117,8 +117,7 @@ fn show_window(app: tauri::AppHandle) {
             .set_type(MessageType::Error)
             .set_title("Initialization error")
             .set_text(&format!(
-                "Cannot display application window due to an error:\n{}",
-                e
+                "Cannot display application window due to an error:\n{e}"
             ))
             .show_alert()
             .unwrap();
@@ -138,8 +137,7 @@ fn is_dev() -> bool {
 async fn toggle_decorations(b: bool, window: tauri::Window) -> api::Result<()> {
     window.set_decorations(b).map_err(|e| {
         theseus::Error::from(theseus::ErrorKind::OtherError(format!(
-            "Failed to toggle decorations: {}",
-            e
+            "Failed to toggle decorations: {e}"
         )))
     })?;
     Ok(())
@@ -320,7 +318,7 @@ fn main() {
             #[cfg(target_os = "windows")]
             {
                 // tauri doesn't expose runtime errors, so matching a string representation seems like the only solution
-                if format!("{:?}", e).contains(
+                if format!("{e:?}").contains(
                     "Runtime(CreateWebview(WebView2Error(WindowsError",
                 ) {
                     MessageDialog::new()
@@ -338,8 +336,7 @@ fn main() {
                 .set_type(MessageType::Error)
                 .set_title("Initialization error")
                 .set_text(&format!(
-                    "Cannot initialize application due to an error:\n{:?}",
-                    e
+                    "Cannot initialize application due to an error:\n{e:?}"
                 ))
                 .show_alert()
                 .unwrap();

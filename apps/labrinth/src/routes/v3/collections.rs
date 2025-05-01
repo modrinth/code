@@ -424,7 +424,7 @@ pub async fn collection_icon_edit(
 
     let collection_id: CollectionId = collection_item.id.into();
     let upload_result = crate::util::img::upload_image_optimized(
-        &format!("data/{}", collection_id),
+        &format!("data/{collection_id}"),
         bytes.freeze(),
         &ext.ext,
         Some(96),

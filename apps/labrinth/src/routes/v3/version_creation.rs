@@ -486,8 +486,7 @@ async fn version_create_inner(
                 || image.context.inner_id().is_some()
             {
                 return Err(CreateError::InvalidInput(format!(
-                    "Image {} is not unused and in the 'version' context",
-                    image_id
+                    "Image {image_id} is not unused and in the 'version' context"
                 )));
             }
 
@@ -506,8 +505,7 @@ async fn version_create_inner(
             image_item::Image::clear_cache(image.id.into(), redis).await?;
         } else {
             return Err(CreateError::InvalidInput(format!(
-                "Image {} does not exist",
-                image_id
+                "Image {image_id} does not exist"
             )));
         }
     }
@@ -810,7 +808,7 @@ pub async fn upload_file(
 ) -> Result<(), CreateError> {
     let (file_name, file_extension) = get_name_ext(content_disposition)?;
 
-    if other_file_names.contains(&format!("{}.{}", file_name, file_extension)) {
+    if other_file_names.contains(&format!("{file_name}.{file_extension}")) {
         return Err(CreateError::InvalidInput(
             "Duplicate files are not allowed to be uploaded to Modrinth!"
                 .to_string(),

@@ -51,8 +51,7 @@ pub async fn upload_image_optimized(
     let content_type = crate::util::ext::get_image_content_type(file_extension)
         .ok_or_else(|| {
             ApiError::InvalidInput(format!(
-                "Invalid format for image: {}",
-                file_extension
+                "Invalid format for image: {file_extension}"
             ))
         })?;
 
@@ -91,7 +90,7 @@ pub async fn upload_image_optimized(
     let upload_data = file_host
         .upload_file(
             content_type,
-            &format!("{}/{}.{}", upload_folder, hash, file_extension),
+            &format!("{upload_folder}/{hash}.{file_extension}"),
             bytes,
         )
         .await?;

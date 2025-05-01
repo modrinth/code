@@ -157,7 +157,7 @@ impl ApiV3 {
         pat: Option<&str>,
     ) -> ServiceResponse {
         let req = test::TestRequest::get()
-            .uri(&format!("/v3/user/{}/collections", user_id_or_username))
+            .uri(&format!("/v3/user/{user_id_or_username}/collections"))
             .append_pat(pat)
             .to_request();
         self.call(req).await

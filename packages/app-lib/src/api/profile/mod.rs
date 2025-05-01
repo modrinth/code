@@ -470,8 +470,7 @@ pub async fn export_mrpack(
         state.io_semaphore.0.acquire().await?;
     let profile = get(profile_path).await?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
-            "Tried to export a nonexistent or unloaded profile at path {}!",
-            profile_path
+            "Tried to export a nonexistent or unloaded profile at path {profile_path}!"
         ))
     })?;
 
@@ -617,8 +616,7 @@ fn pack_get_relative_path(
         .strip_prefix(profile_path)
         .map_err(|_| {
             crate::ErrorKind::FSError(format!(
-                "Path {path:?} does not correspond to a profile",
-                path = path
+                "Path {path:?} does not correspond to a profile"
             ))
         })?
         .components()
@@ -656,8 +654,7 @@ pub async fn run_credentials(
     let settings = Settings::get(&state.pool).await?;
     let profile = get(path).await?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
-            "Tried to run a nonexistent or unloaded profile at path {}!",
-            path
+            "Tried to run a nonexistent or unloaded profile at path {path}!"
         ))
     })?;
 
@@ -753,8 +750,7 @@ pub async fn try_update_playtime(path: &str) -> crate::Result<()> {
 
     let profile = get(path).await?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
-            "Tried to update playtime for a nonexistent or unloaded profile at path {}!",
-            path
+            "Tried to update playtime for a nonexistent or unloaded profile at path {path}!"
         ))
     })?;
     let updated_recent_playtime = profile.recent_time_played;

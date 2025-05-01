@@ -470,8 +470,7 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             .await;
             if p != ProjectPermissions::empty() {
                 return Err(format!(
-                    "Test 1 failed. Expected no permissions, got {:?}",
-                    p
+                    "Test 1 failed. Expected no permissions, got {p:?}"
                 ));
             }
 
@@ -511,8 +510,7 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             .await;
             if p != ProjectPermissions::empty() {
                 return Err(format!(
-                    "Test 2 failed. Expected no permissions, got {:?}",
-                    p
+                    "Test 2 failed. Expected no permissions, got {p:?}"
                 ));
             }
 
@@ -561,8 +559,7 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             .await;
             if p != failure_project_permissions {
                 return Err(format!(
-                    "Test 3 failed. Expected {:?}, got {:?}",
-                    failure_project_permissions, p
+                    "Test 3 failed. Expected {failure_project_permissions:?}, got {p:?}"
                 ));
             }
 
@@ -607,8 +604,7 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             .await;
             if p != success_permissions {
                 return Err(format!(
-                    "Test 4 failed. Expected {:?}, got {:?}",
-                    success_permissions, p
+                    "Test 4 failed. Expected {success_permissions:?}, got {p:?}"
                 ));
             }
 
@@ -666,8 +662,7 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             .await;
             if p != failure_project_permissions {
                 return Err(format!(
-                    "Test 5 failed. Expected {:?}, got {:?}",
-                    failure_project_permissions, p
+                    "Test 5 failed. Expected {failure_project_permissions:?}, got {p:?}"
                 ));
             }
 
@@ -721,8 +716,7 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             .await;
             if p != success_permissions {
                 return Err(format!(
-                    "Test 6 failed. Expected {:?}, got {:?}",
-                    success_permissions, p
+                    "Test 6 failed. Expected {success_permissions:?}, got {p:?}"
                 ));
             }
 
@@ -790,8 +784,7 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             .await;
             if p != failure_project_permissions {
                 return Err(format!(
-                    "Test 7 failed. Expected {:?}, got {:?}",
-                    failure_project_permissions, p
+                    "Test 7 failed. Expected {failure_project_permissions:?}, got {p:?}"
                 ));
             }
 
@@ -856,8 +849,7 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             .await;
             if p != success_permissions {
                 return Err(format!(
-                    "Test 8 failed. Expected {:?}, got {:?}",
-                    success_permissions, p
+                    "Test 8 failed. Expected {success_permissions:?}, got {p:?}"
                 ));
             }
 
@@ -927,8 +919,7 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             .await;
             if p != OrganizationPermissions::empty() {
                 return Err(format!(
-                    "Test 1 failed. Expected no permissions, got {:?}",
-                    p
+                    "Test 1 failed. Expected no permissions, got {p:?}"
                 ));
             }
             Ok(())
@@ -976,8 +967,7 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             .await;
             if p != failure_organization_permissions {
                 return Err(format!(
-                    "Test 2 failed. Expected {:?}, got {:?}",
-                    failure_organization_permissions, p
+                    "Test 2 failed. Expected {failure_organization_permissions:?}, got {p:?}"
                 ));
             }
             Ok(())
@@ -1021,8 +1011,7 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             .await;
             if p != success_permissions {
                 return Err(format!(
-                    "Test 3 failed. Expected {:?}, got {:?}",
-                    success_permissions, p
+                    "Test 3 failed. Expected {success_permissions:?}, got {p:?}"
                 ));
             }
             Ok(())

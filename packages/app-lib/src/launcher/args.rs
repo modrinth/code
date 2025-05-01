@@ -438,16 +438,14 @@ pub async fn get_processor_main_class(
             .map_err(|e| IOError::with_path(e, &path))?;
         let mut archive = zip::ZipArchive::new(zipfile).map_err(|_| {
             crate::ErrorKind::LauncherError(format!(
-                "Cannot read processor at {}",
-                path
+                "Cannot read processor at {path}"
             ))
             .as_error()
         })?;
 
         let file = archive.by_name("META-INF/MANIFEST.MF").map_err(|_| {
             crate::ErrorKind::LauncherError(format!(
-                "Cannot read processor manifest at {}",
-                path
+                "Cannot read processor manifest at {path}"
             ))
             .as_error()
         })?;

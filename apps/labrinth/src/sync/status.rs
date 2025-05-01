@@ -67,5 +67,5 @@ pub async fn push_back_user_expiry(
 }
 
 fn get_field_name(user: UserId) -> String {
-    format!("user_status:{}", user)
+    format!("user_status:{user}")
 }

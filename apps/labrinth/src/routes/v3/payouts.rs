@@ -676,8 +676,7 @@ pub async fn cancel_payout(
                             .make_paypal_request::<(), ()>(
                                 Method::POST,
                                 &format!(
-                                    "payments/payouts-item/{}/cancel",
-                                    platform_id
+                                    "payments/payouts-item/{platform_id}/cancel"
                                 ),
                                 None,
                                 None,
@@ -689,7 +688,7 @@ pub async fn cancel_payout(
                         payouts
                             .make_tremendous_request::<(), ()>(
                                 Method::POST,
-                                &format!("rewards/{}/cancel", platform_id),
+                                &format!("rewards/{platform_id}/cancel"),
                                 None,
                             )
                             .await?;

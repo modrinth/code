@@ -9,5 +9,6 @@ edition = "2021"
 theseus = { path = "../../packages/app-lib", features = ["cli"] }
 tokio = { version = "1", features = ["full"] }
 webbrowser = "0.8.13"
+enumset = "1.1"
 
 tracing = "0.1.37"

@@ -1,7 +1,7 @@
 <script setup>
 import { Button, Slider } from '@modrinth/ui'
 import { ref, watch } from 'vue'
-import { get, set } from '@/helpers/settings.js'
+import { get, set } from '@/helpers/settings.ts'
 import { purge_cache_types } from '@/helpers/cache.js'
 import { handleError } from '@/store/notifications.js'
 import { BoxIcon, FolderSearchIcon, TrashIcon } from '@modrinth/assets'
