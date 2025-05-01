@@ -74,6 +74,7 @@ const props = withDefaults(
     playingWorld: false,
     startingInstance: false,
     supportsQuickPlay: false,
+    currentProtocol: null,
 
     refreshing: false,
     serverStatus: undefined,

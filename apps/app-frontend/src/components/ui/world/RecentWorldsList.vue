@@ -103,13 +103,13 @@ async function populateJumpBackIn() {
     // fetch protocol versions for all unique MC versions with server worlds
     const uniqueServerInstances = new Set<string>(servers.map((x) => x.instancePath))
     await Promise.all(
-      [...uniqueServerInstances].map((path) => {
+      [...uniqueServerInstances].map((path) =>
         get_profile_protocol_version(path)
           .then((protoVer) => (protocolVersions.value[path] = protoVer))
           .catch(() => {
             console.error(`Failed to get profile protocol for: ${path} `)
-          })
-      }),
+          }),
+      ),
     )
 
     // initialize server data
@@ -122,7 +122,7 @@ async function populateJumpBackIn() {
     })
 
     // fetch each server's data
-    await Promise.all(
+    Promise.all(
       servers.map(({ instancePath, address }) =>
         refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address),
       ),
@@ -262,7 +262,7 @@ onUnmounted(() => {
           :rendered-motd="
             item.world.type === 'server' ? serverData[item.world.address].renderedMotd : undefined
           "
-          :current-protocol="protocolVersions[item.instance.game_version]"
+          :current-protocol="protocolVersions[item.instance.path]"
           :game-mode="
             item.world.type === 'singleplayer' ? GAME_MODES[item.world.game_mode] : undefined
           "
