@@ -297,10 +297,8 @@ onUnmounted(() => {
   </div>
 </template>
 <style scoped lang="scss">
-@media (min-width: 1900px) {
-  .grid-when-huge {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(670px, 1fr));
-  }
+.grid-when-huge {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(670px, 1fr));
 }
 </style>
