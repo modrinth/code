@@ -87,7 +87,8 @@
         "img-src": "https: 'unsafe-inline' 'self' asset: http://asset.localhost blob: data:",
         "style-src": "'unsafe-inline' 'self'",
         "script-src": "https://*.posthog.com 'self'",
-        "frame-src": "https://www.youtube.com https://www.youtube-nocookie.com https://discord.com https://*.githubusercontent.com 'self'"
+        "frame-src": "https://www.youtube.com https://www.youtube-nocookie.com https://discord.com 'self'",
+        "media-src": "https://*.githubusercontent.com"
       }
     }
   }
