@@ -1,4 +1,4 @@
-# Daedalus
+# Daedalus (Metadata service)
 
 Daedalus is a powerful tool which queries and generates metadata for the Minecraft (and other games in the future!) game
 and mod loaders for:
@@ -8,3 +8,5 @@ and mod loaders for:
 - Reliability (Provides a versioning system which ensures no breakage with updates)
 
 Daedalus supports the original Minecraft data and reposting for the Forge, Fabric, Quilt, and NeoForge loaders.
+
+Read more about this projects and how to contribute to it on the [Daedalus contributing page](https://docs.modrinth.com/contributing/daedalus/).
