@@ -1,8 +1,8 @@
 //! Functions for fetching infromation from the Internet
 use super::io::{self, IOError};
 use crate::config::{MODRINTH_API_URL, MODRINTH_API_URL_V3};
-use crate::event::emit::emit_loading;
 use crate::event::LoadingBarId;
+use crate::event::emit::emit_loading;
 use bytes::Bytes;
 use lazy_static::lazy_static;
 use reqwest::Method;

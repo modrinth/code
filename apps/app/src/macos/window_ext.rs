@@ -1,9 +1,9 @@
 // Stolen from https://gist.github.com/charrondev/43150e940bd2771b1ea88256d491c7a9
 use objc::{msg_send, sel, sel_impl};
-use rand::{distributions::Alphanumeric, Rng};
+use rand::{Rng, distributions::Alphanumeric};
 use tauri::{
-    plugin::{Builder, TauriPlugin},
     Emitter, Runtime, Window,
+    plugin::{Builder, TauriPlugin},
 }; // 0.8
 
 const WINDOW_CONTROL_PAD_X: f64 = 9.0;
@@ -73,7 +73,7 @@ struct WindowState<R: Runtime> {
 #[cfg(target_os = "macos")]
 pub fn setup_traffic_light_positioner<R: Runtime>(window: Window<R>) {
     use cocoa::appkit::NSWindow;
-    use cocoa::base::{id, BOOL};
+    use cocoa::base::{BOOL, id};
     use cocoa::foundation::NSUInteger;
     use objc::runtime::{Object, Sel};
     use std::ffi::c_void;

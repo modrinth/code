@@ -2,10 +2,10 @@ use super::settings::{Hooks, MemorySettings, WindowSize};
 use crate::profile::get_full_path;
 use crate::state::server_join_log::JoinLogEntry;
 use crate::state::{
-    cache_file_hash, CacheBehaviour, CachedEntry, CachedFileHash,
+    CacheBehaviour, CachedEntry, CachedFileHash, cache_file_hash,
 };
 use crate::util;
-use crate::util::fetch::{write_cached_icon, FetchSemaphore, IoSemaphore};
+use crate::util::fetch::{FetchSemaphore, IoSemaphore, write_cached_icon};
 use crate::util::io::{self};
 use chrono::{DateTime, TimeDelta, TimeZone, Utc};
 use dashmap::DashMap;

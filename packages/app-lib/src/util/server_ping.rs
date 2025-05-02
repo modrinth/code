@@ -1,5 +1,5 @@
-use crate::error::Result;
 use crate::ErrorKind;
+use crate::error::Result;
 use serde::{Deserialize, Serialize};
 use serde_json::value::RawValue;
 use std::time::Duration;

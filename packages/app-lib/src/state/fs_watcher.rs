@@ -1,9 +1,9 @@
-use crate::event::emit::{emit_profile, emit_warning};
 use crate::event::ProfilePayloadType;
+use crate::event::emit::{emit_profile, emit_warning};
 use crate::state::{DirectoryInfo, ProfileInstallStage, ProjectType};
-use futures::{channel::mpsc::channel, SinkExt, StreamExt};
+use futures::{SinkExt, StreamExt, channel::mpsc::channel};
 use notify::{RecommendedWatcher, RecursiveMode};
-use notify_debouncer_mini::{new_debouncer, DebounceEventResult, Debouncer};
+use notify_debouncer_mini::{DebounceEventResult, Debouncer, new_debouncer};
 use std::time::Duration;
 use tokio::sync::RwLock;
 

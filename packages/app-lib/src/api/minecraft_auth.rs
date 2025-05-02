@@ -1,7 +1,7 @@
 //! Authentication flow interface
 
-use crate::state::{Credentials, MinecraftLoginFlow};
 use crate::State;
+use crate::state::{Credentials, MinecraftLoginFlow};
 
 #[tracing::instrument]
 pub async fn begin_login() -> crate::Result<MinecraftLoginFlow> {

@@ -9,7 +9,7 @@ use crate::state::{
     MemorySettings, ModrinthCredentials, Profile, ProfileInstallStage,
     TeamMember, Theme, VersionFile, WindowSize,
 };
-use crate::util::fetch::{read_json, IoSemaphore};
+use crate::util::fetch::{IoSemaphore, read_json};
 use chrono::{DateTime, Utc};
 use p256::ecdsa::SigningKey;
 use p256::pkcs8::DecodePrivateKey;
@@ -250,9 +250,11 @@ where
                                                     .metadata
                                                     .game_version
                                                     .clone(),
-                                                loaders: vec![mod_loader
-                                                    .as_str()
-                                                    .to_string()],
+                                                loaders: vec![
+                                                    mod_loader
+                                                        .as_str()
+                                                        .to_string(),
+                                                ],
                                                 update_version_id:
                                                     update_version.id.clone(),
                                             },

@@ -3,13 +3,13 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 
 use crate::{
+    State,
     prelude::ModLoader,
     state::ProfileInstallStage,
     util::{
         fetch::{fetch, write_cached_icon},
         io,
     },
-    State,
 };
 
 use super::{copy_dotminecraft, recache_icon};

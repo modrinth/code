@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{prelude::ModLoader, state::ProfileInstallStage, util::io, State};
+use crate::{State, prelude::ModLoader, state::ProfileInstallStage, util::io};
 
 use super::{copy_dotminecraft, recache_icon};
 

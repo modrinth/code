@@ -3,7 +3,7 @@ use crate::launcher::get_loader_version_from_profile;
 use crate::profile::get_full_path;
 use crate::state::attached_world_data::AttachedWorldData;
 use crate::state::{
-    attached_world_data, server_join_log, Profile, ProfileInstallStage,
+    Profile, ProfileInstallStage, attached_world_data, server_join_log,
 };
 pub use crate::util::server_ping::{
     ServerGameProfile, ServerPlayers, ServerStatus, ServerVersion,
