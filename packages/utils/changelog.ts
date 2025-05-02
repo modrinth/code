@@ -11,6 +11,27 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-05-01T18:10:00-07:00`,
+    product: 'app',
+    version: `0.9.5`,
+    body: `### Improvements
+- Fixed certain mods with a large number of versions not being able to be installed or load their versions.
+- Fixed server descriptions not being rendered with the Minecraft font.
+- When installing a modpack, the page will now change to the instance once it's created.
+- Last played time for existing servers will now be loaded from log files instead of displaying "Never played".
+- Home page's "Jump back in" section will now display in multiple columns when the screen is very large.
+- Added the ability to launch the instance from a World entry on the Home page.
+- Added the ability to hide a world from the Home page.
+- Added an appearance setting to only show instances instead of worlds on the Home page.
+- Fixed Home page rendering being blocked by server pings.
+- Fixed Home page sometimes not sending the correct protocol version when fetching server data.
+- Fixed server data not being loaded immediately after adding it.
+- Fixed Worlds tab filters showing up in the wrong situations.
+- Fixed new Singleplayer worlds not being added to the Worlds tab without a refresh.
+- Fixed an excessive number of items showing up in "Jump back in" sometimes.
+- Fixed critical error modal cutting off long single-line error messages.`,
+  },
+  {
     date: `2025-04-29T08:20:00-07:00`,
     product: 'web',
     body: `### Improvements
