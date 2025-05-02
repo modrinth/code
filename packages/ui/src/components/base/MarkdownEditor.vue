@@ -126,7 +126,7 @@
       </span>
       <div class="markdown-body-wrapper">
         <div
-          style="width: 100%"
+          style="width: 100%; max-height: 306px;"
           class="markdown-body"
           v-html="renderHighlightedString(imageMarkdown)"
         />
