@@ -4,8 +4,8 @@ use crate::launcher::parse_rules;
 use crate::profile::QuickPlayType;
 use crate::{
     event::{
-        emit::{emit_loading, loading_try_for_each_concurrent},
         LoadingBarId,
+        emit::{emit_loading, loading_try_for_each_concurrent},
     },
     state::State,
     util::{fetch::*, io, platform::OsExt},

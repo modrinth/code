@@ -1,10 +1,10 @@
+use crate::State;
 use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
 use crate::state::{CachedEntry, LinkedData, ProfileInstallStage, SideType};
 use crate::util::fetch::{fetch, fetch_advanced, write_cached_icon};
 use crate::util::io;
-use crate::State;
 
 use reqwest::Method;
 use serde::{Deserialize, Serialize};

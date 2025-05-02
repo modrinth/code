@@ -10,8 +10,8 @@ use tokio::task::JoinError;
 use crate::State;
 #[cfg(target_os = "windows")]
 use winreg::{
-    enums::{HKEY_LOCAL_MACHINE, KEY_READ, KEY_WOW64_32KEY, KEY_WOW64_64KEY},
     RegKey,
+    enums::{HKEY_LOCAL_MACHINE, KEY_READ, KEY_WOW64_32KEY, KEY_WOW64_64KEY},
 };
 
 // Entrypoint function (Windows)

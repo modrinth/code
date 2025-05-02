@@ -1,6 +1,6 @@
 use crate::config::{META_URL, MODRINTH_API_URL, MODRINTH_API_URL_V3};
 use crate::state::ProjectType;
-use crate::util::fetch::{fetch_json, sha1_async, FetchSemaphore};
+use crate::util::fetch::{FetchSemaphore, fetch_json, sha1_async};
 use chrono::{DateTime, Utc};
 use dashmap::DashSet;
 use reqwest::Method;
@@ -1285,7 +1285,7 @@ impl CachedEntry {
 
                         if let Some(values) =
                             filtered_keys.iter_mut().find(|x| {
-                                x.0 .0 == loaders_key && x.0 .1 == game_version
+                                x.0.0 == loaders_key && x.0.1 == game_version
                             })
                         {
                             values.1.push(hash.to_string());

@@ -1,9 +1,9 @@
 //! Theseus profile management interface
 
+use crate::event::LoadingBarType;
 use crate::event::emit::{
     emit_loading, init_loading, loading_try_for_each_concurrent,
 };
-use crate::event::LoadingBarType;
 use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
@@ -12,10 +12,10 @@ use crate::state::{
     ProfileFile, ProfileInstallStage, ProjectType, SideType,
 };
 
-use crate::event::{emit::emit_profile, ProfilePayloadType};
+use crate::event::{ProfilePayloadType, emit::emit_profile};
 use crate::util::fetch;
 use crate::util::io::{self, IOError};
-pub use crate::{state::Profile, State};
+pub use crate::{State, state::Profile};
 use async_zip::tokio::write::ZipFileWriter;
 use async_zip::{Compression, ZipEntryBuilder};
 use serde_json::json;
@@ -831,7 +831,7 @@ pub async fn create_mrpack_json(
             return Err(crate::ErrorKind::OtherError(
                 "Loader version mismatch".to_string(),
             )
-            .into())
+            .into());
         }
     };
     dependencies

@@ -1,13 +1,13 @@
-use std::sync::{atomic::AtomicBool, Arc};
+use std::sync::{Arc, atomic::AtomicBool};
 
 use discord_rich_presence::{
-    activity::{Activity, Assets},
     DiscordIpc, DiscordIpcClient,
+    activity::{Activity, Assets},
 };
 use tokio::sync::RwLock;
 
-use crate::state::Profile;
 use crate::State;
+use crate::state::Profile;
 
 pub struct DiscordGuard {
     client: Arc<RwLock<DiscordIpcClient>>,

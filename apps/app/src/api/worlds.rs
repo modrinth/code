@@ -3,7 +3,7 @@ use either::Either;
 use enumset::EnumSet;
 use tauri::{AppHandle, Manager, Runtime};
 use theseus::prelude::ProcessMetadata;
-use theseus::profile::{get_full_path, QuickPlayType};
+use theseus::profile::{QuickPlayType, get_full_path};
 use theseus::worlds::{
     DisplayStatus, ServerPackStatus, ServerStatus, World, WorldType,
     WorldWithProfile,

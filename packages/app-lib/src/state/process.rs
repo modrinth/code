@@ -4,8 +4,8 @@ use crate::profile;
 use crate::util::io::IOError;
 use chrono::{DateTime, TimeZone, Utc};
 use dashmap::DashMap;
-use quick_xml::events::Event;
 use quick_xml::Reader;
+use quick_xml::events::Event;
 use serde::Deserialize;
 use serde::Serialize;
 use std::fs::OpenOptions;
@@ -345,7 +345,10 @@ impl Process {
                                                 &current_content,
                                             )
                                         {
-                                            tracing::error!("Failed to write throwable to log file: {}", e);
+                                            tracing::error!(
+                                                "Failed to write throwable to log file: {}",
+                                                e
+                                            );
                                         }
                                     }
                                 }

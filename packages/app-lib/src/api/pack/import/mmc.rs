@@ -1,14 +1,14 @@
 use std::path::{Path, PathBuf};
 
-use serde::{de, Deserialize, Serialize};
+use serde::{Deserialize, Serialize, de};
 
 use crate::{
+    State,
     pack::{
         import::{self, copy_dotminecraft},
         install_from::{self, CreatePackDescription, PackDependency},
     },
     util::io,
-    State,
 };
 
 // instance.cfg

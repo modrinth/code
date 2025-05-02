@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use native_dialog::{MessageDialog, MessageType};
+use native_dialog::{DialogBuilder, MessageLevel};
 use std::env;
 use tauri::{Listener, Manager};
 use theseus::prelude::*;
@@ -113,13 +113,14 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
 fn show_window(app: tauri::AppHandle) {
     let win = app.get_window("main").unwrap();
     if let Err(e) = win.show() {
-        MessageDialog::new()
-            .set_type(MessageType::Error)
+        DialogBuilder::message()
+            .set_level(MessageLevel::Error)
             .set_title("Initialization error")
-            .set_text(&format!(
+            .set_text(format!(
                 "Cannot display application window due to an error:\n{e}"
             ))
-            .show_alert()
+            .alert()
+            .show()
             .unwrap();
         panic!("cannot display application window")
     } else {
@@ -321,24 +322,26 @@ fn main() {
                 if format!("{e:?}").contains(
                     "Runtime(CreateWebview(WebView2Error(WindowsError",
                 ) {
-                    MessageDialog::new()
-                        .set_type(MessageType::Error)
+                    DialogBuilder::message()
+                        .set_level(MessageLevel::Error)
                         .set_title("Initialization error")
                         .set_text("Your Microsoft Edge WebView2 installation is corrupt.\n\nMicrosoft Edge WebView2 is required to run Modrinth App.\n\nLearn how to repair it at https://support.modrinth.com/en/articles/8797765-corrupted-microsoft-edge-webview2-installation")
-                        .show_alert()
+                        .alert()
+                        .show()
                         .unwrap();
 
                     panic!("webview2 initialization failed")
                 }
             }
 
-            MessageDialog::new()
-                .set_type(MessageType::Error)
+            DialogBuilder::message()
+                .set_level(MessageLevel::Error)
                 .set_title("Initialization error")
-                .set_text(&format!(
+                .set_text(format!(
                     "Cannot initialize application due to an error:\n{e:?}"
                 ))
-                .show_alert()
+                .alert()
+                .show()
                 .unwrap();
 
             tracing::error!("Error while running tauri application: {:?}", e);

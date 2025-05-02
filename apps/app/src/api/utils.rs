@@ -47,8 +47,8 @@ pub enum OS {
 // Create a new HashMap with the same keys
 // Values provided should not be used directly, as they are not guaranteed to be up-to-date
 #[tauri::command]
-pub async fn progress_bars_list(
-) -> Result<DashMap<uuid::Uuid, theseus::LoadingBar>> {
+pub async fn progress_bars_list()
+-> Result<DashMap<uuid::Uuid, theseus::LoadingBar>> {
     let res = theseus::EventState::list_progress_bars().await?;
     Ok(res)
 }

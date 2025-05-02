@@ -161,7 +161,7 @@ pub fn emit_loading(
     let display_frac = loading_bar.current / loading_bar.total;
     let opt_display_frac = if display_frac >= 1.0 {
         None // by convention, when its done, we submit None
-             // any further updates will be ignored (also sending None)
+    // any further updates will be ignored (also sending None)
     } else {
         Some(display_frac)
     };

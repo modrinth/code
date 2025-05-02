@@ -3,13 +3,13 @@ use crate::launcher::get_loader_version_from_profile;
 use crate::profile::get_full_path;
 use crate::state::attached_world_data::AttachedWorldData;
 use crate::state::{
-    attached_world_data, server_join_log, Profile, ProfileInstallStage,
+    Profile, ProfileInstallStage, attached_world_data, server_join_log,
 };
 pub use crate::util::server_ping::{
     ServerGameProfile, ServerPlayers, ServerStatus, ServerVersion,
 };
 use crate::util::{io, server_ping};
-use crate::{launcher, Error, ErrorKind, Result, State};
+use crate::{Error, ErrorKind, Result, State, launcher};
 use async_walkdir::WalkDir;
 use async_zip::{Compression, ZipEntryBuilder};
 use chrono::{DateTime, Local, TimeZone, Utc};
@@ -743,8 +743,8 @@ pub async fn remove_server_from_profile(
 }
 
 mod servers_data {
-    use crate::util::io;
     use crate::Result;
+    use crate::util::io;
     use serde::{Deserialize, Serialize};
     use std::path::Path;
 

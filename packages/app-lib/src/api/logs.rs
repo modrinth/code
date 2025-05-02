@@ -9,9 +9,9 @@ use tokio::{
 };
 
 use crate::{
+    State,
     prelude::Credentials,
     util::io::{self, IOError},
-    State,
 };
 
 #[derive(Serialize, Debug)]

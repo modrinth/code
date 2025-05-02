@@ -3,6 +3,7 @@ use std::{collections::HashMap, path::PathBuf};
 use serde::{Deserialize, Serialize};
 
 use crate::{
+    State,
     pack::{
         self,
         import::{self, copy_dotminecraft},
@@ -11,7 +12,6 @@ use crate::{
     prelude::ModLoader,
     state::{LinkedData, ProfileInstallStage},
     util::io,
-    State,
 };
 
 #[derive(Serialize, Deserialize)]

@@ -10,8 +10,8 @@ use std::path::PathBuf;
 use crate::util::io;
 use crate::util::jre::extract_java_majorminor_version;
 use crate::{
-    util::jre::{self},
     LoadingBarType, State,
+    util::jre::{self},
 };
 
 pub async fn get_java_versions() -> crate::Result<DashMap<u32, JavaVersion>> {
