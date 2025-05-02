@@ -1,4 +1,4 @@
-FROM rust:1.82.0 as build
+FROM rust:1.86.0 AS build
 ENV PKG_CONFIG_ALLOW_CROSS=1
 
 WORKDIR /usr/src/daedalus
@@ -9,9 +9,9 @@ RUN cargo build --release --package daedalus_client
 FROM debian:bookworm-slim
 
 RUN apt-get update \
- && apt-get install -y --no-install-recommends ca-certificates openssl \
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/*
+  && apt-get install -y --no-install-recommends ca-certificates openssl \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
 RUN update-ca-certificates
 
