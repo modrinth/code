@@ -22,7 +22,7 @@ import { version as getOsVersion, platform as getOsPlatform } from '@tauri-apps/
 import { useTheming } from '@/store/state'
 import FeatureFlagSettings from '@/components/ui/settings/FeatureFlagSettings.vue'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import { get, set } from '@/helpers/settings'
+import { get, set } from '@/helpers/settings.ts'
 
 const themeStore = useTheming()
 

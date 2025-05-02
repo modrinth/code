@@ -1080,8 +1080,7 @@ impl VersionFieldValue {
         let field_name = field_type.to_str();
         let did_not_exist_error = |field_name: &str, desired_field: &str| {
             DatabaseError::SchemaError(format!(
-                "Field name {} for field {} in does not exist",
-                desired_field, field_name
+                "Field name {desired_field} for field {field_name} in does not exist"
             ))
         };
 
@@ -1103,8 +1102,7 @@ impl VersionFieldValue {
             .collect::<Vec<_>>();
         if field_id.len() > 1 {
             return Err(DatabaseError::SchemaError(format!(
-                "Multiple field ids for field {}",
-                field_name
+                "Multiple field ids for field {field_name}"
             )));
         }
 

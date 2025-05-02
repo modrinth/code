@@ -103,8 +103,7 @@ impl MinecraftGameVersion {
             }
             _ => {
                 return Err(DatabaseError::SchemaError(format!(
-                    "Game version requires field value to be an enum: {:?}",
-                    version_field
+                    "Game version requires field value to be an enum: {version_field:?}"
                 )));
             }
         };

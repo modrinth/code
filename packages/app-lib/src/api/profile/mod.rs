@@ -36,6 +36,13 @@ use tokio::{fs::File, process::Command, sync::RwLock};
 pub mod create;
 pub mod update;
 
+#[derive(Debug, Clone)]
+pub enum QuickPlayType {
+    None,
+    Singleplayer(String),
+    Server(String),
+}
+
 /// Remove a profile
 #[tracing::instrument]
 pub async fn remove(path: &str) -> crate::Result<()> {
@@ -463,8 +470,7 @@ pub async fn export_mrpack(
         state.io_semaphore.0.acquire().await?;
     let profile = get(profile_path).await?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
-            "Tried to export a nonexistent or unloaded profile at path {}!",
-            profile_path
+            "Tried to export a nonexistent or unloaded profile at path {profile_path}!"
         ))
     })?;
 
@@ -610,8 +616,7 @@ fn pack_get_relative_path(
         .strip_prefix(profile_path)
         .map_err(|_| {
             crate::ErrorKind::FSError(format!(
-                "Path {path:?} does not correspond to a profile",
-                path = path
+                "Path {path:?} does not correspond to a profile"
             ))
         })?
         .components()
@@ -623,14 +628,17 @@ fn pack_get_relative_path(
 /// Run Minecraft using a profile and the default credentials, logged in credentials,
 /// failing with an error if no credentials are available
 #[tracing::instrument]
-pub async fn run(path: &str) -> crate::Result<ProcessMetadata> {
+pub async fn run(
+    path: &str,
+    quick_play_type: &QuickPlayType,
+) -> crate::Result<ProcessMetadata> {
     let state = State::get().await?;
 
     let default_account = Credentials::get_default_credential(&state.pool)
         .await?
         .ok_or_else(|| crate::ErrorKind::NoCredentialsError.as_error())?;
 
-    run_credentials(path, &default_account).await
+    run_credentials(path, &default_account, quick_play_type).await
 }
 
 /// Run Minecraft using a profile, and credentials for authentication
@@ -640,13 +648,13 @@ pub async fn run(path: &str) -> crate::Result<ProcessMetadata> {
 pub async fn run_credentials(
     path: &str,
     credentials: &Credentials,
+    quick_play_type: &QuickPlayType,
 ) -> crate::Result<ProcessMetadata> {
     let state = State::get().await?;
     let settings = Settings::get(&state.pool).await?;
     let profile = get(path).await?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
-            "Tried to run a nonexistent or unloaded profile at path {}!",
-            path
+            "Tried to run a nonexistent or unloaded profile at path {path}!"
         ))
     })?;
 
@@ -719,6 +727,7 @@ pub async fn run_credentials(
         credentials,
         post_exit_hook,
         &profile,
+        quick_play_type,
     )
     .await
 }
@@ -741,8 +750,7 @@ pub async fn try_update_playtime(path: &str) -> crate::Result<()> {
 
     let profile = get(path).await?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
-            "Tried to update playtime for a nonexistent or unloaded profile at path {}!",
-            path
+            "Tried to update playtime for a nonexistent or unloaded profile at path {path}!"
         ))
     })?;
     let updated_recent_playtime = profile.recent_time_played;

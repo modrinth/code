@@ -1096,7 +1096,7 @@ pub async fn organization_icon_edit(
 
     let organization_id: OrganizationId = organization_item.id.into();
     let upload_result = crate::util::img::upload_image_optimized(
-        &format!("data/{}", organization_id),
+        &format!("data/{organization_id}"),
         bytes.freeze(),
         &ext.ext,
         Some(96),

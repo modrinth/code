@@ -393,7 +393,7 @@ pub async fn oauth_client_icon_edit(
     )
     .await?;
     let upload_result = upload_image_optimized(
-        &format!("data/{}", client_id),
+        &format!("data/{client_id}"),
         bytes.freeze(),
         &ext.ext,
         Some(96),

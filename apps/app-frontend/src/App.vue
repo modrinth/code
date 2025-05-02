@@ -16,6 +16,7 @@ import {
   RestoreIcon,
   RightArrowIcon,
   SettingsIcon,
+  WorldIcon,
   XIcon,
 } from '@modrinth/assets'
 import { Avatar, Button, ButtonStyled, Notifications, OverflowMenu } from '@modrinth/ui'
@@ -23,7 +24,7 @@ import { useLoading, useTheming } from '@/store/state'
 import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
-import { get } from '@/helpers/settings'
+import { get } from '@/helpers/settings.ts'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
@@ -166,11 +167,17 @@ async function setupApp() {
     `https://api.modrinth.com/appCriticalAnnouncement.json?version=${version}`,
     'criticalAnnouncements',
     true,
-  ).then((res) => {
-    if (res && res.header && res.body) {
-      criticalErrorMessage.value = res
-    }
-  })
+  )
+    .then((res) => {
+      if (res && res.header && res.body) {
+        criticalErrorMessage.value = res
+      }
+    })
+    .catch(() => {
+      console.log(
+        `No critical announcement found at https://api.modrinth.com/appCriticalAnnouncement.json?version=${version}`,
+      )
+    })
 
   useFetch(`https://modrinth.com/blog/news.json`, 'news', true).then((res) => {
     if (res && res.articles) {
@@ -359,7 +366,7 @@ function handleAuxClick(e) {
 <template>
   <SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
   <div id="teleports"></div>
-  <div v-if="stateInitialized" class="app-grid-layout relative">
+  <div v-if="stateInitialized" class="app-grid-layout experimental-styles-within relative">
     <Suspense>
       <AppSettingsModal ref="settingsModal" />
     </Suspense>
@@ -371,6 +378,9 @@ function handleAuxClick(e) {
     >
       <NavButton v-tooltip.right="'Home'" to="/">
         <HomeIcon />
+      </NavButton>
+      <NavButton v-if="themeStore.featureFlags.worlds_tab" v-tooltip.right="'Worlds'" to="/worlds">
+        <WorldIcon />
       </NavButton>
       <NavButton
         v-tooltip.right="'Discover content'"

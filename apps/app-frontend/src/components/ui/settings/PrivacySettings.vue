@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { get, set } from '@/helpers/settings'
+import { get, set } from '@/helpers/settings.ts'
 import { Toggle } from '@modrinth/ui'
 import { optInAnalytics, optOutAnalytics } from '@/helpers/analytics'
 

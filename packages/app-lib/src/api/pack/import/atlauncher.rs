@@ -162,7 +162,7 @@ pub async fn import_atlauncher(
         profile_path: profile_path.to_string(),
     };
 
-    let backup_name = format!("ATLauncher-{}", instance_folder);
+    let backup_name = format!("ATLauncher-{instance_folder}");
     let minecraft_folder = atlauncher_instance_path;
 
     import_atlauncher_unmanaged(
@@ -190,8 +190,7 @@ async fn import_atlauncher_unmanaged(
     let mod_loader: ModLoader = serde_json::from_str::<ModLoader>(&mod_loader)
         .map_err(|_| {
             crate::ErrorKind::InputError(format!(
-                "Could not parse mod loader type: {}",
-                mod_loader
+                "Could not parse mod loader type: {mod_loader}"
             ))
         })?;
 

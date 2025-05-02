@@ -605,6 +605,7 @@
                     shown: !isMember,
                   },
                   { id: 'copy-id', action: () => copyId() },
+                  { id: 'copy-permalink', action: () => copyPermalink() },
                 ]"
                 aria-label="More options"
                 :dropdown-id="`${baseId}-more-options`"
@@ -625,6 +626,10 @@
                 <template #copy-id>
                   <ClipboardCopyIcon aria-hidden="true" />
                   Copy ID
+                </template>
+                <template #copy-permalink>
+                  <ClipboardCopyIcon aria-hidden="true" />
+                  Copy permanent link
                 </template>
               </OverflowMenu>
             </ButtonStyled>
@@ -854,6 +859,7 @@ import { reportProject } from "~/utils/report-helpers.ts";
 
 const data = useNuxtApp();
 const route = useNativeRoute();
+const config = useRuntimeConfig();
 
 const auth = await useAuth();
 const user = await useUser();
@@ -1437,6 +1443,10 @@ async function updateMembers() {
 
 async function copyId() {
   await navigator.clipboard.writeText(project.value.id);
+}
+
+async function copyPermalink() {
+  await navigator.clipboard.writeText(`${config.public.siteUrl}/project/${project.value.id}`);
 }
 
 const collapsedChecklist = ref(false);

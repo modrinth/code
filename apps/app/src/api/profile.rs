@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use theseus::prelude::*;
+use theseus::profile::QuickPlayType;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("profile")
@@ -250,7 +251,7 @@ pub async fn profile_get_pack_export_candidates(
 // invoke('plugin:profile|profile_run', path)
 #[tauri::command]
 pub async fn profile_run(path: &str) -> Result<ProcessMetadata> {
-    let process = profile::run(path).await?;
+    let process = profile::run(path, &QuickPlayType::None).await?;
 
     Ok(process)
 }
@@ -264,7 +265,9 @@ pub async fn profile_run_credentials(
     path: &str,
     credentials: Credentials,
 ) -> Result<ProcessMetadata> {
-    let process = profile::run_credentials(path, &credentials).await?;
+    let process =
+        profile::run_credentials(path, &credentials, &QuickPlayType::None)
+            .await?;
 
     Ok(process)
 }
@@ -347,6 +350,9 @@ pub async fn profile_edit(path: &str, edit_profile: EditProfile) -> Result<()> {
             prof.name = name;
         }
         if let Some(game_version) = edit_profile.game_version.clone() {
+            if game_version != prof.game_version {
+                prof.protocol_version = None;
+            }
             prof.game_version = game_version;
         }
         if let Some(loader) = edit_profile.loader {

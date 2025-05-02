@@ -44,7 +44,7 @@
     ]
   },
   "productName": "Modrinth App",
-  "version": "0.9.3",
+  "version": "0.9.5",
   "mainBinaryName": "Modrinth App",
   "identifier": "ModrinthApp",
   "plugins": {
@@ -76,14 +76,14 @@
     ],
     "security": {
       "assetProtocol": {
-        "scope": ["$APPDATA/caches/icons/*", "$APPCONFIG/caches/icons/*", "$CONFIG/caches/icons/*"],
+        "scope": ["$APPDATA/caches/icons/*", "$APPCONFIG/caches/icons/*", "$CONFIG/caches/icons/*", "$APPDATA/profiles/*/saves/*/icon.png", "$APPCONFIG/profiles/*/saves/*/icon.png", "$CONFIG/profiles/*/saves/*/icon.png"],
         "enable": true
       },
       "capabilities": ["ads", "core", "plugins"],
       "csp": {
         "default-src": "'self' customprotocol: asset:",
         "connect-src": "ipc: http://ipc.localhost https://modrinth.com https://*.modrinth.com https://*.posthog.com https://*.sentry.io https://api.mclo.gs",
-        "font-src": ["https://cdn-raw.modrinth.com/fonts/inter/"],
+        "font-src": ["https://cdn-raw.modrinth.com/fonts/"],
         "img-src": "https: 'unsafe-inline' 'self' asset: http://asset.localhost blob: data:",
         "style-src": "'unsafe-inline' 'self'",
         "script-src": "https://*.posthog.com 'self'",

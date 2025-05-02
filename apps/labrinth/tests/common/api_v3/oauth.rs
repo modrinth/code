@@ -104,8 +104,7 @@ impl ApiV3 {
                     code: auth_code,
                     redirect_uri: original_redirect_uri,
                     client_id: serde_json::from_str(&format!(
-                        "\"{}\"",
-                        client_id
+                        "\"{client_id}\""
                     ))
                     .unwrap(),
                 })

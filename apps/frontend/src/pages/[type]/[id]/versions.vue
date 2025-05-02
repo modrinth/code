@@ -169,7 +169,7 @@
             </template>
             <template #copy-maven>
               <ClipboardCopyIcon aria-hidden="true" />
-              Copy Modrinth Maven
+              Copy Maven coordinates
             </template>
           </OverflowMenu>
         </ButtonStyled>

@@ -20,11 +20,56 @@
   "app.settings.tabs.resource-management": {
     "message": "Resource management"
   },
+  "instance.add-server.add-and-play": {
+    "message": "Add and play"
+  },
+  "instance.add-server.add-server": {
+    "message": "Add server"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Disabled"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Enabled"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Prompt"
+  },
+  "instance.add-server.title": {
+    "message": "Add a server"
+  },
+  "instance.edit-server.title": {
+    "message": "Edit server"
+  },
+  "instance.edit-world.name": {
+    "message": "Name"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft World"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Reset icon"
+  },
+  "instance.edit-world.title": {
+    "message": "Edit world"
+  },
   "instance.filter.disabled": {
     "message": "Disabled projects"
   },
   "instance.filter.updates-available": {
     "message": "Updates available"
+  },
+  "instance.server-modal.address": {
+    "message": "Address"
+  },
+  "instance.server-modal.name": {
+    "message": "Name"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft Server"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Resource pack"
   },
   "instance.settings.tabs.general": {
     "message": "General"
@@ -307,6 +352,42 @@
   },
   "instance.settings.title": {
     "message": "Settings"
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "A Minecraft Server"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "Can't connect to server"
+  },
+  "instance.worlds.copy_address": {
+    "message": "Copy address"
+  },
+  "instance.worlds.filter.available": {
+    "message": "Available"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "Instance is already open"
+  },
+  "instance.worlds.hardcore": {
+    "message": "Hardcore mode"
+  },
+  "instance.worlds.no_quick_play": {
+    "message": "You can only jump straight into worlds on Minecraft 1.20+"
+  },
+  "instance.worlds.play_anyway": {
+    "message": "Play anyway"
+  },
+  "instance.worlds.type.server": {
+    "message": "Server"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "Singleplayer"
+  },
+  "instance.worlds.view_instance": {
+    "message": "View instance"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "World is in use"
   },
   "search.filter.locked.instance": {
     "message": "Provided by the instance"

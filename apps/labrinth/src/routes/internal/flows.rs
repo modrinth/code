@@ -247,7 +247,7 @@ impl AuthProvider {
         state: String,
     ) -> Result<String, AuthenticationError> {
         let self_addr = dotenvy::var("SELF_ADDR")?;
-        let raw_redirect_uri = format!("{}/v2/auth/callback", self_addr);
+        let raw_redirect_uri = format!("{self_addr}/v2/auth/callback");
         let redirect_uri = urlencoding::encode(&raw_redirect_uri);
 
         Ok(match self {
@@ -255,30 +255,24 @@ impl AuthProvider {
                 let client_id = dotenvy::var("GITHUB_CLIENT_ID")?;
 
                 format!(
-                    "https://github.com/login/oauth/authorize?client_id={}&prompt=select_account&state={}&scope=read%3Auser%20user%3Aemail&redirect_uri={}",
-                    client_id,
-                    state,
-                    redirect_uri,
+                    "https://github.com/login/oauth/authorize?client_id={client_id}&prompt=select_account&state={state}&scope=read%3Auser%20user%3Aemail&redirect_uri={redirect_uri}",
                 )
             }
             AuthProvider::Discord => {
                 let client_id = dotenvy::var("DISCORD_CLIENT_ID")?;
 
-                format!("https://discord.com/api/oauth2/authorize?client_id={}&state={}&response_type=code&scope=identify%20email&redirect_uri={}", client_id, state, redirect_uri)
+                format!("https://discord.com/api/oauth2/authorize?client_id={client_id}&state={state}&response_type=code&scope=identify%20email&redirect_uri={redirect_uri}")
             }
             AuthProvider::Microsoft => {
                 let client_id = dotenvy::var("MICROSOFT_CLIENT_ID")?;
 
-                format!("https://login.live.com/oauth20_authorize.srf?client_id={}&response_type=code&scope=user.read&state={}&prompt=select_account&redirect_uri={}", client_id, state, redirect_uri)
+                format!("https://login.live.com/oauth20_authorize.srf?client_id={client_id}&response_type=code&scope=user.read&state={state}&prompt=select_account&redirect_uri={redirect_uri}")
             }
             AuthProvider::GitLab => {
                 let client_id = dotenvy::var("GITLAB_CLIENT_ID")?;
 
                 format!(
-                    "https://gitlab.com/oauth/authorize?client_id={}&state={}&scope=read_user+profile+email&response_type=code&redirect_uri={}",
-                    client_id,
-                    state,
-                    redirect_uri,
+                    "https://gitlab.com/oauth/authorize?client_id={client_id}&state={state}&scope=read_user+profile+email&response_type=code&redirect_uri={redirect_uri}",
                 )
             }
             AuthProvider::Google => {
@@ -342,8 +336,7 @@ impl AuthProvider {
                 let client_secret = dotenvy::var("GITHUB_CLIENT_SECRET")?;
 
                 let url = format!(
-                    "https://github.com/login/oauth/access_token?client_id={}&client_secret={}&code={}&redirect_uri={}",
-                    client_id, client_secret, code, redirect_uri
+                    "https://github.com/login/oauth/access_token?client_id={client_id}&client_secret={client_secret}&code={code}&redirect_uri={redirect_uri}"
                 );
 
                 let token: AccessToken = reqwest::Client::new()
@@ -482,9 +475,8 @@ impl AuthProvider {
                 form.insert("openid.mode".to_string(), "check_authentication");
 
                 for val in signed.split(',') {
-                    if let Some(arr_val) = query.get(&format!("openid.{}", val))
-                    {
-                        form.insert(format!("openid.{}", val), &**arr_val);
+                    if let Some(arr_val) = query.get(&format!("openid.{val}")) {
+                        form.insert(format!("openid.{val}"), &**arr_val);
                     }
                 }
 
@@ -621,8 +613,7 @@ impl AuthProvider {
                     email: discord_user.email,
                     avatar_url: discord_user.avatar.map(|x| {
                         format!(
-                            "https://cdn.discordapp.com/avatars/{}/{}.webp",
-                            id, x
+                            "https://cdn.discordapp.com/avatars/{id}/{x}.webp"
                         )
                     }),
                     bio: None,
@@ -741,9 +732,7 @@ impl AuthProvider {
 
                 let response: String = reqwest::get(
                     &format!(
-                        "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={}&steamids={}",
-                        api_key,
-                        token
+                        "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={api_key}&steamids={token}"
                     )
                 )
                     .await?
@@ -1367,7 +1356,7 @@ pub async fn create_account_with_password(
             if let Some(feedback) =
                 score.feedback().clone().and_then(|x| x.warning())
             {
-                format!("Password too weak: {}", feedback)
+                format!("Password too weak: {feedback}")
             } else {
                 "Specified password is too weak! Please improve its strength."
                     .to_string()
@@ -2030,7 +2019,7 @@ pub async fn change_password(
                 if let Some(feedback) =
                     score.feedback().clone().and_then(|x| x.warning())
                 {
-                    format!("Password too weak: {}", feedback)
+                    format!("Password too weak: {feedback}")
                 } else {
                     "Specified password is too weak! Please improve its strength.".to_string()
                 },
@@ -2085,8 +2074,8 @@ pub async fn change_password(
 
         send_email(
             email,
-            &format!("Password {}", changed),
-            &format!("Your password has been {} on your account.", changed),
+            &format!("Password {changed}"),
+            &format!("Your password has been {changed} on your account."),
             "If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).",
             None,
         )?;

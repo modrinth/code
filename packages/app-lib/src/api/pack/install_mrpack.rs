@@ -266,10 +266,7 @@ pub async fn install_zipped_mrpack_files(
                 emit_loading(
                     &loading_bar,
                     30.0 / total_len as f64,
-                    Some(&format!(
-                        "Extracting override {}/{}",
-                        index, total_len
-                    )),
+                    Some(&format!("Extracting override {index}/{total_len}")),
                 )?;
             }
         }

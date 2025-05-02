@@ -5,9 +5,9 @@ use crate::state;
 use crate::state::{
     CacheValue, CachedEntry, CachedFile, CachedFileHash, CachedFileUpdate,
     Credentials, DefaultPage, DependencyType, DeviceToken, DeviceTokenKey,
-    DeviceTokenPair, FileType, Hooks, LinkedData, MemorySettings,
-    ModrinthCredentials, Profile, ProfileInstallStage, TeamMember, Theme,
-    VersionFile, WindowSize,
+    DeviceTokenPair, FileType, Hooks, LauncherFeatureVersion, LinkedData,
+    MemorySettings, ModrinthCredentials, Profile, ProfileInstallStage,
+    TeamMember, Theme, VersionFile, WindowSize,
 };
 use crate::util::fetch::{read_json, IoSemaphore};
 use chrono::{DateTime, Utc};
@@ -317,9 +317,11 @@ where
                             ProfileInstallStage::NotInstalled
                         }
                     },
+                    launcher_feature_version: LauncherFeatureVersion::None,
                     name: profile.metadata.name,
                     icon_path: profile.metadata.icon,
                     game_version: profile.metadata.game_version,
+                    protocol_version: None,
                     loader: profile.metadata.loader.into(),
                     loader_version: profile
                         .metadata

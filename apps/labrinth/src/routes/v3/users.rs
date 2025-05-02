@@ -595,7 +595,7 @@ pub async fn user_icon_edit(
 
         let user_id: UserId = actual_user.id.into();
         let upload_result = crate::util::img::upload_image_optimized(
-            &format!("data/{}", user_id),
+            &format!("data/{user_id}"),
             bytes.freeze(),
             &ext.ext,
             Some(96),

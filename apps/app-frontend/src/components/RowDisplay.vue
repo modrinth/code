@@ -10,7 +10,6 @@ import {
   StopCircleIcon,
   ExternalIcon,
   EyeIcon,
-  ChevronRightIcon,
 } from '@modrinth/assets'
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import Instance from '@/components/ui/Instance.vue'
@@ -26,6 +25,7 @@ import { trackEvent } from '@/helpers/analytics'
 import { handleSevereError } from '@/store/error.js'
 import { install as installVersion } from '@/store/install.js'
 import { openUrl } from '@tauri-apps/plugin-opener'
+import { HeadingLink } from '@modrinth/ui'
 
 const router = useRouter()
 
@@ -44,7 +44,9 @@ const props = defineProps({
 })
 
 const actualInstances = computed(() =>
-  props.instances.filter((x) => x && x.instances && x.instances[0]),
+  props.instances.filter(
+    (x) => (x && x.instances && x.instances[0] && x.show === undefined) || x.show,
+  ),
 )
 
 const modsRow = ref(null)
@@ -181,6 +183,10 @@ const maxInstancesPerRow = ref(1)
 const maxProjectsPerRow = ref(1)
 
 const calculateCardsPerRow = () => {
+  if (rows.value.length === 0) {
+    return
+  }
+
   // Calculate how many cards fit in one row
   const containerWidth = rows.value[0].clientWidth
   // Convert container width from pixels to rem
@@ -204,16 +210,21 @@ const calculateCardsPerRow = () => {
 
 const rowContainer = ref(null)
 const resizeObserver = ref(null)
+
 onMounted(() => {
   calculateCardsPerRow()
   resizeObserver.value = new ResizeObserver(calculateCardsPerRow)
-  resizeObserver.value.observe(rowContainer.value)
+  if (rowContainer.value) {
+    resizeObserver.value.observe(rowContainer.value)
+  }
   window.addEventListener('resize', calculateCardsPerRow)
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', calculateCardsPerRow)
-  resizeObserver.value.unobserve(rowContainer.value)
+  if (rowContainer.value) {
+    resizeObserver.value.unobserve(rowContainer.value)
+  }
 })
 </script>
 
@@ -227,17 +238,10 @@ onUnmounted(() => {
     @proceed="deleteProfile"
   />
   <div ref="rowContainer" class="flex flex-col gap-4">
-    <div v-for="(row, rowIndex) in actualInstances" ref="rows" :key="row.label" class="row">
-      <router-link
-        class="flex mb-3 leading-none items-center gap-1 text-primary text-lg font-bold hover:underline group"
-        :class="{ 'mt-1': rowIndex > 0 }"
-        :to="row.route"
-      >
+    <div v-for="row in actualInstances" ref="rows" :key="row.label" class="row">
+      <HeadingLink class="mt-1" :to="row.route">
         {{ row.label }}
-        <ChevronRightIcon
-          class="h-5 w-5 stroke-[3px] group-hover:translate-x-1 transition-transform group-hover:text-brand"
-        />
-      </router-link>
+      </HeadingLink>
       <section
         v-if="row.instance"
         ref="modsRow"

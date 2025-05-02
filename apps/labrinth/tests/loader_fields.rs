@@ -487,7 +487,7 @@ async fn test_multi_get_redis_cache() {
             // Create 5 modpacks
             let mut modpacks = Vec::new();
             for i in 0..5 {
-                let slug = format!("test-modpack-{}", i);
+                let slug = format!("test-modpack-{i}");
 
                 let creation_data = get_public_project_creation_data(
                     &slug,
@@ -503,7 +503,7 @@ async fn test_multi_get_redis_cache() {
             // Create 5 mods
             let mut mods = Vec::new();
             for i in 0..5 {
-                let slug = format!("test-mod-{}", i);
+                let slug = format!("test-mod-{i}");
 
                 let creation_data = get_public_project_creation_data(
                     &slug,

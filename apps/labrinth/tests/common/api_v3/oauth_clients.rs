@@ -47,7 +47,7 @@ impl ApiV3 {
         pat: Option<&str>,
     ) -> Vec<OAuthClient> {
         let req = TestRequest::get()
-            .uri(&format!("/v3/user/{}/oauth_apps", user_id))
+            .uri(&format!("/v3/user/{user_id}/oauth_apps"))
             .append_pat(pat)
             .to_request();
         let resp = self.call(req).await;
@@ -62,7 +62,7 @@ impl ApiV3 {
         pat: Option<&str>,
     ) -> ServiceResponse {
         let req = TestRequest::get()
-            .uri(&format!("/_internal/oauth/app/{}", client_id))
+            .uri(&format!("/_internal/oauth/app/{client_id}"))
             .append_pat(pat)
             .to_request();
 
@@ -93,7 +93,7 @@ impl ApiV3 {
         pat: Option<&str>,
     ) -> ServiceResponse {
         let req = TestRequest::delete()
-            .uri(&format!("/_internal/oauth/app/{}", client_id))
+            .uri(&format!("/_internal/oauth/app/{client_id}"))
             .append_pat(pat)
             .to_request();
 

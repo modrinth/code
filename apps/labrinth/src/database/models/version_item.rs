@@ -912,7 +912,7 @@ impl Version {
                         file.hashes.iter().map(|(algo, hash)| {
                             (
                                 VERSION_FILES_NAMESPACE,
-                                Some(format!("{}_{}", algo, hash)),
+                                Some(format!("{algo}_{hash}")),
                             )
                         })
                     },

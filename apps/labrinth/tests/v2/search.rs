@@ -328,7 +328,7 @@ async fn search_projects() {
                         .collect();
                     expected_project_ids.sort();
                     found_project_ids.sort();
-                    println!("Facets: {:?}", facets);
+                    println!("Facets: {facets:?}");
                     assert_eq!(found_project_ids, expected_project_ids);
                 }
             })

@@ -123,6 +123,7 @@
                   },
                   { divider: true, shown: auth.user && currentMember },
                   { id: 'copy-id', action: () => copyId() },
+                  { id: 'copy-permalink', action: () => copyPermalink() },
                 ]"
                 aria-label="More options"
               >
@@ -134,6 +135,10 @@
                 <template #copy-id>
                   <ClipboardCopyIcon aria-hidden="true" />
                   {{ formatMessage(commonMessages.copyIdButton) }}
+                </template>
+                <template #copy-permalink>
+                  <ClipboardCopyIcon aria-hidden="true" />
+                  {{ formatMessage(commonMessages.copyPermalinkButton) }}
                 </template>
               </OverflowMenu>
             </ButtonStyled>
@@ -287,6 +292,7 @@ const cosmetics = useCosmetics();
 const route = useNativeRoute();
 const tags = useTags();
 const flags = useFeatureFlags();
+const config = useRuntimeConfig();
 
 let orgId = useRouteId();
 
@@ -501,6 +507,12 @@ const navLinks = computed(() => [
 
 async function copyId() {
   await navigator.clipboard.writeText(organization.value.id);
+}
+
+async function copyPermalink() {
+  await navigator.clipboard.writeText(
+    `${config.public.siteUrl}/organization/${organization.value.id}`,
+  );
 }
 </script>
 

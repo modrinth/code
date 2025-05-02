@@ -1,8 +1,10 @@
 <template>
-  <div :style="colorClasses" class="radial-header relative pb-1" v-bind="$attrs">
-    <slot />
+  <div>
+    <div :style="colorClasses" class="radial-header relative" v-bind="$attrs">
+      <slot />
+    </div>
+    <div class="radial-header-divider" />
   </div>
-  <div class="radial-header-divider" />
 </template>
 <script setup lang="ts">
 import { computed } from 'vue'
