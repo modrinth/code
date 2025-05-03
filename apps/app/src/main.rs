@@ -14,14 +14,6 @@ mod error;
 #[cfg(target_os = "macos")]
 mod macos;
 
-#[cfg(target_os = "macos")]
-#[macro_use]
-extern crate cocoa;
-
-#[cfg(target_os = "macos")]
-#[macro_use]
-extern crate objc;
-
 // Should be called in launcher initialization
 #[tracing::instrument(skip_all)]
 #[tauri::command]
@@ -240,11 +232,8 @@ fn main() {
                 dbg!(url);
             });
 
-            #[cfg(not(target_os = "linux"))]
-            {
-                if let Some(window) = app.get_window("main") {
-                    window.set_shadow(true).unwrap();
-                }
+            if let Some(window) = app.get_window("main") {
+                window.set_shadow(true).ok();
             }
 
             Ok(())
@@ -275,11 +264,6 @@ fn main() {
             show_window,
             restart_app,
         ]);
-
-    #[cfg(target_os = "macos")]
-    {
-        builder = builder.plugin(macos::window_ext::init());
-    }
 
     tracing::info!("Initializing app...");
     let app = builder.build(tauri::generate_context!());
