@@ -71,6 +71,8 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import { get_available_capes, get_available_skins } from './helpers/skins'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
+import { list } from '@/helpers/profile.js'
+import { $fetch } from 'ofetch'
 
 const themeStore = useTheming()
 
@@ -219,6 +221,8 @@ async function setupApp() {
   } catch (error) {
     console.warn('Failed to generate skin previews in app setup.', error)
   }
+
+  await processPendingSurveys()
 }
 
 const stateFailed = ref(false)
@@ -391,6 +395,91 @@ function handleAuxClick(e) {
       cancelable: true,
     })
     e.target.dispatchEvent(event)
+  }
+}
+
+function cleanupOldSurveyDisplayData() {
+  const threeWeeksAgo = new Date()
+  threeWeeksAgo.setDate(threeWeeksAgo.getDate() - 21)
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+
+    if (key.startsWith('survey-') && key.endsWith('-display')) {
+      const dateValue = new Date(localStorage.getItem(key))
+      if (dateValue < threeWeeksAgo) {
+        localStorage.removeItem(key)
+      }
+    }
+  }
+}
+
+async function processPendingSurveys() {
+  function isWithinLastTwoWeeks(date) {
+    const twoWeeksAgo = new Date()
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14)
+    return date >= twoWeeksAgo
+  }
+
+  cleanupOldSurveyDisplayData()
+
+  const creds = await getCreds().catch(handleError)
+  const userId = creds?.user_id
+
+  const instances = await list().catch(handleError)
+  const isActivePlayer =
+    instances.findIndex(
+      (instance) =>
+        isWithinLastTwoWeeks(instance.last_played) && !isWithinLastTwoWeeks(instance.created),
+    ) >= 0
+
+  let surveys = []
+  try {
+    surveys = await $fetch('https://api.modrinth.com/v2/surveys')
+  } catch (e) {
+    console.error('Error fetching surveys:', e)
+  }
+
+  const surveyToShow = surveys.find(
+    (survey) =>
+      localStorage.getItem(`survey-${survey.id}-display`) === null &&
+      survey.type === 'tally_app' &&
+      ((survey.condition === 'active_player' && isActivePlayer) ||
+        (survey.assigned_users.includes(userId) && !survey.dismissed_users.includes(userId))),
+  )
+
+  if (surveyToShow) {
+    const formId = surveyToShow.tally_id
+
+    const popupOptions = {
+      layout: 'modal',
+      width: 700,
+      autoClose: 2000,
+      hideTitle: true,
+      hiddenFields: {
+        user_id: userId,
+      },
+      onOpen: () => console.info('Opened user survey'),
+      onClose: () => console.info('Closed user survey'),
+      onSubmit: () => console.info('Active user survey submitted'),
+    }
+
+    try {
+      if (window.Tally?.openPopup) {
+        console.info(`Opening Tally popup for user survey (form ID: ${formId})`)
+        localStorage.setItem(`survey-${surveyToShow.id}-display`, new Date())
+        window.Tally.openPopup(formId, popupOptions)
+      } else {
+        console.warn('Tally script not yet loaded')
+      }
+    } catch (e) {
+      console.error('Error opening Tally popup:', e)
+    }
+
+    console.info(`Found user survey to show with tally_id: ${formId}`)
+    window.Tally.openPopup(formId, popupOptions)
+  } else {
+    console.info('No user survey to show')
   }
 }
 </script>
