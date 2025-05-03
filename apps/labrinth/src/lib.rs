@@ -316,7 +316,7 @@ pub fn app_config(
     .configure(
         #[allow(unused_variables)]
         |cfg| {
-            #[cfg(not(target_env = "msvc"))]
+            #[cfg(target_os = "linux")]
             routes::debug::config(cfg)
         },
     )
