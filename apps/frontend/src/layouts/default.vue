@@ -32,39 +32,38 @@
       variant="warning"
     >
       <template #title>
-      <span>
-        {{ auth?.user?.email
-        ? formatMessage(verifyEmailBannerMessages.title)
-        : formatMessage(addEmailBannerMessages.title) }}
-      </span>
+        <span>
+          {{
+            auth?.user?.email
+              ? formatMessage(verifyEmailBannerMessages.title)
+              : formatMessage(addEmailBannerMessages.title)
+          }}
+        </span>
       </template>
       <template #description>
         <span>
-          {{ auth?.user?.email
-          ? formatMessage(verifyEmailBannerMessages.description)
-          : formatMessage(addEmailBannerMessages.description) }}
+          {{
+            auth?.user?.email
+              ? formatMessage(verifyEmailBannerMessages.description)
+              : formatMessage(addEmailBannerMessages.description)
+          }}
         </span>
       </template>
       <template #actions>
-        <button
-          v-if="auth?.user?.email"
-          class="btn"
-          @click="resendVerifyEmail"
-        >
+        <button v-if="auth?.user?.email" class="btn" @click="resendVerifyEmail">
           {{ formatMessage(verifyEmailBannerMessages.action) }}
         </button>
-        <nuxt-link
-          v-else
-          class="btn"
-          to="/settings/account"
-        >
+        <nuxt-link v-else class="btn" to="/settings/account">
           <SettingsIcon aria-hidden="true" />
           {{ formatMessage(addEmailBannerMessages.action) }}
         </nuxt-link>
       </template>
     </PagewideBanner>
     <PagewideBanner
-      v-if="user.subscriptions.some(x => x.status === 'payment-failed') && route.path !== '/settings/billing'"
+      v-if="
+        user.subscriptions.some((x) => x.status === 'payment-failed') &&
+        route.path !== '/settings/billing'
+      "
       variant="error"
     >
       <template #title>
@@ -81,7 +80,10 @@
       </template>
     </PagewideBanner>
     <PagewideBanner
-      v-if="config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com') && !cosmetics.hideStagingBanner"
+      v-if="
+        config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com') &&
+        !cosmetics.hideStagingBanner
+      "
       variant="warning"
     >
       <template #title>
@@ -91,23 +93,22 @@
         {{ formatMessage(stagingBannerMessages.description) }}
       </template>
       <template #actions_right>
-        <Button transparent icon-only @click="hideStagingBanner" aria-label="Close">
+        <Button transparent icon-only aria-label="Close" @click="hideStagingBanner">
           <XIcon aria-hidden="true" />
         </Button>
       </template>
     </PagewideBanner>
-    <PagewideBanner
-      v-if="generatedStateErrors?.length"
-      variant="error"
-    >
+    <PagewideBanner v-if="generatedStateErrors?.length" variant="error">
       <template #title>
         <span>{{ formatMessage(failedToBuildBannerMessages.title) }}</span>
       </template>
       <template #description>
-        {{ formatMessage(
-        failedToBuildBannerMessages.description,
-        { errors: generatedStateErrors, url: config.public.apiBaseUrl }
-      ) }}
+        {{
+          formatMessage(failedToBuildBannerMessages.description, {
+            errors: generatedStateErrors,
+            url: config.public.apiBaseUrl,
+          })
+        }}
       </template>
     </PagewideBanner>
     <header
@@ -705,7 +706,14 @@ import {
   GitHubIcon,
   ScaleIcon,
 } from "@modrinth/assets";
-import { Button, ButtonStyled, OverflowMenu, PagewideBanner, Avatar, commonMessages } from "@modrinth/ui";
+import {
+  Button,
+  ButtonStyled,
+  OverflowMenu,
+  PagewideBanner,
+  Avatar,
+  commonMessages,
+} from "@modrinth/ui";
 import { isAdmin, isStaff } from "@modrinth/utils";
 import { errors as generatedStateErrors } from "~/generated/state.json";
 
@@ -738,7 +746,8 @@ const verifyEmailBannerMessages = defineMessages({
   },
   description: {
     id: "layout.banner.verify-email.description",
-    defaultMessage: "For security reasons, Modrinth needs you to verify the email address associated with your account."
+    defaultMessage:
+      "For security reasons, Modrinth needs you to verify the email address associated with your account.",
   },
   action: {
     id: "layout.banner.verify-email.action",
@@ -753,7 +762,8 @@ const addEmailBannerMessages = defineMessages({
   },
   description: {
     id: "layout.banner.add-email.description",
-    defaultMessage: "For security reasons, Modrinth needs you to register an email address to your account."
+    defaultMessage:
+      "For security reasons, Modrinth needs you to register an email address to your account.",
   },
   action: {
     id: "layout.banner.add-email.button",
@@ -764,12 +774,12 @@ const addEmailBannerMessages = defineMessages({
 const subscriptionPaymentFailedBannerMessages = defineMessages({
   title: {
     id: "layout.banner.subscription-payment-failed.title",
-    defaultMessage:
-      "Billing action required.",
+    defaultMessage: "Billing action required.",
   },
   description: {
     id: "layout.banner.subscription-payment-failed.description",
-    defaultMessage: "One or more subscriptions failed to renew. Please update your payment method to prevent losing access!",
+    defaultMessage:
+      "One or more subscriptions failed to renew. Please update your payment method to prevent losing access!",
   },
   action: {
     id: "layout.banner.subscription-payment-failed.button",

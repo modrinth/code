@@ -1,8 +1,8 @@
 <template>
   <div :class="['site-banner', `site-banner--${variant}`, '[&>*]:z-[6]']">
     <div class="site-banner__title">
-      <IssuesIcon aria-hidden="true" v-if="variant == 'warning' || variant == 'error'" />
-      <InfoIcon aria-hidden="true" v-if="variant == 'info'" />
+      <IssuesIcon v-if="variant == 'warning' || variant == 'error'" aria-hidden="true" />
+      <InfoIcon v-if="variant == 'info'" aria-hidden="true" />
       <slot name="title" />
     </div>
     <div class="site-banner__description">
