@@ -1,4 +1,4 @@
-import { createFormatter, type Formatter } from "@vintl/how-ago";
+import {createFormatter, type FormatOptions, type Formatter} from "@vintl/how-ago";
 import type { IntlController } from "@vintl/vintl/controller";
 
 const formatters = new WeakMap<IntlController<any>, Formatter>();
@@ -10,7 +10,9 @@ export function useRelativeTime(): Formatter {
 
   if (formatter == null) {
     const formatterRef = computed(() => createFormatter(vintl.intl));
-    formatter = (value, options) => formatterRef.value(value, options);
+    const defaultOptions: FormatOptions = { roundingMode: "halfExpand" as const };
+
+    formatter = (value, options) => formatterRef.value(value, {...options, ...defaultOptions});
     formatters.set(vintl, formatter);
   }
 
