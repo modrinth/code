@@ -16,9 +16,9 @@
     "eslint": "^8.57.0",
     "eslint-config-custom": "workspace:*",
     "tsconfig": "workspace:*",
+    "typescript": "^5.4.5",
     "vue": "^3.5.13",
-    "vue-router": "4.3.0",
-    "typescript": "^5.4.5"
+    "vue-router": "4.3.0"
   },
   "dependencies": {
     "@codemirror/commands": "^6.3.2",
@@ -29,6 +29,7 @@
     "@modrinth/assets": "workspace:*",
     "@modrinth/utils": "workspace:*",
     "@types/markdown-it": "^14.1.1",
+    "@vintl/how-ago": "^3.0.1",
     "apexcharts": "^3.44.0",
     "dayjs": "^1.11.10",
     "floating-vue": "^5.2.2",

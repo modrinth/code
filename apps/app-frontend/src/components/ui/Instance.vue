@@ -9,7 +9,7 @@ import {
   StopCircleIcon,
   TimerIcon,
 } from '@modrinth/assets'
-import { Avatar, ButtonStyled } from '@modrinth/ui'
+import { Avatar, ButtonStyled, useRelativeTime } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { finish_install, kill, run } from '@/helpers/profile'
 import { get_by_profile_path } from '@/helpers/process'
@@ -19,10 +19,9 @@ import { showProfileInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
 import { trackEvent } from '@/helpers/analytics'
 import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import { formatCategory } from '@modrinth/utils'
 
-dayjs.extend(relativeTime)
+const formatRelativeTime = useRelativeTime()
 
 const props = defineProps({
   instance: {
@@ -173,7 +172,9 @@ onUnmounted(() => unlisten())
       </div>
       <div class="flex items-center col-span-3 gap-1 text-secondary font-semibold">
         <TimerIcon />
-        <span class="text-sm"> Played {{ dayjs(instance.last_played).fromNow() }} </span>
+        <span class="text-sm">
+          Played {{ formatRelativeTime(dayjs(instance.last_played).toISOString()) }}
+        </span>
       </div>
     </div>
   </template>

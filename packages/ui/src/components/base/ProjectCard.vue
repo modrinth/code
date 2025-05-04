@@ -80,6 +80,8 @@ import EnvironmentIndicator from './EnvironmentIndicator.vue'
 </script>
 
 <script>
+import { useRelativeTime } from '../../composables'
+
 dayjs.extend(relativeTime)
 export default defineComponent({
   props: {
@@ -191,6 +193,10 @@ export default defineComponent({
       default: null,
     },
   },
+  setup(_) {
+    const formatRelativeTime = useRelativeTime()
+    return { formatRelativeTime }
+  },
   computed: {
     toColor() {
       let color = this.color
@@ -205,13 +211,13 @@ export default defineComponent({
       return dayjs(this.createdAt).format('MMMM D, YYYY [at] h:mm:ss A')
     },
     sinceCreation() {
-      return dayjs(this.createdAt).fromNow()
+      return this.formatRelativeTime(this.createdAt)
     },
     updatedDate() {
       return dayjs(this.updatedAt).format('MMMM D, YYYY [at] h:mm:ss A')
     },
     sinceUpdated() {
-      return dayjs(this.updatedAt).fromNow()
+      return this.formatRelativeTime(this.updatedAt)
     },
   },
   methods: {
