@@ -22,7 +22,7 @@ pub enum ErrorKind {
     Fetch { inner: reqwest::Error, item: String },
     #[error("Error while uploading file to S3: {file}")]
     S3 {
-        inner: s3::error::S3Error,
+        inner: Box<s3::error::S3Error>,
         file: String,
     },
     #[error("Error acquiring semaphore: {0}")]
