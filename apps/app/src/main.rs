@@ -232,6 +232,7 @@ fn main() {
                 dbg!(url);
             });
 
+            #[cfg(not(target_os = "linux"))]
             if let Some(window) = app.get_window("main") {
                 window.set_shadow(true).ok();
             }
