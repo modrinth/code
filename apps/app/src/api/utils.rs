@@ -53,25 +53,24 @@ pub async fn progress_bars_list()
     Ok(res)
 }
 
-// cfg only on mac os
 // disables mouseover and fixes a random crash error only fixed by recent versions of macos
-#[cfg(target_os = "macos")]
 #[tauri::command]
 pub async fn should_disable_mouseover() -> bool {
-    // We try to match version to 12.2 or higher. If unrecognizable to pattern or lower, we default to the css with disabled mouseover for safety
-    let os = os_info::get();
-    if let os_info::Version::Semantic(major, minor, _) = os.version() {
-        if *major >= 12 && *minor >= 3 {
-            // Mac os version is 12.3 or higher, we allow mouseover
-            return false;
+    if cfg!(target_os = "macos") {
+        // We try to match version to 12.2 or higher. If unrecognizable to pattern or lower, we default to the css with disabled mouseover for safety
+        if let tauri_plugin_os::Version::Semantic(major, minor, _) =
+            tauri_plugin_os::version()
+        {
+            if major >= 12 && minor >= 3 {
+                // Mac os version is 12.3 or higher, we allow mouseover
+                return false;
+            }
         }
+        true
+    } else {
+        // Not macos, we allow mouseover
+        false
     }
-    true
-}
-#[cfg(not(target_os = "macos"))]
-#[tauri::command]
-pub async fn should_disable_mouseover() -> bool {
-    false
 }
 
 #[tauri::command]
