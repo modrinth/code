@@ -419,6 +419,7 @@ async function processPendingSurveys() {
   const surveyToShow = surveys.find(
     (survey) =>
       localStorage.getItem(`survey-${survey.id}-display`) === null &&
+      survey.type === 'tally_app' &&
       ((survey.condition === 'active_player' && isActivePlayer) ||
         (survey.assigned_users.includes(userId) && !survey.dismissed_users.includes(userId))),
   )
@@ -451,8 +452,8 @@ async function processPendingSurveys() {
       console.error('Error opening Tally popup:', e)
     }
 
-    console.info(`Found user survey to show with tally_id: ${tallyId}`)
-    window.Tally.openPopup(tallyId, popupOptions)
+    console.info(`Found user survey to show with tally_id: ${formId}`)
+    window.Tally.openPopup(formId, popupOptions)
   } else {
     console.info('No user survey to show')
   }
