@@ -14,7 +14,6 @@
       <p class="welcome-box__subtitle">
         <IntlFormatted
           :message-id="messages.welcomeDescription"
-          :values="{ userCount: formatNumber(stats.authors, false) }"
         >
           <template #bold="{ children }">
             <strong>
@@ -57,12 +56,10 @@
 <script setup>
 import { Checkbox, commonMessages } from "@modrinth/ui";
 import { RightArrowIcon } from "@modrinth/assets";
-import { formatNumber } from "~/plugins/shorthands.js";
 
 const route = useRoute();
 
 const { formatMessage } = useVIntl();
-const { data: stats } = await useAsyncData("statistics", () => useBaseFetch("statistics"));
 
 const messages = defineMessages({
   subscribeCheckbox: {
@@ -77,7 +74,7 @@ const messages = defineMessages({
   welcomeDescription: {
     id: "auth.welcome.description",
     defaultMessage:
-      "You’re now part of the <bold>{userCount}</bold> member community of creators & explorers already building, downloading, and staying up-to-date with the most awesome mods. Welcome!",
+      "You’re now part of the amazing community of creators & explorers already building, downloading, and staying up-to-date with the most awesome mods. Welcome!",
   },
   welcomeLongTitle: {
     id: "auth.welcome.long-title",
