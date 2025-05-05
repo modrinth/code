@@ -1,60 +1,57 @@
 <template>
-    <div class="welcome-box has-bot">
-      <img
-        src="https://cdn-raw.modrinth.com/sad-bot.webp"
-        alt="Waving Modrinth Bot"
-        class="welcome-box__waving-bot"
-      />
-      <div class="welcome-box__top-glow" />
-      <div class="welcome-box__body">
-        <h1 class="welcome-box__title">
-          {{ formatMessage(messages.welcomeLongTitle) }}
-        </h1>
+  <div class="welcome-box has-bot">
+    <img
+      src="https://cdn-raw.modrinth.com/sad-bot.webp"
+      alt="Waving Modrinth Bot"
+      class="welcome-box__waving-bot"
+    />
+    <div class="welcome-box__top-glow" />
+    <div class="welcome-box__body">
+      <h1 class="welcome-box__title">
+        {{ formatMessage(messages.welcomeLongTitle) }}
+      </h1>
 
-        <p class="welcome-box__subtitle">
-          <IntlFormatted
-            :message-id="messages.welcomeDescription"
-            :values="{ userCount: formatNumber(stats.authors, false) }"
-          >
-            <template #bold="{ children }">
-              <strong>
-                <component :is="() => normalizeChildren(children)" />
-              </strong>
-            </template>
-          </IntlFormatted>
-        </p>
-
-        <Checkbox
-          v-model="subscribe"
-          class="subscribe-btn"
-          :label="formatMessage(messages.subscribeCheckbox)"
-          :description="formatMessage(messages.subscribeCheckbox)"
-        />
-
-        <button
-          class="btn btn-primary continue-btn centered-btn"
-          @click="continueSignUp"
+      <p class="welcome-box__subtitle">
+        <IntlFormatted
+          :message-id="messages.welcomeDescription"
+          :values="{ userCount: formatNumber(stats.authors, false) }"
         >
-          {{ formatMessage(commonMessages.continueButton) }}
-          <RightArrowIcon />
-        </button>
+          <template #bold="{ children }">
+            <strong>
+              <component :is="() => normalizeChildren(children)" />
+            </strong>
+          </template>
+        </IntlFormatted>
+      </p>
 
-        <p class="tos-text">
-          <IntlFormatted :message-id="messages.tosLabel">
-            <template #terms-link="{ children }">
-              <NuxtLink to="/legal/terms" class="text-link">
-                <component :is="() => children" />
-              </NuxtLink>
-            </template>
-            <template #privacy-policy-link="{ children }">
-              <NuxtLink to="/legal/privacy" class="text-link">
-                <component :is="() => children" />
-              </NuxtLink>
-            </template>
-          </IntlFormatted>
-        </p>
-      </div>
+      <Checkbox
+        v-model="subscribe"
+        class="subscribe-btn"
+        :label="formatMessage(messages.subscribeCheckbox)"
+        :description="formatMessage(messages.subscribeCheckbox)"
+      />
+
+      <button class="btn btn-primary centered-btn" @click="continueSignUp">
+        {{ formatMessage(commonMessages.continueButton) }}
+        <RightArrowIcon />
+      </button>
+
+      <p class="tos-text">
+        <IntlFormatted :message-id="messages.tosLabel">
+          <template #terms-link="{ children }">
+            <NuxtLink to="/legal/terms" class="text-link">
+              <component :is="() => children" />
+            </NuxtLink>
+          </template>
+          <template #privacy-policy-link="{ children }">
+            <NuxtLink to="/legal/privacy" class="text-link">
+              <component :is="() => children" />
+            </NuxtLink>
+          </template>
+        </IntlFormatted>
+      </p>
     </div>
+  </div>
 </template>
 
 <script setup>
@@ -101,7 +98,7 @@ const subscribe = ref(true);
 onMounted(async () => {
   await useAuth(route.query.authToken);
   await useUser();
-})
+});
 
 async function continueSignUp() {
   if (subscribe.value) {
@@ -121,91 +118,77 @@ async function continueSignUp() {
 </script>
 
 <style lang="scss" scoped>
-.main {
-  margin: var(--spacing-card-lg) auto;
-  width: calc(100% - 4rem);
-  min-height: min(90vh, 30rem);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  @media screen and (min-width: 800px) {
-    width: 600px;
-  }
-}
-
 .welcome-box {
   background-color: var(--color-raised-bg);
-  border-radius: 1.25rem;
+  border-radius: var(--size-rounded-lg);
   padding: 1.75rem 2rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
   box-shadow: var(--shadow-card);
   position: relative;
-}
 
-.welcome-box.has-bot {
-  margin-block: 120px;
-}
+  &.has-bot {
+    margin-block: 120px;
+  }
 
-.welcome-box p {
-  margin: 0;
-}
+  p {
+    margin: 0;
+  }
+  a {
+    color: var(--color-brand);
+    font-weight: var(--weight-bold);
+    &:hover,
+    &:focus {
+      filter: brightness(1.125);
+      text-decoration: underline;
+    }
+  }
 
-.welcome-box a {
-  color: var(--color-brand);
-  font-weight: 600;
-}
+  &__waving-bot {
+    --bot-height: 112px;
+    position: absolute;
+    top: calc(-1 * var(--bot-height));
+    right: 5rem;
+    height: var(--bot-height);
+    width: auto;
+  }
 
-.welcome-box a:hover,
-.welcome-box a:focus {
-  filter: brightness(1.125);
-  text-decoration: underline;
-}
-
-.welcome-box__waving-bot {
-  --_bot-height: 112px;
-  position: absolute;
-  top: calc(-1 * var(--_bot-height));
-  right: 5rem;
-  width: auto;
-  height: var(--_bot-height);
-}
-
-.welcome-box__top-glow {
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(
+  &__top-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    opacity: 0.4;
+    background: linear-gradient(
       to right,
       transparent 2rem,
       var(--color-green) calc(100% - 13rem),
       var(--color-green) calc(100% - 5rem),
       transparent calc(100% - 2rem)
-  );
-  position: absolute;
-  top: 0;
-  left: 0;
-  opacity: 0.4;
-}
+    );
+  }
 
-.welcome-box__title {
-  font-size: 2rem;
-  font-weight: 900;
-  margin: 0;
-}
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
 
-.welcome-box__subtitle {
-  font-size: 1.1rem;
-}
+  &__title {
+    font-size: var(--text-32);
+    font-weight: var(--weight-extrabold);
+    margin: 0;
+  }
 
-.welcome-box__body {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
+  &__subtitle {
+    font-size: var(--text-18);
+  }
 
-.tos-text {
-  font-size: 0.875rem;
-  line-height: 1.5;
+  .tos-text {
+    font-size: var(--text-14);
+    line-height: 1.5;
+  }
 }
 </style>
