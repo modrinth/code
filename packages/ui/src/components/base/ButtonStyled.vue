@@ -210,7 +210,7 @@ const fontSize = computed(() => {
     return 'text-sm'
   }
   return 'text-base'
-});
+})
 </script>
 
 <template>
