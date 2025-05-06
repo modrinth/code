@@ -62,6 +62,29 @@ impl AttachedWorldData {
             })
             .collect())
     }
+
+    pub async fn remove_for_world(
+        instance: &str,
+        world_type: WorldType,
+        world_id: &str,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<()> {
+        let world_type = world_type.as_str();
+
+        sqlx::query!(
+            "
+            DELETE FROM attached_world_data
+            WHERE profile_path = $1 and world_type = $2 and world_id = $3
+            ",
+            instance,
+            world_type,
+            world_id
+        )
+        .execute(exec)
+        .await?;
+
+        Ok(())
+    }
 }
 
 macro_rules! attached_data_setter {
