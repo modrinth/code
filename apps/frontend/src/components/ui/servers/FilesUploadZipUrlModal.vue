@@ -43,7 +43,11 @@
           data-lpignore="true"
           data-protonpass-ignore="true"
           required
-          placeholder="https://www.example.com/.../modpack-name-1.0.2.zip"
+          :placeholder="
+            cf
+              ? 'https://www.curseforge.com/.../modpack-name/files/6412259'
+              : 'https://www.example.com/.../modpack-name-1.0.2.zip'
+          "
           autocomplete="off"
         />
         <div v-if="submitted && error" class="text-red">{{ error }}</div>
