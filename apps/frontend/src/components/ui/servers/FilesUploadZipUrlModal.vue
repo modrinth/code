@@ -45,7 +45,7 @@
           required
           :placeholder="
             cf
-              ? 'https://www.curseforge.com/.../modpack-name/files/6412259'
+              ? 'https://www.curseforge.com/minecraft/modpacks/.../files/6412259'
               : 'https://www.example.com/.../modpack-name-1.0.2.zip'
           "
           autocomplete="off"
@@ -91,14 +91,13 @@ const submitted = ref(false);
 
 const trimmedUrl = computed(() => url.value.trim());
 
+const regex = /https:\/\/(www\.)?curseforge\.com\/minecraft\/modpacks\/[^/]+\/files\/\d+/;
+
 const error = computed(() => {
   if (trimmedUrl.value.length === 0) {
     return "URL is required.";
   }
-  if (
-    cf.value &&
-    (!trimmedUrl.value.includes("curseforge.com") || !trimmedUrl.value.startsWith("https://"))
-  ) {
+  if (cf.value && !regex.test(trimmedUrl.value)) {
     return "URL must be a CurseForge modpack version URL.";
   } else if (!cf.value && !trimmedUrl.value.includes("/")) {
     return "URL must be valid.";
