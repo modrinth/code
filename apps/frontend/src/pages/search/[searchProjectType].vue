@@ -334,6 +334,7 @@ import {
   ImageIcon,
 } from "@modrinth/assets";
 import { computed } from "vue";
+import { useNuxtApp } from "#app";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import LogoAnimated from "~/components/brand/LogoAnimated.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
@@ -344,6 +345,8 @@ const { formatMessage } = useVIntl();
 const filtersMenuOpen = ref(false);
 
 const data = useNuxtApp();
+const { $listen } = data;
+
 const route = useNativeRoute();
 const router = useNativeRouter();
 
@@ -484,6 +487,7 @@ const {
 
   // Functions
   createPageParams,
+  readQueryParams,
 } = useSearch(projectTypes, tags, serverFilters);
 
 const messages = defineMessages({
@@ -653,6 +657,10 @@ useSeoMeta({
   description,
   ogTitle,
   ogDescription: description,
+});
+
+$listen("search:clear", () => {
+  readQueryParams();
 });
 </script>
 

@@ -115,6 +115,7 @@
             :highlighted-style="
               route.name === 'search-mods' ? 'main-nav-primary' : 'main-nav-secondary'
             "
+            @click="$emit('search:clear')"
           >
             <nuxt-link to="/mods"> <BoxIcon aria-hidden="true" /> Mods </nuxt-link>
           </ButtonStyled>
@@ -126,6 +127,7 @@
             :highlighted-style="
               route.name === 'search-resourcepacks' ? 'main-nav-primary' : 'main-nav-secondary'
             "
+            @click="$emit('search:clear')"
           >
             <nuxt-link to="/resourcepacks">
               <PaintBrushIcon aria-hidden="true" /> Resource Packs
@@ -137,6 +139,7 @@
             :highlighted-style="
               route.name === 'search-datapacks' ? 'main-nav-primary' : 'main-nav-secondary'
             "
+            @click="$emit('search:clear')"
           >
             <nuxt-link to="/datapacks"> <BracesIcon aria-hidden="true" /> Data Packs </nuxt-link>
           </ButtonStyled>
@@ -146,6 +149,7 @@
             :highlighted-style="
               route.name === 'search-modpacks' ? 'main-nav-primary' : 'main-nav-secondary'
             "
+            @click="$emit('search:clear')"
           >
             <nuxt-link to="/modpacks"> <PackageOpenIcon aria-hidden="true" /> Modpacks </nuxt-link>
           </ButtonStyled>
@@ -155,6 +159,7 @@
             :highlighted-style="
               route.name === 'search-shaders' ? 'main-nav-primary' : 'main-nav-secondary'
             "
+            @click="$emit('search:clear')"
           >
             <nuxt-link to="/shaders"> <GlassesIcon aria-hidden="true" /> Shaders </nuxt-link>
           </ButtonStyled>
@@ -164,6 +169,7 @@
             :highlighted-style="
               route.name === 'search-plugins' ? 'main-nav-primary' : 'main-nav-secondary'
             "
+            @click="$emit('search:clear')"
           >
             <nuxt-link to="/plugins"> <PlugIcon aria-hidden="true" /> Plugins </nuxt-link>
           </ButtonStyled>
@@ -202,6 +208,7 @@
                 },
               ]"
               hoverable
+              @select="$emit('search:clear')"
             >
               <BoxIcon
                 v-if="route.name === 'search-mods' || route.path.startsWith('/mod/')"
@@ -705,6 +712,8 @@ import TeleportOverflowMenu from "~/components/ui/servers/TeleportOverflowMenu.v
 const { formatMessage } = useVIntl();
 
 const app = useNuxtApp();
+const { $emit } = app;
+
 const auth = await useAuth();
 const user = await useUser();
 
