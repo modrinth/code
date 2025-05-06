@@ -180,7 +180,7 @@ async fn version_create_inner(
         }
 
         let result = async {
-            let content_disposition = field.content_disposition().clone();
+            let content_disposition = field.content_disposition().unwrap().clone();
             let name = content_disposition.get_name().ok_or_else(|| {
                 CreateError::MissingValueError("Missing content name".to_string())
             })?;
@@ -692,7 +692,8 @@ async fn upload_file_to_version_inner(
         }
 
         let result = async {
-            let content_disposition = field.content_disposition().clone();
+            let content_disposition =
+                field.content_disposition().unwrap().clone();
             let name = content_disposition.get_name().ok_or_else(|| {
                 CreateError::MissingValueError(
                     "Missing content name".to_string(),

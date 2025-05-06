@@ -373,8 +373,7 @@ async fn project_create_inner(
                 )))
             })?;
 
-        let content_disposition = field.content_disposition();
-        let name = content_disposition.get_name().ok_or_else(|| {
+        let name = field.name().ok_or_else(|| {
             CreateError::MissingValueError(String::from("Missing content name"))
         })?;
 
@@ -472,7 +471,7 @@ async fn project_create_inner(
         }
 
         let result = async {
-            let content_disposition = field.content_disposition().clone();
+            let content_disposition = field.content_disposition().unwrap().clone();
 
             let name = content_disposition.get_name().ok_or_else(|| {
                 CreateError::MissingValueError("Missing content name".to_string())

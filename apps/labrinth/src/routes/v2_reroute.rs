@@ -73,7 +73,7 @@ where
 
     if let Some(field) = multipart.next().await {
         let mut field = field?;
-        let content_disposition = field.content_disposition().clone();
+        let content_disposition = field.content_disposition().unwrap().clone();
         let field_name = content_disposition.get_name().unwrap_or("");
         let field_filename = content_disposition.get_filename();
         let field_content_type = field.content_type();
@@ -100,7 +100,7 @@ where
 
     while let Some(field) = multipart.next().await {
         let mut field = field?;
-        let content_disposition = field.content_disposition().clone();
+        let content_disposition = field.content_disposition().unwrap().clone();
         let field_name = content_disposition.get_name().unwrap_or("");
         let field_filename = content_disposition.get_filename();
         let field_content_type = field.content_type();

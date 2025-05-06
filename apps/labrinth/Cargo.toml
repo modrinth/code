@@ -11,17 +11,17 @@ name = "labrinth"
 path = "src/main.rs"
 
 [dependencies]
-actix-web = "4.4.1"
+actix-web = "4.10.2"
 actix-rt = "2.9.0"
-actix-multipart = "0.6.1"
-actix-cors = "0.7.0"
+actix-multipart = "0.7.2"
+actix-cors = "0.7.1"
 actix-ws = "0.3.0"
 actix-files = "0.6.5"
-prometheus = "0.13.4"
+prometheus = "0.13.4" # Locked on 0.13 until actix updates to 0.14
 actix-web-prom = { version = "0.9.0", features = ["process"] }
 
 tracing = "0.1.41"
-tracing-actix-web = "0.7.16"
+tracing-actix-web = "0.7.18"
 console-subscriber = "0.4.1"
 
 tokio = { version = "1.35.1", features = ["sync", "rt-multi-thread"] }
@@ -46,7 +46,7 @@ chrono = { version = "0.4.26", features = ["serde"] }
 yaserde = "0.12.0"
 yaserde_derive = "0.12.0"
 
-rand = "0.8.5"
+rand = "0.8.5" # Locked on 0.8 until argon2 updates to 0.9
 rand_chacha = "0.3.1"
 bytes = "1.4.0"
 base64 = "0.21.7"
