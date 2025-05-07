@@ -8,8 +8,7 @@ use color_thief::ColorFormat;
 use hex::ToHex;
 use image::imageops::FilterType;
 use image::{
-    DynamicImage, EncodableLayout, GenericImageView, ImageError,
-    ImageOutputFormat,
+    DynamicImage, EncodableLayout, GenericImageView, ImageError, ImageFormat,
 };
 use sha1::Digest;
 use std::io::Cursor;
@@ -152,7 +151,7 @@ fn process_image(
 
     // Optimize and compress
     let mut output = Vec::new();
-    img.write_to(&mut Cursor::new(&mut output), ImageOutputFormat::WebP)?;
+    img.write_to(&mut Cursor::new(&mut output), ImageFormat::WebP)?;
 
     Ok((bytes::Bytes::from(output), "webp".to_string()))
 }
