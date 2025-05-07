@@ -73,7 +73,8 @@ export async function fetchExtraNotificationData(
       if (notification.body.report_id) bulk.reports.push(notification.body.report_id);
       if (notification.body.thread_id) bulk.threads.push(notification.body.thread_id);
       if (notification.body.invited_by) bulk.users.push(notification.body.invited_by);
-      if (notification.body.organization_id) bulk.organizations.push(notification.body.organization_id);
+      if (notification.body.organization_id)
+        bulk.organizations.push(notification.body.organization_id);
     }
   }
 
@@ -98,21 +99,35 @@ export async function fetchExtraNotificationData(
   for (const n of notifications) {
     n.extra_data = {};
     if (n.body) {
-      if (n.body.project_id) n.extra_data.project = projects.find((x) => x.id === n.body!.project_id);
-      if (n.body.organization_id) n.extra_data.organization = organizations.find((x) => x.id === n.body!.organization_id);
+      if (n.body.project_id)
+        n.extra_data.project = projects.find((x) => x.id === n.body!.project_id);
+      if (n.body.organization_id)
+        n.extra_data.organization = organizations.find((x) => x.id === n.body!.organization_id);
       if (n.body.report_id) {
         n.extra_data.report = reports.find((x) => x.id === n.body!.report_id);
         const t = (n.extra_data.report as Report | undefined)?.item_type;
-        if (t === "project") n.extra_data.project = projects.find((x) => x.id === (n.extra_data?.report as Report | undefined)?.item_id);
-        else if (t === "user") n.extra_data.user = users.find((x) => x.id === (n.extra_data?.report as Report | undefined)?.item_id);
+        if (t === "project")
+          n.extra_data.project = projects.find(
+            (x) => x.id === (n.extra_data?.report as Report | undefined)?.item_id,
+          );
+        else if (t === "user")
+          n.extra_data.user = users.find(
+            (x) => x.id === (n.extra_data?.report as Report | undefined)?.item_id,
+          );
         else if (t === "version") {
-          n.extra_data.version = versions.find((x) => x.id === (n.extra_data?.report as Report | undefined)?.item_id);
-          n.extra_data.project = projects.find((x) => x.id === (n.extra_data?.version as Version | undefined)?.project_id);
+          n.extra_data.version = versions.find(
+            (x) => x.id === (n.extra_data?.report as Report | undefined)?.item_id,
+          );
+          n.extra_data.project = projects.find(
+            (x) => x.id === (n.extra_data?.version as Version | undefined)?.project_id,
+          );
         }
       }
       if (n.body.thread_id) n.extra_data.thread = threads.find((x) => x.id === n.body!.thread_id);
-      if (n.body.invited_by) n.extra_data.invited_by = users.find((x) => x.id === n.body!.invited_by);
-      if (n.body.version_id) n.extra_data.version = versions.find((x) => x.id === n.body!.version_id);
+      if (n.body.invited_by)
+        n.extra_data.invited_by = users.find((x) => x.id === n.body!.invited_by);
+      if (n.body.version_id)
+        n.extra_data.version = versions.find((x) => x.id === n.body!.version_id);
     }
   }
   return notifications;
@@ -147,7 +162,9 @@ export async function markAsRead(
   ids: string[],
 ): Promise<(notifications: Notification[]) => Notification[]> {
   try {
-    await useBaseFetch(`notifications?ids=${JSON.stringify([...new Set(ids)])}`, { method: "PATCH" });
+    await useBaseFetch(`notifications?ids=${JSON.stringify([...new Set(ids)])}`, {
+      method: "PATCH",
+    });
     return (notifications: Notification[]) => {
       const newNotifs = notifications ?? [];
       newNotifs.forEach((n) => {
