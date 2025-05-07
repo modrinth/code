@@ -99,15 +99,8 @@ maxminddb = "0.26.0"
 flate2 = "1.0.25"
 tar = "0.4.38"
 
-sentry = { version = "0.34.0", default-features = false, features = [
-    "backtrace",
-    "contexts",
-    "debug-images",
-    "panic",
-    "rustls",
-    "reqwest",
-] }
-sentry-actix = "0.34.0"
+sentry = { version = "0.37.0", default-features = false, features = ["backtrace", "contexts", "debug-images", "panic", "rustls", "reqwest"] }
+sentry-actix = "0.37.0"
 
 image = "0.24.6"
 color-thief = "0.2.2"
