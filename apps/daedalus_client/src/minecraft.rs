@@ -1,11 +1,11 @@
 use crate::util::fetch_json;
 use crate::{
-    util::download_file, util::format_url, util::sha1_async, Error,
-    MirrorArtifact, UploadFile,
+    Error, MirrorArtifact, UploadFile, util::download_file, util::format_url,
+    util::sha1_async,
 };
 use daedalus::minecraft::{
-    merge_partial_library, Library, PartialLibrary, VersionInfo,
-    VersionManifest, VERSION_MANIFEST_URL,
+    Library, PartialLibrary, VERSION_MANIFEST_URL, VersionInfo,
+    VersionManifest, merge_partial_library,
 };
 use dashmap::DashMap;
 use serde::Deserialize;
