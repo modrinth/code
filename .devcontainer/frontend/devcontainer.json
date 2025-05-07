@@ -1,0 +1,38 @@
+{
+  "name": "Modrinth (frontend)",
+
+  "image": "mcr.microsoft.com/devcontainers/base:1-bookworm",
+
+  "features": {
+    "ghcr.io/devcontainers/features/node": {
+      "version": "20",
+      "installYarnUsingApt": false,
+      "pnpmVersion": "none"
+    }
+  },
+
+  "containerEnv": {
+    "BROWSER_BASE_URL": "https://api.modrinth.com/v2/"
+  },
+
+  "onCreateCommand": "npm i -g corepack && corepack enable && COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack install",
+  "updateContentCommand": "pnpm install --ignore-scripts && pnpm --filter=@modrinth/frontend postinstall",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Vue.volar",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "EditorConfig.EditorConfig",
+        "Nuxtr.nuxtr-vscode",
+        "antfu.goto-alias"
+      ],
+      "settings": {
+        "extensions.ignoreRecommendations": true
+      }
+    }
+  },
+
+  "appPort": [3000]
+}
