@@ -2,7 +2,7 @@
 name = "daedalus"
 version = "0.2.3"
 authors = ["Jai A <jai@modrinth.com>"]
-edition = "2021"
+edition = "2024"
 license = "MIT"
 description = "Utilities for querying and parsing Minecraft metadata"
 repository = "https://github.com/modrinth/daedalus/"
