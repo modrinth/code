@@ -1,6 +1,10 @@
+use crate::State;
 use crate::event::ProfilePayloadType;
 use crate::event::emit::{emit_profile, emit_warning};
-use crate::state::{DirectoryInfo, ProfileInstallStage, ProjectType};
+use crate::state::{
+    DirectoryInfo, ProfileInstallStage, ProjectType, attached_world_data,
+};
+use crate::worlds::WorldType;
 use futures::{SinkExt, StreamExt, channel::mpsc::channel};
 use notify::{RecommendedWatcher, RecursiveMode};
 use notify_debouncer_mini::{DebounceEventResult, Debouncer, new_debouncer};
@@ -87,16 +91,31 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                         "World updated: {}",
                                         e.path.display()
                                     );
-                                    Some(ProfilePayloadType::WorldUpdated {
-                                        world: e
-                                            .path
-                                            .parent()
-                                            .unwrap()
-                                            .file_name()
-                                            .unwrap()
-                                            .to_string_lossy()
-                                            .to_string(),
-                                    })
+                                    let world = e
+                                        .path
+                                        .parent()
+                                        .unwrap()
+                                        .file_name()
+                                        .unwrap()
+                                        .to_string_lossy()
+                                        .to_string();
+                                    if !e.path.is_file() {
+                                        let profile_path_str = profile_path_str.clone();
+                                        let world = world.clone();
+                                        tokio::spawn(async move {
+                                            if let Ok(state) = State::get().await {
+                                                if let Err(e) = attached_world_data::AttachedWorldData::remove_for_world(
+                                                    &profile_path_str,
+                                                    WorldType::Singleplayer,
+                                                    &world,
+                                                    &state.pool
+                                                ).await {
+                                                    tracing::warn!("Failed to remove AttachedWorldData for '{world}': {e}")
+                                                }
+                                            }
+                                        });
+                                    }
+                                    Some(ProfilePayloadType::WorldUpdated { world })
                                 } else if first_file_name
                                     .filter(|x| *x == "saves")
                                     .is_none()

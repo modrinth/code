@@ -54,7 +54,7 @@ async function saveServer() {
       'server',
       address.value,
       newDisplayStatus.value,
-    )
+    ).catch(handleError)
   }
 
   emit('submit', {
