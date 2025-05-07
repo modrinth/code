@@ -1892,7 +1892,7 @@ dependencies = [
  "chrono",
  "serde",
  "serde_json",
- "thiserror 1.0.69",
+ "thiserror 2.0.12",
 ]
 
 [[package]]
@@ -1915,7 +1915,7 @@ dependencies = [
  "serde-xml-rs",
  "serde_json",
  "sha1_smol",
- "thiserror 1.0.69",
+ "thiserror 2.0.12",
  "tokio",
  "tracing",
  "tracing-error",
@@ -4413,7 +4413,7 @@ dependencies = [
  "spdx",
  "sqlx",
  "tar",
- "thiserror 1.0.69",
+ "thiserror 2.0.12",
  "tikv-jemalloc-ctl",
  "tikv-jemallocator",
  "tokio",

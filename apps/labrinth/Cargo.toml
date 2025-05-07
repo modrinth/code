@@ -74,7 +74,7 @@ censor = "0.3.0"
 spdx = { version = "0.10.3", features = ["text"] }
 
 dotenvy = "0.15.7"
-thiserror = "1.0.56"
+thiserror = "2.0.12"
 either = "1.13"
 
 sqlx = { version = "0.8.2", features = [
