@@ -5,12 +5,7 @@
         <Logo404 />
       </div>
       <div class="error-box" :class="{ 'has-bot': !is404 }">
-        <img
-          v-if="!is404"
-          :src="SadRinthbot"
-          alt="Sad Modrinth bot"
-          class="error-box__sad-bot"
-        />
+        <img v-if="!is404" :src="SadRinthbot" alt="Sad Modrinth bot" class="error-box__sad-bot" />
         <div v-if="!is404" class="error-box__top-glow" />
         <div class="error-box__body">
           <h1 class="error-box__title">{{ formatMessage(errorMessages.title) }}</h1>
@@ -55,8 +50,8 @@
 
 <script setup>
 import { defineMessage, useVIntl } from "@vintl/vintl";
+import { SadRinthbot } from "@modrinth/assets";
 import Logo404 from "~/assets/images/404.svg";
-import { SadRinthbot } from "@modrinth/assets"
 
 const { formatMessage } = useVIntl();
 

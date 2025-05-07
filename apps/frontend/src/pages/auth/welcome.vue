@@ -1,10 +1,6 @@
 <template>
   <div class="welcome-box has-bot">
-    <img
-      :src="WavingRinthbot"
-      alt="Waving Modrinth Bot"
-      class="welcome-box__waving-bot"
-    />
+    <img :src="WavingRinthbot" alt="Waving Modrinth Bot" class="welcome-box__waving-bot" />
     <div class="welcome-box__top-glow" />
     <div class="welcome-box__body">
       <h1 class="welcome-box__title">
@@ -12,9 +8,7 @@
       </h1>
 
       <p class="welcome-box__subtitle">
-        <IntlFormatted
-          :message-id="messages.welcomeDescription"
-        >
+        <IntlFormatted :message-id="messages.welcomeDescription">
           <template #bold="{ children }">
             <strong>
               <component :is="() => normalizeChildren(children)" />
@@ -55,8 +49,7 @@
 
 <script setup>
 import { Checkbox, commonMessages } from "@modrinth/ui";
-import { RightArrowIcon } from "@modrinth/assets";
-import { WavingRinthbot } from "@modrinth/assets"
+import { RightArrowIcon, WavingRinthbot } from "@modrinth/assets";
 
 const route = useRoute();
 
@@ -75,7 +68,7 @@ const messages = defineMessages({
   welcomeDescription: {
     id: "auth.welcome.description",
     defaultMessage:
-      "You’re now part of the awesome community of creators & explorers already building, downloading, and staying up-to-date with awazing mods. Welcome!",
+      "You’re now part of the awesome community of creators & explorers already building, downloading, and staying up-to-date with awazing mods.",
   },
   welcomeLongTitle: {
     id: "auth.welcome.long-title",
