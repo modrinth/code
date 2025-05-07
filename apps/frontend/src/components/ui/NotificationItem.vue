@@ -335,7 +335,7 @@ import ThreadSummary from "~/components/ui/thread/ThreadSummary.vue";
 import { getProjectLink, getVersionLink } from "~/helpers/projects.js";
 import { getUserLink } from "~/helpers/users.js";
 import { acceptTeamInvite, removeSelfFromTeam } from "~/helpers/teams.js";
-import { markAsRead } from "~/helpers/notifications.js";
+import { markAsRead } from "~/helpers/notifications.ts";
 import DoubleIcon from "~/components/ui/DoubleIcon.vue";
 import Avatar from "~/components/ui/Avatar.vue";
 import Badge from "~/components/ui/Badge.vue";
