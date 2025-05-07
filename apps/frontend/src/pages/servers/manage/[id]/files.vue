@@ -923,6 +923,8 @@ onMounted(async () => {
       redoLastOperation();
     }
   });
+
+  props.server.fs?.clearQueuedOps();
 });
 
 onUnmounted(() => {

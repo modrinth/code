@@ -1087,6 +1087,10 @@ const moveFileOrFolder = (path: string, newPath: string) => {
   });
 };
 
+const clearQueuedOps = () => {
+  internalServerReference.value.fs.queuedOps = [];
+};
+
 const removeQueuedOp = (op: FSQueuedOp["op"], src: string) => {
   internalServerReference.value.fs.queuedOps = internalServerReference.value.fs.queuedOps.filter(
     (x: FSQueuedOp) => x.op !== op || x.src !== src,
@@ -1379,6 +1383,7 @@ const modules: any = {
     downloadFile,
     extractFile,
     removeQueuedOp,
+    clearQueuedOps,
     modifyOp,
   },
 };
@@ -1703,6 +1708,7 @@ type FSFunctions = {
   }>;
 
   removeQueuedOp: (op: FSQueuedOp["op"], src: string) => void;
+  clearQueuedOps: () => void;
 
   modifyOp: (id: string, action: "dismiss" | "cancel") => Promise<any>;
 };

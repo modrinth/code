@@ -50,12 +50,7 @@ const show = (zipPath: string, conflictingFiles: string[]) => {
 
 const proceed = () => {
   emit("proceed", path.value);
-  hide();
 };
 
-const hide = () => {
-  modal.value?.hide();
-};
-
-defineExpose({ show, hide });
+defineExpose({ show });
 </script>
