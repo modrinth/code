@@ -2104,9 +2104,9 @@ dependencies = [
 
 [[package]]
 name = "derive-new"
-version = "0.6.0"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d150dea618e920167e5973d70ae6ece4385b7164e0d799fe7c122dd0a5d912ad"
+checksum = "2cdc8d50f426189eef89dac62fabfa0abb27d5cc008f25bf4156a0203325becc"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -7174,9 +7174,9 @@ dependencies = [
 
 [[package]]
 name = "rust_iso3166"
-version = "0.1.13"
+version = "0.1.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd3126eab517ef8ca4761a366cb0d55e1bf5ab9c7b7f18301d712a57de000a90"
+checksum = "df0d3a0089ee08071ea1baaba83f2265c97f7646c53c3f92b205eb2cdaab72b1"
 dependencies = [
  "js-sys",
  "phf 0.11.2",
@@ -10447,7 +10447,7 @@ version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf221c93e13a30d793f7645a0e7762c55d169dbb0a49671918a2319d289b10bb"
 dependencies = [
- "windows-sys 0.48.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
