@@ -299,7 +299,7 @@ pub async fn teams_get(
     .map(|x| x.1)
     .ok();
 
-    let teams_groups = teams_data.into_iter().group_by(|data| data.team_id.0);
+    let teams_groups = teams_data.into_iter().chunk_by(|data| data.team_id.0);
 
     let mut teams: Vec<Vec<crate::models::teams::TeamMember>> = vec![];
 

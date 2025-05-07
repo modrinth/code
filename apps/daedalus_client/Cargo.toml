@@ -24,7 +24,7 @@ rust-s3 = { version = "0.35.1", default-features = false, features = ["fail-on-e
 dashmap = "6.1.0"
 sha1_smol = { version = "1.0.0", features = ["std"] }
 indexmap = { version = "2.2.6", features = ["serde"] }
-itertools = "0.13.0"
+itertools = "0.14.0"
 tracing-error = "0.2.0"
 
 tracing = "0.1"
