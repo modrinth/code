@@ -90,8 +90,8 @@ rust_decimal = { version = "1.33.1", features = [
     "serde-with-float",
     "serde-with-str",
 ] }
-redis = { version = "0.27.5", features = ["tokio-comp", "ahash", "r2d2"] }
-deadpool-redis = "0.18.0"
+redis = { version = "0.29.5", features = ["tokio-comp", "ahash", "r2d2"] } # Locked on 0.29 until deadpool-redis updates to 0.30
+deadpool-redis = "0.20.0"
 clickhouse = { version = "0.13.2", features = ["uuid", "time"] }
 uuid = { version = "1.2.2", features = ["v4", "fast-rng", "serde"] }
 
