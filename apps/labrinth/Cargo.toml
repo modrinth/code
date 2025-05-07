@@ -2,7 +2,7 @@
 name = "labrinth"
 version = "2.7.0"
 authors = ["geometrically <jai@modrinth.com>"]
-edition = "2018"
+edition = "2024"
 license = "AGPL-3.0"
 
 # This seems redundant, but it's necessary for Docker to work

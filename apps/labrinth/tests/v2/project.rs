@@ -4,13 +4,13 @@ use crate::{
     assert_status,
     common::{
         api_common::{ApiProject, ApiVersion, AppendsOptionalPat},
-        api_v2::{request_data::get_public_project_creation_data_json, ApiV2},
+        api_v2::{ApiV2, request_data::get_public_project_creation_data_json},
         database::{
-            generate_random_name, ADMIN_USER_PAT, FRIEND_USER_ID,
-            FRIEND_USER_PAT, USER_USER_PAT,
+            ADMIN_USER_PAT, FRIEND_USER_ID, FRIEND_USER_PAT, USER_USER_PAT,
+            generate_random_name,
         },
         dummy_data::TestFile,
-        environment::{with_test_environment, TestEnvironment},
+        environment::{TestEnvironment, with_test_environment},
         permissions::{PermissionsTest, PermissionsTestContext},
     },
 };
@@ -469,7 +469,7 @@ async fn permissions_patch_project_v2() {
                 .map(|(key, value)| {
                     let test_env = test_env.clone();
                     async move {
-                        let req_gen = |ctx: PermissionsTestContext| async {
+                        let req_gen = async |ctx: PermissionsTestContext| {
                             api.edit_project(
                             &ctx.project_id.unwrap(),
                             json!({
