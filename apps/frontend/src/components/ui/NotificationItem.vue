@@ -184,7 +184,7 @@
               "
               class="date"
             >
-              {{ fromNow(notif.extra_data.version.date_published) }}
+              {{ formatRelativeTime(notif.extra_data.version.date_published) }}
             </span>
           </span>
         </div>
@@ -201,7 +201,7 @@
         v-tooltip="$dayjs(notification.created).format('MMMM D, YYYY [at] h:mm A')"
         class="inline-flex"
       >
-        <CalendarIcon class="mr-1" /> Received {{ fromNow(notification.created) }}
+        <CalendarIcon class="mr-1" /> Received {{ formatRelativeTime(notification.created) }}
       </span>
     </span>
     <div v-if="compact" class="notification__actions">
@@ -331,6 +331,7 @@ import {
   XIcon,
   ExternalIcon,
 } from "@modrinth/assets";
+import { useRelativeTime } from "@modrinth/ui";
 import ThreadSummary from "~/components/ui/thread/ThreadSummary.vue";
 import { getProjectLink, getVersionLink } from "~/helpers/projects.js";
 import { getUserLink } from "~/helpers/users.js";
@@ -344,6 +345,8 @@ import Categories from "~/components/ui/search/Categories.vue";
 
 const app = useNuxtApp();
 const emit = defineEmits(["update:notifications"]);
+
+const formatRelativeTime = useRelativeTime();
 
 const props = defineProps({
   notification: {

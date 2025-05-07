@@ -360,6 +360,7 @@ import {
   ContentPageHeader,
   commonMessages,
   NewModal,
+  useRelativeTime,
 } from "@modrinth/ui";
 import { isStaff } from "~/helpers/users.js";
 import NavTabs from "~/components/ui/NavTabs.vue";

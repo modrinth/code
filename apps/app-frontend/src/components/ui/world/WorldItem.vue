@@ -8,6 +8,14 @@ import {
 } from '@/helpers/worlds.ts'
 import { formatNumber } from '@modrinth/utils'
 import {
+  useRelativeTime,
+  Avatar,
+  ButtonStyled,
+  commonMessages,
+  OverflowMenu,
+  SmartClickable,
+} from '@modrinth/ui'
+import {
   IssuesIcon,
   EyeIcon,
   ClipboardCopyIcon,
@@ -25,7 +33,6 @@ import {
   UserIcon,
   XIcon,
 } from '@modrinth/assets'
-import { Avatar, ButtonStyled, commonMessages, OverflowMenu, SmartClickable } from '@modrinth/ui'
 import type { MessageDescriptor } from '@vintl/vintl'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import type { Component } from 'vue'
@@ -36,6 +43,7 @@ import { useRouter } from 'vue-router'
 import { Tooltip } from 'floating-vue'
 
 const { formatMessage } = useVIntl()
+const formatRelativeTime = useRelativeTime()
 
 const router = useRouter()
 
@@ -255,7 +263,7 @@ const messages = defineMessages({
             <template v-if="world.last_played">
               {{
                 formatMessage(commonMessages.playedLabel, {
-                  time: dayjs(world.last_played).fromNow(),
+                  time: formatRelativeTime(dayjs(world.last_played).toISOString()),
                 })
               }}
             </template>
