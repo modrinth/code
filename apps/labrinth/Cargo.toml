@@ -128,7 +128,7 @@ ariadne = { path = "../../packages/ariadne" }
 clap = { version = "4.5", features = ["derive"] }
 iana-time-zone = "0.1.61"
 
-[target.'cfg(not(target_env = "msvc"))'.dependencies]
+[target.'cfg(target_os = "linux")'.dependencies]
 tikv-jemallocator = { version = "0.6.0", features = ["profiling", "unprefixed_malloc_on_supported_platforms"] }
 tikv-jemalloc-ctl = { version = "0.6.0", features = ["stats"] }
 jemalloc_pprof = { version = "0.7.0", features = ["flamegraph"] }
