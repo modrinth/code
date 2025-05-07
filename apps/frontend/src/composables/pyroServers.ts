@@ -1697,7 +1697,10 @@ type FSFunctions = {
     override?: boolean,
     dry?: boolean,
     silentQueue?: boolean,
-  ) => Promise<any>;
+  ) => Promise<{
+    modpack_name: string | null;
+    conflicting_files: string[];
+  }>;
 
   removeQueuedOp: (op: FSQueuedOp["op"], src: string) => void;
 
@@ -1738,7 +1741,7 @@ type WSModule = JWTAuth & {
   error?: ModuleError;
 };
 
-type FSModule = {
+export type FSModule = {
   auth: JWTAuth;
   ops: FilesystemOp[];
   queuedOps: FSQueuedOp[];

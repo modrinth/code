@@ -6,6 +6,7 @@
       @create="handleCreateNewItem"
     />
     <FilesUploadZipUrlModal ref="uploadZipModal" :server="server" />
+    <FilesUploadConflictModal ref="uploadConflictModal" @proceed="extractItem" />
 
     <LazyUiServersFilesRenameItemModal
       ref="renameItemModal"
@@ -36,6 +37,7 @@
             :breadcrumb-segments="breadcrumbSegments"
             :search-query="searchQuery"
             :current-filter="viewFilter"
+            :base-id="`browse-navbar-${baseId}`"
             @navigate="navigateToSegment"
             @create="showCreateModal"
             @upload="initiateFileUpload"
@@ -287,8 +289,10 @@ import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDr
 import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
 import type { FilesystemOp, FSQueuedOp } from "~/types/servers.ts";
 import FilesUploadZipUrlModal from "~/components/ui/servers/FilesUploadZipUrlModal.vue";
+import FilesUploadConflictModal from "~/components/ui/servers/FilesUploadConflictModal.vue";
 
 const flags = useFeatureFlags();
+const baseId = useId();
 
 interface BaseOperation {
   type: "move" | "rename";
@@ -344,6 +348,7 @@ const renameItemModal = ref();
 const moveItemModal = ref();
 const deleteItemModal = ref();
 const uploadZipModal = ref();
+const uploadConflictModal = ref();
 
 const newItemType = ref<"file" | "directory">("file");
 const selectedItem = ref<any>(null);
@@ -576,10 +581,27 @@ const handleRenameItem = async (newName: string) => {
   }
 };
 
+const extractItem = async (path: string) => {
+  try {
+    await props.server.fs?.extractFile(path, true, false);
+  } catch (error) {
+    console.error("Error extracting item:", error);
+    handleError(error);
+  }
+};
+
 const handleExtractItem = async (item: { name: string; type: string; path: string }) => {
   try {
-    const dry = await props.server.fs?.extractFile(item.path, true, false);
-    // console.log("Dry run result:", dry);
+    const dry = await props.server.fs?.extractFile(item.path, true, true, true);
+    if (dry) {
+      if (dry.conflicting_files.length === 0) {
+        await extractItem(item.path);
+      } else {
+        uploadConflictModal.value.show(item.path, dry.conflicting_files);
+      }
+    } else {
+      handleError(new Error("Error running dry run"));
+    }
   } catch (error) {
     console.error("Error extracting item:", error);
     handleError(error);

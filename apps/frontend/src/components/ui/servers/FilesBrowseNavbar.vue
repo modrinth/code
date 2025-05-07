@@ -118,6 +118,7 @@
 
       <ButtonStyled type="transparent">
         <OverflowMenu
+          :dropdown-id="`create-new-${baseId}`"
           position="bottom"
           direction="left"
           aria-label="Create new..."
@@ -174,6 +175,7 @@ const props = defineProps<{
   breadcrumbSegments: string[];
   searchQuery: string;
   currentFilter: string;
+  baseId: string;
 }>();
 
 defineEmits<{
