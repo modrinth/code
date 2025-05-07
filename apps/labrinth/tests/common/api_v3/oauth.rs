@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use actix_http::StatusCode;
+use actix_web::http::header::{AUTHORIZATION, LOCATION};
 use actix_web::{
     dev::ServiceResponse,
     test::{self, TestRequest},
@@ -9,7 +10,6 @@ use labrinth::auth::oauth::{
     OAuthClientAccessRequest, RespondToOAuthClientScopes, TokenRequest,
     TokenResponse,
 };
-use reqwest::header::{AUTHORIZATION, LOCATION};
 
 use crate::{
     assert_status,

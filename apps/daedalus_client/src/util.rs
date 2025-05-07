@@ -7,7 +7,7 @@ use std::sync::Arc;
 use tokio::sync::Semaphore;
 
 lazy_static::lazy_static! {
-    static ref BUCKET : Bucket = {
+    static ref BUCKET: Bucket = {
         let region = dotenvy::var("S3_REGION").unwrap();
         let b = Bucket::new(
             &dotenvy::var("S3_BUCKET_NAME").unwrap(),
@@ -31,9 +31,9 @@ lazy_static::lazy_static! {
         ).unwrap();
 
         if region == "path-style" {
-            b.with_path_style()
+            *b.with_path_style()
         } else {
-            b
+            *b
         }
     };
 }

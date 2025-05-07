@@ -52,7 +52,7 @@ impl S3Host {
             )
         })?;
 
-        Ok(S3Host { bucket })
+        Ok(S3Host { bucket: *bucket })
     }
 }
 

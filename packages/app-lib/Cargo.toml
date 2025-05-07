@@ -17,7 +17,7 @@ zip = "2.6.1"
 async_zip = { version = "0.0.17", features = ["chrono", "tokio-fs", "deflate", "bzip2", "zstd", "deflate64"] }
 flate2 = "1.1.1"
 tempfile = "3.5.0"
-dashmap = { version = "6.0.1", features = ["serde"] }
+dashmap = { version = "6.1.0", features = ["serde"] }
 quick-xml = { version = "0.37", features = ["async-tokio"] }
 enumset = "1.1"
 
@@ -42,7 +42,7 @@ indicatif = { version = "0.17.3", optional = true }
 
 async-tungstenite = { version = "0.29.1", features = ["tokio-runtime", "tokio-rustls-webpki-roots"] }
 futures = "0.3"
-reqwest = { version = "0.12.3", features = ["json", "stream", "deflate", "gzip", "brotli", "rustls-tls", "charset", "http2", "macos-system-configuration"], default-features = false }
+reqwest = { version = "0.12.15", features = ["json", "stream", "deflate", "gzip", "brotli", "rustls-tls", "charset", "http2", "macos-system-configuration"], default-features = false }
 tokio = { version = "1", features = ["full"] }
 tokio-util = "0.7"
 async-recursion = "1.0.4"

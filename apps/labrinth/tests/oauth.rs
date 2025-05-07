@@ -1,4 +1,5 @@
 use actix_http::StatusCode;
+use actix_web::http::header::{CACHE_CONTROL, PRAGMA};
 use actix_web::test;
 use common::{
     api_v3::oauth::get_redirect_location_query_params,
@@ -14,7 +15,6 @@ use common::{
     environment::{with_test_environment, TestEnvironment},
 };
 use labrinth::auth::oauth::TokenResponse;
-use reqwest::header::{CACHE_CONTROL, PRAGMA};
 
 mod common;
 

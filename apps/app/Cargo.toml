@@ -39,7 +39,7 @@ uuid = { version = "1.1", features = ["serde", "v4"] }
 tracing = "0.1.37"
 tracing-error = "0.2.0"
 
-dashmap = "6.0.1"
+dashmap = "6.1.0"
 paste = "1.0.15"
 enumset = { version = "1.1", features = ["serde"] }
 

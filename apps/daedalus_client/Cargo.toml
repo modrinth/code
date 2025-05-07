@@ -16,21 +16,12 @@ serde_json = "1.0"
 serde-xml-rs = "0.6.0"
 lazy_static = "1.4.0"
 thiserror = "1.0"
-reqwest = { version = "0.12.5", default-features = false, features = [
-    "stream",
-    "json",
-    "rustls-tls-native-roots",
-] }
+reqwest = { version = "0.12.15", default-features = false, features = ["stream", "json", "rustls-tls-native-roots"] }
 async_zip = { version = "0.0.17", features = ["full"] }
 chrono = { version = "0.4", features = ["serde"] }
 bytes = "1.6.0"
-rust-s3 = { version = "0.33.0", default-features = false, features = [
-    "fail-on-err",
-    "tags",
-    "tokio-rustls-tls",
-    "reqwest",
-] }
-dashmap = "5.5.3"
+rust-s3 = { version = "0.35.1", default-features = false, features = ["fail-on-err", "tags", "tokio-rustls-tls"] }
+dashmap = "6.1.0"
 sha1_smol = { version = "1.0.0", features = ["std"] }
 indexmap = { version = "2.2.6", features = ["serde"] }
 itertools = "0.13.0"
