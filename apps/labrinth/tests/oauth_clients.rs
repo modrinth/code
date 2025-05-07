@@ -4,7 +4,7 @@ use common::{
     api_v3::ApiV3,
     database::{FRIEND_USER_ID, FRIEND_USER_PAT, USER_USER_ID, USER_USER_PAT},
     dummy_data::DummyOAuthClientAlpha,
-    environment::{with_test_environment, TestEnvironment},
+    environment::{TestEnvironment, with_test_environment},
     get_json_val_str,
 };
 use labrinth::{

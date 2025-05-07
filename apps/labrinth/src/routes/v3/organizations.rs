@@ -5,7 +5,7 @@ use super::ApiError;
 use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::models::team_item::TeamMember;
 use crate::database::models::{
-    generate_organization_id, team_item, Organization,
+    Organization, generate_organization_id, team_item,
 };
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
@@ -19,7 +19,7 @@ use crate::util::img::delete_old_images;
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use crate::{database, models};
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::base62_impl::parse_base62;
 use futures::TryStreamExt;
 use rust_decimal::Decimal;

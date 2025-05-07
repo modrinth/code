@@ -6,12 +6,12 @@ use crate::routes::ApiError;
 
 use crate::database::redis::RedisPool;
 use actix_web::web::{self, Data};
-use actix_web::{delete, get, patch, post, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post};
 use chrono::{DateTime, Utc};
-use rand::distributions::Alphanumeric;
 use rand::Rng;
-use rand_chacha::rand_core::SeedableRng;
+use rand::distributions::Alphanumeric;
 use rand_chacha::ChaCha20Rng;
+use rand_chacha::rand_core::SeedableRng;
 
 use crate::models::pats::{PersonalAccessToken, Scopes};
 use crate::queue::session::AuthQueue;

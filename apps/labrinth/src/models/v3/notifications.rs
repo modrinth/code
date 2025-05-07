@@ -92,18 +92,26 @@ impl From<DBNotification> for Notification {
                     ..
                 } => (
                     "You have been invited to join a team!".to_string(),
-                    format!("An invite has been sent for you to be {role} of a team"),
+                    format!(
+                        "An invite has been sent for you to be {role} of a team"
+                    ),
                     format!("/project/{project_id}"),
                     vec![
                         NotificationAction {
                             name: "Accept".to_string(),
-                            action_route: ("POST".to_string(), format!("team/{team_id}/join")),
+                            action_route: (
+                                "POST".to_string(),
+                                format!("team/{team_id}/join"),
+                            ),
                         },
                         NotificationAction {
                             name: "Deny".to_string(),
                             action_route: (
                                 "DELETE".to_string(),
-                                format!("team/{team_id}/members/{}", UserId::from(notif.user_id)),
+                                format!(
+                                    "team/{team_id}/members/{}",
+                                    UserId::from(notif.user_id)
+                                ),
                             ),
                         },
                     ],
@@ -114,7 +122,8 @@ impl From<DBNotification> for Notification {
                     team_id,
                     ..
                 } => (
-                    "You have been invited to join an organization!".to_string(),
+                    "You have been invited to join an organization!"
+                        .to_string(),
                     format!(
                         "An invite has been sent for you to be {role} of an organization"
                     ),
@@ -122,7 +131,10 @@ impl From<DBNotification> for Notification {
                     vec![
                         NotificationAction {
                             name: "Accept".to_string(),
-                            action_route: ("POST".to_string(), format!("team/{team_id}/join")),
+                            action_route: (
+                                "POST".to_string(),
+                                format!("team/{team_id}/join"),
+                            ),
                         },
                         NotificationAction {
                             name: "Deny".to_string(),

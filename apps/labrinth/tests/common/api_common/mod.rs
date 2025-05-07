@@ -8,11 +8,11 @@ use self::request_data::{ImageData, ProjectCreationRequestData};
 use actix_web::dev::ServiceResponse;
 use async_trait::async_trait;
 use labrinth::{
+    LabrinthConfig,
     models::{
         projects::{ProjectId, VersionType},
         teams::{OrganizationPermissions, ProjectPermissions},
     },
-    LabrinthConfig,
 };
 
 use super::dummy_data::TestFile;
@@ -169,7 +169,7 @@ pub trait ApiProject {
     ) -> ServiceResponse;
     async fn get_moderation_inbox(&self, pat: Option<&str>) -> ServiceResponse;
     async fn read_thread(&self, id: &str, pat: Option<&str>)
-        -> ServiceResponse;
+    -> ServiceResponse;
     async fn delete_thread_message(
         &self,
         id: &str,
@@ -340,7 +340,7 @@ pub trait ApiVersion {
         pat: Option<&str>,
     ) -> CommonVersion;
     async fn get_version(&self, id: &str, pat: Option<&str>)
-        -> ServiceResponse;
+    -> ServiceResponse;
     async fn get_version_deserialized_common(
         &self,
         id_or_slug: &str,

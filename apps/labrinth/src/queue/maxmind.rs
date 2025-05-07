@@ -61,7 +61,9 @@ impl MaxMindIndexer {
         }
 
         if should_panic {
-            panic!("Unable to download maxmind database- did you get a license key?")
+            panic!(
+                "Unable to download maxmind database- did you get a license key?"
+            )
         } else {
             warn!("Unable to download maxmind database.");
 

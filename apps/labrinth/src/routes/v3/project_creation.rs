@@ -1,10 +1,10 @@
-use super::version_creation::{try_create_version_fields, InitialVersionData};
-use crate::auth::{get_user_from_headers, AuthenticationError};
+use super::version_creation::{InitialVersionData, try_create_version_fields};
+use crate::auth::{AuthenticationError, get_user_from_headers};
 use crate::database::models::loader_fields::{
     Loader, LoaderField, LoaderFieldEnumValue,
 };
 use crate::database::models::thread_item::ThreadBuilder;
-use crate::database::models::{self, image_item, User};
+use crate::database::models::{self, User, image_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostingError};
 use crate::models::error::ApiError;

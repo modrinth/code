@@ -10,7 +10,7 @@ use crate::{
     common::{
         api_common::{Api, ApiProject, ApiVersion},
         database::{FRIEND_USER_PAT, MOD_USER_PAT, USER_USER_PAT},
-        dummy_data::{TestFile, DUMMY_CATEGORIES},
+        dummy_data::{DUMMY_CATEGORIES, TestFile},
     },
 };
 

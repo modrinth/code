@@ -13,7 +13,7 @@ use crate::common::dummy_data::{
 };
 use ariadne::ids::base62_impl::parse_base62;
 use common::environment::{
-    with_test_environment, with_test_environment_all, TestEnvironment,
+    TestEnvironment, with_test_environment, with_test_environment_all,
 };
 use common::permissions::{PermissionsTest, PermissionsTestContext};
 use futures::StreamExt;

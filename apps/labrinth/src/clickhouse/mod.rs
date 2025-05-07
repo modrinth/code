@@ -1,4 +1,4 @@
-use hyper_tls::{native_tls, HttpsConnector};
+use hyper_tls::{HttpsConnector, native_tls};
 use hyper_util::client::legacy::connect::HttpConnector;
 use hyper_util::rt::TokioExecutor;
 

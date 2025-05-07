@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use actix_web::{get, web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, get, web};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 

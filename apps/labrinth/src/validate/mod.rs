@@ -1,6 +1,6 @@
+use crate::database::models::DatabaseError;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::models::loader_fields::VersionField;
-use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::models::pack::PackFormat;
 use crate::models::projects::{FileType, Loader};

@@ -11,7 +11,7 @@ use labrinth::models::{
 };
 use serde_json::json;
 use sqlx::Executor;
-use zip::{write::FileOptions, CompressionMethod, ZipWriter};
+use zip::{CompressionMethod, ZipWriter, write::FileOptions};
 
 use crate::{
     assert_status,
@@ -19,7 +19,7 @@ use crate::{
 };
 
 use super::{
-    api_common::{request_data::ImageData, ApiProject, AppendsOptionalPat},
+    api_common::{ApiProject, AppendsOptionalPat, request_data::ImageData},
     api_v3::ApiV3,
     database::TemporaryDatabase,
 };

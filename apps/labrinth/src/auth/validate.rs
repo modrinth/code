@@ -6,8 +6,8 @@ use crate::models::pats::Scopes;
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
 use crate::routes::internal::session::get_session_metadata;
-use actix_web::http::header::{HeaderValue, AUTHORIZATION};
 use actix_web::HttpRequest;
+use actix_web::http::header::{AUTHORIZATION, HeaderValue};
 use chrono::Utc;
 
 pub async fn get_user_from_headers<'a, E>(

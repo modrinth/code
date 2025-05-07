@@ -1,18 +1,18 @@
 use std::collections::HashMap;
 
-use super::v3::project_creation::CreateError;
 use super::ApiError;
+use super::v3::project_creation::CreateError;
 use crate::models::v2::projects::LegacySideType;
 use crate::util::actix::{
-    generate_multipart, MultipartSegment, MultipartSegmentData,
+    MultipartSegment, MultipartSegmentData, generate_multipart,
 };
 use actix_multipart::Multipart;
+use actix_web::HttpResponse;
 use actix_web::http::header::{
     ContentDisposition, HeaderMap, TryIntoHeaderPair,
 };
-use actix_web::HttpResponse;
-use futures::{stream, Future, StreamExt};
-use serde_json::{json, Value};
+use futures::{Future, StreamExt, stream};
+use serde_json::{Value, json};
 
 pub async fn extract_ok_json<T>(
     response: HttpResponse,

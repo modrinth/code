@@ -6,7 +6,7 @@ use crate::models::notifications::Notification;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, web};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
@@ -45,8 +45,8 @@ pub async fn notifications_get(
     .await?
     .1;
 
-    use database::models::notification_item::Notification as DBNotification;
     use database::models::NotificationId as DBNotificationId;
+    use database::models::notification_item::Notification as DBNotification;
 
     let notification_ids: Vec<DBNotificationId> =
         serde_json::from_str::<Vec<NotificationId>>(ids.ids.as_str())?

@@ -5,7 +5,7 @@ use crate::util::env::parse_strings_from_var;
 use actix_cors::Cors;
 use actix_files::Files;
 use actix_web::http::StatusCode;
-use actix_web::{web, HttpResponse};
+use actix_web::{HttpResponse, web};
 use futures::FutureExt;
 
 pub mod internal;
@@ -137,7 +137,9 @@ pub enum ApiError {
     Io(#[from] std::io::Error),
     #[error("Resource not found")]
     NotFound,
-    #[error("You are being rate-limited. Please wait {0} milliseconds. 0/{1} remaining.")]
+    #[error(
+        "You are being rate-limited. Please wait {0} milliseconds. 0/{1} remaining."
+    )]
     RateLimitError(u128, u32),
     #[error("Error while interacting with payment processor: {0}")]
     Stripe(#[from] stripe::StripeError),

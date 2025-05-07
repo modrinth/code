@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use super::super::ids::OrganizationId;
 use super::super::teams::TeamId;
 use super::super::users::UserId;
-use crate::database::models::{version_item, DatabaseError};
+use crate::database::models::{DatabaseError, version_item};
 use crate::database::redis::RedisPool;
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::projects::{

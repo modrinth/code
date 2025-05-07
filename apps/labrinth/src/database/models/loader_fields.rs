@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use std::hash::Hasher;
 
-use super::ids::*;
 use super::DatabaseError;
+use super::ids::*;
 use crate::database::redis::RedisPool;
 use chrono::DateTime;
 use chrono::Utc;
@@ -1016,8 +1016,8 @@ impl VersionFieldValue {
                             enum_values.push(ev.clone());
                         } else {
                             return Err(format!(
-                            "Provided value '{av}' is not a valid variant for {field_name}"
-                        ));
+                                "Provided value '{av}' is not a valid variant for {field_name}"
+                            ));
                         }
                     }
                     enum_values

@@ -7,27 +7,27 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::version_item::{
     DependencyBuilder, VersionBuilder, VersionFileBuilder,
 };
-use crate::database::models::{self, image_item, Organization};
+use crate::database::models::{self, Organization, image_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::images::{Image, ImageContext, ImageId};
 use crate::models::notifications::NotificationBody;
 use crate::models::pack::PackFileHash;
 use crate::models::pats::Scopes;
-use crate::models::projects::{skip_nulls, DependencyType, ProjectStatus};
 use crate::models::projects::{
     Dependency, FileType, Loader, ProjectId, Version, VersionFile, VersionId,
     VersionStatus, VersionType,
 };
+use crate::models::projects::{DependencyType, ProjectStatus, skip_nulls};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
-use crate::validate::{validate_file, ValidationResult};
+use crate::validate::{ValidationResult, validate_file};
 use actix_multipart::{Field, Multipart};
 use actix_web::web::Data;
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, web};
 use chrono::Utc;
 use futures::stream::StreamExt;
 use hex::ToHex;

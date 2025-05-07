@@ -4,15 +4,15 @@ use actix_web::test;
 use common::{
     api_v3::oauth::get_redirect_location_query_params,
     api_v3::{
+        ApiV3,
         oauth::{
             get_auth_code_from_redirect_params, get_authorize_accept_flow_id,
         },
-        ApiV3,
     },
     database::FRIEND_USER_ID,
     database::{FRIEND_USER_PAT, USER_USER_ID, USER_USER_PAT},
     dummy_data::DummyOAuthClientAlpha,
-    environment::{with_test_environment, TestEnvironment},
+    environment::{TestEnvironment, with_test_environment},
 };
 use labrinth::auth::oauth::TokenResponse;
 
