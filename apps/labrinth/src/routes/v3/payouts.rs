@@ -11,7 +11,7 @@ use crate::routes::ApiError;
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
 use chrono::{DateTime, Datelike, Duration, TimeZone, Utc, Weekday};
 use hex::ToHex;
-use hmac::{Hmac, Mac, NewMac};
+use hmac::{Hmac, Mac};
 use reqwest::Method;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};

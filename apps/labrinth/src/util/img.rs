@@ -5,11 +5,13 @@ use crate::file_hosting::FileHost;
 use crate::models::images::ImageContext;
 use crate::routes::ApiError;
 use color_thief::ColorFormat;
+use hex::ToHex;
 use image::imageops::FilterType;
 use image::{
     DynamicImage, EncodableLayout, GenericImageView, ImageError,
     ImageOutputFormat,
 };
+use sha1::Digest;
 use std::io::Cursor;
 use webp::Encoder;
 
@@ -57,7 +59,7 @@ pub async fn upload_image_optimized(
 
     let cdn_url = dotenvy::var("CDN_URL")?;
 
-    let hash = sha1::Sha1::from(&bytes).hexdigest();
+    let hash = sha1::Sha1::digest(&bytes).encode_hex::<String>();
     let (processed_image, processed_image_ext) = process_image(
         bytes.clone(),
         content_type,

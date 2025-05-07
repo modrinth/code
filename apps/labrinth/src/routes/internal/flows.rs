@@ -31,6 +31,7 @@ use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::Arc;
 use validator::Validate;
+use zxcvbn::Score;
 
 pub fn config(cfg: &mut ServiceConfig) {
     cfg.service(
@@ -1349,13 +1350,11 @@ pub async fn create_account_with_password(
     let score = zxcvbn::zxcvbn(
         &new_account.password,
         &[&new_account.username, &new_account.email],
-    )?;
+    );
 
-    if score.score() < 3 {
+    if score.score() < Score::Three {
         return Err(ApiError::InvalidInput(
-            if let Some(feedback) =
-                score.feedback().clone().and_then(|x| x.warning())
-            {
+            if let Some(feedback) = score.feedback().and_then(|x| x.warning()) {
                 format!("Password too weak: {feedback}")
             } else {
                 "Specified password is too weak! Please improve its strength."
@@ -2012,12 +2011,12 @@ pub async fn change_password(
         let score = zxcvbn::zxcvbn(
             new_password,
             &[&user.username, &user.email.clone().unwrap_or_default()],
-        )?;
+        );
 
-        if score.score() < 3 {
+        if score.score() < Score::Three {
             return Err(ApiError::InvalidInput(
                 if let Some(feedback) =
-                    score.feedback().clone().and_then(|x| x.warning())
+                    score.feedback().and_then(|x| x.warning())
                 {
                     format!("Password too weak: {feedback}")
                 } else {

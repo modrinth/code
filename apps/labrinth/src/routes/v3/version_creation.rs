@@ -30,8 +30,10 @@ use actix_web::web::Data;
 use actix_web::{web, HttpRequest, HttpResponse};
 use chrono::Utc;
 use futures::stream::StreamExt;
+use hex::ToHex;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use sha1::Digest;
 use sqlx::postgres::PgPool;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
@@ -832,7 +834,7 @@ pub async fn upload_file(
         "Project file exceeds the maximum of 500MiB. Contact a moderator or admin to request permission to upload larger files."
     ).await?;
 
-    let hash = sha1::Sha1::from(&data).hexdigest();
+    let hash = sha1::Sha1::digest(&data).encode_hex::<String>();
     let exists = sqlx::query!(
         "
         SELECT EXISTS(SELECT 1 FROM hashes h

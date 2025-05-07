@@ -18,6 +18,7 @@ use actix_http::StatusCode;
 use actix_web::test;
 use ariadne::ids::base62_impl::parse_base62;
 use futures::StreamExt;
+use hex::ToHex;
 use itertools::Itertools;
 use labrinth::{
     database::models::project_item::PROJECTS_SLUGS_NAMESPACE,
@@ -25,6 +26,7 @@ use labrinth::{
     util::actix::{AppendsMultipart, MultipartSegment, MultipartSegmentData},
 };
 use serde_json::json;
+use sha1::Digest;
 
 #[actix_rt::test]
 async fn test_project_type_sanity() {
@@ -202,9 +204,8 @@ async fn test_add_remove_project() {
             let uploaded_version_id = project.versions[0];
 
             // Checks files to ensure they were uploaded and correctly identify the file
-            let hash = sha1::Sha1::from(basic_mod_file.bytes())
-                .digest()
-                .to_string();
+            let hash = sha1::Sha1::digest(basic_mod_file.bytes())
+                .encode_hex::<String>();
             let version = api
                 .get_version_from_hash_deserialized(
                     &hash,
