@@ -64,7 +64,7 @@ totp-rs = { version = "5.0.2", features = ["gen_secret"] }
 url = "2.4.0"
 urlencoding = "2.1.2"
 
-zip = "0.6.6"
+zip = "2.6.1"
 
 itertools = "0.12.0"
 

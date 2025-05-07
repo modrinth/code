@@ -98,7 +98,7 @@ impl TestFile {
             let mut zip = ZipWriter::new(&mut cursor);
             zip.start_file(
                 "fabric.mod.json",
-                FileOptions::default()
+                FileOptions::<()>::default()
                     .compression_method(CompressionMethod::Stored),
             )
             .unwrap();
@@ -106,7 +106,7 @@ impl TestFile {
 
             zip.start_file(
                 "META-INF/mods.toml",
-                FileOptions::default()
+                FileOptions::<()>::default()
                     .compression_method(CompressionMethod::Stored),
             )
             .unwrap();
@@ -159,7 +159,7 @@ impl TestFile {
             let mut zip = ZipWriter::new(&mut cursor);
             zip.start_file(
                 "modrinth.index.json",
-                FileOptions::default()
+                FileOptions::<()>::default()
                     .compression_method(CompressionMethod::Stored),
             )
             .unwrap();
