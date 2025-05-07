@@ -95,7 +95,7 @@ deadpool-redis = "0.20.0"
 clickhouse = { version = "0.13.2", features = ["uuid", "time"] }
 uuid = { version = "1.2.2", features = ["v4", "fast-rng", "serde"] }
 
-maxminddb = "0.24.0"
+maxminddb = "0.26.0"
 flate2 = "1.0.25"
 tar = "0.4.38"
 
