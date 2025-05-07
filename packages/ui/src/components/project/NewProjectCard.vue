@@ -50,7 +50,7 @@
           <HistoryIcon class="shrink-0" />
           <span>
             <span class="text-secondary">Updated</span>
-            {{ dayjs(project.date_modified ?? project.updated).fromNow() }}
+            {{ formatRelativeTime(project.date_modified ?? project.updated) }}
           </span>
         </div>
         <div
@@ -67,10 +67,9 @@
 import { TagsIcon, DownloadIcon, HeartIcon, HistoryIcon } from '@modrinth/assets'
 import Avatar from '../base/Avatar.vue'
 import { formatNumber, formatCategory } from '@modrinth/utils'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
+import { useRelativeTime } from '../../composables'
 
-dayjs.extend(relativeTime)
+const formatRelativeTime = useRelativeTime()
 
 defineProps({
   project: {
