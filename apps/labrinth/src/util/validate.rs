@@ -19,7 +19,7 @@ pub fn validation_errors_to_string(
 
     let map = errors.into_errors();
 
-    let key_option = map.keys().next().copied();
+    let key_option = map.keys().next();
 
     if let Some(field) = key_option {
         if let Some(error) = map.get(field) {

@@ -371,14 +371,14 @@ pub struct EditProject {
         length(max = 2048)
     )]
     pub discord_url: Option<Option<String>>,
-    #[validate]
+    #[validate(nested)]
     pub donation_urls: Option<Vec<DonationLink>>,
     pub license_id: Option<String>,
     pub client_side: Option<LegacySideType>,
     pub server_side: Option<LegacySideType>,
     #[validate(
         length(min = 3, max = 64),
-        regex = "crate::util::validate::RE_URL_SAFE"
+        regex(path = *crate::util::validate::RE_URL_SAFE)
     )]
     pub slug: Option<String>,
     pub status: Option<ProjectStatus>,
@@ -586,11 +586,11 @@ pub struct BulkEditProject {
     pub add_additional_categories: Option<Vec<String>>,
     pub remove_additional_categories: Option<Vec<String>>,
 
-    #[validate]
+    #[validate(nested)]
     pub donation_urls: Option<Vec<DonationLink>>,
-    #[validate]
+    #[validate(nested)]
     pub add_donation_urls: Option<Vec<DonationLink>>,
-    #[validate]
+    #[validate(nested)]
     pub remove_donation_urls: Option<Vec<DonationLink>>,
 
     #[serde(

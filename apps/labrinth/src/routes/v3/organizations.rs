@@ -102,7 +102,7 @@ pub async fn organization_projects_get(
 pub struct NewOrganization {
     #[validate(
         length(min = 3, max = 64),
-        regex = "crate::util::validate::RE_URL_SAFE"
+        regex(path = *crate::util::validate::RE_URL_SAFE)
     )]
     pub slug: String,
     // Title of the organization
@@ -371,7 +371,7 @@ pub struct OrganizationEdit {
     pub description: Option<String>,
     #[validate(
         length(min = 3, max = 64),
-        regex = "crate::util::validate::RE_URL_SAFE"
+        regex(path = *crate::util::validate::RE_URL_SAFE)
     )]
     pub slug: Option<String>,
     #[validate(length(min = 3, max = 64))]

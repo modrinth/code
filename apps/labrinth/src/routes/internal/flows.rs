@@ -1305,7 +1305,7 @@ pub async fn sign_up_sendy(email: &str) -> Result<(), AuthenticationError> {
 
 #[derive(Deserialize, Validate)]
 pub struct NewAccount {
-    #[validate(length(min = 1, max = 39), regex = "RE_URL_SAFE")]
+    #[validate(length(min = 1, max = 39), regex(path = *RE_URL_SAFE))]
     pub username: String,
     #[validate(length(min = 8, max = 256))]
     pub password: String,

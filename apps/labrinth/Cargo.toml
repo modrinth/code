@@ -68,7 +68,7 @@ zip = "2.6.1"
 
 itertools = "0.14.0"
 
-validator = { version = "0.16.1", features = ["derive", "phone"] }
+validator = { version = "0.20.0", features = ["derive"] }
 regex = "1.10.2"
 censor = "0.3.0"
 spdx = { version = "0.10.3", features = ["text"] }

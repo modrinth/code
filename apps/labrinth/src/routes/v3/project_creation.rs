@@ -168,7 +168,7 @@ pub struct ProjectCreateData {
     pub name: String,
     #[validate(
         length(min = 3, max = 64),
-        regex = "crate::util::validate::RE_URL_SAFE"
+        regex(path = *crate::util::validate::RE_URL_SAFE)
     )]
     #[serde(alias = "mod_slug")]
     /// The slug of a project, used for vanity URLs
@@ -182,8 +182,7 @@ pub struct ProjectCreateData {
     /// A long description of the project, in markdown.
     pub description: String,
 
-    #[validate(length(max = 32))]
-    #[validate]
+    #[validate(nested, length(max = 32))]
     /// A list of initial versions to upload with the created project
     pub initial_versions: Vec<InitialVersionData>,
     #[validate(length(max = 3))]
@@ -209,8 +208,7 @@ pub struct ProjectCreateData {
     /// The license id that the project follows
     pub license_id: String,
 
-    #[validate(length(max = 64))]
-    #[validate]
+    #[validate(nested, length(max = 64))]
     /// The multipart names of the gallery items to upload
     pub gallery_items: Option<Vec<NewGalleryItem>>,
     #[serde(default = "default_requested_status")]
