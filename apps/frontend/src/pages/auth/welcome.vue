@@ -1,7 +1,7 @@
 <template>
   <div class="welcome-box has-bot">
     <img
-      src="https://cdn-raw.modrinth.com/sad-bot.webp"
+      :src="WavingRinthbot"
       alt="Waving Modrinth Bot"
       class="welcome-box__waving-bot"
     />
@@ -56,6 +56,7 @@
 <script setup>
 import { Checkbox, commonMessages } from "@modrinth/ui";
 import { RightArrowIcon } from "@modrinth/assets";
+import { WavingRinthbot } from "@modrinth/assets"
 
 const route = useRoute();
 

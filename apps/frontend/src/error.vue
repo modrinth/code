@@ -7,7 +7,7 @@
       <div class="error-box" :class="{ 'has-bot': !is404 }">
         <img
           v-if="!is404"
-          src="https://cdn-raw.modrinth.com/sad-bot.webp"
+          :src="SadRinthbot"
           alt="Sad Modrinth bot"
           class="error-box__sad-bot"
         />
@@ -56,6 +56,7 @@
 <script setup>
 import { defineMessage, useVIntl } from "@vintl/vintl";
 import Logo404 from "~/assets/images/404.svg";
+import { SadRinthbot } from "@modrinth/assets"
 
 const { formatMessage } = useVIntl();
 
