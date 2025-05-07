@@ -669,6 +669,7 @@ export function useSearch(
     // Functions
     createPageParams,
     createPageParamsString,
+    readQueryParams
   }
 }
 
