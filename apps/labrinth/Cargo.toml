@@ -113,9 +113,9 @@ lettre = "0.11.3"
 derive-new = "0.7.0"
 rust_iso3166 = "0.1.11"
 
-async-stripe = { version = "0.39.1", features = ["runtime-tokio-hyper-rustls"] }
+async-stripe = { version = "0.41.0", features = ["runtime-tokio-hyper-rustls"] }
 rusty-money = "0.4.1"
-json-patch = "*"
+json-patch = "4.0.0"
 
 ariadne = { path = "../../packages/ariadne" }
 
