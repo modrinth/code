@@ -622,10 +622,7 @@ async fn fetch(
 
                         let path = format!(
                             "com.modrinth.daedalus:{}-installer-extracts:{}:{}@{}",
-                            mod_loader,
-                            version.raw,
-                            file_name,
-                            ext
+                            mod_loader, version.raw, file_name, ext
                         );
 
                         upload_files.insert(

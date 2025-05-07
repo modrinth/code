@@ -203,7 +203,7 @@ pub async fn download_file(
                     inner: err,
                     item: url.to_string(),
                 }
-                .into())
+                .into());
             }
         }
     }
