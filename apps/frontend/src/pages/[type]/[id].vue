@@ -871,6 +871,7 @@ import {
   ProjectSidebarDetails,
   ProjectSidebarLinks,
   ScrollablePanel,
+  useRelativeTime,
 } from "@modrinth/ui";
 import VersionSummary from "@modrinth/ui/src/components/version/VersionSummary.vue";
 import { formatCategory, isRejected, isStaff, isUnderReview, renderString } from "@modrinth/utils";

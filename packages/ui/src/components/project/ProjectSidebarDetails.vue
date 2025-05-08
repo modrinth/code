@@ -68,8 +68,10 @@ import { BookTextIcon, CalendarIcon, ScaleIcon, VersionIcon, ExternalIcon } from
 import { useVIntl, defineMessages } from '@vintl/vintl'
 import { computed } from 'vue'
 import dayjs from 'dayjs'
+import { useRelativeTime } from '../../composables'
 
 const { formatMessage } = useVIntl()
+const formatRelativeTime = useRelativeTime()
 
 const props = defineProps<{
   project: {
@@ -89,16 +91,16 @@ const props = defineProps<{
 }>()
 
 const createdDate = computed(() =>
-  props.project.published ? dayjs(props.project.published).fromNow() : 'unknown',
+  props.project.published ? formatRelativeTime(props.project.published) : 'unknown',
 )
 const submittedDate = computed(() =>
-  props.project.queued ? dayjs(props.project.queued).fromNow() : 'unknown',
+  props.project.queued ? formatRelativeTime(props.project.queued) : 'unknown',
 )
 const publishedDate = computed(() =>
-  props.project.approved ? dayjs(props.project.approved).fromNow() : 'unknown',
+  props.project.approved ? formatRelativeTime(props.project.approved) : 'unknown',
 )
 const updatedDate = computed(() =>
-  props.project.updated ? dayjs(props.project.updated).fromNow() : 'unknown',
+  props.project.updated ? formatRelativeTime(props.project.updated) : 'unknown',
 )
 
 const licenseIdDisplay = computed(() => {

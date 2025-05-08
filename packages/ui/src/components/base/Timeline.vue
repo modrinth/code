@@ -48,7 +48,7 @@ withDefaults(
     mask-image: linear-gradient(
       to bottom,
       transparent 0%,
-      black 8rem,
+      black,
       black calc(100% - 8rem),
       transparent 100%
     );
