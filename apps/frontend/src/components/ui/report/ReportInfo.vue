@@ -95,7 +95,7 @@
       </nuxt-link>
       <span>&nbsp;</span>
       <span v-tooltip="$dayjs(report.created).format('MMMM D, YYYY [at] h:mm A')">{{
-        fromNow(report.created)
+        formatRelativeTime(report.created)
       }}</span>
       <CopyCode v-if="flags.developerMode" :text="report.id" class="report-id" />
     </div>
@@ -105,10 +105,13 @@
 <script setup>
 import { ReportIcon, UnknownIcon, VersionIcon } from "@modrinth/assets";
 import { renderHighlightedString } from "~/helpers/highlight.js";
+import { useRelativeTime } from "@modrinth/ui";
 import Avatar from "~/components/ui/Avatar.vue";
 import Badge from "~/components/ui/Badge.vue";
 import ThreadSummary from "~/components/ui/thread/ThreadSummary.vue";
 import CopyCode from "~/components/ui/CopyCode.vue";
+
+const formatRelativeTime = useRelativeTime();
 
 defineProps({
   report: {
