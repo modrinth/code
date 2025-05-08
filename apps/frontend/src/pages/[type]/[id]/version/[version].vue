@@ -541,7 +541,6 @@
             :close-on-select="false"
             :clear-on-select="false"
             :show-labels="false"
-            :limit="6"
             :hide-selected="true"
             placeholder="Choose loaders..."
           />
@@ -566,7 +565,6 @@
               :close-on-select="false"
               :clear-on-select="false"
               :show-labels="false"
-              :limit="6"
               :hide-selected="true"
               :custom-label="(version) => version"
               placeholder="Choose versions..."
