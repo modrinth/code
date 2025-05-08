@@ -6,6 +6,6 @@ declare module '*.svg?component' {
 }
 
 declare module '*.webp' {
-  const src: string;
-  export default src;
+  const src: string
+  export default src
 }

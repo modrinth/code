@@ -4,16 +4,16 @@
 import _ModrinthIcon from './branding/logo.svg?component'
 import _FourOhFourNotFound from './branding/404.svg?component'
 import _ModrinthPlusIcon from './branding/modrinth-plus.svg?component'
-import _AngryRinthbot from "./branding/rinthbot/angry.webp"
-import _AnnoyedRinthbot from "./branding/rinthbot/annoyed.webp"
-import _ConfusedRinthbot from "./branding/rinthbot/confused.webp"
-import _ExcitedRinthbot from "./branding/rinthbot/excited.webp"
-import _LaughingRinthbot from "./branding/rinthbot/laughing.webp"
-import _SadRinthbot from "./branding/rinthbot/sad.webp"
-import _SleepingRinthbot from "./branding/rinthbot/sleeping.webp"
-import _SobbingRinthbot from "./branding/rinthbot/sobbing.webp"
-import _ThinkingRinthbot from "./branding/rinthbot/thinking.webp"
-import _WavingRinthbot from "./branding/rinthbot/waving.webp"
+import _AngryRinthbot from './branding/rinthbot/angry.webp'
+import _AnnoyedRinthbot from './branding/rinthbot/annoyed.webp'
+import _ConfusedRinthbot from './branding/rinthbot/confused.webp'
+import _ExcitedRinthbot from './branding/rinthbot/excited.webp'
+import _LaughingRinthbot from './branding/rinthbot/laughing.webp'
+import _SadRinthbot from './branding/rinthbot/sad.webp'
+import _SleepingRinthbot from './branding/rinthbot/sleeping.webp'
+import _SobbingRinthbot from './branding/rinthbot/sobbing.webp'
+import _ThinkingRinthbot from './branding/rinthbot/thinking.webp'
+import _WavingRinthbot from './branding/rinthbot/waving.webp'
 
 // External Icons
 import _SSODiscordIcon from './external/sso/discord.svg?component'
