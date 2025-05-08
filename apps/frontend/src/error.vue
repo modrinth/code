@@ -328,11 +328,11 @@ const routeMessages = [
     width: 100%;
     height: 1px;
     background: linear-gradient(
-        to right,
-        transparent 2rem,
-        var(--color-green) calc(100% - 13rem),
-        var(--color-green) calc(100% - 5rem),
-        transparent calc(100% - 2rem)
+      to right,
+      transparent 2rem,
+      var(--color-green) calc(100% - 13rem),
+      var(--color-green) calc(100% - 5rem),
+      transparent calc(100% - 2rem)
     );
     position: absolute;
     top: 0;
