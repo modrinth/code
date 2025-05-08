@@ -1,17 +1,33 @@
 <template>
-  <div :class="['site-banner', `site-banner--${variant}`, '[&>*]:z-[6]']">
-    <div class="site-banner__title">
-      <IssuesIcon v-if="variant == 'warning' || variant == 'error'" aria-hidden="true" />
-      <InfoIcon v-if="variant == 'info'" aria-hidden="true" />
+  <div
+    :class="[
+      'site-banner relative grid gap-2 py-8 px-4 lg:px-8 z-4',
+      `site-banner--${variant}`
+    ]"
+  >
+    <div class="site-banner__title flex items-center gap-2 font-bold text-base text-contrast z-6">
+      <IssuesIcon
+        v-if="variant === 'warning' || variant === 'error'"
+        class="w-6 h-6 flex-shrink-0"
+        aria-hidden="true"
+      />
+      <InfoIcon
+        v-if="variant === 'info'"
+        class="w-6 h-6 flex-shrink-0"
+        aria-hidden="true"
+      />
       <slot name="title" />
     </div>
-    <div class="site-banner__description">
+
+    <div class="site-banner__description flex flex-col gap-4">
       <slot name="description" />
     </div>
-    <div v-if="$slots.actions" class="site-banner__actions">
+
+    <div v-if="$slots.actions" class="site-banner__actions" >
       <slot name="actions" />
     </div>
-    <div v-if="$slots.actions_right" class="site-banner__actions_right">
+
+    <div v-if="$slots.actions_right" class="site-banner__actions_right" >
       <slot name="actions_right" />
     </div>
   </div>
@@ -30,107 +46,65 @@ const props = defineProps({
 </script>
 
 <style scoped lang="scss">
+$variants: (
+  error: (
+    border: var(--color-red),
+    bg:     var(--color-red-bg)
+  ),
+  warning: (
+    border: var(--color-orange),
+    bg:     var(--color-orange-bg)
+  ),
+  info: (
+    border: var(--color-blue),
+    bg:     var(--color-blue-bg)
+  )
+);
+
 .site-banner {
-  display: grid;
-  gap: 0.5rem;
-  grid-template: "title actions_right" "description actions_right" "actions actions_right";
-  padding-block: var(--gap-xl);
-  padding-inline: max(calc((100% - 80rem) / 2 + var(--gap-md)), var(--gap-xl));
-  position: relative;
-  z-index: 4;
+  grid-template-areas:
+    "title actions_right"
+    "description actions_right"
+    "actions actions_right";
+
+  @each $name, $cols in $variants {
+    &--#{$name} {
+      background-color: var(--color-bg);
+      border-bottom: 2px solid map-get($cols, border);
+
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-color: map-get($cols, bg);
+        z-index: 5;
+      }
+
+      .site-banner__title svg,
+      a {
+        color: map-get($cols, border);
+      }
+    }
+  }
 
   .site-banner__title {
     grid-area: title;
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    font-weight: bold;
-    font-size: var(--font-size-md);
-    color: var(--color-contrast);
-
-    svg {
-      width: 1.5rem;
-      height: 1.5rem;
-      flex-shrink: 0;
-    }
   }
 
   .site-banner__description {
     grid-area: description;
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-md);
   }
 
   .site-banner__actions {
     grid-area: actions;
   }
 
+  .site-banner__actions_right {
+    grid-area: actions_right;
+  }
+
   a {
     color: inherit;
-  }
-
-  &--error {
-    background-color: var(--color-bg);
-    border-bottom: 2px solid var(--color-red);
-
-    &::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-color: var(--color-red-bg);
-      z-index: 5;
-    }
-
-    .site-banner__title svg {
-      color: var(--color-red);
-    }
-
-    a {
-      color: var(--color-red);
-    }
-  }
-
-  &--warning {
-    background-color: var(--color-bg);
-    border-bottom: 2px solid var(--color-orange);
-
-    &::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-color: var(--color-orange-bg);
-      z-index: 5;
-    }
-
-    .site-banner__title svg {
-      color: var(--color-orange);
-    }
-
-    a {
-      color: var(--color-orange);
-    }
-  }
-
-  &--info {
-    background-color: var(--color-bg);
-    border-bottom: 2px solid var(--color-blue);
-
-    &::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-color: var(--color-blue-bg);
-      z-index: 5;
-    }
-
-    .site-banner__title svg {
-      color: var(--color-blue);
-    }
-
-    a {
-      color: var(--color-blue);
-    }
   }
 }
 </style>
