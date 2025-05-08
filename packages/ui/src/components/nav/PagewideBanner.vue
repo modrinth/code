@@ -1,110 +1,83 @@
 <template>
   <div
     :class="[
-      'site-banner relative grid gap-2 py-8 px-4 lg:px-8 z-4',
-      `site-banner--${variant}`
+      `banner-grid relative before:content-[''] before:absolute before:inset-0 before:z-[1] [&>*]:z-[6] border-solid border-0`,
+      containerClasses[variant]
     ]"
   >
-    <div class="site-banner__title flex items-center gap-2 font-bold text-base text-contrast z-6">
+    <div
+      :class="[
+        'grid-area-[title] flex items-center gap-2 font-bold text-[var(--font-size-md)]',
+        iconClasses[variant]
+      ]"
+    >
       <IssuesIcon
         v-if="variant === 'warning' || variant === 'error'"
-        class="w-6 h-6 flex-shrink-0"
         aria-hidden="true"
+        class="w-6 h-6 flex-shrink-0"
+        :class="iconClasses[variant]"
       />
       <InfoIcon
         v-if="variant === 'info'"
-        class="w-6 h-6 flex-shrink-0"
         aria-hidden="true"
+        class="w-6 h-6 flex-shrink-0"
+        :class="iconClasses[variant]"
       />
       <slot name="title" />
     </div>
 
-    <div class="site-banner__description flex flex-col gap-4">
+    <div class="grid-area-[description] flex flex-col gap-[var(--gap-md)]">
       <slot name="description" />
     </div>
 
-    <div v-if="$slots.actions" class="site-banner__actions" >
+    <div v-if="$slots.actions" class="grid-area-[actions]">
       <slot name="actions" />
     </div>
 
-    <div v-if="$slots.actions_right" class="site-banner__actions_right" >
+    <div v-if="$slots.actions_right" class="grid-area-[actions_right]">
       <slot name="actions_right" />
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
-import { IssuesIcon, InfoIcon } from '@modrinth/assets'
+<script lang="ts" setup>
+import { InfoIcon, IssuesIcon } from '@modrinth/assets'
 
-const props = defineProps({
-  variant: {
-    type: String as () => 'error' | 'warning' | 'info',
-    required: true,
-    validator: (v: string) => ['error', 'warning', 'info'].includes(v),
-  },
-})
+const props = defineProps<{
+  variant: 'error' | 'warning' | 'info'
+}>()
+
+const containerClasses = {
+  error:   'bg-brand-red-50 border-b-2 border-b-brand-red before:bg-brand-red-900',
+  warning: 'bg-brand-orange-50 border-b-2 border-b-brand-orange before:bg-brand-orange-900',
+  info:    'bg-brand-blue-50 border-b-2 border-b-brand-blue before:bg-brand-blue-900',
+}
+
+const iconClasses = {
+  error: 'text-brand-red',
+  warning: 'text-brand-orange',
+  info: 'text-brand-blue',
+}
 </script>
 
-<style scoped lang="scss">
-$variants: (
-  error: (
-    border: var(--color-red),
-    bg:     var(--color-red-bg)
-  ),
-  warning: (
-    border: var(--color-orange),
-    bg:     var(--color-orange-bg)
-  ),
-  info: (
-    border: var(--color-blue),
-    bg:     var(--color-blue-bg)
-  )
-);
-
-.site-banner {
+<style scoped>
+.banner-grid {
+  display: grid;
+  gap: 0.5rem;
   grid-template-areas:
-    "title actions_right"
-    "description actions_right"
-    "actions actions_right";
+    'title         actions_right'
+    'description   actions_right'
+    'actions       actions_right';
+  padding-block: var(--gap-xl);
+  padding-inline: max(calc((100% - 80rem) / 2 + var(--gap-md)), var(--gap-xl));
+}
 
-  @each $name, $cols in $variants {
-    &--#{$name} {
-      background-color: var(--color-bg);
-      border-bottom: 2px solid map-get($cols, border);
+.grid-area-\[title\] { grid-area: title; }
+.grid-area-\[description\] { grid-area: description; }
+.grid-area-\[actions\] { grid-area: actions; }
+.grid-area-\[actions_right\] { grid-area: actions_right; }
 
-      &::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background-color: map-get($cols, bg);
-        z-index: 5;
-      }
-
-      .site-banner__title svg,
-      a {
-        color: map-get($cols, border);
-      }
-    }
-  }
-
-  .site-banner__title {
-    grid-area: title;
-  }
-
-  .site-banner__description {
-    grid-area: description;
-  }
-
-  .site-banner__actions {
-    grid-area: actions;
-  }
-
-  .site-banner__actions_right {
-    grid-area: actions_right;
-  }
-
-  a {
-    color: inherit;
-  }
+.banner-grid a {
+  @apply underline text-current;
 }
 </style>

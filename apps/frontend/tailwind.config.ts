@@ -1,5 +1,7 @@
-/** @type {import('tailwindcss').Config} */
-const config = {
+import shadesGenerator from "@modrinth/utils/shades-generator";
+import type { Config } from 'tailwindcss'
+
+const config: Config = {
   content: [
     "./src/components/**/*.{js,vue,ts}",
     "./src/layouts/**/*.vue",
@@ -126,6 +128,7 @@ const config = {
       backgroundImage: {
         mazeBg: "var(--landing-maze-bg)",
         mazeGradientBg: "var(--landing-maze-gradient-bg)",
+        // @ts-ignore
         landing: {
           mazeOuterBg: "var(--landing-maze-outer-bg)",
           colorHeading: "var(--landing-color-heading)",
@@ -147,7 +150,9 @@ const config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    shadesGenerator,
+  ],
   corePlugins: {
     preflight: false,
   },
