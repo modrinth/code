@@ -256,11 +256,11 @@
               >
                 <div class="country-flag-container">
                   <template v-if="name.toLowerCase() === 'xx' || !name">
-                    <img
-                      src="https://cdn.modrinth.com/placeholder-banner.svg"
-                      alt="Placeholder flag"
-                      class="country-flag"
-                    />
+                    <div
+                      class="country-flag flex select-none items-center justify-center bg-bg-raised font-extrabold text-secondary"
+                    >
+                      ?
+                    </div>
                   </template>
                   <template v-else>
                     <img
@@ -272,7 +272,7 @@
                 </div>
                 <div class="country-text">
                   <strong class="country-name">
-                    <template v-if="name.toLowerCase() === 'xx' || !name">Hidden</template>
+                    <template v-if="name.toLowerCase() === 'xx' || !name">Other</template>
                     <template v-else>{{ countryCodeToName(name) }}</template>
                   </strong>
                   <span class="data-point">{{ formatNumber(count) }}</span>
