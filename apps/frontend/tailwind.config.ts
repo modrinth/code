@@ -1,5 +1,5 @@
-import shadesGenerator from "@modrinth/utils/shades-generator";
-import type { Config } from 'tailwindcss'
+import shadesGenerator from "@modrinth/utils/tailwind/shades-generator";
+import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
@@ -37,6 +37,23 @@ const config: Config = {
           blue: "var(--color-blue-bg)",
           purple: "var(--color-purple-bg)",
           raised: "var(--color-raised-bg)",
+        },
+        banners: {
+          error: {
+            bg: "var(--banner-error-bg)",
+            text: "var(--banner-error-text)",
+            border: "var(--banner-error-border)",
+          },
+          warning: {
+            bg: "var(--banner-warning-bg)",
+            text: "var(--banner-warning-text)",
+            border: "var(--banner-warning-border)",
+          },
+          info: {
+            bg: "var(--banner-info-bg)",
+            text: "var(--banner-info-text)",
+            border: "var(--banner-info-border)",
+          },
         },
         highlight: {
           DEFAULT: "var(--color-brand-highlight)",
@@ -150,9 +167,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [
-    shadesGenerator,
-  ],
+  plugins: [shadesGenerator],
   corePlugins: {
     preflight: false,
   },

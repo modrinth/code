@@ -1,7 +1,7 @@
 <template>
   <div
     :class="[
-      `banner-grid relative before:content-[''] before:absolute before:inset-0 before:z-[1] [&>*]:z-[6] border-solid border-0`,
+      'banner-grid relative border-b-2 border-solid border-0',
       containerClasses[variant]
     ]"
   >
@@ -15,13 +15,11 @@
         v-if="variant === 'warning' || variant === 'error'"
         aria-hidden="true"
         class="w-6 h-6 flex-shrink-0"
-        :class="iconClasses[variant]"
       />
       <InfoIcon
         v-if="variant === 'info'"
         aria-hidden="true"
         class="w-6 h-6 flex-shrink-0"
-        :class="iconClasses[variant]"
       />
       <slot name="title" />
     </div>
@@ -48,9 +46,9 @@ const props = defineProps<{
 }>()
 
 const containerClasses = {
-  error:   'bg-brand-red-50 border-b-2 border-b-brand-red before:bg-brand-red-900',
-  warning: 'bg-brand-orange-50 border-b-2 border-b-brand-orange before:bg-brand-orange-900',
-  info:    'bg-brand-blue-50 border-b-2 border-b-brand-blue before:bg-brand-blue-900',
+  error:   'bg-banners-error-bg text-banners-error-text border-banners-error-border',
+  warning: 'bg-banners-warning-bg text-banners-warning-text border-banners-warning-border',
+  info:    'bg-banners-info-bg text-banners-info-text border-banners-info-border',
 }
 
 const iconClasses = {
@@ -72,10 +70,11 @@ const iconClasses = {
   padding-inline: max(calc((100% - 80rem) / 2 + var(--gap-md)), var(--gap-xl));
 }
 
-.grid-area-\[title\] { grid-area: title; }
-.grid-area-\[description\] { grid-area: description; }
-.grid-area-\[actions\] { grid-area: actions; }
-.grid-area-\[actions_right\] { grid-area: actions_right; }
+
+.grid-area-\[title\]        { grid-area: title; }
+.grid-area-\[description\]  { grid-area: description; }
+.grid-area-\[actions\]      { grid-area: actions; }
+.grid-area-\[actions_right\]{ grid-area: actions_right; }
 
 .banner-grid a {
   @apply underline text-current;
