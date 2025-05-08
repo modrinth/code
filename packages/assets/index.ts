@@ -15,6 +15,7 @@ import _SSOSteamIcon from './external/sso/steam.svg?component'
 import _AppleIcon from './external/apple.svg?component'
 import _BlueskyIcon from './external/bluesky.svg?component'
 import _BuyMeACoffeeIcon from './external/bmac.svg?component'
+import _CurseForgeIcon from './external/curseforge.svg?component'
 import _DiscordIcon from './external/discord.svg?component'
 import _GithubIcon from './external/github.svg?component'
 import _KoFiIcon from './external/kofi.svg?component'
@@ -74,6 +75,7 @@ import _ExternalIcon from './icons/external.svg?component'
 import _EyeIcon from './icons/eye.svg?component'
 import _EyeOffIcon from './icons/eye-off.svg?component'
 import _FileIcon from './icons/file.svg?component'
+import _FileArchiveIcon from './icons/file-archive.svg?component'
 import _FileTextIcon from './icons/file-text.svg?component'
 import _FilterIcon from './icons/filter.svg?component'
 import _FilterXIcon from './icons/filter-x.svg?component'
@@ -225,6 +227,7 @@ export const AppleIcon = _AppleIcon
 export const BlueskyIcon = _BlueskyIcon
 export const BuyMeACoffeeIcon = _BuyMeACoffeeIcon
 export const GithubIcon = _GithubIcon
+export const CurseForgeIcon = _CurseForgeIcon
 export const DiscordIcon = _DiscordIcon
 export const KoFiIcon = _KoFiIcon
 export const MastodonIcon = _MastodonIcon
@@ -281,6 +284,7 @@ export const ExternalIcon = _ExternalIcon
 export const EyeIcon = _EyeIcon
 export const EyeOffIcon = _EyeOffIcon
 export const FileIcon = _FileIcon
+export const FileArchiveIcon = _FileArchiveIcon
 export const FileTextIcon = _FileTextIcon
 export const FilterIcon = _FilterIcon
 export const FilterXIcon = _FilterXIcon

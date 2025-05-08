@@ -224,6 +224,45 @@ export interface WSBackupProgressEvent {
   ready: boolean;
 }
 
+export type FSQueuedOpUnarchive = {
+  op: "unarchive";
+  src: string;
+};
+
+export type FSQueuedOp = FSQueuedOpUnarchive;
+
+export type FSOpUnarchive = {
+  op: "unarchive";
+  progress: number; // Note: 1 does not mean it's done
+  id: string; // UUID
+
+  mime: string;
+  src: string;
+  state:
+    | "queued"
+    | "ongoing"
+    | "cancelled"
+    | "done"
+    | "failed-corrupted"
+    | "failed-invalid-path"
+    | "failed-cf-no-serverpack"
+    | "failed-cf-not-available"
+    | "failed-not-reachable";
+
+  current_file: string | null;
+  failed_path?: string;
+  bytes_processed: number;
+  files_processed: number;
+  started: string;
+};
+
+export type FilesystemOp = FSOpUnarchive;
+
+export interface WSFilesystemOpsEvent {
+  event: "filesystem-ops";
+  all: FilesystemOp[];
+}
+
 export type WSEvent =
   | WSLogEvent
   | WSStatsEvent
@@ -234,7 +273,8 @@ export type WSEvent =
   | WSAuthOkEvent
   | WSUptimeEvent
   | WSNewModEvent
-  | WSBackupProgressEvent;
+  | WSBackupProgressEvent
+  | WSFilesystemOpsEvent;
 
 export interface Servers {
   servers: Server[];
