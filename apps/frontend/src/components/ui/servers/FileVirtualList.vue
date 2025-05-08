@@ -30,6 +30,7 @@
           :size="item.size"
           @delete="$emit('delete', item)"
           @rename="$emit('rename', item)"
+          @extract="$emit('extract', item)"
           @download="$emit('download', item)"
           @move="$emit('move', item)"
           @move-direct-to="$emit('moveDirectTo', $event)"
@@ -49,14 +50,12 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "delete", item: any): void;
-  (e: "rename", item: any): void;
-  (e: "download", item: any): void;
-  (e: "move", item: any): void;
-  (e: "edit", item: any): void;
+  (
+    e: "delete" | "rename" | "download" | "move" | "edit" | "moveDirectTo" | "extract",
+    item: any,
+  ): void;
   (e: "contextmenu", item: any, x: number, y: number): void;
   (e: "loadMore"): void;
-  (e: "moveDirectTo", item: any): void;
 }>();
 
 const ITEM_HEIGHT = 61;

@@ -19,7 +19,14 @@ import {
   WorldIcon,
   XIcon,
 } from '@modrinth/assets'
-import { Avatar, Button, ButtonStyled, Notifications, OverflowMenu } from '@modrinth/ui'
+import {
+  Avatar,
+  Button,
+  ButtonStyled,
+  Notifications,
+  OverflowMenu,
+  useRelativeTime,
+} from '@modrinth/ui'
 import { useLoading, useTheming } from '@/store/state'
 import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
@@ -61,6 +68,8 @@ import { hide_ads_window, init_ads_window } from '@/helpers/ads.js'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
+
+const formatRelativeTime = useRelativeTime()
 
 const themeStore = useTheming()
 
@@ -590,7 +599,7 @@ function handleAuxClick(e) {
                 </h4>
                 <p class="my-1 text-sm text-secondary leading-tight">{{ item.summary }}</p>
                 <p class="text-right text-sm text-secondary opacity-60 leading-tight m-0">
-                  {{ dayjs(item.date).fromNow() }}
+                  {{ formatRelativeTime(dayjs(item.date).toISOString()) }}
                 </p>
               </a>
               <hr

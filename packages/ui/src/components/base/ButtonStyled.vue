@@ -4,7 +4,7 @@ import { computed } from 'vue'
 const props = withDefaults(
   defineProps<{
     color?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple'
-    size?: 'standard' | 'large'
+    size?: 'standard' | 'large' | 'small'
     circular?: boolean
     type?: 'standard' | 'outlined' | 'transparent' | 'highlight' | 'highlight-colored-text'
     colorFill?: 'auto' | 'background' | 'text' | 'none'
@@ -67,6 +67,8 @@ const colorVar = computed(() => {
 const height = computed(() => {
   if (props.size === 'large') {
     return '3rem'
+  } else if (props.size === 'small') {
+    return '1.5rem'
   }
   return '2.25rem'
 })
@@ -74,6 +76,8 @@ const height = computed(() => {
 const width = computed(() => {
   if (props.size === 'large') {
     return props.circular ? '3rem' : 'auto'
+  } else if (props.size === 'small') {
+    return props.circular ? '1.5rem' : 'auto'
   }
   return props.circular ? '2.25rem' : 'auto'
 })
@@ -82,6 +86,8 @@ const paddingX = computed(() => {
   let padding = props.circular ? '0.5rem' : '0.75rem'
   if (props.size === 'large') {
     padding = props.circular ? '0.75rem' : '1rem'
+  } else if (props.size === 'small') {
+    padding = props.circular ? '0.125rem' : '0.5rem'
   }
   return `calc(${padding} - 0.125rem)`
 })
@@ -96,6 +102,8 @@ const paddingY = computed(() => {
 const gap = computed(() => {
   if (props.size === 'large') {
     return '0.5rem'
+  } else if (props.size === 'small') {
+    return '0.25rem'
   }
   return '0.375rem'
 })
@@ -114,6 +122,8 @@ const radius = computed(() => {
 
   if (props.size === 'large') {
     return '1rem'
+  } else if (props.size === 'small') {
+    return '0.5rem'
   }
   return '0.75rem'
 })
@@ -121,6 +131,8 @@ const radius = computed(() => {
 const iconSize = computed(() => {
   if (props.size === 'large') {
     return '1.5rem'
+  } else if (props.size === 'small') {
+    return '1rem'
   }
   return '1.25rem'
 })
@@ -192,12 +204,19 @@ const colorVariables = computed(() => {
 
   return `--_bg: ${colors.bg}; --_text: ${colors.text}; --_hover-bg: ${hoverColors.bg}; --_hover-text: ${hoverColors.text};`
 })
+
+const fontSize = computed(() => {
+  if (props.size === 'small') {
+    return 'text-sm'
+  }
+  return 'text-base'
+})
 </script>
 
 <template>
   <div
     class="btn-wrapper"
-    :class="{ outline: type === 'outlined' }"
+    :class="[{ outline: type === 'outlined' }, fontSize]"
     :style="`${colorVariables}--_height:${height};--_width:${width};--_radius: ${radius};--_padding-x:${paddingX};--_padding-y:${paddingY};--_gap:${gap};--_font-weight:${fontWeight};--_icon-size:${iconSize};`"
   >
     <slot />

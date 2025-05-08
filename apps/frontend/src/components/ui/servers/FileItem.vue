@@ -53,6 +53,7 @@
       <ButtonStyled circular type="transparent">
         <UiServersTeleportOverflowMenu :options="menuOptions" direction="left" position="bottom">
           <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
+          <template #extract><PackageOpenIcon /> Extract</template>
           <template #rename><EditIcon /> Rename</template>
           <template #move><RightArrowIcon /> Move</template>
           <template #download><DownloadIcon /> Download</template>
@@ -73,6 +74,8 @@ import {
   FolderOpenIcon,
   FileIcon,
   RightArrowIcon,
+  PackageOpenIcon,
+  FileArchiveIcon,
 } from "@modrinth/assets";
 import { computed, shallowRef, ref } from "vue";
 import { renderToString } from "vue/server-renderer";
@@ -99,15 +102,14 @@ interface FileItemProps {
 const props = defineProps<FileItemProps>();
 
 const emit = defineEmits<{
-  (e: "rename", item: { name: string; type: string; path: string }): void;
-  (e: "move", item: { name: string; type: string; path: string }): void;
+  (
+    e: "rename" | "move" | "download" | "delete" | "edit" | "extract",
+    item: { name: string; type: string; path: string },
+  ): void;
   (
     e: "moveDirectTo",
     item: { name: string; type: string; path: string; destination: string },
   ): void;
-  (e: "download", item: { name: string; type: string; path: string }): void;
-  (e: "delete", item: { name: string; type: string; path: string }): void;
-  (e: "edit", item: { name: string; type: string; path: string }): void;
   (e: "contextmenu", x: number, y: number): void;
 }>();
 
@@ -143,6 +145,7 @@ const codeExtensions = Object.freeze([
 
 const textExtensions = Object.freeze(["txt", "md", "log", "cfg", "conf", "properties", "ini"]);
 const imageExtensions = Object.freeze(["png", "jpg", "jpeg", "gif", "svg", "webp"]);
+const supportedArchiveExtensions = Object.freeze(["zip"]);
 const units = Object.freeze(["B", "KB", "MB", "GB", "TB", "PB", "EB"]);
 
 const route = shallowRef(useRoute());
@@ -156,7 +159,18 @@ const containerClasses = computed(() => [
 
 const fileExtension = computed(() => props.name.split(".").pop()?.toLowerCase() || "");
 
+const isZip = computed(() => fileExtension.value === "zip");
+
 const menuOptions = computed(() => [
+  {
+    id: "extract",
+    shown: isZip.value,
+    action: () => emit("extract", { name: props.name, type: props.type, path: props.path }),
+  },
+  {
+    divider: true,
+    shown: isZip.value,
+  },
   {
     id: "rename",
     action: () => emit("rename", { name: props.name, type: props.type, path: props.path }),
@@ -189,6 +203,7 @@ const iconComponent = computed(() => {
   if (codeExtensions.includes(ext)) return UiServersIconsCodeFileIcon;
   if (textExtensions.includes(ext)) return UiServersIconsTextFileIcon;
   if (imageExtensions.includes(ext)) return UiServersIconsImageFileIcon;
+  if (supportedArchiveExtensions.includes(ext)) return FileArchiveIcon;
   return FileIcon;
 });
 

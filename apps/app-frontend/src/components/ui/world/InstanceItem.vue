@@ -8,7 +8,14 @@ import {
   SpinnerIcon,
   StopCircleIcon,
 } from '@modrinth/assets'
-import { Avatar, ButtonStyled, commonMessages, OverflowMenu, SmartClickable } from '@modrinth/ui'
+import {
+  Avatar,
+  ButtonStyled,
+  commonMessages,
+  OverflowMenu,
+  SmartClickable,
+  useRelativeTime,
+} from '@modrinth/ui'
 import { useVIntl } from '@vintl/vintl'
 import { computed, nextTick, ref, onMounted, onUnmounted } from 'vue'
 import { showProfileInFolder } from '@/helpers/utils'
@@ -25,6 +32,7 @@ import { handleError } from '@/store/notifications'
 import { process_listener } from '@/helpers/events'
 
 const { formatMessage } = useVIntl()
+const formatRelativeTime = useRelativeTime()
 
 const router = useRouter()
 
@@ -144,7 +152,7 @@ onUnmounted(() => {
             <template v-if="instance.last_played">
               {{
                 formatMessage(commonMessages.playedLabel, {
-                  time: dayjs(instance.last_played).fromNow(),
+                  time: formatRelativeTime(instance.last_played.toISOString()),
                 })
               }}
             </template>

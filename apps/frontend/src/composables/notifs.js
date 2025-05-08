@@ -11,11 +11,13 @@ export const addNotification = (notification) => {
   );
   if (existingNotif) {
     setNotificationTimer(existingNotif);
+    existingNotif.count++;
 
     return;
   }
 
   notification.id = new Date();
+  notification.count = 1;
 
   setNotificationTimer(notification);
   notifications.value.push(notification);

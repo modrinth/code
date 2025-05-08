@@ -41,6 +41,9 @@
   "instance.edit-server.title": {
     "message": "Edit server"
   },
+  "instance.edit-world.hide-from-home": {
+    "message": "Hide from the Home page"
+  },
   "instance.edit-world.name": {
     "message": "Name"
   },
@@ -362,6 +365,9 @@
   "instance.worlds.copy_address": {
     "message": "Copy address"
   },
+  "instance.worlds.dont_show_on_home": {
+    "message": "Don't show on Home"
+  },
   "instance.worlds.filter.available": {
     "message": "Available"
   },
@@ -376,6 +382,9 @@
   },
   "instance.worlds.play_anyway": {
     "message": "Play anyway"
+  },
+  "instance.worlds.play_instance": {
+    "message": "Play instance"
   },
   "instance.worlds.type.server": {
     "message": "Server"

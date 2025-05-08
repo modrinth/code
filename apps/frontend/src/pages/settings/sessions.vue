@@ -57,7 +57,7 @@
 </template>
 <script setup>
 import { XIcon } from "@modrinth/assets";
-import { commonMessages, commonSettingsMessages } from "@modrinth/ui";
+import { commonMessages, commonSettingsMessages, useRelativeTime } from "@modrinth/ui";
 
 definePageMeta({
   middleware: "auth",

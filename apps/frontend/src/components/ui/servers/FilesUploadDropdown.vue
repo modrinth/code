@@ -1,101 +1,105 @@
 <template>
-  <Transition name="upload-status" @enter="onUploadStatusEnter" @leave="onUploadStatusLeave">
-    <div v-show="isUploading" ref="uploadStatusRef" class="upload-status">
-      <div
-        ref="statusContentRef"
-        :class="['flex flex-col p-4 text-sm text-contrast', $attrs.class]"
-      >
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2 font-bold">
-            <FolderOpenIcon class="size-4" />
-            <span>
-              <span class="capitalize">
-                {{ props.fileType ? props.fileType : "File" }} Uploads
+  <div>
+    <Transition name="upload-status" @enter="onUploadStatusEnter" @leave="onUploadStatusLeave">
+      <div v-show="isUploading" ref="uploadStatusRef" class="upload-status">
+        <div
+          ref="statusContentRef"
+          v-bind="$attrs"
+          :class="['flex flex-col p-4 text-sm text-contrast']"
+        >
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 font-bold">
+              <FolderOpenIcon class="size-4" />
+              <span>
+                <span class="capitalize">
+                  {{ props.fileType ? props.fileType : "File" }} uploads
+                </span>
+                <span>{{ activeUploads.length > 0 ? ` - ${activeUploads.length} left` : "" }}</span>
               </span>
-              <span>{{ activeUploads.length > 0 ? ` - ${activeUploads.length} left` : "" }}</span>
-            </span>
-          </div>
-        </div>
-
-        <div class="mt-2 space-y-2">
-          <div
-            v-for="item in uploadQueue"
-            :key="item.file.name"
-            class="flex h-6 items-center justify-between gap-2 text-xs"
-          >
-            <div class="flex flex-1 items-center gap-2 truncate">
-              <transition-group name="status-icon" mode="out-in">
-                <UiServersPanelSpinner
-                  v-show="item.status === 'uploading'"
-                  key="spinner"
-                  class="absolute !size-4"
-                />
-                <CheckCircleIcon
-                  v-show="item.status === 'completed'"
-                  key="check"
-                  class="absolute size-4 text-green"
-                />
-                <XCircleIcon
-                  v-show="
-                    item.status === 'error' ||
-                    item.status === 'cancelled' ||
-                    item.status === 'incorrect-type'
-                  "
-                  key="error"
-                  class="absolute size-4 text-red"
-                />
-              </transition-group>
-              <span class="ml-6 truncate">{{ item.file.name }}</span>
-              <span class="text-secondary">{{ item.size }}</span>
             </div>
-            <div class="flex min-w-[80px] items-center justify-end gap-2">
-              <template v-if="item.status === 'completed'">
-                <span>Done</span>
-              </template>
-              <template v-else-if="item.status === 'error'">
-                <span class="text-red">Failed - File already exists</span>
-              </template>
-              <template v-else-if="item.status === 'incorrect-type'">
-                <span class="text-red">Failed - Incorrect file type</span>
-              </template>
-              <template v-else>
-                <template v-if="item.status === 'uploading'">
-                  <span>{{ item.progress }}%</span>
-                  <div class="h-1 w-20 overflow-hidden rounded-full bg-bg">
-                    <div
-                      class="h-full bg-contrast transition-all duration-200"
-                      :style="{ width: item.progress + '%' }"
-                    />
-                  </div>
-                  <ButtonStyled color="red" type="transparent" @click="cancelUpload(item)">
-                    <button>Cancel</button>
-                  </ButtonStyled>
+          </div>
+
+          <div class="mt-2 space-y-2">
+            <div
+              v-for="item in uploadQueue"
+              :key="item.file.name"
+              class="flex h-6 items-center justify-between gap-2 text-xs"
+            >
+              <div class="flex flex-1 items-center gap-2 truncate">
+                <transition-group name="status-icon" mode="out-in">
+                  <UiServersPanelSpinner
+                    v-show="item.status === 'uploading'"
+                    key="spinner"
+                    class="absolute !size-4"
+                  />
+                  <CheckCircleIcon
+                    v-show="item.status === 'completed'"
+                    key="check"
+                    class="absolute size-4 text-green"
+                  />
+                  <XCircleIcon
+                    v-show="
+                      item.status === 'error' ||
+                      item.status === 'cancelled' ||
+                      item.status === 'incorrect-type'
+                    "
+                    key="error"
+                    class="absolute size-4 text-red"
+                  />
+                </transition-group>
+                <span class="ml-6 truncate">{{ item.file.name }}</span>
+                <span class="text-secondary">{{ item.size }}</span>
+              </div>
+              <div class="flex min-w-[80px] items-center justify-end gap-2">
+                <template v-if="item.status === 'completed'">
+                  <span>Done</span>
                 </template>
-                <template v-else-if="item.status === 'cancelled'">
-                  <span class="text-red">Cancelled</span>
+                <template v-else-if="item.status === 'error'">
+                  <span class="text-red">Failed - File already exists</span>
+                </template>
+                <template v-else-if="item.status === 'incorrect-type'">
+                  <span class="text-red">Failed - Incorrect file type</span>
                 </template>
                 <template v-else>
-                  <span>{{ item.progress }}%</span>
-                  <div class="h-1 w-20 overflow-hidden rounded-full bg-bg">
-                    <div
-                      class="h-full bg-contrast transition-all duration-200"
-                      :style="{ width: item.progress + '%' }"
-                    />
-                  </div>
+                  <template v-if="item.status === 'uploading'">
+                    <span>{{ item.progress }}%</span>
+                    <div class="h-1 w-20 overflow-hidden rounded-full bg-bg">
+                      <div
+                        class="h-full bg-contrast transition-all duration-200"
+                        :style="{ width: item.progress + '%' }"
+                      />
+                    </div>
+                    <ButtonStyled color="red" type="transparent" @click="cancelUpload(item)">
+                      <button>Cancel</button>
+                    </ButtonStyled>
+                  </template>
+                  <template v-else-if="item.status === 'cancelled'">
+                    <span class="text-red">Cancelled</span>
+                  </template>
+                  <template v-else>
+                    <span>{{ item.progress }}%</span>
+                    <div class="h-1 w-20 overflow-hidden rounded-full bg-bg">
+                      <div
+                        class="h-full bg-contrast transition-all duration-200"
+                        :style="{ width: item.progress + '%' }"
+                      />
+                    </div>
+                  </template>
                 </template>
-              </template>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </Transition>
+    </Transition>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { FolderOpenIcon, CheckCircleIcon, XCircleIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 import { ref, computed, watch, nextTick } from "vue";
+import type { FSModule } from "~/composables/pyroServers.ts";
 
 interface UploadItem {
   file: File;

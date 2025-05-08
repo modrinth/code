@@ -32,68 +32,68 @@
           @mousedown.stop
           @mouseleave="handleMouseLeave"
         >
-          <ButtonStyled
+          <template
             v-for="(option, index) in filteredOptions"
-            :key="option.id"
-            type="transparent"
-            role="menuitem"
-            :color="option.color"
+            :key="isDivider(option) ? `divider-${index}` : option.id"
           >
-            <button
-              v-if="typeof option.action === 'function'"
-              :ref="
-                (el) => {
-                  if (el) menuItemsRef[index] = el as HTMLElement;
-                }
-              "
-              class="w-full !justify-start !whitespace-nowrap focus-visible:!outline-none"
-              :aria-selected="index === selectedIndex"
-              :style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
-              @click="handleItemClick(option, index)"
-              @focus="selectedIndex = index"
-              @mouseover="handleMouseOver(index)"
-            >
-              <slot :name="option.id">{{ option.id }}</slot>
-            </button>
-            <nuxt-link
-              v-else-if="typeof option.action === 'string' && option.action.startsWith('/')"
-              :ref="
-                (el) => {
-                  if (el) menuItemsRef[index] = el as HTMLElement;
-                }
-              "
-              :to="option.action"
-              class="w-full !justify-start !whitespace-nowrap focus-visible:!outline-none"
-              :aria-selected="index === selectedIndex"
-              :style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
-              @click="handleItemClick(option, index)"
-              @focus="selectedIndex = index"
-              @mouseover="handleMouseOver(index)"
-            >
-              <slot :name="option.id">{{ option.id }}</slot>
-            </nuxt-link>
-            <a
-              v-else-if="typeof option.action === 'string' && !option.action.startsWith('http')"
-              :ref="
-                (el) => {
-                  if (el) menuItemsRef[index] = el as HTMLElement;
-                }
-              "
-              :href="option.action"
-              target="_blank"
-              class="w-full !justify-start !whitespace-nowrap focus-visible:!outline-none"
-              :aria-selected="index === selectedIndex"
-              :style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
-              @click="handleItemClick(option, index)"
-              @focus="selectedIndex = index"
-              @mouseover="handleMouseOver(index)"
-            >
-              <slot :name="option.id">{{ option.id }}</slot>
-            </a>
-            <span v-else>
-              <slot :name="option.id">{{ option.id }}</slot>
-            </span>
-          </ButtonStyled>
+            <div v-if="isDivider(option)" class="h-px w-full bg-button-bg"></div>
+            <ButtonStyled v-else type="transparent" role="menuitem" :color="option.color">
+              <button
+                v-if="typeof option.action === 'function'"
+                :ref="
+                  (el) => {
+                    if (el) menuItemsRef[index] = el as HTMLElement;
+                  }
+                "
+                class="w-full !justify-start !whitespace-nowrap focus-visible:!outline-none"
+                :aria-selected="index === selectedIndex"
+                :style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
+                @click="handleItemClick(option, index)"
+                @focus="selectedIndex = index"
+                @mouseover="handleMouseOver(index)"
+              >
+                <slot :name="option.id">{{ option.id }}</slot>
+              </button>
+              <nuxt-link
+                v-else-if="typeof option.action === 'string' && option.action.startsWith('/')"
+                :ref="
+                  (el) => {
+                    if (el) menuItemsRef[index] = el as HTMLElement;
+                  }
+                "
+                :to="option.action"
+                class="w-full !justify-start !whitespace-nowrap focus-visible:!outline-none"
+                :aria-selected="index === selectedIndex"
+                :style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
+                @click="handleItemClick(option, index)"
+                @focus="selectedIndex = index"
+                @mouseover="handleMouseOver(index)"
+              >
+                <slot :name="option.id">{{ option.id }}</slot>
+              </nuxt-link>
+              <a
+                v-else-if="typeof option.action === 'string' && !option.action.startsWith('http')"
+                :ref="
+                  (el) => {
+                    if (el) menuItemsRef[index] = el as HTMLElement;
+                  }
+                "
+                :href="option.action"
+                target="_blank"
+                class="w-full !justify-start !whitespace-nowrap focus-visible:!outline-none"
+                :aria-selected="index === selectedIndex"
+                :style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
+                @click="handleItemClick(option, index)"
+                @focus="selectedIndex = index"
+                @mouseover="handleMouseOver(index)"
+              >
+                <slot :name="option.id">{{ option.id }}</slot>
+              </a>
+              <span v-else>
+                <slot :name="option.id">{{ option.id }}</slot>
+              </span>
+            </ButtonStyled>
+          </template>
         </div>
       </Transition>
     </Teleport>
@@ -112,9 +112,20 @@ interface Option {
   color?: "standard" | "brand" | "red" | "orange" | "green" | "blue" | "purple";
 }
 
+type Divider = {
+  divider: true;
+  shown?: boolean;
+};
+
+type Item = Option | Divider;
+
+function isDivider(item: Item): item is Divider {
+  return (item as Divider).divider;
+}
+
 const props = withDefaults(
   defineProps<{
-    options: Option[];
+    options: Item[];
     hoverable?: boolean;
   }>(),
   {
@@ -338,7 +349,9 @@ const handleKeydown = (event: KeyboardEvent) => {
     case " ":
       event.preventDefault();
       if (selectedIndex.value >= 0) {
-        selectOption(filteredOptions.value[selectedIndex.value]);
+        const option = filteredOptions.value[selectedIndex.value];
+        if (isDivider(option)) break;
+        selectOption(option);
       }
       break;
     case "Escape":
@@ -361,8 +374,9 @@ const handleKeydown = (event: KeyboardEvent) => {
     default:
       if (event.key.length === 1) {
         typeAheadBuffer.value += event.key.toLowerCase();
-        const matchIndex = filteredOptions.value.findIndex((option) =>
-          option.id.toLowerCase().startsWith(typeAheadBuffer.value),
+        const matchIndex = filteredOptions.value.findIndex(
+          (option) =>
+            !isDivider(option) && option.id.toLowerCase().startsWith(typeAheadBuffer.value),
         );
         if (matchIndex !== -1) {
           selectedIndex.value = matchIndex;
