@@ -11,6 +11,25 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-05-07T19:30:00-07:00`,
+    product: 'servers',
+    body: `### Added
+- Added the ability to extract .zip files in the Files page.
+- Added the ability to extract a remote .zip file from a URL, or from a CurseForge modpack version URL.
+- Dependencies will now automatically be installed when installing a mod from Modrinth.`,
+  },
+  {
+    date: `2025-05-07T19:30:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed organization URLs being case sensitive. (Contributed by [IMB11](https://github.com/modrinth/code/pull/3621))
+- Fixed notifications not loading sometimes. (Contributed by [IMB11](https://github.com/modrinth/code/pull/3624))
+- Fixed marking all notifications as read. (Contributed by [IMB11](https://github.com/modrinth/code/pull/3624))
+- Fixed relative time sometimes having poor rounding, and sometimes showing future dates unexpectedly. (Contributed by [IMB11](https://github.com/modrinth/code/pull/3612))
+- Fixed localized pricing not showing in some cases for Modrinth+. (Contributed by [IMB11](https://github.com/modrinth/code/pull/3623))
+- Fixed Modrinth changelog page link back to the full changelog not being clickable sometimes. (Contributed by [ThatGravyBoat](https://github.com/modrinth/code/pull/3593))`,
+  },
+  {
     date: `2025-05-01T18:30:00-07:00`,
     product: 'web',
     body: `### Improvements
