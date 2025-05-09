@@ -5,7 +5,7 @@ authors = ["Jai A <jaiagr+gpg@pm.me>"]
 edition = "2024"
 
 [dependencies]
-bytes = "1"
+bytes = { version = "1", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 serde_ini = "0.2.0"
@@ -30,6 +30,7 @@ sys-info = "0.9.0"
 sysinfo = "0.35.0"
 thiserror = "2.0.12"
 either = "1.13"
+data-url = "0.3.1"
 
 tracing = "0.1.37"
 tracing-subscriber = { version = "0.3.18", features = ["chrono", "env-filter"] }
@@ -43,7 +44,7 @@ indicatif = { version = "0.17.3", optional = true }
 
 async-tungstenite = { version = "0.29.1", features = ["tokio-runtime", "tokio-rustls-webpki-roots"] }
 futures = "0.3"
-reqwest = { version = "0.12.15", features = ["json", "stream", "deflate", "gzip", "brotli", "rustls-tls", "charset", "http2", "macos-system-configuration"], default-features = false }
+reqwest = { version = "0.12.15", features = ["json", "stream", "deflate", "gzip", "brotli", "rustls-tls", "charset", "http2", "macos-system-configuration", "multipart"], default-features = false }
 tokio = { version = "1", features = ["full"] }
 tokio-util = "0.7"
 async-recursion = "1.0.4"
@@ -66,7 +67,7 @@ rand = "0.8"
 byteorder = "1.5.0"
 base64 = "0.22.1"
 
-sqlx = { version = "0.8.2", features = [ "runtime-tokio", "sqlite", "macros" ] }
+sqlx = { version = "0.8.2", features = [ "runtime-tokio", "sqlite", "macros", "uuid" ] }
 
 quartz_nbt = { version = "0.2", features = ["serde"] }
 hickory-resolver = "0.25"
