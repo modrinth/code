@@ -1,4 +1,3 @@
-import shadesGenerator from "@modrinth/utils/tailwind/shades-generator";
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -167,7 +166,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [shadesGenerator],
+  plugins: [],
   corePlugins: {
     preflight: false,
   },
