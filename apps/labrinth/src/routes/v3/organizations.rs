@@ -63,7 +63,7 @@ pub async fn organization_projects_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::ORGANIZATION_READ]),
+        Some(&[Scopes::ORGANIZATION_READ, Scopes::PROJECT_READ]),
     )
     .await
     .map(|x| x.1)
