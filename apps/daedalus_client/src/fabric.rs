@@ -1,6 +1,6 @@
 use crate::util::{download_file, fetch_json, format_url};
-use crate::{insert_mirrored_artifact, Error, MirrorArtifact, UploadFile};
-use daedalus::modded::{Manifest, PartialVersionInfo, DUMMY_REPLACE_STRING};
+use crate::{Error, MirrorArtifact, UploadFile, insert_mirrored_artifact};
+use daedalus::modded::{DUMMY_REPLACE_STRING, Manifest, PartialVersionInfo};
 use dashmap::DashMap;
 use serde::Deserialize;
 use std::sync::Arc;
@@ -169,10 +169,11 @@ async fn fetch(
                         insert_mirrored_artifact(
                             &new_name,
                             None,
-                            vec![lib
-                                .url
-                                .clone()
-                                .unwrap_or_else(|| maven_url.to_string())],
+                            vec![
+                                lib.url
+                                    .clone()
+                                    .unwrap_or_else(|| maven_url.to_string()),
+                            ],
                             false,
                             mirror_artifacts,
                         )?;

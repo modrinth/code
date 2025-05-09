@@ -2,7 +2,7 @@
 
 use common::{
     api_v3::ApiV3,
-    environment::{with_test_environment, TestEnvironment},
+    environment::{TestEnvironment, with_test_environment},
 };
 
 mod common;

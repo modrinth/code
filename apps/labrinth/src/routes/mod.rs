@@ -5,7 +5,7 @@ use crate::util::env::parse_strings_from_var;
 use actix_cors::Cors;
 use actix_files::Files;
 use actix_web::http::StatusCode;
-use actix_web::{web, HttpResponse};
+use actix_web::{HttpResponse, web};
 use futures::FutureExt;
 
 pub mod internal;
@@ -127,8 +127,6 @@ pub enum ApiError {
     ImageParse(#[from] image::ImageError),
     #[error("Password Hashing Error: {0}")]
     PasswordHashing(#[from] argon2::password_hash::Error),
-    #[error("Password strength checking error: {0}")]
-    PasswordStrengthCheck(#[from] zxcvbn::ZxcvbnError),
     #[error("{0}")]
     Mail(#[from] crate::auth::email::MailError),
     #[error("Error while rerouting request: {0}")]
@@ -139,7 +137,9 @@ pub enum ApiError {
     Io(#[from] std::io::Error),
     #[error("Resource not found")]
     NotFound,
-    #[error("You are being rate-limited. Please wait {0} milliseconds. 0/{1} remaining.")]
+    #[error(
+        "You are being rate-limited. Please wait {0} milliseconds. 0/{1} remaining."
+    )]
     RateLimitError(u128, u32),
     #[error("Error while interacting with payment processor: {0}")]
     Stripe(#[from] stripe::StripeError),
@@ -168,7 +168,6 @@ impl ApiError {
                 ApiError::Decoding(..) => "decoding_error",
                 ApiError::ImageParse(..) => "invalid_image",
                 ApiError::PasswordHashing(..) => "password_hashing_error",
-                ApiError::PasswordStrengthCheck(..) => "strength_check_error",
                 ApiError::Mail(..) => "mail_error",
                 ApiError::Clickhouse(..) => "clickhouse_error",
                 ApiError::Reroute(..) => "reroute_error",
@@ -206,7 +205,6 @@ impl actix_web::ResponseError for ApiError {
             ApiError::Decoding(..) => StatusCode::BAD_REQUEST,
             ApiError::ImageParse(..) => StatusCode::BAD_REQUEST,
             ApiError::PasswordHashing(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::PasswordStrengthCheck(..) => StatusCode::BAD_REQUEST,
             ApiError::Mail(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Reroute(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::NotFound => StatusCode::NOT_FOUND,

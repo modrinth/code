@@ -2,7 +2,7 @@
 name = "labrinth"
 version = "2.7.0"
 authors = ["geometrically <jai@modrinth.com>"]
-edition = "2018"
+edition = "2024"
 license = "AGPL-3.0"
 
 # This seems redundant, but it's necessary for Docker to work
@@ -11,17 +11,17 @@ name = "labrinth"
 path = "src/main.rs"
 
 [dependencies]
-actix-web = "4.4.1"
+actix-web = "4.10.2"
 actix-rt = "2.9.0"
-actix-multipart = "0.6.1"
-actix-cors = "0.7.0"
+actix-multipart = "0.7.2"
+actix-cors = "0.7.1"
 actix-ws = "0.3.0"
 actix-files = "0.6.5"
-prometheus = "0.13.4"
+prometheus = "0.13.4" # Locked on 0.13 until actix updates to 0.14
 actix-web-prom = { version = "0.9.0", features = ["process"] }
 
 tracing = "0.1.41"
-tracing-actix-web = "0.7.16"
+tracing-actix-web = "0.7.18"
 console-subscriber = "0.4.1"
 
 tokio = { version = "1.35.1", features = ["sync", "rt-multi-thread"] }
@@ -30,14 +30,15 @@ tokio-stream = "0.1.14"
 futures = "0.3.30"
 futures-util = "0.3.30"
 async-trait = "0.1.70"
-dashmap = "5.4.0"
+dashmap = "6.1.0"
 lazy_static = "1.4.0"
 
-meilisearch-sdk = "0.27.1"
-rust-s3 = "0.33.0"
-reqwest = { version = "0.11.18", features = ["json", "multipart"] }
-hyper = { version = "0.14", features = ["full"] }
-hyper-tls = "0.5.0"
+meilisearch-sdk = "0.28.0"
+rust-s3 = { version = "0.35.1", default-features = false, features = ["fail-on-err", "tags", "tokio-rustls-tls"] }
+reqwest = { version = "0.12.15", features = ["json", "multipart"] }
+hyper = { version = "1.6", features = ["full"] }
+hyper-tls = "0.6.0"
+hyper-util = "0.1.11"
 
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -46,34 +47,34 @@ chrono = { version = "0.4.26", features = ["serde"] }
 yaserde = "0.12.0"
 yaserde_derive = "0.12.0"
 
-rand = "0.8.5"
-rand_chacha = "0.3.1"
+rand = "0.8.5" # Locked on 0.8 until argon2 updates to 0.9
+rand_chacha = "0.3.1" # Locked on 0.3 until we can update rand to 0.9
 bytes = "1.4.0"
-base64 = "0.21.7"
-sha1 = { version = "0.6.1", features = ["std"] }
-sha2 = "0.9.9"
-hmac = "0.11.0"
+base64 = "0.22.1"
+sha1 = { version = "0.10.6", features = ["std"] }
+sha2 = "0.10.9"
+hmac = "0.12.1"
 argon2 = { version = "0.5.0", features = ["std"] }
 murmur2 = "0.1.0"
 bitflags = "2.4.0"
 hex = "0.4.3"
-zxcvbn = "2.2.2"
+zxcvbn = "3.1.0"
 totp-rs = { version = "5.0.2", features = ["gen_secret"] }
 
 url = "2.4.0"
 urlencoding = "2.1.2"
 
-zip = "0.6.6"
+zip = "2.6.1"
 
-itertools = "0.12.0"
+itertools = "0.14.0"
 
-validator = { version = "0.16.1", features = ["derive", "phone"] }
+validator = { version = "0.20.0", features = ["derive"] }
 regex = "1.10.2"
 censor = "0.3.0"
 spdx = { version = "0.10.3", features = ["text"] }
 
 dotenvy = "0.15.7"
-thiserror = "1.0.56"
+thiserror = "2.0.12"
 either = "1.13"
 
 sqlx = { version = "0.8.2", features = [
@@ -89,26 +90,19 @@ rust_decimal = { version = "1.33.1", features = [
     "serde-with-float",
     "serde-with-str",
 ] }
-redis = { version = "0.27.5", features = ["tokio-comp", "ahash", "r2d2"] }
-deadpool-redis = "0.18.0"
-clickhouse = { version = "0.11.2", features = ["uuid", "time"] }
+redis = { version = "0.29.5", features = ["tokio-comp", "ahash", "r2d2"] } # Locked on 0.29 until deadpool-redis updates to 0.30
+deadpool-redis = "0.20.0"
+clickhouse = { version = "0.13.2", features = ["uuid", "time"] }
 uuid = { version = "1.2.2", features = ["v4", "fast-rng", "serde"] }
 
-maxminddb = "0.24.0"
+maxminddb = "0.26.0"
 flate2 = "1.0.25"
 tar = "0.4.38"
 
-sentry = { version = "0.34.0", default-features = false, features = [
-    "backtrace",
-    "contexts",
-    "debug-images",
-    "panic",
-    "rustls",
-    "reqwest",
-] }
-sentry-actix = "0.34.0"
+sentry = { version = "0.37.0", default-features = false, features = ["backtrace", "contexts", "debug-images", "panic", "rustls", "reqwest"] }
+sentry-actix = "0.37.0"
 
-image = "0.24.6"
+image = "0.25.6"
 color-thief = "0.2.2"
 webp = "0.3.0"
 
@@ -116,12 +110,12 @@ woothee = "0.13.0"
 
 lettre = "0.11.3"
 
-derive-new = "0.6.0"
+derive-new = "0.7.0"
 rust_iso3166 = "0.1.11"
 
-async-stripe = { version = "0.39.1", features = ["runtime-tokio-hyper-rustls"] }
+async-stripe = { version = "0.41.0", features = ["runtime-tokio-hyper-rustls"] }
 rusty-money = "0.4.1"
-json-patch = "*"
+json-patch = "4.0.0"
 
 ariadne = { path = "../../packages/ariadne" }
 

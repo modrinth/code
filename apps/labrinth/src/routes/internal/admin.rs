@@ -14,7 +14,7 @@ use crate::routes::ApiError;
 use crate::search::SearchConfig;
 use crate::util::date::get_current_tenths_of_ms;
 use crate::util::guards::admin_key_guard;
-use actix_web::{get, patch, post, web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, get, patch, post, web};
 use serde::Deserialize;
 use sqlx::PgPool;
 use std::collections::HashMap;
@@ -237,7 +237,10 @@ pub async fn delphi_result_ingest(
     .await
     .ok();
 
-    let mut thread_header = format!("Suspicious traces found at [version {}](https://modrinth.com/project/{}/version/{})", body.version_id, body.project_id, body.version_id);
+    let mut thread_header = format!(
+        "Suspicious traces found at [version {}](https://modrinth.com/project/{}/version/{})",
+        body.version_id, body.project_id, body.version_id
+    );
 
     for (issue, trace) in &body.issues {
         for path in trace.keys() {

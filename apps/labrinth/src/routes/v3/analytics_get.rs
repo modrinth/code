@@ -11,12 +11,12 @@ use crate::{
     },
     queue::session::AuthQueue,
 };
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Duration, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::postgres::types::PgInterval;
 use sqlx::PgPool;
+use sqlx::postgres::types::PgInterval;
 use std::collections::HashMap;
 use std::convert::TryInto;
 

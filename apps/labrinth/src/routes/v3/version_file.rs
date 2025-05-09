@@ -8,7 +8,7 @@ use crate::models::projects::VersionType;
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
 use crate::{database, models};
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, web};
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use itertools::Itertools;

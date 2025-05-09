@@ -1,5 +1,5 @@
+use labrinth::{LabrinthConfig, file_hosting, queue};
 use labrinth::{check_env_vars, clickhouse};
-use labrinth::{file_hosting, queue, LabrinthConfig};
 use std::sync::Arc;
 
 pub mod api_common;

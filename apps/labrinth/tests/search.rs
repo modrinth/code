@@ -5,8 +5,8 @@ use common::database::*;
 use common::dummy_data::DUMMY_CATEGORIES;
 
 use ariadne::ids::base62_impl::parse_base62;
-use common::environment::with_test_environment;
 use common::environment::TestEnvironment;
+use common::environment::with_test_environment;
 use common::search::setup_search_projects;
 use futures::stream::StreamExt;
 use serde_json::json;

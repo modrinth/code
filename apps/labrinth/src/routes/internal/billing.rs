@@ -14,11 +14,11 @@ use crate::models::pats::Scopes;
 use crate::models::users::Badges;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::Utc;
-use rust_decimal::prelude::ToPrimitive;
 use rust_decimal::Decimal;
+use rust_decimal::prelude::ToPrimitive;
 use serde::Serialize;
 use serde_with::serde_derive::Deserialize;
 use sqlx::{PgPool, Postgres, Transaction};
@@ -1992,9 +1992,18 @@ pub async fn stripe_webhook(
                         let _ = send_email(
                             email,
                             "Payment Failed for Modrinth",
-                            &format!("Our attempt to collect payment for {money} from the payment card on file was unsuccessful."),
+                            &format!(
+                                "Our attempt to collect payment for {money} from the payment card on file was unsuccessful."
+                            ),
                             "Please visit the following link below to update your payment method or contact your card provider. If the button does not work, you can copy the link and paste it into your browser.",
-                            Some(("Update billing settings", &format!("{}/{}", dotenvy::var("SITE_URL")?,  dotenvy::var("SITE_BILLING_PATH")?))),
+                            Some((
+                                "Update billing settings",
+                                &format!(
+                                    "{}/{}",
+                                    dotenvy::var("SITE_URL")?,
+                                    dotenvy::var("SITE_BILLING_PATH")?
+                                ),
+                            )),
                         );
                     }
 

@@ -1,13 +1,13 @@
 use crate::util::{
-    format_url, upload_file_to_bucket, upload_url_to_bucket_mirrors,
-    REQWEST_CLIENT,
+    REQWEST_CLIENT, format_url, upload_file_to_bucket,
+    upload_url_to_bucket_mirrors,
 };
 use daedalus::get_path_from_artifact;
 use dashmap::{DashMap, DashSet};
 use std::sync::Arc;
 use tokio::sync::Semaphore;
 use tracing_error::ErrorLayer;
-use tracing_subscriber::{fmt, prelude::*, EnvFilter};
+use tracing_subscriber::{EnvFilter, fmt, prelude::*};
 
 mod error;
 mod fabric;

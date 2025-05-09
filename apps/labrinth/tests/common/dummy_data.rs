@@ -11,7 +11,7 @@ use labrinth::models::{
 };
 use serde_json::json;
 use sqlx::Executor;
-use zip::{write::FileOptions, CompressionMethod, ZipWriter};
+use zip::{CompressionMethod, ZipWriter, write::FileOptions};
 
 use crate::{
     assert_status,
@@ -19,7 +19,7 @@ use crate::{
 };
 
 use super::{
-    api_common::{request_data::ImageData, ApiProject, AppendsOptionalPat},
+    api_common::{ApiProject, AppendsOptionalPat, request_data::ImageData},
     api_v3::ApiV3,
     database::TemporaryDatabase,
 };
@@ -98,7 +98,7 @@ impl TestFile {
             let mut zip = ZipWriter::new(&mut cursor);
             zip.start_file(
                 "fabric.mod.json",
-                FileOptions::default()
+                FileOptions::<()>::default()
                     .compression_method(CompressionMethod::Stored),
             )
             .unwrap();
@@ -106,7 +106,7 @@ impl TestFile {
 
             zip.start_file(
                 "META-INF/mods.toml",
-                FileOptions::default()
+                FileOptions::<()>::default()
                     .compression_method(CompressionMethod::Stored),
             )
             .unwrap();
@@ -159,7 +159,7 @@ impl TestFile {
             let mut zip = ZipWriter::new(&mut cursor);
             zip.start_file(
                 "modrinth.index.json",
-                FileOptions::default()
+                FileOptions::<()>::default()
                     .compression_method(CompressionMethod::Stored),
             )
             .unwrap();

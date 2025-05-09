@@ -14,7 +14,7 @@ use crate::models::threads::{MessageBody, ThreadType};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::img;
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use futures::StreamExt;
@@ -162,7 +162,7 @@ pub async fn report_create(
             return Err(ApiError::InvalidInput(format!(
                 "Invalid report item type: {}",
                 new_report.item_type.as_str()
-            )))
+            )));
         }
     }
 

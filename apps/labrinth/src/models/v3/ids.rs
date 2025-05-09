@@ -15,8 +15,8 @@ pub use super::threads::ThreadMessageId;
 pub use crate::models::billing::{
     ChargeId, ProductId, ProductPriceId, UserSubscriptionId,
 };
-use ariadne::ids::base62_id_impl;
 pub use ariadne::ids::Base62Id;
+use ariadne::ids::base62_id_impl;
 pub use ariadne::users::UserId;
 
 base62_id_impl!(ProjectId, ProjectId);

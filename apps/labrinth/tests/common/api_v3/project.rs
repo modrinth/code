@@ -20,9 +20,9 @@ use crate::{
     assert_status,
     common::{
         api_common::{
+            Api, ApiProject, AppendsOptionalPat,
             models::{CommonItemType, CommonProject, CommonVersion},
             request_data::{ImageData, ProjectCreationRequestData},
-            Api, ApiProject, AppendsOptionalPat,
         },
         database::MOD_USER_PAT,
         dummy_data::TestFile,
@@ -30,8 +30,8 @@ use crate::{
 };
 
 use super::{
-    request_data::{self, get_public_project_creation_data},
     ApiV3,
+    request_data::{self, get_public_project_creation_data},
 };
 
 #[async_trait(?Send)]

@@ -4,9 +4,9 @@ use crate::{
     assert_status,
     common::{
         api_common::{
+            Api, ApiProject, AppendsOptionalPat,
             models::{CommonItemType, CommonProject, CommonVersion},
             request_data::{ImageData, ProjectCreationRequestData},
-            Api, ApiProject, AppendsOptionalPat,
         },
         dummy_data::TestFile,
     },
@@ -27,8 +27,8 @@ use serde_json::json;
 use crate::common::database::MOD_USER_PAT;
 
 use super::{
-    request_data::{self, get_public_project_creation_data},
     ApiV2,
+    request_data::{self, get_public_project_creation_data},
 };
 
 impl ApiV2 {

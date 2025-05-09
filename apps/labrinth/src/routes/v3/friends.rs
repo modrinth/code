@@ -5,13 +5,13 @@ use crate::models::pats::Scopes;
 use crate::models::users::UserFriend;
 use crate::queue::session::AuthQueue;
 use crate::queue::socket::ActiveSockets;
+use crate::routes::ApiError;
 use crate::routes::internal::statuses::{
     broadcast_friends_message, send_message_to_user,
 };
-use crate::routes::ApiError;
 use crate::sync::friends::RedisFriendsMessage;
 use crate::sync::status::get_user_status;
-use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use ariadne::networking::message::ServerToClientMessage;
 use chrono::Utc;
 use sqlx::PgPool;

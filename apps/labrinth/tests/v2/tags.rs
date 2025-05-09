@@ -5,7 +5,7 @@ use std::collections::HashSet;
 
 use crate::common::{
     api_v2::ApiV2,
-    environment::{with_test_environment, TestEnvironment},
+    environment::{TestEnvironment, with_test_environment},
 };
 
 #[actix_rt::test]

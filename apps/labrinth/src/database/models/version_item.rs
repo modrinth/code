@@ -1,6 +1,6 @@
+use super::DatabaseError;
 use super::ids::*;
 use super::loader_fields::VersionField;
-use super::DatabaseError;
 use crate::database::models::loader_fields::{
     QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
 };

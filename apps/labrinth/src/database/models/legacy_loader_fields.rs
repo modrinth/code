@@ -12,10 +12,10 @@ use serde_json::json;
 use crate::database::redis::RedisPool;
 
 use super::{
+    DatabaseError, LoaderFieldEnumValueId,
     loader_fields::{
         LoaderFieldEnum, LoaderFieldEnumValue, VersionField, VersionFieldValue,
     },
-    DatabaseError, LoaderFieldEnumValueId,
 };
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
