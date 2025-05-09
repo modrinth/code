@@ -81,7 +81,7 @@ pub async fn organization_projects_get(
         )
         .fetch(&**pool)
         .map_ok(|m| database::models::ProjectId(m.id))
-        .try_collect::<Vec<database::models::ProjectId>>()
+        .try_collect::<Vec<_>>()
         .await?;
 
         let projects_data = crate::database::models::Project::get_many_ids(
