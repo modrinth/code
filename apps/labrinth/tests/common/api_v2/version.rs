@@ -1,14 +1,14 @@
 use std::collections::HashMap;
 
 use super::{
-    request_data::{self, get_public_version_creation_data},
     ApiV2,
+    request_data::{self, get_public_version_creation_data},
 };
 use crate::{
     assert_status,
     common::{
         api_common::{
-            models::CommonVersion, Api, ApiVersion, AppendsOptionalPat,
+            Api, ApiVersion, AppendsOptionalPat, models::CommonVersion,
         },
         dummy_data::TestFile,
     },

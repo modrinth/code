@@ -16,7 +16,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::img::upload_image_optimized;
 use crate::util::routes::read_from_payload;
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, web};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 

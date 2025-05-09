@@ -1,9 +1,9 @@
 use crate::database;
+use crate::database::models::Collection;
 use crate::database::models::project_item::QueryProject;
 use crate::database::models::version_item::QueryVersion;
-use crate::database::models::Collection;
 use crate::database::redis::RedisPool;
-use crate::database::{models, Project, Version};
+use crate::database::{Project, Version, models};
 use crate::models::users::User;
 use crate::routes::ApiError;
 use itertools::Itertools;

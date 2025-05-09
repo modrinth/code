@@ -8,7 +8,7 @@ use serde_json::json;
 
 use crate::common::{
     api_common::ApiTeams,
-    database::{generate_random_name, ADMIN_USER_PAT},
+    database::{ADMIN_USER_PAT, generate_random_name},
 };
 
 use super::{

@@ -1,4 +1,4 @@
-use super::{ids::*, Organization, Project};
+use super::{Organization, Project, ids::*};
 use crate::{
     database::redis::RedisPool,
     models::teams::{OrganizationPermissions, ProjectPermissions},

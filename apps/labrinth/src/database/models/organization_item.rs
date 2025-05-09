@@ -5,7 +5,7 @@ use futures::TryStreamExt;
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 
-use super::{ids::*, TeamMember};
+use super::{TeamMember, ids::*};
 use serde::{Deserialize, Serialize};
 
 const ORGANIZATIONS_NAMESPACE: &str = "organizations";

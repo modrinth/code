@@ -6,7 +6,7 @@ use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::project_item::{GalleryItem, ModCategory};
 use crate::database::models::thread_item::ThreadMessageBuilder;
-use crate::database::models::{ids as db_ids, image_item, TeamMember};
+use crate::database::models::{TeamMember, ids as db_ids, image_item};
 use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
 use crate::file_hosting::FileHost;
@@ -23,12 +23,12 @@ use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::search::indexing::remove_documents;
-use crate::search::{search_for_project, SearchConfig, SearchError};
+use crate::search::{SearchConfig, SearchError, search_for_project};
 use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use futures::TryStreamExt;
@@ -214,7 +214,7 @@ pub struct EditProject {
     pub license_id: Option<String>,
     #[validate(
         length(min = 3, max = 64),
-        regex = "crate::util::validate::RE_URL_SAFE"
+        regex(path = *crate::util::validate::RE_URL_SAFE)
     )]
     pub slug: Option<String>,
     pub status: Option<ProjectStatus>,

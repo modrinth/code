@@ -14,7 +14,7 @@ use crate::common::api_v2::ApiV2;
 
 use crate::common::api_v2::request_data::get_public_project_creation_data;
 use crate::common::dummy_data::{DummyProjectAlpha, DummyProjectBeta};
-use crate::common::environment::{with_test_environment, TestEnvironment};
+use crate::common::environment::{TestEnvironment, with_test_environment};
 use crate::common::{
     database::{ENEMY_USER_PAT, USER_USER_PAT},
     dummy_data::TestFile,
@@ -470,10 +470,10 @@ async fn add_version_project_types_v2() {
                 )
                 .await;
             assert_eq!(test_project.project_type, "project"); // No project_type set, as no versions are set
-                                                              // Default to 'project' if none are found
-                                                              // This is a known difference between older v2 ,but is acceptable.
-                                                              // This would be the appropriate test on older v2:
-                                                              // assert_eq!(test_project.project_type, "modpack");
+            // Default to 'project' if none are found
+            // This is a known difference between older v2 ,but is acceptable.
+            // This would be the appropriate test on older v2:
+            // assert_eq!(test_project.project_type, "modpack");
 
             // Create a version with a modpack file attached
             let test_version = api

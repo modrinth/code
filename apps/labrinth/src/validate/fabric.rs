@@ -1,5 +1,5 @@
 use crate::validate::{
-    filter_out_packs, SupportedGameVersions, ValidationError, ValidationResult,
+    SupportedGameVersions, ValidationError, ValidationResult, filter_out_packs,
 };
 use std::io::Cursor;
 use zip::ZipArchive;

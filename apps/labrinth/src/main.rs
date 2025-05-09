@@ -17,7 +17,7 @@ use tracing_actix_web::TracingLogger;
 static ALLOC: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
 
 #[allow(non_upper_case_globals)]
-#[export_name = "malloc_conf"]
+#[unsafe(export_name = "malloc_conf")]
 pub static malloc_conf: &[u8] =
     b"prof:true,prof_active:true,lg_prof_sample:19\0";
 
@@ -63,7 +63,9 @@ async fn main() -> std::io::Result<()> {
     });
     if sentry.is_enabled() {
         info!("Enabled Sentry integration");
-        std::env::set_var("RUST_BACKTRACE", "1");
+        unsafe {
+            std::env::set_var("RUST_BACKTRACE", "1");
+        }
     }
 
     if args.run_background_task.is_none() {

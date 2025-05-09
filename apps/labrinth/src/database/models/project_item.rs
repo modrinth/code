@@ -2,7 +2,7 @@ use super::loader_fields::{
     QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
     VersionField,
 };
-use super::{ids::*, User};
+use super::{User, ids::*};
 use crate::database::models;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;

@@ -6,22 +6,21 @@ use crate::database::models::oauth_client_authorization_item::OAuthClientAuthori
 use crate::database::models::oauth_client_item::OAuthClient as DBOAuthClient;
 use crate::database::models::oauth_token_item::OAuthAccessToken;
 use crate::database::models::{
-    generate_oauth_access_token_id, generate_oauth_client_authorization_id,
-    OAuthClientAuthorizationId,
+    OAuthClientAuthorizationId, generate_oauth_access_token_id,
+    generate_oauth_client_authorization_id,
 };
 use crate::database::redis::RedisPool;
 use crate::models;
 use crate::models::ids::OAuthClientId;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
-use actix_web::http::header::LOCATION;
+use actix_web::http::header::{CACHE_CONTROL, LOCATION, PRAGMA};
 use actix_web::web::{Data, Query, ServiceConfig};
-use actix_web::{get, post, web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, get, post, web};
 use chrono::Duration;
 use rand::distributions::Alphanumeric;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
-use reqwest::header::{CACHE_CONTROL, PRAGMA};
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 

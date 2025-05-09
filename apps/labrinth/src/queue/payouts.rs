@@ -13,8 +13,8 @@ use rust_decimal::Decimal;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use sqlx::postgres::PgQueryResult;
 use sqlx::PgPool;
+use sqlx::postgres::PgQueryResult;
 use std::collections::HashMap;
 use tokio::sync::RwLock;
 

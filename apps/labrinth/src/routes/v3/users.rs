@@ -1,13 +1,13 @@
 use std::{collections::HashMap, sync::Arc};
 
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, web};
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use validator::Validate;
 
-use super::{oauth_clients::get_user_clients, ApiError};
+use super::{ApiError, oauth_clients::get_user_clients};
 use crate::util::img::delete_old_images;
 use crate::{
     auth::{filter_visible_projects, get_user_from_headers},
@@ -364,7 +364,7 @@ lazy_static! {
 
 #[derive(Serialize, Deserialize, Validate)]
 pub struct EditUser {
-    #[validate(length(min = 1, max = 39), regex = "RE_URL_SAFE")]
+    #[validate(length(min = 1, max = 39), regex(path = *RE_URL_SAFE))]
     pub username: Option<String>,
     #[serde(
         default,

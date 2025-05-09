@@ -16,7 +16,7 @@ use crate::routes::{v2_reroute, v3};
 use actix_multipart::Multipart;
 use actix_web::http::header::ContentDisposition;
 use actix_web::web::Data;
-use actix_web::{post, web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, post, web};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sqlx::postgres::PgPool;
@@ -36,7 +36,7 @@ pub struct InitialVersionData {
     pub file_parts: Vec<String>,
     #[validate(
         length(min = 1, max = 32),
-        regex = "crate::util::validate::RE_URL_SAFE"
+        regex(path = *crate::util::validate::RE_URL_SAFE)
     )]
     pub version_number: String,
     #[validate(

@@ -1,5 +1,5 @@
 use crate::util::{download_file, fetch_json, fetch_xml, format_url};
-use crate::{insert_mirrored_artifact, Error, MirrorArtifact, UploadFile};
+use crate::{Error, MirrorArtifact, UploadFile, insert_mirrored_artifact};
 use chrono::{DateTime, Utc};
 use daedalus::get_path_from_artifact;
 use daedalus::modded::PartialVersionInfo;
@@ -7,8 +7,8 @@ use dashmap::DashMap;
 use futures::io::Cursor;
 use indexmap::IndexMap;
 use itertools::Itertools;
-use serde::de::DeserializeOwned;
 use serde::Deserialize;
+use serde::de::DeserializeOwned;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Semaphore;
@@ -589,14 +589,16 @@ async fn fetch(
                         mod_loader: &str,
                         version: &ForgeVersion,
                     ) -> Result<String, Error> {
-                        let extract_file =
-                            read_file(zip, &value[1..value.len()])
-                                .await?
-                                .ok_or_else(|| {
-                                    crate::ErrorKind::InvalidInput(format!(
+                        let extract_file = read_file(
+                            zip,
+                            &value[1..value.len()],
+                        )
+                        .await?
+                        .ok_or_else(|| {
+                            crate::ErrorKind::InvalidInput(format!(
                                 "Unable reading data key {key} at path {value}",
                             ))
-                                })?;
+                        })?;
 
                         let file_name = value.split('/').next_back()
                             .ok_or_else(|| {
@@ -622,10 +624,7 @@ async fn fetch(
 
                         let path = format!(
                             "com.modrinth.daedalus:{}-installer-extracts:{}:{}@{}",
-                            mod_loader,
-                            version.raw,
-                            file_name,
-                            ext
+                            mod_loader, version.raw, file_name, ext
                         );
 
                         upload_files.insert(
@@ -753,7 +752,8 @@ async fn fetch(
                 .rev()
                 .chunk_by(|x| x.game_version.clone())
                 .into_iter()
-                .map(|(game_version, loaders)| daedalus::modded::Version {
+                .map(|(game_version, loaders)| {
+                    daedalus::modded::Version {
                     id: game_version,
                     stable: true,
                     loaders: loaders
@@ -766,6 +766,7 @@ async fn fetch(
                             stable: false,
                         })
                         .collect(),
+                }
                 })
                 .collect(),
         };

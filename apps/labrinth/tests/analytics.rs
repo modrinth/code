@@ -5,12 +5,12 @@ use common::permissions::PermissionsTestContext;
 use common::{
     api_v3::ApiV3,
     database::*,
-    environment::{with_test_environment, TestEnvironment},
+    environment::{TestEnvironment, with_test_environment},
 };
 use itertools::Itertools;
 use labrinth::models::teams::ProjectPermissions;
 use labrinth::queue::payouts;
-use rust_decimal::{prelude::ToPrimitive, Decimal};
+use rust_decimal::{Decimal, prelude::ToPrimitive};
 
 mod common;
 
@@ -89,7 +89,7 @@ pub async fn analytics_revenue() {
             assert_eq!(analytics.len(), 1); // 1 project
             let project_analytics = analytics.get(&alpha_project_id).unwrap();
             assert_eq!(project_analytics.len(), 8); // 1 days cut off, and 2 points take place on the same day. note that the day exactly 14 days ago is included
-                                                    // sorted_by_key, values in the order of smallest to largest key
+            // sorted_by_key, values in the order of smallest to largest key
             let (sorted_keys, sorted_by_key): (Vec<i64>, Vec<Decimal>) =
                 project_analytics
                     .iter()

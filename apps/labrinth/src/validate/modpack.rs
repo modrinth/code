@@ -90,7 +90,7 @@ impl super::Validator for ModpackValidator {
                 _ => {
                     return Err(ValidationError::InvalidInput(
                         "Invalid pack file path!".into(),
-                    ))
+                    ));
                 }
             };
         }

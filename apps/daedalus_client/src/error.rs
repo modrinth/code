@@ -12,7 +12,9 @@ pub enum ErrorKind {
     SerdeJSON(#[from] serde_json::Error),
     #[error("Error while deserializing XML: {0}")]
     SerdeXML(#[from] serde_xml_rs::Error),
-    #[error("Failed to validate file checksum at url {url} with hash {hash} after {tries} tries")]
+    #[error(
+        "Failed to validate file checksum at url {url} with hash {hash} after {tries} tries"
+    )]
     ChecksumFailure {
         hash: String,
         url: String,

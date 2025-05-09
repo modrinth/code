@@ -1,29 +1,29 @@
 use crate::auth::email::send_email;
 use crate::auth::validate::get_user_record_from_bearer_token;
-use crate::auth::{get_user_from_headers, AuthProvider, AuthenticationError};
+use crate::auth::{AuthProvider, AuthenticationError, get_user_from_headers};
 use crate::database::models::flow_item::Flow;
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::pats::Scopes;
 use crate::models::users::{Badges, Role};
 use crate::queue::session::AuthQueue;
-use crate::routes::internal::session::issue_session;
 use crate::routes::ApiError;
+use crate::routes::internal::session::issue_session;
 use crate::util::captcha::check_hcaptcha;
 use crate::util::env::parse_strings_from_var;
 use crate::util::ext::get_image_ext;
 use crate::util::img::upload_image_optimized;
-use crate::util::validate::{validation_errors_to_string, RE_URL_SAFE};
-use actix_web::web::{scope, Data, Query, ServiceConfig};
-use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
+use crate::util::validate::{RE_URL_SAFE, validation_errors_to_string};
+use actix_web::web::{Data, Query, ServiceConfig, scope};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use argon2::password_hash::SaltString;
 use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use ariadne::ids::random_base62_rng;
 use base64::Engine;
 use chrono::{Duration, Utc};
-use rand_chacha::rand_core::SeedableRng;
 use rand_chacha::ChaCha20Rng;
+use rand_chacha::rand_core::SeedableRng;
 use reqwest::header::AUTHORIZATION;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
@@ -31,6 +31,7 @@ use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::Arc;
 use validator::Validate;
+use zxcvbn::Score;
 
 pub fn config(cfg: &mut ServiceConfig) {
     cfg.service(
@@ -261,12 +262,16 @@ impl AuthProvider {
             AuthProvider::Discord => {
                 let client_id = dotenvy::var("DISCORD_CLIENT_ID")?;
 
-                format!("https://discord.com/api/oauth2/authorize?client_id={client_id}&state={state}&response_type=code&scope=identify%20email&redirect_uri={redirect_uri}")
+                format!(
+                    "https://discord.com/api/oauth2/authorize?client_id={client_id}&state={state}&response_type=code&scope=identify%20email&redirect_uri={redirect_uri}"
+                )
             }
             AuthProvider::Microsoft => {
                 let client_id = dotenvy::var("MICROSOFT_CLIENT_ID")?;
 
-                format!("https://login.live.com/oauth20_authorize.srf?client_id={client_id}&response_type=code&scope=user.read&state={state}&prompt=select_account&redirect_uri={redirect_uri}")
+                format!(
+                    "https://login.live.com/oauth20_authorize.srf?client_id={client_id}&response_type=code&scope=user.read&state={state}&prompt=select_account&redirect_uri={redirect_uri}"
+                )
             }
             AuthProvider::GitLab => {
                 let client_id = dotenvy::var("GITLAB_CLIENT_ID")?;
@@ -282,7 +287,9 @@ impl AuthProvider {
                     "https://accounts.google.com/o/oauth2/v2/auth?client_id={}&state={}&scope={}&response_type=code&redirect_uri={}",
                     client_id,
                     state,
-                    urlencoding::encode("https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile"),
+                    urlencoding::encode(
+                        "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile"
+                    ),
                     redirect_uri,
                 )
             }
@@ -291,7 +298,9 @@ impl AuthProvider {
                     "https://steamcommunity.com/openid/login?openid.ns={}&openid.mode={}&openid.return_to={}{}{}&openid.realm={}&openid.identity={}&openid.claimed_id={}",
                     urlencoding::encode("http://specs.openid.net/auth/2.0"),
                     "checkid_setup",
-                    redirect_uri, urlencoding::encode("?state="), state,
+                    redirect_uri,
+                    urlencoding::encode("?state="),
+                    state,
                     self_addr,
                     "http://specs.openid.net/auth/2.0/identifier_select",
                     "http://specs.openid.net/auth/2.0/identifier_select",
@@ -309,7 +318,9 @@ impl AuthProvider {
 
                 format!(
                     "https://{auth_url}/connect?flowEntry=static&client_id={client_id}&scope={}&response_type=code&redirect_uri={redirect_uri}&state={state}",
-                    urlencoding::encode("openid email address https://uri.paypal.com/services/paypalattributes"),
+                    urlencoding::encode(
+                        "openid email address https://uri.paypal.com/services/paypalattributes"
+                    ),
                 )
             }
         })
@@ -1259,7 +1270,10 @@ pub async fn delete_auth_provider(
             send_email(
                 email,
                 "Authentication method removed",
-                &format!("When logging into Modrinth, you can no longer log in using the {} authentication provider.", delete_provider.provider.as_str()),
+                &format!(
+                    "When logging into Modrinth, you can no longer log in using the {} authentication provider.",
+                    delete_provider.provider.as_str()
+                ),
                 "If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).",
                 None,
             )?;
@@ -1304,7 +1318,7 @@ pub async fn sign_up_sendy(email: &str) -> Result<(), AuthenticationError> {
 
 #[derive(Deserialize, Validate)]
 pub struct NewAccount {
-    #[validate(length(min = 1, max = 39), regex = "RE_URL_SAFE")]
+    #[validate(length(min = 1, max = 39), regex(path = *RE_URL_SAFE))]
     pub username: String,
     #[validate(length(min = 8, max = 256))]
     pub password: String,
@@ -1349,13 +1363,11 @@ pub async fn create_account_with_password(
     let score = zxcvbn::zxcvbn(
         &new_account.password,
         &[&new_account.username, &new_account.email],
-    )?;
+    );
 
-    if score.score() < 3 {
+    if score.score() < Score::Three {
         return Err(ApiError::InvalidInput(
-            if let Some(feedback) =
-                score.feedback().clone().and_then(|x| x.warning())
-            {
+            if let Some(feedback) = score.feedback().and_then(|x| x.warning()) {
                 format!("Password too weak: {feedback}")
             } else {
                 "Specified password is too weak! Please improve its strength."
@@ -1928,7 +1940,15 @@ pub async fn reset_password_begin(
                 "Reset your password",
                 "Please visit the following link below to reset your password. If the button does not work, you can copy the link and paste it into your browser.",
                 "If you did not request for your password to be reset, you can safely ignore this email.",
-                Some(("Reset password", &format!("{}/{}?flow={}", dotenvy::var("SITE_URL")?,  dotenvy::var("SITE_RESET_PASSWORD_PATH")?, flow))),
+                Some((
+                    "Reset password",
+                    &format!(
+                        "{}/{}?flow={}",
+                        dotenvy::var("SITE_URL")?,
+                        dotenvy::var("SITE_RESET_PASSWORD_PATH")?,
+                        flow
+                    ),
+                )),
             )?;
         }
     }
@@ -2012,12 +2032,12 @@ pub async fn change_password(
         let score = zxcvbn::zxcvbn(
             new_password,
             &[&user.username, &user.email.clone().unwrap_or_default()],
-        )?;
+        );
 
-        if score.score() < 3 {
+        if score.score() < Score::Three {
             return Err(ApiError::InvalidInput(
                 if let Some(feedback) =
-                    score.feedback().clone().and_then(|x| x.warning())
+                    score.feedback().and_then(|x| x.warning())
                 {
                     format!("Password too weak: {feedback}")
                 } else {
@@ -2135,7 +2155,10 @@ pub async fn set_email(
         send_email(
             user_email,
             "Email changed",
-            &format!("Your email has been updated to {} on your account.", email.email),
+            &format!(
+                "Your email has been updated to {} on your account.",
+                email.email
+            ),
             "If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).",
             None,
         )?;
@@ -2320,6 +2343,14 @@ fn send_email_verify(
         "Verify your email",
         opener,
         "Please visit the following link below to verify your email. If the button does not work, you can copy the link and paste it into your browser. This link expires in 24 hours.",
-        Some(("Verify email", &format!("{}/{}?flow={}", dotenvy::var("SITE_URL")?,  dotenvy::var("SITE_VERIFY_EMAIL_PATH")?, flow))),
+        Some((
+            "Verify email",
+            &format!(
+                "{}/{}?flow={}",
+                dotenvy::var("SITE_URL")?,
+                dotenvy::var("SITE_VERIFY_EMAIL_PATH")?,
+                flow
+            ),
+        )),
     )
 }

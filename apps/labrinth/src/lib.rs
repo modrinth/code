@@ -374,7 +374,10 @@ pub fn check_env_vars() -> bool {
             failed |= check_var::<String>("MOCK_FILE_PATH");
         }
         Some(backend) => {
-            warn!("Variable `STORAGE_BACKEND` contains an invalid value: {}. Expected \"backblaze\", \"s3\", or \"local\".", backend);
+            warn!(
+                "Variable `STORAGE_BACKEND` contains an invalid value: {}. Expected \"backblaze\", \"s3\", or \"local\".",
+                backend
+            );
             failed |= true;
         }
         _ => {
@@ -387,12 +390,16 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<usize>("VERSION_INDEX_INTERVAL");
 
     if parse_strings_from_var("WHITELISTED_MODPACK_DOMAINS").is_none() {
-        warn!("Variable `WHITELISTED_MODPACK_DOMAINS` missing in dotenv or not a json array of strings");
+        warn!(
+            "Variable `WHITELISTED_MODPACK_DOMAINS` missing in dotenv or not a json array of strings"
+        );
         failed |= true;
     }
 
     if parse_strings_from_var("ALLOWED_CALLBACK_URLS").is_none() {
-        warn!("Variable `ALLOWED_CALLBACK_URLS` missing in dotenv or not a json array of strings");
+        warn!(
+            "Variable `ALLOWED_CALLBACK_URLS` missing in dotenv or not a json array of strings"
+        );
         failed |= true;
     }
 

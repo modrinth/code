@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use actix_http::StatusCode;
 use actix_web::test;
 use common::api_v3::ApiV3;
-use common::environment::{with_test_environment, TestEnvironment};
+use common::environment::{TestEnvironment, with_test_environment};
 use itertools::Itertools;
 use labrinth::database::models::legacy_loader_fields::MinecraftGameVersion;
 use labrinth::models::v3;
@@ -364,16 +364,20 @@ async fn creating_loader_fields() {
             project.fields.get("game_versions").unwrap(),
             &[json!("1.20.1"), json!("1.20.2"), json!("1.20.5")]
         );
-        assert!(project
-            .fields
-            .get("singleplayer")
-            .unwrap()
-            .contains(&json!(false)));
-        assert!(project
-            .fields
-            .get("singleplayer")
-            .unwrap()
-            .contains(&json!(true)));
+        assert!(
+            project
+                .fields
+                .get("singleplayer")
+                .unwrap()
+                .contains(&json!(false))
+        );
+        assert!(
+            project
+                .fields
+                .get("singleplayer")
+                .unwrap()
+                .contains(&json!(true))
+        );
     })
     .await
 }

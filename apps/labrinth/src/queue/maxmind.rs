@@ -61,7 +61,9 @@ impl MaxMindIndexer {
         }
 
         if should_panic {
-            panic!("Unable to download maxmind database- did you get a license key?")
+            panic!(
+                "Unable to download maxmind database- did you get a license key?"
+            )
         } else {
             warn!("Unable to download maxmind database.");
 
@@ -73,9 +75,13 @@ impl MaxMindIndexer {
         let maxmind = self.reader.read().await;
 
         if let Some(ref maxmind) = *maxmind {
-            maxmind.lookup::<Country>(ip.into()).ok().and_then(|x| {
-                x.country.and_then(|x| x.iso_code.map(|x| x.to_string()))
-            })
+            maxmind
+                .lookup::<Country>(ip.into())
+                .ok()
+                .flatten()
+                .and_then(|x| {
+                    x.country.and_then(|x| x.iso_code.map(|x| x.to_string()))
+                })
         } else {
             None
         }

@@ -10,8 +10,10 @@ use crate::models::projects::ProjectStatus;
 use crate::models::threads::MessageBody;
 use crate::routes::ApiError;
 use dashmap::DashSet;
+use hex::ToHex;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use sha1::Digest;
 use sqlx::PgPool;
 use std::collections::HashMap;
 use std::io::{Cursor, Read};
@@ -329,7 +331,7 @@ impl AutomatedModerationQueue {
                                             let mut contents = Vec::new();
                                             file.read_to_end(&mut contents)?;
 
-                                            let hash = sha1::Sha1::from(&contents).hexdigest();
+                                            let hash = sha1::Sha1::digest(&contents).encode_hex::<String>();
                                             let murmur = hash_flame_murmur32(contents);
 
                                             hashes.push((

@@ -1,9 +1,9 @@
 use crate::common::{
     api_common::{ApiProject, ApiTeams},
     database::{
-        generate_random_name, ADMIN_USER_PAT, ENEMY_USER_ID_PARSED,
-        ENEMY_USER_PAT, FRIEND_USER_ID_PARSED, MOD_USER_ID, MOD_USER_PAT,
-        USER_USER_ID, USER_USER_ID_PARSED,
+        ADMIN_USER_PAT, ENEMY_USER_ID_PARSED, ENEMY_USER_PAT,
+        FRIEND_USER_ID_PARSED, MOD_USER_ID, MOD_USER_PAT, USER_USER_ID,
+        USER_USER_ID_PARSED, generate_random_name,
     },
     dummy_data::{
         DummyImage, DummyOrganizationZeta, DummyProjectAlpha, DummyProjectBeta,
@@ -14,7 +14,7 @@ use common::{
     api_v3::ApiV3,
     database::{FRIEND_USER_ID, FRIEND_USER_PAT, USER_USER_PAT},
     environment::{
-        with_test_environment, with_test_environment_all, TestEnvironment,
+        TestEnvironment, with_test_environment, with_test_environment_all,
     },
     permissions::{PermissionsTest, PermissionsTestContext},
 };
@@ -372,9 +372,11 @@ async fn add_remove_organization_projects() {
                     USER_USER_PAT,
                 )
                 .await;
-            assert!(projects
-                .iter()
-                .any(|p| p.id.to_string() == alpha_project_id));
+            assert!(
+                projects
+                    .iter()
+                    .any(|p| p.id.to_string() == alpha_project_id)
+            );
 
             // Add/remove project to organization, first by ID, then by slug
             for alpha in [alpha_project_id, alpha_project_slug] {
@@ -411,9 +413,11 @@ async fn add_remove_organization_projects() {
                         USER_USER_PAT,
                     )
                     .await;
-                assert!(!projects
-                    .iter()
-                    .any(|p| p.id.to_string() == alpha_project_id));
+                assert!(
+                    !projects
+                        .iter()
+                        .any(|p| p.id.to_string() == alpha_project_id)
+                );
 
                 // Remove project from organization
                 let resp = test_env
@@ -437,9 +441,11 @@ async fn add_remove_organization_projects() {
                         USER_USER_PAT,
                     )
                     .await;
-                assert!(projects
-                    .iter()
-                    .any(|p| p.id.to_string() == alpha_project_id));
+                assert!(
+                    projects
+                        .iter()
+                        .any(|p| p.id.to_string() == alpha_project_id)
+                );
 
                 // Get organization projects
                 let projects = test_env
