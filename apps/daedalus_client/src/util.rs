@@ -78,7 +78,7 @@ pub async fn upload_file_to_bucket(
             BUCKET.put_object(key.clone(), &bytes).await
         }
         .map_err(|err| ErrorKind::S3 {
-            inner: err,
+            inner: Box::new(err),
             file: path.clone(),
         });
 

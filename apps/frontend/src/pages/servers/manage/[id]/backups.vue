@@ -56,8 +56,7 @@
           </TagItem>
         </div>
         <p class="m-0">
-          You can have up to {{ data.backup_quota }} backups at once, securely off-site with
-          Backblaze.
+          You can have up to {{ data.backup_quota }} backups at once, stored securely off-site.
         </p>
       </div>
       <div

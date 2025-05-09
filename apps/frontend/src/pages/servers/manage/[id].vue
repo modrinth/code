@@ -787,6 +787,40 @@ const handleWebSocketMessage = (data: WSEvent) => {
 
       break;
     }
+    case "filesystem-ops": {
+      if (!server.fs) {
+        console.error("FilesystemOps received, but server.fs is not available", data.all);
+        break;
+      }
+      if (JSON.stringify(server.fs.ops) !== JSON.stringify(data.all)) {
+        server.fs.ops = data.all;
+      }
+
+      server.fs.queuedOps = server.fs.queuedOps.filter(
+        (queuedOp) => !data.all.some((x) => x.src === queuedOp.src),
+      );
+
+      const cancelled = data.all.filter((x) => x.state === "cancelled");
+      Promise.all(cancelled.map((x) => server.fs?.modifyOp(x.id, "dismiss")));
+
+      const completed = data.all.filter((x) => x.state === "done");
+      if (completed.length > 0) {
+        setTimeout(
+          async () =>
+            await Promise.all(
+              completed.map((x) => {
+                if (!server.fs?.opsQueuedForModification.includes(x.id)) {
+                  server.fs?.opsQueuedForModification.push(x.id);
+                  return server.fs?.modifyOp(x.id, "dismiss");
+                }
+                return Promise.resolve();
+              }),
+            ),
+          3000,
+        );
+      }
+      break;
+    }
     default:
       console.warn("Unhandled WebSocket event:", data);
   }

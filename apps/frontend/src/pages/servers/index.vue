@@ -303,7 +303,7 @@
               </svg>
               <h2 class="m-0 text-lg font-bold">Backups included</h2>
               <h3 class="m-0 text-base font-normal text-secondary">
-                Every server comes with 15 backups stored securely off-site with Backblaze.
+                Every server comes with 15 backups stored securely off-site.
               </h3>
             </div>
           </div>

@@ -94,7 +94,7 @@
         <IssuesIcon v-if="project.age_warning" />
         Submitted
         <span v-tooltip="$dayjs(project.queued).format('MMMM D, YYYY [at] h:mm A')">{{
-          fromNow(project.queued)
+          formatRelativeTime(project.queued)
         }}</span>
       </span>
       <span v-else class="submitter-info"><UnknownIcon /> Unknown queue date</span>
@@ -103,7 +103,7 @@
 </template>
 
 <script setup>
-import { Chips } from "@modrinth/ui";
+import { Chips, useRelativeTime } from "@modrinth/ui";
 import {
   UnknownIcon,
   EyeIcon,
@@ -127,6 +127,8 @@ const router = useRouter();
 const now = app.$dayjs();
 const TIME_24H = 86400000;
 const TIME_48H = TIME_24H * 2;
+
+const formatRelativeTime = useRelativeTime();
 
 const { data: projects } = await useAsyncData("moderation/projects?count=1000", () =>
   useBaseFetch("moderation/projects?count=1000", { internal: true }),

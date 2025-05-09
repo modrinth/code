@@ -12,7 +12,7 @@ use std::sync::Arc;
 use tracing::{error, info};
 use tracing_actix_web::TracingLogger;
 
-#[cfg(not(target_env = "msvc"))]
+#[cfg(target_os = "linux")]
 #[global_allocator]
 static ALLOC: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
 
@@ -149,7 +149,7 @@ async fn main() -> std::io::Result<()> {
         .await
         .expect("Failed to register redis metrics");
 
-    #[cfg(not(target_env = "msvc"))]
+    #[cfg(target_os = "linux")]
     labrinth::routes::debug::jemalloc_mmeory_stats(&prometheus.registry)
         .expect("Failed to register jemalloc metrics");
 
