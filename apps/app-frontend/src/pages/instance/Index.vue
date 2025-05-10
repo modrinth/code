@@ -273,6 +273,10 @@ const tabs = computed(() => [
     href: `${basePath.value}/worlds`,
   },
   {
+    label: 'Screenshots',
+    href: `${basePath.value}/screenshots`
+  },
+  {
     label: 'Logs',
     href: `${basePath.value}/logs`,
   },

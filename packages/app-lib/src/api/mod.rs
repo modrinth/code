@@ -13,6 +13,7 @@ pub mod profile;
 pub mod settings;
 pub mod tags;
 pub mod worlds;
+pub mod screenshots;
 
 pub mod data {
     pub use crate::state::{

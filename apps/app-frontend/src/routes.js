@@ -133,6 +133,15 @@ export default new createRouter({
           },
         },
         {
+          path: 'screenshots',
+          name: 'Screenshots',
+          component: Instance.Screenshots,
+          meta: {
+            useRootContext: true,
+            breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Screenshots' }],
+          },
+        },
+        {
           path: '',
           name: 'Mods',
           component: Instance.Mods,
