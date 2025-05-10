@@ -57,7 +57,7 @@ pub async fn organization_projects_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let info = info.into_inner().0;
+    let id = info.into_inner().0;
     let current_user = get_user_from_headers(
         &req,
         &**pool,
@@ -69,33 +69,36 @@ pub async fn organization_projects_get(
     .map(|x| x.1)
     .ok();
 
-    let possible_organization_id: Option<u64> = parse_base62(&info).ok();
+    let organization_data = Organization::get(&id, &**pool, &redis).await?;
+    if let Some(organization) = organization_data {
+        let project_ids = sqlx::query!(
+            "
+            SELECT m.id FROM organizations o
+            INNER JOIN mods m ON m.organization_id = o.id
+            WHERE o.id = $1
+            ",
+            organization.id as database::models::ids::OrganizationId
+        )
+        .fetch(&**pool)
+        .map_ok(|m| database::models::ProjectId(m.id))
+        .try_collect::<Vec<_>>()
+        .await?;
 
-    let project_ids = sqlx::query!(
-        "
-        SELECT m.id FROM organizations o
-        INNER JOIN mods m ON m.organization_id = o.id
-        WHERE (o.id = $1 AND $1 IS NOT NULL) OR (o.slug = $2 AND $2 IS NOT NULL)
-        ",
-        possible_organization_id.map(|x| x as i64),
-        info
-    )
-    .fetch(&**pool)
-    .map_ok(|m| database::models::ProjectId(m.id))
-    .try_collect::<Vec<database::models::ProjectId>>()
-    .await?;
+        let projects_data = crate::database::models::Project::get_many_ids(
+            &project_ids,
+            &**pool,
+            &redis,
+        )
+        .await?;
 
-    let projects_data = crate::database::models::Project::get_many_ids(
-        &project_ids,
-        &**pool,
-        &redis,
-    )
-    .await?;
+        let projects =
+            filter_visible_projects(projects_data, &current_user, &pool, true)
+                .await?;
 
-    let projects =
-        filter_visible_projects(projects_data, &current_user, &pool, true)
-            .await?;
-    Ok(HttpResponse::Ok().json(projects))
+        Ok(HttpResponse::Ok().json(projects))
+    } else {
+        Err(ApiError::NotFound)
+    }
 }
 
 #[derive(Deserialize, Validate)]

@@ -294,7 +294,7 @@ const tags = useTags();
 const flags = useFeatureFlags();
 const config = useRuntimeConfig();
 
-let orgId = useRouteId().toLowerCase();
+let orgId = useRouteId();
 
 // hacky way to show the edit button on the corner of the card.
 const routeHasSettings = computed(() => route.path.includes("settings"));
