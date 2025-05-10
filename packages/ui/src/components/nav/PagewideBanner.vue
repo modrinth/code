@@ -1,14 +1,11 @@
 <template>
   <div
-    :class="[
-      'banner-grid relative border-b-2 border-solid border-0',
-      containerClasses[variant]
-    ]"
+    :class="['banner-grid relative border-b-2 border-solid border-0', containerClasses[variant]]"
   >
     <div
       :class="[
         'grid-area-[title] flex items-center gap-2 font-bold text-[var(--font-size-md)]',
-        iconClasses[variant]
+        iconClasses[variant],
       ]"
     >
       <IssuesIcon
@@ -16,11 +13,7 @@
         aria-hidden="true"
         class="w-6 h-6 flex-shrink-0"
       />
-      <InfoIcon
-        v-if="variant === 'info'"
-        aria-hidden="true"
-        class="w-6 h-6 flex-shrink-0"
-      />
+      <InfoIcon v-if="variant === 'info'" aria-hidden="true" class="w-6 h-6 flex-shrink-0" />
       <slot name="title" />
     </div>
 
@@ -41,14 +34,14 @@
 <script lang="ts" setup>
 import { InfoIcon, IssuesIcon } from '@modrinth/assets'
 
-const props = defineProps<{
+defineProps<{
   variant: 'error' | 'warning' | 'info'
 }>()
 
 const containerClasses = {
-  error:   'bg-banners-error-bg text-banners-error-text border-banners-error-border',
+  error: 'bg-banners-error-bg text-banners-error-text border-banners-error-border',
   warning: 'bg-banners-warning-bg text-banners-warning-text border-banners-warning-border',
-  info:    'bg-banners-info-bg text-banners-info-text border-banners-info-border',
+  info: 'bg-banners-info-bg text-banners-info-text border-banners-info-border',
 }
 
 const iconClasses = {
@@ -70,11 +63,18 @@ const iconClasses = {
   padding-inline: max(calc((100% - 80rem) / 2 + var(--gap-md)), var(--gap-xl));
 }
 
-
-.grid-area-\[title\]        { grid-area: title; }
-.grid-area-\[description\]  { grid-area: description; }
-.grid-area-\[actions\]      { grid-area: actions; }
-.grid-area-\[actions_right\]{ grid-area: actions_right; }
+.grid-area-\[title\] {
+  grid-area: title;
+}
+.grid-area-\[description\] {
+  grid-area: description;
+}
+.grid-area-\[actions\] {
+  grid-area: actions;
+}
+.grid-area-\[actions_right\] {
+  grid-area: actions_right;
+}
 
 .banner-grid a {
   @apply underline text-current;
