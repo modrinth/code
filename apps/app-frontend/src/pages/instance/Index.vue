@@ -277,6 +277,7 @@ import {
 	EditIcon,
 	ExternalIcon,
 	EyeIcon,
+	FileImageIcon,
 	FolderOpenIcon,
 	GlobeIcon,
 	HashIcon,
@@ -542,6 +543,11 @@ const tabs = computed(() => [
 		label: 'Files',
 		href: `${basePath.value}/files`,
 		icon: FolderOpenIcon,
+	},
+	{
+		label: 'Screenshots',
+		href: `${basePath.value}/screenshots`,
+		icon: FileImageIcon,
 	},
 	{
 		label: 'Worlds',

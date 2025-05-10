@@ -250,6 +250,7 @@ fn main() {
         .plugin(api::friends::init())
         .plugin(api::worlds::init())
         .manage(PendingUpdateData::default())
+        .plugin(api::screenshots::init())
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             is_dev,

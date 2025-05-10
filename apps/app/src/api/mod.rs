@@ -26,6 +26,7 @@ pub mod cache;
 pub mod files;
 pub mod friends;
 pub mod worlds;
+pub mod screenshots;
 
 mod oauth_utils;
 

@@ -4,5 +4,6 @@ import Logs from './Logs.vue'
 import Mods from './Mods.vue'
 import Overview from './Overview.vue'
 import Worlds from './Worlds.vue'
+import Screenshots from './Screenshots.vue'
 
-export { Files, Index, Logs, Mods, Overview, Worlds }
+export { Files, Index, Logs, Mods, Overview, Worlds, Screenshots }
