@@ -10,10 +10,10 @@ pub mod mr_auth;
 pub mod pack;
 pub mod process;
 pub mod profile;
+pub mod screenshots;
 pub mod settings;
 pub mod tags;
 pub mod worlds;
-pub mod screenshots;
 
 pub mod data {
     pub use crate::state::{
@@ -28,12 +28,12 @@ pub mod data {
 
 pub mod prelude {
     pub use crate::{
-        State,
         data::*,
         event::CommandPayload,
-        jre, metadata, minecraft_auth, mr_auth, pack, process,
-        profile::{self, Profile, create},
+        jre,
+        metadata, minecraft_auth, mr_auth, pack, process, profile::{self, create, Profile},
         settings,
-        util::io::{IOError, canonicalize},
+        util::io::{canonicalize, IOError},
+        State,
     };
 }
