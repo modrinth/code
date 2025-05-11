@@ -1,33 +1,27 @@
 <template>
-  <div class="rounded-lg overflow-hidden shadow-md w-full text-contrast bg-bg-raised">
-    <div class="relative">
-      <img
-          :alt="getFileName(screenshot.path)"
-          :src="`data:image/png;base64,${screenshot.data}`"
-          class="w-full h-auto object-contain"
-      />
+  <div class="group rounded-lg relative overflow-hidden shadow-md w-full text-contrast">
+    <div
+        class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+    >
+      <Button icon-only title="Rename" @click="renameScreenshot">
+        <EditIcon/>
+      </Button>
+      <Button icon-only title="Copy" @click="copyImageToClipboard">
+        <ClipboardCopyIcon/>
+      </Button>
+      <Button icon-only title="Share" @click="shareScreenshot">
+        <ShareIcon/>
+      </Button>
+      <Button color="red" icon-only title="Delete" @click="deleteScreenshot">
+        <TrashIcon/>
+      </Button>
     </div>
-    <div class="p-4">
-      <div class="flex items-center gap-2">
-        <div class="font-medium truncate max-w-[calc(100%-120px)]">
-          {{ getFileName(screenshot.path) }}
-        </div>
-        <div class="flex gap-1 ml-auto">
-          <Button icon-only title="Rename" @click="renameScreenshot">
-            <EditIcon/>
-          </Button>
-          <Button icon-only title="Copy" @click="copyImageToClipboard">
-            <ClipboardCopyIcon/>
-          </Button>
-          <Button icon-only title="Share" @click="shareScreenshot">
-            <ShareIcon/>
-          </Button>
-          <Button color="red" icon-only title="Delete" @click="deleteScreenshot">
-            <TrashIcon/>
-          </Button>
-        </div>
-      </div>
-    </div>
+
+    <img
+        :alt="getFileName(screenshot.path)"
+        :src="`data:image/png;base64,${screenshot.data}`"
+        class="w-full h-full object-cover"
+    />
   </div>
 </template>
 

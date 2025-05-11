@@ -75,7 +75,7 @@ const hasToday = computed(() => screenshotsByDate.value.some(([label]) => label 
 
     <div v-else class="space-y-8">
       <template v-if="!hasToday">
-        <details class="group space-y-2" open>
+        <details class="space-y-2" open>
           <summary class="cursor-pointer flex items-center justify-between">
             <h2
                 class="text-xxl font-bold underline decoration-4 decoration-brand-green underline-offset-8"
@@ -91,7 +91,7 @@ const hasToday = computed(() => screenshotsByDate.value.some(([label]) => label 
       </template>
 
       <template v-for="[date, shots] in screenshotsByDate" :key="date">
-        <details class="group space-y-2" open>
+        <details class="space-y-2" open>
           <summary class="cursor-pointer flex items-center justify-between">
             <h2
                 class="text-xxl font-bold underline decoration-4 decoration-brand-green underline-offset-8"
