@@ -11,11 +11,11 @@ pub mod minecraft_skins;
 pub mod mr_auth;
 pub mod pack;
 pub mod process;
+pub mod screenshots;
 pub mod server_address;
 pub mod settings;
 pub mod tags;
 pub mod worlds;
-pub mod screenshots;
 
 pub mod data {
     pub use crate::state::{
@@ -38,7 +38,6 @@ pub mod data {
 
 pub mod prelude {
     pub use crate::{
-        State,
         data::*,
         event::CommandPayload,
         install, instance, jre, metadata, minecraft_auth, mr_auth, pack,
