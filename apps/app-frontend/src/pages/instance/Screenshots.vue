@@ -3,7 +3,7 @@ import type {GameInstance} from '@/helpers/types'
 import type ContextMenu from '@/components/ui/ContextMenu.vue'
 import {DropdownIcon} from '@modrinth/assets'
 import type {Version} from '@modrinth/utils'
-import {computed, onMounted, ref} from 'vue'
+import {computed, onBeforeMount, ref} from 'vue'
 import dayjs from 'dayjs'
 import advancedFormat from 'dayjs/plugin/advancedFormat.js'
 import type {Screenshot} from '@/helpers/screenshots.ts'
@@ -21,11 +21,7 @@ const props = defineProps<{
   installed: boolean
 }>()
 
-const screenshots = ref<Screenshot[]>([])
-
-onMounted(async () => {
-  screenshots.value = (await getAllProfileScreenshots(props.instance.path)) ?? []
-})
+const screenshots = ref<Screenshot[]>(await getAllProfileScreenshots(props.instance.path) ?? [])
 
 function groupAndSortByDate(items: Screenshot[]) {
   const today = dayjs().startOf('day')
@@ -57,6 +53,10 @@ function groupAndSortByDate(items: Screenshot[]) {
       .map(([label, {items}]) => [label, items] as const)
 }
 
+const markDeleted = (s: Screenshot) => {
+  screenshots.value = screenshots.value.filter(shot => shot.path !== s.path)
+}
+
 const screenshotsByDate = computed(() => groupAndSortByDate(screenshots.value))
 const hasToday = computed(() => screenshotsByDate.value.some(([label]) => label === 'Today'))
 </script>
@@ -75,7 +75,7 @@ const hasToday = computed(() => screenshotsByDate.value.some(([label]) => label 
 
     <div v-else class="space-y-8">
       <template v-if="!hasToday">
-        <details class="space-y-2" open>
+        <details class="group space-y-2" open>
           <summary class="cursor-pointer flex items-center justify-between">
             <h2
                 class="text-xxl font-bold underline decoration-4 decoration-brand-green underline-offset-8"
@@ -91,7 +91,7 @@ const hasToday = computed(() => screenshotsByDate.value.some(([label]) => label 
       </template>
 
       <template v-for="[date, shots] in screenshotsByDate" :key="date">
-        <details class="space-y-2" open>
+        <details class="group space-y-2" open>
           <summary class="cursor-pointer flex items-center justify-between">
             <h2
                 class="text-xxl font-bold underline decoration-4 decoration-brand-green underline-offset-8"
@@ -103,7 +103,13 @@ const hasToday = computed(() => screenshotsByDate.value.some(([label]) => label 
             />
           </summary>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
-            <ScreenshotCard v-for="s in shots" :key="s.path" :screenshot="s"/>
+            <ScreenshotCard
+                v-for="s in shots"
+                :key="s.path"
+                :screenshot="s"
+                :profile-path="instance.path"
+                @deleted="markDeleted(s)"
+            />
           </div>
         </details>
       </template>

@@ -268,7 +268,12 @@ fn main() {
             .plugin(
                 "screenshots",
                 InlinedPlugin::new()
-                    .commands(&["get_all_profile_screenshots"])
+                    .commands(&[
+                        "get_all_profile_screenshots",
+                        "get_screenshot_data",
+                        "delete_profile_screenshot",
+                        "open_profile_screenshot",
+                    ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
                     ),
