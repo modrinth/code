@@ -16,11 +16,7 @@
           <Button icon-only title="Rename" @click="renameScreenshot">
             <EditIcon/>
           </Button>
-          <Button
-              icon-only
-              title="Copy"
-              @click="copyImageToClipboard"
-          >
+          <Button icon-only title="Copy" @click="copyImageToClipboard">
             <ClipboardCopyIcon/>
           </Button>
           <Button icon-only title="Share" @click="shareScreenshot">
@@ -36,16 +32,16 @@
 </template>
 
 <script lang="ts" setup>
-import {ClipboardCopyIcon, EditIcon, ShareIcon, TrashIcon} from "@modrinth/assets";
-import {Button} from "@modrinth/ui";
-import type {Screenshot} from "@/helpers/screenshots.ts";
-import {useNotifications} from "@/store/state";
+import {ClipboardCopyIcon, EditIcon, ShareIcon, TrashIcon} from '@modrinth/assets'
+import {Button} from '@modrinth/ui'
+import type {Screenshot} from '@/helpers/screenshots.ts'
+import {useNotifications} from '@/store/state'
 
-const notifications = useNotifications();
+const notifications = useNotifications()
 
 const props = defineProps<{
   screenshot: Screenshot
-}>();
+}>()
 
 const getFileName = (path: string | undefined) => {
   if (!path) return 'Untitled'
@@ -54,26 +50,27 @@ const getFileName = (path: string | undefined) => {
 
 const copyImageToClipboard = async () => {
   try {
-    const base64 = props.screenshot.data;
-    const binary = atob(base64);
+    const base64 = props.screenshot.data
+    const binary = atob(base64)
 
-    const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0))
 
-    const blob = new Blob([bytes], {type: `data:image/png`});
-    const clipboardItem = new ClipboardItem({"image/png": blob});
+    const blob = new Blob([bytes], {type: `data:image/png`})
+    const clipboardItem = new ClipboardItem({'image/png': blob})
 
-    await navigator.clipboard.write([clipboardItem]);
+    await navigator.clipboard.write([clipboardItem])
 
     notifications.addNotification({
-      title: "Copied to clipboard",
-      text: "The screenshot has successfully been copied to your clipboard.",
-      type: 'success'
+      title: 'Copied to clipboard',
+      text: 'The screenshot has successfully been copied to your clipboard.',
+      type: 'success',
     })
+    // eslint-disable-next-line
   } catch (error: any) {
     notifications.addNotification({
       title: 'Failed to copy screenshot',
       text: error.message,
-      type: 'warn'
+      type: 'warn',
     })
   }
 }
