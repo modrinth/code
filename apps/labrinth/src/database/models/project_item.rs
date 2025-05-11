@@ -808,7 +808,7 @@ impl Project {
                                 icon_url: m.icon_url.clone(),
                                 raw_icon_url: m.raw_icon_url.clone(),
                                 published: m.published,
-                                updated: versions.clone().into_iter().map(|x| x.1).last().unwrap_or(m.published),
+                                updated: versions.iter().map(|x| x.1).next_back().unwrap_or(m.published),
                                 license_url: m.license_url.clone(),
                                 status: ProjectStatus::from_string(
                                     &m.status,
