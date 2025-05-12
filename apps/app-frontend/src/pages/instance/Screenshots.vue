@@ -15,6 +15,7 @@ import {
 } from '@/helpers/screenshots.ts'
 import ScreenshotCard from '@/components/ui/ScreenshotCard.vue'
 import type {
+  GalleryEntry,
   NavigationFunction,
   OpenExternallyFunction,
 } from '@modrinth/ui/src/components/modal/ImagePreviewModal.vue'
@@ -63,36 +64,28 @@ function markDeleted(s: Screenshot): void {
   screenshots.value = screenshots.value.filter((shot) => shot.path !== s.path)
 }
 
-const viewNextScreenshot: NavigationFunction = (async (screenshot: Screenshot) => {
-  const indexOfNextScreenshot = screenshots.value.findIndex((s) => s.path === screenshot.path) + 1
-  if (indexOfNextScreenshot > screenshots.value.length - 1) return undefined
-  screenshot = screenshots.value[indexOfNextScreenshot]
-  return {
-    src: `data:image/png;base64,${await getScreenshotData(props.instance.path, screenshot)}`,
-    alt: getScreenshotFileName(screenshot.path),
-    key: {
-      ...screenshot,
-      title: getScreenshotFileName(screenshot.path),
-      description: `Taken on ${dayjs(screenshot.creation_date).format('MMMM Do, YYYY')}`,
-    },
-  }
-}) as NavigationFunction
+async function navigateScreenshot(screenshot: Screenshot, offset: number): Promise<GalleryEntry> {
+  const list = screenshots.value
+  const idx = list.findIndex((s) => s.path === screenshot.path)
+  const newIdx = (idx + offset + list.length) % list.length
+  const next = list[newIdx]
 
-const viewPreviousScreenshot: NavigationFunction = (async (screenshot: Screenshot) => {
-  const indexOfPreviousScreenshot =
-    screenshots.value.findIndex((s) => s.path === screenshot.path) - 1
-  if (indexOfPreviousScreenshot < 0) return undefined
-  screenshot = screenshots.value[indexOfPreviousScreenshot]
   return {
-    src: `data:image/png;base64,${await getScreenshotData(props.instance.path, screenshot)}`,
-    alt: getScreenshotFileName(screenshot.path),
+    src: `data:image/png;base64,${await getScreenshotData(props.instance.path, next)}`,
+    alt: getScreenshotFileName(next.path),
     key: {
-      ...screenshot,
-      title: getScreenshotFileName(screenshot.path),
-      description: `Taken on ${dayjs(screenshot.creation_date).format('MMMM Do, YYYY')}`,
+      ...next,
+      title: getScreenshotFileName(next.path),
+      description: `Taken on ${dayjs(next.creation_date).format('MMMM Do, YYYY')}`,
     },
   }
-}) as NavigationFunction
+}
+
+const viewNextScreenshot: NavigationFunction = ((s) =>
+  navigateScreenshot(s, 1)) as NavigationFunction
+
+const viewPreviousScreenshot: NavigationFunction = ((s) =>
+  navigateScreenshot(s, -1)) as NavigationFunction
 
 const openExternally: OpenExternallyFunction = (async (src: string, screenshot: Screenshot) => {
   const result = await openProfileScreenshot(props.instance.path, screenshot)
