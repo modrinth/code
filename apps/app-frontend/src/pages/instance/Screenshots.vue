@@ -7,8 +7,19 @@ import { computed, ref } from 'vue'
 import dayjs from 'dayjs'
 import advancedFormat from 'dayjs/plugin/advancedFormat.js'
 import type { Screenshot } from '@/helpers/screenshots.ts'
-import { getAllProfileScreenshots } from '@/helpers/screenshots.ts'
+import {
+  getScreenshotData,
+  getScreenshotFileName,
+  getAllProfileScreenshots,
+  openProfileScreenshot,
+} from '@/helpers/screenshots.ts'
 import ScreenshotCard from '@/components/ui/ScreenshotCard.vue'
+import type {
+  NavigationFunction,
+  OpenExternallyFunction,
+} from '@modrinth/ui/src/components/modal/ImagePreviewModal.vue'
+import ImagePreviewModal from '@modrinth/ui/src/components/modal/ImagePreviewModal.vue'
+import { useNotifications } from '@/store/state'
 
 dayjs.extend(advancedFormat)
 
@@ -21,98 +32,144 @@ const props = defineProps<{
   installed: boolean
 }>()
 
+const notifications = useNotifications()
 const screenshots = ref<Screenshot[]>((await getAllProfileScreenshots(props.instance.path)) ?? [])
+const imagePreviewModal = ref<typeof ImagePreviewModal>()
 
-function groupAndSortByDate(items: Screenshot[]) {
-  const today = dayjs().startOf('day')
-  const yesterday = today.subtract(1, 'day')
-  const map = new Map<string, { labelDate: dayjs.Dayjs; items: Screenshot[] }>()
+function groupAndSortByDate(items: Screenshot[]): readonly [string, Screenshot[]][] {
+  const todayTS = dayjs().startOf('day').valueOf()
+  const yesterdayTS = dayjs().subtract(1, 'day').startOf('day').valueOf()
 
+  const groups = new Map<number, Screenshot[]>()
   for (const shot of items) {
-    const d = dayjs(shot.creation_date).startOf('day')
-    let label: string
-    if (d.isSame(today)) label = 'Today'
-    else if (d.isSame(yesterday)) label = 'Yesterday'
-    else label = dayjs(shot.creation_date).format('MMMM Do, YYYY')
-
-    if (!map.has(label)) {
-      map.set(label, { labelDate: d, items: [] })
-    }
-
-    map.get(label)!.items.push(shot)
+    const ts = dayjs(shot.creation_date).startOf('day').valueOf()
+    const bucket = groups.get(ts)
+    if (bucket) bucket.push(shot)
+    else groups.set(ts, [shot])
   }
 
-  return Array.from(map.entries())
-    .sort(([a, aData], [b, bData]) => {
-      if (a === 'Today') return -1
-      if (b === 'Today') return 1
-      if (a === 'Yesterday') return -1
-      if (b === 'Yesterday') return 1
-      return bData.labelDate.unix() - aData.labelDate.unix()
-    })
-    .map(([label, { items }]) => [label, items] as const)
+  const sortedTS = Array.from(groups.keys()).sort((a, b) => b - a)
+  return sortedTS.map((ts) => {
+    let label: string
+    if (ts === todayTS) label = 'Today'
+    else if (ts === yesterdayTS) label = 'Yesterday'
+    else label = dayjs(ts).format('MMMM Do, YYYY')
+
+    return [label, groups.get(ts)!] as const
+  })
 }
 
-const markDeleted = (s: Screenshot) => {
+function markDeleted(s: Screenshot): void {
   screenshots.value = screenshots.value.filter((shot) => shot.path !== s.path)
 }
+
+const viewNextScreenshot: NavigationFunction = (async (screenshot: Screenshot) => {
+  const indexOfNextScreenshot = screenshots.value.findIndex((s) => s.path === screenshot.path) + 1
+  if (indexOfNextScreenshot > screenshots.value.length - 1) return undefined
+  screenshot = screenshots.value[indexOfNextScreenshot]
+  return {
+    src: `data:image/png;base64,${await getScreenshotData(props.instance.path, screenshot)}`,
+    alt: getScreenshotFileName(screenshot.path),
+    key: {
+      ...screenshot,
+      title: getScreenshotFileName(screenshot.path),
+      description: `Taken on ${dayjs(screenshot.creation_date).format('MMMM Do, YYYY')}`,
+    },
+  }
+}) as NavigationFunction
+
+const viewPreviousScreenshot: NavigationFunction = (async (screenshot: Screenshot) => {
+  const indexOfPreviousScreenshot =
+    screenshots.value.findIndex((s) => s.path === screenshot.path) - 1
+  if (indexOfPreviousScreenshot < 0) return undefined
+  screenshot = screenshots.value[indexOfPreviousScreenshot]
+  return {
+    src: `data:image/png;base64,${await getScreenshotData(props.instance.path, screenshot)}`,
+    alt: getScreenshotFileName(screenshot.path),
+    key: {
+      ...screenshot,
+      title: getScreenshotFileName(screenshot.path),
+      description: `Taken on ${dayjs(screenshot.creation_date).format('MMMM Do, YYYY')}`,
+    },
+  }
+}) as NavigationFunction
+
+const openExternally: OpenExternallyFunction = (async (src: string, screenshot: Screenshot) => {
+  const result = await openProfileScreenshot(props.instance.path, screenshot)
+  if (!result) {
+    notifications.addNotification({
+      title: 'Unable to open screenshot in folder.',
+      type: 'error',
+    })
+  }
+}) as OpenExternallyFunction
 
 const screenshotsByDate = computed(() => groupAndSortByDate(screenshots.value))
 const hasToday = computed(() => screenshotsByDate.value.some(([label]) => label === 'Today'))
 </script>
 
 <template>
-  <div class="w-full p-5">
-    <div
-      v-if="!screenshots.length"
-      class="flex flex-col items-center justify-center py-12 text-center"
-    >
-      <div class="text-lg font-medium mb-2">No screenshots yet</div>
-      <div class="text-sm text-gray-500 dark:text-gray-400">
-        Screenshots taken in-game will appear here
+  <div>
+    <ImagePreviewModal
+      ref="imagePreviewModal"
+      :next="viewNextScreenshot"
+      :prev="viewPreviousScreenshot"
+      :open-externally="openExternally"
+      disable-zoom
+    />
+    <div class="w-full p-5">
+      <div
+        v-if="!screenshots.length"
+        class="flex flex-col items-center justify-center py-12 text-center"
+      >
+        <div class="text-lg font-medium mb-2">No screenshots yet</div>
+        <div class="text-sm text-gray-500 dark:text-gray-400">
+          Screenshots taken in-game will appear here
+        </div>
       </div>
-    </div>
 
-    <div v-else class="space-y-8">
-      <template v-if="!hasToday">
-        <details class="group space-y-2" open>
-          <summary class="cursor-pointer flex items-center justify-between">
-            <h2
-              class="text-xxl font-bold underline decoration-4 decoration-brand-green underline-offset-8"
-            >
-              Today
-            </h2>
-            <DropdownIcon
-              class="w-5 h-5 transform transition-transform duration-200 group-open:rotate-180"
-            />
-          </summary>
-          <p class="text-lg font-medium mb-2">You haven't taken any screenshots today.</p>
-        </details>
-      </template>
+      <div v-else class="space-y-8">
+        <template v-if="!hasToday">
+          <details class="group space-y-2" open>
+            <summary class="cursor-pointer flex items-center justify-between">
+              <h2
+                class="text-xxl font-bold underline decoration-4 decoration-brand-green underline-offset-8"
+              >
+                Today
+              </h2>
+              <DropdownIcon
+                class="w-5 h-5 transform transition-transform duration-200 group-open:rotate-180"
+              />
+            </summary>
+            <p class="text-lg font-medium mb-2">You haven't taken any screenshots today.</p>
+          </details>
+        </template>
 
-      <template v-for="[date, shots] in screenshotsByDate" :key="date">
-        <details class="group space-y-2" open>
-          <summary class="cursor-pointer flex items-center justify-between">
-            <h2
-              class="text-xxl font-bold underline decoration-4 decoration-brand-green underline-offset-8"
-            >
-              {{ date }}
-            </h2>
-            <DropdownIcon
-              class="w-5 h-5 transform transition-transform duration-200 group-open:rotate-180"
-            />
-          </summary>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
-            <ScreenshotCard
-              v-for="s in shots"
-              :key="s.path"
-              :screenshot="s"
-              :profile-path="instance.path"
-              @deleted="markDeleted(s)"
-            />
-          </div>
-        </details>
-      </template>
+        <template v-for="[date, shots] in screenshotsByDate" :key="date">
+          <details class="group space-y-2" open>
+            <summary class="cursor-pointer flex items-center justify-between">
+              <h2
+                class="text-xxl font-bold underline decoration-4 decoration-brand-green underline-offset-8"
+              >
+                {{ date }}
+              </h2>
+              <DropdownIcon
+                class="w-5 h-5 transform transition-transform duration-200 group-open:rotate-180"
+              />
+            </summary>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+              <ScreenshotCard
+                v-for="s in shots"
+                :key="s.path"
+                :screenshot="s"
+                :profile-path="instance.path"
+                :image-preview-modal="imagePreviewModal!"
+                @deleted="markDeleted(s)"
+              />
+            </div>
+          </details>
+        </template>
+      </div>
     </div>
   </div>
 </template>
