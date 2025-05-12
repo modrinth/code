@@ -115,7 +115,6 @@ const hasToday = computed(() => screenshotsByDate.value.some(([label]) => label 
       :next="viewNextScreenshot"
       :prev="viewPreviousScreenshot"
       :open-externally="openExternally"
-      disable-zoom
     />
     <div class="w-full p-5">
       <div
