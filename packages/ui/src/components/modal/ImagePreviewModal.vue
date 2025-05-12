@@ -27,10 +27,12 @@ const props = withDefaults(
     next: NavigationFunction
     prev: NavigationFunction
     openExternally: OpenExternallyFunction
+    openExternallyTooltip?: string
     disableZoom?: boolean
   }>(),
   {
     disableZoom: false,
+    openExternallyTooltip: 'Open externally',
   },
 )
 
@@ -137,16 +139,23 @@ defineExpose({ show, hide })
         class="card !p-3 transition-all duration-250 ease-in-out group-hover:opacity-100 opacity-40 group-hover:translate-y-0 translate-y-1 group-hover:scale-100 scale-90"
       >
         <div class="flex items-center gap-2">
-          <ButtonStyled circular icon-only @click="hide">
+          <ButtonStyled v-tooltip="'Close'" circular icon-only @click="hide">
             <Button><XIcon /><span class="sr-only">Close</span></Button>
           </ButtonStyled>
 
-          <ButtonStyled circular icon-only @click="handleOpenExternally">
-            <Button><ExternalIcon /><span class="sr-only">Open externally</span></Button>
+          <ButtonStyled
+            v-tooltip="openExternallyTooltip"
+            circular
+            icon-only
+            @click="handleOpenExternally"
+          >
+            <Button
+              ><ExternalIcon /><span class="sr-only">{{ openExternallyTooltip }}</span></Button
+            >
           </ButtonStyled>
 
           <template v-if="!disableZoom">
-            <ButtonStyled circular icon-only @click="toggleZoom">
+            <ButtonStyled v-tooltip="'Toggle zoom'" circular icon-only @click="toggleZoom">
               <Button>
                 <ExpandIcon v-if="scale <= 1" /><ContractIcon v-else />
                 <span class="sr-only">Toggle zoom</span>
@@ -155,13 +164,13 @@ defineExpose({ show, hide })
           </template>
 
           <template v-if="prevImageData">
-            <ButtonStyled circular icon-only @click="prevImage">
+            <ButtonStyled v-tooltip="'Previous'" circular icon-only @click="prevImage">
               <Button><LeftArrowIcon /><span class="sr-only">Previous</span></Button>
             </ButtonStyled>
           </template>
 
           <template v-if="nextImageData">
-            <ButtonStyled circular icon-only @click="nextImage">
+            <ButtonStyled v-tooltip="'Next'" circular icon-only @click="nextImage">
               <Button><RightArrowIcon /><span class="sr-only">Next</span></Button>
             </ButtonStyled>
           </template>
