@@ -12,7 +12,6 @@ export type Tab<Props> = {
 }
 
 defineProps<{
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tabs: Tab<any>[]
 }>()
 

@@ -1,14 +1,14 @@
 <template>
   <div
-      ref="wrapperContainer"
-      class="group rounded-lg relative overflow-hidden shadow-md w-full text-contrast"
-      @mouseenter="isHovered = true"
-      @mouseleave="isHovered = false"
+    ref="wrapperContainer"
+    class="group rounded-lg relative overflow-hidden shadow-md w-full text-contrast"
+    @mouseenter="isHovered = true"
+    @mouseleave="isHovered = false"
   >
     <div
-        v-if="loaded"
-        class="absolute top-2 right-2 flex gap-1 transition-opacity duration-200 z-10"
-        :class="{ 'opacity-0': !isHovered, 'opacity-100': isHovered }"
+      v-if="loaded"
+      class="absolute top-2 right-2 flex gap-1 transition-opacity duration-200 z-10"
+      :class="{ 'opacity-0': !isHovered, 'opacity-100': isHovered }"
     >
       <Button v-tooltip="'Copy'" icon-only title="Copy" @click="copyImageToClipboard">
         <ClipboardCopyIcon />
@@ -24,22 +24,18 @@
     <div class="aspect-video bg-bg-raised overflow-hidden">
       <div v-if="!loaded" class="absolute inset-0 skeleton"></div>
       <img
-          v-else
-          :alt="getScreenshotFileName(screenshot.path)"
-          :src="blobUrl"
-          class="w-full h-full object-cover transition-opacity duration-700"
-          :class="{ 'opacity-0': !loaded, 'opacity-100': loaded }"
-          @load="onLoad"
-          @click="
-          imagePreviewModal.show(
-            blobUrl,
-            getScreenshotFileName(screenshot.path),
-            {
-              ...screenshot,
-              title: getScreenshotFileName(screenshot.path),
-              description: `Taken on ${dayjs(screenshot.creation_date).format('MMMM Do, YYYY')}`,
-            }
-          )
+        v-else
+        :alt="getScreenshotFileName(screenshot.path)"
+        :src="blobUrl"
+        class="w-full h-full object-cover transition-opacity duration-700"
+        :class="{ 'opacity-0': !loaded, 'opacity-100': loaded }"
+        @load="onLoad"
+        @click="
+          imagePreviewModal.show(blobUrl, getScreenshotFileName(screenshot.path), {
+            ...screenshot,
+            title: getScreenshotFileName(screenshot.path),
+            description: `Taken on ${dayjs(screenshot.creation_date).format('MMMM Do, YYYY')}`,
+          })
         "
       />
     </div>
@@ -83,7 +79,11 @@ async function loadData(): Promise<void> {
   try {
     const base64 = await getScreenshotData(props.profilePath, props.screenshot)
     if (!base64) {
-      notifications.addNotification({ title: 'Failed to load screenshot:', text: props.screenshot.path, type: 'error' })
+      notifications.addNotification({
+        title: 'Failed to load screenshot:',
+        text: props.screenshot.path,
+        type: 'error',
+      })
       return
     }
 
@@ -92,7 +92,7 @@ async function loadData(): Promise<void> {
     const blob = new Blob([bytes], { type: 'image/png' })
 
     blobUrl.value = URL.createObjectURL(blob)
-    loaded.value = true;
+    loaded.value = true
   } catch (err: any) {
     notifications.addNotification({
       title: 'Error fetching screenshot',
@@ -104,17 +104,17 @@ async function loadData(): Promise<void> {
 
 onMounted(() => {
   observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            loadData()
-            if (observer && wrapperContainer.value) {
-              observer.unobserve(wrapperContainer.value)
-            }
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          loadData()
+          if (observer && wrapperContainer.value) {
+            observer.unobserve(wrapperContainer.value)
           }
         }
-      },
-      { rootMargin: '100px', threshold: 0.1 }
+      }
+    },
+    { rootMargin: '100px', threshold: 0.1 },
   )
   if (wrapperContainer.value) observer.observe(wrapperContainer.value)
 })
@@ -170,10 +170,10 @@ async function viewInFolder() {
 <style scoped>
 .skeleton {
   background: linear-gradient(
-      90deg,
-      var(--color-bg) 25%,
-      var(--color-raised-bg) 50%,
-      var(--color-bg) 75%
+    90deg,
+    var(--color-bg) 25%,
+    var(--color-raised-bg) 50%,
+    var(--color-bg) 75%
   );
   background-size: 200% 100%;
   animation: wave 1500ms infinite linear;
