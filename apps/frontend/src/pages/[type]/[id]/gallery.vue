@@ -129,72 +129,12 @@
       proceed-label="Delete"
       @proceed="deleteGalleryImage"
     />
-    <div
-      v-if="expandedGalleryItem != null"
-      class="expanded-image-modal"
-      @click="expandedGalleryItem = null"
-    >
-      <div class="content">
-        <img
-          class="image"
-          :class="{ 'zoomed-in': zoomedIn }"
-          :src="
-            expandedGalleryItem.raw_url
-              ? expandedGalleryItem.raw_url
-              : 'https://cdn.modrinth.com/placeholder-banner.svg'
-          "
-          :alt="expandedGalleryItem.title ? expandedGalleryItem.title : 'gallery-image'"
-          @click.stop
-        />
-
-        <div class="floating" @click.stop>
-          <div class="text">
-            <h2 v-if="expandedGalleryItem.title">
-              {{ expandedGalleryItem.title }}
-            </h2>
-            <p v-if="expandedGalleryItem.description">
-              {{ expandedGalleryItem.description }}
-            </p>
-          </div>
-          <div class="controls">
-            <div class="buttons">
-              <button class="close circle-button" @click="expandedGalleryItem = null">
-                <XIcon aria-hidden="true" />
-              </button>
-              <a
-                class="open circle-button"
-                target="_blank"
-                :href="
-                  expandedGalleryItem.raw_url
-                    ? expandedGalleryItem.raw_url
-                    : 'https://cdn.modrinth.com/placeholder-banner.svg'
-                "
-              >
-                <ExternalIcon aria-hidden="true" />
-              </a>
-              <button class="circle-button" @click="zoomedIn = !zoomedIn">
-                <ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
-                <ContractIcon v-else aria-hidden="true" />
-              </button>
-              <button
-                v-if="project.gallery.length > 1"
-                class="previous circle-button"
-                @click="previousImage()"
-              >
-                <LeftArrowIcon aria-hidden="true" />
-              </button>
-              <button
-                v-if="project.gallery.length > 1"
-                class="next circle-button"
-                @click="nextImage()"
-              >
-                <RightArrowIcon aria-hidden="true" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <ImagePreviewModal
+      ref="imageModal"
+      :next="getNextEntry"
+      :prev="getPrevEntry"
+      :open-externally="openExternally"
+    />
     <div v-if="currentMember" class="card header-buttons">
       <FileInput
         :max-size="524288000"
@@ -218,7 +158,7 @@
     </div>
     <div class="items">
       <div v-for="(item, index) in project.gallery" :key="index" class="card gallery-item">
-        <a class="gallery-thumbnail" @click="expandImage(item, index)">
+        <a class="gallery-thumbnail" @click="openImage(item, index)">
           <img
             :src="item.url ? item.url : 'https://cdn.modrinth.com/placeholder-banner.svg'"
             :alt="item.title ? item.title : 'gallery-image'"
@@ -285,17 +225,12 @@ import {
   SaveIcon,
   StarIcon,
   XIcon,
-  RightArrowIcon,
-  LeftArrowIcon,
-  ExternalIcon,
-  ExpandIcon,
-  ContractIcon,
   UploadIcon,
   InfoIcon,
   ImageIcon,
   TransferIcon,
 } from "@modrinth/assets";
-import { ConfirmModal } from "@modrinth/ui";
+import { ConfirmModal, ImagePreviewModal } from "@modrinth/ui";
 import FileInput from "~/components/ui/FileInput.vue";
 import DropArea from "~/components/ui/DropArea.vue";
 import Modal from "~/components/ui/Modal.vue";
@@ -375,24 +310,39 @@ export default defineNuxtComponent({
     document.addEventListener("keydown", this._keyListener.bind(this));
   },
   methods: {
-    nextImage() {
-      this.expandedGalleryIndex++;
-      if (this.expandedGalleryIndex >= this.project.gallery.length) {
-        this.expandedGalleryIndex = 0;
-      }
-      this.expandedGalleryItem = this.project.gallery[this.expandedGalleryIndex];
+    openImage(item, index) {
+      const src = item.raw_url || item.url;
+      const alt = item.title || "gallery-image";
+      this.$refs.imageModal.show(src, alt, {
+        index,
+        title: item.title,
+        description: item.description,
+      });
     },
-    previousImage() {
-      this.expandedGalleryIndex--;
-      if (this.expandedGalleryIndex < 0) {
-        this.expandedGalleryIndex = this.project.gallery.length - 1;
-      }
-      this.expandedGalleryItem = this.project.gallery[this.expandedGalleryIndex];
+    getGalleryEntry(key, offset) {
+      const gallery = this.project.gallery;
+      const len = gallery.length;
+      const i = (key.index + offset + len) % len;
+      const item = gallery[i];
+
+      return {
+        src: item.raw_url || item.url,
+        alt: item.title || "gallery-image",
+        key: {
+          index: i,
+          title: item.title,
+          description: item.description,
+        },
+      };
     },
-    expandImage(item, index) {
-      this.expandedGalleryItem = item;
-      this.expandedGalleryIndex = index;
-      this.zoomedIn = false;
+    getNextEntry(key) {
+      return this.getGalleryEntry(key, 1);
+    },
+    getPrevEntry(key) {
+      return this.getGalleryEntry(key, -1);
+    },
+    openExternally(src) {
+      window.open(src, "_blank");
     },
     resetEdit() {
       this.editIndex = -1;
@@ -536,137 +486,6 @@ export default defineNuxtComponent({
     gap: 0.5ch;
     align-items: center;
     color: var(--color-text-inactive);
-  }
-}
-
-.expanded-image-modal {
-  position: fixed;
-  z-index: 20;
-  overflow: auto;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #000000;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  .content {
-    position: relative;
-    width: calc(100vw - 2 * var(--spacing-card-lg));
-    height: calc(100vh - 2 * var(--spacing-card-lg));
-
-    .circle-button {
-      padding: 0.5rem;
-      line-height: 1;
-      display: flex;
-      max-width: 2rem;
-      color: var(--color-button-text);
-      background-color: var(--color-button-bg);
-      border-radius: var(--size-rounded-max);
-      margin: 0;
-      box-shadow: inset 0px -1px 1px rgb(17 24 39 / 10%);
-
-      &:not(:last-child) {
-        margin-right: 0.5rem;
-      }
-
-      &:hover {
-        background-color: var(--color-button-bg-hover) !important;
-
-        svg {
-          color: var(--color-button-text-hover) !important;
-        }
-      }
-
-      &:active {
-        background-color: var(--color-button-bg-active) !important;
-
-        svg {
-          color: var(--color-button-text-active) !important;
-        }
-      }
-
-      svg {
-        height: 1rem;
-        width: 1rem;
-      }
-    }
-
-    .image {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      max-width: calc(100vw - 2 * var(--spacing-card-lg));
-      max-height: calc(100vh - 2 * var(--spacing-card-lg));
-      border-radius: var(--size-rounded-card);
-
-      &.zoomed-in {
-        object-fit: cover;
-        width: auto;
-        height: calc(100vh - 2 * var(--spacing-card-lg));
-        max-width: calc(100vw - 2 * var(--spacing-card-lg));
-      }
-    }
-    .floating {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: var(--spacing-card-md);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: var(--spacing-card-sm);
-      transition: opacity 0.25s ease-in-out;
-      opacity: 1;
-      padding: 2rem 2rem 0 2rem;
-
-      &:not(&:hover) {
-        opacity: 0.4;
-        .text {
-          transform: translateY(2.5rem) scale(0.8);
-          opacity: 0;
-        }
-        .controls {
-          transform: translateY(0.25rem) scale(0.9);
-        }
-      }
-
-      .text {
-        display: flex;
-        flex-direction: column;
-        max-width: 40rem;
-        transition:
-          opacity 0.25s ease-in-out,
-          transform 0.25s ease-in-out;
-        text-shadow: 1px 1px 10px #000000d4;
-        margin-bottom: 0.25rem;
-        gap: 0.5rem;
-
-        h2 {
-          color: var(--dark-color-text-dark);
-          font-size: 1.25rem;
-          text-align: center;
-          margin: 0;
-        }
-
-        p {
-          color: var(--dark-color-text);
-          margin: 0;
-        }
-      }
-      .controls {
-        background-color: var(--color-raised-bg);
-        padding: var(--spacing-card-md);
-        border-radius: var(--size-rounded-card);
-        transition:
-          opacity 0.25s ease-in-out,
-          transform 0.25s ease-in-out;
-      }
-    }
   }
 }
 

@@ -22,12 +22,17 @@ export type NavigationFunction = (key: any | GalleryKey) => GalleryEntry | Promi
 export type OpenExternallyFunction = (src: string, key: any | GalleryKey) => void | Promise<void>
 export type GalleryKey = { title?: string; description?: string }
 
-const props = defineProps<{
-  next: NavigationFunction
-  prev: NavigationFunction
-  openExternally: OpenExternallyFunction
-  disableZoom: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    next: NavigationFunction
+    prev: NavigationFunction
+    openExternally: OpenExternallyFunction
+    disableZoom?: boolean
+  }>(),
+  {
+    disableZoom: false,
+  },
+)
 
 const src = ref<string>()
 const alt = ref<string>()
@@ -112,12 +117,18 @@ defineExpose({ show, hide })
     >
       <div
         v-if="key?.title || key?.description"
-        class="flex flex-col max-w-[40rem] text-shadow mb-1 gap-2 transition-all duration-250 ease-in-out group-hover:opacity-100 opacity-0 group-hover:translate-y-0 translate-y-5 group-hover:scale-100 scale-80"
+        class="flex flex-col max-w-[40rem] mb-1 gap-2 transition-all duration-250 ease-in-out group-hover:opacity-100 opacity-0 group-hover:translate-y-0 translate-y-5 group-hover:scale-100 scale-80"
       >
-        <h2 v-if="key?.title" class="text-[var(--dark-color-text-dark)] text-xl text-center m-0">
+        <h2
+          v-if="key?.title"
+          class="text-shadow text-[var(--dark-color-text-dark)] text-xl text-center m-0"
+        >
           {{ key.title }}
         </h2>
-        <p v-if="key?.description" class="text-[var(--dark-color-text)] m-0 text-center">
+        <p
+          v-if="key?.description"
+          class="text-shadow text-[var(--dark-color-text)] m-0 text-center"
+        >
           {{ key.description }}
         </p>
       </div>
@@ -159,3 +170,9 @@ defineExpose({ show, hide })
     </div>
   </div>
 </template>
+
+<style scoped>
+.text-shadow {
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 1)) drop-shadow(0 0 4px rgba(0, 0, 0, 1));
+}
+</style>
