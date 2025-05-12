@@ -11,8 +11,8 @@ export type GalleryEntry = {
   alt: string
 };
 
-export type NavigationFunction = (key: any) => GalleryEntry | Promise<GalleryEntry>;
-export type OpenExternallyFunction = (src: string, key: any) => (void | Promise<void>);
+export type NavigationFunction = (key: any | GalleryKey) => GalleryEntry | Promise<GalleryEntry>;
+export type OpenExternallyFunction = (src: string, key: any | GalleryKey) => (void | Promise<void>);
 
 export type GalleryKey = {
   title?: string,
