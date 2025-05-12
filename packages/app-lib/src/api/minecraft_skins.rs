@@ -103,6 +103,7 @@ impl Skin {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
+#[serde(rename_all = "snake_case")]
 pub enum SkinSource {
     /// A default Minecraft skin, which may be assigned to players at random by default.
     Default,
