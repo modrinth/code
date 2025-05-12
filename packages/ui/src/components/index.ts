@@ -60,6 +60,7 @@ export { default as ContentListPanel } from './content/ContentListPanel.vue'
 
 // Modals
 export { default as NewModal } from './modal/NewModal.vue'
+export { default as ImagePreviewModal } from "./modal/ImagePreviewModal.vue"
 export { default as Modal } from './modal/Modal.vue'
 export { default as ConfirmModal } from './modal/ConfirmModal.vue'
 export { default as ShareModal } from './modal/ShareModal.vue'

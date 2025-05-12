@@ -40,3 +40,8 @@ export async function getScreenshotData(
     screenshot,
   })
 }
+
+export function getScreenshotFileName(path: string | undefined) {
+  if (!path) return 'Untitled'
+  return path.split('/').pop()!
+}
