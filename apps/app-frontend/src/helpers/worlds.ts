@@ -4,6 +4,7 @@ import { openPath } from '@/helpers/utils'
 import { autoToHTML } from '@geometrically/minecraft-motd-parser'
 import dayjs from 'dayjs'
 import type { GameVersion } from '@modrinth/ui'
+import type { ProfileEvent } from '@/helpers/types'
 
 type BaseWorld = {
   name: string
@@ -309,19 +310,3 @@ export function hasQuickPlaySupport(gameVersions: GameVersion[], currentVersion:
 
   return versionIndex !== -1 && targetIndex !== -1 && versionIndex <= targetIndex
 }
-
-export type ProfileEvent = { profile_path_id: string } & (
-  | {
-      event: 'servers_updated'
-    }
-  | {
-      event: 'world_updated'
-      world: string
-    }
-  | {
-      event: 'server_joined'
-      host: string
-      port: number
-      timestamp: string
-    }
-)

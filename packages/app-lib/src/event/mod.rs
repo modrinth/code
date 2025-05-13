@@ -1,4 +1,5 @@
 //! Theseus state management system
+use crate::screenshots::Screenshot;
 use ariadne::users::{UserId, UserStatus};
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
@@ -251,6 +252,10 @@ pub enum ProfilePayloadType {
         host: String,
         port: u16,
         timestamp: DateTime<Utc>,
+    },
+    ScreenshotChanged {
+        file_exists: bool,
+        screenshot: Screenshot,
     },
     Edited,
     Removed,

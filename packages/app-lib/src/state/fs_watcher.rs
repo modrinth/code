@@ -1,10 +1,13 @@
+use std::path::Path;
 use crate::State;
 use crate::event::ProfilePayloadType;
 use crate::event::emit::{emit_profile, emit_warning};
+use crate::screenshots::Screenshot;
 use crate::state::{
     DirectoryInfo, ProfileInstallStage, ProjectType, attached_world_data,
 };
 use crate::worlds::WorldType;
+use chrono::{DateTime, Utc};
 use futures::{SinkExt, StreamExt, channel::mpsc::channel};
 use notify::{RecommendedWatcher, RecursiveMode};
 use notify_debouncer_mini::{DebounceEventResult, Debouncer, new_debouncer};
@@ -117,6 +120,34 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                     }
                                     Some(ProfilePayloadType::WorldUpdated { world })
                                 } else if first_file_name
+                                    .filter(|x| *x == "screenshots")
+                                    .is_some()
+                                    && e.path
+                                    .extension()
+                                    .and_then(|ext| ext.to_str())
+                                    .filter(|s| *s == "png")
+                                    .is_some()
+                                {
+                                    let path_str = e.path.to_string_lossy().into_owned();
+                                    let file_exists = Path::new(&e.path).exists();
+
+                                    let creation_date = if file_exists {
+                                        let meta = std::fs::metadata(&e.path).unwrap();
+                                        let created_time = meta.created()
+                                            .unwrap_or_else(|_| meta.modified().unwrap());
+                                        DateTime::<Utc>::from(created_time)
+                                    } else { 
+                                        Utc::now()
+                                    };
+
+                                    Some(ProfilePayloadType::ScreenshotChanged {
+                                        file_exists,
+                                        screenshot: Screenshot {
+                                            path: path_str,
+                                            creation_date,
+                                        },
+                                    })
+                                } else if first_file_name
                                     .filter(|x| *x == "saves")
                                     .is_none()
                                 {
@@ -177,6 +208,7 @@ pub(crate) async fn watch_profile(
         for sub_path in ProjectType::iterator().map(|x| x.get_folder()).chain([
             "crash-reports",
             "saves",
+            "screenshots",
             "servers.dat",
         ]) {
             let full_path = profile_path.join(sub_path);
