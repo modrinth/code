@@ -1,4 +1,4 @@
-//! Theseus state management system
+use crate::screenshots::Screenshot;
 use ariadne::ids::UserId;
 use ariadne::users::UserStatus;
 use chrono::{DateTime, Utc};
@@ -277,6 +277,10 @@ pub enum InstancePayloadType {
         host: String,
         port: u16,
         timestamp: DateTime<Utc>,
+    },
+    ScreenshotChanged {
+        file_exists: bool,
+        screenshot: Screenshot,
     },
     Edited,
     ContentInstallFinished {

@@ -1,12 +1,15 @@
 use crate::State;
 use crate::event::InstancePayloadType;
 use crate::event::emit::{emit_instance, emit_warning};
+use crate::screenshots::Screenshot;
 use crate::state::{
     DirectoryInfo, InstanceInstallStage, ProjectType, attached_world_data,
 };
 use crate::worlds::WorldType;
+use chrono::{DateTime, Utc};
 use notify::{RecommendedWatcher, RecursiveMode};
 use notify_debouncer_mini::{DebounceEventResult, Debouncer, new_debouncer};
+use std::path::Path;
 use std::{collections::HashMap, sync::Arc, time::Duration};
 use tokio::sync::{RwLock, mpsc::channel};
 
@@ -130,6 +133,33 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                     })
                                 } else if first_file_name
                                     .as_ref()
+                                    .is_some_and(|x| *x == "screenshots")
+                                    && e.path
+                                        .extension()
+                                        .as_ref()
+                                        .is_some_and(|s| *s == "png")
+                                {
+                                    let path_str = e.path.to_string_lossy().into_owned();
+                                    let file_exists = Path::new(&e.path).exists();
+
+                                    let creation_date = if file_exists {
+                                        let meta = std::fs::metadata(&e.path).unwrap();
+                                        let created_time = meta.created()
+                                            .unwrap_or_else(|_| meta.modified().unwrap());
+                                        DateTime::<Utc>::from(created_time)
+                                    } else { 
+                                        Utc::now()
+                                    };
+
+                                    Some(InstancePayloadType::ScreenshotChanged {
+                                        file_exists,
+                                        screenshot: Screenshot {
+                                            path: path_str,
+                                            creation_date,
+                                        },
+                                    })
+                                } else if first_file_name
+                                    .as_ref()
                                     .is_none_or(|x| *x != "saves")
                                 {
                                     Some(InstancePayloadType::Synced)
@@ -196,7 +226,7 @@ pub(crate) async fn watch_instance_folder(
     let mut to_watch = Vec::new();
     for sub_path in ProjectType::iterator()
         .map(|x| x.get_folder())
-        .chain(["crash-reports", "saves"])
+        .chain(["crash-reports", "saves", "screenshots"])
     {
         let full_path = full_instance_path.join(sub_path);
 

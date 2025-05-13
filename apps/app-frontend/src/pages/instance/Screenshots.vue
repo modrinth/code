@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { GameInstance } from '@/helpers/types'
+import type { GameInstance, ProfileEvent } from '@/helpers/types'
 import type ContextMenu from '@/components/ui/ContextMenu.vue'
 import { DropdownIcon } from '@modrinth/assets'
 import type { Version } from '@modrinth/utils'
-import { computed, ref } from 'vue'
+import { computed, onUnmounted, ref } from 'vue'
 import dayjs from 'dayjs'
 import advancedFormat from 'dayjs/plugin/advancedFormat.js'
 import type { Screenshot } from '@/helpers/screenshots.ts'
@@ -21,6 +21,7 @@ import type {
 } from '@modrinth/ui/src/components/modal/ImagePreviewModal.vue'
 import ImagePreviewModal from '@modrinth/ui/src/components/modal/ImagePreviewModal.vue'
 import { useNotifications } from '@/store/state'
+import { profile_listener } from '@/helpers/events'
 
 dayjs.extend(advancedFormat)
 
@@ -99,6 +100,27 @@ const openExternally: OpenExternallyFunction = (async (src: string, screenshot: 
 
 const screenshotsByDate = computed(() => groupAndSortByDate(screenshots.value))
 const hasToday = computed(() => screenshotsByDate.value.some(([label]) => label === 'Today'))
+
+const unlistenProfile = await profile_listener(async (e: ProfileEvent) => {
+  if (e.profile_path_id !== props.instance.path) return
+
+  console.info(`Handling profile event '${e.event}' for profile: ${e.profile_path_id}`)
+
+  if (e.event === 'screenshot_changed') {
+    const exists = screenshots.value.some((shot) => shot.path === e.screenshot.path)
+    if (e.file_exists && !exists) {
+      screenshots.value = [e.screenshot, ...screenshots.value]
+    }
+
+    if (!e.file_exists && exists) {
+      screenshots.value = screenshots.value.filter((shot) => shot.path !== e.screenshot.path)
+    }
+  }
+})
+
+onUnmounted(() => {
+  unlistenProfile()
+})
 </script>
 
 <template>
