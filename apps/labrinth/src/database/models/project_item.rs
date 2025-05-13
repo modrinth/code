@@ -759,7 +759,7 @@ impl Project {
                     "
                     SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
                     m.icon_url icon_url, m.raw_icon_url raw_icon_url, m.description description, m.published published,
-                    m.updated updated, m.approved approved, m.queued, m.status status, m.requested_status requested_status,
+                    m.approved approved, m.queued, m.status status, m.requested_status requested_status,
                     m.license_url license_url,
                     m.team_id team_id, m.organization_id organization_id, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
                     m.webhook_sent, m.color,
@@ -786,7 +786,9 @@ impl Project {
                             games,
                             loader_loader_field_ids,
                         } = loaders_ptypes_games.remove(&project_id).map(|x|x.1).unwrap_or_default();
+                        // Each version is a tuple of (VersionId, DateTime<Utc>)
                         let mut versions = versions.remove(&project_id).map(|x| x.1).unwrap_or_default();
+                        versions.sort_by(|a, b| a.1.cmp(&b.1));
                         let mut gallery = mods_gallery.remove(&project_id).map(|x| x.1).unwrap_or_default();
                         let urls = links.remove(&project_id).map(|x| x.1).unwrap_or_default();
                         let version_fields = version_fields.remove(&project_id).map(|x| x.1).unwrap_or_default();
@@ -806,7 +808,7 @@ impl Project {
                                 icon_url: m.icon_url.clone(),
                                 raw_icon_url: m.raw_icon_url.clone(),
                                 published: m.published,
-                                updated: m.updated,
+                                updated: versions.iter().map(|x| x.1).next_back().unwrap_or(m.published),
                                 license_url: m.license_url.clone(),
                                 status: ProjectStatus::from_string(
                                     &m.status,
@@ -833,11 +835,7 @@ impl Project {
                             additional_categories: m.additional_categories.unwrap_or_default(),
                             project_types,
                             games,
-                            versions: {
-                                // Each version is a tuple of (VersionId, DateTime<Utc>)
-                                versions.sort_by(|a, b| a.1.cmp(&b.1));
-                                versions.into_iter().map(|x| x.0).collect()
-                            },
+                            versions: versions.into_iter().map(|x| x.0).collect(),
                             gallery_items: {
                                 gallery.sort_by(|a, b| a.ordering.cmp(&b.ordering));
                                 gallery
