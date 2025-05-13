@@ -1,11 +1,6 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { ButtonStyled, commonMessages } from '@modrinth/ui'
-import { EditIcon } from '@modrinth/assets'
-import { useVIntl } from '@vintl/vintl'
-import type { Cape, Skin } from '@/helpers/skins.ts'
-
-const { formatMessage } = useVIntl()
+import { computed } from 'vue'
+import type { Cape } from '@/helpers/skins.ts'
 
 const emit = defineEmits<{
   (e: 'select'): void

@@ -20,7 +20,28 @@ const props = defineProps<{
 const currentSkin = ref<string | undefined>()
 const currentCape = ref<Cape | undefined>()
 
-const previewSkin = computed(() => currentSkin.value ? `https://vzge.me/full/350/${currentSkin.value}.png?no=ears&y=180` : undefined)
+const mcUrlRegex = /texture\/([a-fA-F0-9]+)$/
+
+const textureId = computed(() => {
+  if (!currentCape.value) {
+    return undefined
+  }
+
+  const mcTextureMatch = currentCape.value.texture.match(mcUrlRegex)
+
+  if (mcTextureMatch) {
+    return mcTextureMatch[1]
+  } else {
+    return undefined;
+  }
+})
+
+
+const capeParams = computed(() => {
+  return textureId.value ? `&replacecape=${textureId.value}` : ``
+})
+
+const previewSkin = computed(() => currentSkin.value ? `https://vzge.me/full/350/${currentSkin.value}.png?no=ears&y=180${capeParams.value}` : undefined)
 
 function show(e: MouseEvent, skin?: string, selected?: Cape) {
   currentSkin.value = skin
