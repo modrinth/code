@@ -293,22 +293,6 @@ export default defineNuxtComponent({
       return "image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.gif,.webp";
     },
   },
-  mounted() {
-    this._keyListener = function (e) {
-      if (this.expandedGalleryItem) {
-        e.preventDefault();
-        if (e.key === "Escape") {
-          this.expandedGalleryItem = null;
-        } else if (e.key === "ArrowLeft") {
-          this.previousImage();
-        } else if (e.key === "ArrowRight") {
-          this.nextImage();
-        }
-      }
-    };
-
-    document.addEventListener("keydown", this._keyListener.bind(this));
-  },
   methods: {
     openImage(item, index) {
       const src = item.raw_url || item.url;
