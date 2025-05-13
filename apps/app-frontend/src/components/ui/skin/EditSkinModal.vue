@@ -4,7 +4,7 @@ import { computed, useTemplateRef } from 'vue'
 
 const modal = useTemplateRef('modal')
 
-const previewSkin = computed(() => `https://vzge.me/full/350/ProspectorDev.png?no=ears&y=180`)
+const previewSkin = computed(() => `https://vzge.me/full/350/ProspectorDev.png?no=ears`)
 
 function show(e: MouseEvent) {
   modal.value?.show(e)
