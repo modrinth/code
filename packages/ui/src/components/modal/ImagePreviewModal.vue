@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computedAsync } from '@vueuse/core'
-import { ref, defineProps, defineExpose, nextTick } from 'vue'
+import { ref, defineProps, defineExpose, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import {
   ContractIcon,
   ExpandIcon,
@@ -15,12 +15,15 @@ import { pxOf } from '@modrinth/utils'
 
 export type GalleryEntry = {
   src: string
-  key: any | GalleryKey
+  key: GalleryKey
   alt: string
 }
-export type NavigationFunction = (key: any | GalleryKey) => GalleryEntry | Promise<GalleryEntry>
-export type OpenExternallyFunction = (src: string, key: any | GalleryKey) => void | Promise<void>
-export type GalleryKey = { title?: string; description?: string }
+export type NavigationFunction = (key: GalleryKey) => GalleryEntry | Promise<GalleryEntry>
+export type OpenExternallyFunction = (src: string, key: GalleryKey) => void | Promise<void>
+export type GalleryKey = any & {
+  title?: string
+  description?: string
+}
 
 const props = withDefaults(
   defineProps<{
@@ -38,12 +41,12 @@ const props = withDefaults(
 
 const src = ref<string>()
 const alt = ref<string>()
-const key = ref<any | GalleryKey>()
+const key = ref<GalleryKey>()
 const shown = ref(false)
 const scale = ref(1)
 const imageRef = ref<HTMLImageElement | null>(null)
 
-function show(_src: string, _alt: string, _key: any | GalleryKey) {
+function show(_src: string, _alt: string, _key: GalleryKey) {
   shown.value = true
   src.value = _src
   alt.value = _alt
@@ -90,7 +93,33 @@ async function toggleZoom() {
   }
 }
 
-defineExpose({ show, hide })
+function keyListener(e: KeyboardEvent) {
+  if (!shown.value) return
+
+  e.preventDefault()
+
+  switch (e.key) {
+    case 'Escape':
+      hide()
+      break
+    case 'ArrowLeft':
+      prevImage()
+      break
+    case 'ArrowRight':
+      nextImage()
+      break
+  }
+}
+
+defineExpose({ show, hide, nextImage, prevImage })
+
+onMounted(() => {
+  document.addEventListener('keydown', keyListener)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('keydown', keyListener)
+})
 </script>
 
 <template>
