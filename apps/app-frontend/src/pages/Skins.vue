@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { UpdatedIcon, PlusIcon } from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
+import { ButtonStyled, SkinPreviewRenderer } from '@modrinth/ui'
 import { ref, computed, useTemplateRef } from 'vue'
 import SkinButton from '@/components/ui/skin/SkinButton.vue'
 import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
@@ -13,8 +13,8 @@ import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
 const editSkinModal = useTemplateRef('editSkinModal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
 
-const selectedSkin = ref('ProspectorDev')
-const previewSkin = computed(() => `https://vzge.me/full/350/${selectedSkin.value}.png?no=ears`)
+const selectedSkin = ref('its_imb11')
+const previewSkin = computed(() => `https://vzge.me/processedskin/${selectedSkin.value}.png`)
 
 const savedSkins = computed(() => skins.value.filter((skin) => skin.source !== 'Default'))
 const defaultSkins = computed(() =>
@@ -91,7 +91,7 @@ async function loadSkins() {
         </div>
       </div>
       <div class="h-[80vh] flex items-center justify-center">
-        <img alt="" :src="previewSkin" />
+        <SkinPreviewRenderer :model-src="'/src/assets/models/wide_player.gltf'" :nametag="selectedSkin" :texture-src="previewSkin" />
       </div>
     </div>
     <div class="flex flex-col gap-6 add-perspective">

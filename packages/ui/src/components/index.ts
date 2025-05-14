@@ -96,6 +96,9 @@ export { default as SearchSidebarFilter } from './search/SearchSidebarFilter.vue
 // Billing
 export { default as PurchaseModal } from './billing/PurchaseModal.vue'
 
+// Skins
+export { default as SkinPreviewRenderer } from "./skin/SkinPreviewRenderer.vue"
+
 // Version
 export { default as VersionChannelIndicator } from './version/VersionChannelIndicator.vue'
 export { default as VersionFilterControl } from './version/VersionFilterControl.vue'
