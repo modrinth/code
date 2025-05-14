@@ -10,7 +10,7 @@
     <TresCanvas
       shadows
       alpha
-      :antialias="false"
+      :antialias="antialias"
       @pointerdown="onPointerDown"
       @pointermove="onPointerMove"
       @pointerup="onPointerUp"
@@ -69,11 +69,14 @@ import { useGLTF } from '@tresjs/cientos'
 import { useTexture, TresCanvas } from '@tresjs/core'
 import {ref, computed, watch} from 'vue'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   textureSrc: string
   modelSrc: string
   nametag?: string
-}>()
+  antialias?: boolean
+}>(), {
+  antialias: false,
+})
 
 const { scene } = await useGLTF(props.modelSrc)
 
@@ -132,6 +135,8 @@ const isDragging = ref(false)
 const previousX = ref(0)
 
 const onPointerDown = (event: PointerEvent) => {
+  (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
+
   isDragging.value = true
   previousX.value = event.clientX
 }
@@ -143,8 +148,9 @@ const onPointerMove = (event: PointerEvent) => {
   previousX.value = event.clientX
 }
 
-const onPointerUp = () => {
-  isDragging.value = false
+const onPointerUp = (event: PointerEvent) => {
+  isDragging.value = false;
+  (event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId)
 }
 
 const radialTexture = createRadialTexture(512)
