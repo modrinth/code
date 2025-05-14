@@ -3,7 +3,7 @@
     <div class="absolute bottom-[18%] left-1/2 transform -translate-x-1/2 text-primary px-3 py-1 rounded text-md pointer-events-none z-10">
       Drag to rotate
     </div>
-    <div class="absolute top-[10%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md text-[225%] pointer-events-none z-10 font-minecraft text-secondary bg-bg-raised shadow-md border">
+    <div v-if="nametag" class="absolute top-[10%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md text-[225%] pointer-events-none z-10 font-minecraft text-secondary bg-bg-raised shadow-md border">
       {{ nametag }}
     </div>
 
