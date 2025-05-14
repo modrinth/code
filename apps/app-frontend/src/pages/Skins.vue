@@ -7,11 +7,13 @@ import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
 import type { Cape, Skin, SkinModel } from '@/helpers/skins.ts'
 import { get_available_skins, get_available_capes } from '@/helpers/skins.ts'
 import { handleError } from '@/store/notifications'
-import CapeButton from '@/components/ui/skin/CapeButton.vue'
 import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
+import { get as getSettings } from "@/helpers/settings.ts";
 
 const editSkinModal = useTemplateRef('editSkinModal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
+
+const settings = ref(await getSettings());
 
 const selectedSkin = ref('its_imb11')
 const previewSkin = computed(() => `https://vzge.me/processedskin/${selectedSkin.value}.png`)
@@ -91,7 +93,7 @@ async function loadSkins() {
         </div>
       </div>
       <div class="h-[80vh] flex items-center justify-center">
-        <SkinPreviewRenderer :model-src="'/src/assets/models/wide_player.gltf'" :nametag="selectedSkin" :texture-src="previewSkin" />
+        <SkinPreviewRenderer :model-src="'/src/assets/models/wide_player.gltf'" :nametag="settings.hide_nametag_skins_page ? undefined : selectedSkin" :texture-src="previewSkin" />
       </div>
     </div>
     <div class="flex flex-col gap-6 add-perspective">
