@@ -9,7 +9,6 @@ use crate::util::fetch::{FetchSemaphore, IoSemaphore, write_cached_icon};
 use crate::util::io::{self};
 use chrono::{DateTime, TimeDelta, TimeZone, Utc};
 use dashmap::DashMap;
-use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
@@ -17,6 +16,7 @@ use std::collections::HashSet;
 use std::convert::TryFrom;
 use std::convert::TryInto;
 use std::path::Path;
+use std::sync::LazyLock;
 use tokio::fs::DirEntry;
 use tokio::io::{AsyncBufReadExt, AsyncRead};
 use tokio::task::JoinSet;
@@ -837,9 +837,9 @@ impl Profile {
         state: &crate::State,
         join_entry: &mut JoinLogEntry,
     ) -> crate::Result<()> {
-        lazy_static! {
-            static ref LOG_LINE_REGEX: Regex = Regex::new(r"^\[[0-9]{2}(?::[0-9]{2}){2}] \[.+?/[A-Z]+?]: Connecting to (.+?), ([1-9][0-9]{0,4})$").unwrap();
-        }
+        static LOG_LINE_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+            Regex::new(r"^\[[0-9]{2}(?::[0-9]{2}){2}] \[.+?/[A-Z]+?]: Connecting to (.+?), ([1-9][0-9]{0,4})$").unwrap()
+        });
         let reader = tokio::io::BufReader::new(reader);
         let mut lines = reader.lines();
         while let Some(log_line) = lines.next_line().await? {

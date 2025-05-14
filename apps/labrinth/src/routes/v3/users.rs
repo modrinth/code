@@ -1,8 +1,6 @@
 use std::{collections::HashMap, sync::Arc};
 
 use actix_web::{HttpRequest, HttpResponse, web};
-use lazy_static::lazy_static;
-use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use validator::Validate;
@@ -358,13 +356,9 @@ pub async fn orgs_list(
     }
 }
 
-lazy_static! {
-    static ref RE_URL_SAFE: Regex = Regex::new(r"^[a-zA-Z0-9_-]*$").unwrap();
-}
-
 #[derive(Serialize, Deserialize, Validate)]
 pub struct EditUser {
-    #[validate(length(min = 1, max = 39), regex(path = *RE_URL_SAFE))]
+    #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_URL_SAFE))]
     pub username: Option<String>,
     #[serde(
         default,

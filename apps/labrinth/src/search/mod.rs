@@ -83,7 +83,7 @@ impl SearchConfig {
     pub fn make_client(
         &self,
     ) -> Result<Client, meilisearch_sdk::errors::Error> {
-        Client::new(self.address.as_str(), Some(self.key.as_str()))
+        Client::new(self.address.as_str(), Some(self.key.as_str()), )
     }
 
     // Next: true if we want the next index (we are preparing the next swap), false if we want the current index (searching)

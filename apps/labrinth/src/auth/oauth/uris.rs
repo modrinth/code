@@ -3,7 +3,7 @@ use crate::auth::oauth::OAuthErrorType;
 use crate::database::models::OAuthClientId;
 use serde::{Deserialize, Serialize};
 
-#[derive(derive_new::new, Serialize, Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct OAuthRedirectUris {
     pub original: Option<String>,
     pub validated: ValidatedRedirectUri,

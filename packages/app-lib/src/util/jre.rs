@@ -276,7 +276,7 @@ pub async fn check_java_at_filepath(path: &Path) -> Option<JavaVersion> {
     };
 
     let bytes = include_bytes!("../../library/JavaInfo.class");
-    let tempdir: PathBuf = tempfile::tempdir().ok()?.into_path();
+    let tempdir = tempfile::tempdir().ok()?.keep();
     if !tempdir.exists() {
         return None;
     }

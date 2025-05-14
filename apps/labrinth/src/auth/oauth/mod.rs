@@ -111,10 +111,10 @@ pub async fn init_oauth(
                 .map_err(|e| {
                     OAuthError::redirect(e, &oauth_info.state, &redirect_uri)
                 })?;
-        let redirect_uris = OAuthRedirectUris::new(
-            oauth_info.redirect_uri.clone(),
-            redirect_uri.clone(),
-        );
+        let redirect_uris = OAuthRedirectUris {
+            original: oauth_info.redirect_uri.clone(),
+            validated: redirect_uri.clone(),
+        };
         match existing_authorization {
             Some(existing_authorization)
                 if existing_authorization.scopes.contains(requested_scopes) =>

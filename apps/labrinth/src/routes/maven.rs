@@ -12,7 +12,7 @@ use crate::{auth::get_user_from_headers, database};
 use actix_web::{HttpRequest, HttpResponse, get, route, web};
 use sqlx::PgPool;
 use std::collections::HashSet;
-use yaserde_derive::YaSerialize;
+use yaserde::YaSerialize;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(maven_metadata);

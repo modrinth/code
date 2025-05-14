@@ -906,11 +906,11 @@ pub async fn edit_project_categories(
     categories: &Vec<String>,
     perms: &ProjectPermissions,
     project_id: db_ids::ProjectId,
-    additional: bool,
+    is_additional: bool,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
 ) -> Result<(), ApiError> {
     if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-        let additional_str = if additional { "additional " } else { "" };
+        let additional_str = if is_additional { "additional " } else { "" };
         return Err(ApiError::CustomAuthentication(format!(
             "You do not have the permissions to edit the {additional_str}categories of this project!"
         )));
@@ -928,7 +928,11 @@ pub async fn edit_project_categories(
 
         let mcategories = category_ids
             .values()
-            .map(|x| ModCategory::new(project_id, *x, additional))
+            .map(|&category_id| ModCategory {
+                project_id,
+                category_id,
+                is_additional,
+            })
             .collect::<Vec<_>>();
         mod_categories.extend(mcategories);
     }
@@ -1081,7 +1085,6 @@ pub async fn dependency_list(
     }
 }
 
-#[derive(derive_new::new)]
 pub struct CategoryChanges<'a> {
     pub categories: &'a Option<Vec<String>>,
     pub add_categories: &'a Option<Vec<String>>,
@@ -1241,11 +1244,11 @@ pub async fn projects_edit(
             &categories,
             &project.categories,
             project.inner.id as db_ids::ProjectId,
-            CategoryChanges::new(
-                &bulk_edit_project.categories,
-                &bulk_edit_project.add_categories,
-                &bulk_edit_project.remove_categories,
-            ),
+            CategoryChanges {
+                categories: &bulk_edit_project.categories,
+                add_categories: &bulk_edit_project.add_categories,
+                remove_categories: &bulk_edit_project.remove_categories,
+            },
             3,
             false,
             &mut transaction,
@@ -1256,11 +1259,12 @@ pub async fn projects_edit(
             &categories,
             &project.additional_categories,
             project.inner.id as db_ids::ProjectId,
-            CategoryChanges::new(
-                &bulk_edit_project.additional_categories,
-                &bulk_edit_project.add_additional_categories,
-                &bulk_edit_project.remove_additional_categories,
-            ),
+            CategoryChanges {
+                categories: &bulk_edit_project.additional_categories,
+                add_categories: &bulk_edit_project.add_additional_categories,
+                remove_categories: &bulk_edit_project
+                    .remove_additional_categories,
+            },
             256,
             true,
             &mut transaction,
@@ -1383,11 +1387,11 @@ pub async fn bulk_edit_project_categories(
                     ))
                 })?
                 .id;
-            mod_categories.push(ModCategory::new(
+            mod_categories.push(ModCategory {
                 project_id,
                 category_id,
                 is_additional,
-            ));
+            });
         }
         ModCategory::insert_many(mod_categories, &mut *transaction).await?;
     }

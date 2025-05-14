@@ -9,8 +9,6 @@ use crate::models::v2::user::LegacyUser;
 use crate::queue::session::AuthQueue;
 use crate::routes::{ApiError, v2_reroute, v3};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
-use lazy_static::lazy_static;
-use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::sync::Arc;
@@ -135,20 +133,16 @@ pub async fn projects_list(
     }
 }
 
-lazy_static! {
-    static ref RE_URL_SAFE: Regex = Regex::new(r"^[a-zA-Z0-9_-]*$").unwrap();
-}
-
 #[derive(Serialize, Deserialize, Validate)]
 pub struct EditUser {
-    #[validate(length(min = 1, max = 39), regex(path = *RE_URL_SAFE))]
+    #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_URL_SAFE))]
     pub username: Option<String>,
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
         with = "::serde_with::rust::double_option"
     )]
-    #[validate(length(min = 1, max = 64), regex(path = *RE_URL_SAFE))]
+    #[validate(length(min = 1, max = 64), regex(path = *crate::util::validate::RE_URL_SAFE))]
     pub name: Option<Option<String>>,
     #[serde(
         default,

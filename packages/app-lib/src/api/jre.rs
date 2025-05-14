@@ -6,6 +6,7 @@ use dashmap::DashMap;
 use reqwest::Method;
 use serde::Deserialize;
 use std::path::PathBuf;
+use sysinfo::{MemoryRefreshKind, RefreshKind};
 
 use crate::util::io;
 use crate::util::jre::extract_java_majorminor_version;
@@ -175,11 +176,10 @@ pub async fn test_jre(
 
 // Gets maximum memory in KiB.
 pub async fn get_max_memory() -> crate::Result<u64> {
-    Ok(sys_info::mem_info()
-        .map_err(|_| {
-            crate::Error::from(crate::ErrorKind::LauncherError(
-                "Unable to get computer memory".to_string(),
-            ))
-        })?
-        .total)
+    Ok(sysinfo::System::new_with_specifics(
+        RefreshKind::nothing()
+            .with_memory(MemoryRefreshKind::nothing().with_ram()),
+    )
+    .total_memory()
+        / 1024)
 }

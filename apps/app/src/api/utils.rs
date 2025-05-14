@@ -1,4 +1,6 @@
 use serde::{Deserialize, Serialize};
+use tauri::Runtime;
+use tauri_plugin_opener::OpenerExt;
 use theseus::{
     handler,
     prelude::{CommandPayload, DirectoryInfo},
@@ -74,29 +76,29 @@ pub async fn should_disable_mouseover() -> bool {
 }
 
 #[tauri::command]
-pub fn highlight_in_folder(path: PathBuf) {
-    let res = opener::reveal(path);
-
-    if let Err(e) = res {
+pub fn highlight_in_folder<R: Runtime>(
+    app: tauri::AppHandle<R>,
+    path: PathBuf,
+) {
+    if let Err(e) = app.opener().reveal_item_in_dir(path) {
         tracing::error!("Failed to highlight file in folder: {}", e);
     }
 }
 
 #[tauri::command]
-pub fn open_path(path: PathBuf) {
-    let res = opener::open(path);
-
-    if let Err(e) = res {
+pub fn open_path<R: Runtime>(app: tauri::AppHandle<R>, path: PathBuf) {
+    if let Err(e) = app.opener().open_path(path.to_string_lossy(), None::<&str>)
+    {
         tracing::error!("Failed to open path: {}", e);
     }
 }
 
 #[tauri::command]
-pub fn show_launcher_logs_folder() {
+pub fn show_launcher_logs_folder<R: Runtime>(app: tauri::AppHandle<R>) {
     let path = DirectoryInfo::launcher_logs_dir().unwrap_or_default();
     // failure to get folder just opens filesystem
     // (ie: if in debug mode only and launcher_logs never created)
-    open_path(path);
+    open_path(app, path);
 }
 
 // Get opening command

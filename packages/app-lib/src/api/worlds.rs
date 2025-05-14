@@ -17,7 +17,6 @@ use either::Either;
 use enumset::{EnumSet, EnumSetType};
 use fs4::tokio::AsyncFileExt;
 use futures::StreamExt;
-use lazy_static::lazy_static;
 use quartz_nbt::{NbtCompound, NbtTag};
 use regex::{Regex, RegexBuilder};
 use serde::{Deserialize, Serialize};
@@ -25,6 +24,7 @@ use std::cmp::Reverse;
 use std::io::Cursor;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::path::{Path, PathBuf};
+use std::sync::LazyLock;
 use tokio::io::AsyncWriteExt;
 use tokio_util::compat::FuturesAsyncWriteCompatExt;
 use url::Url;
@@ -548,17 +548,19 @@ pub async fn backup_world(instance: &Path, world: &str) -> Result<u64> {
 }
 
 fn find_available_name(dir: &Path, file_name: &str, extension: &str) -> String {
-    lazy_static! {
-        static ref RESERVED_WINDOWS_FILENAMES: Regex = RegexBuilder::new(r#"^.*\.|(?:COM|CLOCK\$|CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\..*)?$"#)
+    static RESERVED_WINDOWS_FILENAMES: LazyLock<Regex> = LazyLock::new(|| {
+        RegexBuilder::new(r#"^.*\.|(?:COM|CLOCK\$|CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\..*)?$"#)
             .case_insensitive(true)
             .build()
-            .unwrap();
-        static ref COPY_COUNTER_PATTERN: Regex = RegexBuilder::new(r#"^(?<name>.*) \((?<count>\d*)\)$"#)
+            .unwrap()
+    });
+    static COPY_COUNTER_PATTERN: LazyLock<Regex> = LazyLock::new(|| {
+        RegexBuilder::new(r#"^(?<name>.*) \((?<count>\d*)\)$"#)
             .case_insensitive(true)
             .unicode(true)
             .build()
-            .unwrap();
-    }
+            .unwrap()
+    });
 
     let mut file_name = file_name.replace(
         [
