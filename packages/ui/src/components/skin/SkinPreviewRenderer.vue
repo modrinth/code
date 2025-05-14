@@ -3,36 +3,46 @@
     <div class="absolute bottom-[18%] left-1/2 transform -translate-x-1/2 text-primary px-3 py-1 rounded text-md pointer-events-none z-10">
       Drag to Rotate
     </div>
-    <div
-      class="absolute top-[5%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md text-[190%] pointer-events-none z-10 font-minecraft
-      text-secondary bg-bg-raised shadow-md border"
-    >
+    <div class="absolute top-[10%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md text-[225%] pointer-events-none z-10 font-minecraft text-secondary bg-bg-raised shadow-md border">
       {{ nametag }}
     </div>
 
-    <TresCanvas shadows alpha :antialias="false" @pointerdown="onPointerDown" @pointermove="onPointerMove" @pointerup="onPointerUp" @pointerleave="onPointerUp">
+    <TresCanvas
+      shadows
+      alpha
+      :antialias="false"
+      @pointerdown="onPointerDown"
+      @pointermove="onPointerMove"
+      @pointerup="onPointerUp"
+      @pointerleave="onPointerUp"
+    >
       <Suspense>
         <Group>
-          <Group
-            ref="modelGroup"
-            :rotation="[0, modelRotation, 0]"
-            :position="[0, 0, 2]"
-          >
-            <primitive
-              v-if="scene"
-              ref="modelRef"
-              :object="scene"
-            />
+          <Group ref="modelGroup" :rotation="[0, modelRotation, 0]" :position="[0, 0, 2]" :scale="[0.8, 0.8, 0.8]">
+            <primitive v-if="scene" ref="modelRef" :object="scene" />
           </Group>
+
+          <TresMesh
+            :position="[0, -0.099, 2.2]"
+            :rotation="[-Math.PI / 2, 0, 0]"
+            :scale="[0.4, 0.4, 0.4]"
+          >
+            <TresCircleGeometry :args="[1, 32]" />
+            <TresMeshBasicMaterial
+              color="#000000"
+              :opacity="0.1"
+              transparent
+              :depth-write="false"
+            />
+          </TresMesh>
 
           <TresMesh :position="[0, -0.1, 2]" :rotation="[-Math.PI / 2, 0, 0]" :scale="[0.75, 0.75, 0.75]">
             <TresPlaneGeometry :args="[2, 2]" />
-            <TresShaderMaterial
+            <TresMeshBasicMaterial
+              :map="radialTexture"
               transparent
               :depth-write="false"
-              :uniforms="spotlightUniforms"
-              :vertex-shader="spotlightVertexShader"
-              :fragment-shader="spotlightFragmentShader"
+              :blending="AdditiveBlending"
             />
           </TresMesh>
         </Group>
@@ -53,9 +63,9 @@
 
 <script setup lang="ts">
 import * as THREE from 'three'
-import {Html, useGLTF} from '@tresjs/cientos'
+import { useGLTF } from '@tresjs/cientos'
 import { useTexture, TresCanvas } from '@tresjs/core'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 
 const props = defineProps<{
   textureSrc: string
@@ -66,12 +76,11 @@ const props = defineProps<{
 const { scene } = await useGLTF(props.modelSrc)
 await useTexture([props.textureSrc])
 
-const modelRef = ref(null)
-const modelGroup = ref(null)
-const cameraRef = ref(null)
-const nametagRef = ref(null)
+const modelRef = ref<THREE.Object3D | null>(null)
+const modelGroup = ref<THREE.Group | null>(null)
+const cameraRef = ref<THREE.PerspectiveCamera | null>(null)
 const centre = ref<[number, number, number]>([0, 1, 0])
-const modelHeight = ref(1.8)
+const modelHeight = ref(1.4)
 
 if (scene) {
   const bbox = new THREE.Box3().setFromObject(scene)
@@ -94,10 +103,8 @@ const onPointerDown = (event: PointerEvent) => {
 
 const onPointerMove = (event: PointerEvent) => {
   if (!isDragging.value) return
-
   const deltaX = event.clientX - previousX.value
   modelRotation.value += deltaX * 0.01
-
   previousX.value = event.clientX
 }
 
@@ -105,40 +112,22 @@ const onPointerUp = () => {
   isDragging.value = false
 }
 
-const spotlightUniforms = {
-  uColor: { value: new THREE.Color(1.0, 1.0, 1.0) },
-  uIntensity: { value: 3 },
-  uRadius: { value: 1 }
+const radialTexture = createRadialTexture(512)
+radialTexture.minFilter = THREE.LinearFilter
+radialTexture.magFilter = THREE.LinearFilter
+radialTexture.wrapS = radialTexture.wrapT = THREE.ClampToEdgeWrapping
+
+function createRadialTexture(size: number): THREE.CanvasTexture {
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = size
+  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+  const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
+  grad.addColorStop(0, 'rgba(119,119,119,0.25)')
+  grad.addColorStop(1, 'rgba(255,255,255,0)')
+  ctx.fillStyle = grad
+  ctx.fillRect(0, 0, size, size)
+  return new THREE.CanvasTexture(canvas)
 }
 
-// language=GLSL
-const spotlightVertexShader = `
-  attribute vec3 position;
-  attribute vec2 uv;
-  varying vec2 vUv;
-
-  void main() {
-    vUv = uv;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  }
-`;
-
-// language=GLSL
-const spotlightFragmentShader = `
-  precision highp float;
-
-  uniform vec3 uColor;
-  uniform float uIntensity;
-  uniform float uRadius;
-
-  varying vec2 vUv;
-
-  void main() {
-    float dist = distance(vUv, vec2(0.5));
-    float alpha = 1.0 - smoothstep(0.0, uRadius, dist);
-
-    vec3 col = uColor * uIntensity * alpha;
-    gl_FragColor = vec4(col, alpha);
-  }
-`;
+const AdditiveBlending = THREE.AdditiveBlending
 </script>
