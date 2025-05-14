@@ -1,7 +1,7 @@
 <template>
   <div class="relative w-full h-full">
     <div class="absolute bottom-[18%] left-1/2 transform -translate-x-1/2 text-primary px-3 py-1 rounded text-md pointer-events-none z-10">
-      Drag to Rotate
+      Drag to rotate
     </div>
     <div class="absolute top-[10%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md text-[225%] pointer-events-none z-10 font-minecraft text-secondary bg-bg-raised shadow-md border">
       {{ nametag }}
@@ -42,7 +42,7 @@
               :map="radialTexture"
               transparent
               :depth-write="false"
-              :blending="AdditiveBlending"
+              :blending="THREE.AdditiveBlending"
             />
           </TresMesh>
         </Group>
@@ -56,7 +56,9 @@
         :look-at="target"
       />
 
-      <TresAmbientLight :intensity="2" />
+      <TresAmbientLight
+        :intensity="0.75"
+      />
     </TresCanvas>
   </div>
 </template>
@@ -65,7 +67,7 @@
 import * as THREE from 'three'
 import { useGLTF } from '@tresjs/cientos'
 import { useTexture, TresCanvas } from '@tresjs/core'
-import { ref, computed } from 'vue'
+import {ref, computed, watch} from 'vue'
 
 const props = defineProps<{
   textureSrc: string
@@ -74,7 +76,40 @@ const props = defineProps<{
 }>()
 
 const { scene } = await useGLTF(props.modelSrc)
-await useTexture([props.textureSrc])
+
+let texture = await useTexture([props.textureSrc])
+applyTextureToScene(scene, texture);
+
+watch(
+  () => props.textureSrc,
+  async newSrc => {
+    texture = await useTexture([newSrc])
+    applyTextureToScene(scene, texture)
+  }
+)
+
+function applyTextureToScene(root: THREE.Object3D | null, tex: THREE.Texture) {
+  texture.flipY = false
+  texture.magFilter = THREE.NearestFilter
+  texture.minFilter = THREE.NearestFilter
+
+  if (!root) return
+  root.traverse(child => {
+    if ((child as THREE.Mesh).isMesh) {
+      const mesh = child as THREE.Mesh
+      const setProps = (mat: THREE.Material) => {
+        const m = mat as THREE.MeshStandardMaterial
+        m.map = tex
+        m.metalness = 0
+        m.roughness = 1
+        m.needsUpdate = true
+      }
+
+      if (Array.isArray(mesh.material)) mesh.material.forEach(setProps)
+      else setProps(mesh.material)
+    }
+  })
+}
 
 const modelRef = ref<THREE.Object3D | null>(null)
 const modelGroup = ref<THREE.Group | null>(null)
@@ -128,6 +163,4 @@ function createRadialTexture(size: number): THREE.CanvasTexture {
   ctx.fillRect(0, 0, size, size)
   return new THREE.CanvasTexture(canvas)
 }
-
-const AdditiveBlending = THREE.AdditiveBlending
 </script>
