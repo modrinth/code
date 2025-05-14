@@ -18,19 +18,19 @@
     >
       <Suspense>
         <Group>
-          <Group ref="modelGroup" :rotation="[0, modelRotation, 0]" :position="[0, 0, 2]" :scale="[0.8, 0.8, 0.8]">
+          <Group ref="modelGroup" :rotation="[0, modelRotation, 0]" :position="[0, -0.05, 1.95]" :scale="[0.8, 0.8, 0.8]">
             <primitive v-if="scene" ref="modelRef" :object="scene" />
           </Group>
 
           <TresMesh
-            :position="[0, -0.099, 2.2]"
+            :position="[0, -0.095, 2]"
             :rotation="[-Math.PI / 2, 0, 0]"
             :scale="[0.4, 0.4, 0.4]"
           >
             <TresCircleGeometry :args="[1, 32]" />
             <TresMeshBasicMaterial
               color="#000000"
-              :opacity="0.1"
+              :opacity="0.6"
               transparent
               :depth-write="false"
             />

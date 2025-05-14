@@ -56,6 +56,14 @@ watch(
     />
   </div>
 
+  <div class="mt-4 flex items-center justify-between">
+    <div>
+      <h2 class="m-0 text-lg font-extrabold text-contrast">Hide Nametag</h2>
+      <p class="m-0 mt-1">Allows you to disable the nametag that appears above the main preview on the skin management page.</p>
+    </div>
+    <Toggle id="hide-nametag-skins-page" v-model="settings.hide_nametag_skins_page" />
+  </div>
+
   <div v-if="os !== 'MacOS'" class="mt-4 flex items-center justify-between gap-4">
     <div>
       <h2 class="m-0 text-lg font-extrabold text-contrast">Native Decorations</h2>
@@ -118,13 +126,5 @@ watch(
         }
       "
     />
-  </div>
-
-  <div class="mt-4 flex items-center justify-between">
-    <div>
-      <h2 class="m-0 text-lg font-extrabold text-contrast">Hide nametag on skins page</h2>
-      <p class="m-0 mt-1">Allows you to disable the nametag that appears above the main preview on the skin management page.</p>
-    </div>
-    <Toggle id="hide-nametag-skins-page" v-model="settings.hide_nametag_skins_page" />
   </div>
 </template>
