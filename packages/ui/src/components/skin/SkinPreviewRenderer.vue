@@ -15,6 +15,10 @@
       @pointermove="onPointerMove"
       @pointerup="onPointerUp"
       @pointerleave="onPointerUp"
+      :rendererOptions="{
+        outputColorSpace: THREE.SRGBColorSpace,
+        toneMapping: THREE.NoToneMapping
+      }"
     >
       <Suspense>
         <Group>
@@ -57,7 +61,7 @@
       />
 
       <TresAmbientLight
-        :intensity="0.75"
+        :intensity="2"
       />
     </TresCanvas>
   </div>
@@ -92,6 +96,7 @@ watch(
 )
 
 function applyTextureToScene(root: THREE.Object3D | null, tex: THREE.Texture) {
+  texture.colorSpace = THREE.SRGBColorSpace
   texture.flipY = false
   texture.magFilter = THREE.NearestFilter
   texture.minFilter = THREE.NearestFilter
@@ -104,6 +109,8 @@ function applyTextureToScene(root: THREE.Object3D | null, tex: THREE.Texture) {
         const m = mat as THREE.MeshStandardMaterial
         m.map = tex
         m.metalness = 0
+        m.color.set(0xffffff)
+        m.toneMapped = false
         m.roughness = 1
         m.needsUpdate = true
       }
