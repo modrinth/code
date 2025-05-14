@@ -99,6 +99,9 @@ export { default as PurchaseModal } from './billing/PurchaseModal.vue'
 export { default as AddPaymentMethodModal } from './billing/AddPaymentMethodModal.vue'
 export { default as ModrinthServersPurchaseModal } from './billing/ModrinthServersPurchaseModal.vue'
 
+// Skins
+export { default as SkinPreviewRenderer } from "./skin/SkinPreviewRenderer.vue"
+
 // Version
 export { default as VersionChannelIndicator } from './version/VersionChannelIndicator.vue'
 export { default as VersionFilterControl } from './version/VersionFilterControl.vue'
