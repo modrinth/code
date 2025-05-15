@@ -40,7 +40,7 @@ tauri = { workspace = true, optional = true }
 indicatif = { workspace = true, optional = true }
 
 async-tungstenite = { workspace = true, features = ["tokio-runtime", "tokio-rustls-webpki-roots"] }
-futures.workspace = true
+futures = { workspace = true, features = ["async-await", "alloc", "executor"] }
 reqwest = { workspace = true, features = ["json", "stream", "deflate", "gzip", "brotli", "rustls-tls-webpki-roots", "charset", "http2", "macos-system-configuration"] }
 tokio = { workspace = true, features = ["time", "io-util", "net", "sync", "fs", "macros", "process"] }
 tokio-util = { workspace = true, features = ["compat"] }
@@ -62,7 +62,7 @@ p256 = { workspace = true, features = ["ecdsa"] }
 rand.workspace = true
 base64.workspace = true
 
-sqlx = { workspace = true, features = ["runtime-tokio", "sqlite", "macros"] }
+sqlx = { workspace = true, features = ["runtime-tokio", "sqlite", "macros", "migrate", "json"] }
 
 quartz_nbt = { workspace = true, features = ["serde"] }
 hickory-resolver.workspace = true
