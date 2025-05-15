@@ -169,7 +169,7 @@ function show(e: MouseEvent, skin?: Skin) {
 
 function hide() {
   modal.value?.hide()
-  setTimeout(resetState, 100)
+  resetState()
 }
 
 async function onTextureSelected(files: FileList|null) {
@@ -215,8 +215,8 @@ async function save() {
       await add_and_equip_custom_skin(blob, variant.value, selectedCape.value)
       emit('saved')
     } else {
-      await remove_custom_skin(currentSkin.value!)
       await add_and_equip_custom_skin(blob, variant.value, selectedCape.value)
+      await remove_custom_skin(currentSkin.value!)
       emit('saved')
     }
 
