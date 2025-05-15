@@ -13,7 +13,7 @@ use tokio::sync::{RwLock, mpsc::channel};
 pub type FileWatcher = RwLock<Debouncer<RecommendedWatcher>>;
 
 pub async fn init_watcher() -> crate::Result<FileWatcher> {
-    let (mut tx, mut rx) = channel(1);
+    let (tx, mut rx) = channel(1);
 
     let file_watcher = new_debouncer(
         Duration::from_secs_f32(1.0),
