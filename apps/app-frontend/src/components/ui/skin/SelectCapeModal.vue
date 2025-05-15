@@ -74,7 +74,7 @@ defineExpose({
       <div>
         <ScrollablePanel class="h-[20rem] w-[30rem]">
           <div class="grid grid-cols-6 gap-2 items-start w-full">
-            <CapeButton v-for="cape in capes" :key="`cape-${cape.id}`" :cape="cape" :selected="currentCape?.id === cape.id" @select="currentCape = cape" />
+            <CapeButton v-for="cape in capes" :key="cape.id" :name="cape.name" :texture="cape.texture" :selected="currentCape?.id === cape.id" @select="currentCape = cape" />
           </div>
         </ScrollablePanel>
       </div>

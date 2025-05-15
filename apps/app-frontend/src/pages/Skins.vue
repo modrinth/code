@@ -10,7 +10,7 @@ import {
   get_available_skins,
   get_available_capes,
   filterSavedSkins,
-  filterDefaultSkins, equip_skin,
+  filterDefaultSkins, equip_skin, remove_custom_skin,
 } from '@/helpers/skins.ts'
 import { get as getSettings } from '@/helpers/settings.ts'
 import { get as getCreds } from '@/helpers/mr_auth'
@@ -59,13 +59,41 @@ async function loadSkins() {
 
 async function changeSkin(newSkin: Skin) {
   selectedSkin.value = newSkin;
-  // TODO: Backend is broken! Enums aren't being serialized/deserialized correctly.
   await equip_skin(selectedSkin.value).catch(handleError);
+}
+
+async function handleSkinSaved(newSkin: Skin | null, oldSkin: Skin | null) {
+  if (oldSkin) {
+    await remove_custom_skin(oldSkin).catch(handleError)
+    skins.value = skins.value.filter(s => s.texture_key !== oldSkin.texture_key)
+  }
+
+  if (newSkin) skins.value.push(newSkin)
+  selectedSkin.value =
+    skins.value.find(s => s.texture_key === newSkin?.texture_key) ??
+    skins.value.find(s => s.is_equipped) ??
+    skins.value[0] ??
+    null
+}
+
+async function handleSkinDeleted(deletedSkin: Skin) {
+  skins.value = skins.value.filter(s => s.texture_key !== deletedSkin.texture_key)
+  if (selectedSkin.value?.texture_key === deletedSkin.texture_key) {
+    selectedSkin.value =
+      skins.value.find(s => s.is_equipped) ??
+      skins.value[0] ??
+      null
+  }
 }
 </script>
 
 <template>
-  <EditSkinModal ref="editSkinModal" :capes="capes"/>
+  <EditSkinModal
+    ref="editSkinModal"
+    :capes="capes"
+    @saved="handleSkinSaved"
+    @deleted="handleSkinDeleted"
+  />
   <SelectCapeModal ref="selectCapeModal" :capes="capes"/>
   <div class="p-6 grid grid-cols-[300px_1fr] xl:grid-cols-[3fr_5fr] gap-6">
     <div class="sticky top-6 self-start">
