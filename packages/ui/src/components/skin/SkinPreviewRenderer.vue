@@ -81,14 +81,14 @@ const props = withDefaults(
     textureSrc: string
     slimModelSrc: string
     wideModelSrc: string
-    variant?: 'Slim' | 'Classic' | 'Unknown'
+    variant?: 'SLIM' | 'CLASSIC' | 'UNKNOWN'
     nametag?: string
     antialias?: boolean
     scale?: number
     fov?: number
   }>(),
   {
-    variant: 'Classic',
+    variant: 'CLASSIC',
     antialias: false,
     scale: 1,
     fov: 40
@@ -96,7 +96,7 @@ const props = withDefaults(
 )
 
 const selectedModelSrc = computed(() =>
-  props.variant === 'Slim' ? props.slimModelSrc : props.wideModelSrc
+  props.variant === 'SLIM' ? props.slimModelSrc : props.wideModelSrc
 )
 
 const scene = shallowRef<THREE.Object3D | null>(null)
