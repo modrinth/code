@@ -161,7 +161,7 @@ const isDragging = ref(false)
 const previousX = ref(0)
 
 const onPointerDown = (event: PointerEvent) => {
-  ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
+  (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
   isDragging.value = true
   previousX.value = event.clientX
 }
@@ -174,8 +174,8 @@ const onPointerMove = (event: PointerEvent) => {
 }
 
 const onPointerUp = (event: PointerEvent) => {
-  isDragging.value = false
-  ;(event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId)
+  isDragging.value = false;
+  (event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId)
 }
 
 const radialTexture = createRadialTexture(512)
@@ -196,4 +196,5 @@ function createRadialTexture(size: number): THREE.CanvasTexture {
 }
 
 applyTextureToScene(scene.value, texture.value)
+loadModel(selectedModelSrc.value)
 </script>

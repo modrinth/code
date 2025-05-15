@@ -52,6 +52,7 @@ async function loadCapes() {
 }
 
 async function loadSkins() {
+  skins.value = [];
   skins.value = (await get_available_skins().catch(handleError)) ?? []
   selectedSkin.value = skins.value.find((s) => s.is_equipped) ?? null;
 }
@@ -61,29 +62,6 @@ async function changeSkin(newSkin: Skin) {
   selectedSkin.value = newSkin;
   await equip_skin(selectedSkin.value).catch(handleError);
   await loadSkins();
-}
-
-async function handleSkinSaved(newSkin: Skin | null, oldSkin: Skin | null) {
-  if (oldSkin) {
-    await remove_custom_skin(oldSkin).catch(handleError)
-  }
-
-  await loadSkins()
-  selectedSkin.value =
-    skins.value.find(s => s.texture_key === newSkin?.texture_key) ??
-    skins.value.find(s => s.is_equipped) ??
-    skins.value[0] ??
-    null
-}
-
-async function handleSkinDeleted(deletedSkin: Skin) {
-  await loadSkins();
-  if (selectedSkin.value?.texture_key === deletedSkin.texture_key) {
-    selectedSkin.value =
-      skins.value.find(s => s.is_equipped) ??
-      skins.value[0] ??
-      null
-  }
 }
 
 async function handleCapeSelected(cape: Cape | undefined) {
@@ -98,8 +76,8 @@ async function handleCapeSelected(cape: Cape | undefined) {
   <EditSkinModal
     ref="editSkinModal"
     :capes="capes"
-    @saved="handleSkinSaved"
-    @deleted="handleSkinDeleted"
+    @saved="() => loadSkins()"
+    @deleted="() => loadSkins()"
   />
   <SelectCapeModal ref="selectCapeModal" :capes="capes" @select="handleCapeSelected"/>
   <div class="p-6 grid grid-cols-[300px_1fr] xl:grid-cols-[3fr_5fr] gap-6">
