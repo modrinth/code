@@ -100,6 +100,7 @@ async function handleCapeSelected(cape: Cape | undefined) {
           slim-model-src="/src/assets/models/slim_player.gltf"
           :nametag="settings.hide_nametag_skins_page ? undefined : credentials?.user?.username"
           :texture-src="previewSkin"
+          :variant="selectedSkin?.variant"
         />
       </div>
     </div>
