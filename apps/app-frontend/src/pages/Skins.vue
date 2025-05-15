@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { UpdatedIcon, PlusIcon } from '@modrinth/assets'
 import { ButtonStyled, SkinPreviewRenderer } from '@modrinth/ui'
-import { ref, computed, useTemplateRef } from 'vue'
+import {ref, computed, useTemplateRef, onMounted} from 'vue'
 import SkinButton from '@/components/ui/skin/SkinButton.vue'
 import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
 import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
@@ -16,14 +16,15 @@ import { get as getSettings } from '@/helpers/settings.ts'
 import { get as getCreds } from '@/helpers/mr_auth'
 import { get_user } from '@/helpers/cache'
 import type { Cape, Skin } from '@/helpers/skins.ts'
+import {get_default_user, users} from "@/helpers/auth";
 
 const editSkinModal = useTemplateRef('editSkinModal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
 
 const settings = ref(await getSettings())
-const credentials = ref()
 const skins = ref<Skin[]>([])
 const capes = ref<Cape[]>([])
+const username = ref<string | undefined>(undefined)
 
 const selectedSkin = ref<Skin | null>(null)
 
@@ -36,15 +37,7 @@ const defaultSkins = computed(() => filterDefaultSkins(skins.value))
 
 const currentCape = ref<Cape>()
 
-await Promise.all([fetchCredentials(), loadCapes(), loadSkins()])
-
-async function fetchCredentials() {
-  const creds = await getCreds().catch(handleError)
-  if (creds?.user_id) {
-    creds.user = await get_user(creds.user_id).catch(handleError)
-  }
-  credentials.value = creds
-}
+await Promise.all([loadCapes(), loadSkins(), loadUsername()])
 
 async function loadCapes() {
   capes.value = (await get_available_capes().catch(handleError)) ?? []
@@ -52,15 +45,14 @@ async function loadCapes() {
 }
 
 async function loadSkins() {
-  skins.value = [];
+  console.log(skins.value)
   skins.value = (await get_available_skins().catch(handleError)) ?? []
+  console.log(skins.value)
   selectedSkin.value = skins.value.find((s) => s.is_equipped) ?? null;
 }
 
 async function changeSkin(newSkin: Skin) {
-  console.log(newSkin);
-  selectedSkin.value = newSkin;
-  await equip_skin(selectedSkin.value).catch(handleError);
+  await equip_skin(newSkin).catch(handleError);
   await loadSkins();
 }
 
@@ -69,6 +61,18 @@ async function handleCapeSelected(cape: Cape | undefined) {
   await set_default_cape(currentCape.value).catch(handleError);
   await loadSkins();
   await loadCapes();
+}
+
+async function loadUsername() {
+  try {
+    const defaultId = await get_default_user()
+    const allAccounts = await users();
+    const current = allAccounts.find(acc => acc.profile.id === defaultId)
+    username.value = current?.profile.name ?? null
+  } catch (e) {
+    handleError(e)
+    username.value = null
+  }
 }
 </script>
 
@@ -98,7 +102,7 @@ async function handleCapeSelected(cape: Cape | undefined) {
         <SkinPreviewRenderer
           wide-model-src="/src/assets/models/classic_player.gltf"
           slim-model-src="/src/assets/models/slim_player.gltf"
-          :nametag="settings.hide_nametag_skins_page ? undefined : credentials?.user?.username"
+          :nametag="settings.hide_nametag_skins_page ? undefined : username"
           :texture-src="previewSkin"
           :variant="selectedSkin?.variant"
         />
