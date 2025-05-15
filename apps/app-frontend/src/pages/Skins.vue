@@ -53,11 +53,11 @@ async function loadCapes() {
 
 async function loadSkins() {
   skins.value = (await get_available_skins().catch(handleError)) ?? []
-  selectedSkin.value =
-    skins.value.find((s) => s.texture_key === 'its_imb11') ?? skins.value[0] ?? null
+  selectedSkin.value = skins.value.find((s) => s.is_equipped) ?? null;
 }
 
 async function changeSkin(newSkin: Skin) {
+  console.log(newSkin);
   selectedSkin.value = newSkin;
   await equip_skin(selectedSkin.value).catch(handleError);
   await loadSkins();
@@ -77,7 +77,6 @@ async function handleSkinSaved(newSkin: Skin | null, oldSkin: Skin | null) {
 }
 
 async function handleSkinDeleted(deletedSkin: Skin) {
-  await remove_custom_skin(deletedSkin).catch(handleError);
   await loadSkins();
   if (selectedSkin.value?.texture_key === deletedSkin.texture_key) {
     selectedSkin.value =
