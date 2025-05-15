@@ -10,7 +10,7 @@ import {
   get_available_skins,
   get_available_capes,
   filterSavedSkins,
-  filterDefaultSkins, equip_skin, remove_custom_skin,
+  filterDefaultSkins, equip_skin, remove_custom_skin, set_default_cape,
 } from '@/helpers/skins.ts'
 import { get as getSettings } from '@/helpers/settings.ts'
 import { get as getCreds } from '@/helpers/mr_auth'
@@ -85,6 +85,11 @@ async function handleSkinDeleted(deletedSkin: Skin) {
       null
   }
 }
+
+async function handleCapeSelected(cape: Cape | undefined) {
+  currentCape.value = cape;
+  await set_default_cape(currentCape.value).catch(handleError);
+}
 </script>
 
 <template>
@@ -94,7 +99,7 @@ async function handleSkinDeleted(deletedSkin: Skin) {
     @saved="handleSkinSaved"
     @deleted="handleSkinDeleted"
   />
-  <SelectCapeModal ref="selectCapeModal" :capes="capes"/>
+  <SelectCapeModal ref="selectCapeModal" :capes="capes" @select="handleCapeSelected"/>
   <div class="p-6 grid grid-cols-[300px_1fr] xl:grid-cols-[3fr_5fr] gap-6">
     <div class="sticky top-6 self-start">
       <div class="flex justify-between gap-4">

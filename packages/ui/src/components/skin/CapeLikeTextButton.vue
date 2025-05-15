@@ -3,7 +3,7 @@ const emit = defineEmits<{
   (e: 'click'): void
 }>()
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     tooltip: string
     highlighted?: boolean
@@ -37,7 +37,7 @@ const props = withDefaults(
           <slot name="icon"></slot>
         </div>
 
-        <span class="text-xs text-white/80 group-hover:text-white">
+        <span class="text-xs group-hover:text-white" :class="{ 'text-white': highlighted }">
           <slot name="default"></slot>
         </span>
       </span>

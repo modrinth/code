@@ -2,13 +2,13 @@
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { useTemplateRef, ref, computed } from 'vue'
 import type { Cape } from '@/helpers/skins.ts'
-import { ButtonStyled, ScrollablePanel, CapeButton } from '@modrinth/ui'
+import {ButtonStyled, ScrollablePanel, CapeButton, CapeLikeTextButton} from '@modrinth/ui'
 import { CheckIcon, XIcon} from '@modrinth/assets'
 
 const modal = useTemplateRef('modal')
 
 const emit = defineEmits<{
-  (e: 'select', cape: string | undefined): void
+  (e: 'select', cape: Cape | undefined): void
 }>()
 
 const props = defineProps<{
@@ -49,7 +49,7 @@ function show(e: MouseEvent, skin?: string, selected?: Cape) {
 }
 
 function select() {
-  emit('select', currentCape.value?.id)
+  emit('select', currentCape.value)
   hide()
 }
 
@@ -67,14 +67,20 @@ defineExpose({
     <template #title>
       <span class="text-lg font-extrabold text-contrast">Selecting a cape</span>
     </template>
-    <div class="grid grid-cols-[auto_1fr] gap-6">
+    <div class="grid grid-cols-[auto_1fr] gap-6 mb-5">
       <div class="flex">
         <img :src="previewSkin" alt="" class="w-auto my-auto h-60 object-contain" />
       </div>
       <div>
-        <ScrollablePanel class="h-[20rem] w-[30rem]">
-          <div class="grid grid-cols-6 gap-2 items-start w-full">
-            <CapeButton v-for="cape in capes" :key="cape.id" :name="cape.name" :texture="cape.texture" :selected="currentCape?.id === cape.id" @select="currentCape = cape" />
+        <ScrollablePanel class="max-h-[20rem] max-w-[30rem] mb-5 h-full">
+          <div class="flex flex-wrap gap-2 justify-center content-start overflow-y-auto h-full">
+            <CapeLikeTextButton tooltip="No Cape" :highlighted="!currentCape" @click="currentCape = undefined">
+              <template #icon>
+                <XIcon />
+              </template>
+              <span>No Cape</span>
+            </CapeLikeTextButton>
+            <CapeButton v-for="cape in capes" :key="cape.id" :name="cape.name" :texture="cape.texture" :id="cape.id" :selected="currentCape?.id === cape.id" @select="currentCape = cape" />
           </div>
         </ScrollablePanel>
       </div>
