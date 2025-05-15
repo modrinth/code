@@ -7,19 +7,19 @@ import {
   SkinPreviewRenderer,
   CapeButton,
   CapeLikeTextButton,
-  Button, RadioButtons
+  Button, RadioButtons, ButtonStyled
 } from '@modrinth/ui'
 import {
   add_and_equip_custom_skin,
   type Cape,
   determineModelType,
-  equip_skin,
+  equip_skin, remove_custom_skin,
   type Skin,
   type SkinModel
 } from '@/helpers/skins.ts'
 import {handleError} from '@/store/notifications'
 import {computed, ref, useTemplateRef, watch} from 'vue'
-import {CheckCircleIcon, InfoIcon, UploadIcon, ChevronRightIcon} from "@modrinth/assets";
+import {CheckCircleIcon, InfoIcon, UploadIcon, ChevronRightIcon, CheckIcon, SaveIcon, XIcon, TrashIcon } from "@modrinth/assets";
 
 const modal = useTemplateRef('modal')
 const mode = ref<'new' | 'edit'>('new')
@@ -27,6 +27,7 @@ const currentSkin = ref<Skin | null>(null)
 const textureBlob = ref<Uint8Array | null>(null)
 const variant = ref<SkinModel>('Classic')
 const selectedCape = ref<Cape | undefined>(undefined)
+const tempSkinUrl = ref<string>('/src/assets/skins/steve.png')
 
 const props = defineProps<{ capes?: Cape[] }>()
 const firstThreeCapes = computed(() => props.capes?.slice(0, 3) ?? [])
@@ -49,27 +50,30 @@ watch(textureBlob, async (blob, prev) => {
 
 const previewSkin = computed(() => {
   if (localPreviewUrl.value) return localPreviewUrl.value
-  if (currentSkin.value) return currentSkin.value.texture;
+  if (currentSkin.value) return currentSkin.value.texture
+  if (mode.value === 'new') return tempSkinUrl.value
   return ''
 })
 
 const emit = defineEmits<{
-  (e: 'view-more-capes', ev: MouseEvent): void
-  (e: 'saved'): void
+  (e: 'saved', editedSkin: Skin | null, oldSkin: Skin): void
+  (e: 'deleted', deletedSkin: Skin): void
 }>()
 
+const disableSave = computed(() => mode.value === 'new' && !textureBlob.value)
+
 function resetState() {
-  mode.value         = 'new'
-  currentSkin.value  = null
-  textureBlob.value  = null
-  fileName.value     = null
+  mode.value = 'new'
+  currentSkin.value = null
+  textureBlob.value = null
+  fileName.value = null
 
   if (localPreviewUrl.value) {
     URL.revokeObjectURL(localPreviewUrl.value)
     localPreviewUrl.value = null
   }
 
-  variant.value      = 'Classic'
+  variant.value = 'Classic'
   selectedCape.value = undefined
 }
 
@@ -77,6 +81,13 @@ function show(e: MouseEvent, skin?: Skin) {
   mode.value = skin ? 'edit' : 'new'
   currentSkin.value = skin ?? null
   textureBlob.value = null
+
+  if (!skin) {
+    tempSkinUrl.value = Math.random() <= 0.05
+      ? '/src/assets/skins/herobrine.png'
+      : '/src/assets/skins/steve.png'
+  }
+
   variant.value = skin?.variant ?? 'Classic'
   selectedCape.value = skin?.cape_id ? props.capes?.find(c => c.id === skin.cape_id) : undefined
   modal.value?.show(e)
@@ -84,7 +95,7 @@ function show(e: MouseEvent, skin?: Skin) {
 
 function hide() {
   modal.value?.hide()
-  resetState()
+  setTimeout(resetState, 100);
 }
 
 async function onTextureSelected(files: FileList | null) {
@@ -104,29 +115,40 @@ function selectCape(cape: Cape | undefined) {
 }
 
 function viewMoreCapes(e: MouseEvent) {
-  hide()
-  emit('view-more-capes', e)
+  // TODO: later
+}
+
+async function handleDelete() {
+  try {
+    await remove_custom_skin(currentSkin.value!)
+    emit('deleted', currentSkin.value!)
+    hide();
+  } catch (err) {
+    handleError(err);
+  }
 }
 
 async function save() {
   try {
+    let edited: Skin | null = null;
     if (mode.value === 'new') {
       if (!textureBlob.value) throw new Error('Please upload a skin texture first.')
-      await add_and_equip_custom_skin(textureBlob.value, variant.value, selectedCape.value).catch(handleError)
+      await add_and_equip_custom_skin(textureBlob.value, variant.value, selectedCape.value)
     } else if (currentSkin.value) {
-      const edited: Skin = {
+      edited = {
         ...currentSkin.value,
         variant: variant.value,
-        cape_id: selectedCape.value?.id
+        cape_id: selectedCape.value?.id,
+        is_equipped: true
       }
       if (textureBlob.value) {
-        await add_and_equip_custom_skin(textureBlob.value, variant.value, selectedCape.value).catch(handleError)
+        await add_and_equip_custom_skin(textureBlob.value, variant.value, selectedCape.value)
       } else {
-        await equip_skin(edited).catch(handleError)
+        await equip_skin(edited);
       }
     }
+    emit('saved', edited, currentSkin.value!)
     hide()
-    emit('saved')
   } catch (err) {
     handleError(err)
   }
@@ -159,8 +181,8 @@ defineExpose({
             wide-model-src="/src/assets/models/classic_player.gltf"
             :variant="variant"
             :texture-src="previewSkin"
-            scale="1.4"
-            fov="50"
+            :scale="1.4"
+            :fov="50"
             class="h-full w-full"
           />
         </div>
@@ -180,11 +202,11 @@ defineExpose({
             >
               <UploadIcon aria-hidden="true" />
             </FileInput>
-              <div class="flex items-center gap-2 mx-auto">
+              <div class="flex items-center gap-2 mx-auto" v-if="fileName || mode === 'new'">
                   <InfoIcon v-if="!fileName" aria-hidden="true" class="text-brand-blue" />
                   <CheckCircleIcon v-else aria-hidden="true" class="text-brand-green" />
-                    <small class="max-w-64 truncate block" v-tooltip="fileName ?? currentSkin.texture ?? undefined">
-                      {{ fileName || (mode === 'edit' ? currentSkin.texture : 'No skin has been uploaded yet.') }}
+                    <small class="max-w-64 truncate block" v-tooltip="fileName ?? undefined">
+                      {{ fileName || 'No skin has been uploaded yet.' }}
                     </small>
               </div>
           </Card>
@@ -211,7 +233,7 @@ defineExpose({
               :selected="selectedCape?.id === cape.id"
               @select="selectCape(cape)"
             />
-            <CapeLikeTextButton tooltip="View more capes" v-if="capes?.length > 3">
+            <CapeLikeTextButton tooltip="View more capes" v-if="(capes?.length || 0) > 3">
               <template #icon>
                 <ChevronRightIcon />
               </template>
@@ -220,6 +242,25 @@ defineExpose({
           </div>
         </section>
       </div>
+    </div>
+    <div class="flex flex-row gap-2 mt-6">
+      <ButtonStyled color="brand" :disabled="disableSave">
+        <Button @click="save" v-tooltip="disableSave && 'You need to upload a skin first!'" :disabled="disableSave">
+          <CheckIcon v-if="mode === 'new'"/>
+          <SaveIcon v-else />
+          {{ (mode === 'edit' ? 'Save skin' : 'Add skin') }}
+        </Button>
+      </ButtonStyled>
+      <Button @click="hide">
+        <XIcon />
+        Cancel
+      </Button>
+      <ButtonStyled color="red" v-if="mode === 'edit'">
+        <Button @click="handleDelete">
+          <TrashIcon />
+          Delete
+        </Button>
+      </ButtonStyled>
     </div>
   </ModalWrapper>
 </template>

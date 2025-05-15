@@ -121,14 +121,14 @@ export async function get_available_skins(): Promise<Skin[]> {
 }
 
 export async function add_and_equip_custom_skin(
-  texture_blob: Uint8Array,
+  textureBlob: Uint8Array,
   variant: SkinModel,
-  cape_override?: Cape,
+  capeOverride?: Cape,
 ): Promise<void> {
   await invoke('plugin:minecraft-skins|add_and_equip_custom_skin', {
-    texture_blob,
+    textureBlob,
     variant,
-    cape_override,
+    capeOverride,
   })
 }
 

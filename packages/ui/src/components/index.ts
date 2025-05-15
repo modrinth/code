@@ -101,6 +101,8 @@ export { default as ModrinthServersPurchaseModal } from './billing/ModrinthServe
 
 // Skins
 export { default as SkinPreviewRenderer } from "./skin/SkinPreviewRenderer.vue"
+export { default as CapeButton } from "./skin/CapeButton.vue"
+export { default as CapeLikeTextButton } from "./skin/CapeLikeTextButton.vue"
 
 // Version
 export { default as VersionChannelIndicator } from './version/VersionChannelIndicator.vue'

@@ -5,7 +5,7 @@
         Drag to rotate
       </span>
     </div>
-    <div v-if="nametag" class="absolute top-[10%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md text-[225%] pointer-events-none z-10 font-minecraft text-secondary bg-bg-raised shadow-md border">
+    <div v-if="nametag" class="absolute top-[13%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md text-[200%] pointer-events-none z-10 font-minecraft text-white bg-black/60 shadow-md border-solid border-1 border-white/10">
       {{ nametag }}
     </div>
 
