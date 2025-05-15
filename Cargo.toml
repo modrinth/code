@@ -87,7 +87,7 @@ paste = "1.0.15"
 prometheus = "0.14.0"
 quartz_nbt = "0.2.9"
 quick-xml = "0.37.5"
-rand = "=0.8.5"  # Locked on 0.8 until argon2 updates to 0.9
+rand = "=0.8.5"  # Locked on 0.8 until argon2 and p256 update to 0.9
 rand_chacha = "=0.3.1"  # Locked on 0.3 until we can update rand to 0.9
 redis = "=0.29.5"  # Locked on 0.29 until deadpool-redis updates to 0.30
 regex = "1.11.1"
