@@ -10086,9 +10086,9 @@ dependencies = [
 
 [[package]]
 name = "weezl"
-version = "0.1.9"
+version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "78c888f2a25014723b17ac60a626d626549f773e0d702b1320956f8d769ae1f8"
+checksum = "53a85b86a771b1c87058196170769dd264f66c0782acf1ae6cc51bfd64b39082"
 
 [[package]]
 name = "wfd"
