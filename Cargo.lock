@@ -4340,7 +4340,6 @@ dependencies = [
  "futures-util",
  "hex",
  "hmac",
- "hyper 1.6.0",
  "hyper-tls",
  "hyper-util",
  "iana-time-zone",
@@ -8941,7 +8940,6 @@ dependencies = [
  "enumset",
  "theseus",
  "tokio",
- "tracing",
 ]
 
 [[package]]

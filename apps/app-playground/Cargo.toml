@@ -9,5 +9,3 @@ edition = "2024"
 theseus = { workspace = true, features = ["cli"] }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 enumset.workspace = true
-
-tracing.workspace = true
