@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { UpdatedIcon, PlusIcon } from '@modrinth/assets'
-import { ButtonStyled, SkinPreviewRenderer } from '@modrinth/ui'
+import { ButtonStyled, SkinPreviewRenderer, SkinButton, SkinLikeTextButton } from '@modrinth/ui'
 import {ref, computed, useTemplateRef, onMounted} from 'vue'
-import SkinButton from '@/components/ui/skin/SkinButton.vue'
 import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
 import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
 import { handleError } from '@/store/notifications'
@@ -17,6 +16,7 @@ import { get as getCreds } from '@/helpers/mr_auth'
 import { get_user } from '@/helpers/cache'
 import type { Cape, Skin } from '@/helpers/skins.ts'
 import {get_default_user, users} from "@/helpers/auth";
+import {generateSkinPreviews, map} from "@/helpers/rendering/batchSkinRenderer.ts";
 
 const editSkinModal = useTemplateRef('editSkinModal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
@@ -45,9 +45,8 @@ async function loadCapes() {
 }
 
 async function loadSkins() {
-  console.log(skins.value)
   skins.value = (await get_available_skins().catch(handleError)) ?? []
-  console.log(skins.value)
+  generateSkinPreviews(skins.value);
   selectedSkin.value = skins.value.find((s) => s.is_equipped) ?? null;
 }
 
@@ -68,10 +67,10 @@ async function loadUsername() {
     const defaultId = await get_default_user()
     const allAccounts = await users();
     const current = allAccounts.find(acc => acc.profile.id === defaultId)
-    username.value = current?.profile.name ?? null
+    username.value = current?.profile?.name ?? undefined
   } catch (e) {
     handleError(e)
-    username.value = null
+    username.value = undefined
   }
 }
 </script>
@@ -112,20 +111,21 @@ async function loadUsername() {
     <div class="flex flex-col gap-6 add-perspective">
       <section class="flex flex-col gap-3">
         <h2 class="text-lg font-bold m-0 text-primary">Saved skins</h2>
-        <div class="grid grid-cols-3 gap-2">
-          <button
-            class="flex flex-col gap-3 active:scale-95 hover:brightness-125 font-medium text-primary items-center justify-center border-2 border-transparent border-solid cursor-pointer h-40 bg-button-bg rounded-xl"
-            @click="editSkinModal?.show"
-          >
-            <PlusIcon class="w-6 h-6" />
+        <div class="flex flex-row flex-wrap gap-2">
+          <SkinLikeTextButton @click="editSkinModal?.show" class="max-w-[9vw]" tooltip="Add a skin">
+            <template #icon>
+              <PlusIcon />
+            </template>
             Add a skin
-          </button>
+          </SkinLikeTextButton>
 
           <SkinButton
             v-for="skin in savedSkins"
+            class="max-w-[9vw]"
             :key="`saved-skin-${skin.texture_key}`"
             editable
-            :skin="skin"
+            :forward-image-src="map.get(skin.texture_key)?.forwards ?? ''"
+            :backward-image-src="map.get(skin.texture_key)?.backwards ?? ''"
             :selected="selectedSkin === skin"
             @select="changeSkin(skin)"
             @edit="e => editSkinModal?.show(e, skin)"
@@ -135,12 +135,15 @@ async function loadUsername() {
 
       <section class="flex flex-col gap-3">
         <h2 class="text-lg font-bold m-0 text-primary">Default skins</h2>
-        <div class="grid grid-cols-3 gap-2">
+        <div class="flex flex-row flex-wrap gap-2">
           <SkinButton
             v-for="skin in defaultSkins"
+            class="max-w-[9vw]"
             :key="`default-skin-${skin.texture_key}`"
-            :skin="skin"
+            :forward-image-src="map.get(skin.texture_key)?.forwards ?? ''"
+            :backward-image-src="map.get(skin.texture_key)?.backwards ?? ''"
             :selected="selectedSkin === skin"
+            :tooltip="skin.name"
             @select="changeSkin(skin)"
             @edit="e => editSkinModal?.show(e, skin)"
           />
