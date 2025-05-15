@@ -32,7 +32,7 @@ futures-util.workspace = true
 async-trait.workspace = true
 dashmap.workspace = true
 
-meilisearch-sdk = { workspace = true, features = ["reqwest"] } # This pulls reqwest with the native TLS feature, which is highly inefficient and inconsistent
+meilisearch-sdk = { workspace = true, features = ["reqwest"] }
 rust-s3.workspace = true
 reqwest = { workspace = true, features = ["http2", "rustls-tls-webpki-roots", "json", "multipart"] }
 hyper = { workspace = true, features = ["client", "http1", "http2"] }
