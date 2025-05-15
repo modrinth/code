@@ -1,4 +1,4 @@
-# ![Modrinth Monorepo Cover](/.github/assets/monorepo_cover.png) 
+# ![Modrinth Monorepo Cover](/.github/assets/monorepo_cover.png)
 
 ![Issues](https://img.shields.io/github/issues-raw/Modrinth/code?color=c78aff&label=issues&style=for-the-badge)
 ![Pull Requests](https://img.shields.io/github/issues-pr-raw/Modrinth/code?color=c78aff&label=PRs&style=for-the-badge)
