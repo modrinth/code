@@ -25,7 +25,7 @@ const modal = useTemplateRef('modal')
 const mode = ref<'new' | 'edit'>('new')
 const currentSkin = ref<Skin | null>(null)
 const textureBlob = ref<Uint8Array | null>(null)
-const variant = ref<SkinModel>('Classic')
+const variant = ref<SkinModel>('CLASSIC')
 const selectedCape = ref<Cape | undefined>(undefined)
 const tempSkinUrl = ref<string>('/src/assets/skins/steve.png')
 
@@ -39,7 +39,7 @@ watch(textureBlob, async (blob, prev) => {
   if (prev && localPreviewUrl.value) URL.revokeObjectURL(localPreviewUrl.value)
   localPreviewUrl.value = blob ? URL.createObjectURL(new Blob([blob])) : null
 
-  if (blob && variant.value === 'Unknown' && localPreviewUrl.value) {
+  if (blob && variant.value === 'UNKNOWN' && localPreviewUrl.value) {
     try {
       variant.value = await determineModelType(localPreviewUrl.value)
     } catch (err) {
@@ -73,7 +73,7 @@ function resetState() {
     localPreviewUrl.value = null
   }
 
-  variant.value = 'Classic'
+  variant.value = 'CLASSIC'
   selectedCape.value = undefined
 }
 
@@ -88,7 +88,7 @@ function show(e: MouseEvent, skin?: Skin) {
       : '/src/assets/skins/steve.png'
   }
 
-  variant.value = skin?.variant ?? 'Classic'
+  variant.value = skin?.variant ?? 'CLASSIC'
   selectedCape.value = skin?.cape_id ? props.capes?.find(c => c.id === skin.cape_id) : undefined
   modal.value?.show(e)
 }
@@ -215,9 +215,9 @@ defineExpose({
           <h2 class="text-base font-semibold mb-2">Arm style</h2>
           <RadioButtons
             v-model="variant"
-            :items="['Classic', 'Slim']">
+            :items="['CLASSIC', 'SLIM']">
             <template #default="{ item }">
-              {{ item === 'Classic' ? 'Wide' : 'Slim' }}
+              {{ item === 'CLASSIC' ? 'Wide' : 'Slim' }}
             </template>
           </RadioButtons>
         </section>
