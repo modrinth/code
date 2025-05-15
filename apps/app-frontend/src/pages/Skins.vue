@@ -10,7 +10,7 @@ import {
   get_available_skins,
   get_available_capes,
   filterSavedSkins,
-  filterDefaultSkins, equip_skin, remove_custom_skin, set_default_cape,
+  filterDefaultSkins, equip_skin, remove_custom_skin, set_default_cape, add_and_equip_custom_skin,
 } from '@/helpers/skins.ts'
 import { get as getSettings } from '@/helpers/settings.ts'
 import { get as getCreds } from '@/helpers/mr_auth'
@@ -60,15 +60,15 @@ async function loadSkins() {
 async function changeSkin(newSkin: Skin) {
   selectedSkin.value = newSkin;
   await equip_skin(selectedSkin.value).catch(handleError);
+  await loadSkins();
 }
 
 async function handleSkinSaved(newSkin: Skin | null, oldSkin: Skin | null) {
   if (oldSkin) {
     await remove_custom_skin(oldSkin).catch(handleError)
-    skins.value = skins.value.filter(s => s.texture_key !== oldSkin.texture_key)
   }
 
-  if (newSkin) skins.value.push(newSkin)
+  await loadSkins()
   selectedSkin.value =
     skins.value.find(s => s.texture_key === newSkin?.texture_key) ??
     skins.value.find(s => s.is_equipped) ??
@@ -77,7 +77,8 @@ async function handleSkinSaved(newSkin: Skin | null, oldSkin: Skin | null) {
 }
 
 async function handleSkinDeleted(deletedSkin: Skin) {
-  skins.value = skins.value.filter(s => s.texture_key !== deletedSkin.texture_key)
+  await remove_custom_skin(deletedSkin).catch(handleError);
+  await loadSkins();
   if (selectedSkin.value?.texture_key === deletedSkin.texture_key) {
     selectedSkin.value =
       skins.value.find(s => s.is_equipped) ??
@@ -89,6 +90,8 @@ async function handleSkinDeleted(deletedSkin: Skin) {
 async function handleCapeSelected(cape: Cape | undefined) {
   currentCape.value = cape;
   await set_default_cape(currentCape.value).catch(handleError);
+  await loadSkins();
+  await loadCapes();
 }
 </script>
 
