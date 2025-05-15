@@ -165,11 +165,12 @@ impl CustomMinecraftSkin {
         db: impl sqlx::Acquire<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<()> {
         let minecraft_user_id = minecraft_user_id.as_hyphenated();
+        let cape_id = self.cape_id.map(|id| id.hyphenated());
 
         sqlx::query!(
             "DELETE FROM custom_minecraft_skins \
             WHERE minecraft_user_uuid = ? AND texture_key = ? AND variant = ? AND cape_id = ?",
-            minecraft_user_id, self.texture_key, self.variant, self.cape_id
+            minecraft_user_id, self.texture_key, self.variant, cape_id
         )
         .execute(&mut *db.acquire().await?)
         .await?;
