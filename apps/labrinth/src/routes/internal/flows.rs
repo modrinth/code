@@ -13,7 +13,7 @@ use crate::util::captcha::check_hcaptcha;
 use crate::util::env::parse_strings_from_var;
 use crate::util::ext::get_image_ext;
 use crate::util::img::upload_image_optimized;
-use crate::util::validate::{RE_URL_SAFE, validation_errors_to_string};
+use crate::util::validate::validation_errors_to_string;
 use actix_web::web::{Data, Query, ServiceConfig, scope};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use argon2::password_hash::SaltString;
@@ -1318,7 +1318,7 @@ pub async fn sign_up_sendy(email: &str) -> Result<(), AuthenticationError> {
 
 #[derive(Deserialize, Validate)]
 pub struct NewAccount {
-    #[validate(length(min = 1, max = 39), regex(path = *RE_URL_SAFE))]
+    #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_URL_SAFE))]
     pub username: String,
     #[validate(length(min = 8, max = 256))]
     pub password: String,

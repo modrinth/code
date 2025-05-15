@@ -15,8 +15,7 @@ pub async fn authenticate_run() -> theseus::Result<Credentials> {
     println!("A browser window will now open, follow the login flow there.");
     let login = minecraft_auth::begin_login().await?;
 
-    println!("URL {}", login.redirect_uri.as_str());
-    webbrowser::open(login.redirect_uri.as_str())?;
+    println!("Open URL {} in a browser", login.redirect_uri.as_str());
 
     println!("Please enter URL code: ");
     let mut input = String::new();

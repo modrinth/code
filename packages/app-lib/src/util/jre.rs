@@ -276,11 +276,10 @@ pub async fn check_java_at_filepath(path: &Path) -> Option<JavaVersion> {
     };
 
     let bytes = include_bytes!("../../library/JavaInfo.class");
-    let tempdir: PathBuf = tempfile::tempdir().ok()?.into_path();
-    if !tempdir.exists() {
+    let Ok(tempdir) = tempfile::tempdir() else {
         return None;
-    }
-    let file_path = tempdir.join("JavaInfo.class");
+    };
+    let file_path = tempdir.path().join("JavaInfo.class");
     io::write(&file_path, bytes).await.ok()?;
 
     let output = Command::new(&java)

@@ -50,7 +50,7 @@ fn require_profiling_activated(
     }
 }
 
-pub fn jemalloc_mmeory_stats(
+pub fn jemalloc_memory_stats(
     registry: &Registry,
 ) -> Result<(), prometheus::Error> {
     let allocated_mem = IntGauge::new(

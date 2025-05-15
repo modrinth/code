@@ -1,6 +1,5 @@
 //! Platform-related code
 use daedalus::minecraft::{Os, OsRule};
-use regex::Regex;
 
 // OS detection
 pub trait OsExt {
@@ -92,12 +91,16 @@ pub fn os_rule(
         }
     }
 
-    if let Some(version) = &rule.version {
-        if let Ok(regex) = Regex::new(version.as_str()) {
-            rule_match &=
-                regex.is_match(&sys_info::os_release().unwrap_or_default());
-        }
-    }
+    // `rule.version` is ignored because it's not usually seen on real recent
+    // Minecraft version manifests, its alleged regex syntax is undefined and is
+    // likely to not match `Regex`'s, and the way to get the value to match it
+    // against is allegedly calling `System.getProperty("os.version")`, which
+    // on Windows the OpenJDK implements by fetching the kernel32.dll version,
+    // an approach that no public Rust library implements. Moreover, launchers
+    // such as PrismLauncher also ignore this field. Code references:
+    // - https://github.com/openjdk/jdk/blob/948ade8e7003a41683600428c8e3155c7ed798db/src/java.base/windows/native/libjava/java_props_md.c#L556
+    // - https://github.com/PrismLauncher/PrismLauncher/blob/1c20faccf88999474af70db098a4c10e7a03af33/launcher/minecraft/Rule.h#L77
+    // - https://github.com/FillZpp/sys-info-rs/blob/60ecf1470a5b7c90242f429934a3bacb6023ec4d/c/windows.c#L23-L38
 
     rule_match
 }

@@ -117,11 +117,10 @@ impl GalleryItem {
     }
 }
 
-#[derive(derive_new::new)]
 pub struct ModCategory {
-    project_id: ProjectId,
-    category_id: CategoryId,
-    is_additional: bool,
+    pub project_id: ProjectId,
+    pub category_id: CategoryId,
+    pub is_additional: bool,
 }
 
 impl ModCategory {
@@ -245,12 +244,18 @@ impl ProjectBuilder {
         let project_id = self.project_id;
         let mod_categories = categories
             .into_iter()
-            .map(|c| ModCategory::new(project_id, c, false))
-            .chain(
-                additional_categories
-                    .into_iter()
-                    .map(|c| ModCategory::new(project_id, c, true)),
-            )
+            .map(|category_id| ModCategory {
+                project_id,
+                category_id,
+                is_additional: false,
+            })
+            .chain(additional_categories.into_iter().map(|category_id| {
+                ModCategory {
+                    project_id,
+                    category_id,
+                    is_additional: true,
+                }
+            }))
             .collect_vec();
         ModCategory::insert_many(mod_categories, &mut *transaction).await?;
 

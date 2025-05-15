@@ -5,30 +5,27 @@ use crate::state::{
     DirectoryInfo, ProfileInstallStage, ProjectType, attached_world_data,
 };
 use crate::worlds::WorldType;
-use futures::{SinkExt, StreamExt, channel::mpsc::channel};
 use notify::{RecommendedWatcher, RecursiveMode};
 use notify_debouncer_mini::{DebounceEventResult, Debouncer, new_debouncer};
 use std::time::Duration;
-use tokio::sync::RwLock;
+use tokio::sync::{RwLock, mpsc::channel};
 
 pub type FileWatcher = RwLock<Debouncer<RecommendedWatcher>>;
 
 pub async fn init_watcher() -> crate::Result<FileWatcher> {
-    let (mut tx, mut rx) = channel(1);
+    let (tx, mut rx) = channel(1);
 
     let file_watcher = new_debouncer(
         Duration::from_secs_f32(1.0),
         move |res: DebounceEventResult| {
-            futures::executor::block_on(async {
-                tx.send(res).await.unwrap();
-            })
+            tx.blocking_send(res).ok();
         },
     )?;
 
     tokio::task::spawn(async move {
         let span = tracing::span!(tracing::Level::INFO, "init_watcher");
         tracing::info!(parent: &span, "Initting watcher");
-        while let Some(res) = rx.next().await {
+        while let Some(res) = rx.recv().await {
             let _span = span.enter();
 
             match res {

@@ -152,7 +152,7 @@ async fn main() -> std::io::Result<()> {
         .expect("Failed to register redis metrics");
 
     #[cfg(target_os = "linux")]
-    labrinth::routes::debug::jemalloc_mmeory_stats(&prometheus.registry)
+    labrinth::routes::debug::jemalloc_memory_stats(&prometheus.registry)
         .expect("Failed to register jemalloc metrics");
 
     let labrinth_config = labrinth::app_setup(
