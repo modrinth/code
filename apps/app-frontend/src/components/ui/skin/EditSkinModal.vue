@@ -211,6 +211,8 @@ async function save() {
       blob = new Uint8Array(buf)
     }
 
+    await unequip_skin();
+
     if (mode.value === 'new') {
       await add_and_equip_custom_skin(blob, variant.value, selectedCape.value)
       emit('saved')
