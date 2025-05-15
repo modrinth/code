@@ -1,4 +1,4 @@
-import { invoke } from '@tauri-apps/api/core'
+import {invoke} from '@tauri-apps/api/core'
 import {handleError} from "@/store/notifications";
 
 export interface Cape {
@@ -9,8 +9,8 @@ export interface Cape {
   is_equipped: boolean
 }
 
-export type SkinModel = 'Classic' | 'Slim' | 'Unknown'
-export type SkinSource = 'Default' | 'CustomExternal' | 'Custom'
+export type SkinModel = 'CLASSIC' | 'SLIM' | 'UNKNOWN'
+export type SkinSource = 'default' | 'custom_external' | 'custom'
 
 export interface Skin {
   texture_key: string
@@ -25,25 +25,25 @@ export interface Skin {
 export const DEFAULT_MODEL_SORTING = ['Steve', 'Alex'] as string[]
 
 export const DEFAULT_MODELS: Record<string, SkinModel> = {
-  Steve: 'Classic',
-  Alex: 'Slim',
-  Zuri: 'Classic',
-  Sunny: 'Classic',
-  Noor: 'Slim',
-  Makena: 'Slim',
-  Kai: 'Classic',
-  Efe: 'Slim',
-  Ari: 'Classic',
+  Steve: 'CLASSIC',
+  Alex: 'SLIM',
+  Zuri: 'CLASSIC',
+  Sunny: 'CLASSIC',
+  Noor: 'SLIM',
+  Makena: 'SLIM',
+  Kai: 'CLASSIC',
+  Efe: 'SLIM',
+  Ari: 'CLASSIC',
 }
 
 export function filterSavedSkins(list: Skin[]) {
-  const customSkins = list.filter((s) => s.source !== 'Default');
+  const customSkins = list.filter((s) => s.source !== 'default');
   console.log(customSkins[0]);
   fixUnknownSkins(customSkins).catch(handleError);
   return customSkins;
 }
 
-export async function determineModelType(texture: string): Promise<'Slim' | 'Classic'> {
+export async function determineModelType(texture: string): Promise<'SLIM' | 'CLASSIC'> {
   return new Promise((resolve, reject) => {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
@@ -72,13 +72,13 @@ export async function determineModelType(texture: string): Promise<'Slim' | 'Cla
       for (let y = 0; y < armHeight; y++) {
         const alphaIndex = (3 + y * armWidth) * 4 + 3;
         if (imageData[alphaIndex] !== 0) {
-          resolve('Classic');
+          resolve('CLASSIC');
           return;
         }
       }
 
       canvas.remove();
-      resolve('Slim');
+      resolve('SLIM');
     };
 
     image.onerror = () => {
@@ -89,11 +89,10 @@ export async function determineModelType(texture: string): Promise<'Slim' | 'Cla
 }
 
 export async function fixUnknownSkins(list: Skin[]) {
-  const unknownSkins = list.filter((s) => s.variant === "Unknown");
+  const unknownSkins = list.filter((s) => s.variant === "UNKNOWN");
   for (let unknownSkin of unknownSkins) {
     console.log(unknownSkin.texture);
-    const modelType = await determineModelType(unknownSkin.texture);
-    unknownSkin.variant = modelType;
+    unknownSkin.variant = await determineModelType(unknownSkin.texture);
   }
 }
 
@@ -102,7 +101,7 @@ export function filterDefaultSkins(list: Skin[]) {
   return list
     .filter(
       (s) =>
-        s.source === 'Default' &&
+        s.source === 'default' &&
         (!s.name || s.variant === DEFAULT_MODELS[s.name]),
     )
     .sort((a, b) => {
