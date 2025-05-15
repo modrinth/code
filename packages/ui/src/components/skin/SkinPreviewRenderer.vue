@@ -1,7 +1,9 @@
 <template>
   <div class="relative w-full h-full">
-    <div class="absolute bottom-[18%] left-1/2 transform -translate-x-1/2 text-primary px-3 py-1 rounded text-md pointer-events-none z-10">
-      Drag to rotate
+    <div class="absolute bottom-[18%] left-0 right-0 flex justify-center items-center mb-2 pointer-events-none z-10">
+      <span class="text-primary text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+        Drag to rotate
+      </span>
     </div>
     <div v-if="nametag" class="absolute top-[10%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md text-[225%] pointer-events-none z-10 font-minecraft text-secondary bg-bg-raised shadow-md border">
       {{ nametag }}
@@ -22,14 +24,16 @@
     >
       <Suspense>
         <Group>
-          <Group ref="modelGroup" :rotation="[0, modelRotation, 0]" :position="[0, -0.05, 1.95]" :scale="[0.8, 0.8, 0.8]">
-            <primitive v-if="scene" ref="modelRef" :object="scene" />
+          <!-- Apply the scale prop to the model group -->
+          <Group :rotation="[0, modelRotation, 0]" :position="[0, -0.05 * scale, 1.95]" :scale="[0.8 * scale, 0.8 * scale, 0.8 * scale]">
+            <primitive v-if="scene" :object="scene" />
           </Group>
 
+          <!-- Scale the shadow accordingly -->
           <TresMesh
-            :position="[0, -0.095, 2]"
+            :position="[0, -0.095 * scale, 2]"
             :rotation="[-Math.PI / 2, 0, 0]"
-            :scale="[0.4, 0.4, 0.4]"
+            :scale="[0.4 * scale, 0.4 * scale, 0.4 * scale]"
           >
             <TresCircleGeometry :args="[1, 32]" />
             <TresMeshBasicMaterial
@@ -40,7 +44,8 @@
             />
           </TresMesh>
 
-          <TresMesh :position="[0, -0.1, 2]" :rotation="[-Math.PI / 2, 0, 0]" :scale="[0.75, 0.75, 0.75]">
+          <!-- Scale the radial gradient effect -->
+          <TresMesh :position="[0, -0.1 * scale, 2]" :rotation="[-Math.PI / 2, 0, 0]" :scale="[0.75 * scale, 0.75 * scale, 0.75 * scale]">
             <TresPlaneGeometry :args="[2, 2]" />
             <TresMeshBasicMaterial
               :map="radialTexture"
@@ -52,17 +57,15 @@
         </Group>
       </Suspense>
 
+      <!-- Use the fov prop for the camera -->
       <TresPerspectiveCamera
-        ref="cameraRef"
         :makeDefault="true"
-        :fov="40"
+        :fov="fov"
         :position="[0, 1.5, -3.25]"
         :look-at="target"
       />
 
-      <TresAmbientLight
-        :intensity="2"
-      />
+      <TresAmbientLight :intensity="2" />
     </TresCanvas>
   </div>
 </template>
@@ -71,64 +74,80 @@
 import * as THREE from 'three'
 import { useGLTF } from '@tresjs/cientos'
 import { useTexture, TresCanvas } from '@tresjs/core'
-import {ref, computed, watch} from 'vue'
+import {shallowRef, ref, computed, watch, markRaw} from 'vue'
 
-const props = withDefaults(defineProps<{
-  textureSrc: string
-  modelSrc: string
-  nametag?: string
-  antialias?: boolean
-}>(), {
-  antialias: false,
-})
+const props = withDefaults(
+  defineProps<{
+    textureSrc: string
+    slimModelSrc: string
+    wideModelSrc: string
+    variant?: 'Slim' | 'Classic' | 'Unknown'
+    nametag?: string
+    antialias?: boolean
+    scale?: number
+    fov?: number
+  }>(),
+  {
+    variant: 'Classic',
+    antialias: false,
+    scale: 1,
+    fov: 40
+  }
+)
 
-const { scene } = await useGLTF(props.modelSrc)
+const selectedModelSrc = computed(() =>
+  props.variant === 'Slim' ? props.slimModelSrc : props.wideModelSrc
+)
 
-let texture = await useTexture([props.textureSrc])
-applyTextureToScene(scene, texture);
+const scene = shallowRef<THREE.Object3D | null>(null)
+
+async function loadModel(src: string) {
+  const { scene: loadedScene } = await useGLTF(src)
+  scene.value = markRaw(loadedScene)
+  applyTextureToScene(scene.value, texture.value)
+  updateModelInfo()
+}
+
+watch(selectedModelSrc, src => loadModel(src), { immediate: true })
+
+const texture = ref<THREE.Texture>(await useTexture([props.textureSrc]))
 
 watch(
   () => props.textureSrc,
   async newSrc => {
-    texture = await useTexture([newSrc])
-    applyTextureToScene(scene, texture)
+    texture.value = await useTexture([newSrc])
+    applyTextureToScene(scene.value, texture.value)
   }
 )
 
 function applyTextureToScene(root: THREE.Object3D | null, tex: THREE.Texture) {
-  texture.colorSpace = THREE.SRGBColorSpace
-  texture.flipY = false
-  texture.magFilter = THREE.NearestFilter
-  texture.minFilter = THREE.NearestFilter
-
   if (!root) return
+  tex.colorSpace = THREE.SRGBColorSpace
+  tex.flipY = false
+  tex.magFilter = THREE.NearestFilter
+  tex.minFilter = THREE.NearestFilter
   root.traverse(child => {
     if ((child as THREE.Mesh).isMesh) {
       const mesh = child as THREE.Mesh
-      const setProps = (mat: THREE.Material) => {
-        const m = mat as THREE.MeshStandardMaterial
-        m.map = tex
-        m.metalness = 0
-        m.color.set(0xffffff)
-        m.toneMapped = false
-        m.roughness = 1
-        m.needsUpdate = true
-      }
-
-      if (Array.isArray(mesh.material)) mesh.material.forEach(setProps)
-      else setProps(mesh.material)
+      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+      materials.forEach((mat: THREE.MeshStandardMaterial) => {
+        mat.map = tex
+        mat.metalness = 0
+        mat.color.set(0xffffff)
+        mat.toneMapped = false
+        mat.roughness = 1
+        mat.needsUpdate = true
+      })
     }
   })
 }
 
-const modelRef = ref<THREE.Object3D | null>(null)
-const modelGroup = ref<THREE.Group | null>(null)
-const cameraRef = ref<THREE.PerspectiveCamera | null>(null)
 const centre = ref<[number, number, number]>([0, 1, 0])
 const modelHeight = ref(1.4)
 
-if (scene) {
-  const bbox = new THREE.Box3().setFromObject(scene)
+function updateModelInfo() {
+  if (!scene.value) return
+  const bbox = new THREE.Box3().setFromObject(scene.value)
   const mid = new THREE.Vector3()
   bbox.getCenter(mid)
   centre.value = [mid.x, mid.y, mid.z]
@@ -142,8 +161,7 @@ const isDragging = ref(false)
 const previousX = ref(0)
 
 const onPointerDown = (event: PointerEvent) => {
-  (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
-
+  ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
   isDragging.value = true
   previousX.value = event.clientX
 }
@@ -156,8 +174,8 @@ const onPointerMove = (event: PointerEvent) => {
 }
 
 const onPointerUp = (event: PointerEvent) => {
-  isDragging.value = false;
-  (event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId)
+  isDragging.value = false
+  ;(event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId)
 }
 
 const radialTexture = createRadialTexture(512)
@@ -176,4 +194,6 @@ function createRadialTexture(size: number): THREE.CanvasTexture {
   ctx.fillRect(0, 0, size, size)
   return new THREE.CanvasTexture(canvas)
 }
+
+applyTextureToScene(scene.value, texture.value)
 </script>
