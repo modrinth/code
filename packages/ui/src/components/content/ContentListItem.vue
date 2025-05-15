@@ -9,14 +9,14 @@ export interface ContentCreator {
   type: 'user' | 'organization'
   id: string
   link?: string | RouteLocationRaw
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   linkProps?: any
 }
 
 export interface ContentProject {
   id: string
   link?: string | RouteLocationRaw
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   linkProps?: any
 }
 

@@ -341,3 +341,14 @@ export const getArrayOrString = (x: string[] | string): string[] => {
     return x
   }
 }
+
+export function pxOf(varName: string) {
+  const el = document.createElement('div')
+  el.style.visibility = 'hidden'
+  el.style.position = 'absolute'
+  el.style.marginLeft = `var(${varName})`
+  document.body.appendChild(el)
+  const px = parseFloat(getComputedStyle(el).marginLeft)
+  document.body.removeChild(el)
+  return px
+}

@@ -10,6 +10,7 @@ pub mod mr_auth;
 pub mod pack;
 pub mod process;
 pub mod profile;
+pub mod screenshots;
 pub mod settings;
 pub mod tags;
 pub mod worlds;

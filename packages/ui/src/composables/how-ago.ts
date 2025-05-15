@@ -3,7 +3,6 @@ import type { IntlController } from '@vintl/vintl/controller'
 import { useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 const formatters = new WeakMap<IntlController<any>, Formatter>()
 
 export function useRelativeTime(): Formatter {

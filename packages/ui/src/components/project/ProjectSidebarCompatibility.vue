@@ -94,7 +94,7 @@ defineProps<{
     loaders: string[]
     client_side: EnvironmentValue
     server_side: EnvironmentValue
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     versions: any[]
   }
   tags: {

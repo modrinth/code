@@ -264,6 +264,19 @@ fn main() {
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
                     ),
+            )
+            .plugin(
+                "screenshots",
+                InlinedPlugin::new()
+                    .commands(&[
+                        "get_all_profile_screenshots",
+                        "get_screenshot_data",
+                        "delete_profile_screenshot",
+                        "open_profile_screenshot",
+                    ])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
             ),
     )
     .expect("Failed to run tauri-build");
