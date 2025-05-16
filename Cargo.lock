@@ -8878,6 +8878,7 @@ dependencies = [
  "flate2",
  "fs4",
  "futures",
+ "heck 0.5.0",
  "hickory-resolver",
  "indicatif",
  "notify",
