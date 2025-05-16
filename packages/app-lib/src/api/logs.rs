@@ -45,7 +45,7 @@ impl CensoredString {
             .replace(&format!("/{username}/"), "/{COMPUTER_USERNAME}/")
             .replace(&format!("\\{username}\\"), "\\{COMPUTER_USERNAME}\\");
         for credentials in credentials_list {
-            // Use the offline profile to guarantee that this function is does not cause
+            // Use the offline profile to guarantee that this function does not cause
             // Mojang API request, and is never delayed by a network request. The offline
             // profile is optimistically updated on upsert from time to time anyway
             s = s
