@@ -1,5 +1,6 @@
-/** @type {import('tailwindcss').Config} */
-const config = {
+import type { Config } from "tailwindcss";
+
+const config: Config = {
   content: [
     "./src/components/**/*.{js,vue,ts}",
     "./src/layouts/**/*.vue",
@@ -35,6 +36,23 @@ const config = {
           blue: "var(--color-blue-bg)",
           purple: "var(--color-purple-bg)",
           raised: "var(--color-raised-bg)",
+        },
+        banners: {
+          error: {
+            bg: "var(--banner-error-bg)",
+            text: "var(--banner-error-text)",
+            border: "var(--banner-error-border)",
+          },
+          warning: {
+            bg: "var(--banner-warning-bg)",
+            text: "var(--banner-warning-text)",
+            border: "var(--banner-warning-border)",
+          },
+          info: {
+            bg: "var(--banner-info-bg)",
+            text: "var(--banner-info-text)",
+            border: "var(--banner-info-border)",
+          },
         },
         highlight: {
           DEFAULT: "var(--color-brand-highlight)",
@@ -126,6 +144,7 @@ const config = {
       backgroundImage: {
         mazeBg: "var(--landing-maze-bg)",
         mazeGradientBg: "var(--landing-maze-gradient-bg)",
+        // @ts-ignore
         landing: {
           mazeOuterBg: "var(--landing-maze-outer-bg)",
           colorHeading: "var(--landing-color-heading)",

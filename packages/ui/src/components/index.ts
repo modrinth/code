@@ -71,6 +71,7 @@ export { default as Breadcrumbs } from './nav/Breadcrumbs.vue'
 export { default as NavItem } from './nav/NavItem.vue'
 export { default as NavRow } from './nav/NavRow.vue'
 export { default as NavStack } from './nav/NavStack.vue'
+export { default as PagewideBanner } from './nav/PagewideBanner.vue'
 
 // Project
 export { default as NewProjectCard } from './project/NewProjectCard.vue'

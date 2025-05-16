@@ -162,6 +162,18 @@ html {
   --landing-green-label-bg: rgba(0, 216, 69, 0.15);
 
   --landing-raw-bg: #fff;
+
+  --banner-error-bg: #fee2e2;
+  --banner-error-text: #991b1b;
+  --banner-error-border: #ef4444;
+
+  --banner-warning-bg: #ffedd5;
+  --banner-warning-text: #713f12;
+  --banner-warning-border: #f97316;
+
+  --banner-info-bg: #dbeafe;
+  --banner-info-text: #1e3a8a;
+  --banner-info-border: #3b82f6;
 }
 
 .dark,
@@ -286,6 +298,18 @@ html {
 
   --hover-filter: brightness(120%);
   --active-filter: brightness(140%);
+
+  --banner-error-bg: #4c1515;
+  --banner-error-text: #fee2e2;
+  --banner-error-border: #7f1d1d;
+
+  --banner-warning-bg: #4a2a0a;
+  --banner-warning-text: #ffe6c0;
+  --banner-warning-border: #b54708;
+
+  --banner-info-bg: #1e2a44;
+  --banner-info-text: #dbeafe;
+  --banner-info-border: #2563eb;
 }
 
 .oled-mode {
