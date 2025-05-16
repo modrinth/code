@@ -88,7 +88,7 @@ rust_decimal = { workspace = true, features = [
     "serde-with-float",
     "serde-with-str",
 ] }
-redis = { workspace = true, features = ["tokio-comp", "ahash", "r2d2"] } # Locked on 0.29 until deadpool-redis updates to 0.30
+redis = { workspace = true, features = ["tokio-comp", "ahash", "r2d2"] }
 deadpool-redis.workspace = true
 clickhouse = { workspace = true, features = ["uuid", "time"] }
 uuid = { workspace = true, features = ["v4", "fast-rng", "serde"] }

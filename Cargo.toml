@@ -135,6 +135,7 @@ tauri-plugin-os = "2.2.1"
 tauri-plugin-single-instance = "2.2.3"
 tauri-plugin-updater = { version = "2.7.1", default-features = false, features = [
   "rustls-tls",
+  "zip",
 ] }
 tauri-plugin-window-state = "2.2.2"
 tempfile = "3.20.0"

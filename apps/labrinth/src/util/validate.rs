@@ -7,7 +7,9 @@ use validator::{ValidationErrors, ValidationErrorsKind};
 use crate::models::pats::Scopes;
 
 pub static RE_URL_SAFE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"^[a-zA-Z0-9_-]*$").unwrap());
+    LazyLock::new(|| Regex::new(r#"^[a-zA-Z0-9!@$()`.+,_"-]*$"#).unwrap());
+pub static RE_USERNAME: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r#"^[a-zA-Z0-9_-]*$"#).unwrap());
 
 //TODO: In order to ensure readability, only the first error is printed, this may need to be expanded on in the future!
 pub fn validation_errors_to_string(
