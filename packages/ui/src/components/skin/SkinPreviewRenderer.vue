@@ -13,14 +13,14 @@
       shadows
       alpha
       :antialias="antialias"
+      :renderer-options="{
+        outputColorSpace: THREE.SRGBColorSpace,
+        toneMapping: THREE.NoToneMapping
+      }"
       @pointerdown="onPointerDown"
       @pointermove="onPointerMove"
       @pointerup="onPointerUp"
       @pointerleave="onPointerUp"
-      :rendererOptions="{
-        outputColorSpace: THREE.SRGBColorSpace,
-        toneMapping: THREE.NoToneMapping
-      }"
     >
       <Suspense>
         <Group>
@@ -55,7 +55,7 @@
       </Suspense>
 
       <TresPerspectiveCamera
-        :makeDefault="true"
+        :make-default="true"
         :fov="fov"
         :position="[0, 1.5, -3.25]"
         :look-at="target"

@@ -1,5 +1,5 @@
-import {invoke} from '@tauri-apps/api/core'
-import {handleError} from "@/store/notifications";
+import { invoke } from '@tauri-apps/api/core'
+import { handleError } from '@/store/notifications'
 
 export interface Cape {
   id: string
@@ -37,70 +37,66 @@ export const DEFAULT_MODELS: Record<string, SkinModel> = {
 }
 
 export function filterSavedSkins(list: Skin[]) {
-  const customSkins = list.filter((s) => s.source !== 'default');
-  fixUnknownSkins(customSkins).catch(handleError);
-  return customSkins;
+  const customSkins = list.filter((s) => s.source !== 'default')
+  fixUnknownSkins(customSkins).catch(handleError)
+  return customSkins
 }
 
 export async function determineModelType(texture: string): Promise<'SLIM' | 'CLASSIC'> {
   return new Promise((resolve, reject) => {
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
+    const canvas = document.createElement('canvas')
+    const context = canvas.getContext('2d')
 
     if (!context) {
-      return reject(new Error('Failed to create canvas rendering context.'));
+      return reject(new Error('Failed to create canvas rendering context.'))
     }
 
-    const image = new Image();
-    image.crossOrigin = 'anonymous';
-    image.src = texture;
+    const image = new Image()
+    image.crossOrigin = 'anonymous'
+    image.src = texture
 
     image.onload = () => {
-      canvas.width = image.width;
-      canvas.height = image.height;
+      canvas.width = image.width
+      canvas.height = image.height
 
-      context.drawImage(image, 0, 0);
+      context.drawImage(image, 0, 0)
 
-      const armX = 44;
-      const armY = 16;
-      const armWidth = 4;
-      const armHeight = 12;
+      const armX = 44
+      const armY = 16
+      const armWidth = 4
+      const armHeight = 12
 
-      const imageData = context.getImageData(armX, armY, armWidth, armHeight).data;
+      const imageData = context.getImageData(armX, armY, armWidth, armHeight).data
 
       for (let y = 0; y < armHeight; y++) {
-        const alphaIndex = (3 + y * armWidth) * 4 + 3;
+        const alphaIndex = (3 + y * armWidth) * 4 + 3
         if (imageData[alphaIndex] !== 0) {
-          resolve('CLASSIC');
-          return;
+          resolve('CLASSIC')
+          return
         }
       }
 
-      canvas.remove();
-      resolve('SLIM');
-    };
+      canvas.remove()
+      resolve('SLIM')
+    }
 
     image.onerror = () => {
-      canvas.remove();
-      reject(new Error('Failed to load the image.'));
-    };
-  });
+      canvas.remove()
+      reject(new Error('Failed to load the image.'))
+    }
+  })
 }
 
 export async function fixUnknownSkins(list: Skin[]) {
-  const unknownSkins = list.filter((s) => s.variant === "UNKNOWN");
-  for (let unknownSkin of unknownSkins) {
-    unknownSkin.variant = await determineModelType(unknownSkin.texture);
+  const unknownSkins = list.filter((s) => s.variant === 'UNKNOWN')
+  for (const unknownSkin of unknownSkins) {
+    unknownSkin.variant = await determineModelType(unknownSkin.texture)
   }
 }
 
 export function filterDefaultSkins(list: Skin[]) {
   return list
-    .filter(
-      (s) =>
-        s.source === 'default' &&
-        (!s.name || s.variant === DEFAULT_MODELS[s.name]),
-    )
+    .filter((s) => s.source === 'default' && (!s.name || s.variant === DEFAULT_MODELS[s.name]))
     .sort((a, b) => {
       const aIndex = a.name ? DEFAULT_MODEL_SORTING.indexOf(a.name) : -1
       const bIndex = b.name ? DEFAULT_MODEL_SORTING.indexOf(b.name) : -1

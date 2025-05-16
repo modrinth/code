@@ -14,7 +14,8 @@
             wide-model-src="/src/assets/models/classic_player.gltf"
             :variant="variant"
             :texture-src="previewSkin"
-            :scale="1.4" :fov="50"
+            :scale="1.4"
+            :fov="50"
             class="h-full w-full"
           />
         </div>
@@ -34,17 +35,19 @@
               <UploadIcon aria-hidden="true" />
             </FileInput>
 
-            <div class="flex items-center gap-2" v-if="fileName || mode === 'new'">
+            <div v-if="fileName || mode === 'new'" class="flex items-center gap-2">
               <InfoIcon v-if="!fileName" class="text-brand-blue" />
               <CheckCircleIcon v-else class="text-brand-green" />
-              <small class="truncate" v-tooltip="fileName">{{ fileName || 'No skin uploaded yet.' }}</small>
+              <small v-tooltip="fileName" class="truncate">{{
+                fileName || 'No skin uploaded yet.'
+              }}</small>
             </div>
           </Card>
         </section>
 
         <section>
           <h2 class="text-base font-semibold mb-2">Arm style</h2>
-          <RadioButtons v-model="variant" :items="['CLASSIC','SLIM']">
+          <RadioButtons v-model="variant" :items="['CLASSIC', 'SLIM']">
             <template #default="{ item }">
               {{ item === 'CLASSIC' ? 'Wide' : 'Slim' }}
             </template>
@@ -56,15 +59,19 @@
           <div class="flex gap-2">
             <CapeButton
               v-for="cape in firstThreeCapes"
-              :key="cape.id"
               :id="cape.id"
+              :key="cape.id"
               :texture="cape.texture"
               :name="cape.name || 'Cape'"
               :selected="selectedCape?.id === cape.id"
               @select="selectCape(cape)"
             />
-            <CapeLikeTextButton v-if="capes?.length ?? 0 > 3" tooltip="View more capes" @click="viewMoreCapes">
-              <template #icon><ChevronRightIcon/></template>
+            <CapeLikeTextButton
+              v-if="capes?.length ?? 0 > 3"
+              tooltip="View more capes"
+              @click="viewMoreCapes"
+            >
+              <template #icon><ChevronRightIcon /></template>
               <span>More</span>
             </CapeLikeTextButton>
           </div>
@@ -74,14 +81,18 @@
 
     <div class="flex gap-2 mt-6">
       <ButtonStyled color="brand" :disabled="disableSave">
-        <Button @click="save" :disabled="disableSave" v-tooltip="disableSave && 'Upload a skin first!'">
+        <Button
+          v-tooltip="disableSave && 'Upload a skin first!'"
+          :disabled="disableSave"
+          @click="save"
+        >
           <CheckIcon v-if="mode === 'new'" /><SaveIcon v-else />
           {{ mode === 'new' ? 'Add skin' : 'Save skin' }}
         </Button>
       </ButtonStyled>
-      <Button @click="hide"><XIcon/>Cancel</Button>
-      <ButtonStyled color="red" v-if="mode==='edit'">
-        <Button @click="handleDelete"><TrashIcon/>Delete</Button>
+      <Button @click="hide"><XIcon />Cancel</Button>
+      <ButtonStyled v-if="mode === 'edit'" color="red">
+        <Button @click="handleDelete"><TrashIcon />Delete</Button>
       </ButtonStyled>
     </div>
   </ModalWrapper>
@@ -91,29 +102,41 @@
 import { ref, computed, watch, useTemplateRef } from 'vue'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import {
-  Card, FileInput, SkinPreviewRenderer,
-  Button, RadioButtons, CapeButton, CapeLikeTextButton, ButtonStyled
+  Card,
+  FileInput,
+  SkinPreviewRenderer,
+  Button,
+  RadioButtons,
+  CapeButton,
+  CapeLikeTextButton,
+  ButtonStyled,
 } from '@modrinth/ui'
 import {
   add_and_equip_custom_skin,
   remove_custom_skin,
-  equip_skin,
   unequip_skin,
-  get_available_skins,
-  type Skin, type Cape, type SkinModel
+  type Skin,
+  type Cape,
+  type SkinModel,
 } from '@/helpers/skins.ts'
 import { handleError } from '@/store/notifications'
 import {
-  CheckCircleIcon, InfoIcon, UploadIcon,
-  CheckIcon, SaveIcon, XIcon, TrashIcon, ChevronRightIcon
+  CheckCircleIcon,
+  InfoIcon,
+  UploadIcon,
+  CheckIcon,
+  SaveIcon,
+  XIcon,
+  TrashIcon,
+  ChevronRightIcon,
 } from '@modrinth/assets'
 
 const modal = useTemplateRef('modal')
-const mode = ref<'new'|'edit'>('new')
-const currentSkin = ref<Skin|null>(null)
+const mode = ref<'new' | 'edit'>('new')
+const currentSkin = ref<Skin | null>(null)
 
-const fileUploadTextureBlob = ref<Uint8Array|null>(null)
-const fileName = ref<string|null>(null)
+const fileUploadTextureBlob = ref<Uint8Array | null>(null)
+const fileName = ref<string | null>(null)
 watch(fileUploadTextureBlob, () => {
   if (fileName.value === null && fileUploadTextureBlob.value) {
     fileName.value = 'New upload'
@@ -121,11 +144,11 @@ watch(fileUploadTextureBlob, () => {
 })
 
 const variant = ref<SkinModel>('CLASSIC')
-const selectedCape = ref<Cape|undefined>(undefined)
+const selectedCape = ref<Cape | undefined>(undefined)
 const props = defineProps<{ capes?: Cape[] }>()
-const firstThreeCapes = computed(() => props.capes?.slice(0,3) ?? [])
+const firstThreeCapes = computed(() => props.capes?.slice(0, 3) ?? [])
 
-const localPreviewUrl = ref<string|null>(null)
+const localPreviewUrl = ref<string | null>(null)
 watch(fileUploadTextureBlob, (blob, prev) => {
   if (prev && localPreviewUrl.value) URL.revokeObjectURL(localPreviewUrl.value)
   if (blob) localPreviewUrl.value = URL.createObjectURL(new Blob([blob]))
@@ -137,9 +160,7 @@ const previewSkin = computed(() => {
   return '/src/assets/skins/steve.png'
 })
 
-const disableSave = computed(() =>
-  mode.value==='new' && !fileUploadTextureBlob.value
-)
+const disableSave = computed(() => mode.value === 'new' && !fileUploadTextureBlob.value)
 
 function resetState() {
   mode.value = 'new'
@@ -159,7 +180,7 @@ function show(e: MouseEvent, skin?: Skin) {
   currentSkin.value = skin ?? null
   if (skin) {
     variant.value = skin.variant
-    selectedCape.value = props.capes?.find(c=>c.id===skin.cape_id)
+    selectedCape.value = props.capes?.find((c) => c.id === skin.cape_id)
   } else {
     variant.value = 'CLASSIC'
     selectedCape.value = undefined
@@ -172,7 +193,7 @@ function hide() {
   resetState()
 }
 
-async function onTextureSelected(files: FileList|null) {
+async function onTextureSelected(files: FileList | null) {
   if (!files?.length) return
   const file = files[0]
   fileName.value = file.name
@@ -180,9 +201,10 @@ async function onTextureSelected(files: FileList|null) {
   fileUploadTextureBlob.value = new Uint8Array(buf)
 }
 
-function changeVariant(v: SkinModel){ variant.value = v }
-function selectCape(c: Cape|undefined){ selectedCape.value = c }
-function viewMoreCapes(){
+function selectCape(c: Cape | undefined) {
+  selectedCape.value = c
+}
+function viewMoreCapes() {
   // TODO: later
 }
 
@@ -211,7 +233,7 @@ async function save() {
       blob = new Uint8Array(buf)
     }
 
-    await unequip_skin();
+    await unequip_skin()
 
     if (mode.value === 'new') {
       await add_and_equip_custom_skin(blob, variant.value, selectedCape.value)
@@ -229,8 +251,7 @@ async function save() {
 }
 
 const emit = defineEmits<{
-  (e:'saved'):void
-  (e:'deleted'):void
+  (e: 'saved' | 'deleted'): void
 }>()
 
 defineExpose({ show, hide })

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue'
+import { useTemplateRef } from 'vue'
 import { NewModal as Modal } from '@modrinth/ui'
 import { show_ads_window, hide_ads_window } from '@/helpers/ads.js'
 import { useTheming } from '@/store/theme.ts'

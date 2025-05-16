@@ -83,13 +83,15 @@ async function refreshFeaturedProjects() {
 await fetchInstances()
 await refreshFeaturedProjects()
 
-const unlistenProfile = await profile_listener(async (e: { event: string; profile_path_id: string }) => {
-  await fetchInstances()
+const unlistenProfile = await profile_listener(
+  async (e: { event: string; profile_path_id: string }) => {
+    await fetchInstances()
 
-  if (e.event === 'added' || e.event === 'created' || e.event === 'removed') {
-    await refreshFeaturedProjects()
-  }
-})
+    if (e.event === 'added' || e.event === 'created' || e.event === 'removed') {
+      await refreshFeaturedProjects()
+    }
+  },
+)
 
 onUnmounted(() => {
   unlistenProfile()

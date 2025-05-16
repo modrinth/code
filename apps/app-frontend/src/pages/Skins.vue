@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { UpdatedIcon, PlusIcon } from '@modrinth/assets'
 import { ButtonStyled, SkinPreviewRenderer, SkinButton, SkinLikeTextButton } from '@modrinth/ui'
-import {ref, computed, useTemplateRef, watch} from 'vue'
+import { ref, computed, useTemplateRef, watch } from 'vue'
 import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
 import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
 import { handleError } from '@/store/notifications'
@@ -9,12 +9,15 @@ import {
   get_available_skins,
   get_available_capes,
   filterSavedSkins,
-  filterDefaultSkins, equip_skin, set_default_cape
+  filterDefaultSkins,
+  equip_skin,
+  set_default_cape,
 } from '@/helpers/skins.ts'
 import { get as getSettings } from '@/helpers/settings.ts'
 import type { Cape, Skin } from '@/helpers/skins.ts'
-import {get_default_user, users} from "@/helpers/auth";
-import {generateSkinPreviews, map, RenderResult} from "@/helpers/rendering/batchSkinRenderer.ts";
+import { get_default_user, users } from '@/helpers/auth'
+import type { RenderResult } from '@/helpers/rendering/batchSkinRenderer.ts'
+import { generateSkinPreviews, map } from '@/helpers/rendering/batchSkinRenderer.ts'
 
 const editSkinModal = useTemplateRef('editSkinModal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
@@ -30,7 +33,7 @@ const defaultCape = ref<Cape>()
 const forceSkinRefreshKey = ref(0)
 
 const previewSkin = computed(() =>
-  selectedSkin.value ? `https://vzge.me/processedskin/${selectedSkin.value.texture_key}.png` : ''
+  selectedSkin.value ? `https://vzge.me/processedskin/${selectedSkin.value.texture_key}.png` : '',
 )
 
 const savedSkins = computed(() => filterSavedSkins(skins.value))
@@ -38,7 +41,7 @@ const defaultSkins = computed(() => filterDefaultSkins(skins.value))
 
 const currentCape = computed(() => {
   if (selectedSkin.value?.cape_id) {
-    const overrideCape = capes.value.find(c => c.id === selectedSkin.value?.cape_id)
+    const overrideCape = capes.value.find((c) => c.id === selectedSkin.value?.cape_id)
     if (overrideCape) {
       return overrideCape
     }
@@ -56,10 +59,10 @@ async function loadCapes() {
 
 async function loadSkins() {
   skins.value = (await get_available_skins().catch(handleError)) ?? []
-  generateSkinPreviews(skins.value, capes.value);
+  generateSkinPreviews(skins.value, capes.value)
 
   const previousSkinId = selectedSkin.value?.texture_key
-  selectedSkin.value = skins.value.find((s) => s.is_equipped) ?? null;
+  selectedSkin.value = skins.value.find((s) => s.is_equipped) ?? null
 
   if (previousSkinId && selectedSkin.value?.texture_key === previousSkinId) {
     forceSkinRefreshKey.value++
@@ -67,25 +70,25 @@ async function loadSkins() {
 }
 
 async function changeSkin(newSkin: Skin) {
-  await equip_skin(newSkin).catch(handleError);
-  await loadSkins();
+  await equip_skin(newSkin).catch(handleError)
+  await loadSkins()
 }
 
 async function handleCapeSelected(cape: Cape | undefined) {
-  await set_default_cape(cape).catch(handleError);
-  await loadSkins();
-  await loadCapes();
+  await set_default_cape(cape).catch(handleError)
+  await loadSkins()
+  await loadCapes()
 }
 
 async function onSkinSaved() {
-  await Promise.all([loadCapes(), loadSkins()]);
+  await Promise.all([loadCapes(), loadSkins()])
 }
 
 async function loadUsername() {
   try {
     const defaultId = await get_default_user()
-    const allAccounts = await users();
-    const current = allAccounts.find(acc => acc.profile.id === defaultId)
+    const allAccounts = await users()
+    const current = allAccounts.find((acc) => acc.profile.id === defaultId)
     username.value = current?.profile?.name ?? undefined
   } catch (e) {
     handleError(e)
@@ -94,13 +97,16 @@ async function loadUsername() {
 }
 
 function getBakedSkinTextures(skin: Skin): RenderResult | undefined {
-  const key = `${skin.texture_key}+${skin.variant}+${skin.cape_id ?? 'no-cape'}`;
-  return map.get(key);
+  const key = `${skin.texture_key}+${skin.variant}+${skin.cape_id ?? 'no-cape'}`
+  return map.get(key)
 }
 
-watch(() => selectedSkin.value?.cape_id, () => {
-  forceSkinRefreshKey.value++
-})
+watch(
+  () => selectedSkin.value?.cape_id,
+  () => {
+    forceSkinRefreshKey.value++
+  },
+)
 </script>
 
 <template>
@@ -110,17 +116,22 @@ watch(() => selectedSkin.value?.cape_id, () => {
     @saved="onSkinSaved"
     @deleted="() => loadSkins()"
   />
-  <SelectCapeModal ref="selectCapeModal" :capes="capes" @select="handleCapeSelected"/>
+  <SelectCapeModal ref="selectCapeModal" :capes="capes" @select="handleCapeSelected" />
   <div class="p-6 grid grid-cols-[300px_1fr] xl:grid-cols-[3fr_5fr] gap-6">
     <div class="sticky top-6 self-start">
       <div class="flex justify-between gap-4">
         <h1 class="m-0 text-2xl font-bold">Skins</h1>
         <ButtonStyled :disabled="!!selectedSkin?.cape_id">
           <button
-            v-tooltip="selectedSkin?.cape_id ? 'The equipped skin is overriding the default cape.' : undefined"
+            v-tooltip="
+              selectedSkin?.cape_id
+                ? 'The equipped skin is overriding the default cape.'
+                : undefined
+            "
             :disabled="!!selectedSkin?.cape_id"
-            @click="(e: MouseEvent) =>
-              selectCapeModal?.show(e, selectedSkin?.texture_key, currentCape)"
+            @click="
+              (e: MouseEvent) => selectCapeModal?.show(e, selectedSkin?.texture_key, currentCape)
+            "
           >
             <UpdatedIcon />
             Change cape
@@ -145,7 +156,11 @@ watch(() => selectedSkin.value?.cape_id, () => {
       <section class="flex flex-col gap-3">
         <h2 class="text-lg font-bold m-0 text-primary">Saved skins</h2>
         <div class="flex flex-row flex-wrap gap-2">
-          <SkinLikeTextButton @click="editSkinModal?.show" class="flex-none w-[8vw] h-[15vw] max-w-[8rem] max-h-[15rem]" tooltip="Add a skin">
+          <SkinLikeTextButton
+            class="flex-none w-[8vw] h-[15vw] max-w-[8rem] max-h-[15rem]"
+            tooltip="Add a skin"
+            @click="editSkinModal?.show"
+          >
             <template #icon>
               <PlusIcon />
             </template>
@@ -154,14 +169,14 @@ watch(() => selectedSkin.value?.cape_id, () => {
 
           <SkinButton
             v-for="skin in savedSkins"
-            class="flex-none w-[8vw] h-[15vw] max-w-[8rem] max-h-[15rem]"
             :key="`saved-skin-${skin.texture_key}`"
+            class="flex-none w-[8vw] h-[15vw] max-w-[8rem] max-h-[15rem]"
             editable
             :forward-image-src="getBakedSkinTextures(skin)?.forwards"
             :backward-image-src="getBakedSkinTextures(skin)?.backwards"
             :selected="selectedSkin === skin"
             @select="changeSkin(skin)"
-            @edit="e => editSkinModal?.show(e, skin)"
+            @edit="(e) => editSkinModal?.show(e, skin)"
           />
         </div>
       </section>
@@ -171,14 +186,14 @@ watch(() => selectedSkin.value?.cape_id, () => {
         <div class="flex flex-row flex-wrap gap-2">
           <SkinButton
             v-for="skin in defaultSkins"
-            class="flex-none w-[8vw] h-[15vw] max-w-[8rem] max-h-[15rem]"
             :key="`default-skin-${skin.texture_key}`"
+            class="flex-none w-[8vw] h-[15vw] max-w-[8rem] max-h-[15rem]"
             :forward-image-src="getBakedSkinTextures(skin)?.forwards"
             :backward-image-src="getBakedSkinTextures(skin)?.backwards"
             :selected="selectedSkin === skin"
             :tooltip="skin.name"
             @select="changeSkin(skin)"
-            @edit="e => editSkinModal?.show(e, skin)"
+            @edit="(e) => editSkinModal?.show(e, skin)"
           />
         </div>
       </section>
