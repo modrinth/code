@@ -1,26 +1,31 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { Cape } from '@/helpers/skins.ts'
 
 const emit = defineEmits<{
   (e: 'select'): void
 }>()
 
-const highlighted = computed(() => props.selected ?? props.cape.is_equipped)
-
 const props = withDefaults(
   defineProps<{
-    cape: Cape
+    name: string
+    id: string
+    texture: string
+    isEquipped?: boolean
     selected?: boolean
   }>(),
   {
+    isEquipped: false,
     selected: undefined,
   },
 )
+
+console.log(props);
+
+const highlighted = computed(() => props.selected ?? props.isEquipped)
 </script>
 
 <template>
-  <button v-tooltip="cape.name" class="block border-0 m-0 p-0 bg-transparent group cursor-pointer" :aria-label="cape.name" @click="emit('select')">
+  <button v-tooltip="name" class="block border-0 m-0 p-0 bg-transparent group cursor-pointer" :aria-label="name" @click="emit('select')">
     <span
       :class="
         highlighted
@@ -30,23 +35,25 @@ const props = withDefaults(
       class="block p-[3px] rounded-lg border-0 group-active:scale-95 transition-all"
     >
       <span
-        class="block cursed-cape-shit rounded-[5px]"
+        class="block magical-cape-transform rounded-[5px]"
         :class="{ 'highlighted-inner-shadow': highlighted }"
       >
-        <img :src="cape.texture" alt="" />
+        <img :src="texture" alt="" />
       </span>
     </span>
   </button>
 </template>
 <style lang="scss" scoped>
-.cursed-cape-shit {
+.magical-cape-transform {
   aspect-ratio: 10 / 16;
   position: relative;
   overflow: hidden;
   box-sizing: content-box;
+  width: 60px;
+  min-height: 96px;
 }
 
-.cursed-cape-shit img {
+.magical-cape-transform img {
   position: absolute;
   object-fit: cover;
   image-rendering: pixelated;

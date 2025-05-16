@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { ButtonStyled, commonMessages } from '@modrinth/ui'
 import { EditIcon } from '@modrinth/assets'
 import { useVIntl } from '@vintl/vintl'
-import type { Cape, Skin } from '@/helpers/skins.ts'
 
 const { formatMessage } = useVIntl()
 
@@ -13,43 +12,30 @@ const emit = defineEmits<{
 }>()
 
 const props = withDefaults(defineProps<{
-  skin: Skin
+  forwardImageSrc?: string
+  backwardImageSrc?: string
   selected: boolean
-  defaultCape?: Cape
   editable?: boolean
+  tooltip?: string
 }>(), {
-  defaultCape: undefined,
   editable: false,
 })
 
-const base64Prefix = 'data:image/png;base64,'
-const mcUrlRegex = /texture\/([a-fA-F0-9]+)$/
-
-const texture = computed(() => {
-  const mcTextureMatch = props.skin.texture.match(mcUrlRegex)
-
-  if (mcTextureMatch) {
-    return mcTextureMatch[1]
-  } else if (props.skin.texture.startsWith(base64Prefix)) {
-    return props.skin.texture.split(base64Prefix)[1]
-  } else {
-    return props.skin.texture
-  }
+const pressed = ref(false)
+const imagesLoaded = ref({
+  forward: Boolean(props.forwardImageSrc),
+  backward: Boolean(props.backwardImageSrc)
 })
 
-const slim = computed(() => props.skin.variant === 'Slim')
-
-const skinUrl = computed(
-  () => `https://vzge.me/bust/${texture.value}.png?no=ears${slim.value ? '&slim' : ''}`,
-)
-const backUrl = computed(() => `${skinUrl.value}&y=130`)
-
-const pressed = ref(false)
+function onImageLoad(type: 'forward' | 'backward') {
+  imagesLoaded.value[type] = true
+}
 </script>
 
 <template>
   <div
-    class="skin-button__parent group flex relative border-2 border-solid transform-3d rotate-y-90 transition-all h-40 p-0 bg-transparent rounded-xl overflow-hidden"
+    v-tooltip="tooltip ?? undefined"
+    class="skin-button__parent group flex relative border-2 border-solid transform-3d rotate-y-90 transition-all p-0 bg-transparent rounded-xl overflow-hidden"
     :class="[
       selected ? `border-brand` : 'border-transparent',
       {
@@ -65,21 +51,29 @@ const pressed = ref(false)
       @mouseleave="pressed = false"
       @click="emit('select')"
     ></button>
-    <span class="skin-button__image-parent pointer-events-none w-full h-full">
+
+    <div v-if="!forwardImageSrc || !backwardImageSrc" class="skeleton-loader w-full h-full rounded-xl">
+      <div class="absolute inset-0 rounded-xl skeleton"></div>
+    </div>
+
+    <span v-else class="skin-button__image-parent pointer-events-none w-full h-full flex flex-col justify-end">
       <img
         alt=""
-        :src="skinUrl"
-        class="skin-button__image-facing rounded-xl object-contain object-bottom w-full h-full mt-auto mx-auto"
+        :src="forwardImageSrc"
+        class="skin-button__image-facing rounded-xl object-contain w-full h-auto mx-auto mb-0"
+        @load="onImageLoad('forward')"
       />
       <img
         alt=""
-        :src="backUrl"
-        class="skin-button__image-away rounded-xl object-contain object-bottom w-full h-full mt-auto mx-auto"
+        :src="backwardImageSrc"
+        class="skin-button__image-away rounded-xl object-contain w-full h-auto mx-auto mb-0"
+        @load="onImageLoad('backward')"
       />
     </span>
+
     <span
       v-if="editable"
-      class="absolute pointer-events-none inset-0 flex items-end p-2 translate-y-4 -translate-x-4 scale-75 opacity-0 transition-all group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 group-hover:translate-x-0"
+      class="absolute pointer-events-none inset-0 flex items-end justify-center p-2 translate-y-4 scale-75 opacity-0 transition-all group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 group-hover:translate-x-0"
     >
       <ButtonStyled color="brand">
         <button
@@ -99,6 +93,21 @@ const pressed = ref(false)
 <style scoped lang="scss">
 .skin-button__parent {
   perspective: 1000px;
+
+  .skeleton-loader {
+    aspect-ratio: 1 / 1;
+  }
+
+  .skeleton {
+    background: linear-gradient(
+        90deg,
+        var(--color-bg, #f0f0f0) 25%,
+        var(--color-raised-bg, #e0e0e0) 50%,
+        var(--color-bg, #f0f0f0) 75%
+    );
+    background-size: 200% 100%;
+    animation: wave 1500ms infinite linear;
+  }
 
   .skin-button__image-parent {
     transform-style: preserve-3d;
@@ -146,6 +155,15 @@ const pressed = ref(false)
         animation: appear-halfway 0.3s ease-in-out forwards;
       }
     }
+  }
+}
+
+@keyframes wave {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }
 
