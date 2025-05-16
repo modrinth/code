@@ -1,10 +1,10 @@
-use super::version_creation::{try_create_version_fields, InitialVersionData};
-use crate::auth::{get_user_from_headers, AuthenticationError};
+use super::version_creation::{InitialVersionData, try_create_version_fields};
+use crate::auth::{AuthenticationError, get_user_from_headers};
 use crate::database::models::loader_fields::{
     Loader, LoaderField, LoaderFieldEnumValue,
 };
 use crate::database::models::thread_item::ThreadBuilder;
-use crate::database::models::{self, image_item, User};
+use crate::database::models::{self, User, image_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostingError};
 use crate::models::error::ApiError;
@@ -168,7 +168,7 @@ pub struct ProjectCreateData {
     pub name: String,
     #[validate(
         length(min = 3, max = 64),
-        regex = "crate::util::validate::RE_URL_SAFE"
+        regex(path = *crate::util::validate::RE_URL_SAFE)
     )]
     #[serde(alias = "mod_slug")]
     /// The slug of a project, used for vanity URLs
@@ -182,8 +182,7 @@ pub struct ProjectCreateData {
     /// A long description of the project, in markdown.
     pub description: String,
 
-    #[validate(length(max = 32))]
-    #[validate]
+    #[validate(nested, length(max = 32))]
     /// A list of initial versions to upload with the created project
     pub initial_versions: Vec<InitialVersionData>,
     #[validate(length(max = 3))]
@@ -209,8 +208,7 @@ pub struct ProjectCreateData {
     /// The license id that the project follows
     pub license_id: String,
 
-    #[validate(length(max = 64))]
-    #[validate]
+    #[validate(nested, length(max = 64))]
     /// The multipart names of the gallery items to upload
     pub gallery_items: Option<Vec<NewGalleryItem>>,
     #[serde(default = "default_requested_status")]
@@ -373,8 +371,7 @@ async fn project_create_inner(
                 )))
             })?;
 
-        let content_disposition = field.content_disposition();
-        let name = content_disposition.get_name().ok_or_else(|| {
+        let name = field.name().ok_or_else(|| {
             CreateError::MissingValueError(String::from("Missing content name"))
         })?;
 
@@ -472,7 +469,7 @@ async fn project_create_inner(
         }
 
         let result = async {
-            let content_disposition = field.content_disposition().clone();
+            let content_disposition = field.content_disposition().unwrap().clone();
 
             let name = content_disposition.get_name().ok_or_else(|| {
                 CreateError::MissingValueError("Missing content name".to_string())
@@ -810,8 +807,7 @@ async fn project_create_inner(
                     || image.context.inner_id().is_some()
                 {
                     return Err(CreateError::InvalidInput(format!(
-                        "Image {} is not unused and in the 'project' context",
-                        image_id
+                        "Image {image_id} is not unused and in the 'project' context"
                     )));
                 }
 
@@ -830,8 +826,7 @@ async fn project_create_inner(
                 image_item::Image::clear_cache(image.id.into(), redis).await?;
             } else {
                 return Err(CreateError::InvalidInput(format!(
-                    "Image {} does not exist",
-                    image_id
+                    "Image {image_id} does not exist"
                 )));
             }
         }

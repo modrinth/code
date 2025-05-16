@@ -5,8 +5,8 @@ use common::database::*;
 use common::dummy_data::DUMMY_CATEGORIES;
 
 use ariadne::ids::base62_impl::parse_base62;
-use common::environment::with_test_environment;
 use common::environment::TestEnvironment;
+use common::environment::with_test_environment;
 use common::search::setup_search_projects;
 use futures::stream::StreamExt;
 use serde_json::json;
@@ -114,7 +114,7 @@ async fn search_projects() {
                         let num_hits = projects.total_hits;
                         expected_project_ids.sort();
                         found_project_ids.sort();
-                        println!("Facets: {:?}", facets);
+                        println!("Facets: {facets:?}");
                         assert_eq!(found_project_ids, expected_project_ids);
                         assert_eq!(num_hits, { expected_project_ids.len() });
                     }

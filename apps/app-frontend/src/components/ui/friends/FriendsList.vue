@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Avatar, ButtonStyled, OverflowMenu } from '@modrinth/ui'
+import { Avatar, ButtonStyled, OverflowMenu, useRelativeTime } from '@modrinth/ui'
 import {
   UserPlusIcon,
   MoreVerticalIcon,
@@ -17,6 +17,8 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+
+const formatRelativeTime = useRelativeTime()
 
 const props = defineProps<{
   credentials: unknown | null
@@ -205,7 +207,9 @@ onUnmounted(() => {
                 You sent <span class="font-bold">{{ friend.username }}</span> a friend request
               </template>
             </p>
-            <p class="m-0 text-sm text-secondary">{{ friend.created.fromNow() }}</p>
+            <p class="m-0 text-sm text-secondary">
+              {{ formatRelativeTime(friend.created.toISOString()) }}
+            </p>
           </div>
           <div class="flex gap-2">
             <template v-if="friend.id === userCredentials.user_id">

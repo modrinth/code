@@ -1,8 +1,8 @@
 //! Theseus tag management interface
 use crate::state::CachedEntry;
 pub use crate::{
-    state::{Category, DonationPlatform, GameVersion, Loader},
     State,
+    state::{Category, DonationPlatform, GameVersion, Loader},
 };
 
 /// Get category tags

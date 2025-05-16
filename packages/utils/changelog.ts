@@ -11,6 +11,108 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-05-08T09:00:00-07:00`,
+    product: 'servers',
+    body: `### Added
+- Added the ability to extract .zip files in the Files page.
+- Added the ability to extract a remote .zip file from a URL, or from a CurseForge modpack version URL.
+- Dependencies will now automatically be installed when installing a mod from Modrinth.`,
+  },
+  {
+    date: `2025-05-08T09:00:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed game version and loader selection when editing a version only showing up to 6 selected items, making it frustrating to remove a specific version.
+- Fixed organization URLs being case sensitive. (Contributed by [IMB11](https://github.com/modrinth/code/pull/3621))
+- Fixed notifications not loading sometimes. (Contributed by [IMB11](https://github.com/modrinth/code/pull/3624))
+- Fixed marking all notifications as read. (Contributed by [IMB11](https://github.com/modrinth/code/pull/3624))
+- Fixed relative time sometimes having poor rounding, and sometimes showing future dates unexpectedly. (Contributed by [IMB11](https://github.com/modrinth/code/pull/3612))
+- Fixed localized pricing not showing in some cases for Modrinth+. (Contributed by [IMB11](https://github.com/modrinth/code/pull/3623))
+- Fixed Modrinth changelog page link back to the full changelog not being clickable sometimes. (Contributed by [ThatGravyBoat](https://github.com/modrinth/code/pull/3593))
+- Fixed analytics 'Views' tab not having the updated display for 'Other' regions.`,
+  },
+  {
+    date: `2025-05-01T18:30:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Added a button to switch Modrinth+ billing between monthly and yearly.
+- Updated Modrinth App marketing page screenshots.`,
+  },
+  {
+    date: `2025-05-01T18:10:00-07:00`,
+    product: 'app',
+    version: `0.9.5`,
+    body: `### Improvements
+- Fixed certain mods with a large number of versions not being able to be installed or load their versions.
+- Fixed server descriptions not being rendered with the Minecraft font.
+- When installing a modpack, the page will now change to the instance once it's created.
+- Last played time for existing servers will now be loaded from log files instead of displaying "Never played".
+- Home page's "Jump back in" section will now display in multiple columns when the screen is very large.
+- Added the ability to launch the instance from a World entry on the Home page.
+- Added the ability to hide a world from the Home page.
+- Added an appearance setting to only show instances instead of worlds on the Home page.
+- Fixed Home page rendering being blocked by server pings.
+- Fixed Home page sometimes not sending the correct protocol version when fetching server data.
+- Fixed server data not being loaded immediately after adding it.
+- Fixed Worlds tab filters showing up in the wrong situations.
+- Fixed new Singleplayer worlds not being added to the Worlds tab without a refresh.
+- Fixed an excessive number of items showing up in "Jump back in" sometimes.
+- Fixed critical error modal cutting off long single-line error messages.`,
+  },
+  {
+    date: `2025-04-29T08:20:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed multiple 'Hidden' countries showing up in analytics, updated flag and changed to 'Other'.`,
+  },
+  {
+    date: `2025-04-28T19:45:00-07:00`,
+    product: 'servers',
+    body: `### Added
+- Added support for installing snapshot versions of Minecraft.
+
+### Improvements
+- Fixed a bug where the loader version wouldn't update after changing Minecraft version if the old loader version did not support the newly selected Minecraft version.
+- Improved wording of unprovisioned servers, to inform people that newly purchased servers may be unprovisioned for a small amount of time.`,
+  },
+  {
+    date: `2025-04-28T19:45:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Combined Apple Silicon and Intel download links for Modrinth App into one link.
+- Added an option to copy a permanent link (using IDs instead of changeable slugs) to projects, users, and organizations.
+- Fixed overflow issue with dev-mode Maven coordinates widget, and changed wording.`,
+  },
+  {
+    date: `2025-04-26T19:15:00-07:00`,
+    product: 'app',
+    version: `0.9.4`,
+    body: `### Added
+- Added a Worlds tab to instances that allow you to manage your worlds and servers directly from the app
+  - Server ping, play count, and descriptions will all show before having to open the game.
+  - Add, edit, and remove servers
+  - Edit and delete singleplayer worlds
+- Added 'Quick Play' functionality, allowing you to jump straight into worlds and servers from the app
+- Added new launcher-log.txt file to log stdout to a file, similar to the Minecraft Launcher which can be helpful for debugging.
+
+### Improvements
+- Overhauled the 'Jump back in' section of the Home page, showing recently played worlds instead of just instances.
+  - This supports the new 'Quick Play' functionality, allowing you to jump back into your recent worlds (on supported Minecraft versions 1.20+)
+- Improved the fatal error dialog to show debug information more prominently, and allow you to copy it to share with support.
+- Fixed the display of critical announcements that has been broken since 0.9.0.
+- Fixed content authors not displaying properly on Content page if the content was owned by an organization.
+- Fixed random errors on the Library page, causing no instances to load.
+- Fixed .mrpack file association on Linux.
+- Fixed occasional failures when moving app directory between disks.`,
+  },
+  {
+    date: `2025-04-25T19:45:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Added feedback survey upon Modrinth Servers cancellation.
+- Added FAQ question about the currency for Modrinth Servers subscription payments.`,
+  },
+  {
     date: `2025-04-18T22:30:00-07:00`,
     product: 'web',
     body: `### Improvements

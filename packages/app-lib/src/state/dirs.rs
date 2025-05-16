@@ -1,8 +1,8 @@
 //! Theseus directory information
+use crate::LoadingBarType;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::state::{JavaVersion, Profile, Settings};
 use crate::util::fetch::IoSemaphore;
-use crate::LoadingBarType;
 use dashmap::DashSet;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;

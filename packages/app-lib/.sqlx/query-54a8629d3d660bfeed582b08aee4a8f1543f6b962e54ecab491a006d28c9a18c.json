@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT profile_path, host, port, join_time\n        FROM join_log\n        WHERE profile_path = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "profile_path",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "host",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "port",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "join_time",
+        "ordinal": 3,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "54a8629d3d660bfeed582b08aee4a8f1543f6b962e54ecab491a006d28c9a18c"
+}

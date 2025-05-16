@@ -4,7 +4,7 @@ use crate::models::v2::projects::LegacyProject;
 use crate::queue::session::AuthQueue;
 use crate::routes::internal;
 use crate::{database::redis::RedisPool, routes::v2_reroute};
-use actix_web::{get, web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, get, web};
 use serde::Deserialize;
 use sqlx::PgPool;
 

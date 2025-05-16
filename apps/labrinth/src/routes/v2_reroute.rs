@@ -1,18 +1,18 @@
 use std::collections::HashMap;
 
-use super::v3::project_creation::CreateError;
 use super::ApiError;
+use super::v3::project_creation::CreateError;
 use crate::models::v2::projects::LegacySideType;
 use crate::util::actix::{
-    generate_multipart, MultipartSegment, MultipartSegmentData,
+    MultipartSegment, MultipartSegmentData, generate_multipart,
 };
 use actix_multipart::Multipart;
+use actix_web::HttpResponse;
 use actix_web::http::header::{
     ContentDisposition, HeaderMap, TryIntoHeaderPair,
 };
-use actix_web::HttpResponse;
-use futures::{stream, Future, StreamExt};
-use serde_json::{json, Value};
+use futures::{Future, StreamExt, stream};
+use serde_json::{Value, json};
 
 pub async fn extract_ok_json<T>(
     response: HttpResponse,
@@ -73,7 +73,7 @@ where
 
     if let Some(field) = multipart.next().await {
         let mut field = field?;
-        let content_disposition = field.content_disposition().clone();
+        let content_disposition = field.content_disposition().unwrap().clone();
         let field_name = content_disposition.get_name().unwrap_or("");
         let field_filename = content_disposition.get_filename();
         let field_content_type = field.content_type();
@@ -100,7 +100,7 @@ where
 
     while let Some(field) = multipart.next().await {
         let mut field = field?;
-        let content_disposition = field.content_disposition().clone();
+        let content_disposition = field.content_disposition().unwrap().clone();
         let field_name = content_disposition.get_name().unwrap_or("");
         let field_filename = content_disposition.get_filename();
         let field_content_type = field.content_type();
@@ -144,7 +144,7 @@ where
 
     match (
         "Content-Type",
-        format!("multipart/form-data; boundary={}", boundary).as_str(),
+        format!("multipart/form-data; boundary={boundary}").as_str(),
     )
         .try_into_pair()
     {
@@ -153,8 +153,7 @@ where
         }
         Err(err) => {
             CreateError::InvalidInput(format!(
-                "Error inserting test header: {:?}.",
-                err
+                "Error inserting test header: {err:?}."
             ));
         }
     };

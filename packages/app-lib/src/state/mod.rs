@@ -45,6 +45,9 @@ pub use self::mr_auth::*;
 
 mod legacy_converter;
 
+pub mod attached_world_data;
+pub mod server_join_log;
+
 // Global state
 // RwLock on state only has concurrent reads, except for config dir change which takes control of the State
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
@@ -108,7 +111,9 @@ impl State {
     /// Get the current launcher state, waiting for initialization
     pub async fn get() -> crate::Result<Arc<Self>> {
         if !LAUNCHER_STATE.initialized() {
-            tracing::error!("Attempted to get state before it is initialized - this should never happen!");
+            tracing::error!(
+                "Attempted to get state before it is initialized - this should never happen!"
+            );
             while !LAUNCHER_STATE.initialized() {
                 tokio::time::sleep(std::time::Duration::from_millis(100)).await;
             }

@@ -33,7 +33,7 @@ pub fn random_base62_rng_range<R: rand::RngCore>(
 ) -> u64 {
     use rand::Rng;
     assert!(n_min > 0 && n_max <= 11 && n_min <= n_max);
-    // gen_range is [low, high): max value is `MULTIPLES[n] - 1`,
+    // random_range is [low, high): max value is `MULTIPLES[n] - 1`,
     // which is n characters long when encoded
     rng.gen_range(MULTIPLES[n_min - 1]..MULTIPLES[n_max])
 }

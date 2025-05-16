@@ -48,8 +48,10 @@ import dayjs from 'dayjs'
 import { useVIntl, defineMessages } from '@vintl/vintl'
 import { computed, ref } from 'vue'
 import AutoLink from '../base/AutoLink.vue'
+import { useRelativeTime } from '../../composables'
 
 const { formatMessage } = useVIntl()
+const formatRelativeTime = useRelativeTime()
 
 const props = withDefaults(
   defineProps<{
@@ -70,7 +72,7 @@ const recent = computed(() => props.entry.date.isAfter(currentDate.value.subtrac
 const future = computed(() => props.entry.date.isAfter(currentDate.value))
 const dateTooltip = computed(() => props.entry.date.format('MMMM D, YYYY [at] h:mm A'))
 
-const relativeDate = computed(() => props.entry.date.fromNow())
+const relativeDate = computed(() => formatRelativeTime(props.entry.date.toISOString()))
 const longDate = computed(() => props.entry.date.format('MMMM D, YYYY'))
 const versionName = computed(() => props.entry.version ?? longDate.value)
 

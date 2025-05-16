@@ -9,10 +9,10 @@ use crate::models::projects::{ProjectId, VersionId};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::{auth::get_user_from_headers, database};
-use actix_web::{get, route, web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, get, route, web};
 use sqlx::PgPool;
 use std::collections::HashSet;
-use yaserde_derive::YaSerialize;
+use yaserde::YaSerialize;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(maven_metadata);

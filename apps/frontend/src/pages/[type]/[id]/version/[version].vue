@@ -541,7 +541,6 @@
             :close-on-select="false"
             :clear-on-select="false"
             :show-labels="false"
-            :limit="6"
             :hide-selected="true"
             placeholder="Choose loaders..."
           />
@@ -566,7 +565,6 @@
               :close-on-select="false"
               :clear-on-select="false"
               :show-labels="false"
-              :limit="6"
               :hide-selected="true"
               :custom-label="(version) => version"
               placeholder="Choose versions..."
@@ -622,7 +620,7 @@
           <CopyCode :text="version.id" />
         </div>
         <div v-if="!isEditing && flags.developerMode">
-          <h4>Modrinth Maven</h4>
+          <h4>Maven coordinates</h4>
           <div class="maven-section">
             <CopyCode :text="`maven.modrinth:${project.id}:${version.id}`" />
           </div>
@@ -1555,6 +1553,10 @@ export default defineNuxtComponent({
     display: flex;
     align-items: center;
     gap: 0.5rem;
+
+    button {
+      max-width: 100%;
+    }
   }
 
   .team-member {

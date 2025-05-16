@@ -1052,7 +1052,6 @@ watch(
       document.body.removeAttribute("tabindex");
     }
 
-    updateCurrentDate();
     runAnalytics();
   },
 );

@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use native_dialog::{MessageDialog, MessageType};
+use native_dialog::{DialogBuilder, MessageLevel};
 use std::env;
 use tauri::{Listener, Manager};
 use theseus::prelude::*;
@@ -13,14 +13,6 @@ mod error;
 
 #[cfg(target_os = "macos")]
 mod macos;
-
-#[cfg(target_os = "macos")]
-#[macro_use]
-extern crate cocoa;
-
-#[cfg(target_os = "macos")]
-#[macro_use]
-extern crate objc;
 
 // Should be called in launcher initialization
 #[tracing::instrument(skip_all)]
@@ -113,14 +105,14 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
 fn show_window(app: tauri::AppHandle) {
     let win = app.get_window("main").unwrap();
     if let Err(e) = win.show() {
-        MessageDialog::new()
-            .set_type(MessageType::Error)
+        DialogBuilder::message()
+            .set_level(MessageLevel::Error)
             .set_title("Initialization error")
-            .set_text(&format!(
-                "Cannot display application window due to an error:\n{}",
-                e
+            .set_text(format!(
+                "Cannot display application window due to an error:\n{e}"
             ))
-            .show_alert()
+            .alert()
+            .show()
             .unwrap();
         panic!("cannot display application window")
     } else {
@@ -138,8 +130,7 @@ fn is_dev() -> bool {
 async fn toggle_decorations(b: bool, window: tauri::Window) -> api::Result<()> {
     window.set_decorations(b).map_err(|e| {
         theseus::Error::from(theseus::ErrorKind::OtherError(format!(
-            "Failed to toggle decorations: {}",
-            e
+            "Failed to toggle decorations: {e}"
         )))
     })?;
     Ok(())
@@ -242,9 +233,9 @@ fn main() {
             });
 
             #[cfg(not(target_os = "linux"))]
-            {
-                if let Some(window) = app.get_window("main") {
-                    window.set_shadow(true).unwrap();
+            if let Some(window) = app.get_window("main") {
+                if let Err(e) = window.set_shadow(true) {
+                    tracing::warn!("Failed to set window shadow: {e}");
                 }
             }
 
@@ -268,6 +259,7 @@ fn main() {
         .plugin(api::cache::init())
         .plugin(api::ads::init())
         .plugin(api::friends::init())
+        .plugin(api::worlds::init())
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             is_dev,
@@ -275,11 +267,6 @@ fn main() {
             show_window,
             restart_app,
         ]);
-
-    #[cfg(target_os = "macos")]
-    {
-        builder = builder.plugin(macos::window_ext::init());
-    }
 
     tracing::info!("Initializing app...");
     let app = builder.build(tauri::generate_context!());
@@ -319,28 +306,29 @@ fn main() {
             #[cfg(target_os = "windows")]
             {
                 // tauri doesn't expose runtime errors, so matching a string representation seems like the only solution
-                if format!("{:?}", e).contains(
+                if format!("{e:?}").contains(
                     "Runtime(CreateWebview(WebView2Error(WindowsError",
                 ) {
-                    MessageDialog::new()
-                        .set_type(MessageType::Error)
+                    DialogBuilder::message()
+                        .set_level(MessageLevel::Error)
                         .set_title("Initialization error")
                         .set_text("Your Microsoft Edge WebView2 installation is corrupt.\n\nMicrosoft Edge WebView2 is required to run Modrinth App.\n\nLearn how to repair it at https://support.modrinth.com/en/articles/8797765-corrupted-microsoft-edge-webview2-installation")
-                        .show_alert()
+                        .alert()
+                        .show()
                         .unwrap();
 
                     panic!("webview2 initialization failed")
                 }
             }
 
-            MessageDialog::new()
-                .set_type(MessageType::Error)
+            DialogBuilder::message()
+                .set_level(MessageLevel::Error)
                 .set_title("Initialization error")
-                .set_text(&format!(
-                    "Cannot initialize application due to an error:\n{:?}",
-                    e
+                .set_text(format!(
+                    "Cannot initialize application due to an error:\n{e:?}"
                 ))
-                .show_alert()
+                .alert()
+                .show()
                 .unwrap();
 
             tracing::error!("Error while running tauri application: {:?}", e);

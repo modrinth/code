@@ -7,31 +7,33 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::version_item::{
     DependencyBuilder, VersionBuilder, VersionFileBuilder,
 };
-use crate::database::models::{self, image_item, Organization};
+use crate::database::models::{self, Organization, image_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::images::{Image, ImageContext, ImageId};
 use crate::models::notifications::NotificationBody;
 use crate::models::pack::PackFileHash;
 use crate::models::pats::Scopes;
-use crate::models::projects::{skip_nulls, DependencyType, ProjectStatus};
 use crate::models::projects::{
     Dependency, FileType, Loader, ProjectId, Version, VersionFile, VersionId,
     VersionStatus, VersionType,
 };
+use crate::models::projects::{DependencyType, ProjectStatus, skip_nulls};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
-use crate::validate::{validate_file, ValidationResult};
+use crate::validate::{ValidationResult, validate_file};
 use actix_multipart::{Field, Multipart};
 use actix_web::web::Data;
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, web};
 use chrono::Utc;
 use futures::stream::StreamExt;
+use hex::ToHex;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use sha1::Digest;
 use sqlx::postgres::PgPool;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
@@ -50,7 +52,7 @@ pub struct InitialVersionData {
     pub file_parts: Vec<String>,
     #[validate(
         length(min = 1, max = 32),
-        regex = "crate::util::validate::RE_URL_SAFE"
+        regex(path = *crate::util::validate::RE_URL_SAFE)
     )]
     pub version_number: String,
     #[validate(
@@ -180,7 +182,7 @@ async fn version_create_inner(
         }
 
         let result = async {
-            let content_disposition = field.content_disposition().clone();
+            let content_disposition = field.content_disposition().unwrap().clone();
             let name = content_disposition.get_name().ok_or_else(|| {
                 CreateError::MissingValueError("Missing content name".to_string())
             })?;
@@ -486,8 +488,7 @@ async fn version_create_inner(
                 || image.context.inner_id().is_some()
             {
                 return Err(CreateError::InvalidInput(format!(
-                    "Image {} is not unused and in the 'version' context",
-                    image_id
+                    "Image {image_id} is not unused and in the 'version' context"
                 )));
             }
 
@@ -506,8 +507,7 @@ async fn version_create_inner(
             image_item::Image::clear_cache(image.id.into(), redis).await?;
         } else {
             return Err(CreateError::InvalidInput(format!(
-                "Image {} does not exist",
-                image_id
+                "Image {image_id} does not exist"
             )));
         }
     }
@@ -694,7 +694,8 @@ async fn upload_file_to_version_inner(
         }
 
         let result = async {
-            let content_disposition = field.content_disposition().clone();
+            let content_disposition =
+                field.content_disposition().unwrap().clone();
             let name = content_disposition.get_name().ok_or_else(|| {
                 CreateError::MissingValueError(
                     "Missing content name".to_string(),
@@ -810,7 +811,7 @@ pub async fn upload_file(
 ) -> Result<(), CreateError> {
     let (file_name, file_extension) = get_name_ext(content_disposition)?;
 
-    if other_file_names.contains(&format!("{}.{}", file_name, file_extension)) {
+    if other_file_names.contains(&format!("{file_name}.{file_extension}")) {
         return Err(CreateError::InvalidInput(
             "Duplicate files are not allowed to be uploaded to Modrinth!"
                 .to_string(),
@@ -833,7 +834,7 @@ pub async fn upload_file(
         "Project file exceeds the maximum of 500MiB. Contact a moderator or admin to request permission to upload larger files."
     ).await?;
 
-    let hash = sha1::Sha1::from(&data).hexdigest();
+    let hash = sha1::Sha1::digest(&data).encode_hex::<String>();
     let exists = sqlx::query!(
         "
         SELECT EXISTS(SELECT 1 FROM hashes h

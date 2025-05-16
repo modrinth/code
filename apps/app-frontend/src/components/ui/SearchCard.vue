@@ -124,7 +124,10 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { ref, computed } from 'vue'
 import { install as installVersion } from '@/store/install.js'
+import { useRouter } from 'vue-router'
 dayjs.extend(relativeTime)
+
+const router = useRouter()
 
 const props = defineProps({
   backgroundImage: {
@@ -167,6 +170,9 @@ async function install() {
     () => {
       installing.value = false
       emit('install', props.project.project_id ?? props.project.id)
+    },
+    (profile) => {
+      router.push(`/instance/${profile}`)
     },
   )
 }

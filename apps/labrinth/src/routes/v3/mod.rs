@@ -1,6 +1,6 @@
 pub use super::ApiError;
 use crate::util::cors::default_cors;
-use actix_web::{web, HttpResponse};
+use actix_web::{HttpResponse, web};
 use serde_json::json;
 
 pub mod analytics_get;

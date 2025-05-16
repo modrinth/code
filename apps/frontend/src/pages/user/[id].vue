@@ -125,6 +125,7 @@
                     shown: auth.user?.id !== user.id,
                   },
                   { id: 'copy-id', action: () => copyId() },
+                  { id: 'copy-permalink', action: () => copyPermalink() },
                   {
                     id: 'open-billing',
                     action: () => navigateTo(`/admin/billing/${user.id}`),
@@ -150,6 +151,10 @@
                 <template #copy-id>
                   <ClipboardCopyIcon aria-hidden="true" />
                   {{ formatMessage(commonMessages.copyIdButton) }}
+                </template>
+                <template #copy-permalink>
+                  <ClipboardCopyIcon aria-hidden="true" />
+                  {{ formatMessage(commonMessages.copyPermalinkButton) }}
                 </template>
                 <template #open-billing>
                   <CurrencyIcon aria-hidden="true" />
@@ -355,6 +360,7 @@ import {
   ContentPageHeader,
   commonMessages,
   NewModal,
+  useRelativeTime,
 } from "@modrinth/ui";
 import { isStaff } from "~/helpers/users.js";
 import NavTabs from "~/components/ui/NavTabs.vue";
@@ -381,6 +387,7 @@ const auth = await useAuth();
 const cosmetics = useCosmetics();
 const tags = useTags();
 const flags = useFeatureFlags();
+const config = useRuntimeConfig();
 
 const vintl = useVIntl();
 const { formatMessage } = vintl;
@@ -614,6 +621,10 @@ const badges = computed(() => {
 
 async function copyId() {
   await navigator.clipboard.writeText(user.value.id);
+}
+
+async function copyPermalink() {
+  await navigator.clipboard.writeText(`${config.public.siteUrl}/user/${user.value.id}`);
 }
 
 const navLinks = computed(() => [

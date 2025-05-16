@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { get, set } from '@/helpers/settings'
+import { get, set } from '@/helpers/settings.ts'
 import { ref, watch } from 'vue'
 import { get_max_memory } from '@/helpers/jre'
 import { handleError } from '@/store/notifications'

@@ -1,8 +1,8 @@
 //! Theseus profile management interface
 
 pub use crate::{
-    state::{Hooks, MemorySettings, Profile, Settings, WindowSize},
     State,
+    state::{Hooks, MemorySettings, Profile, Settings, WindowSize},
 };
 
 /// Gets entire settings

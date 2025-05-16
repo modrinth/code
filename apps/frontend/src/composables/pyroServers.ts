@@ -1,7 +1,7 @@
 // usePyroServer is a composable that interfaces with the REDACTED API to get data and control the users server
 import { $fetch, FetchError } from "ofetch";
 import type { ServerNotice } from "@modrinth/utils";
-import type { WSBackupState, WSBackupTask } from "~/types/servers.ts";
+import type { FilesystemOp, FSQueuedOp, WSBackupState, WSBackupTask } from "~/types/servers.ts";
 
 interface PyroFetchOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -40,12 +40,19 @@ class PyroServerError extends Error {
   }
 }
 
-export class PyroServersFetchError extends Error {
+type V1ErrorInfo = {
+  context?: string;
+  error: string;
+  description: string;
+};
+
+export class ServersError extends Error {
   constructor(
     message: string,
     public readonly statusCode?: number,
     public readonly originalError?: Error,
     public readonly module?: string,
+    public readonly v1Error?: V1ErrorInfo,
   ) {
     let errorMessage = message;
     let method = "GET";
@@ -96,17 +103,35 @@ export class PyroServersFetchError extends Error {
   }
 }
 
+export const handleError = (err: any) => {
+  if (err instanceof ServersError && err.v1Error) {
+    addNotification({
+      title: err.v1Error?.context ?? `An error occurred`,
+      type: "error",
+      text: err.v1Error.description,
+      errorCode: err.v1Error.error,
+    });
+  } else {
+    addNotification({
+      title: "An error occurred",
+      type: "error",
+      text: err.message ?? (err.data ? err.data.description : err),
+    });
+  }
+};
+
 async function PyroFetch<T>(
   path: string,
   options: PyroFetchOptions = {},
   module?: string,
+  errorContext?: string,
 ): Promise<T> {
   const config = useRuntimeConfig();
   const auth = await useAuth();
   const authToken = auth.value?.token;
 
   if (!authToken) {
-    throw new PyroServersFetchError("Missing auth token", 401, undefined, module);
+    throw new ServersError("Missing auth token", 401, undefined, module);
   }
 
   const {
@@ -124,16 +149,18 @@ async function PyroFetch<T>(
   );
 
   if (!base) {
-    throw new PyroServersFetchError(
-      "Configuration error: Missing PYRO_BASE_URL",
-      500,
-      undefined,
-      module,
-    );
+    throw new ServersError("Configuration error: Missing PYRO_BASE_URL", 500, undefined, module);
   }
 
-  const fullUrl = override?.url
-    ? `https://${override.url}/${path.replace(/^\//, "")}`
+  const versionString = `v${version}`;
+
+  let newOverrideUrl = override?.url;
+  if (newOverrideUrl && newOverrideUrl.includes("v0") && version !== 0) {
+    newOverrideUrl = newOverrideUrl.replace("v0", versionString);
+  }
+
+  const fullUrl = newOverrideUrl
+    ? `https://${newOverrideUrl}/${path.replace(/^\//, "")}`
     : `${base}/modrinth/v${version}/${path.replace(/^\//, "")}`;
 
   const headers: Record<string, string> = {
@@ -170,11 +197,20 @@ async function PyroFetch<T>(
       attempts++;
 
       if (error instanceof FetchError) {
+        let v1Error: V1ErrorInfo | undefined;
+
+        if (error.data.error && error.data.description) {
+          v1Error = {
+            context: errorContext,
+            ...error.data,
+          };
+        }
+
         const statusCode = error.response?.status;
         const isRetryable = statusCode ? [408, 429, 500, 502, 503, 504].includes(statusCode) : true;
 
         if (!isRetryable || attempts >= maxAttempts) {
-          throw new PyroServersFetchError(error.message, statusCode, error, module);
+          throw new ServersError(error.message, statusCode, error, module, v1Error);
         }
 
         const delay = Math.min(1000 * Math.pow(2, attempts - 1) + Math.random() * 1000, 10000);
@@ -182,7 +218,7 @@ async function PyroFetch<T>(
         continue;
       }
 
-      throw new PyroServersFetchError(
+      throw new ServersError(
         "Unexpected error during fetch operation",
         undefined,
         error as Error,
@@ -419,7 +455,7 @@ const processImage = async (iconUrl: string | undefined) => {
         }
       }
     } catch (error) {
-      if (error instanceof PyroServersFetchError && error.statusCode === 404 && iconUrl) {
+      if (error instanceof ServersError && error.statusCode === 404 && iconUrl) {
         try {
           const response = await fetch(iconUrl);
           if (!response.ok) throw new Error("Failed to fetch icon");
@@ -892,7 +928,7 @@ const retryWithAuth = async (requestFn: () => Promise<any>) => {
   try {
     return await requestFn();
   } catch (error) {
-    if (error instanceof PyroServersFetchError && error.statusCode === 401) {
+    if (error instanceof ServersError && error.statusCode === 401) {
       await internalServerReference.value.refresh(["fs"]);
       return await requestFn();
     }
@@ -1051,6 +1087,68 @@ const moveFileOrFolder = (path: string, newPath: string) => {
   });
 };
 
+const clearQueuedOps = () => {
+  internalServerReference.value.fs.queuedOps = [];
+};
+
+const removeQueuedOp = (op: FSQueuedOp["op"], src: string) => {
+  internalServerReference.value.fs.queuedOps = internalServerReference.value.fs.queuedOps.filter(
+    (x: FSQueuedOp) => x.op !== op || x.src !== src,
+  );
+};
+
+const extractFile = (path: string, override = true, dry = false, silentQueue = false) =>
+  retryWithAuth(async () => {
+    console.log(
+      `Extracting: ${path}` + (dry ? " (dry run)" : "") + (silentQueue ? " (silent)" : ""),
+    );
+
+    const encodedPath = encodeURIComponent(path);
+
+    if (!silentQueue) {
+      internalServerReference.value.fs.queuedOps.push({
+        op: "unarchive",
+        src: path,
+      });
+
+      setTimeout(() => internalServerReference.value.fs.removeQueuedOp("unarchive", path), 4000);
+    }
+
+    return (await PyroFetch(
+      `/unarchive?src=${encodedPath}&trg=/&override=${override}&dry=${dry}`,
+      {
+        method: "POST",
+        override: internalServerReference.value.fs.auth,
+        version: 1,
+      },
+      undefined,
+      "Error extracting file",
+    ).catch((err) => {
+      removeQueuedOp("unarchive", path);
+      throw err;
+    })) as { modpack_name: string | null };
+  });
+
+const modifyOp = (id: string, action: "dismiss" | "cancel") =>
+  retryWithAuth(async () => {
+    return await PyroFetch(
+      `/ops/${action}?id=${id}`,
+      {
+        method: "POST",
+        override: internalServerReference.value.fs.auth,
+        version: 1,
+      },
+      undefined,
+      `Error ${action === "dismiss" ? "dismissing" : "cancelling"} filesystem operation`,
+    ).then(() => {
+      internalServerReference.value.fs.opsQueuedForModification =
+        internalServerReference.value.fs.opsQueuedForModification.filter((x: string) => x !== id);
+      internalServerReference.value.fs.ops = internalServerReference.value.fs.ops.filter(
+        (x: FilesystemOp) => x.id !== id,
+      );
+    });
+  });
+
 const deleteFileOrFolder = (path: string, recursive: boolean) => {
   const encodedPath = encodeURIComponent(path);
   return retryWithAuth(async () => {
@@ -1104,9 +1202,9 @@ const modules: any = {
         return data;
       } catch (error) {
         const fetchError =
-          error instanceof PyroServersFetchError
+          error instanceof ServersError
             ? error
-            : new PyroServersFetchError("Unknown error occurred", undefined, error as Error);
+            : new ServersError("Unknown error occurred", undefined, error as Error);
 
         return {
           status: "error",
@@ -1135,9 +1233,9 @@ const modules: any = {
         };
       } catch (error) {
         const fetchError =
-          error instanceof PyroServersFetchError
+          error instanceof ServersError
             ? error
-            : new PyroServersFetchError("Unknown error occurred", undefined, error as Error);
+            : new ServersError("Unknown error occurred", undefined, error as Error);
 
         return {
           data: [],
@@ -1160,9 +1258,9 @@ const modules: any = {
         };
       } catch (error) {
         const fetchError =
-          error instanceof PyroServersFetchError
+          error instanceof ServersError
             ? error
-            : new PyroServersFetchError("Unknown error occurred", undefined, error as Error);
+            : new ServersError("Unknown error occurred", undefined, error as Error);
 
         return {
           data: [],
@@ -1196,9 +1294,9 @@ const modules: any = {
         };
       } catch (error) {
         const fetchError =
-          error instanceof PyroServersFetchError
+          error instanceof ServersError
             ? error
-            : new PyroServersFetchError("Unknown error occurred", undefined, error as Error);
+            : new ServersError("Unknown error occurred", undefined, error as Error);
 
         return {
           allocations: [],
@@ -1221,9 +1319,9 @@ const modules: any = {
         return await PyroFetch<Startup>(`servers/${serverId}/startup`, {}, "startup");
       } catch (error) {
         const fetchError =
-          error instanceof PyroServersFetchError
+          error instanceof ServersError
             ? error
-            : new PyroServersFetchError("Unknown error occurred", undefined, error as Error);
+            : new ServersError("Unknown error occurred", undefined, error as Error);
 
         return {
           error: {
@@ -1241,9 +1339,9 @@ const modules: any = {
         return await PyroFetch<JWTAuth>(`servers/${serverId}/ws`, {}, "ws");
       } catch (error) {
         const fetchError =
-          error instanceof PyroServersFetchError
+          error instanceof ServersError
             ? error
-            : new PyroServersFetchError("Unknown error occurred", undefined, error as Error);
+            : new ServersError("Unknown error occurred", undefined, error as Error);
 
         return {
           error: {
@@ -1255,14 +1353,16 @@ const modules: any = {
     },
   },
   fs: {
+    queuedOps: [],
+    opsQueuedForModification: [],
     get: async (serverId: string) => {
       try {
         return { auth: await PyroFetch<JWTAuth>(`servers/${serverId}/fs`, {}, "fs") };
       } catch (error) {
         const fetchError =
-          error instanceof PyroServersFetchError
+          error instanceof ServersError
             ? error
-            : new PyroServersFetchError("Unknown error occurred", undefined, error as Error);
+            : new ServersError("Unknown error occurred", undefined, error as Error);
 
         return {
           auth: undefined,
@@ -1281,6 +1381,10 @@ const modules: any = {
     moveFileOrFolder,
     deleteFileOrFolder,
     downloadFile,
+    extractFile,
+    removeQueuedOp,
+    clearQueuedOps,
+    modifyOp,
   },
 };
 
@@ -1588,10 +1692,29 @@ type FSFunctions = {
    * @returns
    */
   downloadFile: (path: string, raw?: boolean) => Promise<any>;
+
+  /**
+   * @param path - The path of the file to extract
+   * @returns
+   */
+  extractFile: (
+    path: string,
+    override?: boolean,
+    dry?: boolean,
+    silentQueue?: boolean,
+  ) => Promise<{
+    modpack_name: string | null;
+    conflicting_files: string[];
+  }>;
+
+  removeQueuedOp: (op: FSQueuedOp["op"], src: string) => void;
+  clearQueuedOps: () => void;
+
+  modifyOp: (id: string, action: "dismiss" | "cancel") => Promise<any>;
 };
 
 type ModuleError = {
-  error: PyroServersFetchError;
+  error: ServersError;
   timestamp: number;
 };
 
@@ -1624,8 +1747,11 @@ type WSModule = JWTAuth & {
   error?: ModuleError;
 };
 
-type FSModule = {
+export type FSModule = {
   auth: JWTAuth;
+  ops: FilesystemOp[];
+  queuedOps: FSQueuedOp[];
+  opsQueuedForModification: string[];
   error?: ModuleError;
 } & FSFunctions;
 

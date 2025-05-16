@@ -6,7 +6,7 @@ use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::project_item::{GalleryItem, ModCategory};
 use crate::database::models::thread_item::ThreadMessageBuilder;
-use crate::database::models::{ids as db_ids, image_item, TeamMember};
+use crate::database::models::{TeamMember, ids as db_ids, image_item};
 use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
 use crate::file_hosting::FileHost;
@@ -23,12 +23,12 @@ use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::search::indexing::remove_documents;
-use crate::search::{search_for_project, SearchConfig, SearchError};
+use crate::search::{SearchConfig, SearchError, search_for_project};
 use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use futures::TryStreamExt;
@@ -214,7 +214,7 @@ pub struct EditProject {
     pub license_id: Option<String>,
     #[validate(
         length(min = 3, max = 64),
-        regex = "crate::util::validate::RE_URL_SAFE"
+        regex(path = *crate::util::validate::RE_URL_SAFE)
     )]
     pub slug: Option<String>,
     pub status: Option<ProjectStatus>,
@@ -710,10 +710,8 @@ pub async fn project_edit(
                         ));
                     }
 
-                    let ids_to_delete = links
-                        .iter()
-                        .map(|(name, _)| name.clone())
-                        .collect::<Vec<String>>();
+                    let ids_to_delete =
+                        links.keys().cloned().collect::<Vec<String>>();
                     // Deletes all links from hashmap- either will be deleted or be replaced
                     sqlx::query!(
                         "
@@ -908,11 +906,11 @@ pub async fn edit_project_categories(
     categories: &Vec<String>,
     perms: &ProjectPermissions,
     project_id: db_ids::ProjectId,
-    additional: bool,
+    is_additional: bool,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
 ) -> Result<(), ApiError> {
     if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-        let additional_str = if additional { "additional " } else { "" };
+        let additional_str = if is_additional { "additional " } else { "" };
         return Err(ApiError::CustomAuthentication(format!(
             "You do not have the permissions to edit the {additional_str}categories of this project!"
         )));
@@ -930,7 +928,11 @@ pub async fn edit_project_categories(
 
         let mcategories = category_ids
             .values()
-            .map(|x| ModCategory::new(project_id, *x, additional))
+            .map(|&category_id| ModCategory {
+                project_id,
+                category_id,
+                is_additional,
+            })
             .collect::<Vec<_>>();
         mod_categories.extend(mcategories);
     }
@@ -1083,7 +1085,6 @@ pub async fn dependency_list(
     }
 }
 
-#[derive(derive_new::new)]
 pub struct CategoryChanges<'a> {
     pub categories: &'a Option<Vec<String>>,
     pub add_categories: &'a Option<Vec<String>>,
@@ -1243,11 +1244,11 @@ pub async fn projects_edit(
             &categories,
             &project.categories,
             project.inner.id as db_ids::ProjectId,
-            CategoryChanges::new(
-                &bulk_edit_project.categories,
-                &bulk_edit_project.add_categories,
-                &bulk_edit_project.remove_categories,
-            ),
+            CategoryChanges {
+                categories: &bulk_edit_project.categories,
+                add_categories: &bulk_edit_project.add_categories,
+                remove_categories: &bulk_edit_project.remove_categories,
+            },
             3,
             false,
             &mut transaction,
@@ -1258,11 +1259,12 @@ pub async fn projects_edit(
             &categories,
             &project.additional_categories,
             project.inner.id as db_ids::ProjectId,
-            CategoryChanges::new(
-                &bulk_edit_project.additional_categories,
-                &bulk_edit_project.add_additional_categories,
-                &bulk_edit_project.remove_additional_categories,
-            ),
+            CategoryChanges {
+                categories: &bulk_edit_project.additional_categories,
+                add_categories: &bulk_edit_project.add_additional_categories,
+                remove_categories: &bulk_edit_project
+                    .remove_additional_categories,
+            },
             256,
             true,
             &mut transaction,
@@ -1270,10 +1272,7 @@ pub async fn projects_edit(
         .await?;
 
         if let Some(links) = &bulk_edit_project.link_urls {
-            let ids_to_delete = links
-                .iter()
-                .map(|(name, _)| name.clone())
-                .collect::<Vec<String>>();
+            let ids_to_delete = links.keys().cloned().collect::<Vec<String>>();
             // Deletes all links from hashmap- either will be deleted or be replaced
             sqlx::query!(
                 "
@@ -1388,11 +1387,11 @@ pub async fn bulk_edit_project_categories(
                     ))
                 })?
                 .id;
-            mod_categories.push(ModCategory::new(
+            mod_categories.push(ModCategory {
                 project_id,
                 category_id,
                 is_additional,
-            ));
+            });
         }
         ModCategory::insert_many(mod_categories, &mut *transaction).await?;
     }
@@ -1482,7 +1481,7 @@ pub async fn project_icon_edit(
 
     let project_id: ProjectId = project_item.inner.id.into();
     let upload_result = upload_image_optimized(
-        &format!("data/{}", project_id),
+        &format!("data/{project_id}"),
         bytes.freeze(),
         &ext.ext,
         Some(96),
@@ -1700,7 +1699,7 @@ pub async fn add_gallery_item(
 
     let id: ProjectId = project_item.inner.id.into();
     let upload_result = upload_image_optimized(
-        &format!("data/{}/images", id),
+        &format!("data/{id}/images"),
         bytes.freeze(),
         &ext.ext,
         Some(350),

@@ -5,7 +5,7 @@ use crate::models::v2::projects::{LegacyProject, LegacyVersion};
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::version_file::HashQuery;
 use crate::routes::{v2_reroute, v3};
-use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::collections::HashMap;

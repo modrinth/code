@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use std::hash::Hasher;
 
-use super::ids::*;
 use super::DatabaseError;
+use super::ids::*;
 use crate::database::redis::RedisPool;
 use chrono::DateTime;
 use chrono::Utc;
@@ -1016,8 +1016,8 @@ impl VersionFieldValue {
                             enum_values.push(ev.clone());
                         } else {
                             return Err(format!(
-                            "Provided value '{av}' is not a valid variant for {field_name}"
-                        ));
+                                "Provided value '{av}' is not a valid variant for {field_name}"
+                            ));
                         }
                     }
                     enum_values
@@ -1080,8 +1080,7 @@ impl VersionFieldValue {
         let field_name = field_type.to_str();
         let did_not_exist_error = |field_name: &str, desired_field: &str| {
             DatabaseError::SchemaError(format!(
-                "Field name {} for field {} in does not exist",
-                desired_field, field_name
+                "Field name {desired_field} for field {field_name} in does not exist"
             ))
         };
 
@@ -1103,8 +1102,7 @@ impl VersionFieldValue {
             .collect::<Vec<_>>();
         if field_id.len() > 1 {
             return Err(DatabaseError::SchemaError(format!(
-                "Multiple field ids for field {}",
-                field_name
+                "Multiple field ids for field {field_name}"
             )));
         }
 

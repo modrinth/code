@@ -1,13 +1,11 @@
 [package]
 name = "theseus_playground"
 version = "0.0.0"
-edition = "2021"
+edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-theseus = { path = "../../packages/app-lib", features = ["cli"] }
-tokio = { version = "1", features = ["full"] }
-webbrowser = "0.8.13"
-
-tracing = "0.1.37"
+theseus = { workspace = true, features = ["cli"] }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+enumset.workspace = true

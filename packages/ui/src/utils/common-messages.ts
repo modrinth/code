@@ -21,6 +21,10 @@ export const commonMessages = defineMessages({
     id: 'button.copy-id',
     defaultMessage: 'Copy ID',
   },
+  copyPermalinkButton: {
+    id: 'button.copy-permalink',
+    defaultMessage: 'Copy permanent link',
+  },
   changesSavedLabel: {
     id: 'label.changes-saved',
     defaultMessage: 'Changes saved',
@@ -85,6 +89,10 @@ export const commonMessages = defineMessages({
     id: 'input.view.list',
     defaultMessage: 'Rows view',
   },
+  loadingLabel: {
+    id: 'label.loading',
+    defaultMessage: 'Loading...',
+  },
   moderationLabel: {
     id: 'label.moderation',
     defaultMessage: 'Moderation',
@@ -92,6 +100,14 @@ export const commonMessages = defineMessages({
   notificationsLabel: {
     id: 'label.notifications',
     defaultMessage: 'Notifications',
+  },
+  playButton: {
+    id: 'button.play',
+    defaultMessage: 'Play',
+  },
+  playedLabel: {
+    id: 'label.played',
+    defaultMessage: 'Played {time}',
   },
   privateLabel: {
     id: 'collection.label.private',
@@ -101,13 +117,25 @@ export const commonMessages = defineMessages({
     id: 'label.public',
     defaultMessage: 'Public',
   },
+  refreshButton: {
+    id: 'button.refresh',
+    defaultMessage: 'Refresh',
+  },
   rejectedLabel: {
     id: 'label.rejected',
     defaultMessage: 'Rejected',
   },
+  removeButton: {
+    id: 'button.remove',
+    defaultMessage: 'Remove',
+  },
   reportButton: {
     id: 'button.report',
     defaultMessage: 'Report',
+  },
+  openFolderButton: {
+    id: 'button.open-folder',
+    defaultMessage: 'Open folder',
   },
   passwordLabel: {
     id: 'label.password',
@@ -125,6 +153,10 @@ export const commonMessages = defineMessages({
     id: 'label.scopes',
     defaultMessage: 'Scopes',
   },
+  serverLabel: {
+    id: 'label.server',
+    defaultMessage: 'Server',
+  },
   serversLabel: {
     id: 'label.servers',
     defaultMessage: 'Servers',
@@ -140,6 +172,14 @@ export const commonMessages = defineMessages({
   signOutButton: {
     id: 'button.sign-out',
     defaultMessage: 'Sign out',
+  },
+  singleplayerLabel: {
+    id: 'label.singleplayer',
+    defaultMessage: 'Singleplayer',
+  },
+  stopButton: {
+    id: 'button.stop',
+    defaultMessage: 'Stop',
   },
   titleLabel: {
     id: 'label.title',

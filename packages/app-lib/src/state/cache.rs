@@ -1,6 +1,6 @@
 use crate::config::{META_URL, MODRINTH_API_URL, MODRINTH_API_URL_V3};
 use crate::state::ProjectType;
-use crate::util::fetch::{fetch_json, sha1_async, FetchSemaphore};
+use crate::util::fetch::{FetchSemaphore, fetch_json, sha1_async};
 use chrono::{DateTime, Utc};
 use dashmap::DashSet;
 use reqwest::Method;
@@ -843,7 +843,7 @@ impl CachedEntry {
             fetch_semaphore: &FetchSemaphore,
             pool: &SqlitePool,
         ) -> crate::Result<Vec<T>> {
-            const MAX_REQUEST_SIZE: usize = 1000;
+            const MAX_REQUEST_SIZE: usize = 800;
 
             let urls = keys
                 .iter()
@@ -1072,7 +1072,7 @@ impl CachedEntry {
             CacheValueType::File => {
                 let mut versions = fetch_json::<HashMap<String, Version>>(
                     Method::POST,
-                    &format!("{}version_files", MODRINTH_API_URL),
+                    &format!("{MODRINTH_API_URL}version_files"),
                     None,
                     Some(serde_json::json!({
                         "algorithm": "sha1",
@@ -1285,7 +1285,7 @@ impl CachedEntry {
 
                         if let Some(values) =
                             filtered_keys.iter_mut().find(|x| {
-                                x.0 .0 == loaders_key && x.0 .1 == game_version
+                                x.0.0 == loaders_key && x.0.1 == game_version
                             })
                         {
                             values.1.push(hash.to_string());
@@ -1307,7 +1307,7 @@ impl CachedEntry {
                 });
 
                 let version_update_url =
-                    format!("{}version_files/update", MODRINTH_API_URL);
+                    format!("{MODRINTH_API_URL}version_files/update");
                 let variations =
                     futures::future::try_join_all(filtered_keys.iter().map(
                         |((loaders_key, game_version), hashes)| {
@@ -1481,7 +1481,7 @@ pub async fn cache_file_hash(
 
     CachedEntry::upsert_many(
         &[CacheValue::FileHash(CachedFileHash {
-            path: format!("{}/{}", profile_path, path),
+            path: format!("{profile_path}/{path}"),
             size: size as u64,
             hash,
             project_type,

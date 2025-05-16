@@ -1,5 +1,5 @@
 use crate::database::models::{
-    product_item, DatabaseError, ProductId, ProductPriceId,
+    DatabaseError, ProductId, ProductPriceId, product_item,
 };
 use crate::database::redis::RedisPool;
 use crate::models::billing::{Price, ProductMetadata};

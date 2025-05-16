@@ -1,5 +1,5 @@
-use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::auth::AuthenticationError;
+use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::database::models::friend_item::FriendItem;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
@@ -9,12 +9,12 @@ use crate::queue::socket::{
     ActiveSocket, ActiveSockets, SocketId, TunnelSocketType,
 };
 use crate::routes::ApiError;
-use crate::sync::friends::{RedisFriendsMessage, FRIENDS_CHANNEL_NAME};
+use crate::sync::friends::{FRIENDS_CHANNEL_NAME, RedisFriendsMessage};
 use crate::sync::status::{
     get_user_status, push_back_user_expiry, replace_user_status,
 };
 use actix_web::web::{Data, Payload};
-use actix_web::{get, web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, get, web};
 use actix_ws::Message;
 use ariadne::ids::UserId;
 use ariadne::networking::message::{
@@ -31,7 +31,7 @@ use sqlx::PgPool;
 use std::pin::pin;
 use std::sync::atomic::Ordering;
 use tokio::sync::oneshot::error::TryRecvError;
-use tokio::time::{sleep, Duration};
+use tokio::time::{Duration, sleep};
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(ws_init);
@@ -91,8 +91,7 @@ pub async fn ws_init(
     let friend_statuses = if !friends.is_empty() {
         let db = db.clone();
         let redis = redis.clone();
-
-        let statuses = tokio_stream::iter(friends.iter())
+        tokio_stream::iter(friends.iter())
             .map(|x| {
                 let db = db.clone();
                 let redis = redis.clone();
@@ -112,9 +111,10 @@ pub async fn ws_init(
             })
             .buffer_unordered(16)
             .collect::<Vec<_>>()
-            .await;
-
-        statuses.into_iter().flatten().collect()
+            .await
+            .into_iter()
+            .flatten()
+            .collect()
     } else {
         Vec::new()
     };

@@ -5,10 +5,10 @@ use crate::{
     auth::{checks::ValidateAuthorized, get_user_from_headers},
     database::{
         models::{
-            generate_oauth_client_id, generate_oauth_redirect_id,
+            DatabaseError, OAuthClientId, User, generate_oauth_client_id,
+            generate_oauth_redirect_id,
             oauth_client_authorization_item::OAuthClientAuthorization,
             oauth_client_item::{OAuthClient, OAuthRedirectUri},
-            DatabaseError, OAuthClientId, User,
         },
         redis::RedisPool,
     },
@@ -26,14 +26,13 @@ use crate::{
     util::routes::read_from_payload,
 };
 use actix_web::{
-    delete, get, patch, post,
+    HttpRequest, HttpResponse, delete, get, patch, post,
     web::{self, scope},
-    HttpRequest, HttpResponse,
 };
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use itertools::Itertools;
-use rand::{distributions::Alphanumeric, Rng, SeedableRng};
+use rand::{Rng, SeedableRng, distributions::Alphanumeric};
 use rand_chacha::ChaCha20Rng;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -393,7 +392,7 @@ pub async fn oauth_client_icon_edit(
     )
     .await?;
     let upload_result = upload_image_optimized(
-        &format!("data/{}", client_id),
+        &format!("data/{client_id}"),
         bytes.freeze(),
         &ext.ext,
         Some(96),

@@ -16,7 +16,7 @@ use crate::models::threads::{MessageBody, Thread, ThreadId, ThreadType};
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, web};
 use futures::TryStreamExt;
 use serde::Deserialize;
 use sqlx::PgPool;
@@ -527,8 +527,7 @@ pub async fn thread_send_message(
                     ) || image.context.inner_id().is_some()
                     {
                         return Err(ApiError::InvalidInput(format!(
-                            "Image {} is not unused and in the 'thread_message' context",
-                            image_id
+                            "Image {image_id} is not unused and in the 'thread_message' context"
                         )));
                     }
 
@@ -548,8 +547,7 @@ pub async fn thread_send_message(
                         .await?;
                 } else {
                     return Err(ApiError::InvalidInput(format!(
-                        "Image {} does not exist",
-                        image_id
+                        "Image {image_id} does not exist"
                     )));
                 }
             }

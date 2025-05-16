@@ -1,32 +1,33 @@
 use crate::config::{MODRINTH_API_URL_V3, MODRINTH_SOCKET_URL};
 use crate::data::ModrinthCredentials;
-use crate::event::emit::emit_friend;
 use crate::event::FriendPayload;
+use crate::event::emit::emit_friend;
 use crate::state::tunnel::InternalTunnelSocket;
 use crate::state::{ProcessManager, Profile, TunnelSocket};
-use crate::util::fetch::{fetch_advanced, fetch_json, FetchSemaphore};
+use crate::util::fetch::{FetchSemaphore, fetch_advanced, fetch_json};
 use ariadne::networking::message::{
     ClientToServerMessage, ServerToClientMessage,
 };
 use ariadne::users::{UserId, UserStatus};
-use async_tungstenite::tokio::{connect_async, ConnectStream};
-use async_tungstenite::tungstenite::client::IntoClientRequest;
-use async_tungstenite::tungstenite::Message;
 use async_tungstenite::WebSocketStream;
+use async_tungstenite::tokio::{ConnectStream, connect_async};
+use async_tungstenite::tungstenite::Message;
+use async_tungstenite::tungstenite::client::IntoClientRequest;
+use bytes::Bytes;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use either::Either;
 use futures::stream::SplitSink;
 use futures::{SinkExt, StreamExt};
-use reqwest::header::HeaderValue;
 use reqwest::Method;
+use reqwest::header::HeaderValue;
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 use std::ops::Deref;
 use std::sync::Arc;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use tokio::net::tcp::OwnedReadHalf;
 use tokio::net::TcpStream;
+use tokio::net::tcp::OwnedReadHalf;
 use tokio::sync::{Mutex, RwLock};
 use uuid::Uuid;
 
@@ -204,7 +205,10 @@ impl FriendsSocket {
                                     }
                                 }
                                 Err(e) => {
-                                    tracing::error!("Error handling message from websocket server: {:?}", e);
+                                    tracing::error!(
+                                        "Error handling message from websocket server: {:?}",
+                                        e
+                                    );
                                 }
                             }
                         }
@@ -258,7 +262,7 @@ impl FriendsSocket {
                     last_ping = Utc::now();
                     let mut write = state.friends_socket.write.write().await;
                     if let Some(write) = write.as_mut() {
-                        let _ = write.send(Message::Ping(Vec::new())).await;
+                        let _ = write.send(Message::Ping(Bytes::new())).await;
                     }
                 }
 

@@ -10,23 +10,23 @@ use crate::database::models::loader_fields::{
     self, LoaderField, LoaderFieldEnumValue, VersionField,
 };
 use crate::database::models::version_item::{DependencyBuilder, LoaderVersion};
-use crate::database::models::{image_item, Organization};
+use crate::database::models::{Organization, image_item};
 use crate::database::redis::RedisPool;
 use crate::models;
 use crate::models::ids::VersionId;
 use crate::models::images::ImageContext;
 use crate::models::pats::Scopes;
-use crate::models::projects::{skip_nulls, Loader};
 use crate::models::projects::{
     Dependency, FileType, VersionStatus, VersionType,
 };
+use crate::models::projects::{Loader, skip_nulls};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
-use crate::search::indexing::remove_documents;
 use crate::search::SearchConfig;
+use crate::search::indexing::remove_documents;
 use crate::util::img;
 use crate::util::validate::validation_errors_to_string;
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::base62_impl::parse_base62;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -207,7 +207,7 @@ pub struct EditVersion {
     pub name: Option<String>,
     #[validate(
         length(min = 1, max = 32),
-        regex = "crate::util::validate::RE_URL_SAFE"
+        regex(path = *crate::util::validate::RE_URL_SAFE)
     )]
     pub version_number: Option<String>,
     #[validate(length(max = 65536))]
@@ -287,10 +287,10 @@ pub async fn version_edit_helper(
         ApiError::Validation(validation_errors_to_string(err, None))
     })?;
 
-    let version_id = info.0;
-    let id = version_id.into();
+    let version_id = info.0.into();
 
-    let result = database::models::Version::get(id, &**pool, &redis).await?;
+    let result =
+        database::models::Version::get(version_id, &**pool, &redis).await?;
 
     if let Some(version_item) = result {
         let team_member =
@@ -345,7 +345,7 @@ pub async fn version_edit_helper(
                     WHERE (id = $2)
                     ",
                     name.trim(),
-                    id as database::models::ids::VersionId,
+                    version_id as database::models::ids::VersionId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -359,7 +359,7 @@ pub async fn version_edit_helper(
                     WHERE (id = $2)
                     ",
                     number,
-                    id as database::models::ids::VersionId,
+                    version_id as database::models::ids::VersionId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -373,7 +373,7 @@ pub async fn version_edit_helper(
                     WHERE (id = $2)
                     ",
                     version_type.as_str(),
-                    id as database::models::ids::VersionId,
+                    version_id as database::models::ids::VersionId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -384,7 +384,7 @@ pub async fn version_edit_helper(
                     "
                     DELETE FROM dependencies WHERE dependent_id = $1
                     ",
-                    id as database::models::ids::VersionId,
+                    version_id as database::models::ids::VersionId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -448,7 +448,7 @@ pub async fn version_edit_helper(
                     WHERE version_id = $1
                     AND field_id = ANY($2)
                     ",
-                    id as database::models::ids::VersionId,
+                    version_id as database::models::ids::VersionId,
                     &loader_field_ids
                 )
                 .execute(&mut *transaction)
@@ -476,7 +476,7 @@ pub async fn version_edit_helper(
                         .remove(&loader_field.id)
                         .unwrap_or_default();
                     let vf: VersionField = VersionField::check_parse(
-                        version_id.into(),
+                        version_id,
                         loader_field.clone(),
                         vf_value.clone(),
                         enum_variants,
@@ -493,7 +493,7 @@ pub async fn version_edit_helper(
                     "
                     DELETE FROM loaders_versions WHERE version_id = $1
                     ",
-                    id as database::models::ids::VersionId,
+                    version_id as database::models::ids::VersionId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -513,7 +513,10 @@ pub async fn version_edit_helper(
                                     .to_string(),
                             )
                         })?;
-                    loader_versions.push(LoaderVersion::new(loader_id, id));
+                    loader_versions.push(LoaderVersion {
+                        loader_id,
+                        version_id,
+                    });
                 }
                 LoaderVersion::insert_many(loader_versions, &mut transaction)
                     .await?;
@@ -535,7 +538,7 @@ pub async fn version_edit_helper(
                     WHERE (id = $2)
                     ",
                     featured,
-                    id as database::models::ids::VersionId,
+                    version_id as database::models::ids::VersionId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -549,7 +552,7 @@ pub async fn version_edit_helper(
                     WHERE (id = $2)
                     ",
                     body,
-                    id as database::models::ids::VersionId,
+                    version_id as database::models::ids::VersionId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -569,7 +572,7 @@ pub async fn version_edit_helper(
                     WHERE (id = $2)
                     ",
                     *downloads as i32,
-                    id as database::models::ids::VersionId,
+                    version_id as database::models::ids::VersionId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -604,7 +607,7 @@ pub async fn version_edit_helper(
                     WHERE (id = $2)
                     ",
                     status.as_str(),
-                    id as database::models::ids::VersionId,
+                    version_id as database::models::ids::VersionId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -652,7 +655,7 @@ pub async fn version_edit_helper(
                     WHERE (id = $2)
                     ",
                     ordering.to_owned() as Option<i32>,
-                    id as database::models::ids::VersionId,
+                    version_id as database::models::ids::VersionId,
                 )
                 .execute(&mut *transaction)
                 .await?;

@@ -81,7 +81,7 @@ pub async fn pat_full_test() {
 
         // Change scopes and test again
         let req = test::TestRequest::patch()
-            .uri(&format!("/_internal/pat/{}", id))
+            .uri(&format!("/_internal/pat/{id}"))
             .append_pat(USER_USER_PAT)
             .set_json(json!({
                 "scopes": 0,
@@ -93,7 +93,7 @@ pub async fn pat_full_test() {
 
         // Change scopes back, and set expiry to the past, and test again
         let req = test::TestRequest::patch()
-            .uri(&format!("/_internal/pat/{}", id))
+            .uri(&format!("/_internal/pat/{id}"))
             .append_pat(USER_USER_PAT)
             .set_json(json!({
                 "scopes": Scopes::COLLECTION_CREATE,
@@ -109,21 +109,21 @@ pub async fn pat_full_test() {
 
         // Change everything back to normal and test again
         let req = test::TestRequest::patch()
-            .uri(&format!("/_internal/pat/{}", id))
+            .uri(&format!("/_internal/pat/{id}"))
             .append_pat(USER_USER_PAT)
             .set_json(json!({
                 "expires": Utc::now() + Duration::days(1), // no longer expired!
             }))
             .to_request();
 
-        println!("PAT ID FOR TEST: {}", id);
+        println!("PAT ID FOR TEST: {id}");
         let resp = test_env.call(req).await;
         assert_status!(&resp, StatusCode::NO_CONTENT);
         assert_eq!(mock_pat_test(access_token).await, 200); // Works again
 
         // Patching to a bad expiry should fail
         let req = test::TestRequest::patch()
-            .uri(&format!("/_internal/pat/{}", id))
+            .uri(&format!("/_internal/pat/{id}"))
             .append_pat(USER_USER_PAT)
             .set_json(json!({
                 "expires": Utc::now() - Duration::days(1), // Past
@@ -140,7 +140,7 @@ pub async fn pat_full_test() {
             }
 
             let req = test::TestRequest::patch()
-                .uri(&format!("/_internal/pat/{}", id))
+                .uri(&format!("/_internal/pat/{id}"))
                 .append_pat(USER_USER_PAT)
                 .set_json(json!({
                     "scopes": scope.bits(),
@@ -156,7 +156,7 @@ pub async fn pat_full_test() {
         // Delete PAT
         let req = test::TestRequest::delete()
             .append_pat(USER_USER_PAT)
-            .uri(&format!("/_internal/pat/{}", id))
+            .uri(&format!("/_internal/pat/{id}"))
             .to_request();
         let resp = test_env.call(req).await;
         assert_status!(&resp, StatusCode::NO_CONTENT);
@@ -260,7 +260,7 @@ pub async fn bad_pats() {
 
         // Patching to a bad expiry should fail
         let req = test::TestRequest::patch()
-            .uri(&format!("/_internal/pat/{}", id))
+            .uri(&format!("/_internal/pat/{id}"))
             .append_pat(USER_USER_PAT)
             .set_json(json!({
                 "expires": Utc::now() - Duration::days(1), // Past
@@ -277,7 +277,7 @@ pub async fn bad_pats() {
             }
 
             let req = test::TestRequest::patch()
-                .uri(&format!("/_internal/pat/{}", id))
+                .uri(&format!("/_internal/pat/{id}"))
                 .append_pat(USER_USER_PAT)
                 .set_json(json!({
                     "scopes": scope.bits(),

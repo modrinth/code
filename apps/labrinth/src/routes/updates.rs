@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use actix_web::{get, web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, get, web};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
@@ -116,7 +116,7 @@ pub async fn forge_updates(
             for game_version in &game_versions {
                 response
                     .promos
-                    .entry(format!("{}-recommended", game_version))
+                    .entry(format!("{game_version}-recommended"))
                     .or_insert_with(|| version.version_number.clone());
             }
         }
@@ -124,7 +124,7 @@ pub async fn forge_updates(
         for game_version in &game_versions {
             response
                 .promos
-                .entry(format!("{}-latest", game_version))
+                .entry(format!("{game_version}-latest"))
                 .or_insert_with(|| version.version_number.clone());
         }
     }

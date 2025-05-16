@@ -1,60 +1,52 @@
 [package]
 name = "theseus_gui"
-version = "0.9.3"
+version = "0.9.5"
 description = "The Modrinth App is a desktop application for managing your Minecraft mods"
 license = "GPL-3.0-only"
 repository = "https://github.com/modrinth/code/apps/app/"
-edition = "2021"
+edition = "2024"
 build = "build.rs"
 
 [build-dependencies]
-tauri-build = { version = "2.0.3", features = ["codegen"] }
+tauri-build = { workspace = true, features = ["codegen"] }
 
 [dependencies]
-theseus = { path = "../../packages/app-lib", features = ["tauri"] }
+theseus = { workspace = true, features = ["tauri"] }
 
-serde_json = "1.0"
-serde = { version = "1.0", features = ["derive"] }
-serde_with = "3.0.0"
+serde_json.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_with.workspace = true
 
-tauri = { version = "2.1.1",  features = ["devtools", "macos-private-api", "protocol-asset", "unstable"] }
-tauri-plugin-window-state = "2.2.0"
-tauri-plugin-deep-link = "2.2.0"
-tauri-plugin-os = "2.2.0"
-tauri-plugin-opener = "2.2.1"
-tauri-plugin-dialog = "2.2.0"
-tauri-plugin-updater = { version = "2.3.0" }
-tauri-plugin-single-instance = { version = "2.2.0" }
+tauri = { workspace = true, features = ["devtools", "macos-private-api", "protocol-asset", "unstable"] }
+tauri-plugin-window-state.workspace = true
+tauri-plugin-deep-link.workspace = true
+tauri-plugin-os.workspace = true
+tauri-plugin-opener.workspace = true
+tauri-plugin-dialog.workspace = true
+tauri-plugin-updater.workspace = true
+tauri-plugin-single-instance.workspace = true
 
-tokio = { version = "1", features = ["full"] }
-thiserror = "1.0"
-daedalus = { path = "../../packages/daedalus" }
-chrono = "0.4.26"
+tokio = { workspace = true, features = ["time"] }
+thiserror.workspace = true
+daedalus.workspace = true
+chrono.workspace = true
+either.workspace = true
 
-url = "2.2"
-uuid = { version = "1.1", features = ["serde", "v4"] }
-os_info = "3.7.0"
+url.workspace = true
+urlencoding.workspace = true
+uuid = { workspace = true, features = ["serde", "v4"] }
 
-tracing = "0.1.37"
-tracing-error = "0.2.0"
+tracing.workspace = true
+tracing-error.workspace = true
 
-dashmap = "6.0.1"
-paste = "1.0.15"
+dashmap.workspace = true
+paste.workspace = true
+enumset = { workspace = true, features = ["serde"] }
 
-opener = { version = "0.7.2", features = ["reveal", "dbus-vendored"] }
-
-native-dialog = "0.7.0"
-
-[target.'cfg(not(target_os = "linux"))'.dependencies]
-window-shadows = "0.2.1"
-
-[target.'cfg(target_os = "macos")'.dependencies]
-cocoa = "0.25.0"
-objc = "0.2.7"
-rand = "0.8.5"
+native-dialog.workspace = true
 
 [target.'cfg(target_os = "linux")'.dependencies]
-tauri-plugin-updater = { version = "2.3.0", optional = true, features = ["native-tls-vendored", "zip"], default-features = false }
+tauri-plugin-updater = { workspace = true, optional = true }
 
 [features]
 # by default Tauri runs in production mode

@@ -26,7 +26,7 @@ const selected: Ref<string[]> = computed(() =>
 
 const allSelected = ref(false)
 
-const model = defineModel()
+const model = defineModel<string[]>()
 
 function updateSelection() {
   model.value = selected.value

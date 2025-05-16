@@ -1,7 +1,7 @@
 use crate::models::error::ApiError;
 use crate::models::projects::SearchRequest;
-use actix_web::http::StatusCode;
 use actix_web::HttpResponse;
+use actix_web::http::StatusCode;
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use meilisearch_sdk::client::Client;
@@ -252,10 +252,10 @@ pub async fn search_for_project(
                                     serde_json::from_value::<Vec<String>>(facet)
                                         .unwrap_or_default()
                                 } else {
-                                    vec![serde_json::from_value::<String>(
-                                        facet,
-                                    )
-                                    .unwrap_or_default()]
+                                    vec![
+                                        serde_json::from_value::<String>(facet)
+                                            .unwrap_or_default(),
+                                    ]
                                 }
                             })
                             .collect_vec()

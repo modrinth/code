@@ -9,14 +9,14 @@ use crate::models::collections::{Collection, CollectionStatus};
 use crate::models::ids::{CollectionId, ProjectId};
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
-use crate::routes::v3::project_creation::CreateError;
 use crate::routes::ApiError;
+use crate::routes::v3::project_creation::CreateError;
 use crate::util::img::delete_old_images;
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use crate::{database, models};
 use actix_web::web::Data;
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use itertools::Itertools;
@@ -322,14 +322,15 @@ pub async fn collection_edit(
                 .collect_vec();
             let mut validated_project_ids = Vec::new();
             for project_id in new_project_ids {
-                let project =
-                    database::models::Project::get(project_id, &**pool, &redis)
-                        .await?
-                        .ok_or_else(|| {
-                            ApiError::InvalidInput(format!(
-                            "The specified project {project_id} does not exist!"
-                        ))
-                        })?;
+                let project = database::models::Project::get(
+                    project_id, &**pool, &redis,
+                )
+                .await?
+                .ok_or_else(|| {
+                    ApiError::InvalidInput(format!(
+                        "The specified project {project_id} does not exist!"
+                    ))
+                })?;
                 validated_project_ids.push(project.inner.id.0);
             }
             // Insert- don't throw an error if it already exists
@@ -424,7 +425,7 @@ pub async fn collection_icon_edit(
 
     let collection_id: CollectionId = collection_item.id.into();
     let upload_result = crate::util::img::upload_image_optimized(
-        &format!("data/{}", collection_id),
+        &format!("data/{collection_id}"),
         bytes.freeze(),
         &ext.ext,
         Some(96),

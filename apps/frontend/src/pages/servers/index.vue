@@ -303,7 +303,7 @@
               </svg>
               <h2 class="m-0 text-lg font-bold">Backups included</h2>
               <h3 class="m-0 text-base font-normal text-secondary">
-                Every server comes with 15 backups stored securely off-site with Backblaze.
+                Every server comes with 15 backups stored securely off-site.
               </h3>
             </div>
           </div>
@@ -399,7 +399,7 @@
               </summary>
               <p class="m-0 ml-6 leading-[160%]">
                 Modrinth Servers are powered by AMD Ryzen 7900 and 7950X3D equivalent CPUs at 5+
-                GHz, paired with with DDR5 memory.
+                GHz, paired with DDR5 memory.
               </p>
             </details>
             <details pyro-hash="cpu-burst" class="group" :open="$route.hash === '#cpu-burst'">
@@ -478,6 +478,18 @@
                 mod, data pack, or plugin that causes the server to lag. Since our servers are very
                 high-end, you shouldn't run into much trouble as long as you pick an appropriate
                 plan for the content you're running on the server.
+              </p>
+            </details>
+
+            <details pyro-hash="players" class="group" :open="$route.hash === '#prices'">
+              <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
+                <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
+                  <RightArrowIcon />
+                </span>
+                What currency are the prices in?
+              </summary>
+              <p class="m-0 ml-6 leading-[160%]">
+                All prices are listed in United States Dollars (USD).
               </p>
             </details>
           </div>

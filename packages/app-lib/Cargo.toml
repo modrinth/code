@@ -1,70 +1,76 @@
 [package]
 name = "theseus"
-version = "0.9.3"
+version = "0.9.5"
 authors = ["Jai A <jaiagr+gpg@pm.me>"]
-edition = "2021"
+edition = "2024"
 
 [dependencies]
-bytes = "1"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-serde_ini = "0.2.0"
-sha1_smol = { version = "1.0.0", features = ["std"] }
-sha2 = "0.10.8"
-url = "2.2"
-uuid = { version = "1.1", features = ["serde", "v4"] }
-zip = "0.6.5"
-async_zip = { version = "0.0.17", features = ["chrono", "tokio-fs", "deflate", "bzip2", "zstd", "deflate64"] }
-flate2 = "1.0.28"
-tempfile = "3.5.0"
-dashmap = { version = "6.0.1", features = ["serde"] }
+bytes.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+serde_ini.workspace = true
+sha1_smol.workspace = true
+sha2.workspace = true
+url = { workspace = true, features = ["serde"] }
+uuid = { workspace = true, features = ["serde", "v4"] }
+zip.workspace = true
+async_zip = { workspace = true, features = ["chrono", "tokio-fs", "deflate", "bzip2", "zstd", "deflate64"] }
+flate2.workspace = true
+tempfile.workspace = true
+dashmap = { workspace = true, features = ["serde"] }
+quick-xml = { workspace = true, features = ["async-tokio"] }
+enumset.workspace = true
 
-chrono = { version = "0.4.19", features = ["serde"] }
-daedalus = { path = "../../packages/daedalus" }
-dirs = "5.0.1"
+chrono = { workspace = true, features = ["serde"] }
+daedalus.workspace = true
+dirs.workspace = true
 
-regex = "1.5"
-sys-info = "0.9.0"
-sysinfo = "0.30.8"
-thiserror = "1.0"
-either = "1.13"
+regex.workspace = true
+sysinfo = { workspace = true, features = ["system", "disk"] }
+thiserror.workspace = true
+either.workspace = true
 
-tracing = "0.1.37"
-tracing-subscriber = { version = "0.3.18", features = ["chrono", "env-filter"] }
-tracing-error = "0.2.0"
+tracing.workspace = true
+tracing-subscriber = { workspace = true, features = ["chrono", "env-filter"] }
+tracing-error.workspace = true
 
-paste = { version = "1.0" }
+paste.workspace = true
 
-tauri = { version = "2.0.0-rc", optional = true }
-indicatif = { version = "0.17.3", optional = true }
+tauri = { workspace = true, optional = true }
+indicatif = { workspace = true, optional = true }
 
-async-tungstenite = { version = "0.27.0", features = ["tokio-runtime", "tokio-rustls-webpki-roots"] }
-futures = "0.3"
-reqwest = { version = "0.12.3", features = ["json", "stream", "deflate", "gzip", "brotli", "rustls-tls", "charset", "http2", "macos-system-configuration"], default-features = false }
-tokio = { version = "1", features = ["full"] }
-async-recursion = "1.0.4"
+async-tungstenite = { workspace = true, features = ["tokio-runtime", "tokio-rustls-webpki-roots"] }
+futures = { workspace = true, features = ["async-await", "alloc"] }
+reqwest = { workspace = true, features = ["json", "stream", "deflate", "gzip", "brotli", "rustls-tls-webpki-roots", "charset", "http2", "macos-system-configuration"] }
+tokio = { workspace = true, features = ["time", "io-util", "net", "sync", "fs", "macros", "process"] }
+tokio-util = { workspace = true, features = ["compat"] }
+async-recursion.workspace = true
+fs4 = { workspace = true, features = ["tokio"] }
+async-walkdir.workspace = true
+async-compression = { workspace = true, features = ["tokio", "gzip"] }
 
-notify = { version = "6.1.1", default-features = false }
-notify-debouncer-mini = { version = "0.4.1", default-features = false }
+notify.workspace = true
+notify-debouncer-mini.workspace = true
 
-lazy_static = "1.4.0"
-dunce = "1.0.3"
+dunce.workspace = true
 
-whoami = "1.4.0"
+whoami.workspace = true
 
-discord-rich-presence = "0.2.4"
+discord-rich-presence.workspace = true
 
-p256 = { version = "0.13.2", features = ["ecdsa"] }
-rand = "0.8"
-byteorder = "1.5.0"
-base64 = "0.22.0"
+p256 = { workspace = true, features = ["ecdsa"] }
+rand.workspace = true
+base64.workspace = true
 
-sqlx = { version = "0.8.2", features = [ "runtime-tokio", "sqlite", "macros" ] }
+sqlx = { workspace = true, features = ["runtime-tokio", "sqlite", "macros", "migrate", "json"] }
 
-ariadne = { path = "../ariadne" }
+quartz_nbt = { workspace = true, features = ["serde"] }
+hickory-resolver.workspace = true
+
+ariadne.workspace = true
 
 [target.'cfg(windows)'.dependencies]
-winreg = "0.52.0"
+winreg.workspace = true
 
 [features]
 tauri = ["dep:tauri"]

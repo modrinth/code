@@ -14,7 +14,7 @@ use crate::models::threads::{MessageBody, ThreadType};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::img;
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use futures::StreamExt;
@@ -162,7 +162,7 @@ pub async fn report_create(
             return Err(ApiError::InvalidInput(format!(
                 "Invalid report item type: {}",
                 new_report.item_type.as_str()
-            )))
+            )));
         }
     }
 
@@ -178,8 +178,7 @@ pub async fn report_create(
                 || image.context.inner_id().is_some()
             {
                 return Err(ApiError::InvalidInput(format!(
-                    "Image {} is not unused and in the 'report' context",
-                    image_id
+                    "Image {image_id} is not unused and in the 'report' context"
                 )));
             }
 
@@ -198,8 +197,7 @@ pub async fn report_create(
             image_item::Image::clear_cache(image.id.into(), &redis).await?;
         } else {
             return Err(ApiError::InvalidInput(format!(
-                "Image {} could not be found",
-                image_id
+                "Image {image_id} could not be found"
             )));
         }
     }

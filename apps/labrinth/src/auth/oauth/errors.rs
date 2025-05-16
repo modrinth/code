@@ -1,8 +1,8 @@
 use super::ValidatedRedirectUri;
 use crate::auth::AuthenticationError;
 use crate::models::error::ApiError;
-use actix_web::http::{header::LOCATION, StatusCode};
 use actix_web::HttpResponse;
+use actix_web::http::{StatusCode, header::LOCATION};
 use ariadne::ids::DecodingError;
 
 #[derive(thiserror::Error, Debug)]
@@ -95,7 +95,7 @@ impl actix_web::ResponseError for OAuthError {
             );
 
             if let Some(state) = self.state.as_ref() {
-                redirect_uri = format!("{}&state={}", redirect_uri, state);
+                redirect_uri = format!("{redirect_uri}&state={state}");
             }
 
             HttpResponse::Ok()
@@ -122,7 +122,9 @@ pub enum OAuthErrorType {
         "The provided redirect URI did not match any configured in the client"
     )]
     RedirectUriNotConfigured(String),
-    #[error("The provided scope was malformed or did not correspond to known scopes ({0})")]
+    #[error(
+        "The provided scope was malformed or did not correspond to known scopes ({0})"
+    )]
     FailedScopeParse(bitflags::parser::ParseError),
     #[error(
         "The provided scope requested scopes broader than the developer app is configured with"
@@ -138,9 +140,13 @@ pub enum OAuthErrorType {
     ClientAuthenticationFailed,
     #[error("The provided authorization grant code was invalid")]
     InvalidAuthCode,
-    #[error("The provided client id did not match the id this authorization code was granted to")]
+    #[error(
+        "The provided client id did not match the id this authorization code was granted to"
+    )]
     UnauthorizedClient,
-    #[error("The provided redirect URI did not exactly match the uri originally provided when this flow began")]
+    #[error(
+        "The provided redirect URI did not exactly match the uri originally provided when this flow began"
+    )]
     RedirectUriChanged(Option<String>),
     #[error("The provided grant type ({0}) must be \"authorization_code\"")]
     OnlySupportsAuthorizationCodeGrant(String),

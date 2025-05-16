@@ -1,5 +1,5 @@
 use crate::util::{download_file, fetch_json, fetch_xml, format_url};
-use crate::{insert_mirrored_artifact, Error, MirrorArtifact, UploadFile};
+use crate::{Error, MirrorArtifact, UploadFile, insert_mirrored_artifact};
 use chrono::{DateTime, Utc};
 use daedalus::get_path_from_artifact;
 use daedalus::modded::PartialVersionInfo;
@@ -7,8 +7,8 @@ use dashmap::DashMap;
 use futures::io::Cursor;
 use indexmap::IndexMap;
 use itertools::Itertools;
-use serde::de::DeserializeOwned;
 use serde::Deserialize;
+use serde::de::DeserializeOwned;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Semaphore;
@@ -57,7 +57,7 @@ pub async fn fetch_forge(
 
         ForgeVersion {
             format_version,
-            installer_url: format!("https://maven.minecraftforge.net/net/minecraftforge/forge/{0}/forge-{0}-installer.jar", loader_version),
+            installer_url: format!("https://maven.minecraftforge.net/net/minecraftforge/forge/{loader_version}/forge-{loader_version}-installer.jar"),
             raw: loader_version,
             loader_version: version_split,
             game_version: game_version.clone(),
@@ -137,7 +137,7 @@ pub async fn fetch_neo(
 
         Ok(ForgeVersion {
             format_version: 2,
-            installer_url: format!("https://maven.neoforged.net/net/neoforged/forge/{0}/forge-{0}-installer.jar", loader_version),
+            installer_url: format!("https://maven.neoforged.net/net/neoforged/forge/{loader_version}/forge-{loader_version}-installer.jar"),
             raw: loader_version,
             loader_version: version_split,
             game_version: "1.20.1".to_string(), // All NeoForge Forge versions are for 1.20.1
@@ -163,7 +163,7 @@ pub async fn fetch_neo(
 
         Ok(ForgeVersion {
             format_version: 2,
-            installer_url: format!("https://maven.neoforged.net/net/neoforged/neoforge/{0}/neoforge-{0}-installer.jar", loader_version),
+            installer_url: format!("https://maven.neoforged.net/net/neoforged/neoforge/{loader_version}/neoforge-{loader_version}-installer.jar"),
             loader_version: loader_version.clone(),
             raw: loader_version,
             game_version,
@@ -502,7 +502,7 @@ async fn fetch(
                             )?;
 
                             artifact.url =
-                                format_url(&format!("maven/{}", artifact_path));
+                                format_url(&format!("maven/{artifact_path}"));
 
                             return Ok(lib);
                         }
@@ -589,14 +589,16 @@ async fn fetch(
                         mod_loader: &str,
                         version: &ForgeVersion,
                     ) -> Result<String, Error> {
-                        let extract_file =
-                            read_file(zip, &value[1..value.len()])
-                                .await?
-                                .ok_or_else(|| {
-                                    crate::ErrorKind::InvalidInput(format!(
+                        let extract_file = read_file(
+                            zip,
+                            &value[1..value.len()],
+                        )
+                        .await?
+                        .ok_or_else(|| {
+                            crate::ErrorKind::InvalidInput(format!(
                                 "Unable reading data key {key} at path {value}",
                             ))
-                                })?;
+                        })?;
 
                         let file_name = value.split('/').next_back()
                             .ok_or_else(|| {
@@ -622,10 +624,7 @@ async fn fetch(
 
                         let path = format!(
                             "com.modrinth.daedalus:{}-installer-extracts:{}:{}@{}",
-                            mod_loader,
-                            version.raw,
-                            file_name,
-                            ext
+                            mod_loader, version.raw, file_name, ext
                         );
 
                         upload_files.insert(
@@ -753,7 +752,8 @@ async fn fetch(
                 .rev()
                 .chunk_by(|x| x.game_version.clone())
                 .into_iter()
-                .map(|(game_version, loaders)| daedalus::modded::Version {
+                .map(|(game_version, loaders)| {
+                    daedalus::modded::Version {
                     id: game_version,
                     stable: true,
                     loaders: loaders
@@ -766,6 +766,7 @@ async fn fetch(
                             stable: false,
                         })
                         .collect(),
+                }
                 })
                 .collect(),
         };

@@ -1,10 +1,10 @@
 use crate::common::api_common::ApiProject;
 use crate::common::api_common::ApiVersion;
-use crate::common::api_v2::request_data::get_public_project_creation_data;
 use crate::common::api_v2::ApiV2;
+use crate::common::api_v2::request_data::get_public_project_creation_data;
 use crate::common::dummy_data::TestFile;
-use crate::common::environment::with_test_environment;
 use crate::common::environment::TestEnvironment;
+use crate::common::environment::with_test_environment;
 use crate::common::scopes::ScopeTest;
 use ariadne::ids::base62_impl::parse_base62;
 use labrinth::models::pats::Scopes;

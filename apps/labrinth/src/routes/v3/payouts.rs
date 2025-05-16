@@ -1,17 +1,17 @@
 use crate::auth::validate::get_user_record_from_bearer_token;
-use crate::auth::{get_user_from_headers, AuthenticationError};
+use crate::auth::{AuthenticationError, get_user_from_headers};
 use crate::database::models::generate_payout_id;
 use crate::database::redis::RedisPool;
 use crate::models::ids::PayoutId;
 use crate::models::pats::Scopes;
 use crate::models::payouts::{PayoutMethodType, PayoutStatus};
-use crate::queue::payouts::{make_aditude_request, PayoutsQueue};
+use crate::queue::payouts::{PayoutsQueue, make_aditude_request};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use chrono::{DateTime, Datelike, Duration, TimeZone, Utc, Weekday};
 use hex::ToHex;
-use hmac::{Hmac, Mac, NewMac};
+use hmac::{Hmac, Mac};
 use reqwest::Method;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -620,7 +620,7 @@ pub async fn create_payout(
         PayoutMethodType::Unknown => {
             return Err(ApiError::Payments(
                 "Invalid payment method specified!".to_string(),
-            ))
+            ));
         }
     };
 
@@ -676,8 +676,7 @@ pub async fn cancel_payout(
                             .make_paypal_request::<(), ()>(
                                 Method::POST,
                                 &format!(
-                                    "payments/payouts-item/{}/cancel",
-                                    platform_id
+                                    "payments/payouts-item/{platform_id}/cancel"
                                 ),
                                 None,
                                 None,
@@ -689,7 +688,7 @@ pub async fn cancel_payout(
                         payouts
                             .make_tremendous_request::<(), ()>(
                                 Method::POST,
-                                &format!("rewards/{}/cancel", platform_id),
+                                &format!("rewards/{platform_id}/cancel"),
                                 None,
                             )
                             .await?;
@@ -697,7 +696,7 @@ pub async fn cancel_payout(
                     PayoutMethodType::Unknown => {
                         return Err(ApiError::InvalidInput(
                             "Payout cannot be cancelled!".to_string(),
-                        ))
+                        ));
                     }
                 }
 

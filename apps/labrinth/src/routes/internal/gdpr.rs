@@ -3,7 +3,7 @@ use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use actix_web::{post, web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, post, web};
 use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {

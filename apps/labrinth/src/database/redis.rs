@@ -4,7 +4,7 @@ use chrono::{TimeZone, Utc};
 use dashmap::DashMap;
 use deadpool_redis::{Config, Runtime};
 use prometheus::{IntGauge, Registry};
-use redis::{cmd, Cmd, ExistenceCheck, SetExpiry, SetOptions};
+use redis::{Cmd, ExistenceCheck, SetExpiry, SetOptions, cmd};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

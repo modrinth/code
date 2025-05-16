@@ -1,13 +1,11 @@
 use std::{collections::HashMap, sync::Arc};
 
-use actix_web::{web, HttpRequest, HttpResponse};
-use lazy_static::lazy_static;
-use regex::Regex;
+use actix_web::{HttpRequest, HttpResponse, web};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use validator::Validate;
 
-use super::{oauth_clients::get_user_clients, ApiError};
+use super::{ApiError, oauth_clients::get_user_clients};
 use crate::util::img::delete_old_images;
 use crate::{
     auth::{filter_visible_projects, get_user_from_headers},
@@ -358,13 +356,9 @@ pub async fn orgs_list(
     }
 }
 
-lazy_static! {
-    static ref RE_URL_SAFE: Regex = Regex::new(r"^[a-zA-Z0-9_-]*$").unwrap();
-}
-
 #[derive(Serialize, Deserialize, Validate)]
 pub struct EditUser {
-    #[validate(length(min = 1, max = 39), regex = "RE_URL_SAFE")]
+    #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_URL_SAFE))]
     pub username: Option<String>,
     #[serde(
         default,
@@ -595,7 +589,7 @@ pub async fn user_icon_edit(
 
         let user_id: UserId = actual_user.id.into();
         let upload_result = crate::util::img::upload_image_optimized(
-            &format!("data/{}", user_id),
+            &format!("data/{user_id}"),
             bytes.freeze(),
             &ext.ext,
             Some(96),

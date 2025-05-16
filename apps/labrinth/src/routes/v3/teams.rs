@@ -1,10 +1,10 @@
 use crate::auth::checks::is_visible_project;
 use crate::auth::get_user_from_headers;
+use crate::database::Project;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::team_item::TeamAssociationId;
 use crate::database::models::{Organization, Team, TeamMember, User};
 use crate::database::redis::RedisPool;
-use crate::database::Project;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::teams::{
@@ -13,7 +13,7 @@ use crate::models::teams::{
 use crate::models::users::UserId;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, web};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -299,7 +299,7 @@ pub async fn teams_get(
     .map(|x| x.1)
     .ok();
 
-    let teams_groups = teams_data.into_iter().group_by(|data| data.team_id.0);
+    let teams_groups = teams_data.into_iter().chunk_by(|data| data.team_id.0);
 
     let mut teams: Vec<Vec<crate::models::teams::TeamMember>> = vec![];
 

@@ -92,7 +92,7 @@
             <div class="mb-4 mt-2 flex w-full items-center gap-1 text-sm text-secondary">
               {{ formatCategory(subscription.interval) }} ⋅ {{ subscription.status }} ⋅
               {{ dayjs(subscription.created).format("MMMM D, YYYY [at] h:mma") }} ({{
-                dayjs(subscription.created).fromNow()
+                formatRelativeTime(subscription.created)
               }})
             </div>
           </div>
@@ -151,7 +151,7 @@
                 </span>
                 <span class="text-sm text-secondary">
                   {{ dayjs(charge.due).format("MMMM D, YYYY [at] h:mma") }}
-                  <span class="text-secondary">({{ dayjs(charge.due).fromNow() }}) </span>
+                  <span class="text-secondary">({{ formatRelativeTime(charge.due) }}) </span>
                 </span>
                 <div
                   v-if="flags.developerMode"
@@ -196,7 +196,15 @@
   </div>
 </template>
 <script setup>
-import { Avatar, ButtonStyled, CopyCode, DropdownSelect, NewModal, Toggle } from "@modrinth/ui";
+import {
+  Avatar,
+  ButtonStyled,
+  CopyCode,
+  DropdownSelect,
+  NewModal,
+  Toggle,
+  useRelativeTime,
+} from "@modrinth/ui";
 import { formatCategory, formatPrice } from "@modrinth/utils";
 import {
   CheckIcon,
@@ -215,7 +223,9 @@ const flags = useFeatureFlags();
 const route = useRoute();
 const data = useNuxtApp();
 const vintl = useVIntl();
+
 const { formatMessage } = vintl;
+const formatRelativeTime = useRelativeTime();
 
 const messages = defineMessages({
   userNotFoundError: {

@@ -1,14 +1,13 @@
+use std::sync::LazyLock;
+
 use itertools::Itertools;
-use lazy_static::lazy_static;
 use regex::Regex;
 use validator::{ValidationErrors, ValidationErrorsKind};
 
 use crate::models::pats::Scopes;
 
-lazy_static! {
-    pub static ref RE_URL_SAFE: Regex =
-        Regex::new(r#"^[a-zA-Z0-9!@$()`.+,_"-]*$"#).unwrap();
-}
+pub static RE_URL_SAFE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"^[a-zA-Z0-9_-]*$").unwrap());
 
 //TODO: In order to ensure readability, only the first error is printed, this may need to be expanded on in the future!
 pub fn validation_errors_to_string(
@@ -19,7 +18,7 @@ pub fn validation_errors_to_string(
 
     let map = errors.into_errors();
 
-    let key_option = map.keys().next().copied();
+    let key_option = map.keys().next();
 
     if let Some(field) = key_option {
         if let Some(error) = map.get(field) {

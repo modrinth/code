@@ -1,12 +1,16 @@
 use serde::{Deserialize, Serialize};
+use tauri::Runtime;
+use tauri_plugin_opener::OpenerExt;
 use theseus::{
     handler,
     prelude::{CommandPayload, DirectoryInfo},
 };
 
-use crate::api::Result;
+use crate::api::{Result, TheseusSerializableError};
 use dashmap::DashMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
+use theseus::prelude::canonicalize;
+use url::Url;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("utils")
@@ -45,57 +49,56 @@ pub enum OS {
 // Create a new HashMap with the same keys
 // Values provided should not be used directly, as they are not guaranteed to be up-to-date
 #[tauri::command]
-pub async fn progress_bars_list(
-) -> Result<DashMap<uuid::Uuid, theseus::LoadingBar>> {
+pub async fn progress_bars_list()
+-> Result<DashMap<uuid::Uuid, theseus::LoadingBar>> {
     let res = theseus::EventState::list_progress_bars().await?;
     Ok(res)
 }
 
-// cfg only on mac os
 // disables mouseover and fixes a random crash error only fixed by recent versions of macos
-#[cfg(target_os = "macos")]
 #[tauri::command]
 pub async fn should_disable_mouseover() -> bool {
-    // We try to match version to 12.2 or higher. If unrecognizable to pattern or lower, we default to the css with disabled mouseover for safety
-    let os = os_info::get();
-    if let os_info::Version::Semantic(major, minor, _) = os.version() {
-        if *major >= 12 && *minor >= 3 {
-            // Mac os version is 12.3 or higher, we allow mouseover
-            return false;
+    if cfg!(target_os = "macos") {
+        // We try to match version to 12.2 or higher. If unrecognizable to pattern or lower, we default to the css with disabled mouseover for safety
+        if let tauri_plugin_os::Version::Semantic(major, minor, _) =
+            tauri_plugin_os::version()
+        {
+            if major >= 12 && minor >= 3 {
+                // Mac os version is 12.3 or higher, we allow mouseover
+                return false;
+            }
         }
+        true
+    } else {
+        // Not macos, we allow mouseover
+        false
     }
-    true
-}
-#[cfg(not(target_os = "macos"))]
-#[tauri::command]
-pub async fn should_disable_mouseover() -> bool {
-    false
 }
 
 #[tauri::command]
-pub fn highlight_in_folder(path: PathBuf) {
-    let res = opener::reveal(path);
-
-    if let Err(e) = res {
+pub fn highlight_in_folder<R: Runtime>(
+    app: tauri::AppHandle<R>,
+    path: PathBuf,
+) {
+    if let Err(e) = app.opener().reveal_item_in_dir(path) {
         tracing::error!("Failed to highlight file in folder: {}", e);
     }
 }
 
 #[tauri::command]
-pub fn open_path(path: PathBuf) {
-    let res = opener::open(path);
-
-    if let Err(e) = res {
+pub fn open_path<R: Runtime>(app: tauri::AppHandle<R>, path: PathBuf) {
+    if let Err(e) = app.opener().open_path(path.to_string_lossy(), None::<&str>)
+    {
         tracing::error!("Failed to open path: {}", e);
     }
 }
 
 #[tauri::command]
-pub fn show_launcher_logs_folder() {
+pub fn show_launcher_logs_folder<R: Runtime>(app: tauri::AppHandle<R>) {
     let path = DirectoryInfo::launcher_logs_dir().unwrap_or_default();
     // failure to get folder just opens filesystem
     // (ie: if in debug mode only and launcher_logs never created)
-    open_path(path);
+    open_path(app, path);
 }
 
 // Get opening command
@@ -139,4 +142,29 @@ pub async fn get_opening_command() -> Result<Option<CommandPayload>> {
 pub async fn handle_command(command: String) -> Result<()> {
     tracing::info!("handle command: {command}");
     Ok(theseus::handler::parse_and_emit_command(&command).await?)
+}
+
+// Remove when (and if) https://github.com/tauri-apps/tauri/issues/12022 is implemented
+pub(crate) fn tauri_convert_file_src(path: &Path) -> Result<Url> {
+    #[cfg(any(windows, target_os = "android"))]
+    const BASE: &str = "http://asset.localhost/";
+    #[cfg(not(any(windows, target_os = "android")))]
+    const BASE: &str = "asset://localhost/";
+
+    macro_rules! theseus_try {
+        ($test:expr) => {
+            match $test {
+                Ok(val) => val,
+                Err(e) => {
+                    return Err(TheseusSerializableError::Theseus(e.into()))
+                }
+            }
+        };
+    }
+
+    let path = theseus_try!(canonicalize(path));
+    let path = path.to_string_lossy();
+    let encoded = urlencoding::encode(&path);
+
+    Ok(theseus_try!(Url::parse(&format!("{BASE}{encoded}"))))
 }

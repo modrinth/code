@@ -2,6 +2,7 @@ use super::{DeleteFileData, FileHost, FileHostingError, UploadFileData};
 use async_trait::async_trait;
 use bytes::Bytes;
 use chrono::Utc;
+use hex::ToHex;
 use sha2::Digest;
 
 #[derive(Default)]
@@ -27,7 +28,7 @@ impl FileHost for MockHost {
         std::fs::create_dir_all(
             path.parent().ok_or(FileHostingError::InvalidFilename)?,
         )?;
-        let content_sha1 = sha1::Sha1::from(&file_bytes).hexdigest();
+        let content_sha1 = sha1::Sha1::digest(&file_bytes).encode_hex();
         let content_sha512 = format!("{:x}", sha2::Sha512::digest(&file_bytes));
 
         std::fs::write(path, &*file_bytes)?;

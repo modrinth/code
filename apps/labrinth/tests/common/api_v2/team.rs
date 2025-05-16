@@ -10,8 +10,8 @@ use serde_json::json;
 use crate::{
     assert_status,
     common::api_common::{
-        models::{CommonNotification, CommonTeamMember},
         Api, ApiTeams, AppendsOptionalPat,
+        models::{CommonNotification, CommonTeamMember},
     },
 };
 

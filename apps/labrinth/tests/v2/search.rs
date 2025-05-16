@@ -5,10 +5,10 @@ use crate::common::api_common::ApiVersion;
 use crate::common::api_v2::ApiV2;
 
 use crate::common::database::*;
-use crate::common::dummy_data::TestFile;
 use crate::common::dummy_data::DUMMY_CATEGORIES;
-use crate::common::environment::with_test_environment;
+use crate::common::dummy_data::TestFile;
 use crate::common::environment::TestEnvironment;
+use crate::common::environment::with_test_environment;
 use actix_http::StatusCode;
 use ariadne::ids::base62_impl::parse_base62;
 use futures::stream::StreamExt;
@@ -328,7 +328,7 @@ async fn search_projects() {
                         .collect();
                     expected_project_ids.sort();
                     found_project_ids.sort();
-                    println!("Facets: {:?}", facets);
+                    println!("Facets: {facets:?}");
                     assert_eq!(found_project_ids, expected_project_ids);
                 }
             })

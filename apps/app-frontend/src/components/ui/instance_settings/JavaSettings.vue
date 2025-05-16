@@ -7,7 +7,7 @@ import { handleError } from '@/store/notifications'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import { get_max_memory } from '@/helpers/jre'
-import { get } from '@/helpers/settings'
+import { get } from '@/helpers/settings.ts'
 import type { InstanceSettingsTabProps, AppSettings, MemorySettings } from '../../../helpers/types'
 
 const { formatMessage } = useVIntl()

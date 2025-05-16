@@ -132,7 +132,7 @@
                 class="z-[1] flex cursor-help items-center gap-1 text-nowrap font-medium xl:self-center"
               >
                 <CalendarIcon class="xl:hidden" />
-                {{ dayjs(version.date_published).fromNow() }}
+                {{ formatRelativeTime(version.date_published) }}
               </div>
               <div
                 class="pointer-events-none z-[1] flex items-center gap-1 font-medium xl:self-center"
@@ -185,11 +185,12 @@ import { Pagination, VersionChannelIndicator, VersionFilterControl } from '../in
 import { useVIntl } from '@vintl/vintl'
 import { type Ref, ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import dayjs from 'dayjs'
 import AutoLink from '../base/AutoLink.vue'
 import TagItem from '../base/TagItem.vue'
+import { useRelativeTime } from '../../composables'
 
 const { formatMessage } = useVIntl()
+const formatRelativeTime = useRelativeTime()
 
 type VersionWithDisplayUrlEnding = Version & {
   displayUrlEnding: string

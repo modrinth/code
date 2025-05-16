@@ -1,6 +1,6 @@
+use super::DatabaseError;
 use super::ids::*;
 use super::loader_fields::VersionField;
-use super::DatabaseError;
 use crate::database::models::loader_fields::{
     QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
 };
@@ -229,7 +229,10 @@ impl VersionBuilder {
 
         let loader_versions = loaders
             .iter()
-            .map(|l| LoaderVersion::new(*l, version_id))
+            .map(|&loader_id| LoaderVersion {
+                loader_id,
+                version_id,
+            })
             .collect_vec();
         LoaderVersion::insert_many(loader_versions, transaction).await?;
 
@@ -239,7 +242,7 @@ impl VersionBuilder {
     }
 }
 
-#[derive(derive_new::new, Serialize, Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct LoaderVersion {
     pub loader_id: LoaderId,
     pub version_id: VersionId,
@@ -912,7 +915,7 @@ impl Version {
                         file.hashes.iter().map(|(algo, hash)| {
                             (
                                 VERSION_FILES_NAMESPACE,
-                                Some(format!("{}_{}", algo, hash)),
+                                Some(format!("{algo}_{hash}")),
                             )
                         })
                     },

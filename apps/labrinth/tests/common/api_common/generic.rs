@@ -10,9 +10,9 @@ use labrinth::models::{
 use crate::common::{api_v2::ApiV2, api_v3::ApiV3, dummy_data::TestFile};
 
 use super::{
+    Api, ApiProject, ApiTags, ApiTeams, ApiUser, ApiVersion,
     models::{CommonProject, CommonVersion},
     request_data::{ImageData, ProjectCreationRequestData},
-    Api, ApiProject, ApiTags, ApiTeams, ApiUser, ApiVersion,
 };
 
 #[derive(Clone)]

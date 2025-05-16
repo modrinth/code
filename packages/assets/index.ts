@@ -4,6 +4,16 @@
 import _ModrinthIcon from './branding/logo.svg?component'
 import _FourOhFourNotFound from './branding/404.svg?component'
 import _ModrinthPlusIcon from './branding/modrinth-plus.svg?component'
+import _AngryRinthbot from './branding/rinthbot/angry.webp'
+import _AnnoyedRinthbot from './branding/rinthbot/annoyed.webp'
+import _ConfusedRinthbot from './branding/rinthbot/confused.webp'
+import _ExcitedRinthbot from './branding/rinthbot/excited.webp'
+import _LaughingRinthbot from './branding/rinthbot/laughing.webp'
+import _SadRinthbot from './branding/rinthbot/sad.webp'
+import _SleepingRinthbot from './branding/rinthbot/sleeping.webp'
+import _SobbingRinthbot from './branding/rinthbot/sobbing.webp'
+import _ThinkingRinthbot from './branding/rinthbot/thinking.webp'
+import _WavingRinthbot from './branding/rinthbot/waving.webp'
 
 // External Icons
 import _SSODiscordIcon from './external/sso/discord.svg?component'
@@ -15,6 +25,7 @@ import _SSOSteamIcon from './external/sso/steam.svg?component'
 import _AppleIcon from './external/apple.svg?component'
 import _BlueskyIcon from './external/bluesky.svg?component'
 import _BuyMeACoffeeIcon from './external/bmac.svg?component'
+import _CurseForgeIcon from './external/curseforge.svg?component'
 import _DiscordIcon from './external/discord.svg?component'
 import _GithubIcon from './external/github.svg?component'
 import _KoFiIcon from './external/kofi.svg?component'
@@ -27,7 +38,6 @@ import _TumblrIcon from './external/tumblr.svg?component'
 import _TwitterIcon from './external/twitter.svg?component'
 import _WindowsIcon from './external/windows.svg?component'
 import _YouTubeIcon from './external/youtube.svg?component'
-import _PyroIcon from './external/pyro.svg?component'
 
 // Icons
 import _AlignLeftIcon from './icons/align-left.svg?component'
@@ -37,6 +47,7 @@ import _AsteriskIcon from './icons/asterisk.svg?component'
 import _BanIcon from './icons/ban.svg?component'
 import _BellIcon from './icons/bell.svg?component'
 import _BellRingIcon from './icons/bell-ring.svg?component'
+import _BlocksIcon from './icons/blocks.svg?component'
 import _BookIcon from './icons/book.svg?component'
 import _BookTextIcon from './icons/book-text.svg?component'
 import _BookmarkIcon from './icons/bookmark.svg?component'
@@ -74,6 +85,7 @@ import _ExternalIcon from './icons/external.svg?component'
 import _EyeIcon from './icons/eye.svg?component'
 import _EyeOffIcon from './icons/eye-off.svg?component'
 import _FileIcon from './icons/file.svg?component'
+import _FileArchiveIcon from './icons/file-archive.svg?component'
 import _FileTextIcon from './icons/file-text.svg?component'
 import _FilterIcon from './icons/filter.svg?component'
 import _FilterXIcon from './icons/filter-x.svg?component'
@@ -123,12 +135,14 @@ import _MoonIcon from './icons/moon.svg?component'
 import _MoreHorizontalIcon from './icons/more-horizontal.svg?component'
 import _MoreVerticalIcon from './icons/more-vertical.svg?component'
 import _NewspaperIcon from './icons/newspaper.svg?component'
+import _NoSignalIcon from './icons/no-signal.svg?component'
 import _OmorphiaIcon from './icons/omorphia.svg?component'
 import _OrganizationIcon from './icons/organization.svg?component'
 import _PackageIcon from './icons/package.svg?component'
 import _PackageOpenIcon from './icons/package-open.svg?component'
 import _PackageClosedIcon from './icons/package-closed.svg?component'
 import _PaintBrushIcon from './icons/paintbrush.svg?component'
+import _PickaxeIcon from './icons/pickaxe.svg?component'
 import _PlayIcon from './icons/play.svg?component'
 import _PlugIcon from './icons/plug.svg?component'
 import _PlusIcon from './icons/plus.svg?component'
@@ -150,6 +164,8 @@ import _ServerIcon from './icons/server.svg?component'
 import _SettingsIcon from './icons/settings.svg?component'
 import _ShareIcon from './icons/share.svg?component'
 import _ShieldIcon from './icons/shield.svg?component'
+import _SignalIcon from './icons/signal.svg?component'
+import _SkullIcon from './icons/skull.svg?component'
 import _SlashIcon from './icons/slash.svg?component'
 import _SortAscendingIcon from './icons/sort-asc.svg?component'
 import _SortDescendingIcon from './icons/sort-desc.svg?component'
@@ -179,6 +195,7 @@ import _UsersIcon from './icons/users.svg?component'
 import _VersionIcon from './icons/version.svg?component'
 import _WikiIcon from './icons/wiki.svg?component'
 import _WindowIcon from './icons/window.svg?component'
+import _WorldIcon from './icons/world.svg?component'
 import _WrenchIcon from './icons/wrench.svg?component'
 import _XIcon from './icons/x.svg?component'
 import _XCircleIcon from './icons/x-circle.svg?component'
@@ -210,6 +227,16 @@ import './omorphia.scss'
 export const ModrinthIcon = _ModrinthIcon
 export const FourOhFourNotFound = _FourOhFourNotFound
 export const ModrinthPlusIcon = _ModrinthPlusIcon
+export const AngryRinthbot = _AngryRinthbot
+export const AnnoyedRinthbot = _AnnoyedRinthbot
+export const ConfusedRinthbot = _ConfusedRinthbot
+export const ExcitedRinthbot = _ExcitedRinthbot
+export const LaughingRinthbot = _LaughingRinthbot
+export const SadRinthbot = _SadRinthbot
+export const SleepingRinthbot = _SleepingRinthbot
+export const SobbingRinthbot = _SobbingRinthbot
+export const ThinkingRinthbot = _ThinkingRinthbot
+export const WavingRinthbot = _WavingRinthbot
 export const SSODiscordIcon = _SSODiscordIcon
 export const SSOGitHubIcon = _SSOGitHubIcon
 export const SSOGitLabIcon = _SSOGitLabIcon
@@ -220,13 +247,13 @@ export const AppleIcon = _AppleIcon
 export const BlueskyIcon = _BlueskyIcon
 export const BuyMeACoffeeIcon = _BuyMeACoffeeIcon
 export const GithubIcon = _GithubIcon
+export const CurseForgeIcon = _CurseForgeIcon
 export const DiscordIcon = _DiscordIcon
 export const KoFiIcon = _KoFiIcon
 export const MastodonIcon = _MastodonIcon
 export const OpenCollectiveIcon = _OpenCollectiveIcon
 export const PatreonIcon = _PatreonIcon
 export const PayPalIcon = _PayPalIcon
-export const PyroIcon = _PyroIcon
 export const RedditIcon = _RedditIcon
 export const TumblrIcon = _TumblrIcon
 export const TwitterIcon = _TwitterIcon
@@ -239,6 +266,7 @@ export const AsteriskIcon = _AsteriskIcon
 export const BanIcon = _BanIcon
 export const BellIcon = _BellIcon
 export const BellRingIcon = _BellRingIcon
+export const BlocksIcon = _BlocksIcon
 export const BookIcon = _BookIcon
 export const BookTextIcon = _BookTextIcon
 export const BookmarkIcon = _BookmarkIcon
@@ -276,6 +304,7 @@ export const ExternalIcon = _ExternalIcon
 export const EyeIcon = _EyeIcon
 export const EyeOffIcon = _EyeOffIcon
 export const FileIcon = _FileIcon
+export const FileArchiveIcon = _FileArchiveIcon
 export const FileTextIcon = _FileTextIcon
 export const FilterIcon = _FilterIcon
 export const FilterXIcon = _FilterXIcon
@@ -325,12 +354,14 @@ export const MoonIcon = _MoonIcon
 export const MoreHorizontalIcon = _MoreHorizontalIcon
 export const MoreVerticalIcon = _MoreVerticalIcon
 export const NewspaperIcon = _NewspaperIcon
+export const NoSignalIcon = _NoSignalIcon
 export const OmorphiaIcon = _OmorphiaIcon
 export const OrganizationIcon = _OrganizationIcon
 export const PackageIcon = _PackageIcon
 export const PackageOpenIcon = _PackageOpenIcon
 export const PackageClosedIcon = _PackageClosedIcon
 export const PaintBrushIcon = _PaintBrushIcon
+export const PickaxeIcon = _PickaxeIcon
 export const PlayIcon = _PlayIcon
 export const PlugIcon = _PlugIcon
 export const PlusIcon = _PlusIcon
@@ -352,6 +383,8 @@ export const ServerIcon = _ServerIcon
 export const SettingsIcon = _SettingsIcon
 export const ShareIcon = _ShareIcon
 export const ShieldIcon = _ShieldIcon
+export const SignalIcon = _SignalIcon
+export const SkullIcon = _SkullIcon
 export const SlashIcon = _SlashIcon
 export const SortAscendingIcon = _SortAscendingIcon
 export const SortDescendingIcon = _SortDescendingIcon
@@ -381,6 +414,7 @@ export const UsersIcon = _UsersIcon
 export const VersionIcon = _VersionIcon
 export const WikiIcon = _WikiIcon
 export const WindowIcon = _WindowIcon
+export const WorldIcon = _WorldIcon
 export const WrenchIcon = _WrenchIcon
 export const XIcon = _XIcon
 export const XCircleIcon = _XCircleIcon

@@ -8,6 +8,9 @@
   "button.copy-id": {
     "defaultMessage": "Copy ID"
   },
+  "button.copy-permalink": {
+    "defaultMessage": "Copy permanent link"
+  },
   "button.create-a-project": {
     "defaultMessage": "Create a project"
   },
@@ -19,6 +22,21 @@
   },
   "button.edit": {
     "defaultMessage": "Edit"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Open folder"
+  },
+  "button.play": {
+    "defaultMessage": "Play"
+  },
+  "button.refresh": {
+    "defaultMessage": "Refresh"
+  },
+  "button.remove": {
+    "defaultMessage": "Remove"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Remove image"
   },
   "button.report": {
     "defaultMessage": "Report"
@@ -34,6 +52,9 @@
   },
   "button.sign-out": {
     "defaultMessage": "Sign out"
+  },
+  "button.stop": {
+    "defaultMessage": "Stop"
   },
   "button.upload-image": {
     "defaultMessage": "Upload image"
@@ -65,6 +86,21 @@
   "input.view.list": {
     "defaultMessage": "Rows view"
   },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "Adventure mode"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "Creative mode"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "Spectator mode"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "Survival mode"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "Unknown game mode"
+  },
   "label.changes-saved": {
     "defaultMessage": "Changes saved"
   },
@@ -89,6 +125,9 @@
   "label.followed-projects": {
     "defaultMessage": "Followed projects"
   },
+  "label.loading": {
+    "defaultMessage": "Loading..."
+  },
   "label.moderation": {
     "defaultMessage": "Moderation"
   },
@@ -97,6 +136,9 @@
   },
   "label.password": {
     "defaultMessage": "Password"
+  },
+  "label.played": {
+    "defaultMessage": "Played {time}"
   },
   "label.public": {
     "defaultMessage": "Public"
@@ -107,11 +149,17 @@
   "label.scopes": {
     "defaultMessage": "Scopes"
   },
+  "label.server": {
+    "defaultMessage": "Server"
+  },
   "label.servers": {
     "defaultMessage": "Servers"
   },
   "label.settings": {
     "defaultMessage": "Settings"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "Singleplayer"
   },
   "label.title": {
     "defaultMessage": "Title"
