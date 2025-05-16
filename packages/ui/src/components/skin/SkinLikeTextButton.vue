@@ -5,7 +5,7 @@ const pressed = ref(false)
 
 <template>
   <div
-    class="relative w-full aspect-[2/3] border-2 border-transparent rounded-xl overflow-hidden"
+    class="relative border-2 border-transparent rounded-xl overflow-hidden"
     :class="{ 'scale-95': pressed }"
   >
     <button

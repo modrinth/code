@@ -112,7 +112,7 @@ async function loadUsername() {
       <section class="flex flex-col gap-3">
         <h2 class="text-lg font-bold m-0 text-primary">Saved skins</h2>
         <div class="flex flex-row flex-wrap gap-2">
-          <SkinLikeTextButton @click="editSkinModal?.show" class="max-w-[9vw]" tooltip="Add a skin">
+          <SkinLikeTextButton @click="editSkinModal?.show" class="flex-none w-[8vw] h-[15vw] max-w-[8rem] max-h-[15rem]" tooltip="Add a skin">
             <template #icon>
               <PlusIcon />
             </template>
@@ -121,7 +121,7 @@ async function loadUsername() {
 
           <SkinButton
             v-for="skin in savedSkins"
-            class="max-w-[9vw]"
+            class="flex-none w-[8vw] h-[15vw] max-w-[8rem] max-h-[15rem]"
             :key="`saved-skin-${skin.texture_key}`"
             editable
             :forward-image-src="map.get(skin.texture_key)?.forwards ?? ''"
@@ -138,7 +138,7 @@ async function loadUsername() {
         <div class="flex flex-row flex-wrap gap-2">
           <SkinButton
             v-for="skin in defaultSkins"
-            class="max-w-[9vw]"
+            class="flex-none w-[8vw] h-[15vw] max-w-[8rem] max-h-[15rem]"
             :key="`default-skin-${skin.texture_key}`"
             :forward-image-src="map.get(skin.texture_key)?.forwards ?? ''"
             :backward-image-src="map.get(skin.texture_key)?.backwards ?? ''"
