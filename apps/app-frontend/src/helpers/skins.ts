@@ -38,7 +38,6 @@ export const DEFAULT_MODELS: Record<string, SkinModel> = {
 
 export function filterSavedSkins(list: Skin[]) {
   const customSkins = list.filter((s) => s.source !== 'default');
-  console.log(customSkins[0]);
   fixUnknownSkins(customSkins).catch(handleError);
   return customSkins;
 }
@@ -91,13 +90,11 @@ export async function determineModelType(texture: string): Promise<'SLIM' | 'CLA
 export async function fixUnknownSkins(list: Skin[]) {
   const unknownSkins = list.filter((s) => s.variant === "UNKNOWN");
   for (let unknownSkin of unknownSkins) {
-    console.log(unknownSkin.texture);
     unknownSkin.variant = await determineModelType(unknownSkin.texture);
   }
 }
 
 export function filterDefaultSkins(list: Skin[]) {
-  console.log(list);
   return list
     .filter(
       (s) =>

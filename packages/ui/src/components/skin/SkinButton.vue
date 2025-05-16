@@ -12,8 +12,8 @@ const emit = defineEmits<{
 }>()
 
 const props = withDefaults(defineProps<{
-  forwardImageSrc: string
-  backwardImageSrc: string
+  forwardImageSrc?: string
+  backwardImageSrc?: string
   selected: boolean
   editable?: boolean
   tooltip?: string
@@ -22,6 +22,14 @@ const props = withDefaults(defineProps<{
 })
 
 const pressed = ref(false)
+const imagesLoaded = ref({
+  forward: Boolean(props.forwardImageSrc),
+  backward: Boolean(props.backwardImageSrc)
+})
+
+function onImageLoad(type: 'forward' | 'backward') {
+  imagesLoaded.value[type] = true
+}
 </script>
 
 <template>
@@ -43,18 +51,26 @@ const pressed = ref(false)
       @mouseleave="pressed = false"
       @click="emit('select')"
     ></button>
-    <span class="skin-button__image-parent pointer-events-none w-full h-full flex flex-col justify-end">
+
+    <div v-if="!forwardImageSrc || !backwardImageSrc" class="skeleton-loader w-full h-full rounded-xl">
+      <div class="absolute inset-0 rounded-xl skeleton"></div>
+    </div>
+
+    <span v-else class="skin-button__image-parent pointer-events-none w-full h-full flex flex-col justify-end">
       <img
         alt=""
         :src="forwardImageSrc"
         class="skin-button__image-facing rounded-xl object-contain w-full h-auto mx-auto mb-0"
+        @load="onImageLoad('forward')"
       />
       <img
         alt=""
         :src="backwardImageSrc"
         class="skin-button__image-away rounded-xl object-contain w-full h-auto mx-auto mb-0"
+        @load="onImageLoad('backward')"
       />
     </span>
+
     <span
       v-if="editable"
       class="absolute pointer-events-none inset-0 flex items-end justify-center p-2 translate-y-4 scale-75 opacity-0 transition-all group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 group-hover:translate-x-0"
@@ -77,6 +93,21 @@ const pressed = ref(false)
 <style scoped lang="scss">
 .skin-button__parent {
   perspective: 1000px;
+
+  .skeleton-loader {
+    aspect-ratio: 1 / 1;
+  }
+
+  .skeleton {
+    background: linear-gradient(
+        90deg,
+        var(--color-bg, #f0f0f0) 25%,
+        var(--color-raised-bg, #e0e0e0) 50%,
+        var(--color-bg, #f0f0f0) 75%
+    );
+    background-size: 200% 100%;
+    animation: wave 1500ms infinite linear;
+  }
 
   .skin-button__image-parent {
     transform-style: preserve-3d;
@@ -124,6 +155,15 @@ const pressed = ref(false)
         animation: appear-halfway 0.3s ease-in-out forwards;
       }
     }
+  }
+}
+
+@keyframes wave {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }
 
