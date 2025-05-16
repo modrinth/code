@@ -34,6 +34,7 @@ function onImageLoad(type: 'forward' | 'backward') {
 
 <template>
   <div
+    v-tooltip="tooltip ?? undefined"
     class="skin-button__parent group flex relative border-2 border-solid transform-3d rotate-y-90 transition-all p-0 bg-transparent rounded-xl overflow-hidden"
     :class="[
       selected ? `border-brand` : 'border-transparent',
@@ -41,7 +42,6 @@ function onImageLoad(type: 'forward' | 'backward') {
         'scale-95': pressed,
       },
     ]"
-    v-tooltip="tooltip ?? undefined"
   >
     <button
       class="absolute inset-0 rounded-xl cursor-pointer p-0 border-none group-hover:brightness-125"

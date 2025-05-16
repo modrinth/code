@@ -2,8 +2,14 @@
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { useTemplateRef, ref, computed } from 'vue'
 import type { Cape, SkinModel } from '@/helpers/skins.ts'
-import {ButtonStyled, ScrollablePanel, CapeButton, CapeLikeTextButton, SkinPreviewRenderer} from '@modrinth/ui'
-import { CheckIcon, XIcon} from '@modrinth/assets'
+import {
+  ButtonStyled,
+  ScrollablePanel,
+  CapeButton,
+  CapeLikeTextButton,
+  SkinPreviewRenderer,
+} from '@modrinth/ui'
+import { CheckIcon, XIcon } from '@modrinth/assets'
 
 const modal = useTemplateRef('modal')
 
@@ -12,7 +18,7 @@ const emit = defineEmits<{
 }>()
 
 defineProps<{
-  capes: Cape[];
+  capes: Cape[]
 }>()
 
 const currentSkinId = ref<string | undefined>()
@@ -21,9 +27,16 @@ const currentSkinVariant = ref<SkinModel>('CLASSIC')
 const currentCapeTexture = computed<string | undefined>(() => currentCape.value?.texture)
 const currentCape = ref<Cape | undefined>()
 
-function show(e: MouseEvent, skinId?: string, selected?: Cape, skinTexture?: string, variant?: SkinModel) {
+function show(
+  e: MouseEvent,
+  skinId?: string,
+  selected?: Cape,
+  skinTexture?: string,
+  variant?: SkinModel,
+) {
   currentSkinId.value = skinId
-  currentSkinTexture.value = skinTexture || (skinId ? `https://vzge.me/processedskin/${skinId}.png` : '')
+  currentSkinTexture.value =
+    skinTexture || (skinId ? `https://vzge.me/processedskin/${skinId}.png` : '')
   currentSkinVariant.value = variant || 'CLASSIC'
   currentCape.value = selected
   modal.value?.show(e)
@@ -86,10 +99,10 @@ defineExpose({
             </CapeLikeTextButton>
             <CapeButton
               v-for="cape in capes"
+              :id="cape.id"
               :key="cape.id"
               :name="cape.name"
               :texture="cape.texture"
-              :id="cape.id"
               :selected="currentCape?.id === cape.id"
               @select="updateSelectedCape(cape)"
             />

@@ -59,7 +59,10 @@ watch(
   <div class="mt-4 flex items-center justify-between">
     <div>
       <h2 class="m-0 text-lg font-extrabold text-contrast">Hide Nametag</h2>
-      <p class="m-0 mt-1">Allows you to disable the nametag that appears above the main preview on the skin management page.</p>
+      <p class="m-0 mt-1">
+        Allows you to disable the nametag that appears above the main preview on the skin management
+        page.
+      </p>
     </div>
     <Toggle id="hide-nametag-skins-page" v-model="settings.hide_nametag_skins_page" />
   </div>
