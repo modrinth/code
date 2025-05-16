@@ -26,7 +26,7 @@ const pressed = ref(false)
 
 <template>
   <div
-    class="skin-button__parent group flex relative border-2 border-solid transform-3d rotate-y-90 transition-all p-0 bg-transparent rounded-xl overflow-hidden w-full aspect-[2/3]"
+    class="skin-button__parent group flex relative border-2 border-solid transform-3d rotate-y-90 transition-all p-0 bg-transparent rounded-xl overflow-hidden"
     :class="[
       selected ? `border-brand` : 'border-transparent',
       {

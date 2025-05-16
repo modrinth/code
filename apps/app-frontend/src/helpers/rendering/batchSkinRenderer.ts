@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader, GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import {Skin, determineModelType, get_available_skins} from '../skins';
-import {reactive} from "vue";
+import { Skin, determineModelType } from '../skins';
+import { reactive } from "vue";
 
 interface RenderResult {
   forwards: string;
@@ -14,14 +14,9 @@ class BatchSkinRenderer {
   private readonly camera: THREE.PerspectiveCamera;
   private modelCache: Map<string, GLTF> = new Map();
   private textureCache: Map<string, THREE.Texture> = new Map();
-  private readonly width: number;
-  private readonly height: number;
   private currentModel: THREE.Group | null = null;
 
-  constructor(width: number = 215, height: number = 645) {
-    this.width = width;
-    this.height = height;
-
+  constructor(width: number = 215, height: number = 215*2) {
     // Create canvas and renderer
     const canvas = document.createElement('canvas');
     canvas.width = width;
@@ -40,7 +35,7 @@ class BatchSkinRenderer {
     this.renderer.setSize(width, height);
 
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(40, width/height, 0.1, 1000);
+    this.camera = new THREE.PerspectiveCamera(20, width/height, 0.4, 1000);
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 2);
     this.scene.add(ambientLight);
@@ -120,43 +115,28 @@ class BatchSkinRenderer {
   public async renderSkin(textureUrl: string, modelUrl: string): Promise<RenderResult> {
     await this.setupModel(modelUrl, textureUrl);
 
-    // Create a bounding box for the entire model
-    const bbox = new THREE.Box3().setFromObject(this.currentModel!);
+    // Find the Head part of the model for lookAt target
+    const headPart = this.currentModel!.getObjectByName('Head');
+    let lookAtTarget: [number, number, number];
 
-    // Calculate model dimensions
-    const boxCenter = bbox.getCenter(new THREE.Vector3());
-    const boxSize = bbox.getSize(new THREE.Vector3());
+    if (headPart) {
+      // Get the world position of the head
+      const headPosition = new THREE.Vector3();
+      headPart.getWorldPosition(headPosition);
+      lookAtTarget = [headPosition.x, headPosition.y, headPosition.z];
+    } else {
+      throw new Error("Failed to find 'Head' object in model.")
+    }
 
-    // Calculate optimal camera distance based on model height and canvas aspect ratio
-    const aspectRatio = this.height / this.width;
-    const verticalFOVRadians = this.camera.fov * Math.PI / 180;
-    const cameraDistance = (boxSize.y * 1.5) / Math.tan(verticalFOVRadians / 2);
+    // Front view (looking at the player's face)
+    const frontCameraPos: [number, number, number] = [2, 1, -2.5];
 
-    // Position camera perfectly front and back, with no side angle
-    const frontCameraPos: [number, number, number] = [
-      0, // No x-offset for straight-on view
-      boxCenter.y + (boxSize.y * 0.1), // Slightly above center to frame face better
-      boxCenter.z - cameraDistance // Front view (negative z)
-    ];
+    // Back view (looking at the player's back)
+    const backCameraPos: [number, number, number] = [2, 1, 6.0];
 
-    const backCameraPos: [number, number, number] = [
-      0, // No x-offset for straight-on view
-      boxCenter.y + (boxSize.y * 0.1), // Same height as front
-      boxCenter.z + cameraDistance // Back view (positive z)
-    ];
-
-    // Look at the center of the model (vertically centered on face/upper torso)
-    const lookAtPos: [number, number, number] = [
-      boxCenter.x,
-      boxCenter.y - (boxSize.y * 0.7),
-      boxCenter.z
-    ];
-
-    // Pass these positions to renderView with the lookAt target
-    const [forwards, backwards] = await Promise.all([
-      this.renderView(frontCameraPos, lookAtPos),
-      this.renderView(backCameraPos, lookAtPos)
-    ]);
+    // Render both views
+    const forwards = await this.renderView(frontCameraPos, lookAtTarget);
+    const backwards = await this.renderView(backCameraPos, lookAtTarget);
 
     return { forwards, backwards };
   }
@@ -185,6 +165,7 @@ class BatchSkinRenderer {
 
   /**
    * Sets up a model with texture in the scene
+   * TODO: Cape
    */
   private async setupModel(modelUrl: string, textureUrl: string): Promise<void> {
     // Clean up previous model if it exists
@@ -240,6 +221,7 @@ function getModelUrlForVariant(variant: string): string {
 }
 
 export const map = reactive(new Map<string, RenderResult>());
+const DEBUG_MODE = false;
 
 /**
  * Generates skin previews for an array of skins
@@ -249,14 +231,19 @@ export const map = reactive(new Map<string, RenderResult>());
  * @returns A map of skin texture keys to their rendered front and back views
  */
 export async function generateSkinPreviews(skins: Skin[]): Promise<void> {
-  const renderer = new BatchSkinRenderer(215, 645);
+  const renderer = new BatchSkinRenderer();
 
   try {
     // Process each skin
     for (const skin of skins) {
       // Skip if already in result map
       if (map.has(skin.texture_key)) {
-        continue;
+        if (DEBUG_MODE) {
+          const result = map.get(skin.texture_key)!
+          URL.revokeObjectURL(result.forwards)
+          URL.revokeObjectURL(result.backwards)
+          map.delete(skin.texture_key)
+        } else continue;
       }
 
       // Determine model variant if unknown
@@ -274,6 +261,7 @@ export async function generateSkinPreviews(skins: Skin[]): Promise<void> {
 
       // Render the skin
       const renderResult = await renderer.renderSkin(skin.texture, modelUrl);
+      console.log(renderResult.forwards);
 
       // Store in result map and cache
       map.set(skin.texture_key, renderResult);
