@@ -63,7 +63,9 @@ defineExpose({
 <template>
   <ModalWrapper ref="modal">
     <template #title>
-      <span class="text-lg font-extrabold text-contrast">Selecting a cape</span>
+      <div class="flex flex-col">
+        <span class="text-lg font-extrabold text-heading">Change cape</span>
+      </div>
     </template>
     <div class="flex flex-col md:flex-row gap-6">
       <div class="max-h-[25rem] h-[25rem] w-[16rem] min-w-[16rem] overflow-hidden relative">
@@ -78,7 +80,7 @@ defineExpose({
             :variant="currentSkinVariant"
             :scale="1.4"
             :fov="50"
-            :initial-rotation="180"
+            :initial-rotation="Math.PI + (Math.PI / 8)"
             class="h-full w-full"
           />
         </div>
