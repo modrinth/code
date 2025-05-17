@@ -1296,6 +1296,11 @@ pub async fn sign_up_sendy(email: &str) -> Result<(), AuthenticationError> {
     let api_key = dotenvy::var("SENDY_API_KEY")?;
     let site_url = dotenvy::var("SITE_URL")?;
 
+    if url.is_empty() || url == "none" {
+        tracing::info!("Sendy URL not set, skipping signup");
+        return Ok(());
+    }
+
     let mut form = HashMap::new();
 
     form.insert("api_key", &*api_key);
