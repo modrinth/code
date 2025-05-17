@@ -95,9 +95,6 @@ importers:
       posthog-js:
         specifier: ^1.158.2
         version: 1.158.2
-      three:
-        specifier: ^0.172.0
-        version: 0.172.0
       vite-svg-loader:
         specifier: ^5.1.0
         version: 5.1.0(vue@3.5.13(typescript@5.5.4))

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { UpdatedIcon, PlusIcon } from '@modrinth/assets'
+import {UpdatedIcon, PlusIcon, ExcitedRinthbot} from '@modrinth/assets'
 import { ButtonStyled, SkinPreviewRenderer, SkinButton, SkinLikeTextButton } from '@modrinth/ui'
-import { ref, computed, useTemplateRef, watch } from 'vue'
+import { ref, computed, useTemplateRef, watch, onMounted, onUnmounted } from 'vue'
 import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
 import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
 import { handleError } from '@/store/notifications'
@@ -18,6 +18,7 @@ import type { Cape, Skin } from '@/helpers/skins.ts'
 import { get_default_user, users } from '@/helpers/auth'
 import type { RenderResult } from '@/helpers/rendering/batchSkinRenderer.ts'
 import { generateSkinPreviews, map } from '@/helpers/rendering/batchSkinRenderer.ts'
+import { WavingRinthbot } from '@modrinth/assets'
 
 const editSkinModal = useTemplateRef('editSkinModal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
@@ -25,16 +26,13 @@ const selectCapeModal = useTemplateRef('selectCapeModal')
 const settings = ref(await getSettings())
 const skins = ref<Skin[]>([])
 const capes = ref<Cape[]>([])
-const username = ref<string | undefined>(undefined)
+const currentUser = ref(undefined)
+const currentUserId = ref<string | undefined>(undefined)
 
+// @ts-ignore
+const username = computed(() => currentUser.value?.profile?.name ?? undefined)
 const selectedSkin = ref<Skin | null>(null)
 const defaultCape = ref<Cape>()
-
-const forceSkinRefreshKey = ref(0)
-
-const previewSkin = computed(() =>
-  selectedSkin.value ? `https://vzge.me/processedskin/${selectedSkin.value.texture_key}.png` : '',
-)
 
 const savedSkins = computed(() => filterSavedSkins(skins.value))
 const defaultSkins = computed(() => filterDefaultSkins(skins.value))
@@ -46,11 +44,39 @@ const currentCape = computed(() => {
       return overrideCape
     }
   }
-
   return defaultCape.value
 })
 
-await Promise.all([loadCapes(), loadSkins(), loadUsername()])
+const skinTexture = computed(() => selectedSkin.value?.texture ?? '')
+const capeTexture = computed(() => currentCape.value?.texture)
+const skinVariant = computed(() => selectedSkin.value?.variant)
+const skinNametag = computed(() => settings.value.hide_nametag_skins_page ? undefined : username.value)
+
+await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
+
+let userCheckInterval: number | null = null
+
+onMounted(() => {
+  // TODO: Surely a better way to do this?
+  userCheckInterval = window.setInterval(checkUserChanges, 250)
+})
+
+onUnmounted(() => {
+  if (userCheckInterval !== null) {
+    window.clearInterval(userCheckInterval)
+  }
+})
+
+async function checkUserChanges() {
+  try {
+    const defaultId = await get_default_user()
+    if (defaultId !== currentUserId.value) {
+      await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
+    }
+  } catch (e) {
+    handleError(e)
+  }
+}
 
 async function loadCapes() {
   capes.value = (await get_available_capes().catch(handleError)) ?? []
@@ -60,13 +86,7 @@ async function loadCapes() {
 async function loadSkins() {
   skins.value = (await get_available_skins().catch(handleError)) ?? []
   generateSkinPreviews(skins.value, capes.value)
-
-  const previousSkinId = selectedSkin.value?.texture_key
   selectedSkin.value = skins.value.find((s) => s.is_equipped) ?? null
-
-  if (previousSkinId && selectedSkin.value?.texture_key === previousSkinId) {
-    forceSkinRefreshKey.value++
-  }
 }
 
 async function changeSkin(newSkin: Skin) {
@@ -84,15 +104,18 @@ async function onSkinSaved() {
   await Promise.all([loadCapes(), loadSkins()])
 }
 
-async function loadUsername() {
+async function loadCurrentUser() {
   try {
     const defaultId = await get_default_user()
+    currentUserId.value = defaultId
+
     const allAccounts = await users()
-    const current = allAccounts.find((acc) => acc.profile.id === defaultId)
-    username.value = current?.profile?.name ?? undefined
+    // @ts-ignore
+    currentUser.value = allAccounts.find((acc) => acc.profile.id === defaultId)
   } catch (e) {
     handleError(e)
-    username.value = undefined
+    currentUser.value = undefined
+    currentUserId.value = undefined
   }
 }
 
@@ -103,9 +126,7 @@ function getBakedSkinTextures(skin: Skin): RenderResult | undefined {
 
 watch(
   () => selectedSkin.value?.cape_id,
-  () => {
-    forceSkinRefreshKey.value++
-  },
+  () => {}
 )
 </script>
 
@@ -117,21 +138,28 @@ watch(
     @deleted="() => loadSkins()"
   />
   <SelectCapeModal ref="selectCapeModal" :capes="capes" @select="handleCapeSelected" />
-  <div class="p-6 grid grid-cols-[300px_1fr] xl:grid-cols-[3fr_5fr] gap-6">
+
+  <div v-if="currentUser" class="p-6 grid grid-cols-[300px_1fr] xl:grid-cols-[3fr_5fr] gap-6">
     <div class="sticky top-6 self-start">
       <div class="flex justify-between gap-4">
         <h1 class="m-0 text-2xl font-bold">Skins</h1>
         <ButtonStyled :disabled="!!selectedSkin?.cape_id">
           <button
             v-tooltip="
-              selectedSkin?.cape_id
-                ? 'The equipped skin is overriding the default cape.'
-                : undefined
-            "
+      selectedSkin?.cape_id
+        ? 'The equipped skin is overriding the default cape.'
+        : undefined
+        "
             :disabled="!!selectedSkin?.cape_id"
             @click="
-              (e: MouseEvent) => selectCapeModal?.show(e, selectedSkin?.texture_key, currentCape)
-            "
+          (e: MouseEvent) => selectCapeModal?.show(
+            e,
+            selectedSkin?.texture_key,
+            currentCape,
+            skinTexture,
+            skinVariant
+          )
+        "
           >
             <UpdatedIcon />
             Change cape
@@ -140,14 +168,14 @@ watch(
       </div>
       <div class="h-[80vh] flex items-center justify-center">
         <SkinPreviewRenderer
-          :key="forceSkinRefreshKey"
           wide-model-src="/src/assets/models/classic_player.gltf"
           slim-model-src="/src/assets/models/slim_player.gltf"
           cape-model-src="/src/assets/models/cape.gltf"
-          :cape-src="currentCape?.texture"
-          :texture-src="previewSkin"
-          :variant="selectedSkin?.variant"
-          :nametag="settings.hide_nametag_skins_page ? undefined : username"
+          :cape-src="capeTexture"
+          :texture-src="skinTexture"
+          :variant="skinVariant"
+          :nametag="skinNametag"
+          :initial-rotation="Math.PI / 8"
         />
       </div>
     </div>
@@ -197,6 +225,20 @@ watch(
           />
         </div>
       </section>
+    </div>
+  </div>
+
+  <div v-else class="flex items-center justify-center min-h-[50vh] p-6 pt-28">
+    <div class="bg-bg-raised rounded-lg p-7 flex flex-col gap-5 shadow-md relative max-w-xl w-full mx-auto">
+      <img :src="ExcitedRinthbot" alt="Excited Modrinth Bot" class="absolute -top-28 right-8 md:right-20 h-28 w-auto" />
+      <div class="absolute top-0 left-0 w-full h-[1px] opacity-40 bg-gradient-to-r from-transparent via-green-500 to-transparent" style="background: linear-gradient(to right, transparent 2rem, var(--color-green) calc(100% - 13rem), var(--color-green) calc(100% - 5rem), transparent calc(100% - 2rem))"></div>
+
+      <div class="flex flex-col gap-5">
+        <h1 class="text-3xl font-extrabold m-0">Login Required</h1>
+        <p class="text-lg m-0">
+          Please log into your account to use the skin management features of the Modrinth app.
+        </p>
+      </div>
     </div>
   </div>
 </template>
