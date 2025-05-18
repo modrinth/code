@@ -71,22 +71,38 @@ async function checkUserChanges() {
   try {
     const defaultId = await get_default_user()
     if (defaultId !== currentUserId.value) {
-      await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
+      await loadCurrentUser();
+      await loadCapes();
+      await loadSkins();
     }
   } catch (e) {
-    handleError(e)
+    if (currentUser.value) {
+      handleError(e)
+    }
   }
 }
 
 async function loadCapes() {
-  capes.value = (await get_available_capes().catch(handleError)) ?? []
-  defaultCape.value = capes.value.find((c) => c.is_equipped)
+  try {
+    capes.value = (await get_available_capes()) ?? []
+    defaultCape.value = capes.value.find((c) => c.is_equipped)
+  } catch (error) {
+    if (currentUser.value) {
+      handleError(e)
+    }
+  }
 }
 
 async function loadSkins() {
-  skins.value = (await get_available_skins().catch(handleError)) ?? []
-  generateSkinPreviews(skins.value, capes.value)
-  selectedSkin.value = skins.value.find((s) => s.is_equipped) ?? null
+  try {
+    skins.value = (await get_available_skins()) ?? []
+    generateSkinPreviews(skins.value, capes.value)
+    selectedSkin.value = skins.value.find((s) => s.is_equipped) ?? null
+  } catch (error) {
+    if (currentUser.value) {
+      handleError(e)
+    }
+  }
 }
 
 async function changeSkin(newSkin: Skin) {
