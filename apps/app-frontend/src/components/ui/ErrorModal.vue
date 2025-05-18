@@ -219,8 +219,8 @@ async function copyToClipboard(text) {
           <template v-else-if="metadata.notEnoughSpace">
             <h3>Not enough space</h3>
             <p>
-              It looks like there is not enough space on the disk containing the dirctory you
-              selected Please free up some space and try again or cancel the directory change.
+              It looks like there is not enough space on the disk containing the directory you
+              selected. Please free up some space and try again or cancel the directory change.
             </p>
           </template>
           <template v-else>
