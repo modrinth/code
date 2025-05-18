@@ -53,7 +53,11 @@ If you would like 'placeholder_category' to be marked as supporting modpacks too
 INSERT INTO categories VALUES (0, 'placeholder_category', 2); -- modloader id, supported type id
 ```
 
+You can find more example SQL statements for seeding the database in the `apps/labrinth/tests/files/dummy_data.sql` file.
+
 The majority of configuration is done at runtime using [dotenvy](https://crates.io/crates/dotenvy) and the `.env` file. Each of the variables and what they do can be found in the dropdown below. Additionally, there are three command line options that can be used to specify to MeiliSearch what you want to do.
+
+During development, you might notice that changes made directly to entities in the PostgreSQL database do not seem to take effect. This is often because the Redis cache still holds outdated data. To ensure your updates are reflected, clear the cache by e.g. running `redis-cli FLUSHALL`, which will force Labrinth to fetch the latest data from the database the next time it is needed.
 
 <details>
 <summary>.env variables & command line options</summary>
@@ -73,6 +77,11 @@ The majority of configuration is done at runtime using [dotenvy](https://crates.
 `MEILISEARCH_KEY`: The name that MeiliSearch is given  
 `BIND_ADDR`: The bind address for the server. Supports both IPv4 and IPv6  
 `MOCK_FILE_PATH`: The path used to store uploaded files; this has no default value and will panic if unspecified
+`SMTP_USERNAME`: The username used to authenticate with the SMTP server
+`SMTP_PASSWORD`: The password associated with the `SMTP_USERNAME` for SMTP authentication
+`SMTP_HOST`: The hostname or IP address of the SMTP server
+`SMTP_PORT`: The port number on which the SMTP server is listening (commonly 25, 465, or 587)
+`SMTP_TLS`: The TLS mode to use for the SMTP connection, which can be one of the following: `none`, `opportunistic_start_tls`, `requires_start_tls`, `tls`
 
 #### CDN options
 
