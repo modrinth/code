@@ -19,6 +19,7 @@ use sqlx::PgPool;
 use sqlx::postgres::types::PgInterval;
 use std::collections::HashMap;
 use std::convert::TryInto;
+use std::num::NonZeroU32;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -48,7 +49,7 @@ pub struct GetData {
     pub start_date: Option<DateTime<Utc>>, // defaults to 2 weeks ago
     pub end_date: Option<DateTime<Utc>>,   // defaults to now
 
-    pub resolution_minutes: Option<u32>, // defaults to 1 day. Ignored in routes that do not aggregate over a resolution (eg: /countries)
+    pub resolution_minutes: Option<NonZeroU32>, // defaults to 1 day. Ignored in routes that do not aggregate over a resolution (eg: /countries)
 }
 
 /// Get playtime data for a set of projects or versions
@@ -94,7 +95,9 @@ pub async fn playtimes_get(
 
     let start_date = data.start_date.unwrap_or(Utc::now() - Duration::weeks(2));
     let end_date = data.end_date.unwrap_or(Utc::now());
-    let resolution_minutes = data.resolution_minutes.unwrap_or(60 * 24);
+    let resolution_minutes = data
+        .resolution_minutes
+        .map_or(60 * 24, |minutes| minutes.get());
 
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
@@ -161,7 +164,9 @@ pub async fn views_get(
 
     let start_date = data.start_date.unwrap_or(Utc::now() - Duration::weeks(2));
     let end_date = data.end_date.unwrap_or(Utc::now());
-    let resolution_minutes = data.resolution_minutes.unwrap_or(60 * 24);
+    let resolution_minutes = data
+        .resolution_minutes
+        .map_or(60 * 24, |minutes| minutes.get());
 
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
@@ -228,7 +233,9 @@ pub async fn downloads_get(
 
     let start_date = data.start_date.unwrap_or(Utc::now() - Duration::weeks(2));
     let end_date = data.end_date.unwrap_or(Utc::now());
-    let resolution_minutes = data.resolution_minutes.unwrap_or(60 * 24);
+    let resolution_minutes = data
+        .resolution_minutes
+        .map_or(60 * 24, |minutes| minutes.get());
 
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
@@ -295,7 +302,9 @@ pub async fn revenue_get(
 
     let start_date = data.start_date.unwrap_or(Utc::now() - Duration::weeks(2));
     let end_date = data.end_date.unwrap_or(Utc::now());
-    let resolution_minutes = data.resolution_minutes.unwrap_or(60 * 24);
+    let resolution_minutes = data
+        .resolution_minutes
+        .map_or(60 * 24, |minutes| minutes.get());
 
     // Round up/down to nearest duration as we are using pgadmin, does not have rounding in the fetch command
     // Round start_date down to nearest resolution
