@@ -608,17 +608,18 @@
           }}
         </h2>
 
-        <ul class="m-0 mt-8 flex w-full flex-col gap-8 p-0 lg:flex-row">
+        <div class="flex w-full flex-col items-center gap-6 mt-8">
+          <PaymentCycleToggle v-model="selectedPaymentCycle" :quarterly-discount-percentage="QUARTERLY_DISCOUNT_PERCENTAGE" />
+  
+          <ul class="m-0 flex w-full flex-col gap-8 p-0 lg:flex-row">
           <ServerPlanSelector
             :capacity="capacityStatuses?.small?.available"
             plan="small"
             :ram="plans.small.metadata.ram"
             :storage="plans.small.metadata.storage"
             :cpus="plans.small.metadata.cpu"
-            :price="
-              plans.small?.prices?.find((x) => x.currency_code === 'USD')?.prices?.intervals
-                ?.monthly
-            "
+              :price="getPriceForInterval(plans.small, selectedPaymentCycle)"
+              :payment-cycle="selectedPaymentCycle"
             @select="selectProduct('small')"
             @scroll-to-faq="scrollToFaq()"
           />
@@ -628,27 +629,24 @@
             :ram="plans.medium.metadata.ram"
             :storage="plans.medium.metadata.storage"
             :cpus="plans.medium.metadata.cpu"
-            :price="
-              plans.medium?.prices?.find((x) => x.currency_code === 'USD')?.prices?.intervals
-                ?.monthly
-            "
+              :price="getPriceForInterval(plans.medium, selectedPaymentCycle)"
+              :payment-cycle="selectedPaymentCycle"
             @select="selectProduct('medium')"
             @scroll-to-faq="scrollToFaq()"
           />
           <ServerPlanSelector
             :capacity="capacityStatuses?.large?.available"
+              plan="large"
             :ram="plans.large.metadata.ram"
             :storage="plans.large.metadata.storage"
             :cpus="plans.large.metadata.cpu"
-            :price="
-              plans.large?.prices?.find((x) => x.currency_code === 'USD')?.prices?.intervals
-                ?.monthly
-            "
-            plan="large"
+              :price="getPriceForInterval(plans.large, selectedPaymentCycle)"
+              :payment-cycle="selectedPaymentCycle"
             @select="selectProduct('large')"
             @scroll-to-faq="scrollToFaq()"
           />
         </ul>
+        </div>
 
         <div
           class="mb-24 flex w-full flex-col items-start justify-between gap-4 rounded-2xl bg-bg p-8 text-left lg:flex-row lg:gap-0"
@@ -693,6 +691,11 @@ import { products } from "~/generated/state.json";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
 import Globe from "~/components/ui/servers/Globe.vue";
 import ServerPlanSelector from "~/components/ui/servers/marketing/ServerPlanSelector.vue";
+import PaymentCycleToggle from "~/components/ui/servers/marketing/PaymentCycleToggle.vue";
+
+// Discount percentage applied to quarterly payments
+// This is applied universally to all payment calculations
+const QUARTERLY_DISCOUNT_PERCENTAGE = 0.16; // 16% discount
 
 const pyroProducts = products.filter((p) => p.metadata.type === "pyro");
 const pyroPlanProducts = pyroProducts.filter(
@@ -754,6 +757,13 @@ const { data: hasServers } = await useAsyncData("ServerListCountCheck", async ()
   }
 });
 
+/**
+ * Fetches server capacity status for available server configurations
+ * Determines if specific plans are available for purchase based on current infrastructure capacity
+ * 
+ * @param customProduct - Optional specific product to check availability for
+ * @returns Object containing availability status for different server configurations
+ */
 async function fetchCapacityStatuses(customProduct = null) {
   try {
     const productsToCheck = customProduct?.metadata
@@ -793,6 +803,13 @@ async function fetchCapacityStatuses(customProduct = null) {
     }
   } catch (error) {
     console.error("Error checking server capacities:", error);
+    // Provide fallback values when capacity check fails
+    addNotification({
+      group: "main",
+      title: "Error Checking Server Capacity",
+      type: "error",
+      text: "Could not retrieve server capacity information. Please try again later.",
+    });
     return {
       custom: { available: 0 },
       small: { available: 0 },
@@ -802,6 +819,7 @@ async function fetchCapacityStatuses(customProduct = null) {
   }
 }
 
+// Fetch and track capacity status for all server plans
 const { data: capacityStatuses, refresh: refreshCapacity } = await useAsyncData(
   "ServerCapacityAll",
   fetchCapacityStatuses,
@@ -907,6 +925,40 @@ const plans = {
   custom: pyroProducts || [],
 };
 
+const selectedPaymentCycle = ref('quarterly');
+
+/**
+ * Calculates the effective monthly price for a product based on payment interval
+ * - For monthly plans, returns the standard monthly price
+ * - For quarterly plans, applies the discount and divides by 3 for monthly equivalent
+ * 
+ * @param product - The server product containing price data
+ * @param interval - Payment interval ('monthly' or 'quarterly')
+ * @returns Price in cents (divide by 100 for dollars)
+ */
+function getPriceForInterval(product, interval) {
+  const usdPrices = product?.prices?.find((x) => x.currency_code === 'USD');
+
+  if (!usdPrices || !usdPrices.prices || !usdPrices.prices.intervals) {
+    return 0;
+  }
+
+  if (interval === 'quarterly') {
+    let quarterlyPrice = usdPrices.prices.intervals.quarterly;
+    if (!quarterlyPrice || quarterlyPrice === 0) {
+      // Calculate quarterly price if missing from backend
+      const monthlyPrice = usdPrices.prices.intervals.monthly || 0;
+      if (monthlyPrice > 0) {
+        quarterlyPrice = (monthlyPrice * 3) * (1 - QUARTERLY_DISCOUNT_PERCENTAGE);
+      } else {
+        quarterlyPrice = 0;
+      }
+    }
+    return quarterlyPrice / 3; // Effective monthly price
+  } 
+  return usdPrices.prices.intervals.monthly || 0;
+}
+
 const selectProduct = async (product) => {
   if (loggedOut.value) {
     data.$router.push(`/auth/sign-in?redirect=${encodeURIComponent("/servers?plan=" + product)}`);
@@ -914,9 +966,11 @@ const selectProduct = async (product) => {
   }
 
   await refreshCapacity();
-  console.log(capacityStatuses.value);
 
-  if ((product === "custom" && isCustomAtCapacity.value) || isAtCapacity.value) {
+  if (
+    (product === "custom" && isCustomAtCapacity.value) ||
+    (isAtCapacity.value && product !== "custom") // Ensure 'custom' check is specific
+  ) {
     addNotification({
       group: "main",
       title: "Server Capacity Full",
@@ -926,12 +980,14 @@ const selectProduct = async (product) => {
     return;
   }
 
-  const selectedPlan = plans[product];
-  if (!selectedPlan) return;
+  const currentSelectedPlan = plans[product]; // Renamed to avoid conflict if 'selectedPlan' is a global reactive property
+  if (!currentSelectedPlan) {
+    return;
+  }
 
   if (
-    (product === "custom" && !selectedPlan.length) ||
-    (product !== "custom" && !selectedPlan.metadata)
+    (product === "custom" && !currentSelectedPlan.length) || // Check length for custom array
+    (product !== "custom" && !currentSelectedPlan.metadata)
   ) {
     addNotification({
       group: "main",
@@ -942,20 +998,28 @@ const selectProduct = async (product) => {
     return;
   }
 
-  // required for the purchase modal
-  if (!pyroProducts.metadata) {
-    pyroProducts.metadata = {};
+  // Attach the selected payment cycle to the product object that will be used by the modal
+  // Ensure selectedPlan is an object before assigning properties
+  let productForModal = {};
+  if (product === "custom") {
+    productForModal = { ...(currentSelectedPlan?.[0] || {}) }; 
+    if (!productForModal.metadata) productForModal.metadata = {};
+  } else {
+    productForModal = { ...currentSelectedPlan };
   }
-  pyroProducts.metadata.type = "pyro";
+  productForModal.selectedPlanInterval = selectedPaymentCycle.value;
 
   customServer.value = product === "custom";
-  selectedProduct.value = selectedPlan;
+  // selectedProduct is a ref that PurchaseModal watches.
+  // It should be set to the actual product object the modal will work with.
+  selectedProduct.value = productForModal; 
+  
   showModal.value = true;
   modalKey.value++;
   await nextTick();
 
   if (purchaseModal.value && purchaseModal.value.show) {
-    purchaseModal.value.show();
+    purchaseModal.value.show(selectedPaymentCycle.value);
   }
 };
 

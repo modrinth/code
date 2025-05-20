@@ -720,6 +720,8 @@ const serverLoader = ref('Vanilla')
 const eulaAccepted = ref(!!props.existingSubscription)
 
 const mutatedProduct = ref({ ...props.product })
+// Custom server RAM slider minimum and maximum values
+// These define the bounds for configurable server options
 const customMinRam = ref(0)
 const customMaxRam = ref(0)
 const customMatchingProduct = ref()
@@ -752,6 +754,8 @@ const updateCustomServerProduct = () => {
 }
 
 let updateCustomServerStockTimeout = null
+// Checks real-time server capacity/availability from backend for the selected RAM configuration
+// Uses debouncing to prevent API spam during slider adjustment
 const updateCustomServerStock = async () => {
   if (updateCustomServerStockTimeout) {
     clearTimeout(updateCustomServerStockTimeout)
@@ -1041,22 +1045,41 @@ async function submitPayment() {
 }
 
 defineExpose({
-  show: () => {
+  show: (preSelectedCycle) => {
+    if (preSelectedCycle) {
+      selectedPlan.value = preSelectedCycle;
+      
+      // Skip to payment step if cycle is pre-selected
+      if (mutatedProduct.value.metadata.type === 'pyro' && !props.projectId) {
+        purchaseModalStep.value = 2; // Skip to payment step
+      } else {
+        purchaseModalStep.value = 1; // Skip to payment step (no server config needed)
+      }
+    }
+    
+    // Initialize Stripe and other configuration
     if (props.customServer) {
-      updateRamValues()
+      updateRamValues();
     }
 
-    stripe = Stripe(props.publishableKey)
+    stripe = Stripe(props.publishableKey);
 
-    selectedPlan.value = props.existingSubscription ? props.existingSubscription.interval : 'yearly'
-    serverName.value = props.serverName || ''
-    serverLoader.value = 'Vanilla'
+    // Set selectedPlan based on existing subscription or default, only if not preSelected
+    if (!preSelectedCycle) {
+        selectedPlan.value = props.existingSubscription ? props.existingSubscription.interval : 'yearly';
+    }
+    
+    serverName.value = props.serverName || '';
 
-    purchaseModalStep.value = 0
-    loadingPaymentMethodModal.value = 0
-    paymentLoading.value = false
+    // Reset steps only if not pre-selected and stepping through flow
+    if (!preSelectedCycle) {
+        purchaseModalStep.value = 0;
+    }
+    
+    loadingPaymentMethodModal.value = 0;
+    paymentLoading.value = false;
 
-    purchaseModal.value.show()
+    purchaseModal.value.show();
   },
 })
 </script>
