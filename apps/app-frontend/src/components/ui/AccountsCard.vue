@@ -44,8 +44,9 @@
       </div>
       <div v-else class="logged-out account">
         <h4>Not signed in</h4>
-        <Button v-tooltip="'Log in'" icon-only color="primary" @click="login()">
-          <LogInIcon />
+        <Button v-tooltip="'Log in'" :disabled="loginDisabled" icon-only color="primary" @click="login()">
+          <LogInIcon v-if="!loginDisabled" />
+          <SpinnerIcon v-else class="animate-spin" />
         </Button>
       </div>
       <div v-if="displayAccounts.length > 0" class="account-group">
@@ -68,7 +69,7 @@
 </template>
 
 <script setup>
-import { DropdownIcon, PlusIcon, TrashIcon, LogInIcon } from '@modrinth/assets'
+import { DropdownIcon, PlusIcon, TrashIcon, LogInIcon, SpinnerIcon } from '@modrinth/assets'
 import { Avatar, Button, Card } from '@modrinth/ui'
 import { ref, computed, onMounted, onBeforeUnmount, onUnmounted } from 'vue'
 import {
@@ -94,14 +95,22 @@ defineProps({
 const emit = defineEmits(['change'])
 
 const accounts = ref({})
+const loginDisabled = ref(false);
 const defaultUser = ref()
 
 async function refreshValues() {
   defaultUser.value = await get_default_user().catch(handleError)
   accounts.value = await users().catch(handleError)
 }
+
+function setLoginDisabled(value) {
+  loginDisabled.value = value;
+}
+
 defineExpose({
   refreshValues,
+  setLoginDisabled,
+  loginDisabled
 })
 await refreshValues()
 
@@ -120,6 +129,7 @@ async function setAccount(account) {
 }
 
 async function login() {
+  loginDisabled.value = true;
   const loggedIn = await login_flow().catch(handleSevereError)
 
   if (loggedIn) {
@@ -128,6 +138,7 @@ async function login() {
   }
 
   trackEvent('AccountLogIn')
+  loginDisabled.value = false;
 }
 
 const logout = async (id) => {

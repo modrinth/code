@@ -1,7 +1,13 @@
 <script setup lang="ts">
-import {UpdatedIcon, PlusIcon, ExcitedRinthbot} from '@modrinth/assets'
-import { ButtonStyled, SkinPreviewRenderer, SkinButton, SkinLikeTextButton } from '@modrinth/ui'
-import { ref, computed, useTemplateRef, watch, onMounted, onUnmounted } from 'vue'
+import {UpdatedIcon, PlusIcon, ExcitedRinthbot, LogInIcon, SpinnerIcon } from '@modrinth/assets'
+import {
+  ButtonStyled,
+  SkinPreviewRenderer,
+  SkinButton,
+  SkinLikeTextButton,
+  Button
+} from '@modrinth/ui'
+import {ref, computed, useTemplateRef, watch, onMounted, onUnmounted, inject, Ref} from 'vue'
 import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
 import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
 import { handleError } from '@/store/notifications'
@@ -15,10 +21,12 @@ import {
 } from '@/helpers/skins.ts'
 import { get as getSettings } from '@/helpers/settings.ts'
 import type { Cape, Skin } from '@/helpers/skins.ts'
-import { get_default_user, users } from '@/helpers/auth'
+import { get_default_user, users, login as login_flow } from '@/helpers/auth'
 import type { RenderResult } from '@/helpers/rendering/batchSkinRenderer.ts'
 import { generateSkinPreviews, map } from '@/helpers/rendering/batchSkinRenderer.ts'
-import { WavingRinthbot } from '@modrinth/assets'
+import {handleSevereError} from "@/store/error";
+import {trackEvent} from "@/helpers/analytics";
+import AccountsCard from "@/components/ui/AccountsCard.vue";
 
 const editSkinModal = useTemplateRef('editSkinModal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
@@ -26,6 +34,9 @@ const selectCapeModal = useTemplateRef('selectCapeModal')
 const settings = ref(await getSettings())
 const skins = ref<Skin[]>([])
 const capes = ref<Cape[]>([])
+
+const accountsCard = inject('accountsCard') as Ref<typeof AccountsCard>
+const loginInProgress = ref(false);
 const currentUser = ref(undefined)
 const currentUserId = ref<string | undefined>(undefined)
 
@@ -75,9 +86,9 @@ async function checkUserChanges() {
       await loadCapes();
       await loadSkins();
     }
-  } catch (e) {
+  } catch (error) {
     if (currentUser.value) {
-      handleError(e)
+      handleError(error)
     }
   }
 }
@@ -88,7 +99,7 @@ async function loadCapes() {
     defaultCape.value = capes.value.find((c) => c.is_equipped)
   } catch (error) {
     if (currentUser.value) {
-      handleError(e)
+      handleError(error)
     }
   }
 }
@@ -100,7 +111,7 @@ async function loadSkins() {
     selectedSkin.value = skins.value.find((s) => s.is_equipped) ?? null
   } catch (error) {
     if (currentUser.value) {
-      handleError(e)
+      handleError(error)
     }
   }
 }
@@ -138,6 +149,18 @@ async function loadCurrentUser() {
 function getBakedSkinTextures(skin: Skin): RenderResult | undefined {
   const key = `${skin.texture_key}+${skin.variant}+${skin.cape_id ?? 'no-cape'}`
   return map.get(key)
+}
+
+async function login() {
+  accountsCard.value.setLoginDisabled(true);
+  const loggedIn = await login_flow().catch(handleSevereError)
+
+  if (loggedIn && accountsCard) {
+    await accountsCard.value.refreshValues()
+  }
+
+  trackEvent('AccountLogIn')
+  accountsCard.value.setLoginDisabled(false);
 }
 
 watch(
@@ -244,16 +267,23 @@ watch(
     </div>
   </div>
 
-  <div v-else class="flex items-center justify-center min-h-[50vh] p-6 pt-28">
+  <div v-else class="flex items-center justify-center min-h-[50vh] pt-[25%]">
     <div class="bg-bg-raised rounded-lg p-7 flex flex-col gap-5 shadow-md relative max-w-xl w-full mx-auto">
       <img :src="ExcitedRinthbot" alt="Excited Modrinth Bot" class="absolute -top-28 right-8 md:right-20 h-28 w-auto" />
       <div class="absolute top-0 left-0 w-full h-[1px] opacity-40 bg-gradient-to-r from-transparent via-green-500 to-transparent" style="background: linear-gradient(to right, transparent 2rem, var(--color-green) calc(100% - 13rem), var(--color-green) calc(100% - 5rem), transparent calc(100% - 2rem))"></div>
 
       <div class="flex flex-col gap-5">
-        <h1 class="text-3xl font-extrabold m-0">Login Required</h1>
+        <h1 class="text-3xl font-extrabold m-0">Please sign-in</h1>
         <p class="text-lg m-0">
-          Please log into your account to use the skin management features of the Modrinth app.
+          Please sign into your Minecraft account to use the skin management features of the Modrinth app.
         </p>
+        <ButtonStyled color="brand" :disabled="accountsCard.loginDisabled" v-show="accountsCard">
+          <Button @click="login" :disabled="accountsCard.loginDisabled">
+            <LogInIcon v-if="!accountsCard.loginDisabled" />
+            <SpinnerIcon class="animate-spin" v-else />
+            Sign In
+          </Button>
+        </ButtonStyled>
       </div>
     </div>
   </div>
