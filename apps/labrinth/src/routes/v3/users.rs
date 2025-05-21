@@ -88,9 +88,12 @@ pub async fn admin_user_email(
         )
     })?;
 
-    let user =
-        User::get_id(crate::database::models::UserId(user_id), &**pool, &redis)
-            .await?;
+    let user = User::get_id(
+        crate::database::models::DBUserId(user_id),
+        &**pool,
+        &redis,
+    )
+    .await?;
 
     if let Some(user) = user {
         Ok(HttpResponse::Ok().json(user))
@@ -419,7 +422,7 @@ pub async fn user_edit(
                         WHERE (id = $2)
                         ",
                         username,
-                        id as crate::database::models::ids::UserId,
+                        id as crate::database::models::ids::DBUserId,
                     )
                     .execute(&mut *transaction)
                     .await?;
@@ -438,7 +441,7 @@ pub async fn user_edit(
                     WHERE (id = $2)
                     ",
                     bio.as_deref(),
-                    id as crate::database::models::ids::UserId,
+                    id as crate::database::models::ids::DBUserId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -461,7 +464,7 @@ pub async fn user_edit(
                     WHERE (id = $2)
                     ",
                     role,
-                    id as crate::database::models::ids::UserId,
+                    id as crate::database::models::ids::DBUserId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -482,7 +485,7 @@ pub async fn user_edit(
                     WHERE (id = $2)
                     ",
                     badges.bits() as i64,
-                    id as crate::database::models::ids::UserId,
+                    id as crate::database::models::ids::DBUserId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -503,7 +506,7 @@ pub async fn user_edit(
                     WHERE (id = $2)
                     ",
                     venmo_handle,
-                    id as crate::database::models::ids::UserId,
+                    id as crate::database::models::ids::DBUserId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -517,7 +520,7 @@ pub async fn user_edit(
                     WHERE (id = $2)
                     ",
                     allow_friend_requests,
-                    id as crate::database::models::ids::UserId,
+                    id as crate::database::models::ids::DBUserId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -605,7 +608,7 @@ pub async fn user_icon_edit(
             ",
             upload_result.url,
             upload_result.raw_url,
-            actual_user.id as crate::database::models::ids::UserId,
+            actual_user.id as crate::database::models::ids::DBUserId,
         )
         .execute(&**pool)
         .await?;
@@ -657,7 +660,7 @@ pub async fn user_icon_delete(
             SET avatar_url = NULL, raw_avatar_url = NULL
             WHERE (id = $1)
             ",
-            actual_user.id as crate::database::models::ids::UserId,
+            actual_user.id as crate::database::models::ids::DBUserId,
         )
         .execute(&**pool)
         .await?;

@@ -396,13 +396,13 @@ async fn project_create_inner(
             serde_json::from_str(&format!("\"{}\"", create_data.slug)).ok();
 
         if let Some(slug_project_id) = slug_project_id_option {
-            let slug_project_id: models::ids::ProjectId =
+            let slug_project_id: models::ids::DBProjectId =
                 slug_project_id.into();
             let results = sqlx::query!(
                 "
                 SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)
                 ",
-                slug_project_id as models::ids::ProjectId
+                slug_project_id as models::ids::DBProjectId
             )
             .fetch_one(&mut **transaction)
             .await
@@ -816,7 +816,7 @@ async fn project_create_inner(
                     SET mod_id = $1
                     WHERE id = $2
                     ",
-                    id as models::ids::ProjectId,
+                    id as models::ids::DBProjectId,
                     image_id.0 as i64
                 )
                 .execute(&mut **transaction)

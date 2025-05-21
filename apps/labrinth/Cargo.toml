@@ -31,6 +31,7 @@ futures.workspace = true
 futures-util.workspace = true
 async-trait.workspace = true
 dashmap.workspace = true
+paste.workspace = true
 
 meilisearch-sdk = { workspace = true, features = ["reqwest"] }
 rust-s3.workspace = true

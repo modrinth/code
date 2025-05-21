@@ -622,12 +622,12 @@ impl AutomatedModerationQueue {
 
                             if !mod_messages.is_empty() {
                                 let first_time = database::models::Thread::get(project.thread_id, &pool).await?
-                                    .map(|x| x.messages.iter().all(|x| x.author_id == Some(database::models::UserId(AUTOMOD_ID)) || x.hide_identity))
+                                    .map(|x| x.messages.iter().all(|x| x.author_id == Some(database::models::DBUserId(AUTOMOD_ID)) || x.hide_identity))
                                     .unwrap_or(true);
 
                                 let mut transaction = pool.begin().await?;
                                 let id = ThreadMessageBuilder {
-                                    author_id: Some(database::models::UserId(AUTOMOD_ID)),
+                                    author_id: Some(database::models::DBUserId(AUTOMOD_ID)),
                                     body: MessageBody::Text {
                                         body: mod_messages.markdown(true),
                                         private: false,
@@ -649,7 +649,7 @@ impl AutomatedModerationQueue {
 
                                 if mod_messages.should_reject(first_time) {
                                     ThreadMessageBuilder {
-                                        author_id: Some(database::models::UserId(AUTOMOD_ID)),
+                                        author_id: Some(database::models::DBUserId(AUTOMOD_ID)),
                                         body: MessageBody::StatusChange {
                                             new_status: ProjectStatus::Rejected,
                                             old_status: project.inner.status,
@@ -740,7 +740,7 @@ impl AutomatedModerationQueue {
 
                             let mut transaction = pool.begin().await?;
                             ThreadMessageBuilder {
-                                author_id: Some(database::models::UserId(AUTOMOD_ID)),
+                                author_id: Some(database::models::DBUserId(AUTOMOD_ID)),
                                 body: MessageBody::Text {
                                     body: str,
                                     private: true,

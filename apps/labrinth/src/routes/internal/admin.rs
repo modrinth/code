@@ -71,7 +71,7 @@ pub async fn count_download(
     .ok()
     .flatten();
 
-    let project_id: crate::database::models::ids::ProjectId =
+    let project_id: crate::database::models::ids::DBProjectId =
         download_body.project_id.into();
 
     let id_option =
@@ -97,7 +97,7 @@ pub async fn count_download(
         WHERE ((version_number = $1 OR id = $3) AND mod_id = $2)
         ",
         download_body.version_name,
-        project_id as crate::database::models::ids::ProjectId,
+        project_id as crate::database::models::ids::DBProjectId,
         id_option
     )
     .fetch_optional(pool.as_ref())
@@ -255,7 +255,7 @@ pub async fn delphi_result_ingest(
 
     let mut transaction = pool.begin().await?;
     ThreadMessageBuilder {
-        author_id: Some(crate::database::models::UserId(AUTOMOD_ID)),
+        author_id: Some(crate::database::models::DBUserId(AUTOMOD_ID)),
         body: MessageBody::Text {
             body: thread_header,
             private: true,

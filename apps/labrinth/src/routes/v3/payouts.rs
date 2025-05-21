@@ -161,7 +161,10 @@ pub async fn paypal_webhook(
                 transaction.commit().await?;
 
                 crate::database::models::user_item::User::clear_caches(
-                    &[(crate::database::models::UserId(result.user_id), None)],
+                    &[(
+                        crate::database::models::DBUserId(result.user_id),
+                        None,
+                    )],
                     &redis,
                 )
                 .await?;
@@ -268,7 +271,10 @@ pub async fn tremendous_webhook(
                 transaction.commit().await?;
 
                 crate::database::models::user_item::User::clear_caches(
-                    &[(crate::database::models::UserId(result.user_id), None)],
+                    &[(
+                        crate::database::models::DBUserId(result.user_id),
+                        None,
+                    )],
                     &redis,
                 )
                 .await?;
@@ -788,7 +794,7 @@ pub async fn get_balance(
 }
 
 async fn get_user_balance(
-    user_id: crate::database::models::ids::UserId,
+    user_id: crate::database::models::ids::DBUserId,
     pool: &PgPool,
 ) -> Result<UserBalance, sqlx::Error> {
     let payouts = sqlx::query!(

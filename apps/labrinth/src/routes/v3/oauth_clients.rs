@@ -5,7 +5,7 @@ use crate::{
     auth::{checks::ValidateAuthorized, get_user_from_headers},
     database::{
         models::{
-            DatabaseError, OAuthClientId, User, generate_oauth_client_id,
+            DBOAuthClientId, DatabaseError, User, generate_oauth_client_id,
             generate_oauth_redirect_id,
             oauth_client_authorization_item::OAuthClientAuthorization,
             oauth_client_item::{OAuthClient, OAuthRedirectUri},
@@ -39,7 +39,7 @@ use sqlx::PgPool;
 use validator::Validate;
 
 use crate::database::models::oauth_client_item::OAuthClient as DBOAuthClient;
-use crate::models::ids::OAuthClientId as ApiOAuthClientId;
+use crate::models::ids::OAuthClientId;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -102,7 +102,7 @@ pub async fn get_user_clients(
 
 #[get("app/{id}")]
 pub async fn get_client(
-    id: web::Path<ApiOAuthClientId>,
+    id: web::Path<OAuthClientId>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     let clients = get_clients_inner(&[id.into_inner()], pool).await?;
@@ -121,7 +121,7 @@ pub async fn get_clients(
     let ids: Vec<_> = info
         .ids
         .iter()
-        .map(|id| parse_base62(id).map(ApiOAuthClientId))
+        .map(|id| parse_base62(id).map(OAuthClientId))
         .collect::<Result<_, _>>()?;
 
     let clients = get_clients_inner(&ids, pool).await?;
@@ -218,7 +218,7 @@ pub async fn oauth_client_create(
 #[delete("app/{id}")]
 pub async fn oauth_client_delete(
     req: HttpRequest,
-    client_id: web::Path<ApiOAuthClientId>,
+    client_id: web::Path<OAuthClientId>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -274,7 +274,7 @@ pub struct OAuthClientEdit {
 #[patch("app/{id}")]
 pub async fn oauth_client_edit(
     req: HttpRequest,
-    client_id: web::Path<ApiOAuthClientId>,
+    client_id: web::Path<OAuthClientId>,
     client_updates: web::Json<OAuthClientEdit>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -351,7 +351,7 @@ pub struct Extension {
 pub async fn oauth_client_icon_edit(
     web::Query(ext): web::Query<Extension>,
     req: HttpRequest,
-    client_id: web::Path<ApiOAuthClientId>,
+    client_id: web::Path<OAuthClientId>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
@@ -419,7 +419,7 @@ pub async fn oauth_client_icon_edit(
 #[delete("app/{id}/icon")]
 pub async fn oauth_client_icon_delete(
     req: HttpRequest,
-    client_id: web::Path<ApiOAuthClientId>,
+    client_id: web::Path<OAuthClientId>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
@@ -532,7 +532,7 @@ fn generate_oauth_client_secret() -> String {
 
 async fn create_redirect_uris(
     uri_strings: impl IntoIterator<Item = impl Display>,
-    client_id: OAuthClientId,
+    client_id: DBOAuthClientId,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
 ) -> Result<Vec<OAuthRedirectUri>, DatabaseError> {
     let mut redirect_uris = vec![];
@@ -581,10 +581,10 @@ async fn edit_redirects(
 }
 
 pub async fn get_clients_inner(
-    ids: &[ApiOAuthClientId],
+    ids: &[OAuthClientId],
     pool: web::Data<PgPool>,
 ) -> Result<Vec<models::oauth_clients::OAuthClient>, ApiError> {
-    let ids: Vec<OAuthClientId> = ids.iter().map(|i| (*i).into()).collect();
+    let ids: Vec<DBOAuthClientId> = ids.iter().map(|i| (*i).into()).collect();
     let clients = OAuthClient::get_many(&ids, &**pool).await?;
 
     Ok(clients.into_iter().map(|c| c.into()).collect_vec())

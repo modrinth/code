@@ -213,7 +213,7 @@ async fn version_create_inner(
                     ));
                 }
 
-                let project_id: models::ProjectId = version_create_data.project_id.unwrap().into();
+                let project_id: models::DBProjectId = version_create_data.project_id.unwrap().into();
 
                 // Ensure that the project this version is being added to exists
                 if models::Project::get_id(project_id, &mut **transaction, redis)
@@ -403,11 +403,11 @@ async fn version_create_inner(
         SELECT follower_id FROM mod_follows
         WHERE mod_id = $1
         ",
-        builder.project_id as crate::database::models::ids::ProjectId
+        builder.project_id as crate::database::models::ids::DBProjectId
     )
     .fetch(&mut **transaction)
-    .map_ok(|m| models::ids::UserId(m.follower_id))
-    .try_collect::<Vec<models::ids::UserId>>()
+    .map_ok(|m| models::ids::DBUserId(m.follower_id))
+    .try_collect::<Vec<models::ids::DBUserId>>()
     .await?;
 
     let project_id: ProjectId = builder.project_id.into();
@@ -517,7 +517,7 @@ async fn version_create_inner(
 
     let project_status = sqlx::query!(
         "SELECT status FROM mods WHERE id = $1",
-        project_id as models::ProjectId,
+        project_id as models::DBProjectId,
     )
     .fetch_optional(pool)
     .await?;
@@ -543,7 +543,7 @@ pub async fn upload_file_to_version(
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
 
-    let version_id = models::VersionId::from(url_data.into_inner().0);
+    let version_id = models::DBVersionId::from(url_data.into_inner().0);
 
     let result = upload_file_to_version_inner(
         req,
@@ -586,7 +586,7 @@ async fn upload_file_to_version_inner(
     redis: Data<RedisPool>,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
-    version_id: models::VersionId,
+    version_id: models::DBVersionId,
     session_queue: &AuthQueue,
 ) -> Result<HttpResponse, CreateError> {
     let cdn_url = dotenvy::var("CDN_URL")?;
@@ -904,8 +904,8 @@ pub async fn upload_file(
                             .map(|x| x.as_bytes())
                 }) {
                     dependencies.push(DependencyBuilder {
-                        project_id: Some(models::ProjectId(dep.project_id)),
-                        version_id: Some(models::VersionId(dep.version_id)),
+                        project_id: Some(models::DBProjectId(dep.project_id)),
+                        version_id: Some(models::DBVersionId(dep.version_id)),
                         file_name: None,
                         dependency_type: DependencyType::Embedded.to_string(),
                     });

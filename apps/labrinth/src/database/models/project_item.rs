@@ -31,7 +31,7 @@ pub struct LinkUrl {
 impl LinkUrl {
     pub async fn insert_many_projects(
         links: Vec<Self>,
-        project_id: ProjectId,
+        project_id: DBProjectId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), sqlx::error::Error> {
         let (project_ids, platform_ids, urls): (Vec<_>, Vec<_>, Vec<_>) = links
@@ -70,7 +70,7 @@ pub struct GalleryItem {
 impl GalleryItem {
     pub async fn insert_many(
         items: Vec<Self>,
-        project_id: ProjectId,
+        project_id: DBProjectId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), sqlx::error::Error> {
         let (
@@ -118,7 +118,7 @@ impl GalleryItem {
 }
 
 pub struct ModCategory {
-    pub project_id: ProjectId,
+    pub project_id: DBProjectId,
     pub category_id: CategoryId,
     pub is_additional: bool,
 }
@@ -154,9 +154,9 @@ impl ModCategory {
 
 #[derive(Clone)]
 pub struct ProjectBuilder {
-    pub project_id: ProjectId,
-    pub team_id: TeamId,
-    pub organization_id: Option<OrganizationId>,
+    pub project_id: DBProjectId,
+    pub team_id: DBTeamId,
+    pub organization_id: Option<DBOrganizationId>,
     pub name: String,
     pub summary: String,
     pub description: String,
@@ -180,7 +180,7 @@ impl ProjectBuilder {
     pub async fn insert(
         self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<ProjectId, DatabaseError> {
+    ) -> Result<DBProjectId, DatabaseError> {
         let project_struct = Project {
             id: self.project_id,
             team_id: self.team_id,
@@ -264,9 +264,9 @@ impl ProjectBuilder {
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Project {
-    pub id: ProjectId,
-    pub team_id: TeamId,
-    pub organization_id: Option<OrganizationId>,
+    pub id: DBProjectId,
+    pub team_id: DBTeamId,
+    pub organization_id: Option<DBOrganizationId>,
     pub name: String,
     pub summary: String,
     pub description: String,
@@ -311,8 +311,8 @@ impl Project {
                 LOWER($14), $15, $16, $17
             )
             ",
-            self.id as ProjectId,
-            self.team_id as TeamId,
+            self.id as DBProjectId,
+            self.team_id as DBTeamId,
             &self.name,
             &self.summary,
             &self.description,
@@ -336,7 +336,7 @@ impl Project {
     }
 
     pub async fn remove(
-        id: ProjectId,
+        id: DBProjectId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
@@ -351,7 +351,7 @@ impl Project {
                 DELETE FROM mod_follows
                 WHERE mod_id = $1
                 ",
-                id as ProjectId
+                id as DBProjectId
             )
             .execute(&mut **transaction)
             .await?;
@@ -361,7 +361,7 @@ impl Project {
                 DELETE FROM mods_gallery
                 WHERE mod_id = $1
                 ",
-                id as ProjectId
+                id as DBProjectId
             )
             .execute(&mut **transaction)
             .await?;
@@ -371,7 +371,7 @@ impl Project {
                 DELETE FROM mod_follows
                 WHERE mod_id = $1
                 ",
-                id as ProjectId,
+                id as DBProjectId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -384,7 +384,7 @@ impl Project {
                 SET mod_id = NULL
                 WHERE mod_id = $1
                 ",
-                id as ProjectId,
+                id as DBProjectId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -394,7 +394,7 @@ impl Project {
                 DELETE FROM mods_categories
                 WHERE joining_mod_id = $1
                 ",
-                id as ProjectId,
+                id as DBProjectId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -404,7 +404,7 @@ impl Project {
                 DELETE FROM mods_links
                 WHERE joining_mod_id = $1
                 ",
-                id as ProjectId,
+                id as DBProjectId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -418,7 +418,7 @@ impl Project {
                 "
                 DELETE FROM dependencies WHERE mod_dependency_id = $1
                 ",
-                id as ProjectId,
+                id as DBProjectId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -429,7 +429,7 @@ impl Project {
                 SET mod_id = NULL
                 WHERE (mod_id = $1)
                 ",
-                id as ProjectId,
+                id as DBProjectId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -439,7 +439,7 @@ impl Project {
                 DELETE FROM mods
                 WHERE id = $1
                 ",
-                id as ProjectId,
+                id as DBProjectId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -453,10 +453,10 @@ impl Project {
                 WHERE team_id = $1
                 RETURNING user_id
                 ",
-                project.inner.team_id as TeamId,
+                project.inner.team_id as DBTeamId,
             )
             .fetch(&mut **transaction)
-            .map_ok(|x| UserId(x.user_id))
+            .map_ok(|x| DBUserId(x.user_id))
             .try_collect::<Vec<_>>()
             .await?;
 
@@ -467,7 +467,7 @@ impl Project {
                 DELETE FROM teams
                 WHERE id = $1
                 ",
-                project.inner.team_id as TeamId,
+                project.inner.team_id as DBTeamId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -492,7 +492,7 @@ impl Project {
     }
 
     pub async fn get_id<'a, 'b, E>(
-        id: ProjectId,
+        id: DBProjectId,
         executor: E,
         redis: &RedisPool,
     ) -> Result<Option<QueryProject>, DatabaseError>
@@ -509,7 +509,7 @@ impl Project {
     }
 
     pub async fn get_many_ids<'a, E>(
-        project_ids: &[ProjectId],
+        project_ids: &[DBProjectId],
         exec: E,
         redis: &RedisPool,
     ) -> Result<Vec<QueryProject>, DatabaseError>
@@ -553,7 +553,7 @@ impl Project {
                     .collect::<Vec<_>>();
 
                 let all_version_ids = DashSet::new();
-                let versions: DashMap<ProjectId, Vec<(VersionId, DateTime<Utc>)>> = sqlx::query!(
+                let versions: DashMap<DBProjectId, Vec<(DBVersionId, DateTime<Utc>)>> = sqlx::query!(
                     "
                     SELECT DISTINCT mod_id, v.id as id, date_published
                     FROM mods m
@@ -570,11 +570,11 @@ impl Project {
                     .fetch(&mut *exec)
                     .try_fold(
                         DashMap::new(),
-                        |acc: DashMap<ProjectId, Vec<(VersionId, DateTime<Utc>)>>, m| {
-                            let version_id = VersionId(m.id);
+                        |acc: DashMap<DBProjectId, Vec<(DBVersionId, DateTime<Utc>)>>, m| {
+                            let version_id = DBVersionId(m.id);
                             let date_published = m.date_published;
                             all_version_ids.insert(version_id);
-                            acc.entry(ProjectId(m.mod_id))
+                            acc.entry(DBProjectId(m.mod_id))
                                 .or_default()
                                 .push((version_id, date_published));
                             async move { Ok(acc) }
@@ -583,7 +583,7 @@ impl Project {
                     .await?;
 
                 let loader_field_enum_value_ids = DashSet::new();
-                let version_fields: DashMap<ProjectId, Vec<QueryVersionField>> = sqlx::query!(
+                let version_fields: DashMap<DBProjectId, Vec<QueryVersionField>> = sqlx::query!(
                     "
                     SELECT DISTINCT mod_id, version_id, field_id, int_value, enum_value, string_value
                     FROM versions v
@@ -595,9 +595,9 @@ impl Project {
                     .fetch(&mut *exec)
                     .try_fold(
                         DashMap::new(),
-                        |acc: DashMap<ProjectId, Vec<QueryVersionField>>, m| {
+                        |acc: DashMap<DBProjectId, Vec<QueryVersionField>>, m| {
                             let qvf = QueryVersionField {
-                                version_id: VersionId(m.version_id),
+                                version_id: DBVersionId(m.version_id),
                                 field_id: LoaderFieldId(m.field_id),
                                 int_value: m.int_value,
                                 enum_value: if m.enum_value == -1  { None } else { Some(LoaderFieldEnumValueId(m.enum_value)) },
@@ -608,7 +608,7 @@ impl Project {
                                 loader_field_enum_value_ids.insert(LoaderFieldEnumValueId(m.enum_value));
                             }
 
-                            acc.entry(ProjectId(m.mod_id)).or_default().push(qvf);
+                            acc.entry(DBProjectId(m.mod_id)).or_default().push(qvf);
                             async move { Ok(acc) }
                         },
                     )
@@ -638,7 +638,7 @@ impl Project {
                     .try_collect()
                     .await?;
 
-                let mods_gallery: DashMap<ProjectId, Vec<GalleryItem>> = sqlx::query!(
+                let mods_gallery: DashMap<DBProjectId, Vec<GalleryItem>> = sqlx::query!(
                     "
                     SELECT DISTINCT mod_id, mg.image_url, mg.raw_image_url, mg.featured, mg.name, mg.description, mg.created, mg.ordering
                     FROM mods_gallery mg
@@ -648,8 +648,8 @@ impl Project {
                     &project_ids_parsed,
                     &slugs
                 ).fetch(&mut *exec)
-                    .try_fold(DashMap::new(), |acc : DashMap<ProjectId, Vec<GalleryItem>>, m| {
-                        acc.entry(ProjectId(m.mod_id))
+                    .try_fold(DashMap::new(), |acc : DashMap<DBProjectId, Vec<GalleryItem>>, m| {
+                        acc.entry(DBProjectId(m.mod_id))
                             .or_default()
                             .push(GalleryItem {
                                 image_url: m.image_url,
@@ -664,7 +664,7 @@ impl Project {
                     }
                     ).await?;
 
-                let links: DashMap<ProjectId, Vec<LinkUrl>> = sqlx::query!(
+                let links: DashMap<DBProjectId, Vec<LinkUrl>> = sqlx::query!(
                     "
                     SELECT DISTINCT joining_mod_id as mod_id, joining_platform_id as platform_id, lp.name as platform_name, url, lp.donation as donation
                     FROM mods_links ml
@@ -675,8 +675,8 @@ impl Project {
                     &project_ids_parsed,
                     &slugs
                 ).fetch(&mut *exec)
-                    .try_fold(DashMap::new(), |acc : DashMap<ProjectId, Vec<LinkUrl>>, m| {
-                        acc.entry(ProjectId(m.mod_id))
+                    .try_fold(DashMap::new(), |acc : DashMap<DBProjectId, Vec<LinkUrl>>, m| {
+                        acc.entry(DBProjectId(m.mod_id))
                             .or_default()
                             .push(LinkUrl {
                                 platform_id: LinkPlatformId(m.platform_id),
@@ -697,7 +697,7 @@ impl Project {
                 }
 
                 let loader_field_ids = DashSet::new();
-                let loaders_ptypes_games: DashMap<ProjectId, VersionLoaderData> = sqlx::query!(
+                let loaders_ptypes_games: DashMap<DBProjectId, VersionLoaderData> = sqlx::query!(
                     "
                     SELECT DISTINCT mod_id,
                         ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
@@ -718,7 +718,7 @@ impl Project {
                     &all_version_ids.iter().map(|x| x.0).collect::<Vec<_>>()
                 ).fetch(&mut *exec)
                     .map_ok(|m| {
-                        let project_id = ProjectId(m.mod_id);
+                        let project_id = DBProjectId(m.mod_id);
 
                         // Add loader fields to the set we need to fetch
                         let loader_loader_field_ids = m.loader_fields.unwrap_or_default().into_iter().map(LoaderFieldId).collect::<Vec<_>>();
@@ -784,14 +784,14 @@ impl Project {
                     .fetch(&mut *exec)
                     .try_fold(DashMap::new(), |acc, m| {
                         let id = m.id;
-                        let project_id = ProjectId(id);
+                        let project_id = DBProjectId(id);
                         let VersionLoaderData {
                             loaders,
                             project_types,
                             games,
                             loader_loader_field_ids,
                         } = loaders_ptypes_games.remove(&project_id).map(|x|x.1).unwrap_or_default();
-                        // Each version is a tuple of (VersionId, DateTime<Utc>)
+                        // Each version is a tuple of (DBVersionId, DateTime<Utc>)
                         let mut versions = versions.remove(&project_id).map(|x| x.1).unwrap_or_default();
                         versions.sort_by(|a, b| a.1.cmp(&b.1));
                         let mut gallery = mods_gallery.remove(&project_id).map(|x| x.1).unwrap_or_default();
@@ -804,9 +804,9 @@ impl Project {
 
                         let project = QueryProject {
                             inner: Project {
-                                id: ProjectId(id),
-                                team_id: TeamId(m.team_id),
-                                organization_id: m.organization_id.map(OrganizationId),
+                                id: DBProjectId(id),
+                                team_id: DBTeamId(m.team_id),
+                                organization_id: m.organization_id.map(DBOrganizationId),
                                 name: m.name.clone(),
                                 summary: m.summary.clone(),
                                 downloads: m.downloads,
@@ -847,7 +847,7 @@ impl Project {
                             },
                             urls,
                             aggregate_version_fields: VersionField::from_query_json(version_fields, &loader_fields, &loader_field_enum_values, true),
-                            thread_id: ThreadId(m.thread_id),
+                            thread_id: DBThreadId(m.thread_id),
                         };
 
                         acc.insert(m.id, (m.slug, project));
@@ -863,18 +863,25 @@ impl Project {
     }
 
     pub async fn get_dependencies<'a, E>(
-        id: ProjectId,
+        id: DBProjectId,
         exec: E,
         redis: &RedisPool,
     ) -> Result<
-        Vec<(Option<VersionId>, Option<ProjectId>, Option<ProjectId>)>,
+        Vec<(
+            Option<DBVersionId>,
+            Option<DBProjectId>,
+            Option<DBProjectId>,
+        )>,
         DatabaseError,
     >
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        type Dependencies =
-            Vec<(Option<VersionId>, Option<ProjectId>, Option<ProjectId>)>;
+        type Dependencies = Vec<(
+            Option<DBVersionId>,
+            Option<DBProjectId>,
+            Option<DBProjectId>,
+        )>;
 
         let mut redis = redis.connect().await?;
 
@@ -896,18 +903,18 @@ impl Project {
             LEFT JOIN versions vd ON d.dependency_id = vd.id
             WHERE v.mod_id = $1
             ",
-            id as ProjectId
+            id as DBProjectId
         )
         .fetch(exec)
         .map_ok(|x| {
             (
-                x.dependency_id.map(VersionId),
+                x.dependency_id.map(DBVersionId),
                 if x.mod_id == Some(0) {
                     None
                 } else {
-                    x.mod_id.map(ProjectId)
+                    x.mod_id.map(DBProjectId)
                 },
-                x.mod_dependency_id.map(ProjectId),
+                x.mod_dependency_id.map(DBProjectId),
             )
         })
         .try_collect::<Dependencies>()
@@ -925,7 +932,7 @@ impl Project {
     }
 
     pub async fn clear_cache(
-        id: ProjectId,
+        id: DBProjectId,
         slug: Option<String>,
         clear_dependencies: Option<bool>,
         redis: &RedisPool,
@@ -955,11 +962,11 @@ pub struct QueryProject {
     pub inner: Project,
     pub categories: Vec<String>,
     pub additional_categories: Vec<String>,
-    pub versions: Vec<VersionId>,
+    pub versions: Vec<DBVersionId>,
     pub project_types: Vec<String>,
     pub games: Vec<String>,
     pub urls: Vec<LinkUrl>,
     pub gallery_items: Vec<GalleryItem>,
-    pub thread_id: ThreadId,
+    pub thread_id: DBThreadId,
     pub aggregate_version_fields: Vec<VersionField>,
 }

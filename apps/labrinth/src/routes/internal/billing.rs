@@ -1439,7 +1439,7 @@ pub async fn stripe_webhook(
                 let user_id = if let Some(user_id) = metadata
                     .get("modrinth_user_id")
                     .and_then(|x| parse_base62(x).ok())
-                    .map(|x| crate::database::models::ids::UserId(x as i64))
+                    .map(|x| crate::database::models::ids::DBUserId(x as i64))
                 {
                     user_id
                 } else {
@@ -1464,7 +1464,7 @@ pub async fn stripe_webhook(
                 let charge_id = if let Some(charge_id) = metadata
                     .get("modrinth_charge_id")
                     .and_then(|x| parse_base62(x).ok())
-                    .map(|x| crate::database::models::ids::ChargeId(x as i64))
+                    .map(|x| crate::database::models::ids::DBChargeId(x as i64))
                 {
                     charge_id
                 } else {
@@ -1557,7 +1557,7 @@ pub async fn stripe_webhook(
                         .get("modrinth_price_id")
                         .and_then(|x| parse_base62(x).ok())
                         .map(|x| {
-                            crate::database::models::ids::ProductPriceId(
+                            crate::database::models::ids::DBProductPriceId(
                                 x as i64,
                             )
                         }) {
@@ -1601,7 +1601,7 @@ pub async fn stripe_webhook(
                                     .get("modrinth_subscription_id")
                                     .and_then(|x| parse_base62(x).ok())
                                     .map(|x| {
-                                        crate::database::models::ids::UserSubscriptionId(x as i64)
+                                        crate::database::models::ids::DBUserSubscriptionId(x as i64)
                                     }) {
                                     subscription_id
                                 } else {
@@ -1736,7 +1736,7 @@ pub async fn stripe_webhook(
                                 ",
                                 badges.bits() as i64,
                                 metadata.user_item.id
-                                    as crate::database::models::ids::UserId,
+                                    as crate::database::models::ids::DBUserId,
                             )
                             .execute(&mut *transaction)
                             .await?;
@@ -2212,7 +2212,7 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
                         WHERE (id = $2)
                         ",
                         badges.bits() as i64,
-                        user.id as crate::database::models::ids::UserId,
+                        user.id as crate::database::models::ids::DBUserId,
                     )
                     .execute(&mut *transaction)
                     .await?;

@@ -14,7 +14,7 @@ const SESSIONS_USERS_NAMESPACE: &str = "sessions_users";
 
 pub struct SessionBuilder {
     pub session: String,
-    pub user_id: UserId,
+    pub user_id: DBUserId,
 
     pub os: Option<String>,
     pub platform: Option<String>,
@@ -30,7 +30,7 @@ impl SessionBuilder {
     pub async fn insert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<SessionId, DatabaseError> {
+    ) -> Result<DBSessionId, DatabaseError> {
         let id = generate_session_id(transaction).await?;
 
         sqlx::query!(
@@ -44,9 +44,9 @@ impl SessionBuilder {
                 $6, $7, $8, $9
             )
             ",
-            id as SessionId,
+            id as DBSessionId,
             self.session,
-            self.user_id as UserId,
+            self.user_id as DBUserId,
             self.os,
             self.platform,
             self.city,
@@ -63,9 +63,9 @@ impl SessionBuilder {
 
 #[derive(Deserialize, Serialize)]
 pub struct Session {
-    pub id: SessionId,
+    pub id: DBSessionId,
     pub session: String,
-    pub user_id: UserId,
+    pub user_id: DBUserId,
 
     pub created: DateTime<Utc>,
     pub last_login: DateTime<Utc>,
@@ -100,7 +100,7 @@ impl Session {
     }
 
     pub async fn get_id<'a, 'b, E>(
-        id: SessionId,
+        id: DBSessionId,
         executor: E,
         redis: &RedisPool,
     ) -> Result<Option<Session>, DatabaseError>
@@ -117,7 +117,7 @@ impl Session {
     }
 
     pub async fn get_many_ids<'a, E>(
-        session_ids: &[SessionId],
+        session_ids: &[DBSessionId],
         exec: E,
         redis: &RedisPool,
     ) -> Result<Vec<Session>, DatabaseError>
@@ -174,9 +174,9 @@ impl Session {
                     .fetch(exec)
                     .try_fold(DashMap::new(), |acc, x| {
                         let session = Session {
-                            id: SessionId(x.id),
+                            id: DBSessionId(x.id),
                             session: x.session.clone(),
-                            user_id: UserId(x.user_id),
+                            user_id: DBUserId(x.user_id),
                             created: x.created,
                             last_login: x.last_login,
                             expires: x.expires,
@@ -202,10 +202,10 @@ impl Session {
     }
 
     pub async fn get_user_sessions<'a, E>(
-        user_id: UserId,
+        user_id: DBUserId,
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<SessionId>, DatabaseError>
+    ) -> Result<Vec<DBSessionId>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -219,11 +219,11 @@ impl Session {
             .await?;
 
         if let Some(res) = res {
-            return Ok(res.into_iter().map(SessionId).collect());
+            return Ok(res.into_iter().map(DBSessionId).collect());
         }
 
         use futures::TryStreamExt;
-        let db_sessions: Vec<SessionId> = sqlx::query!(
+        let db_sessions: Vec<DBSessionId> = sqlx::query!(
             "
                 SELECT id
                 FROM sessions
@@ -233,8 +233,8 @@ impl Session {
             user_id.0,
         )
         .fetch(exec)
-        .map_ok(|x| SessionId(x.id))
-        .try_collect::<Vec<SessionId>>()
+        .map_ok(|x| DBSessionId(x.id))
+        .try_collect::<Vec<DBSessionId>>()
         .await?;
 
         redis
@@ -251,9 +251,9 @@ impl Session {
 
     pub async fn clear_cache(
         clear_sessions: Vec<(
-            Option<SessionId>,
+            Option<DBSessionId>,
             Option<String>,
-            Option<UserId>,
+            Option<DBUserId>,
         )>,
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
@@ -281,14 +281,14 @@ impl Session {
     }
 
     pub async fn remove(
-        id: SessionId,
+        id: DBSessionId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Option<()>, sqlx::error::Error> {
         sqlx::query!(
             "
             DELETE FROM sessions WHERE id = $1
             ",
-            id as SessionId,
+            id as DBSessionId,
         )
         .execute(&mut **transaction)
         .await?;

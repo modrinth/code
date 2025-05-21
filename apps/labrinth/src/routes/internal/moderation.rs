@@ -56,8 +56,8 @@ pub async fn get_projects(
         count.count as i64
     )
     .fetch(&**pool)
-    .map_ok(|m| database::models::ProjectId(m.id))
-    .try_collect::<Vec<database::models::ProjectId>>()
+    .map_ok(|m| database::models::DBProjectId(m.id))
+    .try_collect::<Vec<database::models::DBProjectId>>()
     .await?;
 
     let projects: Vec<_> =

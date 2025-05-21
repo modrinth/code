@@ -4,13 +4,15 @@ use serde::{Deserialize, Serialize};
 
 use crate::models::pats::Scopes;
 
-use super::{DatabaseError, OAuthClientAuthorizationId, OAuthClientId, UserId};
+use super::{
+    DBOAuthClientAuthorizationId, DBOAuthClientId, DBUserId, DatabaseError,
+};
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct OAuthClientAuthorization {
-    pub id: OAuthClientAuthorizationId,
-    pub client_id: OAuthClientId,
-    pub user_id: UserId,
+    pub id: DBOAuthClientAuthorizationId,
+    pub client_id: DBOAuthClientId,
+    pub user_id: DBUserId,
     pub scopes: Scopes,
     pub created: DateTime<Utc>,
 }
@@ -26,9 +28,9 @@ struct AuthorizationQueryResult {
 impl From<AuthorizationQueryResult> for OAuthClientAuthorization {
     fn from(value: AuthorizationQueryResult) -> Self {
         OAuthClientAuthorization {
-            id: OAuthClientAuthorizationId(value.id),
-            client_id: OAuthClientId(value.client_id),
-            user_id: UserId(value.user_id),
+            id: DBOAuthClientAuthorizationId(value.id),
+            client_id: DBOAuthClientId(value.client_id),
+            user_id: DBUserId(value.user_id),
             scopes: Scopes::from_postgres(value.scopes),
             created: value.created,
         }
@@ -37,8 +39,8 @@ impl From<AuthorizationQueryResult> for OAuthClientAuthorization {
 
 impl OAuthClientAuthorization {
     pub async fn get(
-        client_id: OAuthClientId,
-        user_id: UserId,
+        client_id: DBOAuthClientId,
+        user_id: DBUserId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Option<OAuthClientAuthorization>, DatabaseError> {
         let value = sqlx::query_as!(
@@ -58,7 +60,7 @@ impl OAuthClientAuthorization {
     }
 
     pub async fn get_all_for_user(
-        user_id: UserId,
+        user_id: DBUserId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<OAuthClientAuthorization>, DatabaseError> {
         let results = sqlx::query_as!(
@@ -77,9 +79,9 @@ impl OAuthClientAuthorization {
     }
 
     pub async fn upsert(
-        id: OAuthClientAuthorizationId,
-        client_id: OAuthClientId,
-        user_id: UserId,
+        id: DBOAuthClientAuthorizationId,
+        client_id: DBOAuthClientId,
+        user_id: DBUserId,
         scopes: Scopes,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), DatabaseError> {
@@ -106,8 +108,8 @@ impl OAuthClientAuthorization {
     }
 
     pub async fn remove(
-        client_id: OAuthClientId,
-        user_id: UserId,
+        client_id: DBOAuthClientId,
+        user_id: DBUserId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(

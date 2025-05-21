@@ -370,10 +370,10 @@ pub async fn update_files(
         &update_data.version_types.clone().unwrap_or_default().iter().map(|x| x.to_string()).collect::<Vec<_>>(),
     )
         .fetch(&**pool)
-        .try_fold(DashMap::new(), |acc : DashMap<_,Vec<database::models::ids::VersionId>>, m| {
-            acc.entry(database::models::ProjectId(m.mod_id))
+        .try_fold(DashMap::new(), |acc : DashMap<_,Vec<database::models::ids::DBVersionId>>, m| {
+            acc.entry(database::models::DBProjectId(m.mod_id))
                 .or_default()
-                .push(database::models::VersionId(m.version_id));
+                .push(database::models::DBVersionId(m.version_id));
             async move { Ok(acc) }
         })
         .await?;

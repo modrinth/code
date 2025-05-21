@@ -74,7 +74,7 @@ impl TempUser {
         client: &PgPool,
         file_host: &Arc<dyn FileHost + Send + Sync>,
         redis: &RedisPool,
-    ) -> Result<crate::database::models::UserId, AuthenticationError> {
+    ) -> Result<crate::database::models::DBUserId, AuthenticationError> {
         if let Some(email) = &self.email {
             if crate::database::models::User::get_email(email, client)
                 .await?
@@ -821,7 +821,7 @@ impl AuthProvider {
         &self,
         id: &str,
         executor: E,
-    ) -> Result<Option<crate::database::models::UserId>, AuthenticationError>
+    ) -> Result<Option<crate::database::models::DBUserId>, AuthenticationError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -835,7 +835,7 @@ impl AuthProvider {
                 .fetch_optional(executor)
                 .await?;
 
-                value.map(|x| crate::database::models::UserId(x.id))
+                value.map(|x| crate::database::models::DBUserId(x.id))
             }
             AuthProvider::Discord => {
                 let value = sqlx::query!(
@@ -846,7 +846,7 @@ impl AuthProvider {
                 .fetch_optional(executor)
                 .await?;
 
-                value.map(|x| crate::database::models::UserId(x.id))
+                value.map(|x| crate::database::models::DBUserId(x.id))
             }
             AuthProvider::Microsoft => {
                 let value = sqlx::query!(
@@ -856,7 +856,7 @@ impl AuthProvider {
                 .fetch_optional(executor)
                 .await?;
 
-                value.map(|x| crate::database::models::UserId(x.id))
+                value.map(|x| crate::database::models::DBUserId(x.id))
             }
             AuthProvider::GitLab => {
                 let value = sqlx::query!(
@@ -867,7 +867,7 @@ impl AuthProvider {
                 .fetch_optional(executor)
                 .await?;
 
-                value.map(|x| crate::database::models::UserId(x.id))
+                value.map(|x| crate::database::models::DBUserId(x.id))
             }
             AuthProvider::Google => {
                 let value = sqlx::query!(
@@ -877,7 +877,7 @@ impl AuthProvider {
                 .fetch_optional(executor)
                 .await?;
 
-                value.map(|x| crate::database::models::UserId(x.id))
+                value.map(|x| crate::database::models::DBUserId(x.id))
             }
             AuthProvider::Steam => {
                 let value = sqlx::query!(
@@ -888,7 +888,7 @@ impl AuthProvider {
                 .fetch_optional(executor)
                 .await?;
 
-                value.map(|x| crate::database::models::UserId(x.id))
+                value.map(|x| crate::database::models::DBUserId(x.id))
             }
             AuthProvider::PayPal => {
                 let value = sqlx::query!(
@@ -898,14 +898,14 @@ impl AuthProvider {
                 .fetch_optional(executor)
                 .await?;
 
-                value.map(|x| crate::database::models::UserId(x.id))
+                value.map(|x| crate::database::models::DBUserId(x.id))
             }
         })
     }
 
     pub async fn update_user_id(
         &self,
-        user_id: crate::database::models::UserId,
+        user_id: crate::database::models::DBUserId,
         id: Option<&str>,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), AuthenticationError> {
@@ -917,7 +917,7 @@ impl AuthProvider {
                     SET github_id = $2
                     WHERE (id = $1)
                     ",
-                    user_id as crate::database::models::UserId,
+                    user_id as crate::database::models::DBUserId,
                     id.and_then(|x| x.parse::<i64>().ok())
                 )
                 .execute(&mut **transaction)
@@ -930,7 +930,7 @@ impl AuthProvider {
                     SET discord_id = $2
                     WHERE (id = $1)
                     ",
-                    user_id as crate::database::models::UserId,
+                    user_id as crate::database::models::DBUserId,
                     id.and_then(|x| x.parse::<i64>().ok())
                 )
                 .execute(&mut **transaction)
@@ -943,7 +943,7 @@ impl AuthProvider {
                     SET microsoft_id = $2
                     WHERE (id = $1)
                     ",
-                    user_id as crate::database::models::UserId,
+                    user_id as crate::database::models::DBUserId,
                     id,
                 )
                 .execute(&mut **transaction)
@@ -956,7 +956,7 @@ impl AuthProvider {
                     SET gitlab_id = $2
                     WHERE (id = $1)
                     ",
-                    user_id as crate::database::models::UserId,
+                    user_id as crate::database::models::DBUserId,
                     id.and_then(|x| x.parse::<i64>().ok())
                 )
                 .execute(&mut **transaction)
@@ -969,7 +969,7 @@ impl AuthProvider {
                     SET google_id = $2
                     WHERE (id = $1)
                     ",
-                    user_id as crate::database::models::UserId,
+                    user_id as crate::database::models::DBUserId,
                     id,
                 )
                 .execute(&mut **transaction)
@@ -982,7 +982,7 @@ impl AuthProvider {
                     SET steam_id = $2
                     WHERE (id = $1)
                     ",
-                    user_id as crate::database::models::UserId,
+                    user_id as crate::database::models::DBUserId,
                     id.and_then(|x| x.parse::<i64>().ok())
                 )
                 .execute(&mut **transaction)
@@ -996,7 +996,7 @@ impl AuthProvider {
                         SET paypal_country = NULL, paypal_email = NULL, paypal_id = NULL
                         WHERE (id = $1)
                         ",
-                        user_id as crate::database::models::UserId,
+                        user_id as crate::database::models::DBUserId,
                     )
                     .execute(&mut **transaction)
                     .await?;
@@ -1007,7 +1007,7 @@ impl AuthProvider {
                         SET paypal_id = $2
                         WHERE (id = $1)
                         ",
-                        user_id as crate::database::models::UserId,
+                        user_id as crate::database::models::DBUserId,
                         id,
                     )
                     .execute(&mut **transaction)
@@ -1150,7 +1150,7 @@ pub async fn auth_callback(
                         oauth_user.country,
                         oauth_user.email,
                         oauth_user.id,
-                        id as crate::database::models::ids::UserId,
+                        id as crate::database::models::ids::DBUserId,
                     )
                         .execute(&mut *transaction)
                         .await?;
@@ -1525,7 +1525,7 @@ async fn validate_2fa_code(
     input: String,
     secret: String,
     allow_backup: bool,
-    user_id: crate::database::models::UserId,
+    user_id: crate::database::models::DBUserId,
     redis: &RedisPool,
     pool: &PgPool,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -1581,7 +1581,7 @@ async fn validate_2fa_code(
                     DELETE FROM user_backup_codes
                     WHERE user_id = $1 AND code = $2
                     ",
-                user_id as crate::database::models::ids::UserId,
+                user_id as crate::database::models::ids::DBUserId,
                 code as i64,
             )
             .execute(&mut **transaction)
@@ -1744,7 +1744,7 @@ pub async fn finish_2fa_flow(
             WHERE (id = $2)
             ",
             secret,
-            user_id as crate::database::models::ids::UserId,
+            user_id as crate::database::models::ids::DBUserId,
         )
         .execute(&mut *transaction)
         .await?;
@@ -1754,7 +1754,7 @@ pub async fn finish_2fa_flow(
             DELETE FROM user_backup_codes
             WHERE user_id = $1
             ",
-            user_id as crate::database::models::ids::UserId,
+            user_id as crate::database::models::ids::DBUserId,
         )
         .execute(&mut *transaction)
         .await?;
@@ -1774,7 +1774,7 @@ pub async fn finish_2fa_flow(
                     $1, $2
                 )
                 ",
-                user_id as crate::database::models::ids::UserId,
+                user_id as crate::database::models::ids::DBUserId,
                 val as i64,
             )
             .execute(&mut *transaction)
@@ -1867,7 +1867,7 @@ pub async fn remove_2fa(
         SET totp_secret = NULL
         WHERE (id = $1)
         ",
-        user.id as crate::database::models::ids::UserId,
+        user.id as crate::database::models::ids::DBUserId,
     )
     .execute(&mut *transaction)
     .await?;
@@ -1877,7 +1877,7 @@ pub async fn remove_2fa(
         DELETE FROM user_backup_codes
         WHERE user_id = $1
         ",
-        user.id as crate::database::models::ids::UserId,
+        user.id as crate::database::models::ids::DBUserId,
     )
     .execute(&mut *transaction)
     .await?;
@@ -2079,7 +2079,7 @@ pub async fn change_password(
         WHERE (id = $2)
         ",
         update_password,
-        user.id as crate::database::models::ids::UserId,
+        user.id as crate::database::models::ids::DBUserId,
     )
     .execute(&mut *transaction)
     .await?;
@@ -2289,7 +2289,7 @@ pub async fn verify_email(
             SET email_verified = TRUE
             WHERE (id = $1)
             ",
-            user.id as crate::database::models::ids::UserId,
+            user.id as crate::database::models::ids::DBUserId,
         )
         .execute(&mut *transaction)
         .await?;

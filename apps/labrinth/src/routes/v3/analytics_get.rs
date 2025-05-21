@@ -590,7 +590,7 @@ async fn filter_allowed_ids(
         let team_ids = projects_data
             .iter()
             .map(|x| x.inner.team_id)
-            .collect::<Vec<database::models::TeamId>>();
+            .collect::<Vec<database::models::DBTeamId>>();
         let team_members =
             database::models::TeamMember::get_from_team_full_many(
                 &team_ids, &***pool, redis,
@@ -600,7 +600,7 @@ async fn filter_allowed_ids(
         let organization_ids = projects_data
             .iter()
             .filter_map(|x| x.inner.organization_id)
-            .collect::<Vec<database::models::OrganizationId>>();
+            .collect::<Vec<database::models::DBOrganizationId>>();
         let organizations = database::models::Organization::get_many_ids(
             &organization_ids,
             &***pool,
@@ -611,7 +611,7 @@ async fn filter_allowed_ids(
         let organization_team_ids = organizations
             .iter()
             .map(|x| x.team_id)
-            .collect::<Vec<database::models::TeamId>>();
+            .collect::<Vec<database::models::DBTeamId>>();
         let organization_team_members =
             database::models::TeamMember::get_from_team_full_many(
                 &organization_team_ids,

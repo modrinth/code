@@ -204,13 +204,13 @@ pub async fn images_add(
         raw_url: upload_result.raw_url,
         size: content_length as u64,
         created: chrono::Utc::now(),
-        owner_id: database::models::UserId::from(user.id),
+        owner_id: database::models::DBUserId::from(user.id),
         context: context.context_as_str().to_string(),
         project_id: if let ImageContext::Project {
             project_id: Some(id),
         } = context
         {
-            Some(crate::database::models::ProjectId::from(id))
+            Some(crate::database::models::DBProjectId::from(id))
         } else {
             None
         },
@@ -218,7 +218,7 @@ pub async fn images_add(
             version_id: Some(id),
         } = context
         {
-            Some(database::models::VersionId::from(id))
+            Some(database::models::DBVersionId::from(id))
         } else {
             None
         },
@@ -226,7 +226,7 @@ pub async fn images_add(
             thread_message_id: Some(id),
         } = context
         {
-            Some(database::models::ThreadMessageId::from(id))
+            Some(database::models::DBThreadMessageId::from(id))
         } else {
             None
         },
@@ -234,7 +234,7 @@ pub async fn images_add(
             report_id: Some(id),
         } = context
         {
-            Some(database::models::ReportId::from(id))
+            Some(database::models::DBReportId::from(id))
         } else {
             None
         },

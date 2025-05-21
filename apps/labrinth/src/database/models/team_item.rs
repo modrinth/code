@@ -15,7 +15,7 @@ pub struct TeamBuilder {
     pub members: Vec<TeamMemberBuilder>,
 }
 pub struct TeamMemberBuilder {
-    pub user_id: UserId,
+    pub user_id: DBUserId,
     pub role: String,
     pub is_owner: bool,
     pub permissions: ProjectPermissions,
@@ -29,7 +29,7 @@ impl TeamBuilder {
     pub async fn insert(
         self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<TeamId, super::DatabaseError> {
+    ) -> Result<DBTeamId, super::DatabaseError> {
         let team_id = generate_team_id(transaction).await?;
 
         let team = Team { id: team_id };
@@ -39,7 +39,7 @@ impl TeamBuilder {
             INSERT INTO teams (id)
             VALUES ($1)
             ",
-            team.id as TeamId,
+            team.id as DBTeamId,
         )
         .execute(&mut **transaction)
         .await?;
@@ -111,18 +111,18 @@ impl TeamBuilder {
 /// A team of users who control a project
 pub struct Team {
     /// The id of the team
-    pub id: TeamId,
+    pub id: DBTeamId,
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug, Copy)]
 pub enum TeamAssociationId {
-    Project(ProjectId),
-    Organization(OrganizationId),
+    Project(DBProjectId),
+    Organization(DBOrganizationId),
 }
 
 impl Team {
     pub async fn get_association<'a, 'b, E>(
-        id: TeamId,
+        id: DBTeamId,
         executor: E,
     ) -> Result<Option<TeamAssociationId>, super::DatabaseError>
     where
@@ -133,14 +133,14 @@ impl Team {
             SELECT m.id AS pid, NULL AS oid
             FROM mods m
             WHERE m.team_id = $1
-            
+
             UNION ALL
-             
+
             SELECT NULL AS pid, o.id AS oid
             FROM organizations o
-            WHERE o.team_id = $1    
+            WHERE o.team_id = $1
             ",
-            id as TeamId
+            id as DBTeamId
         )
         .fetch_optional(executor)
         .await?;
@@ -150,11 +150,12 @@ impl Team {
             let mut team_association_id = None;
             if let Some(pid) = t.pid {
                 team_association_id =
-                    Some(TeamAssociationId::Project(ProjectId(pid)));
+                    Some(TeamAssociationId::Project(DBProjectId(pid)));
             }
             if let Some(oid) = t.oid {
-                team_association_id =
-                    Some(TeamAssociationId::Organization(OrganizationId(oid)));
+                team_association_id = Some(TeamAssociationId::Organization(
+                    DBOrganizationId(oid),
+                ));
             }
             return Ok(team_association_id);
         }
@@ -165,11 +166,11 @@ impl Team {
 /// A member of a team
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct TeamMember {
-    pub id: TeamMemberId,
-    pub team_id: TeamId,
+    pub id: DBTeamMemberId,
+    pub team_id: DBTeamId,
 
     /// The ID of the user associated with the member
-    pub user_id: UserId,
+    pub user_id: DBUserId,
     pub role: String,
     pub is_owner: bool,
 
@@ -189,7 +190,7 @@ pub struct TeamMember {
 impl TeamMember {
     // Lists the full members of a team
     pub async fn get_from_team_full<'a, 'b, E>(
-        id: TeamId,
+        id: DBTeamId,
         executor: E,
         redis: &RedisPool,
     ) -> Result<Vec<TeamMember>, super::DatabaseError>
@@ -200,7 +201,7 @@ impl TeamMember {
     }
 
     pub async fn get_from_team_full_many<'a, E>(
-        team_ids: &[TeamId],
+        team_ids: &[DBTeamId],
         exec: E,
         redis: &RedisPool,
     ) -> Result<Vec<TeamMember>, super::DatabaseError>
@@ -229,8 +230,8 @@ impl TeamMember {
                     .fetch(exec)
                     .try_fold(DashMap::new(), |acc: DashMap<i64, Vec<TeamMember>>, m| {
                         let member = TeamMember {
-                            id: TeamMemberId(m.id),
-                            team_id: TeamId(m.team_id),
+                            id: DBTeamMemberId(m.id),
+                            team_id: DBTeamId(m.team_id),
                             role: m.member_role,
                             is_owner: m.is_owner,
                             permissions: ProjectPermissions::from_bits(m.permissions as u64)
@@ -239,7 +240,7 @@ impl TeamMember {
                                 .organization_permissions
                                 .map(|p| OrganizationPermissions::from_bits(p as u64).unwrap_or_default()),
                             accepted: m.accepted,
-                            user_id: UserId(m.user_id),
+                            user_id: DBUserId(m.user_id),
                             payouts_split: m.payouts_split,
                             ordering: m.ordering,
                         };
@@ -260,7 +261,7 @@ impl TeamMember {
     }
 
     pub async fn clear_cache(
-        id: TeamId,
+        id: DBTeamId,
         redis: &RedisPool,
     ) -> Result<(), super::DatabaseError> {
         let mut redis = redis.connect().await?;
@@ -270,8 +271,8 @@ impl TeamMember {
 
     /// Gets a team member from a user id and team id.  Does not return pending members.
     pub async fn get_from_user_id<'a, 'b, E>(
-        id: TeamId,
-        user_id: UserId,
+        id: DBTeamId,
+        user_id: DBUserId,
         executor: E,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
@@ -284,8 +285,8 @@ impl TeamMember {
 
     /// Gets team members from user ids and team ids.  Does not return pending members.
     pub async fn get_from_user_id_many<'a, 'b, E>(
-        team_ids: &[TeamId],
-        user_id: UserId,
+        team_ids: &[DBTeamId],
+        user_id: DBUserId,
         executor: E,
     ) -> Result<Vec<Self>, super::DatabaseError>
     where
@@ -303,12 +304,12 @@ impl TeamMember {
             ORDER BY ordering
             ",
             &team_ids_parsed,
-            user_id as UserId
+            user_id as DBUserId
         )
         .fetch(executor)
         .map_ok(|m| TeamMember {
-            id: TeamMemberId(m.id),
-            team_id: TeamId(m.team_id),
+            id: DBTeamMemberId(m.id),
+            team_id: DBTeamId(m.team_id),
             user_id,
             role: m.role,
             is_owner: m.is_owner,
@@ -329,8 +330,8 @@ impl TeamMember {
 
     /// Gets a team member from a user id and team id, including pending members.
     pub async fn get_from_user_id_pending<'a, 'b, E>(
-        id: TeamId,
-        user_id: UserId,
+        id: DBTeamId,
+        user_id: DBUserId,
         executor: E,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
@@ -341,20 +342,20 @@ impl TeamMember {
             SELECT id, team_id, role AS member_role, is_owner, permissions, organization_permissions,
                 accepted, payouts_split, role,
                 ordering, user_id
-                
+
             FROM team_members
             WHERE (team_id = $1 AND user_id = $2)
             ORDER BY ordering
             ",
-            id as TeamId,
-            user_id as UserId
+            id as DBTeamId,
+            user_id as DBUserId
         )
         .fetch_optional(executor)
         .await?;
 
         if let Some(m) = result {
             Ok(Some(TeamMember {
-                id: TeamMemberId(m.id),
+                id: DBTeamMemberId(m.id),
                 team_id: id,
                 user_id,
                 role: m.role,
@@ -389,9 +390,9 @@ impl TeamMember {
                 $1, $2, $3, $4, $5, $6, $7, $8, $9
             )
             ",
-            self.id as TeamMemberId,
-            self.team_id as TeamId,
-            self.user_id as UserId,
+            self.id as DBTeamMemberId,
+            self.team_id as DBTeamId,
+            self.user_id as DBUserId,
             self.role,
             self.permissions.bits() as i64,
             self.organization_permissions.map(|p| p.bits() as i64),
@@ -406,8 +407,8 @@ impl TeamMember {
     }
 
     pub async fn delete(
-        id: TeamId,
-        user_id: UserId,
+        id: DBTeamId,
+        user_id: DBUserId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), super::DatabaseError> {
         sqlx::query!(
@@ -415,8 +416,8 @@ impl TeamMember {
             DELETE FROM team_members
             WHERE (team_id = $1 AND user_id = $2 AND NOT is_owner = TRUE)
             ",
-            id as TeamId,
-            user_id as UserId,
+            id as DBTeamId,
+            user_id as DBUserId,
         )
         .execute(&mut **transaction)
         .await?;
@@ -426,8 +427,8 @@ impl TeamMember {
 
     #[allow(clippy::too_many_arguments)]
     pub async fn edit_team_member(
-        id: TeamId,
-        user_id: UserId,
+        id: DBTeamId,
+        user_id: DBUserId,
         new_permissions: Option<ProjectPermissions>,
         new_organization_permissions: Option<OrganizationPermissions>,
         new_role: Option<String>,
@@ -445,8 +446,8 @@ impl TeamMember {
                 WHERE (team_id = $2 AND user_id = $3)
                 ",
                 permissions.bits() as i64,
-                id as TeamId,
-                user_id as UserId,
+                id as DBTeamId,
+                user_id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -460,8 +461,8 @@ impl TeamMember {
                 WHERE (team_id = $2 AND user_id = $3)
                 ",
                 organization_permissions.bits() as i64,
-                id as TeamId,
-                user_id as UserId,
+                id as DBTeamId,
+                user_id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -475,8 +476,8 @@ impl TeamMember {
                 WHERE (team_id = $2 AND user_id = $3)
                 ",
                 role,
-                id as TeamId,
-                user_id as UserId,
+                id as DBTeamId,
+                user_id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -490,8 +491,8 @@ impl TeamMember {
                     SET accepted = TRUE
                     WHERE (team_id = $1 AND user_id = $2)
                     ",
-                    id as TeamId,
-                    user_id as UserId,
+                    id as DBTeamId,
+                    user_id as DBUserId,
                 )
                 .execute(&mut **transaction)
                 .await?;
@@ -506,8 +507,8 @@ impl TeamMember {
                 WHERE (team_id = $2 AND user_id = $3)
                 ",
                 payouts_split,
-                id as TeamId,
-                user_id as UserId,
+                id as DBTeamId,
+                user_id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -521,8 +522,8 @@ impl TeamMember {
                 WHERE (team_id = $2 AND user_id = $3)
                 ",
                 ordering,
-                id as TeamId,
-                user_id as UserId,
+                id as DBTeamId,
+                user_id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -536,8 +537,8 @@ impl TeamMember {
                 WHERE (team_id = $2 AND user_id = $3)
                 ",
                 is_owner,
-                id as TeamId,
-                user_id as UserId,
+                id as DBTeamId,
+                user_id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -547,8 +548,8 @@ impl TeamMember {
     }
 
     pub async fn get_from_user_id_project<'a, 'b, E>(
-        id: ProjectId,
-        user_id: UserId,
+        id: DBProjectId,
+        user_id: DBUserId,
         allow_pending: bool,
         executor: E,
     ) -> Result<Option<Self>, super::DatabaseError>
@@ -568,8 +569,8 @@ impl TeamMember {
             INNER JOIN team_members tm ON tm.team_id = m.team_id AND user_id = $2 AND accepted = ANY($3)
             WHERE m.id = $1
             ",
-            id as ProjectId,
-            user_id as UserId,
+            id as DBProjectId,
+            user_id as DBUserId,
             &accepted
         )
             .fetch_optional(executor)
@@ -577,8 +578,8 @@ impl TeamMember {
 
         if let Some(m) = result {
             Ok(Some(TeamMember {
-                id: TeamMemberId(m.id),
-                team_id: TeamId(m.team_id),
+                id: DBTeamMemberId(m.id),
+                team_id: DBTeamId(m.team_id),
                 user_id,
                 role: m.role,
                 is_owner: m.is_owner,
@@ -600,8 +601,8 @@ impl TeamMember {
     }
 
     pub async fn get_from_user_id_organization<'a, 'b, E>(
-        id: OrganizationId,
-        user_id: UserId,
+        id: DBOrganizationId,
+        user_id: DBUserId,
         allow_pending: bool,
         executor: E,
     ) -> Result<Option<Self>, super::DatabaseError>
@@ -620,8 +621,8 @@ impl TeamMember {
             INNER JOIN team_members tm ON tm.team_id = o.team_id AND user_id = $2 AND accepted = ANY($3)
             WHERE o.id = $1
             ",
-            id as OrganizationId,
-            user_id as UserId,
+            id as DBOrganizationId,
+            user_id as DBUserId,
             &accepted
         )
             .fetch_optional(executor)
@@ -629,8 +630,8 @@ impl TeamMember {
 
         if let Some(m) = result {
             Ok(Some(TeamMember {
-                id: TeamMemberId(m.id),
-                team_id: TeamId(m.team_id),
+                id: DBTeamMemberId(m.id),
+                team_id: DBTeamId(m.team_id),
                 user_id,
                 role: m.role,
                 is_owner: m.is_owner,
@@ -652,8 +653,8 @@ impl TeamMember {
     }
 
     pub async fn get_from_user_id_version<'a, 'b, E>(
-        id: VersionId,
-        user_id: UserId,
+        id: DBVersionId,
+        user_id: DBUserId,
         executor: E,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
@@ -661,22 +662,22 @@ impl TeamMember {
     {
         let result = sqlx::query!(
             "
-            SELECT tm.id, tm.team_id, tm.user_id, tm.role, tm.is_owner, tm.permissions, tm.organization_permissions, tm.accepted, tm.payouts_split, tm.ordering, v.mod_id 
+            SELECT tm.id, tm.team_id, tm.user_id, tm.role, tm.is_owner, tm.permissions, tm.organization_permissions, tm.accepted, tm.payouts_split, tm.ordering, v.mod_id
             FROM versions v
             INNER JOIN mods m ON m.id = v.mod_id
             INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.user_id = $2 AND tm.accepted = TRUE
             WHERE v.id = $1
             ",
-            id as VersionId,
-            user_id as UserId
+            id as DBVersionId,
+            user_id as DBUserId
         )
             .fetch_optional(executor)
             .await?;
 
         if let Some(m) = result {
             Ok(Some(TeamMember {
-                id: TeamMemberId(m.id),
-                team_id: TeamId(m.team_id),
+                id: DBTeamMemberId(m.id),
+                team_id: DBTeamId(m.team_id),
                 user_id,
                 role: m.role,
                 is_owner: m.is_owner,
@@ -702,7 +703,7 @@ impl TeamMember {
     // - organization team member (a user's membership to a given organization that owns a given project)
     pub async fn get_for_project_permissions<'a, 'b, E>(
         project: &Project,
-        user_id: UserId,
+        user_id: DBUserId,
         executor: E,
     ) -> Result<(Option<Self>, Option<Self>), super::DatabaseError>
     where

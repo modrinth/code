@@ -1,9 +1,9 @@
-use crate::database::models::UserId;
+use crate::database::models::DBUserId;
 use chrono::{DateTime, Utc};
 
 pub struct FriendItem {
-    pub user_id: UserId,
-    pub friend_id: UserId,
+    pub user_id: DBUserId,
+    pub friend_id: DBUserId,
     pub created: DateTime<Utc>,
     pub accepted: bool,
 }
@@ -30,8 +30,8 @@ impl FriendItem {
     }
 
     pub async fn get_friend<'a, E>(
-        user_id: UserId,
-        friend_id: UserId,
+        user_id: DBUserId,
+        friend_id: DBUserId,
         exec: E,
     ) -> Result<Option<FriendItem>, sqlx::Error>
     where
@@ -49,8 +49,8 @@ impl FriendItem {
         .fetch_optional(exec)
         .await?
             .map(|row| FriendItem {
-                user_id: UserId(row.user_id),
-                friend_id: UserId(row.friend_id),
+                user_id: DBUserId(row.user_id),
+                friend_id: DBUserId(row.friend_id),
                 created: row.created,
                 accepted: row.accepted,
             });
@@ -59,8 +59,8 @@ impl FriendItem {
     }
 
     pub async fn update_friend(
-        user_id: UserId,
-        friend_id: UserId,
+        user_id: DBUserId,
+        friend_id: DBUserId,
         accepted: bool,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), sqlx::Error> {
@@ -81,7 +81,7 @@ impl FriendItem {
     }
 
     pub async fn get_user_friends<'a, E>(
-        user_id: UserId,
+        user_id: DBUserId,
         accepted: Option<bool>,
         exec: E,
     ) -> Result<Vec<FriendItem>, sqlx::Error>
@@ -100,8 +100,8 @@ impl FriendItem {
         .await?
         .into_iter()
         .map(|row| FriendItem {
-            user_id: UserId(row.user_id),
-            friend_id: UserId(row.friend_id),
+            user_id: DBUserId(row.user_id),
+            friend_id: DBUserId(row.friend_id),
             created: row.created,
             accepted: row.accepted,
         })
@@ -112,8 +112,8 @@ impl FriendItem {
     }
 
     pub async fn remove(
-        user_id: UserId,
-        friend_id: UserId,
+        user_id: DBUserId,
+        friend_id: DBUserId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), sqlx::Error> {
         sqlx::query!(

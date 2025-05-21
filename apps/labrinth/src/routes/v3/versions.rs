@@ -132,7 +132,7 @@ pub async fn versions_get(
         serde_json::from_str::<Vec<models::ids::VersionId>>(&ids.ids)?
             .into_iter()
             .map(|x| x.into())
-            .collect::<Vec<database::models::VersionId>>();
+            .collect::<Vec<database::models::DBVersionId>>();
     let versions_data =
         database::models::Version::get_many(&version_ids, &**pool, &redis)
             .await?;
@@ -345,7 +345,7 @@ pub async fn version_edit_helper(
                     WHERE (id = $2)
                     ",
                     name.trim(),
-                    version_id as database::models::ids::VersionId,
+                    version_id as database::models::ids::DBVersionId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -359,7 +359,7 @@ pub async fn version_edit_helper(
                     WHERE (id = $2)
                     ",
                     number,
-                    version_id as database::models::ids::VersionId,
+                    version_id as database::models::ids::DBVersionId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -373,7 +373,7 @@ pub async fn version_edit_helper(
                     WHERE (id = $2)
                     ",
                     version_type.as_str(),
-                    version_id as database::models::ids::VersionId,
+                    version_id as database::models::ids::DBVersionId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -384,7 +384,7 @@ pub async fn version_edit_helper(
                     "
                     DELETE FROM dependencies WHERE dependent_id = $1
                     ",
-                    version_id as database::models::ids::VersionId,
+                    version_id as database::models::ids::DBVersionId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -448,7 +448,7 @@ pub async fn version_edit_helper(
                     WHERE version_id = $1
                     AND field_id = ANY($2)
                     ",
-                    version_id as database::models::ids::VersionId,
+                    version_id as database::models::ids::DBVersionId,
                     &loader_field_ids
                 )
                 .execute(&mut *transaction)
@@ -493,7 +493,7 @@ pub async fn version_edit_helper(
                     "
                     DELETE FROM loaders_versions WHERE version_id = $1
                     ",
-                    version_id as database::models::ids::VersionId,
+                    version_id as database::models::ids::DBVersionId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -538,7 +538,7 @@ pub async fn version_edit_helper(
                     WHERE (id = $2)
                     ",
                     featured,
-                    version_id as database::models::ids::VersionId,
+                    version_id as database::models::ids::DBVersionId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -552,7 +552,7 @@ pub async fn version_edit_helper(
                     WHERE (id = $2)
                     ",
                     body,
-                    version_id as database::models::ids::VersionId,
+                    version_id as database::models::ids::DBVersionId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -572,7 +572,7 @@ pub async fn version_edit_helper(
                     WHERE (id = $2)
                     ",
                     *downloads as i32,
-                    version_id as database::models::ids::VersionId,
+                    version_id as database::models::ids::DBVersionId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -587,7 +587,7 @@ pub async fn version_edit_helper(
                     ",
                     diff as i32,
                     version_item.inner.project_id
-                        as database::models::ids::ProjectId,
+                        as database::models::ids::DBProjectId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -607,7 +607,7 @@ pub async fn version_edit_helper(
                     WHERE (id = $2)
                     ",
                     status.as_str(),
-                    version_id as database::models::ids::VersionId,
+                    version_id as database::models::ids::DBVersionId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -655,7 +655,7 @@ pub async fn version_edit_helper(
                     WHERE (id = $2)
                     ",
                     ordering.to_owned() as Option<i32>,
-                    version_id as database::models::ids::VersionId,
+                    version_id as database::models::ids::DBVersionId,
                 )
                 .execute(&mut *transaction)
                 .await?;

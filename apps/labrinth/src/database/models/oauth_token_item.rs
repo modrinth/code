@@ -1,6 +1,6 @@
 use super::{
-    DatabaseError, OAuthAccessTokenId, OAuthClientAuthorizationId,
-    OAuthClientId, UserId,
+    DBOAuthAccessTokenId, DBOAuthClientAuthorizationId, DBOAuthClientId,
+    DBUserId, DatabaseError,
 };
 use crate::models::pats::Scopes;
 use chrono::{DateTime, Utc};
@@ -9,8 +9,8 @@ use sha2::Digest;
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct OAuthAccessToken {
-    pub id: OAuthAccessTokenId,
-    pub authorization_id: OAuthClientAuthorizationId,
+    pub id: DBOAuthAccessTokenId,
+    pub authorization_id: DBOAuthClientAuthorizationId,
     pub token_hash: String,
     pub scopes: Scopes,
     pub created: DateTime<Utc>,
@@ -18,8 +18,8 @@ pub struct OAuthAccessToken {
     pub last_used: Option<DateTime<Utc>>,
 
     // Stored separately inside oauth_client_authorizations table
-    pub client_id: OAuthClientId,
-    pub user_id: UserId,
+    pub client_id: DBOAuthClientId,
+    pub user_id: DBUserId,
 }
 
 impl OAuthAccessToken {
@@ -50,15 +50,15 @@ impl OAuthAccessToken {
         .await?;
 
         Ok(value.map(|r| OAuthAccessToken {
-            id: OAuthAccessTokenId(r.id),
-            authorization_id: OAuthClientAuthorizationId(r.authorization_id),
+            id: DBOAuthAccessTokenId(r.id),
+            authorization_id: DBOAuthClientAuthorizationId(r.authorization_id),
             token_hash: r.token_hash,
             scopes: Scopes::from_postgres(r.scopes),
             created: r.created,
             expires: r.expires,
             last_used: r.last_used,
-            client_id: OAuthClientId(r.client_id),
-            user_id: UserId(r.user_id),
+            client_id: DBOAuthClientId(r.client_id),
+            user_id: DBUserId(r.user_id),
         }))
     }
 

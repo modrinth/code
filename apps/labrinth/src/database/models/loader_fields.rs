@@ -153,7 +153,7 @@ impl Loader {
             SELECT l.id id, l.loader loader, l.icon icon, l.metadata metadata,
             ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
             ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games
-            FROM loaders l            
+            FROM loaders l
             LEFT OUTER JOIN loaders_project_types lpt ON joining_loader_id = l.id
             LEFT OUTER JOIN project_types pt ON lpt.joining_project_type_id = pt.id
             LEFT OUTER JOIN loaders_project_types_games lptg ON lptg.loader_id = lpt.joining_loader_id AND lptg.project_type_id = lpt.joining_project_type_id
@@ -293,7 +293,7 @@ impl std::hash::Hash for LoaderFieldEnumValue {
 
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq, Hash)]
 pub struct VersionField {
-    pub version_id: VersionId,
+    pub version_id: DBVersionId,
     pub field_id: LoaderFieldId,
     pub field_name: String,
     pub value: VersionFieldValue,
@@ -312,7 +312,7 @@ pub enum VersionFieldValue {
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct QueryVersionField {
-    pub version_id: VersionId,
+    pub version_id: DBVersionId,
     pub field_id: LoaderFieldId,
     pub int_value: Option<i32>,
     pub enum_value: Option<LoaderFieldEnumValueId>,
@@ -524,7 +524,7 @@ impl LoaderFieldEnum {
 
         let result = sqlx::query!(
             "
-            SELECT lfe.id, lfe.enum_name, lfe.ordering, lfe.hidable 
+            SELECT lfe.id, lfe.enum_name, lfe.ordering, lfe.hidable
             FROM loader_field_enums lfe
             WHERE lfe.enum_name = $1
             ORDER BY lfe.ordering ASC
@@ -781,7 +781,7 @@ impl VersionField {
     }
 
     pub fn check_parse(
-        version_id: VersionId,
+        version_id: DBVersionId,
         loader_field: LoaderField,
         value: serde_json::Value,
         enum_variants: Vec<LoaderFieldEnumValue>,
@@ -1032,7 +1032,7 @@ impl VersionFieldValue {
         field_type: &LoaderFieldType,
         qvfs: Vec<QueryVersionField>,
         qlfev: &[QueryLoaderFieldEnumValue],
-    ) -> Result<(VersionId, VersionFieldValue), DatabaseError> {
+    ) -> Result<(DBVersionId, VersionFieldValue), DatabaseError> {
         match field_type {
             LoaderFieldType::Integer
             | LoaderFieldType::Text
@@ -1076,7 +1076,7 @@ impl VersionFieldValue {
         field_type: &LoaderFieldType,
         qvfs: Vec<QueryVersionField>,
         qlfev: &[QueryLoaderFieldEnumValue],
-    ) -> Result<Vec<(VersionId, VersionFieldValue)>, DatabaseError> {
+    ) -> Result<Vec<(DBVersionId, VersionFieldValue)>, DatabaseError> {
         let field_name = field_type.to_str();
         let did_not_exist_error = |field_name: &str, desired_field: &str| {
             DatabaseError::SchemaError(format!(
@@ -1093,7 +1093,8 @@ impl VersionFieldValue {
         // If the field type is a non-array, then the reason for multiple version ids is that there are multiple versions being aggregated, and those version ids are contained within.
         // If the field type is an array, then the reason for multiple version ids is that there are multiple values for a single version
         // (or a greater aggregation between multiple arrays, in which case the per-field version is lost, so we just take the first one and use it for that)
-        let version_id = version_id.into_iter().next().unwrap_or(VersionId(0));
+        let version_id =
+            version_id.into_iter().next().unwrap_or(DBVersionId(0));
 
         let field_id = qvfs
             .iter()
@@ -1106,12 +1107,11 @@ impl VersionFieldValue {
             )));
         }
 
-        let mut value =
-            match field_type {
-                // Singleton fields
-                // If there are multiple, we assume multiple versions are being concatenated
-                LoaderFieldType::Integer => qvfs
-                    .into_iter()
+        let mut value = match field_type {
+            // Singleton fields
+            // If there are multiple, we assume multiple versions are being concatenated
+            LoaderFieldType::Integer => {
+                qvfs.into_iter()
                     .map(|qvf| {
                         Ok((
                             qvf.version_id,
@@ -1121,11 +1121,12 @@ impl VersionFieldValue {
                         ))
                     })
                     .collect::<Result<
-                        Vec<(VersionId, VersionFieldValue)>,
+                        Vec<(DBVersionId, VersionFieldValue)>,
                         DatabaseError,
-                    >>()?,
-                LoaderFieldType::Text => qvfs
-                    .into_iter()
+                    >>()?
+            }
+            LoaderFieldType::Text => {
+                qvfs.into_iter()
                     .map(|qvf| {
                         Ok((
                             qvf.version_id,
@@ -1135,11 +1136,12 @@ impl VersionFieldValue {
                         ))
                     })
                     .collect::<Result<
-                        Vec<(VersionId, VersionFieldValue)>,
+                        Vec<(DBVersionId, VersionFieldValue)>,
                         DatabaseError,
-                    >>()?,
-                LoaderFieldType::Boolean => qvfs
-                    .into_iter()
+                    >>()?
+            }
+            LoaderFieldType::Boolean => {
+                qvfs.into_iter()
                     .map(|qvf| {
                         Ok((
                             qvf.version_id,
@@ -1152,11 +1154,12 @@ impl VersionFieldValue {
                         ))
                     })
                     .collect::<Result<
-                        Vec<(VersionId, VersionFieldValue)>,
+                        Vec<(DBVersionId, VersionFieldValue)>,
                         DatabaseError,
-                    >>()?,
-                LoaderFieldType::Enum(id) => qvfs
-                    .into_iter()
+                    >>()?
+            }
+            LoaderFieldType::Enum(id) => {
+                qvfs.into_iter()
                     .map(|qvf| {
                         Ok((
                             qvf.version_id,
@@ -1189,90 +1192,86 @@ impl VersionFieldValue {
                         ))
                     })
                     .collect::<Result<
-                        Vec<(VersionId, VersionFieldValue)>,
+                        Vec<(DBVersionId, VersionFieldValue)>,
                         DatabaseError,
-                    >>()?,
+                    >>()?
+            }
 
-                // Array fields
-                // We concatenate into one array
-                LoaderFieldType::ArrayInteger => vec![(
-                    version_id,
-                    VersionFieldValue::ArrayInteger(
-                        qvfs.into_iter()
-                            .map(|qvf| {
+            // Array fields
+            // We concatenate into one array
+            LoaderFieldType::ArrayInteger => vec![(
+                version_id,
+                VersionFieldValue::ArrayInteger(
+                    qvfs.into_iter()
+                        .map(|qvf| {
+                            qvf.int_value.ok_or(did_not_exist_error(
+                                field_name,
+                                "int_value",
+                            ))
+                        })
+                        .collect::<Result<_, _>>()?,
+                ),
+            )],
+            LoaderFieldType::ArrayText => vec![(
+                version_id,
+                VersionFieldValue::ArrayText(
+                    qvfs.into_iter()
+                        .map(|qvf| {
+                            qvf.string_value.ok_or(did_not_exist_error(
+                                field_name,
+                                "string_value",
+                            ))
+                        })
+                        .collect::<Result<_, _>>()?,
+                ),
+            )],
+            LoaderFieldType::ArrayBoolean => vec![(
+                version_id,
+                VersionFieldValue::ArrayBoolean(
+                    qvfs.into_iter()
+                        .map(|qvf| {
+                            Ok::<bool, DatabaseError>(
                                 qvf.int_value.ok_or(did_not_exist_error(
                                     field_name,
                                     "int_value",
-                                ))
+                                ))? != 0,
+                            )
+                        })
+                        .collect::<Result<_, _>>()?,
+                ),
+            )],
+            LoaderFieldType::ArrayEnum(id) => vec![(
+                version_id,
+                VersionFieldValue::ArrayEnum(
+                    *id,
+                    qvfs.into_iter()
+                        .map(|qvf| {
+                            let enum_id = qvf.enum_value.ok_or(
+                                did_not_exist_error(field_name, "enum_value"),
+                            )?;
+                            let lfev = qlfev
+                                .iter()
+                                .find(|x| x.id == enum_id)
+                                .ok_or(did_not_exist_error(
+                                field_name,
+                                "enum_value",
+                            ))?;
+                            Ok::<_, DatabaseError>(LoaderFieldEnumValue {
+                                id: lfev.id,
+                                enum_id: lfev.enum_id,
+                                value: lfev.value.clone(),
+                                ordering: lfev.ordering,
+                                created: lfev.created,
+                                metadata: lfev
+                                    .metadata
+                                    .clone()
+                                    .unwrap_or_default(),
                             })
-                            .collect::<Result<_, _>>()?,
-                    ),
-                )],
-                LoaderFieldType::ArrayText => vec![(
-                    version_id,
-                    VersionFieldValue::ArrayText(
-                        qvfs.into_iter()
-                            .map(|qvf| {
-                                qvf.string_value.ok_or(did_not_exist_error(
-                                    field_name,
-                                    "string_value",
-                                ))
-                            })
-                            .collect::<Result<_, _>>()?,
-                    ),
-                )],
-                LoaderFieldType::ArrayBoolean => vec![(
-                    version_id,
-                    VersionFieldValue::ArrayBoolean(
-                        qvfs.into_iter()
-                            .map(|qvf| {
-                                Ok::<bool, DatabaseError>(
-                                    qvf.int_value.ok_or(
-                                        did_not_exist_error(
-                                            field_name,
-                                            "int_value",
-                                        ),
-                                    )? != 0,
-                                )
-                            })
-                            .collect::<Result<_, _>>()?,
-                    ),
-                )],
-                LoaderFieldType::ArrayEnum(id) => vec![(
-                    version_id,
-                    VersionFieldValue::ArrayEnum(
-                        *id,
-                        qvfs.into_iter()
-                            .map(|qvf| {
-                                let enum_id = qvf.enum_value.ok_or(
-                                    did_not_exist_error(
-                                        field_name,
-                                        "enum_value",
-                                    ),
-                                )?;
-                                let lfev = qlfev
-                                    .iter()
-                                    .find(|x| x.id == enum_id)
-                                    .ok_or(did_not_exist_error(
-                                        field_name,
-                                        "enum_value",
-                                    ))?;
-                                Ok::<_, DatabaseError>(LoaderFieldEnumValue {
-                                    id: lfev.id,
-                                    enum_id: lfev.enum_id,
-                                    value: lfev.value.clone(),
-                                    ordering: lfev.ordering,
-                                    created: lfev.created,
-                                    metadata: lfev
-                                        .metadata
-                                        .clone()
-                                        .unwrap_or_default(),
-                                })
-                            })
-                            .collect::<Result<_, _>>()?,
-                    ),
-                )],
-            };
+                        })
+                        .collect::<Result<_, _>>()?,
+                ),
+            )],
+        };
 
         // Sort arrayenums by ordering, then by created
         for (_, v) in value.iter_mut() {

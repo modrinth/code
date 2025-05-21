@@ -144,7 +144,7 @@ pub async fn collections_get(
     let ids = ids
         .into_iter()
         .map(|x| {
-            parse_base62(x).map(|x| database::models::CollectionId(x as i64))
+            parse_base62(x).map(|x| database::models::DBCollectionId(x as i64))
         })
         .collect::<Result<Vec<_>, _>>()?;
 
@@ -177,7 +177,7 @@ pub async fn collection_get(
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
 
-    let id = database::models::CollectionId(parse_base62(&string)? as i64);
+    let id = database::models::DBCollectionId(parse_base62(&string)? as i64);
     let collection_data =
         database::models::Collection::get(id, &**pool, &redis).await?;
     let user_option = get_user_from_headers(
@@ -241,7 +241,7 @@ pub async fn collection_edit(
     })?;
 
     let string = info.into_inner().0;
-    let id = database::models::CollectionId(parse_base62(&string)? as i64);
+    let id = database::models::DBCollectionId(parse_base62(&string)? as i64);
     let result = database::models::Collection::get(id, &**pool, &redis).await?;
 
     if let Some(collection_item) = result {
@@ -261,7 +261,7 @@ pub async fn collection_edit(
                 WHERE (id = $2)
                 ",
                 name.trim(),
-                id as database::models::ids::CollectionId,
+                id as database::models::ids::DBCollectionId,
             )
             .execute(&mut *transaction)
             .await?;
@@ -275,7 +275,7 @@ pub async fn collection_edit(
                 WHERE (id = $2)
                 ",
                 description.as_ref(),
-                id as database::models::ids::CollectionId,
+                id as database::models::ids::DBCollectionId,
             )
             .execute(&mut *transaction)
             .await?;
@@ -298,7 +298,7 @@ pub async fn collection_edit(
                 WHERE (id = $2)
                 ",
                 status.to_string(),
-                id as database::models::ids::CollectionId,
+                id as database::models::ids::DBCollectionId,
             )
             .execute(&mut *transaction)
             .await?;
@@ -311,7 +311,7 @@ pub async fn collection_edit(
                 DELETE FROM collections_mods
                 WHERE collection_id = $1
                 ",
-                collection_item.id as database::models::ids::CollectionId,
+                collection_item.id as database::models::ids::DBCollectionId,
             )
             .execute(&mut *transaction)
             .await?;
@@ -352,7 +352,7 @@ pub async fn collection_edit(
                 SET updated = NOW()
                 WHERE id = $1
                 ",
-                collection_item.id as database::models::ids::CollectionId,
+                collection_item.id as database::models::ids::DBCollectionId,
             )
             .execute(&mut *transaction)
             .await?;
@@ -395,7 +395,7 @@ pub async fn collection_icon_edit(
     .1;
 
     let string = info.into_inner().0;
-    let id = database::models::CollectionId(parse_base62(&string)? as i64);
+    let id = database::models::DBCollectionId(parse_base62(&string)? as i64);
     let collection_item =
         database::models::Collection::get(id, &**pool, &redis)
             .await?
@@ -445,7 +445,7 @@ pub async fn collection_icon_edit(
         upload_result.url,
         upload_result.raw_url,
         upload_result.color.map(|x| x as i32),
-        collection_item.id as database::models::ids::CollectionId,
+        collection_item.id as database::models::ids::DBCollectionId,
     )
     .execute(&mut *transaction)
     .await?;
@@ -476,7 +476,7 @@ pub async fn delete_collection_icon(
     .1;
 
     let string = info.into_inner().0;
-    let id = database::models::CollectionId(parse_base62(&string)? as i64);
+    let id = database::models::DBCollectionId(parse_base62(&string)? as i64);
     let collection_item =
         database::models::Collection::get(id, &**pool, &redis)
             .await?
@@ -503,7 +503,7 @@ pub async fn delete_collection_icon(
         SET icon_url = NULL, raw_icon_url = NULL, color = NULL
         WHERE (id = $1)
         ",
-        collection_item.id as database::models::ids::CollectionId,
+        collection_item.id as database::models::ids::DBCollectionId,
     )
     .execute(&mut *transaction)
     .await?;
@@ -533,7 +533,7 @@ pub async fn collection_delete(
     .1;
 
     let string = info.into_inner().0;
-    let id = database::models::CollectionId(parse_base62(&string)? as i64);
+    let id = database::models::DBCollectionId(parse_base62(&string)? as i64);
     let collection = database::models::Collection::get(id, &**pool, &redis)
         .await?
         .ok_or_else(|| {

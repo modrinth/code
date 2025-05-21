@@ -77,10 +77,10 @@ pub async fn organization_projects_get(
             INNER JOIN mods m ON m.organization_id = o.id
             WHERE o.id = $1
             ",
-            organization.id as database::models::ids::OrganizationId
+            organization.id as database::models::ids::DBOrganizationId
         )
         .fetch(&**pool)
-        .map_ok(|m| database::models::ProjectId(m.id))
+        .map_ok(|m| database::models::DBProjectId(m.id))
         .try_collect::<Vec<_>>()
         .await?;
 
@@ -256,7 +256,7 @@ pub async fn organization_get(
                 logged_in
                     || x.accepted
                     || user_id
-                        .map(|y: crate::database::models::UserId| {
+                        .map(|y: crate::database::models::DBUserId| {
                             y == x.user_id
                         })
                         .unwrap_or(false)
@@ -344,7 +344,7 @@ pub async fn organizations_get(
                 logged_in
                     || x.accepted
                     || user_id
-                        .map(|y: crate::database::models::UserId| {
+                        .map(|y: crate::database::models::DBUserId| {
                             y == x.user_id
                         })
                         .unwrap_or(false)
@@ -437,7 +437,7 @@ pub async fn organizations_edit(
                     WHERE (id = $2)
                     ",
                     description,
-                    id as database::models::ids::OrganizationId,
+                    id as database::models::ids::DBOrganizationId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -457,7 +457,7 @@ pub async fn organizations_edit(
                     WHERE (id = $2)
                     ",
                     name,
-                    id as database::models::ids::OrganizationId,
+                    id as database::models::ids::DBOrganizationId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -519,7 +519,7 @@ pub async fn organizations_edit(
                     WHERE (id = $2)
                     ",
                     Some(slug),
-                    id as database::models::ids::OrganizationId,
+                    id as database::models::ids::DBOrganizationId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -607,12 +607,12 @@ pub async fn organization_delete(
         SELECT user_id FROM team_members
         WHERE team_id = $1 AND is_owner = TRUE
         ",
-        organization.team_id as database::models::ids::TeamId
+        organization.team_id as database::models::ids::DBTeamId
     )
     .fetch_one(&**pool)
     .await?
     .user_id;
-    let owner_id = database::models::ids::UserId(owner_id);
+    let owner_id = database::models::ids::DBUserId(owner_id);
 
     let mut transaction = pool.begin().await?;
 
@@ -626,10 +626,10 @@ pub async fn organization_delete(
         INNER JOIN teams t ON t.id = m.team_id
         WHERE o.id = $1 AND $1 IS NOT NULL
         ",
-        organization.id as database::models::ids::OrganizationId
+        organization.id as database::models::ids::DBOrganizationId
     )
     .fetch(&mut *transaction)
-    .map_ok(|c| database::models::TeamId(c.id))
+    .map_ok(|c| database::models::DBTeamId(c.id))
     .try_collect::<Vec<_>>()
     .await?;
 
@@ -777,8 +777,8 @@ pub async fn organization_projects_add(
             SET organization_id = $1
             WHERE (id = $2)
             ",
-            organization.id as database::models::OrganizationId,
-            project_item.inner.id as database::models::ids::ProjectId
+            organization.id as database::models::DBOrganizationId,
+            project_item.inner.id as database::models::ids::DBProjectId
         )
         .execute(&mut *transaction)
         .await?;
@@ -794,20 +794,20 @@ pub async fn organization_projects_add(
             INNER JOIN users u ON u.id = team_members.user_id
             WHERE team_id = $1 AND is_owner = TRUE
             ",
-            organization.team_id as database::models::ids::TeamId
+            organization.team_id as database::models::ids::DBTeamId
         )
         .fetch_one(&mut *transaction)
         .await?;
         let organization_owner_user_id =
-            database::models::ids::UserId(organization_owner_user_id.id);
+            database::models::ids::DBUserId(organization_owner_user_id.id);
 
         sqlx::query!(
             "
             DELETE FROM team_members
             WHERE team_id = $1 AND (is_owner = TRUE OR user_id = $2)
             ",
-            project_item.inner.team_id as database::models::ids::TeamId,
-            organization_owner_user_id as database::models::ids::UserId,
+            project_item.inner.team_id as database::models::ids::DBTeamId,
+            organization_owner_user_id as database::models::ids::DBUserId,
         )
         .execute(&mut *transaction)
         .await?;
@@ -980,7 +980,7 @@ pub async fn organization_projects_remove(
                 role = 'Inherited Owner'
             WHERE (id = $1)
             ",
-            new_owner.id as database::models::ids::TeamMemberId,
+            new_owner.id as database::models::ids::DBTeamMemberId,
             ProjectPermissions::all().bits() as i64
         )
         .execute(&mut *transaction)
@@ -992,7 +992,7 @@ pub async fn organization_projects_remove(
             SET organization_id = NULL
             WHERE (id = $1)
             ",
-            project_item.inner.id as database::models::ids::ProjectId
+            project_item.inner.id as database::models::ids::DBProjectId
         )
         .execute(&mut *transaction)
         .await?;
@@ -1119,7 +1119,7 @@ pub async fn organization_icon_edit(
         upload_result.url,
         upload_result.raw_url,
         upload_result.color.map(|x| x as i32),
-        organization_item.id as database::models::ids::OrganizationId,
+        organization_item.id as database::models::ids::DBOrganizationId,
     )
     .execute(&mut *transaction)
     .await?;
@@ -1201,7 +1201,7 @@ pub async fn delete_organization_icon(
         SET icon_url = NULL, raw_icon_url = NULL, color = NULL
         WHERE (id = $1)
         ",
-        organization_item.id as database::models::ids::OrganizationId,
+        organization_item.id as database::models::ids::DBOrganizationId,
     )
     .execute(&mut *transaction)
     .await?;
