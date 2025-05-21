@@ -9,9 +9,8 @@ use crate::database::models::{
 };
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
-use crate::models::ids::{ThreadMessageId, VersionId};
+use crate::models::ids::{ReportId, ThreadMessageId, VersionId};
 use crate::models::images::{Image, ImageContext};
-use crate::models::reports::ReportId;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::img::upload_image_optimized;

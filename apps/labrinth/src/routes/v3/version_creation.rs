@@ -10,13 +10,14 @@ use crate::database::models::version_item::{
 use crate::database::models::{self, Organization, image_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
-use crate::models::images::{Image, ImageContext, ImageId};
+use crate::models::ids::{ImageId, ProjectId, VersionId};
+use crate::models::images::{Image, ImageContext};
 use crate::models::notifications::NotificationBody;
 use crate::models::pack::PackFileHash;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    Dependency, FileType, Loader, ProjectId, Version, VersionFile, VersionId,
-    VersionStatus, VersionType,
+    Dependency, FileType, Loader, Version, VersionFile, VersionStatus,
+    VersionType,
 };
 use crate::models::projects::{DependencyType, ProjectStatus, skip_nulls};
 use crate::models::teams::ProjectPermissions;

@@ -20,9 +20,10 @@ use ariadne::ids::base62_impl::parse_base62;
 use futures::StreamExt;
 use hex::ToHex;
 use itertools::Itertools;
+use labrinth::models::ids::ProjectId;
 use labrinth::{
     database::models::project_item::PROJECTS_SLUGS_NAMESPACE,
-    models::{projects::ProjectId, teams::ProjectPermissions},
+    models::teams::ProjectPermissions,
     util::actix::{AppendsMultipart, MultipartSegment, MultipartSegmentData},
 };
 use serde_json::json;

@@ -121,7 +121,7 @@ impl User {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        User::get_many(&[crate::models::ids::UserId::from(id)], executor, redis)
+        User::get_many(&[ariadne::ids::UserId::from(id)], executor, redis)
             .await
             .map(|x| x.into_iter().next())
     }
@@ -136,7 +136,7 @@ impl User {
     {
         let ids = user_ids
             .iter()
-            .map(|x| crate::models::ids::UserId::from(*x))
+            .map(|x| ariadne::ids::UserId::from(*x))
             .collect::<Vec<_>>();
         User::get_many(&ids, exec, redis).await
     }

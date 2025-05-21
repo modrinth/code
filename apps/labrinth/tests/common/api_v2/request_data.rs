@@ -7,10 +7,8 @@ use crate::common::{
     },
     dummy_data::TestFile,
 };
-use labrinth::{
-    models::projects::ProjectId,
-    util::actix::{MultipartSegment, MultipartSegmentData},
-};
+use labrinth::models::ids::ProjectId;
+use labrinth::util::actix::{MultipartSegment, MultipartSegmentData};
 
 pub fn get_public_project_creation_data(
     slug: &str,

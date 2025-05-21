@@ -1,7 +1,8 @@
 //! "Database" for Hydra
 
-use crate::models::users::{UserId, UserStatus};
+use crate::models::users::UserStatus;
 use actix_ws::Session;
+use ariadne::ids::UserId;
 use dashmap::{DashMap, DashSet};
 use std::sync::atomic::AtomicU32;
 use uuid::Uuid;

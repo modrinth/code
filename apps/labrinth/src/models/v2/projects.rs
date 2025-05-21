@@ -3,17 +3,15 @@ use std::convert::TryFrom;
 use std::collections::HashMap;
 
 use super::super::ids::OrganizationId;
-use super::super::teams::TeamId;
-use super::super::users::UserId;
 use crate::database::models::{DatabaseError, version_item};
 use crate::database::redis::RedisPool;
-use crate::models::ids::{ProjectId, VersionId};
+use crate::models::ids::{ProjectId, TeamId, ThreadId, VersionId};
 use crate::models::projects::{
     Dependency, License, Link, Loader, ModeratorMessage, MonetizationStatus,
     Project, ProjectStatus, Version, VersionFile, VersionStatus, VersionType,
 };
-use crate::models::threads::ThreadId;
 use crate::routes::v2_reroute::{self, capitalize_first};
+use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};

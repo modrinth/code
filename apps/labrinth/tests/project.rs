@@ -21,11 +21,12 @@ use hex::ToHex;
 use labrinth::database::models::project_item::{
     PROJECTS_NAMESPACE, PROJECTS_SLUGS_NAMESPACE,
 };
-use labrinth::models::projects::ProjectId;
+use labrinth::models::ids::ProjectId;
 use labrinth::models::teams::ProjectPermissions;
 use labrinth::util::actix::{MultipartSegment, MultipartSegmentData};
 use serde_json::json;
 use sha1::Digest;
+
 mod common;
 
 #[actix_rt::test]

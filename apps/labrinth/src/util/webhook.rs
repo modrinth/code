@@ -1,6 +1,6 @@
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::redis::RedisPool;
-use crate::models::projects::ProjectId;
+use crate::models::ids::ProjectId;
 use crate::routes::ApiError;
 use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Utc};

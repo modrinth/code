@@ -1,27 +1,15 @@
 use std::collections::{HashMap, HashSet};
 
-use super::ids::{Base62Id, OrganizationId};
-use super::teams::TeamId;
-use super::users::UserId;
 use crate::database::models::loader_fields::VersionField;
 use crate::database::models::project_item::{LinkUrl, QueryProject};
 use crate::database::models::version_item::QueryVersion;
-use crate::models::threads::ThreadId;
+use crate::models::ids::{
+    OrganizationId, ProjectId, TeamId, ThreadId, VersionId,
+};
+use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
-
-/// The ID of a specific project, encoded as base62 for usage in the API
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Debug, Hash)]
-#[serde(from = "Base62Id")]
-#[serde(into = "Base62Id")]
-pub struct ProjectId(pub u64);
-
-/// The ID of a specific version of a project
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Hash, Debug)]
-#[serde(from = "Base62Id")]
-#[serde(into = "Base62Id")]
-pub struct VersionId(pub u64);
 
 /// A project returned from the API
 #[derive(Serialize, Deserialize, Clone)]

@@ -6,7 +6,7 @@ use crate::database::models::thread_item::{
 };
 use crate::database::redis::RedisPool;
 use crate::models::ids::ImageId;
-use crate::models::ids::{ProjectId, UserId, VersionId};
+use crate::models::ids::{ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
 use crate::models::reports::{ItemType, Report};
@@ -15,6 +15,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::img;
 use actix_web::{HttpRequest, HttpResponse, web};
+use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use futures::StreamExt;
@@ -353,7 +354,7 @@ pub async fn report_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    info: web::Path<(crate::models::reports::ReportId,)>,
+    info: web::Path<(crate::models::ids::ReportId,)>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -393,7 +394,7 @@ pub async fn report_edit(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    info: web::Path<(crate::models::reports::ReportId,)>,
+    info: web::Path<(crate::models::ids::ReportId,)>,
     session_queue: web::Data<AuthQueue>,
     edit_report: web::Json<EditReport>,
 ) -> Result<HttpResponse, ApiError> {
@@ -492,7 +493,7 @@ pub async fn report_edit(
 pub async fn report_delete(
     req: HttpRequest,
     pool: web::Data<PgPool>,
-    info: web::Path<(crate::models::reports::ReportId,)>,
+    info: web::Path<(crate::models::ids::ReportId,)>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {

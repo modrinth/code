@@ -476,14 +476,14 @@ impl From<ProjectId> for ids::ProjectId {
         ids::ProjectId(id.0 as u64)
     }
 }
-impl From<ids::UserId> for UserId {
-    fn from(id: ids::UserId) -> Self {
+impl From<ariadne::ids::UserId> for UserId {
+    fn from(id: ariadne::ids::UserId) -> Self {
         UserId(id.0 as i64)
     }
 }
-impl From<UserId> for ids::UserId {
+impl From<UserId> for ariadne::ids::UserId {
     fn from(id: UserId) -> Self {
-        ids::UserId(id.0 as u64)
+        ariadne::ids::UserId(id.0 as u64)
     }
 }
 impl From<ids::TeamId> for TeamId {

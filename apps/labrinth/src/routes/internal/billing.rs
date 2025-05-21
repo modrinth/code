@@ -85,7 +85,7 @@ pub async fn products(
 
 #[derive(Deserialize)]
 struct SubscriptionsQuery {
-    pub user_id: Option<crate::models::ids::UserId>,
+    pub user_id: Option<ariadne::ids::UserId>,
 }
 
 #[get("subscriptions")]
@@ -600,7 +600,7 @@ pub async fn user_customer(
 
 #[derive(Deserialize)]
 pub struct ChargesQuery {
-    pub user_id: Option<crate::models::ids::UserId>,
+    pub user_id: Option<ariadne::ids::UserId>,
 }
 
 #[get("payments")]
@@ -944,7 +944,7 @@ pub async fn active_servers(
 
     #[derive(Serialize)]
     struct ActiveServer {
-        pub user_id: crate::models::ids::UserId,
+        pub user_id: ariadne::ids::UserId,
         pub server_id: String,
         pub price_id: crate::models::ids::ProductPriceId,
         pub interval: PriceDuration,
@@ -2061,7 +2061,7 @@ pub async fn stripe_webhook(
 }
 
 async fn get_or_create_customer(
-    user_id: crate::models::ids::UserId,
+    user_id: ariadne::ids::UserId,
     stripe_customer_id: Option<&str>,
     user_email: Option<&str>,
     client: &stripe::Client,

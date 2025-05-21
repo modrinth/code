@@ -1,14 +1,6 @@
-use super::{
-    ids::{Base62Id, TeamId},
-    teams::TeamMember,
-};
+use super::teams::TeamMember;
+use crate::models::ids::{OrganizationId, TeamId};
 use serde::{Deserialize, Serialize};
-
-/// The ID of a team
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Hash, Debug)]
-#[serde(from = "Base62Id")]
-#[serde(into = "Base62Id")]
-pub struct OrganizationId(pub u64);
 
 /// An organization of users who control a project
 #[derive(Serialize, Deserialize)]

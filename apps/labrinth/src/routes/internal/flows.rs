@@ -115,47 +115,45 @@ impl TempUser {
             }
         }
 
-        let (avatar_url, raw_avatar_url) =
-            if let Some(avatar_url) = self.avatar_url {
-                let res = reqwest::get(&avatar_url).await?;
-                let headers = res.headers().clone();
+        let (avatar_url, raw_avatar_url) = if let Some(avatar_url) =
+            self.avatar_url
+        {
+            let res = reqwest::get(&avatar_url).await?;
+            let headers = res.headers().clone();
 
-                let img_data = if let Some(content_type) = headers
-                    .get(reqwest::header::CONTENT_TYPE)
-                    .and_then(|ct| ct.to_str().ok())
-                {
-                    get_image_ext(content_type)
-                } else {
-                    avatar_url.rsplit('.').next()
-                };
+            let img_data = if let Some(content_type) = headers
+                .get(reqwest::header::CONTENT_TYPE)
+                .and_then(|ct| ct.to_str().ok())
+            {
+                get_image_ext(content_type)
+            } else {
+                avatar_url.rsplit('.').next()
+            };
 
-                if let Some(ext) = img_data {
-                    let bytes = res.bytes().await?;
+            if let Some(ext) = img_data {
+                let bytes = res.bytes().await?;
 
-                    let upload_result = upload_image_optimized(
-                        &format!(
-                            "user/{}",
-                            crate::models::users::UserId::from(user_id)
-                        ),
-                        bytes,
-                        ext,
-                        Some(96),
-                        Some(1.0),
-                        &**file_host,
-                    )
-                    .await;
+                let upload_result = upload_image_optimized(
+                    &format!("user/{}", ariadne::ids::UserId::from(user_id)),
+                    bytes,
+                    ext,
+                    Some(96),
+                    Some(1.0),
+                    &**file_host,
+                )
+                .await;
 
-                    if let Ok(upload_result) = upload_result {
-                        (Some(upload_result.url), Some(upload_result.raw_url))
-                    } else {
-                        (None, None)
-                    }
+                if let Ok(upload_result) = upload_result {
+                    (Some(upload_result.url), Some(upload_result.raw_url))
                 } else {
                     (None, None)
                 }
             } else {
                 (None, None)
-            };
+            }
+        } else {
+            (None, None)
+        };
 
         if let Some(username) = username {
             crate::database::models::User {

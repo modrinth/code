@@ -11,11 +11,12 @@ use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
 use crate::file_hosting::FileHost;
 use crate::models;
+use crate::models::ids::ProjectId;
 use crate::models::images::ImageContext;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    MonetizationStatus, Project, ProjectId, ProjectStatus, SearchRequest,
+    MonetizationStatus, Project, ProjectStatus, SearchRequest,
 };
 use crate::models::teams::ProjectPermissions;
 use crate::models::threads::MessageBody;

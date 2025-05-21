@@ -9,8 +9,7 @@ use crate::database::models::{
 };
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
-use crate::models::ids::UserId;
-use crate::models::organizations::OrganizationId;
+use crate::models::ids::OrganizationId;
 use crate::models::pats::Scopes;
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::queue::session::AuthQueue;
@@ -20,6 +19,7 @@ use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use crate::{database, models};
 use actix_web::{HttpRequest, HttpResponse, web};
+use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::parse_base62;
 use futures::TryStreamExt;
 use rust_decimal::Decimal;

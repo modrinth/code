@@ -1,10 +1,5 @@
 use std::{collections::HashMap, sync::Arc};
 
-use actix_web::{HttpRequest, HttpResponse, web};
-use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
-use validator::Validate;
-
 use super::{ApiError, oauth_clients::get_user_clients};
 use crate::util::img::delete_old_images;
 use crate::{
@@ -13,7 +8,6 @@ use crate::{
     file_hosting::FileHost,
     models::{
         collections::{Collection, CollectionStatus},
-        ids::UserId,
         notifications::Notification,
         pats::Scopes,
         projects::Project,
@@ -22,6 +16,11 @@ use crate::{
     queue::session::AuthQueue,
     util::{routes::read_from_payload, validate::validation_errors_to_string},
 };
+use actix_web::{HttpRequest, HttpResponse, web};
+use ariadne::ids::UserId;
+use serde::{Deserialize, Serialize};
+use sqlx::PgPool;
+use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.route("user", web::get().to(user_auth_get));

@@ -5,15 +5,14 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::team_item::TeamAssociationId;
 use crate::database::models::{Organization, Team, TeamMember, User};
 use crate::database::redis::RedisPool;
+use crate::models::ids::TeamId;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
-use crate::models::teams::{
-    OrganizationPermissions, ProjectPermissions, TeamId,
-};
-use crate::models::users::UserId;
+use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use actix_web::{HttpRequest, HttpResponse, web};
+use ariadne::ids::UserId;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;

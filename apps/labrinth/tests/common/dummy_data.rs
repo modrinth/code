@@ -1,22 +1,22 @@
 #![allow(dead_code)]
 use std::io::{Cursor, Write};
 
-use actix_http::StatusCode;
-use actix_web::test::{self, TestRequest};
-use labrinth::models::{
-    oauth_clients::OAuthClient,
-    organizations::Organization,
-    pats::Scopes,
-    projects::{Project, ProjectId, Version},
-};
-use serde_json::json;
-use sqlx::Executor;
-use zip::{CompressionMethod, ZipWriter, write::FileOptions};
-
 use crate::{
     assert_status,
     common::{api_common::Api, api_v3, database::USER_USER_PAT},
 };
+use actix_http::StatusCode;
+use actix_web::test::{self, TestRequest};
+use labrinth::models::ids::ProjectId;
+use labrinth::models::{
+    oauth_clients::OAuthClient,
+    organizations::Organization,
+    pats::Scopes,
+    projects::{Project, Version},
+};
+use serde_json::json;
+use sqlx::Executor;
+use zip::{CompressionMethod, ZipWriter, write::FileOptions};
 
 use super::{
     api_common::{ApiProject, AppendsOptionalPat, request_data::ImageData},
