@@ -9,7 +9,7 @@ const pressed = ref(false)
     :class="{ 'scale-95': pressed }"
   >
     <button
-      class="absolute inset-0 bg-button-bg rounded-xl cursor-pointer p-0 border-none hover:brightness-125"
+      class="absolute inset-0 skin-like-text-bg rounded-xl cursor-pointer p-0 border-none"
       @mousedown="pressed = true"
       @mouseup="pressed = false"
       @mouseleave="pressed = false"
@@ -24,3 +24,14 @@ const pressed = ref(false)
     </div>
   </div>
 </template>
+
+<style scoped lang="scss">
+.skin-like-text-bg {
+  background: linear-gradient(180deg, #3a3d47 0%, #33363d 100%);
+  transition: filter 200ms ease-in-out, box-shadow 200ms ease-in-out;
+}
+.skin-like-text-bg:hover {
+  filter: brightness(var(--hover-brightness));
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+</style>

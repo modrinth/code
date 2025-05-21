@@ -7,7 +7,8 @@ import {
   SkinLikeTextButton,
   Button
 } from '@modrinth/ui'
-import {ref, computed, useTemplateRef, watch, onMounted, onUnmounted, inject, Ref} from 'vue'
+import type { Ref} from 'vue';
+import {ref, computed, useTemplateRef, watch, onMounted, onUnmounted, inject} from 'vue'
 import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
 import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
 import { handleError } from '@/store/notifications'
@@ -26,7 +27,7 @@ import type { RenderResult } from '@/helpers/rendering/batchSkinRenderer.ts'
 import { generateSkinPreviews, map } from '@/helpers/rendering/batchSkinRenderer.ts'
 import {handleSevereError} from "@/store/error";
 import {trackEvent} from "@/helpers/analytics";
-import AccountsCard from "@/components/ui/AccountsCard.vue";
+import type AccountsCard from "@/components/ui/AccountsCard.vue";
 
 const editSkinModal = useTemplateRef('editSkinModal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
@@ -178,8 +179,8 @@ watch(
   />
   <SelectCapeModal ref="selectCapeModal" :capes="capes" @select="handleCapeSelected" />
 
-  <div v-if="currentUser" class="p-6 grid grid-cols-[300px_1fr] xl:grid-cols-[3fr_5fr] gap-6">
-    <div class="sticky top-6 self-start">
+  <div v-if="currentUser" class="p-4 grid grid-cols-[300px_1fr] xl:grid-cols-[3fr_5fr] gap-6">
+    <div class="sticky top-6 self-start p-2">
       <div class="flex justify-between gap-4">
         <h1 class="m-0 text-2xl font-bold">Skins</h1>
         <ButtonStyled :disabled="!!selectedSkin?.cape_id">
@@ -219,12 +220,12 @@ watch(
       </div>
     </div>
 
-    <div class="flex flex-col gap-6 add-perspective">
-      <section class="flex flex-col gap-3">
+    <div class="flex flex-col gap-6 add-perspective pt-2">
+      <section class="flex flex-col gap-2 mt-1">
         <h2 class="text-lg font-bold m-0 text-primary">Saved skins</h2>
-        <div class="flex flex-row flex-wrap gap-2">
+        <div class="flex flex-row flex-wrap gap-2 w-full">
           <SkinLikeTextButton
-            class="flex-none w-[8vw] h-[15vw] max-w-[8rem] max-h-[15rem]"
+            class="flex-none skin-card"
             tooltip="Add a skin"
             @click="editSkinModal?.show"
           >
@@ -237,7 +238,7 @@ watch(
           <SkinButton
             v-for="skin in savedSkins"
             :key="`saved-skin-${skin.texture_key}`"
-            class="flex-none w-[8vw] h-[15vw] max-w-[8rem] max-h-[15rem]"
+            class="flex-none skin-card"
             editable
             :forward-image-src="getBakedSkinTextures(skin)?.forwards"
             :backward-image-src="getBakedSkinTextures(skin)?.backwards"
@@ -248,13 +249,13 @@ watch(
         </div>
       </section>
 
-      <section class="flex flex-col gap-3">
+      <section class="flex flex-col gap-2 mt-1 mr-0">
         <h2 class="text-lg font-bold m-0 text-primary">Default skins</h2>
-        <div class="flex flex-row flex-wrap gap-2">
+        <div class="flex flex-row flex-wrap gap-2 w-full">
           <SkinButton
             v-for="skin in defaultSkins"
             :key="`default-skin-${skin.texture_key}`"
-            class="flex-none w-[8vw] h-[15vw] max-w-[8rem] max-h-[15rem]"
+            class="flex-none skin-card"
             :forward-image-src="getBakedSkinTextures(skin)?.forwards"
             :backward-image-src="getBakedSkinTextures(skin)?.backwards"
             :selected="selectedSkin === skin"
@@ -277,10 +278,10 @@ watch(
         <p class="text-lg m-0">
           Please sign into your Minecraft account to use the skin management features of the Modrinth app.
         </p>
-        <ButtonStyled color="brand" :disabled="accountsCard.loginDisabled" v-show="accountsCard">
-          <Button @click="login" :disabled="accountsCard.loginDisabled">
+        <ButtonStyled v-show="accountsCard" color="brand" :disabled="accountsCard.loginDisabled">
+          <Button :disabled="accountsCard.loginDisabled" @click="login">
             <LogInIcon v-if="!accountsCard.loginDisabled" />
-            <SpinnerIcon class="animate-spin" v-else />
+            <SpinnerIcon v-else class="animate-spin" />
             Sign In
           </Button>
         </ButtonStyled>
@@ -288,3 +289,17 @@ watch(
     </div>
   </div>
 </template>
+
+<style lang="scss" scoped>
+$skin-card-width: 10.5vw;
+$skin-card-aspect: 1.1;
+
+.skin-card {
+  width: $skin-card-width;
+  min-width: $skin-card-width;
+  max-width: $skin-card-width;
+  height: calc(#{$skin-card-width} * #{$skin-card-aspect});
+  min-height: calc(#{$skin-card-width} * #{$skin-card-aspect});
+  max-height: calc(#{$skin-card-width} * #{$skin-card-aspect});
+}
+</style>

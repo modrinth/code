@@ -21,7 +21,7 @@ class BatchSkinRenderer {
   private bodyNode: THREE.Object3D | null = null
   private capeAttached: boolean = false
 
-  constructor(width: number = 215, height: number = 215 * 2) {
+  constructor(width: number = 360, height: number = 504) {
     const canvas = document.createElement('canvas')
     canvas.width = width
     canvas.height = height
@@ -155,7 +155,7 @@ class BatchSkinRenderer {
     if (headPart) {
       const headPosition = new THREE.Vector3()
       headPart.getWorldPosition(headPosition)
-      lookAtTarget = [headPosition.x, headPosition.y, headPosition.z]
+      lookAtTarget = [headPosition.x, headPosition.y - 0.3, headPosition.z]
     } else {
       throw new Error("Failed to find 'Head' object in model.")
     }
@@ -219,7 +219,7 @@ class BatchSkinRenderer {
 
     const group = new THREE.Group()
     group.add(model)
-    group.position.set(0, -0.5, 1.95)
+    group.position.set(0, 0.3, 1.95)
     group.scale.set(0.8, 0.8, 0.8)
 
     this.scene.add(group)
