@@ -21,7 +21,6 @@ const props = withDefaults(defineProps<{
   editable: false,
 })
 
-const pressed = ref(false)
 const imagesLoaded = ref({
   forward: Boolean(props.forwardImageSrc),
   backward: Boolean(props.backwardImageSrc)
@@ -35,45 +34,44 @@ function onImageLoad(type: 'forward' | 'backward') {
 <template>
   <div
     v-tooltip="tooltip ?? undefined"
-    class="skin-button__parent group flex relative border-2 border-solid transform-3d rotate-y-90 transition-all p-0 bg-transparent rounded-xl overflow-hidden"
+    class="group flex relative overflow-hidden rounded-xl border-solid border-2 transition-colors duration-200"
     :class="[
-      selected ? `border-brand` : 'border-transparent',
-      {
-        'scale-95': pressed,
-      },
+      selected ? 'border-brand' : 'border-transparent hover:border-white/50'
     ]"
   >
     <button
-      class="absolute inset-0 rounded-xl cursor-pointer p-0 border-none group-hover:brightness-125"
-      :class="selected ? `bg-brand-highlight` : 'bg-button-bg'"
-      @mousedown="pressed = true"
-      @mouseup="pressed = false"
-      @mouseleave="pressed = false"
+      class="skin-btn-bg absolute inset-0 rounded-xl cursor-pointer p-0 border-none group-hover:brightness-125"
+      :class="selected ? 'selected' : ''"
       @click="emit('select')"
     ></button>
 
-    <div v-if="!forwardImageSrc || !backwardImageSrc" class="skeleton-loader w-full h-full rounded-xl">
-      <div class="absolute inset-0 rounded-xl skeleton"></div>
+    <div v-if="!(imagesLoaded.forward && imagesLoaded.backward)" class="skeleton-loader w-full h-full rounded-xl">
+      <div class="skeleton absolute inset-0 rounded-xl aspect-[5/7]"></div>
     </div>
 
-    <span v-else class="skin-button__image-parent pointer-events-none w-full h-full flex flex-col justify-end">
+    <span 
+      v-show="imagesLoaded.forward && imagesLoaded.backward"
+      :class="['skin-button__image-parent pointer-events-none w-full h-full grid [transform-style:preserve-3d] transition-transform duration-500 group-hover:[transform:rotateY(180deg)] place-items-stretch', selected ? 'with-shadow' : '']"
+    >
       <img
         alt=""
         :src="forwardImageSrc"
-        class="skin-button__image-facing rounded-xl object-contain w-full h-auto mx-auto mb-0"
+        class="skin-button__image-facing rounded-xl object-contain w-full h-full [backface-visibility:hidden] col-start-1 row-start-1"
+        height="504"
         @load="onImageLoad('forward')"
       />
       <img
         alt=""
         :src="backwardImageSrc"
-        class="skin-button__image-away rounded-xl object-contain w-full h-auto mx-auto mb-0"
+        class="skin-button__image-away rounded-xl object-contain w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] col-start-1 row-start-1"
+        height="504"
         @load="onImageLoad('backward')"
       />
     </span>
 
     <span
       v-if="editable"
-      class="absolute pointer-events-none inset-0 flex items-end justify-center p-2 translate-y-4 scale-75 opacity-0 transition-all group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 group-hover:translate-x-0"
+      class="absolute pointer-events-none inset-0 flex items-end justify-start p-2 translate-y-4 scale-75 opacity-0 transition-all group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 group-hover:translate-x-0"
     >
       <ButtonStyled color="brand">
         <button
@@ -91,71 +89,19 @@ function onImageLoad(type: 'forward' | 'backward') {
 </template>
 
 <style scoped lang="scss">
-.skin-button__parent {
-  perspective: 1000px;
+.skeleton-loader {
+  aspect-ratio: 5 / 7;
+}
 
-  .skeleton-loader {
-    aspect-ratio: 1 / 1;
-  }
-
-  .skeleton {
-    background: linear-gradient(
-        90deg,
-        var(--color-bg, #f0f0f0) 25%,
-        var(--color-raised-bg, #e0e0e0) 50%,
-        var(--color-bg, #f0f0f0) 75%
-    );
-    background-size: 200% 100%;
-    animation: wave 1500ms infinite linear;
-  }
-
-  .skin-button__image-parent {
-    transform-style: preserve-3d;
-    display: grid;
-
-    /*
-      Set the images to be in the same position
-     */
-    .skin-button__image-facing,
-    .skin-button__image-away {
-      grid-area: 1 / 1;
-    }
-  }
-
-  .skin-button__image-parent {
-    transition: transform 0.3s ease-in-out;
-
-    .skin-button__image-away {
-      opacity: 0;
-      transform: rotateY(180deg);
-    }
-  }
-
-  :not(&:hover) {
-    .skin-button__image-parent {
-      .skin-button__image-facing {
-        animation: appear-halfway 0.3s ease-in-out forwards;
-      }
-
-      .skin-button__image-away {
-        animation: vanish-halfway 0.3s ease-in-out forwards;
-      }
-    }
-  }
-
-  &:hover {
-    .skin-button__image-parent {
-      transform: rotateY(180deg);
-
-      .skin-button__image-facing {
-        animation: vanish-halfway 0.3s ease-in-out forwards;
-      }
-
-      .skin-button__image-away {
-        animation: appear-halfway 0.3s ease-in-out forwards;
-      }
-    }
-  }
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg, #f0f0f0) 25%,
+    var(--color-raised-bg, #e0e0e0) 50%,
+    var(--color-bg, #f0f0f0) 75%
+  );
+  background-size: 200% 100%;
+  animation: wave 1500ms infinite linear;
 }
 
 @keyframes wave {
@@ -167,33 +113,25 @@ function onImageLoad(type: 'forward' | 'backward') {
   }
 }
 
-@keyframes vanish-halfway {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 1;
-  }
-  51% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 0;
-  }
+.skin-btn-bg {
+  background: linear-gradient(180deg, #3a3d47 0%, #33363d 100%);
+}
+.skin-btn-bg.selected {
+  background: linear-gradient(180deg, #5a5d6b 0%, #424956 100%);
+}
+.with-shadow img {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
 }
 
-@keyframes appear-halfway {
-  0% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 0;
-  }
-  51% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 1;
-  }
+.skin-button__image-parent img {
+  transition: filter 200ms ease-in-out;
+}
+
+.group:hover .skin-button__image-parent img {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.with-shadow img {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
 }
 </style>
