@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch, provide } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import {
   ArrowBigUpDashIcon,
@@ -305,6 +305,7 @@ onMounted(() => {
 })
 
 const accounts = ref(null)
+provide('accountsCard', accounts)
 
 command_listener(handleCommand)
 async function handleCommand(e) {
