@@ -296,7 +296,6 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
             @select="changeSkin(skin)"
           >
             <template #overlay-buttons>
-              <div class="flex gap-2" style="pointer-events: auto;">
                   <Button
                     color="green"
                     aria-label="Edit skin"
@@ -315,8 +314,6 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
                   >
                     <TrashIcon class="w-5 h-5" />
                   </Button>
-                
-              </div>
             </template>
           </SkinButton>
         </div>
@@ -404,7 +401,7 @@ $skin-card-gap: 4px;
 
 .skin-card-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: $skin-card-gap;
   width: 100%;
 

@@ -67,7 +67,7 @@ function onImageLoad(type: 'forward' | 'backward') {
 
     <span
       v-if="$slots['overlay-buttons']"
-      class="absolute inset-0 flex items-end justify-start p-2 translate-y-4 scale-75 opacity-0 transition-all group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 group-hover:translate-x-0"
+      class="absolute inset-0 flex items-end justify-start p-1 gap-1 translate-y-4 scale-75 opacity-0 transition-all group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 group-hover:translate-x-0"
       style="pointer-events: none;"
     >
       <slot name="overlay-buttons" />
