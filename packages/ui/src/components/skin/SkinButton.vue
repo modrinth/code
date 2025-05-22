@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ButtonStyled, commonMessages } from '@modrinth/ui'
+import ButtonStyled from "../base/ButtonStyled.vue"
+import { commonMessages } from '../../utils'
 import { EditIcon } from '@modrinth/assets'
 import { useVIntl } from '@vintl/vintl'
 
