@@ -26,7 +26,7 @@
       <div class="flex flex-col gap-4 w-full min-h-[20rem]">
         <section>
           <h2 class="text-base font-semibold mb-2">Texture</h2>
-          <Button>
+          <Button @click="openUploadSkinModal">
             <UploadIcon /> Replace texture
           </Button>
         </section>
@@ -85,9 +85,6 @@
         </Button>
       </ButtonStyled>
       <Button @click="hide"><XIcon/>Cancel</Button>
-      <ButtonStyled v-if="mode==='edit'" color="red">
-        <Button @click="handleDelete"><TrashIcon/>Delete</Button>
-      </ButtonStyled>
     </div>
   </NewModal>
 
@@ -231,17 +228,33 @@ function show(e: MouseEvent, skin?: Skin) {
   modal.value?.show(e)
 }
 
+function showNew(e: MouseEvent, skinTexture: Uint8Array, filename: string) {
+  mode.value = 'new'
+  currentSkin.value = null
+  fileUploadTextureBlob.value = skinTexture
+  fileName.value = filename
+  variant.value = 'CLASSIC'
+  selectedCape.value = undefined
+  visibleCapeList.value = []
+  initVisibleCapeList()
+  modal.value?.show(e)
+}
+
+function restoreWithNewTexture(skinTexture: Uint8Array, filename: string) {
+  fileUploadTextureBlob.value = skinTexture
+  fileName.value = filename
+  
+  if (shouldRestoreModal.value) {
+    setTimeout(() => {
+      modal.value?.show()
+      shouldRestoreModal.value = false
+    }, 0)
+  }
+}
+
 function hide() {
   modal.value?.hide()
   setTimeout(() => resetState(), 250)
-}
-
-async function onTextureSelected(files: FileList|null) {
-  if (!files?.length) return
-  const file = files[0]
-  fileName.value = file.name
-  const buf = await file.arrayBuffer()
-  fileUploadTextureBlob.value = new Uint8Array(buf)
 }
 
 function selectCape(cape: Cape|undefined) {
@@ -298,17 +311,10 @@ function openSelectCapeModal(e: MouseEvent) {
   }, 0)
 }
 
-async function handleDelete() {
-  try {
-    if (currentSkin.value?.is_equipped) {
-      await unequip_skin()
-    }
-    await remove_custom_skin(currentSkin.value!)
-    emit('deleted', currentSkin.value!)
-    hide()
-  } catch (err) {
-    handleError(err)
-  }
+function openUploadSkinModal(e: MouseEvent) {
+  shouldRestoreModal.value = true
+  modal.value?.hide()
+  emit('open-upload-modal', e)
 }
 
 async function save() {
@@ -345,9 +351,16 @@ watch(() => props.capes, () => {
 }, { immediate: true })
 
 const emit = defineEmits<{
-  (e:'saved'):void
-  (e:'deleted', skin: Skin):void
+  (event: 'saved'): void
+  (event: 'deleted', skin: Skin): void
+  (event: 'open-upload-modal', mouseEvent: MouseEvent): void
 }>()
 
-defineExpose({ show, hide })
+defineExpose({
+  show,
+  showNew,
+  restoreWithNewTexture,
+  hide,
+  shouldRestoreModal
+})
 </script>
