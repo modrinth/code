@@ -5,7 +5,7 @@
         Drag to rotate
       </span>
     </div>
-    <div v-if="nametag" class="absolute top-[13%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md text-[200%] pointer-events-none z-10 font-minecraft text-white bg-black/60 shadow-md border-solid border-1 border-white/10">
+    <div v-if="nametag" class="absolute top-[13%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md text-[200%] pointer-events-none z-10 font-minecraft text-primary nametag-bg">
       {{ nametag }}
     </div>
 
@@ -226,7 +226,7 @@ function applyTextureToScene(root: THREE.Object3D | null, tex: THREE.Texture | n
 
       const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
 
-      materials.forEach((mat, index, array) => {
+      materials.forEach((mat, _index, _array) => {
         const standardMat = mat as THREE.MeshStandardMaterial
         standardMat.map = tex
         standardMat.metalness = 0
@@ -248,7 +248,7 @@ function applyCapeTexture(root: THREE.Object3D | null, tex: THREE.Texture | null
 
       const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
 
-      materials.forEach((mat, index, array) => {
+      materials.forEach((mat, _index, _array) => {
         const standardMat = mat as THREE.MeshStandardMaterial
         standardMat.map = tex || transparentTexture
         standardMat.transparent = true
@@ -342,3 +342,10 @@ onBeforeMount(async () => {
   }
 })
 </script>
+
+<style scoped lang="scss">
+.nametag-bg {
+  background: linear-gradient(308.68deg, rgba(0, 0, 0, 0) -52.46%, rgba(100, 100, 100, 0.1) 94.75%), rgba(0, 0, 0, 0.2);
+  box-shadow: inset -0.5px -0.5px 0px rgba(0, 0, 0, 0.25), inset 0.5px 0.5px 0px rgba(255, 255, 255, 0.05);
+}
+</style>
