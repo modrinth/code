@@ -56,7 +56,7 @@ withDefaults(
 
 @supports (background-color: color-mix(in srgb, transparent, transparent)) {
   .highlighted-glow::before {
-    box-shadow: inset 0 0 2px 4px color-mix(in srgb, var(--color-brand), transparent 10%);
+    box-shadow: inset 0 0 2px 2px color-mix(in srgb, var(--color-brand), transparent 10%);
   }
 }
 </style>

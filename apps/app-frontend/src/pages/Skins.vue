@@ -9,9 +9,10 @@ import {
   ConfirmModal
 } from '@modrinth/ui'
 import type { Ref } from 'vue';
-import { ref, computed, useTemplateRef, watch, onMounted, onUnmounted, inject, nextTick } from 'vue'
+import { ref, computed, useTemplateRef, watch, onMounted, onUnmounted, inject } from 'vue'
 import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
 import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
+import UploadSkinModal from '@/components/ui/skin/UploadSkinModal.vue'
 import { handleError } from '@/store/notifications'
 import {
   get_available_skins,
@@ -33,13 +34,13 @@ import type AccountsCard from "@/components/ui/AccountsCard.vue";
 
 const editSkinModal = useTemplateRef('editSkinModal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
+const uploadSkinModal = useTemplateRef('uploadSkinModal')
 
 const settings = ref(await getSettings())
 const skins = ref<Skin[]>([])
 const capes = ref<Cape[]>([])
 
 const accountsCard = inject('accountsCard') as Ref<typeof AccountsCard>
-const loginInProgress = ref(false);
 const currentUser = ref(undefined)
 const currentUserId = ref<string | undefined>(undefined)
 
@@ -151,6 +152,33 @@ async function login() {
   accountsCard.value.setLoginDisabled(false);
 }
 
+function openUploadSkinModal(e: MouseEvent) {
+  uploadSkinModal.value?.show(e)
+}
+
+function onSkinFileUploaded(file: File) {
+  const fakeEvent = new MouseEvent('click')
+  file.arrayBuffer().then(buf => {
+    const skinTexture = new Uint8Array(buf)
+    
+    if (editSkinModal.value && editSkinModal.value.shouldRestoreModal) {
+      editSkinModal.value.restoreWithNewTexture(skinTexture, file.name)
+    } else {
+      editSkinModal.value?.showNew(fakeEvent, skinTexture, file.name)
+    }
+  })
+}
+
+function onUploadCanceled() {
+  if (editSkinModal.value && editSkinModal.value.shouldRestoreModal) {
+    setTimeout(() => {
+      const fakeEvent = new MouseEvent('click')
+      editSkinModal.value!.show(fakeEvent)
+      editSkinModal.value!.shouldRestoreModal = false
+    }, 0)
+  }
+}
+
 watch(
   () => selectedSkin.value?.cape_id,
   () => {}
@@ -190,8 +218,10 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
     :capes="capes"
     @saved="onSkinSaved"
     @deleted="() => loadSkins()"
+    @open-upload-modal="openUploadSkinModal"
   />
   <SelectCapeModal ref="selectCapeModal" :capes="capes" @select="handleCapeSelected" />
+  <UploadSkinModal ref="uploadSkinModal" @uploaded="onSkinFileUploaded" @canceled="onUploadCanceled" />
   <ConfirmModal
     ref="deleteSkinModal"
     title="Are you sure you want to delete this skin?"
@@ -248,7 +278,7 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
           <SkinLikeTextButton
               class="skin-card"
               tooltip="Add a skin"
-              @click="editSkinModal?.show"
+              @click="openUploadSkinModal"
             >
               <template #icon>
                 <PlusIcon class="w-5 h-5 stroke-2" />
