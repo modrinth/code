@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import {UpdatedIcon, PlusIcon, ExcitedRinthbot, LogInIcon, SpinnerIcon } from '@modrinth/assets'
+import { UpdatedIcon, PlusIcon, ExcitedRinthbot, LogInIcon, SpinnerIcon, EditIcon, TrashIcon } from '@modrinth/assets'
 import {
   ButtonStyled,
   SkinPreviewRenderer,
   SkinButton,
   SkinLikeTextButton,
-  Button
+  Button,
+  ConfirmModal
 } from '@modrinth/ui'
-import type { Ref} from 'vue';
-import {ref, computed, useTemplateRef, watch, onMounted, onUnmounted, inject, nextTick} from 'vue'
+import type { Ref } from 'vue';
+import { ref, computed, useTemplateRef, watch, onMounted, onUnmounted, inject, nextTick } from 'vue'
 import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
 import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
 import { handleError } from '@/store/notifications'
@@ -19,14 +20,15 @@ import {
   filterDefaultSkins,
   equip_skin,
   set_default_cape,
+  remove_custom_skin,
 } from '@/helpers/skins.ts'
 import { get as getSettings } from '@/helpers/settings.ts'
 import type { Cape, Skin } from '@/helpers/skins.ts'
 import { get_default_user, users, login as login_flow } from '@/helpers/auth'
 import type { RenderResult } from '@/helpers/rendering/batchSkinRenderer.ts'
 import { generateSkinPreviews, map } from '@/helpers/rendering/batchSkinRenderer.ts'
-import {handleSevereError} from "@/store/error";
-import {trackEvent} from "@/helpers/analytics";
+import { handleSevereError } from "@/store/error";
+import { trackEvent } from "@/helpers/analytics";
 import type AccountsCard from "@/components/ui/AccountsCard.vue";
 
 const editSkinModal = useTemplateRef('editSkinModal')
@@ -64,6 +66,21 @@ const skinVariant = computed(() => selectedSkin.value?.variant)
 const skinNametag = computed(() => settings.value.hide_nametag_skins_page ? undefined : username.value)
 
 let userCheckInterval: number | null = null
+
+const deleteSkinModal = ref()
+const skinToDelete = ref<Skin | null>(null)
+
+function confirmDeleteSkin(skin: Skin) {
+  skinToDelete.value = skin
+  deleteSkinModal.value?.show()
+}
+
+async function deleteSkin() {
+  if (!skinToDelete.value) return
+  await remove_custom_skin(skinToDelete.value).catch(handleError)
+  await loadSkins()
+  skinToDelete.value = null
+}
 
 async function loadCapes() {
   try {
@@ -175,6 +192,13 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
     @deleted="() => loadSkins()"
   />
   <SelectCapeModal ref="selectCapeModal" :capes="capes" @select="handleCapeSelected" />
+  <ConfirmModal
+    ref="deleteSkinModal"
+    title="Are you sure you want to delete this skin?"
+    description="This will permanently delete the selected skin. This action cannot be undone."
+    proceed-label="Delete"
+    @proceed="deleteSkin"
+  />
 
   <div v-if="currentUser" class="p-4 skin-layout">
     <div class="preview-panel">
@@ -236,13 +260,35 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
             v-for="skin in savedSkins"
             :key="`saved-skin-${skin.texture_key}`"
             class="skin-card"
-            editable
             :forward-image-src="getBakedSkinTextures(skin)?.forwards"
             :backward-image-src="getBakedSkinTextures(skin)?.backwards"
             :selected="selectedSkin === skin"
             @select="changeSkin(skin)"
-            @edit="(e) => editSkinModal?.show(e, skin)"
-          />
+          >
+            <template #overlay-buttons>
+              <div class="flex gap-2" style="pointer-events: auto;">
+                  <Button
+                    color="green"
+                    aria-label="Edit skin"
+                    @click.stop="(e) => editSkinModal?.show(e, skin)"
+                  >
+                    <EditIcon class="w-5 h-5" /> Edit
+                  </Button>
+                <Button
+                    v-show="!skin.is_equipped"
+                    v-tooltip="'Delete skin'"
+                    aria-label="Delete skin"
+                    color="red"
+                    class="!rounded-[100%]"
+                    icon-only
+                    @click.stop="() => confirmDeleteSkin(skin)"
+                  >
+                    <TrashIcon class="w-5 h-5" />
+                  </Button>
+                
+              </div>
+            </template>
+          </SkinButton>
         </div>
       </section>
 
@@ -258,7 +304,6 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
             :selected="selectedSkin === skin"
             :tooltip="skin.name"
             @select="changeSkin(skin)"
-            @edit="(e) => editSkinModal?.show(e, skin)"
           />
         </div>
       </section>
@@ -288,7 +333,7 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
 </template>
 
 <style lang="scss" scoped>
-$skin-card-width: 140px;
+$skin-card-width: 155px;
 $skin-card-gap: 4px;
 
 .skin-layout {
@@ -329,15 +374,20 @@ $skin-card-gap: 4px;
 
 .skin-card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, $skin-card-width);
+  grid-template-columns: repeat(6, 1fr);
   gap: $skin-card-gap;
   width: 100%;
+
+  @media (max-width: 1110px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .skin-card {
-  width: $skin-card-width;
-  aspect-ratio: 1.05;
+  aspect-ratio: 0.95;
   border-radius: 10px;
   box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
 }
 </style>
