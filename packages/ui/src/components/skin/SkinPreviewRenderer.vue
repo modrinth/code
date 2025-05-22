@@ -36,7 +36,7 @@
             <TresCircleGeometry :args="[1, 32]" />
             <TresMeshBasicMaterial
               color="#000000"
-              :opacity="0.6"
+              :opacity="0.3"
               transparent
               :depth-write="false"
             />
@@ -309,8 +309,8 @@ function createRadialTexture(size: number): THREE.CanvasTexture {
   canvas.width = canvas.height = size
   const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
   const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
-  grad.addColorStop(0, 'rgba(119,119,119,0.25)')
-  grad.addColorStop(1, 'rgba(255,255,255,0)')
+  grad.addColorStop(0, 'rgba(119,119,119,0.15)')
+  grad.addColorStop(0.9, 'rgba(255,255,255,0)')
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, size, size)
   return new THREE.CanvasTexture(canvas)
