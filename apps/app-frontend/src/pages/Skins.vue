@@ -8,7 +8,7 @@ import {
   Button
 } from '@modrinth/ui'
 import type { Ref} from 'vue';
-import {ref, computed, useTemplateRef, watch, onMounted, onUnmounted, inject} from 'vue'
+import {ref, computed, useTemplateRef, watch, onMounted, onUnmounted, inject, nextTick} from 'vue'
 import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
 import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
 import { handleError } from '@/store/notifications'
@@ -41,7 +41,6 @@ const loginInProgress = ref(false);
 const currentUser = ref(undefined)
 const currentUserId = ref<string | undefined>(undefined)
 
-// @ts-ignore
 const username = computed(() => currentUser.value?.profile?.name ?? undefined)
 const selectedSkin = ref<Skin | null>(null)
 const defaultCape = ref<Cape>()
@@ -64,35 +63,7 @@ const capeTexture = computed(() => currentCape.value?.texture)
 const skinVariant = computed(() => selectedSkin.value?.variant)
 const skinNametag = computed(() => settings.value.hide_nametag_skins_page ? undefined : username.value)
 
-await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
-
 let userCheckInterval: number | null = null
-
-onMounted(() => {
-  // TODO: Surely a better way to do this?
-  userCheckInterval = window.setInterval(checkUserChanges, 250)
-})
-
-onUnmounted(() => {
-  if (userCheckInterval !== null) {
-    window.clearInterval(userCheckInterval)
-  }
-})
-
-async function checkUserChanges() {
-  try {
-    const defaultId = await get_default_user()
-    if (defaultId !== currentUserId.value) {
-      await loadCurrentUser();
-      await loadCapes();
-      await loadSkins();
-    }
-  } catch (error) {
-    if (currentUser.value) {
-      handleError(error)
-    }
-  }
-}
 
 async function loadCapes() {
   try {
@@ -138,7 +109,6 @@ async function loadCurrentUser() {
     currentUserId.value = defaultId
 
     const allAccounts = await users()
-    // @ts-ignore
     currentUser.value = allAccounts.find((acc) => acc.profile.id === defaultId)
   } catch (e) {
     handleError(e)
@@ -168,6 +138,33 @@ watch(
   () => selectedSkin.value?.cape_id,
   () => {}
 )
+
+onMounted(() => {
+  userCheckInterval = window.setInterval(checkUserChanges, 250);
+})
+
+onUnmounted(() => {
+  if (userCheckInterval !== null) {
+    window.clearInterval(userCheckInterval);
+  }
+})
+
+async function checkUserChanges() {
+  try {
+    const defaultId = await get_default_user()
+    if (defaultId !== currentUserId.value) {
+      await loadCurrentUser();
+      await loadCapes();
+      await loadSkins();
+    }
+  } catch (error) {
+    if (currentUser.value) {
+      handleError(error)
+    }
+  }
+}
+
+await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
 </script>
 
 <template>
@@ -179,8 +176,8 @@ watch(
   />
   <SelectCapeModal ref="selectCapeModal" :capes="capes" @select="handleCapeSelected" />
 
-  <div v-if="currentUser" class="p-4 grid grid-cols-[300px_1fr] xl:grid-cols-[3fr_5fr] gap-6">
-    <div class="sticky top-6 self-start p-2">
+  <div v-if="currentUser" class="p-4 skin-layout">
+    <div class="preview-panel">
       <div class="flex justify-between gap-4">
         <h1 class="m-0 text-2xl font-bold">Skins</h1>
         <ButtonStyled :disabled="!!selectedSkin?.cape_id">
@@ -206,7 +203,7 @@ watch(
           </button>
         </ButtonStyled>
       </div>
-      <div class="h-[80vh] flex items-center justify-center">
+      <div class="preview-container">
         <SkinPreviewRenderer
           wide-model-src="/src/assets/models/classic_player.gltf"
           slim-model-src="/src/assets/models/slim_player.gltf"
@@ -220,25 +217,25 @@ watch(
       </div>
     </div>
 
-    <div class="flex flex-col gap-6 add-perspective pt-2">
+    <div class="skins-container">
       <section class="flex flex-col gap-2 mt-1">
         <h2 class="text-lg font-bold m-0 text-primary">Saved skins</h2>
-        <div class="flex flex-row flex-wrap gap-2 w-full">
+        <div class="skin-card-grid">
           <SkinLikeTextButton
-            class="flex-none skin-card"
-            tooltip="Add a skin"
-            @click="editSkinModal?.show"
-          >
-            <template #icon>
-              <PlusIcon />
-            </template>
-            Add a skin
+              class="skin-card"
+              tooltip="Add a skin"
+              @click="editSkinModal?.show"
+            >
+              <template #icon>
+                <PlusIcon class="w-5 h-5 stroke-2" />
+              </template>
+              <span>Add a skin</span>
           </SkinLikeTextButton>
 
           <SkinButton
             v-for="skin in savedSkins"
             :key="`saved-skin-${skin.texture_key}`"
-            class="flex-none skin-card"
+            class="skin-card"
             editable
             :forward-image-src="getBakedSkinTextures(skin)?.forwards"
             :backward-image-src="getBakedSkinTextures(skin)?.backwards"
@@ -249,13 +246,13 @@ watch(
         </div>
       </section>
 
-      <section class="flex flex-col gap-2 mt-1 mr-0">
+      <section class="flex flex-col gap-2 mt-6">
         <h2 class="text-lg font-bold m-0 text-primary">Default skins</h2>
-        <div class="flex flex-row flex-wrap gap-2 w-full">
+        <div class="skin-card-grid">
           <SkinButton
             v-for="skin in defaultSkins"
             :key="`default-skin-${skin.texture_key}`"
-            class="flex-none skin-card"
+            class="skin-card"
             :forward-image-src="getBakedSkinTextures(skin)?.forwards"
             :backward-image-src="getBakedSkinTextures(skin)?.backwards"
             :selected="selectedSkin === skin"
@@ -291,15 +288,56 @@ watch(
 </template>
 
 <style lang="scss" scoped>
-$skin-card-width: 10.5vw;
-$skin-card-aspect: 1.1;
+$skin-card-width: 140px;
+$skin-card-gap: 4px;
+
+.skin-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 2.5rem;
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.preview-panel {
+  position: sticky;
+  top: 1.5rem;
+  align-self: start;
+  padding: 0.5rem;
+
+  @media (max-width: 700px) {
+    position: static;
+  }
+}
+
+.preview-container {
+  height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  @media (max-width: 700px) {
+    height: 50vh;
+  }
+}
+
+.skins-container {
+  padding-top: 0.5rem;
+}
+
+.skin-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, $skin-card-width);
+  gap: $skin-card-gap;
+  width: 100%;
+}
 
 .skin-card {
   width: $skin-card-width;
-  min-width: $skin-card-width;
-  max-width: $skin-card-width;
-  height: calc(#{$skin-card-width} * #{$skin-card-aspect});
-  min-height: calc(#{$skin-card-width} * #{$skin-card-aspect});
-  max-height: calc(#{$skin-card-width} * #{$skin-card-aspect});
+  aspect-ratio: 1.05;
+  border-radius: 10px;
+  box-sizing: border-box;
 }
 </style>
