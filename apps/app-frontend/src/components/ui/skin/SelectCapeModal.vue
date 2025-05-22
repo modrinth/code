@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { useTemplateRef, ref, computed } from 'vue'
 import type { Cape, SkinModel } from '@/helpers/skins.ts'
 import {
@@ -8,6 +7,7 @@ import {
   CapeButton,
   CapeLikeTextButton,
   SkinPreviewRenderer,
+  NewModal
 } from '@modrinth/ui'
 import { CheckIcon, XIcon } from '@modrinth/assets'
 
@@ -15,11 +15,20 @@ const modal = useTemplateRef('modal')
 
 const emit = defineEmits<{
   (e: 'select', cape: Cape | undefined): void
+  (e: 'cancel'): void
 }>()
 
-defineProps<{
+const props = defineProps<{
   capes: Cape[]
 }>()
+
+const sortedCapes = computed(() => {
+  return [...props.capes].sort((a, b) => {
+    const nameA = (a.name || '').toLowerCase();
+    const nameB = (b.name || '').toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
+});
 
 const currentSkinId = ref<string | undefined>()
 const currentSkinTexture = ref<string | undefined>()
@@ -35,8 +44,7 @@ function show(
   variant?: SkinModel,
 ) {
   currentSkinId.value = skinId
-  currentSkinTexture.value =
-    skinTexture || (skinId ? `https://vzge.me/processedskin/${skinId}.png` : '')
+  currentSkinTexture.value = skinTexture
   currentSkinVariant.value = variant || 'CLASSIC'
   currentCape.value = selected
   modal.value?.show(e)
@@ -49,10 +57,15 @@ function select() {
 
 function hide() {
   modal.value?.hide()
+  emit('cancel')
 }
 
 function updateSelectedCape(cape: Cape | undefined) {
   currentCape.value = cape
+}
+
+function onModalHide() {
+  emit('cancel')
 }
 
 defineExpose({
@@ -61,7 +74,7 @@ defineExpose({
 })
 </script>
 <template>
-  <ModalWrapper ref="modal">
+  <NewModal ref="modal" @on-hide="onModalHide">
     <template #title>
       <div class="flex flex-col">
         <span class="text-lg font-extrabold text-heading">Change cape</span>
@@ -100,7 +113,7 @@ defineExpose({
               <span>None</span>
             </CapeLikeTextButton>
             <CapeButton
-              v-for="cape in capes"
+              v-for="cape in sortedCapes"
               :id="cape.id"
               :key="cape.id"
               :name="cape.name"
@@ -126,5 +139,5 @@ defineExpose({
         </button>
       </ButtonStyled>
     </div>
-  </ModalWrapper>
+  </NewModal>
 </template>
