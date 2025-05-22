@@ -16,7 +16,8 @@
             :variant="variant"
             :texture-src="previewSkin"
             :cape-src="selectedCapeTexture"
-            :scale="1.4" :fov="50"
+            :scale="1.4"
+            :fov="50"
             :initial-rotation="Math.PI / 8"
             class="h-full w-full"
           />
@@ -26,14 +27,12 @@
       <div class="flex flex-col gap-4 w-full min-h-[20rem]">
         <section>
           <h2 class="text-base font-semibold mb-2">Texture</h2>
-          <Button @click="openUploadSkinModal">
-            <UploadIcon /> Replace texture
-          </Button>
+          <Button @click="openUploadSkinModal"> <UploadIcon /> Replace texture </Button>
         </section>
 
         <section>
           <h2 class="text-base font-semibold mb-2">Arm style</h2>
-          <RadioButtons v-model="variant" :items="['CLASSIC','SLIM']">
+          <RadioButtons v-model="variant" :items="['CLASSIC', 'SLIM']">
             <template #default="{ item }">
               {{ item === 'CLASSIC' ? 'Wide' : 'Slim' }}
             </template>
@@ -69,7 +68,7 @@
               tooltip="View more capes"
               @mouseup="openSelectCapeModal"
             >
-              <template #icon><ChevronRightIcon/></template>
+              <template #icon><ChevronRightIcon /></template>
               <span>More</span>
             </CapeLikeTextButton>
           </div>
@@ -84,41 +83,49 @@
           {{ mode === 'new' ? 'Add skin' : 'Save skin' }}
         </Button>
       </ButtonStyled>
-      <Button @click="hide"><XIcon/>Cancel</Button>
+      <Button @click="hide"><XIcon />Cancel</Button>
     </div>
   </NewModal>
 
-  <SelectCapeModal ref="selectCapeModal" :capes="capes || []" @select="handleCapeSelected" @cancel="handleCapeCancel" />
+  <SelectCapeModal
+    ref="selectCapeModal"
+    :capes="capes || []"
+    @select="handleCapeSelected"
+    @cancel="handleCapeCancel"
+  />
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch, useTemplateRef } from 'vue'
 import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
 import {
-  Card, FileInput, SkinPreviewRenderer,
-  Button, RadioButtons, CapeButton, CapeLikeTextButton, ButtonStyled,
-  NewModal
+  SkinPreviewRenderer,
+  Button,
+  RadioButtons,
+  CapeButton,
+  CapeLikeTextButton,
+  ButtonStyled,
+  NewModal,
 } from '@modrinth/ui'
 import {
   add_and_equip_custom_skin,
   remove_custom_skin,
   unequip_skin,
-  type Skin, type Cape, type SkinModel
+  type Skin,
+  type Cape,
+  type SkinModel,
 } from '@/helpers/skins.ts'
 import { handleError } from '@/store/notifications'
-import {
-  UploadIcon,
-  CheckIcon, SaveIcon, XIcon, TrashIcon, ChevronRightIcon
-} from '@modrinth/assets'
+import { UploadIcon, CheckIcon, SaveIcon, XIcon, ChevronRightIcon } from '@modrinth/assets'
 
 const modal = useTemplateRef('modal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
-const mode = ref<'new'|'edit'>('new')
-const currentSkin = ref<Skin|null>(null)
+const mode = ref<'new' | 'edit'>('new')
+const currentSkin = ref<Skin | null>(null)
 const shouldRestoreModal = ref(false)
 
-const fileUploadTextureBlob = ref<Uint8Array|null>(null)
-const fileName = ref<string|null>(null)
+const fileUploadTextureBlob = ref<Uint8Array | null>(null)
+const fileName = ref<string | null>(null)
 watch(fileUploadTextureBlob, () => {
   if (fileName.value === null && fileUploadTextureBlob.value) {
     fileName.value = 'New upload'
@@ -126,7 +133,7 @@ watch(fileUploadTextureBlob, () => {
 })
 
 const variant = ref<SkinModel>('CLASSIC')
-const selectedCape = ref<Cape|undefined>(undefined)
+const selectedCape = ref<Cape | undefined>(undefined)
 const props = defineProps<{ capes?: Cape[] }>()
 
 const selectedCapeTexture = computed(() => selectedCape.value?.texture)
@@ -134,11 +141,11 @@ const visibleCapeList = ref<Cape[]>([])
 
 const sortedCapes = computed(() => {
   return [...(props.capes || [])].sort((a, b) => {
-    const nameA = (a.name || '').toLowerCase();
-    const nameB = (b.name || '').toLowerCase();
-    return nameA.localeCompare(nameB);
-  });
-});
+    const nameA = (a.name || '').toLowerCase()
+    const nameB = (b.name || '').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+})
 
 function initVisibleCapeList() {
   if (!props.capes || props.capes.length === 0) {
@@ -163,10 +170,10 @@ function getSortedCapes(count: number): Cape[] {
 
 function getSortedCapeExcluding(excludeId: string): Cape | undefined {
   if (!sortedCapes.value || sortedCapes.value.length <= 1) return undefined
-  return sortedCapes.value.find(cape => cape.id !== excludeId)
+  return sortedCapes.value.find((cape) => cape.id !== excludeId)
 }
 
-const localPreviewUrl = ref<string|null>(null)
+const localPreviewUrl = ref<string | null>(null)
 watch(fileUploadTextureBlob, (blob, prev) => {
   if (prev && localPreviewUrl.value) URL.revokeObjectURL(localPreviewUrl.value)
   if (blob) localPreviewUrl.value = URL.createObjectURL(new Blob([blob]))
@@ -179,24 +186,25 @@ const previewSkin = computed(() => {
 })
 
 const hasEdits = computed(() => {
-  if (mode.value !== 'edit') return true;
-  if (fileUploadTextureBlob.value) return true;
-  if (!currentSkin.value) return false;
-  if (variant.value !== currentSkin.value.variant) return true;
-  if ((selectedCape.value?.id || null) !== (currentSkin.value.cape_id || null)) return true;
-  return false;
-});
+  if (mode.value !== 'edit') return true
+  if (fileUploadTextureBlob.value) return true
+  if (!currentSkin.value) return false
+  if (variant.value !== currentSkin.value.variant) return true
+  if ((selectedCape.value?.id || null) !== (currentSkin.value.cape_id || null)) return true
+  return false
+})
 
-const disableSave = computed(() =>
-  (mode.value === 'new' && !fileUploadTextureBlob.value) ||
-  (mode.value === 'edit' && !hasEdits.value)
-);
+const disableSave = computed(
+  () =>
+    (mode.value === 'new' && !fileUploadTextureBlob.value) ||
+    (mode.value === 'edit' && !hasEdits.value),
+)
 
 const saveTooltip = computed(() => {
-  if (mode.value === 'new' && !fileUploadTextureBlob.value) return 'Upload a skin first!';
-  if (mode.value === 'edit' && !hasEdits.value) return 'Make an edit to the skin first!';
-  return undefined;
-});
+  if (mode.value === 'new' && !fileUploadTextureBlob.value) return 'Upload a skin first!'
+  if (mode.value === 'edit' && !hasEdits.value) return 'Make an edit to the skin first!'
+  return undefined
+})
 
 function resetState() {
   mode.value = 'new'
@@ -218,7 +226,7 @@ function show(e: MouseEvent, skin?: Skin) {
   currentSkin.value = skin ?? null
   if (skin) {
     variant.value = skin.variant
-    selectedCape.value = props.capes?.find(c=>c.id===skin.cape_id)
+    selectedCape.value = props.capes?.find((c) => c.id === skin.cape_id)
   } else {
     variant.value = 'CLASSIC'
     selectedCape.value = undefined
@@ -243,7 +251,7 @@ function showNew(e: MouseEvent, skinTexture: Uint8Array, filename: string) {
 function restoreWithNewTexture(skinTexture: Uint8Array, filename: string) {
   fileUploadTextureBlob.value = skinTexture
   fileName.value = filename
-  
+
   if (shouldRestoreModal.value) {
     setTimeout(() => {
       modal.value?.show()
@@ -257,12 +265,12 @@ function hide() {
   setTimeout(() => resetState(), 250)
 }
 
-function selectCape(cape: Cape|undefined) {
+function selectCape(cape: Cape | undefined) {
   if (cape && selectedCape.value?.id !== cape.id) {
-    const isInVisibleList = visibleCapeList.value.some(c => c.id === cape.id)
+    const isInVisibleList = visibleCapeList.value.some((c) => c.id === cape.id)
     if (!isInVisibleList && visibleCapeList.value.length > 0) {
       visibleCapeList.value.splice(0, 1, cape)
-    
+
       if (visibleCapeList.value.length > 1 && visibleCapeList.value[1].id === cape.id) {
         const otherCape = getSortedCapeExcluding(cape.id)
         if (otherCape) {
@@ -306,7 +314,7 @@ function openSelectCapeModal(e: MouseEvent) {
       currentSkin.value?.texture_key,
       selectedCape.value,
       previewSkin.value,
-      variant.value
+      variant.value,
     )
   }, 0)
 }
@@ -329,7 +337,7 @@ async function save() {
       blob = new Uint8Array(buf)
     }
 
-    await unequip_skin();
+    await unequip_skin()
 
     if (mode.value === 'new') {
       await add_and_equip_custom_skin(blob, variant.value, selectedCape.value)
@@ -346,9 +354,13 @@ async function save() {
   }
 }
 
-watch(() => props.capes, () => {
-  initVisibleCapeList()
-}, { immediate: true })
+watch(
+  () => props.capes,
+  () => {
+    initVisibleCapeList()
+  },
+  { immediate: true },
+)
 
 const emit = defineEmits<{
   (event: 'saved'): void
@@ -361,6 +373,6 @@ defineExpose({
   showNew,
   restoreWithNewTexture,
   hide,
-  shouldRestoreModal
+  shouldRestoreModal,
 })
 </script>

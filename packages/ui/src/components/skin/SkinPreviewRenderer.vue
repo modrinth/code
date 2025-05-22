@@ -1,11 +1,16 @@
 <template>
   <div class="relative w-full h-full cursor-grab">
-    <div class="absolute bottom-[18%] left-0 right-0 flex justify-center items-center mb-2 pointer-events-none z-10">
+    <div
+      class="absolute bottom-[18%] left-0 right-0 flex justify-center items-center mb-2 pointer-events-none z-10"
+    >
       <span class="text-primary text-xs px-2 py-1 rounded-full backdrop-blur-sm">
         Drag to rotate
       </span>
     </div>
-    <div v-if="nametag" class="absolute top-[13%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md text-[200%] pointer-events-none z-10 font-minecraft text-primary nametag-bg">
+    <div
+      v-if="nametag"
+      class="absolute top-[13%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md text-[200%] pointer-events-none z-10 font-minecraft text-primary nametag-bg"
+    >
       {{ nametag }}
     </div>
 
@@ -13,18 +18,22 @@
       shadows
       alpha
       :antialias="antialias"
+      :renderer-options="{
+        outputColorSpace: THREE.SRGBColorSpace,
+        toneMapping: THREE.NoToneMapping,
+      }"
       @pointerdown="onPointerDown"
       @pointermove="onPointerMove"
       @pointerup="onPointerUp"
       @pointerleave="onPointerUp"
-      :rendererOptions="{
-        outputColorSpace: THREE.SRGBColorSpace,
-        toneMapping: THREE.NoToneMapping
-      }"
     >
       <Suspense>
         <Group>
-          <Group :rotation="[0, modelRotation, 0]" :position="[0, -0.05 * scale, 1.95]" :scale="[0.8 * scale, 0.8 * scale, 0.8 * scale]">
+          <Group
+            :rotation="[0, modelRotation, 0]"
+            :position="[0, -0.05 * scale, 1.95]"
+            :scale="[0.8 * scale, 0.8 * scale, 0.8 * scale]"
+          >
             <primitive v-if="scene" :object="scene" />
           </Group>
 
@@ -42,7 +51,11 @@
             />
           </TresMesh>
 
-          <TresMesh :position="[0, -0.1 * scale, 2]" :rotation="[-Math.PI / 2, 0, 0]" :scale="[0.75 * scale, 0.75 * scale, 0.75 * scale]">
+          <TresMesh
+            :position="[0, -0.1 * scale, 2]"
+            :rotation="[-Math.PI / 2, 0, 0]"
+            :scale="[0.75 * scale, 0.75 * scale, 0.75 * scale]"
+          >
             <TresPlaneGeometry :args="[2, 2]" />
             <TresMeshBasicMaterial
               :map="radialTexture"
@@ -55,7 +68,7 @@
       </Suspense>
 
       <TresPerspectiveCamera
-        :makeDefault="true"
+        :make-default="true"
         :fov="fov"
         :position="[0, 1.5, -3.25]"
         :look-at="target"
@@ -83,7 +96,7 @@ const props = withDefaults(
     nametag?: string
     antialias?: boolean
     scale?: number
-    fov?: number,
+    fov?: number
     initialRotation?: number
   }>(),
   {
@@ -94,11 +107,11 @@ const props = withDefaults(
     capeModelSrc: '',
     capeSrc: undefined,
     initialRotation: 15.75,
-  }
+  },
 )
 
 const selectedModelSrc = computed(() =>
-  props.variant === 'SLIM' ? props.slimModelSrc : props.wideModelSrc
+  props.variant === 'SLIM' ? props.slimModelSrc : props.wideModelSrc,
 )
 
 const scene = shallowRef<THREE.Object3D | null>(null)
@@ -135,7 +148,7 @@ async function loadModel(src: string) {
   }
 
   bodyNode.value = null
-  loadedScene.traverse(node => {
+  loadedScene.traverse((node) => {
     if (node.name === 'Body') {
       bodyNode.value = node
     }
@@ -218,11 +231,11 @@ function attachCapeToBody() {
 function applyTextureToScene(root: THREE.Object3D | null, tex: THREE.Texture | null) {
   if (!root || !tex) return
 
-  root.traverse(child => {
+  root.traverse((child) => {
     if ((child as THREE.Mesh).isMesh) {
       const mesh = child as THREE.Mesh
 
-      if (mesh.name === "Cape") return
+      if (mesh.name === 'Cape') return
 
       const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
 
@@ -242,7 +255,7 @@ function applyTextureToScene(root: THREE.Object3D | null, tex: THREE.Texture | n
 function applyCapeTexture(root: THREE.Object3D | null, tex: THREE.Texture | null) {
   if (!root) return
 
-  root.traverse(child => {
+  root.traverse((child) => {
     if ((child as THREE.Mesh).isMesh) {
       const mesh = child as THREE.Mesh
 
@@ -282,7 +295,7 @@ const isDragging = ref(false)
 const previousX = ref(0)
 
 const onPointerDown = (event: PointerEvent) => {
-  (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
+  ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
   isDragging.value = true
   previousX.value = event.clientX
 }
@@ -295,8 +308,8 @@ const onPointerMove = (event: PointerEvent) => {
 }
 
 const onPointerUp = (event: PointerEvent) => {
-  isDragging.value = false;
-  (event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId)
+  isDragging.value = false
+  ;(event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId)
 }
 
 const radialTexture = createRadialTexture(512)
@@ -316,17 +329,26 @@ function createRadialTexture(size: number): THREE.CanvasTexture {
   return new THREE.CanvasTexture(canvas)
 }
 
-watch(selectedModelSrc, src => loadModel(src))
-watch(() => props.capeModelSrc, src => src && loadCape(src))
-watch(() => props.textureSrc, async newSrc => {
-  texture.value = await loadAndApplyTexture(newSrc)
-  if (scene.value && texture.value) {
-    applyTextureToScene(scene.value, texture.value)
-  }
-})
-watch(() => props.capeSrc, async newCapeSrc => {
-  await loadAndApplyCapeTexture(newCapeSrc)
-})
+watch(selectedModelSrc, (src) => loadModel(src))
+watch(
+  () => props.capeModelSrc,
+  (src) => src && loadCape(src),
+)
+watch(
+  () => props.textureSrc,
+  async (newSrc) => {
+    texture.value = await loadAndApplyTexture(newSrc)
+    if (scene.value && texture.value) {
+      applyTextureToScene(scene.value, texture.value)
+    }
+  },
+)
+watch(
+  () => props.capeSrc,
+  async (newCapeSrc) => {
+    await loadAndApplyCapeTexture(newCapeSrc)
+  },
+)
 
 onBeforeMount(async () => {
   texture.value = await loadAndApplyTexture(props.textureSrc)
@@ -345,7 +367,10 @@ onBeforeMount(async () => {
 
 <style scoped lang="scss">
 .nametag-bg {
-  background: linear-gradient(308.68deg, rgba(0, 0, 0, 0) -52.46%, rgba(100, 100, 100, 0.1) 94.75%), rgba(0, 0, 0, 0.2);
-  box-shadow: inset -0.5px -0.5px 0px rgba(0, 0, 0, 0.25), inset 0.5px 0.5px 0px rgba(255, 255, 255, 0.05);
+  background: linear-gradient(308.68deg, rgba(0, 0, 0, 0) -52.46%, rgba(100, 100, 100, 0.1) 94.75%),
+    rgba(0, 0, 0, 0.2);
+  box-shadow:
+    inset -0.5px -0.5px 0px rgba(0, 0, 0, 0.25),
+    inset 0.5px 0.5px 0px rgba(255, 255, 255, 0.05);
 }
 </style>

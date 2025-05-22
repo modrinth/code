@@ -14,7 +14,9 @@ const pressed = ref(false)
       @mouseup="pressed = false"
       @mouseleave="pressed = false"
     ></button>
-    <div class="relative w-full h-full flex flex-col items-center justify-center pointer-events-none">
+    <div
+      class="relative w-full h-full flex flex-col items-center justify-center pointer-events-none"
+    >
       <div class="mb-2">
         <slot name="icon"></slot>
       </div>
@@ -28,7 +30,9 @@ const pressed = ref(false)
 <style scoped lang="scss">
 .skin-like-text-bg {
   background: linear-gradient(180deg, #3a3d47 0%, #33363d 100%);
-  transition: filter 200ms ease-in-out, box-shadow 200ms ease-in-out;
+  transition:
+    filter 200ms ease-in-out,
+    box-shadow 200ms ease-in-out;
 }
 .skin-like-text-bg:hover {
   filter: brightness(var(--hover-brightness));

@@ -44,7 +44,13 @@
       </div>
       <div v-else class="logged-out account">
         <h4>Not signed in</h4>
-        <Button v-tooltip="'Log in'" :disabled="loginDisabled" icon-only color="primary" @click="login()">
+        <Button
+          v-tooltip="'Log in'"
+          :disabled="loginDisabled"
+          icon-only
+          color="primary"
+          @click="login()"
+        >
           <LogInIcon v-if="!loginDisabled" />
           <SpinnerIcon v-else class="animate-spin" />
         </Button>
@@ -95,7 +101,7 @@ defineProps({
 const emit = defineEmits(['change'])
 
 const accounts = ref({})
-const loginDisabled = ref(false);
+const loginDisabled = ref(false)
 const defaultUser = ref()
 
 async function refreshValues() {
@@ -104,13 +110,13 @@ async function refreshValues() {
 }
 
 function setLoginDisabled(value) {
-  loginDisabled.value = value;
+  loginDisabled.value = value
 }
 
 defineExpose({
   refreshValues,
   setLoginDisabled,
-  loginDisabled
+  loginDisabled,
 })
 await refreshValues()
 
@@ -129,7 +135,7 @@ async function setAccount(account) {
 }
 
 async function login() {
-  loginDisabled.value = true;
+  loginDisabled.value = true
   const loggedIn = await login_flow().catch(handleSevereError)
 
   if (loggedIn) {
@@ -138,7 +144,7 @@ async function login() {
   }
 
   trackEvent('AccountLogIn')
-  loginDisabled.value = false;
+  loginDisabled.value = false
 }
 
 const logout = async (id) => {
