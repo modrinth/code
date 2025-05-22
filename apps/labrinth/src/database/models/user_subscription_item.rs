@@ -1,5 +1,5 @@
 use crate::database::models::{
-    DatabaseError, ProductPriceId, UserId, UserSubscriptionId,
+    DBProductPriceId, DBUserId, DBUserSubscriptionId, DatabaseError,
 };
 use crate::models::billing::{
     PriceDuration, SubscriptionMetadata, SubscriptionStatus,
@@ -9,9 +9,9 @@ use itertools::Itertools;
 use std::convert::{TryFrom, TryInto};
 
 pub struct UserSubscriptionItem {
-    pub id: UserSubscriptionId,
-    pub user_id: UserId,
-    pub price_id: ProductPriceId,
+    pub id: DBUserSubscriptionId,
+    pub user_id: DBUserId,
+    pub price_id: DBProductPriceId,
     pub interval: PriceDuration,
     pub created: DateTime<Utc>,
     pub status: SubscriptionStatus,
@@ -48,9 +48,9 @@ impl TryFrom<UserSubscriptionResult> for UserSubscriptionItem {
 
     fn try_from(r: UserSubscriptionResult) -> Result<Self, Self::Error> {
         Ok(UserSubscriptionItem {
-            id: UserSubscriptionId(r.id),
-            user_id: UserId(r.user_id),
-            price_id: ProductPriceId(r.price_id),
+            id: DBUserSubscriptionId(r.id),
+            user_id: DBUserId(r.user_id),
+            price_id: DBProductPriceId(r.price_id),
             interval: PriceDuration::from_string(&r.interval),
             created: r.created,
             status: SubscriptionStatus::from_string(&r.status),
@@ -61,14 +61,14 @@ impl TryFrom<UserSubscriptionResult> for UserSubscriptionItem {
 
 impl UserSubscriptionItem {
     pub async fn get(
-        id: UserSubscriptionId,
+        id: DBUserSubscriptionId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Option<UserSubscriptionItem>, DatabaseError> {
         Ok(Self::get_many(&[id], exec).await?.into_iter().next())
     }
 
     pub async fn get_many(
-        ids: &[UserSubscriptionId],
+        ids: &[DBUserSubscriptionId],
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<UserSubscriptionItem>, DatabaseError> {
         let ids = ids.iter().map(|id| id.0).collect_vec();
@@ -87,7 +87,7 @@ impl UserSubscriptionItem {
     }
 
     pub async fn get_all_user(
-        user_id: UserId,
+        user_id: DBUserId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<UserSubscriptionItem>, DatabaseError> {
         let user_id = user_id.0;

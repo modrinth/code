@@ -1,12 +1,7 @@
-use super::ids::Base62Id;
-use crate::models::users::UserId;
+use crate::models::ids::SessionId;
+use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Hash, Debug)]
-#[serde(from = "Base62Id")]
-#[serde(into = "Base62Id")]
-pub struct SessionId(pub u64);
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Session {

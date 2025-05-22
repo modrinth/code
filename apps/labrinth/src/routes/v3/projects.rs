@@ -11,11 +11,12 @@ use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
 use crate::file_hosting::FileHost;
 use crate::models;
+use crate::models::ids::ProjectId;
 use crate::models::images::ImageContext;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    MonetizationStatus, Project, ProjectId, ProjectStatus, SearchRequest,
+    MonetizationStatus, Project, ProjectStatus, SearchRequest,
 };
 use crate::models::teams::ProjectPermissions;
 use crate::models::threads::MessageBody;
@@ -103,7 +104,7 @@ pub async fn random_projects_get(
             .collect::<Vec<String>>(),
     )
     .fetch(&**pool)
-    .map_ok(|m| db_ids::ProjectId(m.id))
+    .map_ok(|m| db_ids::DBProjectId(m.id))
     .try_collect::<Vec<_>>()
     .await?;
 
@@ -303,7 +304,7 @@ pub async fn project_edit(
                     WHERE (id = $2)
                     ",
                     name.trim(),
-                    id as db_ids::ProjectId,
+                    id as db_ids::DBProjectId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -324,7 +325,7 @@ pub async fn project_edit(
                     WHERE (id = $2)
                     ",
                     summary,
-                    id as db_ids::ProjectId,
+                    id as db_ids::DBProjectId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -363,7 +364,7 @@ pub async fn project_edit(
                         SET moderation_message = NULL, moderation_message_body = NULL, queued = NOW()
                         WHERE (id = $1)
                         ",
-                        id as db_ids::ProjectId,
+                        id as db_ids::DBProjectId,
                     )
                     .execute(&mut *transaction)
                     .await?;
@@ -382,7 +383,7 @@ pub async fn project_edit(
                         SET approved = NOW()
                         WHERE id = $1 AND approved IS NULL
                         ",
-                        id as db_ids::ProjectId,
+                        id as db_ids::DBProjectId,
                     )
                     .execute(&mut *transaction)
                     .await?;
@@ -407,7 +408,7 @@ pub async fn project_edit(
                             SET webhook_sent = TRUE
                             WHERE id = $1
                             ",
-                            id as db_ids::ProjectId,
+                            id as db_ids::DBProjectId,
                         )
                         .execute(&mut *transaction)
                         .await?;
@@ -447,10 +448,10 @@ pub async fn project_edit(
                         FROM team_members tm
                         WHERE tm.team_id = $1 AND tm.accepted
                         ",
-                        project_item.inner.team_id as db_ids::TeamId
+                        project_item.inner.team_id as db_ids::DBTeamId
                     )
                     .fetch(&mut *transaction)
-                    .map_ok(|c| db_models::UserId(c.id))
+                    .map_ok(|c| db_models::DBUserId(c.id))
                     .try_collect::<Vec<_>>()
                     .await?;
 
@@ -484,7 +485,7 @@ pub async fn project_edit(
                     WHERE (id = $2)
                     ",
                     status.as_str(),
-                    id as db_ids::ProjectId,
+                    id as db_ids::DBProjectId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -528,7 +529,7 @@ pub async fn project_edit(
                     WHERE (id = $2)
                     ",
                     requested_status.map(|x| x.as_str()),
-                    id as db_ids::ProjectId,
+                    id as db_ids::DBProjectId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -541,7 +542,7 @@ pub async fn project_edit(
                         DELETE FROM mods_categories
                         WHERE joining_mod_id = $1 AND is_additional = FALSE
                         ",
-                        id as db_ids::ProjectId,
+                        id as db_ids::DBProjectId,
                     )
                     .execute(&mut *transaction)
                     .await?;
@@ -553,7 +554,7 @@ pub async fn project_edit(
                         DELETE FROM mods_categories
                         WHERE joining_mod_id = $1 AND is_additional = TRUE
                         ",
-                        id as db_ids::ProjectId,
+                        id as db_ids::DBProjectId,
                     )
                     .execute(&mut *transaction)
                     .await?;
@@ -564,7 +565,7 @@ pub async fn project_edit(
                 edit_project_categories(
                     categories,
                     &perms,
-                    id as db_ids::ProjectId,
+                    id as db_ids::DBProjectId,
                     false,
                     &mut transaction,
                 )
@@ -575,7 +576,7 @@ pub async fn project_edit(
                 edit_project_categories(
                     categories,
                     &perms,
-                    id as db_ids::ProjectId,
+                    id as db_ids::DBProjectId,
                     true,
                     &mut transaction,
                 )
@@ -597,7 +598,7 @@ pub async fn project_edit(
                     WHERE (id = $2)
                     ",
                     license_url.as_deref(),
-                    id as db_ids::ProjectId,
+                    id as db_ids::DBProjectId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -663,7 +664,7 @@ pub async fn project_edit(
                     WHERE (id = $2)
                     ",
                     Some(slug),
-                    id as db_ids::ProjectId,
+                    id as db_ids::DBProjectId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -696,7 +697,7 @@ pub async fn project_edit(
                     WHERE (id = $2)
                     ",
                     license,
-                    id as db_ids::ProjectId,
+                    id as db_ids::DBProjectId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -720,7 +721,7 @@ pub async fn project_edit(
                             SELECT id FROM link_platforms WHERE name = ANY($2)
                         )
                         ",
-                        id as db_ids::ProjectId,
+                        id as db_ids::DBProjectId,
                         &ids_to_delete
                     )
                     .execute(&mut *transaction)
@@ -747,7 +748,7 @@ pub async fn project_edit(
                                 INSERT INTO mods_links (joining_mod_id, joining_platform_id, url)
                                 VALUES ($1, $2, $3)
                                 ",
-                                id as db_ids::ProjectId,
+                                id as db_ids::DBProjectId,
                                 platform_id as db_ids::LinkPlatformId,
                                 url
                             )
@@ -775,7 +776,7 @@ pub async fn project_edit(
                     WHERE (id = $2)
                     ",
                     moderation_message.as_deref(),
-                    id as db_ids::ProjectId,
+                    id as db_ids::DBProjectId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -801,7 +802,7 @@ pub async fn project_edit(
                     WHERE (id = $2)
                     ",
                     moderation_message_body.as_deref(),
-                    id as db_ids::ProjectId,
+                    id as db_ids::DBProjectId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -822,7 +823,7 @@ pub async fn project_edit(
                     WHERE (id = $2)
                     ",
                     description,
-                    id as db_ids::ProjectId,
+                    id as db_ids::DBProjectId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -856,7 +857,7 @@ pub async fn project_edit(
                     WHERE (id = $2)
                     ",
                     monetization_status.as_str(),
-                    id as db_ids::ProjectId,
+                    id as db_ids::DBProjectId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -905,7 +906,7 @@ pub async fn project_edit(
 pub async fn edit_project_categories(
     categories: &Vec<String>,
     perms: &ProjectPermissions,
-    project_id: db_ids::ProjectId,
+    project_id: db_ids::DBProjectId,
     is_additional: bool,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
 ) -> Result<(), ApiError> {
@@ -1051,7 +1052,7 @@ pub async fn dependency_list(
             .iter()
             .filter_map(|x| x.0)
             .unique()
-            .collect::<Vec<db_models::VersionId>>();
+            .collect::<Vec<db_models::DBVersionId>>();
         let (projects_result, versions_result) = futures::future::try_join(
             database::Project::get_many_ids(&project_ids, &**pool, &redis),
             database::Version::get_many(&dep_version_ids, &**pool, &redis),
@@ -1133,7 +1134,7 @@ pub async fn projects_edit(
         ApiError::Validation(validation_errors_to_string(err, None))
     })?;
 
-    let project_ids: Vec<db_ids::ProjectId> =
+    let project_ids: Vec<db_ids::DBProjectId> =
         serde_json::from_str::<Vec<ProjectId>>(&ids.ids)?
             .into_iter()
             .map(|x| x.into())
@@ -1155,7 +1156,7 @@ pub async fn projects_edit(
     let team_ids = projects_data
         .iter()
         .map(|x| x.inner.team_id)
-        .collect::<Vec<db_models::TeamId>>();
+        .collect::<Vec<db_models::DBTeamId>>();
     let team_members = db_models::TeamMember::get_from_team_full_many(
         &team_ids, &**pool, &redis,
     )
@@ -1164,7 +1165,7 @@ pub async fn projects_edit(
     let organization_ids = projects_data
         .iter()
         .filter_map(|x| x.inner.organization_id)
-        .collect::<Vec<db_models::OrganizationId>>();
+        .collect::<Vec<db_models::DBOrganizationId>>();
     let organizations = db_models::Organization::get_many_ids(
         &organization_ids,
         &**pool,
@@ -1175,7 +1176,7 @@ pub async fn projects_edit(
     let organization_team_ids = organizations
         .iter()
         .map(|x| x.team_id)
-        .collect::<Vec<db_models::TeamId>>();
+        .collect::<Vec<db_models::DBTeamId>>();
     let organization_team_members =
         db_models::TeamMember::get_from_team_full_many(
             &organization_team_ids,
@@ -1243,7 +1244,7 @@ pub async fn projects_edit(
         bulk_edit_project_categories(
             &categories,
             &project.categories,
-            project.inner.id as db_ids::ProjectId,
+            project.inner.id as db_ids::DBProjectId,
             CategoryChanges {
                 categories: &bulk_edit_project.categories,
                 add_categories: &bulk_edit_project.add_categories,
@@ -1258,7 +1259,7 @@ pub async fn projects_edit(
         bulk_edit_project_categories(
             &categories,
             &project.additional_categories,
-            project.inner.id as db_ids::ProjectId,
+            project.inner.id as db_ids::DBProjectId,
             CategoryChanges {
                 categories: &bulk_edit_project.additional_categories,
                 add_categories: &bulk_edit_project.add_additional_categories,
@@ -1281,7 +1282,7 @@ pub async fn projects_edit(
                     SELECT id FROM link_platforms WHERE name = ANY($2)
                 )
                 ",
-                project.inner.id as db_ids::ProjectId,
+                project.inner.id as db_ids::DBProjectId,
                 &ids_to_delete
             )
             .execute(&mut *transaction)
@@ -1304,7 +1305,7 @@ pub async fn projects_edit(
                         INSERT INTO mods_links (joining_mod_id, joining_platform_id, url)
                         VALUES ($1, $2, $3)
                         ",
-                        project.inner.id as db_ids::ProjectId,
+                        project.inner.id as db_ids::DBProjectId,
                         platform_id as db_ids::LinkPlatformId,
                         url
                     )
@@ -1331,7 +1332,7 @@ pub async fn projects_edit(
 pub async fn bulk_edit_project_categories(
     all_db_categories: &[db_models::categories::Category],
     project_categories: &Vec<String>,
-    project_id: db_ids::ProjectId,
+    project_id: db_ids::DBProjectId,
     bulk_changes: CategoryChanges<'_>,
     max_num_categories: usize,
     is_additional: bool,
@@ -1369,7 +1370,7 @@ pub async fn bulk_edit_project_categories(
             DELETE FROM mods_categories
             WHERE joining_mod_id = $1 AND is_additional = $2
             ",
-            project_id as db_ids::ProjectId,
+            project_id as db_ids::DBProjectId,
             is_additional
         )
         .execute(&mut **transaction)
@@ -1501,7 +1502,7 @@ pub async fn project_icon_edit(
         upload_result.url,
         upload_result.raw_url,
         upload_result.color.map(|x| x as i32),
-        project_item.inner.id as db_ids::ProjectId,
+        project_item.inner.id as db_ids::DBProjectId,
     )
     .execute(&mut *transaction)
     .await?;
@@ -1590,7 +1591,7 @@ pub async fn delete_project_icon(
         SET icon_url = NULL, raw_icon_url = NULL, color = NULL
         WHERE (id = $1)
         ",
-        project_item.inner.id as db_ids::ProjectId,
+        project_item.inner.id as db_ids::DBProjectId,
     )
     .execute(&mut *transaction)
     .await?;
@@ -1727,7 +1728,7 @@ pub async fn add_gallery_item(
                 SET featured = $2
                 WHERE mod_id = $1
                 ",
-            project_item.inner.id as db_ids::ProjectId,
+            project_item.inner.id as db_ids::DBProjectId,
             false,
         )
         .execute(&mut *transaction)
@@ -1822,7 +1823,7 @@ pub async fn edit_gallery_item(
     })?;
 
     let project_item = db_models::Project::get_id(
-        database::models::ProjectId(result.mod_id),
+        database::models::DBProjectId(result.mod_id),
         &**pool,
         &redis,
     )
@@ -1873,7 +1874,7 @@ pub async fn edit_gallery_item(
                 SET featured = $2
                 WHERE mod_id = $1
                 ",
-                project_item.inner.id as db_ids::ProjectId,
+                project_item.inner.id as db_ids::DBProjectId,
                 false,
             )
             .execute(&mut *transaction)
@@ -1985,7 +1986,7 @@ pub async fn delete_gallery_item(
     })?;
 
     let project_item = db_models::Project::get_id(
-        database::models::ProjectId(item.mod_id),
+        database::models::DBProjectId(item.mod_id),
         &**pool,
         &redis,
     )
@@ -2131,7 +2132,7 @@ pub async fn project_delete(
         DELETE FROM collections_mods
         WHERE mod_id = $1
         ",
-        project.inner.id as db_ids::ProjectId,
+        project.inner.id as db_ids::DBProjectId,
     )
     .execute(&mut *transaction)
     .await?;
@@ -2185,8 +2186,8 @@ pub async fn project_follow(
             )
         })?;
 
-    let user_id: db_ids::UserId = user.id.into();
-    let project_id: db_ids::ProjectId = result.inner.id;
+    let user_id: db_ids::DBUserId = user.id.into();
+    let project_id: db_ids::DBProjectId = result.inner.id;
 
     if !is_visible_project(&result.inner, &Some(user), &pool, false).await? {
         return Err(ApiError::NotFound);
@@ -2196,8 +2197,8 @@ pub async fn project_follow(
         "
         SELECT EXISTS(SELECT 1 FROM mod_follows mf WHERE mf.follower_id = $1 AND mf.mod_id = $2)
         ",
-        user_id as db_ids::UserId,
-        project_id as db_ids::ProjectId
+        user_id as db_ids::DBUserId,
+        project_id as db_ids::DBProjectId
     )
     .fetch_one(&**pool)
     .await?
@@ -2213,7 +2214,7 @@ pub async fn project_follow(
             SET follows = follows + 1
             WHERE id = $1
             ",
-            project_id as db_ids::ProjectId,
+            project_id as db_ids::DBProjectId,
         )
         .execute(&mut *transaction)
         .await?;
@@ -2223,8 +2224,8 @@ pub async fn project_follow(
             INSERT INTO mod_follows (follower_id, mod_id)
             VALUES ($1, $2)
             ",
-            user_id as db_ids::UserId,
-            project_id as db_ids::ProjectId
+            user_id as db_ids::DBUserId,
+            project_id as db_ids::DBProjectId
         )
         .execute(&mut *transaction)
         .await?;
@@ -2265,15 +2266,15 @@ pub async fn project_unfollow(
             )
         })?;
 
-    let user_id: db_ids::UserId = user.id.into();
+    let user_id: db_ids::DBUserId = user.id.into();
     let project_id = result.inner.id;
 
     let following = sqlx::query!(
         "
         SELECT EXISTS(SELECT 1 FROM mod_follows mf WHERE mf.follower_id = $1 AND mf.mod_id = $2)
         ",
-        user_id as db_ids::UserId,
-        project_id as db_ids::ProjectId
+        user_id as db_ids::DBUserId,
+        project_id as db_ids::DBProjectId
     )
     .fetch_one(&**pool)
     .await?
@@ -2289,7 +2290,7 @@ pub async fn project_unfollow(
             SET follows = follows - 1
             WHERE id = $1
             ",
-            project_id as db_ids::ProjectId,
+            project_id as db_ids::DBProjectId,
         )
         .execute(&mut *transaction)
         .await?;
@@ -2299,8 +2300,8 @@ pub async fn project_unfollow(
             DELETE FROM mod_follows
             WHERE follower_id = $1 AND mod_id = $2
             ",
-            user_id as db_ids::UserId,
-            project_id as db_ids::ProjectId
+            user_id as db_ids::DBUserId,
+            project_id as db_ids::DBProjectId
         )
         .execute(&mut *transaction)
         .await?;
@@ -2384,7 +2385,7 @@ pub async fn project_get_organization(
                 logged_in
                     || x.accepted
                     || user_id
-                        .map(|y: crate::database::models::UserId| {
+                        .map(|y: crate::database::models::DBUserId| {
                             y == x.user_id
                         })
                         .unwrap_or(false)

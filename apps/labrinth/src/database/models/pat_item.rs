@@ -16,11 +16,11 @@ const PATS_USERS_NAMESPACE: &str = "pats_users";
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct PersonalAccessToken {
-    pub id: PatId,
+    pub id: DBPatId,
     pub name: String,
     pub access_token: String,
     pub scopes: Scopes,
-    pub user_id: UserId,
+    pub user_id: DBUserId,
     pub created: DateTime<Utc>,
     pub expires: DateTime<Utc>,
     pub last_used: Option<DateTime<Utc>>,
@@ -42,11 +42,11 @@ impl PersonalAccessToken {
                 $6
             )
             ",
-            self.id as PatId,
+            self.id as DBPatId,
             self.name,
             self.access_token,
             self.scopes.bits() as i64,
-            self.user_id as UserId,
+            self.user_id as DBUserId,
             self.expires
         )
         .execute(&mut **transaction)
@@ -73,7 +73,7 @@ impl PersonalAccessToken {
     }
 
     pub async fn get_many_ids<'a, E>(
-        pat_ids: &[PatId],
+        pat_ids: &[DBPatId],
         exec: E,
         redis: &RedisPool,
     ) -> Result<Vec<PersonalAccessToken>, DatabaseError>
@@ -126,11 +126,11 @@ impl PersonalAccessToken {
                     .fetch(exec)
                     .try_fold(DashMap::new(), |acc, x| {
                         let pat = PersonalAccessToken {
-                            id: PatId(x.id),
+                            id: DBPatId(x.id),
                             name: x.name,
                             access_token: x.access_token.clone(),
                             scopes: Scopes::from_bits(x.scopes as u64).unwrap_or(Scopes::NONE),
-                            user_id: UserId(x.user_id),
+                            user_id: DBUserId(x.user_id),
                             created: x.created,
                             expires: x.expires,
                             last_used: x.last_used,
@@ -149,10 +149,10 @@ impl PersonalAccessToken {
     }
 
     pub async fn get_user_pats<'a, E>(
-        user_id: UserId,
+        user_id: DBUserId,
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<PatId>, DatabaseError>
+    ) -> Result<Vec<DBPatId>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -166,10 +166,10 @@ impl PersonalAccessToken {
             .await?;
 
         if let Some(res) = res {
-            return Ok(res.into_iter().map(PatId).collect());
+            return Ok(res.into_iter().map(DBPatId).collect());
         }
 
-        let db_pats: Vec<PatId> = sqlx::query!(
+        let db_pats: Vec<DBPatId> = sqlx::query!(
             "
             SELECT id
             FROM pats
@@ -179,8 +179,8 @@ impl PersonalAccessToken {
             user_id.0,
         )
         .fetch(exec)
-        .map_ok(|x| PatId(x.id))
-        .try_collect::<Vec<PatId>>()
+        .map_ok(|x| DBPatId(x.id))
+        .try_collect::<Vec<DBPatId>>()
         .await?;
 
         redis
@@ -195,7 +195,7 @@ impl PersonalAccessToken {
     }
 
     pub async fn clear_cache(
-        clear_pats: Vec<(Option<PatId>, Option<String>, Option<UserId>)>,
+        clear_pats: Vec<(Option<DBPatId>, Option<String>, Option<DBUserId>)>,
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
@@ -223,14 +223,14 @@ impl PersonalAccessToken {
     }
 
     pub async fn remove(
-        id: PatId,
+        id: DBPatId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Option<()>, sqlx::error::Error> {
         sqlx::query!(
             "
             DELETE FROM pats WHERE id = $1
             ",
-            id as PatId,
+            id as DBPatId,
         )
         .execute(&mut **transaction)
         .await?;

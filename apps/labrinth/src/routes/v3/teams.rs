@@ -5,15 +5,14 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::team_item::TeamAssociationId;
 use crate::database::models::{Organization, Team, TeamMember, User};
 use crate::database::redis::RedisPool;
+use crate::models::ids::TeamId;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
-use crate::models::teams::{
-    OrganizationPermissions, ProjectPermissions, TeamId,
-};
-use crate::models::users::UserId;
+use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use actix_web::{HttpRequest, HttpResponse, web};
+use ariadne::ids::UserId;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -102,7 +101,7 @@ pub async fn team_members_get_project(
                 logged_in
                     || x.accepted
                     || user_id
-                        .map(|y: crate::database::models::UserId| {
+                        .map(|y: crate::database::models::DBUserId| {
                             y == x.user_id
                         })
                         .unwrap_or(false)
@@ -177,7 +176,7 @@ pub async fn team_members_get_organization(
                 logged_in
                     || x.accepted
                     || user_id
-                        .map(|y: crate::database::models::UserId| {
+                        .map(|y: crate::database::models::DBUserId| {
                             y == x.user_id
                         })
                         .unwrap_or(false)
@@ -243,7 +242,7 @@ pub async fn team_members_get(
             logged_in
                 || x.accepted
                 || user_id
-                    .map(|y: crate::database::models::UserId| y == x.user_id)
+                    .map(|y: crate::database::models::DBUserId| y == x.user_id)
                     .unwrap_or(false)
         })
         .flat_map(|data| {
@@ -277,7 +276,7 @@ pub async fn teams_get(
     let team_ids = serde_json::from_str::<Vec<TeamId>>(&ids.ids)?
         .into_iter()
         .map(|x| x.into())
-        .collect::<Vec<crate::database::models::ids::TeamId>>();
+        .collect::<Vec<crate::database::models::ids::DBTeamId>>();
 
     let teams_data =
         TeamMember::get_from_team_full_many(&team_ids, &**pool, &redis).await?;
@@ -997,10 +996,11 @@ pub async fn transfer_ownership(
             .fetch_all(&mut *transaction)
             .await?;
 
-            let team_ids: Vec<crate::database::models::ids::TeamId> = team_ids
-                .into_iter()
-                .map(|x| TeamId(x.team_id as u64).into())
-                .collect();
+            let team_ids: Vec<crate::database::models::ids::DBTeamId> =
+                team_ids
+                    .into_iter()
+                    .map(|x| TeamId(x.team_id as u64).into())
+                    .collect();
 
             // If the owner of the organization is a member of the project, remove them
             for team_id in team_ids.iter() {

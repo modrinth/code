@@ -17,37 +17,37 @@ const FLOWS_NAMESPACE: &str = "flows";
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum Flow {
     OAuth {
-        user_id: Option<UserId>,
+        user_id: Option<DBUserId>,
         url: String,
         provider: AuthProvider,
     },
     Login2FA {
-        user_id: UserId,
+        user_id: DBUserId,
     },
     Initialize2FA {
-        user_id: UserId,
+        user_id: DBUserId,
         secret: String,
     },
     ForgotPassword {
-        user_id: UserId,
+        user_id: DBUserId,
     },
     ConfirmEmail {
-        user_id: UserId,
+        user_id: DBUserId,
         confirm_email: String,
     },
     MinecraftAuth,
     InitOAuthAppApproval {
-        user_id: UserId,
-        client_id: OAuthClientId,
-        existing_authorization_id: Option<OAuthClientAuthorizationId>,
+        user_id: DBUserId,
+        client_id: DBOAuthClientId,
+        existing_authorization_id: Option<DBOAuthClientAuthorizationId>,
         scopes: Scopes,
         redirect_uris: OAuthRedirectUris,
         state: Option<String>,
     },
     OAuthAuthorizationCodeSupplied {
-        user_id: UserId,
-        client_id: OAuthClientId,
-        authorization_id: OAuthClientAuthorizationId,
+        user_id: DBUserId,
+        client_id: DBOAuthClientId,
+        authorization_id: DBOAuthClientAuthorizationId,
         scopes: Scopes,
         original_redirect_uri: Option<String>, // Needed for https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.3
     },

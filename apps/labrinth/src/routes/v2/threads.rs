@@ -2,8 +2,8 @@ use std::sync::Arc;
 
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
-use crate::models::ids::ThreadMessageId;
-use crate::models::threads::{MessageBody, Thread, ThreadId};
+use crate::models::ids::{ThreadId, ThreadMessageId};
+use crate::models::threads::{MessageBody, Thread};
 use crate::models::v2::threads::LegacyThread;
 use crate::queue::session::AuthQueue;
 use crate::routes::{ApiError, v2_reroute, v3};

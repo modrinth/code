@@ -1,5 +1,5 @@
 use crate::auth::get_user_from_headers;
-use crate::database::models::UserId;
+use crate::database::models::DBUserId;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::models::users::UserFriend;
@@ -77,8 +77,8 @@ pub async fn add_friend(
             .await?;
 
             async fn send_friend_status(
-                user_id: UserId,
-                friend_id: UserId,
+                user_id: DBUserId,
+                friend_id: DBUserId,
                 sockets: &ActiveSockets,
                 redis: &RedisPool,
             ) -> Result<(), ApiError> {

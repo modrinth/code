@@ -19,11 +19,9 @@ use actix_web::{
     test::{self, TestRequest},
 };
 use async_trait::async_trait;
+use labrinth::models::ids::ProjectId;
 use labrinth::{
-    models::{
-        projects::{ProjectId, VersionType},
-        v3::projects::Version,
-    },
+    models::{projects::VersionType, v3::projects::Version},
     routes::v3::version_file::FileUpdateData,
     util::actix::AppendsMultipart,
 };

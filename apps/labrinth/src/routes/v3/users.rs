@@ -1,10 +1,5 @@
 use std::{collections::HashMap, sync::Arc};
 
-use actix_web::{HttpRequest, HttpResponse, web};
-use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
-use validator::Validate;
-
 use super::{ApiError, oauth_clients::get_user_clients};
 use crate::util::img::delete_old_images;
 use crate::{
@@ -13,7 +8,6 @@ use crate::{
     file_hosting::FileHost,
     models::{
         collections::{Collection, CollectionStatus},
-        ids::UserId,
         notifications::Notification,
         pats::Scopes,
         projects::Project,
@@ -22,6 +16,11 @@ use crate::{
     queue::session::AuthQueue,
     util::{routes::read_from_payload, validate::validation_errors_to_string},
 };
+use actix_web::{HttpRequest, HttpResponse, web};
+use ariadne::ids::UserId;
+use serde::{Deserialize, Serialize};
+use sqlx::PgPool;
+use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.route("user", web::get().to(user_auth_get));
@@ -89,9 +88,12 @@ pub async fn admin_user_email(
         )
     })?;
 
-    let user =
-        User::get_id(crate::database::models::UserId(user_id), &**pool, &redis)
-            .await?;
+    let user = User::get_id(
+        crate::database::models::DBUserId(user_id),
+        &**pool,
+        &redis,
+    )
+    .await?;
 
     if let Some(user) = user {
         Ok(HttpResponse::Ok().json(user))
@@ -420,7 +422,7 @@ pub async fn user_edit(
                         WHERE (id = $2)
                         ",
                         username,
-                        id as crate::database::models::ids::UserId,
+                        id as crate::database::models::ids::DBUserId,
                     )
                     .execute(&mut *transaction)
                     .await?;
@@ -439,7 +441,7 @@ pub async fn user_edit(
                     WHERE (id = $2)
                     ",
                     bio.as_deref(),
-                    id as crate::database::models::ids::UserId,
+                    id as crate::database::models::ids::DBUserId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -462,7 +464,7 @@ pub async fn user_edit(
                     WHERE (id = $2)
                     ",
                     role,
-                    id as crate::database::models::ids::UserId,
+                    id as crate::database::models::ids::DBUserId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -483,7 +485,7 @@ pub async fn user_edit(
                     WHERE (id = $2)
                     ",
                     badges.bits() as i64,
-                    id as crate::database::models::ids::UserId,
+                    id as crate::database::models::ids::DBUserId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -504,7 +506,7 @@ pub async fn user_edit(
                     WHERE (id = $2)
                     ",
                     venmo_handle,
-                    id as crate::database::models::ids::UserId,
+                    id as crate::database::models::ids::DBUserId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -518,7 +520,7 @@ pub async fn user_edit(
                     WHERE (id = $2)
                     ",
                     allow_friend_requests,
-                    id as crate::database::models::ids::UserId,
+                    id as crate::database::models::ids::DBUserId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -606,7 +608,7 @@ pub async fn user_icon_edit(
             ",
             upload_result.url,
             upload_result.raw_url,
-            actual_user.id as crate::database::models::ids::UserId,
+            actual_user.id as crate::database::models::ids::DBUserId,
         )
         .execute(&**pool)
         .await?;
@@ -658,7 +660,7 @@ pub async fn user_icon_delete(
             SET avatar_url = NULL, raw_avatar_url = NULL
             WHERE (id = $1)
             ",
-            actual_user.id as crate::database::models::ids::UserId,
+            actual_user.id as crate::database::models::ids::DBUserId,
         )
         .execute(&**pool)
         .await?;

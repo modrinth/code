@@ -143,7 +143,7 @@ pub async fn export(
     .fetch_all(pool.as_ref())
     .await?
     .into_iter()
-    .map(|x| crate::database::models::ids::ThreadMessageId(x.id))
+    .map(|x| crate::database::models::ids::DBThreadMessageId(x.id))
     .collect::<Vec<_>>();
 
     let messages =
@@ -163,7 +163,7 @@ pub async fn export(
     .fetch_all(pool.as_ref())
     .await?
     .into_iter()
-    .map(|x| crate::database::models::ids::ImageId(x.id))
+    .map(|x| crate::database::models::ids::DBImageId(x.id))
     .collect::<Vec<_>>();
 
     let uploaded_images = crate::database::models::image_item::Image::get_many(

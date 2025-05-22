@@ -5,10 +5,11 @@ use crate::event::emit::emit_friend;
 use crate::state::tunnel::InternalTunnelSocket;
 use crate::state::{ProcessManager, Profile, TunnelSocket};
 use crate::util::fetch::{FetchSemaphore, fetch_advanced, fetch_json};
+use ariadne::ids::UserId;
 use ariadne::networking::message::{
     ClientToServerMessage, ServerToClientMessage,
 };
-use ariadne::users::{UserId, UserStatus};
+use ariadne::users::UserStatus;
 use async_tungstenite::WebSocketStream;
 use async_tungstenite::tokio::{ConnectStream, connect_async};
 use async_tungstenite::tungstenite::Message;

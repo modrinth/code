@@ -45,7 +45,7 @@ pub async fn notifications_get(
     .await?
     .1;
 
-    use database::models::NotificationId as DBNotificationId;
+    use database::models::DBNotificationId;
     use database::models::notification_item::Notification as DBNotification;
 
     let notification_ids: Vec<DBNotificationId> =
@@ -240,7 +240,7 @@ pub async fn notifications_read(
         )
         .await?;
 
-    let mut notifications: Vec<database::models::ids::NotificationId> =
+    let mut notifications: Vec<database::models::ids::DBNotificationId> =
         Vec::new();
 
     for notification in notifications_data {
@@ -293,7 +293,7 @@ pub async fn notifications_delete(
         )
         .await?;
 
-    let mut notifications: Vec<database::models::ids::NotificationId> =
+    let mut notifications: Vec<database::models::ids::DBNotificationId> =
         Vec::new();
 
     for notification in notifications_data {

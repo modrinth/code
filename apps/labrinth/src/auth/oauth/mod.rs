@@ -6,7 +6,7 @@ use crate::database::models::oauth_client_authorization_item::OAuthClientAuthori
 use crate::database::models::oauth_client_item::OAuthClient as DBOAuthClient;
 use crate::database::models::oauth_token_item::OAuthAccessToken;
 use crate::database::models::{
-    OAuthClientAuthorizationId, generate_oauth_access_token_id,
+    DBOAuthClientAuthorizationId, generate_oauth_access_token_id,
     generate_oauth_client_authorization_id,
 };
 use crate::database::redis::RedisPool;
@@ -417,9 +417,9 @@ fn generate_access_token() -> String {
 }
 
 async fn init_oauth_code_flow(
-    user_id: crate::database::models::UserId,
+    user_id: crate::database::models::DBUserId,
     client_id: OAuthClientId,
-    authorization_id: OAuthClientAuthorizationId,
+    authorization_id: DBOAuthClientAuthorizationId,
     scopes: Scopes,
     redirect_uris: OAuthRedirectUris,
     state: Option<String>,

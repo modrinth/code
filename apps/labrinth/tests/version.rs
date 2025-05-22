@@ -15,8 +15,9 @@ use common::database::USER_USER_PAT;
 use common::environment::{with_test_environment, with_test_environment_all};
 use futures::StreamExt;
 use labrinth::database::models::version_item::VERSIONS_NAMESPACE;
+use labrinth::models::ids::VersionId;
 use labrinth::models::projects::{
-    Dependency, DependencyType, VersionId, VersionStatus, VersionType,
+    Dependency, DependencyType, VersionStatus, VersionType,
 };
 use labrinth::routes::v3::version_file::FileUpdateData;
 use serde_json::json;

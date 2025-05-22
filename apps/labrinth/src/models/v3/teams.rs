@@ -1,14 +1,8 @@
-use super::ids::Base62Id;
 use crate::bitflags_serde_impl;
+use crate::models::ids::TeamId;
 use crate::models::users::User;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-
-/// The ID of a team
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(from = "Base62Id")]
-#[serde(into = "Base62Id")]
-pub struct TeamId(pub u64);
 
 pub const DEFAULT_ROLE: &str = "Member";
 

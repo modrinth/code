@@ -4,8 +4,8 @@ use crate::database::models::loader_fields::Loader;
 use crate::database::models::project_item::QueryProject;
 use crate::database::models::version_item::{QueryFile, QueryVersion};
 use crate::database::redis::RedisPool;
+use crate::models::ids::{ProjectId, VersionId};
 use crate::models::pats::Scopes;
-use crate::models::projects::{ProjectId, VersionId};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::{auth::get_user_from_headers, database};
@@ -103,7 +103,7 @@ pub async fn maven_metadata(
         WHERE mod_id = $1 AND status = ANY($2)
         ORDER BY ordering ASC NULLS LAST, date_published ASC
         ",
-        project.inner.id as database::models::ids::ProjectId,
+        project.inner.id as database::models::ids::DBProjectId,
         &*crate::models::projects::VersionStatus::iterator()
             .filter(|x| x.is_listed())
             .map(|x| x.to_string())

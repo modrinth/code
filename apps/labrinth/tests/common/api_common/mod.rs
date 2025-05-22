@@ -5,17 +5,17 @@ use self::models::{
     CommonProject, CommonTeamMember, CommonVersion,
 };
 use self::request_data::{ImageData, ProjectCreationRequestData};
+use super::dummy_data::TestFile;
 use actix_web::dev::ServiceResponse;
 use async_trait::async_trait;
+use labrinth::models::ids::ProjectId;
 use labrinth::{
     LabrinthConfig,
     models::{
-        projects::{ProjectId, VersionType},
+        projects::VersionType,
         teams::{OrganizationPermissions, ProjectPermissions},
     },
 };
-
-use super::dummy_data::TestFile;
 
 pub mod generic;
 pub mod models;

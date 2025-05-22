@@ -1,9 +1,9 @@
-use super::ids::{ProjectId, UserId};
-use super::{CollectionId, ReportId, ThreadId};
+use super::ids::{DBProjectId, DBUserId};
+use super::{DBCollectionId, DBReportId, DBThreadId};
 use crate::database::models;
 use crate::database::models::charge_item::ChargeItem;
 use crate::database::models::user_subscription_item::UserSubscriptionItem;
-use crate::database::models::{DatabaseError, OrganizationId};
+use crate::database::models::{DBOrganizationId, DatabaseError};
 use crate::database::redis::RedisPool;
 use crate::models::billing::ChargeStatus;
 use crate::models::users::Badges;
@@ -20,7 +20,7 @@ const USERS_PROJECTS_NAMESPACE: &str = "users_projects";
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct User {
-    pub id: UserId,
+    pub id: DBUserId,
 
     pub github_id: Option<i64>,
     pub discord_id: Option<i64>,
@@ -72,7 +72,7 @@ impl User {
                 $14, $15, $16, $17, $18, $19, $20, $21
             )
             ",
-            self.id as UserId,
+            self.id as DBUserId,
             &self.username,
             self.email.as_ref(),
             self.avatar_url.as_ref(),
@@ -114,20 +114,20 @@ impl User {
     }
 
     pub async fn get_id<'a, 'b, E>(
-        id: UserId,
+        id: DBUserId,
         executor: E,
         redis: &RedisPool,
     ) -> Result<Option<User>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        User::get_many(&[crate::models::ids::UserId::from(id)], executor, redis)
+        User::get_many(&[ariadne::ids::UserId::from(id)], executor, redis)
             .await
             .map(|x| x.into_iter().next())
     }
 
     pub async fn get_many_ids<'a, E>(
-        user_ids: &[UserId],
+        user_ids: &[DBUserId],
         exec: E,
         redis: &RedisPool,
     ) -> Result<Vec<User>, DatabaseError>
@@ -136,7 +136,7 @@ impl User {
     {
         let ids = user_ids
             .iter()
-            .map(|x| crate::models::ids::UserId::from(*x))
+            .map(|x| ariadne::ids::UserId::from(*x))
             .collect::<Vec<_>>();
         User::get_many(&ids, exec, redis).await
     }
@@ -188,7 +188,7 @@ impl User {
                     .fetch(exec)
                     .try_fold(DashMap::new(), |acc, u| {
                         let user = User {
-                            id: UserId(u.id),
+                            id: DBUserId(u.id),
                             github_id: u.github_id,
                             discord_id: u.discord_id,
                             gitlab_id: u.gitlab_id,
@@ -227,7 +227,7 @@ impl User {
     pub async fn get_email<'a, E>(
         email: &str,
         exec: E,
-    ) -> Result<Option<UserId>, sqlx::Error>
+    ) -> Result<Option<DBUserId>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -241,14 +241,14 @@ impl User {
         .fetch_optional(exec)
         .await?;
 
-        Ok(user_pass.map(|x| UserId(x.id)))
+        Ok(user_pass.map(|x| DBUserId(x.id)))
     }
 
     pub async fn get_projects<'a, E>(
-        user_id: UserId,
+        user_id: DBUserId,
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<ProjectId>, DatabaseError>
+    ) -> Result<Vec<DBProjectId>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -257,7 +257,7 @@ impl User {
         let mut redis = redis.connect().await?;
 
         let cached_projects = redis
-            .get_deserialized_from_json::<Vec<ProjectId>>(
+            .get_deserialized_from_json::<Vec<DBProjectId>>(
                 USERS_PROJECTS_NAMESPACE,
                 &user_id.0.to_string(),
             )
@@ -274,11 +274,11 @@ impl User {
             WHERE tm.user_id = $1
             ORDER BY m.downloads DESC
             ",
-            user_id as UserId,
+            user_id as DBUserId,
         )
         .fetch(exec)
-        .map_ok(|m| ProjectId(m.id))
-        .try_collect::<Vec<ProjectId>>()
+        .map_ok(|m| DBProjectId(m.id))
+        .try_collect::<Vec<DBProjectId>>()
         .await?;
 
         redis
@@ -294,9 +294,9 @@ impl User {
     }
 
     pub async fn get_organizations<'a, E>(
-        user_id: UserId,
+        user_id: DBUserId,
         exec: E,
-    ) -> Result<Vec<OrganizationId>, sqlx::Error>
+    ) -> Result<Vec<DBOrganizationId>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -308,20 +308,20 @@ impl User {
             INNER JOIN team_members tm ON tm.team_id = o.team_id AND tm.accepted = TRUE
             WHERE tm.user_id = $1
             ",
-            user_id as UserId,
+            user_id as DBUserId,
         )
         .fetch(exec)
-        .map_ok(|m| OrganizationId(m.id))
-        .try_collect::<Vec<OrganizationId>>()
+        .map_ok(|m| DBOrganizationId(m.id))
+        .try_collect::<Vec<DBOrganizationId>>()
         .await?;
 
         Ok(orgs)
     }
 
     pub async fn get_collections<'a, E>(
-        user_id: UserId,
+        user_id: DBUserId,
         exec: E,
-    ) -> Result<Vec<CollectionId>, sqlx::Error>
+    ) -> Result<Vec<DBCollectionId>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -332,20 +332,20 @@ impl User {
             SELECT c.id FROM collections c
             WHERE c.user_id = $1
             ",
-            user_id as UserId,
+            user_id as DBUserId,
         )
         .fetch(exec)
-        .map_ok(|m| CollectionId(m.id))
-        .try_collect::<Vec<CollectionId>>()
+        .map_ok(|m| DBCollectionId(m.id))
+        .try_collect::<Vec<DBCollectionId>>()
         .await?;
 
         Ok(projects)
     }
 
     pub async fn get_follows<'a, E>(
-        user_id: UserId,
+        user_id: DBUserId,
         exec: E,
-    ) -> Result<Vec<ProjectId>, sqlx::Error>
+    ) -> Result<Vec<DBProjectId>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -356,20 +356,20 @@ impl User {
             SELECT mf.mod_id FROM mod_follows mf
             WHERE mf.follower_id = $1
             ",
-            user_id as UserId,
+            user_id as DBUserId,
         )
         .fetch(exec)
-        .map_ok(|m| ProjectId(m.mod_id))
-        .try_collect::<Vec<ProjectId>>()
+        .map_ok(|m| DBProjectId(m.mod_id))
+        .try_collect::<Vec<DBProjectId>>()
         .await?;
 
         Ok(projects)
     }
 
     pub async fn get_reports<'a, E>(
-        user_id: UserId,
+        user_id: DBUserId,
         exec: E,
-    ) -> Result<Vec<ReportId>, sqlx::Error>
+    ) -> Result<Vec<DBReportId>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -380,18 +380,18 @@ impl User {
             SELECT r.id FROM reports r
             WHERE r.user_id = $1
             ",
-            user_id as UserId,
+            user_id as DBUserId,
         )
         .fetch(exec)
-        .map_ok(|m| ReportId(m.id))
-        .try_collect::<Vec<ReportId>>()
+        .map_ok(|m| DBReportId(m.id))
+        .try_collect::<Vec<DBReportId>>()
         .await?;
 
         Ok(reports)
     }
 
     pub async fn get_backup_codes<'a, E>(
-        user_id: UserId,
+        user_id: DBUserId,
         exec: E,
     ) -> Result<Vec<String>, sqlx::Error>
     where
@@ -404,7 +404,7 @@ impl User {
             SELECT code FROM user_backup_codes
             WHERE user_id = $1
             ",
-            user_id as UserId,
+            user_id as DBUserId,
         )
         .fetch(exec)
         .map_ok(|m| to_base62(m.code as u64))
@@ -415,7 +415,7 @@ impl User {
     }
 
     pub async fn clear_caches(
-        user_ids: &[(UserId, Option<String>)],
+        user_ids: &[(DBUserId, Option<String>)],
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
@@ -435,7 +435,7 @@ impl User {
     }
 
     pub async fn clear_project_cache(
-        user_ids: &[UserId],
+        user_ids: &[DBUserId],
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
@@ -452,7 +452,7 @@ impl User {
     }
 
     pub async fn remove(
-        id: UserId,
+        id: DBUserId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
@@ -462,7 +462,7 @@ impl User {
             User::clear_caches(&[(id, Some(delete_user.username))], redis)
                 .await?;
 
-            let deleted_user: UserId =
+            let deleted_user: DBUserId =
                 crate::models::users::DELETED_USER.into();
 
             sqlx::query!(
@@ -471,8 +471,8 @@ impl User {
                 SET user_id = $1
                 WHERE (user_id = $2 AND is_owner = TRUE)
                 ",
-                deleted_user as UserId,
-                id as UserId,
+                deleted_user as DBUserId,
+                id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -483,8 +483,8 @@ impl User {
                 SET author_id = $1
                 WHERE (author_id = $2)
                 ",
-                deleted_user as UserId,
-                id as UserId,
+                deleted_user as DBUserId,
+                id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -495,7 +495,7 @@ impl User {
                 SELECT n.id FROM notifications n
                 WHERE n.user_id = $1
                 ",
-                id as UserId,
+                id as DBUserId,
             )
             .fetch(&mut **transaction)
             .map_ok(|m| m.id)
@@ -507,7 +507,7 @@ impl User {
                 DELETE FROM notifications
                 WHERE user_id = $1
                 ",
-                id as UserId,
+                id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -528,10 +528,10 @@ impl User {
                 FROM collections
                 WHERE user_id = $1
                 ",
-                id as UserId,
+                id as DBUserId,
             )
             .fetch(&mut **transaction)
-            .map_ok(|x| CollectionId(x.id))
+            .map_ok(|x| DBCollectionId(x.id))
             .try_collect::<Vec<_>>()
             .await?;
 
@@ -547,10 +547,10 @@ impl User {
                 INNER JOIN reports r ON t.report_id = r.id AND (r.user_id = $1 OR r.reporter = $1)
                 WHERE report_id IS NOT NULL
                 ",
-                id as UserId,
+                id as DBUserId,
             )
             .fetch(&mut **transaction)
-            .map_ok(|x| ThreadId(x.id))
+            .map_ok(|x| DBThreadId(x.id))
             .try_collect::<Vec<_>>()
             .await?;
 
@@ -563,7 +563,7 @@ impl User {
                 DELETE FROM reports
                 WHERE user_id = $1 OR reporter = $1
                 ",
-                id as UserId,
+                id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -573,7 +573,7 @@ impl User {
                 DELETE FROM mod_follows
                 WHERE follower_id = $1
                 ",
-                id as UserId,
+                id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -583,7 +583,7 @@ impl User {
                 DELETE FROM team_members
                 WHERE user_id = $1
                 ",
-                id as UserId,
+                id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -593,7 +593,7 @@ impl User {
                 DELETE FROM payouts_values
                 WHERE user_id = $1
                 ",
-                id as UserId,
+                id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -603,7 +603,7 @@ impl User {
                 DELETE FROM payouts
                 WHERE user_id = $1
                 ",
-                id as UserId,
+                id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -614,8 +614,8 @@ impl User {
                 SET body = '{"type": "deleted"}', author_id = $2
                 WHERE author_id = $1
                 "#,
-                id as UserId,
-                deleted_user as UserId,
+                id as DBUserId,
+                deleted_user as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -625,7 +625,7 @@ impl User {
                 DELETE FROM threads_members
                 WHERE user_id = $1
                 ",
-                id as UserId,
+                id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -635,7 +635,7 @@ impl User {
                 DELETE FROM sessions
                 WHERE user_id = $1
                 ",
-                id as UserId,
+                id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -645,7 +645,7 @@ impl User {
                 DELETE FROM pats
                 WHERE user_id = $1
                 ",
-                id as UserId,
+                id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -655,7 +655,7 @@ impl User {
                 DELETE FROM friends
                 WHERE user_id = $1 OR friend_id = $1
                 ",
-                id as UserId,
+                id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -683,8 +683,8 @@ impl User {
                 SET user_id = $1
                 WHERE user_id = $2
                 ",
-                deleted_user as UserId,
-                id as UserId,
+                deleted_user as DBUserId,
+                id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -694,7 +694,7 @@ impl User {
                 DELETE FROM user_backup_codes
                 WHERE user_id = $1
                 ",
-                id as UserId,
+                id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -704,7 +704,7 @@ impl User {
                 DELETE FROM users
                 WHERE id = $1
                 ",
-                id as UserId,
+                id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;

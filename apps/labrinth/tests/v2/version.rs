@@ -1,16 +1,15 @@
+use crate::assert_status;
+use crate::common::api_common::{ApiProject, ApiVersion};
+use crate::common::api_v2::ApiV2;
 use actix_http::StatusCode;
 use actix_web::test;
 use futures::StreamExt;
-use labrinth::models::projects::VersionId;
+use labrinth::models::ids::VersionId;
 use labrinth::{
     models::projects::{Loader, VersionStatus, VersionType},
     routes::v2::version_file::FileUpdateData,
 };
 use serde_json::json;
-
-use crate::assert_status;
-use crate::common::api_common::{ApiProject, ApiVersion};
-use crate::common::api_v2::ApiV2;
 
 use crate::common::api_v2::request_data::get_public_project_creation_data;
 use crate::common::dummy_data::{DummyProjectAlpha, DummyProjectBeta};

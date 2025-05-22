@@ -1,5 +1,6 @@
 //! Theseus state management system
-use ariadne::users::{UserId, UserStatus};
+use ariadne::ids::UserId;
+use ariadne::users::UserStatus;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};

@@ -90,7 +90,7 @@ pub async fn filter_visible_project_ids(
     user_option: &Option<User>,
     pool: &PgPool,
     hide_unlisted: bool,
-) -> Result<Vec<crate::database::models::ProjectId>, ApiError> {
+) -> Result<Vec<crate::database::models::DBProjectId>, ApiError> {
     let mut return_projects = Vec::new();
     let mut check_projects = Vec::new();
 
@@ -129,11 +129,11 @@ pub async fn filter_enlisted_projects_ids(
     projects: Vec<&Project>,
     user_option: &Option<User>,
     pool: &PgPool,
-) -> Result<Vec<crate::database::models::ProjectId>, ApiError> {
+) -> Result<Vec<crate::database::models::DBProjectId>, ApiError> {
     let mut return_projects = vec![];
 
     if let Some(user) = user_option {
-        let user_id: models::ids::UserId = user.id.into();
+        let user_id: models::ids::DBUserId = user.id.into();
 
         use futures::TryStreamExt;
 
@@ -154,7 +154,7 @@ pub async fn filter_enlisted_projects_ids(
                 .iter()
                 .filter_map(|x| x.organization_id.map(|x| x.0))
                 .collect::<Vec<_>>(),
-            user_id as database::models::ids::UserId,
+            user_id as database::models::ids::DBUserId,
         )
         .fetch(pool)
         .map_ok(|row| {
@@ -236,7 +236,7 @@ pub async fn filter_visible_version_ids(
     user_option: &Option<User>,
     pool: &PgPool,
     redis: &RedisPool,
-) -> Result<Vec<crate::database::models::VersionId>, ApiError> {
+) -> Result<Vec<crate::database::models::DBVersionId>, ApiError> {
     let mut return_versions = Vec::new();
     let mut check_versions = Vec::new();
 
@@ -291,7 +291,7 @@ pub async fn filter_enlisted_version_ids(
     user_option: &Option<User>,
     pool: &PgPool,
     redis: &RedisPool,
-) -> Result<Vec<crate::database::models::VersionId>, ApiError> {
+) -> Result<Vec<crate::database::models::DBVersionId>, ApiError> {
     let mut return_versions = Vec::new();
 
     // Get project ids of versions

@@ -4352,6 +4352,7 @@ dependencies = [
  "maxminddb",
  "meilisearch-sdk",
  "murmur2",
+ "paste",
  "prometheus",
  "rand 0.8.5",
  "rand_chacha 0.3.1",

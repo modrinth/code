@@ -1,5 +1,5 @@
 use crate::auth::{AuthenticationError, get_user_from_headers};
-use crate::database::models::UserId;
+use crate::database::models::DBUserId;
 use crate::database::models::session_item::Session as DBSession;
 use crate::database::models::session_item::SessionBuilder;
 use crate::database::redis::RedisPool;
@@ -85,7 +85,7 @@ pub async fn get_session_metadata(
 
 pub async fn issue_session(
     req: HttpRequest,
-    user_id: UserId,
+    user_id: DBUserId,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     redis: &RedisPool,
 ) -> Result<DBSession, AuthenticationError> {

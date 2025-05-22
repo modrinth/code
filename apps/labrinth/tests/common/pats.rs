@@ -23,7 +23,7 @@ pub async fn create_test_pat(
         name: format!("test_pat_{}", scopes.bits()),
         access_token: format!("mrp_{}", id.0),
         scopes,
-        user_id: database::models::ids::UserId(user_id),
+        user_id: database::models::ids::DBUserId(user_id),
         created: Utc::now(),
         expires: Utc::now() + chrono::Duration::days(1),
         last_used: None,

@@ -8,16 +8,14 @@ use crate::database::models::{self, User, image_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostingError};
 use crate::models::error::ApiError;
-use crate::models::ids::{ImageId, OrganizationId};
+use crate::models::ids::{ImageId, OrganizationId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    License, Link, MonetizationStatus, ProjectId, ProjectStatus, VersionId,
-    VersionStatus,
+    License, Link, MonetizationStatus, ProjectStatus, VersionStatus,
 };
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
-use crate::models::users::UserId;
 use crate::queue::session::AuthQueue;
 use crate::search::indexing::IndexingError;
 use crate::util::img::upload_image_optimized;
@@ -27,6 +25,7 @@ use actix_multipart::{Field, Multipart};
 use actix_web::http::StatusCode;
 use actix_web::web::{self, Data};
 use actix_web::{HttpRequest, HttpResponse};
+use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::to_base62;
 use chrono::Utc;
 use futures::stream::StreamExt;
@@ -397,13 +396,13 @@ async fn project_create_inner(
             serde_json::from_str(&format!("\"{}\"", create_data.slug)).ok();
 
         if let Some(slug_project_id) = slug_project_id_option {
-            let slug_project_id: models::ids::ProjectId =
+            let slug_project_id: models::ids::DBProjectId =
                 slug_project_id.into();
             let results = sqlx::query!(
                 "
                 SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)
                 ",
-                slug_project_id as models::ids::ProjectId
+                slug_project_id as models::ids::DBProjectId
             )
             .fetch_one(&mut **transaction)
             .await
@@ -817,7 +816,7 @@ async fn project_create_inner(
                     SET mod_id = $1
                     WHERE id = $2
                     ",
-                    id as models::ids::ProjectId,
+                    id as models::ids::DBProjectId,
                     image_id.0 as i64
                 )
                 .execute(&mut **transaction)
