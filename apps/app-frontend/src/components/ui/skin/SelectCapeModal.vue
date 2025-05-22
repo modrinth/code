@@ -97,7 +97,7 @@ defineExpose({
               <template #icon>
                 <XIcon />
               </template>
-              <span>No Cape</span>
+              <span>None</span>
             </CapeLikeTextButton>
             <CapeButton
               v-for="cape in capes"

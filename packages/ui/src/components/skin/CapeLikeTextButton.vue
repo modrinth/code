@@ -22,23 +22,23 @@ withDefaults(
     @click="emit('click')"
   >
     <span
-      :class="
+      :class="[
+        'block rounded-lg group-active:scale-95 transition-all border-2 relative',
         highlighted
-          ? `bg-brand highlighted-outer-glow`
-          : `bg-button-bg opacity-75 group-hover:opacity-100`
-      "
-      class="block p-[3px] rounded-lg border-0 group-active:scale-95 transition-all"
+          ? 'border-brand highlighted-glow'
+          : 'border-transparent opacity-75 group-hover:opacity-100'
+      ]"
     >
-      <span
-        class="flex flex-col items-center justify-center aspect-[10/16] w-[60px] min-h-[96px] rounded-[5px] bg-black/10 relative overflow-hidden"
-        :class="{ 'highlighted-inner-shadow': highlighted }"
-      >
-        <div class="mb-1">
-          <slot name="icon"></slot>
-        </div>
-
-        <span class="text-xs group-hover:text-white" :class="{ 'text-white': highlighted }">
-          <slot name="default"></slot>
+      <span class="block p-[3px] rounded-lg bg-button-bg">
+        <span
+          class="flex flex-col items-center justify-center aspect-[10/16] w-[60px] min-h-[96px] rounded-[5px] bg-black/10 relative overflow-hidden"
+        >
+          <div class="mb-1">
+            <slot name="icon"></slot>
+          </div>
+          <span class="text-xs group-hover:text-white" :class="{ 'text-white': highlighted }">
+            <slot></slot>
+          </span>
         </span>
       </span>
     </span>
@@ -46,17 +46,17 @@ withDefaults(
 </template>
 
 <style lang="scss" scoped>
-.highlighted-inner-shadow::before {
+.highlighted-glow::before {
   content: '';
   position: absolute;
   inset: 0;
-  box-shadow: inset 0 0 4px 4px rgba(0, 0, 0, 0.2);
-  z-index: 2;
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 @supports (background-color: color-mix(in srgb, transparent, transparent)) {
-  .highlighted-outer-glow {
-    box-shadow: 0 0 4px 2px color-mix(in srgb, var(--color-brand), transparent 70%);
+  .highlighted-glow::before {
+    box-shadow: inset 0 0 2px 4px color-mix(in srgb, var(--color-brand), transparent 10%);
   }
 }
 </style>

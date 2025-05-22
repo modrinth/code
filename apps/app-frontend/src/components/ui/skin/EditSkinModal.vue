@@ -65,7 +65,7 @@
               <template #icon>
                 <XIcon />
               </template>
-              <span>No Cape</span>
+              <span>None</span>
             </CapeLikeTextButton>
 
             <CapeButton
