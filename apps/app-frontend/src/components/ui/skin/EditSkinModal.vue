@@ -23,26 +23,12 @@
         </div>
       </div>
 
-      <div class="flex flex-col gap-4 w-full">
+      <div class="flex flex-col gap-4 w-full min-h-[20rem]">
         <section>
           <h2 class="text-base font-semibold mb-2">Texture</h2>
-          <Card class="!bg-bg p-4 flex flex-col items-center gap-4">
-            <FileInput
-              :max-size="8000"
-              accept="image/png"
-              :prompt="mode === 'edit' ? 'Replace skin' : 'Upload a skin'"
-              class="btn btn-primary"
-              @change="onTextureSelected"
-            >
-              <UploadIcon aria-hidden="true" />
-            </FileInput>
-
-            <div v-if="fileName || mode === 'new'" class="flex items-center gap-2">
-              <InfoIcon v-if="!fileName" class="text-brand-blue" />
-              <CheckCircleIcon v-else class="text-brand-green" />
-              <small v-tooltip="fileName" class="truncate">{{ fileName || 'No skin uploaded yet.' }}</small>
-            </div>
-          </Card>
+          <Button>
+            <UploadIcon /> Replace texture
+          </Button>
         </section>
 
         <section>
@@ -91,7 +77,7 @@
       </div>
     </div>
 
-    <div class="flex gap-2 mt-6">
+    <div class="flex gap-2 mt-12">
       <ButtonStyled color="brand" :disabled="disableSave">
         <Button v-tooltip="saveTooltip" :disabled="disableSave" @click="save">
           <CheckIcon v-if="mode === 'new'" /><SaveIcon v-else />
@@ -124,7 +110,7 @@ import {
 } from '@/helpers/skins.ts'
 import { handleError } from '@/store/notifications'
 import {
-  CheckCircleIcon, InfoIcon, UploadIcon,
+  UploadIcon,
   CheckIcon, SaveIcon, XIcon, TrashIcon, ChevronRightIcon
 } from '@modrinth/assets'
 

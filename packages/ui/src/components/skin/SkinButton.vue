@@ -1,11 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import ButtonStyled from "../base/ButtonStyled.vue"
-import { commonMessages } from '../../utils'
-import { EditIcon } from '@modrinth/assets'
-import { useVIntl } from '@vintl/vintl'
-
-const { formatMessage } = useVIntl()
 
 const emit = defineEmits<{
   (e: 'select'): void
@@ -16,10 +10,11 @@ const props = withDefaults(defineProps<{
   forwardImageSrc?: string
   backwardImageSrc?: string
   selected: boolean
-  editable?: boolean
   tooltip?: string
 }>(), {
-  editable: false,
+  forwardImageSrc: undefined,
+  backwardImageSrc: undefined,
+  tooltip: undefined,
 })
 
 const imagesLoaded = ref({
@@ -71,20 +66,11 @@ function onImageLoad(type: 'forward' | 'backward') {
     </span>
 
     <span
-      v-if="editable"
-      class="absolute pointer-events-none inset-0 flex items-end justify-start p-2 translate-y-4 scale-75 opacity-0 transition-all group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 group-hover:translate-x-0"
+      v-if="$slots['overlay-buttons']"
+      class="absolute inset-0 flex items-end justify-start p-2 translate-y-4 scale-75 opacity-0 transition-all group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 group-hover:translate-x-0"
+      style="pointer-events: none;"
     >
-      <ButtonStyled color="brand">
-        <button
-          class="pointer-events-auto shadow-black/50 shadow-lg"
-          @mousedown.stop
-          @mouseup.stop
-          @click="(e) => emit('edit', e)"
-        >
-          <EditIcon />
-          {{ formatMessage(commonMessages.editButton) }}
-        </button>
-      </ButtonStyled>
+      <slot name="overlay-buttons" />
     </span>
   </div>
 </template>
