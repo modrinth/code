@@ -1,14 +1,22 @@
 <script setup lang="ts">
-import { UpdatedIcon, PlusIcon, ExcitedRinthbot, LogInIcon, SpinnerIcon, EditIcon, TrashIcon } from '@modrinth/assets'
+import {
+  UpdatedIcon,
+  PlusIcon,
+  ExcitedRinthbot,
+  LogInIcon,
+  SpinnerIcon,
+  EditIcon,
+  TrashIcon,
+} from '@modrinth/assets'
 import {
   ButtonStyled,
   SkinPreviewRenderer,
   SkinButton,
   SkinLikeTextButton,
   Button,
-  ConfirmModal
+  ConfirmModal,
 } from '@modrinth/ui'
-import type { Ref } from 'vue';
+import type { Ref } from 'vue'
 import { ref, computed, useTemplateRef, watch, onMounted, onUnmounted, inject } from 'vue'
 import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
 import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
@@ -28,9 +36,9 @@ import type { Cape, Skin } from '@/helpers/skins.ts'
 import { get_default_user, users, login as login_flow } from '@/helpers/auth'
 import type { RenderResult } from '@/helpers/rendering/batchSkinRenderer.ts'
 import { generateSkinPreviews, map } from '@/helpers/rendering/batchSkinRenderer.ts'
-import { handleSevereError } from "@/store/error";
-import { trackEvent } from "@/helpers/analytics";
-import type AccountsCard from "@/components/ui/AccountsCard.vue";
+import { handleSevereError } from '@/store/error'
+import { trackEvent } from '@/helpers/analytics'
+import type AccountsCard from '@/components/ui/AccountsCard.vue'
 
 const editSkinModal = useTemplateRef('editSkinModal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
@@ -64,7 +72,9 @@ const currentCape = computed(() => {
 const skinTexture = computed(() => selectedSkin.value?.texture ?? '')
 const capeTexture = computed(() => currentCape.value?.texture)
 const skinVariant = computed(() => selectedSkin.value?.variant)
-const skinNametag = computed(() => settings.value.hide_nametag_skins_page ? undefined : username.value)
+const skinNametag = computed(() =>
+  settings.value.hide_nametag_skins_page ? undefined : username.value,
+)
 
 let userCheckInterval: number | null = null
 
@@ -141,7 +151,7 @@ function getBakedSkinTextures(skin: Skin): RenderResult | undefined {
 }
 
 async function login() {
-  accountsCard.value.setLoginDisabled(true);
+  accountsCard.value.setLoginDisabled(true)
   const loggedIn = await login_flow().catch(handleSevereError)
 
   if (loggedIn && accountsCard) {
@@ -149,7 +159,7 @@ async function login() {
   }
 
   trackEvent('AccountLogIn')
-  accountsCard.value.setLoginDisabled(false);
+  accountsCard.value.setLoginDisabled(false)
 }
 
 function openUploadSkinModal(e: MouseEvent) {
@@ -158,9 +168,9 @@ function openUploadSkinModal(e: MouseEvent) {
 
 function onSkinFileUploaded(file: File) {
   const fakeEvent = new MouseEvent('click')
-  file.arrayBuffer().then(buf => {
+  file.arrayBuffer().then((buf) => {
     const skinTexture = new Uint8Array(buf)
-    
+
     if (editSkinModal.value && editSkinModal.value.shouldRestoreModal) {
       editSkinModal.value.restoreWithNewTexture(skinTexture, file.name)
     } else {
@@ -181,16 +191,16 @@ function onUploadCanceled() {
 
 watch(
   () => selectedSkin.value?.cape_id,
-  () => {}
+  () => {},
 )
 
 onMounted(() => {
-  userCheckInterval = window.setInterval(checkUserChanges, 250);
+  userCheckInterval = window.setInterval(checkUserChanges, 250)
 })
 
 onUnmounted(() => {
   if (userCheckInterval !== null) {
-    window.clearInterval(userCheckInterval);
+    window.clearInterval(userCheckInterval)
   }
 })
 
@@ -198,9 +208,9 @@ async function checkUserChanges() {
   try {
     const defaultId = await get_default_user()
     if (defaultId !== currentUserId.value) {
-      await loadCurrentUser();
-      await loadCapes();
-      await loadSkins();
+      await loadCurrentUser()
+      await loadCapes()
+      await loadSkins()
     }
   } catch (error) {
     if (currentUser.value) {
@@ -221,7 +231,11 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
     @open-upload-modal="openUploadSkinModal"
   />
   <SelectCapeModal ref="selectCapeModal" :capes="capes" @select="handleCapeSelected" />
-  <UploadSkinModal ref="uploadSkinModal" @uploaded="onSkinFileUploaded" @canceled="onUploadCanceled" />
+  <UploadSkinModal
+    ref="uploadSkinModal"
+    @uploaded="onSkinFileUploaded"
+    @canceled="onUploadCanceled"
+  />
   <ConfirmModal
     ref="deleteSkinModal"
     title="Are you sure you want to delete this skin?"
@@ -237,20 +251,21 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
         <ButtonStyled :disabled="!!selectedSkin?.cape_id">
           <button
             v-tooltip="
-      selectedSkin?.cape_id
-        ? 'The equipped skin is overriding the default cape.'
-        : undefined
-        "
+              selectedSkin?.cape_id
+                ? 'The equipped skin is overriding the default cape.'
+                : undefined
+            "
             :disabled="!!selectedSkin?.cape_id"
             @click="
-          (e: MouseEvent) => selectCapeModal?.show(
-            e,
-            selectedSkin?.texture_key,
-            currentCape,
-            skinTexture,
-            skinVariant
-          )
-        "
+              (e: MouseEvent) =>
+                selectCapeModal?.show(
+                  e,
+                  selectedSkin?.texture_key,
+                  currentCape,
+                  skinTexture,
+                  skinVariant,
+                )
+            "
           >
             <UpdatedIcon />
             Change cape
@@ -275,15 +290,11 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
       <section class="flex flex-col gap-2 mt-1">
         <h2 class="text-lg font-bold m-0 text-primary">Saved skins</h2>
         <div class="skin-card-grid">
-          <SkinLikeTextButton
-              class="skin-card"
-              tooltip="Add a skin"
-              @click="openUploadSkinModal"
-            >
-              <template #icon>
-                <PlusIcon class="w-5 h-5 stroke-2" />
-              </template>
-              <span>Add a skin</span>
+          <SkinLikeTextButton class="skin-card" tooltip="Add a skin" @click="openUploadSkinModal">
+            <template #icon>
+              <PlusIcon class="w-5 h-5 stroke-2" />
+            </template>
+            <span>Add a skin</span>
           </SkinLikeTextButton>
 
           <SkinButton
@@ -296,24 +307,24 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
             @select="changeSkin(skin)"
           >
             <template #overlay-buttons>
-                  <Button
-                    color="green"
-                    aria-label="Edit skin"
-                    @click.stop="(e) => editSkinModal?.show(e, skin)"
-                  >
-                    <EditIcon class="w-5 h-5" /> Edit
-                  </Button>
-                <Button
-                    v-show="!skin.is_equipped"
-                    v-tooltip="'Delete skin'"
-                    aria-label="Delete skin"
-                    color="red"
-                    class="!rounded-[100%]"
-                    icon-only
-                    @click.stop="() => confirmDeleteSkin(skin)"
-                  >
-                    <TrashIcon class="w-5 h-5" />
-                  </Button>
+              <Button
+                color="green"
+                aria-label="Edit skin"
+                @click.stop="(e) => editSkinModal?.show(e, skin)"
+              >
+                <EditIcon class="w-5 h-5" /> Edit
+              </Button>
+              <Button
+                v-show="!skin.is_equipped"
+                v-tooltip="'Delete skin'"
+                aria-label="Delete skin"
+                color="red"
+                class="!rounded-[100%]"
+                icon-only
+                @click.stop="() => confirmDeleteSkin(skin)"
+              >
+                <TrashIcon class="w-5 h-5" />
+              </Button>
             </template>
           </SkinButton>
         </div>
@@ -338,14 +349,32 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
   </div>
 
   <div v-else class="flex items-center justify-center min-h-[50vh] pt-[25%]">
-    <div class="bg-bg-raised rounded-lg p-7 flex flex-col gap-5 shadow-md relative max-w-xl w-full mx-auto">
-      <img :src="ExcitedRinthbot" alt="Excited Modrinth Bot" class="absolute -top-28 right-8 md:right-20 h-28 w-auto" />
-      <div class="absolute top-0 left-0 w-full h-[1px] opacity-40 bg-gradient-to-r from-transparent via-green-500 to-transparent" style="background: linear-gradient(to right, transparent 2rem, var(--color-green) calc(100% - 13rem), var(--color-green) calc(100% - 5rem), transparent calc(100% - 2rem))"></div>
+    <div
+      class="bg-bg-raised rounded-lg p-7 flex flex-col gap-5 shadow-md relative max-w-xl w-full mx-auto"
+    >
+      <img
+        :src="ExcitedRinthbot"
+        alt="Excited Modrinth Bot"
+        class="absolute -top-28 right-8 md:right-20 h-28 w-auto"
+      />
+      <div
+        class="absolute top-0 left-0 w-full h-[1px] opacity-40 bg-gradient-to-r from-transparent via-green-500 to-transparent"
+        style="
+          background: linear-gradient(
+            to right,
+            transparent 2rem,
+            var(--color-green) calc(100% - 13rem),
+            var(--color-green) calc(100% - 5rem),
+            transparent calc(100% - 2rem)
+          );
+        "
+      ></div>
 
       <div class="flex flex-col gap-5">
         <h1 class="text-3xl font-extrabold m-0">Please sign-in</h1>
         <p class="text-lg m-0">
-          Please sign into your Minecraft account to use the skin management features of the Modrinth app.
+          Please sign into your Minecraft account to use the skin management features of the
+          Modrinth app.
         </p>
         <ButtonStyled v-show="accountsCard" color="brand" :disabled="accountsCard.loginDisabled">
           <Button :disabled="accountsCard.loginDisabled" @click="login">

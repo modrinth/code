@@ -1,9 +1,7 @@
 <template>
   <NewModal ref="modal" @on-hide="hide(true)">
     <template #title>
-      <span class="text-lg font-extrabold text-contrast">
-        Upload skin texture
-      </span>
+      <span class="text-lg font-extrabold text-contrast"> Upload skin texture </span>
     </template>
     <div class="relative">
       <div
@@ -12,10 +10,22 @@
         @drop.prevent="handleFileOperation"
         @dragover.prevent
       >
-        <p class="mx-auto mb-0 text-primary text-xl text-center flex items-center gap-2"><UploadIcon /> Select skin texture file</p>
-        <p class="mx-auto mt-0 text-secondary text-sm text-center">Drag and drop or click here to browse</p>
-        <p class="mx-auto mt-0 text-secondary text-xs text-center">Only 64x64 PNG files are accepted</p>
-        <input ref="fileInput" type="file" accept="image/png" class="hidden" @change="handleFileOperation" />
+        <p class="mx-auto mb-0 text-primary text-xl text-center flex items-center gap-2">
+          <UploadIcon /> Select skin texture file
+        </p>
+        <p class="mx-auto mt-0 text-secondary text-sm text-center">
+          Drag and drop or click here to browse
+        </p>
+        <p class="mx-auto mt-0 text-secondary text-xs text-center">
+          Only 64x64 PNG files are accepted
+        </p>
+        <input
+          ref="fileInput"
+          type="file"
+          accept="image/png"
+          class="hidden"
+          @change="handleFileOperation"
+        />
       </div>
     </div>
   </NewModal>
@@ -24,7 +34,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { UploadIcon } from '@modrinth/assets'
-import { useNotifications } from "@/store/state"
+import { useNotifications } from '@/store/state'
 import { NewModal } from '@modrinth/ui'
 
 const notifications = useNotifications()
@@ -71,30 +81,30 @@ async function validateImageDimensions(file: File): Promise<boolean> {
 
 async function handleFileOperation(e: Event | DragEvent) {
   // Get files from either drag event or file input
-  const files = (e as DragEvent).dataTransfer?.files || (e.target as HTMLInputElement).files;
+  const files = (e as DragEvent).dataTransfer?.files || (e.target as HTMLInputElement).files
   if (!files || files.length === 0) {
-    return;
+    return
   }
-  const file = files[0];
+  const file = files[0]
   if (file.type !== 'image/png') {
     notifications.addNotification({
       title: 'Invalid file type.',
       text: 'Only PNG files are accepted.',
       type: 'error',
-    });
-    return;
+    })
+    return
   }
-  const isValidDimensions = await validateImageDimensions(file);
+  const isValidDimensions = await validateImageDimensions(file)
   if (!isValidDimensions) {
     notifications.addNotification({
       title: 'Invalid dimensions.',
       text: 'Only 64x64 PNG files are accepted.',
       type: 'error',
-    });
-    return;
+    })
+    return
   }
-  emit('uploaded', file);
-  hide();
+  emit('uploaded', file)
+  hide()
 }
 
 defineExpose({ show, hide })

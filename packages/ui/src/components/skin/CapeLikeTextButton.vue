@@ -26,7 +26,7 @@ withDefaults(
         'block rounded-lg group-active:scale-95 transition-all border-2 relative',
         highlighted
           ? 'border-brand highlighted-glow'
-          : 'border-transparent opacity-75 group-hover:opacity-100'
+          : 'border-transparent opacity-75 group-hover:opacity-100',
       ]"
     >
       <span class="block p-[3px] rounded-lg bg-button-bg">

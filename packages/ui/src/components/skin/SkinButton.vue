@@ -6,20 +6,23 @@ const emit = defineEmits<{
   (e: 'edit', event: MouseEvent): void
 }>()
 
-const props = withDefaults(defineProps<{
-  forwardImageSrc?: string
-  backwardImageSrc?: string
-  selected: boolean
-  tooltip?: string
-}>(), {
-  forwardImageSrc: undefined,
-  backwardImageSrc: undefined,
-  tooltip: undefined,
-})
+const props = withDefaults(
+  defineProps<{
+    forwardImageSrc?: string
+    backwardImageSrc?: string
+    selected: boolean
+    tooltip?: string
+  }>(),
+  {
+    forwardImageSrc: undefined,
+    backwardImageSrc: undefined,
+    tooltip: undefined,
+  },
+)
 
 const imagesLoaded = ref({
   forward: Boolean(props.forwardImageSrc),
-  backward: Boolean(props.backwardImageSrc)
+  backward: Boolean(props.backwardImageSrc),
 })
 
 function onImageLoad(type: 'forward' | 'backward') {
@@ -31,9 +34,7 @@ function onImageLoad(type: 'forward' | 'backward') {
   <div
     v-tooltip="tooltip ?? undefined"
     class="group flex relative overflow-hidden rounded-xl border-solid border-2 transition-colors duration-200"
-    :class="[
-      selected ? 'border-brand' : 'border-transparent hover:border-white/50'
-    ]"
+    :class="[selected ? 'border-brand' : 'border-transparent hover:border-white/50']"
   >
     <button
       class="skin-btn-bg absolute inset-0 cursor-pointer p-0 border-none group-hover:brightness-125"
@@ -41,13 +42,19 @@ function onImageLoad(type: 'forward' | 'backward') {
       @click="emit('select')"
     ></button>
 
-    <div v-if="!(imagesLoaded.forward && imagesLoaded.backward)" class="skeleton-loader w-full h-full">
+    <div
+      v-if="!(imagesLoaded.forward && imagesLoaded.backward)"
+      class="skeleton-loader w-full h-full"
+    >
       <div class="skeleton absolute inset-0 aspect-[5/7]"></div>
     </div>
 
     <span
       v-show="imagesLoaded.forward && imagesLoaded.backward"
-      :class="['skin-button__image-parent pointer-events-none w-full h-full grid [transform-style:preserve-3d] transition-transform duration-500 group-hover:[transform:rotateY(180deg)] place-items-stretch', selected ? 'with-shadow' : '']"
+      :class="[
+        'skin-button__image-parent pointer-events-none w-full h-full grid [transform-style:preserve-3d] transition-transform duration-500 group-hover:[transform:rotateY(180deg)] place-items-stretch',
+        selected ? 'with-shadow' : '',
+      ]"
     >
       <img
         alt=""
@@ -68,7 +75,7 @@ function onImageLoad(type: 'forward' | 'backward') {
     <span
       v-if="$slots['overlay-buttons']"
       class="absolute inset-0 flex items-end justify-start p-1 gap-1 translate-y-4 scale-75 opacity-0 transition-all group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 group-hover:translate-x-0"
-      style="pointer-events: none;"
+      style="pointer-events: none"
     >
       <slot name="overlay-buttons" />
     </span>
@@ -104,7 +111,13 @@ function onImageLoad(type: 'forward' | 'backward') {
   background: linear-gradient(180deg, #3a3d47 0%, #33363d 100%);
 }
 .skin-btn-bg.selected {
-  background: linear-gradient(157.61deg, var(--color-brand) -76.68%, rgba(27, 217, 106, 0.534) -38.61%, rgba(12, 89, 44, 0.6) 100.4%), #27292F;
+  background: linear-gradient(
+      157.61deg,
+      var(--color-brand) -76.68%,
+      rgba(27, 217, 106, 0.534) -38.61%,
+      rgba(12, 89, 44, 0.6) 100.4%
+    ),
+    #27292f;
 }
 
 .skin-btn-bg.selected:hover,

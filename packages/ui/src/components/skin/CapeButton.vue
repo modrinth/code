@@ -19,13 +19,18 @@ const props = withDefaults(
   },
 )
 
-console.log(props);
+console.log(props)
 
 const highlighted = computed(() => props.selected ?? props.isEquipped)
 </script>
 
 <template>
-  <button v-tooltip="name" class="block border-0 m-0 p-0 bg-transparent group cursor-pointer" :aria-label="name" @click="emit('select')">
+  <button
+    v-tooltip="name"
+    class="block border-0 m-0 p-0 bg-transparent group cursor-pointer"
+    :aria-label="name"
+    @click="emit('select')"
+  >
     <span
       :class="
         highlighted

@@ -7,7 +7,7 @@ import {
   CapeButton,
   CapeLikeTextButton,
   SkinPreviewRenderer,
-  NewModal
+  NewModal,
 } from '@modrinth/ui'
 import { CheckIcon, XIcon } from '@modrinth/assets'
 
@@ -24,11 +24,11 @@ const props = defineProps<{
 
 const sortedCapes = computed(() => {
   return [...props.capes].sort((a, b) => {
-    const nameA = (a.name || '').toLowerCase();
-    const nameB = (b.name || '').toLowerCase();
-    return nameA.localeCompare(nameB);
-  });
-});
+    const nameA = (a.name || '').toLowerCase()
+    const nameB = (b.name || '').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+})
 
 const currentSkinId = ref<string | undefined>()
 const currentSkinTexture = ref<string | undefined>()
@@ -93,7 +93,7 @@ defineExpose({
             :variant="currentSkinVariant"
             :scale="1.4"
             :fov="50"
-            :initial-rotation="Math.PI + (Math.PI / 8)"
+            :initial-rotation="Math.PI + Math.PI / 8"
             class="h-full w-full"
           />
         </div>

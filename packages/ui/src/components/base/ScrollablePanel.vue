@@ -66,13 +66,13 @@ function onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
 
 <style lang="scss" scoped>
 @property --_top-fade-height {
-  syntax: "<length-percentage>";
+  syntax: '<length-percentage>';
   inherits: false;
   initial-value: 0%;
 }
 
 @property --_bottom-fade-height {
-  syntax: "<length-percentage>";
+  syntax: '<length-percentage>';
   inherits: false;
   initial-value: 0%;
 }
@@ -88,15 +88,17 @@ function onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
   display: flex;
   overflow: hidden;
   position: relative;
-  transition: --_top-fade-height 0.05s linear, --_bottom-fade-height 0.05s linear;
+  transition:
+    --_top-fade-height 0.05s linear,
+    --_bottom-fade-height 0.05s linear;
 
   --_fade-height: 3rem;
 
   mask-image: linear-gradient(
-      transparent,
-      rgb(0 0 0 / 100%) var(--_top-fade-height, 0%),
-      rgb(0 0 0 / 100%) calc(100% - var(--_bottom-fade-height, 0%)),
-      transparent 100%
+    transparent,
+    rgb(0 0 0 / 100%) var(--_top-fade-height, 0%),
+    rgb(0 0 0 / 100%) calc(100% - var(--_bottom-fade-height, 0%)),
+    transparent 100%
   );
 
   &.top-fade {
