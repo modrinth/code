@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-full h-full">
+  <div class="relative w-full h-full cursor-grab">
     <div class="absolute bottom-[18%] left-0 right-0 flex justify-center items-center mb-2 pointer-events-none z-10">
       <span class="text-primary text-xs px-2 py-1 rounded-full backdrop-blur-sm">
         Drag to rotate
