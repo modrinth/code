@@ -85,7 +85,7 @@ pub async fn collection_create(
     let collection_id: CollectionId =
         generate_collection_id(&mut transaction).await?.into();
 
-    let initial_project_ids = project_item::Project::get_many(
+    let initial_project_ids = project_item::DBProject::get_many(
         &collection_create_data.projects,
         &mut *transaction,
         &redis,
@@ -149,7 +149,7 @@ pub async fn collections_get(
         .collect::<Result<Vec<_>, _>>()?;
 
     let collections_data =
-        database::models::Collection::get_many(&ids, &**pool, &redis).await?;
+        database::models::DBCollection::get_many(&ids, &**pool, &redis).await?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -179,7 +179,7 @@ pub async fn collection_get(
 
     let id = database::models::DBCollectionId(parse_base62(&string)? as i64);
     let collection_data =
-        database::models::Collection::get(id, &**pool, &redis).await?;
+        database::models::DBCollection::get(id, &**pool, &redis).await?;
     let user_option = get_user_from_headers(
         &req,
         &**pool,
@@ -242,7 +242,8 @@ pub async fn collection_edit(
 
     let string = info.into_inner().0;
     let id = database::models::DBCollectionId(parse_base62(&string)? as i64);
-    let result = database::models::Collection::get(id, &**pool, &redis).await?;
+    let result =
+        database::models::DBCollection::get(id, &**pool, &redis).await?;
 
     if let Some(collection_item) = result {
         if !can_modify_collection(&collection_item, &user) {
@@ -322,7 +323,7 @@ pub async fn collection_edit(
                 .collect_vec();
             let mut validated_project_ids = Vec::new();
             for project_id in new_project_ids {
-                let project = database::models::Project::get(
+                let project = database::models::DBProject::get(
                     project_id, &**pool, &redis,
                 )
                 .await?
@@ -359,7 +360,7 @@ pub async fn collection_edit(
         }
 
         transaction.commit().await?;
-        database::models::Collection::clear_cache(collection_item.id, &redis)
+        database::models::DBCollection::clear_cache(collection_item.id, &redis)
             .await?;
 
         Ok(HttpResponse::NoContent().body(""))
@@ -397,7 +398,7 @@ pub async fn collection_icon_edit(
     let string = info.into_inner().0;
     let id = database::models::DBCollectionId(parse_base62(&string)? as i64);
     let collection_item =
-        database::models::Collection::get(id, &**pool, &redis)
+        database::models::DBCollection::get(id, &**pool, &redis)
             .await?
             .ok_or_else(|| {
                 ApiError::InvalidInput(
@@ -451,7 +452,7 @@ pub async fn collection_icon_edit(
     .await?;
 
     transaction.commit().await?;
-    database::models::Collection::clear_cache(collection_item.id, &redis)
+    database::models::DBCollection::clear_cache(collection_item.id, &redis)
         .await?;
 
     Ok(HttpResponse::NoContent().body(""))
@@ -478,7 +479,7 @@ pub async fn delete_collection_icon(
     let string = info.into_inner().0;
     let id = database::models::DBCollectionId(parse_base62(&string)? as i64);
     let collection_item =
-        database::models::Collection::get(id, &**pool, &redis)
+        database::models::DBCollection::get(id, &**pool, &redis)
             .await?
             .ok_or_else(|| {
                 ApiError::InvalidInput(
@@ -509,7 +510,7 @@ pub async fn delete_collection_icon(
     .await?;
 
     transaction.commit().await?;
-    database::models::Collection::clear_cache(collection_item.id, &redis)
+    database::models::DBCollection::clear_cache(collection_item.id, &redis)
         .await?;
 
     Ok(HttpResponse::NoContent().body(""))
@@ -534,7 +535,7 @@ pub async fn collection_delete(
 
     let string = info.into_inner().0;
     let id = database::models::DBCollectionId(parse_base62(&string)? as i64);
-    let collection = database::models::Collection::get(id, &**pool, &redis)
+    let collection = database::models::DBCollection::get(id, &**pool, &redis)
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(
@@ -546,7 +547,7 @@ pub async fn collection_delete(
     }
     let mut transaction = pool.begin().await?;
 
-    let result = database::models::Collection::remove(
+    let result = database::models::DBCollection::remove(
         collection.id,
         &mut transaction,
         &redis,
@@ -554,7 +555,7 @@ pub async fn collection_delete(
     .await?;
 
     transaction.commit().await?;
-    database::models::Collection::clear_cache(collection.id, &redis).await?;
+    database::models::DBCollection::clear_cache(collection.id, &redis).await?;
 
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))
@@ -564,7 +565,7 @@ pub async fn collection_delete(
 }
 
 fn can_modify_collection(
-    collection: &database::models::Collection,
+    collection: &database::models::DBCollection,
     user: &models::users::User,
 ) -> bool {
     collection.user_id == user.id.into() || user.role.is_mod()

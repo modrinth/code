@@ -8,7 +8,7 @@ use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use std::convert::{TryFrom, TryInto};
 
-pub struct UserSubscriptionItem {
+pub struct DBUserSubscription {
     pub id: DBUserSubscriptionId,
     pub user_id: DBUserId,
     pub price_id: DBProductPriceId,
@@ -18,7 +18,7 @@ pub struct UserSubscriptionItem {
     pub metadata: Option<SubscriptionMetadata>,
 }
 
-struct UserSubscriptionResult {
+struct UserSubscriptionQueryResult {
     id: i64,
     user_id: i64,
     price_id: i64,
@@ -31,7 +31,7 @@ struct UserSubscriptionResult {
 macro_rules! select_user_subscriptions_with_predicate {
     ($predicate:tt, $param:ident) => {
         sqlx::query_as!(
-            UserSubscriptionResult,
+            UserSubscriptionQueryResult,
             r#"
             SELECT
                 us.id, us.user_id, us.price_id, us.interval, us.created, us.status, us.metadata
@@ -43,11 +43,11 @@ macro_rules! select_user_subscriptions_with_predicate {
     };
 }
 
-impl TryFrom<UserSubscriptionResult> for UserSubscriptionItem {
+impl TryFrom<UserSubscriptionQueryResult> for DBUserSubscription {
     type Error = serde_json::Error;
 
-    fn try_from(r: UserSubscriptionResult) -> Result<Self, Self::Error> {
-        Ok(UserSubscriptionItem {
+    fn try_from(r: UserSubscriptionQueryResult) -> Result<Self, Self::Error> {
+        Ok(DBUserSubscription {
             id: DBUserSubscriptionId(r.id),
             user_id: DBUserId(r.user_id),
             price_id: DBProductPriceId(r.price_id),
@@ -59,18 +59,18 @@ impl TryFrom<UserSubscriptionResult> for UserSubscriptionItem {
     }
 }
 
-impl UserSubscriptionItem {
+impl DBUserSubscription {
     pub async fn get(
         id: DBUserSubscriptionId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Option<UserSubscriptionItem>, DatabaseError> {
+    ) -> Result<Option<DBUserSubscription>, DatabaseError> {
         Ok(Self::get_many(&[id], exec).await?.into_iter().next())
     }
 
     pub async fn get_many(
         ids: &[DBUserSubscriptionId],
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<UserSubscriptionItem>, DatabaseError> {
+    ) -> Result<Vec<DBUserSubscription>, DatabaseError> {
         let ids = ids.iter().map(|id| id.0).collect_vec();
         let ids_ref: &[i64] = &ids;
         let results = select_user_subscriptions_with_predicate!(
@@ -89,7 +89,7 @@ impl UserSubscriptionItem {
     pub async fn get_all_user(
         user_id: DBUserId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<UserSubscriptionItem>, DatabaseError> {
+    ) -> Result<Vec<DBUserSubscription>, DatabaseError> {
         let user_id = user_id.0;
         let results = select_user_subscriptions_with_predicate!(
             "WHERE us.user_id = $1",
@@ -107,7 +107,7 @@ impl UserSubscriptionItem {
     pub async fn get_all_servers(
         status: Option<SubscriptionStatus>,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<UserSubscriptionItem>, DatabaseError> {
+    ) -> Result<Vec<DBUserSubscription>, DatabaseError> {
         let status = status.map(|x| x.as_str());
 
         let results = select_user_subscriptions_with_predicate!(

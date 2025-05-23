@@ -35,8 +35,8 @@ pub struct Collection {
     pub projects: Vec<ProjectId>,
 }
 
-impl From<database::models::Collection> for Collection {
-    fn from(c: database::models::Collection) -> Self {
+impl From<database::models::DBCollection> for Collection {
+    fn from(c: database::models::DBCollection) -> Self {
         Self {
             id: c.id.into(),
             user: c.user_id.into(),

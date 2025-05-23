@@ -1,6 +1,6 @@
 use crate::auth::AuthenticationError;
 use crate::auth::validate::get_user_record_from_bearer_token;
-use crate::database::models::friend_item::FriendItem;
+use crate::database::models::friend_item::DBFriend;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::models::users::User;
@@ -85,8 +85,7 @@ pub async fn ws_init(
     };
 
     let friends =
-        FriendItem::get_user_friends(user.id.into(), Some(true), &**pool)
-            .await?;
+        DBFriend::get_user_friends(user.id.into(), Some(true), &**pool).await?;
 
     let friend_statuses = if !friends.is_empty() {
         let db = db.clone();
@@ -383,7 +382,7 @@ pub async fn broadcast_to_local_friends(
         user_id,
         message,
         sockets,
-        FriendItem::get_user_friends(user_id.into(), Some(true), pool).await?,
+        DBFriend::get_user_friends(user_id.into(), Some(true), pool).await?,
     )
     .await
 }
@@ -392,7 +391,7 @@ async fn broadcast_to_known_local_friends(
     user_id: UserId,
     message: ServerToClientMessage,
     sockets: &ActiveSockets,
-    friends: Vec<FriendItem>,
+    friends: Vec<DBFriend>,
 ) -> Result<(), crate::database::models::DatabaseError> {
     // FIXME Probably shouldn't be using database errors for this. Maybe ApiError?
 

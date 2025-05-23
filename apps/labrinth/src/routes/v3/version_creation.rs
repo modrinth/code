@@ -7,7 +7,7 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::version_item::{
     DependencyBuilder, VersionBuilder, VersionFileBuilder,
 };
-use crate::database::models::{self, Organization, image_item};
+use crate::database::models::{self, DBOrganization, image_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::ids::{ImageId, ProjectId, VersionId};
@@ -216,7 +216,7 @@ async fn version_create_inner(
                 let project_id: models::DBProjectId = version_create_data.project_id.unwrap().into();
 
                 // Ensure that the project this version is being added to exists
-                if models::Project::get_id(project_id, &mut **transaction, redis)
+                if models::DBProject::get_id(project_id, &mut **transaction, redis)
                     .await?
                     .is_none()
                 {
@@ -227,7 +227,7 @@ async fn version_create_inner(
 
                 // Check that the user creating this version is a team member
                 // of the project the version is being added to.
-                let team_member = models::TeamMember::get_from_user_id_project(
+                let team_member = models::DBTeamMember::get_from_user_id_project(
                     project_id,
                     user.id.into(),
                     false,
@@ -236,14 +236,14 @@ async fn version_create_inner(
                 .await?;
 
                 // Get organization attached, if exists, and the member project permissions
-                let organization = models::Organization::get_associated_organization_project_id(
+                let organization = models::DBOrganization::get_associated_organization_project_id(
                     project_id,
                     &mut **transaction,
                 )
                 .await?;
 
                 let organization_team_member = if let Some(organization) = &organization {
-                    models::TeamMember::get_from_user_id(
+                    models::DBTeamMember::get_from_user_id(
                         organization.team_id,
                         user.id.into(),
                         &mut **transaction,
@@ -481,7 +481,7 @@ async fn version_create_inner(
 
     for image_id in version_data.uploaded_images {
         if let Some(db_image) =
-            image_item::Image::get(image_id.into(), &mut **transaction, redis)
+            image_item::DBImage::get(image_id.into(), &mut **transaction, redis)
                 .await?
         {
             let image: Image = db_image.into();
@@ -505,7 +505,7 @@ async fn version_create_inner(
             .execute(&mut **transaction)
             .await?;
 
-            image_item::Image::clear_cache(image.id.into(), redis).await?;
+            image_item::DBImage::clear_cache(image.id.into(), redis).await?;
         } else {
             return Err(CreateError::InvalidInput(format!(
                 "Image {image_id} does not exist"
@@ -513,7 +513,7 @@ async fn version_create_inner(
         }
     }
 
-    models::Project::clear_cache(project_id, None, Some(true), redis).await?;
+    models::DBProject::clear_cache(project_id, None, Some(true), redis).await?;
 
     let project_status = sqlx::query!(
         "SELECT status FROM mods WHERE id = $1",
@@ -604,7 +604,7 @@ async fn upload_file_to_version_inner(
     .await?
     .1;
 
-    let result = models::Version::get(version_id, &**client, &redis).await?;
+    let result = models::DBVersion::get(version_id, &**client, &redis).await?;
 
     let version = match result {
         Some(v) => v,
@@ -629,7 +629,7 @@ async fn upload_file_to_version_inner(
         })
         .collect::<Result<Vec<_>, _>>()?;
 
-    if models::Project::get_id(
+    if models::DBProject::get_id(
         version.inner.project_id,
         &mut **transaction,
         &redis,
@@ -643,7 +643,7 @@ async fn upload_file_to_version_inner(
     }
 
     if !user.role.is_admin() {
-        let team_member = models::TeamMember::get_from_user_id_project(
+        let team_member = models::DBTeamMember::get_from_user_id_project(
             version.inner.project_id,
             user.id.into(),
             false,
@@ -652,7 +652,7 @@ async fn upload_file_to_version_inner(
         .await?;
 
         let organization =
-            Organization::get_associated_organization_project_id(
+            DBOrganization::get_associated_organization_project_id(
                 version.inner.project_id,
                 &**client,
             )
@@ -660,7 +660,7 @@ async fn upload_file_to_version_inner(
 
         let organization_team_member = if let Some(organization) = &organization
         {
-            models::TeamMember::get_from_user_id(
+            models::DBTeamMember::get_from_user_id(
                 organization.team_id,
                 user.id.into(),
                 &mut **transaction,
@@ -782,7 +782,7 @@ async fn upload_file_to_version_inner(
     }
 
     // Clear version cache
-    models::Version::clear_cache(&version, &redis).await?;
+    models::DBVersion::clear_cache(&version, &redis).await?;
 
     Ok(HttpResponse::NoContent().body(""))
 }

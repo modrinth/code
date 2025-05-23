@@ -4,7 +4,7 @@ use super::{ApiError, oauth_clients::get_user_clients};
 use crate::util::img::delete_old_images;
 use crate::{
     auth::{filter_visible_projects, get_user_from_headers},
-    database::{models::User, redis::RedisPool},
+    database::{models::DBUser, redis::RedisPool},
     file_hosting::FileHost,
     models::{
         collections::{Collection, CollectionStatus},
@@ -88,7 +88,7 @@ pub async fn admin_user_email(
         )
     })?;
 
-    let user = User::get_id(
+    let user = DBUser::get_id(
         crate::database::models::DBUserId(user_id),
         &**pool,
         &redis,
@@ -120,12 +120,12 @@ pub async fn projects_list(
     .map(|x| x.1)
     .ok();
 
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
-        let project_data = User::get_projects(id, &**pool, &redis).await?;
+        let project_data = DBUser::get_projects(id, &**pool, &redis).await?;
 
-        let projects: Vec<_> = crate::database::Project::get_many_ids(
+        let projects: Vec<_> = crate::database::DBProject::get_many_ids(
             &project_data,
             &**pool,
             &redis,
@@ -177,7 +177,7 @@ pub async fn users_get(
 ) -> Result<HttpResponse, ApiError> {
     let user_ids = serde_json::from_str::<Vec<String>>(&ids.ids)?;
 
-    let users_data = User::get_many(&user_ids, &**pool, &redis).await?;
+    let users_data = DBUser::get_many(&user_ids, &**pool, &redis).await?;
 
     let users: Vec<crate::models::users::User> =
         users_data.into_iter().map(From::from).collect();
@@ -192,7 +192,7 @@ pub async fn user_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_data = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let user_data = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(data) = user_data {
         let auth_user = get_user_from_headers(
@@ -237,7 +237,7 @@ pub async fn collections_list(
     .map(|x| x.1)
     .ok();
 
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
         let user_id: UserId = id.into();
@@ -246,9 +246,9 @@ pub async fn collections_list(
             .map(|y| y.role.is_mod() || y.id == user_id)
             .unwrap_or(false);
 
-        let project_data = User::get_collections(id, &**pool).await?;
+        let project_data = DBUser::get_collections(id, &**pool).await?;
 
-        let response: Vec<_> = crate::database::models::Collection::get_many(
+        let response: Vec<_> = crate::database::models::DBCollection::get_many(
             &project_data,
             &**pool,
             &redis,
@@ -285,13 +285,13 @@ pub async fn orgs_list(
     .map(|x| x.1)
     .ok();
 
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
-        let org_data = User::get_organizations(id, &**pool).await?;
+        let org_data = DBUser::get_organizations(id, &**pool).await?;
 
         let organizations_data =
-            crate::database::models::organization_item::Organization::get_many_ids(
+            crate::database::models::organization_item::DBOrganization::get_many_ids(
                 &org_data, &**pool, &redis,
             )
             .await?;
@@ -302,11 +302,11 @@ pub async fn orgs_list(
             .collect::<Vec<_>>();
 
         let teams_data =
-            crate::database::models::TeamMember::get_from_team_full_many(
+            crate::database::models::DBTeamMember::get_from_team_full_many(
                 &team_ids, &**pool, &redis,
             )
             .await?;
-        let users = User::get_many_ids(
+        let users = DBUser::get_many_ids(
             &teams_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
             &**pool,
             &redis,
@@ -397,7 +397,7 @@ pub async fn user_edit(
         ApiError::Validation(validation_errors_to_string(err, None))
     })?;
 
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(actual_user) = id_option {
         let id = actual_user.id;
@@ -408,7 +408,7 @@ pub async fn user_edit(
 
             if let Some(username) = &new_user.username {
                 let existing_user_id_option =
-                    User::get(username, &**pool, &redis).await?;
+                    DBUser::get(username, &**pool, &redis).await?;
 
                 if existing_user_id_option
                     .map(|x| UserId::from(x.id))
@@ -527,7 +527,7 @@ pub async fn user_edit(
             }
 
             transaction.commit().await?;
-            User::clear_caches(&[(id, Some(actual_user.username))], &redis)
+            DBUser::clear_caches(&[(id, Some(actual_user.username))], &redis)
                 .await?;
             Ok(HttpResponse::NoContent().body(""))
         } else {
@@ -565,7 +565,7 @@ pub async fn user_icon_edit(
     )
     .await?
     .1;
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(actual_user) = id_option {
         if user.id != actual_user.id.into() && !user.role.is_mod() {
@@ -612,7 +612,7 @@ pub async fn user_icon_edit(
         )
         .execute(&**pool)
         .await?;
-        User::clear_caches(&[(actual_user.id, None)], &redis).await?;
+        DBUser::clear_caches(&[(actual_user.id, None)], &redis).await?;
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
@@ -637,7 +637,7 @@ pub async fn user_icon_delete(
     )
     .await?
     .1;
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(actual_user) = id_option {
         if user.id != actual_user.id.into() && !user.role.is_mod() {
@@ -665,7 +665,7 @@ pub async fn user_icon_delete(
         .execute(&**pool)
         .await?;
 
-        User::clear_caches(&[(actual_user.id, None)], &redis).await?;
+        DBUser::clear_caches(&[(actual_user.id, None)], &redis).await?;
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
@@ -689,7 +689,7 @@ pub async fn user_delete(
     )
     .await?
     .1;
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
         if !user.role.is_admin() && user.id != id.into() {
@@ -700,7 +700,7 @@ pub async fn user_delete(
 
         let mut transaction = pool.begin().await?;
 
-        let result = User::remove(id, &mut transaction, &redis).await?;
+        let result = DBUser::remove(id, &mut transaction, &redis).await?;
 
         transaction.commit().await?;
 
@@ -730,7 +730,7 @@ pub async fn user_follows(
     )
     .await?
     .1;
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
         if !user.role.is_admin() && user.id != id.into() {
@@ -739,8 +739,8 @@ pub async fn user_follows(
             ));
         }
 
-        let project_ids = User::get_follows(id, &**pool).await?;
-        let projects: Vec<_> = crate::database::Project::get_many_ids(
+        let project_ids = DBUser::get_follows(id, &**pool).await?;
+        let projects: Vec<_> = crate::database::DBProject::get_many_ids(
             &project_ids,
             &**pool,
             &redis,
@@ -772,7 +772,7 @@ pub async fn user_notifications(
     )
     .await?
     .1;
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
         if !user.role.is_admin() && user.id != id.into() {
@@ -782,7 +782,7 @@ pub async fn user_notifications(
         }
 
         let mut notifications: Vec<Notification> =
-            crate::database::models::notification_item::Notification::get_many_user(
+            crate::database::models::notification_item::DBNotification::get_many_user(
                 id, &**pool, &redis,
             )
             .await?

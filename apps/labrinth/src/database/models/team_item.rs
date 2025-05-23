@@ -1,4 +1,4 @@
-use super::{Organization, Project, ids::*};
+use super::{DBOrganization, DBProject, ids::*};
 use crate::{
     database::redis::RedisPool,
     models::teams::{OrganizationPermissions, ProjectPermissions},
@@ -32,7 +32,7 @@ impl TeamBuilder {
     ) -> Result<DBTeamId, super::DatabaseError> {
         let team_id = generate_team_id(transaction).await?;
 
-        let team = Team { id: team_id };
+        let team = DBTeam { id: team_id };
 
         sqlx::query!(
             "
@@ -109,7 +109,7 @@ impl TeamBuilder {
 }
 
 /// A team of users who control a project
-pub struct Team {
+pub struct DBTeam {
     /// The id of the team
     pub id: DBTeamId,
 }
@@ -120,7 +120,7 @@ pub enum TeamAssociationId {
     Organization(DBOrganizationId),
 }
 
-impl Team {
+impl DBTeam {
     pub async fn get_association<'a, 'b, E>(
         id: DBTeamId,
         executor: E,
@@ -165,7 +165,7 @@ impl Team {
 
 /// A member of a team
 #[derive(Deserialize, Serialize, Clone, Debug)]
-pub struct TeamMember {
+pub struct DBTeamMember {
     pub id: DBTeamMemberId,
     pub team_id: DBTeamId,
 
@@ -187,13 +187,13 @@ pub struct TeamMember {
     pub ordering: i64,
 }
 
-impl TeamMember {
+impl DBTeamMember {
     // Lists the full members of a team
     pub async fn get_from_team_full<'a, 'b, E>(
         id: DBTeamId,
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Vec<TeamMember>, super::DatabaseError>
+    ) -> Result<Vec<DBTeamMember>, super::DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -204,7 +204,7 @@ impl TeamMember {
         team_ids: &[DBTeamId],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<TeamMember>, super::DatabaseError>
+    ) -> Result<Vec<DBTeamMember>, super::DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -228,8 +228,8 @@ impl TeamMember {
                     &team_ids
                 )
                     .fetch(exec)
-                    .try_fold(DashMap::new(), |acc: DashMap<i64, Vec<TeamMember>>, m| {
-                        let member = TeamMember {
+                    .try_fold(DashMap::new(), |acc: DashMap<i64, Vec<DBTeamMember>>, m| {
+                        let member = DBTeamMember {
                             id: DBTeamMemberId(m.id),
                             team_id: DBTeamId(m.team_id),
                             role: m.member_role,
@@ -307,7 +307,7 @@ impl TeamMember {
             user_id as DBUserId
         )
         .fetch(executor)
-        .map_ok(|m| TeamMember {
+        .map_ok(|m| DBTeamMember {
             id: DBTeamMemberId(m.id),
             team_id: DBTeamId(m.team_id),
             user_id,
@@ -322,7 +322,7 @@ impl TeamMember {
             payouts_split: m.payouts_split,
             ordering: m.ordering,
         })
-        .try_collect::<Vec<TeamMember>>()
+        .try_collect::<Vec<DBTeamMember>>()
         .await?;
 
         Ok(team_members)
@@ -354,7 +354,7 @@ impl TeamMember {
         .await?;
 
         if let Some(m) = result {
-            Ok(Some(TeamMember {
+            Ok(Some(DBTeamMember {
                 id: DBTeamMemberId(m.id),
                 team_id: id,
                 user_id,
@@ -577,7 +577,7 @@ impl TeamMember {
             .await?;
 
         if let Some(m) = result {
-            Ok(Some(TeamMember {
+            Ok(Some(DBTeamMember {
                 id: DBTeamMemberId(m.id),
                 team_id: DBTeamId(m.team_id),
                 user_id,
@@ -629,7 +629,7 @@ impl TeamMember {
             .await?;
 
         if let Some(m) = result {
-            Ok(Some(TeamMember {
+            Ok(Some(DBTeamMember {
                 id: DBTeamMemberId(m.id),
                 team_id: DBTeamId(m.team_id),
                 user_id,
@@ -675,7 +675,7 @@ impl TeamMember {
             .await?;
 
         if let Some(m) = result {
-            Ok(Some(TeamMember {
+            Ok(Some(DBTeamMember {
                 id: DBTeamMemberId(m.id),
                 team_id: DBTeamId(m.team_id),
                 user_id,
@@ -702,7 +702,7 @@ impl TeamMember {
     // - project team member (a user's membership to a given project)
     // - organization team member (a user's membership to a given organization that owns a given project)
     pub async fn get_for_project_permissions<'a, 'b, E>(
-        project: &Project,
+        project: &DBProject,
         user_id: DBUserId,
         executor: E,
     ) -> Result<(Option<Self>, Option<Self>), super::DatabaseError>
@@ -713,7 +713,7 @@ impl TeamMember {
             Self::get_from_user_id(project.team_id, user_id, executor).await?;
 
         let organization =
-            Organization::get_associated_organization_project_id(
+            DBOrganization::get_associated_organization_project_id(
                 project.id, executor,
             )
             .await?;

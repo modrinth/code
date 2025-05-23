@@ -25,7 +25,7 @@ impl CollectionBuilder {
         self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<DBCollectionId, DatabaseError> {
-        let collection_struct = Collection {
+        let collection_struct = DBCollection {
             id: self.collection_id,
             name: self.name,
             user_id: self.user_id,
@@ -44,7 +44,7 @@ impl CollectionBuilder {
     }
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct Collection {
+pub struct DBCollection {
     pub id: DBCollectionId,
     pub user_id: DBUserId,
     pub name: String,
@@ -58,7 +58,7 @@ pub struct Collection {
     pub projects: Vec<DBProjectId>,
 }
 
-impl Collection {
+impl DBCollection {
     pub async fn insert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -131,7 +131,7 @@ impl Collection {
             .execute(&mut **transaction)
             .await?;
 
-            models::Collection::clear_cache(collection.id, redis).await?;
+            models::DBCollection::clear_cache(collection.id, redis).await?;
 
             Ok(Some(()))
         } else {
@@ -143,11 +143,11 @@ impl Collection {
         id: DBCollectionId,
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Option<Collection>, DatabaseError>
+    ) -> Result<Option<DBCollection>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        Collection::get_many(&[id], executor, redis)
+        DBCollection::get_many(&[id], executor, redis)
             .await
             .map(|x| x.into_iter().next())
     }
@@ -156,7 +156,7 @@ impl Collection {
         collection_ids: &[DBCollectionId],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<Collection>, DatabaseError>
+    ) -> Result<Vec<DBCollection>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -180,7 +180,7 @@ impl Collection {
                     )
                     .fetch(exec)
                     .try_fold(DashMap::new(), |acc, m| {
-                        let collection = Collection {
+                        let collection = DBCollection {
                             id: DBCollectionId(m.id),
                             user_id: DBUserId(m.user_id),
                             name: m.name.clone(),

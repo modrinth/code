@@ -1,8 +1,8 @@
 use super::ids::{DBProjectId, DBUserId};
 use super::{DBCollectionId, DBReportId, DBThreadId};
 use crate::database::models;
-use crate::database::models::charge_item::ChargeItem;
-use crate::database::models::user_subscription_item::UserSubscriptionItem;
+use crate::database::models::charge_item::DBCharge;
+use crate::database::models::user_subscription_item::DBUserSubscription;
 use crate::database::models::{DBOrganizationId, DatabaseError};
 use crate::database::redis::RedisPool;
 use crate::models::billing::ChargeStatus;
@@ -19,7 +19,7 @@ const USER_USERNAMES_NAMESPACE: &str = "users_usernames";
 const USERS_PROJECTS_NAMESPACE: &str = "users_projects";
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
-pub struct User {
+pub struct DBUser {
     pub id: DBUserId,
 
     pub github_id: Option<i64>,
@@ -51,7 +51,7 @@ pub struct User {
     pub allow_friend_requests: bool,
 }
 
-impl User {
+impl DBUser {
     pub async fn insert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -104,11 +104,11 @@ impl User {
         string: &str,
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Option<User>, DatabaseError>
+    ) -> Result<Option<DBUser>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        User::get_many(&[string], executor, redis)
+        DBUser::get_many(&[string], executor, redis)
             .await
             .map(|x| x.into_iter().next())
     }
@@ -117,11 +117,11 @@ impl User {
         id: DBUserId,
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Option<User>, DatabaseError>
+    ) -> Result<Option<DBUser>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        User::get_many(&[ariadne::ids::UserId::from(id)], executor, redis)
+        DBUser::get_many(&[ariadne::ids::UserId::from(id)], executor, redis)
             .await
             .map(|x| x.into_iter().next())
     }
@@ -130,7 +130,7 @@ impl User {
         user_ids: &[DBUserId],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<User>, DatabaseError>
+    ) -> Result<Vec<DBUser>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -138,7 +138,7 @@ impl User {
             .iter()
             .map(|x| ariadne::ids::UserId::from(*x))
             .collect::<Vec<_>>();
-        User::get_many(&ids, exec, redis).await
+        DBUser::get_many(&ids, exec, redis).await
     }
 
     pub async fn get_many<
@@ -149,7 +149,7 @@ impl User {
         users_strings: &[T],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<User>, DatabaseError>
+    ) -> Result<Vec<DBUser>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -187,7 +187,7 @@ impl User {
                 )
                     .fetch(exec)
                     .try_fold(DashMap::new(), |acc, u| {
-                        let user = User {
+                        let user = DBUser {
                             id: DBUserId(u.id),
                             github_id: u.github_id,
                             discord_id: u.discord_id,
@@ -459,7 +459,7 @@ impl User {
         let user = Self::get_id(id, &mut **transaction, redis).await?;
 
         if let Some(delete_user) = user {
-            User::clear_caches(&[(id, Some(delete_user.username))], redis)
+            DBUser::clear_caches(&[(id, Some(delete_user.username))], redis)
                 .await?;
 
             let deleted_user: DBUserId =
@@ -536,7 +536,7 @@ impl User {
             .await?;
 
             for collection_id in user_collections {
-                models::Collection::remove(collection_id, transaction, redis)
+                models::DBCollection::remove(collection_id, transaction, redis)
                     .await?;
             }
 
@@ -555,7 +555,7 @@ impl User {
             .await?;
 
             for thread_id in report_threads {
-                models::Thread::remove_full(thread_id, transaction).await?;
+                models::DBThread::remove_full(thread_id, transaction).await?;
             }
 
             sqlx::query!(
@@ -661,12 +661,12 @@ impl User {
             .await?;
 
             let open_subscriptions =
-                UserSubscriptionItem::get_all_user(id, &mut **transaction)
+                DBUserSubscription::get_all_user(id, &mut **transaction)
                     .await?;
 
             for x in open_subscriptions {
                 let charge =
-                    ChargeItem::get_open_subscription(x.id, &mut **transaction)
+                    DBCharge::get_open_subscription(x.id, &mut **transaction)
                         .await?;
                 if let Some(mut charge) = charge {
                     charge.status = ChargeStatus::Cancelled;

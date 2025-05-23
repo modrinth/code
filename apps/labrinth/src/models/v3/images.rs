@@ -2,7 +2,7 @@ use super::{
     ids::{ProjectId, ThreadMessageId, VersionId},
     pats::Scopes,
 };
-use crate::database::models::image_item::Image as DBImage;
+use crate::database::models::image_item::DBImage;
 use crate::models::ids::{ImageId, ReportId};
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};

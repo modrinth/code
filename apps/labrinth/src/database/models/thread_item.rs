@@ -12,14 +12,14 @@ pub struct ThreadBuilder {
 }
 
 #[derive(Clone, Serialize)]
-pub struct Thread {
+pub struct DBThread {
     pub id: DBThreadId,
 
     pub project_id: Option<DBProjectId>,
     pub report_id: Option<DBReportId>,
     pub type_: ThreadType,
 
-    pub messages: Vec<ThreadMessage>,
+    pub messages: Vec<DBThreadMessage>,
     pub members: Vec<DBUserId>,
 }
 
@@ -31,7 +31,7 @@ pub struct ThreadMessageBuilder {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct ThreadMessage {
+pub struct DBThreadMessage {
     pub id: DBThreadMessageId,
     pub thread_id: DBThreadId,
     pub author_id: Option<DBUserId>,
@@ -111,11 +111,11 @@ impl ThreadBuilder {
     }
 }
 
-impl Thread {
+impl DBThread {
     pub async fn get<'a, E>(
         id: DBThreadId,
         exec: E,
-    ) -> Result<Option<Thread>, sqlx::Error>
+    ) -> Result<Option<DBThread>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -127,7 +127,7 @@ impl Thread {
     pub async fn get_many<'a, E>(
         thread_ids: &[DBThreadId],
         exec: E,
-    ) -> Result<Vec<Thread>, sqlx::Error>
+    ) -> Result<Vec<DBThread>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -149,13 +149,13 @@ impl Thread {
             &thread_ids_parsed
         )
         .fetch(exec)
-            .map_ok(|x| Thread {
+            .map_ok(|x| DBThread {
                 id: DBThreadId(x.id),
                 project_id: x.mod_id.map(DBProjectId),
                 report_id: x.report_id.map(DBReportId),
                 type_: ThreadType::from_string(&x.thread_type),
                 messages: {
-                    let mut messages: Vec<ThreadMessage> = serde_json::from_value(
+                    let mut messages: Vec<DBThreadMessage> = serde_json::from_value(
                         x.messages.unwrap_or_default(),
                     )
                         .ok()
@@ -165,7 +165,7 @@ impl Thread {
                 },
                 members: x.members.unwrap_or_default().into_iter().map(DBUserId).collect(),
             })
-        .try_collect::<Vec<Thread>>()
+        .try_collect::<Vec<DBThread>>()
         .await?;
 
         Ok(threads)
@@ -207,11 +207,11 @@ impl Thread {
     }
 }
 
-impl ThreadMessage {
+impl DBThreadMessage {
     pub async fn get<'a, E>(
         id: DBThreadMessageId,
         exec: E,
-    ) -> Result<Option<ThreadMessage>, sqlx::Error>
+    ) -> Result<Option<DBThreadMessage>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -223,7 +223,7 @@ impl ThreadMessage {
     pub async fn get_many<'a, E>(
         message_ids: &[DBThreadMessageId],
         exec: E,
-    ) -> Result<Vec<ThreadMessage>, sqlx::Error>
+    ) -> Result<Vec<DBThreadMessage>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -240,7 +240,7 @@ impl ThreadMessage {
             &message_ids_parsed
         )
         .fetch(exec)
-        .map_ok(|x| ThreadMessage {
+        .map_ok(|x| DBThreadMessage {
             id: DBThreadMessageId(x.id),
             thread_id: DBThreadId(x.thread_id),
             author_id: x.author_id.map(DBUserId),
@@ -248,7 +248,7 @@ impl ThreadMessage {
             created: x.created,
             hide_identity: x.hide_identity,
         })
-        .try_collect::<Vec<ThreadMessage>>()
+        .try_collect::<Vec<DBThreadMessage>>()
         .await?;
 
         Ok(messages)

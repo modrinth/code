@@ -179,7 +179,7 @@ impl VersionBuilder {
         self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<DBVersionId, DatabaseError> {
-        let version = Version {
+        let version = DBVersion {
             id: self.version_id,
             project_id: self.project_id,
             author_id: self.author_id,
@@ -229,12 +229,12 @@ impl VersionBuilder {
 
         let loader_versions = loaders
             .iter()
-            .map(|&loader_id| LoaderVersion {
+            .map(|&loader_id| DBLoaderVersion {
                 loader_id,
                 version_id,
             })
             .collect_vec();
-        LoaderVersion::insert_many(loader_versions, transaction).await?;
+        DBLoaderVersion::insert_many(loader_versions, transaction).await?;
 
         VersionField::insert_many(self.version_fields, transaction).await?;
 
@@ -243,12 +243,12 @@ impl VersionBuilder {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct LoaderVersion {
+pub struct DBLoaderVersion {
     pub loader_id: LoaderId,
     pub version_id: DBVersionId,
 }
 
-impl LoaderVersion {
+impl DBLoaderVersion {
     pub async fn insert_many(
         items: Vec<Self>,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -273,7 +273,7 @@ impl LoaderVersion {
 }
 
 #[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
-pub struct Version {
+pub struct DBVersion {
     pub id: DBVersionId,
     pub project_id: DBProjectId,
     pub author_id: DBUserId,
@@ -289,7 +289,7 @@ pub struct Version {
     pub ordering: Option<i32>,
 }
 
-impl Version {
+impl DBVersion {
     pub async fn insert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -339,7 +339,7 @@ impl Version {
             return Ok(None);
         };
 
-        Version::clear_cache(&result, redis).await?;
+        DBVersion::clear_cache(&result, redis).await?;
 
         sqlx::query!(
             "
@@ -447,7 +447,7 @@ impl Version {
         .execute(&mut **transaction)
         .await?;
 
-        crate::database::models::Project::clear_cache(
+        crate::database::models::DBProject::clear_cache(
             DBProjectId(project_id.mod_id),
             None,
             None,
@@ -462,7 +462,7 @@ impl Version {
         id: DBVersionId,
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Option<QueryVersion>, DatabaseError>
+    ) -> Result<Option<VersionQueryResult>, DatabaseError>
     where
         E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
     {
@@ -475,7 +475,7 @@ impl Version {
         version_ids: &[DBVersionId],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<QueryVersion>, DatabaseError>
+    ) -> Result<Vec<VersionQueryResult>, DatabaseError>
     where
         E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
     {
@@ -684,7 +684,7 @@ impl Version {
                     })
                     .await?;
 
-                let dependencies : DashMap<DBVersionId, Vec<QueryDependency>> = sqlx::query!(
+                let dependencies : DashMap<DBVersionId, Vec<DependencyQueryResult>> = sqlx::query!(
                     "
                     SELECT DISTINCT dependent_id as version_id, d.mod_dependency_id as dependency_project_id, d.dependency_id as dependency_version_id, d.dependency_file_name as file_name, d.dependency_type as dependency_type
                     FROM dependencies d
@@ -692,8 +692,8 @@ impl Version {
                     ",
                     &version_ids
                 ).fetch(&mut *exec)
-                    .try_fold(DashMap::new(), |acc : DashMap<_,Vec<QueryDependency>>, m| {
-                        let dependency = QueryDependency {
+                    .try_fold(DashMap::new(), |acc : DashMap<_,Vec<DependencyQueryResult>>, m| {
+                        let dependency = DependencyQueryResult {
                             project_id: m.dependency_project_id.map(DBProjectId),
                             version_id: m.dependency_version_id.map(DBVersionId),
                             file_name: m.file_name,
@@ -735,8 +735,8 @@ impl Version {
                             .filter(|x| loader_loader_field_ids.contains(&x.id))
                             .collect::<Vec<_>>();
 
-                        let query_version = QueryVersion {
-                            inner: Version {
+                        let query_version = VersionQueryResult {
+                            inner: DBVersion {
                                 id: DBVersionId(v.id),
                                 project_id: DBProjectId(v.mod_id),
                                 author_id: DBUserId(v.author_id),
@@ -765,7 +765,7 @@ impl Version {
                                         }
                                     }
 
-                                    QueryFile {
+                                    FileQueryResult {
                                         id: x.id,
                                         url: x.url.clone(),
                                         filename: x.filename.clone(),
@@ -815,7 +815,7 @@ impl Version {
         version_id: Option<DBVersionId>,
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Option<SingleFile>, DatabaseError>
+    ) -> Result<Option<DBFile>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -832,7 +832,7 @@ impl Version {
         hashes: &[String],
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Vec<SingleFile>, DatabaseError>
+    ) -> Result<Vec<DBFile>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -872,7 +872,7 @@ impl Version {
                         if let Some(hash) = hashes.get(&algorithm) {
                             let key = format!("{algorithm}_{hash}");
 
-                            let file = SingleFile {
+                            let file = DBFile {
                                 id: DBFileId(f.id),
                                 version_id: DBVersionId(f.version_id),
                                 project_id: DBProjectId(f.mod_id),
@@ -899,7 +899,7 @@ impl Version {
     }
 
     pub async fn clear_cache(
-        version: &QueryVersion,
+        version: &VersionQueryResult,
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
@@ -927,19 +927,19 @@ impl Version {
 }
 
 #[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
-pub struct QueryVersion {
-    pub inner: Version,
+pub struct VersionQueryResult {
+    pub inner: DBVersion,
 
-    pub files: Vec<QueryFile>,
+    pub files: Vec<FileQueryResult>,
     pub version_fields: Vec<VersionField>,
     pub loaders: Vec<String>,
     pub project_types: Vec<String>,
     pub games: Vec<String>,
-    pub dependencies: Vec<QueryDependency>,
+    pub dependencies: Vec<DependencyQueryResult>,
 }
 
 #[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
-pub struct QueryDependency {
+pub struct DependencyQueryResult {
     pub project_id: Option<DBProjectId>,
     pub version_id: Option<DBVersionId>,
     pub file_name: Option<String>,
@@ -947,7 +947,7 @@ pub struct QueryDependency {
 }
 
 #[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
-pub struct QueryFile {
+pub struct FileQueryResult {
     pub id: DBFileId,
     pub url: String,
     pub filename: String,
@@ -958,7 +958,7 @@ pub struct QueryFile {
 }
 
 #[derive(Clone, Deserialize, Serialize)]
-pub struct SingleFile {
+pub struct DBFile {
     pub id: DBFileId,
     pub version_id: DBVersionId,
     pub project_id: DBProjectId,
@@ -970,19 +970,19 @@ pub struct SingleFile {
     pub file_type: Option<FileType>,
 }
 
-impl std::cmp::Ord for QueryVersion {
+impl std::cmp::Ord for VersionQueryResult {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.inner.cmp(&other.inner)
     }
 }
 
-impl std::cmp::PartialOrd for QueryVersion {
+impl std::cmp::PartialOrd for VersionQueryResult {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl std::cmp::Ord for Version {
+impl std::cmp::Ord for DBVersion {
     fn cmp(&self, other: &Self) -> Ordering {
         let ordering_order = match (self.ordering, other.ordering) {
             (None, None) => Ordering::Equal,
@@ -998,7 +998,7 @@ impl std::cmp::Ord for Version {
     }
 }
 
-impl std::cmp::PartialOrd for Version {
+impl std::cmp::PartialOrd for DBVersion {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
@@ -1035,8 +1035,8 @@ mod tests {
         id: i64,
         ordering: Option<i32>,
         date_published: DateTime<Utc>,
-    ) -> Version {
-        Version {
+    ) -> DBVersion {
+        DBVersion {
             id: DBVersionId(id),
             ordering,
             date_published,

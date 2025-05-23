@@ -27,7 +27,7 @@ pub struct Organization {
 
 impl Organization {
     pub fn from(
-        data: crate::database::models::organization_item::Organization,
+        data: crate::database::models::organization_item::DBOrganization,
         team_members: Vec<TeamMember>,
     ) -> Self {
         Self {

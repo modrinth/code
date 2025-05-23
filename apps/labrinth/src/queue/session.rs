@@ -1,5 +1,5 @@
-use crate::database::models::pat_item::PersonalAccessToken;
-use crate::database::models::session_item::Session;
+use crate::database::models::pat_item::DBPersonalAccessToken;
+use crate::database::models::session_item::DBSession;
 use crate::database::models::{
     DBOAuthAccessTokenId, DBPatId, DBSessionId, DBUserId, DatabaseError,
 };
@@ -123,10 +123,10 @@ impl AuthQueue {
                     Some(session),
                     Some(user_id),
                 ));
-                Session::remove(id, &mut transaction).await?;
+                DBSession::remove(id, &mut transaction).await?;
             }
 
-            Session::clear_cache(clear_cache_sessions, redis).await?;
+            DBSession::clear_cache(clear_cache_sessions, redis).await?;
 
             let ids = pat_queue.iter().map(|id| id.0).collect_vec();
             let clear_cache_pats = pat_queue
@@ -153,7 +153,7 @@ impl AuthQueue {
             .await?;
 
             transaction.commit().await?;
-            PersonalAccessToken::clear_cache(clear_cache_pats, redis).await?;
+            DBPersonalAccessToken::clear_cache(clear_cache_pats, redis).await?;
         }
 
         Ok(())

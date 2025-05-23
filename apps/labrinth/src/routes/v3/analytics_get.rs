@@ -578,7 +578,7 @@ async fn filter_allowed_ids(
     // If no project_ids or version_ids are provided, we default to all projects the user has *public* access to
     if project_ids.is_none() && !remove_defaults.unwrap_or(false) {
         project_ids = Some(
-            user_item::User::get_projects(user.id.into(), &***pool, redis)
+            user_item::DBUser::get_projects(user.id.into(), &***pool, redis)
                 .await?
                 .into_iter()
                 .map(|x| ProjectId::from(x).to_string())
@@ -589,7 +589,7 @@ async fn filter_allowed_ids(
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
     let project_ids = if let Some(project_strings) = project_ids {
-        let projects_data = database::models::Project::get_many(
+        let projects_data = database::models::DBProject::get_many(
             &project_strings,
             &***pool,
             redis,
@@ -601,7 +601,7 @@ async fn filter_allowed_ids(
             .map(|x| x.inner.team_id)
             .collect::<Vec<database::models::DBTeamId>>();
         let team_members =
-            database::models::TeamMember::get_from_team_full_many(
+            database::models::DBTeamMember::get_from_team_full_many(
                 &team_ids, &***pool, redis,
             )
             .await?;
@@ -610,7 +610,7 @@ async fn filter_allowed_ids(
             .iter()
             .filter_map(|x| x.inner.organization_id)
             .collect::<Vec<database::models::DBOrganizationId>>();
-        let organizations = database::models::Organization::get_many_ids(
+        let organizations = database::models::DBOrganization::get_many_ids(
             &organization_ids,
             &***pool,
             redis,
@@ -622,7 +622,7 @@ async fn filter_allowed_ids(
             .map(|x| x.team_id)
             .collect::<Vec<database::models::DBTeamId>>();
         let organization_team_members =
-            database::models::TeamMember::get_from_team_full_many(
+            database::models::DBTeamMember::get_from_team_full_many(
                 &organization_team_ids,
                 &***pool,
                 redis,

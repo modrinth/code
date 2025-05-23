@@ -90,11 +90,11 @@ pub struct UserSubscription {
     pub metadata: Option<SubscriptionMetadata>,
 }
 
-impl From<crate::database::models::user_subscription_item::UserSubscriptionItem>
+impl From<crate::database::models::user_subscription_item::DBUserSubscription>
     for UserSubscription
 {
     fn from(
-        x: crate::database::models::user_subscription_item::UserSubscriptionItem,
+        x: crate::database::models::user_subscription_item::DBUserSubscription,
     ) -> Self {
         Self {
             id: x.id.into(),

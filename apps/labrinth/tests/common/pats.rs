@@ -18,7 +18,7 @@ pub async fn create_test_pat(
 ) -> String {
     let mut transaction = db.pool.begin().await.unwrap();
     let id = generate_pat_id(&mut transaction).await.unwrap();
-    let pat = database::models::pat_item::PersonalAccessToken {
+    let pat = database::models::pat_item::DBPersonalAccessToken {
         id,
         name: format!("test_pat_{}", scopes.bits()),
         access_token: format!("mrp_{}", id.0),

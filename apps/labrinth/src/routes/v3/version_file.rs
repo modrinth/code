@@ -56,7 +56,7 @@ pub async fn get_version_from_hash(
         .algorithm
         .clone()
         .unwrap_or_else(|| default_algorithm_from_hashes(&[hash.clone()]));
-    let file = database::models::Version::get_file_from_hash(
+    let file = database::models::DBVersion::get_file_from_hash(
         algorithm,
         hash,
         hash_query.version_id.map(|x| x.into()),
@@ -66,7 +66,7 @@ pub async fn get_version_from_hash(
     .await?;
     if let Some(file) = file {
         let version =
-            database::models::Version::get(file.version_id, &**pool, &redis)
+            database::models::DBVersion::get(file.version_id, &**pool, &redis)
                 .await?;
         if let Some(version) = version {
             if !is_visible_version(&version.inner, &user_option, &pool, &redis)
@@ -139,7 +139,7 @@ pub async fn get_update_from_hash(
     .map(|x| x.1)
     .ok();
     let hash = info.into_inner().0.to_lowercase();
-    if let Some(file) = database::models::Version::get_file_from_hash(
+    if let Some(file) = database::models::DBVersion::get_file_from_hash(
         hash_query
             .algorithm
             .clone()
@@ -151,11 +151,14 @@ pub async fn get_update_from_hash(
     )
     .await?
     {
-        if let Some(project) =
-            database::models::Project::get_id(file.project_id, &**pool, &redis)
-                .await?
+        if let Some(project) = database::models::DBProject::get_id(
+            file.project_id,
+            &**pool,
+            &redis,
+        )
+        .await?
         {
-            let mut versions = database::models::Version::get_many(
+            let mut versions = database::models::DBVersion::get_many(
                 &project.versions,
                 &**pool,
                 &redis,
@@ -241,7 +244,7 @@ pub async fn get_versions_from_hashes(
         .clone()
         .unwrap_or_else(|| default_algorithm_from_hashes(&file_data.hashes));
 
-    let files = database::models::Version::get_files_from_hash(
+    let files = database::models::DBVersion::get_files_from_hash(
         algorithm.clone(),
         &file_data.hashes,
         &**pool,
@@ -251,7 +254,7 @@ pub async fn get_versions_from_hashes(
 
     let version_ids = files.iter().map(|x| x.version_id).collect::<Vec<_>>();
     let versions_data = filter_visible_versions(
-        database::models::Version::get_many(&version_ids, &**pool, &redis)
+        database::models::DBVersion::get_many(&version_ids, &**pool, &redis)
             .await?,
         &user_option,
         &pool,
@@ -294,7 +297,7 @@ pub async fn get_projects_from_hashes(
         .algorithm
         .clone()
         .unwrap_or_else(|| default_algorithm_from_hashes(&file_data.hashes));
-    let files = database::models::Version::get_files_from_hash(
+    let files = database::models::DBVersion::get_files_from_hash(
         algorithm.clone(),
         &file_data.hashes,
         &**pool,
@@ -305,8 +308,12 @@ pub async fn get_projects_from_hashes(
     let project_ids = files.iter().map(|x| x.project_id).collect::<Vec<_>>();
 
     let projects_data = filter_visible_projects(
-        database::models::Project::get_many_ids(&project_ids, &**pool, &redis)
-            .await?,
+        database::models::DBProject::get_many_ids(
+            &project_ids,
+            &**pool,
+            &redis,
+        )
+        .await?,
         &user_option,
         &pool,
         false,
@@ -343,7 +350,7 @@ pub async fn update_files(
         .algorithm
         .clone()
         .unwrap_or_else(|| default_algorithm_from_hashes(&update_data.hashes));
-    let files = database::models::Version::get_files_from_hash(
+    let files = database::models::DBVersion::get_files_from_hash(
         algorithm.clone(),
         &update_data.hashes,
         &**pool,
@@ -378,7 +385,7 @@ pub async fn update_files(
         })
         .await?;
 
-    let versions = database::models::Version::get_many(
+    let versions = database::models::DBVersion::get_many(
         &update_version_ids
             .into_iter()
             .filter_map(|x| x.1.last().copied())
@@ -447,7 +454,7 @@ pub async fn update_individual_files(
                 .collect::<Vec<_>>(),
         )
     });
-    let files = database::models::Version::get_files_from_hash(
+    let files = database::models::DBVersion::get_files_from_hash(
         algorithm.clone(),
         &update_data
             .hashes
@@ -459,13 +466,13 @@ pub async fn update_individual_files(
     )
     .await?;
 
-    let projects = database::models::Project::get_many_ids(
+    let projects = database::models::DBProject::get_many_ids(
         &files.iter().map(|x| x.project_id).collect::<Vec<_>>(),
         &**pool,
         &redis,
     )
     .await?;
-    let all_versions = database::models::Version::get_many(
+    let all_versions = database::models::DBVersion::get_many(
         &projects
             .iter()
             .flat_map(|x| x.versions.clone())
@@ -574,7 +581,7 @@ pub async fn delete_file(
         .algorithm
         .clone()
         .unwrap_or_else(|| default_algorithm_from_hashes(&[hash.clone()]));
-    let file = database::models::Version::get_file_from_hash(
+    let file = database::models::DBVersion::get_file_from_hash(
         algorithm.clone(),
         hash,
         hash_query.version_id.map(|x| x.into()),
@@ -586,7 +593,7 @@ pub async fn delete_file(
     if let Some(row) = file {
         if !user.role.is_admin() {
             let team_member =
-                database::models::TeamMember::get_from_user_id_version(
+                database::models::DBTeamMember::get_from_user_id_version(
                     row.version_id,
                     user.id.into(),
                     &**pool,
@@ -595,26 +602,27 @@ pub async fn delete_file(
                 .map_err(ApiError::Database)?;
 
             let organization =
-                database::models::Organization::get_associated_organization_project_id(
+                database::models::DBOrganization::get_associated_organization_project_id(
                     row.project_id,
                     &**pool,
                 )
                 .await
                 .map_err(ApiError::Database)?;
 
-            let organization_team_member =
-                if let Some(organization) = &organization {
-                    database::models::TeamMember::get_from_user_id_organization(
-                        organization.id,
-                        user.id.into(),
-                        false,
-                        &**pool,
-                    )
-                    .await
-                    .map_err(ApiError::Database)?
-                } else {
-                    None
-                };
+            let organization_team_member = if let Some(organization) =
+                &organization
+            {
+                database::models::DBTeamMember::get_from_user_id_organization(
+                    organization.id,
+                    user.id.into(),
+                    false,
+                    &**pool,
+                )
+                .await
+                .map_err(ApiError::Database)?
+            } else {
+                None
+            };
 
             let permissions = ProjectPermissions::get_permissions_by_role(
                 &user.role,
@@ -632,7 +640,7 @@ pub async fn delete_file(
         }
 
         let version =
-            database::models::Version::get(row.version_id, &**pool, &redis)
+            database::models::DBVersion::get(row.version_id, &**pool, &redis)
                 .await?;
         if let Some(version) = version {
             if version.files.len() < 2 {
@@ -642,7 +650,7 @@ pub async fn delete_file(
                 ));
             }
 
-            database::models::Version::clear_cache(&version, &redis).await?;
+            database::models::DBVersion::clear_cache(&version, &redis).await?;
         }
 
         let mut transaction = pool.begin().await?;
@@ -705,7 +713,7 @@ pub async fn download_version(
         .algorithm
         .clone()
         .unwrap_or_else(|| default_algorithm_from_hashes(&[hash.clone()]));
-    let file = database::models::Version::get_file_from_hash(
+    let file = database::models::DBVersion::get_file_from_hash(
         algorithm.clone(),
         hash,
         hash_query.version_id.map(|x| x.into()),
@@ -716,7 +724,7 @@ pub async fn download_version(
 
     if let Some(file) = file {
         let version =
-            database::models::Version::get(file.version_id, &**pool, &redis)
+            database::models::DBVersion::get(file.version_id, &**pool, &redis)
                 .await?;
 
         if let Some(version) = version {

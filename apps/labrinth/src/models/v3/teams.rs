@@ -42,8 +42,10 @@ impl Default for ProjectPermissions {
 impl ProjectPermissions {
     pub fn get_permissions_by_role(
         role: &crate::models::users::Role,
-        project_team_member: &Option<crate::database::models::TeamMember>, // team member of the user in the project
-        organization_team_member: &Option<crate::database::models::TeamMember>, // team member of the user in the organization
+        project_team_member: &Option<crate::database::models::DBTeamMember>, // team member of the user in the project
+        organization_team_member: &Option<
+            crate::database::models::DBTeamMember,
+        >, // team member of the user in the organization
     ) -> Option<Self> {
         if role.is_admin() {
             return Some(ProjectPermissions::all());
@@ -99,7 +101,7 @@ impl Default for OrganizationPermissions {
 impl OrganizationPermissions {
     pub fn get_permissions_by_role(
         role: &crate::models::users::Role,
-        team_member: &Option<crate::database::models::TeamMember>,
+        team_member: &Option<crate::database::models::DBTeamMember>,
     ) -> Option<Self> {
         if role.is_admin() {
             return Some(OrganizationPermissions::all());
@@ -154,8 +156,8 @@ pub struct TeamMember {
 
 impl TeamMember {
     pub fn from(
-        data: crate::database::models::team_item::TeamMember,
-        user: crate::database::models::User,
+        data: crate::database::models::team_item::DBTeamMember,
+        user: crate::database::models::DBUser,
         override_permissions: bool,
     ) -> Self {
         let user: User = user.into();
@@ -166,7 +168,7 @@ impl TeamMember {
     // if already available.
     // (Avoids a db query in some cases)
     pub fn from_model(
-        data: crate::database::models::team_item::TeamMember,
+        data: crate::database::models::team_item::DBTeamMember,
         user: crate::models::users::User,
         override_permissions: bool,
     ) -> Self {

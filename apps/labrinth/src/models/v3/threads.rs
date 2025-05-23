@@ -86,7 +86,7 @@ impl ThreadType {
 
 impl Thread {
     pub fn from(
-        data: crate::database::models::Thread,
+        data: crate::database::models::DBThread,
         users: Vec<User>,
         user: &User,
     ) -> Self {
@@ -119,7 +119,7 @@ impl Thread {
 
 impl ThreadMessage {
     pub fn from(
-        data: crate::database::models::ThreadMessage,
+        data: crate::database::models::DBThreadMessage,
         user: &User,
     ) -> Self {
         Self {

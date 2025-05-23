@@ -50,7 +50,7 @@ pub async fn get_user_record_from_bearer_token<'a, 'b, E>(
     executor: E,
     redis: &RedisPool,
     session_queue: &AuthQueue,
-) -> Result<Option<(Scopes, user_item::User)>, AuthenticationError>
+) -> Result<Option<(Scopes, user_item::DBUser)>, AuthenticationError>
 where
     E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
@@ -63,7 +63,7 @@ where
     let possible_user = match token.split_once('_') {
         Some(("mrp", _)) => {
             let pat =
-                crate::database::models::pat_item::PersonalAccessToken::get(
+                crate::database::models::pat_item::DBPersonalAccessToken::get(
                     token, executor, redis,
                 )
                 .await?
@@ -74,25 +74,26 @@ where
             }
 
             let user =
-                user_item::User::get_id(pat.user_id, executor, redis).await?;
+                user_item::DBUser::get_id(pat.user_id, executor, redis).await?;
 
             session_queue.add_pat(pat.id).await;
 
             user.map(|x| (pat.scopes, x))
         }
         Some(("mra", _)) => {
-            let session = crate::database::models::session_item::Session::get(
-                token, executor, redis,
-            )
-            .await?
-            .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+            let session =
+                crate::database::models::session_item::DBSession::get(
+                    token, executor, redis,
+                )
+                .await?
+                .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
             if session.expires < Utc::now() {
                 return Err(AuthenticationError::InvalidCredentials);
             }
 
             let user =
-                user_item::User::get_id(session.user_id, executor, redis)
+                user_item::DBUser::get_id(session.user_id, executor, redis)
                     .await?;
 
             let rate_limit_ignore = dotenvy::var("RATE_LIMIT_IGNORE_KEY")?;
@@ -110,11 +111,11 @@ where
             user.map(|x| (Scopes::all(), x))
         }
         Some(("mro", _)) => {
-            use crate::database::models::oauth_token_item::OAuthAccessToken;
+            use crate::database::models::oauth_token_item::DBOAuthAccessToken;
 
-            let hash = OAuthAccessToken::hash_token(token);
+            let hash = DBOAuthAccessToken::hash_token(token);
             let access_token =
-                crate::database::models::oauth_token_item::OAuthAccessToken::get(hash, executor)
+                crate::database::models::oauth_token_item::DBOAuthAccessToken::get(hash, executor)
                     .await?
                     .ok_or(AuthenticationError::InvalidCredentials)?;
 
@@ -122,9 +123,12 @@ where
                 return Err(AuthenticationError::InvalidCredentials);
             }
 
-            let user =
-                user_item::User::get_id(access_token.user_id, executor, redis)
-                    .await?;
+            let user = user_item::DBUser::get_id(
+                access_token.user_id,
+                executor,
+                redis,
+            )
+            .await?;
 
             session_queue.add_oauth_access_token(access_token.id).await;
 
@@ -135,7 +139,7 @@ where
             let id =
                 AuthProvider::GitHub.get_user_id(&user.id, executor).await?;
 
-            let user = user_item::User::get_id(
+            let user = user_item::DBUser::get_id(
                 id.ok_or_else(|| AuthenticationError::InvalidCredentials)?,
                 executor,
                 redis,

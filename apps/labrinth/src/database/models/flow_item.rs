@@ -15,7 +15,7 @@ const FLOWS_NAMESPACE: &str = "flows";
 
 #[derive(Deserialize, Serialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
-pub enum Flow {
+pub enum DBFlow {
     OAuth {
         user_id: Option<DBUserId>,
         url: String,
@@ -53,7 +53,7 @@ pub enum Flow {
     },
 }
 
-impl Flow {
+impl DBFlow {
     pub async fn insert(
         &self,
         expires: Duration,
@@ -81,7 +81,7 @@ impl Flow {
     pub async fn get(
         id: &str,
         redis: &RedisPool,
-    ) -> Result<Option<Flow>, DatabaseError> {
+    ) -> Result<Option<DBFlow>, DatabaseError> {
         let mut redis = redis.connect().await?;
 
         redis.get_deserialized_from_json(FLOWS_NAMESPACE, id).await
@@ -91,9 +91,9 @@ impl Flow {
     /// The predicate should validate that the flow being removed is the correct one, as a security measure
     pub async fn take_if(
         id: &str,
-        predicate: impl FnOnce(&Flow) -> bool,
+        predicate: impl FnOnce(&DBFlow) -> bool,
         redis: &RedisPool,
-    ) -> Result<Option<Flow>, DatabaseError> {
+    ) -> Result<Option<DBFlow>, DatabaseError> {
         let flow = Self::get(id, redis).await?;
         if let Some(flow) = flow.as_ref() {
             if predicate(flow) {

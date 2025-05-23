@@ -204,7 +204,7 @@ pub async fn delphi_result_ingest(
 
     let webhook_url = dotenvy::var("DELPHI_SLACK_WEBHOOK")?;
 
-    let project = crate::database::models::Project::get_id(
+    let project = crate::database::models::DBProject::get_id(
         body.project_id.into(),
         &**pool,
         &redis,

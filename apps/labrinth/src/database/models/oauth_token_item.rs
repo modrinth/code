@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use sha2::Digest;
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
-pub struct OAuthAccessToken {
+pub struct DBOAuthAccessToken {
     pub id: DBOAuthAccessTokenId,
     pub authorization_id: DBOAuthClientAuthorizationId,
     pub token_hash: String,
@@ -22,11 +22,11 @@ pub struct OAuthAccessToken {
     pub user_id: DBUserId,
 }
 
-impl OAuthAccessToken {
+impl DBOAuthAccessToken {
     pub async fn get(
         token_hash: String,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Option<OAuthAccessToken>, DatabaseError> {
+    ) -> Result<Option<DBOAuthAccessToken>, DatabaseError> {
         let value = sqlx::query!(
             "
             SELECT
@@ -49,7 +49,7 @@ impl OAuthAccessToken {
         .fetch_optional(exec)
         .await?;
 
-        Ok(value.map(|r| OAuthAccessToken {
+        Ok(value.map(|r| DBOAuthAccessToken {
             id: DBOAuthAccessTokenId(r.id),
             authorization_id: DBOAuthClientAuthorizationId(r.authorization_id),
             token_hash: r.token_hash,

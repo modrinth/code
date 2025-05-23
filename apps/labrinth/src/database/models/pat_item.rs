@@ -15,7 +15,7 @@ const PATS_TOKENS_NAMESPACE: &str = "pats_tokens";
 const PATS_USERS_NAMESPACE: &str = "pats_users";
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
-pub struct PersonalAccessToken {
+pub struct DBPersonalAccessToken {
     pub id: DBPatId,
     pub name: String,
     pub access_token: String,
@@ -26,7 +26,7 @@ pub struct PersonalAccessToken {
     pub last_used: Option<DateTime<Utc>>,
 }
 
-impl PersonalAccessToken {
+impl DBPersonalAccessToken {
     pub async fn insert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -63,7 +63,7 @@ impl PersonalAccessToken {
         id: T,
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Option<PersonalAccessToken>, DatabaseError>
+    ) -> Result<Option<DBPersonalAccessToken>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -76,7 +76,7 @@ impl PersonalAccessToken {
         pat_ids: &[DBPatId],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<PersonalAccessToken>, DatabaseError>
+    ) -> Result<Vec<DBPersonalAccessToken>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -84,7 +84,7 @@ impl PersonalAccessToken {
             .iter()
             .map(|x| crate::models::ids::PatId::from(*x))
             .collect::<Vec<_>>();
-        PersonalAccessToken::get_many(&ids, exec, redis).await
+        DBPersonalAccessToken::get_many(&ids, exec, redis).await
     }
 
     pub async fn get_many<
@@ -95,7 +95,7 @@ impl PersonalAccessToken {
         pat_strings: &[T],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<PersonalAccessToken>, DatabaseError>
+    ) -> Result<Vec<DBPersonalAccessToken>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -125,7 +125,7 @@ impl PersonalAccessToken {
                     )
                     .fetch(exec)
                     .try_fold(DashMap::new(), |acc, x| {
-                        let pat = PersonalAccessToken {
+                        let pat = DBPersonalAccessToken {
                             id: DBPatId(x.id),
                             name: x.name,
                             access_token: x.access_token.clone(),

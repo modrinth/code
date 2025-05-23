@@ -1,7 +1,7 @@
 use super::pats::Scopes;
-use crate::database::models::oauth_client_authorization_item::OAuthClientAuthorization as DBOAuthClientAuthorization;
-use crate::database::models::oauth_client_item::OAuthClient as DBOAuthClient;
-use crate::database::models::oauth_client_item::OAuthRedirectUri as DBOAuthRedirectUri;
+use crate::database::models::oauth_client_authorization_item::DBOAuthClientAuthorization;
+use crate::database::models::oauth_client_item::DBOAuthClient;
+use crate::database::models::oauth_client_item::DBOAuthRedirectUri;
 use crate::models::ids::{
     OAuthClientAuthorizationId, OAuthClientId, OAuthRedirectUriId,
 };

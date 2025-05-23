@@ -5,7 +5,7 @@ use futures::TryStreamExt;
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 
-use super::{TeamMember, ids::*};
+use super::{DBTeamMember, ids::*};
 use serde::{Deserialize, Serialize};
 
 const ORGANIZATIONS_NAMESPACE: &str = "organizations";
@@ -13,7 +13,7 @@ const ORGANIZATIONS_TITLES_NAMESPACE: &str = "organizations_titles";
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 /// An organization of users who together control one or more projects and organizations.
-pub struct Organization {
+pub struct DBOrganization {
     /// The id of the organization
     pub id: DBOrganizationId,
 
@@ -35,7 +35,7 @@ pub struct Organization {
     pub color: Option<u32>,
 }
 
-impl Organization {
+impl DBOrganization {
     pub async fn insert(
         self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -142,7 +142,7 @@ impl Organization {
                     )
                     .fetch(exec)
                     .try_fold(DashMap::new(), |acc, m| {
-                        let org = Organization {
+                        let org = DBOrganization {
                             id: DBOrganizationId(m.id),
                             slug: m.slug.clone(),
                             name: m.name,
@@ -188,7 +188,7 @@ impl Organization {
         .await?;
 
         if let Some(result) = result {
-            Ok(Some(Organization {
+            Ok(Some(DBOrganization {
                 id: DBOrganizationId(result.id),
                 slug: result.slug,
                 name: result.name,
@@ -221,7 +221,7 @@ impl Organization {
             .execute(&mut **transaction)
             .await?;
 
-            TeamMember::clear_cache(organization.team_id, redis).await?;
+            DBTeamMember::clear_cache(organization.team_id, redis).await?;
 
             sqlx::query!(
                 "

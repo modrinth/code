@@ -233,7 +233,7 @@ impl AutomatedModerationQueue {
             for project in projects {
                 async {
                     let project =
-                        database::Project::get_id((project).into(), &pool, &redis).await?;
+                        database::DBProject::get_id((project).into(), &pool, &redis).await?;
 
                     if let Some(project) = project {
                         let res = async {
@@ -261,7 +261,7 @@ impl AutomatedModerationQueue {
                             }
 
                             let versions =
-                                database::Version::get_many(&project.versions, &pool, &redis)
+                                database::DBVersion::get_many(&project.versions, &pool, &redis)
                                     .await?
                                     .into_iter()
                                     // we only support modpacks at this time
@@ -343,7 +343,7 @@ impl AutomatedModerationQueue {
                                         }
                                     }
 
-                                    let files = database::models::Version::get_files_from_hash(
+                                    let files = database::models::DBVersion::get_files_from_hash(
                                         "sha1".to_string(),
                                         &hashes.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
                                         &pool,
@@ -354,7 +354,7 @@ impl AutomatedModerationQueue {
                                     let version_ids =
                                         files.iter().map(|x| x.version_id).collect::<Vec<_>>();
                                     let versions_data = filter_visible_versions(
-                                        database::models::Version::get_many(
+                                        database::models::DBVersion::get_many(
                                             &version_ids,
                                             &pool,
                                             &redis,
@@ -621,7 +621,7 @@ impl AutomatedModerationQueue {
                             }
 
                             if !mod_messages.is_empty() {
-                                let first_time = database::models::Thread::get(project.thread_id, &pool).await?
+                                let first_time = database::models::DBThread::get(project.thread_id, &pool).await?
                                     .map(|x| x.messages.iter().all(|x| x.author_id == Some(database::models::DBUserId(AUTOMOD_ID)) || x.hide_identity))
                                     .unwrap_or(true);
 
@@ -640,7 +640,7 @@ impl AutomatedModerationQueue {
                                     .insert(&mut transaction)
                                     .await?;
 
-                                let members = database::models::TeamMember::get_from_team_full(
+                                let members = database::models::DBTeamMember::get_from_team_full(
                                     project.inner.team_id,
                                     &pool,
                                     &redis,
@@ -700,7 +700,7 @@ impl AutomatedModerationQueue {
                                         .execute(&pool)
                                         .await?;
 
-                                    database::models::Project::clear_cache(
+                                    database::models::DBProject::clear_cache(
                                         project.inner.id,
                                         project.inner.slug.clone(),
                                         None,
