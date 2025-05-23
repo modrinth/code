@@ -652,19 +652,19 @@ For a brief rundown of how this works:
       shown: true,
       options: [
         {
+          name: "Insufficient",
+          resultingMessage: `## Insufficient Gallery Images
+        We ask that projects like yours show off their content using images in the Gallery, or optionally in the Description, in order to effectively and clearly inform users of its content per section 2.1 of [Modrinth's content rules](https://modrinth.com/legal/rules#general-expectations).
+        Keep in mind that you should:
+        - Set a featured image that best represents your project.
+        - Ensure all your images have titles that accurately label the image, and optionally, details on the contents of the image in the images Description.
+        - Upload any relevant images in your Description to your Gallery tab for best results.`,
+        },
+        {
           name: "Not relevant",
           shown: props.project.gallery.length > 0,
           resultingMessage: `## Unrelated Gallery Images
 Per section 5.5 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous) any images in your project's Gallery must be relevant to the project and also include a Title.`,
-        },
-        {
-          name: "Insufficient",
-          resultingMessage: `## Insufficient Gallery Images
-We ask that projects like yours show off their content using images in the Gallery, or optionally in the Description, in order to effectively and clearly inform users of its content per section 2.1 of [Modrinth's content rules](https://modrinth.com/legal/rules#general-expectations).
-Keep in mind that you should:
-- Set a featured image that best represents your project.
-- Ensure all your images have titles that accurately label the image, and optionally, details on the contents of the image in the images Description.
-- Upload any relevant images in your Description to your Gallery tab for best results.`,
         },
       ],
     },
