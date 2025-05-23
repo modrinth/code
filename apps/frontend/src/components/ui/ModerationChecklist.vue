@@ -256,7 +256,9 @@
         </p>
         <div class="options input-group">
           <button
-            v-for="(option, index) in steps[currentStepIndex].options"
+            v-for="(option, index) in steps[currentStepIndex].options.filter(
+              (x) => x.shown !== false,
+            )"
             :key="index"
             class="btn"
             :class="{
@@ -646,16 +648,17 @@ For a brief rundown of how this works:
     {
       id: "gallery",
       navigate: `/${props.project.project_type}/${props.project.slug}/gallery`,
-      question: `Are the project's gallery images relevant?`,
-      shown: props.project.gallery.length > 0,
+      question: `Are this project's gallery images sufficient?`,
+      shown: true,
       options: [
         {
           name: "Not relevant",
+          shown: props.project.gallery.length > 0,
           resultingMessage: `## Unrelated Gallery Images
 Per section 5.5 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous) any images in your project's Gallery must be relevant to the project and also include a Title.`,
         },
         {
-          name: "Insufficient images",
+          name: "Insufficient",
           resultingMessage: `## Insufficient Gallery Images
 We ask that projects like yours show off their content using images in the Gallery, or optionally in the Description, in order to effectively and clearly inform users of its content per section 2.1 of [Modrinth's content rules](https://modrinth.com/legal/rules#general-expectations).
 Keep in mind that you should:
