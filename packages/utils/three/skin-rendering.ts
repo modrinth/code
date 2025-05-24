@@ -40,7 +40,7 @@ export async function loadModel(modelUrl: string): Promise<GLTF> {
  */
 export async function loadTexture(
   textureUrl: string,
-  config: SkinRendererConfig = {}
+  config: SkinRendererConfig = {},
 ): Promise<THREE.Texture> {
   const cacheKey = `${textureUrl}_${JSON.stringify(config)}`
 
@@ -95,7 +95,7 @@ export function applyTexture(model: THREE.Object3D, texture: THREE.Texture): voi
 export function applyCapeTexture(
   model: THREE.Object3D,
   texture: THREE.Texture | null,
-  transparentTexture?: THREE.Texture
+  transparentTexture?: THREE.Texture,
 ): void {
   model.traverse((child) => {
     if ((child as THREE.Mesh).isMesh) {
@@ -125,7 +125,7 @@ export function attachCapeToBody(
   bodyNode: THREE.Object3D,
   capeModel: THREE.Object3D,
   position = { x: 0, y: -1, z: -0.01 },
-  rotation = { x: 0, y: -Math.PI / 2, z: 0 }
+  rotation = { x: 0, y: -Math.PI / 2, z: 0 },
 ): void {
   if (!bodyNode || !capeModel) return
 
@@ -184,17 +184,14 @@ export async function setupSkinModel(
   textureUrl: string,
   capeModelUrl?: string,
   capeTextureUrl?: string,
-  config: SkinRendererConfig = {}
+  config: SkinRendererConfig = {},
 ): Promise<{
   model: THREE.Object3D
   bodyNode: THREE.Object3D | null
   capeModel: THREE.Object3D | null
 }> {
   // Load model and texture in parallel
-  const [gltf, texture] = await Promise.all([
-    loadModel(modelUrl),
-    loadTexture(textureUrl, config),
-  ])
+  const [gltf, texture] = await Promise.all([loadModel(modelUrl), loadTexture(textureUrl, config)])
 
   const model = gltf.scene.clone()
   applyTexture(model, texture)

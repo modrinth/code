@@ -70,7 +70,7 @@
 
       <!-- eslint-disable-next-line vue/attribute-hyphenation -->
       <TresPerspectiveCamera
-        :makeDefault="true"
+        :make-default="true"
         :fov="fov"
         :position="[0, 1.5, -3.25]"
         :look-at="target"
@@ -96,7 +96,7 @@ import {
   attachCapeToBody,
   findBodyNode,
   createTransparentTexture,
-  loadTexture as loadSkinTexture
+  loadTexture as loadSkinTexture,
 } from '@modrinth/utils'
 
 const props = withDefaults(
@@ -299,17 +299,14 @@ watch(
       attachCapeToBodyWrapper()
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
-watch(
-  capeScene,
-  (newCapeScene) => {
-    if (newCapeScene && bodyNode.value && isModelLoaded.value && !capeAttached.value) {
-      attachCapeToBodyWrapper()
-    }
+watch(capeScene, (newCapeScene) => {
+  if (newCapeScene && bodyNode.value && isModelLoaded.value && !capeAttached.value) {
+    attachCapeToBodyWrapper()
   }
-)
+})
 
 watch(selectedModelSrc, (src) => loadModel(src))
 watch(
@@ -358,7 +355,7 @@ onBeforeMount(async () => {
 <style scoped lang="scss">
 .nametag-bg {
   background: linear-gradient(308.68deg, rgba(0, 0, 0, 0) -52.46%, rgba(100, 100, 100, 0.1) 94.75%),
-  rgba(0, 0, 0, 0.2);
+    rgba(0, 0, 0, 0.2);
   box-shadow:
     inset -0.5px -0.5px 0px rgba(0, 0, 0, 0.25),
     inset 0.5px 0.5px 0px rgba(255, 255, 255, 0.05);
