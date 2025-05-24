@@ -127,7 +127,7 @@ impl LegacyProject {
             .collect();
 
         if let Some(versions_item) = versions_item {
-            // Extract side types from remaining fields (singleplayer, client_only, etc)
+            // Extract side types from remaining fields
             let fields = versions_item
                 .version_fields
                 .iter()
@@ -135,10 +135,11 @@ impl LegacyProject {
                     (f.field_name.clone(), f.value.clone().serialize_internal())
                 })
                 .collect::<HashMap<_, _>>();
-            (client_side, server_side) = v2_reroute::convert_side_types_v2(
-                &fields,
-                Some(&*og_project_type),
-            );
+            (client_side, server_side) =
+                v2_reroute::convert_v3_side_types_to_v2_side_types(
+                    &fields,
+                    Some(&*og_project_type),
+                );
 
             // - if loader is mrpack, this is a modpack
             // the loaders are whatever the corresponding loader fields are
