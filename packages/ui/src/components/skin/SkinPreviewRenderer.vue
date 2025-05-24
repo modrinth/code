@@ -68,9 +68,8 @@
         </Group>
       </Suspense>
 
-      <!-- eslint-disable-next-line vue/attribute-hyphenation -->
       <TresPerspectiveCamera
-        :make-default="true"
+        :make-default.camel="true"
         :fov="fov"
         :position="[0, 1.5, -3.25]"
         :look-at="target"
