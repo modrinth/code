@@ -77,7 +77,7 @@
         This is a private conversation thread with the Modrinth moderators. They may message you
         with issues concerning this project. This thread is only checked when you submit your
         project for review. For additional inquiries, contact
-        <a href="https://support.modrinth.com">Modrinth support</a>.
+        <a href="https://support.modrinth.com">Modrinth Support</a>.
       </p>
       <ConversationThread
         v-if="thread"

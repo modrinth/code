@@ -224,7 +224,7 @@
                   explanations for this. If you just purchased your server, this is normal. It could
                   take up to an hour for your server to be provisioned. Otherwise, if you purchased
                   this server a while ago, it has likely since been suspended. If this is not what
-                  you were expecting, please contact Modrinth support with the following
+                  you were expecting, please contact Modrinth Support with the following
                   information:
                 </p>
                 <div class="flex w-full flex-col gap-2">
