@@ -292,7 +292,7 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
         <div class="skin-card-grid">
           <SkinLikeTextButton class="skin-card" tooltip="Add a skin" @click="openUploadSkinModal">
             <template #icon>
-              <PlusIcon class="w-5 h-5 stroke-2" />
+              <PlusIcon class="size-8" />
             </template>
             <span>Add a skin</span>
           </SkinLikeTextButton>
@@ -312,7 +312,7 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
                 aria-label="Edit skin"
                 @click.stop="(e) => editSkinModal?.show(e, skin)"
               >
-                <EditIcon class="w-5 h-5" /> Edit
+                <EditIcon /> Edit
               </Button>
               <Button
                 v-show="!skin.is_equipped"
@@ -323,7 +323,7 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
                 icon-only
                 @click.stop="() => confirmDeleteSkin(skin)"
               >
-                <TrashIcon class="w-5 h-5" />
+                <TrashIcon />
               </Button>
             </template>
           </SkinButton>
