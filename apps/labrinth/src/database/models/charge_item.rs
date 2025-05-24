@@ -254,6 +254,27 @@ impl DBCharge {
             .collect::<Result<Vec<_>, serde_json::Error>>()?)
     }
 
+    pub async fn get_cancellable(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+    ) -> Result<Vec<DBCharge>, DatabaseError> {
+        let charge_type = ChargeType::Subscription.as_str();
+        let res = select_charges_with_predicate!(
+            r#"
+            WHERE
+                charge_type = $1 AND
+                status = 'failed' AND due < NOW() - INTERVAL '30 days'
+            "#,
+            charge_type
+        )
+        .fetch_all(exec)
+        .await?;
+
+        Ok(res
+            .into_iter()
+            .map(|r| r.try_into())
+            .collect::<Result<Vec<_>, serde_json::Error>>()?)
+    }
+
     pub async fn remove(
         id: DBChargeId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,

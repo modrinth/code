@@ -2284,12 +2284,19 @@ pub async fn index_billing(
 ) {
     info!("Indexing billing queue");
     let res = async {
+        // If a charge has continuously failed for more than a month, it should be cancelled
+        let charges_to_cancel = DBCharge::get_cancellable(&pool).await?;
+
+        for mut charge in charges_to_cancel {
+            charge.status = ChargeStatus::Cancelled;
+
+            let mut transaction = pool.begin().await?;
+            charge.upsert(&mut transaction).await?;
+            transaction.commit().await?;
+        }
+
         // If a charge is open and due or has been attempted more than two days ago, it should be processed
-        let charges_to_do =
-            crate::database::models::charge_item::DBCharge::get_chargeable(
-                &pool,
-            )
-            .await?;
+        let charges_to_do = DBCharge::get_chargeable(&pool).await?;
 
         let prices = product_item::DBProductPrice::get_many(
             &charges_to_do
