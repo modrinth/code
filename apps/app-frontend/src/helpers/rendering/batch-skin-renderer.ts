@@ -3,6 +3,7 @@ import type { Skin, Cape } from '../skins'
 import { determineModelType } from '../skins'
 import { reactive } from 'vue'
 import { setupSkinModel, disposeCaches } from '@modrinth/utils'
+import { skinPreviewStorage } from '../storage/skin-preview-storage'
 
 export interface RenderResult {
   forwards: string
@@ -98,7 +99,6 @@ class BatchSkinRenderer {
       this.scene.remove(this.currentModel)
     }
 
-    // Use the utility function to setup the skin model
     const { model } = await setupSkinModel(modelUrl, textureUrl, capeModelUrl, capeUrl)
 
     const group = new THREE.Group()
@@ -130,6 +130,21 @@ function getModelUrlForVariant(variant: string): string {
 export const map = reactive(new Map<string, RenderResult>())
 const DEBUG_MODE = false
 
+export async function cleanupUnusedPreviews(skins: Skin[], capes: Cape[]): Promise<void> {
+  const validKeys = new Set<string>()
+
+  for (const skin of skins) {
+    const key = `${skin.texture_key}+${skin.variant}+${skin.cape_id ?? 'no-cape'}`
+    validKeys.add(key)
+  }
+
+  try {
+    await skinPreviewStorage.cleanupInvalidKeys(validKeys)
+  } catch (error) {
+    console.warn('Failed to cleanup unused skin previews:', error)
+  }
+}
+
 export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promise<void> {
   const renderer = new BatchSkinRenderer()
   const capeModelUrl = '/src/assets/models/cape.gltf'
@@ -145,6 +160,16 @@ export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promis
           URL.revokeObjectURL(result.backwards)
           map.delete(key)
         } else continue
+      }
+
+      try {
+        const cached = await skinPreviewStorage.retrieve(key)
+        if (cached) {
+          map.set(key, cached)
+          continue
+        }
+      } catch (error) {
+        console.warn('Failed to retrieve cached skin preview:', error)
       }
 
       let variant = skin.variant
@@ -167,8 +192,15 @@ export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promis
       )
 
       map.set(key, renderResult)
+
+      try {
+        await skinPreviewStorage.store(key, renderResult)
+      } catch (error) {
+        console.warn('Failed to store skin preview in persistent storage:', error)
+      }
     }
   } finally {
     renderer.dispose()
+    await cleanupUnusedPreviews(skins, capes)
   }
 }
