@@ -520,6 +520,9 @@ importers:
       '@types/markdown-it':
         specifier: ^14.1.1
         version: 14.1.1
+      '@types/three':
+        specifier: ^0.172.0
+        version: 0.172.0
       dayjs:
         specifier: ^1.11.10
         version: 1.11.11
@@ -529,6 +532,9 @@ importers:
       markdown-it:
         specifier: ^14.1.0
         version: 14.1.0
+      three:
+        specifier: ^0.172.0
+        version: 0.172.0
       xss:
         specifier: ^1.0.14
         version: 1.0.15

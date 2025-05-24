@@ -15,6 +15,7 @@
     </div>
 
     <TresCanvas
+      v-if="isReady"
       shadows
       alpha
       :antialias="antialias"
@@ -67,8 +68,9 @@
         </Group>
       </Suspense>
 
+      <!-- eslint-disable-next-line vue/attribute-hyphenation -->
       <TresPerspectiveCamera
-        :make-default="true"
+        :makeDefault="true"
         :fov="fov"
         :position="[0, 1.5, -3.25]"
         :look-at="target"
@@ -76,6 +78,10 @@
 
       <TresAmbientLight :intensity="2" />
     </TresCanvas>
+
+    <div v-else class="w-full h-full flex items-center justify-center">
+      <div class="text-primary">Loading...</div>
+    </div>
   </div>
 </template>
 
@@ -84,6 +90,14 @@ import * as THREE from 'three'
 import { useGLTF } from '@tresjs/cientos'
 import { useTexture, TresCanvas } from '@tresjs/core'
 import { shallowRef, ref, computed, watch, markRaw, onBeforeMount } from 'vue'
+import {
+  applyTexture,
+  applyCapeTexture,
+  attachCapeToBody,
+  findBodyNode,
+  createTransparentTexture,
+  loadTexture as loadSkinTexture
+} from '@modrinth/utils'
 
 const props = withDefaults(
   defineProps<{
@@ -123,44 +137,29 @@ const texture = shallowRef<THREE.Texture | null>(null)
 const capeTexture = shallowRef<THREE.Texture | null>(null)
 const transparentTexture = createTransparentTexture()
 
-function createTransparentTexture(): THREE.Texture {
-  const canvas = document.createElement('canvas')
-  canvas.width = canvas.height = 1
-  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
-  ctx.clearRect(0, 0, 1, 1)
-
-  const texture = new THREE.CanvasTexture(canvas)
-  texture.needsUpdate = true
-  texture.colorSpace = THREE.SRGBColorSpace
-  texture.flipY = false
-  texture.magFilter = THREE.NearestFilter
-  texture.minFilter = THREE.NearestFilter
-
-  return texture
-}
+const isModelLoaded = ref(false)
+const isTextureLoaded = ref(false)
+const isReady = computed(() => isModelLoaded.value && isTextureLoaded.value)
 
 async function loadModel(src: string) {
-  const { scene: loadedScene } = await useGLTF(src)
-  scene.value = markRaw(loadedScene)
+  try {
+    isModelLoaded.value = false
+    const { scene: loadedScene } = await useGLTF(src)
+    scene.value = markRaw(loadedScene)
 
-  if (texture.value) {
-    applyTextureToScene(scene.value, texture.value)
-  }
-
-  bodyNode.value = null
-  loadedScene.traverse((node) => {
-    if (node.name === 'Body') {
-      bodyNode.value = node
+    if (texture.value) {
+      applyTexture(scene.value, texture.value)
     }
-  })
 
-  capeAttached.value = false
+    bodyNode.value = findBodyNode(loadedScene)
+    capeAttached.value = false
 
-  if (capeScene.value && bodyNode.value) {
-    attachCapeToBody()
+    updateModelInfo()
+    isModelLoaded.value = true
+  } catch (error) {
+    console.error('Failed to load model:', error)
+    isModelLoaded.value = false
   }
-
-  updateModelInfo()
 }
 
 async function loadCape(src: string) {
@@ -169,24 +168,39 @@ async function loadCape(src: string) {
     return
   }
 
-  const { scene: loadedCape } = await useGLTF(src)
-  capeScene.value = markRaw(loadedCape)
+  try {
+    const { scene: loadedCape } = await useGLTF(src)
+    capeScene.value = markRaw(loadedCape)
 
-  applyCapeTexture(capeScene.value, capeTexture.value)
+    applyCapeTexture(capeScene.value, capeTexture.value, transparentTexture)
 
-  if (bodyNode.value && !capeAttached.value) {
-    attachCapeToBody()
+    if (bodyNode.value && !capeAttached.value) {
+      attachCapeToBodyWrapper()
+    }
+  } catch (error) {
+    console.error('Failed to load cape:', error)
+    capeScene.value = null
   }
 }
 
 async function loadAndApplyTexture(src: string) {
   if (!src) return null
-  const tex = await useTexture([src])
-  tex.colorSpace = THREE.SRGBColorSpace
-  tex.flipY = false
-  tex.magFilter = THREE.NearestFilter
-  tex.minFilter = THREE.NearestFilter
-  return tex
+
+  try {
+    try {
+      return await loadSkinTexture(src)
+    } catch {
+      const tex = await useTexture([src])
+      tex.colorSpace = THREE.SRGBColorSpace
+      tex.flipY = false
+      tex.magFilter = THREE.NearestFilter
+      tex.minFilter = THREE.NearestFilter
+      return tex
+    }
+  } catch (error) {
+    console.error('Failed to load texture:', error)
+    return null
+  }
 }
 
 async function loadAndApplyCapeTexture(src: string | undefined) {
@@ -201,7 +215,7 @@ async function loadAndApplyCapeTexture(src: string | undefined) {
   }
 
   if (capeScene.value) {
-    applyCapeTexture(capeScene.value, capeTexture.value)
+    applyCapeTexture(capeScene.value, capeTexture.value, transparentTexture)
   }
 
   if (capeScene.value && bodyNode.value) {
@@ -209,71 +223,16 @@ async function loadAndApplyCapeTexture(src: string | undefined) {
       capeScene.value.parent.remove(capeScene.value)
       capeAttached.value = false
     } else if (src && !capeAttached.value) {
-      attachCapeToBody()
+      attachCapeToBodyWrapper()
     }
   }
 }
 
-function attachCapeToBody() {
+function attachCapeToBodyWrapper() {
   if (!bodyNode.value || !capeScene.value || capeAttached.value) return
 
-  if (capeScene.value.parent) {
-    capeScene.value.parent.remove(capeScene.value)
-  }
-
-  capeScene.value.position.set(0, -1, -0.01)
-  capeScene.value.rotation.set(0, -Math.PI / 2, 0)
-
-  bodyNode.value.add(capeScene.value)
+  attachCapeToBody(bodyNode.value, capeScene.value)
   capeAttached.value = true
-}
-
-function applyTextureToScene(root: THREE.Object3D | null, tex: THREE.Texture | null) {
-  if (!root || !tex) return
-
-  root.traverse((child) => {
-    if ((child as THREE.Mesh).isMesh) {
-      const mesh = child as THREE.Mesh
-
-      if (mesh.name === 'Cape') return
-
-      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
-
-      materials.forEach((mat, _index, _array) => {
-        const standardMat = mat as THREE.MeshStandardMaterial
-        standardMat.map = tex
-        standardMat.metalness = 0
-        standardMat.color.set(0xffffff)
-        standardMat.toneMapped = false
-        standardMat.roughness = 1
-        standardMat.needsUpdate = true
-      })
-    }
-  })
-}
-
-function applyCapeTexture(root: THREE.Object3D | null, tex: THREE.Texture | null) {
-  if (!root) return
-
-  root.traverse((child) => {
-    if ((child as THREE.Mesh).isMesh) {
-      const mesh = child as THREE.Mesh
-
-      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
-
-      materials.forEach((mat, _index, _array) => {
-        const standardMat = mat as THREE.MeshStandardMaterial
-        standardMat.map = tex || transparentTexture
-        standardMat.transparent = true
-        standardMat.metalness = 0
-        standardMat.color.set(0xffffff)
-        standardMat.toneMapped = false
-        standardMat.roughness = 1
-        standardMat.side = THREE.DoubleSide
-        standardMat.needsUpdate = true
-      })
-    }
-  })
 }
 
 const centre = ref<[number, number, number]>([0, 1, 0])
@@ -281,11 +240,15 @@ const modelHeight = ref(1.4)
 
 function updateModelInfo() {
   if (!scene.value) return
-  const bbox = new THREE.Box3().setFromObject(scene.value)
-  const mid = new THREE.Vector3()
-  bbox.getCenter(mid)
-  centre.value = [mid.x, mid.y, mid.z]
-  modelHeight.value = bbox.max.y - bbox.min.y
+  try {
+    const bbox = new THREE.Box3().setFromObject(scene.value)
+    const mid = new THREE.Vector3()
+    bbox.getCenter(mid)
+    centre.value = [mid.x, mid.y, mid.z]
+    modelHeight.value = bbox.max.y - bbox.min.y
+  } catch (error) {
+    console.error('Failed to update model info:', error)
+  }
 }
 
 const target = computed(() => centre.value)
@@ -329,6 +292,25 @@ function createRadialTexture(size: number): THREE.CanvasTexture {
   return new THREE.CanvasTexture(canvas)
 }
 
+watch(
+  [bodyNode, capeScene, isModelLoaded],
+  ([newBodyNode, newCapeScene, modelLoaded]) => {
+    if (newBodyNode && newCapeScene && modelLoaded && !capeAttached.value) {
+      attachCapeToBodyWrapper()
+    }
+  },
+  { immediate: true }
+)
+
+watch(
+  capeScene,
+  (newCapeScene) => {
+    if (newCapeScene && bodyNode.value && isModelLoaded.value && !capeAttached.value) {
+      attachCapeToBodyWrapper()
+    }
+  }
+)
+
 watch(selectedModelSrc, (src) => loadModel(src))
 watch(
   () => props.capeModelSrc,
@@ -337,10 +319,12 @@ watch(
 watch(
   () => props.textureSrc,
   async (newSrc) => {
+    isTextureLoaded.value = false
     texture.value = await loadAndApplyTexture(newSrc)
     if (scene.value && texture.value) {
-      applyTextureToScene(scene.value, texture.value)
+      applyTexture(scene.value, texture.value)
     }
+    isTextureLoaded.value = true
   },
 )
 watch(
@@ -351,16 +335,22 @@ watch(
 )
 
 onBeforeMount(async () => {
-  texture.value = await loadAndApplyTexture(props.textureSrc)
+  try {
+    isTextureLoaded.value = false
+    texture.value = await loadAndApplyTexture(props.textureSrc)
+    isTextureLoaded.value = true
 
-  await loadModel(selectedModelSrc.value)
+    await loadModel(selectedModelSrc.value)
 
-  if (props.capeSrc) {
-    await loadAndApplyCapeTexture(props.capeSrc)
-  }
+    if (props.capeSrc) {
+      await loadAndApplyCapeTexture(props.capeSrc)
+    }
 
-  if (props.capeModelSrc) {
-    await loadCape(props.capeModelSrc)
+    if (props.capeModelSrc) {
+      await loadCape(props.capeModelSrc)
+    }
+  } catch (error) {
+    console.error('Failed to initialize skin preview:', error)
   }
 })
 </script>
@@ -368,7 +358,7 @@ onBeforeMount(async () => {
 <style scoped lang="scss">
 .nametag-bg {
   background: linear-gradient(308.68deg, rgba(0, 0, 0, 0) -52.46%, rgba(100, 100, 100, 0.1) 94.75%),
-    rgba(0, 0, 0, 0.2);
+  rgba(0, 0, 0, 0.2);
   box-shadow:
     inset -0.5px -0.5px 0px rgba(0, 0, 0, 0.25),
     inset 0.5px 0.5px 0px rgba(255, 255, 255, 0.05);
