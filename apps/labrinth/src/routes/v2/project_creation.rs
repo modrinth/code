@@ -158,10 +158,12 @@ pub async fn project_create(
                 .into_iter()
                 .map(|v| {
                     let mut fields = HashMap::new();
-                    fields.extend(v2_reroute::convert_side_types_v3(
-                        client_side,
-                        server_side,
-                    ));
+                    fields.extend(
+                        v2_reroute::convert_v2_side_types_to_v3_side_types(
+                            client_side,
+                            server_side,
+                        ),
+                    );
                     fields.insert(
                         "game_versions".to_string(),
                         json!(v.game_versions),
