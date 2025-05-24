@@ -2,7 +2,7 @@ use super::loader_fields::{
     QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
     VersionField,
 };
-use super::{User, ids::*};
+use super::{DBUser, ids::*};
 use crate::database::models;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
@@ -57,7 +57,7 @@ impl LinkUrl {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct GalleryItem {
+pub struct DBGalleryItem {
     pub image_url: String,
     pub raw_image_url: String,
     pub featured: bool,
@@ -67,7 +67,7 @@ pub struct GalleryItem {
     pub ordering: i64,
 }
 
-impl GalleryItem {
+impl DBGalleryItem {
     pub async fn insert_many(
         items: Vec<Self>,
         project_id: DBProjectId,
@@ -117,13 +117,13 @@ impl GalleryItem {
     }
 }
 
-pub struct ModCategory {
+pub struct DBModCategory {
     pub project_id: DBProjectId,
     pub category_id: CategoryId,
     pub is_additional: bool,
 }
 
-impl ModCategory {
+impl DBModCategory {
     pub async fn insert_many(
         items: Vec<Self>,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -171,7 +171,7 @@ pub struct ProjectBuilder {
     pub license: String,
     pub slug: Option<String>,
     pub link_urls: Vec<LinkUrl>,
-    pub gallery_items: Vec<GalleryItem>,
+    pub gallery_items: Vec<DBGalleryItem>,
     pub color: Option<u32>,
     pub monetization_status: MonetizationStatus,
 }
@@ -181,7 +181,7 @@ impl ProjectBuilder {
         self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<DBProjectId, DatabaseError> {
-        let project_struct = Project {
+        let project_struct = DBProject {
             id: self.project_id,
             team_id: self.team_id,
             organization_id: self.organization_id,
@@ -234,7 +234,7 @@ impl ProjectBuilder {
         )
         .await?;
 
-        GalleryItem::insert_many(
+        DBGalleryItem::insert_many(
             gallery_items,
             self.project_id,
             &mut *transaction,
@@ -244,26 +244,26 @@ impl ProjectBuilder {
         let project_id = self.project_id;
         let mod_categories = categories
             .into_iter()
-            .map(|category_id| ModCategory {
+            .map(|category_id| DBModCategory {
                 project_id,
                 category_id,
                 is_additional: false,
             })
             .chain(additional_categories.into_iter().map(|category_id| {
-                ModCategory {
+                DBModCategory {
                     project_id,
                     category_id,
                     is_additional: true,
                 }
             }))
             .collect_vec();
-        ModCategory::insert_many(mod_categories, &mut *transaction).await?;
+        DBModCategory::insert_many(mod_categories, &mut *transaction).await?;
 
         Ok(self.project_id)
     }
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct Project {
+pub struct DBProject {
     pub id: DBProjectId,
     pub team_id: DBTeamId,
     pub organization_id: Option<DBOrganizationId>,
@@ -291,7 +291,7 @@ pub struct Project {
     pub loaders: Vec<String>,
 }
 
-impl Project {
+impl DBProject {
     pub async fn insert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -343,7 +343,7 @@ impl Project {
         let project = Self::get_id(id, &mut **transaction, redis).await?;
 
         if let Some(project) = project {
-            Project::clear_cache(id, project.inner.slug, Some(true), redis)
+            DBProject::clear_cache(id, project.inner.slug, Some(true), redis)
                 .await?;
 
             sqlx::query!(
@@ -376,7 +376,8 @@ impl Project {
             .execute(&mut **transaction)
             .await?;
 
-            models::Thread::remove_full(project.thread_id, transaction).await?;
+            models::DBThread::remove_full(project.thread_id, transaction)
+                .await?;
 
             sqlx::query!(
                 "
@@ -410,7 +411,7 @@ impl Project {
             .await?;
 
             for version in project.versions {
-                super::Version::remove_full(version, redis, transaction)
+                super::DBVersion::remove_full(version, redis, transaction)
                     .await?;
             }
 
@@ -444,7 +445,7 @@ impl Project {
             .execute(&mut **transaction)
             .await?;
 
-            models::TeamMember::clear_cache(project.inner.team_id, redis)
+            models::DBTeamMember::clear_cache(project.inner.team_id, redis)
                 .await?;
 
             let affected_user_ids = sqlx::query!(
@@ -460,7 +461,7 @@ impl Project {
             .try_collect::<Vec<_>>()
             .await?;
 
-            User::clear_project_cache(&affected_user_ids, redis).await?;
+            DBUser::clear_project_cache(&affected_user_ids, redis).await?;
 
             sqlx::query!(
                 "
@@ -482,11 +483,11 @@ impl Project {
         string: &str,
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Option<QueryProject>, DatabaseError>
+    ) -> Result<Option<ProjectQueryResult>, DatabaseError>
     where
         E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
     {
-        Project::get_many(&[string], executor, redis)
+        DBProject::get_many(&[string], executor, redis)
             .await
             .map(|x| x.into_iter().next())
     }
@@ -495,11 +496,11 @@ impl Project {
         id: DBProjectId,
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Option<QueryProject>, DatabaseError>
+    ) -> Result<Option<ProjectQueryResult>, DatabaseError>
     where
         E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
     {
-        Project::get_many(
+        DBProject::get_many(
             &[crate::models::ids::ProjectId::from(id)],
             executor,
             redis,
@@ -512,7 +513,7 @@ impl Project {
         project_ids: &[DBProjectId],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<QueryProject>, DatabaseError>
+    ) -> Result<Vec<ProjectQueryResult>, DatabaseError>
     where
         E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
     {
@@ -520,7 +521,7 @@ impl Project {
             .iter()
             .map(|x| crate::models::ids::ProjectId::from(*x))
             .collect::<Vec<_>>();
-        Project::get_many(&ids, exec, redis).await
+        DBProject::get_many(&ids, exec, redis).await
     }
 
     pub async fn get_many<
@@ -531,7 +532,7 @@ impl Project {
         project_strings: &[T],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<QueryProject>, DatabaseError>
+    ) -> Result<Vec<ProjectQueryResult>, DatabaseError>
     where
         E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
     {
@@ -638,7 +639,7 @@ impl Project {
                     .try_collect()
                     .await?;
 
-                let mods_gallery: DashMap<DBProjectId, Vec<GalleryItem>> = sqlx::query!(
+                let mods_gallery: DashMap<DBProjectId, Vec<DBGalleryItem>> = sqlx::query!(
                     "
                     SELECT DISTINCT mod_id, mg.image_url, mg.raw_image_url, mg.featured, mg.name, mg.description, mg.created, mg.ordering
                     FROM mods_gallery mg
@@ -648,10 +649,10 @@ impl Project {
                     &project_ids_parsed,
                     &slugs
                 ).fetch(&mut *exec)
-                    .try_fold(DashMap::new(), |acc : DashMap<DBProjectId, Vec<GalleryItem>>, m| {
+                    .try_fold(DashMap::new(), |acc : DashMap<DBProjectId, Vec<DBGalleryItem>>, m| {
                         acc.entry(DBProjectId(m.mod_id))
                             .or_default()
-                            .push(GalleryItem {
+                            .push(DBGalleryItem {
                                 image_url: m.image_url,
                                 raw_image_url: m.raw_image_url,
                                 featured: m.featured.unwrap_or(false),
@@ -802,8 +803,8 @@ impl Project {
                             .filter(|x| loader_loader_field_ids.contains(&x.id))
                             .collect::<Vec<_>>();
 
-                        let project = QueryProject {
-                            inner: Project {
+                        let project = ProjectQueryResult {
+                            inner: DBProject {
                                 id: DBProjectId(id),
                                 team_id: DBTeamId(m.team_id),
                                 organization_id: m.organization_id.map(DBOrganizationId),
@@ -958,15 +959,15 @@ impl Project {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct QueryProject {
-    pub inner: Project,
+pub struct ProjectQueryResult {
+    pub inner: DBProject,
     pub categories: Vec<String>,
     pub additional_categories: Vec<String>,
     pub versions: Vec<DBVersionId>,
     pub project_types: Vec<String>,
     pub games: Vec<String>,
     pub urls: Vec<LinkUrl>,
-    pub gallery_items: Vec<GalleryItem>,
+    pub gallery_items: Vec<DBGalleryItem>,
     pub thread_id: DBThreadId,
     pub aggregate_version_fields: Vec<VersionField>,
 }

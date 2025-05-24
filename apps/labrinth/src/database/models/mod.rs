@@ -26,17 +26,17 @@ pub mod user_item;
 pub mod user_subscription_item;
 pub mod version_item;
 
-pub use collection_item::Collection;
+pub use collection_item::DBCollection;
 pub use ids::*;
-pub use image_item::Image;
-pub use oauth_client_item::OAuthClient;
-pub use organization_item::Organization;
-pub use project_item::Project;
-pub use team_item::Team;
-pub use team_item::TeamMember;
-pub use thread_item::{Thread, ThreadMessage};
-pub use user_item::User;
-pub use version_item::Version;
+pub use image_item::DBImage;
+pub use oauth_client_item::DBOAuthClient;
+pub use organization_item::DBOrganization;
+pub use project_item::DBProject;
+pub use team_item::DBTeam;
+pub use team_item::DBTeamMember;
+pub use thread_item::{DBThread, DBThreadMessage};
+pub use user_item::DBUser;
+pub use version_item::DBVersion;
 
 #[derive(Error, Debug)]
 pub enum DatabaseError {

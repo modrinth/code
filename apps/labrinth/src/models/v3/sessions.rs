@@ -27,7 +27,7 @@ pub struct Session {
 
 impl Session {
     pub fn from(
-        data: crate::database::models::session_item::Session,
+        data: crate::database::models::session_item::DBSession,
         include_session: bool,
         current_session: Option<&str>,
     ) -> Self {

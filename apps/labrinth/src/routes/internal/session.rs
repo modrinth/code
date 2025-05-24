@@ -1,6 +1,6 @@
 use crate::auth::{AuthenticationError, get_user_from_headers};
 use crate::database::models::DBUserId;
-use crate::database::models::session_item::Session as DBSession;
+use crate::database::models::session_item::DBSession;
 use crate::database::models::session_item::SessionBuilder;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;

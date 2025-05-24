@@ -4,9 +4,9 @@ use std::sync::Arc;
 use crate::auth::checks::{filter_visible_versions, is_visible_project};
 use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::models::notification_item::NotificationBuilder;
-use crate::database::models::project_item::{GalleryItem, ModCategory};
+use crate::database::models::project_item::{DBGalleryItem, DBModCategory};
 use crate::database::models::thread_item::ThreadMessageBuilder;
-use crate::database::models::{TeamMember, ids as db_ids, image_item};
+use crate::database::models::{DBTeamMember, ids as db_ids, image_item};
 use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
 use crate::file_hosting::FileHost;
@@ -109,7 +109,7 @@ pub async fn random_projects_get(
     .await?;
 
     let projects_data =
-        db_models::Project::get_many_ids(&project_ids, &**pool, &redis)
+        db_models::DBProject::get_many_ids(&project_ids, &**pool, &redis)
             .await?
             .into_iter()
             .map(Project::from)
@@ -132,7 +132,7 @@ pub async fn projects_get(
 ) -> Result<HttpResponse, ApiError> {
     let ids = serde_json::from_str::<Vec<&str>>(&ids.ids)?;
     let projects_data =
-        db_models::Project::get_many(&ids, &**pool, &redis).await?;
+        db_models::DBProject::get_many(&ids, &**pool, &redis).await?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -162,7 +162,7 @@ pub async fn project_get(
     let string = info.into_inner().0;
 
     let project_data =
-        db_models::Project::get(&string, &**pool, &redis).await?;
+        db_models::DBProject::get(&string, &**pool, &redis).await?;
     let user_option = get_user_from_headers(
         &req,
         &**pool,
@@ -268,12 +268,12 @@ pub async fn project_edit(
     })?;
 
     let string = info.into_inner().0;
-    let result = db_models::Project::get(&string, &**pool, &redis).await?;
+    let result = db_models::DBProject::get(&string, &**pool, &redis).await?;
     if let Some(project_item) = result {
         let id = project_item.inner.id;
 
         let (team_member, organization_team_member) =
-            db_models::TeamMember::get_for_project_permissions(
+            db_models::DBTeamMember::get_for_project_permissions(
                 &project_item.inner,
                 user.id.into(),
                 &**pool,
@@ -884,7 +884,7 @@ pub async fn project_edit(
             .await?;
 
             transaction.commit().await?;
-            db_models::Project::clear_cache(
+            db_models::DBProject::clear_cache(
                 project_item.inner.id,
                 project_item.inner.slug,
                 None,
@@ -929,7 +929,7 @@ pub async fn edit_project_categories(
 
         let mcategories = category_ids
             .values()
-            .map(|&category_id| ModCategory {
+            .map(|&category_id| DBModCategory {
                 project_id,
                 category_id,
                 is_additional,
@@ -937,7 +937,7 @@ pub async fn edit_project_categories(
             .collect::<Vec<_>>();
         mod_categories.extend(mcategories);
     }
-    ModCategory::insert_many(mod_categories, &mut *transaction).await?;
+    DBModCategory::insert_many(mod_categories, &mut *transaction).await?;
 
     Ok(())
 }
@@ -980,7 +980,8 @@ pub async fn project_get_check(
 ) -> Result<HttpResponse, ApiError> {
     let slug = info.into_inner().0;
 
-    let project_data = db_models::Project::get(&slug, &**pool, &redis).await?;
+    let project_data =
+        db_models::DBProject::get(&slug, &**pool, &redis).await?;
 
     if let Some(project) = project_data {
         Ok(HttpResponse::Ok().json(json! ({
@@ -1006,7 +1007,7 @@ pub async fn dependency_list(
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
 
-    let result = db_models::Project::get(&string, &**pool, &redis).await?;
+    let result = db_models::DBProject::get(&string, &**pool, &redis).await?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -1026,7 +1027,7 @@ pub async fn dependency_list(
             return Err(ApiError::NotFound);
         }
 
-        let dependencies = database::Project::get_dependencies(
+        let dependencies = database::DBProject::get_dependencies(
             project.inner.id,
             &**pool,
             &redis,
@@ -1054,8 +1055,8 @@ pub async fn dependency_list(
             .unique()
             .collect::<Vec<db_models::DBVersionId>>();
         let (projects_result, versions_result) = futures::future::try_join(
-            database::Project::get_many_ids(&project_ids, &**pool, &redis),
-            database::Version::get_many(&dep_version_ids, &**pool, &redis),
+            database::DBProject::get_many_ids(&project_ids, &**pool, &redis),
+            database::DBVersion::get_many(&dep_version_ids, &**pool, &redis),
         )
         .await?;
 
@@ -1141,7 +1142,8 @@ pub async fn projects_edit(
             .collect();
 
     let projects_data =
-        db_models::Project::get_many_ids(&project_ids, &**pool, &redis).await?;
+        db_models::DBProject::get_many_ids(&project_ids, &**pool, &redis)
+            .await?;
 
     if let Some(id) = project_ids
         .iter()
@@ -1157,7 +1159,7 @@ pub async fn projects_edit(
         .iter()
         .map(|x| x.inner.team_id)
         .collect::<Vec<db_models::DBTeamId>>();
-    let team_members = db_models::TeamMember::get_from_team_full_many(
+    let team_members = db_models::DBTeamMember::get_from_team_full_many(
         &team_ids, &**pool, &redis,
     )
     .await?;
@@ -1166,7 +1168,7 @@ pub async fn projects_edit(
         .iter()
         .filter_map(|x| x.inner.organization_id)
         .collect::<Vec<db_models::DBOrganizationId>>();
-    let organizations = db_models::Organization::get_many_ids(
+    let organizations = db_models::DBOrganization::get_many_ids(
         &organization_ids,
         &**pool,
         &redis,
@@ -1178,7 +1180,7 @@ pub async fn projects_edit(
         .map(|x| x.team_id)
         .collect::<Vec<db_models::DBTeamId>>();
     let organization_team_members =
-        db_models::TeamMember::get_from_team_full_many(
+        db_models::DBTeamMember::get_from_team_full_many(
             &organization_team_ids,
             &**pool,
             &redis,
@@ -1315,7 +1317,7 @@ pub async fn projects_edit(
             }
         }
 
-        db_models::Project::clear_cache(
+        db_models::DBProject::clear_cache(
             project.inner.id,
             project.inner.slug,
             None,
@@ -1388,13 +1390,13 @@ pub async fn bulk_edit_project_categories(
                     ))
                 })?
                 .id;
-            mod_categories.push(ModCategory {
+            mod_categories.push(DBModCategory {
                 project_id,
                 category_id,
                 is_additional,
             });
         }
-        ModCategory::insert_many(mod_categories, &mut *transaction).await?;
+        DBModCategory::insert_many(mod_categories, &mut *transaction).await?;
     }
 
     Ok(())
@@ -1427,7 +1429,7 @@ pub async fn project_icon_edit(
     .1;
     let string = info.into_inner().0;
 
-    let project_item = db_models::Project::get(&string, &**pool, &redis)
+    let project_item = db_models::DBProject::get(&string, &**pool, &redis)
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(
@@ -1437,7 +1439,7 @@ pub async fn project_icon_edit(
 
     if !user.role.is_mod() {
         let (team_member, organization_team_member) =
-            db_models::TeamMember::get_for_project_permissions(
+            db_models::DBTeamMember::get_for_project_permissions(
                 &project_item.inner,
                 user.id.into(),
                 &**pool,
@@ -1508,7 +1510,7 @@ pub async fn project_icon_edit(
     .await?;
 
     transaction.commit().await?;
-    db_models::Project::clear_cache(
+    db_models::DBProject::clear_cache(
         project_item.inner.id,
         project_item.inner.slug,
         None,
@@ -1538,7 +1540,7 @@ pub async fn delete_project_icon(
     .1;
     let string = info.into_inner().0;
 
-    let project_item = db_models::Project::get(&string, &**pool, &redis)
+    let project_item = db_models::DBProject::get(&string, &**pool, &redis)
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(
@@ -1548,7 +1550,7 @@ pub async fn delete_project_icon(
 
     if !user.role.is_mod() {
         let (team_member, organization_team_member) =
-            db_models::TeamMember::get_for_project_permissions(
+            db_models::DBTeamMember::get_for_project_permissions(
                 &project_item.inner,
                 user.id.into(),
                 &**pool,
@@ -1597,7 +1599,7 @@ pub async fn delete_project_icon(
     .await?;
 
     transaction.commit().await?;
-    db_models::Project::clear_cache(
+    db_models::DBProject::clear_cache(
         project_item.inner.id,
         project_item.inner.slug,
         None,
@@ -1645,7 +1647,7 @@ pub async fn add_gallery_item(
     .1;
     let string = info.into_inner().0;
 
-    let project_item = db_models::Project::get(&string, &**pool, &redis)
+    let project_item = db_models::DBProject::get(&string, &**pool, &redis)
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(
@@ -1662,7 +1664,7 @@ pub async fn add_gallery_item(
 
     if !user.role.is_admin() {
         let (team_member, organization_team_member) =
-            db_models::TeamMember::get_for_project_permissions(
+            db_models::DBTeamMember::get_for_project_permissions(
                 &project_item.inner,
                 user.id.into(),
                 &**pool,
@@ -1735,7 +1737,7 @@ pub async fn add_gallery_item(
         .await?;
     }
 
-    let gallery_item = vec![db_models::project_item::GalleryItem {
+    let gallery_item = vec![db_models::project_item::DBGalleryItem {
         image_url: upload_result.url,
         raw_image_url: upload_result.raw_url,
         featured: item.featured,
@@ -1744,7 +1746,7 @@ pub async fn add_gallery_item(
         created: Utc::now(),
         ordering: item.ordering.unwrap_or(0),
     }];
-    GalleryItem::insert_many(
+    DBGalleryItem::insert_many(
         gallery_item,
         project_item.inner.id,
         &mut transaction,
@@ -1752,7 +1754,7 @@ pub async fn add_gallery_item(
     .await?;
 
     transaction.commit().await?;
-    db_models::Project::clear_cache(
+    db_models::DBProject::clear_cache(
         project_item.inner.id,
         project_item.inner.slug,
         None,
@@ -1822,7 +1824,7 @@ pub async fn edit_gallery_item(
         ))
     })?;
 
-    let project_item = db_models::Project::get_id(
+    let project_item = db_models::DBProject::get_id(
         database::models::DBProjectId(result.mod_id),
         &**pool,
         &redis,
@@ -1836,7 +1838,7 @@ pub async fn edit_gallery_item(
 
     if !user.role.is_mod() {
         let (team_member, organization_team_member) =
-            db_models::TeamMember::get_for_project_permissions(
+            db_models::DBTeamMember::get_for_project_permissions(
                 &project_item.inner,
                 user.id.into(),
                 &**pool,
@@ -1935,7 +1937,7 @@ pub async fn edit_gallery_item(
 
     transaction.commit().await?;
 
-    db_models::Project::clear_cache(
+    db_models::DBProject::clear_cache(
         project_item.inner.id,
         project_item.inner.slug,
         None,
@@ -1985,7 +1987,7 @@ pub async fn delete_gallery_item(
         ))
     })?;
 
-    let project_item = db_models::Project::get_id(
+    let project_item = db_models::DBProject::get_id(
         database::models::DBProjectId(item.mod_id),
         &**pool,
         &redis,
@@ -1999,7 +2001,7 @@ pub async fn delete_gallery_item(
 
     if !user.role.is_mod() {
         let (team_member, organization_team_member) =
-            db_models::TeamMember::get_for_project_permissions(
+            db_models::DBTeamMember::get_for_project_permissions(
                 &project_item.inner,
                 user.id.into(),
                 &**pool,
@@ -2049,7 +2051,7 @@ pub async fn delete_gallery_item(
 
     transaction.commit().await?;
 
-    db_models::Project::clear_cache(
+    db_models::DBProject::clear_cache(
         project_item.inner.id,
         project_item.inner.slug,
         None,
@@ -2079,7 +2081,7 @@ pub async fn project_delete(
     .1;
     let string = info.into_inner().0;
 
-    let project = db_models::Project::get(&string, &**pool, &redis)
+    let project = db_models::DBProject::get(&string, &**pool, &redis)
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(
@@ -2089,7 +2091,7 @@ pub async fn project_delete(
 
     if !user.role.is_admin() {
         let (team_member, organization_team_member) =
-            db_models::TeamMember::get_for_project_permissions(
+            db_models::DBTeamMember::get_for_project_permissions(
                 &project.inner,
                 user.id.into(),
                 &**pool,
@@ -2122,9 +2124,10 @@ pub async fn project_delete(
         project_id: Some(project.inner.id.into()),
     };
     let uploaded_images =
-        db_models::Image::get_many_contexted(context, &mut transaction).await?;
+        db_models::DBImage::get_many_contexted(context, &mut transaction)
+            .await?;
     for image in uploaded_images {
-        image_item::Image::remove(image.id, &mut transaction, &redis).await?;
+        image_item::DBImage::remove(image.id, &mut transaction, &redis).await?;
     }
 
     sqlx::query!(
@@ -2137,9 +2140,12 @@ pub async fn project_delete(
     .execute(&mut *transaction)
     .await?;
 
-    let result =
-        db_models::Project::remove(project.inner.id, &mut transaction, &redis)
-            .await?;
+    let result = db_models::DBProject::remove(
+        project.inner.id,
+        &mut transaction,
+        &redis,
+    )
+    .await?;
 
     transaction.commit().await?;
 
@@ -2178,7 +2184,7 @@ pub async fn project_follow(
     .1;
     let string = info.into_inner().0;
 
-    let result = db_models::Project::get(&string, &**pool, &redis)
+    let result = db_models::DBProject::get(&string, &**pool, &redis)
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(
@@ -2258,7 +2264,7 @@ pub async fn project_unfollow(
     .1;
     let string = info.into_inner().0;
 
-    let result = db_models::Project::get(&string, &**pool, &redis)
+    let result = db_models::DBProject::get(&string, &**pool, &redis)
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(
@@ -2336,7 +2342,7 @@ pub async fn project_get_organization(
     let user_id = current_user.as_ref().map(|x| x.id.into());
 
     let string = info.into_inner().0;
-    let result = db_models::Project::get(&string, &**pool, &redis)
+    let result = db_models::DBProject::get(&string, &**pool, &redis)
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(
@@ -2350,7 +2356,7 @@ pub async fn project_get_organization(
         ))
     } else if let Some(organization_id) = result.inner.organization_id {
         let organization =
-            db_models::Organization::get_id(organization_id, &**pool, &redis)
+            db_models::DBOrganization::get_id(organization_id, &**pool, &redis)
                 .await?
                 .ok_or_else(|| {
                     ApiError::InvalidInput(
@@ -2358,14 +2364,14 @@ pub async fn project_get_organization(
                     )
                 })?;
 
-        let members_data = TeamMember::get_from_team_full(
+        let members_data = DBTeamMember::get_from_team_full(
             organization.team_id,
             &**pool,
             &redis,
         )
         .await?;
 
-        let users = crate::database::models::User::get_many_ids(
+        let users = crate::database::models::DBUser::get_many_ids(
             &members_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
             &**pool,
             &redis,

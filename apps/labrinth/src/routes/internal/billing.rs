@@ -1,5 +1,5 @@
 use crate::auth::{get_user_from_headers, send_email};
-use crate::database::models::charge_item::ChargeItem;
+use crate::database::models::charge_item::DBCharge;
 use crate::database::models::{
     generate_charge_id, generate_user_subscription_id, product_item,
     user_subscription_item,
@@ -59,7 +59,8 @@ pub async fn products(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let products = product_item::QueryProduct::list(&**pool, &redis).await?;
+    let products =
+        product_item::QueryProductWithPrices::list(&**pool, &redis).await?;
 
     let products = products
         .into_iter()
@@ -107,7 +108,7 @@ pub async fn subscriptions(
     .1;
 
     let subscriptions =
-        user_subscription_item::UserSubscriptionItem::get_all_user(
+        user_subscription_item::DBUserSubscription::get_all_user(
             if let Some(user_id) = query.user_id {
                 if user.role.is_admin() {
                     user_id.into()
@@ -173,8 +174,8 @@ pub async fn refund_charge(
         ));
     }
 
-    if let Some(charge) = ChargeItem::get(id.into(), &**pool).await? {
-        let refunds = ChargeItem::get_children(id.into(), &**pool).await?;
+    if let Some(charge) = DBCharge::get(id.into(), &**pool).await? {
+        let refunds = DBCharge::get_children(id.into(), &**pool).await?;
         let refunds = -refunds
             .into_iter()
             .filter_map(|x| match x.status {
@@ -261,7 +262,7 @@ pub async fn refund_charge(
         let mut transaction = pool.begin().await?;
 
         let charge_id = generate_charge_id(&mut transaction).await?;
-        ChargeItem {
+        DBCharge {
             id: charge_id,
             user_id: charge.user_id,
             price_id: charge.price_id,
@@ -284,7 +285,7 @@ pub async fn refund_charge(
         if body.0.unprovision.unwrap_or(false) {
             if let Some(subscription_id) = charge.subscription_id {
                 let open_charge =
-                    ChargeItem::get_open_subscription(subscription_id, &**pool)
+                    DBCharge::get_open_subscription(subscription_id, &**pool)
                         .await?;
                 if let Some(mut open_charge) = open_charge {
                     open_charge.status = ChargeStatus::Cancelled;
@@ -332,7 +333,7 @@ pub async fn edit_subscription(
     let (id,) = info.into_inner();
 
     if let Some(subscription) =
-        user_subscription_item::UserSubscriptionItem::get(id.into(), &**pool)
+        user_subscription_item::DBUserSubscription::get(id.into(), &**pool)
             .await?
     {
         if subscription.user_id != user.id.into() && !user.role.is_admin() {
@@ -342,7 +343,7 @@ pub async fn edit_subscription(
         let mut transaction = pool.begin().await?;
 
         let mut open_charge =
-            crate::database::models::charge_item::ChargeItem::get_open_subscription(
+            crate::database::models::charge_item::DBCharge::get_open_subscription(
                 subscription.id,
                 &mut *transaction,
             )
@@ -353,7 +354,7 @@ pub async fn edit_subscription(
                 )
             })?;
 
-        let current_price = product_item::ProductPriceItem::get(
+        let current_price = product_item::DBProductPrice::get(
             subscription.price_id,
             &mut *transaction,
         )
@@ -397,7 +398,7 @@ pub async fn edit_subscription(
 
         let intent = if let Some(product_id) = &edit_subscription.product {
             let product_price =
-                product_item::ProductPriceItem::get_all_product_prices(
+                product_item::DBProductPrice::get_all_product_prices(
                     (*product_id).into(),
                     &mut *transaction,
                 )
@@ -622,7 +623,7 @@ pub async fn charges(
     .1;
 
     let charges =
-        crate::database::models::charge_item::ChargeItem::get_from_user(
+        crate::database::models::charge_item::DBCharge::get_from_user(
             if let Some(user_id) = query.user_id {
                 if user.role.is_admin() {
                     user_id.into()
@@ -829,7 +830,7 @@ pub async fn remove_payment_method(
     .await?;
 
     let user_subscriptions =
-        user_subscription_item::UserSubscriptionItem::get_all_user(
+        user_subscription_item::DBUserSubscription::get_all_user(
             user.id.into(),
             &**pool,
         )
@@ -935,12 +936,11 @@ pub async fn active_servers(
         ));
     }
 
-    let servers =
-        user_subscription_item::UserSubscriptionItem::get_all_servers(
-            query.subscription_status,
-            &**pool,
-        )
-        .await?;
+    let servers = user_subscription_item::DBUserSubscription::get_all_servers(
+        query.subscription_status,
+        &**pool,
+    )
+    .await?;
 
     #[derive(Serialize)]
     struct ActiveServer {
@@ -1153,7 +1153,7 @@ pub async fn initiate_payment(
         match payment_request.charge {
             ChargeRequestType::Existing { id } => {
                 let charge =
-                    crate::database::models::charge_item::ChargeItem::get(
+                    crate::database::models::charge_item::DBCharge::get(
                         id.into(),
                         &**pool,
                     )
@@ -1178,7 +1178,7 @@ pub async fn initiate_payment(
                 interval,
             } => {
                 let product =
-                    product_item::ProductItem::get(product_id.into(), &**pool)
+                    product_item::DBProduct::get(product_id.into(), &**pool)
                         .await?
                         .ok_or_else(|| {
                             ApiError::InvalidInput(
@@ -1188,7 +1188,7 @@ pub async fn initiate_payment(
                         })?;
 
                 let mut product_prices =
-                    product_item::ProductPriceItem::get_all_product_prices(
+                    product_item::DBProductPrice::get_all_product_prices(
                         product.id, &**pool,
                     )
                     .await?;
@@ -1229,14 +1229,14 @@ pub async fn initiate_payment(
                 if let Price::Recurring { .. } = price_item.prices {
                     if product.unitary {
                         let user_subscriptions =
-                        user_subscription_item::UserSubscriptionItem::get_all_user(
+                        user_subscription_item::DBUserSubscription::get_all_user(
                             user.id.into(),
                             &**pool,
                         )
                         .await?;
 
                         let user_products =
-                            product_item::ProductPriceItem::get_many(
+                            product_item::DBProductPrice::get_many(
                                 &user_subscriptions
                                     .iter()
                                     .filter(|x| {
@@ -1413,12 +1413,12 @@ pub async fn stripe_webhook(
         &dotenvy::var("STRIPE_WEBHOOK_SECRET")?,
     ) {
         struct PaymentIntentMetadata {
-            pub user_item: crate::database::models::user_item::User,
-            pub product_price_item: product_item::ProductPriceItem,
-            pub product_item: product_item::ProductItem,
-            pub charge_item: crate::database::models::charge_item::ChargeItem,
+            pub user_item: crate::database::models::user_item::DBUser,
+            pub product_price_item: product_item::DBProductPrice,
+            pub product_item: product_item::DBProduct,
+            pub charge_item: crate::database::models::charge_item::DBCharge,
             pub user_subscription_item:
-                Option<user_subscription_item::UserSubscriptionItem>,
+                Option<user_subscription_item::DBUserSubscription>,
             pub payment_metadata: Option<PaymentRequestMetadata>,
             #[allow(dead_code)]
             pub charge_type: ChargeType,
@@ -1447,7 +1447,7 @@ pub async fn stripe_webhook(
                 };
 
                 let user = if let Some(user) =
-                    crate::database::models::user_item::User::get_id(
+                    crate::database::models::user_item::DBUser::get_id(
                         user_id, pool, redis,
                     )
                     .await?
@@ -1483,17 +1483,14 @@ pub async fn stripe_webhook(
                 let (charge, price, product, subscription) = if let Some(
                     mut charge,
                 ) =
-                    crate::database::models::charge_item::ChargeItem::get(
+                    crate::database::models::charge_item::DBCharge::get(
                         charge_id, pool,
                     )
                     .await?
                 {
                     let price = if let Some(price) =
-                        product_item::ProductPriceItem::get(
-                            charge.price_id,
-                            pool,
-                        )
-                        .await?
+                        product_item::DBProductPrice::get(charge.price_id, pool)
+                            .await?
                     {
                         price
                     } else {
@@ -1501,7 +1498,7 @@ pub async fn stripe_webhook(
                     };
 
                     let product = if let Some(product) =
-                        product_item::ProductItem::get(price.product_id, pool)
+                        product_item::DBProduct::get(price.product_id, pool)
                             .await?
                     {
                         product
@@ -1517,7 +1514,7 @@ pub async fn stripe_webhook(
 
                     if let Some(subscription_id) = charge.subscription_id {
                         let mut subscription = if let Some(subscription) =
-                            user_subscription_item::UserSubscriptionItem::get(
+                            user_subscription_item::DBUserSubscription::get(
                                 subscription_id,
                                 pool,
                             )
@@ -1567,7 +1564,7 @@ pub async fn stripe_webhook(
                     };
 
                     let price = if let Some(price) =
-                        product_item::ProductPriceItem::get(price_id, pool)
+                        product_item::DBProductPrice::get(price_id, pool)
                             .await?
                     {
                         price
@@ -1576,7 +1573,7 @@ pub async fn stripe_webhook(
                     };
 
                     let product = if let Some(product) =
-                        product_item::ProductItem::get(price.product_id, pool)
+                        product_item::DBProduct::get(price.product_id, pool)
                             .await?
                     {
                         product
@@ -1608,14 +1605,14 @@ pub async fn stripe_webhook(
                                     break 'metadata;
                                 };
 
-                                let subscription = if let Some(mut subscription) = user_subscription_item::UserSubscriptionItem::get(subscription_id, pool).await? {
+                                let subscription = if let Some(mut subscription) = user_subscription_item::DBUserSubscription::get(subscription_id, pool).await? {
                                     subscription.status = SubscriptionStatus::Unprovisioned;
                                     subscription.price_id = price_id;
                                     subscription.interval = interval;
 
                                     subscription
                                 } else {
-                                    user_subscription_item::UserSubscriptionItem {
+                                    user_subscription_item::DBUserSubscription {
                                         id: subscription_id,
                                         user_id,
                                         price_id,
@@ -1637,7 +1634,7 @@ pub async fn stripe_webhook(
                         }
                     };
 
-                    let charge = ChargeItem {
+                    let charge = DBCharge {
                         id: charge_id,
                         user_id,
                         price_id,
@@ -1870,7 +1867,7 @@ pub async fn stripe_webhook(
                     if let Some(mut subscription) =
                         metadata.user_subscription_item
                     {
-                        let open_charge = ChargeItem::get_open_subscription(
+                        let open_charge = DBCharge::get_open_subscription(
                             subscription.id,
                             &mut *transaction,
                         )
@@ -1898,7 +1895,7 @@ pub async fn stripe_webhook(
                         {
                             let charge_id =
                                 generate_charge_id(&mut transaction).await?;
-                            ChargeItem {
+                            DBCharge {
                                 id: charge_id,
                                 user_id: metadata.user_item.id,
                                 price_id: metadata.product_price_item.id,
@@ -1936,7 +1933,7 @@ pub async fn stripe_webhook(
                     }
 
                     transaction.commit().await?;
-                    crate::database::models::user_item::User::clear_caches(
+                    crate::database::models::user_item::DBUser::clear_caches(
                         &[(metadata.user_item.id, None)],
                         &redis,
                     )
@@ -2098,7 +2095,7 @@ async fn get_or_create_customer(
         .execute(pool)
         .await?;
 
-        crate::database::models::user_item::User::clear_caches(
+        crate::database::models::user_item::DBUser::clear_caches(
             &[(user_id.into(), None)],
             redis,
         )
@@ -2116,10 +2113,10 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
         let mut clear_cache_users = Vec::new();
 
         // If an active subscription has a canceled charge OR a failed charge more than two days ago, it should be cancelled
-        let all_charges = ChargeItem::get_unprovision(&pool).await?;
+        let all_charges = DBCharge::get_unprovision(&pool).await?;
 
         let mut all_subscriptions =
-            user_subscription_item::UserSubscriptionItem::get_many(
+            user_subscription_item::DBUserSubscription::get_many(
                 &all_charges
                     .iter()
                     .filter_map(|x| x.subscription_id)
@@ -2129,7 +2126,7 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
                 &pool,
             )
             .await?;
-        let subscription_prices = product_item::ProductPriceItem::get_many(
+        let subscription_prices = product_item::DBProductPrice::get_many(
             &all_subscriptions
                 .iter()
                 .map(|x| x.price_id)
@@ -2139,7 +2136,7 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
             &pool,
         )
         .await?;
-        let subscription_products = product_item::ProductItem::get_many(
+        let subscription_products = product_item::DBProduct::get_many(
             &subscription_prices
                 .iter()
                 .map(|x| x.product_id)
@@ -2149,7 +2146,7 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
             &pool,
         )
         .await?;
-        let users = crate::database::models::User::get_many_ids(
+        let users = crate::database::models::DBUser::get_many_ids(
             &all_subscriptions
                 .iter()
                 .map(|x| x.user_id)
@@ -2260,7 +2257,7 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
             clear_cache_users.push(user.id);
         }
 
-        crate::database::models::User::clear_caches(
+        crate::database::models::DBUser::clear_caches(
             &clear_cache_users
                 .into_iter()
                 .map(|x| (x, None))
@@ -2289,12 +2286,12 @@ pub async fn index_billing(
     let res = async {
         // If a charge is open and due or has been attempted more than two days ago, it should be processed
         let charges_to_do =
-            crate::database::models::charge_item::ChargeItem::get_chargeable(
+            crate::database::models::charge_item::DBCharge::get_chargeable(
                 &pool,
             )
             .await?;
 
-        let prices = product_item::ProductPriceItem::get_many(
+        let prices = product_item::DBProductPrice::get_many(
             &charges_to_do
                 .iter()
                 .map(|x| x.price_id)
@@ -2305,7 +2302,7 @@ pub async fn index_billing(
         )
         .await?;
 
-        let users = crate::database::models::User::get_many_ids(
+        let users = crate::database::models::DBUser::get_many_ids(
             &charges_to_do
                 .iter()
                 .map(|x| x.user_id)

@@ -62,7 +62,7 @@ impl SessionBuilder {
 }
 
 #[derive(Deserialize, Serialize)]
-pub struct Session {
+pub struct DBSession {
     pub id: DBSessionId,
     pub session: String,
     pub user_id: DBUserId,
@@ -81,7 +81,7 @@ pub struct Session {
     pub ip: String,
 }
 
-impl Session {
+impl DBSession {
     pub async fn get<
         'a,
         E,
@@ -90,7 +90,7 @@ impl Session {
         id: T,
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Option<Session>, DatabaseError>
+    ) -> Result<Option<DBSession>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -103,11 +103,11 @@ impl Session {
         id: DBSessionId,
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Option<Session>, DatabaseError>
+    ) -> Result<Option<DBSession>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        Session::get_many(
+        DBSession::get_many(
             &[crate::models::ids::SessionId::from(id)],
             executor,
             redis,
@@ -120,7 +120,7 @@ impl Session {
         session_ids: &[DBSessionId],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<Session>, DatabaseError>
+    ) -> Result<Vec<DBSession>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -128,7 +128,7 @@ impl Session {
             .iter()
             .map(|x| crate::models::ids::SessionId::from(*x))
             .collect::<Vec<_>>();
-        Session::get_many(&ids, exec, redis).await
+        DBSession::get_many(&ids, exec, redis).await
     }
 
     pub async fn get_many<
@@ -139,7 +139,7 @@ impl Session {
         session_strings: &[T],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<Session>, DatabaseError>
+    ) -> Result<Vec<DBSession>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -173,7 +173,7 @@ impl Session {
                 )
                     .fetch(exec)
                     .try_fold(DashMap::new(), |acc, x| {
-                        let session = Session {
+                        let session = DBSession {
                             id: DBSessionId(x.id),
                             session: x.session.clone(),
                             user_id: DBUserId(x.user_id),

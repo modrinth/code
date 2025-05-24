@@ -1,6 +1,6 @@
 use super::ids::OrganizationId;
-use crate::database::models::notification_item::Notification as DBNotification;
-use crate::database::models::notification_item::NotificationAction as DBNotificationAction;
+use crate::database::models::notification_item::DBNotification;
+use crate::database::models::notification_item::DBNotificationAction;
 use crate::models::ids::{
     NotificationId, ProjectId, ReportId, TeamId, ThreadId, ThreadMessageId,
     VersionId,

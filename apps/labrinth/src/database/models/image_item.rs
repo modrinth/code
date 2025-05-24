@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 const IMAGES_NAMESPACE: &str = "images";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct Image {
+pub struct DBImage {
     pub id: DBImageId,
     pub url: String,
     pub raw_url: String,
@@ -25,7 +25,7 @@ pub struct Image {
     pub report_id: Option<DBReportId>,
 }
 
-impl Image {
+impl DBImage {
     pub async fn insert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -75,7 +75,7 @@ impl Image {
             .execute(&mut **transaction)
             .await?;
 
-            Image::clear_cache(image.id, redis).await?;
+            DBImage::clear_cache(image.id, redis).await?;
 
             Ok(Some(()))
         } else {
@@ -86,7 +86,7 @@ impl Image {
     pub async fn get_many_contexted(
         context: ImageContext,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<Vec<Image>, sqlx::Error> {
+    ) -> Result<Vec<DBImage>, sqlx::Error> {
         // Set all of project_id, version_id, thread_message_id, report_id to None
         // Then set the one that is relevant to Some
 
@@ -141,7 +141,7 @@ impl Image {
         .map_ok(|row| {
             let id = DBImageId(row.id);
 
-            Image {
+            DBImage {
                 id,
                 url: row.url,
                 raw_url: row.raw_url,
@@ -155,7 +155,7 @@ impl Image {
                 report_id: row.report_id.map(DBReportId),
             }
         })
-        .try_collect::<Vec<Image>>()
+        .try_collect::<Vec<DBImage>>()
         .await
     }
 
@@ -163,11 +163,11 @@ impl Image {
         id: DBImageId,
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Option<Image>, DatabaseError>
+    ) -> Result<Option<DBImage>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        Image::get_many(&[id], executor, redis)
+        DBImage::get_many(&[id], executor, redis)
             .await
             .map(|x| x.into_iter().next())
     }
@@ -176,7 +176,7 @@ impl Image {
         image_ids: &[DBImageId],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<Image>, DatabaseError>
+    ) -> Result<Vec<DBImage>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -197,7 +197,7 @@ impl Image {
                 )
                     .fetch(exec)
                     .try_fold(DashMap::new(), |acc, i| {
-                        let img = Image {
+                        let img = DBImage {
                             id: DBImageId(i.id),
                             url: i.url,
                             raw_url: i.raw_url,

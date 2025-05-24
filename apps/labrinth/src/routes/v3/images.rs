@@ -67,7 +67,7 @@ pub async fn images_add(
         ImageContext::Project { project_id } => {
             if let Some(id) = data.project_id {
                 let project =
-                    project_item::Project::get(&id, &**pool, &redis).await?;
+                    project_item::DBProject::get(&id, &**pool, &redis).await?;
                 if let Some(project) = project {
                     if is_team_member_project(
                         &project.inner,
@@ -92,7 +92,7 @@ pub async fn images_add(
         ImageContext::Version { version_id } => {
             if let Some(id) = data.version_id {
                 let version =
-                    version_item::Version::get(id.into(), &**pool, &redis)
+                    version_item::DBVersion::get(id.into(), &**pool, &redis)
                         .await?;
                 if let Some(version) = version {
                     if is_team_member_version(
@@ -119,7 +119,7 @@ pub async fn images_add(
         ImageContext::ThreadMessage { thread_message_id } => {
             if let Some(id) = data.thread_message_id {
                 let thread_message =
-                    thread_item::ThreadMessage::get(id.into(), &**pool)
+                    thread_item::DBThreadMessage::get(id.into(), &**pool)
                         .await?
                         .ok_or_else(|| {
                             ApiError::InvalidInput(
@@ -127,7 +127,7 @@ pub async fn images_add(
                                     .to_string(),
                             )
                         })?;
-                let thread = thread_item::Thread::get(thread_message.thread_id, &**pool)
+                let thread = thread_item::DBThread::get(thread_message.thread_id, &**pool)
                     .await?
                     .ok_or_else(|| {
                         ApiError::InvalidInput(
@@ -147,14 +147,14 @@ pub async fn images_add(
         }
         ImageContext::Report { report_id } => {
             if let Some(id) = data.report_id {
-                let report = report_item::Report::get(id.into(), &**pool)
+                let report = report_item::DBReport::get(id.into(), &**pool)
                     .await?
                     .ok_or_else(|| {
                         ApiError::InvalidInput(
                             "The report could not be found.".to_string(),
                         )
                     })?;
-                let thread = thread_item::Thread::get(report.thread_id, &**pool)
+                let thread = thread_item::DBThread::get(report.thread_id, &**pool)
                     .await?
                     .ok_or_else(|| {
                         ApiError::InvalidInput(
@@ -198,7 +198,7 @@ pub async fn images_add(
 
     let mut transaction = pool.begin().await?;
 
-    let db_image: database::models::Image = database::models::Image {
+    let db_image: database::models::DBImage = database::models::DBImage {
         id: database::models::generate_image_id(&mut transaction).await?,
         url: upload_result.url,
         raw_url: upload_result.raw_url,

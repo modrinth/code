@@ -199,7 +199,7 @@ pub async fn delete_unused_images(
     redis: &RedisPool,
 ) -> Result<(), ApiError> {
     let uploaded_images =
-        database::models::Image::get_many_contexted(context, transaction)
+        database::models::DBImage::get_many_contexted(context, transaction)
             .await?;
 
     for image in uploaded_images {
@@ -212,8 +212,8 @@ pub async fn delete_unused_images(
         }
 
         if should_delete {
-            image_item::Image::remove(image.id, transaction, redis).await?;
-            image_item::Image::clear_cache(image.id, redis).await?;
+            image_item::DBImage::remove(image.id, transaction, redis).await?;
+            image_item::DBImage::clear_cache(image.id, redis).await?;
         }
     }
 

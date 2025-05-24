@@ -1,14 +1,14 @@
 use crate::database::models::DBUserId;
 use chrono::{DateTime, Utc};
 
-pub struct FriendItem {
+pub struct DBFriend {
     pub user_id: DBUserId,
     pub friend_id: DBUserId,
     pub created: DateTime<Utc>,
     pub accepted: bool,
 }
 
-impl FriendItem {
+impl DBFriend {
     pub async fn insert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -33,7 +33,7 @@ impl FriendItem {
         user_id: DBUserId,
         friend_id: DBUserId,
         exec: E,
-    ) -> Result<Option<FriendItem>, sqlx::Error>
+    ) -> Result<Option<DBFriend>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -48,7 +48,7 @@ impl FriendItem {
         )
         .fetch_optional(exec)
         .await?
-            .map(|row| FriendItem {
+            .map(|row| DBFriend {
                 user_id: DBUserId(row.user_id),
                 friend_id: DBUserId(row.friend_id),
                 created: row.created,
@@ -84,7 +84,7 @@ impl FriendItem {
         user_id: DBUserId,
         accepted: Option<bool>,
         exec: E,
-    ) -> Result<Vec<FriendItem>, sqlx::Error>
+    ) -> Result<Vec<DBFriend>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -99,7 +99,7 @@ impl FriendItem {
         .fetch_all(exec)
         .await?
         .into_iter()
-        .map(|row| FriendItem {
+        .map(|row| DBFriend {
             user_id: DBUserId(row.user_id),
             friend_id: DBUserId(row.friend_id),
             created: row.created,

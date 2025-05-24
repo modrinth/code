@@ -258,8 +258,12 @@ pub async fn project_create(
         Ok(project) => {
             let version_item = match project.versions.first() {
                 Some(vid) => {
-                    version_item::Version::get((*vid).into(), &**client, &redis)
-                        .await?
+                    version_item::DBVersion::get(
+                        (*vid).into(),
+                        &**client,
+                        &redis,
+                    )
+                    .await?
                 }
                 None => None,
             };

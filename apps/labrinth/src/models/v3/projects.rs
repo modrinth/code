@@ -1,8 +1,8 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::database::models::loader_fields::VersionField;
-use crate::database::models::project_item::{LinkUrl, QueryProject};
-use crate::database::models::version_item::QueryVersion;
+use crate::database::models::project_item::{LinkUrl, ProjectQueryResult};
+use crate::database::models::version_item::VersionQueryResult;
 use crate::models::ids::{
     OrganizationId, ProjectId, TeamId, ThreadId, VersionId,
 };
@@ -139,8 +139,8 @@ pub fn from_duplicate_version_fields(
     fields
 }
 
-impl From<QueryProject> for Project {
-    fn from(data: QueryProject) -> Self {
+impl From<ProjectQueryResult> for Project {
+    fn from(data: ProjectQueryResult) -> Self {
         let fields =
             from_duplicate_version_fields(data.aggregate_version_fields);
         let m = data.inner;
@@ -657,8 +657,8 @@ where
     Ok(map)
 }
 
-impl From<QueryVersion> for Version {
-    fn from(data: QueryVersion) -> Version {
+impl From<VersionQueryResult> for Version {
+    fn from(data: VersionQueryResult) -> Version {
         let v = data.inner;
         Version {
             id: v.id.into(),

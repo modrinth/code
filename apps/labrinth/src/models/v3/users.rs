@@ -63,7 +63,7 @@ pub struct UserPayoutData {
     pub balance: Decimal,
 }
 
-use crate::database::models::user_item::User as DBUser;
+use crate::database::models::user_item::DBUser;
 impl From<DBUser> for User {
     fn from(data: DBUser) -> Self {
         Self {
@@ -196,9 +196,7 @@ pub struct UserFriend {
 }
 
 impl UserFriend {
-    pub fn from(
-        data: crate::database::models::friend_item::FriendItem,
-    ) -> Self {
+    pub fn from(data: crate::database::models::friend_item::DBFriend) -> Self {
         Self {
             id: data.friend_id.into(),
             friend_id: data.user_id.into(),

@@ -103,7 +103,7 @@ impl LegacyProject {
     // It's safe to use a db version_item for this as the only info is side types, game versions, and loader fields (for loaders), which used to be public on project anyway.
     pub fn from(
         data: Project,
-        versions_item: Option<version_item::QueryVersion>,
+        versions_item: Option<version_item::VersionQueryResult>,
     ) -> Self {
         let mut client_side = LegacySideType::Unknown;
         let mut server_side = LegacySideType::Unknown;
@@ -237,7 +237,8 @@ impl LegacyProject {
             .filter_map(|p| p.versions.first().map(|i| (*i).into()))
             .collect();
         let example_versions =
-            version_item::Version::get_many(&version_ids, exec, redis).await?;
+            version_item::DBVersion::get_many(&version_ids, exec, redis)
+                .await?;
         let mut legacy_projects = Vec::new();
         for project in data {
             let version_item = example_versions

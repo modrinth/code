@@ -86,10 +86,6 @@ impl_base62_display!(Base62Id);
 #[macro_export]
 macro_rules! base62_id {
     ($struct:ident) => {
-        $crate::ids::base62_id!($struct, "ariadne::ids::Base62Id");
-    };
-
-    ($struct:ident, $base_type:expr) => {
         #[derive(
             Copy,
             Clone,
@@ -100,8 +96,8 @@ macro_rules! base62_id {
             Debug,
             Hash,
         )]
-        #[serde(from = $base_type)]
-        #[serde(into = $base_type)]
+        #[serde(from = "ariadne::ids::Base62Id")]
+        #[serde(into = "ariadne::ids::Base62Id")]
         pub struct $struct(pub u64);
 
         $crate::ids::impl_base62_display!($struct);
@@ -120,7 +116,8 @@ macro_rules! base62_id {
     };
 }
 
-base62_id!(UserId, "crate::ids::Base62Id");
+use crate as ariadne; // Hack because serde(from) and serde(into) don't work with $crate
+base62_id!(UserId);
 
 pub use {base62_id, impl_base62_display};
 

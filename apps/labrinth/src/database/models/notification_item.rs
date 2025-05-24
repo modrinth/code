@@ -12,7 +12,7 @@ pub struct NotificationBuilder {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct Notification {
+pub struct DBNotification {
     pub id: DBNotificationId,
     pub user_id: DBUserId,
     pub body: NotificationBody,
@@ -21,7 +21,7 @@ pub struct Notification {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct NotificationAction {
+pub struct DBNotificationAction {
     pub id: NotificationActionId,
     pub notification_id: DBNotificationId,
     pub name: String,
@@ -72,13 +72,13 @@ impl NotificationBuilder {
         .execute(&mut **transaction)
         .await?;
 
-        Notification::clear_user_notifications_cache(&users, redis).await?;
+        DBNotification::clear_user_notifications_cache(&users, redis).await?;
 
         Ok(())
     }
 }
 
-impl Notification {
+impl DBNotification {
     pub async fn get<'a, 'b, E>(
         id: DBNotificationId,
         executor: E,
@@ -94,7 +94,7 @@ impl Notification {
     pub async fn get_many<'a, E>(
         notification_ids: &[DBNotificationId],
         exec: E,
-    ) -> Result<Vec<Notification>, sqlx::Error>
+    ) -> Result<Vec<DBNotification>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -116,7 +116,7 @@ impl Notification {
             .map_ok(|row| {
                 let id = DBNotificationId(row.id);
 
-                Notification {
+                DBNotification {
                     id,
                     user_id: DBUserId(row.user_id),
                     read: row.read,
@@ -140,7 +140,7 @@ impl Notification {
                     }),
                 }
             })
-            .try_collect::<Vec<Notification>>()
+            .try_collect::<Vec<DBNotification>>()
             .await
     }
 
@@ -148,13 +148,13 @@ impl Notification {
         user_id: DBUserId,
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<Notification>, DatabaseError>
+    ) -> Result<Vec<DBNotification>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         let mut redis = redis.connect().await?;
 
-        let cached_notifications: Option<Vec<Notification>> = redis
+        let cached_notifications: Option<Vec<DBNotification>> = redis
             .get_deserialized_from_json(
                 USER_NOTIFICATIONS_NAMESPACE,
                 &user_id.0.to_string(),
@@ -180,7 +180,7 @@ impl Notification {
             .map_ok(|row| {
                 let id = DBNotificationId(row.id);
 
-                Notification {
+                DBNotification {
                     id,
                     user_id: DBUserId(row.user_id),
                     read: row.read,
@@ -204,7 +204,7 @@ impl Notification {
                     }),
                 }
             })
-            .try_collect::<Vec<Notification>>()
+            .try_collect::<Vec<DBNotification>>()
             .await?;
 
         redis
@@ -249,7 +249,7 @@ impl Notification {
         .try_collect::<Vec<_>>()
         .await?;
 
-        Notification::clear_user_notifications_cache(
+        DBNotification::clear_user_notifications_cache(
             affected_users.iter(),
             redis,
         )
@@ -297,7 +297,7 @@ impl Notification {
         .try_collect::<Vec<_>>()
         .await?;
 
-        Notification::clear_user_notifications_cache(
+        DBNotification::clear_user_notifications_cache(
             affected_users.iter(),
             redis,
         )

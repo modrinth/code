@@ -9,7 +9,7 @@ use super::{
 };
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
-pub struct OAuthClientAuthorization {
+pub struct DBOAuthClientAuthorization {
     pub id: DBOAuthClientAuthorizationId,
     pub client_id: DBOAuthClientId,
     pub user_id: DBUserId,
@@ -17,7 +17,7 @@ pub struct OAuthClientAuthorization {
     pub created: DateTime<Utc>,
 }
 
-struct AuthorizationQueryResult {
+struct DBAuthClientAuthorizationQueryResult {
     id: i64,
     client_id: i64,
     user_id: i64,
@@ -25,9 +25,9 @@ struct AuthorizationQueryResult {
     created: DateTime<Utc>,
 }
 
-impl From<AuthorizationQueryResult> for OAuthClientAuthorization {
-    fn from(value: AuthorizationQueryResult) -> Self {
-        OAuthClientAuthorization {
+impl From<DBAuthClientAuthorizationQueryResult> for DBOAuthClientAuthorization {
+    fn from(value: DBAuthClientAuthorizationQueryResult) -> Self {
+        DBOAuthClientAuthorization {
             id: DBOAuthClientAuthorizationId(value.id),
             client_id: DBOAuthClientId(value.client_id),
             user_id: DBUserId(value.user_id),
@@ -37,14 +37,14 @@ impl From<AuthorizationQueryResult> for OAuthClientAuthorization {
     }
 }
 
-impl OAuthClientAuthorization {
+impl DBOAuthClientAuthorization {
     pub async fn get(
         client_id: DBOAuthClientId,
         user_id: DBUserId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Option<OAuthClientAuthorization>, DatabaseError> {
+    ) -> Result<Option<DBOAuthClientAuthorization>, DatabaseError> {
         let value = sqlx::query_as!(
-            AuthorizationQueryResult,
+            DBAuthClientAuthorizationQueryResult,
             "
             SELECT id, client_id, user_id, scopes, created
             FROM oauth_client_authorizations
@@ -62,9 +62,9 @@ impl OAuthClientAuthorization {
     pub async fn get_all_for_user(
         user_id: DBUserId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<OAuthClientAuthorization>, DatabaseError> {
+    ) -> Result<Vec<DBOAuthClientAuthorization>, DatabaseError> {
         let results = sqlx::query_as!(
-            AuthorizationQueryResult,
+            DBAuthClientAuthorizationQueryResult,
             "
             SELECT id, client_id, user_id, scopes, created
             FROM oauth_client_authorizations

@@ -155,7 +155,7 @@ pub struct PersonalAccessToken {
 
 impl PersonalAccessToken {
     pub fn from(
-        data: crate::database::models::pat_item::PersonalAccessToken,
+        data: crate::database::models::pat_item::DBPersonalAccessToken,
         include_token: bool,
     ) -> Self {
         Self {

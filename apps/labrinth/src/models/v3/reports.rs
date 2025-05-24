@@ -1,4 +1,4 @@
-use crate::database::models::report_item::QueryReport as DBReport;
+use crate::database::models::report_item::ReportQueryResult as DBReport;
 use crate::models::ids::{ProjectId, ReportId, ThreadId, VersionId};
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};

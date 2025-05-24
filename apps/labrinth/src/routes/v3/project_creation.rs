@@ -4,7 +4,7 @@ use crate::database::models::loader_fields::{
     Loader, LoaderField, LoaderFieldEnumValue,
 };
 use crate::database::models::thread_item::ThreadBuilder;
-use crate::database::models::{self, User, image_item};
+use crate::database::models::{self, DBUser, image_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostingError};
 use crate::models::error::ApiError;
@@ -646,7 +646,7 @@ async fn project_create_inner(
         let mut members = vec![];
 
         if let Some(organization_id) = project_create_data.organization_id {
-            let org = models::Organization::get_id(
+            let org = models::DBOrganization::get_id(
                 organization_id.into(),
                 pool,
                 redis,
@@ -658,7 +658,7 @@ async fn project_create_inner(
                 )
             })?;
 
-            let team_member = models::TeamMember::get_from_user_id(
+            let team_member = models::DBTeamMember::get_from_user_id(
                 org.team_id,
                 current_user.id.into(),
                 pool,
@@ -773,7 +773,7 @@ async fn project_create_inner(
             link_urls,
             gallery_items: gallery_urls
                 .iter()
-                .map(|x| models::project_item::GalleryItem {
+                .map(|x| models::project_item::DBGalleryItem {
                     image_url: x.url.clone(),
                     raw_image_url: x.raw_url.clone(),
                     featured: x.featured,
@@ -791,10 +791,10 @@ async fn project_create_inner(
         let now = Utc::now();
 
         let id = project_builder_actual.insert(&mut *transaction).await?;
-        User::clear_project_cache(&[current_user.id.into()], redis).await?;
+        DBUser::clear_project_cache(&[current_user.id.into()], redis).await?;
 
         for image_id in project_create_data.uploaded_images {
-            if let Some(db_image) = image_item::Image::get(
+            if let Some(db_image) = image_item::DBImage::get(
                 image_id.into(),
                 &mut **transaction,
                 redis,
@@ -822,7 +822,8 @@ async fn project_create_inner(
                 .execute(&mut **transaction)
                 .await?;
 
-                image_item::Image::clear_cache(image.id.into(), redis).await?;
+                image_item::DBImage::clear_cache(image.id.into(), redis)
+                    .await?;
             } else {
                 return Err(CreateError::InvalidInput(format!(
                     "Image {image_id} does not exist"

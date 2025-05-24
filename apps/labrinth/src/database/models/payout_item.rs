@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use super::{DBPayoutId, DBUserId, DatabaseError};
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
-pub struct Payout {
+pub struct DBPayout {
     pub id: DBPayoutId,
     pub user_id: DBUserId,
     pub created: DateTime<Utc>,
@@ -19,7 +19,7 @@ pub struct Payout {
     pub platform_id: Option<String>,
 }
 
-impl Payout {
+impl DBPayout {
     pub async fn insert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -51,11 +51,11 @@ impl Payout {
     pub async fn get<'a, 'b, E>(
         id: DBPayoutId,
         executor: E,
-    ) -> Result<Option<Payout>, DatabaseError>
+    ) -> Result<Option<DBPayout>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        Payout::get_many(&[id], executor)
+        DBPayout::get_many(&[id], executor)
             .await
             .map(|x| x.into_iter().next())
     }
@@ -63,7 +63,7 @@ impl Payout {
     pub async fn get_many<'a, E>(
         payout_ids: &[DBPayoutId],
         exec: E,
-    ) -> Result<Vec<Payout>, DatabaseError>
+    ) -> Result<Vec<DBPayout>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -78,7 +78,7 @@ impl Payout {
             &payout_ids.into_iter().map(|x| x.0).collect::<Vec<_>>()
         )
         .fetch(exec)
-        .map_ok(|r| Payout {
+        .map_ok(|r| DBPayout {
             id: DBPayoutId(r.id),
             user_id: DBUserId(r.user_id),
             created: r.created,
@@ -89,7 +89,7 @@ impl Payout {
             platform_id: r.platform_id,
             fee: r.fee,
         })
-        .try_collect::<Vec<Payout>>()
+        .try_collect::<Vec<DBPayout>>()
         .await?;
 
         Ok(results)

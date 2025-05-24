@@ -7,7 +7,7 @@ use crate::models::billing::{
 use chrono::{DateTime, Utc};
 use std::convert::{TryFrom, TryInto};
 
-pub struct ChargeItem {
+pub struct DBCharge {
     pub id: DBChargeId,
     pub user_id: DBUserId,
     pub price_id: DBProductPriceId,
@@ -30,7 +30,7 @@ pub struct ChargeItem {
     pub net: Option<i64>,
 }
 
-struct ChargeResult {
+struct ChargeQueryResult {
     id: i64,
     user_id: i64,
     price_id: i64,
@@ -48,11 +48,11 @@ struct ChargeResult {
     net: Option<i64>,
 }
 
-impl TryFrom<ChargeResult> for ChargeItem {
+impl TryFrom<ChargeQueryResult> for DBCharge {
     type Error = serde_json::Error;
 
-    fn try_from(r: ChargeResult) -> Result<Self, Self::Error> {
-        Ok(ChargeItem {
+    fn try_from(r: ChargeQueryResult) -> Result<Self, Self::Error> {
+        Ok(DBCharge {
             id: DBChargeId(r.id),
             user_id: DBUserId(r.user_id),
             price_id: DBProductPriceId(r.price_id),
@@ -77,7 +77,7 @@ impl TryFrom<ChargeResult> for ChargeItem {
 macro_rules! select_charges_with_predicate {
     ($predicate:tt, $param:ident) => {
         sqlx::query_as!(
-            ChargeResult,
+            ChargeQueryResult,
             r#"
             SELECT
                 id, user_id, price_id, amount, currency_code, status, due, last_attempt,
@@ -96,7 +96,7 @@ macro_rules! select_charges_with_predicate {
     };
 }
 
-impl ChargeItem {
+impl DBCharge {
     pub async fn upsert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -146,7 +146,7 @@ impl ChargeItem {
     pub async fn get(
         id: DBChargeId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Option<ChargeItem>, DatabaseError> {
+    ) -> Result<Option<DBCharge>, DatabaseError> {
         let id = id.0;
         let res = select_charges_with_predicate!("WHERE id = $1", id)
             .fetch_optional(exec)
@@ -158,7 +158,7 @@ impl ChargeItem {
     pub async fn get_from_user(
         user_id: DBUserId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<ChargeItem>, DatabaseError> {
+    ) -> Result<Vec<DBCharge>, DatabaseError> {
         let user_id = user_id.0;
         let res = select_charges_with_predicate!(
             "WHERE user_id = $1 ORDER BY due DESC",
@@ -176,7 +176,7 @@ impl ChargeItem {
     pub async fn get_children(
         charge_id: DBChargeId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<ChargeItem>, DatabaseError> {
+    ) -> Result<Vec<DBCharge>, DatabaseError> {
         let charge_id = charge_id.0;
         let res = select_charges_with_predicate!(
             "WHERE parent_charge_id = $1",
@@ -194,7 +194,7 @@ impl ChargeItem {
     pub async fn get_open_subscription(
         user_subscription_id: DBUserSubscriptionId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Option<ChargeItem>, DatabaseError> {
+    ) -> Result<Option<DBCharge>, DatabaseError> {
         let user_subscription_id = user_subscription_id.0;
         let res = select_charges_with_predicate!(
             "WHERE subscription_id = $1 AND (status = 'open' OR status = 'cancelled')",
@@ -208,7 +208,7 @@ impl ChargeItem {
 
     pub async fn get_chargeable(
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<ChargeItem>, DatabaseError> {
+    ) -> Result<Vec<DBCharge>, DatabaseError> {
         let charge_type = ChargeType::Subscription.as_str();
         let res = select_charges_with_predicate!(
             r#"
@@ -232,7 +232,7 @@ impl ChargeItem {
 
     pub async fn get_unprovision(
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<ChargeItem>, DatabaseError> {
+    ) -> Result<Vec<DBCharge>, DatabaseError> {
         let charge_type = ChargeType::Subscription.as_str();
         let res = select_charges_with_predicate!(
             r#"

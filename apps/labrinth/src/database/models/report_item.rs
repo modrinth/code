@@ -1,7 +1,7 @@
 use super::ids::*;
 use chrono::{DateTime, Utc};
 
-pub struct Report {
+pub struct DBReport {
     pub id: DBReportId,
     pub report_type_id: ReportTypeId,
     pub project_id: Option<DBProjectId>,
@@ -13,7 +13,7 @@ pub struct Report {
     pub closed: bool,
 }
 
-pub struct QueryReport {
+pub struct ReportQueryResult {
     pub id: DBReportId,
     pub report_type: String,
     pub project_id: Option<DBProjectId>,
@@ -26,7 +26,7 @@ pub struct QueryReport {
     pub thread_id: DBThreadId,
 }
 
-impl Report {
+impl DBReport {
     pub async fn insert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -59,7 +59,7 @@ impl Report {
     pub async fn get<'a, E>(
         id: DBReportId,
         exec: E,
-    ) -> Result<Option<QueryReport>, sqlx::Error>
+    ) -> Result<Option<ReportQueryResult>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -71,7 +71,7 @@ impl Report {
     pub async fn get_many<'a, E>(
         report_ids: &[DBReportId],
         exec: E,
-    ) -> Result<Vec<QueryReport>, sqlx::Error>
+    ) -> Result<Vec<ReportQueryResult>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -91,7 +91,7 @@ impl Report {
             &report_ids_parsed
         )
         .fetch(exec)
-        .map_ok(|x| QueryReport {
+        .map_ok(|x| ReportQueryResult {
             id: DBReportId(x.id),
             report_type: x.name,
             project_id: x.mod_id.map(DBProjectId),
@@ -103,7 +103,7 @@ impl Report {
             closed: x.closed,
             thread_id: DBThreadId(x.thread_id)
         })
-        .try_collect::<Vec<QueryReport>>()
+        .try_collect::<Vec<ReportQueryResult>>()
         .await?;
 
         Ok(reports)
@@ -137,7 +137,7 @@ impl Report {
         .await?;
 
         if let Some(thread_id) = thread_id {
-            crate::database::models::Thread::remove_full(
+            crate::database::models::DBThread::remove_full(
                 DBThreadId(thread_id.id),
                 transaction,
             )

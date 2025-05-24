@@ -22,7 +22,7 @@ pub struct Payout {
 }
 
 impl Payout {
-    pub fn from(data: crate::database::models::payout_item::Payout) -> Self {
+    pub fn from(data: crate::database::models::payout_item::DBPayout) -> Self {
         Self {
             id: data.id.into(),
             user_id: data.user_id.into(),
