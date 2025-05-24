@@ -1,4 +1,5 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
+use std::mem;
 
 use crate::database::models::loader_fields::VersionField;
 use crate::database::models::project_item::{LinkUrl, ProjectQueryResult};
@@ -8,6 +9,7 @@ use crate::models::ids::{
 };
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
@@ -95,19 +97,6 @@ pub struct Project {
     pub fields: HashMap<String, Vec<serde_json::Value>>,
 }
 
-fn remove_duplicates(values: Vec<serde_json::Value>) -> Vec<serde_json::Value> {
-    let mut seen = HashSet::new();
-    values
-        .into_iter()
-        .filter(|value| {
-            // Convert the JSON value to a string for comparison
-            let as_string = value.to_string();
-            // Check if the string is already in the set
-            seen.insert(as_string)
-        })
-        .collect()
-}
-
 // This is a helper function to convert a list of VersionFields into a HashMap of field name to vecs of values
 // This allows for removal of duplicates
 pub fn from_duplicate_version_fields(
@@ -132,9 +121,9 @@ pub fn from_duplicate_version_fields(
         }
     }
 
-    // Remove duplicates by converting to string and back
+    // Remove duplicates
     for (_, v) in fields.iter_mut() {
-        *v = remove_duplicates(v.clone());
+        *v = mem::take(v).into_iter().unique().collect_vec();
     }
     fields
 }
@@ -624,7 +613,7 @@ pub struct Version {
     pub downloads: u32,
     /// The type of the release - `Alpha`, `Beta`, or `Release`.
     pub version_type: VersionType,
-    /// The status of tne version
+    /// The status of the version
     pub status: VersionStatus,
     /// The requested status of the version (used for scheduling)
     pub requested_status: Option<VersionStatus>,
@@ -880,7 +869,7 @@ impl std::fmt::Display for DependencyType {
 }
 
 impl DependencyType {
-    // These are constant, so this can remove unneccessary allocations (`to_string`)
+    // These are constant, so this can remove unnecessary allocations (`to_string`)
     pub fn as_str(&self) -> &'static str {
         match self {
             DependencyType::Required => "required",
