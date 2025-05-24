@@ -361,7 +361,14 @@
                       "
                       color="green"
                     >
-                      <button @click="resubscribePyro(subscription.id, $dayjs(getPyroCharge(subscription).due).isBefore($dayjs()))">
+                      <button
+                        @click="
+                          resubscribePyro(
+                            subscription.id,
+                            $dayjs(getPyroCharge(subscription).due).isBefore($dayjs()),
+                          )
+                        "
+                      >
                         Resubscribe <RightArrowIcon />
                       </button>
                     </ButtonStyled>
