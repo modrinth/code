@@ -2,10 +2,7 @@ import * as THREE from 'three'
 import type { Skin, Cape } from '../skins'
 import { determineModelType } from '../skins'
 import { reactive } from 'vue'
-import {
-  setupSkinModel,
-  disposeCaches
-} from '@modrinth/utils'
+import { setupSkinModel, disposeCaches } from '@modrinth/utils'
 
 export interface RenderResult {
   forwards: string
@@ -102,12 +99,7 @@ class BatchSkinRenderer {
     }
 
     // Use the utility function to setup the skin model
-    const { model } = await setupSkinModel(
-      modelUrl,
-      textureUrl,
-      capeModelUrl,
-      capeUrl
-    )
+    const { model } = await setupSkinModel(modelUrl, textureUrl, capeModelUrl, capeUrl)
 
     const group = new THREE.Group()
     group.add(model)
