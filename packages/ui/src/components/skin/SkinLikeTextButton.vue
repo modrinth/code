@@ -1,41 +1,70 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+
+const props = withDefaults(
+  defineProps<{
+    selected?: boolean
+    tooltip?: string
+  }>(),
+  {
+    selected: false,
+    tooltip: undefined,
+  },
+)
+
+const emit = defineEmits<{ (e: 'click'): void }>()
+
 const pressed = ref(false)
 </script>
 
 <template>
   <div
-    class="relative border-2 border-transparent rounded-xl overflow-hidden"
-    :class="{ 'scale-95': pressed }"
+    v-tooltip="tooltip ?? undefined"
+    class="group relative overflow-hidden rounded-xl border-2 transition-all duration-200"
+    :class="[
+      props.selected ? 'border-brand' : 'border-transparent hover:border-inverted',
+      pressed ? 'scale-95' : '',
+    ]"
   >
     <button
-      class="absolute inset-0 skin-like-text-bg rounded-xl cursor-pointer p-0 border-none"
+      class="skin-btn-bg absolute inset-0 cursor-pointer p-0 border-none group-hover:brightness-125 transition-all duration-200"
+      :class="props.selected ? 'selected' : ''"
       @mousedown="pressed = true"
       @mouseup="pressed = false"
       @mouseleave="pressed = false"
+      @click="emit('click')"
     ></button>
+
     <div
-      class="relative w-full h-full flex flex-col items-center justify-center pointer-events-none"
+      class="relative w-full h-full flex flex-col items-center justify-center pointer-events-none z-10"
     >
-      <div class="mb-2">
-        <slot name="icon"></slot>
+      <div v-if="$slots.icon" class="mb-2">
+        <slot name="icon" />
       </div>
-      <span class="text-md text-center px-2">
-        <slot></slot>
+      <span class="text-md text-center px-2 text-primary">
+        <slot />
       </span>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-.skin-like-text-bg {
-  background: linear-gradient(180deg, #3a3d47 0%, #33363d 100%);
-  transition:
-    filter 200ms ease-in-out,
-    box-shadow 200ms ease-in-out;
+.skin-btn-bg {
+  background: var(--color-gradient-button-bg);
 }
-.skin-like-text-bg:hover {
-  filter: brightness(var(--hover-brightness));
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+.skin-btn-bg.selected {
+  background: linear-gradient(
+      157.61deg,
+      var(--color-brand) -76.68%,
+      rgba(27, 217, 106, 0.534) -38.61%,
+      rgba(12, 89, 44, 0.6) 100.4%
+    ),
+    var(--color-bg);
+}
+
+.skin-btn-bg.selected:hover,
+.group:hover .skin-btn-bg.selected {
+  filter: brightness(1.15);
 }
 </style>

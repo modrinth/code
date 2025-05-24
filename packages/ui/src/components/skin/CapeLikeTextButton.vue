@@ -26,17 +26,17 @@ withDefaults(
         'block rounded-lg group-active:scale-95 transition-all border-2 relative',
         highlighted
           ? 'border-brand highlighted-glow'
-          : 'border-transparent opacity-75 group-hover:opacity-100',
+          : 'border-transparent brightness-95 group-hover:brightness-100',
       ]"
     >
       <span class="block p-[3px] rounded-lg bg-button-bg">
         <span
-          class="flex flex-col items-center justify-center aspect-[10/16] w-[60px] min-h-[96px] rounded-[5px] bg-black/10 relative overflow-hidden"
+          class="flex flex-col items-center justify-center aspect-[10/16] w-[60px] min-h-[96px] rounded-[5px] bg-black/10 relative overflow-hidden text-primary z-10"
         >
           <div class="mb-1">
             <slot name="icon"></slot>
           </div>
-          <span class="text-xs group-hover:text-white" :class="{ 'text-white': highlighted }">
+          <span class="text-xs">
             <slot></slot>
           </span>
         </span>

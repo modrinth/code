@@ -9,7 +9,7 @@
     </div>
     <div
       v-if="nametag"
-      class="absolute top-[13%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md text-[200%] pointer-events-none z-10 font-minecraft text-primary nametag-bg"
+      class="absolute top-[13%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md text-[200%] pointer-events-none z-10 font-minecraft text-inverted nametag-bg"
     >
       {{ nametag }}
     </div>

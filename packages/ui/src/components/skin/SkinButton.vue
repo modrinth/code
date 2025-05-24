@@ -34,7 +34,7 @@ function onImageLoad(type: 'forward' | 'backward') {
   <div
     v-tooltip="tooltip ?? undefined"
     class="group flex relative overflow-hidden rounded-xl border-solid border-2 transition-colors duration-200"
-    :class="[selected ? 'border-brand' : 'border-transparent hover:border-white/50']"
+    :class="[selected ? 'border-brand' : 'border-transparent hover:border-inverted']"
   >
     <button
       class="skin-btn-bg absolute inset-0 cursor-pointer p-0 border-none group-hover:brightness-125"
@@ -74,8 +74,7 @@ function onImageLoad(type: 'forward' | 'backward') {
 
     <span
       v-if="$slots['overlay-buttons']"
-      class="absolute inset-0 flex items-end justify-start p-1 gap-1 translate-y-4 scale-75 opacity-0 transition-all group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 group-hover:translate-x-0"
-      style="pointer-events: none"
+      class="pointer-events-none absolute inset-0 flex items-end justify-start p-1 gap-1 translate-y-4 scale-75 opacity-0 transition-all group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 group-hover:translate-x-0"
     >
       <slot name="overlay-buttons" />
     </span>
@@ -90,9 +89,9 @@ function onImageLoad(type: 'forward' | 'backward') {
 .skeleton {
   background: linear-gradient(
     90deg,
-    var(--color-bg, #f0f0f0) 25%,
-    var(--color-raised-bg, #e0e0e0) 50%,
-    var(--color-bg, #f0f0f0) 75%
+    var(--color-bg) 25%,
+    var(--color-raised-bg) 50%,
+    var(--color-bg) 75%
   );
   background-size: 200% 100%;
   animation: wave 1500ms infinite linear;
@@ -108,8 +107,9 @@ function onImageLoad(type: 'forward' | 'backward') {
 }
 
 .skin-btn-bg {
-  background: linear-gradient(180deg, #3a3d47 0%, #33363d 100%);
+  background: var(--color-gradient-button-bg);
 }
+
 .skin-btn-bg.selected {
   background: linear-gradient(
       157.61deg,
@@ -117,7 +117,7 @@ function onImageLoad(type: 'forward' | 'backward') {
       rgba(27, 217, 106, 0.534) -38.61%,
       rgba(12, 89, 44, 0.6) 100.4%
     ),
-    #27292f;
+    var(--color-bg);
 }
 
 .skin-btn-bg.selected:hover,

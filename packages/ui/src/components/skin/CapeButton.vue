@@ -35,7 +35,7 @@ const highlighted = computed(() => props.selected ?? props.isEquipped)
       :class="
         highlighted
           ? `bg-brand highlighted-outer-glow`
-          : `bg-button-bg opacity-75 group-hover:opacity-100`
+          : `bg-button-bg brightness-95 group-hover:brightness-100`
       "
       class="block p-[3px] rounded-lg border-0 group-active:scale-95 transition-all"
     >
@@ -80,7 +80,7 @@ const highlighted = computed(() => props.selected ?? props.isEquipped)
   content: '';
   position: absolute;
   inset: 0;
-  box-shadow: inset 0 0 4px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 0 4px 4px rgba(0, 0, 0, 0.4);
   z-index: 2;
 }
 

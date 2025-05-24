@@ -309,6 +309,7 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
             <template #overlay-buttons>
               <Button
                 color="green"
+                class="pointer-events-auto"
                 aria-label="Edit skin"
                 @click.stop="(e) => editSkinModal?.show(e, skin)"
               >
@@ -319,7 +320,7 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
                 v-tooltip="'Delete skin'"
                 aria-label="Delete skin"
                 color="red"
-                class="!rounded-[100%]"
+                class="!rounded-[100%] pointer-events-auto"
                 icon-only
                 @click.stop="() => confirmDeleteSkin(skin)"
               >
