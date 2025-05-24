@@ -67,8 +67,8 @@ VALUES (2, 'Ordering_Negative1', '{"type":"release","major":false}', -1);
 INSERT INTO loader_field_enum_values(enum_id, value, metadata, ordering)
 VALUES (2, 'Ordering_Positive100', '{"type":"release","major":false}', 100);
 
-INSERT INTO loader_fields_loaders(loader_id, loader_field_id) 
-SELECT l.id, lf.id FROM loaders l CROSS JOIN loader_fields lf WHERE lf.field IN ('game_versions','singleplayer', 'client_and_server', 'client_only', 'server_only')  ON CONFLICT DO NOTHING;
+INSERT INTO loader_fields_loaders(loader_id, loader_field_id)
+SELECT l.id, lf.id FROM loaders l CROSS JOIN loader_fields lf WHERE lf.field IN ('game_versions','environment') ON CONFLICT DO NOTHING;
 
 INSERT INTO categories (id, category, project_type) VALUES
     (51, 'combat', 1),
@@ -108,6 +108,6 @@ VALUES (
 INSERT INTO oauth_client_redirect_uris (id, client_id, uri) VALUES (1, 1, 'https://modrinth.com/oauth_callback');
 
 -- Create dummy data table to mark that this file has been run
-CREATE TABLE dummy_data ( 
+CREATE TABLE dummy_data (
     update_id bigint PRIMARY KEY
  );
