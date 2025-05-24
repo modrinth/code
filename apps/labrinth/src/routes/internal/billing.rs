@@ -16,7 +16,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
-use chrono::Utc;
+use chrono::{Duration, Utc};
 use rust_decimal::Decimal;
 use rust_decimal::prelude::ToPrimitive;
 use serde::Serialize;
@@ -366,9 +366,12 @@ pub async fn edit_subscription(
         })?;
 
         if let Some(cancelled) = &edit_subscription.cancelled {
-            if open_charge.status != ChargeStatus::Open
-                && open_charge.status != ChargeStatus::Cancelled
-            {
+            if !matches!(
+                open_charge.status,
+                ChargeStatus::Open
+                    | ChargeStatus::Cancelled
+                    | ChargeStatus::Failed
+            ) {
                 return Err(ApiError::InvalidInput(
                     "You may not change the status of this subscription!"
                         .to_string(),
@@ -377,6 +380,9 @@ pub async fn edit_subscription(
 
             if *cancelled {
                 open_charge.status = ChargeStatus::Cancelled;
+            } else if open_charge.status == ChargeStatus::Failed {
+                // Force another resubscription attempt
+                open_charge.last_attempt = Some(Utc::now() - Duration::days(2));
             } else {
                 open_charge.status = ChargeStatus::Open;
             }
