@@ -547,10 +547,12 @@ pub async fn project_edit(
             let version = Version::from(version);
             let mut fields = version.fields;
             let (current_client_side, current_server_side) =
-                v2_reroute::convert_side_types_v2(&fields, None);
+                v2_reroute::convert_v3_side_types_to_v2_side_types(
+                    &fields, None,
+                );
             let client_side = client_side.unwrap_or(current_client_side);
             let server_side = server_side.unwrap_or(current_server_side);
-            fields.extend(v2_reroute::convert_side_types_v3(
+            fields.extend(v2_reroute::convert_v2_side_types_to_v3_side_types(
                 client_side,
                 server_side,
             ));
