@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE payouts\n        SET status = $1\n        WHERE status = $2 AND created < NOW() - INTERVAL '30 days'\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "33893ae0a7d244c33b489e4d4fa444fa17a6bb5b7a834794a5482f4dc85c6ce0"
+}
