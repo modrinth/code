@@ -264,17 +264,10 @@ pub fn convert_side_types_v2_bools(
 }
 
 pub fn capitalize_first(input: &str) -> String {
-    let mut first_char = true;
     input
         .chars()
-        .map(|char| {
-            if first_char {
-                first_char = false;
-                char.to_ascii_uppercase()
-            } else {
-                char
-            }
-        })
+        .enumerate()
+        .map(|(i, c)| if i == 0 { c.to_ascii_uppercase() } else { c })
         .collect()
 }
 
