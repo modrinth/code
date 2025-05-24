@@ -15,7 +15,7 @@
     </div>
 
     <TresCanvas
-      v-if="isReady"
+      v-show="isReady"
       shadows
       alpha
       :antialias="antialias"
@@ -78,7 +78,7 @@
       <TresAmbientLight :intensity="2" />
     </TresCanvas>
 
-    <div v-else class="w-full h-full flex items-center justify-center">
+    <div v-if="!isReady" class="w-full h-full flex items-center justify-center">
       <div class="text-primary">Loading...</div>
     </div>
   </div>
@@ -120,6 +120,7 @@ const props = withDefaults(
     capeModelSrc: '',
     capeSrc: undefined,
     initialRotation: 15.75,
+    nametag: undefined,
   },
 )
 
@@ -148,6 +149,7 @@ async function loadModel(src: string) {
 
     if (texture.value) {
       applyTexture(scene.value, texture.value)
+      texture.value.needsUpdate = true
     }
 
     bodyNode.value = findBodyNode(loadedScene)

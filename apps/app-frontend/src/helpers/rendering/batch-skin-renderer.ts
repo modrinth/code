@@ -130,7 +130,7 @@ function getModelUrlForVariant(variant: string): string {
 export const map = reactive(new Map<string, RenderResult>())
 const DEBUG_MODE = false
 
-export async function cleanupUnusedPreviews(skins: Skin[], capes: Cape[]): Promise<void> {
+export async function cleanupUnusedPreviews(skins: Skin[]): Promise<void> {
   const validKeys = new Set<string>()
 
   for (const skin of skins) {
@@ -201,6 +201,6 @@ export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promis
     }
   } finally {
     renderer.dispose()
-    await cleanupUnusedPreviews(skins, capes)
+    await cleanupUnusedPreviews(skins)
   }
 }

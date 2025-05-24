@@ -206,7 +206,7 @@ async function setupApp() {
     const capes = (await get_available_capes()) ?? []
     generateSkinPreviews(skins, capes)
   } catch (error) {
-    console.warn("Failed to generate skin previews in app setup.", error);
+    console.warn('Failed to generate skin previews in app setup.', error)
   }
 }
 

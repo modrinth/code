@@ -9,13 +9,9 @@ export interface SkinRendererConfig {
   textureMinFilter?: THREE.MinificationTextureFilter
 }
 
-// Private caches
 const modelCache: Map<string, GLTF> = new Map()
 const textureCache: Map<string, THREE.Texture> = new Map()
 
-/**
- * Load and cache a GLTF model
- */
 export async function loadModel(modelUrl: string): Promise<GLTF> {
   if (modelCache.has(modelUrl)) {
     return modelCache.get(modelUrl)!
@@ -35,9 +31,6 @@ export async function loadModel(modelUrl: string): Promise<GLTF> {
   })
 }
 
-/**
- * Load and configure a texture with skin-specific settings
- */
 export async function loadTexture(
   textureUrl: string,
   config: SkinRendererConfig = {},
@@ -62,9 +55,6 @@ export async function loadTexture(
   })
 }
 
-/**
- * Apply skin texture to a model, excluding cape meshes
- */
 export function applyTexture(model: THREE.Object3D, texture: THREE.Texture): void {
   model.traverse((child) => {
     if ((child as THREE.Mesh).isMesh) {
@@ -89,9 +79,6 @@ export function applyTexture(model: THREE.Object3D, texture: THREE.Texture): voi
   })
 }
 
-/**
- * Apply cape texture with specific settings for cape materials
- */
 export function applyCapeTexture(
   model: THREE.Object3D,
   texture: THREE.Texture | null,
@@ -118,9 +105,6 @@ export function applyCapeTexture(
   })
 }
 
-/**
- * Attach cape model to the body node with standard positioning
- */
 export function attachCapeToBody(
   bodyNode: THREE.Object3D,
   capeModel: THREE.Object3D,
@@ -129,22 +113,15 @@ export function attachCapeToBody(
 ): void {
   if (!bodyNode || !capeModel) return
 
-  // Remove cape from current parent if it exists
   if (capeModel.parent) {
     capeModel.parent.remove(capeModel)
   }
 
-  // Set cape position and rotation
   capeModel.position.set(position.x, position.y, position.z)
   capeModel.rotation.set(rotation.x, rotation.y, rotation.z)
-
-  // Attach to body
   bodyNode.add(capeModel)
 }
 
-/**
- * Find the body node in a model hierarchy
- */
 export function findBodyNode(model: THREE.Object3D): THREE.Object3D | null {
   let bodyNode: THREE.Object3D | null = null
 
@@ -157,9 +134,6 @@ export function findBodyNode(model: THREE.Object3D): THREE.Object3D | null {
   return bodyNode
 }
 
-/**
- * Create a transparent texture for use as fallback
- */
 export function createTransparentTexture(): THREE.Texture {
   const canvas = document.createElement('canvas')
   canvas.width = canvas.height = 1
@@ -176,9 +150,6 @@ export function createTransparentTexture(): THREE.Texture {
   return texture
 }
 
-/**
- * Setup a complete skin model with optional cape
- */
 export async function setupSkinModel(
   modelUrl: string,
   textureUrl: string,
@@ -217,9 +188,6 @@ export async function setupSkinModel(
   return { model, bodyNode, capeModel }
 }
 
-/**
- * Clear all caches and dispose of cached resources
- */
 export function disposeCaches(): void {
   Array.from(textureCache.values()).forEach((texture) => {
     texture.dispose()
