@@ -1,5 +1,4 @@
-use std::collections::{HashMap, HashSet};
-use std::hash::RandomState;
+use std::collections::HashMap;
 use std::mem;
 
 use crate::database::models::loader_fields::VersionField;
@@ -124,9 +123,7 @@ pub fn from_duplicate_version_fields(
 
     // Remove duplicates
     for (_, v) in fields.iter_mut() {
-        *v = HashSet::<_, RandomState>::from_iter(mem::take(v).into_iter())
-            .into_iter()
-            .collect_vec();
+        *v = mem::take(v).into_iter().unique().collect_vec();
     }
     fields
 }
