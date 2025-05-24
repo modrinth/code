@@ -1,9 +1,11 @@
 import * as THREE from 'three'
-import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import type { Skin, Cape } from '../skins'
 import { determineModelType } from '../skins'
 import { reactive } from 'vue'
+import {
+  setupSkinModel,
+  disposeCaches
+} from '@modrinth/utils'
 
 export interface RenderResult {
   forwards: string
@@ -14,12 +16,7 @@ class BatchSkinRenderer {
   private renderer: THREE.WebGLRenderer
   private readonly scene: THREE.Scene
   private readonly camera: THREE.PerspectiveCamera
-  private modelCache: Map<string, GLTF> = new Map()
-  private textureCache: Map<string, THREE.Texture> = new Map()
   private currentModel: THREE.Group | null = null
-  private capeModel: THREE.Object3D | null = null
-  private bodyNode: THREE.Object3D | null = null
-  private capeAttached: boolean = false
 
   constructor(width: number = 360, height: number = 504) {
     const canvas = document.createElement('canvas')
@@ -43,102 +40,6 @@ class BatchSkinRenderer {
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 2)
     this.scene.add(ambientLight)
-  }
-
-  private async loadModel(modelUrl: string): Promise<GLTF> {
-    if (this.modelCache.has(modelUrl)) {
-      return this.modelCache.get(modelUrl)!
-    }
-
-    const loader = new GLTFLoader()
-    return new Promise<GLTF>((resolve, reject) => {
-      loader.load(
-        modelUrl,
-        (gltf) => {
-          this.modelCache.set(modelUrl, gltf)
-          resolve(gltf)
-        },
-        undefined,
-        reject,
-      )
-    })
-  }
-
-  private async loadTexture(textureUrl: string): Promise<THREE.Texture> {
-    if (this.textureCache.has(textureUrl)) {
-      return this.textureCache.get(textureUrl)!
-    }
-
-    return new Promise<THREE.Texture>((resolve) => {
-      const textureLoader = new THREE.TextureLoader()
-      textureLoader.load(textureUrl, (texture) => {
-        texture.colorSpace = THREE.SRGBColorSpace
-        texture.flipY = false
-        texture.magFilter = THREE.NearestFilter
-        texture.minFilter = THREE.NearestFilter
-
-        this.textureCache.set(textureUrl, texture)
-        resolve(texture)
-      })
-    })
-  }
-
-  private applyTexture(model: THREE.Object3D, texture: THREE.Texture): void {
-    model.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh) {
-        const mesh = child as THREE.Mesh
-
-        if (mesh.name === 'Cape') return
-
-        const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
-
-        materials.forEach((mat: THREE.Material) => {
-          if (mat instanceof THREE.MeshStandardMaterial) {
-            mat.map = texture
-            mat.metalness = 0
-            mat.color.set(0xffffff)
-            mat.toneMapped = false
-            mat.roughness = 1
-            mat.needsUpdate = true
-          }
-        })
-      }
-    })
-  }
-
-  private applyCapeTexture(model: THREE.Object3D, texture: THREE.Texture): void {
-    model.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh) {
-        const mesh = child as THREE.Mesh
-        const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
-
-        materials.forEach((mat: THREE.Material) => {
-          if (mat instanceof THREE.MeshStandardMaterial) {
-            mat.map = texture
-            mat.metalness = 0
-            mat.color.set(0xffffff)
-            mat.toneMapped = false
-            mat.roughness = 1
-            mat.side = THREE.DoubleSide
-            mat.needsUpdate = true
-          }
-        })
-      }
-    })
-  }
-
-  private attachCapeToBody(): void {
-    if (!this.bodyNode || !this.capeModel || this.capeAttached) return
-
-    if (this.capeModel.parent) {
-      this.capeModel.parent.remove(this.capeModel)
-    }
-
-    this.capeModel.position.set(0, -1, -0.01)
-    this.capeModel.rotation.set(0, -Math.PI / 2, 0)
-
-    this.bodyNode.add(this.capeModel)
-    this.capeAttached = true
   }
 
   public async renderSkin(
@@ -200,22 +101,13 @@ class BatchSkinRenderer {
       this.scene.remove(this.currentModel)
     }
 
-    this.bodyNode = null
-    this.capeAttached = false
-
-    const [gltf, texture] = await Promise.all([
-      this.loadModel(modelUrl),
-      this.loadTexture(textureUrl),
-    ])
-
-    const model = gltf.scene.clone()
-    this.applyTexture(model, texture)
-
-    model.traverse((node) => {
-      if (node.name === 'Body') {
-        this.bodyNode = node
-      }
-    })
+    // Use the utility function to setup the skin model
+    const { model } = await setupSkinModel(
+      modelUrl,
+      textureUrl,
+      capeModelUrl,
+      capeUrl
+    )
 
     const group = new THREE.Group()
     group.add(model)
@@ -224,30 +116,11 @@ class BatchSkinRenderer {
 
     this.scene.add(group)
     this.currentModel = group
-
-    if (capeModelUrl && capeUrl) {
-      const [capeGltf, capeTexture] = await Promise.all([
-        this.loadModel(capeModelUrl),
-        this.loadTexture(capeUrl),
-      ])
-
-      this.capeModel = capeGltf.scene.clone()
-      this.applyCapeTexture(this.capeModel, capeTexture)
-
-      if (this.bodyNode && this.capeModel) {
-        this.attachCapeToBody()
-      }
-    }
   }
 
   public dispose(): void {
-    Array.from(this.textureCache.values()).forEach((texture) => {
-      texture.dispose()
-    })
-
     this.renderer.dispose()
-    this.textureCache.clear()
-    this.modelCache.clear()
+    disposeCaches()
   }
 }
 

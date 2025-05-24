@@ -418,6 +418,7 @@ $skin-card-gap: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-left: calc((2.5rem / 2));
 
   @media (max-width: 700px) {
     height: 50vh;
@@ -430,7 +431,7 @@ $skin-card-gap: 4px;
 
 .skin-card-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: $skin-card-gap;
   width: 100%;
 
