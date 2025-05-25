@@ -16,9 +16,6 @@
         <p class="mx-auto mt-0 text-secondary text-sm text-center">
           Drag and drop or click here to browse
         </p>
-        <p class="mx-auto mt-0 text-secondary text-xs text-center">
-          Only 64x64 PNG files are accepted
-        </p>
         <input
           ref="fileInput"
           type="file"

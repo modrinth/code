@@ -1,15 +1,22 @@
 <template>
   <div class="relative w-full h-full cursor-grab">
     <div
-      class="absolute bottom-[18%] left-0 right-0 flex justify-center items-center mb-2 pointer-events-none z-10"
+      class="absolute bottom-[18%] left-0 right-0 flex flex-col justify-center items-center mb-2 pointer-events-none z-10 gap-2"
     >
       <span class="text-primary text-xs px-2 py-1 rounded-full backdrop-blur-sm">
         Drag to rotate
       </span>
     </div>
     <div
+      class="absolute bottom-[10%] left-0 right-0 flex justify-center items-center pointer-events-auto z-10"
+    >
+      <slot name="subtitle" />
+    </div>
+    <div
       v-if="nametag"
-      class="absolute top-[13%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md text-[200%] pointer-events-none z-10 font-minecraft text-inverted nametag-bg"
+      ref="nametagElement"
+      class="absolute top-[13%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md pointer-events-none z-10 font-minecraft text-inverted nametag-bg"
+      :style="{ fontSize: dynamicNametagFontSize }"
     >
       {{ nametag }}
     </div>
@@ -88,7 +95,19 @@
 import * as THREE from 'three'
 import { useGLTF } from '@tresjs/cientos'
 import { useTexture, TresCanvas, useRenderLoop } from '@tresjs/core'
-import { shallowRef, ref, computed, watch, markRaw, onBeforeMount, onUnmounted, toRefs } from 'vue'
+import {
+  shallowRef,
+  ref,
+  computed,
+  watch,
+  markRaw,
+  onBeforeMount,
+  onUnmounted,
+  toRefs,
+  useTemplateRef,
+  onMounted,
+  nextTick,
+} from 'vue'
 import {
   applyTexture,
   applyCapeTexture,
@@ -129,12 +148,12 @@ const props = withDefaults(
     capeSrc: undefined,
     initialRotation: 15.75,
     nametag: undefined,
-    animationConfig: {
+    animationConfig: () => ({
       baseAnimation: 'idle',
       randomAnimations: [],
       randomAnimationInterval: 8000,
       transitionDuration: 0.5,
-    }
+    }),
   },
 )
 
@@ -160,6 +179,30 @@ const actions = ref<Record<string, THREE.AnimationAction>>({})
 const clock = new THREE.Clock()
 const currentAnimation = ref<string>('')
 const randomAnimationTimer = ref<number | null>(null)
+
+const nametagElement = useTemplateRef<HTMLElement>('nametagElement')
+const maxContainerWidth = ref(300)
+
+const dynamicNametagFontSize = computed(() => {
+  if (!props.nametag) return '2rem'
+  const textLength = props.nametag.length
+  const baseSize = 32
+  const minSize = 12
+  const maxSize = 32
+  const availableWidth = maxContainerWidth.value - 64
+  const estimatedCharWidth = baseSize * 0.6
+  const estimatedTextWidth = textLength * estimatedCharWidth
+  const scaleFactor = availableWidth / estimatedTextWidth
+  const calculatedSize = Math.max(minSize, Math.min(maxSize, baseSize * scaleFactor))
+
+  return `${calculatedSize}px`
+})
+
+const updateContainerWidth = () => {
+  if (nametagElement.value?.parentElement) {
+    maxContainerWidth.value = nametagElement.value.parentElement.clientWidth
+  }
+}
 
 const { baseAnimation, randomAnimations } = toRefs(props.animationConfig)
 
@@ -480,8 +523,24 @@ watch(
       setupRandomAnimationLoop()
     }
   },
-  { deep: true }
+  { deep: true },
 )
+
+watch(
+  () => props.nametag,
+  () => {
+    nextTick(() => {
+      updateContainerWidth()
+    })
+  },
+)
+
+onMounted(() => {
+  nextTick(() => {
+    updateContainerWidth()
+    window.addEventListener('resize', updateContainerWidth)
+  })
+})
 
 onBeforeMount(async () => {
   try {
@@ -512,13 +571,15 @@ onUnmounted(() => {
     mixer.value.stopAllAction()
     mixer.value = null
   }
+
+  window.removeEventListener('resize', updateContainerWidth)
 })
 </script>
 
 <style scoped lang="scss">
 .nametag-bg {
   background: linear-gradient(308.68deg, rgba(0, 0, 0, 0) -52.46%, rgba(100, 100, 100, 0.1) 94.75%),
-  rgba(0, 0, 0, 0.2);
+    rgba(0, 0, 0, 0.2);
   box-shadow:
     inset -0.5px -0.5px 0px rgba(0, 0, 0, 0.25),
     inset 0.5px 0.5px 0px rgba(255, 255, 255, 0.05);

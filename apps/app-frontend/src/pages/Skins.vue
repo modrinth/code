@@ -246,32 +246,7 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
 
   <div v-if="currentUser" class="p-4 skin-layout">
     <div class="preview-panel">
-      <div class="flex justify-between gap-4">
-        <h1 class="m-0 text-2xl font-bold">Skins</h1>
-        <ButtonStyled :disabled="!!selectedSkin?.cape_id">
-          <button
-            v-tooltip="
-              selectedSkin?.cape_id
-                ? 'The equipped skin is overriding the default cape.'
-                : undefined
-            "
-            :disabled="!!selectedSkin?.cape_id"
-            @click="
-              (e: MouseEvent) =>
-                selectCapeModal?.show(
-                  e,
-                  selectedSkin?.texture_key,
-                  currentCape,
-                  skinTexture,
-                  skinVariant,
-                )
-            "
-          >
-            <UpdatedIcon />
-            Change cape
-          </button>
-        </ButtonStyled>
-      </div>
+      <h1 class="m-0 text-2xl font-bold">Skins</h1>
       <div class="preview-container">
         <SkinPreviewRenderer
           wide-model-src="/src/assets/models/classic_player.gltf"
@@ -282,7 +257,33 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
           :variant="skinVariant"
           :nametag="skinNametag"
           :initial-rotation="Math.PI / 8"
-        />
+        >
+          <template #subtitle>
+            <ButtonStyled :disabled="!!selectedSkin?.cape_id">
+              <button
+                v-tooltip="
+                  selectedSkin?.cape_id
+                    ? 'The equipped skin is overriding the default cape.'
+                    : undefined
+                "
+                :disabled="!!selectedSkin?.cape_id"
+                @click="
+                  (e: MouseEvent) =>
+                    selectCapeModal?.show(
+                      e,
+                      selectedSkin?.texture_key,
+                      currentCape,
+                      skinTexture,
+                      skinVariant,
+                    )
+                "
+              >
+                <UpdatedIcon />
+                Change cape
+              </button>
+            </ButtonStyled>
+          </template>
+        </SkinPreviewRenderer>
       </div>
     </div>
 
@@ -404,14 +405,9 @@ $skin-card-gap: 4px;
 }
 
 .preview-panel {
-  position: sticky;
   top: 1.5rem;
   align-self: start;
   padding: 0.5rem;
-
-  @media (max-width: 700px) {
-    position: static;
-  }
 }
 
 .preview-container {
