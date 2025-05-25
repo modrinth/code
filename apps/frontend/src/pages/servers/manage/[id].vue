@@ -33,26 +33,7 @@
     </div>
   </div>
   <div
-    v-if="serverData?.status === 'suspended' && serverData.suspension_reason === 'support'"
-    class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
-  >
-    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-      <div class="flex flex-col items-center text-center">
-        <div class="flex flex-col items-center gap-4">
-          <div class="grid place-content-center rounded-full bg-bg-blue p-4">
-            <TransferIcon class="size-12 text-blue" />
-          </div>
-          <h1 class="m-0 mb-2 w-fit text-4xl font-bold">We're working on your server</h1>
-        </div>
-        <p class="text-lg text-secondary">
-          You recently contacted Modrinth Support, and we're actively working on your server. It
-          will be back online shortly.
-        </p>
-      </div>
-    </div>
-  </div>
-  <div
-    v-else-if="serverData?.status === 'suspended' && serverData.suspension_reason !== 'upgrading'"
+    v-else-if="serverData?.status === 'suspended'"
     class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
   >
     <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -72,7 +53,7 @@
                 : "Your server has been suspended."
           }}
           <br />
-          Contact Modrinth support if you believe this is an error.
+          Contact Modrinth Support if you believe this is an error.
         </p>
       </div>
       <ButtonStyled size="large" color="brand" @click="() => router.push('/settings/billing')">
@@ -97,7 +78,7 @@
         </div>
         <p class="text-lg text-secondary">
           You don't have permission to view this server or it no longer exists. If you believe this
-          is an error, please contact Modrinth support.
+          is an error, please contact Modrinth Support.
         </p>
       </div>
       <UiCopyCode :text="JSON.stringify(server.general?.error)" />
@@ -289,7 +270,7 @@
                     can change the loader by clicking the "Change Loader" button.
                   </li>
                   <li>
-                    If you're stuck, please contact Modrinth support with the information below:
+                    If you're stuck, please contact Modrinth Support with the information below:
                   </li>
                 </ul>
                 <ButtonStyled>
@@ -309,7 +290,7 @@
                 An error occurred while installing your server because Modrinth Servers does not
                 support the version of Minecraft or the loader you specified. Try reinstalling your
                 server with a different version or loader, and if the problem persists, please
-                contact Modrinth support with your server's debug information.
+                contact Modrinth Support with your server's debug information.
               </div>
 
               <div
