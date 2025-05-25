@@ -735,6 +735,18 @@ pub async fn process_payout(
     pool: &PgPool,
     client: &clickhouse::Client,
 ) -> Result<(), ApiError> {
+    sqlx::query!(
+        "
+        UPDATE payouts
+        SET status = $1
+        WHERE status = $2 AND created < NOW() - INTERVAL '30 days'
+        ",
+        crate::models::payouts::PayoutStatus::Failed.as_str(),
+        crate::models::payouts::PayoutStatus::InTransit.as_str(),
+    )
+    .execute(pool)
+    .await?;
+
     let start: DateTime<Utc> = DateTime::from_naive_utc_and_offset(
         (Utc::now() - Duration::days(1))
             .date_naive()
