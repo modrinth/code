@@ -87,8 +87,8 @@
 <script setup lang="ts">
 import * as THREE from 'three'
 import { useGLTF } from '@tresjs/cientos'
-import { useTexture, TresCanvas } from '@tresjs/core'
-import { shallowRef, ref, computed, watch, markRaw, onBeforeMount } from 'vue'
+import { useTexture, TresCanvas, useRenderLoop } from '@tresjs/core'
+import { shallowRef, ref, computed, watch, markRaw, onBeforeMount, onUnmounted, toRefs } from 'vue'
 import {
   applyTexture,
   applyCapeTexture,
@@ -97,6 +97,13 @@ import {
   createTransparentTexture,
   loadTexture as loadSkinTexture,
 } from '@modrinth/utils'
+
+interface AnimationConfig {
+  baseAnimation: string
+  randomAnimations: string[]
+  randomAnimationInterval?: number
+  transitionDuration?: number
+}
 
 const props = withDefaults(
   defineProps<{
@@ -111,6 +118,7 @@ const props = withDefaults(
     scale?: number
     fov?: number
     initialRotation?: number
+    animationConfig?: AnimationConfig
   }>(),
   {
     variant: 'CLASSIC',
@@ -121,6 +129,12 @@ const props = withDefaults(
     capeSrc: undefined,
     initialRotation: 15.75,
     nametag: undefined,
+    animationConfig: {
+      baseAnimation: 'idle',
+      randomAnimations: [],
+      randomAnimationInterval: 8000,
+      transitionDuration: 0.5,
+    }
   },
 )
 
@@ -141,10 +155,127 @@ const isModelLoaded = ref(false)
 const isTextureLoaded = ref(false)
 const isReady = computed(() => isModelLoaded.value && isTextureLoaded.value)
 
+const mixer = ref<THREE.AnimationMixer | null>(null)
+const actions = ref<Record<string, THREE.AnimationAction>>({})
+const clock = new THREE.Clock()
+const currentAnimation = ref<string>('')
+const randomAnimationTimer = ref<number | null>(null)
+
+const { baseAnimation, randomAnimations } = toRefs(props.animationConfig)
+
+function initializeAnimations(loadedScene: THREE.Object3D, clips: THREE.AnimationClip[]) {
+  if (!clips || clips.length === 0) {
+    console.warn('No animation clips found in the model')
+    return
+  }
+
+  mixer.value = new THREE.AnimationMixer(loadedScene)
+  actions.value = {}
+
+  clips.forEach((clip) => {
+    const action = mixer.value!.clipAction(clip)
+    actions.value[clip.name] = action
+    console.log(`Loaded animation: ${clip.name}`)
+  })
+
+  if (baseAnimation.value && actions.value[baseAnimation.value]) {
+    playAnimation(baseAnimation.value)
+    setupRandomAnimationLoop()
+  } else {
+    console.warn(`Base animation "${baseAnimation.value}" not found`)
+
+    const firstAnimationName = Object.keys(actions.value)[0]
+    if (firstAnimationName) {
+      console.log(`Playing first available animation: ${firstAnimationName}`)
+      playAnimation(firstAnimationName)
+    }
+  }
+}
+
+function playAnimation(name: string) {
+  if (!mixer.value || !actions.value[name]) {
+    console.warn(`Animation "${name}" not found!`)
+    return false
+  }
+
+  const action = actions.value[name]
+  const transitionDuration = props.animationConfig.transitionDuration || 0.3
+
+  Object.entries(actions.value).forEach(([actionName, actionInstance]) => {
+    if (actionName !== name && actionInstance.isRunning()) {
+      actionInstance.fadeOut(transitionDuration)
+    }
+  })
+
+  // Reset and play the new animation
+  action.reset()
+  action.setLoop(THREE.LoopRepeat, Infinity)
+  action.fadeIn(transitionDuration)
+  action.play()
+
+  currentAnimation.value = name
+  console.log(`Playing animation: ${name}`)
+  return true
+}
+
+function setupRandomAnimationLoop() {
+  const interval = props.animationConfig.randomAnimationInterval || 10000
+
+  randomAnimationTimer.value = window.setInterval(() => {
+    if (randomAnimations.value.length > 0) {
+      if (currentAnimation.value === baseAnimation.value) {
+        const randomIndex = Math.floor(Math.random() * randomAnimations.value.length)
+        const randomAnimationName = randomAnimations.value[randomIndex]
+
+        if (actions.value[randomAnimationName]) {
+          playRandomAnimation(randomAnimationName)
+        }
+      }
+    }
+  }, interval)
+}
+
+function playRandomAnimation(name: string) {
+  if (!playAnimation(name)) return
+
+  const animationDuration = actions.value[name].getClip().duration * 1000
+
+  setTimeout(() => {
+    if (currentAnimation.value === name && baseAnimation.value) {
+      playAnimation(baseAnimation.value)
+    }
+  }, animationDuration + 500)
+}
+
+function stopAnimations() {
+  if (mixer.value) {
+    mixer.value.stopAllAction()
+  }
+  currentAnimation.value = ''
+}
+
+function getAvailableAnimations(): string[] {
+  return Object.keys(actions.value)
+}
+
+defineExpose({
+  playAnimation,
+  stopAnimations,
+  getAvailableAnimations,
+  getCurrentAnimation: () => currentAnimation.value,
+})
+
+const { onLoop } = useRenderLoop()
+onLoop(() => {
+  if (mixer.value) {
+    mixer.value.update(clock.getDelta())
+  }
+})
+
 async function loadModel(src: string) {
   try {
     isModelLoaded.value = false
-    const { scene: loadedScene } = await useGLTF(src)
+    const { scene: loadedScene, animations } = await useGLTF(src)
     scene.value = markRaw(loadedScene)
 
     if (texture.value) {
@@ -154,6 +285,10 @@ async function loadModel(src: string) {
 
     bodyNode.value = findBodyNode(loadedScene)
     capeAttached.value = false
+
+    if (animations && animations.length > 0) {
+      initializeAnimations(loadedScene, animations)
+    }
 
     updateModelInfo()
     isModelLoaded.value = true
@@ -332,6 +467,22 @@ watch(
   },
 )
 
+watch(
+  () => props.animationConfig,
+  (newConfig) => {
+    if (randomAnimationTimer.value) {
+      clearInterval(randomAnimationTimer.value)
+      randomAnimationTimer.value = null
+    }
+
+    if (mixer.value && newConfig.baseAnimation && actions.value[newConfig.baseAnimation]) {
+      playAnimation(newConfig.baseAnimation)
+      setupRandomAnimationLoop()
+    }
+  },
+  { deep: true }
+)
+
 onBeforeMount(async () => {
   try {
     isTextureLoaded.value = false
@@ -351,12 +502,23 @@ onBeforeMount(async () => {
     console.error('Failed to initialize skin preview:', error)
   }
 })
+
+onUnmounted(() => {
+  if (randomAnimationTimer.value) {
+    clearInterval(randomAnimationTimer.value)
+  }
+
+  if (mixer.value) {
+    mixer.value.stopAllAction()
+    mixer.value = null
+  }
+})
 </script>
 
 <style scoped lang="scss">
 .nametag-bg {
   background: linear-gradient(308.68deg, rgba(0, 0, 0, 0) -52.46%, rgba(100, 100, 100, 0.1) 94.75%),
-    rgba(0, 0, 0, 0.2);
+  rgba(0, 0, 0, 0.2);
   box-shadow:
     inset -0.5px -0.5px 0px rgba(0, 0, 0, 0.25),
     inset 0.5px 0.5px 0px rgba(255, 255, 255, 0.05);
