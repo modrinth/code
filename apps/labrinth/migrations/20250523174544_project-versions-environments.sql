@@ -72,7 +72,7 @@ INSERT INTO version_fields (version_id, field_id, enum_value)
     JOIN loader_fields lf ON vf.field_id = lf.id
     WHERE lf.field IN ('server_only', 'singleplayer', 'client_and_server', 'client_only')
     GROUP BY vf.version_id
-    HAVING COUNT(DISTINCT lf.field) = VAR_env_field_enum_id;
+    HAVING COUNT(DISTINCT lf.field) = 4;
 
 -- Clean up old fields from the project versions
 DELETE FROM version_fields
