@@ -1011,8 +1011,6 @@ pub struct PaymentRequest {
     pub metadata: Option<PaymentRequestMetadata>,
 }
 
-const DEFAULT_SERVER_REGION: &str = "us-vin";
-
 fn infer_currency_code(country: &str) -> String {
     match country {
         "US" => "USD",
@@ -1817,10 +1815,7 @@ pub async fn stripe_webhook(
 
                                             (
                                                 None,
-                                                Some(
-                                                    DEFAULT_SERVER_REGION
-                                                        .to_owned(),
-                                                ),
+                                                None,
                                                 serde_json::json!({
                                                     "loader": "Vanilla",
                                                     "game_version": minecraft_versions.first().map(|x| x.version.clone()),
@@ -1835,11 +1830,6 @@ pub async fn stripe_webhook(
                                                 "{}'s server",
                                                 metadata.user_item.username
                                             )
-                                        });
-
-                                    let server_region = server_region
-                                        .unwrap_or_else(|| {
-                                            DEFAULT_SERVER_REGION.to_owned()
                                         });
 
                                     #[derive(Deserialize)]
