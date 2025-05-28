@@ -226,6 +226,7 @@ fn convert_legacy_skin_texture(
 /// Equivalent to Mojang's Blaze3D `NativeImage#copyRect(int, int, int, int, int, int,
 /// boolean, boolean)` method, but with the last two parameters fixed to `true` and `false`,
 /// respectively.
+#[allow(clippy::too_many_arguments)]
 fn copy_rect_mirror_horizontally<PixelType: NoUninit + AnyBitPattern>(
     texture_buf: &mut [PixelType],
     texture_info: &png::Info,
