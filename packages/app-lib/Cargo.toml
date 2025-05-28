@@ -23,6 +23,9 @@ quick-xml = { workspace = true, features = ["async-tokio"] }
 enumset.workspace = true
 chardetng.workspace = true
 encoding_rs.workspace = true
+png.workspace = true
+bytemuck.workspace = true
+rgb.workspace = true
 
 chrono = { workspace = true, features = ["serde"] }
 daedalus.workspace = true
@@ -48,7 +51,7 @@ async-tungstenite = { workspace = true, features = ["tokio-runtime", "tokio-rust
 futures = { workspace = true, features = ["async-await", "alloc"] }
 reqwest = { workspace = true, features = ["json", "stream", "deflate", "gzip", "brotli", "rustls-tls-webpki-roots", "charset", "http2", "macos-system-configuration", "multipart"] }
 tokio = { workspace = true, features = ["time", "io-util", "net", "sync", "fs", "macros", "process"] }
-tokio-util = { workspace = true, features = ["compat"] }
+tokio-util = { workspace = true, features = ["compat", "io", "io-util"] }
 async-recursion.workspace = true
 fs4 = { workspace = true, features = ["tokio"] }
 async-walkdir.workspace = true

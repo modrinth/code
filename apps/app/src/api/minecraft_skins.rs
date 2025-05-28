@@ -12,6 +12,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             equip_skin,
             remove_custom_skin,
             unequip_skin,
+            normalize_skin_texture,
         ])
         .build()
 }
@@ -79,4 +80,12 @@ pub async fn remove_custom_skin(skin: Skin) -> Result<()> {
 #[tauri::command]
 pub async fn unequip_skin() -> Result<()> {
     Ok(minecraft_skins::unequip_skin().await?)
+}
+
+/// `invoke('plugin:minecraft-skins|normalize_skin_texture')`
+///
+/// See also: [minecraft_skins::normalize_skin_texture]
+#[tauri::command]
+pub async fn normalize_skin_texture(skin: &Skin) -> Result<Bytes> {
+    Ok(minecraft_skins::normalize_skin_texture(skin).await?)
 }

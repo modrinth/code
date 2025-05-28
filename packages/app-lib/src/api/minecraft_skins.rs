@@ -1,14 +1,10 @@
 //! Theseus skin management interface
 
-use std::{
-    borrow::Cow,
-    sync::{
-        Arc,
-        atomic::{AtomicBool, Ordering},
-    },
+use std::sync::{
+    Arc,
+    atomic::{AtomicBool, Ordering},
 };
 
-use base64::Engine;
 pub use bytes::Bytes;
 use data_url::DataUrl;
 use futures::{Stream, StreamExt, TryStreamExt, future::Either, stream};
@@ -37,6 +33,8 @@ mod assets {
     }
     pub use default::DEFAULT_SKINS;
 }
+
+mod png_util;
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Cape {
@@ -202,9 +200,16 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
                     name: None,
                     variant: custom_skin.variant,
                     cape_id: custom_skin.cape_id,
-                    texture: texture_blob_to_data_url(
+                    texture: png_util::blob_to_data_url(
                         custom_skin.texture_blob(&state.pool).await?,
-                    ),
+                    )
+                    .or_else(|| {
+                        // Fall back to a placeholder texture if the DB somehow contains corrupt data
+                        png_util::blob_to_data_url(include_bytes!(
+                            "minecraft_skins/assets/default/MissingNo.png"
+                        ))
+                    })
+                    .unwrap(),
                     source: SkinSource::Custom,
                     is_equipped,
                     texture_key: custom_skin.texture_key.into(),
@@ -265,7 +270,7 @@ pub async fn add_and_equip_custom_skin(
     variant: MinecraftSkinVariant,
     cape_override: Option<Cape>,
 ) -> crate::Result<()> {
-    let (skin_width, skin_height) = png_dimensions(&texture_blob)?;
+    let (skin_width, skin_height) = png_util::dimensions(&texture_blob)?;
     if skin_width != 64 || ![32, 64].contains(&skin_height) {
         return Err(ErrorKind::InvalidSkinTexture)?;
     }
@@ -457,6 +462,17 @@ pub async fn unequip_skin() -> crate::Result<()> {
     Ok(())
 }
 
+/// Normalizes the texture of a Minecraft skin to the modern 64x64 format, handling
+/// legacy 64x32 skins as the vanilla game client does. This function prioritizes
+/// PNG encoding speed over compression density, so the resulting textures are better
+/// suited for display purposes, not persistent storage or transmission.
+///
+/// Returns the normalized, processed texture as a byte array in PNG format.
+#[tracing::instrument]
+pub async fn normalize_skin_texture(skin: &Skin) -> crate::Result<Bytes> {
+    png_util::normalize_skin_texture(skin).await
+}
+
 /// Synchronizes the equipped cape with the selected cape if necessary, taking into
 /// account the currently equipped cape, the default cape for the player, and if a
 /// cape override is provided.
@@ -526,58 +542,4 @@ async fn save_current_custom_external_skin(
     }
 
     Ok(())
-}
-
-fn texture_blob_to_data_url(texture_blob: Vec<u8>) -> Arc<Url> {
-    let data = if is_png(&texture_blob) {
-        Cow::Owned(texture_blob)
-    } else {
-        // Fall back to a placeholder texture if the DB somehow contains corrupt data
-        Cow::Borrowed(
-            &include_bytes!("minecraft_skins/assets/default/MissingNo.png")[..],
-        )
-    };
-
-    Url::parse(&format!(
-        "data:image/png;base64,{}",
-        base64::engine::general_purpose::STANDARD.encode(data)
-    ))
-    .unwrap()
-    .into()
-}
-
-fn is_png(data: &[u8]) -> bool {
-    /// The initial 8 bytes of a PNG file, used to identify it as such.
-    ///
-    /// Reference: <https://www.w3.org/TR/png-3/#3PNGsignature>
-    const PNG_SIGNATURE: &[u8] =
-        &[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
-
-    data.starts_with(PNG_SIGNATURE)
-}
-
-fn png_dimensions(data: &[u8]) -> crate::Result<(u32, u32)> {
-    if !is_png(data) {
-        Err(ErrorKind::InvalidPng)?;
-    }
-
-    // Read the width and height fields from the IHDR chunk, which the
-    // PNG specification mandates to be the first in the file, just after
-    // the 8 signature bytes. See:
-    // https://www.w3.org/TR/png-3/#5DataRep
-    // https://www.w3.org/TR/png-3/#11IHDR
-    let width = u32::from_be_bytes(
-        data.get(16..20)
-            .ok_or(ErrorKind::InvalidPng)?
-            .try_into()
-            .unwrap(),
-    );
-    let height = u32::from_be_bytes(
-        data.get(20..24)
-            .ok_or(ErrorKind::InvalidPng)?
-            .try_into()
-            .unwrap(),
-    );
-
-    Ok((width, height))
 }
