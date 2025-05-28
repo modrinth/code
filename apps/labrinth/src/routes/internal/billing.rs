@@ -1856,6 +1856,7 @@ pub async fn stripe_webhook(
                                             "source": source,
                                             "payment_interval": metadata.charge_item.subscription_interval.map(|x| match x {
                                                 PriceDuration::Monthly => 1,
+                                                PriceDuration::Quarterly => 3,
                                                 PriceDuration::Yearly => 12,
                                             })
                                         }))
