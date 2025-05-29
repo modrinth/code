@@ -41,6 +41,7 @@ import {generateSkinPreviews, map} from '@/helpers/rendering/batch-skin-renderer
 import {handleSevereError} from '@/store/error'
 import {trackEvent} from '@/helpers/analytics'
 import type AccountsCard from '@/components/ui/AccountsCard.vue'
+import {arrayBufferToBase64} from "@modrinth/utils";
 
 const editSkinModal = useTemplateRef('editSkinModal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
@@ -177,12 +178,13 @@ function openUploadSkinModal(e: MouseEvent) {
 function onSkinFileUploaded(file: File) {
   const fakeEvent = new MouseEvent('click')
   file.arrayBuffer().then(async (buf) => {
-    const skinTexture: Uint8Array = await normalize_skin_texture(new Uint8Array(buf))
+    const skinTextureNormalized: Uint8Array = await normalize_skin_texture(`data:image/png;base64,` + arrayBufferToBase64(buf))
+    const skinTexUrl = `data:image/png;base64,` + arrayBufferToBase64(skinTextureNormalized);
 
     if (editSkinModal.value && editSkinModal.value.shouldRestoreModal) {
-      editSkinModal.value.restoreWithNewTexture(skinTexture, file.name)
+      editSkinModal.value.restoreWithNewTexture(skinTexUrl)
     } else {
-      editSkinModal.value?.showNew(fakeEvent, skinTexture, file.name)
+      editSkinModal.value?.showNew(fakeEvent, skinTexUrl)
     }
   })
 }

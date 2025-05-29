@@ -207,12 +207,7 @@ async function setupApp() {
   fetchCredentials()
 
   try {
-    const skins = (await get_available_skins()).map(async skin => {
-      return {
-        ...skin,
-        normalized_texture: await get_normalized_skin_texture(skin.texture)
-      }
-    }) ?? []
+    const skins = (await get_available_skins()) ?? []
     const capes = (await get_available_capes()) ?? []
     generateSkinPreviews(skins, capes)
   } catch (error) {

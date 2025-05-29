@@ -113,12 +113,12 @@ import {
   unequip_skin,
   type Skin,
   type Cape,
-  type SkinModel, normalize_skin_texture, get_normalized_skin_texture,
+  type SkinModel,
+  get_normalized_skin_texture,
 } from '@/helpers/skins.ts'
 import { handleError } from '@/store/notifications'
 import { UploadIcon, CheckIcon, SaveIcon, XIcon, ChevronRightIcon } from '@modrinth/assets'
 import {computedAsync} from "@vueuse/core";
-import {arrayBufferToBase64} from "@modrinth/utils";
 
 const modal = useTemplateRef('modal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
@@ -126,13 +126,7 @@ const mode = ref<'new' | 'edit'>('new')
 const currentSkin = ref<Skin | null>(null)
 const shouldRestoreModal = ref(false)
 
-const fileUploadTextureBlob = ref<Uint8Array | null>(null)
-const fileName = ref<string | null>(null)
-watch(fileUploadTextureBlob, () => {
-  if (fileName.value === null && fileUploadTextureBlob.value) {
-    fileName.value = 'New upload'
-  }
-})
+const uploadedTextureUrl = ref<string | null>(null)
 
 const variant = ref<SkinModel>('CLASSIC')
 const selectedCape = ref<Cape | undefined>(undefined)
@@ -175,23 +169,16 @@ function getSortedCapeExcluding(excludeId: string): Cape | undefined {
   return sortedCapes.value.find((cape) => cape.id !== excludeId)
 }
 
-const localPreviewUrl = ref<string | null>(null)
-watch(fileUploadTextureBlob, (blob, prev) => {
-  if (prev && localPreviewUrl.value) URL.revokeObjectURL(localPreviewUrl.value)
-  if (blob) localPreviewUrl.value = URL.createObjectURL(new Blob([blob]))
-  else localPreviewUrl.value = null
-})
 const previewSkin = computedAsync(async () => {
-  if (localPreviewUrl.value)
-    return localPreviewUrl.value;
+  if (uploadedTextureUrl.value) return uploadedTextureUrl.value
   else if (currentSkin.value) {
-    return await get_normalized_skin_texture(currentSkin.value);
+    return await get_normalized_skin_texture(currentSkin.value)
   } else return '/src/assets/skins/steve.png'
 })
 
 const hasEdits = computed(() => {
   if (mode.value !== 'edit') return true
-  if (fileUploadTextureBlob.value) return true
+  if (uploadedTextureUrl.value) return true
   if (!currentSkin.value) return false
   if (variant.value !== currentSkin.value.variant) return true
   if ((selectedCape.value?.id || null) !== (currentSkin.value.cape_id || null)) return true
@@ -200,12 +187,12 @@ const hasEdits = computed(() => {
 
 const disableSave = computed(
   () =>
-    (mode.value === 'new' && !fileUploadTextureBlob.value) ||
+    (mode.value === 'new' && !uploadedTextureUrl.value) ||
     (mode.value === 'edit' && !hasEdits.value),
 )
 
 const saveTooltip = computed(() => {
-  if (mode.value === 'new' && !fileUploadTextureBlob.value) return 'Upload a skin first!'
+  if (mode.value === 'new' && !uploadedTextureUrl.value) return 'Upload a skin first!'
   if (mode.value === 'edit' && !hasEdits.value) return 'Make an edit to the skin first!'
   return undefined
 })
@@ -213,16 +200,11 @@ const saveTooltip = computed(() => {
 function resetState() {
   mode.value = 'new'
   currentSkin.value = null
-  fileUploadTextureBlob.value = null
-  fileName.value = null
+  uploadedTextureUrl.value = null
   variant.value = 'CLASSIC'
   selectedCape.value = undefined
   visibleCapeList.value = []
   shouldRestoreModal.value = false
-  if (localPreviewUrl.value) {
-    URL.revokeObjectURL(localPreviewUrl.value)
-    localPreviewUrl.value = null
-  }
 }
 
 function show(e: MouseEvent, skin?: Skin) {
@@ -240,11 +222,10 @@ function show(e: MouseEvent, skin?: Skin) {
   modal.value?.show(e)
 }
 
-function showNew(e: MouseEvent, skinTexture: Uint8Array, filename: string) {
+function showNew(e: MouseEvent, skinTextureUrl: string) {
   mode.value = 'new'
   currentSkin.value = null
-  fileUploadTextureBlob.value = skinTexture
-  fileName.value = filename
+  uploadedTextureUrl.value = skinTextureUrl
   variant.value = 'CLASSIC'
   selectedCape.value = undefined
   visibleCapeList.value = []
@@ -252,9 +233,8 @@ function showNew(e: MouseEvent, skinTexture: Uint8Array, filename: string) {
   modal.value?.show(e)
 }
 
-function restoreWithNewTexture(skinTexture: Uint8Array, filename: string) {
-  fileUploadTextureBlob.value = skinTexture
-  fileName.value = filename
+function restoreWithNewTexture(skinTextureUrl: string) {
+  uploadedTextureUrl.value = skinTextureUrl
 
   if (shouldRestoreModal.value) {
     setTimeout(() => {
@@ -331,23 +311,23 @@ function openUploadSkinModal(e: MouseEvent) {
 
 async function save() {
   try {
-    let blob: Uint8Array
-    if (fileUploadTextureBlob.value) {
-      blob = fileUploadTextureBlob.value
+    let textureUrl: string
+
+    if (uploadedTextureUrl.value) {
+      textureUrl = uploadedTextureUrl.value
     } else {
-      const url = currentSkin.value!.texture
-      const resp = await fetch(url)
-      const buf = await resp.arrayBuffer()
-      blob = new Uint8Array(buf)
+      textureUrl = currentSkin.value!.texture
     }
 
     await unequip_skin()
 
+    const bytes: Uint8Array = new Uint8Array(await (await fetch(textureUrl)).arrayBuffer())
+
     if (mode.value === 'new') {
-      await add_and_equip_custom_skin(blob, variant.value, selectedCape.value)
+      await add_and_equip_custom_skin(bytes, variant.value, selectedCape.value)
       emit('saved')
     } else {
-      await add_and_equip_custom_skin(blob, variant.value, selectedCape.value)
+      await add_and_equip_custom_skin(bytes, variant.value, selectedCape.value)
       await remove_custom_skin(currentSkin.value!)
       emit('saved')
     }

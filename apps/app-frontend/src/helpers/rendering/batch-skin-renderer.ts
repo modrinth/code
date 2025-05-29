@@ -145,7 +145,7 @@ export async function cleanupUnusedPreviews(skins: Skin[]): Promise<void> {
   }
 }
 
-export async function generateSkinPreviews(skins: (Skin & { normalized_skin_texture: string })[], capes: Cape[]): Promise<void> {
+export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promise<void> {
   const renderer = new BatchSkinRenderer()
   const capeModelUrl = '/src/assets/models/cape.gltf'
 
@@ -185,7 +185,7 @@ export async function generateSkinPreviews(skins: (Skin & { normalized_skin_text
       const modelUrl = getModelUrlForVariant(variant)
       const cape: Cape | undefined = capes.find((_cape) => _cape.id === skin.cape_id)
       const renderResult = await renderer.renderSkin(
-        skin.normalized_skin_texture,
+        await get_normalized_skin_texture(skin),
         modelUrl,
         cape?.texture,
         capeModelUrl,
