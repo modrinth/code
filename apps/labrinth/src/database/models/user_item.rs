@@ -234,7 +234,7 @@ impl DBUser {
         let user_pass = sqlx::query!(
             "
             SELECT id FROM users
-            WHERE LOWER(email) = LOWER($1)
+            WHERE email ILIKE $1
             ",
             email
         )
