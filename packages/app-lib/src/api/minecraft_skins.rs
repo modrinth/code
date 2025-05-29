@@ -6,8 +6,7 @@ use std::sync::{
 };
 
 pub use bytes::Bytes;
-use data_url::DataUrl;
-use futures::{Stream, StreamExt, TryStreamExt, future::Either, stream};
+use futures::{StreamExt, TryStreamExt, stream};
 use serde::{Deserialize, Serialize};
 use url::Url;
 use uuid::Uuid;
@@ -21,7 +20,6 @@ use crate::{
             CustomMinecraftSkin, DefaultMinecraftCape, mojang_api,
         },
     },
-    util::fetch::REQWEST_CLIENT,
 };
 
 use super::data::Credentials;
@@ -74,32 +72,6 @@ pub struct Skin {
     pub is_equipped: bool,
 }
 
-impl Skin {
-    /// Resolves the skin texture URL to a stream of bytes.
-    pub async fn resolve_texture(
-        &self,
-    ) -> crate::Result<impl Stream<Item = Result<Bytes, reqwest::Error>> + use<>>
-    {
-        if self.texture.scheme() == "data" {
-            let data = DataUrl::process(self.texture.as_str())?
-                .decode_to_vec()?
-                .0
-                .into();
-
-            Ok(Either::Left(stream::once(async { Ok(data) })))
-        } else {
-            let response = REQWEST_CLIENT
-                .get(self.texture.as_str())
-                .header("Accept", "image/png")
-                .send()
-                .await
-                .and_then(|response| response.error_for_status())?;
-
-            Ok(Either::Right(response.bytes_stream()))
-        }
-    }
-}
-
 #[derive(Deserialize, Serialize, Debug, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum SkinSource {
@@ -109,6 +81,14 @@ pub enum SkinSource {
     CustomExternal,
     /// A custom skin we have set up in our app.
     Custom,
+}
+
+/// Represents either a URL or a blob for a Minecraft skin PNG texture.
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(untagged)]
+pub enum UrlOrBlob {
+    Url(Url),
+    Blob(Bytes),
 }
 
 /// Retrieves the available capes for the currently selected Minecraft profile. At most one cape
@@ -398,7 +378,7 @@ pub async fn equip_skin(skin: Skin) -> crate::Result<()> {
 
     mojang_api::MinecraftSkinOperation::equip(
         &selected_credentials,
-        skin.resolve_texture().await?,
+        png_util::url_to_data_stream(&skin.texture).await?,
         skin.variant,
     )
     .await?;
@@ -467,10 +447,12 @@ pub async fn unequip_skin() -> crate::Result<()> {
 /// PNG encoding speed over compression density, so the resulting textures are better
 /// suited for display purposes, not persistent storage or transmission.
 ///
-/// Returns the normalized, processed texture as a byte array in PNG format.
+/// The normalized, processed is returned texture as a byte array in PNG format.
 #[tracing::instrument]
-pub async fn normalize_skin_texture(skin: &Skin) -> crate::Result<Bytes> {
-    png_util::normalize_skin_texture(skin).await
+pub async fn normalize_skin_texture(
+    texture: &UrlOrBlob,
+) -> crate::Result<Bytes> {
+    png_util::normalize_skin_texture(texture).await
 }
 
 /// Synchronizes the equipped cape with the selected cape if necessary, taking into
@@ -526,8 +508,7 @@ async fn save_current_custom_external_skin(
         CustomMinecraftSkin::add(
             selected_credentials.offline_profile.id,
             &current_external_skin.texture_key,
-            &current_external_skin
-                .resolve_texture()
+            &png_util::url_to_data_stream(&current_external_skin.texture)
                 .await?
                 .try_fold(vec![], async |mut texture_blob, chunk| {
                     texture_blob.extend_from_slice(&chunk);
