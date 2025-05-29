@@ -47,6 +47,7 @@ const emit = defineEmits<{
 function show(e?: MouseEvent) {
   modal.value?.show(e)
 }
+
 function hide(emitCanceled = false) {
   modal.value?.hide()
   resetState()
@@ -54,9 +55,11 @@ function hide(emitCanceled = false) {
     emit('canceled')
   }
 }
+
 function resetState() {
   if (fileInput.value) fileInput.value.value = ''
 }
+
 function triggerFileInput() {
   fileInput.value?.click()
 }
@@ -66,7 +69,7 @@ async function validateImageDimensions(file: File): Promise<boolean> {
     const img = new Image()
     img.onload = () => {
       URL.revokeObjectURL(img.src)
-      resolve(img.width === 64 && img.height === 64)
+      resolve(img.width === 64 && (img.height === 64 || img.height == 32))
     }
     img.onerror = () => {
       URL.revokeObjectURL(img.src)
@@ -77,7 +80,6 @@ async function validateImageDimensions(file: File): Promise<boolean> {
 }
 
 async function handleFileOperation(e: Event | DragEvent) {
-  // Get files from either drag event or file input
   const files = (e as DragEvent).dataTransfer?.files || (e.target as HTMLInputElement).files
   if (!files || files.length === 0) {
     return
@@ -95,7 +97,7 @@ async function handleFileOperation(e: Event | DragEvent) {
   if (!isValidDimensions) {
     notifications.addNotification({
       title: 'Invalid dimensions.',
-      text: 'Only 64x64 PNG files are accepted.',
+      text: 'Only 64x64 and 64x32 PNG files are accepted.',
       type: 'error',
     })
     return

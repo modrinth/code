@@ -341,3 +341,14 @@ export const getArrayOrString = (x: string[] | string): string[] => {
     return x
   }
 }
+
+export function arrayBufferToBase64(buffer: Uint8Array | ArrayBuffer): string {
+  const bytes = buffer instanceof Uint8Array
+    ? buffer
+    : new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}

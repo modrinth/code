@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import {Skin, Cape, normalize_skin_texture, get_normalized_skin_texture_url} from '../skins'
+import {Skin, Cape, normalize_skin_texture, get_normalized_skin_texture} from '../skins'
 import { determineModelType } from '../skins'
 import { reactive } from 'vue'
 import { setupSkinModel, disposeCaches } from '@modrinth/utils'
@@ -145,7 +145,7 @@ export async function cleanupUnusedPreviews(skins: Skin[]): Promise<void> {
   }
 }
 
-export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promise<void> {
+export async function generateSkinPreviews(skins: (Skin & { normalized_skin_texture: string })[], capes: Cape[]): Promise<void> {
   const renderer = new BatchSkinRenderer()
   const capeModelUrl = '/src/assets/models/cape.gltf'
 
@@ -185,7 +185,7 @@ export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promis
       const modelUrl = getModelUrlForVariant(variant)
       const cape: Cape | undefined = capes.find((_cape) => _cape.id === skin.cape_id)
       const renderResult = await renderer.renderSkin(
-        await get_normalized_skin_texture_url(skin),
+        skin.normalized_skin_texture,
         modelUrl,
         cape?.texture,
         capeModelUrl,

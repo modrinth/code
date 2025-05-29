@@ -1,43 +1,45 @@
 <script setup lang="ts">
 import {
-  UpdatedIcon,
-  PlusIcon,
+  EditIcon,
   ExcitedRinthbot,
   LogInIcon,
+  PlusIcon,
   SpinnerIcon,
-  EditIcon,
   TrashIcon,
+  UpdatedIcon,
 } from '@modrinth/assets'
 import {
+  Button,
   ButtonStyled,
-  SkinPreviewRenderer,
+  ConfirmModal,
   SkinButton,
   SkinLikeTextButton,
-  Button,
-  ConfirmModal,
+  SkinPreviewRenderer,
 } from '@modrinth/ui'
-import type { Ref } from 'vue'
-import { ref, computed, useTemplateRef, watch, onMounted, onUnmounted, inject } from 'vue'
+import {computedAsync} from '@vueuse/core'
+import type {Ref} from 'vue'
+import {computed, inject, onMounted, onUnmounted, ref, useTemplateRef, watch} from 'vue'
 import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
 import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
 import UploadSkinModal from '@/components/ui/skin/UploadSkinModal.vue'
-import { handleError } from '@/store/notifications'
+import {handleError} from '@/store/notifications'
+import {Cape, normalize_skin_texture, Skin} from '@/helpers/skins.ts'
 import {
-  get_available_skins,
-  get_available_capes,
-  filterSavedSkins,
-  filterDefaultSkins,
   equip_skin,
-  set_default_cape,
+  filterDefaultSkins,
+  filterSavedSkins,
+  get_available_capes,
+  get_available_skins,
+  get_normalized_skin_texture,
   remove_custom_skin,
+  set_default_cape,
 } from '@/helpers/skins.ts'
-import { get as getSettings } from '@/helpers/settings.ts'
-import type { Cape, Skin } from '@/helpers/skins.ts'
-import { get_default_user, users, login as login_flow } from '@/helpers/auth'
-import type { RenderResult } from '@/helpers/rendering/batch-skin-renderer.ts'
-import { generateSkinPreviews, map } from '@/helpers/rendering/batch-skin-renderer.ts'
-import { handleSevereError } from '@/store/error'
-import { trackEvent } from '@/helpers/analytics'
+import {get as getSettings} from '@/helpers/settings.ts'
+import {get_default_user, login as login_flow, users} from '@/helpers/auth'
+import type {RenderResult} from '@/helpers/rendering/batch-skin-renderer.ts'
+import {generateSkinPreviews, map} from '@/helpers/rendering/batch-skin-renderer.ts'
+import {handleSevereError} from '@/store/error'
+import {trackEvent} from '@/helpers/analytics'
 import type AccountsCard from '@/components/ui/AccountsCard.vue'
 
 const editSkinModal = useTemplateRef('editSkinModal')
@@ -69,7 +71,13 @@ const currentCape = computed(() => {
   return defaultCape.value
 })
 
-const skinTexture = computed(() => selectedSkin.value?.texture ?? '')
+const skinTexture = computedAsync(async () => {
+  if (selectedSkin.value?.texture) {
+    return await get_normalized_skin_texture(selectedSkin.value);
+  } else {
+    return '';
+  }
+})
 const capeTexture = computed(() => currentCape.value?.texture)
 const skinVariant = computed(() => selectedSkin.value?.variant)
 const skinNametag = computed(() =>
@@ -168,8 +176,8 @@ function openUploadSkinModal(e: MouseEvent) {
 
 function onSkinFileUploaded(file: File) {
   const fakeEvent = new MouseEvent('click')
-  file.arrayBuffer().then((buf) => {
-    const skinTexture = new Uint8Array(buf)
+  file.arrayBuffer().then(async (buf) => {
+    const skinTexture: Uint8Array = await normalize_skin_texture(new Uint8Array(buf))
 
     if (editSkinModal.value && editSkinModal.value.shouldRestoreModal) {
       editSkinModal.value.restoreWithNewTexture(skinTexture, file.name)
@@ -253,7 +261,7 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
           slim-model-src="/src/assets/models/slim_player.gltf"
           cape-model-src="/src/assets/models/cape.gltf"
           :cape-src="capeTexture"
-          :texture-src="skinTexture"
+          :texture-src="skinTexture || ''"
           :variant="skinVariant"
           :nametag="skinNametag"
           :initial-rotation="Math.PI / 8"
