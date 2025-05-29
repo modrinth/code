@@ -141,6 +141,12 @@ pub enum ErrorKind {
     #[error("Invalid PNG")]
     InvalidPng,
 
+    #[error("Invalid PNG: {0}")]
+    PngDecodingError(#[from] png::DecodingError),
+
+    #[error("PNG encoding error: {0}")]
+    PngEncodingError(#[from] png::EncodingError),
+
     #[error(
         "A skin texture must have a dimension of either 64x64 or 64x32 pixels"
     )]

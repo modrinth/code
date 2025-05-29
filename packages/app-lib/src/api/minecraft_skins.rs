@@ -1,17 +1,12 @@
 //! Theseus skin management interface
 
-use std::{
-    borrow::Cow,
-    sync::{
-        Arc,
-        atomic::{AtomicBool, Ordering},
-    },
+use std::sync::{
+    Arc,
+    atomic::{AtomicBool, Ordering},
 };
 
-use base64::Engine;
 pub use bytes::Bytes;
-use data_url::DataUrl;
-use futures::{Stream, StreamExt, TryStreamExt, future::Either, stream};
+use futures::{StreamExt, TryStreamExt, stream};
 use serde::{Deserialize, Serialize};
 use url::Url;
 use uuid::Uuid;
@@ -25,7 +20,6 @@ use crate::{
             CustomMinecraftSkin, DefaultMinecraftCape, mojang_api,
         },
     },
-    util::fetch::REQWEST_CLIENT,
 };
 
 use super::data::Credentials;
@@ -37,6 +31,8 @@ mod assets {
     }
     pub use default::DEFAULT_SKINS;
 }
+
+mod png_util;
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Cape {
@@ -76,33 +72,7 @@ pub struct Skin {
     pub is_equipped: bool,
 }
 
-impl Skin {
-    /// Resolves the skin texture URL to a stream of bytes.
-    pub async fn resolve_texture(
-        &self,
-    ) -> crate::Result<impl Stream<Item = Result<Bytes, reqwest::Error>> + use<>>
-    {
-        if self.texture.scheme() == "data" {
-            let data = DataUrl::process(self.texture.as_str())?
-                .decode_to_vec()?
-                .0
-                .into();
-
-            Ok(Either::Left(stream::once(async { Ok(data) })))
-        } else {
-            let response = REQWEST_CLIENT
-                .get(self.texture.as_str())
-                .header("Accept", "image/png")
-                .send()
-                .await
-                .and_then(|response| response.error_for_status())?;
-
-            Ok(Either::Right(response.bytes_stream()))
-        }
-    }
-}
-
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum SkinSource {
     /// A default Minecraft skin, which may be assigned to players at random by default.
@@ -111,6 +81,14 @@ pub enum SkinSource {
     CustomExternal,
     /// A custom skin we have set up in our app.
     Custom,
+}
+
+/// Represents either a URL or a blob for a Minecraft skin PNG texture.
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(untagged)]
+pub enum UrlOrBlob {
+    Url(Url),
+    Blob(Bytes),
 }
 
 /// Retrieves the available capes for the currently selected Minecraft profile. At most one cape
@@ -202,9 +180,16 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
                     name: None,
                     variant: custom_skin.variant,
                     cape_id: custom_skin.cape_id,
-                    texture: texture_blob_to_data_url(
+                    texture: png_util::blob_to_data_url(
                         custom_skin.texture_blob(&state.pool).await?,
-                    ),
+                    )
+                    .or_else(|| {
+                        // Fall back to a placeholder texture if the DB somehow contains corrupt data
+                        png_util::blob_to_data_url(include_bytes!(
+                            "minecraft_skins/assets/default/MissingNo.png"
+                        ))
+                    })
+                    .unwrap(),
                     source: SkinSource::Custom,
                     is_equipped,
                     texture_key: custom_skin.texture_key.into(),
@@ -256,14 +241,16 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
 }
 
 /// Adds a custom skin to the app database and equips it for the currently selected
-/// Minecraft profile.
+/// Minecraft profile. If the currently equipped skin is custom but not managed by
+/// the app (i.e., it was set externally by another launcher, the Minecraft website,
+/// etc.), that skin will be added as a custom skin to the app database as well.
 #[tracing::instrument]
 pub async fn add_and_equip_custom_skin(
     texture_blob: Bytes,
     variant: MinecraftSkinVariant,
     cape_override: Option<Cape>,
 ) -> crate::Result<()> {
-    let (skin_width, skin_height) = png_dimensions(&texture_blob)?;
+    let (skin_width, skin_height) = png_util::dimensions(&texture_blob)?;
     if skin_width != 64 || ![32, 64].contains(&skin_height) {
         return Err(ErrorKind::InvalidSkinTexture)?;
     }
@@ -275,9 +262,11 @@ pub async fn add_and_equip_custom_skin(
         .await?
         .ok_or(ErrorKind::NoCredentialsError)?;
 
-    // We have to equip the skin first, as it's the Mojang API backend who knows
-    // how to compute the texture key we require, which we can then read from the
-    // updated player profile
+    save_current_custom_external_skin(&state, &selected_credentials).await?;
+
+    // We have to equip the new skin before storing it, as it's the Mojang API backend
+    // who knows how to compute the texture key we require, which we can then read from
+    // the updated player profile
     mojang_api::MinecraftSkinOperation::equip(
         &selected_credentials,
         stream::iter([Ok::<_, String>(Bytes::clone(&texture_blob))]),
@@ -366,6 +355,10 @@ pub async fn set_default_cape(cape: Option<Cape>) -> crate::Result<()> {
 ///
 /// This function does not check that the passed skin, if custom, exists in the app database,
 /// giving the caller complete freedom to equip any skin at any time.
+///
+/// If the currently equipped skin is a custom skin that is not managed by the app (i.e., it was
+/// set externally by another launcher, the Minecraft website, etc.), that skin will be added as
+/// a custom skin to the app database, in order to allow the app to manage it later.
 #[tracing::instrument]
 pub async fn equip_skin(skin: Skin) -> crate::Result<()> {
     let state = State::get().await?;
@@ -373,6 +366,8 @@ pub async fn equip_skin(skin: Skin) -> crate::Result<()> {
     let selected_credentials = Credentials::get_default_credential(&state.pool)
         .await?
         .ok_or(ErrorKind::NoCredentialsError)?;
+
+    save_current_custom_external_skin(&state, &selected_credentials).await?;
 
     let profile =
         selected_credentials.online_profile().await.ok_or_else(|| {
@@ -383,7 +378,7 @@ pub async fn equip_skin(skin: Skin) -> crate::Result<()> {
 
     mojang_api::MinecraftSkinOperation::equip(
         &selected_credentials,
-        skin.resolve_texture().await?,
+        png_util::url_to_data_stream(&skin.texture).await?,
         skin.variant,
     )
     .await?;
@@ -447,6 +442,19 @@ pub async fn unequip_skin() -> crate::Result<()> {
     Ok(())
 }
 
+/// Normalizes the texture of a Minecraft skin to the modern 64x64 format, handling
+/// legacy 64x32 skins as the vanilla game client does. This function prioritizes
+/// PNG encoding speed over compression density, so the resulting textures are better
+/// suited for display purposes, not persistent storage or transmission.
+///
+/// The normalized, processed is returned texture as a byte array in PNG format.
+#[tracing::instrument]
+pub async fn normalize_skin_texture(
+    texture: &UrlOrBlob,
+) -> crate::Result<Bytes> {
+    png_util::normalize_skin_texture(texture).await
+}
+
 /// Synchronizes the equipped cape with the selected cape if necessary, taking into
 /// account the currently equipped cape, the default cape for the player, and if a
 /// cape override is provided.
@@ -485,56 +493,34 @@ async fn sync_cape(
     Ok(())
 }
 
-fn texture_blob_to_data_url(texture_blob: Vec<u8>) -> Arc<Url> {
-    let data = if is_png(&texture_blob) {
-        Cow::Owned(texture_blob)
-    } else {
-        // Fall back to a placeholder texture if the DB somehow contains corrupt data
-        Cow::Borrowed(
-            &include_bytes!("minecraft_skins/assets/default/MissingNo.png")[..],
+/// Stores the currently equipped skin as a custom skin, if it is a custom skin that is not
+/// managed by the app (i.e., it was externally set).
+async fn save_current_custom_external_skin(
+    state: &State,
+    selected_credentials: &Credentials,
+) -> crate::Result<()> {
+    if let Some(current_external_skin) = get_available_skins()
+        .await?
+        .into_iter()
+        .find(|skin| skin.is_equipped)
+        .filter(|skin| skin.source == SkinSource::CustomExternal)
+    {
+        CustomMinecraftSkin::add(
+            selected_credentials.offline_profile.id,
+            &current_external_skin.texture_key,
+            &png_util::url_to_data_stream(&current_external_skin.texture)
+                .await?
+                .try_fold(vec![], async |mut texture_blob, chunk| {
+                    texture_blob.extend_from_slice(&chunk);
+                    Ok(texture_blob)
+                })
+                .await?,
+            current_external_skin.variant,
+            current_external_skin.cape_id,
+            &state.pool,
         )
-    };
-
-    Url::parse(&format!(
-        "data:image/png;base64,{}",
-        base64::engine::general_purpose::STANDARD.encode(data)
-    ))
-    .unwrap()
-    .into()
-}
-
-fn is_png(data: &[u8]) -> bool {
-    /// The initial 8 bytes of a PNG file, used to identify it as such.
-    ///
-    /// Reference: <https://www.w3.org/TR/png-3/#3PNGsignature>
-    const PNG_SIGNATURE: &[u8] =
-        &[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
-
-    data.starts_with(PNG_SIGNATURE)
-}
-
-fn png_dimensions(data: &[u8]) -> crate::Result<(u32, u32)> {
-    if !is_png(data) {
-        Err(ErrorKind::InvalidPng)?;
+        .await?;
     }
 
-    // Read the width and height fields from the IHDR chunk, which the
-    // PNG specification mandates to be the first in the file, just after
-    // the 8 signature bytes. See:
-    // https://www.w3.org/TR/png-3/#5DataRep
-    // https://www.w3.org/TR/png-3/#11IHDR
-    let width = u32::from_be_bytes(
-        data.get(16..20)
-            .ok_or(ErrorKind::InvalidPng)?
-            .try_into()
-            .unwrap(),
-    );
-    let height = u32::from_be_bytes(
-        data.get(20..24)
-            .ok_or(ErrorKind::InvalidPng)?
-            .try_into()
-            .unwrap(),
-    );
-
-    Ok((width, height))
+    Ok(())
 }

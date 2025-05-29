@@ -1,52 +1,64 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { Cape } from '@/helpers/skins.ts'
 
 const emit = defineEmits<{
   (e: 'select'): void
 }>()
 
-const highlighted = computed(() => props.selected ?? props.cape.is_equipped)
-
 const props = withDefaults(
   defineProps<{
-    cape: Cape
+    name: string
+    id: string
+    texture: string
+    isEquipped?: boolean
     selected?: boolean
   }>(),
   {
+    isEquipped: false,
     selected: undefined,
   },
 )
+
+console.log(props)
+
+const highlighted = computed(() => props.selected ?? props.isEquipped)
 </script>
 
 <template>
-  <button v-tooltip="cape.name" class="block border-0 m-0 p-0 bg-transparent group cursor-pointer" :aria-label="cape.name" @click="emit('select')">
+  <button
+    v-tooltip="name"
+    class="block border-0 m-0 p-0 bg-transparent group cursor-pointer"
+    :aria-label="name"
+    @click="emit('select')"
+  >
     <span
       :class="
         highlighted
           ? `bg-brand highlighted-outer-glow`
-          : `bg-button-bg opacity-75 group-hover:opacity-100`
+          : `bg-button-bg brightness-95 group-hover:brightness-100`
       "
       class="block p-[3px] rounded-lg border-0 group-active:scale-95 transition-all"
     >
       <span
-        class="block cursed-cape-shit rounded-[5px]"
+        class="block magical-cape-transform rounded-[5px]"
         :class="{ 'highlighted-inner-shadow': highlighted }"
       >
-        <img :src="cape.texture" alt="" />
+        <img :src="texture" alt="" />
       </span>
     </span>
   </button>
 </template>
 <style lang="scss" scoped>
-.cursed-cape-shit {
+.magical-cape-transform {
   aspect-ratio: 10 / 16;
   position: relative;
   overflow: hidden;
   box-sizing: content-box;
+  width: 60px;
+  min-height: 96px;
 }
 
-.cursed-cape-shit img {
+.magical-cape-transform img {
   position: absolute;
   object-fit: cover;
   image-rendering: pixelated;
@@ -68,13 +80,13 @@ const props = withDefaults(
   content: '';
   position: absolute;
   inset: 0;
-  box-shadow: inset 0 0 4px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 0 4px 4px rgba(0, 0, 0, 0.4);
   z-index: 2;
 }
 
 @supports (background-color: color-mix(in srgb, transparent, transparent)) {
-  .highlighted-outer-glow {
-    box-shadow: 0 0 4px 2px color-mix(in srgb, var(--color-brand), transparent 70%);
+  .highlighted-glow::before {
+    box-shadow: inset 0 0 2px 4px color-mix(in srgb, var(--color-brand), transparent 10%);
   }
 }
 </style>

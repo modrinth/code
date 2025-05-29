@@ -96,6 +96,13 @@ export { default as SearchSidebarFilter } from './search/SearchSidebarFilter.vue
 // Billing
 export { default as PurchaseModal } from './billing/PurchaseModal.vue'
 
+// Skins
+export { default as SkinPreviewRenderer } from './skin/SkinPreviewRenderer.vue'
+export { default as CapeButton } from './skin/CapeButton.vue'
+export { default as CapeLikeTextButton } from './skin/CapeLikeTextButton.vue'
+export { default as SkinButton } from './skin/SkinButton.vue'
+export { default as SkinLikeTextButton } from './skin/SkinLikeTextButton.vue'
+
 // Version
 export { default as VersionChannelIndicator } from './version/VersionChannelIndicator.vue'
 export { default as VersionFilterControl } from './version/VersionFilterControl.vue'
