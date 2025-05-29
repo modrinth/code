@@ -362,3 +362,14 @@ export function getPingLevel(ping: number) {
     return 1
   }
 }
+
+export function arrayBufferToBase64(buffer: Uint8Array | ArrayBuffer): string {
+  const bytes = buffer instanceof Uint8Array
+    ? buffer
+    : new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}

@@ -14,7 +14,7 @@
             wide-model-src="/src/assets/models/classic_player.gltf"
             cape-model-src="/src/assets/models/cape.gltf"
             :variant="variant"
-            :texture-src="previewSkin"
+            :texture-src="previewSkin || ''"
             :cape-src="selectedCapeTexture"
             :scale="1.4"
             :fov="50"
@@ -113,10 +113,12 @@ import {
   unequip_skin,
   type Skin,
   type Cape,
-  type SkinModel,
+  type SkinModel, normalize_skin_texture, get_normalized_skin_texture,
 } from '@/helpers/skins.ts'
 import { handleError } from '@/store/notifications'
 import { UploadIcon, CheckIcon, SaveIcon, XIcon, ChevronRightIcon } from '@modrinth/assets'
+import {computedAsync} from "@vueuse/core";
+import {arrayBufferToBase64} from "@modrinth/utils";
 
 const modal = useTemplateRef('modal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
@@ -179,10 +181,12 @@ watch(fileUploadTextureBlob, (blob, prev) => {
   if (blob) localPreviewUrl.value = URL.createObjectURL(new Blob([blob]))
   else localPreviewUrl.value = null
 })
-const previewSkin = computed(() => {
-  if (localPreviewUrl.value) return localPreviewUrl.value
-  if (currentSkin.value) return currentSkin.value.texture
-  return '/src/assets/skins/steve.png'
+const previewSkin = computedAsync(async () => {
+  if (localPreviewUrl.value)
+    return localPreviewUrl.value;
+  else if (currentSkin.value) {
+    return await get_normalized_skin_texture(currentSkin.value);
+  } else return '/src/assets/skins/steve.png'
 })
 
 const hasEdits = computed(() => {

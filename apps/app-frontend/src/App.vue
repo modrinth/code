@@ -69,7 +69,12 @@ import { hide_ads_window, init_ads_window } from '@/helpers/ads.js'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
-import { get_available_capes, get_available_skins } from './helpers/skins'
+import {
+  get_available_capes,
+  get_available_skins,
+  get_normalized_skin_texture,
+  normalize_skin_texture,
+} from './helpers/skins'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
 
 const formatRelativeTime = useRelativeTime()
@@ -202,7 +207,12 @@ async function setupApp() {
   fetchCredentials()
 
   try {
-    const skins = (await get_available_skins()) ?? []
+    const skins = (await get_available_skins()).map(async skin => {
+      return {
+        ...skin,
+        normalized_texture: await get_normalized_skin_texture(skin.texture)
+      }
+    }) ?? []
     const capes = (await get_available_capes()) ?? []
     generateSkinPreviews(skins, capes)
   } catch (error) {
