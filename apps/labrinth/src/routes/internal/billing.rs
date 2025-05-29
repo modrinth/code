@@ -997,6 +997,7 @@ pub enum ChargeRequestType {
 pub enum PaymentRequestMetadata {
     Pyro {
         server_name: Option<String>,
+        server_region: Option<String>,
         source: serde_json::Value,
     },
 }
@@ -1789,33 +1790,39 @@ pub async fn stripe_webhook(
                                         .await?
                                         .error_for_status()?;
                                 } else {
-                                    let (server_name, source) = if let Some(
-                                        PaymentRequestMetadata::Pyro {
-                                            ref server_name,
-                                            ref source,
-                                        },
-                                    ) =
-                                        metadata.payment_metadata
-                                    {
-                                        (server_name.clone(), source.clone())
-                                    } else {
-                                        // Create a server with the latest version of Minecraft
-                                        let minecraft_versions = crate::database::models::legacy_loader_fields::MinecraftGameVersion::list(
-                                            Some("release"),
-                                            None,
-                                            &**pool,
-                                            &redis,
-                                        ).await?;
+                                    let (server_name, server_region, source) =
+                                        if let Some(
+                                            PaymentRequestMetadata::Pyro {
+                                                ref server_name,
+                                                ref server_region,
+                                                ref source,
+                                            },
+                                        ) = metadata.payment_metadata
+                                        {
+                                            (
+                                                server_name.clone(),
+                                                server_region.clone(),
+                                                source.clone(),
+                                            )
+                                        } else {
+                                            // Create a server with the latest version of Minecraft
+                                            let minecraft_versions = crate::database::models::legacy_loader_fields::MinecraftGameVersion::list(
+                                                Some("release"),
+                                                None,
+                                                &**pool,
+                                                &redis,
+                                            ).await?;
 
-                                        (
-                                            None,
-                                            serde_json::json!({
-                                                "loader": "Vanilla",
-                                                "game_version": minecraft_versions.first().map(|x| x.version.clone()),
-                                                "loader_version": ""
-                                            }),
-                                        )
-                                    };
+                                            (
+                                                None,
+                                                None,
+                                                serde_json::json!({
+                                                    "loader": "Vanilla",
+                                                    "game_version": minecraft_versions.first().map(|x| x.version.clone()),
+                                                    "loader_version": ""
+                                                }),
+                                            )
+                                        };
 
                                     let server_name = server_name
                                         .unwrap_or_else(|| {
@@ -1845,9 +1852,11 @@ pub async fn stripe_webhook(
                                                 "swap_mb": swap,
                                                 "storage_mb": storage,
                                             },
+                                            "region": server_region,
                                             "source": source,
                                             "payment_interval": metadata.charge_item.subscription_interval.map(|x| match x {
                                                 PriceDuration::Monthly => 1,
+                                                PriceDuration::Quarterly => 3,
                                                 PriceDuration::Yearly => 12,
                                             })
                                         }))

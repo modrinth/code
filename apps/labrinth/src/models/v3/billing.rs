@@ -49,6 +49,7 @@ pub enum Price {
 #[serde(rename_all = "kebab-case")]
 pub enum PriceDuration {
     Monthly,
+    Quarterly,
     Yearly,
 }
 
@@ -56,6 +57,7 @@ impl PriceDuration {
     pub fn duration(&self) -> chrono::Duration {
         match self {
             PriceDuration::Monthly => chrono::Duration::days(30),
+            PriceDuration::Quarterly => chrono::Duration::days(90),
             PriceDuration::Yearly => chrono::Duration::days(365),
         }
     }
@@ -63,19 +65,27 @@ impl PriceDuration {
     pub fn from_string(string: &str) -> PriceDuration {
         match string {
             "monthly" => PriceDuration::Monthly,
+            "quarterly" => PriceDuration::Quarterly,
             "yearly" => PriceDuration::Yearly,
             _ => PriceDuration::Monthly,
         }
     }
+
     pub fn as_str(&self) -> &'static str {
         match self {
             PriceDuration::Monthly => "monthly",
+            PriceDuration::Quarterly => "quarterly",
             PriceDuration::Yearly => "yearly",
         }
     }
 
     pub fn iterator() -> impl Iterator<Item = PriceDuration> {
-        vec![PriceDuration::Monthly, PriceDuration::Yearly].into_iter()
+        vec![
+            PriceDuration::Monthly,
+            PriceDuration::Quarterly,
+            PriceDuration::Yearly,
+        ]
+        .into_iter()
     }
 }
 
