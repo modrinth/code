@@ -142,6 +142,15 @@ export async function remove_custom_skin(skin: Skin): Promise<void> {
   })
 }
 
+export async function get_normalized_skin_texture_url(skin: Skin): Promise<string> {
+  const bytes: Uint8Array = await normalize_skin_texture(skin);
+  return `data:image/png;base64,` + Buffer.from(bytes).toString("base64");
+}
+
+export async function normalize_skin_texture(skin: Skin): Promise<Uint8Array> {
+  return await invoke('plugin:minecraft-skins|normalize_skin_texture', { skin })
+}
+
 export async function unequip_skin(): Promise<void> {
   await invoke('plugin:minecraft-skins|unequip_skin')
 }
