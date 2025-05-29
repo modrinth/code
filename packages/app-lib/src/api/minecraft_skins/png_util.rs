@@ -5,13 +5,33 @@ use std::sync::Arc;
 use base64::Engine;
 use bytemuck::{AnyBitPattern, NoUninit};
 use bytes::Bytes;
-use futures::TryStreamExt;
+use data_url::DataUrl;
+use futures::{Stream, TryStreamExt, future::Either, stream};
 use tokio_util::{compat::FuturesAsyncReadCompatExt, io::SyncIoBridge};
 use url::Url;
 
-use crate::ErrorKind;
+use crate::{
+    ErrorKind, minecraft_skins::UrlOrBlob, util::fetch::REQWEST_CLIENT,
+};
 
-use super::Skin;
+pub async fn url_to_data_stream(
+    url: &Url,
+) -> crate::Result<impl Stream<Item = Result<Bytes, reqwest::Error>> + use<>> {
+    if url.scheme() == "data" {
+        let data = DataUrl::process(url.as_str())?.decode_to_vec()?.0.into();
+
+        Ok(Either::Left(stream::once(async { Ok(data) })))
+    } else {
+        let response = REQWEST_CLIENT
+            .get(url.as_str())
+            .header("Accept", "image/png")
+            .send()
+            .await
+            .and_then(|response| response.error_for_status())?;
+
+        Ok(Either::Right(response.bytes_stream()))
+    }
+}
 
 pub fn blob_to_data_url(png_data: impl AsRef<[u8]>) -> Option<Arc<Url>> {
     let png_data = png_data.as_ref();
@@ -69,14 +89,27 @@ pub fn dimensions(png_data: &[u8]) -> crate::Result<(u32, u32)> {
 /// PNG encoding speed over compression density, so the resulting textures are better
 /// suited for display purposes, not persistent storage or transmission.
 ///
-/// Returns the normalized, processed texture as a byte array in PNG format.
-pub async fn normalize_skin_texture(skin: &Skin) -> crate::Result<Bytes> {
+/// The normalized, processed is returned texture as a byte array in PNG format.
+pub async fn normalize_skin_texture(
+    texture: &UrlOrBlob,
+) -> crate::Result<Bytes> {
     let texture_stream = SyncIoBridge::new(Box::pin(
-        skin.resolve_texture()
-            .await?
-            .map_err(std::io::Error::other)
-            .into_async_read()
-            .compat(),
+        match texture {
+            UrlOrBlob::Url(url) => Either::Left(
+                url_to_data_stream(url)
+                    .await?
+                    .map_err(std::io::Error::other)
+                    .into_async_read(),
+            ),
+            UrlOrBlob::Blob(blob) => Either::Right(
+                stream::once({
+                    let blob = Bytes::clone(blob);
+                    async { Ok(blob) }
+                })
+                .into_async_read(),
+            ),
+        }
+        .compat(),
     ));
 
     tokio::task::spawn_blocking(|| {
@@ -253,23 +286,14 @@ fn copy_rect_mirror_horizontally<PixelType: NoUninit + AnyBitPattern>(
 #[cfg(test)]
 #[tokio::test]
 async fn normalize_skin_texture_works() {
-    use crate::{minecraft_skins::SkinSource, state::MinecraftSkinVariant};
-
     let legacy_png_data = &include_bytes!("assets/default/MissingNo.png")[..];
     let expected_normalized_png_data =
         &include_bytes!("assets/test/MissingNo_normalized.png")[..];
 
-    let normalized_png_data = normalize_skin_texture(&Skin {
-        texture_key: "missingno".into(),
-        name: None,
-        variant: MinecraftSkinVariant::Classic,
-        cape_id: None,
-        texture: blob_to_data_url(legacy_png_data).unwrap(),
-        source: SkinSource::Default,
-        is_equipped: false,
-    })
-    .await
-    .expect("Failed to normalize skin texture");
+    let normalized_png_data =
+        normalize_skin_texture(&UrlOrBlob::Blob(legacy_png_data.into()))
+            .await
+            .expect("Failed to normalize skin texture");
 
     let decode_to_pixels = |png_data: &[u8]| {
         let decoder = png::Decoder::new(png_data);

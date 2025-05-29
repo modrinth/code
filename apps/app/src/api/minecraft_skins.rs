@@ -1,6 +1,8 @@
 use crate::api::Result;
 
-use theseus::minecraft_skins::{self, Bytes, Cape, MinecraftSkinVariant, Skin};
+use theseus::minecraft_skins::{
+    self, Bytes, Cape, MinecraftSkinVariant, Skin, UrlOrBlob,
+};
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("minecraft-skins")
@@ -86,6 +88,6 @@ pub async fn unequip_skin() -> Result<()> {
 ///
 /// See also: [minecraft_skins::normalize_skin_texture]
 #[tauri::command]
-pub async fn normalize_skin_texture(skin: Skin) -> Result<Bytes> {
-    Ok(minecraft_skins::normalize_skin_texture(&skin).await?)
+pub async fn normalize_skin_texture(texture: UrlOrBlob) -> Result<Bytes> {
+    Ok(minecraft_skins::normalize_skin_texture(&texture).await?)
 }
