@@ -571,7 +571,6 @@ const reinstallFromMrpack = (mrpack: File, hardReset: boolean = false) => {
   const hardResetParam = hardReset ? "true" : "false";
 
   const progressSubject = new EventTarget();
-  const abortController = new AbortController();
 
   const uploadPromise = (async () => {
     try {
@@ -606,17 +605,12 @@ const reinstallFromMrpack = (mrpack: File, hardReset: boolean = false) => {
         xhr.ontimeout = () => reject(new Error("[pyroservers] .mrpack u timed out"));
         xhr.timeout = 30 * 60 * 1000;
 
-        xhr.open(
-          "POST",
-          `https://${auth.url}/reinstallMrpackMultiparted?hard=${hardResetParam}`,
-        );
+        xhr.open("POST", `https://${auth.url}/reinstallMrpackMultiparted?hard=${hardResetParam}`);
         xhr.setRequestHeader("Authorization", `Bearer ${auth.token}`);
 
         const formData = new FormData();
         formData.append("file", mrpack);
         xhr.send(formData);
-
-        abortController.signal.addEventListener("abort", () => xhr.abort());
       });
     } catch (err) {
       console.error("Error reinstalling from mrpack:", err);
@@ -626,10 +620,9 @@ const reinstallFromMrpack = (mrpack: File, hardReset: boolean = false) => {
 
   return {
     promise: uploadPromise,
-    onProgress: (
-      cb: (p: { loaded: number; total: number; progress: number }) => void,
-    ) => progressSubject.addEventListener("progress", ((e: CustomEvent) => cb(e.detail)) as EventListener),
-    cancel: () => abortController.abort(),
+    onProgress: (cb: (p: { loaded: number; total: number; progress: number }) => void) =>
+      progressSubject.addEventListener("progress", ((e: CustomEvent) =>
+        cb(e.detail)) as EventListener),
   };
 };
 
@@ -1463,7 +1456,13 @@ type GeneralFunctions = {
    * @param mrpack - The mrpack file.
    * @param hardReset - Whether to perform a hard reset.
    */
-  reinstallFromMrpack: (mrpack: File, hardReset?: boolean) => Promise<void>;
+  reinstallFromMrpack: (
+    mrpack: File,
+    hardReset?: boolean,
+  ) => {
+    promise: Promise<void>;
+    onProgress: (cb: (p: { loaded: number; total: number; progress: number }) => void) => void;
+  };
 
   /**
    * Suspends or resumes the server.
