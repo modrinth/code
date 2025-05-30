@@ -1,32 +1,35 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import AutoLink from '../base/AutoLink.vue';
-import { MemoryStickIcon, DatabaseIcon, CPUIcon, SparklesIcon, UnknownIcon } from '@modrinth/assets';
+import { computed } from 'vue'
+import AutoLink from '../base/AutoLink.vue'
+import { MemoryStickIcon, DatabaseIcon, CPUIcon, SparklesIcon, UnknownIcon } from '@modrinth/assets'
 
 const emit = defineEmits<{
-  (e: 'click-bursting-link'): void,
+  (e: 'click-bursting-link'): void
 }>()
 
-const props = withDefaults(defineProps<{
-  ram: number;
-  storage: number;
-  cpus: number;
-  burstingLink?: string;
-}>(), {
+const props = withDefaults(
+  defineProps<{
+    ram: number
+    storage: number
+    cpus: number
+    burstingLink?: string
+  }>(),
+  {
     burstingLink: undefined,
-})
+  },
+)
 
 const formattedRam = computed(() => {
-  return props.ram / 1024;
-});
+  return props.ram / 1024
+})
 
 const formattedStorage = computed(() => {
-  return props.storage / 1024;
-});
+  return props.storage / 1024
+})
 
 const sharedCpus = computed(() => {
-  return props.cpus / 2;
-});
+  return props.cpus / 2
+})
 </script>
 <template>
   <ul class="m-0 flex list-none flex-col gap-2 px-0 text-sm leading-normal text-secondary">

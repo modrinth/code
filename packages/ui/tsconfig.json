@@ -6,7 +6,5 @@
     "lib": ["esnext", "dom"],
     "noImplicitAny": false
   },
-  "types": [
-    "@stripe/stripe-js",
-  ]
+  "types": ["@stripe/stripe-js"]
 }

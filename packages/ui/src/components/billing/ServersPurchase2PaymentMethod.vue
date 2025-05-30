@@ -7,7 +7,7 @@ import PaymentMethodOption from './PaymentMethodOption.vue'
 const { formatMessage } = useVIntl()
 
 const emit = defineEmits<{
-  (e: 'select', paymentMethod: Stripe.PaymentMethod | undefined): void,
+  (e: 'select', paymentMethod: Stripe.PaymentMethod | undefined): void
 }>()
 
 defineProps<{
@@ -37,13 +37,25 @@ const messages = defineMessages({
     {{ formatMessage(messages.description) }}
   </p>
   <div class="flex flex-col gap-1">
-    <PaymentMethodOption v-for="method in paymentMethods" :key="method.id" :item="method" :selected="selected?.id === method.id" @select="emit('select', method)" />
-    <PaymentMethodOption :loading="false" :item="undefined" :selected="selected === undefined" @select="emit('select', undefined)" />
+    <PaymentMethodOption
+      v-for="method in paymentMethods"
+      :key="method.id"
+      :item="method"
+      :selected="selected?.id === method.id"
+      @select="emit('select', method)"
+    />
+    <PaymentMethodOption
+      :loading="false"
+      :item="undefined"
+      :selected="selected === undefined"
+      @select="emit('select', undefined)"
+    />
   </div>
-  <div v-show="selected === undefined" class="min-h-[16rem] flex flex-col gap-2 mt-2 p-4 bg-table-alternateRow rounded-xl justify-center items-center">
-    <div
-      v-show="loadingElements"
-    >
+  <div
+    v-show="selected === undefined"
+    class="min-h-[16rem] flex flex-col gap-2 mt-2 p-4 bg-table-alternateRow rounded-xl justify-center items-center"
+  >
+    <div v-show="loadingElements">
       <ModalLoadingIndicator :error="loadingElementsFailed">
         Loading...
         <template #error> Error loading Stripe payment UI. </template>

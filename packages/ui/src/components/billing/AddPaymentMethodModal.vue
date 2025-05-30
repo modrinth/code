@@ -15,9 +15,9 @@ const props = defineProps<AddPaymentMethodProps>()
 const loading = ref(false)
 
 async function open(paymentMethods: Stripe.PaymentMethod[]) {
-  modal.value?.show();
+  modal.value?.show()
   await nextTick()
-  await addPaymentMethod.value?.reload(paymentMethods);
+  await addPaymentMethod.value?.reload(paymentMethods)
 }
 
 const messages = defineMessages({
@@ -44,7 +44,15 @@ defineExpose({
       </span>
     </template>
     <div class="w-[40rem] max-w-full">
-      <AddPaymentMethod ref="addPaymentMethod" :publishable-key="props.publishableKey" :return-url="props.returnUrl" :create-setup-intent="props.createSetupIntent" :on-error="props.onError" @start-loading="loading = true" @stop-loading="loading = false" />
+      <AddPaymentMethod
+        ref="addPaymentMethod"
+        :publishable-key="props.publishableKey"
+        :return-url="props.returnUrl"
+        :create-setup-intent="props.createSetupIntent"
+        :on-error="props.onError"
+        @start-loading="loading = true"
+        @stop-loading="loading = false"
+      />
       <div class="input-group mt-auto pt-4">
         <ButtonStyled color="brand">
           <button :disabled="loading" @click="addPaymentMethod.submit()">

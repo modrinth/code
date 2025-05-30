@@ -21,10 +21,10 @@ export type AddPaymentMethodProps = {
 
 const props = defineProps<AddPaymentMethodProps>()
 
-const elementsLoaded = ref<0 | 1 | 2>(0);
-const stripe = ref<StripsJs>();
-const elements = ref<StripeElements>();
-const error = ref(false);
+const elementsLoaded = ref<0 | 1 | 2>(0)
+const stripe = ref<StripsJs>()
+const elements = ref<StripeElements>()
+const error = ref(false)
 
 function handleError(error: Error) {
   props.onError(error)
@@ -33,10 +33,10 @@ function handleError(error: Error) {
 
 async function reload(paymentMethods: Stripe.PaymentMethod[]) {
   try {
-    elementsLoaded.value = 0;
-    error.value = false;
+    elementsLoaded.value = 0
+    error.value = false
 
-    const result = await props.createSetupIntent();
+    const result = await props.createSetupIntent()
 
     stripe.value = await loadStripe(props.publishableKey)
     const {
@@ -45,17 +45,17 @@ async function reload(paymentMethods: Stripe.PaymentMethod[]) {
       paymentElement,
     } = createStripeElements(stripe.value, paymentMethods, {
       clientSecret: result.client_secret,
-    });
+    })
 
-    elements.value = newElements;
-    paymentElement.on("ready", () => {
-      elementsLoaded.value += 1;
-    });
-    addressElement.on("ready", () => {
-      elementsLoaded.value += 1;
-    });
+    elements.value = newElements
+    paymentElement.on('ready', () => {
+      elementsLoaded.value += 1
+    })
+    addressElement.on('ready', () => {
+      elementsLoaded.value += 1
+    })
   } catch (err) {
-    handleError(err);
+    handleError(err)
   }
 }
 
@@ -67,18 +67,18 @@ async function submit(): Promise<boolean> {
     confirmParams: {
       return_url: props.returnUrl,
     },
-  });
+  })
 
   console.log(result)
 
-  const { error } = result;
+  const { error } = result
 
   emit('stopLoading')
-  if (error && error.type !== "validation_error") {
+  if (error && error.type !== 'validation_error') {
     handleError(error.message)
-    return false;
+    return false
   } else if (!error) {
-    return true;
+    return true
   }
 }
 
@@ -90,9 +90,7 @@ defineExpose({
 
 <template>
   <div class="min-h-[16rem] flex flex-col gap-2 justify-center items-center">
-    <div
-      v-show="elementsLoaded < 2"
-    >
+    <div v-show="elementsLoaded < 2">
       <ModalLoadingIndicator :error="error">
         Loading...
         <template #error> Error loading Stripe payment UI. </template>

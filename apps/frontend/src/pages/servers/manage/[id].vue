@@ -297,7 +297,7 @@
                       You can change the loader by clicking the "Change Loader" button.
                     </li>
                     <li>
-                    If you're stuck, please contact Modrinth Support with the information below:
+                      If you're stuck, please contact Modrinth Support with the information below:
                     </li>
                   </ul>
                   <ButtonStyled>

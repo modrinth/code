@@ -2,7 +2,13 @@
 import { ref, computed, useTemplateRef, nextTick } from 'vue'
 import NewModal from '../modal/NewModal.vue'
 import { type MessageDescriptor, useVIntl, defineMessage } from '@vintl/vintl'
-import { ChevronRightIcon, LeftArrowIcon, RightArrowIcon, XIcon, CheckCircleIcon } from '@modrinth/assets'
+import {
+  ChevronRightIcon,
+  LeftArrowIcon,
+  RightArrowIcon,
+  XIcon,
+  CheckCircleIcon,
+} from '@modrinth/assets'
 import type {
   CreatePaymentIntentRequest,
   CreatePaymentIntentResponse,
@@ -65,7 +71,7 @@ const {
   paymentMethodLoading,
   reloadPaymentIntent,
   hasPaymentMethod,
-  submitPayment
+  submitPayment,
 } = useStripe(
   props.publishableKey,
   props.customer,
@@ -130,7 +136,9 @@ async function beforeProceed(step: string) {
       await initializeStripe()
 
       if (primaryPaymentMethodId.value) {
-        const paymentMethod = await props.paymentMethods.find((x) => x.id === primaryPaymentMethodId.value)
+        const paymentMethod = await props.paymentMethods.find(
+          (x) => x.id === primaryPaymentMethodId.value,
+        )
         await selectPaymentMethod(paymentMethod)
         await setStep('review', true)
         return true

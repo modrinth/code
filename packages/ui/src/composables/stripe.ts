@@ -5,19 +5,30 @@ import {
   loadStripe,
   type StripeAddressElement,
   type StripeElements,
-  type StripePaymentElement
+  type StripePaymentElement,
 } from '@stripe/stripe-js'
 import { computed, ref, type Ref } from 'vue'
 import type { ContactOption } from '@stripe/stripe-js/dist/stripe-js/elements/address'
 import type {
   ServerPlan,
   BasePaymentIntentResponse,
-  ChargeRequestType, CreatePaymentIntentRequest, CreatePaymentIntentResponse,
+  ChargeRequestType,
+  CreatePaymentIntentRequest,
+  CreatePaymentIntentResponse,
   PaymentRequestType,
-  ServerBillingInterval, UpdatePaymentIntentRequest, UpdatePaymentIntentResponse
+  ServerBillingInterval,
+  UpdatePaymentIntentRequest,
+  UpdatePaymentIntentResponse,
 } from '../../utils/billing'
 
-export type CreateElements = (paymentMethods: Stripe.PaymentMethod[], options: StripeElementsOptionsMode) => { elements: StripeElements, paymentElement: StripePaymentElement, addressElement: StripeAddressElement }
+export type CreateElements = (
+  paymentMethods: Stripe.PaymentMethod[],
+  options: StripeElementsOptionsMode,
+) => {
+  elements: StripeElements
+  paymentElement: StripePaymentElement
+  addressElement: StripeAddressElement
+}
 
 export const useStripe = (
   publishableKey: string,
@@ -27,13 +38,15 @@ export const useStripe = (
   currency: string,
   product: Ref<ServerPlan>,
   interval: Ref<ServerBillingInterval>,
-  initiatePayment: (body: CreatePaymentIntentRequest | UpdatePaymentIntentRequest) => Promise<CreatePaymentIntentResponse | UpdatePaymentIntentResponse>,
+  initiatePayment: (
+    body: CreatePaymentIntentRequest | UpdatePaymentIntentRequest,
+  ) => Promise<CreatePaymentIntentResponse | UpdatePaymentIntentResponse>,
 ) => {
   const stripe = ref<StripeJs | null>(null)
 
   let elements: StripeElements | undefined = undefined
   const elementsLoaded = ref<0 | 1 | 2>(0)
-  const loadingElementsFailed = ref<boolean>(false);
+  const loadingElementsFailed = ref<boolean>(false)
 
   const paymentMethodLoading = ref(false)
   const loadingFailed = ref<string>()
@@ -97,7 +110,15 @@ export const useStripe = (
 
     paymentMethods.forEach((method) => {
       const addr = method.billing_details?.address
-      if (addr && addr.line1 && addr.city && addr.postal_code && addr.country && addr.state && method.billing_details.name) {
+      if (
+        addr &&
+        addr.line1 &&
+        addr.city &&
+        addr.postal_code &&
+        addr.country &&
+        addr.state &&
+        method.billing_details.name
+      ) {
         contacts.push({
           address: {
             line1: addr.line1,
@@ -122,11 +143,7 @@ export const useStripe = (
   }
 
   const primaryPaymentMethodId = computed<string | null>(() => {
-    if (
-      customer &&
-      customer.invoice_settings &&
-      customer.invoice_settings.default_payment_method
-    ) {
+    if (customer && customer.invoice_settings && customer.invoice_settings.default_payment_method) {
       const method = customer.invoice_settings.default_payment_method
       if (typeof method === 'string') {
         return method
@@ -159,7 +176,9 @@ export const useStripe = (
         } = createElements({
           mode: 'payment',
           currency: currency.toLowerCase(),
-          amount: product.value.prices.find((x) => x.currency_code === currency)?.prices.intervals[interval.value],
+          amount: product.value.prices.find((x) => x.currency_code === currency)?.prices.intervals[
+            interval.value
+          ],
           paymentMethodCreation: 'manual',
           setupFutureUsage: 'off_session',
         })
@@ -187,13 +206,13 @@ export const useStripe = (
 
       const requestType: PaymentRequestType = confirmation
         ? {
-          type: 'confirmation_token',
-          token: id,
-        }
+            type: 'confirmation_token',
+            token: id,
+          }
         : {
-          type: 'payment_method',
-          id: id,
-        }
+            type: 'payment_method',
+            id: id,
+          }
 
       const charge: ChargeRequestType = {
         type: 'new',
@@ -211,7 +230,7 @@ export const useStripe = (
         })
         console.log(`Updated payment intent: ${interval.value} for ${result.total}`)
       } else {
-        ({
+        ;({
           payment_intent_id: paymentIntentId.value,
           client_secret: clientSecret,
           ...result
@@ -232,7 +251,7 @@ export const useStripe = (
         }
       }
     } catch (err) {
-      emit('error', err);
+      emit('error', err)
     }
     paymentMethodLoading.value = false
   }
@@ -247,7 +266,7 @@ export const useStripe = (
     })
 
     if (error) {
-      emit('error', error);
+      emit('error', error)
       return
     }
 
@@ -256,7 +275,7 @@ export const useStripe = (
 
   function handlePaymentError(err: string | Error) {
     paymentMethodLoading.value = false
-    emit('error', typeof err === 'string' ? new Error(err) : err);
+    emit('error', typeof err === 'string' ? new Error(err) : err)
   }
 
   async function createNewPaymentMethod() {
@@ -291,7 +310,7 @@ export const useStripe = (
     confirmationToken.value = token
     paymentMethodLoading.value = false
 
-    return token;
+    return token
   }
 
   async function selectPaymentMethod(paymentMethod: Stripe.PaymentMethod | undefined) {
@@ -352,6 +371,6 @@ export const useStripe = (
     loadStripeElements,
     tax,
     total,
-    submitPayment
+    submitPayment,
   }
 }

@@ -18,10 +18,18 @@ const props = defineProps<{
 }>()
 
 const isCurrentRegion = computed(() => currentRegion.value === props.region.shortcode)
-const flag = computed(() => regionOverrides[props.region.shortcode]?.flag ?? `https://flagcdn.com/${props.region.country_code}.svg`)
+const flag = computed(
+  () =>
+    regionOverrides[props.region.shortcode]?.flag ??
+    `https://flagcdn.com/${props.region.country_code}.svg`,
+)
 const overrideTitle = computed(() => regionOverrides[props.region.shortcode]?.name)
-const title = computed(() => overrideTitle.value ? formatMessage(overrideTitle.value) : props.region.display_name)
-const locationSubtitle = computed(() => overrideTitle.value ? props.region.display_name : undefined)
+const title = computed(() =>
+  overrideTitle.value ? formatMessage(overrideTitle.value) : props.region.display_name,
+)
+const locationSubtitle = computed(() =>
+  overrideTitle.value ? props.region.display_name : undefined,
+)
 const pingLevel = computed(() => getPingLevel(props.ping ?? 0))
 
 function setRegion() {
@@ -37,14 +45,18 @@ function setRegion() {
       'bg-button-bg border-transparent text-primary': !isCurrentRegion,
       'bg-brand-highlight border-brand text-contrast': isCurrentRegion,
       'opacity-50 cursor-not-allowed': outOfStock,
-      'hover:text-contrast active:scale-95 hover:brightness-[--hover-brightness] focus-visible:brightness-[--hover-brightness] ': !outOfStock,
+      'hover:text-contrast active:scale-95 hover:brightness-[--hover-brightness] focus-visible:brightness-[--hover-brightness] ':
+        !outOfStock,
     }"
     @click="setRegion"
   >
     <img
       v-if="flag"
       class="aspect-[16/10] max-w-16 w-full object-cover rounded-md border-1 border-solid"
-      :class="[isCurrentRegion ? 'border-brand' : 'border-button-border', { 'saturate-[0.25]': outOfStock }]"
+      :class="[
+        isCurrentRegion ? 'border-brand' : 'border-button-border',
+        { 'saturate-[0.25]': outOfStock },
+      ]"
       :src="flag"
       alt=""
       aria-hidden="true"
@@ -68,16 +80,12 @@ function setRegion() {
             stroke-width="3px"
             class="shrink-0"
           />
-          <SpinnerIcon v-else class="animate-spin"/>
+          <SpinnerIcon v-else class="animate-spin" />
           <span v-if="bestPing" :class="bestPing ? 'text-brand' : 'text-primary'">
             Lowest latency ({{ ping }}ms)
           </span>
-          <template v-else-if="ping">
-            {{ ping }}ms
-          </template>
-          <span v-else>
-            Testing connection...
-          </span>
+          <template v-else-if="ping"> {{ ping }}ms </template>
+          <span v-else> Testing connection... </span>
         </template>
       </span>
     </span>
