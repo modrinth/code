@@ -1020,6 +1020,7 @@ fn infer_currency_code(country: &str) -> String {
         "BE" => "EUR",
         "CY" => "EUR",
         "EE" => "EUR",
+        "ES" => "EUR",
         "FI" => "EUR",
         "FR" => "EUR",
         "DE" => "EUR",
@@ -1066,6 +1067,7 @@ fn infer_currency_code(country: &str) -> String {
         "TW" => "TWD",
         "SA" => "SAR",
         "QA" => "QAR",
+        "SG" => "SGD",
         _ => "USD",
     }
     .to_string()
