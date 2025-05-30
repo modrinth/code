@@ -37,8 +37,7 @@ const periodSuffix = computed(() => {
             <template v-if="loading">
               <SpinnerIcon class="animate-spin size-4" />
             </template>
-            <template v-else>
-              {{ formatPrice(locale, total, currency) }} </template
+            <template v-else> {{ formatPrice(locale, total, currency) }} </template
             ><span class="text-xs text-secondary">{{ periodSuffix }}</span>
           </span>
         </div>
@@ -57,8 +56,7 @@ const periodSuffix = computed(() => {
           <template v-if="loading">
             <SpinnerIcon class="animate-spin size-4" />
           </template>
-          <template v-else>
-            {{ formatPrice(locale, amount, currency) }} </template
+          <template v-else> {{ formatPrice(locale, amount, currency) }} </template
           ><span class="text-xs text-secondary">{{ periodSuffix }}</span>
         </div>
       </div>
