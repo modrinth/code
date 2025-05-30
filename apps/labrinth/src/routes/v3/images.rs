@@ -14,7 +14,7 @@ use crate::models::images::{Image, ImageContext};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::img::upload_image_optimized;
-use crate::util::routes::read_from_payload;
+use crate::util::routes::read_limited_from_payload;
 use actix_web::{HttpRequest, HttpResponse, web};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -178,7 +178,7 @@ pub async fn images_add(
     }
 
     // Upload the image to the file host
-    let bytes = read_from_payload(
+    let bytes = read_limited_from_payload(
         &mut payload,
         1_048_576,
         "Icons must be smaller than 1MiB",

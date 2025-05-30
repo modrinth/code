@@ -97,6 +97,15 @@ bitflags::bitflags! {
         // delete an organization
         const ORGANIZATION_DELETE = 1 << 38;
 
+        // create a shared instance
+        const SHARED_INSTANCE_CREATE = 1 << 40;
+        // read a shared instance
+        const SHARED_INSTANCE_READ = 1 << 41;
+        // write to a shared instance
+        const SHARED_INSTANCE_WRITE = 1 << 42;
+        // delete a shared instance
+        const SHARED_INSTANCE_DELETE = 1 << 43;
+
         // only accessible by modrinth-issued sessions
         const SESSION_ACCESS = 1 << 39;
 

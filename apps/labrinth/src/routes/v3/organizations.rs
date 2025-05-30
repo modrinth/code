@@ -15,7 +15,7 @@ use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::CreateError;
 use crate::util::img::delete_old_images;
-use crate::util::routes::read_from_payload;
+use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use crate::{database, models};
 use actix_web::{HttpRequest, HttpResponse, web};
@@ -1096,7 +1096,7 @@ pub async fn organization_icon_edit(
     )
     .await?;
 
-    let bytes = read_from_payload(
+    let bytes = read_limited_from_payload(
         &mut payload,
         262144,
         "Icons must be smaller than 256KiB",

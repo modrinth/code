@@ -14,7 +14,10 @@ use crate::{
         users::{Badges, Role},
     },
     queue::session::AuthQueue,
-    util::{routes::read_from_payload, validate::validation_errors_to_string},
+    util::{
+        routes::read_limited_from_payload,
+        validate::validation_errors_to_string,
+    },
 };
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::UserId;
@@ -582,7 +585,7 @@ pub async fn user_icon_edit(
         )
         .await?;
 
-        let bytes = read_from_payload(
+        let bytes = read_limited_from_payload(
             &mut payload,
             262144,
             "Icons must be smaller than 256KiB",

@@ -27,7 +27,7 @@ use crate::search::indexing::remove_documents;
 use crate::search::{SearchConfig, SearchError, search_for_project};
 use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
-use crate::util::routes::read_from_payload;
+use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::base62_impl::parse_base62;
@@ -1475,7 +1475,7 @@ pub async fn project_icon_edit(
     )
     .await?;
 
-    let bytes = read_from_payload(
+    let bytes = read_limited_from_payload(
         &mut payload,
         262144,
         "Icons must be smaller than 256KiB",
@@ -1693,7 +1693,7 @@ pub async fn add_gallery_item(
         }
     }
 
-    let bytes = read_from_payload(
+    let bytes = read_limited_from_payload(
         &mut payload,
         2 * (1 << 20),
         "Gallery image exceeds the maximum of 2MiB.",

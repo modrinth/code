@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, file_id, shared_instance_id\n            FROM shared_instance_versions\n            WHERE id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "file_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "shared_instance_id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "bf4ab2ae77d8a4b4db197323dd7d74d8b9e3b68aca8d6d19929188cfa4aedaea"
+}

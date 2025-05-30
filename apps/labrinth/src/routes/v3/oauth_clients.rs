@@ -23,7 +23,7 @@ use crate::{
 };
 use crate::{
     file_hosting::FileHost, models::oauth_clients::DeleteOAuthClientQueryParam,
-    util::routes::read_from_payload,
+    util::routes::read_limited_from_payload,
 };
 use actix_web::{
     HttpRequest, HttpResponse, delete, get, patch, post,
@@ -385,7 +385,7 @@ pub async fn oauth_client_icon_edit(
     )
     .await?;
 
-    let bytes = read_from_payload(
+    let bytes = read_limited_from_payload(
         &mut payload,
         262144,
         "Icons must be smaller than 256KiB",
