@@ -144,8 +144,8 @@ pub async fn is_valid_mmc(instance_folder: PathBuf) -> bool {
     let instance_cfg = instance_folder.join("instance.cfg");
     let mmc_pack = instance_folder.join("mmc-pack.json");
 
-    let mmc_pack = match io::read_to_string(&mmc_pack).await {
-        Ok(mmc_pack) => mmc_pack,
+    let mmc_pack = match io::read_any_encoding_to_string(&mmc_pack).await {
+        Ok((mmc_pack, _)) => mmc_pack,
         Err(_) => return false,
     };
 
@@ -155,7 +155,7 @@ pub async fn is_valid_mmc(instance_folder: PathBuf) -> bool {
 
 #[tracing::instrument]
 pub async fn get_instances_subpath(config: PathBuf) -> Option<String> {
-    let launcher = io::read_to_string(&config).await.ok()?;
+    let launcher = io::read_any_encoding_to_string(&config).await.ok()?.0;
     let launcher: MMCLauncherEnum = serde_ini::from_str(&launcher).ok()?;
     match launcher {
         MMCLauncherEnum::General(p) => Some(p.general.instance_dir),
@@ -165,10 +165,9 @@ pub async fn get_instances_subpath(config: PathBuf) -> Option<String> {
 
 // Loading the INI (instance.cfg) file
 async fn load_instance_cfg(file_path: &Path) -> crate::Result<MMCInstance> {
-    let instance_cfg: String = io::read_to_string(file_path).await?;
-    let instance_cfg_enum: MMCInstanceEnum =
-        serde_ini::from_str::<MMCInstanceEnum>(&instance_cfg)?;
-    match instance_cfg_enum {
+    match serde_ini::from_str::<MMCInstanceEnum>(
+        &io::read_any_encoding_to_string(file_path).await?.0,
+    )? {
         MMCInstanceEnum::General(instance_cfg) => Ok(instance_cfg.general),
         MMCInstanceEnum::Instance(instance_cfg) => Ok(instance_cfg),
     }
@@ -183,9 +182,13 @@ pub async fn import_mmc(
     let mmc_instance_path =
         mmc_base_path.join("instances").join(instance_folder);
 
-    let mmc_pack =
-        io::read_to_string(&mmc_instance_path.join("mmc-pack.json")).await?;
-    let mmc_pack: MMCPack = serde_json::from_str::<MMCPack>(&mmc_pack)?;
+    let mmc_pack = serde_json::from_str::<MMCPack>(
+        &io::read_any_encoding_to_string(
+            &mmc_instance_path.join("mmc-pack.json"),
+        )
+        .await?
+        .0,
+    )?;
 
     let instance_cfg =
         load_instance_cfg(&mmc_instance_path.join("instance.cfg")).await?;
@@ -243,7 +246,7 @@ pub async fn import_mmc(
             _ => return Err(crate::ErrorKind::InputError("Instance is managed, but managed pack type not specified in instance.cfg".to_string()).into())
         }
     } else {
-        // Direclty import unmanaged pack
+        // Directly import unmanaged pack
         import_mmc_unmanaged(
             profile_path,
             minecraft_folder,
