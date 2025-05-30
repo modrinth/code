@@ -193,9 +193,12 @@ impl PayoutsQueue {
                 pub error_description: String,
             }
 
-            if let Ok(error) =
+            if let Ok(mut error) =
                 serde_json::from_value::<PayPalError>(value.clone())
             {
+                if error.name == "INSUFFICIENT_FUNDS" {
+                    error.message = "Modrinth's PayPal account is short on funds. Please try again in a couple days.".to_string();
+                }
                 return Err(ApiError::Payments(format!(
                     "error name: {}, message: {}",
                     error.name, error.message
