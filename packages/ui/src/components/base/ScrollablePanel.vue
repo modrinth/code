@@ -100,30 +100,6 @@ function onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
-<<<<<<< HEAD
   max-height: 19rem;
-
-  ::-webkit-scrollbar {
-    transition: all;
-  }
-
-  &::-webkit-scrollbar {
-    width: var(--gap-md);
-    border: 3px solid var(--color-bg);
-  }
-
-  &::-webkit-scrollbar-track {
-    background: var(--color-bg);
-    border: 3px solid var(--color-bg);
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: var(--color-raised-bg);
-    border-radius: var(--radius-lg);
-    padding: 4px;
-    border: 3px solid var(--color-bg);
-  }
-=======
->>>>>>> origin/main
 }
 </style>
