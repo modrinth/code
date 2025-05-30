@@ -1,10 +1,10 @@
 <template>
-  <div class="scrollable-pane-wrapper" :class="{ 'max-height': !props.noMaxHeight }">
+  <div class="scrollable-pane-wrapper">
     <div
       class="wrapper-wrapper"
       :class="{
-        'top-fade': !scrollableAtTop && !props.noMaxHeight,
-        'bottom-fade': !scrollableAtBottom && !props.noMaxHeight,
+        'top-fade': !scrollableAtTop && !props.disableScrolling,
+        'bottom-fade': !scrollableAtBottom && !props.disableScrolling,
       }"
     >
       <div ref="scrollablePane" class="scrollable-pane" @scroll="onScroll">
@@ -19,10 +19,10 @@ import { ref, onMounted, onUnmounted } from 'vue'
 
 const props = withDefaults(
   defineProps<{
-    noMaxHeight?: boolean
+    disableScrolling?: boolean
   }>(),
   {
-    noMaxHeight: false,
+    disableScrolling: false,
   },
 )
 
@@ -49,7 +49,7 @@ onUnmounted(() => {
 })
 function updateFade(scrollTop, offsetHeight, scrollHeight) {
   scrollableAtBottom.value = Math.ceil(scrollTop + offsetHeight) >= scrollHeight
-  scrollableAtTop.value = scrollTop === 0
+  scrollableAtTop.value = scrollTop <= 0
 }
 function onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
   updateFade(scrollTop, offsetHeight, scrollHeight)
@@ -63,10 +63,6 @@ function onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
   position: relative;
 }
 
-  &.max-height {
-    max-height: 19rem;
-  }
-}
 .wrapper-wrapper {
   flex-grow: 1;
   display: flex;
@@ -74,33 +70,20 @@ function onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
   position: relative;
 
   --_fade-height: 4rem;
-  margin-bottom: var(--gap-sm);
-  &.top-fade::before,
-  &.bottom-fade::after {
-    opacity: 1;
+
+  &.top-fade {
+    mask-image: linear-gradient(transparent, rgb(0 0 0 / 100%) var(--_fade-height));
   }
-  &::before,
-  &::after {
-    content: '';
-    left: 0;
-    right: 0;
-    opacity: 0;
-    position: absolute;
-    pointer-events: none;
-    transition: opacity 0.125s ease;
-    height: var(--_fade-height);
-    z-index: 1;
-  }
-  &::before {
-    top: 0;
-    background-image: linear-gradient(
-      var(--scrollable-pane-bg, var(--color-raised-bg)),
-      transparent
+
+  &.bottom-fade {
+    mask-image: linear-gradient(
+      rgb(0 0 0 / 100%) calc(100% - var(--_fade-height)),
+      transparent 100%
     );
   }
-  &::after {
-    bottom: 0;
-    background-image: linear-gradient(
+
+  &.top-fade.bottom-fade {
+    mask-image: linear-gradient(
       transparent,
       rgb(0 0 0 / 100%) var(--_fade-height),
       rgb(0 0 0 / 100%) calc(100% - var(--_fade-height)),
@@ -117,6 +100,7 @@ function onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
+<<<<<<< HEAD
   max-height: 19rem;
 
   ::-webkit-scrollbar {
@@ -139,5 +123,7 @@ function onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
     padding: 4px;
     border: 3px solid var(--color-bg);
   }
+=======
+>>>>>>> origin/main
 }
 </style>
