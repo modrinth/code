@@ -197,7 +197,7 @@ impl PayoutsQueue {
                 serde_json::from_value::<PayPalError>(value.clone())
             {
                 if error.name == "INSUFFICIENT_FUNDS" {
-                    error.message = "Modrinth's PayPal account is short on funds. Please try again in a couple days.".to_string();
+                    error.message = "We're currently transferring funds to our PayPal account. Please try again in a couple days.".to_string();
                 }
                 return Err(ApiError::Payments(format!(
                     "error name: {}, message: {}",
