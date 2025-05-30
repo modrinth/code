@@ -7,10 +7,8 @@ use crate::models::v2::notifications::LegacyNotification;
 use crate::models::v2::projects::LegacyProject;
 use crate::models::v2::user::LegacyUser;
 use crate::queue::session::AuthQueue;
-use crate::routes::{v2_reroute, v3, ApiError};
-use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
-use lazy_static::lazy_static;
-use regex::Regex;
+use crate::routes::{ApiError, v2_reroute, v3};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::sync::Arc;
@@ -27,6 +25,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(user_delete)
             .service(user_edit)
             .service(user_icon_edit)
+            .service(user_icon_delete)
             .service(user_notifications)
             .service(user_follows),
     );
@@ -85,11 +84,13 @@ pub async fn users_get(
 
 #[get("{id}")]
 pub async fn user_get(
+    req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let response = v3::users::user_get(info, pool, redis)
+    let response = v3::users::user_get(req, info, pool, redis, session_queue)
         .await
         .or_else(v2_reroute::flatten_404_error)?;
 
@@ -132,20 +133,16 @@ pub async fn projects_list(
     }
 }
 
-lazy_static! {
-    static ref RE_URL_SAFE: Regex = Regex::new(r"^[a-zA-Z0-9_-]*$").unwrap();
-}
-
 #[derive(Serialize, Deserialize, Validate)]
 pub struct EditUser {
-    #[validate(length(min = 1, max = 39), regex = "RE_URL_SAFE")]
+    #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_USERNAME))]
     pub username: Option<String>,
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
         with = "::serde_with::rust::double_option"
     )]
-    #[validate(length(min = 1, max = 64), regex = "RE_URL_SAFE")]
+    #[validate(length(min = 1, max = 64), regex(path = *crate::util::validate::RE_USERNAME))]
     pub name: Option<Option<String>>,
     #[serde(
         default,
@@ -215,6 +212,28 @@ pub async fn user_icon_edit(
         redis,
         file_host,
         payload,
+        session_queue,
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)
+}
+
+#[delete("{id}/icon")]
+pub async fn user_icon_delete(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    // Returns NoContent, so we don't need to convert to V2
+    v3::users::user_icon_delete(
+        req,
+        info,
+        pool,
+        redis,
+        file_host,
         session_queue,
     )
     .await

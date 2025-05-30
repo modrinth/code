@@ -262,8 +262,9 @@ export const processAnalyticsByCountry = (category, projects, sortFn) => {
 
   loadedProjectData.forEach((data) => {
     Object.entries(data).forEach(([country, value]) => {
-      const current = countrySums.get(country) || 0;
-      countrySums.set(country, current + value);
+      const countryCode = country || "XX";
+      const current = countrySums.get(countryCode) || 0;
+      countrySums.set(countryCode, current + value);
     });
   });
 
@@ -304,13 +305,10 @@ export const useFetchAllAnalytics = (
   projects,
   selectedProjects,
   personalRevenue = false,
+  startDate = ref(dayjs().subtract(30, "days")),
+  endDate = ref(dayjs()),
+  timeResolution = ref(1440),
 ) => {
-  const timeResolution = ref(1440); // 1 day
-  const timeRange = ref(43200); // 30 days
-
-  const startDate = ref(Date.now() - timeRange.value * 60 * 1000);
-  const endDate = ref(Date.now());
-
   const downloadData = ref(null);
   const viewData = ref(null);
   const revenueData = ref(null);
@@ -394,8 +392,8 @@ export const useFetchAllAnalytics = (
     [() => startDate.value, () => endDate.value, () => timeResolution.value, () => projects.value],
     async () => {
       const q = {
-        start_date: dayjs(startDate.value).toISOString(),
-        end_date: dayjs(endDate.value).toISOString(),
+        start_date: startDate.value.toISOString(),
+        end_date: endDate.value.toISOString(),
         resolution_minutes: timeResolution.value,
       };
 
@@ -442,7 +440,6 @@ export const useFetchAllAnalytics = (
   return {
     // Configuration
     timeResolution,
-    timeRange,
 
     startDate,
     endDate,

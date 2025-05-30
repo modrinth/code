@@ -1,7 +1,7 @@
 use crate::models::error::ApiError;
 use crate::models::projects::SearchRequest;
-use actix_web::http::StatusCode;
 use actix_web::HttpResponse;
+use actix_web::http::StatusCode;
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use meilisearch_sdk::client::Client;
@@ -80,7 +80,9 @@ impl SearchConfig {
         }
     }
 
-    pub fn make_client(&self) -> Client {
+    pub fn make_client(
+        &self,
+    ) -> Result<Client, meilisearch_sdk::errors::Error> {
         Client::new(self.address.as_str(), Some(self.key.as_str()))
     }
 
@@ -190,7 +192,7 @@ pub async fn search_for_project(
     info: &SearchRequest,
     config: &SearchConfig,
 ) -> Result<SearchResults, SearchError> {
-    let client = Client::new(&*config.address, Some(&*config.key));
+    let client = Client::new(&*config.address, Some(&*config.key))?;
 
     let offset: usize = info.offset.as_deref().unwrap_or("0").parse()?;
     let index = info.index.as_deref().unwrap_or("relevance");
@@ -207,8 +209,9 @@ pub async fn search_for_project(
     let mut filter_string = String::new();
 
     // Convert offset and limit to page and hits_per_page
-    let hits_per_page = limit;
-    let page = offset / limit + 1;
+    let hits_per_page = if limit == 0 { 1 } else { limit };
+
+    let page = offset / hits_per_page + 1;
 
     let results = {
         let mut query = meilisearch_index.search();
@@ -249,10 +252,10 @@ pub async fn search_for_project(
                                     serde_json::from_value::<Vec<String>>(facet)
                                         .unwrap_or_default()
                                 } else {
-                                    vec![serde_json::from_value::<String>(
-                                        facet,
-                                    )
-                                    .unwrap_or_default()]
+                                    vec![
+                                        serde_json::from_value::<String>(facet)
+                                            .unwrap_or_default(),
+                                    ]
                                 }
                             })
                             .collect_vec()

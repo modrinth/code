@@ -31,6 +31,12 @@ pub use self::minecraft_auth::*;
 mod cache;
 pub use self::cache::*;
 
+mod friends;
+pub use self::friends::*;
+
+mod tunnel;
+pub use self::tunnel::*;
+
 pub mod db;
 pub mod fs_watcher;
 mod mr_auth;
@@ -38,6 +44,9 @@ mod mr_auth;
 pub use self::mr_auth::*;
 
 mod legacy_converter;
+
+pub mod attached_world_data;
+pub mod server_join_log;
 
 // Global state
 // RwLock on state only has concurrent reads, except for config dir change which takes control of the State
@@ -60,6 +69,9 @@ pub struct State {
     /// Process manager
     pub process_manager: ProcessManager,
 
+    /// Friends socket
+    pub friends_socket: FriendsSocket,
+
     pub(crate) pool: SqlitePool,
 
     pub(crate) file_watcher: FileWatcher,
@@ -81,6 +93,16 @@ impl State {
             if let Err(e) = res {
                 tracing::error!("Error running discord RPC: {e}");
             }
+
+            let _ = state
+                .friends_socket
+                .connect(
+                    &state.pool,
+                    &state.api_semaphore,
+                    &state.process_manager,
+                )
+                .await;
+            let _ = FriendsSocket::socket_loop().await;
         });
 
         Ok(())
@@ -89,7 +111,12 @@ impl State {
     /// Get the current launcher state, waiting for initialization
     pub async fn get() -> crate::Result<Arc<Self>> {
         if !LAUNCHER_STATE.initialized() {
-            while !LAUNCHER_STATE.initialized() {}
+            tracing::error!(
+                "Attempted to get state before it is initialized - this should never happen!"
+            );
+            while !LAUNCHER_STATE.initialized() {
+                tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+            }
         }
 
         Ok(Arc::clone(
@@ -103,10 +130,12 @@ impl State {
 
     #[tracing::instrument]
     async fn initialize_state() -> crate::Result<Arc<Self>> {
+        tracing::info!("Connecting to app database");
         let pool = db::connect().await?;
 
         legacy_converter::migrate_legacy_data(&pool).await?;
 
+        tracing::info!("Fetching app settings");
         let mut settings = Settings::get(&pool).await?;
 
         let fetch_semaphore =
@@ -116,6 +145,7 @@ impl State {
         let api_semaphore =
             FetchSemaphore(Semaphore::new(settings.max_concurrent_downloads));
 
+        tracing::info!("Initializing directories");
         DirectoryInfo::move_launcher_directory(
             &mut settings,
             &pool,
@@ -126,8 +156,13 @@ impl State {
 
         let discord_rpc = DiscordGuard::init()?;
 
+        tracing::info!("Initializing file watcher");
         let file_watcher = fs_watcher::init_watcher().await?;
-        fs_watcher::watch_profiles_init(&file_watcher, &directories).await?;
+        fs_watcher::watch_profiles_init(&file_watcher, &directories).await;
+
+        let process_manager = ProcessManager::new();
+
+        let friends_socket = FriendsSocket::new();
 
         Ok(Arc::new(Self {
             directories,
@@ -135,7 +170,8 @@ impl State {
             io_semaphore,
             api_semaphore,
             discord_rpc,
-            process_manager: ProcessManager::new(),
+            process_manager,
+            friends_socket,
             pool,
             file_watcher,
         }))

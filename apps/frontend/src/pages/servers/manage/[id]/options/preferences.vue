@@ -49,7 +49,7 @@ const route = useNativeRoute();
 const serverId = route.params.id as string;
 
 const props = defineProps<{
-  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
 }>();
 
 const preferences = {
@@ -57,6 +57,11 @@ const preferences = {
     displayName: "RAM as bytes",
     description:
       "When enabled, RAM will be displayed as bytes instead of a percentage in your server's Overview.",
+    implemented: true,
+  },
+  hideSubdomainLabel: {
+    displayName: "Hide subdomain label",
+    description: "When enabled, the subdomain label will be hidden from the server header.",
     implemented: true,
   },
   autoRestart: {
@@ -84,6 +89,7 @@ type UserPreferences = {
 
 const defaultPreferences: UserPreferences = {
   ramAsNumber: false,
+  hideSubdomainLabel: false,
   autoRestart: false,
   powerDontAskAgain: false,
   backupWhileRunning: false,

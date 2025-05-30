@@ -10,15 +10,17 @@ use crate::models::projects::ProjectStatus;
 use crate::models::threads::MessageBody;
 use crate::routes::ApiError;
 use dashmap::DashSet;
+use hex::ToHex;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use sha1::Digest;
 use sqlx::PgPool;
 use std::collections::HashMap;
 use std::io::{Cursor, Read};
 use std::time::Duration;
 use zip::ZipArchive;
 
-const AUTOMOD_ID: i64 = 0;
+pub const AUTOMOD_ID: i64 = 0;
 
 pub struct ModerationMessages {
     pub messages: Vec<ModerationMessage>,
@@ -168,19 +170,19 @@ impl ModerationMessage {
 
                     for project in &projects {
                         let additional_text = if project.contains("ftb-quests") {
-                            Some("Heracles")
+                            Some(("Odyssey Quests", "lo90fZoB"))
                         } else if project.contains("ftb-ranks") || project.contains("ftb-essentials") {
-                            Some("Prometheus")
+                            Some(("Odyssey Roles", "iYcNKH7W"))
                         } else if project.contains("ftb-teams") {
-                            Some("Argonauts")
+                            Some(("Odyssey Guilds", "bb2EpKpx"))
                         } else if project.contains("ftb-chunks") {
-                            Some("Cadmus")
+                            Some(("Odyssey Claims", "fEWKxVzh"))
                         } else {
                             None
                         };
 
                         val.push_str(&if let Some(additional_text) = additional_text {
-                            format!("- {project}(consider using [{additional_text}](https://modrinth.com/mod/{}) instead)\n", additional_text.to_lowercase())
+                            format!("- {project} (consider using [{}](https://modrinth.com/project/{}) instead)\n", additional_text.0, additional_text.1)
                         } else {
                             format!("- {project}\n")
                         })
@@ -231,7 +233,7 @@ impl AutomatedModerationQueue {
             for project in projects {
                 async {
                     let project =
-                        database::Project::get_id((project).into(), &pool, &redis).await?;
+                        database::DBProject::get_id((project).into(), &pool, &redis).await?;
 
                     if let Some(project) = project {
                         let res = async {
@@ -259,7 +261,7 @@ impl AutomatedModerationQueue {
                             }
 
                             let versions =
-                                database::Version::get_many(&project.versions, &pool, &redis)
+                                database::DBVersion::get_many(&project.versions, &pool, &redis)
                                     .await?
                                     .into_iter()
                                     // we only support modpacks at this time
@@ -329,7 +331,7 @@ impl AutomatedModerationQueue {
                                             let mut contents = Vec::new();
                                             file.read_to_end(&mut contents)?;
 
-                                            let hash = sha1::Sha1::from(&contents).hexdigest();
+                                            let hash = sha1::Sha1::digest(&contents).encode_hex::<String>();
                                             let murmur = hash_flame_murmur32(contents);
 
                                             hashes.push((
@@ -341,7 +343,7 @@ impl AutomatedModerationQueue {
                                         }
                                     }
 
-                                    let files = database::models::Version::get_files_from_hash(
+                                    let files = database::models::DBVersion::get_files_from_hash(
                                         "sha1".to_string(),
                                         &hashes.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
                                         &pool,
@@ -352,7 +354,7 @@ impl AutomatedModerationQueue {
                                     let version_ids =
                                         files.iter().map(|x| x.version_id).collect::<Vec<_>>();
                                     let versions_data = filter_visible_versions(
-                                        database::models::Version::get_many(
+                                        database::models::DBVersion::get_many(
                                             &version_ids,
                                             &pool,
                                             &redis,
@@ -619,13 +621,13 @@ impl AutomatedModerationQueue {
                             }
 
                             if !mod_messages.is_empty() {
-                                let first_time = database::models::Thread::get(project.thread_id, &pool).await?
-                                    .map(|x| x.messages.iter().all(|x| x.author_id == Some(database::models::UserId(AUTOMOD_ID)) || x.hide_identity))
+                                let first_time = database::models::DBThread::get(project.thread_id, &pool).await?
+                                    .map(|x| x.messages.iter().all(|x| x.author_id == Some(database::models::DBUserId(AUTOMOD_ID)) || x.hide_identity))
                                     .unwrap_or(true);
 
                                 let mut transaction = pool.begin().await?;
                                 let id = ThreadMessageBuilder {
-                                    author_id: Some(database::models::UserId(AUTOMOD_ID)),
+                                    author_id: Some(database::models::DBUserId(AUTOMOD_ID)),
                                     body: MessageBody::Text {
                                         body: mod_messages.markdown(true),
                                         private: false,
@@ -638,7 +640,7 @@ impl AutomatedModerationQueue {
                                     .insert(&mut transaction)
                                     .await?;
 
-                                let members = database::models::TeamMember::get_from_team_full(
+                                let members = database::models::DBTeamMember::get_from_team_full(
                                     project.inner.team_id,
                                     &pool,
                                     &redis,
@@ -647,7 +649,7 @@ impl AutomatedModerationQueue {
 
                                 if mod_messages.should_reject(first_time) {
                                     ThreadMessageBuilder {
-                                        author_id: Some(database::models::UserId(AUTOMOD_ID)),
+                                        author_id: Some(database::models::DBUserId(AUTOMOD_ID)),
                                         body: MessageBody::StatusChange {
                                             new_status: ProjectStatus::Rejected,
                                             old_status: project.inner.status,
@@ -698,7 +700,7 @@ impl AutomatedModerationQueue {
                                         .execute(&pool)
                                         .await?;
 
-                                    database::models::Project::clear_cache(
+                                    database::models::DBProject::clear_cache(
                                         project.inner.id,
                                         project.inner.slug.clone(),
                                         None,
@@ -738,7 +740,7 @@ impl AutomatedModerationQueue {
 
                             let mut transaction = pool.begin().await?;
                             ThreadMessageBuilder {
-                                author_id: Some(database::models::UserId(AUTOMOD_ID)),
+                                author_id: Some(database::models::DBUserId(AUTOMOD_ID)),
                                 body: MessageBody::Text {
                                     body: str,
                                     private: true,

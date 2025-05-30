@@ -4,6 +4,7 @@ use crate::file_hosting::{
 use async_trait::async_trait;
 use bytes::Bytes;
 use chrono::Utc;
+use hex::ToHex;
 use s3::bucket::Bucket;
 use s3::creds::Credentials;
 use s3::region::Region;
@@ -52,7 +53,7 @@ impl S3Host {
             )
         })?;
 
-        Ok(S3Host { bucket })
+        Ok(S3Host { bucket: *bucket })
     }
 }
 
@@ -64,7 +65,7 @@ impl FileHost for S3Host {
         file_name: &str,
         file_bytes: Bytes,
     ) -> Result<UploadFileData, FileHostingError> {
-        let content_sha1 = sha1::Sha1::from(&file_bytes).hexdigest();
+        let content_sha1 = sha1::Sha1::digest(&file_bytes).encode_hex();
         let content_sha512 = format!("{:x}", sha2::Sha512::digest(&file_bytes));
 
         self.bucket
@@ -74,10 +75,10 @@ impl FileHost for S3Host {
                 content_type,
             )
             .await
-            .map_err(|_| {
-                FileHostingError::S3Error(
-                    "Error while uploading file to S3".to_string(),
-                )
+            .map_err(|err| {
+                FileHostingError::S3Error(format!(
+                    "Error while uploading file {file_name} to S3: {err}"
+                ))
             })?;
 
         Ok(UploadFileData {
@@ -100,10 +101,10 @@ impl FileHost for S3Host {
         self.bucket
             .delete_object(format!("/{file_name}"))
             .await
-            .map_err(|_| {
-                FileHostingError::S3Error(
-                    "Error while deleting file from S3".to_string(),
-                )
+            .map_err(|err| {
+                FileHostingError::S3Error(format!(
+                    "Error while deleting file {file_name} to S3: {err}"
+                ))
             })?;
 
         Ok(DeleteFileData {

@@ -1,11 +1,14 @@
 <template>
   <ButtonStyled>
     <PopoutMenu
-      v-if="options.length > 1"
+      v-if="options.length > 1 || showAlways"
       v-bind="$attrs"
       :disabled="disabled"
       :position="position"
       :direction="direction"
+      :dropdown-id="dropdownId"
+      :dropdown-class="dropdownClass"
+      :tooltip="tooltip"
       @open="
         () => {
           searchQuery = ''
@@ -15,15 +18,15 @@
       <slot />
       <DropdownIcon class="h-5 w-5 text-secondary" />
       <template #menu>
-        <div class="iconified-input mb-2 w-full" v-if="search">
+        <div v-if="search" class="iconified-input mb-2 w-full">
           <label for="search-input" hidden>Search...</label>
           <SearchIcon aria-hidden="true" />
           <input
             id="search-input"
+            ref="searchInput"
             v-model="searchQuery"
             placeholder="Search..."
             type="text"
-            ref="searchInput"
             @keydown.enter="
               () => {
                 toggleOption(filteredOptions[0])
@@ -40,7 +43,7 @@
             class="!w-full"
             :color="manyValues.includes(option) ? 'secondary' : 'default'"
           >
-            <slot name="option" :option="option">{{ displayName(option) }}</slot>
+            <slot name="option" :option="option">{{ getOptionLabel(option) }}</slot>
             <CheckIcon
               class="h-5 w-5 text-contrast ml-auto transition-opacity"
               :class="{ 'opacity-0': !manyValues.includes(option) }"
@@ -56,7 +59,7 @@
             class="!w-full"
             :color="manyValues.includes(option) ? 'secondary' : 'default'"
           >
-            <slot name="option" :option="option">{{ displayName(option) }}</slot>
+            <slot name="option" :option="option">{{ getOptionLabel(option) }}</slot>
             <CheckIcon
               class="h-5 w-5 text-contrast ml-auto transition-opacity"
               :class="{ 'opacity-0': !manyValues.includes(option) }"
@@ -69,7 +72,7 @@
   </ButtonStyled>
 </template>
 <script setup lang="ts">
-import { CheckIcon, DropdownIcon, SearchIcon, XIcon } from '@modrinth/assets'
+import { CheckIcon, DropdownIcon, SearchIcon } from '@modrinth/assets'
 import { ButtonStyled, PopoutMenu, Button } from '../index'
 import { computed, ref } from 'vue'
 import ScrollablePanel from './ScrollablePanel.vue'
@@ -85,15 +88,27 @@ const props = withDefaults(
     direction?: string
     displayName?: (option: Option) => string
     search?: boolean
+    dropdownId?: string
+    dropdownClass?: string
+    showAlways?: boolean
+    tooltip?: string
   }>(),
   {
     disabled: false,
     position: 'auto',
     direction: 'auto',
-    displayName: (option: Option) => option as string,
+    displayName: undefined,
     search: false,
+    dropdownId: '',
+    dropdownClass: '',
+    showAlways: false,
+    tooltip: '',
   },
 )
+
+function getOptionLabel(option: Option): string {
+  return props.displayName?.(option) ?? (option as string)
+}
 
 const emit = defineEmits(['update:modelValue', 'change'])
 const selectedValues = ref(props.modelValue || [])
@@ -116,7 +131,7 @@ const filteredOptions = computed(() => {
   return props.options.filter(
     (x) =>
       !searchQuery.value ||
-      props.displayName(x).toLowerCase().includes(searchQuery.value.toLowerCase()),
+      getOptionLabel(x).toLowerCase().includes(searchQuery.value.toLowerCase()),
   )
 })
 

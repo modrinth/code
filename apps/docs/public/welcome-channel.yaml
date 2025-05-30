@@ -6,19 +6,21 @@
     - title: __Welcome to Modrinth's Discord server!__
       url: https://modrinth.com
       color: 0x1bd96a
-      description: "Modrinth is the place for Minecraft mods, plugins, data packs, shaders, resource packs, and
-        modpacks. Discover, play, and share Minecraft content through our open-source platform built for the community."
+      description:
+        'Modrinth is the place for Minecraft mods, plugins, data packs, shaders, resource packs, and
+        modpacks. Discover, play, and share Minecraft content through our open-source platform built for the community.'
 
 - type: embed
   embeds:
-    - title: "**:scroll: __Rules__**"
+    - title: '**:scroll: __Rules__**'
       color: 0x4f9cff
-      description: "Modrinth's rules are easy to follow. Despite this, please keep in mind that this is not an entirely
+      description:
+        "Modrinth's rules are easy to follow. Despite this, please keep in mind that this is not an entirely
         open forum. First and foremost, this Discord server is intended to facilitate the development of Modrinth and
         for communication regarding Modrinth. Ultimately, it is up to the discretion of the moderators whether your
         messages are in violation of our rules.\n\n
         Modrinth's rules are split up into two categories: the **__DOs__** and the **__DO NOTs__**."
-    - title: ":white_check_mark: Do:"
+    - title: ':white_check_mark: Do:'
       color: 0x1bd96a
       description: >-
         1. Treat every user with respect and consider the opinions and viewpoints of others
@@ -33,7 +35,7 @@
         4. Contact the moderators at any time via the <@&895382919772766219> ping
 
         5. Respect the use of accessibility and self-identity tools such as [PluralKit](https://pluralkit.me)
-    - title: ":no_entry: Do not:"
+    - title: ':no_entry: Do not:'
       color: 0xff496e
       description: >-
         6. Harass, bother, provoke, or insult anyone, including by sending unsolicited DMs or friend requests
@@ -46,7 +48,7 @@
         9. Report Modrinth content in the Discord (use the Report button on the website)
 
         10. Assume staff member's opinions reflect those of Modrinth
-    - title: ":pencil2: Nickname policy:"
+    - title: ':pencil2: Nickname policy:'
       color: 0xffa347
       description: >-
         We want to keep this server clean and therefore require that display names of all members on the server are
@@ -60,7 +62,7 @@
         from the server. We will also permanently remove any users whose profiles contain inappropriate content.
 - type: links
   color: 0x4f9cff
-  title: "**:link: __Links__**"
+  title: '**:link: __Links__**'
   links:
     Website: https://modrinth.com
     Support: https://support.modrinth.com

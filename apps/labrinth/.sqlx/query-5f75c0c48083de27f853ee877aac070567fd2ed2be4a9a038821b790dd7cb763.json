@@ -1,0 +1,173 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,\n                    m.icon_url icon_url, m.raw_icon_url raw_icon_url, m.description description, m.published published,\n                    m.approved approved, m.queued, m.status status, m.requested_status requested_status,\n                    m.license_url license_url,\n                    m.team_id team_id, m.organization_id organization_id, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,\n                    m.webhook_sent, m.color,\n                    t.id thread_id, m.monetization_status monetization_status,\n                    ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,\n                    ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories\n                    FROM mods m\n                    INNER JOIN threads t ON t.mod_id = m.id\n                    LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id\n                    LEFT JOIN categories c ON mc.joining_category_id = c.id\n                    WHERE m.id = ANY($1) OR m.slug = ANY($2)\n                    GROUP BY t.id, m.id;\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "summary",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "downloads",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "follows",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "icon_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "raw_icon_url",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "published",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "approved",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "queued",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 11,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 12,
+        "name": "requested_status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 13,
+        "name": "license_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 14,
+        "name": "team_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 15,
+        "name": "organization_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 16,
+        "name": "license",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 17,
+        "name": "slug",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 18,
+        "name": "moderation_message",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 19,
+        "name": "moderation_message_body",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 20,
+        "name": "webhook_sent",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 21,
+        "name": "color",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 22,
+        "name": "thread_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 23,
+        "name": "monetization_status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 24,
+        "name": "categories",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 25,
+        "name": "additional_categories",
+        "type_info": "VarcharArray"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      true,
+      true,
+      false,
+      true,
+      false,
+      true,
+      true,
+      true,
+      false,
+      true,
+      false,
+      false,
+      null,
+      null
+    ]
+  },
+  "hash": "5f75c0c48083de27f853ee877aac070567fd2ed2be4a9a038821b790dd7cb763"
+}

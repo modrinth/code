@@ -13,8 +13,8 @@ use rust_decimal::Decimal;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use sqlx::postgres::PgQueryResult;
 use sqlx::PgPool;
+use sqlx::postgres::PgQueryResult;
 use std::collections::HashMap;
 use tokio::sync::RwLock;
 
@@ -23,7 +23,7 @@ pub struct PayoutsQueue {
     payout_options: RwLock<Option<PayoutMethods>>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct PayPalCredentials {
     access_token: String,
     token_type: String,
@@ -34,6 +34,12 @@ struct PayPalCredentials {
 struct PayoutMethods {
     options: Vec<PayoutMethod>,
     expires: DateTime<Utc>,
+}
+
+#[derive(Serialize)]
+pub struct AccountBalance {
+    pub available: Decimal,
+    pub pending: Decimal,
 }
 
 impl Default for PayoutsQueue {
@@ -545,6 +551,136 @@ impl PayoutsQueue {
 
         Ok(options.options)
     }
+
+    pub async fn get_brex_balance() -> Result<Option<AccountBalance>, ApiError>
+    {
+        #[derive(Deserialize)]
+        struct BrexBalance {
+            pub amount: i64,
+            // pub currency: String,
+        }
+
+        #[derive(Deserialize)]
+        struct BrexAccount {
+            pub current_balance: BrexBalance,
+            pub available_balance: BrexBalance,
+        }
+
+        #[derive(Deserialize)]
+        struct BrexResponse {
+            pub items: Vec<BrexAccount>,
+        }
+
+        let client = reqwest::Client::new();
+        let res = client
+            .get(format!("{}accounts/cash", dotenvy::var("BREX_API_URL")?))
+            .bearer_auth(&dotenvy::var("BREX_API_KEY")?)
+            .send()
+            .await?
+            .json::<BrexResponse>()
+            .await?;
+
+        Ok(Some(AccountBalance {
+            available: Decimal::from(
+                res.items
+                    .iter()
+                    .map(|x| x.available_balance.amount)
+                    .sum::<i64>(),
+            ) / Decimal::from(100),
+            pending: Decimal::from(
+                res.items
+                    .iter()
+                    .map(|x| {
+                        x.current_balance.amount - x.available_balance.amount
+                    })
+                    .sum::<i64>(),
+            ) / Decimal::from(100),
+        }))
+    }
+
+    pub async fn get_paypal_balance() -> Result<Option<AccountBalance>, ApiError>
+    {
+        let api_username = dotenvy::var("PAYPAL_NVP_USERNAME")?;
+        let api_password = dotenvy::var("PAYPAL_NVP_PASSWORD")?;
+        let api_signature = dotenvy::var("PAYPAL_NVP_SIGNATURE")?;
+
+        let mut params = HashMap::new();
+        params.insert("METHOD", "GetBalance");
+        params.insert("VERSION", "204");
+        params.insert("USER", &api_username);
+        params.insert("PWD", &api_password);
+        params.insert("SIGNATURE", &api_signature);
+        params.insert("RETURNALLCURRENCIES", "1");
+
+        let endpoint = "https://api-3t.paypal.com/nvp";
+
+        let client = reqwest::Client::new();
+        let response = client.post(endpoint).form(&params).send().await?;
+
+        let text = response.text().await?;
+        let body = urlencoding::decode(&text).unwrap_or_default();
+
+        let mut key_value_map = HashMap::new();
+
+        for pair in body.split('&') {
+            let mut iter = pair.splitn(2, '=');
+            if let (Some(key), Some(value)) = (iter.next(), iter.next()) {
+                key_value_map.insert(key.to_string(), value.to_string());
+            }
+        }
+
+        if let Some(amount) = key_value_map
+            .get("L_AMT0")
+            .and_then(|x| Decimal::from_str_exact(x).ok())
+        {
+            Ok(Some(AccountBalance {
+                available: amount,
+                pending: Decimal::ZERO,
+            }))
+        } else {
+            Ok(None)
+        }
+    }
+
+    pub async fn get_tremendous_balance(
+        &self,
+    ) -> Result<Option<AccountBalance>, ApiError> {
+        #[derive(Deserialize)]
+        struct FundingSourceMeta {
+            available_cents: u64,
+            pending_cents: u64,
+        }
+
+        #[derive(Deserialize)]
+        struct FundingSource {
+            method: String,
+            meta: FundingSourceMeta,
+        }
+
+        #[derive(Deserialize)]
+        struct FundingSourceRequest {
+            pub funding_sources: Vec<FundingSource>,
+        }
+
+        let val = self
+            .make_tremendous_request::<(), FundingSourceRequest>(
+                Method::GET,
+                "funding_sources",
+                None,
+            )
+            .await?;
+
+        Ok(val
+            .funding_sources
+            .into_iter()
+            .find(|x| x.method == "balance")
+            .map(|x| AccountBalance {
+                available: Decimal::from(x.meta.available_cents)
+                    / Decimal::from(100),
+                pending: Decimal::from(x.meta.pending_cents)
+                    / Decimal::from(100),
+            }))
+    }
 }
 
 #[derive(Deserialize)]
@@ -599,6 +735,18 @@ pub async fn process_payout(
     pool: &PgPool,
     client: &clickhouse::Client,
 ) -> Result<(), ApiError> {
+    sqlx::query!(
+        "
+        UPDATE payouts
+        SET status = $1
+        WHERE status = $2 AND created < NOW() - INTERVAL '30 days'
+        ",
+        crate::models::payouts::PayoutStatus::Failed.as_str(),
+        crate::models::payouts::PayoutStatus::InTransit.as_str(),
+    )
+    .execute(pool)
+    .await?;
+
     let start: DateTime<Utc> = DateTime::from_naive_utc_and_offset(
         (Utc::now() - Duration::days(1))
             .date_naive()

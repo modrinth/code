@@ -8,7 +8,7 @@ use crate::database::models::loader_fields::{
     Game, Loader, LoaderField, LoaderFieldEnumValue, LoaderFieldType,
 };
 use crate::database::redis::RedisPool;
-use actix_web::{web, HttpResponse};
+use actix_web::{HttpResponse, web};
 
 use itertools::Itertools;
 use serde_json::Value;
@@ -156,7 +156,7 @@ pub async fn loader_fields_list(
                 "'{}' is not an enumerable field, but an '{}' field.",
                 query.loader_field,
                 loader_field.field_type.to_str()
-            )))
+            )));
         }
     };
 

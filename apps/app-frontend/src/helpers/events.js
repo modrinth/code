@@ -62,7 +62,7 @@ export async function process_listener(callback) {
     ProfilePayload {
         uuid: unique identification of the process in the state (currently identified by path, but that will change)
         name: name of the profile
-        profile_path: relative path to profile (used for path identification)
+        profile_path: relative path toprofile_listener profile (used for path identification)
         path: path to profile (used for opening the profile in the OS file explorer)
         event: event type ("Created", "Added", "Edited", "Removed")
     }
@@ -92,4 +92,8 @@ export async function command_listener(callback) {
 */
 export async function warning_listener(callback) {
   return await listen('warning', (event) => callback(event.payload))
+}
+
+export async function friend_listener(callback) {
+  return await listen('friend', (event) => callback(event.payload))
 }

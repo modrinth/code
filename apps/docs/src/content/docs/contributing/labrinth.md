@@ -3,10 +3,11 @@ title: Labrinth (API)
 description: Guide for contributing to Modrinth's backend
 ---
 
+This project is part of our [monorepo](https://github.com/modrinth/code). You can find it in the `apps/labrinth` directory.
 
 [labrinth] is the Rust-based backend serving Modrinth's API with the help of the [Actix](https://actix.rs) framework. To get started with a labrinth instance, install docker, docker-compose (which comes with Docker), and [Rust]. The initial startup can be done simply with the command `docker-compose up`, or with `docker compose up` (Compose V2 and later). That will deploy a PostgreSQL database on port 5432 and a MeiliSearch instance on port 7700. To run the API itself, you'll need to use the `cargo run` command, this will deploy the API on port 8000.
 
-Now, you'll have to install the sqlx CLI, which can be done with cargo:
+To get a basic configuration, copy the `.env.local` file to `.env`. Now, you'll have to install the sqlx CLI, which can be done with cargo:
 
 ```bash
 cargo install --git https://github.com/launchbadge/sqlx sqlx-cli --no-default-features --features postgres,rustls
@@ -52,7 +53,11 @@ If you would like 'placeholder_category' to be marked as supporting modpacks too
 INSERT INTO categories VALUES (0, 'placeholder_category', 2); -- modloader id, supported type id
 ```
 
+You can find more example SQL statements for seeding the database in the `apps/labrinth/tests/files/dummy_data.sql` file.
+
 The majority of configuration is done at runtime using [dotenvy](https://crates.io/crates/dotenvy) and the `.env` file. Each of the variables and what they do can be found in the dropdown below. Additionally, there are three command line options that can be used to specify to MeiliSearch what you want to do.
+
+During development, you might notice that changes made directly to entities in the PostgreSQL database do not seem to take effect. This is often because the Redis cache still holds outdated data. To ensure your updates are reflected, clear the cache by e.g. running `redis-cli FLUSHALL`, which will force Labrinth to fetch the latest data from the database the next time it is needed.
 
 <details>
 <summary>.env variables & command line options</summary>
@@ -72,6 +77,11 @@ The majority of configuration is done at runtime using [dotenvy](https://crates.
 `MEILISEARCH_KEY`: The name that MeiliSearch is given  
 `BIND_ADDR`: The bind address for the server. Supports both IPv4 and IPv6  
 `MOCK_FILE_PATH`: The path used to store uploaded files; this has no default value and will panic if unspecified
+`SMTP_USERNAME`: The username used to authenticate with the SMTP server
+`SMTP_PASSWORD`: The password associated with the `SMTP_USERNAME` for SMTP authentication
+`SMTP_HOST`: The hostname or IP address of the SMTP server
+`SMTP_PORT`: The port number on which the SMTP server is listening (commonly 25, 465, or 587)
+`SMTP_TLS`: The TLS mode to use for the SMTP connection, which can be one of the following: `none`, `opportunistic_start_tls`, `requires_start_tls`, `tls`
 
 #### CDN options
 

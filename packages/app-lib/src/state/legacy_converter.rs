@@ -1,15 +1,15 @@
-use crate::data::{Dependency, User, Version};
+use crate::data::{Dependency, ProjectType, User, Version};
 use crate::jre::check_jre;
 use crate::prelude::ModLoader;
 use crate::state;
 use crate::state::{
     CacheValue, CachedEntry, CachedFile, CachedFileHash, CachedFileUpdate,
     Credentials, DefaultPage, DependencyType, DeviceToken, DeviceTokenKey,
-    DeviceTokenPair, FileType, Hooks, LinkedData, MemorySettings,
-    ModrinthCredentials, Profile, ProfileInstallStage, TeamMember, Theme,
-    VersionFile, WindowSize,
+    DeviceTokenPair, FileType, Hooks, LauncherFeatureVersion, LinkedData,
+    MemorySettings, ModrinthCredentials, Profile, ProfileInstallStage,
+    TeamMember, Theme, VersionFile, WindowSize,
 };
-use crate::util::fetch::{read_json, IoSemaphore};
+use crate::util::fetch::{IoSemaphore, read_json};
 use chrono::{DateTime, Utc};
 use p256::ecdsa::SigningKey;
 use p256::pkcs8::DecodePrivateKey;
@@ -226,6 +226,7 @@ where
                                             path: file_name,
                                             size: metadata.len(),
                                             hash: sha1.clone(),
+                                            project_type: ProjectType::get_from_parent_folder(&full_path),
                                         },
                                     ));
                                 }
@@ -249,9 +250,11 @@ where
                                                     .metadata
                                                     .game_version
                                                     .clone(),
-                                                loader: mod_loader
-                                                    .as_str()
-                                                    .to_string(),
+                                                loaders: vec![
+                                                    mod_loader
+                                                        .as_str()
+                                                        .to_string(),
+                                                ],
                                                 update_version_id:
                                                     update_version.id.clone(),
                                             },
@@ -307,7 +310,7 @@ where
                             ProfileInstallStage::Installed
                         }
                         LegacyProfileInstallStage::Installing => {
-                            ProfileInstallStage::Installing
+                            ProfileInstallStage::MinecraftInstalling
                         }
                         LegacyProfileInstallStage::PackInstalling => {
                             ProfileInstallStage::PackInstalling
@@ -316,9 +319,11 @@ where
                             ProfileInstallStage::NotInstalled
                         }
                     },
+                    launcher_feature_version: LauncherFeatureVersion::None,
                     name: profile.metadata.name,
                     icon_path: profile.metadata.icon,
                     game_version: profile.metadata.game_version,
+                    protocol_version: None,
                     loader: profile.metadata.loader.into(),
                     loader_version: profile
                         .metadata

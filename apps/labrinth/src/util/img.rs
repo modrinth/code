@@ -5,11 +5,12 @@ use crate::file_hosting::FileHost;
 use crate::models::images::ImageContext;
 use crate::routes::ApiError;
 use color_thief::ColorFormat;
+use hex::ToHex;
 use image::imageops::FilterType;
 use image::{
-    DynamicImage, EncodableLayout, GenericImageView, ImageError,
-    ImageOutputFormat,
+    DynamicImage, EncodableLayout, GenericImageView, ImageError, ImageFormat,
 };
+use sha1::Digest;
 use std::io::Cursor;
 use webp::Encoder;
 
@@ -25,7 +26,7 @@ pub fn get_color_from_img(data: &[u8]) -> Result<Option<u32>, ImageError> {
     )
     .ok()
     .and_then(|x| x.first().copied())
-    .map(|x| (x.r as u32) << 16 | (x.g as u32) << 8 | (x.b as u32));
+    .map(|x| ((x.r as u32) << 16) | ((x.g as u32) << 8) | (x.b as u32));
 
     Ok(color)
 }
@@ -51,14 +52,13 @@ pub async fn upload_image_optimized(
     let content_type = crate::util::ext::get_image_content_type(file_extension)
         .ok_or_else(|| {
             ApiError::InvalidInput(format!(
-                "Invalid format for image: {}",
-                file_extension
+                "Invalid format for image: {file_extension}"
             ))
         })?;
 
     let cdn_url = dotenvy::var("CDN_URL")?;
 
-    let hash = sha1::Sha1::from(&bytes).hexdigest();
+    let hash = sha1::Sha1::digest(&bytes).encode_hex::<String>();
     let (processed_image, processed_image_ext) = process_image(
         bytes.clone(),
         content_type,
@@ -91,7 +91,7 @@ pub async fn upload_image_optimized(
     let upload_data = file_host
         .upload_file(
             content_type,
-            &format!("{}/{}.{}", upload_folder, hash, file_extension),
+            &format!("{upload_folder}/{hash}.{file_extension}"),
             bytes,
         )
         .await?;
@@ -151,7 +151,7 @@ fn process_image(
 
     // Optimize and compress
     let mut output = Vec::new();
-    img.write_to(&mut Cursor::new(&mut output), ImageOutputFormat::WebP)?;
+    img.write_to(&mut Cursor::new(&mut output), ImageFormat::WebP)?;
 
     Ok((bytes::Bytes::from(output), "webp".to_string()))
 }
@@ -199,7 +199,7 @@ pub async fn delete_unused_images(
     redis: &RedisPool,
 ) -> Result<(), ApiError> {
     let uploaded_images =
-        database::models::Image::get_many_contexted(context, transaction)
+        database::models::DBImage::get_many_contexted(context, transaction)
             .await?;
 
     for image in uploaded_images {
@@ -212,8 +212,8 @@ pub async fn delete_unused_images(
         }
 
         if should_delete {
-            image_item::Image::remove(image.id, transaction, redis).await?;
-            image_item::Image::clear_cache(image.id, redis).await?;
+            image_item::DBImage::remove(image.id, transaction, redis).await?;
+            image_item::DBImage::clear_cache(image.id, redis).await?;
         }
     }
 

@@ -1,8 +1,8 @@
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::redis::RedisPool;
-use crate::models::ids::base62_impl::to_base62;
-use crate::models::projects::ProjectId;
+use crate::models::ids::ProjectId;
 use crate::routes::ApiError;
+use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Utc};
 use serde::Serialize;
 use sqlx::PgPool;
@@ -47,7 +47,7 @@ async fn get_webhook_metadata(
     redis: &RedisPool,
     emoji: bool,
 ) -> Result<Option<WebhookMetadata>, ApiError> {
-    let project = crate::database::models::project_item::Project::get_id(
+    let project = crate::database::models::project_item::DBProject::get_id(
         project_id.into(),
         pool,
         redis,
@@ -58,7 +58,7 @@ async fn get_webhook_metadata(
         let mut owner = None;
 
         if let Some(organization_id) = project.inner.organization_id {
-            let organization = crate::database::models::organization_item::Organization::get_id(
+            let organization = crate::database::models::organization_item::DBOrganization::get_id(
                 organization_id,
                 pool,
                 redis,
@@ -71,13 +71,13 @@ async fn get_webhook_metadata(
                     url: format!(
                         "{}/organization/{}",
                         dotenvy::var("SITE_URL").unwrap_or_default(),
-                        organization.slug
+                        to_base62(organization.id.0 as u64)
                     ),
                     icon_url: organization.icon_url,
                 });
             }
         } else {
-            let team = crate::database::models::team_item::TeamMember::get_from_team_full(
+            let team = crate::database::models::team_item::DBTeamMember::get_from_team_full(
                 project.inner.team_id,
                 pool,
                 redis,
@@ -85,7 +85,7 @@ async fn get_webhook_metadata(
             .await?;
 
             if let Some(member) = team.into_iter().find(|x| x.is_owner) {
-                let user = crate::database::models::user_item::User::get_id(
+                let user = crate::database::models::user_item::DBUser::get_id(
                     member.user_id,
                     pool,
                     redis,
@@ -97,7 +97,7 @@ async fn get_webhook_metadata(
                         url: format!(
                             "{}/user/{}",
                             dotenvy::var("SITE_URL").unwrap_or_default(),
-                            user.username
+                            to_base62(user.id.0 as u64)
                         ),
                         name: user.username,
                         icon_url: user.avatar_url,
@@ -145,11 +145,7 @@ async fn get_webhook_metadata(
                 "{}/{}/{}",
                 dotenvy::var("SITE_URL").unwrap_or_default(),
                 project_type,
-                project
-                    .inner
-                    .slug
-                    .clone()
-                    .unwrap_or_else(|| to_base62(project.inner.id.0 as u64))
+                to_base62(project.inner.id.0 as u64)
             ),
             project_title: project.inner.name,
             project_summary: project.inner.summary,
@@ -612,7 +608,7 @@ fn get_gv_range(
     for interval in new_intervals {
         if interval.len() == 2 {
             output.push(format!(
-                "{}—{}",
+                "{}–{}",
                 &game_versions[interval[0][0]].version,
                 &game_versions[interval[1][0]].version
             ))

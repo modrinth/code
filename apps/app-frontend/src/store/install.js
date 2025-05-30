@@ -2,14 +2,14 @@ import { defineStore } from 'pinia'
 import {
   add_project_from_version,
   check_installed,
-  list,
   get,
   get_projects,
+  list,
   remove_project,
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
 import { get_project, get_version_many } from '@/helpers/cache.js'
-import { install as packInstall } from '@/helpers/pack.js'
+import { create_profile_and_install as packInstall } from '@/helpers/pack.js'
 import { trackEvent } from '@/helpers/analytics.js'
 import dayjs from 'dayjs'
 
@@ -23,8 +23,8 @@ export const useInstall = defineStore('installStore', {
     setInstallConfirmModal(ref) {
       this.installConfirmModal = ref
     },
-    showInstallConfirmModal(project, version_id, onInstall) {
-      this.installConfirmModal.show(project, version_id, onInstall)
+    showInstallConfirmModal(project, version_id, onInstall, createInstanceCallback) {
+      this.installConfirmModal.show(project, version_id, onInstall, createInstanceCallback)
     },
     setIncompatibilityWarningModal(ref) {
       this.incompatibilityWarningModal = ref
@@ -41,7 +41,14 @@ export const useInstall = defineStore('installStore', {
   },
 })
 
-export const install = async (projectId, versionId, instancePath, source, callback = () => {}) => {
+export const install = async (
+  projectId,
+  versionId,
+  instancePath,
+  source,
+  callback = () => {},
+  createInstanceCallback = () => {},
+) => {
   const project = await get_project(projectId, 'must_revalidate').catch(handleError)
 
   if (project.project_type === 'modpack') {
@@ -49,7 +56,13 @@ export const install = async (projectId, versionId, instancePath, source, callba
     const packs = await list().catch(handleError)
 
     if (packs.length === 0 || !packs.find((pack) => pack.linked_data?.project_id === project.id)) {
-      await packInstall(project.id, version, project.title, project.icon_url).catch(handleError)
+      await packInstall(
+        project.id,
+        version,
+        project.title,
+        project.icon_url,
+        createInstanceCallback,
+      ).catch(handleError)
 
       trackEvent('PackInstall', {
         id: project.id,
@@ -61,7 +74,7 @@ export const install = async (projectId, versionId, instancePath, source, callba
       callback(version)
     } else {
       const install = useInstall()
-      install.showInstallConfirmModal(project, version, callback)
+      install.showInstallConfirmModal(project, version, callback, createInstanceCallback)
     }
   } else {
     if (instancePath) {

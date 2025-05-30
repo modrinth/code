@@ -2,10 +2,9 @@ use crate::database::models::loader_fields::VersionField;
 use crate::database::models::{project_item, version_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
-use crate::models::ids::ImageId;
+use crate::models::ids::{ImageId, ProjectId, VersionId};
 use crate::models::projects::{
-    Dependency, FileType, Loader, ProjectId, Version, VersionId, VersionStatus,
-    VersionType,
+    Dependency, FileType, Loader, Version, VersionStatus, VersionType,
 };
 use crate::models::v2::projects::LegacyVersion;
 use crate::queue::moderation::AutomatedModerationQueue;
@@ -16,7 +15,7 @@ use crate::routes::{v2_reroute, v3};
 use actix_multipart::Multipart;
 use actix_web::http::header::ContentDisposition;
 use actix_web::web::Data;
-use actix_web::{post, web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, post, web};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sqlx::postgres::PgPool;
@@ -36,7 +35,7 @@ pub struct InitialVersionData {
     pub file_parts: Vec<String>,
     #[validate(
         length(min = 1, max = 32),
-        regex = "crate::util::validate::RE_URL_SAFE"
+        regex(path = *crate::util::validate::RE_URL_SAFE)
     )]
     pub version_number: String,
     #[validate(
@@ -188,7 +187,7 @@ pub async fn version_create(
                 // Handle project type via file extension prediction
                 let mut project_type = None;
                 for file_part in &legacy_create.file_parts {
-                    if let Some(ext) = file_part.split('.').last() {
+                    if let Some(ext) = file_part.split('.').next_back() {
                         match ext {
                             "mrpack" | "mrpack-primary" => {
                                 project_type = Some("modpack");
@@ -289,17 +288,20 @@ async fn get_example_version_fields(
         None => return Ok(None),
     };
 
-    let vid =
-        match project_item::Project::get_id(project_id.into(), &**pool, redis)
-            .await?
-            .and_then(|p| p.versions.first().cloned())
-        {
-            Some(vid) => vid,
-            None => return Ok(None),
-        };
+    let vid = match project_item::DBProject::get_id(
+        project_id.into(),
+        &**pool,
+        redis,
+    )
+    .await?
+    .and_then(|p| p.versions.first().cloned())
+    {
+        Some(vid) => vid,
+        None => return Ok(None),
+    };
 
     let example_version =
-        match version_item::Version::get(vid, &**pool, redis).await? {
+        match version_item::DBVersion::get(vid, &**pool, redis).await? {
             Some(version) => version,
             None => return Ok(None),
         };

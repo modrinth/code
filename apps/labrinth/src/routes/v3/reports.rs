@@ -6,9 +6,7 @@ use crate::database::models::thread_item::{
 };
 use crate::database::redis::RedisPool;
 use crate::models::ids::ImageId;
-use crate::models::ids::{
-    base62_impl::parse_base62, ProjectId, UserId, VersionId,
-};
+use crate::models::ids::{ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
 use crate::models::reports::{ItemType, Report};
@@ -16,7 +14,9 @@ use crate::models::threads::{MessageBody, ThreadType};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::img;
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, web};
+use ariadne::ids::UserId;
+use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use futures::StreamExt;
 use serde::Deserialize;
@@ -87,7 +87,7 @@ pub async fn report_create(
         ))
     })?;
 
-    let mut report = crate::database::models::report_item::Report {
+    let mut report = crate::database::models::report_item::DBReport {
         id,
         report_type_id: report_type,
         project_id: None,
@@ -163,7 +163,7 @@ pub async fn report_create(
             return Err(ApiError::InvalidInput(format!(
                 "Invalid report item type: {}",
                 new_report.item_type.as_str()
-            )))
+            )));
         }
     }
 
@@ -171,7 +171,7 @@ pub async fn report_create(
 
     for image_id in new_report.uploaded_images {
         if let Some(db_image) =
-            image_item::Image::get(image_id.into(), &mut *transaction, &redis)
+            image_item::DBImage::get(image_id.into(), &mut *transaction, &redis)
                 .await?
         {
             let image: Image = db_image.into();
@@ -179,8 +179,7 @@ pub async fn report_create(
                 || image.context.inner_id().is_some()
             {
                 return Err(ApiError::InvalidInput(format!(
-                    "Image {} is not unused and in the 'report' context",
-                    image_id
+                    "Image {image_id} is not unused and in the 'report' context"
                 )));
             }
 
@@ -196,11 +195,10 @@ pub async fn report_create(
             .execute(&mut *transaction)
             .await?;
 
-            image_item::Image::clear_cache(image.id.into(), &redis).await?;
+            image_item::DBImage::clear_cache(image.id.into(), &redis).await?;
         } else {
             return Err(ApiError::InvalidInput(format!(
-                "Image {} could not be found",
-                image_id
+                "Image {image_id} could not be found"
             )));
         }
     }
@@ -274,8 +272,8 @@ pub async fn reports(
             count.count as i64
         )
         .fetch(&**pool)
-        .map_ok(|m| crate::database::models::ids::ReportId(m.id))
-        .try_collect::<Vec<crate::database::models::ids::ReportId>>()
+        .map_ok(|m| crate::database::models::ids::DBReportId(m.id))
+        .try_collect::<Vec<crate::database::models::ids::DBReportId>>()
         .await?
     } else {
         sqlx::query!(
@@ -289,16 +287,17 @@ pub async fn reports(
             count.count as i64
         )
         .fetch(&**pool)
-        .map_ok(|m| crate::database::models::ids::ReportId(m.id))
-        .try_collect::<Vec<crate::database::models::ids::ReportId>>()
+        .map_ok(|m| crate::database::models::ids::DBReportId(m.id))
+        .try_collect::<Vec<crate::database::models::ids::DBReportId>>()
         .await?
     };
 
-    let query_reports = crate::database::models::report_item::Report::get_many(
-        &report_ids,
-        &**pool,
-    )
-    .await?;
+    let query_reports =
+        crate::database::models::report_item::DBReport::get_many(
+            &report_ids,
+            &**pool,
+        )
+        .await?;
 
     let mut reports: Vec<Report> = Vec::new();
 
@@ -321,17 +320,18 @@ pub async fn reports_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let report_ids: Vec<crate::database::models::ids::ReportId> =
+    let report_ids: Vec<crate::database::models::ids::DBReportId> =
         serde_json::from_str::<Vec<crate::models::ids::ReportId>>(&ids.ids)?
             .into_iter()
             .map(|x| x.into())
             .collect();
 
-    let reports_data = crate::database::models::report_item::Report::get_many(
-        &report_ids,
-        &**pool,
-    )
-    .await?;
+    let reports_data =
+        crate::database::models::report_item::DBReport::get_many(
+            &report_ids,
+            &**pool,
+        )
+        .await?;
 
     let user = get_user_from_headers(
         &req,
@@ -356,7 +356,7 @@ pub async fn report_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    info: web::Path<(crate::models::reports::ReportId,)>,
+    info: web::Path<(crate::models::ids::ReportId,)>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -371,7 +371,8 @@ pub async fn report_get(
     let id = info.into_inner().0.into();
 
     let report =
-        crate::database::models::report_item::Report::get(id, &**pool).await?;
+        crate::database::models::report_item::DBReport::get(id, &**pool)
+            .await?;
 
     if let Some(report) = report {
         if !user.role.is_mod() && report.reporter != user.id.into() {
@@ -396,7 +397,7 @@ pub async fn report_edit(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    info: web::Path<(crate::models::reports::ReportId,)>,
+    info: web::Path<(crate::models::ids::ReportId,)>,
     session_queue: web::Data<AuthQueue>,
     edit_report: web::Json<EditReport>,
 ) -> Result<HttpResponse, ApiError> {
@@ -412,7 +413,8 @@ pub async fn report_edit(
     let id = info.into_inner().0.into();
 
     let report =
-        crate::database::models::report_item::Report::get(id, &**pool).await?;
+        crate::database::models::report_item::DBReport::get(id, &**pool)
+            .await?;
 
     if let Some(report) = report {
         if !user.role.is_mod() && report.reporter != user.id.into() {
@@ -429,7 +431,7 @@ pub async fn report_edit(
                 WHERE (id = $2)
                 ",
                 edit_body,
-                id as crate::database::models::ids::ReportId,
+                id as crate::database::models::ids::DBReportId,
             )
             .execute(&mut *transaction)
             .await?;
@@ -462,7 +464,7 @@ pub async fn report_edit(
                 WHERE (id = $2)
                 ",
                 edit_closed,
-                id as crate::database::models::ids::ReportId,
+                id as crate::database::models::ids::DBReportId,
             )
             .execute(&mut *transaction)
             .await?;
@@ -495,7 +497,7 @@ pub async fn report_edit(
 pub async fn report_delete(
     req: HttpRequest,
     pool: web::Data<PgPool>,
-    info: web::Path<(crate::models::reports::ReportId,)>,
+    info: web::Path<(crate::models::ids::ReportId,)>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -514,14 +516,16 @@ pub async fn report_delete(
     let context = ImageContext::Report {
         report_id: Some(id),
     };
-    let uploaded_images =
-        database::models::Image::get_many_contexted(context, &mut transaction)
-            .await?;
+    let uploaded_images = database::models::DBImage::get_many_contexted(
+        context,
+        &mut transaction,
+    )
+    .await?;
     for image in uploaded_images {
-        image_item::Image::remove(image.id, &mut transaction, &redis).await?;
+        image_item::DBImage::remove(image.id, &mut transaction, &redis).await?;
     }
 
-    let result = crate::database::models::report_item::Report::remove_full(
+    let result = crate::database::models::report_item::DBReport::remove_full(
         id.into(),
         &mut transaction,
     )

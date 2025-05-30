@@ -21,8 +21,8 @@ mod state;
 pub use api::*;
 pub use error::*;
 pub use event::{
-    emit::emit_loading, emit::init_loading, EventState, LoadingBar,
-    LoadingBarType,
+    EventState, LoadingBar, LoadingBarType, emit::emit_loading,
+    emit::init_loading,
 };
 pub use logger::start_logger;
 pub use state::State;

@@ -74,8 +74,8 @@
         v-tooltip="$dayjs(updatedAt).format('MMMM D, YYYY [at] h:mm A')"
         class="stat date"
       >
-        <EditIcon aria-hidden="true" />
-        <span class="date-label">Updated </span>{{ fromNow(updatedAt) }}
+        <UpdatedIcon aria-hidden="true" />
+        <span class="date-label">Updated </span>{{ formatRelativeTime(updatedAt) }}
       </div>
       <div
         v-else-if="showCreatedDate"
@@ -83,22 +83,19 @@
         class="stat date"
       >
         <CalendarIcon aria-hidden="true" />
-        <span class="date-label">Published </span>{{ fromNow(createdAt) }}
+        <span class="date-label">Published </span>{{ formatRelativeTime(createdAt) }}
       </div>
     </div>
   </article>
 </template>
 
 <script>
+import { CalendarIcon, UpdatedIcon, DownloadIcon, HeartIcon } from "@modrinth/assets";
 import Categories from "~/components/ui/search/Categories.vue";
 import Badge from "~/components/ui/Badge.vue";
 import EnvironmentIndicator from "~/components/ui/EnvironmentIndicator.vue";
-
-import CalendarIcon from "~/assets/images/utils/calendar.svg?component";
-import EditIcon from "~/assets/images/utils/updated.svg?component";
-import DownloadIcon from "~/assets/images/utils/download.svg?component";
-import HeartIcon from "~/assets/images/utils/heart.svg?component";
 import Avatar from "~/components/ui/Avatar.vue";
+import { useRelativeTime } from "@modrinth/ui";
 
 export default {
   components: {
@@ -107,7 +104,7 @@ export default {
     Categories,
     Badge,
     CalendarIcon,
-    EditIcon,
+    UpdatedIcon,
     DownloadIcon,
     HeartIcon,
   },
@@ -217,8 +214,9 @@ export default {
   },
   setup() {
     const tags = useTags();
+    const formatRelativeTime = useRelativeTime();
 
-    return { tags };
+    return { tags, formatRelativeTime };
   },
   computed: {
     projectTypeDisplay() {

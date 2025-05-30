@@ -12,10 +12,10 @@ use serde_json::json;
 use crate::database::redis::RedisPool;
 
 use super::{
+    DatabaseError, LoaderFieldEnumValueId,
     loader_fields::{
         LoaderFieldEnum, LoaderFieldEnumValue, VersionField, VersionFieldValue,
     },
-    DatabaseError, LoaderFieldEnumValueId,
 };
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
@@ -103,8 +103,7 @@ impl MinecraftGameVersion {
             }
             _ => {
                 return Err(DatabaseError::SchemaError(format!(
-                    "Game version requires field value to be an enum: {:?}",
-                    version_field
+                    "Game version requires field value to be an enum: {version_field:?}"
                 )));
             }
         };

@@ -1,7 +1,7 @@
-use crate::auth::{get_user_from_headers, AuthenticationError};
-use crate::database::models::session_item::Session as DBSession;
+use crate::auth::{AuthenticationError, get_user_from_headers};
+use crate::database::models::DBUserId;
+use crate::database::models::session_item::DBSession;
 use crate::database::models::session_item::SessionBuilder;
-use crate::database::models::UserId;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::models::sessions::Session;
@@ -9,8 +9,8 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::env::parse_var;
 use actix_web::http::header::AUTHORIZATION;
-use actix_web::web::{scope, Data, ServiceConfig};
-use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
+use actix_web::web::{Data, ServiceConfig, scope};
+use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use chrono::Utc;
 use rand::distributions::Alphanumeric;
 use rand::{Rng, SeedableRng};
@@ -61,7 +61,7 @@ pub async fn get_session_metadata(
         .headers()
         .get("user-agent")
         .and_then(|x| x.to_str().ok())
-        .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+        .unwrap_or("No user agent");
 
     let parser = Parser::new();
     let info = parser.parse(user_agent);
@@ -85,7 +85,7 @@ pub async fn get_session_metadata(
 
 pub async fn issue_session(
     req: HttpRequest,
-    user_id: UserId,
+    user_id: DBUserId,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     redis: &RedisPool,
 ) -> Result<DBSession, AuthenticationError> {

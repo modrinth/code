@@ -1,11 +1,11 @@
-export interface Mod {
-  id: string;
-  filename: string;
-  modrinth_ids: {
-    project_id: string;
-    version_id: string;
-  };
-}
+// export interface Mod {
+//   id: string;
+//   filename: string;
+//   modrinth_ids: {
+//     project_id: string;
+//     version_id: string;
+//   };
+// }
 
 interface License {
   id: string;
@@ -149,6 +149,17 @@ export type ServerState = "running" | "stopped" | "crashed";
 //   state: ServerState;
 // }
 
+export type Loaders =
+  | "Fabric"
+  | "Quilt"
+  | "Forge"
+  | "NeoForge"
+  | "Paper"
+  | "Spigot"
+  | "Bukkit"
+  | "Vanilla"
+  | "Purpur";
+
 export interface WSLogEvent {
   event: "log";
   message: string;
@@ -201,6 +212,57 @@ export interface WSNewModEvent {
   event: "new-mod";
 }
 
+export type WSBackupTask = "file" | "create" | "restore";
+export type WSBackupState = "ongoing" | "done" | "failed" | "cancelled" | "unchanged";
+
+export interface WSBackupProgressEvent {
+  event: "backup-progress";
+  task: WSBackupTask;
+  id: string;
+  progress: number; // percentage
+  state: WSBackupState;
+  ready: boolean;
+}
+
+export type FSQueuedOpUnarchive = {
+  op: "unarchive";
+  src: string;
+};
+
+export type FSQueuedOp = FSQueuedOpUnarchive;
+
+export type FSOpUnarchive = {
+  op: "unarchive";
+  progress: number; // Note: 1 does not mean it's done
+  id: string; // UUID
+
+  mime: string;
+  src: string;
+  state:
+    | "queued"
+    | "ongoing"
+    | "cancelled"
+    | "done"
+    | "failed-corrupted"
+    | "failed-invalid-path"
+    | "failed-cf-no-serverpack"
+    | "failed-cf-not-available"
+    | "failed-not-reachable";
+
+  current_file: string | null;
+  failed_path?: string;
+  bytes_processed: number;
+  files_processed: number;
+  started: string;
+};
+
+export type FilesystemOp = FSOpUnarchive;
+
+export interface WSFilesystemOpsEvent {
+  event: "filesystem-ops";
+  all: FilesystemOp[];
+}
+
 export type WSEvent =
   | WSLogEvent
   | WSStatsEvent
@@ -210,7 +272,9 @@ export type WSEvent =
   | WSInstallationResultEvent
   | WSAuthOkEvent
   | WSUptimeEvent
-  | WSNewModEvent;
+  | WSNewModEvent
+  | WSBackupProgressEvent
+  | WSFilesystemOpsEvent;
 
 export interface Servers {
   servers: Server[];

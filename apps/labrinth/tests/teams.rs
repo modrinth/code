@@ -3,7 +3,7 @@ use actix_http::StatusCode;
 use common::{
     api_v3::ApiV3,
     environment::{
-        with_test_environment, with_test_environment_all, TestEnvironment,
+        TestEnvironment, with_test_environment, with_test_environment_all,
     },
 };
 use labrinth::models::teams::{OrganizationPermissions, ProjectPermissions};

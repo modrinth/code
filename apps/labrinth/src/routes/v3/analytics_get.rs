@@ -6,18 +6,20 @@ use crate::{
     auth::get_user_from_headers,
     database::models::user_item,
     models::{
-        ids::{base62_impl::to_base62, ProjectId, VersionId},
+        ids::{ProjectId, VersionId},
         pats::Scopes,
     },
     queue::session::AuthQueue,
 };
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, web};
+use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Duration, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::postgres::types::PgInterval;
 use sqlx::PgPool;
+use sqlx::postgres::types::PgInterval;
 use std::collections::HashMap;
 use std::convert::TryInto;
+use std::num::NonZeroU32;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -47,7 +49,7 @@ pub struct GetData {
     pub start_date: Option<DateTime<Utc>>, // defaults to 2 weeks ago
     pub end_date: Option<DateTime<Utc>>,   // defaults to now
 
-    pub resolution_minutes: Option<u32>, // defaults to 1 day. Ignored in routes that do not aggregate over a resolution (eg: /countries)
+    pub resolution_minutes: Option<NonZeroU32>, // defaults to 1 day. Ignored in routes that do not aggregate over a resolution (eg: /countries)
 }
 
 /// Get playtime data for a set of projects or versions
@@ -93,7 +95,9 @@ pub async fn playtimes_get(
 
     let start_date = data.start_date.unwrap_or(Utc::now() - Duration::weeks(2));
     let end_date = data.end_date.unwrap_or(Utc::now());
-    let resolution_minutes = data.resolution_minutes.unwrap_or(60 * 24);
+    let resolution_minutes = data
+        .resolution_minutes
+        .map_or(60 * 24, |minutes| minutes.get());
 
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
@@ -160,7 +164,9 @@ pub async fn views_get(
 
     let start_date = data.start_date.unwrap_or(Utc::now() - Duration::weeks(2));
     let end_date = data.end_date.unwrap_or(Utc::now());
-    let resolution_minutes = data.resolution_minutes.unwrap_or(60 * 24);
+    let resolution_minutes = data
+        .resolution_minutes
+        .map_or(60 * 24, |minutes| minutes.get());
 
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
@@ -227,7 +233,9 @@ pub async fn downloads_get(
 
     let start_date = data.start_date.unwrap_or(Utc::now() - Duration::weeks(2));
     let end_date = data.end_date.unwrap_or(Utc::now());
-    let resolution_minutes = data.resolution_minutes.unwrap_or(60 * 24);
+    let resolution_minutes = data
+        .resolution_minutes
+        .map_or(60 * 24, |minutes| minutes.get());
 
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
@@ -294,7 +302,9 @@ pub async fn revenue_get(
 
     let start_date = data.start_date.unwrap_or(Utc::now() - Duration::weeks(2));
     let end_date = data.end_date.unwrap_or(Utc::now());
-    let resolution_minutes = data.resolution_minutes.unwrap_or(60 * 24);
+    let resolution_minutes = data
+        .resolution_minutes
+        .map_or(60 * 24, |minutes| minutes.get());
 
     // Round up/down to nearest duration as we are using pgadmin, does not have rounding in the fetch command
     // Round start_date down to nearest resolution
@@ -568,7 +578,7 @@ async fn filter_allowed_ids(
     // If no project_ids or version_ids are provided, we default to all projects the user has *public* access to
     if project_ids.is_none() && !remove_defaults.unwrap_or(false) {
         project_ids = Some(
-            user_item::User::get_projects(user.id.into(), &***pool, redis)
+            user_item::DBUser::get_projects(user.id.into(), &***pool, redis)
                 .await?
                 .into_iter()
                 .map(|x| ProjectId::from(x).to_string())
@@ -579,7 +589,7 @@ async fn filter_allowed_ids(
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
     let project_ids = if let Some(project_strings) = project_ids {
-        let projects_data = database::models::Project::get_many(
+        let projects_data = database::models::DBProject::get_many(
             &project_strings,
             &***pool,
             redis,
@@ -589,9 +599,9 @@ async fn filter_allowed_ids(
         let team_ids = projects_data
             .iter()
             .map(|x| x.inner.team_id)
-            .collect::<Vec<database::models::TeamId>>();
+            .collect::<Vec<database::models::DBTeamId>>();
         let team_members =
-            database::models::TeamMember::get_from_team_full_many(
+            database::models::DBTeamMember::get_from_team_full_many(
                 &team_ids, &***pool, redis,
             )
             .await?;
@@ -599,8 +609,8 @@ async fn filter_allowed_ids(
         let organization_ids = projects_data
             .iter()
             .filter_map(|x| x.inner.organization_id)
-            .collect::<Vec<database::models::OrganizationId>>();
-        let organizations = database::models::Organization::get_many_ids(
+            .collect::<Vec<database::models::DBOrganizationId>>();
+        let organizations = database::models::DBOrganization::get_many_ids(
             &organization_ids,
             &***pool,
             redis,
@@ -610,9 +620,9 @@ async fn filter_allowed_ids(
         let organization_team_ids = organizations
             .iter()
             .map(|x| x.team_id)
-            .collect::<Vec<database::models::TeamId>>();
+            .collect::<Vec<database::models::DBTeamId>>();
         let organization_team_members =
-            database::models::TeamMember::get_from_team_full_many(
+            database::models::DBTeamMember::get_from_team_full_many(
                 &organization_team_ids,
                 &***pool,
                 redis,

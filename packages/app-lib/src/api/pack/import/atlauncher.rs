@@ -3,6 +3,7 @@ use std::{collections::HashMap, path::PathBuf};
 use serde::{Deserialize, Serialize};
 
 use crate::{
+    State,
     pack::{
         self,
         import::{self, copy_dotminecraft},
@@ -11,7 +12,6 @@ use crate::{
     prelude::ModLoader,
     state::{LinkedData, ProfileInstallStage},
     util::io,
-    State,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -162,7 +162,7 @@ pub async fn import_atlauncher(
         profile_path: profile_path.to_string(),
     };
 
-    let backup_name = format!("ATLauncher-{}", instance_folder);
+    let backup_name = format!("ATLauncher-{instance_folder}");
     let minecraft_folder = atlauncher_instance_path;
 
     import_atlauncher_unmanaged(
@@ -190,8 +190,7 @@ async fn import_atlauncher_unmanaged(
     let mod_loader: ModLoader = serde_json::from_str::<ModLoader>(&mod_loader)
         .map_err(|_| {
             crate::ErrorKind::InputError(format!(
-                "Could not parse mod loader type: {}",
-                mod_loader
+                "Could not parse mod loader type: {mod_loader}"
             ))
         })?;
 

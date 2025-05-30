@@ -1,12 +1,8 @@
-use crate::models::ids::{Base62Id, UserId};
+use crate::models::ids::PayoutId;
+use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Debug)]
-#[serde(from = "Base62Id")]
-#[serde(into = "Base62Id")]
-pub struct PayoutId(pub u64);
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Payout {
@@ -26,7 +22,7 @@ pub struct Payout {
 }
 
 impl Payout {
-    pub fn from(data: crate::database::models::payout_item::Payout) -> Self {
+    pub fn from(data: crate::database::models::payout_item::DBPayout) -> Self {
         Self {
             id: data.id.into(),
             user_id: data.user_id.into(),

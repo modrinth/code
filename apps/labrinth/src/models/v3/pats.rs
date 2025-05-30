@@ -1,14 +1,8 @@
-use super::ids::Base62Id;
 use crate::bitflags_serde_impl;
-use crate::models::ids::UserId;
+use crate::models::ids::PatId;
+use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-
-/// The ID of a team
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Hash, Debug)]
-#[serde(from = "Base62Id")]
-#[serde(into = "Base62Id")]
-pub struct PatId(pub u64);
 
 bitflags::bitflags! {
     #[derive(Copy, Clone, Debug)]
@@ -161,7 +155,7 @@ pub struct PersonalAccessToken {
 
 impl PersonalAccessToken {
     pub fn from(
-        data: crate::database::models::pat_item::PersonalAccessToken,
+        data: crate::database::models::pat_item::DBPersonalAccessToken,
         include_token: bool,
     ) -> Self {
         Self {

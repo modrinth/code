@@ -1,24 +1,21 @@
-use super::version_creation::{try_create_version_fields, InitialVersionData};
-use crate::auth::{get_user_from_headers, AuthenticationError};
+use super::version_creation::{InitialVersionData, try_create_version_fields};
+use crate::auth::{AuthenticationError, get_user_from_headers};
 use crate::database::models::loader_fields::{
     Loader, LoaderField, LoaderFieldEnumValue,
 };
 use crate::database::models::thread_item::ThreadBuilder;
-use crate::database::models::{self, image_item, User};
+use crate::database::models::{self, DBUser, image_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostingError};
 use crate::models::error::ApiError;
-use crate::models::ids::base62_impl::to_base62;
-use crate::models::ids::{ImageId, OrganizationId};
+use crate::models::ids::{ImageId, OrganizationId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    License, Link, MonetizationStatus, ProjectId, ProjectStatus, VersionId,
-    VersionStatus,
+    License, Link, MonetizationStatus, ProjectStatus, VersionStatus,
 };
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
-use crate::models::users::UserId;
 use crate::queue::session::AuthQueue;
 use crate::search::indexing::IndexingError;
 use crate::util::img::upload_image_optimized;
@@ -28,6 +25,8 @@ use actix_multipart::{Field, Multipart};
 use actix_web::http::StatusCode;
 use actix_web::web::{self, Data};
 use actix_web::{HttpRequest, HttpResponse};
+use ariadne::ids::UserId;
+use ariadne::ids::base62_impl::to_base62;
 use chrono::Utc;
 use futures::stream::StreamExt;
 use image::ImageError;
@@ -86,8 +85,6 @@ pub enum CreateError {
     CustomAuthenticationError(String),
     #[error("Image Parsing Error: {0}")]
     ImageError(#[from] ImageError),
-    #[error("Reroute Error: {0}")]
-    RerouteError(#[from] reqwest::Error),
 }
 
 impl actix_web::ResponseError for CreateError {
@@ -119,7 +116,6 @@ impl actix_web::ResponseError for CreateError {
             CreateError::ValidationError(..) => StatusCode::BAD_REQUEST,
             CreateError::FileValidationError(..) => StatusCode::BAD_REQUEST,
             CreateError::ImageError(..) => StatusCode::BAD_REQUEST,
-            CreateError::RerouteError(..) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 
@@ -146,7 +142,6 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::ValidationError(..) => "invalid_input",
                 CreateError::FileValidationError(..) => "invalid_input",
                 CreateError::ImageError(..) => "invalid_image",
-                CreateError::RerouteError(..) => "reroute_error",
             },
             description: self.to_string(),
         })
@@ -172,7 +167,7 @@ pub struct ProjectCreateData {
     pub name: String,
     #[validate(
         length(min = 3, max = 64),
-        regex = "crate::util::validate::RE_URL_SAFE"
+        regex(path = *crate::util::validate::RE_URL_SAFE)
     )]
     #[serde(alias = "mod_slug")]
     /// The slug of a project, used for vanity URLs
@@ -186,8 +181,7 @@ pub struct ProjectCreateData {
     /// A long description of the project, in markdown.
     pub description: String,
 
-    #[validate(length(max = 32))]
-    #[validate]
+    #[validate(nested, length(max = 32))]
     /// A list of initial versions to upload with the created project
     pub initial_versions: Vec<InitialVersionData>,
     #[validate(length(max = 3))]
@@ -213,8 +207,7 @@ pub struct ProjectCreateData {
     /// The license id that the project follows
     pub license_id: String,
 
-    #[validate(length(max = 64))]
-    #[validate]
+    #[validate(nested, length(max = 64))]
     /// The multipart names of the gallery items to upload
     pub gallery_items: Option<Vec<NewGalleryItem>>,
     #[serde(default = "default_requested_status")]
@@ -377,8 +370,7 @@ async fn project_create_inner(
                 )))
             })?;
 
-        let content_disposition = field.content_disposition();
-        let name = content_disposition.get_name().ok_or_else(|| {
+        let name = field.name().ok_or_else(|| {
             CreateError::MissingValueError(String::from("Missing content name"))
         })?;
 
@@ -404,13 +396,13 @@ async fn project_create_inner(
             serde_json::from_str(&format!("\"{}\"", create_data.slug)).ok();
 
         if let Some(slug_project_id) = slug_project_id_option {
-            let slug_project_id: models::ids::ProjectId =
+            let slug_project_id: models::ids::DBProjectId =
                 slug_project_id.into();
             let results = sqlx::query!(
                 "
                 SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)
                 ",
-                slug_project_id as models::ids::ProjectId
+                slug_project_id as models::ids::DBProjectId
             )
             .fetch_one(&mut **transaction)
             .await
@@ -476,7 +468,7 @@ async fn project_create_inner(
         }
 
         let result = async {
-            let content_disposition = field.content_disposition().clone();
+            let content_disposition = field.content_disposition().unwrap().clone();
 
             let name = content_disposition.get_name().ok_or_else(|| {
                 CreateError::MissingValueError("Missing content name".to_string())
@@ -654,7 +646,7 @@ async fn project_create_inner(
         let mut members = vec![];
 
         if let Some(organization_id) = project_create_data.organization_id {
-            let org = models::Organization::get_id(
+            let org = models::DBOrganization::get_id(
                 organization_id.into(),
                 pool,
                 redis,
@@ -666,7 +658,7 @@ async fn project_create_inner(
                 )
             })?;
 
-            let team_member = models::TeamMember::get_from_user_id(
+            let team_member = models::DBTeamMember::get_from_user_id(
                 org.team_id,
                 current_user.id.into(),
                 pool,
@@ -781,7 +773,7 @@ async fn project_create_inner(
             link_urls,
             gallery_items: gallery_urls
                 .iter()
-                .map(|x| models::project_item::GalleryItem {
+                .map(|x| models::project_item::DBGalleryItem {
                     image_url: x.url.clone(),
                     raw_image_url: x.raw_url.clone(),
                     featured: x.featured,
@@ -799,10 +791,10 @@ async fn project_create_inner(
         let now = Utc::now();
 
         let id = project_builder_actual.insert(&mut *transaction).await?;
-        User::clear_project_cache(&[current_user.id.into()], redis).await?;
+        DBUser::clear_project_cache(&[current_user.id.into()], redis).await?;
 
         for image_id in project_create_data.uploaded_images {
-            if let Some(db_image) = image_item::Image::get(
+            if let Some(db_image) = image_item::DBImage::get(
                 image_id.into(),
                 &mut **transaction,
                 redis,
@@ -814,8 +806,7 @@ async fn project_create_inner(
                     || image.context.inner_id().is_some()
                 {
                     return Err(CreateError::InvalidInput(format!(
-                        "Image {} is not unused and in the 'project' context",
-                        image_id
+                        "Image {image_id} is not unused and in the 'project' context"
                     )));
                 }
 
@@ -825,17 +816,17 @@ async fn project_create_inner(
                     SET mod_id = $1
                     WHERE id = $2
                     ",
-                    id as models::ids::ProjectId,
+                    id as models::ids::DBProjectId,
                     image_id.0 as i64
                 )
                 .execute(&mut **transaction)
                 .await?;
 
-                image_item::Image::clear_cache(image.id.into(), redis).await?;
+                image_item::DBImage::clear_cache(image.id.into(), redis)
+                    .await?;
             } else {
                 return Err(CreateError::InvalidInput(format!(
-                    "Image {} does not exist",
-                    image_id
+                    "Image {image_id} does not exist"
                 )));
             }
         }

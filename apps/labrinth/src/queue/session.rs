@@ -1,7 +1,7 @@
-use crate::database::models::pat_item::PersonalAccessToken;
-use crate::database::models::session_item::Session;
+use crate::database::models::pat_item::DBPersonalAccessToken;
+use crate::database::models::session_item::DBSession;
 use crate::database::models::{
-    DatabaseError, OAuthAccessTokenId, PatId, SessionId, UserId,
+    DBOAuthAccessTokenId, DBPatId, DBSessionId, DBUserId, DatabaseError,
 };
 use crate::database::redis::RedisPool;
 use crate::routes::internal::session::SessionMetadata;
@@ -12,9 +12,9 @@ use std::collections::{HashMap, HashSet};
 use tokio::sync::Mutex;
 
 pub struct AuthQueue {
-    session_queue: Mutex<HashMap<SessionId, SessionMetadata>>,
-    pat_queue: Mutex<HashSet<PatId>>,
-    oauth_access_token_queue: Mutex<HashSet<OAuthAccessTokenId>>,
+    session_queue: Mutex<HashMap<DBSessionId, SessionMetadata>>,
+    pat_queue: Mutex<HashSet<DBPatId>>,
+    oauth_access_token_queue: Mutex<HashSet<DBOAuthAccessTokenId>>,
 }
 
 impl Default for AuthQueue {
@@ -32,22 +32,26 @@ impl AuthQueue {
             oauth_access_token_queue: Mutex::new(HashSet::with_capacity(1000)),
         }
     }
-    pub async fn add_session(&self, id: SessionId, metadata: SessionMetadata) {
+    pub async fn add_session(
+        &self,
+        id: DBSessionId,
+        metadata: SessionMetadata,
+    ) {
         self.session_queue.lock().await.insert(id, metadata);
     }
 
-    pub async fn add_pat(&self, id: PatId) {
+    pub async fn add_pat(&self, id: DBPatId) {
         self.pat_queue.lock().await.insert(id);
     }
 
     pub async fn add_oauth_access_token(
         &self,
-        id: crate::database::models::OAuthAccessTokenId,
+        id: crate::database::models::DBOAuthAccessTokenId,
     ) {
         self.oauth_access_token_queue.lock().await.insert(id);
     }
 
-    pub async fn take_sessions(&self) -> HashMap<SessionId, SessionMetadata> {
+    pub async fn take_sessions(&self) -> HashMap<DBSessionId, SessionMetadata> {
         let mut queue = self.session_queue.lock().await;
         let len = queue.len();
 
@@ -87,7 +91,7 @@ impl AuthQueue {
                     SET last_login = $2, city = $3, country = $4, ip = $5, os = $6, platform = $7, user_agent = $8
                     WHERE (id = $1)
                     ",
-                    id as SessionId,
+                    id as DBSessionId,
                     Utc::now(),
                     metadata.city,
                     metadata.country,
@@ -109,8 +113,8 @@ impl AuthQueue {
                 "
             )
             .fetch(&mut *transaction)
-            .map_ok(|x| (SessionId(x.id), x.session, UserId(x.user_id)))
-            .try_collect::<Vec<(SessionId, String, UserId)>>()
+            .map_ok(|x| (DBSessionId(x.id), x.session, DBUserId(x.user_id)))
+            .try_collect::<Vec<(DBSessionId, String, DBUserId)>>()
             .await?;
 
             for (id, session, user_id) in expired_ids {
@@ -119,10 +123,10 @@ impl AuthQueue {
                     Some(session),
                     Some(user_id),
                 ));
-                Session::remove(id, &mut transaction).await?;
+                DBSession::remove(id, &mut transaction).await?;
             }
 
-            Session::clear_cache(clear_cache_sessions, redis).await?;
+            DBSession::clear_cache(clear_cache_sessions, redis).await?;
 
             let ids = pat_queue.iter().map(|id| id.0).collect_vec();
             let clear_cache_pats = pat_queue
@@ -149,7 +153,7 @@ impl AuthQueue {
             .await?;
 
             transaction.commit().await?;
-            PersonalAccessToken::clear_cache(clear_cache_pats, redis).await?;
+            DBPersonalAccessToken::clear_cache(clear_cache_pats, redis).await?;
         }
 
         Ok(())
@@ -157,7 +161,7 @@ impl AuthQueue {
 }
 
 async fn update_oauth_access_token_last_used(
-    oauth_access_token_queue: HashSet<OAuthAccessTokenId>,
+    oauth_access_token_queue: HashSet<DBOAuthAccessTokenId>,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
 ) -> Result<(), DatabaseError> {
     let ids = oauth_access_token_queue.iter().map(|id| id.0).collect_vec();

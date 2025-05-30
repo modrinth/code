@@ -1,210 +1,116 @@
 <template>
-  <NewModal ref="editModal" header="Select modpack">
-    <UiServersProjectSelect type="modpack" @select="reinstallNew" />
-  </NewModal>
-
-  <NewModal
+  <LazyUiServersPlatformVersionSelectModal
     ref="versionSelectModal"
-    :header="isSecondPhase ? 'Confirm reinstallation' : 'Select version'"
-    @hide="onHide"
-    @show="onShow"
-  >
-    <div class="flex flex-col gap-4 md:w-[600px]">
-      <p
-        :style="{
-          lineHeight: isSecondPhase ? '1.5' : undefined,
-          marginBottom: isSecondPhase ? '-12px' : '0',
-          marginTop: isSecondPhase ? '-4px' : '-2px',
-        }"
-      >
-        {{
-          isSecondPhase
-            ? "This will reinstall your server and erase all data. You may want to back up your server before proceeding. Are you sure you want to continue?"
-            : "Choose the version of Minecraft you want to use for this server."
-        }}
-      </p>
-      <div v-if="!isSecondPhase" class="flex flex-col gap-2">
-        <UiServersTeleportDropdownMenu
-          v-model="selectedMCVersion"
-          name="mcVersion"
-          :options="mcVersions"
-          placeholder="Select Minecraft version..."
-        />
-        <UiServersTeleportDropdownMenu
-          v-if="selectedMCVersion && selectedLoader.toLowerCase() !== 'vanilla'"
-          v-model="selectedLoaderVersion"
-          name="loaderVersion"
-          :options="selectedLoaderVersions"
-          placeholder="Select loader version..."
-        />
-        <div class="mt-2 flex items-center gap-2">
-          <input
-            id="hard-reset"
-            :checked="hardReset"
-            class="switch stylized-toggle"
-            type="checkbox"
-            @change="hardReset = ($event.target as HTMLInputElement).checked"
-          />
-          <label for="hard-reset">Clean reinstall</label>
-        </div>
-      </div>
-      <div class="mt-4 flex justify-start gap-4">
-        <ButtonStyled :color="isDangerous ? 'red' : 'brand'">
-          <button :disabled="canInstall" @click="handleReinstall">
-            <RightArrowIcon />
-            {{
-              isSecondPhase
-                ? "Erase and install"
-                : loadingServerCheck
-                  ? "Loading..."
-                  : isDangerous
-                    ? "Erase and install"
-                    : "Install"
-            }}
-          </button>
-        </ButtonStyled>
-        <ButtonStyled>
-          <button
-            :disabled="isLoading"
-            @click="
-              if (isSecondPhase) {
-                isSecondPhase = false;
-              } else {
-                versionSelectModal?.hide();
-              }
-            "
-          >
-            <XIcon />
-            {{ isSecondPhase ? "No" : "Cancel" }}
-          </button>
-        </ButtonStyled>
-      </div>
-    </div>
-  </NewModal>
+    :server="props.server"
+    :current-loader="data?.loader as Loaders"
+    :backup-in-progress="backupInProgress"
+    @reinstall="emit('reinstall', $event)"
+  />
 
-  <NewModal ref="mrpackModal" header="Upload mrpack" @hide="onHide" @show="onShow">
-    <div>
-      <div class="mt-2 flex items-center gap-2">
-        <input
-          id="hard-reset"
-          :checked="hardReset"
-          class="switch stylized-toggle"
-          type="checkbox"
-          @change="hardReset = ($event.target as HTMLInputElement).checked"
-        />
-        <label for="hard-reset">Clean reinstall</label>
-      </div>
-      <input
-        type="file"
-        accept=".mrpack"
-        class="mt-4"
-        :disabled="isLoading"
-        @change="uploadMrpack"
-      />
-      <div class="mt-4 flex justify-start gap-4">
-        <ButtonStyled :color="isDangerous ? 'red' : 'brand'">
-          <button :disabled="!mrpackFile || isLoading" @click="reinstallMrpack">
-            <RightArrowIcon />
-            {{
-              isSecondPhase
-                ? "Erase and install"
-                : loadingServerCheck
-                  ? "Loading..."
-                  : isDangerous
-                    ? "Erase and install"
-                    : "Install"
-            }}
-          </button>
-        </ButtonStyled>
-        <ButtonStyled>
-          <button :disabled="isLoading" @click="mrpackModal?.hide">
-            <XIcon />
-            Cancel
-          </button>
-        </ButtonStyled>
-      </div>
-    </div>
-  </NewModal>
+  <LazyUiServersPlatformMrpackModal
+    ref="mrpackModal"
+    :server="props.server"
+    @reinstall="emit('reinstall', $event)"
+  />
+
+  <LazyUiServersPlatformChangeModpackVersionModal
+    ref="modpackVersionModal"
+    :server="props.server"
+    :project="data?.project"
+    :versions="Array.isArray(versions) ? versions : []"
+    :current-version="currentVersion"
+    :current-version-id="data?.upstream?.version_id"
+    :server-status="data?.status"
+    @reinstall="emit('reinstall')"
+  />
 
   <div class="flex h-full w-full flex-col">
     <div v-if="data && versions" class="flex w-full flex-col">
       <div class="card flex flex-col gap-4">
-        <div class="flex flex-row items-center justify-between gap-2">
-          <h2 class="m-0 text-lg font-bold text-contrast">Modpack</h2>
+        <div class="flex select-none flex-col items-center justify-between gap-2 lg:flex-row">
+          <div class="flex flex-row items-center gap-2">
+            <h2 class="m-0 text-lg font-bold text-contrast">Modpack</h2>
+            <div
+              v-if="updateAvailable"
+              class="rounded-full bg-bg-orange px-2 py-1 text-xs font-medium text-orange"
+            >
+              <span>Update available</span>
+            </div>
+          </div>
           <div v-if="data.upstream" class="flex gap-4">
             <ButtonStyled>
-              <nuxt-link
-                :class="{
-                  'looks-disabled': props.server.general?.status === 'installing' && isError,
-                }"
-                :to="`/modpacks?sid=${props.server.serverId}`"
+              <button
+                class="!w-full sm:!w-auto"
+                :disabled="isInstalling"
+                @click="mrpackModal.show()"
               >
-                <TransferIcon class="size-4" />
-                Change modpack
-              </nuxt-link>
-            </ButtonStyled>
-            <ButtonStyled>
-              <button class="!w-full sm:!w-auto" @click="mrpackModal.show()">
-                <UploadIcon class="size-4" /> Upload .mrpack file
+                <UploadIcon class="size-4" /> Import .mrpack
               </button>
+            </ButtonStyled>
+            <!-- dumb hack to make a button link not a link -->
+            <ButtonStyled>
+              <template v-if="isInstalling">
+                <button :disabled="isInstalling">
+                  <TransferIcon class="size-4" />
+                  Switch modpack
+                </button>
+              </template>
+              <nuxt-link v-else :to="`/modpacks?sid=${props.server.serverId}`">
+                <TransferIcon class="size-4" />
+                Switch modpack
+              </nuxt-link>
             </ButtonStyled>
           </div>
         </div>
-        <div
-          v-if="data.upstream"
-          class="flex w-full justify-between gap-2 rounded-3xl bg-table-alternateRow p-4"
-        >
-          <div class="flex flex-col gap-4 sm:flex-row">
-            <UiAvatar :src="data.project?.icon_url" size="120px" />
-
-            <div class="flex flex-col justify-between">
-              <div class="flex flex-col gap-2">
-                <h1 class="m-0 flex gap-2 text-2xl font-extrabold leading-none text-contrast">
-                  {{ data.project?.title }}
-                </h1>
-                <span class="text-md text-secondary">
-                  {{
-                    data.project?.description && data.project.description.length > 150
-                      ? data.project.description.substring(0, 150) + "..."
-                      : data.project?.description || ""
-                  }}
-                </span>
-              </div>
-              <div
-                class="mt-2 flex w-full max-w-[24rem] flex-col items-center gap-2 sm:mt-0 sm:flex-row"
-              >
-                <UiServersTeleportDropdownMenu
-                  v-if="versions && Array.isArray(versions) && versions.length > 0"
-                  v-model="version"
-                  :options="options"
-                  placeholder="Change version"
-                  name="version"
-                />
-                <ButtonStyled>
-                  <button
-                    :disabled="
-                      isLoading || (props.server.general?.status === 'installing' && isError)
-                    "
-                    class="!w-full sm:!w-auto"
-                    @click="reinstallCurrent"
-                  >
-                    <DownloadIcon class="size-4" />
-                    Reinstall
-                  </button>
-                </ButtonStyled>
-              </div>
-            </div>
+        <div v-if="data.upstream" class="flex flex-col gap-2">
+          <div
+            v-if="versionsError || currentVersionError"
+            class="rounded-2xl border border-solid border-red p-4 text-contrast"
+          >
+            <p class="m-0 font-bold">Something went wrong while loading your modpack.</p>
+            <p class="m-0 mb-2 mt-1 text-sm">
+              {{ versionsError || currentVersionError }}
+            </p>
+            <ButtonStyled>
+              <button :disabled="isInstalling" @click="refreshData">Retry</button>
+            </ButtonStyled>
           </div>
+
+          <NewProjectCard
+            v-if="!versionsError && !currentVersionError"
+            class="!cursor-default !bg-bg !filter-none"
+            :project="projectCardData"
+            :categories="data.project?.categories || []"
+          >
+            <template #actions>
+              <ButtonStyled color="brand">
+                <button :disabled="isInstalling" @click="modpackVersionModal.show()">
+                  <SettingsIcon class="size-4" />
+                  Change version
+                </button>
+              </ButtonStyled>
+            </template>
+          </NewProjectCard>
         </div>
         <div v-else class="flex w-full flex-col items-center gap-2 sm:w-fit sm:flex-row">
           <ButtonStyled>
-            <nuxt-link class="!w-full sm:!w-auto" :to="`/modpacks?sid=${props.server.serverId}`">
-              <DownloadIcon class="size-4" /> Install a modpack
+            <nuxt-link
+              v-tooltip="backupInProgress ? formatMessage(backupInProgress.tooltip) : undefined"
+              :class="{ disabled: backupInProgress }"
+              class="!w-full sm:!w-auto"
+              :to="`/modpacks?sid=${props.server.serverId}`"
+            >
+              <CompassIcon class="size-4" /> Find a modpack
             </nuxt-link>
           </ButtonStyled>
           <span class="hidden sm:block">or</span>
           <ButtonStyled>
-            <button class="!w-full sm:!w-auto" @click="mrpackModal.show()">
+            <button
+              v-tooltip="backupInProgress ? formatMessage(backupInProgress.tooltip) : undefined"
+              :disabled="!!backupInProgress"
+              class="!w-full sm:!w-auto"
+              @click="mrpackModal.show()"
+            >
               <UploadIcon class="size-4" /> Upload .mrpack file
             </button>
           </ButtonStyled>
@@ -213,398 +119,151 @@
 
       <div class="card flex flex-col gap-4">
         <div class="flex flex-col gap-2">
-          <h2 class="m-0 text-lg font-bold text-contrast">Mod loader</h2>
-          <p class="m-0">Mod loaders allow you to run mods on your server.</p>
+          <h2 class="m-0 text-lg font-bold text-contrast">Platform</h2>
+          <p class="m-0">Your server's platform is the software that runs mods and plugins.</p>
           <div v-if="data.upstream" class="mt-2 flex items-center gap-2">
             <InfoIcon class="hidden sm:block" />
             <span class="text-sm text-secondary">
-              Your server was installed from a modpack, which automatically chooses the appropriate
-              mod loader.
+              The current platform was automatically selected based on your modpack.
             </span>
           </div>
         </div>
         <div
-          class="flex w-full flex-col gap-1 rounded-2xl bg-table-alternateRow p-2"
+          class="flex w-full flex-col gap-1 rounded-2xl"
           :class="{
             'pointer-events-none cursor-not-allowed select-none opacity-50':
-              props.server.general?.status === 'installing' && isError,
+              props.server.general?.status === 'installing',
           }"
           :tabindex="props.server.general?.status === 'installing' ? -1 : 0"
         >
-          <UiServersLoaderSelector :data="data" @select-loader="selectLoader" />
+          <UiServersLoaderSelector
+            :data="data"
+            :is-installing="isInstalling"
+            @select-loader="selectLoader"
+          />
         </div>
       </div>
     </div>
 
-    <UiServersPyroLoading v-else />
+    <div v-else />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, NewModal } from "@modrinth/ui";
-import {
-  TransferIcon,
-  DownloadIcon,
-  UploadIcon,
-  InfoIcon,
-  RightArrowIcon,
-  XIcon,
-} from "@modrinth/assets";
+import { ButtonStyled, NewProjectCard } from "@modrinth/ui";
+import { TransferIcon, UploadIcon, InfoIcon, CompassIcon, SettingsIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
+import type { Loaders } from "~/types/servers";
+import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
 
-const route = useNativeRoute();
-const serverId = route.params.id as string;
+const { formatMessage } = useVIntl();
 
 const props = defineProps<{
-  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  backupInProgress?: BackupInProgressReason;
 }>();
 
 const emit = defineEmits<{
   reinstall: [any?];
 }>();
 
-const tags = useTags();
+const isInstalling = computed(() => props.server.general?.status === "installing");
 
-const isLoading = ref(false);
-
-const hardReset = ref(false);
-const backupServer = ref(false);
-
-const isError = computed(() => props.server.general?.status === "error");
-const isDangerous = computed(() => hardReset.value);
-const isBackupLimited = computed(() => (props.server.backups?.data?.length || 0) >= 15);
-
-const versionStrings = ["forge", "fabric", "quilt", "neo"] as const;
-
-const loaderVersions = (await Promise.all(
-  versionStrings.map(async (loader) => {
-    const runFetch = async (iterations: number) => {
-      if (iterations > 5) {
-        throw new Error("Failed to fetch loader versions");
-      }
-      try {
-        // get our info
-        const res = await $fetch(`/loader-versions?loader=${loader}`);
-        return { [loader]: (res as any).gameVersions };
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (_) {
-        return await runFetch(iterations + 1);
-      }
-    };
-    try {
-      return await runFetch(0);
-    } catch (e) {
-      console.error(e);
-    }
-  }),
-).then((res) => res.reduce((acc, val) => ({ ...acc, ...val }), {}))) as Record<
-  string,
-  {
-    // eslint-disable-next-line no-template-curly-in-string
-    id: "${modrinth.gameVersion}" | (string & {});
-    stable: boolean;
-    loaders: {
-      id: string;
-      url: string;
-      stable: boolean;
-    }[];
-  }[]
->;
-
-const editModal = ref();
 const versionSelectModal = ref();
 const mrpackModal = ref();
-
-const canInstall = computed(() => {
-  const conds =
-    !selectedMCVersion.value ||
-    isBackupLimited.value ||
-    isLoading.value ||
-    loadingServerCheck.value ||
-    serverCheckError.value.trim().length > 0;
-
-  if (selectedLoader.value.toLowerCase() === "vanilla") {
-    return conds;
-  }
-
-  return conds || !selectedLoaderVersion.value;
-});
-
-const mcVersions = tags.value.gameVersions
-  .filter((x) => x.version_type === "release")
-  .map((x) => x.version)
-  .filter((x) => {
-    // const num = parseInt(x.replace(/\./g, ""), 10);
-    // Versions 1.2.4 and below don't have server jars from Mojang
-    // return isNaN(num) || num >= 125;
-    // above code broke singular versions up until 1.24 (ie 1.25 showed)
-    const segment = parseInt(x.split(".")[1], 10);
-    return !isNaN(segment) && segment > 2;
-  });
-
-const selectedLoaderVersions = computed(() => {
-  /*
-      loaderVersions[
-      selectedLoader.value.toLowerCase() === "neoforge" ? "neo" : selectedLoader.toLowerCase()
-    ]
-      .find((x) => x.id === selectedMCVersion)
-      ?.loaders.map((x) => x.id) || []
-      */
-  let loader = selectedLoader.value.toLowerCase();
-  if (loader === "neoforge") {
-    loader = "neo";
-  }
-  const backwardsCompatibleVersion = loaderVersions[loader].find(
-    // eslint-disable-next-line no-template-curly-in-string
-    (x) => x.id === "${modrinth.gameVersion}",
-  );
-  if (backwardsCompatibleVersion) {
-    return backwardsCompatibleVersion.loaders.map((x) => x.id);
-  }
-  return (
-    loaderVersions[loader]
-      .find((x) => x.id === selectedMCVersion.value)
-      ?.loaders.map((x) => x.id) || []
-  );
-});
+const modpackVersionModal = ref();
 
 const data = computed(() => props.server.general);
-watch(
-  () => data.value?.loader,
-  () => {
-    console.log("Loader:", data.value?.loader);
+
+const {
+  data: versions,
+  error: versionsError,
+  refresh: refreshVersions,
+} = await useAsyncData(
+  `content-loader-versions-${data.value?.upstream?.project_id}`,
+  async () => {
+    if (!data.value?.upstream?.project_id) return [];
+    try {
+      const result = await useBaseFetch(`project/${data.value.upstream.project_id}/version`);
+      return result || [];
+    } catch (e) {
+      console.error("couldnt fetch all versions:", e);
+      throw new Error("Failed to load modpack versions.");
+    }
   },
-  {
-    deep: true,
-    immediate: true,
+  { default: () => [] },
+);
+
+const {
+  data: currentVersion,
+  error: currentVersionError,
+  refresh: refreshCurrentVersion,
+} = await useAsyncData(
+  `content-loader-version-${data.value?.upstream?.version_id}`,
+  async () => {
+    if (!data.value?.upstream?.version_id) return null;
+    try {
+      const result = await useBaseFetch(`version/${data.value.upstream.version_id}`);
+      return result || null;
+    } catch (e) {
+      console.error("couldnt fetch version:", e);
+      throw new Error("Failed to load modpack version.");
+    }
   },
+  { default: () => null },
 );
-const { data: versions } = data?.value?.upstream
-  ? await useLazyAsyncData(
-      `content-loader-versions`,
-      () => useBaseFetch(`project/${data?.value?.upstream?.project_id}/version`) as any,
-    )
-  : { data: { value: [] } };
 
-const options = computed(() => (versions?.value as any[]).map((x) => x.version_number));
-const versionIds = computed(() =>
-  (versions?.value as any[]).map((x) => {
-    return { [x.version_number]: x.id };
-  }),
-);
-const version = ref();
-const currentVersion = ref();
-
-const selectedLoader = ref("");
-const selectedMCVersion = ref("");
-const selectedLoaderVersion = ref("");
-const isSecondPhase = ref(false);
-
-const updateData = async () => {
-  if (!data.value?.upstream?.version_id) {
-    return;
-  }
-  currentVersion.value = await useBaseFetch(`version/${data?.value?.upstream?.version_id}`);
-  version.value = currentVersion.value.version_number;
-};
-updateData();
+const projectCardData = computed(() => ({
+  icon_url: data.value?.project?.icon_url,
+  title: data.value?.project?.title,
+  description: data.value?.project?.description,
+  downloads: data.value?.project?.downloads,
+  follows: data.value?.project?.followers,
+  // @ts-ignore
+  date_modified: currentVersion.value?.date_published || data.value?.project?.updated,
+}));
 
 const selectLoader = (loader: string) => {
-  selectedLoader.value = loader;
-  versionSelectModal.value.show();
+  versionSelectModal.value?.show(loader as Loaders);
 };
 
-const loadingServerCheck = ref(false);
-const serverCheckError = ref("");
+const refreshData = async () => {
+  await Promise.all([refreshVersions(), refreshCurrentVersion()]);
+};
 
-const cachedVersions: Record<string, any> = {};
-
-watch(selectedMCVersion, async () => {
-  if (selectedMCVersion.value.trim().length < 3) return;
-  // const res = await fetch(
-  //   `/loader-versions?loader=minecraft&version=${selectedMCVersion.value}`,
-  // ).then((r) => r.json());
-
-  loadingServerCheck.value = true;
-  const res =
-    cachedVersions[selectedMCVersion.value] ||
-    (await $fetch(`/loader-versions?loader=minecraft&version=${selectedMCVersion.value}`));
-
-  cachedVersions[selectedMCVersion.value] = res;
-
-  loadingServerCheck.value = false;
-
-  if (res.downloads.server) {
-    serverCheckError.value = "";
-  } else {
-    serverCheckError.value =
-      "We couldn't find a server.jar for this version. Please pick another one.";
+const updateAvailable = computed(() => {
+  // so sorry
+  // @ts-ignore
+  if (!data.value?.upstream || !versions.value?.length || !currentVersion.value) {
+    return false;
   }
+
+  // @ts-ignore
+  const latestVersion = versions.value[0];
+  // @ts-ignore
+  return latestVersion.id !== currentVersion.value.id;
 });
 
-const onShow = () => {
-  selectedMCVersion.value = "";
-  selectedLoaderVersion.value = "";
-};
-
-const onHide = () => {
-  hardReset.value = false;
-  backupServer.value = false;
-  isSecondPhase.value = false;
-  serverCheckError.value = "";
-  loadingServerCheck.value = false;
-  isLoading.value = false;
-  mrpackFile.value = null;
-};
-
-const handleReinstallError = (error: any) => {
-  if (error instanceof PyroFetchError && error.statusCode === 429) {
-    addNotification({
-      group: "server",
-      title: "Cannot reinstall server",
-      text: "You are being rate limited. Please try again later.",
-      type: "error",
-    });
-  } else {
-    addNotification({
-      group: "server",
-      title: "Reinstall Failed",
-      text: "An unexpected error occurred while reinstalling. Please try again later.",
-      type: "error",
-    });
-  }
-};
-
-const reinstallCurrent = async () => {
-  const projectId = data.value?.upstream?.project_id;
-  if (!projectId) {
-    throw new Error("Project ID not found");
-  }
-  const resolvedVersionIds = versionIds.value;
-  const versionId = resolvedVersionIds.find((entry: any) => entry[version.value])?.[version.value];
-  try {
-    await props.server.general?.reinstall(serverId, false, projectId, versionId);
-    emit("reinstall");
-  } catch (error) {
-    handleReinstallError(error);
-  }
-};
-
-const handleReinstall = async () => {
-  if (hardReset.value && !backupServer.value && !isSecondPhase.value) {
-    isSecondPhase.value = true;
-    return;
-  }
-
-  if (backupServer.value) {
-    try {
-      const date = new Date();
-      const format = date.toLocaleString(navigator.language || "en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-        hour: "numeric",
-        minute: "numeric",
-        second: "numeric",
-        timeZoneName: "short",
-      });
-      const backupName = `Reinstallation - ${format}`;
-      isLoading.value = true;
-      await props.server.backups?.create(backupName);
-    } catch {
-      addNotification({
-        group: "server",
-        title: "Backup Failed",
-        text: "An unexpected error occurred while backing up. Please try again later.",
-        type: "error",
-      });
-      isLoading.value = false;
-      return;
+watch(
+  () => props.server.general?.status,
+  async (newStatus, oldStatus) => {
+    if (oldStatus === "installing" && newStatus === "available") {
+      await Promise.all([
+        refreshVersions(),
+        refreshCurrentVersion(),
+        props.server.refresh(["general"]),
+      ]);
     }
-  }
-
-  isLoading.value = true;
-
-  try {
-    await props.server.general?.reinstall(
-      serverId,
-      true,
-      selectedLoader.value,
-      selectedMCVersion.value,
-      selectedLoader.value === "Vanilla" ? "" : selectedLoaderVersion.value,
-      hardReset.value,
-    );
-
-    emit("reinstall", {
-      loader: selectedLoader.value,
-      lVersion: selectedLoaderVersion.value,
-      mVersion: selectedMCVersion.value,
-    });
-
-    await nextTick();
-    window.scrollTo(0, 0);
-  } catch (error) {
-    handleReinstallError(error);
-  } finally {
-    isLoading.value = false;
-    versionSelectModal.value.hide();
-  }
-};
-
-const reinstallNew = async (project: any, versionNumber: string) => {
-  editModal.value.hide();
-  try {
-    const versions = (await useBaseFetch(`project/${project.project_id}/version`)) as any;
-    const version = versions.find((x: any) => x.version_number === versionNumber);
-
-    if (!version?.id) {
-      throw new Error("Version not found");
-    }
-    await props.server.general?.reinstall(serverId, false, project.project_id, version.id);
-    emit("reinstall");
-    await nextTick();
-    window.scrollTo(0, 0);
-  } catch (error) {
-    handleReinstallError(error);
-  }
-};
-
-const mrpackFile = ref<File | null>(null);
-
-const uploadMrpack = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  if (!target.files || target.files.length === 0) {
-    return;
-  }
-  mrpackFile.value = target.files[0];
-};
-
-const reinstallMrpack = async () => {
-  if (!mrpackFile.value) {
-    return;
-  }
-
-  const mrpack = new File([mrpackFile.value], mrpackFile.value.name, {
-    type: mrpackFile.value.type,
-  });
-
-  try {
-    isLoading.value = true;
-    await props.server.general?.reinstallFromMrpack(mrpack, hardReset.value);
-    emit("reinstall");
-    await nextTick();
-    window.scrollTo(0, 0);
-  } catch (error) {
-    handleReinstallError(error);
-  } finally {
-    isLoading.value = false;
-    mrpackModal.value.hide();
-  }
-};
+  },
+);
 </script>
 
 <style scoped>
 .stylized-toggle:checked::after {
   background: var(--color-accent-contrast) !important;
+}
+
+.button-base:active {
+  scale: none !important;
 }
 </style>

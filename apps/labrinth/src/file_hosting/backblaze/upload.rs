@@ -1,7 +1,9 @@
 use super::authorization::UploadUrlData;
 use crate::file_hosting::FileHostingError;
 use bytes::Bytes;
+use hex::ToHex;
 use serde::{Deserialize, Serialize};
+use sha1::Digest;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -35,7 +37,7 @@ pub async fn upload_file(
         .header(reqwest::header::CONTENT_LENGTH, file_bytes.len())
         .header(
             "X-Bz-Content-Sha1",
-            sha1::Sha1::from(&file_bytes).hexdigest(),
+            sha1::Sha1::digest(&file_bytes).encode_hex::<String>(),
         )
         .body(file_bytes)
         .send()

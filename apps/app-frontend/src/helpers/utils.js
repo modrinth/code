@@ -37,6 +37,13 @@ export async function restartApp() {
   return await invoke('restart_app')
 }
 
+/**
+ * @deprecated This method is no longer needed, and just returns its parameter
+ */
+export function sanitizePotentialFileUrl(url) {
+  return url
+}
+
 export const releaseColor = (releaseType) => {
   switch (releaseType) {
     case 'release':
@@ -50,16 +57,6 @@ export const releaseColor = (releaseType) => {
   }
 }
 
-export function debounce(fn, wait) {
-  let timer
-  return function (...args) {
-    if (timer) {
-      clearTimeout(timer) // clear any pre-existing timer
-    }
-
-    const context = this // get the current context
-    timer = setTimeout(() => {
-      fn.apply(context, args) // call the function if time expires
-    }, wait)
-  }
+export async function copyToClipboard(text) {
+  await navigator.clipboard.writeText(text)
 }

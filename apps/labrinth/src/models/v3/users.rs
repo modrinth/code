@@ -1,13 +1,9 @@
-use super::ids::Base62Id;
 use crate::{auth::AuthProvider, bitflags_serde_impl};
+use ariadne::ids::UserId;
+pub use ariadne::users::UserStatus;
 use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Debug, Hash)]
-#[serde(from = "Base62Id")]
-#[serde(into = "Base62Id")]
-pub struct UserId(pub u64);
 
 pub const DELETED_USER: UserId = UserId(127155982985829);
 
@@ -67,7 +63,7 @@ pub struct UserPayoutData {
     pub balance: Decimal,
 }
 
-use crate::database::models::user_item::User as DBUser;
+use crate::database::models::user_item::DBUser;
 impl From<DBUser> for User {
     fn from(data: DBUser) -> Self {
         Self {
@@ -191,26 +187,21 @@ impl Role {
 
 #[derive(Serialize, Deserialize)]
 pub struct UserFriend {
+    // The user who accepted the friend request
     pub id: UserId,
-    pub pending: bool,
+    /// THe user who sent the friend request
+    pub friend_id: UserId,
+    pub accepted: bool,
     pub created: DateTime<Utc>,
 }
 
 impl UserFriend {
-    pub fn from(
-        data: crate::database::models::friend_item::FriendItem,
-    ) -> Self {
+    pub fn from(data: crate::database::models::friend_item::DBFriend) -> Self {
         Self {
             id: data.friend_id.into(),
-            pending: data.accepted,
+            friend_id: data.user_id.into(),
+            accepted: data.accepted,
             created: data.created,
         }
     }
-}
-
-#[derive(Serialize, Deserialize, Clone)]
-pub struct UserStatus {
-    pub user_id: UserId,
-    pub profile_name: Option<String>,
-    pub last_update: DateTime<Utc>,
 }

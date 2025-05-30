@@ -15,8 +15,8 @@ pub use validate::{check_is_moderator_from_headers, get_user_from_headers};
 
 use crate::file_hosting::FileHostingError;
 use crate::models::error::ApiError;
-use actix_web::http::StatusCode;
 use actix_web::HttpResponse;
+use actix_web::http::StatusCode;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -34,7 +34,7 @@ pub enum AuthenticationError {
     #[error("Error uploading user profile picture")]
     FileHosting(#[from] FileHostingError),
     #[error("Error while decoding PAT: {0}")]
-    Decoding(#[from] crate::models::ids::DecodingError),
+    Decoding(#[from] ariadne::ids::DecodingError),
     #[error("{0}")]
     Mail(#[from] email::MailError),
     #[error("Invalid Authentication Credentials")]

@@ -1,7 +1,7 @@
 <script setup>
-import { XIcon, DownloadIcon } from '@modrinth/assets'
+import { DownloadIcon, XIcon } from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
-import { install as pack_install } from '@/helpers/pack'
+import { create_profile_and_install as pack_install } from '@/helpers/pack'
 import { ref } from 'vue'
 import { trackEvent } from '@/helpers/analytics'
 import { handleError } from '@/store/state.js'
@@ -13,15 +13,17 @@ const confirmModal = ref(null)
 const installing = ref(false)
 
 const onInstall = ref(() => {})
+const onCreateInstance = ref(() => {})
 
 defineExpose({
-  show: (projectVal, versionIdVal, callback) => {
+  show: (projectVal, versionIdVal, callback, createInstanceCallback) => {
     project.value = projectVal
     versionId.value = versionIdVal
     installing.value = false
     confirmModal.value.show()
 
     onInstall.value = callback
+    onCreateInstance.value = createInstanceCallback
 
     trackEvent('PackInstallStart')
   },
@@ -36,6 +38,7 @@ async function install() {
     versionId.value,
     project.value.title,
     project.value.icon_url,
+    onCreateInstance.value,
   ).catch(handleError)
   trackEvent('PackInstall', {
     id: project.value.id,
@@ -68,6 +71,5 @@ async function install() {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding: 1rem;
 }
 </style>

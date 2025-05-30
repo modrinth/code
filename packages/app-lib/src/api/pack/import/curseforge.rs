@@ -3,13 +3,13 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 
 use crate::{
+    State,
     prelude::ModLoader,
     state::ProfileInstallStage,
     util::{
         fetch::{fetch, write_cached_icon},
         io,
     },
-    State,
 };
 
 use super::{copy_dotminecraft, recache_icon};
@@ -78,7 +78,7 @@ pub async fn import_curseforge(
         let icon_bytes =
             fetch(&thumbnail_url, None, &state.fetch_semaphore, &state.pool)
                 .await?;
-        let filename = thumbnail_url.rsplit('/').last();
+        let filename = thumbnail_url.rsplit('/').next_back();
         if let Some(filename) = filename {
             icon = Some(
                 write_cached_icon(

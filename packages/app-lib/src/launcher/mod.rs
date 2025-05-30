@@ -2,22 +2,22 @@
 use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_or_edit_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
+use crate::launcher::download::download_log_config;
 use crate::launcher::io::IOError;
+use crate::profile::QuickPlayType;
 use crate::state::{
     Credentials, JavaVersion, ProcessMetadata, ProfileInstallStage,
 };
 use crate::util::io;
-use crate::{
-    process,
-    state::{self as st},
-    State,
-};
+use crate::{State, process, state as st};
 use chrono::Utc;
 use daedalus as d;
-use daedalus::minecraft::{RuleAction, VersionInfo};
+use daedalus::minecraft::{LoggingSide, RuleAction, VersionInfo};
 use daedalus::modded::LoaderVersion;
+use serde::Deserialize;
 use st::Profile;
 use std::collections::HashMap;
+use std::path::PathBuf;
 use tokio::process::Command;
 
 mod args;
@@ -31,11 +31,14 @@ pub mod download;
 pub fn parse_rules(
     rules: &[d::minecraft::Rule],
     java_version: &str,
+    quick_play_type: &QuickPlayType,
     minecraft_updated: bool,
 ) -> bool {
     let mut x = rules
         .iter()
-        .map(|x| parse_rule(x, java_version, minecraft_updated))
+        .map(|x| {
+            parse_rule(x, java_version, quick_play_type, minecraft_updated)
+        })
         .collect::<Vec<Option<bool>>>();
 
     if rules
@@ -56,26 +59,30 @@ pub fn parse_rules(
 pub fn parse_rule(
     rule: &d::minecraft::Rule,
     java_version: &str,
+    quick_play_type: &QuickPlayType,
     minecraft_updated: bool,
 ) -> Option<bool> {
     use d::minecraft::{Rule, RuleAction};
 
     let res = match rule {
-        Rule {
-            os: Some(ref os), ..
-        } => {
+        Rule { os: Some(os), .. } => {
             crate::util::platform::os_rule(os, java_version, minecraft_updated)
         }
         Rule {
-            features: Some(ref features),
+            features: Some(features),
             ..
         } => {
             !features.is_demo_user.unwrap_or(true)
                 || features.has_custom_resolution.unwrap_or(false)
                 || !features.has_quick_plays_support.unwrap_or(true)
-                || !features.is_quick_play_multiplayer.unwrap_or(true)
+                || (features.is_quick_play_singleplayer.unwrap_or(false)
+                    && matches!(
+                        quick_play_type,
+                        QuickPlayType::Singleplayer(_)
+                    ))
+                || (features.is_quick_play_multiplayer.unwrap_or(false)
+                    && matches!(quick_play_type, QuickPlayType::Server(..)))
                 || !features.is_quick_play_realms.unwrap_or(true)
-                || !features.is_quick_play_singleplayer.unwrap_or(true)
         }
         _ => return Some(true),
     };
@@ -199,7 +206,7 @@ pub async fn install_minecraft(
     .await?;
 
     crate::api::profile::edit(&profile.path, |prof| {
-        prof.install_stage = ProfileInstallStage::Installing;
+        prof.install_stage = ProfileInstallStage::MinecraftInstalling;
 
         async { Ok(()) }
     })
@@ -288,8 +295,7 @@ pub async fn install_minecraft(
         .await?
         .ok_or_else(|| {
             crate::ErrorKind::LauncherError(format!(
-                "Java path invalid or non-functional: {:?}",
-                java_version
+                "Java path invalid or non-functional: {java_version:?}"
             ))
         })?;
 
@@ -308,12 +314,11 @@ pub async fn install_minecraft(
     )
     .await?;
 
+    let client_path = state
+        .directories
+        .version_dir(&version_jar)
+        .join(format!("{version_jar}.jar"));
     if let Some(processors) = &version_info.processors {
-        let client_path = state
-            .directories
-            .version_dir(&version_jar)
-            .join(format!("{version_jar}.jar"));
-
         let libraries_dir = state.directories.libraries_dir();
 
         if let Some(ref mut data) = version_info.data {
@@ -398,16 +403,18 @@ pub async fn install_minecraft(
                     &loading_bar,
                     30.0 / total_length as f64,
                     Some(&format!(
-                        "Running forge processor {}/{}",
-                        index, total_length
+                        "Running forge processor {index}/{total_length}"
                     )),
                 )?;
             }
         }
     }
 
+    let protocol_version = read_protocol_version_from_jar(client_path).await?;
+
     crate::api::profile::edit(&profile.path, |prof| {
         prof.install_stage = ProfileInstallStage::Installed;
+        prof.protocol_version = protocol_version;
 
         async { Ok(()) }
     })
@@ -415,6 +422,34 @@ pub async fn install_minecraft(
     emit_loading(&loading_bar, 1.0, Some("Finished installing"))?;
 
     Ok(())
+}
+
+pub async fn read_protocol_version_from_jar(
+    path: PathBuf,
+) -> crate::Result<Option<i32>> {
+    let zip = async_zip::tokio::read::fs::ZipFileReader::new(path).await?;
+    let Some(entry_index) = zip
+        .file()
+        .entries()
+        .iter()
+        .position(|x| matches!(x.filename().as_str(), Ok("version.json")))
+    else {
+        return Ok(None);
+    };
+
+    #[derive(Deserialize, Debug)]
+    struct VersionData {
+        protocol_version: Option<i32>,
+    }
+
+    let mut data = vec![];
+    zip.reader_with_entry(entry_index)
+        .await?
+        .read_to_end_checked(&mut data)
+        .await?;
+    let data: VersionData = serde_json::from_slice(&data)?;
+
+    Ok(data.protocol_version)
 }
 
 #[tracing::instrument(skip_all)]
@@ -429,9 +464,10 @@ pub async fn launch_minecraft(
     credentials: &Credentials,
     post_exit_hook: Option<String>,
     profile: &Profile,
+    quick_play_type: &QuickPlayType,
 ) -> crate::Result<ProcessMetadata> {
     if profile.install_stage == ProfileInstallStage::PackInstalling
-        || profile.install_stage == ProfileInstallStage::Installing
+        || profile.install_stage == ProfileInstallStage::MinecraftInstalling
     {
         return Err(crate::ErrorKind::LauncherError(
             "Profile is still installing".to_string(),
@@ -485,7 +521,7 @@ pub async fn launch_minecraft(
             format!("{}-{}", version.id.clone(), it.id.clone())
         });
 
-    let version_info = download::download_version_info(
+    let mut version_info = download::download_version_info(
         &state,
         version,
         loader_version.as_ref(),
@@ -493,6 +529,26 @@ pub async fn launch_minecraft(
         None,
     )
     .await?;
+    if version_info.logging.is_none() {
+        let requires_logging_info = version_index
+            <= minecraft
+                .versions
+                .iter()
+                .position(|x| x.id == "13w39a")
+                .unwrap_or(0);
+        if requires_logging_info {
+            version_info = download::download_version_info(
+                &state,
+                version,
+                loader_version.as_ref(),
+                Some(true),
+                None,
+            )
+            .await?;
+        }
+    }
+
+    download_log_config(&state, &version_info, None, false).await?;
 
     let java_version = get_java_version_from_profile(profile, &version_info)
         .await?
@@ -552,6 +608,7 @@ pub async fn launch_minecraft(
                     .map(|x| x.as_slice()),
                 &natives_dir,
                 &state.directories.libraries_dir(),
+                &state.directories.log_configs_dir(),
                 &args::get_class_paths(
                     &state.directories.libraries_dir(),
                     version_info.libraries.as_slice(),
@@ -563,6 +620,11 @@ pub async fn launch_minecraft(
                 *memory,
                 Vec::from(java_args),
                 &java_version.architecture,
+                quick_play_type,
+                version_info
+                    .logging
+                    .as_ref()
+                    .and_then(|x| x.get(&LoggingSide::Client)),
             )?
             .into_iter()
             .collect::<Vec<_>>(),
@@ -581,6 +643,7 @@ pub async fn launch_minecraft(
                 &version.type_,
                 *resolution,
                 &java_version.architecture,
+                quick_play_type,
             )?
             .into_iter()
             .collect::<Vec<_>>(),
@@ -612,10 +675,10 @@ pub async fn launch_minecraft(
             // check if the regex exists in the file
             if !re.is_match(&options_string) {
                 // The key was not found in the file, so append it
-                options_string.push_str(&format!("\n{}:{}", key, value));
+                options_string.push_str(&format!("\n{key}:{value}"));
             } else {
                 let replaced_string = re
-                    .replace_all(&options_string, &format!("{}:{}", key, value))
+                    .replace_all(&options_string, &format!("{key}:{value}"))
                     .to_string();
                 options_string = replaced_string;
             }
@@ -633,12 +696,10 @@ pub async fn launch_minecraft(
 
     let mut censor_strings = HashMap::new();
     let username = whoami::username();
+    censor_strings
+        .insert(format!("/{username}/"), "/{COMPUTER_USERNAME}/".to_string());
     censor_strings.insert(
-        format!("/{}/", username),
-        "/{COMPUTER_USERNAME}/".to_string(),
-    );
-    censor_strings.insert(
-        format!("\\{}\\", username),
+        format!("\\{username}\\"),
         "\\{COMPUTER_USERNAME}\\".to_string(),
     );
     censor_strings.insert(
@@ -677,10 +738,21 @@ pub async fn launch_minecraft(
         .set_activity(&format!("Playing {}", profile.name), true)
         .await;
 
+    let _ = state
+        .friends_socket
+        .update_status(Some(profile.name.clone()))
+        .await;
+
     // Create Minecraft child by inserting it into the state
     // This also spawns the process and prepares the subsequent processes
     state
         .process_manager
-        .insert_new_process(&profile.path, command, post_exit_hook)
+        .insert_new_process(
+            &profile.path,
+            command,
+            post_exit_hook,
+            state.directories.profile_logs_dir(&profile.path),
+            version_info.logging.is_some(),
+        )
         .await
 }

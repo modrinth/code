@@ -1,5 +1,6 @@
-use hyper::client::HttpConnector;
-use hyper_tls::{native_tls, HttpsConnector};
+use hyper_tls::{HttpsConnector, native_tls};
+use hyper_util::client::legacy::connect::HttpConnector;
+use hyper_util::rt::TokioExecutor;
 
 mod fetch;
 
@@ -22,7 +23,8 @@ pub async fn init_client_with_database(
         let https_connector =
             HttpsConnector::from((http_connector, tls_connector));
         let hyper_client =
-            hyper::client::Client::builder().build(https_connector);
+            hyper_util::client::legacy::Client::builder(TokioExecutor::new())
+                .build(https_connector);
 
         clickhouse::Client::with_http_client(hyper_client)
             .with_url(dotenvy::var("CLICKHOUSE_URL").unwrap())
@@ -35,10 +37,24 @@ pub async fn init_client_with_database(
         .execute()
         .await?;
 
+    let clickhouse_replicated =
+        dotenvy::var("CLICKHOUSE_REPLICATED").unwrap() == "true";
+    let cluster_line = if clickhouse_replicated {
+        "ON cluster '{cluster}'"
+    } else {
+        ""
+    };
+
+    let engine = if clickhouse_replicated {
+        "ReplicatedMergeTree('/clickhouse/{installation}/{cluster}/tables/{shard}/{database}/{table}', '{replica}')"
+    } else {
+        "MergeTree()"
+    };
+
     client
         .query(&format!(
             "
-            CREATE TABLE IF NOT EXISTS {database}.views
+            CREATE TABLE IF NOT EXISTS {database}.views {cluster_line}
             (
                 recorded DateTime64(4),
                 domain String,
@@ -53,8 +69,9 @@ pub async fn init_client_with_database(
                 user_agent String,
                 headers Array(Tuple(String, String))
             )
-            ENGINE = MergeTree()
+            ENGINE = {engine}
             PRIMARY KEY (project_id, recorded, ip)
+            SETTINGS index_granularity = 8192
             "
         ))
         .execute()
@@ -63,7 +80,7 @@ pub async fn init_client_with_database(
     client
         .query(&format!(
             "
-            CREATE TABLE IF NOT EXISTS {database}.downloads
+            CREATE TABLE IF NOT EXISTS {database}.downloads {cluster_line}
             (
                 recorded DateTime64(4),
                 domain String,
@@ -78,8 +95,9 @@ pub async fn init_client_with_database(
                 user_agent String,
                 headers Array(Tuple(String, String))
             )
-            ENGINE = MergeTree()
+            ENGINE = {engine}
             PRIMARY KEY (project_id, recorded, ip)
+            SETTINGS index_granularity = 8192
             "
         ))
         .execute()
@@ -88,7 +106,7 @@ pub async fn init_client_with_database(
     client
         .query(&format!(
             "
-            CREATE TABLE IF NOT EXISTS {database}.playtime
+            CREATE TABLE IF NOT EXISTS {database}.playtime {cluster_line}
             (
                 recorded DateTime64(4),
                 seconds UInt64,
@@ -101,8 +119,9 @@ pub async fn init_client_with_database(
                 game_version String,
                 parent UInt64
             )
-            ENGINE = MergeTree()
+            ENGINE = {engine}
             PRIMARY KEY (project_id, recorded, user_id)
+            SETTINGS index_granularity = 8192
             "
         ))
         .execute()

@@ -1,5 +1,7 @@
 // usePyroServer is a composable that interfaces with the REDACTED API to get data and control the users server
 import { $fetch, FetchError } from "ofetch";
+import type { ServerNotice } from "@modrinth/utils";
+import type { FilesystemOp, FSQueuedOp, WSBackupState, WSBackupTask } from "~/types/servers.ts";
 
 interface PyroFetchOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -10,19 +12,136 @@ interface PyroFetchOptions {
     url?: string;
     token?: string;
   };
-  retry?: boolean;
+  retry?: number | boolean;
 }
 
-async function PyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promise<T> {
+class PyroServerError extends Error {
+  public readonly errors: Map<string, Error> = new Map();
+  public readonly timestamp: number = Date.now();
+
+  constructor(message?: string) {
+    super(message || "Multiple errors occurred");
+    this.name = "PyroServerError";
+  }
+
+  addError(module: string, error: Error) {
+    this.errors.set(module, error);
+    this.message = this.buildErrorMessage();
+  }
+
+  hasErrors() {
+    return this.errors.size > 0;
+  }
+
+  private buildErrorMessage(): string {
+    return Array.from(this.errors.entries())
+      .map(([_module, error]) => error.message)
+      .join("\n");
+  }
+}
+
+type V1ErrorInfo = {
+  context?: string;
+  error: string;
+  description: string;
+};
+
+export class ServersError extends Error {
+  constructor(
+    message: string,
+    public readonly statusCode?: number,
+    public readonly originalError?: Error,
+    public readonly module?: string,
+    public readonly v1Error?: V1ErrorInfo,
+  ) {
+    let errorMessage = message;
+    let method = "GET";
+    let path = "";
+
+    if (originalError instanceof FetchError) {
+      const matches = message.match(/\[([A-Z]+)\]\s+"([^"]+)":/);
+      if (matches) {
+        method = matches[1];
+        path = matches[2].replace(/https?:\/\/[^/]+\/[^/]+\/v\d+\//, "");
+      }
+
+      const statusMessage = (() => {
+        if (!statusCode) return "Unknown Error";
+        switch (statusCode) {
+          case 400:
+            return "Bad Request";
+          case 401:
+            return "Unauthorized";
+          case 403:
+            return "Forbidden";
+          case 404:
+            return "Not Found";
+          case 408:
+            return "Request Timeout";
+          case 429:
+            return "Too Many Requests";
+          case 500:
+            return "Internal Server Error";
+          case 502:
+            return "Bad Gateway";
+          case 503:
+            return "Service Unavailable";
+          case 504:
+            return "Gateway Timeout";
+          default:
+            return `HTTP ${statusCode}`;
+        }
+      })();
+
+      errorMessage = `[${method}] ${statusMessage} (${statusCode}) while fetching ${path}${module ? ` in ${module}` : ""}`;
+    } else {
+      errorMessage = `${message}${statusCode ? ` (${statusCode})` : ""}${module ? ` in ${module}` : ""}`;
+    }
+
+    super(errorMessage);
+    this.name = "PyroServersFetchError";
+  }
+}
+
+export const handleError = (err: any) => {
+  if (err instanceof ServersError && err.v1Error) {
+    addNotification({
+      title: err.v1Error?.context ?? `An error occurred`,
+      type: "error",
+      text: err.v1Error.description,
+      errorCode: err.v1Error.error,
+    });
+  } else {
+    addNotification({
+      title: "An error occurred",
+      type: "error",
+      text: err.message ?? (err.data ? err.data.description : err),
+    });
+  }
+};
+
+async function PyroFetch<T>(
+  path: string,
+  options: PyroFetchOptions = {},
+  module?: string,
+  errorContext?: string,
+): Promise<T> {
   const config = useRuntimeConfig();
   const auth = await useAuth();
   const authToken = auth.value?.token;
 
   if (!authToken) {
-    throw new PyroFetchError("Cannot pyrofetch without auth", 10000);
+    throw new ServersError("Missing auth token", 401, undefined, module);
   }
 
-  const { method = "GET", contentType = "application/json", body, version = 0, override } = options;
+  const {
+    method = "GET",
+    contentType = "application/json",
+    body,
+    version = 0,
+    override,
+    retry = method === "GET" ? 3 : 0,
+  } = options;
 
   const base = (import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl)?.replace(
     /\/$/,
@@ -30,19 +149,21 @@ async function PyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promi
   );
 
   if (!base) {
-    throw new PyroFetchError(
-      "Cannot pyrofetch without base url. Make sure to set a PYRO_BASE_URL in environment variables",
-      10001,
-    );
+    throw new ServersError("Configuration error: Missing PYRO_BASE_URL", 500, undefined, module);
   }
 
-  const fullUrl = override?.url
-    ? `https://${override.url}/${path.replace(/^\//, "")}`
+  const versionString = `v${version}`;
+
+  let newOverrideUrl = override?.url;
+  if (newOverrideUrl && newOverrideUrl.includes("v0") && version !== 0) {
+    newOverrideUrl = newOverrideUrl.replace("v0", versionString);
+  }
+
+  const fullUrl = newOverrideUrl
+    ? `https://${newOverrideUrl}/${path.replace(/^\//, "")}`
     : `${base}/modrinth/v${version}/${path.replace(/^\//, "")}`;
 
-  type HeadersRecord = Record<string, string>;
-
-  const headers: HeadersRecord = {
+  const headers: Record<string, string> = {
     Authorization: `Bearer ${override?.token ?? authToken}`,
     "Access-Control-Allow-Headers": "Authorization",
     "User-Agent": "Pyro/1.0 (https://pyro.host)",
@@ -57,45 +178,59 @@ async function PyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promi
     headers.Origin = window.location.origin;
   }
 
-  try {
-    const response = await $fetch<T>(fullUrl, {
-      method,
-      headers,
-      body: body && contentType === "application/json" ? JSON.stringify(body) : body ?? undefined,
-      timeout: 10000,
-      retry: options.retry !== false ? (method === "GET" ? 3 : 0) : 0,
-    });
-    return response;
-  } catch (error) {
-    console.error("[PYROSERVERS]:", error);
-    if (error instanceof FetchError) {
-      const statusCode = error.response?.status;
-      const statusText = error.response?.statusText || "Unknown error";
-      const errorMessages: { [key: number]: string } = {
-        400: "Bad Request",
-        401: "Unauthorized",
-        403: "Forbidden",
-        404: "Not Found",
-        405: "Method Not Allowed",
-        429: "Too Many Requests",
-        500: "Internal Server Error",
-        502: "Bad Gateway",
-      };
-      const message =
-        statusCode && statusCode in errorMessages
-          ? errorMessages[statusCode]
-          : `HTTP Error: ${statusCode || "unknown"} ${statusText}`;
-      throw new PyroFetchError(`[PYROSERVERS][PYRO] ${message}`, statusCode, error);
+  let attempts = 0;
+  const maxAttempts = (typeof retry === "boolean" ? (retry ? 1 : 0) : retry) + 1;
+  let lastError: Error | null = null;
+
+  while (attempts < maxAttempts) {
+    try {
+      const response = await $fetch<T>(fullUrl, {
+        method,
+        headers,
+        body: body && contentType === "application/json" ? JSON.stringify(body) : body ?? undefined,
+        timeout: 10000,
+      });
+
+      return response;
+    } catch (error) {
+      lastError = error as Error;
+      attempts++;
+
+      if (error instanceof FetchError) {
+        let v1Error: V1ErrorInfo | undefined;
+
+        if (error.data.error && error.data.description) {
+          v1Error = {
+            context: errorContext,
+            ...error.data,
+          };
+        }
+
+        const statusCode = error.response?.status;
+        const isRetryable = statusCode ? [408, 429, 500, 502, 503, 504].includes(statusCode) : true;
+
+        if (!isRetryable || attempts >= maxAttempts) {
+          throw new ServersError(error.message, statusCode, error, module, v1Error);
+        }
+
+        const delay = Math.min(1000 * Math.pow(2, attempts - 1) + Math.random() * 1000, 10000);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        continue;
+      }
+
+      throw new ServersError(
+        "Unexpected error during fetch operation",
+        undefined,
+        error as Error,
+        module,
+      );
     }
-    throw new PyroFetchError(
-      "[PYROSERVERS][PYRO] An unexpected error occurred during the fetch operation.",
-      undefined,
-      error as Error,
-    );
   }
+
+  throw lastError || new Error("Maximum retry attempts reached");
 }
 
-const internalServerRefrence = ref<any>(null);
+const internalServerReference = ref<any>(null);
 
 interface License {
   id: string;
@@ -168,7 +303,13 @@ interface General {
   backup_quota: number;
   used_backup_quota: number;
   status: string;
-  suspension_reason: string;
+  suspension_reason:
+    | "moderated"
+    | "paymentfailed"
+    | "cancelled"
+    | "upgrading"
+    | "other"
+    | (string & {});
   loader: string;
   loader_version: string;
   mc_version: string;
@@ -184,6 +325,11 @@ interface General {
   sftp_password: string;
   sftp_host: string;
   datacenter?: string;
+  notices?: ServerNotice[];
+  node: {
+    token: string;
+    instance: string;
+  };
 }
 
 interface Allocation {
@@ -198,21 +344,32 @@ interface Startup {
   jdk_build: "corretto" | "temurin" | "graal";
 }
 
-interface Mod {
+export interface Mod {
   filename: string;
-  project_id: string;
-  version_id: string;
-  name: string;
-  version_number: string;
-  icon_url: string;
+  project_id: string | undefined;
+  version_id: string | undefined;
+  name: string | undefined;
+  version_number: string | undefined;
+  icon_url: string | undefined;
+  owner: string | undefined;
   disabled: boolean;
+  installing: boolean;
 }
 
-interface Backup {
+export interface Backup {
   id: string;
   name: string;
   created_at: string;
+  locked: boolean;
+  automated: boolean;
+  interrupted: boolean;
   ongoing: boolean;
+  task: {
+    [K in WSBackupTask]?: {
+      progress: number;
+      state: WSBackupState;
+    };
+  };
 }
 
 interface AutoBackupSettings {
@@ -224,6 +381,23 @@ interface JWTAuth {
   url: string;
   token: string;
 }
+
+export interface DirectoryItem {
+  name: string;
+  type: "directory" | "file";
+  count?: number;
+  modified: number;
+  created: number;
+  path: string;
+}
+
+export interface DirectoryResponse {
+  items: DirectoryItem[];
+  total: number;
+  current?: number;
+}
+
+type ContentType = "mod" | "plugin";
 
 const constructServerProperties = (properties: any): string => {
   let fileContent = `#Minecraft server properties\n#${new Date().toUTCString()}\n`;
@@ -242,108 +416,109 @@ const constructServerProperties = (properties: any): string => {
 };
 
 const processImage = async (iconUrl: string | undefined) => {
-  const image = ref<string | null>(null);
-  const auth = await PyroFetch<JWTAuth>(`servers/${internalServerRefrence.value.serverId}/fs`);
-  try {
-    const fileData = await PyroFetch(`/download?path=/server-icon-original.png`, {
-      override: auth,
-      retry: false,
-    });
+  const sharedImage = useState<string | undefined>(
+    `server-icon-${internalServerReference.value.serverId}`,
+  );
 
-    if (fileData instanceof Blob) {
-      if (import.meta.client) {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-        const img = new Image();
-        img.src = URL.createObjectURL(fileData);
-        await new Promise<void>((resolve) => {
-          img.onload = () => {
-            canvas.width = 512;
-            canvas.height = 512;
-            ctx?.drawImage(img, 0, 0, 512, 512);
-            const dataURL = canvas.toDataURL("image/png");
-            internalServerRefrence.value.general.image = dataURL;
-            image.value = dataURL;
-            resolve();
-          };
-        });
-      }
-    }
-  } catch (error) {
-    if (error instanceof PyroFetchError && error.statusCode === 404) {
-      console.log("[PYROSERVERS] No server icon found");
-    } else {
-      console.error(error);
-    }
+  if (sharedImage.value) {
+    return sharedImage.value;
   }
 
-  if (image.value === null && iconUrl) {
-    console.log("iconUrl", iconUrl);
+  try {
+    const auth = await PyroFetch<JWTAuth>(`servers/${internalServerReference.value.serverId}/fs`);
     try {
-      const response = await fetch(iconUrl);
-      const file = await response.blob();
-      const originalfile = new File([file], "server-icon-original.png", {
-        type: "image/png",
+      const fileData = await PyroFetch(`/download?path=/server-icon-original.png`, {
+        override: auth,
+        retry: false,
       });
-      if (import.meta.client) {
-        const scaledFile = await new Promise<File>((resolve, reject) => {
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-          const img = new Image();
-          img.src = URL.createObjectURL(file);
-          img.onload = () => {
-            canvas.width = 64;
-            canvas.height = 64;
-            ctx?.drawImage(img, 0, 0, 64, 64);
-            canvas.toBlob((blob) => {
-              if (blob) {
-                const data = new File([blob], "server-icon.png", { type: "image/png" });
-                resolve(data);
-              } else {
-                reject(new Error("Canvas toBlob failed"));
-              }
-            }, "image/png");
-          };
-          img.onerror = reject;
-        });
-        if (scaledFile) {
-          await PyroFetch(`/create?path=/server-icon.png&type=file`, {
-            method: "POST",
-            contentType: "application/octet-stream",
-            body: scaledFile,
-            override: auth,
-          });
 
-          await PyroFetch(`/create?path=/server-icon-original.png&type=file`, {
-            method: "POST",
-            contentType: "application/octet-stream",
-            body: originalfile,
-            override: auth,
+      if (fileData instanceof Blob) {
+        if (import.meta.client) {
+          const dataURL = await new Promise<string>((resolve) => {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const img = new Image();
+            img.onload = () => {
+              canvas.width = 512;
+              canvas.height = 512;
+              ctx?.drawImage(img, 0, 0, 512, 512);
+              const dataURL = canvas.toDataURL("image/png");
+              sharedImage.value = dataURL;
+              resolve(dataURL);
+              URL.revokeObjectURL(img.src);
+            };
+            img.src = URL.createObjectURL(fileData);
           });
+          return dataURL;
         }
       }
     } catch (error) {
-      if (error instanceof PyroFetchError && error.statusCode === 404) {
-        console.log("[PYROSERVERS] No server icon found");
-      } else {
-        console.error(error);
+      if (error instanceof ServersError && error.statusCode === 404 && iconUrl) {
+        try {
+          const response = await fetch(iconUrl);
+          if (!response.ok) throw new Error("Failed to fetch icon");
+          const file = await response.blob();
+          const originalFile = new File([file], "server-icon-original.png", { type: "image/png" });
+
+          if (import.meta.client) {
+            const dataURL = await new Promise<string>((resolve) => {
+              const canvas = document.createElement("canvas");
+              const ctx = canvas.getContext("2d");
+              const img = new Image();
+              img.onload = () => {
+                canvas.width = 64;
+                canvas.height = 64;
+                ctx?.drawImage(img, 0, 0, 64, 64);
+                canvas.toBlob(async (blob) => {
+                  if (blob) {
+                    const scaledFile = new File([blob], "server-icon.png", { type: "image/png" });
+                    await PyroFetch(`/create?path=/server-icon.png&type=file`, {
+                      method: "POST",
+                      contentType: "application/octet-stream",
+                      body: scaledFile,
+                      override: auth,
+                    });
+                    await PyroFetch(`/create?path=/server-icon-original.png&type=file`, {
+                      method: "POST",
+                      contentType: "application/octet-stream",
+                      body: originalFile,
+                      override: auth,
+                    });
+                  }
+                }, "image/png");
+                const dataURL = canvas.toDataURL("image/png");
+                sharedImage.value = dataURL;
+                resolve(dataURL);
+                URL.revokeObjectURL(img.src);
+              };
+              img.src = URL.createObjectURL(file);
+            });
+            return dataURL;
+          }
+        } catch (error) {
+          console.error("Failed to process external icon:", error);
+        }
       }
     }
+  } catch (error) {
+    console.error("Failed to process server icon:", error);
   }
-  return image.value;
+
+  sharedImage.value = undefined;
+  return undefined;
 };
 
 // ------------------ GENERAL ------------------ //
 
 const sendPowerAction = async (action: string) => {
   try {
-    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/power`, {
+    await PyroFetch(`servers/${internalServerReference.value.serverId}/power`, {
       method: "POST",
       body: { action },
     });
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    await internalServerRefrence.value.refresh();
+    await internalServerReference.value.refresh();
   } catch (error) {
     console.error("Error changing power state:", error);
     throw error;
@@ -352,7 +527,7 @@ const sendPowerAction = async (action: string) => {
 
 const updateName = async (newName: string) => {
   try {
-    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/name`, {
+    await PyroFetch(`servers/${internalServerReference.value.serverId}/name`, {
       method: "POST",
       body: { name: newName },
     });
@@ -396,7 +571,7 @@ const reinstallFromMrpack = async (mrpack: File, hardReset: boolean = false) => 
   const hardResetParam = hardReset ? "true" : "false";
   try {
     const auth = await PyroFetch<JWTAuth>(
-      `servers/${internalServerRefrence.value.serverId}/reinstallFromMrpack`,
+      `servers/${internalServerReference.value.serverId}/reinstallFromMrpack`,
     );
 
     const formData = new FormData();
@@ -425,7 +600,7 @@ const reinstallFromMrpack = async (mrpack: File, hardReset: boolean = false) => 
 
 const suspendServer = async (status: boolean) => {
   try {
-    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/suspend`, {
+    await PyroFetch(`servers/${internalServerReference.value.serverId}/suspend`, {
       method: "POST",
       body: { suspended: status },
     });
@@ -437,7 +612,7 @@ const suspendServer = async (status: boolean) => {
 
 const fetchConfigFile = async (fileName: string) => {
   try {
-    return await PyroFetch(`servers/${internalServerRefrence.value.serverId}/config/${fileName}`);
+    return await PyroFetch(`servers/${internalServerReference.value.serverId}/config/${fileName}`);
   } catch (error) {
     console.error("Error fetching config file:", error);
     throw error;
@@ -468,7 +643,7 @@ const setMotd = async (motd: string) => {
       const newProps = constructServerProperties(props);
       const octetStream = new Blob([newProps], { type: "application/octet-stream" });
       const auth = await await PyroFetch<JWTAuth>(
-        `servers/${internalServerRefrence.value.serverId}/fs`,
+        `servers/${internalServerReference.value.serverId}/fs`,
       );
 
       return await PyroFetch(`/update?path=/server.properties`, {
@@ -483,13 +658,16 @@ const setMotd = async (motd: string) => {
   }
 };
 
-// ------------------ MODS ------------------ //
+// ------------------ CONTENT ------------------ //
 
-const installMod = async (projectId: string, versionId: string) => {
+const installContent = async (contentType: ContentType, projectId: string, versionId: string) => {
   try {
-    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/mods`, {
+    await PyroFetch(`servers/${internalServerReference.value.serverId}/mods`, {
       method: "POST",
-      body: { rinth_ids: { project_id: projectId, version_id: versionId } },
+      body: {
+        rinth_ids: { project_id: projectId, version_id: versionId },
+        install_as: contentType,
+      },
     });
   } catch (error) {
     console.error("Error installing mod:", error);
@@ -497,12 +675,12 @@ const installMod = async (projectId: string, versionId: string) => {
   }
 };
 
-const removeMod = async (modId: string) => {
+const removeContent = async (path: string) => {
   try {
-    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/deleteMod`, {
+    await PyroFetch(`servers/${internalServerReference.value.serverId}/deleteMod`, {
       method: "POST",
       body: {
-        path: modId,
+        path,
       },
     });
   } catch (error) {
@@ -511,11 +689,11 @@ const removeMod = async (modId: string) => {
   }
 };
 
-const reinstallMod = async (modId: string, versionId: string) => {
+const reinstallContent = async (replace: string, projectId: string, versionId: string) => {
   try {
-    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/mods/${modId}`, {
-      method: "PUT",
-      body: { version_id: versionId },
+    await PyroFetch(`servers/${internalServerReference.value.serverId}/mods/update`, {
+      method: "POST",
+      body: { replace, project_id: projectId, version_id: versionId },
     });
   } catch (error) {
     console.error("Error reinstalling mod:", error);
@@ -527,10 +705,15 @@ const reinstallMod = async (modId: string, versionId: string) => {
 
 const createBackup = async (backupName: string) => {
   try {
-    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups`, {
-      method: "POST",
-      body: { name: backupName },
-    });
+    const response = await PyroFetch<{ id: string }>(
+      `servers/${internalServerReference.value.serverId}/backups`,
+      {
+        method: "POST",
+        body: { name: backupName },
+      },
+    );
+    await internalServerReference.value.refresh(["backups"]);
+    return response.id;
   } catch (error) {
     console.error("Error creating backup:", error);
     throw error;
@@ -539,10 +722,14 @@ const createBackup = async (backupName: string) => {
 
 const renameBackup = async (backupId: string, newName: string) => {
   try {
-    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups/${backupId}/rename`, {
-      method: "POST",
-      body: { name: newName },
-    });
+    await PyroFetch(
+      `servers/${internalServerReference.value.serverId}/backups/${backupId}/rename`,
+      {
+        method: "POST",
+        body: { name: newName },
+      },
+    );
+    await internalServerReference.value.refresh(["backups"]);
   } catch (error) {
     console.error("Error renaming backup:", error);
     throw error;
@@ -551,9 +738,10 @@ const renameBackup = async (backupId: string, newName: string) => {
 
 const deleteBackup = async (backupId: string) => {
   try {
-    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups/${backupId}`, {
+    await PyroFetch(`servers/${internalServerReference.value.serverId}/backups/${backupId}`, {
       method: "DELETE",
     });
+    await internalServerReference.value.refresh(["backups"]);
   } catch (error) {
     console.error("Error deleting backup:", error);
     throw error;
@@ -563,29 +751,35 @@ const deleteBackup = async (backupId: string) => {
 const restoreBackup = async (backupId: string) => {
   try {
     await PyroFetch(
-      `servers/${internalServerRefrence.value.serverId}/backups/${backupId}/restore`,
+      `servers/${internalServerReference.value.serverId}/backups/${backupId}/restore`,
       {
         method: "POST",
       },
     );
+    await internalServerReference.value.refresh(["backups"]);
   } catch (error) {
     console.error("Error restoring backup:", error);
     throw error;
   }
 };
 
-const downloadBackup = async (backupId: string) => {
+const prepareBackup = async (backupId: string) => {
   try {
-    return await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups/${backupId}`);
+    await PyroFetch(
+      `servers/${internalServerReference.value.serverId}/backups/${backupId}/prepare-download`,
+      {
+        method: "POST",
+      },
+    );
   } catch (error) {
-    console.error("Error downloading backup:", error);
+    console.error("Error preparing backup:", error);
     throw error;
   }
 };
 
 const updateAutoBackup = async (autoBackup: "enable" | "disable", interval: number) => {
   try {
-    return await PyroFetch(`servers/${internalServerRefrence.value.serverId}/autobackup`, {
+    return await PyroFetch(`servers/${internalServerReference.value.serverId}/autobackup`, {
       method: "POST",
       body: { set: autoBackup, interval },
     });
@@ -597,9 +791,47 @@ const updateAutoBackup = async (autoBackup: "enable" | "disable", interval: numb
 
 const getAutoBackup = async () => {
   try {
-    return await PyroFetch(`servers/${internalServerRefrence.value.serverId}/autobackup`);
+    return await PyroFetch(`servers/${internalServerReference.value.serverId}/autobackup`);
   } catch (error) {
     console.error("Error getting auto backup settings:", error);
+    throw error;
+  }
+};
+
+const lockBackup = async (backupId: string) => {
+  try {
+    await PyroFetch(`servers/${internalServerReference.value.serverId}/backups/${backupId}/lock`, {
+      method: "POST",
+    });
+    await internalServerReference.value.refresh(["backups"]);
+  } catch (error) {
+    console.error("Error locking backup:", error);
+    throw error;
+  }
+};
+
+const unlockBackup = async (backupId: string) => {
+  try {
+    await PyroFetch(
+      `servers/${internalServerReference.value.serverId}/backups/${backupId}/unlock`,
+      {
+        method: "POST",
+      },
+    );
+    await internalServerReference.value.refresh(["backups"]);
+  } catch (error) {
+    console.error("Error unlocking backup:", error);
+    throw error;
+  }
+};
+
+const retryBackup = async (backupId: string) => {
+  try {
+    await PyroFetch(`servers/${internalServerReference.value.serverId}/backups/${backupId}/retry`, {
+      method: "POST",
+    });
+  } catch (error) {
+    console.error("Error retrying backup:", error);
     throw error;
   }
 };
@@ -609,7 +841,7 @@ const getAutoBackup = async () => {
 const reserveAllocation = async (name: string): Promise<Allocation> => {
   try {
     return await PyroFetch<Allocation>(
-      `servers/${internalServerRefrence.value.serverId}/allocations?name=${name}`,
+      `servers/${internalServerReference.value.serverId}/allocations?name=${name}`,
       {
         method: "POST",
       },
@@ -623,7 +855,7 @@ const reserveAllocation = async (name: string): Promise<Allocation> => {
 const updateAllocation = async (port: number, name: string) => {
   try {
     await PyroFetch(
-      `servers/${internalServerRefrence.value.serverId}/allocations/${port}?name=${name}`,
+      `servers/${internalServerReference.value.serverId}/allocations/${port}?name=${name}`,
       {
         method: "PUT",
       },
@@ -636,7 +868,7 @@ const updateAllocation = async (port: number, name: string) => {
 
 const deleteAllocation = async (port: number) => {
   try {
-    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/allocations/${port}`, {
+    await PyroFetch(`servers/${internalServerReference.value.serverId}/allocations/${port}`, {
       method: "DELETE",
     });
   } catch (error) {
@@ -656,7 +888,7 @@ const checkSubdomainAvailability = async (subdomain: string): Promise<{ availabl
 
 const changeSubdomain = async (subdomain: string) => {
   try {
-    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/subdomain`, {
+    await PyroFetch(`servers/${internalServerReference.value.serverId}/subdomain`, {
       method: "POST",
       body: { subdomain },
     });
@@ -674,7 +906,7 @@ const updateStartupSettings = async (
   jdkBuild: "corretto" | "temurin" | "graal",
 ) => {
   try {
-    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/startup`, {
+    await PyroFetch(`servers/${internalServerReference.value.serverId}/startup`, {
       method: "POST",
       body: {
         invocation: invocation || null,
@@ -694,10 +926,12 @@ const retryWithAuth = async (requestFn: () => Promise<any>) => {
   try {
     return await requestFn();
   } catch (error) {
-    if (error instanceof PyroFetchError && error.statusCode === 401) {
-      await internalServerRefrence.value.refresh(["fs"]);
+    if (error instanceof ServersError && error.statusCode === 401) {
+      await internalServerReference.value.refresh(["fs"]);
       return await requestFn();
     }
+
+    throw error;
   }
 };
 
@@ -705,7 +939,7 @@ const listDirContents = (path: string, page: number, pageSize: number) => {
   return retryWithAuth(async () => {
     const encodedPath = encodeURIComponent(path);
     return await PyroFetch(`/list?path=${encodedPath}&page=${page}&page_size=${pageSize}`, {
-      override: internalServerRefrence.value.fs.auth,
+      override: internalServerReference.value.fs.auth,
       retry: false,
     });
   });
@@ -717,34 +951,91 @@ const createFileOrFolder = (path: string, type: "file" | "directory") => {
     return await PyroFetch(`/create?path=${encodedPath}&type=${type}`, {
       method: "POST",
       contentType: "application/octet-stream",
-      override: internalServerRefrence.value.fs.auth,
+      override: internalServerReference.value.fs.auth,
     });
   });
 };
 
 const uploadFile = (path: string, file: File) => {
+  // eslint-disable-next-line require-await
   return retryWithAuth(async () => {
     const encodedPath = encodeURIComponent(path);
-    return await PyroFetch(`/create?path=${encodedPath}&type=file`, {
-      method: "POST",
-      contentType: "application/octet-stream",
-      body: file,
-      override: internalServerRefrence.value.fs.auth,
+    const progressSubject = new EventTarget();
+    const abortController = new AbortController();
+
+    const uploadPromise = new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+
+      xhr.upload.addEventListener("progress", (e) => {
+        if (e.lengthComputable) {
+          const progress = (e.loaded / e.total) * 100;
+          progressSubject.dispatchEvent(
+            new CustomEvent("progress", {
+              detail: {
+                loaded: e.loaded,
+                total: e.total,
+                progress,
+              },
+            }),
+          );
+        }
+      });
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(xhr.response);
+        } else {
+          reject(new Error(`Upload failed with status ${xhr.status}`));
+        }
+      };
+
+      xhr.onerror = () => reject(new Error("Upload failed"));
+      xhr.onabort = () => reject(new Error("Upload cancelled"));
+
+      xhr.open(
+        "POST",
+        `https://${internalServerReference.value.fs.auth.url}/create?path=${encodedPath}&type=file`,
+      );
+      xhr.setRequestHeader(
+        "Authorization",
+        `Bearer ${internalServerReference.value.fs.auth.token}`,
+      );
+      xhr.setRequestHeader("Content-Type", "application/octet-stream");
+      xhr.send(file);
+
+      abortController.signal.addEventListener("abort", () => {
+        xhr.abort();
+      });
     });
+
+    return {
+      promise: uploadPromise,
+      onProgress: (
+        callback: (progress: { loaded: number; total: number; progress: number }) => void,
+      ) => {
+        progressSubject.addEventListener("progress", ((e: CustomEvent) => {
+          callback(e.detail);
+        }) as EventListener);
+      },
+      cancel: () => {
+        abortController.abort();
+      },
+    };
   });
 };
 
 const renameFileOrFolder = (path: string, name: string) => {
   const pathName = path.split("/").slice(0, -1).join("/") + "/" + name;
   return retryWithAuth(async () => {
-    return await PyroFetch(`/move`, {
+    await PyroFetch(`/move`, {
       method: "POST",
-      override: internalServerRefrence.value.fs.auth,
+      override: internalServerReference.value.fs.auth,
       body: {
         source: path,
         destination: pathName,
       },
     });
+    return true;
   });
 };
 
@@ -755,7 +1046,7 @@ const updateFile = (path: string, content: string) => {
       method: "PUT",
       contentType: "application/octet-stream",
       body: octetStream,
-      override: internalServerRefrence.value.fs.auth,
+      override: internalServerReference.value.fs.auth,
     });
   });
 };
@@ -785,7 +1076,7 @@ const moveFileOrFolder = (path: string, newPath: string) => {
 
     return await PyroFetch(`/move`, {
       method: "POST",
-      override: internalServerRefrence.value.fs.auth,
+      override: internalServerReference.value.fs.auth,
       body: {
         source: path,
         destination: newPath,
@@ -794,12 +1085,74 @@ const moveFileOrFolder = (path: string, newPath: string) => {
   });
 };
 
+const clearQueuedOps = () => {
+  internalServerReference.value.fs.queuedOps = [];
+};
+
+const removeQueuedOp = (op: FSQueuedOp["op"], src: string) => {
+  internalServerReference.value.fs.queuedOps = internalServerReference.value.fs.queuedOps.filter(
+    (x: FSQueuedOp) => x.op !== op || x.src !== src,
+  );
+};
+
+const extractFile = (path: string, override = true, dry = false, silentQueue = false) =>
+  retryWithAuth(async () => {
+    console.log(
+      `Extracting: ${path}` + (dry ? " (dry run)" : "") + (silentQueue ? " (silent)" : ""),
+    );
+
+    const encodedPath = encodeURIComponent(path);
+
+    if (!silentQueue) {
+      internalServerReference.value.fs.queuedOps.push({
+        op: "unarchive",
+        src: path,
+      });
+
+      setTimeout(() => internalServerReference.value.fs.removeQueuedOp("unarchive", path), 4000);
+    }
+
+    return (await PyroFetch(
+      `/unarchive?src=${encodedPath}&trg=/&override=${override}&dry=${dry}`,
+      {
+        method: "POST",
+        override: internalServerReference.value.fs.auth,
+        version: 1,
+      },
+      undefined,
+      "Error extracting file",
+    ).catch((err) => {
+      removeQueuedOp("unarchive", path);
+      throw err;
+    })) as { modpack_name: string | null };
+  });
+
+const modifyOp = (id: string, action: "dismiss" | "cancel") =>
+  retryWithAuth(async () => {
+    return await PyroFetch(
+      `/ops/${action}?id=${id}`,
+      {
+        method: "POST",
+        override: internalServerReference.value.fs.auth,
+        version: 1,
+      },
+      undefined,
+      `Error ${action === "dismiss" ? "dismissing" : "cancelling"} filesystem operation`,
+    ).then(() => {
+      internalServerReference.value.fs.opsQueuedForModification =
+        internalServerReference.value.fs.opsQueuedForModification.filter((x: string) => x !== id);
+      internalServerReference.value.fs.ops = internalServerReference.value.fs.ops.filter(
+        (x: FilesystemOp) => x.id !== id,
+      );
+    });
+  });
+
 const deleteFileOrFolder = (path: string, recursive: boolean) => {
   const encodedPath = encodeURIComponent(path);
   return retryWithAuth(async () => {
     return await PyroFetch(`/delete?path=${encodedPath}&recursive=${recursive}`, {
       method: "DELETE",
-      override: internalServerRefrence.value.fs.auth,
+      override: internalServerReference.value.fs.auth,
     });
   });
 };
@@ -808,7 +1161,7 @@ const downloadFile = (path: string, raw?: boolean) => {
   return retryWithAuth(async () => {
     const encodedPath = encodeURIComponent(path);
     const fileData = await PyroFetch(`/download?path=${encodedPath}`, {
-      override: internalServerRefrence.value.fs.auth,
+      override: internalServerReference.value.fs.auth,
     });
 
     if (fileData instanceof Blob) {
@@ -825,17 +1178,18 @@ const modules: any = {
   general: {
     get: async (serverId: string) => {
       try {
-        const data = await PyroFetch<General>(`servers/${serverId}`);
-        // TODO: temp hack to fix hydration error
+        const data = await PyroFetch<General>(`servers/${serverId}`, {}, "general");
         if (data.upstream?.project_id) {
           const res = await $fetch(
             `https://api.modrinth.com/v2/project/${data.upstream.project_id}`,
           );
           data.project = res as Project;
         }
+
         if (import.meta.client) {
           data.image = (await processImage(data.project?.icon_url)) ?? undefined;
         }
+
         const motd = await getMotd();
         if (motd === "A Minecraft Server") {
           await setMotd(
@@ -845,8 +1199,19 @@ const modules: any = {
         data.motd = motd;
         return data;
       } catch (error) {
-        internalServerRefrence.value.setError(error);
-        return undefined;
+        const fetchError =
+          error instanceof ServersError
+            ? error
+            : new ServersError("Unknown error occurred", undefined, error as Error);
+
+        return {
+          status: "error",
+          server_id: serverId,
+          error: {
+            error: fetchError,
+            timestamp: Date.now(),
+          },
+        };
       }
     },
     updateName,
@@ -856,51 +1221,88 @@ const modules: any = {
     suspend: suspendServer,
     getMotd,
     setMotd,
-    fetchConfigFile,
   },
-  mods: {
+  content: {
     get: async (serverId: string) => {
       try {
-        const mods = await PyroFetch<Mod[]>(`servers/${serverId}/mods`);
+        const mods = await PyroFetch<Mod[]>(`servers/${serverId}/mods`, {}, "content");
         return {
-          data:
-            internalServerRefrence.value.error === undefined
-              ? mods.sort((a, b) => (a?.name ?? "").localeCompare(b?.name ?? ""))
-              : [],
+          data: mods.sort((a, b) => (a?.name ?? "").localeCompare(b?.name ?? "")),
         };
       } catch (error) {
-        internalServerRefrence.value.setError(error);
-        return undefined;
+        const fetchError =
+          error instanceof ServersError
+            ? error
+            : new ServersError("Unknown error occurred", undefined, error as Error);
+
+        return {
+          data: [],
+          error: {
+            error: fetchError,
+            timestamp: Date.now(),
+          },
+        };
       }
     },
-    install: installMod,
-    remove: removeMod,
-    reinstall: reinstallMod,
+    install: installContent,
+    remove: removeContent,
+    reinstall: reinstallContent,
   },
   backups: {
     get: async (serverId: string) => {
       try {
-        return { data: await PyroFetch<Backup[]>(`servers/${serverId}/backups`) };
+        return {
+          data: await PyroFetch<Backup[]>(`servers/${serverId}/backups`, {}, "backups"),
+        };
       } catch (error) {
-        internalServerRefrence.value.setError(error);
-        return undefined;
+        const fetchError =
+          error instanceof ServersError
+            ? error
+            : new ServersError("Unknown error occurred", undefined, error as Error);
+
+        return {
+          data: [],
+          error: {
+            error: fetchError,
+            timestamp: Date.now(),
+          },
+        };
       }
     },
     create: createBackup,
     rename: renameBackup,
     delete: deleteBackup,
     restore: restoreBackup,
-    download: downloadBackup,
+    prepare: prepareBackup,
     updateAutoBackup,
     getAutoBackup,
+    lock: lockBackup,
+    unlock: unlockBackup,
+    retry: retryBackup,
   },
   network: {
     get: async (serverId: string) => {
       try {
-        return { allocations: await PyroFetch<Allocation[]>(`servers/${serverId}/allocations`) };
+        return {
+          allocations: await PyroFetch<Allocation[]>(
+            `servers/${serverId}/allocations`,
+            {},
+            "network",
+          ),
+        };
       } catch (error) {
-        internalServerRefrence.value.setError(error);
-        return undefined;
+        const fetchError =
+          error instanceof ServersError
+            ? error
+            : new ServersError("Unknown error occurred", undefined, error as Error);
+
+        return {
+          allocations: [],
+          error: {
+            error: fetchError,
+            timestamp: Date.now(),
+          },
+        };
       }
     },
     reserveAllocation,
@@ -912,10 +1314,19 @@ const modules: any = {
   startup: {
     get: async (serverId: string) => {
       try {
-        return await PyroFetch<Startup>(`servers/${serverId}/startup`);
+        return await PyroFetch<Startup>(`servers/${serverId}/startup`, {}, "startup");
       } catch (error) {
-        internalServerRefrence.value.setError(error);
-        return undefined;
+        const fetchError =
+          error instanceof ServersError
+            ? error
+            : new ServersError("Unknown error occurred", undefined, error as Error);
+
+        return {
+          error: {
+            error: fetchError,
+            timestamp: Date.now(),
+          },
+        };
       }
     },
     update: updateStartupSettings,
@@ -923,20 +1334,41 @@ const modules: any = {
   ws: {
     get: async (serverId: string) => {
       try {
-        return await PyroFetch<JWTAuth>(`servers/${serverId}/ws`);
+        return await PyroFetch<JWTAuth>(`servers/${serverId}/ws`, {}, "ws");
       } catch (error) {
-        internalServerRefrence.value.setError(error);
-        return undefined;
+        const fetchError =
+          error instanceof ServersError
+            ? error
+            : new ServersError("Unknown error occurred", undefined, error as Error);
+
+        return {
+          error: {
+            error: fetchError,
+            timestamp: Date.now(),
+          },
+        };
       }
     },
   },
   fs: {
+    queuedOps: [],
+    opsQueuedForModification: [],
     get: async (serverId: string) => {
       try {
-        return { auth: await PyroFetch<JWTAuth>(`servers/${serverId}/fs`) };
+        return { auth: await PyroFetch<JWTAuth>(`servers/${serverId}/fs`, {}, "fs") };
       } catch (error) {
-        internalServerRefrence.value.setError(error);
-        return undefined;
+        const fetchError =
+          error instanceof ServersError
+            ? error
+            : new ServersError("Unknown error occurred", undefined, error as Error);
+
+        return {
+          auth: undefined,
+          error: {
+            error: fetchError,
+            timestamp: Date.now(),
+          },
+        };
       }
     },
     listDirContents,
@@ -947,6 +1379,10 @@ const modules: any = {
     moveFileOrFolder,
     deleteFileOrFolder,
     downloadFile,
+    extractFile,
+    removeQueuedOp,
+    clearQueuedOps,
+    modifyOp,
   },
 };
 
@@ -1012,15 +1448,14 @@ type GeneralFunctions = {
   setMotd: (motd: string) => Promise<void>;
 
   /**
-   * INTERNAL: Gets the config file of a server.
-   * @param fileName - The name of the file.
+   * @deprecated Use fs.downloadFile instead
    */
   fetchConfigFile: (fileName: string) => Promise<any>;
 };
 
-type ModFunctions = {
+type ContentFunctions = {
   /**
-   * INTERNAL: Gets the mods of a server.
+   * INTERNAL: Gets the list content of a server.
    * @param serverId - The ID of the server.
    * @returns
    */
@@ -1028,23 +1463,25 @@ type ModFunctions = {
 
   /**
    * Installs a mod to a server.
+   * @param contentType - The type of content to install.
    * @param projectId - The ID of the project.
    * @param versionId - The ID of the version.
    */
-  install: (projectId: string, versionId: string) => Promise<void>;
+  install: (contentType: ContentType, projectId: string, versionId: string) => Promise<void>;
 
   /**
    * Removes a mod from a server.
-   * @param modId - The ID of the mod.
+   * @param path - The path of the mod file.
    */
-  remove: (modId: string) => Promise<void>;
+  remove: (path: string) => Promise<void>;
 
   /**
    * Reinstalls a mod to a server.
-   * @param modId - The ID of the mod.
-   * @param versionId - The ID of the version.
+   * @param replace - The path of the mod to replace.
+   * @param projectId - The ID of the content.
+   * @param versionId - The ID of the new version.
    */
-  reinstall: (modId: string, versionId: string) => Promise<void>;
+  reinstall: (replace: string, projectId: string, versionId: string) => Promise<void>;
 };
 
 type BackupFunctions = {
@@ -1058,6 +1495,7 @@ type BackupFunctions = {
   /**
    * Creates a new backup for the server.
    * @param backupName - The name of the backup.
+   * @returns The ID of the backup.
    */
   create: (backupName: string) => Promise<void>;
 
@@ -1088,6 +1526,12 @@ type BackupFunctions = {
   download: (backupId: string) => Promise<void>;
 
   /**
+   * Prepare a backup for the server.
+   * @param backupId - The ID of the backup.
+   */
+  prepare: (backupId: string) => Promise<void>;
+
+  /**
    * Updates the auto backup settings of the server.
    * @param autoBackup - Whether to enable auto backup.
    * @param interval - The interval to backup at (in Hours).
@@ -1098,6 +1542,24 @@ type BackupFunctions = {
    * Gets the auto backup settings of the server.
    */
   getAutoBackup: () => Promise<AutoBackupSettings>;
+
+  /**
+   * Locks a backup for the server.
+   * @param backupId - The ID of the backup.
+   */
+  lock: (backupId: string) => Promise<void>;
+
+  /**
+   * Unlocks a backup for the server.
+   * @param backupId - The ID of the backup.
+   */
+  unlock: (backupId: string) => Promise<void>;
+
+  /**
+   * Retries a failed backup for the server.
+   * @param backupId - The ID of the backup.
+   */
+  retry: (backupId: string) => Promise<void>;
 };
 
 type NetworkFunctions = {
@@ -1177,7 +1639,7 @@ type FSFunctions = {
    * @param pageSize - The page size to list.
    * @returns
    */
-  listDirContents: (path: string, page: number, pageSize: number) => Promise<any>;
+  listDirContents: (path: string, page: number, pageSize: number) => Promise<DirectoryResponse>;
 
   /**
    * @param path - The path to create the file or folder at.
@@ -1228,26 +1690,80 @@ type FSFunctions = {
    * @returns
    */
   downloadFile: (path: string, raw?: boolean) => Promise<any>;
+
+  /**
+   * @param path - The path of the file to extract
+   * @returns
+   */
+  extractFile: (
+    path: string,
+    override?: boolean,
+    dry?: boolean,
+    silentQueue?: boolean,
+  ) => Promise<{
+    modpack_name: string | null;
+    conflicting_files: string[];
+  }>;
+
+  removeQueuedOp: (op: FSQueuedOp["op"], src: string) => void;
+  clearQueuedOps: () => void;
+
+  modifyOp: (id: string, action: "dismiss" | "cancel") => Promise<any>;
 };
 
-type GeneralModule = General & GeneralFunctions;
-type ModsModule = { data: Mod[] } & ModFunctions;
-type BackupsModule = { data: Backup[] } & BackupFunctions;
-type NetworkModule = { allocations: Allocation[] } & NetworkFunctions;
-type StartupModule = Startup & StartupFunctions;
-type FSModule = { auth: JWTAuth } & FSFunctions;
+type ModuleError = {
+  error: ServersError;
+  timestamp: number;
+};
+
+type GeneralModule = General &
+  GeneralFunctions & {
+    error?: ModuleError;
+  };
+
+type ContentModule = {
+  data: Mod[];
+  error?: ModuleError;
+} & ContentFunctions;
+
+type BackupsModule = {
+  data: Backup[];
+  error?: ModuleError;
+} & BackupFunctions;
+
+type NetworkModule = {
+  allocations: Allocation[];
+  error?: ModuleError;
+} & NetworkFunctions;
+
+type StartupModule = Startup &
+  StartupFunctions & {
+    error?: ModuleError;
+  };
+
+type WSModule = JWTAuth & {
+  error?: ModuleError;
+};
+
+export type FSModule = {
+  auth: JWTAuth;
+  ops: FilesystemOp[];
+  queuedOps: FSQueuedOp[];
+  opsQueuedForModification: string[];
+  error?: ModuleError;
+} & FSFunctions;
 
 type ModulesMap = {
   general: GeneralModule;
-  mods: ModsModule;
+  content: ContentModule;
   backups: BackupsModule;
   network: NetworkModule;
   startup: StartupModule;
-  ws: JWTAuth;
+  ws: WSModule;
   fs: FSModule;
 };
 
-type avaliableModules = ("general" | "mods" | "backups" | "network" | "startup" | "ws" | "fs")[];
+type avaliableModules = ("general" | "content" | "backups" | "network" | "startup" | "ws" | "fs")[];
 
 export type Server<T extends avaliableModules> = {
   [K in T[number]]?: ModulesMap[K];
@@ -1255,8 +1771,16 @@ export type Server<T extends avaliableModules> = {
   /**
    * Refreshes the included modules of the server
    * @param refreshModules - The modules to refresh.
+   * @param options - The options to use when refreshing the modules.
    */
-  refresh: (refreshModules?: avaliableModules) => Promise<void>;
+  refresh: (
+    refreshModules?: avaliableModules,
+    options?: {
+      preserveConnection?: boolean;
+      preserveInstallState?: boolean;
+    },
+  ) => Promise<void>;
+  loadModules: (modulesToLoad: avaliableModules) => Promise<void>;
   setError: (error: Error) => void;
   error?: Error;
   serverId: string;
@@ -1264,49 +1788,103 @@ export type Server<T extends avaliableModules> = {
 
 export const usePyroServer = async (serverId: string, includedModules: avaliableModules) => {
   const server: Server<typeof includedModules> = reactive({
-    refresh: async (refreshModules?: avaliableModules) => {
-      const promises: Promise<void>[] = [];
-      if (refreshModules) {
-        for (const module of refreshModules) {
-          promises.push(
-            (async () => {
-              const mods = modules[module];
-              if (mods.get) {
-                const data = await mods.get(serverId);
-                server[module] = { ...server[module], ...data };
-              }
-            })(),
-          );
+    refresh: async (
+      refreshModules?: avaliableModules,
+      options?: {
+        preserveConnection?: boolean;
+        preserveInstallState?: boolean;
+      },
+    ) => {
+      if (server.general?.status === "installing" && !refreshModules) {
+        return;
+      }
+
+      const modulesToRefresh = [...new Set(refreshModules || includedModules)];
+      const serverError = new PyroServerError();
+
+      const modulePromises = modulesToRefresh.map(async (module) => {
+        try {
+          const mods = modules[module];
+          if (!mods?.get) return;
+
+          const data = await mods.get(serverId);
+          if (!data) return;
+
+          if (module === "general" && options?.preserveConnection) {
+            server[module] = {
+              ...server[module],
+              ...data,
+              image: server[module]?.image || data.image,
+              motd: server[module]?.motd || data.motd,
+              status:
+                options.preserveInstallState && server[module]?.status === "installing"
+                  ? "installing"
+                  : data.status,
+            };
+          } else {
+            server[module] = { ...server[module], ...data };
+          }
+        } catch (error) {
+          console.error(`Failed to refresh module ${module}:`, error);
+          if (error instanceof Error) {
+            serverError.addError(module, error);
+          }
         }
-      } else {
-        for (const module of includedModules) {
-          promises.push(
-            (async () => {
-              const mods = modules[module];
-              if (mods.get) {
-                const data = await mods.get(serverId);
-                server[module] = { ...server[module], ...data };
-              }
-            })(),
-          );
+      });
+
+      await Promise.allSettled(modulePromises);
+
+      if (serverError.hasErrors()) {
+        if (server.error && server.error instanceof PyroServerError) {
+          serverError.errors.forEach((error, module) => {
+            (server.error as PyroServerError).addError(module, error);
+          });
+        } else {
+          server.setError(serverError);
         }
       }
-      await Promise.all(promises);
+    },
+    loadModules: async (modulesToLoad: avaliableModules) => {
+      const newModules = modulesToLoad.filter((module) => !server[module]);
+      if (newModules.length === 0) return;
+
+      newModules.forEach((module) => {
+        server[module] = modules[module];
+      });
+
+      await server.refresh(newModules);
     },
     setError: (error: Error) => {
-      server.error = error;
+      if (!server.error) {
+        server.error = error;
+      } else if (error instanceof PyroServerError) {
+        if (!(server.error instanceof PyroServerError)) {
+          const newError = new PyroServerError();
+          newError.addError("previous", server.error);
+          server.error = newError;
+        }
+        error.errors.forEach((err, module) => {
+          (server.error as PyroServerError).addError(module, err);
+        });
+      }
     },
+
     serverId,
   });
 
-  for (const module of includedModules) {
-    const mods = modules[module];
-    server[module] = mods;
+  const initialModules = includedModules.filter((module) => ["general", "ws"].includes(module));
+  const deferredModules = includedModules.filter((module) => !["general", "ws"].includes(module));
+
+  initialModules.forEach((module) => {
+    server[module] = modules[module];
+  });
+
+  internalServerReference.value = server;
+  await server.refresh(initialModules);
+
+  if (deferredModules.length > 0) {
+    await server.loadModules(deferredModules);
   }
-
-  internalServerRefrence.value = server;
-
-  await server.refresh();
 
   return server as Server<typeof includedModules>;
 };

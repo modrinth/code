@@ -1,12 +1,13 @@
 use crate::database::redis::RedisPool;
+use crate::models::ids::TeamId;
 use crate::models::teams::{
-    OrganizationPermissions, ProjectPermissions, TeamId, TeamMember,
+    OrganizationPermissions, ProjectPermissions, TeamMember,
 };
-use crate::models::users::UserId;
 use crate::models::v2::teams::LegacyTeamMember;
 use crate::queue::session::AuthQueue;
-use crate::routes::{v2_reroute, v3, ApiError};
-use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
+use crate::routes::{ApiError, v2_reroute, v3};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
+use ariadne::ids::UserId;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;

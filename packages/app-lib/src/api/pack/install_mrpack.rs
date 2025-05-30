@@ -1,25 +1,25 @@
+use crate::event::LoadingBarType;
 use crate::event::emit::{
     emit_loading, init_or_edit_loading, loading_try_for_each_concurrent,
 };
-use crate::event::LoadingBarType;
 use crate::pack::install_from::{
-    set_profile_information, EnvType, PackFile, PackFileHash,
+    EnvType, PackFile, PackFileHash, set_profile_information,
 };
 use crate::state::{
-    cache_file_hash, CacheBehaviour, CachedEntry, ProfileInstallStage, SideType,
+    CacheBehaviour, CachedEntry, ProfileInstallStage, SideType, cache_file_hash,
 };
 use crate::util::fetch::{fetch_mirrors, write};
 use crate::util::io;
-use crate::{profile, State};
+use crate::{State, profile};
 use async_zip::base::read::seek::ZipFileReader;
 
+use super::install_from::{
+    CreatePack, CreatePackLocation, PackFormat, generate_pack_from_file,
+    generate_pack_from_version_id,
+};
+use crate::data::ProjectType;
 use std::io::Cursor;
 use std::path::{Component, PathBuf};
-
-use super::install_from::{
-    generate_pack_from_file, generate_pack_from_version_id, CreatePack,
-    CreatePackLocation, PackFormat,
-};
 
 /// Install a pack
 /// Wrapper around install_pack_files that generates a pack creation description, and
@@ -189,6 +189,7 @@ pub async fn install_zipped_mrpack_files(
                                 .hashes
                                 .get(&PackFileHash::Sha1)
                                 .map(|x| &**x),
+                            ProjectType::get_from_parent_folder(&path),
                             &state.pool,
                         )
                         .await?;
@@ -247,6 +248,7 @@ pub async fn install_zipped_mrpack_files(
                         &profile_path,
                         &new_path.to_string_lossy(),
                         None,
+                        ProjectType::get_from_parent_folder(&new_path),
                         &state.pool,
                     )
                     .await?;
@@ -264,10 +266,7 @@ pub async fn install_zipped_mrpack_files(
                 emit_loading(
                     &loading_bar,
                     30.0 / total_len as f64,
-                    Some(&format!(
-                        "Extracting override {}/{}",
-                        index, total_len
-                    )),
+                    Some(&format!("Extracting override {index}/{total_len}")),
                 )?;
             }
         }

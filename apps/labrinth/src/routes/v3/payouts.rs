@@ -1,17 +1,17 @@
 use crate::auth::validate::get_user_record_from_bearer_token;
-use crate::auth::{get_user_from_headers, AuthenticationError};
+use crate::auth::{AuthenticationError, get_user_from_headers};
 use crate::database::models::generate_payout_id;
 use crate::database::redis::RedisPool;
 use crate::models::ids::PayoutId;
 use crate::models::pats::Scopes;
 use crate::models::payouts::{PayoutMethodType, PayoutStatus};
-use crate::queue::payouts::{make_aditude_request, PayoutsQueue};
+use crate::queue::payouts::{PayoutsQueue, make_aditude_request};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
-use chrono::{Datelike, Duration, TimeZone, Utc, Weekday};
+use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
+use chrono::{DateTime, Datelike, Duration, TimeZone, Utc, Weekday};
 use hex::ToHex;
-use hmac::{Hmac, Mac, NewMac};
+use hmac::{Hmac, Mac};
 use reqwest::Method;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -160,8 +160,11 @@ pub async fn paypal_webhook(
 
                 transaction.commit().await?;
 
-                crate::database::models::user_item::User::clear_caches(
-                    &[(crate::database::models::UserId(result.user_id), None)],
+                crate::database::models::user_item::DBUser::clear_caches(
+                    &[(
+                        crate::database::models::DBUserId(result.user_id),
+                        None,
+                    )],
                     &redis,
                 )
                 .await?;
@@ -267,8 +270,11 @@ pub async fn tremendous_webhook(
 
                 transaction.commit().await?;
 
-                crate::database::models::user_item::User::clear_caches(
-                    &[(crate::database::models::UserId(result.user_id), None)],
+                crate::database::models::user_item::DBUser::clear_caches(
+                    &[(
+                        crate::database::models::DBUserId(result.user_id),
+                        None,
+                    )],
                     &redis,
                 )
                 .await?;
@@ -313,12 +319,12 @@ pub async fn user_payouts(
     .1;
 
     let payout_ids =
-        crate::database::models::payout_item::Payout::get_all_for_user(
+        crate::database::models::payout_item::DBPayout::get_all_for_user(
             user.id.into(),
             &**pool,
         )
         .await?;
-    let payouts = crate::database::models::payout_item::Payout::get_many(
+    let payouts = crate::database::models::payout_item::DBPayout::get_many(
         &payout_ids,
         &**pool,
     )
@@ -471,7 +477,7 @@ pub async fn create_payout(
             }
 
             let mut payout_item =
-                crate::database::models::payout_item::Payout {
+                crate::database::models::payout_item::DBPayout {
                     id: payout_id,
                     user_id: user.id,
                     created: Utc::now(),
@@ -544,7 +550,7 @@ pub async fn create_payout(
             if let Some(email) = user.email {
                 if user.email_verified {
                     let mut payout_item =
-                        crate::database::models::payout_item::Payout {
+                        crate::database::models::payout_item::DBPayout {
                             id: payout_id,
                             user_id: user.id,
                             created: Utc::now(),
@@ -620,14 +626,14 @@ pub async fn create_payout(
         PayoutMethodType::Unknown => {
             return Err(ApiError::Payments(
                 "Invalid payment method specified!".to_string(),
-            ))
+            ));
         }
     };
 
     payout_item.insert(&mut transaction).await?;
 
     transaction.commit().await?;
-    crate::database::models::User::clear_caches(&[(user.id, None)], &redis)
+    crate::database::models::DBUser::clear_caches(&[(user.id, None)], &redis)
         .await?;
 
     Ok(HttpResponse::NoContent().finish())
@@ -654,7 +660,7 @@ pub async fn cancel_payout(
 
     let id = info.into_inner().0;
     let payout =
-        crate::database::models::payout_item::Payout::get(id.into(), &**pool)
+        crate::database::models::payout_item::DBPayout::get(id.into(), &**pool)
             .await?;
 
     if let Some(payout) = payout {
@@ -676,8 +682,7 @@ pub async fn cancel_payout(
                             .make_paypal_request::<(), ()>(
                                 Method::POST,
                                 &format!(
-                                    "payments/payouts-item/{}/cancel",
-                                    platform_id
+                                    "payments/payouts-item/{platform_id}/cancel"
                                 ),
                                 None,
                                 None,
@@ -689,7 +694,7 @@ pub async fn cancel_payout(
                         payouts
                             .make_tremendous_request::<(), ()>(
                                 Method::POST,
-                                &format!("rewards/{}/cancel", platform_id),
+                                &format!("rewards/{platform_id}/cancel"),
                                 None,
                             )
                             .await?;
@@ -697,7 +702,7 @@ pub async fn cancel_payout(
                     PayoutMethodType::Unknown => {
                         return Err(ApiError::InvalidInput(
                             "Payout cannot be cancelled!".to_string(),
-                        ))
+                        ));
                     }
                 }
 
@@ -763,6 +768,7 @@ pub async fn payment_methods(
 pub struct UserBalance {
     pub available: Decimal,
     pub pending: Decimal,
+    pub dates: HashMap<DateTime<Utc>, Decimal>,
 }
 
 #[get("balance")]
@@ -788,30 +794,30 @@ pub async fn get_balance(
 }
 
 async fn get_user_balance(
-    user_id: crate::database::models::ids::UserId,
+    user_id: crate::database::models::ids::DBUserId,
     pool: &PgPool,
 ) -> Result<UserBalance, sqlx::Error> {
-    let available = sqlx::query!(
+    let payouts = sqlx::query!(
         "
-        SELECT SUM(amount)
+        SELECT date_available, SUM(amount) sum
         FROM payouts_values
-        WHERE user_id = $1 AND date_available <= NOW()
+        WHERE user_id = $1
+        GROUP BY date_available
+        ORDER BY date_available DESC
         ",
         user_id.0
     )
-    .fetch_optional(pool)
+    .fetch_all(pool)
     .await?;
 
-    let pending = sqlx::query!(
-        "
-        SELECT SUM(amount)
-        FROM payouts_values
-        WHERE user_id = $1 AND date_available > NOW()
-        ",
-        user_id.0
-    )
-    .fetch_optional(pool)
-    .await?;
+    let available = payouts
+        .iter()
+        .filter(|x| x.date_available <= Utc::now())
+        .fold(Decimal::ZERO, |acc, x| acc + x.sum.unwrap_or(Decimal::ZERO));
+    let pending = payouts
+        .iter()
+        .filter(|x| x.date_available > Utc::now())
+        .fold(Decimal::ZERO, |acc, x| acc + x.sum.unwrap_or(Decimal::ZERO));
 
     let withdrawn = sqlx::query!(
         "
@@ -824,12 +830,6 @@ async fn get_user_balance(
     .fetch_optional(pool)
     .await?;
 
-    let available = available
-        .map(|x| x.sum.unwrap_or(Decimal::ZERO))
-        .unwrap_or(Decimal::ZERO);
-    let pending = pending
-        .map(|x| x.sum.unwrap_or(Decimal::ZERO))
-        .unwrap_or(Decimal::ZERO);
     let (withdrawn, fees) = withdrawn
         .map(|x| {
             (
@@ -844,6 +844,10 @@ async fn get_user_balance(
             - withdrawn.round_dp(16)
             - fees.round_dp(16),
         pending,
+        dates: payouts
+            .iter()
+            .map(|x| (x.date_available, x.sum.unwrap_or(Decimal::ZERO)))
+            .collect(),
     })
 }
 

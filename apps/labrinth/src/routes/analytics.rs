@@ -8,8 +8,8 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::date::get_current_tenths_of_ms;
 use crate::util::env::parse_strings_from_var;
-use actix_web::{post, web};
 use actix_web::{HttpRequest, HttpResponse};
+use actix_web::{post, web};
 use serde::Deserialize;
 use sqlx::PgPool;
 use std::collections::HashMap;
@@ -130,7 +130,7 @@ pub async fn page_view_ingest(
             ];
 
             if PROJECT_TYPES.contains(&segments_vec[0]) {
-                let project = crate::database::models::Project::get(
+                let project = crate::database::models::DBProject::get(
                     segments_vec[1],
                     &**pool,
                     &redis,
@@ -189,7 +189,7 @@ pub async fn playtime_ingest(
         ));
     }
 
-    let versions = crate::database::models::Version::get_many(
+    let versions = crate::database::models::DBVersion::get_many(
         &playtimes.iter().map(|x| (*x.0).into()).collect::<Vec<_>>(),
         &**pool,
         &redis,

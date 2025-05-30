@@ -12,20 +12,20 @@ const COLLECTIONS_NAMESPACE: &str = "collections";
 
 #[derive(Clone)]
 pub struct CollectionBuilder {
-    pub collection_id: CollectionId,
-    pub user_id: UserId,
+    pub collection_id: DBCollectionId,
+    pub user_id: DBUserId,
     pub name: String,
     pub description: Option<String>,
     pub status: CollectionStatus,
-    pub projects: Vec<ProjectId>,
+    pub projects: Vec<DBProjectId>,
 }
 
 impl CollectionBuilder {
     pub async fn insert(
         self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<CollectionId, DatabaseError> {
-        let collection_struct = Collection {
+    ) -> Result<DBCollectionId, DatabaseError> {
+        let collection_struct = DBCollection {
             id: self.collection_id,
             name: self.name,
             user_id: self.user_id,
@@ -44,9 +44,9 @@ impl CollectionBuilder {
     }
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct Collection {
-    pub id: CollectionId,
-    pub user_id: UserId,
+pub struct DBCollection {
+    pub id: DBCollectionId,
+    pub user_id: DBUserId,
     pub name: String,
     pub description: Option<String>,
     pub created: DateTime<Utc>,
@@ -55,10 +55,10 @@ pub struct Collection {
     pub raw_icon_url: Option<String>,
     pub color: Option<u32>,
     pub status: CollectionStatus,
-    pub projects: Vec<ProjectId>,
+    pub projects: Vec<DBProjectId>,
 }
 
-impl Collection {
+impl DBCollection {
     pub async fn insert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -66,16 +66,16 @@ impl Collection {
         sqlx::query!(
             "
             INSERT INTO collections (
-                id, user_id, name, description, 
+                id, user_id, name, description,
                 created, icon_url, raw_icon_url, status
             )
             VALUES (
-                $1, $2, $3, $4, 
+                $1, $2, $3, $4,
                 $5, $6, $7, $8
             )
             ",
-            self.id as CollectionId,
-            self.user_id as UserId,
+            self.id as DBCollectionId,
+            self.user_id as DBUserId,
             &self.name,
             self.description.as_ref(),
             self.created,
@@ -104,7 +104,7 @@ impl Collection {
     }
 
     pub async fn remove(
-        id: CollectionId,
+        id: DBCollectionId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
@@ -116,7 +116,7 @@ impl Collection {
                 DELETE FROM collections_mods
                 WHERE collection_id = $1
                 ",
-                id as CollectionId,
+                id as DBCollectionId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -126,12 +126,12 @@ impl Collection {
                 DELETE FROM collections
                 WHERE id = $1
                 ",
-                id as CollectionId,
+                id as DBCollectionId,
             )
             .execute(&mut **transaction)
             .await?;
 
-            models::Collection::clear_cache(collection.id, redis).await?;
+            models::DBCollection::clear_cache(collection.id, redis).await?;
 
             Ok(Some(()))
         } else {
@@ -140,23 +140,23 @@ impl Collection {
     }
 
     pub async fn get<'a, 'b, E>(
-        id: CollectionId,
+        id: DBCollectionId,
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Option<Collection>, DatabaseError>
+    ) -> Result<Option<DBCollection>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        Collection::get_many(&[id], executor, redis)
+        DBCollection::get_many(&[id], executor, redis)
             .await
             .map(|x| x.into_iter().next())
     }
 
     pub async fn get_many<'a, E>(
-        collection_ids: &[CollectionId],
+        collection_ids: &[DBCollectionId],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<Collection>, DatabaseError>
+    ) -> Result<Vec<DBCollection>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -180,9 +180,9 @@ impl Collection {
                     )
                     .fetch(exec)
                     .try_fold(DashMap::new(), |acc, m| {
-                        let collection = Collection {
-                            id: CollectionId(m.id),
-                            user_id: UserId(m.user_id),
+                        let collection = DBCollection {
+                            id: DBCollectionId(m.id),
+                            user_id: DBUserId(m.user_id),
                             name: m.name.clone(),
                             description: m.description.clone(),
                             icon_url: m.icon_url.clone(),
@@ -195,7 +195,7 @@ impl Collection {
                                 .mods
                                 .unwrap_or_default()
                                 .into_iter()
-                                .map(ProjectId)
+                                .map(DBProjectId)
                                 .collect(),
                         };
 
@@ -213,7 +213,7 @@ impl Collection {
     }
 
     pub async fn clear_cache(
-        id: CollectionId,
+        id: DBCollectionId,
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;

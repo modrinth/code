@@ -15,7 +15,7 @@ pub struct PackFormat {
     pub name: String,
     #[validate(length(max = 2048))]
     pub summary: Option<String>,
-    #[validate]
+    #[validate(nested)]
     pub files: Vec<PackFile>,
     pub dependencies: std::collections::HashMap<PackDependency, String>,
 }

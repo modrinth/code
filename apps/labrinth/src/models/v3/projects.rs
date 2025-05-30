@@ -1,27 +1,17 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
+use std::mem;
 
-use super::ids::{Base62Id, OrganizationId};
-use super::teams::TeamId;
-use super::users::UserId;
 use crate::database::models::loader_fields::VersionField;
-use crate::database::models::project_item::{LinkUrl, QueryProject};
-use crate::database::models::version_item::QueryVersion;
-use crate::models::threads::ThreadId;
+use crate::database::models::project_item::{LinkUrl, ProjectQueryResult};
+use crate::database::models::version_item::VersionQueryResult;
+use crate::models::ids::{
+    OrganizationId, ProjectId, TeamId, ThreadId, VersionId,
+};
+use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
-
-/// The ID of a specific project, encoded as base62 for usage in the API
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Debug, Hash)]
-#[serde(from = "Base62Id")]
-#[serde(into = "Base62Id")]
-pub struct ProjectId(pub u64);
-
-/// The ID of a specific version of a project
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Hash, Debug)]
-#[serde(from = "Base62Id")]
-#[serde(into = "Base62Id")]
-pub struct VersionId(pub u64);
 
 /// A project returned from the API
 #[derive(Serialize, Deserialize, Clone)]
@@ -107,19 +97,6 @@ pub struct Project {
     pub fields: HashMap<String, Vec<serde_json::Value>>,
 }
 
-fn remove_duplicates(values: Vec<serde_json::Value>) -> Vec<serde_json::Value> {
-    let mut seen = HashSet::new();
-    values
-        .into_iter()
-        .filter(|value| {
-            // Convert the JSON value to a string for comparison
-            let as_string = value.to_string();
-            // Check if the string is already in the set
-            seen.insert(as_string)
-        })
-        .collect()
-}
-
 // This is a helper function to convert a list of VersionFields into a HashMap of field name to vecs of values
 // This allows for removal of duplicates
 pub fn from_duplicate_version_fields(
@@ -144,15 +121,15 @@ pub fn from_duplicate_version_fields(
         }
     }
 
-    // Remove duplicates by converting to string and back
+    // Remove duplicates
     for (_, v) in fields.iter_mut() {
-        *v = remove_duplicates(v.clone());
+        *v = mem::take(v).into_iter().unique().collect_vec();
     }
     fields
 }
 
-impl From<QueryProject> for Project {
-    fn from(data: QueryProject) -> Self {
+impl From<ProjectQueryResult> for Project {
+    fn from(data: ProjectQueryResult) -> Self {
         let fields =
             from_duplicate_version_fields(data.aggregate_version_fields);
         let m = data.inner;
@@ -636,7 +613,7 @@ pub struct Version {
     pub downloads: u32,
     /// The type of the release - `Alpha`, `Beta`, or `Release`.
     pub version_type: VersionType,
-    /// The status of tne version
+    /// The status of the version
     pub status: VersionStatus,
     /// The requested status of the version (used for scheduling)
     pub requested_status: Option<VersionStatus>,
@@ -669,8 +646,8 @@ where
     Ok(map)
 }
 
-impl From<QueryVersion> for Version {
-    fn from(data: QueryVersion) -> Version {
+impl From<VersionQueryResult> for Version {
+    fn from(data: VersionQueryResult) -> Version {
         let v = data.inner;
         Version {
             id: v.id.into(),
@@ -892,7 +869,7 @@ impl std::fmt::Display for DependencyType {
 }
 
 impl DependencyType {
-    // These are constant, so this can remove unneccessary allocations (`to_string`)
+    // These are constant, so this can remove unnecessary allocations (`to_string`)
     pub fn as_str(&self) -> &'static str {
         match self {
             DependencyType::Required => "required",

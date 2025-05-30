@@ -1,26 +1,38 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
-use crate::state::{cache_file_hash, CacheBehaviour, CachedEntry};
+use crate::profile::get_full_path;
+use crate::state::server_join_log::JoinLogEntry;
+use crate::state::{
+    CacheBehaviour, CachedEntry, CachedFileHash, cache_file_hash,
+};
 use crate::util;
-use crate::util::fetch::{write_cached_icon, FetchSemaphore, IoSemaphore};
+use crate::util::fetch::{FetchSemaphore, IoSemaphore, write_cached_icon};
 use crate::util::io::{self};
-use chrono::{DateTime, TimeZone, Utc};
+use chrono::{DateTime, TimeDelta, TimeZone, Utc};
 use dashmap::DashMap;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
+use std::collections::HashSet;
 use std::convert::TryFrom;
 use std::convert::TryInto;
-use std::path::{Path, PathBuf};
+use std::path::Path;
+use std::sync::LazyLock;
+use tokio::fs::DirEntry;
+use tokio::io::{AsyncBufReadExt, AsyncRead};
+use tokio::task::JoinSet;
 
 // Represent a Minecraft instance.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Profile {
     pub path: String,
     pub install_stage: ProfileInstallStage,
+    pub launcher_feature_version: LauncherFeatureVersion,
 
     pub name: String,
     pub icon_path: Option<String>,
 
     pub game_version: String,
+    pub protocol_version: Option<i32>,
     pub loader: ModLoader,
     pub loader_version: Option<String>,
 
@@ -51,7 +63,9 @@ pub enum ProfileInstallStage {
     /// Profile is installed
     Installed,
     /// Profile's minecraft game is still installing
-    Installing,
+    MinecraftInstalling,
+    /// Pack is installed, but Minecraft installation has not begun
+    PackInstalled,
     /// Profile created for pack, but the pack hasn't been fully installed yet
     PackInstalling,
     /// Profile is not installed
@@ -62,7 +76,8 @@ impl ProfileInstallStage {
     pub fn as_str(&self) -> &'static str {
         match *self {
             Self::Installed => "installed",
-            Self::Installing => "installing",
+            Self::MinecraftInstalling => "minecraft_installing",
+            Self::PackInstalled => "pack_installed",
             Self::PackInstalling => "pack_installing",
             Self::NotInstalled => "not_installed",
         }
@@ -71,10 +86,44 @@ impl ProfileInstallStage {
     pub fn from_str(val: &str) -> Self {
         match val {
             "installed" => Self::Installed,
-            "installing" => Self::Installing,
+            "minecraft_installing" => Self::MinecraftInstalling,
+            "installing" => Self::MinecraftInstalling, // Backwards compatibility
+            "pack_installed" => Self::PackInstalled,
             "pack_installing" => Self::PackInstalling,
             "not_installed" => Self::NotInstalled,
             _ => Self::NotInstalled,
+        }
+    }
+}
+
+#[derive(
+    Serialize, Deserialize, Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum LauncherFeatureVersion {
+    None,
+    MigratedServerLastPlayTime,
+}
+
+impl LauncherFeatureVersion {
+    pub const MOST_RECENT: Self = Self::MigratedServerLastPlayTime;
+
+    pub fn as_str(&self) -> &'static str {
+        match *self {
+            Self::None => "none",
+            Self::MigratedServerLastPlayTime => {
+                "migrated_server_last_play_time"
+            }
+        }
+    }
+
+    pub fn from_str(val: &str) -> Self {
+        match val {
+            "none" => Self::None,
+            "migrated_server_last_play_time" => {
+                Self::MigratedServerLastPlayTime
+            }
+            _ => Self::None,
         }
     }
 }
@@ -146,7 +195,7 @@ pub struct FileMetadata {
     pub version_id: String,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Copy)]
+#[derive(Serialize, Deserialize, Clone, Debug, Copy, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum ProjectType {
     Mod,
@@ -176,7 +225,7 @@ impl ProjectType {
         }
     }
 
-    pub fn get_from_parent_folder(path: PathBuf) -> Option<Self> {
+    pub fn get_from_parent_folder(path: &Path) -> Option<Self> {
         // Get parent folder
         let path = path.parent()?.file_name()?;
         match path.to_str()? {
@@ -193,7 +242,7 @@ impl ProjectType {
             ProjectType::Mod => "mod",
             ProjectType::DataPack => "datapack",
             ProjectType::ResourcePack => "resourcepack",
-            ProjectType::ShaderPack => "shaderpack",
+            ProjectType::ShaderPack => "shader",
         }
     }
 
@@ -203,6 +252,15 @@ impl ProjectType {
             ProjectType::DataPack => "datapacks",
             ProjectType::ResourcePack => "resourcepacks",
             ProjectType::ShaderPack => "shaderpacks",
+        }
+    }
+
+    pub fn get_loaders(&self) -> &'static [&'static str] {
+        match self {
+            ProjectType::Mod => &["fabric", "forge", "quilt", "neoforge"],
+            ProjectType::DataPack => &["datapack"],
+            ProjectType::ResourcePack => &["vanilla", "canvas", "minecraft"],
+            ProjectType::ShaderPack => &["iris", "optifine"],
         }
     }
 
@@ -245,6 +303,8 @@ struct ProfileQueryResult {
     override_hook_pre_launch: Option<String>,
     override_hook_wrapper: Option<String>,
     override_hook_post_exit: Option<String>,
+    protocol_version: Option<i64>,
+    launcher_feature_version: String,
 }
 
 impl TryFrom<ProfileQueryResult> for Profile {
@@ -254,9 +314,13 @@ impl TryFrom<ProfileQueryResult> for Profile {
         Ok(Profile {
             path: x.path,
             install_stage: ProfileInstallStage::from_str(&x.install_stage),
+            launcher_feature_version: LauncherFeatureVersion::from_str(
+                &x.launcher_feature_version,
+            ),
             name: x.name,
             icon_path: x.icon_path,
             game_version: x.game_version,
+            protocol_version: x.protocol_version.map(|x| x as i32),
             loader: ModLoader::from_string(&x.mod_loader),
             loader_version: x.mod_loader_version,
             groups: serde_json::from_value(x.groups).unwrap_or_default(),
@@ -320,8 +384,8 @@ macro_rules! select_profiles_with_predicate {
             ProfileQueryResult,
             r#"
             SELECT
-                path, install_stage, name, icon_path,
-                game_version, mod_loader, mod_loader_version,
+                path, install_stage, launcher_feature_version, name, icon_path,
+                game_version, protocol_version, mod_loader, mod_loader_version,
                 json(groups) as "groups!: serde_json::Value",
                 linked_project_id, linked_version_id, locked,
                 created, modified, last_played,
@@ -383,6 +447,8 @@ impl Profile {
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<()> {
         let install_stage = self.install_stage.as_str();
+        let launcher_feature_version = self.launcher_feature_version.as_str();
+
         let mod_loader = self.loader.as_str();
 
         let groups = serde_json::to_string(&self.groups)?;
@@ -419,7 +485,8 @@ impl Profile {
                 submitted_time_played, recent_time_played,
                 override_java_path, override_extra_launch_args, override_custom_env_vars,
                 override_mc_memory_max, override_mc_force_fullscreen, override_mc_game_resolution_x, override_mc_game_resolution_y,
-                override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit
+                override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit,
+                protocol_version, launcher_feature_version
             )
             VALUES (
                 $1, $2, $3, $4,
@@ -430,7 +497,8 @@ impl Profile {
                 $15, $16,
                 $17, jsonb($18), jsonb($19),
                 $20, $21, $22, $23,
-                $24, $25, $26
+                $24, $25, $26,
+                $27, $28
             )
             ON CONFLICT (path) DO UPDATE SET
                 install_stage = $2,
@@ -464,7 +532,10 @@ impl Profile {
 
                 override_hook_pre_launch = $24,
                 override_hook_wrapper = $25,
-                override_hook_post_exit = $26
+                override_hook_post_exit = $26,
+
+                protocol_version = $27,
+                launcher_feature_version = $28
             ",
             self.path,
             install_stage,
@@ -492,6 +563,8 @@ impl Profile {
             self.hooks.pre_launch,
             self.hooks.wrapper,
             self.hooks.post_exit,
+            self.protocol_version,
+            launcher_feature_version
         )
             .execute(exec)
             .await?;
@@ -538,13 +611,13 @@ impl Profile {
 
     pub(crate) async fn refresh_all() -> crate::Result<()> {
         let state = crate::State::get().await?;
-        let all = Self::get_all(&state.pool).await?;
+        let mut all = Self::get_all(&state.pool).await?;
 
         let mut keys = vec![];
+        let mut migrations = JoinSet::new();
 
-        for profile in &all {
-            let path =
-                crate::api::profile::get_full_path(&profile.path).await?;
+        for profile in &mut all {
+            let path = get_full_path(&profile.path).await?;
 
             for project_type in ProjectType::iterator() {
                 let folder = project_type.get_folder();
@@ -575,7 +648,53 @@ impl Profile {
                     }
                 }
             }
+
+            if profile.install_stage == ProfileInstallStage::MinecraftInstalling
+            {
+                profile.install_stage = ProfileInstallStage::PackInstalled;
+                profile.upsert(&state.pool).await?;
+            } else if profile.install_stage
+                == ProfileInstallStage::PackInstalling
+            {
+                profile.install_stage = ProfileInstallStage::NotInstalled;
+                profile.upsert(&state.pool).await?;
+            }
+
+            if profile.launcher_feature_version
+                < LauncherFeatureVersion::MOST_RECENT
+            {
+                let state = state.clone();
+                let profile_path = profile.path.clone();
+                migrations.spawn(async move {
+                    let Ok(Some(mut profile)) = Self::get(&profile_path, &state.pool).await else {
+                        tracing::error!("Failed to find instance '{}' for migration", profile_path);
+                        return;
+                    };
+                    drop(profile_path);
+
+                    tracing::info!(
+                        "Migrating profile '{}' from launcher feature version {:?} to {:?}",
+                        profile.path, profile.launcher_feature_version, LauncherFeatureVersion::MOST_RECENT
+                    );
+                    loop {
+                        let result = profile.perform_launcher_feature_migration(&state).await;
+                        if result.is_err() || profile.launcher_feature_version == LauncherFeatureVersion::MOST_RECENT {
+                            if let Err(err) = result {
+                                tracing::error!("Failed to migrate instance '{}': {}", profile.path, err);
+                                return;
+                            }
+                            if let Err(err) = profile.upsert(&state.pool).await {
+                                tracing::error!("Failed to update instance '{}' migration state: {}", profile.path, err);
+                                return;
+                            }
+                            break;
+                        }
+                    }
+                    tracing::info!("Finished migration for profile '{}'", profile.path);
+                });
+            }
         }
+        migrations.join_all().await;
 
         let file_hashes = CachedEntry::get_file_hash_many(
             &keys.iter().map(|s| &**s).collect::<Vec<_>>(),
@@ -587,17 +706,10 @@ impl Profile {
 
         let file_updates = file_hashes
             .iter()
-            .filter_map(|x| {
-                all.iter().find(|prof| x.path.contains(&prof.path)).map(
-                    |profile| {
-                        format!(
-                            "{}-{}-{}",
-                            x.hash,
-                            profile.loader.as_str(),
-                            profile.game_version
-                        )
-                    },
-                )
+            .filter_map(|file| {
+                all.iter()
+                    .find(|prof| file.path.contains(&prof.path))
+                    .map(|profile| Self::get_cache_key(file, profile))
             })
             .collect::<Vec<_>>();
 
@@ -620,6 +732,144 @@ impl Profile {
             )
         )?;
 
+        Ok(())
+    }
+
+    async fn perform_launcher_feature_migration(
+        &mut self,
+        state: &crate::State,
+    ) -> crate::Result<()> {
+        match self.launcher_feature_version {
+            LauncherFeatureVersion::None => {
+                if self.last_played.is_none() {
+                    self.launcher_feature_version =
+                        LauncherFeatureVersion::MigratedServerLastPlayTime;
+                    return Ok(());
+                }
+                let mut join_log_entry = JoinLogEntry {
+                    profile_path: self.path.clone(),
+                    ..Default::default()
+                };
+                let logs_path = state.directories.profile_logs_dir(&self.path);
+                let Ok(mut directory) = io::read_dir(&logs_path).await else {
+                    self.launcher_feature_version =
+                        LauncherFeatureVersion::MigratedServerLastPlayTime;
+                    return Ok(());
+                };
+                let existing_joins_map =
+                    super::server_join_log::get_joins(&self.path, &state.pool)
+                        .await?;
+                let existing_joins = existing_joins_map
+                    .keys()
+                    .map(|x| (&x.0 as &str, x.1))
+                    .collect::<HashSet<_>>();
+                while let Some(log_file) = directory.next_entry().await? {
+                    if let Err(err) = Self::parse_log_file(
+                        &log_file,
+                        |host, port| existing_joins.contains(&(host, port)),
+                        state,
+                        &mut join_log_entry,
+                    )
+                    .await
+                    {
+                        tracing::error!(
+                            "Failed to parse log file '{}': {}",
+                            log_file.path().display(),
+                            err
+                        );
+                    }
+                }
+                self.launcher_feature_version =
+                    LauncherFeatureVersion::MigratedServerLastPlayTime;
+            }
+            LauncherFeatureVersion::MOST_RECENT => unreachable!(
+                "LauncherFeatureVersion::MOST_RECENT was not updated"
+            ),
+        }
+        Ok(())
+    }
+
+    // Parses a log file on a best-effort basis, using the log's creation time, rather than the
+    // actual times mentioned in the log file, which are missing date information.
+    async fn parse_log_file(
+        log_file: &DirEntry,
+        should_skip: impl Fn(&str, u16) -> bool,
+        state: &crate::State,
+        join_entry: &mut JoinLogEntry,
+    ) -> crate::Result<()> {
+        let file_name = log_file.file_name();
+        let Some(file_name) = file_name.to_str() else {
+            return Ok(());
+        };
+        let log_time = io::metadata(&log_file.path()).await?.created()?.into();
+        if file_name == "latest.log" {
+            let file = io::open_file(&log_file.path()).await?;
+            Self::parse_open_log_file(
+                file,
+                should_skip,
+                log_time,
+                state,
+                join_entry,
+            )
+            .await
+        } else if file_name.ends_with(".log.gz") {
+            let file = io::open_file(&log_file.path()).await?;
+            let file = tokio::io::BufReader::new(file);
+            let file =
+                async_compression::tokio::bufread::GzipDecoder::new(file);
+            Self::parse_open_log_file(
+                file,
+                should_skip,
+                log_time,
+                state,
+                join_entry,
+            )
+            .await
+        } else {
+            Ok(())
+        }
+    }
+
+    async fn parse_open_log_file(
+        reader: impl AsyncRead + Unpin,
+        should_skip: impl Fn(&str, u16) -> bool,
+        mut log_time: DateTime<Utc>,
+        state: &crate::State,
+        join_entry: &mut JoinLogEntry,
+    ) -> crate::Result<()> {
+        static LOG_LINE_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+            Regex::new(r"^\[[0-9]{2}(?::[0-9]{2}){2}] \[.+?/[A-Z]+?]: Connecting to (.+?), ([1-9][0-9]{0,4})$").unwrap()
+        });
+        let reader = tokio::io::BufReader::new(reader);
+        let mut lines = reader.lines();
+        while let Some(log_line) = lines.next_line().await? {
+            let Some(log_line) = LOG_LINE_REGEX.captures(&log_line) else {
+                continue;
+            };
+
+            let Some(host) = log_line.get(1) else {
+                continue;
+            };
+            let host = host.as_str();
+
+            let Some(port) = log_line.get(2) else {
+                continue;
+            };
+            let Ok(port) = port.as_str().parse::<u16>() else {
+                continue;
+            };
+
+            if should_skip(host, port) {
+                continue;
+            }
+
+            join_entry.host = host.to_string();
+            join_entry.port = port;
+            join_entry.join_time = log_time;
+            join_entry.upsert(&state.pool).await?;
+
+            log_time += TimeDelta::seconds(1);
+        }
         Ok(())
     }
 
@@ -664,7 +914,7 @@ impl Profile {
                                 path: format!(
                                     "{}/{folder}/{}",
                                     self.path,
-                                    file_name.replace(".disabled", "")
+                                    file_name.trim_end_matches(".disabled")
                                 ),
                                 file_name: file_name.to_string(),
                                 project_type,
@@ -690,14 +940,7 @@ impl Profile {
 
         let file_updates = file_hashes
             .iter()
-            .map(|x| {
-                format!(
-                    "{}-{}-{}",
-                    x.hash,
-                    self.loader.as_str(),
-                    self.game_version
-                )
-            })
+            .map(|x| Self::get_cache_key(x, self))
             .collect::<Vec<_>>();
 
         let file_hashes_ref =
@@ -725,8 +968,9 @@ impl Profile {
             let info_index = file_info.iter().position(|x| x.hash == hash.hash);
             let file = info_index.map(|x| file_info.remove(x));
 
-            if let Some(initial_file_index) =
-                keys.iter().position(|x| x.path == hash.path)
+            if let Some(initial_file_index) = keys
+                .iter()
+                .position(|x| x.path == hash.path.trim_end_matches(".disabled"))
             {
                 let initial_file = keys.remove(initial_file_index);
 
@@ -770,6 +1014,18 @@ impl Profile {
         }
 
         Ok(files)
+    }
+
+    fn get_cache_key(file: &CachedFileHash, profile: &Profile) -> String {
+        format!(
+            "{}-{}-{}",
+            file.hash,
+            file.project_type
+                .filter(|x| *x != ProjectType::Mod)
+                .map(|x| x.get_loaders().join("+"))
+                .unwrap_or_else(|| profile.loader.as_str().to_string()),
+            profile.game_version
+        )
     }
 
     #[tracing::instrument(skip(pool))]
@@ -872,8 +1128,15 @@ impl Profile {
         let project_path =
             format!("{}/{}", project_type.get_folder(), file_name);
 
-        cache_file_hash(bytes.clone(), profile_path, &project_path, hash, exec)
-            .await?;
+        cache_file_hash(
+            bytes.clone(),
+            profile_path,
+            &project_path,
+            hash,
+            Some(project_type),
+            exec,
+        )
+        .await?;
 
         util::fetch::write(&path.join(&project_path), &bytes, io_semaphore)
             .await?;
@@ -890,12 +1153,13 @@ impl Profile {
         let path = crate::api::profile::get_full_path(profile_path).await?;
 
         let new_path = if project_path.ends_with(".disabled") {
-            project_path.replace(".disabled", "")
+            project_path.trim_end_matches(".disabled").to_string()
         } else {
             format!("{project_path}.disabled")
         };
 
-        io::rename(&path.join(project_path), &path.join(&new_path)).await?;
+        io::rename_or_move(&path.join(project_path), &path.join(&new_path))
+            .await?;
 
         Ok(new_path)
     }

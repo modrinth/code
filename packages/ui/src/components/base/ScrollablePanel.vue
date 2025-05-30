@@ -61,6 +61,7 @@ function onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
   display: flex;
   flex-direction: column;
   position: relative;
+}
 
   &.max-height {
     max-height: 19rem;
@@ -71,6 +72,7 @@ function onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
   display: flex;
   overflow: hidden;
   position: relative;
+
   --_fade-height: 4rem;
   margin-bottom: var(--gap-sm);
   &.top-fade::before,
@@ -100,7 +102,9 @@ function onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
     bottom: 0;
     background-image: linear-gradient(
       transparent,
-      var(--scrollable-pane-bg, var(--color-raised-bg))
+      rgb(0 0 0 / 100%) var(--_fade-height),
+      rgb(0 0 0 / 100%) calc(100% - var(--_fade-height)),
+      transparent 100%
     );
   }
 }

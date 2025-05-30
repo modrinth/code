@@ -2,13 +2,13 @@
   <img
     v-if="src"
     ref="img"
-    :style="`--_size: ${cssSize}`"
     class="`experimental-styles-within avatar"
+    :style="`--_size: ${cssSize}`"
     :class="{
       circle: circle,
       'no-shadow': noShadow,
       raised: raised,
-      pixelated: raised,
+      pixelated: pixelated,
     }"
     :src="src"
     :alt="alt"
@@ -18,8 +18,9 @@
   <svg
     v-else
     class="`experimental-styles-within avatar"
-    :style="`--_size: ${cssSize}`"
+    :style="`--_size: ${cssSize}${tint ? `;--_tint:oklch(50% 75% ${tint})` : ''}`"
     :class="{
+      tint: tint,
       circle: circle,
       'no-shadow': noShadow,
       raised: raised,
@@ -44,7 +45,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 
 const pixelated = ref(false)
 const img = ref(null)
@@ -78,6 +79,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  tintBy: {
+    type: String,
+    default: null,
+  },
 })
 
 const LEGACY_PRESETS = {
@@ -91,11 +96,29 @@ const LEGACY_PRESETS = {
 const cssSize = computed(() => LEGACY_PRESETS[props.size] ?? props.size)
 
 function updatePixelated() {
-  if (img.value && img.value.naturalWidth && img.value.naturalWidth <= 96) {
+  if (img.value && img.value.naturalWidth && img.value.naturalWidth < 32) {
     pixelated.value = true
   } else {
     pixelated.value = false
   }
+}
+
+const tint = computed(() => {
+  if (props.tintBy) {
+    return hash(props.tintBy) % 360
+  } else {
+    return null
+  }
+})
+
+function hash(str) {
+  let hash = 0
+  for (let i = 0, len = str.length; i < len; i++) {
+    const chr = str.charCodeAt(i)
+    hash = (hash << 5) - hash + chr
+    hash |= 0
+  }
+  return hash
 }
 </script>
 
@@ -108,13 +131,14 @@ function updatePixelated() {
   background-color: var(--color-button-bg);
   object-fit: contain;
   border-radius: calc(16 / 96 * var(--_size));
+  position: relative;
 
   &.circle {
     border-radius: 50%;
   }
 
   &:not(.no-shadow) {
-    box-shadow: var(--shadow-inset-lg), var(--shadow-card);
+    box-shadow: var(--shadow-card);
   }
 
   &.no-shadow {
@@ -127,6 +151,10 @@ function updatePixelated() {
 
   &.raised {
     background-color: var(--color-raised-bg);
+  }
+
+  &.tint {
+    background-color: color-mix(in oklch, var(--color-button-bg) 100%, var(--_tint) 5%);
   }
 }
 </style>

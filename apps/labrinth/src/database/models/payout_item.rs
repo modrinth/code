@@ -3,12 +3,12 @@ use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
-use super::{DatabaseError, PayoutId, UserId};
+use super::{DBPayoutId, DBUserId, DatabaseError};
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
-pub struct Payout {
-    pub id: PayoutId,
-    pub user_id: UserId,
+pub struct DBPayout {
+    pub id: DBPayoutId,
+    pub user_id: DBUserId,
     pub created: DateTime<Utc>,
     pub status: PayoutStatus,
     pub amount: Decimal,
@@ -19,7 +19,7 @@ pub struct Payout {
     pub platform_id: Option<String>,
 }
 
-impl Payout {
+impl DBPayout {
     pub async fn insert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -49,21 +49,21 @@ impl Payout {
     }
 
     pub async fn get<'a, 'b, E>(
-        id: PayoutId,
+        id: DBPayoutId,
         executor: E,
-    ) -> Result<Option<Payout>, DatabaseError>
+    ) -> Result<Option<DBPayout>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        Payout::get_many(&[id], executor)
+        DBPayout::get_many(&[id], executor)
             .await
             .map(|x| x.into_iter().next())
     }
 
     pub async fn get_many<'a, E>(
-        payout_ids: &[PayoutId],
+        payout_ids: &[DBPayoutId],
         exec: E,
-    ) -> Result<Vec<Payout>, DatabaseError>
+    ) -> Result<Vec<DBPayout>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -78,9 +78,9 @@ impl Payout {
             &payout_ids.into_iter().map(|x| x.0).collect::<Vec<_>>()
         )
         .fetch(exec)
-        .map_ok(|r| Payout {
-            id: PayoutId(r.id),
-            user_id: UserId(r.user_id),
+        .map_ok(|r| DBPayout {
+            id: DBPayoutId(r.id),
+            user_id: DBUserId(r.user_id),
             created: r.created,
             status: PayoutStatus::from_string(&r.status),
             amount: r.amount,
@@ -89,16 +89,16 @@ impl Payout {
             platform_id: r.platform_id,
             fee: r.fee,
         })
-        .try_collect::<Vec<Payout>>()
+        .try_collect::<Vec<DBPayout>>()
         .await?;
 
         Ok(results)
     }
 
     pub async fn get_all_for_user(
-        user_id: UserId,
+        user_id: DBUserId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<PayoutId>, DatabaseError> {
+    ) -> Result<Vec<DBPayoutId>, DatabaseError> {
         let results = sqlx::query!(
             "
             SELECT id
@@ -112,7 +112,7 @@ impl Payout {
 
         Ok(results
             .into_iter()
-            .map(|r| PayoutId(r.id))
+            .map(|r| DBPayoutId(r.id))
             .collect::<Vec<_>>())
     }
 }

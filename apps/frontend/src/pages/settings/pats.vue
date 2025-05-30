@@ -203,9 +203,14 @@
 </template>
 <script setup>
 import { PlusIcon, XIcon, TrashIcon, EditIcon, SaveIcon } from "@modrinth/assets";
-import { Checkbox, ConfirmModal } from "@modrinth/ui";
+import {
+  Checkbox,
+  ConfirmModal,
+  commonSettingsMessages,
+  commonMessages,
+  useRelativeTime,
+} from "@modrinth/ui";
 
-import { commonSettingsMessages } from "~/utils/common-messages.ts";
 import {
   hasScope,
   scopeList,

@@ -31,10 +31,10 @@
             : 'https://cdn.modrinth.com/placeholder-banner.svg'
         "
         :alt="expandedGalleryItem.title ? expandedGalleryItem.title : 'gallery-image'"
-        @click.stop=""
+        @click.stop="() => {}"
       />
 
-      <div class="floating" @click.stop="">
+      <div class="floating" @click.stop="() => {}">
         <div class="text">
           <h2 v-if="expandedGalleryItem.title">
             {{ expandedGalleryItem.title }}
@@ -99,7 +99,7 @@ import { show_ads_window, hide_ads_window } from '@/helpers/ads.js'
 const props = defineProps({
   project: {
     type: Object,
-    default: () => {},
+    default: () => ({}),
   },
 })
 
@@ -198,7 +198,7 @@ document.addEventListener('keypress', keyListener)
 
 .expanded-image-modal {
   position: fixed;
-  z-index: 10;
+  z-index: 11;
   overflow: auto;
   top: 0;
   left: 0;

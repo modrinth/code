@@ -1,12 +1,11 @@
-use crate::{
-    database::redis::RedisPool, models::ids::base62_impl::parse_base62,
-};
+use crate::database::redis::RedisPool;
+use ariadne::ids::base62_impl::parse_base62;
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 
-use super::{ids::*, TeamMember};
+use super::{DBTeamMember, ids::*};
 use serde::{Deserialize, Serialize};
 
 const ORGANIZATIONS_NAMESPACE: &str = "organizations";
@@ -14,9 +13,9 @@ const ORGANIZATIONS_TITLES_NAMESPACE: &str = "organizations_titles";
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 /// An organization of users who together control one or more projects and organizations.
-pub struct Organization {
+pub struct DBOrganization {
     /// The id of the organization
-    pub id: OrganizationId,
+    pub id: DBOrganizationId,
 
     /// The slug of the organization
     pub slug: String,
@@ -25,7 +24,7 @@ pub struct Organization {
     pub name: String,
 
     /// The associated team of the organization
-    pub team_id: TeamId,
+    pub team_id: DBTeamId,
 
     /// The description of the organization
     pub description: String,
@@ -36,7 +35,7 @@ pub struct Organization {
     pub color: Option<u32>,
 }
 
-impl Organization {
+impl DBOrganization {
     pub async fn insert(
         self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -49,7 +48,7 @@ impl Organization {
             self.id.0,
             self.slug,
             self.name,
-            self.team_id as TeamId,
+            self.team_id as DBTeamId,
             self.description,
             self.icon_url,
             self.raw_icon_url,
@@ -75,7 +74,7 @@ impl Organization {
     }
 
     pub async fn get_id<'a, 'b, E>(
-        id: OrganizationId,
+        id: DBOrganizationId,
         exec: E,
         redis: &RedisPool,
     ) -> Result<Option<Self>, super::DatabaseError>
@@ -88,7 +87,7 @@ impl Organization {
     }
 
     pub async fn get_many_ids<'a, 'b, E>(
-        organization_ids: &[OrganizationId],
+        organization_ids: &[DBOrganizationId],
         exec: E,
         redis: &RedisPool,
     ) -> Result<Vec<Self>, super::DatabaseError>
@@ -143,11 +142,11 @@ impl Organization {
                     )
                     .fetch(exec)
                     .try_fold(DashMap::new(), |acc, m| {
-                        let org = Organization {
-                            id: OrganizationId(m.id),
+                        let org = DBOrganization {
+                            id: DBOrganizationId(m.id),
                             slug: m.slug.clone(),
                             name: m.name,
-                            team_id: TeamId(m.team_id),
+                            team_id: DBTeamId(m.team_id),
                             description: m.description,
                             icon_url: m.icon_url,
                             raw_icon_url: m.raw_icon_url,
@@ -169,7 +168,7 @@ impl Organization {
 
     // Gets organization associated with a project ID, if it exists and there is one
     pub async fn get_associated_organization_project_id<'a, 'b, E>(
-        project_id: ProjectId,
+        project_id: DBProjectId,
         exec: E,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
@@ -183,17 +182,17 @@ impl Organization {
             WHERE m.id = $1
             GROUP BY o.id;
             ",
-            project_id as ProjectId,
+            project_id as DBProjectId,
         )
         .fetch_optional(exec)
         .await?;
 
         if let Some(result) = result {
-            Ok(Some(Organization {
-                id: OrganizationId(result.id),
+            Ok(Some(DBOrganization {
+                id: DBOrganizationId(result.id),
                 slug: result.slug,
                 name: result.name,
-                team_id: TeamId(result.team_id),
+                team_id: DBTeamId(result.team_id),
                 description: result.description,
                 icon_url: result.icon_url,
                 raw_icon_url: result.raw_icon_url,
@@ -205,7 +204,7 @@ impl Organization {
     }
 
     pub async fn remove(
-        id: OrganizationId,
+        id: DBOrganizationId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         redis: &RedisPool,
     ) -> Result<Option<()>, super::DatabaseError> {
@@ -217,19 +216,19 @@ impl Organization {
                 DELETE FROM organizations
                 WHERE id = $1
                 ",
-                id as OrganizationId,
+                id as DBOrganizationId,
             )
             .execute(&mut **transaction)
             .await?;
 
-            TeamMember::clear_cache(organization.team_id, redis).await?;
+            DBTeamMember::clear_cache(organization.team_id, redis).await?;
 
             sqlx::query!(
                 "
                 DELETE FROM team_members
                 WHERE team_id = $1
                 ",
-                organization.team_id as TeamId,
+                organization.team_id as DBTeamId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -239,7 +238,7 @@ impl Organization {
                 DELETE FROM teams
                 WHERE id = $1
                 ",
-                organization.team_id as TeamId,
+                organization.team_id as DBTeamId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -251,7 +250,7 @@ impl Organization {
     }
 
     pub async fn clear_cache(
-        id: OrganizationId,
+        id: DBOrganizationId,
         slug: Option<String>,
         redis: &RedisPool,
     ) -> Result<(), super::DatabaseError> {

@@ -1,19 +1,11 @@
-use super::ids::{Base62Id, ImageId};
-use crate::models::ids::{ProjectId, ReportId};
+use crate::models::ids::{
+    ImageId, ProjectId, ReportId, ThreadId, ThreadMessageId,
+};
 use crate::models::projects::ProjectStatus;
-use crate::models::users::{User, UserId};
+use crate::models::users::User;
+use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(from = "Base62Id")]
-#[serde(into = "Base62Id")]
-pub struct ThreadId(pub u64);
-
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Debug)]
-#[serde(from = "Base62Id")]
-#[serde(into = "Base62Id")]
-pub struct ThreadMessageId(pub u64);
 
 #[derive(Serialize, Deserialize)]
 pub struct Thread {
@@ -94,7 +86,7 @@ impl ThreadType {
 
 impl Thread {
     pub fn from(
-        data: crate::database::models::Thread,
+        data: crate::database::models::DBThread,
         users: Vec<User>,
         user: &User,
     ) -> Self {
@@ -127,7 +119,7 @@ impl Thread {
 
 impl ThreadMessage {
     pub fn from(
-        data: crate::database::models::ThreadMessage,
+        data: crate::database::models::DBThreadMessage,
         user: &User,
     ) -> Self {
         Self {

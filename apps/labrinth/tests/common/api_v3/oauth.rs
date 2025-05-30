@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use actix_http::StatusCode;
+use actix_web::http::header::{AUTHORIZATION, LOCATION};
 use actix_web::{
     dev::ServiceResponse,
     test::{self, TestRequest},
@@ -9,7 +10,6 @@ use labrinth::auth::oauth::{
     OAuthClientAccessRequest, RespondToOAuthClientScopes, TokenRequest,
     TokenResponse,
 };
-use reqwest::header::{AUTHORIZATION, LOCATION};
 
 use crate::{
     assert_status,
@@ -104,8 +104,7 @@ impl ApiV3 {
                     code: auth_code,
                     redirect_uri: original_redirect_uri,
                     client_id: serde_json::from_str(&format!(
-                        "\"{}\"",
-                        client_id
+                        "\"{client_id}\""
                     ))
                     .unwrap(),
                 })

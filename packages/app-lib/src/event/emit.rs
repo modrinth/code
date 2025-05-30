@@ -1,4 +1,4 @@
-use super::LoadingBarId;
+use super::{FriendPayload, LoadingBarId};
 use crate::event::{
     CommandPayload, EventError, LoadingBar, LoadingBarType, ProcessPayloadType,
     ProfilePayloadType,
@@ -161,7 +161,7 @@ pub fn emit_loading(
     let display_frac = loading_bar.current / loading_bar.total;
     let opt_display_frac = if display_frac >= 1.0 {
         None // by convention, when its done, we submit None
-             // any further updates will be ignored (also sending None)
+    // any further updates will be ignored (also sending None)
     } else {
         Some(display_frac)
     };
@@ -293,6 +293,20 @@ pub async fn emit_profile(
             )
             .map_err(EventError::from)?;
     }
+    Ok(())
+}
+
+#[allow(unused_variables)]
+pub async fn emit_friend(payload: FriendPayload) -> crate::Result<()> {
+    #[cfg(feature = "tauri")]
+    {
+        let event_state = crate::EventState::get()?;
+        event_state
+            .app
+            .emit("friend", payload)
+            .map_err(EventError::from)?;
+    }
+
     Ok(())
 }
 

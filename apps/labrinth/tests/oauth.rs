@@ -1,20 +1,20 @@
 use actix_http::StatusCode;
+use actix_web::http::header::{CACHE_CONTROL, PRAGMA};
 use actix_web::test;
 use common::{
     api_v3::oauth::get_redirect_location_query_params,
     api_v3::{
+        ApiV3,
         oauth::{
             get_auth_code_from_redirect_params, get_authorize_accept_flow_id,
         },
-        ApiV3,
     },
     database::FRIEND_USER_ID,
     database::{FRIEND_USER_PAT, USER_USER_ID, USER_USER_PAT},
     dummy_data::DummyOAuthClientAlpha,
-    environment::{with_test_environment, TestEnvironment},
+    environment::{TestEnvironment, with_test_environment},
 };
 use labrinth::auth::oauth::TokenResponse;
-use reqwest::header::{CACHE_CONTROL, PRAGMA};
 
 mod common;
 
@@ -28,7 +28,7 @@ async fn oauth_flow_happy_path() {
         } = &env.dummy.oauth_client_alpha;
 
         // Initiate authorization
-        let redirect_uri = format!("{}?foo=bar", base_redirect_uri);
+        let redirect_uri = format!("{base_redirect_uri}?foo=bar");
         let original_state = "1234";
         let resp = env
             .api

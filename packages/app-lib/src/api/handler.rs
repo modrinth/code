@@ -2,8 +2,8 @@ use std::path::PathBuf;
 
 use crate::{
     event::{
-        emit::{emit_command, emit_warning},
         CommandPayload,
+        emit::{emit_command, emit_warning},
     },
     util::io,
 };

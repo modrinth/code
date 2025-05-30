@@ -6,15 +6,15 @@
   >
     <nav
       aria-label="Breadcrumb navigation"
-      class="m-0 flex list-none items-center p-0 text-contrast"
+      class="m-0 flex min-w-0 flex-shrink items-center p-0 text-contrast"
     >
-      <ol class="m-0 flex list-none items-center p-0">
-        <li class="-ml-1">
+      <ol class="m-0 flex min-w-0 flex-shrink list-none items-center p-0">
+        <li class="-ml-1 flex-shrink-0">
           <ButtonStyled type="transparent">
             <button
               v-tooltip="'Back to home'"
               type="button"
-              class="grid h-12 w-10 place-content-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+              class="mr-2 grid h-12 w-10 place-content-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
               @click="goHome"
             >
               <span

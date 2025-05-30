@@ -74,7 +74,7 @@
   </span>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
   ModrinthIcon,
   ScaleIcon,
@@ -172,16 +172,10 @@ const messages = defineMessages({
 })
 const { formatMessage } = useVIntl()
 
-defineProps({
-  type: {
-    type: String,
-    required: true,
-  },
-  color: {
-    type: String,
-    default: '',
-  },
-})
+defineProps<{
+  type: string
+  color?: string
+}>()
 </script>
 <style lang="scss" scoped>
 .version-badge {

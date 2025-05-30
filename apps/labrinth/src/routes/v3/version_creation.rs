@@ -7,34 +7,38 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::version_item::{
     DependencyBuilder, VersionBuilder, VersionFileBuilder,
 };
-use crate::database::models::{self, image_item, Organization};
+use crate::database::models::{self, DBOrganization, image_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
-use crate::models::images::{Image, ImageContext, ImageId};
+use crate::models::ids::{ImageId, ProjectId, VersionId};
+use crate::models::images::{Image, ImageContext};
 use crate::models::notifications::NotificationBody;
 use crate::models::pack::PackFileHash;
 use crate::models::pats::Scopes;
-use crate::models::projects::{skip_nulls, DependencyType, ProjectStatus};
 use crate::models::projects::{
-    Dependency, FileType, Loader, ProjectId, Version, VersionFile, VersionId,
-    VersionStatus, VersionType,
+    Dependency, FileType, Loader, Version, VersionFile, VersionStatus,
+    VersionType,
 };
+use crate::models::projects::{DependencyType, ProjectStatus, skip_nulls};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
-use crate::validate::{validate_file, ValidationResult};
+use crate::validate::{ValidationResult, validate_file};
 use actix_multipart::{Field, Multipart};
 use actix_web::web::Data;
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, web};
 use chrono::Utc;
 use futures::stream::StreamExt;
+use hex::ToHex;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use sha1::Digest;
 use sqlx::postgres::PgPool;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
+use tracing::error;
 use validator::Validate;
 
 fn default_requested_status() -> VersionStatus {
@@ -49,7 +53,7 @@ pub struct InitialVersionData {
     pub file_parts: Vec<String>,
     #[validate(
         length(min = 1, max = 32),
-        regex = "crate::util::validate::RE_URL_SAFE"
+        regex(path = *crate::util::validate::RE_URL_SAFE)
     )]
     pub version_number: String,
     #[validate(
@@ -179,7 +183,7 @@ async fn version_create_inner(
         }
 
         let result = async {
-            let content_disposition = field.content_disposition().clone();
+            let content_disposition = field.content_disposition().unwrap().clone();
             let name = content_disposition.get_name().ok_or_else(|| {
                 CreateError::MissingValueError("Missing content name".to_string())
             })?;
@@ -209,10 +213,10 @@ async fn version_create_inner(
                     ));
                 }
 
-                let project_id: models::ProjectId = version_create_data.project_id.unwrap().into();
+                let project_id: models::DBProjectId = version_create_data.project_id.unwrap().into();
 
                 // Ensure that the project this version is being added to exists
-                if models::Project::get_id(project_id, &mut **transaction, redis)
+                if models::DBProject::get_id(project_id, &mut **transaction, redis)
                     .await?
                     .is_none()
                 {
@@ -223,7 +227,7 @@ async fn version_create_inner(
 
                 // Check that the user creating this version is a team member
                 // of the project the version is being added to.
-                let team_member = models::TeamMember::get_from_user_id_project(
+                let team_member = models::DBTeamMember::get_from_user_id_project(
                     project_id,
                     user.id.into(),
                     false,
@@ -232,14 +236,14 @@ async fn version_create_inner(
                 .await?;
 
                 // Get organization attached, if exists, and the member project permissions
-                let organization = models::Organization::get_associated_organization_project_id(
+                let organization = models::DBOrganization::get_associated_organization_project_id(
                     project_id,
                     &mut **transaction,
                 )
                 .await?;
 
                 let organization_team_member = if let Some(organization) = &organization {
-                    models::TeamMember::get_from_user_id(
+                    models::DBTeamMember::get_from_user_id(
                         organization.team_id,
                         user.id.into(),
                         &mut **transaction,
@@ -399,11 +403,11 @@ async fn version_create_inner(
         SELECT follower_id FROM mod_follows
         WHERE mod_id = $1
         ",
-        builder.project_id as crate::database::models::ids::ProjectId
+        builder.project_id as crate::database::models::ids::DBProjectId
     )
     .fetch(&mut **transaction)
-    .map_ok(|m| models::ids::UserId(m.follower_id))
-    .try_collect::<Vec<models::ids::UserId>>()
+    .map_ok(|m| models::ids::DBUserId(m.follower_id))
+    .try_collect::<Vec<models::ids::DBUserId>>()
     .await?;
 
     let project_id: ProjectId = builder.project_id.into();
@@ -477,7 +481,7 @@ async fn version_create_inner(
 
     for image_id in version_data.uploaded_images {
         if let Some(db_image) =
-            image_item::Image::get(image_id.into(), &mut **transaction, redis)
+            image_item::DBImage::get(image_id.into(), &mut **transaction, redis)
                 .await?
         {
             let image: Image = db_image.into();
@@ -485,8 +489,7 @@ async fn version_create_inner(
                 || image.context.inner_id().is_some()
             {
                 return Err(CreateError::InvalidInput(format!(
-                    "Image {} is not unused and in the 'version' context",
-                    image_id
+                    "Image {image_id} is not unused and in the 'version' context"
                 )));
             }
 
@@ -502,20 +505,19 @@ async fn version_create_inner(
             .execute(&mut **transaction)
             .await?;
 
-            image_item::Image::clear_cache(image.id.into(), redis).await?;
+            image_item::DBImage::clear_cache(image.id.into(), redis).await?;
         } else {
             return Err(CreateError::InvalidInput(format!(
-                "Image {} does not exist",
-                image_id
+                "Image {image_id} does not exist"
             )));
         }
     }
 
-    models::Project::clear_cache(project_id, None, Some(true), redis).await?;
+    models::DBProject::clear_cache(project_id, None, Some(true), redis).await?;
 
     let project_status = sqlx::query!(
         "SELECT status FROM mods WHERE id = $1",
-        project_id as models::ProjectId,
+        project_id as models::DBProjectId,
     )
     .fetch_optional(pool)
     .await?;
@@ -541,7 +543,7 @@ pub async fn upload_file_to_version(
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
 
-    let version_id = models::VersionId::from(url_data.into_inner().0);
+    let version_id = models::DBVersionId::from(url_data.into_inner().0);
 
     let result = upload_file_to_version_inner(
         req,
@@ -584,7 +586,7 @@ async fn upload_file_to_version_inner(
     redis: Data<RedisPool>,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
-    version_id: models::VersionId,
+    version_id: models::DBVersionId,
     session_queue: &AuthQueue,
 ) -> Result<HttpResponse, CreateError> {
     let cdn_url = dotenvy::var("CDN_URL")?;
@@ -602,7 +604,7 @@ async fn upload_file_to_version_inner(
     .await?
     .1;
 
-    let result = models::Version::get(version_id, &**client, &redis).await?;
+    let result = models::DBVersion::get(version_id, &**client, &redis).await?;
 
     let version = match result {
         Some(v) => v,
@@ -627,7 +629,7 @@ async fn upload_file_to_version_inner(
         })
         .collect::<Result<Vec<_>, _>>()?;
 
-    if models::Project::get_id(
+    if models::DBProject::get_id(
         version.inner.project_id,
         &mut **transaction,
         &redis,
@@ -641,7 +643,7 @@ async fn upload_file_to_version_inner(
     }
 
     if !user.role.is_admin() {
-        let team_member = models::TeamMember::get_from_user_id_project(
+        let team_member = models::DBTeamMember::get_from_user_id_project(
             version.inner.project_id,
             user.id.into(),
             false,
@@ -650,7 +652,7 @@ async fn upload_file_to_version_inner(
         .await?;
 
         let organization =
-            Organization::get_associated_organization_project_id(
+            DBOrganization::get_associated_organization_project_id(
                 version.inner.project_id,
                 &**client,
             )
@@ -658,7 +660,7 @@ async fn upload_file_to_version_inner(
 
         let organization_team_member = if let Some(organization) = &organization
         {
-            models::TeamMember::get_from_user_id(
+            models::DBTeamMember::get_from_user_id(
                 organization.team_id,
                 user.id.into(),
                 &mut **transaction,
@@ -693,7 +695,8 @@ async fn upload_file_to_version_inner(
         }
 
         let result = async {
-            let content_disposition = field.content_disposition().clone();
+            let content_disposition =
+                field.content_disposition().unwrap().clone();
             let name = content_disposition.get_name().ok_or_else(|| {
                 CreateError::MissingValueError(
                     "Missing content name".to_string(),
@@ -779,7 +782,7 @@ async fn upload_file_to_version_inner(
     }
 
     // Clear version cache
-    models::Version::clear_cache(&version, &redis).await?;
+    models::DBVersion::clear_cache(&version, &redis).await?;
 
     Ok(HttpResponse::NoContent().body(""))
 }
@@ -809,7 +812,7 @@ pub async fn upload_file(
 ) -> Result<(), CreateError> {
     let (file_name, file_extension) = get_name_ext(content_disposition)?;
 
-    if other_file_names.contains(&format!("{}.{}", file_name, file_extension)) {
+    if other_file_names.contains(&format!("{file_name}.{file_extension}")) {
         return Err(CreateError::InvalidInput(
             "Duplicate files are not allowed to be uploaded to Modrinth!"
                 .to_string(),
@@ -832,7 +835,7 @@ pub async fn upload_file(
         "Project file exceeds the maximum of 500MiB. Contact a moderator or admin to request permission to upload larger files."
     ).await?;
 
-    let hash = sha1::Sha1::from(&data).hexdigest();
+    let hash = sha1::Sha1::digest(&data).encode_hex::<String>();
     let exists = sqlx::query!(
         "
         SELECT EXISTS(SELECT 1 FROM hashes h
@@ -901,8 +904,8 @@ pub async fn upload_file(
                             .map(|x| x.as_bytes())
                 }) {
                     dependencies.push(DependencyBuilder {
-                        project_id: Some(models::ProjectId(dep.project_id)),
-                        version_id: Some(models::VersionId(dep.version_id)),
+                        project_id: Some(models::DBProjectId(dep.project_id)),
+                        version_id: Some(models::DBVersionId(dep.version_id)),
                         file_name: None,
                         dependency_type: DependencyType::Embedded.to_string(),
                     });
@@ -977,6 +980,30 @@ pub async fn upload_file(
     if let ValidationResult::Warning(msg) = validation_result {
         if primary {
             return Err(CreateError::InvalidInput(msg.to_string()));
+        }
+    }
+
+    let url = format!("{cdn_url}/{file_path_encode}");
+
+    let client = reqwest::Client::new();
+    let delphi_url = dotenvy::var("DELPHI_URL")?;
+    match client
+        .post(delphi_url)
+        .json(&serde_json::json!({
+            "url": url,
+            "project_id": project_id,
+            "version_id": version_id,
+        }))
+        .send()
+        .await
+    {
+        Ok(res) => {
+            if !res.status().is_success() {
+                error!("Failed to upload file to Delphi: {url}");
+            }
+        }
+        Err(e) => {
+            error!("Failed to upload file to Delphi: {url}: {e}");
         }
     }
 
