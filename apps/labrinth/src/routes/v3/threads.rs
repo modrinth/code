@@ -7,12 +7,12 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
-use crate::models::ids::ThreadMessageId;
+use crate::models::ids::{ThreadId, ThreadMessageId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::ProjectStatus;
-use crate::models::threads::{MessageBody, Thread, ThreadId, ThreadType};
+use crate::models::threads::{MessageBody, Thread, ThreadType};
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
@@ -34,7 +34,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 }
 
 pub async fn is_authorized_thread(
-    thread: &database::models::Thread,
+    thread: &database::models::DBThread,
     user: &User,
     pool: &PgPool,
 ) -> Result<bool, ApiError> {
@@ -42,14 +42,14 @@ pub async fn is_authorized_thread(
         return Ok(true);
     }
 
-    let user_id: database::models::UserId = user.id.into();
+    let user_id: database::models::DBUserId = user.id.into();
     Ok(match thread.type_ {
         ThreadType::Report => {
             if let Some(report_id) = thread.report_id {
                 let report_exists = sqlx::query!(
                     "SELECT EXISTS(SELECT 1 FROM reports WHERE id = $1 AND reporter = $2)",
-                    report_id as database::models::ids::ReportId,
-                    user_id as database::models::ids::UserId,
+                    report_id as database::models::ids::DBReportId,
+                    user_id as database::models::ids::DBUserId,
                 )
                 .fetch_one(pool)
                 .await?
@@ -64,8 +64,8 @@ pub async fn is_authorized_thread(
             if let Some(project_id) = thread.project_id {
                 let project_exists = sqlx::query!(
                     "SELECT EXISTS(SELECT 1 FROM mods m INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.user_id = $2 WHERE m.id = $1)",
-                    project_id as database::models::ids::ProjectId,
-                    user_id as database::models::ids::UserId,
+                    project_id as database::models::ids::DBProjectId,
+                    user_id as database::models::ids::DBUserId,
                 )
                     .fetch_one(pool)
                     .await?
@@ -74,8 +74,8 @@ pub async fn is_authorized_thread(
                 if !project_exists.unwrap_or(false) {
                     let org_exists = sqlx::query!(
                         "SELECT EXISTS(SELECT 1 FROM mods m INNER JOIN organizations o ON m.organization_id = o.id INNER JOIN team_members tm ON tm.team_id = o.team_id AND tm.user_id = $2 WHERE m.id = $1)",
-                        project_id as database::models::ids::ProjectId,
-                        user_id as database::models::ids::UserId,
+                        project_id as database::models::ids::DBProjectId,
+                        user_id as database::models::ids::DBUserId,
                     )
                         .fetch_one(pool)
                         .await?
@@ -94,12 +94,12 @@ pub async fn is_authorized_thread(
 }
 
 pub async fn filter_authorized_threads(
-    threads: Vec<database::models::Thread>,
+    threads: Vec<database::models::DBThread>,
     user: &User,
     pool: &web::Data<PgPool>,
     redis: &RedisPool,
 ) -> Result<Vec<Thread>, ApiError> {
-    let user_id: database::models::UserId = user.id.into();
+    let user_id: database::models::DBUserId = user.id.into();
 
     let mut return_threads = Vec::new();
     let mut check_threads = Vec::new();
@@ -130,7 +130,7 @@ pub async fn filter_authorized_threads(
                 WHERE m.id = ANY($1)
                 ",
                 &*project_thread_ids,
-                user_id as database::models::ids::UserId,
+                user_id as database::models::ids::DBUserId,
             )
             .fetch(&***pool)
             .map_ok(|row| {
@@ -163,7 +163,7 @@ pub async fn filter_authorized_threads(
                 WHERE m.id = ANY($1)
                 ",
                 &*project_thread_ids,
-                user_id as database::models::ids::UserId,
+                user_id as database::models::ids::DBUserId,
             )
             .fetch(&***pool)
             .map_ok(|row| {
@@ -194,7 +194,7 @@ pub async fn filter_authorized_threads(
                 WHERE id = ANY($1) AND reporter = $2
                 ",
                 &*report_thread_ids,
-                user_id as database::models::ids::UserId,
+                user_id as database::models::ids::DBUserId,
             )
             .fetch(&***pool)
             .map_ok(|row| {
@@ -216,7 +216,7 @@ pub async fn filter_authorized_threads(
     let mut user_ids = return_threads
         .iter()
         .flat_map(|x| x.members.clone())
-        .collect::<Vec<database::models::UserId>>();
+        .collect::<Vec<database::models::DBUserId>>();
     user_ids.append(
         &mut return_threads
             .iter()
@@ -226,11 +226,11 @@ pub async fn filter_authorized_threads(
                     .filter_map(|x| x.author_id)
                     .collect::<Vec<_>>()
             })
-            .collect::<Vec<database::models::UserId>>(),
+            .collect::<Vec<database::models::DBUserId>>(),
     );
 
     let users: Vec<User> =
-        database::models::User::get_many_ids(&user_ids, &***pool, redis)
+        database::models::DBUser::get_many_ids(&user_ids, &***pool, redis)
             .await?
             .into_iter()
             .map(From::from)
@@ -278,7 +278,7 @@ pub async fn thread_get(
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0.into();
 
-    let thread_data = database::models::Thread::get(string, &**pool).await?;
+    let thread_data = database::models::DBThread::get(string, &**pool).await?;
 
     let user = get_user_from_headers(
         &req,
@@ -308,12 +308,13 @@ pub async fn thread_get(
                     .collect::<Vec<_>>(),
             );
 
-            let users: Vec<User> =
-                database::models::User::get_many_ids(authors, &**pool, &redis)
-                    .await?
-                    .into_iter()
-                    .map(From::from)
-                    .collect();
+            let users: Vec<User> = database::models::DBUser::get_many_ids(
+                authors, &**pool, &redis,
+            )
+            .await?
+            .into_iter()
+            .map(From::from)
+            .collect();
 
             return Ok(
                 HttpResponse::Ok().json(Thread::from(data, users, &user))
@@ -345,14 +346,14 @@ pub async fn threads_get(
     .await?
     .1;
 
-    let thread_ids: Vec<database::models::ids::ThreadId> =
+    let thread_ids: Vec<database::models::ids::DBThreadId> =
         serde_json::from_str::<Vec<ThreadId>>(&ids.ids)?
             .into_iter()
             .map(|x| x.into())
             .collect();
 
     let threads_data =
-        database::models::Thread::get_many(&thread_ids, &**pool).await?;
+        database::models::DBThread::get_many(&thread_ids, &**pool).await?;
 
     let threads =
         filter_authorized_threads(threads_data, &user, &pool, &redis).await?;
@@ -383,7 +384,7 @@ pub async fn thread_send_message(
     .await?
     .1;
 
-    let string: database::models::ThreadId = info.into_inner().0.into();
+    let string: database::models::DBThreadId = info.into_inner().0.into();
 
     if let MessageBody::Text {
         body,
@@ -405,7 +406,7 @@ pub async fn thread_send_message(
         }
 
         if let Some(replying_to) = replying_to {
-            let thread_message = database::models::ThreadMessage::get(
+            let thread_message = database::models::DBThreadMessage::get(
                 (*replying_to).into(),
                 &**pool,
             )
@@ -430,7 +431,7 @@ pub async fn thread_send_message(
         ));
     }
 
-    let result = database::models::Thread::get(string, &**pool).await?;
+    let result = database::models::DBThread::get(string, &**pool).await?;
 
     if let Some(thread) = result {
         if !is_authorized_thread(&thread, &user, &pool).await? {
@@ -449,16 +450,17 @@ pub async fn thread_send_message(
         .await?;
 
         if let Some(project_id) = thread.project_id {
-            let project =
-                database::models::Project::get_id(project_id, &**pool, &redis)
-                    .await?;
+            let project = database::models::DBProject::get_id(
+                project_id, &**pool, &redis,
+            )
+            .await?;
 
             if let Some(project) = project {
                 if project.inner.status != ProjectStatus::Processing
                     && user.role.is_mod()
                 {
                     let members =
-                        database::models::TeamMember::get_from_team_full(
+                        database::models::DBTeamMember::get_from_team_full(
                             project.inner.team_id,
                             &**pool,
                             &redis,
@@ -482,9 +484,10 @@ pub async fn thread_send_message(
                 }
             }
         } else if let Some(report_id) = thread.report_id {
-            let report =
-                database::models::report_item::Report::get(report_id, &**pool)
-                    .await?;
+            let report = database::models::report_item::DBReport::get(
+                report_id, &**pool,
+            )
+            .await?;
 
             if let Some(report) = report {
                 if report.closed && !user.role.is_mod() {
@@ -513,7 +516,7 @@ pub async fn thread_send_message(
         } = &new_message.body
         {
             for image_id in associated_images {
-                if let Some(db_image) = image_item::Image::get(
+                if let Some(db_image) = image_item::DBImage::get(
                     (*image_id).into(),
                     &mut *transaction,
                     &redis,
@@ -543,7 +546,7 @@ pub async fn thread_send_message(
                     .execute(&mut *transaction)
                     .await?;
 
-                    image_item::Image::clear_cache(image.id.into(), &redis)
+                    image_item::DBImage::clear_cache(image.id.into(), &redis)
                         .await?;
                 } else {
                     return Err(ApiError::InvalidInput(format!(
@@ -579,7 +582,7 @@ pub async fn message_delete(
     .await?
     .1;
 
-    let result = database::models::ThreadMessage::get(
+    let result = database::models::DBThreadMessage::get(
         info.into_inner().0.into(),
         &**pool,
     )
@@ -598,7 +601,7 @@ pub async fn message_delete(
             thread_message_id: Some(thread.id.into()),
         };
         let images =
-            database::Image::get_many_contexted(context, &mut transaction)
+            database::DBImage::get_many_contexted(context, &mut transaction)
                 .await?;
         let cdn_url = dotenvy::var("CDN_URL")?;
         for image in images {
@@ -606,7 +609,8 @@ pub async fn message_delete(
             if let Some(icon_path) = name {
                 file_host.delete_file_version("", icon_path).await?;
             }
-            database::Image::remove(image.id, &mut transaction, &redis).await?;
+            database::DBImage::remove(image.id, &mut transaction, &redis)
+                .await?;
         }
 
         let private = if let MessageBody::Text { private, .. } = thread.body {
@@ -617,7 +621,7 @@ pub async fn message_delete(
             false
         };
 
-        database::models::ThreadMessage::remove_full(
+        database::models::DBThreadMessage::remove_full(
             thread.id,
             private,
             &mut transaction,

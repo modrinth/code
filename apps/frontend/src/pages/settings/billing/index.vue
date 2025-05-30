@@ -224,7 +224,7 @@
                   explanations for this. If you just purchased your server, this is normal. It could
                   take up to an hour for your server to be provisioned. Otherwise, if you purchased
                   this server a while ago, it has likely since been suspended. If this is not what
-                  you were expecting, please contact Modrinth support with the following
+                  you were expecting, please contact Modrinth Support with the following
                   information:
                 </p>
                 <div class="flex w-full flex-col gap-2">
@@ -361,7 +361,14 @@
                       "
                       color="green"
                     >
-                      <button @click="resubscribePyro(subscription.id)">
+                      <button
+                        @click="
+                          resubscribePyro(
+                            subscription.id,
+                            $dayjs(getPyroCharge(subscription).due).isBefore($dayjs()),
+                          )
+                        "
+                      >
                         Resubscribe <RightArrowIcon />
                       </button>
                     </ButtonStyled>
@@ -1005,7 +1012,7 @@ async function fetchCapacityStatuses(serverId, product) {
   }
 }
 
-const resubscribePyro = async (subscriptionId) => {
+const resubscribePyro = async (subscriptionId, wasSuspended) => {
   try {
     await useBaseFetch(`billing/subscription/${subscriptionId}`, {
       internal: true,
@@ -1015,6 +1022,21 @@ const resubscribePyro = async (subscriptionId) => {
       },
     });
     await refresh();
+    if (wasSuspended) {
+      data.$notify({
+        group: "main",
+        title: "Resubscription request submitted",
+        text: "If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.",
+        type: "success",
+      });
+    } else {
+      data.$notify({
+        group: "main",
+        title: "Success",
+        text: "Server subscription resubscribed successfully",
+        type: "success",
+      });
+    }
   } catch {
     data.$notify({
       group: "main",

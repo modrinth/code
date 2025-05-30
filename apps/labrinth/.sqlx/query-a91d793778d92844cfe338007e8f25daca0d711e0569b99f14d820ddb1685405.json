@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT m.id AS pid, NULL AS oid\n            FROM mods m\n            WHERE m.team_id = $1\n\n            UNION ALL\n\n            SELECT NULL AS pid, o.id AS oid\n            FROM organizations o\n            WHERE o.team_id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "pid",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "oid",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null,
+      null
+    ]
+  },
+  "hash": "a91d793778d92844cfe338007e8f25daca0d711e0569b99f14d820ddb1685405"
+}

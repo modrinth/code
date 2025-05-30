@@ -1,24 +1,23 @@
+use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
+use labrinth::models::ids::{
+    ImageId, NotificationId, OrganizationId, ProjectId, ReportId, TeamId,
+    ThreadId, ThreadMessageId, VersionId,
+};
 use labrinth::{
     auth::AuthProvider,
     models::{
-        images::ImageId,
-        notifications::NotificationId,
-        organizations::OrganizationId,
         projects::{
             Dependency, GalleryItem, License, ModeratorMessage,
-            MonetizationStatus, ProjectId, ProjectStatus, VersionFile,
-            VersionId, VersionStatus, VersionType,
+            MonetizationStatus, ProjectStatus, VersionFile, VersionStatus,
+            VersionType,
         },
-        reports::ReportId,
-        teams::{ProjectPermissions, TeamId},
-        threads::{ThreadId, ThreadMessageId},
-        users::{Badges, Role, User, UserId, UserPayoutData},
+        teams::ProjectPermissions,
+        users::{Badges, Role, User, UserPayoutData},
     },
 };
 use rust_decimal::Decimal;
 use serde::Deserialize;
-
 // Fields shared by every version of the API.
 // No struct in here should have ANY field that
 // is not present in *every* version of the API.

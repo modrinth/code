@@ -1,9 +1,9 @@
 use crate::database;
-use crate::database::models::Collection;
-use crate::database::models::project_item::QueryProject;
-use crate::database::models::version_item::QueryVersion;
+use crate::database::models::DBCollection;
+use crate::database::models::project_item::ProjectQueryResult;
+use crate::database::models::version_item::VersionQueryResult;
 use crate::database::redis::RedisPool;
-use crate::database::{Project, Version, models};
+use crate::database::{DBProject, DBVersion, models};
 use crate::models::users::User;
 use crate::routes::ApiError;
 use itertools::Itertools;
@@ -38,7 +38,7 @@ where
 }
 
 pub async fn is_visible_project(
-    project_data: &Project,
+    project_data: &DBProject,
     user_option: &Option<User>,
     pool: &PgPool,
     hide_unlisted: bool,
@@ -54,7 +54,7 @@ pub async fn is_visible_project(
 }
 
 pub async fn is_team_member_project(
-    project_data: &Project,
+    project_data: &DBProject,
     user_option: &Option<User>,
     pool: &PgPool,
 ) -> Result<bool, ApiError> {
@@ -64,7 +64,7 @@ pub async fn is_team_member_project(
 }
 
 pub async fn filter_visible_projects(
-    mut projects: Vec<QueryProject>,
+    mut projects: Vec<ProjectQueryResult>,
     user_option: &Option<User>,
     pool: &PgPool,
     hide_unlisted: bool,
@@ -86,11 +86,11 @@ pub async fn filter_visible_projects(
 // - the user is a mod
 // This is essentially whether you can know of the project's existence
 pub async fn filter_visible_project_ids(
-    projects: Vec<&Project>,
+    projects: Vec<&DBProject>,
     user_option: &Option<User>,
     pool: &PgPool,
     hide_unlisted: bool,
-) -> Result<Vec<crate::database::models::ProjectId>, ApiError> {
+) -> Result<Vec<crate::database::models::DBProjectId>, ApiError> {
     let mut return_projects = Vec::new();
     let mut check_projects = Vec::new();
 
@@ -126,14 +126,14 @@ pub async fn filter_visible_project_ids(
 // These are projects we have internal access to and can potentially see even if they are hidden
 // This is useful for getting visibility of versions, or seeing analytics or sensitive team-restricted data of a project
 pub async fn filter_enlisted_projects_ids(
-    projects: Vec<&Project>,
+    projects: Vec<&DBProject>,
     user_option: &Option<User>,
     pool: &PgPool,
-) -> Result<Vec<crate::database::models::ProjectId>, ApiError> {
+) -> Result<Vec<crate::database::models::DBProjectId>, ApiError> {
     let mut return_projects = vec![];
 
     if let Some(user) = user_option {
-        let user_id: models::ids::UserId = user.id.into();
+        let user_id: models::ids::DBUserId = user.id.into();
 
         use futures::TryStreamExt;
 
@@ -154,7 +154,7 @@ pub async fn filter_enlisted_projects_ids(
                 .iter()
                 .filter_map(|x| x.organization_id.map(|x| x.0))
                 .collect::<Vec<_>>(),
-            user_id as database::models::ids::UserId,
+            user_id as database::models::ids::DBUserId,
         )
         .fetch(pool)
         .map_ok(|row| {
@@ -173,7 +173,7 @@ pub async fn filter_enlisted_projects_ids(
 }
 
 pub async fn is_visible_version(
-    version_data: &Version,
+    version_data: &DBVersion,
     user_option: &Option<User>,
     pool: &PgPool,
     redis: &RedisPool,
@@ -184,7 +184,7 @@ pub async fn is_visible_version(
 }
 
 pub async fn is_team_member_version(
-    version_data: &Version,
+    version_data: &DBVersion,
     user_option: &Option<User>,
     pool: &PgPool,
     redis: &RedisPool,
@@ -195,7 +195,7 @@ pub async fn is_team_member_version(
 }
 
 pub async fn filter_visible_versions(
-    mut versions: Vec<QueryVersion>,
+    mut versions: Vec<VersionQueryResult>,
     user_option: &Option<User>,
     pool: &PgPool,
     redis: &RedisPool,
@@ -211,7 +211,7 @@ pub async fn filter_visible_versions(
     Ok(versions.into_iter().map(|x| x.into()).collect())
 }
 
-impl ValidateAuthorized for models::OAuthClient {
+impl ValidateAuthorized for models::DBOAuthClient {
     fn validate_authorized(
         &self,
         user_option: Option<&User>,
@@ -232,11 +232,11 @@ impl ValidateAuthorized for models::OAuthClient {
 }
 
 pub async fn filter_visible_version_ids(
-    versions: Vec<&Version>,
+    versions: Vec<&DBVersion>,
     user_option: &Option<User>,
     pool: &PgPool,
     redis: &RedisPool,
-) -> Result<Vec<crate::database::models::VersionId>, ApiError> {
+) -> Result<Vec<crate::database::models::DBVersionId>, ApiError> {
     let mut return_versions = Vec::new();
     let mut check_versions = Vec::new();
 
@@ -247,7 +247,7 @@ pub async fn filter_visible_version_ids(
 
     // Get visible projects- ones we are allowed to see public versions for.
     let visible_project_ids = filter_visible_project_ids(
-        Project::get_many_ids(&project_ids, pool, redis)
+        DBProject::get_many_ids(&project_ids, pool, redis)
             .await?
             .iter()
             .map(|x| &x.inner)
@@ -287,11 +287,11 @@ pub async fn filter_visible_version_ids(
 }
 
 pub async fn filter_enlisted_version_ids(
-    versions: Vec<&Version>,
+    versions: Vec<&DBVersion>,
     user_option: &Option<User>,
     pool: &PgPool,
     redis: &RedisPool,
-) -> Result<Vec<crate::database::models::VersionId>, ApiError> {
+) -> Result<Vec<crate::database::models::DBVersionId>, ApiError> {
     let mut return_versions = Vec::new();
 
     // Get project ids of versions
@@ -299,7 +299,7 @@ pub async fn filter_enlisted_version_ids(
 
     // Get enlisted projects- ones we are allowed to see hidden versions for.
     let authorized_project_ids = filter_enlisted_projects_ids(
-        Project::get_many_ids(&project_ids, pool, redis)
+        DBProject::get_many_ids(&project_ids, pool, redis)
             .await?
             .iter()
             .map(|x| &x.inner)
@@ -325,7 +325,7 @@ pub async fn filter_enlisted_version_ids(
 }
 
 pub async fn is_visible_collection(
-    collection_data: &Collection,
+    collection_data: &DBCollection,
     user_option: &Option<User>,
 ) -> Result<bool, ApiError> {
     let mut authorized = !collection_data.status.is_hidden()
@@ -341,7 +341,7 @@ pub async fn is_visible_collection(
 }
 
 pub async fn filter_visible_collections(
-    collections: Vec<Collection>,
+    collections: Vec<DBCollection>,
     user_option: &Option<User>,
 ) -> Result<Vec<crate::models::collections::Collection>, ApiError> {
     let mut return_collections = Vec::new();

@@ -31,6 +31,7 @@ futures.workspace = true
 futures-util.workspace = true
 async-trait.workspace = true
 dashmap.workspace = true
+paste.workspace = true
 
 meilisearch-sdk = { workspace = true, features = ["reqwest"] }
 rust-s3.workspace = true
@@ -88,7 +89,7 @@ rust_decimal = { workspace = true, features = [
     "serde-with-float",
     "serde-with-str",
 ] }
-redis = { workspace = true, features = ["tokio-comp", "ahash", "r2d2"] } # Locked on 0.29 until deadpool-redis updates to 0.30
+redis = { workspace = true, features = ["tokio-comp", "ahash", "r2d2"] }
 deadpool-redis.workspace = true
 clickhouse = { workspace = true, features = ["uuid", "time"] }
 uuid = { workspace = true, features = ["v4", "fast-rng", "serde"] }

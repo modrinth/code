@@ -1,6 +1,6 @@
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::redis::RedisPool;
-use crate::models::projects::ProjectId;
+use crate::models::ids::ProjectId;
 use crate::routes::ApiError;
 use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Utc};
@@ -47,7 +47,7 @@ async fn get_webhook_metadata(
     redis: &RedisPool,
     emoji: bool,
 ) -> Result<Option<WebhookMetadata>, ApiError> {
-    let project = crate::database::models::project_item::Project::get_id(
+    let project = crate::database::models::project_item::DBProject::get_id(
         project_id.into(),
         pool,
         redis,
@@ -58,7 +58,7 @@ async fn get_webhook_metadata(
         let mut owner = None;
 
         if let Some(organization_id) = project.inner.organization_id {
-            let organization = crate::database::models::organization_item::Organization::get_id(
+            let organization = crate::database::models::organization_item::DBOrganization::get_id(
                 organization_id,
                 pool,
                 redis,
@@ -77,7 +77,7 @@ async fn get_webhook_metadata(
                 });
             }
         } else {
-            let team = crate::database::models::team_item::TeamMember::get_from_team_full(
+            let team = crate::database::models::team_item::DBTeamMember::get_from_team_full(
                 project.inner.team_id,
                 pool,
                 redis,
@@ -85,7 +85,7 @@ async fn get_webhook_metadata(
             .await?;
 
             if let Some(member) = team.into_iter().find(|x| x.is_owner) {
-                let user = crate::database::models::user_item::User::get_id(
+                let user = crate::database::models::user_item::DBUser::get_id(
                     member.user_id,
                     pool,
                     redis,

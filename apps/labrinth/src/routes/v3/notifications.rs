@@ -45,8 +45,8 @@ pub async fn notifications_get(
     .await?
     .1;
 
-    use database::models::NotificationId as DBNotificationId;
-    use database::models::notification_item::Notification as DBNotification;
+    use database::models::DBNotificationId;
+    use database::models::notification_item::DBNotification;
 
     let notification_ids: Vec<DBNotificationId> =
         serde_json::from_str::<Vec<NotificationId>>(ids.ids.as_str())?
@@ -55,7 +55,7 @@ pub async fn notifications_get(
             .collect();
 
     let notifications_data: Vec<DBNotification> =
-        database::models::notification_item::Notification::get_many(
+        database::models::notification_item::DBNotification::get_many(
             &notification_ids,
             &**pool,
         )
@@ -90,7 +90,7 @@ pub async fn notification_get(
     let id = info.into_inner().0;
 
     let notification_data =
-        database::models::notification_item::Notification::get(
+        database::models::notification_item::DBNotification::get(
             id.into(),
             &**pool,
         )
@@ -127,7 +127,7 @@ pub async fn notification_read(
     let id = info.into_inner().0;
 
     let notification_data =
-        database::models::notification_item::Notification::get(
+        database::models::notification_item::DBNotification::get(
             id.into(),
             &**pool,
         )
@@ -137,7 +137,7 @@ pub async fn notification_read(
         if data.user_id == user.id.into() || user.role.is_admin() {
             let mut transaction = pool.begin().await?;
 
-            database::models::notification_item::Notification::read(
+            database::models::notification_item::DBNotification::read(
                 id.into(),
                 &mut transaction,
                 &redis,
@@ -177,7 +177,7 @@ pub async fn notification_delete(
     let id = info.into_inner().0;
 
     let notification_data =
-        database::models::notification_item::Notification::get(
+        database::models::notification_item::DBNotification::get(
             id.into(),
             &**pool,
         )
@@ -187,7 +187,7 @@ pub async fn notification_delete(
         if data.user_id == user.id.into() || user.role.is_admin() {
             let mut transaction = pool.begin().await?;
 
-            database::models::notification_item::Notification::remove(
+            database::models::notification_item::DBNotification::remove(
                 id.into(),
                 &mut transaction,
                 &redis,
@@ -234,13 +234,13 @@ pub async fn notifications_read(
     let mut transaction = pool.begin().await?;
 
     let notifications_data =
-        database::models::notification_item::Notification::get_many(
+        database::models::notification_item::DBNotification::get_many(
             &notification_ids,
             &**pool,
         )
         .await?;
 
-    let mut notifications: Vec<database::models::ids::NotificationId> =
+    let mut notifications: Vec<database::models::ids::DBNotificationId> =
         Vec::new();
 
     for notification in notifications_data {
@@ -249,7 +249,7 @@ pub async fn notifications_read(
         }
     }
 
-    database::models::notification_item::Notification::read_many(
+    database::models::notification_item::DBNotification::read_many(
         &notifications,
         &mut transaction,
         &redis,
@@ -287,13 +287,13 @@ pub async fn notifications_delete(
     let mut transaction = pool.begin().await?;
 
     let notifications_data =
-        database::models::notification_item::Notification::get_many(
+        database::models::notification_item::DBNotification::get_many(
             &notification_ids,
             &**pool,
         )
         .await?;
 
-    let mut notifications: Vec<database::models::ids::NotificationId> =
+    let mut notifications: Vec<database::models::ids::DBNotificationId> =
         Vec::new();
 
     for notification in notifications_data {
@@ -302,7 +302,7 @@ pub async fn notifications_delete(
         }
     }
 
-    database::models::notification_item::Notification::remove_many(
+    database::models::notification_item::DBNotification::remove_many(
         &notifications,
         &mut transaction,
         &redis,

@@ -60,15 +60,7 @@
       Your server's hardware is currently being upgraded and will be back online shortly.
     </div>
     <div
-      v-if="status === 'suspended' && suspension_reason === 'support'"
-      class="relative -mt-4 flex w-full flex-row items-center gap-2 rounded-b-3xl bg-bg-blue p-4 text-sm font-bold text-contrast"
-    >
-      <HammerIcon />
-      You recently requested support for your server and we are actively working on it. It will be
-      back online shortly.
-    </div>
-    <div
-      v-else-if="status === 'suspended' && suspension_reason !== 'upgrading'"
+      v-else-if="status === 'suspended'"
       class="relative -mt-4 flex w-full flex-col gap-2 rounded-b-3xl bg-bg-red p-4 text-sm font-bold text-contrast"
     >
       <div class="flex flex-row gap-2">

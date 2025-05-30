@@ -2,10 +2,9 @@ use crate::database::models::loader_fields::VersionField;
 use crate::database::models::{project_item, version_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
-use crate::models::ids::ImageId;
+use crate::models::ids::{ImageId, ProjectId, VersionId};
 use crate::models::projects::{
-    Dependency, FileType, Loader, ProjectId, Version, VersionId, VersionStatus,
-    VersionType,
+    Dependency, FileType, Loader, Version, VersionStatus, VersionType,
 };
 use crate::models::v2::projects::LegacyVersion;
 use crate::queue::moderation::AutomatedModerationQueue;
@@ -289,17 +288,20 @@ async fn get_example_version_fields(
         None => return Ok(None),
     };
 
-    let vid =
-        match project_item::Project::get_id(project_id.into(), &**pool, redis)
-            .await?
-            .and_then(|p| p.versions.first().cloned())
-        {
-            Some(vid) => vid,
-            None => return Ok(None),
-        };
+    let vid = match project_item::DBProject::get_id(
+        project_id.into(),
+        &**pool,
+        redis,
+    )
+    .await?
+    .and_then(|p| p.versions.first().cloned())
+    {
+        Some(vid) => vid,
+        None => return Ok(None),
+    };
 
     let example_version =
-        match version_item::Version::get(vid, &**pool, redis).await? {
+        match version_item::DBVersion::get(vid, &**pool, redis).await? {
             Some(version) => version,
             None => return Ok(None),
         };

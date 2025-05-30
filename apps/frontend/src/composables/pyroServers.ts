@@ -307,10 +307,8 @@ interface General {
     | "moderated"
     | "paymentfailed"
     | "cancelled"
-    | "other"
-    | "transferring"
     | "upgrading"
-    | "support"
+    | "other"
     | (string & {});
   loader: string;
   loader_version: string;

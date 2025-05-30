@@ -43,7 +43,7 @@ color-thief = "0.2.2"
 console-subscriber = "0.4.1"
 daedalus = { path = "packages/daedalus" }
 dashmap = "6.1.0"
-deadpool-redis = "0.20.0"
+deadpool-redis = "0.21.1"
 dirs = "6.0.0"
 discord-rich-presence = "0.2.5"
 dotenv-build = "0.1.1"
@@ -89,7 +89,7 @@ quartz_nbt = "0.2.9"
 quick-xml = "0.37.5"
 rand = "=0.8.5"  # Locked on 0.8 until argon2 and p256 update to 0.9
 rand_chacha = "=0.3.1"  # Locked on 0.3 until we can update rand to 0.9
-redis = "=0.29.5"  # Locked on 0.29 until deadpool-redis updates to 0.30
+redis = "0.31.0"
 regex = "1.11.1"
 reqwest = { version = "0.12.15", default-features = false }
 rust-s3 = { version = "0.35.1", default-features = false, features = [
@@ -135,6 +135,7 @@ tauri-plugin-os = "2.2.1"
 tauri-plugin-single-instance = "2.2.3"
 tauri-plugin-updater = { version = "2.7.1", default-features = false, features = [
   "rustls-tls",
+  "zip",
 ] }
 tauri-plugin-window-state = "2.2.2"
 tempfile = "3.20.0"

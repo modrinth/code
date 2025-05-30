@@ -116,7 +116,7 @@ pub enum OAuthErrorType {
     AuthenticationError(#[from] AuthenticationError),
     #[error("Client {} has no redirect URIs specified", .client_id.0)]
     ClientMissingRedirectURI {
-        client_id: crate::database::models::OAuthClientId,
+        client_id: crate::database::models::DBOAuthClientId,
     },
     #[error(
         "The provided redirect URI did not match any configured in the client"
@@ -133,7 +133,7 @@ pub enum OAuthErrorType {
     #[error("The provided flow id was invalid")]
     InvalidAcceptFlowId,
     #[error("The provided client id was invalid")]
-    InvalidClientId(crate::database::models::OAuthClientId),
+    InvalidClientId(crate::database::models::DBOAuthClientId),
     #[error("The provided ID could not be decoded: {0}")]
     MalformedId(#[from] DecodingError),
     #[error("Failed to authenticate client")]

@@ -6,35 +6,35 @@ use serde::{Deserialize, Serialize};
 
 pub struct ThreadBuilder {
     pub type_: ThreadType,
-    pub members: Vec<UserId>,
-    pub project_id: Option<ProjectId>,
-    pub report_id: Option<ReportId>,
+    pub members: Vec<DBUserId>,
+    pub project_id: Option<DBProjectId>,
+    pub report_id: Option<DBReportId>,
 }
 
 #[derive(Clone, Serialize)]
-pub struct Thread {
-    pub id: ThreadId,
+pub struct DBThread {
+    pub id: DBThreadId,
 
-    pub project_id: Option<ProjectId>,
-    pub report_id: Option<ReportId>,
+    pub project_id: Option<DBProjectId>,
+    pub report_id: Option<DBReportId>,
     pub type_: ThreadType,
 
-    pub messages: Vec<ThreadMessage>,
-    pub members: Vec<UserId>,
+    pub messages: Vec<DBThreadMessage>,
+    pub members: Vec<DBUserId>,
 }
 
 pub struct ThreadMessageBuilder {
-    pub author_id: Option<UserId>,
+    pub author_id: Option<DBUserId>,
     pub body: MessageBody,
-    pub thread_id: ThreadId,
+    pub thread_id: DBThreadId,
     pub hide_identity: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct ThreadMessage {
-    pub id: ThreadMessageId,
-    pub thread_id: ThreadId,
-    pub author_id: Option<UserId>,
+pub struct DBThreadMessage {
+    pub id: DBThreadMessageId,
+    pub thread_id: DBThreadId,
+    pub author_id: Option<DBUserId>,
     pub body: MessageBody,
     pub created: DateTime<Utc>,
     pub hide_identity: bool,
@@ -44,7 +44,7 @@ impl ThreadMessageBuilder {
     pub async fn insert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<ThreadMessageId, DatabaseError> {
+    ) -> Result<DBThreadMessageId, DatabaseError> {
         let thread_message_id = generate_thread_message_id(transaction).await?;
 
         sqlx::query!(
@@ -56,10 +56,10 @@ impl ThreadMessageBuilder {
                 $1, $2, $3, $4, $5
             )
             ",
-            thread_message_id as ThreadMessageId,
+            thread_message_id as DBThreadMessageId,
             self.author_id.map(|x| x.0),
             serde_json::value::to_value(self.body.clone())?,
-            self.thread_id as ThreadId,
+            self.thread_id as DBThreadId,
             self.hide_identity
         )
         .execute(&mut **transaction)
@@ -73,7 +73,7 @@ impl ThreadBuilder {
     pub async fn insert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<ThreadId, DatabaseError> {
+    ) -> Result<DBThreadId, DatabaseError> {
         let thread_id = generate_thread_id(&mut *transaction).await?;
         sqlx::query!(
             "
@@ -84,7 +84,7 @@ impl ThreadBuilder {
                 $1, $2, $3, $4
             )
             ",
-            thread_id as ThreadId,
+            thread_id as DBThreadId,
             self.type_.as_str(),
             self.project_id.map(|x| x.0),
             self.report_id.map(|x| x.0),
@@ -111,11 +111,11 @@ impl ThreadBuilder {
     }
 }
 
-impl Thread {
+impl DBThread {
     pub async fn get<'a, E>(
-        id: ThreadId,
+        id: DBThreadId,
         exec: E,
-    ) -> Result<Option<Thread>, sqlx::Error>
+    ) -> Result<Option<DBThread>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -125,9 +125,9 @@ impl Thread {
     }
 
     pub async fn get_many<'a, E>(
-        thread_ids: &[ThreadId],
+        thread_ids: &[DBThreadId],
         exec: E,
-    ) -> Result<Vec<Thread>, sqlx::Error>
+    ) -> Result<Vec<DBThread>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -149,13 +149,13 @@ impl Thread {
             &thread_ids_parsed
         )
         .fetch(exec)
-            .map_ok(|x| Thread {
-                id: ThreadId(x.id),
-                project_id: x.mod_id.map(ProjectId),
-                report_id: x.report_id.map(ReportId),
+            .map_ok(|x| DBThread {
+                id: DBThreadId(x.id),
+                project_id: x.mod_id.map(DBProjectId),
+                report_id: x.report_id.map(DBReportId),
                 type_: ThreadType::from_string(&x.thread_type),
                 messages: {
-                    let mut messages: Vec<ThreadMessage> = serde_json::from_value(
+                    let mut messages: Vec<DBThreadMessage> = serde_json::from_value(
                         x.messages.unwrap_or_default(),
                     )
                         .ok()
@@ -163,16 +163,16 @@ impl Thread {
                     messages.sort_by(|a, b| a.created.cmp(&b.created));
                     messages
                 },
-                members: x.members.unwrap_or_default().into_iter().map(UserId).collect(),
+                members: x.members.unwrap_or_default().into_iter().map(DBUserId).collect(),
             })
-        .try_collect::<Vec<Thread>>()
+        .try_collect::<Vec<DBThread>>()
         .await?;
 
         Ok(threads)
     }
 
     pub async fn remove_full(
-        id: ThreadId,
+        id: DBThreadId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Option<()>, sqlx::error::Error> {
         sqlx::query!(
@@ -180,7 +180,7 @@ impl Thread {
             DELETE FROM threads_messages
             WHERE thread_id = $1
             ",
-            id as ThreadId,
+            id as DBThreadId,
         )
         .execute(&mut **transaction)
         .await?;
@@ -189,7 +189,7 @@ impl Thread {
             DELETE FROM threads_members
             WHERE thread_id = $1
             ",
-            id as ThreadId
+            id as DBThreadId
         )
         .execute(&mut **transaction)
         .await?;
@@ -198,7 +198,7 @@ impl Thread {
             DELETE FROM threads
             WHERE id = $1
             ",
-            id as ThreadId,
+            id as DBThreadId,
         )
         .execute(&mut **transaction)
         .await?;
@@ -207,11 +207,11 @@ impl Thread {
     }
 }
 
-impl ThreadMessage {
+impl DBThreadMessage {
     pub async fn get<'a, E>(
-        id: ThreadMessageId,
+        id: DBThreadMessageId,
         exec: E,
-    ) -> Result<Option<ThreadMessage>, sqlx::Error>
+    ) -> Result<Option<DBThreadMessage>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -221,9 +221,9 @@ impl ThreadMessage {
     }
 
     pub async fn get_many<'a, E>(
-        message_ids: &[ThreadMessageId],
+        message_ids: &[DBThreadMessageId],
         exec: E,
-    ) -> Result<Vec<ThreadMessage>, sqlx::Error>
+    ) -> Result<Vec<DBThreadMessage>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -240,22 +240,22 @@ impl ThreadMessage {
             &message_ids_parsed
         )
         .fetch(exec)
-        .map_ok(|x| ThreadMessage {
-            id: ThreadMessageId(x.id),
-            thread_id: ThreadId(x.thread_id),
-            author_id: x.author_id.map(UserId),
+        .map_ok(|x| DBThreadMessage {
+            id: DBThreadMessageId(x.id),
+            thread_id: DBThreadId(x.thread_id),
+            author_id: x.author_id.map(DBUserId),
             body: serde_json::from_value(x.body).unwrap_or(MessageBody::Deleted { private: false }),
             created: x.created,
             hide_identity: x.hide_identity,
         })
-        .try_collect::<Vec<ThreadMessage>>()
+        .try_collect::<Vec<DBThreadMessage>>()
         .await?;
 
         Ok(messages)
     }
 
     pub async fn remove_full(
-        id: ThreadMessageId,
+        id: DBThreadMessageId,
         private: bool,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Option<()>, sqlx::error::Error> {
@@ -265,7 +265,7 @@ impl ThreadMessage {
             SET body = $2
             WHERE id = $1
             ",
-            id as ThreadMessageId,
+            id as DBThreadMessageId,
             serde_json::to_value(MessageBody::Deleted { private })
                 .unwrap_or(serde_json::json!({}))
         )

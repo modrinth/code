@@ -56,12 +56,12 @@ pub async fn get_projects(
         count.count as i64
     )
     .fetch(&**pool)
-    .map_ok(|m| database::models::ProjectId(m.id))
-    .try_collect::<Vec<database::models::ProjectId>>()
+    .map_ok(|m| database::models::DBProjectId(m.id))
+    .try_collect::<Vec<database::models::DBProjectId>>()
     .await?;
 
     let projects: Vec<_> =
-        database::Project::get_many_ids(&project_ids, &**pool, &redis)
+        database::DBProject::get_many_ids(&project_ids, &**pool, &redis)
             .await?
             .into_iter()
             .map(crate::models::projects::Project::from)
@@ -88,7 +88,7 @@ pub async fn get_project_meta(
 
     let project_id = info.into_inner().0;
     let project =
-        database::models::Project::get(&project_id, &**pool, &redis).await?;
+        database::models::DBProject::get(&project_id, &**pool, &redis).await?;
 
     if let Some(project) = project {
         let rows = sqlx::query!(

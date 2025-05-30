@@ -10,6 +10,7 @@ use crate::common::{
     },
 };
 use actix_http::StatusCode;
+use ariadne::ids::UserId;
 use common::{
     api_v3::ApiV3,
     database::{FRIEND_USER_ID, FRIEND_USER_PAT, USER_USER_PAT},
@@ -18,10 +19,7 @@ use common::{
     },
     permissions::{PermissionsTest, PermissionsTestContext},
 };
-use labrinth::models::{
-    teams::{OrganizationPermissions, ProjectPermissions},
-    users::UserId,
-};
+use labrinth::models::teams::{OrganizationPermissions, ProjectPermissions};
 use serde_json::json;
 
 mod common;

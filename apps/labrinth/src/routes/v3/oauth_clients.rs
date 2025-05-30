@@ -5,10 +5,10 @@ use crate::{
     auth::{checks::ValidateAuthorized, get_user_from_headers},
     database::{
         models::{
-            DatabaseError, OAuthClientId, User, generate_oauth_client_id,
+            DBOAuthClientId, DBUser, DatabaseError, generate_oauth_client_id,
             generate_oauth_redirect_id,
-            oauth_client_authorization_item::OAuthClientAuthorization,
-            oauth_client_item::{OAuthClient, OAuthRedirectUri},
+            oauth_client_authorization_item::DBOAuthClientAuthorization,
+            oauth_client_item::{DBOAuthClient, DBOAuthRedirectUri},
         },
         redis::RedisPool,
     },
@@ -38,8 +38,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use validator::Validate;
 
-use crate::database::models::oauth_client_item::OAuthClient as DBOAuthClient;
-use crate::models::ids::OAuthClientId as ApiOAuthClientId;
+use crate::models::ids::OAuthClientId;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -75,7 +74,7 @@ pub async fn get_user_clients(
     .await?
     .1;
 
-    let target_user = User::get(&info.into_inner(), &**pool, &redis).await?;
+    let target_user = DBUser::get(&info.into_inner(), &**pool, &redis).await?;
 
     if let Some(target_user) = target_user {
         if target_user.id != current_user.id.into()
@@ -87,7 +86,8 @@ pub async fn get_user_clients(
         }
 
         let clients =
-            OAuthClient::get_all_user_clients(target_user.id, &**pool).await?;
+            DBOAuthClient::get_all_user_clients(target_user.id, &**pool)
+                .await?;
 
         let response = clients
             .into_iter()
@@ -102,7 +102,7 @@ pub async fn get_user_clients(
 
 #[get("app/{id}")]
 pub async fn get_client(
-    id: web::Path<ApiOAuthClientId>,
+    id: web::Path<OAuthClientId>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     let clients = get_clients_inner(&[id.into_inner()], pool).await?;
@@ -121,7 +121,7 @@ pub async fn get_clients(
     let ids: Vec<_> = info
         .ids
         .iter()
-        .map(|id| parse_base62(id).map(ApiOAuthClientId))
+        .map(|id| parse_base62(id).map(OAuthClientId))
         .collect::<Result<_, _>>()?;
 
     let clients = get_clients_inner(&ids, pool).await?;
@@ -190,7 +190,7 @@ pub async fn oauth_client_create(
     )
     .await?;
 
-    let client = OAuthClient {
+    let client = DBOAuthClient {
         id: client_id,
         icon_url: None,
         raw_icon_url: None,
@@ -218,7 +218,7 @@ pub async fn oauth_client_create(
 #[delete("app/{id}")]
 pub async fn oauth_client_delete(
     req: HttpRequest,
-    client_id: web::Path<ApiOAuthClientId>,
+    client_id: web::Path<OAuthClientId>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -234,10 +234,10 @@ pub async fn oauth_client_delete(
     .1;
 
     let client =
-        OAuthClient::get(client_id.into_inner().into(), &**pool).await?;
+        DBOAuthClient::get(client_id.into_inner().into(), &**pool).await?;
     if let Some(client) = client {
         client.validate_authorized(Some(&current_user))?;
-        OAuthClient::remove(client.id, &**pool).await?;
+        DBOAuthClient::remove(client.id, &**pool).await?;
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
@@ -274,7 +274,7 @@ pub struct OAuthClientEdit {
 #[patch("app/{id}")]
 pub async fn oauth_client_edit(
     req: HttpRequest,
-    client_id: web::Path<ApiOAuthClientId>,
+    client_id: web::Path<OAuthClientId>,
     client_updates: web::Json<OAuthClientEdit>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -295,7 +295,7 @@ pub async fn oauth_client_edit(
     })?;
 
     if let Some(existing_client) =
-        OAuthClient::get(client_id.into_inner().into(), &**pool).await?
+        DBOAuthClient::get(client_id.into_inner().into(), &**pool).await?
     {
         existing_client.validate_authorized(Some(&current_user))?;
 
@@ -351,7 +351,7 @@ pub struct Extension {
 pub async fn oauth_client_icon_edit(
     web::Query(ext): web::Query<Extension>,
     req: HttpRequest,
-    client_id: web::Path<ApiOAuthClientId>,
+    client_id: web::Path<OAuthClientId>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
@@ -368,7 +368,7 @@ pub async fn oauth_client_icon_edit(
     .await?
     .1;
 
-    let client = OAuthClient::get((*client_id).into(), &**pool)
+    let client = DBOAuthClient::get((*client_id).into(), &**pool)
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(
@@ -419,7 +419,7 @@ pub async fn oauth_client_icon_edit(
 #[delete("app/{id}/icon")]
 pub async fn oauth_client_icon_delete(
     req: HttpRequest,
-    client_id: web::Path<ApiOAuthClientId>,
+    client_id: web::Path<OAuthClientId>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
@@ -435,7 +435,7 @@ pub async fn oauth_client_icon_delete(
     .await?
     .1;
 
-    let client = OAuthClient::get((*client_id).into(), &**pool)
+    let client = DBOAuthClient::get((*client_id).into(), &**pool)
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(
@@ -482,7 +482,7 @@ pub async fn get_user_oauth_authorizations(
     .await?
     .1;
 
-    let authorizations = OAuthClientAuthorization::get_all_for_user(
+    let authorizations = DBOAuthClientAuthorization::get_all_for_user(
         current_user.id.into(),
         &**pool,
     )
@@ -512,7 +512,7 @@ pub async fn revoke_oauth_authorization(
     .await?
     .1;
 
-    OAuthClientAuthorization::remove(
+    DBOAuthClientAuthorization::remove(
         info.client_id.into(),
         current_user.id.into(),
         &**pool,
@@ -532,13 +532,13 @@ fn generate_oauth_client_secret() -> String {
 
 async fn create_redirect_uris(
     uri_strings: impl IntoIterator<Item = impl Display>,
-    client_id: OAuthClientId,
+    client_id: DBOAuthClientId,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-) -> Result<Vec<OAuthRedirectUri>, DatabaseError> {
+) -> Result<Vec<DBOAuthRedirectUri>, DatabaseError> {
     let mut redirect_uris = vec![];
     for uri in uri_strings.into_iter() {
         let id = generate_oauth_redirect_id(transaction).await?;
-        redirect_uris.push(OAuthRedirectUri {
+        redirect_uris.push(DBOAuthRedirectUri {
             id,
             client_id,
             uri: uri.to_string(),
@@ -550,7 +550,7 @@ async fn create_redirect_uris(
 
 async fn edit_redirects(
     redirects: Vec<String>,
-    existing_client: &OAuthClient,
+    existing_client: &DBOAuthClient,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
 ) -> Result<(), DatabaseError> {
     let updated_redirects: HashSet<String> = redirects.into_iter().collect();
@@ -566,12 +566,12 @@ async fn edit_redirects(
         &mut *transaction,
     )
     .await?;
-    OAuthClient::insert_redirect_uris(&redirects_to_add, &mut **transaction)
+    DBOAuthClient::insert_redirect_uris(&redirects_to_add, &mut **transaction)
         .await?;
 
     let mut redirects_to_remove = existing_client.redirect_uris.clone();
     redirects_to_remove.retain(|r| !updated_redirects.contains(&r.uri));
-    OAuthClient::remove_redirect_uris(
+    DBOAuthClient::remove_redirect_uris(
         redirects_to_remove.iter().map(|r| r.id),
         &mut **transaction,
     )
@@ -581,11 +581,11 @@ async fn edit_redirects(
 }
 
 pub async fn get_clients_inner(
-    ids: &[ApiOAuthClientId],
+    ids: &[OAuthClientId],
     pool: web::Data<PgPool>,
 ) -> Result<Vec<models::oauth_clients::OAuthClient>, ApiError> {
-    let ids: Vec<OAuthClientId> = ids.iter().map(|i| (*i).into()).collect();
-    let clients = OAuthClient::get_many(&ids, &**pool).await?;
+    let ids: Vec<DBOAuthClientId> = ids.iter().map(|i| (*i).into()).collect();
+    let clients = DBOAuthClient::get_many(&ids, &**pool).await?;
 
     Ok(clients.into_iter().map(|c| c.into()).collect_vec())
 }

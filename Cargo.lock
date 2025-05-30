@@ -447,12 +447,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "arc-swap"
-version = "1.7.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69f7f8c3906b62b754cd5326047894316021dcfe5a194c8ea52bdd94934a3457"
-
-[[package]]
 name = "arg_enum_proc_macro"
 version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1982,9 +1976,9 @@ dependencies = [
 
 [[package]]
 name = "deadpool-redis"
-version = "0.20.0"
+version = "0.21.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c136f185b3ca9d1f4e4e19c11570e1002f4bfdd592d589053e225716d613851f"
+checksum = "667d186d69c8b4dd7f8cf1ac71bec88b312e1752f2d1a63028aa9ea124c3f191"
 dependencies = [
  "deadpool",
  "redis",
@@ -4352,6 +4346,7 @@ dependencies = [
  "maxminddb",
  "meilisearch-sdk",
  "murmur2",
+ "paste",
  "prometheus",
  "rand 0.8.5",
  "rand_chacha 0.3.1",
@@ -4387,7 +4382,7 @@ dependencies = [
  "webp",
  "woothee",
  "yaserde",
- "zip",
+ "zip 3.0.0",
  "zxcvbn",
 ]
 
@@ -6604,13 +6599,13 @@ dependencies = [
 
 [[package]]
 name = "redis"
-version = "0.29.5"
+version = "0.31.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1bc42f3a12fd4408ce64d8efef67048a924e543bd35c6591c0447fda9054695f"
+checksum = "0bc1ea653e0b2e097db3ebb5b7f678be339620b8041f66b30a308c1d45d36a7f"
 dependencies = [
  "ahash 0.8.12",
- "arc-swap",
  "bytes",
+ "cfg-if",
  "combine",
  "futures-util",
  "itoa 1.0.15",
@@ -8704,6 +8699,7 @@ dependencies = [
  "tokio",
  "url",
  "windows-sys 0.59.0",
+ "zip 2.4.2",
 ]
 
 [[package]]
@@ -8907,7 +8903,7 @@ dependencies = [
  "uuid 1.16.0",
  "whoami",
  "winreg 0.55.0",
- "zip",
+ "zip 3.0.0",
 ]
 
 [[package]]
@@ -11027,6 +11023,21 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.101",
+]
+
+[[package]]
+name = "zip"
+version = "2.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fabe6324e908f85a1c52063ce7aa26b68dcb7eb6dbc83a2d148403c9bc3eba50"
+dependencies = [
+ "arbitrary",
+ "crc32fast",
+ "crossbeam-utils",
+ "displaydoc",
+ "indexmap 2.9.0",
+ "memchr",
+ "thiserror 2.0.12",
 ]
 
 [[package]]

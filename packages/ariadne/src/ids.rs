@@ -1,4 +1,3 @@
-pub use super::users::UserId;
 use thiserror::Error;
 
 /// Generates a random 64 bit integer that is exactly `n` characters
@@ -72,24 +71,7 @@ pub enum DecodingError {
 }
 
 #[macro_export]
-macro_rules! from_base62id {
-    ($($struct:ty, $con:expr;)+) => {
-        $(
-            impl From<Base62Id> for $struct {
-                fn from(id: Base62Id) -> $struct {
-                    $con(id.0)
-                }
-            }
-            impl From<$struct> for Base62Id {
-                fn from(id: $struct) -> Base62Id {
-                    Base62Id(id.0)
-                }
-            }
-        )+
-    };
-}
-
-#[macro_export]
+#[doc(hidden)]
 macro_rules! impl_base62_display {
     ($struct:ty) => {
         impl std::fmt::Display for $struct {
@@ -102,15 +84,42 @@ macro_rules! impl_base62_display {
 impl_base62_display!(Base62Id);
 
 #[macro_export]
-macro_rules! base62_id_impl {
-    ($struct:ty, $cons:expr) => {
-        $crate::ids::from_base62id!($struct, $cons;);
-        $crate::ids::impl_base62_display!($struct);
-    }
-}
-base62_id_impl!(UserId, UserId);
+macro_rules! base62_id {
+    ($struct:ident) => {
+        #[derive(
+            Copy,
+            Clone,
+            PartialEq,
+            Eq,
+            serde::Serialize,
+            serde::Deserialize,
+            Debug,
+            Hash,
+        )]
+        #[serde(from = "ariadne::ids::Base62Id")]
+        #[serde(into = "ariadne::ids::Base62Id")]
+        pub struct $struct(pub u64);
 
-pub use {base62_id_impl, from_base62id, impl_base62_display};
+        $crate::ids::impl_base62_display!($struct);
+
+        impl From<$crate::ids::Base62Id> for $struct {
+            fn from(id: $crate::ids::Base62Id) -> Self {
+                Self(id.0)
+            }
+        }
+
+        impl From<$struct> for $crate::ids::Base62Id {
+            fn from(id: $struct) -> Self {
+                Self(id.0)
+            }
+        }
+    };
+}
+
+use crate as ariadne; // Hack because serde(from) and serde(into) don't work with $crate
+base62_id!(UserId);
+
+pub use {base62_id, impl_base62_display};
 
 pub mod base62_impl {
     use serde::de::{self, Deserializer, Visitor};

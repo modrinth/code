@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 
+use crate::common::{api_v2::ApiV2, api_v3::ApiV3, dummy_data::TestFile};
 use actix_web::dev::ServiceResponse;
 use async_trait::async_trait;
+use labrinth::models::ids::ProjectId;
 use labrinth::models::{
-    projects::{ProjectId, VersionType},
+    projects::VersionType,
     teams::{OrganizationPermissions, ProjectPermissions},
 };
-
-use crate::common::{api_v2::ApiV2, api_v3::ApiV3, dummy_data::TestFile};
 
 use super::{
     Api, ApiProject, ApiTags, ApiTeams, ApiUser, ApiVersion,

@@ -229,7 +229,7 @@ pub async fn project_get(
         Ok(project) => {
             let version_item = match project.versions.first() {
                 Some(vid) => {
-                    version_item::Version::get((*vid).into(), &**pool, &redis)
+                    version_item::DBVersion::get((*vid).into(), &**pool, &redis)
                         .await?
                 }
                 None => None,
@@ -469,7 +469,7 @@ pub async fn project_edit(
     if let Some(donation_urls) = v2_new_project.donation_urls {
         // Fetch current donation links from project so we know what to delete
         let fetched_example_project =
-            project_item::Project::get(&info.0, &**pool, &redis).await?;
+            project_item::DBProject::get(&info.0, &**pool, &redis).await?;
         let donation_links = fetched_example_project
             .map(|x| {
                 x.urls
@@ -533,7 +533,7 @@ pub async fn project_edit(
     if response.status().is_success()
         && (client_side.is_some() || server_side.is_some())
     {
-        let project_item = project_item::Project::get(
+        let project_item = project_item::DBProject::get(
             &new_slug.unwrap_or(project_id),
             &**pool,
             &redis,
@@ -541,7 +541,7 @@ pub async fn project_edit(
         .await?;
         let version_ids = project_item.map(|x| x.versions).unwrap_or_default();
         let versions =
-            version_item::Version::get_many(&version_ids, &**pool, &redis)
+            version_item::DBVersion::get_many(&version_ids, &**pool, &redis)
                 .await?;
         for version in versions {
             let version = Version::from(version);

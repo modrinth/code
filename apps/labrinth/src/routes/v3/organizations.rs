@@ -3,14 +3,13 @@ use std::sync::Arc;
 
 use super::ApiError;
 use crate::auth::{filter_visible_projects, get_user_from_headers};
-use crate::database::models::team_item::TeamMember;
+use crate::database::models::team_item::DBTeamMember;
 use crate::database::models::{
-    Organization, generate_organization_id, team_item,
+    DBOrganization, generate_organization_id, team_item,
 };
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
-use crate::models::ids::UserId;
-use crate::models::organizations::OrganizationId;
+use crate::models::ids::OrganizationId;
 use crate::models::pats::Scopes;
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::queue::session::AuthQueue;
@@ -20,6 +19,7 @@ use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use crate::{database, models};
 use actix_web::{HttpRequest, HttpResponse, web};
+use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::parse_base62;
 use futures::TryStreamExt;
 use rust_decimal::Decimal;
@@ -69,7 +69,7 @@ pub async fn organization_projects_get(
     .map(|x| x.1)
     .ok();
 
-    let organization_data = Organization::get(&id, &**pool, &redis).await?;
+    let organization_data = DBOrganization::get(&id, &**pool, &redis).await?;
     if let Some(organization) = organization_data {
         let project_ids = sqlx::query!(
             "
@@ -77,14 +77,14 @@ pub async fn organization_projects_get(
             INNER JOIN mods m ON m.organization_id = o.id
             WHERE o.id = $1
             ",
-            organization.id as database::models::ids::OrganizationId
+            organization.id as database::models::ids::DBOrganizationId
         )
         .fetch(&**pool)
-        .map_ok(|m| database::models::ProjectId(m.id))
+        .map_ok(|m| database::models::DBProjectId(m.id))
         .try_collect::<Vec<_>>()
         .await?;
 
-        let projects_data = crate::database::models::Project::get_many_ids(
+        let projects_data = crate::database::models::DBProject::get_many_ids(
             &project_ids,
             &**pool,
             &redis,
@@ -146,7 +146,7 @@ pub async fn organization_create(
         organization_strings.push(name_organization_id.to_string());
     }
     organization_strings.push(new_organization.slug.clone());
-    let results = Organization::get_many(
+    let results = DBOrganization::get_many(
         &organization_strings,
         &mut *transaction,
         &redis,
@@ -174,7 +174,7 @@ pub async fn organization_create(
     let team_id = team.insert(&mut transaction).await?;
 
     // Create organization
-    let organization = Organization {
+    let organization = DBOrganization {
         id: organization_id,
         slug: new_organization.slug.clone(),
         name: new_organization.name.clone(),
@@ -188,10 +188,11 @@ pub async fn organization_create(
     transaction.commit().await?;
 
     // Only member is the owner, the logged in one
-    let member_data = TeamMember::get_from_team_full(team_id, &**pool, &redis)
-        .await?
-        .into_iter()
-        .next();
+    let member_data =
+        DBTeamMember::get_from_team_full(team_id, &**pool, &redis)
+            .await?
+            .into_iter()
+            .next();
     let members_data = if let Some(member_data) = member_data {
         vec![crate::models::teams::TeamMember::from_model(
             member_data,
@@ -230,13 +231,13 @@ pub async fn organization_get(
     .ok();
     let user_id = current_user.as_ref().map(|x| x.id.into());
 
-    let organization_data = Organization::get(&id, &**pool, &redis).await?;
+    let organization_data = DBOrganization::get(&id, &**pool, &redis).await?;
     if let Some(data) = organization_data {
         let members_data =
-            TeamMember::get_from_team_full(data.team_id, &**pool, &redis)
+            DBTeamMember::get_from_team_full(data.team_id, &**pool, &redis)
                 .await?;
 
-        let users = crate::database::models::User::get_many_ids(
+        let users = crate::database::models::DBUser::get_many_ids(
             &members_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
             &**pool,
             &redis,
@@ -256,7 +257,7 @@ pub async fn organization_get(
                 logged_in
                     || x.accepted
                     || user_id
-                        .map(|y: crate::database::models::UserId| {
+                        .map(|y: crate::database::models::DBUserId| {
                             y == x.user_id
                         })
                         .unwrap_or(false)
@@ -293,15 +294,16 @@ pub async fn organizations_get(
 ) -> Result<HttpResponse, ApiError> {
     let ids = serde_json::from_str::<Vec<&str>>(&ids.ids)?;
     let organizations_data =
-        Organization::get_many(&ids, &**pool, &redis).await?;
+        DBOrganization::get_many(&ids, &**pool, &redis).await?;
     let team_ids = organizations_data
         .iter()
         .map(|x| x.team_id)
         .collect::<Vec<_>>();
 
     let teams_data =
-        TeamMember::get_from_team_full_many(&team_ids, &**pool, &redis).await?;
-    let users = crate::database::models::User::get_many_ids(
+        DBTeamMember::get_from_team_full_many(&team_ids, &**pool, &redis)
+            .await?;
+    let users = crate::database::models::DBUser::get_many_ids(
         &teams_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
         &**pool,
         &redis,
@@ -344,7 +346,7 @@ pub async fn organizations_get(
                 logged_in
                     || x.accepted
                     || user_id
-                        .map(|y: crate::database::models::UserId| {
+                        .map(|y: crate::database::models::DBUserId| {
                             y == x.user_id
                         })
                         .unwrap_or(false)
@@ -405,11 +407,11 @@ pub async fn organizations_edit(
 
     let string = info.into_inner().0;
     let result =
-        database::models::Organization::get(&string, &**pool, &redis).await?;
+        database::models::DBOrganization::get(&string, &**pool, &redis).await?;
     if let Some(organization_item) = result {
         let id = organization_item.id;
 
-        let team_member = database::models::TeamMember::get_from_user_id(
+        let team_member = database::models::DBTeamMember::get_from_user_id(
             organization_item.team_id,
             user.id.into(),
             &**pool,
@@ -437,7 +439,7 @@ pub async fn organizations_edit(
                     WHERE (id = $2)
                     ",
                     description,
-                    id as database::models::ids::OrganizationId,
+                    id as database::models::ids::DBOrganizationId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -457,7 +459,7 @@ pub async fn organizations_edit(
                     WHERE (id = $2)
                     ",
                     name,
-                    id as database::models::ids::OrganizationId,
+                    id as database::models::ids::DBOrganizationId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -519,14 +521,14 @@ pub async fn organizations_edit(
                     WHERE (id = $2)
                     ",
                     Some(slug),
-                    id as database::models::ids::OrganizationId,
+                    id as database::models::ids::DBOrganizationId,
                 )
                 .execute(&mut *transaction)
                 .await?;
             }
 
             transaction.commit().await?;
-            database::models::Organization::clear_cache(
+            database::models::DBOrganization::clear_cache(
                 organization_item.id,
                 Some(organization_item.slug),
                 &redis,
@@ -564,7 +566,7 @@ pub async fn organization_delete(
     let string = info.into_inner().0;
 
     let organization =
-        database::models::Organization::get(&string, &**pool, &redis)
+        database::models::DBOrganization::get(&string, &**pool, &redis)
             .await?
             .ok_or_else(|| {
                 ApiError::InvalidInput(
@@ -574,7 +576,7 @@ pub async fn organization_delete(
 
     if !user.role.is_admin() {
         let team_member =
-            database::models::TeamMember::get_from_user_id_organization(
+            database::models::DBTeamMember::get_from_user_id_organization(
                 organization.id,
                 user.id.into(),
                 false,
@@ -607,12 +609,12 @@ pub async fn organization_delete(
         SELECT user_id FROM team_members
         WHERE team_id = $1 AND is_owner = TRUE
         ",
-        organization.team_id as database::models::ids::TeamId
+        organization.team_id as database::models::ids::DBTeamId
     )
     .fetch_one(&**pool)
     .await?
     .user_id;
-    let owner_id = database::models::ids::UserId(owner_id);
+    let owner_id = database::models::ids::DBUserId(owner_id);
 
     let mut transaction = pool.begin().await?;
 
@@ -626,10 +628,10 @@ pub async fn organization_delete(
         INNER JOIN teams t ON t.id = m.team_id
         WHERE o.id = $1 AND $1 IS NOT NULL
         ",
-        organization.id as database::models::ids::OrganizationId
+        organization.id as database::models::ids::DBOrganizationId
     )
     .fetch(&mut *transaction)
-    .map_ok(|c| database::models::TeamId(c.id))
+    .map_ok(|c| database::models::DBTeamId(c.id))
     .try_collect::<Vec<_>>()
     .await?;
 
@@ -638,7 +640,7 @@ pub async fn organization_delete(
             &mut transaction,
         )
         .await?;
-        let member = TeamMember {
+        let member = DBTeamMember {
             id: new_id,
             team_id: *organization_project_team,
             user_id: owner_id,
@@ -653,7 +655,7 @@ pub async fn organization_delete(
         member.insert(&mut transaction).await?;
     }
     // Safely remove the organization
-    let result = database::models::Organization::remove(
+    let result = database::models::DBOrganization::remove(
         organization.id,
         &mut transaction,
         &redis,
@@ -662,7 +664,7 @@ pub async fn organization_delete(
 
     transaction.commit().await?;
 
-    database::models::Organization::clear_cache(
+    database::models::DBOrganization::clear_cache(
         organization.id,
         Some(organization.slug),
         &redis,
@@ -670,7 +672,7 @@ pub async fn organization_delete(
     .await?;
 
     for team_id in organization_project_teams {
-        database::models::TeamMember::clear_cache(team_id, &redis).await?;
+        database::models::DBTeamMember::clear_cache(team_id, &redis).await?;
     }
 
     if result.is_some() {
@@ -704,7 +706,7 @@ pub async fn organization_projects_add(
     .1;
 
     let organization =
-        database::models::Organization::get(&info, &**pool, &redis)
+        database::models::DBOrganization::get(&info, &**pool, &redis)
             .await?
             .ok_or_else(|| {
                 ApiError::InvalidInput(
@@ -712,7 +714,7 @@ pub async fn organization_projects_add(
                 )
             })?;
 
-    let project_item = database::models::Project::get(
+    let project_item = database::models::DBProject::get(
         &project_info.project_id,
         &**pool,
         &redis,
@@ -731,7 +733,7 @@ pub async fn organization_projects_add(
     }
 
     let project_team_member =
-        database::models::TeamMember::get_from_user_id_project(
+        database::models::DBTeamMember::get_from_user_id_project(
             project_item.inner.id,
             current_user.id.into(),
             false,
@@ -744,7 +746,7 @@ pub async fn organization_projects_add(
             )
         })?;
     let organization_team_member =
-        database::models::TeamMember::get_from_user_id_organization(
+        database::models::DBTeamMember::get_from_user_id_organization(
             organization.id,
             current_user.id.into(),
             false,
@@ -777,8 +779,8 @@ pub async fn organization_projects_add(
             SET organization_id = $1
             WHERE (id = $2)
             ",
-            organization.id as database::models::OrganizationId,
-            project_item.inner.id as database::models::ids::ProjectId
+            organization.id as database::models::DBOrganizationId,
+            project_item.inner.id as database::models::ids::DBProjectId
         )
         .execute(&mut *transaction)
         .await?;
@@ -794,37 +796,37 @@ pub async fn organization_projects_add(
             INNER JOIN users u ON u.id = team_members.user_id
             WHERE team_id = $1 AND is_owner = TRUE
             ",
-            organization.team_id as database::models::ids::TeamId
+            organization.team_id as database::models::ids::DBTeamId
         )
         .fetch_one(&mut *transaction)
         .await?;
         let organization_owner_user_id =
-            database::models::ids::UserId(organization_owner_user_id.id);
+            database::models::ids::DBUserId(organization_owner_user_id.id);
 
         sqlx::query!(
             "
             DELETE FROM team_members
             WHERE team_id = $1 AND (is_owner = TRUE OR user_id = $2)
             ",
-            project_item.inner.team_id as database::models::ids::TeamId,
-            organization_owner_user_id as database::models::ids::UserId,
+            project_item.inner.team_id as database::models::ids::DBTeamId,
+            organization_owner_user_id as database::models::ids::DBUserId,
         )
         .execute(&mut *transaction)
         .await?;
 
         transaction.commit().await?;
 
-        database::models::User::clear_project_cache(
+        database::models::DBUser::clear_project_cache(
             &[current_user.id.into()],
             &redis,
         )
         .await?;
-        database::models::TeamMember::clear_cache(
+        database::models::DBTeamMember::clear_cache(
             project_item.inner.team_id,
             &redis,
         )
         .await?;
-        database::models::Project::clear_cache(
+        database::models::DBProject::clear_cache(
             project_item.inner.id,
             project_item.inner.slug,
             None,
@@ -866,17 +868,20 @@ pub async fn organization_projects_remove(
     .await?
     .1;
 
-    let organization =
-        database::models::Organization::get(&organization_id, &**pool, &redis)
-            .await?
-            .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "The specified organization does not exist!".to_string(),
-                )
-            })?;
+    let organization = database::models::DBOrganization::get(
+        &organization_id,
+        &**pool,
+        &redis,
+    )
+    .await?
+    .ok_or_else(|| {
+        ApiError::InvalidInput(
+            "The specified organization does not exist!".to_string(),
+        )
+    })?;
 
     let project_item =
-        database::models::Project::get(&project_id, &**pool, &redis)
+        database::models::DBProject::get(&project_id, &**pool, &redis)
             .await?
             .ok_or_else(|| {
                 ApiError::InvalidInput(
@@ -896,7 +901,7 @@ pub async fn organization_projects_remove(
     }
 
     let organization_team_member =
-        database::models::TeamMember::get_from_user_id_organization(
+        database::models::DBTeamMember::get_from_user_id_organization(
             organization.id,
             current_user.id.into(),
             false,
@@ -916,7 +921,7 @@ pub async fn organization_projects_remove(
     .unwrap_or_default();
     if permissions.contains(OrganizationPermissions::REMOVE_PROJECT) {
         // Now that permissions are confirmed, we confirm the veracity of the new user as an org member
-        database::models::TeamMember::get_from_user_id_organization(
+        database::models::DBTeamMember::get_from_user_id_organization(
             organization.id,
             data.new_owner.into(),
             false,
@@ -932,13 +937,14 @@ pub async fn organization_projects_remove(
 
         // Then, we get the team member of the project and that user (if it exists)
         // We use the team member get directly
-        let new_owner = database::models::TeamMember::get_from_user_id_project(
-            project_item.inner.id,
-            data.new_owner.into(),
-            true,
-            &**pool,
-        )
-        .await?;
+        let new_owner =
+            database::models::DBTeamMember::get_from_user_id_project(
+                project_item.inner.id,
+                data.new_owner.into(),
+                true,
+                &**pool,
+            )
+            .await?;
 
         let mut transaction = pool.begin().await?;
 
@@ -951,7 +957,7 @@ pub async fn organization_projects_remove(
                         &mut transaction,
                     )
                     .await?;
-                let member = TeamMember {
+                let member = DBTeamMember {
                     id: new_id,
                     team_id: project_item.inner.team_id,
                     user_id: data.new_owner.into(),
@@ -980,7 +986,7 @@ pub async fn organization_projects_remove(
                 role = 'Inherited Owner'
             WHERE (id = $1)
             ",
-            new_owner.id as database::models::ids::TeamMemberId,
+            new_owner.id as database::models::ids::DBTeamMemberId,
             ProjectPermissions::all().bits() as i64
         )
         .execute(&mut *transaction)
@@ -992,23 +998,23 @@ pub async fn organization_projects_remove(
             SET organization_id = NULL
             WHERE (id = $1)
             ",
-            project_item.inner.id as database::models::ids::ProjectId
+            project_item.inner.id as database::models::ids::DBProjectId
         )
         .execute(&mut *transaction)
         .await?;
 
         transaction.commit().await?;
-        database::models::User::clear_project_cache(
+        database::models::DBUser::clear_project_cache(
             &[current_user.id.into()],
             &redis,
         )
         .await?;
-        database::models::TeamMember::clear_cache(
+        database::models::DBTeamMember::clear_cache(
             project_item.inner.team_id,
             &redis,
         )
         .await?;
-        database::models::Project::clear_cache(
+        database::models::DBProject::clear_cache(
             project_item.inner.id,
             project_item.inner.slug,
             None,
@@ -1052,7 +1058,7 @@ pub async fn organization_icon_edit(
     let string = info.into_inner().0;
 
     let organization_item =
-        database::models::Organization::get(&string, &**pool, &redis)
+        database::models::DBOrganization::get(&string, &**pool, &redis)
             .await?
             .ok_or_else(|| {
                 ApiError::InvalidInput(
@@ -1061,7 +1067,7 @@ pub async fn organization_icon_edit(
             })?;
 
     if !user.role.is_mod() {
-        let team_member = database::models::TeamMember::get_from_user_id(
+        let team_member = database::models::DBTeamMember::get_from_user_id(
             organization_item.team_id,
             user.id.into(),
             &**pool,
@@ -1119,13 +1125,13 @@ pub async fn organization_icon_edit(
         upload_result.url,
         upload_result.raw_url,
         upload_result.color.map(|x| x as i32),
-        organization_item.id as database::models::ids::OrganizationId,
+        organization_item.id as database::models::ids::DBOrganizationId,
     )
     .execute(&mut *transaction)
     .await?;
 
     transaction.commit().await?;
-    database::models::Organization::clear_cache(
+    database::models::DBOrganization::clear_cache(
         organization_item.id,
         Some(organization_item.slug),
         &redis,
@@ -1155,7 +1161,7 @@ pub async fn delete_organization_icon(
     let string = info.into_inner().0;
 
     let organization_item =
-        database::models::Organization::get(&string, &**pool, &redis)
+        database::models::DBOrganization::get(&string, &**pool, &redis)
             .await?
             .ok_or_else(|| {
                 ApiError::InvalidInput(
@@ -1164,7 +1170,7 @@ pub async fn delete_organization_icon(
             })?;
 
     if !user.role.is_mod() {
-        let team_member = database::models::TeamMember::get_from_user_id(
+        let team_member = database::models::DBTeamMember::get_from_user_id(
             organization_item.team_id,
             user.id.into(),
             &**pool,
@@ -1201,14 +1207,14 @@ pub async fn delete_organization_icon(
         SET icon_url = NULL, raw_icon_url = NULL, color = NULL
         WHERE (id = $1)
         ",
-        organization_item.id as database::models::ids::OrganizationId,
+        organization_item.id as database::models::ids::DBOrganizationId,
     )
     .execute(&mut *transaction)
     .await?;
 
     transaction.commit().await?;
 
-    database::models::Organization::clear_cache(
+    database::models::DBOrganization::clear_cache(
         organization_item.id,
         Some(organization_item.slug),
         &redis,

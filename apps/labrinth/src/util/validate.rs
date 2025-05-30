@@ -7,7 +7,9 @@ use validator::{ValidationErrors, ValidationErrorsKind};
 use crate::models::pats::Scopes;
 
 pub static RE_URL_SAFE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"^[a-zA-Z0-9_-]*$").unwrap());
+    LazyLock::new(|| Regex::new(r#"^[a-zA-Z0-9!@$()`.+,_"-]*$"#).unwrap());
+pub static RE_USERNAME: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r#"^[a-zA-Z0-9_-]*$"#).unwrap());
 
 //TODO: In order to ensure readability, only the first error is printed, this may need to be expanded on in the future!
 pub fn validation_errors_to_string(
@@ -71,10 +73,8 @@ pub fn validate_deps(
         .duplicates_by(|x| {
             format!(
                 "{}-{}-{}",
-                x.version_id
-                    .unwrap_or(crate::models::projects::VersionId(0)),
-                x.project_id
-                    .unwrap_or(crate::models::projects::ProjectId(0)),
+                x.version_id.unwrap_or(crate::models::ids::VersionId(0)),
+                x.project_id.unwrap_or(crate::models::ids::ProjectId(0)),
                 x.file_name.as_deref().unwrap_or_default()
             )
         })

@@ -1,11 +1,13 @@
 use crate::auth::checks::{is_visible_project, is_visible_version};
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::models::loader_fields::Loader;
-use crate::database::models::project_item::QueryProject;
-use crate::database::models::version_item::{QueryFile, QueryVersion};
+use crate::database::models::project_item::ProjectQueryResult;
+use crate::database::models::version_item::{
+    FileQueryResult, VersionQueryResult,
+};
 use crate::database::redis::RedisPool;
+use crate::models::ids::{ProjectId, VersionId};
 use crate::models::pats::Scopes;
-use crate::models::projects::{ProjectId, VersionId};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::{auth::get_user_from_headers, database};
@@ -76,7 +78,7 @@ pub async fn maven_metadata(
 ) -> Result<HttpResponse, ApiError> {
     let project_id = params.into_inner().0;
     let Some(project) =
-        database::models::Project::get(&project_id, &**pool, &redis).await?
+        database::models::DBProject::get(&project_id, &**pool, &redis).await?
     else {
         return Err(ApiError::NotFound);
     };
@@ -103,7 +105,7 @@ pub async fn maven_metadata(
         WHERE mod_id = $1 AND status = ANY($2)
         ORDER BY ordering ASC NULLS LAST, date_published ASC
         ",
-        project.inner.id as database::models::ids::ProjectId,
+        project.inner.id as database::models::ids::DBProjectId,
         &*crate::models::projects::VersionStatus::iterator()
             .filter(|x| x.is_listed())
             .map(|x| x.to_string())
@@ -159,17 +161,17 @@ pub async fn maven_metadata(
 }
 
 async fn find_version(
-    project: &QueryProject,
+    project: &ProjectQueryResult,
     vcoords: &String,
     pool: &PgPool,
     redis: &RedisPool,
-) -> Result<Option<QueryVersion>, ApiError> {
+) -> Result<Option<VersionQueryResult>, ApiError> {
     let id_option = ariadne::ids::base62_impl::parse_base62(vcoords)
         .ok()
         .map(|x| x as i64);
 
     let all_versions =
-        database::models::Version::get_many(&project.versions, pool, redis)
+        database::models::DBVersion::get_many(&project.versions, pool, redis)
             .await?;
 
     let exact_matches = all_versions
@@ -236,9 +238,9 @@ async fn find_version(
 fn find_file<'a>(
     project_id: &str,
     vcoords: &str,
-    version: &'a QueryVersion,
+    version: &'a VersionQueryResult,
     file: &str,
-) -> Option<&'a QueryFile> {
+) -> Option<&'a FileQueryResult> {
     if let Some(selected_file) =
         version.files.iter().find(|x| x.filename == file)
     {
@@ -282,7 +284,7 @@ pub async fn version_file(
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
     let Some(project) =
-        database::models::Project::get(&project_id, &**pool, &redis).await?
+        database::models::DBProject::get(&project_id, &**pool, &redis).await?
     else {
         return Err(ApiError::NotFound);
     };
@@ -348,7 +350,7 @@ pub async fn version_file_sha1(
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
     let Some(project) =
-        database::models::Project::get(&project_id, &**pool, &redis).await?
+        database::models::DBProject::get(&project_id, &**pool, &redis).await?
     else {
         return Err(ApiError::NotFound);
     };
@@ -393,7 +395,7 @@ pub async fn version_file_sha512(
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
     let Some(project) =
-        database::models::Project::get(&project_id, &**pool, &redis).await?
+        database::models::DBProject::get(&project_id, &**pool, &redis).await?
     else {
         return Err(ApiError::NotFound);
     };
