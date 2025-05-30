@@ -341,3 +341,17 @@ export const getArrayOrString = (x: string[] | string): string[] => {
     return x
   }
 }
+
+export function getPingLevel(ping: number) {
+  if (ping < 150) {
+    return 5
+  } else if (ping < 300) {
+    return 4
+  } else if (ping < 600) {
+    return 3
+  } else if (ping < 1000) {
+    return 2
+  } else {
+    return 1
+  }
+}

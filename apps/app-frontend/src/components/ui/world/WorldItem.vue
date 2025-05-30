@@ -6,7 +6,7 @@ import {
   getWorldIdentifier,
   showWorldInFolder,
 } from '@/helpers/worlds.ts'
-import { formatNumber } from '@modrinth/utils'
+import { formatNumber, getPingLevel } from '@modrinth/utils'
 import {
   useRelativeTime,
   Avatar,
@@ -107,20 +107,6 @@ const serverIncompatible = computed(
     !!props.currentProtocol &&
     props.serverStatus.version.protocol !== props.currentProtocol,
 )
-
-function getPingLevel(ping: number) {
-  if (ping < 150) {
-    return 5
-  } else if (ping < 300) {
-    return 4
-  } else if (ping < 600) {
-    return 3
-  } else if (ping < 1000) {
-    return 2
-  } else {
-    return 1
-  }
-}
 
 const locked = computed(() => props.world.type === 'singleplayer' && props.world.locked)
 

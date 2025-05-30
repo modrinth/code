@@ -332,6 +332,9 @@ interface General {
     token: string;
     instance: string;
   };
+  flows?: {
+    intro?: boolean;
+  };
 }
 
 interface Allocation {

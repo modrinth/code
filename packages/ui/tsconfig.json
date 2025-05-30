@@ -5,5 +5,8 @@
   "compilerOptions": {
     "lib": ["esnext", "dom"],
     "noImplicitAny": false
-  }
+  },
+  "types": [
+    "@stripe/stripe-js",
+  ]
 }

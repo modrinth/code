@@ -11,10 +11,12 @@
   },
   "devDependencies": {
     "@formatjs/cli": "^6.2.12",
+    "@stripe/stripe-js": "^7.3.1",
     "@vintl/unplugin": "^1.5.1",
     "@vintl/vintl": "^4.4.1",
     "eslint": "^8.57.0",
     "eslint-config-custom": "workspace:*",
+    "stripe": "^18.1.1",
     "tsconfig": "workspace:*",
     "typescript": "^5.4.5",
     "vue": "^3.5.13",

@@ -437,39 +437,13 @@
       :return-url="`${config.public.siteUrl}/servers/manage`"
       :server-name="`${auth?.user?.username}'s server`"
     />
-    <NewModal ref="addPaymentMethodModal">
-      <template #title>
-        <span class="text-lg font-extrabold text-contrast">
-          {{ formatMessage(messages.paymentMethodTitle) }}
-        </span>
-      </template>
-      <div class="min-h-[16rem] md:w-[600px]">
-        <div
-          v-show="loadingPaymentMethodModal !== 2"
-          class="flex min-h-[16rem] items-center justify-center"
-        >
-          <AnimatedLogo class="w-[80px]" />
-        </div>
-        <div v-show="loadingPaymentMethodModal === 2" class="min-h-[16rem] p-1">
-          <div id="address-element"></div>
-          <div id="payment-element" class="mt-4"></div>
-        </div>
-        <div v-show="loadingPaymentMethodModal === 2" class="input-group mt-auto pt-4">
-          <ButtonStyled color="brand">
-            <button :disabled="loadingAddMethod" @click="submit">
-              <PlusIcon />
-              {{ formatMessage(messages.paymentMethodAdd) }}
-            </button>
-          </ButtonStyled>
-          <ButtonStyled>
-            <button @click="$refs.addPaymentMethodModal.hide()">
-              <XIcon />
-              {{ formatMessage(commonMessages.cancelButton) }}
-            </button>
-          </ButtonStyled>
-        </div>
-      </div>
-    </NewModal>
+    <AddPaymentMethodModal
+      ref="addPaymentMethodModal"
+      :publishable-key="config.public.stripePublishableKey"
+      :return-url="`${config.public.siteUrl}/settings/billing`"
+      :create-setup-intent="createSetupIntent"
+      :on-error="handleError"
+    />
     <div class="header__row">
       <div class="header__title">
         <h2 class="text-2xl">{{ formatMessage(messages.paymentMethodTitle) }}</h2>
@@ -583,9 +557,8 @@
 <script setup>
 import {
   ConfirmModal,
-  NewModal,
+  AddPaymentMethodModal,
   OverflowMenu,
-  AnimatedLogo,
   PurchaseModal,
   ButtonStyled,
   CopyCode,
@@ -610,7 +583,7 @@ import {
   UpdatedIcon,
   HistoryIcon,
 } from "@modrinth/assets";
-import { calculateSavings, formatPrice, createStripeElements, getCurrency } from "@modrinth/utils";
+import { calculateSavings, formatPrice, getCurrency } from "@modrinth/utils";
 import { ref, computed } from "vue";
 import { products } from "~/generated/state.json";
 
@@ -747,19 +720,6 @@ const paymentMethodTypes = defineMessages({
   },
 });
 
-let stripe = null;
-let elements = null;
-
-function loadStripe() {
-  try {
-    if (!stripe) {
-      stripe = Stripe(config.public.stripePublishableKey);
-    }
-  } catch (error) {
-    console.error("Error loading Stripe:", error);
-  }
-}
-
 const [
   { data: paymentMethods, refresh: refreshPaymentMethods },
   { data: charges, refresh: refreshCharges },
@@ -835,69 +795,16 @@ const primaryPaymentMethodId = computed(() => {
 });
 
 const addPaymentMethodModal = ref();
-const loadingPaymentMethodModal = ref(0);
-async function addPaymentMethod() {
-  try {
-    loadingPaymentMethodModal.value = 0;
-    addPaymentMethodModal.value.show();
 
-    const result = await useBaseFetch("billing/payment_method", {
-      internal: true,
-      method: "POST",
-    });
-
-    loadStripe();
-    const {
-      elements: elementsVal,
-      addressElement,
-      paymentElement,
-    } = createStripeElements(stripe, paymentMethods.value, {
-      clientSecret: result.client_secret,
-    });
-
-    elements = elementsVal;
-    paymentElement.on("ready", () => {
-      loadingPaymentMethodModal.value += 1;
-    });
-    addressElement.on("ready", () => {
-      loadingPaymentMethodModal.value += 1;
-    });
-  } catch (err) {
-    data.$notify({
-      group: "main",
-      title: "An error occurred",
-      text: err.data ? err.data.description : err,
-      type: "error",
-    });
-  }
+function addPaymentMethod() {
+  addPaymentMethodModal.value.show(paymentMethods.value);
 }
 
-const loadingAddMethod = ref(false);
-async function submit() {
-  startLoading();
-  loadingAddMethod.value = true;
-
-  loadStripe();
-  const { error } = await stripe.confirmSetup({
-    elements,
-    confirmParams: {
-      return_url: `${config.public.siteUrl}/settings/billing`,
-    },
+async function createSetupIntent() {
+  return await useBaseFetch("billing/payment_method", {
+    internal: true,
+    method: "POST",
   });
-
-  if (error && error.type !== "validation_error") {
-    data.$notify({
-      group: "main",
-      title: "An error occurred",
-      text: error.message,
-      type: "error",
-    });
-  } else if (!error) {
-    await refresh();
-    addPaymentMethodModal.value.close();
-  }
-  loadingAddMethod.value = false;
-  stopLoading();
 }
 
 const removePaymentMethodIndex = ref();
