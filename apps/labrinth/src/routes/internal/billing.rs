@@ -1304,6 +1304,12 @@ pub async fn initiate_payment(
             amount: Some(price),
             currency: Some(stripe_currency),
             customer: Some(customer),
+            metadata: interval.map(|interval| {
+                HashMap::from([(
+                    "modrinth_subscription_interval".to_string(),
+                    interval.as_str().to_string(),
+                )])
+            }),
             ..Default::default()
         };
 
