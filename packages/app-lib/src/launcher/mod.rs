@@ -14,6 +14,7 @@ use chrono::Utc;
 use daedalus as d;
 use daedalus::minecraft::{LoggingSide, RuleAction, VersionInfo};
 use daedalus::modded::LoaderVersion;
+use regex::Regex;
 use serde::Deserialize;
 use st::Profile;
 use std::collections::HashMap;
@@ -662,14 +663,29 @@ pub async fn launch_minecraft(
 
     // Overwrites the minecraft options.txt file with the settings from the profile
     // Uses 'a:b' syntax which is not quite yaml
-    use regex::Regex;
-
     if !mc_set_options.is_empty() {
         let options_path = instance_path.join("options.txt");
-        let mut options_string = String::new();
-        if options_path.exists() {
-            options_string = io::read_to_string(&options_path).await?;
+
+        let (mut options_string, input_encoding) = if options_path.exists() {
+            io::read_any_encoding_to_string(&options_path).await?
+        } else {
+            (String::new(), encoding_rs::UTF_8)
+        };
+
+        // UTF-16 encodings may be successfully detected and read, but we cannot encode
+        // them back, and it's technically possible that the game client strongly expects
+        // such encoding
+        if input_encoding != input_encoding.output_encoding() {
+            return Err(crate::ErrorKind::LauncherError(format!(
+                "The instance options.txt file uses an unsupported encoding: {}. \
+                Please either turn off instance options that need to modify this file, \
+                or convert the file to an encoding that both the game and this app support, \
+                such as UTF-8.",
+                input_encoding.name()
+            ))
+            .into());
         }
+
         for (key, value) in mc_set_options {
             let re = Regex::new(&format!(r"(?m)^{}:.*$", regex::escape(key)))?;
             // check if the regex exists in the file
@@ -684,7 +700,8 @@ pub async fn launch_minecraft(
             }
         }
 
-        io::write(&options_path, options_string).await?;
+        io::write(&options_path, input_encoding.encode(&options_string).0)
+            .await?;
     }
 
     crate::api::profile::edit(&profile.path, |prof| {
