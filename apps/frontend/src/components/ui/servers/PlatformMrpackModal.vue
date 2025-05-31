@@ -1,6 +1,27 @@
 <template>
   <NewModal ref="mrpackModal" header="Uploading mrpack" @hide="onHide" @show="onShow">
     <div class="flex flex-col gap-4 md:w-[600px]">
+      <Transition
+        enter-active-class="transition-all duration-300 ease-out"
+        enter-from-class="opacity-0 max-h-0"
+        enter-to-class="opacity-100 max-h-20"
+        leave-active-class="transition-all duration-200 ease-in"
+        leave-from-class="opacity-100 max-h-20"
+        leave-to-class="opacity-0 max-h-0"
+      >
+        <div v-if="isLoading" class="w-full">
+          <div class="mb-2 flex justify-between text-sm">
+            <span class="font-medium text-contrast">Uploading...</span>
+            <span class="text-secondary">{{ Math.round(uploadProgress) }}%</span>
+          </div>
+          <div class="h-2 w-full rounded-full bg-divider">
+            <div
+              class="h-2 rounded-full bg-brand transition-all duration-300 ease-out"
+              :style="{ width: `${uploadProgress}%` }"
+            ></div>
+          </div>
+        </div>
+      </Transition>
       <p
         v-if="isMrpackModalSecondPhase"
         :style="{
@@ -134,6 +155,7 @@ const hardReset = ref(false);
 const isLoading = ref(false);
 const loadingServerCheck = ref(false);
 const mrpackFile = ref<File | null>(null);
+const uploadProgress = ref(0);
 
 const isDangerous = computed(() => hardReset.value);
 const canInstall = computed(() => !mrpackFile.value || isLoading.value || loadingServerCheck.value);
@@ -152,18 +174,30 @@ const handleReinstall = async () => {
     return;
   }
 
+  if (!mrpackFile.value) {
+    addNotification({
+      group: "server",
+      title: "No file selected",
+      text: "Choose a .mrpack file before installing.",
+      type: "error",
+    });
+    return;
+  }
+
   isLoading.value = true;
+  uploadProgress.value = 0;
+
+  const { onProgress, promise } = props.server.general!.reinstallFromMrpack(
+    mrpackFile.value,
+    hardReset.value,
+  );
+
+  onProgress(({ progress }) => {
+    uploadProgress.value = progress;
+  });
 
   try {
-    if (!mrpackFile.value) {
-      throw new Error("No mrpack file selected");
-    }
-
-    const mrpack = new File([mrpackFile.value], mrpackFile.value.name, {
-      type: mrpackFile.value.type,
-    });
-
-    await props.server.general?.reinstallFromMrpack(mrpack, hardReset.value);
+    await promise;
 
     emit("reinstall", {
       loader: "mrpack",
@@ -185,7 +219,7 @@ const handleReinstall = async () => {
     } else {
       addNotification({
         group: "server",
-        title: "Reinstall Failed",
+        title: "Reinstall failed",
         text: "An unexpected error occurred while reinstalling. Please try again later.",
         type: "error",
       });
@@ -194,7 +228,6 @@ const handleReinstall = async () => {
     isLoading.value = false;
   }
 };
-
 const onShow = () => {
   hardReset.value = false;
   isMrpackModalSecondPhase.value = false;
