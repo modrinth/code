@@ -24,6 +24,7 @@ export const useUserCountry = () => {
   if (import.meta.client) {
     onMounted(() => {
       if (fromServer.value) return;
+      // @ts-expect-error - ignore TS not knowing about navigator.userLanguage
       const lang = navigator.language || navigator.userLanguage || "";
       const region = lang.split("-")[1];
       if (region) {

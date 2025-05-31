@@ -49,7 +49,9 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
 
   const fullUrl = override?.url
     ? `https://${override.url}/${path.replace(/^\//, "")}`
-    : `${base}/modrinth/v${version}/${path.replace(/^\//, "")}`;
+    : version === 0
+      ? `${base}/modrinth/v${version}/${path.replace(/^\//, "")}`
+      : `${base}/v${version}/${path.replace(/^\//, "")}`;
 
   type HeadersRecord = Record<string, string>;
 

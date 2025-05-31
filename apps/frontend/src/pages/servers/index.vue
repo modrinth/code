@@ -4,27 +4,28 @@
     data-pyro
     class="servers-hero relative isolate -mt-44 h-full min-h-screen pt-8"
   >
-    <PurchaseModal
-      v-if="showModal && selectedProduct && customer"
-      :key="selectedProduct.id"
+    <ModrinthServersPurchaseModal
+      v-if="customer"
+      :key="`purchase-modal-${customer.id}`"
       ref="purchaseModal"
-      :product="selectedProduct"
-      :country="country"
-      :custom-server="customServer"
       :publishable-key="config.public.stripePublishableKey"
-      :send-billing-request="
+      :initiate-payment="
         async (body) =>
           await useBaseFetch('billing/payment', { internal: true, method: 'POST', body })
       "
-      :fetch-payment-data="fetchPaymentData"
+      :available-products="pyroProducts"
       :on-error="handleError"
       :customer="customer"
       :payment-methods="paymentMethods"
+      :currency="selectedCurrency"
       :return-url="`${config.public.siteUrl}/servers/manage`"
       :server-name="`${auth?.user?.username}'s server`"
-      :fetch-capacity-statuses="fetchCapacityStatuses"
       :out-of-stock-url="outOfStockUrl"
-      @hidden="handleModalHidden"
+      :fetch-capacity-statuses="fetchCapacityStatuses"
+      :pings="regionPings"
+      :regions="regions"
+      :refresh-payment-methods="fetchPaymentData"
+      :fetch-stock="fetchStock"
     />
 
     <section
@@ -498,117 +499,53 @@
     </section>
 
     <section
-      v-if="false"
-      class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
-    >
-      <div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
-      <div class="mx-auto flex w-full max-w-7xl flex-col gap-8">
-        <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
-          <div class="flex flex-col gap-8">
-            <div class="flex flex-col gap-4">
-              <div
-                class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
-              >
-                Server Locations
-              </div>
-              <h1 class="relative m-0 max-w-2xl text-4xl leading-[120%] md:text-7xl">
-                Coast-to-Coast Coverage
-              </h1>
-            </div>
-
-            <div class="flex flex-col gap-8">
-              <div class="flex flex-col gap-4">
-                <div class="flex items-center gap-3">
-                  <div class="grid size-8 place-content-center rounded-full bg-highlight-green">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="text-brand"
-                    >
-                      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-                      <circle cx="12" cy="10" r="3" />
-                    </svg>
-                  </div>
-                  <h2 class="relative m-0 text-xl font-medium leading-[155%] md:text-2xl">
-                    US Coverage
-                  </h2>
-                </div>
-                <p
-                  class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
-                >
-                  With strategically placed servers in New York, California, Texas, Florida, and
-                  Washington, we ensure low latency connections for players across North America.
-                  Each location is equipped with high-performance hardware and DDoS protection.
-                </p>
-              </div>
-
-              <div class="flex flex-col gap-4">
-                <div class="flex items-center gap-3">
-                  <div class="grid size-8 place-content-center rounded-full bg-highlight-blue">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="text-blue"
-                    >
-                      <path d="M12 2a10 10 0 1 0 10 10" />
-                      <path d="M18 13a6 6 0 0 0-6-6" />
-                      <path d="M13 2.05a10 10 0 0 1 2 2" />
-                      <path d="M19.5 8.5a10 10 0 0 1 2 2" />
-                    </svg>
-                  </div>
-                  <h2 class="relative m-0 text-xl font-medium leading-[155%] md:text-2xl">
-                    Global Expansion
-                  </h2>
-                </div>
-                <p
-                  class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
-                >
-                  We're expanding to Europe and Asia-Pacific regions soon, bringing Modrinth's
-                  seamless hosting experience worldwide. Join our Discord to stay updated on new
-                  region launches.
-                </p>
-              </div>
-            </div>
-          </div>
-          <Globe />
-        </div>
-      </div>
-    </section>
-
-    <section
       id="plan"
       class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
     >
       <div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
       <div class="mx-auto flex w-full max-w-7xl flex-col items-center gap-8 text-center">
         <h1 class="relative m-0 text-4xl leading-[120%] md:text-7xl">
-          Start your server on Modrinth
+          There's a server for everyone
         </h1>
-        <h2
-          class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
-        >
-          {{
-            isAtCapacity && !loggedOut
-              ? "We are currently at capacity. Please try again later."
-              : "There's a plan for everyone! Choose the one that fits your needs."
-          }}
-        </h2>
+        <p class="m-0 flex items-center gap-1">
+          Available in North America and Europe for wide coverage.
+        </p>
 
-        <ul class="m-0 mt-8 flex w-full flex-col gap-8 p-0 lg:flex-row">
+        <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+          <span></span>
+          <OptionGroup v-slot="{ option }" v-model="billingPeriod" :options="billingPeriods">
+            <template v-if="option === 'monthly'"> Pay monthly </template>
+            <span v-else-if="option === 'quarterly'"> Pay quarterly </span>
+            <span v-else-if="option === 'yearly'"> Pay yearly </span>
+          </OptionGroup>
+          <template v-if="billingPeriods.includes('quarterly')">
+            <button
+              v-if="billingPeriod !== 'quarterly'"
+              class="bg-transparent p-0 text-sm font-medium text-brand hover:underline active:scale-95"
+              @click="billingPeriod = 'quarterly'"
+            >
+              Save 16% with quarterly billing!
+            </button>
+            <span v-else class="text-sm font-medium text-primary">
+              Saving 16% with quarterly billing!
+            </span>
+          </template>
+          <template v-else-if="billingPeriods.includes('yearly')">
+            <button
+              v-if="billingPeriod !== 'yearly'"
+              class="bg-transparent p-0 text-sm font-medium text-brand hover:underline active:scale-95"
+              @click="billingPeriod = 'yearly'"
+            >
+              Save 16% with yearly billing!
+            </button>
+            <span v-else class="text-sm font-medium text-primary">
+              Saving 16% with yearly billing!
+            </span>
+          </template>
+          <span v-else></span>
+        </div>
+
+        <ul class="m-0 flex w-full grid-cols-3 flex-col gap-8 p-0 lg:grid">
           <ServerPlanSelector
             :capacity="capacityStatuses?.small?.available"
             plan="small"
@@ -616,9 +553,12 @@
             :storage="plans.small.metadata.storage"
             :cpus="plans.small.metadata.cpu"
             :price="
-              plans.small?.prices?.find((x) => x.currency_code === 'USD')?.prices?.intervals
-                ?.monthly
+              plans.small?.prices?.find((x) => x.currency_code === selectedCurrency)?.prices
+                ?.intervals?.[billingPeriod]
             "
+            :interval="billingPeriod"
+            :currency="selectedCurrency"
+            :is-usa="country.toLowerCase() === 'us'"
             @select="selectProduct('small')"
             @scroll-to-faq="scrollToFaq()"
           />
@@ -629,9 +569,12 @@
             :storage="plans.medium.metadata.storage"
             :cpus="plans.medium.metadata.cpu"
             :price="
-              plans.medium?.prices?.find((x) => x.currency_code === 'USD')?.prices?.intervals
-                ?.monthly
+              plans.medium?.prices?.find((x) => x.currency_code === selectedCurrency)?.prices
+                ?.intervals?.[billingPeriod]
             "
+            :interval="billingPeriod"
+            :currency="selectedCurrency"
+            :is-usa="country.toLowerCase() === 'us'"
             @select="selectProduct('medium')"
             @scroll-to-faq="scrollToFaq()"
           />
@@ -641,10 +584,13 @@
             :storage="plans.large.metadata.storage"
             :cpus="plans.large.metadata.cpu"
             :price="
-              plans.large?.prices?.find((x) => x.currency_code === 'USD')?.prices?.intervals
-                ?.monthly
+              plans.large?.prices?.find((x) => x.currency_code === selectedCurrency)?.prices
+                ?.intervals?.[billingPeriod]
             "
+            :currency="selectedCurrency"
+            :is-usa="country.toLowerCase() === 'us'"
             plan="large"
+            :interval="billingPeriod"
             @select="selectProduct('large')"
             @scroll-to-faq="scrollToFaq()"
           />
@@ -654,10 +600,9 @@
           class="mb-24 flex w-full flex-col items-start justify-between gap-4 rounded-2xl bg-bg p-8 text-left lg:flex-row lg:gap-0"
         >
           <div class="flex flex-col gap-4">
-            <h1 class="m-0">Build your own</h1>
+            <h1 class="m-0">Know exactly what you need?</h1>
             <h2 class="m-0 text-base font-normal text-primary">
-              If you're a more technical server administrator, you can pick your own RAM and storage
-              options.
+              Pick a customized plan with just the specs you need.
             </h2>
           </div>
 
@@ -666,7 +611,7 @@
           >
             <ButtonStyled color="standard" size="large">
               <button class="w-full md:w-fit" @click="selectProduct('custom')">
-                Build your own
+                Get started
                 <RightArrowIcon class="shrink-0" />
               </button>
             </ButtonStyled>
@@ -679,7 +624,7 @@
 </template>
 
 <script setup>
-import { ButtonStyled, PurchaseModal } from "@modrinth/ui";
+import { ButtonStyled, ModrinthServersPurchaseModal } from "@modrinth/ui";
 import {
   BoxIcon,
   GameIcon,
@@ -691,8 +636,11 @@ import {
 } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
-import Globe from "~/components/ui/servers/Globe.vue";
 import ServerPlanSelector from "~/components/ui/servers/marketing/ServerPlanSelector.vue";
+import OptionGroup from "~/components/ui/OptionGroup.vue";
+
+const billingPeriods = ref(["monthly", "yearly"]);
+const billingPeriod = ref(billingPeriods.value.includes("quarterly") ? "quarterly" : "monthly");
 
 const pyroProducts = products.filter((p) => p.metadata.type === "pyro");
 const pyroPlanProducts = pyroProducts.filter(
@@ -709,16 +657,6 @@ useSeoMeta({
   description,
   ogTitle: title,
   ogDescription: description,
-});
-
-useHead({
-  script: [
-    {
-      src: "https://js.stripe.com/v3/",
-      defer: true,
-      async: true,
-    },
-  ],
 });
 
 const auth = await useAuth();
@@ -740,6 +678,7 @@ const isDeleting = ref(false);
 const typingSpeed = 75;
 const deletingSpeed = 25;
 const pauseTime = 2000;
+const selectedCurrency = ref("USD");
 
 const loggedOut = computed(() => !auth.value.user);
 const outOfStockUrl = "https://discord.modrinth.com";
@@ -753,6 +692,16 @@ const { data: hasServers } = await useAsyncData("ServerListCountCheck", async ()
     return false;
   }
 });
+
+function fetchStock(region, request) {
+  return usePyroFetch(`stock?region=${region.shortcode}`, {
+    method: "POST",
+    body: {
+      ...request,
+    },
+    bypassAuth: true,
+  }).then((res) => res.available);
+}
 
 async function fetchCapacityStatuses(customProduct = null) {
   try {
@@ -840,23 +789,6 @@ const handleError = (err) => {
     text: err.message ?? (err.data ? err.data.description : err),
   });
 };
-
-const handleModalHidden = () => {
-  showModal.value = false;
-};
-
-watch(selectedProduct, async (newProduct) => {
-  if (newProduct) {
-    showModal.value = false;
-    await nextTick();
-    showModal.value = true;
-    modalKey.value++;
-    await nextTick();
-    if (purchaseModal.value && purchaseModal.value.show) {
-      purchaseModal.value.show();
-    }
-  }
-});
 
 async function fetchPaymentData() {
   if (!auth.value.user) return;
@@ -954,8 +886,10 @@ const selectProduct = async (product) => {
   modalKey.value++;
   await nextTick();
 
-  if (purchaseModal.value && purchaseModal.value.show) {
-    purchaseModal.value.show();
+  if (product === "custom") {
+    purchaseModal.value?.show(billingPeriod.value);
+  } else {
+    purchaseModal.value?.show(billingPeriod.value, selectedProduct.value);
   }
 };
 
@@ -966,9 +900,82 @@ const planQuery = () => {
   }
 };
 
+const regions = ref([]);
+const regionPings = ref([]);
+
+function pingRegions() {
+  usePyroFetch("regions", {
+    method: "GET",
+    version: 1,
+    bypassAuth: true,
+  }).then((res) => {
+    regions.value = res;
+    regions.value.forEach((region) => {
+      runPingTest(region);
+    });
+  });
+}
+
+const PING_COUNT = 20;
+const PING_INTERVAL = 400;
+const MAX_PING_TIME = 1000;
+
+function runPingTest(region, index = 1) {
+  if (index > 10) {
+    regionPings.value.push({
+      region: region.shortcode,
+      ping: -1,
+    });
+    return;
+  }
+
+  const wsUrl = `wss://${region.shortcode}${index}.${region.zone}/pingtest`;
+  try {
+    const socket = new WebSocket(wsUrl);
+    const pings = [];
+
+    socket.onopen = () => {
+      for (let i = 0; i < PING_COUNT; i++) {
+        setTimeout(() => {
+          socket.send(performance.now());
+        }, i * PING_INTERVAL);
+      }
+      setTimeout(
+        () => {
+          socket.close();
+
+          const median = Math.round([...pings].sort((a, b) => a - b)[Math.floor(pings.length / 2)]);
+          if (median) {
+            regionPings.value.push({
+              region: region.shortcode,
+              ping: median,
+            });
+          }
+        },
+        PING_COUNT * PING_INTERVAL + MAX_PING_TIME,
+      );
+    };
+
+    socket.onmessage = (event) => {
+      pings.push(performance.now() - event.data);
+    };
+
+    socket.onerror = (event) => {
+      console.error(
+        `Failed to connect pingtest WebSocket with ${wsUrl}, trying index ${index + 1}:`,
+        event,
+      );
+      runPingTest(region, index + 1);
+    };
+  } catch (error) {
+    console.error(`Failed to connect pingtest WebSocket with ${wsUrl}:`, error);
+  }
+}
+
 onMounted(() => {
   startTyping();
   planQuery();
+  pingRegions();
 });
 
 watch(customer, (newCustomer) => {

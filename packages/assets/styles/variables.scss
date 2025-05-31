@@ -200,6 +200,8 @@ html {
   --color-platform-sponge: #f9e580;
 
   --hover-brightness: 1.25;
+
+  --experimental-color-button-bg: #33363d;
 }
 
 .oled-mode {
@@ -257,7 +259,7 @@ html {
 }
 
 .dark-experiments {
-  --color-button-bg: #33363d;
+  --color-button-bg: var(--experimental-color-button-bg);
 }
 
 .dark-mode:not(.oled-mode),

@@ -61,16 +61,26 @@ export const getCurrency = (userCountry) => {
   return countryCurrency[userCountry] ?? 'USD'
 }
 
-export const formatPrice = (locale, price, currency) => {
-  const formatter = new Intl.NumberFormat(locale, {
+export const formatPrice = (locale, price, currency, trimZeros = false) => {
+  let formatter = new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
   })
 
   const maxDigits = formatter.resolvedOptions().maximumFractionDigits
-
   const convertedPrice = price / Math.pow(10, maxDigits)
 
+  let minimumFractionDigits = maxDigits
+
+  if (trimZeros && Number.isInteger(convertedPrice)) {
+    minimumFractionDigits = 0
+  }
+
+  formatter = new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency,
+    minimumFractionDigits,
+  })
   return formatter.format(convertedPrice)
 }
 
@@ -87,13 +97,13 @@ export const createStripeElements = (stripe, paymentMethods, options) => {
     appearance: {
       variables: {
         colorPrimary: styles.getPropertyValue('--color-brand'),
-        colorBackground: styles.getPropertyValue('--color-bg'),
+        colorBackground: styles.getPropertyValue('--experimental-color-button-bg'),
         colorText: styles.getPropertyValue('--color-base'),
         colorTextPlaceholder: styles.getPropertyValue('--color-secondary'),
         colorDanger: styles.getPropertyValue('--color-red'),
         fontFamily: styles.getPropertyValue('--font-standard'),
         spacingUnit: '0.25rem',
-        borderRadius: '1rem',
+        borderRadius: '0.75rem',
       },
     },
     loader: 'never',

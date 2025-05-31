@@ -313,7 +313,7 @@ const selectedLoaderVersions = computed<string[]>(() => {
   const loader = selectedLoader.value.toLowerCase();
 
   if (loader === "paper") {
-    return paperVersions.value[selectedMCVersion.value].map((x) => `${x}`) || [];
+    return paperVersions.value[selectedMCVersion.value]?.map((x) => `${x}`) || [];
   }
 
   if (loader === "purpur") {

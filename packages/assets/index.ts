@@ -77,6 +77,7 @@ import _CopyrightIcon from './icons/copyright.svg?component'
 import _CrownIcon from './icons/crown.svg?component'
 import _CurrencyIcon from './icons/currency.svg?component'
 import _DashboardIcon from './icons/dashboard.svg?component'
+import _DatabaseIcon from './icons/database.svg?component'
 import _DownloadIcon from './icons/download.svg?component'
 import _DropdownIcon from './icons/dropdown.svg?component'
 import _EditIcon from './icons/edit.svg?component'
@@ -125,6 +126,7 @@ import _LogOutIcon from './icons/log-out.svg?component'
 import _MailIcon from './icons/mail.svg?component'
 import _ManageIcon from './icons/manage.svg?component'
 import _MaximizeIcon from './icons/maximize.svg?component'
+import _MemoryStickIcon from './icons/memory-stick.svg?component'
 import _MessageIcon from './icons/message.svg?component'
 import _MicrophoneIcon from './icons/microphone.svg?component'
 import _MinimizeIcon from './icons/minimize.svg?component'
@@ -295,6 +297,7 @@ export const CopyrightIcon = _CopyrightIcon
 export const CrownIcon = _CrownIcon
 export const CurrencyIcon = _CurrencyIcon
 export const DashboardIcon = _DashboardIcon
+export const DatabaseIcon = _DatabaseIcon
 export const DownloadIcon = _DownloadIcon
 export const DropdownIcon = _DropdownIcon
 export const EditIcon = _EditIcon
@@ -344,6 +347,7 @@ export const LogOutIcon = _LogOutIcon
 export const MailIcon = _MailIcon
 export const ManageIcon = _ManageIcon
 export const MaximizeIcon = _MaximizeIcon
+export const MemoryStickIcon = _MemoryStickIcon
 export const MessageIcon = _MessageIcon
 export const MicrophoneIcon = _MicrophoneIcon
 export const MinimizeIcon = _MinimizeIcon
