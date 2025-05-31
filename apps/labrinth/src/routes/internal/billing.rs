@@ -1020,6 +1020,7 @@ fn infer_currency_code(country: &str) -> String {
         "BE" => "EUR",
         "CY" => "EUR",
         "EE" => "EUR",
+        "ES" => "EUR",
         "FI" => "EUR",
         "FR" => "EUR",
         "DE" => "EUR",
@@ -1066,6 +1067,7 @@ fn infer_currency_code(country: &str) -> String {
         "TW" => "TWD",
         "SA" => "SAR",
         "QA" => "QAR",
+        "SG" => "SGD",
         _ => "USD",
     }
     .to_string()
@@ -1302,6 +1304,12 @@ pub async fn initiate_payment(
             amount: Some(price),
             currency: Some(stripe_currency),
             customer: Some(customer),
+            metadata: interval.map(|interval| {
+                HashMap::from([(
+                    "modrinth_subscription_interval".to_string(),
+                    interval.as_str().to_string(),
+                )])
+            }),
             ..Default::default()
         };
 
