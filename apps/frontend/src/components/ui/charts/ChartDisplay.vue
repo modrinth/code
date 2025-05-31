@@ -102,8 +102,9 @@
                 <Chart
                   v-if="analytics.formattedData.value.downloads && selectedChart === 'downloads'"
                   ref="downloadsChart"
-                  type="line"
+                  type="area"
                   name="Download data"
+                  stacked="true"
                   :hide-legend="true"
                   :data="analytics.formattedData.value.downloads.chart.data"
                   :labels="analytics.formattedData.value.downloads.chart.labels"
@@ -117,8 +118,9 @@
                 <Chart
                   v-if="analytics.formattedData.value.views && selectedChart === 'views'"
                   ref="viewsChart"
-                  type="line"
+                  type="area"
                   name="View data"
+                  stacked="true"
                   :hide-legend="true"
                   :data="analytics.formattedData.value.views.chart.data"
                   :labels="analytics.formattedData.value.views.chart.labels"
@@ -132,8 +134,9 @@
                 <Chart
                   v-if="analytics.formattedData.value.revenue && selectedChart === 'revenue'"
                   ref="revenueChart"
-                  type="line"
+                  type="area"
                   name="Revenue data"
+                  stacked="true"
                   :hide-legend="true"
                   :data="analytics.formattedData.value.revenue.chart.data"
                   :labels="analytics.formattedData.value.revenue.chart.labels"
