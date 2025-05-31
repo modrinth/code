@@ -110,5 +110,13 @@ ALTER TABLE loader_fields_loaders ADD PRIMARY KEY (loader_id, loader_field_id);
 DELETE FROM loader_fields
     WHERE field IN ('server_only', 'singleplayer', 'client_and_server', 'client_only');
 
+-- Add a field to the projects table to track whether the new environment field value has been
+-- reviewed to be appropriate after automated migration
+ALTER TABLE mods
+    ADD COLUMN side_types_migration_review_status VARCHAR(64) NOT NULL DEFAULT 'reviewed'
+    CHECK (side_types_migration_review_status IN ('reviewed', 'pending'));
+
+UPDATE mods SET side_types_migration_review_status = 'pending';
+
 END;
 $$
