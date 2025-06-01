@@ -390,6 +390,7 @@ impl PayoutsQueue {
                     "bank",
                     "ach",
                     "visa_card",
+                    "charity",
                 ];
 
                 if !SUPPORTED_METHODS.contains(&&*product.category)
