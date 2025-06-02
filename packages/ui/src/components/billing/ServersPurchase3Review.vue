@@ -204,7 +204,7 @@ function setInterval(newInterval: ServerBillingInterval) {
       :loading="loading"
       :total="total ?? -1"
       :billing-items="
-        total && tax
+        total !== undefined && tax !== undefined
           ? [
               {
                 title: `Modrinth Servers (${planName})`,
