@@ -954,17 +954,19 @@ pub async fn active_servers(
         pub server_id: String,
         pub price_id: crate::models::ids::ProductPriceId,
         pub interval: PriceDuration,
+        pub region: Option<String>,
     }
 
     let server_ids = servers
         .into_iter()
         .filter_map(|x| {
             x.metadata.as_ref().map(|metadata| match metadata {
-                SubscriptionMetadata::Pyro { id } => ActiveServer {
+                SubscriptionMetadata::Pyro { id, region } => ActiveServer {
                     user_id: x.user_id.into(),
                     server_id: id.clone(),
                     price_id: x.price_id.into(),
                     interval: x.interval,
+                    region: region.clone(),
                 },
             })
         })
@@ -1764,8 +1766,10 @@ pub async fn stripe_webhook(
                             {
                                 let client = reqwest::Client::new();
 
-                                if let Some(SubscriptionMetadata::Pyro { id }) =
-                                    &subscription.metadata
+                                if let Some(SubscriptionMetadata::Pyro {
+                                    id,
+                                    region: _,
+                                }) = &subscription.metadata
                                 {
                                     client
                                         .post(format!(
@@ -1880,6 +1884,7 @@ pub async fn stripe_webhook(
                                         subscription.metadata =
                                             Some(SubscriptionMetadata::Pyro {
                                                 id: res.uuid,
+                                                region: server_region,
                                             });
                                     }
                                 }
@@ -2240,7 +2245,7 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
                     true
                 }
                 ProductMetadata::Pyro { .. } => {
-                    if let Some(SubscriptionMetadata::Pyro { id }) =
+                    if let Some(SubscriptionMetadata::Pyro { id, region: _ }) =
                         &subscription.metadata
                     {
                         let res = reqwest::Client::new()

@@ -145,7 +145,7 @@ impl SubscriptionStatus {
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum SubscriptionMetadata {
-    Pyro { id: String },
+    Pyro { id: String, region: Option<String> },
 }
 
 #[derive(Serialize, Deserialize)]
