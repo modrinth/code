@@ -58,6 +58,7 @@ const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
 const selectedPlan = ref<ServerPlan>()
 const selectedInterval = ref<ServerBillingInterval>('quarterly')
 const loading = ref(false)
+const selectedRegion = ref<string>()
 
 const {
   initializeStripe,
@@ -83,11 +84,11 @@ const {
   props.currency,
   selectedPlan,
   selectedInterval,
+  selectedRegion,
   props.initiatePayment,
   props.onError,
 )
 
-const selectedRegion = ref<string>()
 const customServer = ref<boolean>(false)
 const acceptedEula = ref<boolean>(false)
 const firstTimeThru = ref<boolean>(true)

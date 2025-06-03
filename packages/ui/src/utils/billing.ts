@@ -71,8 +71,9 @@ export type CreatePaymentIntentRequest = PaymentRequestType & {
   metadata?: {
     type: 'pyro'
     server_name?: string
+    server_region?: string
     source: {
-      loader: string
+      loader?: string
       game_version?: string
       loader_version?: string
     }
