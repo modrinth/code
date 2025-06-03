@@ -186,7 +186,7 @@ function setInterval(newInterval: ServerBillingInterval) {
           >{{
             formatPrice(
               locale,
-              prices?.prices?.intervals?.['quarterly'] ?? 0 / monthsInInterval['quarterly'],
+              (prices?.prices?.intervals?.['quarterly'] ?? 0) / monthsInInterval['quarterly'],
               currency,
               true,
             )

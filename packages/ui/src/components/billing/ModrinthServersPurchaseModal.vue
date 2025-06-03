@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, useTemplateRef, nextTick } from 'vue'
+import { ref, computed, useTemplateRef, nextTick, watch } from 'vue'
 import NewModal from '../modal/NewModal.vue'
 import { type MessageDescriptor, useVIntl, defineMessage } from '@vintl/vintl'
 import {
@@ -193,6 +193,10 @@ async function setStep(step: Step | undefined, skipValidation = false) {
     await afterProceed(step)
   }
 }
+
+watch(selectedPlan, () => {
+  console.log(selectedPlan.value)
+})
 
 function begin(interval: ServerBillingInterval, plan?: ServerPlan) {
   loading.value = false

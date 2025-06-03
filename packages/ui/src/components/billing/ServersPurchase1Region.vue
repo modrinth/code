@@ -82,11 +82,15 @@ function updateRamStock(regionToCheck: string, newRam: number) {
 }
 
 watch(selectedRam, (newRam: number) => {
-  updateRamStock(selectedRegion.value, newRam)
+  if (props.custom && selectedRegion.value) {
+    updateRamStock(selectedRegion.value, newRam)
+  }
 })
 
-watch(selectedRegion, (newRegion: number) => {
-  updateRamStock(newRegion, selectedRam.value)
+watch(selectedRegion, (newRegion: string | undefined) => {
+  if (props.custom && newRegion) {
+    updateRamStock(newRegion, selectedRam.value)
+  }
 })
 
 const currentStock = ref<{ [region: string]: number }>({})
@@ -154,7 +158,9 @@ onMounted(() => {
           : firstWithStock?.shortcode
     }
     selectedRegion.value = stockedRegion
-    updateRamStock(stockedRegion, minRam.value)
+    if (props.custom && stockedRegion) {
+      updateRamStock(stockedRegion, minRam.value)
+    }
     loading.value = false
   })
 })
