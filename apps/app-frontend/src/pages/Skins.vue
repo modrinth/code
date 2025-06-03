@@ -455,6 +455,7 @@ $skin-card-gap: 4px;
 
 .preview-panel {
   top: 1.5rem;
+  position: sticky;
   align-self: start;
   padding: 0.5rem;
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-full h-full cursor-grab">
+  <div ref="skinPreviewContainer" class="relative w-full h-full cursor-grab">
     <div
       class="absolute bottom-[18%] left-0 right-0 flex flex-col justify-center items-center mb-2 pointer-events-none z-10 gap-2"
     >
@@ -14,9 +14,8 @@
     </div>
     <div
       v-if="nametag"
-      ref="nametagElement"
-      class="absolute top-[13%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md pointer-events-none z-10 font-minecraft text-inverted nametag-bg"
-      :style="{ fontSize: dynamicNametagFontSize }"
+      class="absolute top-[20%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md pointer-events-none z-10 font-minecraft text-inverted nametag-bg transition-all duration-200"
+      :style="{ fontSize: nametagFontSize }"
     >
       {{ nametag }}
     </div>
@@ -105,8 +104,6 @@ import {
   onUnmounted,
   toRefs,
   useTemplateRef,
-  onMounted,
-  nextTick,
 } from 'vue'
 import {
   applyTexture,
@@ -116,6 +113,7 @@ import {
   createTransparentTexture,
   loadTexture as loadSkinTexture,
 } from '@modrinth/utils'
+import { useDynamicFontSize } from '../../composables'
 
 interface AnimationConfig {
   baseAnimation: string
@@ -157,6 +155,19 @@ const props = withDefaults(
   },
 )
 
+const skinPreviewContainer = useTemplateRef<HTMLElement>('skinPreviewContainer')
+const nametagText = computed(() => props.nametag)
+
+const { fontSize: nametagFontSize } = useDynamicFontSize({
+  containerElement: skinPreviewContainer,
+  text: nametagText,
+  baseFontSize: 2,
+  minFontSize: 1.25,
+  maxFontSize: 4,
+  padding: 24,
+  fontFamily: 'inherit',
+})
+
 const selectedModelSrc = computed(() =>
   props.variant === 'SLIM' ? props.slimModelSrc : props.wideModelSrc,
 )
@@ -179,30 +190,6 @@ const actions = ref<Record<string, THREE.AnimationAction>>({})
 const clock = new THREE.Clock()
 const currentAnimation = ref<string>('')
 const randomAnimationTimer = ref<number | null>(null)
-
-const nametagElement = useTemplateRef<HTMLElement>('nametagElement')
-const maxContainerWidth = ref(300)
-
-const dynamicNametagFontSize = computed(() => {
-  if (!props.nametag) return '2rem'
-  const textLength = props.nametag.length
-  const baseSize = 32
-  const minSize = 12
-  const maxSize = 32
-  const availableWidth = maxContainerWidth.value - 64
-  const estimatedCharWidth = baseSize * 0.6
-  const estimatedTextWidth = textLength * estimatedCharWidth
-  const scaleFactor = availableWidth / estimatedTextWidth
-  const calculatedSize = Math.max(minSize, Math.min(maxSize, baseSize * scaleFactor))
-
-  return `${calculatedSize}px`
-})
-
-const updateContainerWidth = () => {
-  if (nametagElement.value?.parentElement) {
-    maxContainerWidth.value = nametagElement.value.parentElement.clientWidth
-  }
-}
 
 const { baseAnimation, randomAnimations } = toRefs(props.animationConfig)
 
@@ -250,7 +237,6 @@ function playAnimation(name: string) {
     }
   })
 
-  // Reset and play the new animation
   action.reset()
   action.setLoop(THREE.LoopRepeat, Infinity)
   action.fadeIn(transitionDuration)
@@ -526,22 +512,6 @@ watch(
   { deep: true },
 )
 
-watch(
-  () => props.nametag,
-  () => {
-    nextTick(() => {
-      updateContainerWidth()
-    })
-  },
-)
-
-onMounted(() => {
-  nextTick(() => {
-    updateContainerWidth()
-    window.addEventListener('resize', updateContainerWidth)
-  })
-})
-
 onBeforeMount(async () => {
   try {
     isTextureLoaded.value = false
@@ -571,8 +541,6 @@ onUnmounted(() => {
     mixer.value.stopAllAction()
     mixer.value = null
   }
-
-  window.removeEventListener('resize', updateContainerWidth)
 })
 </script>
 
