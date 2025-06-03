@@ -217,7 +217,14 @@
               v-if="interval === 'yearly' || interval === 'quarterly'"
               class="rounded-full bg-brand px-2 py-1 font-bold text-brand-inverted"
             >
-              SAVE {{ calculateSavings(price.prices.intervals.monthly, rawPrice, interval === 'quarterly' ? 3 : 12) }}%
+              SAVE
+              {{
+                calculateSavings(
+                  price.prices.intervals.monthly,
+                  rawPrice,
+                  interval === 'quarterly' ? 3 : 12,
+                )
+              }}%
             </span>
             <span class="ml-auto text-lg" :class="{ 'text-secondary': selectedPlan !== interval }">
               {{ formatPrice(locale, rawPrice, price.currency_code) }}

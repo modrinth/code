@@ -520,19 +520,15 @@
           </OptionGroup>
           <template v-if="billingPeriods.includes('quarterly')">
             <button
+              v-if="billingPeriod !== 'quarterly'"
               class="bg-transparent p-0 text-sm font-medium text-brand hover:underline active:scale-95"
               @click="billingPeriod = 'quarterly'"
             >
               Save 16% with quarterly billing!
             </button>
-          </template>
-          <template v-else-if="billingPeriods.includes('yearly')">
-            <button
-              class="bg-transparent p-0 text-sm font-medium text-brand hover:underline active:scale-95"
-              @click="billingPeriod = 'yearly'"
-            >
-              Save 16% with yearly billing!
-            </button>
+            <span v-else class="bg-transparent p-0 text-sm font-medium text-brand">
+              Save 16% with quarterly billing!
+            </span>
           </template>
           <span v-else></span>
         </div>

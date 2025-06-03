@@ -309,7 +309,15 @@ defineExpose({
         </button>
       </ButtonStyled>
       <ButtonStyled color="brand">
-        <button v-tooltip="currentStep === 'review' && !acceptedEula ? 'You must accept the Minecraft EULA to proceed.' : undefined" :disabled="!canProceed" @click="setStep(nextStep)">
+        <button
+          v-tooltip="
+            currentStep === 'review' && !acceptedEula
+              ? 'You must accept the Minecraft EULA to proceed.'
+              : undefined
+          "
+          :disabled="!canProceed"
+          @click="setStep(nextStep)"
+        >
           <template v-if="currentStep === 'review'">
             <SpinnerIcon v-if="completingPurchase" class="animate-spin" />
             <CheckCircleIcon v-else />

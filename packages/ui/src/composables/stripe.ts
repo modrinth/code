@@ -1,9 +1,5 @@
 import type Stripe from 'stripe'
-import {
-  type Stripe as StripeJs,
-  loadStripe,
-  type StripeElements,
-} from '@stripe/stripe-js'
+import { type Stripe as StripeJs, loadStripe, type StripeElements } from '@stripe/stripe-js'
 import { computed, ref, type Ref } from 'vue'
 import type { ContactOption } from '@stripe/stripe-js/dist/stripe-js/elements/address'
 import type {
@@ -391,6 +387,6 @@ export const useStripe = (
     tax,
     total,
     submitPayment,
-    completingPurchase
+    completingPurchase,
   }
 }

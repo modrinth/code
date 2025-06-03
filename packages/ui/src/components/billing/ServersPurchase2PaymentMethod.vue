@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type Stripe from 'stripe'
-import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
 import { useVIntl, defineMessages } from '@vintl/vintl'
 import PaymentMethodOption from './PaymentMethodOption.vue'
 

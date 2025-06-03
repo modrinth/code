@@ -177,13 +177,13 @@ function setInterval(newInterval: ServerBillingInterval) {
       <RadioButtonIcon v-else class="size-6 text-secondary" />
       <div class="flex flex-col items-start gap-1 font-medium text-primary">
         <span class="flex items-center gap-1" :class="{ 'text-contrast': interval === 'quarterly' }"
-        >Pay quarterly
+          >Pay quarterly
           <span class="text-xs font-bold text-brand px-1.5 py-0.5 rounded-full bg-brand-highlight"
-          >{{ interval === 'quarterly' ? 'Saving' : 'Save' }} 16%</span
+            >{{ interval === 'quarterly' ? 'Saving' : 'Save' }} 16%</span
           ></span
         >
         <span class="text-sm text-secondary flex items-center gap-1"
-        >{{
+          >{{
             formatPrice(
               locale,
               prices?.prices?.intervals?.['quarterly'] ?? 0 / monthsInInterval['quarterly'],
