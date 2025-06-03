@@ -443,8 +443,8 @@
                 Where are Modrinth Servers located? Can I choose a region?
               </summary>
               <p class="m-0 ml-6 leading-[160%]">
-                Currently, Modrinth Servers are located on the east coast of the United States in
-                Vint Hill, Virginia. More regions to come in the future!
+                We have servers in both North America in Vint Hill, Virginia, and Europe in Limburg,
+                Germany. More regions to come in the future!
               </p>
             </details>
 
