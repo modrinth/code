@@ -35,6 +35,7 @@
     "@types/markdown-it": "^14.1.1",
     "@types/three": "^0.172.0",
     "@vintl/how-ago": "^3.0.1",
+    "@vueuse/core": "^11.1.0",
     "apexcharts": "^3.44.0",
     "dayjs": "^1.11.10",
     "floating-vue": "^5.2.2",

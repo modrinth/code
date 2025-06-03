@@ -444,6 +444,9 @@ importers:
       '@vintl/how-ago':
         specifier: ^3.0.1
         version: 3.0.1(@formatjs/intl@2.10.4(typescript@5.5.4))
+      '@vueuse/core':
+        specifier: ^11.1.0
+        version: 11.1.0(vue@3.5.13(typescript@5.5.4))
       apexcharts:
         specifier: ^3.44.0
         version: 3.49.2
