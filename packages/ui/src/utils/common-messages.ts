@@ -17,6 +17,14 @@ export const commonMessages = defineMessages({
     id: 'button.continue',
     defaultMessage: 'Continue',
   },
+  nextButton: {
+    id: 'button.next',
+    defaultMessage: 'Next',
+  },
+  backButton: {
+    id: 'button.back',
+    defaultMessage: 'Back',
+  },
   copyIdButton: {
     id: 'button.copy-id',
     defaultMessage: 'Copy ID',
@@ -205,6 +213,10 @@ export const commonMessages = defineMessages({
     id: 'label.visit-your-profile',
     defaultMessage: 'Visit your profile',
   },
+  paymentMethodCardDisplay: {
+    id: 'omorphia.component.purchase_modal.payment_method_card_display',
+    defaultMessage: '{card_brand} ending in {last_four}',
+  },
 })
 
 export const commonSettingsMessages = defineMessages({
@@ -243,5 +255,53 @@ export const commonSettingsMessages = defineMessages({
   billing: {
     id: 'settings.billing.title',
     defaultMessage: 'Billing and subscriptions',
+  },
+})
+
+export const paymentMethodMessages = defineMessages({
+  visa: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.visa',
+    defaultMessage: 'Visa',
+  },
+  amex: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.amex',
+    defaultMessage: 'American Express',
+  },
+  diners: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.diners',
+    defaultMessage: 'Diners Club',
+  },
+  discover: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.discover',
+    defaultMessage: 'Discover',
+  },
+  eftpos: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.eftpos',
+    defaultMessage: 'EFTPOS',
+  },
+  jcb: { id: 'omorphia.component.purchase_modal.payment_method_type.jcb', defaultMessage: 'JCB' },
+  mastercard: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.mastercard',
+    defaultMessage: 'MasterCard',
+  },
+  unionpay: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.unionpay',
+    defaultMessage: 'UnionPay',
+  },
+  paypal: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.paypal',
+    defaultMessage: 'PayPal',
+  },
+  cashapp: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.cashapp',
+    defaultMessage: 'Cash App',
+  },
+  amazon_pay: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.amazon_pay',
+    defaultMessage: 'Amazon Pay',
+  },
+  unknown: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.unknown',
+    defaultMessage: 'Unknown payment method',
   },
 })
