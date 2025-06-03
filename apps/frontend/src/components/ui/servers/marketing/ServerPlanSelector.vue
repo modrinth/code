@@ -60,7 +60,7 @@ const plans: Record<
     }),
     description: defineMessage({
       id: "servers.plan.large.description",
-      defaultMessage: "Ideal for 15-25 players, modpacks, or heavy modding.",
+      defaultMessage: "Ideal for 15–25 players, modpacks, or heavy modding.",
     }),
     mostPopular: false,
   },
