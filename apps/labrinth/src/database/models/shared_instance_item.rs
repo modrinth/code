@@ -1,5 +1,5 @@
 use crate::database::models::{
-    DBFileId, DBSharedInstanceId, DBSharedInstanceVersionId, DBUserId,
+    DBSharedInstanceId, DBSharedInstanceVersionId, DBUserId,
 };
 use crate::database::redis::RedisPool;
 use dashmap::DashMap;
@@ -71,6 +71,39 @@ impl DBSharedInstance {
         .await?;
 
         Ok(result.map(Into::into))
+    }
+
+    pub async fn list_for_user(
+        user: DBUserId,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+    ) -> Result<Vec<Self>, sqlx::Error> {
+        let results = sqlx::query_as!(
+            SharedInstanceQueryResult,
+            r#"
+            -- https://github.com/launchbadge/sqlx/issues/1266
+            SELECT
+                id as "id!",
+                title as "title!",
+                owner_id as "owner_id!",
+                current_version_id
+            FROM shared_instances
+            WHERE owner_id = $1
+            UNION
+            SELECT
+                id as "id!",
+                title as "title!",
+                owner_id as "owner_id!",
+                current_version_id
+            FROM shared_instances
+            JOIN shared_instance_users ON id = shared_instance_id
+            WHERE user_id = $1
+            "#,
+            user.0,
+        )
+        .fetch_all(exec)
+        .await?;
+
+        Ok(results.into_iter().map(Into::into).collect())
     }
 }
 //endregion
@@ -167,22 +200,25 @@ impl DBSharedInstanceUser {
 //region shared_instance_versions
 pub struct DBSharedInstanceVersion {
     pub id: DBSharedInstanceVersionId,
-    pub file_id: DBFileId,
     pub shared_instance_id: DBSharedInstanceId,
+    pub size: u64,
+    pub sha512: Vec<u8>,
 }
 
 struct SharedInstanceVersionQueryResult {
     id: i64,
-    file_id: i64,
     shared_instance_id: i64,
+    size: i64,
+    sha512: Vec<u8>,
 }
 
 impl From<SharedInstanceVersionQueryResult> for DBSharedInstanceVersion {
     fn from(val: SharedInstanceVersionQueryResult) -> Self {
         DBSharedInstanceVersion {
             id: DBSharedInstanceVersionId(val.id),
-            file_id: DBFileId(val.file_id),
             shared_instance_id: DBSharedInstanceId(val.shared_instance_id),
+            size: val.size as u64,
+            sha512: val.sha512,
         }
     }
 }
@@ -194,12 +230,13 @@ impl DBSharedInstanceVersion {
     ) -> Result<(), sqlx::Error> {
         sqlx::query!(
             "
-            INSERT INTO shared_instance_versions (id, file_id, shared_instance_id)
-            VALUES ($1, $2, $3)
+            INSERT INTO shared_instance_versions (id, shared_instance_id, size, sha512)
+            VALUES ($1, $2, $3, $4)
             ",
             self.id as DBSharedInstanceVersionId,
-            self.file_id as DBFileId,
             self.shared_instance_id as DBSharedInstanceId,
+            self.size as i64,
+            self.sha512,
         )
         .execute(&mut **transaction)
         .await?;
@@ -214,7 +251,7 @@ impl DBSharedInstanceVersion {
         let result = sqlx::query_as!(
             SharedInstanceVersionQueryResult,
             "
-            SELECT id, file_id, shared_instance_id
+            SELECT id, shared_instance_id, size, sha512
             FROM shared_instance_versions
             WHERE id = $1
             ",

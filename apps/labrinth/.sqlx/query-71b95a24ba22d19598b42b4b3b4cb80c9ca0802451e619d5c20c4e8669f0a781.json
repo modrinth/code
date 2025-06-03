@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, file_id, shared_instance_id\n            FROM shared_instance_versions\n            WHERE id = $1\n            ",
+  "query": "\n            SELECT id, shared_instance_id, size, sha512\n            FROM shared_instance_versions\n            WHERE id = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -10,13 +10,18 @@
       },
       {
         "ordinal": 1,
-        "name": "file_id",
+        "name": "shared_instance_id",
         "type_info": "Int8"
       },
       {
         "ordinal": 2,
-        "name": "shared_instance_id",
+        "name": "size",
         "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "sha512",
+        "type_info": "Bytea"
       }
     ],
     "parameters": {
@@ -27,8 +32,9 @@
     "nullable": [
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "bf4ab2ae77d8a4b4db197323dd7d74d8b9e3b68aca8d6d19929188cfa4aedaea"
+  "hash": "71b95a24ba22d19598b42b4b3b4cb80c9ca0802451e619d5c20c4e8669f0a781"
 }

@@ -1,3 +1,5 @@
+pub const MRPACK_MIME_TYPE: &str = "application/x-modrinth-modpack+zip";
+
 pub fn get_image_content_type(extension: &str) -> Option<&'static str> {
     match extension {
         "bmp" => Some("image/bmp"),
@@ -24,7 +26,7 @@ pub fn project_file_type(ext: &str) -> Option<&str> {
     match ext {
         "jar" => Some("application/java-archive"),
         "zip" | "litemod" => Some("application/zip"),
-        "mrpack" => Some("application/x-modrinth-modpack+zip"),
+        "mrpack" => Some(MRPACK_MIME_TYPE),
         _ => None,
     }
 }

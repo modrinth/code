@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            -- https://github.com/launchbadge/sqlx/issues/1266\n            SELECT\n                id as \"id!\",\n                title as \"title!\",\n                owner_id as \"owner_id!\",\n                current_version_id\n            FROM shared_instances\n            WHERE owner_id = $1\n            UNION\n            SELECT\n                id as \"id!\",\n                title as \"title!\",\n                owner_id as \"owner_id!\",\n                current_version_id\n            FROM shared_instances\n            JOIN shared_instance_users ON id = shared_instance_id\n            WHERE user_id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "title!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "owner_id!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "current_version_id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "b69470794cae8bb49c8760242ec4307fb4ef9ec5755aad2e7902ba5d3b1e8187"
+}

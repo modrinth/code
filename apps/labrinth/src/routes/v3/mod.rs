@@ -13,6 +13,7 @@ pub mod payouts;
 pub mod project_creation;
 pub mod projects;
 pub mod reports;
+pub mod shared_instance_version_creation;
 pub mod shared_instances;
 pub mod statistics;
 pub mod tags;
@@ -37,6 +38,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .configure(project_creation::config)
             .configure(projects::config)
             .configure(reports::config)
+            .configure(shared_instance_version_creation::config)
             .configure(shared_instances::config)
             .configure(statistics::config)
             .configure(tags::config)

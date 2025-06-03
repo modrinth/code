@@ -246,7 +246,7 @@ pub struct UploadedFile {
 pub async fn undo_uploads(
     file_host: &dyn FileHost,
     uploaded_files: &[UploadedFile],
-) -> Result<(), CreateError> {
+) -> Result<(), FileHostingError> {
     for file in uploaded_files {
         file_host
             .delete_file_version(&file.file_id, &file.file_name)
