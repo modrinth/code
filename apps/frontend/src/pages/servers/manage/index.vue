@@ -102,6 +102,7 @@
           :mc_version="server.mc_version"
           :upstream="server.upstream"
           :net="server.net"
+          :flows="server.flows"
         />
         <LazyUiServersServerListingSkeleton v-if="isPollingForNewServers" />
       </ul>
@@ -133,6 +134,7 @@ interface ServerResponse {
   servers: Server[];
 }
 
+const router = useRouter();
 const route = useRoute();
 const hasError = ref(false);
 const isPollingForNewServers = ref(false);
@@ -179,6 +181,7 @@ const checkForNewServers = async () => {
   if (JSON.stringify(previousServerList.value) !== JSON.stringify(serverList.value)) {
     isPollingForNewServers.value = false;
     clearInterval(intervalId);
+    router.replace({ query: {} });
   } else if (refreshCount.value >= 5) {
     isPollingForNewServers.value = false;
     clearInterval(intervalId);

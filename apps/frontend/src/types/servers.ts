@@ -104,6 +104,9 @@ export interface Server {
     version_id: string;
   };
   motd: string;
+  flows: {
+    intro?: boolean;
+  };
 }
 
 export interface Stats {

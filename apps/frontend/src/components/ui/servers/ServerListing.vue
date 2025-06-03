@@ -43,7 +43,14 @@
         </div>
         <div v-else class="min-h-[20px]"></div>
 
+        <div
+          v-if="isConfiguring"
+          class="flex min-w-0 items-center gap-2 truncate text-sm font-semibold text-brand"
+        >
+          <SparklesIcon class="size-5 shrink-0" /> New server
+        </div>
         <UiServersServerInfoLabels
+          v-else
           :server-data="{ game, mc_version, loader, loader_version, net }"
           :show-game-label="showGameLabel"
           :show-loader-label="showLoaderLabel"
@@ -73,7 +80,7 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronRightIcon, HammerIcon, LockIcon } from "@modrinth/assets";
+import { ChevronRightIcon, LockIcon, SparklesIcon } from "@modrinth/assets";
 import type { Project, Server } from "~/types/servers";
 
 const props = defineProps<Partial<Server>>();
@@ -106,4 +113,5 @@ if (import.meta.server && projectData.value?.icon_url) {
 }
 
 const iconUrl = computed(() => projectData.value?.icon_url || undefined);
+const isConfiguring = computed(() => props.flows?.intro);
 </script>
