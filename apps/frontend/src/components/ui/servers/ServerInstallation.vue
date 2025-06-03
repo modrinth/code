@@ -2,8 +2,9 @@
   <LazyUiServersPlatformVersionSelectModal
     ref="versionSelectModal"
     :server="props.server"
-    :current-loader="ignoreCurrentInstallation ? null : (data?.loader as Loaders)"
+    :current-loader="ignoreCurrentInstallation ? undefined : (data?.loader as Loaders)"
     :backup-in-progress="backupInProgress"
+    :initial-setup="ignoreCurrentInstallation"
     @reinstall="emit('reinstall', $event)"
   />
 

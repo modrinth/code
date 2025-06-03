@@ -127,7 +127,10 @@
           </div>
         </div>
 
-        <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
+        <div
+          v-if="!initialSetup"
+          class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4"
+        >
           <div class="flex w-full flex-row items-center justify-between">
             <label class="w-full text-lg font-bold text-contrast" for="hard-reset">
               Erase all data
@@ -146,7 +149,10 @@
           <div class="font-bold">This does not affect your backups, which are stored off-site.</div>
         </div>
 
-        <BackupWarning :backup-link="`/servers/manage/${props.server?.serverId}/backups`" />
+        <BackupWarning
+          v-if="!initialSetup"
+          :backup-link="`/servers/manage/${props.server?.serverId}/backups`"
+        />
       </div>
 
       <div class="mt-4 flex justify-start gap-4">
@@ -217,6 +223,7 @@ const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
   currentLoader: Loaders | undefined;
   backupInProgress?: BackupInProgressReason;
+  initialSetup?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -456,7 +463,7 @@ const handleReinstall = async () => {
       selectedLoader.value,
       selectedMCVersion.value,
       selectedLoader.value === "Vanilla" ? "" : selectedLoaderVersion.value,
-      hardReset.value,
+      props.initialSetup ? true : hardReset.value,
     );
 
     emit("reinstall", {

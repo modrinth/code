@@ -239,18 +239,26 @@
       </div>
     </div>
 
-    <div v-if="serverData.flows?.intro">
-      <h2 class="my-4 text-xl font-extrabold">
-        What would you like to install on your new server?
-      </h2>
+    <template v-if="serverData.flows?.intro">
+      <div
+        v-if="serverData?.status === 'installing'"
+        class="w-50 h-50 flex items-center justify-center gap-2 text-center text-lg font-bold"
+      >
+        <LazyUiServersPanelSpinner class="size-10 animate-spin" /> Setting up your server...
+      </div>
+      <div v-else>
+        <h2 class="my-4 text-xl font-extrabold">
+          What would you like to install on your new server?
+        </h2>
 
-      <ServerInstallation
-        :server="server"
-        :backup-in-progress="backupInProgress"
-        ignore-current-installation
-        @reinstall="onReinstall"
-      />
-    </div>
+        <ServerInstallation
+          :server="server"
+          :backup-in-progress="backupInProgress"
+          ignore-current-installation
+          @reinstall="onReinstall"
+        />
+      </div>
+    </template>
 
     <template v-else>
       <div
