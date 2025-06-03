@@ -51,19 +51,4 @@ const messages = defineMessages({
       @select="emit('select', undefined)"
     />
   </div>
-  <div
-    v-show="selected === undefined"
-    class="min-h-[16rem] flex flex-col gap-2 mt-2 p-4 bg-table-alternateRow rounded-xl justify-center items-center"
-  >
-    <div v-show="loadingElements">
-      <ModalLoadingIndicator :error="loadingElementsFailed">
-        Loading...
-        <template #error> Error loading Stripe payment UI. </template>
-      </ModalLoadingIndicator>
-    </div>
-    <div class="w-full">
-      <div id="address-element"></div>
-      <div id="payment-element" class="mt-4"></div>
-    </div>
-  </div>
 </template>

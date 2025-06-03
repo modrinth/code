@@ -8,6 +8,7 @@ import {
   RightArrowIcon,
   XIcon,
   CheckCircleIcon,
+  SpinnerIcon,
 } from '@modrinth/assets'
 import type {
   CreatePaymentIntentRequest,
@@ -27,6 +28,7 @@ import RegionSelector from './ServersPurchase1Region.vue'
 import PaymentMethodSelector from './ServersPurchase2PaymentMethod.vue'
 import ConfirmPurchase from './ServersPurchase3Review.vue'
 import { useStripe } from '../../composables/stripe'
+import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
 
 const { formatMessage } = useVIntl()
 
@@ -49,11 +51,12 @@ const props = defineProps<{
   initiatePayment: (
     body: CreatePaymentIntentRequest | UpdatePaymentIntentRequest,
   ) => Promise<UpdatePaymentIntentResponse | CreatePaymentIntentResponse>
+  onError: (err: Error) => void
 }>()
 
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
 const selectedPlan = ref<ServerPlan>()
-const selectedInterval = ref<ServerBillingInterval>()
+const selectedInterval = ref<ServerBillingInterval>('quarterly')
 const loading = ref(false)
 
 const {
@@ -72,21 +75,22 @@ const {
   reloadPaymentIntent,
   hasPaymentMethod,
   submitPayment,
+  completingPurchase,
 } = useStripe(
   props.publishableKey,
   props.customer,
   props.paymentMethods,
-  props.clientSecret,
   props.currency,
   selectedPlan,
   selectedInterval,
   props.initiatePayment,
-  console.error,
+  props.onError,
 )
 
 const selectedRegion = ref<string>()
 const customServer = ref<boolean>(false)
 const acceptedEula = ref<boolean>(false)
+const firstTimeThru = ref<boolean>(true)
 
 type Step = 'region' | 'payment' | 'review'
 
@@ -111,9 +115,13 @@ const currentPing = computed(() => {
 
 const currentStep = ref<Step>()
 
-const currentStepIndex = computed(() => steps.indexOf(currentStep.value))
-const previousStep = computed(() => steps[steps.indexOf(currentStep.value) - 1])
-const nextStep = computed(() => steps[steps.indexOf(currentStep.value) + 1])
+const currentStepIndex = computed(() => (currentStep.value ? steps.indexOf(currentStep.value) : -1))
+const previousStep = computed(() =>
+  currentStep.value ? steps[steps.indexOf(currentStep.value) - 1] : undefined,
+)
+const nextStep = computed(() =>
+  currentStep.value ? steps[steps.indexOf(currentStep.value) + 1] : undefined,
+)
 
 const canProceed = computed(() => {
   switch (currentStep.value) {
@@ -122,7 +130,7 @@ const canProceed = computed(() => {
     case 'payment':
       return selectedPaymentMethod.value || !loadingElements.value
     case 'review':
-      return acceptedEula.value && hasPaymentMethod.value
+      return acceptedEula.value && hasPaymentMethod.value && !completingPurchase.value
     default:
       return false
   }
@@ -135,13 +143,14 @@ async function beforeProceed(step: string) {
     case 'payment':
       await initializeStripe()
 
-      if (primaryPaymentMethodId.value) {
+      if (primaryPaymentMethodId.value && firstTimeThru.value) {
         const paymentMethod = await props.paymentMethods.find(
           (x) => x.id === primaryPaymentMethodId.value,
         )
         await selectPaymentMethod(paymentMethod)
         await setStep('review', true)
-        return true
+        firstTimeThru.value = false
+        return false
       }
       return true
     case 'review':
@@ -166,13 +175,13 @@ async function afterProceed(step: string) {
   }
 }
 
-async function setStep(step: Step, skipValidation = false) {
+async function setStep(step: Step | undefined, skipValidation = false) {
   if (!step) {
     await submitPayment(props.returnUrl)
     return
   }
 
-  if (!canProceed.value || skipValidation) {
+  if (!skipValidation && !canProceed.value) {
     return
   }
 
@@ -191,6 +200,7 @@ function begin(interval: ServerBillingInterval, plan?: ServerPlan) {
   customServer.value = !selectedPlan.value
   selectedPaymentMethod.value = undefined
   currentStep.value = steps[0]
+  firstTimeThru.value = true
   modal.value?.show()
 }
 
@@ -206,7 +216,7 @@ defineExpose({
           <button
             v-if="index < currentStepIndex"
             class="bg-transparent active:scale-95 font-bold text-secondary p-0"
-            @click="setStep(id)"
+            @click="setStep(id, true)"
           >
             {{ formatMessage(title) }}
           </button>
@@ -249,31 +259,48 @@ defineExpose({
         v-else-if="
           currentStep === 'review' &&
           hasPaymentMethod &&
-          selectedRegion &&
+          currentRegion &&
           selectedInterval &&
           selectedPlan
         "
-        ref="currentStepRef"
         v-model:interval="selectedInterval"
         v-model:accepted-eula="acceptedEula"
         :currency="currency"
         :plan="selectedPlan"
-        :region="regions.find((x) => x.shortcode === selectedRegion)"
+        :region="currentRegion"
         :ping="currentPing"
         :loading="paymentMethodLoading"
         :selected-payment-method="selectedPaymentMethod || inputtedPaymentMethod"
         :tax="tax"
         :total="total"
-        :on-error="console.error"
-        @change-payment-method="setStep('payment')"
+        @change-payment-method="setStep('payment', true)"
         @reload-payment-intent="reloadPaymentIntent"
-        @error="console.error"
       />
       <div v-else>Something went wrong</div>
+      <div
+        v-show="
+          selectedPaymentMethod === undefined &&
+          currentStep === 'payment' &&
+          selectedPlan &&
+          selectedInterval
+        "
+        class="min-h-[16rem] flex flex-col gap-2 mt-2 p-4 bg-table-alternateRow rounded-xl justify-center items-center"
+      >
+        <div v-show="loadingElements">
+          <ModalLoadingIndicator :error="loadingElementsFailed">
+            Loading...
+            <template #error> Error loading Stripe payment UI. </template>
+          </ModalLoadingIndicator>
+        </div>
+        <div class="w-full">
+          <div id="address-element"></div>
+          <div id="payment-element" class="mt-4"></div>
+        </div>
+      </div>
     </div>
     <div class="flex gap-2 justify-between mt-4">
       <ButtonStyled>
-        <button v-if="previousStep" @click="previousStep && setStep(previousStep)">
+        <button v-if="previousStep" @click="previousStep && setStep(previousStep, true)">
           <LeftArrowIcon /> {{ formatMessage(commonMessages.backButton) }}
         </button>
         <button v-else @click="modal?.hide()">
@@ -282,9 +309,10 @@ defineExpose({
         </button>
       </ButtonStyled>
       <ButtonStyled color="brand">
-        <button :disabled="!canProceed" @click="setStep(nextStep)">
+        <button v-tooltip="currentStep === 'review' && !acceptedEula ? 'You must accept the Minecraft EULA to proceed.' : undefined" :disabled="!canProceed" @click="setStep(nextStep)">
           <template v-if="currentStep === 'review'">
-            <CheckCircleIcon />
+            <SpinnerIcon v-if="completingPurchase" class="animate-spin" />
+            <CheckCircleIcon v-else />
             Subscribe
           </template>
           <template v-else>

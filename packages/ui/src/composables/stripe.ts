@@ -1,11 +1,8 @@
 import type Stripe from 'stripe'
-import type { StripeElementsOptionsMode } from '@stripe/stripe-js/dist/stripe-js/elements-group'
 import {
   type Stripe as StripeJs,
   loadStripe,
-  type StripeAddressElement,
   type StripeElements,
-  type StripePaymentElement,
 } from '@stripe/stripe-js'
 import { computed, ref, type Ref } from 'vue'
 import type { ContactOption } from '@stripe/stripe-js/dist/stripe-js/elements/address'
@@ -19,28 +16,28 @@ import type {
   ServerBillingInterval,
   UpdatePaymentIntentRequest,
   UpdatePaymentIntentResponse,
-} from '../../utils/billing'
+} from '../utils/billing.ts'
 
-export type CreateElements = (
-  paymentMethods: Stripe.PaymentMethod[],
-  options: StripeElementsOptionsMode,
-) => {
-  elements: StripeElements
-  paymentElement: StripePaymentElement
-  addressElement: StripeAddressElement
-}
+// export type CreateElements = (
+//   paymentMethods: Stripe.PaymentMethod[],
+//   options: StripeElementsOptionsMode,
+// ) => {
+//   elements: StripeElements
+//   paymentElement: StripePaymentElement
+//   addressElement: StripeAddressElement
+// }
 
 export const useStripe = (
   publishableKey: string,
   customer: Stripe.Customer,
   paymentMethods: Stripe.PaymentMethod[],
-  clientSecret: string,
   currency: string,
-  product: Ref<ServerPlan>,
+  product: Ref<ServerPlan | undefined>,
   interval: Ref<ServerBillingInterval>,
   initiatePayment: (
     body: CreatePaymentIntentRequest | UpdatePaymentIntentRequest,
   ) => Promise<CreatePaymentIntentResponse | UpdatePaymentIntentResponse>,
+  onError: (err: Error) => void,
 ) => {
   const stripe = ref<StripeJs | null>(null)
 
@@ -57,6 +54,8 @@ export const useStripe = (
   const submittingPayment = ref(false)
   const selectedPaymentMethod = ref<Stripe.PaymentMethod>()
   const inputtedPaymentMethod = ref<Stripe.PaymentMethod>()
+  const clientSecret = ref<string>()
+  const completingPurchase = ref<boolean>(false)
 
   async function initialize() {
     stripe.value = await loadStripe(publishableKey)
@@ -71,10 +70,10 @@ export const useStripe = (
   }
 
   const planPrices = computed(() => {
-    return product.value.prices.find((x) => x.currency_code === currency)
+    return product.value?.prices.find((x) => x.currency_code === currency)
   })
 
-  const createElements: CreateElements = (options) => {
+  const createElements = (options) => {
     const styles = getComputedStyle(document.body)
 
     if (!stripe.value) {
@@ -158,11 +157,11 @@ export const useStripe = (
   })
 
   const loadStripeElements = async () => {
-    loadingFailed.value = false
+    loadingFailed.value = undefined
     try {
-      if (!customer) {
+      if (!customer && primaryPaymentMethodId.value) {
         paymentMethodLoading.value = true
-        await props.refreshPaymentMethods()
+        await refreshPaymentIntent(primaryPaymentMethodId.value, false)
         paymentMethodLoading.value = false
       }
 
@@ -176,7 +175,7 @@ export const useStripe = (
         } = createElements({
           mode: 'payment',
           currency: currency.toLowerCase(),
-          amount: product.value.prices.find((x) => x.currency_code === currency)?.prices.intervals[
+          amount: product.value?.prices.find((x) => x.currency_code === currency)?.prices.intervals[
             interval.value
           ],
           paymentMethodCreation: 'manual',
@@ -214,6 +213,10 @@ export const useStripe = (
             id: id,
           }
 
+      if (!product.value) {
+        return handlePaymentError('No product selected')
+      }
+
       const charge: ChargeRequestType = {
         type: 'new',
         product_id: product.value?.id,
@@ -232,7 +235,7 @@ export const useStripe = (
       } else {
         ;({
           payment_intent_id: paymentIntentId.value,
-          client_secret: clientSecret,
+          client_secret: clientSecret.value,
           ...result
         } = await createIntent({
           ...requestType,
@@ -251,7 +254,7 @@ export const useStripe = (
         }
       }
     } catch (err) {
-      emit('error', err)
+      handlePaymentError(err as string)
     }
     paymentMethodLoading.value = false
   }
@@ -260,13 +263,16 @@ export const useStripe = (
     if (!elements) {
       return handlePaymentError('No elements')
     }
+    if (!stripe.value) {
+      return handlePaymentError('No stripe')
+    }
 
     const { error, confirmationToken: confirmation } = await stripe.value.createConfirmationToken({
       elements,
     })
 
     if (error) {
-      emit('error', error)
+      handlePaymentError(error.message ?? 'Unknown error creating confirmation token')
       return
     }
 
@@ -275,7 +281,8 @@ export const useStripe = (
 
   function handlePaymentError(err: string | Error) {
     paymentMethodLoading.value = false
-    emit('error', typeof err === 'string' ? new Error(err) : err)
+    completingPurchase.value = false
+    onError(typeof err === 'string' ? new Error(err) : err)
   }
 
   async function createNewPaymentMethod() {
@@ -288,7 +295,7 @@ export const useStripe = (
     const { error: submitError } = await elements.submit()
 
     if (submitError) {
-      return handlePaymentError(submitError)
+      return handlePaymentError(submitError.message ?? 'Unknown error creating payment method')
     }
 
     const token = await createConfirmationToken()
@@ -325,9 +332,20 @@ export const useStripe = (
   const loadingElements = computed(() => elementsLoaded.value < 2)
 
   async function submitPayment(returnUrl: string) {
+    completingPurchase.value = true
+    const secert = clientSecret.value
+
+    if (!secert) {
+      return handlePaymentError('No client secret')
+    }
+
+    if (!stripe.value) {
+      return handlePaymentError('No stripe')
+    }
+
     submittingPayment.value = true
     const { error } = await stripe.value.confirmPayment({
-      clientSecret,
+      clientSecret: secert,
       confirmParams: {
         confirmation_token: confirmationToken.value,
         return_url: `${returnUrl}?priceId=${product.value?.prices.find((x) => x.currency_code === currency)?.id}&plan=${interval.value}`,
@@ -335,10 +353,11 @@ export const useStripe = (
     })
 
     if (error) {
-      props.onError(error)
+      handlePaymentError(error.message ?? 'Unknown error submitting payment')
       return false
     }
     submittingPayment.value = false
+    completingPurchase.value = false
     return true
   }
 
@@ -372,5 +391,6 @@ export const useStripe = (
     tax,
     total,
     submitPayment,
+    completingPurchase
   }
 }

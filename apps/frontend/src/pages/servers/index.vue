@@ -520,27 +520,19 @@
           </OptionGroup>
           <template v-if="billingPeriods.includes('quarterly')">
             <button
-              v-if="billingPeriod !== 'quarterly'"
               class="bg-transparent p-0 text-sm font-medium text-brand hover:underline active:scale-95"
               @click="billingPeriod = 'quarterly'"
             >
               Save 16% with quarterly billing!
             </button>
-            <span v-else class="text-sm font-medium text-primary">
-              Saving 16% with quarterly billing!
-            </span>
           </template>
           <template v-else-if="billingPeriods.includes('yearly')">
             <button
-              v-if="billingPeriod !== 'yearly'"
               class="bg-transparent p-0 text-sm font-medium text-brand hover:underline active:scale-95"
               @click="billingPeriod = 'yearly'"
             >
               Save 16% with yearly billing!
             </button>
-            <span v-else class="text-sm font-medium text-primary">
-              Saving 16% with yearly billing!
-            </span>
           </template>
           <span v-else></span>
         </div>
@@ -639,7 +631,7 @@ import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
 import ServerPlanSelector from "~/components/ui/servers/marketing/ServerPlanSelector.vue";
 import OptionGroup from "~/components/ui/OptionGroup.vue";
 
-const billingPeriods = ref(["monthly", "yearly"]);
+const billingPeriods = ref(["monthly", "quarterly"]);
 const billingPeriod = ref(billingPeriods.value.includes("quarterly") ? "quarterly" : "monthly");
 
 const pyroProducts = products.filter((p) => p.metadata.type === "pyro");

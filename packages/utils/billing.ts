@@ -84,10 +84,10 @@ export const formatPrice = (locale, price, currency, trimZeros = false) => {
   return formatter.format(convertedPrice)
 }
 
-export const calculateSavings = (monthlyPlan, annualPlan) => {
-  const monthlyAnnualized = monthlyPlan * 12
+export const calculateSavings = (monthlyPlan, plan, months = 12) => {
+  const monthlyAnnualized = monthlyPlan * months
 
-  return Math.floor(((monthlyAnnualized - annualPlan) / monthlyAnnualized) * 100)
+  return Math.floor(((monthlyAnnualized - plan) / monthlyAnnualized) * 100)
 }
 
 export const createStripeElements = (stripe, paymentMethods, options) => {

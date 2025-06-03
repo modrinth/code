@@ -38,11 +38,10 @@ const props = defineProps<{
   ping?: number
   loading?: boolean
   selectedPaymentMethod: Stripe.PaymentMethod | undefined
-  onError: (error: Error) => void
 }>()
 
-const interval = defineModel<ServerBillingInterval>('interval')
-const acceptedEula = defineModel<boolean>('accepted-eula', { required: true })
+const interval = defineModel<ServerBillingInterval>('interval', { required: true })
+const acceptedEula = defineModel<boolean>('acceptedEula', { required: true })
 
 const prices = computed(() => {
   return props.plan.prices.find((x) => x.currency_code === props.currency)
@@ -143,14 +142,14 @@ function setInterval(newInterval: ServerBillingInterval) {
     </div>
   </div>
 
-  <div class="grid grid-cols-2 gap-2">
+  <div class="grid grid-cols-2 gap-2 mt-4">
     <button
       :class="
         interval === 'monthly'
           ? 'bg-button-bg border-transparent'
           : 'bg-transparent  border-button-border'
       "
-      class="mt-4 rounded-2xl active:scale-[0.98] transition-transform duration-100 border-2 border-solid p-4 flex items-center gap-2"
+      class="rounded-2xl active:scale-[0.98] transition-transform duration-100 border-2 border-solid p-4 flex items-center gap-2"
       @click="setInterval('monthly')"
     >
       <RadioButtonCheckedIcon v-if="interval === 'monthly'" class="size-6 text-brand" />
@@ -167,27 +166,27 @@ function setInterval(newInterval: ServerBillingInterval) {
     </button>
     <button
       :class="
-        interval === 'yearly'
+        interval === 'quarterly'
           ? 'bg-button-bg border-transparent'
           : 'bg-transparent  border-button-border'
       "
-      class="mt-4 rounded-2xl active:scale-[0.98] transition-transform duration-100 border-2 border-solid p-4 flex items-center gap-2"
-      @click="setInterval('yearly')"
+      class="rounded-2xl active:scale-[0.98] transition-transform duration-100 border-2 border-solid p-4 flex items-center gap-2"
+      @click="setInterval('quarterly')"
     >
-      <RadioButtonCheckedIcon v-if="interval === 'yearly'" class="size-6 text-brand" />
+      <RadioButtonCheckedIcon v-if="interval === 'quarterly'" class="size-6 text-brand" />
       <RadioButtonIcon v-else class="size-6 text-secondary" />
       <div class="flex flex-col items-start gap-1 font-medium text-primary">
-        <span class="flex items-center gap-1" :class="{ 'text-contrast': interval === 'yearly' }"
-          >Pay yearly
+        <span class="flex items-center gap-1" :class="{ 'text-contrast': interval === 'quarterly' }"
+        >Pay quarterly
           <span class="text-xs font-bold text-brand px-1.5 py-0.5 rounded-full bg-brand-highlight"
-            >{{ interval === 'quarterly' ? 'Saving' : 'Save' }} 16%</span
+          >{{ interval === 'quarterly' ? 'Saving' : 'Save' }} 16%</span
           ></span
         >
         <span class="text-sm text-secondary flex items-center gap-1"
-          >{{
+        >{{
             formatPrice(
               locale,
-              prices?.prices?.intervals?.['yearly'] ?? 0 / monthsInInterval['yearly'],
+              prices?.prices?.intervals?.['quarterly'] ?? 0 / monthsInInterval['quarterly'],
               currency,
               true,
             )
