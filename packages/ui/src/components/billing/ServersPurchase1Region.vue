@@ -26,7 +26,7 @@ const selectedPlan = defineModel<ServerPlan>('plan')
 const selectedRegion = defineModel<string>('region')
 
 const regionOrder: string[] = [
-  // 'us-vin', 'eu-lim'
+  'us-vin', 'eu-lim'
 ]
 
 const sortedRegions = computed(() => {
