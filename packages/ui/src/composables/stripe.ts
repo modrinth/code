@@ -230,8 +230,8 @@ export const useStripe = (
           metadata: {
             type: 'pyro',
             server_region: region.value,
-            source: {}
-          }
+            source: {},
+          },
         })
         console.log(`Updated payment intent: ${interval.value} for ${result.total}`)
       } else {
@@ -245,8 +245,8 @@ export const useStripe = (
           metadata: {
             type: 'pyro',
             server_region: region.value,
-            source: {}
-          }
+            source: {},
+          },
         }))
         console.log(`Created payment intent: ${interval.value} for ${result.total}`)
       }

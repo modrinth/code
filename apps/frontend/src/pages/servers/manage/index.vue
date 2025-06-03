@@ -89,7 +89,10 @@
         </div>
       </div>
 
-      <ul v-if="filteredData.length > 0" class="m-0 flex flex-col gap-4 p-0">
+      <ul
+        v-if="filteredData.length > 0 || isPollingForNewServers"
+        class="m-0 flex flex-col gap-4 p-0"
+      >
         <UiServersServerListing
           v-for="server in filteredData"
           :key="server.server_id"
