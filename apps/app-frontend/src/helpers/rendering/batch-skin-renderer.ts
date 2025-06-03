@@ -1,6 +1,6 @@
 import * as THREE from 'three'
-import {Skin, Cape, normalize_skin_texture, get_normalized_skin_texture} from '../skins'
-import { determineModelType } from '../skins'
+import type { Skin, Cape } from '../skins'
+import { get_normalized_skin_texture, determineModelType } from '../skins'
 import { reactive } from 'vue'
 import { setupSkinModel, disposeCaches } from '@modrinth/utils'
 import { skinPreviewStorage } from '../storage/skin-preview-storage'
