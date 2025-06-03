@@ -168,11 +168,19 @@ const fuse = computed(() => {
   });
 });
 
+function introToTop(array: Server[]): Server[] {
+  return array.slice().sort((a, b) => {
+    return Number(b.flows?.intro) - Number(a.flows?.intro);
+  });
+}
+
 const filteredData = computed(() => {
   if (!searchInput.value.trim()) {
-    return serverList.value;
+    return introToTop(serverList.value);
   }
-  return fuse.value ? fuse.value.search(searchInput.value).map((result) => result.item) : [];
+  return fuse.value
+    ? introToTop(fuse.value.search(searchInput.value).map((result) => result.item))
+    : [];
 });
 
 const previousServerList = ref<Server[]>([]);

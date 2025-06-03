@@ -25,6 +25,16 @@ const checkingCustomStock = ref(false)
 const selectedPlan = defineModel<ServerPlan>('plan')
 const selectedRegion = defineModel<string>('region')
 
+const regionOrder: string[] = [
+  // 'us-vin', 'eu-lim'
+]
+
+const sortedRegions = computed(() => {
+  return props.regions.slice().sort((a, b) => {
+    return regionOrder.indexOf(a.shortcode) - regionOrder.indexOf(b.shortcode)
+  })
+})
+
 const selectedRam = ref<number>(-1)
 
 const ramOptions = computed(() => {
@@ -55,7 +65,7 @@ function updateRamStock(regionToCheck: string, newRam: number) {
       (product) => (product.metadata.ram ?? 0) / 1024 === newRam,
     )
     if (plan) {
-      const region = props.regions.find((region) => region.shortcode === regionToCheck)
+      const region = sortedRegions.value.find((region) => region.shortcode === regionToCheck)
       if (region) {
         props
           .fetchStock(region, {
@@ -113,7 +123,7 @@ const messages = defineMessages({
 
 async function updateStock() {
   currentStock.value = {}
-  const capacityChecks = props.regions.map((region) =>
+  const capacityChecks = sortedRegions.value.map((region) =>
     props.fetchStock(
       region,
       selectedPlan.value
@@ -133,7 +143,7 @@ async function updateStock() {
   )
   const results = await Promise.all(capacityChecks)
   results.forEach((result, index) => {
-    currentStock.value[props.regions[index].shortcode] = result
+    currentStock.value[sortedRegions.value[index].shortcode] = result
   })
 }
 
@@ -146,10 +156,13 @@ onMounted(() => {
           return acc.ping < cur.ping ? acc : cur
         })?.region
       : undefined
+  selectedRegion.value = undefined
   selectedRam.value = minRam.value
   checkingCustomStock.value = true
   updateStock().then(() => {
-    const firstWithStock = props.regions.find((region) => currentStock.value[region.shortcode] > 0)
+    const firstWithStock = sortedRegions.value.find(
+      (region) => currentStock.value[region.shortcode] > 0,
+    )
     let stockedRegion = selectedRegion.value
     if (!stockedRegion) {
       stockedRegion =
@@ -176,7 +189,7 @@ onMounted(() => {
     </h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <ServersRegionButton
-        v-for="region in regions"
+        v-for="region in sortedRegions"
         :key="region.shortcode"
         v-model="selectedRegion"
         :region="region"

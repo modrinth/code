@@ -862,11 +862,8 @@ const newLoaderVersion = ref<string | null>(null);
 const newMCVersion = ref<string | null>(null);
 
 const onReinstall = (potentialArgs: any) => {
-  if (serverData.value?.flows?.intro) {
-    usePyroFetch(`servers/${server.serverId}/flows/intro`, {
-      method: "DELETE",
-      version: 1,
-    });
+  if (serverData.value?.flows?.intro && server.general?.project) {
+    server.general?.endIntro();
   }
 
   if (!serverData.value) return;
@@ -1186,6 +1183,10 @@ onMounted(() => {
     }
   } else {
     connectWebSocket();
+  }
+
+  if (server.general?.flows?.intro && server.general?.project) {
+    server.general?.endIntro();
   }
 
   if (username.value && email.value && userId.value && createdAt.value) {

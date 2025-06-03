@@ -905,7 +905,7 @@ function pingRegions() {
 }
 
 const PING_COUNT = 20;
-const PING_INTERVAL = 400;
+const PING_INTERVAL = 200;
 const MAX_PING_TIME = 1000;
 
 function runPingTest(region, index = 1) {

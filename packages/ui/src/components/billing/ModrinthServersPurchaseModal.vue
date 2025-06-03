@@ -91,7 +91,7 @@ const {
 
 const customServer = ref<boolean>(false)
 const acceptedEula = ref<boolean>(false)
-const firstTimeThru = ref<boolean>(true)
+const skipPaymentMethods = ref<boolean>(true)
 
 type Step = 'region' | 'payment' | 'review'
 
@@ -117,9 +117,13 @@ const currentPing = computed(() => {
 const currentStep = ref<Step>()
 
 const currentStepIndex = computed(() => (currentStep.value ? steps.indexOf(currentStep.value) : -1))
-const previousStep = computed(() =>
-  currentStep.value ? steps[steps.indexOf(currentStep.value) - 1] : undefined,
-)
+const previousStep = computed(() => {
+  const step = currentStep.value ? steps[steps.indexOf(currentStep.value) - 1] : undefined
+  if (step === 'payment' && skipPaymentMethods.value && primaryPaymentMethodId.value) {
+    return 'region'
+  }
+  return step
+})
 const nextStep = computed(() =>
   currentStep.value ? steps[steps.indexOf(currentStep.value) + 1] : undefined,
 )
@@ -144,13 +148,12 @@ async function beforeProceed(step: string) {
     case 'payment':
       await initializeStripe()
 
-      if (primaryPaymentMethodId.value && firstTimeThru.value) {
+      if (primaryPaymentMethodId.value && skipPaymentMethods.value) {
         const paymentMethod = await props.paymentMethods.find(
           (x) => x.id === primaryPaymentMethodId.value,
         )
         await selectPaymentMethod(paymentMethod)
         await setStep('review', true)
-        firstTimeThru.value = false
         return false
       }
       return true
@@ -205,7 +208,7 @@ function begin(interval: ServerBillingInterval, plan?: ServerPlan) {
   customServer.value = !selectedPlan.value
   selectedPaymentMethod.value = undefined
   currentStep.value = steps[0]
-  firstTimeThru.value = true
+  skipPaymentMethods.value = true
   modal.value?.show()
 }
 
@@ -278,7 +281,12 @@ defineExpose({
         :selected-payment-method="selectedPaymentMethod || inputtedPaymentMethod"
         :tax="tax"
         :total="total"
-        @change-payment-method="setStep('payment', true)"
+        @change-payment-method="
+          () => {
+            skipPaymentMethods = false
+            setStep('payment', true)
+          }
+        "
         @reload-payment-intent="reloadPaymentIntent"
       />
       <div v-else>Something went wrong</div>

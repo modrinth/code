@@ -81,10 +81,7 @@ function setRegion() {
             class="shrink-0"
           />
           <SpinnerIcon v-else class="animate-spin" />
-          <span v-if="bestPing" :class="bestPing ? 'text-brand' : 'text-primary'">
-            Lowest latency ({{ ping }}ms)
-          </span>
-          <template v-else-if="ping"> {{ ping }}ms </template>
+          <template v-if="ping"> {{ ping }}ms </template>
           <span v-else> Testing connection... </span>
         </template>
       </span>
