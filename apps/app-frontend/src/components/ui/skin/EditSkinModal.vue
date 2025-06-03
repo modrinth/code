@@ -77,13 +77,15 @@
     </div>
 
     <div class="flex gap-2 mt-12">
-      <ButtonStyled color="brand" :disabled="disableSave">
-        <Button v-tooltip="saveTooltip" :disabled="disableSave" @click="save">
-          <CheckIcon v-if="mode === 'new'" /><SaveIcon v-else />
+      <ButtonStyled color="brand" :disabled="disableSave || isSaving">
+        <Button v-tooltip="saveTooltip" :disabled="disableSave || isSaving" @click="save">
+          <SpinnerIcon v-if="isSaving" class="animate-spin" />
+          <CheckIcon v-else-if="mode === 'new'" />
+          <SaveIcon v-else />
           {{ mode === 'new' ? 'Add skin' : 'Save skin' }}
         </Button>
       </ButtonStyled>
-      <Button @click="hide"><XIcon />Cancel</Button>
+      <Button :disabled="isSaving" @click="hide"><XIcon />Cancel</Button>
     </div>
   </NewModal>
 
@@ -117,14 +119,22 @@ import {
   get_normalized_skin_texture,
 } from '@/helpers/skins.ts'
 import { handleError } from '@/store/notifications'
-import { UploadIcon, CheckIcon, SaveIcon, XIcon, ChevronRightIcon } from '@modrinth/assets'
-import {computedAsync} from "@vueuse/core";
+import {
+  UploadIcon,
+  CheckIcon,
+  SaveIcon,
+  XIcon,
+  ChevronRightIcon,
+  SpinnerIcon,
+} from '@modrinth/assets'
+import { computedAsync } from '@vueuse/core'
 
 const modal = useTemplateRef('modal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
 const mode = ref<'new' | 'edit'>('new')
 const currentSkin = ref<Skin | null>(null)
 const shouldRestoreModal = ref(false)
+const isSaving = ref(false) // Add loading state
 
 const uploadedTextureUrl = ref<string | null>(null)
 
@@ -192,6 +202,7 @@ const disableSave = computed(
 )
 
 const saveTooltip = computed(() => {
+  if (isSaving.value) return 'Saving...'
   if (mode.value === 'new' && !uploadedTextureUrl.value) return 'Upload a skin first!'
   if (mode.value === 'edit' && !hasEdits.value) return 'Make an edit to the skin first!'
   return undefined
@@ -205,6 +216,7 @@ function resetState() {
   selectedCape.value = undefined
   visibleCapeList.value = []
   shouldRestoreModal.value = false
+  isSaving.value = false
 }
 
 function show(e: MouseEvent, skin?: Skin) {
@@ -310,6 +322,8 @@ function openUploadSkinModal(e: MouseEvent) {
 }
 
 async function save() {
+  isSaving.value = true
+
   try {
     let textureUrl: string
 
@@ -335,6 +349,8 @@ async function save() {
     hide()
   } catch (err) {
     handleError(err)
+  } finally {
+    isSaving.value = false
   }
 }
 

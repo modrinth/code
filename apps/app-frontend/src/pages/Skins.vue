@@ -16,15 +16,16 @@ import {
   SkinLikeTextButton,
   SkinPreviewRenderer,
 } from '@modrinth/ui'
-import {computedAsync} from '@vueuse/core'
-import type {Ref} from 'vue'
-import {computed, inject, onMounted, onUnmounted, ref, useTemplateRef, watch} from 'vue'
+import { computedAsync } from '@vueuse/core'
+import type { Ref } from 'vue'
+import { computed, inject, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
 import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
 import UploadSkinModal from '@/components/ui/skin/UploadSkinModal.vue'
-import {handleError} from '@/store/notifications'
-import {Cape, normalize_skin_texture, Skin} from '@/helpers/skins.ts'
+import { handleError } from '@/store/notifications'
+import type { Cape, Skin } from '@/helpers/skins.ts'
 import {
+  normalize_skin_texture,
   equip_skin,
   filterDefaultSkins,
   filterSavedSkins,
@@ -34,14 +35,14 @@ import {
   remove_custom_skin,
   set_default_cape,
 } from '@/helpers/skins.ts'
-import {get as getSettings} from '@/helpers/settings.ts'
-import {get_default_user, login as login_flow, users} from '@/helpers/auth'
-import type {RenderResult} from '@/helpers/rendering/batch-skin-renderer.ts'
-import {generateSkinPreviews, map} from '@/helpers/rendering/batch-skin-renderer.ts'
-import {handleSevereError} from '@/store/error'
-import {trackEvent} from '@/helpers/analytics'
+import { get as getSettings } from '@/helpers/settings.ts'
+import { get_default_user, login as login_flow, users } from '@/helpers/auth'
+import type { RenderResult } from '@/helpers/rendering/batch-skin-renderer.ts'
+import { generateSkinPreviews, map } from '@/helpers/rendering/batch-skin-renderer.ts'
+import { handleSevereError } from '@/store/error'
+import { trackEvent } from '@/helpers/analytics'
 import type AccountsCard from '@/components/ui/AccountsCard.vue'
-import {arrayBufferToBase64} from "@modrinth/utils";
+import { arrayBufferToBase64 } from '@modrinth/utils'
 
 const editSkinModal = useTemplateRef('editSkinModal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
@@ -59,6 +60,9 @@ const username = computed(() => currentUser.value?.profile?.name ?? undefined)
 const selectedSkin = ref<Skin | null>(null)
 const defaultCape = ref<Cape>()
 
+const originalSelectedSkin = ref<Skin | null>(null)
+const originalDefaultCape = ref<Cape>()
+
 const savedSkins = computed(() => filterSavedSkins(skins.value))
 const defaultSkins = computed(() => filterDefaultSkins(skins.value))
 
@@ -74,9 +78,9 @@ const currentCape = computed(() => {
 
 const skinTexture = computedAsync(async () => {
   if (selectedSkin.value?.texture) {
-    return await get_normalized_skin_texture(selectedSkin.value);
+    return await get_normalized_skin_texture(selectedSkin.value)
   } else {
-    return '';
+    return ''
   }
 })
 const capeTexture = computed(() => currentCape.value?.texture)
@@ -106,6 +110,7 @@ async function loadCapes() {
   try {
     capes.value = (await get_available_capes()) ?? []
     defaultCape.value = capes.value.find((c) => c.is_equipped)
+    originalDefaultCape.value = defaultCape.value
   } catch (error) {
     if (currentUser.value) {
       handleError(error)
@@ -118,6 +123,7 @@ async function loadSkins() {
     skins.value = (await get_available_skins()) ?? []
     generateSkinPreviews(skins.value, capes.value)
     selectedSkin.value = skins.value.find((s) => s.is_equipped) ?? null
+    originalSelectedSkin.value = selectedSkin.value
   } catch (error) {
     if (currentUser.value) {
       handleError(error)
@@ -126,14 +132,45 @@ async function loadSkins() {
 }
 
 async function changeSkin(newSkin: Skin) {
-  await equip_skin(newSkin).catch(handleError)
-  await loadSkins()
+  const previousSkin = selectedSkin.value
+  const previousSkinsList = [...skins.value]
+
+  skins.value = skins.value.map((skin) => {
+    return {
+      ...skin,
+      is_equipped: skin.texture_key === newSkin.texture_key,
+    }
+  })
+
+  selectedSkin.value = skins.value.find((s) => s.texture_key === newSkin.texture_key) || null
+
+  try {
+    await equip_skin(newSkin)
+  } catch (error) {
+    selectedSkin.value = previousSkin
+    skins.value = previousSkinsList
+    handleError(error)
+  }
 }
 
 async function handleCapeSelected(cape: Cape | undefined) {
-  await set_default_cape(cape).catch(handleError)
-  await loadSkins()
-  await loadCapes()
+  const previousDefaultCape = defaultCape.value
+  const previousCapesList = [...capes.value]
+
+  capes.value = capes.value.map((c) => ({
+    ...c,
+    is_equipped: cape ? c.id === cape.id : false,
+  }))
+
+  defaultCape.value = cape ? capes.value.find((c) => c.id === cape.id) : undefined
+
+  try {
+    await set_default_cape(cape)
+  } catch (error) {
+    defaultCape.value = previousDefaultCape
+    capes.value = previousCapesList
+    handleError(error)
+  }
 }
 
 async function onSkinSaved() {
@@ -178,8 +215,10 @@ function openUploadSkinModal(e: MouseEvent) {
 function onSkinFileUploaded(file: File) {
   const fakeEvent = new MouseEvent('click')
   file.arrayBuffer().then(async (buf) => {
-    const skinTextureNormalized: Uint8Array = await normalize_skin_texture(`data:image/png;base64,` + arrayBufferToBase64(buf))
-    const skinTexUrl = `data:image/png;base64,` + arrayBufferToBase64(skinTextureNormalized);
+    const skinTextureNormalized: Uint8Array = await normalize_skin_texture(
+      `data:image/png;base64,` + arrayBufferToBase64(buf),
+    )
+    const skinTexUrl = `data:image/png;base64,` + arrayBufferToBase64(skinTextureNormalized)
 
     if (editSkinModal.value && editSkinModal.value.shouldRestoreModal) {
       editSkinModal.value.restoreWithNewTexture(skinTexUrl)

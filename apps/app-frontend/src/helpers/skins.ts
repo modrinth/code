@@ -1,6 +1,6 @@
 import { invoke } from '@tauri-apps/api/core'
 import { handleError } from '@/store/notifications'
-import {arrayBufferToBase64} from "@modrinth/utils";
+import { arrayBufferToBase64 } from '@modrinth/utils'
 
 export interface Cape {
   id: string
@@ -144,9 +144,9 @@ export async function remove_custom_skin(skin: Skin): Promise<void> {
 }
 
 export async function get_normalized_skin_texture(skin: Skin): Promise<string> {
-  const data = await normalize_skin_texture(skin.texture);
-  const base64 = arrayBufferToBase64(data);
-  return `data:image/png;base64,${base64}`;
+  const data = await normalize_skin_texture(skin.texture)
+  const base64 = arrayBufferToBase64(data)
+  return `data:image/png;base64,${base64}`
 }
 
 export async function normalize_skin_texture(texture: Uint8Array | string): Promise<Uint8Array> {
