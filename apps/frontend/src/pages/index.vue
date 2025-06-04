@@ -527,7 +527,7 @@
 </template>
 <script setup>
 import { Multiselect } from "vue-multiselect";
-import { ButtonStyled, useRelativeTime } from "@modrinth/ui";
+import { Avatar, ButtonStyled, useRelativeTime } from "@modrinth/ui";
 import {
   CompassIcon,
   LogInIcon,
@@ -539,7 +539,6 @@ import {
 } from "@modrinth/assets";
 import PrismLauncherLogo from "~/assets/images/external/prism.svg?component";
 import ATLauncherLogo from "~/assets/images/external/atlauncher.svg?component";
-import Avatar from "~/components/ui/Avatar.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 
 import { homePageProjects, homePageSearch, homePageNotifs } from "~/generated/state.json";

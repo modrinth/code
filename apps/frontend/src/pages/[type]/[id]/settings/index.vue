@@ -242,8 +242,7 @@
 import { formatProjectStatus } from "@modrinth/utils";
 import { UploadIcon, SaveIcon, TrashIcon, XIcon, IssuesIcon, CheckIcon } from "@modrinth/assets";
 import { Multiselect } from "vue-multiselect";
-import { ConfirmModal } from "@modrinth/ui";
-import Avatar from "~/components/ui/Avatar.vue";
+import { ConfirmModal, Avatar } from "@modrinth/ui";
 import FileInput from "~/components/ui/FileInput.vue";
 
 const props = defineProps({

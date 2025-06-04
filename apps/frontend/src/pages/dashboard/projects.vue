@@ -279,18 +279,19 @@
             </div>
 
             <div>
-              <Badge v-if="project.status" :type="project.status" class="status" />
+              <ProjectStatusBadge v-if="project.status" :status="project.status" />
             </div>
 
             <div>
-              <nuxt-link
-                class="square-button"
-                :to="`/${$getProjectTypeForUrl(project.project_type, project.loaders)}/${
-                  project.slug ? project.slug : project.id
-                }/settings`"
-              >
-                <SettingsIcon />
-              </nuxt-link>
+              <ButtonStyled circular>
+                <nuxt-link
+                  :to="`/${$getProjectTypeForUrl(project.project_type, project.loaders)}/${
+                    project.slug ? project.slug : project.id
+                  }/settings`"
+                >
+                  <SettingsIcon />
+                </nuxt-link>
+              </ButtonStyled>
             </div>
           </div>
         </div>
@@ -312,19 +313,23 @@ import {
   SortAscendingIcon as AscendingIcon,
   SortDescendingIcon as DescendingIcon,
 } from "@modrinth/assets";
-import { commonMessages } from "@modrinth/ui";
+import {
+  Avatar,
+  ButtonStyled,
+  Checkbox,
+  CopyCode,
+  ProjectStatusBadge,
+  commonMessages,
+} from "@modrinth/ui";
 
-import Badge from "~/components/ui/Badge.vue";
-import Checkbox from "~/components/ui/Checkbox.vue";
 import Modal from "~/components/ui/Modal.vue";
-import Avatar from "~/components/ui/Avatar.vue";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
-import CopyCode from "~/components/ui/CopyCode.vue";
 
 export default defineNuxtComponent({
   components: {
     Avatar,
-    Badge,
+    ButtonStyled,
+    ProjectStatusBadge,
     SettingsIcon,
     TrashIcon,
     Checkbox,
