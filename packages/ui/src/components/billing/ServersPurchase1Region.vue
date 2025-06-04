@@ -25,9 +25,7 @@ const checkingCustomStock = ref(false)
 const selectedPlan = defineModel<ServerPlan>('plan')
 const selectedRegion = defineModel<string>('region')
 
-const regionOrder: string[] = [
-  'us-vin', 'eu-lim'
-]
+const regionOrder: string[] = ['us-vin', 'eu-lim']
 
 const sortedRegions = computed(() => {
   return props.regions.slice().sort((a, b) => {
