@@ -630,7 +630,15 @@
   </div>
 </template>
 <script>
-import { ButtonStyled, ConfirmModal, MarkdownEditor } from "@modrinth/ui";
+import {
+  Avatar,
+  Badge,
+  CopyCode,
+  Checkbox,
+  ButtonStyled,
+  ConfirmModal,
+  MarkdownEditor,
+} from "@modrinth/ui";
 import {
   FileIcon,
   TrashIcon,
@@ -656,13 +664,9 @@ import { renderHighlightedString } from "~/helpers/highlight.js";
 import { reportVersion } from "~/utils/report-helpers.ts";
 import { useImageUpload } from "~/composables/image-upload.ts";
 
-import Avatar from "~/components/ui/Avatar.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
-import Badge from "~/components/ui/Badge.vue";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
-import CopyCode from "~/components/ui/CopyCode.vue";
 import Categories from "~/components/ui/search/Categories.vue";
-import Checkbox from "~/components/ui/Checkbox.vue";
 import FileInput from "~/components/ui/FileInput.vue";
 import Modal from "~/components/ui/Modal.vue";
 
