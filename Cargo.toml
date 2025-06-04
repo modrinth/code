@@ -34,6 +34,7 @@ async-walkdir = "2.1.0"
 async_zip = "0.0.17"
 base64 = "0.22.1"
 bitflags = "2.9.0"
+bytemuck = "1.23.0"
 bytes = "1.10.1"
 censor = "0.3.0"
 chrono = "0.4.41"
@@ -86,6 +87,7 @@ notify = { version = "8.0.0", default-features = false }
 notify-debouncer-mini = { version = "0.6.0", default-features = false }
 p256 = "0.13.2"
 paste = "1.0.15"
+png = "0.17.16"
 prometheus = "0.14.0"
 quartz_nbt = "0.2.9"
 quick-xml = "0.37.5"
@@ -94,6 +96,7 @@ rand_chacha = "=0.3.1"  # Locked on 0.3 until we can update rand to 0.9
 redis = "=0.29.5"  # Locked on 0.29 until deadpool-redis updates to 0.30
 regex = "1.11.1"
 reqwest = { version = "0.12.15", default-features = false }
+rgb = "0.8.50"
 rust-s3 = { version = "0.35.1", default-features = false, features = [
   "fail-on-err",
   "tags",

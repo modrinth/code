@@ -110,6 +110,7 @@ fn main() {
                         "equip_skin",
                         "remove_custom_skin",
                         "unequip_skin",
+                        "normalize_skin_texture",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
