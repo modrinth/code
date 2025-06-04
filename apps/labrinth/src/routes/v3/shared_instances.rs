@@ -3,11 +3,13 @@ use crate::database::models::shared_instance_item::{
     DBSharedInstance, DBSharedInstanceUser, DBSharedInstanceVersion,
 };
 use crate::database::models::{
-    DBSharedInstanceId, DBUserId, generate_shared_instance_id,
+    DBSharedInstanceId, generate_shared_instance_id,
 };
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
-use crate::models::shared_instances::SharedInstance;
+use crate::models::shared_instances::{
+    SharedInstance, SharedInstanceUserPermissions,
+};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::routes::read_typed_from_payload;
@@ -219,7 +221,22 @@ pub async fn shared_instance_edit(
     };
 
     if !user.role.is_mod() && instance.owner_id != user.id.into() {
-        return Err(ApiError::NotFound);
+        let permissions = DBSharedInstanceUser::get_user_permissions(
+            id,
+            user.id.into(),
+            &**pool,
+        )
+        .await?;
+        if let Some(permissions) = permissions {
+            if !permissions.contains(SharedInstanceUserPermissions::EDIT) {
+                return Err(ApiError::CustomAuthentication(
+                    "You do not have permission to edit this shared instance."
+                        .to_string(),
+                ));
+            }
+        } else {
+            return Err(ApiError::NotFound);
+        }
     }
 
     if let Some(title) = edit_instance.title {
@@ -260,30 +277,37 @@ pub async fn shared_instance_delete(
     .await?
     .1;
 
-    let query = if user.role.is_mod() {
-        sqlx::query!(
-            "
-            DELETE FROM shared_instances
-            WHERE id = $1
-            ",
-            id as DBSharedInstanceId,
-        )
-    } else {
-        let user_id: DBUserId = user.id.into();
-        sqlx::query!(
-            "
-            DELETE FROM shared_instances
-            WHERE id = $1 AND owner_id = $2
-            ",
-            id as DBSharedInstanceId,
-            user_id as DBUserId,
-        )
-    };
-    let rows_affected = query.execute(&**pool).await?.rows_affected();
-
-    if rows_affected == 0 {
+    let Some(instance) = DBSharedInstance::get(id, &**pool).await? else {
         return Err(ApiError::NotFound);
+    };
+
+    if !user.role.is_mod() && instance.owner_id != user.id.into() {
+        let permissions = DBSharedInstanceUser::get_user_permissions(
+            id,
+            user.id.into(),
+            &**pool,
+        )
+        .await?;
+        if let Some(permissions) = permissions {
+            if !permissions.contains(SharedInstanceUserPermissions::DELETE) {
+                return Err(ApiError::CustomAuthentication(
+                    "You do not have permission to delete this shared instance.".to_string()
+                ));
+            }
+        } else {
+            return Err(ApiError::NotFound);
+        }
     }
+
+    sqlx::query!(
+        "
+        DELETE FROM shared_instances
+        WHERE id = $1
+        ",
+        id as DBSharedInstanceId,
+    )
+    .execute(&**pool)
+    .await?;
 
     DBSharedInstanceUser::clear_cache(id, &redis).await?;
 

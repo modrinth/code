@@ -63,6 +63,9 @@ impl SharedInstanceVersion {
 bitflags! {
     #[derive(Copy, Clone, Debug)]
     pub struct SharedInstanceUserPermissions: u64 {
+        const EDIT = 1 << 0;
+        const DELETE = 1 << 1;
+        const UPLOAD_VERSION = 1 << 2;
     }
 }
 

@@ -140,6 +140,31 @@ impl DBSharedInstanceUser {
         Ok(())
     }
 
+    pub async fn get_user_permissions(
+        instance_id: DBSharedInstanceId,
+        user_id: DBUserId,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+    ) -> Result<Option<SharedInstanceUserPermissions>, super::DatabaseError>
+    {
+        let permissions = sqlx::query!(
+            "
+            SELECT permissions
+            FROM shared_instance_users
+            WHERE shared_instance_id = $1 AND user_id = $2
+            ",
+            instance_id as DBSharedInstanceId,
+            user_id as DBUserId,
+        )
+        .fetch_optional(exec)
+        .await?
+        .map(|x| {
+            SharedInstanceUserPermissions::from_bits(x.permissions as u64)
+                .unwrap_or(SharedInstanceUserPermissions::empty())
+        });
+
+        Ok(permissions)
+    }
+
     pub async fn get_from_instance(
         instance_id: DBSharedInstanceId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,

@@ -1,6 +1,6 @@
 use crate::auth::get_user_from_headers;
 use crate::database::models::shared_instance_item::{
-    DBSharedInstance, DBSharedInstanceVersion,
+    DBSharedInstance, DBSharedInstanceUser, DBSharedInstanceVersion,
 };
 use crate::database::models::{
     DBSharedInstanceId, DBSharedInstanceVersionId,
@@ -10,7 +10,9 @@ use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::ids::{SharedInstanceId, SharedInstanceVersionId};
 use crate::models::pats::Scopes;
-use crate::models::shared_instances::SharedInstanceVersion;
+use crate::models::shared_instances::{
+    SharedInstanceUserPermissions, SharedInstanceVersion,
+};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::v3::project_creation::UploadedFile;
@@ -116,7 +118,23 @@ async fn shared_instance_version_create_inner(
         return Err(ApiError::NotFound);
     };
     if !user.role.is_mod() && instance.owner_id != user.id.into() {
-        return Err(ApiError::NotFound);
+        let permissions = DBSharedInstanceUser::get_user_permissions(
+            instance_id,
+            user.id.into(),
+            pool,
+        )
+        .await?;
+        if let Some(permissions) = permissions {
+            if !permissions
+                .contains(SharedInstanceUserPermissions::UPLOAD_VERSION)
+            {
+                return Err(ApiError::CustomAuthentication(
+                    "You do not have permission to upload a version for this shared instance.".to_string()
+                ));
+            }
+        } else {
+            return Err(ApiError::NotFound);
+        }
     }
 
     let version_id =
