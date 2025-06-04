@@ -207,7 +207,7 @@ async function PyroFetch<T>(
         }
 
         const statusCode = error.response?.status;
-        const isRetryable = statusCode ? [408, 429, 500, 502, 503, 504].includes(statusCode) : true;
+        const isRetryable = statusCode ? [408, 429, 500, 502, 504].includes(statusCode) : true;
 
         if (!isRetryable || attempts >= maxAttempts) {
           throw new ServersError(error.message, statusCode, error, module, v1Error);
