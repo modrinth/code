@@ -127,16 +127,16 @@ import {
   ChevronRightIcon,
   SpinnerIcon,
 } from '@modrinth/assets'
-import { computedAsync } from '@vueuse/core'
 
 const modal = useTemplateRef('modal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
 const mode = ref<'new' | 'edit'>('new')
 const currentSkin = ref<Skin | null>(null)
 const shouldRestoreModal = ref(false)
-const isSaving = ref(false) // Add loading state
+const isSaving = ref(false)
 
 const uploadedTextureUrl = ref<string | null>(null)
+const previewSkin = ref<string>('')
 
 const variant = ref<SkinModel>('CLASSIC')
 const selectedCape = ref<Cape | undefined>(undefined)
@@ -179,12 +179,20 @@ function getSortedCapeExcluding(excludeId: string): Cape | undefined {
   return sortedCapes.value.find((cape) => cape.id !== excludeId)
 }
 
-const previewSkin = computedAsync(async () => {
-  if (uploadedTextureUrl.value) return uploadedTextureUrl.value
-  else if (currentSkin.value) {
-    return await get_normalized_skin_texture(currentSkin.value)
-  } else return '/src/assets/skins/steve.png'
-})
+async function loadPreviewSkin() {
+  if (uploadedTextureUrl.value) {
+    previewSkin.value = uploadedTextureUrl.value
+  } else if (currentSkin.value) {
+    try {
+      previewSkin.value = await get_normalized_skin_texture(currentSkin.value)
+    } catch (error) {
+      console.error('Failed to load skin texture:', error)
+      previewSkin.value = '/src/assets/skins/steve.png'
+    }
+  } else {
+    previewSkin.value = '/src/assets/skins/steve.png'
+  }
+}
 
 const hasEdits = computed(() => {
   if (mode.value !== 'edit') return true
@@ -212,6 +220,7 @@ function resetState() {
   mode.value = 'new'
   currentSkin.value = null
   uploadedTextureUrl.value = null
+  previewSkin.value = ''
   variant.value = 'CLASSIC'
   selectedCape.value = undefined
   visibleCapeList.value = []
@@ -219,7 +228,7 @@ function resetState() {
   isSaving.value = false
 }
 
-function show(e: MouseEvent, skin?: Skin) {
+async function show(e: MouseEvent, skin?: Skin) {
   mode.value = skin ? 'edit' : 'new'
   currentSkin.value = skin ?? null
   if (skin) {
@@ -231,10 +240,13 @@ function show(e: MouseEvent, skin?: Skin) {
   }
   visibleCapeList.value = []
   initVisibleCapeList()
+
+  await loadPreviewSkin()
+
   modal.value?.show(e)
 }
 
-function showNew(e: MouseEvent, skinTextureUrl: string) {
+async function showNew(e: MouseEvent, skinTextureUrl: string) {
   mode.value = 'new'
   currentSkin.value = null
   uploadedTextureUrl.value = skinTextureUrl
@@ -242,11 +254,15 @@ function showNew(e: MouseEvent, skinTextureUrl: string) {
   selectedCape.value = undefined
   visibleCapeList.value = []
   initVisibleCapeList()
+
+  await loadPreviewSkin()
+
   modal.value?.show(e)
 }
 
-function restoreWithNewTexture(skinTextureUrl: string) {
+async function restoreWithNewTexture(skinTextureUrl: string) {
   uploadedTextureUrl.value = skinTextureUrl
+  await loadPreviewSkin()
 
   if (shouldRestoreModal.value) {
     setTimeout(() => {
@@ -353,6 +369,10 @@ async function save() {
     isSaving.value = false
   }
 }
+
+watch([uploadedTextureUrl, currentSkin], async () => {
+  await loadPreviewSkin()
+})
 
 watch(
   () => props.capes,
