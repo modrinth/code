@@ -862,7 +862,7 @@ const newLoaderVersion = ref<string | null>(null);
 const newMCVersion = ref<string | null>(null);
 
 const onReinstall = (potentialArgs: any) => {
-  if (serverData.value?.flows?.intro && server.general?.project) {
+  if (serverData.value?.flows?.intro) {
     server.general?.endIntro();
   }
 
