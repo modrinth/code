@@ -601,8 +601,8 @@ const reinstallFromMrpack = (mrpack: File, hardReset: boolean = false) => {
             : reject(new Error(`[pyroservers] XHR error status: ${xhr.status}`));
 
         xhr.onerror = () => reject(new Error("[pyroservers] .mrpack upload failed"));
-        xhr.onabort = () => reject(new Error("[pyroservers] .mrpack u cancelled"));
-        xhr.ontimeout = () => reject(new Error("[pyroservers] .mrpack u timed out"));
+        xhr.onabort = () => reject(new Error("[pyroservers] .mrpack upload cancelled"));
+        xhr.ontimeout = () => reject(new Error("[pyroservers] .mrpack upload timed out"));
         xhr.timeout = 30 * 60 * 1000;
 
         xhr.open("POST", `https://${auth.url}/reinstallMrpackMultiparted?hard=${hardResetParam}`);
