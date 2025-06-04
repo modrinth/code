@@ -2,8 +2,10 @@ use crate::database::models::{
     DBSharedInstanceId, DBSharedInstanceVersionId, DBUserId,
 };
 use crate::database::redis::RedisPool;
+use crate::models::shared_instances::SharedInstanceUserPermissions;
 use dashmap::DashMap;
 use futures_util::TryStreamExt;
+use serde::{Deserialize, Serialize};
 
 //region shared_instances
 pub struct DBSharedInstance {
@@ -111,9 +113,11 @@ impl DBSharedInstance {
 //region shared_instance_users
 const USERS_NAMESPACE: &str = "shared_instance_users";
 
+#[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct DBSharedInstanceUser {
     pub user_id: DBUserId,
     pub shared_instance_id: DBSharedInstanceId,
+    pub permissions: SharedInstanceUserPermissions,
 }
 
 impl DBSharedInstanceUser {
@@ -123,11 +127,12 @@ impl DBSharedInstanceUser {
     ) -> Result<(), sqlx::Error> {
         sqlx::query!(
             "
-            INSERT INTO shared_instance_users (user_id, shared_instance_id)
-            VALUES ($1, $2)
+            INSERT INTO shared_instance_users (user_id, shared_instance_id, permissions)
+            VALUES ($1, $2, $3)
             ",
             self.user_id as DBUserId,
             self.shared_instance_id as DBSharedInstanceId,
+            self.permissions.bits() as i64,
         )
         .execute(&mut **transaction)
         .await?;
@@ -139,7 +144,7 @@ impl DBSharedInstanceUser {
         instance_id: DBSharedInstanceId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
         redis: &RedisPool,
-    ) -> Result<Vec<DBUserId>, super::DatabaseError> {
+    ) -> Result<Vec<DBSharedInstanceUser>, super::DatabaseError> {
         Self::get_from_instance_many(&[instance_id], exec, redis).await
     }
 
@@ -147,7 +152,7 @@ impl DBSharedInstanceUser {
         instance_ids: &[DBSharedInstanceId],
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
         redis: &RedisPool,
-    ) -> Result<Vec<DBUserId>, super::DatabaseError> {
+    ) -> Result<Vec<DBSharedInstanceUser>, super::DatabaseError> {
         if instance_ids.is_empty() {
             return Ok(vec![]);
         }
@@ -159,23 +164,32 @@ impl DBSharedInstanceUser {
                 async |user_ids| {
                     let users = sqlx::query!(
                         "
-                        SELECT shared_instance_id, user_id
+                        SELECT shared_instance_id, user_id, permissions
                         FROM shared_instance_users
                         WHERE shared_instance_id = ANY($1)
                         ",
                         &user_ids
                     )
                     .fetch(exec)
-                    .try_fold(
-                        DashMap::new(),
-                        |acc: DashMap<_, Vec<DBUserId>>, m| {
-                            acc.entry(m.shared_instance_id)
-                                .or_default()
-                                .push(DBUserId(m.user_id));
+                    .try_fold(DashMap::new(), |acc: DashMap<_, Vec<_>>, m| {
+                        acc.entry(m.shared_instance_id).or_default().push(
+                            DBSharedInstanceUser {
+                                user_id: DBUserId(m.user_id),
+                                shared_instance_id: DBSharedInstanceId(
+                                    m.shared_instance_id,
+                                ),
+                                permissions:
+                                    SharedInstanceUserPermissions::from_bits(
+                                        m.permissions as u64,
+                                    )
+                                    .unwrap_or(
+                                        SharedInstanceUserPermissions::empty(),
+                                    ),
+                            },
+                        );
 
-                            async move { Ok(acc) }
-                        },
-                    )
+                        async move { Ok(acc) }
+                    })
                     .await?;
 
                     Ok(users)

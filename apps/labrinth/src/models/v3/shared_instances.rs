@@ -1,9 +1,10 @@
-use crate::database::models::DBUserId;
+use crate::bitflags_serde_impl;
 use crate::database::models::shared_instance_item::{
-    DBSharedInstance, DBSharedInstanceVersion,
+    DBSharedInstance, DBSharedInstanceUser, DBSharedInstanceVersion,
 };
 use crate::models::ids::{SharedInstanceId, SharedInstanceVersionId};
 use ariadne::ids::UserId;
+use bitflags::bitflags;
 use hex::ToHex;
 use serde::{Deserialize, Serialize};
 
@@ -13,13 +14,13 @@ pub struct SharedInstance {
     pub title: String,
     pub owner: UserId,
     pub current_version: Option<SharedInstanceVersion>,
-    pub additional_users: Vec<UserId>,
+    pub additional_users: Vec<SharedInstanceUser>,
 }
 
 impl SharedInstance {
     pub fn from_db(
         instance: DBSharedInstance,
-        users: Vec<DBUserId>,
+        users: Vec<DBSharedInstanceUser>,
         current_version: Option<DBSharedInstanceVersion>,
         cdn_url: &str,
     ) -> Self {
@@ -55,6 +56,29 @@ impl SharedInstanceVersion {
             url: format!(
                 "{cdn_url}/shared_instance/{shared_instance_id}/{version_id}.mrpack"
             ),
+        }
+    }
+}
+
+bitflags! {
+    #[derive(Copy, Clone, Debug)]
+    pub struct SharedInstanceUserPermissions: u64 {
+    }
+}
+
+bitflags_serde_impl!(SharedInstanceUserPermissions, u64);
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SharedInstanceUser {
+    pub user: UserId,
+    pub permissions: SharedInstanceUserPermissions,
+}
+
+impl From<DBSharedInstanceUser> for SharedInstanceUser {
+    fn from(user: DBSharedInstanceUser) -> Self {
+        SharedInstanceUser {
+            user: user.user_id.into(),
+            permissions: user.permissions,
         }
     }
 }

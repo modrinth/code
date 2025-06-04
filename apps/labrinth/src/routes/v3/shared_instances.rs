@@ -156,7 +156,7 @@ pub async fn shared_instance_get(
                 .await?;
         if !user.role.is_mod()
             && shared_instance.owner_id != user.id.into()
-            && !users.contains(&user.id.into())
+            && !users.iter().any(|x| x.user_id == user.id.into())
         {
             return Err(ApiError::NotFound);
         }
