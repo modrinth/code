@@ -133,7 +133,7 @@ function generateTooltip({ series, seriesIndex, dataPointIndex, w }, props) {
       props,
     );
   } else {
-    const returnTopN = 5;
+    const returnTopN = 15;
 
     const listEntries = series
       .map((value, index) => [
