@@ -571,35 +571,63 @@ const reinstallServer = async (
   }
 };
 
-const reinstallFromMrpack = async (mrpack: File, hardReset: boolean = false) => {
+const reinstallFromMrpack = (mrpack: File, hardReset: boolean = false) => {
   const hardResetParam = hardReset ? "true" : "false";
-  try {
-    const auth = await PyroFetch<JWTAuth>(
-      `servers/${internalServerReference.value.serverId}/reinstallFromMrpack`,
-    );
 
-    const formData = new FormData();
-    formData.append("file", mrpack);
+  const progressSubject = new EventTarget();
 
-    const response = await fetch(
-      `https://${auth.url}/reinstallMrpackMultiparted?hard=${hardResetParam}`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${auth.token}`,
-        },
-        body: formData,
-        signal: AbortSignal.timeout(30 * 60 * 1000),
-      },
-    );
+  const uploadPromise = (async () => {
+    try {
+      const auth = await PyroFetch<JWTAuth>(
+        `servers/${internalServerReference.value.serverId}/reinstallFromMrpack`,
+      );
 
-    if (!response.ok) {
-      throw new Error(`[pyroservers] native fetch err status: ${response.status}`);
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+
+        xhr.upload.addEventListener("progress", (e) => {
+          if (e.lengthComputable) {
+            progressSubject.dispatchEvent(
+              new CustomEvent("progress", {
+                detail: {
+                  loaded: e.loaded,
+                  total: e.total,
+                  progress: (e.loaded / e.total) * 100,
+                },
+              }),
+            );
+          }
+        });
+
+        xhr.onload = () =>
+          xhr.status >= 200 && xhr.status < 300
+            ? resolve()
+            : reject(new Error(`[pyroservers] XHR error status: ${xhr.status}`));
+
+        xhr.onerror = () => reject(new Error("[pyroservers] .mrpack upload failed"));
+        xhr.onabort = () => reject(new Error("[pyroservers] .mrpack upload cancelled"));
+        xhr.ontimeout = () => reject(new Error("[pyroservers] .mrpack upload timed out"));
+        xhr.timeout = 30 * 60 * 1000;
+
+        xhr.open("POST", `https://${auth.url}/reinstallMrpackMultiparted?hard=${hardResetParam}`);
+        xhr.setRequestHeader("Authorization", `Bearer ${auth.token}`);
+
+        const formData = new FormData();
+        formData.append("file", mrpack);
+        xhr.send(formData);
+      });
+    } catch (err) {
+      console.error("Error reinstalling from mrpack:", err);
+      throw err;
     }
-  } catch (error) {
-    console.error("Error reinstalling from mrpack:", error);
-    throw error;
-  }
+  })();
+
+  return {
+    promise: uploadPromise,
+    onProgress: (cb: (p: { loaded: number; total: number; progress: number }) => void) =>
+      progressSubject.addEventListener("progress", ((e: CustomEvent) =>
+        cb(e.detail)) as EventListener),
+  };
 };
 
 const suspendServer = async (status: boolean) => {
@@ -1439,7 +1467,13 @@ type GeneralFunctions = {
    * @param mrpack - The mrpack file.
    * @param hardReset - Whether to perform a hard reset.
    */
-  reinstallFromMrpack: (mrpack: File, hardReset?: boolean) => Promise<void>;
+  reinstallFromMrpack: (
+    mrpack: File,
+    hardReset?: boolean,
+  ) => {
+    promise: Promise<void>;
+    onProgress: (cb: (p: { loaded: number; total: number; progress: number }) => void) => void;
+  };
 
   /**
    * Suspends or resumes the server.
