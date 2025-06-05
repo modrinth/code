@@ -86,6 +86,7 @@
             world.type === 'server' ? editServerModal?.show(world) : editWorldModal?.show(world)
         "
         @delete="() => promptToRemoveWorld(world)"
+        @open-folder="(world: SingleplayerWorld) => showWorldInFolder(instance.path, world.path)"
       />
     </div>
   </div>
@@ -151,6 +152,7 @@ import {
   hasQuickPlaySupport,
   refreshWorlds,
   handleDefaultProfileUpdateEvent,
+  showWorldInFolder,
 } from '@/helpers/worlds.ts'
 import AddServerModal from '@/components/ui/world/modal/AddServerModal.vue'
 import EditServerModal from '@/components/ui/world/modal/EditServerModal.vue'
