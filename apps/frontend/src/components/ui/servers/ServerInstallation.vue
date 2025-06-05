@@ -162,12 +162,12 @@ import { ButtonStyled, NewProjectCard } from "@modrinth/ui";
 import { TransferIcon, UploadIcon, InfoIcon, CompassIcon, SettingsIcon } from "@modrinth/assets";
 import type { Loaders } from "@modrinth/utils";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
-import type {Server} from "~/composables/servers/contentType.ts";
+import { PyroServer } from "~/composables/servers/pyro-servers";
 
 const { formatMessage } = useVIntl();
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: PyroServer;
   ignoreCurrentInstallation?: boolean;
   backupInProgress?: BackupInProgressReason;
 }>();

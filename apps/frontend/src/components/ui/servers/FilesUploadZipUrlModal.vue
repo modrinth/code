@@ -77,12 +77,12 @@ import { ExternalIcon, SpinnerIcon, DownloadIcon, XIcon } from "@modrinth/assets
 import { BackupWarning, ButtonStyled, NewModal } from "@modrinth/ui";
 import { ref, computed, nextTick } from "vue";
 import { handleError } from "~/composables/servers/pyro-servers.ts";
-import type {Server} from "~/composables/servers/contentType.ts";
+import { PyroServer } from "~/composables/servers/pyro-servers.ts";
 
 const cf = ref(false);
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: PyroServer;
 }>();
 
 const modal = ref<typeof NewModal>();
@@ -111,10 +111,10 @@ const handleSubmit = async () => {
   if (!error.value) {
     // hide();
     try {
-      const dry = await props.server.fs?.extractFile(trimmedUrl.value, true, true);
+      const dry = await props.server.fs.extractFile(trimmedUrl.value, true, true);
 
       if (!cf.value || dry.modpack_name) {
-        await props.server.fs?.extractFile(trimmedUrl.value, true, false, true);
+        await props.server.fs.extractFile(trimmedUrl.value, true, false, true);
         hide();
       } else {
         submitted.value = false;

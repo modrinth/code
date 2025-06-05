@@ -48,7 +48,6 @@
 import { ref, nextTick, computed } from "vue";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { SpinnerIcon, SaveIcon, XIcon, IssuesIcon } from "@modrinth/assets";
-
 import { PyroServer } from "~/composables/servers/pyro-servers.ts"
 
 const props = defineProps<{
@@ -71,7 +70,7 @@ const nameExists = computed(() => {
   }
 
   return props.server.backups.data.some(
-    (backup: ) => backup.name.trim().toLowerCase() === trimmedName.value.toLowerCase(),
+    (backup: Backup) => backup.name.trim().toLowerCase() === trimmedName.value.toLowerCase(),
   );
 });
 

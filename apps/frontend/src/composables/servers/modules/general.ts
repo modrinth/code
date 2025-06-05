@@ -1,6 +1,6 @@
 import { $fetch } from "ofetch";
-import { usePyroFetch } from "../pyro-fetch.ts";
-import { ServerModule } from "./server-module.ts";
+import { pyroFetch } from "../pyro-fetch";
+import { ServerModule } from "./base";
 import type { ServerGeneral, Project, PowerAction, JWTAuth } from "@modrinth/utils";
 
 export class GeneralModule extends ServerModule implements ServerGeneral {
@@ -27,20 +27,42 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
   node!: { token: string; instance: string };
   flows?: { intro?: boolean };
 
+  async fetch(): Promise<void> {
+    const data = await pyroFetch<ServerGeneral>(`servers/${this.serverId}`, {}, "general");
+
+    if (data.upstream?.project_id) {
+      const project = await $fetch(`https://api.modrinth.com/v2/project/${data.upstream.project_id}`);
+      data.project = project as Project;
+    }
+
+    if (import.meta.client) {
+      data.image = (await this.server.processImage(data.project?.icon_url)) ?? undefined;
+    }
+
+    const motd = await this.getMotd();
+    if (motd === "A Minecraft Server") {
+      await this.setMotd(`§b${data.project?.title || data.loader + " " + data.mc_version} §f♦ §aModrinth Servers`);
+    }
+    data.motd = motd;
+
+    // Copy data to this module
+    Object.assign(this, data);
+  }
+
   async updateName(newName: string): Promise<void> {
-    await usePyroFetch(`servers/${this.serverId}/name`, {
+    await pyroFetch(`servers/${this.serverId}/name`, {
       method: "POST",
       body: { name: newName },
     });
   }
 
   async power(action: PowerAction): Promise<void> {
-    await usePyroFetch(`servers/${this.serverId}/power`, {
+    await pyroFetch(`servers/${this.serverId}/power`, {
       method: "POST",
       body: { action },
     });
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    await this.server.refresh(["general"]);
+    await this.fetch(); // Refresh this module
   }
 
   async reinstall(
@@ -55,12 +77,12 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
       if (projectId.toLowerCase() === "neoforge") {
         projectId = "NeoForge";
       }
-      await usePyroFetch(`servers/${this.serverId}/reinstall?hard=${hardResetParam}`, {
+      await pyroFetch(`servers/${this.serverId}/reinstall?hard=${hardResetParam}`, {
         method: "POST",
         body: { loader: projectId, loader_version: loaderVersionId, game_version: versionId },
       });
     } else {
-      await usePyroFetch(`servers/${this.serverId}/reinstall?hard=${hardResetParam}`, {
+      await pyroFetch(`servers/${this.serverId}/reinstall?hard=${hardResetParam}`, {
         method: "POST",
         body: { project_id: projectId, version_id: versionId },
       });
@@ -69,7 +91,7 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
 
   async reinstallFromMrpack(mrpack: File, hardReset: boolean = false): Promise<void> {
     const hardResetParam = hardReset ? "true" : "false";
-    const auth = await usePyroFetch<JWTAuth>(`servers/${this.serverId}/reinstallFromMrpack`);
+    const auth = await pyroFetch<JWTAuth>(`servers/${this.serverId}/reinstallFromMrpack`);
 
     const formData = new FormData();
     formData.append("file", mrpack);
@@ -89,18 +111,18 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
   }
 
   async suspend(status: boolean): Promise<void> {
-    await usePyroFetch(`servers/${this.serverId}/suspend`, {
+    await pyroFetch(`servers/${this.serverId}/suspend`, {
       method: "POST",
       body: { suspended: status },
     });
   }
 
   async endIntro(): Promise<void> {
-    await usePyroFetch(`servers/${this.serverId}/flows/intro`, {
+    await pyroFetch(`servers/${this.serverId}/flows/intro`, {
       method: "DELETE",
       version: 1,
     });
-    await this.server.refresh(["general"]);
+    await this.fetch(); // Refresh this module
   }
 
   async getMotd(): Promise<string | undefined> {
@@ -126,9 +148,9 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
       props.motd = motd;
       const newProps = this.server.constructServerProperties(props);
       const octetStream = new Blob([newProps], { type: "application/octet-stream" });
-      const auth = await usePyroFetch<JWTAuth>(`servers/${this.serverId}/fs`);
+      const auth = await pyroFetch<JWTAuth>(`servers/${this.serverId}/fs`);
 
-      await usePyroFetch(`/update?path=/server.properties`, {
+      await pyroFetch(`/update?path=/server.properties`, {
         method: "PUT",
         contentType: "application/octet-stream",
         body: octetStream,

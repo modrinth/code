@@ -69,11 +69,10 @@
 <script setup lang="ts">
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { DownloadIcon, XIcon } from "@modrinth/assets";
-
-import type {Server} from "~/composables/servers/contentType.ts";
+import { PyroServer } from "~/composables/servers/pyro-servers.ts";
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: PyroServer;
   project: any;
   versions: any[];
   currentVersion?: any;
@@ -99,7 +98,7 @@ const handleReinstall = async () => {
   try {
     const versionId = props.versions.find((v) => v.version_number === selectedVersion.value)?.id;
 
-    await props.server.general?.reinstall(
+    await props.server.general.reinstall(
       props.server.serverId,
       false,
       props.project.id,

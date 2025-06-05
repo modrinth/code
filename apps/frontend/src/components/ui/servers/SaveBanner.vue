@@ -31,8 +31,7 @@
 
 <script setup lang="ts">
 import { ButtonStyled } from "@modrinth/ui";
-
-import type {Server} from "~/composables/servers/contentType.ts";
+import { PyroServer } from "~/composables/servers/pyro-servers.ts";
 
 const props = defineProps<{
   isUpdating: boolean;
@@ -40,7 +39,7 @@ const props = defineProps<{
   save: () => void;
   reset: () => void;
   isVisible: boolean;
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: PyroServer;
 }>();
 
 const saveAndRestart = async () => {

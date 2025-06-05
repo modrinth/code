@@ -17,8 +17,7 @@ import {
 import { ButtonStyled, commonMessages, OverflowMenu, ProgressBar } from "@modrinth/ui";
 import { defineMessages, useVIntl } from "@vintl/vintl";
 import { ref } from "vue";
-
-import type {Backup} from "@modrinth/utils";
+import type { Backup } from "@modrinth/utils";
 
 const flags = useFeatureFlags();
 const { formatMessage } = useVIntl();

@@ -117,10 +117,10 @@
 import { BackupWarning, ButtonStyled, NewModal } from "@modrinth/ui";
 import { UploadIcon, RightArrowIcon, XIcon, ServerIcon } from "@modrinth/assets";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
-import type {Server} from "~/composables/servers/contentType.ts";
+import { PyroServer } from "~/composables/servers/pyro-servers.ts";
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: PyroServer;
   backupInProgress?: BackupInProgressReason;
 }>();
 
@@ -175,7 +175,7 @@ const handleReinstall = async () => {
     window.scrollTo(0, 0);
     hide();
   } catch (error) {
-    if (error instanceof PyroFetchError && error.statusCode === 429) {
+    if (error instanceof PyroFetchError && (error as any)?.statusCode === 429) {
       addNotification({
         group: "server",
         title: "Cannot reinstall server",

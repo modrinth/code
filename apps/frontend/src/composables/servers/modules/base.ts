@@ -10,4 +10,6 @@ export abstract class ServerModule {
   protected get serverId(): string {
     return this.server.serverId;
   }
+
+  abstract fetch(): Promise<void>;
 }

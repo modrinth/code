@@ -438,7 +438,7 @@ import { reloadNuxtApp, navigateTo } from "#app";
 import type { MessageDescriptor } from "@vintl/vintl";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "@modrinth/utils";
 import { usePyroConsole } from "~/store/console.ts";
-import { usePyroFetch } from "~/composables/servers/pyro-fetch.ts";
+import { pyroFetch } from "~/composables/servers/pyro-fetch.ts";
 import ServerInstallation from "~/components/ui/servers/ServerInstallation.vue";
 import type {Backup} from "~/composables/servers/contentType.ts";
 
@@ -1158,7 +1158,7 @@ const cleanup = () => {
 };
 
 async function dismissNotice(noticeId: number) {
-  await usePyroFetch(`servers/${serverId}/notices/${noticeId}/dismiss`, {
+  await pyroFetch(`servers/${serverId}/notices/${noticeId}/dismiss`, {
     method: "POST",
   }).catch((err) => {
     app.$notify({

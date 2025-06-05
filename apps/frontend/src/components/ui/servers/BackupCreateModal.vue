@@ -46,9 +46,10 @@ import { ref, nextTick, computed } from "vue";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { IssuesIcon, PlusIcon, XIcon } from "@modrinth/assets";
 import type { ServerBackup } from "@modrinth/utils";
+import { PyroServer } from "~/composables/servers/pyro-servers.ts";
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: PyroServer;
 }>();
 
 const modal = ref<InstanceType<typeof NewModal>>();

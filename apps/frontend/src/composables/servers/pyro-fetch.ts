@@ -1,4 +1,6 @@
 import { $fetch, FetchError } from "ofetch";
+import { ServersError, PyroFetchError } from "@modrinth/utils";
+import type { V1ErrorInfo } from "@modrinth/utils";
 
 export interface PyroFetchOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -9,104 +11,156 @@ export interface PyroFetchOptions {
     url?: string;
     token?: string;
   };
-  retry?: boolean;
+  retry?: number | boolean;
   bypassAuth?: boolean;
 }
 
-export class PyroFetchError extends Error {
-  constructor(
-    message: string,
-    public statusCode?: number,
-    public originalError?: Error,
-  ) {
-    super(message);
-    this.name = "PyroFetchError";
-  }
-}
-
-export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promise<T> {
+export async function pyroFetch<T>(
+  path: string,
+  options: PyroFetchOptions = {},
+  module?: string,
+  errorContext?: string,
+): Promise<T> {
   const config = useRuntimeConfig();
   const auth = await useAuth();
   const authToken = auth.value?.token;
 
   if (!authToken && !options.bypassAuth) {
-    throw new PyroFetchError("Cannot pyrofetch without auth", 10000);
+    const error = new PyroFetchError("Cannot pyrofetch without auth", 10000);
+    throw new ServersError("Missing auth token", 401, error, module);
   }
 
-  const { method = "GET", contentType = "application/json", body, version = 0, override } = options;
+  const {
+    method = "GET",
+    contentType = "application/json",
+    body,
+    version = 0,
+    override,
+    retry = method === "GET" ? 3 : 0,
+  } = options;
 
-  const base = (import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl)?.replace(
-    /\/$/,
-    "",
-  );
+  const base = (import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl)?.replace(/\/$/, "");
 
   if (!base) {
-    throw new PyroFetchError(
+    const error = new PyroFetchError(
       "Cannot pyrofetch without base url. Make sure to set a PYRO_BASE_URL in environment variables",
       10001,
     );
+    throw new ServersError("Configuration error: Missing PYRO_BASE_URL", 500, error, module);
   }
 
-  const fullUrl = override?.url
-    ? `https://${override.url}/${path.replace(/^\//, "")}`
+  const versionString = `v${version}`;
+  let newOverrideUrl = override?.url;
+  if (newOverrideUrl && newOverrideUrl.includes("v0") && version !== 0) {
+    newOverrideUrl = newOverrideUrl.replace("v0", versionString);
+  }
+
+  const fullUrl = newOverrideUrl
+    ? `https://${newOverrideUrl}/${path.replace(/^\//, "")}`
     : version === 0
       ? `${base}/modrinth/v${version}/${path.replace(/^\//, "")}`
       : `${base}/v${version}/${path.replace(/^\//, "")}`;
 
-  type HeadersRecord = Record<string, string>;
-
-  const authHeader: HeadersRecord = options.bypassAuth
-    ? {}
-    : {
-        Authorization: `Bearer ${override?.token ?? authToken}`,
-        "Access-Control-Allow-Headers": "Authorization",
-      };
-
-  const headers: HeadersRecord = {
-    ...authHeader,
+  const headers: Record<string, string> = {
     "User-Agent": "Pyro/1.0 (https://pyro.host)",
     Vary: "Accept, Origin",
-    "Content-Type": contentType,
   };
+
+  if (!options.bypassAuth) {
+    headers.Authorization = `Bearer ${override?.token ?? authToken}`;
+    headers["Access-Control-Allow-Headers"] = "Authorization";
+  }
+
+  if (contentType !== "none") {
+    headers["Content-Type"] = contentType;
+  }
 
   if (import.meta.client && typeof window !== "undefined") {
     headers.Origin = window.location.origin;
   }
 
-  try {
-    const response = await $fetch<T>(fullUrl, {
-      method,
-      headers,
-      body: body && contentType === "application/json" ? JSON.stringify(body) : body ?? undefined,
-      timeout: 10000,
-      retry: options.retry !== false ? (method === "GET" ? 3 : 0) : 0,
-    });
-    return response;
-  } catch (error) {
-    console.error("Fetch error:", error);
-    if (error instanceof FetchError) {
-      const statusCode = error.response?.status;
-      const statusText = error.response?.statusText || "Unknown error";
-      const errorMessages: { [key: number]: string } = {
-        400: "Bad Request",
-        401: "Unauthorized",
-        403: "Forbidden",
-        404: "Not Found",
-        405: "Method Not Allowed",
-        429: "Too Many Requests",
-        500: "Internal Server Error",
-        502: "Bad Gateway",
-      };
-      const message =
-        statusCode && statusCode in errorMessages
+  let attempts = 0;
+  const maxAttempts = (typeof retry === "boolean" ? (retry ? 3 : 1) : retry) + 1;
+  let lastError: Error | null = null;
+
+  while (attempts < maxAttempts) {
+    try {
+      const response = await $fetch<T>(fullUrl, {
+        method,
+        headers,
+        body: body && contentType === "application/json" ? JSON.stringify(body) : body ?? undefined,
+        timeout: 10000,
+      });
+
+      return response;
+    } catch (error) {
+      lastError = error as Error;
+      attempts++;
+
+      if (error instanceof FetchError) {
+        const statusCode = error.response?.status;
+        const statusText = error.response?.statusText || "Unknown error";
+
+        let v1Error: V1ErrorInfo | undefined;
+        if (error.data?.error && error.data?.description) {
+          v1Error = {
+            context: errorContext,
+            ...error.data,
+          };
+        }
+
+        const errorMessages: { [key: number]: string } = {
+          400: "Bad Request",
+          401: "Unauthorized",
+          403: "Forbidden",
+          404: "Not Found",
+          405: "Method Not Allowed",
+          408: "Request Timeout",
+          429: "Too Many Requests",
+          500: "Internal Server Error",
+          502: "Bad Gateway",
+          503: "Service Unavailable",
+          504: "Gateway Timeout",
+        };
+
+        const message = statusCode && statusCode in errorMessages
           ? errorMessages[statusCode]
           : `HTTP Error: ${statusCode || "unknown"} ${statusText}`;
-      throw new PyroFetchError(`[PYROFETCH][PYRO] ${message}`, statusCode, error);
+
+        const isRetryable = statusCode ? [408, 429, 500, 502, 503, 504].includes(statusCode) : true;
+
+        if (!isRetryable || attempts >= maxAttempts) {
+          console.error("Fetch error:", error);
+
+          const pyroError = new PyroFetchError(`[PYROFETCH][PYRO] ${message}`, statusCode, error);
+          throw new ServersError(error.message, statusCode, pyroError, module, v1Error);
+        }
+
+        const delay = Math.min(1000 * Math.pow(2, attempts - 1) + Math.random() * 1000, 10000);
+        console.warn(`Retrying request in ${delay}ms (attempt ${attempts}/${maxAttempts - 1})`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        continue;
+      }
+
+      console.error("Unexpected fetch error:", error);
+      const pyroError = new PyroFetchError(
+        "[PYROFETCH][PYRO] An unexpected error occurred during the fetch operation.",
+        undefined,
+        error as Error,
+      );
+      throw new ServersError("Unexpected error during fetch operation", undefined, pyroError, module);
     }
-    throw new PyroFetchError(
-      "[PYROFETCH][PYRO] An unexpected error occurred during the fetch operation.",
-      undefined,
-      error as Error,
-    );
   }
+
+  console.error("All retry attempts failed:", lastError);
+  if (lastError instanceof FetchError) {
+    const statusCode = lastError.response?.status;
+    const pyroError = new PyroFetchError("Maximum retry attempts reached", statusCode, lastError);
+    throw new ServersError("Maximum retry attempts reached", statusCode, pyroError, module);
+  }
+
+  const pyroError = new PyroFetchError("Maximum retry attempts reached", undefined, lastError || undefined);
+  throw new ServersError("Maximum retry attempts reached", undefined, pyroError, module);
 }
+
+export const pyroFetch = pyroFetch;

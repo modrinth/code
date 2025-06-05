@@ -202,7 +202,7 @@ import { DropdownIcon, RightArrowIcon, ServerIcon, XIcon } from "@modrinth/asset
 import { $fetch } from "ofetch";
 import type { Loaders } from "@modrinth/utils";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
-import type {Server} from "~/composables/servers/contentType.ts";
+import { PyroServer } from "~/composables/servers/pyro-servers.ts";
 
 const { formatMessage } = useVIntl();
 
@@ -220,7 +220,7 @@ type VersionMap = Record<string, LoaderVersion[]>;
 type VersionCache = Record<string, any>;
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: PyroServer;
   currentLoader: Loaders | undefined;
   backupInProgress?: BackupInProgressReason;
   initialSetup?: boolean;
@@ -474,7 +474,7 @@ const handleReinstall = async () => {
 
     hide();
   } catch (error) {
-    if (error instanceof PyroFetchError && error.statusCode === 429) {
+    if (error instanceof PyroFetchError && (error as any)?.statusCode === 429) {
       addNotification({
         group: "server",
         title: "Cannot reinstall server",
