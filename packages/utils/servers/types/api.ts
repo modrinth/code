@@ -1,4 +1,4 @@
-import { ServersError } from "../errors";
+import { PyroServerError } from "../errors";
 
 export interface V1ErrorInfo {
   context?: string;
@@ -12,7 +12,7 @@ export interface JWTAuth {
 }
 
 export interface ModuleError {
-  error: ServersError;
+  error: PyroServerError;
   timestamp: number;
 }
 

@@ -440,7 +440,7 @@ import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "@mo
 import { usePyroConsole } from "~/store/console.ts";
 import { pyroFetch } from "~/composables/servers/pyro-fetch.ts";
 import ServerInstallation from "~/components/ui/servers/ServerInstallation.vue";
-import type {Backup} from "~/composables/servers/contentType.ts";
+import type { Backup } from "@modrinth/utils";
 
 const app = useNuxtApp() as unknown as { $notify: any };
 

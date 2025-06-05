@@ -1,5 +1,5 @@
-import { ServersError } from "@modrinth/utils";
-import { pyroFetch } from "../pyro-fetch";
+import { PyroServerError } from "@modrinth/utils";
+import { pyroFetch } from "../pyro-fetch.ts";
 import { ServerModule } from "./base";
 import type {
   JWTAuth,
@@ -25,7 +25,7 @@ export class FSModule extends ServerModule {
     try {
       return await requestFn();
     } catch (error) {
-      if (error instanceof ServersError && error.statusCode === 401) {
+      if (error instanceof PyroServerError && error.statusCode === 401) {
         await this.fetch(); // Refresh auth
         return await requestFn();
       }

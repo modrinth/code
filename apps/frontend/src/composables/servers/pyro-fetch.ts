@@ -1,5 +1,5 @@
 import { $fetch, FetchError } from "ofetch";
-import { ServersError, PyroFetchError } from "@modrinth/utils";
+import { PyroServerError, PyroFetchError } from "@modrinth/utils";
 import type { V1ErrorInfo } from "@modrinth/utils";
 
 export interface PyroFetchOptions {
@@ -27,7 +27,7 @@ export async function pyroFetch<T>(
 
   if (!authToken && !options.bypassAuth) {
     const error = new PyroFetchError("Cannot pyrofetch without auth", 10000);
-    throw new ServersError("Missing auth token", 401, error, module);
+    throw new PyroServerError("Missing auth token", 401, error, module);
   }
 
   const {
@@ -46,7 +46,7 @@ export async function pyroFetch<T>(
       "Cannot pyrofetch without base url. Make sure to set a PYRO_BASE_URL in environment variables",
       10001,
     );
-    throw new ServersError("Configuration error: Missing PYRO_BASE_URL", 500, error, module);
+    throw new PyroServerError("Configuration error: Missing PYRO_BASE_URL", 500, error, module);
   }
 
   const versionString = `v${version}`;
@@ -133,7 +133,7 @@ export async function pyroFetch<T>(
           console.error("Fetch error:", error);
 
           const pyroError = new PyroFetchError(`[PYROFETCH][PYRO] ${message}`, statusCode, error);
-          throw new ServersError(error.message, statusCode, pyroError, module, v1Error);
+          throw new PyroServerError(error.message, statusCode, pyroError, module, v1Error);
         }
 
         const delay = Math.min(1000 * Math.pow(2, attempts - 1) + Math.random() * 1000, 10000);
@@ -148,7 +148,7 @@ export async function pyroFetch<T>(
         undefined,
         error as Error,
       );
-      throw new ServersError("Unexpected error during fetch operation", undefined, pyroError, module);
+      throw new PyroServerError("Unexpected error during fetch operation", undefined, pyroError, module);
     }
   }
 
@@ -156,11 +156,9 @@ export async function pyroFetch<T>(
   if (lastError instanceof FetchError) {
     const statusCode = lastError.response?.status;
     const pyroError = new PyroFetchError("Maximum retry attempts reached", statusCode, lastError);
-    throw new ServersError("Maximum retry attempts reached", statusCode, pyroError, module);
+    throw new PyroServerError("Maximum retry attempts reached", statusCode, pyroError, module);
   }
 
   const pyroError = new PyroFetchError("Maximum retry attempts reached", undefined, lastError || undefined);
-  throw new ServersError("Maximum retry attempts reached", undefined, pyroError, module);
+  throw new PyroServerError("Maximum retry attempts reached", undefined, pyroError, module);
 }
-
-export const pyroFetch = pyroFetch;

@@ -1,4 +1,4 @@
-import { pyroFetch } from "../pyro-fetch";
+import { pyroFetch } from "../pyro-fetch.ts";
 import { ServerModule } from "./base";
 import type { JWTAuth } from "@modrinth/utils";
 

@@ -1,5 +1,4 @@
-import { $fetch } from "ofetch";
-import { ServersError } from "@modrinth/utils";
+import { PyroServerError } from "@modrinth/utils";
 import { pyroFetch } from "./pyro-fetch.ts";
 import type {
   JWTAuth,
@@ -18,7 +17,7 @@ import {
 } from "./modules"
 
 export function handleError(err: any) {
-  if (err instanceof ServersError && err.v1Error) {
+  if (err instanceof PyroServerError && err.v1Error) {
     addNotification({
       title: err.v1Error?.context ?? `An error occurred`,
       type: "error",
@@ -129,7 +128,7 @@ export class PyroServer {
           return dataURL;
         }
       } catch (error) {
-        if (error instanceof ServersError && error.statusCode === 404 && iconUrl) {
+        if (error instanceof PyroServerError && error.statusCode === 404 && iconUrl) {
           // Handle external icon processing
           try {
             const response = await fetch(iconUrl);
@@ -215,7 +214,7 @@ export class PyroServer {
         }
       } catch (error) {
         this.errors[module] = {
-          error: error instanceof ServersError ? error : new ServersError("Unknown error", undefined, error as Error),
+          error: error instanceof PyroServerError ? error : new PyroServerError("Unknown error", undefined, error as Error),
           timestamp: Date.now(),
         };
       }

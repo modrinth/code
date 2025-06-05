@@ -1,5 +1,5 @@
 import { $fetch } from "ofetch";
-import { pyroFetch } from "../pyro-fetch";
+import { pyroFetch } from "../pyro-fetch.ts";
 import { ServerModule } from "./base";
 import type { ServerGeneral, Project, PowerAction, JWTAuth } from "@modrinth/utils";
 

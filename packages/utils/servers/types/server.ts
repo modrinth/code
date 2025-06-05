@@ -1,7 +1,6 @@
 import type { Project } from "../../types"
 import type { ServerNotice } from "./common";
 
-// Server data types
 export interface ServerGeneral {
   server_id: string;
   name: string;

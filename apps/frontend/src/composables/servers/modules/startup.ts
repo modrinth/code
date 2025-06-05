@@ -1,12 +1,12 @@
-import { pyroFetch } from "../pyro-fetch";
+import { pyroFetch } from "../pyro-fetch.ts";
 import { ServerModule } from "./base";
 import type { Startup, JDKVersion, JDKBuild } from "@modrinth/utils";
 
 export class StartupModule extends ServerModule implements Startup {
   invocation!: string;
   original_invocation!: string;
-  jdk_version!: "lts8" | "lts11" | "lts17" | "lts21";
-  jdk_build!: "corretto" | "temurin" | "graal";
+  jdk_version!: JDKVersion;
+  jdk_build!: JDKBuild;
 
   async fetch(): Promise<void> {
     const data = await pyroFetch<Startup>(`servers/${this.serverId}/startup`, {}, "startup");
