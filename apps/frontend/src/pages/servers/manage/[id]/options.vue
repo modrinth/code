@@ -17,8 +17,8 @@ import {
   UserIcon,
   WrenchIcon,
 } from "@modrinth/assets";
-import type { Server } from "~/composables/pyroServers";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
+import type {Server} from "~/composables/servers/contentType.ts";
 
 const route = useRoute();
 const serverId = route.params.id as string;

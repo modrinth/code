@@ -280,16 +280,14 @@ import { computed } from "vue";
 import { ButtonStyled, ProgressBar } from "@modrinth/ui";
 import { formatBytes } from "@modrinth/utils";
 import {
-  type DirectoryResponse,
-  type DirectoryItem,
-  type Server,
   handleError,
-} from "~/composables/pyroServers.ts";
+} from "~/composables/servers/pyro-servers.ts";
 import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
 import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
-import type { FilesystemOp, FSQueuedOp } from "~/types/servers.ts";
+import type { FilesystemOp, FSQueuedOp } from "@modrinth/utils.ts";
 import FilesUploadZipUrlModal from "~/components/ui/servers/FilesUploadZipUrlModal.vue";
 import FilesUploadConflictModal from "~/components/ui/servers/FilesUploadConflictModal.vue";
+import type {DirectoryItem, DirectoryResponse, Server} from "~/composables/servers/contentType.ts";
 
 const flags = useFeatureFlags();
 const baseId = useId();

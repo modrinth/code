@@ -31,7 +31,8 @@
 
 <script setup lang="ts">
 import { ButtonStyled } from "@modrinth/ui";
-import type { Server } from "~/composables/pyroServers";
+
+import type {Server} from "~/composables/servers/contentType.ts";
 
 const props = defineProps<{
   isUpdating: boolean;

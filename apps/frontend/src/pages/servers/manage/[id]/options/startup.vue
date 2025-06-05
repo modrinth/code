@@ -112,7 +112,8 @@
 <script setup lang="ts">
 import { UpdatedIcon, IssuesIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
-import type { Server } from "~/composables/pyroServers";
+
+import type {Server} from "~/composables/servers/contentType.ts";
 
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;

@@ -1,6 +1,6 @@
 import { $fetch, FetchError } from "ofetch";
 
-interface PyroFetchOptions {
+export interface PyroFetchOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   contentType?: string;
   body?: Record<string, any>;

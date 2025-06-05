@@ -99,7 +99,8 @@
 import { FolderOpenIcon, CheckCircleIcon, XCircleIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 import { ref, computed, watch, nextTick } from "vue";
-import type { FSModule } from "~/composables/pyroServers.ts";
+
+import type {FSModule} from "~/composables/servers/contentType.ts";
 
 interface UploadItem {
   file: File;

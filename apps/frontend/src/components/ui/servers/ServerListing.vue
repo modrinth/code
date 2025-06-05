@@ -81,7 +81,7 @@
 
 <script setup lang="ts">
 import { ChevronRightIcon, LockIcon, SparklesIcon } from "@modrinth/assets";
-import type { Project, Server } from "~/types/servers";
+import type { Project, Server } from "@modrinth/utils";
 
 const props = defineProps<Partial<Server>>();
 

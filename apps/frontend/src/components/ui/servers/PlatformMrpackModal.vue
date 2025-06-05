@@ -116,8 +116,8 @@
 <script setup lang="ts">
 import { BackupWarning, ButtonStyled, NewModal } from "@modrinth/ui";
 import { UploadIcon, RightArrowIcon, XIcon, ServerIcon } from "@modrinth/assets";
-import type { Server } from "~/composables/pyroServers";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
+import type {Server} from "~/composables/servers/contentType.ts";
 
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;

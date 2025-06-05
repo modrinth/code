@@ -436,11 +436,11 @@ import { ButtonStyled, ServerNotice } from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
 import { reloadNuxtApp, navigateTo } from "#app";
 import type { MessageDescriptor } from "@vintl/vintl";
-import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
+import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "@modrinth/utils";
 import { usePyroConsole } from "~/store/console.ts";
-import { type Backup } from "~/composables/pyroServers.ts";
-import { usePyroFetch } from "~/composables/pyroFetch.ts";
+import { usePyroFetch } from "~/composables/servers/pyro-fetch.ts";
 import ServerInstallation from "~/components/ui/servers/ServerInstallation.vue";
+import type {Backup} from "~/composables/servers/contentType.ts";
 
 const app = useNuxtApp() as unknown as { $notify: any };
 

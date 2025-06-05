@@ -20,12 +20,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { ConfirmModal } from "@modrinth/ui";
-import type { Server } from "~/composables/pyroServers";
 import BackupItem from "~/components/ui/servers/BackupItem.vue";
-
-defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
-}>();
 
 const emit = defineEmits<{
   (e: "delete", backup: Backup | undefined): void;

@@ -19,11 +19,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { ConfirmModal, NewModal } from "@modrinth/ui";
-import type { Server } from "~/composables/pyroServers";
 import BackupItem from "~/components/ui/servers/BackupItem.vue";
+import { PyroServer } from "~/composables/servers/pyro-servers.ts"
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: PyroServer;
 }>();
 
 const modal = ref<InstanceType<typeof NewModal>>();

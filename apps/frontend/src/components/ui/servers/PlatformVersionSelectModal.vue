@@ -200,9 +200,9 @@
 import { BackupWarning, ButtonStyled, NewModal, Toggle } from "@modrinth/ui";
 import { DropdownIcon, RightArrowIcon, ServerIcon, XIcon } from "@modrinth/assets";
 import { $fetch } from "ofetch";
-import type { Server } from "~/composables/pyroServers";
-import type { Loaders } from "~/types/servers";
+import type { Loaders } from "@modrinth/utils";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
+import type {Server} from "~/composables/servers/contentType.ts";
 
 const { formatMessage } = useVIntl();
 

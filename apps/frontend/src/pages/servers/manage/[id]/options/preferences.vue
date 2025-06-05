@@ -43,7 +43,8 @@
 
 <script setup lang="ts">
 import { useStorage } from "@vueuse/core";
-import type { Server } from "~/composables/pyroServers";
+
+import type {Server} from "~/composables/servers/contentType.ts";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;

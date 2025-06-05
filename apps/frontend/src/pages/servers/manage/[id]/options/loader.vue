@@ -7,9 +7,9 @@
 </template>
 
 <script setup lang="ts">
-import type { Server } from "~/composables/pyroServers";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
 import ServerInstallation from "~/components/ui/servers/ServerInstallation.vue";
+import type {Server} from "~/composables/servers/contentType.ts";
 
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;

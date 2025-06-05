@@ -46,7 +46,7 @@ export const NOTICE_LEVELS: Record<
   },
 }
 
-const DISMISSABLE = {
+export const DISMISSABLE = {
   name: defineMessage({
     id: 'servers.notice.dismissable',
     defaultMessage: 'Dismissable',
@@ -57,7 +57,7 @@ const DISMISSABLE = {
   },
 }
 
-const UNDISMISSABLE = {
+export const UNDISMISSABLE = {
   name: defineMessage({
     id: 'servers.notice.undismissable',
     defaultMessage: 'Undismissable',

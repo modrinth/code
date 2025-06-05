@@ -2,10 +2,9 @@
 import dayjs from "dayjs";
 import { ButtonStyled, commonMessages, CopyCode, ServerNotice, TagItem } from "@modrinth/ui";
 import { EditIcon, SettingsIcon, TrashIcon } from "@modrinth/assets";
-import { ServerNotice as ServerNoticeType } from "@modrinth/utils";
+import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
 import { useRelativeTime } from "@modrinth/ui";
 import {
-  DISMISSABLE,
   getDismissableMetadata,
   NOTICE_LEVELS,
 } from "@modrinth/ui/src/utils/notices.ts";

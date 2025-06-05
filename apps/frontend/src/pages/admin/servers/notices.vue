@@ -275,7 +275,7 @@ import { useVIntl } from "@vintl/vintl";
 import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
 import { computed } from "vue";
 import { NOTICE_LEVELS } from "@modrinth/ui/src/utils/notices.ts";
-import { usePyroFetch } from "~/composables/pyroFetch.ts";
+import { usePyroFetch } from "~/composables/servers/pyro-fetch.ts";
 import AssignNoticeModal from "~/components/ui/servers/notice/AssignNoticeModal.vue";
 
 const { formatMessage } = useVIntl();

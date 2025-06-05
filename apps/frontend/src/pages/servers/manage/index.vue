@@ -122,8 +122,8 @@ import Fuse from "fuse.js";
 import { HammerIcon, PlusIcon, SearchIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 import { reloadNuxtApp } from "#app";
-import type { PyroFetchError } from "~/composables/pyroFetch";
-import type { Server } from "~/types/servers";
+import type { PyroFetchError } from "~/composables/servers/pyro-fetch.ts";
+import type { Server } from "@modrinth/utils";
 
 definePageMeta({
   middleware: "auth",

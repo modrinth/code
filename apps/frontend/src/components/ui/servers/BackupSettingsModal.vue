@@ -59,7 +59,8 @@
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { XIcon, SaveIcon } from "@modrinth/assets";
 import { ref, computed } from "vue";
-import type { Server } from "~/composables/pyroServers";
+
+import type {Server} from "~/composables/servers/contentType.ts";
 
 const props = defineProps<{
   server: Server<["backups"]>;

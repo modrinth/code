@@ -273,7 +273,8 @@ import {
 } from "@modrinth/assets";
 import { ButtonStyled, NewModal, ConfirmModal } from "@modrinth/ui";
 import { ref, computed, nextTick } from "vue";
-import type { Server } from "~/composables/pyroServers";
+
+import type {Server} from "~/composables/servers/contentType.ts";
 
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;

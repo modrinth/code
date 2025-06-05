@@ -34,8 +34,8 @@
 <script setup lang="ts">
 import { RightArrowIcon } from "@modrinth/assets";
 import type { RouteLocationNormalized } from "vue-router";
-import type { Server } from "~/composables/pyroServers";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
+import type {Server} from "~/composables/servers/contentType.ts";
 
 const emit = defineEmits(["reinstall"]);
 

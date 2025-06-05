@@ -48,10 +48,11 @@
 import { ref, nextTick, computed } from "vue";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { SpinnerIcon, SaveIcon, XIcon, IssuesIcon } from "@modrinth/assets";
-import type { Server } from "~/composables/pyroServers";
+
+import { PyroServer } from "~/composables/servers/pyro-servers.ts"
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: PyroServer;
 }>();
 
 const modal = ref<InstanceType<typeof NewModal>>();
@@ -70,7 +71,7 @@ const nameExists = computed(() => {
   }
 
   return props.server.backups.data.some(
-    (backup) => backup.name.trim().toLowerCase() === trimmedName.value.toLowerCase(),
+    (backup: ) => backup.name.trim().toLowerCase() === trimmedName.value.toLowerCase(),
   );
 });
 

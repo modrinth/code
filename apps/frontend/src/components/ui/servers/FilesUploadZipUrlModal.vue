@@ -76,7 +76,8 @@
 import { ExternalIcon, SpinnerIcon, DownloadIcon, XIcon } from "@modrinth/assets";
 import { BackupWarning, ButtonStyled, NewModal } from "@modrinth/ui";
 import { ref, computed, nextTick } from "vue";
-import { handleError, type Server } from "~/composables/pyroServers.ts";
+import { handleError } from "~/composables/servers/pyro-servers.ts";
+import type {Server} from "~/composables/servers/contentType.ts";
 
 const cf = ref(false);
 

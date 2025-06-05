@@ -141,7 +141,8 @@
 import { ref, watch, computed, inject } from "vue";
 import { EyeIcon, SearchIcon, IssuesIcon } from "@modrinth/assets";
 import Fuse from "fuse.js";
-import type { Server } from "~/composables/pyroServers";
+
+import type {Server} from "~/composables/servers/contentType.ts";
 
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;

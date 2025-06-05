@@ -40,7 +40,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import type { ServerState } from "~/types/servers";
+import type { ServerState } from "@modrinth/utils";
 
 const STATUS_CLASSES = {
   running: { main: "bg-brand", bg: "bg-bg-green" },
