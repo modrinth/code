@@ -518,8 +518,14 @@
   "servers.region.europe": {
     "defaultMessage": "Europe"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "North America"
+  "servers.region.european-union": {
+    "defaultMessage": "European Union"
+  },
+  "servers.region.germany": {
+    "defaultMessage": "Germany"
+  },
+  "servers.region.usa": {
+    "defaultMessage": "United States of America"
   },
   "servers.region.prompt": {
     "defaultMessage": "Where would you like your server to be located?"
