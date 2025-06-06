@@ -444,7 +444,7 @@ import type {
   Backup,
   PowerAction,
 } from "@modrinth/utils";
-import { usePyroConsole } from "~/store/console.ts";
+import { useModrinthServersConsole } from "~/store/console.ts";
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import { ModrinthServer, useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
 import ServerInstallation from "~/components/ui/servers/ServerInstallation.vue";
@@ -504,7 +504,7 @@ const errorLogFile = ref("");
 const serverData = computed(() => server.general);
 const isConnected = ref(false);
 const isWSAuthIncorrect = ref(false);
-const pyroConsole = usePyroConsole();
+const modrinthServersConsole = useModrinthServersConsole();
 const cpuData = ref<number[]>([]);
 const ramData = ref<number[]>([]);
 const isActioning = ref(false);
@@ -678,7 +678,7 @@ const connectWebSocket = () => {
         return;
       }
 
-      pyroConsole.clear();
+      modrinthServersConsole.clear();
       socket.value?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
       isConnected.value = true;
       isReconnecting.value = false;
@@ -686,7 +686,7 @@ const connectWebSocket = () => {
 
       if (firstConnect.value) {
         for (let i = 0; i < initialConsoleMessage.length; i++) {
-          pyroConsole.addLine(initialConsoleMessage[i]);
+          modrinthServersConsole.addLine(initialConsoleMessage[i]);
         }
       }
 
@@ -709,7 +709,7 @@ const connectWebSocket = () => {
 
     socket.value.onclose = () => {
       if (isMounted.value) {
-        pyroConsole.addLine("\nSomething went wrong with the connection, we're reconnecting...");
+        modrinthServersConsole.addLine("\nSomething went wrong with the connection, we're reconnecting...");
         isConnected.value = false;
         scheduleReconnect();
       }
@@ -767,7 +767,7 @@ const handleWebSocketMessage = (data: WSEvent) => {
     case "log":
       // eslint-disable-next-line no-case-declarations
       const log = data.message.split("\n").filter((l) => l.trim());
-      pyroConsole.addLines(log);
+      modrinthServersConsole.addLines(log);
       break;
     case "stats":
       updateStats(data);
