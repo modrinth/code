@@ -17,14 +17,14 @@ import {
   UserIcon,
   WrenchIcon,
 } from "@modrinth/assets";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
-import type { Server } from "~/composables/servers/contentType.ts";
 
 const route = useRoute();
 const serverId = route.params.id as string;
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: ModrinthServer;
   backupInProgress?: BackupInProgressReason;
 }>();
 

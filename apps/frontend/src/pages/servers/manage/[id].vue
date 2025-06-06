@@ -434,7 +434,6 @@ import {
 import DOMPurify from "dompurify";
 import { ButtonStyled, ServerNotice } from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
-import { reloadNuxtApp, navigateTo } from "#app";
 import type { MessageDescriptor } from "@vintl/vintl";
 import type {
   ServerState,
@@ -444,6 +443,7 @@ import type {
   Backup,
   PowerAction,
 } from "@modrinth/utils";
+import { reloadNuxtApp, navigateTo } from "#app";
 import { useModrinthServersConsole } from "~/store/console.ts";
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import { ModrinthServer, useModrinthServers } from "~/composables/servers/modrinth-servers.ts";

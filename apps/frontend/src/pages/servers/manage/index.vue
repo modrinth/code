@@ -121,8 +121,8 @@ import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import Fuse from "fuse.js";
 import { HammerIcon, PlusIcon, SearchIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
-import { reloadNuxtApp } from "#app";
 import type { Server, ModrinthServersFetchError } from "@modrinth/utils";
+import { reloadNuxtApp } from "#app";
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 
 definePageMeta({
