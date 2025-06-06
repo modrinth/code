@@ -709,7 +709,9 @@ const connectWebSocket = () => {
 
     socket.value.onclose = () => {
       if (isMounted.value) {
-        modrinthServersConsole.addLine("\nSomething went wrong with the connection, we're reconnecting...");
+        modrinthServersConsole.addLine(
+          "\nSomething went wrong with the connection, we're reconnecting...",
+        );
         isConnected.value = false;
         scheduleReconnect();
       }

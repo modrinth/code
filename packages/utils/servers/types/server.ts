@@ -51,7 +51,7 @@ export interface Startup {
   jdk_build: 'corretto' | 'temurin' | 'graal'
 }
 
-export type PowerAction = 'start' | 'stop' | 'restart' | 'kill'
+export type PowerAction = 'Start' | 'Stop' | 'Restart' | 'Kill'
 export type JDKVersion = 'lts8' | 'lts11' | 'lts17' | 'lts21'
 export type JDKBuild = 'corretto' | 'temurin' | 'graal'
 
@@ -66,4 +66,4 @@ export type Loaders =
   | 'Vanilla'
   | 'Purpur'
 
-export type ServerState = 'running' | 'stopped' | 'crashed'
+export type ServerState = 'starting' | 'running' | 'restarting' | 'stopping' | 'stopped'

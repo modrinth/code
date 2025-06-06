@@ -200,7 +200,7 @@
 import { BackupWarning, ButtonStyled, NewModal, Toggle } from "@modrinth/ui";
 import { DropdownIcon, RightArrowIcon, ServerIcon, XIcon } from "@modrinth/assets";
 import { $fetch } from "ofetch";
-import type { Loaders } from "@modrinth/utils";
+import { type Loaders, ModrinthServersFetchError } from "@modrinth/utils";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
@@ -458,7 +458,6 @@ const handleReinstall = async () => {
 
   try {
     await props.server.general?.reinstall(
-      props.server.serverId,
       true,
       selectedLoader.value,
       selectedMCVersion.value,
@@ -474,7 +473,7 @@ const handleReinstall = async () => {
 
     hide();
   } catch (error) {
-    if (error instanceof PyroFetchError && (error as any)?.statusCode === 429) {
+    if (error instanceof ModrinthServersFetchError && (error as any)?.statusCode === 429) {
       addNotification({
         group: "server",
         title: "Cannot reinstall server",
