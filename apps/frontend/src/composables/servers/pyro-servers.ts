@@ -1,10 +1,6 @@
 import { PyroServerError } from "@modrinth/utils";
-import { pyroFetch } from "./pyro-fetch.ts";
-import type {
-  JWTAuth,
-  ModuleError,
-  ModuleName
-} from "@modrinth/utils";
+import type { JWTAuth, ModuleError, ModuleName } from "@modrinth/utils";
+import { usePyroFetch } from "./pyro-fetch.ts";
 
 import {
   GeneralModule,
@@ -14,7 +10,7 @@ import {
   StartupModule,
   WSModule,
   FSModule,
-} from "./modules"
+} from "./modules/index.ts";
 
 export function handleError(err: any) {
   if (err instanceof PyroServerError && err.v1Error) {
@@ -75,7 +71,7 @@ export class PyroServer {
   }
 
   async fetchConfigFile(fileName: string): Promise<any> {
-    return await pyroFetch(`servers/${this.serverId}/config/${fileName}`);
+    return await usePyroFetch(`servers/${this.serverId}/config/${fileName}`);
   }
 
   constructServerProperties(properties: any): string {
@@ -102,9 +98,9 @@ export class PyroServer {
     }
 
     try {
-      const auth = await pyroFetch<JWTAuth>(`servers/${this.serverId}/fs`);
+      const auth = await usePyroFetch<JWTAuth>(`servers/${this.serverId}/fs`);
       try {
-        const fileData = await pyroFetch(`/download?path=/server-icon-original.png`, {
+        const fileData = await usePyroFetch(`/download?path=/server-icon-original.png`, {
           override: auth,
           retry: false,
         });
@@ -134,7 +130,9 @@ export class PyroServer {
             const response = await fetch(iconUrl);
             if (!response.ok) throw new Error("Failed to fetch icon");
             const file = await response.blob();
-            const originalFile = new File([file], "server-icon-original.png", { type: "image/png" });
+            const originalFile = new File([file], "server-icon-original.png", {
+              type: "image/png",
+            });
 
             if (import.meta.client) {
               const dataURL = await new Promise<string>((resolve) => {
@@ -148,13 +146,13 @@ export class PyroServer {
                   canvas.toBlob(async (blob) => {
                     if (blob) {
                       const scaledFile = new File([blob], "server-icon.png", { type: "image/png" });
-                      await pyroFetch(`/create?path=/server-icon.png&type=file`, {
+                      await usePyroFetch(`/create?path=/server-icon.png&type=file`, {
                         method: "POST",
                         contentType: "application/octet-stream",
                         body: scaledFile,
                         override: auth,
                       });
-                      await pyroFetch(`/create?path=/server-icon-original.png&type=file`, {
+                      await usePyroFetch(`/create?path=/server-icon-original.png&type=file`, {
                         method: "POST",
                         contentType: "application/octet-stream",
                         body: originalFile,
@@ -184,15 +182,43 @@ export class PyroServer {
     return undefined;
   }
 
-  async refresh(modules: ModuleName[] = []): Promise<void> {
-    const modulesToRefresh = modules.length > 0 ? modules : ["general", "content", "backups", "network", "startup", "ws", "fs"] as ModuleName[];
+  async refresh(
+    modules: ModuleName[] = [],
+    options?: {
+      preserveConnection?: boolean;
+      preserveInstallState?: boolean;
+    },
+  ): Promise<void> {
+    const modulesToRefresh =
+      modules.length > 0
+        ? modules
+        : (["general", "content", "backups", "network", "startup", "ws", "fs"] as ModuleName[]);
 
     for (const module of modulesToRefresh) {
       try {
         switch (module) {
-          case "general":
-            await this.general.fetch();
+          case "general": {
+            if (options?.preserveConnection) {
+              const currentImage = this.general.image;
+              const currentMotd = this.general.motd;
+              const currentStatus = this.general.status;
+
+              await this.general.fetch();
+
+              if (currentImage) {
+                this.general.image = currentImage;
+              }
+              if (currentMotd) {
+                this.general.motd = currentMotd;
+              }
+              if (options.preserveInstallState && currentStatus === "installing") {
+                this.general.status = "installing";
+              }
+            } else {
+              await this.general.fetch();
+            }
             break;
+          }
           case "content":
             await this.content.fetch();
             break;
@@ -214,7 +240,10 @@ export class PyroServer {
         }
       } catch (error) {
         this.errors[module] = {
-          error: error instanceof PyroServerError ? error : new PyroServerError("Unknown error", undefined, error as Error),
+          error:
+            error instanceof PyroServerError
+              ? error
+              : new PyroServerError("Unknown error", undefined, error as Error),
           timestamp: Date.now(),
         };
       }
@@ -226,7 +255,10 @@ export class PyroServer {
   }
 }
 
-export const usePyroServer = async (serverId: string, includedModules: ModuleName[] = ["general"]) => {
+export const usePyroServer = async (
+  serverId: string,
+  includedModules: ModuleName[] = ["general"],
+) => {
   const server = new PyroServer(serverId);
   await server.refresh(includedModules);
   return reactive(server);

@@ -15,7 +15,7 @@ export interface PyroFetchOptions {
   bypassAuth?: boolean;
 }
 
-export async function pyroFetch<T>(
+export async function usePyroFetch<T>(
   path: string,
   options: PyroFetchOptions = {},
   module?: string,
@@ -39,7 +39,10 @@ export async function pyroFetch<T>(
     retry = method === "GET" ? 3 : 0,
   } = options;
 
-  const base = (import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl)?.replace(/\/$/, "");
+  const base = (import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl)?.replace(
+    /\/$/,
+    "",
+  );
 
   if (!base) {
     const error = new PyroFetchError(
@@ -123,9 +126,10 @@ export async function pyroFetch<T>(
           504: "Gateway Timeout",
         };
 
-        const message = statusCode && statusCode in errorMessages
-          ? errorMessages[statusCode]
-          : `HTTP Error: ${statusCode || "unknown"} ${statusText}`;
+        const message =
+          statusCode && statusCode in errorMessages
+            ? errorMessages[statusCode]
+            : `HTTP Error: ${statusCode || "unknown"} ${statusText}`;
 
         const isRetryable = statusCode ? [408, 429, 500, 502, 503, 504].includes(statusCode) : true;
 
@@ -148,7 +152,12 @@ export async function pyroFetch<T>(
         undefined,
         error as Error,
       );
-      throw new PyroServerError("Unexpected error during fetch operation", undefined, pyroError, module);
+      throw new PyroServerError(
+        "Unexpected error during fetch operation",
+        undefined,
+        pyroError,
+        module,
+      );
     }
   }
 
@@ -159,6 +168,10 @@ export async function pyroFetch<T>(
     throw new PyroServerError("Maximum retry attempts reached", statusCode, pyroError, module);
   }
 
-  const pyroError = new PyroFetchError("Maximum retry attempts reached", undefined, lastError || undefined);
+  const pyroError = new PyroFetchError(
+    "Maximum retry attempts reached",
+    undefined,
+    lastError || undefined,
+  );
   throw new PyroServerError("Maximum retry attempts reached", undefined, pyroError, module);
 }

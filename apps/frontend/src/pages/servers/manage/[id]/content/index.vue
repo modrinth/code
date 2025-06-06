@@ -352,7 +352,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
 import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
-import type {Server} from "~/composables/servers/contentType.ts";
+import type { Server } from "~/composables/servers/contentType.ts";
 
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;

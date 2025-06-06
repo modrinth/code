@@ -4,7 +4,7 @@ export class PyroFetchError extends Error {
     public statusCode?: number,
     public originalError?: Error,
   ) {
-    super(message);
-    this.name = "PyroFetchError";
+    super(message)
+    this.name = 'PyroFetchError'
   }
 }

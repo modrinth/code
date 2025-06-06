@@ -623,6 +623,7 @@ import {
   ServerIcon,
 } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
+import { usePyroFetch } from "~/composables/servers/pyro-fetch.ts";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
 import ServerPlanSelector from "~/components/ui/servers/marketing/ServerPlanSelector.vue";
 import OptionGroup from "~/components/ui/OptionGroup.vue";

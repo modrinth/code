@@ -191,7 +191,7 @@ import { TerminalSquareIcon, XIcon, IssuesIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 import type { ServerState, Stats } from "@modrinth/utils";
 
-import type {Server} from "~/composables/servers/contentType.ts";
+import type { Server } from "~/composables/servers/contentType.ts";
 
 type ServerProps = {
   socket: WebSocket | null;

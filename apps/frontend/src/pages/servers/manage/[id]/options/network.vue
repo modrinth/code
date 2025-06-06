@@ -274,7 +274,7 @@ import {
 import { ButtonStyled, NewModal, ConfirmModal } from "@modrinth/ui";
 import { ref, computed, nextTick } from "vue";
 
-import type {Server} from "~/composables/servers/contentType.ts";
+import type { Server } from "~/composables/servers/contentType.ts";
 
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;

@@ -63,8 +63,8 @@
   </div>
   <div
     v-else-if="
-      server.general?.error?.error.statusCode === 403 ||
-      server.general?.error?.error.statusCode === 404
+      server.moduleErrors?.general?.error.statusCode === 403 ||
+      server.moduleErrors?.general?.error.statusCode === 404
     "
     class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
   >
@@ -81,7 +81,7 @@
           is an error, please contact Modrinth Support.
         </p>
       </div>
-      <UiCopyCode :text="JSON.stringify(server.general?.error)" />
+      <UiCopyCode :text="JSON.stringify(server.moduleErrors?.general?.error)" />
 
       <ButtonStyled size="large" color="brand" @click="() => router.push('/servers/manage')">
         <button class="mt-6 !w-full">Go back to all servers</button>
@@ -89,7 +89,7 @@
     </div>
   </div>
   <div
-    v-else-if="server.general?.error?.error.statusCode === 503"
+    v-else-if="server.moduleErrors?.general?.error.statusCode === 503"
     class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
   >
     <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -141,7 +141,7 @@
     </div>
   </div>
   <div
-    v-else-if="server.general?.error"
+    v-else-if="server.moduleErrors?.general?.error"
     class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
   >
     <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -162,7 +162,7 @@
           temporary network issue. You'll be reconnected automatically.
         </p>
       </div>
-      <UiCopyCode :text="JSON.stringify(server.general?.error)" />
+      <UiCopyCode :text="JSON.stringify(server.moduleErrors?.general?.error)" />
       <ButtonStyled
         :disabled="formattedTime !== '00'"
         size="large"
@@ -252,7 +252,7 @@
         </h2>
 
         <ServerInstallation
-          :server="server"
+          :server="server as PyroServer"
           :backup-in-progress="backupInProgress"
           ignore-current-installation
           @reinstall="onReinstall"
@@ -419,7 +419,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch, type Reactive } from "vue";
 import {
   SettingsIcon,
   CopyIcon,
@@ -436,11 +436,18 @@ import { ButtonStyled, ServerNotice } from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
 import { reloadNuxtApp, navigateTo } from "#app";
 import type { MessageDescriptor } from "@vintl/vintl";
-import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "@modrinth/utils";
+import type {
+  ServerState,
+  Stats,
+  WSEvent,
+  WSInstallationResultEvent,
+  Backup,
+  PowerAction,
+} from "@modrinth/utils";
 import { usePyroConsole } from "~/store/console.ts";
-import { pyroFetch } from "~/composables/servers/pyro-fetch.ts";
+import { usePyroFetch } from "~/composables/servers/pyro-fetch.ts";
+import { PyroServer, usePyroServer } from "~/composables/servers/pyro-servers.ts";
 import ServerInstallation from "~/components/ui/servers/ServerInstallation.vue";
-import type { Backup } from "@modrinth/utils";
 
 const app = useNuxtApp() as unknown as { $notify: any };
 
@@ -467,19 +474,19 @@ const route = useNativeRoute();
 const router = useRouter();
 const serverId = route.params.id as string;
 
-const server = await usePyroServer(serverId, ["general", "ws"]);
+const server: Reactive<PyroServer> = await usePyroServer(serverId, ["general", "ws"]);
 
 const loadModulesPromise = Promise.resolve().then(() => {
   if (server.general?.status === "suspended") {
     return;
   }
-  return server.loadModules(["content", "backups", "network", "startup", "fs"]);
+  return server.refresh(["content", "backups", "network", "startup", "fs"]);
 });
 
 provide("modulesLoaded", loadModulesPromise);
 
 watch(
-  () => [server.general?.error, server.ws?.error],
+  () => [server.moduleErrors?.general, server.moduleErrors?.ws],
   ([generalError, wsError]) => {
     if (server.general?.status === "suspended") return;
 
@@ -1021,11 +1028,11 @@ const toAdverb = (word: string) => {
   return word + "ing";
 };
 
-const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") => {
+const sendPowerAction = async (action: PowerAction) => {
   const actionName = action.charAt(0).toUpperCase() + action.slice(1);
   try {
     isActioning.value = true;
-    await server.general?.power(actionName);
+    await server.general?.power(action);
   } catch (error) {
     console.error(`Error ${toAdverb(actionName)} server:`, error);
     notifyError(
@@ -1158,7 +1165,7 @@ const cleanup = () => {
 };
 
 async function dismissNotice(noticeId: number) {
-  await pyroFetch(`servers/${serverId}/notices/${noticeId}/dismiss`, {
+  await usePyroFetch(`servers/${serverId}/notices/${noticeId}/dismiss`, {
     method: "POST",
   }).catch((err) => {
     app.$notify({
@@ -1177,8 +1184,8 @@ onMounted(() => {
     isLoading.value = false;
     return;
   }
-  if (server.error) {
-    if (!server.error.message.includes("Forbidden")) {
+  if (server.moduleErrors.general?.error) {
+    if (!server.moduleErrors.general?.error?.message?.includes("Forbidden")) {
       startPolling();
     }
   } else {

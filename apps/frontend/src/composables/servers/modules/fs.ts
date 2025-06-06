@@ -1,12 +1,13 @@
-import { PyroServerError } from "@modrinth/utils";
-import { pyroFetch } from "../pyro-fetch.ts";
-import { ServerModule } from "./base";
 import type {
+  FileUploadQuery,
   JWTAuth,
   DirectoryResponse,
   FilesystemOp,
-  FSQueuedOp
+  FSQueuedOp,
 } from "@modrinth/utils";
+import { PyroServerError } from "@modrinth/utils";
+import { usePyroFetch } from "../pyro-fetch.ts";
+import { ServerModule } from "./base.ts";
 
 export class FSModule extends ServerModule {
   auth!: JWTAuth;
@@ -15,7 +16,7 @@ export class FSModule extends ServerModule {
   opsQueuedForModification: string[] = [];
 
   async fetch(): Promise<void> {
-    this.auth = await pyroFetch<JWTAuth>(`servers/${this.serverId}/fs`, {}, "fs");
+    this.auth = await usePyroFetch<JWTAuth>(`servers/${this.serverId}/fs`, {}, "fs");
     this.ops = [];
     this.queuedOps = [];
     this.opsQueuedForModification = [];
@@ -33,20 +34,20 @@ export class FSModule extends ServerModule {
     }
   }
 
-  async listDirContents(path: string, page: number, pageSize: number): Promise<DirectoryResponse> {
+  listDirContents(path: string, page: number, pageSize: number): Promise<DirectoryResponse> {
     return this.retryWithAuth(async () => {
       const encodedPath = encodeURIComponent(path);
-      return await pyroFetch(`/list?path=${encodedPath}&page=${page}&page_size=${pageSize}`, {
+      return await usePyroFetch(`/list?path=${encodedPath}&page=${page}&page_size=${pageSize}`, {
         override: this.auth,
         retry: false,
       });
     });
   }
 
-  async createFileOrFolder(path: string, type: "file" | "directory"): Promise<void> {
+  createFileOrFolder(path: string, type: "file" | "directory"): Promise<void> {
     return this.retryWithAuth(async () => {
       const encodedPath = encodeURIComponent(path);
-      await pyroFetch(`/create?path=${encodedPath}&type=${type}`, {
+      await usePyroFetch(`/create?path=${encodedPath}&type=${type}`, {
         method: "POST",
         contentType: "application/octet-stream",
         override: this.auth,
@@ -54,61 +55,61 @@ export class FSModule extends ServerModule {
     });
   }
 
-  async uploadFile(path: string, file: File): Promise<any> {
-    return this.retryWithAuth(async () => {
-      const encodedPath = encodeURIComponent(path);
-      const progressSubject = new EventTarget();
-      const abortController = new AbortController();
+  uploadFile(path: string, file: File): FileUploadQuery {
+    const encodedPath = encodeURIComponent(path);
+    const progressSubject = new EventTarget();
+    const abortController = new AbortController();
 
-      const uploadPromise = new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
+    const uploadPromise = new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
 
-        xhr.upload.addEventListener("progress", (e) => {
-          if (e.lengthComputable) {
-            const progress = (e.loaded / e.total) * 100;
-            progressSubject.dispatchEvent(
-              new CustomEvent("progress", {
-                detail: { loaded: e.loaded, total: e.total, progress },
-              }),
-            );
-          }
-        });
-
-        xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            resolve(xhr.response);
-          } else {
-            reject(new Error(`Upload failed with status ${xhr.status}`));
-          }
-        };
-
-        xhr.onerror = () => reject(new Error("Upload failed"));
-        xhr.onabort = () => reject(new Error("Upload cancelled"));
-
-        xhr.open("POST", `https://${this.auth.url}/create?path=${encodedPath}&type=file`);
-        xhr.setRequestHeader("Authorization", `Bearer ${this.auth.token}`);
-        xhr.setRequestHeader("Content-Type", "application/octet-stream");
-        xhr.send(file);
-
-        abortController.signal.addEventListener("abort", () => xhr.abort());
+      xhr.upload.addEventListener("progress", (e) => {
+        if (e.lengthComputable) {
+          const progress = (e.loaded / e.total) * 100;
+          progressSubject.dispatchEvent(
+            new CustomEvent("progress", {
+              detail: { loaded: e.loaded, total: e.total, progress },
+            }),
+          );
+        }
       });
 
-      return {
-        promise: uploadPromise,
-        onProgress: (callback: (progress: { loaded: number; total: number; progress: number }) => void) => {
-          progressSubject.addEventListener("progress", ((e: CustomEvent) => {
-            callback(e.detail);
-          }) as EventListener);
-        },
-        cancel: () => abortController.abort(),
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(xhr.response);
+        } else {
+          reject(new Error(`Upload failed with status ${xhr.status}`));
+        }
       };
+
+      xhr.onerror = () => reject(new Error("Upload failed"));
+      xhr.onabort = () => reject(new Error("Upload cancelled"));
+
+      xhr.open("POST", `https://${this.auth.url}/create?path=${encodedPath}&type=file`);
+      xhr.setRequestHeader("Authorization", `Bearer ${this.auth.token}`);
+      xhr.setRequestHeader("Content-Type", "application/octet-stream");
+      xhr.send(file);
+
+      abortController.signal.addEventListener("abort", () => xhr.abort());
     });
+
+    return {
+      promise: uploadPromise,
+      onProgress: (
+        callback: (progress: { loaded: number; total: number; progress: number }) => void,
+      ) => {
+        progressSubject.addEventListener("progress", ((e: CustomEvent) => {
+          callback(e.detail);
+        }) as EventListener);
+      },
+      cancel: () => abortController.abort(),
+    } as FileUploadQuery;
   }
 
-  async renameFileOrFolder(path: string, name: string): Promise<void> {
+  renameFileOrFolder(path: string, name: string): Promise<void> {
     const pathName = path.split("/").slice(0, -1).join("/") + "/" + name;
     return this.retryWithAuth(async () => {
-      await pyroFetch(`/move`, {
+      await usePyroFetch(`/move`, {
         method: "POST",
         override: this.auth,
         body: { source: path, destination: pathName },
@@ -116,10 +117,10 @@ export class FSModule extends ServerModule {
     });
   }
 
-  async updateFile(path: string, content: string): Promise<void> {
+  updateFile(path: string, content: string): Promise<void> {
     const octetStream = new Blob([content], { type: "application/octet-stream" });
     return this.retryWithAuth(async () => {
-      await pyroFetch(`/update?path=${path}`, {
+      await usePyroFetch(`/update?path=${path}`, {
         method: "PUT",
         contentType: "application/octet-stream",
         body: octetStream,
@@ -128,10 +129,10 @@ export class FSModule extends ServerModule {
     });
   }
 
-  async moveFileOrFolder(path: string, newPath: string): Promise<void> {
+  moveFileOrFolder(path: string, newPath: string): Promise<void> {
     return this.retryWithAuth(async () => {
       await this.server.createMissingFolders(newPath.substring(0, newPath.lastIndexOf("/")));
-      await pyroFetch(`/move`, {
+      await usePyroFetch(`/move`, {
         method: "POST",
         override: this.auth,
         body: { source: path, destination: newPath },
@@ -139,20 +140,20 @@ export class FSModule extends ServerModule {
     });
   }
 
-  async deleteFileOrFolder(path: string, recursive: boolean): Promise<void> {
+  deleteFileOrFolder(path: string, recursive: boolean): Promise<void> {
     const encodedPath = encodeURIComponent(path);
     return this.retryWithAuth(async () => {
-      await pyroFetch(`/delete?path=${encodedPath}&recursive=${recursive}`, {
+      await usePyroFetch(`/delete?path=${encodedPath}&recursive=${recursive}`, {
         method: "DELETE",
         override: this.auth,
       });
     });
   }
 
-  async downloadFile(path: string, raw?: boolean): Promise<any> {
+  downloadFile(path: string, raw?: boolean): Promise<any> {
     return this.retryWithAuth(async () => {
       const encodedPath = encodeURIComponent(path);
-      const fileData = await pyroFetch(`/download?path=${encodedPath}`, {
+      const fileData = await usePyroFetch(`/download?path=${encodedPath}`, {
         override: this.auth,
       });
 
@@ -163,7 +164,12 @@ export class FSModule extends ServerModule {
     });
   }
 
-  async extractFile(path: string, override = true, dry = false, silentQueue = false): Promise<{ modpack_name: string | null; conflicting_files: string[] }> {
+  extractFile(
+    path: string,
+    override = true,
+    dry = false,
+    silentQueue = false,
+  ): Promise<{ modpack_name: string | null; conflicting_files: string[] }> {
     return this.retryWithAuth(async () => {
       const encodedPath = encodeURIComponent(path);
 
@@ -173,11 +179,16 @@ export class FSModule extends ServerModule {
       }
 
       try {
-        return await pyroFetch(`/unarchive?src=${encodedPath}&trg=/&override=${override}&dry=${dry}`, {
-          method: "POST",
-          override: this.auth,
-          version: 1,
-        }, undefined, "Error extracting file");
+        return await usePyroFetch(
+          `/unarchive?src=${encodedPath}&trg=/&override=${override}&dry=${dry}`,
+          {
+            method: "POST",
+            override: this.auth,
+            version: 1,
+          },
+          undefined,
+          "Error extracting file",
+        );
       } catch (err) {
         this.removeQueuedOp("unarchive", path);
         throw err;
@@ -185,13 +196,18 @@ export class FSModule extends ServerModule {
     });
   }
 
-  async modifyOp(id: string, action: "dismiss" | "cancel"): Promise<void> {
+  modifyOp(id: string, action: "dismiss" | "cancel"): Promise<void> {
     return this.retryWithAuth(async () => {
-      await pyroFetch(`/ops/${action}?id=${id}`, {
-        method: "POST",
-        override: this.auth,
-        version: 1,
-      }, undefined, `Error ${action === "dismiss" ? "dismissing" : "cancelling"} filesystem operation`);
+      await usePyroFetch(
+        `/ops/${action}?id=${id}`,
+        {
+          method: "POST",
+          override: this.auth,
+          version: 1,
+        },
+        undefined,
+        `Error ${action === "dismiss" ? "dismissing" : "cancelling"} filesystem operation`,
+      );
 
       this.opsQueuedForModification = this.opsQueuedForModification.filter((x: string) => x !== id);
       this.ops = this.ops.filter((x: FilesystemOp) => x.id !== id);

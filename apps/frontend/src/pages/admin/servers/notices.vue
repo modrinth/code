@@ -275,7 +275,7 @@ import { useVIntl } from "@vintl/vintl";
 import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
 import { computed } from "vue";
 import { NOTICE_LEVELS } from "@modrinth/ui/src/utils/notices.ts";
-import { pyroFetch } from "~/composables/servers/pyro-fetch.ts";
+import { usePyroFetch } from "~/composables/servers/pyro-fetch.ts";
 import AssignNoticeModal from "~/components/ui/servers/notice/AssignNoticeModal.vue";
 
 const { formatMessage } = useVIntl();
@@ -290,7 +290,7 @@ const assignNoticeModal = ref<InstanceType<typeof AssignNoticeModal>>();
 await refreshNotices();
 
 async function refreshNotices() {
-  await pyroFetch("notices").then((res) => {
+  await usePyroFetch("notices").then((res) => {
     notices.value = res as ServerNoticeType[];
     notices.value.sort((a, b) => {
       const dateDiff = dayjs(b.announce_at).diff(dayjs(a.announce_at));
@@ -347,7 +347,7 @@ function startEditing(notice: ServerNoticeType, assignments: boolean = false) {
 }
 
 async function deleteNotice(notice: ServerNoticeType) {
-  await pyroFetch(`notices/${notice.id}`, {
+  await usePyroFetch(`notices/${notice.id}`, {
     method: "DELETE",
   })
     .then(() => {
@@ -401,7 +401,7 @@ async function saveChanges() {
     return;
   }
 
-  await pyroFetch(`notices/${editingNotice.value?.id}`, {
+  await usePyroFetch(`notices/${editingNotice.value?.id}`, {
     method: "PATCH",
     body: {
       message: newNoticeMessage.value,
@@ -432,7 +432,7 @@ async function createNotice() {
     return;
   }
 
-  await pyroFetch("notices", {
+  await usePyroFetch("notices", {
     method: "POST",
     body: {
       message: newNoticeMessage.value,

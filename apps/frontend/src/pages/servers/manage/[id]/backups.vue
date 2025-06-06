@@ -158,7 +158,7 @@ import BackupCreateModal from "~/components/ui/servers/BackupCreateModal.vue";
 import BackupRestoreModal from "~/components/ui/servers/BackupRestoreModal.vue";
 import BackupDeleteModal from "~/components/ui/servers/BackupDeleteModal.vue";
 import BackupSettingsModal from "~/components/ui/servers/BackupSettingsModal.vue";
-import type {Server} from "~/composables/servers/contentType.ts";
+import type { Server } from "~/composables/servers/contentType.ts";
 
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;

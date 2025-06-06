@@ -118,7 +118,7 @@
 import { ButtonStyled } from "@modrinth/ui";
 import { CopyIcon, ExternalIcon, EyeIcon, EyeOffIcon } from "@modrinth/assets";
 
-import type {Server} from "~/composables/servers/contentType.ts";
+import type { Server } from "~/composables/servers/contentType.ts";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;

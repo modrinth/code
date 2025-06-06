@@ -82,6 +82,7 @@
 <script setup lang="ts">
 import { ChevronRightIcon, LockIcon, SparklesIcon } from "@modrinth/assets";
 import type { Project, Server } from "@modrinth/utils";
+import { usePyroServer } from "~/composables/servers/pyro-servers.ts";
 
 const props = defineProps<Partial<Server>>();
 

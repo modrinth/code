@@ -20,7 +20,7 @@
 import { ref } from "vue";
 import { ConfirmModal, NewModal } from "@modrinth/ui";
 import BackupItem from "~/components/ui/servers/BackupItem.vue";
-import { PyroServer } from "~/composables/servers/pyro-servers.ts"
+import { PyroServer } from "~/composables/servers/pyro-servers.ts";
 
 const props = defineProps<{
   server: PyroServer;

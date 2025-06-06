@@ -1,5 +1,5 @@
-import { FetchError } from "ofetch";
-import { V1ErrorInfo } from "../types";
+import { FetchError } from 'ofetch'
+import { V1ErrorInfo } from '../types'
 
 export class PyroServerError extends Error {
   constructor(
@@ -9,51 +9,51 @@ export class PyroServerError extends Error {
     public readonly module?: string,
     public readonly v1Error?: V1ErrorInfo,
   ) {
-    let errorMessage = message;
-    let method = "GET";
-    let path = "";
+    let errorMessage = message
+    let method = 'GET'
+    let path = ''
 
     if (originalError instanceof FetchError) {
-      const matches = message.match(/\[([A-Z]+)\]\s+"([^"]+)":/);
+      const matches = message.match(/\[([A-Z]+)\]\s+"([^"]+)":/)
       if (matches) {
-        method = matches[1];
-        path = matches[2].replace(/https?:\/\/[^/]+\/[^/]+\/v\d+\//, "");
+        method = matches[1]
+        path = matches[2].replace(/https?:\/\/[^/]+\/[^/]+\/v\d+\//, '')
       }
 
       const statusMessage = (() => {
-        if (!statusCode) return "Unknown Error";
+        if (!statusCode) return 'Unknown Error'
         switch (statusCode) {
           case 400:
-            return "Bad Request";
+            return 'Bad Request'
           case 401:
-            return "Unauthorized";
+            return 'Unauthorized'
           case 403:
-            return "Forbidden";
+            return 'Forbidden'
           case 404:
-            return "Not Found";
+            return 'Not Found'
           case 408:
-            return "Request Timeout";
+            return 'Request Timeout'
           case 429:
-            return "Too Many Requests";
+            return 'Too Many Requests'
           case 500:
-            return "Internal Server Error";
+            return 'Internal Server Error'
           case 502:
-            return "Bad Gateway";
+            return 'Bad Gateway'
           case 503:
-            return "Service Unavailable";
+            return 'Service Unavailable'
           case 504:
-            return "Gateway Timeout";
+            return 'Gateway Timeout'
           default:
-            return `HTTP ${statusCode}`;
+            return `HTTP ${statusCode}`
         }
-      })();
+      })()
 
-      errorMessage = `[${method}] ${statusMessage} (${statusCode}) while fetching ${path}${module ? ` in ${module}` : ""}`;
+      errorMessage = `[${method}] ${statusMessage} (${statusCode}) while fetching ${path}${module ? ` in ${module}` : ''}`
     } else {
-      errorMessage = `${message}${statusCode ? ` (${statusCode})` : ""}${module ? ` in ${module}` : ""}`;
+      errorMessage = `${message}${statusCode ? ` (${statusCode})` : ''}${module ? ` in ${module}` : ''}`
     }
 
-    super(errorMessage);
-    this.name = "PyroServersFetchError";
+    super(errorMessage)
+    this.name = 'PyroServersFetchError'
   }
 }

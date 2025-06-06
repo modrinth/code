@@ -44,7 +44,7 @@
 <script setup lang="ts">
 import { useStorage } from "@vueuse/core";
 
-import type {Server} from "~/composables/servers/contentType.ts";
+import type { Server } from "~/composables/servers/contentType.ts";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;

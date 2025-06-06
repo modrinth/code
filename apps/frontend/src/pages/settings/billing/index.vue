@@ -592,6 +592,7 @@ import {
 } from "@modrinth/assets";
 import { calculateSavings, formatPrice, getCurrency } from "@modrinth/utils";
 import { ref, computed } from "vue";
+import { usePyroFetch } from "~/composables/servers/pyro-fetch.ts";
 import { products } from "~/generated/state.json";
 
 definePageMeta({

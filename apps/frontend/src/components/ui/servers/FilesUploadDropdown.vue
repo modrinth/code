@@ -99,7 +99,7 @@
 import { FolderOpenIcon, CheckCircleIcon, XCircleIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 import { ref, computed, watch, nextTick } from "vue";
-import { FSModule } from "~/composables/servers/modules"
+import { FSModule } from "~/composables/servers/modules";
 
 interface UploadItem {
   file: File;

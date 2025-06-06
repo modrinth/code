@@ -1,16 +1,16 @@
-import { pyroFetch } from "../pyro-fetch.ts";
-import { ServerModule } from "./base";
 import type { Backup, AutoBackupSettings } from "@modrinth/utils";
+import { usePyroFetch } from "../pyro-fetch.ts";
+import { ServerModule } from "./base.ts";
 
 export class BackupsModule extends ServerModule {
   data: Backup[] = [];
 
   async fetch(): Promise<void> {
-    this.data = await pyroFetch<Backup[]>(`servers/${this.serverId}/backups`, {}, "backups");
+    this.data = await usePyroFetch<Backup[]>(`servers/${this.serverId}/backups`, {}, "backups");
   }
 
   async create(backupName: string): Promise<string> {
-    const response = await pyroFetch<{ id: string }>(`servers/${this.serverId}/backups`, {
+    const response = await usePyroFetch<{ id: string }>(`servers/${this.serverId}/backups`, {
       method: "POST",
       body: { name: backupName },
     });
@@ -19,7 +19,7 @@ export class BackupsModule extends ServerModule {
   }
 
   async rename(backupId: string, newName: string): Promise<void> {
-    await pyroFetch(`servers/${this.serverId}/backups/${backupId}/rename`, {
+    await usePyroFetch(`servers/${this.serverId}/backups/${backupId}/rename`, {
       method: "POST",
       body: { name: newName },
     });
@@ -27,53 +27,53 @@ export class BackupsModule extends ServerModule {
   }
 
   async delete(backupId: string): Promise<void> {
-    await pyroFetch(`servers/${this.serverId}/backups/${backupId}`, {
+    await usePyroFetch(`servers/${this.serverId}/backups/${backupId}`, {
       method: "DELETE",
     });
     await this.fetch(); // Refresh this module
   }
 
   async restore(backupId: string): Promise<void> {
-    await pyroFetch(`servers/${this.serverId}/backups/${backupId}/restore`, {
+    await usePyroFetch(`servers/${this.serverId}/backups/${backupId}/restore`, {
       method: "POST",
     });
     await this.fetch(); // Refresh this module
   }
 
   async prepare(backupId: string): Promise<void> {
-    await pyroFetch(`servers/${this.serverId}/backups/${backupId}/prepare-download`, {
+    await usePyroFetch(`servers/${this.serverId}/backups/${backupId}/prepare-download`, {
       method: "POST",
     });
   }
 
   async lock(backupId: string): Promise<void> {
-    await pyroFetch(`servers/${this.serverId}/backups/${backupId}/lock`, {
+    await usePyroFetch(`servers/${this.serverId}/backups/${backupId}/lock`, {
       method: "POST",
     });
     await this.fetch(); // Refresh this module
   }
 
   async unlock(backupId: string): Promise<void> {
-    await pyroFetch(`servers/${this.serverId}/backups/${backupId}/unlock`, {
+    await usePyroFetch(`servers/${this.serverId}/backups/${backupId}/unlock`, {
       method: "POST",
     });
     await this.fetch(); // Refresh this module
   }
 
   async retry(backupId: string): Promise<void> {
-    await pyroFetch(`servers/${this.serverId}/backups/${backupId}/retry`, {
+    await usePyroFetch(`servers/${this.serverId}/backups/${backupId}/retry`, {
       method: "POST",
     });
   }
 
   async updateAutoBackup(autoBackup: "enable" | "disable", interval: number): Promise<void> {
-    await pyroFetch(`servers/${this.serverId}/autobackup`, {
+    await usePyroFetch(`servers/${this.serverId}/autobackup`, {
       method: "POST",
       body: { set: autoBackup, interval },
     });
   }
 
   async getAutoBackup(): Promise<AutoBackupSettings> {
-    return await pyroFetch(`servers/${this.serverId}/autobackup`);
+    return await usePyroFetch(`servers/${this.serverId}/autobackup`);
   }
 }
