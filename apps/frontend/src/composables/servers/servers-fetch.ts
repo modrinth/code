@@ -26,7 +26,10 @@ export async function useServersFetch<T>(
   const authToken = auth.value?.token;
 
   if (!authToken && !options.bypassAuth) {
-    const error = new ModrinthServersFetchError("[Modrinth Servers] Cannot fetch without auth", 10000);
+    const error = new ModrinthServersFetchError(
+      "[Modrinth Servers] Cannot fetch without auth",
+      10000,
+    );
     throw new ModrinthServerError("Missing auth token", 401, error, module);
   }
 
