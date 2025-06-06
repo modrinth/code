@@ -252,7 +252,7 @@
         </h2>
 
         <ServerInstallation
-          :server="server as PyroServer"
+          :server="server as ModrinthServer"
           :backup-in-progress="backupInProgress"
           ignore-current-installation
           @reinstall="onReinstall"
@@ -445,8 +445,8 @@ import type {
   PowerAction,
 } from "@modrinth/utils";
 import { usePyroConsole } from "~/store/console.ts";
-import { usePyroFetch } from "~/composables/servers/pyro-fetch.ts";
-import { PyroServer, usePyroServer } from "~/composables/servers/pyro-servers.ts";
+import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
+import { ModrinthServer, useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
 import ServerInstallation from "~/components/ui/servers/ServerInstallation.vue";
 
 const app = useNuxtApp() as unknown as { $notify: any };
@@ -474,7 +474,7 @@ const route = useNativeRoute();
 const router = useRouter();
 const serverId = route.params.id as string;
 
-const server: Reactive<PyroServer> = await usePyroServer(serverId, ["general", "ws"]);
+const server: Reactive<ModrinthServer> = await useModrinthServers(serverId, ["general", "ws"]);
 
 const loadModulesPromise = Promise.resolve().then(() => {
   if (server.general?.status === "suspended") {
@@ -1165,7 +1165,7 @@ const cleanup = () => {
 };
 
 async function dismissNotice(noticeId: number) {
-  await usePyroFetch(`servers/${serverId}/notices/${noticeId}/dismiss`, {
+  await useServersFetch(`servers/${serverId}/notices/${noticeId}/dismiss`, {
     method: "POST",
   }).catch((err) => {
     app.$notify({

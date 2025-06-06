@@ -1,4 +1,4 @@
-export class PyroMultipleErrors extends Error {
+export class ModrinthServersMultiError extends Error {
   public readonly errors: Map<string, Error> = new Map()
   public readonly timestamp: number = Date.now()
 

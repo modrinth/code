@@ -1,8 +1,8 @@
 import { $fetch, FetchError } from "ofetch";
-import { PyroServerError, PyroFetchError } from "@modrinth/utils";
+import { ModrinthServerError, ModrinthServersFetchError } from "@modrinth/utils";
 import type { V1ErrorInfo } from "@modrinth/utils";
 
-export interface PyroFetchOptions {
+export interface ServersFetchOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   contentType?: string;
   body?: Record<string, any>;
@@ -15,9 +15,9 @@ export interface PyroFetchOptions {
   bypassAuth?: boolean;
 }
 
-export async function usePyroFetch<T>(
+export async function useServersFetch<T>(
   path: string,
-  options: PyroFetchOptions = {},
+  options: ServersFetchOptions = {},
   module?: string,
   errorContext?: string,
 ): Promise<T> {
@@ -26,8 +26,8 @@ export async function usePyroFetch<T>(
   const authToken = auth.value?.token;
 
   if (!authToken && !options.bypassAuth) {
-    const error = new PyroFetchError("Cannot pyrofetch without auth", 10000);
-    throw new PyroServerError("Missing auth token", 401, error, module);
+    const error = new ModrinthServersFetchError("Cannot pyrofetch without auth", 10000);
+    throw new ModrinthServerError("Missing auth token", 401, error, module);
   }
 
   const {
@@ -45,11 +45,11 @@ export async function usePyroFetch<T>(
   );
 
   if (!base) {
-    const error = new PyroFetchError(
+    const error = new ModrinthServersFetchError(
       "Cannot pyrofetch without base url. Make sure to set a PYRO_BASE_URL in environment variables",
       10001,
     );
-    throw new PyroServerError("Configuration error: Missing PYRO_BASE_URL", 500, error, module);
+    throw new ModrinthServerError("Configuration error: Missing PYRO_BASE_URL", 500, error, module);
   }
 
   const versionString = `v${version}`;
@@ -136,8 +136,12 @@ export async function usePyroFetch<T>(
         if (!isRetryable || attempts >= maxAttempts) {
           console.error("Fetch error:", error);
 
-          const pyroError = new PyroFetchError(`[PYROFETCH][PYRO] ${message}`, statusCode, error);
-          throw new PyroServerError(error.message, statusCode, pyroError, module, v1Error);
+          const pyroError = new ModrinthServersFetchError(
+            `[PYROFETCH][PYRO] ${message}`,
+            statusCode,
+            error,
+          );
+          throw new ModrinthServerError(error.message, statusCode, pyroError, module, v1Error);
         }
 
         const delay = Math.min(1000 * Math.pow(2, attempts - 1) + Math.random() * 1000, 10000);
@@ -147,12 +151,12 @@ export async function usePyroFetch<T>(
       }
 
       console.error("Unexpected fetch error:", error);
-      const pyroError = new PyroFetchError(
+      const pyroError = new ModrinthServersFetchError(
         "[PYROFETCH][PYRO] An unexpected error occurred during the fetch operation.",
         undefined,
         error as Error,
       );
-      throw new PyroServerError(
+      throw new ModrinthServerError(
         "Unexpected error during fetch operation",
         undefined,
         pyroError,
@@ -164,14 +168,18 @@ export async function usePyroFetch<T>(
   console.error("All retry attempts failed:", lastError);
   if (lastError instanceof FetchError) {
     const statusCode = lastError.response?.status;
-    const pyroError = new PyroFetchError("Maximum retry attempts reached", statusCode, lastError);
-    throw new PyroServerError("Maximum retry attempts reached", statusCode, pyroError, module);
+    const pyroError = new ModrinthServersFetchError(
+      "Maximum retry attempts reached",
+      statusCode,
+      lastError,
+    );
+    throw new ModrinthServerError("Maximum retry attempts reached", statusCode, pyroError, module);
   }
 
-  const pyroError = new PyroFetchError(
+  const pyroError = new ModrinthServersFetchError(
     "Maximum retry attempts reached",
     undefined,
     lastError || undefined,
   );
-  throw new PyroServerError("Maximum retry attempts reached", undefined, pyroError, module);
+  throw new ModrinthServerError("Maximum retry attempts reached", undefined, pyroError, module);
 }

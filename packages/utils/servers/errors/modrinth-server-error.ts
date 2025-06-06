@@ -1,7 +1,7 @@
 import { FetchError } from 'ofetch'
 import { V1ErrorInfo } from '../types'
 
-export class PyroServerError extends Error {
+export class ModrinthServerError extends Error {
   constructor(
     message: string,
     public readonly statusCode?: number,

@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import { ButtonStyled } from "@modrinth/ui";
-import { PyroServer } from "~/composables/servers/pyro-servers.ts";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
   isUpdating: boolean;
@@ -39,7 +39,7 @@ const props = defineProps<{
   save: () => void;
   reset: () => void;
   isVisible: boolean;
-  server: PyroServer;
+  server: ModrinthServer;
 }>();
 
 const saveAndRestart = async () => {

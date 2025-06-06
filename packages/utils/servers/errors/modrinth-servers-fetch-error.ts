@@ -1,4 +1,4 @@
-export class PyroFetchError extends Error {
+export class ModrinthServersFetchError extends Error {
   constructor(
     message: string,
     public statusCode?: number,

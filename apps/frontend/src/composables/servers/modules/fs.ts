@@ -5,8 +5,8 @@ import type {
   FilesystemOp,
   FSQueuedOp,
 } from "@modrinth/utils";
-import { PyroServerError } from "@modrinth/utils";
-import { usePyroFetch } from "../pyro-fetch.ts";
+import { ModrinthServerError } from "@modrinth/utils";
+import { useServersFetch } from "../servers-fetch.ts";
 import { ServerModule } from "./base.ts";
 
 export class FSModule extends ServerModule {
@@ -16,7 +16,7 @@ export class FSModule extends ServerModule {
   opsQueuedForModification: string[] = [];
 
   async fetch(): Promise<void> {
-    this.auth = await usePyroFetch<JWTAuth>(`servers/${this.serverId}/fs`, {}, "fs");
+    this.auth = await useServersFetch<JWTAuth>(`servers/${this.serverId}/fs`, {}, "fs");
     this.ops = [];
     this.queuedOps = [];
     this.opsQueuedForModification = [];
@@ -26,7 +26,7 @@ export class FSModule extends ServerModule {
     try {
       return await requestFn();
     } catch (error) {
-      if (error instanceof PyroServerError && error.statusCode === 401) {
+      if (error instanceof ModrinthServerError && error.statusCode === 401) {
         await this.fetch(); // Refresh auth
         return await requestFn();
       }
@@ -37,7 +37,7 @@ export class FSModule extends ServerModule {
   listDirContents(path: string, page: number, pageSize: number): Promise<DirectoryResponse> {
     return this.retryWithAuth(async () => {
       const encodedPath = encodeURIComponent(path);
-      return await usePyroFetch(`/list?path=${encodedPath}&page=${page}&page_size=${pageSize}`, {
+      return await useServersFetch(`/list?path=${encodedPath}&page=${page}&page_size=${pageSize}`, {
         override: this.auth,
         retry: false,
       });
@@ -47,7 +47,7 @@ export class FSModule extends ServerModule {
   createFileOrFolder(path: string, type: "file" | "directory"): Promise<void> {
     return this.retryWithAuth(async () => {
       const encodedPath = encodeURIComponent(path);
-      await usePyroFetch(`/create?path=${encodedPath}&type=${type}`, {
+      await useServersFetch(`/create?path=${encodedPath}&type=${type}`, {
         method: "POST",
         contentType: "application/octet-stream",
         override: this.auth,
@@ -109,7 +109,7 @@ export class FSModule extends ServerModule {
   renameFileOrFolder(path: string, name: string): Promise<void> {
     const pathName = path.split("/").slice(0, -1).join("/") + "/" + name;
     return this.retryWithAuth(async () => {
-      await usePyroFetch(`/move`, {
+      await useServersFetch(`/move`, {
         method: "POST",
         override: this.auth,
         body: { source: path, destination: pathName },
@@ -120,7 +120,7 @@ export class FSModule extends ServerModule {
   updateFile(path: string, content: string): Promise<void> {
     const octetStream = new Blob([content], { type: "application/octet-stream" });
     return this.retryWithAuth(async () => {
-      await usePyroFetch(`/update?path=${path}`, {
+      await useServersFetch(`/update?path=${path}`, {
         method: "PUT",
         contentType: "application/octet-stream",
         body: octetStream,
@@ -132,7 +132,7 @@ export class FSModule extends ServerModule {
   moveFileOrFolder(path: string, newPath: string): Promise<void> {
     return this.retryWithAuth(async () => {
       await this.server.createMissingFolders(newPath.substring(0, newPath.lastIndexOf("/")));
-      await usePyroFetch(`/move`, {
+      await useServersFetch(`/move`, {
         method: "POST",
         override: this.auth,
         body: { source: path, destination: newPath },
@@ -143,7 +143,7 @@ export class FSModule extends ServerModule {
   deleteFileOrFolder(path: string, recursive: boolean): Promise<void> {
     const encodedPath = encodeURIComponent(path);
     return this.retryWithAuth(async () => {
-      await usePyroFetch(`/delete?path=${encodedPath}&recursive=${recursive}`, {
+      await useServersFetch(`/delete?path=${encodedPath}&recursive=${recursive}`, {
         method: "DELETE",
         override: this.auth,
       });
@@ -153,7 +153,7 @@ export class FSModule extends ServerModule {
   downloadFile(path: string, raw?: boolean): Promise<any> {
     return this.retryWithAuth(async () => {
       const encodedPath = encodeURIComponent(path);
-      const fileData = await usePyroFetch(`/download?path=${encodedPath}`, {
+      const fileData = await useServersFetch(`/download?path=${encodedPath}`, {
         override: this.auth,
       });
 
@@ -179,7 +179,7 @@ export class FSModule extends ServerModule {
       }
 
       try {
-        return await usePyroFetch(
+        return await useServersFetch(
           `/unarchive?src=${encodedPath}&trg=/&override=${override}&dry=${dry}`,
           {
             method: "POST",
@@ -198,7 +198,7 @@ export class FSModule extends ServerModule {
 
   modifyOp(id: string, action: "dismiss" | "cancel"): Promise<void> {
     return this.retryWithAuth(async () => {
-      await usePyroFetch(
+      await useServersFetch(
         `/ops/${action}?id=${id}`,
         {
           method: "POST",

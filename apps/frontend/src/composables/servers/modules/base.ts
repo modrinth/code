@@ -1,9 +1,9 @@
-import type { PyroServer } from "../pyro-servers.ts";
+import type { ModrinthServer } from "../modrinth-servers.ts";
 
 export abstract class ServerModule {
-  protected server: PyroServer;
+  protected server: ModrinthServer;
 
-  constructor(server: PyroServer) {
+  constructor(server: ModrinthServer) {
     this.server = server;
   }
 

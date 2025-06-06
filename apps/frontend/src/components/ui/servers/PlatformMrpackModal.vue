@@ -117,10 +117,10 @@
 import { BackupWarning, ButtonStyled, NewModal } from "@modrinth/ui";
 import { UploadIcon, RightArrowIcon, XIcon, ServerIcon } from "@modrinth/assets";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
-import { PyroServer } from "~/composables/servers/pyro-servers.ts";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
-  server: PyroServer;
+  server: ModrinthServer;
   backupInProgress?: BackupInProgressReason;
 }>();
 

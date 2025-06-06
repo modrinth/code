@@ -76,13 +76,13 @@
 import { ExternalIcon, SpinnerIcon, DownloadIcon, XIcon } from "@modrinth/assets";
 import { BackupWarning, ButtonStyled, NewModal } from "@modrinth/ui";
 import { ref, computed, nextTick } from "vue";
-import { handleError } from "~/composables/servers/pyro-servers.ts";
-import { PyroServer } from "~/composables/servers/pyro-servers.ts";
+import { handleError } from "~/composables/servers/modrinth-servers.ts";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const cf = ref(false);
 
 const props = defineProps<{
-  server: PyroServer;
+  server: ModrinthServer;
 }>();
 
 const modal = ref<typeof NewModal>();

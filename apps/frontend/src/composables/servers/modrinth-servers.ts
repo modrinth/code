@@ -1,6 +1,6 @@
-import { PyroServerError } from "@modrinth/utils";
+import { ModrinthServerError } from "@modrinth/utils";
 import type { JWTAuth, ModuleError, ModuleName } from "@modrinth/utils";
-import { usePyroFetch } from "./pyro-fetch.ts";
+import { useServersFetch } from "./servers-fetch.ts";
 
 import {
   GeneralModule,
@@ -13,7 +13,7 @@ import {
 } from "./modules/index.ts";
 
 export function handleError(err: any) {
-  if (err instanceof PyroServerError && err.v1Error) {
+  if (err instanceof ModrinthServerError && err.v1Error) {
     addNotification({
       title: err.v1Error?.context ?? `An error occurred`,
       type: "error",
@@ -29,7 +29,7 @@ export function handleError(err: any) {
   }
 }
 
-export class PyroServer {
+export class ModrinthServer {
   readonly serverId: string;
   private errors: Partial<Record<ModuleName, ModuleError>> = {};
 
@@ -71,7 +71,7 @@ export class PyroServer {
   }
 
   async fetchConfigFile(fileName: string): Promise<any> {
-    return await usePyroFetch(`servers/${this.serverId}/config/${fileName}`);
+    return await useServersFetch(`servers/${this.serverId}/config/${fileName}`);
   }
 
   constructServerProperties(properties: any): string {
@@ -98,9 +98,9 @@ export class PyroServer {
     }
 
     try {
-      const auth = await usePyroFetch<JWTAuth>(`servers/${this.serverId}/fs`);
+      const auth = await useServersFetch<JWTAuth>(`servers/${this.serverId}/fs`);
       try {
-        const fileData = await usePyroFetch(`/download?path=/server-icon-original.png`, {
+        const fileData = await useServersFetch(`/download?path=/server-icon-original.png`, {
           override: auth,
           retry: false,
         });
@@ -124,7 +124,7 @@ export class PyroServer {
           return dataURL;
         }
       } catch (error) {
-        if (error instanceof PyroServerError && error.statusCode === 404 && iconUrl) {
+        if (error instanceof ModrinthServerError && error.statusCode === 404 && iconUrl) {
           // Handle external icon processing
           try {
             const response = await fetch(iconUrl);
@@ -146,13 +146,13 @@ export class PyroServer {
                   canvas.toBlob(async (blob) => {
                     if (blob) {
                       const scaledFile = new File([blob], "server-icon.png", { type: "image/png" });
-                      await usePyroFetch(`/create?path=/server-icon.png&type=file`, {
+                      await useServersFetch(`/create?path=/server-icon.png&type=file`, {
                         method: "POST",
                         contentType: "application/octet-stream",
                         body: scaledFile,
                         override: auth,
                       });
-                      await usePyroFetch(`/create?path=/server-icon-original.png&type=file`, {
+                      await useServersFetch(`/create?path=/server-icon-original.png&type=file`, {
                         method: "POST",
                         contentType: "application/octet-stream",
                         body: originalFile,
@@ -241,9 +241,9 @@ export class PyroServer {
       } catch (error) {
         this.errors[module] = {
           error:
-            error instanceof PyroServerError
+            error instanceof ModrinthServerError
               ? error
-              : new PyroServerError("Unknown error", undefined, error as Error),
+              : new ModrinthServerError("Unknown error", undefined, error as Error),
           timestamp: Date.now(),
         };
       }
@@ -255,11 +255,11 @@ export class PyroServer {
   }
 }
 
-export const usePyroServer = async (
+export const useModrinthServers = async (
   serverId: string,
   includedModules: ModuleName[] = ["general"],
 ) => {
-  const server = new PyroServer(serverId);
+  const server = new ModrinthServer(serverId);
   await server.refresh(includedModules);
   return reactive(server);
 };

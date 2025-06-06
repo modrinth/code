@@ -69,10 +69,10 @@
 <script setup lang="ts">
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { DownloadIcon, XIcon } from "@modrinth/assets";
-import { PyroServer } from "~/composables/servers/pyro-servers.ts";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
-  server: PyroServer;
+  server: ModrinthServer;
   project: any;
   versions: any[];
   currentVersion?: any;

@@ -1,5 +1,5 @@
 import type { JWTAuth } from "@modrinth/utils";
-import { usePyroFetch } from "../pyro-fetch.ts";
+import { useServersFetch } from "../servers-fetch.ts";
 import { ServerModule } from "./base.ts";
 
 export class WSModule extends ServerModule implements JWTAuth {
@@ -7,7 +7,7 @@ export class WSModule extends ServerModule implements JWTAuth {
   token!: string;
 
   async fetch(): Promise<void> {
-    const data = await usePyroFetch<JWTAuth>(`servers/${this.serverId}/ws`, {}, "ws");
+    const data = await useServersFetch<JWTAuth>(`servers/${this.serverId}/ws`, {}, "ws");
     Object.assign(this, data);
   }
 }

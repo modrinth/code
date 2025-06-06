@@ -623,7 +623,7 @@ import {
   ServerIcon,
 } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
-import { usePyroFetch } from "~/composables/servers/pyro-fetch.ts";
+import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
 import ServerPlanSelector from "~/components/ui/servers/marketing/ServerPlanSelector.vue";
 import OptionGroup from "~/components/ui/OptionGroup.vue";
@@ -675,7 +675,7 @@ const outOfStockUrl = "https://discord.modrinth.com";
 const { data: hasServers } = await useAsyncData("ServerListCountCheck", async () => {
   try {
     if (!auth.value.user) return false;
-    const response = await usePyroFetch("servers");
+    const response = await useServersFetch("servers");
     return response.servers && response.servers.length > 0;
   } catch {
     return false;
@@ -683,7 +683,7 @@ const { data: hasServers } = await useAsyncData("ServerListCountCheck", async ()
 });
 
 function fetchStock(region, request) {
-  return usePyroFetch(`stock?region=${region.shortcode}`, {
+  return useServersFetch(`stock?region=${region.shortcode}`, {
     method: "POST",
     body: {
       ...request,
@@ -703,7 +703,7 @@ async function fetchCapacityStatuses(customProduct = null) {
           ),
         ];
     const capacityChecks = productsToCheck.map((product) =>
-      usePyroFetch("stock", {
+      useServersFetch("stock", {
         method: "POST",
         body: {
           cpu: product.metadata.cpu,
@@ -893,7 +893,7 @@ const regions = ref([]);
 const regionPings = ref([]);
 
 function pingRegions() {
-  usePyroFetch("regions", {
+  useServersFetch("regions", {
     method: "GET",
     version: 1,
     bypassAuth: true,

@@ -202,7 +202,7 @@ import { DropdownIcon, RightArrowIcon, ServerIcon, XIcon } from "@modrinth/asset
 import { $fetch } from "ofetch";
 import type { Loaders } from "@modrinth/utils";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
-import { PyroServer } from "~/composables/servers/pyro-servers.ts";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const { formatMessage } = useVIntl();
 
@@ -220,7 +220,7 @@ type VersionMap = Record<string, LoaderVersion[]>;
 type VersionCache = Record<string, any>;
 
 const props = defineProps<{
-  server: PyroServer;
+  server: ModrinthServer;
   currentLoader: Loaders | undefined;
   backupInProgress?: BackupInProgressReason;
   initialSetup?: boolean;
