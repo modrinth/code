@@ -26,7 +26,7 @@ export async function useServersFetch<T>(
   const authToken = auth.value?.token;
 
   if (!authToken && !options.bypassAuth) {
-    const error = new ModrinthServersFetchError("Cannot pyrofetch without auth", 10000);
+    const error = new ModrinthServersFetchError("[Modrinth Servers] Cannot fetch without auth", 10000);
     throw new ModrinthServerError("Missing auth token", 401, error, module);
   }
 
@@ -46,7 +46,7 @@ export async function useServersFetch<T>(
 
   if (!base) {
     const error = new ModrinthServersFetchError(
-      "Cannot pyrofetch without base url. Make sure to set a PYRO_BASE_URL in environment variables",
+      "[Modrinth Servers] Cannot fetch without base url. Make sure to set a PYRO_BASE_URL in environment variables",
       10001,
     );
     throw new ModrinthServerError("Configuration error: Missing PYRO_BASE_URL", 500, error, module);
@@ -65,7 +65,7 @@ export async function useServersFetch<T>(
       : `${base}/v${version}/${path.replace(/^\//, "")}`;
 
   const headers: Record<string, string> = {
-    "User-Agent": "Pyro/1.0 (https://pyro.host)",
+    "User-Agent": "Modrinth/1.0 (https://modrinth.com)",
     Vary: "Accept, Origin",
   };
 
@@ -131,17 +131,17 @@ export async function useServersFetch<T>(
             ? errorMessages[statusCode]
             : `HTTP Error: ${statusCode || "unknown"} ${statusText}`;
 
-        const isRetryable = statusCode ? [408, 429, 500, 502, 503, 504].includes(statusCode) : true;
+        const isRetryable = statusCode ? [408, 429, 500, 502, 504].includes(statusCode) : true;
 
         if (!isRetryable || attempts >= maxAttempts) {
           console.error("Fetch error:", error);
 
-          const pyroError = new ModrinthServersFetchError(
-            `[PYROFETCH][PYRO] ${message}`,
+          const fetchError = new ModrinthServersFetchError(
+            `[Modrinth Servers] ${message}`,
             statusCode,
             error,
           );
-          throw new ModrinthServerError(error.message, statusCode, pyroError, module, v1Error);
+          throw new ModrinthServerError(error.message, statusCode, fetchError, module, v1Error);
         }
 
         const delay = Math.min(1000 * Math.pow(2, attempts - 1) + Math.random() * 1000, 10000);
@@ -151,15 +151,15 @@ export async function useServersFetch<T>(
       }
 
       console.error("Unexpected fetch error:", error);
-      const pyroError = new ModrinthServersFetchError(
-        "[PYROFETCH][PYRO] An unexpected error occurred during the fetch operation.",
+      const fetchError = new ModrinthServersFetchError(
+        "[Modrinth Servers] An unexpected error occurred during the fetch operation.",
         undefined,
         error as Error,
       );
       throw new ModrinthServerError(
         "Unexpected error during fetch operation",
         undefined,
-        pyroError,
+        fetchError,
         module,
       );
     }
@@ -176,10 +176,10 @@ export async function useServersFetch<T>(
     throw new ModrinthServerError("Maximum retry attempts reached", statusCode, pyroError, module);
   }
 
-  const pyroError = new ModrinthServersFetchError(
+  const fetchError = new ModrinthServersFetchError(
     "Maximum retry attempts reached",
     undefined,
     lastError || undefined,
   );
-  throw new ModrinthServerError("Maximum retry attempts reached", undefined, pyroError, module);
+  throw new ModrinthServerError("Maximum retry attempts reached", undefined, fetchError, module);
 }
