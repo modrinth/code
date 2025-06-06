@@ -56,6 +56,7 @@ function show(world: SingleplayerWorld) {
   icon.value = world.icon
   displayStatus.value = world.display_status
   hideFromHome.value = world.display_status === 'hidden'
+  removeIcon.value = false
   modal.value.show()
 }
 
