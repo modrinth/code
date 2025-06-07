@@ -33,6 +33,7 @@
     "@types/markdown-it": "^14.1.1",
     "@vintl/how-ago": "^3.0.1",
     "apexcharts": "^3.44.0",
+    "cronstrue": "^2.61.0",
     "dayjs": "^1.11.10",
     "floating-vue": "^5.2.2",
     "highlight.js": "^11.9.0",
