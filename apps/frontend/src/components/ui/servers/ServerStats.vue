@@ -28,7 +28,8 @@
         <div class="absolute -left-8 -top-4 h-28 w-56 rounded-full bg-bg-raised blur-lg" />
       </div>
 
-      <component :is="metric.icon" class="absolute right-10 top-10 z-10" />
+      <component :is="metric.icon" class="absolute right-10 top-10 z-10 size-8" />
+
       <ClientOnly>
         <VueApexCharts
           v-if="metric.showGraph"
