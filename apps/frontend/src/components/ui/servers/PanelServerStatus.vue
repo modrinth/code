@@ -40,7 +40,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import type { ServerState } from "~/types/servers";
+import type { ServerState } from "@modrinth/utils";
 
 const STATUS_CLASSES = {
   running: { main: "bg-brand", bg: "bg-bg-green" },
@@ -49,7 +49,7 @@ const STATUS_CLASSES = {
   unknown: { main: "", bg: "" },
 } as const;
 
-const STATUS_TEXTS = {
+const STATUS_TEXTS: Partial<Record<ServerState, string>> = {
   running: "Running",
   stopped: "",
   crashed: "Crashed",
@@ -63,7 +63,10 @@ defineProps<{
 const isExpanded = ref(false);
 
 function getStatusClass(state: ServerState) {
-  return STATUS_CLASSES[state] ?? STATUS_CLASSES.unknown;
+  if (state in STATUS_CLASSES) {
+    return STATUS_CLASSES[state as keyof typeof STATUS_CLASSES];
+  }
+  return STATUS_CLASSES.unknown;
 }
 
 function getStatusText(state: ServerState) {

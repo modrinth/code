@@ -5,12 +5,12 @@
 </template>
 
 <script setup lang="ts">
-import type { Server } from "~/composables/pyroServers";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const route = useNativeRoute();
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: ModrinthServer;
 }>();
 
 const data = computed(() => props.server.general);

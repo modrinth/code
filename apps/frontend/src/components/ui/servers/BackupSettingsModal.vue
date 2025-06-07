@@ -59,10 +59,10 @@
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { XIcon, SaveIcon } from "@modrinth/assets";
 import { ref, computed } from "vue";
-import type { Server } from "~/composables/pyroServers";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
-  server: Server<["backups"]>;
+  server: ModrinthServer;
 }>();
 
 const modal = ref<InstanceType<typeof NewModal>>();

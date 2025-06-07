@@ -3,7 +3,7 @@ import { Accordion, ButtonStyled, NewModal, ServerNotice, TagItem } from "@modri
 import { PlusIcon, XIcon } from "@modrinth/assets";
 import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
 import { ref } from "vue";
-import { usePyroFetch } from "~/composables/pyroFetch.ts";
+import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 
 const app = useNuxtApp() as unknown as { $notify: any };
 
@@ -23,7 +23,7 @@ const assignedNodes = computed(() => assigned.value.filter((n) => n.kind === "no
 const inputField = ref("");
 
 async function refresh() {
-  await usePyroFetch("notices").then((res) => {
+  await useServersFetch("notices").then((res) => {
     const notices = res as ServerNoticeType[];
     assigned.value = notices.find((n) => n.id === notice.value?.id)?.assigned ?? [];
   });
@@ -33,9 +33,12 @@ async function assign(server: boolean = true) {
   const input = inputField.value.trim();
 
   if (input !== "" && notice.value) {
-    await usePyroFetch(`notices/${notice.value.id}/assign?${server ? "server" : "node"}=${input}`, {
-      method: "PUT",
-    }).catch((err) => {
+    await useServersFetch(
+      `notices/${notice.value.id}/assign?${server ? "server" : "node"}=${input}`,
+      {
+        method: "PUT",
+      },
+    ).catch((err) => {
       app.$notify({
         group: "main",
         title: "Error assigning notice",
@@ -75,9 +78,12 @@ async function unassignDetect() {
 
 async function unassign(id: string, server: boolean = true) {
   if (notice.value) {
-    await usePyroFetch(`notices/${notice.value.id}/unassign?${server ? "server" : "node"}=${id}`, {
-      method: "PUT",
-    }).catch((err) => {
+    await useServersFetch(
+      `notices/${notice.value.id}/unassign?${server ? "server" : "node"}=${id}`,
+      {
+        method: "PUT",
+      },
+    ).catch((err) => {
       app.$notify({
         group: "main",
         title: "Error unassigning notice",

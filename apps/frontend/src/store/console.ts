@@ -18,7 +18,7 @@ const initialBatchSize = 256;
  * @property {function(string): void} addConsoleOutput - Method to add a new console output line
  * @property {function(): void} clear - Method to clear all console output
  */
-export const usePyroConsole = createGlobalState(() => {
+export const useModrinthServersConsole = createGlobalState(() => {
   /**
    * Reactive array storing console output lines
    * @type {Ref<string[]>}

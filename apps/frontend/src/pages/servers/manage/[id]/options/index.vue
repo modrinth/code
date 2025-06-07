@@ -114,11 +114,10 @@
 <script setup lang="ts">
 import { EditIcon, TransferIcon } from "@modrinth/assets";
 import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
-
-import type { Server } from "~/composables/pyroServers";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: ModrinthServer;
 }>();
 
 const data = computed(() => props.server.general);

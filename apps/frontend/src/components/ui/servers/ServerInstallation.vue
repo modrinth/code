@@ -160,14 +160,14 @@
 <script setup lang="ts">
 import { ButtonStyled, NewProjectCard } from "@modrinth/ui";
 import { TransferIcon, UploadIcon, InfoIcon, CompassIcon, SettingsIcon } from "@modrinth/assets";
-import type { Server } from "~/composables/pyroServers";
-import type { Loaders } from "~/types/servers";
+import type { Loaders } from "@modrinth/utils";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const { formatMessage } = useVIntl();
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: ModrinthServer;
   ignoreCurrentInstallation?: boolean;
   backupInProgress?: BackupInProgressReason;
 }>();

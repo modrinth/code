@@ -189,8 +189,8 @@
 <script setup lang="ts">
 import { TerminalSquareIcon, XIcon, IssuesIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
-import type { ServerState, Stats } from "~/types/servers";
-import type { Server } from "~/composables/pyroServers";
+import type { ServerState, Stats } from "@modrinth/utils";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 type ServerProps = {
   socket: WebSocket | null;
@@ -203,7 +203,7 @@ type ServerProps = {
     exit_code?: number;
   };
   isServerRunning: boolean;
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: ModrinthServer;
 };
 
 const props = defineProps<ServerProps>();

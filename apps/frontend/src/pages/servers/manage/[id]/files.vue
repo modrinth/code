@@ -278,16 +278,11 @@ import {
 } from "@modrinth/assets";
 import { computed } from "vue";
 import { ButtonStyled, ProgressBar } from "@modrinth/ui";
-import { formatBytes } from "@modrinth/utils";
-import {
-  type DirectoryResponse,
-  type DirectoryItem,
-  type Server,
-  handleError,
-} from "~/composables/pyroServers.ts";
+import { formatBytes, ModrinthServersFetchError } from "@modrinth/utils";
+import type { FilesystemOp, FSQueuedOp, DirectoryItem, DirectoryResponse } from "@modrinth/utils";
+import { handleError, ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
 import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
-import type { FilesystemOp, FSQueuedOp } from "~/types/servers.ts";
 import FilesUploadZipUrlModal from "~/components/ui/servers/FilesUploadZipUrlModal.vue";
 import FilesUploadConflictModal from "~/components/ui/servers/FilesUploadConflictModal.vue";
 
@@ -316,7 +311,7 @@ interface RenameOperation extends BaseOperation {
 type Operation = MoveOperation | RenameOperation;
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: ModrinthServer;
 }>();
 
 const modulesLoaded = inject<Promise<void>>("modulesLoaded");
@@ -402,7 +397,7 @@ const fetchDirectoryContents = async (): Promise<DirectoryResponse> => {
     };
   } catch (error) {
     console.error("Error fetching directory contents:", error);
-    if (error instanceof PyroFetchError && error.statusCode === 400) {
+    if (error instanceof ModrinthServersFetchError && error.statusCode === 400) {
       return directoryData.value || { items: [], total: 0 };
     }
     throw error;
@@ -561,7 +556,7 @@ const handleRenameItem = async (newName: string) => {
     });
   } catch (error) {
     console.error("Error renaming item:", error);
-    if (error instanceof PyroFetchError) {
+    if (error instanceof ModrinthServersFetchError) {
       if (error.statusCode === 400) {
         addNotification({
           group: "files",
@@ -719,7 +714,7 @@ const showDeleteModal = (item: any) => {
 
 const handleCreateError = (error: any) => {
   console.error("Error creating item:", error);
-  if (error instanceof PyroFetchError) {
+  if (error instanceof ModrinthServersFetchError) {
     if (error.statusCode === 400) {
       addNotification({
         group: "files",
