@@ -426,6 +426,9 @@ importers:
       apexcharts:
         specifier: ^3.44.0
         version: 3.49.2
+      cronstrue:
+        specifier: ^2.61.0
+        version: 2.61.0
       dayjs:
         specifier: ^1.11.10
         version: 1.11.11
@@ -3570,6 +3573,10 @@ packages:
 
   cronstrue@2.52.0:
     resolution: {integrity: sha512-NKgHbWkSZXJUcaBHSsyzC8eegD6bBd4O0oCI6XMIJ+y4Bq3v4w7sY3wfWoKPuVlq9pQHRB6od0lmKpIqi8TlKA==}
+    hasBin: true
+
+  cronstrue@2.61.0:
+    resolution: {integrity: sha512-ootN5bvXbIQI9rW94+QsXN5eROtXWwew6NkdGxIRpS/UFWRggL0G5Al7a9GTBFEsuvVhJ2K3CntIIVt7L2ILhA==}
     hasBin: true
 
   cross-spawn@7.0.3:
@@ -11552,6 +11559,8 @@ snapshots:
   croner@9.0.0: {}
 
   cronstrue@2.52.0: {}
+
+  cronstrue@2.61.0: {}
 
   cross-spawn@7.0.3:
     dependencies:

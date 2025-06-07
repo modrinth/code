@@ -211,6 +211,8 @@ import _DBIcon from './icons/db.svg?component'
 import _LoaderIcon from './icons/loader.svg?component'
 import _ImportIcon from './icons/import.svg?component'
 import _TimerIcon from './icons/timer.svg?component'
+import _CalendarSyncIcon from './icons/calendar-sync.svg?component'
+import _ToggleRightIcon from './icons/toggle-right.svg?component'
 
 // Editor Icons
 import _BoldIcon from './icons/bold.svg?component'
@@ -443,3 +445,5 @@ export const LoaderIcon = _LoaderIcon
 export const ImportIcon = _ImportIcon
 export const CardIcon = _CardIcon
 export const TimerIcon = _TimerIcon
+export const CalendarSyncIcon = _CalendarSyncIcon
+export const ToggleRightIcon = _ToggleRightIcon
