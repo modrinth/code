@@ -170,8 +170,23 @@
         </ContentPageHeader>
       </div>
       <div class="normal-page__content">
-        <div v-if="navLinks.length >= 2" class="mb-4 max-w-full overflow-x-auto">
-          <NavTabs :links="navLinks" />
+        <div class="flex w-full justify-between items-start gap-4">
+          <div v-if="navLinks.length >= 2" class="mb-4 max-w-full overflow-x-auto">
+            <NavTabs :links="navLinks" />
+          </div>
+
+          <DropdownSelect
+            v-slot="{ selected }"
+            v-model="currentSortType"
+            class="!w-auto flex-grow md:flex-grow-0"
+            name="Sort by"
+            :options="sortTypes"
+            :display-name="(option) => option?.display"
+            @change="updateSearchResults()"
+          >
+            <span class="font-semibold text-primary">Sort by: </span>
+            <span class="font-semibold text-secondary">{{ selected }}</span>
+          </DropdownSelect>
         </div>
         <div v-if="projects.length > 0">
           <div
@@ -361,7 +376,10 @@ import {
   commonMessages,
   NewModal,
   useRelativeTime,
+  DropdownSelect,
+  useSearch,
 } from "@modrinth/ui";
+
 import { isStaff } from "~/helpers/users.js";
 import NavTabs from "~/components/ui/NavTabs.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
@@ -383,6 +401,7 @@ import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const data = useNuxtApp();
 const route = useNativeRoute();
+const router = useNativeRouter();
 const auth = await useAuth();
 const cosmetics = useCosmetics();
 const tags = useTags();
@@ -477,13 +496,190 @@ const messages = defineMessages({
 });
 
 let user, projects, organizations, collections;
-try {
-  [{ data: user }, { data: projects }, { data: organizations }, { data: collections }] =
-    await Promise.all([
+
+const projectTypes = computed(() => {
+  const obj = {};
+
+  if (collections !== undefined && collections.value && collections.value.length > 0) {
+    obj.collection = true;
+  }
+
+  if (projects !== undefined && projects.value && projects.value.length > 0) {
+    for (const project of projects.value) {
+      obj[project.project_type] = true;
+    }
+  }
+
+  delete obj.project;
+
+  return Object.keys(obj);
+});
+const sumDownloads = computed(() => {
+  let sum = 0;
+
+  if (projects !== undefined && projects.value && projects.value.length > 0) {
+    for (const project of projects.value) {
+      sum += project.downloads;
+    }
+  }
+
+  return sum;
+});
+
+const server = ref();
+const serverHideInstalled = ref(false);
+const eraseDataOnInstall = ref(false);
+
+const PERSISTENT_QUERY_PARAMS = ["sid", "shi"];
+
+const serverFilters = computed(() => {
+  const filters = [];
+  if (server.value && projectType.value.id !== "modpack") {
+    const gameVersion = server.value.general?.mc_version;
+    if (gameVersion) {
+      filters.push({
+        type: "game_version",
+        option: gameVersion,
+      });
+    }
+
+    const platform = server.value.general?.loader?.toLowerCase();
+
+    const modLoaders = ["fabric", "forge", "quilt", "neoforge"];
+
+    if (platform && modLoaders.includes(platform)) {
+      filters.push({
+        type: "mod_loader",
+        option: platform,
+      });
+    }
+
+    const pluginLoaders = ["paper", "purpur"];
+
+    if (platform && pluginLoaders.includes(platform)) {
+      filters.push({
+        type: "plugin_loader",
+        option: platform,
+      });
+    }
+
+    if (serverHideInstalled.value) {
+      const installedMods = server.value.content?.data
+        .filter((x) => x.project_id)
+        .map((x) => x.project_id);
+
+      installedMods
+        ?.map((x) => ({
+          type: "project_id",
+          option: `project_id:${x}`,
+          negative: true,
+        }))
+        .forEach((x) => filters.push(x));
+    }
+  }
+
+  return filters;
+});
+
+const {
+  // Selections
+  query,
+  currentSortType,
+  currentFilters,
+  toggledGroups,
+  maxResults,
+  currentPage,
+  overriddenProvidedFilterTypes,
+
+  // Lists
+  filters,
+  sortTypes,
+
+  // Computed
+  requestParams,
+
+  // Functions
+  createPageParams,
+} = useSearch(projectTypes, tags, serverFilters);
+
+function scrollToTop(behavior = "smooth") {
+  window.scrollTo({ top: 0, behavior });
+}
+
+async function updateSearchResults(pageNumber) {
+  currentPage.value = pageNumber || 1;
+  scrollToTop();
+
+  if (query.value === null) {
+    return;
+  }
+
+  projects = await fetchUserProjects();
+
+  if (import.meta.client) {
+    const persistentParams = {};
+
+    for (const [key, value] of Object.entries(route.query)) {
+      if (PERSISTENT_QUERY_PARAMS.includes(key)) {
+        persistentParams[key] = value;
+      }
+    }
+
+    if (serverHideInstalled.value) {
+      persistentParams.shi = "true";
+    } else {
+      delete persistentParams.shi;
+    }
+
+    const params = {
+      ...persistentParams,
+      ...createPageParams(),
+    };
+
+    router.replace({ path: route.path, query: params });
+  }
+}
+
+watch([currentFilters], () => {
+  updateSearchResults(1);
+});
+
+async function fetchUserProjects() {
+  const requestParamsValue = requestParams
+    .value
+    .replace(/page=\d+/, "")
+    .replace(/limit=\d+/, "")
+
+  return await useBaseFetch(`user/${route.params.id}/projects${requestParamsValue}`,
+    {
+      transform: (projects) => {
+        for (const project of projects) {
+          project.categories = project.categories.concat(project.loaders);
+          project.project_type = data.$getProjectTypeForUrl(
+            project.project_type,
+            project.categories,
+            tags.value,
+          );
+        }
+
+        return projects;
+      },
+    }
+  )
+}
+
+async function fetchUserData() {
+  try {
+    const requestParamsValue = requestParams
+      .value
+      .replace(/page=\d+/, "")
+      .replace(/limit=\d+/, "")
+
+    return await Promise.all([
       useAsyncData(`user/${route.params.id}`, () => useBaseFetch(`user/${route.params.id}`)),
       useAsyncData(
-        `user/${route.params.id}/projects`,
-        () => useBaseFetch(`user/${route.params.id}/projects`),
+        `user/${route.params.id}/projects${requestParamsValue}`,
+        () => useBaseFetch(`user/${route.params.id}/projects${requestParamsValue}`),
         {
           transform: (projects) => {
             for (const project of projects) {
@@ -508,13 +704,16 @@ try {
         useBaseFetch(`user/${route.params.id}/collections`, { apiVersion: 3 }),
       ),
     ]);
-} catch {
-  throw createError({
-    fatal: true,
-    statusCode: 404,
-    message: formatMessage(messages.userNotFoundError),
-  });
+  } catch {
+    throw createError({
+      fatal: true,
+      statusCode: 404,
+      message: formatMessage(messages.userNotFoundError),
+    });
+  }
 }
+
+[{ data: user }, { data: projects }, { data: organizations }, { data: collections }] = await fetchUserData();
 
 if (!user.value) {
   throw createError({
@@ -544,31 +743,6 @@ useSeoMeta({
   ogTitle: () => title.value,
   ogDescription: () => description.value,
   ogImage: () => user.value.avatar_url ?? "https://cdn.modrinth.com/placeholder.png",
-});
-
-const projectTypes = computed(() => {
-  const obj = {};
-
-  if (collections.value.length > 0) {
-    obj.collection = true;
-  }
-
-  for (const project of projects.value) {
-    obj[project.project_type] = true;
-  }
-
-  delete obj.project;
-
-  return Object.keys(obj);
-});
-const sumDownloads = computed(() => {
-  let sum = 0;
-
-  for (const project of projects.value) {
-    sum += project.downloads;
-  }
-
-  return sum;
 });
 
 const joinDate = computed(() => new Date(user.value.created));
