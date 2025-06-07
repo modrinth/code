@@ -28,7 +28,7 @@
         <div class="absolute -left-8 -top-4 h-28 w-56 rounded-full bg-bg-raised blur-lg" />
       </div>
 
-      <component :is="metric.iconComponent" class="absolute right-10 top-10 z-10 size-8" />
+      <component :is="metric.icon" class="absolute right-10 top-10 z-10 size-8" />
 
       <div class="chart-space absolute bottom-0 left-0 right-0">
         <ClientOnly>
@@ -118,7 +118,7 @@ const metrics = computed(() => {
       title: "CPU usage",
       value: `${cpuPercent.toFixed(2)}%`,
       max: "100%",
-      iconComponent: CPUIcon,
+      icon: CPUIcon,
       data: cpuData.value,
       showGraph: true,
       warning: cpuPercent >= 90 ? "CPU usage is very high" : null,
@@ -129,7 +129,7 @@ const metrics = computed(() => {
         ? formatBytes(stats.value.ram_usage_bytes)
         : `${ramPercent.toFixed(2)}%`,
       max: userPreferences.value.ramAsNumber ? formatBytes(stats.value.ram_total_bytes) : "100%",
-      iconComponent: DBIcon,
+      icon: DBIcon,
       data: ramData.value,
       showGraph: true,
       warning: ramPercent >= 90 ? "Memory usage is very high" : null,
