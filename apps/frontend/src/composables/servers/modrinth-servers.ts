@@ -11,6 +11,7 @@ import {
   WSModule,
   FSModule,
 } from "./modules/index.ts";
+import { ScheudlingModule } from "./modules/scheduling.ts";
 
 export function handleError(err: any) {
   if (err instanceof ModrinthServerError && err.v1Error) {
@@ -40,6 +41,7 @@ export class ModrinthServer {
   readonly startup: StartupModule;
   readonly ws: WSModule;
   readonly fs: FSModule;
+  readonly scheduling: ScheudlingModule;
 
   constructor(serverId: string) {
     this.serverId = serverId;
@@ -51,6 +53,7 @@ export class ModrinthServer {
     this.startup = new StartupModule(this);
     this.ws = new WSModule(this);
     this.fs = new FSModule(this);
+    this.scheduling = new ScheudlingModule(this);
   }
 
   async createMissingFolders(path: string): Promise<void> {
@@ -192,7 +195,16 @@ export class ModrinthServer {
     const modulesToRefresh =
       modules.length > 0
         ? modules
-        : (["general", "content", "backups", "network", "startup", "ws", "fs"] as ModuleName[]);
+        : ([
+            "general",
+            "content",
+            "backups",
+            "network",
+            "startup",
+            "ws",
+            "fs",
+            "scheduling",
+          ] as ModuleName[]);
 
     for (const module of modulesToRefresh) {
       try {
@@ -237,6 +249,8 @@ export class ModrinthServer {
           case "fs":
             await this.fs.fetch();
             break;
+          case "scheduling":
+            await this.scheduling.fetch();
         }
       } catch (error) {
         this.errors[module] = {
