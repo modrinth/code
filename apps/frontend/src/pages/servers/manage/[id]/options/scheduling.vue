@@ -179,8 +179,7 @@ const props = defineProps<{
   server: ModrinthServer;
 }>();
 
-const tasks = ref<ScheduledTask[]>([]);
-
+const tasks = ref<ScheduledTask[]>(props.server.scheduling.tasks);
 const selectedTasks = ref<ScheduledTask[]>([]);
 const sortBy = ref("Name");
 const descending = ref(false);

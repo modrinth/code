@@ -480,7 +480,7 @@ const loadModulesPromise = Promise.resolve().then(() => {
   if (server.general?.status === "suspended") {
     return;
   }
-  return server.refresh(["content", "backups", "network", "startup", "fs"]);
+  return server.refresh(["content", "backups", "network", "startup", "fs", "scheduling"]);
 });
 
 provide("modulesLoaded", loadModulesPromise);

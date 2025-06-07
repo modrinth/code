@@ -16,7 +16,7 @@ import {
   CardIcon,
   UserIcon,
   WrenchIcon,
-  CalendarSyncIcon
+  CalendarSyncIcon,
 } from "@modrinth/assets";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
@@ -36,7 +36,11 @@ useHead({
 const navLinks = [
   { icon: SettingsIcon, label: "General", href: `/servers/manage/${serverId}/options` },
   { icon: WrenchIcon, label: "Platform", href: `/servers/manage/${serverId}/options/loader` },
-  { icon: CalendarSyncIcon, label: "Task Scheduling", href: `/servers/manage/${serverId}/options/scheduling`},
+  {
+    icon: CalendarSyncIcon,
+    label: "Task Scheduling",
+    href: `/servers/manage/${serverId}/options/scheduling`,
+  },
   { icon: TextQuoteIcon, label: "Startup", href: `/servers/manage/${serverId}/options/startup` },
   { icon: VersionIcon, label: "Network", href: `/servers/manage/${serverId}/options/network` },
   { icon: ListIcon, label: "Properties", href: `/servers/manage/${serverId}/options/properties` },
