@@ -28,18 +28,21 @@
         <div class="absolute -left-8 -top-4 h-28 w-56 rounded-full bg-bg-raised blur-lg" />
       </div>
 
-      <component :is="metric.icon" class="absolute right-10 top-10 z-10 size-8" />
+      <component :is="metric.iconComponent" class="absolute right-10 top-10 z-10 size-8" />
 
-      <ClientOnly>
-        <VueApexCharts
-          v-if="metric.showGraph"
-          type="area"
-          height="142"
-          :options="getChartOptions(metric.warning)"
-          :series="[{ name: metric.title, data: metric.data }]"
-          class="chart absolute bottom-0 left-0 right-0 w-full opacity-0"
-        />
-      </ClientOnly>
+      <div class="chart-space absolute bottom-0 left-0 right-0">
+        <ClientOnly>
+          <VueApexCharts
+            v-if="metric.showGraph"
+            type="area"
+            height="142"
+            :options="getChartOptions(metric.warning, index)"
+            :series="[{ name: metric.title, data: metric.data }]"
+            class="chart opacity-0"
+            :class="{ 'chart-loaded': chartsReady.has(index) }"
+          />
+        </ClientOnly>
+      </div>
     </div>
 
     <NuxtLink
@@ -67,6 +70,8 @@ const route = useNativeRoute();
 const serverId = route.params.id;
 const VueApexCharts = defineAsyncComponent(() => import("vue3-apexcharts"));
 
+const chartsReady = ref(new Set<number>());
+
 const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
   ramAsNumber: false,
 });
@@ -74,6 +79,10 @@ const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
 const props = defineProps<{ data: Stats }>();
 
 const stats = shallowRef(props.data.current);
+
+const onChartReady = (index: number) => {
+  chartsReady.value.add(index);
+};
 
 const formatBytes = (bytes: number) => {
   const units = ["B", "KB", "MB", "GB"];
@@ -109,7 +118,7 @@ const metrics = computed(() => {
       title: "CPU usage",
       value: `${cpuPercent.toFixed(2)}%`,
       max: "100%",
-      icon: CPUIcon,
+      iconComponent: CPUIcon,
       data: cpuData.value,
       showGraph: true,
       warning: cpuPercent >= 90 ? "CPU usage is very high" : null,
@@ -120,7 +129,7 @@ const metrics = computed(() => {
         ? formatBytes(stats.value.ram_usage_bytes)
         : `${ramPercent.toFixed(2)}%`,
       max: userPreferences.value.ramAsNumber ? formatBytes(stats.value.ram_total_bytes) : "100%",
-      icon: DBIcon,
+      iconComponent: DBIcon,
       data: ramData.value,
       showGraph: true,
       warning: ramPercent >= 90 ? "Memory usage is very high" : null,
@@ -128,7 +137,7 @@ const metrics = computed(() => {
   ];
 });
 
-const getChartOptions = (hasWarning: string | null) => ({
+const getChartOptions = (hasWarning: string | null, index: number) => ({
   chart: {
     type: "area",
     animations: { enabled: false },
@@ -139,6 +148,10 @@ const getChartOptions = (hasWarning: string | null) => ({
       right: -10,
       top: 0,
       bottom: 0,
+    },
+    events: {
+      mounted: () => onChartReady(index),
+      updated: () => onChartReady(index),
     },
   },
   stroke: { curve: "smooth", width: 3 },
@@ -181,16 +194,20 @@ watch(
 </script>
 
 <style scoped>
-.chart {
-  animation: fadeIn 0.2s ease-out 0.2s forwards;
+.chart-space {
+  height: 142px;
+  width: calc(100% + 48px);
   margin-left: -24px;
   margin-right: -24px;
-  width: calc(100% + 48px) !important;
 }
 
-@keyframes fadeIn {
-  to {
-    opacity: 1;
-  }
+.chart {
+  width: 100% !important;
+  height: 142px !important;
+  transition: opacity 0.3s ease-out;
+}
+
+.chart-loaded {
+  opacity: 1;
 }
 </style>
