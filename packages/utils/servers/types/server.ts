@@ -66,4 +66,11 @@ export type Loaders =
   | 'Vanilla'
   | 'Purpur'
 
-export type ServerState = 'starting' | 'running' | 'restarting' | 'stopping' | 'stopped' | 'crashed'
+export type ServerState =
+  | 'starting'
+  | 'running'
+  | 'restarting'
+  | 'stopping'
+  | 'stopped'
+  | 'crashed'
+  | 'unknown'

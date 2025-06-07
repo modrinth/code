@@ -20,6 +20,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { ConfirmModal } from "@modrinth/ui";
+import type { Backup } from "@modrinth/utils";
 import BackupItem from "~/components/ui/servers/BackupItem.vue";
 
 const emit = defineEmits<{

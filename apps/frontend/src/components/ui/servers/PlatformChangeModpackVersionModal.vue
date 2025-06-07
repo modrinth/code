@@ -69,6 +69,7 @@
 <script setup lang="ts">
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { DownloadIcon, XIcon } from "@modrinth/assets";
+import { ModrinthServersFetchError } from "@modrinth/utils";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
@@ -99,7 +100,6 @@ const handleReinstall = async () => {
     const versionId = props.versions.find((v) => v.version_number === selectedVersion.value)?.id;
 
     await props.server.general.reinstall(
-      props.server.serverId,
       false,
       props.project.id,
       versionId,
@@ -110,7 +110,7 @@ const handleReinstall = async () => {
     emit("reinstall");
     hide();
   } catch (error) {
-    if (error instanceof PyroFetchError && error.statusCode === 429) {
+    if (error instanceof ModrinthServersFetchError && error.statusCode === 429) {
       addNotification({
         group: "server",
         title: "Cannot reinstall server",

@@ -45,7 +45,7 @@
 import { ref, nextTick, computed } from "vue";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { IssuesIcon, PlusIcon, XIcon } from "@modrinth/assets";
-import type { ServerBackup } from "@modrinth/utils";
+import { ModrinthServersFetchError, type ServerBackup } from "@modrinth/utils";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
@@ -100,7 +100,7 @@ const createBackup = async () => {
     hideModal();
     await props.server.refresh();
   } catch (error) {
-    if (error instanceof PyroFetchError && (error as any)?.statusCode === 429) {
+    if (error instanceof ModrinthServersFetchError && error?.statusCode === 429) {
       isRateLimited.value = true;
       addNotification({
         type: "error",

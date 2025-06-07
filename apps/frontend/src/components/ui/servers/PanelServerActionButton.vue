@@ -168,7 +168,7 @@ const isStoppingState = computed(() => serverState.value === "stopping");
 const showStopButton = computed(() => isRunning.value || isStoppingState.value);
 
 const primaryActionText = computed(() => {
-  const states: Record<ServerState, string> = {
+  const states: Partial<Record<ServerState, string>> = {
     starting: "Starting...",
     restarting: "Restarting...",
     running: "Restart",

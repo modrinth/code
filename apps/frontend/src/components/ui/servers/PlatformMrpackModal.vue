@@ -116,6 +116,7 @@
 <script setup lang="ts">
 import { BackupWarning, ButtonStyled, NewModal } from "@modrinth/ui";
 import { UploadIcon, RightArrowIcon, XIcon, ServerIcon } from "@modrinth/assets";
+import { ModrinthServersFetchError } from "@modrinth/utils";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
@@ -175,7 +176,7 @@ const handleReinstall = async () => {
     window.scrollTo(0, 0);
     hide();
   } catch (error) {
-    if (error instanceof PyroFetchError && (error as any)?.statusCode === 429) {
+    if (error instanceof ModrinthServersFetchError && error?.statusCode === 429) {
       addNotification({
         group: "server",
         title: "Cannot reinstall server",

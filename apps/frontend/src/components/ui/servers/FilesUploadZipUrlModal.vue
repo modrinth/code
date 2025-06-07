@@ -75,9 +75,9 @@
 <script setup lang="ts">
 import { ExternalIcon, SpinnerIcon, DownloadIcon, XIcon } from "@modrinth/assets";
 import { BackupWarning, ButtonStyled, NewModal } from "@modrinth/ui";
+import { ModrinthServersFetchError } from "@modrinth/utils";
 import { ref, computed, nextTick } from "vue";
-import { handleError } from "~/composables/servers/modrinth-servers.ts";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { handleError, ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const cf = ref(false);
 
@@ -119,16 +119,10 @@ const handleSubmit = async () => {
       } else {
         submitted.value = false;
         handleError(
-          new ServersError(
+          new ModrinthServersFetchError(
             "Could not find CurseForge modpack at that URL.",
-            undefined,
-            undefined,
-            undefined,
-            {
-              context: "Error installing modpack",
-              error: `url: ${url.value}`,
-              description: "Could not find CurseForge modpack at that URL.",
-            },
+            404,
+            new Error(`No modpack found at ${url.value}`),
           ),
         );
       }
