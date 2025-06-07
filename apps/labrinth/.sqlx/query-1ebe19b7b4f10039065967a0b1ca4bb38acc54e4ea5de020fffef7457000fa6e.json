@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, title, owner_id, current_version_id\n            FROM shared_instances\n            WHERE id = $1\n            ",
+  "query": "\n            SELECT id, title, owner_id, public, current_version_id\n            FROM shared_instances\n            WHERE id = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -20,6 +20,11 @@
       },
       {
         "ordinal": 3,
+        "name": "public",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 4,
         "name": "current_version_id",
         "type_info": "Int8"
       }
@@ -33,8 +38,9 @@
       false,
       false,
       false,
+      false,
       true
     ]
   },
-  "hash": "5a4863ee33dc5d338036803c763fb72efbe2faa8b9cd9f12b7076d38085f4cf8"
+  "hash": "1ebe19b7b4f10039065967a0b1ca4bb38acc54e4ea5de020fffef7457000fa6e"
 }

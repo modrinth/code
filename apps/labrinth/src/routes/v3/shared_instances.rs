@@ -13,6 +13,7 @@ use crate::models::shared_instances::{
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::routes::read_typed_from_payload;
+use actix_web::http::header::AUTHORIZATION;
 use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, web};
 use futures_util::future::try_join_all;
@@ -38,6 +39,8 @@ pub struct CreateSharedInstance {
         custom(function = "crate::util::validate::validate_name")
     )]
     pub title: String,
+    #[serde(default)]
+    pub public: bool,
 }
 
 pub async fn shared_instance_create(
@@ -68,6 +71,7 @@ pub async fn shared_instance_create(
         id,
         title: new_instance.title,
         owner_id: user.id.into(),
+        public: new_instance.public,
         current_version_id: None,
     };
     instance.insert(&mut transaction).await?;
@@ -78,8 +82,9 @@ pub async fn shared_instance_create(
         id: id.into(),
         title: instance.title,
         owner: user.id,
+        public: instance.public,
         current_version: None,
-        additional_users: vec![],
+        additional_users: Some(vec![]),
     }))
 }
 
@@ -115,12 +120,14 @@ pub async fn shared_instance_list(
             let instance_id = instance.id;
             Ok(SharedInstance::from_db(
                 instance,
-                DBSharedInstanceUser::get_from_instance(
-                    instance_id,
-                    &**pool,
-                    &redis,
-                )
-                .await?,
+                Some(
+                    DBSharedInstanceUser::get_from_instance(
+                        instance_id,
+                        &**pool,
+                        &redis,
+                    )
+                    .await?,
+                ),
                 version,
                 &cdn_url,
             ))
@@ -140,15 +147,19 @@ pub async fn shared_instance_get(
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0.into();
 
-    let user = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Some(&[Scopes::SHARED_INSTANCE_READ]),
-    )
-    .await?
-    .1;
+    let user = if req.headers().contains_key(AUTHORIZATION) {
+        let (_, user) = get_user_from_headers(
+            &req,
+            &**pool,
+            &redis,
+            &session_queue,
+            Some(&[Scopes::SHARED_INSTANCE_READ]),
+        )
+        .await?;
+        Some(user)
+    } else {
+        None
+    };
 
     let shared_instance = DBSharedInstance::get(id, &**pool).await?;
 
@@ -156,10 +167,15 @@ pub async fn shared_instance_get(
         let users =
             DBSharedInstanceUser::get_from_instance(id, &**pool, &redis)
                 .await?;
-        if !user.role.is_mod()
-            && shared_instance.owner_id != user.id.into()
-            && !users.iter().any(|x| x.user_id == user.id.into())
-        {
+
+        let privately_accessible = if let Some(user) = user {
+            user.role.is_mod()
+                || shared_instance.owner_id == user.id.into()
+                || users.iter().any(|x| x.user_id == user.id.into())
+        } else {
+            false
+        };
+        if !shared_instance.public && !privately_accessible {
             return Err(ApiError::NotFound);
         }
 
@@ -172,7 +188,7 @@ pub async fn shared_instance_get(
         let cdn_url = dotenvy::var("CDN_URL")?;
         let shared_instance = SharedInstance::from_db(
             shared_instance,
-            users,
+            privately_accessible.then_some(users),
             current_version,
             &cdn_url,
         );
@@ -190,6 +206,7 @@ pub struct EditSharedInstance {
         custom(function = "crate::util::validate::validate_name")
     )]
     pub title: Option<String>,
+    pub public: Option<bool>,
 }
 
 pub async fn shared_instance_edit(
@@ -247,6 +264,20 @@ pub async fn shared_instance_edit(
             WHERE id = $2
             ",
             title,
+            id as DBSharedInstanceId,
+        )
+        .execute(&mut *transaction)
+        .await?;
+    }
+
+    if let Some(public) = edit_instance.public {
+        sqlx::query!(
+            "
+            UPDATE shared_instances
+            SET public = $1
+            WHERE id = $2
+            ",
+            public,
             id as DBSharedInstanceId,
         )
         .execute(&mut *transaction)

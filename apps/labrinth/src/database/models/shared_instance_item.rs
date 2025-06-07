@@ -12,6 +12,7 @@ pub struct DBSharedInstance {
     pub id: DBSharedInstanceId,
     pub title: String,
     pub owner_id: DBUserId,
+    pub public: bool,
     pub current_version_id: Option<DBSharedInstanceVersionId>,
 }
 
@@ -19,6 +20,7 @@ struct SharedInstanceQueryResult {
     id: i64,
     title: String,
     owner_id: i64,
+    public: bool,
     current_version_id: Option<i64>,
 }
 
@@ -28,6 +30,7 @@ impl From<SharedInstanceQueryResult> for DBSharedInstance {
             id: DBSharedInstanceId(val.id),
             title: val.title,
             owner_id: DBUserId(val.owner_id),
+            public: val.public,
             current_version_id: val
                 .current_version_id
                 .map(DBSharedInstanceVersionId),
@@ -63,7 +66,7 @@ impl DBSharedInstance {
         let result = sqlx::query_as!(
             SharedInstanceQueryResult,
             "
-            SELECT id, title, owner_id, current_version_id
+            SELECT id, title, owner_id, public, current_version_id
             FROM shared_instances
             WHERE id = $1
             ",
@@ -82,10 +85,11 @@ impl DBSharedInstance {
         let results = sqlx::query_as!(
             SharedInstanceQueryResult,
             r#"
-            -- https://github.com/launchbadge/sqlx/issues/1266
+            -- See https://github.com/launchbadge/sqlx/issues/1266 for why we need all the "as"
             SELECT
                 id as "id!",
                 title as "title!",
+                public as "public!",
                 owner_id as "owner_id!",
                 current_version_id
             FROM shared_instances
@@ -94,6 +98,7 @@ impl DBSharedInstance {
             SELECT
                 id as "id!",
                 title as "title!",
+                public as "public!",
                 owner_id as "owner_id!",
                 current_version_id
             FROM shared_instances

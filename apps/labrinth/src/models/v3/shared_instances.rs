@@ -13,14 +13,16 @@ pub struct SharedInstance {
     pub id: SharedInstanceId,
     pub title: String,
     pub owner: UserId,
+    pub public: bool,
     pub current_version: Option<SharedInstanceVersion>,
-    pub additional_users: Vec<SharedInstanceUser>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub additional_users: Option<Vec<SharedInstanceUser>>,
 }
 
 impl SharedInstance {
     pub fn from_db(
         instance: DBSharedInstance,
-        users: Vec<DBSharedInstanceUser>,
+        users: Option<Vec<DBSharedInstanceUser>>,
         current_version: Option<DBSharedInstanceVersion>,
         cdn_url: &str,
     ) -> Self {
@@ -28,9 +30,11 @@ impl SharedInstance {
             id: instance.id.into(),
             title: instance.title,
             owner: instance.owner_id.into(),
+            public: instance.public,
             current_version: current_version
                 .map(|x| SharedInstanceVersion::from_db(x, cdn_url)),
-            additional_users: users.into_iter().map(Into::into).collect(),
+            additional_users: users
+                .map(|x| x.into_iter().map(Into::into).collect()),
         }
     }
 }
