@@ -26,7 +26,7 @@ const editProfileObject = computed(() => {
   } = {}
 
   // When hooks are not overridden per-instance, we want to clear them
-  editProfile.hooks = overrideHooks.value ? hooks.value : {};
+  editProfile.hooks = overrideHooks.value ? hooks.value : {}
 
   return editProfile
 })
