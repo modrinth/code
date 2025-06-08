@@ -1,4 +1,4 @@
--- These indidces substantially bring down the cost of the query plan for the
+-- These indices substantially bring down the cost of the query plan for the
 -- hot query at `labrinth::routes::v3::projects::random_projects_get`, from
 -- ~235 to 0.29..18.92 (~10x improvement; for comparison, a lookup by primary
 -- key has 0.29..8.3 cost).
