@@ -3,6 +3,7 @@ use crate::database::models::{
 };
 use crate::database::redis::RedisPool;
 use crate::models::shared_instances::SharedInstanceUserPermissions;
+use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use futures_util::TryStreamExt;
 use serde::{Deserialize, Serialize};
@@ -247,6 +248,7 @@ pub struct DBSharedInstanceVersion {
     pub shared_instance_id: DBSharedInstanceId,
     pub size: u64,
     pub sha512: Vec<u8>,
+    pub created: DateTime<Utc>,
 }
 
 struct SharedInstanceVersionQueryResult {
@@ -254,6 +256,7 @@ struct SharedInstanceVersionQueryResult {
     shared_instance_id: i64,
     size: i64,
     sha512: Vec<u8>,
+    created: DateTime<Utc>,
 }
 
 impl From<SharedInstanceVersionQueryResult> for DBSharedInstanceVersion {
@@ -263,6 +266,7 @@ impl From<SharedInstanceVersionQueryResult> for DBSharedInstanceVersion {
             shared_instance_id: DBSharedInstanceId(val.shared_instance_id),
             size: val.size as u64,
             sha512: val.sha512,
+            created: val.created,
         }
     }
 }
@@ -274,13 +278,14 @@ impl DBSharedInstanceVersion {
     ) -> Result<(), sqlx::Error> {
         sqlx::query!(
             "
-            INSERT INTO shared_instance_versions (id, shared_instance_id, size, sha512)
-            VALUES ($1, $2, $3, $4)
+            INSERT INTO shared_instance_versions (id, shared_instance_id, size, sha512, created)
+            VALUES ($1, $2, $3, $4, $5)
             ",
             self.id as DBSharedInstanceVersionId,
             self.shared_instance_id as DBSharedInstanceId,
             self.size as i64,
             self.sha512,
+            self.created,
         )
         .execute(&mut **transaction)
         .await?;
@@ -295,7 +300,7 @@ impl DBSharedInstanceVersion {
         let result = sqlx::query_as!(
             SharedInstanceVersionQueryResult,
             "
-            SELECT id, shared_instance_id, size, sha512
+            SELECT id, shared_instance_id, size, sha512, created
             FROM shared_instance_versions
             WHERE id = $1
             ",
@@ -314,9 +319,10 @@ impl DBSharedInstanceVersion {
         let results = sqlx::query_as!(
             SharedInstanceVersionQueryResult,
             "
-            SELECT id, shared_instance_id, size, sha512
+            SELECT id, shared_instance_id, size, sha512, created
             FROM shared_instance_versions
             WHERE shared_instance_id = $1
+            ORDER BY created DESC
             ",
             instance_id as DBSharedInstanceId,
         )

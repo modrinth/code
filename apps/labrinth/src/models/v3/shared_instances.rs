@@ -5,6 +5,7 @@ use crate::database::models::shared_instance_item::{
 use crate::models::ids::{SharedInstanceId, SharedInstanceVersionId};
 use ariadne::ids::UserId;
 use bitflags::bitflags;
+use chrono::{DateTime, Utc};
 use hex::ToHex;
 use serde::{Deserialize, Serialize};
 
@@ -46,6 +47,7 @@ pub struct SharedInstanceVersion {
     pub size: u64,
     pub sha512: String,
     pub url: String,
+    pub created: DateTime<Utc>,
 }
 
 impl SharedInstanceVersion {
@@ -57,6 +59,7 @@ impl SharedInstanceVersion {
             shared_instance: shared_instance_id,
             size: version.size,
             sha512: version.sha512.encode_hex(),
+            created: version.created,
             url: format!(
                 "{cdn_url}/shared_instance/{shared_instance_id}/{version_id}.mrpack"
             ),
@@ -70,6 +73,7 @@ bitflags! {
         const EDIT = 1 << 0;
         const DELETE = 1 << 1;
         const UPLOAD_VERSION = 1 << 2;
+        const DELETE_VERSION = 1 << 3;
     }
 }
 

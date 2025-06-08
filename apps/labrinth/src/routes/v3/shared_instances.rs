@@ -4,7 +4,7 @@ use crate::database::models::shared_instance_item::{
     DBSharedInstance, DBSharedInstanceUser, DBSharedInstanceVersion,
 };
 use crate::database::models::{
-    DBSharedInstanceId, generate_shared_instance_id,
+    DBSharedInstanceId, DBSharedInstanceVersionId, generate_shared_instance_id,
 };
 use crate::database::redis::RedisPool;
 use crate::models::ids::{SharedInstanceId, SharedInstanceVersionId};
@@ -33,9 +33,10 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .route("{id}", web::delete().to(shared_instance_delete))
             .route("{id}/version", web::get().to(shared_instance_version_list)),
     );
-    cfg.route(
-        "shared-instance-version/{id}",
-        web::get().to(shared_instance_version_get),
+    cfg.service(
+        web::scope("shared-instance-version")
+            .route("{id}", web::get().to(shared_instance_version_get))
+            .route("{id}", web::delete().to(shared_instance_version_delete)),
     );
 }
 
@@ -470,4 +471,103 @@ async fn can_access_instance_as_maybe_user(
     Ok(user.is_some_and(|user| {
         can_access_instance_privately(instance, &users, &user)
     }))
+}
+
+pub async fn shared_instance_version_delete(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    info: web::Path<(SharedInstanceVersionId,)>,
+    session_queue: Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let version_id = info.into_inner().0.into();
+
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::SHARED_INSTANCE_VERSION_DELETE]),
+    )
+    .await?
+    .1;
+
+    let shared_instance_version =
+        DBSharedInstanceVersion::get(version_id, &**pool).await?;
+
+    if let Some(shared_instance_version) = shared_instance_version {
+        let shared_instance = DBSharedInstance::get(
+            shared_instance_version.shared_instance_id,
+            &**pool,
+        )
+        .await?;
+        if let Some(shared_instance) = shared_instance {
+            if !user.role.is_mod() && shared_instance.owner_id != user.id.into()
+            {
+                let permissions = DBSharedInstanceUser::get_user_permissions(
+                    shared_instance.id,
+                    user.id.into(),
+                    &**pool,
+                )
+                .await?;
+                if let Some(permissions) = permissions {
+                    if !permissions
+                        .contains(SharedInstanceUserPermissions::DELETE)
+                    {
+                        return Err(ApiError::CustomAuthentication(
+                            "You do not have permission to delete this shared instance version.".to_string()
+                        ));
+                    }
+                } else {
+                    return Err(ApiError::NotFound);
+                }
+            }
+
+            delete_instance_version(shared_instance.id, version_id, &pool)
+                .await?;
+
+            Ok(HttpResponse::NoContent().body(""))
+        } else {
+            Err(ApiError::NotFound)
+        }
+    } else {
+        Err(ApiError::NotFound)
+    }
+}
+
+async fn delete_instance_version(
+    instance_id: DBSharedInstanceId,
+    version_id: DBSharedInstanceVersionId,
+    pool: &PgPool,
+) -> Result<(), ApiError> {
+    let mut transaction = pool.begin().await?;
+
+    sqlx::query!(
+        "
+        DELETE FROM shared_instance_versions
+        WHERE id = $1
+        ",
+        version_id as DBSharedInstanceVersionId,
+    )
+    .execute(&mut *transaction)
+    .await?;
+
+    sqlx::query!(
+        "
+        UPDATE shared_instances
+        SET current_version_id = (
+            SELECT id FROM shared_instance_versions
+            WHERE shared_instance_id = $1
+            ORDER BY created DESC
+            LIMIT 1
+        )
+        WHERE id = $1
+        ",
+        instance_id as DBSharedInstanceId,
+    )
+    .execute(&mut *transaction)
+    .await?;
+
+    transaction.commit().await?;
+    Ok(())
 }

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, shared_instance_id, size, sha512\n            FROM shared_instance_versions\n            WHERE shared_instance_id = $1\n            ",
+  "query": "\n            SELECT id, shared_instance_id, size, sha512, created\n            FROM shared_instance_versions\n            WHERE shared_instance_id = $1\n            ORDER BY created DESC\n            ",
   "describe": {
     "columns": [
       {
@@ -22,6 +22,11 @@
         "ordinal": 3,
         "name": "sha512",
         "type_info": "Bytea"
+      },
+      {
+        "ordinal": 4,
+        "name": "created",
+        "type_info": "Timestamptz"
       }
     ],
     "parameters": {
@@ -33,8 +38,9 @@
       false,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "333f44542dfd569aa01351b0370b81816aaf92339f12e3d1f5b350659b36c364"
+  "hash": "265c4d6f33714c8a5cf3137c429e2b57e917e9507942d65f40c1b733209cabf0"
 }

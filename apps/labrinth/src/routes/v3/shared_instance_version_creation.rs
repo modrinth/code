@@ -21,6 +21,7 @@ use actix_web::http::header::ContentLength;
 use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, web};
 use bytes::BytesMut;
+use chrono::Utc;
 use futures_util::StreamExt;
 use hex::FromHex;
 use sqlx::{PgPool, Postgres, Transaction};
@@ -180,6 +181,7 @@ async fn shared_instance_version_create_inner(
         shared_instance_id: instance_id,
         size: content_length as u64,
         sha512,
+        created: Utc::now(),
     };
     new_version.insert(transaction).await?;
 
