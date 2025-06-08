@@ -303,7 +303,7 @@
           <h2 class="text-lg text-contrast">{{ formatMessage(messages.profileOrganizations) }}</h2>
           <div class="flex flex-wrap gap-2">
             <nuxt-link
-              v-for="org in organizations"
+              v-for="org in organizations.sort((a, b) => a.name.localeCompare(b.name))"
               :key="org.id"
               v-tooltip="org.name"
               class="organization"

@@ -14,7 +14,7 @@
       <template v-if="orgs?.length > 0">
         <div class="orgs-grid">
           <nuxt-link
-            v-for="org in orgs"
+            v-for="org in orgs.sort((a, b) => a.name.localeCompare(b.name))"
             :key="org.id"
             :to="`/organization/${org.slug}`"
             class="universal-card button-base recessed org"
