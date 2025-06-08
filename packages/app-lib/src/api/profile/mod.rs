@@ -644,7 +644,6 @@ pub async fn run(
 /// Run Minecraft using a profile, and credentials for authentication
 /// Returns Arc pointer to RwLock to Child
 #[tracing::instrument(skip(credentials))]
-
 pub async fn run_credentials(
     path: &str,
     credentials: &Credentials,
@@ -662,7 +661,8 @@ pub async fn run_credentials(
         .hooks
         .pre_launch
         .as_ref()
-        .or(settings.hooks.pre_launch.as_ref());
+        .or(settings.hooks.pre_launch.as_ref())
+        .filter(|hook_command| !hook_command.is_empty());
     if let Some(hook) = pre_launch_hooks {
         // TODO: hook parameters
         let mut cmd = hook.split(' ');
@@ -692,7 +692,12 @@ pub async fn run_credentials(
         .clone()
         .unwrap_or(settings.extra_launch_args);
 
-    let wrapper = profile.hooks.wrapper.clone().or(settings.hooks.wrapper);
+    let wrapper = profile
+        .hooks
+        .wrapper
+        .clone()
+        .or(settings.hooks.wrapper)
+        .filter(|hook_command| !hook_command.is_empty());
 
     let memory = profile.memory.unwrap_or(settings.memory);
     let resolution =
@@ -704,8 +709,12 @@ pub async fn run_credentials(
         .unwrap_or(settings.custom_env_vars);
 
     // Post post exit hooks
-    let post_exit_hook =
-        profile.hooks.post_exit.clone().or(settings.hooks.post_exit);
+    let post_exit_hook = profile
+        .hooks
+        .post_exit
+        .clone()
+        .or(settings.hooks.post_exit)
+        .filter(|hook_command| !hook_command.is_empty());
 
     // Any options.txt settings that we want set, add here
     let mut mc_set_options: Vec<(String, String)> = vec![];

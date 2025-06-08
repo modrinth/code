@@ -8887,6 +8887,7 @@ dependencies = [
  "serde",
  "serde_ini",
  "serde_json",
+ "serde_with",
  "sha1_smol",
  "sha2",
  "sqlx",
