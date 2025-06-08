@@ -94,7 +94,7 @@ pub async fn random_projects_get(
     })?;
 
     let project_ids = sqlx::query!(
-        "SELECT id FROM mods WHERE status = ANY($1) ORDER BY md5(id::varchar) LIMIT $2",
+        "SELECT id FROM (SELECT id FROM mods WHERE status = ANY($1) ORDER BY md5(id::varchar) LIMIT $2) ORDER BY RANDOM()",
         &*crate::models::projects::ProjectStatus::iterator()
             .filter(|x| x.is_searchable())
             .map(|x| x.to_string())
