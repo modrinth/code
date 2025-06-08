@@ -95,13 +95,14 @@ pub async fn random_projects_get(
 
     let project_ids = sqlx::query!(
         "
-            SELECT id FROM mods TABLESAMPLE SYSTEM_ROWS($1) WHERE status = ANY($2)
+            SELECT id FROM mods TABLESAMPLE SYSTEM_ROWS($1) WHERE status = ANY($2) LIMIT $3
             ",
-        count.count as i32,
+        (count.count * 10) as i32,
         &*crate::models::projects::ProjectStatus::iterator()
             .filter(|x| x.is_searchable())
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
+        count.count as i32,
     )
     .fetch(&**pool)
     .map_ok(|m| db_ids::DBProjectId(m.id))
