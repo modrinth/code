@@ -96,10 +96,10 @@ pub async fn random_projects_get(
     let project_ids = sqlx::query!(
         // IDs are randomly generated (see the `generate_ids` macro), so ID order is
         // equivalent to a random order
-        "SELECT id FROM mods WHERE status = ANY($1) \
-            ORDER BY id \
-            LIMIT $2 \
-            OFFSET GREATEST(ROUND(RANDOM() * (SELECT COUNT(*) FROM mods WHERE status = ANY($1)))::int8 - $2, 0)",
+        "SELECT id FROM mods WHERE status = ANY($1)
+        ORDER BY id
+        LIMIT $2
+        OFFSET GREATEST(ROUND(RANDOM() * (SELECT COUNT(*) FROM mods WHERE status = ANY($1)))::int8 - $2, 0)",
         &*crate::models::projects::ProjectStatus::iterator()
             .filter(|x| x.is_searchable())
             .map(|x| x.to_string())

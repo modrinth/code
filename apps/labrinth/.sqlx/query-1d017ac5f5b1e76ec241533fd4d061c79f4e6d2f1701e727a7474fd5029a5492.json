@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id FROM mods WHERE status = ANY($1) ORDER BY id LIMIT $2 OFFSET GREATEST(ROUND(RANDOM() * (SELECT COUNT(*) FROM mods WHERE status = ANY($1)))::int8 - $2, 0)",
+  "query": "SELECT id FROM mods WHERE status = ANY($1)\n        ORDER BY id\n        LIMIT $2\n        OFFSET GREATEST(ROUND(RANDOM() * (SELECT COUNT(*) FROM mods WHERE status = ANY($1)))::int8 - $2, 0)",
   "describe": {
     "columns": [
       {
@@ -19,5 +19,5 @@
       false
     ]
   },
-  "hash": "233f1d5d9cfbe6e774c31e7b0f1e5b065e970ff14762443601c4e70bb8fe70d3"
+  "hash": "1d017ac5f5b1e76ec241533fd4d061c79f4e6d2f1701e727a7474fd5029a5492"
 }
