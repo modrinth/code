@@ -94,10 +94,7 @@ pub async fn random_projects_get(
     })?;
 
     let project_ids = sqlx::query!(
-        "
-            SELECT id FROM mods TABLESAMPLE SYSTEM_ROWS($1) WHERE status = ANY($2) LIMIT $3
-            ",
-        (count.count * 10) as i32,
+        "SELECT id FROM mods WHERE status = ANY($1) ORDER BY md5(id::varchar) LIMIT $2",
         &*crate::models::projects::ProjectStatus::iterator()
             .filter(|x| x.is_searchable())
             .map(|x| x.to_string())

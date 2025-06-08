@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id FROM mods TABLESAMPLE SYSTEM_ROWS($1) WHERE status = ANY($2) LIMIT $3\n            ",
+  "query": "SELECT id FROM mods WHERE status = ANY($1) ORDER BY md5(id::varchar) LIMIT $2",
   "describe": {
     "columns": [
       {
@@ -11,7 +11,6 @@
     ],
     "parameters": {
       "Left": [
-        "Int8",
         "TextArray",
         "Int8"
       ]
@@ -20,5 +19,5 @@
       false
     ]
   },
-  "hash": "202720c714473ad48e902c9e06ff7258b2c08bc734f96b4da6fd861970f6381c"
+  "hash": "f8ff0e3cee1404e7b2144741f6806848172887d96bdec82a7b53624d09320980"
 }
