@@ -1,4 +1,5 @@
 use crate::auth::get_user_from_headers;
+use crate::auth::validate::get_maybe_user_from_headers;
 use crate::database::models::shared_instance_item::{
     DBSharedInstance, DBSharedInstanceUser, DBSharedInstanceVersion,
 };
@@ -6,14 +7,15 @@ use crate::database::models::{
     DBSharedInstanceId, generate_shared_instance_id,
 };
 use crate::database::redis::RedisPool;
+use crate::models::ids::{SharedInstanceId, SharedInstanceVersionId};
 use crate::models::pats::Scopes;
 use crate::models::shared_instances::{
-    SharedInstance, SharedInstanceUserPermissions,
+    SharedInstance, SharedInstanceUserPermissions, SharedInstanceVersion,
 };
+use crate::models::users::User;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::routes::read_typed_from_payload;
-use actix_web::http::header::AUTHORIZATION;
 use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, web};
 use futures_util::future::try_join_all;
@@ -28,7 +30,12 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         web::scope("shared-instance")
             .route("{id}", web::get().to(shared_instance_get))
             .route("{id}", web::patch().to(shared_instance_edit))
-            .route("{id}", web::delete().to(shared_instance_delete)),
+            .route("{id}", web::delete().to(shared_instance_delete))
+            .route("{id}/version", web::get().to(shared_instance_version_list)),
+    );
+    cfg.route(
+        "shared-instance-version/{id}",
+        web::get().to(shared_instance_version_get),
     );
 }
 
@@ -142,24 +149,20 @@ pub async fn shared_instance_get(
     req: HttpRequest,
     pool: Data<PgPool>,
     redis: Data<RedisPool>,
-    info: web::Path<(crate::models::ids::SharedInstanceId,)>,
+    info: web::Path<(SharedInstanceId,)>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0.into();
 
-    let user = if req.headers().contains_key(AUTHORIZATION) {
-        let (_, user) = get_user_from_headers(
-            &req,
-            &**pool,
-            &redis,
-            &session_queue,
-            Some(&[Scopes::SHARED_INSTANCE_READ]),
-        )
-        .await?;
-        Some(user)
-    } else {
-        None
-    };
+    let user = get_maybe_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::SHARED_INSTANCE_READ,
+    )
+    .await?
+    .map(|(_, user)| user);
 
     let shared_instance = DBSharedInstance::get(id, &**pool).await?;
 
@@ -168,13 +171,9 @@ pub async fn shared_instance_get(
             DBSharedInstanceUser::get_from_instance(id, &**pool, &redis)
                 .await?;
 
-        let privately_accessible = if let Some(user) = user {
-            user.role.is_mod()
-                || shared_instance.owner_id == user.id.into()
-                || users.iter().any(|x| x.user_id == user.id.into())
-        } else {
-            false
-        };
+        let privately_accessible = user.is_some_and(|user| {
+            can_access_instance_privately(&shared_instance, &users, &user)
+        });
         if !shared_instance.public && !privately_accessible {
             return Err(ApiError::NotFound);
         }
@@ -199,6 +198,16 @@ pub async fn shared_instance_get(
     }
 }
 
+fn can_access_instance_privately(
+    instance: &DBSharedInstance,
+    users: &[DBSharedInstanceUser],
+    user: &User,
+) -> bool {
+    user.role.is_mod()
+        || instance.owner_id == user.id.into()
+        || users.iter().any(|x| x.user_id == user.id.into())
+}
+
 #[derive(Deserialize, Validate)]
 pub struct EditSharedInstance {
     #[validate(
@@ -214,7 +223,7 @@ pub async fn shared_instance_edit(
     pool: Data<PgPool>,
     mut body: web::Payload,
     redis: Data<RedisPool>,
-    info: web::Path<(crate::models::ids::SharedInstanceId,)>,
+    info: web::Path<(SharedInstanceId,)>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0.into();
@@ -293,7 +302,7 @@ pub async fn shared_instance_delete(
     req: HttpRequest,
     pool: Data<PgPool>,
     redis: Data<RedisPool>,
-    info: web::Path<(crate::models::ids::SharedInstanceId,)>,
+    info: web::Path<(SharedInstanceId,)>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id: DBSharedInstanceId = info.into_inner().0.into();
@@ -343,4 +352,122 @@ pub async fn shared_instance_delete(
     DBSharedInstanceUser::clear_cache(id, &redis).await?;
 
     Ok(HttpResponse::NoContent().body(""))
+}
+
+pub async fn shared_instance_version_list(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    info: web::Path<(SharedInstanceId,)>,
+    session_queue: Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let cdn_url = dotenvy::var("CDN_URL")?;
+    let id = info.into_inner().0.into();
+
+    let user = get_maybe_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::SHARED_INSTANCE_READ,
+    )
+    .await?
+    .map(|(_, user)| user);
+
+    let shared_instance = DBSharedInstance::get(id, &**pool).await?;
+
+    if let Some(shared_instance) = shared_instance {
+        if !can_access_instance_as_maybe_user(
+            &pool,
+            &redis,
+            &shared_instance,
+            user,
+        )
+        .await?
+        {
+            return Err(ApiError::NotFound);
+        }
+
+        let versions =
+            DBSharedInstanceVersion::get_for_instance(id, &**pool).await?;
+        let versions = versions
+            .into_iter()
+            .map(|version| SharedInstanceVersion::from_db(version, &cdn_url))
+            .collect::<Vec<_>>();
+
+        Ok(HttpResponse::Ok().json(versions))
+    } else {
+        Err(ApiError::NotFound)
+    }
+}
+
+pub async fn shared_instance_version_get(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    info: web::Path<(SharedInstanceVersionId,)>,
+    session_queue: Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let cdn_url = dotenvy::var("CDN_URL")?;
+    let version_id = info.into_inner().0.into();
+
+    let user = get_maybe_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::SHARED_INSTANCE_READ,
+    )
+    .await?
+    .map(|(_, user)| user);
+
+    let shared_instance_version =
+        DBSharedInstanceVersion::get(version_id, &**pool).await?;
+
+    if let Some(shared_instance_version) = shared_instance_version {
+        let shared_instance = DBSharedInstance::get(
+            shared_instance_version.shared_instance_id,
+            &**pool,
+        )
+        .await?;
+        if let Some(shared_instance) = shared_instance {
+            if !can_access_instance_as_maybe_user(
+                &pool,
+                &redis,
+                &shared_instance,
+                user,
+            )
+            .await?
+            {
+                return Err(ApiError::NotFound);
+            }
+
+            let version = SharedInstanceVersion::from_db(
+                shared_instance_version,
+                &cdn_url,
+            );
+            Ok(HttpResponse::Ok().json(version))
+        } else {
+            Err(ApiError::NotFound)
+        }
+    } else {
+        Err(ApiError::NotFound)
+    }
+}
+
+async fn can_access_instance_as_maybe_user(
+    pool: &PgPool,
+    redis: &RedisPool,
+    instance: &DBSharedInstance,
+    user: Option<User>,
+) -> Result<bool, ApiError> {
+    if instance.public {
+        return Ok(true);
+    }
+    let users =
+        DBSharedInstanceUser::get_from_instance(instance.id, pool, redis)
+            .await?;
+    Ok(user.is_some_and(|user| {
+        can_access_instance_privately(instance, &users, &user)
+    }))
 }

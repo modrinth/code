@@ -299,12 +299,31 @@ impl DBSharedInstanceVersion {
             FROM shared_instance_versions
             WHERE id = $1
             ",
-            id.0,
+            id as DBSharedInstanceVersionId,
         )
         .fetch_optional(exec)
         .await?;
 
         Ok(result.map(Into::into))
+    }
+
+    pub async fn get_for_instance(
+        instance_id: DBSharedInstanceId,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+    ) -> Result<Vec<Self>, sqlx::Error> {
+        let results = sqlx::query_as!(
+            SharedInstanceVersionQueryResult,
+            "
+            SELECT id, shared_instance_id, size, sha512
+            FROM shared_instance_versions
+            WHERE shared_instance_id = $1
+            ",
+            instance_id as DBSharedInstanceId,
+        )
+        .fetch_all(exec)
+        .await?;
+
+        Ok(results.into_iter().map(Into::into).collect())
     }
 }
 //endregion
