@@ -80,7 +80,7 @@ pub async fn version_project_get_helper(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ, Scopes::VERSION_READ]),
+        Scopes::PROJECT_READ | Scopes::VERSION_READ,
     )
     .await
     .map(|x| x.1)
@@ -145,7 +145,7 @@ pub async fn versions_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::VERSION_READ]),
+        Scopes::VERSION_READ,
     )
     .await
     .map(|x| x.1)
@@ -184,7 +184,7 @@ pub async fn version_get_helper(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::VERSION_READ]),
+        Scopes::VERSION_READ,
     )
     .await
     .map(|x| x.1)
@@ -281,7 +281,7 @@ pub async fn version_edit_helper(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::VERSION_WRITE]),
+        Scopes::VERSION_WRITE,
     )
     .await?
     .1;
@@ -736,7 +736,7 @@ pub async fn version_list(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ, Scopes::VERSION_READ]),
+        Scopes::PROJECT_READ | Scopes::VERSION_READ,
     )
     .await
     .map(|x| x.1)
@@ -883,7 +883,7 @@ pub async fn version_delete(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::VERSION_DELETE]),
+        Scopes::VERSION_DELETE,
     )
     .await?
     .1;

@@ -39,7 +39,7 @@ pub async fn get_pats(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PAT_READ]),
+        Scopes::PAT_READ,
     )
     .await?
     .1;
@@ -99,7 +99,7 @@ pub async fn create_pat(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PAT_CREATE]),
+        Scopes::PAT_CREATE,
     )
     .await?
     .1;
@@ -174,7 +174,7 @@ pub async fn edit_pat(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PAT_WRITE]),
+        Scopes::PAT_WRITE,
     )
     .await?
     .1;
@@ -266,7 +266,7 @@ pub async fn delete_pat(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PAT_DELETE]),
+        Scopes::PAT_DELETE,
     )
     .await?
     .1;

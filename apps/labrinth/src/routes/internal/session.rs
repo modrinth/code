@@ -141,7 +141,7 @@ pub async fn list(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_READ]),
+        Scopes::SESSION_READ,
     )
     .await?
     .1;
@@ -178,7 +178,7 @@ pub async fn delete(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_DELETE]),
+        Scopes::SESSION_DELETE,
     )
     .await?
     .1;
@@ -212,10 +212,15 @@ pub async fn refresh(
     redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let current_user =
-        get_user_from_headers(&req, &**pool, &redis, &session_queue, None)
-            .await?
-            .1;
+    let current_user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::empty(),
+    )
+    .await?
+    .1;
     let session = req
         .headers()
         .get(AUTHORIZATION)
