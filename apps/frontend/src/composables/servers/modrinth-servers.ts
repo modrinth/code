@@ -11,7 +11,7 @@ import {
   WSModule,
   FSModule,
 } from "./modules/index.ts";
-import { ScheudlingModule } from "./modules/scheduling.ts";
+import { SchedulingModule } from "./modules/scheduling.ts";
 
 export function handleError(err: any) {
   if (err instanceof ModrinthServerError && err.v1Error) {
@@ -41,7 +41,7 @@ export class ModrinthServer {
   readonly startup: StartupModule;
   readonly ws: WSModule;
   readonly fs: FSModule;
-  readonly scheduling: ScheudlingModule;
+  readonly scheduling: SchedulingModule;
 
   constructor(serverId: string) {
     this.serverId = serverId;
@@ -53,7 +53,7 @@ export class ModrinthServer {
     this.startup = new StartupModule(this);
     this.ws = new WSModule(this);
     this.fs = new FSModule(this);
-    this.scheduling = new ScheudlingModule(this);
+    this.scheduling = new SchedulingModule(this);
   }
 
   async createMissingFolders(path: string): Promise<void> {

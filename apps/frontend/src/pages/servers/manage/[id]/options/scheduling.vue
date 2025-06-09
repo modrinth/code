@@ -154,11 +154,13 @@
         </section>
       </div>
     </div>
+
+    <ScheduleTaskModal ref="scheduleModal" @save="handleTaskSave" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineProps } from "vue";
+import { ref, computed } from "vue";
 import { Multiselect } from "vue-multiselect";
 import {
   PlusIcon,
@@ -170,7 +172,7 @@ import {
   SortAscendingIcon as AscendingIcon,
   SortDescendingIcon as DescendingIcon,
 } from "@modrinth/assets";
-import { Toggle, Checkbox, RaisedBadge, ButtonStyled } from "@modrinth/ui";
+import { Toggle, Checkbox, RaisedBadge, ButtonStyled, ScheduleTaskModal } from "@modrinth/ui";
 import cronstrue from "cronstrue";
 import type { ScheduledTask } from "@modrinth/utils";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
@@ -179,10 +181,16 @@ const props = defineProps<{
   server: ModrinthServer;
 }>();
 
-const tasks = ref<ScheduledTask[]>(props.server.scheduling.tasks);
+onBeforeMount(async () => {
+  await props.server.scheduling.fetch();
+});
+
 const selectedTasks = ref<ScheduledTask[]>([]);
 const sortBy = ref("Name");
 const descending = ref(false);
+const scheduleModal = ref();
+
+const tasks = computed(() => props.server.scheduling.tasks);
 
 const sortedTasks = computed(() => {
   const sorted = [...tasks.value];
@@ -208,88 +216,112 @@ const sortedTasks = computed(() => {
   return descending.value ? sorted.reverse() : sorted;
 });
 
-const handleSelectAll = (selected: boolean) => {
+function handleSelectAll(selected: boolean): void {
   selectedTasks.value = selected ? [...tasks.value] : [];
-};
+}
 
-const handleTaskSelect = (task: ScheduledTask, selected: boolean) => {
+function handleTaskSelect(task: ScheduledTask, selected: boolean): void {
   if (selected) {
     selectedTasks.value.push(task);
   } else {
     selectedTasks.value = selectedTasks.value.filter((t) => t !== task);
   }
-};
+}
 
-const handleTaskToggle = async (task: ScheduledTask, enabled: boolean) => {
+async function handleTaskToggle(task: ScheduledTask, enabled: boolean): Promise<void> {
   try {
-    task.enabled = enabled;
+    await props.server.scheduling.editTask(task.title, { enabled });
     console.log("Toggle task:", task.title, enabled);
   } catch (error) {
     console.error("Failed to toggle task:", error);
     task.enabled = !enabled;
   }
-};
+}
 
-const handleTaskEdit = (task: ScheduledTask) => {
-  console.log("Edit task:", task.title);
-};
+function handleTaskEdit(task: ScheduledTask): void {
+  scheduleModal.value?.show(task);
+}
 
-const handleTaskDelete = async (task: ScheduledTask) => {
+async function handleTaskDelete(task: ScheduledTask): Promise<void> {
   if (confirm(`Are you sure you want to delete "${task.title}"?`)) {
     try {
-      const index = tasks.value.indexOf(task);
-      if (index > -1) {
-        tasks.value.splice(index, 1);
-      }
+      await props.server.scheduling.deleteTask(task);
       selectedTasks.value = selectedTasks.value.filter((t) => t !== task);
       console.log("Delete task:", task.title);
     } catch (error) {
       console.error("Failed to delete task:", error);
     }
   }
-};
+}
 
-const handleCreateTask = () => {
-  console.log("Create new task");
-};
+function handleCreateTask(): void {
+  scheduleModal.value?.showNew();
+}
 
-const handleBulkToggle = async () => {
+async function handleBulkToggle(): Promise<void> {
   const enabledCount = selectedTasks.value.filter((t) => t.enabled).length;
   const shouldEnable = enabledCount < selectedTasks.value.length / 2;
 
   try {
-    selectedTasks.value.forEach((task: ScheduledTask) => {
-      task.enabled = shouldEnable;
-    });
+    await Promise.all(
+      selectedTasks.value.map((task) =>
+        props.server.scheduling.editTask(task.title, { enabled: shouldEnable }),
+      ),
+    );
     console.log("Bulk toggle tasks:", selectedTasks.value.length, "to", shouldEnable);
   } catch (error) {
     console.error("Failed to bulk toggle tasks:", error);
   }
-};
+}
 
-const handleBulkDelete = async () => {
-  // TODO: Confirm delete modal.
-  // `Are you sure you want to delete ${selectedTasks.value.length} selected tasks?`
-};
+async function handleBulkDelete(): Promise<void> {
+  if (confirm(`Are you sure you want to delete ${selectedTasks.value.length} selected tasks?`)) {
+    try {
+      await Promise.all(
+        selectedTasks.value.map((task) => props.server.scheduling.deleteTask(task)),
+      );
+      selectedTasks.value = [];
+      console.log("Bulk delete completed");
+    } catch (error) {
+      console.error("Failed to bulk delete tasks:", error);
+    }
+  }
+}
 
-const updateSort = () => {
-  // Trigger reactivity for sortedTasks somehow.
-};
-
-const updateDescending = () => {
-  descending.value = !descending.value;
-};
-
-const getHumanReadableCron = (cronExpression: string) => {
+async function handleTaskSave(data: ScheduledTask): Promise<void> {
   try {
-    // eslint-disable-next-line import/no-named-as-default-member
+    if (scheduleModal.value?.mode === "edit") {
+      await props.server.scheduling.editTask(
+        scheduleModal.value.originalData?.title || data.title,
+        data,
+      );
+      console.log("Updated task:", data.title);
+    } else {
+      await props.server.scheduling.createTask(data);
+      console.log("Created task:", data.title);
+    }
+  } catch (error) {
+    console.error("Failed to save task:", error);
+  }
+}
+
+function updateSort(): void {
+  // Trigger reactivity for sortedTasks
+}
+
+function updateDescending(): void {
+  descending.value = !descending.value;
+}
+
+function getHumanReadableCron(cronExpression: string): string {
+  try {
     return cronstrue.toString(cronExpression);
   } catch {
     return cronExpression;
   }
-};
+}
 
-const formatWarningIntervals = (intervals: number[]) => {
+function formatWarningIntervals(intervals: number[]): string {
   return intervals
     .sort((a, b) => b - a)
     .map((seconds) => {
@@ -298,7 +330,7 @@ const formatWarningIntervals = (intervals: number[]) => {
       return `${seconds}s`;
     })
     .join(", ");
-};
+}
 </script>
 
 <style lang="scss" scoped>
@@ -321,12 +353,10 @@ const formatWarningIntervals = (intervals: number[]) => {
       justify-content: center;
       padding: var(--spacing-card-sm);
 
-      // Left edge of table
       &:first-child {
         padding-left: var(--spacing-card-bg);
       }
 
-      // Right edge of table
       &:last-child {
         padding-right: var(--spacing-card-bg);
       }

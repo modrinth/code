@@ -66,6 +66,7 @@ import _ChevronRightIcon from './icons/chevron-right.svg?component'
 import _ClearIcon from './icons/clear.svg?component'
 import _ClientIcon from './icons/client.svg?component'
 import _ClipboardCopyIcon from './icons/clipboard-copy.svg?component'
+import _ClockIcon from './icons/clock.svg?component'
 import _CodeIcon from './icons/code.svg?component'
 import _CoffeeIcon from './icons/coffee.svg?component'
 import _CoinsIcon from './icons/coins.svg?component'
@@ -287,6 +288,7 @@ export const ChevronRightIcon = _ChevronRightIcon
 export const ClearIcon = _ClearIcon
 export const ClientIcon = _ClientIcon
 export const ClipboardCopyIcon = _ClipboardCopyIcon
+export const ClockIcon = _ClockIcon
 export const CodeIcon = _CodeIcon
 export const CoffeeIcon = _CoffeeIcon
 export const CoinsIcon = _CoinsIcon
