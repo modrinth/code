@@ -32,11 +32,7 @@
         <template #actions>
           <div class="flex gap-2">
             <ButtonStyled
-              v-if="
-                instance.install_stage === 'installing' ||
-                instance.install_stage === 'pack_installing' ||
-                instance.install_stage === 'minecraft_installing'
-              "
+              v-if="['installing', 'pack_installing', 'minecraft_installing'].includes(instance.install_stage)"
               color="brand"
               size="large"
             >
