@@ -519,6 +519,9 @@ impl ProjectStatus {
     }
 
     // Project can be displayed in search
+    // IMPORTANT: if this is changed, make sure to update the `mods_searchable_ids_gist`
+    // index in the DB to keep random project queries fast (see the
+    // `20250609134334_spatial-random-project-index.sql` migration)
     pub fn is_searchable(&self) -> bool {
         matches!(self, ProjectStatus::Approved | ProjectStatus::Archived)
     }
