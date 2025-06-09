@@ -6,10 +6,13 @@
           <div class="header__row">
             <h2 class="header__title text-2xl">Task Scheduling</h2>
             <div class="input-group">
-              <button class="iconified-button brand-button" @click="handleCreateTask">
+              <NuxtLink
+                :to="`/servers/manage/${route.params.id}/options/scheduling/new`"
+                class="iconified-button brand-button"
+              >
                 <PlusIcon />
                 Create Task
-              </button>
+              </NuxtLink>
             </div>
           </div>
 
@@ -129,9 +132,12 @@
                 <div>
                   <div class="flex gap-1">
                     <ButtonStyled icon-only circular>
-                      <button v-tooltip="'Edit task'" @click="handleTaskEdit(task)">
+                      <NuxtLink
+                        v-tooltip="'Edit task'"
+                        :to="`/servers/manage/${route.params.id}/options/scheduling/${encodeURIComponent(task.title)}`"
+                      >
                         <EditIcon />
-                      </button>
+                      </NuxtLink>
                     </ButtonStyled>
                     <ButtonStyled icon-only circular color="red">
                       <button
@@ -154,8 +160,6 @@
         </section>
       </div>
     </div>
-
-    <ScheduleTaskModal ref="scheduleModal" @save="handleTaskSave" />
   </div>
 </template>
 
@@ -172,7 +176,7 @@ import {
   SortAscendingIcon as AscendingIcon,
   SortDescendingIcon as DescendingIcon,
 } from "@modrinth/assets";
-import { Toggle, Checkbox, RaisedBadge, ButtonStyled, ScheduleTaskModal } from "@modrinth/ui";
+import { Toggle, Checkbox, RaisedBadge, ButtonStyled } from "@modrinth/ui";
 import cronstrue from "cronstrue";
 import type { ScheduledTask } from "@modrinth/utils";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
@@ -181,6 +185,8 @@ const props = defineProps<{
   server: ModrinthServer;
 }>();
 
+const route = useRoute();
+
 onBeforeMount(async () => {
   await props.server.scheduling.fetch();
 });
@@ -188,7 +194,6 @@ onBeforeMount(async () => {
 const selectedTasks = ref<ScheduledTask[]>([]);
 const sortBy = ref("Name");
 const descending = ref(false);
-const scheduleModal = ref();
 
 const tasks = computed(() => props.server.scheduling.tasks);
 
@@ -238,10 +243,6 @@ async function handleTaskToggle(task: ScheduledTask, enabled: boolean): Promise<
   }
 }
 
-function handleTaskEdit(task: ScheduledTask): void {
-  scheduleModal.value?.show(task);
-}
-
 async function handleTaskDelete(task: ScheduledTask): Promise<void> {
   if (confirm(`Are you sure you want to delete "${task.title}"?`)) {
     try {
@@ -252,10 +253,6 @@ async function handleTaskDelete(task: ScheduledTask): Promise<void> {
       console.error("Failed to delete task:", error);
     }
   }
-}
-
-function handleCreateTask(): void {
-  scheduleModal.value?.showNew();
 }
 
 async function handleBulkToggle(): Promise<void> {
@@ -285,23 +282,6 @@ async function handleBulkDelete(): Promise<void> {
     } catch (error) {
       console.error("Failed to bulk delete tasks:", error);
     }
-  }
-}
-
-async function handleTaskSave(data: ScheduledTask): Promise<void> {
-  try {
-    if (scheduleModal.value?.mode === "edit") {
-      await props.server.scheduling.editTask(
-        scheduleModal.value.originalData?.title || data.title,
-        data,
-      );
-      console.log("Updated task:", data.title);
-    } else {
-      await props.server.scheduling.createTask(data);
-      console.log("Created task:", data.title);
-    }
-  } catch (error) {
-    console.error("Failed to save task:", error);
   }
 }
 

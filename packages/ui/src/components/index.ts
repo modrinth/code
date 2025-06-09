@@ -40,6 +40,7 @@ export { default as SimpleBadge } from './base/SimpleBadge.vue'
 export { default as Slider } from './base/Slider.vue'
 export { default as SmartClickable } from './base/SmartClickable.vue'
 export { default as StatItem } from './base/StatItem.vue'
+export { default as TabbedContent } from "./base/TabbedContent.vue"
 export { default as TagItem } from './base/TagItem.vue'
 export { default as TeleportDropdownMenu } from './base/TeleportDropdownMenu.vue'
 export { default as Timeline } from './base/Timeline.vue'
@@ -112,4 +113,3 @@ export { default as ThemeSelector } from './settings/ThemeSelector.vue'
 // Servers
 export { default as BackupWarning } from './servers/backups/BackupWarning.vue'
 export { default as ServersSpecs } from './billing/ServersSpecs.vue'
-export { default as ScheduleTaskModal } from "./servers/scheduling/ScheduleTaskModal.vue"
