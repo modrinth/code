@@ -1243,7 +1243,7 @@ pub async fn delete_auth_provider(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_AUTH_WRITE]),
+        Scopes::USER_AUTH_WRITE,
     )
     .await?
     .1;
@@ -1663,7 +1663,7 @@ pub async fn begin_2fa_flow(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_AUTH_WRITE]),
+        Scopes::USER_AUTH_WRITE,
     )
     .await?
     .1;
@@ -1708,7 +1708,7 @@ pub async fn finish_2fa_flow(
             &**pool,
             &redis,
             &session_queue,
-            Some(&[Scopes::USER_AUTH_WRITE]),
+            Scopes::USER_AUTH_WRITE,
         )
         .await?
         .1;
@@ -2140,7 +2140,7 @@ pub async fn set_email(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_AUTH_WRITE]),
+        Scopes::USER_AUTH_WRITE,
     )
     .await?
     .1;
@@ -2223,7 +2223,7 @@ pub async fn resend_verify_email(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_AUTH_WRITE]),
+        Scopes::USER_AUTH_WRITE,
     )
     .await?
     .1;
@@ -2328,7 +2328,7 @@ pub async fn subscribe_newsletter(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_AUTH_WRITE]),
+        Scopes::USER_AUTH_WRITE,
     )
     .await?
     .1;

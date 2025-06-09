@@ -69,7 +69,7 @@ pub async fn get_user_clients(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await?
     .1;
@@ -167,7 +167,7 @@ pub async fn oauth_client_create(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await?
     .1;
@@ -228,7 +228,7 @@ pub async fn oauth_client_delete(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await?
     .1;
@@ -285,7 +285,7 @@ pub async fn oauth_client_edit(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await?
     .1;
@@ -363,7 +363,7 @@ pub async fn oauth_client_icon_edit(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await?
     .1;
@@ -430,7 +430,7 @@ pub async fn oauth_client_icon_delete(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await?
     .1;
@@ -477,7 +477,7 @@ pub async fn get_user_oauth_authorizations(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await?
     .1;
@@ -507,7 +507,7 @@ pub async fn revoke_oauth_authorization(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await?
     .1;

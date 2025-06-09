@@ -142,7 +142,7 @@ pub async fn projects_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ]),
+        Scopes::PROJECT_READ,
     )
     .await
     .map(|x| x.1)
@@ -171,7 +171,7 @@ pub async fn project_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ]),
+        Scopes::PROJECT_READ,
     )
     .await
     .map(|x| x.1)
@@ -261,7 +261,7 @@ pub async fn project_edit(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_WRITE]),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     .1;
@@ -1017,7 +1017,7 @@ pub async fn dependency_list(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ]),
+        Scopes::PROJECT_READ,
     )
     .await
     .map(|x| x.1)
@@ -1129,7 +1129,7 @@ pub async fn projects_edit(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_WRITE]),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     .1;
@@ -1426,7 +1426,7 @@ pub async fn project_icon_edit(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_WRITE]),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     .1;
@@ -1537,7 +1537,7 @@ pub async fn delete_project_icon(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_WRITE]),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     .1;
@@ -1644,7 +1644,7 @@ pub async fn add_gallery_item(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_WRITE]),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     .1;
@@ -1802,7 +1802,7 @@ pub async fn edit_gallery_item(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_WRITE]),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     .1;
@@ -1969,7 +1969,7 @@ pub async fn delete_gallery_item(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_WRITE]),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     .1;
@@ -2078,7 +2078,7 @@ pub async fn project_delete(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_DELETE]),
+        Scopes::PROJECT_DELETE,
     )
     .await?
     .1;
@@ -2181,7 +2181,7 @@ pub async fn project_follow(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_WRITE]),
+        Scopes::USER_WRITE,
     )
     .await?
     .1;
@@ -2261,7 +2261,7 @@ pub async fn project_unfollow(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_WRITE]),
+        Scopes::USER_WRITE,
     )
     .await?
     .1;
@@ -2337,7 +2337,7 @@ pub async fn project_get_organization(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ, Scopes::ORGANIZATION_READ]),
+        Scopes::PROJECT_READ | Scopes::ORGANIZATION_READ,
     )
     .await
     .map(|x| x.1)

@@ -46,7 +46,7 @@ pub async fn get_version_from_hash(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::VERSION_READ]),
+        Scopes::VERSION_READ,
     )
     .await
     .map(|x| x.1)
@@ -132,7 +132,7 @@ pub async fn get_update_from_hash(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::VERSION_READ]),
+        Scopes::VERSION_READ,
     )
     .await
     .map(|x| x.1)
@@ -231,7 +231,7 @@ pub async fn get_versions_from_hashes(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::VERSION_READ]),
+        Scopes::VERSION_READ,
     )
     .await
     .map(|x| x.1)
@@ -285,7 +285,7 @@ pub async fn get_projects_from_hashes(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ, Scopes::VERSION_READ]),
+        Scopes::PROJECT_READ | Scopes::VERSION_READ,
     )
     .await
     .map(|x| x.1)
@@ -437,7 +437,7 @@ pub async fn update_individual_files(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::VERSION_READ]),
+        Scopes::VERSION_READ,
     )
     .await
     .map(|x| x.1)
@@ -569,7 +569,7 @@ pub async fn delete_file(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::VERSION_WRITE]),
+        Scopes::VERSION_WRITE,
     )
     .await?
     .1;
@@ -699,7 +699,7 @@ pub async fn download_version(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::VERSION_READ]),
+        Scopes::VERSION_READ,
     )
     .await
     .map(|x| x.1)

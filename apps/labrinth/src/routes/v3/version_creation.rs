@@ -169,7 +169,7 @@ async fn version_create_inner(
         pool,
         redis,
         session_queue,
-        Some(&[Scopes::VERSION_CREATE]),
+        Scopes::VERSION_CREATE,
     )
     .await?
     .1;
@@ -599,7 +599,7 @@ async fn upload_file_to_version_inner(
         &**client,
         &redis,
         session_queue,
-        Some(&[Scopes::VERSION_WRITE]),
+        Scopes::VERSION_WRITE,
     )
     .await?
     .1;

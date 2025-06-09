@@ -55,10 +55,15 @@ pub async fn page_view_ingest(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user =
-        get_user_from_headers(&req, &**pool, &redis, &session_queue, None)
-            .await
-            .ok();
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::empty(),
+    )
+    .await
+    .ok();
     let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
 
     let url = Url::parse(&url_input.url).map_err(|_| {
@@ -177,7 +182,7 @@ pub async fn playtime_ingest(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PERFORM_ANALYTICS]),
+        Scopes::PERFORM_ANALYTICS,
     )
     .await?;
 
