@@ -3,11 +3,18 @@
     <div
       class="wrapper-wrapper"
       :class="{
-        'top-fade': !scrollableAtTop && !props.disableScrolling,
-        'bottom-fade': !scrollableAtBottom && !props.disableScrolling,
+        'top-fade': !scrollableAtTop && !disableScrolling,
+        'bottom-fade': !scrollableAtBottom && !disableScrolling,
       }"
     >
-      <div ref="scrollablePane" class="scrollable-pane" @scroll="onScroll">
+      <div
+        ref="scrollablePane"
+        :class="{
+          'max-h-[19rem]': !disableScrolling,
+        }"
+        class="scrollable-pane"
+        @scroll="onScroll"
+      >
         <slot />
       </div>
     </div>
@@ -17,7 +24,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     disableScrolling?: boolean
   }>(),

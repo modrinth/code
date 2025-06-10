@@ -34,7 +34,7 @@
             "
           />
         </div>
-        <ScrollablePanel v-if="search" class="h-[17rem]">
+        <ScrollablePanel v-if="search">
           <Button
             v-for="(option, index) in filteredOptions"
             :key="`option-${index}`"

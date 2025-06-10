@@ -71,7 +71,7 @@ pub async fn collection_create(
         &**client,
         &redis,
         &session_queue,
-        Some(&[Scopes::COLLECTION_CREATE]),
+        Scopes::COLLECTION_CREATE,
     )
     .await?
     .1;
@@ -156,7 +156,7 @@ pub async fn collections_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::COLLECTION_READ]),
+        Scopes::COLLECTION_READ,
     )
     .await
     .map(|x| x.1)
@@ -185,7 +185,7 @@ pub async fn collection_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::COLLECTION_READ]),
+        Scopes::COLLECTION_READ,
     )
     .await
     .map(|x| x.1)
@@ -231,7 +231,7 @@ pub async fn collection_edit(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::COLLECTION_WRITE]),
+        Scopes::COLLECTION_WRITE,
     )
     .await?
     .1;
@@ -390,7 +390,7 @@ pub async fn collection_icon_edit(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::COLLECTION_WRITE]),
+        Scopes::COLLECTION_WRITE,
     )
     .await?
     .1;
@@ -471,7 +471,7 @@ pub async fn delete_collection_icon(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::COLLECTION_WRITE]),
+        Scopes::COLLECTION_WRITE,
     )
     .await?
     .1;
@@ -528,7 +528,7 @@ pub async fn collection_delete(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::COLLECTION_DELETE]),
+        Scopes::COLLECTION_DELETE,
     )
     .await?
     .1;

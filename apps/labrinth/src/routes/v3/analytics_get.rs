@@ -82,7 +82,7 @@ pub async fn playtimes_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::ANALYTICS]),
+        Scopes::ANALYTICS,
     )
     .await
     .map(|x| x.1)?;
@@ -151,7 +151,7 @@ pub async fn views_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::ANALYTICS]),
+        Scopes::ANALYTICS,
     )
     .await
     .map(|x| x.1)?;
@@ -220,7 +220,7 @@ pub async fn downloads_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::ANALYTICS]),
+        Scopes::ANALYTICS,
     )
     .await
     .map(|x| x.1)?;
@@ -289,7 +289,7 @@ pub async fn revenue_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PAYOUTS_READ]),
+        Scopes::PAYOUTS_READ,
     )
     .await
     .map(|x| x.1)?;
@@ -430,7 +430,7 @@ pub async fn countries_downloads_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::ANALYTICS]),
+        Scopes::ANALYTICS,
     )
     .await
     .map(|x| x.1)?;
@@ -503,7 +503,7 @@ pub async fn countries_views_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::ANALYTICS]),
+        Scopes::ANALYTICS,
     )
     .await
     .map(|x| x.1)?;

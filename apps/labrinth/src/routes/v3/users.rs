@@ -63,7 +63,7 @@ pub async fn admin_user_email(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await
     .map(|x| x.1)?;
@@ -117,7 +117,7 @@ pub async fn projects_list(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ]),
+        Scopes::PROJECT_READ,
     )
     .await
     .map(|x| x.1)
@@ -153,7 +153,7 @@ pub async fn user_auth_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_READ]),
+        Scopes::USER_READ,
     )
     .await?;
 
@@ -203,7 +203,7 @@ pub async fn user_get(
             &**pool,
             &redis,
             &session_queue,
-            Some(&[Scopes::SESSION_ACCESS]),
+            Scopes::SESSION_ACCESS,
         )
         .await
         .map(|x| x.1)
@@ -234,7 +234,7 @@ pub async fn collections_list(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::COLLECTION_READ]),
+        Scopes::COLLECTION_READ,
     )
     .await
     .map(|x| x.1)
@@ -282,7 +282,7 @@ pub async fn orgs_list(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ]),
+        Scopes::PROJECT_READ,
     )
     .await
     .map(|x| x.1)
@@ -392,7 +392,7 @@ pub async fn user_edit(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_WRITE]),
+        Scopes::USER_WRITE,
     )
     .await?;
 
@@ -564,7 +564,7 @@ pub async fn user_icon_edit(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_WRITE]),
+        Scopes::USER_WRITE,
     )
     .await?
     .1;
@@ -636,7 +636,7 @@ pub async fn user_icon_delete(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_WRITE]),
+        Scopes::USER_WRITE,
     )
     .await?
     .1;
@@ -688,7 +688,7 @@ pub async fn user_delete(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_DELETE]),
+        Scopes::USER_DELETE,
     )
     .await?
     .1;
@@ -729,7 +729,7 @@ pub async fn user_follows(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_READ]),
+        Scopes::USER_READ,
     )
     .await?
     .1;
@@ -771,7 +771,7 @@ pub async fn user_notifications(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::NOTIFICATION_READ]),
+        Scopes::NOTIFICATION_READ,
     )
     .await?
     .1;

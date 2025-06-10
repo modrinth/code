@@ -151,7 +151,7 @@ async fn index_swaps() {
                 test_env.api.remove_project("alpha", USER_USER_PAT).await;
             assert_status!(&resp, StatusCode::NO_CONTENT);
 
-            // We should not get any results, because the project has been deleted
+            // Deletions should not be indexed immediately
             let projects = test_env
                 .api
                 .search_deserialized(
@@ -160,7 +160,8 @@ async fn index_swaps() {
                     USER_USER_PAT,
                 )
                 .await;
-            assert_eq!(projects.total_hits, 0);
+            assert_eq!(projects.total_hits, 1);
+            assert!(projects.hits[0].slug.as_ref().unwrap().contains("alpha"));
 
             // But when we reindex, it should be gone
             let resp = test_env.api.reset_search_index().await;

@@ -1,7 +1,7 @@
 <template>
   <div
     data-pyro-server-list-root
-    class="experimental-styles-within relative mx-auto flex min-h-screen w-full max-w-[1280px] flex-col px-6"
+    class="experimental-styles-within relative mx-auto mb-6 flex min-h-screen w-full max-w-[1280px] flex-col px-6"
   >
     <div
       v-if="hasError || fetchError"
@@ -89,7 +89,10 @@
         </div>
       </div>
 
-      <ul v-if="filteredData.length > 0" class="m-0 flex flex-col gap-4 p-0">
+      <ul
+        v-if="filteredData.length > 0 || isPollingForNewServers"
+        class="m-0 flex flex-col gap-4 p-0"
+      >
         <UiServersServerListing
           v-for="server in filteredData"
           :key="server.server_id"
@@ -102,6 +105,7 @@
           :mc_version="server.mc_version"
           :upstream="server.upstream"
           :net="server.net"
+          :flows="server.flows"
         />
         <LazyUiServersServerListingSkeleton v-if="isPollingForNewServers" />
       </ul>
@@ -133,6 +137,7 @@ interface ServerResponse {
   servers: Server[];
 }
 
+const router = useRouter();
 const route = useRoute();
 const hasError = ref(false);
 const isPollingForNewServers = ref(false);
@@ -163,11 +168,19 @@ const fuse = computed(() => {
   });
 });
 
+function introToTop(array: Server[]): Server[] {
+  return array.slice().sort((a, b) => {
+    return Number(b.flows?.intro) - Number(a.flows?.intro);
+  });
+}
+
 const filteredData = computed(() => {
   if (!searchInput.value.trim()) {
-    return serverList.value;
+    return introToTop(serverList.value);
   }
-  return fuse.value ? fuse.value.search(searchInput.value).map((result) => result.item) : [];
+  return fuse.value
+    ? introToTop(fuse.value.search(searchInput.value).map((result) => result.item))
+    : [];
 });
 
 const previousServerList = ref<Server[]>([]);
@@ -179,6 +192,7 @@ const checkForNewServers = async () => {
   if (JSON.stringify(previousServerList.value) !== JSON.stringify(serverList.value)) {
     isPollingForNewServers.value = false;
     clearInterval(intervalId);
+    router.replace({ query: {} });
   } else if (refreshCount.value >= 5) {
     isPollingForNewServers.value = false;
     clearInterval(intervalId);

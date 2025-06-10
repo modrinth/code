@@ -342,7 +342,7 @@ async fn project_create_inner(
         pool,
         redis,
         session_queue,
-        Some(&[Scopes::PROJECT_CREATE]),
+        Scopes::PROJECT_CREATE,
     )
     .await?
     .1;

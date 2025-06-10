@@ -2,6 +2,7 @@
 import { $fetch, FetchError } from "ofetch";
 import type { ServerNotice } from "@modrinth/utils";
 import type { FilesystemOp, FSQueuedOp, WSBackupState, WSBackupTask } from "~/types/servers.ts";
+import { usePyroFetch } from "~/composables/pyroFetch.ts";
 
 interface PyroFetchOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -329,6 +330,9 @@ interface General {
   node: {
     token: string;
     instance: string;
+  };
+  flows?: {
+    intro?: boolean;
   };
 }
 
@@ -1221,6 +1225,13 @@ const modules: any = {
     suspend: suspendServer,
     getMotd,
     setMotd,
+    endIntro: async () => {
+      await usePyroFetch(`servers/${internalServerReference.value.serverId}/flows/intro`, {
+        method: "DELETE",
+        version: 1,
+      });
+      await internalServerReference.value.refresh(["general"]);
+    },
   },
   content: {
     get: async (serverId: string) => {
@@ -1451,6 +1462,8 @@ type GeneralFunctions = {
    * @deprecated Use fs.downloadFile instead
    */
   fetchConfigFile: (fileName: string) => Promise<any>;
+
+  endIntro: () => Promise<void>;
 };
 
 type ContentFunctions = {

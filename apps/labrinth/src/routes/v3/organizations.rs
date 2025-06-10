@@ -63,7 +63,7 @@ pub async fn organization_projects_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::ORGANIZATION_READ, Scopes::PROJECT_READ]),
+        Scopes::ORGANIZATION_READ | Scopes::PROJECT_READ,
     )
     .await
     .map(|x| x.1)
@@ -127,7 +127,7 @@ pub async fn organization_create(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::ORGANIZATION_CREATE]),
+        Scopes::ORGANIZATION_CREATE,
     )
     .await?
     .1;
@@ -224,7 +224,7 @@ pub async fn organization_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::ORGANIZATION_READ]),
+        Scopes::ORGANIZATION_READ,
     )
     .await
     .map(|x| x.1)
@@ -315,7 +315,7 @@ pub async fn organizations_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::ORGANIZATION_READ]),
+        Scopes::ORGANIZATION_READ,
     )
     .await
     .map(|x| x.1)
@@ -396,7 +396,7 @@ pub async fn organizations_edit(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::ORGANIZATION_WRITE]),
+        Scopes::ORGANIZATION_WRITE,
     )
     .await?
     .1;
@@ -559,7 +559,7 @@ pub async fn organization_delete(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::ORGANIZATION_DELETE]),
+        Scopes::ORGANIZATION_DELETE,
     )
     .await?
     .1;
@@ -700,7 +700,7 @@ pub async fn organization_projects_add(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_WRITE, Scopes::ORGANIZATION_WRITE]),
+        Scopes::PROJECT_WRITE | Scopes::ORGANIZATION_WRITE,
     )
     .await?
     .1;
@@ -863,7 +863,7 @@ pub async fn organization_projects_remove(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_WRITE, Scopes::ORGANIZATION_WRITE]),
+        Scopes::PROJECT_WRITE | Scopes::ORGANIZATION_WRITE,
     )
     .await?
     .1;
@@ -1051,7 +1051,7 @@ pub async fn organization_icon_edit(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::ORGANIZATION_WRITE]),
+        Scopes::ORGANIZATION_WRITE,
     )
     .await?
     .1;
@@ -1154,7 +1154,7 @@ pub async fn delete_organization_icon(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::ORGANIZATION_WRITE]),
+        Scopes::ORGANIZATION_WRITE,
     )
     .await?
     .1;

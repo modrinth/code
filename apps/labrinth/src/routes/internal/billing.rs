@@ -102,7 +102,7 @@ pub async fn subscriptions(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await?
     .1;
@@ -161,7 +161,7 @@ pub async fn refund_charge(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await?
     .1;
@@ -325,7 +325,7 @@ pub async fn edit_subscription(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await?
     .1;
@@ -585,7 +585,7 @@ pub async fn user_customer(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await?
     .1;
@@ -623,7 +623,7 @@ pub async fn charges(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await?
     .1;
@@ -682,7 +682,7 @@ pub async fn add_payment_method_flow(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await?
     .1;
@@ -736,7 +736,7 @@ pub async fn edit_payment_method(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await?
     .1;
@@ -805,7 +805,7 @@ pub async fn remove_payment_method(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await?
     .1;
@@ -892,7 +892,7 @@ pub async fn payment_methods(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await?
     .1;
@@ -954,17 +954,19 @@ pub async fn active_servers(
         pub server_id: String,
         pub price_id: crate::models::ids::ProductPriceId,
         pub interval: PriceDuration,
+        pub region: Option<String>,
     }
 
     let server_ids = servers
         .into_iter()
         .filter_map(|x| {
             x.metadata.as_ref().map(|metadata| match metadata {
-                SubscriptionMetadata::Pyro { id } => ActiveServer {
+                SubscriptionMetadata::Pyro { id, region } => ActiveServer {
                     user_id: x.user_id.into(),
                     server_id: id.clone(),
                     price_id: x.price_id.into(),
                     interval: x.interval,
+                    region: region.clone(),
                 },
             })
         })
@@ -1020,6 +1022,7 @@ fn infer_currency_code(country: &str) -> String {
         "BE" => "EUR",
         "CY" => "EUR",
         "EE" => "EUR",
+        "ES" => "EUR",
         "FI" => "EUR",
         "FR" => "EUR",
         "DE" => "EUR",
@@ -1066,6 +1069,7 @@ fn infer_currency_code(country: &str) -> String {
         "TW" => "TWD",
         "SA" => "SAR",
         "QA" => "QAR",
+        "SG" => "SGD",
         _ => "USD",
     }
     .to_string()
@@ -1085,7 +1089,7 @@ pub async fn initiate_payment(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await?
     .1;
@@ -1302,6 +1306,12 @@ pub async fn initiate_payment(
             amount: Some(price),
             currency: Some(stripe_currency),
             customer: Some(customer),
+            metadata: interval.map(|interval| {
+                HashMap::from([(
+                    "modrinth_subscription_interval".to_string(),
+                    interval.as_str().to_string(),
+                )])
+            }),
             ..Default::default()
         };
 
@@ -1756,8 +1766,10 @@ pub async fn stripe_webhook(
                             {
                                 let client = reqwest::Client::new();
 
-                                if let Some(SubscriptionMetadata::Pyro { id }) =
-                                    &subscription.metadata
+                                if let Some(SubscriptionMetadata::Pyro {
+                                    id,
+                                    region: _,
+                                }) = &subscription.metadata
                                 {
                                     client
                                         .post(format!(
@@ -1856,6 +1868,7 @@ pub async fn stripe_webhook(
                                             "source": source,
                                             "payment_interval": metadata.charge_item.subscription_interval.map(|x| match x {
                                                 PriceDuration::Monthly => 1,
+                                                PriceDuration::Quarterly => 3,
                                                 PriceDuration::Yearly => 12,
                                             })
                                         }))
@@ -1871,6 +1884,7 @@ pub async fn stripe_webhook(
                                         subscription.metadata =
                                             Some(SubscriptionMetadata::Pyro {
                                                 id: res.uuid,
+                                                region: server_region,
                                             });
                                     }
                                 }
@@ -2231,7 +2245,7 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
                     true
                 }
                 ProductMetadata::Pyro { .. } => {
-                    if let Some(SubscriptionMetadata::Pyro { id }) =
+                    if let Some(SubscriptionMetadata::Pyro { id, region: _ }) =
                         &subscription.metadata
                     {
                         let res = reqwest::Client::new()

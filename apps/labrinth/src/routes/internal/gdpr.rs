@@ -22,7 +22,7 @@ pub async fn export(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await?
     .1;

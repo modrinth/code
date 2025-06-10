@@ -46,16 +46,15 @@ pub async fn get_version_from_hash(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::VERSION_READ]),
+        Scopes::VERSION_READ,
     )
     .await
     .map(|x| x.1)
     .ok();
     let hash = info.into_inner().0.to_lowercase();
-    let algorithm = hash_query
-        .algorithm
-        .clone()
-        .unwrap_or_else(|| default_algorithm_from_hashes(&[hash.clone()]));
+    let algorithm = hash_query.algorithm.clone().unwrap_or_else(|| {
+        default_algorithm_from_hashes(std::slice::from_ref(&hash))
+    });
     let file = database::models::DBVersion::get_file_from_hash(
         algorithm,
         hash,
@@ -133,17 +132,16 @@ pub async fn get_update_from_hash(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::VERSION_READ]),
+        Scopes::VERSION_READ,
     )
     .await
     .map(|x| x.1)
     .ok();
     let hash = info.into_inner().0.to_lowercase();
     if let Some(file) = database::models::DBVersion::get_file_from_hash(
-        hash_query
-            .algorithm
-            .clone()
-            .unwrap_or_else(|| default_algorithm_from_hashes(&[hash.clone()])),
+        hash_query.algorithm.clone().unwrap_or_else(|| {
+            default_algorithm_from_hashes(std::slice::from_ref(&hash))
+        }),
         hash,
         hash_query.version_id.map(|x| x.into()),
         &**pool,
@@ -233,7 +231,7 @@ pub async fn get_versions_from_hashes(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::VERSION_READ]),
+        Scopes::VERSION_READ,
     )
     .await
     .map(|x| x.1)
@@ -287,7 +285,7 @@ pub async fn get_projects_from_hashes(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ, Scopes::VERSION_READ]),
+        Scopes::PROJECT_READ | Scopes::VERSION_READ,
     )
     .await
     .map(|x| x.1)
@@ -439,7 +437,7 @@ pub async fn update_individual_files(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::VERSION_READ]),
+        Scopes::VERSION_READ,
     )
     .await
     .map(|x| x.1)
@@ -571,16 +569,15 @@ pub async fn delete_file(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::VERSION_WRITE]),
+        Scopes::VERSION_WRITE,
     )
     .await?
     .1;
 
     let hash = info.into_inner().0.to_lowercase();
-    let algorithm = hash_query
-        .algorithm
-        .clone()
-        .unwrap_or_else(|| default_algorithm_from_hashes(&[hash.clone()]));
+    let algorithm = hash_query.algorithm.clone().unwrap_or_else(|| {
+        default_algorithm_from_hashes(std::slice::from_ref(&hash))
+    });
     let file = database::models::DBVersion::get_file_from_hash(
         algorithm.clone(),
         hash,
@@ -702,17 +699,16 @@ pub async fn download_version(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::VERSION_READ]),
+        Scopes::VERSION_READ,
     )
     .await
     .map(|x| x.1)
     .ok();
 
     let hash = info.into_inner().0.to_lowercase();
-    let algorithm = hash_query
-        .algorithm
-        .clone()
-        .unwrap_or_else(|| default_algorithm_from_hashes(&[hash.clone()]));
+    let algorithm = hash_query.algorithm.clone().unwrap_or_else(|| {
+        default_algorithm_from_hashes(std::slice::from_ref(&hash))
+    });
     let file = database::models::DBVersion::get_file_from_hash(
         algorithm.clone(),
         hash,

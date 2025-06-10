@@ -159,7 +159,7 @@
     "message": "Subscribe to updates about Modrinth"
   },
   "auth.welcome.description": {
-    "message": "You’re now part of the awesome community of creators & explorers already building, downloading, and staying up-to-date with amazing mods."
+    "message": "You’re now part of the awesome community of creators & explorers already building, downloading, and staying up-to-date with awazing mods."
   },
   "auth.welcome.label.tos": {
     "message": "By creating an account, you have agreed to Modrinth's <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>."
@@ -350,11 +350,14 @@
   "layout.banner.add-email.button": {
     "message": "Visit account settings"
   },
+  "layout.banner.add-email.description": {
+    "message": "For security reasons, Modrinth needs you to register an email address to your account."
+  },
   "layout.banner.build-fail.description": {
     "message": "This deploy of Modrinth's frontend failed to generate state from the API. This may be due to an outage or an error in configuration. Rebuild when the API is available. Error codes: {errors}; Current API URL is: {url}"
   },
   "layout.banner.build-fail.title": {
-    "message": "Error generating state from API when building"
+    "message": "Error generating state from API when building."
   },
   "layout.banner.staging.description": {
     "message": "The staging environment is completely separate from the production Modrinth database. This is used for testing and debugging purposes, and may be running in-development versions of the Modrinth backend or frontend newer than the production instance."
@@ -365,11 +368,11 @@
   "layout.banner.subscription-payment-failed.button": {
     "message": "Update billing info"
   },
-  "layout.banner.subscription-payment-failed.title": {
-    "message": "Billing action required"
-  },
   "layout.banner.subscription-payment-failed.description": {
     "message": "One or more subscriptions failed to renew. Please update your payment method to prevent losing access!"
+  },
+  "layout.banner.subscription-payment-failed.title": {
+    "message": "Billing action required."
   },
   "layout.banner.verify-email.action": {
     "message": "Re-send verification email"
@@ -1047,31 +1050,22 @@
     "message": "No notices"
   },
   "servers.plan.large.description": {
-    "message": "Ideal for larger communities, modpacks, and heavy modding."
+    "message": "Ideal for 15–25 players, modpacks, or heavy modding."
   },
   "servers.plan.large.name": {
     "message": "Large"
   },
-  "servers.plan.large.symbol": {
-    "message": "L"
-  },
   "servers.plan.medium.description": {
-    "message": "Great for modded multiplayer and small communities."
+    "message": "Great for 6–15 players and multiple mods."
   },
   "servers.plan.medium.name": {
     "message": "Medium"
   },
-  "servers.plan.medium.symbol": {
-    "message": "M"
-  },
   "servers.plan.small.description": {
-    "message": "Perfect for vanilla multiplayer, small friend groups, SMPs, and light modding."
+    "message": "Perfect for 1–5 friends with a few light mods."
   },
   "servers.plan.small.name": {
     "message": "Small"
-  },
-  "servers.plan.small.symbol": {
-    "message": "S"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Cancel subscription"
