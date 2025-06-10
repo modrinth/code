@@ -110,7 +110,7 @@ async fn shared_instance_version_create_inner(
         pool,
         redis,
         session_queue,
-        Some(&[Scopes::SHARED_INSTANCE_VERSION_CREATE]),
+        Scopes::SHARED_INSTANCE_VERSION_CREATE,
     )
     .await?
     .1;

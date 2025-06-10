@@ -68,7 +68,7 @@ pub async fn shared_instance_create(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SHARED_INSTANCE_CREATE]),
+        Scopes::SHARED_INSTANCE_CREATE,
     )
     .await?
     .1;
@@ -109,7 +109,7 @@ pub async fn shared_instance_list(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SHARED_INSTANCE_READ]),
+        Scopes::SHARED_INSTANCE_READ,
     )
     .await?
     .1;
@@ -238,7 +238,7 @@ pub async fn shared_instance_edit(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SHARED_INSTANCE_WRITE]),
+        Scopes::SHARED_INSTANCE_WRITE,
     )
     .await?
     .1;
@@ -313,7 +313,7 @@ pub async fn shared_instance_delete(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SHARED_INSTANCE_DELETE]),
+        Scopes::SHARED_INSTANCE_DELETE,
     )
     .await?
     .1;
@@ -487,7 +487,7 @@ pub async fn shared_instance_version_delete(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SHARED_INSTANCE_VERSION_DELETE]),
+        Scopes::SHARED_INSTANCE_VERSION_DELETE,
     )
     .await?
     .1;
