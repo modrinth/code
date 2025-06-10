@@ -94,14 +94,6 @@ async fn main() -> std::io::Result<()> {
 
     let file_host: Arc<dyn file_hosting::FileHost + Send + Sync> =
         match storage_backend.as_str() {
-            "backblaze" => Arc::new(
-                file_hosting::BackblazeHost::new(
-                    &dotenvy::var("BACKBLAZE_KEY_ID").unwrap(),
-                    &dotenvy::var("BACKBLAZE_KEY").unwrap(),
-                    &dotenvy::var("BACKBLAZE_BUCKET_ID").unwrap(),
-                )
-                .await,
-            ),
             "s3" => Arc::new(
                 S3Host::new(
                     &dotenvy::var("S3_BUCKET_NAME").unwrap(),

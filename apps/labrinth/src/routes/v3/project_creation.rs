@@ -308,13 +308,13 @@ Get logged in user
 
 2. Upload
     - Icon: check file format & size
-        - Upload to backblaze & record URL
+        - Upload to S3 & record URL
     - Project files
         - Check for matching version
         - File size limits?
         - Check file type
             - Eventually, malware scan
-        - Upload to backblaze & create VersionFileBuilder
+        - Upload to S3 & create VersionFileBuilder
     -
 
 3. Creation
@@ -333,7 +333,7 @@ async fn project_create_inner(
     redis: &RedisPool,
     session_queue: &AuthQueue,
 ) -> Result<HttpResponse, CreateError> {
-    // The base URL for files uploaded to backblaze
+    // The base URL for files uploaded to S3
     let cdn_url = dotenvy::var("CDN_URL")?;
 
     // The currently logged in user

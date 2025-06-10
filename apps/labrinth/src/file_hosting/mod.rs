@@ -1,21 +1,15 @@
 use async_trait::async_trait;
 use thiserror::Error;
 
-mod backblaze;
 mod mock;
 mod s3_host;
 
-pub use backblaze::BackblazeHost;
 use bytes::Bytes;
 pub use mock::MockHost;
 pub use s3_host::S3Host;
 
 #[derive(Error, Debug)]
 pub enum FileHostingError {
-    #[error("Error while accessing the data from backblaze")]
-    HttpError(#[from] reqwest::Error),
-    #[error("Backblaze error: {0}")]
-    BackblazeError(serde_json::Value),
     #[error("S3 error: {0}")]
     S3Error(String),
     #[error("File system error in file hosting: {0}")]

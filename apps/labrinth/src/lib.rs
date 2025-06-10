@@ -358,11 +358,6 @@ pub fn check_env_vars() -> bool {
 
     let storage_backend = dotenvy::var("STORAGE_BACKEND").ok();
     match storage_backend.as_deref() {
-        Some("backblaze") => {
-            failed |= check_var::<String>("BACKBLAZE_KEY_ID");
-            failed |= check_var::<String>("BACKBLAZE_KEY");
-            failed |= check_var::<String>("BACKBLAZE_BUCKET_ID");
-        }
         Some("s3") => {
             failed |= check_var::<String>("S3_ACCESS_TOKEN");
             failed |= check_var::<String>("S3_SECRET");
@@ -375,8 +370,7 @@ pub fn check_env_vars() -> bool {
         }
         Some(backend) => {
             warn!(
-                "Variable `STORAGE_BACKEND` contains an invalid value: {}. Expected \"backblaze\", \"s3\", or \"local\".",
-                backend
+                "Variable `STORAGE_BACKEND` contains an invalid value: {backend}. Expected \"s3\" or \"local\"."
             );
             failed |= true;
         }
