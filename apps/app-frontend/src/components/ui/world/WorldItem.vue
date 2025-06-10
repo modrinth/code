@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import type { ServerStatus, ServerWorld, SingleplayerWorld, World } from '@/helpers/worlds.ts'
-import {
-  set_world_display_status,
-  getWorldIdentifier,
-} from '@/helpers/worlds.ts'
+import { set_world_display_status, getWorldIdentifier } from '@/helpers/worlds.ts'
 import { formatNumber, getPingLevel } from '@modrinth/utils'
 import {
   useRelativeTime,
@@ -47,8 +44,8 @@ const formatRelativeTime = useRelativeTime()
 const router = useRouter()
 
 const emit = defineEmits<{
-  (e: 'play' | 'play-instance' | 'update' | 'stop' | 'refresh' | 'edit' | 'delete'): void,
-  (e: 'open-folder', world: SingleplayerWorld): void,
+  (e: 'play' | 'play-instance' | 'update' | 'stop' | 'refresh' | 'edit' | 'delete'): void
+  (e: 'open-folder', world: SingleplayerWorld): void
 }>()
 
 const props = withDefaults(
@@ -380,7 +377,7 @@ const messages = defineMessages({
               {
                 id: 'open-folder',
                 shown: world.type === 'singleplayer',
-                action: () => world.type === 'singleplayer' ?  emit('open-folder', world) : {},
+                action: () => (world.type === 'singleplayer' ? emit('open-folder', world) : {}),
               },
               {
                 divider: true,
