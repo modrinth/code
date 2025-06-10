@@ -58,7 +58,7 @@ pub async fn report_create(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::REPORT_CREATE]),
+        Scopes::REPORT_CREATE,
     )
     .await?
     .1;
@@ -254,7 +254,7 @@ pub async fn reports(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::REPORT_READ]),
+        Scopes::REPORT_READ,
     )
     .await?
     .1;
@@ -338,7 +338,7 @@ pub async fn reports_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::REPORT_READ]),
+        Scopes::REPORT_READ,
     )
     .await?
     .1;
@@ -364,7 +364,7 @@ pub async fn report_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::REPORT_READ]),
+        Scopes::REPORT_READ,
     )
     .await?
     .1;
@@ -406,7 +406,7 @@ pub async fn report_edit(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::REPORT_WRITE]),
+        Scopes::REPORT_WRITE,
     )
     .await?
     .1;
@@ -506,7 +506,7 @@ pub async fn report_delete(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::REPORT_DELETE]),
+        Scopes::REPORT_DELETE,
     )
     .await?;
 

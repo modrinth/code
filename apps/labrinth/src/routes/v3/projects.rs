@@ -94,14 +94,21 @@ pub async fn random_projects_get(
     })?;
 
     let project_ids = sqlx::query!(
-        "
-            SELECT id FROM mods TABLESAMPLE SYSTEM_ROWS($1) WHERE status = ANY($2)
-            ",
-        count.count as i32,
+        // IDs are randomly generated (see the `generate_ids` macro), so fetching a
+        // number of mods nearest to a random point in the ID space is equivalent to
+        // random sampling
+        "WITH random_id_point AS (
+            SELECT POINT(RANDOM() * ((SELECT MAX(id) FROM mods) - (SELECT MIN(id) FROM mods) + 1) + (SELECT MIN(id) FROM mods), 0) AS point
+        )
+        SELECT id FROM mods
+        WHERE status = ANY($1)
+        ORDER BY POINT(id, 0) <-> (SELECT point FROM random_id_point)
+        LIMIT $2",
         &*crate::models::projects::ProjectStatus::iterator()
             .filter(|x| x.is_searchable())
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
+        count.count as i32,
     )
     .fetch(&**pool)
     .map_ok(|m| db_ids::DBProjectId(m.id))
@@ -139,7 +146,7 @@ pub async fn projects_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ]),
+        Scopes::PROJECT_READ,
     )
     .await
     .map(|x| x.1)
@@ -168,7 +175,7 @@ pub async fn project_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ]),
+        Scopes::PROJECT_READ,
     )
     .await
     .map(|x| x.1)
@@ -258,7 +265,7 @@ pub async fn project_edit(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_WRITE]),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     .1;
@@ -1014,7 +1021,7 @@ pub async fn dependency_list(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ]),
+        Scopes::PROJECT_READ,
     )
     .await
     .map(|x| x.1)
@@ -1126,7 +1133,7 @@ pub async fn projects_edit(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_WRITE]),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     .1;
@@ -1423,7 +1430,7 @@ pub async fn project_icon_edit(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_WRITE]),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     .1;
@@ -1534,7 +1541,7 @@ pub async fn delete_project_icon(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_WRITE]),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     .1;
@@ -1641,7 +1648,7 @@ pub async fn add_gallery_item(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_WRITE]),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     .1;
@@ -1799,7 +1806,7 @@ pub async fn edit_gallery_item(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_WRITE]),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     .1;
@@ -1966,7 +1973,7 @@ pub async fn delete_gallery_item(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_WRITE]),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     .1;
@@ -2075,7 +2082,7 @@ pub async fn project_delete(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_DELETE]),
+        Scopes::PROJECT_DELETE,
     )
     .await?
     .1;
@@ -2178,7 +2185,7 @@ pub async fn project_follow(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_WRITE]),
+        Scopes::USER_WRITE,
     )
     .await?
     .1;
@@ -2258,7 +2265,7 @@ pub async fn project_unfollow(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_WRITE]),
+        Scopes::USER_WRITE,
     )
     .await?
     .1;
@@ -2334,7 +2341,7 @@ pub async fn project_get_organization(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ, Scopes::ORGANIZATION_READ]),
+        Scopes::PROJECT_READ | Scopes::ORGANIZATION_READ,
     )
     .await
     .map(|x| x.1)

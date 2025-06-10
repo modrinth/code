@@ -15,7 +15,7 @@ pub async fn get_user_from_headers<'a, E>(
     executor: E,
     redis: &RedisPool,
     session_queue: &AuthQueue,
-    required_scopes: Option<&[Scopes]>,
+    required_scopes: Scopes,
 ) -> Result<(Scopes, User), AuthenticationError>
 where
     E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
@@ -33,12 +33,8 @@ where
 
     let user = User::from_full(db_user);
 
-    if let Some(required_scopes) = required_scopes {
-        for scope in required_scopes {
-            if !scopes.contains(*scope) {
-                return Err(AuthenticationError::InvalidCredentials);
-            }
-        }
+    if !scopes.contains(required_scopes) {
+        return Err(AuthenticationError::InvalidCredentials);
     }
 
     Ok((scopes, user))
@@ -175,7 +171,7 @@ pub async fn check_is_moderator_from_headers<'a, 'b, E>(
     executor: E,
     redis: &RedisPool,
     session_queue: &AuthQueue,
-    required_scopes: Option<&[Scopes]>,
+    required_scopes: Scopes,
 ) -> Result<User, AuthenticationError>
 where
     E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,

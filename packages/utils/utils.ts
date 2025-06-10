@@ -177,8 +177,15 @@ export const formatCategory = (name) => {
     return 'Colored Lighting'
   } else if (name === 'optifine') {
     return 'OptiFine'
+  } else if (name === 'bta-babric') {
+    return 'BTA (Babric)'
+  } else if (name === 'legacy-fabric') {
+    return 'Legacy Fabric'
+  } else if (name === 'java-agent') {
+    return 'Java Agent'
+  } else if (name === 'nilloader') {
+    return 'NilLoader'
   }
-
   return capitalizeString(name)
 }
 

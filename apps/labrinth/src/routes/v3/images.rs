@@ -49,14 +49,12 @@ pub async fn images_add(
 ) -> Result<HttpResponse, ApiError> {
     let mut context = ImageContext::from_str(&data.context, None);
 
-    let scopes = vec![context.relevant_scope()];
-
     let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Some(&scopes),
+        context.relevant_scope(),
     )
     .await?
     .1;

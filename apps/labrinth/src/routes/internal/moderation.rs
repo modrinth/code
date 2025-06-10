@@ -39,7 +39,7 @@ pub async fn get_projects(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ]),
+        Scopes::PROJECT_READ,
     )
     .await?;
 
@@ -82,7 +82,7 @@ pub async fn get_project_meta(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ]),
+        Scopes::PROJECT_READ,
     )
     .await?;
 
@@ -234,7 +234,7 @@ pub async fn set_project_meta(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ]),
+        Scopes::PROJECT_READ,
     )
     .await?;
 

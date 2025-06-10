@@ -36,7 +36,7 @@ pub async fn add_friend(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_WRITE]),
+        Scopes::USER_WRITE,
     )
     .await?
     .1;
@@ -154,7 +154,7 @@ pub async fn remove_friend(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_WRITE]),
+        Scopes::USER_WRITE,
     )
     .await?
     .1;
@@ -200,7 +200,7 @@ pub async fn friends(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_READ]),
+        Scopes::USER_READ,
     )
     .await?
     .1;
