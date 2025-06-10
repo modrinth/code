@@ -5,7 +5,6 @@
         <section v-if="error" class="universal-card">
           <h2>An error occurred whilst opening the task editor.</h2>
           <p>{{ error }}</p>
-          <!-- TODO: Replace this with a better error visualization. -->
         </section>
         <section v-else class="universal-card">
           <h2>{{ isNew ? "New scheduled task" : "Editing scheduled task" }}</h2>
@@ -97,11 +96,11 @@
               v-model="customCron"
               type="text"
               class="input input-bordered font-mono"
-              placeholder="0 9 * * *"
+              placeholder="0 0 9 * * *"
             />
             <div v-if="!isValidCron" class="text-xs text-brand-red">
-              Invalid cron format. Please use 5 space-separated values (e.g., minute hour day month
-              day-of-week).
+              Invalid cron format. Please use 6 space-separated values (e.g.,
+              <code>second minute hour day month day-of-week</code>).
             </div>
             <div v-else class="text-xs">
               {{ humanReadableDescription }}
@@ -144,7 +143,6 @@
               :placeholder="`/tellraw @a \u0022Restarting in {}!\u0022`"
               class="input input-bordered"
             />
-            <!-- TODO: Warning interval UI -->
           </div>
 
           <div class="mt-6 flex max-w-md gap-2">
@@ -194,7 +192,7 @@ const task = ref<Partial<ServerSchedule | Schedule>>({});
 const scheduleType = ref<"daily" | "custom">("daily");
 const dayInterval = ref("1");
 const selectedTime = ref({ hour: "9", minute: "0" });
-const customCron = ref("0 9 * * *");
+const customCron = ref("0 0 9 * * *");
 const actionKinds: ActionKind[] = ["restart", "game-command"];
 
 const commandValue = computed({
@@ -218,14 +216,14 @@ const cronString = computed(() => {
   const hour = selectedTime.value.hour === "" ? "0" : selectedTime.value.hour;
   const days = dayInterval.value === "" || Number(dayInterval.value) < 1 ? "1" : dayInterval.value;
   if (days === "1") {
-    return `${minute} ${hour} * * *`;
+    return `0 ${minute} ${hour} * * *`;
   } else {
-    return `${minute} ${hour} */${days} * *`;
+    return `0 ${minute} ${hour} */${days} * *`;
   }
 });
 
 const CRON_REGEX =
-  /^\s*([0-9*/,-]+)\s+([0-9*/,-]+)\s+([0-9*/,-]+)\s+([0-9*/,-]+)\s+([0-9*/,-]+)\s*$/;
+  /^\s*([0-9*/,-]+)\s+([0-9*/,-]+)\s+([0-9*/,-]+)\s+([0-9*/,-]+)\s+([0-9*/,-]+)\s+([0-9*/,-]+)\s*$/;
 
 const isValidCron = computed(() => {
   const cronToTest = scheduleType.value === "custom" ? customCron.value.trim() : cronString.value;
@@ -236,7 +234,10 @@ const isValidCron = computed(() => {
 
   if (scheduleType.value === "custom") {
     try {
-      cronToString(cronToTest);
+      const parts = cronToTest.split(/\s+/);
+      if (parts.length === 6) {
+        cronToString(parts.slice(1).join(" "));
+      }
       return true;
     } catch {
       return false;
@@ -250,7 +251,11 @@ const humanReadableDescription = computed<string | undefined>(() => {
   if (!isValidCron.value && scheduleType.value === "custom") return undefined;
   if (scheduleType.value === "custom") {
     try {
-      return cronToString(customCron.value.trim());
+      const parts = customCron.value.trim().split(/\s+/);
+      if (parts.length === 6) {
+        return cronToString(parts.slice(1).join(" "));
+      }
+      return "Invalid cron expression";
     } catch {
       return "Invalid cron expression";
     }
@@ -327,7 +332,30 @@ onBeforeMount(async () => {
         task.value = { ...found };
         if (task.value.every && typeof task.value.every === "string") {
           const parts = task.value.every.split(/\s+/);
-          if (parts.length === 5) {
+          if (parts.length === 6) {
+            const second = parts[0];
+            const minute = parts[1];
+            const hour = parts[2];
+            const dayOfMonth = parts[3];
+
+            if (second === "0" && dayOfMonth.startsWith("*/")) {
+              scheduleType.value = "daily";
+              dayInterval.value = dayOfMonth.substring(2);
+              selectedTime.value = { hour, minute };
+            } else if (
+              second === "0" &&
+              dayOfMonth === "*" &&
+              parts[4] === "*" &&
+              parts[5] === "*"
+            ) {
+              scheduleType.value = "daily";
+              dayInterval.value = "1";
+              selectedTime.value = { hour, minute };
+            } else {
+              scheduleType.value = "custom";
+              customCron.value = task.value.every;
+            }
+          } else if (parts.length === 5) {
             const minute = parts[0];
             const hour = parts[1];
             const dayOfMonth = parts[2];
@@ -342,7 +370,7 @@ onBeforeMount(async () => {
               selectedTime.value = { hour, minute };
             } else {
               scheduleType.value = "custom";
-              customCron.value = task.value.every;
+              customCron.value = `0 ${task.value.every}`;
             }
           } else {
             scheduleType.value = "custom";
@@ -369,7 +397,7 @@ onBeforeMount(async () => {
     scheduleType.value = "daily";
     dayInterval.value = "1";
     selectedTime.value = { hour: "9", minute: "0" };
-    customCron.value = "0 9 * * *";
+    customCron.value = "0 0 9 * * *";
     if (isValidCron.value) {
       task.value.every = cronString.value;
     }
