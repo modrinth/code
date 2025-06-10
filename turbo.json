@@ -4,7 +4,7 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".nuxt/**", "dist/**", ".output/**", "target/**"],
+      "outputs": [".nuxt/**", "dist/**", ".output/**", "$TURBO_ROOT$/target/**"],
       "env": [
         "NODE_ENV",
         "SITE_URL",
@@ -20,20 +20,50 @@
         "PROD_OVERRIDE",
         "PYRO_MASTER_KEY",
         "PORT",
-        "SQLX_OFFLINE"
+        "SQLX_OFFLINE",
+        "DATABASE_URL",
+        "CARGO_*",
+        "RUST_*",
+        "RUSTFLAGS",
+        "FORCE_COLOR",
+        "NEXTEST_*"
       ]
     },
     "lint": {
-      "env": ["SQLX_OFFLINE"]
+      "env": [
+        "DATABASE_URL",
+        "SQLX_OFFLINE",
+        "CARGO_*",
+        "RUST_*",
+        "RUSTFLAGS",
+        "FORCE_COLOR",
+        "NEXTEST_*"
+      ]
     },
     "dev": {
       "cache": false,
       "persistent": true,
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "env": ["DISPLAY", "WEBKIT_DISABLE_DMABUF_RENDERER"]
+      "env": [
+        "DISPLAY",
+        "WEBKIT_DISABLE_DMABUF_RENDERER",
+        "CARGO_*",
+        "RUST_*",
+        "RUSTFLAGS",
+        "FORCE_COLOR",
+        "NEXTEST_*"
+      ]
     },
     "test": {
-      "env": ["SQLX_OFFLINE", "DATABASE_URL"]
+      "env": [
+        "SQLX_OFFLINE",
+        "DATABASE_URL",
+        "CARGO_*",
+        "RUST_*",
+        "RUSTFLAGS",
+        "FORCE_COLOR",
+        "NEXTEST_*"
+      ]
     },
     "fix": {
       "cache": false

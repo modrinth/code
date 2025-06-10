@@ -6,7 +6,6 @@ services:
     ports:
       - '5432:5432'
     environment:
-      POSTGRES_DB: postgres
       POSTGRES_USER: labrinth
       POSTGRES_PASSWORD: labrinth
       POSTGRES_HOST_AUTH_METHOD: trust

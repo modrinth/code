@@ -32,16 +32,16 @@ jobs:
 
       - name: Rust setup (mac)
         if: startsWith(matrix.platform, 'macos')
-        uses: dtolnay/rust-toolchain@stable
+        uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          components: rustfmt, clippy
-          targets: aarch64-apple-darwin, x86_64-apple-darwin
+          rustflags: ''
+          target: x86_64-apple-darwin
 
       - name: Rust setup
         if: "!startsWith(matrix.platform, 'macos')"
-        uses: dtolnay/rust-toolchain@stable
+        uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          components: rustfmt, clippy
+          rustflags: ''
 
       - name: Setup rust cache
         uses: actions/cache@v4
@@ -72,10 +72,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-rust-target-
 
-      - name: Use Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version-file: .nvmrc
 
       - name: Install pnpm via corepack
         shell: bash

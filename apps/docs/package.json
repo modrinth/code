@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro check && astro build",
+    "lint": "astro check",
+    "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
