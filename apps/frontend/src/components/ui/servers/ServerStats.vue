@@ -44,8 +44,8 @@
             height="142"
             :options="getChartOptions(metric.warning, index)"
             :series="[{ name: metric.title, data: metric.data }]"
-            class="chart opacity-0"
-            :class="{ 'chart-loaded': chartsReady.has(index) }"
+            class="chart"
+            :class="chartsReady.has(index) ? 'opacity-100' : 'opacity-0'"
           />
         </ClientOnly>
       </div>
@@ -70,7 +70,7 @@
 
 <script setup lang="ts">
 import { ref, computed, shallowRef } from "vue";
-import { FolderOpenIcon, CPUIcon, DBIcon, IssuesIcon } from "@modrinth/assets";
+import { FolderOpenIcon, CPUIcon, DatabaseIcon, IssuesIcon } from "@modrinth/assets";
 import { useStorage } from "@vueuse/core";
 import type { Stats } from "~/types/servers";
 
@@ -136,7 +136,7 @@ const metrics = computed(() => {
         title: "Memory usage",
         value: "0.00%",
         max: "100%",
-        icon: DBIcon,
+        icon: DatabaseIcon,
         data: ramData.value,
         showGraph: false,
         warning: null,
@@ -169,7 +169,7 @@ const metrics = computed(() => {
         ? formatBytes(stats.value.ram_usage_bytes)
         : `${ramPercent.toFixed(2)}%`,
       max: userPreferences.value.ramAsNumber ? formatBytes(stats.value.ram_total_bytes) : "100%",
-      icon: DBIcon,
+      icon: DatabaseIcon,
       data: ramData.value,
       showGraph: true,
       warning: ramPercent >= 90 ? "Memory usage is very high" : null,
@@ -247,9 +247,5 @@ watch(
   width: 100% !important;
   height: 142px !important;
   transition: opacity 0.3s ease-out;
-}
-
-.chart-loaded {
-  opacity: 1;
 }
 </style>
