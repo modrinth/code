@@ -32,7 +32,11 @@
         <template #actions>
           <div class="flex gap-2">
             <ButtonStyled
-              v-if="['installing', 'pack_installing', 'minecraft_installing'].includes(instance.install_stage)"
+              v-if="
+                ['installing', 'pack_installing', 'minecraft_installing'].includes(
+                  instance.install_stage,
+                )
+              "
               color="brand"
               size="large"
             >
