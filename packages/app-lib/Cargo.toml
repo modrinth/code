@@ -2,7 +2,7 @@
 name = "theseus"
 version = "0.9.5"
 authors = ["Jai A <jaiagr+gpg@pm.me>"]
-edition = "2024"
+edition.workspace = true
 
 [dependencies]
 bytes.workspace = true
@@ -75,3 +75,6 @@ winreg.workspace = true
 [features]
 tauri = ["dep:tauri"]
 cli = ["dep:indicatif"]
+
+[lints]
+workspace = true
