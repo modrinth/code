@@ -1,45 +1,45 @@
-import type { ScheduledTask } from "@modrinth/utils";
+import type { Schedule, ServerSchedule } from "@modrinth/utils";
 import { useServersFetch } from "../servers-fetch.ts";
 import { ServerModule } from "./base.ts";
 
 export class SchedulingModule extends ServerModule {
-  tasks: ScheduledTask[] = [];
+  tasks: ServerSchedule[] = [];
 
   async fetch(): Promise<void> {
-    // this.tasks = await useServersFetch<ScheduledTask[]>(
-    //   `servers/${this.serverId}/options/schedules`,
-    //   { version: 1 },
-    // );
+    const response = await useServersFetch<{ items: ServerSchedule[] }>(
+      `servers/${this.serverId}/options/schedules`,
+      { version: 1 },
+    );
+    this.tasks = response.items;
   }
 
-  async deleteTask(task: ScheduledTask): Promise<void> {
-    // await useServersFetch(`servers/${this.serverId}/options/schedules`, {
-    //   method: "DELETE",
-    //   body: { title: task.title },
-    //   version: 1,
-    // });
-    // this.tasks = this.tasks.filter((t) => t.title !== task.title);
+  async deleteTask(task: ServerSchedule): Promise<void> {
+    await useServersFetch(`servers/${this.serverId}/options/schedules/${task.id}`, {
+      method: "DELETE",
+      version: 1,
+    });
+    this.tasks = this.tasks.filter((t) => t.id !== task.id);
   }
 
-  async createTask(task: ScheduledTask): Promise<number> {
-    // await useServersFetch(`servers/${this.serverId}/options/schedules`, {
-    //   method: "POST",
-    //   body: task,
-    //   version: 1,
-    // });
-    // this.tasks.push(task);
-    // return this.tasks.length;
+  async createTask(task: Schedule): Promise<number> {
+    const response = await useServersFetch<{ id: number }>(
+      `servers/${this.serverId}/options/schedules`,
+      {
+        method: "POST",
+        body: task,
+        version: 1,
+      },
+    );
+    await this.fetch();
+    return response.id;
   }
 
-  async editTask(taskTitle: string, updatedTask: Partial<ScheduledTask>): Promise<void> {
-    // await useServersFetch(`servers/${this.serverId}/options/schedules`, {
-    //   method: "PATCH",
-    //   body: { title: taskTitle, ...updatedTask },
-    //   version: 1,
-    // });
-    // const index = this.tasks.findIndex((t) => t.title === taskTitle);
-    // if (index !== -1) {
-    //   this.tasks[index] = { ...this.tasks[index], ...updatedTask };
-    // }
+  async editTask(taskId: number, updatedTask: Partial<Schedule>): Promise<void> {
+    await useServersFetch(`servers/${this.serverId}/options/schedules/${taskId}`, {
+      method: "PATCH",
+      body: updatedTask,
+      version: 1,
+    });
+    await this.fetch();
   }
 }
