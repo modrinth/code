@@ -11,6 +11,7 @@ use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
 use std::sync::Arc;
 use tracing::{error, info};
 use tracing_actix_web::TracingLogger;
+use labrinth::util::env::parse_var;
 
 #[cfg(target_os = "linux")]
 #[global_allocator]
@@ -97,6 +98,7 @@ async fn main() -> std::io::Result<()> {
             "s3" => Arc::new(
                 S3Host::new(
                     &dotenvy::var("S3_BUCKET_NAME").unwrap(),
+                    parse_var("S3_USES_PATH_STYLE_BUCKETS").unwrap(),
                     &dotenvy::var("S3_REGION").unwrap(),
                     &dotenvy::var("S3_URL").unwrap(),
                     &dotenvy::var("S3_ACCESS_TOKEN").unwrap(),

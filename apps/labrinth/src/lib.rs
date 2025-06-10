@@ -364,6 +364,7 @@ pub fn check_env_vars() -> bool {
             failed |= check_var::<String>("S3_URL");
             failed |= check_var::<String>("S3_REGION");
             failed |= check_var::<String>("S3_BUCKET_NAME");
+            failed |= check_var::<bool>("S3_USES_PATH_STYLE_BUCKETS");
         }
         Some("local") => {
             failed |= check_var::<String>("MOCK_FILE_PATH");

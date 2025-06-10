@@ -17,12 +17,13 @@ pub struct S3Host {
 impl S3Host {
     pub fn new(
         bucket_name: &str,
+        bucket_uses_path_style: bool,
         bucket_region: &str,
         url: &str,
         access_token: &str,
         secret: &str,
     ) -> Result<S3Host, FileHostingError> {
-        let bucket = Bucket::new(
+        let mut bucket = Bucket::new(
             bucket_name,
             if bucket_region == "r2" {
                 Region::R2 {
@@ -52,6 +53,12 @@ impl S3Host {
                 "Error while creating Bucket instance".to_string(),
             )
         })?;
+
+        if bucket_uses_path_style {
+            bucket.set_path_style();
+        } else {
+            bucket.set_subdomain_style();
+        }
 
         Ok(S3Host { bucket: *bucket })
     }
