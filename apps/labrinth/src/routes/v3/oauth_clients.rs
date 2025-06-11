@@ -1,6 +1,9 @@
 use std::{collections::HashSet, fmt::Display, sync::Arc};
 
 use super::ApiError;
+use crate::file_hosting::FileHostPublicity;
+use crate::models::ids::OAuthClientId;
+use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::{
     auth::{checks::ValidateAuthorized, get_user_from_headers},
     database::{
@@ -37,9 +40,6 @@ use rand_chacha::ChaCha20Rng;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use validator::Validate;
-
-use crate::models::ids::OAuthClientId;
-use crate::util::img::{delete_old_images, upload_image_optimized};
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -381,6 +381,7 @@ pub async fn oauth_client_icon_edit(
     delete_old_images(
         client.icon_url.clone(),
         client.raw_icon_url.clone(),
+        FileHostPublicity::Public,
         &***file_host,
     )
     .await?;
@@ -393,6 +394,7 @@ pub async fn oauth_client_icon_edit(
     .await?;
     let upload_result = upload_image_optimized(
         &format!("data/{client_id}"),
+        FileHostPublicity::Public,
         bytes.freeze(),
         &ext.ext,
         Some(96),
@@ -447,6 +449,7 @@ pub async fn oauth_client_icon_delete(
     delete_old_images(
         client.icon_url.clone(),
         client.raw_icon_url.clone(),
+        FileHostPublicity::Public,
         &***file_host,
     )
     .await?;

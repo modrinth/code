@@ -97,7 +97,8 @@ async fn main() -> std::io::Result<()> {
         match storage_backend.as_str() {
             "s3" => Arc::new(
                 S3Host::new(
-                    &dotenvy::var("S3_BUCKET_NAME").unwrap(),
+                    &dotenvy::var("S3_PUBLIC_BUCKET_NAME").unwrap(),
+                    &dotenvy::var("S3_PRIVATE_BUCKET_NAME").unwrap(),
                     parse_var("S3_USES_PATH_STYLE_BUCKETS").unwrap(),
                     &dotenvy::var("S3_REGION").unwrap(),
                     &dotenvy::var("S3_URL").unwrap(),

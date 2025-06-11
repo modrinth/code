@@ -9,7 +9,7 @@ use crate::database::models::version_item::{
 };
 use crate::database::models::{self, DBOrganization, image_item};
 use crate::database::redis::RedisPool;
-use crate::file_hosting::FileHost;
+use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::{ImageId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::notifications::NotificationBody;
@@ -955,12 +955,12 @@ pub async fn upload_file(
         format!("data/{}/versions/{}/{}", project_id, version_id, &file_name);
 
     let upload_data = file_host
-        .upload_file(content_type, &file_path, data)
+        .upload_file(content_type, &file_path, FileHostPublicity::Public, data)
         .await?;
 
     uploaded_files.push(UploadedFile {
-        file_id: upload_data.file_id,
-        file_name: file_path,
+        name: file_path,
+        publicity: FileHostPublicity::Public,
     });
 
     let sha1_bytes = upload_data.content_sha1.into_bytes();

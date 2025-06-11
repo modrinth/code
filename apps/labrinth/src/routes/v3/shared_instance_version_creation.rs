@@ -7,7 +7,7 @@ use crate::database::models::{
     generate_shared_instance_version_id,
 };
 use crate::database::redis::RedisPool;
-use crate::file_hosting::FileHost;
+use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::{SharedInstanceId, SharedInstanceVersionId};
 use crate::models::pats::Scopes;
 use crate::models::shared_instances::{
@@ -166,12 +166,17 @@ async fn shared_instance_version_create_inner(
     );
 
     let upload_data = file_host
-        .upload_file(MRPACK_MIME_TYPE, &file_path, file_data)
+        .upload_file(
+            MRPACK_MIME_TYPE,
+            &file_path,
+            FileHostPublicity::Public, // TODO
+            file_data,
+        )
         .await?;
 
     uploaded_files.push(UploadedFile {
-        file_id: upload_data.file_id,
-        file_name: file_path,
+        name: file_path,
+        publicity: upload_data.file_publicity,
     });
 
     let sha512 = Vec::<u8>::from_hex(upload_data.content_sha512).unwrap();

@@ -363,7 +363,8 @@ pub fn check_env_vars() -> bool {
             failed |= check_var::<String>("S3_SECRET");
             failed |= check_var::<String>("S3_URL");
             failed |= check_var::<String>("S3_REGION");
-            failed |= check_var::<String>("S3_BUCKET_NAME");
+            failed |= check_var::<String>("S3_PUBLIC_BUCKET_NAME");
+            failed |= check_var::<String>("S3_PRIVATE_BUCKET_NAME");
             failed |= check_var::<bool>("S3_USES_PATH_STYLE_BUCKETS");
         }
         Some("local") => {

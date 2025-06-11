@@ -9,7 +9,7 @@ use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::models::{DBTeamMember, ids as db_ids, image_item};
 use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
-use crate::file_hosting::FileHost;
+use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models;
 use crate::models::ids::ProjectId;
 use crate::models::images::ImageContext;
@@ -1478,6 +1478,7 @@ pub async fn project_icon_edit(
     delete_old_images(
         project_item.inner.icon_url,
         project_item.inner.raw_icon_url,
+        FileHostPublicity::Public,
         &***file_host,
     )
     .await?;
@@ -1492,6 +1493,7 @@ pub async fn project_icon_edit(
     let project_id: ProjectId = project_item.inner.id.into();
     let upload_result = upload_image_optimized(
         &format!("data/{project_id}"),
+        FileHostPublicity::Public,
         bytes.freeze(),
         &ext.ext,
         Some(96),
@@ -1588,6 +1590,7 @@ pub async fn delete_project_icon(
     delete_old_images(
         project_item.inner.icon_url,
         project_item.inner.raw_icon_url,
+        FileHostPublicity::Public,
         &***file_host,
     )
     .await?;
@@ -1710,6 +1713,7 @@ pub async fn add_gallery_item(
     let id: ProjectId = project_item.inner.id.into();
     let upload_result = upload_image_optimized(
         &format!("data/{id}/images"),
+        FileHostPublicity::Public,
         bytes.freeze(),
         &ext.ext,
         Some(350),
@@ -2040,6 +2044,7 @@ pub async fn delete_gallery_item(
     delete_old_images(
         Some(item.image_url),
         Some(item.raw_image_url),
+        FileHostPublicity::Public,
         &***file_host,
     )
     .await?;

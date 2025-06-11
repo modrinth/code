@@ -20,8 +20,8 @@ pub enum FileHostingError {
 
 #[derive(Debug, Clone)]
 pub struct UploadFileData {
-    pub file_id: String,
     pub file_name: String,
+    pub file_publicity: FileHostPublicity,
     pub content_length: u32,
     pub content_sha512: String,
     pub content_sha1: String,
@@ -35,17 +35,25 @@ pub struct DeleteFileData {
     pub file_name: String,
 }
 
+#[derive(Debug, Copy, Clone)]
+pub enum FileHostPublicity {
+    Public,
+    Private,
+}
+
 #[async_trait]
 pub trait FileHost {
     async fn upload_file(
         &self,
         content_type: &str,
         file_name: &str,
+        file_publicity: FileHostPublicity,
         file_bytes: Bytes,
     ) -> Result<UploadFileData, FileHostingError>;
 
     async fn delete_file_version(
         &self,
         file_name: &str,
+        file_publicity: FileHostPublicity,
     ) -> Result<DeleteFileData, FileHostingError>;
 }

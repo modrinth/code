@@ -1,9 +1,13 @@
-use super::{DeleteFileData, FileHost, FileHostingError, UploadFileData};
+use super::{
+    DeleteFileData, FileHost, FileHostPublicity, FileHostingError,
+    UploadFileData,
+};
 use async_trait::async_trait;
 use bytes::Bytes;
 use chrono::Utc;
 use hex::ToHex;
 use sha2::Digest;
+use std::path::PathBuf;
 
 #[derive(Default)]
 pub struct MockHost(());
@@ -20,11 +24,10 @@ impl FileHost for MockHost {
         &self,
         content_type: &str,
         file_name: &str,
+        file_publicity: FileHostPublicity,
         file_bytes: Bytes,
     ) -> Result<UploadFileData, FileHostingError> {
-        let path =
-            std::path::Path::new(&dotenvy::var("MOCK_FILE_PATH").unwrap())
-                .join(file_name.replace("../", ""));
+        let path = get_file_path(file_name, file_publicity);
         std::fs::create_dir_all(
             path.parent().ok_or(FileHostingError::InvalidFilename)?,
         )?;
@@ -33,8 +36,8 @@ impl FileHost for MockHost {
 
         std::fs::write(path, &*file_bytes)?;
         Ok(UploadFileData {
-            file_id: String::from("MOCK_FILE_ID"),
             file_name: file_name.to_string(),
+            file_publicity,
             content_length: file_bytes.len() as u32,
             content_sha512,
             content_sha1,
@@ -47,10 +50,9 @@ impl FileHost for MockHost {
     async fn delete_file_version(
         &self,
         file_name: &str,
+        file_publicity: FileHostPublicity,
     ) -> Result<DeleteFileData, FileHostingError> {
-        let path =
-            std::path::Path::new(&dotenvy::var("MOCK_FILE_PATH").unwrap())
-                .join(file_name.replace("../", ""));
+        let path = get_file_path(file_name, file_publicity);
         if path.exists() {
             std::fs::remove_file(path)?;
         }
@@ -58,4 +60,19 @@ impl FileHost for MockHost {
             file_name: file_name.to_string(),
         })
     }
+}
+
+fn get_file_path(
+    file_name: &str,
+    file_publicity: FileHostPublicity,
+) -> PathBuf {
+    let mut path = PathBuf::new();
+
+    path.push(dotenvy::var("MOCK_FILE_PATH").unwrap());
+    if matches!(file_publicity, FileHostPublicity::Private) {
+        path.push("private");
+    }
+    path.push(file_name.replace("../", ""));
+
+    path
 }
