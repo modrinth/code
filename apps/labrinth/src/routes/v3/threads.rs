@@ -608,7 +608,7 @@ pub async fn message_delete(
             let name = image.url.split(&format!("{cdn_url}/")).nth(1);
             if let Some(icon_path) = name {
                 file_host
-                    .delete_file_version(
+                    .delete_file(
                         icon_path,
                         FileHostPublicity::Public, // FIXME: Consider using private file storage?
                     )

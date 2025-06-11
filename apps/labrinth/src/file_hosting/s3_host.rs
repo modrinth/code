@@ -118,7 +118,7 @@ impl FileHost for S3Host {
         })
     }
 
-    async fn delete_file_version(
+    async fn delete_file(
         &self,
         file_name: &str,
         file_publicity: FileHostPublicity,

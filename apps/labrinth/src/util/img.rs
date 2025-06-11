@@ -183,7 +183,7 @@ pub async fn delete_old_images(
         let name = image_url.split(&cdn_url_start).nth(1);
 
         if let Some(icon_path) = name {
-            file_host.delete_file_version(icon_path, publicity).await?;
+            file_host.delete_file(icon_path, publicity).await?;
         }
     }
 
@@ -191,7 +191,7 @@ pub async fn delete_old_images(
         let name = raw_image_url.split(&cdn_url_start).nth(1);
 
         if let Some(icon_path) = name {
-            file_host.delete_file_version(icon_path, publicity).await?;
+            file_host.delete_file(icon_path, publicity).await?;
         }
     }
 
