@@ -1,6 +1,7 @@
 use crate::auth::email::send_email;
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::auth::{AuthProvider, AuthenticationError, get_user_from_headers};
+use crate::database::models::DBUser;
 use crate::database::models::flow_item::DBFlow;
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
@@ -76,7 +77,7 @@ impl TempUser {
         redis: &RedisPool,
     ) -> Result<crate::database::models::DBUserId, AuthenticationError> {
         if let Some(email) = &self.email {
-            if crate::database::models::DBUser::get_email(email, client)
+            if crate::database::models::DBUser::get_by_email(email, client)
                 .await?
                 .is_some()
             {
@@ -1385,9 +1386,12 @@ pub async fn create_account_with_password(
         .hash_password(new_account.password.as_bytes(), &salt)?
         .to_string();
 
-    if crate::database::models::DBUser::get_email(&new_account.email, &**pool)
-        .await?
-        .is_some()
+    if crate::database::models::DBUser::get_by_email(
+        &new_account.email,
+        &**pool,
+    )
+    .await?
+    .is_some()
     {
         return Err(ApiError::InvalidInput(
             "Email is already registered on Modrinth!".to_string(),
@@ -1450,7 +1454,8 @@ pub async fn create_account_with_password(
 
 #[derive(Deserialize, Validate)]
 pub struct Login {
-    pub username: String,
+    #[serde(rename = "username")]
+    pub username_or_email: String,
     pub password: String,
     pub challenge: String,
 }
@@ -1466,14 +1471,17 @@ pub async fn login_password(
         return Err(ApiError::Turnstile);
     }
 
-    let user = if let Some(user) =
-        crate::database::models::DBUser::get(&login.username, &**pool, &redis)
-            .await?
+    let user = if let Some(user) = crate::database::models::DBUser::get(
+        &login.username_or_email,
+        &**pool,
+        &redis,
+    )
+    .await?
     {
         user
     } else {
-        let user = crate::database::models::DBUser::get_email(
-            &login.username,
+        let user = crate::database::models::DBUser::get_by_email(
+            &login.username_or_email,
             &**pool,
         )
         .await?
@@ -1903,7 +1911,8 @@ pub async fn remove_2fa(
 
 #[derive(Deserialize)]
 pub struct ResetPassword {
-    pub username: String,
+    #[serde(rename = "username")]
+    pub username_or_email: String,
     pub challenge: String,
 }
 
@@ -1918,46 +1927,77 @@ pub async fn reset_password_begin(
         return Err(ApiError::Turnstile);
     }
 
-    let user = if let Some(user_id) =
-        crate::database::models::DBUser::get_email(
-            &reset_password.username,
+    let user =
+        match crate::database::models::DBUser::get_by_case_insensitive_email(
+            &reset_password.username_or_email,
             &**pool,
         )
-        .await?
-    {
-        crate::database::models::DBUser::get_id(user_id, &**pool, &redis)
-            .await?
-    } else {
-        crate::database::models::DBUser::get(
-            &reset_password.username,
-            &**pool,
-            &redis,
-        )
-        .await?
-    };
+        .await?[..]
+        {
+            [] => {
+                // Try finding by username or ID
+                crate::database::models::DBUser::get(
+                    &reset_password.username_or_email,
+                    &**pool,
+                    &redis,
+                )
+                .await?
+            }
+            [user_id] => {
+                // If there is only one user with the given email, ignoring case,
+                // we can assume it's the user we want to reset the password for
+                crate::database::models::DBUser::get_id(
+                    user_id, &**pool, &redis,
+                )
+                .await?
+            }
+            _ => {
+                // When several users use variations of the same email with
+                // different cases, we cannot reliably tell which user should
+                // receive the password reset email, so fall back to case sensitive
+                // search to avoid spamming multiple users
+                if let Some(user_id) =
+                    crate::database::models::DBUser::get_by_email(
+                        &reset_password.username_or_email,
+                        &**pool,
+                    )
+                    .await?
+                {
+                    crate::database::models::DBUser::get_id(
+                        user_id, &**pool, &redis,
+                    )
+                    .await?
+                } else {
+                    None
+                }
+            }
+        };
 
-    if let Some(user) = user {
-        let flow = DBFlow::ForgotPassword { user_id: user.id }
+    if let Some(DBUser {
+        id: user_id,
+        email: Some(email),
+        ..
+    }) = user
+    {
+        let flow = DBFlow::ForgotPassword { user_id }
             .insert(Duration::hours(24), &redis)
             .await?;
 
-        if let Some(email) = user.email {
-            send_email(
-                email,
-                "Reset your password",
-                "Please visit the following link below to reset your password. If the button does not work, you can copy the link and paste it into your browser.",
-                "If you did not request for your password to be reset, you can safely ignore this email.",
-                Some((
-                    "Reset password",
-                    &format!(
-                        "{}/{}?flow={}",
-                        dotenvy::var("SITE_URL")?,
-                        dotenvy::var("SITE_RESET_PASSWORD_PATH")?,
-                        flow
-                    ),
-                )),
-            )?;
-        }
+        send_email(
+            email,
+            "Reset your password",
+            "Please visit the following link below to reset your password. If the button does not work, you can copy the link and paste it into your browser.",
+            "If you did not request for your password to be reset, you can safely ignore this email.",
+            Some((
+                "Reset password",
+                &format!(
+                    "{}/{}?flow={}",
+                    dotenvy::var("SITE_URL")?,
+                    dotenvy::var("SITE_RESET_PASSWORD_PATH")?,
+                    flow
+                ),
+            )),
+        )?;
     }
 
     Ok(HttpResponse::Ok().finish())
