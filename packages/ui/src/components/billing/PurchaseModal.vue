@@ -2,7 +2,8 @@
   <NewModal ref="purchaseModal">
     <template #title>
       <span class="text-contrast text-xl font-extrabold">
-        <template v-if="productType === 'midas'">Subscribe to Modrinth+!</template>
+        <template v-if="intervalChangeOnly"> Change billing interval </template>
+        <template v-else-if="productType === 'midas'">Subscribe to Modrinth+!</template>
         <template v-else-if="productType === 'pyro'">
           <template v-if="existingSubscription"> Upgrade server plan </template>
           <template v-else> Subscribe to Modrinth Servers! </template>
@@ -11,11 +12,11 @@
       </span>
     </template>
     <div class="flex items-center gap-1 pb-4">
-      <template v-if="productType === 'pyro' && !projectId">
+      <template v-if="!props.intervalChangeOnly && productType === 'pyro' && !projectId">
         <span
           :class="{
-            'text-secondary': purchaseModalStep !== 0,
-            'font-bold': purchaseModalStep === 0,
+            'text-secondary': !isConfigStep,
+            'font-bold': isConfigStep,
           }"
         >
           Configure
@@ -25,8 +26,8 @@
       </template>
       <span
         :class="{
-          'text-secondary': purchaseModalStep !== (productType === 'pyro' && !projectId ? 1 : 0),
-          'font-bold': purchaseModalStep === (productType === 'pyro' && !projectId ? 1 : 0),
+          'text-secondary': !isBillingStep,
+          'font-bold': isBillingStep,
         }"
       >
         {{ productType === 'pyro' ? 'Billing' : 'Plan' }}
@@ -37,8 +38,8 @@
       <ChevronRightIcon class="h-5 w-5 text-secondary" />
       <span
         :class="{
-          'text-secondary': purchaseModalStep !== (productType === 'pyro' && !projectId ? 2 : 1),
-          'font-bold': purchaseModalStep === (productType === 'pyro' && !projectId ? 2 : 1),
+          'text-secondary': !isPaymentStep,
+          'font-bold': isPaymentStep,
         }"
       >
         Payment
@@ -46,17 +47,14 @@
       <ChevronRightIcon class="h-5 w-5 text-secondary" />
       <span
         :class="{
-          'text-secondary': purchaseModalStep !== (productType === 'pyro' && !projectId ? 3 : 2),
-          'font-bold': purchaseModalStep === (productType === 'pyro' && !projectId ? 3 : 2),
+          'text-secondary': !isReviewStep,
+          'font-bold': isReviewStep,
         }"
       >
         Review
       </span>
     </div>
-    <div
-      v-if="productType === 'pyro' && !projectId && purchaseModalStep === 0"
-      class="md:w-[600px] flex flex-col gap-4"
-    >
+    <div v-if="!props.intervalChangeOnly && isConfigStep" class="md:w-[600px] flex flex-col gap-4">
       <div v-if="!existingSubscription">
         <p class="my-2 text-lg font-bold">Configure your server</p>
         <div class="flex flex-col gap-4">
@@ -182,10 +180,7 @@
         </div>
       </div>
     </div>
-    <div
-      v-if="purchaseModalStep === (mutatedProduct.metadata.type === 'pyro' && !projectId ? 1 : 0)"
-      class="md:w-[600px]"
-    >
+    <div v-if="isBillingStep" class="md:w-[600px]">
       <div>
         <p class="my-2 text-lg font-bold">Choose billing interval</p>
         <div v-if="existingPlan" class="flex flex-col gap-3 mb-4 text-secondary">
@@ -249,9 +244,7 @@
         </div>
       </div>
     </div>
-    <template
-      v-if="purchaseModalStep === (mutatedProduct.metadata.type === 'pyro' && !projectId ? 2 : 1)"
-    >
+    <template v-if="isPaymentStep">
       <div
         v-show="loadingPaymentMethodModal !== 2"
         class="flex min-h-[16rem] items-center justify-center md:w-[600px]"
@@ -263,12 +256,20 @@
         <div id="payment-element" class="mt-4"></div>
       </div>
     </template>
-    <div
-      v-if="purchaseModalStep === (mutatedProduct.metadata.type === 'pyro' && !projectId ? 3 : 2)"
-      class="md:w-[650px]"
-    >
+    <div v-if="isReviewStep" class="md:w-[650px]">
+      <div v-if="props.intervalChangeOnly" class="r-4 rounded-xl bg-bg p-4">
+        <p class="my-2 text-lg font-bold text-primary">Billing interval change</p>
+        <div class="mb-2 flex justify-between">
+          <span class="text-secondary">
+            Current interval: {{ props.existingSubscription?.interval }}
+          </span>
+        </div>
+        <div class="mb-2 flex justify-between">
+          <span class="text-secondary"> New interval: {{ selectedPlan }} </span>
+        </div>
+      </div>
       <div
-        v-if="mutatedProduct.metadata.type === 'pyro' && !existingSubscription"
+        v-else-if="mutatedProduct.metadata.type === 'pyro' && !existingSubscription"
         class="r-4 rounded-xl bg-bg p-4 mb-4"
       >
         <p class="my-2 text-lg font-bold text-primary">Server details</p>
@@ -429,7 +430,7 @@
       </p>
     </div>
     <div class="input-group push-right pt-4">
-      <template v-if="purchaseModalStep === 0">
+      <template v-if="!props.intervalChangeOnly && purchaseModalStep === 0">
         <button class="btn" @click="$refs.purchaseModal.hide()">
           <XIcon />
           Cancel
@@ -454,40 +455,21 @@
           </template>
         </button>
       </template>
-      <template
-        v-else-if="
-          purchaseModalStep === (mutatedProduct.metadata.type === 'pyro' && !projectId ? 1 : 0)
-        "
-      >
-        <button
-          class="btn"
-          @click="
-            purchaseModalStep =
-              mutatedProduct.metadata.type === 'pyro' && !projectId ? 0 : purchaseModalStep
-          "
-        >
+      <template v-else-if="isBillingStep">
+        <button v-if="!props.intervalChangeOnly" class="btn" @click="purchaseModalStep = 0">
           Back
         </button>
-        <button class="btn btn-primary" :disabled="paymentLoading" @click="beginPurchaseFlow(true)">
+        <button
+          class="btn btn-primary"
+          :disabled="paymentLoading || isSameInterval"
+          @click="beginPurchaseFlow(true)"
+        >
           <RightArrowIcon />
           Select
         </button>
       </template>
-      <template
-        v-else-if="
-          purchaseModalStep === (mutatedProduct.metadata.type === 'pyro' && !projectId ? 2 : 1)
-        "
-      >
-        <button
-          class="btn"
-          @click="
-            () => {
-              purchaseModalStep = mutatedProduct.metadata.type === 'pyro' && !projectId ? 1 : 0
-              loadingPaymentMethodModal = 0
-              paymentLoading = false
-            }
-          "
-        >
+      <template v-else-if="isPaymentStep">
+        <button class="btn" @click="purchaseModalStep = props.intervalChangeOnly ? 0 : 1">
           Back
         </button>
         <button class="btn btn-primary" :disabled="paymentLoading" @click="validatePayment">
@@ -495,11 +477,7 @@
           Continue
         </button>
       </template>
-      <template
-        v-else-if="
-          purchaseModalStep === (mutatedProduct.metadata.type === 'pyro' && !projectId ? 3 : 2)
-        "
-      >
+      <template v-else-if="isReviewStep">
         <button class="btn" @click="$refs.purchaseModal.hide()">
           <XIcon />
           Cancel
@@ -511,7 +489,7 @@
           @click="submitPayment"
         >
           <CheckCircleIcon />
-          Subscribe
+          {{ props.intervalChangeOnly ? 'Change Interval' : 'Subscribe' }}
         </button>
         <!-- Default Subscribe Button, so M+ still works -->
         <button v-else class="btn btn-primary" :disabled="paymentLoading" @click="submitPayment">
@@ -639,9 +617,39 @@ const props = defineProps({
     required: false,
     default: null,
   },
+  intervalChangeOnly: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const productType = computed(() => (props.customServer ? 'pyro' : props.product.metadata.type))
+
+const isConfigStep = computed(
+  () =>
+    productType.value === 'pyro' &&
+    !props.projectId &&
+    !props.intervalChangeOnly &&
+    purchaseModalStep.value === 0,
+)
+
+const isBillingStep = computed(
+  () =>
+    purchaseModalStep.value ===
+    (props.intervalChangeOnly ? 0 : productType.value === 'pyro' && !props.projectId ? 1 : 0),
+)
+
+const isPaymentStep = computed(
+  () =>
+    purchaseModalStep.value ===
+    (props.intervalChangeOnly ? 1 : productType.value === 'pyro' && !props.projectId ? 2 : 1),
+)
+
+const isReviewStep = computed(
+  () =>
+    purchaseModalStep.value ===
+    (props.intervalChangeOnly ? 2 : productType.value === 'pyro' && !props.projectId ? 3 : 2),
+)
 
 const messages = defineMessages({
   paymentMethodCardDisplay: {
@@ -749,6 +757,10 @@ const customServerConfig = reactive({
 })
 
 const updateCustomServerProduct = () => {
+  if (!props.product || !Array.isArray(props.product)) {
+    return
+  }
+
   customMatchingProduct.value = props.product.find(
     (product) => product.metadata.ram === customServerConfig.ram,
   )
@@ -789,6 +801,10 @@ const updateCustomServerStock = async () => {
 }
 
 function updateRamValues() {
+  if (!props.product || !Array.isArray(props.product)) {
+    return
+  }
+
   const ramValues = props.product.map((product) => product.metadata.ram / 1024)
   customMinRam.value = Math.min(...ramValues)
   customMaxRam.value = Math.max(...ramValues)
@@ -868,10 +884,19 @@ const sharedCpus = computed(() => {
   return (mutatedProduct.value?.metadata?.cpu ?? 0) / 2
 })
 
+const isSameInterval = computed(() => {
+  return (
+    props.intervalChangeOnly &&
+    props.existingSubscription &&
+    selectedPlan.value === props.existingSubscription.interval
+  )
+})
+
 function nextStep() {
   if (
     mutatedProduct.value.metadata.type === 'pyro' &&
     !props.projectId &&
+    !props.intervalChangeOnly &&
     purchaseModalStep.value === 0
   ) {
     purchaseModalStep.value = 1
@@ -891,13 +916,19 @@ async function beginPurchaseFlow(skip = false) {
     paymentLoading.value = true
     await refreshPayment(null, primaryPaymentMethodId.value)
     paymentLoading.value = false
-    purchaseModalStep.value =
-      mutatedProduct.value.metadata.type === 'pyro' && !props.projectId ? 3 : 2
+    purchaseModalStep.value = props.intervalChangeOnly
+      ? 2
+      : mutatedProduct.value.metadata.type === 'pyro' && !props.projectId
+        ? 3
+        : 2
   } else {
     try {
       loadingPaymentMethodModal.value = 0
-      purchaseModalStep.value =
-        mutatedProduct.value.metadata.type === 'pyro' && !props.projectId ? 2 : 1
+      purchaseModalStep.value = props.intervalChangeOnly
+        ? 1
+        : mutatedProduct.value.metadata.type === 'pyro' && !props.projectId
+          ? 2
+          : 1
 
       await nextTick()
 
@@ -955,8 +986,11 @@ async function validatePayment() {
 
   loadingPaymentMethodModal.value = 0
   confirmationToken.value = await createConfirmationToken()
-  purchaseModalStep.value =
-    mutatedProduct.value.metadata.type === 'pyro' && !props.projectId ? 3 : 2
+  purchaseModalStep.value = props.intervalChangeOnly
+    ? 2
+    : mutatedProduct.value.metadata.type === 'pyro' && !props.projectId
+      ? 3
+      : 2
   paymentLoading.value = false
 }
 
@@ -1006,7 +1040,7 @@ async function refreshPayment(confirmationId, paymentMethodId) {
           },
     )
 
-    if (!paymentIntentId.value) {
+    if (result.payment_intent_id && !paymentIntentId.value) {
       paymentIntentId.value = result.payment_intent_id
       clientSecret.value = result.client_secret
     }

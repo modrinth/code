@@ -354,6 +354,21 @@
                       </button>
                     </ButtonStyled>
                     <ButtonStyled
+                      v-if="
+                        getPyroCharge(subscription) &&
+                        getPyroCharge(subscription).status !== 'cancelled' &&
+                        getPyroCharge(subscription).status !== 'failed'
+                      "
+                      color="purple"
+                      color-fill="text"
+                    >
+                      <button @click="showPyroIntervalChange(subscription)">
+                        <TransferIcon />
+                        <!-- TODO: Make this attractive af for monthly subscribers -->
+                        Change billing interval
+                      </button>
+                    </ButtonStyled>
+                    <ButtonStyled
                       v-else-if="
                         getPyroCharge(subscription) &&
                         (getPyroCharge(subscription).status === 'cancelled' ||
@@ -408,6 +423,31 @@
             text: err.message ?? (err.data ? err.data.description : err),
           })
       "
+      :customer="customer"
+      :payment-methods="paymentMethods"
+      :return-url="`${config.public.siteUrl}/settings/billing`"
+    />
+    <PurchaseModal
+      v-if="currentProduct"
+      ref="pyroIntervalModal"
+      :product="[currentProduct]"
+      :country="country"
+      custom-server
+      interval-change-only
+      :existing-subscription="currentSubscription"
+      :existing-plan="currentProduct"
+      :publishable-key="config.public.stripePublishableKey"
+      :send-billing-request="
+        async (body) => {
+          await useBaseFetch(`billing/subscription/${currentSubscription.id}`, {
+            internal: true,
+            method: 'PATCH',
+            body,
+          });
+        }
+      "
+      :renewal-date="currentSubRenewalDate"
+      :on-error="handleError"
       :customer="customer"
       :payment-methods="paymentMethods"
       :return-url="`${config.public.siteUrl}/settings/billing`"
@@ -822,6 +862,18 @@ const oppositeInterval = computed(() =>
   midasCharge.value?.subscription_interval === "yearly" ? "monthly" : "yearly",
 );
 
+async function showPyroIntervalChange(subscription) {
+  currentSubscription.value = subscription;
+  currentSubRenewalDate.value = getPyroCharge(subscription).due;
+  currentProduct.value = getPyroProduct(subscription);
+
+  upgradeProducts.value = [currentProduct.value];
+  upgradeProducts.value.metadata = { type: "pyro" };
+
+  await nextTick();
+  pyroIntervalModal.value.show();
+}
+
 async function switchMidasInterval(interval) {
   changingInterval.value = true;
   startLoading();
@@ -941,6 +993,7 @@ const getProductPrice = (product, interval) => {
 const modalCancel = ref(null);
 
 const pyroPurchaseModal = ref();
+const pyroIntervalModal = ref();
 const currentSubscription = ref(null);
 const currentProduct = ref(null);
 const upgradeProducts = ref([]);
