@@ -18,6 +18,7 @@
 <script setup>
 import ReportInfo from "~/components/ui/report/ReportInfo.vue";
 import { addReportMessage } from "~/helpers/threads.js";
+import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
 
 defineProps({
   moderation: {
@@ -53,13 +54,13 @@ const threadIds = [
 
 const [{ data: users }, { data: versions }, { data: threads }] = await Promise.all([
   await useAsyncData(`users?ids=${JSON.stringify(userIds)}`, () =>
-    useBaseFetch(`users?ids=${encodeURIComponent(JSON.stringify(userIds))}`),
+    fetchSegmented(userIds, (ids) => `users?ids=${asEncodedJsonArray(ids)}`),
   ),
   await useAsyncData(`versions?ids=${JSON.stringify(versionIds)}`, () =>
-    useBaseFetch(`versions?ids=${encodeURIComponent(JSON.stringify(versionIds))}`),
+    fetchSegmented(versionIds, (ids) => `versions?ids=${asEncodedJsonArray(ids)}`),
   ),
   await useAsyncData(`threads?ids=${JSON.stringify(threadIds)}`, () =>
-    useBaseFetch(`threads?ids=${encodeURIComponent(JSON.stringify(threadIds))}`),
+    fetchSegmented(threadIds, (ids) => `threads?ids=${asEncodedJsonArray(ids)}`),
   ),
 ]);
 
@@ -70,7 +71,7 @@ const versionProjects = versions.value.map((version) => version.project_id);
 const projectIds = [...new Set(reportedProjects.concat(versionProjects))];
 
 const { data: projects } = await useAsyncData(`projects?ids=${JSON.stringify(projectIds)}`, () =>
-  useBaseFetch(`projects?ids=${encodeURIComponent(JSON.stringify(projectIds))}`),
+  fetchSegmented(projectIds, (ids) => `projects?ids=${asEncodedJsonArray(ids)}`),
 );
 
 reports.value = rawReports.map((report) => {
