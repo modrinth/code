@@ -170,7 +170,7 @@
         </ContentPageHeader>
       </div>
       <div class="normal-page__content">
-        <div class="flex w-full justify-between items-start gap-4">
+        <div class="flex w-full items-start justify-between gap-4">
           <div v-if="navLinks.length >= 2" class="mb-4 max-w-full overflow-x-auto">
             <NavTabs :links="navLinks" />
           </div>
@@ -645,35 +645,27 @@ watch([currentFilters], () => {
 });
 
 async function fetchUserProjects() {
-  const requestParamsValue = requestParams
-    .value
-    .replace(/page=\d+/, "")
-    .replace(/limit=\d+/, "")
+  const requestParamsValue = requestParams.value.replace(/page=\d+/, "").replace(/limit=\d+/, "");
 
-  return await useBaseFetch(`user/${route.params.id}/projects${requestParamsValue}`,
-    {
-      transform: (projects) => {
-        for (const project of projects) {
-          project.categories = project.categories.concat(project.loaders);
-          project.project_type = data.$getProjectTypeForUrl(
-            project.project_type,
-            project.categories,
-            tags.value,
-          );
-        }
+  return await useBaseFetch(`user/${route.params.id}/projects${requestParamsValue}`, {
+    transform: (projects) => {
+      for (const project of projects) {
+        project.categories = project.categories.concat(project.loaders);
+        project.project_type = data.$getProjectTypeForUrl(
+          project.project_type,
+          project.categories,
+          tags.value,
+        );
+      }
 
-        return projects;
-      },
-    }
-  )
+      return projects;
+    },
+  });
 }
 
 async function fetchUserData() {
   try {
-    const requestParamsValue = requestParams
-      .value
-      .replace(/page=\d+/, "")
-      .replace(/limit=\d+/, "")
+    const requestParamsValue = requestParams.value.replace(/page=\d+/, "").replace(/limit=\d+/, "");
 
     return await Promise.all([
       useAsyncData(`user/${route.params.id}`, () => useBaseFetch(`user/${route.params.id}`)),
@@ -713,7 +705,8 @@ async function fetchUserData() {
   }
 }
 
-[{ data: user }, { data: projects }, { data: organizations }, { data: collections }] = await fetchUserData();
+[{ data: user }, { data: projects }, { data: organizations }, { data: collections }] =
+  await fetchUserData();
 
 if (!user.value) {
   throw createError({
