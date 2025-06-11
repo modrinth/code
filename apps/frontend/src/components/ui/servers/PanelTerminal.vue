@@ -301,7 +301,7 @@ import { useDebounceFn } from "@vueuse/core";
 import { NewModal } from "@modrinth/ui";
 import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
 import DOMPurify from "dompurify";
-import { usePyroConsole } from "~/store/console.ts";
+import { useModrinthServersConsole } from "~/store/console.ts";
 
 const { $cosmetics } = useNuxtApp();
 const cosmetics = $cosmetics;
@@ -318,7 +318,7 @@ const SEPARATOR_HEIGHT = 32;
 const SCROLL_END_DELAY = 150;
 const progressiveBlurIterations = ref(8);
 
-const pyroConsole = usePyroConsole();
+const pyroConsole = useModrinthServersConsole();
 const consoleOutput = computed(() => (props.loading ? [] : pyroConsole.output.value));
 
 const scrollContainer = ref<HTMLElement | null>(null);

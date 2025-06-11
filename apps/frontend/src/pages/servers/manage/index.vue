@@ -36,7 +36,7 @@
             <li v-if="fetchError" class="text-red">
               <p>Error details:</p>
               <UiCopyCode
-                :text="(fetchError as PyroFetchError).message || 'Unknown error'"
+                :text="(fetchError as ModrinthServersFetchError).message || 'Unknown error'"
                 :copyable="false"
                 :selectable="false"
                 :language="'json'"
@@ -121,9 +121,9 @@ import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import Fuse from "fuse.js";
 import { HammerIcon, PlusIcon, SearchIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
+import type { Server, ModrinthServersFetchError } from "@modrinth/utils";
 import { reloadNuxtApp } from "#app";
-import type { PyroFetchError } from "~/composables/pyroFetch";
-import type { Server } from "~/types/servers";
+import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 
 definePageMeta({
   middleware: "auth",
@@ -146,7 +146,9 @@ const {
   data: serverResponse,
   error: fetchError,
   refresh,
-} = await useAsyncData<ServerResponse>("ServerList", () => usePyroFetch<ServerResponse>("servers"));
+} = await useAsyncData<ServerResponse>("ServerList", () =>
+  useServersFetch<ServerResponse>("servers"),
+);
 
 watch([fetchError, serverResponse], ([error, response]) => {
   hasError.value = !!error || !response;

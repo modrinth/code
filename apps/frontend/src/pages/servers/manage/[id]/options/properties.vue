@@ -1,6 +1,9 @@
 <template>
   <div class="relative h-full w-full select-none overflow-y-auto">
-    <div v-if="server.fs?.error" class="flex w-full flex-col items-center justify-center gap-4 p-4">
+    <div
+      v-if="server.moduleErrors.fs"
+      class="flex w-full flex-col items-center justify-center gap-4 p-4"
+    >
       <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
         <div class="flex flex-col items-center text-center">
           <div class="flex flex-col items-center gap-4">
@@ -11,7 +14,9 @@
           </div>
           <p class="text-lg text-secondary">
             We couldn't access your server's properties. Here's what we know:
-            <span class="break-all font-mono">{{ JSON.stringify(server.fs.error) }}</span>
+            <span class="break-all font-mono">{{
+              JSON.stringify(server.moduleErrors.fs.error)
+            }}</span>
           </p>
           <ButtonStyled size="large" color="brand" @click="() => server.refresh(['fs'])">
             <button class="mt-6 !w-full">Retry</button>
@@ -141,10 +146,10 @@
 import { ref, watch, computed, inject } from "vue";
 import { EyeIcon, SearchIcon, IssuesIcon } from "@modrinth/assets";
 import Fuse from "fuse.js";
-import type { Server } from "~/composables/pyroServers";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: ModrinthServer;
 }>();
 
 const tags = useTags();

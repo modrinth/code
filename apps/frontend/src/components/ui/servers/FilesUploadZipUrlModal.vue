@@ -75,13 +75,14 @@
 <script setup lang="ts">
 import { ExternalIcon, SpinnerIcon, DownloadIcon, XIcon } from "@modrinth/assets";
 import { BackupWarning, ButtonStyled, NewModal } from "@modrinth/ui";
+import { ModrinthServersFetchError } from "@modrinth/utils";
 import { ref, computed, nextTick } from "vue";
-import { handleError, type Server } from "~/composables/pyroServers.ts";
+import { handleError, ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const cf = ref(false);
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: ModrinthServer;
 }>();
 
 const modal = ref<typeof NewModal>();
@@ -110,24 +111,18 @@ const handleSubmit = async () => {
   if (!error.value) {
     // hide();
     try {
-      const dry = await props.server.fs?.extractFile(trimmedUrl.value, true, true);
+      const dry = await props.server.fs.extractFile(trimmedUrl.value, true, true);
 
       if (!cf.value || dry.modpack_name) {
-        await props.server.fs?.extractFile(trimmedUrl.value, true, false, true);
+        await props.server.fs.extractFile(trimmedUrl.value, true, false, true);
         hide();
       } else {
         submitted.value = false;
         handleError(
-          new ServersError(
+          new ModrinthServersFetchError(
             "Could not find CurseForge modpack at that URL.",
-            undefined,
-            undefined,
-            undefined,
-            {
-              context: "Error installing modpack",
-              error: `url: ${url.value}`,
-              description: "Could not find CurseForge modpack at that URL.",
-            },
+            404,
+            new Error(`No modpack found at ${url.value}`),
           ),
         );
       }

@@ -72,7 +72,7 @@
 import { ref, computed, shallowRef } from "vue";
 import { FolderOpenIcon, CPUIcon, DatabaseIcon, IssuesIcon } from "@modrinth/assets";
 import { useStorage } from "@vueuse/core";
-import type { Stats } from "~/types/servers";
+import type { Stats } from "@modrinth/utils";
 
 const route = useNativeRoute();
 const serverId = route.params.id;
