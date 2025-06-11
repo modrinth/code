@@ -32,7 +32,6 @@ pub struct UploadFileData {
 
 #[derive(Debug, Clone)]
 pub struct DeleteFileData {
-    pub file_id: String,
     pub file_name: String,
 }
 
@@ -47,7 +46,6 @@ pub trait FileHost {
 
     async fn delete_file_version(
         &self,
-        file_id: &str,
         file_name: &str,
     ) -> Result<DeleteFileData, FileHostingError>;
 }

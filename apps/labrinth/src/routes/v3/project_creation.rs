@@ -248,9 +248,7 @@ pub async fn undo_uploads(
     uploaded_files: &[UploadedFile],
 ) -> Result<(), FileHostingError> {
     for file in uploaded_files {
-        file_host
-            .delete_file_version(&file.file_id, &file.file_name)
-            .await?;
+        file_host.delete_file_version(&file.file_name).await?;
     }
     Ok(())
 }

@@ -102,7 +102,6 @@ impl FileHost for S3Host {
 
     async fn delete_file_version(
         &self,
-        file_id: &str,
         file_name: &str,
     ) -> Result<DeleteFileData, FileHostingError> {
         self.bucket
@@ -115,7 +114,6 @@ impl FileHost for S3Host {
             })?;
 
         Ok(DeleteFileData {
-            file_id: file_id.to_string(),
             file_name: file_name.to_string(),
         })
     }

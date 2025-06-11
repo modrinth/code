@@ -6,12 +6,12 @@ use labrinth::background_task::BackgroundTask;
 use labrinth::database::redis::RedisPool;
 use labrinth::file_hosting::S3Host;
 use labrinth::search;
+use labrinth::util::env::parse_var;
 use labrinth::util::ratelimit::rate_limit_middleware;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
 use std::sync::Arc;
 use tracing::{error, info};
 use tracing_actix_web::TracingLogger;
-use labrinth::util::env::parse_var;
 
 #[cfg(target_os = "linux")]
 #[global_allocator]

@@ -607,7 +607,7 @@ pub async fn message_delete(
         for image in images {
             let name = image.url.split(&format!("{cdn_url}/")).nth(1);
             if let Some(icon_path) = name {
-                file_host.delete_file_version("", icon_path).await?;
+                file_host.delete_file_version(icon_path).await?;
             }
             database::DBImage::remove(image.id, &mut transaction, &redis)
                 .await?;
