@@ -57,7 +57,7 @@ pub async fn team_members_get_project(
             &**pool,
             &redis,
             &session_queue,
-            Some(&[Scopes::PROJECT_READ]),
+            Scopes::PROJECT_READ,
         )
         .await
         .map(|x| x.1)
@@ -142,7 +142,7 @@ pub async fn team_members_get_organization(
             &**pool,
             &redis,
             &session_queue,
-            Some(&[Scopes::ORGANIZATION_READ]),
+            Scopes::ORGANIZATION_READ,
         )
         .await
         .map(|x| x.1)
@@ -222,7 +222,7 @@ pub async fn team_members_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ]),
+        Scopes::PROJECT_READ,
     )
     .await
     .map(|x| x.1)
@@ -294,7 +294,7 @@ pub async fn teams_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ]),
+        Scopes::PROJECT_READ,
     )
     .await
     .map(|x| x.1)
@@ -348,7 +348,7 @@ pub async fn join_team(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_WRITE]),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     .1;
@@ -437,7 +437,7 @@ pub async fn add_team_member(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_WRITE]),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     .1;
@@ -692,7 +692,7 @@ pub async fn edit_team_member(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_WRITE]),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     .1;
@@ -878,7 +878,7 @@ pub async fn transfer_ownership(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_WRITE]),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     .1;
@@ -1050,7 +1050,7 @@ pub async fn remove_team_member(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_WRITE]),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     .1;

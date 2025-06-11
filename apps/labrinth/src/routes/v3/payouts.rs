@@ -313,7 +313,7 @@ pub async fn user_payouts(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PAYOUTS_READ]),
+        Scopes::PAYOUTS_READ,
     )
     .await?
     .1;
@@ -653,7 +653,7 @@ pub async fn cancel_payout(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PAYOUTS_WRITE]),
+        Scopes::PAYOUTS_WRITE,
     )
     .await?
     .1;
@@ -783,7 +783,7 @@ pub async fn get_balance(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PAYOUTS_READ]),
+        Scopes::PAYOUTS_READ,
     )
     .await?
     .1;

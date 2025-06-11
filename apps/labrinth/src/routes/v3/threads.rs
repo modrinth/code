@@ -285,7 +285,7 @@ pub async fn thread_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::THREAD_READ]),
+        Scopes::THREAD_READ,
     )
     .await?
     .1;
@@ -341,7 +341,7 @@ pub async fn threads_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::THREAD_READ]),
+        Scopes::THREAD_READ,
     )
     .await?
     .1;
@@ -379,7 +379,7 @@ pub async fn thread_send_message(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::THREAD_WRITE]),
+        Scopes::THREAD_WRITE,
     )
     .await?
     .1;
@@ -577,7 +577,7 @@ pub async fn message_delete(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::THREAD_WRITE]),
+        Scopes::THREAD_WRITE,
     )
     .await?
     .1;

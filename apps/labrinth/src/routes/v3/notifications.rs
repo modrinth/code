@@ -40,7 +40,7 @@ pub async fn notifications_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::NOTIFICATION_READ]),
+        Scopes::NOTIFICATION_READ,
     )
     .await?
     .1;
@@ -82,7 +82,7 @@ pub async fn notification_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::NOTIFICATION_READ]),
+        Scopes::NOTIFICATION_READ,
     )
     .await?
     .1;
@@ -119,7 +119,7 @@ pub async fn notification_read(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::NOTIFICATION_WRITE]),
+        Scopes::NOTIFICATION_WRITE,
     )
     .await?
     .1;
@@ -169,7 +169,7 @@ pub async fn notification_delete(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::NOTIFICATION_WRITE]),
+        Scopes::NOTIFICATION_WRITE,
     )
     .await?
     .1;
@@ -220,7 +220,7 @@ pub async fn notifications_read(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::NOTIFICATION_WRITE]),
+        Scopes::NOTIFICATION_WRITE,
     )
     .await?
     .1;
@@ -273,7 +273,7 @@ pub async fn notifications_delete(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::NOTIFICATION_WRITE]),
+        Scopes::NOTIFICATION_WRITE,
     )
     .await?
     .1;

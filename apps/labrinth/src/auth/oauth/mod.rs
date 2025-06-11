@@ -68,7 +68,7 @@ pub async fn init_oauth(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_AUTH_WRITE]),
+        Scopes::USER_AUTH_WRITE,
     )
     .await?
     .1;
@@ -323,7 +323,7 @@ pub async fn accept_or_reject_client_scopes(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await?
     .1;
