@@ -207,7 +207,6 @@ import _CubeIcon from './icons/cube.svg?component'
 import _CloudIcon from './icons/cloud.svg?component'
 import _CogIcon from './icons/cog.svg?component'
 import _CPUIcon from './icons/cpu.svg?component'
-import _DBIcon from './icons/db.svg?component'
 import _LoaderIcon from './icons/loader.svg?component'
 import _ImportIcon from './icons/import.svg?component'
 import _TimerIcon from './icons/timer.svg?component'
@@ -438,7 +437,6 @@ export const CubeIcon = _CubeIcon
 export const CloudIcon = _CloudIcon
 export const CogIcon = _CogIcon
 export const CPUIcon = _CPUIcon
-export const DBIcon = _DBIcon
 export const LoaderIcon = _LoaderIcon
 export const ImportIcon = _ImportIcon
 export const CardIcon = _CardIcon
