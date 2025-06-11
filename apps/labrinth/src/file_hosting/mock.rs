@@ -8,6 +8,7 @@ use chrono::Utc;
 use hex::ToHex;
 use sha2::Digest;
 use std::path::PathBuf;
+use std::time::Duration;
 
 #[derive(Default)]
 pub struct MockHost(());
@@ -45,6 +46,15 @@ impl FileHost for MockHost {
             content_type: content_type.to_string(),
             upload_timestamp: Utc::now().timestamp() as u64,
         })
+    }
+
+    async fn get_url_for_private_file(
+        &self,
+        file_name: &str,
+        _expiry: Duration,
+    ) -> Result<String, FileHostingError> {
+        let cdn_url = dotenvy::var("CDN_URL").unwrap();
+        Ok(format!("{cdn_url}/private/{file_name}"))
     }
 
     async fn delete_file(

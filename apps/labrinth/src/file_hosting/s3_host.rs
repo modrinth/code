@@ -10,6 +10,7 @@ use s3::bucket::Bucket;
 use s3::creds::Credentials;
 use s3::region::Region;
 use sha2::Digest;
+use std::time::Duration;
 
 pub struct S3Host {
     public_bucket: Bucket,
@@ -46,16 +47,12 @@ impl S3Host {
                     None,
                     None,
                 )
-                .map_err(|_| {
-                    FileHostingError::S3Error(
-                        "Error while creating credentials".to_string(),
-                    )
+                .map_err(|e| {
+                    FileHostingError::S3Error("creating credentials", e.into())
                 })?,
             )
-            .map_err(|_| {
-                FileHostingError::S3Error(
-                    "Error while creating Bucket instance".to_string(),
-                )
+            .map_err(|e| {
+                FileHostingError::S3Error("creating Bucket instance", e)
             })?;
 
             if bucket_uses_path_style {
@@ -100,11 +97,7 @@ impl FileHost for S3Host {
                 content_type,
             )
             .await
-            .map_err(|err| {
-                FileHostingError::S3Error(format!(
-                    "Error while uploading file {file_name} to S3: {err}"
-                ))
-            })?;
+            .map_err(|e| FileHostingError::S3Error("uploading file", e))?;
 
         Ok(UploadFileData {
             file_name: file_name.to_string(),
@@ -118,6 +111,25 @@ impl FileHost for S3Host {
         })
     }
 
+    async fn get_url_for_private_file(
+        &self,
+        file_name: &str,
+        expiry: Duration,
+    ) -> Result<String, FileHostingError> {
+        let url = self
+            .private_bucket
+            .presign_get(
+                format!("/{file_name}"),
+                expiry.as_secs().try_into().unwrap(),
+                None,
+            )
+            .await
+            .map_err(|e| {
+                FileHostingError::S3Error("generating presigned URL", e)
+            })?;
+        Ok(url)
+    }
+
     async fn delete_file(
         &self,
         file_name: &str,
@@ -126,11 +138,7 @@ impl FileHost for S3Host {
         self.get_bucket(file_publicity)
             .delete_object(format!("/{file_name}"))
             .await
-            .map_err(|err| {
-                FileHostingError::S3Error(format!(
-                    "Error while deleting file {file_name} to S3: {err}"
-                ))
-            })?;
+            .map_err(|e| FileHostingError::S3Error("deleting file", e))?;
 
         Ok(DeleteFileData {
             file_name: file_name.to_string(),

@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use std::time::Duration;
 use thiserror::Error;
 
 mod mock;
@@ -10,8 +11,8 @@ pub use s3_host::S3Host;
 
 #[derive(Error, Debug)]
 pub enum FileHostingError {
-    #[error("S3 error: {0}")]
-    S3Error(String),
+    #[error("S3 error when {0}: {1}")]
+    S3Error(&'static str, s3::error::S3Error),
     #[error("File system error in file hosting: {0}")]
     FileSystemError(#[from] std::io::Error),
     #[error("Invalid Filename")]
@@ -50,6 +51,12 @@ pub trait FileHost {
         file_publicity: FileHostPublicity,
         file_bytes: Bytes,
     ) -> Result<UploadFileData, FileHostingError>;
+
+    async fn get_url_for_private_file(
+        &self,
+        file_name: &str,
+        expiry: Duration,
+    ) -> Result<String, FileHostingError>;
 
     async fn delete_file(
         &self,
