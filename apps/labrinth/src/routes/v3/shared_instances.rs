@@ -415,21 +415,14 @@ pub async fn shared_instance_version_get(
     .await?
     .map(|(_, user)| user);
 
-    let version =
-        DBSharedInstanceVersion::get(version_id, &**pool).await?;
+    let version = DBSharedInstanceVersion::get(version_id, &**pool).await?;
 
     if let Some(version) = version {
-        let instance = DBSharedInstance::get(
-            version.shared_instance_id,
-            &**pool,
-        )
-        .await?;
+        let instance =
+            DBSharedInstance::get(version.shared_instance_id, &**pool).await?;
         if let Some(instance) = instance {
             if !can_access_instance_as_maybe_user(
-                &pool,
-                &redis,
-                &instance,
-                user,
+                &pool, &redis, &instance, user,
             )
             .await?
             {

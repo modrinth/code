@@ -3,21 +3,23 @@ use crate::database::models::shared_instance_item::{
     DBSharedInstance, DBSharedInstanceUser, DBSharedInstanceVersion,
 };
 use crate::database::models::{
-    generate_shared_instance_version_id, DBSharedInstanceId,
-    DBSharedInstanceVersionId,
+    DBSharedInstanceId, DBSharedInstanceVersionId,
+    generate_shared_instance_version_id,
 };
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::{SharedInstanceId, SharedInstanceVersionId};
 use crate::models::pats::Scopes;
-use crate::models::shared_instances::{SharedInstanceUserPermissions, SharedInstanceVersion};
+use crate::models::shared_instances::{
+    SharedInstanceUserPermissions, SharedInstanceVersion,
+};
 use crate::queue::session::AuthQueue;
-use crate::routes::v3::project_creation::UploadedFile;
 use crate::routes::ApiError;
+use crate::routes::v3::project_creation::UploadedFile;
 use crate::util::ext::MRPACK_MIME_TYPE;
 use actix_web::http::header::ContentLength;
 use actix_web::web::Data;
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, web};
 use bytes::BytesMut;
 use chrono::Utc;
 use futures_util::StreamExt;
