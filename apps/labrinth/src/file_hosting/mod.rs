@@ -1,5 +1,4 @@
 use async_trait::async_trait;
-use std::time::Duration;
 use thiserror::Error;
 
 mod mock;
@@ -55,7 +54,7 @@ pub trait FileHost {
     async fn get_url_for_private_file(
         &self,
         file_name: &str,
-        expiry: Duration,
+        expiry_secs: u32,
     ) -> Result<String, FileHostingError>;
 
     async fn delete_file(

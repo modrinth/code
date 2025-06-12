@@ -10,7 +10,6 @@ use s3::bucket::Bucket;
 use s3::creds::Credentials;
 use s3::region::Region;
 use sha2::Digest;
-use std::time::Duration;
 
 pub struct S3Host {
     public_bucket: Bucket,
@@ -114,15 +113,11 @@ impl FileHost for S3Host {
     async fn get_url_for_private_file(
         &self,
         file_name: &str,
-        expiry: Duration,
+        expiry_secs: u32,
     ) -> Result<String, FileHostingError> {
         let url = self
             .private_bucket
-            .presign_get(
-                format!("/{file_name}"),
-                expiry.as_secs().try_into().unwrap(),
-                None,
-            )
+            .presign_get(format!("/{file_name}"), expiry_secs, None)
             .await
             .map_err(|e| {
                 FileHostingError::S3Error("generating presigned URL", e)

@@ -7,6 +7,7 @@ use crate::database::models::{
     DBSharedInstanceId, DBSharedInstanceVersionId, generate_shared_instance_id,
 };
 use crate::database::redis::RedisPool;
+use crate::file_hosting::FileHost;
 use crate::models::ids::{SharedInstanceId, SharedInstanceVersionId};
 use crate::models::pats::Scopes;
 use crate::models::shared_instances::{
@@ -16,11 +17,12 @@ use crate::models::users::User;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::routes::read_typed_from_payload;
-use actix_web::web::Data;
+use actix_web::web::{Data, Redirect};
 use actix_web::{HttpRequest, HttpResponse, web};
 use futures_util::future::try_join_all;
 use serde::Deserialize;
 use sqlx::PgPool;
+use std::sync::Arc;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -36,7 +38,11 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("shared-instance-version")
             .route("{id}", web::get().to(shared_instance_version_get))
-            .route("{id}", web::delete().to(shared_instance_version_delete)),
+            .route("{id}", web::delete().to(shared_instance_version_delete))
+            .route(
+                "{id}/download",
+                web::get().to(shared_instance_version_download),
+            ),
     );
 }
 
@@ -553,4 +559,54 @@ async fn delete_instance_version(
 
     transaction.commit().await?;
     Ok(())
+}
+
+pub async fn shared_instance_version_download(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    info: web::Path<(SharedInstanceVersionId,)>,
+    session_queue: Data<AuthQueue>,
+) -> Result<Redirect, ApiError> {
+    let version_id = info.into_inner().0.into();
+
+    let user = get_maybe_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::SHARED_INSTANCE_VERSION_READ,
+    )
+    .await?
+    .map(|(_, user)| user);
+
+    let version = DBSharedInstanceVersion::get(version_id, &**pool).await?;
+
+    if let Some(version) = version {
+        let instance =
+            DBSharedInstance::get(version.shared_instance_id, &**pool).await?;
+        if let Some(instance) = instance {
+            if !can_access_instance_as_maybe_user(
+                &pool, &redis, &instance, user,
+            )
+            .await?
+            {
+                return Err(ApiError::NotFound);
+            }
+
+            let file_name = format!(
+                "shared_instance/{}.mrpack",
+                SharedInstanceVersionId::from(version_id)
+            );
+            let url =
+                file_host.get_url_for_private_file(&file_name, 60).await?;
+
+            Ok(Redirect::to(url).see_other())
+        } else {
+            Err(ApiError::NotFound)
+        }
+    } else {
+        Err(ApiError::NotFound)
+    }
 }

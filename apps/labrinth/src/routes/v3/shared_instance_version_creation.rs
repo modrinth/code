@@ -158,8 +158,7 @@ async fn shared_instance_version_create_inner(
 
     let file_data = file_data.freeze();
     let file_path = format!(
-        "shared_instance/{}/{}.mrpack",
-        SharedInstanceId::from(instance_id),
+        "shared_instance/{}.mrpack",
         SharedInstanceVersionId::from(version_id),
     );
 
@@ -167,7 +166,7 @@ async fn shared_instance_version_create_inner(
         .upload_file(
             MRPACK_MIME_TYPE,
             &file_path,
-            FileHostPublicity::Public, // TODO
+            FileHostPublicity::Private,
             file_data,
         )
         .await?;
