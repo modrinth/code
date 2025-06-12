@@ -119,6 +119,8 @@ ariadne.workspace = true
 
 clap = { workspace = true, features = ["derive"] }
 
+webauthn-rs.workspace = true
+
 [target.'cfg(target_os = "linux")'.dependencies]
 tikv-jemallocator = { workspace = true, features = ["profiling", "unprefixed_malloc_on_supported_platforms"] }
 tikv-jemalloc-ctl = { workspace = true, features = ["stats"] }
