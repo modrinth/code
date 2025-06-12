@@ -102,8 +102,6 @@ pub async fn shared_instance_list(
     redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let cdn_url = dotenvy::var("CDN_URL")?;
-
     let user = get_user_from_headers(
         &req,
         &**pool,
@@ -137,7 +135,6 @@ pub async fn shared_instance_list(
                     .await?,
                 ),
                 version,
-                &cdn_url,
             ))
         },
     ))
@@ -185,12 +182,10 @@ pub async fn shared_instance_get(
             } else {
                 None
             };
-        let cdn_url = dotenvy::var("CDN_URL")?;
         let shared_instance = SharedInstance::from_db(
             shared_instance,
             privately_accessible.then_some(users),
             current_version,
-            &cdn_url,
         );
 
         Ok(HttpResponse::Ok().json(shared_instance))
@@ -362,7 +357,6 @@ pub async fn shared_instance_version_list(
     info: web::Path<(SharedInstanceId,)>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let cdn_url = dotenvy::var("CDN_URL")?;
     let id = info.into_inner().0.into();
 
     let user = get_maybe_user_from_headers(
@@ -393,8 +387,8 @@ pub async fn shared_instance_version_list(
             DBSharedInstanceVersion::get_for_instance(id, &**pool).await?;
         let versions = versions
             .into_iter()
-            .map(|version| SharedInstanceVersion::from_db(version, &cdn_url))
-            .collect::<Vec<_>>();
+            .map(Into::into)
+            .collect::<Vec<SharedInstanceVersion>>();
 
         Ok(HttpResponse::Ok().json(versions))
     } else {
@@ -409,7 +403,6 @@ pub async fn shared_instance_version_get(
     info: web::Path<(SharedInstanceVersionId,)>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let cdn_url = dotenvy::var("CDN_URL")?;
     let version_id = info.into_inner().0.into();
 
     let user = get_maybe_user_from_headers(
@@ -422,20 +415,20 @@ pub async fn shared_instance_version_get(
     .await?
     .map(|(_, user)| user);
 
-    let shared_instance_version =
+    let version =
         DBSharedInstanceVersion::get(version_id, &**pool).await?;
 
-    if let Some(shared_instance_version) = shared_instance_version {
-        let shared_instance = DBSharedInstance::get(
-            shared_instance_version.shared_instance_id,
+    if let Some(version) = version {
+        let instance = DBSharedInstance::get(
+            version.shared_instance_id,
             &**pool,
         )
         .await?;
-        if let Some(shared_instance) = shared_instance {
+        if let Some(instance) = instance {
             if !can_access_instance_as_maybe_user(
                 &pool,
                 &redis,
-                &shared_instance,
+                &instance,
                 user,
             )
             .await?
@@ -443,10 +436,7 @@ pub async fn shared_instance_version_get(
                 return Err(ApiError::NotFound);
             }
 
-            let version = SharedInstanceVersion::from_db(
-                shared_instance_version,
-                &cdn_url,
-            );
+            let version: SharedInstanceVersion = version.into();
             Ok(HttpResponse::Ok().json(version))
         } else {
             Err(ApiError::NotFound)
