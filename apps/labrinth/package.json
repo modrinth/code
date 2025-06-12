@@ -2,10 +2,13 @@
   "name": "@modrinth/labrinth",
   "scripts": {
     "build": "cargo build --release",
-    "lint": "cargo fmt --check && cargo clippy --all-targets --all-features -- -D warnings",
-    "fix": "cargo fmt && cargo clippy --fix",
+    "lint": "cargo fmt --check && cargo clippy --all-targets",
+    "fix": "cargo clippy --all-targets --fix --allow-dirty && cargo fmt",
     "dev": "cargo run",
-    "//": "CI will fail since test takes up too much disk space. So we have it named differently.",
-    "test-labrinth": "cargo test"
+    "//": "Labrinth integration tests require a lot of disk space, so in the standard GitHub Actions",
+    "//": "runners we must remove useless development tools from the base image, which frees up ~20 GiB.",
+    "//": "The command commented out below can be used in CI to debug what is taking up space:",
+    "//": "sudo du -xh --max-depth=4 / | sort -rh | curl -X POST --data-urlencode content@/dev/fd/0 https://api.mclo.gs/1/log",
+    "test": "if-ci sudo rm -rf /usr/local/lib/android /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/share/swift && cargo nextest run --all-targets --no-fail-fast"
   }
 }

@@ -21,6 +21,7 @@
     "intl:extract": "pnpm ui:intl:extract && pnpm web:intl:extract && pnpm app:intl:extract"
   },
   "devDependencies": {
+    "if-ci": "^3.0.0",
     "prettier": "^3.3.2",
     "turbo": "^2.2.3",
     "vue": "^3.5.13"
