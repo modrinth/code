@@ -73,6 +73,10 @@ export function applyTexture(model: THREE.Object3D, texture: THREE.Texture): voi
           mat.toneMapped = false
           mat.roughness = 1
           mat.needsUpdate = true
+          mat.depthTest = true
+          mat.side = THREE.DoubleSide
+          mat.alphaTest = 0.1
+          mat.depthWrite = true
         }
       })
     }
@@ -97,8 +101,11 @@ export function applyCapeTexture(
           mat.color.set(0xffffff)
           mat.toneMapped = false
           mat.roughness = 1
-          mat.side = THREE.DoubleSide
           mat.needsUpdate = true
+          mat.depthTest = true
+          mat.depthWrite = true
+          mat.side = THREE.DoubleSide
+          mat.alphaTest = 0.1
         }
       })
     }
@@ -108,8 +115,8 @@ export function applyCapeTexture(
 export function attachCapeToBody(
   bodyNode: THREE.Object3D,
   capeModel: THREE.Object3D,
-  position = { x: 0, y: -1, z: -0.01 },
-  rotation = { x: 0, y: -Math.PI / 2, z: 0 },
+  position = { x: 0, y: -1, z: 0.01 },
+  rotation = { x: 0, y: Math.PI / 2, z: 0 },
 ): void {
   if (!bodyNode || !capeModel) return
 

@@ -59,8 +59,8 @@ class BatchSkinRenderer {
       throw new Error("Failed to find 'Head' object in model.")
     }
 
-    const frontCameraPos: [number, number, number] = [2, 1, -2.5]
-    const backCameraPos: [number, number, number] = [2, 1, 6.0]
+    const frontCameraPos: [number, number, number] = [2, 1, 6.0]
+    const backCameraPos: [number, number, number] = [2, 1, -2.5]
 
     const forwards = await this.renderView(frontCameraPos, lookAtTarget)
     const backwards = await this.renderView(backCameraPos, lookAtTarget)

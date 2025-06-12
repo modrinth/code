@@ -1,5 +1,5 @@
 <template>
-  <div ref="skinPreviewContainer" class="relative w-full h-full cursor-grab">
+  <div ref="skinPreviewContainer" class="relative w-full h-full cursor-grab" @click="onCanvasClick">
     <div
       class="absolute bottom-[18%] left-0 right-0 flex flex-col justify-center items-center mb-2 pointer-events-none z-10 gap-2"
     >
@@ -14,7 +14,7 @@
     </div>
     <div
       v-if="nametag"
-      class="absolute top-[20%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md pointer-events-none z-10 font-minecraft text-inverted nametag-bg transition-all duration-200"
+      class="absolute top-[18%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md pointer-events-none z-10 font-minecraft nametag-bg transition-all duration-200"
       :style="{ fontSize: nametagFontSize }"
     >
       {{ nametag }}
@@ -148,7 +148,7 @@ const props = withDefaults(
     nametag: undefined,
     animationConfig: () => ({
       baseAnimation: 'idle',
-      randomAnimations: [],
+      randomAnimations: ['idle_sub_1', 'idle_sub_2', 'idle_sub_3'],
       randomAnimationInterval: 8000,
       transitionDuration: 0.5,
     }),
@@ -418,26 +418,39 @@ function updateModelInfo() {
 
 const target = computed(() => centre.value)
 
-const modelRotation = ref(props.initialRotation)
+const modelRotation = ref(props.initialRotation + Math.PI)
 const isDragging = ref(false)
 const previousX = ref(0)
+const hasDragged = ref(false)
 
-const onPointerDown = (event: PointerEvent) => {
+function onPointerDown(event: PointerEvent) {
   ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
   isDragging.value = true
   previousX.value = event.clientX
+  hasDragged.value = false
 }
 
-const onPointerMove = (event: PointerEvent) => {
+function onPointerMove(event: PointerEvent) {
   if (!isDragging.value) return
   const deltaX = event.clientX - previousX.value
   modelRotation.value += deltaX * 0.01
   previousX.value = event.clientX
+  hasDragged.value = true
 }
 
-const onPointerUp = (event: PointerEvent) => {
+function onPointerUp(event: PointerEvent) {
   isDragging.value = false
   ;(event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId)
+}
+
+function onCanvasClick() {
+  if (!hasDragged.value) {
+    if (actions.value['interact']) {
+      playRandomAnimation('interact')
+    }
+  }
+
+  hasDragged.value = false
 }
 
 const radialTexture = createRadialTexture(512)
