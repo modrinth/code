@@ -448,7 +448,7 @@ pub async fn project_edit(
                     }
                 }
 
-                if team_member.map(|x| !x.accepted).unwrap_or(true) {
+                if team_member.is_none_or(|x| !x.accepted) {
                     let notified_members = sqlx::query!(
                         "
                         SELECT tm.user_id id
@@ -2397,13 +2397,11 @@ pub async fn project_get_organization(
             .filter(|x| {
                 logged_in
                     || x.accepted
-                    || user_id
-                        .map(|y: crate::database::models::DBUserId| {
-                            y == x.user_id
-                        })
-                        .unwrap_or(false)
+                    || user_id.is_some_and(
+                        |y: crate::database::models::DBUserId| y == x.user_id,
+                    )
             })
-            .flat_map(|data| {
+            .filter_map(|data| {
                 users.iter().find(|x| x.id == data.user_id).map(|user| {
                     crate::models::teams::TeamMember::from(
                         data,

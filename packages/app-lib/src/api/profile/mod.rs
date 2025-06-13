@@ -586,7 +586,7 @@ pub async fn get_pack_export_candidates(
         .await
         .map_err(|e| IOError::with_path(e, &profile_base_dir))?
     {
-        let path: PathBuf = entry.path();
+        let path = entry.path();
         if path.is_dir() {
             // Two layers of files/folders if its a folder
             let mut read_dir = io::read_dir(&path).await?;
@@ -595,10 +595,10 @@ pub async fn get_pack_export_candidates(
                 .await
                 .map_err(|e| IOError::with_path(e, &profile_base_dir))?
             {
-                let path: PathBuf = entry.path();
-
-                path_list
-                    .push(pack_get_relative_path(&profile_base_dir, &path)?);
+                path_list.push(pack_get_relative_path(
+                    &profile_base_dir,
+                    &entry.path(),
+                )?);
             }
         } else {
             // One layer of files/folders if its a file
@@ -669,7 +669,7 @@ pub async fn run_credentials(
         if let Some(command) = cmd.next() {
             let full_path = get_full_path(&profile.path).await?;
             let result = Command::new(command)
-                .args(cmd.collect::<Vec<&str>>())
+                .args(cmd)
                 .current_dir(&full_path)
                 .spawn()
                 .map_err(|e| IOError::with_path(e, &full_path))?
@@ -881,15 +881,12 @@ pub async fn create_mrpack_json(
                 env.insert(EnvType::Client, SideType::Required);
                 env.insert(EnvType::Server, SideType::Required);
 
-                let primary_file =
-                    if let Some(primary_file) = version.files.first() {
-                        primary_file
-                    } else {
-                        return Some(Err(crate::ErrorKind::OtherError(
-                            format!("No primary file found for mod at: {path}"),
-                        )
-                        .as_error()));
-                    };
+                let Some(primary_file) = version.files.first() else {
+                    return Some(Err(crate::ErrorKind::OtherError(format!(
+                        "No primary file found for mod at: {path}"
+                    ))
+                    .as_error()));
+                };
 
                 let file_size = primary_file.size;
                 let downloads = vec![primary_file.url.clone()];

@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use serde_json::json;
 
 use crate::common::{

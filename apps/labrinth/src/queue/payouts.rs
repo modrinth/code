@@ -441,8 +441,8 @@ impl PayoutsQueue {
                         }
                     } else {
                         PayoutMethodFee {
-                            percentage: Default::default(),
-                            min: Default::default(),
+                            percentage: Decimal::default(),
+                            min: Decimal::default(),
                             max: None,
                         }
                     },
@@ -833,7 +833,7 @@ pub async fn process_payout(
         .map(|x| (x.project_id, x.page_views))
         .collect::<HashMap<u64, u64>>();
 
-    for (key, value) in downloads_values.iter() {
+    for (key, value) in &downloads_values {
         let counter = views_values.entry(*key).or_insert(0);
         *counter += *value;
     }

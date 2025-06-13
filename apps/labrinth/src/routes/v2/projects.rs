@@ -83,7 +83,7 @@ pub async fn project_search(
                                     val
                                 )
                             } else {
-                                facet.to_string()
+                                facet
                             }
                         })
                         .collect::<Vec<_>>()

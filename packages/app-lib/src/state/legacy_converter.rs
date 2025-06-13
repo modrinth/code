@@ -29,9 +29,7 @@ where
         return Ok(());
     };
 
-    let old_launcher_root = if let Some(dir) = default_settings_dir() {
-        dir
-    } else {
+    let Some(old_launcher_root) = default_settings_dir() else {
         return Ok(());
     };
     let old_launcher_root_str = old_launcher_root.to_string_lossy().to_string();
@@ -177,12 +175,10 @@ where
 
                 let profile_path = entry.path().join("profile.json");
 
-                let profile = if let Ok(profile) =
+                let Ok(profile) =
                     read_json::<LegacyProfile>(&profile_path, &io_semaphore)
                         .await
-                {
-                    profile
-                } else {
+                else {
                     continue;
                 };
 
@@ -285,7 +281,7 @@ where
 
                                         TeamMember {
                                             team_id: x.team_id,
-                                            user: user.clone(),
+                                            user,
                                             is_owner: x.role == "Owner",
                                             role: x.role,
                                             ordering: x.ordering,

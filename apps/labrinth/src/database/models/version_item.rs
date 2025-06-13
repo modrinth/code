@@ -52,7 +52,7 @@ impl DependencyBuilder {
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), DatabaseError> {
         let mut project_ids = Vec::new();
-        for dependency in builders.iter() {
+        for dependency in &builders {
             project_ids.push(
                 dependency
                     .try_get_project_id(transaction)
@@ -333,9 +333,7 @@ impl DBVersion {
     ) -> Result<Option<()>, DatabaseError> {
         let result = Self::get(id, &mut **transaction, redis).await?;
 
-        let result = if let Some(result) = result {
-            result
-        } else {
+        let Some(result) = result else {
             return Ok(None);
         };
 
@@ -550,7 +548,7 @@ impl DBVersion {
 
                         // Add loader fields to the set we need to fetch
                         let loader_loader_field_ids = m.loader_fields.unwrap_or_default().into_iter().map(LoaderFieldId).collect::<Vec<_>>();
-                        for loader_field_id in loader_loader_field_ids.iter() {
+                        for loader_field_id in &loader_loader_field_ids {
                             loader_field_ids.insert(*loader_field_id);
                         }
 
@@ -756,7 +754,7 @@ impl DBVersion {
                                 let mut files = files.into_iter().map(|x| {
                                     let mut file_hashes = HashMap::new();
 
-                                    for hash in hashes.iter() {
+                                    for hash in &hashes {
                                         if hash.file_id == x.id {
                                             file_hashes.insert(
                                                 hash.algorithm.clone(),
@@ -852,7 +850,7 @@ impl DBVersion {
                     ORDER BY v.date_published
                     ",
                     algorithm,
-                    &file_ids.into_iter().flat_map(|x| x.split('_').last().map(|x| x.as_bytes().to_vec())).collect::<Vec<_>>(),
+                    &file_ids.into_iter().filter_map(|x| x.split('_').last().map(|x| x.as_bytes().to_vec())).collect::<Vec<_>>(),
                 )
                     .fetch(executor)
                     .try_fold(DashMap::new(), |acc, f| {
@@ -1042,14 +1040,14 @@ mod tests {
             date_published,
             project_id: DBProjectId(0),
             author_id: DBUserId(0),
-            name: Default::default(),
-            version_number: Default::default(),
-            changelog: Default::default(),
-            downloads: Default::default(),
-            version_type: Default::default(),
-            featured: Default::default(),
+            name: String::new(),
+            version_number: String::new(),
+            changelog: String::new(),
+            downloads: 0,
+            version_type: String::new(),
+            featured: false,
             status: VersionStatus::Listed,
-            requested_status: Default::default(),
+            requested_status: None,
         }
     }
 }

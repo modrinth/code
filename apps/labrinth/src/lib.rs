@@ -313,13 +313,16 @@ pub fn app_config(
     .app_data(labrinth_config.automated_moderation_queue.clone())
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
     .app_data(labrinth_config.rate_limiter.clone())
-    .configure(
-        #[allow(unused_variables)]
-        |cfg| {
-            #[cfg(target_os = "linux")]
-            routes::debug::config(cfg)
-        },
-    )
+    .configure({
+        #[cfg(target_os = "linux")]
+        {
+            |cfg| routes::debug::config(cfg)
+        }
+        #[cfg(not(target_os = "linux"))]
+        {
+            |_cfg| ()
+        }
+    })
     .configure(routes::v2::config)
     .configure(routes::v3::config)
     .configure(routes::internal::config)

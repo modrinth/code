@@ -17,7 +17,7 @@ use daedalus::modded::LoaderVersion;
 use regex::Regex;
 use serde::Deserialize;
 use st::Profile;
-use std::collections::HashMap;
+use std::fmt::Write;
 use std::path::PathBuf;
 use tokio::process::Command;
 
@@ -137,8 +137,7 @@ pub async fn get_java_version_from_profile(
     let key = version_info
         .java_version
         .as_ref()
-        .map(|it| it.major_version)
-        .unwrap_or(8);
+        .map_or(8, |it| it.major_version);
 
     let state = State::get().await?;
 
@@ -253,8 +252,7 @@ pub async fn install_minecraft(
 
         let loader_version_id = loader_version.clone();
         crate::api::profile::edit(&profile.path, |prof| {
-            prof.loader_version =
-                loader_version_id.clone().map(|x| x.id.clone());
+            prof.loader_version = loader_version_id.clone().map(|x| x.id);
 
             async { Ok(()) }
         })
@@ -279,8 +277,7 @@ pub async fn install_minecraft(
     let key = version_info
         .java_version
         .as_ref()
-        .map(|it| it.major_version)
-        .unwrap_or(8);
+        .map_or(8, |it| it.major_version);
     let (java_version, set_java) = if let Some(java_version) =
         get_java_version_from_profile(profile, &version_info).await?
     {
@@ -631,8 +628,7 @@ pub async fn launch_minecraft(
                     .as_ref()
                     .and_then(|x| x.get(&LoggingSide::Client)),
             )?
-            .into_iter()
-            .collect::<Vec<_>>(),
+            .into_iter(),
         )
         .arg(version_info.main_class.clone())
         .args(
@@ -650,8 +646,7 @@ pub async fn launch_minecraft(
                 &java_version.architecture,
                 quick_play_type,
             )?
-            .into_iter()
-            .collect::<Vec<_>>(),
+            .into_iter(),
         )
         .current_dir(instance_path.clone());
 
@@ -695,7 +690,7 @@ pub async fn launch_minecraft(
             // check if the regex exists in the file
             if !re.is_match(&options_string) {
                 // The key was not found in the file, so append it
-                options_string.push_str(&format!("\n{key}:{value}"));
+                write!(&mut options_string, "\n{key}:{value}").unwrap();
             } else {
                 let replaced_string = re
                     .replace_all(&options_string, &format!("{key}:{value}"))
@@ -714,31 +709,6 @@ pub async fn launch_minecraft(
         async { Ok(()) }
     })
     .await?;
-
-    let mut censor_strings = HashMap::new();
-    let username = whoami::username();
-    censor_strings
-        .insert(format!("/{username}/"), "/{COMPUTER_USERNAME}/".to_string());
-    censor_strings.insert(
-        format!("\\{username}\\"),
-        "\\{COMPUTER_USERNAME}\\".to_string(),
-    );
-    censor_strings.insert(
-        credentials.access_token.clone(),
-        "{MINECRAFT_ACCESS_TOKEN}".to_string(),
-    );
-    censor_strings.insert(
-        credentials.username.clone(),
-        "{MINECRAFT_USERNAME}".to_string(),
-    );
-    censor_strings.insert(
-        credentials.id.as_simple().to_string(),
-        "{MINECRAFT_UUID}".to_string(),
-    );
-    censor_strings.insert(
-        credentials.id.as_hyphenated().to_string(),
-        "{MINECRAFT_UUID}".to_string(),
-    );
 
     // If in tauri, and the 'minimize on launch' setting is enabled, minimize the window
     #[cfg(feature = "tauri")]

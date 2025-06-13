@@ -26,6 +26,7 @@ enum MMCInstanceEnum {
 struct MMCInstanceGeneral {
     pub general: MMCInstance,
 }
+
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "PascalCase")]
 pub struct MMCInstance {
@@ -144,9 +145,9 @@ pub async fn is_valid_mmc(instance_folder: PathBuf) -> bool {
     let instance_cfg = instance_folder.join("instance.cfg");
     let mmc_pack = instance_folder.join("mmc-pack.json");
 
-    let mmc_pack = match io::read_any_encoding_to_string(&mmc_pack).await {
-        Ok((mmc_pack, _)) => mmc_pack,
-        Err(_) => return false,
+    let Ok((mmc_pack, _)) = io::read_any_encoding_to_string(&mmc_pack).await
+    else {
+        return false;
     };
 
     load_instance_cfg(&instance_cfg).await.is_ok()
@@ -233,7 +234,7 @@ pub async fn import_mmc(
                 // Kept separate as we may in the future want to add special handling for modrinth managed packs
                 import_mmc_unmanaged(profile_path, minecraft_folder, "Imported Modrinth Modpack".to_string(), description, mmc_pack).await?;
             }
-            Some(MMCManagedPackType::Flame) | Some(MMCManagedPackType::ATLauncher) => {
+            Some(MMCManagedPackType::Flame | MMCManagedPackType::ATLauncher) => {
                 // For flame/atlauncher managed packs
                 // Treat as unmanaged, but with 'minecraft' folder instead of '.minecraft'
                 import_mmc_unmanaged(profile_path, minecraft_folder, "Imported Modpack".to_string(), description, mmc_pack).await?;

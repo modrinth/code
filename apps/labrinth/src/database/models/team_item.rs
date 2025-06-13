@@ -45,7 +45,7 @@ impl TeamBuilder {
         .await?;
 
         let mut team_member_ids = Vec::new();
-        for _ in self.members.iter() {
+        for _ in &self.members {
             team_member_ids.push(generate_team_member_id(transaction).await?.0);
         }
         let TeamBuilder { members } = self;

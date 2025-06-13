@@ -77,7 +77,6 @@ pub enum SupportedGameVersions {
     All,
     PastDate(DateTime<Utc>),
     Range(DateTime<Utc>, DateTime<Utc>),
-    #[allow(dead_code)]
     Custom(Vec<MinecraftGameVersion>),
 }
 
@@ -232,8 +231,7 @@ fn game_version_supported(
                 all_game_versions
                     .iter()
                     .find(|y| y.version == x.version)
-                    .map(|x| x.created > date)
-                    .unwrap_or(false)
+                    .is_some_and(|x| x.created > date)
             })
         }
         SupportedGameVersions::Range(before, after) => {
@@ -241,8 +239,7 @@ fn game_version_supported(
                 all_game_versions
                     .iter()
                     .find(|y| y.version == x.version)
-                    .map(|x| x.created > before && x.created < after)
-                    .unwrap_or(false)
+                    .is_some_and(|x| x.created > before && x.created < after)
             })
         }
         SupportedGameVersions::Custom(versions) => {

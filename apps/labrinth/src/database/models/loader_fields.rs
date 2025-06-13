@@ -675,7 +675,7 @@ impl LoaderFieldEnumValue {
             .into_iter()
             .filter(|x| {
                 let mut bool = true;
-                for (key, value) in filter.iter() {
+                for (key, value) in &filter {
                     if let Some(metadata_value) = x.metadata.get(key) {
                         bool &= metadata_value == value;
                     } else {
@@ -713,7 +713,7 @@ impl VersionField {
                     query_version_fields.push(base.clone().with_string_value(s))
                 }
                 VersionFieldValue::Boolean(b) => query_version_fields
-                    .push(base.clone().with_int_value(if b { 1 } else { 0 })),
+                    .push(base.clone().with_int_value(b as i32)),
                 VersionFieldValue::ArrayInteger(v) => {
                     for i in v {
                         query_version_fields
@@ -728,9 +728,8 @@ impl VersionField {
                 }
                 VersionFieldValue::ArrayBoolean(v) => {
                     for b in v {
-                        query_version_fields.push(
-                            base.clone().with_int_value(if b { 1 } else { 0 }),
-                        );
+                        query_version_fields
+                            .push(base.clone().with_int_value(b as i32));
                     }
                 }
                 VersionFieldValue::Enum(_, v) => query_version_fields
@@ -757,7 +756,7 @@ impl VersionField {
                     l.field_id.0,
                     l.version_id.0,
                     l.int_value,
-                    l.enum_value.as_ref().map(|e| e.0).unwrap_or(-1),
+                    l.enum_value.as_ref().map_or(-1, |e| e.0),
                     l.string_value.clone(),
                 )
             })
@@ -849,12 +848,11 @@ impl VersionField {
         query_loader_fields
             .iter()
             .flat_map(|q| {
-                let loader_field_type = match LoaderFieldType::build(
+                let Some(loader_field_type) = LoaderFieldType::build(
                     &q.field_type,
                     q.enum_type.map(|l| l.0),
-                ) {
-                    Some(lft) => lft,
-                    None => return vec![],
+                ) else {
+                    return vec![];
                 };
                 let loader_field = LoaderField {
                     id: q.id,
@@ -1085,23 +1083,17 @@ impl VersionFieldValue {
         };
 
         // Check errors- version_id must all be the same
+        // If the field type is a non-array, then the reason for multiple version ids is that there are multiple versions being aggregated, and those version ids are contained within.
+        // If the field type is an array, then the reason for multiple version ids is that there are multiple values for a single version
+        // (or a greater aggregation between multiple arrays, in which case the per-field version is lost, so we just take the first one and use it for that)
         let version_id = qvfs
             .iter()
             .map(|qvf| qvf.version_id)
             .unique()
-            .collect::<Vec<_>>();
-        // If the field type is a non-array, then the reason for multiple version ids is that there are multiple versions being aggregated, and those version ids are contained within.
-        // If the field type is an array, then the reason for multiple version ids is that there are multiple values for a single version
-        // (or a greater aggregation between multiple arrays, in which case the per-field version is lost, so we just take the first one and use it for that)
-        let version_id =
-            version_id.into_iter().next().unwrap_or(DBVersionId(0));
+            .next()
+            .unwrap_or(DBVersionId(0));
 
-        let field_id = qvfs
-            .iter()
-            .map(|qvf| qvf.field_id)
-            .unique()
-            .collect::<Vec<_>>();
-        if field_id.len() > 1 {
+        if qvfs.iter().map(|qvf| qvf.field_id).unique().count() > 1 {
             return Err(DatabaseError::SchemaError(format!(
                 "Multiple field ids for field {field_name}"
             )));
@@ -1274,7 +1266,7 @@ impl VersionFieldValue {
         };
 
         // Sort arrayenums by ordering, then by created
-        for (_, v) in value.iter_mut() {
+        for (_, v) in &mut value {
             if let VersionFieldValue::ArrayEnum(_, v) = v {
                 v.sort_by(|a, b| {
                     a.ordering.cmp(&b.ordering).then(a.created.cmp(&b.created))
@@ -1317,8 +1309,8 @@ impl VersionFieldValue {
         }
     }
 
-    // For conversion to an interanl string(s), such as for search facets, filtering, or direct hardcoding
-    // No matter the type, it will be converted to a Vec<String>, whre the non-array types will have a single element
+    // For conversion to an internal string(s), such as for search facets, filtering, or direct hardcoding
+    // No matter the type, it will be converted to a Vec<String>, where the non-array types will have a single element
     pub fn as_strings(&self) -> Vec<String> {
         match self {
             VersionFieldValue::Integer(i) => vec![i.to_string()],
@@ -1343,22 +1335,19 @@ impl VersionFieldValue {
             VersionFieldValue::Integer(i) => value.as_i64() == Some(*i as i64),
             VersionFieldValue::Text(s) => value.as_str() == Some(s),
             VersionFieldValue::Boolean(b) => value.as_bool() == Some(*b),
-            VersionFieldValue::ArrayInteger(v) => value
-                .as_i64()
-                .map(|i| v.contains(&(i as i32)))
-                .unwrap_or(false),
-            VersionFieldValue::ArrayText(v) => value
-                .as_str()
-                .map(|s| v.contains(&s.to_string()))
-                .unwrap_or(false),
+            VersionFieldValue::ArrayInteger(v) => {
+                value.as_i64().is_some_and(|i| v.contains(&(i as i32)))
+            }
+            VersionFieldValue::ArrayText(v) => {
+                value.as_str().is_some_and(|s| v.contains(&s.to_string()))
+            }
             VersionFieldValue::ArrayBoolean(v) => {
-                value.as_bool().map(|b| v.contains(&b)).unwrap_or(false)
+                value.as_bool().is_some_and(|b| v.contains(&b))
             }
             VersionFieldValue::Enum(_, v) => value.as_str() == Some(&v.value),
             VersionFieldValue::ArrayEnum(_, v) => value
                 .as_str()
-                .map(|s| v.iter().any(|v| v.value == s))
-                .unwrap_or(false),
+                .is_some_and(|s| v.iter().any(|v| v.value == s)),
         }
     }
 }

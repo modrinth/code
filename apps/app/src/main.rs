@@ -229,7 +229,6 @@ fn main() {
                 tauri::async_runtime::spawn(api::utils::handle_command(
                     payload,
                 ));
-                dbg!(url);
             });
 
             #[cfg(not(target_os = "linux"))]
@@ -273,8 +272,9 @@ fn main() {
 
     match app {
         Ok(app) => {
-            #[allow(unused_variables)]
             app.run(|app, event| {
+                #[cfg(not(target_os = "macos"))]
+                drop((app, event));
                 #[cfg(target_os = "macos")]
                 if let tauri::RunEvent::Opened { urls } = event {
                     tracing::info!("Handling webview open {urls:?}");

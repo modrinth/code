@@ -794,8 +794,7 @@ pub async fn version_list(
             .filter(|version| {
                 filters
                     .featured
-                    .map(|featured| featured == version.inner.featured)
-                    .unwrap_or(true)
+                    .is_none_or(|featured| featured == version.inner.featured)
             })
             .cloned()
             .collect::<Vec<_>>();
@@ -830,22 +829,20 @@ pub async fn version_list(
             }
 
             joined_filters.into_iter().for_each(|filter| {
-                versions
-                    .iter()
-                    .find(|version| {
-                        // TODO: This is the bandaid fix for detecting auto-featured versions.
-                        let game_versions = version
-                            .version_fields
-                            .iter()
-                            .find(|vf| vf.field_name == "game_versions")
-                            .map(|vf| vf.value.clone())
-                            .map(|v| v.as_strings())
-                            .unwrap_or_default();
-                        game_versions.contains(&filter.0.version)
-                            && version.loaders.contains(&filter.1.loader)
-                    })
-                    .map(|version| response.push(version.clone()))
-                    .unwrap_or(());
+                if let Some(version) = versions.iter().find(|version| {
+                    // TODO: This is the bandaid fix for detecting auto-featured versions.
+                    let game_versions = version
+                        .version_fields
+                        .iter()
+                        .find(|vf| vf.field_name == "game_versions")
+                        .map(|vf| vf.value.clone())
+                        .map(|v| v.as_strings())
+                        .unwrap_or_default();
+                    game_versions.contains(&filter.0.version)
+                        && version.loaders.contains(&filter.1.loader)
+                }) {
+                    response.push(version.clone());
+                }
             });
 
             if response.is_empty() {

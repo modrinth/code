@@ -17,8 +17,7 @@ use crate::common::dummy_data::{
     DummyProjectAlpha, DummyProjectBeta, TestFile,
 };
 
-// importing common module.
-mod common;
+pub mod common;
 
 #[actix_rt::test]
 
@@ -242,7 +241,7 @@ async fn creating_loader_fields() {
                 USER_USER_PAT,
             )
             .await;
-        assert_eq!(v.fields.get("test_fabric_optional").unwrap(), &json!(555));
+        assert_eq!(&v.fields["test_fabric_optional"], &json!(555));
         // - Patch
         let resp = api
             .edit_version(
@@ -257,7 +256,7 @@ async fn creating_loader_fields() {
         let v = api
             .get_version_deserialized(alpha_version_id, USER_USER_PAT)
             .await;
-        assert_eq!(v.fields.get("test_fabric_optional").unwrap(), &json!(555));
+        assert_eq!(&v.fields["test_fabric_optional"], &json!(555));
 
         // Simply setting them as expected works
         // - Create
@@ -286,12 +285,9 @@ async fn creating_loader_fields() {
                 USER_USER_PAT,
             )
             .await;
-        assert_eq!(
-            v.fields.get("game_versions").unwrap(),
-            &json!(["1.20.1", "1.20.2"])
-        );
-        assert_eq!(v.fields.get("singleplayer").unwrap(), &json!(false));
-        assert_eq!(v.fields.get("server_only").unwrap(), &json!(true));
+        assert_eq!(&v.fields["game_versions"], &json!(["1.20.1", "1.20.2"]));
+        assert_eq!(&v.fields["singleplayer"], &json!(false));
+        assert_eq!(&v.fields["server_only"], &json!(true));
         // - Patch
         let resp = api
             .edit_version(
@@ -308,10 +304,7 @@ async fn creating_loader_fields() {
         let v = api
             .get_version_deserialized(alpha_version_id, USER_USER_PAT)
             .await;
-        assert_eq!(
-            v.fields.get("game_versions").unwrap(),
-            &json!(["1.20.1", "1.20.2"])
-        );
+        assert_eq!(&v.fields["game_versions"], &json!(["1.20.1", "1.20.2"]));
 
         // Now that we've created a version, we need to make sure that the Project's loader fields are updated (aggregate)
         // First, add a new version
@@ -361,23 +354,11 @@ async fn creating_loader_fields() {
             )
             .await;
         assert_eq!(
-            project.fields.get("game_versions").unwrap(),
+            &project.fields["game_versions"],
             &[json!("1.20.1"), json!("1.20.2"), json!("1.20.5")]
         );
-        assert!(
-            project
-                .fields
-                .get("singleplayer")
-                .unwrap()
-                .contains(&json!(false))
-        );
-        assert!(
-            project
-                .fields
-                .get("singleplayer")
-                .unwrap()
-                .contains(&json!(true))
-        );
+        assert!(project.fields["singleplayer"].contains(&json!(false)));
+        assert!(project.fields["singleplayer"].contains(&json!(true)));
     })
     .await
 }
@@ -533,7 +514,7 @@ async fn test_multi_get_redis_cache() {
             assert_eq!(projects.len(), 10);
 
             // Ensure all 5 modpacks have 'mrpack_loaders', and all 5 mods do not
-            for project in projects.iter() {
+            for project in &projects {
                 if modpacks.contains(project.slug.as_ref().unwrap()) {
                     assert!(project.fields.contains_key("mrpack_loaders"));
                 } else if mods.contains(project.slug.as_ref().unwrap()) {
@@ -566,7 +547,7 @@ async fn test_multi_get_redis_cache() {
             assert_eq!(versions.len(), 10);
 
             // Ensure all 5 versions from modpacks have 'mrpack_loaders', and all 5 versions from mods do not
-            for version in versions.iter() {
+            for version in &versions {
                 if version_ids_modpacks.contains(&version.id) {
                     assert!(version.fields.contains_key("mrpack_loaders"));
                 } else if version_ids_mods.contains(&version.id) {

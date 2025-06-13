@@ -692,7 +692,7 @@ impl Process {
                 let mut cmd = hook.split(' ');
                 if let Some(command) = cmd.next() {
                     let mut command = Command::new(command);
-                    command.args(cmd.collect::<Vec<&str>>()).current_dir(
+                    command.args(cmd).current_dir(
                         profile::get_full_path(&profile_path).await?,
                     );
                     command.spawn().map_err(IOError::from)?;
