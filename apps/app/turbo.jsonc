@@ -1,5 +1,5 @@
 {
-  "$schema": "https://turbo.build/schema.json",
+  "$schema": "../../node_modules/turbo/schema.json",
   "extends": ["//"],
   "tasks": {
     // Running Clippy and tests on a Tauri application requires
