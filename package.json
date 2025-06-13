@@ -18,6 +18,7 @@
     "lint": "turbo run lint --continue",
     "test": "turbo run test --continue",
     "fix": "turbo run fix --continue",
+    "ci": "turbo run lint test --continue",
     "intl:extract": "pnpm ui:intl:extract && pnpm web:intl:extract && pnpm app:intl:extract"
   },
   "devDependencies": {

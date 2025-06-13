@@ -45,15 +45,8 @@
       "cache": false,
       "persistent": true,
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "env": [
-        "DISPLAY",
-        "WEBKIT_DISABLE_DMABUF_RENDERER",
-        "CARGO_*",
-        "RUST_*",
-        "RUSTFLAGS",
-        "FORCE_COLOR",
-        "NEXTEST_*"
-      ]
+      "env": ["CARGO_*", "RUST_*", "RUSTFLAGS", "FORCE_COLOR", "NEXTEST_*"],
+      "passThroughEnv": ["DISPLAY", "WEBKIT_DISABLE_DMABUF_RENDERER"]
     },
     "test": {
       "env": [
