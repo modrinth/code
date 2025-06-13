@@ -4,8 +4,7 @@ version = "0.9.5"
 description = "The Modrinth App is a desktop application for managing your Minecraft mods"
 license = "GPL-3.0-only"
 repository = "https://github.com/modrinth/code/apps/app/"
-edition = "2024"
-build = "build.rs"
+edition.workspace = true
 
 [build-dependencies]
 tauri-build = { workspace = true, features = ["codegen"] }
@@ -56,3 +55,6 @@ default = ["custom-protocol"]
 # DO NOT remove this
 custom-protocol = ["tauri/custom-protocol"]
 updater = []
+
+[lints]
+workspace = true

@@ -10,6 +10,9 @@ members = [
   "packages/daedalus",
 ]
 
+[workspace.package]
+edition = "2024"
+
 [workspace.dependencies]
 actix-cors = "0.7.1"
 actix-files = "0.6.6"
@@ -21,6 +24,7 @@ actix-web-prom = "0.10.0"
 actix-ws = "0.3.0"
 argon2 = { version = "0.5.3", features = ["std"] }
 ariadne = { path = "packages/ariadne" }
+async_zip = "0.0.17"
 async-compression = { version = "0.4.24", default-features = false }
 async-recursion = "1.1.1"
 async-stripe = { version = "0.41.0", default-features = false, features = [
@@ -31,7 +35,6 @@ async-tungstenite = { version = "0.29.1", default-features = false, features = [
   "futures-03-sink",
 ] }
 async-walkdir = "2.1.0"
-async_zip = "0.0.17"
 base64 = "0.22.1"
 bitflags = "2.9.1"
 bytes = "1.10.1"
@@ -91,19 +94,19 @@ quartz_nbt = "0.2.9"
 quick-xml = "0.37.5"
 rand = "=0.8.5"  # Locked on 0.8 until argon2 and p256 update to 0.9
 rand_chacha = "=0.3.1"  # Locked on 0.3 until we can update rand to 0.9
-redis = "=0.31.0" # Locked on 0.31 until deadpool-redis updates to 0.32
+redis = "=0.31.0"  # Locked on 0.31 until deadpool-redis updates to 0.32
 regex = "1.11.1"
 reqwest = { version = "0.12.19", default-features = false }
-rust-s3 = { version = "0.35.1", default-features = false, features = [
-  "fail-on-err",
-  "tags",
-  "tokio-rustls-tls",
-] }
 rust_decimal = { version = "1.37.1", features = [
   "serde-with-float",
   "serde-with-str",
 ] }
 rust_iso3166 = "0.1.14"
+rust-s3 = { version = "0.35.1", default-features = false, features = [
+  "fail-on-err",
+  "tags",
+  "tokio-rustls-tls",
+] }
 rusty-money = "0.4.1"
 sentry = { version = "0.38.1", default-features = false, features = [
   "backtrace",
@@ -115,12 +118,12 @@ sentry = { version = "0.38.1", default-features = false, features = [
 ] }
 sentry-actix = "0.38.1"
 serde = "1.0.219"
-serde-xml-rs = "0.8.1"  # Also an XML (de)serializer, consider dropping yaserde in favor of this
 serde_bytes = "0.11.17"
 serde_cbor = "0.11.2"
 serde_ini = "0.2.0"
 serde_json = "1.0.140"
 serde_with = "3.12.0"
+serde-xml-rs = "0.8.1"  # Also an XML (de)serializer, consider dropping yaserde in favor of this
 sha1 = "0.10.6"
 sha1_smol = { version = "1.0.1", features = ["std"] }
 sha2 = "0.10.9"
@@ -169,6 +172,17 @@ zip = { version = "4.0.0", default-features = false, features = [
   "zstd",
 ] }
 zxcvbn = "3.1.0"
+
+[workspace.lints.clippy]
+# Turn most warnings into errors by default
+all = { level = "deny", priority = -1 }
+clear_with_drain = "deny"
+large_stack_arrays = "deny"
+negative_feature_names = "deny"
+non_std_lazy_statics = "deny"
+read_zero_byte_vec = "deny"
+redundant_feature_names = "deny"
+wildcard_dependencies = "deny"
 
 [patch.crates-io]
 wry = { git = "https://github.com/modrinth/wry", rev = "cafdaa9" }

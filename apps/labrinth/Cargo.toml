@@ -2,7 +2,7 @@
 name = "labrinth"
 version = "2.7.0"
 authors = ["geometrically <jai@modrinth.com>"]
-edition = "2024"
+edition.workspace = true
 license = "AGPL-3.0"
 
 # This seems redundant, but it's necessary for Docker to work
@@ -131,3 +131,6 @@ actix-http.workspace = true
 dotenv-build.workspace = true
 chrono.workspace = true
 iana-time-zone.workspace = true
+
+[lints]
+workspace = true

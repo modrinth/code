@@ -2,7 +2,7 @@
 name = "daedalus"
 version = "0.2.3"
 authors = ["Jai A <jai@modrinth.com>"]
-edition = "2024"
+edition.workspace = true
 license = "MIT"
 description = "Utilities for querying and parsing Minecraft metadata"
 repository = "https://github.com/modrinth/daedalus/"
@@ -18,3 +18,6 @@ serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 chrono = { workspace = true, features = ["serde"] }
 thiserror.workspace = true
+
+[lints]
+workspace = true
