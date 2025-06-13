@@ -353,9 +353,11 @@ pub async fn install_minecraft(
                     }
                 }
 
-                let cp = wrap_ref_builder!(cp = processor.classpath.clone() => {
-                    cp.push(processor.jar.clone())
-                });
+                let cp = {
+                    let mut cp = processor.classpath.clone();
+                    cp.push(processor.jar.clone());
+                    cp
+                };
 
                 let child = Command::new(&java_version.path)
                     .arg("-cp")
@@ -578,7 +580,9 @@ pub async fn launch_minecraft(
     let args = version_info.arguments.clone().unwrap_or_default();
     let mut command = match wrapper {
         Some(hook) => {
-            wrap_ref_builder!(it = Command::new(hook) => {it.arg(&java_version.path)})
+            let mut command = Command::new(hook);
+            command.arg(&java_version.path);
+            command
         }
         None => Command::new(&java_version.path),
     };
