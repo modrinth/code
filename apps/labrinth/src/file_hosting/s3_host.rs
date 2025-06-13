@@ -11,6 +11,15 @@ use s3::creds::Credentials;
 use s3::region::Region;
 use sha2::Digest;
 
+pub struct S3BucketConfig {
+    pub name: String,
+    pub uses_path_style: bool,
+    pub region: String,
+    pub url: String,
+    pub access_token: String,
+    pub secret: String,
+}
+
 pub struct S3Host {
     public_bucket: Bucket,
     private_bucket: Bucket,
@@ -18,54 +27,46 @@ pub struct S3Host {
 
 impl S3Host {
     pub fn new(
-        public_bucket_name: &str,
-        private_bucket_name: &str,
-        bucket_uses_path_style: bool,
-        bucket_region: &str,
-        url: &str,
-        access_token: &str,
-        secret: &str,
+        public_bucket: S3BucketConfig,
+        private_bucket: S3BucketConfig,
     ) -> Result<S3Host, FileHostingError> {
-        let create_bucket = |bucket_name| -> Result<_, FileHostingError> {
-            let mut bucket = Bucket::new(
-                bucket_name,
-                if bucket_region == "r2" {
-                    Region::R2 {
-                        account_id: url.to_string(),
-                    }
-                } else {
-                    Region::Custom {
-                        region: bucket_region.to_string(),
-                        endpoint: url.to_string(),
-                    }
-                },
-                Credentials::new(
-                    Some(access_token),
-                    Some(secret),
-                    None,
-                    None,
-                    None,
+        let create_bucket =
+            |config: S3BucketConfig| -> Result<_, FileHostingError> {
+                let mut bucket = Bucket::new(
+                    "",
+                    if config.region == "r2" {
+                        Region::R2 {
+                            account_id: config.url,
+                        }
+                    } else {
+                        Region::Custom {
+                            region: config.region,
+                            endpoint: config.url,
+                        }
+                    },
+                    Credentials {
+                        access_key: Some(config.access_token),
+                        secret_key: Some(config.secret),
+                        ..Credentials::anonymous().unwrap()
+                    },
                 )
                 .map_err(|e| {
-                    FileHostingError::S3Error("creating credentials", e.into())
-                })?,
-            )
-            .map_err(|e| {
-                FileHostingError::S3Error("creating Bucket instance", e)
-            })?;
+                    FileHostingError::S3Error("creating Bucket instance", e)
+                })?;
 
-            if bucket_uses_path_style {
-                bucket.set_path_style();
-            } else {
-                bucket.set_subdomain_style();
-            }
+                bucket.name = config.name;
+                if config.uses_path_style {
+                    bucket.set_path_style();
+                } else {
+                    bucket.set_subdomain_style();
+                }
 
-            Ok(bucket)
-        };
+                Ok(bucket)
+            };
 
         Ok(S3Host {
-            public_bucket: *create_bucket(public_bucket_name)?,
-            private_bucket: *create_bucket(private_bucket_name)?,
+            public_bucket: *create_bucket(public_bucket)?,
+            private_bucket: *create_bucket(private_bucket)?,
         })
     }
 

@@ -6,7 +6,7 @@ mod s3_host;
 
 use bytes::Bytes;
 pub use mock::MockHost;
-pub use s3_host::S3Host;
+pub use s3_host::{S3BucketConfig, S3Host};
 
 #[derive(Error, Debug)]
 pub enum FileHostingError {

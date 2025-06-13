@@ -331,7 +331,7 @@ pub fn app_config(
 pub fn check_env_vars() -> bool {
     let mut failed = false;
 
-    fn check_var<T: std::str::FromStr>(var: &'static str) -> bool {
+    fn check_var<T: std::str::FromStr>(var: &str) -> bool {
         let check = parse_var::<T>(var).is_none();
         if check {
             warn!(
@@ -359,13 +359,25 @@ pub fn check_env_vars() -> bool {
     let storage_backend = dotenvy::var("STORAGE_BACKEND").ok();
     match storage_backend.as_deref() {
         Some("s3") => {
-            failed |= check_var::<String>("S3_ACCESS_TOKEN");
-            failed |= check_var::<String>("S3_SECRET");
-            failed |= check_var::<String>("S3_URL");
-            failed |= check_var::<String>("S3_REGION");
-            failed |= check_var::<String>("S3_PUBLIC_BUCKET_NAME");
-            failed |= check_var::<String>("S3_PRIVATE_BUCKET_NAME");
-            failed |= check_var::<bool>("S3_USES_PATH_STYLE_BUCKETS");
+            let mut check_var_set = |var_prefix| {
+                failed |= check_var::<String>(&format!(
+                    "S3_{var_prefix}_BUCKET_NAME"
+                ));
+                failed |= check_var::<bool>(&format!(
+                    "S3_{var_prefix}_USES_PATH_STYLE_BUCKET"
+                ));
+                failed |=
+                    check_var::<String>(&format!("S3_{var_prefix}_REGION"));
+                failed |= check_var::<String>(&format!("S3_{var_prefix}_URL"));
+                failed |= check_var::<String>(&format!(
+                    "S3_{var_prefix}_ACCESS_TOKEN"
+                ));
+                failed |=
+                    check_var::<String>(&format!("S3_{var_prefix}_SECRET"));
+            };
+
+            check_var_set("PUBLIC");
+            check_var_set("PRIVATE");
         }
         Some("local") => {
             failed |= check_var::<String>("MOCK_FILE_PATH");
