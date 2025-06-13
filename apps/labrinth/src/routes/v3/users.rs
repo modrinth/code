@@ -1,6 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 
 use super::{ApiError, oauth_clients::get_user_clients};
+use crate::file_hosting::FileHostPublicity;
 use crate::util::img::delete_old_images;
 use crate::{
     auth::{filter_visible_projects, get_user_from_headers},
@@ -581,6 +582,7 @@ pub async fn user_icon_edit(
         delete_old_images(
             actual_user.avatar_url,
             actual_user.raw_avatar_url,
+            FileHostPublicity::Public,
             &***file_host,
         )
         .await?;
@@ -595,6 +597,7 @@ pub async fn user_icon_edit(
         let user_id: UserId = actual_user.id.into();
         let upload_result = crate::util::img::upload_image_optimized(
             &format!("data/{user_id}"),
+            FileHostPublicity::Public,
             bytes.freeze(),
             &ext.ext,
             Some(96),
@@ -653,6 +656,7 @@ pub async fn user_icon_delete(
         delete_old_images(
             actual_user.avatar_url,
             actual_user.raw_avatar_url,
+            FileHostPublicity::Public,
             &***file_host,
         )
         .await?;

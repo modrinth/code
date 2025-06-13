@@ -3,7 +3,7 @@ use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::auth::{AuthProvider, AuthenticationError, get_user_from_headers};
 use crate::database::models::flow_item::DBFlow;
 use crate::database::redis::RedisPool;
-use crate::file_hosting::FileHost;
+use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::pats::Scopes;
 use crate::models::users::{Badges, Role};
 use crate::queue::session::AuthQueue;
@@ -135,6 +135,7 @@ impl TempUser {
 
                 let upload_result = upload_image_optimized(
                     &format!("user/{}", ariadne::ids::UserId::from(user_id)),
+                    FileHostPublicity::Public,
                     bytes,
                     ext,
                     Some(96),

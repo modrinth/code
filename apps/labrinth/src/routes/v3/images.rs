@@ -8,7 +8,7 @@ use crate::database::models::{
     project_item, report_item, thread_item, version_item,
 };
 use crate::database::redis::RedisPool;
-use crate::file_hosting::FileHost;
+use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::{ReportId, ThreadMessageId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::queue::session::AuthQueue;
@@ -186,6 +186,7 @@ pub async fn images_add(
     let content_length = bytes.len();
     let upload_result = upload_image_optimized(
         "data/cached_images",
+        FileHostPublicity::Public, // FIXME: Maybe use private images for threads
         bytes.freeze(),
         &data.ext,
         None,

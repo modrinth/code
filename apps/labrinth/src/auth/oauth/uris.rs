@@ -101,7 +101,7 @@ mod tests {
         );
 
         assert!(validated.is_err_and(|e| matches!(
-            e.error_type,
+            *e.error_type,
             OAuthErrorType::RedirectUriNotConfigured(_)
         )));
     }

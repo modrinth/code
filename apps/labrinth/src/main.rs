@@ -4,8 +4,9 @@ use actix_web_prom::PrometheusMetricsBuilder;
 use clap::Parser;
 use labrinth::background_task::BackgroundTask;
 use labrinth::database::redis::RedisPool;
-use labrinth::file_hosting::S3Host;
+use labrinth::file_hosting::{S3BucketConfig, S3Host};
 use labrinth::search;
+use labrinth::util::env::parse_var;
 use labrinth::util::ratelimit::rate_limit_middleware;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
 use std::sync::Arc;
@@ -52,6 +53,7 @@ async fn main() -> std::io::Result<()> {
 
     if check_env_vars() {
         error!("Some environment variables are missing!");
+        std::process::exit(1);
     }
 
     // DSN is from SENTRY_DSN env variable.
@@ -94,24 +96,33 @@ async fn main() -> std::io::Result<()> {
 
     let file_host: Arc<dyn file_hosting::FileHost + Send + Sync> =
         match storage_backend.as_str() {
-            "backblaze" => Arc::new(
-                file_hosting::BackblazeHost::new(
-                    &dotenvy::var("BACKBLAZE_KEY_ID").unwrap(),
-                    &dotenvy::var("BACKBLAZE_KEY").unwrap(),
-                    &dotenvy::var("BACKBLAZE_BUCKET_ID").unwrap(),
+            "s3" => {
+                let config_from_env = |bucket_type| S3BucketConfig {
+                    name: parse_var(&format!("S3_{bucket_type}_BUCKET_NAME"))
+                        .unwrap(),
+                    uses_path_style: parse_var(&format!(
+                        "S3_{bucket_type}_USES_PATH_STYLE_BUCKET"
+                    ))
+                    .unwrap(),
+                    region: parse_var(&format!("S3_{bucket_type}_REGION"))
+                        .unwrap(),
+                    url: parse_var(&format!("S3_{bucket_type}_URL")).unwrap(),
+                    access_token: parse_var(&format!(
+                        "S3_{bucket_type}_ACCESS_TOKEN"
+                    ))
+                    .unwrap(),
+                    secret: parse_var(&format!("S3_{bucket_type}_SECRET"))
+                        .unwrap(),
+                };
+
+                Arc::new(
+                    S3Host::new(
+                        config_from_env("PUBLIC"),
+                        config_from_env("PRIVATE"),
+                    )
+                    .unwrap(),
                 )
-                .await,
-            ),
-            "s3" => Arc::new(
-                S3Host::new(
-                    &dotenvy::var("S3_BUCKET_NAME").unwrap(),
-                    &dotenvy::var("S3_REGION").unwrap(),
-                    &dotenvy::var("S3_URL").unwrap(),
-                    &dotenvy::var("S3_ACCESS_TOKEN").unwrap(),
-                    &dotenvy::var("S3_SECRET").unwrap(),
-                )
-                .unwrap(),
-            ),
+            }
             "local" => Arc::new(file_hosting::MockHost::new()),
             _ => panic!("Invalid storage backend specified. Aborting startup!"),
         };

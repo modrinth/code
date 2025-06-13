@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-pub fn parse_var<T: FromStr>(var: &'static str) -> Option<T> {
+pub fn parse_var<T: FromStr>(var: &str) -> Option<T> {
     dotenvy::var(var).ok().and_then(|i| i.parse().ok())
 }
 pub fn parse_strings_from_var(var: &'static str) -> Option<Vec<String>> {

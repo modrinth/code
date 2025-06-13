@@ -6,7 +6,7 @@ use crate::database::models::image_item;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::redis::RedisPool;
-use crate::file_hosting::FileHost;
+use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::{ThreadId, ThreadMessageId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::notifications::NotificationBody;
@@ -607,7 +607,12 @@ pub async fn message_delete(
         for image in images {
             let name = image.url.split(&format!("{cdn_url}/")).nth(1);
             if let Some(icon_path) = name {
-                file_host.delete_file_version("", icon_path).await?;
+                file_host
+                    .delete_file(
+                        icon_path,
+                        FileHostPublicity::Public, // FIXME: Consider using private file storage?
+                    )
+                    .await?;
             }
             database::DBImage::remove(image.id, &mut transaction, &redis)
                 .await?;

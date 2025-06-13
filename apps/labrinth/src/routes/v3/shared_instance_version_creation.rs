@@ -7,7 +7,7 @@ use crate::database::models::{
     generate_shared_instance_version_id,
 };
 use crate::database::redis::RedisPool;
-use crate::file_hosting::FileHost;
+use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::{SharedInstanceId, SharedInstanceVersionId};
 use crate::models::pats::Scopes;
 use crate::models::shared_instances::{
@@ -45,7 +45,7 @@ pub async fn shared_instance_version_create(
     web::Header(ContentLength(content_length)): web::Header<ContentLength>,
     redis: Data<RedisPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
-    info: web::Path<(crate::models::ids::SharedInstanceId,)>,
+    info: web::Path<(SharedInstanceId,)>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     if content_length > MAX_FILE_SIZE {
@@ -103,8 +103,6 @@ async fn shared_instance_version_create_inner(
     transaction: &mut Transaction<'_, Postgres>,
     uploaded_files: &mut Vec<UploadedFile>,
 ) -> Result<HttpResponse, ApiError> {
-    let cdn_url = dotenvy::var("CDN_URL")?;
-
     let user = get_user_from_headers(
         &req,
         pool,
@@ -160,18 +158,22 @@ async fn shared_instance_version_create_inner(
 
     let file_data = file_data.freeze();
     let file_path = format!(
-        "shared_instance/{}/{}.mrpack",
-        SharedInstanceId::from(instance_id),
+        "shared_instance/{}.mrpack",
         SharedInstanceVersionId::from(version_id),
     );
 
     let upload_data = file_host
-        .upload_file(MRPACK_MIME_TYPE, &file_path, file_data)
+        .upload_file(
+            MRPACK_MIME_TYPE,
+            &file_path,
+            FileHostPublicity::Private,
+            file_data,
+        )
         .await?;
 
     uploaded_files.push(UploadedFile {
-        file_id: upload_data.file_id,
-        file_name: file_path,
+        name: file_path,
+        publicity: upload_data.file_publicity,
     });
 
     let sha512 = Vec::<u8>::from_hex(upload_data.content_sha512).unwrap();
@@ -193,6 +195,6 @@ async fn shared_instance_version_create_inner(
     .execute(&mut **transaction)
     .await?;
 
-    Ok(HttpResponse::Created()
-        .json(SharedInstanceVersion::from_db(new_version, &cdn_url)))
+    let version: SharedInstanceVersion = new_version.into();
+    Ok(HttpResponse::Created().json(version))
 }

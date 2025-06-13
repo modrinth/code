@@ -9,7 +9,7 @@ use ariadne::ids::DecodingError;
 #[error("{}", .error_type)]
 pub struct OAuthError {
     #[source]
-    pub error_type: OAuthErrorType,
+    pub error_type: Box<OAuthErrorType>,
 
     pub state: Option<String>,
     pub valid_redirect_uri: Option<ValidatedRedirectUri>,
@@ -32,7 +32,7 @@ impl OAuthError {
     /// See: IETF RFC 6749 4.1.2.1 (https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1)
     pub fn error(error_type: impl Into<OAuthErrorType>) -> Self {
         Self {
-            error_type: error_type.into(),
+            error_type: Box::new(error_type.into()),
             valid_redirect_uri: None,
             state: None,
         }
@@ -48,7 +48,7 @@ impl OAuthError {
         valid_redirect_uri: &ValidatedRedirectUri,
     ) -> Self {
         Self {
-            error_type: err.into(),
+            error_type: Box::new(err.into()),
             state: state.clone(),
             valid_redirect_uri: Some(valid_redirect_uri.clone()),
         }
@@ -57,7 +57,7 @@ impl OAuthError {
 
 impl actix_web::ResponseError for OAuthError {
     fn status_code(&self) -> StatusCode {
-        match self.error_type {
+        match *self.error_type {
             OAuthErrorType::AuthenticationError(_)
             | OAuthErrorType::FailedScopeParse(_)
             | OAuthErrorType::ScopesTooBroad
