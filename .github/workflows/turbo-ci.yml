@@ -25,12 +25,6 @@ jobs:
         with:
           fetch-depth: 2
 
-      # This is required because Tauri depends on the frontend build directory to
-      # exist, but it is not created until the frontend is built, which may happen
-      # after the backend is built
-      - name: 📁 Create Tauri frontend build directories
-        run: mkdir -p apps/app-frontend/dist
-
       - name: 🧰 Install build dependencies
         run: |
           sudo apt-get update
@@ -71,17 +65,14 @@ jobs:
       - name: 🧰 Install dependencies
         run: pnpm install
 
-      - name: 🔍 Lint
-        run: pnpm lint
-
       - name: ⚙️ Start services
         run: docker compose up -d
 
       - name: ⚙️ Setup Labrinth environment and database
         working-directory: apps/labrinth
         run: |
-          mv .env.local .env
+          cp .env.local .env
           sqlx database setup
 
-      - name: ✔️ Test
-        run: pnpm test
+      - name: 🔍 Lint and test
+        run: pnpm run ci
