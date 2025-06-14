@@ -1,5 +1,4 @@
 use crate::state::DirectoryInfo;
-use sqlx::migrate::MigrateDatabase;
 use sqlx::sqlite::{
     SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions,
 };
@@ -20,14 +19,11 @@ pub(crate) async fn connect() -> crate::Result<Pool<Sqlite>> {
 
     let uri = format!("sqlite:{}", settings_dir.join("app.db").display());
 
-    if !Sqlite::database_exists(&uri).await? {
-        Sqlite::create_database(&uri).await?;
-    }
-
     let conn_options = SqliteConnectOptions::from_str(&uri)?
         .busy_timeout(Duration::from_secs(30))
         .journal_mode(SqliteJournalMode::Wal)
-        .optimize_on_close(true, None);
+        .optimize_on_close(true, None)
+        .create_if_missing(true);
 
     let pool = SqlitePoolOptions::new()
         .max_connections(100)
