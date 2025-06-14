@@ -214,7 +214,7 @@
 </template>
 
 <script setup>
-import { OverflowMenu, MarkdownEditor } from "@modrinth/ui";
+import { CopyCode, OverflowMenu, MarkdownEditor } from "@modrinth/ui";
 import {
   DropdownIcon,
   ReplyIcon,
@@ -226,7 +226,6 @@ import {
   ScaleIcon,
 } from "@modrinth/assets";
 import { useImageUpload } from "~/composables/image-upload.ts";
-import CopyCode from "~/components/ui/CopyCode.vue";
 import ThreadMessage from "~/components/ui/thread/ThreadMessage.vue";
 import { isStaff } from "~/helpers/users.js";
 import { isApproved, isRejected } from "~/helpers/projects.js";

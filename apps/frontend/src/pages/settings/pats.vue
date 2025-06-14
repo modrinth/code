@@ -205,6 +205,7 @@
 import { PlusIcon, XIcon, TrashIcon, EditIcon, SaveIcon } from "@modrinth/assets";
 import {
   Checkbox,
+  CopyCode,
   ConfirmModal,
   commonSettingsMessages,
   commonMessages,
@@ -219,7 +220,6 @@ import {
   getScopeValue,
 } from "~/composables/auth/scopes.ts";
 
-import CopyCode from "~/components/ui/CopyCode.vue";
 import Modal from "~/components/ui/Modal.vue";
 
 const { formatMessage } = useVIntl();
