@@ -244,7 +244,7 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
 /// Minecraft profile. If the currently equipped skin is custom but not managed by
 /// the app (i.e., it was set externally by another launcher, the Minecraft website,
 /// etc.), that skin will be added as a custom skin to the app database as well.
-#[tracing::instrument]
+#[tracing::instrument(skip(texture_blob))]
 pub async fn add_and_equip_custom_skin(
     texture_blob: Bytes,
     variant: MinecraftSkinVariant,

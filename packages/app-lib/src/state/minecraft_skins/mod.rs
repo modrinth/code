@@ -169,7 +169,7 @@ impl CustomMinecraftSkin {
 
         sqlx::query!(
             "DELETE FROM custom_minecraft_skins \
-            WHERE minecraft_user_uuid = ? AND texture_key = ? AND variant = ? AND cape_id = ?",
+            WHERE minecraft_user_uuid = ? AND texture_key = ? AND variant = ? AND cape_id IS ?",
             minecraft_user_id, self.texture_key, self.variant, cape_id
         )
         .execute(&mut *db.acquire().await?)
