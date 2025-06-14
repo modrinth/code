@@ -68,7 +68,7 @@ export const getDefaultColor = (value) => {
   return defaultColors[value % defaultColors.length];
 };
 
-export const intToRgba = (color, projectId = "Unknown", theme = "dark", alpha = "1") => {
+export const intToRgba = (color, projectId = "Unknown", theme = "dark") => {
   const hash = hashProjectId(projectId);
 
   if (!color || color === 0) {
@@ -110,7 +110,7 @@ export const intToRgba = (color, projectId = "Unknown", theme = "dark", alpha = 
   g = Math.min(255, Math.max(0, g));
   b = Math.min(255, Math.max(0, b));
 
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  return `rgb(${r}, ${g}, ${b})`;
 };
 
 const emptyAnalytics = {
