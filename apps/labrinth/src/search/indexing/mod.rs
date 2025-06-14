@@ -52,23 +52,19 @@ pub async fn remove_documents(
 
     for index in &indexes {
         deletion_tasks.push(async move {
-            let task_info = index
+            // After being successfully submitted above, Meilisearch tasks are executed
+            // asynchronously, so wait some time for them to complete
+            index
                 .delete_documents(
                     &ids.iter().map(|x| to_base62(x.0)).collect::<Vec<_>>(),
                 )
-                .await?;
-
-            // After being successfully submitted above, Meilisearch tasks are executed
-            // asynchronously, so wait some time for them to complete
-            task_info
+                .await?
                 .wait_for_completion(
                     client,
                     None,
                     Some(Duration::from_secs(15)),
                 )
-                .await?;
-
-            Ok::<_, meilisearch_sdk::errors::Error>(())
+                .await
         });
     }
 
