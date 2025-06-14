@@ -38,6 +38,7 @@ tracing-subscriber = { workspace = true, features = ["chrono", "env-filter"] }
 tracing-error.workspace = true
 
 paste.workspace = true
+heck.workspace = true
 
 tauri = { workspace = true, optional = true }
 indicatif = { workspace = true, optional = true }
