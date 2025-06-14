@@ -165,16 +165,16 @@ pub async fn normalize_skin_texture(
         // that keeps most people wondering, is what sets a carefully crafted image
         // manipulation routine apart :)
         if let Some(source_chromacities) =
-            png_reader.info().source_chromaticities.as_ref().cloned()
+            png_reader.info().source_chromaticities.as_ref().copied()
         {
             png_encoder.set_source_chromaticities(source_chromacities);
         }
         if let Some(source_gamma) =
-            png_reader.info().source_gamma.as_ref().cloned()
+            png_reader.info().source_gamma.as_ref().copied()
         {
             png_encoder.set_source_gamma(source_gamma);
         }
-        if let Some(source_srgb) = png_reader.info().srgb.as_ref().cloned() {
+        if let Some(source_srgb) = png_reader.info().srgb.as_ref().copied() {
             png_encoder.set_source_srgb(source_srgb);
         }
 
