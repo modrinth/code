@@ -11,7 +11,7 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
-    date: `2025-06-13T19:30:00-07:00`,
+    date: `2025-06-14T10:50:00-07:00`,
     product: 'servers',
     body: `### Improvements
 - Fixed various issues with the panel loading improperly in certain cases.
@@ -19,7 +19,7 @@ const VERSIONS: VersionEntry[] = [
 - Server panel performance should be a little faster now.`,
   },
   {
-    date: `2025-06-13T19:30:00-07:00`,
+    date: `2025-06-14T10:50:00-07:00`,
     product: 'web',
     body: `### Improvements
 - Creator analytics charts will now show up to 15 projects in a tooltip instead of 5. (Contributed by [Erb3](https://github.com/modrinth/code/pull/2898))
