@@ -52,7 +52,7 @@ pub async fn remove_documents(
 
     for index in &indexes {
         deletion_tasks.push(async move {
-            // After being successfully submitted above, Meilisearch tasks are executed
+            // After being successfully submitted, Meilisearch tasks are executed
             // asynchronously, so wait some time for them to complete
             index
                 .delete_documents(
