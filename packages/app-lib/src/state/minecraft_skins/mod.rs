@@ -95,15 +95,15 @@ impl CustomMinecraftSkin {
         let mut transaction = db.begin().await?;
 
         sqlx::query!(
-            "INSERT OR IGNORE INTO custom_minecraft_skins (minecraft_user_uuid, texture_key, variant, cape_id) VALUES (?, ?, ?, ?)",
-            minecraft_user_id, texture_key, variant, cape_id
+            "INSERT OR REPLACE INTO custom_minecraft_skin_textures (texture_key, texture) VALUES (?, ?)",
+            texture_key, texture
         )
         .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
-            "INSERT OR REPLACE INTO custom_minecraft_skin_textures (texture_key, texture) VALUES (?, ?)",
-            texture_key, texture
+            "INSERT OR REPLACE INTO custom_minecraft_skins (minecraft_user_uuid, texture_key, variant, cape_id) VALUES (?, ?, ?, ?)",
+            minecraft_user_id, texture_key, variant, cape_id
         )
         .execute(&mut *transaction)
         .await?;

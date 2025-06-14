@@ -38,7 +38,7 @@ CREATE TABLE custom_minecraft_skins (
 
     PRIMARY KEY (minecraft_user_uuid, texture_key, variant, cape_id),
     FOREIGN KEY (texture_key) REFERENCES custom_minecraft_skin_textures(texture_key)
-        ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE INITIALLY DEFERRED
+        ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- Similar partial foreign key emulation as above
