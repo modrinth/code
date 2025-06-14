@@ -65,8 +65,7 @@ pub async fn import_curseforge(
         "Curseforge-{}",
         curseforge_instance_folder
             .file_name()
-            .map(|a| a.to_string_lossy().to_string())
-            .unwrap_or("Unknown".to_string())
+            .map_or("Unknown".to_string(), |a| a.to_string_lossy().to_string())
     );
 
     let state = State::get().await?;

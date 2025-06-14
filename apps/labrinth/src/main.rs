@@ -8,6 +8,7 @@ use labrinth::file_hosting::S3Host;
 use labrinth::search;
 use labrinth::util::ratelimit::rate_limit_middleware;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
+use std::ffi::CStr;
 use std::sync::Arc;
 use tracing::{error, info};
 use tracing_actix_web::TracingLogger;
@@ -16,10 +17,8 @@ use tracing_actix_web::TracingLogger;
 #[global_allocator]
 static ALLOC: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
 
-#[allow(non_upper_case_globals)]
 #[unsafe(export_name = "malloc_conf")]
-pub static malloc_conf: &[u8] =
-    b"prof:true,prof_active:true,lg_prof_sample:19\0";
+pub static MALLOC_CONF: &CStr = c"prof:true,prof_active:true,lg_prof_sample:19";
 
 #[derive(Clone)]
 pub struct Pepper {

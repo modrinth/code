@@ -139,9 +139,7 @@ pub async fn edit_loading(
 // increment refers to by what relative increment to the loading struct's total to update
 // message is the message to display on the loading bar- if None, use the loading bar's default one
 // By convention, fraction is the fraction of the progress bar that is filled
-#[allow(unused_variables)]
 #[tracing::instrument(level = "debug")]
-
 pub fn emit_loading(
     key: &LoadingBarId,
     increment_frac: f64,
@@ -149,22 +147,13 @@ pub fn emit_loading(
 ) -> crate::Result<()> {
     let event_state = crate::EventState::get()?;
 
-    let mut loading_bar = match event_state.loading_bars.get_mut(&key.0) {
-        Some(f) => f,
-        None => {
-            return Err(EventError::NoLoadingBar(key.0).into());
-        }
+    let Some(mut loading_bar) = event_state.loading_bars.get_mut(&key.0) else {
+        return Err(EventError::NoLoadingBar(key.0).into());
     };
 
     // Tick up loading bar
     loading_bar.current += increment_frac;
     let display_frac = loading_bar.current / loading_bar.total;
-    let opt_display_frac = if display_frac >= 1.0 {
-        None // by convention, when its done, we submit None
-    // any further updates will be ignored (also sending None)
-    } else {
-        Some(display_frac)
-    };
 
     if f64::abs(display_frac - loading_bar.last_sent) > 0.005 {
         // Emit event to indicatif progress bar
@@ -187,7 +176,12 @@ pub fn emit_loading(
             .emit(
                 "loading",
                 LoadingPayload {
-                    fraction: opt_display_frac,
+                    fraction: if display_frac >= 1.0 {
+                        None // by convention, when its done, we submit None
+                    // any further updates will be ignored (also sending None)
+                    } else {
+                        Some(display_frac)
+                    },
                     message: message
                         .unwrap_or(&loading_bar.message)
                         .to_string(),
@@ -197,6 +191,9 @@ pub fn emit_loading(
             )
             .map_err(EventError::from)?;
 
+        #[cfg(not(any(feature = "cli", feature = "tauri")))]
+        let _ = message;
+
         loading_bar.last_sent = display_frac;
     }
 
@@ -204,8 +201,6 @@ pub fn emit_loading(
 }
 
 // emit_warning(message)
-#[allow(dead_code)]
-#[allow(unused_variables)]
 pub async fn emit_warning(message: &str) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
@@ -227,8 +222,6 @@ pub async fn emit_warning(message: &str) -> crate::Result<()> {
 // emit_command(CommandPayload::Something { something })
 // ie: installing a pack, opening an .mrpack, etc
 // Generally used for url deep links and file opens that we want to handle in the frontend
-#[allow(dead_code)]
-#[allow(unused_variables)]
 pub async fn emit_command(command: CommandPayload) -> crate::Result<()> {
     tracing::debug!("Command: {}", serde_json::to_string(&command)?);
     #[cfg(feature = "tauri")]

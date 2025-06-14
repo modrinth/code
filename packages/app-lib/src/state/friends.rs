@@ -174,7 +174,7 @@ impl FriendsSocket {
                                             ServerToClientMessage::FriendRequest { from } => {
                                                 let _ = emit_friend(FriendPayload::FriendRequest { from }).await;
                                             }
-                                            ServerToClientMessage::FriendRequestRejected { .. } => todo!(),
+                                            ServerToClientMessage::FriendRequestRejected { .. } => {}, // TODO
 
                                             ServerToClientMessage::FriendSocketListening { .. } => {}, // TODO
                                             ServerToClientMessage::FriendSocketStoppedListening { .. } => {}, // TODO

@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use super::{
     api_common::{Api, ApiBuildable, generic::GenericApi},
     api_v2::ApiV2,

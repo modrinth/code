@@ -98,13 +98,12 @@ pub async fn upload_image_optimized(
 
     let url = format!("{}/{}", cdn_url, upload_data.file_name);
     Ok(UploadImageResult {
-        url: processed_upload_data
-            .clone()
-            .map(|x| format!("{}/{}", cdn_url, x.file_name))
-            .unwrap_or_else(|| url.clone()),
+        url: processed_upload_data.clone().map_or_else(
+            || url.clone(),
+            |x| format!("{}/{}", cdn_url, x.file_name),
+        ),
         url_path: processed_upload_data
-            .map(|x| x.file_name)
-            .unwrap_or_else(|| upload_data.file_name.clone()),
+            .map_or_else(|| upload_data.file_name.clone(), |x| x.file_name),
 
         raw_url: url,
         raw_url_path: upload_data.file_name,
@@ -119,7 +118,7 @@ fn process_image(
     min_aspect_ratio: Option<f32>,
 ) -> Result<(bytes::Bytes, String), ImageError> {
     if content_type.to_lowercase() == "image/gif" {
-        return Ok((image_bytes.clone(), "gif".to_string()));
+        return Ok((image_bytes, "gif".to_string()));
     }
 
     let mut img = image::load_from_memory(&image_bytes)?;

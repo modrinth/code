@@ -122,7 +122,7 @@ pub fn from_duplicate_version_fields(
     }
 
     // Remove duplicates
-    for (_, v) in fields.iter_mut() {
+    for v in fields.values_mut() {
         *v = mem::take(v).into_iter().unique().collect_vec();
     }
     fields

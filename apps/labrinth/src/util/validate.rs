@@ -1,4 +1,4 @@
-use std::sync::LazyLock;
+use std::{fmt::Write, sync::LazyLock};
 
 use itertools::Itertools;
 use regex::Regex;
@@ -44,15 +44,17 @@ pub fn validation_errors_to_string(
                 ValidationErrorsKind::Field(errors) => {
                     if let Some(error) = errors.first() {
                         if let Some(adder) = adder {
-                            output.push_str(&format!(
-                                "Field {} {} failed validation with error: {}",
-                                field, adder, error.code
-                            ));
+                            write!(
+                                &mut output,
+                                "Field {field} {adder} failed validation with error: {}",
+                                error.code
+                            ).unwrap();
                         } else {
-                            output.push_str(&format!(
-                                "Field {} failed validation with error: {}",
-                                field, error.code
-                            ));
+                            write!(
+                                &mut output,
+                                "Field {field} failed validation with error: {}",
+                                error.code
+                            ).unwrap();
                         }
                     }
 

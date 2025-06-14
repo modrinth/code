@@ -87,9 +87,9 @@ pub fn get_lib_path(
     lib: &str,
     allow_not_exist: bool,
 ) -> crate::Result<String> {
-    let mut path = libraries_path.to_path_buf();
-
-    path.push(get_path_from_artifact(lib)?);
+    let path = libraries_path
+        .to_path_buf()
+        .join(get_path_from_artifact(lib)?);
 
     if !path.exists() && allow_not_exist {
         return Ok(path.to_string_lossy().to_string());

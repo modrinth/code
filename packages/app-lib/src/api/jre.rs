@@ -166,9 +166,8 @@ pub async fn test_jre(
     path: PathBuf,
     major_version: u32,
 ) -> crate::Result<bool> {
-    let jre = match jre::check_java_at_filepath(&path).await {
-        Some(jre) => jre,
-        None => return Ok(false),
+    let Some(jre) = jre::check_java_at_filepath(&path).await else {
+        return Ok(false);
     };
     let (major, _) = extract_java_majorminor_version(&jre.version)?;
     Ok(major == major_version)

@@ -1249,7 +1249,7 @@ pub async fn delete_auth_provider(
     .await?
     .1;
 
-    if !user.auth_providers.map(|x| x.len() > 1).unwrap_or(false)
+    if user.auth_providers.is_none_or(|x| x.len() <= 1)
         && !user.has_password.unwrap_or(false)
     {
         return Err(ApiError::InvalidInput(

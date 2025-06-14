@@ -606,13 +606,10 @@ async fn upload_file_to_version_inner(
 
     let result = models::DBVersion::get(version_id, &**client, &redis).await?;
 
-    let version = match result {
-        Some(v) => v,
-        None => {
-            return Err(CreateError::InvalidInput(
-                "An invalid version id was supplied".to_string(),
-            ));
-        }
+    let Some(version) = result else {
+        return Err(CreateError::InvalidInput(
+            "An invalid version id was supplied".to_string(),
+        ));
     };
 
     let all_loaders =
@@ -1065,7 +1062,7 @@ pub fn try_create_version_fields(
         .filter(|lf| !lf.optional)
         .map(|lf| lf.field.clone())
         .collect::<HashSet<_>>();
-    for (key, value) in submitted_fields.iter() {
+    for (key, value) in submitted_fields {
         let loader_field = loader_fields
             .iter()
             .find(|lf| &lf.field == key)

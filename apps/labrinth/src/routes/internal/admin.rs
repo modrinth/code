@@ -18,6 +18,7 @@ use actix_web::{HttpRequest, HttpResponse, get, patch, post, web};
 use serde::Deserialize;
 use sqlx::PgPool;
 use std::collections::HashMap;
+use std::fmt::Write;
 use std::net::Ipv4Addr;
 use std::sync::Arc;
 use tracing::info;
@@ -221,9 +222,11 @@ pub async fn delphi_result_ingest(
 
     for (issue, trace) in &body.issues {
         for (path, code) in trace {
-            header.push_str(&format!(
+            write!(
+                &mut header,
                 "\n issue {issue} found at file {path}: \n ```\n{code}\n```"
-            ));
+            )
+            .unwrap();
         }
     }
 
@@ -244,12 +247,15 @@ pub async fn delphi_result_ingest(
 
     for (issue, trace) in &body.issues {
         for path in trace.keys() {
-            thread_header
-                .push_str(&format!("\n\n- issue {issue} found at file {path}"));
+            write!(
+                &mut thread_header,
+                "\n\n- issue {issue} found at file {path}"
+            )
+            .unwrap();
         }
 
         if trace.is_empty() {
-            thread_header.push_str(&format!("\n\n- issue {issue} found",));
+            write!(&mut thread_header, "\n\n- issue {issue} found").unwrap();
         }
     }
 

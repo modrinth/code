@@ -10,7 +10,7 @@ use labrinth::models::teams::{OrganizationPermissions, ProjectPermissions};
 use rust_decimal::Decimal;
 use serde_json::json;
 
-mod common;
+pub mod common;
 
 #[actix_rt::test]
 async fn test_get_team() {
