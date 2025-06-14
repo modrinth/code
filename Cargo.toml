@@ -47,6 +47,7 @@ color-thief = "0.2.2"
 console-subscriber = "0.4.1"
 daedalus = { path = "packages/daedalus" }
 dashmap = "6.1.0"
+data-url = "0.3.1"
 deadpool-redis = "0.21.1"
 dirs = "6.0.0"
 discord-rich-presence = "0.2.5"
