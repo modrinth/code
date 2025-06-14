@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "DELETE FROM default_minecraft_capes WHERE minecraft_user_uuid = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "27a4ca00ab9d1647bf63287169f6dd3eed86ba421c83e74fe284609a8020bd22"
+}
