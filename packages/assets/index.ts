@@ -66,6 +66,7 @@ import _ChevronRightIcon from './icons/chevron-right.svg?component'
 import _ClearIcon from './icons/clear.svg?component'
 import _ClientIcon from './icons/client.svg?component'
 import _ClipboardCopyIcon from './icons/clipboard-copy.svg?component'
+import _ClockIcon from './icons/clock.svg?component'
 import _CodeIcon from './icons/code.svg?component'
 import _CoffeeIcon from './icons/coffee.svg?component'
 import _CoinsIcon from './icons/coins.svg?component'
@@ -182,6 +183,7 @@ import _TagsIcon from './icons/tags.svg?component'
 import _TerminalSquareIcon from './icons/terminal-square.svg?component'
 import _TransferIcon from './icons/transfer.svg?component'
 import _TrashIcon from './icons/trash.svg?component'
+import _TriangleAlertIcon from './icons/triangle-alert.svg?component'
 import _UndoIcon from './icons/undo.svg?component'
 import _RedoIcon from './icons/redo.svg?component'
 import _UnknownIcon from './icons/unknown.svg?component'
@@ -210,6 +212,8 @@ import _CPUIcon from './icons/cpu.svg?component'
 import _LoaderIcon from './icons/loader.svg?component'
 import _ImportIcon from './icons/import.svg?component'
 import _TimerIcon from './icons/timer.svg?component'
+import _CalendarSyncIcon from './icons/calendar-sync.svg?component'
+import _ToggleRightIcon from './icons/toggle-right.svg?component'
 
 // Editor Icons
 import _BoldIcon from './icons/bold.svg?component'
@@ -285,6 +289,7 @@ export const ChevronRightIcon = _ChevronRightIcon
 export const ClearIcon = _ClearIcon
 export const ClientIcon = _ClientIcon
 export const ClipboardCopyIcon = _ClipboardCopyIcon
+export const ClockIcon = _ClockIcon
 export const CodeIcon = _CodeIcon
 export const CoffeeIcon = _CoffeeIcon
 export const CoinsIcon = _CoinsIcon
@@ -441,3 +446,6 @@ export const LoaderIcon = _LoaderIcon
 export const ImportIcon = _ImportIcon
 export const CardIcon = _CardIcon
 export const TimerIcon = _TimerIcon
+export const CalendarSyncIcon = _CalendarSyncIcon
+export const ToggleRightIcon = _ToggleRightIcon
+export const TriangleAlertIcon = _TriangleAlertIcon
