@@ -649,6 +649,9 @@ pub async fn organization_delete(
             ordering: 0,
         };
         member.insert(&mut transaction).await?;
+
+        database::models::DBUser::clear_project_cache(&[owner_id], &redis)
+            .await?;
     }
     // Safely remove the organization
     let result = database::models::DBOrganization::remove(
