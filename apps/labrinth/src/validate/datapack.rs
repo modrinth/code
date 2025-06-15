@@ -1,6 +1,7 @@
 use crate::validate::{
     SupportedGameVersions, ValidationError, ValidationResult,
 };
+use chrono::DateTime;
 use std::io::Cursor;
 use zip::ZipArchive;
 
@@ -16,7 +17,10 @@ impl super::Validator for DataPackValidator {
     }
 
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
-        SupportedGameVersions::All
+        // Time since release of 17w43a, 2017-10-25, which introduced datapacks
+        SupportedGameVersions::PastDate(
+            DateTime::from_timestamp(1508889600, 0).unwrap(),
+        )
     }
 
     fn validate(
