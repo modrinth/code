@@ -114,7 +114,7 @@ async fn creating_loader_fields() {
                 Some(
                     serde_json::from_value(json!([{
                         "op": "remove",
-                        "path": "/singleplayer"
+                        "path": "/environment"
                     }]))
                     .unwrap(),
                 ),
@@ -273,12 +273,8 @@ async fn creating_loader_fields() {
                         "value": ["1.20.1", "1.20.2"]
                     }, {
                         "op": "add",
-                        "path": "/singleplayer",
-                        "value": false
-                    }, {
-                        "op": "add",
-                        "path": "/server_only",
-                        "value": true
+                        "path": "/environment",
+                        "value": "client_or_server_prefers_both"
                     }]))
                     .unwrap(),
                 ),
@@ -286,16 +282,17 @@ async fn creating_loader_fields() {
             )
             .await;
         assert_eq!(&v.fields["game_versions"], &json!(["1.20.1", "1.20.2"]));
-        assert_eq!(&v.fields["singleplayer"], &json!(false));
-        assert_eq!(&v.fields["server_only"], &json!(true));
+        assert_eq!(
+            &v.fields["environment"],
+            &json!("client_or_server_prefers_both")
+        );
         // - Patch
         let resp = api
             .edit_version(
                 alpha_version_id,
                 json!({
                     "game_versions": ["1.20.1", "1.20.2"],
-                    "singleplayer": false,
-                    "server_only": true
+                    "environment": "client_or_server_prefers_both"
                 }),
                 USER_USER_PAT,
             )
@@ -320,8 +317,8 @@ async fn creating_loader_fields() {
                     "value": ["1.20.5"]
                 }, {
                     "op": "add",
-                    "path": "/singleplayer",
-                    "value": false
+                    "path": "/environment",
+                    "value": "client_or_server"
                 }]))
                 .unwrap(),
             ),
@@ -357,8 +354,13 @@ async fn creating_loader_fields() {
             &project.fields["game_versions"],
             &[json!("1.20.1"), json!("1.20.2"), json!("1.20.5")]
         );
-        assert!(project.fields["singleplayer"].contains(&json!(false)));
-        assert!(project.fields["singleplayer"].contains(&json!(true)));
+        assert!(
+            project.fields["environment"].contains(&json!("client_or_server"))
+        );
+        assert!(
+            project.fields["environment"]
+                .contains(&json!("client_or_server_prefers_both"))
+        );
     })
     .await
 }
@@ -421,10 +423,7 @@ async fn get_available_loader_fields() {
                 fabric_loader_fields,
                 [
                     "game_versions",
-                    "singleplayer",
-                    "client_and_server",
-                    "client_only",
-                    "server_only",
+                    "environment",
                     "test_fabric_optional" // exists for testing
                 ]
                 .iter()
@@ -444,10 +443,7 @@ async fn get_available_loader_fields() {
                 mrpack_loader_fields,
                 [
                     "game_versions",
-                    "singleplayer",
-                    "client_and_server",
-                    "client_only",
-                    "server_only",
+                    "environment",
                     // mrpack has all the general fields as well as this
                     "mrpack_loaders"
                 ]

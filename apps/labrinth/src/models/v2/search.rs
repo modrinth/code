@@ -102,28 +102,20 @@ impl LegacyResultSearchProject {
 
         let project_loader_fields =
             result_search_project.project_loader_fields.clone();
-        let get_one_bool_loader_field = |key: &str| {
+        let get_one_string_loader_field = |key: &str| {
             project_loader_fields
                 .get(key)
-                .cloned()
-                .unwrap_or_default()
+                .map_or(&[][..], |values| values.as_slice())
                 .first()
-                .and_then(|s| s.as_bool())
+                .and_then(|s| s.as_str())
         };
 
-        let singleplayer = get_one_bool_loader_field("singleplayer");
-        let client_only =
-            get_one_bool_loader_field("client_only").unwrap_or(false);
-        let server_only =
-            get_one_bool_loader_field("server_only").unwrap_or(false);
-        let client_and_server = get_one_bool_loader_field("client_and_server");
+        let environment =
+            get_one_string_loader_field("environment").unwrap_or("unknown");
 
         let (client_side, server_side) =
-            v2_reroute::convert_side_types_v2_bools(
-                singleplayer,
-                client_only,
-                server_only,
-                client_and_server,
+            v2_reroute::convert_v3_environment_to_v2_side_types(
+                environment,
                 Some(&*og_project_type),
             );
         let client_side = client_side.to_string();

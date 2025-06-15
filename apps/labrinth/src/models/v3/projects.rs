@@ -92,6 +92,9 @@ pub struct Project {
     /// The monetization status of this project
     pub monetization_status: MonetizationStatus,
 
+    /// The status of the manual review of the migration of side types of this project
+    pub side_types_migration_review_status: SideTypesMigrationReviewStatus,
+
     /// Aggregated loader-fields across its myriad of versions
     #[serde(flatten)]
     pub fields: HashMap<String, Vec<serde_json::Value>>,
@@ -206,6 +209,8 @@ impl From<ProjectQueryResult> for Project {
             color: m.color,
             thread_id: data.thread_id.into(),
             monetization_status: m.monetization_status,
+            side_types_migration_review_status: m
+                .side_types_migration_review_status,
             fields,
         }
     }
@@ -588,6 +593,35 @@ impl MonetizationStatus {
     }
 }
 
+/// Represents the status of the manual review of the migration of side types of this
+/// project to the new environment field.
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, Eq, PartialEq)]
+#[serde(rename_all = "kebab-case")]
+pub enum SideTypesMigrationReviewStatus {
+    /// The project has been reviewed to use the new environment side types appropriately.
+    Reviewed,
+    /// The project has been automatically migrated to the new environment side types, but
+    /// the appropriateness of such migration has not been reviewed.
+    Pending,
+}
+
+impl SideTypesMigrationReviewStatus {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            SideTypesMigrationReviewStatus::Reviewed => "reviewed",
+            SideTypesMigrationReviewStatus::Pending => "pending",
+        }
+    }
+
+    pub fn from_string(string: &str) -> SideTypesMigrationReviewStatus {
+        match string {
+            "reviewed" => SideTypesMigrationReviewStatus::Reviewed,
+            "pending" => SideTypesMigrationReviewStatus::Pending,
+            _ => SideTypesMigrationReviewStatus::Reviewed,
+        }
+    }
+}
+
 /// A specific version of a project
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Version {
@@ -846,7 +880,6 @@ impl std::fmt::Display for VersionType {
 }
 
 impl VersionType {
-    // These are constant, so this can remove unneccessary allocations (`to_string`)
     pub fn as_str(&self) -> &'static str {
         match self {
             VersionType::Release => "release",
