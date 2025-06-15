@@ -29,7 +29,7 @@
           {{ author }}
         </nuxt-link>
       </p>
-      <Badge v-if="status && status !== 'approved'" :type="status" class="status" />
+      <ProjectStatusBadge v-if="status && status !== 'approved'" :status="status" class="status" />
     </div>
     <p class="description">
       {{ description }}
@@ -91,18 +91,16 @@
 
 <script>
 import { CalendarIcon, UpdatedIcon, DownloadIcon, HeartIcon } from "@modrinth/assets";
+import { Avatar, ProjectStatusBadge, useRelativeTime } from "@modrinth/ui";
 import Categories from "~/components/ui/search/Categories.vue";
-import Badge from "~/components/ui/Badge.vue";
 import EnvironmentIndicator from "~/components/ui/EnvironmentIndicator.vue";
-import Avatar from "~/components/ui/Avatar.vue";
-import { useRelativeTime } from "@modrinth/ui";
 
 export default {
   components: {
+    ProjectStatusBadge,
     EnvironmentIndicator,
     Avatar,
     Categories,
-    Badge,
     CalendarIcon,
     UpdatedIcon,
     DownloadIcon,
