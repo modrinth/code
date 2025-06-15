@@ -22,7 +22,7 @@ import { computed, inject, onMounted, onUnmounted, ref, useTemplateRef, watch } 
 import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
 import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
 import UploadSkinModal from '@/components/ui/skin/UploadSkinModal.vue'
-import { handleError } from '@/store/notifications'
+import { handleError, useNotifications } from '@/store/notifications'
 import type { Cape, Skin } from '@/helpers/skins.ts'
 import {
   normalize_skin_texture,
@@ -47,6 +47,8 @@ import { arrayBufferToBase64 } from '@modrinth/utils'
 const editSkinModal = useTemplateRef('editSkinModal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
 const uploadSkinModal = useTemplateRef('uploadSkinModal')
+
+const notifications = useNotifications()
 
 const settings = ref(await getSettings())
 const skins = ref<Skin[]>([])
@@ -149,7 +151,16 @@ async function changeSkin(newSkin: Skin) {
   } catch (error) {
     selectedSkin.value = previousSkin
     skins.value = previousSkinsList
-    handleError(error)
+
+    if ((error as { message?: string })?.message?.includes('429 Too Many Requests')) {
+      notifications.addNotification({
+        type: 'error',
+        title: 'Slow down!',
+        text: "You're changing your skin too frequently. Mojang's servers have temporarily blocked further requests. Please wait a moment before trying again.",
+      })
+    } else {
+      handleError(error)
+    }
   }
 }
 
@@ -169,7 +180,16 @@ async function handleCapeSelected(cape: Cape | undefined) {
   } catch (error) {
     defaultCape.value = previousDefaultCape
     capes.value = previousCapesList
-    handleError(error)
+
+    if ((error as { message?: string })?.message?.includes('429 Too Many Requests')) {
+      notifications.addNotification({
+        type: 'error',
+        title: 'Slow down!',
+        text: "You're changing your cape too frequently. Mojang's servers have temporarily blocked further requests. Please wait a moment before trying again.",
+      })
+    } else {
+      handleError(error)
+    }
   }
 }
 

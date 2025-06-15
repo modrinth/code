@@ -150,7 +150,7 @@ const props = withDefaults(
       baseAnimation: 'idle',
       randomAnimations: ['idle_sub_1', 'idle_sub_2', 'idle_sub_3'],
       randomAnimationInterval: 8000,
-      transitionDuration: 0.5,
+      transitionDuration: 0.2,
     }),
   },
 )
@@ -204,11 +204,14 @@ function initializeAnimations(loadedScene: THREE.Object3D, clips: THREE.Animatio
 
   clips.forEach((clip) => {
     const action = mixer.value!.clipAction(clip)
+
+    action.setLoop(THREE.LoopOnce, 1)
+    action.clampWhenFinished = true
     actions.value[clip.name] = action
-    console.log(`Loaded animation: ${clip.name}`)
   })
 
   if (baseAnimation.value && actions.value[baseAnimation.value]) {
+    actions.value[baseAnimation.value].setLoop(THREE.LoopRepeat, Infinity)
     playAnimation(baseAnimation.value)
     setupRandomAnimationLoop()
   } else {
@@ -216,7 +219,7 @@ function initializeAnimations(loadedScene: THREE.Object3D, clips: THREE.Animatio
 
     const firstAnimationName = Object.keys(actions.value)[0]
     if (firstAnimationName) {
-      console.log(`Playing first available animation: ${firstAnimationName}`)
+      actions.value[firstAnimationName].setLoop(THREE.LoopRepeat, Infinity)
       playAnimation(firstAnimationName)
     }
   }
@@ -229,6 +232,12 @@ function playAnimation(name: string) {
   }
 
   const action = actions.value[name]
+
+  if (currentAnimation.value === name && action.isRunning() && name !== baseAnimation.value) {
+    console.log(`Animation "${name}" is already running, ignoring request`)
+    return false
+  }
+
   const transitionDuration = props.animationConfig.transitionDuration || 0.3
 
   Object.entries(actions.value).forEach(([actionName, actionInstance]) => {
@@ -238,12 +247,35 @@ function playAnimation(name: string) {
   })
 
   action.reset()
-  action.setLoop(THREE.LoopRepeat, Infinity)
+
+  if (name === baseAnimation.value) {
+    action.setLoop(THREE.LoopRepeat, Infinity)
+  } else {
+    action.setLoop(THREE.LoopOnce, 1)
+    action.clampWhenFinished = true
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const onFinished = (event: any) => {
+      if (event.action === action) {
+        mixer.value?.removeEventListener('finished', onFinished)
+        if (currentAnimation.value === name && baseAnimation.value) {
+          action.fadeOut(transitionDuration)
+          const baseAction = actions.value[baseAnimation.value]
+          baseAction.reset()
+          baseAction.fadeIn(transitionDuration)
+          baseAction.play()
+          currentAnimation.value = baseAnimation.value
+        }
+      }
+    }
+
+    mixer.value.addEventListener('finished', onFinished)
+  }
+
   action.fadeIn(transitionDuration)
   action.play()
 
   currentAnimation.value = name
-  console.log(`Playing animation: ${name}`)
   return true
 }
 
@@ -265,15 +297,48 @@ function setupRandomAnimationLoop() {
 }
 
 function playRandomAnimation(name: string) {
-  if (!playAnimation(name)) return
+  if (!mixer.value || !actions.value[name]) {
+    console.warn(`Animation "${name}" not found!`)
+    return
+  }
 
-  const animationDuration = actions.value[name].getClip().duration * 1000
+  const action = actions.value[name]
 
-  setTimeout(() => {
-    if (currentAnimation.value === name && baseAnimation.value) {
-      playAnimation(baseAnimation.value)
+  if (currentAnimation.value === name && action.isRunning()) {
+    console.log(`Animation "${name}" is already running, ignoring request`)
+    return
+  }
+
+  const transitionDuration = props.animationConfig.transitionDuration || 0.3
+
+  if (baseAnimation.value && actions.value[baseAnimation.value].isRunning()) {
+    actions.value[baseAnimation.value].fadeOut(transitionDuration)
+  }
+
+  action.reset()
+  action.setLoop(THREE.LoopOnce, 1)
+  action.clampWhenFinished = true
+  action.fadeIn(transitionDuration)
+  action.play()
+
+  currentAnimation.value = name
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const onFinished = (event: any) => {
+    if (event.action === action) {
+      mixer.value?.removeEventListener('finished', onFinished)
+      if (currentAnimation.value === name && baseAnimation.value) {
+        action.fadeOut(transitionDuration)
+        const baseAction = actions.value[baseAnimation.value]
+        baseAction.reset()
+        baseAction.fadeIn(transitionDuration)
+        baseAction.play()
+        currentAnimation.value = baseAnimation.value
+      }
     }
-  }, animationDuration + 500)
+  }
+
+  mixer.value.addEventListener('finished', onFinished)
 }
 
 function stopAnimations() {
