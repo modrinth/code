@@ -169,7 +169,7 @@ const chartOptions = computed(() => {
       toolbar: {
         show: false,
       },
-      stacked: props.stacked,
+      stacked: props.type === "line" ? false : props.stacked,
       stackType: props.percentStacked ? "100%" : "normal",
       zoom: {
         autoScaleYaxis: true,

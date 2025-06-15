@@ -12,6 +12,8 @@ export type DisplayLocation =
   | "user"
   | "collection";
 
+export type ChartType = "area" | "line";
+
 export interface Cosmetics {
   rightSearchLayout: boolean;
   leftContentLayout: boolean;
@@ -22,6 +24,8 @@ export interface Cosmetics {
   preferredDarkTheme: DarkTheme;
   searchDisplayMode: Record<DisplayLocation, DisplayMode>;
   hideStagingBanner: boolean;
+  analyticsChartType: ChartType;
+  analyticsProjectColors: boolean;
 }
 
 export default defineNuxtPlugin({
@@ -51,6 +55,8 @@ export default defineNuxtPlugin({
           user: "list",
           collection: "list",
         },
+        analyticsChartType: "line",
+        analyticsProjectColors: true,
         hideStagingBanner: false,
       }),
     });

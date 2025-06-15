@@ -58,6 +58,8 @@ import _BracesIcon from './icons/braces.svg?component'
 import _CalendarIcon from './icons/calendar.svg?component'
 import _CardIcon from './icons/card.svg?component'
 import _ChartIcon from './icons/chart.svg?component'
+import _ChartAreaIcon from './icons/chart-area.svg?component'
+import _ChartLineIcon from './icons/chart-line.svg?component'
 import _CheckIcon from './icons/check.svg?component'
 import _CheckCheckIcon from './icons/check-check.svg?component'
 import _CheckCircleIcon from './icons/check-circle.svg?component'
@@ -276,6 +278,8 @@ export const BoxImportIcon = _BoxImportIcon
 export const BracesIcon = _BracesIcon
 export const CalendarIcon = _CalendarIcon
 export const ChartIcon = _ChartIcon
+export const ChartAreaIcon = _ChartAreaIcon
+export const ChartLineIcon = _ChartLineIcon
 export const CheckIcon = _CheckIcon
 export const CheckCheckIcon = _CheckCheckIcon
 export const CheckCircleIcon = _CheckCircleIcon
