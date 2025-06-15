@@ -11,7 +11,7 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
-    date: `2025-06-14T10:50:00-07:00`,
+    date: `2025-06-15T14:30:00-07:00`,
     product: 'servers',
     body: `### Improvements
 - Fixed various issues with the panel loading improperly in certain cases.
@@ -19,13 +19,13 @@ const VERSIONS: VersionEntry[] = [
 - Server panel performance should be a little faster now.`,
   },
   {
-    date: `2025-06-14T10:50:00-07:00`,
+    date: `2025-06-15T14:30:00-07:00`,
     product: 'web',
     body: `### Improvements
-- Creator analytics charts will now show up to 15 projects in a tooltip instead of 5. (Contributed by [Erb3](https://github.com/modrinth/code/pull/2898))
-- Made certain scrollable containers not have a fixed height, and allow them to be smaller if they have fewer items.
+- Creator analytics charts will now show up to 15 projects in a tooltip instead of 5.
+- Made certain scrollable containers not have a fixed height, and allow them to be smaller if they have fewer items. (Contributed by [Erb3](https://github.com/modrinth/code/pull/2898))
 - Made organizations sort consistently alphabetically. (Contributed by [WorldWidePixel](https://github.com/modrinth/code/pull/3755))
-- Clarified the 'File too large' error message when uploading an image larger than 1MiB in the text editor.`,
+- Clarified the 'File too large' error message when uploading an image larger than 1MiB in the text editor. (Contributed by [IThundxr](https://github.com/modrinth/code/pull/3774))`,
   },
   {
     date: `2025-06-03T14:35:00-07:00`,
