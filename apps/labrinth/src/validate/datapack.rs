@@ -1,9 +1,8 @@
 use crate::validate::{
-    SupportedGameVersions, ValidationError, ValidationResult,
+    MaybeProtectedZipFile, PLAUSIBLE_PACK_REGEX, SupportedGameVersions,
+    ValidationError, ValidationResult,
 };
 use chrono::DateTime;
-use std::io::Cursor;
-use zip::ZipArchive;
 
 pub struct DataPackValidator;
 
@@ -23,16 +22,23 @@ impl super::Validator for DataPackValidator {
         )
     }
 
-    fn validate(
+    fn validate_maybe_protected_zip(
         &self,
-        archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
+        file: &mut MaybeProtectedZipFile,
     ) -> Result<ValidationResult, ValidationError> {
-        if archive.by_name("pack.mcmeta").is_err() {
-            return Ok(ValidationResult::Warning(
+        if match file {
+            MaybeProtectedZipFile::Unprotected(archive) => {
+                archive.by_name("pack.mcmeta").is_ok()
+            }
+            MaybeProtectedZipFile::MaybeProtected { data, .. } => {
+                PLAUSIBLE_PACK_REGEX.is_match(data)
+            }
+        } {
+            Ok(ValidationResult::Pass)
+        } else {
+            Ok(ValidationResult::Warning(
                 "No pack.mcmeta present for datapack file. Tip: Make sure pack.mcmeta is in the root directory of your datapack!",
-            ));
+            ))
         }
-
-        Ok(ValidationResult::Pass)
     }
 }
