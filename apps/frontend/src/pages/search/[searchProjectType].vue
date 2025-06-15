@@ -507,8 +507,6 @@ const messages = defineMessages({
 });
 
 async function serverInstall(project) {
-  console.log(project);
-
   project.installing = true;
   try {
     const versions = await useBaseFetch(`project/${project.project_id}/version`, {}, false, true);
