@@ -9,7 +9,9 @@
             <span v-if="tasks.length < 1">
               No scheduled tasks yet. Click the button to create your first task.
             </span>
-            <span v-else>You can manage multiple tasks at once by selecting them below.</span>
+            <span v-else-if="!isMobile"
+              >You can manage multiple tasks at once by selecting them below.</span
+            >
           </div>
           <div>
             <ButtonStyled color="green"
@@ -19,11 +21,11 @@
         </div>
 
         <template v-if="tasks.length > 0">
-          <div class="input-group">
+          <div v-if="!isMobile" class="input-group">
             <ButtonStyled>
               <button :disabled="selectedTasks.length === 0" @click="handleBulkToggle">
                 <ToggleRightIcon />
-                Toggle delected
+                Toggle selected
               </button>
             </ButtonStyled>
             <ButtonStyled color="red">
@@ -57,7 +59,7 @@
             </div>
           </div>
 
-          <div class="grid-table">
+          <div v-if="!isMobile" class="grid-table">
             <div class="grid-table__row grid-table__header">
               <div>
                 <Checkbox
@@ -67,8 +69,8 @@
               </div>
               <div>Type</div>
               <div>Task Details</div>
-              <div>Schedule</div>
-              <div>Warnings</div>
+              <div class="schedule-col">Schedule</div>
+              <div class="details-col">Warnings</div>
               <div>Enabled</div>
               <div>Actions</div>
             </div>
@@ -103,10 +105,10 @@
                   </code>
                 </div>
               </div>
-              <div>
+              <div class="schedule-col">
                 <span class="text-sm text-secondary">{{ getHumanReadableCron(task.every) }}</span>
               </div>
-              <div>
+              <div class="details-col">
                 <div
                   v-if="task.warn_intervals && task.warn_intervals.length > 0"
                   class="flex flex-col gap-1"
@@ -142,6 +144,41 @@
               </div>
             </div>
           </div>
+
+          <div v-else class="mt-4 flex flex-col gap-3">
+            <Card
+              v-for="(task, index) in sortedTasks"
+              :key="`mobile-task-${index}`"
+              class="rounded-lg border !bg-bg p-4 shadow-sm"
+            >
+              <div class="flex items-center justify-between gap-2">
+                <h3 class="mb-0 truncate font-medium">{{ task.title }}</h3>
+                <Toggle
+                  :model-value="task.enabled"
+                  @update:model-value="(value) => handleTaskToggle(task, value || false)"
+                />
+              </div>
+              <div class="mt-2 flex items-center gap-2">
+                <RaisedBadge
+                  :text="task.action_kind === 'restart' ? 'Restart' : 'Command'"
+                  :icon="task.action_kind === 'restart' ? UpdatedIcon : CodeIcon"
+                  class="text-xs"
+                />
+                <div class="ml-auto flex flex-row gap-2">
+                  <ButtonStyled icon-only circular>
+                    <button class="p-1" @click="modal?.show(task)">
+                      <EditIcon />
+                    </button>
+                  </ButtonStyled>
+                  <ButtonStyled icon-only circular color="red">
+                    <button class="p-1" @click="handleTaskDelete(task)">
+                      <TrashIcon />
+                    </button>
+                  </ButtonStyled>
+                </div>
+              </div>
+            </Card>
+          </div>
         </template>
       </section>
     </div>
@@ -149,7 +186,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, onUnmounted, onBeforeMount } from "vue";
 import { Multiselect } from "vue-multiselect";
 import {
   PlusIcon,
@@ -161,7 +198,7 @@ import {
   SortAscendingIcon as AscendingIcon,
   SortDescendingIcon as DescendingIcon,
 } from "@modrinth/assets";
-import { Toggle, Checkbox, RaisedBadge, ButtonStyled } from "@modrinth/ui";
+import { Toggle, Checkbox, RaisedBadge, ButtonStyled, Card } from "@modrinth/ui";
 import cronstrue from "cronstrue";
 import type { ServerSchedule } from "@modrinth/utils";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
@@ -171,8 +208,6 @@ const props = defineProps<{
   server: ModrinthServer;
 }>();
 
-const route = useRoute();
-
 onBeforeMount(async () => {
   await props.server.scheduling.fetch();
 });
@@ -181,6 +216,7 @@ const selectedTasks = ref<ServerSchedule[]>([]);
 const sortBy = ref("Name");
 const descending = ref(false);
 const modal = ref<typeof EditScheduledTaskModal>();
+const isMobile = ref(true);
 
 const tasks = computed(() => props.server.scheduling.tasks as ServerSchedule[]);
 
@@ -206,6 +242,19 @@ const sortedTasks = computed(() => {
   }
 
   return descending.value ? sorted.reverse() : sorted;
+});
+
+function checkMobile() {
+  isMobile.value = window.innerWidth < 874;
+}
+
+onMounted(() => {
+  checkMobile();
+  window.addEventListener("resize", checkMobile);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", checkMobile);
 });
 
 function handleSelectAll(selected: boolean): void {
@@ -341,68 +390,6 @@ function formatWarningIntervals(intervals: number[]): string {
       padding-bottom: var(--spacing-card-bg);
     }
   }
-
-  @media screen and (max-width: 900px) {
-    display: flex;
-    flex-direction: column;
-
-    .grid-table__row {
-      display: grid;
-      grid-template:
-        "checkbox type title actions"
-        "checkbox schedule warnings actions";
-      grid-template-columns: min-content min-content 1fr min-content;
-
-      :nth-child(1) {
-        grid-area: checkbox;
-      }
-      :nth-child(2) {
-        grid-area: type;
-      }
-      :nth-child(3) {
-        grid-area: title;
-      }
-      :nth-child(4) {
-        grid-area: schedule;
-        padding-top: 0;
-      }
-      :nth-child(5) {
-        grid-area: warnings;
-        padding-top: 0;
-      }
-      :nth-child(6) {
-        grid-area: actions;
-        align-items: flex-start;
-      }
-      :nth-child(7) {
-        grid-area: actions;
-        align-items: flex-end;
-      }
-    }
-
-    .grid-table__header {
-      grid-template: "checkbox actions";
-      grid-template-columns: min-content minmax(min-content, 1fr);
-
-      :nth-child(2),
-      :nth-child(3),
-      :nth-child(4),
-      :nth-child(5),
-      :nth-child(6) {
-        display: none;
-      }
-    }
-  }
-
-  @media screen and (max-width: 600px) {
-    .grid-table__row :nth-child(3) code {
-      font-size: 11px;
-    }
-
-    .grid-table__row :nth-child(5) .font-mono {
-      font-size: 11px;
-    }
-  }
 }
 
 .labeled-control-row {
@@ -422,5 +409,29 @@ function formatWarningIntervals(intervals: number[]): string {
 
 .push-right {
   margin-left: auto;
+}
+
+@media (max-width: 1050px) {
+  .schedule-col {
+    display: none !important;
+  }
+
+  .grid-table {
+    grid-template-columns:
+      min-content minmax(min-content, 120px) minmax(min-content, 2fr) minmax(min-content, 120px)
+      min-content min-content;
+  }
+}
+
+@media (max-width: 1010px) {
+  .details-col {
+    display: none !important;
+  }
+
+  .grid-table {
+    grid-template-columns:
+      min-content minmax(min-content, 120px) minmax(min-content, 2fr) minmax(min-content, 120px)
+      min-content;
+  }
 }
 </style>

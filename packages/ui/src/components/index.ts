@@ -40,11 +40,11 @@ export { default as SimpleBadge } from './base/SimpleBadge.vue'
 export { default as Slider } from './base/Slider.vue'
 export { default as SmartClickable } from './base/SmartClickable.vue'
 export { default as StatItem } from './base/StatItem.vue'
-export { default as TabbedContent } from "./base/TabbedContent.vue"
+export { default as TabbedContent } from './base/TabbedContent.vue'
 export { default as TagItem } from './base/TagItem.vue'
 export { default as TeleportDropdownMenu } from './base/TeleportDropdownMenu.vue'
 export { default as Timeline } from './base/Timeline.vue'
-export { default as TimePicker } from "./base/TimePicker.vue"
+export { default as TimePicker } from './base/TimePicker.vue'
 export { default as Toggle } from './base/Toggle.vue'
 
 // Branding

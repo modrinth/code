@@ -183,6 +183,7 @@ import _TagsIcon from './icons/tags.svg?component'
 import _TerminalSquareIcon from './icons/terminal-square.svg?component'
 import _TransferIcon from './icons/transfer.svg?component'
 import _TrashIcon from './icons/trash.svg?component'
+import _TriangleAlertIcon from './icons/triangle-alert.svg?component'
 import _UndoIcon from './icons/undo.svg?component'
 import _RedoIcon from './icons/redo.svg?component'
 import _UnknownIcon from './icons/unknown.svg?component'
@@ -447,3 +448,4 @@ export const CardIcon = _CardIcon
 export const TimerIcon = _TimerIcon
 export const CalendarSyncIcon = _CalendarSyncIcon
 export const ToggleRightIcon = _ToggleRightIcon
+export const TriangleAlertIcon = _TriangleAlertIcon
