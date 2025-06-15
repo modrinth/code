@@ -77,6 +77,9 @@ const errorMessages = computed(
 
 const route = useRoute();
 
+// TODO: REMOVE BEFORE MERGE
+console.log(props.error);
+
 watch(route, () => {
   console.log(route);
 });
