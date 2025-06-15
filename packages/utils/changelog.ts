@@ -11,6 +11,13 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-06-15T16:25:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Fixed installing modpacks from search.
+- Fixed setting subdomains.`,
+  },
+  {
     date: `2025-06-15T14:30:00-07:00`,
     product: 'servers',
     body: `### Improvements
