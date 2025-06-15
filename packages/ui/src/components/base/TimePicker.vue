@@ -14,7 +14,7 @@
     >
       <button>
         <ClockIcon class="h-4 w-4" />
-        {{ modelValue ? formatTime(modelValue) : placeholder }}
+        {{ modelValue ? formatTime(modelValue) : placeholder }} {{ useUtcValues ? 'UTC' : '' }}
       </button>
     </ButtonStyled>
 
@@ -100,31 +100,78 @@ interface Props {
   modelValue?: TimeValue
   disabled?: boolean
   placeholder?: string
+  useUtcValues?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: () => ({ hour: '12', minute: '00' }),
   disabled: false,
   placeholder: 'Select time',
+  useUtcValues: false,
 })
 
 const emit = defineEmits<{
   'update:modelValue': [value: TimeValue]
 }>()
 
+function utcToLocal(utcTime: TimeValue): TimeValue {
+  const today = new Date()
+  const utcHour = utcTime.hour === '' ? 0 : parseInt(utcTime.hour)
+  const utcMinute = utcTime.minute === '' ? 0 : parseInt(utcTime.minute)
+
+  const utcDate = new Date(
+    Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), utcHour, utcMinute),
+  )
+
+  return {
+    hour: utcDate.getHours().toString(),
+    minute: utcDate.getMinutes().toString(),
+  }
+}
+
+function localToUtc(localTime: TimeValue): TimeValue {
+  const today = new Date()
+  const localHour = localTime.hour === '' ? 0 : parseInt(localTime.hour)
+  const localMinute = localTime.minute === '' ? 0 : parseInt(localTime.minute)
+
+  const localDate = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+    localHour,
+    localMinute,
+  )
+
+  return {
+    hour: localDate.getUTCHours().toString(),
+    minute: localDate.getUTCMinutes().toString(),
+  }
+}
+
+function emitTime(localTime: TimeValue) {
+  const timeToEmit = props.useUtcValues ? localToUtc(localTime) : localTime
+  emit('update:modelValue', timeToEmit)
+}
+
 const dropdown = ref()
 const originalTime = ref<TimeValue>({ hour: '12', minute: '00' })
-const currentTime = reactive<TimeValue>({
-  hour: props.modelValue?.hour || '12',
-  minute: props.modelValue?.minute || '00',
-})
+
+const getInitialTime = (): TimeValue => {
+  const defaultTime = { hour: '12', minute: '00' }
+  if (!props.modelValue) return defaultTime
+
+  return props.useUtcValues ? utcToLocal(props.modelValue) : props.modelValue
+}
+
+const currentTime = reactive<TimeValue>(getInitialTime())
 
 watch(
   () => props.modelValue,
   (newValue) => {
     if (newValue) {
-      currentTime.hour = newValue.hour
-      currentTime.minute = newValue.minute
+      const displayTime = props.useUtcValues ? utcToLocal(newValue) : newValue
+      currentTime.hour = displayTime.hour
+      currentTime.minute = displayTime.minute
     }
   },
   { deep: true },
@@ -165,7 +212,7 @@ function handleHourChange(event: Event) {
   }
 
   currentTime.hour = hour
-  emit('update:modelValue', { ...currentTime })
+  emitTime(currentTime)
 }
 
 function handleMinuteChange(event: Event) {
@@ -178,19 +225,19 @@ function handleMinuteChange(event: Event) {
   }
 
   currentTime.minute = minute
-  emit('update:modelValue', { ...currentTime })
+  emitTime(currentTime)
 }
 
 function handleQuickSelect(hour: string, minute: string) {
   currentTime.hour = hour
   currentTime.minute = minute
-  emit('update:modelValue', { ...currentTime })
+  emitTime(currentTime)
 }
 
 function handleCancel() {
   currentTime.hour = originalTime.value.hour
   currentTime.minute = originalTime.value.minute
-  emit('update:modelValue', { ...originalTime.value })
+  emitTime(originalTime.value)
   dropdown.value?.hide()
 }
 

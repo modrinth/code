@@ -4,10 +4,10 @@
       v-for="item in items"
       :key="formatLabel(item)"
       class="btn"
-      :class="{ selected: selected === item, capitalize: capitalize }"
+      :class="{ selected: isSelected(item), capitalize: capitalize }"
       @click="toggleItem(item)"
     >
-      <CheckIcon v-if="selected === item" />
+      <CheckIcon v-if="isSelected(item)" />
       <span>{{ formatLabel(item) }}</span>
     </Button>
   </div>
@@ -23,26 +23,48 @@ const props = withDefaults(
     formatLabel?: (item: T) => string
     neverEmpty?: boolean
     capitalize?: boolean
+    multi?: boolean
   }>(),
   {
     neverEmpty: true,
     // Intentional any type, as this default should only be used for primitives (string or number)
     formatLabel: (item) => item.toString(),
     capitalize: true,
+    multi: false,
   },
 )
-const selected = defineModel<T | null>()
+const selected = defineModel<T | null | T[]>()
 
 // If one always has to be selected, default to the first one
 if (props.items.length > 0 && props.neverEmpty && !selected.value) {
-  selected.value = props.items[0]
+  selected.value = props.multi ? [props.items[0]] : props.items[0]
+}
+
+function isSelected(item: T): boolean {
+  if (props.multi) {
+    return Array.isArray(selected.value) && selected.value.includes(item)
+  }
+  return selected.value === item
 }
 
 function toggleItem(item: T) {
-  if (selected.value === item && !props.neverEmpty) {
-    selected.value = null
+  if (props.multi) {
+    const currentSelection = Array.isArray(selected.value) ? selected.value : []
+    const isCurrentlySelected = currentSelection.includes(item)
+
+    if (isCurrentlySelected) {
+      if (!props.neverEmpty || currentSelection.length > 1) {
+        selected.value = currentSelection.filter((i) => i !== item)
+      }
+    } else {
+      selected.value = [...currentSelection, item]
+    }
   } else {
-    selected.value = item
+    if (selected.value === item && !props.neverEmpty) {
+      selected.value = null
+    } else {
+      selected.value = item
+    }
   }
 }
 </script>

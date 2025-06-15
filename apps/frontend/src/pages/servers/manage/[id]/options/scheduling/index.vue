@@ -1,25 +1,20 @@
 <template>
+  <EditScheduledTaskModal ref="modal" :server="server"></EditScheduledTaskModal>
   <div class="relative h-full w-full overflow-y-auto">
     <div class="flex h-full w-full flex-col">
       <section class="universal-card">
         <div class="mb-6 flex items-center justify-between">
           <div class="flex h-full flex-col justify-center">
-            <h3 class="font-semibold leading-tight">Task Scheduling</h3>
-            <p v-if="tasks.length < 1" class="mt-1 text-secondary">
+            <h2 class="m-0 text-lg font-bold text-contrast">Task scheduling</h2>
+            <span v-if="tasks.length < 1">
               No scheduled tasks yet. Click the button to create your first task.
-            </p>
-            <p v-else class="mt-1 text-secondary">
-              You can manage multiple tasks at once by selecting them below.
-            </p>
+            </span>
+            <span v-else>You can manage multiple tasks at once by selecting them below.</span>
           </div>
           <div>
-            <NuxtLink
-              :to="`/servers/manage/${route.params.id}/options/scheduling/new`"
-              class="iconified-button brand-button"
+            <ButtonStyled color="green"
+              ><button @click="modal?.show()"><PlusIcon /> Create task</button></ButtonStyled
             >
-              <PlusIcon />
-              Create Task
-            </NuxtLink>
           </div>
         </div>
 
@@ -28,13 +23,13 @@
             <ButtonStyled>
               <button :disabled="selectedTasks.length === 0" @click="handleBulkToggle">
                 <ToggleRightIcon />
-                Toggle Selected
+                Toggle delected
               </button>
             </ButtonStyled>
             <ButtonStyled color="red">
               <button :disabled="selectedTasks.length === 0" @click="handleBulkDelete">
                 <TrashIcon />
-                Delete Selected
+                Delete selected
               </button>
             </ButtonStyled>
             <div class="push-right">
@@ -134,23 +129,12 @@
               <div>
                 <div class="flex gap-1">
                   <ButtonStyled icon-only circular>
-                    <NuxtLink
-                      v-tooltip="'Edit task'"
-                      :to="`/servers/manage/${route.params.id}/options/scheduling/${task.id}`"
-                    >
+                    <button :v-tooltip="'Edit Task'" @click="modal?.show(task)">
                       <EditIcon />
-                    </NuxtLink>
+                    </button>
                   </ButtonStyled>
                   <ButtonStyled icon-only circular color="red">
-                    <button
-                      v-tooltip="
-                        task.title === 'Auto Restart'
-                          ? 'You cant delete the automatic restart task.'
-                          : 'Delete task'
-                      "
-                      :disabled="task.title === 'Auto Restart'"
-                      @click="handleTaskDelete(task)"
-                    >
+                    <button @click="handleTaskDelete(task)">
                       <TrashIcon />
                     </button>
                   </ButtonStyled>
@@ -181,6 +165,7 @@ import { Toggle, Checkbox, RaisedBadge, ButtonStyled } from "@modrinth/ui";
 import cronstrue from "cronstrue";
 import type { ServerSchedule } from "@modrinth/utils";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import EditScheduledTaskModal from "~/components/ui/servers/scheduling/EditScheduledTaskModal.vue";
 
 const props = defineProps<{
   server: ModrinthServer;
@@ -195,6 +180,7 @@ onBeforeMount(async () => {
 const selectedTasks = ref<ServerSchedule[]>([]);
 const sortBy = ref("Name");
 const descending = ref(false);
+const modal = ref<typeof EditScheduledTaskModal>();
 
 const tasks = computed(() => props.server.scheduling.tasks as ServerSchedule[]);
 
