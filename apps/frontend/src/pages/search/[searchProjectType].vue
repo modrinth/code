@@ -507,6 +507,8 @@ const messages = defineMessages({
 });
 
 async function serverInstall(project) {
+  console.log(project);
+
   project.installing = true;
   try {
     const versions = await useBaseFetch(`project/${project.project_id}/version`, {}, false, true);
@@ -520,7 +522,6 @@ async function serverInstall(project) {
 
     if (projectType.value.id === "modpack") {
       await server.value.general.reinstall(
-        server.value.serverId,
         false,
         project.project_id,
         version.id,
