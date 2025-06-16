@@ -75,9 +75,8 @@ fn get_file_path(
     file_name: &str,
     file_publicity: FileHostPublicity,
 ) -> PathBuf {
-    let mut path = PathBuf::new();
+    let mut path = PathBuf::from(dotenvy::var("MOCK_FILE_PATH").unwrap());
 
-    path.push(dotenvy::var("MOCK_FILE_PATH").unwrap());
     if matches!(file_publicity, FileHostPublicity::Private) {
         path.push("private");
     }
