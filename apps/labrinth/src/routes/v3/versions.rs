@@ -958,7 +958,7 @@ pub async fn version_delete(
     )
     .await?;
     transaction.commit().await?;
-    remove_documents(&[version.inner.id.into()], &search_config).await?;
+
     database::models::DBProject::clear_cache(
         version.inner.project_id,
         None,
@@ -966,6 +966,7 @@ pub async fn version_delete(
         &redis,
     )
     .await?;
+    remove_documents(&[version.inner.id.into()], &search_config).await?;
 
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))
