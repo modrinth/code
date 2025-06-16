@@ -77,7 +77,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ButtonStyled } from './ButtonStyled.vue'
+import ButtonStyled from './ButtonStyled.vue'
 import { CopyIcon, CheckIcon } from '@modrinth/assets'
 import type { Component } from 'vue'
 
