@@ -155,19 +155,25 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
   }
 
   async setMotd(motd: string): Promise<void> {
-    const props = (await this.server.fetchConfigFile("ServerProperties")) as any;
-    if (props) {
-      props.motd = motd;
-      const newProps = this.server.constructServerProperties(props);
-      const octetStream = new Blob([newProps], { type: "application/octet-stream" });
-      const auth = await useServersFetch<JWTAuth>(`servers/${this.serverId}/fs`);
+    try {
+      const props = (await this.server.fetchConfigFile("ServerProperties")) as any;
+      if (props) {
+        props.motd = motd;
+        const newProps = this.server.constructServerProperties(props);
+        const octetStream = new Blob([newProps], { type: "application/octet-stream" });
+        const auth = await useServersFetch<JWTAuth>(`servers/${this.serverId}/fs`);
 
-      await useServersFetch(`/update?path=/server.properties`, {
-        method: "PUT",
-        contentType: "application/octet-stream",
-        body: octetStream,
-        override: auth,
-      });
+        await useServersFetch(`/update?path=/server.properties`, {
+          method: "PUT",
+          contentType: "application/octet-stream",
+          body: octetStream,
+          override: auth,
+        });
+      }
+    } catch {
+      console.error(
+        "[Modrinth Servers] [General] Failed to set MOTD due to lack of server properties file.",
+      );
     }
   }
 }
