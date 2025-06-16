@@ -74,14 +74,26 @@
           <div class="grid place-content-center rounded-full bg-bg-orange p-4">
             <TransferIcon class="size-12 text-orange" />
           </div>
-          <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server not found</h1>
+          <h1 class="m-0 mb-2 w-fit text-4xl font-bold">An error occured.</h1>
         </div>
-        <p class="text-lg text-secondary">
-          You don't have permission to view this server or it no longer exists. If you believe this
-          is an error, please contact Modrinth Support.
-        </p>
+        <p class="text-lg text-secondary">Please contact Modrinth Support.</p>
       </div>
-      <UiCopyCode :text="JSON.stringify(server.moduleErrors?.general?.error)" />
+
+      <div class="flex flex-col gap-2">
+        <UiCopyCode :text="'Server ID: ' + server.serverId" />
+        <div class="markdown-body">
+          <code>
+            <pre>
+            Timestamp: {{ server.moduleErrors.general.timestamp }}
+            Error {{ server.moduleErrors.general.error.name }}
+            Message {{ server.moduleErrors.general.error.message }}
+            <template v-if="server.moduleErrors.general.error.originalError">
+            Original: {{ server.moduleErrors.general.error.originalError }}
+            </template>
+          </pre>
+          </code>
+        </div>
+      </div>
 
       <ButtonStyled size="large" color="brand" @click="() => router.push('/servers/manage')">
         <button class="mt-6 !w-full">Go back to all servers</button>
@@ -115,7 +127,9 @@
 
         <div class="flex flex-col gap-2">
           <UiCopyCode :text="'Server ID: ' + server.serverId" />
-          <UiCopyCode :text="'Node: ' + server.general?.datacenter" />
+          <UiCopyCode
+            :text="'Node: ' + (server.general?.datacenter ?? 'Unknown! Please contact support!')"
+          />
         </div>
       </div>
       <ButtonStyled
@@ -162,7 +176,7 @@
           temporary network issue. You'll be reconnected automatically.
         </p>
       </div>
-      <UiCopyCode :text="JSON.stringify(server.moduleErrors?.general?.error)" />
+      <UiCopyCode :text="JSON.stringify(server.moduleErrors?.general?.error.message)" />
       <ButtonStyled
         :disabled="formattedTime !== '00'"
         size="large"
@@ -760,7 +774,7 @@ const startUptimeUpdates = () => {
 const stopUptimeUpdates = () => {
   if (uptimeIntervalId) {
     clearInterval(uptimeIntervalId);
-    intervalId = null;
+    pollingIntervalId = null;
   }
 };
 
@@ -1055,7 +1069,7 @@ const notifyError = (title: string, text: string) => {
   });
 };
 
-let intervalId: ReturnType<typeof setInterval> | null = null;
+let pollingIntervalId: ReturnType<typeof setInterval> | null = null;
 const countdown = ref(15);
 
 const formattedTime = computed(() => {
@@ -1099,21 +1113,51 @@ const backupInProgress = computed(() => {
 });
 
 const stopPolling = () => {
-  if (intervalId) {
-    clearInterval(intervalId);
-    intervalId = null;
+  if (pollingIntervalId) {
+    clearTimeout(pollingIntervalId);
+    pollingIntervalId = null;
   }
 };
 
 const startPolling = () => {
-  countdown.value = 15;
-  intervalId = setInterval(() => {
-    if (countdown.value <= 0) {
-      reloadNuxtApp();
-    } else {
-      countdown.value--;
+  stopPolling();
+
+  let retryCount = 0;
+  const maxRetries = 10;
+
+  const poll = async () => {
+    try {
+      await server.refresh(["general", "ws"]);
+
+      if (!server.moduleErrors?.general?.error) {
+        stopPolling();
+        connectWebSocket();
+        return;
+      }
+
+      retryCount++;
+      if (retryCount >= maxRetries) {
+        console.error("Max retries reached, stopping polling");
+        stopPolling();
+        return;
+      }
+
+      // Exponential backoff: 3s, 6s, 12s, 24s, etc.
+      const delay = Math.min(3000 * Math.pow(2, retryCount - 1), 60000);
+
+      pollingIntervalId = setTimeout(poll, delay);
+    } catch (error) {
+      console.error("Polling failed:", error);
+      retryCount++;
+
+      if (retryCount < maxRetries) {
+        const delay = Math.min(3000 * Math.pow(2, retryCount - 1), 60000);
+        pollingIntervalId = setTimeout(poll, delay);
+      }
     }
-  }, 1000);
+  };
+
+  poll();
 };
 
 const copyServerDebugInfo = () => {
