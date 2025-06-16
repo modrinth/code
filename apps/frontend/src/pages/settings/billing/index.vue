@@ -330,8 +330,7 @@
                     <ButtonStyled
                       v-if="
                         getPyroCharge(subscription) &&
-                        getPyroCharge(subscription).status !== 'cancelled' &&
-                        getPyroCharge(subscription).status !== 'failed'
+                        getPyroCharge(subscription).status !== 'cancelled'
                       "
                     >
                       <button @click="showCancellationSurvey(subscription)">
