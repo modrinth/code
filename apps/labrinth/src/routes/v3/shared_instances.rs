@@ -600,7 +600,7 @@ pub async fn shared_instance_version_download(
                 SharedInstanceVersionId::from(version_id)
             );
             let url =
-                file_host.get_url_for_private_file(&file_name, 60).await?;
+                file_host.get_url_for_private_file(&file_name, 180).await?;
 
             Ok(Redirect::to(url).see_other())
         } else {
