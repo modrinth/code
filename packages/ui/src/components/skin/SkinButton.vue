@@ -52,8 +52,7 @@ function onImageLoad(type: 'forward' | 'backward') {
     <span
       v-show="imagesLoaded.forward && imagesLoaded.backward"
       :class="[
-        'skin-button__image-parent pointer-events-none w-full h-full grid [transform-style:preserve-3d] transition-transform duration-500 group-hover:[transform:rotateY(180deg)] place-items-stretch',
-        selected ? 'with-shadow' : '',
+        'skin-button__image-parent pointer-events-none w-full h-full grid [transform-style:preserve-3d] transition-transform duration-500 group-hover:[transform:rotateY(180deg)] place-items-stretch with-shadow',
       ]"
     >
       <img

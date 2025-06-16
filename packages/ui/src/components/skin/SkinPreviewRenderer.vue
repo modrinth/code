@@ -83,7 +83,7 @@
       />
 
       <TresAmbientLight :intensity="2" />
-      <TresDirectionalLight :position="[2, 4, 3]" :intensity="1.2" :cast-shadow="false" />
+      <TresDirectionalLight :position="[2, 4, 3]" :intensity="1.2" :cast-shadow="true" />
     </TresCanvas>
 
     <div v-if="!isReady" class="w-full h-full flex items-center justify-center">

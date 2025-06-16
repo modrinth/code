@@ -39,7 +39,7 @@ class BatchSkinRenderer {
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 2)
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2)
-    directionalLight.castShadow = false
+    directionalLight.castShadow = true
     directionalLight.position.set(2, 4, 3)
     this.scene.add(ambientLight)
     this.scene.add(directionalLight)
