@@ -18,48 +18,25 @@
     v-if="serverData?.status === 'suspended' && serverData.suspension_reason === 'upgrading'"
     class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
   >
-    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-      <div class="flex flex-col items-center text-center">
-        <div class="flex flex-col items-center gap-4">
-          <div class="grid place-content-center rounded-full bg-bg-blue p-4">
-            <TransferIcon class="size-12 text-blue" />
-          </div>
-          <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server upgrading</h1>
-        </div>
-        <p class="text-lg text-secondary">
-          Your server's hardware is currently being upgraded and will be back online shortly!
-        </p>
-      </div>
-    </div>
+    <ErrorInformationCard
+      title="Server upgrading"
+      description="Your server's hardware is currently being upgraded and will be back online shortly!"
+      :icon="TransferIcon"
+      icon-color="blue"
+      :action="generalErrorAction"
+    />
   </div>
   <div
     v-else-if="serverData?.status === 'suspended'"
     class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
   >
-    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-      <div class="flex flex-col items-center text-center">
-        <div class="flex flex-col items-center gap-4">
-          <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-            <LockIcon class="size-12 text-orange" />
-          </div>
-          <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server suspended</h1>
-        </div>
-        <p class="text-lg text-secondary">
-          {{
-            serverData.suspension_reason === "cancelled"
-              ? "Your subscription has been cancelled."
-              : serverData.suspension_reason
-                ? `Your server has been suspended: ${serverData.suspension_reason}`
-                : "Your server has been suspended."
-          }}
-          <br />
-          Contact Modrinth Support if you believe this is an error.
-        </p>
-      </div>
-      <ButtonStyled size="large" color="brand" @click="() => router.push('/settings/billing')">
-        <button class="mt-6 !w-full">Go to billing settings</button>
-      </ButtonStyled>
-    </div>
+    <ErrorInformationCard
+      title="Server suspended"
+      :description="suspendedDescription"
+      :icon="LockIcon"
+      icon-color="orange"
+      :action="suspendedAction"
+    />
   </div>
   <div
     v-else-if="
@@ -68,124 +45,69 @@
     "
     class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
   >
-    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-      <div class="flex flex-col items-center text-center">
-        <div class="flex flex-col items-center gap-4">
-          <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-            <TransferIcon class="size-12 text-orange" />
-          </div>
-          <h1 class="m-0 mb-2 w-fit text-4xl font-bold">An error occured.</h1>
-        </div>
-        <p class="text-lg text-secondary">Please contact Modrinth Support.</p>
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <UiCopyCode :text="'Server ID: ' + server.serverId" />
-        <div class="markdown-body">
-          <code>
-            <pre>
-            Timestamp: {{ server.moduleErrors.general.timestamp }}
-            Error {{ server.moduleErrors.general.error.name }}
-            Message {{ server.moduleErrors.general.error.message }}
-            <template v-if="server.moduleErrors.general.error.originalError">
-            Original: {{ server.moduleErrors.general.error.originalError }}
-            </template>
-          </pre>
-          </code>
-        </div>
-      </div>
-
-      <ButtonStyled size="large" color="brand" @click="() => router.push('/servers/manage')">
-        <button class="mt-6 !w-full">Go back to all servers</button>
-      </ButtonStyled>
-    </div>
+    <ErrorInformationCard
+      title="An error occured."
+      description="Please contact Modrinth Support."
+      :icon="TransferIcon"
+      icon-color="orange"
+      :error-details="generalErrorDetails"
+      :action="generalErrorAction"
+    />
   </div>
   <div
     v-else-if="server.moduleErrors?.general?.error.statusCode === 503"
     class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
   >
-    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-      <div class="flex flex-col items-center text-center">
-        <div class="flex flex-col items-center gap-4">
-          <div class="grid place-content-center rounded-full bg-bg-red p-4">
-            <UiServersIconsPanelErrorIcon class="size-12 text-red" />
-          </div>
-          <h1 class="m-0 mb-4 w-fit text-4xl font-bold">Server Node Unavailable</h1>
+    <ErrorInformationCard
+      title="Server Node Unavailable"
+      :icon="PanelErrorIcon"
+      icon-color="red"
+      :action="nodeUnavailableAction"
+      :error-details="nodeUnavailableDetails"
+    >
+      <template #description>
+        <div class="text-md space-y-4">
+          <p class="leading-[170%] text-secondary">
+            Your server's node, where your Modrinth Server is physically hosted, is experiencing
+            issues. We are working with our datacenter to resolve the issue as quickly as possible.
+          </p>
+          <p class="leading-[170%] text-secondary">
+            Your data is safe and will not be lost, and your server will be back online as soon as
+            the issue is resolved.
+          </p>
+          <p class="leading-[170%] text-secondary">
+            For updates, please join the Modrinth Discord or contact Modrinth Support via the chat
+            bubble in the bottom right corner and we'll be happy to help.
+          </p>
         </div>
-        <p class="m-0 mb-4 leading-[170%] text-secondary">
-          Your server's node, where your Modrinth Server is physically hosted, is experiencing
-          issues. We are working with our datacenter to resolve the issue as quickly as possible.
-        </p>
-        <p class="m-0 mb-4 leading-[170%] text-secondary">
-          Your data is safe and will not be lost, and your server will be back online as soon as the
-          issue is resolved.
-        </p>
-        <p class="m-0 mb-4 leading-[170%] text-secondary">
-          For updates, please join the Modrinth Discord or contact Modrinth Support via the chat
-          bubble in the bottom right corner and we'll be happy to help.
-        </p>
-
-        <div class="flex flex-col gap-2">
-          <UiCopyCode :text="'Server ID: ' + server.serverId" />
-          <UiCopyCode
-            :text="'Node: ' + (server.general?.datacenter ?? 'Unknown! Please contact support!')"
-          />
-        </div>
-      </div>
-      <ButtonStyled
-        size="large"
-        color="standard"
-        @click="
-          () =>
-            navigateTo('https://discord.modrinth.com', {
-              external: true,
-            })
-        "
-      >
-        <button class="mt-6 !w-full">Join Modrinth Discord</button>
-      </ButtonStyled>
-      <ButtonStyled
-        :disabled="formattedTime !== '00'"
-        size="large"
-        color="standard"
-        @click="() => reloadNuxtApp()"
-      >
-        <button class="mt-3 !w-full">Reload</button>
-      </ButtonStyled>
-    </div>
+      </template>
+    </ErrorInformationCard>
   </div>
   <div
     v-else-if="server.moduleErrors?.general?.error"
     class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
   >
-    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-      <div class="flex flex-col items-center text-center">
-        <div class="flex flex-col items-center gap-4">
-          <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-            <TransferIcon class="size-12 text-orange" />
-          </div>
-          <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Connection lost</h1>
+    <ErrorInformationCard
+      title="Connection lost"
+      description=""
+      :icon="TransferIcon"
+      icon-color="orange"
+      :action="connectionLostAction"
+    >
+      <template #description>
+        <div class="space-y-4">
           <div class="text-center text-secondary">
             {{
               formattedTime == "00" ? "Reconnecting..." : `Retrying in ${formattedTime} seconds...`
             }}
           </div>
+          <p class="text-lg text-secondary">
+            Something went wrong, and we couldn't connect to your server. This is likely due to a
+            temporary network issue. You'll be reconnected automatically.
+          </p>
         </div>
-        <p class="text-lg text-secondary">
-          Something went wrong, and we couldn't connect to your server. This is likely due to a
-          temporary network issue. You'll be reconnected automatically.
-        </p>
-      </div>
-      <UiCopyCode :text="JSON.stringify(server.moduleErrors?.general?.error.message)" />
-      <ButtonStyled
-        :disabled="formattedTime !== '00'"
-        size="large"
-        color="brand"
-        @click="() => reloadNuxtApp()"
-      >
-        <button class="mt-6 !w-full">Reload</button>
-      </ButtonStyled>
-    </div>
+      </template>
+    </ErrorInformationCard>
   </div>
   <!-- SERVER START -->
   <div
@@ -446,7 +368,7 @@ import {
   LockIcon,
 } from "@modrinth/assets";
 import DOMPurify from "dompurify";
-import { ButtonStyled, ServerNotice } from "@modrinth/ui";
+import { ButtonStyled, ErrorInformationCard, ServerNotice } from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
 import type { MessageDescriptor } from "@vintl/vintl";
 import type {
@@ -462,6 +384,7 @@ import { useModrinthServersConsole } from "~/store/console.ts";
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import { ModrinthServer, useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
 import ServerInstallation from "~/components/ui/servers/ServerInstallation.vue";
+import PanelErrorIcon from "~/components/ui/servers/icons/PanelErrorIcon.vue";
 
 const app = useNuxtApp() as unknown as { $notify: any };
 
@@ -1159,6 +1082,95 @@ const startPolling = () => {
 
   poll();
 };
+
+const nodeUnavailableDetails = computed(() => [
+  {
+    label: "Server ID",
+    value: server.serverId,
+    type: "inline" as const,
+  },
+  {
+    label: "Node",
+    value: server.general?.datacenter ?? "Unknown! Please contact support!",
+    type: "inline" as const,
+  },
+]);
+
+const suspendedDescription = computed(() => {
+  if (serverData.value?.suspension_reason === "cancelled") {
+    return "Your subscription has been cancelled.\nContact Modrinth Support if you believe this is an error.";
+  }
+  if (serverData.value?.suspension_reason) {
+    return `Your server has been suspended: ${serverData.value.suspension_reason}\nContact Modrinth Support if you believe this is an error.`;
+  }
+  return "Your server has been suspended.\nContact Modrinth Support if you believe this is an error.";
+});
+
+const generalErrorDetails = computed(() => [
+  {
+    label: "Server ID",
+    value: server.serverId,
+    type: "inline" as const,
+  },
+  {
+    label: "Timestamp",
+    value: String(server.moduleErrors?.general?.timestamp),
+    type: "inline" as const,
+  },
+  {
+    label: "Error Name",
+    value: server.moduleErrors?.general?.error.name,
+    type: "inline" as const,
+  },
+  {
+    label: "Error Message",
+    value: server.moduleErrors?.general?.error.message,
+    type: "block" as const,
+  },
+  ...(server.moduleErrors?.general?.error.originalError
+    ? [
+        {
+          label: "Original Error",
+          value: String(server.moduleErrors.general.error.originalError),
+          type: "hidden" as const,
+        },
+      ]
+    : []),
+  ...(server.moduleErrors?.general?.error.stack
+    ? [
+        {
+          label: "Stack Trace",
+          value: server.moduleErrors.general.error.stack,
+          type: "hidden" as const,
+        },
+      ]
+    : []),
+]);
+
+const suspendedAction = computed(() => ({
+  label: "Go to billing settings",
+  onClick: () => router.push("/settings/billing"),
+  color: "brand" as const,
+}));
+
+const generalErrorAction = computed(() => ({
+  label: "Go back to all servers",
+  onClick: () => router.push("/servers/manage"),
+  color: "brand" as const,
+}));
+
+const nodeUnavailableAction = computed(() => ({
+  label: "Join Modrinth Discord",
+  onClick: () => navigateTo("https://discord.modrinth.com", { external: true }),
+  color: "standard" as const,
+}));
+
+const connectionLostAction = computed(() => ({
+  label: "Reload",
+  onClick: () => reloadNuxtApp(),
+  color: "brand" as const,
+  disabled: formattedTime.value !== "00",
+}));
 
 const copyServerDebugInfo = () => {
   const debugInfo = `Server ID: ${serverData.value?.server_id}\nError: ${errorMessage.value}\nKind: ${serverData.value?.upstream?.kind}\nProject ID: ${serverData.value?.upstream?.project_id}\nVersion ID: ${serverData.value?.upstream?.version_id}\nLog: ${errorLog.value}`;
