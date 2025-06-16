@@ -211,7 +211,7 @@ pub async fn user_get(
         .ok();
 
         let response: crate::models::users::User =
-            if auth_user.map(|x| x.role.is_admin()).unwrap_or(false) {
+            if auth_user.is_some_and(|x| x.role.is_admin()) {
                 crate::models::users::User::from_full(data)
             } else {
                 data.into()
@@ -246,9 +246,8 @@ pub async fn collections_list(
     if let Some(id) = id_option.map(|x| x.id) {
         let user_id: UserId = id.into();
 
-        let can_view_private = user
-            .map(|y| y.role.is_mod() || y.id == user_id)
-            .unwrap_or(false);
+        let can_view_private =
+            user.is_some_and(|y| y.role.is_mod() || y.id == user_id);
 
         let project_data = DBUser::get_collections(id, &**pool).await?;
 
@@ -338,7 +337,7 @@ pub async fn orgs_list(
             let team_members: Vec<_> = members_data
                 .into_iter()
                 .filter(|x| logged_in || x.accepted || id == x.user_id)
-                .flat_map(|data| {
+                .filter_map(|data| {
                     users.iter().find(|x| x.id == data.user_id).map(|user| {
                         crate::models::teams::TeamMember::from(
                             data,
@@ -416,8 +415,7 @@ pub async fn user_edit(
 
                 if existing_user_id_option
                     .map(|x| UserId::from(x.id))
-                    .map(|id| id == user.id)
-                    .unwrap_or(true)
+                    .is_none_or(|id| id == user.id)
                 {
                     sqlx::query!(
                         "

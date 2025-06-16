@@ -1,11 +1,7 @@
 <template>
-  <div
-    v-if="isConnected && !isWsAuthIncorrect"
-    class="relative flex select-none flex-col gap-6"
-    data-pyro-server-manager-root
-  >
+  <div class="relative flex select-none flex-col gap-6" data-pyro-server-manager-root>
     <div
-      v-if="inspectingError"
+      v-if="inspectingError && isConnected && !isWsAuthIncorrect"
       data-pyro-servers-inspecting-error
       class="flex justify-between rounded-2xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
     >
@@ -77,26 +73,34 @@
         </ButtonStyled>
       </div>
     </div>
+
     <div class="flex flex-col-reverse gap-6 md:flex-col">
-      <UiServersServerStats :data="stats" />
+      <UiServersServerStats
+        :data="isConnected && !isWsAuthIncorrect ? stats : undefined"
+        :loading="!isConnected || isWsAuthIncorrect"
+      />
+
       <div
         class="relative flex h-[700px] w-full flex-col gap-3 overflow-hidden rounded-2xl border border-divider bg-bg-raised p-4 transition-all duration-300 ease-in-out md:p-8"
+        :class="{ 'border-0': !isConnected || isWsAuthIncorrect }"
       >
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-4">
             <h2 class="m-0 text-3xl font-extrabold text-contrast">Console</h2>
-
-            <UiServersPanelServerStatus :state="serverPowerState" />
+            <UiServersPanelServerStatus
+              v-if="isConnected && !isWsAuthIncorrect"
+              :state="serverPowerState"
+            />
           </div>
         </div>
-        <!-- <div class="flex flex-row items-center gap-2 text-sm font-medium">
-          <InfoIcon class="hidden sm:block" />
-          Click and drag to select lines, then CMD+C to copy
-        </div> -->
-        <UiServersPanelTerminal :full-screen="fullScreen">
+
+        <UiServersPanelTerminal
+          :full-screen="fullScreen"
+          :loading="!isConnected || isWsAuthIncorrect"
+        >
           <div class="relative w-full px-4 pt-4">
             <ul
-              v-if="suggestions.length"
+              v-if="suggestions.length && isConnected && !isWsAuthIncorrect"
               id="command-suggestions"
               ref="suggestionsList"
               class="mt-1 max-h-60 w-full list-none overflow-auto rounded-md border border-divider bg-bg-raised p-0 shadow-lg"
@@ -120,7 +124,7 @@
             </ul>
             <div class="relative flex items-center">
               <span
-                v-if="bestSuggestion"
+                v-if="bestSuggestion && isConnected && !isWsAuthIncorrect"
                 class="pointer-events-none absolute left-[26px] transform select-none text-gray-400"
               >
                 <span class="ml-[23.5px] whitespace-pre">{{
@@ -142,7 +146,7 @@
                 <TerminalSquareIcon class="ml-3 h-5 w-5" />
               </div>
               <input
-                v-if="isServerRunning"
+                v-if="isServerRunning && isConnected && !isWsAuthIncorrect"
                 v-model="commandInput"
                 type="text"
                 placeholder="Send a command"
@@ -168,29 +172,25 @@
         </UiServersPanelTerminal>
       </div>
     </div>
-  </div>
-  <UiServersOverviewLoading v-else-if="!isConnected && !isWsAuthIncorrect" />
-  <div v-else-if="isWsAuthIncorrect" class="flex flex-col">
-    <h2>Could not connect to the server.</h2>
-    <p>
-      An error occurred while attempting to connect to your server. Please try refreshing the page.
-      (WebSocket Authentication Failed)
-    </p>
-  </div>
-  <div v-else class="flex flex-col">
-    <h2>Could not connect to the server.</h2>
-    <p>
-      An error occurred while attempting to connect to your server. Please try refreshing the page.
-      (No further information)
-    </p>
+
+    <div
+      v-if="isWsAuthIncorrect"
+      class="absolute inset-0 flex flex-col items-center justify-center bg-bg"
+    >
+      <h2>Could not connect to the server.</h2>
+      <p>
+        An error occurred while attempting to connect to your server. Please try refreshing the
+        page. (WebSocket Authentication Failed)
+      </p>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { TerminalSquareIcon, XIcon, IssuesIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
-import type { ServerState, Stats } from "~/types/servers";
-import type { Server } from "~/composables/pyroServers";
+import type { ServerState, Stats } from "@modrinth/utils";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 type ServerProps = {
   socket: WebSocket | null;
@@ -203,7 +203,7 @@ type ServerProps = {
     exit_code?: number;
   };
   isServerRunning: boolean;
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: ModrinthServer;
 };
 
 const props = defineProps<ServerProps>();

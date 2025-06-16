@@ -330,8 +330,7 @@
                     <ButtonStyled
                       v-if="
                         getPyroCharge(subscription) &&
-                        getPyroCharge(subscription).status !== 'cancelled' &&
-                        getPyroCharge(subscription).status !== 'failed'
+                        getPyroCharge(subscription).status !== 'cancelled'
                       "
                     >
                       <button @click="showCancellationSurvey(subscription)">
@@ -592,6 +591,7 @@ import {
 } from "@modrinth/assets";
 import { calculateSavings, formatPrice, getCurrency } from "@modrinth/utils";
 import { ref, computed } from "vue";
+import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import { products } from "~/generated/state.json";
 
 definePageMeta({
@@ -744,7 +744,7 @@ const [
     useBaseFetch("billing/subscriptions", { internal: true }),
   ),
   useAsyncData("billing/products", () => useBaseFetch("billing/products", { internal: true })),
-  useAsyncData("servers", () => usePyroFetch("servers")),
+  useAsyncData("servers", () => useServersFetch("servers")),
 ]);
 
 const midasProduct = ref(products.find((x) => x.metadata?.type === "midas"));
@@ -984,7 +984,7 @@ async function fetchCapacityStatuses(serverId, product) {
   if (product) {
     try {
       return {
-        custom: await usePyroFetch(`servers/${serverId}/upgrade-stock`, {
+        custom: await useServersFetch(`servers/${serverId}/upgrade-stock`, {
           method: "POST",
           body: {
             cpu: product.metadata.cpu,

@@ -5,7 +5,7 @@ use common::{
     environment::with_test_environment_all,
 };
 
-mod common;
+pub mod common;
 
 // user GET (permissions, different users)
 // users GET

@@ -14,9 +14,10 @@ use chrono::Utc;
 use daedalus as d;
 use daedalus::minecraft::{LoggingSide, RuleAction, VersionInfo};
 use daedalus::modded::LoaderVersion;
+use regex::Regex;
 use serde::Deserialize;
 use st::Profile;
-use std::collections::HashMap;
+use std::fmt::Write;
 use std::path::PathBuf;
 use tokio::process::Command;
 
@@ -136,8 +137,7 @@ pub async fn get_java_version_from_profile(
     let key = version_info
         .java_version
         .as_ref()
-        .map(|it| it.major_version)
-        .unwrap_or(8);
+        .map_or(8, |it| it.major_version);
 
     let state = State::get().await?;
 
@@ -252,8 +252,7 @@ pub async fn install_minecraft(
 
         let loader_version_id = loader_version.clone();
         crate::api::profile::edit(&profile.path, |prof| {
-            prof.loader_version =
-                loader_version_id.clone().map(|x| x.id.clone());
+            prof.loader_version = loader_version_id.clone().map(|x| x.id);
 
             async { Ok(()) }
         })
@@ -278,8 +277,7 @@ pub async fn install_minecraft(
     let key = version_info
         .java_version
         .as_ref()
-        .map(|it| it.major_version)
-        .unwrap_or(8);
+        .map_or(8, |it| it.major_version);
     let (java_version, set_java) = if let Some(java_version) =
         get_java_version_from_profile(profile, &version_info).await?
     {
@@ -352,9 +350,11 @@ pub async fn install_minecraft(
                     }
                 }
 
-                let cp = wrap_ref_builder!(cp = processor.classpath.clone() => {
-                    cp.push(processor.jar.clone())
-                });
+                let cp = {
+                    let mut cp = processor.classpath.clone();
+                    cp.push(processor.jar.clone());
+                    cp
+                };
 
                 let child = Command::new(&java_version.path)
                     .arg("-cp")
@@ -577,7 +577,9 @@ pub async fn launch_minecraft(
     let args = version_info.arguments.clone().unwrap_or_default();
     let mut command = match wrapper {
         Some(hook) => {
-            wrap_ref_builder!(it = Command::new(hook) => {it.arg(&java_version.path)})
+            let mut command = Command::new(hook);
+            command.arg(&java_version.path);
+            command
         }
         None => Command::new(&java_version.path),
     };
@@ -626,8 +628,7 @@ pub async fn launch_minecraft(
                     .as_ref()
                     .and_then(|x| x.get(&LoggingSide::Client)),
             )?
-            .into_iter()
-            .collect::<Vec<_>>(),
+            .into_iter(),
         )
         .arg(version_info.main_class.clone())
         .args(
@@ -645,8 +646,7 @@ pub async fn launch_minecraft(
                 &java_version.architecture,
                 quick_play_type,
             )?
-            .into_iter()
-            .collect::<Vec<_>>(),
+            .into_iter(),
         )
         .current_dir(instance_path.clone());
 
@@ -662,20 +662,35 @@ pub async fn launch_minecraft(
 
     // Overwrites the minecraft options.txt file with the settings from the profile
     // Uses 'a:b' syntax which is not quite yaml
-    use regex::Regex;
-
     if !mc_set_options.is_empty() {
         let options_path = instance_path.join("options.txt");
-        let mut options_string = String::new();
-        if options_path.exists() {
-            options_string = io::read_to_string(&options_path).await?;
+
+        let (mut options_string, input_encoding) = if options_path.exists() {
+            io::read_any_encoding_to_string(&options_path).await?
+        } else {
+            (String::new(), encoding_rs::UTF_8)
+        };
+
+        // UTF-16 encodings may be successfully detected and read, but we cannot encode
+        // them back, and it's technically possible that the game client strongly expects
+        // such encoding
+        if input_encoding != input_encoding.output_encoding() {
+            return Err(crate::ErrorKind::LauncherError(format!(
+                "The instance options.txt file uses an unsupported encoding: {}. \
+                Please either turn off instance options that need to modify this file, \
+                or convert the file to an encoding that both the game and this app support, \
+                such as UTF-8.",
+                input_encoding.name()
+            ))
+            .into());
         }
+
         for (key, value) in mc_set_options {
             let re = Regex::new(&format!(r"(?m)^{}:.*$", regex::escape(key)))?;
             // check if the regex exists in the file
             if !re.is_match(&options_string) {
                 // The key was not found in the file, so append it
-                options_string.push_str(&format!("\n{key}:{value}"));
+                write!(&mut options_string, "\n{key}:{value}").unwrap();
             } else {
                 let replaced_string = re
                     .replace_all(&options_string, &format!("{key}:{value}"))
@@ -684,7 +699,8 @@ pub async fn launch_minecraft(
             }
         }
 
-        io::write(&options_path, options_string).await?;
+        io::write(&options_path, input_encoding.encode(&options_string).0)
+            .await?;
     }
 
     crate::api::profile::edit(&profile.path, |prof| {
@@ -693,31 +709,6 @@ pub async fn launch_minecraft(
         async { Ok(()) }
     })
     .await?;
-
-    let mut censor_strings = HashMap::new();
-    let username = whoami::username();
-    censor_strings
-        .insert(format!("/{username}/"), "/{COMPUTER_USERNAME}/".to_string());
-    censor_strings.insert(
-        format!("\\{username}\\"),
-        "\\{COMPUTER_USERNAME}\\".to_string(),
-    );
-    censor_strings.insert(
-        credentials.access_token.clone(),
-        "{MINECRAFT_ACCESS_TOKEN}".to_string(),
-    );
-    censor_strings.insert(
-        credentials.username.clone(),
-        "{MINECRAFT_USERNAME}".to_string(),
-    );
-    censor_strings.insert(
-        credentials.id.as_simple().to_string(),
-        "{MINECRAFT_UUID}".to_string(),
-    );
-    censor_strings.insert(
-        credentials.id.as_hyphenated().to_string(),
-        "{MINECRAFT_UUID}".to_string(),
-    );
 
     // If in tauri, and the 'minimize on launch' setting is enabled, minimize the window
     #[cfg(feature = "tauri")]

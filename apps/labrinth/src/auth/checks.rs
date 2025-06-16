@@ -100,10 +100,7 @@ pub async fn filter_visible_project_ids(
             project.status.is_searchable()
         } else {
             !project.status.is_hidden()
-        }) || user_option
-            .as_ref()
-            .map(|x| x.role.is_mod())
-            .unwrap_or(false)
+        }) || user_option.as_ref().is_some_and(|x| x.role.is_mod())
         {
             return_projects.push(project.id);
         } else if user_option.is_some() {
@@ -158,7 +155,7 @@ pub async fn filter_enlisted_projects_ids(
         )
         .fetch(pool)
         .map_ok(|row| {
-            for x in projects.iter() {
+            for x in &projects {
                 let bool =
                     Some(x.id.0) == row.id && Some(x.team_id.0) == row.team_id;
                 if bool {
@@ -238,7 +235,6 @@ pub async fn filter_visible_version_ids(
     redis: &RedisPool,
 ) -> Result<Vec<crate::database::models::DBVersionId>, ApiError> {
     let mut return_versions = Vec::new();
-    let mut check_versions = Vec::new();
 
     // First, filter out versions belonging to projects we can't see
     // (ie: a hidden project, but public version, should still be hidden)
@@ -271,15 +267,10 @@ pub async fn filter_visible_version_ids(
         // - we are enlisted on the team of the mod
         if (!version.status.is_hidden()
             && visible_project_ids.contains(&version.project_id))
-            || user_option
-                .as_ref()
-                .map(|x| x.role.is_mod())
-                .unwrap_or(false)
+            || user_option.as_ref().is_some_and(|x| x.role.is_mod())
             || enlisted_version_ids.contains(&version.id)
         {
             return_versions.push(version.id);
-        } else if user_option.is_some() {
-            check_versions.push(version);
         }
     }
 
@@ -310,10 +301,7 @@ pub async fn filter_enlisted_version_ids(
     .await?;
 
     for version in versions {
-        if user_option
-            .as_ref()
-            .map(|x| x.role.is_mod())
-            .unwrap_or(false)
+        if user_option.as_ref().is_some_and(|x| x.role.is_mod())
             || (user_option.is_some()
                 && authorized_project_ids.contains(&version.project_id))
         {
@@ -349,10 +337,7 @@ pub async fn filter_visible_collections(
 
     for collection in collections {
         if !collection.status.is_hidden()
-            || user_option
-                .as_ref()
-                .map(|x| x.role.is_mod())
-                .unwrap_or(false)
+            || user_option.as_ref().is_some_and(|x| x.role.is_mod())
         {
             return_collections.push(collection.into());
         } else if user_option.is_some() {

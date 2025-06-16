@@ -14,7 +14,7 @@
       <template v-if="orgs?.length > 0">
         <div class="orgs-grid">
           <nuxt-link
-            v-for="org in orgs"
+            v-for="org in sortedOrgs"
             :key="org.id"
             :to="`/organization/${org.slug}`"
             class="universal-card button-base recessed org"
@@ -66,6 +66,8 @@ const { data: orgs, error } = useAsyncData("organizations", () => {
     apiVersion: 3,
   });
 });
+
+const sortedOrgs = computed(() => orgs.value.sort((a, b) => a.name.localeCompare(b.name)));
 
 const onlyAcceptedMembers = (members) => members.filter((member) => member?.accepted);
 

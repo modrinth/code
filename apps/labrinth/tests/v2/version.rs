@@ -219,7 +219,7 @@ async fn version_updates() {
 
             // Add 3 new versions, 1 before, and 2 after, with differing game_version/version_types/loaders
             let mut update_ids = vec![];
-            for (version_number, patch_value) in [
+            for (version_number, patch_value) in &[
                 (
                     "0.9.9",
                     json!({
@@ -241,9 +241,7 @@ async fn version_updates() {
                         "version_type": "beta"
                     }),
                 ),
-            ]
-            .iter()
-            {
+            ] {
                 let version = api
                     .add_public_version_deserialized_common(
                         *alpha_project_id_parsed,

@@ -163,7 +163,7 @@ impl DBUser {
             |ids| async move {
                 let user_ids: Vec<i64> = ids
                     .iter()
-                    .flat_map(|x| parse_base62(&x.to_string()).ok())
+                    .filter_map(|x| parse_base62(&x.to_string()).ok())
                     .map(|x| x as i64)
                     .collect();
                 let slugs = ids
@@ -224,24 +224,46 @@ impl DBUser {
         Ok(val)
     }
 
-    pub async fn get_email<'a, E>(
+    pub async fn get_by_email<'a, E>(
         email: &str,
         exec: E,
     ) -> Result<Option<DBUserId>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        let user_pass = sqlx::query!(
+        let user = sqlx::query!(
             "
             SELECT id FROM users
             WHERE email = $1
             ",
             email
         )
+        .map(|row| DBUserId(row.id))
         .fetch_optional(exec)
         .await?;
 
-        Ok(user_pass.map(|x| DBUserId(x.id)))
+        Ok(user)
+    }
+
+    pub async fn get_by_case_insensitive_email<'a, E>(
+        email: &str,
+        exec: E,
+    ) -> Result<Vec<DBUserId>, sqlx::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        let users = sqlx::query!(
+            "
+            SELECT id FROM users
+            WHERE LOWER(email) = LOWER($1)
+            ",
+            email
+        )
+        .map(|row| DBUserId(row.id))
+        .fetch_all(exec)
+        .await?;
+
+        Ok(users)
     }
 
     pub async fn get_projects<'a, E>(

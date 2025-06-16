@@ -217,8 +217,7 @@ pub async fn ws_init(
                         if status
                             .profile_name
                             .as_ref()
-                            .map(|x| x.len() > 64)
-                            .unwrap_or(false)
+                            .is_some_and(|x| x.len() > 64)
                         {
                             return;
                         }

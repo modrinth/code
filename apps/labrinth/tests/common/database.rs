@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use labrinth::{database::redis::RedisPool, search};
 use sqlx::{PgPool, postgres::PgPoolOptions};
 use std::time::Duration;

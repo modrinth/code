@@ -11,6 +11,58 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-06-16T11:00:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Rolled out hotfixes with the previous days' updates.
+- Failed subscriptions can now be cancelled.`,
+  },
+  {
+    date: `2025-06-16T11:00:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Improved error handling.
+- Rolled out hotfixes with the previous days' updates.'`,
+  },
+  {
+    date: `2025-06-15T16:25:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Fixed installing modpacks from search.
+- Fixed setting subdomains.`,
+  },
+  {
+    date: `2025-06-15T14:30:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Fixed various issues with the panel loading improperly in certain cases.
+- Fixed CPU icon being smaller than the rest.
+- Server panel performance should be a little faster now.`,
+  },
+  {
+    date: `2025-06-15T14:30:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Creator analytics charts will now show up to 15 projects in a tooltip instead of 5.
+- Made certain scrollable containers not have a fixed height, and allow them to be smaller if they have fewer items. (Contributed by [Erb3](https://github.com/modrinth/code/pull/2898))
+- Made organizations sort consistently alphabetically. (Contributed by [WorldWidePixel](https://github.com/modrinth/code/pull/3755))
+- Clarified the 'File too large' error message when uploading an image larger than 1MiB in the text editor. (Contributed by [IThundxr](https://github.com/modrinth/code/pull/3774))`,
+  },
+  {
+    date: `2025-06-03T14:35:00-07:00`,
+    product: 'servers',
+    body: `### Added
+- Added support for servers in Europe.
+- Added server setup for new servers upon opening the panel for the first time.`,
+  },
+  {
+    date: `2025-06-03T14:35:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Overhauled Modrinth Servers purchase flow.
+- Added the ability to donate creator rewards to charity.`,
+  },
+  {
     date: `2025-05-08T09:00:00-07:00`,
     product: 'servers',
     body: `### Added

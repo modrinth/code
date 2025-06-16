@@ -303,7 +303,7 @@
           <h2 class="text-lg text-contrast">{{ formatMessage(messages.profileOrganizations) }}</h2>
           <div class="flex flex-wrap gap-2">
             <nuxt-link
-              v-for="org in organizations"
+              v-for="org in sortedOrgs"
               :key="org.id"
               v-tooltip="org.name"
               class="organization"
@@ -515,6 +515,8 @@ try {
     message: formatMessage(messages.userNotFoundError),
   });
 }
+
+const sortedOrgs = computed(() => organizations.value.sort((a, b) => a.name.localeCompare(b.name)));
 
 if (!user.value) {
   throw createError({

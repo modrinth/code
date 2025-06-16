@@ -1,5 +1,4 @@
-// importing common module.
-mod common;
+pub mod common;
 
 // Not all tests expect exactly the same functionality in v2 and v3.
 // For example, though we expect the /GET version to return the corresponding project,

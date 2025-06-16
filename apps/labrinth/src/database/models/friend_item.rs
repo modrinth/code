@@ -105,7 +105,7 @@ impl DBFriend {
             created: row.created,
             accepted: row.accepted,
         })
-        .filter(|x| accepted.map(|y| y == x.accepted).unwrap_or(true))
+        .filter(|x| accepted.is_none_or(|y| y == x.accepted))
         .collect::<Vec<_>>();
 
         Ok(friends)

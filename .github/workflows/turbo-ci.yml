@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: ['main']
+    branches: [main]
   pull_request:
     types: [opened, synchronize]
   merge_group:
@@ -10,71 +10,69 @@ on:
 
 jobs:
   build:
-    name: Build, Test, and Lint
+    name: Lint and Test
     runs-on: ubuntu-22.04
 
+    env:
+      # Ensure pnpm output is colored in GitHub Actions logs
+      FORCE_COLOR: 3
+      # Make cargo nextest successfully ignore projects without tests
+      NEXTEST_NO_TESTS: pass
+
     steps:
-      - name: Check out code
+      - name: 📥 Check out code
         uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
-      - name: Cache turbo build setup
-        uses: actions/cache@v4
-        with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-
-
-      - name: Install build dependencies
+      - name: 🧰 Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -yq libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
 
-      - name: Setup Node.JS environment
+      - name: 🧰 Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: 🧰 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version-file: .nvmrc
+          cache: pnpm
 
-      - name: Install pnpm via corepack
-        shell: bash
-        run: |
-          corepack enable
-          corepack prepare --activate
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - uses: actions/cache@v4
-        name: Setup pnpm cache
+      - name: 🧰 Setup Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          rustflags: ''
+          components: clippy, rustfmt
+          cache: false
 
-      - name: Install dependencies
+      - name: 🧰 Setup nextest
+        uses: taiki-e/install-action@nextest
+
+      # cargo-binstall does not have pre-built binaries for sqlx-cli, so we fall
+      # back to a cached cargo install
+      - name: 🧰 Setup cargo-sqlx
+        uses: AlexTMjugador/cache-cargo-install-action@feat/features-support
+        with:
+          tool: sqlx-cli
+          locked: false
+          no-default-features: true
+          features: rustls,postgres
+
+      - name: 💨 Setup Turbo cache
+        uses: rharkor/caching-for-turbo@v1.8
+
+      - name: 🧰 Install dependencies
         run: pnpm install
 
-      - name: Build
-        run: pnpm build
-        env:
-          SQLX_OFFLINE: true
+      - name: ⚙️ Start services
+        run: docker compose up --wait
 
-      - name: Lint
-        run: pnpm lint
-        env:
-          SQLX_OFFLINE: true
+      - name: ⚙️ Setup Labrinth environment and database
+        working-directory: apps/labrinth
+        run: |
+          cp .env.local .env
+          sqlx database setup
 
-      - name: Start docker compose
-        run: docker compose up -d
-
-      - name: Test
-        run: pnpm test
-        env:
-          SQLX_OFFLINE: true
-          DATABASE_URL: postgresql://labrinth:labrinth@localhost/postgres
+      - name: 🔍 Lint and test
+        run: pnpm run ci

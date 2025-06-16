@@ -57,11 +57,13 @@ pub async fn read_from_field(
 ) -> Result<BytesMut, CreateError> {
     let mut bytes = BytesMut::new();
     while let Some(chunk) = field.next().await {
-        if bytes.len() >= cap {
+        let chunk = chunk?;
+
+        if bytes.len().saturating_add(chunk.len()) > cap {
             return Err(CreateError::InvalidInput(String::from(err_msg)));
-        } else {
-            bytes.extend_from_slice(&chunk?);
         }
+
+        bytes.extend_from_slice(&chunk);
     }
     Ok(bytes)
 }

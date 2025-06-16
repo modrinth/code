@@ -115,6 +115,7 @@ import {
 import Avatar from "~/components/ui/Avatar.vue";
 import Badge from "~/components/ui/Badge.vue";
 import { formatProjectType } from "~/plugins/shorthands.js";
+import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
 
 useHead({
   title: "Review projects - Modrinth",
@@ -169,28 +170,6 @@ const projectTypes = computed(() => {
 
   return [...set];
 });
-
-function segmentData(data, segmentSize = 800) {
-  return data.reduce((acc, curr, index) => {
-    const segment = Math.floor(index / segmentSize);
-
-    if (!acc[segment]) {
-      acc[segment] = [];
-    }
-    acc[segment].push(curr);
-    return acc;
-  }, []);
-}
-
-function fetchSegmented(data, createUrl, options = {}) {
-  return Promise.all(segmentData(data).map((ids) => useBaseFetch(createUrl(ids), options))).then(
-    (results) => results.flat(),
-  );
-}
-
-function asEncodedJsonArray(data) {
-  return encodeURIComponent(JSON.stringify(data));
-}
 
 if (projects.value) {
   const teamIds = projects.value.map((x) => x.team_id);

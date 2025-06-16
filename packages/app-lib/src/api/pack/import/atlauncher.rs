@@ -97,12 +97,15 @@ pub struct ATLauncherMod {
 
 // Check if folder has a instance.json that parses
 pub async fn is_valid_atlauncher(instance_folder: PathBuf) -> bool {
-    let instance: String =
-        io::read_to_string(&instance_folder.join("instance.json"))
-            .await
-            .unwrap_or("".to_string());
-    let instance: Result<ATInstance, serde_json::Error> =
-        serde_json::from_str::<ATInstance>(&instance);
+    let instance = serde_json::from_str::<ATInstance>(
+        &io::read_any_encoding_to_string(
+            &instance_folder.join("instance.json"),
+        )
+        .await
+        .unwrap_or(("".into(), encoding_rs::UTF_8))
+        .0,
+    );
+
     if let Err(e) = instance {
         tracing::warn!(
             "Could not parse instance.json at {}: {}",
@@ -124,14 +127,17 @@ pub async fn import_atlauncher(
 ) -> crate::Result<()> {
     let atlauncher_instance_path = atlauncher_base_path
         .join("instances")
-        .join(instance_folder.clone());
+        .join(&instance_folder);
 
     // Load instance.json
-    let atinstance: String =
-        io::read_to_string(&atlauncher_instance_path.join("instance.json"))
-            .await?;
-    let atinstance: ATInstance =
-        serde_json::from_str::<ATInstance>(&atinstance)?;
+    let atinstance = serde_json::from_str::<ATInstance>(
+        &io::read_any_encoding_to_string(
+            &atlauncher_instance_path.join("instance.json"),
+        )
+        .await
+        .unwrap_or(("".into(), encoding_rs::UTF_8))
+        .0,
+    )?;
 
     // Icon path should be {instance_folder}/instance.png if it exists,
     // Second possibility is ATLauncher/configs/images/{safe_pack_name}.png (safe pack name is alphanumeric lowercase)

@@ -127,12 +127,11 @@ where
                     .await?;
 
             let rate_limit_ignore = dotenvy::var("RATE_LIMIT_IGNORE_KEY")?;
-            if !req
+            if req
                 .headers()
                 .get("x-ratelimit-key")
                 .and_then(|x| x.to_str().ok())
-                .map(|x| x == rate_limit_ignore)
-                .unwrap_or(false)
+                .is_none_or(|x| x != rate_limit_ignore)
             {
                 let metadata = get_session_metadata(req).await?;
                 session_queue.add_session(session.id, metadata).await;
@@ -164,7 +163,7 @@ where
 
             user.map(|u| (access_token.scopes, u))
         }
-        Some(("github", _)) | Some(("gho", _)) | Some(("ghp", _)) => {
+        Some(("github" | "gho" | "ghp", _)) => {
             let user = AuthProvider::GitHub.get_user(token).await?;
             let id =
                 AuthProvider::GitHub.get_user_id(&user.id, executor).await?;

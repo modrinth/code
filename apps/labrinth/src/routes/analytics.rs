@@ -216,7 +216,7 @@ pub async fn playtime_ingest(
                 version_id: version.inner.id.0 as u64,
                 loader: playtime.loader,
                 game_version: playtime.game_version,
-                parent: playtime.parent.map(|x| x.0).unwrap_or(0),
+                parent: playtime.parent.map_or(0, |x| x.0),
             });
         }
     }

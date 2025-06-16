@@ -255,7 +255,7 @@ async fn get_all_worlds_in_profile(
         AttachedWorldData::get_all_for_instance(profile_path, &state.pool)
             .await?;
     if !attached_data.is_empty() {
-        for world in worlds.iter_mut() {
+        for world in &mut worlds {
             if let Some(data) = attached_data
                 .get(&(world.world_type(), world.world_id().to_owned()))
             {

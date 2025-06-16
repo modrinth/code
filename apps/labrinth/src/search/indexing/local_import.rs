@@ -522,7 +522,7 @@ async fn index_versions(
     // Convert to partial versions
     let mut res_versions: HashMap<DBProjectId, Vec<PartialVersion>> =
         HashMap::new();
-    for (project_id, version_ids) in versions.iter() {
+    for (project_id, version_ids) in &versions {
         for version_id in version_ids {
             // Extract version-specific data fetched
             // We use 'remove' as every version is only in the map once

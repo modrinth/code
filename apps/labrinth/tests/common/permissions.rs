@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use actix_http::StatusCode;
 use actix_web::{dev::ServiceResponse, test};
 use futures::Future;

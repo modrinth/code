@@ -10,7 +10,8 @@
     "postinstall": "nuxi prepare",
     "lint": "eslint . && prettier --check .",
     "fix": "eslint . --fix && prettier --write .",
-    "intl:extract": "formatjs extract \"{,src/components,src/composables,src/layouts,src/middleware,src/modules,src/pages,src/plugins,src/utils}/**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" \"src/error.vue\" --ignore '**/*.d.ts' --ignore 'node_modules' --out-file src/locales/en-US/index.json --format crowdin --preserve-whitespace"
+    "intl:extract": "formatjs extract \"{,src/components,src/composables,src/layouts,src/middleware,src/modules,src/pages,src/plugins,src/utils}/**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" \"src/error.vue\" --ignore '**/*.d.ts' --ignore 'node_modules' --out-file src/locales/en-US/index.json --format crowdin --preserve-whitespace",
+    "test": "nuxi build"
   },
   "devDependencies": {
     "@formatjs/cli": "^6.2.12",

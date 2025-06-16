@@ -59,7 +59,7 @@
 
       <template v-else>
         <ButtonStyled v-if="showStopButton" type="transparent">
-          <button :disabled="!canTakeAction" @click="initiateAction('stop')">
+          <button :disabled="!canTakeAction" @click="initiateAction('Stop')">
             <div class="flex gap-1">
               <StopCircleIcon class="h-5 w-5" />
               <span>{{ isStoppingState ? "Stopping..." : "Stop" }}</span>
@@ -120,14 +120,12 @@ import {
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { useRouter } from "vue-router";
 import { useStorage } from "@vueuse/core";
-
-type ServerAction = "start" | "stop" | "restart" | "kill";
-type ServerState = "stopped" | "starting" | "running" | "stopping" | "restarting";
+import type { PowerAction as ServerPowerAction, ServerState } from "@modrinth/utils";
 
 const flags = useFeatureFlags();
 
 interface PowerAction {
-  action: ServerAction;
+  action: ServerPowerAction;
   nextState: ServerState;
 }
 
@@ -142,7 +140,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "action", action: ServerAction): void;
+  (e: "action", action: ServerPowerAction): void;
 }>();
 
 const router = useRouter();
@@ -170,7 +168,7 @@ const isStoppingState = computed(() => serverState.value === "stopping");
 const showStopButton = computed(() => isRunning.value || isStoppingState.value);
 
 const primaryActionText = computed(() => {
-  const states: Record<ServerState, string> = {
+  const states: Partial<Record<ServerState, string>> = {
     starting: "Starting...",
     restarting: "Restarting...",
     running: "Restart",
@@ -193,7 +191,7 @@ const menuOptions = computed(() => [
           id: "kill",
           label: "Kill server",
           icon: SlashIcon,
-          action: () => initiateAction("kill"),
+          action: () => initiateAction("Kill"),
         },
       ]),
   {
@@ -221,17 +219,17 @@ async function copyId() {
   await navigator.clipboard.writeText(serverId as string);
 }
 
-function initiateAction(action: ServerAction) {
+function initiateAction(action: ServerPowerAction) {
   if (!canTakeAction.value) return;
 
-  const stateMap: Record<ServerAction, ServerState> = {
-    start: "starting",
-    stop: "stopping",
-    restart: "restarting",
-    kill: "stopping",
+  const stateMap: Record<ServerPowerAction, ServerState> = {
+    Start: "starting",
+    Stop: "stopping",
+    Restart: "restarting",
+    Kill: "stopping",
   };
 
-  if (action === "start") {
+  if (action === "Start") {
     emit("action", action);
     serverState.value = stateMap[action];
     startingDelay.value = true;
@@ -249,7 +247,7 @@ function initiateAction(action: ServerAction) {
 }
 
 function handlePrimaryAction() {
-  initiateAction(isRunning.value ? "restart" : "start");
+  initiateAction(isRunning.value ? "Restart" : "Start");
 }
 
 function executePowerAction() {
@@ -263,7 +261,7 @@ function executePowerAction() {
     userPreferences.value.powerDontAskAgain = true;
   }
 
-  if (action === "start") {
+  if (action === "Start") {
     startingDelay.value = true;
     setTimeout(() => (startingDelay.value = false), 5000);
   }

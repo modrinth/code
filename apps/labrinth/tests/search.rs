@@ -14,7 +14,7 @@ use serde_json::json;
 use crate::common::api_common::Api;
 use crate::common::api_common::ApiProject;
 
-mod common;
+pub mod common;
 
 // TODO: Revisit this wit   h the new modify_json in the version maker
 // That change here should be able to simplify it vastly
@@ -151,22 +151,7 @@ async fn index_swaps() {
                 test_env.api.remove_project("alpha", USER_USER_PAT).await;
             assert_status!(&resp, StatusCode::NO_CONTENT);
 
-            // Deletions should not be indexed immediately
-            let projects = test_env
-                .api
-                .search_deserialized(
-                    None,
-                    Some(json!([["categories:fabric"]])),
-                    USER_USER_PAT,
-                )
-                .await;
-            assert_eq!(projects.total_hits, 1);
-            assert!(projects.hits[0].slug.as_ref().unwrap().contains("alpha"));
-
-            // But when we reindex, it should be gone
-            let resp = test_env.api.reset_search_index().await;
-            assert_status!(&resp, StatusCode::NO_CONTENT);
-
+            // We should wait for deletions to be indexed
             let projects = test_env
                 .api
                 .search_deserialized(
@@ -177,7 +162,7 @@ async fn index_swaps() {
                 .await;
             assert_eq!(projects.total_hits, 0);
 
-            // Reindex again, should still be gone
+            // When we reindex, it should be still gone
             let resp = test_env.api.reset_search_index().await;
             assert_status!(&resp, StatusCode::NO_CONTENT);
 

@@ -36,13 +36,15 @@ pub struct InstalledModpack {
 
 // Check if folder has a minecraftinstance.json that parses
 pub async fn is_valid_curseforge(instance_folder: PathBuf) -> bool {
-    let minecraftinstance: String =
-        io::read_to_string(&instance_folder.join("minecraftinstance.json"))
-            .await
-            .unwrap_or("".to_string());
-    let minecraftinstance: Result<MinecraftInstance, serde_json::Error> =
-        serde_json::from_str::<MinecraftInstance>(&minecraftinstance);
-    minecraftinstance.is_ok()
+    let minecraft_instance = serde_json::from_str::<MinecraftInstance>(
+        &io::read_any_encoding_to_string(
+            &instance_folder.join("minecraftinstance.json"),
+        )
+        .await
+        .unwrap_or(("".into(), encoding_rs::UTF_8))
+        .0,
+    );
+    minecraft_instance.is_ok()
 }
 
 pub async fn import_curseforge(
@@ -50,19 +52,20 @@ pub async fn import_curseforge(
     profile_path: &str,                  // path to profile
 ) -> crate::Result<()> {
     // Load minecraftinstance.json
-    let minecraft_instance: String = io::read_to_string(
-        &curseforge_instance_folder.join("minecraftinstance.json"),
-    )
-    .await?;
-    let minecraft_instance: MinecraftInstance =
-        serde_json::from_str::<MinecraftInstance>(&minecraft_instance)?;
-    let override_title: Option<String> = minecraft_instance.name.clone();
+    let minecraft_instance = serde_json::from_str::<MinecraftInstance>(
+        &io::read_any_encoding_to_string(
+            &curseforge_instance_folder.join("minecraftinstance.json"),
+        )
+        .await
+        .unwrap_or(("".into(), encoding_rs::UTF_8))
+        .0,
+    )?;
+    let override_title = minecraft_instance.name;
     let backup_name = format!(
         "Curseforge-{}",
         curseforge_instance_folder
             .file_name()
-            .map(|a| a.to_string_lossy().to_string())
-            .unwrap_or("Unknown".to_string())
+            .map_or("Unknown".to_string(), |a| a.to_string_lossy().to_string())
     );
 
     let state = State::get().await?;

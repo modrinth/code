@@ -80,10 +80,9 @@ pub async fn fetch_advanced(
 ) -> crate::Result<Bytes> {
     let _permit = semaphore.0.acquire().await?;
 
-    let creds = if !header
+    let creds = if header
         .as_ref()
-        .map(|x| &*x.0.to_lowercase() == "authorization")
-        .unwrap_or(false)
+        .is_none_or(|x| &*x.0.to_lowercase() != "authorization")
         && (url.starts_with("https://cdn.modrinth.com")
             || url.starts_with(MODRINTH_API_URL)
             || url.starts_with(MODRINTH_API_URL_V3))

@@ -227,13 +227,11 @@ async fn get_all_jre_path() -> HashSet<PathBuf> {
     paths.unwrap_or_else(|_| HashSet::new())
 }
 
-#[cfg(target_os = "windows")]
-#[allow(dead_code)]
-pub const JAVA_BIN: &str = "javaw.exe";
-
-#[cfg(not(target_os = "windows"))]
-#[allow(dead_code)]
-pub const JAVA_BIN: &str = "java";
+pub const JAVA_BIN: &str = if cfg!(target_os = "windows") {
+    "javaw.exe"
+} else {
+    "java"
+};
 
 // For each example filepath in 'paths', perform check_java_at_filepath, checking each one concurrently
 // and returning a JavaVersion for every valid path that points to a java bin
@@ -249,7 +247,7 @@ pub async fn check_java_at_filepaths(
         .collect::<Vec<_>>()
         .await;
 
-    jres.into_iter().flat_map(|x| x.ok()).flatten().collect()
+    jres.into_iter().filter_map(|x| x.ok()).flatten().collect()
 }
 
 // For example filepath 'path', attempt to resolve it and get a Java version at this path

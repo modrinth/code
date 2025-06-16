@@ -35,7 +35,6 @@ impl IOError {
     }
 }
 
-// dunce canonicalize
 pub fn canonicalize(
     path: impl AsRef<std::path::Path>,
 ) -> Result<std::path::PathBuf, IOError> {
@@ -46,7 +45,6 @@ pub fn canonicalize(
     })
 }
 
-// read_dir
 pub async fn read_dir(
     path: impl AsRef<std::path::Path>,
 ) -> Result<tokio::fs::ReadDir, IOError> {
@@ -59,7 +57,6 @@ pub async fn read_dir(
         })
 }
 
-// create_dir
 pub async fn create_dir(
     path: impl AsRef<std::path::Path>,
 ) -> Result<(), IOError> {
@@ -72,7 +69,6 @@ pub async fn create_dir(
         })
 }
 
-// create_dir_all
 pub async fn create_dir_all(
     path: impl AsRef<std::path::Path>,
 ) -> Result<(), IOError> {
@@ -85,7 +81,6 @@ pub async fn create_dir_all(
         })
 }
 
-// remove_dir_all
 pub async fn remove_dir_all(
     path: impl AsRef<std::path::Path>,
 ) -> Result<(), IOError> {
@@ -98,20 +93,37 @@ pub async fn remove_dir_all(
         })
 }
 
-// read_to_string
-pub async fn read_to_string(
+/// Reads a text file to a string, automatically detecting its encoding and
+/// substituting any invalid characters with the Unicode replacement character.
+///
+/// This function is best suited for reading Minecraft instance files, whose
+/// encoding may vary depending on the platform, launchers, client versions
+/// (older Minecraft versions tended to rely on the system's default codepage
+/// more on Windows platforms), and mods used, while not being highly sensitive
+/// to occasional occurrences of mojibake or character replacements.
+pub async fn read_any_encoding_to_string(
     path: impl AsRef<std::path::Path>,
-) -> Result<String, IOError> {
+) -> Result<(String, &'static encoding_rs::Encoding), IOError> {
     let path = path.as_ref();
-    tokio::fs::read_to_string(path)
-        .await
-        .map_err(|e| IOError::IOPathError {
-            source: e,
-            path: path.to_string_lossy().to_string(),
-        })
+    let file_bytes =
+        tokio::fs::read(path)
+            .await
+            .map_err(|e| IOError::IOPathError {
+                source: e,
+                path: path.to_string_lossy().to_string(),
+            })?;
+
+    let file_encoding = {
+        let mut encoding_detector = chardetng::EncodingDetector::new();
+        encoding_detector.feed(&file_bytes, true);
+        encoding_detector.guess(None, true)
+    };
+
+    let (file_string, actual_file_encoding, _) =
+        file_encoding.decode(&file_bytes);
+    Ok((file_string.to_string(), actual_file_encoding))
 }
 
-// read
 pub async fn read(
     path: impl AsRef<std::path::Path>,
 ) -> Result<Vec<u8>, IOError> {
@@ -124,7 +136,6 @@ pub async fn read(
         })
 }
 
-// write
 pub async fn write(
     path: impl AsRef<std::path::Path>,
     data: impl AsRef<[u8]>,
@@ -186,7 +197,6 @@ pub fn is_same_disk(old_dir: &Path, new_dir: &Path) -> Result<bool, IOError> {
     }
 }
 
-// rename
 pub async fn rename_or_move(
     from: impl AsRef<std::path::Path>,
     to: impl AsRef<std::path::Path>,
@@ -228,7 +238,6 @@ async fn move_recursive(from: &Path, to: &Path) -> Result<(), IOError> {
     Ok(())
 }
 
-// copy
 pub async fn copy(
     from: impl AsRef<std::path::Path>,
     to: impl AsRef<std::path::Path>,
@@ -243,7 +252,6 @@ pub async fn copy(
         })
 }
 
-// remove file
 pub async fn remove_file(
     path: impl AsRef<std::path::Path>,
 ) -> Result<(), IOError> {
@@ -256,7 +264,6 @@ pub async fn remove_file(
         })
 }
 
-// open file
 pub async fn open_file(
     path: impl AsRef<std::path::Path>,
 ) -> Result<tokio::fs::File, IOError> {
@@ -269,7 +276,6 @@ pub async fn open_file(
         })
 }
 
-// remove dir
 pub async fn remove_dir(
     path: impl AsRef<std::path::Path>,
 ) -> Result<(), IOError> {
@@ -282,7 +288,6 @@ pub async fn remove_dir(
         })
 }
 
-// metadata
 pub async fn metadata(
     path: impl AsRef<std::path::Path>,
 ) -> Result<std::fs::Metadata, IOError> {

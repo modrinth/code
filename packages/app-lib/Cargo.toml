@@ -2,13 +2,14 @@
 name = "theseus"
 version = "0.9.5"
 authors = ["Jai A <jaiagr+gpg@pm.me>"]
-edition = "2024"
+edition.workspace = true
 
 [dependencies]
 bytes.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 serde_ini.workspace = true
+serde_with.workspace = true
 sha1_smol.workspace = true
 sha2.workspace = true
 url = { workspace = true, features = ["serde"] }
@@ -20,6 +21,8 @@ tempfile.workspace = true
 dashmap = { workspace = true, features = ["serde"] }
 quick-xml = { workspace = true, features = ["async-tokio"] }
 enumset.workspace = true
+chardetng.workspace = true
+encoding_rs.workspace = true
 
 chrono = { workspace = true, features = ["serde"] }
 daedalus.workspace = true
@@ -75,3 +78,6 @@ winreg.workspace = true
 [features]
 tauri = ["dep:tauri"]
 cli = ["dep:indicatif"]
+
+[lints]
+workspace = true

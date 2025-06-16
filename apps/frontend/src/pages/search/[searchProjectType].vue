@@ -334,6 +334,7 @@ import {
   ImageIcon,
 } from "@modrinth/assets";
 import { computed } from "vue";
+import { useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import LogoAnimated from "~/components/brand/LogoAnimated.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
@@ -388,7 +389,7 @@ async function updateServerContext() {
     if (!auth.value.user) {
       router.push("/auth/sign-in?redirect=" + encodeURIComponent(route.fullPath));
     } else if (route.query.sid !== null) {
-      server.value = await usePyroServer(route.query.sid, ["general", "content"], {
+      server.value = await useModrinthServers(route.query.sid, ["general", "content"], {
         waitForModules: true,
       });
     }
@@ -519,7 +520,6 @@ async function serverInstall(project) {
 
     if (projectType.value.id === "modpack") {
       await server.value.general.reinstall(
-        server.value.serverId,
         false,
         project.project_id,
         version.id,

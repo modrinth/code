@@ -9,18 +9,19 @@
     "tsc:check": "vue-tsc --noEmit",
     "lint": "eslint . && prettier --check .",
     "fix": "eslint . --fix && prettier --write .",
-    "intl:extract": "formatjs extract \"{,src/components,src/composables,src/helpers,src/pages,src/store}/**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" --ignore '**/*.d.ts' --ignore 'node_modules' --out-file src/locales/en-US/index.json --format crowdin --preserve-whitespace"
+    "intl:extract": "formatjs extract \"{,src/components,src/composables,src/helpers,src/pages,src/store}/**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" --ignore '**/*.d.ts' --ignore 'node_modules' --out-file src/locales/en-US/index.json --format crowdin --preserve-whitespace",
+    "test": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "@geometrically/minecraft-motd-parser": "^1.1.4",
     "@modrinth/assets": "workspace:*",
     "@modrinth/ui": "workspace:*",
     "@modrinth/utils": "workspace:*",
     "@sentry/vue": "^8.27.0",
-    "@geometrically/minecraft-motd-parser": "^1.1.4",
     "@tauri-apps/api": "^2.5.0",
     "@tauri-apps/plugin-dialog": "^2.2.1",
-    "@tauri-apps/plugin-os": "^2.2.1",
     "@tauri-apps/plugin-opener": "^2.2.6",
+    "@tauri-apps/plugin-os": "^2.2.1",
     "@tauri-apps/plugin-updater": "^2.7.1",
     "@tauri-apps/plugin-window-state": "^2.2.2",
     "@vintl/vintl": "^4.4.1",
@@ -39,11 +40,12 @@
     "@eslint/compat": "^1.1.1",
     "@formatjs/cli": "^6.2.12",
     "@nuxt/eslint-config": "^0.5.6",
+    "@taijased/vue-render-tracker": "^1.0.7",
     "@vitejs/plugin-vue": "^5.0.4",
     "autoprefixer": "^10.4.19",
     "eslint": "^9.9.1",
     "eslint-config-custom": "workspace:*",
-    "eslint-plugin-turbo": "^2.1.1",
+    "eslint-plugin-turbo": "^2.5.4",
     "postcss": "^8.4.39",
     "prettier": "^3.2.5",
     "sass": "^1.74.1",
@@ -51,8 +53,7 @@
     "tsconfig": "workspace:*",
     "typescript": "^5.5.4",
     "vite": "^5.4.6",
-    "vue-tsc": "^2.1.6",
-    "@taijased/vue-render-tracker": "^1.0.7"
+    "vue-tsc": "^2.1.6"
   },
   "packageManager": "pnpm@9.4.0",
   "web-types": "../../web-types.json"

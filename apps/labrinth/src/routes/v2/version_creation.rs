@@ -283,28 +283,23 @@ async fn get_example_version_fields(
     pool: Data<PgPool>,
     redis: &RedisPool,
 ) -> Result<Option<Vec<VersionField>>, CreateError> {
-    let project_id = match project_id {
-        Some(project_id) => project_id,
-        None => return Ok(None),
+    let Some(project_id) = project_id else {
+        return Ok(None);
     };
 
-    let vid = match project_item::DBProject::get_id(
-        project_id.into(),
-        &**pool,
-        redis,
-    )
-    .await?
-    .and_then(|p| p.versions.first().cloned())
-    {
-        Some(vid) => vid,
-        None => return Ok(None),
+    let Some(vid) =
+        project_item::DBProject::get_id(project_id.into(), &**pool, redis)
+            .await?
+            .and_then(|p| p.versions.first().copied())
+    else {
+        return Ok(None);
     };
 
-    let example_version =
-        match version_item::DBVersion::get(vid, &**pool, redis).await? {
-            Some(version) => version,
-            None => return Ok(None),
-        };
+    let Some(example_version) =
+        version_item::DBVersion::get(vid, &**pool, redis).await?
+    else {
+        return Ok(None);
+    };
     Ok(Some(example_version.version_fields))
 }
 

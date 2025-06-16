@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use std::io::{Cursor, Write};
 
 use crate::{
@@ -28,7 +27,6 @@ use super::{database::USER_USER_ID, get_json_val_str};
 
 pub const DUMMY_DATA_UPDATE: i64 = 7;
 
-#[allow(dead_code)]
 pub const DUMMY_CATEGORIES: &[&str] = &[
     "combat",
     "decoration",
@@ -41,7 +39,6 @@ pub const DUMMY_CATEGORIES: &[&str] = &[
 
 pub const DUMMY_OAUTH_CLIENT_ALPHA_SECRET: &str = "abcdefghijklmnopqrstuvwxyz";
 
-#[allow(dead_code)]
 #[derive(Clone)]
 pub enum TestFile {
     DummyProjectAlpha,
@@ -173,7 +170,6 @@ impl TestFile {
 }
 
 #[derive(Clone)]
-#[allow(dead_code)]
 pub enum DummyImage {
     SmallIcon, // 200x200
 }

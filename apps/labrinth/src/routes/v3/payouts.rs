@@ -830,14 +830,13 @@ async fn get_user_balance(
     .fetch_optional(pool)
     .await?;
 
-    let (withdrawn, fees) = withdrawn
-        .map(|x| {
+    let (withdrawn, fees) =
+        withdrawn.map_or((Decimal::ZERO, Decimal::ZERO), |x| {
             (
                 x.amount.unwrap_or(Decimal::ZERO),
                 x.fee.unwrap_or(Decimal::ZERO),
             )
-        })
-        .unwrap_or((Decimal::ZERO, Decimal::ZERO));
+        });
 
     Ok(UserBalance {
         available: available.round_dp(16)

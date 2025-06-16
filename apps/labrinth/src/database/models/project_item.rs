@@ -545,7 +545,7 @@ impl DBProject {
                 let mut exec = exec.acquire().await?;
                 let project_ids_parsed: Vec<i64> = ids
                     .iter()
-                    .flat_map(|x| parse_base62(&x.to_string()).ok())
+                    .filter_map(|x| parse_base62(&x.to_string()).ok())
                     .map(|x| x as i64)
                     .collect();
                 let slugs = ids
@@ -723,7 +723,7 @@ impl DBProject {
 
                         // Add loader fields to the set we need to fetch
                         let loader_loader_field_ids = m.loader_fields.unwrap_or_default().into_iter().map(LoaderFieldId).collect::<Vec<_>>();
-                        for loader_field_id in loader_loader_field_ids.iter() {
+                        for loader_field_id in &loader_loader_field_ids {
                             loader_field_ids.insert(*loader_field_id);
                         }
 

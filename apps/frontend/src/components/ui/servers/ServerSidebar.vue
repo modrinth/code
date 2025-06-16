@@ -34,15 +34,15 @@
 <script setup lang="ts">
 import { RightArrowIcon } from "@modrinth/assets";
 import type { RouteLocationNormalized } from "vue-router";
-import type { Server } from "~/composables/pyroServers";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const emit = defineEmits(["reinstall"]);
 
 defineProps<{
   navLinks: { label: string; href: string; icon: Component; external?: boolean }[];
   route: RouteLocationNormalized;
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: ModrinthServer;
   backupInProgress?: BackupInProgressReason;
 }>();
 

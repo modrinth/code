@@ -256,13 +256,11 @@ pub async fn organization_get(
             .filter(|x| {
                 logged_in
                     || x.accepted
-                    || user_id
-                        .map(|y: crate::database::models::DBUserId| {
-                            y == x.user_id
-                        })
-                        .unwrap_or(false)
+                    || user_id.is_some_and(
+                        |y: crate::database::models::DBUserId| y == x.user_id,
+                    )
             })
-            .flat_map(|data| {
+            .filter_map(|data| {
                 users.iter().find(|x| x.id == data.user_id).map(|user| {
                     crate::models::teams::TeamMember::from(
                         data,
@@ -345,13 +343,11 @@ pub async fn organizations_get(
             .filter(|x| {
                 logged_in
                     || x.accepted
-                    || user_id
-                        .map(|y: crate::database::models::DBUserId| {
-                            y == x.user_id
-                        })
-                        .unwrap_or(false)
+                    || user_id.is_some_and(
+                        |y: crate::database::models::DBUserId| y == x.user_id,
+                    )
             })
-            .flat_map(|data| {
+            .filter_map(|data| {
                 users.iter().find(|x| x.id == data.user_id).map(|user| {
                     crate::models::teams::TeamMember::from(
                         data,
@@ -635,7 +631,7 @@ pub async fn organization_delete(
     .try_collect::<Vec<_>>()
     .await?;
 
-    for organization_project_team in organization_project_teams.iter() {
+    for organization_project_team in &organization_project_teams {
         let new_id = crate::database::models::ids::generate_team_member_id(
             &mut transaction,
         )

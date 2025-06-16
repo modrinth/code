@@ -247,9 +247,13 @@ pub struct WindowSize(pub u16, pub u16);
 
 /// Game initialization hooks
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde_with::serde_as]
 pub struct Hooks {
+    #[serde_as(as = "serde_with::NoneAsEmptyString")]
     pub pre_launch: Option<String>,
+    #[serde_as(as = "serde_with::NoneAsEmptyString")]
     pub wrapper: Option<String>,
+    #[serde_as(as = "serde_with::NoneAsEmptyString")]
     pub post_exit: Option<String>,
 }
 

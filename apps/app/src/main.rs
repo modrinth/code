@@ -197,7 +197,7 @@ fn main() {
             {
                 let payload = macos::deep_link::get_or_init_payload(app);
 
-                let mtx_copy = payload.payload.clone();
+                let mtx_copy = payload.payload;
                 app.listen("deep-link://new-url", move |url| {
                     let mtx_copy_copy = mtx_copy.clone();
                     let request = url.payload().to_owned();
@@ -229,7 +229,6 @@ fn main() {
                 tauri::async_runtime::spawn(api::utils::handle_command(
                     payload,
                 ));
-                dbg!(url);
             });
 
             #[cfg(not(target_os = "linux"))]
@@ -273,22 +272,22 @@ fn main() {
 
     match app {
         Ok(app) => {
-            #[allow(unused_variables)]
             app.run(|app, event| {
+                #[cfg(not(target_os = "macos"))]
+                drop((app, event));
                 #[cfg(target_os = "macos")]
                 if let tauri::RunEvent::Opened { urls } = event {
                     tracing::info!("Handling webview open {urls:?}");
 
                     let file = urls
                         .into_iter()
-                        .filter_map(|url| url.to_file_path().ok())
-                        .next();
+                        .find_map(|url| url.to_file_path().ok());
 
                     if let Some(file) = file {
                         let payload =
                             macos::deep_link::get_or_init_payload(app);
 
-                        let mtx_copy = payload.payload.clone();
+                        let mtx_copy = payload.payload;
                         let request = file.to_string_lossy().to_string();
                         tauri::async_runtime::spawn(async move {
                             let mut payload = mtx_copy.lock().await;
