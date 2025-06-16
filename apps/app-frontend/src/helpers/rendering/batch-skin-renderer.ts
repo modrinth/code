@@ -30,6 +30,7 @@ class BatchSkinRenderer {
 
     this.renderer.outputColorSpace = THREE.SRGBColorSpace
     this.renderer.toneMapping = THREE.NoToneMapping
+    this.renderer.toneMappingExposure = 10.0
     this.renderer.setClearColor(0x000000, 0)
     this.renderer.setSize(width, height)
 
@@ -37,7 +38,11 @@ class BatchSkinRenderer {
     this.camera = new THREE.PerspectiveCamera(20, width / height, 0.4, 1000)
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 2)
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2)
+    directionalLight.castShadow = false
+    directionalLight.position.set(2, 4, 3)
     this.scene.add(ambientLight)
+    this.scene.add(directionalLight)
   }
 
   public async renderSkin(
@@ -59,8 +64,8 @@ class BatchSkinRenderer {
       throw new Error("Failed to find 'Head' object in model.")
     }
 
-    const frontCameraPos: [number, number, number] = [2, 1, 6.0]
-    const backCameraPos: [number, number, number] = [2, 1, -2.5]
+    const frontCameraPos: [number, number, number] = [-1.3, 1, 6.3]
+    const backCameraPos: [number, number, number] = [-1.3, 1, -2.5]
 
     const forwards = await this.renderView(frontCameraPos, lookAtTarget)
     const backwards = await this.renderView(backCameraPos, lookAtTarget)

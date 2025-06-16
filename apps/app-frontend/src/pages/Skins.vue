@@ -148,6 +148,9 @@ async function changeSkin(newSkin: Skin) {
 
   try {
     await equip_skin(newSkin)
+    if (accountsCard.value) {
+      await accountsCard.value.refreshValues()
+    }
   } catch (error) {
     selectedSkin.value = previousSkin
     skins.value = previousSkinsList

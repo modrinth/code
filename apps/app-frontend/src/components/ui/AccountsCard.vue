@@ -9,9 +9,7 @@
     <Avatar
       size="36px"
       :src="
-        selectedAccount
-          ? `https://mc-heads.net/avatar/${selectedAccount.profile.id}/128`
-          : 'https://launcher-files.modrinth.com/assets/steve_head.png'
+        selectedAccount ? avatarUrl : 'https://launcher-files.modrinth.com/assets/steve_head.png'
       "
     />
     <div class="flex flex-col w-full">
@@ -58,7 +56,14 @@
       <div v-if="displayAccounts.length > 0" class="account-group">
         <div v-for="account in displayAccounts" :key="account.profile.id" class="account-row">
           <Button class="option account" @click="setAccount(account)">
-            <Avatar :src="`https://mc-heads.net/avatar/${account.profile.id}/128`" class="icon" />
+            <Avatar
+              :src="
+                account.profile.id == selectedAccount.profile.id
+                  ? avatarUrl
+                  : `https://mc-heads.net/avatar/${account.profile.id}/128`
+              "
+              class="icon"
+            />
             <p>{{ account.profile.name }}</p>
           </Button>
           <Button v-tooltip="'Log out'" icon-only @click="logout(account.profile.id)">
@@ -89,6 +94,7 @@ import { handleError } from '@/store/state.js'
 import { trackEvent } from '@/helpers/analytics'
 import { process_listener } from '@/helpers/events'
 import { handleSevereError } from '@/store/error.js'
+import { get_available_skins } from '@/helpers/skins'
 
 defineProps({
   mode: {
@@ -103,10 +109,18 @@ const emit = defineEmits(['change'])
 const accounts = ref({})
 const loginDisabled = ref(false)
 const defaultUser = ref()
+const equippedSkin = ref(null)
 
 async function refreshValues() {
   defaultUser.value = await get_default_user().catch(handleError)
   accounts.value = await users().catch(handleError)
+
+  try {
+    const skins = await get_available_skins()
+    equippedSkin.value = skins.find((skin) => skin.is_equipped)
+  } catch {
+    equippedSkin.value = null
+  }
 }
 
 function setLoginDisabled(value) {
@@ -123,6 +137,13 @@ await refreshValues()
 const displayAccounts = computed(() =>
   accounts.value.filter((account) => defaultUser.value !== account.profile.id),
 )
+
+const avatarUrl = computed(() => {
+  if (equippedSkin.value?.texture_key) {
+    return `https://mc-heads.net/avatar/${equippedSkin.value.texture_key}/128`
+  }
+  return `https://mc-heads.net/avatar/${selectedAccount.value.profile.id}/128`
+})
 
 const selectedAccount = computed(() =>
   accounts.value.find((account) => account.profile.id === defaultUser.value),

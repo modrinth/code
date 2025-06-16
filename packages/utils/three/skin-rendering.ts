@@ -71,6 +71,7 @@ export function applyTexture(model: THREE.Object3D, texture: THREE.Texture): voi
           mat.metalness = 0
           mat.color.set(0xffffff)
           mat.toneMapped = false
+          mat.flatShading = true
           mat.roughness = 1
           mat.needsUpdate = true
           mat.depthTest = true
@@ -100,6 +101,7 @@ export function applyCapeTexture(
           mat.metalness = 0
           mat.color.set(0xffffff)
           mat.toneMapped = false
+          mat.flatShading = true
           mat.roughness = 1
           mat.needsUpdate = true
           mat.depthTest = true

@@ -17,7 +17,7 @@
       class="absolute top-[18%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md pointer-events-none z-10 font-minecraft nametag-bg transition-all duration-200"
       :style="{ fontSize: nametagFontSize }"
     >
-      {{ nametag }}
+      {{ nametagText }}
     </div>
 
     <TresCanvas
@@ -28,6 +28,7 @@
       :renderer-options="{
         outputColorSpace: THREE.SRGBColorSpace,
         toneMapping: THREE.NoToneMapping,
+        toneMappingExposure: 10.0,
       }"
       @pointerdown="onPointerDown"
       @pointermove="onPointerMove"
@@ -47,12 +48,12 @@
           <TresMesh
             :position="[0, -0.095 * scale, 2]"
             :rotation="[-Math.PI / 2, 0, 0]"
-            :scale="[0.4 * scale, 0.4 * scale, 0.4 * scale]"
+            :scale="[0.5 * 0.75 * scale, 0.5 * 0.75 * scale, 0.5 * 0.75 * scale]"
           >
-            <TresCircleGeometry :args="[1, 32]" />
+            <TresCircleGeometry :args="[1, 128]" />
             <TresMeshBasicMaterial
               color="#000000"
-              :opacity="0.3"
+              :opacity="0.2"
               transparent
               :depth-write="false"
             />
@@ -63,7 +64,7 @@
             :rotation="[-Math.PI / 2, 0, 0]"
             :scale="[0.75 * scale, 0.75 * scale, 0.75 * scale]"
           >
-            <TresPlaneGeometry :args="[2, 2]" />
+            <TresCircleGeometry :args="[1, 128]" />
             <TresMeshBasicMaterial
               :map="radialTexture"
               transparent
@@ -82,6 +83,7 @@
       />
 
       <TresAmbientLight :intensity="2" />
+      <TresDirectionalLight :position="[2, 4, 3]" :intensity="1.2" :cast-shadow="false" />
     </TresCanvas>
 
     <div v-if="!isReady" class="w-full h-full flex items-center justify-center">
@@ -161,9 +163,9 @@ const nametagText = computed(() => props.nametag)
 const { fontSize: nametagFontSize } = useDynamicFontSize({
   containerElement: skinPreviewContainer,
   text: nametagText,
-  baseFontSize: 2,
+  baseFontSize: 1.8,
   minFontSize: 1.25,
-  maxFontSize: 4,
+  maxFontSize: 2,
   padding: 24,
   fontFamily: 'inherit',
 })
@@ -190,6 +192,7 @@ const actions = ref<Record<string, THREE.AnimationAction>>({})
 const clock = new THREE.Clock()
 const currentAnimation = ref<string>('')
 const randomAnimationTimer = ref<number | null>(null)
+const lastRandomAnimation = ref<string>('')
 
 const { baseAnimation, randomAnimations } = toRefs(props.animationConfig)
 
@@ -282,18 +285,36 @@ function playAnimation(name: string) {
 function setupRandomAnimationLoop() {
   const interval = props.animationConfig.randomAnimationInterval || 10000
 
-  randomAnimationTimer.value = window.setInterval(() => {
-    if (randomAnimations.value.length > 0) {
-      if (currentAnimation.value === baseAnimation.value) {
-        const randomIndex = Math.floor(Math.random() * randomAnimations.value.length)
-        const randomAnimationName = randomAnimations.value[randomIndex]
+  function scheduleNextAnimation() {
+    if (randomAnimationTimer.value) {
+      clearTimeout(randomAnimationTimer.value)
+    }
+
+    randomAnimationTimer.value = window.setTimeout(() => {
+      if (randomAnimations.value.length > 0 && currentAnimation.value === baseAnimation.value) {
+        const availableAnimations = randomAnimations.value.filter(
+          (anim) => anim !== lastRandomAnimation.value,
+        )
+
+        // If all animations have been used, reset and use the full list
+        const animationsToChooseFrom =
+          availableAnimations.length > 0 ? availableAnimations : randomAnimations.value
+
+        const randomIndex = Math.floor(Math.random() * animationsToChooseFrom.length)
+        const randomAnimationName = animationsToChooseFrom[randomIndex]
 
         if (actions.value[randomAnimationName]) {
+          lastRandomAnimation.value = randomAnimationName
           playRandomAnimation(randomAnimationName)
         }
+      } else {
+        // If not in base animation, wait and try again
+        scheduleNextAnimation()
       }
-    }
-  }, interval)
+    }, interval)
+  }
+
+  scheduleNextAnimation()
 }
 
 function playRandomAnimation(name: string) {
@@ -334,6 +355,9 @@ function playRandomAnimation(name: string) {
         baseAction.fadeIn(transitionDuration)
         baseAction.play()
         currentAnimation.value = baseAnimation.value
+
+        // Schedule the next random animation after returning to base
+        setupRandomAnimationLoop()
       }
     }
   }
@@ -528,7 +552,7 @@ function createRadialTexture(size: number): THREE.CanvasTexture {
   canvas.width = canvas.height = size
   const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
   const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
-  grad.addColorStop(0, 'rgba(119,119,119,0.15)')
+  grad.addColorStop(0, 'rgba(119,119,119,0.1)')
   grad.addColorStop(0.9, 'rgba(255,255,255,0)')
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, size, size)
@@ -578,7 +602,7 @@ watch(
   () => props.animationConfig,
   (newConfig) => {
     if (randomAnimationTimer.value) {
-      clearInterval(randomAnimationTimer.value)
+      clearTimeout(randomAnimationTimer.value)
       randomAnimationTimer.value = null
     }
 
@@ -612,7 +636,7 @@ onBeforeMount(async () => {
 
 onUnmounted(() => {
   if (randomAnimationTimer.value) {
-    clearInterval(randomAnimationTimer.value)
+    clearTimeout(randomAnimationTimer.value)
   }
 
   if (mixer.value) {
