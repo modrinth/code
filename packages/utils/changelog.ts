@@ -14,7 +14,8 @@ const VERSIONS: VersionEntry[] = [
     date: `2025-06-16T11:00:00-07:00`,
     product: 'web',
     body: `### Improvements
-- Rolled out hotfixes with the previous days' updates.`,
+- Rolled out hotfixes with the previous days' updates.
+- Failed subscriptions can now be cancelled.`,
   },
   {
     date: `2025-06-16T11:00:00-07:00`,
