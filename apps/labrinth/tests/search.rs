@@ -52,8 +52,11 @@ async fn search_projects() {
                     vec![1, 2, 3, 4],
                 ),
                 (json!([["project_types:modpack"]]), vec![4]),
-                (json!([["client_only:true"]]), vec![0, 2, 3, 7, 9]),
-                (json!([["server_only:true"]]), vec![0, 2, 3, 6, 7]),
+                (json!([["environment:server_only"]]), vec![0, 2, 3]),
+                (
+                    json!([["environment:client_or_server_prefers_both"]]),
+                    vec![6, 7],
+                ),
                 (json!([["open_source:true"]]), vec![0, 1, 2, 4, 5, 6, 7, 9]),
                 (json!([["license:MIT"]]), vec![1, 2, 4, 9]),
                 (json!([[r#"name:'Mysterious Project'"#]]), vec![2, 3]),

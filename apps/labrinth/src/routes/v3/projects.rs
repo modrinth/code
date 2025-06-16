@@ -17,6 +17,7 @@ use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
     MonetizationStatus, Project, ProjectStatus, SearchRequest,
+    SideTypesMigrationReviewStatus,
 };
 use crate::models::teams::ProjectPermissions;
 use crate::models::threads::MessageBody;
@@ -247,6 +248,8 @@ pub struct EditProject {
     #[validate(length(max = 65536))]
     pub moderation_message_body: Option<Option<String>>,
     pub monetization_status: Option<MonetizationStatus>,
+    pub side_types_migration_review_status:
+        Option<SideTypesMigrationReviewStatus>,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -838,6 +841,29 @@ pub async fn project_edit(
             WHERE (id = $2)
             ",
             monetization_status.as_str(),
+            id as db_ids::DBProjectId,
+        )
+        .execute(&mut *transaction)
+        .await?;
+    }
+
+    if let Some(side_types_migration_review_status) =
+        &new_project.side_types_migration_review_status
+    {
+        if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
+            return Err(ApiError::CustomAuthentication(
+                "You do not have the permissions to edit the side types migration review status of this project!"
+                    .to_string(),
+            ));
+        }
+
+        sqlx::query!(
+            "
+            UPDATE mods
+            SET side_types_migration_review_status = $1
+            WHERE id = $2
+            ",
+            side_types_migration_review_status.as_str(),
             id as db_ids::DBProjectId,
         )
         .execute(&mut *transaction)

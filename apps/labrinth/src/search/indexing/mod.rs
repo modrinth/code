@@ -350,11 +350,8 @@ const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
     "color",
     // Note: loader fields are not here, but are added on as they are needed (so they can be dynamically added depending on which exist).
     // TODO: remove these- as they should be automatically populated. This is a band-aid fix.
-    "server_only",
-    "client_only",
+    "environment",
     "game_versions",
-    "singleplayer",
-    "client_and_server",
     "mrpack_loaders",
     // V2 legacy fields for logical consistency
     "client_side",
@@ -397,11 +394,8 @@ const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
     "color",
     // Note: loader fields are not here, but are added on as they are needed (so they can be dynamically added depending on which exist).
     // TODO: remove these- as they should be automatically populated. This is a band-aid fix.
-    "server_only",
-    "client_only",
+    "environment",
     "game_versions",
-    "singleplayer",
-    "client_and_server",
     "mrpack_loaders",
     // V2 legacy fields for logical consistency
     "client_side",
