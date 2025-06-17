@@ -244,7 +244,7 @@ impl AutomatedModerationQueue {
                                 version_specific: HashMap::new(),
                             };
 
-                            if project.project_types.iter().any(|x| ["mod", "modpack"].contains(&&**x)) && !project.aggregate_version_fields.iter().any(|x| ["server_only", "client_only", "client_and_server", "singleplayer"].contains(&&*x.field_name)) {
+                            if project.project_types.iter().any(|x| ["mod", "modpack"].contains(&&**x)) && !project.aggregate_version_fields.iter().any(|x| x.field_name == "environment") {
                                 mod_messages.messages.push(ModerationMessage::NoSideTypes);
                             }
 

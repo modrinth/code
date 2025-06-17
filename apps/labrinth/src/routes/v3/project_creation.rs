@@ -12,7 +12,8 @@ use crate::models::ids::{ImageId, OrganizationId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    License, Link, MonetizationStatus, ProjectStatus, VersionStatus,
+    License, Link, MonetizationStatus, ProjectStatus,
+    SideTypesMigrationReviewStatus, VersionStatus,
 };
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
@@ -901,6 +902,9 @@ async fn project_create_inner(
             color: project_builder.color,
             thread_id: thread_id.into(),
             monetization_status: MonetizationStatus::Monetized,
+            // New projects are considered reviewed with respect to side types migrations
+            side_types_migration_review_status:
+                SideTypesMigrationReviewStatus::Reviewed,
             fields: HashMap::new(), // Fields instantiate to empty
         };
 

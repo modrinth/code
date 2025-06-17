@@ -362,7 +362,7 @@ pub async fn index_local(
                 let (_, v2_og_project_type) =
                     LegacyProject::get_project_type(&project_types);
                 let (client_side, server_side) =
-                    v2_reroute::convert_side_types_v2(
+                    v2_reroute::convert_v3_side_types_to_v2_side_types(
                         &unvectorized_loader_fields,
                         Some(&v2_og_project_type),
                     );

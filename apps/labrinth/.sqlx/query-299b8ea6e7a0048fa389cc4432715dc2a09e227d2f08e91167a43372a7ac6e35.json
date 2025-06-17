@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                DELETE FROM mods_categories\n                WHERE joining_mod_id = $1 AND is_additional = FALSE\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "299b8ea6e7a0048fa389cc4432715dc2a09e227d2f08e91167a43372a7ac6e35"
+}

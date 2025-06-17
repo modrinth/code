@@ -11,6 +11,20 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-06-16T11:00:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Rolled out hotfixes with the previous days' updates.
+- Failed subscriptions can now be cancelled.`,
+  },
+  {
+    date: `2025-06-16T11:00:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Improved error handling.
+- Rolled out hotfixes with the previous days' updates.'`,
+  },
+  {
     date: `2025-06-15T16:25:00-07:00`,
     product: 'servers',
     body: `### Improvements
