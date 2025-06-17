@@ -671,7 +671,7 @@ pub async fn organization_delete(
         database::models::DBTeamMember::clear_cache(team_id, &redis).await?;
     }
 
-    if !organization_project_teams.is_empty {
+    if !organization_project_teams.is_empty() {
         database::models::DBUser::clear_project_cache(&[owner_id], &redis)
             .await?;
     }
