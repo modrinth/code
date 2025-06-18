@@ -30,7 +30,9 @@
       "providerShortName": null,
       "signingIdentity": null
     },
-    "resources": [],
+    "resources": {
+      "../../packages/app-lib/library/*.class": "library/"
+    },
     "shortDescription": "",
     "linux": {
       "deb": {

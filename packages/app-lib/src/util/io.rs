@@ -2,7 +2,6 @@
 // A wrapper around the tokio IO functions that adds the path to the error message, instead of the uninformative std::io::Error.
 
 use std::{io::Write, path::Path};
-
 use tempfile::NamedTempFile;
 use tokio::task::spawn_blocking;
 
@@ -298,4 +297,73 @@ pub async fn metadata(
             source: e,
             path: path.to_string_lossy().to_string(),
         })
+}
+
+/// Gets a resource file from the executable. Returns `theseus::Result<(value_to_keep_alive, PathBuf)>`.
+#[macro_export]
+macro_rules! get_resource_file {
+    (
+        $file_name:literal,
+        tauri_base_dir: $tauri_base_dir:literal,
+        include_bytes_dir: $include_bytes_dir:literal,
+    ) => {
+        'get_resource_file: {
+            #[cfg(feature = "tauri")]
+            {
+                let state = match $crate::EventState::get() {
+                    Ok(state) => state,
+                    Err(e) => break 'get_resource_file $crate::Result::Err(e),
+                };
+                let path_resolver = tauri::Manager::path(&state.app);
+                let path = match path_resolver.resolve(
+                    concat!($tauri_base_dir, "/", $file_name),
+                    tauri::path::BaseDirectory::Resource,
+                ) {
+                    Ok(path) => path,
+                    Err(e) => {
+                        break 'get_resource_file $crate::Result::Err(e.into());
+                    }
+                };
+                let path = match $crate::util::io::canonicalize(path) {
+                    Ok(path) => path,
+                    Err(e) => {
+                        break 'get_resource_file $crate::Result::Err(e.into());
+                    }
+                };
+                $crate::Result::Ok(((), path))
+            }
+
+            #[cfg(not(feature = "tauri"))]
+            {
+                let dir = match tempfile::tempdir() {
+                    Ok(dir) => dir,
+                    Err(e) => {
+                        break 'get_resource_file $crate::Result::Err(
+                            $crate::util::io::IOError::from(e).into(),
+                        );
+                    }
+                };
+                let path = dir.path().join($file_name);
+                let path = match $crate::util::io::canonicalize(path) {
+                    Ok(path) => path,
+                    Err(e) => {
+                        break 'get_resource_file $crate::Result::Err(e.into());
+                    }
+                };
+                if let Err(e) = $crate::util::io::write(
+                    &path,
+                    include_bytes!(concat!(
+                        $include_bytes_dir,
+                        "/",
+                        $file_name
+                    )),
+                )
+                .await
+                {
+                    break 'get_resource_file $crate::Result::Err(e.into());
+                }
+                $crate::Result::Ok((dir, path))
+            }
+        }
+    };
 }

@@ -7,7 +7,7 @@ use std::process::Command;
 use std::{collections::HashSet, path::Path};
 use tokio::task::JoinError;
 
-use crate::State;
+use crate::{State, get_resource_file};
 #[cfg(target_os = "windows")]
 use winreg::{
     RegKey,
@@ -273,12 +273,13 @@ pub async fn check_java_at_filepath(path: &Path) -> Option<JavaVersion> {
         return None;
     };
 
-    let bytes = include_bytes!("../../library/JavaInfo.class");
-    let Ok(tempdir) = tempfile::tempdir() else {
+    let Ok((_temp, file_path)) = get_resource_file!(
+        "JavaInfo.class",
+        tauri_base_dir: "library",
+        include_bytes_dir: "../../library",
+    ) else {
         return None;
     };
-    let file_path = tempdir.path().join("JavaInfo.class");
-    io::write(&file_path, bytes).await.ok()?;
 
     let output = Command::new(&java)
         .arg("-cp")
