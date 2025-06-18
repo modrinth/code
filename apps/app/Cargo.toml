@@ -16,7 +16,7 @@ serde_json.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_with.workspace = true
 
-tauri = { workspace = true, features = ["devtools", "macos-private-api", "protocol-asset", "unstable"] }
+tauri = { workspace = true, features = ["devtools", "macos-private-api", "protocol-asset"] }
 tauri-plugin-window-state.workspace = true
 tauri-plugin-deep-link.workspace = true
 tauri-plugin-os.workspace = true
