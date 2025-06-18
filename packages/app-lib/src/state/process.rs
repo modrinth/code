@@ -1,19 +1,20 @@
 use crate::event::emit::{emit_process, emit_profile};
 use crate::event::{ProcessPayloadType, ProfilePayloadType};
 use crate::profile;
-use crate::util::io::IOError;
+use crate::util::io::{IOError, ResourceFileKeepAlive};
 use chrono::{DateTime, TimeZone, Utc};
 use dashmap::DashMap;
 use quick_xml::Reader;
 use quick_xml::events::Event;
 use serde::Deserialize;
 use serde::Serialize;
+use std::fmt::Debug;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::ExitStatus;
 use tokio::io::{AsyncBufReadExt, BufReader};
-use tokio::process::{Child, Command};
+use tokio::process::{Child, ChildStdin, Command};
 use uuid::Uuid;
 
 const LAUNCHER_LOG_PATH: &str = "launcher_log.txt";
@@ -35,6 +36,7 @@ impl ProcessManager {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn insert_new_process(
         &self,
         profile_path: &str,
@@ -42,23 +44,41 @@ impl ProcessManager {
         post_exit_command: Option<String>,
         logs_folder: PathBuf,
         xml_logging: bool,
+        main_class_keep_alive: ResourceFileKeepAlive,
+        post_process_init: impl AsyncFnOnce(
+            &ProcessMetadata,
+            &mut ChildStdin,
+        ) -> crate::Result<()>,
     ) -> crate::Result<ProcessMetadata> {
         mc_command.stdout(std::process::Stdio::piped());
         mc_command.stderr(std::process::Stdio::piped());
+        mc_command.stdin(std::process::Stdio::piped());
 
         let mut mc_proc = mc_command.spawn().map_err(IOError::from)?;
 
         let stdout = mc_proc.stdout.take();
         let stderr = mc_proc.stderr.take();
 
-        let process = Process {
+        let mut process = Process {
             metadata: ProcessMetadata {
                 uuid: Uuid::new_v4(),
                 start_time: Utc::now(),
                 profile_path: profile_path.to_string(),
             },
             child: mc_proc,
+            _main_class_keep_alive: main_class_keep_alive,
         };
+
+        if let Err(e) = post_process_init(
+            &process.metadata,
+            &mut process.child.stdin.as_mut().unwrap(),
+        )
+        .await
+        {
+            tracing::error!("Failed to run post-process init: {e}");
+            let _ = process.child.kill().await;
+            return Err(e);
+        }
 
         let metadata = process.metadata.clone();
 
@@ -193,6 +213,7 @@ pub struct ProcessMetadata {
 struct Process {
     metadata: ProcessMetadata,
     child: Child,
+    _main_class_keep_alive: ResourceFileKeepAlive,
 }
 
 #[derive(Debug, Default)]

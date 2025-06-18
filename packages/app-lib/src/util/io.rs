@@ -299,7 +299,12 @@ pub async fn metadata(
         })
 }
 
-/// Gets a resource file from the executable. Returns `theseus::Result<(value_to_keep_alive, PathBuf)>`.
+#[cfg(feature = "tauri")]
+pub type ResourceFileKeepAlive = ();
+#[cfg(not(feature = "tauri"))]
+pub type ResourceFileKeepAlive = tempfile::TempDir;
+
+/// Gets a resource file from the executable. Returns `theseus::Result<(ResourceFileKeepAlive, PathBuf)>`.
 #[macro_export]
 macro_rules! get_resource_file {
     (
