@@ -127,58 +127,63 @@ export class ModrinthServer {
           return dataURL;
         }
       } catch (error) {
-        if (error instanceof ModrinthServerError && error.statusCode === 404 && iconUrl) {
-          // Handle external icon processing
-          try {
-            const response = await fetch(iconUrl);
-            if (!response.ok) throw new Error("Failed to fetch icon");
-            const file = await response.blob();
-            const originalFile = new File([file], "server-icon-original.png", {
-              type: "image/png",
-            });
-
-            if (import.meta.client) {
-              const dataURL = await new Promise<string>((resolve) => {
-                const canvas = document.createElement("canvas");
-                const ctx = canvas.getContext("2d");
-                const img = new Image();
-                img.onload = () => {
-                  canvas.width = 64;
-                  canvas.height = 64;
-                  ctx?.drawImage(img, 0, 0, 64, 64);
-                  canvas.toBlob(async (blob) => {
-                    if (blob) {
-                      const scaledFile = new File([blob], "server-icon.png", { type: "image/png" });
-                      await useServersFetch(`/create?path=/server-icon.png&type=file`, {
-                        method: "POST",
-                        contentType: "application/octet-stream",
-                        body: scaledFile,
-                        override: auth,
-                      });
-                      await useServersFetch(`/create?path=/server-icon-original.png&type=file`, {
-                        method: "POST",
-                        contentType: "application/octet-stream",
-                        body: originalFile,
-                        override: auth,
-                      });
-                    }
-                  }, "image/png");
-                  const dataURL = canvas.toDataURL("image/png");
-                  sharedImage.value = dataURL;
-                  resolve(dataURL);
-                  URL.revokeObjectURL(img.src);
-                };
-                img.src = URL.createObjectURL(file);
+        if (error instanceof ModrinthServerError && error.statusCode === 404) {
+          if (iconUrl) {
+            try {
+              const response = await fetch(iconUrl);
+              if (!response.ok) throw new Error("Failed to fetch icon");
+              const file = await response.blob();
+              const originalFile = new File([file], "server-icon-original.png", {
+                type: "image/png",
               });
-              return dataURL;
+
+              if (import.meta.client) {
+                const dataURL = await new Promise<string>((resolve) => {
+                  const canvas = document.createElement("canvas");
+                  const ctx = canvas.getContext("2d");
+                  const img = new Image();
+                  img.onload = () => {
+                    canvas.width = 64;
+                    canvas.height = 64;
+                    ctx?.drawImage(img, 0, 0, 64, 64);
+                    canvas.toBlob(async (blob) => {
+                      if (blob) {
+                        const scaledFile = new File([blob], "server-icon.png", {
+                          type: "image/png",
+                        });
+                        await useServersFetch(`/create?path=/server-icon.png&type=file`, {
+                          method: "POST",
+                          contentType: "application/octet-stream",
+                          body: scaledFile,
+                          override: auth,
+                        });
+                        await useServersFetch(`/create?path=/server-icon-original.png&type=file`, {
+                          method: "POST",
+                          contentType: "application/octet-stream",
+                          body: originalFile,
+                          override: auth,
+                        });
+                      }
+                    }, "image/png");
+                    const dataURL = canvas.toDataURL("image/png");
+                    sharedImage.value = dataURL;
+                    resolve(dataURL);
+                    URL.revokeObjectURL(img.src);
+                  };
+                  img.src = URL.createObjectURL(file);
+                });
+                return dataURL;
+              }
+            } catch (externalError: any) {
+              console.debug("Could not process external icon:", externalError.message);
             }
-          } catch (error) {
-            console.error("Failed to process external icon:", error);
           }
+        } else {
+          throw error;
         }
       }
-    } catch (error) {
-      console.error("Failed to process server icon:", error);
+    } catch (error: any) {
+      console.debug("Icon processing failed:", error.message);
     }
 
     sharedImage.value = undefined;
@@ -253,6 +258,18 @@ export class ModrinthServer {
             await this.scheduling.fetch();
         }
       } catch (error) {
+        if (error instanceof ModrinthServerError) {
+          if (error.statusCode === 404 && ["fs", "content"].includes(module)) {
+            console.debug(`Optional ${module} resource not found:`, error.message);
+            continue;
+          }
+
+          if (error.statusCode === 503) {
+            console.debug(`Temporary ${module} unavailable:`, error.message);
+            continue;
+          }
+        }
+
         this.errors[module] = {
           error:
             error instanceof ModrinthServerError

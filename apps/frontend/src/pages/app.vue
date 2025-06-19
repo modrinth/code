@@ -8,13 +8,11 @@ import {
   DownloadIcon,
   LinkIcon,
 } from "@modrinth/assets";
-import Avatar from "~/components/ui/Avatar.vue";
+import { Avatar, Checkbox, Badge } from "@modrinth/ui";
 import LogoAnimated from "~/components/brand/LogoAnimated.vue";
-import Badge from "~/components/ui/Badge.vue";
 import PrismIcon from "~/assets/images/external/prism.svg?component";
 import ATLauncher from "~/assets/images/external/atlauncher.svg?component";
 import CurseForge from "~/assets/images/external/curseforge.svg?component";
-import Checkbox from "~/components/ui/Checkbox.vue";
 
 import { homePageProjects } from "~/generated/state.json";
 

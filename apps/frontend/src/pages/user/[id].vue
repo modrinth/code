@@ -355,6 +355,7 @@ import {
   GlobeIcon,
 } from "@modrinth/assets";
 import {
+  Avatar,
   OverflowMenu,
   ButtonStyled,
   ContentPageHeader,
@@ -377,7 +378,6 @@ import BetaTesterBadge from "~/assets/images/badges/beta-tester.svg?component";
 
 import UpToDate from "~/assets/images/illustrations/up_to_date.svg?component";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
-import Avatar from "~/components/ui/Avatar.vue";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
