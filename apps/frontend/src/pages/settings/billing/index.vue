@@ -592,7 +592,7 @@ import {
 import { calculateSavings, formatPrice, getCurrency } from "@modrinth/utils";
 import { ref, computed } from "vue";
 import { products } from "~/generated/state.json";
-import { useServersFetchSimple } from "~/utils/frontend-servers";
+import { useServersFetchSimple } from "~/utils/frontend-servers.ts";
 
 definePageMeta({
   middleware: "auth",
