@@ -81,7 +81,9 @@
         </div>
         <div class="mobile-row">
           is requesting to be
-          <Badge :type="project.requested_status ? project.requested_status : 'approved'" />
+          <ProjectStatusBadge
+            :status="project.requested_status ? project.requested_status : 'approved'"
+          />
         </div>
       </div>
       <div class="input-group">
@@ -103,7 +105,7 @@
 </template>
 
 <script setup>
-import { Chips, useRelativeTime } from "@modrinth/ui";
+import { Avatar, ProjectStatusBadge, Chips, useRelativeTime } from "@modrinth/ui";
 import {
   UnknownIcon,
   EyeIcon,
@@ -112,8 +114,6 @@ import {
   IssuesIcon,
   ScaleIcon,
 } from "@modrinth/assets";
-import Avatar from "~/components/ui/Avatar.vue";
-import Badge from "~/components/ui/Badge.vue";
 import { formatProjectType } from "~/plugins/shorthands.js";
 import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
 
