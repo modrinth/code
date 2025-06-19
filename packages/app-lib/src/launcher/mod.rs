@@ -767,15 +767,14 @@ pub async fn launch_minecraft(
             version_info.logging.is_some(),
             main_class_keep_alive,
             async |process: &ProcessMetadata, stdin| {
-                let profile_created_time =
-                    profile.created.timestamp_millis().to_string();
-                let profile_modified_time =
-                    profile.created.timestamp_millis().to_string();
+                let process_start_time = process.start_time.to_rfc3339();
                 let process_uuid = process.uuid.to_string();
-                let process_start_time =
-                    process.start_time.timestamp_millis().to_string();
+                let profile_created_time = profile.created.to_rfc3339();
+                let profile_modified_time = profile.created.to_rfc3339();
                 let system_properties = [
-                    ("modrinth.profile.name", Some(&profile.name)),
+                    ("modrinth.process.startTime", Some(&process_start_time)),
+                    ("modrinth.process.uuid", Some(&process_uuid)),
+                    ("modrinth.profile.created", Some(&profile_created_time)),
                     ("modrinth.profile.icon", profile.icon_path.as_ref()),
                     (
                         "modrinth.profile.link.project",
@@ -785,10 +784,8 @@ pub async fn launch_minecraft(
                         "modrinth.profile.link.version",
                         profile.linked_data.as_ref().map(|x| &x.version_id),
                     ),
-                    ("modrinth.profile.created", Some(&profile_created_time)),
                     ("modrinth.profile.modified", Some(&profile_modified_time)),
-                    ("modrinth.process.uuid", Some(&process_uuid)),
-                    ("modrinth.process.startTime", Some(&process_start_time)),
+                    ("modrinth.profile.name", Some(&profile.name)),
                 ];
                 for (key, value) in system_properties {
                     let Some(value) = value else {
