@@ -369,13 +369,7 @@ import {
   TriangleAlertIcon,
 } from "@modrinth/assets";
 import DOMPurify from "dompurify";
-import {
-  ButtonStyled,
-  ErrorInformationCard,
-  ServerNotice,
-  useServersFetch,
-  ModrinthServer,
-} from "@modrinth/ui";
+import { ButtonStyled, ErrorInformationCard, ServerNotice, ModrinthServer } from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
 import type { MessageDescriptor } from "@vintl/vintl";
 import type {
@@ -1231,16 +1225,11 @@ const cleanup = () => {
 };
 
 async function dismissNotice(noticeId: number) {
-  await useServersFetch(`servers/${serverId}/notices/${noticeId}/dismiss`, {
-    method: "POST",
-  }).catch((err) => {
-    app.$notify({
-      group: "main",
-      title: "Error dismissing notice",
-      text: err,
-      type: "error",
-    });
-  });
+  await server
+    .request(`servers/${serverId}/notices/${noticeId}/dismiss`, {
+      method: "POST",
+    })
+    .catch(server.errorHandler);
   await server.refresh(["general"]);
 }
 

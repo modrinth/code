@@ -569,7 +569,6 @@ import {
   ButtonStyled,
   CopyCode,
   commonMessages,
-  useServersFetch,
 } from "@modrinth/ui";
 import {
   PlusIcon,
@@ -593,6 +592,7 @@ import {
 import { calculateSavings, formatPrice, getCurrency } from "@modrinth/utils";
 import { ref, computed } from "vue";
 import { products } from "~/generated/state.json";
+import { useServersFetchSimple } from "~/utils/frontend-servers";
 
 definePageMeta({
   middleware: "auth",
@@ -744,7 +744,7 @@ const [
     useBaseFetch("billing/subscriptions", { internal: true }),
   ),
   useAsyncData("billing/products", () => useBaseFetch("billing/products", { internal: true })),
-  useAsyncData("servers", () => useServersFetch("servers")),
+  useAsyncData("servers", () => useServersFetchSimple("servers")),
 ]);
 
 const midasProduct = ref(products.find((x) => x.metadata?.type === "midas"));
@@ -984,7 +984,7 @@ async function fetchCapacityStatuses(serverId, product) {
   if (product) {
     try {
       return {
-        custom: await useServersFetch(`servers/${serverId}/upgrade-stock`, {
+        custom: await useServersFetchSimple(`servers/${serverId}/upgrade-stock`, {
           method: "POST",
           body: {
             cpu: product.metadata.cpu,

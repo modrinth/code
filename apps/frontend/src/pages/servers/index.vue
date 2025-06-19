@@ -612,7 +612,7 @@
 </template>
 
 <script setup>
-import { ButtonStyled, ModrinthServersPurchaseModal, useServersFetch } from "@modrinth/ui";
+import { ButtonStyled, ModrinthServersPurchaseModal } from "@modrinth/ui";
 import {
   BoxIcon,
   GameIcon,
@@ -674,7 +674,7 @@ const outOfStockUrl = "https://discord.modrinth.com";
 const { data: hasServers } = await useAsyncData("ServerListCountCheck", async () => {
   try {
     if (!auth.value.user) return false;
-    const response = await useServersFetch("servers");
+    const response = await useServersFetchSimple("servers");
     return response.servers && response.servers.length > 0;
   } catch {
     return false;
@@ -682,7 +682,7 @@ const { data: hasServers } = await useAsyncData("ServerListCountCheck", async ()
 });
 
 function fetchStock(region, request) {
-  return useServersFetch(`stock?region=${region.shortcode}`, {
+  return useServersFetchSimple(`stock?region=${region.shortcode}`, {
     method: "POST",
     body: {
       ...request,
@@ -702,7 +702,7 @@ async function fetchCapacityStatuses(customProduct = null) {
           ),
         ];
     const capacityChecks = productsToCheck.map((product) =>
-      useServersFetch("stock", {
+      useServersFetchSimple("stock", {
         method: "POST",
         body: {
           cpu: product.metadata.cpu,
@@ -892,7 +892,7 @@ const regions = ref([]);
 const regionPings = ref([]);
 
 function pingRegions() {
-  useServersFetch("regions", {
+  useServersFetchSimple("regions", {
     method: "GET",
     version: 1,
     bypassAuth: true,

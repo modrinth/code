@@ -1,4 +1,9 @@
-import { useModrinthServers, type StateStorage } from "@modrinth/ui";
+import {
+  useModrinthServers,
+  useServersFetch,
+  type ServersFetchOptions,
+  type StateStorage,
+} from "@modrinth/ui";
 
 import { ModrinthServerError, type ModuleName } from "@modrinth/utils";
 import { addNotification } from "~/composables/notifs.js";
@@ -50,5 +55,26 @@ export async function useModrinthServersSimple(serverId: string, modules: Module
     handleServersError,
     new NuxtStateStorage(),
     modules,
+  );
+}
+
+export async function useServersFetchSimple<T>(
+  path: string,
+  options: Partial<ServersFetchOptions> = {},
+  errorContext?: string,
+): Promise<T> {
+  const auth = await useAuth();
+  const config = useRuntimeConfig();
+  const base = import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl;
+
+  return await useServersFetch<T>(
+    path,
+    {
+      base,
+      auth: auth.value.token,
+      ...options,
+    },
+    undefined,
+    errorContext,
   );
 }
