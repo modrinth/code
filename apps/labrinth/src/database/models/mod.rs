@@ -20,6 +20,7 @@ pub mod product_item;
 pub mod project_item;
 pub mod report_item;
 pub mod session_item;
+pub mod shared_instance_item;
 pub mod team_item;
 pub mod thread_item;
 pub mod user_item;
