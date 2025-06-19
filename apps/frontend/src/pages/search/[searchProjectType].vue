@@ -320,7 +320,6 @@ import {
   ButtonStyled,
   NewProjectCard,
   SearchFilterControl,
-  useModrinthServers,
 } from "@modrinth/ui";
 import {
   CheckIcon,
@@ -339,6 +338,7 @@ import ProjectCard from "~/components/ui/ProjectCard.vue";
 import LogoAnimated from "~/components/brand/LogoAnimated.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import NavTabs from "~/components/ui/NavTabs.vue";
+import { useModrinthServersSimple } from "~/utils/frontend-servers";
 
 const { formatMessage } = useVIntl();
 
@@ -389,9 +389,7 @@ async function updateServerContext() {
     if (!auth.value.user) {
       router.push("/auth/sign-in?redirect=" + encodeURIComponent(route.fullPath));
     } else if (route.query.sid !== null) {
-      server.value = await useModrinthServers(route.query.sid, ["general", "content"], {
-        waitForModules: true,
-      });
+      server.value = await useModrinthServersSimple(route.query.sid, ["general", "content"]);
     }
   }
 

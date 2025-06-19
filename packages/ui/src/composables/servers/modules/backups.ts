@@ -1,79 +1,78 @@
 import type { Backup, AutoBackupSettings } from "@modrinth/utils";
-import { useServersFetch } from "../servers-fetch.js";
 import { ServerModule } from "./base.js";
 
 export class BackupsModule extends ServerModule {
   data: Backup[] = [];
 
   async fetch(): Promise<void> {
-    this.data = await useServersFetch<Backup[]>(`servers/${this.serverId}/backups`, {}, "backups");
+    this.data = await this.server.request<Backup[]>(`servers/${this.serverId}/backups`, {}, "backups");
   }
 
   async create(backupName: string): Promise<string> {
-    const response = await useServersFetch<{ id: string }>(`servers/${this.serverId}/backups`, {
+    const response = await this.server.request<{ id: string }>(`servers/${this.serverId}/backups`, {
       method: "POST",
       body: { name: backupName },
     });
-    await this.fetch(); // Refresh this module
+    await this.fetch(); 
     return response.id;
   }
 
   async rename(backupId: string, newName: string): Promise<void> {
-    await useServersFetch(`servers/${this.serverId}/backups/${backupId}/rename`, {
+    await this.server.request(`servers/${this.serverId}/backups/${backupId}/rename`, {
       method: "POST",
       body: { name: newName },
     });
-    await this.fetch(); // Refresh this module
+    await this.fetch(); 
   }
 
   async delete(backupId: string): Promise<void> {
-    await useServersFetch(`servers/${this.serverId}/backups/${backupId}`, {
+    await this.server.request(`servers/${this.serverId}/backups/${backupId}`, {
       method: "DELETE",
     });
-    await this.fetch(); // Refresh this module
+    await this.fetch(); 
   }
 
   async restore(backupId: string): Promise<void> {
-    await useServersFetch(`servers/${this.serverId}/backups/${backupId}/restore`, {
+    await this.server.request(`servers/${this.serverId}/backups/${backupId}/restore`, {
       method: "POST",
     });
-    await this.fetch(); // Refresh this module
+    await this.fetch(); 
   }
 
   async prepare(backupId: string): Promise<void> {
-    await useServersFetch(`servers/${this.serverId}/backups/${backupId}/prepare-download`, {
+    await this.server.request(`servers/${this.serverId}/backups/${backupId}/prepare-download`, {
       method: "POST",
     });
   }
 
   async lock(backupId: string): Promise<void> {
-    await useServersFetch(`servers/${this.serverId}/backups/${backupId}/lock`, {
+    await this.server.request(`servers/${this.serverId}/backups/${backupId}/lock`, {
       method: "POST",
     });
-    await this.fetch(); // Refresh this module
+    await this.fetch(); 
   }
 
   async unlock(backupId: string): Promise<void> {
-    await useServersFetch(`servers/${this.serverId}/backups/${backupId}/unlock`, {
+    await this.server.request(`servers/${this.serverId}/backups/${backupId}/unlock`, {
       method: "POST",
     });
-    await this.fetch(); // Refresh this module
+    await this.fetch(); 
   }
 
   async retry(backupId: string): Promise<void> {
-    await useServersFetch(`servers/${this.serverId}/backups/${backupId}/retry`, {
+    await this.server.request(`servers/${this.serverId}/backups/${backupId}/retry`, {
       method: "POST",
     });
   }
 
   async updateAutoBackup(autoBackup: "enable" | "disable", interval: number): Promise<void> {
-    await useServersFetch(`servers/${this.serverId}/autobackup`, {
+    await this.server.request(`servers/${this.serverId}/autobackup`, {
       method: "POST",
       body: { set: autoBackup, interval },
     });
   }
 
   async getAutoBackup(): Promise<AutoBackupSettings> {
-    return await useServersFetch(`servers/${this.serverId}/autobackup`);
+    return await this.server.request(`servers/${this.serverId}/autobackup`);
   }
 }

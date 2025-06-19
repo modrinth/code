@@ -3,6 +3,8 @@ import { ModrinthServerError, ModrinthServersFetchError } from "@modrinth/utils"
 import type { V1ErrorInfo } from "@modrinth/utils";
 
 export interface ServersFetchOptions {
+  base: string;
+  auth: string;
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   contentType?: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -18,13 +20,11 @@ export interface ServersFetchOptions {
 
 export async function useServersFetch<T>(
   path: string,
-  options: ServersFetchOptions = {},
+  options: ServersFetchOptions,
   module?: string,
   errorContext?: string,
 ): Promise<T> {
-  const config = useRuntimeConfig();
-  const auth = await useAuth();
-  const authToken = auth.value?.token;
+  const authToken = options.auth;
 
   if (!authToken && !options.bypassAuth) {
     const error = new ModrinthServersFetchError(
@@ -43,7 +43,7 @@ export async function useServersFetch<T>(
     retry = method === "GET" ? 3 : 0,
   } = options;
 
-  const base = (import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl)?.replace(
+  const base = options.base.replace(
     /\/$/,
     "",
   );
@@ -82,7 +82,7 @@ export async function useServersFetch<T>(
     headers["Content-Type"] = contentType;
   }
 
-  if (import.meta.client && typeof window !== "undefined") {
+  if (typeof window !== "undefined") {
     headers.Origin = window.location.origin;
   }
 

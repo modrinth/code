@@ -1,6 +1,5 @@
 import { $fetch } from "ofetch";
-import type { ServerGeneral, Project, PowerAction, JWTAuth } from "@modrinth/utils";
-import { useServersFetch } from "../servers-fetch.js";
+import type { ServerGeneral, Project, PowerAction, JWTAuth, ServerNotice } from "@modrinth/utils";
 import { ServerModule } from "./base.js";
 
 export class GeneralModule extends ServerModule implements ServerGeneral {
@@ -28,12 +27,12 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
   sftp_password!: string;
   sftp_host!: string;
   datacenter?: string;
-  notices?: any[];
+  notices?: ServerNotice[];
   node!: { token: string; instance: string };
   flows?: { intro?: boolean };
 
   async fetch(): Promise<void> {
-    const data = await useServersFetch<ServerGeneral>(`servers/${this.serverId}`, {}, "general");
+    const data = await this.server.request<ServerGeneral>(`servers/${this.serverId}`, {}, "general");
 
     if (data.upstream?.project_id) {
       const project = await $fetch(
@@ -42,7 +41,7 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
       data.project = project as Project;
     }
 
-    if (import.meta.client) {
+    if (typeof window !== 'undefined') {
       data.image = (await this.server.processImage(data.project?.icon_url)) ?? undefined;
     }
 
@@ -59,14 +58,14 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
   }
 
   async updateName(newName: string): Promise<void> {
-    await useServersFetch(`servers/${this.serverId}/name`, {
+    await this.server.request(`servers/${this.serverId}/name`, {
       method: "POST",
       body: { name: newName },
     });
   }
 
   async power(action: PowerAction): Promise<void> {
-    await useServersFetch(`servers/${this.serverId}/power`, {
+    await this.server.request(`servers/${this.serverId}/power`, {
       method: "POST",
       body: { action },
     });
@@ -86,12 +85,12 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
       if (projectId.toLowerCase() === "neoforge") {
         projectId = "NeoForge";
       }
-      await useServersFetch(`servers/${this.serverId}/reinstall?hard=${hardResetParam}`, {
+      await this.server.request(`servers/${this.serverId}/reinstall?hard=${hardResetParam}`, {
         method: "POST",
         body: { loader: projectId, loader_version: loaderVersionId, game_version: versionId },
       });
     } else {
-      await useServersFetch(`servers/${this.serverId}/reinstall?hard=${hardResetParam}`, {
+      await this.server.request(`servers/${this.serverId}/reinstall?hard=${hardResetParam}`, {
         method: "POST",
         body: { project_id: projectId, version_id: versionId },
       });
@@ -100,7 +99,7 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
 
   async reinstallFromMrpack(mrpack: File, hardReset: boolean = false): Promise<void> {
     const hardResetParam = hardReset ? "true" : "false";
-    const auth = await useServersFetch<JWTAuth>(`servers/${this.serverId}/reinstallFromMrpack`);
+    const auth = await this.server.request<JWTAuth>(`servers/${this.serverId}/reinstallFromMrpack`);
 
     const formData = new FormData();
     formData.append("file", mrpack);
@@ -123,18 +122,18 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
   }
 
   async suspend(status: boolean): Promise<void> {
-    await useServersFetch(`servers/${this.serverId}/suspend`, {
+    await this.server.request(`servers/${this.serverId}/suspend`, {
       method: "POST",
       body: { suspended: status },
     });
   }
 
   async endIntro(): Promise<void> {
-    await useServersFetch(`servers/${this.serverId}/flows/intro`, {
+    await this.server.request(`servers/${this.serverId}/flows/intro`, {
       method: "DELETE",
       version: 1,
     });
-    await this.fetch(); // Refresh this module
+    await this.fetch();
   }
 
   async getMotd(): Promise<string | undefined> {
@@ -156,14 +155,15 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
 
   async setMotd(motd: string): Promise<void> {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const props = (await this.server.fetchConfigFile("ServerProperties")) as any;
       if (props) {
         props.motd = motd;
         const newProps = this.server.constructServerProperties(props);
         const octetStream = new Blob([newProps], { type: "application/octet-stream" });
-        const auth = await useServersFetch<JWTAuth>(`servers/${this.serverId}/fs`);
+        const auth = await this.server.request<JWTAuth>(`servers/${this.serverId}/fs`);
 
-        await useServersFetch(`/update?path=/server.properties`, {
+        await this.server.request(`/update?path=/server.properties`, {
           method: "PUT",
           contentType: "application/octet-stream",
           body: octetStream,

@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ModrinthServerError } from "@modrinth/utils";
 import type { JWTAuth, ModuleError, ModuleName } from "@modrinth/utils";
-import { useServersFetch } from "./servers-fetch.js";
+import { useServersFetch, type ServersFetchOptions } from "./servers-fetch.js";
 
 import {
   GeneralModule,
@@ -11,26 +12,21 @@ import {
   WSModule,
   FSModule,
 } from "./modules/index.js";
+import { reactive, type Ref } from "vue";
 
-export function handleError(err: any) {
-  if (err instanceof ModrinthServerError && err.v1Error) {
-    addNotification({
-      title: err.v1Error?.context ?? `An error occurred`,
-      type: "error",
-      text: err.v1Error.description,
-      errorCode: err.v1Error.error,
-    });
-  } else {
-    addNotification({
-      title: "An error occurred",
-      type: "error",
-      text: err.message ?? (err.data ? err.data.description : err),
-    });
-  }
+export interface StateStorage {
+  get(key: string): any;
+  set(key: string, value: any): void;
+  getRef(key: string): Ref<any>;
 }
 
 export class ModrinthServer {
   readonly serverId: string;
+  readonly auth: string;
+  readonly base: string;
+  readonly errorHandler: (err: any) => void;
+  readonly stateStorage: StateStorage;
+
   private errors: Partial<Record<ModuleName, ModuleError>> = {};
 
   readonly general: GeneralModule;
@@ -41,8 +37,12 @@ export class ModrinthServer {
   readonly ws: WSModule;
   readonly fs: FSModule;
 
-  constructor(serverId: string) {
+  constructor(serverId: string, auth: string, base: string, errorHandler: (err: any) => void, stateStorage: StateStorage) {
     this.serverId = serverId;
+    this.auth = auth;
+    this.base = base;
+    this.errorHandler = errorHandler;
+    this.stateStorage = stateStorage;
 
     this.general = new GeneralModule(this);
     this.content = new ContentModule(this);
@@ -51,6 +51,15 @@ export class ModrinthServer {
     this.startup = new StartupModule(this);
     this.ws = new WSModule(this);
     this.fs = new FSModule(this);
+  }
+
+  async request<T>(route: string, options: Partial<ServersFetchOptions> = {}, module?: string,
+  errorContext?: string): Promise<T> {
+    return await useServersFetch<T>(route, {
+      auth: this.auth,
+      base: this.base,
+      ...options
+    }, module, errorContext);
   }
 
   async createMissingFolders(path: string): Promise<void> {
@@ -71,7 +80,7 @@ export class ModrinthServer {
   }
 
   async fetchConfigFile(fileName: string): Promise<any> {
-    return await useServersFetch(`servers/${this.serverId}/config/${fileName}`);
+    return await this.request(`servers/${this.serverId}/config/${fileName}`);
   }
 
   constructServerProperties(properties: any): string {
@@ -91,21 +100,22 @@ export class ModrinthServer {
   }
 
   async processImage(iconUrl: string | undefined): Promise<string | undefined> {
-    const sharedImage = useState<string | undefined>(`server-icon-${this.serverId}`);
+    const imageKey = `server-icon-${this.serverId}`;
+    const sharedImage = this.stateStorage.getRef(imageKey);
 
     if (sharedImage.value) {
       return sharedImage.value;
     }
 
     try {
-      const auth = await useServersFetch<JWTAuth>(`servers/${this.serverId}/fs`);
+      const auth = await this.request<JWTAuth>(`servers/${this.serverId}/fs`);
       try {
-        const fileData = await useServersFetch(`/download?path=/server-icon-original.png`, {
+        const fileData = this.request(`/download?path=/server-icon-original.png`, {
           override: auth,
           retry: false,
         });
 
-        if (fileData instanceof Blob && import.meta.client) {
+        if (fileData instanceof Blob && typeof window !== 'undefined') {
           const dataURL = await new Promise<string>((resolve) => {
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
@@ -134,7 +144,7 @@ export class ModrinthServer {
                 type: "image/png",
               });
 
-              if (import.meta.client) {
+              if (typeof window !== 'undefined') {
                 const dataURL = await new Promise<string>((resolve) => {
                   const canvas = document.createElement("canvas");
                   const ctx = canvas.getContext("2d");
@@ -148,13 +158,13 @@ export class ModrinthServer {
                         const scaledFile = new File([blob], "server-icon.png", {
                           type: "image/png",
                         });
-                        await useServersFetch(`/create?path=/server-icon.png&type=file`, {
+                        await this.request(`/create?path=/server-icon.png&type=file`, {
                           method: "POST",
                           contentType: "application/octet-stream",
                           body: scaledFile,
                           override: auth,
                         });
-                        await useServersFetch(`/create?path=/server-icon-original.png&type=file`, {
+                        await this.request(`/create?path=/server-icon-original.png&type=file`, {
                           method: "POST",
                           contentType: "application/octet-stream",
                           body: originalFile,
@@ -274,9 +284,13 @@ export class ModrinthServer {
 
 export const useModrinthServers = async (
   serverId: string,
+  base: string,
+  auth: string,
+  errorHandler: (err: any) => void,
+  stateStorage: StateStorage,
   includedModules: ModuleName[] = ["general"],
 ) => {
-  const server = new ModrinthServer(serverId);
+  const server = new ModrinthServer(serverId, base, auth, errorHandler, stateStorage);
   await server.refresh(includedModules);
   return reactive(server);
 };

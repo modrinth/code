@@ -60,7 +60,7 @@
   >
     <ErrorInformationCard
       title="Server Node Unavailable"
-      :icon="PanelErrorIcon"
+      :icon="TriangleAlertIcon"
       icon-color="red"
       :action="nodeUnavailableAction"
       :error-details="nodeUnavailableDetails"
@@ -366,6 +366,7 @@ import {
   FileIcon,
   TransferIcon,
   LockIcon,
+  TriangleAlertIcon,
 } from "@modrinth/assets";
 import DOMPurify from "dompurify";
 import {
@@ -389,7 +390,7 @@ import type {
 import { reloadNuxtApp, navigateTo } from "#app";
 import { useModrinthServersConsole } from "~/store/console.ts";
 import ServerInstallation from "~/components/ui/servers/ServerInstallation.vue";
-import PanelErrorIcon from "~/components/ui/servers/icons/PanelErrorIcon.vue";
+import { useModrinthServersSimple } from "~/utils/frontend-servers.ts";
 
 const app = useNuxtApp() as unknown as { $notify: any };
 
@@ -416,7 +417,10 @@ const route = useNativeRoute();
 const router = useRouter();
 const serverId = route.params.id as string;
 
-const server: Reactive<ModrinthServer> = await useModrinthServers(serverId, ["general", "ws"]);
+const server: Reactive<ModrinthServer> = await useModrinthServersSimple(serverId, [
+  "general",
+  "ws",
+]);
 
 const loadModulesPromise = Promise.resolve().then(() => {
   if (server.general?.status === "suspended") {

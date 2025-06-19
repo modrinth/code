@@ -82,12 +82,11 @@
 <script setup lang="ts">
 import { ChevronRightIcon, LockIcon, SparklesIcon, TriangleAlertIcon } from "@modrinth/assets";
 import type { Project, Server } from "@modrinth/utils";
-import { useModrinthServers } from "@modrinth/ui";
-
+import { useModrinthServersSimple } from "~/utils/frontend-servers";
 const props = defineProps<Partial<Server>>();
 
 if (props.server_id) {
-  await useModrinthServers(props.server_id, ["general"]);
+  await useModrinthServersSimple(props.server_id, ["general"]);
 }
 
 const showGameLabel = computed(() => !!props.game);
@@ -110,7 +109,7 @@ if (props.upstream) {
 const image = useState<string | undefined>(`server-icon-${props.server_id}`, () => undefined);
 
 if (import.meta.server && projectData.value?.icon_url) {
-  await useModrinthServers(props.server_id!, ["general"]);
+  await useModrinthServersSimple(props.server_id!, ["general"]);
 }
 
 const iconUrl = computed(() => projectData.value?.icon_url || undefined);

@@ -6,7 +6,6 @@ import type {
   FSQueuedOp,
 } from "@modrinth/utils";
 import { ModrinthServerError } from "@modrinth/utils";
-import { useServersFetch } from "../servers-fetch.js";
 import { ServerModule } from "./base.js";
 
 export class FSModule extends ServerModule {
@@ -16,7 +15,7 @@ export class FSModule extends ServerModule {
   opsQueuedForModification: string[] = [];
 
   async fetch(): Promise<void> {
-    this.auth = await useServersFetch<JWTAuth>(`servers/${this.serverId}/fs`, {}, "fs");
+    this.auth = await this.server.request<JWTAuth>(`servers/${this.serverId}/fs`, {}, "fs");
     this.ops = [];
     this.queuedOps = [];
     this.opsQueuedForModification = [];
@@ -37,7 +36,7 @@ export class FSModule extends ServerModule {
   listDirContents(path: string, page: number, pageSize: number): Promise<DirectoryResponse> {
     return this.retryWithAuth(async () => {
       const encodedPath = encodeURIComponent(path);
-      return await useServersFetch(`/list?path=${encodedPath}&page=${page}&page_size=${pageSize}`, {
+      return await this.server.request(`/list?path=${encodedPath}&page=${page}&page_size=${pageSize}`, {
         override: this.auth,
         retry: false,
       });
@@ -47,7 +46,7 @@ export class FSModule extends ServerModule {
   createFileOrFolder(path: string, type: "file" | "directory"): Promise<void> {
     return this.retryWithAuth(async () => {
       const encodedPath = encodeURIComponent(path);
-      await useServersFetch(`/create?path=${encodedPath}&type=${type}`, {
+      await this.server.request(`/create?path=${encodedPath}&type=${type}`, {
         method: "POST",
         contentType: "application/octet-stream",
         override: this.auth,
@@ -109,7 +108,7 @@ export class FSModule extends ServerModule {
   renameFileOrFolder(path: string, name: string): Promise<void> {
     const pathName = path.split("/").slice(0, -1).join("/") + "/" + name;
     return this.retryWithAuth(async () => {
-      await useServersFetch(`/move`, {
+      await this.server.request(`/move`, {
         method: "POST",
         override: this.auth,
         body: { source: path, destination: pathName },
@@ -120,7 +119,7 @@ export class FSModule extends ServerModule {
   updateFile(path: string, content: string): Promise<void> {
     const octetStream = new Blob([content], { type: "application/octet-stream" });
     return this.retryWithAuth(async () => {
-      await useServersFetch(`/update?path=${path}`, {
+      await this.server.request(`/update?path=${path}`, {
         method: "PUT",
         contentType: "application/octet-stream",
         body: octetStream,
@@ -132,7 +131,7 @@ export class FSModule extends ServerModule {
   moveFileOrFolder(path: string, newPath: string): Promise<void> {
     return this.retryWithAuth(async () => {
       await this.server.createMissingFolders(newPath.substring(0, newPath.lastIndexOf("/")));
-      await useServersFetch(`/move`, {
+      await this.server.request(`/move`, {
         method: "POST",
         override: this.auth,
         body: { source: path, destination: newPath },
@@ -143,7 +142,7 @@ export class FSModule extends ServerModule {
   deleteFileOrFolder(path: string, recursive: boolean): Promise<void> {
     const encodedPath = encodeURIComponent(path);
     return this.retryWithAuth(async () => {
-      await useServersFetch(`/delete?path=${encodedPath}&recursive=${recursive}`, {
+      await this.server.request(`/delete?path=${encodedPath}&recursive=${recursive}`, {
         method: "DELETE",
         override: this.auth,
       });
@@ -154,7 +153,7 @@ export class FSModule extends ServerModule {
   downloadFile(path: string, raw?: boolean): Promise<any> {
     return this.retryWithAuth(async () => {
       const encodedPath = encodeURIComponent(path);
-      const fileData = await useServersFetch(`/download?path=${encodedPath}`, {
+      const fileData = await this.server.request(`/download?path=${encodedPath}`, {
         override: this.auth,
       });
 
@@ -180,7 +179,7 @@ export class FSModule extends ServerModule {
       }
 
       try {
-        return await useServersFetch(
+        return await this.server.request(
           `/unarchive?src=${encodedPath}&trg=/&override=${override}&dry=${dry}`,
           {
             method: "POST",
@@ -199,7 +198,7 @@ export class FSModule extends ServerModule {
 
   modifyOp(id: string, action: "dismiss" | "cancel"): Promise<void> {
     return this.retryWithAuth(async () => {
-      await useServersFetch(
+      await this.server.request(
         `/ops/${action}?id=${id}`,
         {
           method: "POST",

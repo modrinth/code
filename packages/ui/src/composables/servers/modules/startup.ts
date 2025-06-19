@@ -1,5 +1,4 @@
 import type { Startup, JDKVersion, JDKBuild } from "@modrinth/utils";
-import { useServersFetch } from "../servers-fetch.js";
 import { ServerModule } from "./base.js";
 
 export class StartupModule extends ServerModule implements Startup {
@@ -9,12 +8,12 @@ export class StartupModule extends ServerModule implements Startup {
   jdk_build!: JDKBuild;
 
   async fetch(): Promise<void> {
-    const data = await useServersFetch<Startup>(`servers/${this.serverId}/startup`, {}, "startup");
+    const data = await this.server.request<Startup>(`servers/${this.serverId}/startup`, {}, "startup");
     Object.assign(this, data);
   }
 
   async update(invocation: string, jdkVersion: JDKVersion, jdkBuild: JDKBuild): Promise<void> {
-    await useServersFetch(`servers/${this.serverId}/startup`, {
+    await this.server.request(`servers/${this.serverId}/startup`, {
       method: "POST",
       body: {
         invocation: invocation || null,
