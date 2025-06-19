@@ -1,7 +1,7 @@
 import { $fetch } from "ofetch";
 import type { ServerGeneral, Project, PowerAction, JWTAuth } from "@modrinth/utils";
-import { useServersFetch } from "../servers-fetch.ts";
-import { ServerModule } from "./base.ts";
+import { useServersFetch } from "../servers-fetch.js";
+import { ServerModule } from "./base.js";
 
 export class GeneralModule extends ServerModule implements ServerGeneral {
   server_id!: string;

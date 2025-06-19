@@ -334,7 +334,7 @@ import {
   ImageIcon,
 } from "@modrinth/assets";
 import { computed } from "vue";
-import { useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
+import { useModrinthServers } from "@modrinth/ui";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import LogoAnimated from "~/components/brand/LogoAnimated.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";

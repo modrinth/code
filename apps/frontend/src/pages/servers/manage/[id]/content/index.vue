@@ -355,7 +355,7 @@ import type { Mod } from "@modrinth/utils";
 import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
 import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { ModrinthServer } from "@modrinth/ui";
 
 const props = defineProps<{
   server: ModrinthServer;

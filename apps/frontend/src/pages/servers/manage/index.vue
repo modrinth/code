@@ -123,7 +123,7 @@ import { HammerIcon, PlusIcon, SearchIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 import type { Server, ModrinthServersFetchError } from "@modrinth/utils";
 import { reloadNuxtApp } from "#app";
-import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
+import { useServersFetch } from "@modrinth/ui";
 
 definePageMeta({
   middleware: "auth",

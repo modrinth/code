@@ -623,7 +623,7 @@ import {
   ServerIcon,
 } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
-import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
+import { useServersFetch } from "@modrinth/ui";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
 import ServerPlanSelector from "~/components/ui/servers/marketing/ServerPlanSelector.vue";
 import OptionGroup from "~/components/ui/OptionGroup.vue";

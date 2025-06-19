@@ -275,7 +275,7 @@ import {
 } from "@modrinth/assets";
 import { ButtonStyled, NewModal, ConfirmModal } from "@modrinth/ui";
 import { ref, computed, nextTick } from "vue";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { ModrinthServer } from "@modrinth/ui";
 
 const props = defineProps<{
   server: ModrinthServer;

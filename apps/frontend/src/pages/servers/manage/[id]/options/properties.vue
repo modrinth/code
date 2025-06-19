@@ -146,7 +146,7 @@
 import { ref, watch, computed, inject } from "vue";
 import { EyeIcon, SearchIcon, IssuesIcon } from "@modrinth/assets";
 import Fuse from "fuse.js";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { ModrinthServer } from "@modrinth/ui";
 
 const props = defineProps<{
   server: ModrinthServer;

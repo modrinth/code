@@ -381,8 +381,8 @@ import type {
 } from "@modrinth/utils";
 import { reloadNuxtApp, navigateTo } from "#app";
 import { useModrinthServersConsole } from "~/store/console.ts";
-import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
-import { ModrinthServer, useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
+import { useServersFetch } from "@modrinth/ui";
+import { ModrinthServer, useModrinthServers } from "@modrinth/ui";
 import ServerInstallation from "~/components/ui/servers/ServerInstallation.vue";
 import PanelErrorIcon from "~/components/ui/servers/icons/PanelErrorIcon.vue";
 

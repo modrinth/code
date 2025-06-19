@@ -3,7 +3,7 @@ import { Accordion, ButtonStyled, NewModal, ServerNotice, TagItem } from "@modri
 import { PlusIcon, XIcon } from "@modrinth/assets";
 import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
 import { ref } from "vue";
-import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
+import { useServersFetch } from "@modrinth/ui";
 
 const app = useNuxtApp() as unknown as { $notify: any };
 

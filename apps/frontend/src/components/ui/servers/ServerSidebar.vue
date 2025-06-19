@@ -35,7 +35,7 @@
 import { RightArrowIcon } from "@modrinth/assets";
 import type { RouteLocationNormalized } from "vue-router";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { ModrinthServer } from "@modrinth/ui";
 
 const emit = defineEmits(["reinstall"]);
 

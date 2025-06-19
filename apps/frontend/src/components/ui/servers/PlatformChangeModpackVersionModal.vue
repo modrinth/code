@@ -70,7 +70,7 @@
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { DownloadIcon, XIcon } from "@modrinth/assets";
 import { ModrinthServersFetchError } from "@modrinth/utils";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { ModrinthServer } from "@modrinth/ui";
 
 const props = defineProps<{
   server: ModrinthServer;

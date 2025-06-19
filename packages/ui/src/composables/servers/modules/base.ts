@@ -1,4 +1,4 @@
-import type { ModrinthServer } from "../modrinth-servers.ts";
+import type { ModrinthServer } from "../modrinth-servers.js";
 
 export abstract class ServerModule {
   protected server: ModrinthServer;

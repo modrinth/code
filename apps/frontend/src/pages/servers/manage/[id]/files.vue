@@ -280,7 +280,7 @@ import { computed } from "vue";
 import { ButtonStyled, ProgressBar } from "@modrinth/ui";
 import { formatBytes, ModrinthServersFetchError } from "@modrinth/utils";
 import type { FilesystemOp, FSQueuedOp, DirectoryItem, DirectoryResponse } from "@modrinth/utils";
-import { handleError, ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { handleError, ModrinthServer } from "@modrinth/ui";
 import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
 import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
 import FilesUploadZipUrlModal from "~/components/ui/servers/FilesUploadZipUrlModal.vue";

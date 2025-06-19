@@ -21,7 +21,7 @@ import { ref } from "vue";
 import { ConfirmModal, NewModal } from "@modrinth/ui";
 import type { Backup } from "@modrinth/utils";
 import BackupItem from "~/components/ui/servers/BackupItem.vue";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { ModrinthServer } from "@modrinth/ui";
 
 const props = defineProps<{
   server: ModrinthServer;

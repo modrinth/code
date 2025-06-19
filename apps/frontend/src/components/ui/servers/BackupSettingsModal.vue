@@ -59,7 +59,7 @@
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { XIcon, SaveIcon } from "@modrinth/assets";
 import { ref, computed } from "vue";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { ModrinthServer } from "@modrinth/ui";
 
 const props = defineProps<{
   server: ModrinthServer;

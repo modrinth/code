@@ -202,7 +202,7 @@ import { DropdownIcon, RightArrowIcon, ServerIcon, XIcon } from "@modrinth/asset
 import { $fetch } from "ofetch";
 import { type Loaders, ModrinthServersFetchError } from "@modrinth/utils";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { ModrinthServer } from "@modrinth/ui";
 
 const { formatMessage } = useVIntl();
 

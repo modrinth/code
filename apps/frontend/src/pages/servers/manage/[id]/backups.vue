@@ -161,7 +161,7 @@ import BackupCreateModal from "~/components/ui/servers/BackupCreateModal.vue";
 import BackupRestoreModal from "~/components/ui/servers/BackupRestoreModal.vue";
 import BackupDeleteModal from "~/components/ui/servers/BackupDeleteModal.vue";
 import BackupSettingsModal from "~/components/ui/servers/BackupSettingsModal.vue";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { ModrinthServer } from "@modrinth/ui";
 
 const props = defineProps<{
   server: ModrinthServer;

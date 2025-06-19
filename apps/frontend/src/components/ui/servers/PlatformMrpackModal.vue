@@ -118,7 +118,7 @@ import { BackupWarning, ButtonStyled, NewModal } from "@modrinth/ui";
 import { UploadIcon, RightArrowIcon, XIcon, ServerIcon } from "@modrinth/assets";
 import { ModrinthServersFetchError } from "@modrinth/utils";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { ModrinthServer } from "@modrinth/ui";
 
 const props = defineProps<{
   server: ModrinthServer;

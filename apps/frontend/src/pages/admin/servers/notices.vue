@@ -275,7 +275,7 @@ import { useVIntl } from "@vintl/vintl";
 import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
 import { computed } from "vue";
 import { NOTICE_LEVELS } from "@modrinth/ui/src/utils/notices.ts";
-import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
+import { useServersFetch } from "@modrinth/ui";
 import AssignNoticeModal from "~/components/ui/servers/notice/AssignNoticeModal.vue";
 
 const { formatMessage } = useVIntl();

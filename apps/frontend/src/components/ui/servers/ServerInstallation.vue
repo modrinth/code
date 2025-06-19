@@ -162,7 +162,7 @@ import { ButtonStyled, NewProjectCard } from "@modrinth/ui";
 import { TransferIcon, UploadIcon, InfoIcon, CompassIcon, SettingsIcon } from "@modrinth/assets";
 import type { Loaders } from "@modrinth/utils";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { ModrinthServer } from "@modrinth/ui";
 
 const { formatMessage } = useVIntl();
 

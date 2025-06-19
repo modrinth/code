@@ -43,10 +43,9 @@
 
 <script setup lang="ts">
 import { ref, nextTick, computed } from "vue";
-import { ButtonStyled, NewModal } from "@modrinth/ui";
+import { ButtonStyled, NewModal, ModrinthServer } from "@modrinth/ui";
 import { IssuesIcon, PlusIcon, XIcon } from "@modrinth/assets";
 import { ModrinthServersFetchError, type ServerBackup } from "@modrinth/utils";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
   server: ModrinthServer;

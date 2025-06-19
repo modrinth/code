@@ -77,7 +77,7 @@ import { ExternalIcon, SpinnerIcon, DownloadIcon, XIcon } from "@modrinth/assets
 import { BackupWarning, ButtonStyled, NewModal } from "@modrinth/ui";
 import { ModrinthServersFetchError } from "@modrinth/utils";
 import { ref, computed, nextTick } from "vue";
-import { handleError, ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { handleError, ModrinthServer } from "@modrinth/ui";
 
 const cf = ref(false);
 

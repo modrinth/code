@@ -1,6 +1,6 @@
 import { ModrinthServerError } from "@modrinth/utils";
 import type { JWTAuth, ModuleError, ModuleName } from "@modrinth/utils";
-import { useServersFetch } from "./servers-fetch.ts";
+import { useServersFetch } from "./servers-fetch.js";
 
 import {
   GeneralModule,
@@ -10,7 +10,7 @@ import {
   StartupModule,
   WSModule,
   FSModule,
-} from "./modules/index.ts";
+} from "./modules/index.js";
 
 export function handleError(err: any) {
   if (err instanceof ModrinthServerError && err.v1Error) {

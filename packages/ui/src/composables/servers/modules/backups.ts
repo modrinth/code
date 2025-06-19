@@ -1,6 +1,6 @@
 import type { Backup, AutoBackupSettings } from "@modrinth/utils";
-import { useServersFetch } from "../servers-fetch.ts";
-import { ServerModule } from "./base.ts";
+import { useServersFetch } from "../servers-fetch.js";
+import { ServerModule } from "./base.js";
 
 export class BackupsModule extends ServerModule {
   data: Backup[] = [];

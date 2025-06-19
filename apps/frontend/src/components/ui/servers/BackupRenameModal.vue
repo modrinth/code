@@ -49,7 +49,7 @@ import { ref, nextTick, computed } from "vue";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { SpinnerIcon, SaveIcon, XIcon, IssuesIcon } from "@modrinth/assets";
 import type { Backup } from "@modrinth/utils";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { ModrinthServer } from "@modrinth/ui";
 
 const props = defineProps<{
   server: ModrinthServer;

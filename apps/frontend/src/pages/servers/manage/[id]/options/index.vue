@@ -114,7 +114,7 @@
 <script setup lang="ts">
 import { EditIcon, TransferIcon } from "@modrinth/assets";
 import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { ModrinthServer } from "@modrinth/ui";
 
 const props = defineProps<{
   server: ModrinthServer;
