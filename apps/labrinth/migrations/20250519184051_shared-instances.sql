@@ -1,7 +1,7 @@
 CREATE TABLE shared_instances (
   id BIGINT PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
-  owner_id BIGINT NOT NULL REFERENCES users ON DELETE CASCADE,
+  owner_id BIGINT NOT NULL REFERENCES users,
   current_version_id BIGINT NULL,
   public BOOLEAN NOT NULL DEFAULT FALSE
 );
