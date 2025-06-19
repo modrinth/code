@@ -1,5 +1,5 @@
 <template>
-  <div v-if="project.versions.length > 0" class="flex flex-col gap-3">
+  <div class="flex flex-col gap-3">
     <h2 class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
     <section class="flex flex-col gap-2">
       <h3 class="text-primary text-base m-0">{{ formatMessage(messages.minecraftJava) }}</h3>
@@ -72,25 +72,10 @@
         </TagItem>
       </div>
     </section>
-    <section>
-      <h3 class="text-base text-primary font-bold m-0">Modrinth Servers compatibility</h3>
-      <div v-if="true" class="flex items-center font-bold gap-2 text-brand text-sm">
-        <BadgeCheckIcon class="size-5" fill="var(--color-brand-highlight)" /> Verified
-      </div>
-      <div v-else-if="false" class="flex items-center font-bold gap-2 text-orange text-sm">
-        <CheckCircleIcon class="size-5" fill="var(--color-orange-highlight)" /> Likely works
-      </div>
-      <div v-else-if="false" class="flex items-center font-bold gap-2 text-red text-sm">
-        <XCircleIcon class="size-5" fill="var(--color-red-highlight)" /> Incompatible
-      </div>
-      <div v-else-if="false" class="flex items-center font-bold gap-2 text-secondary text-sm">
-        <UnknownIcon class="size-5" fill="var(--color-gray-highlight)" /> Unknown
-      </div>
-    </section>
   </div>
 </template>
 <script setup lang="ts">
-import { BadgeCheckIcon, CheckCircleIcon, XCircleIcon, UnknownIcon, ClientIcon, MonitorSmartphoneIcon, ServerIcon, UserIcon } from '@modrinth/assets'
+import { ClientIcon, MonitorSmartphoneIcon, ServerIcon, UserIcon } from '@modrinth/assets'
 import { formatCategory, getVersionsToDisplay } from '@modrinth/utils'
 import type { GameVersionTag, PlatformTag } from '@modrinth/utils'
 import { useVIntl, defineMessages } from '@vintl/vintl'
@@ -120,7 +105,7 @@ defineProps<{
 
 const messages = defineMessages({
   title: {
-    id: 'project.about.compatibility.title',
+    id: 'project.about.modrinth-servers.title',
     defaultMessage: 'Compatibility',
   },
   minecraftJava: {
