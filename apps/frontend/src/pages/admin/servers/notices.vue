@@ -268,6 +268,7 @@ import {
   TeleportDropdownMenu,
   Toggle,
   useRelativeTime,
+  useServersFetch,
 } from "@modrinth/ui";
 import { SettingsIcon, PlusIcon, SaveIcon, TrashIcon, EditIcon, XIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
@@ -275,7 +276,6 @@ import { useVIntl } from "@vintl/vintl";
 import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
 import { computed } from "vue";
 import { NOTICE_LEVELS } from "@modrinth/ui/src/utils/notices.ts";
-import { useServersFetch } from "@modrinth/ui";
 import AssignNoticeModal from "~/components/ui/servers/notice/AssignNoticeModal.vue";
 
 const { formatMessage } = useVIntl();

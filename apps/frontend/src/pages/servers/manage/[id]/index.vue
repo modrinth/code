@@ -188,9 +188,8 @@
 
 <script setup lang="ts">
 import { TerminalSquareIcon, XIcon, IssuesIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+import { ButtonStyled, ModrinthServer } from "@modrinth/ui";
 import type { ServerState, Stats } from "@modrinth/utils";
-import { ModrinthServer } from "@modrinth/ui";
 
 type ServerProps = {
   socket: WebSocket | null;

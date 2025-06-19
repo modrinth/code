@@ -273,9 +273,8 @@ import {
   UploadIcon,
   IssuesIcon,
 } from "@modrinth/assets";
-import { ButtonStyled, NewModal, ConfirmModal } from "@modrinth/ui";
+import { ButtonStyled, NewModal, ConfirmModal, ModrinthServer } from "@modrinth/ui";
 import { ref, computed, nextTick } from "vue";
-import { ModrinthServer } from "@modrinth/ui";
 
 const props = defineProps<{
   server: ModrinthServer;

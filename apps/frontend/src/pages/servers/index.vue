@@ -612,7 +612,7 @@
 </template>
 
 <script setup>
-import { ButtonStyled, ModrinthServersPurchaseModal } from "@modrinth/ui";
+import { ButtonStyled, ModrinthServersPurchaseModal, useServersFetch } from "@modrinth/ui";
 import {
   BoxIcon,
   GameIcon,
@@ -623,7 +623,6 @@ import {
   ServerIcon,
 } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
-import { useServersFetch } from "@modrinth/ui";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
 import ServerPlanSelector from "~/components/ui/servers/marketing/ServerPlanSelector.vue";
 import OptionGroup from "~/components/ui/OptionGroup.vue";

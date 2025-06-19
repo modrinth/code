@@ -120,10 +120,9 @@
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import Fuse from "fuse.js";
 import { HammerIcon, PlusIcon, SearchIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+import { ButtonStyled, useServersFetch } from "@modrinth/ui";
 import type { Server, ModrinthServersFetchError } from "@modrinth/utils";
 import { reloadNuxtApp } from "#app";
-import { useServersFetch } from "@modrinth/ui";
 
 definePageMeta({
   middleware: "auth",

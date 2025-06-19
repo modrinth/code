@@ -115,9 +115,8 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled } from "@modrinth/ui";
+import { ButtonStyled, ModrinthServer } from "@modrinth/ui";
 import { CopyIcon, ExternalIcon, EyeIcon, EyeOffIcon } from "@modrinth/assets";
-import { ModrinthServer } from "@modrinth/ui";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;

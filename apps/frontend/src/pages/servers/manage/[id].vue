@@ -368,7 +368,14 @@ import {
   LockIcon,
 } from "@modrinth/assets";
 import DOMPurify from "dompurify";
-import { ButtonStyled, ErrorInformationCard, ServerNotice } from "@modrinth/ui";
+import {
+  ButtonStyled,
+  ErrorInformationCard,
+  ServerNotice,
+  useServersFetch,
+  ModrinthServer,
+  useModrinthServers,
+} from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
 import type { MessageDescriptor } from "@vintl/vintl";
 import type {
@@ -381,8 +388,6 @@ import type {
 } from "@modrinth/utils";
 import { reloadNuxtApp, navigateTo } from "#app";
 import { useModrinthServersConsole } from "~/store/console.ts";
-import { useServersFetch } from "@modrinth/ui";
-import { ModrinthServer, useModrinthServers } from "@modrinth/ui";
 import ServerInstallation from "~/components/ui/servers/ServerInstallation.vue";
 import PanelErrorIcon from "~/components/ui/servers/icons/PanelErrorIcon.vue";
 

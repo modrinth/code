@@ -5,6 +5,7 @@ import type { V1ErrorInfo } from "@modrinth/utils";
 export interface ServersFetchOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   contentType?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   body?: Record<string, any>;
   version?: number;
   override?: {

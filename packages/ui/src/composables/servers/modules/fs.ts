@@ -150,6 +150,7 @@ export class FSModule extends ServerModule {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   downloadFile(path: string, raw?: boolean): Promise<any> {
     return this.retryWithAuth(async () => {
       const encodedPath = encodeURIComponent(path);

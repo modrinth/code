@@ -569,6 +569,7 @@ import {
   ButtonStyled,
   CopyCode,
   commonMessages,
+  useServersFetch,
 } from "@modrinth/ui";
 import {
   PlusIcon,
@@ -591,7 +592,6 @@ import {
 } from "@modrinth/assets";
 import { calculateSavings, formatPrice, getCurrency } from "@modrinth/utils";
 import { ref, computed } from "vue";
-import { useServersFetch } from "@modrinth/ui";
 import { products } from "~/generated/state.json";
 
 definePageMeta({
