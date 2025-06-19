@@ -4,9 +4,7 @@ import {
   type ServersFetchOptions,
   type StateStorage,
 } from "@modrinth/ui";
-
-import { ModrinthServerError, type ModuleName } from "@modrinth/utils";
-import { addNotification } from "~/composables/notifs.js";
+import type { ModuleName } from "@modrinth/utils";
 import { useAuth } from "~/composables/auth.js";
 
 /**
@@ -23,23 +21,6 @@ export class NuxtStateStorage implements StateStorage {
 
   getRef(key: string): Ref<any> {
     return useState(key);
-  }
-}
-
-export function handleServersError(err: any) {
-  if (err instanceof ModrinthServerError && err.v1Error) {
-    addNotification({
-      title: err.v1Error?.context ?? `An error occurred`,
-      type: "error",
-      text: err.v1Error.description,
-      errorCode: err.v1Error.error,
-    });
-  } else {
-    addNotification({
-      title: "An error occurred",
-      type: "error",
-      text: err.message ?? (err.data ? err.data.description : err),
-    });
   }
 }
 

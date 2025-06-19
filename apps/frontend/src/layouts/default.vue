@@ -716,7 +716,6 @@ import {
 } from "@modrinth/ui";
 import { isAdmin, isStaff } from "@modrinth/utils";
 import { errors as generatedStateErrors } from "~/generated/state.json";
-
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
@@ -738,6 +737,8 @@ const router = useNativeRouter();
 const link = config.public.siteUrl + route.path.replace(/\/+$/, "");
 
 const basePopoutId = useId();
+
+provide("notifications", addNotification);
 
 const verifyEmailBannerMessages = defineMessages({
   title: {
