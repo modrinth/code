@@ -517,6 +517,12 @@
                 <nuxt-link
                   v-tooltip="'Create a server'"
                   :to="`/servers?project=${project.id}#plan`"
+                  @click="
+                    () => {
+                      flags.showProjectPageCreateServersTooltip = false;
+                      saveFeatureFlags();
+                    }
+                  "
                 >
                   <ServerPlusIcon aria-hidden="true" />
                 </nuxt-link>
