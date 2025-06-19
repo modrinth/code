@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { monthsInInterval, type ServerBillingInterval, type ServerPlan, type ServerRegion } from '../../utils/billing'
+import {
+  monthsInInterval,
+  type ServerBillingInterval,
+  type ServerPlan,
+  type ServerRegion,
+} from '../../utils/billing'
 import TagItem from '../base/TagItem.vue'
 import ServersSpecs from './ServersSpecs.vue'
 import { formatPrice, getPingLevel } from '@modrinth/utils'

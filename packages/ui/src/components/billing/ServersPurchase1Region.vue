@@ -9,7 +9,7 @@ import {
   type ServerBillingInterval,
   type ServerPlan,
   type ServerRegion,
-  type ServerStockRequest
+  type ServerStockRequest,
 } from '../../utils/billing'
 import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
 import Slider from '../base/Slider.vue'
@@ -35,7 +35,8 @@ const selectedPlan = defineModel<ServerPlan>('plan')
 const selectedRegion = defineModel<string>('region')
 
 const selectedPrice = computed(() => {
-  const amount = selectedPlan.value?.prices?.find((price) => price.currency_code === props.currency)?.prices?.intervals?.[props.interval];
+  const amount = selectedPlan.value?.prices?.find((price) => price.currency_code === props.currency)
+    ?.prices?.intervals?.[props.interval]
   return amount ? amount / monthsInInterval[props.interval] : undefined
 })
 
@@ -230,7 +231,11 @@ onMounted(() => {
       </h2>
       <div>
         <Slider v-model="selectedRam" :min="minRam" :max="maxRam" :step="2" unit="GB" />
-        <p v-if="selectedPrice" class="mt-2 mb-0"><span class="text-contrast text-lg font-bold">{{ formatPrice(locale, selectedPrice, currency, true) }} / month</span><span v-if="interval !== 'monthly'">, billed {{ interval }}</span></p>
+        <p v-if="selectedPrice" class="mt-2 mb-0">
+          <span class="text-contrast text-lg font-bold"
+            >{{ formatPrice(locale, selectedPrice, currency, true) }} / month</span
+          ><span v-if="interval !== 'monthly'">, billed {{ interval }}</span>
+        </p>
         <div class="bg-bg rounded-xl p-4 mt-2 text-secondary">
           <div v-if="checkingCustomStock" class="flex gap-2 items-center">
             <SpinnerIcon class="size-5 shrink-0 animate-spin" /> Checking availability...

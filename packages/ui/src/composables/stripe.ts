@@ -226,9 +226,11 @@ export const useStripe = (
       const metadata: CreatePaymentIntentRequest['metadata'] = {
         type: 'pyro',
         server_region: region.value,
-        source: project.value ? {
-          project_id: project.value
-        } : {},
+        source: project.value
+          ? {
+              project_id: project.value,
+            }
+          : {},
       }
 
       if (paymentIntentId.value) {
