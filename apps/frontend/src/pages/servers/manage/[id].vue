@@ -375,7 +375,6 @@ import {
   ServerNotice,
   useServersFetch,
   ModrinthServer,
-  useModrinthServers,
 } from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
 import type { MessageDescriptor } from "@vintl/vintl";

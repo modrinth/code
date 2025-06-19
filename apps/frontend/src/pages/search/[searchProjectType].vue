@@ -338,7 +338,7 @@ import ProjectCard from "~/components/ui/ProjectCard.vue";
 import LogoAnimated from "~/components/brand/LogoAnimated.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import NavTabs from "~/components/ui/NavTabs.vue";
-import { useModrinthServersSimple } from "~/utils/frontend-servers";
+import { useModrinthServersSimple } from "~/utils/frontend-servers.ts";
 
 const { formatMessage } = useVIntl();
 

@@ -1,21 +1,21 @@
-import { $fetch, FetchError } from "ofetch";
-import { ModrinthServerError, ModrinthServersFetchError } from "@modrinth/utils";
-import type { V1ErrorInfo } from "@modrinth/utils";
+import { $fetch, FetchError } from 'ofetch'
+import { ModrinthServerError, ModrinthServersFetchError } from '@modrinth/utils'
+import type { V1ErrorInfo } from '@modrinth/utils'
 
 export interface ServersFetchOptions {
-  base: string;
-  auth: string;
-  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-  contentType?: string;
+  base: string
+  auth: string
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+  contentType?: string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  body?: Record<string, any>;
-  version?: number;
+  body?: Record<string, any>
+  version?: number
   override?: {
-    url?: string;
-    token?: string;
-  };
-  retry?: number | boolean;
-  bypassAuth?: boolean;
+    url?: string
+    token?: string
+  }
+  retry?: number | boolean
+  bypassAuth?: boolean
 }
 
 export async function useServersFetch<T>(
@@ -24,166 +24,163 @@ export async function useServersFetch<T>(
   module?: string,
   errorContext?: string,
 ): Promise<T> {
-  const authToken = options.auth;
+  const authToken = options.auth
 
   if (!authToken && !options.bypassAuth) {
     const error = new ModrinthServersFetchError(
-      "[Modrinth Servers] Cannot fetch without auth",
+      '[Modrinth Servers] Cannot fetch without auth',
       10000,
-    );
-    throw new ModrinthServerError("Missing auth token", 401, error, module);
+    )
+    throw new ModrinthServerError('Missing auth token', 401, error, module)
   }
 
   const {
-    method = "GET",
-    contentType = "application/json",
+    method = 'GET',
+    contentType = 'application/json',
     body,
     version = 0,
     override,
-    retry = method === "GET" ? 3 : 0,
-  } = options;
+    retry = method === 'GET' ? 3 : 0,
+  } = options
 
-  const base = options.base.replace(
-    /\/$/,
-    "",
-  );
+  const base = options.base.replace(/\/$/, '')
 
   if (!base) {
     const error = new ModrinthServersFetchError(
-      "[Modrinth Servers] Cannot fetch without base url. Make sure to set a PYRO_BASE_URL in environment variables",
+      '[Modrinth Servers] Cannot fetch without base url. Make sure to set a PYRO_BASE_URL in environment variables',
       10001,
-    );
-    throw new ModrinthServerError("Configuration error: Missing PYRO_BASE_URL", 500, error, module);
+    )
+    throw new ModrinthServerError('Configuration error: Missing PYRO_BASE_URL', 500, error, module)
   }
 
-  const versionString = `v${version}`;
-  let newOverrideUrl = override?.url;
-  if (newOverrideUrl && newOverrideUrl.includes("v0") && version !== 0) {
-    newOverrideUrl = newOverrideUrl.replace("v0", versionString);
+  const versionString = `v${version}`
+  let newOverrideUrl = override?.url
+  if (newOverrideUrl && newOverrideUrl.includes('v0') && version !== 0) {
+    newOverrideUrl = newOverrideUrl.replace('v0', versionString)
   }
 
   const fullUrl = newOverrideUrl
-    ? `https://${newOverrideUrl}/${path.replace(/^\//, "")}`
+    ? `https://${newOverrideUrl}/${path.replace(/^\//, '')}`
     : version === 0
-      ? `${base}/modrinth/v${version}/${path.replace(/^\//, "")}`
-      : `${base}/v${version}/${path.replace(/^\//, "")}`;
+      ? `${base}/modrinth/v${version}/${path.replace(/^\//, '')}`
+      : `${base}/v${version}/${path.replace(/^\//, '')}`
 
   const headers: Record<string, string> = {
-    "User-Agent": "Modrinth/1.0 (https://modrinth.com)",
-    Vary: "Accept, Origin",
-  };
+    'User-Agent': 'Modrinth/1.0 (https://modrinth.com)',
+    Vary: 'Accept, Origin',
+  }
 
   if (!options.bypassAuth) {
-    headers.Authorization = `Bearer ${override?.token ?? authToken}`;
-    headers["Access-Control-Allow-Headers"] = "Authorization";
+    headers.Authorization = `Bearer ${override?.token ?? authToken}`
+    headers['Access-Control-Allow-Headers'] = 'Authorization'
   }
 
-  if (contentType !== "none") {
-    headers["Content-Type"] = contentType;
+  if (contentType !== 'none') {
+    headers['Content-Type'] = contentType
   }
 
-  if (typeof window !== "undefined") {
-    headers.Origin = window.location.origin;
+  if (typeof window !== 'undefined') {
+    headers.Origin = window.location.origin
   }
 
-  let attempts = 0;
-  const maxAttempts = (typeof retry === "boolean" ? (retry ? 3 : 1) : retry) + 1;
-  let lastError: Error | null = null;
+  let attempts = 0
+  const maxAttempts = (typeof retry === 'boolean' ? (retry ? 3 : 1) : retry) + 1
+  let lastError: Error | null = null
 
   while (attempts < maxAttempts) {
     try {
       const response = await $fetch<T>(fullUrl, {
         method,
         headers,
-        body: body && contentType === "application/json" ? JSON.stringify(body) : body ?? undefined,
+        body: body && contentType === 'application/json' ? JSON.stringify(body) : body ?? undefined,
         timeout: 10000,
-      });
+      })
 
-      return response;
+      return response
     } catch (error) {
-      lastError = error as Error;
-      attempts++;
+      lastError = error as Error
+      attempts++
 
       if (error instanceof FetchError) {
-        const statusCode = error.response?.status;
-        const statusText = error.response?.statusText || "Unknown error";
+        const statusCode = error.response?.status
+        const statusText = error.response?.statusText || 'Unknown error'
 
-        let v1Error: V1ErrorInfo | undefined;
+        let v1Error: V1ErrorInfo | undefined
         if (error.data?.error && error.data?.description) {
           v1Error = {
             context: errorContext,
             ...error.data,
-          };
+          }
         }
 
         const errorMessages: { [key: number]: string } = {
-          400: "Bad Request",
-          401: "Unauthorized",
-          403: "Forbidden",
-          404: "Not Found",
-          405: "Method Not Allowed",
-          408: "Request Timeout",
-          429: "Too Many Requests",
-          500: "Internal Server Error",
-          502: "Bad Gateway",
-          503: "Service Unavailable",
-          504: "Gateway Timeout",
-        };
+          400: 'Bad Request',
+          401: 'Unauthorized',
+          403: 'Forbidden',
+          404: 'Not Found',
+          405: 'Method Not Allowed',
+          408: 'Request Timeout',
+          429: 'Too Many Requests',
+          500: 'Internal Server Error',
+          502: 'Bad Gateway',
+          503: 'Service Unavailable',
+          504: 'Gateway Timeout',
+        }
 
         const message =
           statusCode && statusCode in errorMessages
             ? errorMessages[statusCode]
-            : `HTTP Error: ${statusCode || "unknown"} ${statusText}`;
+            : `HTTP Error: ${statusCode || 'unknown'} ${statusText}`
 
-        const isRetryable = statusCode ? [408, 429, 500, 502, 504].includes(statusCode) : true;
+        const isRetryable = statusCode ? [408, 429, 500, 502, 504].includes(statusCode) : true
 
         if (!isRetryable || attempts >= maxAttempts) {
-          console.error("Fetch error:", error);
+          console.error('Fetch error:', error)
 
           const fetchError = new ModrinthServersFetchError(
             `[Modrinth Servers] ${message}`,
             statusCode,
             error,
-          );
-          throw new ModrinthServerError(error.message, statusCode, fetchError, module, v1Error);
+          )
+          throw new ModrinthServerError(error.message, statusCode, fetchError, module, v1Error)
         }
 
-        const delay = Math.min(1000 * Math.pow(2, attempts - 1) + Math.random() * 1000, 10000);
-        console.warn(`Retrying request in ${delay}ms (attempt ${attempts}/${maxAttempts - 1})`);
-        await new Promise((resolve) => setTimeout(resolve, delay));
-        continue;
+        const delay = Math.min(1000 * Math.pow(2, attempts - 1) + Math.random() * 1000, 10000)
+        console.warn(`Retrying request in ${delay}ms (attempt ${attempts}/${maxAttempts - 1})`)
+        await new Promise((resolve) => setTimeout(resolve, delay))
+        continue
       }
 
-      console.error("Unexpected fetch error:", error);
+      console.error('Unexpected fetch error:', error)
       const fetchError = new ModrinthServersFetchError(
-        "[Modrinth Servers] An unexpected error occurred during the fetch operation.",
+        '[Modrinth Servers] An unexpected error occurred during the fetch operation.',
         undefined,
         error as Error,
-      );
+      )
       throw new ModrinthServerError(
-        "Unexpected error during fetch operation",
+        'Unexpected error during fetch operation',
         undefined,
         fetchError,
         module,
-      );
+      )
     }
   }
 
-  console.error("All retry attempts failed:", lastError);
+  console.error('All retry attempts failed:', lastError)
   if (lastError instanceof FetchError) {
-    const statusCode = lastError.response?.status;
+    const statusCode = lastError.response?.status
     const pyroError = new ModrinthServersFetchError(
-      "Maximum retry attempts reached",
+      'Maximum retry attempts reached',
       statusCode,
       lastError,
-    );
-    throw new ModrinthServerError("Maximum retry attempts reached", statusCode, pyroError, module);
+    )
+    throw new ModrinthServerError('Maximum retry attempts reached', statusCode, pyroError, module)
   }
 
   const fetchError = new ModrinthServersFetchError(
-    "Maximum retry attempts reached",
+    'Maximum retry attempts reached',
     undefined,
     lastError || undefined,
-  );
-  throw new ModrinthServerError("Maximum retry attempts reached", undefined, fetchError, module);
+  )
+  throw new ModrinthServerError('Maximum retry attempts reached', undefined, fetchError, module)
 }

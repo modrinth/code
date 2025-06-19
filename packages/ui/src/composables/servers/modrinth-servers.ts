@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ModrinthServerError } from "@modrinth/utils";
-import type { JWTAuth, ModuleError, ModuleName } from "@modrinth/utils";
-import { useServersFetch, type ServersFetchOptions } from "./servers-fetch.js";
+import { ModrinthServerError } from '@modrinth/utils'
+import type { JWTAuth, ModuleError, ModuleName } from '@modrinth/utils'
+import { useServersFetch, type ServersFetchOptions } from './servers-fetch.js'
 
 import {
   GeneralModule,
@@ -11,68 +11,83 @@ import {
   StartupModule,
   WSModule,
   FSModule,
-} from "./modules/index.js";
-import { reactive, type Ref } from "vue";
+} from './modules/index.js'
+import { reactive, type Ref } from 'vue'
 
 export interface StateStorage {
-  get(key: string): any;
-  set(key: string, value: any): void;
-  getRef(key: string): Ref<any>;
+  get(key: string): any
+  set(key: string, value: any): void
+  getRef(key: string): Ref<any>
 }
 
 export class ModrinthServer {
-  readonly serverId: string;
-  readonly auth: string;
-  readonly base: string;
-  readonly errorHandler: (err: any) => void;
-  readonly stateStorage: StateStorage;
+  readonly serverId: string
+  readonly auth: string
+  readonly base: string
+  readonly errorHandler: (err: any) => void
+  readonly stateStorage: StateStorage
 
-  private errors: Partial<Record<ModuleName, ModuleError>> = {};
+  private errors: Partial<Record<ModuleName, ModuleError>> = {}
 
-  readonly general: GeneralModule;
-  readonly content: ContentModule;
-  readonly backups: BackupsModule;
-  readonly network: NetworkModule;
-  readonly startup: StartupModule;
-  readonly ws: WSModule;
-  readonly fs: FSModule;
+  readonly general: GeneralModule
+  readonly content: ContentModule
+  readonly backups: BackupsModule
+  readonly network: NetworkModule
+  readonly startup: StartupModule
+  readonly ws: WSModule
+  readonly fs: FSModule
 
-  constructor(serverId: string, auth: string, base: string, errorHandler: (err: any) => void, stateStorage: StateStorage) {
-    this.serverId = serverId;
-    this.auth = auth;
-    this.base = base;
-    this.errorHandler = errorHandler;
-    this.stateStorage = stateStorage;
+  constructor(
+    serverId: string,
+    auth: string,
+    base: string,
+    errorHandler: (err: any) => void,
+    stateStorage: StateStorage,
+  ) {
+    this.serverId = serverId
+    this.auth = auth
+    this.base = base
+    this.errorHandler = errorHandler
+    this.stateStorage = stateStorage
 
-    this.general = new GeneralModule(this);
-    this.content = new ContentModule(this);
-    this.backups = new BackupsModule(this);
-    this.network = new NetworkModule(this);
-    this.startup = new StartupModule(this);
-    this.ws = new WSModule(this);
-    this.fs = new FSModule(this);
+    this.general = new GeneralModule(this)
+    this.content = new ContentModule(this)
+    this.backups = new BackupsModule(this)
+    this.network = new NetworkModule(this)
+    this.startup = new StartupModule(this)
+    this.ws = new WSModule(this)
+    this.fs = new FSModule(this)
   }
 
-  async request<T>(route: string, options: Partial<ServersFetchOptions> = {}, module?: string,
-  errorContext?: string): Promise<T> {
-    return await useServersFetch<T>(route, {
-      auth: this.auth,
-      base: this.base,
-      ...options
-    }, module, errorContext);
+  async request<T>(
+    route: string,
+    options: Partial<ServersFetchOptions> = {},
+    module?: string,
+    errorContext?: string,
+  ): Promise<T> {
+    return await useServersFetch<T>(
+      route,
+      {
+        auth: this.auth,
+        base: this.base,
+        ...options,
+      },
+      module,
+      errorContext,
+    )
   }
 
   async createMissingFolders(path: string): Promise<void> {
-    if (path.startsWith("/")) {
-      path = path.substring(1);
+    if (path.startsWith('/')) {
+      path = path.substring(1)
     }
-    const folders = path.split("/");
-    let currentPath = "";
+    const folders = path.split('/')
+    let currentPath = ''
 
     for (const folder of folders) {
-      currentPath += "/" + folder;
+      currentPath += '/' + folder
       try {
-        await this.fs.createFileOrFolder(currentPath, "directory");
+        await this.fs.createFileOrFolder(currentPath, 'directory')
       } catch {
         // Folder might already exist, ignore error
       }
@@ -80,189 +95,189 @@ export class ModrinthServer {
   }
 
   async fetchConfigFile(fileName: string): Promise<any> {
-    return await this.request(`servers/${this.serverId}/config/${fileName}`);
+    return await this.request(`servers/${this.serverId}/config/${fileName}`)
   }
 
   constructServerProperties(properties: any): string {
-    let fileContent = `#Minecraft server properties\n#${new Date().toUTCString()}\n`;
+    let fileContent = `#Minecraft server properties\n#${new Date().toUTCString()}\n`
 
     for (const [key, value] of Object.entries(properties)) {
-      if (typeof value === "object") {
-        fileContent += `${key}=${JSON.stringify(value)}\n`;
-      } else if (typeof value === "boolean") {
-        fileContent += `${key}=${value ? "true" : "false"}\n`;
+      if (typeof value === 'object') {
+        fileContent += `${key}=${JSON.stringify(value)}\n`
+      } else if (typeof value === 'boolean') {
+        fileContent += `${key}=${value ? 'true' : 'false'}\n`
       } else {
-        fileContent += `${key}=${value}\n`;
+        fileContent += `${key}=${value}\n`
       }
     }
 
-    return fileContent;
+    return fileContent
   }
 
   async processImage(iconUrl: string | undefined): Promise<string | undefined> {
-    const imageKey = `server-icon-${this.serverId}`;
-    const sharedImage = this.stateStorage.getRef(imageKey);
+    const imageKey = `server-icon-${this.serverId}`
+    const sharedImage = this.stateStorage.getRef(imageKey)
 
     if (sharedImage.value) {
-      return sharedImage.value;
+      return sharedImage.value
     }
 
     try {
-      const auth = await this.request<JWTAuth>(`servers/${this.serverId}/fs`);
+      const auth = await this.request<JWTAuth>(`servers/${this.serverId}/fs`)
       try {
         const fileData = this.request(`/download?path=/server-icon-original.png`, {
           override: auth,
           retry: false,
-        });
+        })
 
         if (fileData instanceof Blob && typeof window !== 'undefined') {
           const dataURL = await new Promise<string>((resolve) => {
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            const img = new Image();
+            const canvas = document.createElement('canvas')
+            const ctx = canvas.getContext('2d')
+            const img = new Image()
             img.onload = () => {
-              canvas.width = 512;
-              canvas.height = 512;
-              ctx?.drawImage(img, 0, 0, 512, 512);
-              const dataURL = canvas.toDataURL("image/png");
-              sharedImage.value = dataURL;
-              resolve(dataURL);
-              URL.revokeObjectURL(img.src);
-            };
-            img.src = URL.createObjectURL(fileData);
-          });
-          return dataURL;
+              canvas.width = 512
+              canvas.height = 512
+              ctx?.drawImage(img, 0, 0, 512, 512)
+              const dataURL = canvas.toDataURL('image/png')
+              sharedImage.value = dataURL
+              resolve(dataURL)
+              URL.revokeObjectURL(img.src)
+            }
+            img.src = URL.createObjectURL(fileData)
+          })
+          return dataURL
         }
       } catch (error) {
         if (error instanceof ModrinthServerError && error.statusCode === 404) {
           if (iconUrl) {
             try {
-              const response = await fetch(iconUrl);
-              if (!response.ok) throw new Error("Failed to fetch icon");
-              const file = await response.blob();
-              const originalFile = new File([file], "server-icon-original.png", {
-                type: "image/png",
-              });
+              const response = await fetch(iconUrl)
+              if (!response.ok) throw new Error('Failed to fetch icon')
+              const file = await response.blob()
+              const originalFile = new File([file], 'server-icon-original.png', {
+                type: 'image/png',
+              })
 
               if (typeof window !== 'undefined') {
                 const dataURL = await new Promise<string>((resolve) => {
-                  const canvas = document.createElement("canvas");
-                  const ctx = canvas.getContext("2d");
-                  const img = new Image();
+                  const canvas = document.createElement('canvas')
+                  const ctx = canvas.getContext('2d')
+                  const img = new Image()
                   img.onload = () => {
-                    canvas.width = 64;
-                    canvas.height = 64;
-                    ctx?.drawImage(img, 0, 0, 64, 64);
+                    canvas.width = 64
+                    canvas.height = 64
+                    ctx?.drawImage(img, 0, 0, 64, 64)
                     canvas.toBlob(async (blob) => {
                       if (blob) {
-                        const scaledFile = new File([blob], "server-icon.png", {
-                          type: "image/png",
-                        });
+                        const scaledFile = new File([blob], 'server-icon.png', {
+                          type: 'image/png',
+                        })
                         await this.request(`/create?path=/server-icon.png&type=file`, {
-                          method: "POST",
-                          contentType: "application/octet-stream",
+                          method: 'POST',
+                          contentType: 'application/octet-stream',
                           body: scaledFile,
                           override: auth,
-                        });
+                        })
                         await this.request(`/create?path=/server-icon-original.png&type=file`, {
-                          method: "POST",
-                          contentType: "application/octet-stream",
+                          method: 'POST',
+                          contentType: 'application/octet-stream',
                           body: originalFile,
                           override: auth,
-                        });
+                        })
                       }
-                    }, "image/png");
-                    const dataURL = canvas.toDataURL("image/png");
-                    sharedImage.value = dataURL;
-                    resolve(dataURL);
-                    URL.revokeObjectURL(img.src);
-                  };
-                  img.src = URL.createObjectURL(file);
-                });
-                return dataURL;
+                    }, 'image/png')
+                    const dataURL = canvas.toDataURL('image/png')
+                    sharedImage.value = dataURL
+                    resolve(dataURL)
+                    URL.revokeObjectURL(img.src)
+                  }
+                  img.src = URL.createObjectURL(file)
+                })
+                return dataURL
               }
             } catch (externalError: any) {
-              console.debug("Could not process external icon:", externalError.message);
+              console.debug('Could not process external icon:', externalError.message)
             }
           }
         } else {
-          throw error;
+          throw error
         }
       }
     } catch (error: any) {
-      console.debug("Icon processing failed:", error.message);
+      console.debug('Icon processing failed:', error.message)
     }
 
-    sharedImage.value = undefined;
-    return undefined;
+    sharedImage.value = undefined
+    return undefined
   }
 
   async refresh(
     modules: ModuleName[] = [],
     options?: {
-      preserveConnection?: boolean;
-      preserveInstallState?: boolean;
+      preserveConnection?: boolean
+      preserveInstallState?: boolean
     },
   ): Promise<void> {
     const modulesToRefresh =
       modules.length > 0
         ? modules
-        : (["general", "content", "backups", "network", "startup", "ws", "fs"] as ModuleName[]);
+        : (['general', 'content', 'backups', 'network', 'startup', 'ws', 'fs'] as ModuleName[])
 
     for (const module of modulesToRefresh) {
       try {
         switch (module) {
-          case "general": {
+          case 'general': {
             if (options?.preserveConnection) {
-              const currentImage = this.general.image;
-              const currentMotd = this.general.motd;
-              const currentStatus = this.general.status;
+              const currentImage = this.general.image
+              const currentMotd = this.general.motd
+              const currentStatus = this.general.status
 
-              await this.general.fetch();
+              await this.general.fetch()
 
               if (currentImage) {
-                this.general.image = currentImage;
+                this.general.image = currentImage
               }
               if (currentMotd) {
-                this.general.motd = currentMotd;
+                this.general.motd = currentMotd
               }
-              if (options.preserveInstallState && currentStatus === "installing") {
-                this.general.status = "installing";
+              if (options.preserveInstallState && currentStatus === 'installing') {
+                this.general.status = 'installing'
               }
             } else {
-              await this.general.fetch();
+              await this.general.fetch()
             }
-            break;
+            break
           }
-          case "content":
-            await this.content.fetch();
-            break;
-          case "backups":
-            await this.backups.fetch();
-            break;
-          case "network":
-            await this.network.fetch();
-            break;
-          case "startup":
-            await this.startup.fetch();
-            break;
-          case "ws":
-            await this.ws.fetch();
-            break;
-          case "fs":
-            await this.fs.fetch();
-            break;
+          case 'content':
+            await this.content.fetch()
+            break
+          case 'backups':
+            await this.backups.fetch()
+            break
+          case 'network':
+            await this.network.fetch()
+            break
+          case 'startup':
+            await this.startup.fetch()
+            break
+          case 'ws':
+            await this.ws.fetch()
+            break
+          case 'fs':
+            await this.fs.fetch()
+            break
         }
       } catch (error) {
         if (error instanceof ModrinthServerError) {
-          if (error.statusCode === 404 && ["fs", "content"].includes(module)) {
-            console.debug(`Optional ${module} resource not found:`, error.message);
-            continue;
+          if (error.statusCode === 404 && ['fs', 'content'].includes(module)) {
+            console.debug(`Optional ${module} resource not found:`, error.message)
+            continue
           }
 
           if (error.statusCode === 503) {
-            console.debug(`Temporary ${module} unavailable:`, error.message);
-            continue;
+            console.debug(`Temporary ${module} unavailable:`, error.message)
+            continue
           }
         }
 
@@ -270,15 +285,15 @@ export class ModrinthServer {
           error:
             error instanceof ModrinthServerError
               ? error
-              : new ModrinthServerError("Unknown error", undefined, error as Error),
+              : new ModrinthServerError('Unknown error', undefined, error as Error),
           timestamp: Date.now(),
-        };
+        }
       }
     }
   }
 
   get moduleErrors() {
-    return this.errors;
+    return this.errors
   }
 }
 
@@ -288,9 +303,9 @@ export const useModrinthServers = async (
   auth: string,
   errorHandler: (err: any) => void,
   stateStorage: StateStorage,
-  includedModules: ModuleName[] = ["general"],
+  includedModules: ModuleName[] = ['general'],
 ) => {
-  const server = new ModrinthServer(serverId, base, auth, errorHandler, stateStorage);
-  await server.refresh(includedModules);
-  return reactive(server);
-};
+  const server = new ModrinthServer(serverId, base, auth, errorHandler, stateStorage)
+  await server.refresh(includedModules)
+  return reactive(server)
+}
