@@ -768,12 +768,10 @@ pub async fn launch_minecraft(
             main_class_keep_alive,
             async |process: &ProcessMetadata, stdin| {
                 let process_start_time = process.start_time.to_rfc3339();
-                let process_uuid = process.uuid.to_string();
                 let profile_created_time = profile.created.to_rfc3339();
                 let profile_modified_time = profile.created.to_rfc3339();
                 let system_properties = [
                     ("modrinth.process.startTime", Some(&process_start_time)),
-                    ("modrinth.process.uuid", Some(&process_uuid)),
                     ("modrinth.profile.created", Some(&profile_created_time)),
                     ("modrinth.profile.icon", profile.icon_path.as_ref()),
                     (
