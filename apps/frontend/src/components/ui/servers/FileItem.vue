@@ -76,17 +76,15 @@ import {
   RightArrowIcon,
   PackageOpenIcon,
   FileArchiveIcon,
+  FolderCogIcon,
+  EarthIcon,
+  FileCodeIcon,
+  FileTextIcon,
+  FileImageIcon,
 } from "@modrinth/assets";
 import { computed, shallowRef, ref } from "vue";
 import { renderToString } from "vue/server-renderer";
 import { useRouter, useRoute } from "vue-router";
-import {
-  UiServersIconsCogFolderIcon,
-  UiServersIconsEarthIcon,
-  UiServersIconsCodeFileIcon,
-  UiServersIconsTextFileIcon,
-  UiServersIconsImageFileIcon,
-} from "#components";
 import PaletteIcon from "~/assets/icons/palette.svg?component";
 
 interface FileItemProps {
@@ -193,16 +191,16 @@ const menuOptions = computed(() => [
 
 const iconComponent = computed(() => {
   if (props.type === "directory") {
-    if (props.name === "config") return UiServersIconsCogFolderIcon;
-    if (props.name === "world") return UiServersIconsEarthIcon;
+    if (props.name === "config") return FolderCogIcon;
+    if (props.name === "world") return EarthIcon;
     if (props.name === "resourcepacks") return PaletteIcon;
     return FolderOpenIcon;
   }
 
   const ext = fileExtension.value;
-  if (codeExtensions.includes(ext)) return UiServersIconsCodeFileIcon;
-  if (textExtensions.includes(ext)) return UiServersIconsTextFileIcon;
-  if (imageExtensions.includes(ext)) return UiServersIconsImageFileIcon;
+  if (codeExtensions.includes(ext)) return FileCodeIcon;
+  if (textExtensions.includes(ext)) return FileTextIcon;
+  if (imageExtensions.includes(ext)) return FileImageIcon;
   if (supportedArchiveExtensions.includes(ext)) return FileArchiveIcon;
   return FileIcon;
 });
@@ -298,9 +296,9 @@ const getDragIcon = async () => {
 
   if (props.type === "directory") {
     if (props.name === "config") {
-      iconToUse = UiServersIconsCogFolderIcon;
+      iconToUse = FolderCogIcon;
     } else if (props.name === "world") {
-      iconToUse = UiServersIconsEarthIcon;
+      iconToUse = EarthIcon;
     } else if (props.name === "resourcepacks") {
       iconToUse = PaletteIcon;
     } else {
@@ -309,11 +307,11 @@ const getDragIcon = async () => {
   } else {
     const ext = fileExtension.value;
     if (codeExtensions.includes(ext)) {
-      iconToUse = UiServersIconsCodeFileIcon;
+      iconToUse = FileCodeIcon;
     } else if (textExtensions.includes(ext)) {
-      iconToUse = UiServersIconsTextFileIcon;
+      iconToUse = FileTextIcon;
     } else if (imageExtensions.includes(ext)) {
-      iconToUse = UiServersIconsImageFileIcon;
+      iconToUse = FileImageIcon;
     } else {
       iconToUse = FileIcon;
     }

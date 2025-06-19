@@ -102,7 +102,7 @@
               <div
                 class="relative flex h-9 w-full items-center rounded-xl bg-button-bg px-4 opacity-50"
               >
-                <UiServersIconsLoadingIcon class="mr-2 animate-spin" />
+                <RefreshCwIcon class="mr-2 animate-spin" />
                 Loading versions...
                 <DropdownIcon class="absolute right-4" />
               </div>
@@ -197,12 +197,11 @@
 </template>
 
 <script setup lang="ts">
-import { BackupWarning, ButtonStyled, NewModal, Toggle } from "@modrinth/ui";
-import { DropdownIcon, RightArrowIcon, ServerIcon, XIcon } from "@modrinth/assets";
+import { BackupWarning, ButtonStyled, NewModal, Toggle, ModrinthServer } from "@modrinth/ui";
+import { DropdownIcon, RefreshCwIcon, RightArrowIcon, ServerIcon, XIcon } from "@modrinth/assets";
 import { $fetch } from "ofetch";
 import { type Loaders, ModrinthServersFetchError } from "@modrinth/utils";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
-import { ModrinthServer } from "@modrinth/ui";
 
 const { formatMessage } = useVIntl();
 

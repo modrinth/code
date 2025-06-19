@@ -70,7 +70,7 @@
         <ButtonStyled type="standard" color="brand">
           <button :disabled="!canTakeAction" @click="handlePrimaryAction">
             <div v-if="isTransitionState" class="grid place-content-center">
-              <UiServersIconsLoadingIcon />
+              <RefreshCwIcon />
             </div>
             <component :is="isRunning ? UpdatedIcon : PlayIcon" v-else />
             <span>{{ primaryActionText }}</span>
@@ -116,6 +116,7 @@ import {
   InfoIcon,
   MoreVerticalIcon,
   ClipboardCopyIcon,
+  RefreshCwIcon,
 } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { useRouter } from "vue-router";

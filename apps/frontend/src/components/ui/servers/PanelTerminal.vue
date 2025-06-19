@@ -221,8 +221,8 @@
         :class="{ hidden: searchInput || hasSelection || isSingleLineSelected }"
         @click="toggleFullscreen"
       >
-        <LazyUiServersIconsMinimizeIconVue v-if="isFullScreen" />
-        <LazyUiServersIconsFullscreenIcon v-else />
+        <MinimizeIcon v-if="isFullScreen" />
+        <FullscreenIcon v-else />
       </button>
 
       <Transition name="fade">
@@ -295,7 +295,15 @@
 </template>
 
 <script setup lang="ts">
-import { RightArrowIcon, CopyIcon, XIcon, SearchIcon, EyeIcon } from "@modrinth/assets";
+import {
+  RightArrowIcon,
+  CopyIcon,
+  XIcon,
+  SearchIcon,
+  EyeIcon,
+  MinimizeIcon,
+  FullscreenIcon,
+} from "@modrinth/assets";
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
 import { useDebounceFn } from "@vueuse/core";
 import { NewModal } from "@modrinth/ui";

@@ -223,6 +223,7 @@
 </template>
 
 <script setup lang="ts">
+// TODO: Figure out where the actual loader icons are, no inline SVG!
 import { LoaderIcon } from "@modrinth/assets";
 import type { Loaders } from "@modrinth/utils";
 

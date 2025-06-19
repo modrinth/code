@@ -9,7 +9,7 @@
       <div class="flex gap-2">
         <ButtonStyled>
           <button size="sm" @click="$emit('refetch')">
-            <UiServersIconsLoadingIcon class="h-5 w-5" />
+            <RefreshCwIcon class="h-5 w-5" />
             Try again
           </button>
         </ButtonStyled>
@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { FileIcon, HomeIcon } from "@modrinth/assets";
+import { FileIcon, HomeIcon, RefreshCwIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 
 defineProps<{

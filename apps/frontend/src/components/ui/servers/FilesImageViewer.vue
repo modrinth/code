@@ -14,7 +14,7 @@
         v-if="state.hasError"
         class="flex h-full w-full flex-col items-center justify-center gap-8"
       >
-        <UiServersIconsPanelErrorIcon />
+        <TriangleAlertIcon />
         <p class="m-0">{{ state.errorMessage || "Invalid or empty image file." }}</p>
       </div>
       <img
@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
-import { ZoomInIcon, ZoomOutIcon } from "@modrinth/assets";
+import { TriangleAlertIcon, ZoomInIcon, ZoomOutIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 
 const ZOOM_MIN = 0.1;
