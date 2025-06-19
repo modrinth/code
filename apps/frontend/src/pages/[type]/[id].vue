@@ -551,7 +551,9 @@
                   <p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
                     Modrinth Servers is the easiest way to play with your friends without hassle!
                   </p>
-                  <p class="m-0 text-wrap text-sm font-bold text-primary">Starting at $6/month</p>
+                  <p class="m-0 text-wrap text-sm font-bold text-primary">
+                    Starting at $5<span class="text-xs"> / month</span>
+                  </p>
                 </div>
               </template>
             </Tooltip>
