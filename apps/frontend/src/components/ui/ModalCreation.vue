@@ -84,11 +84,11 @@
 </template>
 
 <script setup>
-import { NewModal, ButtonStyled, DropdownSelect } from "@modrinth/ui";
+import { NewModal, ButtonStyled, DropdownSelect, injectNotificationManager } from "@modrinth/ui";
 import { XIcon, PlusIcon } from "@modrinth/assets";
 
 const router = useRouter();
-const app = useNuxtApp();
+const { addNotification } = injectNotificationManager();
 
 const props = defineProps({
   organizationId: {
@@ -180,8 +180,7 @@ async function createProject() {
       },
     });
   } catch (err) {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",

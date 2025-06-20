@@ -92,18 +92,7 @@
           </button>
         </ButtonStyled>
         <ButtonStyled>
-          <button
-            :disabled="isLoading"
-            @click="
-              () => {
-                if (isMrpackModalSecondPhase) {
-                  isMrpackModalSecondPhase = false;
-                } else {
-                  hide();
-                }
-              }
-            "
-          >
+          <button :disabled="isLoading" @click="handleCancel">
             <XIcon />
             {{ isMrpackModalSecondPhase ? "Go back" : "Cancel" }}
           </button>
@@ -114,11 +103,17 @@
 </template>
 
 <script setup lang="ts">
-import { BackupWarning, ButtonStyled, NewModal } from "@modrinth/ui";
+import { ref, computed, nextTick } from "vue";
+import {
+  BackupWarning,
+  ButtonStyled,
+  NewModal,
+  injectNotificationManager,
+  type ModrinthServer,
+} from "@modrinth/ui";
 import { UploadIcon, RightArrowIcon, XIcon, ServerIcon } from "@modrinth/assets";
 import { ModrinthServersFetchError } from "@modrinth/utils";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
-import { ModrinthServer } from "@modrinth/ui";
 
 const props = defineProps<{
   server: ModrinthServer;
@@ -129,25 +124,27 @@ const emit = defineEmits<{
   reinstall: [any?];
 }>();
 
-const mrpackModal = ref();
-const isMrpackModalSecondPhase = ref(false);
-const hardReset = ref(false);
-const isLoading = ref(false);
-const loadingServerCheck = ref(false);
+const { addNotification } = injectNotificationManager();
+
+const mrpackModal = ref<InstanceType<typeof NewModal>>();
+const isMrpackModalSecondPhase = ref<boolean>(false);
+const hardReset = ref<boolean>(false);
+const isLoading = ref<boolean>(false);
+const loadingServerCheck = ref<boolean>(false);
 const mrpackFile = ref<File | null>(null);
 
 const isDangerous = computed(() => hardReset.value);
 const canInstall = computed(() => !mrpackFile.value || isLoading.value || loadingServerCheck.value);
 
-const uploadMrpack = (event: Event) => {
+function uploadMrpack(event: Event): void {
   const target = event.target as HTMLInputElement;
   if (!target.files || target.files.length === 0) {
     return;
   }
   mrpackFile.value = target.files[0];
-};
+}
 
-const handleReinstall = async () => {
+async function handleReinstall(): Promise<void> {
   if (hardReset.value && !isMrpackModalSecondPhase.value) {
     isMrpackModalSecondPhase.value = true;
     return;
@@ -178,14 +175,12 @@ const handleReinstall = async () => {
   } catch (error) {
     if (error instanceof ModrinthServersFetchError && error?.statusCode === 429) {
       addNotification({
-        group: "server",
         title: "Cannot reinstall server",
         text: "You are being rate limited. Please try again later.",
         type: "error",
       });
     } else {
       addNotification({
-        group: "server",
         title: "Reinstall Failed",
         text: "An unexpected error occurred while reinstalling. Please try again later.",
         type: "error",
@@ -194,22 +189,35 @@ const handleReinstall = async () => {
   } finally {
     isLoading.value = false;
   }
-};
+}
 
-const onShow = () => {
+function handleCancel(): void {
+  if (isMrpackModalSecondPhase.value) {
+    isMrpackModalSecondPhase.value = false;
+  } else {
+    hide();
+  }
+}
+
+function onShow(): void {
   hardReset.value = false;
   isMrpackModalSecondPhase.value = false;
   loadingServerCheck.value = false;
   isLoading.value = false;
   mrpackFile.value = null;
-};
+}
 
-const onHide = () => {
+function onHide(): void {
   onShow();
-};
+}
 
-const show = () => mrpackModal.value?.show();
-const hide = () => mrpackModal.value?.hide();
+function show(): void {
+  mrpackModal.value?.show();
+}
+
+function hide(): void {
+  mrpackModal.value?.hide();
+}
 
 defineExpose({ show, hide });
 </script>

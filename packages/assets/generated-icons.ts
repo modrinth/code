@@ -132,13 +132,13 @@ import _RadioButtonCheckedIcon from './icons/radio-button-checked.svg?component'
 import _RadioButtonIcon from './icons/radio-button.svg?component'
 import _ReceiptTextIcon from './icons/receipt-text.svg?component'
 import _RedoIcon from './icons/redo.svg?component'
-import _RefreshCwIcon from './icons/refresh-cw.svg?component'
+import _RefreshClockwiseIcon from './icons/refresh-clockwise.svg?component'
 import _ReplyIcon from './icons/reply.svg?component'
 import _ReportIcon from './icons/report.svg?component'
 import _RestoreIcon from './icons/restore.svg?component'
 import _RightArrowIcon from './icons/right-arrow.svg?component'
-import _RotateCcwIcon from './icons/rotate-ccw.svg?component'
-import _RotateCwIcon from './icons/rotate-cw.svg?component'
+import _RotateClockwiseIcon from './icons/rotate-clockwise.svg?component'
+import _RotateCounterClockwiseIcon from './icons/rotate-counter-clockwise.svg?component'
 import _SaveIcon from './icons/save.svg?component'
 import _ScaleIcon from './icons/scale.svg?component'
 import _ScanEyeIcon from './icons/scan-eye.svg?component'
@@ -151,8 +151,8 @@ import _ShieldIcon from './icons/shield.svg?component'
 import _SignalIcon from './icons/signal.svg?component'
 import _SkullIcon from './icons/skull.svg?component'
 import _SlashIcon from './icons/slash.svg?component'
-import _SortAscIcon from './icons/sort-asc.svg?component'
-import _SortDescIcon from './icons/sort-desc.svg?component'
+import _SortAscendingIcon from './icons/sort-ascending.svg?component'
+import _SortDescendingIcon from './icons/sort-descending.svg?component'
 import _SparklesIcon from './icons/sparkles.svg?component'
 import _SpinnerIcon from './icons/spinner.svg?component'
 import _StarIcon from './icons/star.svg?component'
@@ -322,13 +322,13 @@ export const RadioButtonCheckedIcon = _RadioButtonCheckedIcon
 export const RadioButtonIcon = _RadioButtonIcon
 export const ReceiptTextIcon = _ReceiptTextIcon
 export const RedoIcon = _RedoIcon
-export const RefreshCwIcon = _RefreshCwIcon
+export const RefreshClockwiseIcon = _RefreshClockwiseIcon
 export const ReplyIcon = _ReplyIcon
 export const ReportIcon = _ReportIcon
 export const RestoreIcon = _RestoreIcon
 export const RightArrowIcon = _RightArrowIcon
-export const RotateCcwIcon = _RotateCcwIcon
-export const RotateCwIcon = _RotateCwIcon
+export const RotateClockwiseIcon = _RotateClockwiseIcon
+export const RotateCounterClockwiseIcon = _RotateCounterClockwiseIcon
 export const SaveIcon = _SaveIcon
 export const ScaleIcon = _ScaleIcon
 export const ScanEyeIcon = _ScanEyeIcon
@@ -341,8 +341,8 @@ export const ShieldIcon = _ShieldIcon
 export const SignalIcon = _SignalIcon
 export const SkullIcon = _SkullIcon
 export const SlashIcon = _SlashIcon
-export const SortAscIcon = _SortAscIcon
-export const SortDescIcon = _SortDescIcon
+export const SortAscendingIcon = _SortAscendingIcon
+export const SortDescendingIcon = _SortDescendingIcon
 export const SparklesIcon = _SparklesIcon
 export const SpinnerIcon = _SpinnerIcon
 export const StarIcon = _StarIcon

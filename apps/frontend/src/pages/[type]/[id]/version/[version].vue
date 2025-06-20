@@ -638,6 +638,7 @@ import {
   ButtonStyled,
   ConfirmModal,
   MarkdownEditor,
+  injectNotificationManager,
 } from "@modrinth/ui";
 import {
   FileIcon,
@@ -990,12 +991,12 @@ export default defineNuxtComponent({
     renderHighlightedString,
     async addDependency(dependencyAddMode, newDependencyId, newDependencyType, hideErrors) {
       try {
+        const { addNotification } = injectNotificationManager();
         if (dependencyAddMode === "project") {
           const project = await useBaseFetch(`project/${newDependencyId}`);
 
           if (this.version.dependencies.some((dep) => project.id === dep.project_id)) {
-            this.$notify({
-              group: "main",
+            addNotification({
               title: "Dependency already added",
               text: "You cannot add the same dependency twice.",
               type: "error",
@@ -1019,8 +1020,7 @@ export default defineNuxtComponent({
           const project = await useBaseFetch(`project/${version.project_id}`);
 
           if (this.version.dependencies.some((dep) => version.id === dep.version_id)) {
-            this.$notify({
-              group: "main",
+            addNotification({
               title: "Dependency already added",
               text: "You cannot add the same dependency twice.",
               type: "error",
@@ -1047,8 +1047,7 @@ export default defineNuxtComponent({
         this.newDependencyId = "";
       } catch {
         if (!hideErrors) {
-          this.$notify({
-            group: "main",
+          addNotification({
             title: "Invalid Dependency",
             text: "The specified dependency could not be found",
             type: "error",
@@ -1141,8 +1140,8 @@ export default defineNuxtComponent({
           )}`,
         );
       } catch (err) {
-        this.$notify({
-          group: "main",
+        const { addNotification } = injectNotificationManager();
+        addNotification({
           title: "An error occurred",
           text: err.data ? err.data.description : err,
           type: "error",
@@ -1166,8 +1165,8 @@ export default defineNuxtComponent({
       try {
         await this.createVersionRaw(this.version);
       } catch (err) {
-        this.$notify({
-          group: "main",
+        const { addNotification } = injectNotificationManager();
+        addNotification({
           title: "An error occurred",
           text: err.data ? err.data.description : err,
           type: "error",
@@ -1258,6 +1257,7 @@ export default defineNuxtComponent({
     async createDataPackVersion() {
       this.shouldPreventActions = true;
       startLoading();
+      const { addNotification } = injectNotificationManager();
       try {
         const blob = await createDataPackVersion(
           this.project,
@@ -1290,15 +1290,13 @@ export default defineNuxtComponent({
 
         this.$refs.modal_package_mod.hide();
 
-        this.$notify({
-          group: "main",
+        addNotification({
           title: "Packaging Success",
           text: "Your data pack was successfully packaged as a mod! Make sure to playtest to check for errors.",
           type: "success",
         });
       } catch (err) {
-        this.$notify({
-          group: "main",
+        addNotification({
           title: "An error occurred",
           text: err.data ? err.data.description : err,
           type: "error",

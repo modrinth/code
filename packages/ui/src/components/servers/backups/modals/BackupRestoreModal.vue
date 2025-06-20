@@ -17,43 +17,41 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { ConfirmModal, NewModal } from "@modrinth/ui";
-import type { Backup } from "@modrinth/utils";
-import BackupItem from "~/components/ui/servers/BackupItem.vue";
-import { ModrinthServer } from "@modrinth/ui";
+import { ref } from 'vue'
+import type { NewModal, ModrinthServer, BackupItem, ConfirmModal } from '@/index'
+import type { Backup } from '@modrinth/utils'
 
 const props = defineProps<{
-  server: ModrinthServer;
-}>();
+  server: ModrinthServer
+}>()
 
-const modal = ref<InstanceType<typeof NewModal>>();
-const currentBackup = ref<Backup | null>(null);
+const modal = ref<InstanceType<typeof NewModal>>()
+const currentBackup = ref<Backup | null>(null)
 
 function show(backup: Backup) {
-  currentBackup.value = backup;
-  modal.value?.show();
+  currentBackup.value = backup
+  modal.value?.show()
 }
 
 const restoreBackup = async () => {
   if (!currentBackup.value) {
     addNotification({
-      type: "error",
-      title: "Failed to restore backup",
-      text: "Current backup is null",
-    });
-    return;
+      type: 'error',
+      title: 'Failed to restore backup',
+      text: 'Current backup is null',
+    })
+    return
   }
 
   try {
-    await props.server.backups?.restore(currentBackup.value.id);
+    await props.server.backups?.restore(currentBackup.value.id)
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    addNotification({ type: "error", title: "Failed to restore backup", text: message });
+    const message = error instanceof Error ? error.message : String(error)
+    addNotification({ type: 'error', title: 'Failed to restore backup', text: message })
   }
-};
+}
 
 defineExpose({
   show,
-});
+})
 </script>

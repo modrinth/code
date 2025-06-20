@@ -43,8 +43,9 @@
 
 <script setup lang="ts">
 import { useStorage } from "@vueuse/core";
-import { ModrinthServer } from "@modrinth/ui";
+import { ModrinthServer, injectNotificationManager } from "@modrinth/ui";
 
+const { addNotification } = injectNotificationManager();
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 
@@ -109,7 +110,6 @@ const hasUnsavedChanges = computed(() => {
 const savePreferences = () => {
   userPreferences.value = { ...newUserPreferences.value };
   addNotification({
-    group: "serverOptions",
     type: "success",
     title: "Preferences saved",
     text: "Your preferences have been saved.",

@@ -84,7 +84,14 @@ import {
   ShareIcon,
 } from "@modrinth/assets";
 import { ButtonStyled, VersionChannelIndicator } from "@modrinth/ui";
-import { formatBytes, renderHighlightedString } from "@modrinth/utils";
+import {
+  formatBytes,
+  renderHighlightedString,
+  type Dependency,
+  type Project,
+  type User,
+  type Version,
+} from "@modrinth/utils";
 
 const router = useRouter();
 
@@ -104,14 +111,17 @@ const version = computed(() => {
   if (route.params.version === "latest") {
     let versionList = props.versions;
     if (route.query.loader) {
+      // @ts-ignore
       versionList = versionList.filter((x) => x.loaders.includes(route.query.loader));
     }
     if (route.query.version) {
+      // @ts-ignore
       versionList = versionList.filter((x) => x.game_versions.includes(route.query.version));
     }
     version = versionList.reduce((a, b) => (a.date_published > b.date_published ? a : b));
   } else {
     version = props.versions.find(
+      // @ts-ignore
       (x) => x.id === route.params.version || x.displayUrlEnding === route.params.version,
     );
   }

@@ -4,10 +4,6 @@
   "exclude": ["dist", "build", "node_modules"],
   "compilerOptions": {
     "lib": ["esnext", "dom"],
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./*"],
-    },
     "noImplicitAny": false
   },
   "types": ["@stripe/stripe-js"]

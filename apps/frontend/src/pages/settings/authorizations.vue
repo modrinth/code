@@ -88,12 +88,18 @@
   </div>
 </template>
 <script setup>
-import { Button, ConfirmModal, Avatar, commonSettingsMessages } from "@modrinth/ui";
+import {
+  Button,
+  ConfirmModal,
+  Avatar,
+  commonSettingsMessages,
+  injectNotificationManager,
+} from "@modrinth/ui";
 import { TrashIcon, CheckIcon } from "@modrinth/assets";
 import { useScopes } from "~/composables/auth/scopes.ts";
 
 const { formatMessage } = useVIntl();
-
+const { addNotification } = injectNotificationManager();
 const { scopesToDefinitions } = useScopes();
 
 const revokingId = ref(null);
@@ -163,8 +169,7 @@ async function revokeApp(id) {
     revokingId.value = null;
     await refresh();
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",

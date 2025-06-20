@@ -1,5 +1,5 @@
 <script setup>
-import { Button, FileInput, Avatar, ConfirmModal } from "@modrinth/ui";
+import { Button, FileInput, Avatar, ConfirmModal, injectNotificationManager } from "@modrinth/ui";
 import { UploadIcon, SaveIcon, TrashIcon } from "@modrinth/assets";
 
 const {
@@ -10,6 +10,7 @@ const {
   patchIcon,
   patchOrganization,
 } = inject("organizationContext");
+const { addNotification } = injectNotificationManager();
 
 const icon = ref(null);
 const deletedIcon = ref(false);
@@ -74,7 +75,6 @@ const onSaveChanges = useClientTry(async () => {
   await refreshOrganization();
 
   addNotification({
-    group: "main",
     title: "Organization updated",
     text: "Your organization has been updated.",
     type: "success",
@@ -88,7 +88,6 @@ const onDeleteOrganization = useClientTry(async () => {
   });
 
   addNotification({
-    group: "main",
     title: "Organization deleted",
     text: "Your organization has been deleted.",
     type: "success",

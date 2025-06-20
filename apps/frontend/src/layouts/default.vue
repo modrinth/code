@@ -713,6 +713,7 @@ import {
   PagewideBanner,
   Avatar,
   commonMessages,
+  injectNotificationManager,
 } from "@modrinth/ui";
 import { isAdmin, isStaff } from "@modrinth/utils";
 import { errors as generatedStateErrors } from "~/generated/state.json";
@@ -723,8 +724,8 @@ import OrganizationCreateModal from "~/components/ui/OrganizationCreateModal.vue
 import TeleportOverflowMenu from "~/components/ui/servers/TeleportOverflowMenu.vue";
 
 const { formatMessage } = useVIntl();
+const { addNotification } = injectNotificationManager();
 
-const app = useNuxtApp();
 const auth = await useAuth();
 const user = await useUser();
 
@@ -737,8 +738,6 @@ const router = useNativeRouter();
 const link = config.public.siteUrl + route.path.replace(/\/+$/, "");
 
 const basePopoutId = useId();
-
-provide("notifications", addNotification);
 
 const verifyEmailBannerMessages = defineMessages({
   title: {
@@ -1098,15 +1097,13 @@ function developerModeIncrement() {
     developerModeCounter.value = 0;
     saveFeatureFlags();
     if (flags.value.developerMode) {
-      app.$notify({
-        group: "main",
+      addNotification({
         title: "Developer mode activated",
         text: "Developer mode has been enabled",
         type: "success",
       });
     } else {
-      app.$notify({
-        group: "main",
+      addNotification({
         title: "Developer mode deactivated",
         text: "Developer mode has been disabled",
         type: "success",

@@ -50,7 +50,7 @@
           Listed in search results
         </li>
         <li v-else>
-          <ExitIcon class="bad" />
+          <XIcon class="bad" />
           Not listed in search results
         </li>
         <li v-if="isListed(project)">
@@ -58,11 +58,11 @@
           Listed on the profiles of members
         </li>
         <li v-else>
-          <ExitIcon class="bad" />
+          <XIcon class="bad" />
           Not listed on the profiles of members
         </li>
         <li v-if="isPrivate(project)">
-          <ExitIcon class="bad" />
+          <XIcon class="bad" />
           Not accessible with a direct link
         </li>
         <li v-else>
@@ -92,8 +92,8 @@
   </div>
 </template>
 <script setup>
-import { ExitIcon, CheckIcon, IssuesIcon } from "@modrinth/assets";
-import { Badge } from "@modrinth/ui";
+import { XIcon, CheckIcon, IssuesIcon } from "@modrinth/assets";
+import { Badge, injectNotificationManager } from "@modrinth/ui";
 import ConversationThread from "~/components/ui/thread/ConversationThread.vue";
 import {
   getProjectLink,
@@ -104,6 +104,7 @@ import {
   isUnderReview,
 } from "~/helpers/projects.js";
 
+const { addNotification } = injectNotificationManager();
 const props = defineProps({
   project: {
     type: Object,
@@ -124,7 +125,6 @@ const props = defineProps({
   },
 });
 
-const app = useNuxtApp();
 const auth = await useAuth();
 
 const { data: thread } = await useAsyncData(`thread/${props.project.thread_id}`, () =>
@@ -146,8 +146,7 @@ async function setStatus(status) {
     await props.resetProject();
     thread.value = await useBaseFetch(`thread/${thread.value.id}`);
   } catch (err) {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",

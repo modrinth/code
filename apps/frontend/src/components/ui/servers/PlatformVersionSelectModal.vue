@@ -102,7 +102,7 @@
               <div
                 class="relative flex h-9 w-full items-center rounded-xl bg-button-bg px-4 opacity-50"
               >
-                <RefreshCwIcon class="mr-2 animate-spin" />
+                <RefreshClockwiseIcon class="mr-2 animate-spin" />
                 Loading versions...
                 <DropdownIcon class="absolute right-4" />
               </div>
@@ -175,18 +175,7 @@
           </button>
         </ButtonStyled>
         <ButtonStyled>
-          <button
-            :disabled="isLoading"
-            @click="
-              () => {
-                if (isSecondPhase) {
-                  isSecondPhase = false;
-                } else {
-                  hide();
-                }
-              }
-            "
-          >
+          <button :disabled="isLoading" @click="handleCancel">
             <XIcon />
             {{ isSecondPhase ? "Go back" : "Cancel" }}
           </button>
@@ -197,8 +186,22 @@
 </template>
 
 <script setup lang="ts">
-import { BackupWarning, ButtonStyled, NewModal, Toggle, ModrinthServer } from "@modrinth/ui";
-import { DropdownIcon, RefreshCwIcon, RightArrowIcon, ServerIcon, XIcon } from "@modrinth/assets";
+import { ref, computed, watch, onMounted } from "vue";
+import {
+  BackupWarning,
+  ButtonStyled,
+  NewModal,
+  Toggle,
+  injectNotificationManager,
+  type ModrinthServer,
+} from "@modrinth/ui";
+import {
+  DropdownIcon,
+  RefreshClockwiseIcon,
+  RightArrowIcon,
+  ServerIcon,
+  XIcon,
+} from "@modrinth/assets";
 import { $fetch } from "ofetch";
 import { type Loaders, ModrinthServersFetchError } from "@modrinth/utils";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
@@ -229,17 +232,19 @@ const emit = defineEmits<{
   reinstall: [any?];
 }>();
 
-const versionSelectModal = ref();
-const isSecondPhase = ref(false);
-const hardReset = ref(false);
-const isLoading = ref(false);
-const loadingServerCheck = ref(false);
-const serverCheckError = ref("");
-const showSnapshots = ref(false);
+const { addNotification } = injectNotificationManager();
+
+const versionSelectModal = ref<InstanceType<typeof NewModal>>();
+const isSecondPhase = ref<boolean>(false);
+const hardReset = ref<boolean>(false);
+const isLoading = ref<boolean>(false);
+const loadingServerCheck = ref<boolean>(false);
+const serverCheckError = ref<string>("");
+const showSnapshots = ref<boolean>(false);
 
 const selectedLoader = ref<Loaders>("Vanilla");
-const selectedMCVersion = ref("");
-const selectedLoaderVersion = ref("");
+const selectedMCVersion = ref<string>("");
+const selectedLoaderVersion = ref<string>("");
 
 const paperVersions = ref<Record<string, number[]>>({});
 const purpurVersions = ref<Record<string, string[]>>({});
@@ -258,16 +263,16 @@ const isSnapshotSelected = computed(() => {
   return false;
 });
 
-const getLoaderVersions = async (loader: string) => {
+async function getLoaderVersions(loader: string): Promise<any> {
   return await $fetch(
     `https://launcher-meta.modrinth.com/${loader?.toLowerCase()}/v0/manifest.json`,
   );
-};
+}
 
-const fetchLoaderVersions = async () => {
+async function fetchLoaderVersions(): Promise<void> {
   const versions = await Promise.all(
     versionStrings.map(async (loader) => {
-      const runFetch = async (iterations: number) => {
+      const runFetch = async (iterations: number): Promise<Record<string, any>> => {
         if (iterations > 5) {
           throw new Error("Failed to fetch loader versions");
         }
@@ -289,9 +294,9 @@ const fetchLoaderVersions = async () => {
   );
 
   loaderVersions.value = versions.reduce((acc, val) => ({ ...acc, ...val }), {});
-};
+}
 
-const fetchPaperVersions = async (mcVersion: string) => {
+async function fetchPaperVersions(mcVersion: string): Promise<any> {
   try {
     const res = await $fetch(`https://api.papermc.io/v2/projects/paper/versions/${mcVersion}`);
     paperVersions.value[mcVersion] = (res as any).builds.sort((a: number, b: number) => b - a);
@@ -300,9 +305,9 @@ const fetchPaperVersions = async (mcVersion: string) => {
     console.error(e);
     return null;
   }
-};
+}
 
-const fetchPurpurVersions = async (mcVersion: string) => {
+async function fetchPurpurVersions(mcVersion: string): Promise<any> {
   try {
     const res = await $fetch(`https://api.purpurmc.org/v2/purpur/${mcVersion}`);
     purpurVersions.value[mcVersion] = (res as any).builds.all.sort(
@@ -313,7 +318,7 @@ const fetchPurpurVersions = async (mcVersion: string) => {
     console.error(e);
     return null;
   }
-};
+}
 
 const selectedLoaderVersions = computed<string[]>(() => {
   const loader = selectedLoader.value.toLowerCase();
@@ -373,13 +378,13 @@ watch(
   { immediate: true },
 );
 
-const getLoaderVersion = async (loader: string, version: string) => {
+async function getLoaderVersion(loader: string, version: string): Promise<any> {
   return await $fetch(
     `https://launcher-meta.modrinth.com/${loader?.toLowerCase()}/v0/versions/${version}.json`,
   );
-};
+}
 
-const checkVersionAvailability = async (version: string) => {
+async function checkVersionAvailability(version: string): Promise<void> {
   if (!version || version.trim().length < 3) return;
 
   isLoading.value = true;
@@ -413,7 +418,7 @@ const checkVersionAvailability = async (version: string) => {
     loadingServerCheck.value = false;
     isLoading.value = false;
   }
-};
+}
 
 watch(selectedMCVersion, checkVersionAvailability);
 
@@ -447,7 +452,7 @@ const canInstall = computed(() => {
   return conds || !selectedLoaderVersion.value;
 });
 
-const handleReinstall = async () => {
+async function handleReinstall(): Promise<void> {
   if (hardReset.value && !isSecondPhase.value) {
     isSecondPhase.value = true;
     return;
@@ -474,14 +479,12 @@ const handleReinstall = async () => {
   } catch (error) {
     if (error instanceof ModrinthServersFetchError && (error as any)?.statusCode === 429) {
       addNotification({
-        group: "server",
         title: "Cannot reinstall server",
         text: "You are being rate limited. Please try again later.",
         type: "error",
       });
     } else {
       addNotification({
-        group: "server",
         title: "Reinstall Failed",
         text: "An unexpected error occurred while reinstalling. Please try again later.",
         type: "error",
@@ -490,16 +493,24 @@ const handleReinstall = async () => {
   } finally {
     isLoading.value = false;
   }
-};
+}
 
-const onShow = () => {
+function handleCancel(): void {
+  if (isSecondPhase.value) {
+    isSecondPhase.value = false;
+  } else {
+    hide();
+  }
+}
+
+function onShow(): void {
   selectedMCVersion.value = props.server.general?.mc_version || "";
   if (isSnapshotSelected.value) {
     showSnapshots.value = true;
   }
-};
+}
 
-const onHide = () => {
+function onHide(): void {
   hardReset.value = false;
   isSecondPhase.value = false;
   serverCheckError.value = "";
@@ -509,17 +520,20 @@ const onHide = () => {
   serverCheckError.value = "";
   paperVersions.value = {};
   purpurVersions.value = {};
-};
+}
 
-const show = (loader: Loaders) => {
+function show(loader: Loaders): void {
   if (selectedLoader.value !== loader) {
     selectedLoaderVersion.value = "";
   }
   selectedLoader.value = loader;
   selectedMCVersion.value = props.server.general?.mc_version || "";
   versionSelectModal.value?.show();
-};
-const hide = () => versionSelectModal.value?.hide();
+}
+
+function hide(): void {
+  versionSelectModal.value?.hide();
+}
 
 defineExpose({ show, hide });
 </script>

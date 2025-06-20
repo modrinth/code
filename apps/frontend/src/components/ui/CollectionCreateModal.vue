@@ -39,7 +39,7 @@
           </button>
         </ButtonStyled>
         <ButtonStyled>
-          <button @click="modal.hide()">
+          <button @click="hide">
             <XIcon aria-hidden="true" />
             Cancel
           </button>
@@ -48,30 +48,27 @@
     </div>
   </NewModal>
 </template>
-<script setup>
+
+<script setup lang="ts">
+import { ref } from "vue";
 import { PlusIcon, XIcon } from "@modrinth/assets";
-import { ButtonStyled, NewModal } from "@modrinth/ui";
+import { ButtonStyled, NewModal, injectNotificationManager } from "@modrinth/ui";
 
 const router = useNativeRouter();
+const { addNotification } = injectNotificationManager();
 
-const name = ref("");
-const description = ref("");
+const name = ref<string>("");
+const description = ref<string>("");
+const modal = ref<InstanceType<typeof NewModal>>();
 
-const modal = ref();
+const props = defineProps<{
+  projectIds: string[];
+}>();
 
-const props = defineProps({
-  projectIds: {
-    type: Array,
-    default() {
-      return [];
-    },
-  },
-});
-
-async function create() {
+async function create(): Promise<void> {
   startLoading();
   try {
-    const result = await useBaseFetch("collection", {
+    const result: any = await useBaseFetch("collection", {
       method: "POST",
       body: {
         name: name.value.trim(),
@@ -83,11 +80,10 @@ async function create() {
 
     await initUserCollections();
 
-    modal.value.hide();
-    await router.push(`/collection/${result.id}`);
-  } catch (err) {
+    modal.value?.hide();
+    await router.push(`/collection/${result?.id}`);
+  } catch (err: any) {
     addNotification({
-      group: "main",
       title: "An error occurred",
       text: err?.data?.description || err?.message || err,
       type: "error",
@@ -95,10 +91,15 @@ async function create() {
   }
   stopLoading();
 }
-function show(event) {
+
+function hide(): void {
+  modal.value?.hide();
+}
+
+function show(event?: MouseEvent): void {
   name.value = "";
   description.value = "";
-  modal.value.show(event);
+  modal.value?.show(event);
 }
 
 defineExpose({

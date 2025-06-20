@@ -45,97 +45,97 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, computed } from "vue";
-import { ButtonStyled, NewModal } from "@modrinth/ui";
-import { SpinnerIcon, SaveIcon, XIcon, IssuesIcon } from "@modrinth/assets";
-import type { Backup } from "@modrinth/utils";
-import { ModrinthServer } from "@modrinth/ui";
+import { ref, nextTick, computed } from 'vue'
+import type { ModrinthServer } from '@modrinth/ui'
+import { ButtonStyled, NewModal } from '@modrinth/ui'
+import { SpinnerIcon, SaveIcon, XIcon, IssuesIcon } from '@modrinth/assets'
+import type { Backup } from '@modrinth/utils'
 
 const props = defineProps<{
-  server: ModrinthServer;
-}>();
+  server: ModrinthServer
+}>()
 
-const modal = ref<InstanceType<typeof NewModal>>();
-const input = ref<HTMLInputElement>();
-const backupName = ref("");
-const originalName = ref("");
-const isRenaming = ref(false);
+const modal = ref<InstanceType<typeof NewModal>>()
+const input = ref<HTMLInputElement>()
+const backupName = ref('')
+const originalName = ref('')
+const isRenaming = ref(false)
 
-const currentBackup = ref<Backup | null>(null);
+const currentBackup = ref<Backup | null>(null)
 
-const trimmedName = computed(() => backupName.value.trim());
+const trimmedName = computed(() => backupName.value.trim())
 
 const nameExists = computed(() => {
   if (!props.server.backups?.data || trimmedName.value === originalName.value || isRenaming.value) {
-    return false;
+    return false
   }
 
   return props.server.backups.data.some(
     (backup: Backup) => backup.name.trim().toLowerCase() === trimmedName.value.toLowerCase(),
-  );
-});
+  )
+})
 
 const backupNumber = computed(
   () => (props.server.backups?.data?.findIndex((b) => b.id === currentBackup.value?.id) ?? 0) + 1,
-);
+)
 
 const focusInput = () => {
   nextTick(() => {
     setTimeout(() => {
-      input.value?.focus();
-    }, 100);
-  });
-};
+      input.value?.focus()
+    }, 100)
+  })
+}
 
 function show(backup: Backup) {
-  currentBackup.value = backup;
-  backupName.value = backup.name;
-  originalName.value = backup.name;
-  isRenaming.value = false;
-  modal.value?.show();
+  currentBackup.value = backup
+  backupName.value = backup.name
+  originalName.value = backup.name
+  isRenaming.value = false
+  modal.value?.show()
 }
 
 function hide() {
-  modal.value?.hide();
+  modal.value?.hide()
 }
 
 const renameBackup = async () => {
   if (!currentBackup.value) {
     addNotification({
-      type: "error",
-      title: "Error renaming backup",
-      text: "Current backup is null",
-    });
-    return;
+      type: 'error',
+      title: 'Error renaming backup',
+      text: 'Current backup is null',
+    })
+    return
   }
 
   if (trimmedName.value === originalName.value) {
-    hide();
-    return;
+    hide()
+    return
   }
 
-  isRenaming.value = true;
+  isRenaming.value = true
   try {
-    let newName = trimmedName.value;
+    let newName = trimmedName.value
 
     if (newName.length === 0) {
-      newName = `Backup #${backupNumber.value}`;
+      newName = `Backup #${backupNumber.value}`
     }
 
-    await props.server.backups?.rename(currentBackup.value.id, newName);
-    hide();
-    await props.server.refresh();
+    await props.server.backups?.rename(currentBackup.value.id, newName)
+    hide()
+    await props.server.refresh()
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    addNotification({ type: "error", title: "Error renaming backup", text: message });
+    const message = error instanceof Error ? error.message : String(error)
+    addNotification({ type: 'error', title: 'Error renaming backup', text: message })
   } finally {
-    hide();
-    isRenaming.value = false;
+    hide()
+    isRenaming.value = false
   }
-};
+}
 
 defineExpose({
   show,
   hide,
-});
+})
 </script>

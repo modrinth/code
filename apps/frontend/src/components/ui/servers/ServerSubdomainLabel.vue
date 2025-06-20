@@ -19,7 +19,9 @@
 </template>
 
 <script setup lang="ts">
+import { computed, defineProps } from "vue";
 import { LinkIcon } from "@modrinth/assets";
+import { injectNotificationManager } from "@modrinth/ui";
 import { useStorage } from "@vueuse/core";
 
 const props = defineProps<{
@@ -27,15 +29,16 @@ const props = defineProps<{
   noSeparator?: boolean;
 }>();
 
-const copySubdomain = () => {
+const { addNotification } = injectNotificationManager();
+
+function copySubdomain(): void {
   navigator.clipboard.writeText(props.subdomain + ".modrinth.gg");
   addNotification({
-    group: "servers",
     title: "Custom URL copied",
     text: "Your server's URL has been copied to your clipboard.",
     type: "success",
   });
-};
+}
 
 const route = useNativeRoute();
 const serverId = computed(() => route.params.id as string);

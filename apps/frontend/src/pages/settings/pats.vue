@@ -210,6 +210,7 @@ import {
   commonSettingsMessages,
   commonMessages,
   useRelativeTime,
+  injectNotificationManager,
 } from "@modrinth/ui";
 
 import {
@@ -223,7 +224,7 @@ import {
 import Modal from "~/components/ui/Modal.vue";
 
 const { formatMessage } = useVIntl();
-
+const { addNotification } = injectNotificationManager();
 const formatRelativeTime = useRelativeTime();
 
 const createModalMessages = defineMessages({
@@ -346,8 +347,7 @@ async function createPat() {
     pats.value.push(res);
     patModal.value.hide();
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: "error",
@@ -372,8 +372,7 @@ async function editPat() {
     await refresh();
     patModal.value.hide();
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: "error",
@@ -392,8 +391,7 @@ async function removePat(id) {
     });
     await refresh();
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: "error",

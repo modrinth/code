@@ -68,10 +68,11 @@
 </template>
 <script setup>
 import { SendIcon, MailIcon, KeyIcon } from "@modrinth/assets";
-import { commonMessages } from "@modrinth/ui";
+import { commonMessages, injectNotificationManager } from "@modrinth/ui";
 import HCaptcha from "@/components/ui/HCaptcha.vue";
 
 const { formatMessage } = useVIntl();
+const { addNotification } = injectNotificationManager();
 
 const methodChoiceMessages = defineMessages({
   description: {
@@ -179,14 +180,12 @@ async function recovery() {
     });
 
     addNotification({
-      group: "main",
       title: formatMessage(emailSentNotificationMessages.title),
       text: formatMessage(emailSentNotificationMessages.text),
       type: "success",
     });
   } catch (err) {
     addNotification({
-      group: "main",
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: "error",
@@ -211,7 +210,6 @@ async function changePassword() {
     });
 
     addNotification({
-      group: "main",
       title: formatMessage(passwordResetNotificationMessages.title),
       text: formatMessage(passwordResetNotificationMessages.text),
       type: "success",
@@ -219,7 +217,6 @@ async function changePassword() {
     await navigateTo("/auth/sign-in");
   } catch (err) {
     addNotification({
-      group: "main",
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: "error",

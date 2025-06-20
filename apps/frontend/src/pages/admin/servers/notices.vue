@@ -268,6 +268,7 @@ import {
   TeleportDropdownMenu,
   Toggle,
   useRelativeTime,
+  injectNotificationManager,
 } from "@modrinth/ui";
 import { SettingsIcon, PlusIcon, SaveIcon, TrashIcon, EditIcon, XIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
@@ -281,7 +282,7 @@ import { useServersFetchSimple } from "~/utils/frontend-servers.ts";
 const { formatMessage } = useVIntl();
 const formatRelativeTime = useRelativeTime();
 
-const app = useNuxtApp() as unknown as { $notify: any };
+const { addNotification } = injectNotificationManager();
 
 const notices = ref<ServerNoticeType[]>([]);
 const createNoticeModal = ref<InstanceType<typeof NewModal>>();
@@ -351,15 +352,13 @@ async function deleteNotice(notice: ServerNoticeType) {
     method: "DELETE",
   })
     .then(() => {
-      app.$notify({
-        group: "main",
+      addNotification({
         title: `Successfully deleted notice #${notice.id}`,
         type: "success",
       });
     })
     .catch((err) => {
-      app.$notify({
-        group: "main",
+      addNotification({
         title: "Error deleting notice",
         text: err,
         type: "error",
@@ -386,7 +385,6 @@ const noticeSubmitError = computed(() => {
 function validateSubmission(message: string) {
   if (noticeSubmitError.value) {
     addNotification({
-      group: "main",
       title: message,
       text: noticeSubmitError.value,
       type: "error",
@@ -416,8 +414,7 @@ async function saveChanges() {
         : undefined,
     },
   }).catch((err) => {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "Error saving changes to notice",
       text: err,
       type: "error",
@@ -447,8 +444,7 @@ async function createNotice() {
         : undefined,
     },
   }).catch((err) => {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "Error creating notice",
       text: err,
       type: "error",

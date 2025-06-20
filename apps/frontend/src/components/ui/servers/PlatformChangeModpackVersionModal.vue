@@ -67,10 +67,15 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, NewModal } from "@modrinth/ui";
+import { ref, computed, watch } from "vue";
+import {
+  ButtonStyled,
+  NewModal,
+  injectNotificationManager,
+  type ModrinthServer,
+} from "@modrinth/ui";
 import { DownloadIcon, XIcon } from "@modrinth/assets";
 import { ModrinthServersFetchError } from "@modrinth/utils";
-import { ModrinthServer } from "@modrinth/ui";
 
 const props = defineProps<{
   server: ModrinthServer;
@@ -82,17 +87,19 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  reinstall: [any?];
+  reinstall: [];
 }>();
 
-const modal = ref();
-const hardReset = ref(false);
-const isLoading = ref(false);
-const selectedVersion = ref("");
+const { addNotification } = injectNotificationManager();
+
+const modal = ref<InstanceType<typeof NewModal>>();
+const hardReset = ref<boolean>(false);
+const isLoading = ref<boolean>(false);
+const selectedVersion = ref<string>("");
 
 const versionOptions = computed(() => props.versions?.map((v) => v.version_number) || []);
 
-const handleReinstall = async () => {
+async function handleReinstall(): Promise<void> {
   if (!selectedVersion.value || !props.project?.id) return;
 
   isLoading.value = true;
@@ -112,14 +119,12 @@ const handleReinstall = async () => {
   } catch (error) {
     if (error instanceof ModrinthServersFetchError && error.statusCode === 429) {
       addNotification({
-        group: "server",
         title: "Cannot reinstall server",
         text: "You are being rate limited. Please try again later.",
         type: "error",
       });
     } else {
       addNotification({
-        group: "server",
         title: "Reinstall Failed",
         text: "An unexpected error occurred while reinstalling. Please try again later.",
         type: "error",
@@ -128,7 +133,7 @@ const handleReinstall = async () => {
   } finally {
     isLoading.value = false;
   }
-};
+}
 
 watch(
   () => props.serverStatus,
@@ -139,20 +144,25 @@ watch(
   },
 );
 
-const onShow = () => {
+function onShow(): void {
   hardReset.value = false;
   selectedVersion.value =
     props.currentVersion?.version_number ?? props.versions?.[0]?.version_number ?? "";
-};
+}
 
-const onHide = () => {
+function onHide(): void {
   hardReset.value = false;
   selectedVersion.value = "";
   isLoading.value = false;
-};
+}
 
-const show = () => modal.value?.show();
-const hide = () => modal.value?.hide();
+function show(): void {
+  modal.value?.show();
+}
+
+function hide(): void {
+  modal.value?.hide();
+}
 
 defineExpose({ show, hide });
 </script>

@@ -11,7 +11,7 @@
     :fetch-payment-data="fetchPaymentData"
     :on-error="
       (err) =>
-        data.$notify({
+        addNotification({
           group: 'main',
           title: 'An error occurred',
           type: 'error',
@@ -93,7 +93,7 @@ import {
   StarIcon,
   SettingsIcon,
 } from "@modrinth/assets";
-import { PurchaseModal } from "@modrinth/ui";
+import { PurchaseModal, injectNotificationManager } from "@modrinth/ui";
 import { calculateSavings, formatPrice, getCurrency } from "@modrinth/utils";
 import { products } from "~/generated/state.json";
 
@@ -120,7 +120,7 @@ useHead({
 
 const vintl = useVIntl();
 
-const data = useNuxtApp();
+const { addNotification } = injectNotificationManager();
 const config = useRuntimeConfig();
 
 const auth = await useAuth();

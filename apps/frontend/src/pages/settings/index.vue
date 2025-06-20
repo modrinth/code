@@ -199,7 +199,8 @@
 
 <script setup lang="ts">
 import { CodeIcon, RadioButtonCheckedIcon, RadioButtonIcon } from "@modrinth/assets";
-import { Button, ThemeSelector } from "@modrinth/ui";
+import { Button, ThemeSelector, injectNotificationManager } from "@modrinth/ui";
+
 import MessageBanner from "~/components/ui/MessageBanner.vue";
 import type { DisplayLocation } from "~/plugins/cosmetics";
 import { formatProjectType } from "~/plugins/shorthands.js";
@@ -209,6 +210,7 @@ useHead({
   title: "Display settings - Modrinth",
 });
 
+const { addNotification } = injectNotificationManager();
 const { formatMessage } = useVIntl();
 
 const developerModeBanner = defineMessages({
@@ -377,7 +379,6 @@ function disableDeveloperMode() {
   flags.value.developerMode = !flags.value.developerMode;
   saveFeatureFlags();
   addNotification({
-    group: "main",
     title: "Developer mode deactivated",
     text: "Developer mode has been disabled",
     type: "success",

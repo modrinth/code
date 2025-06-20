@@ -115,9 +115,10 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, ModrinthServer } from "@modrinth/ui";
+import { ButtonStyled, ModrinthServer, injectNotificationManager } from "@modrinth/ui";
 import { CopyIcon, ExternalIcon, EyeIcon, EyeOffIcon } from "@modrinth/assets";
 
+const { addNotification } = injectNotificationManager();
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 

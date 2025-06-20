@@ -392,17 +392,20 @@ import {
   FileInput,
   PopoutMenu,
   useRelativeTime,
+  injectNotificationManager,
 } from "@modrinth/ui";
 
 import { isAdmin } from "@modrinth/utils";
 import UpToDate from "assets/images/illustrations/up_to_date.svg";
-import { addNotification } from "~/composables/notifs.js";
 import NavRow from "~/components/ui/NavRow.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const vintl = useVIntl();
+
 const { formatMessage } = vintl;
+const { addNotification } = injectNotificationManager();
+
 const formatRelativeTime = useRelativeTime();
 const formatCompactNumber = useCompactNumber();
 
@@ -672,7 +675,6 @@ async function saveChanges() {
     isEditing.value = false;
   } catch (err) {
     addNotification({
-      group: "main",
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err,
       type: "error",
@@ -696,7 +698,6 @@ async function deleteCollection() {
     }
   } catch (err) {
     addNotification({
-      group: "main",
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: "error",

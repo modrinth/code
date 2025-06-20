@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RefreshCwIcon } from "@modrinth/assets";
+import { RefreshClockwiseIcon } from "@modrinth/assets";
 </script>
 
 <template>
@@ -13,7 +13,7 @@ import { RefreshCwIcon } from "@modrinth/assets";
         src="~/assets/images/servers/minecraft_server_icon.png"
       />
       <div class="absolute inset-0 grid place-content-center">
-        <RefreshCwIcon class="size-8 animate-spin text-contrast" />
+        <RefreshClockwiseIcon class="size-8 animate-spin text-contrast" />
       </div>
     </div>
     <div class="flex flex-col gap-4">

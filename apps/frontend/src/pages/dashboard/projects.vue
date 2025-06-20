@@ -320,6 +320,7 @@ import {
   CopyCode,
   ProjectStatusBadge,
   commonMessages,
+  injectNotificationManager,
 } from "@modrinth/ui";
 
 import Modal from "~/components/ui/Modal.vue";
@@ -473,8 +474,8 @@ export default defineNuxtComponent({
         );
 
         this.$refs.editLinksModal.hide();
-        this.$notify({
-          group: "main",
+        const { addNotification } = injectNotificationManager();
+        addNotification({
           title: "Success",
           text: "Bulk edited selected project's links.",
           type: "success",
@@ -490,8 +491,8 @@ export default defineNuxtComponent({
         this.editLinks.wiki.clear = false;
         this.editLinks.discord.clear = false;
       } catch (e) {
-        this.$notify({
-          group: "main",
+        const { addNotification } = injectNotificationManager();
+        addNotification({
           title: "An error occurred",
           text: e,
           type: "error",

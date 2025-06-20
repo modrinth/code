@@ -42,8 +42,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, computed, inject } from 'vue'
-import { ButtonStyled, type ModrinthServer, NewModal } from '@/index'
+import { ref, nextTick, computed } from 'vue'
+import { ButtonStyled, injectNotificationManager, type ModrinthServer, NewModal } from '@/index'
 import { IssuesIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import { ModrinthServersFetchError, type ServerBackup } from '@modrinth/utils'
 
@@ -51,7 +51,7 @@ const props = defineProps<{
   server: ModrinthServer
 }>()
 
-const notifications = inject('notifications')
+const { addNotification } = injectNotificationManager()
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const input = ref<HTMLInputElement>()

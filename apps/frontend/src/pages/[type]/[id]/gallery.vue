@@ -295,7 +295,7 @@ import {
   ImageIcon,
   TransferIcon,
 } from "@modrinth/assets";
-import { ConfirmModal } from "@modrinth/ui";
+import { ConfirmModal, injectNotificationManager } from "@modrinth/ui";
 import FileInput from "~/components/ui/FileInput.vue";
 import DropArea from "~/components/ui/DropArea.vue";
 import Modal from "~/components/ui/Modal.vue";
@@ -448,8 +448,8 @@ export default defineNuxtComponent({
 
         this.$refs.modal_edit_item.hide();
       } catch (err) {
-        this.$notify({
-          group: "main",
+        const { addNotification } = injectNotificationManager();
+        addNotification({
           title: "An error occurred",
           text: err.data ? err.data.description : err,
           type: "error",
@@ -485,8 +485,8 @@ export default defineNuxtComponent({
         await this.resetProject();
         this.$refs.modal_edit_item.hide();
       } catch (err) {
-        this.$notify({
-          group: "main",
+        const { addNotification } = injectNotificationManager();
+        addNotification({
           title: "An error occurred",
           text: err.data ? err.data.description : err,
           type: "error",
@@ -511,8 +511,8 @@ export default defineNuxtComponent({
 
         await this.resetProject();
       } catch (err) {
-        this.$notify({
-          group: "main",
+        const { addNotification } = injectNotificationManager();
+        addNotification({
           title: "An error occurred",
           text: err.data ? err.data.description : err,
           type: "error",

@@ -101,10 +101,9 @@
 </template>
 
 <script setup lang="ts">
-import { FolderOpenIcon, CheckCircleIcon, XCircleIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
 import { ref, computed, watch, nextTick } from "vue";
-import { FSModule } from "@modrinth/ui";
+import { FolderOpenIcon, CheckCircleIcon, XCircleIcon } from "@modrinth/assets";
+import { ButtonStyled, injectNotificationManager, type FSModule } from "@modrinth/ui";
 
 interface UploadItem {
   file: File;
@@ -126,7 +125,7 @@ interface Props {
   currentPath: string;
   fileType?: string;
   marginBottom?: number;
-  acceptedTypes?: Array<string>;
+  acceptedTypes?: string[];
   fs: FSModule;
 }
 
@@ -135,9 +134,10 @@ defineOptions({
 });
 
 const props = defineProps<Props>();
+const { addNotification } = injectNotificationManager();
 
 const emit = defineEmits<{
-  (e: "uploadComplete"): void;
+  uploadComplete: [];
 }>();
 
 const uploadStatusRef = ref<HTMLElement | null>(null);
@@ -149,21 +149,21 @@ const activeUploads = computed(() =>
   uploadQueue.value.filter((item) => item.status === "pending" || item.status === "uploading"),
 );
 
-const onUploadStatusEnter = (el: Element) => {
+function onUploadStatusEnter(el: Element): void {
   const height = (el as HTMLElement).scrollHeight + (props.marginBottom || 0);
   (el as HTMLElement).style.height = "0";
   // eslint-disable-next-line no-void
   void (el as HTMLElement).offsetHeight;
   (el as HTMLElement).style.height = `${height}px`;
-};
+}
 
-const onUploadStatusLeave = (el: Element) => {
+function onUploadStatusLeave(el: Element): void {
   const height = (el as HTMLElement).scrollHeight + (props.marginBottom || 0);
   (el as HTMLElement).style.height = `${height}px`;
   // eslint-disable-next-line no-void
   void (el as HTMLElement).offsetHeight;
   (el as HTMLElement).style.height = "0";
-};
+}
 
 watch(
   uploadQueue,
@@ -180,14 +180,14 @@ watch(
   { deep: true },
 );
 
-const formatFileSize = (bytes: number): string => {
+function formatFileSize(bytes: number): string {
   if (bytes < 1024) return bytes + " B";
   if (bytes < 1024 ** 2) return (bytes / 1024).toFixed(1) + " KB";
   if (bytes < 1024 ** 3) return (bytes / 1024 ** 2).toFixed(1) + " MB";
   return (bytes / 1024 ** 3).toFixed(1) + " GB";
-};
+}
 
-const cancelUpload = (item: UploadItem) => {
+function cancelUpload(item: UploadItem): void {
   if (item.uploader && item.status === "uploading") {
     item.uploader.cancel();
     item.status = "cancelled";
@@ -200,10 +200,11 @@ const cancelUpload = (item: UploadItem) => {
       }
     }, 5000);
   }
-};
+}
 
 const badFileTypeMsg = "Upload had incorrect file type";
-const uploadFile = async (file: File) => {
+
+async function uploadFile(file: File): Promise<void> {
   const uploadItem: UploadItem = {
     file,
     progress: 0,
@@ -282,14 +283,13 @@ const uploadFile = async (file: File) => {
 
     if (error instanceof Error && error.message !== "Upload cancelled") {
       addNotification({
-        group: "files",
         title: "Upload failed",
         text: `Failed to upload ${file.name}`,
         type: "error",
       });
     }
   }
-};
+}
 
 defineExpose({
   uploadFile,

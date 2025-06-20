@@ -110,4 +110,11 @@ export { default as ThemeSelector } from './settings/ThemeSelector.vue'
 
 // Servers
 export { default as BackupWarning } from './servers/backups/BackupWarning.vue'
+export { default as BackupItem } from "./servers/backups/BackupItem.vue"
+export { default as BackupCreateModal } from "./servers/backups/modals/BackupCreateModal.vue"
+export { default as BackupDeleteModal } from "./servers/backups/modals/BackupDeleteModal.vue"
+export { default as BackupRestoreModal } from "./servers/backups/modals/BackupRestoreModal.vue"
+export { default as BackupRenameModal } from "./servers/backups/modals/BackupRenameModal.vue"
+export { default as BackupSettingsModal } from "./servers/backups/modals/BackupSettingsModal.vue"
+
 export { default as ServersSpecs } from './billing/ServersSpecs.vue'

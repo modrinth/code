@@ -150,6 +150,7 @@ import {
   XIcon,
 } from "@modrinth/assets";
 import { formatDate } from "@modrinth/utils";
+import { injectNotificationManager } from "@modrinth/ui";
 import dayjs from "dayjs";
 import { computed } from "vue";
 
@@ -201,9 +202,8 @@ async function updateVenmo() {
     });
     await useAuth(auth.value.token);
   } catch (err) {
-    const data = useNuxtApp();
-    data.$notify({
-      group: "main",
+    const { addNotification } = injectNotificationManager();
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",

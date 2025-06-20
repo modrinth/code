@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import dayjs from "dayjs";
+import dayjs from 'dayjs'
 import {
   MoreVerticalIcon,
   HistoryIcon,
@@ -13,159 +13,160 @@ import {
   XIcon,
   LockOpenIcon,
   RotateCounterClockwiseIcon,
-} from "@modrinth/assets";
-import { ButtonStyled, commonMessages, OverflowMenu, ProgressBar } from "@modrinth/ui";
-import { defineMessages, useVIntl } from "@vintl/vintl";
-import { ref, computed } from "vue";
-import type { Backup } from "@modrinth/utils";
+} from '@modrinth/assets'
+import { ButtonStyled, commonMessages, OverflowMenu, ProgressBar } from '@modrinth/ui'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+import { ref, computed } from 'vue'
+import type { Backup } from '@modrinth/utils'
 
-const flags = useFeatureFlags();
-const { formatMessage } = useVIntl();
+const { formatMessage } = useVIntl()
 
 const emit = defineEmits<{
-  (e: "prepare" | "download" | "rename" | "restore" | "lock" | "retry"): void;
-  (e: "delete", skipConfirmation?: boolean): void;
-}>();
+  (e: 'prepare' | 'download' | 'rename' | 'restore' | 'lock' | 'retry'): void
+  (e: 'delete', skipConfirmation?: boolean): void
+}>()
 
 const props = withDefaults(
   defineProps<{
-    backup: Backup;
-    preview?: boolean;
-    kyrosUrl?: string;
-    jwt?: string;
+    backup: Backup
+    preview?: boolean
+    kyrosUrl?: string
+    jwt?: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    flags?: any
   }>(),
   {
     preview: false,
     kyrosUrl: undefined,
     jwt: undefined,
   },
-);
+)
 
 const backupQueued = computed(
   () =>
     props.backup.task?.create?.progress === 0 ||
     (props.backup.ongoing && !props.backup.task?.create),
-);
-const automated = computed(() => props.backup.automated);
-const failedToCreate = computed(() => props.backup.interrupted);
+)
+const automated = computed(() => props.backup.automated)
+const failedToCreate = computed(() => props.backup.interrupted)
 
-const preparedDownloadStates = ["ready", "done"];
-const inactiveStates = ["failed", "cancelled"];
+const preparedDownloadStates = ['ready', 'done']
+const inactiveStates = ['failed', 'cancelled']
 
 const hasPreparedDownload = computed(() => {
-  const fileState = props.backup.task?.file?.state ?? "";
-  return preparedDownloadStates.includes(fileState);
-});
+  const fileState = props.backup.task?.file?.state ?? ''
+  return preparedDownloadStates.includes(fileState)
+})
 
 const creating = computed(() => {
-  const task = props.backup.task?.create;
+  const task = props.backup.task?.create
   if (task && task.progress < 1 && !inactiveStates.includes(task.state)) {
-    return task;
+    return task
   }
   if (props.backup.ongoing) {
     return {
       progress: 0,
-      state: "ongoing",
-    };
+      state: 'ongoing',
+    }
   }
-  return undefined;
-});
+  return undefined
+})
 
 const restoring = computed(() => {
-  const task = props.backup.task?.restore;
+  const task = props.backup.task?.restore
   if (task && task.progress < 1 && !inactiveStates.includes(task.state)) {
-    return task;
+    return task
   }
-  return undefined;
-});
+  return undefined
+})
 
-const initiatedPrepare = ref(false);
+const initiatedPrepare = ref(false)
 
 const preparingFile = computed(() => {
   if (hasPreparedDownload.value) {
-    return false;
+    return false
   }
 
-  const task = props.backup.task?.file;
+  const task = props.backup.task?.file
   return (
     (!task && initiatedPrepare.value) ||
     (task && task.progress < 1 && !inactiveStates.includes(task.state))
-  );
-});
+  )
+})
 
-const failedToRestore = computed(() => props.backup.task?.restore?.state === "failed");
-const failedToPrepareFile = computed(() => props.backup.task?.file?.state === "failed");
+const failedToRestore = computed(() => props.backup.task?.restore?.state === 'failed')
+const failedToPrepareFile = computed(() => props.backup.task?.file?.state === 'failed')
 
 const messages = defineMessages({
   locked: {
-    id: "servers.backups.item.locked",
-    defaultMessage: "Locked",
+    id: 'servers.backups.item.locked',
+    defaultMessage: 'Locked',
   },
   lock: {
-    id: "servers.backups.item.lock",
-    defaultMessage: "Lock",
+    id: 'servers.backups.item.lock',
+    defaultMessage: 'Lock',
   },
   unlock: {
-    id: "servers.backups.item.unlock",
-    defaultMessage: "Unlock",
+    id: 'servers.backups.item.unlock',
+    defaultMessage: 'Unlock',
   },
   restore: {
-    id: "servers.backups.item.restore",
-    defaultMessage: "Restore",
+    id: 'servers.backups.item.restore',
+    defaultMessage: 'Restore',
   },
   rename: {
-    id: "servers.backups.item.rename",
-    defaultMessage: "Rename",
+    id: 'servers.backups.item.rename',
+    defaultMessage: 'Rename',
   },
   queuedForBackup: {
-    id: "servers.backups.item.queued-for-backup",
-    defaultMessage: "Queued for backup",
+    id: 'servers.backups.item.queued-for-backup',
+    defaultMessage: 'Queued for backup',
   },
   preparingDownload: {
-    id: "servers.backups.item.preparing-download",
-    defaultMessage: "Preparing download...",
+    id: 'servers.backups.item.preparing-download',
+    defaultMessage: 'Preparing download...',
   },
   prepareDownload: {
-    id: "servers.backups.item.prepare-download",
-    defaultMessage: "Prepare download",
+    id: 'servers.backups.item.prepare-download',
+    defaultMessage: 'Prepare download',
   },
   prepareDownloadAgain: {
-    id: "servers.backups.item.prepare-download-again",
-    defaultMessage: "Try preparing again",
+    id: 'servers.backups.item.prepare-download-again',
+    defaultMessage: 'Try preparing again',
   },
   alreadyPreparing: {
-    id: "servers.backups.item.already-preparing",
-    defaultMessage: "Already preparing backup for download",
+    id: 'servers.backups.item.already-preparing',
+    defaultMessage: 'Already preparing backup for download',
   },
   creatingBackup: {
-    id: "servers.backups.item.creating-backup",
-    defaultMessage: "Creating backup...",
+    id: 'servers.backups.item.creating-backup',
+    defaultMessage: 'Creating backup...',
   },
   restoringBackup: {
-    id: "servers.backups.item.restoring-backup",
-    defaultMessage: "Restoring from backup...",
+    id: 'servers.backups.item.restoring-backup',
+    defaultMessage: 'Restoring from backup...',
   },
   failedToCreateBackup: {
-    id: "servers.backups.item.failed-to-create-backup",
-    defaultMessage: "Failed to create backup",
+    id: 'servers.backups.item.failed-to-create-backup',
+    defaultMessage: 'Failed to create backup',
   },
   failedToRestoreBackup: {
-    id: "servers.backups.item.failed-to-restore-backup",
-    defaultMessage: "Failed to restore from backup",
+    id: 'servers.backups.item.failed-to-restore-backup',
+    defaultMessage: 'Failed to restore from backup',
   },
   failedToPrepareFile: {
-    id: "servers.backups.item.failed-to-prepare-backup",
-    defaultMessage: "Failed to prepare download",
+    id: 'servers.backups.item.failed-to-prepare-backup',
+    defaultMessage: 'Failed to prepare download',
   },
   automated: {
-    id: "servers.backups.item.automated",
-    defaultMessage: "Automated",
+    id: 'servers.backups.item.automated',
+    defaultMessage: 'Automated',
   },
   retry: {
-    id: "servers.backups.item.retry",
-    defaultMessage: "Retry",
+    id: 'servers.backups.item.retry',
+    defaultMessage: 'Retry',
   },
-});
+})
 </script>
 <template>
   <div
@@ -239,7 +240,7 @@ const messages = defineMessages({
     </div>
     <template v-else>
       <div class="col-span-2">
-        {{ dayjs(backup.created_at).format("MMMM D, YYYY [at] h:mm A") }}
+        {{ dayjs(backup.created_at).format('MMMM D, YYYY [at] h:mm A') }}
       </div>
       <div v-if="false">{{ 245 }} MiB</div>
     </template>
@@ -285,8 +286,8 @@ const messages = defineMessages({
             :disabled="!!preparingFile"
             @click="
               () => {
-                initiatedPrepare = true;
-                emit('prepare');
+                initiatedPrepare = true
+                emit('prepare')
               }
             "
           >
@@ -337,7 +338,7 @@ const messages = defineMessages({
       </template>
     </div>
     <pre
-      v-if="!preview && flags.advancedDebugInfo"
+      v-if="!preview && flags?.advancedDebugInfo"
       class="col-span-full m-0 rounded-xl bg-button-bg text-xs"
       >{{ backup }}</pre
     >

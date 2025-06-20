@@ -82,7 +82,7 @@
 <script setup lang="ts">
 import { ChevronRightIcon, LockIcon, SparklesIcon, TriangleAlertIcon } from "@modrinth/assets";
 import type { Project, Server } from "@modrinth/utils";
-import { useModrinthServersSimple } from "~/utils/frontend-servers";
+import { useModrinthServersSimple } from "~/utils/frontend-servers.ts";
 const props = defineProps<Partial<Server>>();
 
 if (props.server_id) {

@@ -369,7 +369,13 @@ import {
   TriangleAlertIcon,
 } from "@modrinth/assets";
 import DOMPurify from "dompurify";
-import { ButtonStyled, ErrorInformationCard, ServerNotice, ModrinthServer } from "@modrinth/ui";
+import {
+  ButtonStyled,
+  ErrorInformationCard,
+  ServerNotice,
+  ModrinthServer,
+  injectNotificationManager,
+} from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
 import type { MessageDescriptor } from "@vintl/vintl";
 import type {
@@ -385,7 +391,7 @@ import { useModrinthServersConsole } from "~/store/console.ts";
 import ServerInstallation from "~/components/ui/servers/ServerInstallation.vue";
 import { useModrinthServersSimple } from "~/utils/frontend-servers.ts";
 
-const app = useNuxtApp() as unknown as { $notify: any };
+const { addNotification } = injectNotificationManager();
 
 const socket = ref<WebSocket | null>(null);
 const isReconnecting = ref(false);
@@ -987,7 +993,6 @@ const sendPowerAction = async (action: PowerAction) => {
 
 const notifyError = (title: string, text: string) => {
   addNotification({
-    group: "server",
     title,
     text,
     type: "error",
