@@ -1,5 +1,8 @@
 //! Theseus error type
+use std::sync::Arc;
+
 use crate::{profile, util};
+use data_url::DataUrlError;
 use tracing_error::InstrumentError;
 
 #[derive(thiserror::Error, Debug)]
@@ -125,12 +128,35 @@ pub enum ErrorKind {
 
     #[error("Error resolving DNS: {0}")]
     DNSError(#[from] hickory_resolver::ResolveError),
+
+    #[error("An online profile for {user_name} is not available")]
+    OnlineMinecraftProfileUnavailable { user_name: String },
+
+    #[error("Invalid data URL: {0}")]
+    InvalidDataUrl(#[from] DataUrlError),
+
+    #[error("Invalid data URL: {0}")]
+    InvalidDataUrlBase64(#[from] data_url::forgiving_base64::InvalidBase64),
+
+    #[error("Invalid PNG")]
+    InvalidPng,
+
+    #[error("Invalid PNG: {0}")]
+    PngDecodingError(#[from] png::DecodingError),
+
+    #[error("PNG encoding error: {0}")]
+    PngEncodingError(#[from] png::EncodingError),
+
+    #[error(
+        "A skin texture must have a dimension of either 64x64 or 64x32 pixels"
+    )]
+    InvalidSkinTexture,
 }
 
 #[derive(Debug)]
 pub struct Error {
-    pub raw: std::sync::Arc<ErrorKind>,
-    pub source: tracing_error::TracedError<std::sync::Arc<ErrorKind>>,
+    pub raw: Arc<ErrorKind>,
+    pub source: tracing_error::TracedError<Arc<ErrorKind>>,
 }
 
 impl std::error::Error for Error {
@@ -148,7 +174,7 @@ impl std::fmt::Display for Error {
 impl<E: Into<ErrorKind>> From<E> for Error {
     fn from(source: E) -> Self {
         let error = Into::<ErrorKind>::into(source);
-        let boxed_error = std::sync::Arc::new(error);
+        let boxed_error = Arc::new(error);
 
         Self {
             raw: boxed_error.clone(),

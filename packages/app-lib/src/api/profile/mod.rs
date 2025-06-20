@@ -642,9 +642,8 @@ pub async fn run(
 }
 
 /// Run Minecraft using a profile, and credentials for authentication
-/// Returns Arc pointer to RwLock to Child
 #[tracing::instrument(skip(credentials))]
-pub async fn run_credentials(
+async fn run_credentials(
     path: &str,
     credentials: &Credentials,
     quick_play_type: &QuickPlayType,
