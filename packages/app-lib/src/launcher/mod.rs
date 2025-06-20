@@ -125,12 +125,10 @@ pub async fn get_java_version_from_profile(
     version_info: &VersionInfo,
 ) -> crate::Result<Option<JavaVersion>> {
     if let Some(java) = profile.java_path.as_ref() {
-        let java = crate::api::jre::check_jre(std::path::PathBuf::from(java))
-            .await
-            .ok()
-            .flatten();
+        let java =
+            crate::api::jre::check_jre(std::path::PathBuf::from(java)).await;
 
-        if let Some(java) = java {
+        if let Ok(java) = java {
             return Ok(Some(java));
         }
     }
@@ -290,13 +288,7 @@ pub async fn install_minecraft(
     };
 
     // Test jre version
-    let java_version = crate::api::jre::check_jre(java_version.clone())
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::LauncherError(format!(
-                "Java path invalid or non-functional: {java_version:?}"
-            ))
-        })?;
+    let java_version = crate::api::jre::check_jre(java_version.clone()).await?;
 
     if set_java {
         java_version.upsert(&state.pool).await?;
@@ -561,14 +553,7 @@ pub async fn launch_minecraft(
 
     // Test jre version
     let java_version =
-        crate::api::jre::check_jre(java_version.path.clone().into())
-            .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::LauncherError(format!(
-                    "Java path invalid or non-functional: {}",
-                    java_version.path
-                ))
-            })?;
+        crate::api::jre::check_jre(java_version.path.clone().into()).await?;
 
     let client_path = state
         .directories
