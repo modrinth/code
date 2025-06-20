@@ -6,7 +6,7 @@
           <NuxtLink
             :to="link.href"
             class="flex items-center gap-2 rounded-xl p-2 hover:bg-button-bg"
-            :class="{ 'bg-button-bg text-contrast': route.path === link.href }"
+            :class="{ 'bg-button-bg text-contrast': isLinkActive(link) }"
           >
             <div class="flex items-center gap-2 font-bold">
               <component :is="link.icon" class="size-6" />
@@ -39,12 +39,32 @@ import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const emit = defineEmits(["reinstall"]);
 
-defineProps<{
-  navLinks: { label: string; href: string; icon: Component; external?: boolean }[];
+const props = defineProps<{
+  navLinks: {
+    label: string;
+    href: string;
+    icon: Component;
+    external?: boolean;
+    matches?: RegExp[];
+  }[];
   route: RouteLocationNormalized;
   server: ModrinthServer;
   backupInProgress?: BackupInProgressReason;
 }>();
+
+const isLinkActive = (link: (typeof props.navLinks)[0]) => {
+  if (props.route.path === link.href) {
+    return true;
+  }
+
+  if (link.matches && link.matches.length > 0) {
+    return link.matches.some((regex: RegExp) => {
+      return regex.test(props.route.path);
+    });
+  }
+
+  return false;
+};
 
 const onReinstall = (...args: any[]) => {
   emit("reinstall", ...args);

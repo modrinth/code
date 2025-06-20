@@ -37,7 +37,7 @@
             </button>
           </ButtonStyled>
         </div>
-        <div class="overflow-y-auto p-6">
+        <div class="modal-content overflow-y-auto p-6">
           <slot> You just lost the game.</slot>
         </div>
       </div>
@@ -236,6 +236,10 @@ function handleKeyDown(event: KeyboardEvent) {
     visibility: hidden;
     opacity: 0;
     transition: all 0.2s ease-in-out;
+
+    .modal-content {
+      scrollbar-gutter: stable;
+    }
 
     @media (prefers-reduced-motion) {
       transition: none !important;
