@@ -23,6 +23,7 @@ quick-xml = { workspace = true, features = ["async-tokio"] }
 enumset.workspace = true
 chardetng.workspace = true
 encoding_rs.workspace = true
+hashlink.workspace = true
 
 chrono = { workspace = true, features = ["serde"] }
 daedalus.workspace = true

@@ -9,7 +9,7 @@ use std::path::PathBuf;
 use sysinfo::{MemoryRefreshKind, RefreshKind};
 
 use crate::util::io;
-use crate::util::jre::extract_java_majorminor_version;
+use crate::util::jre::extract_java_version;
 use crate::{
     LoadingBarType, State,
     util::jre::{self},
@@ -38,9 +38,9 @@ pub async fn find_filtered_jres(
     Ok(if let Some(java_version) = java_version {
         jres.into_iter()
             .filter(|jre| {
-                let jre_version = extract_java_majorminor_version(&jre.version);
+                let jre_version = extract_java_version(&jre.version);
                 if let Ok(jre_version) = jre_version {
-                    jre_version.1 == java_version
+                    jre_version == java_version
                 } else {
                     false
                 }
@@ -157,8 +157,8 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
 }
 
 // Validates JRE at a given at a given path
-pub async fn check_jre(path: PathBuf) -> crate::Result<Option<JavaVersion>> {
-    Ok(jre::check_java_at_filepath(&path).await)
+pub async fn check_jre(path: PathBuf) -> crate::Result<JavaVersion> {
+    jre::check_java_at_filepath(&path).await
 }
 
 // Test JRE at a given path
@@ -166,11 +166,11 @@ pub async fn test_jre(
     path: PathBuf,
     major_version: u32,
 ) -> crate::Result<bool> {
-    let Some(jre) = jre::check_java_at_filepath(&path).await else {
+    let Ok(jre) = jre::check_java_at_filepath(&path).await else {
         return Ok(false);
     };
-    let (major, _) = extract_java_majorminor_version(&jre.version)?;
-    Ok(major == major_version)
+    let version = extract_java_version(&jre.version)?;
+    Ok(version == major_version)
 }
 
 // Gets maximum memory in KiB.
