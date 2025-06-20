@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 
-public class MinecraftLaunch {
+public final class MinecraftLaunch {
   public static void main(String[] args) throws IOException, ReflectiveOperationException {
     final String mainClass = args[0];
     final String[] gameArgs = Arrays.copyOfRange(args, 1, args.length);
@@ -58,7 +58,8 @@ public class MinecraftLaunch {
       try {
         mainMethod = findMainMethodJep512(mainClass);
       } catch (ReflectiveOperationException e) {
-        System.err.println("[MODRINTH] Unable to call JDK findMainMethod. Falling back to pre-Java 25 main method finding.");
+        System.err
+            .println("[MODRINTH] Unable to call JDK findMainMethod. Falling back to pre-Java 25 main method finding.");
         // If the above fails due to JDK implementation details changing
         try {
           mainMethod = findSimpleMainMethod(mainClass);
@@ -77,12 +78,12 @@ public class MinecraftLaunch {
       }
 
       final Object[] parameters = mainMethod.getParameterCount() > 0
-        ? new Object[] {args}
-        : new Object[] {};
+          ? new Object[] { args }
+          : new Object[] {};
 
       mainMethod.invoke(thisObject, parameters);
     } else {
-      findSimpleMainMethod(mainClass).invoke(null, new Object[] {args});
+      findSimpleMainMethod(mainClass).invoke(null, new Object[] { args });
     }
   }
 
@@ -103,7 +104,8 @@ public class MinecraftLaunch {
   }
 
   private static Method findMainMethodJep512(Class<?> mainClass) throws ReflectiveOperationException {
-    // BEWARE BELOW: This code may break if JDK internals to find the main method change.
+    // BEWARE BELOW: This code may break if JDK internals to find the main method
+    // change.
     final Class<?> methodFinderClass = Class.forName("jdk.internal.misc.MethodFinder");
     final Method methodFinderMethod = methodFinderClass.getDeclaredMethod("findMainMethod", Class.class);
     final Object result = methodFinderMethod.invoke(null, mainClass);
