@@ -31,6 +31,7 @@ export const useStripe = (
   product: Ref<ServerPlan | undefined>,
   interval: Ref<ServerBillingInterval>,
   region: Ref<string | undefined>,
+  project: Ref<string | undefined>,
   initiatePayment: (
     body: CreatePaymentIntentRequest | UpdatePaymentIntentRequest,
   ) => Promise<CreatePaymentIntentResponse | UpdatePaymentIntentResponse>,
@@ -222,16 +223,22 @@ export const useStripe = (
 
       let result: BasePaymentIntentResponse
 
+      const metadata: CreatePaymentIntentRequest['metadata'] = {
+        type: 'pyro',
+        server_region: region.value,
+        source: project.value
+          ? {
+              project_id: project.value,
+            }
+          : {},
+      }
+
       if (paymentIntentId.value) {
         result = await updateIntent({
           ...requestType,
           charge,
           existing_payment_intent: paymentIntentId.value,
-          metadata: {
-            type: 'pyro',
-            server_region: region.value,
-            source: {},
-          },
+          metadata,
         })
         console.log(`Updated payment intent: ${interval.value} for ${result.total}`)
       } else {
@@ -242,11 +249,7 @@ export const useStripe = (
         } = await createIntent({
           ...requestType,
           charge,
-          metadata: {
-            type: 'pyro',
-            server_region: region.value,
-            source: {},
-          },
+          metadata: metadata,
         }))
         console.log(`Created payment intent: ${interval.value} for ${result.total}`)
       }

@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { ServerBillingInterval, ServerPlan, ServerRegion } from '../../utils/billing'
+import {
+  monthsInInterval,
+  type ServerBillingInterval,
+  type ServerPlan,
+  type ServerRegion,
+} from '../../utils/billing'
 import TagItem from '../base/TagItem.vue'
 import ServersSpecs from './ServersSpecs.vue'
 import { formatPrice, getPingLevel } from '@modrinth/utils'
@@ -76,12 +81,6 @@ const period = computed(() => {
   if (interval.value === 'yearly') return 'year'
   return '???'
 })
-
-const monthsInInterval: Record<ServerBillingInterval, number> = {
-  monthly: 1,
-  quarterly: 3,
-  yearly: 12,
-}
 
 function setInterval(newInterval: ServerBillingInterval) {
   interval.value = newInterval

@@ -59,6 +59,7 @@ const selectedPlan = ref<ServerPlan>()
 const selectedInterval = ref<ServerBillingInterval>('quarterly')
 const loading = ref(false)
 const selectedRegion = ref<string>()
+const projectId = ref<string>()
 
 const {
   initializeStripe,
@@ -85,6 +86,7 @@ const {
   selectedPlan,
   selectedInterval,
   selectedRegion,
+  projectId,
   props.initiatePayment,
   props.onError,
 )
@@ -201,7 +203,7 @@ watch(selectedPlan, () => {
   console.log(selectedPlan.value)
 })
 
-function begin(interval: ServerBillingInterval, plan?: ServerPlan) {
+function begin(interval: ServerBillingInterval, plan?: ServerPlan, project?: string) {
   loading.value = false
   selectedPlan.value = plan
   selectedInterval.value = interval
@@ -209,6 +211,7 @@ function begin(interval: ServerBillingInterval, plan?: ServerPlan) {
   selectedPaymentMethod.value = undefined
   currentStep.value = steps[0]
   skipPaymentMethods.value = true
+  projectId.value = project
   modal.value?.show()
 }
 
@@ -253,6 +256,8 @@ defineExpose({
         :pings="pings"
         :custom="customServer"
         :available-products="availableProducts"
+        :currency="currency"
+        :interval="selectedInterval"
         :fetch-stock="fetchStock"
       />
       <PaymentMethodSelector
