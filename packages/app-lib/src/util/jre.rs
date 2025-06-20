@@ -308,7 +308,7 @@ pub async fn check_java_at_filepath(path: &Path) -> crate::Result<JavaVersion> {
             if let Ok(version) = extract_java_version(version) {
                 let path = java.to_string_lossy().to_string();
                 return Ok(JavaVersion {
-                    version_number: version,
+                    parsed_version: version,
                     path,
                     version: version.to_string(),
                     architecture: arch.to_string(),

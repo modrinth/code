@@ -623,14 +623,7 @@ pub async fn launch_minecraft(
     );
 
     // The java launcher code requires internal JDK code in Java 25+ in order to support JEP 512
-    if java_version
-        .version
-        .split_once('.')
-        .map_or(java_version.version.as_str(), |(x, _)| x)
-        .parse::<u32>()
-        .unwrap_or(1)
-        >= 25
-    {
+    if java_version.parsed_version >= 25 {
         command.arg("--add-opens=jdk.internal/jdk.internal.misc=ALL-UNNAMED");
     }
 

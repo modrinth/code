@@ -94,6 +94,11 @@ public class MinecraftLaunch {
       javaVersion = javaVersion.substring(0, dotIndex);
     }
 
+    final int dashIndex = javaVersion.indexOf('-');
+    if (dashIndex != -1) {
+      javaVersion = javaVersion.substring(0, dashIndex);
+    }
+
     return Integer.parseInt(javaVersion);
   }
 
