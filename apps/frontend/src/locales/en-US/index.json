@@ -1372,5 +1372,11 @@
   },
   "settings.sessions.unknown-platform": {
     "message": "Unknown platform"
+  },
+  "pages.project.mods.title": {
+    "message": "Project Dependencies"
+  },
+  "pages.project.mods.no_results": {
+    "message": "No dependencies match the selected filters."
   }
 }
