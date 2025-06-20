@@ -76,6 +76,10 @@
               </span>
             </h2>
             <div class="chart-controls__buttons">
+              <Button v-tooltip="'Cycle chart type'" icon-only @click="cycleChartType">
+                <ChartAreaIcon v-if="cosmetics.analyticsChartType === 'area'" />
+                <ChartLineIcon v-else />
+              </Button>
               <Button v-tooltip="'Toggle project colors'" icon-only @click="onToggleColors">
                 <PaletteIcon />
               </Button>
@@ -102,8 +106,9 @@
                 <Chart
                   v-if="analytics.formattedData.value.downloads && selectedChart === 'downloads'"
                   ref="downloadsChart"
-                  type="line"
+                  :type="cosmetics.analyticsChartType"
                   name="Download data"
+                  stacked="true"
                   :hide-legend="true"
                   :data="analytics.formattedData.value.downloads.chart.data"
                   :labels="analytics.formattedData.value.downloads.chart.labels"
@@ -117,8 +122,9 @@
                 <Chart
                   v-if="analytics.formattedData.value.views && selectedChart === 'views'"
                   ref="viewsChart"
-                  type="line"
+                  :type="cosmetics.analyticsChartType"
                   name="View data"
+                  stacked="true"
                   :hide-legend="true"
                   :data="analytics.formattedData.value.views.chart.data"
                   :labels="analytics.formattedData.value.views.chart.labels"
@@ -132,8 +138,9 @@
                 <Chart
                   v-if="analytics.formattedData.value.revenue && selectedChart === 'revenue'"
                   ref="revenueChart"
-                  type="line"
+                  :type="cosmetics.analyticsChartType"
                   name="Revenue data"
+                  stacked="true"
                   :hide-legend="true"
                   :data="analytics.formattedData.value.revenue.chart.data"
                   :labels="analytics.formattedData.value.revenue.chart.labels"
@@ -306,7 +313,7 @@
 <script setup lang="ts">
 import { Button, Card, DropdownSelect } from "@modrinth/ui";
 import { formatMoney, formatNumber, formatCategoryHeader } from "@modrinth/utils";
-import { UpdatedIcon, DownloadIcon } from "@modrinth/assets";
+import { UpdatedIcon, DownloadIcon, ChartLineIcon, ChartAreaIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
 import { computed } from "vue";
 
@@ -316,8 +323,10 @@ import { UiChartsCompactChart as CompactChart, UiChartsChart as Chart } from "#c
 
 import PaletteIcon from "~/assets/icons/palette.svg?component";
 
+const data = useNuxtApp();
 const router = useNativeRouter();
 const theme = useTheme();
+const cosmetics = useCosmetics();
 
 const props = withDefaults(
   defineProps<{
@@ -410,6 +419,13 @@ const isUsingProjectColors = computed({
     });
   },
 });
+
+function cycleChartType() {
+  cosmetics.value.analyticsChartType = data.$cycleValue(cosmetics.value.analyticsChartType, [
+    "area",
+    "line",
+  ]);
+}
 
 const startDate = ref(dayjs().startOf("day"));
 const endDate = ref(dayjs().endOf("day"));
