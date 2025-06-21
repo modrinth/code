@@ -43,7 +43,12 @@
 
 <script setup lang="ts">
 import { ref, nextTick, computed } from 'vue'
-import { ButtonStyled, injectNotificationManager, type ModrinthServer, NewModal } from '@modrinth/ui'
+import {
+  ButtonStyled,
+  injectNotificationManager,
+  type ModrinthServer,
+  NewModal,
+} from '@modrinth/ui'
 import { IssuesIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import { ModrinthServersFetchError, type ServerBackup } from '@modrinth/utils'
 

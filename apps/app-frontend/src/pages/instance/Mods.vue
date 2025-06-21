@@ -275,7 +275,7 @@ import {
   Pagination,
   RadialHeader,
   Toggle,
-  type ContentItem
+  type ContentItem,
 } from '@modrinth/ui'
 import type { Organization, Project, TeamMember, Version } from '@modrinth/utils'
 import { formatProjectType } from '@modrinth/utils'
