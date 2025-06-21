@@ -239,7 +239,7 @@
             <div>
               <nuxt-link
                 tabindex="-1"
-                :to="`/${$getProjectTypeForUrl(project.project_type, project.loaders)}/${
+                :to="`/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
                   project.slug ? project.slug : project.id
                 }`"
               >
@@ -261,7 +261,7 @@
 
                 <nuxt-link
                   class="hover-link wrap-as-needed"
-                  :to="`/${$getProjectTypeForUrl(project.project_type, project.loaders)}/${
+                  :to="`/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
                     project.slug ? project.slug : project.id
                   }`"
                 >
@@ -275,7 +275,7 @@
             </div>
 
             <div>
-              {{ $formatProjectType($getProjectTypeForUrl(project.project_type, project.loaders)) }}
+              {{ formatProjectType(getProjectTypeForUrl(project.project_type, project.loaders)) }}
             </div>
 
             <div>
@@ -285,7 +285,7 @@
             <div>
               <ButtonStyled circular>
                 <nuxt-link
-                  :to="`/${$getProjectTypeForUrl(project.project_type, project.loaders)}/${
+                  :to="`/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
                     project.slug ? project.slug : project.id
                   }/settings`"
                 >
@@ -321,9 +321,11 @@ import {
   ProjectStatusBadge,
   commonMessages,
 } from "@modrinth/ui";
+import { formatProjectType } from "@modrinth/utils";
 
 import Modal from "~/components/ui/Modal.vue";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
+import { getProjectTypeForUrl } from "~/helpers/projects.js";
 
 export default defineNuxtComponent({
   components: {
@@ -395,6 +397,8 @@ export default defineNuxtComponent({
     this.DELETE_PROJECT = 1 << 7;
   },
   methods: {
+    getProjectTypeForUrl,
+    formatProjectType,
     updateDescending() {
       this.descending = !this.descending;
       this.projects = this.updateSort(this.projects, this.sortBy, this.descending);
