@@ -20,9 +20,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { BackupItem, ConfirmModal } from '@modrinth/ui'
 import type { Backup } from '@modrinth/utils'
-import ConfirmModal from '../../../modal/ConfirmModal.vue'
-import BackupItem from '../BackupItem.vue'
 
 withDefaults(
   defineProps<{

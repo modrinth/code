@@ -18,11 +18,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { NewModal, ModrinthServer, BackupItem, ConfirmModal } from '@modrinth/ui'
 import type { Backup } from '@modrinth/utils'
-
-import type { ModrinthServer } from '../../../../composables'
-import type NewModal from '../../../modal/NewModal.vue'
-import { injectNotificationManager } from '../../../../providers'
 
 const props = defineProps<{
   server: ModrinthServer

@@ -275,6 +275,7 @@ import {
   Pagination,
   RadialHeader,
   Toggle,
+  type ContentItem,
 } from '@modrinth/ui'
 import type { Organization, Project, TeamMember, Version } from '@modrinth/utils'
 import { formatProjectType } from '@modrinth/utils'
@@ -308,7 +309,6 @@ import { getCurrentWebview } from '@tauri-apps/api/webview'
 import dayjs from 'dayjs'
 import type { CacheBehaviour, ContentFile, GameInstance } from '@/helpers/types'
 import type ContextMenu from '@/components/ui/ContextMenu.vue'
-import type { ContentItem } from '@modrinth/ui/src/components/content/ContentListItem.vue'
 
 const props = defineProps<{
   instance: GameInstance

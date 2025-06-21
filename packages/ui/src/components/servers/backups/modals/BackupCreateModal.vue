@@ -43,12 +43,14 @@
 
 <script setup lang="ts">
 import { ref, nextTick, computed } from 'vue'
+import {
+  ButtonStyled,
+  injectNotificationManager,
+  type ModrinthServer,
+  NewModal,
+} from '@modrinth/ui'
 import { IssuesIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import { ModrinthServersFetchError, type ServerBackup } from '@modrinth/utils'
-
-import type { ModrinthServer } from '../../../../composables'
-import { injectNotificationManager } from '../../../../providers'
-import NewModal from '../../../modal/NewModal.vue'
 
 const props = defineProps<{
   server: ModrinthServer
