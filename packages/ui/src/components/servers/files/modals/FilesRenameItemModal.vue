@@ -32,63 +32,65 @@
 </template>
 
 <script setup lang="ts">
-import { EditIcon, XIcon } from "@modrinth/assets";
-import { ButtonStyled, NewModal } from "@modrinth/ui";
-import { ref, computed, nextTick } from "vue";
+import { EditIcon, XIcon } from '@modrinth/assets'
+import { ref, computed, nextTick, defineProps, defineEmits, defineExpose } from 'vue'
+
+import ButtonStyled from '../../../base/ButtonStyled.vue'
+import NewModal from '../../../modal/NewModal.vue'
 
 const props = defineProps<{
-  item: { name: string; type: string } | null;
-}>();
+  item: { name: string; type: string } | null
+}>()
 
 const emit = defineEmits<{
-  (e: "rename", newName: string): void;
-}>();
+  (e: 'rename', newName: string): void
+}>()
 
-const modal = ref<typeof NewModal>();
-const renameInput = ref<HTMLInputElement | null>(null);
-const itemName = ref("");
-const submitted = ref(false);
+const modal = ref<typeof NewModal>()
+const renameInput = ref<HTMLInputElement | null>(null)
+const itemName = ref('')
+const submitted = ref(false)
 
 const error = computed(() => {
   if (!itemName.value) {
-    return "Name is required.";
+    return 'Name is required.'
   }
-  if (props.item?.type === "file") {
-    const validPattern = /^[a-zA-Z0-9-_.\s]+$/;
+  if (props.item?.type === 'file') {
+    const validPattern = /^[a-zA-Z0-9-_.\s]+$/
     if (!validPattern.test(itemName.value)) {
-      return "Name must contain only alphanumeric characters, dashes, underscores, dots, or spaces.";
+      return 'Name must contain only alphanumeric characters, dashes, underscores, dots, or spaces.'
     }
   } else {
-    const validPattern = /^[a-zA-Z0-9-_\s]+$/;
+    const validPattern = /^[a-zA-Z0-9-_\s]+$/
     if (!validPattern.test(itemName.value)) {
-      return "Name must contain only alphanumeric characters, dashes, underscores, or spaces.";
+      return 'Name must contain only alphanumeric characters, dashes, underscores, or spaces.'
     }
   }
-  return "";
-});
+  return ''
+})
 
 const handleSubmit = () => {
-  submitted.value = true;
+  submitted.value = true
   if (!error.value) {
-    emit("rename", itemName.value);
-    hide();
+    emit('rename', itemName.value)
+    hide()
   }
-};
+}
 
 const show = (item: { name: string; type: string }) => {
-  itemName.value = item.name;
-  submitted.value = false;
-  modal.value?.show();
+  itemName.value = item.name
+  submitted.value = false
+  modal.value?.show()
   nextTick(() => {
     setTimeout(() => {
-      renameInput.value?.focus();
-    }, 100);
-  });
-};
+      renameInput.value?.focus()
+    }, 100)
+  })
+}
 
 const hide = () => {
-  modal.value?.hide();
-};
+  modal.value?.hide()
+}
 
-defineExpose({ show, hide });
+defineExpose({ show, hide })
 </script>

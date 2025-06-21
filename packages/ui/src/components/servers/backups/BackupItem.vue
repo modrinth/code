@@ -32,13 +32,13 @@ const props = withDefaults(
     preview?: boolean
     kyrosUrl?: string
     jwt?: string
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    flags?: any
+    showAdvancedDebugInfo?: boolean
   }>(),
   {
     preview: false,
     kyrosUrl: undefined,
     jwt: undefined,
+    showAdvancedDebugInfo: false,
   },
 )
 
@@ -338,7 +338,7 @@ const messages = defineMessages({
       </template>
     </div>
     <pre
-      v-if="!preview && flags?.advancedDebugInfo"
+      v-if="!preview && showAdvancedDebugInfo"
       class="col-span-full m-0 rounded-xl bg-button-bg text-xs"
       >{{ backup }}</pre
     >

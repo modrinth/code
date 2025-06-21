@@ -87,7 +87,9 @@ export abstract class AbstractWebNotificationManager {
     }
   }
 
-  private findExistingNotification(notification: Partial<WebNotification>): WebNotification | undefined {
+  private findExistingNotification(
+    notification: Partial<WebNotification>,
+  ): WebNotification | undefined {
     return this.getNotifications().find(
       (existing) =>
         existing.text === notification.text &&

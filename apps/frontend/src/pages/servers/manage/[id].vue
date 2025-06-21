@@ -142,7 +142,7 @@
             data-pyro-server-action-buttons
             class="server-action-buttons-anim flex w-fit flex-shrink-0"
           >
-            <UiServersPanelServerActionButton
+            <PanelServerActionButton
               v-if="!serverData.flows?.intro"
               class="flex-shrink-0"
               :is-online="isServerRunning"
@@ -163,13 +163,14 @@
         >
           <SettingsIcon /> Configuring server...
         </div>
-        <UiServersServerInfoLabels
+        <ServerInfoLabels
           v-else
           :server-data="serverData"
           :show-game-label="showGameLabel"
           :show-loader-label="showLoaderLabel"
           :uptime-seconds="uptimeSeconds"
           :linked="true"
+          :server-id="serverId"
           class="server-action-buttons-anim flex min-w-0 flex-col flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
         />
       </div>
@@ -180,7 +181,7 @@
         v-if="serverData?.status === 'installing'"
         class="w-50 h-50 flex items-center justify-center gap-2 text-center text-lg font-bold"
       >
-        <LazyUiServersPanelSpinner class="size-10 animate-spin" /> Setting up your server...
+        <PanelSpinner class="size-10 animate-spin" /> Setting up your server...
       </div>
       <div v-else>
         <h2 class="my-4 text-xl font-extrabold">
@@ -309,7 +310,7 @@
           data-pyro-server-ws-reconnecting
           class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-sm text-contrast"
         >
-          <UiServersPanelSpinner />
+          <PanelSpinner />
           Hang on, we're reconnecting to your server.
         </div>
 
@@ -323,7 +324,7 @@
           <div class="flex flex-col gap-1">
             <span class="text-lg font-bold"> We're preparing your server! </span>
             <div class="flex flex-row items-center gap-2">
-              <UiServersPanelSpinner class="!h-3 !w-3" /> <LazyUiServersInstallingTicker />
+              <PanelSpinner class="!h-3 !w-3" /> <LazyUiServersInstallingTicker />
             </div>
           </div>
         </div>
@@ -375,6 +376,10 @@ import {
   ServerNotice,
   ModrinthServer,
   injectNotificationManager,
+  injectModrinthServersConsole,
+  PanelSpinner,
+  ServerInfoLabels,
+  PanelServerActionButton,
 } from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
 import type { MessageDescriptor } from "@vintl/vintl";
@@ -387,7 +392,6 @@ import type {
   PowerAction,
 } from "@modrinth/utils";
 import { reloadNuxtApp, navigateTo } from "#app";
-import { useModrinthServersConsole } from "~/store/console.ts";
 import ServerInstallation from "~/components/ui/servers/ServerInstallation.vue";
 import { useModrinthServersSimple } from "~/utils/frontend-servers.ts";
 
@@ -449,7 +453,7 @@ const errorLogFile = ref("");
 const serverData = computed(() => server.general);
 const isConnected = ref(false);
 const isWSAuthIncorrect = ref(false);
-const modrinthServersConsole = useModrinthServersConsole();
+const modrinthServersConsole = injectModrinthServersConsole();
 const cpuData = ref<number[]>([]);
 const ramData = ref<number[]>([]);
 const isActioning = ref(false);

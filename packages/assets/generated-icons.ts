@@ -98,6 +98,7 @@ import _ListBulletedIcon from './icons/list-bulleted.svg?component'
 import _ListEndIcon from './icons/list-end.svg?component'
 import _ListOrderedIcon from './icons/list-ordered.svg?component'
 import _ListIcon from './icons/list.svg?component'
+import _LoaderCircleIcon from './icons/loader-circle.svg?component'
 import _LoaderIcon from './icons/loader.svg?component'
 import _LockOpenIcon from './icons/lock-open.svg?component'
 import _LockIcon from './icons/lock.svg?component'
@@ -124,6 +125,7 @@ import _PackageClosedIcon from './icons/package-closed.svg?component'
 import _PackageOpenIcon from './icons/package-open.svg?component'
 import _PackageIcon from './icons/package.svg?component'
 import _PaintbrushIcon from './icons/paintbrush.svg?component'
+import _PaletteIcon from './icons/palette.svg?component'
 import _PickaxeIcon from './icons/pickaxe.svg?component'
 import _PlayIcon from './icons/play.svg?component'
 import _PlugIcon from './icons/plug.svg?component'
@@ -288,6 +290,7 @@ export const ListBulletedIcon = _ListBulletedIcon
 export const ListEndIcon = _ListEndIcon
 export const ListOrderedIcon = _ListOrderedIcon
 export const ListIcon = _ListIcon
+export const LoaderCircleIcon = _LoaderCircleIcon
 export const LoaderIcon = _LoaderIcon
 export const LockOpenIcon = _LockOpenIcon
 export const LockIcon = _LockIcon
@@ -314,6 +317,7 @@ export const PackageClosedIcon = _PackageClosedIcon
 export const PackageOpenIcon = _PackageOpenIcon
 export const PackageIcon = _PackageIcon
 export const PaintbrushIcon = _PaintbrushIcon
+export const PaletteIcon = _PaletteIcon
 export const PickaxeIcon = _PickaxeIcon
 export const PlayIcon = _PlayIcon
 export const PlugIcon = _PlugIcon

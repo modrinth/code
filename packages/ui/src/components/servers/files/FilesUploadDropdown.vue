@@ -12,9 +12,9 @@
               <FolderOpenIcon class="size-4" />
               <span>
                 <span class="capitalize">
-                  {{ props.fileType ? props.fileType : "File" }} uploads
+                  {{ props.fileType ? props.fileType : 'File' }} uploads
                 </span>
-                <span>{{ activeUploads.length > 0 ? ` - ${activeUploads.length} left` : "" }}</span>
+                <span>{{ activeUploads.length > 0 ? ` - ${activeUploads.length} left` : '' }}</span>
               </span>
             </div>
           </div>
@@ -27,7 +27,7 @@
             >
               <div class="flex flex-1 items-center gap-2 truncate">
                 <transition-group name="status-icon" mode="out-in">
-                  <UiServersPanelSpinner
+                  <PanelSpinner
                     v-show="item.status === 'uploading'"
                     key="spinner"
                     class="absolute !size-4"
@@ -59,7 +59,7 @@
                 </template>
                 <template v-else-if="item.status === 'error-generic'">
                   <span class="text-red"
-                    >Failed - {{ item.error?.message || "An unexpected error occured." }}</span
+                    >Failed - {{ item.error?.message || 'An unexpected error occured.' }}</span
                   >
                 </template>
                 <template v-else-if="item.status === 'incorrect-type'">
@@ -101,118 +101,128 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from "vue";
-import { FolderOpenIcon, CheckCircleIcon, XCircleIcon } from "@modrinth/assets";
-import { ButtonStyled, injectNotificationManager, type FSModule } from "@modrinth/ui";
+import { ref, computed, watch, nextTick } from 'vue'
+import { FolderOpenIcon, CheckCircleIcon, XCircleIcon } from '@modrinth/assets'
+
+import ButtonStyled from '../../base/ButtonStyled.vue'
+import type { FSModule } from '../../../composables'
+import { injectNotificationManager } from '../../../providers'
+import PanelSpinner from '../panel/PanelSpinner.vue'
+
+interface Uploader {
+  cancel: () => void
+  onProgress?: (callback: (data: { progress: number }) => void) => void
+  promise: Promise<unknown>
+}
 
 interface UploadItem {
-  file: File;
-  progress: number;
+  file: File
+  progress: number
   status:
-    | "pending"
-    | "uploading"
-    | "completed"
-    | "error-file-exists"
-    | "error-generic"
-    | "cancelled"
-    | "incorrect-type";
-  size: string;
-  uploader?: any;
-  error?: Error;
+    | 'pending'
+    | 'uploading'
+    | 'completed'
+    | 'error-file-exists'
+    | 'error-generic'
+    | 'cancelled'
+    | 'incorrect-type'
+  size: string
+  uploader?: Uploader
+  error?: Error
 }
 
 interface Props {
-  currentPath: string;
-  fileType?: string;
-  marginBottom?: number;
-  acceptedTypes?: string[];
-  fs: FSModule;
+  currentPath: string
+  fileType?: string
+  marginBottom?: number
+  acceptedTypes?: string[]
+  fs: FSModule
 }
 
 defineOptions({
   inheritAttrs: false,
-});
+})
 
-const props = defineProps<Props>();
-const { addNotification } = injectNotificationManager();
+const props = defineProps<Props>()
+const { addNotification } = injectNotificationManager()
 
 const emit = defineEmits<{
-  uploadComplete: [];
-}>();
+  uploadComplete: []
+}>()
 
-const uploadStatusRef = ref<HTMLElement | null>(null);
-const statusContentRef = ref<HTMLElement | null>(null);
-const uploadQueue = ref<UploadItem[]>([]);
+const uploadStatusRef = ref<HTMLElement | null>(null)
+const statusContentRef = ref<HTMLElement | null>(null)
+const uploadQueue = ref<UploadItem[]>([])
 
-const isUploading = computed(() => uploadQueue.value.length > 0);
+const isUploading = computed(() => uploadQueue.value.length > 0)
 const activeUploads = computed(() =>
-  uploadQueue.value.filter((item) => item.status === "pending" || item.status === "uploading"),
-);
+  uploadQueue.value.filter((item) => item.status === 'pending' || item.status === 'uploading'),
+)
 
 function onUploadStatusEnter(el: Element): void {
-  const height = (el as HTMLElement).scrollHeight + (props.marginBottom || 0);
-  (el as HTMLElement).style.height = "0";
-  // eslint-disable-next-line no-void
-  void (el as HTMLElement).offsetHeight;
-  (el as HTMLElement).style.height = `${height}px`;
+  const height = (el as HTMLElement).scrollHeight + (props.marginBottom || 0)
+  ;(el as HTMLElement).style.height = '0'
+
+  void (el as HTMLElement).offsetHeight
+  ;(el as HTMLElement).style.height = `${height}px`
 }
 
 function onUploadStatusLeave(el: Element): void {
-  const height = (el as HTMLElement).scrollHeight + (props.marginBottom || 0);
-  (el as HTMLElement).style.height = `${height}px`;
-  // eslint-disable-next-line no-void
-  void (el as HTMLElement).offsetHeight;
-  (el as HTMLElement).style.height = "0";
+  const height = (el as HTMLElement).scrollHeight + (props.marginBottom || 0)
+  ;(el as HTMLElement).style.height = `${height}px`
+
+  void (el as HTMLElement).offsetHeight
+  ;(el as HTMLElement).style.height = '0'
 }
 
 watch(
   uploadQueue,
   () => {
-    if (!uploadStatusRef.value) return;
-    const el = uploadStatusRef.value;
-    const itemsHeight = uploadQueue.value.length * 32;
-    const headerHeight = 12;
-    const gap = 8;
-    const padding = 32;
-    const totalHeight = padding + headerHeight + gap + itemsHeight + (props.marginBottom || 0);
-    el.style.height = `${totalHeight}px`;
+    if (!uploadStatusRef.value) return
+    const el = uploadStatusRef.value
+    const itemsHeight = uploadQueue.value.length * 32
+    const headerHeight = 12
+    const gap = 8
+    const padding = 32
+    const totalHeight = padding + headerHeight + gap + itemsHeight + (props.marginBottom || 0)
+    el.style.height = `${totalHeight}px`
   },
   { deep: true },
-);
+)
 
 function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return bytes + " B";
-  if (bytes < 1024 ** 2) return (bytes / 1024).toFixed(1) + " KB";
-  if (bytes < 1024 ** 3) return (bytes / 1024 ** 2).toFixed(1) + " MB";
-  return (bytes / 1024 ** 3).toFixed(1) + " GB";
+  if (bytes < 1024) return bytes + ' B'
+  if (bytes < 1024 ** 2) return (bytes / 1024).toFixed(1) + ' KB'
+  if (bytes < 1024 ** 3) return (bytes / 1024 ** 2).toFixed(1) + ' MB'
+  return (bytes / 1024 ** 3).toFixed(1) + ' GB'
 }
 
 function cancelUpload(item: UploadItem): void {
-  if (item.uploader && item.status === "uploading") {
-    item.uploader.cancel();
-    item.status = "cancelled";
+  if (item.uploader && item.status === 'uploading') {
+    item.uploader.cancel()
+    item.status = 'cancelled'
 
     setTimeout(async () => {
-      const index = uploadQueue.value.findIndex((qItem) => qItem.file.name === item.file.name);
+      const index = uploadQueue.value.findIndex((qItem) => qItem.file.name === item.file.name)
       if (index !== -1) {
-        uploadQueue.value.splice(index, 1);
-        await nextTick();
+        uploadQueue.value.splice(index, 1)
+        await nextTick()
       }
-    }, 5000);
+    }, 5000)
   }
 }
 
-const badFileTypeMsg = "Upload had incorrect file type";
+const badFileTypeMsg = 'Upload had incorrect file type'
 
 async function uploadFile(file: File): Promise<void> {
   const uploadItem: UploadItem = {
     file,
     progress: 0,
-    status: "pending",
+    status: 'pending',
     size: formatFileSize(file.size),
-  };
+  }
 
-  uploadQueue.value.push(uploadItem);
+  uploadQueue.value.push(uploadItem)
 
   try {
     if (
@@ -220,73 +230,73 @@ async function uploadFile(file: File): Promise<void> {
       !props.acceptedTypes.includes(file.type) &&
       !props.acceptedTypes.some((type) => file.name.endsWith(type))
     ) {
-      throw new Error(badFileTypeMsg);
+      throw new Error(badFileTypeMsg)
     }
 
-    uploadItem.status = "uploading";
-    const filePath = `${props.currentPath}/${file.name}`.replace("//", "/");
-    const uploader = await props.fs.uploadFile(filePath, file);
-    uploadItem.uploader = uploader;
+    uploadItem.status = 'uploading'
+    const filePath = `${props.currentPath}/${file.name}`.replace('//', '/')
+    const uploader = await props.fs.uploadFile(filePath, file)
+    uploadItem.uploader = uploader
 
     if (uploader?.onProgress) {
       uploader.onProgress(({ progress }: { progress: number }) => {
-        const index = uploadQueue.value.findIndex((item) => item.file.name === file.name);
+        const index = uploadQueue.value.findIndex((item) => item.file.name === file.name)
         if (index !== -1) {
-          uploadQueue.value[index].progress = Math.round(progress);
+          uploadQueue.value[index].progress = Math.round(progress)
         }
-      });
+      })
     }
 
-    await uploader?.promise;
-    const index = uploadQueue.value.findIndex((item) => item.file.name === file.name);
-    if (index !== -1 && uploadQueue.value[index].status !== "cancelled") {
-      uploadQueue.value[index].status = "completed";
-      uploadQueue.value[index].progress = 100;
+    await uploader?.promise
+    const index = uploadQueue.value.findIndex((item) => item.file.name === file.name)
+    if (index !== -1 && uploadQueue.value[index].status !== 'cancelled') {
+      uploadQueue.value[index].status = 'completed'
+      uploadQueue.value[index].progress = 100
     }
 
-    await nextTick();
+    await nextTick()
 
     setTimeout(async () => {
-      const removeIndex = uploadQueue.value.findIndex((item) => item.file.name === file.name);
+      const removeIndex = uploadQueue.value.findIndex((item) => item.file.name === file.name)
       if (removeIndex !== -1) {
-        uploadQueue.value.splice(removeIndex, 1);
-        await nextTick();
+        uploadQueue.value.splice(removeIndex, 1)
+        await nextTick()
       }
-    }, 5000);
+    }, 5000)
 
-    emit("uploadComplete");
+    emit('uploadComplete')
   } catch (error) {
-    console.error("Error uploading file:", error);
-    const index = uploadQueue.value.findIndex((item) => item.file.name === file.name);
-    if (index !== -1 && uploadQueue.value[index].status !== "cancelled") {
-      const target = uploadQueue.value[index];
+    console.error('Error uploading file:', error)
+    const index = uploadQueue.value.findIndex((item) => item.file.name === file.name)
+    if (index !== -1 && uploadQueue.value[index].status !== 'cancelled') {
+      const target = uploadQueue.value[index]
 
       if (error instanceof Error) {
         if (error.message === badFileTypeMsg) {
-          target.status = "incorrect-type";
-        } else if (target.progress === 100 && error.message.includes("401")) {
-          target.status = "error-file-exists";
+          target.status = 'incorrect-type'
+        } else if (target.progress === 100 && error.message.includes('401')) {
+          target.status = 'error-file-exists'
         } else {
-          target.status = "error-generic";
-          target.error = error;
+          target.status = 'error-generic'
+          target.error = error
         }
       }
     }
 
     setTimeout(async () => {
-      const removeIndex = uploadQueue.value.findIndex((item) => item.file.name === file.name);
+      const removeIndex = uploadQueue.value.findIndex((item) => item.file.name === file.name)
       if (removeIndex !== -1) {
-        uploadQueue.value.splice(removeIndex, 1);
-        await nextTick();
+        uploadQueue.value.splice(removeIndex, 1)
+        await nextTick()
       }
-    }, 5000);
+    }, 5000)
 
-    if (error instanceof Error && error.message !== "Upload cancelled") {
+    if (error instanceof Error && error.message !== 'Upload cancelled') {
       addNotification({
-        title: "Upload failed",
+        title: 'Upload failed',
         text: `Failed to upload ${file.name}`,
-        type: "error",
-      });
+        type: 'error',
+      })
     }
   }
 }
@@ -294,7 +304,7 @@ async function uploadFile(file: File): Promise<void> {
 defineExpose({
   uploadFile,
   cancelUpload,
-});
+})
 </script>
 
 <style scoped>

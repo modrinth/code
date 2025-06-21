@@ -27,30 +27,31 @@
 </template>
 
 <script setup lang="ts">
-import { ConfirmModal } from "@modrinth/ui";
-import { ref } from "vue";
-import { XIcon, CheckIcon } from "@modrinth/assets";
+import { ref, computed, defineEmits, defineExpose } from 'vue'
+import { XIcon, CheckIcon } from '@modrinth/assets'
 
-const path = ref("");
-const files = ref<string[]>([]);
+import ConfirmModal from '../../../modal/ConfirmModal.vue'
+
+const path = ref('')
+const files = ref<string[]>([])
 
 const emit = defineEmits<{
-  (e: "proceed", path: string): void;
-}>();
+  (e: 'proceed', path: string): void
+}>()
 
-const modal = ref<typeof ConfirmModal>();
+const modal = ref<typeof ConfirmModal>()
 
-const hasMany = computed(() => files.value.length > 100);
+const hasMany = computed(() => files.value.length > 100)
 
 const show = (zipPath: string, conflictingFiles: string[]) => {
-  path.value = zipPath;
-  files.value = conflictingFiles;
-  modal.value?.show();
-};
+  path.value = zipPath
+  files.value = conflictingFiles
+  modal.value?.show()
+}
 
 const proceed = () => {
-  emit("proceed", path.value);
-};
+  emit('proceed', path.value)
+}
 
-defineExpose({ show });
+defineExpose({ show })
 </script>

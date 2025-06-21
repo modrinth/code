@@ -55,33 +55,31 @@
 </template>
 
 <script setup lang="ts">
-import { EditIcon, DownloadIcon, TrashIcon, RightArrowIcon } from "@modrinth/assets";
+import { EditIcon, DownloadIcon, TrashIcon, RightArrowIcon } from '@modrinth/assets'
+import { ref } from 'vue'
 
 interface FileItem {
-  type: string;
-  name: string;
-  [key: string]: any;
+  type: string
+  name: string
+  [key: string]: unknown
 }
 
 defineProps<{
-  item: FileItem | null;
-  x: number;
-  y: number;
-  isAtBottom: boolean;
-}>();
+  item: FileItem | null
+  x: number
+  y: number
+  isAtBottom: boolean
+}>()
 
-const ctxRef = ref<HTMLElement | null>(null);
+const ctxRef = ref<HTMLElement | null>(null)
 
 defineEmits<{
-  (e: "rename", item: FileItem): void;
-  (e: "move", item: FileItem): void;
-  (e: "download", item: FileItem): void;
-  (e: "delete", item: FileItem): void;
-}>();
+  (e: 'rename' | 'move' | 'download' | 'delete', item: FileItem): void
+}>()
 
 defineExpose({
   ctxRef,
-});
+})
 </script>
 
 <style scoped>

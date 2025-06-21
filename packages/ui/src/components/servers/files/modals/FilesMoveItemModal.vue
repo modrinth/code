@@ -37,46 +37,48 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowBigUpDashIcon, XIcon } from "@modrinth/assets";
-import { ButtonStyled, NewModal } from "@modrinth/ui";
-import { ref, nextTick, computed } from "vue";
+import { ArrowBigUpDashIcon, XIcon } from '@modrinth/assets'
+import { ref, nextTick, computed, defineProps, defineEmits, defineExpose } from 'vue'
 
-const destinationInput = ref<HTMLInputElement | null>(null);
+import ButtonStyled from '../../../base/ButtonStyled.vue'
+import NewModal from '../../../modal/NewModal.vue'
+
+const destinationInput = ref<HTMLInputElement | null>(null)
 
 const props = defineProps<{
-  item: { name: string } | null;
-  currentPath: string;
-}>();
+  item: { name: string } | null
+  currentPath: string
+}>()
 
 const emit = defineEmits<{
-  (e: "move", destination: string): void;
-}>();
+  (e: 'move', destination: string): void
+}>()
 
-const modal = ref<typeof NewModal>();
-const destination = ref("");
+const modal = ref<typeof NewModal>()
+const destination = ref('')
 const newpath = computed(() => {
-  const path = destination.value.replace("//", "/");
-  return path.startsWith("/") ? path : `/${path}`;
-});
+  const path = destination.value.replace('//', '/')
+  return path.startsWith('/') ? path : `/${path}`
+})
 
 const handleSubmit = () => {
-  emit("move", newpath.value);
-  hide();
-};
+  emit('move', newpath.value)
+  hide()
+}
 
 const show = () => {
-  destination.value = props.currentPath;
-  modal.value?.show();
+  destination.value = props.currentPath
+  modal.value?.show()
   nextTick(() => {
     setTimeout(() => {
-      destinationInput.value?.focus();
-    }, 100);
-  });
-};
+      destinationInput.value?.focus()
+    }, 100)
+  })
+}
 
 const hide = () => {
-  modal.value?.hide();
-};
+  modal.value?.hide()
+}
 
-defineExpose({ show, hide });
+defineExpose({ show, hide })
 </script>

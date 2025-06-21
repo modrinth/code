@@ -8,6 +8,7 @@ export interface DirectoryItem {
   modified: number
   created: number
   path: string
+  size?: number
 }
 
 export interface FileUploadQuery {

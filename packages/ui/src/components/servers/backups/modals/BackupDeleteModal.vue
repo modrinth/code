@@ -12,6 +12,7 @@
       v-if="currentBackup"
       :backup="currentBackup"
       preview
+      :show-advanced-debug-info="showAdvancedDebugInfo"
       class="border-px border-solid border-button-border"
     />
   </ConfirmModal>
@@ -19,16 +20,21 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import ConfirmModal from '@modrinth/ui'
 import type { Backup } from '@modrinth/utils'
+import ConfirmModal from '../../../modal/ConfirmModal.vue'
 import BackupItem from '../BackupItem.vue'
+
+withDefaults(
+  defineProps<{
+    showAdvancedDebugInfo?: boolean
+  }>(),
+  {
+    showAdvancedDebugInfo: false,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'delete', backup: Backup | undefined): void
-}>()
-
-defineProps<{
-  flags?: any
 }>()
 
 const modal = ref<InstanceType<typeof ConfirmModal>>()

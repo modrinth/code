@@ -56,14 +56,18 @@
 </template>
 
 <script setup lang="ts">
-import type { ModrinthServer } from '@modrinth/ui'
-import { ButtonStyled, NewModal } from '@modrinth/ui'
 import { XIcon, SaveIcon } from '@modrinth/assets'
 import { ref, computed } from 'vue'
+
+import type { ModrinthServer } from '../../../../composables'
+import NewModal from '../../../modal/NewModal.vue'
+import { injectNotificationManager } from '../../../../providers'
 
 const props = defineProps<{
   server: ModrinthServer
 }>()
+
+const { addNotification } = injectNotificationManager()
 
 const modal = ref<InstanceType<typeof NewModal>>()
 
@@ -110,7 +114,6 @@ const fetchSettings = async () => {
   } catch (error) {
     console.error('Error fetching backup settings:', error)
     addNotification({
-      group: 'server',
       title: 'Error',
       text: 'Failed to load backup settings',
       type: 'error',
@@ -135,7 +138,6 @@ const saveSettings = async () => {
     }
 
     addNotification({
-      group: 'server',
       title: 'Success',
       text: 'Backup settings updated successfully',
       type: 'success',
@@ -145,7 +147,6 @@ const saveSettings = async () => {
   } catch (error) {
     console.error('Error saving backup settings:', error)
     addNotification({
-      group: 'server',
       title: 'Error',
       text: 'Failed to save backup settings',
       type: 'error',

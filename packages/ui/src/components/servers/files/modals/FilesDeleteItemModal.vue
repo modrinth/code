@@ -42,36 +42,39 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, NewModal } from "@modrinth/ui";
-import { FileIcon, FolderOpenIcon, TrashIcon, XIcon } from "@modrinth/assets";
+import { ref, defineEmits, defineProps, defineExpose } from 'vue'
+import { FileIcon, FolderOpenIcon, TrashIcon, XIcon } from '@modrinth/assets'
+
+import ButtonStyled from '../../../base/ButtonStyled.vue'
+import NewModal from '../../../modal/NewModal.vue'
 
 defineProps<{
   item: {
-    name: string;
-    type: string;
-    count?: number;
-    size?: number;
-  } | null;
-}>();
+    name: string
+    type: string
+    count?: number
+    size?: number
+  } | null
+}>()
 
 const emit = defineEmits<{
-  (e: "delete"): void;
-}>();
+  (e: 'delete'): void
+}>()
 
-const modal = ref<typeof NewModal>();
+const modal = ref<typeof NewModal>()
 
 const handleSubmit = () => {
-  emit("delete");
-  hide();
-};
+  emit('delete')
+  hide()
+}
 
 const show = () => {
-  modal.value?.show();
-};
+  modal.value?.show()
+}
 
 const hide = () => {
-  modal.value?.hide();
-};
+  modal.value?.hide()
+}
 
-defineExpose({ show, hide });
+defineExpose({ show, hide })
 </script>

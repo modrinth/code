@@ -19,33 +19,31 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps } from "vue";
-import { LinkIcon } from "@modrinth/assets";
-import { injectNotificationManager } from "@modrinth/ui";
-import { useStorage } from "@vueuse/core";
+import { computed, defineProps } from 'vue'
+import { LinkIcon } from '@modrinth/assets'
+import { injectNotificationManager } from '@modrinth/ui'
+import { useStorage } from '@vueuse/core'
 
 const props = defineProps<{
-  subdomain: string;
-  noSeparator?: boolean;
-}>();
+  subdomain: string
+  noSeparator?: boolean
+  serverId: string
+}>()
 
-const { addNotification } = injectNotificationManager();
+const { addNotification } = injectNotificationManager()
 
 function copySubdomain(): void {
-  navigator.clipboard.writeText(props.subdomain + ".modrinth.gg");
+  navigator.clipboard.writeText(props.subdomain + '.modrinth.gg')
   addNotification({
-    title: "Custom URL copied",
+    title: 'Custom URL copied',
     text: "Your server's URL has been copied to your clipboard.",
-    type: "success",
-  });
+    type: 'success',
+  })
 }
 
-const route = useNativeRoute();
-const serverId = computed(() => route.params.id as string);
-
-const userPreferences = useStorage(`pyro-server-${serverId.value}-preferences`, {
+const userPreferences = useStorage(`pyro-server-${props.serverId}-preferences`, {
   hideSubdomainLabel: false,
-});
+})
 
-const isHidden = computed(() => userPreferences.value.hideSubdomainLabel);
+const isHidden = computed(() => userPreferences.value.hideSubdomainLabel)
 </script>

@@ -1,31 +1,19 @@
 <template>
   <div data-pyro-file-manager-root class="contents">
-    <LazyUiServersFilesCreateItemModal
-      ref="createItemModal"
-      :type="newItemType"
-      @create="handleCreateNewItem"
-    />
+    <FilesCreateItemModal ref="createItemModal" :type="newItemType" @create="handleCreateNewItem" />
     <FilesUploadZipUrlModal ref="uploadZipModal" :server="server" />
     <FilesUploadConflictModal ref="uploadConflictModal" @proceed="extractItem" />
 
-    <LazyUiServersFilesRenameItemModal
-      ref="renameItemModal"
-      :item="selectedItem"
-      @rename="handleRenameItem"
-    />
+    <FilesRenameItemModal ref="renameItemModal" :item="selectedItem" @rename="handleRenameItem" />
 
-    <LazyUiServersFilesMoveItemModal
+    <FilesMoveItemModal
       ref="moveItemModal"
       :item="selectedItem"
       :current-path="currentPath"
       @move="handleMoveItem"
     />
 
-    <LazyUiServersFilesDeleteItemModal
-      ref="deleteItemModal"
-      :item="selectedItem"
-      @delete="handleDeleteItem"
-    />
+    <FilesDeleteItemModal ref="deleteItemModal" :item="selectedItem" @delete="handleDeleteItem" />
 
     <FilesUploadDragAndDrop
       class="relative flex w-full flex-col rounded-2xl border border-solid border-bg-raised"
@@ -33,7 +21,7 @@
     >
       <div ref="mainContent" class="relative isolate flex w-full flex-col">
         <div v-if="!isEditing" class="contents">
-          <UiServersFilesBrowseNavbar
+          <FilesBrowseNavbar
             :breadcrumb-segments="breadcrumbSegments"
             :search-query="searchQuery"
             :current-filter="viewFilter"
@@ -46,11 +34,7 @@
             @filter="handleFilter"
             @update:search-query="searchQuery = $event"
           />
-          <UiServersFilesLabelBar
-            :sort-field="sortMethod"
-            :sort-desc="sortDesc"
-            @sort="handleSort"
-          />
+          <FilesLabelBar :sort-field="sortMethod" :sort-desc="sortDesc" @sort="handleSort" />
           <div
             v-for="op in ops"
             :key="`fs-op-${op.op}-${op.src}`"
@@ -164,7 +148,7 @@
             @upload-complete="refreshList()"
           />
         </div>
-        <UiServersFilesEditingNavbar
+        <FilesEditingNavbar
           v-else
           :file-name="editingFile?.name"
           :is-image="isEditingImage"
@@ -203,10 +187,10 @@
             class="ace_editor ace_hidpi ace-one-dark ace_dark rounded-b-lg"
             @init="onInit"
           />
-          <UiServersFilesImageViewer v-else :image-blob="imagePreview" />
+          <FilesImageViewer v-else :image-blob="imagePreview" />
         </div>
         <div v-else-if="items.length > 0" class="h-full w-full overflow-hidden rounded-b-2xl">
-          <UiServersFileVirtualList
+          <FileVirtualList
             :items="filteredItems"
             @extract="handleExtractItem"
             @delete="showDeleteModal"
@@ -231,7 +215,7 @@
           </div>
         </div>
 
-        <LazyUiServersFileManagerError
+        <FileManagerError
           v-else-if="loadError"
           title="Unable to load files"
           message="The folder may not exist."
@@ -277,13 +261,27 @@ import {
   FolderOpenIcon,
 } from "@modrinth/assets";
 import { computed } from "vue";
-import { ButtonStyled, ProgressBar, ModrinthServer, injectNotificationManager } from "@modrinth/ui";
+import {
+  ButtonStyled,
+  ProgressBar,
+  ModrinthServer,
+  injectNotificationManager,
+  FilesUploadConflictModal,
+  FilesUploadZipUrlModal,
+  FilesMoveItemModal,
+  FilesCreateItemModal,
+  FilesRenameItemModal,
+  FilesDeleteItemModal,
+  FilesBrowseNavbar,
+  FilesLabelBar,
+  FilesUploadDropdown,
+  FilesEditingNavbar,
+  FilesImageViewer,
+  FileVirtualList,
+  FilesUploadDragAndDrop,
+} from "@modrinth/ui";
 import { formatBytes, ModrinthServersFetchError } from "@modrinth/utils";
 import type { FilesystemOp, FSQueuedOp, DirectoryItem, DirectoryResponse } from "@modrinth/utils";
-import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
-import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
-import FilesUploadZipUrlModal from "~/components/ui/servers/FilesUploadZipUrlModal.vue";
-import FilesUploadConflictModal from "~/components/ui/servers/FilesUploadConflictModal.vue";
 
 const { addNotification } = injectNotificationManager();
 

@@ -39,7 +39,7 @@
                   :class="{ '!text-contrast': index === breadcrumbSegments.length - 1 }"
                   @click="$emit('navigate', index)"
                 >
-                  {{ segment || "" }}
+                  {{ segment || '' }}
                 </button>
               </ButtonStyled>
               <ChevronRightIcon
@@ -105,36 +105,34 @@
 </template>
 
 <script setup lang="ts">
-import { DropdownIcon, SaveIcon, ShareIcon, HomeIcon, ChevronRightIcon } from "@modrinth/assets";
-import { Button, ButtonStyled } from "@modrinth/ui";
-import { computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { DropdownIcon, SaveIcon, ShareIcon, HomeIcon, ChevronRightIcon } from '@modrinth/assets'
+import { computed, defineProps, defineEmits } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
+import ButtonStyled from '../../base/ButtonStyled.vue'
+import Button from '../../base/Button.vue'
 
 const props = defineProps<{
-  breadcrumbSegments: string[];
-  fileName?: string;
-  isImage: boolean;
-  filePath?: string;
-}>();
+  breadcrumbSegments: string[]
+  fileName?: string
+  isImage: boolean
+  filePath?: string
+}>()
 
 const isLogFile = computed(() => {
-  return props.filePath?.startsWith("logs") || props.filePath?.endsWith(".log");
-});
+  return props.filePath?.startsWith('logs') || props.filePath?.endsWith('.log')
+})
 
-const route = useRoute();
-const router = useRouter();
+const route = useRoute()
+const router = useRouter()
 
 const emit = defineEmits<{
-  (e: "cancel"): void;
-  (e: "save"): void;
-  (e: "save-as"): void;
-  (e: "save-restart"): void;
-  (e: "share"): void;
-  (e: "navigate", index: number): void;
-}>();
+  (e: 'cancel' | 'save' | 'save-as' | 'save-restart' | 'share'): void
+  (e: 'navigate', index: number): void
+}>()
 
 const goHome = () => {
-  emit("cancel");
-  router.push({ path: "/servers/manage/" + route.params.id + "/files" });
-};
+  emit('cancel')
+  router.push({ path: '/servers/manage/' + route.params.id + '/files' })
+}
 </script>

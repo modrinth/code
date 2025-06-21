@@ -33,64 +33,66 @@
 </template>
 
 <script setup lang="ts">
-import { PlusIcon, XIcon } from "@modrinth/assets";
-import { ButtonStyled, NewModal } from "@modrinth/ui";
-import { ref, computed, nextTick } from "vue";
+import { PlusIcon, XIcon } from '@modrinth/assets'
+import { ref, computed, nextTick, defineProps, defineEmits, defineExpose } from 'vue'
+
+import ButtonStyled from '../../../base/ButtonStyled.vue'
+import NewModal from '../../../modal/NewModal.vue'
 
 const props = defineProps<{
-  type: "file" | "directory";
-}>();
+  type: 'file' | 'directory'
+}>()
 
 const emit = defineEmits<{
-  (e: "create", name: string): void;
-}>();
+  (e: 'create', name: string): void
+}>()
 
-const modal = ref<typeof NewModal>();
-const displayType = computed(() => (props.type === "directory" ? "folder" : props.type));
-const createInput = ref<HTMLInputElement | null>(null);
-const itemName = ref("");
-const submitted = ref(false);
+const modal = ref<typeof NewModal>()
+const displayType = computed(() => (props.type === 'directory' ? 'folder' : props.type))
+const createInput = ref<HTMLInputElement | null>(null)
+const itemName = ref('')
+const submitted = ref(false)
 
 const error = computed(() => {
   if (!itemName.value) {
-    return "Name is required.";
+    return 'Name is required.'
   }
-  if (props.type === "file") {
-    const validPattern = /^[a-zA-Z0-9-_.\s]+$/;
+  if (props.type === 'file') {
+    const validPattern = /^[a-zA-Z0-9-_.\s]+$/
     if (!validPattern.test(itemName.value)) {
-      return "Name must contain only alphanumeric characters, dashes, underscores, dots, or spaces.";
+      return 'Name must contain only alphanumeric characters, dashes, underscores, dots, or spaces.'
     }
   } else {
-    const validPattern = /^[a-zA-Z0-9-_\s]+$/;
+    const validPattern = /^[a-zA-Z0-9-_\s]+$/
     if (!validPattern.test(itemName.value)) {
-      return "Name must contain only alphanumeric characters, dashes, underscores, or spaces.";
+      return 'Name must contain only alphanumeric characters, dashes, underscores, or spaces.'
     }
   }
-  return "";
-});
+  return ''
+})
 
 const handleSubmit = () => {
-  submitted.value = true;
+  submitted.value = true
   if (!error.value) {
-    emit("create", itemName.value);
-    hide();
+    emit('create', itemName.value)
+    hide()
   }
-};
+}
 
 const show = () => {
-  itemName.value = "";
-  submitted.value = false;
-  modal.value?.show();
+  itemName.value = ''
+  submitted.value = false
+  modal.value?.show()
   nextTick(() => {
     setTimeout(() => {
-      createInput.value?.focus();
-    }, 100);
-  });
-};
+      createInput.value?.focus()
+    }, 100)
+  })
+}
 
 const hide = () => {
-  modal.value?.hide();
-};
+  modal.value?.hide()
+}
 
-defineExpose({ show, hide });
+defineExpose({ show, hide })
 </script>

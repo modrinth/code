@@ -714,6 +714,7 @@ import {
   Avatar,
   commonMessages,
   injectNotificationManager,
+  TeleportOverflowMenu,
 } from "@modrinth/ui";
 import { isAdmin, isStaff } from "@modrinth/utils";
 import { errors as generatedStateErrors } from "~/generated/state.json";
@@ -721,7 +722,6 @@ import ModalCreation from "~/components/ui/ModalCreation.vue";
 import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import OrganizationCreateModal from "~/components/ui/OrganizationCreateModal.vue";
-import TeleportOverflowMenu from "~/components/ui/servers/TeleportOverflowMenu.vue";
 
 const { formatMessage } = useVIntl();
 const { addNotification } = injectNotificationManager();

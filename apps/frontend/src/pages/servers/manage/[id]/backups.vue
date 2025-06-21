@@ -29,7 +29,12 @@
     <BackupCreateModal ref="createBackupModal" :server="server" />
     <BackupRenameModal ref="renameBackupModal" :server="server" />
     <BackupRestoreModal ref="restoreBackupModal" :server="server" />
-    <BackupDeleteModal ref="deleteBackupModal" :server="server" @delete="deleteBackup" />
+    <BackupDeleteModal
+      ref="deleteBackupModal"
+      :server="server"
+      :show-advanced-debug-info="flags.advancedDebugInfo"
+      @delete="deleteBackup"
+    />
     <BackupSettingsModal ref="backupSettingsModal" :server="server" />
 
     <div class="mb-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
@@ -197,6 +202,7 @@ useHead({
 });
 
 const overTheTopDownloadAnimation = ref();
+const flags = useFeatureFlags();
 
 const createBackupModal = ref<InstanceType<typeof BackupCreateModal>>();
 const renameBackupModal = ref<InstanceType<typeof BackupRenameModal>>();
@@ -242,7 +248,13 @@ const prepareDownload = async (backupId: string) => {
     await props.server.backups?.prepare(backupId);
   } catch (error) {
     console.error("Failed to prepare download:", error);
-    addNotification({ type: "error", title: "Failed to prepare backup for download", text: error });
+    if (error instanceof Error) {
+      addNotification({
+        type: "error",
+        title: "Failed to prepare backup for download",
+        text: error.message,
+      });
+    }
   }
 };
 

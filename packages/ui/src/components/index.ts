@@ -42,6 +42,7 @@ export { default as SmartClickable } from './base/SmartClickable.vue'
 export { default as StatItem } from './base/StatItem.vue'
 export { default as TagItem } from './base/TagItem.vue'
 export { default as TeleportDropdownMenu } from './base/TeleportDropdownMenu.vue'
+export { default as TeleportOverflowMenu } from './base/TeleportOverflowMenu.vue'
 export { default as Timeline } from './base/Timeline.vue'
 export { default as Toggle } from './base/Toggle.vue'
 
@@ -99,6 +100,7 @@ export { default as SearchSidebarFilter } from './search/SearchSidebarFilter.vue
 export { default as PurchaseModal } from './billing/PurchaseModal.vue'
 export { default as AddPaymentMethodModal } from './billing/AddPaymentMethodModal.vue'
 export { default as ModrinthServersPurchaseModal } from './billing/ModrinthServersPurchaseModal.vue'
+export { default as ServersSpecs } from './billing/ServersSpecs.vue'
 
 // Version
 export { default as VersionChannelIndicator } from './version/VersionChannelIndicator.vue'
@@ -109,12 +111,4 @@ export { default as VersionSummary } from './version/VersionSummary.vue'
 export { default as ThemeSelector } from './settings/ThemeSelector.vue'
 
 // Servers
-export { default as BackupWarning } from './servers/backups/BackupWarning.vue'
-export { default as BackupItem } from "./servers/backups/BackupItem.vue"
-export { default as BackupCreateModal } from "./servers/backups/modals/BackupCreateModal.vue"
-export { default as BackupDeleteModal } from "./servers/backups/modals/BackupDeleteModal.vue"
-export { default as BackupRestoreModal } from "./servers/backups/modals/BackupRestoreModal.vue"
-export { default as BackupRenameModal } from "./servers/backups/modals/BackupRenameModal.vue"
-export { default as BackupSettingsModal } from "./servers/backups/modals/BackupSettingsModal.vue"
-
-export { default as ServersSpecs } from './billing/ServersSpecs.vue'
+export * from './servers'

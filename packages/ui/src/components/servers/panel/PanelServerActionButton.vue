@@ -6,7 +6,7 @@
           Are you sure you want to <span class="lowercase">{{ confirmActionText }}</span> the
           server?
         </p>
-        <UiCheckbox
+        <Checkbox
           v-model="dontAskAgain"
           label="Don't ask me again"
           class="text-sm"
@@ -34,15 +34,16 @@
       :header="`All of ${serverName || 'Server'} info`"
       @close="closeDetailsModal"
     >
-      <UiServersServerInfoLabels
+      <ServerInfoLabels
         :server-data="serverData"
         :show-game-label="true"
         :show-loader-label="true"
         :uptime-seconds="uptimeSeconds"
         :column="true"
+        :server-id="serverId as string"
         class="mb-6 flex flex-col gap-2"
       />
-      <div v-if="flags.advancedDebugInfo" class="markdown-body">
+      <div v-if="showAdvancedDebugInfo" class="markdown-body">
         <pre>{{ serverData }}</pre>
       </div>
       <ButtonStyled type="standard" color="brand" @click="closeDetailsModal">
@@ -53,7 +54,7 @@
     <div class="flex flex-row items-center gap-2 rounded-lg">
       <ButtonStyled v-if="isInstalling" type="standard" color="brand">
         <button disabled class="flex-shrink-0">
-          <UiServersPanelSpinner class="size-5" /> Installing...
+          <PanelSpinner class="size-5" /> Installing...
         </button>
       </ButtonStyled>
 
@@ -62,7 +63,7 @@
           <button :disabled="!canTakeAction" @click="initiateAction('Stop')">
             <div class="flex gap-1">
               <StopCircleIcon class="h-5 w-5" />
-              <span>{{ isStoppingState ? "Stopping..." : "Stop" }}</span>
+              <span>{{ isStoppingState ? 'Stopping...' : 'Stop' }}</span>
             </div>
           </button>
         </ButtonStyled>
@@ -78,7 +79,7 @@
         </ButtonStyled>
 
         <ButtonStyled circular type="transparent">
-          <UiServersTeleportOverflowMenu :options="[...menuOptions]">
+          <TeleportOverflowMenu :options="[...menuOptions]">
             <MoreVerticalIcon aria-hidden="true" />
             <template #kill>
               <SlashIcon class="h-5 w-5" />
@@ -96,7 +97,7 @@
               <ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" />
               <span>Copy ID</span>
             </template>
-          </UiServersTeleportOverflowMenu>
+          </TeleportOverflowMenu>
         </ButtonStyled>
       </template>
     </div>
@@ -104,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from 'vue'
 import {
   PlayIcon,
   UpdatedIcon,
@@ -117,176 +118,182 @@ import {
   MoreVerticalIcon,
   ClipboardCopyIcon,
   RefreshClockwiseIcon,
-} from "@modrinth/assets";
-import { ButtonStyled, NewModal } from "@modrinth/ui";
-import { useRouter } from "vue-router";
-import { useStorage } from "@vueuse/core";
-import type { PowerAction as ServerPowerAction, ServerState } from "@modrinth/utils";
+} from '@modrinth/assets'
+import { useRouter } from 'vue-router'
+import { useStorage } from '@vueuse/core'
+import type { PowerAction as ServerPowerAction, ServerState } from '@modrinth/utils'
 
-const flags = useFeatureFlags();
+import ButtonStyled from '../../base/ButtonStyled.vue'
+import NewModal from '../../modal/NewModal.vue'
+import Checkbox from '../../base/Checkbox.vue'
+import TeleportOverflowMenu from '../../base/TeleportOverflowMenu.vue'
+import ServerInfoLabels from '../labels/ServerInfoLabels.vue'
+import PanelSpinner from './PanelSpinner.vue'
 
 interface PowerAction {
-  action: ServerPowerAction;
-  nextState: ServerState;
+  action: ServerPowerAction
+  nextState: ServerState
 }
 
 const props = defineProps<{
-  isOnline: boolean;
-  isActioning: boolean;
-  isInstalling: boolean;
-  disabled: boolean;
-  serverName?: string;
-  serverData: object;
-  uptimeSeconds: number;
-}>();
+  isOnline: boolean
+  isActioning: boolean
+  isInstalling: boolean
+  disabled: boolean
+  serverName?: string
+  serverData: object
+  uptimeSeconds: number
+  developerMode?: boolean
+  showAdvancedDebugInfo?: boolean
+}>()
 
 const emit = defineEmits<{
-  (e: "action", action: ServerPowerAction): void;
-}>();
+  (e: 'action', action: ServerPowerAction): void
+}>()
 
-const router = useRouter();
-const serverId = router.currentRoute.value.params.id;
-const confirmActionModal = ref<InstanceType<typeof NewModal> | null>(null);
-const detailsModal = ref<InstanceType<typeof NewModal> | null>(null);
+const router = useRouter()
+const serverId = router.currentRoute.value.params.id
+const confirmActionModal = ref<InstanceType<typeof NewModal> | null>(null)
+const detailsModal = ref<InstanceType<typeof NewModal> | null>(null)
 
 const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
   powerDontAskAgain: false,
-});
+})
 
-const serverState = ref<ServerState>(props.isOnline ? "running" : "stopped");
-const powerAction = ref<PowerAction | null>(null);
-const dontAskAgain = ref(false);
-const startingDelay = ref(false);
+const serverState = ref<ServerState>(props.isOnline ? 'running' : 'stopped')
+const powerAction = ref<PowerAction | null>(null)
+const dontAskAgain = ref(false)
+const startingDelay = ref(false)
 
 const canTakeAction = computed(
   () => !props.isActioning && !startingDelay.value && !isTransitionState.value,
-);
-const isRunning = computed(() => serverState.value === "running");
+)
+const isRunning = computed(() => serverState.value === 'running')
 const isTransitionState = computed(() =>
-  ["starting", "stopping", "restarting"].includes(serverState.value),
-);
-const isStoppingState = computed(() => serverState.value === "stopping");
-const showStopButton = computed(() => isRunning.value || isStoppingState.value);
+  ['starting', 'stopping', 'restarting'].includes(serverState.value),
+)
+const isStoppingState = computed(() => serverState.value === 'stopping')
+const showStopButton = computed(() => isRunning.value || isStoppingState.value)
 
 const primaryActionText = computed(() => {
   const states: Partial<Record<ServerState, string>> = {
-    starting: "Starting...",
-    restarting: "Restarting...",
-    running: "Restart",
-    stopping: "Stopping...",
-    stopped: "Start",
-  };
-  return states[serverState.value];
-});
+    starting: 'Starting...',
+    restarting: 'Restarting...',
+    running: 'Restart',
+    stopping: 'Stopping...',
+    stopped: 'Start',
+  }
+  return states[serverState.value]
+})
 
 const confirmActionText = computed(() => {
-  if (!powerAction.value) return "";
-  return powerAction.value.action.charAt(0).toUpperCase() + powerAction.value.action.slice(1);
-});
+  if (!powerAction.value) return ''
+  return powerAction.value.action.charAt(0).toUpperCase() + powerAction.value.action.slice(1)
+})
 
 const menuOptions = computed(() => [
   ...(props.isInstalling
     ? []
     : [
         {
-          id: "kill",
-          label: "Kill server",
+          id: 'kill',
+          label: 'Kill server',
           icon: SlashIcon,
-          action: () => initiateAction("Kill"),
+          action: () => initiateAction('Kill'),
         },
       ]),
   {
-    id: "allServers",
-    label: "All servers",
+    id: 'allServers',
+    label: 'All servers',
     icon: ServerIcon,
-    action: () => router.push("/servers/manage"),
+    action: () => router.push('/servers/manage'),
   },
   {
-    id: "details",
-    label: "Details",
+    id: 'details',
+    label: 'Details',
     icon: InfoIcon,
     action: () => detailsModal.value?.show(),
   },
   {
-    id: "copy-id",
-    label: "Copy ID",
+    id: 'copy-id',
+    label: 'Copy ID',
     icon: ClipboardCopyIcon,
     action: () => copyId(),
-    shown: flags.value.developerMode,
+    shown: props.developerMode,
   },
-]);
+])
 
 async function copyId() {
-  await navigator.clipboard.writeText(serverId as string);
+  await navigator.clipboard.writeText(serverId as string)
 }
 
 function initiateAction(action: ServerPowerAction) {
-  if (!canTakeAction.value) return;
+  if (!canTakeAction.value) return
 
   const stateMap: Record<ServerPowerAction, ServerState> = {
-    Start: "starting",
-    Stop: "stopping",
-    Restart: "restarting",
-    Kill: "stopping",
-  };
-
-  if (action === "Start") {
-    emit("action", action);
-    serverState.value = stateMap[action];
-    startingDelay.value = true;
-    setTimeout(() => (startingDelay.value = false), 5000);
-    return;
+    Start: 'starting',
+    Stop: 'stopping',
+    Restart: 'restarting',
+    Kill: 'stopping',
   }
 
-  powerAction.value = { action, nextState: stateMap[action] };
+  if (action === 'Start') {
+    emit('action', action)
+    serverState.value = stateMap[action]
+    startingDelay.value = true
+    setTimeout(() => (startingDelay.value = false), 5000)
+    return
+  }
+
+  powerAction.value = { action, nextState: stateMap[action] }
 
   if (userPreferences.value.powerDontAskAgain) {
-    executePowerAction();
+    executePowerAction()
   } else {
-    confirmActionModal.value?.show();
+    confirmActionModal.value?.show()
   }
 }
 
 function handlePrimaryAction() {
-  initiateAction(isRunning.value ? "Restart" : "Start");
+  initiateAction(isRunning.value ? 'Restart' : 'Start')
 }
 
 function executePowerAction() {
-  if (!powerAction.value) return;
+  if (!powerAction.value) return
 
-  const { action, nextState } = powerAction.value;
-  emit("action", action);
-  serverState.value = nextState;
+  const { action, nextState } = powerAction.value
+  emit('action', action)
+  serverState.value = nextState
 
   if (dontAskAgain.value) {
-    userPreferences.value.powerDontAskAgain = true;
+    userPreferences.value.powerDontAskAgain = true
   }
 
-  if (action === "Start") {
-    startingDelay.value = true;
-    setTimeout(() => (startingDelay.value = false), 5000);
+  if (action === 'Start') {
+    startingDelay.value = true
+    setTimeout(() => (startingDelay.value = false), 5000)
   }
 
-  resetPowerAction();
+  resetPowerAction()
 }
 
 function resetPowerAction() {
-  confirmActionModal.value?.hide();
-  powerAction.value = null;
-  dontAskAgain.value = false;
+  confirmActionModal.value?.hide()
+  powerAction.value = null
+  dontAskAgain.value = false
 }
 
 function closeDetailsModal() {
-  detailsModal.value?.hide();
+  detailsModal.value?.hide()
 }
 
 watch(
   () => props.isOnline,
-  (online) => (serverState.value = online ? "running" : "stopped"),
-);
+  (online) => (serverState.value = online ? 'running' : 'stopped'),
+)
 
 watch(
   () => router.currentRoute.value.fullPath,
   () => closeDetailsModal(),
-);
+)
 </script>

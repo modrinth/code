@@ -6,7 +6,7 @@
     <form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleSubmit">
       <div class="flex flex-col gap-2">
         <div class="font-bold text-contrast">
-          {{ cf ? `How to get the modpack version's URL` : "URL of .zip file" }}
+          {{ cf ? `How to get the modpack version's URL` : 'URL of .zip file' }}
         </div>
         <ol v-if="cf" class="mb-1 mt-0 flex flex-col gap-1 pl-8 leading-normal text-secondary">
           <li>
@@ -58,13 +58,13 @@
           <button v-tooltip="error" :disabled="submitted || !!error" type="submit">
             <SpinnerIcon v-if="submitted" class="animate-spin" />
             <DownloadIcon v-else class="h-5 w-5" />
-            {{ submitted ? "Installing..." : "Install" }}
+            {{ submitted ? 'Installing...' : 'Install' }}
           </button>
         </ButtonStyled>
         <ButtonStyled>
           <button type="button" @click="hide">
             <XIcon class="h-5 w-5" />
-            {{ submitted ? "Close" : "Cancel" }}
+            {{ submitted ? 'Close' : 'Cancel' }}
           </button>
         </ButtonStyled>
       </div>
@@ -73,81 +73,85 @@
 </template>
 
 <script setup lang="ts">
-import { ExternalIcon, SpinnerIcon, DownloadIcon, XIcon } from "@modrinth/assets";
-import { BackupWarning, ButtonStyled, NewModal, ModrinthServer } from "@modrinth/ui";
-import { ModrinthServersFetchError } from "@modrinth/utils";
-import { ref, computed, nextTick } from "vue";
+import { ExternalIcon, SpinnerIcon, DownloadIcon, XIcon } from '@modrinth/assets'
+import { ModrinthServersFetchError } from '@modrinth/utils'
+import { ref, computed, nextTick, defineProps, defineExpose } from 'vue'
 
-const cf = ref(false);
+import type { ModrinthServer } from '../../../../composables'
+import BackupWarning from '../../backups/BackupWarning.vue'
+import ButtonStyled from '../../../base/ButtonStyled.vue'
+import NewModal from '../../../modal/NewModal.vue'
+
+const cf = ref(false)
 
 const props = defineProps<{
-  server: ModrinthServer;
-}>();
+  server: ModrinthServer
+}>()
 
-const modal = ref<typeof NewModal>();
-const urlInput = ref<HTMLInputElement | null>(null);
-const url = ref("");
-const submitted = ref(false);
+const modal = ref<typeof NewModal>()
+const urlInput = ref<HTMLInputElement | null>(null)
+const url = ref('')
+const submitted = ref(false)
 
-const trimmedUrl = computed(() => url.value.trim());
+const trimmedUrl = computed(() => url.value.trim())
 
-const regex = /https:\/\/(www\.)?curseforge\.com\/minecraft\/modpacks\/[^/]+\/files\/\d+/;
+const regex = /https:\/\/(www\.)?curseforge\.com\/minecraft\/modpacks\/[^/]+\/files\/\d+/
 
 const error = computed(() => {
   if (trimmedUrl.value.length === 0) {
-    return "URL is required.";
+    return 'URL is required.'
   }
   if (cf.value && !regex.test(trimmedUrl.value)) {
-    return "URL must be a CurseForge modpack version URL.";
-  } else if (!cf.value && !trimmedUrl.value.includes("/")) {
-    return "URL must be valid.";
+    return 'URL must be a CurseForge modpack version URL.'
+  } else if (!cf.value && !trimmedUrl.value.includes('/')) {
+    return 'URL must be valid.'
   }
-  return "";
-});
+  return ''
+})
 
 const handleSubmit = async () => {
-  submitted.value = true;
+  submitted.value = true
   if (!error.value) {
     // hide();
     try {
-      const dry = await props.server.fs.extractFile(trimmedUrl.value, true, true);
+      const dry = await props.server.fs.extractFile(trimmedUrl.value, true, true)
 
       if (!cf.value || dry.modpack_name) {
-        await props.server.fs.extractFile(trimmedUrl.value, true, false, true);
-        hide();
+        await props.server.fs.extractFile(trimmedUrl.value, true, false, true)
+        hide()
       } else {
-        submitted.value = false;
+        submitted.value = false
         props.server.errorHandler(
           new ModrinthServersFetchError(
-            "Could not find CurseForge modpack at that URL.",
+            'Could not find CurseForge modpack at that URL.',
             404,
             new Error(`No modpack found at ${url.value}`),
           ),
-        );
+        )
       }
     } catch (error) {
-      submitted.value = false;
-      console.error("Error installing:", error);
-      props.server.errorHandler(error);
+      submitted.value = false
+      console.error('Error installing:', error)
+      props.server.errorHandler(error)
     }
   }
-};
+}
 
 const show = (isCf: boolean) => {
-  cf.value = isCf;
-  url.value = "";
-  submitted.value = false;
-  modal.value?.show();
+  cf.value = isCf
+  url.value = ''
+  submitted.value = false
+  modal.value?.show()
   nextTick(() => {
     setTimeout(() => {
-      urlInput.value?.focus();
-    }, 100);
-  });
-};
+      urlInput.value?.focus()
+    }, 100)
+  })
+}
 
 const hide = () => {
-  modal.value?.hide();
-};
+  modal.value?.hide()
+}
 
-defineExpose({ show, hide });
+defineExpose({ show, hide })
 </script>

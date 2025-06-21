@@ -9,7 +9,7 @@
       <div class="flex gap-2">
         <ButtonStyled>
           <button size="sm" @click="$emit('refetch')">
-            <RefreshCwIcon class="h-5 w-5" />
+            <RefreshClockwiseIcon class="h-5 w-5" />
             Try again
           </button>
         </ButtonStyled>
@@ -25,16 +25,16 @@
 </template>
 
 <script setup lang="ts">
-import { FileIcon, HomeIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+import { FileIcon, HomeIcon, RefreshClockwiseIcon } from '@modrinth/assets'
+
+import ButtonStyled from '../../base/ButtonStyled.vue'
 
 defineProps<{
-  title: string;
-  message: string;
-}>();
+  title: string
+  message: string
+}>()
 
 defineEmits<{
-  (e: "refetch"): void;
-  (e: "home"): void;
-}>();
+  (e: 'refetch' | 'home'): void
+}>()
 </script>
