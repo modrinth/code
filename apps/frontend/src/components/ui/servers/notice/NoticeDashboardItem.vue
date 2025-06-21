@@ -1,15 +1,23 @@
 <script setup lang="ts">
 import dayjs from "dayjs";
-import { ButtonStyled, commonMessages, CopyCode, ServerNotice, TagItem } from "@modrinth/ui";
+import {
+  ButtonStyled,
+  commonMessages,
+  CopyCode,
+  ServerNotice,
+  TagItem,
+  useRelativeTime,
+  getDismissableMetadata,
+  NOTICE_LEVELS,
+} from "@modrinth/ui";
 import { EditIcon, SettingsIcon, TrashIcon } from "@modrinth/assets";
 import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
-import { useRelativeTime, getDismissableMetadata, NOTICE_LEVELS } from "@modrinth/ui";
 import { useVIntl } from "@vintl/vintl";
 
 const { formatMessage } = useVIntl();
 const formatRelativeTime = useRelativeTime();
 
-const props = defineProps<{
+defineProps<{
   notice: ServerNoticeType;
 }>();
 </script>

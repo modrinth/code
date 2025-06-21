@@ -311,7 +311,16 @@ import {
   SortAscendingIcon,
   SortDescendingIcon,
 } from "@modrinth/assets";
-import { Button, Modal, Avatar, CopyCode, Badge, Checkbox, commonMessages } from "@modrinth/ui";
+import {
+  Button,
+  Modal,
+  Avatar,
+  CopyCode,
+  Badge,
+  Checkbox,
+  commonMessages,
+  injectNotificationManager,
+} from "@modrinth/ui";
 
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import OrganizationProjectTransferModal from "~/components/ui/OrganizationProjectTransferModal.vue";
@@ -319,6 +328,7 @@ import OrganizationProjectTransferModal from "~/components/ui/OrganizationProjec
 const { formatMessage } = useVIntl();
 
 const { organization, projects, refresh } = inject("organizationContext");
+const { addNotification } = injectNotificationManager();
 
 const auth = await useAuth();
 
@@ -374,14 +384,12 @@ const onProjectTransferSubmit = async (projects) => {
     await refreshUserProjects();
 
     addNotification({
-      group: "main",
       title: "Success",
       text: "Transferred selected projects to organization.",
       type: "success",
     });
   } catch (err) {
     addNotification({
-      group: "main",
       title: "An error occurred",
       text: err?.data?.description || err?.message || err || "Unknown error",
       type: "error",
@@ -510,7 +518,6 @@ const onBulkEditLinks = useClientTry(async () => {
   editLinksModal.value.hide();
 
   addNotification({
-    group: "main",
     title: "Success",
     text: "Bulk edited selected project's links.",
     type: "success",

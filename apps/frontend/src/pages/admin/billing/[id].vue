@@ -204,6 +204,7 @@ import {
   NewModal,
   Toggle,
   useRelativeTime,
+  injectNotificationManager,
 } from "@modrinth/ui";
 import { formatCategory, formatPrice } from "@modrinth/utils";
 import {
@@ -221,7 +222,7 @@ import ModrinthServersIcon from "~/components/ui/servers/ModrinthServersIcon.vue
 
 const flags = useFeatureFlags();
 const route = useRoute();
-const data = useNuxtApp();
+const { addNotification } = injectNotificationManager();
 const vintl = useVIntl();
 
 const { formatMessage } = vintl;
@@ -314,8 +315,7 @@ async function refundCharge() {
     await refreshCharges();
     refundModal.value.hide();
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "Error refunding",
       text: err.data?.description ?? err,
       type: "error",

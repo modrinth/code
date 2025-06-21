@@ -5,11 +5,11 @@
       You've been invited be a member of this project with the role of '{{ currentMember.role }}'.
     </p>
     <div class="input-group">
-      <button class="iconified-button brand-button" @click="acceptInvite()">
+      <button class="iconified-button brand-button" @click="acceptInvite">
         <CheckIcon />
         Accept
       </button>
-      <button class="iconified-button danger-button" @click="declineInvite()">
+      <button class="iconified-button danger-button" @click="declineInvite">
         <XIcon />
         Decline
       </button>
@@ -49,7 +49,7 @@
         <button
           :class="{ 'not-collapsed': !collapsed }"
           class="square-button"
-          @click="toggleCollapsed()"
+          @click="toggleCollapsed"
         >
           <DropdownIcon />
         </button>
@@ -107,7 +107,8 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { computed } from "vue";
 import {
   ChevronRightIcon,
   CheckIcon,
@@ -118,90 +119,28 @@ import {
   ScaleIcon,
   DropdownIcon,
 } from "@modrinth/assets";
+import { injectNotificationManager } from "@modrinth/ui";
 import { formatProjectType } from "~/plugins/shorthands.js";
 import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
 
-const props = defineProps({
-  project: {
-    type: Object,
-    required: true,
-  },
-  versions: {
-    type: Array,
-    default() {
-      return [];
-    },
-  },
-  currentMember: {
-    type: Object,
-    default: null,
-  },
-  allMembers: {
-    type: Object,
-    default: null,
-  },
-  isSettings: {
-    type: Boolean,
-    default: false,
-  },
-  collapsed: {
-    type: Boolean,
-    default: false,
-  },
-  routeName: {
-    type: String,
-    default: "",
-  },
-  auth: {
-    type: Object,
-    required: true,
-  },
-  tags: {
-    type: Object,
-    required: true,
-  },
-  setProcessing: {
-    type: Function,
-    default() {
-      return () => {
-        addNotification({
-          group: "main",
-          title: "An error occurred",
-          text: "setProcessing function not found",
-          type: "error",
-        });
-      };
-    },
-  },
-  toggleCollapsed: {
-    type: Function,
-    default() {
-      return () => {
-        addNotification({
-          group: "main",
-          title: "An error occurred",
-          text: "toggleCollapsed function not found",
-          type: "error",
-        });
-      };
-    },
-  },
-  updateMembers: {
-    type: Function,
-    default() {
-      return () => {
-        addNotification({
-          group: "main",
-          title: "An error occurred",
-          text: "updateMembers function not found",
-          type: "error",
-        });
-      };
-    },
-  },
-});
+const { addNotification } = injectNotificationManager();
 
-const featuredGalleryImage = computed(() => props.project.gallery.find((img) => img.featured));
+const props = defineProps<{
+  project: any;
+  versions: any[];
+  currentMember?: any;
+  allMembers?: any;
+  isSettings?: boolean;
+  collapsed?: boolean;
+  routeName?: string;
+  auth: any;
+  tags: any;
+  setProcessing?: () => Promise<void> | void;
+  toggleCollapsed?: () => void;
+  updateMembers?: () => void;
+}>();
+
+const featuredGalleryImage = computed(() => props.project.gallery.find((img: any) => img.featured));
 
 const nags = computed(() => [
   {
@@ -244,7 +183,7 @@ const nags = computed(() => [
     },
   },
   {
-    condition: props.project.gallery.length === 0 || !featuredGalleryImage,
+    condition: props.project.gallery.length === 0 || !featuredGalleryImage.value,
     title: "Feature a gallery image",
     id: "feature-gallery-image",
     description: "Featured gallery images may be the first impression of many users.",
@@ -335,7 +274,8 @@ const nags = computed(() => [
     action: {
       onClick: submitForReview,
       title: "Submit for review",
-      disabled: () => nags.value.filter((x) => x.condition && x.status === "required").length > 0,
+      disabled: () =>
+        nags.value.filter((x: any) => x.condition && x.status === "required").length > 0,
     },
   },
   {
@@ -357,36 +297,42 @@ const nags = computed(() => [
 
 const showInvitation = computed(() => {
   if (props.allMembers && props.auth) {
-    const member = props.allMembers.find((x) => x.user.id === props.auth.user.id);
+    const member = props.allMembers.find((x: any) => x.user.id === props.auth.user.id);
     return member && !member.accepted;
   }
   return false;
 });
 
-const acceptInvite = () => {
+function acceptInvite(): void {
   acceptTeamInvite(props.project.team);
-  props.updateMembers();
-};
-
-const declineInvite = () => {
-  removeTeamMember(props.project.team, props.auth.user.id);
-  props.updateMembers();
-};
-
-const submitForReview = async () => {
-  if (
-    !props.acknowledgedMessage ||
-    nags.value.filter((x) => x.condition && x.status === "required").length === 0
-  ) {
-    await props.setProcessing();
+  if (props.updateMembers) {
+    props.updateMembers();
   }
-};
+}
+
+function declineInvite(): void {
+  removeTeamMember(props.project.team, props.auth.user.id);
+  if (props.updateMembers) {
+    props.updateMembers();
+  }
+}
+
+async function submitForReview(): Promise<void> {
+  if (nags.value.filter((x: any) => x.condition && x.status === "required").length === 0) {
+    if (props.setProcessing) {
+      await props.setProcessing();
+    } else {
+      addNotification({
+        title: "An error occurred",
+        text: "setProcessing function not found",
+        type: "error",
+      });
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
-.invited {
-}
-
 .author-actions {
   margin-top: var(--spacing-card-md);
 

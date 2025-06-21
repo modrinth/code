@@ -331,16 +331,22 @@ import {
   XIcon,
   ExternalIcon,
 } from "@modrinth/assets";
-import { Avatar, ProjectStatusBadge, CopyCode, useRelativeTime } from "@modrinth/ui";
+import {
+  Avatar,
+  ProjectStatusBadge,
+  CopyCode,
+  useRelativeTime,
+  injectNotificationManager,
+} from "@modrinth/ui";
 import ThreadSummary from "~/components/ui/thread/ThreadSummary.vue";
 import { getProjectLink, getVersionLink } from "~/helpers/projects.js";
 import { getUserLink } from "~/helpers/users.js";
 import { acceptTeamInvite, removeSelfFromTeam } from "~/helpers/teams.js";
-import { markAsRead } from "~/helpers/notifications.ts";
+import { markAsRead } from "~/helpers/platform-notifications";
 import DoubleIcon from "~/components/ui/DoubleIcon.vue";
 import Categories from "~/components/ui/search/Categories.vue";
 
-const app = useNuxtApp();
+const { addNotification } = injectNotificationManager();
 const emit = defineEmits(["update:notifications"]);
 
 const formatRelativeTime = useRelativeTime();
@@ -407,8 +413,7 @@ async function read() {
     const newNotifs = updateNotifs(props.notifications);
     emit("update:notifications", newNotifs);
   } catch (err) {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "Error marking notification as read",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -427,8 +432,7 @@ async function performAction(notification, actionIndex) {
       });
     }
   } catch (err) {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",

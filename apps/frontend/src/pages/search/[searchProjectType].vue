@@ -334,11 +334,11 @@ import {
   ImageIcon,
 } from "@modrinth/assets";
 import { computed } from "vue";
-import { useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import LogoAnimated from "~/components/brand/LogoAnimated.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import NavTabs from "~/components/ui/NavTabs.vue";
+import { useModrinthServersSimple } from "~/utils/frontend-servers.ts";
 
 const { formatMessage } = useVIntl();
 
@@ -389,9 +389,7 @@ async function updateServerContext() {
     if (!auth.value.user) {
       router.push("/auth/sign-in?redirect=" + encodeURIComponent(route.fullPath));
     } else if (route.query.sid !== null) {
-      server.value = await useModrinthServers(route.query.sid, ["general", "content"], {
-        waitForModules: true,
-      });
+      server.value = await useModrinthServersSimple(route.query.sid, ["general", "content"]);
     }
   }
 

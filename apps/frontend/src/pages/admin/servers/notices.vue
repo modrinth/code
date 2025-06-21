@@ -268,6 +268,7 @@ import {
   TeleportDropdownMenu,
   Toggle,
   useRelativeTime,
+  injectNotificationManager,
 } from "@modrinth/ui";
 import { SettingsIcon, PlusIcon, SaveIcon, TrashIcon, EditIcon, XIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
@@ -275,13 +276,13 @@ import { useVIntl } from "@vintl/vintl";
 import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
 import { computed } from "vue";
 import { NOTICE_LEVELS } from "@modrinth/ui/src/utils/notices.ts";
-import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import AssignNoticeModal from "~/components/ui/servers/notice/AssignNoticeModal.vue";
+import { useServersFetchSimple } from "~/utils/frontend-servers.ts";
 
 const { formatMessage } = useVIntl();
 const formatRelativeTime = useRelativeTime();
 
-const app = useNuxtApp() as unknown as { $notify: any };
+const { addNotification } = injectNotificationManager();
 
 const notices = ref<ServerNoticeType[]>([]);
 const createNoticeModal = ref<InstanceType<typeof NewModal>>();
@@ -290,7 +291,7 @@ const assignNoticeModal = ref<InstanceType<typeof AssignNoticeModal>>();
 await refreshNotices();
 
 async function refreshNotices() {
-  await useServersFetch("notices").then((res) => {
+  await useServersFetchSimple("notices").then((res) => {
     notices.value = res as ServerNoticeType[];
     notices.value.sort((a, b) => {
       const dateDiff = dayjs(b.announce_at).diff(dayjs(a.announce_at));
@@ -347,19 +348,17 @@ function startEditing(notice: ServerNoticeType, assignments: boolean = false) {
 }
 
 async function deleteNotice(notice: ServerNoticeType) {
-  await useServersFetch(`notices/${notice.id}`, {
+  await useServersFetchSimple(`notices/${notice.id}`, {
     method: "DELETE",
   })
     .then(() => {
-      app.$notify({
-        group: "main",
+      addNotification({
         title: `Successfully deleted notice #${notice.id}`,
         type: "success",
       });
     })
     .catch((err) => {
-      app.$notify({
-        group: "main",
+      addNotification({
         title: "Error deleting notice",
         text: err,
         type: "error",
@@ -386,7 +385,6 @@ const noticeSubmitError = computed(() => {
 function validateSubmission(message: string) {
   if (noticeSubmitError.value) {
     addNotification({
-      group: "main",
       title: message,
       text: noticeSubmitError.value,
       type: "error",
@@ -401,7 +399,7 @@ async function saveChanges() {
     return;
   }
 
-  await useServersFetch(`notices/${editingNotice.value?.id}`, {
+  await useServersFetchSimple(`notices/${editingNotice.value?.id}`, {
     method: "PATCH",
     body: {
       message: newNoticeMessage.value,
@@ -416,8 +414,7 @@ async function saveChanges() {
         : undefined,
     },
   }).catch((err) => {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "Error saving changes to notice",
       text: err,
       type: "error",
@@ -432,7 +429,7 @@ async function createNotice() {
     return;
   }
 
-  await useServersFetch("notices", {
+  await useServersFetchSimple("notices", {
     method: "POST",
     body: {
       message: newNoticeMessage.value,
@@ -447,8 +444,7 @@ async function createNotice() {
         : undefined,
     },
   }).catch((err) => {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "Error creating notice",
       text: err,
       type: "error",

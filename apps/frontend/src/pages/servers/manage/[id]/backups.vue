@@ -29,7 +29,12 @@
     <BackupCreateModal ref="createBackupModal" :server="server" />
     <BackupRenameModal ref="renameBackupModal" :server="server" />
     <BackupRestoreModal ref="restoreBackupModal" :server="server" />
-    <BackupDeleteModal ref="deleteBackupModal" :server="server" @delete="deleteBackup" />
+    <BackupDeleteModal
+      ref="deleteBackupModal"
+      :server="server"
+      :show-advanced-debug-info="flags.advancedDebugInfo"
+      @delete="deleteBackup"
+    />
     <BackupSettingsModal ref="backupSettingsModal" :server="server" />
 
     <div class="mb-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
@@ -150,18 +155,22 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, TagItem } from "@modrinth/ui";
+import {
+  ButtonStyled,
+  TagItem,
+  ModrinthServer,
+  injectNotificationManager,
+  BackupRenameModal,
+  BackupCreateModal,
+  BackupRestoreModal,
+  BackupDeleteModal,
+  BackupSettingsModal,
+  BackupItem,
+} from "@modrinth/ui";
 import { useStorage } from "@vueuse/core";
 import { SpinnerIcon, PlusIcon, DownloadIcon, SettingsIcon, IssuesIcon } from "@modrinth/assets";
 import { ref, computed } from "vue";
 import type { Backup } from "@modrinth/utils";
-import BackupItem from "~/components/ui/servers/BackupItem.vue";
-import BackupRenameModal from "~/components/ui/servers/BackupRenameModal.vue";
-import BackupCreateModal from "~/components/ui/servers/BackupCreateModal.vue";
-import BackupRestoreModal from "~/components/ui/servers/BackupRestoreModal.vue";
-import BackupDeleteModal from "~/components/ui/servers/BackupDeleteModal.vue";
-import BackupSettingsModal from "~/components/ui/servers/BackupSettingsModal.vue";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
   server: ModrinthServer;
@@ -170,6 +179,8 @@ const props = defineProps<{
 
 const route = useNativeRoute();
 const serverId = route.params.id;
+
+const { addNotification } = injectNotificationManager();
 
 const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
   backupWhileRunning: false,
@@ -191,6 +202,7 @@ useHead({
 });
 
 const overTheTopDownloadAnimation = ref();
+const flags = useFeatureFlags();
 
 const createBackupModal = ref<InstanceType<typeof BackupCreateModal>>();
 const renameBackupModal = ref<InstanceType<typeof BackupRenameModal>>();
@@ -236,7 +248,13 @@ const prepareDownload = async (backupId: string) => {
     await props.server.backups?.prepare(backupId);
   } catch (error) {
     console.error("Failed to prepare download:", error);
-    addNotification({ type: "error", title: "Failed to prepare backup for download", text: error });
+    if (error instanceof Error) {
+      addNotification({
+        type: "error",
+        title: "Failed to prepare backup for download",
+        text: error.message,
+      });
+    }
   }
 };
 

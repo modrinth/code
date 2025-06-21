@@ -142,7 +142,7 @@
             "
           >
             <nuxt-link to="/resourcepacks">
-              <PaintBrushIcon aria-hidden="true" /> Resource Packs
+              <PaintbrushIcon aria-hidden="true" /> Resource Packs
             </nuxt-link>
           </ButtonStyled>
           <ButtonStyled
@@ -221,7 +221,7 @@
                 v-if="route.name === 'search-mods' || route.path.startsWith('/mod/')"
                 aria-hidden="true"
               />
-              <PaintBrushIcon
+              <PaintbrushIcon
                 v-else-if="
                   route.name === 'search-resourcepacks' || route.path.startsWith('/resourcepack/')
                 "
@@ -250,7 +250,7 @@
 
               <template #mods> <BoxIcon aria-hidden="true" /> Mods </template>
               <template #resourcepacks>
-                <PaintBrushIcon aria-hidden="true" /> Resource Packs
+                <PaintbrushIcon aria-hidden="true" /> Resource Packs
               </template>
               <template #datapacks> <BracesIcon aria-hidden="true" /> Data Packs </template>
               <template #plugins> <PlugIcon aria-hidden="true" /> Plugins </template>
@@ -696,14 +696,14 @@ import {
   CurrencyIcon,
   BracesIcon,
   GlassesIcon,
-  PaintBrushIcon,
+  PaintbrushIcon,
   PackageOpenIcon,
   DiscordIcon,
   BlueskyIcon,
   TumblrIcon,
   TwitterIcon,
   MastodonIcon,
-  GitHubIcon,
+  GithubIcon,
   ScaleIcon,
 } from "@modrinth/assets";
 import {
@@ -713,19 +713,19 @@ import {
   PagewideBanner,
   Avatar,
   commonMessages,
+  injectNotificationManager,
+  TeleportOverflowMenu,
 } from "@modrinth/ui";
 import { isAdmin, isStaff } from "@modrinth/utils";
 import { errors as generatedStateErrors } from "~/generated/state.json";
-
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import OrganizationCreateModal from "~/components/ui/OrganizationCreateModal.vue";
-import TeleportOverflowMenu from "~/components/ui/servers/TeleportOverflowMenu.vue";
 
 const { formatMessage } = useVIntl();
+const { addNotification } = injectNotificationManager();
 
-const app = useNuxtApp();
 const auth = await useAuth();
 const user = await useUser();
 
@@ -1097,15 +1097,13 @@ function developerModeIncrement() {
     developerModeCounter.value = 0;
     saveFeatureFlags();
     if (flags.value.developerMode) {
-      app.$notify({
-        group: "main",
+      addNotification({
         title: "Developer mode activated",
         text: "Developer mode has been enabled",
         type: "success",
       });
     } else {
-      app.$notify({
-        group: "main",
+      addNotification({
         title: "Developer mode deactivated",
         text: "Developer mode has been disabled",
         type: "success",
@@ -1202,7 +1200,7 @@ const socialLinks = [
       defineMessage({ id: "layout.footer.social.github", defaultMessage: "GitHub" }),
     ),
     href: "https://github.com/modrinth",
-    icon: GitHubIcon,
+    icon: GithubIcon,
   },
 ];
 

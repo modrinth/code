@@ -77,7 +77,7 @@
               v-if="overrides[index] && overrides[index].type === 'dropdown'"
               class="mt-2 flex w-full sm:w-[320px] sm:justify-end"
             >
-              <UiServersTeleportDropdownMenu
+              <TeleportDropdownMenu
                 :id="`server-property-${index}`"
                 v-model="liveProperties[index]"
                 :name="formatPropertyName(index)"
@@ -146,8 +146,14 @@
 import { ref, watch, computed, inject } from "vue";
 import { EyeIcon, SearchIcon, IssuesIcon } from "@modrinth/assets";
 import Fuse from "fuse.js";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import {
+  ButtonStyled,
+  ModrinthServer,
+  TeleportDropdownMenu,
+  injectNotificationManager,
+} from "@modrinth/ui";
 
+const { addNotification } = injectNotificationManager();
 const props = defineProps<{
   server: ModrinthServer;
 }>();
@@ -281,7 +287,6 @@ const saveProperties = async () => {
     originalProperties.value = JSON.parse(JSON.stringify(liveProperties.value));
     await props.server.refresh();
     addNotification({
-      group: "serverOptions",
       type: "success",
       title: "Server properties updated",
       text: "Your server properties were successfully changed.",
@@ -289,7 +294,6 @@ const saveProperties = async () => {
   } catch (error) {
     console.error("Error updating server properties:", error);
     addNotification({
-      group: "serverOptions",
       type: "error",
       title: "Failed to update server properties",
       text: "An error occurred while attempting to update your server properties.",

@@ -123,7 +123,7 @@ import { HammerIcon, PlusIcon, SearchIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 import type { Server, ModrinthServersFetchError } from "@modrinth/utils";
 import { reloadNuxtApp } from "#app";
-import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
+import { useServersFetchSimple } from "~/utils/frontend-servers.ts";
 
 definePageMeta({
   middleware: "auth",
@@ -147,7 +147,7 @@ const {
   error: fetchError,
   refresh,
 } = await useAsyncData<ServerResponse>("ServerList", () =>
-  useServersFetch<ServerResponse>("servers"),
+  useServersFetchSimple<ServerResponse>("servers"),
 );
 
 watch([fetchError, serverResponse], ([error, response]) => {

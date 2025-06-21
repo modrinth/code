@@ -196,7 +196,7 @@
                           @click="showVersionModal(mod)"
                         >
                           <template v-if="mod.changing">
-                            <UiServersIconsLoadingIcon class="animate-spin" />
+                            <RefreshClockwiseIcon class="animate-spin" />
                           </template>
                           <template v-else>
                             <EditIcon />
@@ -206,7 +206,7 @@
 
                       <!-- Dropdown for mobile -->
                       <div class="mr-2 flex items-center sm:hidden">
-                        <UiServersIconsLoadingIcon
+                        <RefreshClockwiseIcon
                           v-if="mod.changing"
                           class="mr-2 h-5 w-5 animate-spin"
                           style="color: var(--color-base)"
@@ -348,15 +348,20 @@ import {
   ListIcon,
   FileIcon,
   IssuesIcon,
+  RefreshClockwiseIcon,
 } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+import {
+  ButtonStyled,
+  ModrinthServer,
+  injectNotificationManager,
+  FilesUploadDragAndDrop,
+  FilesUploadDropdown,
+} from "@modrinth/ui";
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import type { Mod } from "@modrinth/utils";
-import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
-import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
+const { addNotification } = injectNotificationManager();
 const props = defineProps<{
   server: ModrinthServer;
 }>();

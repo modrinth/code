@@ -1,12 +1,18 @@
 <script setup lang="ts">
-import { Accordion, ButtonStyled, NewModal, ServerNotice, TagItem } from "@modrinth/ui";
+import {
+  Accordion,
+  ButtonStyled,
+  NewModal,
+  ServerNotice,
+  TagItem,
+  injectNotificationManager,
+} from "@modrinth/ui";
 import { PlusIcon, XIcon } from "@modrinth/assets";
 import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
 import { ref } from "vue";
-import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
+import { useServersFetchSimple } from "~/utils/frontend-servers.ts";
 
-const app = useNuxtApp() as unknown as { $notify: any };
-
+const { addNotification } = injectNotificationManager();
 const modal = ref<InstanceType<typeof NewModal>>();
 
 const emit = defineEmits<{
@@ -23,7 +29,7 @@ const assignedNodes = computed(() => assigned.value.filter((n) => n.kind === "no
 const inputField = ref("");
 
 async function refresh() {
-  await useServersFetch("notices").then((res) => {
+  await useServersFetchSimple("notices").then((res) => {
     const notices = res as ServerNoticeType[];
     assigned.value = notices.find((n) => n.id === notice.value?.id)?.assigned ?? [];
   });
@@ -33,22 +39,20 @@ async function assign(server: boolean = true) {
   const input = inputField.value.trim();
 
   if (input !== "" && notice.value) {
-    await useServersFetch(
+    await useServersFetchSimple(
       `notices/${notice.value.id}/assign?${server ? "server" : "node"}=${input}`,
       {
         method: "PUT",
       },
     ).catch((err) => {
-      app.$notify({
-        group: "main",
+      addNotification({
         title: "Error assigning notice",
         text: err,
         type: "error",
       });
     });
   } else {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "Error assigning notice",
       text: "No server or node specified",
       type: "error",
@@ -64,8 +68,7 @@ async function unassignDetect() {
   const node = assignedNodes.value.some((assigned) => assigned.id === input);
 
   if (!server && !node) {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "Error unassigning notice",
       text: "ID is not an assigned server or node",
       type: "error",
@@ -78,14 +81,13 @@ async function unassignDetect() {
 
 async function unassign(id: string, server: boolean = true) {
   if (notice.value) {
-    await useServersFetch(
+    await useServersFetchSimple(
       `notices/${notice.value.id}/unassign?${server ? "server" : "node"}=${id}`,
       {
         method: "PUT",
       },
     ).catch((err) => {
-      app.$notify({
-        group: "main",
+      addNotification({
         title: "Error unassigning notice",
         text: err,
         type: "error",

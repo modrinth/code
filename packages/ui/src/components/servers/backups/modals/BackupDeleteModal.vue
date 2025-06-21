@@ -1,0 +1,51 @@
+<template>
+  <ConfirmModal
+    ref="modal"
+    danger
+    title="Are you sure you want to delete this backup?"
+    proceed-label="Delete backup"
+    :confirmation-text="currentBackup?.name ?? 'null'"
+    has-to-type
+    @proceed="emit('delete', currentBackup)"
+  >
+    <BackupItem
+      v-if="currentBackup"
+      :backup="currentBackup"
+      preview
+      :show-advanced-debug-info="showAdvancedDebugInfo"
+      class="border-px border-solid border-button-border"
+    />
+  </ConfirmModal>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import type { Backup } from '@modrinth/utils'
+import ConfirmModal from '../../../modal/ConfirmModal.vue'
+import BackupItem from '../BackupItem.vue'
+
+withDefaults(
+  defineProps<{
+    showAdvancedDebugInfo?: boolean
+  }>(),
+  {
+    showAdvancedDebugInfo: false,
+  },
+)
+
+const emit = defineEmits<{
+  (e: 'delete', backup: Backup | undefined): void
+}>()
+
+const modal = ref<InstanceType<typeof ConfirmModal>>()
+const currentBackup = ref<Backup | undefined>(undefined)
+
+function show(backup: Backup) {
+  currentBackup.value = backup
+  modal.value?.show()
+}
+
+defineExpose({
+  show,
+})
+</script>

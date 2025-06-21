@@ -134,10 +134,11 @@ import {
   KeyIcon,
   MailIcon,
 } from "@modrinth/assets";
-import { commonMessages } from "@modrinth/ui";
+import { commonMessages, injectNotificationManager } from "@modrinth/ui";
 import HCaptcha from "@/components/ui/HCaptcha.vue";
 
 const { formatMessage } = useVIntl();
+const { addNotification } = injectNotificationManager();
 
 const messages = defineMessages({
   additionalOptionsLabel: {
@@ -225,7 +226,6 @@ async function beginPasswordSignIn() {
     }
   } catch (err) {
     addNotification({
-      group: "main",
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: "error",
@@ -250,7 +250,6 @@ async function begin2FASignIn() {
     await finishSignIn(res.session);
   } catch (err) {
     addNotification({
-      group: "main",
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: "error",

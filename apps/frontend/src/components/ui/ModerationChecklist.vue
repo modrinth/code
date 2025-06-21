@@ -9,7 +9,7 @@
       </h1>
       <ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
         <button v-tooltip="`Exit moderation`" @click="exitModeration">
-          <CrossIcon />
+          <XIcon />
         </button>
       </ButtonStyled>
       <ButtonStyled circular>
@@ -306,7 +306,7 @@
           <div class="flex items-center gap-2">
             <ButtonStyled v-if="!done">
               <button aria-label="Skip" @click="goToNextProject">
-                <ExitIcon aria-hidden="true" />
+                <XIcon aria-hidden="true" />
                 <template v-if="futureProjects.length > 0">Skip</template>
                 <template v-else>Exit</template>
               </button>
@@ -373,14 +373,20 @@ import {
   UpdatedIcon,
   CheckIcon,
   DropdownIcon,
-  XIcon as CrossIcon,
+  XIcon,
   EyeOffIcon,
-  ExitIcon,
   ScaleIcon,
 } from "@modrinth/assets";
-import { ButtonStyled, MarkdownEditor, OverflowMenu, Collapsible } from "@modrinth/ui";
+import {
+  ButtonStyled,
+  MarkdownEditor,
+  OverflowMenu,
+  Collapsible,
+  injectNotificationManager,
+} from "@modrinth/ui";
 import Categories from "~/components/ui/search/Categories.vue";
 
+const { addNotification } = injectNotificationManager();
 const props = defineProps({
   project: {
     type: Object,
@@ -862,9 +868,7 @@ async function initializeModPackData() {
 
     modPackData.value = projects;
   } catch (err) {
-    const app = useNuxtApp();
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -982,8 +986,7 @@ async function generateMessage() {
         });
       } catch (err) {
         const app = useNuxtApp();
-        app.$notify({
-          group: "main",
+        addNotification({
           title: "An error occurred",
           text: err.data ? err.data.description : err,
           type: "error",
@@ -1070,8 +1073,7 @@ async function sendMessage(status) {
     done.value = true;
   } catch (err) {
     const app = useNuxtApp();
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",

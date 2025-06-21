@@ -400,7 +400,7 @@
       "
       :on-error="
         (err) =>
-          data.$notify({
+          addNotification({
             group: 'main',
             title: 'An error occurred',
             type: 'error',
@@ -430,7 +430,7 @@
       :renewal-date="currentSubRenewalDate"
       :on-error="
         (err) =>
-          data.$notify({
+          addNotification({
             group: 'main',
             title: 'An error occurred',
             type: 'error',
@@ -569,6 +569,7 @@ import {
   ButtonStyled,
   CopyCode,
   commonMessages,
+  injectNotificationManager,
 } from "@modrinth/ui";
 import {
   PlusIcon,
@@ -591,14 +592,14 @@ import {
 } from "@modrinth/assets";
 import { calculateSavings, formatPrice, getCurrency } from "@modrinth/utils";
 import { ref, computed } from "vue";
-import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import { products } from "~/generated/state.json";
+import { useServersFetchSimple } from "~/utils/frontend-servers.ts";
 
 definePageMeta({
   middleware: "auth",
 });
 
-const app = useNuxtApp();
+const { addNotification } = injectNotificationManager();
 const auth = await useAuth();
 const baseId = useId();
 
@@ -612,7 +613,6 @@ useHead({
   ],
 });
 
-const data = useNuxtApp();
 const config = useRuntimeConfig();
 
 const vintl = useVIntl();
@@ -744,7 +744,7 @@ const [
     useBaseFetch("billing/subscriptions", { internal: true }),
   ),
   useAsyncData("billing/products", () => useBaseFetch("billing/products", { internal: true })),
-  useAsyncData("servers", () => useServersFetch("servers")),
+  useAsyncData("servers", () => useServersFetchSimple("servers")),
 ]);
 
 const midasProduct = ref(products.find((x) => x.metadata?.type === "midas"));
@@ -853,8 +853,7 @@ async function editPaymentMethod(index, primary) {
     });
     await refresh();
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -872,8 +871,7 @@ async function removePaymentMethod(index) {
     });
     await refresh();
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -895,8 +893,7 @@ async function cancelSubscription(id, cancelled) {
     });
     await refresh();
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -963,8 +960,7 @@ const showPyroUpgradeModal = async (subscription) => {
 
   if (!currentProduct.value) {
     console.error("Could not find product for current subscription");
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: "Could not find product for current subscription",
       type: "error",
@@ -984,7 +980,7 @@ async function fetchCapacityStatuses(serverId, product) {
   if (product) {
     try {
       return {
-        custom: await useServersFetch(`servers/${serverId}/upgrade-stock`, {
+        custom: await useServersFetchSimple(`servers/${serverId}/upgrade-stock`, {
           method: "POST",
           body: {
             cpu: product.metadata.cpu,
@@ -996,8 +992,7 @@ async function fetchCapacityStatuses(serverId, product) {
       };
     } catch (error) {
       console.error("Error checking server capacities:", error);
-      app.$notify({
-        group: "main",
+      addNotification({
         title: "Error checking server capacities",
         text: error,
         type: "error",
@@ -1023,23 +1018,20 @@ const resubscribePyro = async (subscriptionId, wasSuspended) => {
     });
     await refresh();
     if (wasSuspended) {
-      data.$notify({
-        group: "main",
+      addNotification({
         title: "Resubscription request submitted",
         text: "If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.",
         type: "success",
       });
     } else {
-      data.$notify({
-        group: "main",
+      addNotification({
         title: "Success",
         text: "Server subscription resubscribed successfully",
         type: "success",
       });
     }
   } catch {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "Error resubscribing",
       text: "An error occurred while resubscribing to your Modrinth server.",
       type: "error",

@@ -214,7 +214,7 @@
 </template>
 
 <script setup>
-import { CopyCode, OverflowMenu, MarkdownEditor } from "@modrinth/ui";
+import { CopyCode, OverflowMenu, MarkdownEditor, injectNotificationManager } from "@modrinth/ui";
 import {
   DropdownIcon,
   ReplyIcon,
@@ -232,6 +232,7 @@ import { isApproved, isRejected } from "~/helpers/projects.js";
 import Modal from "~/components/ui/Modal.vue";
 import Checkbox from "~/components/ui/Checkbox.vue";
 
+const { addNotification } = injectNotificationManager();
 const props = defineProps({
   thread: {
     type: Object,
@@ -345,8 +346,7 @@ async function sendReply(status = null, privateMessage = false) {
       props.setStatus(status);
     }
   } catch (err) {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "Error sending message",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -368,8 +368,7 @@ async function closeReport(reply) {
     });
     await updateThreadLocal();
   } catch (err) {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "Error closing report",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -387,8 +386,7 @@ async function reopenReport() {
     });
     await updateThreadLocal();
   } catch (err) {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "Error reopening report",
       text: err.data ? err.data.description : err,
       type: "error",

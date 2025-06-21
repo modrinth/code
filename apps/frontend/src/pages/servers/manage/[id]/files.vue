@@ -1,31 +1,19 @@
 <template>
   <div data-pyro-file-manager-root class="contents">
-    <LazyUiServersFilesCreateItemModal
-      ref="createItemModal"
-      :type="newItemType"
-      @create="handleCreateNewItem"
-    />
+    <FilesCreateItemModal ref="createItemModal" :type="newItemType" @create="handleCreateNewItem" />
     <FilesUploadZipUrlModal ref="uploadZipModal" :server="server" />
     <FilesUploadConflictModal ref="uploadConflictModal" @proceed="extractItem" />
 
-    <LazyUiServersFilesRenameItemModal
-      ref="renameItemModal"
-      :item="selectedItem"
-      @rename="handleRenameItem"
-    />
+    <FilesRenameItemModal ref="renameItemModal" :item="selectedItem" @rename="handleRenameItem" />
 
-    <LazyUiServersFilesMoveItemModal
+    <FilesMoveItemModal
       ref="moveItemModal"
       :item="selectedItem"
       :current-path="currentPath"
       @move="handleMoveItem"
     />
 
-    <LazyUiServersFilesDeleteItemModal
-      ref="deleteItemModal"
-      :item="selectedItem"
-      @delete="handleDeleteItem"
-    />
+    <FilesDeleteItemModal ref="deleteItemModal" :item="selectedItem" @delete="handleDeleteItem" />
 
     <FilesUploadDragAndDrop
       class="relative flex w-full flex-col rounded-2xl border border-solid border-bg-raised"
@@ -33,7 +21,7 @@
     >
       <div ref="mainContent" class="relative isolate flex w-full flex-col">
         <div v-if="!isEditing" class="contents">
-          <UiServersFilesBrowseNavbar
+          <FilesBrowseNavbar
             :breadcrumb-segments="breadcrumbSegments"
             :search-query="searchQuery"
             :current-filter="viewFilter"
@@ -46,11 +34,7 @@
             @filter="handleFilter"
             @update:search-query="searchQuery = $event"
           />
-          <UiServersFilesLabelBar
-            :sort-field="sortMethod"
-            :sort-desc="sortDesc"
-            @sort="handleSort"
-          />
+          <FilesLabelBar :sort-field="sortMethod" :sort-desc="sortDesc" @sort="handleSort" />
           <div
             v-for="op in ops"
             :key="`fs-op-${op.op}-${op.src}`"
@@ -164,7 +148,7 @@
             @upload-complete="refreshList()"
           />
         </div>
-        <UiServersFilesEditingNavbar
+        <FilesEditingNavbar
           v-else
           :file-name="editingFile?.name"
           :is-image="isEditingImage"
@@ -203,10 +187,10 @@
             class="ace_editor ace_hidpi ace-one-dark ace_dark rounded-b-lg"
             @init="onInit"
           />
-          <UiServersFilesImageViewer v-else :image-blob="imagePreview" />
+          <FilesImageViewer v-else :image-blob="imagePreview" />
         </div>
         <div v-else-if="items.length > 0" class="h-full w-full overflow-hidden rounded-b-2xl">
-          <UiServersFileVirtualList
+          <FileVirtualList
             :items="filteredItems"
             @extract="handleExtractItem"
             @delete="showDeleteModal"
@@ -231,7 +215,7 @@
           </div>
         </div>
 
-        <LazyUiServersFileManagerError
+        <FileManagerError
           v-else-if="loadError"
           title="Unable to load files"
           message="The folder may not exist."
@@ -277,14 +261,29 @@ import {
   FolderOpenIcon,
 } from "@modrinth/assets";
 import { computed } from "vue";
-import { ButtonStyled, ProgressBar } from "@modrinth/ui";
+import {
+  ButtonStyled,
+  ProgressBar,
+  ModrinthServer,
+  injectNotificationManager,
+  FilesUploadConflictModal,
+  FilesUploadZipUrlModal,
+  FilesMoveItemModal,
+  FilesCreateItemModal,
+  FilesRenameItemModal,
+  FilesDeleteItemModal,
+  FilesBrowseNavbar,
+  FilesLabelBar,
+  FilesUploadDropdown,
+  FilesEditingNavbar,
+  FilesImageViewer,
+  FileVirtualList,
+  FilesUploadDragAndDrop,
+} from "@modrinth/ui";
 import { formatBytes, ModrinthServersFetchError } from "@modrinth/utils";
 import type { FilesystemOp, FSQueuedOp, DirectoryItem, DirectoryResponse } from "@modrinth/utils";
-import { handleError, ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
-import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
-import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
-import FilesUploadZipUrlModal from "~/components/ui/servers/FilesUploadZipUrlModal.vue";
-import FilesUploadConflictModal from "~/components/ui/servers/FilesUploadConflictModal.vue";
+
+const { addNotification } = injectNotificationManager();
 
 const flags = useFeatureFlags();
 const baseId = useId();
@@ -449,7 +448,6 @@ const undoLastOperation = async () => {
 
     refreshList();
     addNotification({
-      group: "files",
       title: `${lastOperation.type === "move" ? "Move" : "Rename"} undone`,
       text: `${lastOperation.fileName} has been restored to its original ${lastOperation.type === "move" ? "location" : "name"}`,
       type: "success",
@@ -457,7 +455,6 @@ const undoLastOperation = async () => {
   } catch (error) {
     console.error(`Error undoing ${lastOperation.type}:`, error);
     addNotification({
-      group: "files",
       title: "Undo failed",
       text: `Failed to undo the last ${lastOperation.type} operation`,
       type: "error",
@@ -489,7 +486,6 @@ const redoLastOperation = async () => {
 
     refreshList();
     addNotification({
-      group: "files",
       title: `${lastOperation.type === "move" ? "Move" : "Rename"} redone`,
       text: `${lastOperation.fileName} has been ${lastOperation.type === "move" ? "moved" : "renamed"} again`,
       type: "success",
@@ -497,7 +493,6 @@ const redoLastOperation = async () => {
   } catch (error) {
     console.error(`Error redoing ${lastOperation.type}:`, error);
     addNotification({
-      group: "files",
       title: "Redo failed",
       text: `Failed to redo the last ${lastOperation.type} operation`,
       type: "error",
@@ -513,7 +508,6 @@ const handleCreateNewItem = async (name: string) => {
     refreshList();
 
     addNotification({
-      group: "files",
       title: `${newItemType.value === "directory" ? "Folder" : "File"} created`,
       text: `New ${newItemType.value === "directory" ? "folder" : "file"} ${name} has been created.`,
       type: "success",
@@ -549,7 +543,6 @@ const handleRenameItem = async (newName: string) => {
     }
 
     addNotification({
-      group: "files",
       title: `${selectedItem.value.type === "directory" ? "Folder" : "File"} renamed`,
       text: `${selectedItem.value.name} has been renamed to ${newName}`,
       type: "success",
@@ -559,7 +552,6 @@ const handleRenameItem = async (newName: string) => {
     if (error instanceof ModrinthServersFetchError) {
       if (error.statusCode === 400) {
         addNotification({
-          group: "files",
           title: "Could not rename",
           text: `An item named "${newName}" already exists in this location`,
           type: "error",
@@ -567,7 +559,6 @@ const handleRenameItem = async (newName: string) => {
         return;
       }
       addNotification({
-        group: "files",
         title: "Could not rename item",
         text: "An unexpected error occurred",
         type: "error",
@@ -581,25 +572,25 @@ const extractItem = async (path: string) => {
     await props.server.fs?.extractFile(path, true, false);
   } catch (error) {
     console.error("Error extracting item:", error);
-    handleError(error);
+    props.server.errorHandler(error);
   }
 };
 
-const handleExtractItem = async (item: { name: string; type: string; path: string }) => {
+const handleExtractItem = async (item: Partial<DirectoryItem>) => {
   try {
-    const dry = await props.server.fs?.extractFile(item.path, true, true, true);
+    const dry = await props.server.fs?.extractFile(item.path!, true, true, true);
     if (dry) {
       if (dry.conflicting_files.length === 0) {
-        await extractItem(item.path);
+        await extractItem(item.path!);
       } else {
         uploadConflictModal.value.show(item.path, dry.conflicting_files);
       }
     } else {
-      handleError(new Error("Error running dry run"));
+      props.server.errorHandler(new Error("Error running dry run"));
     }
   } catch (error) {
     console.error("Error extracting item:", error);
-    handleError(error);
+    props.server.errorHandler(error);
   }
 };
 
@@ -625,7 +616,6 @@ const handleMoveItem = async (destination: string) => {
 
     refreshList();
     addNotification({
-      group: "files",
       title: `${itemType === "directory" ? "Folder" : "File"} moved`,
       text: `${selectedItem.value.name} has been moved to ${newPath}`,
       type: "success",
@@ -658,7 +648,6 @@ const handleDirectMove = async (moveData: {
 
     refreshList();
     addNotification({
-      group: "files",
       title: `${moveData.type === "directory" ? "Folder" : "File"} moved`,
       text: `${moveData.name} has been moved to ${newPath}`,
       type: "success",
@@ -675,7 +664,6 @@ const handleDeleteItem = async () => {
 
     refreshList();
     addNotification({
-      group: "files",
       title: "File deleted",
       text: "Your file has been deleted.",
       type: "success",
@@ -717,14 +705,12 @@ const handleCreateError = (error: any) => {
   if (error instanceof ModrinthServersFetchError) {
     if (error.statusCode === 400) {
       addNotification({
-        group: "files",
         title: "Error creating item",
         text: "Invalid file",
         type: "error",
       });
     } else if (error.statusCode === 500) {
       addNotification({
-        group: "files",
         title: "Error creating item",
         text: "Something went wrong. The file may already exist.",
         type: "error",
@@ -861,7 +847,7 @@ const onAnywhereClicked = (e: MouseEvent) => {
 
 const imageExtensions = ["png", "jpg", "jpeg", "gif", "webp"];
 
-const editFile = async (item: { name: string; type: string; path: string }) => {
+const editFile = async (item: Partial<DirectoryItem>) => {
   try {
     const path = `${currentPath.value}/${item.name}`.replace("//", "/");
     const content = (await props.server.fs?.downloadFile(path, true)) as any;
@@ -870,7 +856,7 @@ const editFile = async (item: { name: string; type: string; path: string }) => {
     fileContent.value = await content.text();
     editingFile.value = item;
     isEditing.value = true;
-    const extension = item.name.split(".").pop();
+    const extension = item.name!.split(".").pop();
     if (item.type === "file" && extension && imageExtensions.includes(extension)) {
       isEditingImage.value = true;
       imagePreview.value = content;
@@ -1010,7 +996,6 @@ const requestShareLink = async () => {
     if (response.success) {
       await navigator.clipboard.writeText(response.url);
       addNotification({
-        group: "files",
         title: "Log URL copied",
         text: "Your log file URL has been copied to your clipboard.",
         type: "success",
@@ -1080,7 +1065,6 @@ const saveFileContent = async (exit: boolean = true) => {
     }
 
     addNotification({
-      group: "files",
       title: "File saved",
       text: "Your file has been saved.",
       type: "success",
@@ -1095,7 +1079,6 @@ const saveFileContentRestart = async () => {
   await props.server.general?.power("Restart");
 
   addNotification({
-    group: "files",
     title: "Server restarted",
     text: "Your server has been restarted.",
     type: "success",

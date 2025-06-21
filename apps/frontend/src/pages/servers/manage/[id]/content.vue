@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { ModrinthServer } from "@modrinth/ui";
 
 const route = useNativeRoute();
 

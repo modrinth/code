@@ -17,7 +17,7 @@ import {
   UserIcon,
   WrenchIcon,
 } from "@modrinth/assets";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { ModrinthServer } from "@modrinth/ui";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
 
 const route = useRoute();

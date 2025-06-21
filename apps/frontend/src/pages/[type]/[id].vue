@@ -873,11 +873,12 @@ import {
   ProjectStatusBadge,
   ScrollablePanel,
   useRelativeTime,
+  injectNotificationManager,
 } from "@modrinth/ui";
 import VersionSummary from "@modrinth/ui/src/components/version/VersionSummary.vue";
 import { formatCategory, isRejected, isStaff, isUnderReview, renderString } from "@modrinth/utils";
-import { navigateTo } from "#app";
 import dayjs from "dayjs";
+import { navigateTo } from "#app";
 import Accordion from "~/components/ui/Accordion.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import AutomaticAccordion from "~/components/ui/AutomaticAccordion.vue";
@@ -892,6 +893,7 @@ import ProjectMemberHeader from "~/components/ui/ProjectMemberHeader.vue";
 import { userCollectProject } from "~/composables/user.js";
 import { reportProject } from "~/utils/report-helpers.ts";
 
+const { addNotification } = injectNotificationManager();
 const data = useNuxtApp();
 const route = useNativeRoute();
 const config = useRuntimeConfig();
@@ -1350,8 +1352,7 @@ async function setProcessing() {
 
     project.value.status = "processing";
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -1384,8 +1385,7 @@ async function patchProject(resData, quiet = false) {
 
     result = true;
     if (!quiet) {
-      data.$notify({
-        group: "main",
+      addNotification({
         title: "Project updated",
         text: "Your project has been updated.",
         type: "success",
@@ -1393,8 +1393,7 @@ async function patchProject(resData, quiet = false) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -1423,15 +1422,13 @@ async function patchIcon(icon) {
     );
     await resetProject();
     result = true;
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "Project icon updated",
       text: "Your project's icon has been updated.",
       type: "success",
     });
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",

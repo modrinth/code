@@ -71,8 +71,8 @@
       class="relative -mt-4 flex w-full flex-col gap-2 rounded-b-3xl bg-bg-red p-4 text-sm font-bold text-contrast"
     >
       <div class="flex flex-row gap-2">
-        <UiServersIconsPanelErrorIcon class="!size-5" /> Your server has been suspended. Please
-        update your billing information or contact Modrinth Support for more information.
+        <TriangleAlertIcon class="!size-5" /> Your server has been suspended. Please update your
+        billing information or contact Modrinth Support for more information.
       </div>
       <UiCopyCode :text="`${props.server_id}`" class="ml-auto" />
     </div>
@@ -80,14 +80,13 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronRightIcon, LockIcon, SparklesIcon } from "@modrinth/assets";
+import { ChevronRightIcon, LockIcon, SparklesIcon, TriangleAlertIcon } from "@modrinth/assets";
 import type { Project, Server } from "@modrinth/utils";
-import { useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
-
+import { useModrinthServersSimple } from "~/utils/frontend-servers.ts";
 const props = defineProps<Partial<Server>>();
 
 if (props.server_id) {
-  await useModrinthServers(props.server_id, ["general"]);
+  await useModrinthServersSimple(props.server_id, ["general"]);
 }
 
 const showGameLabel = computed(() => !!props.game);
@@ -110,7 +109,7 @@ if (props.upstream) {
 const image = useState<string | undefined>(`server-icon-${props.server_id}`, () => undefined);
 
 if (import.meta.server && projectData.value?.icon_url) {
-  await useModrinthServers(props.server_id!, ["general"]);
+  await useModrinthServersSimple(props.server_id!, ["general"]);
 }
 
 const iconUrl = computed(() => projectData.value?.icon_url || undefined);

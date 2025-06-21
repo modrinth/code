@@ -196,12 +196,13 @@ import {
   XIcon,
   TransferIcon,
 } from "@modrinth/assets";
-import { Chips, Checkbox, Breadcrumbs } from "@modrinth/ui";
+import { Chips, Checkbox, Breadcrumbs, injectNotificationManager } from "@modrinth/ui";
 import { all } from "iso-3166-1";
 import VenmoIcon from "~/assets/images/external/venmo.svg?component";
 
 const auth = await useAuth();
 const data = useNuxtApp();
+const { addNotification } = injectNotificationManager();
 
 const countries = computed(() =>
   all().map((x) => ({
@@ -354,8 +355,7 @@ async function withdraw() {
     });
     await useAuth(auth.value.token);
     await navigateTo("/dashboard/revenue");
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "Withdrawal complete",
       text:
         selectedMethod.value.type === "tremendous"
@@ -366,8 +366,7 @@ async function withdraw() {
       type: "success",
     });
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",

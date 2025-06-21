@@ -145,10 +145,11 @@ import {
   MailIcon,
   SSOGitLabIcon,
 } from "@modrinth/assets";
-import { Checkbox, commonMessages } from "@modrinth/ui";
+import { Checkbox, commonMessages, injectNotificationManager } from "@modrinth/ui";
 import HCaptcha from "@/components/ui/HCaptcha.vue";
 
 const { formatMessage } = useVIntl();
+const { addNotification } = injectNotificationManager();
 
 const messages = defineMessages({
   title: {
@@ -225,7 +226,6 @@ async function createAccount() {
   try {
     if (confirmPassword.value !== password.value) {
       addNotification({
-        group: "main",
         title: formatMessage(commonMessages.errorNotificationTitle),
         text: formatMessage({
           id: "auth.sign-up.notification.password-mismatch.text",
@@ -264,7 +264,6 @@ async function createAccount() {
     }
   } catch (err) {
     addNotification({
-      group: "main",
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: "error",

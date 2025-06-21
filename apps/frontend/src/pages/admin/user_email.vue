@@ -32,8 +32,10 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ButtonStyled } from "@modrinth/ui";
+import { ButtonStyled, injectNotificationManager } from "@modrinth/ui";
 import { MailIcon } from "@modrinth/assets";
+
+const { addNotification } = injectNotificationManager();
 
 const userEmail = ref("");
 
@@ -41,16 +43,18 @@ async function getUserFromEmail() {
   startLoading();
 
   try {
-    const result = await useBaseFetch(`user_email?email=${encodeURIComponent(userEmail.value)}`, {
-      method: "GET",
-      apiVersion: 3,
-    });
+    const result: any = await useBaseFetch(
+      `user_email?email=${encodeURIComponent(userEmail.value)}`,
+      {
+        method: "GET",
+        apiVersion: 3,
+      },
+    );
 
     await navigateTo(`/user/${result.username}`);
-  } catch (err) {
+  } catch (err: any) {
     console.error(err);
     addNotification({
-      group: "main",
       title: "An error occurred",
       text: err.data.description,
       type: "error",

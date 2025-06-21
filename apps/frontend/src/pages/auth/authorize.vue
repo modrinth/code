@@ -80,7 +80,7 @@
 </template>
 
 <script setup>
-import { Button, Avatar, commonMessages } from "@modrinth/ui";
+import { Button, Avatar, commonMessages, injectNotificationManager } from "@modrinth/ui";
 import { XIcon, CheckIcon } from "@modrinth/assets";
 import { useBaseFetch } from "@/composables/fetch.js";
 import { useAuth } from "@/composables/auth.js";
@@ -117,7 +117,7 @@ const messages = defineMessages({
   },
 });
 
-const data = useNuxtApp();
+const { addNotification } = injectNotificationManager();
 
 const router = useNativeRoute();
 const auth = await useAuth();
@@ -196,8 +196,7 @@ const onAuthorize = async () => {
 
     throw new Error(formatMessage(messages.noRedirectUrlError));
   } catch {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: "error",
@@ -223,8 +222,7 @@ const onReject = async () => {
 
     throw new Error(formatMessage(messages.noRedirectUrlError));
   } catch {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: "error",
