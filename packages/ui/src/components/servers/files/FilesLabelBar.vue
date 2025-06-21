@@ -51,14 +51,14 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronDownIcon, ChevronUpIcon } from "@modrinth/assets";
+import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
 
 defineProps<{
-  sortField: string;
-  sortDesc: boolean;
-}>();
+  sortField: string
+  sortDesc: boolean
+}>()
 
 defineEmits<{
-  (e: "sort", field: string): void;
-}>();
+  (e: 'sort', field: string): void
+}>()
 </script>

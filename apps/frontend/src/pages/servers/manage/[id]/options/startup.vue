@@ -77,7 +77,7 @@
               />
               <label for="show-all-versions" class="text-sm">Show all Java versions</label>
             </div>
-            <UiServersTeleportDropdownMenu
+            <TeleportDropdownMenu
               :id="'java-version-field'"
               v-model="jdkVersion"
               name="java-version"
@@ -113,7 +113,12 @@
 
 <script setup lang="ts">
 import { UpdatedIcon, IssuesIcon } from "@modrinth/assets";
-import { ButtonStyled, ModrinthServer, injectNotificationManager } from "@modrinth/ui";
+import {
+  ButtonStyled,
+  ModrinthServer,
+  injectNotificationManager,
+  TeleportDropdownMenu,
+} from "@modrinth/ui";
 
 const { addNotification } = injectNotificationManager();
 const props = defineProps<{

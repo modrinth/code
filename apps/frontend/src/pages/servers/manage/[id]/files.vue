@@ -572,25 +572,25 @@ const extractItem = async (path: string) => {
     await props.server.fs?.extractFile(path, true, false);
   } catch (error) {
     console.error("Error extracting item:", error);
-    handleError(error);
+    props.server.errorHandler(error);
   }
 };
 
-const handleExtractItem = async (item: { name: string; type: string; path: string }) => {
+const handleExtractItem = async (item: Partial<DirectoryItem>) => {
   try {
-    const dry = await props.server.fs?.extractFile(item.path, true, true, true);
+    const dry = await props.server.fs?.extractFile(item.path!, true, true, true);
     if (dry) {
       if (dry.conflicting_files.length === 0) {
-        await extractItem(item.path);
+        await extractItem(item.path!);
       } else {
         uploadConflictModal.value.show(item.path, dry.conflicting_files);
       }
     } else {
-      handleError(new Error("Error running dry run"));
+      props.server.errorHandler(new Error("Error running dry run"));
     }
   } catch (error) {
     console.error("Error extracting item:", error);
-    handleError(error);
+    props.server.errorHandler(error);
   }
 };
 
@@ -847,7 +847,7 @@ const onAnywhereClicked = (e: MouseEvent) => {
 
 const imageExtensions = ["png", "jpg", "jpeg", "gif", "webp"];
 
-const editFile = async (item: { name: string; type: string; path: string }) => {
+const editFile = async (item: Partial<DirectoryItem>) => {
   try {
     const path = `${currentPath.value}/${item.name}`.replace("//", "/");
     const content = (await props.server.fs?.downloadFile(path, true)) as any;
@@ -856,7 +856,7 @@ const editFile = async (item: { name: string; type: string; path: string }) => {
     fileContent.value = await content.text();
     editingFile.value = item;
     isEditing.value = true;
-    const extension = item.name.split(".").pop();
+    const extension = item.name!.split(".").pop();
     if (item.type === "file" && extension && imageExtensions.includes(extension)) {
       isEditingImage.value = true;
       imagePreview.value = content;

@@ -194,7 +194,7 @@
                   Primary allocation
                 </span>
 
-                <UiCopyCode :text="`${serverIP}:${serverPrimaryPort}`" />
+                <CopyCode :text="`${serverIP}:${serverPrimaryPort}`" />
               </div>
             </div>
 
@@ -279,6 +279,7 @@ import {
   ConfirmModal,
   ModrinthServer,
   injectNotificationManager,
+  CopyCode,
 } from "@modrinth/ui";
 import { ref, computed, nextTick } from "vue";
 

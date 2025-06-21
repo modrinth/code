@@ -54,10 +54,19 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (
-    e: 'delete' | 'rename' | 'download' | 'move' | 'edit' | 'moveDirectTo' | 'extract',
+    e: 'delete' | 'rename' | 'download' | 'move' | 'edit' | 'extract',
     item: Partial<DirectoryItem>,
   ): void
   (e: 'contextmenu', item: DirectoryItem, x: number, y: number): void
+  (
+    e: 'moveDirectTo',
+    item: {
+      name: string
+      type: string
+      path: string
+      destination: string
+    },
+  ): void
   (e: 'loadMore'): void
 }>()
 

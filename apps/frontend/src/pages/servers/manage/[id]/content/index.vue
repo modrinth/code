@@ -350,11 +350,15 @@ import {
   IssuesIcon,
   RefreshClockwiseIcon,
 } from "@modrinth/assets";
-import { ButtonStyled, ModrinthServer, injectNotificationManager } from "@modrinth/ui";
+import {
+  ButtonStyled,
+  ModrinthServer,
+  injectNotificationManager,
+  FilesUploadDragAndDrop,
+  FilesUploadDropdown,
+} from "@modrinth/ui";
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import type { Mod } from "@modrinth/utils";
-import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
-import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
 
 const { addNotification } = injectNotificationManager();

@@ -306,15 +306,13 @@
 <script setup lang="ts">
 import { Button, Card, DropdownSelect } from "@modrinth/ui";
 import { formatMoney, formatNumber, formatCategoryHeader } from "@modrinth/utils";
-import { UpdatedIcon, DownloadIcon } from "@modrinth/assets";
+import { UpdatedIcon, DownloadIcon, PaletteIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
 import { computed } from "vue";
 
 import { analyticsSetToCSVString, intToRgba } from "~/utils/analytics.js";
 
 import { UiChartsCompactChart as CompactChart, UiChartsChart as Chart } from "#components";
-
-import PaletteIcon from "~/assets/icons/palette.svg?component";
 
 const router = useNativeRouter();
 const theme = useTheme();

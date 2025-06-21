@@ -49,7 +49,7 @@ export abstract class AbstractModrinthServersConsole {
 
   clear(): void {
     this.output.value = []
-    this.searchQuery.value = ""
+    this.searchQuery.value = ''
     this.filteredOutput.value = []
     this.lineBuffer = []
     this.isProcessingInitialBatch = false
@@ -73,9 +73,7 @@ export abstract class AbstractModrinthServersConsole {
   protected flushBuffer(): void {
     if (this.lineBuffer.length === 0) return
 
-    const processedLines = this.lineBuffer.flatMap((line) => 
-      line.split('\n').filter(Boolean)
-    )
+    const processedLines = this.lineBuffer.flatMap((line) => line.split('\n').filter(Boolean))
 
     if (this.isProcessingInitialBatch && processedLines.length >= this.INITIAL_BATCH_SIZE) {
       this.isProcessingInitialBatch = false
@@ -101,13 +99,13 @@ export abstract class AbstractModrinthServersConsole {
 
     if (!this.searchRegex) {
       this.searchRegex = new RegExp(
-        this.searchQuery.value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 
-        'i'
+        this.searchQuery.value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+        'i',
       )
     }
 
-    this.filteredOutput.value = this.output.value.filter((line) => 
-      this.searchRegex?.test(line) ?? false
+    this.filteredOutput.value = this.output.value.filter(
+      (line) => this.searchRegex?.test(line) ?? false,
     )
   }
 

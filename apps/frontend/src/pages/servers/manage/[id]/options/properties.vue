@@ -77,7 +77,7 @@
               v-if="overrides[index] && overrides[index].type === 'dropdown'"
               class="mt-2 flex w-full sm:w-[320px] sm:justify-end"
             >
-              <UiServersTeleportDropdownMenu
+              <TeleportDropdownMenu
                 :id="`server-property-${index}`"
                 v-model="liveProperties[index]"
                 :name="formatPropertyName(index)"
@@ -146,7 +146,12 @@
 import { ref, watch, computed, inject } from "vue";
 import { EyeIcon, SearchIcon, IssuesIcon } from "@modrinth/assets";
 import Fuse from "fuse.js";
-import { ModrinthServer, injectNotificationManager } from "@modrinth/ui";
+import {
+  ButtonStyled,
+  ModrinthServer,
+  TeleportDropdownMenu,
+  injectNotificationManager,
+} from "@modrinth/ui";
 
 const { addNotification } = injectNotificationManager();
 const props = defineProps<{
