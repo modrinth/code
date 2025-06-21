@@ -101,9 +101,10 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled } from '@modrinth/ui'
 import { ref, onMounted, onUnmounted, watch, nextTick, computed } from 'vue'
 import { onClickOutside, useElementHover } from '@vueuse/core'
+
+import ButtonStyled from './ButtonStyled.vue'
 
 interface Option {
   id: string
