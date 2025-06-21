@@ -4,6 +4,13 @@
   "private": true,
   "main": "./index.ts",
   "types": "./index.ts",
+  "exports": {
+    ".": {
+      "import": "./index.ts",
+      "require": "./index.ts"
+    },
+    "./src/locales/*": "./src/locales/*"
+  },
   "scripts": {
     "lint": "eslint . && prettier --check .",
     "fix": "eslint . --fix && prettier --write .",

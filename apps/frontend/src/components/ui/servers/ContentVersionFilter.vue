@@ -61,8 +61,7 @@ import { FilterIcon } from "@modrinth/assets";
 import { type Version, formatCategory, type GameVersionTag } from "@modrinth/utils";
 import { ref, computed } from "vue";
 import { useRoute } from "vue-router";
-import ManySelect from "@modrinth/ui/src/components/base/ManySelect.vue";
-import Checkbox from "@modrinth/ui/src/components/base/Checkbox.vue";
+import { ManySelect, Checkbox } from "@modrinth/ui";
 
 export type ListedGameVersion = {
   name: string;

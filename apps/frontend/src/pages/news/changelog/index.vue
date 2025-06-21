@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { type Product, getChangelog } from "@modrinth/utils";
-import { ChangelogEntry } from "@modrinth/ui";
-import Timeline from "@modrinth/ui/src/components/base/Timeline.vue";
+import { ChangelogEntry, Timeline } from "@modrinth/ui";
 import NavTabs from "~/components/ui/NavTabs.vue";
 
 const route = useRoute();

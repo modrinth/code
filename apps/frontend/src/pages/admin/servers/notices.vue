@@ -269,13 +269,13 @@ import {
   Toggle,
   useRelativeTime,
   injectNotificationManager,
+  NOTICE_LEVELS,
 } from "@modrinth/ui";
 import { SettingsIcon, PlusIcon, SaveIcon, TrashIcon, EditIcon, XIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
 import { useVIntl } from "@vintl/vintl";
 import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
 import { computed } from "vue";
-import { NOTICE_LEVELS } from "@modrinth/ui/src/utils/notices.ts";
 import AssignNoticeModal from "~/components/ui/servers/notice/AssignNoticeModal.vue";
 import { useServersFetchSimple } from "~/utils/frontend-servers.ts";
 

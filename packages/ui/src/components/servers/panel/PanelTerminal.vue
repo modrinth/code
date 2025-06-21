@@ -303,10 +303,11 @@ import {
   EyeIcon,
   MinimizeIcon,
   FullscreenIcon,
-} from '@modrinth/assets'
-import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
-import { useDebounceFn } from '@vueuse/core'
-import DOMPurify from 'dompurify'
+} from "@modrinth/assets";
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
+import { useDebounceFn } from "@vueuse/core";
+import { NewModal, ButtonStyled, useModrinthServersConsole } from "@modrinth/ui";
+import DOMPurify from "dompurify";
 
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import NewModal from '../../modal/NewModal.vue'

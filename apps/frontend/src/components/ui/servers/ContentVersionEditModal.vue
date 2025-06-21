@@ -236,8 +236,7 @@ import {
   GameIcon,
   ExternalIcon,
 } from "@modrinth/assets";
-import { Admonition, ButtonStyled, NewModal } from "@modrinth/ui";
-import TagItem from "@modrinth/ui/src/components/base/TagItem.vue";
+import { Admonition, ButtonStyled, NewModal, TagItem } from "@modrinth/ui";
 import { ref, computed } from "vue";
 import { formatCategory, formatVersionsForDisplay, type Mod, type Version } from "@modrinth/utils";
 import Accordion from "~/components/ui/Accordion.vue";
