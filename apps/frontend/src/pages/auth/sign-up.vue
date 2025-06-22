@@ -111,7 +111,7 @@
       <button
         class="btn btn-primary continue-btn centered-btn"
         :disabled="!token"
-        @click="createAccount"
+        @click="createAccount()"
       >
         {{ formatMessage(messages.createAccountButton) }} <RightArrowIcon />
       </button>
