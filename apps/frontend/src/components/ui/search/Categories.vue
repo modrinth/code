@@ -4,12 +4,14 @@
     <span
       v-for="category in categoriesFiltered"
       :key="category.name"
-      v-html="category.icon + $formatCategory(category.name)"
+      v-html="category.icon + formatCategory(category.name)"
     />
   </div>
 </template>
 
 <script>
+import { formatCategory } from "@modrinth/utils";
+
 export default {
   props: {
     categories: {
@@ -38,6 +40,7 @@ export default {
         );
     },
   },
+  methods: { formatCategory },
 };
 </script>
 

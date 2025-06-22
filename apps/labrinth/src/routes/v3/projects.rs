@@ -9,7 +9,7 @@ use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::models::{DBTeamMember, ids as db_ids, image_item};
 use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
-use crate::file_hosting::FileHost;
+use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models;
 use crate::models::ids::ProjectId;
 use crate::models::images::ImageContext;
@@ -28,7 +28,7 @@ use crate::search::indexing::remove_documents;
 use crate::search::{SearchConfig, SearchError, search_for_project};
 use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
-use crate::util::routes::read_from_payload;
+use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::base62_impl::parse_base62;
@@ -1487,11 +1487,12 @@ pub async fn project_icon_edit(
     delete_old_images(
         project_item.inner.icon_url,
         project_item.inner.raw_icon_url,
+        FileHostPublicity::Public,
         &***file_host,
     )
     .await?;
 
-    let bytes = read_from_payload(
+    let bytes = read_limited_from_payload(
         &mut payload,
         262144,
         "Icons must be smaller than 256KiB",
@@ -1501,6 +1502,7 @@ pub async fn project_icon_edit(
     let project_id: ProjectId = project_item.inner.id.into();
     let upload_result = upload_image_optimized(
         &format!("data/{project_id}"),
+        FileHostPublicity::Public,
         bytes.freeze(),
         &ext.ext,
         Some(96),
@@ -1597,6 +1599,7 @@ pub async fn delete_project_icon(
     delete_old_images(
         project_item.inner.icon_url,
         project_item.inner.raw_icon_url,
+        FileHostPublicity::Public,
         &***file_host,
     )
     .await?;
@@ -1709,7 +1712,7 @@ pub async fn add_gallery_item(
         }
     }
 
-    let bytes = read_from_payload(
+    let bytes = read_limited_from_payload(
         &mut payload,
         2 * (1 << 20),
         "Gallery image exceeds the maximum of 2MiB.",
@@ -1719,6 +1722,7 @@ pub async fn add_gallery_item(
     let id: ProjectId = project_item.inner.id.into();
     let upload_result = upload_image_optimized(
         &format!("data/{id}/images"),
+        FileHostPublicity::Public,
         bytes.freeze(),
         &ext.ext,
         Some(350),
@@ -2049,6 +2053,7 @@ pub async fn delete_gallery_item(
     delete_old_images(
         Some(item.image_url),
         Some(item.raw_image_url),
+        FileHostPublicity::Public,
         &***file_host,
     )
     .await?;

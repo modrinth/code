@@ -85,11 +85,10 @@ During development, you might notice that changes made directly to entities in t
 
 #### CDN options
 
-`STORAGE_BACKEND`: Controls what storage backend is used. This can be either `local`, `backblaze`, or `s3`, but defaults to `local`
+`STORAGE_BACKEND`: Controls what storage backend is used. This can be either `local` or `s3`, but defaults to `local`
 
-The Backblaze and S3 configuration options are fairly self-explanatory in name, so here's simply their names:  
-`BACKBLAZE_KEY_ID`, `BACKBLAZE_KEY`, `BACKBLAZE_BUCKET_ID`  
-`S3_ACCESS_TOKEN`, `S3_SECRET`, `S3_URL`, `S3_REGION`, `S3_BUCKET_NAME`
+The S3 configuration options are fairly self-explanatory in name, so here's simply their names:
+`S3_ACCESS_TOKEN`, `S3_SECRET`, `S3_URL`, `S3_REGION`, `S3_PUBLIC_BUCKET_NAME`, `S3_PRIVATE_BUCKET_NAME`, `S3_USES_PATH_STYLE_BUCKETS`
 
 #### Search, OAuth, and miscellaneous options
 

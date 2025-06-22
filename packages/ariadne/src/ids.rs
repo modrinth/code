@@ -71,7 +71,6 @@ pub enum DecodingError {
 }
 
 #[macro_export]
-#[doc(hidden)]
 macro_rules! impl_base62_display {
     ($struct:ty) => {
         impl std::fmt::Display for $struct {
