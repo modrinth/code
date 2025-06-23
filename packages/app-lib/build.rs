@@ -5,7 +5,8 @@ fn main() {
     println!("cargo::rerun-if-changed=java/build/libs/theseus.jar");
     println!("cargo::rerun-if-changed=java/gradle");
     println!("cargo::rerun-if-changed=java/src");
-    println!("cargo::rerun-if-changed=java/*.gradle.kts");
+    println!("cargo::rerun-if-changed=java/build.gradle.kts");
+    println!("cargo::rerun-if-changed=java/settings.gradle.kts");
     println!("cargo::rerun-if-changed=java/gradle.properties");
 
     let gradle_path = fs::canonicalize(
