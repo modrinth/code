@@ -17,6 +17,10 @@ java {
   }
 }
 
+tasks.withType<JavaCompile>().configureEach {
+  options.compilerArgs.addAll(listOf("-Xlint:all", "-Werror"))
+}
+
 tasks.jar {
   archiveFileName = "theseus.jar"
 }
