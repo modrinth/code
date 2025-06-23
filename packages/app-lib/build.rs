@@ -28,6 +28,7 @@ fn main() {
         .arg(build_dir_str)
         .arg("build")
         .arg("--no-daemon")
+        .arg("--console=rich")
         .current_dir(dunce::canonicalize("java").unwrap())
         .status()
         .expect("Failed to wait on Gradle build");
