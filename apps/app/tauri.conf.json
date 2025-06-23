@@ -31,7 +31,7 @@
       "signingIdentity": null
     },
     "resources": {
-      "../../packages/app-lib/java/build/libs/theseus.jar": "theseus.jar"
+      "../../target/theseus-resources/theseus.jar": "theseus.jar"
     },
     "shortDescription": "",
     "linux": {

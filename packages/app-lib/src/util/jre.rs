@@ -275,7 +275,7 @@ pub async fn check_java_at_filepath(path: &Path) -> crate::Result<JavaVersion> {
     let (_temp, file_path) = get_resource_file!(
         "theseus.jar",
         tauri_base_dir: "",
-        include_bytes_dir: "../../java/build/libs/",
+        include_bytes_dir: "../../../../target/theseus-resources/",
     )?;
 
     let output = Command::new(&java)

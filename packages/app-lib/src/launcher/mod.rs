@@ -592,7 +592,7 @@ pub async fn launch_minecraft(
     let (main_class_keep_alive, main_class_path) = get_resource_file!(
         "theseus.jar",
         tauri_base_dir: "",
-        include_bytes_dir: "../../java/build/libs/",
+        include_bytes_dir: "../../../../target/theseus-resources/",
     )?;
 
     command.args(
