@@ -590,9 +590,9 @@ pub async fn launch_minecraft(
     }
 
     let (main_class_keep_alive, main_class_path) = get_resource_file!(
-        "MinecraftLaunch.class",
-        tauri_base_dir: "library",
-        include_bytes_dir: "../../library",
+        "theseus.jar",
+        tauri_base_dir: "",
+        include_bytes_dir: "../../java/build/libs/",
     )?;
 
     command.args(
@@ -605,7 +605,7 @@ pub async fn launch_minecraft(
             &args::get_class_paths(
                 &state.directories.libraries_dir(),
                 version_info.libraries.as_slice(),
-                &[main_class_path.parent().unwrap(), &client_path],
+                &[&main_class_path, &client_path],
                 &java_version.architecture,
                 minecraft_updated,
             )?,
@@ -628,7 +628,7 @@ pub async fn launch_minecraft(
     }
 
     command
-        .arg("MinecraftLaunch")
+        .arg("com.modrinth.theseus.MinecraftLaunch")
         .arg(version_info.main_class.clone())
         .args(
             args::get_minecraft_arguments(

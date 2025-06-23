@@ -1,3 +1,5 @@
+package com.modrinth.theseus;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;

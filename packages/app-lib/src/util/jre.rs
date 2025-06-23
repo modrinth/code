@@ -273,15 +273,15 @@ pub async fn check_java_at_filepath(path: &Path) -> crate::Result<JavaVersion> {
     };
 
     let (_temp, file_path) = get_resource_file!(
-        "JavaInfo.class",
-        tauri_base_dir: "library",
-        include_bytes_dir: "../../library",
+        "theseus.jar",
+        tauri_base_dir: "",
+        include_bytes_dir: "../../java/build/libs/",
     )?;
 
     let output = Command::new(&java)
         .arg("-cp")
-        .arg(file_path.parent().unwrap())
-        .arg("JavaInfo")
+        .arg(file_path)
+        .arg("com.modrinth.theseus.JavaInfo")
         .env_remove("_JAVA_OPTIONS")
         .output()?;
 

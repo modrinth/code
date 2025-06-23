@@ -321,7 +321,7 @@ macro_rules! get_resource_file {
                 };
                 let path_resolver = tauri::Manager::path(&state.app);
                 let path = match path_resolver.resolve(
-                    concat!($tauri_base_dir, "/", $file_name),
+                    concat!($tauri_base_dir, $file_name),
                     tauri::path::BaseDirectory::Resource,
                 ) {
                     Ok(path) => path,
@@ -357,11 +357,7 @@ macro_rules! get_resource_file {
                 };
                 if let Err(e) = $crate::util::io::write(
                     &path,
-                    include_bytes!(concat!(
-                        $include_bytes_dir,
-                        "/",
-                        $file_name
-                    )),
+                    include_bytes!(concat!($include_bytes_dir, $file_name)),
                 )
                 .await
                 {

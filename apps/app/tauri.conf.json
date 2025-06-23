@@ -31,7 +31,7 @@
       "signingIdentity": null
     },
     "resources": {
-      "../../packages/app-lib/library/*.class": "library/"
+      "../../packages/app-lib/java/build/libs/theseus.jar": "theseus.jar"
     },
     "shortDescription": "",
     "linux": {

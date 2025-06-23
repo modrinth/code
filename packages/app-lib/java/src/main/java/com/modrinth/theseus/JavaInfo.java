@@ -1,3 +1,5 @@
+package com.modrinth.theseus;
+
 public final class JavaInfo {
   private static final String[] CHECKED_PROPERTIES = new String[] {
       "os.arch",
