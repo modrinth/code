@@ -1,35 +1,43 @@
 plugins {
-  java
+    java
+    id("com.diffplug.spotless") version "7.0.4"
 }
 
 repositories {
-  mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-  testImplementation(libs.junit.jupiter)
-  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 java {
-  toolchain {
-    languageVersion = JavaLanguageVersion.of(8)
-  }
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
 }
 
 tasks.withType<JavaCompile>().configureEach {
-  options.compilerArgs.addAll(listOf("-Xlint:all", "-Werror"))
+    options.compilerArgs.addAll(listOf("-Xlint:all", "-Werror"))
+}
+
+spotless {
+    java {
+        palantirJavaFormat()
+        removeUnusedImports()
+    }
 }
 
 tasks.jar {
-  archiveFileName = "theseus.jar"
+    archiveFileName = "theseus.jar"
 }
 
 tasks.named<Test>("test") {
-  useJUnitPlatform()
+    useJUnitPlatform()
 }
 
 tasks.withType<AbstractArchiveTask>().configureEach {
-  isPreserveFileTimestamps = false
-  isReproducibleFileOrder = true
+    isPreserveFileTimestamps = false
+    isReproducibleFileOrder = true
 }
