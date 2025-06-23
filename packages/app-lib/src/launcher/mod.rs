@@ -747,7 +747,7 @@ pub async fn launch_minecraft(
             async |process: &ProcessMetadata, stdin| {
                 let process_start_time = process.start_time.to_rfc3339();
                 let profile_created_time = profile.created.to_rfc3339();
-                let profile_modified_time = profile.created.to_rfc3339();
+                let profile_modified_time = profile.modified.to_rfc3339();
                 let system_properties = [
                     ("modrinth.process.startTime", Some(&process_start_time)),
                     ("modrinth.profile.created", Some(&profile_created_time)),
