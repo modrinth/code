@@ -24,3 +24,8 @@ tasks.jar {
 tasks.named<Test>("test") {
   useJUnitPlatform()
 }
+
+tasks.withType<AbstractArchiveTask>().configureEach {
+  isPreserveFileTimestamps = false
+  isReproducibleFileOrder = true
+}
