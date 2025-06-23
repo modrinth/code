@@ -48,14 +48,14 @@
 import { ref, nextTick, computed } from 'vue'
 import { SpinnerIcon, SaveIcon, XIcon, IssuesIcon } from '@modrinth/assets'
 import type { Backup } from '@modrinth/utils'
-import type { ModrinthServer } from '../../../../composables'
-import NewModal from '../../../modal/NewModal.vue'
-import { injectNotificationManager } from '../../../../providers'
+import {
+  NewModal,
+  injectNotificationManager,
+  ButtonStyled,
+  injectModrinthServerContext,
+} from '@modrinth/ui'
 
-const props = defineProps<{
-  server: ModrinthServer
-}>()
-
+const { server } = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
 
 const modal = ref<InstanceType<typeof NewModal>>()
@@ -69,17 +69,17 @@ const currentBackup = ref<Backup | null>(null)
 const trimmedName = computed(() => backupName.value.trim())
 
 const nameExists = computed(() => {
-  if (!props.server.backups?.data || trimmedName.value === originalName.value || isRenaming.value) {
+  if (!server.value.backups?.data || trimmedName.value === originalName.value || isRenaming.value) {
     return false
   }
 
-  return props.server.backups.data.some(
+  return server.value.backups.data.some(
     (backup: Backup) => backup.name.trim().toLowerCase() === trimmedName.value.toLowerCase(),
   )
 })
 
 const backupNumber = computed(
-  () => (props.server.backups?.data?.findIndex((b) => b.id === currentBackup.value?.id) ?? 0) + 1,
+  () => (server.value.backups?.data?.findIndex((b) => b.id === currentBackup.value?.id) ?? 0) + 1,
 )
 
 const focusInput = () => {
@@ -125,9 +125,9 @@ const renameBackup = async () => {
       newName = `Backup #${backupNumber.value}`
     }
 
-    await props.server.backups?.rename(currentBackup.value.id, newName)
+    await server.value.backups?.rename(currentBackup.value.id, newName)
     hide()
-    await props.server.refresh()
+    await server.value.refresh()
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     addNotification({ type: 'error', title: 'Error renaming backup', text: message })

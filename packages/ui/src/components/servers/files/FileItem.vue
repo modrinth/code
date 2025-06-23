@@ -82,12 +82,9 @@ import {
   FileImageIcon,
   PaletteIcon,
 } from '@modrinth/assets'
-import { computed, shallowRef, ref, defineProps, defineEmits, h } from 'vue'
+import { computed, ref, defineProps, defineEmits, h } from 'vue'
 import { renderToString } from 'vue/server-renderer'
-import { useRouter, useRoute } from 'vue-router'
-
-import ButtonStyled from '../../base/ButtonStyled.vue'
-import TeleportOverflowMenu from '../../base/TeleportOverflowMenu.vue'
+import { ButtonStyled, TeleportOverflowMenu } from '@modrinth/ui'
 
 interface FileItemProps {
   name: string
@@ -108,6 +105,7 @@ const emit = defineEmits<{
   ): void
   (e: 'moveDirectTo', item: { name: string; type: string; path: string; destination: string }): void
   (e: 'contextmenu', x: number, y: number): void
+  (e: 'navigate', path: string): void
 }>()
 
 const isDragOver = ref(false)
@@ -144,9 +142,6 @@ const textExtensions = Object.freeze(['txt', 'md', 'log', 'cfg', 'conf', 'proper
 const imageExtensions = Object.freeze(['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'])
 const supportedArchiveExtensions = Object.freeze(['zip'])
 const units = Object.freeze(['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'])
-
-const route = shallowRef(useRoute())
-const router = useRouter()
 
 const containerClasses = computed(() => [
   'group m-0 p-0 focus:!outline-none flex w-full select-none items-center justify-between overflow-hidden border-0 border-b border-solid border-bg-raised p-3 last:border-none hover:bg-bg-raised focus:bg-bg-raised',
@@ -267,11 +262,7 @@ const openContextMenu = (event: MouseEvent) => {
 }
 
 const navigateToFolder = () => {
-  const currentPath = route.value.query.path?.toString() || ''
-  const newPath = currentPath.endsWith('/')
-    ? `${currentPath}${props.name}`
-    : `${currentPath}/${props.name}`
-  router.push({ query: { path: newPath, page: 1 } })
+  emit('navigate', props.path)
 }
 
 const isNavigating = ref(false)

@@ -44,9 +44,7 @@
 <script setup lang="ts">
 import { ref, defineEmits, defineProps, defineExpose } from 'vue'
 import { FileIcon, FolderOpenIcon, TrashIcon, XIcon } from '@modrinth/assets'
-
-import ButtonStyled from '../../../base/ButtonStyled.vue'
-import NewModal from '../../../modal/NewModal.vue'
+import { ButtonStyled, NewModal } from "@modrinth/ui"
 
 defineProps<{
   item: {

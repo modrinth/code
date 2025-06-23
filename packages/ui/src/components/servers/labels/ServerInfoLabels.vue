@@ -13,6 +13,7 @@
       :loader-version="serverData.loader_version ?? ''"
       :no-separator="column"
       :is-link="linked"
+      :tags="tags"
       :link-component="linkComponent"
       :server-id="serverId"
     />
@@ -33,10 +34,13 @@
 
 <script setup lang="ts">
 import type { Component } from 'vue'
-import ServerGameLabel from './ServerGameLabel.vue'
-import ServerLoaderLabel from './ServerLoaderLabel.vue'
-import ServerSubdomainLabel from './ServerSubdomainLabel.vue'
-import ServerUptimeLabel from './ServerUptimeLabel.vue'
+import {
+  ServerGameLabel,
+  ServerLoaderLabel,
+  ServerSubdomainLabel,
+  ServerUptimeLabel,
+  type LoaderTag,
+} from '@modrinth/ui'
 
 interface ServerInfoLabelsProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,6 +52,9 @@ interface ServerInfoLabelsProps {
   linked?: boolean
   serverId: string
   linkComponent?: Component
+  tags: {
+    loaders: LoaderTag[]
+  }
 }
 
 defineProps<ServerInfoLabelsProps>()

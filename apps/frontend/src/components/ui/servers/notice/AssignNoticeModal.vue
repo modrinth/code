@@ -9,7 +9,7 @@ import {
 } from "@modrinth/ui";
 import { PlusIcon, XIcon } from "@modrinth/assets";
 import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useServersFetchSimple } from "~/utils/frontend-servers.ts";
 
 const { addNotification } = injectNotificationManager();

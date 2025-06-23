@@ -276,7 +276,7 @@ import dayjs from "dayjs";
 import { useVIntl } from "@vintl/vintl";
 import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
 import { computed } from "vue";
-import AssignNoticeModal from "~/components/ui/servers/notice/AssignNoticeModal.vue";
+import AssignNoticeModal from "../../../components/ui/servers/notice/AssignNoticeModal.vue";
 import { useServersFetchSimple } from "~/utils/frontend-servers.ts";
 
 const { formatMessage } = useVIntl();

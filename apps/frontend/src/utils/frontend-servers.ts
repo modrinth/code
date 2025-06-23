@@ -1,10 +1,4 @@
-import {
-  useModrinthServers,
-  useServersFetch,
-  type ServersFetchOptions,
-  type StateStorage,
-} from "@modrinth/ui";
-import type { ModuleName } from "@modrinth/utils";
+import { useServersFetch, type ServersFetchOptions, type StateStorage } from "@modrinth/ui";
 import { useAuth } from "~/composables/auth.js";
 
 /**
@@ -22,21 +16,6 @@ export class NuxtStateStorage implements StateStorage {
   getRef(key: string): Ref<any> {
     return useState(key);
   }
-}
-
-export async function useModrinthServersSimple(serverId: string, modules: ModuleName[]) {
-  const auth = await useAuth();
-  const config = useRuntimeConfig();
-  const base = import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl;
-
-  return await useModrinthServers(
-    serverId,
-    auth.value.token,
-    base,
-    handleServersError,
-    new NuxtStateStorage(),
-    modules,
-  );
 }
 
 export async function useServersFetchSimple<T>(

@@ -89,8 +89,8 @@
               noCompatibleVersions
                 ? `No compatible versions of this ${type.toLowerCase()} were found`
                 : versionFilter
-                  ? "Game version and platform is provided by the server"
-                  : "Incompatible game version and platform versions are unlocked"
+                  ? 'Game version and platform is provided by the server'
+                  : 'Incompatible game version and platform versions are unlocked'
             }}
           </span>
         </p>
@@ -120,21 +120,20 @@
         >
           <template #platform>
             <LoaderIcon
-              v-if="filtersRef?.selectedPlatforms.length === 0"
-              :loader="'Vanilla'"
+              :loader="
+                ((filtersRef?.selectedPlatforms?.length === 0
+                  ? 'Vanilla'
+                  : filtersRef?.selectedPlatforms[0]) || 'Vanilla') as Loaders
+              "
+              :tags="tags"
               class="size-5 flex-none"
             />
-            <svg
-              v-else
-              class="size-5 flex-none"
-              v-html="tags.loaders.find((x) => x.name === filtersRef?.selectedPlatforms[0])?.icon"
-            ></svg>
 
             <div class="w-full truncate text-left">
               {{
                 filtersRef?.selectedPlatforms.length === 0
-                  ? "All platforms"
-                  : filtersRef?.selectedPlatforms.map((x) => formatCategory(x)).join(", ")
+                  ? 'All platforms'
+                  : filtersRef?.selectedPlatforms.map((x) => formatCategory(x)).join(', ')
               }}
             </div>
           </template>
@@ -143,8 +142,8 @@
             <div class="w-full truncate text-left">
               {{
                 filtersRef?.selectedGameVersions.length === 0
-                  ? "All game versions"
-                  : filtersRef?.selectedGameVersions.join(", ")
+                  ? 'All game versions'
+                  : filtersRef?.selectedGameVersions.join(', ')
               }}
             </div>
           </template>
@@ -156,19 +155,19 @@
             :disabled="gameVersions.length < 2 && platforms.length < 2"
             @click="
               () => {
-                versionFilter = !versionFilter;
-                setInitialFilters();
-                updateFiltersToUi();
+                versionFilter = !versionFilter
+                setInitialFilters()
+                updateFiltersToUi()
               }
             "
           >
             <LockOpenIcon />
             {{
               gameVersions.length < 2 && platforms.length < 2
-                ? "No other platforms or versions available"
+                ? 'No other platforms or versions available'
                 : versionFilter
-                  ? "Unlock"
-                  : "Return to compatibility"
+                  ? 'Unlock'
+                  : 'Return to compatibility'
             }}
           </button>
         </ButtonStyled>
@@ -190,7 +189,7 @@
       </Admonition>
 
       <Admonition
-        v-else-if="props.modPack"
+        v-else-if="modpack"
         type="warning"
         header="Changing version may cause issues"
         class="mb-2"
@@ -199,7 +198,7 @@
         the mod.
         <NuxtLink
           class="mt-2 flex items-center gap-1"
-          :to="`/servers/manage/${props.serverId}/options/loader`"
+          :to="`/servers/manage/${serverId}/options/loader`"
           target="_blank"
         >
           <ExternalIcon class="size-5 flex-none"></ExternalIcon> Modify modpack version
@@ -235,111 +234,133 @@ import {
   LockOpenIcon,
   GameIcon,
   ExternalIcon,
-} from "@modrinth/assets";
-import { Admonition, ButtonStyled, NewModal, TagItem } from "@modrinth/ui";
-import { ref, computed } from "vue";
-import { formatCategory, formatVersionsForDisplay, type Mod, type Version } from "@modrinth/utils";
-import Accordion from "~/components/ui/Accordion.vue";
-import Checkbox from "~/components/ui/Checkbox.vue";
-import ContentVersionFilter, {
+} from '@modrinth/assets'
+import {
+  Admonition,
+  ButtonStyled,
+  NewModal,
+  TagItem,
+  ContentVersionFilter,
+  LoaderIcon,
+  Checkbox,
+  Accordion,
   type ListedGameVersion,
   type ListedPlatform,
-} from "~/components/ui/servers/ContentVersionFilter.vue";
-import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
+  type LoaderTag,
+  injectModrinthServerContext,
+} from '@modrinth/ui'
+import { ref, computed, type Ref } from 'vue'
+import {
+  formatCategory,
+  formatVersionsForDisplay,
+  type GameVersionTag,
+  type Loaders,
+  type Mod,
+  type Version,
+} from '@modrinth/utils'
+
+const { server } = injectModrinthServerContext()
+
+const modpack = computed(() => Boolean(server.value.general?.upstream))
+const gameVersion = computed(() => server.value.general?.mc_version ?? '')
+const loader = computed(() => server.value.general?.loader?.toLowerCase() ?? '')
+const serverId = computed(() => server.value.serverId)
 
 const props = defineProps<{
-  type: "Mod" | "Plugin";
-  loader: string;
-  gameVersion: string;
-  modPack: boolean;
-  serverId: string;
-}>();
+  type: 'Mod' | 'Plugin'
+  tags: {
+    loaders: LoaderTag[]
+    gameVersions: GameVersionTag[]
+  }
+  // TODO: This must be replaced in the future. Temporary for now.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  useBaseFetch: (...x: any) => Promise<any>
+}>()
 
 interface ContentItem extends Mod {
-  changing?: boolean;
+  changing?: boolean
 }
 
 interface EditVersion extends Version {
-  installed: boolean;
-  upgrade?: boolean;
+  installed: boolean
+  upgrade?: boolean
 }
 
-const modModal = ref();
-const modDetails = ref<ContentItem>();
-const currentVersions = ref<EditVersion[] | null>(null);
-const versionsLoading = ref(false);
-const versionsError = ref("");
-const showBetaAlphaReleases = ref(false);
-const unlockFilterAccordion = ref();
-const versionFilter = ref(true);
-const tags = useTags();
-const noCompatibleVersions = ref(false);
+const modModal = ref()
+const modDetails = ref<ContentItem>()
+const currentVersions = ref<EditVersion[] | null>(null)
+const versionsLoading = ref(false)
+const versionsError = ref('')
+const showBetaAlphaReleases = ref(false)
+const unlockFilterAccordion = ref()
+const versionFilter = ref(true)
+const noCompatibleVersions = ref(false)
 
-const { pluginLoaders, modLoaders } = tags.value.loaders.reduce(
+const { pluginLoaders, modLoaders } = props.tags.loaders.reduce(
   (acc, tag) => {
-    if (tag.supported_project_types.includes("plugin")) {
-      acc.pluginLoaders.push(tag.name);
+    if (tag.supported_project_types.includes('plugin')) {
+      acc.pluginLoaders.push(tag.name)
     }
-    if (tag.supported_project_types.includes("mod")) {
-      acc.modLoaders.push(tag.name);
+    if (tag.supported_project_types.includes('mod')) {
+      acc.modLoaders.push(tag.name)
     }
-    return acc;
+    return acc
   },
   { pluginLoaders: [] as string[], modLoaders: [] as string[] },
-);
+)
 
-const selectedVersion = ref();
-const filtersRef: Ref<InstanceType<typeof ContentVersionFilter> | null> = ref(null);
+const selectedVersion = ref()
+const filtersRef: Ref<InstanceType<typeof ContentVersionFilter> | null> = ref(null)
 interface SelectedContentFilters {
-  selectedGameVersions: string[];
-  selectedPlatforms: string[];
+  selectedGameVersions: string[]
+  selectedPlatforms: string[]
 }
 const selectedFilters = ref<SelectedContentFilters>({
   selectedGameVersions: [],
   selectedPlatforms: [],
-});
+})
 
 const backwardCompatPlatformMap = {
-  purpur: ["purpur", "paper", "spigot", "bukkit"],
-  paper: ["paper", "spigot", "bukkit"],
-  spigot: ["spigot", "bukkit"],
-};
+  purpur: ['purpur', 'paper', 'spigot', 'bukkit'],
+  paper: ['paper', 'spigot', 'bukkit'],
+  spigot: ['spigot', 'bukkit'],
+}
 
-const platforms = ref<ListedPlatform[]>([]);
-const gameVersions = ref<ListedGameVersion[]>([]);
-const initPlatform = ref<string>("");
+const platforms = ref<ListedPlatform[]>([])
+const gameVersions = ref<ListedGameVersion[]>([])
+const initPlatform = ref<string>('')
 
 const setInitialFilters = () => {
   selectedFilters.value = {
     selectedGameVersions: [
-      gameVersions.value.find((version) => version.name === props.gameVersion)?.name ??
+      gameVersions.value.find((version) => version.name === gameVersion.value)?.name ??
         gameVersions.value.find((version) => version.release)?.name ??
         gameVersions.value[0]?.name,
     ],
     selectedPlatforms: [initPlatform.value],
-  };
-};
+  }
+}
 
 const updateFiltersToUi = () => {
-  if (!filtersRef.value) return;
-  filtersRef.value.selectedGameVersions = selectedFilters.value.selectedGameVersions;
-  filtersRef.value.selectedPlatforms = selectedFilters.value.selectedPlatforms;
+  if (!filtersRef.value) return
+  filtersRef.value.selectedGameVersions = selectedFilters.value.selectedGameVersions
+  filtersRef.value.selectedPlatforms = selectedFilters.value.selectedPlatforms
 
-  selectedVersion.value = filteredVersions.value[0];
-};
+  selectedVersion.value = filteredVersions.value[0]
+}
 
 const updateFiltersFromUi = (event: { g: string[]; l: string[] }) => {
   selectedFilters.value = {
     selectedGameVersions: event.g,
     selectedPlatforms: event.l,
-  };
-};
+  }
+}
 
 const filteredVersions = computed(() => {
-  if (!currentVersions.value) return [];
+  if (!currentVersions.value) return []
 
   const versionsWithoutReleaseFilter = currentVersions.value.filter((version: EditVersion) => {
-    if (version.installed) return true;
+    if (version.installed) return true
     return (
       filtersRef.value?.selectedPlatforms.every((platform) =>
         (
@@ -351,181 +372,179 @@ const filteredVersions = computed(() => {
       filtersRef.value?.selectedGameVersions.every((gameVersion) =>
         version.game_versions.includes(gameVersion),
       )
-    );
-  });
+    )
+  })
 
-  const versionTypes = new Set(
-    versionsWithoutReleaseFilter.map((v: EditVersion) => v.version_type),
-  );
-  const releaseVersions = versionTypes.has("release");
-  const betaVersions = versionTypes.has("beta");
-  const alphaVersions = versionTypes.has("alpha");
+  const versionTypes = new Set(versionsWithoutReleaseFilter.map((v: EditVersion) => v.version_type))
+  const releaseVersions = versionTypes.has('release')
+  const betaVersions = versionTypes.has('beta')
+  const alphaVersions = versionTypes.has('alpha')
 
   const versions = versionsWithoutReleaseFilter.filter((version: EditVersion) => {
-    if (showBetaAlphaReleases.value || version.installed) return true;
+    if (showBetaAlphaReleases.value || version.installed) return true
     return releaseVersions
-      ? version.version_type === "release"
+      ? version.version_type === 'release'
       : betaVersions
-        ? version.version_type === "beta"
+        ? version.version_type === 'beta'
         : alphaVersions
-          ? version.version_type === "alpha"
-          : false;
-  });
+          ? version.version_type === 'alpha'
+          : false
+  })
 
   return versions.map((version: EditVersion) => {
-    let suffix = "";
+    let suffix = ''
 
-    if (version.version_type === "alpha" && releaseVersions && betaVersions) {
-      suffix += " (alpha)";
-    } else if (version.version_type === "beta" && releaseVersions) {
-      suffix += " (beta)";
+    if (version.version_type === 'alpha' && releaseVersions && betaVersions) {
+      suffix += ' (alpha)'
+    } else if (version.version_type === 'beta' && releaseVersions) {
+      suffix += ' (beta)'
     }
 
     return {
       ...version,
       version_number: version.version_number + suffix,
-    };
-  });
-});
+    }
+  })
+})
 
 const formattedVersions = computed(() => {
   return {
     game_versions: formatVersionsForDisplay(
       selectedVersion.value?.game_versions || [],
-      tags.value.gameVersions,
+      props.tags.gameVersions,
     ),
     loaders: (selectedVersion.value?.loaders || [])
       .sort((firstLoader: string, secondLoader: string) => {
         const loaderList = backwardCompatPlatformMap[
-          props.loader as keyof typeof backwardCompatPlatformMap
-        ] || [props.loader];
+          loader.value as keyof typeof backwardCompatPlatformMap
+        ] || [loader.value]
 
-        const firstLoaderPosition = loaderList.indexOf(firstLoader.toLowerCase());
-        const secondLoaderPosition = loaderList.indexOf(secondLoader.toLowerCase());
+        const firstLoaderPosition = loaderList.indexOf(firstLoader.toLowerCase())
+        const secondLoaderPosition = loaderList.indexOf(secondLoader.toLowerCase())
 
-        if (firstLoaderPosition === -1 && secondLoaderPosition === -1) return 0;
-        if (firstLoaderPosition === -1) return 1;
-        if (secondLoaderPosition === -1) return -1;
-        return firstLoaderPosition - secondLoaderPosition;
+        if (firstLoaderPosition === -1 && secondLoaderPosition === -1) return 0
+        if (firstLoaderPosition === -1) return 1
+        if (secondLoaderPosition === -1) return -1
+        return firstLoaderPosition - secondLoaderPosition
       })
       .map((loader: string) => formatCategory(loader)),
-  };
-});
+  }
+})
 
 async function show(mod: ContentItem) {
-  versionFilter.value = true;
-  modModal.value.show();
-  versionsLoading.value = true;
-  modDetails.value = mod;
-  versionsError.value = "";
-  currentVersions.value = null;
+  versionFilter.value = true
+  modModal.value.show()
+  versionsLoading.value = true
+  modDetails.value = mod
+  versionsError.value = ''
+  currentVersions.value = null
 
   try {
-    const result = await useBaseFetch(`project/${mod.project_id}/version`, {}, false);
+    const result = await props.useBaseFetch(`project/${mod.project_id}/version`, {}, false)
     if (
       Array.isArray(result) &&
       result.every(
         (item) =>
-          "id" in item &&
-          "version_number" in item &&
-          "version_type" in item &&
-          "loaders" in item &&
-          "game_versions" in item,
+          'id' in item &&
+          'version_number' in item &&
+          'version_type' in item &&
+          'loaders' in item &&
+          'game_versions' in item,
       )
     ) {
-      currentVersions.value = result as EditVersion[];
+      currentVersions.value = result as EditVersion[]
     } else {
-      throw new Error("Invalid version data received.");
+      throw new Error('Invalid version data received.')
     }
 
     // find the installed version and move it to the top of the list
     const currentModIndex = currentVersions.value.findIndex(
       (item: { id: string }) => item.id === mod.version_id,
-    );
+    )
     if (currentModIndex === -1) {
       currentVersions.value[currentModIndex] = {
         ...currentVersions.value[currentModIndex],
         installed: true,
         version_number: `${mod.version_number} (current) (external)`,
-      };
+      }
     } else {
-      currentVersions.value[currentModIndex].version_number = `${mod.version_number} (current)`;
-      currentVersions.value[currentModIndex].installed = true;
+      currentVersions.value[currentModIndex].version_number = `${mod.version_number} (current)`
+      currentVersions.value[currentModIndex].installed = true
     }
 
     // initially filter the platform and game versions for the server config
-    const platformSet = new Set<string>();
-    const gameVersionSet = new Set<string>();
+    const platformSet = new Set<string>()
+    const gameVersionSet = new Set<string>()
     for (const version of currentVersions.value) {
       for (const loader of version.loaders) {
-        platformSet.add(loader);
+        platformSet.add(loader)
       }
       for (const gameVersion of version.game_versions) {
-        gameVersionSet.add(gameVersion);
+        gameVersionSet.add(gameVersion)
       }
     }
     if (gameVersionSet.size > 0) {
-      const filteredGameVersions = tags.value.gameVersions.filter((x) =>
+      const filteredGameVersions = props.tags.gameVersions.filter((x) =>
         gameVersionSet.has(x.version),
-      );
+      )
 
       gameVersions.value = filteredGameVersions.map((x) => ({
         name: x.version,
-        release: x.version_type === "release",
-      }));
+        release: x.version_type === 'release',
+      }))
     }
     if (platformSet.size > 0) {
       const tempPlatforms = Array.from(platformSet).map((platform) => ({
         name: platform,
         isType:
-          props.type === "Plugin"
+          props.type === 'Plugin'
             ? pluginLoaders.includes(platform)
-            : props.type === "Mod"
+            : props.type === 'Mod'
               ? modLoaders.includes(platform)
               : false,
-      }));
-      platforms.value = tempPlatforms;
+      }))
+      platforms.value = tempPlatforms
     }
 
     // set default platform
-    const defaultPlatform = Array.from(platformSet)[0];
-    initPlatform.value = platformSet.has(props.loader)
-      ? props.loader
-      : props.loader in backwardCompatPlatformMap
-        ? backwardCompatPlatformMap[props.loader as keyof typeof backwardCompatPlatformMap].find(
+    const defaultPlatform = Array.from(platformSet)[0]
+    initPlatform.value = platformSet.has(loader.value)
+      ? loader.value
+      : loader.value in backwardCompatPlatformMap
+        ? backwardCompatPlatformMap[loader.value as keyof typeof backwardCompatPlatformMap].find(
             (p) => platformSet.has(p),
           ) || defaultPlatform
-        : defaultPlatform;
+        : defaultPlatform
 
     // check if there's nothing compatible with the server config
     noCompatibleVersions.value =
       !platforms.value.some((p) => p.isType) ||
-      !gameVersions.value.some((v) => v.name === props.gameVersion);
+      !gameVersions.value.some((v) => v.name === gameVersion.value)
 
     if (noCompatibleVersions.value) {
-      unlockFilterAccordion.value.open();
-      versionFilter.value = false;
+      unlockFilterAccordion.value.open()
+      versionFilter.value = false
     }
 
-    setInitialFilters();
-    versionsLoading.value = false;
+    setInitialFilters()
+    versionsLoading.value = false
   } catch (error) {
-    console.error("Error loading versions:", error);
-    versionsError.value = error instanceof Error ? error.message : "Unknown";
+    console.error('Error loading versions:', error)
+    versionsError.value = error instanceof Error ? error.message : 'Unknown'
   }
 }
 
 const emit = defineEmits<{
-  changeVersion: [string];
-}>();
+  changeVersion: [string]
+}>()
 
 function emitChangeModVersion() {
-  if (!selectedVersion.value) return;
-  emit("changeVersion", selectedVersion.value.id.toString());
+  if (!selectedVersion.value) return
+  emit('changeVersion', selectedVersion.value.id.toString())
 }
 
 defineExpose({
   show,
   hide: () => modModal.value.hide(),
-});
+})
 </script>

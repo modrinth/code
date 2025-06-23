@@ -18,7 +18,7 @@ import {
   WrenchIcon,
 } from "@modrinth/assets";
 import { ModrinthServer } from "@modrinth/ui";
-import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
+import type { BackupInProgressReason } from "@modrinth/utils";
 
 const route = useRoute();
 const serverId = route.params.id as string;

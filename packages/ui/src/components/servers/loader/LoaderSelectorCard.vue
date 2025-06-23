@@ -7,6 +7,7 @@
       >
         <LoaderIcon
           :loader="loader.name"
+          :tags="tags"
           class="[&&]:size-6"
           :class="isCurrentLoader ? 'text-brand' : ''"
         />
@@ -33,40 +34,43 @@
     <ButtonStyled>
       <button :disabled="isInstalling" @click="onSelect">
         <DownloadIcon class="h-5 w-5" />
-        {{ isCurrentLoader ? "Reinstall" : "Install" }}
+        {{ isCurrentLoader ? 'Reinstall' : 'Install' }}
       </button>
     </ButtonStyled>
   </div>
 </template>
 
 <script setup lang="ts">
-import { CheckIcon, DownloadIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
-import LoaderIcon from "./icons/LoaderIcon.vue";
+import { CheckIcon, DownloadIcon } from '@modrinth/assets'
+import { ButtonStyled, LoaderIcon, type LoaderTag } from '@modrinth/ui'
+import { computed } from 'vue'
 
 interface LoaderInfo {
-  name: "Vanilla" | "Fabric" | "Forge" | "Quilt" | "Paper" | "NeoForge" | "Purpur";
-  displayName: string;
+  name: 'Vanilla' | 'Fabric' | 'Forge' | 'Quilt' | 'Paper' | 'NeoForge' | 'Purpur'
+  displayName: string
 }
 
 interface Props {
-  loader: LoaderInfo;
-  currentLoader: string | null;
-  loaderVersion: string | null;
-  isInstalling?: boolean;
+  loader: LoaderInfo
+  currentLoader: string | null
+  loaderVersion: string | null
+  isInstalling?: boolean
+  tags: {
+    loaders: LoaderTag[]
+  }
 }
 
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  (e: "select", loader: string): void;
-}>();
+  (e: 'select', loader: string): void
+}>()
 
 const isCurrentLoader = computed(() => {
-  return props.currentLoader?.toLowerCase() === props.loader.name.toLowerCase();
-});
+  return props.currentLoader?.toLowerCase() === props.loader.name.toLowerCase()
+})
 
 const onSelect = () => {
-  emit("select", props.loader.name);
-};
+  emit('select', props.loader.name)
+}
 </script>

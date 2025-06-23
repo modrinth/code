@@ -103,12 +103,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
 import { FolderOpenIcon, CheckCircleIcon, XCircleIcon } from '@modrinth/assets'
-
-import ButtonStyled from '../../base/ButtonStyled.vue'
-import type { FSModule } from '../../../composables'
-import { injectNotificationManager } from '../../../providers'
-import PanelSpinner from '../panel/PanelSpinner.vue'
-
+import { type FSModule, injectNotificationManager, PanelSpinner, ButtonStyled } from "@modrinth/ui"
 interface Uploader {
   cancel: () => void
   onProgress?: (callback: (data: { progress: number }) => void) => void

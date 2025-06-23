@@ -1,12 +1,8 @@
 <template>
-  <UiServersContentVersionEditModal
+  <ContentVersionEditModal
     v-if="!invalidModal"
     ref="versionEditModal"
     :type="type"
-    :mod-pack="Boolean(props.server.general?.upstream)"
-    :game-version="props.server.general?.mc_version ?? ''"
-    :loader="props.server.general?.loader?.toLowerCase() ?? ''"
-    :server-id="props.server.serverId"
     @change-version="changeModVersion($event)"
   />
 
@@ -306,7 +302,7 @@
           </div>
         </div>
         <div v-else class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center">
-          <UiServersIconsLoaderIcon loader="Vanilla" class="size-24" />
+          <LoaderIcon :tags="tags" loader="Vanilla" class="size-24" />
           <p class="m-0 pt-3 font-bold text-contrast">Your server is running Vanilla Minecraft</p>
           <p class="m-0">
             Add content to your server by installing a modpack or choosing a different platform that
@@ -356,6 +352,8 @@ import {
   injectNotificationManager,
   FilesUploadDragAndDrop,
   FilesUploadDropdown,
+  LoaderIcon,
+  ContentVersionEditModal,
 } from "@modrinth/ui";
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import type { Mod } from "@modrinth/utils";
@@ -387,6 +385,7 @@ const localMods = ref<ContentItem[]>([]);
 const searchInput = ref("");
 const modSearchInput = ref("");
 const filterMethod = ref("all");
+const tags = useTags();
 
 const uploadDropdownRef = ref();
 

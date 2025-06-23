@@ -1,23 +1,43 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ModrinthServerError } from '@modrinth/utils'
 import type { JWTAuth, ModuleError, ModuleName } from '@modrinth/utils'
-import { useServersFetch, type ServersFetchOptions } from './servers-fetch.js'
+import { ModrinthServerError } from '@modrinth/utils'
+import { type ServersFetchOptions, useServersFetch } from './servers-fetch.js'
 
 import {
-  GeneralModule,
-  ContentModule,
   BackupsModule,
+  ContentModule,
+  FSModule,
+  GeneralModule,
   NetworkModule,
   StartupModule,
-  WSModule,
-  FSModule,
-} from './modules/index.js'
+  WSModule
+} from './modules'
 import { reactive, type Ref } from 'vue'
+import { injectNotificationManager } from '../../providers'
 
 export interface StateStorage {
   get(key: string): any
   set(key: string, value: any): void
   getRef(key: string): Ref<any>
+}
+
+export function handleServerError(err: any) {
+  const { addNotification } = injectNotificationManager();
+
+  if (err instanceof ModrinthServerError && err.v1Error) {
+    addNotification({
+      title: err.v1Error?.context ?? `An error occurred`,
+      type: "error",
+      text: err.v1Error.description,
+      errorCode: err.v1Error.error,
+    });
+  } else {
+    addNotification({
+      title: "An error occurred",
+      type: "error",
+      text: err.message ?? (err.data ? err.data.description : err),
+    });
+  }
 }
 
 export class ModrinthServer {
@@ -41,13 +61,12 @@ export class ModrinthServer {
     serverId: string,
     auth: string,
     base: string,
-    errorHandler: (err: any) => void,
     stateStorage: StateStorage,
   ) {
     this.serverId = serverId
     this.auth = auth
     this.base = base
-    this.errorHandler = errorHandler
+    this.errorHandler = handleServerError
     this.stateStorage = stateStorage
 
     this.general = new GeneralModule(this)
@@ -131,7 +150,7 @@ export class ModrinthServer {
         })
 
         if (fileData instanceof Blob && typeof window !== 'undefined') {
-          const dataURL = await new Promise<string>((resolve) => {
+          return await new Promise<string>((resolve) => {
             const canvas = document.createElement('canvas')
             const ctx = canvas.getContext('2d')
             const img = new Image()
@@ -146,7 +165,6 @@ export class ModrinthServer {
             }
             img.src = URL.createObjectURL(fileData)
           })
-          return dataURL
         }
       } catch (error) {
         if (error instanceof ModrinthServerError && error.statusCode === 404) {
@@ -160,7 +178,7 @@ export class ModrinthServer {
               })
 
               if (typeof window !== 'undefined') {
-                const dataURL = await new Promise<string>((resolve) => {
+                return await new Promise<string>((resolve) => {
                   const canvas = document.createElement('canvas')
                   const ctx = canvas.getContext('2d')
                   const img = new Image()
@@ -194,7 +212,6 @@ export class ModrinthServer {
                   }
                   img.src = URL.createObjectURL(file)
                 })
-                return dataURL
               }
             } catch (externalError: any) {
               console.debug('Could not process external icon:', externalError.message)
@@ -301,11 +318,10 @@ export const useModrinthServers = async (
   serverId: string,
   base: string,
   auth: string,
-  errorHandler: (err: any) => void,
   stateStorage: StateStorage,
   includedModules: ModuleName[] = ['general'],
 ) => {
-  const server = new ModrinthServer(serverId, base, auth, errorHandler, stateStorage)
+  const server = new ModrinthServer(serverId, base, auth, stateStorage)
   await server.refresh(includedModules)
   return reactive(server)
 }

@@ -44,9 +44,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-
-import FileItem from './FileItem.vue'
 import type { DirectoryItem } from '@modrinth/utils'
+import { FileItem } from "@modrinth/ui"
 
 const props = defineProps<{
   items: DirectoryItem[]

@@ -37,6 +37,7 @@
       <ServerInfoLabels
         :server-data="serverData"
         :show-game-label="true"
+        :tags="tags"
         :show-loader-label="true"
         :uptime-seconds="uptimeSeconds"
         :column="true"
@@ -119,16 +120,16 @@ import {
   ClipboardCopyIcon,
   RefreshClockwiseIcon,
 } from '@modrinth/assets'
-import { useRouter } from 'vue-router'
 import { useStorage } from '@vueuse/core'
 import type { PowerAction as ServerPowerAction, ServerState } from '@modrinth/utils'
-
-import ButtonStyled from '../../base/ButtonStyled.vue'
-import NewModal from '../../modal/NewModal.vue'
-import Checkbox from '../../base/Checkbox.vue'
-import TeleportOverflowMenu from '../../base/TeleportOverflowMenu.vue'
-import ServerInfoLabels from '../labels/ServerInfoLabels.vue'
-import PanelSpinner from './PanelSpinner.vue'
+import {
+  ButtonStyled,
+  NewModal,
+  Checkbox,
+  TeleportOverflowMenu,
+  ServerInfoLabels,
+  PanelSpinner,
+} from '@modrinth/ui'
 
 interface PowerAction {
   action: ServerPowerAction
@@ -145,18 +146,17 @@ const props = defineProps<{
   uptimeSeconds: number
   developerMode?: boolean
   showAdvancedDebugInfo?: boolean
+  serverId?: string
 }>()
 
 const emit = defineEmits<{
   (e: 'action', action: ServerPowerAction): void
 }>()
 
-const router = useRouter()
-const serverId = router.currentRoute.value.params.id
 const confirmActionModal = ref<InstanceType<typeof NewModal> | null>(null)
 const detailsModal = ref<InstanceType<typeof NewModal> | null>(null)
 
-const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
+const userPreferences = useStorage(`pyro-server-${props.serverId}-preferences`, {
   powerDontAskAgain: false,
 })
 
@@ -224,7 +224,7 @@ const menuOptions = computed(() => [
 ])
 
 async function copyId() {
-  await navigator.clipboard.writeText(serverId as string)
+  await navigator.clipboard.writeText(props.serverId as string)
 }
 
 function initiateAction(action: ServerPowerAction) {

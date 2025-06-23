@@ -35,7 +35,8 @@
 
             <li v-if="fetchError" class="text-red">
               <p>Error details:</p>
-              <UiCopyCode
+              {{ console.error(fetchError) }}
+              <CopyCode
                 :text="(fetchError as ModrinthServersFetchError).message || 'Unknown error'"
                 :copyable="false"
                 :selectable="false"
@@ -53,7 +54,7 @@
       </div>
     </div>
 
-    <LazyUiServersServerManageEmptyState
+    <ServerManageEmptyState
       v-else-if="serverList.length === 0 && !isPollingForNewServers && !hasError"
     />
 
@@ -93,7 +94,7 @@
         v-if="filteredData.length > 0 || isPollingForNewServers"
         class="m-0 flex flex-col gap-4 p-0"
       >
-        <UiServersServerListing
+        <ServerListing
           v-for="server in filteredData"
           :key="server.server_id"
           :server_id="server.server_id"
@@ -107,7 +108,7 @@
           :net="server.net"
           :flows="server.flows"
         />
-        <LazyUiServersServerListingSkeleton v-if="isPollingForNewServers" />
+        <ServerListingSkeleton v-if="isPollingForNewServers" />
       </ul>
       <div v-else class="flex h-full items-center justify-center">
         <p class="text-contrast">No servers found.</p>
@@ -120,10 +121,13 @@
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import Fuse from "fuse.js";
 import { HammerIcon, PlusIcon, SearchIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+import { ButtonStyled, CopyCode } from "@modrinth/ui";
 import type { Server, ModrinthServersFetchError } from "@modrinth/utils";
 import { reloadNuxtApp } from "#app";
 import { useServersFetchSimple } from "~/utils/frontend-servers.ts";
+import ServerManageEmptyState from "~/components/ui/servers/ServerManageEmptyState.vue";
+import ServerListing from "~/components/ui/servers/ServerListing.vue";
+import ServerListingSkeleton from "~/components/ui/servers/ServerListingSkeleton.vue";
 
 definePageMeta({
   middleware: "auth",
@@ -215,5 +219,9 @@ onUnmounted(() => {
   if (intervalId) {
     clearInterval(intervalId);
   }
+});
+
+definePageMeta({
+  layout: "default",
 });
 </script>

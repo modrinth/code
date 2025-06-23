@@ -30,8 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled } from "@modrinth/ui";
-import { ModrinthServer } from "@modrinth/ui";
+import { ButtonStyled, ModrinthServer } from "@modrinth/ui";
 
 const props = defineProps<{
   isUpdating: boolean;

@@ -56,8 +56,7 @@
 // TODO: Eventually replace this with the common image viewer used by the skins frontend & gallery page.
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { TriangleAlertIcon, ZoomInIcon, ZoomOutIcon } from '@modrinth/assets'
-
-import ButtonStyled from '../../base/ButtonStyled.vue'
+import { ButtonStyled } from "@modrinth/ui"
 
 const ZOOM_MIN = 0.1
 const ZOOM_MAX = 5

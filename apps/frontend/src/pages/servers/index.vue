@@ -152,7 +152,7 @@
           </div>
 
           <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-            <LoaderIcon loader="fabric" class="size-8 text-brand" />
+            <LoaderIcon :tags="tags" loader="fabric" class="size-8 text-brand" />
             <h2 class="m-0 text-lg font-bold">All your favorite mods</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
               Choose between Vanilla, Fabric, Forge, Quilt and NeoForge. If it's on Modrinth, it can
@@ -616,6 +616,7 @@ import {
   ButtonStyled,
   ModrinthServersPurchaseModal,
   injectNotificationManager,
+  LoaderIcon,
 } from "@modrinth/ui";
 import {
   BoxIcon,
@@ -627,7 +628,6 @@ import {
   ServerIcon,
 } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
-import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
 import ServerPlanSelector from "~/components/ui/servers/marketing/ServerPlanSelector.vue";
 import OptionGroup from "~/components/ui/OptionGroup.vue";
 
@@ -664,6 +664,7 @@ const selectedProduct = ref(null);
 const customServer = ref(false);
 const showModal = ref(false);
 const modalKey = ref(0);
+const tags = useTags();
 
 const words = ["my-smp", "medieval-masters", "create-server", "mega-smp", "spookypack"];
 const currentWordIndex = ref(0);

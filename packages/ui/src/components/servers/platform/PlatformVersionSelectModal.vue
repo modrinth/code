@@ -20,7 +20,7 @@
         }"
       >
         {{
-          "This will reinstall your server and erase all data. Are you sure you want to continue?"
+          'This will reinstall your server and erase all data. Are you sure you want to continue?'
         }}
       </p>
       <div v-if="!isSecondPhase" class="flex flex-col gap-4">
@@ -28,7 +28,7 @@
           <div
             class="grid size-16 place-content-center rounded-2xl border-[2px] border-solid border-button-border bg-button-bg shadow-sm"
           >
-            <UiServersIconsLoaderIcon class="size-10" :loader="selectedLoader" />
+            <LoaderIcon :tags="tags" class="size-10" :loader="selectedLoader" />
           </div>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -165,19 +165,19 @@
             <RightArrowIcon />
             {{
               isLoading
-                ? "Installing..."
+                ? 'Installing...'
                 : isSecondPhase
-                  ? "Erase and install"
+                  ? 'Erase and install'
                   : hardReset
-                    ? "Continue"
-                    : "Install"
+                    ? 'Continue'
+                    : 'Install'
             }}
           </button>
         </ButtonStyled>
         <ButtonStyled>
           <button :disabled="isLoading" @click="handleCancel">
             <XIcon />
-            {{ isSecondPhase ? "Go back" : "Cancel" }}
+            {{ isSecondPhase ? 'Go back' : 'Cancel' }}
           </button>
         </ButtonStyled>
       </div>
@@ -186,184 +186,192 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from "vue";
+import { ref, computed, watch, onMounted } from 'vue'
 import {
   BackupWarning,
   ButtonStyled,
+  LoaderIcon,
   NewModal,
   Toggle,
   injectNotificationManager,
   type ModrinthServer,
-} from "@modrinth/ui";
+  type LoaderTag,
+} from '@modrinth/ui'
 import {
   DropdownIcon,
   RefreshClockwiseIcon,
   RightArrowIcon,
   ServerIcon,
   XIcon,
-} from "@modrinth/assets";
-import { $fetch } from "ofetch";
-import { type Loaders, ModrinthServersFetchError } from "@modrinth/utils";
-import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
+} from '@modrinth/assets'
+import { $fetch } from 'ofetch'
+import {
+  type Loaders,
+  ModrinthServersFetchError,
+  type BackupInProgressReason,
+} from '@modrinth/utils'
+import { useVIntl } from '@vintl/vintl'
 
-const { formatMessage } = useVIntl();
+const { formatMessage } = useVIntl()
 
-interface LoaderVersion {
-  id: string;
-  stable: boolean;
-  loaders: {
-    id: string;
-    url: string;
-    stable: boolean;
-  }[];
+interface MinecraftVersion {
+  downloads?: {
+    server?: string
+  }
 }
 
-type VersionMap = Record<string, LoaderVersion[]>;
-type VersionCache = Record<string, any>;
+interface PaperApiResponse {
+  builds: number[]
+}
+
+interface PurpurApiResponse {
+  builds: {
+    all: string[]
+  }
+}
+
+interface LoaderManifest {
+  gameVersions: string[]
+}
+
+type VersionCache = Record<string, MinecraftVersion>
 
 const props = defineProps<{
-  server: ModrinthServer;
-  currentLoader: Loaders | undefined;
-  backupInProgress?: BackupInProgressReason;
-  initialSetup?: boolean;
-}>();
+  server: ModrinthServer
+  currentLoader: Loaders | undefined
+  backupInProgress?: BackupInProgressReason
+  initialSetup?: boolean
+  tags: {
+    loaders: LoaderTag[]
+    gameVersions: Array<{ version: string; version_type: string }>
+  }
+}>()
 
 const emit = defineEmits<{
-  reinstall: [any?];
-}>();
+  reinstall: [{ loader: string; lVersion: string; mVersion: string }?]
+}>()
 
-const { addNotification } = injectNotificationManager();
+const { addNotification } = injectNotificationManager()
 
-const versionSelectModal = ref<InstanceType<typeof NewModal>>();
-const isSecondPhase = ref<boolean>(false);
-const hardReset = ref<boolean>(false);
-const isLoading = ref<boolean>(false);
-const loadingServerCheck = ref<boolean>(false);
-const serverCheckError = ref<string>("");
-const showSnapshots = ref<boolean>(false);
+const versionSelectModal = ref<InstanceType<typeof NewModal>>()
+const isSecondPhase = ref<boolean>(false)
+const hardReset = ref<boolean>(false)
+const isLoading = ref<boolean>(false)
+const loadingServerCheck = ref<boolean>(false)
+const serverCheckError = ref<string>('')
+const showSnapshots = ref<boolean>(false)
 
-const selectedLoader = ref<Loaders>("Vanilla");
-const selectedMCVersion = ref<string>("");
-const selectedLoaderVersion = ref<string>("");
+const selectedLoader = ref<Loaders>('Vanilla')
+const selectedMCVersion = ref<string>('')
+const selectedLoaderVersion = ref<string>('')
 
-const paperVersions = ref<Record<string, number[]>>({});
-const purpurVersions = ref<Record<string, string[]>>({});
-const loaderVersions = ref<VersionMap>({});
-const cachedVersions = ref<VersionCache>({});
+const paperVersions = ref<Record<string, number[]>>({})
+const purpurVersions = ref<Record<string, string[]>>({})
+const gameVersionsCache = ref<Record<string, string[]>>({})
+const cachedVersions = ref<VersionCache>({})
 
-const versionStrings = ["forge", "fabric", "quilt", "neo"] as const;
+const versionStrings = ['forge', 'fabric', 'quilt', 'neo'] as const
 
 const isSnapshotSelected = computed(() => {
   if (selectedMCVersion.value) {
-    const selected = tags.value.gameVersions.find((x) => x.version === selectedMCVersion.value);
-    if (selected?.version_type !== "release") {
-      return true;
+    const selected = props.tags.gameVersions.find((x) => x.version === selectedMCVersion.value)
+    if (selected?.version_type !== 'release') {
+      return true
     }
   }
-  return false;
-});
+  return false
+})
 
-async function getLoaderVersions(loader: string): Promise<any> {
+async function getLoaderVersions(loader: string): Promise<LoaderManifest> {
   return await $fetch(
     `https://launcher-meta.modrinth.com/${loader?.toLowerCase()}/v0/manifest.json`,
-  );
+  )
 }
 
 async function fetchLoaderVersions(): Promise<void> {
   const versions = await Promise.all(
     versionStrings.map(async (loader) => {
-      const runFetch = async (iterations: number): Promise<Record<string, any>> => {
+      const runFetch = async (iterations: number): Promise<Record<string, string[]>> => {
         if (iterations > 5) {
-          throw new Error("Failed to fetch loader versions");
+          throw new Error('Failed to fetch loader versions')
         }
         try {
-          const res = await getLoaderVersions(loader);
-          return { [loader]: (res as any).gameVersions };
+          const res = await getLoaderVersions(loader)
+          return { [loader]: res.gameVersions }
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (_) {
-          return await runFetch(iterations + 1);
+          return await runFetch(iterations + 1)
         }
-      };
+      }
       try {
-        return await runFetch(0);
+        return await runFetch(0)
       } catch (e) {
-        console.error(e);
-        return { [loader]: [] };
+        console.error(e)
+        return { [loader]: [] }
       }
     }),
-  );
+  )
 
-  loaderVersions.value = versions.reduce((acc, val) => ({ ...acc, ...val }), {});
+  gameVersionsCache.value = versions.reduce((acc, val) => ({ ...acc, ...val }), {})
 }
 
-async function fetchPaperVersions(mcVersion: string): Promise<any> {
+async function fetchPaperVersions(mcVersion: string): Promise<PaperApiResponse | null> {
   try {
-    const res = await $fetch(`https://api.papermc.io/v2/projects/paper/versions/${mcVersion}`);
-    paperVersions.value[mcVersion] = (res as any).builds.sort((a: number, b: number) => b - a);
-    return res;
+    const res = await $fetch<PaperApiResponse>(
+      `https://api.papermc.io/v2/projects/paper/versions/${mcVersion}`,
+    )
+    paperVersions.value[mcVersion] = res.builds.sort((a: number, b: number) => b - a)
+    return res
   } catch (e) {
-    console.error(e);
-    return null;
+    console.error(e)
+    return null
   }
 }
 
-async function fetchPurpurVersions(mcVersion: string): Promise<any> {
+async function fetchPurpurVersions(mcVersion: string): Promise<PurpurApiResponse | null> {
   try {
-    const res = await $fetch(`https://api.purpurmc.org/v2/purpur/${mcVersion}`);
-    purpurVersions.value[mcVersion] = (res as any).builds.all.sort(
+    const res = await $fetch<PurpurApiResponse>(`https://api.purpurmc.org/v2/purpur/${mcVersion}`)
+    purpurVersions.value[mcVersion] = res.builds.all.sort(
       (a: string, b: string) => parseInt(b) - parseInt(a),
-    );
-    return res;
+    )
+    return res
   } catch (e) {
-    console.error(e);
-    return null;
+    console.error(e)
+    return null
   }
 }
 
 const selectedLoaderVersions = computed<string[]>(() => {
-  const loader = selectedLoader.value.toLowerCase();
+  const loader = selectedLoader.value.toLowerCase()
 
-  if (loader === "paper") {
-    return paperVersions.value[selectedMCVersion.value]?.map((x) => `${x}`) || [];
+  if (loader === 'paper') {
+    return paperVersions.value[selectedMCVersion.value]?.map((x) => `${x}`) || []
   }
 
-  if (loader === "purpur") {
-    return purpurVersions.value[selectedMCVersion.value] || [];
+  if (loader === 'purpur') {
+    return purpurVersions.value[selectedMCVersion.value] || []
   }
 
-  if (loader === "vanilla") {
-    return [];
+  if (loader === 'vanilla') {
+    return []
   }
 
-  let apiLoader = loader;
-  if (loader === "neoforge") {
-    apiLoader = "neo";
+  let apiLoader = loader
+  if (loader === 'neoforge') {
+    apiLoader = 'neo'
   }
-
-  const backwardsCompatibleVersion = loaderVersions.value[apiLoader]?.find(
-    // eslint-disable-next-line no-template-curly-in-string
-    (x) => x.id === "${modrinth.gameVersion}",
-  );
-
-  if (backwardsCompatibleVersion) {
-    return backwardsCompatibleVersion.loaders.map((x) => x.id);
-  }
-
-  return (
-    loaderVersions.value[apiLoader]
-      ?.find((x) => x.id === selectedMCVersion.value)
-      ?.loaders.map((x) => x.id) || []
-  );
-});
+  const supportedVersions = gameVersionsCache.value[apiLoader] || []
+  return supportedVersions.includes(selectedMCVersion.value) ? ['latest'] : []
+})
 
 watch(selectedLoader, async () => {
   if (selectedMCVersion.value) {
-    selectedLoaderVersion.value = "";
-    serverCheckError.value = "";
+    selectedLoaderVersion.value = ''
+    serverCheckError.value = ''
 
-    await checkVersionAvailability(selectedMCVersion.value);
+    await checkVersionAvailability(selectedMCVersion.value)
   }
-});
+})
 
 watch(
   selectedLoaderVersions,
@@ -372,170 +380,173 @@ watch(
       newVersions.length > 0 &&
       (!selectedLoaderVersion.value || !newVersions.includes(selectedLoaderVersion.value))
     ) {
-      selectedLoaderVersion.value = String(newVersions[0]);
+      selectedLoaderVersion.value = String(newVersions[0])
     }
   },
   { immediate: true },
-);
+)
 
-async function getLoaderVersion(loader: string, version: string): Promise<any> {
+async function getLoaderVersion(loader: string, version: string): Promise<MinecraftVersion> {
   return await $fetch(
     `https://launcher-meta.modrinth.com/${loader?.toLowerCase()}/v0/versions/${version}.json`,
-  );
+  )
 }
 
 async function checkVersionAvailability(version: string): Promise<void> {
-  if (!version || version.trim().length < 3) return;
+  if (!version || version.trim().length < 3) return
 
-  isLoading.value = true;
-  loadingServerCheck.value = true;
+  isLoading.value = true
+  loadingServerCheck.value = true
 
   try {
-    const mcRes = cachedVersions.value[version] || (await getLoaderVersion("minecraft", version));
+    const mcRes = cachedVersions.value[version] || (await getLoaderVersion('minecraft', version))
 
-    cachedVersions.value[version] = mcRes;
+    cachedVersions.value[version] = mcRes
 
     if (!mcRes.downloads?.server) {
-      serverCheckError.value = "We couldn't find a server.jar for this version.";
-      return;
+      serverCheckError.value = "We couldn't find a server.jar for this version."
+      return
     }
 
-    const loader = selectedLoader.value.toLowerCase();
-    if (loader === "paper" || loader === "purpur") {
-      const fetchFn = loader === "paper" ? fetchPaperVersions : fetchPurpurVersions;
-      const result = await fetchFn(version);
+    const loader = selectedLoader.value.toLowerCase()
+    if (loader === 'paper' || loader === 'purpur') {
+      const fetchFn = loader === 'paper' ? fetchPaperVersions : fetchPurpurVersions
+      const result = await fetchFn(version)
       if (!result) {
-        serverCheckError.value = `This Minecraft version is not supported by ${loader}.`;
-        return;
+        serverCheckError.value = `This Minecraft version is not supported by ${loader}.`
+        return
       }
     }
 
-    serverCheckError.value = "";
+    serverCheckError.value = ''
   } catch (error) {
-    console.error(error);
-    serverCheckError.value = "Failed to fetch versions.";
+    console.error(error)
+    serverCheckError.value = 'Failed to fetch versions.'
   } finally {
-    loadingServerCheck.value = false;
-    isLoading.value = false;
+    loadingServerCheck.value = false
+    isLoading.value = false
   }
 }
 
-watch(selectedMCVersion, checkVersionAvailability);
+watch(selectedMCVersion, checkVersionAvailability)
 
 onMounted(() => {
-  fetchLoaderVersions();
-});
+  fetchLoaderVersions()
+})
 
-const tags = useTags();
 const mcVersions = computed(() =>
-  tags.value.gameVersions
+  props.tags.gameVersions
     .filter((x) =>
       showSnapshots.value
-        ? x.version_type === "snapshot" || x.version_type === "release"
-        : x.version_type === "release",
+        ? x.version_type === 'snapshot' || x.version_type === 'release'
+        : x.version_type === 'release',
     )
     .map((x) => x.version),
-);
+)
 
-const isDangerous = computed(() => hardReset.value);
+const isDangerous = computed(() => hardReset.value)
 const canInstall = computed(() => {
   const conds =
     !selectedMCVersion.value ||
     isLoading.value ||
     loadingServerCheck.value ||
-    serverCheckError.value.trim().length > 0;
+    serverCheckError.value.trim().length > 0
 
-  if (selectedLoader.value.toLowerCase() === "vanilla") {
-    return conds;
+  if (selectedLoader.value.toLowerCase() === 'vanilla') {
+    return conds
   }
 
-  return conds || !selectedLoaderVersion.value;
-});
+  return conds || !selectedLoaderVersion.value
+})
 
 async function handleReinstall(): Promise<void> {
   if (hardReset.value && !isSecondPhase.value) {
-    isSecondPhase.value = true;
-    return;
+    isSecondPhase.value = true
+    return
   }
 
-  isLoading.value = true;
+  isLoading.value = true
 
   try {
     await props.server.general?.reinstall(
       true,
       selectedLoader.value,
       selectedMCVersion.value,
-      selectedLoader.value === "Vanilla" ? "" : selectedLoaderVersion.value,
+      selectedLoader.value === 'Vanilla' ? '' : selectedLoaderVersion.value,
       props.initialSetup ? true : hardReset.value,
-    );
+    )
 
-    emit("reinstall", {
+    emit('reinstall', {
       loader: selectedLoader.value,
       lVersion: selectedLoaderVersion.value,
       mVersion: selectedMCVersion.value,
-    });
+    })
 
-    hide();
+    hide()
   } catch (error) {
-    if (error instanceof ModrinthServersFetchError && (error as any)?.statusCode === 429) {
+    if (
+      error instanceof ModrinthServersFetchError &&
+      'statusCode' in error &&
+      error.statusCode === 429
+    ) {
       addNotification({
-        title: "Cannot reinstall server",
-        text: "You are being rate limited. Please try again later.",
-        type: "error",
-      });
+        title: 'Cannot reinstall server',
+        text: 'You are being rate limited. Please try again later.',
+        type: 'error',
+      })
     } else {
       addNotification({
-        title: "Reinstall Failed",
-        text: "An unexpected error occurred while reinstalling. Please try again later.",
-        type: "error",
-      });
+        title: 'Reinstall Failed',
+        text: 'An unexpected error occurred while reinstalling. Please try again later.',
+        type: 'error',
+      })
     }
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
 }
 
 function handleCancel(): void {
   if (isSecondPhase.value) {
-    isSecondPhase.value = false;
+    isSecondPhase.value = false
   } else {
-    hide();
+    hide()
   }
 }
 
 function onShow(): void {
-  selectedMCVersion.value = props.server.general?.mc_version || "";
+  selectedMCVersion.value = props.server.general?.mc_version || ''
   if (isSnapshotSelected.value) {
-    showSnapshots.value = true;
+    showSnapshots.value = true
   }
 }
 
 function onHide(): void {
-  hardReset.value = false;
-  isSecondPhase.value = false;
-  serverCheckError.value = "";
-  loadingServerCheck.value = false;
-  isLoading.value = false;
-  selectedMCVersion.value = "";
-  serverCheckError.value = "";
-  paperVersions.value = {};
-  purpurVersions.value = {};
+  hardReset.value = false
+  isSecondPhase.value = false
+  serverCheckError.value = ''
+  loadingServerCheck.value = false
+  isLoading.value = false
+  selectedMCVersion.value = ''
+  serverCheckError.value = ''
+  paperVersions.value = {}
+  purpurVersions.value = {}
 }
 
 function show(loader: Loaders): void {
   if (selectedLoader.value !== loader) {
-    selectedLoaderVersion.value = "";
+    selectedLoaderVersion.value = ''
   }
-  selectedLoader.value = loader;
-  selectedMCVersion.value = props.server.general?.mc_version || "";
-  versionSelectModal.value?.show();
+  selectedLoader.value = loader
+  selectedMCVersion.value = props.server.general?.mc_version || ''
+  versionSelectModal.value?.show()
 }
 
 function hide(): void {
-  versionSelectModal.value?.hide();
+  versionSelectModal.value?.hide()
 }
 
-defineExpose({ show, hide });
+defineExpose({ show, hide })
 </script>
 
 <style scoped>

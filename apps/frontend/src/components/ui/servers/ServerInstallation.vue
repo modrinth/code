@@ -1,25 +1,26 @@
 <template>
-  <LazyUiServersPlatformVersionSelectModal
+  <PlatformVersionSelectModal
     ref="versionSelectModal"
     :server="props.server"
     :current-loader="ignoreCurrentInstallation ? undefined : (data?.loader as Loaders)"
     :backup-in-progress="backupInProgress"
     :initial-setup="ignoreCurrentInstallation"
+    :tags="tags"
     @reinstall="emit('reinstall', $event)"
   />
 
-  <LazyUiServersPlatformMrpackModal
+  <PlatformMrpackModal
     ref="mrpackModal"
     :server="props.server"
     @reinstall="emit('reinstall', $event)"
   />
 
-  <LazyUiServersPlatformChangeModpackVersionModal
+  <PlatformChangeModpackVersionModal
     ref="modpackVersionModal"
     :server="props.server"
-    :project="data?.project"
+    :project="data?.project!"
     :versions="Array.isArray(versions) ? versions : []"
-    :current-version="currentVersion"
+    :current-version="currentVersion as Version"
     :current-version-id="data?.upstream?.version_id"
     :server-status="data?.status"
     @reinstall="emit('reinstall')"
@@ -158,10 +159,12 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, NewProjectCard, ModrinthServer } from "@modrinth/ui";
+import { ButtonStyled, NewProjectCard, ModrinthServer, type LoaderTag } from "@modrinth/ui";
 import { TransferIcon, UploadIcon, InfoIcon, CompassIcon, SettingsIcon } from "@modrinth/assets";
-import type { Loaders } from "@modrinth/utils";
-import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
+import type { Loaders, BackupInProgressReason, Version } from "@modrinth/utils";
+import PlatformVersionSelectModal from "../../../../../../packages/ui/src/components/servers/platform/PlatformVersionSelectModal.vue";
+import PlatformMrpackModal from "../../../../../../packages/ui/src/components/servers/platform/PlatformMrpackModal.vue";
+import PlatformChangeModpackVersionModal from "../../../../../../packages/ui/src/components/servers/platform/PlatformChangeModpackVersionModal.vue";
 
 const { formatMessage } = useVIntl();
 
@@ -169,6 +172,13 @@ const props = defineProps<{
   server: ModrinthServer;
   ignoreCurrentInstallation?: boolean;
   backupInProgress?: BackupInProgressReason;
+  tags: {
+    loaders: LoaderTag[];
+    gameVersions: {
+      version: string;
+      version_type: string;
+    }[];
+  };
 }>();
 
 const emit = defineEmits<{

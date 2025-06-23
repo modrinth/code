@@ -57,113 +57,113 @@
 </template>
 
 <script setup lang="ts">
-import { FilterIcon } from "@modrinth/assets";
-import { type Version, formatCategory, type GameVersionTag } from "@modrinth/utils";
-import { ref, computed } from "vue";
-import { useRoute } from "vue-router";
-import { ManySelect, Checkbox } from "@modrinth/ui";
+import { FilterIcon } from '@modrinth/assets'
+import { type Version, formatCategory, type GameVersionTag } from '@modrinth/utils'
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { ManySelect, Checkbox } from '@modrinth/ui'
 
 export type ListedGameVersion = {
-  name: string;
-  release: boolean;
-};
+  name: string
+  release: boolean
+}
 
 export type ListedPlatform = {
-  name: string;
-  isType: boolean;
-};
+  name: string
+  isType: boolean
+}
 
 const props = defineProps<{
-  versions: Version[];
-  gameVersions: GameVersionTag[];
-  listedGameVersions: ListedGameVersion[];
-  listedPlatforms: ListedPlatform[];
-  baseId?: string;
-  type: "Mod" | "Plugin";
+  versions: Version[]
+  gameVersions: GameVersionTag[]
+  listedGameVersions: ListedGameVersion[]
+  listedPlatforms: ListedPlatform[]
+  baseId?: string
+  type: 'Mod' | 'Plugin'
   platformTags: {
-    name: string;
-    supported_project_types: string[];
-  }[];
-  disabled?: boolean;
-}>();
+    name: string
+    supported_project_types: string[]
+  }[]
+  disabled?: boolean
+}>()
 
-const emit = defineEmits(["update:query"]);
-const route = useRoute();
+const emit = defineEmits(['update:query'])
+const route = useRoute()
 
-const showSnapshots = ref(false);
+const showSnapshots = ref(false)
 const hasAnySnapshots = computed(() => {
   return props.versions.some((x) =>
     props.gameVersions.some(
-      (y) => y.version_type !== "release" && x.game_versions.includes(y.version),
+      (y) => y.version_type !== 'release' && x.game_versions.includes(y.version),
     ),
-  );
-});
+  )
+})
 
 const hasOnlySnapshots = computed(() => {
   return props.versions.every((version) => {
     return version.game_versions.every((gv) => {
-      const matched = props.gameVersions.find((tag) => tag.version === gv);
-      return matched && matched.version_type !== "release";
-    });
-  });
-});
+      const matched = props.gameVersions.find((tag) => tag.version === gv)
+      return matched && matched.version_type !== 'release'
+    })
+  })
+})
 
 const hasAnyUnsupportedPlatforms = computed(() => {
-  return props.listedPlatforms.some((x) => !x.isType);
-});
+  return props.listedPlatforms.some((x) => !x.isType)
+})
 
 const hasOnlyUnsupportedPlatforms = computed(() => {
-  return props.listedPlatforms.every((x) => !x.isType);
-});
+  return props.listedPlatforms.every((x) => !x.isType)
+})
 
-const showSupportedPlatformsOnly = ref(true);
+const showSupportedPlatformsOnly = ref(true)
 
 const filterOptions = computed(() => {
-  const filters: Record<"gameVersion" | "platform", string[]> = {
+  const filters: Record<'gameVersion' | 'platform', string[]> = {
     gameVersion: [],
     platform: [],
-  };
+  }
 
   filters.gameVersion = props.listedGameVersions
     .filter((x) => {
-      return showSnapshots.value || hasOnlySnapshots.value ? true : x.release;
+      return showSnapshots.value || hasOnlySnapshots.value ? true : x.release
     })
-    .map((x) => x.name);
+    .map((x) => x.name)
 
   filters.platform = props.listedPlatforms
     .filter((x) => {
       return !showSupportedPlatformsOnly.value || hasOnlyUnsupportedPlatforms.value
         ? true
-        : x.isType;
+        : x.isType
     })
-    .map((x) => x.name);
+    .map((x) => x.name)
 
-  return filters;
-});
+  return filters
+})
 
-const selectedGameVersions = ref<string[]>([]);
-const selectedPlatforms = ref<string[]>([]);
+const selectedGameVersions = ref<string[]>([])
+const selectedPlatforms = ref<string[]>([])
 
-selectedGameVersions.value = route.query.g ? getArrayOrString(route.query.g) : [];
-selectedPlatforms.value = route.query.l ? getArrayOrString(route.query.l) : [];
+selectedGameVersions.value = route.query.g ? getArrayOrString(route.query.g) : []
+selectedPlatforms.value = route.query.l ? getArrayOrString(route.query.l) : []
 
 function updateFilters() {
-  emit("update:query", {
+  emit('update:query', {
     g: selectedGameVersions.value,
     l: selectedPlatforms.value,
-  });
+  })
 }
 
 defineExpose({
   selectedGameVersions,
   selectedPlatforms,
-});
+})
 
 function getArrayOrString(x: string | (string | null)[]): string[] {
-  if (typeof x === "string") {
-    return [x];
+  if (typeof x === 'string') {
+    return [x]
   } else {
-    return x.filter((item): item is string => item !== null);
+    return x.filter((item): item is string => item !== null)
   }
 }
 </script>

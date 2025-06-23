@@ -45,17 +45,14 @@
 import { ref, nextTick, computed } from 'vue'
 import {
   ButtonStyled,
+  injectModrinthServerContext,
   injectNotificationManager,
-  type ModrinthServer,
   NewModal,
 } from '@modrinth/ui'
 import { IssuesIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import { ModrinthServersFetchError, type ServerBackup } from '@modrinth/utils'
 
-const props = defineProps<{
-  server: ModrinthServer
-}>()
-
+const { server } = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
 
 const modal = ref<InstanceType<typeof NewModal>>()
@@ -64,14 +61,14 @@ const isCreating = ref(false)
 const isRateLimited = ref(false)
 const backupName = ref('')
 const newBackupAmount = computed(() =>
-  props.server.backups?.data?.length === undefined ? 1 : props.server.backups?.data?.length + 1,
+  server.value.backups?.data?.length === undefined ? 1 : server.value.backups?.data?.length + 1,
 )
 
 const trimmedName = computed(() => backupName.value.trim())
 
 const nameExists = computed(() => {
-  if (!props.server.backups?.data) return false
-  return props.server.backups.data.some(
+  if (!server.value.backups?.data) return false
+  return server.value.backups.data.some(
     (backup: ServerBackup) => backup.name.trim().toLowerCase() === trimmedName.value.toLowerCase(),
   )
 })
@@ -102,9 +99,9 @@ const createBackup = async () => {
   isCreating.value = true
   isRateLimited.value = false
   try {
-    await props.server.backups?.create(trimmedName.value)
+    await server.value.backups?.create(trimmedName.value)
     hideModal()
-    await props.server.refresh()
+    await server.value.refresh()
   } catch (error) {
     if (error instanceof ModrinthServersFetchError && error?.statusCode === 429) {
       isRateLimited.value = true

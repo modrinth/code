@@ -27,7 +27,7 @@
           </p>
         </div>
 
-        <UiServersTeleportDropdownMenu
+        <TeleportDropdownMenu
           :id="'interval-field'"
           v-model="backupIntervalsLabel"
           :disabled="!autoBackupEnabled || isSaving"
@@ -58,15 +58,15 @@
 <script setup lang="ts">
 import { XIcon, SaveIcon } from '@modrinth/assets'
 import { ref, computed } from 'vue'
+import {
+  NewModal,
+  injectNotificationManager,
+  ButtonStyled,
+  TeleportDropdownMenu,
+  injectModrinthServerContext,
+} from '@modrinth/ui'
 
-import type { ModrinthServer } from '../../../../composables'
-import NewModal from '../../../modal/NewModal.vue'
-import { injectNotificationManager } from '../../../../providers'
-
-const props = defineProps<{
-  server: ModrinthServer
-}>()
-
+const { server } = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
 
 const modal = ref<InstanceType<typeof NewModal>>()
@@ -106,7 +106,7 @@ const hasChanges = computed(() => {
 const fetchSettings = async () => {
   isLoadingSettings.value = true
   try {
-    const settings = await props.server.backups?.getAutoBackup()
+    const settings = await server.value.backups?.getAutoBackup()
     initialSettings.value = settings as { interval: number; enabled: boolean }
     autoBackupEnabled.value = settings?.enabled ?? false
     autoBackupInterval.value = settings?.interval || 6
@@ -127,7 +127,7 @@ const fetchSettings = async () => {
 const saveSettings = async () => {
   isSaving.value = true
   try {
-    await props.server.backups?.updateAutoBackup(
+    await server.value.backups?.updateAutoBackup(
       autoBackupEnabled.value ? 'enable' : 'disable',
       autoBackupInterval.value,
     )

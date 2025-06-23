@@ -8,7 +8,7 @@
     <div class="flex flex-col gap-4 md:w-[600px]">
       <div class="flex flex-col gap-2">
         <p class="m-0">
-          Select the version of {{ props.project?.title || "the modpack" }} you want to install on
+          Select the version of {{ props.project?.title || 'the modpack' }} you want to install on
           your server.
         </p>
         <p v-if="props.currentVersion" class="m-0 text-sm text-secondary">
@@ -17,7 +17,7 @@
       </div>
 
       <div class="flex w-full flex-col gap-4">
-        <UiServersTeleportDropdownMenu
+        <TeleportDropdownMenu
           v-if="props.versions?.length"
           v-model="selectedVersion"
           :options="versionOptions"
@@ -51,7 +51,7 @@
               @click="handleReinstall"
             >
               <DownloadIcon class="size-4" />
-              {{ isLoading ? "Installing..." : hardReset ? "Erase and install" : "Install" }}
+              {{ isLoading ? 'Installing...' : hardReset ? 'Erase and install' : 'Install' }}
             </button>
           </ButtonStyled>
           <ButtonStyled>
@@ -67,44 +67,45 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch } from 'vue'
 import {
   ButtonStyled,
   NewModal,
   injectNotificationManager,
   type ModrinthServer,
-} from "@modrinth/ui";
-import { DownloadIcon, XIcon } from "@modrinth/assets";
-import { ModrinthServersFetchError } from "@modrinth/utils";
+  TeleportDropdownMenu,
+} from '@modrinth/ui'
+import { DownloadIcon, XIcon } from '@modrinth/assets'
+import { ModrinthServersFetchError, type Project, type Version } from '@modrinth/utils'
 
 const props = defineProps<{
-  server: ModrinthServer;
-  project: any;
-  versions: any[];
-  currentVersion?: any;
-  currentVersionId?: string;
-  serverStatus?: string;
-}>();
+  server: ModrinthServer
+  project: Project
+  versions: Version[]
+  currentVersion?: Version
+  currentVersionId?: string
+  serverStatus?: string
+}>()
 
 const emit = defineEmits<{
-  reinstall: [];
-}>();
+  reinstall: []
+}>()
 
-const { addNotification } = injectNotificationManager();
+const { addNotification } = injectNotificationManager()
 
-const modal = ref<InstanceType<typeof NewModal>>();
-const hardReset = ref<boolean>(false);
-const isLoading = ref<boolean>(false);
-const selectedVersion = ref<string>("");
+const modal = ref<InstanceType<typeof NewModal>>()
+const hardReset = ref<boolean>(false)
+const isLoading = ref<boolean>(false)
+const selectedVersion = ref<string>('')
 
-const versionOptions = computed(() => props.versions?.map((v) => v.version_number) || []);
+const versionOptions = computed(() => props.versions?.map((v) => v.version_number) || [])
 
 async function handleReinstall(): Promise<void> {
-  if (!selectedVersion.value || !props.project?.id) return;
+  if (!selectedVersion.value || !props.project?.id) return
 
-  isLoading.value = true;
+  isLoading.value = true
   try {
-    const versionId = props.versions.find((v) => v.version_number === selectedVersion.value)?.id;
+    const versionId = props.versions.find((v) => v.version_number === selectedVersion.value)?.id
 
     await props.server.general.reinstall(
       false,
@@ -112,59 +113,59 @@ async function handleReinstall(): Promise<void> {
       versionId,
       undefined,
       hardReset.value,
-    );
+    )
 
-    emit("reinstall");
-    hide();
+    emit('reinstall')
+    hide()
   } catch (error) {
     if (error instanceof ModrinthServersFetchError && error.statusCode === 429) {
       addNotification({
-        title: "Cannot reinstall server",
-        text: "You are being rate limited. Please try again later.",
-        type: "error",
-      });
+        title: 'Cannot reinstall server',
+        text: 'You are being rate limited. Please try again later.',
+        type: 'error',
+      })
     } else {
       addNotification({
-        title: "Reinstall Failed",
-        text: "An unexpected error occurred while reinstalling. Please try again later.",
-        type: "error",
-      });
+        title: 'Reinstall Failed',
+        text: 'An unexpected error occurred while reinstalling. Please try again later.',
+        type: 'error',
+      })
     }
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
 }
 
 watch(
   () => props.serverStatus,
   (newStatus) => {
-    if (newStatus === "installing") {
-      hide();
+    if (newStatus === 'installing') {
+      hide()
     }
   },
-);
+)
 
 function onShow(): void {
-  hardReset.value = false;
+  hardReset.value = false
   selectedVersion.value =
-    props.currentVersion?.version_number ?? props.versions?.[0]?.version_number ?? "";
+    props.currentVersion?.version_number ?? props.versions?.[0]?.version_number ?? ''
 }
 
 function onHide(): void {
-  hardReset.value = false;
-  selectedVersion.value = "";
-  isLoading.value = false;
+  hardReset.value = false
+  selectedVersion.value = ''
+  isLoading.value = false
 }
 
 function show(): void {
-  modal.value?.show();
+  modal.value?.show()
 }
 
 function hide(): void {
-  modal.value?.hide();
+  modal.value?.hide()
 }
 
-defineExpose({ show, hide });
+defineExpose({ show, hide })
 </script>
 
 <style scoped>

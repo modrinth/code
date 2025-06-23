@@ -18,13 +18,16 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { NewModal, ModrinthServer, BackupItem, ConfirmModal } from '@modrinth/ui'
+import {
+  type NewModal,
+  type BackupItem,
+  type ConfirmModal,
+  injectNotificationManager,
+  injectModrinthServerContext,
+} from '@modrinth/ui'
 import type { Backup } from '@modrinth/utils'
 
-const props = defineProps<{
-  server: ModrinthServer
-}>()
-
+const { server } = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
 
 const modal = ref<InstanceType<typeof NewModal>>()
@@ -46,7 +49,7 @@ const restoreBackup = async () => {
   }
 
   try {
-    await props.server.backups?.restore(currentBackup.value.id)
+    await server.value.backups?.restore(currentBackup.value.id)
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     addNotification({ type: 'error', title: 'Failed to restore backup', text: message })

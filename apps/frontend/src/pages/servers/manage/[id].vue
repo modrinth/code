@@ -40,8 +40,8 @@
   </div>
   <div
     v-else-if="
-      server.moduleErrors?.general?.error.statusCode === 403 ||
-      server.moduleErrors?.general?.error.statusCode === 404
+      server?.moduleErrors?.general?.error.statusCode === 403 ||
+      server?.moduleErrors?.general?.error.statusCode === 404
     "
     class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
   >
@@ -55,7 +55,7 @@
     />
   </div>
   <div
-    v-else-if="server.moduleErrors?.general?.error.statusCode === 503"
+    v-else-if="server?.moduleErrors?.general?.error.statusCode === 503"
     class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
   >
     <ErrorInformationCard
@@ -84,7 +84,7 @@
     </ErrorInformationCard>
   </div>
   <div
-    v-else-if="server.moduleErrors?.general?.error"
+    v-else-if="server?.moduleErrors?.general?.error"
     class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
   >
     <ErrorInformationCard
@@ -189,7 +189,8 @@
         </h2>
 
         <ServerInstallation
-          :server="server as ModrinthServer"
+          :server="server!"
+          :tags="tags"
           :backup-in-progress="backupInProgress"
           ignore-current-installation
           @reinstall="onReinstall"
@@ -337,7 +338,6 @@
           :server-power-state="serverPowerState"
           :power-state-details="powerStateDetails"
           :socket="socket"
-          :server="server"
           :backup-in-progress="backupInProgress"
           @reinstall="onReinstall"
         />
@@ -356,7 +356,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch, type Reactive } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import {
   SettingsIcon,
   CopyIcon,
@@ -374,15 +374,14 @@ import {
   ButtonStyled,
   ErrorInformationCard,
   ServerNotice,
-  ModrinthServer,
   injectNotificationManager,
   injectModrinthServersConsole,
+  injectModrinthServerContext,
   PanelSpinner,
   ServerInfoLabels,
   PanelServerActionButton,
 } from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
-import type { MessageDescriptor } from "@vintl/vintl";
 import type {
   ServerState,
   Stats,
@@ -390,13 +389,18 @@ import type {
   WSInstallationResultEvent,
   Backup,
   PowerAction,
+  FSQueuedOp,
+  ServerNotice as ServerNoticeType,
+  BackupInProgressReason,
 } from "@modrinth/utils";
 import { reloadNuxtApp, navigateTo } from "#app";
 import ServerInstallation from "~/components/ui/servers/ServerInstallation.vue";
-import { useModrinthServersSimple } from "~/utils/frontend-servers.ts";
 
+// Use the server context provided by the servers layout
+const { server } = injectModrinthServerContext();
 const { addNotification } = injectNotificationManager();
 
+const tags = useTags();
 const socket = ref<WebSocket | null>(null);
 const isReconnecting = ref(false);
 const isLoading = ref(true);
@@ -420,24 +424,21 @@ const route = useNativeRoute();
 const router = useRouter();
 const serverId = route.params.id as string;
 
-const server: Reactive<ModrinthServer> = await useModrinthServersSimple(serverId, [
-  "general",
-  "ws",
-]);
-
+// Track module loading status
 const loadModulesPromise = Promise.resolve().then(() => {
-  if (server.general?.status === "suspended") {
+  if (server.value?.general?.status === "suspended") {
     return;
   }
-  return server.refresh(["content", "backups", "network", "startup", "fs"]);
+  return server.value?.refresh(["content", "backups", "network", "startup", "fs"]);
 });
 
 provide("modulesLoaded", loadModulesPromise);
 
+// Watch for errors
 watch(
-  () => [server.moduleErrors?.general, server.moduleErrors?.ws],
+  () => [server.value?.moduleErrors?.general, server.value?.moduleErrors?.ws],
   ([generalError, wsError]) => {
-    if (server.general?.status === "suspended") return;
+    if (server.value?.general?.status === "suspended") return;
 
     const error = generalError?.error || wsError?.error;
     if (error && error.statusCode !== 403) {
@@ -450,7 +451,7 @@ const errorTitle = ref("Error");
 const errorMessage = ref("An unexpected error occurred.");
 const errorLog = ref("");
 const errorLogFile = ref("");
-const serverData = computed(() => server.general);
+const serverData = computed(() => server.value?.general);
 const isConnected = ref(false);
 const isWSAuthIncorrect = ref(false);
 const modrinthServersConsole = injectModrinthServersConsole();
@@ -522,9 +523,11 @@ const navLinks = [
 ];
 
 const filteredNotices = computed(
-  () => serverData.value?.notices?.filter((n) => n.level !== "survey") ?? [],
+  () => serverData.value?.notices?.filter((n: ServerNoticeType) => n.level !== "survey") ?? [],
 );
-const surveyNotice = computed(() => serverData.value?.notices?.find((n) => n.level === "survey"));
+const surveyNotice = computed(() =>
+  serverData.value?.notices?.find((n: ServerNoticeType) => n.level === "survey"),
+);
 
 async function dismissSurvey() {
   const noticeId = surveyNotice.value?.id;
@@ -618,7 +621,7 @@ const connectWebSocket = () => {
   if (!isMounted.value) return;
 
   try {
-    const wsAuth = computed(() => server.ws);
+    const wsAuth = computed(() => server.value?.ws);
     socket.value = new WebSocket(`wss://${wsAuth.value?.url}`);
 
     socket.value.onopen = () => {
@@ -642,9 +645,7 @@ const connectWebSocket = () => {
       firstConnect.value = false;
 
       if (reconnectInterval.value) {
-        if (reconnectInterval.value !== null) {
-          clearInterval(reconnectInterval.value);
-        }
+        clearInterval(reconnectInterval.value);
         reconnectInterval.value = null;
       }
     };
@@ -741,7 +742,7 @@ const handleWebSocketMessage = (data: WSEvent) => {
       handleInstallationResult(data);
       break;
     case "new-mod":
-      server.refresh(["content"]);
+      server.value?.refresh(["content"]);
       console.log("New mod:", data);
       break;
     case "auth-ok":
@@ -753,7 +754,7 @@ const handleWebSocketMessage = (data: WSEvent) => {
       break;
     case "backup-progress": {
       // Update a backup's state
-      const curBackup = server.backups?.data.find((backup) => backup.id === data.id);
+      const curBackup = server.value?.backups?.data.find((backup: Backup) => backup.id === data.id);
 
       if (!curBackup) {
         console.log(`Ignoring backup-progress event for unknown backup: ${data.id}`);
@@ -777,20 +778,20 @@ const handleWebSocketMessage = (data: WSEvent) => {
       break;
     }
     case "filesystem-ops": {
-      if (!server.fs) {
+      if (!server.value?.fs) {
         console.error("FilesystemOps received, but server.fs is not available", data.all);
         break;
       }
-      if (JSON.stringify(server.fs.ops) !== JSON.stringify(data.all)) {
-        server.fs.ops = data.all;
+      if (JSON.stringify(server.value.fs.ops) !== JSON.stringify(data.all)) {
+        server.value.fs.ops = data.all;
       }
 
-      server.fs.queuedOps = server.fs.queuedOps.filter(
-        (queuedOp) => !data.all.some((x) => x.src === queuedOp.src),
+      server.value.fs.queuedOps = server.value.fs.queuedOps.filter(
+        (queuedOp: FSQueuedOp) => !data.all.some((x) => x.src === queuedOp.src),
       );
 
       const cancelled = data.all.filter((x) => x.state === "cancelled");
-      Promise.all(cancelled.map((x) => server.fs?.modifyOp(x.id, "dismiss")));
+      Promise.all(cancelled.map((x) => server.value?.fs?.modifyOp(x.id, "dismiss")));
 
       const completed = data.all.filter((x) => x.state === "done");
       if (completed.length > 0) {
@@ -798,9 +799,9 @@ const handleWebSocketMessage = (data: WSEvent) => {
           async () =>
             await Promise.all(
               completed.map((x) => {
-                if (!server.fs?.opsQueuedForModification.includes(x.id)) {
-                  server.fs?.opsQueuedForModification.push(x.id);
-                  return server.fs?.modifyOp(x.id, "dismiss");
+                if (!server.value?.fs?.opsQueuedForModification.includes(x.id)) {
+                  server.value?.fs?.opsQueuedForModification.push(x.id);
+                  return server.value?.fs?.modifyOp(x.id, "dismiss");
                 }
                 return Promise.resolve();
               }),
@@ -821,7 +822,7 @@ const newMCVersion = ref<string | null>(null);
 
 const onReinstall = (potentialArgs: any) => {
   if (serverData.value?.flows?.intro) {
-    server.general?.endIntro();
+    server.value?.general?.endIntro();
   }
 
   if (!serverData.value) return;
@@ -860,7 +861,7 @@ const handleInstallationResult = async (data: WSInstallationResultEvent) => {
         while (!hasValidData && attempts < maxAttempts) {
           attempts++;
 
-          await server.refresh(["general"], {
+          await server.value?.refresh(["general"], {
             preserveConnection: true,
             preserveInstallState: true,
           });
@@ -868,7 +869,7 @@ const handleInstallationResult = async (data: WSInstallationResultEvent) => {
           if (serverData.value?.loader && serverData.value?.mc_version) {
             hasValidData = true;
             serverData.value.status = "available";
-            await server.refresh(["content", "startup"]);
+            await server.value?.refresh(["content", "startup"]);
             break;
           }
 
@@ -894,11 +895,11 @@ const handleInstallationResult = async (data: WSInstallationResultEvent) => {
       errorTitle.value = "Installation error";
       errorMessage.value = data.reason ?? "Unknown error";
       error.value = new Error(data.reason ?? "Unknown error");
-      let files = await server.fs?.listDirContents("/", 1, 100);
+      let files = await server.value?.fs?.listDirContents("/", 1, 100);
       if (files) {
         if (files.total > 1) {
           for (let i = 1; i < files.total; i++) {
-            const nextFiles = await server.fs?.listDirContents("/", i, 100);
+            const nextFiles = await server.value?.fs?.listDirContents("/", i, 100);
             if (nextFiles?.items?.length === 0) break;
             if (nextFiles) files = nextFiles;
           }
@@ -909,7 +910,7 @@ const handleInstallationResult = async (data: WSInstallationResultEvent) => {
       )?.name;
       errorLogFile.value = fileName ?? "";
       if (fileName) {
-        errorLog.value = await server.fs?.downloadFile(fileName);
+        errorLog.value = await server.value?.fs?.downloadFile(fileName);
       }
       break;
     }
@@ -957,8 +958,8 @@ const updateGraphData = (dataArray: number[], newValue: number): number[] => {
 
 const reauthenticate = async () => {
   try {
-    await server.refresh();
-    const wsAuth = computed(() => server.ws);
+    await server.value?.refresh();
+    const wsAuth = computed(() => server.value?.ws);
     socket.value?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
   } catch (error) {
     console.error("Reauthentication failed:", error);
@@ -983,7 +984,7 @@ const sendPowerAction = async (action: PowerAction) => {
   const actionName = action.charAt(0).toUpperCase() + action.slice(1);
   try {
     isActioning.value = true;
-    await server.general?.power(action);
+    await server.value?.general?.power(action);
   } catch (error) {
     console.error(`Error ${toAdverb(actionName)} server:`, error);
     notifyError(
@@ -1011,11 +1012,6 @@ const formattedTime = computed(() => {
   return `${seconds.toString().padStart(2, "0")}`;
 });
 
-export type BackupInProgressReason = {
-  type: string;
-  tooltip: MessageDescriptor;
-};
-
 const RestoreInProgressReason = {
   type: "restore",
   tooltip: defineMessage({
@@ -1033,7 +1029,7 @@ const CreateInProgressReason = {
 } satisfies BackupInProgressReason;
 
 const backupInProgress = computed(() => {
-  const backups = server.backups?.data;
+  const backups = server.value?.backups?.data;
   if (!backups) {
     return undefined;
   }
@@ -1061,9 +1057,9 @@ const startPolling = () => {
 
   const poll = async () => {
     try {
-      await server.refresh(["general", "ws"]);
+      await server.value?.refresh(["general", "ws"]);
 
-      if (!server.moduleErrors?.general?.error) {
+      if (!server.value?.moduleErrors?.general?.error) {
         stopPolling();
         connectWebSocket();
         return;
@@ -1097,12 +1093,12 @@ const startPolling = () => {
 const nodeUnavailableDetails = computed(() => [
   {
     label: "Server ID",
-    value: server.serverId,
+    value: server.value?.serverId,
     type: "inline" as const,
   },
   {
     label: "Node",
-    value: server.general?.datacenter ?? "Unknown! Please contact support!",
+    value: server.value?.general?.datacenter ?? "Unknown! Please contact support!",
     type: "inline" as const,
   },
 ]);
@@ -1120,38 +1116,38 @@ const suspendedDescription = computed(() => {
 const generalErrorDetails = computed(() => [
   {
     label: "Server ID",
-    value: server.serverId,
+    value: server.value?.serverId,
     type: "inline" as const,
   },
   {
     label: "Timestamp",
-    value: String(server.moduleErrors?.general?.timestamp),
+    value: String(server.value?.moduleErrors?.general?.timestamp),
     type: "inline" as const,
   },
   {
     label: "Error Name",
-    value: server.moduleErrors?.general?.error.name,
+    value: server.value?.moduleErrors?.general?.error.name,
     type: "inline" as const,
   },
   {
     label: "Error Message",
-    value: server.moduleErrors?.general?.error.message,
+    value: server.value?.moduleErrors?.general?.error.message,
     type: "block" as const,
   },
-  ...(server.moduleErrors?.general?.error.originalError
+  ...(server.value?.moduleErrors?.general?.error.originalError
     ? [
         {
           label: "Original Error",
-          value: String(server.moduleErrors.general.error.originalError),
+          value: String(server.value.moduleErrors.general.error.originalError),
           type: "hidden" as const,
         },
       ]
     : []),
-  ...(server.moduleErrors?.general?.error.stack
+  ...(server.value?.moduleErrors?.general?.error.stack
     ? [
         {
           label: "Stack Trace",
-          value: server.moduleErrors.general.error.stack,
+          value: server.value.moduleErrors.general.error.stack,
           type: "hidden" as const,
         },
       ]
@@ -1234,30 +1230,30 @@ const cleanup = () => {
 };
 
 async function dismissNotice(noticeId: number) {
-  await server
-    .request(`servers/${serverId}/notices/${noticeId}/dismiss`, {
+  await server.value
+    ?.request(`servers/${serverId}/notices/${noticeId}/dismiss`, {
       method: "POST",
     })
-    .catch(server.errorHandler);
-  await server.refresh(["general"]);
+    .catch(server.value?.errorHandler);
+  await server.value?.refresh(["general"]);
 }
 
 onMounted(() => {
   isMounted.value = true;
-  if (server.general?.status === "suspended") {
+  if (server.value?.general?.status === "suspended") {
     isLoading.value = false;
     return;
   }
-  if (server.moduleErrors.general?.error) {
-    if (!server.moduleErrors.general?.error?.message?.includes("Forbidden")) {
+  if (server.value?.moduleErrors.general?.error) {
+    if (!server.value?.moduleErrors.general?.error?.message?.includes("Forbidden")) {
       startPolling();
     }
   } else {
     connectWebSocket();
   }
 
-  if (server.general?.flows?.intro && server.general?.project) {
-    server.general?.endIntro();
+  if (server.value?.general?.flows?.intro && server.value?.general?.project) {
+    server.value?.general?.endIntro();
   }
 
   if (username.value && email.value && userId.value && createdAt.value) {
@@ -1319,6 +1315,7 @@ watch(
 );
 
 definePageMeta({
+  layout: "servers",
   middleware: "auth",
 });
 

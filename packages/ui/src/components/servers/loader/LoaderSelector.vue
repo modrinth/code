@@ -5,8 +5,9 @@
       :key="loader.name"
       class="group relative flex items-center justify-between rounded-2xl p-2 pr-2.5 hover:bg-bg"
     >
-      <UiServersLoaderSelectorCard
+      <LoaderSelectorCard
         :loader="loader"
+        :tags="tags"
         :is-current="isCurrentLoader(loader.name)"
         :loader-version="data.loader_version"
         :current-loader="data.loader"
@@ -24,8 +25,9 @@
         :key="loader.name"
         class="group relative flex items-center justify-between rounded-2xl p-2 pr-2.5 hover:bg-bg"
       >
-        <UiServersLoaderSelectorCard
+        <LoaderSelectorCard
           :loader="loader"
+          :tags="tags"
           :is-current="isCurrentLoader(loader.name)"
           :loader-version="data.loader_version"
           :current-loader="data.loader"
@@ -58,6 +60,8 @@
 </template>
 
 <script setup lang="ts">
+import type { LoaderTag } from "@modrinth/ui";
+
 const props = defineProps<{
   data: {
     loader: string | null;
@@ -65,6 +69,9 @@ const props = defineProps<{
   };
   ignoreCurrentInstallation?: boolean;
   isInstalling?: boolean;
+  tags: {
+    loaders: LoaderTag[];
+  };
 }>();
 
 const emit = defineEmits<{

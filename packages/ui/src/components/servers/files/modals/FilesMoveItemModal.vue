@@ -39,9 +39,7 @@
 <script setup lang="ts">
 import { ArrowBigUpDashIcon, XIcon } from '@modrinth/assets'
 import { ref, nextTick, computed, defineProps, defineEmits, defineExpose } from 'vue'
-
-import ButtonStyled from '../../../base/ButtonStyled.vue'
-import NewModal from '../../../modal/NewModal.vue'
+import { ButtonStyled, NewModal } from "@modrinth/ui"
 
 const destinationInput = ref<HTMLInputElement | null>(null)
 

@@ -73,7 +73,7 @@
     <div class="flex flex-shrink-0 items-center gap-1">
       <div class="flex w-full flex-row-reverse sm:flex-row">
         <ButtonStyled type="transparent">
-          <UiServersTeleportOverflowMenu
+          <TeleportOverflowMenu
             position="bottom"
             direction="left"
             aria-label="Filter view"
@@ -93,7 +93,7 @@
             <template #all>Show all</template>
             <template #filesOnly>Files only</template>
             <template #foldersOnly>Folders only</template>
-          </UiServersTeleportOverflowMenu>
+          </TeleportOverflowMenu>
         </ButtonStyled>
         <div class="mx-1 w-full text-sm sm:w-48">
           <label for="search-folder" class="sr-only">Search folder</label>
@@ -169,9 +169,7 @@ import {
 } from '@modrinth/assets'
 import { ref, computed } from 'vue'
 import { useIntersectionObserver } from '@vueuse/core'
-
-import ButtonStyled from '../../base/ButtonStyled.vue'
-import OverflowMenu from '../../base/OverflowMenu.vue'
+import { ButtonStyled, OverflowMenu, TeleportOverflowMenu } from "@modrinth/ui"
 
 const props = defineProps<{
   breadcrumbSegments: string[]

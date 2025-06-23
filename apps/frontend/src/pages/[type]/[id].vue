@@ -876,17 +876,14 @@ import {
   useRelativeTime,
   injectNotificationManager,
 } from "@modrinth/ui";
-import { formatCategory, isRejected, isStaff, isUnderReview, renderString } from "@modrinth/utils";
-import VersionSummary from "@modrinth/ui/src/components/version/VersionSummary.vue";
 import {
   formatCategory,
-  formatProjectType,
   isRejected,
   isStaff,
   isUnderReview,
   renderString,
+  formatProjectType,
 } from "@modrinth/utils";
-import { navigateTo } from "#app";
 import dayjs from "dayjs";
 import { navigateTo } from "#app";
 import Accordion from "~/components/ui/Accordion.vue";

@@ -29,8 +29,7 @@
 <script setup lang="ts">
 import { ref, computed, defineEmits, defineExpose } from 'vue'
 import { XIcon, CheckIcon } from '@modrinth/assets'
-
-import ConfirmModal from '../../../modal/ConfirmModal.vue'
+import { ConfirmModal } from "@modrinth/ui"
 
 const path = ref('')
 const files = ref<string[]>([])

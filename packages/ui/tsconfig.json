@@ -1,6 +1,6 @@
 {
   "extends": "tsconfig/vue.json",
-  "include": [".", ".eslintrc.js"],
+  "include": [".", ".eslintrc.js", "../../apps/frontend/src/components/ui/servers/notice/AssignNoticeModal.vue"],
   "exclude": ["dist", "build", "node_modules"],
   "compilerOptions": {
     "lib": ["esnext", "dom"],

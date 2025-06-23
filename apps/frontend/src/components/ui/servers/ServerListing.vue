@@ -16,7 +16,7 @@
       data-pyro-server-listing
       :data-pyro-server-listing-id="server_id"
     >
-      <UiServersServerIcon v-if="status !== 'suspended'" :image="image" />
+      <ServerIcon v-if="status !== 'suspended'" :image="image" />
       <div
         v-else
         class="bg-bg-secondary flex size-24 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
@@ -33,7 +33,7 @@
           v-if="projectData?.title"
           class="m-0 flex flex-row items-center gap-2 text-sm font-medium text-secondary"
         >
-          <UiAvatar
+          <Avatar
             :src="iconUrl"
             no-shadow
             style="min-height: 20px; min-width: 20px; height: 20px; width: 20px"
@@ -49,12 +49,14 @@
         >
           <SparklesIcon class="size-5 shrink-0" /> New server
         </div>
-        <UiServersServerInfoLabels
+        <ServerInfoLabels
           v-else
           :server-data="{ game, mc_version, loader, loader_version, net }"
           :show-game-label="showGameLabel"
           :show-loader-label="showLoaderLabel"
           :linked="false"
+          :tags="tags"
+          :server-id="server_id!"
           class="pointer-events-none flex w-full flex-row flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
         />
       </div>
@@ -63,7 +65,7 @@
       v-if="status === 'suspended' && suspension_reason === 'upgrading'"
       class="relative -mt-4 flex w-full flex-row items-center gap-2 rounded-b-3xl bg-bg-blue p-4 text-sm font-bold text-contrast"
     >
-      <UiServersPanelSpinner />
+      <PanelSpinner />
       Your server's hardware is currently being upgraded and will be back online shortly.
     </div>
     <div
@@ -74,7 +76,7 @@
         <TriangleAlertIcon class="!size-5" /> Your server has been suspended. Please update your
         billing information or contact Modrinth Support for more information.
       </div>
-      <UiCopyCode :text="`${props.server_id}`" class="ml-auto" />
+      <CopyCode :text="`${props.server_id}`" class="ml-auto" />
     </div>
   </NuxtLink>
 </template>
@@ -82,12 +84,24 @@
 <script setup lang="ts">
 import { ChevronRightIcon, LockIcon, SparklesIcon, TriangleAlertIcon } from "@modrinth/assets";
 import type { Project, Server } from "@modrinth/utils";
-import { useModrinthServersSimple } from "~/utils/frontend-servers.ts";
-const props = defineProps<Partial<Server>>();
+import { Avatar, CopyCode, ModrinthServer, PanelSpinner, ServerInfoLabels } from "@modrinth/ui";
+import ServerIcon from "./ServerIcon.vue";
 
-if (props.server_id) {
-  await useModrinthServersSimple(props.server_id, ["general"]);
-}
+const props = defineProps<Partial<Server>>();
+const server = ref<ModrinthServer | null>(null);
+const tags = useTags();
+
+onMounted(async () => {
+  const auth = await useAuth();
+  const config = useRuntimeConfig();
+  const base = import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl;
+  server.value = new ModrinthServer(
+    props.server_id!,
+    auth.value.token,
+    base,
+    new NuxtStateStorage(),
+  );
+});
 
 const showGameLabel = computed(() => !!props.game);
 const showLoaderLabel = computed(() => !!props.loader);
@@ -107,11 +121,6 @@ if (props.upstream) {
 }
 
 const image = useState<string | undefined>(`server-icon-${props.server_id}`, () => undefined);
-
-if (import.meta.server && projectData.value?.icon_url) {
-  await useModrinthServersSimple(props.server_id!, ["general"]);
-}
-
 const iconUrl = computed(() => projectData.value?.icon_url || undefined);
 const isConfiguring = computed(() => props.flows?.intro);
 </script>

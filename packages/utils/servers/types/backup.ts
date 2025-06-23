@@ -1,4 +1,5 @@
 import type { WSBackupTask, WSBackupState } from './websocket'
+import type { MessageDescriptor } from '@vintl/vintl'
 
 export interface Backup {
   id: string
@@ -14,6 +15,11 @@ export interface Backup {
       state: WSBackupState
     }
   }
+}
+
+export type BackupInProgressReason = {
+  type: string
+  tooltip: MessageDescriptor
 }
 
 export interface AutoBackupSettings {

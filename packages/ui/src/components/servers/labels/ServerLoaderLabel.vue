@@ -2,7 +2,7 @@
   <div v-tooltip="'Change server loader'" class="flex min-w-0 flex-row items-center gap-4 truncate">
     <div v-if="!noSeparator" class="experimental-styles-within h-6 w-0.5 bg-button-border"></div>
     <div class="flex flex-row items-center gap-2">
-      <UiServersIconsLoaderIcon v-if="loader" :loader="loader" class="flex shrink-0 [&&]:size-5" />
+      <LoaderIcon v-if="loader" :tags="tags" :loader="loader" class="flex shrink-0 [&&]:size-5" />
       <div v-else class="size-5 shrink-0 animate-pulse rounded-full bg-button-border"></div>
 
       <template v-if="isLink && linkComponent">
@@ -39,6 +39,7 @@
 
 <script setup lang="ts">
 import type { Component } from 'vue'
+import { LoaderIcon, type LoaderTag } from "@modrinth/ui"
 
 defineProps<{
   noSeparator?: boolean
@@ -46,6 +47,9 @@ defineProps<{
   loaderVersion?: string
   isLink?: boolean
   linkComponent?: Component
-  serverId: string
+  serverId: string,
+  tags: {
+    loaders: LoaderTag[]
+  }
 }>()
 </script>

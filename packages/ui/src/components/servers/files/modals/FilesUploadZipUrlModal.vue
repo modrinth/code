@@ -76,11 +76,7 @@
 import { ExternalIcon, SpinnerIcon, DownloadIcon, XIcon } from '@modrinth/assets'
 import { ModrinthServersFetchError } from '@modrinth/utils'
 import { ref, computed, nextTick, defineProps, defineExpose } from 'vue'
-
-import type { ModrinthServer } from '../../../../composables'
-import BackupWarning from '../../backups/BackupWarning.vue'
-import ButtonStyled from '../../../base/ButtonStyled.vue'
-import NewModal from '../../../modal/NewModal.vue'
+import { type ModrinthServer, BackupWarning, ButtonStyled, NewModal } from "@modrinth/ui"
 
 const cf = ref(false)
 
