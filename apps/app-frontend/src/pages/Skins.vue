@@ -235,24 +235,21 @@ function openUploadSkinModal(e: MouseEvent) {
   uploadSkinModal.value?.show(e)
 }
 
-function onSkinFileUploaded(file: File) {
+function onSkinFileUploaded(buffer: ArrayBuffer) {
   const fakeEvent = new MouseEvent('click')
-  file.arrayBuffer().then(async (buf) => {
-    const skinTextureNormalized: Uint8Array = await normalize_skin_texture(
-      `data:image/png;base64,` + arrayBufferToBase64(buf),
-    )
-    const skinTexUrl = `data:image/png;base64,` + arrayBufferToBase64(skinTextureNormalized)
-
-    if (editSkinModal.value && editSkinModal.value.shouldRestoreModal) {
-      editSkinModal.value.restoreWithNewTexture(skinTexUrl)
-    } else {
-      editSkinModal.value?.showNew(fakeEvent, skinTexUrl)
-    }
-  })
+  normalize_skin_texture(`data:image/png;base64,` + arrayBufferToBase64(buffer)).then(
+    (skinTextureNormalized: Uint8Array) => {
+      const skinTexUrl = `data:image/png;base64,` + arrayBufferToBase64(skinTextureNormalized)
+      if (editSkinModal.value && editSkinModal.value.shouldRestoreModal) {
+        editSkinModal.value.restoreWithNewTexture(skinTexUrl)
+      } else {
+        editSkinModal.value?.showNew(fakeEvent, skinTexUrl)
+      }
+    },
+  )
 }
 
 function onUploadCanceled() {
-  console.log('fuck fuck fuck')
   editSkinModal.value?.restoreModal()
 }
 

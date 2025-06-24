@@ -42,7 +42,7 @@ const unlisten = ref<() => void>()
 const modalVisible = ref(false)
 
 const emit = defineEmits<{
-  (e: 'uploaded', file: File): void
+  (e: 'uploaded', data: ArrayBuffer): void
   (e: 'canceled'): void
 }>()
 
@@ -70,28 +70,14 @@ function triggerFileInput() {
   fileInput.value?.click()
 }
 
-async function validateImageDimensions(blob: Blob): Promise<boolean> {
-  return new Promise((resolve) => {
-    const img = new Image()
-    img.onload = () => {
-      URL.revokeObjectURL(img.src)
-      resolve(img.width === 64 && (img.height === 64 || img.height === 32))
-    }
-    img.onerror = () => {
-      URL.revokeObjectURL(img.src)
-      resolve(false)
-    }
-    img.src = URL.createObjectURL(blob)
-  })
-}
-
 async function handleInputFileChange(e: Event) {
   const files = (e.target as HTMLInputElement).files
   if (!files || files.length === 0) {
     return
   }
   const file = files[0]
-  await processFile(file)
+  const buffer = await file.arrayBuffer()
+  await processData(buffer)
 }
 
 async function setupDragDropListener() {
@@ -110,21 +96,12 @@ async function setupDragDropListener() {
         const filePath = event.payload.paths[0]
 
         try {
-          console.log(filePath);
-          const data = await get_dragged_skin_data(filePath).catch((err) => {
-            throw new Error(`Failed to read file: ${err.message || err}`)
-          })
-
-          const fileName = filePath.split('/').pop() || filePath.split('\\').pop() || 'skin.png'
-          const fileBlob = new Blob([data], { type: 'image/png' })
-          const file = new File([fileBlob], fileName, { type: 'image/png' })
-
-          await processFile(file)
+          const data = await get_dragged_skin_data(filePath)
+          await processData(data.buffer)
         } catch (error) {
-          console.error(error)
           notifications.addNotification({
             title: 'Error processing file',
-            text: error.message || 'Failed to read the dropped file.',
+            text: error instanceof Error ? error.message : 'Failed to read the dropped file.',
             type: 'error',
           })
         }
@@ -142,8 +119,8 @@ async function cleanupDragDropListener() {
   }
 }
 
-async function processFile(file: File) {
-  emit('uploaded', file)
+async function processData(buffer: ArrayBuffer) {
+  emit('uploaded', buffer)
   hide()
 }
 
