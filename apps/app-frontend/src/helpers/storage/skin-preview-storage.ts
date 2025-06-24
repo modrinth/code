@@ -33,11 +33,11 @@ export class SkinPreviewStorage {
   async store(key: string, result: RenderResult): Promise<void> {
     if (!this.db) await this.init()
 
-    const transaction = this.db!.transaction(['previews'], 'readwrite')
-    const store = transaction.objectStore('previews')
-
     const forwardsBlob = await fetch(result.forwards).then((r) => r.blob())
     const backwardsBlob = await fetch(result.backwards).then((r) => r.blob())
+
+    const transaction = this.db!.transaction(['previews'], 'readwrite')
+    const store = transaction.objectStore('previews')
 
     const storedPreview: StoredPreview = {
       forwards: forwardsBlob,

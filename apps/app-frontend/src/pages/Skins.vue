@@ -252,13 +252,8 @@ function onSkinFileUploaded(file: File) {
 }
 
 function onUploadCanceled() {
-  if (editSkinModal.value && editSkinModal.value.shouldRestoreModal) {
-    setTimeout(() => {
-      const fakeEvent = new MouseEvent('click')
-      editSkinModal.value!.show(fakeEvent)
-      editSkinModal.value!.shouldRestoreModal = false
-    }, 0)
-  }
+  console.log("fuck fuck fuck")
+  editSkinModal.value?.restoreModal()
 }
 
 watch(
@@ -363,7 +358,7 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
       <section class="flex flex-col gap-2 mt-1">
         <h2 class="text-lg font-bold m-0 text-primary">Saved skins</h2>
         <div class="skin-card-grid">
-          <SkinLikeTextButton class="skin-card" tooltip="Add a skin" @click="openUploadSkinModal">
+          <SkinLikeTextButton class="skin-card" @click="openUploadSkinModal">
             <template #icon>
               <PlusIcon class="size-8" />
             </template>
@@ -382,10 +377,9 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
             <template #overlay-buttons>
               <Button
                 color="green"
-                class="pointer-events-auto"
                 aria-label="Edit skin"
                 @click.stop="(e) => editSkinModal?.show(e, skin)"
-              >
+                class="pointer-events-auto">
                 <EditIcon /> Edit
               </Button>
               <Button
@@ -451,11 +445,11 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
           Modrinth app.
         </p>
         <ButtonStyled v-show="accountsCard" color="brand" :disabled="accountsCard.loginDisabled">
-          <Button :disabled="accountsCard.loginDisabled" @click="login">
+          <button :disabled="accountsCard.loginDisabled" @click="login">
             <LogInIcon v-if="!accountsCard.loginDisabled" />
             <SpinnerIcon v-else class="animate-spin" />
             Sign In
-          </Button>
+          </button>
         </ButtonStyled>
       </div>
     </div>

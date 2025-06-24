@@ -7,9 +7,9 @@ import {
   CapeButton,
   CapeLikeTextButton,
   SkinPreviewRenderer,
-  NewModal,
 } from '@modrinth/ui'
 import { CheckIcon, XIcon } from '@modrinth/assets'
+import ModalWrapper from "@/components/ui/modal/ModalWrapper.vue";
 
 const modal = useTemplateRef('modal')
 
@@ -74,7 +74,7 @@ defineExpose({
 })
 </script>
 <template>
-  <NewModal ref="modal" @on-hide="onModalHide">
+  <ModalWrapper ref="modal" @on-hide="onModalHide">
     <template #title>
       <div class="flex flex-col">
         <span class="text-lg font-extrabold text-heading">Change cape</span>
@@ -139,5 +139,5 @@ defineExpose({
         </button>
       </ButtonStyled>
     </div>
-  </NewModal>
+  </ModalWrapper>
 </template>

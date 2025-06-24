@@ -58,9 +58,9 @@ watch(
 
   <div class="mt-4 flex items-center justify-between">
     <div>
-      <h2 class="m-0 text-lg font-extrabold text-contrast">Hide Nametag</h2>
+      <h2 class="m-0 text-lg font-extrabold text-contrast">Hide nametag</h2>
       <p class="m-0 mt-1">
-        Allows you to disable the nametag that appears above the main preview on the skin management
+        Disables the nametag above your player on the skins page.
         page.
       </p>
     </div>
@@ -69,7 +69,7 @@ watch(
 
   <div v-if="os !== 'MacOS'" class="mt-4 flex items-center justify-between gap-4">
     <div>
-      <h2 class="m-0 text-lg font-extrabold text-contrast">Native Decorations</h2>
+      <h2 class="m-0 text-lg font-extrabold text-contrast">Native decorations</h2>
       <p class="m-0 mt-1">Use system window frame (app restart required).</p>
     </div>
     <Toggle id="native-decorations" v-model="settings.native_decorations" />

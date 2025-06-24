@@ -1,8 +1,9 @@
 <template>
-  <NewModal ref="modal" @on-hide="resetState">
+  <UploadSkinModal ref="uploadModal" />
+  <ModalWrapper ref="modal" @on-hide="resetState">
     <template #title>
       <span class="text-lg font-extrabold text-contrast">
-        {{ mode === 'edit' ? 'Edit skin' : 'New skin' }}
+        {{ mode === 'edit' ? 'Editing skin' : 'Adding a skin' }}
       </span>
     </template>
 
@@ -78,16 +79,16 @@
 
     <div class="flex gap-2 mt-12">
       <ButtonStyled color="brand" :disabled="disableSave || isSaving">
-        <Button v-tooltip="saveTooltip" :disabled="disableSave || isSaving" @click="save">
+        <button v-tooltip="saveTooltip" :disabled="disableSave || isSaving" @click="save">
           <SpinnerIcon v-if="isSaving" class="animate-spin" />
           <CheckIcon v-else-if="mode === 'new'" />
           <SaveIcon v-else />
           {{ mode === 'new' ? 'Add skin' : 'Save skin' }}
-        </Button>
+        </button>
       </ButtonStyled>
       <Button :disabled="isSaving" @click="hide"><XIcon />Cancel</Button>
     </div>
-  </NewModal>
+  </ModalWrapper>
 
   <SelectCapeModal
     ref="selectCapeModal"
@@ -127,6 +128,8 @@ import {
   ChevronRightIcon,
   SpinnerIcon,
 } from '@modrinth/assets'
+import ModalWrapper from "@/components/ui/modal/ModalWrapper.vue";
+import UploadSkinModal from "@/components/ui/skin/UploadSkinModal.vue";
 
 const modal = useTemplateRef('modal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
@@ -337,6 +340,16 @@ function openUploadSkinModal(e: MouseEvent) {
   emit('open-upload-modal', e)
 }
 
+function restoreModal() {
+  if (shouldRestoreModal.value) {
+    setTimeout(() => {
+      const fakeEvent = new MouseEvent('click')
+      modal.value?.show(fakeEvent)
+      shouldRestoreModal.value = false
+    }, 500);
+  }
+}
+
 async function save() {
   isSaving.value = true
 
@@ -394,5 +407,6 @@ defineExpose({
   restoreWithNewTexture,
   hide,
   shouldRestoreModal,
+  restoreModal
 })
 </script>
