@@ -455,6 +455,47 @@ pub async fn normalize_skin_texture(
     png_util::normalize_skin_texture(texture).await
 }
 
+/// Reads and validates a skin texture file from the given path.
+/// Returns the file content as bytes if it's a valid skin texture (PNG with 64x64 or 64x32 dimensions).
+#[tracing::instrument]
+pub async fn get_dragged_skin_data(path: &std::path::Path) -> crate::Result<Bytes> {
+    if let Some(extension) = path.extension() {
+        if extension.to_string_lossy().to_lowercase() != "png" {
+            return Err(ErrorKind::InvalidSkinTexture.into());
+        }
+    } else {
+        return Err(ErrorKind::InvalidSkinTexture.into());
+    }
+
+    tracing::debug!("Reading file: {:?}", path);
+
+    if !path.exists() {
+        tracing::error!("File does not exist: {:?}", path);
+        return Err(ErrorKind::InvalidSkinTexture.into());
+    }
+
+    let data = match tokio::fs::read(path).await {
+        Ok(data) => {
+            tracing::debug!("File read successfully, size: {} bytes", data.len());
+            data
+        },
+        Err(err) => {
+            tracing::error!("Failed to read file: {}", err);
+            return Err(err.into());
+        }
+    };
+
+    let url_or_blob = UrlOrBlob::Blob(data.clone().into());
+
+    match normalize_skin_texture(&url_or_blob).await {
+        Ok(_) => Ok(data.into()),
+        Err(err) => {
+            tracing::error!("Failed to normalize skin texture: {}", err);
+            Err(ErrorKind::InvalidSkinTexture.into())
+        }
+    }
+}
+
 /// Synchronizes the equipped cape with the selected cape if necessary, taking into
 /// account the currently equipped cape, the default cape for the player, and if a
 /// cape override is provided.

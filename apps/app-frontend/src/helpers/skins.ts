@@ -156,3 +156,7 @@ export async function normalize_skin_texture(texture: Uint8Array | string): Prom
 export async function unequip_skin(): Promise<void> {
   await invoke('plugin:minecraft-skins|unequip_skin')
 }
+
+export async function get_dragged_skin_data(path: string): Promise<Uint8Array> {
+  return invoke('plugin:minecraft-skins|get_dragged_skin_data', { path })
+}

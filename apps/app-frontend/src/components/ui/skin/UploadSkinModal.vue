@@ -32,6 +32,7 @@ import { UploadIcon } from '@modrinth/assets'
 import { useNotifications } from '@/store/state'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { get_dragged_skin_data } from '@/helpers/skins'
 
 const notifications = useNotifications()
 
@@ -106,22 +107,24 @@ async function setupDragDropListener() {
           return
         }
 
-        // const filePath = event.payload.paths[0]
+        const filePath = event.payload.paths[0]
 
         try {
-          // TODO: Drag and drop support for local files
-          // const data = await readFile(filePath)
-          //
-          // const fileName = filePath.split('/').pop() || filePath.split('\\').pop() || 'skin.png'
-          // const fileBlob = new Blob([data], { type: 'image/png' })
-          // const file = new File([fileBlob], fileName, { type: 'image/png' })
-          //
-          // await processFile(file)
+          console.log(filePath);
+          const data = await get_dragged_skin_data(filePath).catch((err) => {
+            throw new Error(`Failed to read file: ${err.message || err}`)
+          })
+
+          const fileName = filePath.split('/').pop() || filePath.split('\\').pop() || 'skin.png'
+          const fileBlob = new Blob([data], { type: 'image/png' })
+          const file = new File([fileBlob], fileName, { type: 'image/png' })
+
+          await processFile(file)
         } catch (error) {
           console.error(error)
           notifications.addNotification({
             title: 'Error processing file',
-            text: 'Failed to read the dropped file.',
+            text: error.message || 'Failed to read the dropped file.',
             type: 'error',
           })
         }
@@ -140,25 +143,6 @@ async function cleanupDragDropListener() {
 }
 
 async function processFile(file: File) {
-  if (!file.name.toLowerCase().endsWith('.png') && file.type !== 'image/png') {
-    notifications.addNotification({
-      title: 'Invalid file type.',
-      text: 'Only PNG files are accepted.',
-      type: 'error',
-    })
-    return
-  }
-
-  const isValidDimensions = await validateImageDimensions(file)
-  if (!isValidDimensions) {
-    notifications.addNotification({
-      title: 'Invalid dimensions.',
-      text: 'Only 64x64 and 64x32 PNG files are accepted.',
-      type: 'error',
-    })
-    return
-  }
-
   emit('uploaded', file)
   hide()
 }

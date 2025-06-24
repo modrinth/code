@@ -111,6 +111,7 @@ fn main() {
                         "remove_custom_skin",
                         "unequip_skin",
                         "normalize_skin_texture",
+                        "get_dragged_skin_data",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

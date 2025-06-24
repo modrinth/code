@@ -1,5 +1,6 @@
 use crate::api::Result;
 
+use std::path::Path;
 use theseus::minecraft_skins::{
     self, Bytes, Cape, MinecraftSkinVariant, Skin, UrlOrBlob,
 };
@@ -15,6 +16,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             remove_custom_skin,
             unequip_skin,
             normalize_skin_texture,
+            get_dragged_skin_data,
         ])
         .build()
 }
@@ -90,4 +92,13 @@ pub async fn unequip_skin() -> Result<()> {
 #[tauri::command]
 pub async fn normalize_skin_texture(texture: UrlOrBlob) -> Result<Bytes> {
     Ok(minecraft_skins::normalize_skin_texture(&texture).await?)
+}
+
+/// `invoke('plugin:minecraft-skins|get_dragged_skin_data', path)`
+///
+/// See also: [minecraft_skins::get_dragged_skin_data]
+#[tauri::command]
+pub async fn get_dragged_skin_data(path: String) -> Result<Bytes> {
+    let path = Path::new(&path);
+    Ok(minecraft_skins::get_dragged_skin_data(path).await?)
 }
