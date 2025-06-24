@@ -14,9 +14,22 @@
     "externalBin": [],
     "icon": ["icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
     "windows": {
-      "certificateThumbprint": null,
-      "digestAlgorithm": "sha256",
-      "timestampUrl": "http://timestamp.digicert.com",
+      "signCommand": {
+        "cmd": "jsign",
+        "args": [
+          "sign",
+          "--verbose",
+          "--storetype",
+          "DIGICERTONE",
+          "--keystore",
+          "https://clientauth.one.digicert.com",
+          "--storepass",
+          "env:DIGICERT_ONE_SIGNER_CREDENTIALS",
+          "--tsaurl",
+          "https://timestamp.sectigo.com,http://timestamp.digicert.com",
+          "%1"
+        ]
+      },
       "nsis": {
         "installMode": "perMachine",
         "installerHooks": "./nsis/hooks.nsi"

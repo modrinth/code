@@ -103,6 +103,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev pkg-config libayatana-appindicator3-dev librsvg2-dev
 
+      - name: Install code signing client (Windows only)
+        if: startsWith(matrix.platform, 'windows')
+        run: choco install jsign
+
       - name: Install frontend dependencies
         run: pnpm install
 
@@ -121,14 +125,28 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
-      - name: build app
+      - name: build app (Linux)
         run: pnpm --filter=@modrinth/app run tauri build --config "tauri-release.conf.json"
-        id: build_os
-        if: "!startsWith(matrix.platform, 'macos')"
+        if: startsWith(matrix.platform, 'ubuntu')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+
+      - name: build app (Windows)
+        run: |
+          [System.Convert]::FromBase64String($env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64) | Set-Content -Path signer-client-cert.p12 -AsByteStream
+          $env:DIGICERT_ONE_SIGNER_CREDENTIALS = "$env:DIGICERT_ONE_SIGNER_API_KEY|signer-client-cert.p12|$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD"
+          pnpm --filter=@modrinth/app run tauri build --config "tauri-release.conf.json" --verbose
+          Remove-Item -Path signer-client-cert.p12
+        if: startsWith(matrix.platform, 'windows')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          DIGICERT_ONE_SIGNER_API_KEY: ${{ secrets.DIGICERT_ONE_SIGNER_API_KEY }}
+          DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64: ${{ secrets.DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64 }}
+          DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD: ${{ secrets.DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD }}
 
       - name: upload ${{ matrix.platform }}
         uses: actions/upload-artifact@v4
