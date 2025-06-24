@@ -26,7 +26,7 @@
       :class="{ expanded: mode === 'expanded', isolated: mode === 'isolated' }"
     >
       <div v-if="selectedAccount" class="selected account">
-        <Avatar size="xs" :src="`https://mc-heads.net/avatar/${selectedAccount.profile.id}/128`" />
+        <Avatar size="xs" :src="avatarUrl" />
         <div>
           <h4>{{ selectedAccount.profile.name }}</h4>
           <p>Selected</p>
@@ -57,11 +57,7 @@
         <div v-for="account in displayAccounts" :key="account.profile.id" class="account-row">
           <Button class="option account" @click="setAccount(account)">
             <Avatar
-              :src="
-                account.profile.id == selectedAccount.profile.id
-                  ? avatarUrl
-                  : `https://mc-heads.net/avatar/${account.profile.id}/128`
-              "
+              :src="getAccountAvatarUrl(account)"
               class="icon"
             />
             <p>{{ account.profile.name }}</p>
@@ -82,7 +78,7 @@
 <script setup>
 import { DropdownIcon, PlusIcon, TrashIcon, LogInIcon, SpinnerIcon } from '@modrinth/assets'
 import { Avatar, Button, Card } from '@modrinth/ui'
-import { ref, computed, onMounted, onBeforeUnmount, onUnmounted } from 'vue'
+import {ref, computed, onMounted, onBeforeUnmount, onUnmounted, watch} from 'vue'
 import {
   users,
   remove_user,
@@ -95,6 +91,7 @@ import { trackEvent } from '@/helpers/analytics'
 import { process_listener } from '@/helpers/events'
 import { handleSevereError } from '@/store/error.js'
 import { get_available_skins } from '@/helpers/skins'
+import { getPlayerHeadUrl } from '@/helpers/rendering/batch-skin-renderer.ts'
 
 defineProps({
   mode: {
@@ -110,6 +107,7 @@ const accounts = ref({})
 const loginDisabled = ref(false)
 const defaultUser = ref()
 const equippedSkin = ref(null)
+const headUrlCache = ref(new Map())
 
 async function refreshValues() {
   defaultUser.value = await get_default_user().catch(handleError)
@@ -118,6 +116,15 @@ async function refreshValues() {
   try {
     const skins = await get_available_skins()
     equippedSkin.value = skins.find((skin) => skin.is_equipped)
+
+    if (equippedSkin.value) {
+      try {
+        const headUrl = await getPlayerHeadUrl(equippedSkin.value)
+        headUrlCache.value.set(equippedSkin.value.texture_key, headUrl)
+      } catch (error) {
+        console.warn('Failed to get head render for equipped skin:', error)
+      }
+    }
   } catch {
     equippedSkin.value = null
   }
@@ -140,10 +147,27 @@ const displayAccounts = computed(() =>
 
 const avatarUrl = computed(() => {
   if (equippedSkin.value?.texture_key) {
+    const cachedUrl = headUrlCache.value.get(equippedSkin.value.texture_key)
+    if (cachedUrl) {
+      return cachedUrl
+    }
     return `https://mc-heads.net/avatar/${equippedSkin.value.texture_key}/128`
   }
-  return `https://mc-heads.net/avatar/${selectedAccount.value.profile.id}/128`
+  if (selectedAccount.value?.profile?.id) {
+    return `https://mc-heads.net/avatar/${selectedAccount.value.profile.id}/128`
+  }
+  return 'https://launcher-files.modrinth.com/assets/steve_head.png'
 })
+
+function getAccountAvatarUrl(account) {
+  if (account.profile.id === selectedAccount.value?.profile?.id && equippedSkin.value?.texture_key) {
+    const cachedUrl = headUrlCache.value.get(equippedSkin.value.texture_key)
+    if (cachedUrl) {
+      return cachedUrl
+    }
+  }
+  return `https://mc-heads.net/avatar/${account.profile.id}/128`
+}
 
 const selectedAccount = computed(() =>
   accounts.value.find((account) => account.profile.id === defaultUser.value),

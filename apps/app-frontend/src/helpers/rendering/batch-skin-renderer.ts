@@ -133,21 +133,165 @@ function getModelUrlForVariant(variant: string): string {
 }
 
 export const map = reactive(new Map<string, RenderResult>())
+export const headMap = reactive(new Map<string, string>())
 const DEBUG_MODE = false
 
 export async function cleanupUnusedPreviews(skins: Skin[]): Promise<void> {
   const validKeys = new Set<string>()
+  const validHeadKeys = new Set<string>()
 
   for (const skin of skins) {
     const key = `${skin.texture_key}+${skin.variant}+${skin.cape_id ?? 'no-cape'}`
+    const headKey = `${skin.texture_key}-head`
     validKeys.add(key)
+    validHeadKeys.add(headKey)
   }
 
   try {
     await skinPreviewStorage.cleanupInvalidKeys(validKeys)
+    await skinPreviewStorage.cleanupInvalidKeys(validHeadKeys)
   } catch (error) {
     console.warn('Failed to cleanup unused skin previews:', error)
   }
+}
+
+export async function generatePlayerHeadBlob(
+  skinUrl: string,
+  size: number = 64
+): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+
+    img.onload = () => {
+      try {
+        const sourceCanvas = document.createElement('canvas');
+        const sourceCtx = sourceCanvas.getContext('2d');
+
+        if (!sourceCtx) {
+          throw new Error('Could not get 2D context from source canvas');
+        }
+
+        sourceCanvas.width = img.width;
+        sourceCanvas.height = img.height;
+
+        sourceCtx.drawImage(img, 0, 0);
+
+        const outputCanvas = document.createElement('canvas');
+        const outputCtx = outputCanvas.getContext('2d');
+
+        if (!outputCtx) {
+          throw new Error('Could not get 2D context from output canvas');
+        }
+
+        outputCanvas.width = size;
+        outputCanvas.height = size;
+
+        outputCtx.imageSmoothingEnabled = false;
+
+        const headImageData = sourceCtx.getImageData(8, 8, 8, 8);
+
+        const headCanvas = document.createElement('canvas');
+        const headCtx = headCanvas.getContext('2d');
+
+        if (!headCtx) {
+          throw new Error('Could not get 2D context from head canvas');
+        }
+
+        headCanvas.width = 8;
+        headCanvas.height = 8;
+        headCtx.putImageData(headImageData, 0, 0);
+
+        outputCtx.drawImage(headCanvas, 0, 0, 8, 8, 0, 0, size, size);
+
+        const hatImageData = sourceCtx.getImageData(40, 8, 8, 8);
+
+        const hatCanvas = document.createElement('canvas');
+        const hatCtx = hatCanvas.getContext('2d');
+
+        if (!hatCtx) {
+          throw new Error('Could not get 2D context from hat canvas');
+        }
+
+        hatCanvas.width = 8;
+        hatCanvas.height = 8;
+        hatCtx.putImageData(hatImageData, 0, 0);
+
+        const hatPixels = hatImageData.data;
+        let hasHat = false;
+
+        for (let i = 3; i < hatPixels.length; i += 4) {
+          if (hatPixels[i] > 0) {
+            hasHat = true;
+            break;
+          }
+        }
+
+        if (hasHat) {
+          outputCtx.drawImage(hatCanvas, 0, 0, 8, 8, 0, 0, size, size);
+        }
+
+        outputCanvas.toBlob((blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error('Failed to create blob from canvas'));
+          }
+        }, 'image/png');
+
+      } catch (error) {
+        reject(error);
+      }
+    };
+
+    img.onerror = () => {
+      reject(new Error('Failed to load skin texture image'));
+    };
+
+    img.src = skinUrl;
+  });
+}
+
+async function generateHeadRender(skin: Skin): Promise<string> {
+  const headKey = `${skin.texture_key}-head`
+
+  if (headMap.has(headKey)) {
+    if (DEBUG_MODE) {
+      const url = headMap.get(headKey)!
+      URL.revokeObjectURL(url)
+      headMap.delete(headKey)
+    } else {
+      return headMap.get(headKey)!
+    }
+  }
+
+  try {
+    const cached = await skinPreviewStorage.retrieve(headKey)
+    if (cached && typeof cached === 'string') {
+      headMap.set(headKey, cached)
+      return cached
+    }
+  } catch (error) {
+    console.warn('Failed to retrieve cached head render:', error)
+  }
+
+  const skinUrl = await get_normalized_skin_texture(skin)
+  const headBlob = await generatePlayerHeadBlob(skinUrl, 64)
+  const headUrl = URL.createObjectURL(headBlob)
+
+  headMap.set(headKey, headUrl)
+
+  try {
+    await skinPreviewStorage.store(headKey, headUrl)
+  } catch (error) {
+    console.warn('Failed to store head render in persistent storage:', error)
+  }
+
+  return headUrl
+}
+
+export async function getPlayerHeadUrl(skin: Skin): Promise<string> {
+  return await generateHeadRender(skin)
 }
 
 export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promise<void> {
@@ -203,6 +347,8 @@ export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promis
       } catch (error) {
         console.warn('Failed to store skin preview in persistent storage:', error)
       }
+
+      await generateHeadRender(skin)
     }
   } finally {
     renderer.dispose()
