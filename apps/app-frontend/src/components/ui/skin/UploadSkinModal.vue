@@ -12,7 +12,7 @@
           <UploadIcon /> Select skin texture file
         </p>
         <p class="mx-auto mt-0 text-secondary text-sm text-center">
-          Drag and drop or click here to browse
+          Click here to browse
         </p>
         <input
           ref="fileInput"
@@ -30,9 +30,9 @@
 import { ref, onBeforeUnmount, watch } from 'vue'
 import { UploadIcon } from '@modrinth/assets'
 import { useNotifications } from '@/store/state'
-import { getCurrentWebview } from '@tauri-apps/api/webview'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import { get_dragged_skin_data } from '@/helpers/skins'
+// import { getCurrentWebview } from '@tauri-apps/api/webview'
+// import { get_dragged_skin_data } from '@/helpers/skins'
 
 const notifications = useNotifications()
 
@@ -94,45 +94,45 @@ async function handleInputFileChange(e: Event) {
   await processFile(file)
 }
 
-async function setupDragDropListener() {
-  try {
-    if (modalVisible.value) {
-      await cleanupDragDropListener()
-      unlisten.value = await getCurrentWebview().onDragDropEvent(async (event) => {
-        if (event.payload.type !== 'drop') {
-          return
-        }
-
-        if (!event.payload.paths || event.payload.paths.length === 0) {
-          return
-        }
-
-        const filePath = event.payload.paths[0]
-
-        try {
-          console.log(filePath);
-          const data = await get_dragged_skin_data(filePath).catch((err) => {
-            throw new Error(`Failed to read file: ${err.message || err}`)
-          })
-
-          const fileName = filePath.split('/').pop() || filePath.split('\\').pop() || 'skin.png'
-          const fileBlob = new Blob([data], { type: 'image/png' })
-          const file = new File([fileBlob], fileName, { type: 'image/png' })
-
-          await processFile(file)
-        } catch (error) {
-          console.error(error)
-          notifications.addNotification({
-            title: 'Error processing file',
-            text: error.message || 'Failed to read the dropped file.',
-            type: 'error',
-          })
-        }
-      })
-    }
-  } catch (error) {
-    console.error('Failed to set up drag and drop listener:', error)
-  }
+function setupDragDropListener() {
+  // try {
+  //   if (modalVisible.value) {
+  //     await cleanupDragDropListener()
+  //     unlisten.value = await getCurrentWebview().onDragDropEvent(async (event) => {
+  //       if (event.payload.type !== 'drop') {
+  //         return
+  //       }
+  //
+  //       if (!event.payload.paths || event.payload.paths.length === 0) {
+  //         return
+  //       }
+  //
+  //       const filePath = event.payload.paths[0]
+  //
+  //       try {
+  //         console.log(filePath);
+  //         const data = await get_dragged_skin_data(filePath).catch((err) => {
+  //           throw new Error(`Failed to read file: ${err.message || err}`)
+  //         })
+  //
+  //         const fileName = filePath.split('/').pop() || filePath.split('\\').pop() || 'skin.png'
+  //         const fileBlob = new Blob([data], { type: 'image/png' })
+  //         const file = new File([fileBlob], fileName, { type: 'image/png' })
+  //
+  //         await processFile(file)
+  //       } catch (error) {
+  //         console.error(error)
+  //         notifications.addNotification({
+  //           title: 'Error processing file',
+  //           text: error.message || 'Failed to read the dropped file.',
+  //           type: 'error',
+  //         })
+  //       }
+  //     })
+  //   }
+  // } catch (error) {
+  //   console.error('Failed to set up drag and drop listener:', error)
+  // }
 }
 
 async function cleanupDragDropListener() {
