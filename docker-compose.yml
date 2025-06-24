@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: labrinth
       POSTGRES_HOST_AUTH_METHOD: trust
     healthcheck:
-      test: ['CMD', 'pg_isready']
+      test: [ 'CMD', 'pg_isready' ]
       interval: 3s
       timeout: 5s
       retries: 3
@@ -25,7 +25,7 @@ services:
       MEILI_MASTER_KEY: modrinth
       MEILI_HTTP_PAYLOAD_SIZE_LIMIT: 107374182400
     healthcheck:
-      test: ['CMD', 'curl', '--fail', 'http://localhost:7700/health']
+      test: [ 'CMD', 'curl', '--fail', 'http://localhost:7700/health' ]
       interval: 3s
       timeout: 5s
       retries: 3
@@ -37,7 +37,7 @@ services:
     volumes:
       - redis-data:/data
     healthcheck:
-      test: ['CMD', 'redis-cli', 'PING']
+      test: [ 'CMD', 'redis-cli', 'PING' ]
       interval: 3s
       timeout: 5s
       retries: 3
@@ -49,7 +49,7 @@ services:
       CLICKHOUSE_USER: default
       CLICKHOUSE_PASSWORD: default
     healthcheck:
-      test: ['CMD', 'clickhouse-client', '--query', 'SELECT 1']
+      test: [ 'CMD', 'clickhouse-client', '--query', 'SELECT 1' ]
       interval: 3s
       timeout: 5s
       retries: 3
