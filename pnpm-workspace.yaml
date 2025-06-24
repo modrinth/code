@@ -1,3 +1,9 @@
 packages:
-  - 'apps/*'
-  - 'packages/*'
+  - 'apps/frontend'
+  - 'apps/labrinth'
+  - 'packages/ariadne'
+  - 'packages/assets'
+  - 'packages/eslint-config-custom'
+  - 'packages/tsconfig'
+  - 'packages/ui'
+  - 'packages/utils'
