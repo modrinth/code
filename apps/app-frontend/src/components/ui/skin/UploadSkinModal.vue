@@ -31,7 +31,6 @@ import { ref, onBeforeUnmount, watch } from 'vue'
 import { UploadIcon } from '@modrinth/assets'
 import { useNotifications } from '@/store/state'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
-import { readFile } from '@tauri-apps/plugin-fs'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 const notifications = useNotifications()
@@ -107,16 +106,17 @@ async function setupDragDropListener() {
           return
         }
 
-        const filePath = event.payload.paths[0]
+        // const filePath = event.payload.paths[0]
 
         try {
-          const data = await readFile(filePath)
-
-          const fileName = filePath.split('/').pop() || filePath.split('\\').pop() || 'skin.png'
-          const fileBlob = new Blob([data], { type: 'image/png' })
-          const file = new File([fileBlob], fileName, { type: 'image/png' })
-
-          await processFile(file)
+          // TODO: Drag and drop support for local files
+          // const data = await readFile(filePath)
+          //
+          // const fileName = filePath.split('/').pop() || filePath.split('\\').pop() || 'skin.png'
+          // const fileBlob = new Blob([data], { type: 'image/png' })
+          // const file = new File([fileBlob], fileName, { type: 'image/png' })
+          //
+          // await processFile(file)
         } catch (error) {
           console.error(error)
           notifications.addNotification({
