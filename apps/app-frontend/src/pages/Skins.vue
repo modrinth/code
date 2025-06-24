@@ -460,7 +460,7 @@ $skin-card-gap: 4px;
 
 .skin-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2.5fr);
   gap: 2.5rem;
 
   @media (max-width: 700px) {
@@ -493,12 +493,20 @@ $skin-card-gap: 4px;
 
 .skin-card-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: $skin-card-gap;
   width: 100%;
 
-  @media (max-width: 1110px) {
-    grid-template-columns: repeat(3, 1fr);
+  @media (min-width: 1300px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @media (min-width: 1750px) {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  @media (min-width: 2050px) {
+    grid-template-columns: repeat(6, 1fr);
   }
 }
 
