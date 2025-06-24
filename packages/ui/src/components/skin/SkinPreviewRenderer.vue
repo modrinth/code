@@ -14,14 +14,13 @@
     </div>
     <div
       v-if="nametag"
-      class="absolute top-[18%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md pointer-events-none z-10 font-minecraft nametag-bg transition-all duration-200"
+      class="absolute top-[18%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md pointer-events-none z-10 font-minecraft text-gray nametag-bg transition-all duration-200"
       :style="{ fontSize: nametagFontSize }"
     >
       {{ nametagText }}
     </div>
 
     <TresCanvas
-      v-show="isReady"
       shadows
       alpha
       :antialias="antialias"
@@ -34,6 +33,8 @@
       @pointermove="onPointerMove"
       @pointerup="onPointerUp"
       @pointerleave="onPointerUp"
+      class="transition-opacity duration-500"
+      :class="{'opacity-0': !isReady, 'opacity-100': isReady}"
     >
       <Suspense>
         <Group>
@@ -86,7 +87,11 @@
       <TresDirectionalLight :position="[2, 4, 3]" :intensity="1.2" :cast-shadow="true" />
     </TresCanvas>
 
-    <div v-if="!isReady" class="w-full h-full flex items-center justify-center">
+    <div
+      v-if="!isReady"
+      class="w-full h-full flex items-center justify-center transition-opacity duration-500"
+      :class="{'opacity-100': !isReady, 'opacity-0': isReady}"
+    >
       <div class="text-primary">Loading...</div>
     </div>
   </div>
@@ -648,8 +653,8 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .nametag-bg {
-  background: linear-gradient(308.68deg, rgba(0, 0, 0, 0) -52.46%, rgba(100, 100, 100, 0.1) 94.75%),
-    rgba(0, 0, 0, 0.2);
+  background: linear-gradient(308.68deg, rgba(50, 50, 50, 0.2) -52.46%, rgba(100, 100, 100, 0.2) 94.75%),
+  rgba(0, 0, 0, 0.2);
   box-shadow:
     inset -0.5px -0.5px 0px rgba(0, 0, 0, 0.25),
     inset 0.5px 0.5px 0px rgba(255, 255, 255, 0.05);

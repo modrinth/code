@@ -21,14 +21,11 @@ const pressed = ref(false)
   <div
     v-tooltip="tooltip ?? undefined"
     class="group relative overflow-hidden rounded-xl border-2 transition-all duration-200"
-    :class="[
-      props.selected ? 'border-brand' : 'border-transparent hover:border-inverted',
-      pressed ? 'scale-95' : '',
-    ]"
+    :class="[selected ? 'border-brand' : 'border-transparent hover:border-inverted']"
   >
     <button
       class="skin-btn-bg absolute inset-0 cursor-pointer p-0 border-none group-hover:brightness-125 transition-all duration-200"
-      :class="props.selected ? 'selected' : ''"
+      :class="selected ? 'selected' : ''"
       @mousedown="pressed = true"
       @mouseup="pressed = false"
       @mouseleave="pressed = false"
@@ -59,8 +56,8 @@ const pressed = ref(false)
       var(--color-brand) -76.68%,
       rgba(27, 217, 106, 0.534) -38.61%,
       rgba(12, 89, 44, 0.6) 100.4%
-    ),
-    var(--color-bg);
+  ),
+  var(--color-bg);
 }
 
 .skin-btn-bg.selected:hover,
