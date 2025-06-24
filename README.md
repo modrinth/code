@@ -9,16 +9,16 @@
 
 ## Modrinth Monorepo
 
-Welcome to the Modrinth Monorepo, the primary codebase for the Modrinth web interface and app. It contains ![Lines](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/modrinth/olympus/badge?logoColor=white&color=black&label=) lines of code and has ![Contributors](https://img.shields.io/github/contributors/Modrinth/code?color=black&label=) contributors!
+Welcome to the Modrinth Monorepo, the primary codebase for the Modrinth web interface and backend server. It contains ![Lines](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/modrinth/olympus/badge?logoColor=white&color=black&label=) lines of code and has ![Contributors](https://img.shields.io/github/contributors/Modrinth/code?color=black&label=) contributors!
 
-If you're not a developer and you've stumbled upon this repository, you can access the web interface on the [Modrinth website](https://modrinth.com) and download the latest release of the app [here](https://modrinth.com/app).
+If you're not a developer and you've stumbled upon this repository, you can access the web interface on the [Modrinth website](https://modrinth.com).
 
 ## Development
 
 This repository contains two primary packages. For detailed development information, please refer to their respective READMEs:
 
+- [Backend Server](apps/labrinth/README.md)
 - [Web Interface](apps/frontend/README.md)
-- [Desktop App](apps/app/README.md)
 
 ## Contributing
 
@@ -32,7 +32,7 @@ If you discover a security vulnerability within our codebase, please follow our 
 
 ## Support
 
-If you need help with the Modrinth web interface or app, please visit our [support page](https://support.modrinth.com). For general inquiries, you can also join our [Discord server](https://discord.modrinth.com).
+If you need help with the Modrinth web interface or backend server, please visit our [support page](https://support.modrinth.com). For general inquiries, you can also join our [Discord server](https://discord.modrinth.com).
 
 ## License
 
