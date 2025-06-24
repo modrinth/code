@@ -3,8 +3,9 @@ use crate::models::ids::{
     ChargeId, CollectionId, FileId, ImageId, NotificationId,
     OAuthAccessTokenId, OAuthClientAuthorizationId, OAuthClientId,
     OAuthRedirectUriId, OrganizationId, PatId, PayoutId, ProductId,
-    ProductPriceId, ProjectId, ReportId, SessionId, TeamId, TeamMemberId,
-    ThreadId, ThreadMessageId, UserSubscriptionId, VersionId,
+    ProductPriceId, ProjectId, ReportId, SessionId, SharedInstanceId,
+    SharedInstanceVersionId, TeamId, TeamMemberId, ThreadId, ThreadMessageId,
+    UserSubscriptionId, VersionId,
 };
 use ariadne::ids::base62_impl::to_base62;
 use ariadne::ids::{UserId, random_base62_rng, random_base62_rng_range};
@@ -88,39 +89,50 @@ macro_rules! generate_bulk_ids {
     };
 }
 
+macro_rules! impl_db_id_interface {
+    ($id_struct:ident, $db_id_struct:ident, $(, generator: $generator_function:ident @ $db_table:expr, $(bulk_generator: $bulk_generator_function:ident,)?)?) => {
+        #[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, PartialEq, Eq, Hash)]
+        #[sqlx(transparent)]
+        pub struct $db_id_struct(pub i64);
+
+        impl From<$id_struct> for $db_id_struct {
+            fn from(id: $id_struct) -> Self {
+                Self(id.0 as i64)
+            }
+        }
+
+        impl From<$db_id_struct> for $id_struct {
+            fn from(id: $db_id_struct) -> Self {
+                Self(id.0 as u64)
+            }
+        }
+
+        $(
+            generate_ids!(
+                $generator_function,
+                $db_id_struct,
+                "SELECT EXISTS(SELECT 1 FROM " + $db_table + " WHERE id=$1)"
+            );
+
+            $(
+                generate_bulk_ids!(
+                    $bulk_generator_function,
+                    $db_id_struct,
+                    "SELECT EXISTS(SELECT 1 FROM " + $db_table + " WHERE id = ANY($1))"
+                );
+            )?
+        )?
+    };
+}
+
 macro_rules! db_id_interface {
     ($id_struct:ident $(, generator: $generator_function:ident @ $db_table:expr, $(bulk_generator: $bulk_generator_function:ident,)?)?) => {
         paste! {
-            #[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, PartialEq, Eq, Hash)]
-            #[sqlx(transparent)]
-            pub struct [< DB $id_struct >](pub i64);
-
-            impl From<$id_struct> for [< DB $id_struct >] {
-                fn from(id: $id_struct) -> Self {
-                    Self(id.0 as i64)
-                }
-            }
-            impl From<[< DB $id_struct >]> for $id_struct {
-                fn from(id: [< DB $id_struct >]) -> Self {
-                    Self(id.0 as u64)
-                }
-            }
-
-            $(
-                generate_ids!(
-                    $generator_function,
-                    [< DB $id_struct >],
-                    "SELECT EXISTS(SELECT 1 FROM " + $db_table + " WHERE id=$1)"
-                );
-
-                $(
-                    generate_bulk_ids!(
-                        $bulk_generator_function,
-                        [< DB $id_struct >],
-                        "SELECT EXISTS(SELECT 1 FROM " + $db_table + " WHERE id = ANY($1))"
-                    );
-                )?
-            )?
+            impl_db_id_interface!(
+                $id_struct,
+                [< DB $id_struct >],
+                $(, generator: $generator_function @ $db_table, $(bulk_generator: $bulk_generator_function,)?)?
+            );
         }
     };
 }
@@ -211,6 +223,14 @@ db_id_interface!(
 db_id_interface!(
     SessionId,
     generator: generate_session_id @ "sessions",
+);
+db_id_interface!(
+    SharedInstanceId,
+    generator: generate_shared_instance_id @ "shared_instances",
+);
+db_id_interface!(
+    SharedInstanceVersionId,
+    generator: generate_shared_instance_version_id @ "shared_instance_versions",
 );
 db_id_interface!(
     TeamId,

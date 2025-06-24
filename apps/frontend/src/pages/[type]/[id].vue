@@ -32,7 +32,7 @@
             <h1 class="wrap-as-needed">
               {{ project.title }}
             </h1>
-            <Badge :type="project.status" />
+            <ProjectStatusBadge :status="project.status" />
           </div>
         </div>
         <h2>Project settings</h2>
@@ -870,17 +870,24 @@ import {
   ProjectSidebarCreators,
   ProjectSidebarDetails,
   ProjectSidebarLinks,
+  ProjectStatusBadge,
   ScrollablePanel,
   useRelativeTime,
 } from "@modrinth/ui";
 import VersionSummary from "@modrinth/ui/src/components/version/VersionSummary.vue";
-import { formatCategory, isRejected, isStaff, isUnderReview, renderString } from "@modrinth/utils";
+import {
+  formatCategory,
+  formatProjectType,
+  isRejected,
+  isStaff,
+  isUnderReview,
+  renderString,
+} from "@modrinth/utils";
 import { navigateTo } from "#app";
 import dayjs from "dayjs";
 import Accordion from "~/components/ui/Accordion.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import AutomaticAccordion from "~/components/ui/AutomaticAccordion.vue";
-import Badge from "~/components/ui/Badge.vue";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import MessageBanner from "~/components/ui/MessageBanner.vue";
@@ -1286,7 +1293,7 @@ featuredVersions.value.sort((a, b) => {
 });
 
 const projectTypeDisplay = computed(() =>
-  data.$formatProjectType(
+  formatProjectType(
     data.$getProjectTypeForDisplay(project.value.project_type, project.value.loaders),
   ),
 );

@@ -14,11 +14,11 @@ use crate::models::threads::{MessageBody, ThreadType};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::img;
+use crate::util::routes::read_typed_from_payload;
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
-use futures::StreamExt;
 use serde::Deserialize;
 use sqlx::PgPool;
 use validator::Validate;
@@ -63,15 +63,7 @@ pub async fn report_create(
     .await?
     .1;
 
-    let mut bytes = web::BytesMut::new();
-    while let Some(item) = body.next().await {
-        bytes.extend_from_slice(&item.map_err(|_| {
-            ApiError::InvalidInput(
-                "Error while parsing request payload!".to_string(),
-            )
-        })?);
-    }
-    let new_report: CreateReport = serde_json::from_slice(bytes.as_ref())?;
+    let new_report: CreateReport = read_typed_from_payload(&mut body).await?;
 
     let id =
         crate::database::models::generate_report_id(&mut transaction).await?;

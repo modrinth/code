@@ -9,7 +9,7 @@ use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::models::{DBTeamMember, ids as db_ids, image_item};
 use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
-use crate::file_hosting::FileHost;
+use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models;
 use crate::models::ids::ProjectId;
 use crate::models::images::ImageContext;
@@ -17,6 +17,7 @@ use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
     MonetizationStatus, Project, ProjectStatus, SearchRequest,
+    SideTypesMigrationReviewStatus,
 };
 use crate::models::teams::ProjectPermissions;
 use crate::models::threads::MessageBody;
@@ -27,7 +28,7 @@ use crate::search::indexing::remove_documents;
 use crate::search::{SearchConfig, SearchError, search_for_project};
 use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
-use crate::util::routes::read_from_payload;
+use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::base62_impl::parse_base62;
@@ -247,6 +248,8 @@ pub struct EditProject {
     #[validate(length(max = 65536))]
     pub moderation_message_body: Option<Option<String>>,
     pub monetization_status: Option<MonetizationStatus>,
+    pub side_types_migration_review_status:
+        Option<SideTypesMigrationReviewStatus>,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -274,640 +277,646 @@ pub async fn project_edit(
         ApiError::Validation(validation_errors_to_string(err, None))
     })?;
 
-    let string = info.into_inner().0;
-    let result = db_models::DBProject::get(&string, &**pool, &redis).await?;
-    if let Some(project_item) = result {
-        let id = project_item.inner.id;
+    let Some(project_item) =
+        db_models::DBProject::get(&info.into_inner().0, &**pool, &redis)
+            .await?
+    else {
+        return Err(ApiError::NotFound);
+    };
 
-        let (team_member, organization_team_member) =
-            db_models::DBTeamMember::get_for_project_permissions(
-                &project_item.inner,
-                user.id.into(),
-                &**pool,
-            )
-            .await?;
+    let id = project_item.inner.id;
 
-        let permissions = ProjectPermissions::get_permissions_by_role(
-            &user.role,
-            &team_member,
-            &organization_team_member,
-        );
+    let (team_member, organization_team_member) =
+        db_models::DBTeamMember::get_for_project_permissions(
+            &project_item.inner,
+            user.id.into(),
+            &**pool,
+        )
+        .await?;
 
-        if let Some(perms) = permissions {
-            let mut transaction = pool.begin().await?;
+    let Some(perms) = ProjectPermissions::get_permissions_by_role(
+        &user.role,
+        &team_member,
+        &organization_team_member,
+    ) else {
+        return Err(ApiError::CustomAuthentication(
+            "You do not have permission to edit this project!".to_string(),
+        ));
+    };
 
-            if let Some(name) = &new_project.name {
-                if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the name of this project!"
-                            .to_string(),
-                    ));
-                }
+    let mut transaction = pool.begin().await?;
 
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET name = $1
-                    WHERE (id = $2)
-                    ",
-                    name.trim(),
-                    id as db_ids::DBProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-
-            if let Some(summary) = &new_project.summary {
-                if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the summary of this project!"
-                            .to_string(),
-                    ));
-                }
-
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET summary = $1
-                    WHERE (id = $2)
-                    ",
-                    summary,
-                    id as db_ids::DBProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-
-            if let Some(status) = &new_project.status {
-                if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the status of this project!"
-                            .to_string(),
-                    ));
-                }
-
-                if !(user.role.is_mod()
-                    || !project_item.inner.status.is_approved()
-                        && status == &ProjectStatus::Processing
-                    || project_item.inner.status.is_approved()
-                        && status.can_be_requested())
-                {
-                    return Err(ApiError::CustomAuthentication(
-                        "You don't have permission to set this status!"
-                            .to_string(),
-                    ));
-                }
-
-                if status == &ProjectStatus::Processing {
-                    if project_item.versions.is_empty() {
-                        return Err(ApiError::InvalidInput(String::from(
-                            "Project submitted for review with no initial versions",
-                        )));
-                    }
-
-                    sqlx::query!(
-                        "
-                        UPDATE mods
-                        SET moderation_message = NULL, moderation_message_body = NULL, queued = NOW()
-                        WHERE (id = $1)
-                        ",
-                        id as db_ids::DBProjectId,
-                    )
-                    .execute(&mut *transaction)
-                    .await?;
-
-                    moderation_queue
-                        .projects
-                        .insert(project_item.inner.id.into());
-                }
-
-                if status.is_approved()
-                    && !project_item.inner.status.is_approved()
-                {
-                    sqlx::query!(
-                        "
-                        UPDATE mods
-                        SET approved = NOW()
-                        WHERE id = $1 AND approved IS NULL
-                        ",
-                        id as db_ids::DBProjectId,
-                    )
-                    .execute(&mut *transaction)
-                    .await?;
-                }
-                if status.is_searchable() && !project_item.inner.webhook_sent {
-                    if let Ok(webhook_url) =
-                        dotenvy::var("PUBLIC_DISCORD_WEBHOOK")
-                    {
-                        crate::util::webhook::send_discord_webhook(
-                            project_item.inner.id.into(),
-                            &pool,
-                            &redis,
-                            webhook_url,
-                            None,
-                        )
-                        .await
-                        .ok();
-
-                        sqlx::query!(
-                            "
-                            UPDATE mods
-                            SET webhook_sent = TRUE
-                            WHERE id = $1
-                            ",
-                            id as db_ids::DBProjectId,
-                        )
-                        .execute(&mut *transaction)
-                        .await?;
-                    }
-                }
-
-                if user.role.is_mod() {
-                    if let Ok(webhook_url) =
-                        dotenvy::var("MODERATION_SLACK_WEBHOOK")
-                    {
-                        crate::util::webhook::send_slack_webhook(
-                            project_item.inner.id.into(),
-                            &pool,
-                            &redis,
-                            webhook_url,
-                            Some(
-                                format!(
-                                    "*<{}/user/{}|{}>* changed project status from *{}* to *{}*",
-                                    dotenvy::var("SITE_URL")?,
-                                    user.username,
-                                    user.username,
-                                    &project_item.inner.status.as_friendly_str(),
-                                    status.as_friendly_str(),
-                                )
-                                .to_string(),
-                            ),
-                        )
-                        .await
-                        .ok();
-                    }
-                }
-
-                if team_member.is_none_or(|x| !x.accepted) {
-                    let notified_members = sqlx::query!(
-                        "
-                        SELECT tm.user_id id
-                        FROM team_members tm
-                        WHERE tm.team_id = $1 AND tm.accepted
-                        ",
-                        project_item.inner.team_id as db_ids::DBTeamId
-                    )
-                    .fetch(&mut *transaction)
-                    .map_ok(|c| db_models::DBUserId(c.id))
-                    .try_collect::<Vec<_>>()
-                    .await?;
-
-                    NotificationBuilder {
-                        body: NotificationBody::StatusChange {
-                            project_id: project_item.inner.id.into(),
-                            old_status: project_item.inner.status,
-                            new_status: *status,
-                        },
-                    }
-                    .insert_many(notified_members, &mut transaction, &redis)
-                    .await?;
-                }
-
-                ThreadMessageBuilder {
-                    author_id: Some(user.id.into()),
-                    body: MessageBody::StatusChange {
-                        new_status: *status,
-                        old_status: project_item.inner.status,
-                    },
-                    thread_id: project_item.thread_id,
-                    hide_identity: user.role.is_mod(),
-                }
-                .insert(&mut transaction)
-                .await?;
-
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET status = $1
-                    WHERE (id = $2)
-                    ",
-                    status.as_str(),
-                    id as db_ids::DBProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-
-                if project_item.inner.status.is_searchable()
-                    && !status.is_searchable()
-                {
-                    remove_documents(
-                        &project_item
-                            .versions
-                            .into_iter()
-                            .map(|x| x.into())
-                            .collect::<Vec<_>>(),
-                        &search_config,
-                    )
-                    .await?;
-                }
-            }
-
-            if let Some(requested_status) = &new_project.requested_status {
-                if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the requested status of this project!"
-                            .to_string(),
-                    ));
-                }
-
-                if !requested_status
-                    .map(|x| x.can_be_requested())
-                    .unwrap_or(true)
-                {
-                    return Err(ApiError::InvalidInput(String::from(
-                        "Specified status cannot be requested!",
-                    )));
-                }
-
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET requested_status = $1
-                    WHERE (id = $2)
-                    ",
-                    requested_status.map(|x| x.as_str()),
-                    id as db_ids::DBProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-
-            if perms.contains(ProjectPermissions::EDIT_DETAILS) {
-                if new_project.categories.is_some() {
-                    sqlx::query!(
-                        "
-                        DELETE FROM mods_categories
-                        WHERE joining_mod_id = $1 AND is_additional = FALSE
-                        ",
-                        id as db_ids::DBProjectId,
-                    )
-                    .execute(&mut *transaction)
-                    .await?;
-                }
-
-                if new_project.additional_categories.is_some() {
-                    sqlx::query!(
-                        "
-                        DELETE FROM mods_categories
-                        WHERE joining_mod_id = $1 AND is_additional = TRUE
-                        ",
-                        id as db_ids::DBProjectId,
-                    )
-                    .execute(&mut *transaction)
-                    .await?;
-                }
-            }
-
-            if let Some(categories) = &new_project.categories {
-                edit_project_categories(
-                    categories,
-                    &perms,
-                    id as db_ids::DBProjectId,
-                    false,
-                    &mut transaction,
-                )
-                .await?;
-            }
-
-            if let Some(categories) = &new_project.additional_categories {
-                edit_project_categories(
-                    categories,
-                    &perms,
-                    id as db_ids::DBProjectId,
-                    true,
-                    &mut transaction,
-                )
-                .await?;
-            }
-
-            if let Some(license_url) = &new_project.license_url {
-                if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the license URL of this project!"
-                            .to_string(),
-                    ));
-                }
-
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET license_url = $1
-                    WHERE (id = $2)
-                    ",
-                    license_url.as_deref(),
-                    id as db_ids::DBProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-
-            if let Some(slug) = &new_project.slug {
-                if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the slug of this project!"
-                            .to_string(),
-                    ));
-                }
-
-                let slug_project_id_option: Option<u64> =
-                    parse_base62(slug).ok();
-                if let Some(slug_project_id) = slug_project_id_option {
-                    let results = sqlx::query!(
-                        "
-                        SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)
-                        ",
-                        slug_project_id as i64
-                    )
-                    .fetch_one(&mut *transaction)
-                    .await?;
-
-                    if results.exists.unwrap_or(true) {
-                        return Err(ApiError::InvalidInput(
-                            "Slug collides with other project's id!"
-                                .to_string(),
-                        ));
-                    }
-                }
-
-                // Make sure the new slug is different from the old one
-                // We are able to unwrap here because the slug is always set
-                if !slug.eq(&project_item
-                    .inner
-                    .slug
-                    .clone()
-                    .unwrap_or_default())
-                {
-                    let results = sqlx::query!(
-                        "
-                      SELECT EXISTS(SELECT 1 FROM mods WHERE slug = LOWER($1))
-                      ",
-                        slug
-                    )
-                    .fetch_one(&mut *transaction)
-                    .await?;
-
-                    if results.exists.unwrap_or(true) {
-                        return Err(ApiError::InvalidInput(
-                            "Slug collides with other project's id!"
-                                .to_string(),
-                        ));
-                    }
-                }
-
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET slug = LOWER($1)
-                    WHERE (id = $2)
-                    ",
-                    Some(slug),
-                    id as db_ids::DBProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-
-            if let Some(license) = &new_project.license_id {
-                if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the license of this project!"
-                            .to_string(),
-                    ));
-                }
-
-                let mut license = license.clone();
-
-                if license.to_lowercase() == "arr" {
-                    license = models::projects::DEFAULT_LICENSE_ID.to_string();
-                }
-
-                spdx::Expression::parse(&license).map_err(|err| {
-                    ApiError::InvalidInput(format!(
-                        "Invalid SPDX license identifier: {err}"
-                    ))
-                })?;
-
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET license = $1
-                    WHERE (id = $2)
-                    ",
-                    license,
-                    id as db_ids::DBProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-            if let Some(links) = &new_project.link_urls {
-                if !links.is_empty() {
-                    if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-                        return Err(ApiError::CustomAuthentication(
-                            "You do not have the permissions to edit the links of this project!"
-                                .to_string(),
-                        ));
-                    }
-
-                    let ids_to_delete =
-                        links.keys().cloned().collect::<Vec<String>>();
-                    // Deletes all links from hashmap- either will be deleted or be replaced
-                    sqlx::query!(
-                        "
-                        DELETE FROM mods_links
-                        WHERE joining_mod_id = $1 AND joining_platform_id IN (
-                            SELECT id FROM link_platforms WHERE name = ANY($2)
-                        )
-                        ",
-                        id as db_ids::DBProjectId,
-                        &ids_to_delete
-                    )
-                    .execute(&mut *transaction)
-                    .await?;
-
-                    for (platform, url) in links {
-                        if let Some(url) = url {
-                            let platform_id =
-                                db_models::categories::LinkPlatform::get_id(
-                                    platform,
-                                    &mut *transaction,
-                                )
-                                .await?
-                                .ok_or_else(
-                                    || {
-                                        ApiError::InvalidInput(format!(
-                                            "Platform {} does not exist.",
-                                            platform.clone()
-                                        ))
-                                    },
-                                )?;
-                            sqlx::query!(
-                                "
-                                INSERT INTO mods_links (joining_mod_id, joining_platform_id, url)
-                                VALUES ($1, $2, $3)
-                                ",
-                                id as db_ids::DBProjectId,
-                                platform_id as db_ids::LinkPlatformId,
-                                url
-                            )
-                            .execute(&mut *transaction)
-                            .await?;
-                        }
-                    }
-                }
-            }
-            if let Some(moderation_message) = &new_project.moderation_message {
-                if !user.role.is_mod()
-                    && (!project_item.inner.status.is_approved()
-                        || moderation_message.is_some())
-                {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the moderation message of this project!"
-                            .to_string(),
-                    ));
-                }
-
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET moderation_message = $1
-                    WHERE (id = $2)
-                    ",
-                    moderation_message.as_deref(),
-                    id as db_ids::DBProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-
-            if let Some(moderation_message_body) =
-                &new_project.moderation_message_body
-            {
-                if !user.role.is_mod()
-                    && (!project_item.inner.status.is_approved()
-                        || moderation_message_body.is_some())
-                {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the moderation message body of this project!"
-                            .to_string(),
-                    ));
-                }
-
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET moderation_message_body = $1
-                    WHERE (id = $2)
-                    ",
-                    moderation_message_body.as_deref(),
-                    id as db_ids::DBProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-
-            if let Some(description) = &new_project.description {
-                if !perms.contains(ProjectPermissions::EDIT_BODY) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the description (body) of this project!"
-                            .to_string(),
-                    ));
-                }
-
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET description = $1
-                    WHERE (id = $2)
-                    ",
-                    description,
-                    id as db_ids::DBProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-
-            if let Some(monetization_status) = &new_project.monetization_status
-            {
-                if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the monetization status of this project!"
-                            .to_string(),
-                    ));
-                }
-
-                if (*monetization_status
-                    == MonetizationStatus::ForceDemonetized
-                    || project_item.inner.monetization_status
-                        == MonetizationStatus::ForceDemonetized)
-                    && !user.role.is_mod()
-                {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the monetization status of this project!"
-                            .to_string(),
-                    ));
-                }
-
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET monetization_status = $1
-                    WHERE (id = $2)
-                    ",
-                    monetization_status.as_str(),
-                    id as db_ids::DBProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-
-            // check new description and body for links to associated images
-            // if they no longer exist in the description or body, delete them
-            let checkable_strings: Vec<&str> =
-                vec![&new_project.description, &new_project.summary]
-                    .into_iter()
-                    .filter_map(|x| x.as_ref().map(|y| y.as_str()))
-                    .collect();
-
-            let context = ImageContext::Project {
-                project_id: Some(id.into()),
-            };
-
-            img::delete_unused_images(
-                context,
-                checkable_strings,
-                &mut transaction,
-                &redis,
-            )
-            .await?;
-
-            transaction.commit().await?;
-            db_models::DBProject::clear_cache(
-                project_item.inner.id,
-                project_item.inner.slug,
-                None,
-                &redis,
-            )
-            .await?;
-
-            Ok(HttpResponse::NoContent().body(""))
-        } else {
-            Err(ApiError::CustomAuthentication(
-                "You do not have permission to edit this project!".to_string(),
-            ))
+    if let Some(name) = &new_project.name {
+        if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
+            return Err(ApiError::CustomAuthentication(
+                "You do not have the permissions to edit the name of this project!"
+                    .to_string(),
+            ));
         }
-    } else {
-        Err(ApiError::NotFound)
+
+        sqlx::query!(
+            "
+            UPDATE mods
+            SET name = $1
+            WHERE (id = $2)
+            ",
+            name.trim(),
+            id as db_ids::DBProjectId,
+        )
+        .execute(&mut *transaction)
+        .await?;
     }
+
+    if let Some(summary) = &new_project.summary {
+        if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
+            return Err(ApiError::CustomAuthentication(
+                "You do not have the permissions to edit the summary of this project!"
+                    .to_string(),
+            ));
+        }
+
+        sqlx::query!(
+            "
+            UPDATE mods
+            SET summary = $1
+            WHERE (id = $2)
+            ",
+            summary,
+            id as db_ids::DBProjectId,
+        )
+        .execute(&mut *transaction)
+        .await?;
+    }
+
+    if let Some(status) = &new_project.status {
+        if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
+            return Err(ApiError::CustomAuthentication(
+                "You do not have the permissions to edit the status of this project!"
+                    .to_string(),
+            ));
+        }
+
+        if !(user.role.is_mod()
+            || !project_item.inner.status.is_approved()
+                && status == &ProjectStatus::Processing
+            || project_item.inner.status.is_approved()
+                && status.can_be_requested())
+        {
+            return Err(ApiError::CustomAuthentication(
+                "You don't have permission to set this status!".to_string(),
+            ));
+        }
+
+        if status == &ProjectStatus::Processing {
+            if project_item.versions.is_empty() {
+                return Err(ApiError::InvalidInput(String::from(
+                    "Project submitted for review with no initial versions",
+                )));
+            }
+
+            sqlx::query!(
+                "
+                UPDATE mods
+                SET moderation_message = NULL, moderation_message_body = NULL, queued = NOW()
+                WHERE (id = $1)
+                ",
+                id as db_ids::DBProjectId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            moderation_queue
+                .projects
+                .insert(project_item.inner.id.into());
+        }
+
+        if status.is_approved() && !project_item.inner.status.is_approved() {
+            sqlx::query!(
+                "
+                UPDATE mods
+                SET approved = NOW()
+                WHERE id = $1 AND approved IS NULL
+                ",
+                id as db_ids::DBProjectId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+        }
+
+        if status.is_searchable() && !project_item.inner.webhook_sent {
+            if let Ok(webhook_url) = dotenvy::var("PUBLIC_DISCORD_WEBHOOK") {
+                crate::util::webhook::send_discord_webhook(
+                    project_item.inner.id.into(),
+                    &pool,
+                    &redis,
+                    webhook_url,
+                    None,
+                )
+                .await
+                .ok();
+
+                sqlx::query!(
+                    "
+                    UPDATE mods
+                    SET webhook_sent = TRUE
+                    WHERE id = $1
+                    ",
+                    id as db_ids::DBProjectId,
+                )
+                .execute(&mut *transaction)
+                .await?;
+            }
+        }
+
+        if user.role.is_mod() {
+            if let Ok(webhook_url) = dotenvy::var("MODERATION_SLACK_WEBHOOK") {
+                crate::util::webhook::send_slack_webhook(
+                    project_item.inner.id.into(),
+                    &pool,
+                    &redis,
+                    webhook_url,
+                    Some(
+                        format!(
+                            "*<{}/user/{}|{}>* changed project status from *{}* to *{}*",
+                            dotenvy::var("SITE_URL")?,
+                            user.username,
+                            user.username,
+                            &project_item.inner.status.as_friendly_str(),
+                            status.as_friendly_str(),
+                        )
+                        .to_string(),
+                    ),
+                )
+                .await
+                .ok();
+            }
+        }
+
+        if team_member.is_none_or(|x| !x.accepted) {
+            let notified_members = sqlx::query!(
+                "
+                SELECT tm.user_id id
+                FROM team_members tm
+                WHERE tm.team_id = $1 AND tm.accepted
+                ",
+                project_item.inner.team_id as db_ids::DBTeamId
+            )
+            .fetch(&mut *transaction)
+            .map_ok(|c| db_models::DBUserId(c.id))
+            .try_collect::<Vec<_>>()
+            .await?;
+
+            NotificationBuilder {
+                body: NotificationBody::StatusChange {
+                    project_id: project_item.inner.id.into(),
+                    old_status: project_item.inner.status,
+                    new_status: *status,
+                },
+            }
+            .insert_many(notified_members, &mut transaction, &redis)
+            .await?;
+        }
+
+        ThreadMessageBuilder {
+            author_id: Some(user.id.into()),
+            body: MessageBody::StatusChange {
+                new_status: *status,
+                old_status: project_item.inner.status,
+            },
+            thread_id: project_item.thread_id,
+            hide_identity: user.role.is_mod(),
+        }
+        .insert(&mut transaction)
+        .await?;
+
+        sqlx::query!(
+            "
+            UPDATE mods
+            SET status = $1
+            WHERE (id = $2)
+            ",
+            status.as_str(),
+            id as db_ids::DBProjectId,
+        )
+        .execute(&mut *transaction)
+        .await?;
+    }
+
+    if let Some(requested_status) = &new_project.requested_status {
+        if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
+            return Err(ApiError::CustomAuthentication(
+                "You do not have the permissions to edit the requested status of this project!"
+                    .to_string(),
+            ));
+        }
+
+        if !requested_status
+            .map(|x| x.can_be_requested())
+            .unwrap_or(true)
+        {
+            return Err(ApiError::InvalidInput(String::from(
+                "Specified status cannot be requested!",
+            )));
+        }
+
+        sqlx::query!(
+            "
+            UPDATE mods
+            SET requested_status = $1
+            WHERE (id = $2)
+            ",
+            requested_status.map(|x| x.as_str()),
+            id as db_ids::DBProjectId,
+        )
+        .execute(&mut *transaction)
+        .await?;
+    }
+
+    if perms.contains(ProjectPermissions::EDIT_DETAILS) {
+        if new_project.categories.is_some() {
+            sqlx::query!(
+                "
+                DELETE FROM mods_categories
+                WHERE joining_mod_id = $1 AND is_additional = FALSE
+                ",
+                id as db_ids::DBProjectId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+        }
+
+        if new_project.additional_categories.is_some() {
+            sqlx::query!(
+                "
+                DELETE FROM mods_categories
+                WHERE joining_mod_id = $1 AND is_additional = TRUE
+                ",
+                id as db_ids::DBProjectId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+        }
+    }
+
+    if let Some(categories) = &new_project.categories {
+        edit_project_categories(
+            categories,
+            &perms,
+            id as db_ids::DBProjectId,
+            false,
+            &mut transaction,
+        )
+        .await?;
+    }
+
+    if let Some(categories) = &new_project.additional_categories {
+        edit_project_categories(
+            categories,
+            &perms,
+            id as db_ids::DBProjectId,
+            true,
+            &mut transaction,
+        )
+        .await?;
+    }
+
+    if let Some(license_url) = &new_project.license_url {
+        if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
+            return Err(ApiError::CustomAuthentication(
+                "You do not have the permissions to edit the license URL of this project!"
+                    .to_string(),
+            ));
+        }
+
+        sqlx::query!(
+            "
+            UPDATE mods
+            SET license_url = $1
+            WHERE (id = $2)
+            ",
+            license_url.as_deref(),
+            id as db_ids::DBProjectId,
+        )
+        .execute(&mut *transaction)
+        .await?;
+    }
+
+    if let Some(slug) = &new_project.slug {
+        if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
+            return Err(ApiError::CustomAuthentication(
+                "You do not have the permissions to edit the slug of this project!"
+                    .to_string(),
+            ));
+        }
+
+        let slug_project_id_option: Option<u64> = parse_base62(slug).ok();
+        if let Some(slug_project_id) = slug_project_id_option {
+            let results = sqlx::query!(
+                "
+                SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)
+                ",
+                slug_project_id as i64
+            )
+            .fetch_one(&mut *transaction)
+            .await?;
+
+            if results.exists.unwrap_or(true) {
+                return Err(ApiError::InvalidInput(
+                    "Slug collides with other project's id!".to_string(),
+                ));
+            }
+        }
+
+        // Make sure the new slug is different from the old one
+        // We are able to unwrap here because the slug is always set
+        if !slug.eq(&project_item.inner.slug.clone().unwrap_or_default()) {
+            let results = sqlx::query!(
+                "
+                SELECT EXISTS(SELECT 1 FROM mods WHERE slug = LOWER($1))
+                ",
+                slug
+            )
+            .fetch_one(&mut *transaction)
+            .await?;
+
+            if results.exists.unwrap_or(true) {
+                return Err(ApiError::InvalidInput(
+                    "Slug collides with other project's id!".to_string(),
+                ));
+            }
+        }
+
+        sqlx::query!(
+            "
+            UPDATE mods
+            SET slug = LOWER($1)
+            WHERE (id = $2)
+            ",
+            Some(slug),
+            id as db_ids::DBProjectId,
+        )
+        .execute(&mut *transaction)
+        .await?;
+    }
+
+    if let Some(license) = &new_project.license_id {
+        if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
+            return Err(ApiError::CustomAuthentication(
+                "You do not have the permissions to edit the license of this project!"
+                    .to_string(),
+            ));
+        }
+
+        let mut license = license.clone();
+
+        if license.to_lowercase() == "arr" {
+            license = models::projects::DEFAULT_LICENSE_ID.to_string();
+        }
+
+        spdx::Expression::parse(&license).map_err(|err| {
+            ApiError::InvalidInput(format!(
+                "Invalid SPDX license identifier: {err}"
+            ))
+        })?;
+
+        sqlx::query!(
+            "
+            UPDATE mods
+            SET license = $1
+            WHERE (id = $2)
+            ",
+            license,
+            id as db_ids::DBProjectId,
+        )
+        .execute(&mut *transaction)
+        .await?;
+    }
+
+    if let Some(links) = &new_project.link_urls {
+        if !links.is_empty() {
+            if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
+                return Err(ApiError::CustomAuthentication(
+                    "You do not have the permissions to edit the links of this project!"
+                        .to_string(),
+                ));
+            }
+
+            let ids_to_delete = links.keys().cloned().collect::<Vec<String>>();
+            // Deletes all links from hashmap- either will be deleted or be replaced
+            sqlx::query!(
+                "
+                DELETE FROM mods_links
+                WHERE joining_mod_id = $1 AND joining_platform_id IN (
+                    SELECT id FROM link_platforms WHERE name = ANY($2)
+                )
+                ",
+                id as db_ids::DBProjectId,
+                &ids_to_delete
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            for (platform, url) in links {
+                if let Some(url) = url {
+                    let platform_id =
+                        db_models::categories::LinkPlatform::get_id(
+                            platform,
+                            &mut *transaction,
+                        )
+                        .await?
+                        .ok_or_else(|| {
+                            ApiError::InvalidInput(format!(
+                                "Platform {} does not exist.",
+                                platform.clone()
+                            ))
+                        })?;
+                    sqlx::query!(
+                        "
+                        INSERT INTO mods_links (joining_mod_id, joining_platform_id, url)
+                        VALUES ($1, $2, $3)
+                        ",
+                        id as db_ids::DBProjectId,
+                        platform_id as db_ids::LinkPlatformId,
+                        url
+                    )
+                    .execute(&mut *transaction)
+                    .await?;
+                }
+            }
+        }
+    }
+    if let Some(moderation_message) = &new_project.moderation_message {
+        if !user.role.is_mod()
+            && (!project_item.inner.status.is_approved()
+                || moderation_message.is_some())
+        {
+            return Err(ApiError::CustomAuthentication(
+                "You do not have the permissions to edit the moderation message of this project!"
+                    .to_string(),
+            ));
+        }
+
+        sqlx::query!(
+            "
+            UPDATE mods
+            SET moderation_message = $1
+            WHERE (id = $2)
+            ",
+            moderation_message.as_deref(),
+            id as db_ids::DBProjectId,
+        )
+        .execute(&mut *transaction)
+        .await?;
+    }
+
+    if let Some(moderation_message_body) = &new_project.moderation_message_body
+    {
+        if !user.role.is_mod()
+            && (!project_item.inner.status.is_approved()
+                || moderation_message_body.is_some())
+        {
+            return Err(ApiError::CustomAuthentication(
+                "You do not have the permissions to edit the moderation message body of this project!"
+                    .to_string(),
+            ));
+        }
+
+        sqlx::query!(
+            "
+            UPDATE mods
+            SET moderation_message_body = $1
+            WHERE (id = $2)
+            ",
+            moderation_message_body.as_deref(),
+            id as db_ids::DBProjectId,
+        )
+        .execute(&mut *transaction)
+        .await?;
+    }
+
+    if let Some(description) = &new_project.description {
+        if !perms.contains(ProjectPermissions::EDIT_BODY) {
+            return Err(ApiError::CustomAuthentication(
+                "You do not have the permissions to edit the description (body) of this project!"
+                    .to_string(),
+            ));
+        }
+
+        sqlx::query!(
+            "
+            UPDATE mods
+            SET description = $1
+            WHERE (id = $2)
+            ",
+            description,
+            id as db_ids::DBProjectId,
+        )
+        .execute(&mut *transaction)
+        .await?;
+    }
+
+    if let Some(monetization_status) = &new_project.monetization_status {
+        if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
+            return Err(ApiError::CustomAuthentication(
+                "You do not have the permissions to edit the monetization status of this project!"
+                    .to_string(),
+            ));
+        }
+
+        if (*monetization_status == MonetizationStatus::ForceDemonetized
+            || project_item.inner.monetization_status
+                == MonetizationStatus::ForceDemonetized)
+            && !user.role.is_mod()
+        {
+            return Err(ApiError::CustomAuthentication(
+                "You do not have the permissions to edit the monetization status of this project!"
+                    .to_string(),
+            ));
+        }
+
+        sqlx::query!(
+            "
+            UPDATE mods
+            SET monetization_status = $1
+            WHERE (id = $2)
+            ",
+            monetization_status.as_str(),
+            id as db_ids::DBProjectId,
+        )
+        .execute(&mut *transaction)
+        .await?;
+    }
+
+    if let Some(side_types_migration_review_status) =
+        &new_project.side_types_migration_review_status
+    {
+        if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
+            return Err(ApiError::CustomAuthentication(
+                "You do not have the permissions to edit the side types migration review status of this project!"
+                    .to_string(),
+            ));
+        }
+
+        sqlx::query!(
+            "
+            UPDATE mods
+            SET side_types_migration_review_status = $1
+            WHERE id = $2
+            ",
+            side_types_migration_review_status.as_str(),
+            id as db_ids::DBProjectId,
+        )
+        .execute(&mut *transaction)
+        .await?;
+    }
+
+    // check new description and body for links to associated images
+    // if they no longer exist in the description or body, delete them
+    let checkable_strings: Vec<&str> =
+        vec![&new_project.description, &new_project.summary]
+            .into_iter()
+            .filter_map(|x| x.as_ref().map(|y| y.as_str()))
+            .collect();
+
+    let context = ImageContext::Project {
+        project_id: Some(id.into()),
+    };
+
+    img::delete_unused_images(
+        context,
+        checkable_strings,
+        &mut transaction,
+        &redis,
+    )
+    .await?;
+
+    transaction.commit().await?;
+
+    db_models::DBProject::clear_cache(
+        project_item.inner.id,
+        project_item.inner.slug,
+        None,
+        &redis,
+    )
+    .await?;
+
+    // Remove no longer searchable projects from search index
+    if let (true, Some(false)) = (
+        project_item.inner.status.is_searchable(),
+        new_project.status.map(|status| status.is_searchable()),
+    ) {
+        remove_documents(
+            &project_item
+                .versions
+                .into_iter()
+                .map(|x| x.into())
+                .collect::<Vec<_>>(),
+            &search_config,
+        )
+        .await?;
+    }
+
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 pub async fn edit_project_categories(
@@ -1478,11 +1487,12 @@ pub async fn project_icon_edit(
     delete_old_images(
         project_item.inner.icon_url,
         project_item.inner.raw_icon_url,
+        FileHostPublicity::Public,
         &***file_host,
     )
     .await?;
 
-    let bytes = read_from_payload(
+    let bytes = read_limited_from_payload(
         &mut payload,
         262144,
         "Icons must be smaller than 256KiB",
@@ -1492,6 +1502,7 @@ pub async fn project_icon_edit(
     let project_id: ProjectId = project_item.inner.id.into();
     let upload_result = upload_image_optimized(
         &format!("data/{project_id}"),
+        FileHostPublicity::Public,
         bytes.freeze(),
         &ext.ext,
         Some(96),
@@ -1588,6 +1599,7 @@ pub async fn delete_project_icon(
     delete_old_images(
         project_item.inner.icon_url,
         project_item.inner.raw_icon_url,
+        FileHostPublicity::Public,
         &***file_host,
     )
     .await?;
@@ -1700,7 +1712,7 @@ pub async fn add_gallery_item(
         }
     }
 
-    let bytes = read_from_payload(
+    let bytes = read_limited_from_payload(
         &mut payload,
         2 * (1 << 20),
         "Gallery image exceeds the maximum of 2MiB.",
@@ -1710,6 +1722,7 @@ pub async fn add_gallery_item(
     let id: ProjectId = project_item.inner.id.into();
     let upload_result = upload_image_optimized(
         &format!("data/{id}/images"),
+        FileHostPublicity::Public,
         bytes.freeze(),
         &ext.ext,
         Some(350),
@@ -2040,6 +2053,7 @@ pub async fn delete_gallery_item(
     delete_old_images(
         Some(item.image_url),
         Some(item.raw_image_url),
+        FileHostPublicity::Public,
         &***file_host,
     )
     .await?;

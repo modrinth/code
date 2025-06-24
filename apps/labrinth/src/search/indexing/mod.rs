@@ -1,9 +1,13 @@
 /// This module is used for the indexing from any source.
 pub mod local_import;
 
+use std::time::Duration;
+
 use crate::database::redis::RedisPool;
 use crate::search::{SearchConfig, UploadSearchProject};
 use ariadne::ids::base62_impl::to_base62;
+use futures::StreamExt;
+use futures::stream::FuturesUnordered;
 use local_import::index_local;
 use meilisearch_sdk::client::{Client, SwapIndexes};
 use meilisearch_sdk::indexes::Index;
@@ -11,6 +15,7 @@ use meilisearch_sdk::settings::{PaginationSetting, Settings};
 use sqlx::postgres::PgPool;
 use thiserror::Error;
 use tracing::info;
+
 #[derive(Error, Debug)]
 pub enum IndexingError {
     #[error("Error while connecting to the MeiliSearch database")]
@@ -41,12 +46,30 @@ pub async fn remove_documents(
     let mut indexes_next = get_indexes_for_indexing(config, true).await?;
     indexes.append(&mut indexes_next);
 
-    for index in indexes {
-        index
-            .delete_documents(
-                &ids.iter().map(|x| to_base62(x.0)).collect::<Vec<_>>(),
-            )
-            .await?;
+    let client = config.make_client()?;
+    let client = &client;
+    let mut deletion_tasks = FuturesUnordered::new();
+
+    for index in &indexes {
+        deletion_tasks.push(async move {
+            // After being successfully submitted, Meilisearch tasks are executed
+            // asynchronously, so wait some time for them to complete
+            index
+                .delete_documents(
+                    &ids.iter().map(|x| to_base62(x.0)).collect::<Vec<_>>(),
+                )
+                .await?
+                .wait_for_completion(
+                    client,
+                    None,
+                    Some(Duration::from_secs(15)),
+                )
+                .await
+        });
+    }
+
+    while let Some(result) = deletion_tasks.next().await {
+        result?;
     }
 
     Ok(())
@@ -327,11 +350,8 @@ const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
     "color",
     // Note: loader fields are not here, but are added on as they are needed (so they can be dynamically added depending on which exist).
     // TODO: remove these- as they should be automatically populated. This is a band-aid fix.
-    "server_only",
-    "client_only",
+    "environment",
     "game_versions",
-    "singleplayer",
-    "client_and_server",
     "mrpack_loaders",
     // V2 legacy fields for logical consistency
     "client_side",
@@ -374,11 +394,8 @@ const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
     "color",
     // Note: loader fields are not here, but are added on as they are needed (so they can be dynamically added depending on which exist).
     // TODO: remove these- as they should be automatically populated. This is a band-aid fix.
-    "server_only",
-    "client_only",
+    "environment",
     "game_versions",
-    "singleplayer",
-    "client_and_server",
     "mrpack_loaders",
     // V2 legacy fields for logical consistency
     "client_side",

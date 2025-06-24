@@ -239,7 +239,7 @@
             <div>
               <nuxt-link
                 tabindex="-1"
-                :to="`/${$getProjectTypeForUrl(project.project_type, project.loaders)}/${
+                :to="`/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
                   project.slug ? project.slug : project.id
                 }`"
               >
@@ -261,7 +261,7 @@
 
                 <nuxt-link
                   class="hover-link wrap-as-needed"
-                  :to="`/${$getProjectTypeForUrl(project.project_type, project.loaders)}/${
+                  :to="`/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
                     project.slug ? project.slug : project.id
                   }`"
                 >
@@ -275,22 +275,23 @@
             </div>
 
             <div>
-              {{ $formatProjectType($getProjectTypeForUrl(project.project_type, project.loaders)) }}
+              {{ formatProjectType(getProjectTypeForUrl(project.project_type, project.loaders)) }}
             </div>
 
             <div>
-              <Badge v-if="project.status" :type="project.status" class="status" />
+              <ProjectStatusBadge v-if="project.status" :status="project.status" />
             </div>
 
             <div>
-              <nuxt-link
-                class="square-button"
-                :to="`/${$getProjectTypeForUrl(project.project_type, project.loaders)}/${
-                  project.slug ? project.slug : project.id
-                }/settings`"
-              >
-                <SettingsIcon />
-              </nuxt-link>
+              <ButtonStyled circular>
+                <nuxt-link
+                  :to="`/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
+                    project.slug ? project.slug : project.id
+                  }/settings`"
+                >
+                  <SettingsIcon />
+                </nuxt-link>
+              </ButtonStyled>
             </div>
           </div>
         </div>
@@ -312,19 +313,25 @@ import {
   SortAscendingIcon as AscendingIcon,
   SortDescendingIcon as DescendingIcon,
 } from "@modrinth/assets";
-import { commonMessages } from "@modrinth/ui";
+import {
+  Avatar,
+  ButtonStyled,
+  Checkbox,
+  CopyCode,
+  ProjectStatusBadge,
+  commonMessages,
+} from "@modrinth/ui";
+import { formatProjectType } from "@modrinth/utils";
 
-import Badge from "~/components/ui/Badge.vue";
-import Checkbox from "~/components/ui/Checkbox.vue";
 import Modal from "~/components/ui/Modal.vue";
-import Avatar from "~/components/ui/Avatar.vue";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
-import CopyCode from "~/components/ui/CopyCode.vue";
+import { getProjectTypeForUrl } from "~/helpers/projects.js";
 
 export default defineNuxtComponent({
   components: {
     Avatar,
-    Badge,
+    ButtonStyled,
+    ProjectStatusBadge,
     SettingsIcon,
     TrashIcon,
     Checkbox,
@@ -390,6 +397,8 @@ export default defineNuxtComponent({
     this.DELETE_PROJECT = 1 << 7;
   },
   methods: {
+    getProjectTypeForUrl,
+    formatProjectType,
     updateDescending() {
       this.descending = !this.descending;
       this.projects = this.updateSort(this.projects, this.sortBy, this.descending);

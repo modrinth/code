@@ -104,13 +104,13 @@
         </nuxt-link>
         <template v-if="tags.rejectedStatuses.includes(notification.body.new_status)">
           has been
-          <Badge :type="notification.body.new_status" />
+          <ProjectStatusBadge :status="notification.body.new_status" />
         </template>
         <template v-else>
           updated from
-          <Badge :type="notification.body.old_status" />
+          <ProjectStatusBadge :status="notification.body.old_status" />
           to
-          <Badge :type="notification.body.new_status" />
+          <ProjectStatusBadge :status="notification.body.new_status" />
         </template>
         by the moderators.
       </template>
@@ -331,16 +331,13 @@ import {
   XIcon,
   ExternalIcon,
 } from "@modrinth/assets";
-import { useRelativeTime } from "@modrinth/ui";
+import { Avatar, ProjectStatusBadge, CopyCode, useRelativeTime } from "@modrinth/ui";
 import ThreadSummary from "~/components/ui/thread/ThreadSummary.vue";
 import { getProjectLink, getVersionLink } from "~/helpers/projects.js";
 import { getUserLink } from "~/helpers/users.js";
 import { acceptTeamInvite, removeSelfFromTeam } from "~/helpers/teams.js";
 import { markAsRead } from "~/helpers/notifications.ts";
 import DoubleIcon from "~/components/ui/DoubleIcon.vue";
-import Avatar from "~/components/ui/Avatar.vue";
-import Badge from "~/components/ui/Badge.vue";
-import CopyCode from "~/components/ui/CopyCode.vue";
 import Categories from "~/components/ui/search/Categories.vue";
 
 const app = useNuxtApp();

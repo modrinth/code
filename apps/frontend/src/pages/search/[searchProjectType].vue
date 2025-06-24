@@ -520,7 +520,6 @@ async function serverInstall(project) {
 
     if (projectType.value.id === "modpack") {
       await server.value.general.reinstall(
-        server.value.serverId,
         false,
         project.project_id,
         version.id,

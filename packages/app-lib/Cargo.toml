@@ -44,7 +44,7 @@ tracing-error.workspace = true
 paste.workspace = true
 heck.workspace = true
 
-tauri = { workspace = true, optional = true }
+tauri = { workspace = true, optional = true, features = ["unstable"] }
 indicatif = { workspace = true, optional = true }
 
 async-tungstenite = { workspace = true, features = ["tokio-runtime", "tokio-rustls-webpki-roots"] }

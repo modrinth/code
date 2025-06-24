@@ -6,13 +6,14 @@ use crate::database::models::loader_fields::{
 use crate::database::models::thread_item::ThreadBuilder;
 use crate::database::models::{self, DBUser, image_item};
 use crate::database::redis::RedisPool;
-use crate::file_hosting::{FileHost, FileHostingError};
+use crate::file_hosting::{FileHost, FileHostPublicity, FileHostingError};
 use crate::models::error::ApiError;
 use crate::models::ids::{ImageId, OrganizationId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    License, Link, MonetizationStatus, ProjectStatus, VersionStatus,
+    License, Link, MonetizationStatus, ProjectStatus,
+    SideTypesMigrationReviewStatus, VersionStatus,
 };
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
@@ -239,18 +240,16 @@ pub struct NewGalleryItem {
 }
 
 pub struct UploadedFile {
-    pub file_id: String,
-    pub file_name: String,
+    pub name: String,
+    pub publicity: FileHostPublicity,
 }
 
 pub async fn undo_uploads(
     file_host: &dyn FileHost,
     uploaded_files: &[UploadedFile],
-) -> Result<(), CreateError> {
+) -> Result<(), FileHostingError> {
     for file in uploaded_files {
-        file_host
-            .delete_file_version(&file.file_id, &file.file_name)
-            .await?;
+        file_host.delete_file(&file.name, file.publicity).await?;
     }
     Ok(())
 }
@@ -308,13 +307,13 @@ Get logged in user
 
 2. Upload
     - Icon: check file format & size
-        - Upload to backblaze & record URL
+        - Upload to S3 & record URL
     - Project files
         - Check for matching version
         - File size limits?
         - Check file type
             - Eventually, malware scan
-        - Upload to backblaze & create VersionFileBuilder
+        - Upload to S3 & create VersionFileBuilder
     -
 
 3. Creation
@@ -333,7 +332,7 @@ async fn project_create_inner(
     redis: &RedisPool,
     session_queue: &AuthQueue,
 ) -> Result<HttpResponse, CreateError> {
-    // The base URL for files uploaded to backblaze
+    // The base URL for files uploaded to S3
     let cdn_url = dotenvy::var("CDN_URL")?;
 
     // The currently logged in user
@@ -515,6 +514,7 @@ async fn project_create_inner(
                     let url = format!("data/{project_id}/images");
                     let upload_result = upload_image_optimized(
                         &url,
+                        FileHostPublicity::Public,
                         data.freeze(),
                         file_extension,
                         Some(350),
@@ -525,8 +525,8 @@ async fn project_create_inner(
                     .map_err(|e| CreateError::InvalidIconFormat(e.to_string()))?;
 
                     uploaded_files.push(UploadedFile {
-                        file_id: upload_result.raw_url_path.clone(),
-                        file_name: upload_result.raw_url_path,
+                        name: upload_result.raw_url_path,
+                        publicity: FileHostPublicity::Public,
                     });
                     gallery_urls.push(crate::models::projects::GalleryItem {
                         url: upload_result.url,
@@ -901,6 +901,9 @@ async fn project_create_inner(
             color: project_builder.color,
             thread_id: thread_id.into(),
             monetization_status: MonetizationStatus::Monetized,
+            // New projects are considered reviewed with respect to side types migrations
+            side_types_migration_review_status:
+                SideTypesMigrationReviewStatus::Reviewed,
             fields: HashMap::new(), // Fields instantiate to empty
         };
 
@@ -1006,6 +1009,7 @@ async fn process_icon_upload(
     .await?;
     let upload_result = crate::util::img::upload_image_optimized(
         &format!("data/{}", to_base62(id)),
+        FileHostPublicity::Public,
         data.freeze(),
         file_extension,
         Some(96),
@@ -1016,13 +1020,13 @@ async fn process_icon_upload(
     .map_err(|e| CreateError::InvalidIconFormat(e.to_string()))?;
 
     uploaded_files.push(UploadedFile {
-        file_id: upload_result.raw_url_path.clone(),
-        file_name: upload_result.raw_url_path,
+        name: upload_result.raw_url_path,
+        publicity: FileHostPublicity::Public,
     });
 
     uploaded_files.push(UploadedFile {
-        file_id: upload_result.url_path.clone(),
-        file_name: upload_result.url_path,
+        name: upload_result.url_path,
+        publicity: FileHostPublicity::Public,
     });
 
     Ok((
