@@ -32,7 +32,7 @@ import { UploadIcon } from '@modrinth/assets'
 import { useNotifications } from '@/store/state'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { readFile } from '@tauri-apps/plugin-fs'
-import ModalWrapper from "@/components/ui/modal/ModalWrapper.vue";
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 const notifications = useNotifications()
 
@@ -110,7 +110,7 @@ async function setupDragDropListener() {
         const filePath = event.payload.paths[0]
 
         try {
-          const data = await readFile(filePath);
+          const data = await readFile(filePath)
 
           const fileName = filePath.split('/').pop() || filePath.split('\\').pop() || 'skin.png'
           const fileBlob = new Blob([data], { type: 'image/png' })
@@ -118,7 +118,7 @@ async function setupDragDropListener() {
 
           await processFile(file)
         } catch (error) {
-          console.error(error);
+          console.error(error)
           notifications.addNotification({
             title: 'Error processing file',
             text: 'Failed to read the dropped file.',

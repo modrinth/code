@@ -9,7 +9,7 @@ import {
   SkinPreviewRenderer,
 } from '@modrinth/ui'
 import { CheckIcon, XIcon } from '@modrinth/assets'
-import ModalWrapper from "@/components/ui/modal/ModalWrapper.vue";
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 const modal = useTemplateRef('modal')
 

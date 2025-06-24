@@ -108,7 +108,6 @@ import {
   CapeButton,
   CapeLikeTextButton,
   ButtonStyled,
-  NewModal,
 } from '@modrinth/ui'
 import {
   add_and_equip_custom_skin,
@@ -128,8 +127,8 @@ import {
   ChevronRightIcon,
   SpinnerIcon,
 } from '@modrinth/assets'
-import ModalWrapper from "@/components/ui/modal/ModalWrapper.vue";
-import UploadSkinModal from "@/components/ui/skin/UploadSkinModal.vue";
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import UploadSkinModal from '@/components/ui/skin/UploadSkinModal.vue'
 
 const modal = useTemplateRef('modal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
@@ -346,7 +345,7 @@ function restoreModal() {
       const fakeEvent = new MouseEvent('click')
       modal.value?.show(fakeEvent)
       shouldRestoreModal.value = false
-    }, 500);
+    }, 500)
   }
 }
 
@@ -407,6 +406,6 @@ defineExpose({
   restoreWithNewTexture,
   hide,
   shouldRestoreModal,
-  restoreModal
+  restoreModal,
 })
 </script>

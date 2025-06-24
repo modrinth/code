@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     selected?: boolean
     tooltip?: string
@@ -56,8 +56,8 @@ const pressed = ref(false)
       var(--color-brand) -76.68%,
       rgba(27, 217, 106, 0.534) -38.61%,
       rgba(12, 89, 44, 0.6) 100.4%
-  ),
-  var(--color-bg);
+    ),
+    var(--color-bg);
 }
 
 .skin-btn-bg.selected:hover,

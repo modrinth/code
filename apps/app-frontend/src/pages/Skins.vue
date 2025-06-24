@@ -252,7 +252,7 @@ function onSkinFileUploaded(file: File) {
 }
 
 function onUploadCanceled() {
-  console.log("fuck fuck fuck")
+  console.log('fuck fuck fuck')
   editSkinModal.value?.restoreModal()
 }
 
@@ -378,8 +378,9 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
               <Button
                 color="green"
                 aria-label="Edit skin"
+                class="pointer-events-auto"
                 @click.stop="(e) => editSkinModal?.show(e, skin)"
-                class="pointer-events-auto">
+              >
                 <EditIcon /> Edit
               </Button>
               <Button

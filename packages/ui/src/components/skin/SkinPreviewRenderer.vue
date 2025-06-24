@@ -29,12 +29,12 @@
         toneMapping: THREE.NoToneMapping,
         toneMappingExposure: 10.0,
       }"
+      class="transition-opacity duration-500"
+      :class="{ 'opacity-0': !isReady, 'opacity-100': isReady }"
       @pointerdown="onPointerDown"
       @pointermove="onPointerMove"
       @pointerup="onPointerUp"
       @pointerleave="onPointerUp"
-      class="transition-opacity duration-500"
-      :class="{'opacity-0': !isReady, 'opacity-100': isReady}"
     >
       <Suspense>
         <Group>
@@ -90,7 +90,7 @@
     <div
       v-if="!isReady"
       class="w-full h-full flex items-center justify-center transition-opacity duration-500"
-      :class="{'opacity-100': !isReady, 'opacity-0': isReady}"
+      :class="{ 'opacity-100': !isReady, 'opacity-0': isReady }"
     >
       <div class="text-primary">Loading...</div>
     </div>
@@ -653,8 +653,12 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .nametag-bg {
-  background: linear-gradient(308.68deg, rgba(50, 50, 50, 0.2) -52.46%, rgba(100, 100, 100, 0.2) 94.75%),
-  rgba(0, 0, 0, 0.2);
+  background: linear-gradient(
+      308.68deg,
+      rgba(50, 50, 50, 0.2) -52.46%,
+      rgba(100, 100, 100, 0.2) 94.75%
+    ),
+    rgba(0, 0, 0, 0.2);
   box-shadow:
     inset -0.5px -0.5px 0px rgba(0, 0, 0, 0.25),
     inset 0.5px 0.5px 0px rgba(255, 255, 255, 0.05);

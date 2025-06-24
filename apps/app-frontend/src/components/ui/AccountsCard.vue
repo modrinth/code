@@ -56,10 +56,7 @@
       <div v-if="displayAccounts.length > 0" class="account-group">
         <div v-for="account in displayAccounts" :key="account.profile.id" class="account-row">
           <Button class="option account" @click="setAccount(account)">
-            <Avatar
-              :src="getAccountAvatarUrl(account)"
-              class="icon"
-            />
+            <Avatar :src="getAccountAvatarUrl(account)" class="icon" />
             <p>{{ account.profile.name }}</p>
           </Button>
           <Button v-tooltip="'Log out'" icon-only @click="logout(account.profile.id)">
@@ -78,7 +75,7 @@
 <script setup>
 import { DropdownIcon, PlusIcon, TrashIcon, LogInIcon, SpinnerIcon } from '@modrinth/assets'
 import { Avatar, Button, Card } from '@modrinth/ui'
-import {ref, computed, onMounted, onBeforeUnmount, onUnmounted, watch} from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, onUnmounted } from 'vue'
 import {
   users,
   remove_user,
@@ -160,7 +157,10 @@ const avatarUrl = computed(() => {
 })
 
 function getAccountAvatarUrl(account) {
-  if (account.profile.id === selectedAccount.value?.profile?.id && equippedSkin.value?.texture_key) {
+  if (
+    account.profile.id === selectedAccount.value?.profile?.id &&
+    equippedSkin.value?.texture_key
+  ) {
     const cachedUrl = headUrlCache.value.get(equippedSkin.value.texture_key)
     if (cachedUrl) {
       return cachedUrl
