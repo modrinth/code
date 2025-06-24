@@ -458,7 +458,9 @@ pub async fn normalize_skin_texture(
 /// Reads and validates a skin texture file from the given path.
 /// Returns the file content as bytes if it's a valid skin texture (PNG with 64x64 or 64x32 dimensions).
 #[tracing::instrument]
-pub async fn get_dragged_skin_data(path: &std::path::Path) -> crate::Result<Bytes> {
+pub async fn get_dragged_skin_data(
+    path: &std::path::Path,
+) -> crate::Result<Bytes> {
     if let Some(extension) = path.extension() {
         if extension.to_string_lossy().to_lowercase() != "png" {
             return Err(ErrorKind::InvalidSkinTexture.into());
@@ -476,9 +478,12 @@ pub async fn get_dragged_skin_data(path: &std::path::Path) -> crate::Result<Byte
 
     let data = match tokio::fs::read(path).await {
         Ok(data) => {
-            tracing::debug!("File read successfully, size: {} bytes", data.len());
+            tracing::debug!(
+                "File read successfully, size: {} bytes",
+                data.len()
+            );
             data
-        },
+        }
         Err(err) => {
             tracing::error!("Failed to read file: {}", err);
             return Err(err.into());
