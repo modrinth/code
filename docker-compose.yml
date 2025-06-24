@@ -15,7 +15,7 @@ services:
       timeout: 5s
       retries: 3
   meilisearch:
-    image: getmeili/meilisearch:v1.12.0
+    image: getmeili/meilisearch:v1.5.0
     restart: on-failure
     ports:
       - '7700:7700'
