@@ -30,9 +30,6 @@
       "providerShortName": null,
       "signingIdentity": null
     },
-    "resources": {
-      "../../target/theseus-resources/theseus.jar": "theseus.jar"
-    },
     "shortDescription": "",
     "linux": {
       "deb": {

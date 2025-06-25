@@ -1,7 +1,7 @@
 use crate::event::emit::{emit_process, emit_profile};
 use crate::event::{ProcessPayloadType, ProfilePayloadType};
 use crate::profile;
-use crate::util::io::{IOError, ResourceFileKeepAlive};
+use crate::util::io::IOError;
 use chrono::{DateTime, TimeZone, Utc};
 use dashmap::DashMap;
 use quick_xml::Reader;
@@ -13,6 +13,7 @@ use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::ExitStatus;
+use tempfile::TempDir;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::{Child, ChildStdin, Command};
 use uuid::Uuid;
@@ -44,7 +45,7 @@ impl ProcessManager {
         post_exit_command: Option<String>,
         logs_folder: PathBuf,
         xml_logging: bool,
-        main_class_keep_alive: ResourceFileKeepAlive,
+        main_class_keep_alive: TempDir,
         post_process_init: impl AsyncFnOnce(
             &ProcessMetadata,
             &mut ChildStdin,
@@ -213,7 +214,7 @@ pub struct ProcessMetadata {
 struct Process {
     metadata: ProcessMetadata,
     child: Child,
-    _main_class_keep_alive: ResourceFileKeepAlive,
+    _main_class_keep_alive: TempDir,
 }
 
 #[derive(Debug, Default)]

@@ -299,72 +299,35 @@ pub async fn metadata(
         })
 }
 
-#[cfg(feature = "tauri")]
-pub type ResourceFileKeepAlive = ();
-#[cfg(not(feature = "tauri"))]
-pub type ResourceFileKeepAlive = tempfile::TempDir;
-
-/// Gets a resource file from the executable. Returns `theseus::Result<(ResourceFileKeepAlive, PathBuf)>`.
+/// Gets a resource file from the executable. Returns `theseus::Result<(TempDir, PathBuf)>`.
 #[macro_export]
 macro_rules! get_resource_file {
-    (
-        $file_name:literal,
-        tauri_base_dir: $tauri_base_dir:literal,
-        include_bytes_dir: $include_bytes_dir:literal,
-    ) => {
+    ($relative_dir:literal / $file_name:literal) => {
         'get_resource_file: {
-            #[cfg(feature = "tauri")]
+            let dir = match tempfile::tempdir() {
+                Ok(dir) => dir,
+                Err(e) => {
+                    break 'get_resource_file $crate::Result::Err(
+                        $crate::util::io::IOError::from(e).into(),
+                    );
+                }
+            };
+            let path = dir.path().join($file_name);
+            if let Err(e) = $crate::util::io::write(
+                &path,
+                include_bytes!(concat!($relative_dir, "/", $file_name)),
+            )
+            .await
             {
-                let state = match $crate::EventState::get() {
-                    Ok(state) => state,
-                    Err(e) => break 'get_resource_file $crate::Result::Err(e),
-                };
-                let path_resolver = tauri::Manager::path(&state.app);
-                let path = match path_resolver.resolve(
-                    concat!($tauri_base_dir, $file_name),
-                    tauri::path::BaseDirectory::Resource,
-                ) {
-                    Ok(path) => path,
-                    Err(e) => {
-                        break 'get_resource_file $crate::Result::Err(e.into());
-                    }
-                };
-                let path = match $crate::util::io::canonicalize(path) {
-                    Ok(path) => path,
-                    Err(e) => {
-                        break 'get_resource_file $crate::Result::Err(e.into());
-                    }
-                };
-                $crate::Result::Ok(((), path))
+                break 'get_resource_file $crate::Result::Err(e.into());
             }
-
-            #[cfg(not(feature = "tauri"))]
-            {
-                let dir = match tempfile::tempdir() {
-                    Ok(dir) => dir,
-                    Err(e) => {
-                        break 'get_resource_file $crate::Result::Err(
-                            $crate::util::io::IOError::from(e).into(),
-                        );
-                    }
-                };
-                let path = dir.path().join($file_name);
-                let path = match $crate::util::io::canonicalize(path) {
-                    Ok(path) => path,
-                    Err(e) => {
-                        break 'get_resource_file $crate::Result::Err(e.into());
-                    }
-                };
-                if let Err(e) = $crate::util::io::write(
-                    &path,
-                    include_bytes!(concat!($include_bytes_dir, $file_name)),
-                )
-                .await
-                {
+            let path = match $crate::util::io::canonicalize(path) {
+                Ok(path) => path,
+                Err(e) => {
                     break 'get_resource_file $crate::Result::Err(e.into());
                 }
-                $crate::Result::Ok((dir, path))
-            }
+            };
+            $crate::Result::Ok((dir, path))
         }
     };
 }
