@@ -33,6 +33,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
   advancedDebugInfo: false,
   showProjectPageDownloadModalServersPromo: true,
   showProjectPageCreateServersTooltip: true,
+  showProjectPageQuickServerButton: false,
   // advancedRendering: true,
   // externalLinksNewTab: true,
   // notUsingBlockers: false,

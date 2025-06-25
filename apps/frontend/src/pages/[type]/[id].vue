@@ -506,7 +506,7 @@
               </ButtonStyled>
             </div>
             <Tooltip
-              v-if="canCreateServerFrom"
+              v-if="canCreateServerFrom && flags.showProjectPageQuickServerButton"
               theme="dismissable-prompt"
               :triggers="[]"
               :shown="flags.showProjectPageCreateServersTooltip"
