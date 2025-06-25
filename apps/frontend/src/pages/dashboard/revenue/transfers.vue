@@ -76,7 +76,7 @@
             </span>
             <template v-if="payout.method">
               <span>⋅</span>
-              <span>{{ $formatWallet(payout.method) }} ({{ payout.method_address }})</span>
+              <span>{{ formatWallet(payout.method) }} ({{ payout.method_address }})</span>
             </template>
           </div>
         </div>
@@ -95,7 +95,7 @@
 </template>
 <script setup>
 import { XIcon, PayPalIcon, UnknownIcon } from "@modrinth/assets";
-import { capitalizeString } from "@modrinth/utils";
+import { capitalizeString, formatWallet } from "@modrinth/utils";
 import { Badge, Breadcrumbs, DropdownSelect } from "@modrinth/ui";
 import dayjs from "dayjs";
 import TremendousIcon from "~/assets/images/external/tremendous.svg?component";

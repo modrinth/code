@@ -39,7 +39,7 @@
                   />
                   <XCircleIcon
                     v-show="
-                      item.status === 'error' ||
+                      item.status.includes('error') ||
                       item.status === 'cancelled' ||
                       item.status === 'incorrect-type'
                     "
@@ -54,8 +54,13 @@
                 <template v-if="item.status === 'completed'">
                   <span>Done</span>
                 </template>
-                <template v-else-if="item.status === 'error'">
+                <template v-else-if="item.status === 'error-file-exists'">
                   <span class="text-red">Failed - File already exists</span>
+                </template>
+                <template v-else-if="item.status === 'error-generic'">
+                  <span class="text-red"
+                    >Failed - {{ item.error?.message || "An unexpected error occured." }}</span
+                  >
                 </template>
                 <template v-else-if="item.status === 'incorrect-type'">
                   <span class="text-red">Failed - Incorrect file type</span>
@@ -104,9 +109,17 @@ import { FSModule } from "~/composables/servers/modules/fs.ts";
 interface UploadItem {
   file: File;
   progress: number;
-  status: "pending" | "uploading" | "completed" | "error" | "cancelled" | "incorrect-type";
+  status:
+    | "pending"
+    | "uploading"
+    | "completed"
+    | "error-file-exists"
+    | "error-generic"
+    | "cancelled"
+    | "incorrect-type";
   size: string;
   uploader?: any;
+  error?: Error;
 }
 
 interface Props {
@@ -245,8 +258,18 @@ const uploadFile = async (file: File) => {
     console.error("Error uploading file:", error);
     const index = uploadQueue.value.findIndex((item) => item.file.name === file.name);
     if (index !== -1 && uploadQueue.value[index].status !== "cancelled") {
-      uploadQueue.value[index].status =
-        error instanceof Error && error.message === badFileTypeMsg ? "incorrect-type" : "error";
+      const target = uploadQueue.value[index];
+
+      if (error instanceof Error) {
+        if (error.message === badFileTypeMsg) {
+          target.status = "incorrect-type";
+        } else if (target.progress === 100 && error.message.includes("401")) {
+          target.status = "error-file-exists";
+        } else {
+          target.status = "error-generic";
+          target.error = error;
+        }
+      }
     }
 
     setTimeout(async () => {

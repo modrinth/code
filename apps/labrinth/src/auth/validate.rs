@@ -10,6 +10,40 @@ use actix_web::HttpRequest;
 use actix_web::http::header::{AUTHORIZATION, HeaderValue};
 use chrono::Utc;
 
+pub async fn get_maybe_user_from_headers<'a, E>(
+    req: &HttpRequest,
+    executor: E,
+    redis: &RedisPool,
+    session_queue: &AuthQueue,
+    required_scopes: Scopes,
+) -> Result<Option<(Scopes, User)>, AuthenticationError>
+where
+    E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+{
+    if !req.headers().contains_key(AUTHORIZATION) {
+        return Ok(None);
+    }
+
+    // Fetch DB user record and minos user from headers
+    let Some((scopes, db_user)) = get_user_record_from_bearer_token(
+        req,
+        None,
+        executor,
+        redis,
+        session_queue,
+    )
+    .await?
+    else {
+        return Ok(None);
+    };
+
+    if !scopes.contains(required_scopes) {
+        return Ok(None);
+    }
+
+    Ok(Some((scopes, User::from_full(db_user))))
+}
+
 pub async fn get_user_from_headers<'a, E>(
     req: &HttpRequest,
     executor: E,
