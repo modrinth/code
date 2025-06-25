@@ -36,22 +36,8 @@ fn main() {
         println!("cargo::error=Gradle build failed with {exit_status}");
         exit(exit_status.code().unwrap_or(1));
     }
-
-    // Unfortunately, there doesn't appear to be a better way to get the path to the target directory
-    let resources_out = out_dir
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .join("theseus-resources");
-    fs::create_dir_all(&resources_out).unwrap();
-    fs::copy(
-        out_dir.join("java/libs/theseus.jar"),
-        resources_out.join("theseus.jar"),
-    )
-    .unwrap();
+    println!(
+        "cargo::rustc-env=JAVA_JARS_DIR={}",
+        out_dir.join("java/libs").display()
+    );
 }

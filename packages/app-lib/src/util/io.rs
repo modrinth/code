@@ -302,7 +302,7 @@ pub async fn metadata(
 /// Gets a resource file from the executable. Returns `theseus::Result<(TempDir, PathBuf)>`.
 #[macro_export]
 macro_rules! get_resource_file {
-    ($relative_dir:literal / $file_name:literal) => {
+    (directory: $relative_dir:expr, file: $file_name:expr) => {
         'get_resource_file: {
             let dir = match tempfile::tempdir() {
                 Ok(dir) => dir,
@@ -329,5 +329,13 @@ macro_rules! get_resource_file {
             };
             $crate::Result::Ok((dir, path))
         }
+    };
+
+    ($relative_dir:literal / $file_name:literal) => {
+        get_resource_file!(directory: $relative_dir, file: $file_name)
+    };
+
+    (env $dir_env_name:literal / $file_name:literal) => {
+        get_resource_file!(directory: env!($dir_env_name), file: $file_name)
     };
 }
