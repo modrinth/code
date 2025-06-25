@@ -111,7 +111,7 @@ jobs:
         run: pnpm install
 
       - name: build app (macos)
-        run: pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config "tauri-release.conf.json"
+        run: pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json
         if: startsWith(matrix.platform, 'macos')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -126,7 +126,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
       - name: build app (Linux)
-        run: pnpm --filter=@modrinth/app run tauri build --config "tauri-release.conf.json"
+        run: pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json
         if: startsWith(matrix.platform, 'ubuntu')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -135,9 +135,9 @@ jobs:
 
       - name: build app (Windows)
         run: |
-          [System.Convert]::FromBase64String($env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64.Trim()) | Set-Content -Path signer-client-cert.p12 -AsByteStream
-          $env:DIGICERT_ONE_SIGNER_CREDENTIALS = "$env:DIGICERT_ONE_SIGNER_API_KEY.Trim()|$PWD\signer-client-cert.p12|$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD.Trim()"
-          pnpm --filter=@modrinth/app run tauri build --config "tauri-release.conf.json" --verbose
+          [System.Convert]::FromBase64String("$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64") | Set-Content -Path signer-client-cert.p12 -AsByteStream
+          $env:DIGICERT_ONE_SIGNER_CREDENTIALS = "$env:DIGICERT_ONE_SIGNER_API_KEY|$PWD\signer-client-cert.p12|$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD"
+          pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json --verbose
           Remove-Item -Path signer-client-cert.p12
         if: startsWith(matrix.platform, 'windows')
         env:
