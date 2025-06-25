@@ -2031,7 +2031,9 @@ pub async fn change_password(
 
             Some(user)
         } else {
-            None
+            return Err(ApiError::CustomAuthentication(
+                "The password change flow code is invalid or has expired. Did you copy it promptly and correctly?".to_string(),
+            ));
         }
     } else {
         None
