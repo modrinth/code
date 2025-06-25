@@ -100,6 +100,24 @@ fn main() {
                     ),
             )
             .plugin(
+                "minecraft-skins",
+                InlinedPlugin::new()
+                    .commands(&[
+                        "get_available_capes",
+                        "get_available_skins",
+                        "add_and_equip_custom_skin",
+                        "set_default_cape",
+                        "equip_skin",
+                        "remove_custom_skin",
+                        "unequip_skin",
+                        "normalize_skin_texture",
+                        "get_dragged_skin_data",
+                    ])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
+            )
+            .plugin(
                 "mr-auth",
                 InlinedPlugin::new()
                     .commands(&["modrinth_login", "logout", "get"])
@@ -151,7 +169,6 @@ fn main() {
                         "profile_update_managed_modrinth_version",
                         "profile_repair_managed_modrinth",
                         "profile_run",
-                        "profile_run_credentials",
                         "profile_kill",
                         "profile_edit",
                         "profile_edit_icon",
