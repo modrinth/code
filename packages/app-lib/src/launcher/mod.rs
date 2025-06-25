@@ -589,11 +589,8 @@ pub async fn launch_minecraft(
         io::create_dir_all(&natives_dir).await?;
     }
 
-    let (main_class_keep_alive, main_class_path) = get_resource_file!(
-        "MinecraftLaunch.class",
-        tauri_base_dir: "library",
-        include_bytes_dir: "../../library",
-    )?;
+    let (main_class_keep_alive, main_class_path) =
+        get_resource_file!("../../library" / "MinecraftLaunch.class")?;
 
     command.args(
         args::get_jvm_arguments(

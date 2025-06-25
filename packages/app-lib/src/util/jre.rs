@@ -272,11 +272,8 @@ pub async fn check_java_at_filepath(path: &Path) -> crate::Result<JavaVersion> {
         return Err(JREError::NoExecutable(java).into());
     };
 
-    let (_temp, file_path) = get_resource_file!(
-        "JavaInfo.class",
-        tauri_base_dir: "library",
-        include_bytes_dir: "../../library",
-    )?;
+    let (_temp, file_path) =
+        get_resource_file!("../../library" / "JavaInfo.class")?;
 
     let output = Command::new(&java)
         .arg("-cp")
