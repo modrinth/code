@@ -98,7 +98,7 @@ rand_chacha = "=0.3.1"  # Locked on 0.3 until we can update rand to 0.9
 redis = "=0.31.0"  # Locked on 0.31 until deadpool-redis updates to 0.32
 regex = "1.11.1"
 reqwest = { version = "0.12.20", default-features = false }
-rust_decimal = { version = "1.37.1", features = [
+rust_decimal = { version = "1.37.2", features = [
   "serde-with-float",
   "serde-with-str",
 ] }
