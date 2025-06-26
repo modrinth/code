@@ -9,7 +9,7 @@ use crate::state::{
     Credentials, JavaVersion, ProcessMetadata, ProfileInstallStage,
 };
 use crate::util::io;
-use crate::{State, process, state as st};
+use crate::{State, get_resource_file, process, state as st};
 use chrono::Utc;
 use daedalus as d;
 use daedalus::minecraft::{LoggingSide, RuleAction, VersionInfo};
@@ -19,6 +19,7 @@ use serde::Deserialize;
 use st::Profile;
 use std::fmt::Write;
 use std::path::PathBuf;
+use tokio::io::AsyncWriteExt;
 use tokio::process::Command;
 
 mod args;
@@ -124,12 +125,10 @@ pub async fn get_java_version_from_profile(
     version_info: &VersionInfo,
 ) -> crate::Result<Option<JavaVersion>> {
     if let Some(java) = profile.java_path.as_ref() {
-        let java = crate::api::jre::check_jre(std::path::PathBuf::from(java))
-            .await
-            .ok()
-            .flatten();
+        let java =
+            crate::api::jre::check_jre(std::path::PathBuf::from(java)).await;
 
-        if let Some(java) = java {
+        if let Ok(java) = java {
             return Ok(Some(java));
         }
     }
@@ -289,13 +288,7 @@ pub async fn install_minecraft(
     };
 
     // Test jre version
-    let java_version = crate::api::jre::check_jre(java_version.clone())
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::LauncherError(format!(
-                "Java path invalid or non-functional: {java_version:?}"
-            ))
-        })?;
+    let java_version = crate::api::jre::check_jre(java_version.clone()).await?;
 
     if set_java {
         java_version.upsert(&state.pool).await?;
@@ -560,14 +553,7 @@ pub async fn launch_minecraft(
 
     // Test jre version
     let java_version =
-        crate::api::jre::check_jre(java_version.path.clone().into())
-            .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::LauncherError(format!(
-                    "Java path invalid or non-functional: {}",
-                    java_version.path
-                ))
-            })?;
+        crate::api::jre::check_jre(java_version.path.clone().into()).await?;
 
     let client_path = state
         .directories
@@ -603,33 +589,43 @@ pub async fn launch_minecraft(
         io::create_dir_all(&natives_dir).await?;
     }
 
-    command
-        .args(
-            args::get_jvm_arguments(
-                args.get(&d::minecraft::ArgumentType::Jvm)
-                    .map(|x| x.as_slice()),
-                &natives_dir,
+    let (main_class_keep_alive, main_class_path) =
+        get_resource_file!("../../library" / "MinecraftLaunch.class")?;
+
+    command.args(
+        args::get_jvm_arguments(
+            args.get(&d::minecraft::ArgumentType::Jvm)
+                .map(|x| x.as_slice()),
+            &natives_dir,
+            &state.directories.libraries_dir(),
+            &state.directories.log_configs_dir(),
+            &args::get_class_paths(
                 &state.directories.libraries_dir(),
-                &state.directories.log_configs_dir(),
-                &args::get_class_paths(
-                    &state.directories.libraries_dir(),
-                    version_info.libraries.as_slice(),
-                    &client_path,
-                    &java_version.architecture,
-                    minecraft_updated,
-                )?,
-                &version_jar,
-                *memory,
-                Vec::from(java_args),
+                version_info.libraries.as_slice(),
+                &[main_class_path.parent().unwrap(), &client_path],
                 &java_version.architecture,
-                quick_play_type,
-                version_info
-                    .logging
-                    .as_ref()
-                    .and_then(|x| x.get(&LoggingSide::Client)),
-            )?
-            .into_iter(),
-        )
+                minecraft_updated,
+            )?,
+            &version_jar,
+            *memory,
+            Vec::from(java_args),
+            &java_version.architecture,
+            quick_play_type,
+            version_info
+                .logging
+                .as_ref()
+                .and_then(|x| x.get(&LoggingSide::Client)),
+        )?
+        .into_iter(),
+    );
+
+    // The java launcher code requires internal JDK code in Java 25+ in order to support JEP 512
+    if java_version.parsed_version >= 25 {
+        command.arg("--add-opens=jdk.internal/jdk.internal.misc=ALL-UNNAMED");
+    }
+
+    command
+        .arg("MinecraftLaunch")
         .arg(version_info.main_class.clone())
         .args(
             args::get_minecraft_arguments(
@@ -744,6 +740,40 @@ pub async fn launch_minecraft(
             post_exit_hook,
             state.directories.profile_logs_dir(&profile.path),
             version_info.logging.is_some(),
+            main_class_keep_alive,
+            async |process: &ProcessMetadata, stdin| {
+                let process_start_time = process.start_time.to_rfc3339();
+                let profile_created_time = profile.created.to_rfc3339();
+                let profile_modified_time = profile.modified.to_rfc3339();
+                let system_properties = [
+                    ("modrinth.process.startTime", Some(&process_start_time)),
+                    ("modrinth.profile.created", Some(&profile_created_time)),
+                    ("modrinth.profile.icon", profile.icon_path.as_ref()),
+                    (
+                        "modrinth.profile.link.project",
+                        profile.linked_data.as_ref().map(|x| &x.project_id),
+                    ),
+                    (
+                        "modrinth.profile.link.version",
+                        profile.linked_data.as_ref().map(|x| &x.version_id),
+                    ),
+                    ("modrinth.profile.modified", Some(&profile_modified_time)),
+                    ("modrinth.profile.name", Some(&profile.name)),
+                ];
+                for (key, value) in system_properties {
+                    let Some(value) = value else {
+                        continue;
+                    };
+                    stdin.write_all(b"property\t").await?;
+                    stdin.write_all(key.as_bytes()).await?;
+                    stdin.write_u8(b'\t').await?;
+                    stdin.write_all(value.as_bytes()).await?;
+                    stdin.write_u8(b'\n').await?;
+                }
+                stdin.write_all(b"launch\n").await?;
+                stdin.flush().await?;
+                Ok(())
+            },
         )
         .await
 }

@@ -8889,6 +8889,7 @@ dependencies = [
  "flate2",
  "fs4",
  "futures",
+ "hashlink",
  "hickory-resolver",
  "indicatif",
  "notify",

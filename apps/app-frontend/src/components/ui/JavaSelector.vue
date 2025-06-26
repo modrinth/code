@@ -127,7 +127,7 @@ async function handleJavaFileInput() {
   const filePath = await open()
 
   if (filePath) {
-    let result = await get_jre(filePath.path ?? filePath)
+    let result = await get_jre(filePath.path ?? filePath).catch(handleError)
     if (!result) {
       result = {
         path: filePath.path ?? filePath,

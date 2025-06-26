@@ -83,7 +83,7 @@ where
         settings.prev_custom_dir = Some(old_launcher_root_str.clone());
 
         for (_, legacy_version) in legacy_settings.java_globals.0 {
-            if let Ok(Some(java_version)) =
+            if let Ok(java_version) =
                 check_jre(PathBuf::from(legacy_version.path)).await
             {
                 java_version.upsert(exec).await?;
