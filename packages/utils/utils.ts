@@ -185,6 +185,12 @@ export const formatCategory = (name) => {
     return 'Java Agent'
   } else if (name === 'nilloader') {
     return 'NilLoader'
+  } else if (name === 'mrpack') {
+    return 'Modpack'
+  } else if (name === 'minecraft') {
+    return 'Resource Pack'
+  } else if (name === 'vanilla') {
+    return 'Vanilla Shader'
   }
   return capitalizeString(name)
 }

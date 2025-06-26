@@ -875,7 +875,14 @@ import {
   useRelativeTime,
 } from "@modrinth/ui";
 import VersionSummary from "@modrinth/ui/src/components/version/VersionSummary.vue";
-import { formatCategory, isRejected, isStaff, isUnderReview, renderString } from "@modrinth/utils";
+import {
+  formatCategory,
+  formatProjectType,
+  isRejected,
+  isStaff,
+  isUnderReview,
+  renderString,
+} from "@modrinth/utils";
 import { navigateTo } from "#app";
 import dayjs from "dayjs";
 import Accordion from "~/components/ui/Accordion.vue";
@@ -1286,7 +1293,7 @@ featuredVersions.value.sort((a, b) => {
 });
 
 const projectTypeDisplay = computed(() =>
-  data.$formatProjectType(
+  formatProjectType(
     data.$getProjectTypeForDisplay(project.value.project_type, project.value.loaders),
   ),
 );

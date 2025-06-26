@@ -1,6 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 
 use super::{ApiError, oauth_clients::get_user_clients};
+use crate::file_hosting::FileHostPublicity;
 use crate::util::img::delete_old_images;
 use crate::{
     auth::{filter_visible_projects, get_user_from_headers},
@@ -14,7 +15,10 @@ use crate::{
         users::{Badges, Role},
     },
     queue::session::AuthQueue,
-    util::{routes::read_from_payload, validate::validation_errors_to_string},
+    util::{
+        routes::read_limited_from_payload,
+        validate::validation_errors_to_string,
+    },
 };
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::UserId;
@@ -576,11 +580,12 @@ pub async fn user_icon_edit(
         delete_old_images(
             actual_user.avatar_url,
             actual_user.raw_avatar_url,
+            FileHostPublicity::Public,
             &***file_host,
         )
         .await?;
 
-        let bytes = read_from_payload(
+        let bytes = read_limited_from_payload(
             &mut payload,
             262144,
             "Icons must be smaller than 256KiB",
@@ -590,6 +595,7 @@ pub async fn user_icon_edit(
         let user_id: UserId = actual_user.id.into();
         let upload_result = crate::util::img::upload_image_optimized(
             &format!("data/{user_id}"),
+            FileHostPublicity::Public,
             bytes.freeze(),
             &ext.ext,
             Some(96),
@@ -648,6 +654,7 @@ pub async fn user_icon_delete(
         delete_old_images(
             actual_user.avatar_url,
             actual_user.raw_avatar_url,
+            FileHostPublicity::Public,
             &***file_host,
         )
         .await?;
