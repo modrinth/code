@@ -17,6 +17,12 @@ on:
       - 'packages/ui/**'
       - 'packages/utils/**'
   workflow_dispatch:
+    inputs:
+      sign-windows-binaries:
+        description: Whether to sign the generated Windows binaries
+        type: boolean
+        default: false
+        required: false
 
 jobs:
   build:
@@ -109,6 +115,12 @@ jobs:
 
       - name: Install frontend dependencies
         run: pnpm install
+
+      - name: Disable Windows code signing for non-final release builds
+        if: ${{ startsWith(matrix.platform, 'windows') && !startsWith(github.ref, 'refs/tags/v') && !inputs.sign-windows-binaries }}
+        run: |
+          jq 'del(.bundle.windows.signCommand)' apps/app/tauri-release.conf.json > apps/app/tauri-release.conf.json.new
+          mv apps/app/tauri-release.conf.json.new apps/app/tauri-release.conf.json
 
       - name: build app (macos)
         run: pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json
