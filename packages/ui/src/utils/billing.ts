@@ -1,4 +1,5 @@
 import type Stripe from 'stripe'
+import type { Loaders } from '@modrinth/utils'
 
 export type ServerBillingInterval = 'monthly' | 'yearly' | 'quarterly'
 
@@ -80,15 +81,7 @@ export type CreatePaymentIntentRequest = PaymentRequestType & {
     server_region?: string
     source:
       | {
-          loader:
-            | 'Forge'
-            | 'NeoForge'
-            | 'Fabric'
-            | 'Quilt'
-            | 'Purpur'
-            | 'Spigot'
-            | 'Vanilla'
-            | 'Paper'
+          loader: Loaders
           game_version?: string
           loader_version?: string
         }
