@@ -76,6 +76,9 @@ ariadne.workspace = true
 [target.'cfg(windows)'.dependencies]
 winreg.workspace = true
 
+[build-dependencies]
+dunce.workspace = true
+
 [features]
 tauri = ["dep:tauri"]
 cli = ["dep:indicatif"]

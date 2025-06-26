@@ -14,5 +14,5 @@ max_line_length = 100
 max_line_length = off
 trim_trailing_whitespace = false
 
-[*.rs]
+[*.{rs,java,kts}]
 indent_size = 4
