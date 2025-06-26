@@ -120,7 +120,7 @@ jobs:
         if: ${{ startsWith(matrix.platform, 'windows') && !startsWith(github.ref, 'refs/tags/v') && !inputs.sign-windows-binaries }}
         run: |
           jq 'del(.bundle.windows.signCommand)' apps/app/tauri-release.conf.json > apps/app/tauri-release.conf.json.new
-          mv apps/app/tauri-release.conf.json.new apps/app/tauri-release.conf.json
+          Move-Item -Path apps/app/tauri-release.conf.json.new -Destination apps/app/tauri-release.conf.json -Force
 
       - name: build app (macos)
         run: pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json
