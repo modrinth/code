@@ -668,7 +668,7 @@ pub async fn organization_delete(
     .await?;
 
     for team_id in &organization_project_teams {
-        database::models::DBTeamMember::clear_cache(team_id, &redis).await?;
+        database::models::DBTeamMember::clear_cache(*team_id, &redis).await?;
     }
 
     if !organization_project_teams.is_empty() {
