@@ -72,7 +72,7 @@ pub struct Skin {
     pub is_equipped: bool,
 }
 
-#[derive(Deserialize, Serialize, Debug, PartialEq, Eq)]
+#[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "snake_case")]
 pub enum SkinSource {
     /// A default Minecraft skin, which may be assigned to players at random by default.
@@ -241,9 +241,7 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
 }
 
 /// Adds a custom skin to the app database and equips it for the currently selected
-/// Minecraft profile. If the currently equipped skin is custom but not managed by
-/// the app (i.e., it was set externally by another launcher, the Minecraft website,
-/// etc.), that skin will be added as a custom skin to the app database as well.
+/// Minecraft profile.
 #[tracing::instrument(skip(texture_blob))]
 pub async fn add_and_equip_custom_skin(
     texture_blob: Bytes,
@@ -262,11 +260,9 @@ pub async fn add_and_equip_custom_skin(
         .await?
         .ok_or(ErrorKind::NoCredentialsError)?;
 
-    save_current_custom_external_skin(&state, &selected_credentials).await?;
-
-    // We have to equip the new skin before storing it, as it's the Mojang API backend
-    // who knows how to compute the texture key we require, which we can then read from
-    // the updated player profile
+    // We have to equip the skin first, as it's the Mojang API backend who knows
+    // how to compute the texture key we require, which we can then read from the
+    // updated player profile
     mojang_api::MinecraftSkinOperation::equip(
         &selected_credentials,
         stream::iter([Ok::<_, String>(Bytes::clone(&texture_blob))]),
@@ -355,10 +351,6 @@ pub async fn set_default_cape(cape: Option<Cape>) -> crate::Result<()> {
 ///
 /// This function does not check that the passed skin, if custom, exists in the app database,
 /// giving the caller complete freedom to equip any skin at any time.
-///
-/// If the currently equipped skin is a custom skin that is not managed by the app (i.e., it was
-/// set externally by another launcher, the Minecraft website, etc.), that skin will be added as
-/// a custom skin to the app database, in order to allow the app to manage it later.
 #[tracing::instrument]
 pub async fn equip_skin(skin: Skin) -> crate::Result<()> {
     let state = State::get().await?;
@@ -366,8 +358,6 @@ pub async fn equip_skin(skin: Skin) -> crate::Result<()> {
     let selected_credentials = Credentials::get_default_credential(&state.pool)
         .await?
         .ok_or(ErrorKind::NoCredentialsError)?;
-
-    save_current_custom_external_skin(&state, &selected_credentials).await?;
 
     let profile =
         selected_credentials.online_profile().await.ok_or_else(|| {
@@ -534,38 +524,6 @@ async fn sync_cape(
                 .await?
             }
         }
-    }
-
-    Ok(())
-}
-
-/// Stores the currently equipped skin as a custom skin, if it is a custom skin that is not
-/// managed by the app (i.e., it was externally set).
-async fn save_current_custom_external_skin(
-    state: &State,
-    selected_credentials: &Credentials,
-) -> crate::Result<()> {
-    if let Some(current_external_skin) = get_available_skins()
-        .await?
-        .into_iter()
-        .find(|skin| skin.is_equipped)
-        .filter(|skin| skin.source == SkinSource::CustomExternal)
-    {
-        CustomMinecraftSkin::add(
-            selected_credentials.offline_profile.id,
-            &current_external_skin.texture_key,
-            &png_util::url_to_data_stream(&current_external_skin.texture)
-                .await?
-                .try_fold(vec![], async |mut texture_blob, chunk| {
-                    texture_blob.extend_from_slice(&chunk);
-                    Ok(texture_blob)
-                })
-                .await?,
-            current_external_skin.variant,
-            current_external_skin.cape_id,
-            &state.pool,
-        )
-        .await?;
     }
 
     Ok(())
