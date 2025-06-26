@@ -285,13 +285,13 @@ const selectedCharge = ref(null);
 const refundType = ref("full");
 const refundTypes = ref(["full", "partial", "none"]);
 const refundAmount = ref(0);
-const unprovision = ref(false);
+const unprovision = ref(true);
 
 function showRefundModal(charge) {
   selectedCharge.value = charge;
   refundType.value = "full";
   refundAmount.value = 0;
-  unprovision.value = false;
+  unprovision.value = true;
   refundModal.value.show();
 }
 
