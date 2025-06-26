@@ -13,7 +13,7 @@ use daedalus::{
     modded::SidedDataEntry,
 };
 use dunce::canonicalize;
-use std::collections::HashSet;
+use hashlink::LinkedHashSet;
 use std::io::{BufRead, BufReader};
 use std::{collections::HashMap, path::Path};
 use uuid::Uuid;
@@ -24,7 +24,7 @@ const TEMPORARY_REPLACE_CHAR: &str = "\n";
 pub fn get_class_paths(
     libraries_path: &Path,
     libraries: &[Library],
-    client_path: &Path,
+    launcher_class_path: &[&Path],
     java_arch: &str,
     minecraft_updated: bool,
 ) -> crate::Result<String> {
@@ -48,20 +48,22 @@ pub fn get_class_paths(
 
             Some(get_lib_path(libraries_path, &library.name, false))
         })
-        .collect::<Result<HashSet<_>, _>>()?;
+        .collect::<Result<LinkedHashSet<_>, _>>()?;
 
-    cps.insert(
-        canonicalize(client_path)
-            .map_err(|_| {
-                crate::ErrorKind::LauncherError(format!(
-                    "Specified class path {} does not exist",
-                    client_path.to_string_lossy()
-                ))
-                .as_error()
-            })?
-            .to_string_lossy()
-            .to_string(),
-    );
+    for launcher_path in launcher_class_path {
+        cps.insert(
+            canonicalize(launcher_path)
+                .map_err(|_| {
+                    crate::ErrorKind::LauncherError(format!(
+                        "Specified class path {} does not exist",
+                        launcher_path.to_string_lossy()
+                    ))
+                    .as_error()
+                })?
+                .to_string_lossy()
+                .to_string(),
+        );
+    }
 
     Ok(cps
         .into_iter()
