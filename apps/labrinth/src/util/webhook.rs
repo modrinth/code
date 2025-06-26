@@ -158,13 +158,13 @@ async fn get_webhook_metadata(
             categories_formatted: project
                 .categories
                 .into_iter()
-                .map(format_category)
+                .map(format_category_or_loader)
                 .collect(),
             loaders_formatted: project
                 .inner
                 .loaders
                 .into_iter()
-                .map(format_category)
+                .map(format_category_or_loader)
                 .collect(),
             versions_formatted: formatted_game_versions,
             gallery_image: project
@@ -576,7 +576,10 @@ fn get_gv_range(
     output
 }
 
-fn format_category(mut x: String) -> String {
+// Converted from knossos
+// See: packages/utils/utils.ts
+// https://github.com/modrinth/code/blob/47af459f24e541a844b42b1c8427af6a7b86381e/packages/utils/utils.ts#L147-L196
+fn format_category_or_loader(mut x: String) -> String {
     match &*x {
         "modloader" => "Risugami's ModLoader".to_string(),
         "bungeecord" => "BungeeCord".to_string(),
