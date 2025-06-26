@@ -14,11 +14,12 @@ dependencies {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(8)
+        languageVersion = JavaLanguageVersion.of(11)
     }
 }
 
 tasks.withType<JavaCompile>().configureEach {
+    options.release = 8
     options.compilerArgs.addAll(listOf("-Xlint:all", "-Werror"))
 }
 
