@@ -86,7 +86,7 @@
               }"
               @click="serverLoader = loader"
             >
-              <LoaderIcon :tags="tags" :loader="loader" class="!h-12 !w-12" />
+              <LoaderIcon :loader="loader" class="!h-12 !w-12" />
               <p class="text-lg font-bold m-0">{{ loader }}</p>
             </button>
           </div>

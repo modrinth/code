@@ -31,7 +31,7 @@
             </li>
           </div>
         </div>
-        <div v-else-if="props.serverPowerState === 'crashed'" class="flex flex-row gap-4">
+        <div v-else-if="serverPowerState === 'crashed'" class="flex flex-row gap-4">
           <IssuesIcon class="hidden h-8 w-8 text-red sm:block" />
 
           <div class="flex flex-col gap-2">
@@ -75,7 +75,7 @@
     </div>
 
     <div class="flex flex-col-reverse gap-6 md:flex-col">
-      <UiServersServerStats
+      <ServerStats
         :data="isConnected && !isWsAuthIncorrect ? stats : undefined"
         :loading="!isConnected || isWsAuthIncorrect"
       />
@@ -94,10 +94,7 @@
           </div>
         </div>
 
-        <UiServersPanelTerminal
-          :full-screen="fullScreen"
-          :loading="!isConnected || isWsAuthIncorrect"
-        >
+        <PanelTerminal :full-screen="fullScreen" :loading="!isConnected || isWsAuthIncorrect">
           <div class="relative w-full px-4 pt-4">
             <ul
               v-if="suggestions.length && isConnected && !isWsAuthIncorrect"
@@ -169,7 +166,7 @@
               />
             </div>
           </div>
-        </UiServersPanelTerminal>
+        </PanelTerminal>
       </div>
     </div>
 
@@ -188,8 +185,10 @@
 
 <script setup lang="ts">
 import { TerminalSquareIcon, XIcon, IssuesIcon } from "@modrinth/assets";
-import { ButtonStyled, ModrinthServer } from "@modrinth/ui";
+import { ButtonStyled, injectModrinthServerContext, PanelTerminal } from "@modrinth/ui";
 import type { ServerState, Stats } from "@modrinth/utils";
+
+import ServerStats from "~/components/ui/servers/ServerStats.vue";
 
 type ServerProps = {
   socket: WebSocket | null;
@@ -202,8 +201,9 @@ type ServerProps = {
     exit_code?: number;
   };
   isServerRunning: boolean;
-  server: ModrinthServer;
 };
+
+const { server } = injectModrinthServerContext();
 
 const props = defineProps<ServerProps>();
 
@@ -244,7 +244,7 @@ const inspectingError = ref<ErrorData | null>(null);
 
 const inspectError = async () => {
   try {
-    const log = await props.server.fs?.downloadFile("logs/latest.log");
+    const log = await server.value?.fs?.downloadFile("logs/latest.log");
     if (!log) return;
 
     // @ts-ignore
@@ -585,7 +585,7 @@ const commandInput = ref("");
 const suggestions = ref<string[]>([]);
 const selectedSuggestionIndex = ref(0);
 
-const serverData = computed(() => props.server.general);
+const serverData = computed(() => server.value?.general);
 // const serverIP = computed(() => serverData.value?.net.ip ?? "");
 // const serverPort = computed(() => serverData.value?.net.port ?? 0);
 // const serverDomain = computed(() => serverData.value?.net.domain ?? "");

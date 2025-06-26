@@ -152,7 +152,7 @@
           </div>
 
           <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-            <LoaderIcon :tags="tags" loader="fabric" class="size-8 text-brand" />
+            <LoaderIcon loader="Fabric" class="size-8 text-brand" />
             <h2 class="m-0 text-lg font-bold">All your favorite mods</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
               Choose between Vanilla, Fabric, Forge, Quilt and NeoForge. If it's on Modrinth, it can

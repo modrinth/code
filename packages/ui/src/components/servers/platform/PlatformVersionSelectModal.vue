@@ -28,7 +28,7 @@
           <div
             class="grid size-16 place-content-center rounded-2xl border-[2px] border-solid border-button-border bg-button-bg shadow-sm"
           >
-            <LoaderIcon :tags="tags" class="size-10" :loader="selectedLoader" />
+            <LoaderIcon class="size-10" :loader="selectedLoader" />
           </div>
           <svg
             xmlns="http://www.w3.org/2000/svg"
