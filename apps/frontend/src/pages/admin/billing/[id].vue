@@ -153,10 +153,7 @@
                   {{ dayjs(charge.due).format("MMMM D, YYYY [at] h:mma") }}
                   <span class="text-secondary">({{ formatRelativeTime(charge.due) }}) </span>
                 </span>
-                <div
-                  v-if="flags.developerMode"
-                  class="flex w-full items-center gap-1 text-xs text-secondary"
-                >
+                <div class="flex w-full items-center gap-1 text-xs text-secondary">
                   {{ charge.status }}
                   ⋅
                   {{ charge.type }}
@@ -219,7 +216,6 @@ import dayjs from "dayjs";
 import { products } from "~/generated/state.json";
 import ModrinthServersIcon from "~/components/ui/servers/ModrinthServersIcon.vue";
 
-const flags = useFeatureFlags();
 const route = useRoute();
 const data = useNuxtApp();
 const vintl = useVIntl();
