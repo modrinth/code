@@ -1,6 +1,24 @@
 {
   "bundle": {
-    "createUpdaterArtifacts": "v1Compatible"
+    "createUpdaterArtifacts": "v1Compatible",
+    "windows": {
+      "signCommand": {
+        "cmd": "jsign",
+        "args": [
+          "sign",
+          "--verbose",
+          "--storetype",
+          "DIGICERTONE",
+          "--keystore",
+          "https://clientauth.one.digicert.com",
+          "--storepass",
+          "env:DIGICERT_ONE_SIGNER_CREDENTIALS",
+          "--tsaurl",
+          "https://timestamp.sectigo.com,http://timestamp.digicert.com",
+          "%1"
+        ]
+      }
+    }
   },
   "build": {
     "features": ["updater"]
