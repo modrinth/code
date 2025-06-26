@@ -452,6 +452,16 @@
               {{ formatCategory(currentPlatform) }}.
             </p>
           </AutomaticAccordion>
+          <ServersPromo
+            v-if="flags.showProjectPageDownloadModalServersPromo"
+            :link="`/servers#plan`"
+            @close="
+              () => {
+                flags.showProjectPageDownloadModalServersPromo = false;
+                saveFeatureFlags();
+              }
+            "
+          />
         </div>
       </template>
     </NewModal>
@@ -495,6 +505,64 @@
                 </button>
               </ButtonStyled>
             </div>
+            <Tooltip
+              v-if="canCreateServerFrom && flags.showProjectPageQuickServerButton"
+              theme="dismissable-prompt"
+              :triggers="[]"
+              :shown="flags.showProjectPageCreateServersTooltip"
+              :auto-hide="false"
+              placement="bottom-start"
+            >
+              <ButtonStyled size="large" circular>
+                <nuxt-link
+                  v-tooltip="'Create a server'"
+                  :to="`/servers?project=${project.id}#plan`"
+                  @click="
+                    () => {
+                      flags.showProjectPageCreateServersTooltip = false;
+                      saveFeatureFlags();
+                    }
+                  "
+                >
+                  <ServerPlusIcon aria-hidden="true" />
+                </nuxt-link>
+              </ButtonStyled>
+              <template #popper>
+                <div class="experimental-styles-within flex max-w-60 flex-col gap-1">
+                  <div class="flex items-center justify-between gap-4">
+                    <h3 class="m-0 flex items-center gap-2 text-base font-bold text-contrast">
+                      Create a server
+                      <TagItem
+                        :style="{
+                          '--_color': 'var(--color-brand)',
+                          '--_bg-color': 'var(--color-brand-highlight)',
+                        }"
+                        >New</TagItem
+                      >
+                    </h3>
+                    <ButtonStyled size="small" circular>
+                      <button
+                        v-tooltip="`Don't show again`"
+                        @click="
+                          () => {
+                            flags.showProjectPageCreateServersTooltip = false;
+                            saveFeatureFlags();
+                          }
+                        "
+                      >
+                        <XIcon aria-hidden="true" />
+                      </button>
+                    </ButtonStyled>
+                  </div>
+                  <p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
+                    Modrinth Servers is the easiest way to play with your friends without hassle!
+                  </p>
+                  <p class="m-0 text-wrap text-sm font-bold text-primary">
+                    Starting at $5<span class="text-xs"> / month</span>
+                  </p>
+                </div>
+              </template>
+            </Tooltip>
             <ClientOnly>
               <ButtonStyled
                 size="large"
@@ -850,12 +918,14 @@ import {
   ReportIcon,
   ScaleIcon,
   SearchIcon,
+  ServerPlusIcon,
   SettingsIcon,
   TagsIcon,
   UsersIcon,
   VersionIcon,
   WrenchIcon,
   ModrinthIcon,
+  XIcon,
 } from "@modrinth/assets";
 import {
   Avatar,
@@ -872,6 +942,8 @@ import {
   ProjectSidebarLinks,
   ProjectStatusBadge,
   ScrollablePanel,
+  TagItem,
+  ServersPromo,
   useRelativeTime,
 } from "@modrinth/ui";
 import VersionSummary from "@modrinth/ui/src/components/version/VersionSummary.vue";
@@ -885,6 +957,7 @@ import {
 } from "@modrinth/utils";
 import { navigateTo } from "#app";
 import dayjs from "dayjs";
+import { Tooltip } from "floating-vue";
 import Accordion from "~/components/ui/Accordion.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import AutomaticAccordion from "~/components/ui/AutomaticAccordion.vue";
@@ -898,6 +971,7 @@ import NavTabs from "~/components/ui/NavTabs.vue";
 import ProjectMemberHeader from "~/components/ui/ProjectMemberHeader.vue";
 import { userCollectProject } from "~/composables/user.js";
 import { reportProject } from "~/utils/report-helpers.ts";
+import { saveFeatureFlags } from "~/composables/featureFlags.ts";
 
 const data = useNuxtApp();
 const route = useNativeRoute();
@@ -1311,6 +1385,10 @@ const description = computed(
     } by ${members.value.find((x) => x.is_owner)?.user?.username || "a Creator"} on Modrinth`,
 );
 
+const canCreateServerFrom = computed(() => {
+  return project.value.project_type === "modpack" && project.value.server_side !== "unsupported";
+});
+
 if (!route.name.startsWith("type-id-settings")) {
   useSeoMeta({
     title: () => title.value,
@@ -1677,6 +1755,35 @@ const navLinks = computed(() => {
 @media (hover: none) and (max-width: 767px) {
   .modrinth-app-section {
     display: none;
+  }
+}
+
+.servers-popup {
+  box-shadow:
+    0 0 12px 1px rgba(0, 175, 92, 0.6),
+    var(--shadow-floating);
+
+  &::before {
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid var(--color-button-bg);
+    content: " ";
+    position: absolute;
+    top: -7px;
+    left: 17px;
+  }
+  &::after {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid var(--color-raised-bg);
+    content: " ";
+    position: absolute;
+    top: -5px;
+    left: 18px;
   }
 }
 </style>
