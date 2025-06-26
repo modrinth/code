@@ -19,7 +19,7 @@ on:
   workflow_dispatch:
     inputs:
       sign-windows-binaries:
-        description: Whether to sign the generated Windows binaries
+        description: Sign Windows binaries
         type: boolean
         default: false
         required: false
