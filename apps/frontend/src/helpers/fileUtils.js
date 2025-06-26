@@ -1,4 +1,4 @@
-import { formatBytes } from "~/plugins/shorthands.js";
+import { formatBytes } from "@modrinth/utils";
 
 export const fileIsValid = (file, validationOptions) => {
   const { maxSize, alertOnInvalid } = validationOptions;

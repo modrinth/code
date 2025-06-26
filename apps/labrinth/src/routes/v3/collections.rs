@@ -4,7 +4,7 @@ use crate::database::models::{
     collection_item, generate_collection_id, project_item,
 };
 use crate::database::redis::RedisPool;
-use crate::file_hosting::FileHost;
+use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::collections::{Collection, CollectionStatus};
 use crate::models::ids::{CollectionId, ProjectId};
 use crate::models::pats::Scopes;
@@ -12,7 +12,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::v3::project_creation::CreateError;
 use crate::util::img::delete_old_images;
-use crate::util::routes::read_from_payload;
+use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use crate::{database, models};
 use actix_web::web::Data;
@@ -413,11 +413,12 @@ pub async fn collection_icon_edit(
     delete_old_images(
         collection_item.icon_url,
         collection_item.raw_icon_url,
+        FileHostPublicity::Public,
         &***file_host,
     )
     .await?;
 
-    let bytes = read_from_payload(
+    let bytes = read_limited_from_payload(
         &mut payload,
         262144,
         "Icons must be smaller than 256KiB",
@@ -427,6 +428,7 @@ pub async fn collection_icon_edit(
     let collection_id: CollectionId = collection_item.id.into();
     let upload_result = crate::util::img::upload_image_optimized(
         &format!("data/{collection_id}"),
+        FileHostPublicity::Public,
         bytes.freeze(),
         &ext.ext,
         Some(96),
@@ -493,6 +495,7 @@ pub async fn delete_collection_icon(
     delete_old_images(
         collection_item.icon_url,
         collection_item.raw_icon_url,
+        FileHostPublicity::Public,
         &***file_host,
     )
     .await?;

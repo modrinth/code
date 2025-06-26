@@ -5,7 +5,7 @@
       <Chips
         v-model="projectType"
         :items="projectTypes"
-        :format-label="(x) => (x === 'all' ? 'All' : $formatProjectType(x) + 's')"
+        :format-label="(x) => (x === 'all' ? 'All' : formatProjectType(x) + 's')"
       />
       <button v-if="oldestFirst" class="iconified-button push-right" @click="oldestFirst = false">
         <SortDescendingIcon />
@@ -56,7 +56,7 @@
             <Avatar :src="project.icon_url" size="xs" no-shadow raised />
             <span class="stacked">
               <span class="title">{{ project.name }}</span>
-              <span>{{ $formatProjectType(project.inferred_project_type) }}</span>
+              <span>{{ formatProjectType(project.inferred_project_type) }}</span>
             </span>
           </nuxt-link>
         </div>
@@ -81,7 +81,9 @@
         </div>
         <div class="mobile-row">
           is requesting to be
-          <Badge :type="project.requested_status ? project.requested_status : 'approved'" />
+          <ProjectStatusBadge
+            :status="project.requested_status ? project.requested_status : 'approved'"
+          />
         </div>
       </div>
       <div class="input-group">
@@ -103,7 +105,7 @@
 </template>
 
 <script setup>
-import { Chips, useRelativeTime } from "@modrinth/ui";
+import { Avatar, ProjectStatusBadge, Chips, useRelativeTime } from "@modrinth/ui";
 import {
   UnknownIcon,
   EyeIcon,
@@ -112,9 +114,7 @@ import {
   IssuesIcon,
   ScaleIcon,
 } from "@modrinth/assets";
-import Avatar from "~/components/ui/Avatar.vue";
-import Badge from "~/components/ui/Badge.vue";
-import { formatProjectType } from "~/plugins/shorthands.js";
+import { formatProjectType } from "@modrinth/utils";
 import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
 
 useHead({

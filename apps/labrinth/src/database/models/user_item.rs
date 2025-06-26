@@ -511,6 +511,18 @@ impl DBUser {
             .execute(&mut **transaction)
             .await?;
 
+            sqlx::query!(
+                "
+                UPDATE shared_instances
+                SET owner_id = $1
+                WHERE owner_id = $2
+                ",
+                deleted_user as DBUserId,
+                id as DBUserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+
             use futures::TryStreamExt;
             let notifications: Vec<i64> = sqlx::query!(
                 "

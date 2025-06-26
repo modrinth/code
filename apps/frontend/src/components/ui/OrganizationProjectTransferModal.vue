@@ -57,7 +57,7 @@
             <div class="table-cell">
               <BoxIcon />
               <span>{{
-                $formatProjectType(
+                formatProjectType(
                   $getProjectTypeForDisplay(
                     project.project_types?.[0] ?? "project",
                     project.loaders,
@@ -111,6 +111,7 @@
 <script setup>
 import { BoxIcon, SettingsIcon, TransferIcon, XIcon } from "@modrinth/assets";
 import { Button, Modal, Checkbox, CopyCode, Avatar } from "@modrinth/ui";
+import { formatProjectType } from "@modrinth/utils";
 
 const modalOpen = ref(null);
 
