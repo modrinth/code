@@ -14,6 +14,11 @@ fn main() {
         dunce::canonicalize(PathBuf::from(env::var_os("OUT_DIR").unwrap()))
             .unwrap();
 
+    println!(
+        "cargo::rustc-env=JAVA_JARS_DIR={}",
+        out_dir.join("java/libs").display()
+    );
+
     let gradle_path = fs::canonicalize(
         #[cfg(target_os = "windows")]
         "java\\gradlew.bat",
@@ -36,8 +41,4 @@ fn main() {
         println!("cargo::error=Gradle build failed with {exit_status}");
         exit(exit_status.code().unwrap_or(1));
     }
-    println!(
-        "cargo::rustc-env=JAVA_JARS_DIR={}",
-        out_dir.join("java/libs").display()
-    );
 }
