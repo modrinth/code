@@ -137,7 +137,7 @@ jobs:
         run: |
           [System.Convert]::FromBase64String("$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64") | Set-Content -Path signer-client-cert.p12 -AsByteStream
           $env:DIGICERT_ONE_SIGNER_CREDENTIALS = "$env:DIGICERT_ONE_SIGNER_API_KEY|$PWD\signer-client-cert.p12|$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD"
-          pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json --verbose
+          pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json --verbose --bundles nsis,updater
           Remove-Item -Path signer-client-cert.p12
         if: startsWith(matrix.platform, 'windows')
         env:
