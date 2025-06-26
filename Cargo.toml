@@ -109,7 +109,7 @@ rust-s3 = { version = "0.35.1", default-features = false, features = [
   "tokio-rustls-tls",
 ] }
 rusty-money = "0.4.1"
-sentry = { version = "0.38.1", default-features = false, features = [
+sentry = { version = "0.41.0", default-features = false, features = [
   "backtrace",
   "contexts",
   "debug-images",
