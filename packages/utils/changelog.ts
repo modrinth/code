@@ -11,6 +11,23 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-06-26T11:00:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Fixed support bubble overlapping notifications sometimes.
+- Fixed race condition when creating backups.`,
+  },
+  {
+    date: `2025-06-26T11:00:00-07:00`,
+    product: 'web',
+    body: `### Added
+- Added a dismissable Modrinth Servers promotion to project Download interface to inform users of the service's availability.
+
+### Improvements
+- Added colors for the newly added legacy mod loaders
+- Improved file upload error message in some places.`,
+  },
+  {
     date: `2025-06-16T11:00:00-07:00`,
     product: 'web',
     body: `### Improvements
