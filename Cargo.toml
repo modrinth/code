@@ -132,18 +132,18 @@ spdx = "0.10.8"
 sqlx = { version = "0.8.6", default-features = false }
 sysinfo = { version = "0.35.2", default-features = false }
 tar = "0.4.44"
-tauri = "2.5.1"
-tauri-build = "2.2.0"
-tauri-plugin-deep-link = "2.3.0"
-tauri-plugin-dialog = "2.2.2"
-tauri-plugin-opener = "2.2.7"
-tauri-plugin-os = "2.2.1"
-tauri-plugin-single-instance = "2.2.4"
-tauri-plugin-updater = { version = "2.7.1", default-features = false, features = [
+tauri = "2.6.1"
+tauri-build = "2.3.0"
+tauri-plugin-deep-link = "2.4.0"
+tauri-plugin-dialog = "2.3.0"
+tauri-plugin-opener = "2.4.0"
+tauri-plugin-os = "2.3.0"
+tauri-plugin-single-instance = "2.3.0"
+tauri-plugin-updater = { version = "2.9.0", default-features = false, features = [
   "rustls-tls",
   "zip",
 ] }
-tauri-plugin-window-state = "2.2.2"
+tauri-plugin-window-state = "2.3.0"
 tempfile = "3.20.0"
 theseus = { path = "packages/app-lib" }
 thiserror = "2.0.12"
@@ -213,7 +213,7 @@ wildcard_dependencies = "warn"
 warnings = "deny"
 
 [patch.crates-io]
-wry = { git = "https://github.com/modrinth/wry", rev = "cafdaa9" }
+wry = { git = "https://github.com/modrinth/wry", rev = "21db186" }
 
 # Optimize for speed and reduce size on release builds
 [profile.release]
