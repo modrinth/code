@@ -92,7 +92,7 @@ async function loginMinecraft() {
     const loggedIn = await login_flow()
 
     if (loggedIn) {
-      await set_default_user(loggedIn.id).catch(handleError)
+      await set_default_user(loggedIn.profile.id).catch(handleError)
     }
 
     await trackEvent('AccountLogIn', { source: 'ErrorModal' })
