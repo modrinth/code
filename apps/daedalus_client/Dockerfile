@@ -1,4 +1,4 @@
-FROM rust:1.87.0 AS build
+FROM rust:1.88.0 AS build
 ENV PKG_CONFIG_ALLOW_CROSS=1
 
 WORKDIR /usr/src/daedalus
