@@ -85,6 +85,7 @@ DELETE FROM version_fields
 -- Switch loader fields definitions on the available loaders to use the new environment field
 ALTER TABLE loader_fields_loaders DROP CONSTRAINT unique_loader_field;
 ALTER TABLE loader_fields_loaders DROP CONSTRAINT loader_fields_loaders_pkey;
+ALTER TABLE loader_fields_loaders REPLICA IDENTITY FULL; -- Required due to temporary PK removal for replica sync in production
 
 UPDATE loader_fields_loaders
     SET loader_field_id = VAR_env_field_id
@@ -105,6 +106,7 @@ DELETE FROM loader_fields_loaders
 
 -- Having both a PK and UNIQUE constraint for the same columns is redundant, so only restore the PK
 ALTER TABLE loader_fields_loaders ADD PRIMARY KEY (loader_id, loader_field_id);
+ALTER TABLE loader_fields_loaders REPLICA IDENTITY DEFAULT;
 
 -- Finally, remove the old loader fields
 DELETE FROM loader_fields
