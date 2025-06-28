@@ -762,12 +762,7 @@
           :tags="tags"
           class="card flex-card experimental-styles-within"
         />
-        <AdPlaceholder
-          v-if="
-            (!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus) &&
-            tags.approvedStatuses.includes(project.status)
-          "
-        />
+        <AdPlaceholder v-if="!auth.user && tags.approvedStatuses.includes(project.status)" />
         <ProjectSidebarLinks
           :project="project"
           :link-target="$external()"

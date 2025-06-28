@@ -329,9 +329,7 @@
             </div>
           </div>
         </div>
-        <AdPlaceholder
-          v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
-        />
+        <AdPlaceholder v-if="!auth.user" />
       </div>
     </div>
   </div>
