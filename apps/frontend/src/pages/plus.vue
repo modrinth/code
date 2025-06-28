@@ -73,7 +73,7 @@
         <SparklesIcon class="h-8 w-8 text-purple" />
         <span class="text-lg font-bold">Remove all ads</span>
         <span class="leading-5 text-secondary">
-          Never see an advertisement again on the Modrinth app or the website.
+          Never see an advertisement again on the Modrinth app.
         </span>
       </div>
       <div class="flex flex-col gap-4 rounded-xl bg-bg-raised p-4">
