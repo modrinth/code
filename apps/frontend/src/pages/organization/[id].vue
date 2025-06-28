@@ -289,7 +289,6 @@ const user = await useUser();
 const cosmetics = useCosmetics();
 const route = useNativeRoute();
 const tags = useTags();
-const flags = useFeatureFlags();
 const config = useRuntimeConfig();
 
 let orgId = useRouteId();
