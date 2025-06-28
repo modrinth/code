@@ -102,7 +102,7 @@ export class ModrinthServer {
       try {
         const fileData = await useServersFetch(`/download?path=/server-icon-original.png`, {
           override: auth,
-          retry: false,
+          retry: 1, // Reduce retries for optional resources
         });
 
         if (fileData instanceof Blob && import.meta.client) {
@@ -124,8 +124,14 @@ export class ModrinthServer {
           return dataURL;
         }
       } catch (error) {
-        if (error instanceof ModrinthServerError && error.statusCode === 404) {
-          if (iconUrl) {
+        if (error instanceof ModrinthServerError) {
+          if (error.statusCode && error.statusCode >= 500) {
+            console.debug("Service unavailable, skipping icon processing");
+            sharedImage.value = undefined;
+            return undefined;
+          }
+
+          if (error.statusCode === 404 && iconUrl) {
             try {
               const response = await fetch(iconUrl);
               if (!response.ok) throw new Error("Failed to fetch icon");
@@ -252,7 +258,7 @@ export class ModrinthServer {
             continue;
           }
 
-          if (error.statusCode === 503) {
+          if (error.statusCode && error.statusCode >= 500) {
             console.debug(`Temporary ${module} unavailable:`, error.message);
             continue;
           }
