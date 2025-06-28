@@ -166,10 +166,14 @@ const metrics = computed(() => {
     },
     {
       title: "Memory usage",
-      value: userPreferences.value.ramAsNumber || flags.developerMode
-        ? formatBytes(stats.value.ram_usage_bytes)
-        : `${ramPercent.toFixed(2)}%`,
-      max: userPreferences.value.ramAsNumber || flags.developerMode ? formatBytes(stats.value.ram_total_bytes) : "100%",
+      value:
+        userPreferences.value.ramAsNumber || flags.developerMode
+          ? formatBytes(stats.value.ram_usage_bytes)
+          : `${ramPercent.toFixed(2)}%`,
+      max:
+        userPreferences.value.ramAsNumber || flags.developerMode
+          ? formatBytes(stats.value.ram_total_bytes)
+          : "100%",
       icon: DatabaseIcon,
       data: ramData.value,
       showGraph: true,
