@@ -82,7 +82,7 @@
         <span class="leading-5 text-secondary">Get an exclusive badge on your user page.</span>
       </div>
     </div>
-    <span class="mt-4 text-secondary">...and much more coming soon!</span>
+    <span class="mt-4 text-secondary">...and much more coming soon™!</span>
   </div>
 </template>
 <script setup>
