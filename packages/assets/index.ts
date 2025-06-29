@@ -158,6 +158,7 @@ import _RestoreIcon from './icons/restore.svg?component'
 import _RightArrowIcon from './icons/right-arrow.svg?component'
 import _RotateCounterClockwiseIcon from './icons/rotate-ccw.svg?component'
 import _RotateClockwiseIcon from './icons/rotate-cw.svg?component'
+import _RssIcon from './icons/rss.svg?component'
 import _SaveIcon from './icons/save.svg?component'
 import _ScaleIcon from './icons/scale.svg?component'
 import _ScanEyeIcon from './icons/scan-eye.svg?component'
@@ -445,3 +446,4 @@ export const LoaderIcon = _LoaderIcon
 export const ImportIcon = _ImportIcon
 export const CardIcon = _CardIcon
 export const TimerIcon = _TimerIcon
+export const RssIcon = _RssIcon

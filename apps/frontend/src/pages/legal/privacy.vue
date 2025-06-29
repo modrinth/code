@@ -122,8 +122,8 @@
     <h3>Creator Monetization Program data</h3>
     <p>
       When you sign up for our
-      <a href="https://blog.modrinth.com/p/creator-monetization-beta">
-        Creator Monetization Program</a
+      <nuxt-link to="/news/article/creator-monetization-beta">
+        Creator Monetization Program</nuxt-link
       >
       (the "CMP"), we collect:
     </p>

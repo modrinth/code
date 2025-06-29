@@ -514,12 +514,10 @@
           <strong class="main-header-strong">Modrinth</strong>
         </h2>
         <ButtonStyled color="brand">
-          <a
-            href="https://blog.modrinth.com/?utm_source=website&utm_source=homepage&utm_campaign=newsletter"
-          >
+          <nuxt-link :to="`/news`">
             <NewspaperIcon />
             Visit the blog
-          </a>
+          </nuxt-link>
         </ButtonStyled>
       </div>
     </div>
