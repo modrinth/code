@@ -27,9 +27,11 @@ export class FSModule extends ServerModule {
       return await requestFn();
     } catch (error) {
       if (error instanceof ModrinthServerError && error.statusCode === 401) {
+        console.debug("Auth failed, refreshing JWT and retrying");
         await this.fetch(); // Refresh auth
         return await requestFn();
       }
+
       throw error;
     }
   }
