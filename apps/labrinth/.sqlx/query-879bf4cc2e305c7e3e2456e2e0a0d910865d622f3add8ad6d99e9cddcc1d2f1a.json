@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT SUM(amount) from payouts_values WHERE date_available <= NOW()\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "sum",
+        "type_info": "Numeric"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "879bf4cc2e305c7e3e2456e2e0a0d910865d622f3add8ad6d99e9cddcc1d2f1a"
+}

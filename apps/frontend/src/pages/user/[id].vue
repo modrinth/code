@@ -329,9 +329,7 @@
             </div>
           </div>
         </div>
-        <AdPlaceholder
-          v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
-        />
+        <AdPlaceholder v-if="!auth.user" />
       </div>
     </div>
   </div>
@@ -386,7 +384,6 @@ const route = useNativeRoute();
 const auth = await useAuth();
 const cosmetics = useCosmetics();
 const tags = useTags();
-const flags = useFeatureFlags();
 const config = useRuntimeConfig();
 
 const vintl = useVIntl();

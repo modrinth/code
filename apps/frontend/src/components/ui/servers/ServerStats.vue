@@ -74,6 +74,7 @@ import { FolderOpenIcon, CPUIcon, DatabaseIcon, IssuesIcon } from "@modrinth/ass
 import { useStorage } from "@vueuse/core";
 import type { Stats } from "@modrinth/utils";
 
+const flags = useFeatureFlags();
 const route = useNativeRoute();
 const serverId = route.params.id;
 const VueApexCharts = defineAsyncComponent(() => import("vue3-apexcharts"));
@@ -165,10 +166,14 @@ const metrics = computed(() => {
     },
     {
       title: "Memory usage",
-      value: userPreferences.value.ramAsNumber
-        ? formatBytes(stats.value.ram_usage_bytes)
-        : `${ramPercent.toFixed(2)}%`,
-      max: userPreferences.value.ramAsNumber ? formatBytes(stats.value.ram_total_bytes) : "100%",
+      value:
+        userPreferences.value.ramAsNumber || flags.developerMode
+          ? formatBytes(stats.value.ram_usage_bytes)
+          : `${ramPercent.toFixed(2)}%`,
+      max:
+        userPreferences.value.ramAsNumber || flags.developerMode
+          ? formatBytes(stats.value.ram_total_bytes)
+          : "100%",
       icon: DatabaseIcon,
       data: ramData.value,
       showGraph: true,
