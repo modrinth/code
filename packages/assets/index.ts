@@ -213,6 +213,7 @@ import _CPUIcon from './icons/cpu.svg?component'
 import _LoaderIcon from './icons/loader.svg?component'
 import _ImportIcon from './icons/import.svg?component'
 import _TimerIcon from './icons/timer.svg?component'
+import _GitGraphIcon from './icons/git-graph.svg?component'
 
 // Editor Icons
 import _BoldIcon from './icons/bold.svg?component'
@@ -447,3 +448,4 @@ export const ImportIcon = _ImportIcon
 export const CardIcon = _CardIcon
 export const TimerIcon = _TimerIcon
 export const RssIcon = _RssIcon
+export const GitGraphIcon = _GitGraphIcon

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ButtonStyled } from "@modrinth/ui";
-import { ChevronRightIcon, RssIcon, NewspaperIcon } from "@modrinth/assets";
+import { ChevronRightIcon, RssIcon, NewspaperIcon, GitGraphIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
 
 const { data: articles } = await useAsyncData("news", () => {
@@ -38,6 +38,11 @@ useSeoMeta({
         <ButtonStyled circular>
           <a v-tooltip="`RSS feed`" aria-label="RSS feed" href="/news/feed/rss" target="_blank">
             <RssIcon />
+          </a>
+        </ButtonStyled>
+        <ButtonStyled circular icon-only>
+          <a v-tooltip="`Changelog`" href="/news/changelog" aria-label="Changelog">
+            <GitGraphIcon />
           </a>
         </ButtonStyled>
       </div>
