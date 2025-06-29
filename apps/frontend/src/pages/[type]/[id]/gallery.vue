@@ -137,14 +137,17 @@
       <div class="content">
         <img
           class="image"
-          :class="{ 'zoomed-in': zoomedIn }"
-          :src="
-            expandedGalleryItem.raw_url
-              ? expandedGalleryItem.raw_url
-              : 'https://cdn.modrinth.com/placeholder-banner.svg'
-          "
-          :alt="expandedGalleryItem.title ? expandedGalleryItem.title : 'gallery-image'"
+          :class="{ 'zoomed-in': zoomedIn, hidden: expandedGalleryImageLoading }"
+          :src="expandedGalleryItem.raw_url || 'https://cdn.modrinth.com/placeholder-banner.svg'"
+          :alt="expandedGalleryItem.title || 'gallery-image'"
+          @load="expandedGalleryImageLoading = false"
           @click.stop
+        />
+        <img
+          v-if="expandedGalleryImageLoading"
+          class="image loading-image"
+          :src="expandedGalleryItem.url || 'https://cdn.modrinth.com/placeholder-banner.svg'"
+          :alt="expandedGalleryItem.title || 'gallery-image'"
         />
 
         <div class="floating" @click.stop>
@@ -165,9 +168,7 @@
                 class="open circle-button"
                 target="_blank"
                 :href="
-                  expandedGalleryItem.raw_url
-                    ? expandedGalleryItem.raw_url
-                    : 'https://cdn.modrinth.com/placeholder-banner.svg'
+                  expandedGalleryItem.raw_url || 'https://cdn.modrinth.com/placeholder-banner.svg'
                 "
               >
                 <ExternalIcon aria-hidden="true" />
@@ -220,8 +221,8 @@
       <div v-for="(item, index) in project.gallery" :key="index" class="card gallery-item">
         <a class="gallery-thumbnail" @click="expandImage(item, index)">
           <img
-            :src="item.url ? item.url : 'https://cdn.modrinth.com/placeholder-banner.svg'"
-            :alt="item.title ? item.title : 'gallery-image'"
+            :src="item.url || 'https://cdn.modrinth.com/placeholder-banner.svg'"
+            :alt="item.title || 'gallery-image'"
           />
         </a>
         <div class="gallery-body">
@@ -339,6 +340,8 @@ export default defineNuxtComponent({
     return {
       expandedGalleryItem: null,
       expandedGalleryIndex: 0,
+      expandedGalleryImageLoading: false,
+      expandedGalleryIndices: [],
       zoomedIn: false,
 
       deleteIndex: -1,
@@ -381,6 +384,10 @@ export default defineNuxtComponent({
         this.expandedGalleryIndex = 0;
       }
       this.expandedGalleryItem = this.project.gallery[this.expandedGalleryIndex];
+      if (!this.expandedGalleryIndices.includes(this.expandedGalleryIndex)) {
+        this.expandedGalleryImageLoading = true;
+        this.expandedGalleryIndices.push(this.expandedGalleryIndex);
+      }
     },
     previousImage() {
       this.expandedGalleryIndex--;
@@ -388,11 +395,19 @@ export default defineNuxtComponent({
         this.expandedGalleryIndex = this.project.gallery.length - 1;
       }
       this.expandedGalleryItem = this.project.gallery[this.expandedGalleryIndex];
+      if (!this.expandedGalleryIndices.includes(this.expandedGalleryIndex)) {
+        this.expandedGalleryImageLoading = true;
+        this.expandedGalleryIndices.push(this.expandedGalleryIndex);
+      }
     },
     expandImage(item, index) {
       this.expandedGalleryItem = item;
       this.expandedGalleryIndex = index;
       this.zoomedIn = false;
+      if (!this.expandedGalleryIndices.includes(index)) {
+        this.expandedGalleryImageLoading = true;
+        this.expandedGalleryIndices.push(index);
+      }
     },
     resetEdit() {
       this.editIndex = -1;
@@ -604,11 +619,20 @@ export default defineNuxtComponent({
       max-height: calc(100vh - 2 * var(--spacing-card-lg));
       border-radius: var(--size-rounded-card);
 
+      &.loading-image {
+        min-width: calc(60vw - 2 * var(--spacing-card-lg));
+        min-height: calc(60vh - 2 * var(--spacing-card-lg));
+      }
+
       &.zoomed-in {
         object-fit: cover;
         width: auto;
         height: calc(100vh - 2 * var(--spacing-card-lg));
         max-width: calc(100vw - 2 * var(--spacing-card-lg));
+      }
+
+      &.hidden {
+        display: none;
       }
     }
     .floating {
