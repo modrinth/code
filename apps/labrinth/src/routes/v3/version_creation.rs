@@ -72,6 +72,8 @@ pub struct InitialVersionData {
     pub dependencies: Vec<Dependency>,
     #[serde(alias = "version_type")]
     pub release_channel: VersionType,
+    #[serde(default)]
+    pub project_type: Option<String>,
     #[validate(length(min = 1))]
     pub loaders: Vec<Loader>,
     pub featured: bool,
@@ -423,12 +425,16 @@ async fn version_create_inner(
     .await?;
 
     let loader_structs = selected_loaders.unwrap_or_default();
-    let (all_project_types, all_games): (Vec<String>, Vec<String>) =
-        loader_structs.iter().fold((vec![], vec![]), |mut acc, x| {
-            acc.0.extend_from_slice(&x.supported_project_types);
-            acc.1.extend(x.supported_games.clone());
-            acc
-        });
+    let all_games: Vec<String> = loader_structs
+        .iter()
+        .flat_map(|x| x.supported_games.clone())
+        .collect();
+    let all_project_types = vec![
+        version_data
+            .project_type
+            .clone()
+            .unwrap_or_else(|| "modpack".to_string()),
+    ];
 
     let response = Version {
         id: builder.version_id.into(),
