@@ -26,7 +26,7 @@
           <div class="h-2 w-full rounded-full bg-divider">
             <div
               class="h-2 animate-pulse rounded-full bg-brand transition-all duration-300 ease-out"
-              :style="{ width: `${Math.max(uploadProgress, 8)}%` }"
+              :style="{ width: `${uploadProgress}%` }"
             ></div>
           </div>
         </div>
