@@ -3,7 +3,7 @@ import { ButtonStyled } from "@modrinth/ui";
 import { RssIcon, NewspaperIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
 import { articles as rawArticles } from "@modrinth/blog";
-import { computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import ShareArticleButtons from "~/components/ui/ShareArticleButtons.vue";
 
 const config = useRuntimeConfig();
@@ -19,7 +19,22 @@ if (!rawArticle) {
   });
 }
 
-const article = {
+// Lazy-load HTML content
+const html = ref<string | null>(null);
+const loading = ref(true);
+const error = ref<Error | null>(null);
+
+onMounted(async () => {
+  try {
+    html.value = await rawArticle.html();
+  } catch (e) {
+    error.value = e as Error;
+  } finally {
+    loading.value = false;
+  }
+});
+
+const article = computed(() => ({
   ...rawArticle,
   path: `/news/${rawArticle.slug}`,
   thumbnail: rawArticle.thumbnail
@@ -28,25 +43,25 @@ const article = {
   title: rawArticle.title,
   summary: rawArticle.summary,
   date: rawArticle.date,
-  html: rawArticle.html,
-};
+  html: html.value,
+}));
 
-const articleTitle = computed(() => article.title);
+const articleTitle = computed(() => article.value.title);
 const articleUrl = computed(() => `https://modrinth.com/news/article/${route.params.slug}`);
 
 const thumbnailPath = computed(() =>
-  article.thumbnail
-    ? `${config.public.siteUrl}${article.thumbnail}`
+  article.value.thumbnail
+    ? `${config.public.siteUrl}${article.value.thumbnail}`
     : `${config.public.siteUrl}/news/default.jpg`,
 );
 
-const dayjsDate = computed(() => dayjs(article.date));
+const dayjsDate = computed(() => dayjs(article.value.date));
 
 useSeoMeta({
   title: () => `${articleTitle.value} - Modrinth News`,
   ogTitle: () => articleTitle.value,
-  description: () => article.summary,
-  ogDescription: () => article.summary,
+  description: () => article.value.summary,
+  ogDescription: () => article.value.summary,
   ogType: "article",
   ogImage: () => thumbnailPath.value,
   articlePublishedTime: () => dayjsDate.value.toISOString(),
@@ -88,7 +103,9 @@ useSeoMeta({
         class="aspect-video w-full rounded-xl border-[1px] border-solid border-button-border object-cover sm:rounded-2xl"
         :alt="article.title"
       />
-      <div class="markdown-body" v-html="article.html" />
+      <div v-if="loading" class="markdown-body">Loading article content…</div>
+      <div v-else-if="error" class="markdown-body">Failed to load article content.</div>
+      <div v-else class="markdown-body" v-html="article.html" />
       <h3
         class="mb-0 mt-4 border-0 border-t-[1px] border-solid border-divider pt-4 text-base font-extrabold sm:text-lg"
       >

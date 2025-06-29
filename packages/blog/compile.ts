@@ -48,19 +48,24 @@ async function compileArticles() {
     const minifiedHtml = await minify(html, {
       collapseWhitespace: true,
       removeComments: true,
-      minifyCSS: true,
-      minifyJS: true,
     })
 
     const slug = path.basename(file, '.md')
     const varName = toVarName(slug)
     const exportFile = path.join(COMPILED_DIR, `${varName}.ts`)
+    const contentFile = path.join(COMPILED_DIR, `${varName}.content.ts`)
     const thumbnailPresent = await hasThumbnail(slug)
+
+    const contentTs = `
+// AUTO-GENERATED FILE - DO NOT EDIT
+export const html = ${JSON.stringify(minifiedHtml)};
+`.trimStart()
+    await fs.writeFile(contentFile, contentTs, 'utf8')
 
     const ts = `
 // AUTO-GENERATED FILE - DO NOT EDIT
 export const article = {
-  html: ${JSON.stringify(minifiedHtml)},
+  html: () => import("./${varName}.content").then(m => m.html),
   title: ${JSON.stringify(title)},
   summary: ${JSON.stringify(summary)},
   date: ${JSON.stringify(date)},

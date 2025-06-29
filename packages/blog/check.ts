@@ -34,10 +34,11 @@ async function checkCompiledArticles() {
   const compiledFiles = await fg([`${COMPILED_DIR}/*.ts`])
   const compiledVarNames = compiledFiles.map((f) => path.basename(f, '.ts'))
 
-  // Check all .md have compiled .ts and the proper public thumbnail
+  // Check all .md have compiled .ts and .content.ts and the proper public thumbnail
   for (const file of mdFiles) {
     const varName = toVarName(path.basename(file, '.md'))
     const compiledPath = path.join(COMPILED_DIR, varName + '.ts')
+    const contentPath = path.join(COMPILED_DIR, varName + '.content.ts')
     if (!compiledVarNames.includes(varName)) {
       console.error(`⚠️  Missing compiled article for: ${file} (should be: ${compiledPath})`)
       process.exit(1)
@@ -48,13 +49,18 @@ async function checkCompiledArticles() {
       console.error(`⚠️  Compiled article file not found: ${compiledPath}`)
       process.exit(1)
     }
+    try {
+      await fs.access(contentPath)
+    } catch {
+      console.error(`⚠️  Compiled article content file not found: ${contentPath}`)
+      process.exit(1)
+    }
   }
 
   // Check compiled .ts still have corresponding .md
   for (const compiled of compiledFiles) {
     const varName = path.basename(compiled, '.ts')
-
-    if (varName === 'index') continue
+    if (varName === 'index' || varName.endsWith('.content')) continue
 
     const mdPathGlob = repoPath(`packages/blog/articles/**/${varName.replace(/_/g, '*')}.md`)
     const found = await fg([mdPathGlob])
