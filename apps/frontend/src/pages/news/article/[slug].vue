@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ButtonStyled } from "@modrinth/ui";
-import { RssIcon, NewspaperIcon } from "@modrinth/assets";
+import { RssIcon, GitGraphIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
 import { articles as rawArticles } from "@modrinth/blog";
-import { ref, computed, onMounted } from "vue";
+import { computed } from "vue";
 import ShareArticleButtons from "~/components/ui/ShareArticleButtons.vue";
 
 const config = useRuntimeConfig();
@@ -19,20 +19,8 @@ if (!rawArticle) {
   });
 }
 
-// Lazy-load HTML content
-const html = ref<string | null>(null);
-const loading = ref(true);
-const error = ref<Error | null>(null);
-
-onMounted(async () => {
-  try {
-    html.value = await rawArticle.html();
-  } catch (e) {
-    error.value = e as Error;
-  } finally {
-    loading.value = false;
-  }
-});
+// Load HTML content
+const html = await rawArticle.html();
 
 const article = computed(() => ({
   ...rawArticle,
@@ -43,7 +31,7 @@ const article = computed(() => ({
   title: rawArticle.title,
   summary: rawArticle.summary,
   date: rawArticle.date,
-  html: html.value,
+  html,
 }));
 
 const articleTitle = computed(() => article.value.title);
@@ -79,13 +67,15 @@ useSeoMeta({
         <h1 class="m-0 text-3xl font-extrabold hover:underline">News</h1>
       </nuxt-link>
       <div class="flex gap-2">
-        <ButtonStyled color="brand" type="outlined" class="hidden sm:flex">
-          <button><NewspaperIcon /> Sign up for our newsletter</button>
-        </ButtonStyled>
         <ButtonStyled circular>
-          <button v-tooltip="`RSS feed`" aria-label="RSS feed">
+          <a v-tooltip="`RSS feed`" aria-label="RSS feed" href="/news/feed/rss.xml" target="_blank">
             <RssIcon />
-          </button>
+          </a>
+        </ButtonStyled>
+        <ButtonStyled circular icon-only>
+          <a v-tooltip="`Changelog`" href="/news/changelog" aria-label="Changelog">
+            <GitGraphIcon />
+          </a>
         </ButtonStyled>
       </div>
     </div>
@@ -103,9 +93,7 @@ useSeoMeta({
         class="aspect-video w-full rounded-xl border-[1px] border-solid border-button-border object-cover sm:rounded-2xl"
         :alt="article.title"
       />
-      <div v-if="loading" class="markdown-body">Loading article content…</div>
-      <div v-else-if="error" class="markdown-body">Failed to load article content.</div>
-      <div v-else class="markdown-body" v-html="article.html" />
+      <div class="markdown-body" v-html="article.html" />
       <h3
         class="mb-0 mt-4 border-0 border-t-[1px] border-solid border-divider pt-4 text-base font-extrabold sm:text-lg"
       >

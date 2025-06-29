@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ButtonStyled } from "@modrinth/ui";
-import { ChevronRightIcon, RssIcon, NewspaperIcon, GitGraphIcon } from "@modrinth/assets";
+import { ChevronRightIcon, RssIcon, GitGraphIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
 import { articles as rawArticles } from "@modrinth/blog";
 import { computed, ref } from "vue";
@@ -19,8 +19,6 @@ const articles = ref(
     }))
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
 );
-
-console.log(articles.value);
 
 const featuredArticle = computed(() => articles.value?.[0]);
 const config = useRuntimeConfig();
@@ -44,11 +42,8 @@ useSeoMeta({
         <h1 class="m-0 text-3xl font-extrabold">News</h1>
       </div>
       <div class="flex gap-2">
-        <ButtonStyled v-if="false" color="brand" type="outlined">
-          <button><NewspaperIcon /> Sign up for our newsletter</button>
-        </ButtonStyled>
         <ButtonStyled circular>
-          <a v-tooltip="`RSS feed`" aria-label="RSS feed" href="/news/feed/rss" target="_blank">
+          <a v-tooltip="`RSS feed`" aria-label="RSS feed" href="/news/feed/rss.xml" target="_blank">
             <RssIcon />
           </a>
         </ButtonStyled>

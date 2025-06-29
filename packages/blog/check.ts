@@ -3,11 +3,7 @@ import * as path from 'path'
 import fg from 'fast-glob'
 import { repoPath, toVarName } from './utils'
 
-const PUBLIC_SRC = repoPath('public')
-const PUBLIC_LOCATIONS = [repoPath('apps/frontend/src/public/news/article')]
-
-const ARTICLES_GLOB = repoPath('packages/blog/articles/**/*.md')
-const COMPILED_DIR = repoPath('packages/blog/compiled')
+import { PUBLIC_SRC, PUBLIC_LOCATIONS, ARTICLES_GLOB, COMPILED_DIR } from './blog.config'
 
 async function checkPublicAssets() {
   const srcFiles = await fg(['**/*'], { cwd: PUBLIC_SRC, dot: true })

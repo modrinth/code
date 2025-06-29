@@ -4,13 +4,18 @@ import fg from 'fast-glob'
 import matter from 'gray-matter'
 import { md } from '@modrinth/utils/parse'
 import { minify } from 'html-minifier-terser'
-import { repoPath, copyDir, toVarName } from './utils'
+import { copyDir, toVarName } from './utils'
+import RSS from 'rss'
 
-const ARTICLES_GLOB = repoPath('packages/blog/articles/**/*.md')
-const COMPILED_DIR = repoPath('packages/blog/compiled')
-const ROOT_FILE = path.join(COMPILED_DIR, 'index.ts')
-const PUBLIC_SRC = repoPath('packages/blog/public')
-const PUBLIC_LOCATIONS = [repoPath('apps/frontend/src/public/news/article')]
+import {
+  ARTICLES_GLOB,
+  COMPILED_DIR,
+  ROOT_FILE,
+  PUBLIC_SRC,
+  PUBLIC_LOCATIONS,
+  RSS_PATH,
+  SITE_URL,
+} from './blog.config'
 
 async function ensureCompiledDir() {
   await fs.mkdir(COMPILED_DIR, { recursive: true })
@@ -33,6 +38,7 @@ async function compileArticles() {
   console.log(`🔎  Found ${files.length} markdown articles!`)
   const articleExports: string[] = []
   const articlesArray: string[] = []
+  const articlesForRss = []
 
   for (const file of files) {
     const src = await fs.readFile(file, 'utf8')
@@ -80,6 +86,14 @@ export const article = {
     await fs.writeFile(exportFile, ts, 'utf8')
     articleExports.push(`import { article as ${varName} } from "./${varName}";`)
     articlesArray.push(varName)
+
+    articlesForRss.push({
+      title,
+      summary,
+      date,
+      slug,
+      html: minifiedHtml,
+    } as never)
   }
 
   console.log(`📂  Compiled ${files.length} articles.`)
@@ -95,6 +109,38 @@ export const articles = [
 
   await fs.writeFile(ROOT_FILE, rootExport, 'utf8')
   console.log(`🌟  Done! Wrote root articles export.`)
+
+  await generateRssFeed(articlesForRss)
+}
+
+async function generateRssFeed(articles): Promise<void> {
+  const sorted = [...articles].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+  )
+
+  const feed = new RSS({
+    title: 'Modrinth News',
+    description: 'Keep up-to-date on the latest news from Modrinth.',
+    feed_url: `${SITE_URL}/news/feed/rss.xml`,
+    site_url: `${SITE_URL}/news/`,
+    language: 'en',
+    generator: '@modrinth/blog',
+  })
+
+  for (const article of sorted) {
+    feed.item({
+      title: article.title,
+      description: article.summary,
+      url: `${SITE_URL}/news/article/${article.slug}/`,
+      guid: `${SITE_URL}/news/article/${article.slug}/`,
+      date: article.date,
+      custom_elements: [{ 'content:encoded': `<![CDATA[${article.html}]]>` }],
+    })
+  }
+
+  await fs.mkdir(path.dirname(RSS_PATH), { recursive: true })
+  await fs.writeFile(RSS_PATH, feed.xml({ indent: true }), 'utf8')
+  console.log(`📂  RSS feed written to ${RSS_PATH}`)
 }
 
 async function deleteDirContents(dir: string) {
