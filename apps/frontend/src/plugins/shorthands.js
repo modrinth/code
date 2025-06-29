@@ -13,6 +13,11 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     return cosmeticsStore.externalLinksNewTab ? "_blank" : "";
   });
+  nuxtApp.provide("formatBytes", formatBytes);
+  nuxtApp.provide("formatWallet", formatWallet);
+  nuxtApp.provide("formatProjectType", formatProjectType);
+  nuxtApp.provide("formatCategory", formatCategory);
+  nuxtApp.provide("formatCategoryHeader", formatCategoryHeader);
 
   /*
     Only use on the complete list of versions for a project, partial lists will generate
@@ -151,8 +156,87 @@ export const formatMoney = (number, abbreviate = false) => {
   }
 };
 
+export const formatBytes = (bytes, decimals = 2) => {
+  if (bytes === 0) {
+    return "0 Bytes";
+  }
+
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ["Bytes", "KiB", "MiB", "GiB"];
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+};
+
 export const capitalizeString = (name) => {
   return name ? name.charAt(0).toUpperCase() + name.slice(1) : name;
+};
+
+export const formatWallet = (name) => {
+  if (name === "paypal") {
+    return "PayPal";
+  }
+  return capitalizeString(name);
+};
+
+export const formatProjectType = (name) => {
+  if (name === "resourcepack") {
+    return "Resource Pack";
+  } else if (name === "datapack") {
+    return "Data Pack";
+  }
+
+  return capitalizeString(name);
+};
+
+export const formatCategory = (name) => {
+  if (name === "modloader") {
+    return "Risugami's ModLoader";
+  } else if (name === "bungeecord") {
+    return "BungeeCord";
+  } else if (name === "liteloader") {
+    return "LiteLoader";
+  } else if (name === "neoforge") {
+    return "NeoForge";
+  } else if (name === "game-mechanics") {
+    return "Game Mechanics";
+  } else if (name === "worldgen") {
+    return "World Generation";
+  } else if (name === "core-shaders") {
+    return "Core Shaders";
+  } else if (name === "gui") {
+    return "GUI";
+  } else if (name === "8x-") {
+    return "8x or lower";
+  } else if (name === "512x+") {
+    return "512x or higher";
+  } else if (name === "kitchen-sink") {
+    return "Kitchen Sink";
+  } else if (name === "path-tracing") {
+    return "Path Tracing";
+  } else if (name === "pbr") {
+    return "PBR";
+  } else if (name === "datapack") {
+    return "Data Pack";
+  } else if (name === "colored-lighting") {
+    return "Colored Lighting";
+  } else if (name === "optifine") {
+    return "OptiFine";
+  } else if (name === "mrpack") {
+    return "Modpack";
+  } else if (name === "minecraft") {
+    return "Resource Pack";
+  } else if (name === "vanilla") {
+    return "Vanilla Shader";
+  }
+
+  return capitalizeString(name);
+};
+
+export const formatCategoryHeader = (name) => {
+  return capitalizeString(name);
 };
 
 export const formatVersions = (tag, versionArray) => {

@@ -264,9 +264,7 @@ async fn validate_minecraft_file(
 
         if visited {
             if ALWAYS_ALLOWED_EXT.contains(&&*file_extension) {
-                Ok(ValidationResult::Warning(
-                    "File extension is invalid for input file",
-                ))
+                Ok(ValidationResult::Pass)
             } else {
                 Err(ValidationError::InvalidInput(
                     format!("File extension {file_extension} is invalid for input file").into(),

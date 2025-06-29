@@ -118,7 +118,7 @@ import {
   ScaleIcon,
   DropdownIcon,
 } from "@modrinth/assets";
-import { formatProjectType } from "@modrinth/utils";
+import { formatProjectType } from "~/plugins/shorthands.js";
 import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
 
 const props = defineProps({

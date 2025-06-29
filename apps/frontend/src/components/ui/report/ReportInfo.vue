@@ -11,8 +11,8 @@
         <div class="stacked">
           <span class="title">{{ report.project.title }}</span>
           <span>{{
-            formatProjectType(
-              getProjectTypeForUrl(report.project.project_type, report.project.loaders),
+            $formatProjectType(
+              $getProjectTypeForUrl(report.project.project_type, report.project.loaders),
             )
           }}</span>
         </div>
@@ -53,8 +53,8 @@
         <div class="stacked">
           <span class="title">{{ report.project.title }}</span>
           <span>{{
-            formatProjectType(
-              getProjectTypeForUrl(report.project.project_type, report.project.loaders),
+            $formatProjectType(
+              $getProjectTypeForUrl(report.project.project_type, report.project.loaders),
             )
           }}</span>
         </div>
@@ -105,10 +105,8 @@
 <script setup>
 import { ReportIcon, UnknownIcon, VersionIcon } from "@modrinth/assets";
 import { Avatar, Badge, CopyCode, useRelativeTime } from "@modrinth/ui";
-import { formatProjectType } from "@modrinth/utils";
 import { renderHighlightedString } from "~/helpers/highlight.js";
 import ThreadSummary from "~/components/ui/thread/ThreadSummary.vue";
-import { getProjectTypeForUrl } from "~/helpers/projects.js";
 
 const formatRelativeTime = useRelativeTime();
 

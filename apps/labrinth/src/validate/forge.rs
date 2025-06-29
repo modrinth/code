@@ -65,14 +65,14 @@ impl super::Validator for LegacyForgeValidator {
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
-        if archive.by_name("mcmod.info").is_err()
-            && archive.by_name("META-INF/MANIFEST.MF").is_err()
-            && !archive.file_names().any(|x| x.ends_with(".class"))
-        {
-            return Ok(ValidationResult::Warning(
-                "Forge mod file does not contain mcmod.info or valid class files!",
-            ));
-        };
+        // if archive.by_name("mcmod.info").is_err()
+        //     && archive.by_name("META-INF/MANIFEST.MF").is_err()
+        //     && !archive.file_names().any(|x| x.ends_with(".class"))
+        // {
+        //     return Ok(ValidationResult::Warning(
+        //         "Forge mod file does not contain mcmod.info or valid class files!",
+        //     ));
+        // };
 
         filter_out_packs(archive)?;
 

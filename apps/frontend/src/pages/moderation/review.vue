@@ -5,7 +5,7 @@
       <Chips
         v-model="projectType"
         :items="projectTypes"
-        :format-label="(x) => (x === 'all' ? 'All' : formatProjectType(x) + 's')"
+        :format-label="(x) => (x === 'all' ? 'All' : $formatProjectType(x) + 's')"
       />
       <button v-if="oldestFirst" class="iconified-button push-right" @click="oldestFirst = false">
         <SortDescendingIcon />
@@ -56,7 +56,7 @@
             <Avatar :src="project.icon_url" size="xs" no-shadow raised />
             <span class="stacked">
               <span class="title">{{ project.name }}</span>
-              <span>{{ formatProjectType(project.inferred_project_type) }}</span>
+              <span>{{ $formatProjectType(project.inferred_project_type) }}</span>
             </span>
           </nuxt-link>
         </div>
@@ -114,7 +114,7 @@ import {
   IssuesIcon,
   ScaleIcon,
 } from "@modrinth/assets";
-import { formatProjectType } from "@modrinth/utils";
+import { formatProjectType } from "~/plugins/shorthands.js";
 import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
 
 useHead({

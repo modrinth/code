@@ -22,7 +22,7 @@
     "@vintl/how-ago": "^3.0.1",
     "@vintl/nuxt": "^1.9.2",
     "autoprefixer": "^10.4.19",
-    "eslint": "^8.57.0",
+    "eslint": "8.57.0",
     "glob": "^10.2.7",
     "nuxt": "^3.14.1592",
     "postcss": "^8.4.39",

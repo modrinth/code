@@ -26,7 +26,7 @@
         v-if="notifTypes.length > 1"
         v-model="selectedType"
         :items="notifTypes"
-        :format-label="(x) => (x === 'all' ? 'All' : formatProjectType(x).replace('_', ' ') + 's')"
+        :format-label="(x) => (x === 'all' ? 'All' : $formatProjectType(x).replace('_', ' ') + 's')"
         :capitalize="false"
       />
       <p v-if="pending">Loading notifications...</p>
@@ -58,7 +58,6 @@
 <script setup>
 import { Button, Pagination, Chips } from "@modrinth/ui";
 import { HistoryIcon, CheckCheckIcon } from "@modrinth/assets";
-import { formatProjectType } from "@modrinth/utils";
 import {
   fetchExtraNotificationData,
   groupNotifications,

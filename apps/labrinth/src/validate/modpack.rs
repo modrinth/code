@@ -12,11 +12,11 @@ pub struct ModpackValidator;
 
 impl super::Validator for ModpackValidator {
     fn get_file_extensions(&self) -> &[&str] {
-        &["mrpack"]
+        &["mrpack","zip"]
     }
 
     fn get_supported_loaders(&self) -> &[&str] {
-        &["mrpack"]
+        &["mrpack","zip"]
     }
 
     fn get_supported_game_versions(&self) -> SupportedGameVersions {

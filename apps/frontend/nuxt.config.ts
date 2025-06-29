@@ -108,6 +108,12 @@ export default defineNuxtConfig({
         },
       }),
     ],
+    optimizeDeps: {
+      include: ['xss'],      // 开发时预打包
+    },
+    ssr: {
+      noExternal: ['xss'],   // 服务端渲染时不把它排除在外
+    }
   },
   hooks: {
     async "build:before"() {

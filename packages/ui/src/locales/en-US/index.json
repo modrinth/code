@@ -1,273 +1,273 @@
 {
   "button.back": {
-    "defaultMessage": "Back"
+    "defaultMessage": "返回"
   },
   "button.cancel": {
-    "defaultMessage": "Cancel"
+    "defaultMessage": "取消"
   },
   "button.continue": {
-    "defaultMessage": "Continue"
+    "defaultMessage": "继续"
   },
   "button.copy-id": {
-    "defaultMessage": "Copy ID"
+    "defaultMessage": "复制 ID"
   },
   "button.copy-permalink": {
-    "defaultMessage": "Copy permanent link"
+    "defaultMessage": "复制永久链接"
   },
   "button.create-a-project": {
-    "defaultMessage": "Create a project"
+    "defaultMessage": "创建项目"
   },
   "button.download": {
-    "defaultMessage": "Download"
+    "defaultMessage": "下载"
   },
   "button.downloading": {
-    "defaultMessage": "Downloading"
+    "defaultMessage": "正在下载"
   },
   "button.edit": {
-    "defaultMessage": "Edit"
+    "defaultMessage": "编辑"
   },
   "button.next": {
-    "defaultMessage": "Next"
+    "defaultMessage": "下一步"
   },
   "button.open-folder": {
-    "defaultMessage": "Open folder"
+    "defaultMessage": "打开文件夹"
   },
   "button.play": {
-    "defaultMessage": "Play"
+    "defaultMessage": "播放"
   },
   "button.refresh": {
-    "defaultMessage": "Refresh"
+    "defaultMessage": "刷新"
   },
   "button.remove": {
-    "defaultMessage": "Remove"
+    "defaultMessage": "移除"
   },
   "button.remove-image": {
-    "defaultMessage": "Remove image"
+    "defaultMessage": "移除图片"
   },
   "button.report": {
-    "defaultMessage": "Report"
+    "defaultMessage": "报告"
   },
   "button.save": {
-    "defaultMessage": "Save"
+    "defaultMessage": "保存"
   },
   "button.save-changes": {
-    "defaultMessage": "Save changes"
+    "defaultMessage": "保存更改"
   },
   "button.sign-in": {
-    "defaultMessage": "Sign in"
+    "defaultMessage": "登录"
   },
   "button.sign-out": {
-    "defaultMessage": "Sign out"
+    "defaultMessage": "退出登录"
   },
   "button.stop": {
-    "defaultMessage": "Stop"
+    "defaultMessage": "停止"
   },
   "button.upload-image": {
-    "defaultMessage": "Upload image"
+    "defaultMessage": "上传图片"
   },
   "changelog.justNow": {
-    "defaultMessage": "Just now"
+    "defaultMessage": "刚刚"
   },
   "changelog.product.api": {
     "defaultMessage": "API"
   },
   "changelog.product.app": {
-    "defaultMessage": "App"
+    "defaultMessage": "应用"
   },
   "changelog.product.servers": {
-    "defaultMessage": "Servers"
+    "defaultMessage": "服务器"
   },
   "changelog.product.web": {
-    "defaultMessage": "Website"
+    "defaultMessage": "网站"
   },
   "collection.label.private": {
-    "defaultMessage": "Private"
+    "defaultMessage": "私有"
   },
   "input.view.gallery": {
-    "defaultMessage": "Gallery view"
+    "defaultMessage": "画廊视图"
   },
   "input.view.grid": {
-    "defaultMessage": "Grid view"
+    "defaultMessage": "网格视图"
   },
   "input.view.list": {
-    "defaultMessage": "Rows view"
+    "defaultMessage": "列表视图"
   },
   "instance.worlds.game_mode.adventure": {
-    "defaultMessage": "Adventure mode"
+    "defaultMessage": "冒险模式"
   },
   "instance.worlds.game_mode.creative": {
-    "defaultMessage": "Creative mode"
+    "defaultMessage": "创造模式"
   },
   "instance.worlds.game_mode.spectator": {
-    "defaultMessage": "Spectator mode"
+    "defaultMessage": "旁观者模式"
   },
   "instance.worlds.game_mode.survival": {
-    "defaultMessage": "Survival mode"
+    "defaultMessage": "生存模式"
   },
   "instance.worlds.game_mode.unknown": {
-    "defaultMessage": "Unknown game mode"
+    "defaultMessage": "未知模式"
   },
   "label.changes-saved": {
-    "defaultMessage": "Changes saved"
+    "defaultMessage": "更改已保存"
   },
   "label.collections": {
-    "defaultMessage": "Collections"
+    "defaultMessage": "收藏"
   },
   "label.created-ago": {
-    "defaultMessage": "Created {ago}"
+    "defaultMessage": "创建于 {ago}"
   },
   "label.dashboard": {
-    "defaultMessage": "Dashboard"
+    "defaultMessage": "仪表板"
   },
   "label.delete": {
-    "defaultMessage": "Delete"
+    "defaultMessage": "删除"
   },
   "label.description": {
-    "defaultMessage": "Description"
+    "defaultMessage": "描述"
   },
   "label.error": {
-    "defaultMessage": "Error"
+    "defaultMessage": "错误"
   },
   "label.followed-projects": {
-    "defaultMessage": "Followed projects"
+    "defaultMessage": "关注的项目"
   },
   "label.loading": {
-    "defaultMessage": "Loading..."
+    "defaultMessage": "加载中..."
   },
   "label.moderation": {
-    "defaultMessage": "Moderation"
+    "defaultMessage": "审核"
   },
   "label.notifications": {
-    "defaultMessage": "Notifications"
+    "defaultMessage": "通知"
   },
   "label.password": {
-    "defaultMessage": "Password"
+    "defaultMessage": "密码"
   },
   "label.played": {
-    "defaultMessage": "Played {time}"
+    "defaultMessage": "已游玩 {time}"
   },
   "label.public": {
-    "defaultMessage": "Public"
+    "defaultMessage": "公开"
   },
   "label.rejected": {
-    "defaultMessage": "Rejected"
+    "defaultMessage": "已拒绝"
   },
   "label.scopes": {
-    "defaultMessage": "Scopes"
+    "defaultMessage": "作用域"
   },
   "label.server": {
-    "defaultMessage": "Server"
+    "defaultMessage": "服务器"
   },
   "label.servers": {
-    "defaultMessage": "Servers"
+    "defaultMessage": "服务器"
   },
   "label.settings": {
-    "defaultMessage": "Settings"
+    "defaultMessage": "设置"
   },
   "label.singleplayer": {
-    "defaultMessage": "Singleplayer"
+    "defaultMessage": "单人游戏"
   },
   "label.title": {
-    "defaultMessage": "Title"
+    "defaultMessage": "标题"
   },
   "label.unlisted": {
-    "defaultMessage": "Unlisted"
+    "defaultMessage": "未列出"
   },
   "label.visibility": {
-    "defaultMessage": "Visibility"
+    "defaultMessage": "可见性"
   },
   "label.visit-your-profile": {
-    "defaultMessage": "Visit your profile"
+    "defaultMessage": "访问您的个人资料"
   },
   "modal.add-payment-method.action": {
-    "defaultMessage": "Add payment method"
+    "defaultMessage": "添加支付方式"
   },
   "modal.add-payment-method.title": {
-    "defaultMessage": "Adding a payment method"
+    "defaultMessage": "添加支付方式"
   },
   "notification.error.title": {
-    "defaultMessage": "An error occurred"
+    "defaultMessage": "发生错误"
   },
   "omorphia.component.badge.label.accepted": {
-    "defaultMessage": "Accepted"
+    "defaultMessage": "已接受"
   },
   "omorphia.component.badge.label.approved": {
-    "defaultMessage": "Approved"
+    "defaultMessage": "已批准"
   },
   "omorphia.component.badge.label.archived": {
-    "defaultMessage": "Archived"
+    "defaultMessage": "已存档"
   },
   "omorphia.component.badge.label.closed": {
-    "defaultMessage": "Closed"
+    "defaultMessage": "已关闭"
   },
   "omorphia.component.badge.label.creator": {
-    "defaultMessage": "Creator"
+    "defaultMessage": "创建者"
   },
   "omorphia.component.badge.label.draft": {
-    "defaultMessage": "Draft"
+    "defaultMessage": "草稿"
   },
   "omorphia.component.badge.label.failed": {
-    "defaultMessage": "Failed"
+    "defaultMessage": "失败"
   },
   "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Listed"
+    "defaultMessage": "已列出"
   },
   "omorphia.component.badge.label.moderator": {
-    "defaultMessage": "Moderator"
+    "defaultMessage": "版主"
   },
   "omorphia.component.badge.label.modrinth-team": {
-    "defaultMessage": "Modrinth Team"
+    "defaultMessage": "Modrinth 团队"
   },
   "omorphia.component.badge.label.pending": {
-    "defaultMessage": "Pending"
+    "defaultMessage": "待定"
   },
   "omorphia.component.badge.label.private": {
-    "defaultMessage": "Private"
+    "defaultMessage": "私有"
   },
   "omorphia.component.badge.label.processed": {
-    "defaultMessage": "Processed"
+    "defaultMessage": "已处理"
   },
   "omorphia.component.badge.label.rejected": {
-    "defaultMessage": "Rejected"
+    "defaultMessage": "已拒绝"
   },
   "omorphia.component.badge.label.returned": {
-    "defaultMessage": "Returned"
+    "defaultMessage": "已退回"
   },
   "omorphia.component.badge.label.scheduled": {
-    "defaultMessage": "Scheduled"
+    "defaultMessage": "已安排"
   },
   "omorphia.component.badge.label.under-review": {
-    "defaultMessage": "Under review"
+    "defaultMessage": "审核中"
   },
   "omorphia.component.badge.label.unlisted": {
-    "defaultMessage": "Unlisted"
+    "defaultMessage": "未列出"
   },
   "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Withheld"
+    "defaultMessage": "已保留"
   },
   "omorphia.component.copy.action.copy": {
-    "defaultMessage": "Copy code to clipboard"
+    "defaultMessage": "复制代码到剪贴板"
   },
   "omorphia.component.environment-indicator.label.client": {
-    "defaultMessage": "Client"
+    "defaultMessage": "客户端"
   },
   "omorphia.component.environment-indicator.label.client-and-server": {
-    "defaultMessage": "Client and server"
+    "defaultMessage": "客户端和服务器"
   },
   "omorphia.component.environment-indicator.label.client-or-server": {
-    "defaultMessage": "Client or server"
+    "defaultMessage": "客户端或服务器"
   },
   "omorphia.component.environment-indicator.label.server": {
-    "defaultMessage": "Server"
+    "defaultMessage": "服务器"
   },
   "omorphia.component.environment-indicator.label.type": {
-    "defaultMessage": "A {type}"
+    "defaultMessage": "一个 {type}"
   },
   "omorphia.component.environment-indicator.label.unsupported": {
-    "defaultMessage": "Unsupported"
+    "defaultMessage": "不支持"
   },
   "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} ending in {last_four}"
+    "defaultMessage": "{card_brand} 末尾四位为 {last_four}"
   },
   "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
     "defaultMessage": "Amazon Pay"
@@ -300,82 +300,82 @@
     "defaultMessage": "UnionPay"
   },
   "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "Unknown payment method"
+    "defaultMessage": "未知支付方式"
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
   },
   "project-type.all": {
-    "defaultMessage": "All"
+    "defaultMessage": "全部"
   },
   "project.about.compatibility.environments": {
-    "defaultMessage": "Supported environments"
+    "defaultMessage": "支持的环境"
   },
   "project.about.compatibility.game.minecraftJava": {
-    "defaultMessage": "Minecraft: Java Edition"
+    "defaultMessage": "Minecraft：Java 版"
   },
   "project.about.compatibility.platforms": {
-    "defaultMessage": "Platforms"
+    "defaultMessage": "平台"
   },
   "project.about.compatibility.title": {
-    "defaultMessage": "Compatibility"
+    "defaultMessage": "兼容性"
   },
   "project.about.creators.owner": {
-    "defaultMessage": "Project owner"
+    "defaultMessage": "项目所有者"
   },
   "project.about.creators.title": {
-    "defaultMessage": "Creators"
+    "defaultMessage": "创建者"
   },
   "project.about.details.created": {
-    "defaultMessage": "Created {date}"
+    "defaultMessage": "创建于 {date}"
   },
   "project.about.details.licensed": {
-    "defaultMessage": "Licensed {license}"
+    "defaultMessage": "许可为 {license}"
   },
   "project.about.details.published": {
-    "defaultMessage": "Published {date}"
+    "defaultMessage": "发布于 {date}"
   },
   "project.about.details.submitted": {
-    "defaultMessage": "Submitted {date}"
+    "defaultMessage": "提交于 {date}"
   },
   "project.about.details.title": {
-    "defaultMessage": "Details"
+    "defaultMessage": "详情"
   },
   "project.about.details.updated": {
-    "defaultMessage": "Updated {date}"
+    "defaultMessage": "更新于 {date}"
   },
   "project.about.links.discord": {
-    "defaultMessage": "Join Discord server"
+    "defaultMessage": "加入 Discord 服务器"
   },
   "project.about.links.donate.bmac": {
-    "defaultMessage": "Buy Me a Coffee"
+    "defaultMessage": "请我喝咖啡"
   },
   "project.about.links.donate.generic": {
-    "defaultMessage": "Donate"
+    "defaultMessage": "捐赠"
   },
   "project.about.links.donate.github": {
-    "defaultMessage": "Sponsor on GitHub"
+    "defaultMessage": "在 GitHub 赞助"
   },
   "project.about.links.donate.kofi": {
-    "defaultMessage": "Donate on Ko-fi"
+    "defaultMessage": "在 Ko-fi 捐赠"
   },
   "project.about.links.donate.patreon": {
-    "defaultMessage": "Donate on Patreon"
+    "defaultMessage": "在 Patreon 捐赠"
   },
   "project.about.links.donate.paypal": {
-    "defaultMessage": "Donate on PayPal"
+    "defaultMessage": "在 PayPal 捐赠"
   },
   "project.about.links.issues": {
-    "defaultMessage": "Report issues"
+    "defaultMessage": "报告问题"
   },
   "project.about.links.source": {
-    "defaultMessage": "View source"
+    "defaultMessage": "查看源代码"
   },
   "project.about.links.title": {
-    "defaultMessage": "Links"
+    "defaultMessage": "链接"
   },
   "project.about.links.wiki": {
-    "defaultMessage": "Visit wiki"
+    "defaultMessage": "访问 Wiki"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
@@ -387,201 +387,201 @@
     "defaultMessage": "R"
   },
   "project.visibility.archived": {
-    "defaultMessage": "Archived"
+    "defaultMessage": "已存档"
   },
   "project.visibility.draft": {
-    "defaultMessage": "Draft"
+    "defaultMessage": "草稿"
   },
   "project.visibility.private": {
-    "defaultMessage": "Private"
+    "defaultMessage": "私有"
   },
   "project.visibility.public": {
-    "defaultMessage": "Public"
+    "defaultMessage": "公开"
   },
   "project.visibility.rejected": {
-    "defaultMessage": "Rejected"
+    "defaultMessage": "已拒绝"
   },
   "project.visibility.scheduled": {
-    "defaultMessage": "Scheduled"
+    "defaultMessage": "已安排"
   },
   "project.visibility.under-review": {
-    "defaultMessage": "Under review"
+    "defaultMessage": "审核中"
   },
   "project.visibility.unknown": {
-    "defaultMessage": "Unknown"
+    "defaultMessage": "未知"
   },
   "project.visibility.unlisted": {
-    "defaultMessage": "Unlisted"
+    "defaultMessage": "未列出"
   },
   "project.visibility.unlisted-by-staff": {
-    "defaultMessage": "Unlisted by staff"
+    "defaultMessage": "由工作人员隐藏"
   },
   "search.filter.locked.default": {
-    "defaultMessage": "Filter locked"
+    "defaultMessage": "筛选已锁定"
   },
   "search.filter.locked.default.description": {
-    "defaultMessage": "Unlocking this filter may allow you to install incompatible content."
+    "defaultMessage": "解锁此筛选器可能允许您安装不兼容的内容。"
   },
   "search.filter.locked.default.sync": {
-    "defaultMessage": "Sync filter"
+    "defaultMessage": "同步筛选"
   },
   "search.filter.locked.default.title": {
-    "defaultMessage": "{type} is locked"
+    "defaultMessage": "{type} 已锁定"
   },
   "search.filter.locked.default.unlock": {
-    "defaultMessage": "Unlock filter"
+    "defaultMessage": "解锁筛选器"
   },
   "search.filter_type.environment": {
-    "defaultMessage": "Environment"
+    "defaultMessage": "环境"
   },
   "search.filter_type.environment.client": {
-    "defaultMessage": "Client"
+    "defaultMessage": "客户端"
   },
   "search.filter_type.environment.server": {
-    "defaultMessage": "Server"
+    "defaultMessage": "服务器"
   },
   "search.filter_type.game_version": {
-    "defaultMessage": "Game version"
+    "defaultMessage": "游戏版本"
   },
   "search.filter_type.game_version.all_versions": {
-    "defaultMessage": "Show all versions"
+    "defaultMessage": "显示所有版本"
   },
   "search.filter_type.license": {
-    "defaultMessage": "License"
+    "defaultMessage": "许可证"
   },
   "search.filter_type.license.open_source": {
-    "defaultMessage": "Open source"
+    "defaultMessage": "开源"
   },
   "search.filter_type.mod_loader": {
-    "defaultMessage": "Loader"
+    "defaultMessage": "加载器"
   },
   "search.filter_type.modpack_loader": {
-    "defaultMessage": "Loader"
+    "defaultMessage": "加载器"
   },
   "search.filter_type.plugin_loader": {
-    "defaultMessage": "Loader"
+    "defaultMessage": "加载器"
   },
   "search.filter_type.plugin_platform": {
-    "defaultMessage": "Platform"
+    "defaultMessage": "平台"
   },
   "search.filter_type.project_id": {
-    "defaultMessage": "Project ID"
+    "defaultMessage": "项目 ID"
   },
   "search.filter_type.shader_loader": {
-    "defaultMessage": "Loader"
+    "defaultMessage": "加载器"
   },
   "servers.notice.dismiss": {
-    "defaultMessage": "Dismiss"
+    "defaultMessage": "关闭提示"
   },
   "servers.notice.dismissable": {
-    "defaultMessage": "Dismissable"
+    "defaultMessage": "可关闭"
   },
   "servers.notice.heading.attention": {
-    "defaultMessage": "Attention"
+    "defaultMessage": "注意"
   },
   "servers.notice.heading.info": {
-    "defaultMessage": "Info"
+    "defaultMessage": "信息"
   },
   "servers.notice.level.critical.name": {
-    "defaultMessage": "Critical"
+    "defaultMessage": "严重"
   },
   "servers.notice.level.info.name": {
-    "defaultMessage": "Info"
+    "defaultMessage": "信息"
   },
   "servers.notice.level.survey.name": {
-    "defaultMessage": "Survey"
+    "defaultMessage": "调查"
   },
   "servers.notice.level.warn.name": {
-    "defaultMessage": "Warning"
+    "defaultMessage": "警告"
   },
   "servers.notice.undismissable": {
-    "defaultMessage": "Undismissable"
+    "defaultMessage": "不可关闭"
   },
   "servers.purchase.step.payment.description": {
-    "defaultMessage": "You won't be charged yet."
+    "defaultMessage": "您暂时不会被收费。"
   },
   "servers.purchase.step.payment.prompt": {
-    "defaultMessage": "Select a payment method"
+    "defaultMessage": "请选择支付方式"
   },
   "servers.purchase.step.payment.title": {
-    "defaultMessage": "Payment method"
+    "defaultMessage": "支付方式"
   },
   "servers.purchase.step.region.title": {
-    "defaultMessage": "Region"
+    "defaultMessage": "区域"
   },
   "servers.purchase.step.review.title": {
-    "defaultMessage": "Review"
+    "defaultMessage": "确认"
   },
   "servers.region.custom.prompt": {
-    "defaultMessage": "How much RAM do you want your server to have?"
+    "defaultMessage": "您的服务器需要多少内存？"
   },
   "servers.region.europe": {
-    "defaultMessage": "Europe"
+    "defaultMessage": "欧洲"
   },
   "servers.region.north-america": {
-    "defaultMessage": "North America"
+    "defaultMessage": "北美"
   },
   "servers.region.prompt": {
-    "defaultMessage": "Where would you like your server to be located?"
+    "defaultMessage": "您希望将服务器部署在哪个区域？"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Region not listed? <link>Let us know where you'd like to see Modrinth Servers next!</link>"
+    "defaultMessage": "未找到该区域？<link>告诉我们您想在哪些地方部署 Modrinth 服务器！</link>"
   },
   "settings.account.title": {
-    "defaultMessage": "Account and security"
+    "defaultMessage": "账户与安全"
   },
   "settings.appearance.title": {
-    "defaultMessage": "Appearance"
+    "defaultMessage": "外观"
   },
   "settings.applications.title": {
-    "defaultMessage": "Your applications"
+    "defaultMessage": "您的应用"
   },
   "settings.authorized-apps.title": {
-    "defaultMessage": "Authorized apps"
+    "defaultMessage": "已授权应用"
   },
   "settings.billing.title": {
-    "defaultMessage": "Billing and subscriptions"
+    "defaultMessage": "账单与订阅"
   },
   "settings.display.theme.dark": {
-    "defaultMessage": "Dark"
+    "defaultMessage": "深色"
   },
   "settings.display.theme.description": {
-    "defaultMessage": "Select your preferred color theme for Modrinth on this device."
+    "defaultMessage": "请选择您在此设备上使用的 Modrinth 颜色主题。"
   },
   "settings.display.theme.light": {
-    "defaultMessage": "Light"
+    "defaultMessage": "浅色"
   },
   "settings.display.theme.oled": {
     "defaultMessage": "OLED"
   },
   "settings.display.theme.preferred-dark-theme": {
-    "defaultMessage": "Preferred dark theme"
+    "defaultMessage": "首选深色主题"
   },
   "settings.display.theme.preferred-light-theme": {
-    "defaultMessage": "Preferred light theme"
+    "defaultMessage": "首选浅色主题"
   },
   "settings.display.theme.retro": {
-    "defaultMessage": "Retro"
+    "defaultMessage": "复古"
   },
   "settings.display.theme.system": {
-    "defaultMessage": "Sync with system"
+    "defaultMessage": "与系统同步"
   },
   "settings.display.theme.title": {
-    "defaultMessage": "Color theme"
+    "defaultMessage": "颜色主题"
   },
   "settings.language.title": {
-    "defaultMessage": "Language"
+    "defaultMessage": "语言"
   },
   "settings.pats.title": {
-    "defaultMessage": "Personal access tokens"
+    "defaultMessage": "个人访问令牌"
   },
   "settings.profile.title": {
-    "defaultMessage": "Public profile"
+    "defaultMessage": "公开资料"
   },
   "settings.sessions.title": {
-    "defaultMessage": "Sessions"
+    "defaultMessage": "会话"
   },
   "tooltip.date-at-time": {
-    "defaultMessage": "{date, date, long} at {time, time, short}"
+    "defaultMessage": "{date, date, long} 于 {time, time, short}"
   }
 }

@@ -106,13 +106,13 @@
         </IntlFormatted>
       </p>
 
-      <HCaptcha ref="captcha" v-model="token" />
+      <!-- <HCaptcha ref="captcha" v-model="token" /> -->
 
       <button
+        type="button"
         class="btn btn-primary continue-btn centered-btn"
-        :disabled="!token"
-        @click="createAccount"
-      >
+        @click="createAccount();console.log(9697);"
+      > <!-- :disabled="!token" -->
         {{ formatMessage(messages.createAccountButton) }} <RightArrowIcon />
       </button>
 
@@ -146,7 +146,7 @@ import {
   SSOGitLabIcon,
 } from "@modrinth/assets";
 import { Checkbox, commonMessages } from "@modrinth/ui";
-import HCaptcha from "@/components/ui/HCaptcha.vue";
+// import HCaptcha from "@/components/ui/HCaptcha.vue";
 
 const { formatMessage } = useVIntl();
 
@@ -211,7 +211,7 @@ if (auth.value.user) {
   await navigateTo("/dashboard");
 }
 
-const captcha = ref();
+// const captcha = ref();
 
 const email = ref("");
 const username = ref("");
@@ -221,7 +221,8 @@ const token = ref("");
 const subscribe = ref(true);
 
 async function createAccount() {
-  startLoading();
+  // startLoading();
+  console.log("yeah");
   try {
     if (confirmPassword.value !== password.value) {
       addNotification({
@@ -233,7 +234,7 @@ async function createAccount() {
         }),
         type: "error",
       });
-      captcha.value?.reset();
+      // captcha.value?.reset();
     }
 
     const res = await useBaseFetch("auth/create", {
@@ -269,8 +270,8 @@ async function createAccount() {
       text: err.data ? err.data.description : err,
       type: "error",
     });
-    captcha.value?.reset();
+    // captcha.value?.reset();
   }
-  stopLoading();
+  // stopLoading();
 }
 </script>

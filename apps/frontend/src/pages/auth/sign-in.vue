@@ -81,13 +81,13 @@
           />
         </div>
 
-        <HCaptcha ref="captcha" v-model="token" />
+        <!-- <HCaptcha ref="captcha" v-model="token" /> -->
 
         <button
+          type="button"
           class="btn btn-primary continue-btn centered-btn"
-          :disabled="!token"
           @click="beginPasswordSignIn()"
-        >
+        > <!-- :disabled="!token" -->
           {{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon />
         </button>
 
@@ -135,7 +135,7 @@ import {
   MailIcon,
 } from "@modrinth/assets";
 import { commonMessages } from "@modrinth/ui";
-import HCaptcha from "@/components/ui/HCaptcha.vue";
+// import HCaptcha from "@/components/ui/HCaptcha.vue";
 
 const { formatMessage } = useVIntl();
 
@@ -198,7 +198,7 @@ if (auth.value.user) {
   await finishSignIn();
 }
 
-const captcha = ref();
+// const captcha = ref();
 
 const email = ref("");
 const password = ref("");
@@ -207,7 +207,7 @@ const token = ref("");
 const flow = ref(route.query.flow);
 
 async function beginPasswordSignIn() {
-  startLoading();
+  // startLoading();
   try {
     const res = await useBaseFetch("auth/login", {
       method: "POST",
@@ -230,9 +230,9 @@ async function beginPasswordSignIn() {
       text: err.data ? err.data.description : err,
       type: "error",
     });
-    captcha.value?.reset();
+    // captcha.value?.reset();
   }
-  stopLoading();
+  // stopLoading();
 }
 
 const twoFactorCode = ref(null);
@@ -255,7 +255,7 @@ async function begin2FASignIn() {
       text: err.data ? err.data.description : err,
       type: "error",
     });
-    captcha.value?.reset();
+    // captcha.value?.reset();
   }
   stopLoading();
 }
