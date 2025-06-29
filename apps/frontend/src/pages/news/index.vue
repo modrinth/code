@@ -2,13 +2,25 @@
 import { ButtonStyled } from "@modrinth/ui";
 import { ChevronRightIcon, RssIcon, NewspaperIcon, GitGraphIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
+import { articles as rawArticles } from "@modrinth/blog";
+import { computed, ref } from "vue";
 
-const { data: articles } = await useAsyncData("news", () => {
-  return queryCollection("news")
-    .order("date", "DESC")
-    .select("path", "thumbnail", "title", "summary", "date")
-    .all();
-});
+const articles = ref(
+  rawArticles
+    .map((article) => ({
+      ...article,
+      path: `/news/article/${article.slug}`,
+      thumbnail: article.thumbnail
+        ? `/news/article/${article.slug}/thumbnail.webp`
+        : `/news/default.jpg`,
+      title: article.title,
+      summary: article.summary,
+      date: article.date,
+    }))
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+);
+
+console.log(articles.value);
 
 const featuredArticle = computed(() => articles.value?.[0]);
 const config = useRuntimeConfig();
@@ -48,7 +60,7 @@ useSeoMeta({
       </div>
     </div>
 
-    <template v-if="articles">
+    <template v-if="articles && articles.length">
       <div
         v-if="featuredArticle"
         class="full-width-bg brand-gradient-bg mt-6 border-0 border-y-[1px] border-solid py-4"
@@ -60,11 +72,7 @@ useSeoMeta({
           <article class="featured-article px-6">
             <div class="featured-image-container">
               <img
-                :src="
-                  featuredArticle.thumbnail
-                    ? `${featuredArticle.path}/${featuredArticle.thumbnail}`
-                    : `/news/default.jpg`
-                "
+                :src="featuredArticle.thumbnail"
                 class="aspect-video w-full rounded-2xl border-[1px] border-solid border-button-border object-cover"
               />
             </div>
@@ -93,16 +101,14 @@ useSeoMeta({
 
         <div class="mt-4 flex flex-wrap gap-4">
           <nuxt-link
-            v-for="article in articles?.slice(1)"
+            v-for="article in articles.slice(1)"
             :key="`post-${article.path}`"
             :to="`${article.path}/`"
             class="active:scale-[0.99]! group flex min-w-64 max-w-80 flex-1 flex-col gap-2 transition-all ease-in-out hover:brightness-125"
           >
             <article class="flex h-full grow flex-col gap-4">
               <img
-                :src="
-                  article.thumbnail ? `${article.path}/${article.thumbnail}` : `/news/default.jpg`
-                "
+                :src="article.thumbnail"
                 class="aspect-video w-full rounded-xl border-[1px] border-solid border-button-border object-cover"
               />
               <div class="flex grow flex-col gap-2">

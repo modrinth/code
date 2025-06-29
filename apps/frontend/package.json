@@ -40,7 +40,7 @@
     "@modrinth/assets": "workspace:*",
     "@modrinth/ui": "workspace:*",
     "@modrinth/utils": "workspace:*",
-    "@nuxt/content": "^3.6.1",
+    "@modrinth/blog": "workspace:*",
     "@pinia/nuxt": "^0.5.1",
     "@types/three": "^0.172.0",
     "@vintl/vintl": "^4.4.1",

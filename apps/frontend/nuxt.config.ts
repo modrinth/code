@@ -380,7 +380,7 @@ export default defineNuxtConfig({
       },
     },
   },
-  modules: ["@vintl/nuxt", "@pinia/nuxt", "@nuxt/content"],
+  modules: ["@vintl/nuxt", "@pinia/nuxt"],
   vintl: {
     defaultLocale: "en-US",
     locales: [
