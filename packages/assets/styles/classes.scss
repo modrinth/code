@@ -884,7 +884,7 @@ a,
 .v-popper--theme-tooltip {
   .v-popper__inner {
     background: var(--color-tooltip-bg) !important;
-    color: initial !important;
+    color: var(--color-tooltip-text) !important;
     padding: 0.5rem 0.5rem !important;
     border-radius: var(--radius-sm) !important;
     filter: drop-shadow(5px 5px 0.8rem rgba(0, 0, 0, 0.35));

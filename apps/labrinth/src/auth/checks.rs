@@ -336,7 +336,7 @@ pub async fn filter_visible_collections(
     let mut check_collections = Vec::new();
 
     for collection in collections {
-        if !collection.status.is_hidden()
+        if (!collection.status.is_hidden() && !collection.projects.is_empty())
             || user_option.as_ref().is_some_and(|x| x.role.is_mod())
         {
             return_collections.push(collection.into());

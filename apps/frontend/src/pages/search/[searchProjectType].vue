@@ -55,12 +55,7 @@
       }"
       aria-label="Filters"
     >
-      <AdPlaceholder
-        v-if="
-          (!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus) &&
-          !server
-        "
-      />
+      <AdPlaceholder v-if="!auth.user && !server" />
       <div v-if="filtersMenuOpen" class="fixed inset-0 z-40 bg-bg"></div>
       <div
         class="flex flex-col gap-3"

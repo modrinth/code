@@ -146,9 +146,7 @@
         </ContentPageHeader>
       </div>
       <div class="normal-page__sidebar">
-        <AdPlaceholder
-          v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
-        />
+        <AdPlaceholder v-if="!auth.user" />
 
         <div class="card flex-card">
           <h2>Members</h2>
@@ -291,7 +289,6 @@ const user = await useUser();
 const cosmetics = useCosmetics();
 const route = useNativeRoute();
 const tags = useTags();
-const flags = useFeatureFlags();
 const config = useRuntimeConfig();
 
 let orgId = useRouteId();
