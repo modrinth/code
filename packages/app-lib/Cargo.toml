@@ -48,7 +48,6 @@ futures = { workspace = true, features = ["async-await", "alloc"] }
 reqwest = { workspace = true, features = ["json", "stream", "deflate", "gzip", "brotli", "rustls-tls-webpki-roots", "charset", "http2", "macos-system-configuration"] }
 tokio = { workspace = true, features = ["time", "io-util", "net", "sync", "fs", "macros", "process"] }
 tokio-util = { workspace = true, features = ["compat"] }
-tokio-stream.workspace = true
 async-recursion.workspace = true
 fs4 = { workspace = true, features = ["tokio"] }
 async-walkdir.workspace = true
