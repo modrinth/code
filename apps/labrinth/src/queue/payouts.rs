@@ -1128,5 +1128,7 @@ pub async fn insert_bank_balances(
         .execute(&mut *transaction)
         .await?;
 
+    transaction.commit().await?;
+
     Ok(())
 }

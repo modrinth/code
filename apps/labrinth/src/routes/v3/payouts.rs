@@ -903,7 +903,7 @@ pub async fn platform_revenue(
         "
         SELECT created, SUM(amount) sum
         FROM payouts_values
-        WHERE date_available BETWEEN $1 AND $2
+        WHERE created BETWEEN $1 AND $2
         GROUP BY created
         ORDER BY created DESC
         ",
