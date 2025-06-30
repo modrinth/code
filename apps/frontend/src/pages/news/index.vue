@@ -1,9 +1,41 @@
 <script setup lang="ts">
 import { ButtonStyled } from "@modrinth/ui";
-import { ChevronRightIcon, RssIcon, GitGraphIcon } from "@modrinth/assets";
+import { ChevronRightIcon, RssIcon, GitGraphIcon, CheckIcon, MailIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
 import { articles as rawArticles } from "@modrinth/blog";
 import { computed, ref } from "vue";
+import {useBaseFetch} from "~/composables/fetch";
+
+const auth = await useAuth();
+const showSubscriptionConfirmation = ref(false);
+const subscribed = ref(false);
+
+if (auth.value.user) {
+  try {
+    const { data } = await useBaseFetch('auth/email/subscribe', {
+      method: 'GET'
+    });
+    subscribed.value = data?.subscribed || false;
+  } catch {
+    subscribed.value = false;
+  }
+}
+
+async function subscribe() {
+  try {
+    await useBaseFetch("auth/email/subscribe", {
+      method: "POST",
+    });
+    showSubscriptionConfirmation.value = true;
+    setTimeout(() => {
+      subscribed.value = true;
+    }, 2400);
+  } catch {} finally {
+    setTimeout(() => {
+      showSubscriptionConfirmation.value = false;
+    }, 2500);
+  }
+}
 
 const articles = ref(
   rawArticles
@@ -42,6 +74,16 @@ useSeoMeta({
         <h1 class="m-0 text-3xl font-extrabold">News</h1>
       </div>
       <div class="flex gap-2">
+        <ButtonStyled color="brand" type="outlined" v-if="auth.user && !subscribed">
+          <button v-tooltip="`Subscribe to the Modrinth newsletter`" @click="subscribe">
+            <template v-if="!showSubscriptionConfirmation">
+              <MailIcon /> Subscribe
+            </template>
+            <template v-else>
+              <CheckIcon /> Subscribed!
+            </template>
+          </button>
+        </ButtonStyled>
         <ButtonStyled circular>
           <a v-tooltip="`RSS feed`" aria-label="RSS feed" href="/news/feed/rss.xml" target="_blank">
             <RssIcon />
@@ -94,7 +136,7 @@ useSeoMeta({
           />
         </div>
 
-        <div class="mt-4 flex flex-wrap gap-4">
+        <div class="mt-4 flex flex-wrap justify-center gap-4">
           <nuxt-link
             v-for="article in articles.slice(1)"
             :key="`post-${article.path}`"
