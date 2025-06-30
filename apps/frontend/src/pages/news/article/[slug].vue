@@ -139,6 +139,13 @@ useSeoMeta({
     margin-bottom: 0.5rem;
   }
 
+  ul,
+  ol {
+    p {
+      margin-bottom: 0.5rem;
+    }
+  }
+
   ul {
     strong {
       color: var(--color-contrast);
