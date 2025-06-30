@@ -6,6 +6,7 @@ import { md } from '@modrinth/utils'
 import { minify } from 'html-minifier-terser'
 import { copyDir, toVarName } from './utils'
 import RSS from 'rss'
+import { parseStringPromise } from 'xml2js'
 
 import {
   ARTICLES_GLOB,
@@ -118,6 +119,42 @@ async function generateRssFeed(articles): Promise<void> {
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   )
 
+  let currentRssArticles: { title: string; html: string }[] = []
+  try {
+    const xml = await fs.readFile(RSS_PATH, 'utf8')
+    const parsed = await parseStringPromise(xml)
+    const items = parsed.rss?.channel?.[0]?.item || []
+    currentRssArticles = items.map((item) => ({
+      title: (item.title?.[0] ?? '').trim(),
+      html: (item['content:encoded']?.[0] ?? '').replace(/^<!\[CDATA\[|\]\]>$/g, '').trim(),
+    }))
+  } catch {
+    currentRssArticles = []
+  }
+
+  const newArr = sorted.map((a) => ({
+    title: (a.title ?? '').trim(),
+    html: (a.html ?? '').trim(),
+  }))
+
+  let isEqual = currentRssArticles.length === newArr.length
+  if (isEqual) {
+    for (let i = 0; i < newArr.length; ++i) {
+      if (
+        currentRssArticles[i].title !== newArr[i].title ||
+        currentRssArticles[i].html !== newArr[i].html
+      ) {
+        isEqual = false
+        break
+      }
+    }
+  }
+
+  if (isEqual) {
+    console.log(`⏭️  RSS feed not regenerated (articles unchanged)`)
+    return
+  }
+
   const feed = new RSS({
     title: 'Modrinth News',
     description: 'Keep up-to-date on the latest news from Modrinth.',
@@ -165,7 +202,6 @@ async function deleteDirContents(dir: string) {
 async function copyPublicAssets() {
   console.log('🚚  Copying ./public to all PUBLIC_LOCATIONS...')
   for (const loc of PUBLIC_LOCATIONS) {
-    // Delete existing contents first
     await deleteDirContents(loc)
     await copyDir(PUBLIC_SRC, loc)
     console.log(`📂  Copied ./public to ${loc}`)
