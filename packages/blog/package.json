@@ -17,6 +17,7 @@
     "tsconfig": "workspace:*"
   },
   "dependencies": {
+    "fast-glob": "^3.3.3",
     "gray-matter": "^4.0.3",
     "html-minifier-terser": "^7.2.0",
     "rss": "^1.2.2"

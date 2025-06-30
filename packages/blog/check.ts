@@ -1,12 +1,12 @@
 import { promises as fs } from 'fs'
 import * as path from 'path'
-import fg from 'fast-glob'
+import fastGlob from 'fast-glob'
 import { repoPath, toVarName } from './utils'
 
 import { PUBLIC_SRC, PUBLIC_LOCATIONS, ARTICLES_GLOB, COMPILED_DIR } from './blog.config'
 
 async function checkPublicAssets() {
-  const srcFiles = await fg(['**/*'], { cwd: PUBLIC_SRC, dot: true })
+  const srcFiles = await fastGlob(['**/*'], { cwd: PUBLIC_SRC, dot: true })
   let allOk = true
   for (const target of PUBLIC_LOCATIONS) {
     for (const relativeFile of srcFiles) {
@@ -26,8 +26,8 @@ async function checkPublicAssets() {
 }
 
 async function checkCompiledArticles() {
-  const mdFiles = await fg([ARTICLES_GLOB])
-  const compiledFiles = await fg([`${COMPILED_DIR}/*.ts`])
+  const mdFiles = await fastGlob([ARTICLES_GLOB])
+  const compiledFiles = await fastGlob([`${COMPILED_DIR}/*.ts`])
   const compiledVarNames = compiledFiles.map((f) => path.basename(f, '.ts'))
 
   // Check all .md have compiled .ts and .content.ts and the proper public thumbnail
@@ -59,7 +59,7 @@ async function checkCompiledArticles() {
     if (varName === 'index' || varName.endsWith('.content')) continue
 
     const mdPathGlob = repoPath(`packages/blog/articles/**/${varName.replace(/_/g, '*')}.md`)
-    const found = await fg([mdPathGlob])
+    const found = await fastGlob([mdPathGlob])
     if (!found.length) {
       console.error(`❌  Compiled article ${compiled} has no matching markdown source!`)
       process.exit(1)
