@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import { articles as rawArticles } from "@modrinth/blog";
 import { computed, ref } from "vue";
 import NewsletterButton from "~/components/ui/NewsletterButton.vue";
+import NewsArticleCard from "~/components/ui/news/NewsArticleCard.vue";
 
 const articles = ref(
   rawArticles
@@ -97,30 +98,7 @@ useSeoMeta({
         </div>
 
         <div class="mt-4 grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4">
-          <nuxt-link
-            v-for="article in articles.slice(1)"
-            :key="`post-${article.path}`"
-            :to="`${article.path}/`"
-            class="active:scale-[0.99]! group flex flex-1 flex-col gap-2 transition-all ease-in-out hover:brightness-125"
-          >
-            <article class="flex h-full grow flex-col gap-4">
-              <img
-                :src="article.thumbnail"
-                class="aspect-video w-full rounded-xl border-[1px] border-solid border-button-border object-cover"
-              />
-              <div class="flex grow flex-col gap-2">
-                <h3 class="m-0 text-base leading-tight group-hover:underline">
-                  {{ article.title }}
-                </h3>
-                <p v-if="article.summary" class="m-0 text-sm leading-tight">
-                  {{ article.summary }}
-                </p>
-                <div class="mt-auto text-sm text-secondary">
-                  {{ dayjs(article.date).format("MMMM D, YYYY") }}
-                </div>
-              </div>
-            </article>
-          </nuxt-link>
+          <NewsArticleCard v-for="article in articles" :key="article.path" :article="article" />
         </div>
       </div>
     </template>
