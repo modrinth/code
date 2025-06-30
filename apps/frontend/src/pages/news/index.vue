@@ -4,7 +4,7 @@ import { ChevronRightIcon, RssIcon, GitGraphIcon, CheckIcon, MailIcon } from "@m
 import dayjs from "dayjs";
 import { articles as rawArticles } from "@modrinth/blog";
 import { computed, ref } from "vue";
-import {useBaseFetch} from "~/composables/fetch";
+import { useBaseFetch } from "~/composables/fetch.js";
 
 const auth = await useAuth();
 const showSubscriptionConfirmation = ref(false);
@@ -12,8 +12,8 @@ const subscribed = ref(false);
 
 if (auth.value.user) {
   try {
-    const { data } = await useBaseFetch('auth/email/subscribe', {
-      method: 'GET'
+    const { data } = await useBaseFetch("auth/email/subscribe", {
+      method: "GET",
     });
     subscribed.value = data?.subscribed || false;
   } catch {
@@ -30,7 +30,8 @@ async function subscribe() {
     setTimeout(() => {
       subscribed.value = true;
     }, 2400);
-  } catch {} finally {
+  } catch {
+  } finally {
     setTimeout(() => {
       showSubscriptionConfirmation.value = false;
     }, 2500);
@@ -74,14 +75,10 @@ useSeoMeta({
         <h1 class="m-0 text-3xl font-extrabold">News</h1>
       </div>
       <div class="flex gap-2">
-        <ButtonStyled color="brand" type="outlined" v-if="auth.user && !subscribed">
+        <ButtonStyled v-if="auth.user && !subscribed" color="brand" type="outlined">
           <button v-tooltip="`Subscribe to the Modrinth newsletter`" @click="subscribe">
-            <template v-if="!showSubscriptionConfirmation">
-              <MailIcon /> Subscribe
-            </template>
-            <template v-else>
-              <CheckIcon /> Subscribed!
-            </template>
+            <template v-if="!showSubscriptionConfirmation"> <MailIcon /> Subscribe </template>
+            <template v-else> <CheckIcon /> Subscribed! </template>
           </button>
         </ButtonStyled>
         <ButtonStyled circular>

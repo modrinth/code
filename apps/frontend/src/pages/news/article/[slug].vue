@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ButtonStyled } from "@modrinth/ui";
-import {RssIcon, GitGraphIcon, MailIcon, CheckIcon} from "@modrinth/assets";
+import { RssIcon, GitGraphIcon, MailIcon, CheckIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
 import { articles as rawArticles } from "@modrinth/blog";
 import { computed } from "vue";
 import ShareArticleButtons from "~/components/ui/ShareArticleButtons.vue";
-import {useBaseFetch} from "~/composables/fetch";
+import { useBaseFetch } from "~/composables/fetch.js";
 
 const auth = await useAuth();
 const showSubscriptionConfirmation = ref(false);
@@ -13,8 +13,8 @@ const subscribed = ref(false);
 
 if (auth.value.user) {
   try {
-    const { data } = await useBaseFetch('auth/email/subscribe', {
-      method: 'GET'
+    const { data } = await useBaseFetch("auth/email/subscribe", {
+      method: "GET",
     });
     subscribed.value = data?.subscribed || false;
   } catch {
@@ -28,7 +28,8 @@ async function subscribe() {
       method: "POST",
     });
     showSubscriptionConfirmation.value = true;
-  } catch {} finally {
+  } catch {
+  } finally {
     setTimeout(() => {
       showSubscriptionConfirmation.value = false;
       subscribed.value = true;
@@ -97,14 +98,10 @@ useSeoMeta({
         <h1 class="m-0 text-3xl font-extrabold hover:underline">News</h1>
       </nuxt-link>
       <div class="flex gap-2">
-        <ButtonStyled color="brand" type="outlined" v-if="auth.user && !subscribed">
+        <ButtonStyled v-if="auth.user && !subscribed" color="brand" type="outlined">
           <button v-tooltip="`Subscribe to the Modrinth newsletter`" @click="subscribe">
-            <template v-if="!showSubscriptionConfirmation">
-              <MailIcon /> Subscribe
-            </template>
-            <template v-else>
-              <CheckIcon /> Subscribed!
-            </template>
+            <template v-if="!showSubscriptionConfirmation"> <MailIcon /> Subscribe </template>
+            <template v-else> <CheckIcon /> Subscribed! </template>
           </button>
         </ButtonStyled>
         <ButtonStyled circular>
