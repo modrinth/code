@@ -133,12 +133,12 @@ useSeoMeta({
           />
         </div>
 
-        <div class="mt-4 flex flex-wrap justify-center gap-4">
+        <div class="mt-4 grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4">
           <nuxt-link
             v-for="article in articles.slice(1)"
             :key="`post-${article.path}`"
             :to="`${article.path}/`"
-            class="active:scale-[0.99]! group flex min-w-64 max-w-80 flex-1 flex-col gap-2 transition-all ease-in-out hover:brightness-125"
+            class="active:scale-[0.99]! group flex flex-1 flex-col gap-2 transition-all ease-in-out hover:brightness-125"
           >
             <article class="flex h-full grow flex-col gap-4">
               <img
