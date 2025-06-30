@@ -15,6 +15,7 @@ import {
   PUBLIC_SRC,
   PUBLIC_LOCATIONS,
   RSS_PATH,
+  JSON_PATH,
   SITE_URL,
 } from './blog.config'
 
@@ -32,6 +33,18 @@ async function hasThumbnail(slug: string): Promise<boolean> {
   }
 }
 
+function getArticleLink(slug: string): string {
+  return `${SITE_URL}/news/article/${slug}`
+}
+
+function getThumbnailUrl(slug: string, hasThumb: boolean): string {
+  if (hasThumb) {
+    return `${SITE_URL}/news/article/${slug}/thumbnail.webp`
+  } else {
+    return `${SITE_URL}/news/default.jpg`
+  }
+}
+
 async function compileArticles() {
   await ensureCompiledDir()
 
@@ -40,12 +53,13 @@ async function compileArticles() {
   const articleExports: string[] = []
   const articlesArray: string[] = []
   const articlesForRss = []
+  const articlesForJson = []
 
   for (const file of files) {
     const src = await fs.readFile(file, 'utf8')
     const { content, data } = matter(src)
 
-    const { title, summary, date, ...rest } = data
+    const { title, summary, date, slug: frontSlug, ...rest } = data
     if (!title || !summary || !date) {
       console.error(`❌  Missing required frontmatter in ${file}. Required: title, summary, date`)
       process.exit(1)
@@ -57,7 +71,7 @@ async function compileArticles() {
       removeComments: true,
     })
 
-    const slug = path.basename(file, '.md')
+    const slug = frontSlug || path.basename(file, '.md')
     const varName = toVarName(slug)
     const exportFile = path.join(COMPILED_DIR, `${varName}.ts`)
     const contentFile = path.join(COMPILED_DIR, `${varName}.content.ts`)
@@ -95,6 +109,14 @@ export const article = {
       slug,
       html: minifiedHtml,
     } as never)
+
+    articlesForJson.push({
+      title,
+      summary,
+      thumbnail: getThumbnailUrl(slug, thumbnailPresent),
+      date: new Date(date).toISOString(),
+      link: getArticleLink(slug),
+    } as never)
   }
 
   console.log(`📂  Compiled ${files.length} articles.`)
@@ -112,6 +134,7 @@ export const articles = [
   console.log(`🌟  Done! Wrote root articles export.`)
 
   await generateRssFeed(articlesForRss)
+  await generateJsonFile(articlesForJson)
 }
 
 async function generateRssFeed(articles): Promise<void> {
@@ -178,6 +201,16 @@ async function generateRssFeed(articles): Promise<void> {
   await fs.mkdir(path.dirname(RSS_PATH), { recursive: true })
   await fs.writeFile(RSS_PATH, feed.xml({ indent: true }), 'utf8')
   console.log(`📂  RSS feed written to ${RSS_PATH}`)
+}
+
+async function generateJsonFile(articles): Promise<void> {
+  const sorted = [...articles].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+  )
+  const json = { articles: sorted }
+  await fs.mkdir(path.dirname(JSON_PATH), { recursive: true })
+  await fs.writeFile(JSON_PATH, JSON.stringify(json, null, 2), 'utf8')
+  console.log(`📝  Wrote JSON articles to ${JSON_PATH}`)
 }
 
 async function deleteDirContents(dir: string) {

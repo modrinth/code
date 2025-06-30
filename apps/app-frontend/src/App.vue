@@ -188,7 +188,7 @@ async function setupApp() {
       )
     })
 
-  useFetch(`https://modrinth.com/blog/news.json`, 'news', true).then((res) => {
+  useFetch(`https://modrinth.com/news/feed/articles.json`, 'news', true).then((res) => {
     if (res && res.articles) {
       news.value = res.articles
     }

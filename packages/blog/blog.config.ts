@@ -26,8 +26,9 @@ export const PUBLIC_LOCATIONS = [repoPath('apps/frontend/src/public/news/article
  * The git-repository-root-relative path to the frontend RSS feed file.
  */
 export const RSS_PATH = repoPath('apps/frontend/src/public/news/feed/rss.xml')
+export const JSON_PATH = repoPath('apps/frontend/src/public/news/feed/articles.json')
 
 /**
  * The base URL of the Modrinth site, used for the RSS feed.
  */
-export const SITE_URL = 'https://modrinth.com/'
+export const SITE_URL = 'https://modrinth.com'

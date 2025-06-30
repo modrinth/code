@@ -1,0 +1,165 @@
+{
+  "articles": [
+    {
+      "title": "A New Chapter for Modrinth Servers",
+      "summary": "Modrinth Servers is now fully operated in-house by the Modrinth Team.",
+      "thumbnail": "https://modrinth.com/news/article/a-new-chapter-for-modrinth-servers/thumbnail.webp",
+      "date": "2025-03-13T00:00:00.000Z",
+      "link": "https://modrinth.com/news/article/a-new-chapter-for-modrinth-servers"
+    },
+    {
+      "title": "Host your own server with Modrinth Servers — now in beta",
+      "summary": "Fast, simple, reliable servers directly integrated into Modrinth.",
+      "thumbnail": "https://modrinth.com/news/article/modrinth-servers-beta/thumbnail.webp",
+      "date": "2024-11-03T06:00:00.000Z",
+      "link": "https://modrinth.com/news/article/modrinth-servers-beta"
+    },
+    {
+      "title": "Quintupling Creator Revenue and Becoming Sustainable",
+      "summary": "Announcing an update to our monetization program, creator split, and more!",
+      "thumbnail": "https://modrinth.com/news/article/becoming-sustainable/thumbnail.webp",
+      "date": "2024-09-13T20:00:00.000Z",
+      "link": "https://modrinth.com/news/article/becoming-sustainable"
+    },
+    {
+      "title": "Introducing Modrinth+, a refreshed site look, and a new advertising system!",
+      "summary": "Learn about this major update to Modrinth.",
+      "thumbnail": "https://modrinth.com/news/article/design-refresh/thumbnail.webp",
+      "date": "2024-08-21T20:00:00.000Z",
+      "link": "https://modrinth.com/news/article/design-refresh"
+    },
+    {
+      "title": "Malware Discovery Disclosure: \"Windows Borderless\" mod",
+      "summary": "Threat Analysis and Plan of Action",
+      "thumbnail": "https://modrinth.com/news/article/windows-borderless-malware-disclosure/thumbnail.webp",
+      "date": "2024-05-07T20:00:00.000Z",
+      "link": "https://modrinth.com/news/article/windows-borderless-malware-disclosure"
+    },
+    {
+      "title": "A Sustainable Path Forward for Modrinth",
+      "summary": "Our capital return and what’s next.",
+      "thumbnail": "https://modrinth.com/news/default.jpg",
+      "date": "2024-04-04T20:00:00.000Z",
+      "link": "https://modrinth.com/news/article/capital-return"
+    },
+    {
+      "title": "Creator Update: Analytics, Organizations, Collections, and more",
+      "summary": "December may be over, but we’re not done giving gifts.",
+      "thumbnail": "https://modrinth.com/news/article/creator-update/thumbnail.webp",
+      "date": "2024-01-06T20:00:00.000Z",
+      "link": "https://modrinth.com/news/article/creator-update"
+    },
+    {
+      "title": "Correcting Inflated Download Counts due to Rate Limiting Issue",
+      "summary": "A rate limiting issue caused inflated download counts in certain countries.",
+      "thumbnail": "https://modrinth.com/news/default.jpg",
+      "date": "2023-11-10T20:00:00.000Z",
+      "link": "https://modrinth.com/news/article/download-adjustment"
+    },
+    {
+      "title": "Introducing Modrinth App Beta",
+      "summary": "Changing the modded Minecraft landscape with the new Modrinth App, alongside several other major features.",
+      "thumbnail": "https://modrinth.com/news/default.jpg",
+      "date": "2023-08-05T20:00:00.000Z",
+      "link": "https://modrinth.com/news/article/modrinth-app-beta"
+    },
+    {
+      "title": "(April Fools 2023) Powering up your experience: Modrinth Technologies™️ beta launch!",
+      "summary": "Welcome to the new era of Modrinth. We can't wait to hear your feedback.",
+      "thumbnail": "https://modrinth.com/news/article/new-site-beta/thumbnail.webp",
+      "date": "2023-04-01T08:00:00.000Z",
+      "link": "https://modrinth.com/news/article/new-site-beta"
+    },
+    {
+      "title": "Accelerating Modrinth's Development",
+      "summary": "Our fundraiser and the future of Modrinth!",
+      "thumbnail": "https://modrinth.com/news/default.jpg",
+      "date": "2023-02-01T20:00:00.000Z",
+      "link": "https://modrinth.com/news/article/accelerating-development"
+    },
+    {
+      "title": "Two years of Modrinth: a retrospective",
+      "summary": "The history of Modrinth as we know it from December 2020 to December 2022.",
+      "thumbnail": "https://modrinth.com/news/default.jpg",
+      "date": "2023-01-07T00:00:00.000Z",
+      "link": "https://modrinth.com/news/article/two-years-of-modrinth-history"
+    },
+    {
+      "title": "Modrinth's Anniversary Update",
+      "summary": "Marking two years of Modrinth and discussing our New Year's Resolutions for 2023.",
+      "thumbnail": "https://modrinth.com/news/article/two-years-of-modrinth/thumbnail.webp",
+      "date": "2023-01-07T00:00:00.000Z",
+      "link": "https://modrinth.com/news/article/two-years-of-modrinth"
+    },
+    {
+      "title": "Creators can now make money on Modrinth!",
+      "summary": "Yes, you read the title correctly: Modrinth's creator monetization program, also known as payouts, is now in an open beta phase. Read on for more information!",
+      "thumbnail": "https://modrinth.com/news/article/creator-monetization/thumbnail.webp",
+      "date": "2022-11-12T00:00:00.000Z",
+      "link": "https://modrinth.com/news/article/creator-monetization"
+    },
+    {
+      "title": "Modrinth's Carbon Ads experiment",
+      "summary": "As a step towards implementing author payouts, we're experimenting with a couple different ad providers to see which one works the best for us.",
+      "thumbnail": "https://modrinth.com/news/article/carbon-ads/thumbnail.webp",
+      "date": "2022-09-08T00:00:00.000Z",
+      "link": "https://modrinth.com/news/article/carbon-ads"
+    },
+    {
+      "title": "Plugins and Resource Packs now have a home on Modrinth",
+      "summary": "A small update with a big impact: plugins and resource packs are now available on Modrinth!",
+      "thumbnail": "https://modrinth.com/news/article/plugins-resource-packs/thumbnail.webp",
+      "date": "2022-08-27T00:00:00.000Z",
+      "link": "https://modrinth.com/news/article/plugins-resource-packs"
+    },
+    {
+      "title": "Changes to Modrinth Modpacks",
+      "summary": "CurseForge CDN links requested to be removed by the end of the month",
+      "thumbnail": "https://modrinth.com/news/article/modpack-changes/thumbnail.webp",
+      "date": "2022-05-28T00:00:00.000Z",
+      "link": "https://modrinth.com/news/article/modpack-changes"
+    },
+    {
+      "title": "Modrinth Modpacks: Now in alpha testing",
+      "summary": "After over a year of development, we're happy to announce that modpack support is now in alpha testing.",
+      "thumbnail": "https://modrinth.com/news/article/modpacks-alpha/thumbnail.webp",
+      "date": "2022-05-15T00:00:00.000Z",
+      "link": "https://modrinth.com/news/article/modpacks-alpha"
+    },
+    {
+      "title": "This week in Modrinth development: Filters and Fixes",
+      "summary": "After a great first week since Modrinth launched out of beta, we have continued to improve the user interface based on feedback.",
+      "thumbnail": "https://modrinth.com/news/article/knossos-v2.1.0/thumbnail.webp",
+      "date": "2022-03-09T00:00:00.000Z",
+      "link": "https://modrinth.com/news/article/knossos-v2.1.0"
+    },
+    {
+      "title": "Now showing on Modrinth: A new look!",
+      "summary": "After months of relatively quiet development, Modrinth has released many new features and improvements, including a redesign. Read on to learn more!",
+      "thumbnail": "https://modrinth.com/news/article/redesign/thumbnail.webp",
+      "date": "2022-02-27T00:00:00.000Z",
+      "link": "https://modrinth.com/news/article/redesign"
+    },
+    {
+      "title": "Beginner's Guide to Licensing your Mods",
+      "summary": "Software licenses; the nitty-gritty legal aspect of software development. They're more important than you think.",
+      "thumbnail": "https://modrinth.com/news/article/licensing-guide/thumbnail.webp",
+      "date": "2021-05-16T00:00:00.000Z",
+      "link": "https://modrinth.com/news/article/licensing-guide"
+    },
+    {
+      "title": "Welcome to Modrinth Beta",
+      "summary": "After six months of work, Modrinth enters Beta, helping modders host their mods with ease!",
+      "thumbnail": "https://modrinth.com/news/article/modrinth-beta/thumbnail.webp",
+      "date": "2020-12-01T00:00:00.000Z",
+      "link": "https://modrinth.com/news/article/modrinth-beta"
+    },
+    {
+      "title": "What is Modrinth?",
+      "summary": "Hello, we are Modrinth – an open source mods hosting platform. Sounds dry, doesn't it? So let me tell you our story – and I promise, it won't be boring!",
+      "thumbnail": "https://modrinth.com/news/default.jpg",
+      "date": "2020-11-27T00:00:00.000Z",
+      "link": "https://modrinth.com/news/article/whats-modrinth"
+    }
+  ]
+}
