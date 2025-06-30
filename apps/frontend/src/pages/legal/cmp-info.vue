@@ -147,9 +147,9 @@
       <tbody>
         <tr v-for="item in platformRevenueData" :key="item.time">
           <td>{{ formatDate(dayjs.unix(item.time)) }}</td>
-          <td>{{ formatMoney(item.revenue) }}</td>
-          <td>{{ formatMoney(item.creator_revenue) }}</td>
-          <td>{{ formatMoney(item.revenue - item.creator_revenue) }}</td>
+          <td>{{ formatMoney(Number(item.revenue) + Number(item.creator_revenue)) }}</td>
+          <td>{{ formatMoney(Number(item.creator_revenue)) }}</td>
+          <td>{{ formatMoney(Number(item.revenue)) }}</td>
         </tr>
       </tbody>
     </table>
@@ -187,6 +187,6 @@ const { data: transparencyInformation } = await useAsyncData("payout/platform_re
   }),
 );
 
-const platformRevenue = transparencyInformation.value.all_time;
-const platformRevenueData = transparencyInformation.value.data.slice(0, 5);
+const platformRevenue = (transparencyInformation.value as any)?.all_time;
+const platformRevenueData = (transparencyInformation.value as any)?.data?.slice(0, 5) ?? [];
 </script>
