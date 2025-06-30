@@ -1,4 +1,5 @@
 // AUTO-GENERATED FILE - DO NOT EDIT
+import { article as a_new_chapter_for_modrinth_servers } from './a_new_chapter_for_modrinth_servers'
 import { article as accelerating_development } from './accelerating_development'
 import { article as becoming_sustainable } from './becoming_sustainable'
 import { article as capital_return } from './capital_return'
@@ -23,6 +24,7 @@ import { article as whats_modrinth } from './whats_modrinth'
 import { article as windows_borderless_malware_disclosure } from './windows_borderless_malware_disclosure'
 
 export const articles = [
+  a_new_chapter_for_modrinth_servers,
   accelerating_development,
   becoming_sustainable,
   capital_return,
