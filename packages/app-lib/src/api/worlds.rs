@@ -21,7 +21,6 @@ use quartz_nbt::{NbtCompound, NbtTag};
 use regex::{Regex, RegexBuilder};
 use serde::{Deserialize, Serialize};
 use std::cmp::Reverse;
-use std::collections::HashMap;
 use std::io::Cursor;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::path::{Path, PathBuf};
@@ -395,26 +394,26 @@ async fn get_server_worlds_in_profile(
         .await
         .ok();
 
-    let first_world_index = worlds.len();
     for (index, server) in servers.into_iter().enumerate() {
         if server.hidden {
             // TODO: Figure out whether we want to hide or show direct connect servers
             continue;
         }
-        let icon = server.icon.and_then(|icon| {
-            Url::parse(&format!("data:image/png;base64,{icon}")).ok()
-        });
-        let last_played = join_log
-            .as_ref()
-            .and_then(|log| {
-                let (host, port) = parse_server_address(&server.ip).ok()?;
-                log.get(&(host.to_owned(), port))
-            })
-            .copied();
         let world = World {
             name: server.name,
-            last_played,
-            icon: icon.map(Either::Right),
+            last_played: join_log
+                .as_ref()
+                .and_then(|log| {
+                    let (host, port) = parse_server_address(&server.ip).ok()?;
+                    log.get(&(host.to_owned(), port))
+                })
+                .copied(),
+            icon: server
+                .icon
+                .and_then(|icon| {
+                    Url::parse(&format!("data:image/png;base64,{icon}")).ok()
+                })
+                .map(Either::Right),
             display_status: DisplayStatus::Normal,
             details: WorldDetails::Server {
                 index,
@@ -423,37 +422,6 @@ async fn get_server_worlds_in_profile(
             },
         };
         worlds.push(world);
-    }
-
-    if let Some(join_log) = join_log {
-        let mut resolve_futures = Vec::new();
-        for world in worlds.iter().skip(first_world_index) {
-            if world.last_played.is_none()
-                && let WorldDetails::Server { index, address, .. } =
-                    &world.details
-                && let Ok((host, port)) = parse_server_address(address)
-            {
-                let host = host.to_owned();
-                resolve_futures.push(async move {
-                    let resolved =
-                        resolve_server_address(&host, port).await.ok()?;
-                    Some((*index, resolved))
-                });
-            }
-        }
-
-        let mut worlds_to_update = tokio_stream::iter(resolve_futures)
-            .buffer_unordered(8)
-            .filter_map(async |x| x)
-            .collect::<HashMap<_, _>>()
-            .await;
-        for world in worlds.iter_mut().skip(first_world_index) {
-            if let WorldDetails::Server { index, .. } = &world.details
-                && let Some((host, port)) = worlds_to_update.remove(index)
-            {
-                world.last_played = join_log.get(&(host, port)).copied();
-            }
-        }
     }
 
     Ok(())
