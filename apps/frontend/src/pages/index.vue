@@ -516,7 +516,7 @@
         <ButtonStyled color="brand">
           <nuxt-link :to="`/news`">
             <NewspaperIcon />
-            Visit the blog
+            Latest news
           </nuxt-link>
         </ButtonStyled>
       </div>

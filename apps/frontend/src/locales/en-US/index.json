@@ -383,8 +383,8 @@
   "layout.footer.about": {
     "message": "About"
   },
-  "layout.footer.about.blog": {
-    "message": "Blog"
+  "layout.footer.about.news": {
+    "message": "News"
   },
   "layout.footer.about.careers": {
     "message": "Careers"

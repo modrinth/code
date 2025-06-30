@@ -1,41 +1,11 @@
 <script setup lang="ts">
 import { ButtonStyled } from "@modrinth/ui";
-import { RssIcon, GitGraphIcon, MailIcon, CheckIcon } from "@modrinth/assets";
+import { RssIcon, GitGraphIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
 import { articles as rawArticles } from "@modrinth/blog";
 import { computed } from "vue";
 import ShareArticleButtons from "~/components/ui/ShareArticleButtons.vue";
-import { useBaseFetch } from "~/composables/fetch.js";
-
-const auth = await useAuth();
-const showSubscriptionConfirmation = ref(false);
-const subscribed = ref(false);
-
-if (auth.value.user) {
-  try {
-    const { data } = await useBaseFetch("auth/email/subscribe", {
-      method: "GET",
-    });
-    subscribed.value = data?.subscribed || false;
-  } catch {
-    subscribed.value = false;
-  }
-}
-
-async function subscribe() {
-  try {
-    await useBaseFetch("auth/email/subscribe", {
-      method: "POST",
-    });
-    showSubscriptionConfirmation.value = true;
-  } catch {
-  } finally {
-    setTimeout(() => {
-      showSubscriptionConfirmation.value = false;
-      subscribed.value = true;
-    }, 2500);
-  }
-}
+import NewsletterButton from "~/components/ui/NewsletterButton.vue";
 
 const config = useRuntimeConfig();
 const route = useRoute();
@@ -50,7 +20,6 @@ if (!rawArticle) {
   });
 }
 
-// Load HTML content
 const html = await rawArticle.html();
 
 const article = computed(() => ({
@@ -98,12 +67,7 @@ useSeoMeta({
         <h1 class="m-0 text-3xl font-extrabold hover:underline">News</h1>
       </nuxt-link>
       <div class="flex gap-2">
-        <ButtonStyled v-if="auth.user && !subscribed" color="brand" type="outlined">
-          <button v-tooltip="`Subscribe to the Modrinth newsletter`" @click="subscribe">
-            <template v-if="!showSubscriptionConfirmation"> <MailIcon /> Subscribe </template>
-            <template v-else> <CheckIcon /> Subscribed! </template>
-          </button>
-        </ButtonStyled>
+        <NewsletterButton />
         <ButtonStyled circular>
           <a v-tooltip="`RSS feed`" aria-label="RSS feed" href="/news/feed/rss.xml" target="_blank">
             <RssIcon />
@@ -122,9 +86,7 @@ useSeoMeta({
       <div class="mt-auto text-sm text-secondary sm:text-base">
         Posted on {{ dayjsDate.format("MMMM D, YYYY") }}
       </div>
-      <div class="share-buttons-mobile sm:hidden">
-        <ShareArticleButtons :title="article.title" :url="articleUrl" />
-      </div>
+      <ShareArticleButtons :title="article.title" :url="articleUrl" />
       <img
         :src="article.thumbnail"
         class="aspect-video w-full rounded-xl border-[1px] border-solid border-button-border object-cover sm:rounded-2xl"
@@ -136,12 +98,7 @@ useSeoMeta({
       >
         Share this article
       </h3>
-      <div class="share-buttons-desktop hidden sm:block">
-        <ShareArticleButtons :title="article.title" :url="articleUrl" />
-      </div>
-      <div class="share-buttons-mobile sm:hidden">
-        <ShareArticleButtons :title="article.title" :url="articleUrl" />
-      </div>
+      <ShareArticleButtons :title="article.title" :url="articleUrl" />
     </article>
   </div>
 </template>
@@ -266,7 +223,6 @@ useSeoMeta({
   }
 
   @media (max-width: 640px) {
-    // Smaller margins for mobile
     h1,
     h2,
     h3,
