@@ -116,8 +116,11 @@ pub async fn version_project_get_helper(
             if is_visible_version(&version.inner, &user_option, &pool, &redis)
                 .await?
             {
-                return Ok(HttpResponse::Ok()
-                    .json(models::projects::Version::from(version)));
+                let mut version = models::projects::Version::from(version);
+                if let Some(pt) = VERSION_PROJECT_TYPES.get(&version.id) {
+                    version.project_types = vec![pt.clone()];
+                }
+                return Ok(HttpResponse::Ok().json(version));
             }
         }
     }
@@ -157,9 +160,15 @@ pub async fn versions_get(
     .map(|x| x.1)
     .ok();
 
-    let versions =
+    let mut versions =
         filter_visible_versions(versions_data, &user_option, &pool, &redis)
             .await?;
+
+    for version in &mut versions {
+        if let Some(pt) = VERSION_PROJECT_TYPES.get(&version.id) {
+            version.project_types = vec![pt.clone()];
+        }
+    }
 
     Ok(HttpResponse::Ok().json(versions))
 }
@@ -865,9 +874,15 @@ pub async fn version_list(
         });
         response.dedup_by(|a, b| a.inner.id == b.inner.id);
 
-        let response =
+        let mut response =
             filter_visible_versions(response, &user_option, &pool, &redis)
                 .await?;
+
+        for version in &mut response {
+            if let Some(pt) = VERSION_PROJECT_TYPES.get(&version.id) {
+                version.project_types = vec![pt.clone()];
+            }
+        }
 
         Ok(HttpResponse::Ok().json(response))
     } else {

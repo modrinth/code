@@ -513,7 +513,7 @@
             v-model="version.project_type"
             class="input"
             placeholder="Select one"
-            :options="tags.projectTypes.map((x) => x.actual)"
+            :options="['mod', 'modpack', 'datapack', 'plugin', 'server']"
             :custom-label="(value) => $formatProjectType(value)"
             :searchable="false"
             :close-on-select="true"
