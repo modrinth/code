@@ -185,6 +185,8 @@ pub struct ProjectCreateData {
     #[validate(nested, length(max = 32))]
     /// A list of initial versions to upload with the created project
     pub initial_versions: Vec<InitialVersionData>,
+    #[serde(default)]
+    pub project_type: Option<String>,
     #[validate(length(max = 3))]
     /// A list of the categories that the project is in.
     pub categories: Vec<String>,
@@ -844,19 +846,21 @@ async fn project_create_inner(
             .flat_map(|v| v.loaders.clone())
             .unique()
             .collect::<Vec<_>>();
-        let (project_types, games) = Loader::list(&mut **transaction, redis)
+        let games = Loader::list(&mut **transaction, redis)
             .await?
             .into_iter()
-            .fold(
-                (Vec::new(), Vec::new()),
-                |(mut project_types, mut games), loader| {
-                    if loaders.contains(&loader.id) {
-                        project_types.extend(loader.supported_project_types);
-                        games.extend(loader.supported_games);
-                    }
-                    (project_types, games)
-                },
-            );
+            .fold(Vec::new(), |mut games, loader| {
+                if loaders.contains(&loader.id) {
+                    games.extend(loader.supported_games);
+                }
+                games
+            });
+        let project_types = vec![
+            project_create_data
+                .project_type
+                .clone()
+                .unwrap_or_else(|| "modpack".to_string()),
+        ];
 
         let response = crate::models::projects::Project {
             id: project_id,

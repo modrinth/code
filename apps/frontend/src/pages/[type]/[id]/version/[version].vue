@@ -507,6 +507,24 @@
           </template>
         </div>
         <div>
+          <h4>Project Type</h4>
+          <Multiselect
+            v-if="isEditing"
+            v-model="version.project_type"
+            class="input"
+            placeholder="Select one"
+            :options="tags.projectTypes.map((x) => x.id)"
+            :custom-label="(value) => $formatProjectType(value)"
+            :searchable="false"
+            :close-on-select="true"
+            :show-labels="false"
+            :allow-empty="false"
+          />
+          <template v-else>
+            <span class="value">{{ $formatProjectType(version.project_type) }}</span>
+          </template>
+        </div>
+        <div>
           <h4>Version number</h4>
           <div v-if="isEditing" class="iconified-input">
             <label class="hidden" for="version-number">Version number</label>
@@ -852,6 +870,15 @@ export default defineNuxtComponent({
     }
 
     version = JSON.parse(JSON.stringify(version));
+    if (!version.project_type) {
+      if (version.project_types && version.project_types.length > 0) {
+        version.project_type = version.project_types[0];
+      } else if (props.project && props.project.actualProjectType) {
+        version.project_type = props.project.actualProjectType;
+      } else {
+        version.project_type = 'modpack';
+      }
+    }
     primaryFile = version.files.find((file) => file.primary) ?? version.files[0];
     alternateFile = version.files.find(
       (file) => file.file_type && file.file_type.includes("resource-pack"),
@@ -1101,6 +1128,7 @@ export default defineNuxtComponent({
           name: this.version.name || this.version.version_number,
           version_number: this.version.version_number,
           changelog: this.version.changelog,
+          project_type: this.version.project_type,
           version_type: this.version.version_type,
           dependencies: this.version.dependencies,
           game_versions: this.version.game_versions,
@@ -1196,6 +1224,7 @@ export default defineNuxtComponent({
         version_number: version.version_number,
         version_title: version.name || version.version_number,
         version_body: version.changelog,
+        project_type: version.project_type,
         dependencies: version.dependencies,
         game_versions: version.game_versions,
         loaders: version.loaders,
@@ -1285,6 +1314,7 @@ export default defineNuxtComponent({
           dependencies: this.version.dependencies,
           game_versions: this.version.game_versions,
           loaders: this.packageLoaders,
+          project_type: this.version.project_type,
           featured: this.version.featured,
         });
 

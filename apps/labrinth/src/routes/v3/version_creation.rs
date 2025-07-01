@@ -19,6 +19,7 @@ use crate::models::projects::{
     Dependency, FileType, Loader, Version, VersionFile, VersionStatus,
     VersionType,
 };
+use super::versions::VERSION_PROJECT_TYPES;
 use crate::models::projects::{DependencyType, ProjectStatus, skip_nulls};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::moderation::AutomatedModerationQueue;
@@ -72,6 +73,8 @@ pub struct InitialVersionData {
     pub dependencies: Vec<Dependency>,
     #[serde(alias = "version_type")]
     pub release_channel: VersionType,
+    #[serde(default)]
+    pub project_type: Option<String>,
     #[validate(length(min = 1))]
     pub loaders: Vec<Loader>,
     pub featured: bool,
@@ -423,12 +426,16 @@ async fn version_create_inner(
     .await?;
 
     let loader_structs = selected_loaders.unwrap_or_default();
-    let (all_project_types, all_games): (Vec<String>, Vec<String>) =
-        loader_structs.iter().fold((vec![], vec![]), |mut acc, x| {
-            acc.0.extend_from_slice(&x.supported_project_types);
-            acc.1.extend(x.supported_games.clone());
-            acc
-        });
+    let all_games: Vec<String> = loader_structs
+        .iter()
+        .flat_map(|x| x.supported_games.clone())
+        .collect();
+    let all_project_types = vec![
+        version_data
+            .project_type
+            .clone()
+            .unwrap_or_else(|| "modpack".to_string()),
+    ];
 
     let response = Version {
         id: builder.version_id.into(),
@@ -478,6 +485,13 @@ async fn version_create_inner(
 
     let project_id = builder.project_id;
     builder.insert(transaction).await?;
+    VERSION_PROJECT_TYPES.insert(
+        version_id,
+        version_data
+            .project_type
+            .clone()
+            .unwrap_or_else(|| "modpack".to_string()),
+    );
 
     for image_id in version_data.uploaded_images {
         if let Some(db_image) =
