@@ -15,7 +15,7 @@ const articles = ref(
       path: `/news/article/${article.slug}`,
       thumbnail: article.thumbnail
         ? `/news/article/${article.slug}/thumbnail.webp`
-        : `/news/default.jpg`,
+        : `/news/default.webp`,
       title: article.title,
       summary: article.summary,
       date: article.date,
