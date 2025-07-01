@@ -5,12 +5,16 @@
   "main": "./index.ts",
   "types": "./index.ts",
   "scripts": {
-    "lint": "eslint . && prettier --check .",
-    "fix": "eslint . --fix && prettier --write ."
+    "lint": "pnpm run icons:validate && eslint . && prettier --check .",
+    "fix": "pnpm run icons:generate && eslint . --fix && prettier --write .",
+    "icons:test": "jiti build/generate-exports.ts --test",
+    "icons:validate": "jiti build/generate-exports.ts --validate",
+    "icons:generate": "jiti build/generate-exports.ts"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
     "eslint-config-custom": "workspace:*",
+    "jiti": "^2.4.2",
     "tsconfig": "workspace:*",
     "vue": "^3.5.13"
   }
