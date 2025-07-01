@@ -80,6 +80,7 @@
               projects
             </div>
             <div
+              v-tooltip="sumDownloads.toLocaleString()"
               class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
             >
               <DownloadIcon class="h-6 w-6 text-secondary" />
@@ -389,7 +390,7 @@ const config = useRuntimeConfig();
 const vintl = useVIntl();
 const { formatMessage } = vintl;
 
-const formatCompactNumber = useCompactNumber();
+const formatCompactNumber = useCompactNumber(true);
 
 const formatRelativeTime = useRelativeTime();
 

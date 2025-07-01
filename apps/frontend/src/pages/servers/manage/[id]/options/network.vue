@@ -194,7 +194,7 @@
                   Primary allocation
                 </span>
 
-                <UiCopyCode :text="`${serverIP}:${serverPrimaryPort}`" />
+                <CopyCode :text="`${serverIP}:${serverPrimaryPort}`" />
               </div>
             </div>
 
@@ -228,7 +228,7 @@
                 </div>
 
                 <div class="flex w-full flex-row items-center gap-2 sm:w-auto">
-                  <UiCopyCode :text="`${serverIP}:${allocation.port}`" />
+                  <CopyCode :text="`${serverIP}:${allocation.port}`" />
                   <ButtonStyled icon-only>
                     <button
                       class="!w-full sm:!w-auto"
@@ -273,7 +273,7 @@ import {
   UploadIcon,
   IssuesIcon,
 } from "@modrinth/assets";
-import { ButtonStyled, NewModal, ConfirmModal } from "@modrinth/ui";
+import { ButtonStyled, NewModal, ConfirmModal, CopyCode } from "@modrinth/ui";
 import { ref, computed, nextTick } from "vue";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 

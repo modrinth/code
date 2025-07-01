@@ -43,6 +43,7 @@ import _YouTubeIcon from './external/youtube.svg?component'
 import _AlignLeftIcon from './icons/align-left.svg?component'
 import _ArchiveIcon from './icons/archive.svg?component'
 import _ArrowBigUpDashIcon from './icons/arrow-big-up-dash.svg?component'
+import _ArrowBigRightDashIcon from './icons/arrow-big-right-dash.svg?component'
 import _AsteriskIcon from './icons/asterisk.svg?component'
 import _BadgeCheckIcon from './icons/badge-check.svg?component'
 import _BanIcon from './icons/ban.svg?component'
@@ -449,3 +450,4 @@ export const CardIcon = _CardIcon
 export const TimerIcon = _TimerIcon
 export const RssIcon = _RssIcon
 export const GitGraphIcon = _GitGraphIcon
+export const ArrowBigRightDashIcon = _ArrowBigRightDashIcon

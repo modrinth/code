@@ -98,7 +98,10 @@
               {{ formatCompactNumber(projects?.length || 0) }}
               projects
             </div>
-            <div class="flex items-center gap-2 font-semibold">
+            <div
+              v-tooltip="sumDownloads.toLocaleString()"
+              class="flex items-center gap-2 font-semibold"
+            >
               <DownloadIcon class="h-6 w-6 text-secondary" />
               {{ formatCompactNumber(sumDownloads) }}
               downloads
@@ -282,7 +285,7 @@ import NavTabs from "~/components/ui/NavTabs.vue";
 const vintl = useVIntl();
 const { formatMessage } = vintl;
 
-const formatCompactNumber = useCompactNumber();
+const formatCompactNumber = useCompactNumber(true);
 
 const auth = await useAuth();
 const user = await useUser();

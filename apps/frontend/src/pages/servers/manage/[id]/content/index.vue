@@ -136,7 +136,7 @@
                       class="flex min-w-0 flex-1 items-center gap-2 rounded-xl p-2"
                       draggable="false"
                     >
-                      <UiAvatar
+                      <Avatar
                         :src="mod.icon_url"
                         size="sm"
                         alt="Server Icon"
@@ -349,7 +349,7 @@ import {
   FileIcon,
   IssuesIcon,
 } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+import { Avatar, ButtonStyled } from "@modrinth/ui";
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import type { Mod } from "@modrinth/utils";
 import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
