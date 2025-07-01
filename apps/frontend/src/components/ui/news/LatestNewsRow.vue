@@ -10,7 +10,7 @@
         :key="article.slug"
         :class="{ 'max-xl:hidden': index === 2 }"
       >
-        <NewsArticleCard :article="article" @view="handleArticleView" />
+        <NewsArticleCard :article="article" />
       </div>
     </div>
     <div class="mx-2 my-8 flex w-full items-center justify-center">
@@ -30,16 +30,14 @@ import { articles as rawArticles } from "@modrinth/blog";
 import { ButtonStyled, NewsArticleCard } from "@modrinth/ui";
 import { ref, computed } from "vue";
 
-const router = useRouter();
-
 const articles = ref(
   rawArticles
     .map((article) => ({
       ...article,
-      path: `/news/article/${article.slug}`,
+      path: `/news/article/${article.slug}/`,
       thumbnail: article.thumbnail
         ? `/news/article/${article.slug}/thumbnail.webp`
-        : `/news/default.jpg`,
+        : `/news/default.webp`,
       title: article.title,
       summary: article.summary,
       date: article.date,
@@ -48,8 +46,4 @@ const articles = ref(
 );
 
 const latestArticles = computed(() => articles.value.slice(0, 3));
-
-const handleArticleView = (article) => {
-  router.push(`${article.path}/`);
-};
 </script>

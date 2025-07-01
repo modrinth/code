@@ -6,13 +6,11 @@ import { articles as rawArticles } from "@modrinth/blog";
 import { computed, ref } from "vue";
 import NewsletterButton from "~/components/ui/NewsletterButton.vue";
 
-const router = useRouter();
-
 const articles = ref(
   rawArticles
     .map((article) => ({
       ...article,
-      path: `/news/article/${article.slug}`,
+      path: `/news/article/${article.slug}/`,
       thumbnail: article.thumbnail
         ? `/news/article/${article.slug}/thumbnail.webp`
         : `/news/default.webp`,
@@ -25,10 +23,6 @@ const articles = ref(
 
 const featuredArticle = computed(() => articles.value?.[0]);
 const config = useRuntimeConfig();
-
-const handleArticleView = (article) => {
-  router.push(`${article.path}/`);
-};
 
 useSeoMeta({
   title: "Modrinth News",
@@ -107,7 +101,6 @@ useSeoMeta({
             v-for="article in articles.slice(1)"
             :key="article.path"
             :article="article"
-            @view="handleArticleView"
           />
         </div>
       </div>

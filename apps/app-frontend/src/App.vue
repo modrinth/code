@@ -233,10 +233,6 @@ router.afterEach((to, from, failure) => {
 })
 const route = useRoute()
 
-const handleNewsView = (article) => {
-  openUrl(article.path)
-}
-
 const loading = useLoading()
 loading.setEnabled(false)
 
@@ -598,7 +594,6 @@ function handleAuxClick(e) {
                 v-for="(item, index) in news"
                 :key="`news-${index}`"
                 :article="item"
-                @view="handleNewsView"
               />
             </div>
           </div>
