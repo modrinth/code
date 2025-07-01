@@ -1,6 +1,6 @@
 // AUTO-GENERATED FILE - DO NOT EDIT
 export const article = {
-  html: () => import('./modrinth_app_beta.content').then((m) => m.html),
+  html: () => import(`./modrinth_app_beta.content`).then((m) => m.html),
   title: 'Introducing Modrinth App Beta',
   summary:
     'Changing the modded Minecraft landscape with the new Modrinth App, alongside several other major features.',

@@ -79,14 +79,14 @@ async function compileArticles() {
 
     const contentTs = `
 // AUTO-GENERATED FILE - DO NOT EDIT
-export const html = ${JSON.stringify(minifiedHtml)};
+export const html = \`${minifiedHtml}\`;
 `.trimStart()
     await fs.writeFile(contentFile, contentTs, 'utf8')
 
     const ts = `
 // AUTO-GENERATED FILE - DO NOT EDIT
 export const article = {
-  html: () => import("./${varName}.content").then(m => m.html),
+  html: () => import(\`./${varName}.content\`).then(m => m.html),
   title: ${JSON.stringify(title)},
   summary: ${JSON.stringify(summary)},
   date: ${JSON.stringify(date)},
@@ -209,7 +209,7 @@ async function generateJsonFile(articles): Promise<void> {
   )
   const json = { articles: sorted }
   await fs.mkdir(path.dirname(JSON_PATH), { recursive: true })
-  await fs.writeFile(JSON_PATH, JSON.stringify(json, null, 2), 'utf8')
+  await fs.writeFile(JSON_PATH, JSON.stringify(json, null, 2) + '\n', 'utf8')
   console.log(`📝  Wrote JSON articles to ${JSON_PATH}`)
 }
 
