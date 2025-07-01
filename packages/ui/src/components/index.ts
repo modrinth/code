@@ -59,6 +59,7 @@ export { default as CompactChart } from './chart/CompactChart.vue'
 // Content
 export { default as ContentListPanel } from './content/ContentListPanel.vue'
 export { default as NewsArticleCard } from './content/NewsArticleCard.vue'
+export type { Article as NewsArticle } from './content/NewsArticleCard.vue'
 
 // Modals
 export { default as NewModal } from './modal/NewModal.vue'
