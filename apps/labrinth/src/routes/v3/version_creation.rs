@@ -19,6 +19,7 @@ use crate::models::projects::{
     Dependency, FileType, Loader, Version, VersionFile, VersionStatus,
     VersionType,
 };
+use super::versions::VERSION_PROJECT_TYPES;
 use crate::models::projects::{DependencyType, ProjectStatus, skip_nulls};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::moderation::AutomatedModerationQueue;
@@ -484,6 +485,13 @@ async fn version_create_inner(
 
     let project_id = builder.project_id;
     builder.insert(transaction).await?;
+    VERSION_PROJECT_TYPES.insert(
+        version_id,
+        version_data
+            .project_type
+            .clone()
+            .unwrap_or_else(|| "modpack".to_string()),
+    );
 
     for image_id in version_data.uploaded_images {
         if let Some(db_image) =
