@@ -4,24 +4,21 @@
       <h2 class="m-0 mx-auto text-3xl font-extrabold sm:text-4xl">Latest news from Modrinth</h2>
     </div>
 
-    <div
-      v-if="latestArticles"
-      class="grid grid-cols-1 gap-4 sm:grid-cols-1 sm:px-16 lg:grid-cols-3"
-    >
-      <NewsArticleCard v-for="article in latestArticles" :key="article.slug" :article="article" />
+    <div v-if="latestArticles" class="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4">
+      <div
+        v-for="(article, index) in latestArticles"
+        :key="article.slug"
+        :class="{ 'max-xl:hidden': index === 2 }"
+      >
+        <NewsArticleCard :article="article" />
+      </div>
     </div>
     <div class="mx-2 my-8 flex w-full items-center justify-center">
-      <ButtonStyled
-        as="nuxt-link"
-        :to="'/news'"
-        class="flex items-center gap-1"
-        color="brand"
-        size="large"
-      >
-        <button>
+      <ButtonStyled color="brand" size="large">
+        <nuxt-link to="/news">
           <NewspaperIcon />
           View all news
-        </button>
+        </nuxt-link>
       </ButtonStyled>
     </div>
   </div>
