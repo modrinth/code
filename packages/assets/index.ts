@@ -159,6 +159,7 @@ import _RestoreIcon from './icons/restore.svg?component'
 import _RightArrowIcon from './icons/right-arrow.svg?component'
 import _RotateCounterClockwiseIcon from './icons/rotate-ccw.svg?component'
 import _RotateClockwiseIcon from './icons/rotate-cw.svg?component'
+import _RssIcon from './icons/rss.svg?component'
 import _SaveIcon from './icons/save.svg?component'
 import _ScaleIcon from './icons/scale.svg?component'
 import _ScanEyeIcon from './icons/scan-eye.svg?component'
@@ -213,6 +214,7 @@ import _CPUIcon from './icons/cpu.svg?component'
 import _LoaderIcon from './icons/loader.svg?component'
 import _ImportIcon from './icons/import.svg?component'
 import _TimerIcon from './icons/timer.svg?component'
+import _GitGraphIcon from './icons/git-graph.svg?component'
 
 // Editor Icons
 import _BoldIcon from './icons/bold.svg?component'
@@ -446,4 +448,6 @@ export const LoaderIcon = _LoaderIcon
 export const ImportIcon = _ImportIcon
 export const CardIcon = _CardIcon
 export const TimerIcon = _TimerIcon
+export const RssIcon = _RssIcon
+export const GitGraphIcon = _GitGraphIcon
 export const ArrowBigRightDashIcon = _ArrowBigRightDashIcon

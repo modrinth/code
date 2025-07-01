@@ -11,6 +11,31 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-06-30T19:15:00-07:00`,
+    product: 'web',
+    body: `### Added
+- Added news page, with all our old blog posts now hosted on our website.
+
+### Improvements
+- Changed download count rounding to be more precise.
+- Fixed Creator Monetization Program page to show accurate information again.`,
+  },
+  {
+    date: `2025-06-30T19:15:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Progress will now show when installing Modrinth Pack (.mrpack) files.
+- Fixed storage stats not linking to Files page.
+- Fixed missing icons in some places.`,
+  },
+  {
+    date: `2025-06-29T16:30:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Removed ads for logged in users.
+- Fixed tooltips being unreadable sometimes.`,
+  },
+  {
     date: `2025-06-26T11:00:00-07:00`,
     product: 'servers',
     body: `### Improvements
