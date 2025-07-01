@@ -10,7 +10,7 @@
         :key="article.slug"
         :class="{ 'max-xl:hidden': index === 2 }"
       >
-        <NewsArticleCard :article="article" />
+        <NewsArticleCard :article="article" @view="handleArticleView" />
       </div>
     </div>
     <div class="mx-2 my-8 flex w-full items-center justify-center">
@@ -27,9 +27,10 @@
 <script setup lang="ts">
 import { NewspaperIcon } from "@modrinth/assets";
 import { articles as rawArticles } from "@modrinth/blog";
-import { ButtonStyled } from "@modrinth/ui";
+import { ButtonStyled, NewsArticleCard } from "@modrinth/ui";
 import { ref, computed } from "vue";
-import NewsArticleCard from "./NewsArticleCard.vue";
+
+const router = useRouter();
 
 const articles = ref(
   rawArticles
@@ -47,4 +48,8 @@ const articles = ref(
 );
 
 const latestArticles = computed(() => articles.value.slice(0, 3));
+
+const handleArticleView = (article) => {
+  router.push(`${article.path}/`);
+};
 </script>

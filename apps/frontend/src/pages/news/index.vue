@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ButtonStyled } from "@modrinth/ui";
+import { ButtonStyled, NewsArticleCard } from "@modrinth/ui";
 import { ChevronRightIcon, RssIcon, GitGraphIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
 import { articles as rawArticles } from "@modrinth/blog";
 import { computed, ref } from "vue";
 import NewsletterButton from "~/components/ui/NewsletterButton.vue";
-import NewsArticleCard from "~/components/ui/news/NewsArticleCard.vue";
+
+const router = useRouter();
 
 const articles = ref(
   rawArticles
@@ -24,6 +25,10 @@ const articles = ref(
 
 const featuredArticle = computed(() => articles.value?.[0]);
 const config = useRuntimeConfig();
+
+const handleArticleView = (article) => {
+  router.push(`${article.path}/`);
+};
 
 useSeoMeta({
   title: "Modrinth News",
@@ -63,9 +68,9 @@ useSeoMeta({
         v-if="featuredArticle"
         class="full-width-bg brand-gradient-bg mt-6 border-0 border-y-[1px] border-solid py-4"
       >
-        <nuxt-link
-          :to="`${featuredArticle.path}/`"
-          class="active:scale-[0.99]! group flex transition-all ease-in-out hover:brightness-125"
+        <div
+          class="active:scale-[0.99]! group flex cursor-pointer transition-all ease-in-out hover:brightness-125"
+          @click="handleArticleView(featuredArticle)"
         >
           <article class="featured-article px-6">
             <div class="featured-image-container">
@@ -85,7 +90,7 @@ useSeoMeta({
               </div>
             </div>
           </article>
-        </nuxt-link>
+        </div>
       </div>
 
       <div class="mt-6 px-6">
@@ -102,6 +107,7 @@ useSeoMeta({
             v-for="article in articles.slice(1)"
             :key="article.path"
             :article="article"
+            @view="handleArticleView"
           />
         </div>
       </div>
