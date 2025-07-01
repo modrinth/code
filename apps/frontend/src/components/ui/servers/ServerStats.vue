@@ -68,7 +68,7 @@
 
 <script setup lang="ts">
 import { ref, computed, shallowRef } from "vue";
-import { FolderOpenIcon, CPUIcon, DatabaseIcon, IssuesIcon } from "@modrinth/assets";
+import { FolderOpenIcon, CpuIcon, DatabaseIcon, IssuesIcon } from "@modrinth/assets";
 import { useStorage } from "@vueuse/core";
 import type { Stats } from "@modrinth/utils";
 
@@ -126,7 +126,7 @@ const metrics = computed(() => {
         title: "CPU usage",
         value: "0.00%",
         max: "100%",
-        icon: CPUIcon,
+        icon: CpuIcon,
         data: cpuData.value,
         showGraph: false,
         warning: null,
@@ -157,7 +157,7 @@ const metrics = computed(() => {
       title: "CPU usage",
       value: `${cpuPercent.toFixed(2)}%`,
       max: "100%",
-      icon: CPUIcon,
+      icon: CpuIcon,
       data: cpuData.value,
       showGraph: true,
       warning: cpuPercent >= 90 ? "CPU usage is very high" : null,
