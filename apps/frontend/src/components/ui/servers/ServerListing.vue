@@ -33,7 +33,7 @@
           v-if="projectData?.title"
           class="m-0 flex flex-row items-center gap-2 text-sm font-medium text-secondary"
         >
-          <UiAvatar
+          <Avatar
             :src="iconUrl"
             no-shadow
             style="min-height: 20px; min-width: 20px; height: 20px; width: 20px"
@@ -74,7 +74,7 @@
         <UiServersIconsPanelErrorIcon class="!size-5" /> Your server has been suspended. Please
         update your billing information or contact Modrinth Support for more information.
       </div>
-      <UiCopyCode :text="`${props.server_id}`" class="ml-auto" />
+      <CopyCode :text="`${props.server_id}`" class="ml-auto" />
     </div>
   </NuxtLink>
 </template>
@@ -83,6 +83,7 @@
 import { ChevronRightIcon, LockIcon, SparklesIcon } from "@modrinth/assets";
 import type { Project, Server } from "@modrinth/utils";
 import { useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
+import { Avatar, CopyCode } from "@modrinth/ui";
 
 const props = defineProps<Partial<Server>>();
 
