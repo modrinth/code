@@ -41,7 +41,7 @@ function getThumbnailUrl(slug: string, hasThumb: boolean): string {
   if (hasThumb) {
     return `${SITE_URL}/news/article/${slug}/thumbnail.webp`
   } else {
-    return `${SITE_URL}/news/default.jpg`
+    return `${SITE_URL}/news/default.webp`
   }
 }
 
