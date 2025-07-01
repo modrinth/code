@@ -98,7 +98,11 @@ useSeoMeta({
         </div>
 
         <div class="mt-4 grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4">
-          <NewsArticleCard v-for="article in articles" :key="article.path" :article="article" />
+          <NewsArticleCard
+            v-for="article in articles.slice(1)"
+            :key="article.path"
+            :article="article"
+          />
         </div>
       </div>
     </template>
