@@ -14,7 +14,7 @@ By running every aspect of our hosting platform, we gain the flexibility to tail
 
 ### A Thank You to Pyro
 
-This change is purely a logistical step forward and does not reflect negatively on our partnership with [Pyro](https://pyro.host/?utm_source=blog.modrinth.com&utm_medium=referral&utm_campaign=a-new-chapter-for-modrinth-servers). In fact, Pyro has been an incredible partner in getting Modrinth Servers off the ground and we are very grateful for their collaboration. We completely support Pyro and their future, and we know they’re working on some exciting new products of their own, which we can’t wait to check out!
+This change is purely a logistical step forward and does not reflect negatively on our partnership with [Pyro](https://pyro.host). In fact, Pyro has been an incredible partner in getting Modrinth Servers off the ground and we are very grateful for their collaboration. We completely support Pyro and their future, and we know they’re working on some exciting new products of their own, which we can’t wait to check out!
 
 ### What This Means for You
 
