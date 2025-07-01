@@ -12,7 +12,7 @@
               link="/settings"
               :label="formatMessage(commonSettingsMessages.appearance)"
             >
-              <PaintBrushIcon />
+              <PaintbrushIcon />
             </NavStackItem>
             <NavStackItem
               v-if="isStaging"
@@ -82,7 +82,7 @@
 import {
   ServerIcon,
   GridIcon,
-  PaintBrushIcon,
+  PaintbrushIcon,
   UserIcon,
   ShieldIcon,
   KeyIcon,

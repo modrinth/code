@@ -8,11 +8,11 @@
         :format-label="(x) => (x === 'all' ? 'All' : formatProjectType(x) + 's')"
       />
       <button v-if="oldestFirst" class="iconified-button push-right" @click="oldestFirst = false">
-        <SortDescendingIcon />
+        <SortDescIcon />
         Sorting by oldest
       </button>
       <button v-else class="iconified-button push-right" @click="oldestFirst = true">
-        <SortAscendingIcon />
+        <SortAscIcon />
         Sorting by newest
       </button>
       <button
@@ -109,8 +109,8 @@ import { Avatar, ProjectStatusBadge, Chips, useRelativeTime } from "@modrinth/ui
 import {
   UnknownIcon,
   EyeIcon,
-  SortAscendingIcon,
-  SortDescendingIcon,
+  SortAscIcon,
+  SortDescIcon,
   IssuesIcon,
   ScaleIcon,
 } from "@modrinth/assets";

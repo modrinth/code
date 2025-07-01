@@ -364,6 +364,9 @@ importers:
       eslint-config-custom:
         specifier: workspace:*
         version: link:../eslint-config-custom
+      jiti:
+        specifier: ^2.4.2
+        version: 2.4.2
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig

@@ -50,7 +50,7 @@
           Listed in search results
         </li>
         <li v-else>
-          <ExitIcon class="bad" />
+          <XIcon class="bad" />
           Not listed in search results
         </li>
         <li v-if="isListed(project)">
@@ -58,11 +58,11 @@
           Listed on the profiles of members
         </li>
         <li v-else>
-          <ExitIcon class="bad" />
+          <XIcon class="bad" />
           Not listed on the profiles of members
         </li>
         <li v-if="isPrivate(project)">
-          <ExitIcon class="bad" />
+          <XIcon class="bad" />
           Not accessible with a direct link
         </li>
         <li v-else>
@@ -92,7 +92,7 @@
   </div>
 </template>
 <script setup>
-import { ExitIcon, CheckIcon, IssuesIcon } from "@modrinth/assets";
+import { XIcon, CheckIcon, IssuesIcon } from "@modrinth/assets";
 import { Badge } from "@modrinth/ui";
 import ConversationThread from "~/components/ui/thread/ConversationThread.vue";
 import {
