@@ -12,7 +12,7 @@ const summary: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'low',
-      message: async () => await import('../messages/summary/insufficient.md?raw'),
+      message: async () => (await import('../messages/summary/insufficient.md?raw')).default,
     } as ButtonAction,
     {
       id: 'summary_repeat_title',
@@ -21,7 +21,7 @@ const summary: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'low',
-      message: async () => await import('../messages/summary/repeat-title.md?raw'),
+      message: async () => (await import('../messages/summary/repeat-title.md?raw')).default,
     } as ButtonAction,
     {
       id: 'summary_formatting',
@@ -30,7 +30,7 @@ const summary: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'low',
-      message: async () => await import('../messages/summary/formatting.md?raw'),
+      message: async () => (await import('../messages/summary/formatting.md?raw')).default,
     } as ButtonAction,
     {
       id: 'summary_non_english',
@@ -39,7 +39,7 @@ const summary: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'medium',
-      message: async () => await import('../messages/summary/non-english.md?raw'),
+      message: async () => (await import('../messages/summary/non-english.md?raw')).default,
     } as ButtonAction,
   ],
 }

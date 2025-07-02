@@ -13,7 +13,7 @@ const links: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'low',
-      message: async () => await import('../messages/links/misused.md?raw'),
+      message: async () => (await import('../messages/links/misused.md?raw')).default,
     } as ButtonAction,
     {
       id: 'links_not_accessible_source',
@@ -22,7 +22,7 @@ const links: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'low',
-      message: async () => await import('../messages/links/not-accessible-source.md?raw'),
+      message: async () => (await import('../messages/links/not-accessible-source.md?raw')).default,
     } as ButtonAction,
     {
       id: 'links_not_accessible_other',
@@ -31,7 +31,7 @@ const links: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'low',
-      message: async () => await import('../messages/links/not-accessible-other.md?raw'),
+      message: async () => (await import('../messages/links/not-accessible-other.md?raw')).default,
       relevantExtraInput: [
         {
           label: 'Please specify the link type that is inaccessible.',

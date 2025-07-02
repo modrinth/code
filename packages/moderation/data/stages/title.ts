@@ -11,7 +11,7 @@ const titleStage: Stage = {
       weight: 100,
       suggestedStatus: 'flagged',
       severity: 'low',
-      message: async () => await import('../messages/title/useless-info.md?raw'),
+      message: async () => (await import('../messages/title/useless-info.md?raw')).default,
     },
     {
       id: 'title_minecraft_branding',
@@ -20,7 +20,7 @@ const titleStage: Stage = {
       weight: 100,
       suggestedStatus: 'flagged',
       severity: 'medium',
-      message: async () => await import('../messages/title/minecraft-branding.md?raw'),
+      message: async () => (await import('../messages/title/minecraft-branding.md?raw')).default,
     },
     {
       id: 'title_similarities',
@@ -29,7 +29,7 @@ const titleStage: Stage = {
       weight: 100,
       suggestedStatus: 'flagged',
       severity: 'medium',
-      message: async () => await import('../messages/title/similarities.md?raw'),
+      message: async () => (await import('../messages/title/similarities.md?raw')).default,
     },
   ],
 }

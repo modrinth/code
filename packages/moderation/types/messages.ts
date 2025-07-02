@@ -7,7 +7,7 @@ export interface WeightedMessage {
   /**
    * The message which is appended to the final moderation message if the button is active.
    * @returns A function that lazily loads the message which is appended if the button is active.
-   * @example async () => await import('../messages/example.md?raw'),
+   * @example async () => (await import('../messages/example.md?raw')).default,
    */
   message: () => Promise<typeof import('*.md?raw') | string>
 }

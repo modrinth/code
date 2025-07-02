@@ -1,7 +1,7 @@
 <template>
   <div
-    class="moderation-checklist flex max-w-full flex-col rounded-2xl border-[1px] border-solid border-orange bg-bg-raised p-4 transition-all delay-200 duration-200 ease-in-out"
-    :class="collapsed ? 'w-fit' : ''"
+    class="moderation-checklist flex w-[600px] max-w-full flex-col rounded-2xl border-[1px] border-solid border-orange bg-bg-raised p-4 transition-all delay-200 duration-200 ease-in-out"
+    :class="collapsed ? '!w-fit' : ''"
   >
     <div class="flex grow-0 items-center gap-2">
       <h1 class="m-0 mr-auto flex items-center gap-2 text-2xl font-extrabold text-contrast">
@@ -13,12 +13,12 @@
         </a>
       </ButtonStyled>
       <ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
-        <button v-tooltip="`Exit moderation`" @click="$emit('exit')">
+        <button v-tooltip="`Exit moderation`" @click="emit('exit')">
           <XIcon />
         </button>
       </ButtonStyled>
       <ButtonStyled circular>
-        <button v-tooltip="collapsed ? `Expand` : `Collapse`" @click="$emit('toggleCollapsed')">
+        <button v-tooltip="collapsed ? `Expand` : `Collapse`" @click="emit('toggleCollapsed')">
           <DropdownIcon class="transition-transform" :class="{ 'rotate-180': collapsed }" />
         </button>
       </ButtonStyled>
@@ -28,22 +28,113 @@
       <div class="my-4 h-[1px] w-full bg-divider" />
       <div class="flex-1">
         <h2 class="m-0 mb-2 text-lg font-extrabold">{{ currentStageObj.title }}</h2>
-        <div class="options input-group">
-          <button class="btn">Contains useless info</button>
-          <button class="btn option-selected">Minecraft title</button>
-          <button class="btn">Title similarities</button>
+
+        <!-- Action components grouped by type -->
+        <div class="space-y-4">
+          <!-- Button actions group -->
+          <div v-if="buttonActions.length > 0" class="button-actions-group">
+            <div class="flex flex-wrap gap-2">
+              <template v-for="action in buttonActions" :key="getActionKey(action)">
+                <ButtonStyled
+                  :color="isActionSelected(action) ? 'brand' : 'standard'"
+                  @click="toggleAction(action)"
+                >
+                  <button>
+                    {{ action.label }}
+                  </button>
+                </ButtonStyled>
+              </template>
+            </div>
+          </div>
+
+          <!-- Toggle actions group -->
+          <div v-if="toggleActions.length > 0" class="toggle-actions-group space-y-3">
+            <template v-for="action in toggleActions" :key="getActionKey(action)">
+              <Checkbox
+                :model-value="actionStates[getActionId(action)]?.selected ?? false"
+                :label="action.label"
+                :description="action.description"
+                :disabled="false"
+                @update:model-value="toggleAction(action)"
+              />
+            </template>
+          </div>
+
+          <!-- Dropdown actions group -->
+          <div v-if="dropdownActions.length > 0" class="dropdown-actions-group space-y-3">
+            <template v-for="action in dropdownActions" :key="getActionKey(action)">
+              <div class="inputs universal-labels">
+                <div>
+                  <label :for="`dropdown-${getActionId(action)}`">
+                    <span class="label__title">{{ action.label }}</span>
+                  </label>
+                  <DropdownSelect
+                    :name="`dropdown-${getActionId(action)}`"
+                    :options="action.options"
+                    :model-value="getDropdownValue(action)"
+                    :placeholder="'Select an option'"
+                    :disabled="false"
+                    :display-name="(opt: any) => opt?.label || 'Unknown option'"
+                    @update:model-value="(selected: any) => selectDropdownOption(action, selected)"
+                  />
+                </div>
+              </div>
+            </template>
+          </div>
+
+          <!-- Multi-select chips actions group -->
+          <div v-if="multiSelectActions.length > 0" class="multi-select-actions-group space-y-3">
+            <template v-for="action in multiSelectActions" :key="getActionKey(action)">
+              <div>
+                <div class="mb-2 font-semibold">{{ action.label }}</div>
+                <div class="flex flex-wrap gap-2">
+                  <ButtonStyled
+                    v-for="(option, optIndex) in action.options"
+                    :key="`${getActionId(action)}-chip-${optIndex}`"
+                    :color="isChipSelected(action, optIndex) ? 'brand' : 'standard'"
+                    @click="toggleChip(action, optIndex)"
+                  >
+                    <button>
+                      {{ option.label }}
+                    </button>
+                  </ButtonStyled>
+                </div>
+              </div>
+            </template>
+          </div>
         </div>
 
-        <div class="inputs universal-labels mt-4">
-          <div>
-            <label for="reason">
-              <span class="label__title">
-                Please elaborate on the issue
-                <span class="required">*</span>
-              </span>
-            </label>
-            <input id="reason" type="text" autocomplete="off" />
-          </div>
+        <div v-if="isAnyVisibleInputs" class="my-4 h-[1px] w-full bg-divider" />
+
+        <!-- Additional text inputs -->
+        <div class="space-y-4">
+          <template v-for="action in visibleActions" :key="`inputs-${getActionKey(action)}`">
+            <div
+              v-if="action.relevantExtraInput && isActionSelected(action)"
+              class="inputs universal-labels"
+            >
+              <div
+                v-for="(input, inputIndex) in getVisibleInputs(action)"
+                :key="`input-${getActionId(action)}-${inputIndex}`"
+                class="mt-2"
+              >
+                <label :for="`input-${getActionId(action)}-${inputIndex}`">
+                  <span class="label__title">
+                    {{ input.label }}
+                    <span v-if="input.required" class="required">*</span>
+                  </span>
+                </label>
+                <input
+                  :id="`input-${getActionId(action)}-${inputIndex}`"
+                  v-model="textInputValues[`${getActionId(action)}-${inputIndex}`]"
+                  type="text"
+                  :placeholder="input.placeholder"
+                  autocomplete="off"
+                  @input="persistState"
+                />
+              </div>
+            </div>
+          </template>
         </div>
       </div>
 
@@ -54,7 +145,7 @@
         >
           <div class="flex items-center gap-2">
             <ButtonStyled>
-              <button>
+              <button @click="skipStage">
                 <XIcon aria-hidden="true" />
                 Skip
               </button>
@@ -62,6 +153,12 @@
           </div>
 
           <div class="flex items-center gap-2">
+            <ButtonStyled v-if="debug" color="orange">
+              <button @click="assembleFullMessage">
+                <FileTextIcon aria-hidden="true" />
+                Test Message
+              </button>
+            </ButtonStyled>
             <OverflowMenu :options="stageOptions" class="bg-transparent p-0">
               <ButtonStyled circular>
                 <button v-tooltip="`Stages`">
@@ -71,22 +168,19 @@
 
               <template
                 v-for="opt in stageOptions.filter((opt) => 'id' in opt && 'text' in opt)"
-                #[`${opt.id}`]
+                #[opt.id]
                 :key="opt.id"
               >
                 {{ opt.text }}
               </template>
             </OverflowMenu>
             <ButtonStyled>
-              <button :disabled="!(currentStage > 0)" @click="currentStage = currentStage - 1">
+              <button :disabled="!(currentStage > 0)" @click="previousStage">
                 <LeftArrowIcon aria-hidden="true" /> Previous
               </button>
             </ButtonStyled>
             <ButtonStyled color="brand">
-              <button
-                :disabled="!(currentStage < checklist.length - 1)"
-                @click="currentStage = currentStage + 1"
-              >
+              <button :disabled="!(currentStage < checklist.length - 1)" @click="nextStage">
                 <RightArrowIcon aria-hidden="true" /> Next
               </button>
             </ButtonStyled>
@@ -108,9 +202,27 @@ import {
   FileTextIcon,
 } from "@modrinth/assets";
 import { checklist } from "@modrinth/moderation";
-import { ButtonStyled, Collapsible, OverflowMenu, OverflowMenuOption } from "@modrinth/ui";
+import {
+  ButtonStyled,
+  Collapsible,
+  OverflowMenu,
+  type OverflowMenuOption,
+  Checkbox,
+  DropdownSelect,
+} from "@modrinth/ui";
 import type { Project } from "@modrinth/utils";
 import { useLocalStorage } from "@vueuse/core";
+import type {
+  Action,
+  MultiSelectChipsAction,
+  DropdownAction,
+  AdditionalTextInput,
+  ButtonAction,
+  ToggleAction,
+  ConditionalButtonAction,
+  ConditionalMessage,
+  Stage,
+} from "@modrinth/moderation";
 
 const props = defineProps<{
   project: Project;
@@ -124,6 +236,526 @@ const emit = defineEmits<{
 
 const currentStageObj = computed(() => checklist[currentStage.value]);
 const currentStage = useLocalStorage(`moderation-stage-${props.project.slug}`, () => 0);
+
+interface ActionState {
+  selected: boolean;
+  value?: any;
+}
+
+const serializeActionStates = (states: Record<string, ActionState>): string => {
+  const serializable: Record<string, any> = {};
+  for (const [key, state] of Object.entries(states)) {
+    serializable[key] = {
+      selected: state.selected,
+      value: state.value instanceof Set ? Array.from(state.value) : state.value,
+      isSet: state.value instanceof Set,
+    };
+  }
+  return JSON.stringify(serializable);
+};
+
+const deserializeActionStates = (data: string): Record<string, ActionState> => {
+  try {
+    const parsed = JSON.parse(data);
+    const states: Record<string, ActionState> = {};
+    for (const [key, state] of Object.entries(parsed as Record<string, any>)) {
+      states[key] = {
+        selected: state.selected,
+        value: state.isSet ? new Set(state.value) : state.value,
+      };
+    }
+    return states;
+  } catch {
+    return {};
+  }
+};
+
+const persistedActionStates = useLocalStorage(
+  `moderation-actions-${props.project.slug}`,
+  {},
+  {
+    serializer: {
+      read: (v: any) => (v ? deserializeActionStates(v) : {}),
+      write: (v: any) => serializeActionStates(v),
+    },
+  },
+);
+
+const persistedTextInputs = useLocalStorage(
+  `moderation-inputs-${props.project.slug}`,
+  {} as Record<string, string>,
+);
+
+const actionStates = ref<Record<string, ActionState>>(persistedActionStates.value);
+const textInputValues = ref<Record<string, string>>(persistedTextInputs.value);
+
+const persistState = () => {
+  persistedActionStates.value = actionStates.value;
+  persistedTextInputs.value = textInputValues.value;
+};
+
+watch(actionStates, persistState, { deep: true });
+watch(textInputValues, persistState, { deep: true });
+
+interface MessagePart {
+  weight: number;
+  content: string;
+  actionId: string;
+  stageIndex: number;
+}
+
+watch(
+  currentStage,
+  () => {
+    initializeCurrentStage();
+  },
+  { immediate: true },
+);
+
+onMounted(() => {
+  initializeAllStages();
+});
+
+function initializeAllStages() {
+  checklist.forEach((stage, stageIndex) => {
+    initializeStageActions(stage, stageIndex);
+  });
+}
+
+function initializeCurrentStage() {
+  initializeStageActions(currentStageObj.value, currentStage.value);
+}
+
+function initializeStageActions(stage: Stage, stageIndex: number) {
+  stage.actions.forEach((action, index) => {
+    const actionId = getActionIdForStage(action, stageIndex, index);
+    initializeActionState(action, actionId);
+  });
+
+  stage.actions.forEach((action, actionIndex) => {
+    if (action.enablesActions) {
+      action.enablesActions.forEach((enabledAction, index) => {
+        const actionId = getActionIdForStage(enabledAction, stageIndex, actionIndex, index);
+        initializeActionState(enabledAction, actionId);
+      });
+    }
+  });
+}
+
+function initializeActionState(action: Action, actionId: string) {
+  if (!actionStates.value[actionId]) {
+    if (action.type === "toggle") {
+      actionStates.value[actionId] = {
+        selected: action.defaultChecked || false,
+      };
+    } else if (action.type === "dropdown") {
+      actionStates.value[actionId] = {
+        selected: true,
+        value: action.defaultOption || 0,
+      };
+    } else if (action.type === "multi-select-chips") {
+      actionStates.value[actionId] = {
+        selected: false,
+        value: new Set<number>(),
+      };
+    } else {
+      actionStates.value[actionId] = {
+        selected: false,
+      };
+    }
+  }
+}
+
+function getActionIdForStage(
+  action: Action,
+  stageIndex: number,
+  actionIndex?: number,
+  enabledIndex?: number,
+): string {
+  if (action.id) {
+    return `stage-${stageIndex}-${action.id}`;
+  }
+  const suffix = enabledIndex !== undefined ? `-enabled-${enabledIndex}` : "";
+  return `stage-${stageIndex}-action-${actionIndex}${suffix}`;
+}
+
+function getActionId(action: Action, index?: number): string {
+  return getActionIdForStage(action, currentStage.value, index);
+}
+
+function getActionKey(action: Action): string {
+  const index = visibleActions.value.indexOf(action);
+  return `${currentStage.value}-${index}-${getActionId(action)}`;
+}
+
+const visibleActions = computed(() => {
+  const selectedActionIds = Object.entries(actionStates.value)
+    .filter(([_, state]) => state.selected)
+    .map(([id]) => id);
+
+  const allActions: Action[] = [];
+  const actionSources = new Map<Action, { enabledBy?: Action; actionIndex?: number }>();
+
+  currentStageObj.value.actions.forEach((action, actionIndex) => {
+    allActions.push(action);
+    actionSources.set(action, { actionIndex });
+
+    if (action.enablesActions) {
+      action.enablesActions.forEach((enabledAction) => {
+        allActions.push(enabledAction);
+        actionSources.set(enabledAction, { enabledBy: action, actionIndex });
+      });
+    }
+  });
+
+  return allActions.filter((action) => {
+    const source = actionSources.get(action);
+
+    if (source?.enabledBy) {
+      const enablerId = getActionId(source.enabledBy, source.actionIndex);
+      if (!selectedActionIds.includes(enablerId)) {
+        return false;
+      }
+    }
+
+    const disabledByOthers = currentStageObj.value.actions.some((otherAction, otherIndex) => {
+      const otherId = getActionId(otherAction, otherIndex);
+      return (
+        selectedActionIds.includes(otherId) &&
+        otherAction.disablesActions?.includes(
+          action.id || `action-${currentStage.value}-${source?.actionIndex}`,
+        )
+      );
+    });
+
+    return !disabledByOthers;
+  });
+});
+
+const buttonActions = computed(() =>
+  visibleActions.value.filter(
+    (action) => action.type === "button" || action.type === "conditional-button",
+  ),
+);
+
+const toggleActions = computed(() =>
+  visibleActions.value.filter((action) => action.type === "toggle"),
+);
+
+const dropdownActions = computed(() =>
+  visibleActions.value.filter((action) => action.type === "dropdown"),
+);
+
+const multiSelectActions = computed(() =>
+  visibleActions.value.filter((action) => action.type === "multi-select-chips"),
+);
+
+function getDropdownValue(action: DropdownAction) {
+  const actionId = getActionId(action);
+  const currentValue = actionStates.value[actionId]?.value ?? action.defaultOption ?? 0;
+
+  if (action.options && action.options[currentValue]) {
+    return action.options[currentValue];
+  }
+
+  return action.options?.[0] || null;
+}
+
+function isActionSelected(action: Action): boolean {
+  const actionId = getActionId(action);
+  return actionStates.value[actionId]?.selected || false;
+}
+
+function toggleAction(action: Action) {
+  const actionId = getActionId(action);
+  const state = actionStates.value[actionId];
+  if (state) {
+    state.selected = !state.selected;
+    persistState();
+  }
+}
+
+function selectDropdownOption(action: DropdownAction, selected: any) {
+  const actionId = getActionId(action);
+  const state = actionStates.value[actionId];
+  if (state && selected !== undefined && selected !== null) {
+    const optionIndex = action.options.findIndex(
+      (opt) => opt === selected || (opt?.label && selected?.label && opt.label === selected.label),
+    );
+
+    if (optionIndex !== -1) {
+      state.value = optionIndex;
+      state.selected = true;
+      persistState();
+    }
+  }
+}
+
+function isChipSelected(action: MultiSelectChipsAction, optionIndex: number): boolean {
+  const actionId = getActionId(action);
+  const selectedSet = actionStates.value[actionId]?.value as Set<number> | undefined;
+  return selectedSet?.has(optionIndex) || false;
+}
+
+function toggleChip(action: MultiSelectChipsAction, optionIndex: number) {
+  const actionId = getActionId(action);
+  const state = actionStates.value[actionId];
+  if (state && state.value instanceof Set) {
+    if (state.value.has(optionIndex)) {
+      state.value.delete(optionIndex);
+    } else {
+      state.value.add(optionIndex);
+    }
+    state.selected = state.value.size > 0;
+    persistState();
+  }
+}
+
+const isAnyVisibleInputs = computed(() => {
+  return visibleActions.value.some((action) => {
+    const visibleInputs = getVisibleInputs(action);
+    return visibleInputs.length > 0 && isActionSelected(action);
+  });
+});
+
+function getVisibleInputs(action: Action): AdditionalTextInput[] {
+  if (!action.relevantExtraInput) return [];
+
+  const selectedActionIds = Object.entries(actionStates.value)
+    .filter(([_, state]) => state.selected)
+    .map(([id]) => id);
+
+  return action.relevantExtraInput.filter((input) => {
+    if (!input.showWhen) return true;
+
+    const meetsRequired =
+      !input.showWhen.requiredActions ||
+      input.showWhen.requiredActions.every((id) => selectedActionIds.includes(id));
+
+    const meetsExcluded =
+      !input.showWhen.excludedActions ||
+      !input.showWhen.excludedActions.some((id) => selectedActionIds.includes(id));
+
+    return meetsRequired && meetsExcluded;
+  });
+}
+
+async function assembleFullMessage() {
+  console.log("=== Assembling Full Message Across All Stages ===");
+  const messageParts: MessagePart[] = [];
+
+  for (let stageIndex = 0; stageIndex < checklist.length; stageIndex++) {
+    const stage = checklist[stageIndex];
+    console.log(`\nProcessing Stage ${stageIndex}: ${stage.title}`);
+
+    await processStageActions(stage, stageIndex, messageParts);
+  }
+
+  messageParts.sort((a, b) => a.weight - b.weight);
+
+  console.log("\n=== All Message Parts (sorted by weight) ===");
+  messageParts.forEach((part) => {
+    console.log(`Stage ${part.stageIndex}, Weight ${part.weight}: ${part.actionId}`);
+  });
+
+  const finalMessage = messageParts
+    .map((part) => part.content)
+    .filter((content) => content.trim().length > 0)
+    .join("\n\n");
+
+  console.log("\n=== Final Assembled Message ===");
+  console.log(finalMessage);
+  console.log("=== End Message Assembly ===");
+
+  return finalMessage;
+}
+
+async function processStageActions(stage: Stage, stageIndex: number, messageParts: MessagePart[]) {
+  const selectedActionIds = Object.entries(actionStates.value)
+    .filter(([_, state]) => state.selected)
+    .map(([id]) => id);
+
+  for (let actionIndex = 0; actionIndex < stage.actions.length; actionIndex++) {
+    const action = stage.actions[actionIndex];
+    const actionId = getActionIdForStage(action, stageIndex, actionIndex);
+    const state = actionStates.value[actionId];
+
+    if (!state?.selected) continue;
+
+    await processAction(action, actionId, state, selectedActionIds, stageIndex, messageParts);
+
+    if (action.enablesActions) {
+      for (let enabledIndex = 0; enabledIndex < action.enablesActions.length; enabledIndex++) {
+        const enabledAction = action.enablesActions[enabledIndex];
+        const enabledActionId = getActionIdForStage(
+          enabledAction,
+          stageIndex,
+          actionIndex,
+          enabledIndex,
+        );
+        const enabledState = actionStates.value[enabledActionId];
+
+        if (!enabledState?.selected) continue;
+
+        await processAction(
+          enabledAction,
+          enabledActionId,
+          enabledState,
+          selectedActionIds,
+          stageIndex,
+          messageParts,
+        );
+      }
+    }
+  }
+}
+
+async function processAction(
+  action: Action,
+  actionId: string,
+  state: ActionState,
+  selectedActionIds: string[],
+  stageIndex: number,
+  messageParts: MessagePart[],
+) {
+  console.log(`  Processing action: ${actionId} (${action.type})`);
+
+  if (action.type === "button" || action.type === "toggle") {
+    const buttonAction = action as ButtonAction | ToggleAction;
+    const message = await getActionMessage(buttonAction, selectedActionIds);
+    if (message) {
+      messageParts.push({
+        weight: buttonAction.weight,
+        content: await processMessage(message, action, stageIndex),
+        actionId,
+        stageIndex,
+      });
+    }
+  } else if (action.type === "conditional-button") {
+    const conditionalAction = action as ConditionalButtonAction;
+    const matchingVariant = findMatchingVariant(
+      conditionalAction.messageVariants,
+      selectedActionIds,
+    );
+    if (matchingVariant) {
+      const message = (await matchingVariant.message()) as string;
+      messageParts.push({
+        weight: matchingVariant.weight,
+        content: await processMessage(message, action, stageIndex),
+        actionId,
+        stageIndex,
+      });
+    }
+  } else if (action.type === "dropdown") {
+    const dropdownAction = action as DropdownAction;
+    const selectedIndex = state.value ?? 0;
+    const selectedOption = dropdownAction.options[selectedIndex];
+
+    if (selectedOption && "message" in selectedOption && "weight" in selectedOption) {
+      const message = (await selectedOption.message()) as string;
+      messageParts.push({
+        weight: selectedOption.weight,
+        content: await processMessage(message, action, stageIndex),
+        actionId,
+        stageIndex,
+      });
+    }
+  } else if (action.type === "multi-select-chips") {
+    const multiSelectAction = action as MultiSelectChipsAction;
+    const selectedIndices = state.value as Set<number>;
+
+    for (const index of selectedIndices) {
+      const option = multiSelectAction.options[index];
+      if (option && "message" in option && "weight" in option) {
+        const message = (await option.message()) as string;
+        messageParts.push({
+          weight: option.weight,
+          content: await processMessage(message, action, stageIndex),
+          actionId: `${actionId}-chip-${index}`,
+          stageIndex,
+        });
+      }
+    }
+  }
+}
+
+async function getActionMessage(
+  action: ButtonAction | ToggleAction,
+  selectedActionIds: string[],
+): Promise<string> {
+  if (action.conditionalMessages && action.conditionalMessages.length > 0) {
+    const matchingConditional = findMatchingVariant(action.conditionalMessages, selectedActionIds);
+    if (matchingConditional) {
+      return (await matchingConditional.message()) as string;
+    }
+  }
+
+  return (await action.message()) as string;
+}
+
+function findMatchingVariant(
+  variants: ConditionalMessage[],
+  selectedActionIds: string[],
+): ConditionalMessage | null {
+  for (const variant of variants) {
+    const conditions = variant.conditions;
+
+    const meetsRequired =
+      !conditions.requiredActions ||
+      conditions.requiredActions.every((id) => selectedActionIds.includes(id));
+
+    const meetsExcluded =
+      !conditions.excludedActions ||
+      !conditions.excludedActions.some((id) => selectedActionIds.includes(id));
+
+    if (meetsRequired && meetsExcluded) {
+      return variant;
+    }
+  }
+
+  return variants.find((v) => v.fallbackMessage) || null;
+}
+
+function processMessage(message: string, action: Action, stageIndex: number): string {
+  let processedMessage = message;
+
+  if (action.relevantExtraInput) {
+    action.relevantExtraInput.forEach((input, index) => {
+      if (input.variable) {
+        const inputKey = `stage-${stageIndex}-${action.id || `action-${index}`}-${index}`;
+        const value = textInputValues.value[inputKey] || "";
+
+        const regex = new RegExp(`%${input.variable}%`, "g");
+        processedMessage = processedMessage.replace(regex, value);
+
+        if (value) {
+          console.log(`  Replaced %${input.variable}% with "${value}"`);
+        }
+      }
+    });
+  }
+
+  return processedMessage;
+}
+
+function skipStage() {
+  if (currentStage.value < checklist.length - 1) {
+    currentStage.value++;
+  }
+}
+
+function previousStage() {
+  if (currentStage.value > 0) {
+    currentStage.value--;
+  }
+}
+
+function nextStage() {
+  if (currentStage.value < checklist.length - 1) {
+    currentStage.value++;
+  }
+}
+
 const stageOptions = computed<OverflowMenuOption[]>(() => {
   return checklist.map((_stage, index) => {
     return {
@@ -135,6 +767,24 @@ const stageOptions = computed<OverflowMenuOption[]>(() => {
     } as OverflowMenuOption;
   });
 });
+
+const debug = true;
+if (debug) {
+  watch(
+    actionStates,
+    (newStates) => {
+      console.log("Action states changed:", newStates);
+    },
+    { deep: true },
+  );
+
+  watch(visibleActions, (newActions) => {
+    console.log(
+      "Visible actions:",
+      newActions.map((a) => a.id || "no-id"),
+    );
+  });
+}
 </script>
 
 <style scoped lang="scss">
@@ -143,12 +793,22 @@ const stageOptions = computed<OverflowMenuOption[]>(() => {
     transition: none !important;
   }
 
-  .option-selected {
-    color: var(--color-contrast);
-    background-color: var(--color-brand-highlight);
-    box-shadow:
-      inset 0 0 0 transparent,
-      0 0 0 2px var(--color-brand);
+  .button-actions-group,
+  .toggle-actions-group,
+  .dropdown-actions-group,
+  .multi-select-actions-group {
+    animation: fadeIn 0.2s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
 </style>

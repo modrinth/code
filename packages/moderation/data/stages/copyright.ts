@@ -12,7 +12,7 @@ const copyright: Stage = {
       weight: 10,
       suggestedStatus: 'rejected',
       severity: 'high',
-      message: async () => await import('../messages/copyright/reupload.md?raw'),
+      message: async () => (await import('../messages/copyright/reupload.md?raw')).default,
       relevantExtraInput: [
         {
           label: 'What is the title of the original project?',

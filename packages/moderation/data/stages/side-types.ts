@@ -13,7 +13,7 @@ const sideTypes: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'low',
-      message: async () => await import('../messages/side-types/inaccurate-modpack.md?raw'),
+      message: async () => (await import('../messages/side-types/inaccurate-modpack.md?raw')).default,
     } as ButtonAction,
     {
       id: 'side_types_inaccurate_mod',
@@ -22,7 +22,7 @@ const sideTypes: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'low',
-      message: async () => await import('../messages/side-types/inaccurate-mod.md?raw'),
+      message: async () => (await import('../messages/side-types/inaccurate-mod.md?raw')).default,
     } as ButtonAction,
   ],
 }

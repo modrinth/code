@@ -95,14 +95,14 @@ You can define different messages for an action based on other selected actions:
   type: 'button',
   label: 'My Action',
   weight: 100,
-  message: async () => await import('../messages/default-message.md?raw'),
+  message: async () => (await import('../messages/default-message.md?raw')).default,
   conditionalMessages: [
     {
       conditions: {
         requiredActions: ['other_action_id'],
         excludedActions: ['another_action_id']
       },
-      message: async () => await import('../messages/conditional-message.md?raw'),
+      message: async () => (await import('../messages/conditional-message.md?raw')).default,
     }
   ]
 }

@@ -13,7 +13,7 @@ const categories: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'low',
-      message: async () => await import('../messages/categories/inaccurate.md?raw'),
+      message: async () => (await import('../messages/categories/inaccurate.md?raw')).default,
     } as ButtonAction,
   ],
 }

@@ -12,7 +12,7 @@ const slugStage: Stage = {
       weight: 100,
       suggestedStatus: 'flagged',
       severity: 'low',
-      message: async () => await import('../messages/slug/misused.md?raw'),
+      message: async () => (await import('../messages/slug/misused.md?raw')).default,
     },
   ],
 }

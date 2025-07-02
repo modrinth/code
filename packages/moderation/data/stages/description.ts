@@ -13,7 +13,7 @@ const description: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'medium',
-      message: async () => await import('../messages/description/insufficient.md?raw'),
+      message: async () => (await import('../messages/description/insufficient.md?raw')).default,
       relevantExtraInput: [
         {
           label: 'Please elaborate on how the author can improve their description.',
@@ -29,7 +29,7 @@ const description: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'medium',
-      message: async () => await import('../messages/description/insufficient-packs.md?raw'),
+      message: async () => (await import('../messages/description/insufficient-packs.md?raw')).default,
     } as ButtonAction,
     {
       id: 'description_insufficient_projects',
@@ -38,7 +38,7 @@ const description: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'medium',
-      message: async () => await import('../messages/description/insufficient-projects.md?raw'),
+      message: async () => (await import('../messages/description/insufficient-projects.md?raw')).default,
     } as ButtonAction,
     {
       id: 'description_non_english',
@@ -47,7 +47,7 @@ const description: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'medium',
-      message: async () => await import('../messages/description/non-english.md?raw'),
+      message: async () => (await import('../messages/description/non-english.md?raw')).default,
     } as ButtonAction,
     {
       id: 'description_unfinished',
@@ -56,7 +56,7 @@ const description: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'low',
-      message: async () => await import('../messages/description/unfinished.md?raw'),
+      message: async () => (await import('../messages/description/unfinished.md?raw')).default,
       relevantExtraInput: [
         {
           label: 'Please specify the reason the description appears unfinished.',
@@ -72,7 +72,7 @@ const description: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'low',
-      message: async () => await import('../messages/description/headers-as-body.md?raw'),
+      message: async () => (await import('../messages/description/headers-as-body.md?raw')).default,
     } as ButtonAction,
     {
       id: 'description_image_only',
@@ -81,7 +81,7 @@ const description: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'medium',
-      message: async () => await import('../messages/description/image-only.md?raw'),
+      message: async () => (await import('../messages/description/image-only.md?raw')).default,
     } as ButtonAction,
     {
       id: 'description_non_standard_text',
@@ -90,7 +90,7 @@ const description: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'medium',
-      message: async () => await import('../messages/description/non-standard-text.md?raw'),
+      message: async () => (await import('../messages/description/non-standard-text.md?raw')).default,
     } as ButtonAction,
   ],
 }

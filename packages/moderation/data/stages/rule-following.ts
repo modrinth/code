@@ -13,7 +13,7 @@ const ruleFollowing: Stage = {
       weight: 10,
       suggestedStatus: 'rejected',
       severity: 'critical',
-      message: async () => await import('../messages/rule-breaking.md?raw'),
+      message: async () => (await import('../messages/rule-breaking.md?raw')).default,
       relevantExtraInput: [
         {
           label: 'Please explain to the user how it infringes on our content rules.',

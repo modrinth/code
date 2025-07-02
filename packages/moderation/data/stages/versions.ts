@@ -13,7 +13,8 @@ const versions: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'medium',
-      message: async () => await import('../messages/versions/incorrect-additional-files.md?raw'),
+      message: async () =>
+        (await import('../messages/versions/incorrect-additional-files.md?raw')).default,
     } as ButtonAction,
     {
       id: 'versions_invalid_modpacks',
@@ -22,7 +23,7 @@ const versions: Stage = {
       weight: 10,
       suggestedStatus: 'rejected',
       severity: 'medium',
-      message: async () => await import('../messages/versions/invalid-modpacks.md?raw'),
+      message: async () => (await import('../messages/versions/invalid-modpacks.md?raw')).default,
     } as ButtonAction,
     {
       id: 'versions_invalid_resourcepacks',
@@ -31,7 +32,8 @@ const versions: Stage = {
       weight: 10,
       suggestedStatus: 'rejected',
       severity: 'medium',
-      message: async () => await import('../messages/versions/invalid-resourcepacks.md?raw'),
+      message: async () =>
+        (await import('../messages/versions/invalid-resourcepacks.md?raw')).default,
     } as ButtonAction,
   ],
 }

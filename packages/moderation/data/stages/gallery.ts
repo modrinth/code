@@ -13,7 +13,7 @@ const gallery: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'low',
-      message: async () => await import('../messages/gallery/insufficient.md?raw'),
+      message: async () => (await import('../messages/gallery/insufficient.md?raw')).default,
     } as ButtonAction,
     {
       id: 'gallery_not_relevant',
@@ -22,7 +22,7 @@ const gallery: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'low',
-      message: async () => await import('../messages/gallery/not-relevant.md?raw'),
+      message: async () => (await import('../messages/gallery/not-relevant.md?raw')).default,
     } as ButtonAction,
   ],
 }
