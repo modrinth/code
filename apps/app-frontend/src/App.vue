@@ -602,12 +602,13 @@ function handleAuxClick(e) {
               <FriendsList :credentials="credentials" :sign-in="() => signIn()" />
             </suspense>
           </div>
-          <div v-if="news && news.length > 0" class="pt-4 flex flex-col items-center">
+          <div v-if="news && news.length > 0" class="pt-2 flex flex-col items-center">
             <h3 class="px-4 text-lg m-0 text-left w-full">News</h3>
-            <div class="px-4 pt-2 space-y-4 flex flex-col items-center w-full">
+            <div class="px-4 pt-1 space-y-4 flex flex-col items-center w-full">
               <NewsArticleCard
                 v-for="(item, index) in news"
                 :key="`news-${index}`"
+                compact
                 :article="item"
               />
             </div>
