@@ -183,6 +183,7 @@ fn main() {
                 let _ = win.set_focus();
             }
         }))
+        .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_deep_link::init())

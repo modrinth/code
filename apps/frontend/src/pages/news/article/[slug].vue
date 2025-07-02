@@ -27,7 +27,7 @@ const article = computed(() => ({
   path: `/news/${rawArticle.slug}`,
   thumbnail: rawArticle.thumbnail
     ? `/news/article/${rawArticle.slug}/thumbnail.webp`
-    : `/news/default.jpg`,
+    : `/news/default.webp`,
   title: rawArticle.title,
   summary: rawArticle.summary,
   date: rawArticle.date,

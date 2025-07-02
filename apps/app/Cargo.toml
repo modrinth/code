@@ -43,6 +43,7 @@ paste.workspace = true
 enumset = { workspace = true, features = ["serde"] }
 
 native-dialog.workspace = true
+tauri-plugin-http = "2.5.0"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 tauri-plugin-updater = { workspace = true, optional = true }
