@@ -142,8 +142,8 @@ relevantExtraInput: [
     variable: 'INFO',
     showWhen: {
       requiredActions: ['specific_action_id'],
-      excludedActions: ['incompatible_action_id']
-    }
-  }
+      excludedActions: ['incompatible_action_id'],
+    },
+  },
 ]
 ```
