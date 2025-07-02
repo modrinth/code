@@ -878,7 +878,14 @@
         />
       </div>
       <div class="normal-page__ultimate-sidebar">
-        <ModerationChecklist
+        <NewModerationChecklist
+          v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
+          :project="project"
+          :collapsed="collapsedModerationChecklist"
+          @exit="showModerationChecklist = false"
+          @toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
+        />
+        <!-- <ModerationChecklist
           v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
           :project="project"
           :future-projects="futureProjects"
@@ -886,7 +893,7 @@
           :collapsed="collapsedModerationChecklist"
           @exit="showModerationChecklist = false"
           @toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
-        />
+        /> -->
       </div>
     </div>
   </div>
@@ -950,16 +957,15 @@ import {
   isUnderReview,
   renderString,
 } from "@modrinth/utils";
-import { navigateTo } from "#app";
 import dayjs from "dayjs";
 import { Tooltip } from "floating-vue";
+import { navigateTo } from "#app";
 import Accordion from "~/components/ui/Accordion.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import AutomaticAccordion from "~/components/ui/AutomaticAccordion.vue";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import MessageBanner from "~/components/ui/MessageBanner.vue";
-import ModerationChecklist from "~/components/ui/ModerationChecklist.vue";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
 import NavTabs from "~/components/ui/NavTabs.vue";
@@ -967,6 +973,7 @@ import ProjectMemberHeader from "~/components/ui/ProjectMemberHeader.vue";
 import { userCollectProject } from "~/composables/user.js";
 import { reportProject } from "~/utils/report-helpers.ts";
 import { saveFeatureFlags } from "~/composables/featureFlags.ts";
+import NewModerationChecklist from "~/components/ui/moderation/NewModerationChecklist.vue";
 
 const data = useNuxtApp();
 const route = useNativeRoute();

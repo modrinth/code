@@ -212,6 +212,9 @@ importers:
       '@modrinth/blog':
         specifier: workspace:*
         version: link:../../packages/blog
+      '@modrinth/moderation':
+        specifier: workspace:*
+        version: link:../../packages/moderation
       '@modrinth/ui':
         specifier: workspace:*
         version: link:../../packages/ui
