@@ -437,6 +437,21 @@ importers:
         specifier: ^5.5.3
         version: 5.5.4
 
+  packages/moderation:
+    devDependencies:
+      eslint:
+        specifier: ^8.57.0
+        version: 8.57.0
+      eslint-config-custom:
+        specifier: workspace:*
+        version: link:../eslint-config-custom
+      jiti:
+        specifier: ^2.4.2
+        version: 2.4.2
+      tsconfig:
+        specifier: workspace:*
+        version: link:../tsconfig
+
   packages/tsconfig:
     devDependencies:
       '@vue/tsconfig':
