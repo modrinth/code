@@ -62,9 +62,9 @@ useSeoMeta({
         v-if="featuredArticle"
         class="full-width-bg brand-gradient-bg mt-6 border-0 border-y-[1px] border-solid py-4"
       >
-        <div
+        <nuxt-link
+          :to="`${featuredArticle.path}`"
           class="active:scale-[0.99]! group flex cursor-pointer transition-all ease-in-out hover:brightness-125"
-          @click="handleArticleView(featuredArticle)"
         >
           <article class="featured-article px-6">
             <div class="featured-image-container">
@@ -84,7 +84,7 @@ useSeoMeta({
               </div>
             </div>
           </article>
-        </div>
+        </nuxt-link>
       </div>
 
       <div class="mt-6 px-6">

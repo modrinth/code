@@ -7,6 +7,8 @@
 </template>
 
 <script lang="ts" setup>
+const config = useRuntimeConfig();
+
 useSeoMeta({
   title: "Modrinth Changelog",
   ogTitle: "Modrinth Changelog",
