@@ -8,10 +8,12 @@
     "lint": "eslint . && prettier --check .",
     "fix": "eslint . --fix && prettier --write ."
   },
+  "dependencies": {
+    "@modrinth/utils": "workspace:*"
+  },
   "devDependencies": {
     "eslint": "^8.57.0",
     "eslint-config-custom": "workspace:*",
-    "jiti": "^2.4.2",
     "tsconfig": "workspace:*"
   }
 }

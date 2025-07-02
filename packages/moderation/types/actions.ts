@@ -36,7 +36,7 @@ export interface BaseAction {
   /**
    * Suggested severity level for this moderation action.
    */
-  suggestedSeverity?: ModerationSeverity
+  severity?: ModerationSeverity
 
   /**
    * Actions that become available when this action is selected.
@@ -202,6 +202,13 @@ export interface AdditionalTextInput {
    * Whether the text input is required to be filled out before the action can be completed.
    */
   required?: boolean
+
+  /**
+   * The variable name that will be replaced in the message with the input value.
+   * For example, if variable is "MESSAGE", then "%MESSAGE%" in the action message
+   * will be replaced with the input value.
+   */
+  variable?: string
 
   /**
    * Conditions that determine when this input is shown.
