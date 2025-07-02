@@ -1,5 +1,6 @@
 use std::collections::HashMap;
-use std::sync::Arc;
+use std::sync::{Arc, LazyLock};
+use dashmap::DashMap;
 
 use crate::auth::checks::{filter_visible_versions, is_visible_project};
 use crate::auth::{filter_visible_projects, get_user_from_headers};
@@ -39,6 +40,12 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sqlx::PgPool;
 use validator::Validate;
+
+/// In-memory store for actual project types assigned during creation.
+pub static PROJECT_ACTUAL_TYPES: LazyLock<DashMap<ProjectId, String>> =
+    LazyLock::new(|| DashMap::new());
+/// Redis namespace for persistent project type storage
+pub const PROJECT_ACTUAL_TYPE_NAMESPACE: &str = "project_actual_type";
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.route("search", web::get().to(project_search));
@@ -116,12 +123,33 @@ pub async fn random_projects_get(
     .try_collect::<Vec<_>>()
     .await?;
 
-    let projects_data =
+    let mut projects_data =
         db_models::DBProject::get_many_ids(&project_ids, &**pool, &redis)
             .await?
             .into_iter()
             .map(Project::from)
             .collect::<Vec<_>>();
+
+    for project in &mut projects_data {
+        let mut project_type = PROJECT_ACTUAL_TYPES
+            .get(&project.id)
+            .map(|v| v.clone());
+        if project_type.is_none() {
+            let mut conn = redis.connect().await?;
+            project_type = conn
+                .get_deserialized_from_json(
+                    PROJECT_ACTUAL_TYPE_NAMESPACE,
+                    &project.id.to_string(),
+                )
+                .await?;
+            if let Some(pt) = &project_type {
+                PROJECT_ACTUAL_TYPES.insert(project.id, pt.clone());
+            }
+        }
+        if let Some(pt) = project_type {
+            project.project_types = vec![pt];
+        }
+    }
 
     Ok(HttpResponse::Ok().json(projects_data))
 }
@@ -153,9 +181,30 @@ pub async fn projects_get(
     .map(|x| x.1)
     .ok();
 
-    let projects =
+    let mut projects =
         filter_visible_projects(projects_data, &user_option, &pool, false)
             .await?;
+
+    for project in &mut projects {
+        let mut project_type = PROJECT_ACTUAL_TYPES
+            .get(&project.id)
+            .map(|v| v.clone());
+        if project_type.is_none() {
+            let mut conn = redis.connect().await?;
+            project_type = conn
+                .get_deserialized_from_json(
+                    PROJECT_ACTUAL_TYPE_NAMESPACE,
+                    &project.id.to_string(),
+                )
+                .await?;
+            if let Some(pt) = &project_type {
+                PROJECT_ACTUAL_TYPES.insert(project.id, pt.clone());
+            }
+        }
+        if let Some(pt) = project_type {
+            project.project_types = vec![pt];
+        }
+    }
 
     Ok(HttpResponse::Ok().json(projects))
 }
@@ -184,7 +233,26 @@ pub async fn project_get(
 
     if let Some(data) = project_data {
         if is_visible_project(&data.inner, &user_option, &pool, false).await? {
-            return Ok(HttpResponse::Ok().json(Project::from(data)));
+            let mut project = Project::from(data);
+            let mut project_type = PROJECT_ACTUAL_TYPES
+                .get(&project.id)
+                .map(|v| v.clone());
+            if project_type.is_none() {
+                let mut conn = redis.connect().await?;
+                project_type = conn
+                    .get_deserialized_from_json(
+                        PROJECT_ACTUAL_TYPE_NAMESPACE,
+                        &project.id.to_string(),
+                    )
+                    .await?;
+                if let Some(pt) = &project_type {
+                    PROJECT_ACTUAL_TYPES.insert(project.id, pt.clone());
+                }
+            }
+            if let Some(pt) = project_type {
+                project.project_types = vec![pt];
+            }
+            return Ok(HttpResponse::Ok().json(project));
         }
     }
     Err(ApiError::NotFound)

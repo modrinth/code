@@ -192,6 +192,7 @@ pub async fn project_create(
                         version_body: v.version_body,
                         dependencies: v.dependencies,
                         release_channel: v.release_channel,
+                        project_type: Some(project_type.clone()),
                         loaders,
                         featured: v.featured,
                         primary_file: v.primary_file,
@@ -229,6 +230,7 @@ pub async fn project_create(
                 summary: legacy_create.description, // Description becomes summary
                 description: legacy_create.body,    // Body becomes description
                 initial_versions,
+                project_type: Some(project_type.clone()),
                 categories: legacy_create.categories,
                 additional_categories: legacy_create.additional_categories,
                 license_url: legacy_create.license_url,
