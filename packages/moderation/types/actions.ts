@@ -1,7 +1,21 @@
 import type { WeightedMessage } from './messages'
 
-export type ActionType = 'button' | 'dropdown' | 'multi-select-chips'
-export type Action = ButtonAction | DropdownAction | MultiSelectChipsAction
+export type ActionType =
+  | 'button'
+  | 'dropdown'
+  | 'multi-select-chips'
+  | 'toggle'
+  | 'conditional-button'
+
+export type Action =
+  | ButtonAction
+  | DropdownAction
+  | MultiSelectChipsAction
+  | ToggleAction
+  | ConditionalButtonAction
+
+export type ModerationStatus = 'approved' | 'rejected' | 'flagged'
+export type ModerationSeverity = 'low' | 'medium' | 'high' | 'critical'
 
 export interface BaseAction {
   /**
@@ -13,6 +27,56 @@ export interface BaseAction {
    * Any additional text data that is required to complete the action.
    */
   relevantExtraInput?: AdditionalTextInput[]
+
+  /**
+   * Suggested moderation status when this action is selected.
+   */
+  suggestedStatus?: ModerationStatus
+
+  /**
+   * Suggested severity level for this moderation action.
+   */
+  suggestedSeverity?: ModerationSeverity
+
+  /**
+   * Actions that become available when this action is selected.
+   */
+  enablesActions?: Action[]
+
+  /**
+   * Actions that become unavailable when this action is selected.
+   */
+  disablesActions?: string[] // Array of action IDs
+
+  /**
+   * Unique identifier for this action, used for conditional logic.
+   */
+  id?: string
+}
+
+/**
+ * Represents a conditional message that changes based on other selected actions.
+ */
+export interface ConditionalMessage extends WeightedMessage {
+  /**
+   * Conditions that must be met for this message to be used.
+   */
+  conditions: {
+    /**
+     * Action IDs that must be selected for this message to apply.
+     */
+    requiredActions?: string[]
+
+    /**
+     * Action IDs that must NOT be selected for this message to apply.
+     */
+    excludedActions?: string[]
+  }
+
+  /**
+   * Fallback message if conditions are not met.
+   */
+  fallbackMessage?: () => Promise<typeof import('*.md?raw') | string>
 }
 
 /**
@@ -25,6 +89,55 @@ export interface ButtonAction extends BaseAction, WeightedMessage {
    * The label of the button, which is displayed to the moderator. The text on the button.
    */
   label: string
+
+  /**
+   * Alternative messages based on other selected actions.
+   */
+  conditionalMessages?: ConditionalMessage[]
+}
+
+/**
+ * Represents a simple toggle/checkbox action with separate layout handling.
+ */
+export interface ToggleAction extends BaseAction, WeightedMessage {
+  type: 'toggle'
+
+  /**
+   * The label of the toggle, which is displayed to the moderator.
+   */
+  label: string
+
+  /**
+   * Description text that appears below the toggle.
+   */
+  description?: string
+
+  /**
+   * Whether the toggle is checked by default.
+   */
+  defaultChecked?: boolean
+
+  /**
+   * Alternative messages based on other selected actions.
+   */
+  conditionalMessages?: ConditionalMessage[]
+}
+
+/**
+ * Represents a button that has different behavior based on other selected actions.
+ */
+export interface ConditionalButtonAction extends BaseAction {
+  type: 'conditional-button'
+
+  /**
+   * The label of the button, which is displayed to the moderator.
+   */
+  label: string
+
+  /**
+   * Different message configurations based on conditions.
+   */
+  messageVariants: ConditionalMessage[]
 }
 
 export interface DropdownActionOption extends WeightedMessage {
@@ -89,4 +202,19 @@ export interface AdditionalTextInput {
    * Whether the text input is required to be filled out before the action can be completed.
    */
   required?: boolean
+
+  /**
+   * Conditions that determine when this input is shown.
+   */
+  showWhen?: {
+    /**
+     * Action IDs that must be selected for this input to be shown.
+     */
+    requiredActions?: string[]
+
+    /**
+     * Action IDs that must NOT be selected for this input to be shown.
+     */
+    excludedActions?: string[]
+  }
 }
