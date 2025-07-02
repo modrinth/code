@@ -485,6 +485,7 @@ async fn version_create_inner(
 
     let project_id = builder.project_id;
     builder.insert(transaction).await?;
+  
     let actual_type = version_data
         .project_type
         .clone()

@@ -40,6 +40,7 @@ use validator::Validate;
 /// Temporary store for version project types provided during creation.
 pub static VERSION_PROJECT_TYPES: LazyLock<DashMap<VersionId, String>> =
     LazyLock::new(|| DashMap::new());
+
 /// Redis namespace for storing version project types
 pub const VERSION_PROJECT_TYPE_NAMESPACE: &str = "version_project_type";
 
@@ -941,8 +942,8 @@ pub async fn version_list(
                     VERSION_PROJECT_TYPES.insert(version.id, pt.clone());
                 }
             }
-            if let Some(pt) = project_type {
-                version.project_types = vec![pt];
+            if let Some(pt) = VERSION_PROJECT_TYPES.get(&version.id) {
+                version.project_types = vec![pt.clone()];
             }
         }
 
