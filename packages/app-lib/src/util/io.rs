@@ -2,7 +2,6 @@
 // A wrapper around the tokio IO functions that adds the path to the error message, instead of the uninformative std::io::Error.
 
 use std::{io::Write, path::Path};
-
 use tempfile::NamedTempFile;
 use tokio::task::spawn_blocking;
 
@@ -298,4 +297,45 @@ pub async fn metadata(
             source: e,
             path: path.to_string_lossy().to_string(),
         })
+}
+
+/// Gets a resource file from the executable. Returns `theseus::Result<(TempDir, PathBuf)>`.
+#[macro_export]
+macro_rules! get_resource_file {
+    (directory: $relative_dir:expr, file: $file_name:expr) => {
+        'get_resource_file: {
+            let dir = match tempfile::tempdir() {
+                Ok(dir) => dir,
+                Err(e) => {
+                    break 'get_resource_file $crate::Result::Err(
+                        $crate::util::io::IOError::from(e).into(),
+                    );
+                }
+            };
+            let path = dir.path().join($file_name);
+            if let Err(e) = $crate::util::io::write(
+                &path,
+                include_bytes!(concat!($relative_dir, "/", $file_name)),
+            )
+            .await
+            {
+                break 'get_resource_file $crate::Result::Err(e.into());
+            }
+            let path = match $crate::util::io::canonicalize(path) {
+                Ok(path) => path,
+                Err(e) => {
+                    break 'get_resource_file $crate::Result::Err(e.into());
+                }
+            };
+            $crate::Result::Ok((dir, path))
+        }
+    };
+
+    ($relative_dir:literal / $file_name:literal) => {
+        get_resource_file!(directory: $relative_dir, file: $file_name)
+    };
+
+    (env $dir_env_name:literal / $file_name:literal) => {
+        get_resource_file!(directory: env!($dir_env_name), file: $file_name)
+    };
 }

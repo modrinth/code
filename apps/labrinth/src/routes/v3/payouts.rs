@@ -5,11 +5,11 @@ use crate::database::redis::RedisPool;
 use crate::models::ids::PayoutId;
 use crate::models::pats::Scopes;
 use crate::models::payouts::{PayoutMethodType, PayoutStatus};
-use crate::queue::payouts::{PayoutsQueue, make_aditude_request};
+use crate::queue::payouts::PayoutsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
-use chrono::{DateTime, Datelike, Duration, TimeZone, Utc, Weekday};
+use chrono::{DateTime, Duration, Utc};
 use hex::ToHex;
 use hmac::{Hmac, Mac};
 use reqwest::Method;
@@ -850,9 +850,16 @@ async fn get_user_balance(
     })
 }
 
+#[derive(Deserialize)]
+pub struct RevenueQuery {
+    pub start: Option<DateTime<Utc>>,
+    pub end: Option<DateTime<Utc>>,
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct RevenueResponse {
     pub all_time: Decimal,
+    pub all_time_available: Decimal,
     pub data: Vec<RevenueData>,
 }
 
@@ -865,21 +872,9 @@ pub struct RevenueData {
 
 #[get("platform_revenue")]
 pub async fn platform_revenue(
+    query: web::Query<RevenueQuery>,
     pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let mut redis = redis.connect().await?;
-
-    const PLATFORM_REVENUE_NAMESPACE: &str = "platform_revenue";
-
-    let res: Option<RevenueResponse> = redis
-        .get_deserialized_from_json(PLATFORM_REVENUE_NAMESPACE, "0")
-        .await?;
-
-    if let Some(res) = res {
-        return Ok(HttpResponse::Ok().json(res));
-    }
-
     let all_time_payouts = sqlx::query!(
         "
         SELECT SUM(amount) from payouts_values
@@ -890,111 +885,47 @@ pub async fn platform_revenue(
     .and_then(|x| x.sum)
     .unwrap_or(Decimal::ZERO);
 
-    let points = make_aditude_request(
-        &["METRIC_REVENUE", "METRIC_IMPRESSIONS"],
-        "30d",
-        "1d",
+    let all_available = sqlx::query!(
+        "
+        SELECT SUM(amount) from payouts_values WHERE date_available <= NOW()
+        ",
     )
-    .await?;
+    .fetch_optional(&**pool)
+    .await?
+    .and_then(|x| x.sum)
+    .unwrap_or(Decimal::ZERO);
 
-    let mut points_map = HashMap::new();
+    let utc = Utc::now();
+    let start = query.start.unwrap_or(utc - Duration::days(30));
+    let end = query.end.unwrap_or(utc);
 
-    for point in points {
-        for point in point.points_list {
-            let entry =
-                points_map.entry(point.time.seconds).or_insert((None, None));
-
-            if let Some(revenue) = point.metric.revenue {
-                entry.0 = Some(revenue);
-            }
-
-            if let Some(impressions) = point.metric.impressions {
-                entry.1 = Some(impressions);
-            }
-        }
-    }
-
-    let mut revenue_data = Vec::new();
-    let now = Utc::now();
-
-    for i in 1..=30 {
-        let time = now - Duration::days(i);
-        let start = time
-            .date_naive()
-            .and_hms_opt(0, 0, 0)
-            .unwrap()
-            .and_utc()
-            .timestamp();
-
-        if let Some((revenue, impressions)) = points_map.remove(&(start as u64))
-        {
-            // Before 9/5/24, when legacy payouts were in effect.
-            if start >= 1725494400 {
-                let revenue = revenue.unwrap_or(Decimal::ZERO);
-                let impressions = impressions.unwrap_or(0);
-
-                // Modrinth's share of ad revenue
-                let modrinth_cut = Decimal::from(1) / Decimal::from(4);
-                // Clean.io fee (ad antimalware). Per 1000 impressions.
-                let clean_io_fee = Decimal::from(8) / Decimal::from(1000);
-
-                let net_revenue = revenue
-                    - (clean_io_fee * Decimal::from(impressions)
-                        / Decimal::from(1000));
-
-                let payout = net_revenue * (Decimal::from(1) - modrinth_cut);
-
-                revenue_data.push(RevenueData {
-                    time: start as u64,
-                    revenue: net_revenue,
-                    creator_revenue: payout,
-                });
-
-                continue;
-            }
-        }
-
-        revenue_data.push(get_legacy_data_point(start as u64));
-    }
+    let revenue_data = sqlx::query!(
+        "
+        SELECT created, SUM(amount) sum
+        FROM payouts_values
+        WHERE created BETWEEN $1 AND $2
+        GROUP BY created
+        ORDER BY created DESC
+        ",
+        start,
+        end
+    )
+    .fetch_all(&**pool)
+    .await?
+    .into_iter()
+    .map(|x| RevenueData {
+        time: x.created.timestamp() as u64,
+        revenue: x.sum.unwrap_or(Decimal::ZERO) * Decimal::from(25)
+            / Decimal::from(75),
+        creator_revenue: x.sum.unwrap_or(Decimal::ZERO),
+    })
+    .collect();
 
     let res = RevenueResponse {
         all_time: all_time_payouts,
+        all_time_available: all_available,
         data: revenue_data,
     };
 
-    redis
-        .set_serialized_to_json(
-            PLATFORM_REVENUE_NAMESPACE,
-            0,
-            &res,
-            Some(60 * 60),
-        )
-        .await?;
-
     Ok(HttpResponse::Ok().json(res))
-}
-
-fn get_legacy_data_point(timestamp: u64) -> RevenueData {
-    let start = Utc.timestamp_opt(timestamp as i64, 0).unwrap();
-
-    let old_payouts_budget = Decimal::from(10_000);
-
-    let days = Decimal::from(28);
-    let weekdays = Decimal::from(20);
-    let weekend_bonus = Decimal::from(5) / Decimal::from(4);
-
-    let weekday_amount =
-        old_payouts_budget / (weekdays + (weekend_bonus) * (days - weekdays));
-    let weekend_amount = weekday_amount * weekend_bonus;
-
-    let payout = match start.weekday() {
-        Weekday::Sat | Weekday::Sun => weekend_amount,
-        _ => weekday_amount,
-    };
-
-    RevenueData {
-        time: timestamp,
-        revenue: payout,
-        creator_revenue: payout * (Decimal::from(9) / Decimal::from(10)),
-    }
 }

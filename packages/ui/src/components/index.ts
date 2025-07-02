@@ -58,6 +58,8 @@ export { default as CompactChart } from './chart/CompactChart.vue'
 
 // Content
 export { default as ContentListPanel } from './content/ContentListPanel.vue'
+export { default as NewsArticleCard } from './content/NewsArticleCard.vue'
+export type { Article as NewsArticle } from './content/NewsArticleCard.vue'
 
 // Modals
 export { default as NewModal } from './modal/NewModal.vue'
@@ -116,5 +118,6 @@ export { default as VersionSummary } from './version/VersionSummary.vue'
 export { default as ThemeSelector } from './settings/ThemeSelector.vue'
 
 // Servers
+export { default as ServersPromo } from './servers/ServersPromo.vue'
 export { default as BackupWarning } from './servers/backups/BackupWarning.vue'
 export { default as ServersSpecs } from './billing/ServersSpecs.vue'

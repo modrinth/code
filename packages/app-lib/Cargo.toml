@@ -23,6 +23,7 @@ quick-xml = { workspace = true, features = ["async-tokio"] }
 enumset.workspace = true
 chardetng.workspace = true
 encoding_rs.workspace = true
+hashlink.workspace = true
 png.workspace = true
 bytemuck.workspace = true
 rgb.workspace = true
@@ -79,6 +80,9 @@ ariadne.workspace = true
 
 [target.'cfg(windows)'.dependencies]
 winreg.workspace = true
+
+[build-dependencies]
+dunce.workspace = true
 
 [features]
 tauri = ["dep:tauri"]

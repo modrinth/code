@@ -207,7 +207,7 @@ Keep in mind that you should:\n
 - Set a featured image that best represents your pack.
 - Ensure all your images have titles that accurately label the image, and optionally, details on the contents of the image in the images Description.
 - Upload any relevant images in your Description to your Gallery tab for best results.".to_string(),
-            ModerationMessage::MissingLicense => "You must select a License before your project can be published publicly, having a License associated with your project is important to protecting your rights and allowing others to use your content as you intend. For more information, you can see our [Guide to Licensing Mods](<https://blog.modrinth.com/licensing-guide/>).".to_string(),
+            ModerationMessage::MissingLicense => "You must select a License before your project can be published publicly, having a License associated with your project is important to protecting your rights and allowing others to use your content as you intend. For more information, you can see our [Guide to Licensing Mods](<https://modrinth.com/news/article/licensing-guide/>).".to_string(),
             ModerationMessage::MissingCustomLicenseUrl { license } => format!("It looks like you've selected the License \"{license}\" without providing a valid License link. When using a custom License you must provide a link directly to the License in the License Link field."),
             ModerationMessage::NoSideTypes => "Your project's side types are currently set to Unknown on both sides. Please set accurate side types!".to_string(),
         }

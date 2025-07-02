@@ -500,6 +500,7 @@
 
     <section
       id="plan"
+      pyro-hash="plan"
       class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
     >
       <div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
@@ -603,7 +604,9 @@
                 <RightArrowIcon class="shrink-0" />
               </button>
             </ButtonStyled>
-            <p class="m-0 text-sm">Starting at $3/GB RAM</p>
+            <p v-if="lowestPrice" class="m-0 text-sm">
+              Starting at {{ formatPrice(locale, lowestPrice, selectedCurrency, true) }} / month
+            </p>
           </div>
         </div>
       </div>
@@ -622,20 +625,34 @@ import {
   VersionIcon,
   ServerIcon,
 } from "@modrinth/assets";
+import { computed } from "vue";
+import { monthsInInterval } from "@modrinth/ui/src/utils/billing.ts";
+import { formatPrice } from "@modrinth/utils";
+import { useVIntl } from "@vintl/vintl";
 import { products } from "~/generated/state.json";
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
 import ServerPlanSelector from "~/components/ui/servers/marketing/ServerPlanSelector.vue";
 import OptionGroup from "~/components/ui/OptionGroup.vue";
 
+const { locale } = useVIntl();
+
 const billingPeriods = ref(["monthly", "quarterly"]);
 const billingPeriod = ref(billingPeriods.value.includes("quarterly") ? "quarterly" : "monthly");
 
-const pyroProducts = products.filter((p) => p.metadata.type === "pyro");
+const pyroProducts = products
+  .filter((p) => p.metadata.type === "pyro")
+  .sort((a, b) => a.metadata.ram - b.metadata.ram);
 const pyroPlanProducts = pyroProducts.filter(
   (p) => p.metadata.ram === 4096 || p.metadata.ram === 6144 || p.metadata.ram === 8192,
 );
-pyroPlanProducts.sort((a, b) => a.metadata.ram - b.metadata.ram);
+
+const lowestPrice = computed(() => {
+  const amount = pyroProducts[0]?.prices?.find(
+    (price) => price.currency_code === selectedCurrency.value,
+  )?.prices?.intervals?.[billingPeriod.value];
+  return amount ? amount / monthsInInterval[billingPeriod.value] : undefined;
+});
 
 const title = "Modrinth Servers";
 const description =
@@ -799,6 +816,8 @@ async function fetchPaymentData() {
   }
 }
 
+const selectedProjectId = ref();
+
 const route = useRoute();
 const isAtCapacity = computed(
   () => isSmallAtCapacity.value && isMediumAtCapacity.value && isLargeAtCapacity.value,
@@ -817,7 +836,12 @@ const scrollToFaq = () => {
   }
 };
 
-onMounted(scrollToFaq);
+onMounted(() => {
+  scrollToFaq();
+  if (route.query?.project) {
+    selectedProjectId.value = route.query?.project;
+  }
+});
 
 watch(() => route.hash, scrollToFaq);
 
@@ -876,9 +900,9 @@ const selectProduct = async (product) => {
   await nextTick();
 
   if (product === "custom") {
-    purchaseModal.value?.show(billingPeriod.value);
+    purchaseModal.value?.show(billingPeriod.value, undefined, selectedProjectId.value);
   } else {
-    purchaseModal.value?.show(billingPeriod.value, selectedProduct.value);
+    purchaseModal.value?.show(billingPeriod.value, selectedProduct.value, selectedProjectId.value);
   }
 };
 

@@ -1,6 +1,13 @@
 import type Stripe from 'stripe'
+import type { Loaders } from '@modrinth/utils'
 
 export type ServerBillingInterval = 'monthly' | 'yearly' | 'quarterly'
+
+export const monthsInInterval: Record<ServerBillingInterval, number> = {
+  monthly: 1,
+  quarterly: 3,
+  yearly: 12,
+}
 
 export interface ServerPlan {
   id: string
@@ -72,11 +79,18 @@ export type CreatePaymentIntentRequest = PaymentRequestType & {
     type: 'pyro'
     server_name?: string
     server_region?: string
-    source: {
-      loader?: string
-      game_version?: string
-      loader_version?: string
-    }
+    source:
+      | {
+          loader: Loaders
+          game_version?: string
+          loader_version?: string
+        }
+      | {
+          project_id: string
+          version_id?: string
+        }
+      // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+      | {}
   }
 }
 

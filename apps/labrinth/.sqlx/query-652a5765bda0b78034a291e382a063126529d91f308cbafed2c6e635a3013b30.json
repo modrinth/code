@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT created, SUM(amount) sum\n        FROM payouts_values\n        WHERE created BETWEEN $1 AND $2\n        GROUP BY created\n        ORDER BY created DESC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 1,
+        "name": "sum",
+        "type_info": "Numeric"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Timestamptz",
+        "Timestamptz"
+      ]
+    },
+    "nullable": [
+      false,
+      null
+    ]
+  },
+  "hash": "652a5765bda0b78034a291e382a063126529d91f308cbafed2c6e635a3013b30"
+}

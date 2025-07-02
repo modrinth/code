@@ -457,20 +457,16 @@ pub async fn edit_subscription(
                     )
                 })?;
 
-            // Plan downgrade, update future charge
-            if current_amount > amount {
+            // First branch: Plan downgrade, update future charge
+            // Second branch: For small transactions (under 30 cents), we make a loss on the
+            // proration due to fees. In these situations, just give it to them for free, because
+            // their next charge will be in a day or two anyway.
+            if current_amount > amount || proration < 30 {
                 open_charge.price_id = product_price.id;
                 open_charge.amount = amount as i64;
 
                 None
             } else {
-                // For small transactions (under 30 cents), we make a loss on the proration due to fees
-                if proration < 30 {
-                    return Err(ApiError::InvalidInput(
-                        "Proration is too small!".to_string(),
-                    ));
-                }
-
                 let charge_id = generate_charge_id(&mut transaction).await?;
 
                 let customer_id = get_or_create_customer(

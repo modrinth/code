@@ -98,7 +98,10 @@
               {{ formatCompactNumber(projects?.length || 0) }}
               projects
             </div>
-            <div class="flex items-center gap-2 font-semibold">
+            <div
+              v-tooltip="sumDownloads.toLocaleString()"
+              class="flex items-center gap-2 font-semibold"
+            >
               <DownloadIcon class="h-6 w-6 text-secondary" />
               {{ formatCompactNumber(sumDownloads) }}
               downloads
@@ -146,9 +149,7 @@
         </ContentPageHeader>
       </div>
       <div class="normal-page__sidebar">
-        <AdPlaceholder
-          v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
-        />
+        <AdPlaceholder v-if="!auth.user" />
 
         <div class="card flex-card">
           <h2>Members</h2>
@@ -284,14 +285,13 @@ import NavTabs from "~/components/ui/NavTabs.vue";
 const vintl = useVIntl();
 const { formatMessage } = vintl;
 
-const formatCompactNumber = useCompactNumber();
+const formatCompactNumber = useCompactNumber(true);
 
 const auth = await useAuth();
 const user = await useUser();
 const cosmetics = useCosmetics();
 const route = useNativeRoute();
 const tags = useTags();
-const flags = useFeatureFlags();
 const config = useRuntimeConfig();
 
 let orgId = useRouteId();

@@ -51,7 +51,8 @@ pub fn config(cfg: &mut ServiceConfig) {
             .service(resend_verify_email)
             .service(set_email)
             .service(verify_email)
-            .service(subscribe_newsletter),
+            .service(subscribe_newsletter)
+            .service(get_newsletter_subscription_status),
     );
 }
 
@@ -1321,6 +1322,37 @@ pub async fn sign_up_sendy(email: &str) -> Result<(), AuthenticationError> {
     Ok(())
 }
 
+pub async fn check_sendy_subscription(
+    email: &str,
+) -> Result<bool, AuthenticationError> {
+    let url = dotenvy::var("SENDY_URL")?;
+    let id = dotenvy::var("SENDY_LIST_ID")?;
+    let api_key = dotenvy::var("SENDY_API_KEY")?;
+
+    if url.is_empty() || url == "none" {
+        tracing::info!(
+            "Sendy URL not set, returning false for subscription check"
+        );
+        return Ok(false);
+    }
+
+    let mut form = HashMap::new();
+    form.insert("api_key", &*api_key);
+    form.insert("email", email);
+    form.insert("list_id", &*id);
+
+    let client = reqwest::Client::new();
+    let response = client
+        .post(format!("{url}/api/subscribers/subscription-status.php"))
+        .form(&form)
+        .send()
+        .await?
+        .text()
+        .await?;
+
+    Ok(response.trim() == "Subscribed")
+}
+
 #[derive(Deserialize, Validate)]
 pub struct NewAccount {
     #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_URL_SAFE))]
@@ -2031,7 +2063,9 @@ pub async fn change_password(
 
             Some(user)
         } else {
-            None
+            return Err(ApiError::CustomAuthentication(
+                "The password change flow code is invalid or has expired. Did you copy it promptly and correctly?".to_string(),
+            ));
         }
     } else {
         None
@@ -2382,6 +2416,35 @@ pub async fn subscribe_newsletter(
         Err(ApiError::InvalidInput(
             "User does not have an email.".to_string(),
         ))
+    }
+}
+
+#[get("email/subscribe")]
+pub async fn get_newsletter_subscription_status(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    session_queue: Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::USER_READ,
+    )
+    .await?
+    .1;
+
+    if let Some(email) = user.email {
+        let is_subscribed = check_sendy_subscription(&email).await?;
+        Ok(HttpResponse::Ok().json(serde_json::json!({
+            "subscribed": is_subscribed
+        })))
+    } else {
+        Ok(HttpResponse::Ok().json(serde_json::json!({
+            "subscribed": false
+        })))
     }
 }
 

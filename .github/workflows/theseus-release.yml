@@ -9,14 +9,18 @@ on:
       - .github/workflows/theseus-release.yml
       - 'apps/app/**'
       - 'apps/app-frontend/**'
-      - 'apps/labrinth/src/common/**'
-      - 'apps/labrinth/Cargo.toml'
       - 'packages/app-lib/**'
       - 'packages/app-macros/**'
       - 'packages/assets/**'
       - 'packages/ui/**'
       - 'packages/utils/**'
   workflow_dispatch:
+    inputs:
+      sign-windows-binaries:
+        description: Sign Windows binaries
+        type: boolean
+        default: true
+        required: false
 
 jobs:
   build:
@@ -103,11 +107,21 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev pkg-config libayatana-appindicator3-dev librsvg2-dev
 
+      - name: Install code signing client (Windows only)
+        if: startsWith(matrix.platform, 'windows')
+        run: choco install jsign --ignore-dependencies # GitHub runners come with a global Java installation already
+
       - name: Install frontend dependencies
         run: pnpm install
 
+      - name: Disable Windows code signing for non-final release builds
+        if: ${{ startsWith(matrix.platform, 'windows') && !startsWith(github.ref, 'refs/tags/v') && !inputs.sign-windows-binaries }}
+        run: |
+          jq 'del(.bundle.windows.signCommand)' apps/app/tauri-release.conf.json > apps/app/tauri-release.conf.json.new
+          Move-Item -Path apps/app/tauri-release.conf.json.new -Destination apps/app/tauri-release.conf.json -Force
+
       - name: build app (macos)
-        run: pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config "tauri-release.conf.json"
+        run: pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json
         if: startsWith(matrix.platform, 'macos')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -121,14 +135,29 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
-      - name: build app
-        run: pnpm --filter=@modrinth/app run tauri build --config "tauri-release.conf.json"
-        id: build_os
-        if: "!startsWith(matrix.platform, 'macos')"
+      - name: build app (Linux)
+        run: pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json
+        if: startsWith(matrix.platform, 'ubuntu')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+
+      - name: build app (Windows)
+        run: |
+          [System.Convert]::FromBase64String("$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64") | Set-Content -Path signer-client-cert.p12 -AsByteStream
+          $env:DIGICERT_ONE_SIGNER_CREDENTIALS = "$env:DIGICERT_ONE_SIGNER_API_KEY|$PWD\signer-client-cert.p12|$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD"
+          $env:JAVA_HOME = "$env:JAVA_HOME_11_X64"
+          pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json --verbose --bundles 'nsis,updater'
+          Remove-Item -Path signer-client-cert.p12
+        if: startsWith(matrix.platform, 'windows')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          DIGICERT_ONE_SIGNER_API_KEY: ${{ secrets.DIGICERT_ONE_SIGNER_API_KEY }}
+          DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64: ${{ secrets.DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64 }}
+          DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD: ${{ secrets.DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD }}
 
       - name: upload ${{ matrix.platform }}
         uses: actions/upload-artifact@v4

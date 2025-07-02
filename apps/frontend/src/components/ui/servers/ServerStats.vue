@@ -50,9 +50,7 @@
         </ClientOnly>
       </div>
     </div>
-
-    <component
-      :is="loading ? 'div' : 'NuxtLink'"
+    <nuxt-link
       :to="loading ? undefined : `/servers/manage/${serverId}/files`"
       class="relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
       :class="loading ? '' : 'transition-transform duration-100 hover:scale-105 active:scale-100'"
@@ -64,16 +62,17 @@
       </div>
       <h3 class="text-base font-normal text-secondary">Storage usage</h3>
       <FolderOpenIcon class="absolute right-10 top-10 size-8" />
-    </component>
+    </nuxt-link>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, shallowRef } from "vue";
-import { FolderOpenIcon, CPUIcon, DatabaseIcon, IssuesIcon } from "@modrinth/assets";
+import { FolderOpenIcon, CpuIcon, DatabaseIcon, IssuesIcon } from "@modrinth/assets";
 import { useStorage } from "@vueuse/core";
 import type { Stats } from "@modrinth/utils";
 
+const flags = useFeatureFlags();
 const route = useNativeRoute();
 const serverId = route.params.id;
 const VueApexCharts = defineAsyncComponent(() => import("vue3-apexcharts"));
@@ -127,7 +126,7 @@ const metrics = computed(() => {
         title: "CPU usage",
         value: "0.00%",
         max: "100%",
-        icon: CPUIcon,
+        icon: CpuIcon,
         data: cpuData.value,
         showGraph: false,
         warning: null,
@@ -158,17 +157,21 @@ const metrics = computed(() => {
       title: "CPU usage",
       value: `${cpuPercent.toFixed(2)}%`,
       max: "100%",
-      icon: CPUIcon,
+      icon: CpuIcon,
       data: cpuData.value,
       showGraph: true,
       warning: cpuPercent >= 90 ? "CPU usage is very high" : null,
     },
     {
       title: "Memory usage",
-      value: userPreferences.value.ramAsNumber
-        ? formatBytes(stats.value.ram_usage_bytes)
-        : `${ramPercent.toFixed(2)}%`,
-      max: userPreferences.value.ramAsNumber ? formatBytes(stats.value.ram_total_bytes) : "100%",
+      value:
+        userPreferences.value.ramAsNumber || flags.developerMode
+          ? formatBytes(stats.value.ram_usage_bytes)
+          : `${ramPercent.toFixed(2)}%`,
+      max:
+        userPreferences.value.ramAsNumber || flags.developerMode
+          ? formatBytes(stats.value.ram_total_bytes)
+          : "100%",
       icon: DatabaseIcon,
       data: ramData.value,
       showGraph: true,

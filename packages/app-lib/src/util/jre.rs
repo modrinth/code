@@ -7,7 +7,7 @@ use std::process::Command;
 use std::{collections::HashSet, path::Path};
 use tokio::task::JoinError;
 
-use crate::State;
+use crate::{State, get_resource_file};
 #[cfg(target_os = "windows")]
 use winreg::{
     RegKey,
@@ -183,7 +183,6 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
 
 // Gets all JREs from the PATH env variable
 #[tracing::instrument]
-
 async fn get_all_autoinstalled_jre_path() -> Result<HashSet<PathBuf>, JREError>
 {
     Box::pin(async move {
@@ -239,54 +238,49 @@ pub const JAVA_BIN: &str = if cfg!(target_os = "windows") {
 pub async fn check_java_at_filepaths(
     paths: HashSet<PathBuf>,
 ) -> HashSet<JavaVersion> {
-    let jres = stream::iter(paths.into_iter())
+    stream::iter(paths.into_iter())
         .map(|p: PathBuf| {
             tokio::task::spawn(async move { check_java_at_filepath(&p).await })
         })
         .buffer_unordered(64)
-        .collect::<Vec<_>>()
-        .await;
-
-    jres.into_iter().filter_map(|x| x.ok()).flatten().collect()
+        .filter_map(async |x| x.ok().and_then(Result::ok))
+        .collect()
+        .await
 }
 
 // For example filepath 'path', attempt to resolve it and get a Java version at this path
 // If no such path exists, or no such valid java at this path exists, returns None
 #[tracing::instrument]
-
-pub async fn check_java_at_filepath(path: &Path) -> Option<JavaVersion> {
+pub async fn check_java_at_filepath(path: &Path) -> crate::Result<JavaVersion> {
     // Attempt to canonicalize the potential java filepath
     // If it fails, this path does not exist and None is returned (no Java here)
-    let Ok(path) = io::canonicalize(path) else {
-        return None;
-    };
+    let path = io::canonicalize(path)?;
 
     // Checks for existence of Java at this filepath
     // Adds JAVA_BIN to the end of the path if it is not already there
-    let java = if path.file_name()?.to_str()? != JAVA_BIN {
+    let java = if path
+        .file_name()
+        .and_then(|x| x.to_str())
+        .is_some_and(|x| x != JAVA_BIN)
+    {
         path.join(JAVA_BIN)
     } else {
         path
     };
 
     if !java.exists() {
-        return None;
+        return Err(JREError::NoExecutable(java).into());
     };
 
-    let bytes = include_bytes!("../../library/JavaInfo.class");
-    let Ok(tempdir) = tempfile::tempdir() else {
-        return None;
-    };
-    let file_path = tempdir.path().join("JavaInfo.class");
-    io::write(&file_path, bytes).await.ok()?;
+    let (_temp, file_path) =
+        get_resource_file!(env "JAVA_JARS_DIR" / "theseus.jar")?;
 
     let output = Command::new(&java)
         .arg("-cp")
-        .arg(file_path.parent().unwrap())
-        .arg("JavaInfo")
+        .arg(file_path)
+        .arg("com.modrinth.theseus.JavaInfo")
         .env_remove("_JAVA_OPTIONS")
-        .output()
-        .ok()?;
+        .output()?;
 
     let stdout = String::from_utf8_lossy(&output.stdout);
 
@@ -308,64 +302,49 @@ pub async fn check_java_at_filepath(path: &Path) -> Option<JavaVersion> {
     // Extract version info from it
     if let Some(arch) = java_arch {
         if let Some(version) = java_version {
-            if let Ok((_, major_version)) =
-                extract_java_majorminor_version(version)
-            {
+            if let Ok(version) = extract_java_version(version) {
                 let path = java.to_string_lossy().to_string();
-                return Some(JavaVersion {
-                    major_version,
+                return Ok(JavaVersion {
+                    parsed_version: version,
                     path,
                     version: version.to_string(),
                     architecture: arch.to_string(),
                 });
             }
+
+            return Err(JREError::InvalidJREVersion(version.to_owned()).into());
         }
     }
-    None
+
+    Err(JREError::FailedJavaCheck(java).into())
 }
 
-/// Extract major/minor version from a java version string
-/// Gets the minor version or an error, and assumes 1 for major version if it could not find
-/// "1.8.0_361" -> (1, 8)
-/// "20" -> (1, 20)
-pub fn extract_java_majorminor_version(
-    version: &str,
-) -> Result<(u32, u32), JREError> {
+pub fn extract_java_version(version: &str) -> Result<u32, JREError> {
     let mut split = version.split('.');
-    let major_opt = split.next();
 
-    let mut major;
-    // Try minor. If doesn't exist, in format like "20" so use major
-    let mut minor = if let Some(minor) = split.next() {
-        major = major_opt.unwrap_or("1").parse::<u32>()?;
-        minor.parse::<u32>()?
-    } else {
-        // Formatted like "20", only one value means that is minor version
-        major = 1;
-        major_opt
-            .ok_or_else(|| JREError::InvalidJREVersion(version.to_string()))?
-            .parse::<u32>()?
-    };
-
-    // Java start should always be 1. If more than 1, it is formatted like "17.0.1.2" and starts with minor version
-    if major > 1 {
-        minor = major;
-        major = 1;
+    let version = split.next().unwrap();
+    let version = version.split_once('-').map_or(version, |(x, _)| x);
+    let mut version = version.parse::<u32>()?;
+    if version == 1 {
+        version = split.next().map_or(Ok(1), |x| x.parse::<u32>())?;
     }
 
-    Ok((major, minor))
+    Ok(version)
 }
 
 #[derive(thiserror::Error, Debug)]
 pub enum JREError {
-    #[error("Command error : {0}")]
+    #[error("Command error: {0}")]
     IOError(#[from] std::io::Error),
 
     #[error("Env error: {0}")]
     EnvError(#[from] env::VarError),
 
-    #[error("No JRE found for required version: {0}")]
-    NoJREFound(String),
+    #[error("No executable found at {0}")]
+    NoExecutable(PathBuf),
+
+    #[error("Could not check Java version at path {0}")]
+    FailedJavaCheck(PathBuf),
 
     #[error("Invalid JRE version string: {0}")]
     InvalidJREVersion(String),
@@ -376,9 +355,9 @@ pub enum JREError {
     #[error("Join error: {0}")]
     JoinError(#[from] JoinError),
 
-    #[error("No stored tag for Minecraft Version {0}")]
+    #[error("No stored tag for Minecraft version {0}")]
     NoMinecraftVersionFound(String),
 
-    #[error("Error getting launcher sttae")]
+    #[error("Error getting launcher state")]
     StateError,
 }

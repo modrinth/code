@@ -35,7 +35,7 @@
 
             <li v-if="fetchError" class="text-red">
               <p>Error details:</p>
-              <UiCopyCode
+              <CopyCode
                 :text="(fetchError as ModrinthServersFetchError).message || 'Unknown error'"
                 :copyable="false"
                 :selectable="false"
@@ -120,7 +120,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import Fuse from "fuse.js";
 import { HammerIcon, PlusIcon, SearchIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+import { ButtonStyled, CopyCode } from "@modrinth/ui";
 import type { Server, ModrinthServersFetchError } from "@modrinth/utils";
 import { reloadNuxtApp } from "#app";
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";

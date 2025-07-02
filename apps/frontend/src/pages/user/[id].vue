@@ -80,6 +80,7 @@
               projects
             </div>
             <div
+              v-tooltip="sumDownloads.toLocaleString()"
               class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
             >
               <DownloadIcon class="h-6 w-6 text-secondary" />
@@ -329,9 +330,7 @@
             </div>
           </div>
         </div>
-        <AdPlaceholder
-          v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
-        />
+        <AdPlaceholder v-if="!auth.user" />
       </div>
     </div>
   </div>
@@ -386,13 +385,12 @@ const route = useNativeRoute();
 const auth = await useAuth();
 const cosmetics = useCosmetics();
 const tags = useTags();
-const flags = useFeatureFlags();
 const config = useRuntimeConfig();
 
 const vintl = useVIntl();
 const { formatMessage } = vintl;
 
-const formatCompactNumber = useCompactNumber();
+const formatCompactNumber = useCompactNumber(true);
 
 const formatRelativeTime = useRelativeTime();
 

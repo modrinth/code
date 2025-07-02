@@ -1,0 +1,28 @@
+{
+  "name": "@modrinth/blog",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.d.ts",
+  "scripts": {
+    "lint": "jiti ./check.ts && eslint . && prettier --check .",
+    "fix": "jiti ./compile.ts && eslint . --fix && prettier --write ."
+  },
+  "devDependencies": {
+    "@types/html-minifier-terser": "^7.0.2",
+    "@types/rss": "^0.0.32",
+    "@types/xml2js": "^0.4.14",
+    "eslint": "^8.57.0",
+    "eslint-config-custom": "workspace:*",
+    "jiti": "^2.4.2",
+    "tsconfig": "workspace:*"
+  },
+  "dependencies": {
+    "@modrinth/utils": "workspace:*",
+    "fast-glob": "^3.3.3",
+    "gray-matter": "^4.0.3",
+    "html-minifier-terser": "^7.2.0",
+    "rss": "^1.2.2",
+    "xml2js": "^0.6.2"
+  }
+}
