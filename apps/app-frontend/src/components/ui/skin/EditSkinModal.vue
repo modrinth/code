@@ -43,15 +43,23 @@
         <section>
           <h2 class="text-base font-semibold mb-2">Cape</h2>
           <div class="flex gap-2">
+            <CapeButton
+              v-if="defaultCape"
+              :id="defaultCape.id"
+              :texture="defaultCape.texture"
+              :name="undefined"
+              :selected="!selectedCape"
+              faded
+              @select="selectCape(undefined)"
+            >
+              <span>Use default cape</span>
+            </CapeButton>
             <CapeLikeTextButton
-              tooltip="No Cape"
+              v-else
               :highlighted="!selectedCape"
               @click="selectCape(undefined)"
             >
-              <template #icon>
-                <XIcon />
-              </template>
-              <span>None</span>
+              <span>Use default cape</span>
             </CapeLikeTextButton>
 
             <CapeButton
@@ -142,7 +150,7 @@ const previewSkin = ref<string>('')
 
 const variant = ref<SkinModel>('CLASSIC')
 const selectedCape = ref<Cape | undefined>(undefined)
-const props = defineProps<{ capes?: Cape[] }>()
+const props = defineProps<{ capes?: Cape[], defaultCape?: Cape }>()
 
 const selectedCapeTexture = computed(() => selectedCape.value?.texture)
 const visibleCapeList = ref<Cape[]>([])

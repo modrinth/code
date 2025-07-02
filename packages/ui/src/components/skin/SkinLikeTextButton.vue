@@ -12,7 +12,7 @@ withDefaults(
   },
 )
 
-const emit = defineEmits<{ (e: 'click'): void }>()
+const emit = defineEmits<{ (e: 'click', event: MouseEvent): void }>()
 
 const pressed = ref(false)
 </script>
@@ -29,7 +29,7 @@ const pressed = ref(false)
       @mousedown="pressed = true"
       @mouseup="pressed = false"
       @mouseleave="pressed = false"
-      @click="emit('click')"
+      @click="(e) => emit('click', e)"
     ></button>
 
     <div

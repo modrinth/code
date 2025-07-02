@@ -290,6 +290,7 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
   <EditSkinModal
     ref="editSkinModal"
     :capes="capes"
+    :default-cape="defaultCape"
     @saved="onSkinSaved"
     @deleted="() => loadSkins()"
     @open-upload-modal="openUploadSkinModal"
@@ -310,7 +311,7 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
 
   <div v-if="currentUser" class="p-4 skin-layout">
     <div class="preview-panel">
-      <h1 class="m-0 text-2xl font-bold">Skins</h1>
+      <h1 class="m-0 text-2xl font-bold flex items-center gap-2">Skins <span class="text-sm font-bold px-2 bg-brand-highlight text-brand rounded-full">Beta</span></h1>
       <div class="preview-container">
         <SkinPreviewRenderer
           wide-model-src="/src/assets/models/classic_player.gltf"
@@ -473,6 +474,7 @@ $skin-card-gap: 4px;
   position: sticky;
   align-self: start;
   padding: 0.5rem;
+  padding-top: 0;
 }
 
 .preview-container {

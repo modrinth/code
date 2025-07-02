@@ -5,10 +5,11 @@ const emit = defineEmits<{
 
 withDefaults(
   defineProps<{
-    tooltip: string
+    tooltip?: string
     highlighted?: boolean
   }>(),
   {
+    tooltip: undefined,
     highlighted: false,
   },
 )
@@ -31,7 +32,7 @@ withDefaults(
     >
       <span class="block p-[3px] rounded-lg bg-button-bg">
         <span
-          class="flex flex-col items-center justify-center aspect-[10/16] w-[60px] min-h-[96px] rounded-[5px] bg-black/10 relative overflow-hidden text-primary z-10"
+          class="flex flex-col p-4 items-center justify-center aspect-[10/16] w-[60px] min-h-[96px] rounded-[5px] bg-black/10 relative overflow-hidden text-primary z-10"
         >
           <div class="mb-1">
             <slot name="icon"></slot>

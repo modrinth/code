@@ -7,15 +7,17 @@ const emit = defineEmits<{
 
 const props = withDefaults(
   defineProps<{
-    name: string
+    name: string | undefined
     id: string
     texture: string
     isEquipped?: boolean
     selected?: boolean
+    faded?: boolean
   }>(),
   {
     isEquipped: false,
     selected: undefined,
+    faded: false,
   },
 )
 
@@ -37,13 +39,21 @@ const highlighted = computed(() => props.selected ?? props.isEquipped)
           ? `bg-brand highlighted-outer-glow`
           : `bg-button-bg brightness-95 group-hover:brightness-100`
       "
-      class="block p-[3px] rounded-lg border-0 group-active:scale-95 transition-all"
+      class="relative block p-[3px] rounded-lg border-0 group-active:scale-95 transition-all"
     >
       <span
         class="block magical-cape-transform rounded-[5px]"
-        :class="{ 'highlighted-inner-shadow': highlighted }"
+        :class="{ 'highlighted-inner-shadow': highlighted, 'brightness-[0.3] contrast-[0.8]': faded }"
       >
         <img :src="texture" alt="" />
+      </span>
+      <span v-if="$slots.default || $slots.icon" class="p-4 absolute inset-0 flex items-center justify-center text-primary font-medium">
+        <span class="mb-1">
+          <slot name="icon"></slot>
+        </span>
+        <span class="text-xs">
+          <slot></slot>
+        </span>
       </span>
     </span>
   </button>

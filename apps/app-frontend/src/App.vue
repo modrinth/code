@@ -419,7 +419,7 @@ function handleAuxClick(e) {
       >
         <CompassIcon />
       </NavButton>
-      <NavButton v-tooltip.right="'Skins'" to="/skins">
+      <NavButton v-tooltip.right="'Skins (Beta)'" to="/skins">
         <ChangeSkinIcon />
       </NavButton>
       <NavButton
