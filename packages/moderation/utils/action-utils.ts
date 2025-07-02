@@ -91,7 +91,7 @@ export default class ModerationActionUtils {
   /**
    * Determines the highest suggested severity from selected actions.
    */
-  static getSuggestedSeverity(selectedActions: Action[]): ModerationSeverity | undefined {
+  static getSeverity(selectedActions: Action[]): ModerationSeverity | undefined {
     const severityLevels: Record<ModerationSeverity, number> = {
       low: 1,
       medium: 2,
@@ -102,12 +102,9 @@ export default class ModerationActionUtils {
     let highestSeverity: ModerationSeverity | undefined
 
     selectedActions.forEach((action) => {
-      if (action.suggestedSeverity) {
-        if (
-          !highestSeverity ||
-          severityLevels[action.suggestedSeverity] > severityLevels[highestSeverity]
-        ) {
-          highestSeverity = action.suggestedSeverity
+      if (action.severity) {
+        if (!highestSeverity || severityLevels[action.severity] > severityLevels[highestSeverity]) {
+          highestSeverity = action.severity
         }
       }
     })
