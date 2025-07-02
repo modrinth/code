@@ -146,7 +146,8 @@ useSeoMeta({
     }
   }
 
-  ul {
+  ul,
+  ol {
     strong {
       color: var(--color-contrast);
       font-weight: 600;
