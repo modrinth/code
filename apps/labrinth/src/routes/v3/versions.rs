@@ -41,6 +41,9 @@ use validator::Validate;
 pub static VERSION_PROJECT_TYPES: LazyLock<DashMap<VersionId, String>> =
     LazyLock::new(|| DashMap::new());
 
+/// Redis namespace for storing version project types
+pub const VERSION_PROJECT_TYPE_NAMESPACE: &str = "version_project_type";
+
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.route(
         "version",
@@ -117,8 +120,23 @@ pub async fn version_project_get_helper(
                 .await?
             {
                 let mut version = models::projects::Version::from(version);
-                if let Some(pt) = VERSION_PROJECT_TYPES.get(&version.id) {
-                    version.project_types = vec![pt.clone()];
+                let mut project_type = VERSION_PROJECT_TYPES
+                    .get(&version.id)
+                    .map(|v| v.clone());
+                if project_type.is_none() {
+                    let mut conn = redis.connect().await?;
+                    project_type = conn
+                        .get_deserialized_from_json(
+                            VERSION_PROJECT_TYPE_NAMESPACE,
+                            &version.id.to_string(),
+                        )
+                        .await?;
+                    if let Some(pt) = &project_type {
+                        VERSION_PROJECT_TYPES.insert(version.id, pt.clone());
+                    }
+                }
+                if let Some(pt) = project_type {
+                    version.project_types = vec![pt];
                 }
                 return Ok(HttpResponse::Ok().json(version));
             }
@@ -165,8 +183,23 @@ pub async fn versions_get(
             .await?;
 
     for version in &mut versions {
-        if let Some(pt) = VERSION_PROJECT_TYPES.get(&version.id) {
-            version.project_types = vec![pt.clone()];
+        let mut project_type = VERSION_PROJECT_TYPES
+            .get(&version.id)
+            .map(|v| v.clone());
+        if project_type.is_none() {
+            let mut conn = redis.connect().await?;
+            project_type = conn
+                .get_deserialized_from_json(
+                    VERSION_PROJECT_TYPE_NAMESPACE,
+                    &version.id.to_string(),
+                )
+                .await?;
+            if let Some(pt) = &project_type {
+                VERSION_PROJECT_TYPES.insert(version.id, pt.clone());
+            }
+        }
+        if let Some(pt) = project_type {
+            version.project_types = vec![pt];
         }
     }
 
@@ -208,8 +241,23 @@ pub async fn version_get_helper(
     if let Some(data) = version_data {
         if is_visible_version(&data.inner, &user_option, &pool, &redis).await? {
             let mut version = models::projects::Version::from(data);
-            if let Some(pt) = VERSION_PROJECT_TYPES.get(&version.id) {
-                version.project_types = vec![pt.clone()];
+            let mut project_type = VERSION_PROJECT_TYPES
+                .get(&version.id)
+                .map(|v| v.clone());
+            if project_type.is_none() {
+                let mut conn = redis.connect().await?;
+                project_type = conn
+                    .get_deserialized_from_json(
+                        VERSION_PROJECT_TYPE_NAMESPACE,
+                        &version.id.to_string(),
+                    )
+                    .await?;
+                if let Some(pt) = &project_type {
+                    VERSION_PROJECT_TYPES.insert(version.id, pt.clone());
+                }
+            }
+            if let Some(pt) = project_type {
+                version.project_types = vec![pt];
             }
             return Ok(HttpResponse::Ok().json(version));
         }
@@ -879,6 +927,21 @@ pub async fn version_list(
                 .await?;
 
         for version in &mut response {
+            let mut project_type = VERSION_PROJECT_TYPES
+                .get(&version.id)
+                .map(|v| v.clone());
+            if project_type.is_none() {
+                let mut conn = redis.connect().await?;
+                project_type = conn
+                    .get_deserialized_from_json(
+                        VERSION_PROJECT_TYPE_NAMESPACE,
+                        &version.id.to_string(),
+                    )
+                    .await?;
+                if let Some(pt) = &project_type {
+                    VERSION_PROJECT_TYPES.insert(version.id, pt.clone());
+                }
+            }
             if let Some(pt) = VERSION_PROJECT_TYPES.get(&version.id) {
                 version.project_types = vec![pt.clone()];
             }

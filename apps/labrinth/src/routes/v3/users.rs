@@ -20,6 +20,7 @@ use crate::{
         validate::validation_errors_to_string,
     },
 };
+use crate::routes::v3::projects::{PROJECT_ACTUAL_TYPES, PROJECT_ACTUAL_TYPE_NAMESPACE};
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::UserId;
 use serde::{Deserialize, Serialize};
@@ -135,8 +136,30 @@ pub async fn projects_list(
             &redis,
         )
         .await?;
-        let projects =
+        let mut projects =
             filter_visible_projects(projects, &user, &pool, true).await?;
+
+        for project in &mut projects {
+            let mut project_type = PROJECT_ACTUAL_TYPES
+                .get(&project.id)
+                .map(|v| v.clone());
+            if project_type.is_none() {
+                let mut conn = redis.connect().await?;
+                project_type = conn
+                    .get_deserialized_from_json(
+                        PROJECT_ACTUAL_TYPE_NAMESPACE,
+                        &project.id.to_string(),
+                    )
+                    .await?;
+                if let Some(pt) = &project_type {
+                    PROJECT_ACTUAL_TYPES.insert(project.id, pt.clone());
+                }
+            }
+            if let Some(pt) = project_type {
+                project.project_types = vec![pt];
+            }
+        }
+
         Ok(HttpResponse::Ok().json(projects))
     } else {
         Err(ApiError::NotFound)

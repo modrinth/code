@@ -485,13 +485,23 @@ async fn version_create_inner(
 
     let project_id = builder.project_id;
     builder.insert(transaction).await?;
-    VERSION_PROJECT_TYPES.insert(
-        version_id,
-        version_data
-            .project_type
-            .clone()
-            .unwrap_or_else(|| "modpack".to_string()),
-    );
+  
+    let actual_type = version_data
+        .project_type
+        .clone()
+        .unwrap_or_else(|| "modpack".to_string());
+    VERSION_PROJECT_TYPES.insert(version_id, actual_type.clone());
+    {
+        let mut redis_conn = redis.connect().await?;
+        redis_conn
+            .set_serialized_to_json(
+                super::versions::VERSION_PROJECT_TYPE_NAMESPACE,
+                version_id.0,
+                &actual_type,
+                None,
+            )
+            .await?;
+    }
 
     for image_id in version_data.uploaded_images {
         if let Some(db_image) =

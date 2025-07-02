@@ -28,6 +28,7 @@ use actix_web::web::{self, Data};
 use actix_web::{HttpRequest, HttpResponse};
 use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::to_base62;
+use super::projects::{PROJECT_ACTUAL_TYPES, PROJECT_ACTUAL_TYPE_NAMESPACE};
 use chrono::Utc;
 use futures::stream::StreamExt;
 use image::ImageError;
@@ -862,6 +863,10 @@ async fn project_create_inner(
                 .unwrap_or_else(|| "modpack".to_string()),
         ];
 
+        let actual_type = project_create_data
+            .project_type
+            .clone()
+            .unwrap_or_else(|| "modpack".to_string());
         let response = crate::models::projects::Project {
             id: project_id,
             slug: project_builder.slug.clone(),
@@ -910,6 +915,18 @@ async fn project_create_inner(
                 SideTypesMigrationReviewStatus::Reviewed,
             fields: HashMap::new(), // Fields instantiate to empty
         };
+        PROJECT_ACTUAL_TYPES.insert(project_id.into(), actual_type.clone());
+        {
+            let mut conn = redis.connect().await?;
+            conn
+                .set_serialized_to_json(
+                    PROJECT_ACTUAL_TYPE_NAMESPACE,
+                    project_id.0,
+                    &actual_type,
+                    None,
+                )
+                .await?;
+        }
 
         Ok(HttpResponse::Ok().json(response))
     }
