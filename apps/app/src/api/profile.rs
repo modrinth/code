@@ -28,7 +28,6 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_update_managed_modrinth_version,
             profile_repair_managed_modrinth,
             profile_run,
-            profile_run_credentials,
             profile_kill,
             profile_edit,
             profile_edit_icon,
@@ -252,22 +251,6 @@ pub async fn profile_get_pack_export_candidates(
 #[tauri::command]
 pub async fn profile_run(path: &str) -> Result<ProcessMetadata> {
     let process = profile::run(path, &QuickPlayType::None).await?;
-
-    Ok(process)
-}
-
-// Run Minecraft using a profile using chosen credentials
-// Returns the UUID, which can be used to poll
-// for the actual Child in the state.
-// invoke('plugin:profile|profile_run_credentials', {path, credentials})')
-#[tauri::command]
-pub async fn profile_run_credentials(
-    path: &str,
-    credentials: Credentials,
-) -> Result<ProcessMetadata> {
-    let process =
-        profile::run_credentials(path, &credentials, &QuickPlayType::None)
-            .await?;
 
     Ok(process)
 }

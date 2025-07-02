@@ -8095,6 +8095,7 @@ dependencies = [
  "tokio-stream",
  "tracing",
  "url",
+ "uuid 1.17.0",
  "webpki-roots 0.26.11",
 ]
 
@@ -8177,6 +8178,7 @@ dependencies = [
  "stringprep",
  "thiserror 2.0.12",
  "tracing",
+ "uuid 1.17.0",
  "whoami",
 ]
 
@@ -8216,6 +8218,7 @@ dependencies = [
  "stringprep",
  "thiserror 2.0.12",
  "tracing",
+ "uuid 1.17.0",
  "whoami",
 ]
 
@@ -8242,6 +8245,7 @@ dependencies = [
  "thiserror 2.0.12",
  "tracing",
  "url",
+ "uuid 1.17.0",
 ]
 
 [[package]]
@@ -9004,11 +9008,13 @@ dependencies = [
  "async-walkdir",
  "async_zip",
  "base64 0.22.1",
+ "bytemuck",
  "bytes",
  "chardetng",
  "chrono",
  "daedalus",
  "dashmap",
+ "data-url",
  "dirs",
  "discord-rich-presence",
  "dunce",
@@ -9019,17 +9025,20 @@ dependencies = [
  "fs4",
  "futures",
  "hashlink",
+ "heck 0.5.0",
  "hickory-resolver",
  "indicatif",
  "notify",
  "notify-debouncer-mini",
  "p256",
  "paste",
+ "png",
  "quartz_nbt",
  "quick-xml 0.37.5",
  "rand 0.8.5",
  "regex",
  "reqwest",
+ "rgb",
  "serde",
  "serde_ini",
  "serde_json",

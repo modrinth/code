@@ -33,6 +33,7 @@
     "jre:default",
     "logs:default",
     "metadata:default",
+    "minecraft-skins:default",
     "mr-auth:default",
     "profile-create:default",
     "pack:default",

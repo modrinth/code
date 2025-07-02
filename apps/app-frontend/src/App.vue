@@ -1,8 +1,9 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch, provide } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import {
   ArrowBigUpDashIcon,
+  ChangeSkinIcon,
   CompassIcon,
   DownloadIcon,
   HomeIcon,
@@ -67,6 +68,8 @@ import { hide_ads_window, init_ads_window } from '@/helpers/ads.js'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
+import { get_available_capes, get_available_skins } from './helpers/skins'
+import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
 
 const themeStore = useTheming()
 
@@ -205,6 +208,14 @@ async function setupApp() {
   get_opening_command().then(handleCommand)
   checkUpdates()
   fetchCredentials()
+
+  try {
+    const skins = (await get_available_skins()) ?? []
+    const capes = (await get_available_capes()) ?? []
+    generateSkinPreviews(skins, capes)
+  } catch (error) {
+    console.warn('Failed to generate skin previews in app setup.', error)
+  }
 }
 
 const stateFailed = ref(false)
@@ -312,6 +323,7 @@ onMounted(() => {
 })
 
 const accounts = ref(null)
+provide('accountsCard', accounts)
 
 command_listener(handleCommand)
 async function handleCommand(e) {
@@ -406,6 +418,9 @@ function handleAuxClick(e) {
         :is-subpage="(route) => route.path.startsWith('/project') && !route.query.i"
       >
         <CompassIcon />
+      </NavButton>
+      <NavButton v-tooltip.right="'Skins (Beta)'" to="/skins">
+        <ChangeSkinIcon />
       </NavButton>
       <NavButton
         v-tooltip.right="'Library'"

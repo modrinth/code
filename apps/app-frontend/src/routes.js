@@ -35,6 +35,14 @@ export default new createRouter({
       },
     },
     {
+      path: '/skins',
+      name: 'Skins',
+      component: Pages.Skins,
+      meta: {
+        breadcrumb: [{ name: 'Skins' }],
+      },
+    },
+    {
       path: '/library',
       name: 'Library',
       component: Library.Index,
