@@ -422,7 +422,7 @@ import {
 } from "@modrinth/assets";
 import QrcodeVue from "qrcode.vue";
 import { ConfirmModal } from "@modrinth/ui";
-import GitHubIcon from "assets/icons/auth/sso-github.svg";
+import GithubIcon from "assets/icons/auth/sso-github.svg";
 import MicrosoftIcon from "assets/icons/auth/sso-microsoft.svg";
 import GoogleIcon from "assets/icons/auth/sso-google.svg";
 import SteamIcon from "assets/icons/auth/sso-steam.svg";
@@ -583,7 +583,7 @@ const authProviders = [
   {
     id: "github",
     display: "GitHub",
-    icon: GitHubIcon,
+    icon: GithubIcon,
   },
   {
     id: "gitlab",

@@ -146,7 +146,7 @@
         />
         <div class="push-right input-group">
           <button class="iconified-button" @click="$refs.editLinksModal.hide()">
-            <CrossIcon />
+            <XIcon />
             Cancel
           </button>
           <button class="iconified-button brand-button" @click="bulkEditLinks()">
@@ -199,8 +199,8 @@
                 class="square-button"
                 @click="updateDescending()"
               >
-                <DescendingIcon v-if="descending" />
-                <AscendingIcon v-else />
+                <SortDescIcon v-if="descending" />
+                <SortAscIcon v-else />
               </button>
             </div>
           </div>
@@ -306,12 +306,12 @@ import {
   SettingsIcon,
   TrashIcon,
   PlusIcon,
-  XIcon as CrossIcon,
+  XIcon,
   IssuesIcon,
   EditIcon,
   SaveIcon,
-  SortAscendingIcon as AscendingIcon,
-  SortDescendingIcon as DescendingIcon,
+  SortAscIcon,
+  SortDescIcon,
 } from "@modrinth/assets";
 import {
   Avatar,
@@ -337,15 +337,15 @@ export default defineNuxtComponent({
     Checkbox,
     IssuesIcon,
     PlusIcon,
-    CrossIcon,
+    XIcon,
     EditIcon,
     SaveIcon,
     Modal,
     ModalCreation,
     Multiselect,
     CopyCode,
-    AscendingIcon,
-    DescendingIcon,
+    SortAscIcon,
+    SortDescIcon,
   },
   async setup() {
     const { formatMessage } = useVIntl();
