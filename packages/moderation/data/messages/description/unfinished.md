@@ -1,6 +1,6 @@
 ## Unfinished Description
 
-It looks like your project Description is still a WIP (Work In Progress). 
+It looks like your project Description is still a WIP (Work In Progress).
 
 > %REASON%
 
