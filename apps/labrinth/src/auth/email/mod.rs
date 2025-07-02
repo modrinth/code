@@ -23,14 +23,13 @@ pub fn send_email_raw(
     subject: String,
     body: String,
 ) -> Result<(), MailError> {
-    let username = dotenvy::var("SMTP_USERNAME")?;
+    let from_name = dotenvy::var("SMTP_FROM_NAME").unwrap_or_else(|_| "Modrinth".to_string());
+    let from_address = dotenvy::var("SMTP_FROM_ADDRESS")?;
+
     let email = Message::builder()
         .from(Mailbox::new(
-            Some(username.clone()),
-            Address::new(
-                username.split('@').next().unwrap_or("no-reply"),
-                username.split('@').nth(1).unwrap_or("mail.modrinth.com")
-            )?
+            Some(from_name),
+            from_address.parse()?,
         ))
         .to(to.parse()?)
         .subject(subject)
