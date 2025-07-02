@@ -2,7 +2,7 @@ use lettre::message::Mailbox;
 use lettre::message::header::ContentType;
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::transport::smtp::client::{Tls, TlsParameters};
-use lettre::{Address, Message, SmtpTransport, Transport};
+use lettre::{Message, SmtpTransport, Transport};
 use thiserror::Error;
 use tracing::warn;
 
