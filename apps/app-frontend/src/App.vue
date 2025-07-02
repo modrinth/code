@@ -445,7 +445,7 @@ async function processPendingSurveys() {
       localStorage.getItem(`survey-${survey.id}-display`) === null &&
       survey.type === 'tally_app' &&
       ((survey.condition === 'active_player' && isActivePlayer) ||
-        (survey.assigned_users.includes(userId) && !survey.dismissed_users.includes(userId))),
+        (survey.assigned_users?.includes(userId) && !survey.dismissed_users?.includes(userId))),
   )
 
   if (surveyToShow) {
