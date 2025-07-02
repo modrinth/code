@@ -54,11 +54,7 @@
             >
               <span>Use default cape</span>
             </CapeButton>
-            <CapeLikeTextButton
-              v-else
-              :highlighted="!selectedCape"
-              @click="selectCape(undefined)"
-            >
+            <CapeLikeTextButton v-else :highlighted="!selectedCape" @click="selectCape(undefined)">
               <span>Use default cape</span>
             </CapeLikeTextButton>
 
@@ -150,7 +146,7 @@ const previewSkin = ref<string>('')
 
 const variant = ref<SkinModel>('CLASSIC')
 const selectedCape = ref<Cape | undefined>(undefined)
-const props = defineProps<{ capes?: Cape[], defaultCape?: Cape }>()
+const props = defineProps<{ capes?: Cape[]; defaultCape?: Cape }>()
 
 const selectedCapeTexture = computed(() => selectedCape.value?.texture)
 const visibleCapeList = ref<Cape[]>([])

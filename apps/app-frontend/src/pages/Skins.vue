@@ -311,7 +311,10 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
 
   <div v-if="currentUser" class="p-4 skin-layout">
     <div class="preview-panel">
-      <h1 class="m-0 text-2xl font-bold flex items-center gap-2">Skins <span class="text-sm font-bold px-2 bg-brand-highlight text-brand rounded-full">Beta</span></h1>
+      <h1 class="m-0 text-2xl font-bold flex items-center gap-2">
+        Skins
+        <span class="text-sm font-bold px-2 bg-brand-highlight text-brand rounded-full">Beta</span>
+      </h1>
       <div class="preview-container">
         <SkinPreviewRenderer
           wide-model-src="/src/assets/models/classic_player.gltf"

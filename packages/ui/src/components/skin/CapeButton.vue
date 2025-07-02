@@ -43,11 +43,17 @@ const highlighted = computed(() => props.selected ?? props.isEquipped)
     >
       <span
         class="block magical-cape-transform rounded-[5px]"
-        :class="{ 'highlighted-inner-shadow': highlighted, 'brightness-[0.3] contrast-[0.8]': faded }"
+        :class="{
+          'highlighted-inner-shadow': highlighted,
+          'brightness-[0.3] contrast-[0.8]': faded,
+        }"
       >
         <img :src="texture" alt="" />
       </span>
-      <span v-if="$slots.default || $slots.icon" class="p-4 absolute inset-0 flex items-center justify-center text-primary font-medium">
+      <span
+        v-if="$slots.default || $slots.icon"
+        class="p-4 absolute inset-0 flex items-center justify-center text-primary font-medium"
+      >
         <span class="mb-1">
           <slot name="icon"></slot>
         </span>
