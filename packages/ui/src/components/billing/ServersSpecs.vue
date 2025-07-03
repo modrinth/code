@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import AutoLink from '../base/AutoLink.vue'
-import { MemoryStickIcon, DatabaseIcon, CPUIcon, SparklesIcon, UnknownIcon } from '@modrinth/assets'
+import { MemoryStickIcon, DatabaseIcon, CpuIcon, SparklesIcon, UnknownIcon } from '@modrinth/assets'
 
 const emit = defineEmits<{
   (e: 'click-bursting-link'): void
@@ -40,7 +40,7 @@ const sharedCpus = computed(() => {
       <DatabaseIcon class="h-5 w-5 shrink-0" /> {{ formattedStorage }} GB Storage
     </li>
     <li class="flex items-center gap-2">
-      <CPUIcon class="h-5 w-5 shrink-0" /> {{ sharedCpus }} Shared CPUs
+      <CpuIcon class="h-5 w-5 shrink-0" /> {{ sharedCpus }} Shared CPUs
     </li>
     <li class="flex items-center gap-2">
       <SparklesIcon class="h-5 w-5 shrink-0" /> Bursts up to {{ cpus }} CPUs

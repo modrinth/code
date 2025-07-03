@@ -1,6 +1,20 @@
 {
   "articles": [
     {
+      "title": "Creator Updates, July 2025",
+      "summary": "Addressing recent growth and growing pains that have been affecting creators.",
+      "thumbnail": "https://modrinth.com/news/default.webp",
+      "date": "2025-07-02T04:20:00.000Z",
+      "link": "https://modrinth.com/news/article/creator-updates-july-2025"
+    },
+    {
+      "title": "A Pride Month Success: Over $8,400 Raised for The Trevor Project!",
+      "summary": "A reflection on our Pride Month fundraiser campaign, which raised thousands for LGBTQ+ youth.",
+      "thumbnail": "https://modrinth.com/news/article/pride-campaign-2025/thumbnail.webp",
+      "date": "2025-07-01T18:00:00.000Z",
+      "link": "https://modrinth.com/news/article/pride-campaign-2025"
+    },
+    {
       "title": "A New Chapter for Modrinth Servers",
       "summary": "Modrinth Servers is now fully operated in-house by the Modrinth Team.",
       "thumbnail": "https://modrinth.com/news/article/a-new-chapter-for-modrinth-servers/thumbnail.webp",
@@ -38,7 +52,7 @@
     {
       "title": "A Sustainable Path Forward for Modrinth",
       "summary": "Our capital return and what’s next.",
-      "thumbnail": "https://modrinth.com/news/default.jpg",
+      "thumbnail": "https://modrinth.com/news/default.webp",
       "date": "2024-04-04T20:00:00.000Z",
       "link": "https://modrinth.com/news/article/capital-return"
     },
@@ -52,14 +66,14 @@
     {
       "title": "Correcting Inflated Download Counts due to Rate Limiting Issue",
       "summary": "A rate limiting issue caused inflated download counts in certain countries.",
-      "thumbnail": "https://modrinth.com/news/default.jpg",
+      "thumbnail": "https://modrinth.com/news/default.webp",
       "date": "2023-11-10T20:00:00.000Z",
       "link": "https://modrinth.com/news/article/download-adjustment"
     },
     {
       "title": "Introducing Modrinth App Beta",
       "summary": "Changing the modded Minecraft landscape with the new Modrinth App, alongside several other major features.",
-      "thumbnail": "https://modrinth.com/news/default.jpg",
+      "thumbnail": "https://modrinth.com/news/default.webp",
       "date": "2023-08-05T20:00:00.000Z",
       "link": "https://modrinth.com/news/article/modrinth-app-beta"
     },
@@ -73,14 +87,14 @@
     {
       "title": "Accelerating Modrinth's Development",
       "summary": "Our fundraiser and the future of Modrinth!",
-      "thumbnail": "https://modrinth.com/news/default.jpg",
+      "thumbnail": "https://modrinth.com/news/default.webp",
       "date": "2023-02-01T20:00:00.000Z",
       "link": "https://modrinth.com/news/article/accelerating-development"
     },
     {
       "title": "Two years of Modrinth: a retrospective",
       "summary": "The history of Modrinth as we know it from December 2020 to December 2022.",
-      "thumbnail": "https://modrinth.com/news/default.jpg",
+      "thumbnail": "https://modrinth.com/news/default.webp",
       "date": "2023-01-07T00:00:00.000Z",
       "link": "https://modrinth.com/news/article/two-years-of-modrinth-history"
     },
@@ -157,7 +171,7 @@
     {
       "title": "What is Modrinth?",
       "summary": "Hello, we are Modrinth – an open source mods hosting platform. Sounds dry, doesn't it? So let me tell you our story – and I promise, it won't be boring!",
-      "thumbnail": "https://modrinth.com/news/default.jpg",
+      "thumbnail": "https://modrinth.com/news/default.webp",
       "date": "2020-11-27T00:00:00.000Z",
       "link": "https://modrinth.com/news/article/whats-modrinth"
     }

@@ -5,7 +5,7 @@ import {
   ShieldIcon,
   SettingsIcon,
   GaugeIcon,
-  PaintBrushIcon,
+  PaintbrushIcon,
   GameIcon,
   CoffeeIcon,
 } from '@modrinth/assets'
@@ -41,7 +41,7 @@ const tabs = [
       id: 'app.settings.tabs.appearance',
       defaultMessage: 'Appearance',
     }),
-    icon: PaintBrushIcon,
+    icon: PaintbrushIcon,
     content: AppearanceSettings,
   },
   {

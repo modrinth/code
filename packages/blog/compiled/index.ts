@@ -6,6 +6,7 @@ import { article as capital_return } from './capital_return'
 import { article as carbon_ads } from './carbon_ads'
 import { article as creator_monetization } from './creator_monetization'
 import { article as creator_update } from './creator_update'
+import { article as creator_updates_july_2025 } from './creator_updates_july_2025'
 import { article as design_refresh } from './design_refresh'
 import { article as download_adjustment } from './download_adjustment'
 import { article as knossos_v2_1_0 } from './knossos_v2_1_0'
@@ -17,6 +18,7 @@ import { article as modrinth_beta } from './modrinth_beta'
 import { article as modrinth_servers_beta } from './modrinth_servers_beta'
 import { article as new_site_beta } from './new_site_beta'
 import { article as plugins_resource_packs } from './plugins_resource_packs'
+import { article as pride_campaign_2025 } from './pride_campaign_2025'
 import { article as redesign } from './redesign'
 import { article as two_years_of_modrinth_history } from './two_years_of_modrinth_history'
 import { article as two_years_of_modrinth } from './two_years_of_modrinth'
@@ -31,6 +33,7 @@ export const articles = [
   carbon_ads,
   creator_monetization,
   creator_update,
+  creator_updates_july_2025,
   design_refresh,
   download_adjustment,
   knossos_v2_1_0,
@@ -42,6 +45,7 @@ export const articles = [
   modrinth_servers_beta,
   new_site_beta,
   plugins_resource_packs,
+  pride_campaign_2025,
   redesign,
   two_years_of_modrinth_history,
   two_years_of_modrinth,
