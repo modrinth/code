@@ -20,8 +20,20 @@
   "app.settings.tabs.resource-management": {
     "message": "Resource management"
   },
+  "app.update.later": {
+    "message": "Later"
+  },
+  "app.update.modal-body": {
+    "message": "Version {version} of the Modrinth App is available for installation."
+  },
   "app.update.modal-header": {
     "message": "An update is available!"
+  },
+  "app.update.restart": {
+    "message": "Restart Now"
+  },
+  "app.update.skip": {
+    "message": "Skip This Update"
   },
   "instance.add-server.add-and-play": {
     "message": "Add and play"

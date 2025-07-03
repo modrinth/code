@@ -129,6 +129,7 @@ import _RadioButtonCheckedIcon from './icons/radio-button-checked.svg?component'
 import _RadioButtonIcon from './icons/radio-button.svg?component'
 import _ReceiptTextIcon from './icons/receipt-text.svg?component'
 import _RedoIcon from './icons/redo.svg?component'
+import _RefreshCwIcon from './icons/refresh-cw.svg?component'
 import _ReplyIcon from './icons/reply.svg?component'
 import _ReportIcon from './icons/report.svg?component'
 import _RestoreIcon from './icons/restore.svg?component'
@@ -316,6 +317,7 @@ export const RadioButtonCheckedIcon = _RadioButtonCheckedIcon
 export const RadioButtonIcon = _RadioButtonIcon
 export const ReceiptTextIcon = _ReceiptTextIcon
 export const RedoIcon = _RedoIcon
+export const RefreshCwIcon = _RefreshCwIcon
 export const ReplyIcon = _ReplyIcon
 export const ReportIcon = _ReportIcon
 export const RestoreIcon = _RestoreIcon
