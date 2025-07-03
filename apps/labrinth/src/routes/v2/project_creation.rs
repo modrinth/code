@@ -228,6 +228,7 @@ pub async fn project_create(
                 slug: legacy_create.slug,
                 summary: legacy_create.description, // Description becomes summary
                 description: legacy_create.body,    // Body becomes description
+                project_type,
                 initial_versions,
                 categories: legacy_create.categories,
                 additional_categories: legacy_create.additional_categories,
