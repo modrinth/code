@@ -213,7 +213,7 @@ fn parse_jvm_argument(
 }
 
 #[allow(clippy::too_many_arguments)]
-pub fn get_minecraft_arguments(
+pub async fn get_minecraft_arguments(
     arguments: Option<&[Argument]>,
     legacy_arguments: Option<&str>,
     credentials: &Credentials,
@@ -226,6 +226,9 @@ pub fn get_minecraft_arguments(
     java_arch: &str,
     quick_play_type: &QuickPlayType,
 ) -> crate::Result<Vec<String>> {
+    let access_token = credentials.access_token.clone();
+    let profile = credentials.maybe_online_profile().await;
+
     if let Some(arguments) = arguments {
         let mut parsed_arguments = Vec::new();
 
@@ -235,9 +238,9 @@ pub fn get_minecraft_arguments(
             |arg| {
                 parse_minecraft_argument(
                     arg,
-                    &credentials.access_token,
-                    &credentials.username,
-                    credentials.id,
+                    &access_token,
+                    &profile.name,
+                    profile.id,
                     version,
                     asset_index_name,
                     game_directory,
@@ -257,9 +260,9 @@ pub fn get_minecraft_arguments(
         for x in legacy_arguments.split(' ') {
             parsed_arguments.push(parse_minecraft_argument(
                 &x.replace(' ', TEMPORARY_REPLACE_CHAR),
-                &credentials.access_token,
-                &credentials.username,
-                credentials.id,
+                &access_token,
+                &profile.name,
+                profile.id,
                 version,
                 asset_index_name,
                 game_directory,

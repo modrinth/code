@@ -183,6 +183,7 @@ fn main() {
                 let _ = win.set_focus();
             }
         }))
+        .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_deep_link::init())
@@ -248,6 +249,7 @@ fn main() {
         .plugin(api::logs::init())
         .plugin(api::jre::init())
         .plugin(api::metadata::init())
+        .plugin(api::minecraft_skins::init())
         .plugin(api::pack::init())
         .plugin(api::process::init())
         .plugin(api::profile::init())

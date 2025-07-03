@@ -1,20 +1,19 @@
 <script setup lang="ts">
-import { ButtonStyled } from "@modrinth/ui";
+import { ButtonStyled, NewsArticleCard } from "@modrinth/ui";
 import { ChevronRightIcon, RssIcon, GitGraphIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
 import { articles as rawArticles } from "@modrinth/blog";
 import { computed, ref } from "vue";
 import NewsletterButton from "~/components/ui/NewsletterButton.vue";
-import NewsArticleCard from "~/components/ui/news/NewsArticleCard.vue";
 
 const articles = ref(
   rawArticles
     .map((article) => ({
       ...article,
-      path: `/news/article/${article.slug}`,
+      path: `/news/article/${article.slug}/`,
       thumbnail: article.thumbnail
         ? `/news/article/${article.slug}/thumbnail.webp`
-        : `/news/default.jpg`,
+        : `/news/default.webp`,
       title: article.title,
       summary: article.summary,
       date: article.date,
@@ -31,9 +30,9 @@ useSeoMeta({
   description: "Keep up-to-date on the latest news from Modrinth.",
   ogDescription: "Keep up-to-date on the latest news from Modrinth.",
   ogType: "website",
-  ogImage: () => `${config.public.siteUrl}/news/thumbnail.jpg`,
+  ogImage: () => `${config.public.siteUrl}/news/thumbnail.webp`,
   twitterCard: "summary_large_image",
-  twitterImage: () => `${config.public.siteUrl}/news/thumbnail.jpg`,
+  twitterImage: () => `${config.public.siteUrl}/news/thumbnail.webp`,
 });
 </script>
 
@@ -64,8 +63,8 @@ useSeoMeta({
         class="full-width-bg brand-gradient-bg mt-6 border-0 border-y-[1px] border-solid py-4"
       >
         <nuxt-link
-          :to="`${featuredArticle.path}/`"
-          class="active:scale-[0.99]! group flex transition-all ease-in-out hover:brightness-125"
+          :to="`${featuredArticle.path}`"
+          class="active:scale-[0.99]! group flex cursor-pointer transition-all ease-in-out hover:brightness-125"
         >
           <article class="featured-article px-6">
             <div class="featured-image-container">

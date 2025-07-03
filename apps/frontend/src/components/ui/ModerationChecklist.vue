@@ -9,7 +9,7 @@
       </h1>
       <ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
         <button v-tooltip="`Exit moderation`" @click="exitModeration">
-          <CrossIcon />
+          <XIcon />
         </button>
       </ButtonStyled>
       <ButtonStyled circular>
@@ -306,7 +306,7 @@
           <div class="flex items-center gap-2">
             <ButtonStyled v-if="!done">
               <button aria-label="Skip" @click="goToNextProject">
-                <ExitIcon aria-hidden="true" />
+                <XIcon aria-hidden="true" />
                 <template v-if="futureProjects.length > 0">Skip</template>
                 <template v-else>Exit</template>
               </button>
@@ -335,7 +335,7 @@
               <div class="joined-buttons">
                 <ButtonStyled color="red">
                   <button @click="sendMessage('rejected')">
-                    <CrossIcon aria-hidden="true" /> Reject
+                    <XIcon aria-hidden="true" /> Reject
                   </button>
                 </ButtonStyled>
                 <ButtonStyled color="red">
@@ -373,9 +373,8 @@ import {
   UpdatedIcon,
   CheckIcon,
   DropdownIcon,
-  XIcon as CrossIcon,
   EyeOffIcon,
-  ExitIcon,
+  XIcon,
   ScaleIcon,
 } from "@modrinth/assets";
 import { ButtonStyled, MarkdownEditor, OverflowMenu, Collapsible } from "@modrinth/ui";

@@ -1,6 +1,6 @@
 // AUTO-GENERATED FILE - DO NOT EDIT
 export const article = {
-  html: () => import('./becoming_sustainable.content').then((m) => m.html),
+  html: () => import(`./becoming_sustainable.content`).then((m) => m.html),
   title: 'Quintupling Creator Revenue and Becoming Sustainable',
   summary: 'Announcing an update to our monetization program, creator split, and more!',
   date: '2024-09-13T20:00:00.000Z',

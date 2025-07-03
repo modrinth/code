@@ -39,21 +39,27 @@ pub struct LatestLogCursor {
 #[serde(transparent)]
 pub struct CensoredString(String);
 impl CensoredString {
-    pub fn censor(mut s: String, credentials_set: &Vec<Credentials>) -> Self {
+    pub fn censor(mut s: String, credentials_list: &[Credentials]) -> Self {
         let username = whoami::username();
         s = s
             .replace(&format!("/{username}/"), "/{COMPUTER_USERNAME}/")
             .replace(&format!("\\{username}\\"), "\\{COMPUTER_USERNAME}\\");
-        for credentials in credentials_set {
+        for credentials in credentials_list {
+            // Use the offline profile to guarantee that this function does not cause
+            // Mojang API request, and is never delayed by a network request. The offline
+            // profile is optimistically updated on upsert from time to time anyway
             s = s
                 .replace(&credentials.access_token, "{MINECRAFT_ACCESS_TOKEN}")
-                .replace(&credentials.username, "{MINECRAFT_USERNAME}")
                 .replace(
-                    &credentials.id.as_simple().to_string(),
+                    &credentials.offline_profile.name,
+                    "{MINECRAFT_USERNAME}",
+                )
+                .replace(
+                    &credentials.offline_profile.id.as_simple().to_string(),
                     "{MINECRAFT_UUID}",
                 )
                 .replace(
-                    &credentials.id.as_hyphenated().to_string(),
+                    &credentials.offline_profile.id.as_hyphenated().to_string(),
                     "{MINECRAFT_UUID}",
                 );
         }
@@ -210,7 +216,7 @@ pub async fn get_output_by_filename(
         .await?
         .into_iter()
         .map(|x| x.1)
-        .collect();
+        .collect::<Vec<_>>();
 
     // Load .gz file into String
     if let Some(ext) = path.extension() {
@@ -350,7 +356,7 @@ pub async fn get_generic_live_log_cursor(
         .await?
         .into_iter()
         .map(|x| x.1)
-        .collect();
+        .collect::<Vec<_>>();
     let output = CensoredString::censor(output, &credentials);
     Ok(LatestLogCursor {
         cursor,

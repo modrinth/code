@@ -27,18 +27,17 @@
 <script setup lang="ts">
 import { NewspaperIcon } from "@modrinth/assets";
 import { articles as rawArticles } from "@modrinth/blog";
-import { ButtonStyled } from "@modrinth/ui";
+import { ButtonStyled, NewsArticleCard } from "@modrinth/ui";
 import { ref, computed } from "vue";
-import NewsArticleCard from "./NewsArticleCard.vue";
 
 const articles = ref(
   rawArticles
     .map((article) => ({
       ...article,
-      path: `/news/article/${article.slug}`,
+      path: `/news/article/${article.slug}/`,
       thumbnail: article.thumbnail
         ? `/news/article/${article.slug}/thumbnail.webp`
-        : `/news/default.jpg`,
+        : `/news/default.webp`,
       title: article.title,
       summary: article.summary,
       date: article.date,
