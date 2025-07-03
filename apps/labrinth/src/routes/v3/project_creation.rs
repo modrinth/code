@@ -173,6 +173,9 @@ pub struct ProjectCreateData {
     #[serde(alias = "mod_slug")]
     /// The slug of a project, used for vanity URLs
     pub slug: String,
+    #[serde(default = "default_project_type")]
+    /// The project type of this mod
+    pub project_type: String,
     #[validate(length(min = 3, max = 255))]
     #[serde(alias = "mod_description")]
     /// A short description of the project.
@@ -760,6 +763,8 @@ async fn project_create_inner(
             icon_url: icon_data.clone().map(|x| x.0),
             raw_icon_url: icon_data.clone().map(|x| x.1),
 
+            project_type: project_create_data.project_type.clone(),
+
             license_url: project_create_data.license_url,
             categories,
             additional_categories,
@@ -861,6 +866,7 @@ async fn project_create_inner(
         let response = crate::models::projects::Project {
             id: project_id,
             slug: project_builder.slug.clone(),
+            project_type: project_create_data.project_type.clone(),
             project_types,
             games,
             team_id: team_id.into(),
