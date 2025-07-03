@@ -158,12 +158,6 @@
           </div>
 
           <div class="flex items-center gap-2">
-            <ButtonStyled v-if="debug" color="orange">
-              <button @click="assembleFullMessage">
-                <FileTextIcon aria-hidden="true" />
-                Test Message
-              </button>
-            </ButtonStyled>
             <OverflowMenu :options="stageOptions" class="bg-transparent p-0">
               <ButtonStyled circular>
                 <button v-tooltip="`Stages`">
