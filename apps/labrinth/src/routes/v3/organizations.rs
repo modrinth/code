@@ -18,9 +18,6 @@ use crate::util::img::delete_old_images;
 use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use crate::{database, models};
-use crate::routes::v3::projects::{
-    PROJECT_ACTUAL_TYPES, PROJECT_ACTUAL_TYPE_NAMESPACE,
-};
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::parse_base62;
@@ -94,30 +91,9 @@ pub async fn organization_projects_get(
         )
         .await?;
 
-        let mut projects =
+        let projects =
             filter_visible_projects(projects_data, &current_user, &pool, true)
                 .await?;
-
-        for project in &mut projects {
-            let mut project_type = PROJECT_ACTUAL_TYPES
-                .get(&project.id)
-                .map(|v| v.clone());
-            if project_type.is_none() {
-                let mut conn = redis.connect().await?;
-                project_type = conn
-                    .get_deserialized_from_json(
-                        PROJECT_ACTUAL_TYPE_NAMESPACE,
-                        &project.id.to_string(),
-                    )
-                    .await?;
-                if let Some(pt) = &project_type {
-                    PROJECT_ACTUAL_TYPES.insert(project.id, pt.clone());
-                }
-            }
-            if let Some(pt) = project_type {
-                project.project_types = vec![pt];
-            }
-        }
 
         Ok(HttpResponse::Ok().json(projects))
     } else {

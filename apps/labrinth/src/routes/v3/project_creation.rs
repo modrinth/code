@@ -28,7 +28,6 @@ use actix_web::web::{self, Data};
 use actix_web::{HttpRequest, HttpResponse};
 use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::to_base62;
-use super::projects::{PROJECT_ACTUAL_TYPES, PROJECT_ACTUAL_TYPE_NAMESPACE};
 use chrono::Utc;
 use futures::stream::StreamExt;
 use image::ImageError;
@@ -186,8 +185,6 @@ pub struct ProjectCreateData {
     #[validate(nested, length(max = 32))]
     /// A list of initial versions to upload with the created project
     pub initial_versions: Vec<InitialVersionData>,
-    #[serde(default)]
-    pub project_type: Option<String>,
     #[validate(length(max = 3))]
     /// A list of the categories that the project is in.
     pub categories: Vec<String>,
@@ -847,26 +844,20 @@ async fn project_create_inner(
             .flat_map(|v| v.loaders.clone())
             .unique()
             .collect::<Vec<_>>();
-        let games = Loader::list(&mut **transaction, redis)
+        let (project_types, games) = Loader::list(&mut **transaction, redis)
             .await?
             .into_iter()
-            .fold(Vec::new(), |mut games, loader| {
-                if loaders.contains(&loader.id) {
-                    games.extend(loader.supported_games);
-                }
-                games
-            });
-        let project_types = vec![
-            project_create_data
-                .project_type
-                .clone()
-                .unwrap_or_else(|| "modpack".to_string()),
-        ];
+            .fold(
+                (Vec::new(), Vec::new()),
+                |(mut project_types, mut games), loader| {
+                    if loaders.contains(&loader.id) {
+                        project_types.extend(loader.supported_project_types);
+                        games.extend(loader.supported_games);
+                    }
+                    (project_types, games)
+                },
+            );
 
-        let actual_type = project_create_data
-            .project_type
-            .clone()
-            .unwrap_or_else(|| "modpack".to_string());
         let response = crate::models::projects::Project {
             id: project_id,
             slug: project_builder.slug.clone(),
@@ -915,18 +906,6 @@ async fn project_create_inner(
                 SideTypesMigrationReviewStatus::Reviewed,
             fields: HashMap::new(), // Fields instantiate to empty
         };
-        PROJECT_ACTUAL_TYPES.insert(project_id.into(), actual_type.clone());
-        {
-            let mut conn = redis.connect().await?;
-            conn
-                .set_serialized_to_json(
-                    PROJECT_ACTUAL_TYPE_NAMESPACE,
-                    project_id.0,
-                    &actual_type,
-                    None,
-                )
-                .await?;
-        }
 
         Ok(HttpResponse::Ok().json(response))
     }

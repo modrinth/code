@@ -220,7 +220,6 @@ pub async fn version_create(
                     version_body: legacy_create.version_body,
                     dependencies: legacy_create.dependencies,
                     release_channel: legacy_create.release_channel,
-                    project_type: project_type.map(|p| p.to_string()),
                     loaders,
                     featured: legacy_create.featured,
                     primary_file: legacy_create.primary_file,
