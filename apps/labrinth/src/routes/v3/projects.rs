@@ -226,6 +226,7 @@ pub struct EditProject {
         regex(path = *crate::util::validate::RE_URL_SAFE)
     )]
     pub slug: Option<String>,
+    pub project_type: Option<String>,
     pub status: Option<ProjectStatus>,
     #[serde(
         default,
@@ -653,6 +654,27 @@ pub async fn project_edit(
             WHERE (id = $2)
             ",
             Some(slug),
+            id as db_ids::DBProjectId,
+        )
+        .execute(&mut *transaction)
+        .await?;
+    }
+
+    if let Some(project_type) = &new_project.project_type {
+        if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
+            return Err(ApiError::CustomAuthentication(
+                "You do not have the permissions to edit the project type of this project!"
+                    .to_string(),
+            ));
+        }
+
+        sqlx::query!(
+            "
+            UPDATE mods
+            SET project_type = (SELECT id FROM project_types WHERE name = $1)
+            WHERE (id = $2)
+            ",
+            project_type,
             id as db_ids::DBProjectId,
         )
         .execute(&mut *transaction)

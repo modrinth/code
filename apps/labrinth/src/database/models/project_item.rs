@@ -176,6 +176,7 @@ pub struct ProjectBuilder {
     pub gallery_items: Vec<DBGalleryItem>,
     pub color: Option<u32>,
     pub monetization_status: MonetizationStatus,
+    pub project_type: String,
 }
 
 impl ProjectBuilder {
@@ -287,6 +288,7 @@ pub struct DBProject {
     pub license_url: Option<String>,
     pub license: String,
     pub slug: Option<String>,
+    pub project_type: String,
     pub moderation_message: Option<String>,
     pub moderation_message_body: Option<String>,
     pub webhook_sent: bool,
@@ -308,14 +310,14 @@ impl DBProject {
                 published, downloads, icon_url, raw_icon_url, status, requested_status,
                 license_url, license,
                 slug, color, monetization_status, organization_id,
-                side_types_migration_review_status
+                side_types_migration_review_status, project_type
             )
             VALUES (
                 $1, $2, $3, $4, $5, $6,
                 $7, $8, $9, $10, $11,
                 $12, $13,
                 LOWER($14), $15, $16, $17,
-                $18
+                $18, (SELECT id FROM project_types WHERE name = $19)
             )
             ",
             self.id as DBProjectId,
@@ -335,7 +337,8 @@ impl DBProject {
             self.color.map(|x| x as i32),
             self.monetization_status.as_str(),
             self.organization_id.map(|x| x.0 as i64),
-            self.side_types_migration_review_status.as_str()
+            self.side_types_migration_review_status.as_str(),
+            &self.project_type
         )
         .execute(&mut **transaction)
         .await?;
@@ -778,6 +781,7 @@ impl DBProject {
                     m.team_id team_id, m.organization_id organization_id, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
                     m.webhook_sent, m.color,
                     t.id thread_id, m.monetization_status monetization_status,
+                    pt.name project_type,
                     m.side_types_migration_review_status side_types_migration_review_status,
                     ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
                     ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories
@@ -785,6 +789,7 @@ impl DBProject {
                     INNER JOIN threads t ON t.mod_id = m.id
                     LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
                     LEFT JOIN categories c ON mc.joining_category_id = c.id
+                    LEFT JOIN project_types pt ON pt.id = m.project_type
                     WHERE m.id = ANY($1) OR m.slug = ANY($2)
                     GROUP BY t.id, m.id;
                     ",
@@ -833,6 +838,7 @@ impl DBProject {
                                 )),
                                 license: m.license.clone(),
                                 slug: m.slug.clone(),
+                                project_type: m.project_type.clone(),
                                 description: m.description.clone(),
                                 follows: m.follows,
                                 moderation_message: m.moderation_message,
@@ -851,6 +857,7 @@ impl DBProject {
                             },
                             categories: m.categories.unwrap_or_default(),
                             additional_categories: m.additional_categories.unwrap_or_default(),
+                            project_type: m.project_type,
                             project_types,
                             games,
                             versions: versions.into_iter().map(|x| x.0).collect(),
@@ -976,6 +983,7 @@ pub struct ProjectQueryResult {
     pub categories: Vec<String>,
     pub additional_categories: Vec<String>,
     pub versions: Vec<DBVersionId>,
+    pub project_type: String,
     pub project_types: Vec<String>,
     pub games: Vec<String>,
     pub urls: Vec<LinkUrl>,

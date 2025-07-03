@@ -20,6 +20,8 @@ pub struct Project {
     pub id: ProjectId,
     /// The slug of a project, used for vanity URLs
     pub slug: Option<String>,
+    /// The primary project type
+    pub project_type: String,
     /// The aggregated project typs of the versions of this project
     pub project_types: Vec<String>,
     /// The aggregated games of the versions of this project
@@ -139,6 +141,7 @@ impl From<ProjectQueryResult> for Project {
         Self {
             id: m.id.into(),
             slug: m.slug,
+            project_type: data.project_type,
             project_types: data.project_types,
             games: data.games,
             team_id: m.team_id.into(),

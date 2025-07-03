@@ -79,6 +79,20 @@
         />
       </div>
 
+      <label for="project-type">
+        <span class="label__title">Project Type</span>
+      </label>
+      <select
+        id="project-type"
+        v-model="projectType"
+        :disabled="!hasPermission"
+      >
+        <option value="mod">Mod</option>
+        <option value="modpack">Modpack</option>
+        <option value="datapack">Datapack</option>
+        <option value="plugin">Plugin</option>
+      </select>
+
       <label for="project-summary">
         <span class="label__title">Summary</span>
       </label>
@@ -279,6 +293,7 @@ const router = useNativeRouter();
 const name = ref(props.project.title);
 const slug = ref(props.project.slug);
 const summary = ref(props.project.description);
+const projectType = ref(props.project.actualProjectType);
 const icon = ref(null);
 const previewImage = ref(null);
 const clientSide = ref(props.project.client_side);
@@ -310,6 +325,9 @@ const patchData = computed(() => {
   }
   if (slug.value !== props.project.slug) {
     data.slug = slug.value.trim();
+  }
+  if (projectType.value !== props.project.actualProjectType) {
+    data.project_type = projectType.value;
   }
   if (summary.value !== props.project.description) {
     data.description = summary.value.trim();
