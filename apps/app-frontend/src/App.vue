@@ -384,7 +384,7 @@ async function checkUpdates() {
     updateAvailable.value = !!update
     if (updateAvailable.value) {
       console.log(`Update ${update.version} is available. Showing update modal.`)
-      updateModal.value.show()
+      updateModal.value.show(update)
     }
   }
 
