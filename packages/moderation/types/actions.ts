@@ -1,3 +1,4 @@
+import type { Project } from '@modrinth/utils'
 import type { WeightedMessage } from './messages'
 
 export type ActionType =
@@ -52,6 +53,13 @@ export interface BaseAction {
    * Unique identifier for this action, used for conditional logic.
    */
   id?: string
+
+  /**
+   * A function that determines whether this action should be shown for a given project.
+   *
+   * By default, it returns `true`, meaning the action is always shown.
+   */
+  shouldShow?: ((project: Project) => boolean) | true
 }
 
 /**
@@ -224,4 +232,9 @@ export interface AdditionalTextInput {
      */
     excludedActions?: string[]
   }
+
+  /**
+   * Optional suggestions for the input. Useful for repeating phrases or common responses.
+   */
+  suggestions?: string[]
 }

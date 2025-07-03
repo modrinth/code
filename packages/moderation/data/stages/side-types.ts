@@ -13,6 +13,7 @@ const sideTypes: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'low',
+      shouldShow: (project) => project.project_type === 'modpack',
       message: async () => (await import('../messages/side-types/inaccurate-modpack.md?raw')).default,
     } as ButtonAction,
     {
@@ -22,6 +23,7 @@ const sideTypes: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'low',
+      shouldShow: (project) => project.project_type === 'mod',
       message: async () => (await import('../messages/side-types/inaccurate-mod.md?raw')).default,
     } as ButtonAction,
   ],

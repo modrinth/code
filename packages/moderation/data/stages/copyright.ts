@@ -18,11 +18,13 @@ const copyright: Stage = {
           label: 'What is the title of the original project?',
           variable: 'ORIGINAL_PROJECT',
           required: true,
+          suggestions: ['Vanilla Tweaks'],
         },
         {
           label: 'What is the author of the original project?',
           variable: 'ORIGINAL_AUTHOR',
           required: true,
+          suggestions: ['Vanilla Tweaks Team'],
         },
       ],
     } as ButtonAction,
