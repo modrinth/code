@@ -25,7 +25,8 @@ pub fn send_email_raw(
 ) -> Result<(), MailError> {
     let from_name = dotenvy::var("SMTP_FROM_NAME")
         .unwrap_or_else(|_| "Modrinth".to_string());
-    let from_address = dotenvy::var("SMTP_FROM_ADDRESS").unwrap_or_else(|_| "no-reply@modrinth.com".to_string());
+    let from_address = dotenvy::var("SMTP_FROM_ADDRESS")
+        .unwrap_or_else(|_| "no-reply@modrinth.com".to_string());
 
     let email = Message::builder()
         .from(Mailbox::new(Some(from_name), from_address.parse()?))
