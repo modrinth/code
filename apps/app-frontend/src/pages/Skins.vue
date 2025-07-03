@@ -43,9 +43,9 @@ import { handleSevereError } from '@/store/error'
 import { trackEvent } from '@/helpers/analytics'
 import type AccountsCard from '@/components/ui/AccountsCard.vue'
 import { arrayBufferToBase64 } from '@modrinth/utils'
-import capeModel from '../assets/models/cape.gltf?url'
-import wideModel from '../assets/models/classic_player.gltf?url'
-import slimModel from '../assets/models/slim_player.gltf?url'
+import capeModel from '@/assets/models/cape.gltf?url'
+import wideModel from '@/assets/models/classic_player.gltf?url'
+import slimModel from '@/assets/models/slim_player.gltf?url'
 
 const editSkinModal = useTemplateRef('editSkinModal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
