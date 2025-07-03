@@ -21,75 +21,9 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     tracing::info!("Initializing app event state...");
     theseus::EventState::init(app.clone()).await?;
 
-    #[cfg(feature = "updater")]
-    'updater: {
-        if env::var("MODRINTH_EXTERNAL_UPDATE_PROVIDER").is_ok() {
-            State::init().await?;
-            break 'updater;
-        }
+    tracing::info!("Initializing app state...");
+    State::init().await?;
 
-        use tauri_plugin_updater::UpdaterExt;
-
-        let updater = app.updater_builder().build()?;
-
-        let update_fut = updater.check();
-
-        tracing::info!("Initializing app state...");
-        State::init().await?;
-
-        let check_bar = theseus::init_loading(
-            theseus::LoadingBarType::CheckingForUpdates,
-            1.0,
-            "Checking for updates...",
-        )
-        .await?;
-
-        tracing::info!("Checking for updates...");
-        let update = update_fut.await;
-
-        drop(check_bar);
-
-        if let Some(update) = update.ok().flatten() {
-            tracing::info!("Update found: {:?}", update.download_url);
-            let loader_bar_id = theseus::init_loading(
-                theseus::LoadingBarType::LauncherUpdate {
-                    version: update.version.clone(),
-                    current_version: update.current_version.clone(),
-                },
-                1.0,
-                "Updating Modrinth App...",
-            )
-            .await?;
-
-            // 100 MiB
-            const DEFAULT_CONTENT_LENGTH: u64 = 1024 * 1024 * 100;
-
-            update
-                .download_and_install(
-                    |chunk_length, content_length| {
-                        let _ = theseus::emit_loading(
-                            &loader_bar_id,
-                            (chunk_length as f64)
-                                / (content_length
-                                    .unwrap_or(DEFAULT_CONTENT_LENGTH)
-                                    as f64),
-                            None,
-                        );
-                    },
-                    || {},
-                )
-                .await?;
-
-            app.restart();
-        }
-    }
-
-    #[cfg(not(feature = "updater"))]
-    {
-        State::init().await?;
-    }
-
-    tracing::info!("Finished checking for updates!");
     let state = State::get().await?;
     app.asset_protocol_scope()
         .allow_directory(state.directories.caches_dir(), true)?;
@@ -123,6 +57,11 @@ fn show_window(app: tauri::AppHandle) {
 #[tauri::command]
 fn is_dev() -> bool {
     cfg!(debug_assertions)
+}
+
+#[tauri::command]
+fn are_updates_enabled() -> bool {
+    cfg!(feature = "updater")
 }
 
 // Toggles decorations
@@ -264,6 +203,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             is_dev,
+            are_updates_enabled,
             toggle_decorations,
             show_window,
             restart_app,

@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref, watch, provide } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch, useTemplateRef, provide } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import {
   ArrowBigUpDashIcon,
@@ -42,7 +42,7 @@ import ModrinthLoadingIndicator from '@/components/LoadingIndicatorBar.vue'
 import { handleError, useNotifications } from '@/store/notifications.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { type } from '@tauri-apps/plugin-os'
-import { getOS, isDev, restartApp } from '@/helpers/utils.js'
+import {areUpdatesEnabled, getOS, isDev, restartApp} from '@/helpers/utils.js'
 import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { getVersion } from '@tauri-apps/api/app'
@@ -69,6 +69,7 @@ import { hide_ads_window, init_ads_window } from '@/helpers/ads.js'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
+import UpdateModal from "@/components/ui/UpdateModal.vue";
 import { get_available_capes, get_available_skins } from './helpers/skins'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
 
@@ -209,7 +210,6 @@ async function setupApp() {
     })
 
   get_opening_command().then(handleCommand)
-  checkUpdates()
   fetchCredentials()
 
   try {
@@ -347,15 +347,34 @@ async function handleCommand(e) {
 }
 
 const updateAvailable = ref(false)
+const updateModal = useTemplateRef('updateModal')
 async function checkUpdates() {
-  const update = await check()
-  updateAvailable.value = !!update
+  if (!await areUpdatesEnabled()) {
+    console.log('Skipping update check as updates are disabled in this build')
+    return
+  }
 
+  async function performCheck() {
+    if (updateModal.value.isOpen) {
+      console.log('Skipping update check because the update modal is already open')
+      return
+    }
+
+    const update = await check()
+    updateAvailable.value = !!update
+    if (updateAvailable.value) {
+      console.log(`Update ${update.version} is available. Showing update modal.`)
+      updateModal.value.show()
+    }
+  }
+
+  await performCheck()
   setTimeout(
     () => {
       checkUpdates()
     },
-    5 * 1000 * 60,
+    // 5 * 60 * 1000,
+    30 * 1000,
   )
 }
 
@@ -399,6 +418,9 @@ function handleAuxClick(e) {
   <SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
   <div id="teleports"></div>
   <div v-if="stateInitialized" class="app-grid-layout experimental-styles-within relative">
+    <Suspense @resolve="checkUpdates">
+      <UpdateModal ref="updateModal" />
+    </Suspense>
     <Suspense>
       <AppSettingsModal ref="settingsModal" />
     </Suspense>
