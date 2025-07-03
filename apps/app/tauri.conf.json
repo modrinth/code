@@ -90,8 +90,8 @@
         "font-src": ["https://cdn-raw.modrinth.com/fonts/"],
         "img-src": "https: 'unsafe-inline' 'self' asset: http://asset.localhost http://textures.minecraft.net blob: data:",
         "style-src": "'unsafe-inline' 'self'",
-        "script-src": "https://*.posthog.com 'self'",
-        "frame-src": "https://www.youtube.com https://www.youtube-nocookie.com https://discord.com 'self'",
+        "script-src": "https://*.posthog.com https://tally.so/widgets/embed.js 'self'",
+        "frame-src": "https://www.youtube.com https://www.youtube-nocookie.com https://discord.com https://tally.so/popup/ 'self'",
         "media-src": "https://*.githubusercontent.com"
       }
     }
