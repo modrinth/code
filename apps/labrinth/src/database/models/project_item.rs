@@ -208,6 +208,7 @@ impl ProjectBuilder {
             license_url: self.license_url,
             license: self.license,
             slug: self.slug,
+            project_type: self.project_type,
             moderation_message: None,
             moderation_message_body: None,
             webhook_sent: false,
@@ -791,7 +792,7 @@ impl DBProject {
                     LEFT JOIN categories c ON mc.joining_category_id = c.id
                     LEFT JOIN project_types pt ON pt.id = m.project_type
                     WHERE m.id = ANY($1) OR m.slug = ANY($2)
-                    GROUP BY t.id, m.id;
+                    GROUP BY t.id, m.id, pt.name;
                     ",
                     &project_ids_parsed,
                     &slugs,
@@ -833,9 +834,7 @@ impl DBProject {
                                 status: ProjectStatus::from_string(
                                     &m.status,
                                 ),
-                                requested_status: m.requested_status.map(|x| ProjectStatus::from_string(
-                                    &x,
-                                )),
+                                requested_status: m.requested_status.map(|x| ProjectStatus::from_string(x)),
                                 license: m.license.clone(),
                                 slug: m.slug.clone(),
                                 project_type: m.project_type.clone(),
