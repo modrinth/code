@@ -5,9 +5,14 @@
       class="flex max-h-[250px] min-h-[250px] min-w-[300px] max-w-[300px] flex-col gap-4 rounded-[inherit]"
     >
       <img
+        src="https://cdn-raw.modrinth.com/modrinth-servers-placeholder-light.webp"
+        alt="Host your next server with Modrinth Servers"
+        class="light-image hidden rounded-[inherit]"
+      />
+      <img
         src="https://cdn-raw.modrinth.com/modrinth-servers-placeholder-dark.webp"
         alt="Host your next server with Modrinth Servers"
-        class="rounded-[inherit]"
+        class="dark-image rounded-[inherit]"
       />
     </nuxt-link>
     <div
@@ -132,6 +137,19 @@ iframe[id^="google_ads_iframe"] {
 @media (max-width: 1024px) {
   .ad-parent {
     display: none;
+  }
+}
+</style>
+
+<style lang="scss" scoped>
+.light,
+.light-mode {
+  .dark-image {
+    display: none;
+  }
+
+  .light-image {
+    display: block;
   }
 }
 </style>
