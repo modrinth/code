@@ -44,8 +44,19 @@ export default defineConfig({
     port: 1420,
     strictPort: true,
     headers: {
-      // The additional websocket connect-src is required for Vite dev tools such as HMR to work
-      'content-security-policy': tauriConf.app.security.csp.replace('connect-src ', 'connect-src ws://localhost:1420 '),
+      'content-security-policy': Object.entries(tauriConf.app.security.csp)
+        .map(([directive, sources]) => {
+          // An additional websocket connect-src is required for Vite dev tools to work
+          if (directive === 'connect-src') {
+            sources = Array.isArray(sources) ? sources : [sources]
+            sources.push('ws://localhost:1420')
+          }
+
+          return Array.isArray(sources)
+            ? `${directive} ${sources.join(' ')}`
+            : `${directive} ${sources}`
+        })
+        .join('; '),
     },
   },
   // to make use of `TAURI_ENV_DEBUG` and other env variables

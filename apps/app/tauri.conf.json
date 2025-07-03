@@ -84,7 +84,16 @@
         "enable": true
       },
       "capabilities": ["ads", "core", "plugins"],
-      "csp": "font-src https://cdn-raw.modrinth.com/fonts/; media-src https://*.githubusercontent.com; style-src 'unsafe-inline' 'self'; connect-src ipc: http://ipc.localhost https://modrinth.com https://*.modrinth.com https://*.posthog.com https://*.sentry.io https://api.mclo.gs; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://discord.com 'self'; default-src 'self' customprotocol: asset:; script-src https://*.posthog.com 'self'; img-src https: 'unsafe-inline' 'self' asset: http://asset.localhost blob: data:"
+      "csp": {
+        "default-src": "'self' customprotocol: asset:",
+        "connect-src": "ipc: http://ipc.localhost https://modrinth.com https://*.modrinth.com https://*.posthog.com https://*.sentry.io https://api.mclo.gs",
+        "font-src": ["https://cdn-raw.modrinth.com/fonts/"],
+        "img-src": "https: 'unsafe-inline' 'self' asset: http://asset.localhost blob: data:",
+        "style-src": "'unsafe-inline' 'self'",
+        "script-src": "https://*.posthog.com 'self'",
+        "frame-src": "https://www.youtube.com https://www.youtube-nocookie.com https://discord.com 'self'",
+        "media-src": "https://*.githubusercontent.com"
+      }
     }
   }
 }
