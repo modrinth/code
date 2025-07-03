@@ -5,6 +5,10 @@ export async function isDev() {
   return await invoke('is_dev')
 }
 
+export async function areUpdatesEnabled() {
+  return await invoke('are_updates_enabled')
+}
+
 // One of 'Windows', 'Linux', 'MacOS'
 export async function getOS() {
   return await invoke('plugin:utils|get_os')

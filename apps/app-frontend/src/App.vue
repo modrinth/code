@@ -16,6 +16,7 @@ import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
+import UpdateModal from '@/components/ui/UpdateModal.vue'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { hide_ads_window, init_ads_window } from '@/helpers/ads.js'
@@ -26,9 +27,10 @@ import { useFetch } from '@/helpers/fetch.js'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.js'
 import { get } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
-import { getOS, isDev, restartApp } from '@/helpers/utils.js'
+import { areUpdatesEnabled, getOS, isDev, restartApp } from '@/helpers/utils.js'
 import { useError } from '@/store/error.js'
 import { useInstall } from '@/store/install.js'
+import { handleError } from '@/store/notifications.js'
 import { useLoading, useTheming } from '@/store/state'
 import {
   ArrowBigUpDashIcon,
@@ -67,7 +69,7 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
 import { check } from '@tauri-apps/plugin-updater'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
-import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, provide, ref, useTemplateRef, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import { create_profile_and_install_from_file } from './helpers/pack'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
@@ -215,7 +217,6 @@ async function setupApp() {
     })
 
   get_opening_command().then(handleCommand)
-  checkUpdates()
   fetchCredentials()
 
   try {
@@ -366,15 +367,34 @@ async function handleCommand(e) {
 }
 
 const updateAvailable = ref(false)
+const updateModal = useTemplateRef('updateModal')
 async function checkUpdates() {
-  const update = await check()
-  updateAvailable.value = !!update
+  if (!(await areUpdatesEnabled())) {
+    console.log('Skipping update check as updates are disabled in this build')
+    return
+  }
 
+  async function performCheck() {
+    if (updateModal.value.isOpen) {
+      console.log('Skipping update check because the update modal is already open')
+      return
+    }
+
+    const update = await check()
+    updateAvailable.value = !!update
+    if (updateAvailable.value) {
+      console.log(`Update ${update.version} is available. Showing update modal.`)
+      updateModal.value.show()
+    }
+  }
+
+  await performCheck()
   setTimeout(
     () => {
       checkUpdates()
     },
-    5 * 1000 * 60,
+    // 5 * 60 * 1000,
+    30 * 1000,
   )
 }
 
@@ -418,6 +438,9 @@ function handleAuxClick(e) {
   <SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
   <div id="teleports"></div>
   <div v-if="stateInitialized" class="app-grid-layout experimental-styles-within relative">
+    <Suspense @resolve="checkUpdates">
+      <UpdateModal ref="updateModal" />
+    </Suspense>
     <Suspense>
       <AppSettingsModal ref="settingsModal" />
     </Suspense>
