@@ -44,16 +44,6 @@ const VERSIONS: VersionEntry[] = [
   },
   {
     date: `2025-06-30T19:15:00-07:00`,
-    product: 'web',
-    body: `### Added
-- Added news page, with all our old blog posts now hosted on our website.
-
-### Improvements
-- Changed download count rounding to be more precise.
-- Fixed Creator Monetization Program page to show accurate information again.`,
-  },
-  {
-    date: `2025-06-30T19:15:00-07:00`,
     product: 'servers',
     body: `### Improvements
 - Progress will now show when installing Modrinth Pack (.mrpack) files.
