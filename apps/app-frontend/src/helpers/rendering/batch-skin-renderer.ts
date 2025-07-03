@@ -4,6 +4,9 @@ import { get_normalized_skin_texture, determineModelType } from '../skins'
 import { reactive } from 'vue'
 import { setupSkinModel, disposeCaches } from '@modrinth/utils'
 import { skinPreviewStorage } from '../storage/skin-preview-storage'
+import capeModelUrl from '@/assets/models/cape.gltf?url'
+import wideModelUrl from '@/assets/models/classic_player.gltf?url'
+import slimModelUrl from '@/assets/models/slim_player.gltf?url'
 
 export interface RenderResult {
   forwards: string
@@ -124,11 +127,11 @@ class BatchSkinRenderer {
 function getModelUrlForVariant(variant: string): string {
   switch (variant) {
     case 'SLIM':
-      return '/src/assets/models/slim_player.gltf'
+      return slimModelUrl
     case 'CLASSIC':
     case 'UNKNOWN':
     default:
-      return '/src/assets/models/classic_player.gltf'
+      return wideModelUrl
   }
 }
 
@@ -292,7 +295,6 @@ export async function getPlayerHeadUrl(skin: Skin): Promise<string> {
 
 export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promise<void> {
   const renderer = new BatchSkinRenderer()
-  const capeModelUrl = '/src/assets/models/cape.gltf'
 
   try {
     for (const skin of skins) {
