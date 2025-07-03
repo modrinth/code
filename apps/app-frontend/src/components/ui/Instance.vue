@@ -19,7 +19,6 @@ import { showProfileInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
 import { trackEvent } from '@/helpers/analytics'
 import dayjs from 'dayjs'
-import { formatCategory } from '@modrinth/utils'
 
 const formatRelativeTime = useRelativeTime()
 
