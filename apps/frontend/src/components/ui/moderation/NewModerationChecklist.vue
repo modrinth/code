@@ -14,7 +14,7 @@
       </ButtonStyled>
       <ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
         <button v-tooltip="`Reset progress`" @click="resetProgress">
-          <BrushClean />
+          <BrushCleaningIcon />
         </button>
       </ButtonStyled>
       <ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
@@ -205,7 +205,7 @@ import {
   ScaleIcon,
   ListBulletedIcon,
   FileTextIcon,
-  ClearIcon,
+  BrushCleaningIcon,
 } from "@modrinth/assets";
 import {
   checklist,
