@@ -237,8 +237,8 @@ onUnmounted(() => unlisten())
         </p>
         <div class="flex items-center col-span-3 gap-1 text-secondary font-semibold mt-auto">
           <GameIcon class="shrink-0" />
-          <span class="text-sm">
-            {{ formatCategory(instance.loader) }} {{ instance.game_version }}
+          <span class="text-sm capitalize">
+            {{ instance.loader }} {{ instance.game_version }}
           </span>
         </div>
       </div>
