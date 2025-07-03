@@ -1,8 +1,5 @@
 <template>
-  <ModalWrapper
-    ref="modal"
-    :header="formatMessage(messages.header)"
-  >
+  <ModalWrapper ref="modal" :header="formatMessage(messages.header)">
     <div>{{ formatMessage(messages.body, { version: update!.version }) }}</div>
     <div class="mt-4 flex flex-wrap gap-2">
       <ButtonStyled color="green">
@@ -26,14 +23,14 @@
 </template>
 
 <script setup lang="ts">
-import ModalWrapper from "@/components/ui/modal/ModalWrapper.vue";
-import {defineMessages, useVIntl} from "@vintl/vintl";
-import {useTemplateRef, ref} from 'vue';
-import {Update} from "@tauri-apps/plugin-updater";
-import {ButtonStyled} from "@modrinth/ui";
-import {RefreshCwIcon} from "@modrinth/assets";
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+import { useTemplateRef, ref } from 'vue'
+import type { Update } from '@tauri-apps/plugin-updater'
+import { ButtonStyled } from '@modrinth/ui'
+import { RefreshCwIcon } from '@modrinth/assets'
 
-const {formatMessage} = useVIntl();
+const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
   header: {
@@ -58,13 +55,13 @@ const messages = defineMessages({
   },
 })
 
-const update = ref<Update>();
+const update = ref<Update>()
 
 const modal = useTemplateRef('modal')
 const isOpen = ref(false)
 
 function show(newUpdate: Update) {
-  update.value = newUpdate;
+  update.value = newUpdate
   modal.value!.show()
   isOpen.value = true
 }
@@ -77,5 +74,4 @@ function hide() {
 defineExpose({ show, isOpen })
 </script>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>

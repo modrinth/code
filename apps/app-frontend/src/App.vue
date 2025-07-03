@@ -42,7 +42,7 @@ import ModrinthLoadingIndicator from '@/components/LoadingIndicatorBar.vue'
 import { handleError, useNotifications } from '@/store/notifications.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { type } from '@tauri-apps/plugin-os'
-import {areUpdatesEnabled, getOS, isDev, restartApp} from '@/helpers/utils.js'
+import { areUpdatesEnabled, getOS, isDev, restartApp } from '@/helpers/utils.js'
 import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { getVersion } from '@tauri-apps/api/app'
@@ -69,7 +69,7 @@ import { hide_ads_window, init_ads_window } from '@/helpers/ads.js'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
-import UpdateModal from "@/components/ui/UpdateModal.vue";
+import UpdateModal from '@/components/ui/UpdateModal.vue'
 import { get_available_capes, get_available_skins } from './helpers/skins'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
 
@@ -349,7 +349,7 @@ async function handleCommand(e) {
 const updateAvailable = ref(false)
 const updateModal = useTemplateRef('updateModal')
 async function checkUpdates() {
-  if (!await areUpdatesEnabled()) {
+  if (!(await areUpdatesEnabled())) {
     console.log('Skipping update check as updates are disabled in this build')
     return
   }
