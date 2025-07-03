@@ -834,7 +834,10 @@ impl DBProject {
                                 status: ProjectStatus::from_string(
                                     &m.status,
                                 ),
-                                requested_status: m.requested_status.map(|x| ProjectStatus::from_string(x)),
+                                requested_status: m
+                                    .requested_status
+                                    .as_deref()
+                                    .map(ProjectStatus::from_string),
                                 license: m.license.clone(),
                                 slug: m.slug.clone(),
                                 project_type: m.project_type.clone(),
