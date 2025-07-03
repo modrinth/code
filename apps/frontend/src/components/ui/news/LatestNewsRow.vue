@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-2 p-4 !py-8 shadow-md sm:mx-8 sm:p-32">
+  <div class="mx-2 p-4 !py-8 sm:mx-8 sm:p-32">
     <div class="my-8 flex items-center justify-between">
       <h2 class="m-0 mx-auto text-3xl font-extrabold sm:text-4xl">Latest news from Modrinth</h2>
     </div>

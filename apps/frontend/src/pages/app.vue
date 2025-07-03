@@ -874,7 +874,7 @@ useSeoMeta({
         <nuxt-link to="/legal/privacy">Privacy Policy.</nuxt-link>
       </p>
     </div>
-    <div class="bg-black">
+    <div class="bg-[var(--landing-raw-bg)]">
       <LatestNewsRow />
     </div>
   </div>
