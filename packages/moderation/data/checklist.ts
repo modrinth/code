@@ -10,10 +10,8 @@ import slug from './stages/slug'
 import summary from './stages/summary'
 import title from './stages/title'
 import versions from './stages/versions'
-import { testStage } from './test-stage'
 
 export default [
-  testStage,
   title,
   slug,
   summary,

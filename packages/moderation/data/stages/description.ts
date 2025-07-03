@@ -29,7 +29,9 @@ const description: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'medium',
-      message: async () => (await import('../messages/description/insufficient-packs.md?raw')).default,
+      shouldShow: (project) => project.project_type === 'modpack',
+      message: async () =>
+        (await import('../messages/description/insufficient-packs.md?raw')).default,
     } as ButtonAction,
     {
       id: 'description_insufficient_projects',
@@ -38,7 +40,9 @@ const description: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'medium',
-      message: async () => (await import('../messages/description/insufficient-projects.md?raw')).default,
+      shouldShow: (project) => project.project_type !== 'modpack',
+      message: async () =>
+        (await import('../messages/description/insufficient-projects.md?raw')).default,
     } as ButtonAction,
     {
       id: 'description_non_english',
@@ -90,7 +94,8 @@ const description: Stage = {
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'medium',
-      message: async () => (await import('../messages/description/non-standard-text.md?raw')).default,
+      message: async () =>
+        (await import('../messages/description/non-standard-text.md?raw')).default,
     } as ButtonAction,
   ],
 }
