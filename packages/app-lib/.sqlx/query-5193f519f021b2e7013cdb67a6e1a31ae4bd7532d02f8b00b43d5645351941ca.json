@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                max_concurrent_writes, max_concurrent_downloads,\n                theme, default_page, collapsed_navigation, advanced_rendering, native_decorations,\n                discord_rpc, developer_mode, telemetry, personalized_ads,\n                onboarded,\n                json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,\n                mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,\n                hook_pre_launch, hook_wrapper, hook_post_exit,\n                custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar\n            FROM settings\n            ",
+  "query": "\n            SELECT\n                max_concurrent_writes, max_concurrent_downloads,\n                theme, default_page, collapsed_navigation, hide_nametag_skins_page, advanced_rendering, native_decorations,\n                discord_rpc, developer_mode, telemetry, personalized_ads,\n                onboarded,\n                json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,\n                mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,\n                hook_pre_launch, hook_wrapper, hook_post_exit,\n                custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar\n            FROM settings\n            ",
   "describe": {
     "columns": [
       {
@@ -29,113 +29,118 @@
         "type_info": "Integer"
       },
       {
-        "name": "advanced_rendering",
+        "name": "hide_nametag_skins_page",
         "ordinal": 5,
         "type_info": "Integer"
       },
       {
-        "name": "native_decorations",
+        "name": "advanced_rendering",
         "ordinal": 6,
         "type_info": "Integer"
       },
       {
-        "name": "discord_rpc",
+        "name": "native_decorations",
         "ordinal": 7,
         "type_info": "Integer"
       },
       {
-        "name": "developer_mode",
+        "name": "discord_rpc",
         "ordinal": 8,
         "type_info": "Integer"
       },
       {
-        "name": "telemetry",
+        "name": "developer_mode",
         "ordinal": 9,
         "type_info": "Integer"
       },
       {
-        "name": "personalized_ads",
+        "name": "telemetry",
         "ordinal": 10,
         "type_info": "Integer"
       },
       {
-        "name": "onboarded",
+        "name": "personalized_ads",
         "ordinal": 11,
         "type_info": "Integer"
       },
       {
-        "name": "extra_launch_args",
+        "name": "onboarded",
         "ordinal": 12,
-        "type_info": "Text"
+        "type_info": "Integer"
       },
       {
-        "name": "custom_env_vars",
+        "name": "extra_launch_args",
         "ordinal": 13,
         "type_info": "Text"
       },
       {
-        "name": "mc_memory_max",
+        "name": "custom_env_vars",
         "ordinal": 14,
-        "type_info": "Integer"
+        "type_info": "Text"
       },
       {
-        "name": "mc_force_fullscreen",
+        "name": "mc_memory_max",
         "ordinal": 15,
         "type_info": "Integer"
       },
       {
-        "name": "mc_game_resolution_x",
+        "name": "mc_force_fullscreen",
         "ordinal": 16,
         "type_info": "Integer"
       },
       {
-        "name": "mc_game_resolution_y",
+        "name": "mc_game_resolution_x",
         "ordinal": 17,
         "type_info": "Integer"
       },
       {
-        "name": "hide_on_process_start",
+        "name": "mc_game_resolution_y",
         "ordinal": 18,
         "type_info": "Integer"
       },
       {
-        "name": "hook_pre_launch",
+        "name": "hide_on_process_start",
         "ordinal": 19,
-        "type_info": "Text"
+        "type_info": "Integer"
       },
       {
-        "name": "hook_wrapper",
+        "name": "hook_pre_launch",
         "ordinal": 20,
         "type_info": "Text"
       },
       {
-        "name": "hook_post_exit",
+        "name": "hook_wrapper",
         "ordinal": 21,
         "type_info": "Text"
       },
       {
-        "name": "custom_dir",
+        "name": "hook_post_exit",
         "ordinal": 22,
         "type_info": "Text"
       },
       {
-        "name": "prev_custom_dir",
+        "name": "custom_dir",
         "ordinal": 23,
         "type_info": "Text"
       },
       {
-        "name": "migrated",
+        "name": "prev_custom_dir",
         "ordinal": 24,
+        "type_info": "Text"
+      },
+      {
+        "name": "migrated",
+        "ordinal": 25,
         "type_info": "Integer"
       },
       {
         "name": "feature_flags",
-        "ordinal": 25,
+        "ordinal": 26,
         "type_info": "Text"
       },
       {
         "name": "toggle_sidebar",
-        "ordinal": 26,
+        "ordinal": 27,
         "type_info": "Integer"
       }
     ],
@@ -143,6 +148,7 @@
       "Right": 0
     },
     "nullable": [
+      false,
       false,
       false,
       false,
@@ -172,5 +178,5 @@
       false
     ]
   },
-  "hash": "d90a2f2f823fc546661a94af07249758c5ca82db396268bca5087bac88f733d9"
+  "hash": "5193f519f021b2e7013cdb67a6e1a31ae4bd7532d02f8b00b43d5645351941ca"
 }

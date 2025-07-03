@@ -5,7 +5,7 @@ authors = ["Jai A <jaiagr+gpg@pm.me>"]
 edition.workspace = true
 
 [dependencies]
-bytes.workspace = true
+bytes = { workspace = true, features = ["serde"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 serde_ini.workspace = true
@@ -24,6 +24,9 @@ enumset.workspace = true
 chardetng.workspace = true
 encoding_rs.workspace = true
 hashlink.workspace = true
+png.workspace = true
+bytemuck.workspace = true
+rgb.workspace = true
 
 chrono = { workspace = true, features = ["serde"] }
 daedalus.workspace = true
@@ -33,21 +36,23 @@ regex.workspace = true
 sysinfo = { workspace = true, features = ["system", "disk"] }
 thiserror.workspace = true
 either.workspace = true
+data-url.workspace = true
 
 tracing.workspace = true
 tracing-subscriber = { workspace = true, features = ["chrono", "env-filter"] }
 tracing-error.workspace = true
 
 paste.workspace = true
+heck.workspace = true
 
 tauri = { workspace = true, optional = true, features = ["unstable"] }
 indicatif = { workspace = true, optional = true }
 
 async-tungstenite = { workspace = true, features = ["tokio-runtime", "tokio-rustls-webpki-roots"] }
 futures = { workspace = true, features = ["async-await", "alloc"] }
-reqwest = { workspace = true, features = ["json", "stream", "deflate", "gzip", "brotli", "rustls-tls-webpki-roots", "charset", "http2", "macos-system-configuration"] }
+reqwest = { workspace = true, features = ["json", "stream", "deflate", "gzip", "brotli", "rustls-tls-webpki-roots", "charset", "http2", "macos-system-configuration", "multipart"] }
 tokio = { workspace = true, features = ["time", "io-util", "net", "sync", "fs", "macros", "process"] }
-tokio-util = { workspace = true, features = ["compat"] }
+tokio-util = { workspace = true, features = ["compat", "io", "io-util"] }
 async-recursion.workspace = true
 fs4 = { workspace = true, features = ["tokio"] }
 async-walkdir.workspace = true
@@ -66,7 +71,7 @@ p256 = { workspace = true, features = ["ecdsa"] }
 rand.workspace = true
 base64.workspace = true
 
-sqlx = { workspace = true, features = ["runtime-tokio", "sqlite", "macros", "migrate", "json"] }
+sqlx = { workspace = true, features = ["runtime-tokio", "sqlite", "macros", "migrate", "json", "uuid"] }
 
 quartz_nbt = { workspace = true, features = ["serde"] }
 hickory-resolver.workspace = true

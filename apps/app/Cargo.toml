@@ -1,6 +1,6 @@
 [package]
 name = "theseus_gui"
-version = "0.9.5"
+version = "0.10.0"
 description = "The Modrinth App is a desktop application for managing your Minecraft mods"
 license = "GPL-3.0-only"
 repository = "https://github.com/modrinth/code/apps/app/"
@@ -17,13 +17,14 @@ serde = { workspace = true, features = ["derive"] }
 serde_with.workspace = true
 
 tauri = { workspace = true, features = ["devtools", "macos-private-api", "protocol-asset"] }
-tauri-plugin-window-state.workspace = true
 tauri-plugin-deep-link.workspace = true
-tauri-plugin-os.workspace = true
-tauri-plugin-opener.workspace = true
 tauri-plugin-dialog.workspace = true
-tauri-plugin-updater.workspace = true
+tauri-plugin-http.workspace = true
+tauri-plugin-opener.workspace = true
+tauri-plugin-os.workspace = true
 tauri-plugin-single-instance.workspace = true
+tauri-plugin-updater.workspace = true
+tauri-plugin-window-state.workspace = true
 
 tokio = { workspace = true, features = ["time"] }
 thiserror.workspace = true
@@ -43,7 +44,6 @@ paste.workspace = true
 enumset = { workspace = true, features = ["serde"] }
 
 native-dialog.workspace = true
-tauri-plugin-http = "2.5.0"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 tauri-plugin-updater = { workspace = true, optional = true }

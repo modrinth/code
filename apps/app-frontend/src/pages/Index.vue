@@ -10,6 +10,7 @@ import dayjs from 'dayjs'
 import { get_search_results } from '@/helpers/cache.js'
 import type { SearchResult } from '@modrinth/utils'
 import RecentWorldsList from '@/components/ui/world/RecentWorldsList.vue'
+import type { GameInstance } from '@/helpers/types'
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
@@ -82,13 +83,15 @@ async function refreshFeaturedProjects() {
 await fetchInstances()
 await refreshFeaturedProjects()
 
-const unlistenProfile = await profile_listener(async (e) => {
-  await fetchInstances()
+const unlistenProfile = await profile_listener(
+  async (e: { event: string; profile_path_id: string }) => {
+    await fetchInstances()
 
-  if (e.event === 'added' || e.event === 'created' || e.event === 'removed') {
-    await refreshFeaturedProjects()
-  }
-})
+    if (e.event === 'added' || e.event === 'created' || e.event === 'removed') {
+      await refreshFeaturedProjects()
+    }
+  },
+)
 
 onUnmounted(() => {
   unlistenProfile()
@@ -97,8 +100,8 @@ onUnmounted(() => {
 
 <template>
   <div class="p-6 flex flex-col gap-2">
-    <h1 v-if="recentInstances" class="m-0 text-2xl">Welcome back!</h1>
-    <h1 v-else class="m-0 text-2xl">Welcome to Modrinth App!</h1>
+    <h1 v-if="recentInstances?.length > 0" class="m-0 text-2xl font-extrabold">Welcome back!</h1>
+    <h1 v-else class="m-0 text-2xl font-extrabold">Welcome to Modrinth App!</h1>
     <RecentWorldsList :recent-instances="recentInstances" />
     <RowDisplay
       v-if="hasFeaturedProjects"

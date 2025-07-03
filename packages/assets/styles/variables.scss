@@ -68,6 +68,8 @@
   --color-button-bg-selected: var(--color-brand);
   --color-button-text-selected: var(--color-accent-contrast);
 
+  --color-gradient-button-bg: linear-gradient(180deg, #f8f9fa 0%, #dce0e6 100%);
+
   --loading-bar-gradient: linear-gradient(to right, var(--color-brand) 0%, #00af5c 100%);
 
   --color-platform-fabric: #8a7b71;
@@ -186,6 +188,8 @@ html {
   --color-button-bg-selected: var(--color-brand-highlight);
   --color-button-text-selected: var(--color-brand);
 
+  --color-gradient-button-bg: linear-gradient(180deg, #3a3d47 0%, #33363d 100%);
+
   --loading-bar-gradient: linear-gradient(to right, var(--color-brand) 0%, #1ffa9a 100%);
 
   --color-platform-fabric: #dbb69b;
@@ -230,6 +234,8 @@ html {
     rgba(9, 18, 14, 0.6) 10%,
     rgba(19, 31, 23, 0.5) 100%
   );
+
+  --color-gradient-button-bg: linear-gradient(180deg, #1b1b20 0%, #25262b 100%);
 }
 
 .retro-mode {

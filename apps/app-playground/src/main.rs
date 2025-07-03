@@ -27,7 +27,10 @@ pub async fn authenticate_run() -> theseus::Result<Credentials> {
 
     let credentials = minecraft_auth::finish_login(&input, login).await?;
 
-    println!("Logged in user {}.", credentials.username);
+    println!(
+        "Logged in user {}.",
+        credentials.maybe_online_profile().await.name
+    );
     Ok(credentials)
 }
 

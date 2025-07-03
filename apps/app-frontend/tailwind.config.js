@@ -41,6 +41,7 @@ export default {
           green: 'var(--color-green-highlight)',
           blue: 'var(--color-blue-highlight)',
           purple: 'var(--color-purple-highlight)',
+          gray: 'var(--color-gray-highlight)',
         },
         divider: {
           DEFAULT: 'var(--color-divider)',
