@@ -383,14 +383,14 @@
   "layout.footer.about": {
     "message": "About"
   },
-  "layout.footer.about.news": {
-    "message": "News"
-  },
   "layout.footer.about.careers": {
     "message": "Careers"
   },
   "layout.footer.about.changelog": {
     "message": "Changelog"
+  },
+  "layout.footer.about.news": {
+    "message": "News"
   },
   "layout.footer.about.rewards-program": {
     "message": "Rewards Program"
