@@ -419,7 +419,7 @@
         </div>
       </div>
     </div>
-    <div class="bg-black">
+    <div class="bg-[var(--landing-raw-bg)]">
       <LatestNewsRow />
     </div>
   </div>
