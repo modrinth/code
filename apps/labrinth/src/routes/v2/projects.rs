@@ -376,6 +376,7 @@ pub struct EditProject {
     pub license_id: Option<String>,
     pub client_side: Option<LegacySideType>,
     pub server_side: Option<LegacySideType>,
+    pub project_type: Option<String>,
     #[validate(
         length(min = 3, max = 64),
         regex(path = *crate::util::validate::RE_URL_SAFE)
@@ -512,6 +513,7 @@ pub async fn project_edit(
         moderation_message_body: v2_new_project.moderation_message_body,
         monetization_status: v2_new_project.monetization_status,
         side_types_migration_review_status: None, // Not to be exposed in v2
+        project_type: v2_new_project.project_type,
     };
 
     // This returns 204 or failure so we don't need to do anything with it

@@ -1375,6 +1375,15 @@ async function patchProject(resData, quiet = false) {
       project.value[key] = resData[key];
     }
 
+    if (resData.project_type) {
+      project.value.actualProjectType = resData.project_type;
+      project.value.project_type = data.$getProjectTypeForUrl(
+        resData.project_type,
+        project.value.loaders,
+        tags.value,
+      );
+    }
+
     if (resData.license_id) {
       project.value.license.id = resData.license_id;
     }
