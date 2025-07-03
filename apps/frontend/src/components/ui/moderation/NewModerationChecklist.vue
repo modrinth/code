@@ -479,31 +479,20 @@ const isAnyVisibleInputs = computed(() => {
 });
 
 async function assembleFullMessage() {
-  console.log("=== Assembling Full Message Across All Stages ===");
   const messageParts: MessagePart[] = [];
 
   for (let stageIndex = 0; stageIndex < checklist.length; stageIndex++) {
     const stage = checklist[stageIndex];
-    console.log(`\nProcessing Stage ${stageIndex}: ${stage.title}`);
 
     await processStageActions(stage, stageIndex, messageParts);
   }
 
   messageParts.sort((a, b) => a.weight - b.weight);
 
-  console.log("\n=== All Message Parts (sorted by weight) ===");
-  messageParts.forEach((part) => {
-    console.log(`Stage ${part.stageIndex}, Weight ${part.weight}: ${part.actionId}`);
-  });
-
   const finalMessage = messageParts
     .map((part) => part.content)
     .filter((content) => content.trim().length > 0)
     .join("\n\n");
-
-  console.log("\n=== Final Assembled Message ===");
-  console.log(finalMessage);
-  console.log("=== End Message Assembly ===");
 
   return finalMessage;
 }
@@ -556,8 +545,6 @@ async function processAction(
   stageIndex: number,
   messageParts: MessagePart[],
 ) {
-  console.log(`  Processing action: ${actionId} (${action.type})`);
-
   if (action.type === "button" || action.type === "toggle") {
     const buttonAction = action as ButtonAction | ToggleAction;
     const message = await getActionMessage(buttonAction, selectedActionIds);
@@ -674,24 +661,6 @@ const stageOptions = computed<OverflowMenuOption[]>(() => {
     })
     .filter((opt): opt is OverflowMenuOption => opt !== null);
 });
-
-const debug = true;
-if (debug) {
-  watch(
-    actionStates,
-    (newStates) => {
-      console.log("Action states changed:", newStates);
-    },
-    { deep: true },
-  );
-
-  watch(visibleActions, (newActions) => {
-    console.log(
-      "Visible actions:",
-      newActions.map((a) => a.id || "no-id"),
-    );
-  });
-}
 </script>
 
 <style scoped lang="scss">
