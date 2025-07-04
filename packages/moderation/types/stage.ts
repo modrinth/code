@@ -11,6 +11,11 @@ export interface Stage {
   title: string
 
   /**
+   * Optional id for the stage, used for identification in the checklist.
+   */
+  id?: string
+
+  /**
    * URL to the guidance document for this stage.
    */
   guidance_url: string

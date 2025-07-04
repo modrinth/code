@@ -167,6 +167,7 @@ import _TextQuoteIcon from './icons/text-quote.svg?component'
 import _TimerIcon from './icons/timer.svg?component'
 import _TransferIcon from './icons/transfer.svg?component'
 import _TrashIcon from './icons/trash.svg?component'
+import _TriangleAlertIcon from './icons/triangle-alert.svg?component'
 import _UnderlineIcon from './icons/underline.svg?component'
 import _UndoIcon from './icons/undo.svg?component'
 import _UnknownDonationIcon from './icons/unknown-donation.svg?component'
@@ -355,6 +356,7 @@ export const TextQuoteIcon = _TextQuoteIcon
 export const TimerIcon = _TimerIcon
 export const TransferIcon = _TransferIcon
 export const TrashIcon = _TrashIcon
+export const TriangleAlertIcon = _TriangleAlertIcon
 export const UnderlineIcon = _UnderlineIcon
 export const UndoIcon = _UndoIcon
 export const UnknownDonationIcon = _UnknownDonationIcon

@@ -1,4 +1,5 @@
 import type { Stage } from '../types/stage'
+import modpackPermissionsStage from './modpack-permissions-stage'
 import categories from './stages/categories'
 import copyright from './stages/copyright'
 import description from './stages/description'
@@ -23,4 +24,5 @@ export default [
   versions,
   copyright,
   ruleFollowing,
+  modpackPermissionsStage,
 ] as ReadonlyArray<Stage>

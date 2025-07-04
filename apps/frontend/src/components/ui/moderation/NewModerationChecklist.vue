@@ -32,115 +32,128 @@
     <Collapsible base-class="grow" class="flex grow flex-col" :collapsed="collapsed">
       <div class="my-4 h-[1px] w-full bg-divider" />
       <div class="flex-1">
-        <h2 class="m-0 mb-2 text-lg font-extrabold">{{ currentStageObj.title }}</h2>
+        <template v-if="isModpackPermissionsStage">
+          <ModpackPermissionsFlow
+            :project-id="project.id"
+            @complete="handleModpackPermissionsComplete"
+          />
+        </template>
 
-        <!-- Action components grouped by type -->
-        <div class="space-y-4">
-          <!-- Button actions group -->
-          <div v-if="buttonActions.length > 0" class="button-actions-group">
-            <div class="flex flex-wrap gap-2">
-              <template v-for="action in buttonActions" :key="getActionKey(action)">
-                <ButtonStyled
-                  :color="isActionSelected(action) ? 'brand' : 'standard'"
-                  @click="toggleAction(action)"
-                >
-                  <button>
-                    {{ action.label }}
-                  </button>
-                </ButtonStyled>
+        <template v-else>
+          <h2 class="m-0 mb-2 text-lg font-extrabold">
+            {{ currentStageObj.title }}
+          </h2>
+
+          <!-- Action components grouped by type -->
+          <div class="space-y-4">
+            <!-- Button actions group -->
+            <div v-if="buttonActions.length > 0" class="button-actions-group">
+              <div class="flex flex-wrap gap-2">
+                <template v-for="action in buttonActions" :key="getActionKey(action)">
+                  <ButtonStyled
+                    :color="isActionSelected(action) ? 'brand' : 'standard'"
+                    @click="toggleAction(action)"
+                  >
+                    <button>
+                      {{ action.label }}
+                    </button>
+                  </ButtonStyled>
+                </template>
+              </div>
+            </div>
+
+            <!-- Toggle actions group -->
+            <div v-if="toggleActions.length > 0" class="toggle-actions-group space-y-3">
+              <template v-for="action in toggleActions" :key="getActionKey(action)">
+                <Checkbox
+                  :model-value="actionStates[getActionId(action)]?.selected ?? false"
+                  :label="action.label"
+                  :description="action.description"
+                  :disabled="false"
+                  @update:model-value="toggleAction(action)"
+                />
+              </template>
+            </div>
+
+            <!-- Dropdown actions group -->
+            <div v-if="dropdownActions.length > 0" class="dropdown-actions-group space-y-3">
+              <template v-for="action in dropdownActions" :key="getActionKey(action)">
+                <div class="inputs universal-labels">
+                  <div>
+                    <label :for="`dropdown-${getActionId(action)}`">
+                      <span class="label__title">{{ action.label }}</span>
+                    </label>
+                    <DropdownSelect
+                      :name="`dropdown-${getActionId(action)}`"
+                      :options="action.options"
+                      :model-value="getDropdownValue(action)"
+                      :placeholder="'Select an option'"
+                      :disabled="false"
+                      :display-name="(opt: any) => opt?.label || 'Unknown option'"
+                      @update:model-value="
+                        (selected: any) => selectDropdownOption(action, selected)
+                      "
+                    />
+                  </div>
+                </div>
+              </template>
+            </div>
+
+            <!-- Multi-select chips actions group -->
+            <div v-if="multiSelectActions.length > 0" class="multi-select-actions-group space-y-3">
+              <template v-for="action in multiSelectActions" :key="getActionKey(action)">
+                <div>
+                  <div class="mb-2 font-semibold">{{ action.label }}</div>
+                  <div class="flex flex-wrap gap-2">
+                    <ButtonStyled
+                      v-for="(option, optIndex) in action.options"
+                      :key="`${getActionId(action)}-chip-${optIndex}`"
+                      :color="isChipSelected(action, optIndex) ? 'brand' : 'standard'"
+                      @click="toggleChip(action, optIndex)"
+                    >
+                      <button>
+                        {{ option.label }}
+                      </button>
+                    </ButtonStyled>
+                  </div>
+                </div>
               </template>
             </div>
           </div>
 
-          <!-- Toggle actions group -->
-          <div v-if="toggleActions.length > 0" class="toggle-actions-group space-y-3">
-            <template v-for="action in toggleActions" :key="getActionKey(action)">
-              <Checkbox
-                :model-value="actionStates[getActionId(action)]?.selected ?? false"
-                :label="action.label"
-                :description="action.description"
-                :disabled="false"
-                @update:model-value="toggleAction(action)"
-              />
-            </template>
-          </div>
+          <div v-if="isAnyVisibleInputs" class="my-4 h-[1px] w-full bg-divider" />
 
-          <!-- Dropdown actions group -->
-          <div v-if="dropdownActions.length > 0" class="dropdown-actions-group space-y-3">
-            <template v-for="action in dropdownActions" :key="getActionKey(action)">
-              <div class="inputs universal-labels">
-                <div>
-                  <label :for="`dropdown-${getActionId(action)}`">
-                    <span class="label__title">{{ action.label }}</span>
+          <!-- Additional text inputs -->
+          <div class="space-y-4">
+            <template v-for="action in visibleActions" :key="`inputs-${getActionKey(action)}`">
+              <div
+                v-if="action.relevantExtraInput && isActionSelected(action)"
+                class="inputs universal-labels"
+              >
+                <div
+                  v-for="(input, inputIndex) in getVisibleInputs(action, actionStates)"
+                  :key="`input-${getActionId(action)}-${inputIndex}`"
+                  class="mt-2"
+                >
+                  <label :for="`input-${getActionId(action)}-${inputIndex}`">
+                    <span class="label__title">
+                      {{ input.label }}
+                      <span v-if="input.required" class="required">*</span>
+                    </span>
                   </label>
-                  <DropdownSelect
-                    :name="`dropdown-${getActionId(action)}`"
-                    :options="action.options"
-                    :model-value="getDropdownValue(action)"
-                    :placeholder="'Select an option'"
-                    :disabled="false"
-                    :display-name="(opt: any) => opt?.label || 'Unknown option'"
-                    @update:model-value="(selected: any) => selectDropdownOption(action, selected)"
+                  <input
+                    :id="`input-${getActionId(action)}-${inputIndex}`"
+                    v-model="textInputValues[`${getActionId(action)}-${inputIndex}`]"
+                    type="text"
+                    :placeholder="input.placeholder"
+                    autocomplete="off"
+                    @input="persistState"
                   />
                 </div>
               </div>
             </template>
           </div>
-
-          <!-- Multi-select chips actions group -->
-          <div v-if="multiSelectActions.length > 0" class="multi-select-actions-group space-y-3">
-            <template v-for="action in multiSelectActions" :key="getActionKey(action)">
-              <div>
-                <div class="mb-2 font-semibold">{{ action.label }}</div>
-                <div class="flex flex-wrap gap-2">
-                  <ButtonStyled
-                    v-for="(option, optIndex) in action.options"
-                    :key="`${getActionId(action)}-chip-${optIndex}`"
-                    :color="isChipSelected(action, optIndex) ? 'brand' : 'standard'"
-                    @click="toggleChip(action, optIndex)"
-                  >
-                    <button>
-                      {{ option.label }}
-                    </button>
-                  </ButtonStyled>
-                </div>
-              </div>
-            </template>
-          </div>
-        </div>
-
-        <div v-if="isAnyVisibleInputs" class="my-4 h-[1px] w-full bg-divider" />
-
-        <!-- Additional text inputs -->
-        <div class="space-y-4">
-          <template v-for="action in visibleActions" :key="`inputs-${getActionKey(action)}`">
-            <div
-              v-if="action.relevantExtraInput && isActionSelected(action)"
-              class="inputs universal-labels"
-            >
-              <div
-                v-for="(input, inputIndex) in getVisibleInputs(action, actionStates)"
-                :key="`input-${getActionId(action)}-${inputIndex}`"
-                class="mt-2"
-              >
-                <label :for="`input-${getActionId(action)}-${inputIndex}`">
-                  <span class="label__title">
-                    {{ input.label }}
-                    <span v-if="input.required" class="required">*</span>
-                  </span>
-                </label>
-                <input
-                  :id="`input-${getActionId(action)}-${inputIndex}`"
-                  v-model="textInputValues[`${getActionId(action)}-${inputIndex}`]"
-                  type="text"
-                  :placeholder="input.placeholder"
-                  autocomplete="off"
-                  @input="persistState"
-                />
-              </div>
-            </div>
-          </template>
-        </div>
+        </template>
       </div>
 
       <!-- Stage control buttons -->
@@ -149,12 +162,12 @@
           class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
         >
           <div class="flex items-center gap-2">
-            <ButtonStyled>
-              <button @click="skipStage">
+            <!-- <ButtonStyled>
+              <button @click="goToNextProject">
                 <XIcon aria-hidden="true" />
                 Skip
               </button>
-            </ButtonStyled>
+            </ButtonStyled> -->
           </div>
 
           <div class="flex items-center gap-2">
@@ -231,11 +244,33 @@ import type {
   ConditionalButtonAction,
   Stage,
 } from "@modrinth/moderation";
+import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
 
 const props = defineProps<{
   project: Project;
   collapsed: boolean;
 }>();
+
+const modpackPermissionsComplete = ref(false);
+const isModpackPermissionsStage = computed(() => {
+  return currentStageObj.value.id === "modpack-permissions";
+});
+
+// eslint-disable-next-line require-await, @typescript-eslint/no-unused-vars
+async function handleModpackPermissionsComplete(judgements: any) {
+  try {
+    // await useBaseFetch("moderation/project", {
+    //   method: "POST",
+    //   body: judgements,
+    // });
+
+    modpackPermissionsComplete.value = true;
+
+    nextStage();
+  } catch (error) {
+    console.error("Failed to submit modpack permissions:", error);
+  }
+}
 
 const emit = defineEmits<{
   exit: [];
@@ -246,6 +281,11 @@ function resetProgress() {
   currentStage.value = 0;
   actionStates.value = {};
   textInputValues.value = {};
+
+  localStorage.removeItem(`modpack-permissions-${props.project.id}`);
+  localStorage.removeItem(`modpack-permissions-index-${props.project.id}`);
+  modpackPermissionsComplete.value = false;
+
   initializeAllStages();
 }
 
@@ -472,6 +512,7 @@ const isAnyVisibleInputs = computed(() => {
   });
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function assembleFullMessage() {
   const messageParts: MessagePart[] = [];
 
@@ -598,12 +639,6 @@ async function processAction(
   }
 }
 
-function skipStage() {
-  if (currentStage.value < checklist.length - 1) {
-    currentStage.value++;
-  }
-}
-
 function shouldShowStage(stage: Stage): boolean {
   if (typeof stage.shouldShow === "function") {
     return stage.shouldShow(props.project);
@@ -629,11 +664,24 @@ function previousStage() {
 }
 
 function nextStage() {
+  if (isModpackPermissionsStage.value && !modpackPermissionsComplete.value) {
+    addNotification({
+      title: "Modpack permissions stage unfinished",
+      message: "Please complete the modpack permissions stage before proceeding.",
+      type: "error",
+    });
+
+    return;
+  }
+
   let targetStage = currentStage.value + 1;
 
   while (targetStage < checklist.length) {
     if (shouldShowStageIndex(targetStage)) {
       currentStage.value = targetStage;
+      if (!isModpackPermissionsStage.value) {
+        modpackPermissionsComplete.value = false;
+      }
       return;
     }
     targetStage++;
