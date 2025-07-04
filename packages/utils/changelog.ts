@@ -33,6 +33,12 @@ const VERSIONS: VersionEntry[] = [
 - Fixed servers running old Minecraft versions not showing last played time.`,
   },
   {
+    date: `2025-07-04T12:00:00-07:00`,
+    product: 'web',
+    body: `### Changed
+- Changed fallback ad placeholder from promoting Modrinth+ to Modrinth Servers.`,
+  },
+  {
     date: `2025-06-30T19:15:00-07:00`,
     product: 'web',
     body: `### Added
