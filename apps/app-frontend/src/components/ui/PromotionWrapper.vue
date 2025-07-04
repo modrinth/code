@@ -51,7 +51,8 @@ function updateAdPosition() {
   </div>
 </template>
 <style lang="scss" scoped>
-.light, .light-mode {
+.light,
+.light-mode {
   .dark-image {
     display: none;
   }
