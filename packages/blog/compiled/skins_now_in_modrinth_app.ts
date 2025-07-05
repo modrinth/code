@@ -3,7 +3,7 @@ export const article = {
   html: () => import(`./skins_now_in_modrinth_app.content`).then((m) => m.html),
   title: 'Skins — Now in Modrinth App!',
   summary:
-    'Customize your look, save your favorite skins, and swap them out in a flash, all within the Modrinth App.',
+    'Customize your look, save your favorite skins, and swap them out in a flash, all within Modrinth App.',
   date: '2025-07-05T19:19:00.000Z',
   slug: 'skins-now-in-modrinth-app',
   thumbnail: true,
