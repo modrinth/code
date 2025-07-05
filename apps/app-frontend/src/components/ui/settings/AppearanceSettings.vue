@@ -59,7 +59,7 @@ watch(
   <div class="mt-4 flex items-center justify-between">
     <div>
       <h2 class="m-0 text-lg font-extrabold text-contrast">Hide nametag</h2>
-      <p class="m-0 mt-1">Disables the nametag above your player on the skins page. page.</p>
+      <p class="m-0 mt-1">Disables the nametag above your player on the skins page.</p>
     </div>
     <Toggle id="hide-nametag-skins-page" v-model="settings.hide_nametag_skins_page" />
   </div>
