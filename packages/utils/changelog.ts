@@ -25,7 +25,7 @@ const VERSIONS: VersionEntry[] = [
     date: `2025-07-04T12:00:00-07:00`,
     product: 'app',
     version: `0.10.0`,
-    body: `**Note: This update was pulled due to issues.**
+    body: `**Note: This update is no longer available to download due to issues, you should use v0.10.1**
 
 ### Added
 - Added Skins page as a beta feature. There may be some minor bugs with it, but we'd love to get user feedback on this feature as it's been one of our most highly requested features.
