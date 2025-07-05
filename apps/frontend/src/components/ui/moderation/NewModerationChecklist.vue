@@ -334,6 +334,8 @@ const persistedActionStates = useLocalStorage(
   },
 );
 
+const router = useRouter();
+
 const persistedTextInputs = useLocalStorage(
   `moderation-inputs-${props.project.slug}`,
   {} as Record<string, string>,
@@ -357,14 +359,6 @@ interface MessagePart {
   stageIndex: number;
 }
 
-watch(
-  currentStage,
-  () => {
-    initializeCurrentStage();
-  },
-  { immediate: true },
-);
-
 onMounted(() => {
   initializeAllStages();
 });
@@ -378,6 +372,19 @@ function initializeAllStages() {
 function initializeCurrentStage() {
   initializeStageActions(currentStageObj.value, currentStage.value);
 }
+
+watch(
+  currentStage,
+  (newIndex) => {
+    const stage = checklist[newIndex];
+    if (stage?.navigate) {
+      router.push(`/${props.project.project_type}/${props.project.slug}${stage.navigate}`);
+    }
+
+    initializeCurrentStage();
+  },
+  { immediate: true },
+);
 
 function initializeStageActions(stage: Stage, stageIndex: number) {
   stage.actions.forEach((action, index) => {

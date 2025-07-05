@@ -470,9 +470,13 @@
       class="new-page sidebar"
       :class="{
         'alt-layout': cosmetics.leftContentLayout,
-        'ultimate-sidebar':
+        'checklist-open':
           showModerationChecklist &&
           !collapsedModerationChecklist &&
+          !flags.alwaysShowChecklistAsPopup,
+        'checklist-collapsed':
+          showModerationChecklist &&
+          collapsedModerationChecklist &&
           !flags.alwaysShowChecklistAsPopup,
       }"
     >
@@ -878,13 +882,6 @@
         />
       </div>
       <div class="normal-page__ultimate-sidebar">
-        <NewModerationChecklist
-          v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
-          :project="project"
-          :collapsed="collapsedModerationChecklist"
-          @exit="showModerationChecklist = false"
-          @toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
-        />
         <!-- <ModerationChecklist
           v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
           :project="project"
@@ -896,6 +893,17 @@
         /> -->
       </div>
     </div>
+  </div>
+  <div
+    v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
+    class="moderation-checklist"
+  >
+    <NewModerationChecklist
+      :project="project"
+      :collapsed="collapsedModerationChecklist"
+      @exit="showModerationChecklist = false"
+      @toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
+    />
   </div>
 </template>
 <script setup>
@@ -959,6 +967,7 @@ import {
 } from "@modrinth/utils";
 import dayjs from "dayjs";
 import { Tooltip } from "floating-vue";
+import { useLocalStorage } from "@vueuse/core";
 import { navigateTo } from "#app";
 import Accordion from "~/components/ui/Accordion.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
@@ -1558,9 +1567,16 @@ async function copyPermalink() {
 
 const collapsedChecklist = ref(false);
 
-const showModerationChecklist = ref(false);
-const collapsedModerationChecklist = ref(false);
+console.log(project.value.id);
+
+const showModerationChecklist = useLocalStorage(
+  `show-moderation-checklist-${project.value.id}`,
+  false,
+);
+const collapsedModerationChecklist = useLocalStorage("collapsed-moderation-checklist", false);
+
 const futureProjects = ref([]);
+
 if (import.meta.client && history && history.state && history.state.showChecklist) {
   showModerationChecklist.value = true;
   futureProjects.value = history.state.projects;
@@ -1786,6 +1802,17 @@ const navLinks = computed(() => {
     position: absolute;
     top: -5px;
     left: 18px;
+  }
+}
+
+.moderation-checklist {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  overflow-y: auto;
+
+  > div {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
   }
 }
 </style>
