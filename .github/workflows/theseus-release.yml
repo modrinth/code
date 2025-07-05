@@ -1,4 +1,4 @@
-name: 'Modrinth App build'
+name: Modrinth App build
 on:
   push:
     branches:
@@ -24,103 +24,89 @@ on:
 
 jobs:
   build:
+    name: Build
     strategy:
       fail-fast: false
       matrix:
         platform: [macos-latest, windows-latest, ubuntu-22.04]
+        include:
+          - platform: macos-latest
+            artifact-target-name: universal-apple-darwin
+          - platform: windows-latest
+            artifact-target-name: x86_64-pc-windows-msvc
+          - platform: ubuntu-22.04
+            artifact-target-name: x86_64-unknown-linux-gnu
 
     runs-on: ${{ matrix.platform }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: 📥 Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
-      - name: Rust setup (mac)
-        if: startsWith(matrix.platform, 'macos')
+      - name: 🧰 Setup Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           rustflags: ''
-          target: x86_64-apple-darwin
+          target: ${{ startsWith(matrix.platform, 'macos') && 'x86_64-apple-darwin' || '' }}
 
-      - name: Rust setup
-        if: "!startsWith(matrix.platform, 'macos')"
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          rustflags: ''
+      - name: 🧰 Install pnpm
+        uses: pnpm/action-setup@v4
 
-      - name: Setup rust cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            target/**
-            !target/*/release/bundle/*/*.dmg
-            !target/*/release/bundle/*/*.app.tar.gz
-            !target/*/release/bundle/*/*.app.tar.gz.sig
-            !target/release/bundle/*/*.dmg
-            !target/release/bundle/*/*.app.tar.gz
-            !target/release/bundle/*/*.app.tar.gz.sig
-
-            !target/release/bundle/appimage/*.AppImage
-            !target/release/bundle/appimage/*.AppImage.tar.gz
-            !target/release/bundle/appimage/*.AppImage.tar.gz.sig
-            !target/release/bundle/deb/*.deb
-            !target/release/bundle/rpm/*.rpm
-
-            !target/release/bundle/msi/*.msi
-            !target/release/bundle/msi/*.msi.zip
-            !target/release/bundle/msi/*.msi.zip.sig
-
-            !target/release/bundle/nsis/*.exe
-            !target/release/bundle/nsis/*.nsis.zip
-            !target/release/bundle/nsis/*.nsis.zip.sig
-          key: ${{ runner.os }}-rust-target-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-rust-target-
-
-      - name: Setup Node.js
+      - name: 🧰 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+          cache: pnpm
 
-      - name: Install pnpm via corepack
-        shell: bash
-        run: |
-          corepack enable
-          corepack prepare --activate
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: install dependencies (ubuntu only)
+      - name: 🧰 Install Linux build dependencies
         if: startsWith(matrix.platform, 'ubuntu')
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev pkg-config libayatana-appindicator3-dev librsvg2-dev
+          sudo apt-get install -yq libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
 
-      - name: Install code signing client (Windows only)
-        if: startsWith(matrix.platform, 'windows')
-        run: choco install jsign --ignore-dependencies # GitHub runners come with a global Java installation already
+      - name: 🧰 Setup Dasel
+        uses: jaxxstorm/action-install-gh-release@v2.1.0
+        with:
+          repo: TomWright/dasel
+          tag: v2.8.1
+          extension-matching: disable
+          rename-to: ${{ startsWith(matrix.platform, 'windows') && 'dasel.exe' || 'dasel' }}
+          chmod: 0755
 
-      - name: Install frontend dependencies
+      - name: ⚙️ Set application version
+        shell: bash
+        env:
+          APP_VERSION: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('1.0.0-canary+{0}', github.sha) }}
+        run: |
+          dasel put -f apps/app/Cargo.toml -t string -v "${APP_VERSION#v}" 'package.version'
+          dasel put -f packages/app-lib/Cargo.toml -t string -v "${APP_VERSION#v}" 'package.version'
+          dasel put -f apps/app-frontend/package.json -t string -v "${APP_VERSION#v}" 'version'
+
+      - name: 💨 Setup Turbo cache
+        uses: rharkor/caching-for-turbo@v1.8
+
+      - name: 🧰 Install dependencies
         run: pnpm install
 
-      - name: Disable Windows code signing for non-final release builds
-        if: ${{ startsWith(matrix.platform, 'windows') && !startsWith(github.ref, 'refs/tags/v') && !inputs.sign-windows-binaries }}
+      - name: ✍️ Set up Windows code signing
+        if: startsWith(matrix.platform, 'windows')
+        shell: bash
         run: |
-          jq 'del(.bundle.windows.signCommand)' apps/app/tauri-release.conf.json > apps/app/tauri-release.conf.json.new
-          Move-Item -Path apps/app/tauri-release.conf.json.new -Destination apps/app/tauri-release.conf.json -Force
+          if [ '${{ startsWith(github.ref, 'refs/tags/v') || inputs.sign-windows-binaries }}' = 'true' ]; then
+            choco install jsign --ignore-dependencies # GitHub runners come with a global Java installation already
+          else
+            dasel delete -f apps/app/tauri-release.conf.json 'bundle.windows.signCommand'
+          fi
 
-      - name: build app (macos)
+      - name: 🗑️ Clean up cached bundles
+        shell: bash
+        run: |
+          rm -rf target/release/bundle
+          rm -rf target/*/release/bundle || true
+
+      - name: 🔨 Build macOS app
         run: pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json
         if: startsWith(matrix.platform, 'macos')
         env:
@@ -135,7 +121,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
-      - name: build app (Linux)
+      - name: 🔨 Build Linux app
         run: pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json
         if: startsWith(matrix.platform, 'ubuntu')
         env:
@@ -143,7 +129,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
-      - name: build app (Windows)
+      - name: 🔨 Build Windows app
         run: |
           [System.Convert]::FromBase64String("$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64") | Set-Content -Path signer-client-cert.p12 -AsByteStream
           $env:DIGICERT_ONE_SIGNER_CREDENTIALS = "$env:DIGICERT_ONE_SIGNER_API_KEY|$PWD\signer-client-cert.p12|$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD"
@@ -159,28 +145,10 @@ jobs:
           DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64: ${{ secrets.DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64 }}
           DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD: ${{ secrets.DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD }}
 
-      - name: upload ${{ matrix.platform }}
+      - name: 📤 Upload app bundles
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.platform }}
+          name: App bundle (${{ matrix.artifact-target-name }})
           path: |
-            target/*/release/bundle/*/*.dmg
-            target/*/release/bundle/*/*.app.tar.gz
-            target/*/release/bundle/*/*.app.tar.gz.sig
-            target/release/bundle/*/*.dmg
-            target/release/bundle/*/*.app.tar.gz
-            target/release/bundle/*/*.app.tar.gz.sig
-
-            target/release/bundle/*/*.AppImage
-            target/release/bundle/*/*.AppImage.tar.gz
-            target/release/bundle/*/*.AppImage.tar.gz.sig
-            target/release/bundle/*/*.deb
-            target/release/bundle/*/*.rpm
-
-            target/release/bundle/msi/*.msi
-            target/release/bundle/msi/*.msi.zip
-            target/release/bundle/msi/*.msi.zip.sig
-
-            target/release/bundle/nsis/*.exe
-            target/release/bundle/nsis/*.nsis.zip
-            target/release/bundle/nsis/*.nsis.zip.sig
+            target/release/bundle/**
+            target/*/release/bundle/**
