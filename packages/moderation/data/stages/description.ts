@@ -28,7 +28,7 @@ const description: Stage = {
     {
       id: 'description_insufficient_packs',
       type: 'button',
-      label: 'Insufficient (default packs)',
+      label: 'Insufficient (default)',
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'medium',
@@ -39,7 +39,7 @@ const description: Stage = {
     {
       id: 'description_insufficient_projects',
       type: 'button',
-      label: 'Insufficient (default projects)',
+      label: 'Insufficient (default)',
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'medium',

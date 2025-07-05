@@ -41,7 +41,7 @@
         <div
           style="width: 100%"
           class="markdown-body"
-          v-html="renderHighlightedString(linkMarkdown)"
+          v-html="renderHighlightedString(currentValue ?? '')"
         />
       </div>
       <div class="input-group push-right">
@@ -254,6 +254,10 @@
       <div class="markdown-body-wrapper">
         <div
           style="width: 100%"
+          :style="{
+            maxHeight: props.maxHeight ? `${props.maxHeight}px` : 'unset',
+            overflowY: 'auto',
+          }"
           class="markdown-body"
           v-html="renderHighlightedString(currentValue ?? '')"
         />

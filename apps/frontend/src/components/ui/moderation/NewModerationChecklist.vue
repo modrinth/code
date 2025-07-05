@@ -32,14 +32,30 @@
     <Collapsible base-class="grow" class="flex grow flex-col" :collapsed="collapsed">
       <div class="my-4 h-[1px] w-full bg-divider" />
       <div class="flex-1">
-        <template v-if="isModpackPermissionsStage">
+        <div v-if="done">
+          <p>
+            You are done moderating this project! There are
+            {{ (futureProjects || []).length }} left.
+          </p>
+        </div>
+        <div v-else-if="generatedMessage">
+          <div>
+            <MarkdownEditor
+              v-model="message"
+              :max-height="400"
+              placeholder="No message generated."
+              :disabled="false"
+              :heading-buttons="false"
+            />
+          </div>
+        </div>
+        <div v-else-if="isModpackPermissionsStage">
           <ModpackPermissionsFlow
             :project-id="project.id"
             @complete="handleModpackPermissionsComplete"
           />
-        </template>
-
-        <template v-else>
+        </div>
+        <div v-else>
           <h2 class="m-0 mb-2 text-lg font-extrabold">
             {{ currentStageObj.title }}
           </h2>
@@ -158,7 +174,7 @@
               </div>
             </template>
           </div>
-        </template>
+        </div>
       </div>
 
       <!-- Stage control buttons -->
@@ -167,43 +183,87 @@
           class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
         >
           <div class="flex items-center gap-2">
-            <!-- <ButtonStyled>
+            <ButtonStyled
+              v-if="!done && !generatedMessage && futureProjects && futureProjects.length > 0"
+            >
               <button @click="goToNextProject">
                 <XIcon aria-hidden="true" />
                 Skip
               </button>
-            </ButtonStyled> -->
+            </ButtonStyled>
           </div>
 
           <div class="flex items-center gap-2">
-            <OverflowMenu :options="stageOptions" class="bg-transparent p-0">
-              <ButtonStyled circular>
-                <button v-tooltip="`Stages`">
-                  <ListBulletedIcon />
+            <div v-if="done">
+              <ButtonStyled v-if="(futureProjects || []).length > 0" color="brand">
+                <button @click="goToNextProject">
+                  <RightArrowIcon aria-hidden="true" />
+                  Next Project
                 </button>
               </ButtonStyled>
+              <ButtonStyled v-else color="brand">
+                <button @click="exitModeration">
+                  <CheckIcon aria-hidden="true" />
+                  Done
+                </button>
+              </ButtonStyled>
+            </div>
 
-              <template
-                v-for="opt in stageOptions.filter(
-                  (opt) => 'id' in opt && 'text' in opt && 'icon' in opt,
-                )"
-                #[opt.id]
-                :key="opt.id"
-              >
-                <component :is="opt.icon" v-if="opt.icon" class="mr-2" />
-                {{ opt.text }}
-              </template>
-            </OverflowMenu>
-            <ButtonStyled>
-              <button :disabled="!(currentStage > 0)" @click="previousStage">
-                <LeftArrowIcon aria-hidden="true" /> Previous
-              </button>
-            </ButtonStyled>
-            <ButtonStyled color="brand">
-              <button :disabled="!(currentStage < checklist.length - 1)" @click="nextStage">
-                <RightArrowIcon aria-hidden="true" /> Next
-              </button>
-            </ButtonStyled>
+            <div v-else-if="generatedMessage" class="flex items-center gap-2">
+              <ButtonStyled color="red">
+                <button @click="sendMessage('rejected')">
+                  <XIcon aria-hidden="true" />
+                  Reject
+                </button>
+              </ButtonStyled>
+              <ButtonStyled color="orange">
+                <button @click="sendMessage('withheld')">
+                  <EyeOffIcon aria-hidden="true" />
+                  Withhold
+                </button>
+              </ButtonStyled>
+              <ButtonStyled color="green">
+                <button @click="sendMessage('approved')">
+                  <CheckIcon aria-hidden="true" />
+                  Approve
+                </button>
+              </ButtonStyled>
+            </div>
+
+            <div v-else class="flex items-center gap-2">
+              <OverflowMenu :options="stageOptions" class="bg-transparent p-0">
+                <ButtonStyled circular>
+                  <button v-tooltip="`Stages`">
+                    <ListBulletedIcon />
+                  </button>
+                </ButtonStyled>
+
+                <template
+                  v-for="opt in stageOptions.filter(
+                    (opt) => 'id' in opt && 'text' in opt && 'icon' in opt,
+                  )"
+                  #[opt.id]
+                  :key="opt.id"
+                >
+                  <component :is="opt.icon" v-if="opt.icon" class="mr-2" />
+                  {{ opt.text }}
+                </template>
+              </OverflowMenu>
+              <ButtonStyled>
+                <button :disabled="!(currentStage > 0)" @click="previousStage">
+                  <LeftArrowIcon aria-hidden="true" /> Previous
+                </button>
+              </ButtonStyled>
+              <ButtonStyled v-if="currentStage < checklist.length - 1" color="brand">
+                <button @click="nextStage"><RightArrowIcon aria-hidden="true" /> Next</button>
+              </ButtonStyled>
+              <ButtonStyled v-else color="brand" :disabled="loadingMessage">
+                <button @click="generateMessage">
+                  <CheckIcon aria-hidden="true" />
+                  {{ loadingMessage ? "Generating..." : "Generate Message" }}
+                </button>
+              </ButtonStyled>
+            </div>
           </div>
         </div>
       </div>
@@ -221,6 +281,8 @@ import {
   ListBulletedIcon,
   FileTextIcon,
   BrushCleaningIcon,
+  CheckIcon,
+  EyeOffIcon,
 } from "@modrinth/assets";
 import {
   checklist,
@@ -243,6 +305,7 @@ import {
   type OverflowMenuOption,
   Checkbox,
   DropdownSelect,
+  MarkdownEditor,
 } from "@modrinth/ui";
 import { type Project, renderHighlightedString } from "@modrinth/utils";
 import { computedAsync, useLocalStorage } from "@vueuse/core";
@@ -256,9 +319,11 @@ import type {
   Stage,
 } from "@modrinth/moderation";
 import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
+import { navigateTo } from "#app";
 
 const props = defineProps<{
   project: Project;
+  futureProjects?: Project[];
   collapsed: boolean;
 }>();
 
@@ -271,13 +336,14 @@ const isModpackPermissionsStage = computed(() => {
   return currentStageObj.value.id === "modpack-permissions";
 });
 
-// eslint-disable-next-line require-await, @typescript-eslint/no-unused-vars
+const message = ref("");
+const generatedMessage = ref(false);
+const loadingMessage = ref(false);
+const done = ref(false);
+
 async function handleModpackPermissionsComplete(judgements: any) {
   try {
-    // await useBaseFetch("moderation/project", {
-    //   method: "POST",
-    //   body: judgements,
-    // });
+    await console.log("DUMMY CALL: Modpack permissions judgements", judgements);
 
     modpackPermissionsComplete.value = true;
 
@@ -290,12 +356,18 @@ async function handleModpackPermissionsComplete(judgements: any) {
 const emit = defineEmits<{
   exit: [];
   toggleCollapsed: [];
+  "update:futureProjects": [projects: Project[]];
 }>();
 
 function resetProgress() {
   currentStage.value = 0;
   actionStates.value = {};
   textInputValues.value = {};
+
+  done.value = false;
+  generatedMessage.value = false;
+  message.value = "";
+  loadingMessage.value = false;
 
   localStorage.removeItem(`modpack-permissions-${props.project.id}`);
   localStorage.removeItem(`modpack-permissions-index-${props.project.id}`);
@@ -424,14 +496,18 @@ const visibleActions = computed(() => {
   const actionSources = new Map<Action, { enabledBy?: Action; actionIndex?: number }>();
 
   currentStageObj.value.actions.forEach((action, actionIndex) => {
-    allActions.push(action);
-    actionSources.set(action, { actionIndex });
+    if (shouldShowAction(action)) {
+      allActions.push(action);
+      actionSources.set(action, { actionIndex });
 
-    if (action.enablesActions) {
-      action.enablesActions.forEach((enabledAction) => {
-        allActions.push(enabledAction);
-        actionSources.set(enabledAction, { enabledBy: action, actionIndex });
-      });
+      if (action.enablesActions) {
+        action.enablesActions.forEach((enabledAction) => {
+          if (shouldShowAction(enabledAction)) {
+            allActions.push(enabledAction);
+            actionSources.set(enabledAction, { enabledBy: action, actionIndex });
+          }
+        });
+      }
     }
   });
 
@@ -545,7 +621,6 @@ const isAnyVisibleInputs = computed(() => {
   });
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function assembleFullMessage() {
   const messageParts: MessagePart[] = [];
 
@@ -677,7 +752,15 @@ function shouldShowStage(stage: Stage): boolean {
     return stage.shouldShow(props.project);
   }
 
-  return !stage.shouldShow && true; // Default to true if not defined
+  return !stage.shouldShow && true;
+}
+
+function shouldShowAction(action: Action): boolean {
+  if (typeof action.shouldShow === "function") {
+    return action.shouldShow(props.project);
+  }
+
+  return !action.shouldShow && true;
 }
 
 function shouldShowStageIndex(stageIndex: number): boolean {
@@ -720,6 +803,148 @@ function nextStage() {
     }
     targetStage++;
   }
+}
+
+async function generateMessage() {
+  if (loadingMessage.value) return;
+
+  loadingMessage.value = true;
+
+  try {
+    const baseMessage = await assembleFullMessage();
+    let fullMessage = baseMessage;
+
+    if (isModpackPermissionsStage.value) {
+      const modpackData = localStorage.getItem(`modpack-permissions-${props.project.id}`);
+      if (modpackData) {
+        const judgements = JSON.parse(modpackData);
+        const modpackMessage = await generateModpackMessage(judgements);
+        if (modpackMessage) {
+          fullMessage = baseMessage ? `${baseMessage}\n\n${modpackMessage}` : modpackMessage;
+        }
+      }
+    }
+
+    message.value = fullMessage;
+    generatedMessage.value = true;
+  } catch (error) {
+    console.error("Error generating message:", error);
+    addNotification({
+      title: "Error generating message",
+      message: "Failed to generate moderation message. Please try again.",
+      type: "error",
+    });
+  } finally {
+    loadingMessage.value = false;
+  }
+}
+
+function generateModpackMessage(judgements: any) {
+  const issues = [];
+
+  if (judgements.needsAttribution?.length > 0) {
+    issues.push(
+      "## Modpack Permissions - Attribution Required\n" +
+        "The following mods require attribution:\n" +
+        judgements.needsAttribution.map((mod: any) => `- ${mod.name}`).join("\n"),
+    );
+  }
+
+  if (judgements.noPermission?.length > 0) {
+    issues.push(
+      "## Modpack Permissions - No Permission\n" +
+        "The following mods do not have permission for redistribution:\n" +
+        judgements.noPermission.map((mod: any) => `- ${mod.name}`).join("\n"),
+    );
+  }
+
+  if (judgements.forbidden?.length > 0) {
+    issues.push(
+      "## Modpack Permissions - Forbidden\n" +
+        "The following mods are permanently forbidden from redistribution:\n" +
+        judgements.forbidden.map((mod: any) => `- ${mod.name}`).join("\n"),
+    );
+  }
+
+  if (judgements.unidentified?.length > 0) {
+    issues.push(
+      "## Modpack Permissions - Unidentified\n" +
+        "The following mods could not be identified:\n" +
+        judgements.unidentified.map((mod: any) => `- ${mod.name}`).join("\n"),
+    );
+  }
+
+  return issues.join("\n\n");
+}
+
+async function sendMessage(status: "approved" | "rejected" | "withheld") {
+  if (!message.value.trim()) {
+    addNotification({
+      title: "No message generated",
+      message: "Please generate a message before submitting.",
+      type: "error",
+    });
+    return;
+  }
+
+  try {
+    await console.log("DUMMY CALL: Moderation decision", {
+      projectId: props.project.id,
+      status,
+      message: message.value,
+    });
+
+    if (isModpackPermissionsStage.value) {
+      const modpackData = localStorage.getItem(`modpack-permissions-${props.project.id}`);
+      if (modpackData) {
+        const judgements = JSON.parse(modpackData);
+
+        await console.log("DUMMY CALL: Modpack permissions judgements", judgements);
+      }
+    }
+
+    done.value = true;
+
+    addNotification({
+      title: "Moderation submitted",
+      message: `Project ${status} successfully.`,
+      type: "success",
+    });
+
+    if (props.futureProjects && props.futureProjects.length > 0) {
+      setTimeout(() => {
+        goToNextProject();
+      }, 1000);
+    }
+  } catch (error) {
+    console.error("Error submitting moderation:", error);
+    addNotification({
+      title: "Error submitting moderation",
+      message: "Failed to submit moderation decision. Please try again.",
+      type: "error",
+    });
+  }
+}
+
+async function goToNextProject() {
+  if (!props.futureProjects || props.futureProjects.length === 0) {
+    await exitModeration();
+    return;
+  }
+
+  const remainingProjects = props.futureProjects.slice(1);
+  emit("update:futureProjects", remainingProjects);
+
+  if (remainingProjects.length > 0) {
+    const nextProject = remainingProjects[0];
+    await navigateTo(`/project/${nextProject.slug}/moderate`);
+  } else {
+    await exitModeration();
+  }
+}
+
+async function exitModeration() {
+  await navigateTo("/moderation/review");
 }
 
 const stageOptions = computed<OverflowMenuOption[]>(() => {
