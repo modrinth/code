@@ -195,14 +195,16 @@ async function setupApp() {
     .then((res) => {
       if (res && res.articles) {
         // Format expected by NewsArticleCard component.
-        news.value = res.articles.map((article) => ({
-          ...article,
-          path: article.link,
-          thumbnail: article.thumbnail,
-          title: article.title,
-          summary: article.summary,
-          date: article.date,
-        })).slice(0, 4)
+        news.value = res.articles
+          .map((article) => ({
+            ...article,
+            path: article.link,
+            thumbnail: article.thumbnail,
+            title: article.title,
+            summary: article.summary,
+            date: article.date,
+          }))
+          .slice(0, 4)
       }
     })
 

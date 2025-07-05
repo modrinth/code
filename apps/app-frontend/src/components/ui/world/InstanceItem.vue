@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Dayjs } from 'dayjs';
+import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import {
   EyeIcon,
@@ -42,7 +42,7 @@ const emit = defineEmits<{
 }>()
 
 const props = defineProps<{
-  instance: GameInstance,
+  instance: GameInstance
   last_played: Dayjs
 }>()
 
