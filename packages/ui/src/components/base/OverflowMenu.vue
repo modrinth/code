@@ -87,7 +87,7 @@ interface Item extends BaseOption {
   tooltip?: string
 }
 
-type Option = Divider | Item
+export type Option = Divider | Item
 
 withDefaults(
   defineProps<{

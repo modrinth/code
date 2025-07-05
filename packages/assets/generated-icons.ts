@@ -12,6 +12,7 @@ import _BellRingIcon from './icons/bell-ring.svg?component'
 import _BellIcon from './icons/bell.svg?component'
 import _BlocksIcon from './icons/blocks.svg?component'
 import _BoldIcon from './icons/bold.svg?component'
+import _BookOpenIcon from './icons/book-open.svg?component'
 import _BookTextIcon from './icons/book-text.svg?component'
 import _BookIcon from './icons/book.svg?component'
 import _BookmarkIcon from './icons/bookmark.svg?component'
@@ -19,6 +20,7 @@ import _BotIcon from './icons/bot.svg?component'
 import _BoxImportIcon from './icons/box-import.svg?component'
 import _BoxIcon from './icons/box.svg?component'
 import _BracesIcon from './icons/braces.svg?component'
+import _BrushCleaningIcon from './icons/brush-cleaning.svg?component'
 import _CalendarIcon from './icons/calendar.svg?component'
 import _CardIcon from './icons/card.svg?component'
 import _ChangeSkinIcon from './icons/change-skin.svg?component'
@@ -166,6 +168,7 @@ import _TextQuoteIcon from './icons/text-quote.svg?component'
 import _TimerIcon from './icons/timer.svg?component'
 import _TransferIcon from './icons/transfer.svg?component'
 import _TrashIcon from './icons/trash.svg?component'
+import _TriangleAlertIcon from './icons/triangle-alert.svg?component'
 import _UnderlineIcon from './icons/underline.svg?component'
 import _UndoIcon from './icons/undo.svg?component'
 import _UnknownDonationIcon from './icons/unknown-donation.svg?component'
@@ -199,6 +202,7 @@ export const BellRingIcon = _BellRingIcon
 export const BellIcon = _BellIcon
 export const BlocksIcon = _BlocksIcon
 export const BoldIcon = _BoldIcon
+export const BookOpenIcon = _BookOpenIcon
 export const BookTextIcon = _BookTextIcon
 export const BookIcon = _BookIcon
 export const BookmarkIcon = _BookmarkIcon
@@ -206,6 +210,7 @@ export const BotIcon = _BotIcon
 export const BoxImportIcon = _BoxImportIcon
 export const BoxIcon = _BoxIcon
 export const BracesIcon = _BracesIcon
+export const BrushCleaningIcon = _BrushCleaningIcon
 export const CalendarIcon = _CalendarIcon
 export const CardIcon = _CardIcon
 export const ChangeSkinIcon = _ChangeSkinIcon
@@ -353,6 +358,7 @@ export const TextQuoteIcon = _TextQuoteIcon
 export const TimerIcon = _TimerIcon
 export const TransferIcon = _TransferIcon
 export const TrashIcon = _TrashIcon
+export const TriangleAlertIcon = _TriangleAlertIcon
 export const UnderlineIcon = _UnderlineIcon
 export const UndoIcon = _UndoIcon
 export const UnknownDonationIcon = _UnknownDonationIcon
