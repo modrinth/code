@@ -1,8 +1,11 @@
 import type { Stage } from '../../types/stage'
 import type { ButtonAction } from '../../types/actions'
+import { ListBulletedIcon } from '@modrinth/assets'
 
 const ruleFollowing: Stage = {
   title: 'Does this project follow our content rules?',
+  id: 'rule-following',
+  icon: ListBulletedIcon,
   guidance_url: 'https://modrinth.com/legal/rules',
   navigate: '/',
   actions: [

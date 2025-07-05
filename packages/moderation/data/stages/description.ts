@@ -1,8 +1,11 @@
 import type { Stage } from '../../types/stage'
 import type { ButtonAction } from '../../types/actions'
+import { LibraryIcon } from '@modrinth/assets'
 
 const description: Stage = {
   title: "Is the project's description sufficient?",
+  id: 'description',
+  icon: LibraryIcon,
   guidance_url: 'https://modrinth.com/legal/rules#general-expectations',
   navigate: '/',
   actions: [

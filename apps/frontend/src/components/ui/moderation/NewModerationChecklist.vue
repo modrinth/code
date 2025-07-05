@@ -179,10 +179,13 @@
               </ButtonStyled>
 
               <template
-                v-for="opt in stageOptions.filter((opt) => 'id' in opt && 'text' in opt)"
+                v-for="opt in stageOptions.filter(
+                  (opt) => 'id' in opt && 'text' in opt && 'icon' in opt,
+                )"
                 #[opt.id]
                 :key="opt.id"
               >
+                <component :is="opt.icon" v-if="opt.icon" class="mr-2" />
                 {{ opt.text }}
               </template>
             </OverflowMenu>
@@ -224,6 +227,7 @@ import {
   getVisibleInputs,
   serializeActionStates,
   deserializeActionStates,
+  kebabToTitleCase,
 } from "@modrinth/moderation";
 import {
   ButtonStyled,
@@ -696,9 +700,10 @@ const stageOptions = computed<OverflowMenuOption[]>(() => {
       return {
         id: String(index),
         action: () => (currentStage.value = index),
-        text: stage.title,
+        text: stage.id ? kebabToTitleCase(stage.id) : stage.title,
         color: index === currentStage.value ? "green" : undefined,
         hoverFilled: true,
+        icon: stage.icon ? stage.icon : undefined,
       } as OverflowMenuOption;
     })
     .filter((opt): opt is OverflowMenuOption => opt !== null);

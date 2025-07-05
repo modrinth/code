@@ -1,8 +1,11 @@
 import type { Stage } from '../../types/stage'
 import type { ButtonAction } from '../../types/actions'
+import { ImageIcon } from '@modrinth/assets'
 
 const gallery: Stage = {
   title: "Are this project's gallery images sufficient?",
+  id: 'gallery',
+  icon: ImageIcon,
   guidance_url: 'https://modrinth.com/legal/rules#general-expectations',
   navigate: '/gallery',
   actions: [

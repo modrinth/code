@@ -1,8 +1,11 @@
 import type { Stage } from '../../types/stage'
 import type { ButtonAction } from '../../types/actions'
+import { LinkIcon } from '@modrinth/assets'
 
 const links: Stage = {
   title: "Are the project's links accessible and not misleading?",
+  id: 'links',
+  icon: LinkIcon,
   guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
   navigate: '/settings/links',
   actions: [

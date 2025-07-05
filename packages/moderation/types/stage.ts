@@ -1,5 +1,6 @@
 import type { Project } from '@modrinth/utils'
 import type { Action } from './actions'
+import type { FunctionalComponent, SVGAttributes } from 'vue'
 
 /**
  * Represents a moderation stage with associated actions and optional navigation logic.
@@ -11,9 +12,14 @@ export interface Stage {
   title: string
 
   /**
-   * Optional id for the stage, used for identification in the checklist.
+   * Optional id for the stage, used for identification in the checklist. Will be used in the stage list as well instead of the title.
    */
   id?: string
+
+  /**
+   * Optional icon for the stage, displayed in the stage list and next to the title.
+   */
+  icon?: FunctionalComponent<SVGAttributes>
 
   /**
    * URL to the guidance document for this stage.

@@ -1,7 +1,10 @@
+import { BookOpenIcon } from '@modrinth/assets'
 import type { Stage } from '../../types/stage'
 
 const titleStage: Stage = {
   title: 'Is this title free of useless information?',
+  id: 'title',
+  icon: BookOpenIcon,
   guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
   actions: [
     {

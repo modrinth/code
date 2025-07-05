@@ -12,6 +12,7 @@ import _BellRingIcon from './icons/bell-ring.svg?component'
 import _BellIcon from './icons/bell.svg?component'
 import _BlocksIcon from './icons/blocks.svg?component'
 import _BoldIcon from './icons/bold.svg?component'
+import _BookOpenIcon from './icons/book-open.svg?component'
 import _BookTextIcon from './icons/book-text.svg?component'
 import _BookIcon from './icons/book.svg?component'
 import _BookmarkIcon from './icons/bookmark.svg?component'
@@ -201,6 +202,7 @@ export const BellRingIcon = _BellRingIcon
 export const BellIcon = _BellIcon
 export const BlocksIcon = _BlocksIcon
 export const BoldIcon = _BoldIcon
+export const BookOpenIcon = _BookOpenIcon
 export const BookTextIcon = _BookTextIcon
 export const BookIcon = _BookIcon
 export const BookmarkIcon = _BookmarkIcon

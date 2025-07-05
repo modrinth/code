@@ -9,7 +9,9 @@
     "fix": "eslint . --fix && prettier --write ."
   },
   "dependencies": {
-    "@modrinth/utils": "workspace:*"
+    "@modrinth/utils": "workspace:*",
+    "@modrinth/assets": "workspace:*",
+    "vue": "^3.5.13"
   },
   "devDependencies": {
     "eslint": "^8.57.0",

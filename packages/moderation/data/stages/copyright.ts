@@ -1,8 +1,11 @@
 import type { Stage } from '../../types/stage'
 import type { ButtonAction } from '../../types/actions'
+import { CopyrightIcon } from '@modrinth/assets'
 
 const copyright: Stage = {
   title: 'Does the author have proper permissions to post this project?',
+  id: 'copyright',
+  icon: CopyrightIcon,
   guidance_url: 'https://modrinth.com/legal/rules',
   actions: [
     {

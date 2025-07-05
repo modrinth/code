@@ -1,3 +1,4 @@
+import type { Project } from '@modrinth/utils'
 import type {
   Action,
   AdditionalTextInput,
@@ -181,4 +182,88 @@ export function getVisibleInputs(
 
     return meetsRequired && meetsExcluded
   })
+}
+
+export function expandVariables(template: string, project: Project): string {
+  const variables = flattenProjectVariables(project)
+
+  return Object.entries(variables).reduce((result, [key, value]) => {
+    const variable = `%${key}%`
+    return result.replace(new RegExp(variable, 'g'), value)
+  }, template)
+}
+
+export function kebabToTitleCase(input: string): string {
+  return input
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
+
+export function flattenProjectVariables(project: Project): Record<string, string> {
+  const vars: Record<string, string> = {}
+
+  vars['PROJECT_ID'] = project.id
+  vars['PROJECT_TYPE'] = project.project_type
+  vars['PROJECT_SLUG'] = project.slug
+  vars['PROJECT_TITLE'] = project.title
+  vars['PROJECT_DESCRIPTION'] = project.description
+  vars['PROJECT_STATUS'] = project.status
+  vars['PROJECT_REQUESTED_STATUS'] = project.requested_status
+  vars['PROJECT_MONETIZATION_STATUS'] = project.monetization_status
+  vars['PROJECT_BODY'] = project.body
+
+  vars['PROJECT_ICON_URL'] = project.icon_url || ''
+  vars['PROJECT_ISSUES_URL'] = project.issues_url || ''
+  vars['PROJECT_SOURCE_URL'] = project.source_url || ''
+  vars['PROJECT_WIKI_URL'] = project.wiki_url || ''
+  vars['PROJECT_DISCORD_URL'] = project.discord_url || ''
+
+  vars['PROJECT_DOWNLOADS'] = project.downloads.toString()
+  vars['PROJECT_FOLLOWERS'] = project.followers.toString()
+  vars['PROJECT_COLOR'] = project.color?.toString() || ''
+
+  vars['PROJECT_CLIENT_SIDE'] = project.client_side
+  vars['PROJECT_SERVER_SIDE'] = project.server_side
+
+  vars['PROJECT_TEAM'] = project.team
+  vars['PROJECT_THREAD_ID'] = project.thread_id
+  vars['PROJECT_ORGANIZATION'] = project.organization
+
+  vars['PROJECT_PUBLISHED'] = project.published
+  vars['PROJECT_UPDATED'] = project.updated
+  vars['PROJECT_APPROVED'] = project.approved
+  vars['PROJECT_QUEUED'] = project.queued
+
+  vars['PROJECT_LICENSE_ID'] = project.license.id
+  vars['PROJECT_LICENSE_NAME'] = project.license.name
+  vars['PROJECT_LICENSE_URL'] = project.license.url || ''
+
+  vars['PROJECT_CATEGORIES'] = project.categories.join(', ')
+  vars['PROJECT_ADDITIONAL_CATEGORIES'] = project.additional_categories.join(', ')
+  vars['PROJECT_GAME_VERSIONS'] = project.game_versions.join(', ')
+  vars['PROJECT_LOADERS'] = project.loaders.join(', ')
+  vars['PROJECT_VERSIONS'] = project.versions.join(', ')
+
+  vars['PROJECT_CATEGORIES_COUNT'] = project.categories.length.toString()
+  vars['PROJECT_GAME_VERSIONS_COUNT'] = project.game_versions.length.toString()
+  vars['PROJECT_LOADERS_COUNT'] = project.loaders.length.toString()
+  vars['PROJECT_VERSIONS_COUNT'] = project.versions.length.toString()
+  vars['PROJECT_GALLERY_COUNT'] = (project.gallery?.length || 0).toString()
+  vars['PROJECT_DONATION_URLS_COUNT'] = project.donation_urls.length.toString()
+
+  project.donation_urls.forEach((donation, index) => {
+    vars[`PROJECT_DONATION_${index}_ID`] = donation.id
+    vars[`PROJECT_DONATION_${index}_PLATFORM`] = donation.platform
+    vars[`PROJECT_DONATION_${index}_URL`] = donation.url
+  })
+
+  project.gallery?.forEach((image, index) => {
+    vars[`PROJECT_GALLERY_${index}_URL`] = image.url
+    vars[`PROJECT_GALLERY_${index}_TITLE`] = image.title || ''
+    vars[`PROJECT_GALLERY_${index}_DESCRIPTION`] = image.description || ''
+    vars[`PROJECT_GALLERY_${index}_FEATURED`] = image.featured.toString()
+  })
+
+  return vars
 }
