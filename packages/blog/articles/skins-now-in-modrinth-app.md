@@ -12,7 +12,7 @@ This has been one of our most highly requested features, and we're so excited fo
 
 Adding a new skin is simple, even Herobrine could do it! When you add or edit a skin, you can **upload** your custom texture file directly from your computer, **choose** between the wide or slim arm style to match your preferred character model, and even **assign** a specific cape to that look for the perfect finishing touch.
 
-The interface makes it easy to preview your changes in _real-time_ with the animated player model, so you can see exactly how your skin will look in-game before saving it.
+The interface makes it easy to preview your changes in real-time with the animated player model, so you can see exactly how your skin will look in-game before saving it.
 
 ![The edit skin modal that shows when you go to add or edit a skin.](./edit-skin.webp)
 
