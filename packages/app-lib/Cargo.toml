@@ -27,6 +27,7 @@ hashlink.workspace = true
 png.workspace = true
 bytemuck.workspace = true
 rgb.workspace = true
+shlex.workspace = true
 
 chrono = { workspace = true, features = ["serde"] }
 daedalus.workspace = true

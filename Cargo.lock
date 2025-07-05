@@ -9045,6 +9045,7 @@ dependencies = [
  "serde_with",
  "sha1_smol",
  "sha2",
+ "shlex",
  "sqlx",
  "sysinfo",
  "tauri",
