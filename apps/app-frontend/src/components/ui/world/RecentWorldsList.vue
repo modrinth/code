@@ -84,7 +84,7 @@ async function populateJumpBackIn() {
 
       worldItems.push({
         type: 'world',
-        last_played: dayjs(world.last_played),
+        last_played: dayjs(world.last_played ?? 0),
         world: world,
         instance: instance,
       })
@@ -138,13 +138,13 @@ async function populateJumpBackIn() {
 
     instanceItems.push({
       type: 'instance',
-      last_played: dayjs(instance.last_played),
+      last_played: dayjs(instance.last_played ?? 0),
       instance: instance,
     })
   }
 
   const items: JumpBackInItem[] = [...worldItems, ...instanceItems]
-  items.sort((a, b) => dayjs(b.last_played).diff(dayjs(a.last_played)))
+  items.sort((a, b) => dayjs(b.last_played ?? 0).diff(dayjs(a.last_played ?? 0)))
   jumpBackInItems.value = items
     .filter((item, index) => index < MIN_JUMP_BACK_IN || item.last_played.isAfter(TWO_WEEKS_AGO))
     .slice(0, MAX_JUMP_BACK_IN)
@@ -291,7 +291,7 @@ onUnmounted(() => {
           "
           @stop="() => stopInstance(item.instance.path)"
         />
-        <InstanceItem v-else :instance="item.instance" />
+        <InstanceItem v-else :instance="item.instance" :last_played="item.last_played" />
       </template>
     </div>
   </div>

@@ -19,6 +19,7 @@ import {
   SettingsIcon,
   WorldIcon,
   XIcon,
+  NewspaperIcon,
 } from '@modrinth/assets'
 import {
   Avatar,
@@ -201,7 +202,7 @@ async function setupApp() {
           title: article.title,
           summary: article.summary,
           date: article.date,
-        }))
+        })).slice(0, 4)
       }
     })
 
@@ -610,6 +611,11 @@ function handleAuxClick(e) {
                 :key="`news-${index}`"
                 :article="item"
               />
+              <ButtonStyled color="brand" size="large">
+                <a href="https://modrinth.com/news" target="_blank" class="my-4">
+                  <NewspaperIcon /> View all news
+                </a>
+              </ButtonStyled>
             </div>
           </div>
         </div>

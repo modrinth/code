@@ -30,7 +30,7 @@ const getInstances = async () => {
 
       return dateB - dateA
     })
-    .slice(0, 4)
+    .slice(0, 3)
 }
 
 await getInstances()

@@ -11,10 +11,23 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-07-05T12:00:00-07:00`,
+    product: 'app',
+    version: `0.10.1`,
+    body: `### Improvements
+- News section will now only show up to 4 articles.
+- Fixed critical issue with updating on Windows.
+- Fixed search being broken after a query that yields no results.
+- Fixed 'Jump back in' section on Home page not working.
+- Fixed too many Quick Instance items on the sidebar causing the UI to overflow.`,
+  },
+  {
     date: `2025-07-04T12:00:00-07:00`,
     product: 'app',
     version: `0.10.0`,
-    body: `### Added
+    body: `**Note: This update was pulled due to issues.**
+
+### Added
 - Added Skins page as a beta feature. There may be some minor bugs with it, but we'd love to get user feedback on this feature as it's been one of our most highly requested features.
   - Save as many of your own skins as you'd like to swap between them at any moment.
   - Pick a default cape, or override the cape on any of your saved skin profiles to tailor each look perfectly.
