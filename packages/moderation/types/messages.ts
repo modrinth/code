@@ -9,5 +9,5 @@ export interface WeightedMessage {
    * @returns A function that lazily loads the message which is appended if the button is active.
    * @example async () => (await import('../messages/example.md?raw')).default,
    */
-  message: () => Promise<typeof import('*.md?raw') | string>
+  message: () => Promise<string>
 }

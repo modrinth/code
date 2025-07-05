@@ -184,8 +184,15 @@ export function getVisibleInputs(
   })
 }
 
-export function expandVariables(template: string, project: Project): string {
-  const variables = flattenProjectVariables(project)
+export function expandVariables(
+  template: string,
+  project: Project,
+  variables?: Record<string, string>,
+): string {
+  console.log(template)
+  if (!variables) {
+    variables = flattenProjectVariables(project)
+  }
 
   return Object.entries(variables).reduce((result, [key, value]) => {
     const variable = `%${key}%`

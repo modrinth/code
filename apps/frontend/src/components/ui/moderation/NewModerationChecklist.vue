@@ -44,6 +44,11 @@
             {{ currentStageObj.title }}
           </h2>
 
+          <div v-if="currentStageObj.text" class="mb-4">
+            <div v-if="stageTextExpanded" class="markdown-body" v-html="stageTextExpanded"></div>
+            <div v-else class="markdown-body">Loading stage content...</div>
+          </div>
+
           <!-- Action components grouped by type -->
           <div class="space-y-4">
             <!-- Button actions group -->
@@ -228,6 +233,8 @@ import {
   serializeActionStates,
   deserializeActionStates,
   kebabToTitleCase,
+  flattenProjectVariables,
+  expandVariables,
 } from "@modrinth/moderation";
 import {
   ButtonStyled,
@@ -237,8 +244,8 @@ import {
   Checkbox,
   DropdownSelect,
 } from "@modrinth/ui";
-import type { Project } from "@modrinth/utils";
-import { useLocalStorage } from "@vueuse/core";
+import { type Project, renderHighlightedString } from "@modrinth/utils";
+import { computedAsync, useLocalStorage } from "@vueuse/core";
 import type {
   Action,
   MultiSelectChipsAction,
@@ -254,6 +261,10 @@ const props = defineProps<{
   project: Project;
   collapsed: boolean;
 }>();
+
+const variables = computed(() => {
+  return flattenProjectVariables(props.project);
+});
 
 const modpackPermissionsComplete = ref(false);
 const isModpackPermissionsStage = computed(() => {
@@ -295,6 +306,17 @@ function resetProgress() {
 
 const currentStageObj = computed(() => checklist[currentStage.value]);
 const currentStage = useLocalStorage(`moderation-stage-${props.project.slug}`, () => 0);
+
+const stageTextExpanded = computedAsync(async () => {
+  const stageIndex = currentStage.value;
+  const stage = checklist[stageIndex];
+  if (stage.text) {
+    return renderHighlightedString(
+      expandVariables(await stage.text(), props.project, variables.value),
+    );
+  }
+  return null;
+}, null);
 
 interface ActionState {
   selected: boolean;
@@ -686,6 +708,7 @@ function nextStage() {
       if (!isModpackPermissionsStage.value) {
         modpackPermissionsComplete.value = false;
       }
+
       return;
     }
     targetStage++;
