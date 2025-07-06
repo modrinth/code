@@ -900,6 +900,7 @@
   >
     <NewModerationChecklist
       :project="project"
+      :future-projects="futureProjects"
       :collapsed="collapsedModerationChecklist"
       @exit="showModerationChecklist = false"
       @toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
@@ -996,6 +997,7 @@ const flags = useFeatureFlags();
 const cosmetics = useCosmetics();
 
 const { formatMessage } = useVIntl();
+const { setVisible } = useNotificationRightwards();
 
 const settingsModal = ref();
 const downloadModal = ref();
@@ -1576,6 +1578,14 @@ const showModerationChecklist = useLocalStorage(
 const collapsedModerationChecklist = useLocalStorage("collapsed-moderation-checklist", false);
 
 const futureProjects = ref([]);
+
+watch(
+  showModerationChecklist,
+  (newValue) => {
+    setVisible(newValue);
+  },
+  { immediate: true },
+);
 
 if (import.meta.client && history && history.state && history.state.showChecklist) {
   showModerationChecklist.value = true;

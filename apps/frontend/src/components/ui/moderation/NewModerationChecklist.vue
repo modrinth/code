@@ -34,8 +34,11 @@
       <div class="flex-1">
         <div v-if="done">
           <p>
-            You are done moderating this project! There are
-            {{ (futureProjects || []).length }} left.
+            You are done moderating this project!
+            <template v-if="(futureProjects || []).length > 0">
+              There are
+              {{ (futureProjects || []).length }} left.
+            </template>
           </p>
         </div>
         <div v-else-if="generatedMessage">
@@ -319,7 +322,6 @@ import type {
   Stage,
 } from "@modrinth/moderation";
 import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
-import { navigateTo } from "#app";
 
 const props = defineProps<{
   project: Project;
@@ -927,20 +929,23 @@ async function sendMessage(status: "approved" | "rejected" | "withheld") {
 }
 
 async function goToNextProject() {
-  if (!props.futureProjects || props.futureProjects.length === 0) {
-    await exitModeration();
-    return;
+  const project = props.futureProjects[0];
+
+  if (!project) {
+    await navigateTo("/moderation/review");
   }
 
-  const remainingProjects = props.futureProjects.slice(1);
-  emit("update:futureProjects", remainingProjects);
-
-  if (remainingProjects.length > 0) {
-    const nextProject = remainingProjects[0];
-    await navigateTo(`/project/${nextProject.slug}/moderate`);
-  } else {
-    await exitModeration();
-  }
+  await router.push({
+    name: "type-id",
+    params: {
+      type: "project",
+      id: project,
+    },
+    state: {
+      showChecklist: true,
+      projects: props.futureProjects.slice(1),
+    },
+  });
 }
 
 async function exitModeration() {
