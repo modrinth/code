@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import {
   TrashIcon,
   SearchIcon,
@@ -17,76 +17,125 @@ import LatestNewsRow from "~/components/ui/news/LatestNewsRow.vue";
 
 import { homePageProjects } from "~/generated/state.json";
 
-const os = ref(null);
-const downloadWindows = ref(null);
-const downloadLinux = ref(null);
-const downloadSection = ref(null);
-const windowsLink = ref(null);
-const linuxLinks = {
-  appImage: null,
-  deb: null,
-  rpm: null,
-  thirdParty: "https://support.modrinth.com/en/articles/9298760",
-};
-const macLinks = {
-  universal: null,
-};
+interface LauncherPlatform {
+  install_urls: string[];
+}
 
-let downloadLauncher;
+interface LauncherUpdates {
+  platforms: {
+    "darwin-aarch64": LauncherPlatform;
+    "windows-x86_64": LauncherPlatform;
+    "linux-x86_64": LauncherPlatform;
+  };
+}
+
+type OSType = "Mac" | "Windows" | "Linux" | null;
+
+const downloadWindows = ref<HTMLAnchorElement | null>(null);
+const downloadLinux = ref<HTMLAnchorElement | null>(null);
+const downloadSection = ref<HTMLElement | null>(null);
+const windowsLink = ref<string | null>(null);
+
+const linuxLinks = reactive({
+  appImage: null as string | null,
+  deb: null as string | null,
+  rpm: null as string | null,
+  thirdParty: "https://support.modrinth.com/en/articles/9298760",
+});
+
+const macLinks = reactive({
+  universal: null as string | null,
+});
 
 const newProjects = homePageProjects.slice(0, 40);
 const val = Math.ceil(newProjects.length / 6);
-const rows = ref([
+const rows = [
   newProjects.slice(0, val),
   newProjects.slice(val, val * 2),
   newProjects.slice(val * 2, val * 3),
   newProjects.slice(val * 3, val * 4),
   newProjects.slice(val * 4, val * 5),
-]);
+];
 
-const [{ data: launcherUpdates }] = await Promise.all([
-  await useAsyncData("launcherUpdates", () =>
-    $fetch("https://launcher-files.modrinth.com/updates.json"),
-  ),
-]);
+const { data: launcherUpdates } = await useFetch<LauncherUpdates>(
+  "https://launcher-files.modrinth.com/updates.json",
+  {
+    server: false,
+    getCachedData(key, nuxtApp) {
+      const cached = (nuxtApp.ssrContext?.cache as any)?.[key] || nuxtApp.payload.data[key];
+      if (!cached) return;
 
-macLinks.universal = launcherUpdates.value.platforms["darwin-aarch64"].install_urls[0];
-windowsLink.value = launcherUpdates.value.platforms["windows-x86_64"].install_urls[0];
-linuxLinks.appImage = launcherUpdates.value.platforms["linux-x86_64"].install_urls[1];
-linuxLinks.deb = launcherUpdates.value.platforms["linux-x86_64"].install_urls[0];
-linuxLinks.rpm = launcherUpdates.value.platforms["linux-x86_64"].install_urls[2];
+      const now = Date.now();
+      const cacheTime = cached._cacheTime || 0;
+      const maxAge = 5 * 60 * 1000;
 
-onMounted(() => {
-  os.value = navigator?.platform.toString();
-  os.value = os.value?.includes("Mac")
-    ? "Mac"
-    : os.value?.includes("Win")
-      ? "Windows"
-      : os.value?.includes("Linux")
-        ? "Linux"
-        : null;
+      if (now - cacheTime > maxAge) {
+        return null;
+      }
 
+      return cached;
+    },
+    transform(data) {
+      return {
+        ...data,
+        _cacheTime: Date.now(),
+      };
+    },
+  },
+);
+
+const platform = computed<string>(() => {
+  if (import.meta.server) {
+    const headers = useRequestHeaders();
+    return headers["user-agent"] || "";
+  } else {
+    return navigator.userAgent || "";
+  }
+});
+const os = computed<OSType>(() => {
+  if (platform.value.includes("Mac")) {
+    return "Mac";
+  } else if (platform.value.includes("Win")) {
+    return "Windows";
+  } else if (platform.value.includes("Linux")) {
+    return "Linux";
+  } else {
+    return null;
+  }
+});
+const downloadLauncher = computed(() => {
   if (os.value === "Windows") {
-    downloadLauncher = () => {
-      downloadWindows.value.click();
+    return () => {
+      downloadWindows.value?.click();
     };
   } else if (os.value === "Linux") {
-    downloadLauncher = () => {
-      downloadLinux.value.click();
+    return () => {
+      downloadLinux.value?.click();
     };
   } else {
-    downloadLauncher = () => {
+    return () => {
       scrollToSection();
     };
   }
 });
 
+onBeforeMount(() => {
+  if (launcherUpdates.value?.platforms) {
+    macLinks.universal = launcherUpdates.value.platforms["darwin-aarch64"]?.install_urls[0] || null;
+    windowsLink.value = launcherUpdates.value.platforms["windows-x86_64"]?.install_urls[0] || null;
+    linuxLinks.appImage = launcherUpdates.value.platforms["linux-x86_64"]?.install_urls[1] || null;
+    linuxLinks.deb = launcherUpdates.value.platforms["linux-x86_64"]?.install_urls[0] || null;
+    linuxLinks.rpm = launcherUpdates.value.platforms["linux-x86_64"]?.install_urls[2] || null;
+  }
+});
 const scrollToSection = () => {
   nextTick(() => {
-    window.scrollTo({
-      top: downloadSection.value.offsetTop,
-      behavior: "smooth",
-    });
+    if (downloadSection.value) {
+      window.scrollTo({
+        top: downloadSection.value.offsetTop,
+        behavior: "smooth",
+      });
+    }
   });
 };
 
@@ -485,7 +534,7 @@ useSeoMeta({
                   class="project button-animation gradient-border"
                   :to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
                 >
-                  <Avatar :src="project.icon_url" :alt="project.title" size="sm" loading="lazy" />
+                  <Avatar :src="project.icon_url!" :alt="project.title" size="sm" />
                   <div class="project-info">
                     <span class="title">
                       {{ project.title }}
@@ -596,9 +645,7 @@ useSeoMeta({
           </div>
           <div class="description">
             Modrinth’s launcher is fully open source. You can view the source code on our
-            <a href="https://github.com/modrinth/theseus" rel="noopener" :target="$external()"
-              >GitHub</a
-            >!
+            <a href="https://github.com/modrinth/theseus" rel="noopener" target="_blank">GitHub</a>!
           </div>
         </div>
         <div class="point">
@@ -788,7 +835,7 @@ useSeoMeta({
             Windows
           </div>
           <div class="description">
-            <a ref="downloadWindows" :href="windowsLink" download="">
+            <a ref="downloadWindows" :href="windowsLink || undefined" download="">
               <DownloadIcon />
               <span> Download the beta </span>
             </a>
@@ -812,7 +859,7 @@ useSeoMeta({
             Mac
           </div>
           <div class="description apple">
-            <a :href="macLinks.universal" download="">
+            <a :href="macLinks.universal || undefined" download="">
               <DownloadIcon />
               <span> Download the beta </span>
             </a>
@@ -849,19 +896,19 @@ useSeoMeta({
             Linux
           </div>
           <div class="description apple">
-            <a ref="downloadLinux" :href="linuxLinks.appImage" download="">
+            <a ref="downloadLinux" :href="linuxLinks.appImage || undefined" download="">
               <DownloadIcon />
               <span> Download the AppImage </span>
             </a>
-            <a :href="linuxLinks.deb" download="">
+            <a :href="linuxLinks.deb || undefined" download="">
               <DownloadIcon />
               <span> Download the DEB </span>
             </a>
-            <a :href="linuxLinks.rpm" download="">
+            <a :href="linuxLinks.rpm || undefined" download="">
               <DownloadIcon />
               <span> Download the RPM </span>
             </a>
-            <a :href="linuxLinks.thirdParty" download="">
+            <a :href="linuxLinks.thirdParty || undefined" download="">
               <LinkIcon />
               <span> Third-party packages </span>
             </a>
