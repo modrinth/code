@@ -112,7 +112,7 @@ impl LegacyProject {
         // We'll prioritize 'modpack' first, and if neither are found, use the first one.
         // If there are no project types, default to 'project'
         let project_types = data.project_types;
-        let (mut project_type, og_project_type) =
+        let (mut _project_type, og_project_type) =
             Self::get_project_type(&project_types);
 
         let mut loaders = data.loaders;
@@ -144,7 +144,7 @@ impl LegacyProject {
             // - if loader is mrpack, this is a modpack
             // the loaders are whatever the corresponding loader fields are
             if loaders.contains(&"mrpack".to_string()) {
-                project_type = "modpack".to_string();
+                _project_type = "modpack".to_string();
                 if let Some(mrpack_loaders) =
                     data.fields.iter().find(|f| f.0 == "mrpack_loaders")
                 {
@@ -183,7 +183,7 @@ impl LegacyProject {
         Self {
             id: data.id,
             slug: data.slug,
-            project_type,
+            project_type: data.project_type,
             team: data.team_id,
             organization: data.organization,
             title: data.name,

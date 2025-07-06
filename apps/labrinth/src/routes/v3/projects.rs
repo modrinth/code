@@ -167,10 +167,13 @@ pub async fn project_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    // println!("=== in function Project_get ===");
     let string = info.into_inner().0;
 
     let project_data =
         db_models::DBProject::get(&string, &**pool, &redis).await?;
+    // println!("===== project_data =====");
+    // println!("{:?}",project_data);
     let user_option = get_user_from_headers(
         &req,
         &**pool,
@@ -183,8 +186,14 @@ pub async fn project_get(
     .ok();
 
     if let Some(data) = project_data {
+        // println!("===== Some exists =====");
+        // println!("{:?}", data);
         if is_visible_project(&data.inner, &user_option, &pool, false).await? {
-            return Ok(HttpResponse::Ok().json(Project::from(data)));
+            // println!("===== Project::from(data) =====");
+            // println!("type: = {} =", Project::from(data.clone()).project_type);
+            let responseq = Ok(HttpResponse::Ok().json(Project::from(data)));
+            // println!("{:?}", responseq.body);
+            return responseq;
         }
     }
     Err(ApiError::NotFound)

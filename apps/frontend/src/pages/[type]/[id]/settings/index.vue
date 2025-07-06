@@ -81,7 +81,11 @@
 
       <label for="project-type">
         <span class="label__title">Project Type</span>
+        <span class="label__description">
+          选择项目类型.
+        </span>
       </label>
+      <!-- 
       <select
         id="project-type"
         v-model="projectType"
@@ -92,6 +96,19 @@
         <option value="datapack">Datapack</option>
         <option value="plugin">Plugin</option>
       </select>
+      -->
+      <Multiselect
+        id="project-type"
+        v-model="projectType"
+        class="small-multiselect"
+        placeholder="Select one"
+        :options="projectTypes"
+        :searchable="false"
+        :close-on-select="true"
+        :show-labels="false"
+        :allow-empty="false"
+        :disabled="!hasPermission"
+      />
 
       <label for="project-summary">
         <span class="label__title">Summary</span>
@@ -316,6 +333,7 @@ const hasDeletePermission = computed(() => {
 });
 
 const sideTypes = ["required", "optional", "unsupported"];
+const projectTypes = ["mod", "modpack", "plugin", "datapack"];
 
 const patchData = computed(() => {
   const data = {};

@@ -2,6 +2,12 @@ export const useBaseFetch = async (url, options = {}, skipAuth = false) => {
   const config = useRuntimeConfig();
   let base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl;
 
+  if (import.meta.server) {
+    console.log(`[useBaseFetch][SSR] base=${base} url=${url}`);
+  } else {
+    console.log(`[useBaseFetch][CSR] base=${base} url=${url}`);
+  }
+
   if (!options.headers) {
     options.headers = {};
   }
@@ -32,5 +38,7 @@ export const useBaseFetch = async (url, options = {}, skipAuth = false) => {
     delete options.apiVersion;
   }
 
-  return await $fetch(`${base}${url}`, options);
+  const resp = await $fetch(`${base}${url}`, options);
+  console.log(`[useBaseFetch][SSR] base=${base} url=${url} response=`, resp);
+  return resp;
 };

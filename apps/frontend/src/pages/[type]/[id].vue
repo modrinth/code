@@ -891,6 +891,7 @@ import NavTabs from "~/components/ui/NavTabs.vue";
 import ProjectMemberHeader from "~/components/ui/ProjectMemberHeader.vue";
 import { userCollectProject } from "~/composables/user.js";
 import { reportProject } from "~/utils/report-helpers.ts";
+import { onMounted } from 'vue'
 
 const data = useNuxtApp();
 const route = useNativeRoute();
@@ -1127,20 +1128,27 @@ try {
     { data: versions, error: versionsError },
     { data: organization, refresh: resetOrganization },
   ] = await Promise.all([
-    useAsyncData(`project/${route.params.id}`, () => useBaseFetch(`project/${route.params.id}`), {
-      transform: (project) => {
-        if (project) {
-          project.actualProjectType = JSON.parse(JSON.stringify(project.project_type));
-          project.project_type = data.$getProjectTypeForUrl(
-            project.project_type,
-            project.loaders,
-            tags.value,
-          );
+    useAsyncData(
+      `project/${route.params.id}`,
+      () => useBaseFetch(`project/${route.params.id}`),
+      {
+        onSuccess(raw) {
+          console.log('▶️ API 原始 project 数据：', raw)
+        },
+        transform: (project) => {
+          if (project) {
+            project.actualProjectType = JSON.parse(JSON.stringify(project.project_type))
+            project.project_type = data.$getProjectTypeForUrl(
+              project.project_type,
+              project.loaders,
+              tags.value
+            )
+          }
+          return project
         }
+      }
+    ),
 
-        return project;
-      },
-    }),
     useAsyncData(
       `project/${route.params.id}/members`,
       () => useBaseFetch(`project/${route.params.id}/members`, { apiVersion: 3 }),
@@ -1169,6 +1177,10 @@ try {
     ),
   ]);
 
+  // onMounted(() => {
+  //   console.log('▶️ 响应式 project.value：', project.value)
+  // })
+
   versions = shallowRef(toRaw(versions));
   featuredVersions = shallowRef(toRaw(featuredVersions));
 } catch (err) {
@@ -1194,6 +1206,11 @@ handleError(membersError);
 handleError(dependenciesError);
 handleError(featuredVersionsError);
 handleError(versionsError);
+
+onMounted(() => {
+  console.log('🔎 Client-side project 数据（id.vue）：', project.value);
+    console.log('🔍 actualProjectType =', project.value.actualProjectType);
+})
 
 if (!project.value) {
   throw createError({

@@ -465,8 +465,6 @@ pub async fn project_edit(
         }
     }
 
-    // In v2, setting donation links resets all other donation links
-    // (resetting to the new ones)
     if let Some(donation_urls) = v2_new_project.donation_urls {
         // Fetch current donation links from project so we know what to delete
         let fetched_example_project =
