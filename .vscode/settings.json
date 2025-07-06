@@ -1,6 +1,9 @@
 {
   "prettier.endOfLine": "lf",
   "editor.formatOnSave": true,
+  "[.gltf]": {
+    "editor.formatOnSave": false
+  },
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "editor.detectIndentation": true,
   "editor.codeActionsOnSave": {
