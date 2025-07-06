@@ -20,6 +20,7 @@ import { article as new_site_beta } from './new_site_beta'
 import { article as plugins_resource_packs } from './plugins_resource_packs'
 import { article as pride_campaign_2025 } from './pride_campaign_2025'
 import { article as redesign } from './redesign'
+import { article as skins_now_in_modrinth_app } from './skins_now_in_modrinth_app'
 import { article as two_years_of_modrinth_history } from './two_years_of_modrinth_history'
 import { article as two_years_of_modrinth } from './two_years_of_modrinth'
 import { article as whats_modrinth } from './whats_modrinth'
@@ -47,6 +48,7 @@ export const articles = [
   plugins_resource_packs,
   pride_campaign_2025,
   redesign,
+  skins_now_in_modrinth_app,
   two_years_of_modrinth_history,
   two_years_of_modrinth,
   whats_modrinth,
