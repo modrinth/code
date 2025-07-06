@@ -977,6 +977,9 @@ pub struct SearchRequest {
     pub index: Option<String>,
     pub limit: Option<String>,
 
+    // The current page URI, e.g. "/mods" or "/modpacks"
+    pub uri: Option<String>,
+
     pub new_filters: Option<String>,
 
     // TODO: Deprecated values below. WILL BE REMOVED V3!

@@ -228,9 +228,18 @@ pub async fn search_for_project(
         .map(|x| x.to_string())
         .collect();
 
+    use crate::database::models::categories::ProjectType;
+
+    let project_type_id: Option<i32> = if let Some(uri) = info.uri.as_deref() {
+        let trimmed = uri.trim_start_matches('/').trim_end_matches('s');
+        ProjectType::get_id(trimmed, &pool).await?.map(|x| x.0)
+    } else {
+        None
+    };
+
     let search_pattern = format!("%{}%", info.query.as_deref().unwrap_or("").to_lowercase());
     let sql = format!(
-        "SELECT id FROM mods WHERE status = ANY($1) AND (LOWER(name) LIKE $2 OR LOWER(summary) LIKE $2 OR LOWER(COALESCE(slug,'')) LIKE $2) ORDER BY {order_by} OFFSET $3 LIMIT $4"
+        "SELECT id FROM mods WHERE status = ANY($1) AND (LOWER(name) LIKE $2 OR LOWER(summary) LIKE $2 OR LOWER(COALESCE(slug,'')) LIKE $2) AND ($5::int IS NULL OR project_type = $5) ORDER BY {order_by} OFFSET $3 LIMIT $4"
     );
 
     let ids: Vec<DBProjectId> = sqlx::query(&sql)
@@ -238,16 +247,18 @@ pub async fn search_for_project(
         .bind(&search_pattern)
         .bind(offset as i64)
         .bind(limit as i64)
+        .bind(project_type_id)
         .fetch_all(&pool)
         .await?
         .iter()
         .map(|row| DBProjectId(row.get::<i64, _>("id")))
         .collect();
 
-    let count_sql = "SELECT COUNT(*) FROM mods WHERE status = ANY($1) AND (LOWER(name) LIKE $2 OR LOWER(summary) LIKE $2 OR LOWER(COALESCE(slug,'')) LIKE $2)";
+    let count_sql = "SELECT COUNT(*) FROM mods WHERE status = ANY($1) AND (LOWER(name) LIKE $2 OR LOWER(summary) LIKE $2 OR LOWER(COALESCE(slug,'')) LIKE $2) AND ($3::int IS NULL OR project_type = $3)";
     let total_hits: i64 = sqlx::query_scalar(count_sql)
         .bind(&statuses)
         .bind(&search_pattern)
+        .bind(project_type_id)
         .fetch_one(&pool)
         .await?;
 
