@@ -619,6 +619,12 @@ pub async fn launch_minecraft(
         .into_iter(),
     );
 
+    // The java launcher requires access to java.lang.reflect in order to force access in to
+    // whatever module the main class is in
+    if java_version.parsed_version >= 9 {
+        command.arg("--add-opens=java.base/java.lang.reflect=ALL-UNNAMED");
+    }
+
     // The java launcher code requires internal JDK code in Java 25+ in order to support JEP 512
     if java_version.parsed_version >= 25 {
         command.arg("--add-opens=jdk.internal/jdk.internal.misc=ALL-UNNAMED");
