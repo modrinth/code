@@ -1,8 +1,3 @@
-<script lang="ts">
-import capeModelUrl from '@/assets/models/cape.gltf?url'
-import wideModelUrl from '@/assets/models/classic_player.gltf?url'
-import slimModelUrl from '@/assets/models/slim_player.gltf?url'
-</script>
 <template>
   <UploadSkinModal ref="uploadModal" />
   <ModalWrapper ref="modal" @on-hide="resetState">
@@ -16,9 +11,6 @@ import slimModelUrl from '@/assets/models/slim_player.gltf?url'
       <div class="max-h-[25rem] w-[16rem] min-w-[16rem] overflow-hidden relative">
         <div class="absolute top-[-4rem] left-0 h-[32rem] w-[16rem] flex-shrink-0">
           <SkinPreviewRenderer
-            :slim-model-src="slimModelUrl"
-            :wide-model-src="wideModelUrl"
-            :cape-model-src="capeModelUrl"
             :variant="variant"
             :texture-src="previewSkin || ''"
             :cape-src="selectedCapeTexture"

@@ -121,6 +121,7 @@ import {
   loadTexture as loadSkinTexture,
 } from '@modrinth/utils'
 import { useDynamicFontSize } from '../../composables'
+import { CapeModel, ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
 
 interface AnimationConfig {
   baseAnimation: string
@@ -132,9 +133,6 @@ interface AnimationConfig {
 const props = withDefaults(
   defineProps<{
     textureSrc: string
-    slimModelSrc: string
-    wideModelSrc: string
-    capeModelSrc?: string
     capeSrc?: string
     variant?: 'SLIM' | 'CLASSIC' | 'UNKNOWN'
     nametag?: string
@@ -149,7 +147,6 @@ const props = withDefaults(
     antialias: false,
     scale: 1,
     fov: 40,
-    capeModelSrc: '',
     capeSrc: undefined,
     initialRotation: 15.75,
     nametag: undefined,
@@ -176,7 +173,7 @@ const { fontSize: nametagFontSize } = useDynamicFontSize({
 })
 
 const selectedModelSrc = computed(() =>
-  props.variant === 'SLIM' ? props.slimModelSrc : props.wideModelSrc,
+  props.variant === 'SLIM' ? SlimPlayerModel : ClassicPlayerModel,
 )
 
 const scene = shallowRef<THREE.Object3D | null>(null)
@@ -421,14 +418,9 @@ async function loadModel(src: string) {
   }
 }
 
-async function loadCape(src: string) {
-  if (!src) {
-    capeScene.value = null
-    return
-  }
-
+async function loadCape() {
   try {
-    const { scene: loadedCape } = await useGLTF(src)
+    const { scene: loadedCape } = await useGLTF(CapeModel)
     capeScene.value = markRaw(loadedCape)
 
     applyCapeTexture(capeScene.value, capeTexture.value, transparentTexture)
@@ -582,10 +574,6 @@ watch(capeScene, (newCapeScene) => {
 
 watch(selectedModelSrc, (src) => loadModel(src))
 watch(
-  () => props.capeModelSrc,
-  (src) => src && loadCape(src),
-)
-watch(
   () => props.textureSrc,
   async (newSrc) => {
     isTextureLoaded.value = false
@@ -599,6 +587,7 @@ watch(
 watch(
   () => props.capeSrc,
   async (newCapeSrc) => {
+    await loadCape()
     await loadAndApplyCapeTexture(newCapeSrc)
   },
 )
@@ -631,9 +620,7 @@ onBeforeMount(async () => {
       await loadAndApplyCapeTexture(props.capeSrc)
     }
 
-    if (props.capeModelSrc) {
-      await loadCape(props.capeModelSrc)
-    }
+    await loadCape()
   } catch (error) {
     console.error('Failed to initialize skin preview:', error)
   }
