@@ -1,7 +1,9 @@
 //! Theseus profile management interface
 use crate::launcher::get_loader_version_from_profile;
 use crate::settings::Hooks;
-use crate::state::{LauncherFeatureVersion, LinkedData, ProfileInstallStage};
+use crate::state::{
+    LauncherFeatureVersion, LinkedData, ProfileInstallStage, WrapperType,
+};
 use crate::util::io::{self, canonicalize};
 use crate::{ErrorKind, pack, profile};
 pub use crate::{State, state::Profile};
@@ -97,6 +99,7 @@ pub async fn profile_create(
         hooks: Hooks {
             pre_launch: None,
             wrapper: None,
+            wrapper_type: WrapperType::Path,
             post_exit: None,
         },
     };

@@ -2,7 +2,7 @@ use super::settings::{Hooks, MemorySettings, WindowSize};
 use crate::profile::get_full_path;
 use crate::state::server_join_log::JoinLogEntry;
 use crate::state::{
-    CacheBehaviour, CachedEntry, CachedFileHash, cache_file_hash,
+    CacheBehaviour, CachedEntry, CachedFileHash, WrapperType, cache_file_hash,
 };
 use crate::util;
 use crate::util::fetch::{FetchSemaphore, IoSemaphore, write_cached_icon};
@@ -302,6 +302,7 @@ struct ProfileQueryResult {
     override_mc_game_resolution_y: Option<i64>,
     override_hook_pre_launch: Option<String>,
     override_hook_wrapper: Option<String>,
+    override_hook_wrapper_type: String,
     override_hook_post_exit: Option<String>,
     protocol_version: Option<i64>,
     launcher_feature_version: String,
@@ -372,6 +373,9 @@ impl TryFrom<ProfileQueryResult> for Profile {
             hooks: Hooks {
                 pre_launch: x.override_hook_pre_launch,
                 wrapper: x.override_hook_wrapper,
+                wrapper_type: WrapperType::from_string(
+                    &x.override_hook_wrapper_type,
+                ),
                 post_exit: x.override_hook_post_exit,
             },
         })
@@ -393,7 +397,7 @@ macro_rules! select_profiles_with_predicate {
                 override_java_path,
                 json(override_extra_launch_args) as "override_extra_launch_args!: serde_json::Value", json(override_custom_env_vars) as "override_custom_env_vars!: serde_json::Value",
                 override_mc_memory_max, override_mc_force_fullscreen, override_mc_game_resolution_x, override_mc_game_resolution_y,
-                override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit
+                override_hook_pre_launch, override_hook_wrapper, override_hook_wrapper_type, override_hook_post_exit
             FROM profiles
             "#
                 + $predicate,
@@ -474,6 +478,8 @@ impl Profile {
         let extra_launch_args = serde_json::to_string(&self.extra_launch_args)?;
         let custom_env_vars = serde_json::to_string(&self.custom_env_vars)?;
 
+        let override_hook_wrapper_type = self.hooks.wrapper_type.as_str();
+
         sqlx::query!(
             "
             INSERT INTO profiles (
@@ -485,7 +491,7 @@ impl Profile {
                 submitted_time_played, recent_time_played,
                 override_java_path, override_extra_launch_args, override_custom_env_vars,
                 override_mc_memory_max, override_mc_force_fullscreen, override_mc_game_resolution_x, override_mc_game_resolution_y,
-                override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit,
+                override_hook_pre_launch, override_hook_wrapper, override_hook_wrapper_type, override_hook_post_exit,
                 protocol_version, launcher_feature_version
             )
             VALUES (
@@ -497,8 +503,8 @@ impl Profile {
                 $15, $16,
                 $17, jsonb($18), jsonb($19),
                 $20, $21, $22, $23,
-                $24, $25, $26,
-                $27, $28
+                $24, $25, $26, $27,
+                $28, $29
             )
             ON CONFLICT (path) DO UPDATE SET
                 install_stage = $2,
@@ -532,10 +538,11 @@ impl Profile {
 
                 override_hook_pre_launch = $24,
                 override_hook_wrapper = $25,
-                override_hook_post_exit = $26,
+                override_hook_wrapper_type = $26,
+                override_hook_post_exit = $27,
 
-                protocol_version = $27,
-                launcher_feature_version = $28
+                protocol_version = $28,
+                launcher_feature_version = $29
             ",
             self.path,
             install_stage,
@@ -562,6 +569,7 @@ impl Profile {
             game_resolution_y,
             self.hooks.pre_launch,
             self.hooks.wrapper,
+            override_hook_wrapper_type,
             self.hooks.post_exit,
             self.protocol_version,
             launcher_feature_version
