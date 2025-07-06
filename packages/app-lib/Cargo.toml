@@ -1,6 +1,6 @@
 [package]
 name = "theseus"
-version = "1.0.0-local" # The actual version is set by the theseus-release workflow on tagging
+version = "1.0.0-local" # The actual version is set by the theseus-build workflow on tagging
 authors = ["Jai A <jaiagr+gpg@pm.me>"]
 edition.workspace = true
 
