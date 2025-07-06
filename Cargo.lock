@@ -8999,7 +8999,7 @@ dependencies = [
 
 [[package]]
 name = "theseus"
-version = "0.10.1"
+version = "1.0.0-local"
 dependencies = [
  "ariadne",
  "async-compression",
@@ -9064,7 +9064,7 @@ dependencies = [
 
 [[package]]
 name = "theseus_gui"
-version = "0.10.1"
+version = "1.0.0-local"
 dependencies = [
  "chrono",
  "daedalus",
