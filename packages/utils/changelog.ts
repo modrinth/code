@@ -11,6 +11,17 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-07-06T16:30:00-07:00`,
+    product: 'app',
+    version: `0.10.2`,
+    body: `### Improvements
+- Added additional default skins from free official Minecraft skin packs.
+- Fixed some parts of the player model on Skins page rendering incorrectly.
+- Fixed a number of issues with skin images not loading on macOS.
+- Fixed old Forge versions not loading properly.
+- Fixed a typo in Appearance settings for hiding Skins page nametag.`,
+  },
+  {
     date: `2025-07-05T12:00:00-07:00`,
     product: 'app',
     version: `0.10.1`,
