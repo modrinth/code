@@ -78,7 +78,7 @@ jobs:
       - name: ⚙️ Set application version
         shell: bash
         env:
-          APP_VERSION: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('1.0.0-canary+{0}', github.sha) }}
+          APP_VERSION: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('v1.0.0-canary+{0}', github.sha) }}
         run: |
           dasel put -f apps/app/Cargo.toml -t string -v "${APP_VERSION#v}" 'package.version'
           dasel put -f packages/app-lib/Cargo.toml -t string -v "${APP_VERSION#v}" 'package.version'
@@ -110,7 +110,6 @@ jobs:
         run: pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json
         if: startsWith(matrix.platform, 'macos')
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ENABLE_CODE_SIGNING: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
@@ -125,7 +124,6 @@ jobs:
         run: pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json
         if: startsWith(matrix.platform, 'ubuntu')
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
@@ -135,10 +133,9 @@ jobs:
           $env:DIGICERT_ONE_SIGNER_CREDENTIALS = "$env:DIGICERT_ONE_SIGNER_API_KEY|$PWD\signer-client-cert.p12|$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD"
           $env:JAVA_HOME = "$env:JAVA_HOME_11_X64"
           pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json --verbose --bundles 'nsis,updater'
-          Remove-Item -Path signer-client-cert.p12
+          Remove-Item -Path signer-client-cert.p12 -ErrorAction SilentlyContinue
         if: startsWith(matrix.platform, 'windows')
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           DIGICERT_ONE_SIGNER_API_KEY: ${{ secrets.DIGICERT_ONE_SIGNER_API_KEY }}
