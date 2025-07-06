@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import {
-  CapeModel,
-  ClassicPlayerModel,
   EditIcon,
   ExcitedRinthbot,
   LogInIcon,
   PlusIcon,
-  SlimPlayerModel,
   SpinnerIcon,
   TrashIcon,
   UpdatedIcon,
@@ -319,9 +316,6 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
       </h1>
       <div class="preview-container">
         <SkinPreviewRenderer
-          :wide-model-src="ClassicPlayerModel"
-          :slim-model-src="SlimPlayerModel"
-          :cape-model-src="CapeModel"
           :cape-src="capeTexture"
           :texture-src="skinTexture || ''"
           :variant="skinVariant"
