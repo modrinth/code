@@ -6,10 +6,8 @@ use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use meilisearch_sdk::client::Client;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
-use std::borrow::Cow;
 use std::collections::HashMap;
-use std::fmt::Write;
+use sqlx::Row;
 use thiserror::Error;
 
 pub mod indexing;
@@ -24,6 +22,10 @@ pub enum SearchError {
     IntParsing(#[from] std::num::ParseIntError),
     #[error("Error while formatting strings: {0}")]
     FormatError(#[from] std::fmt::Error),
+    #[error("Database Error: {0}")]
+    Sqlx(#[from] sqlx::error::Error),
+    #[error("Database Error: {0}")]
+    Database(#[from] crate::database::models::DatabaseError),
     #[error("Environment Error")]
     Env(#[from] dotenvy::Error),
     #[error("Invalid index to sort by: {0}")]
@@ -39,6 +41,8 @@ impl actix_web::ResponseError for SearchError {
             SearchError::IntParsing(..) => StatusCode::BAD_REQUEST,
             SearchError::InvalidIndex(..) => StatusCode::BAD_REQUEST,
             SearchError::FormatError(..) => StatusCode::BAD_REQUEST,
+            SearchError::Sqlx(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            SearchError::Database(..) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 
@@ -51,6 +55,8 @@ impl actix_web::ResponseError for SearchError {
                 SearchError::IntParsing(..) => "invalid_input",
                 SearchError::InvalidIndex(..) => "invalid_input",
                 SearchError::FormatError(..) => "invalid_input",
+                SearchError::Sqlx(..) => "database_error",
+                SearchError::Database(..) => "database_error",
             },
             description: self.to_string(),
         })
@@ -192,7 +198,13 @@ pub async fn search_for_project(
     info: &SearchRequest,
     config: &SearchConfig,
 ) -> Result<SearchResults, SearchError> {
-    let client = Client::new(&*config.address, Some(&*config.key))?;
+    use ariadne::ids::base62_impl::to_base62;
+    use crate::database::{connect as db_connect, redis::RedisPool};
+    use crate::database::models::{project_item::DBProject, ids::DBProjectId};
+    use crate::models::projects::{ProjectStatus, from_duplicate_version_fields};
+
+    let pool = db_connect().await?;
+    let redis = RedisPool::new(Some(config.meta_namespace.clone()));
 
     let offset: usize = info.offset.as_deref().unwrap_or("0").parse()?;
     let index = info.index.as_deref().unwrap_or("relevance");
@@ -203,116 +215,134 @@ pub async fn search_for_project(
         .parse::<usize>()?
         .min(100);
 
-    let sort = get_sort_index(config, index)?;
-    let meilisearch_index = client.get_index(sort.0).await?;
-
-    let mut filter_string = String::new();
-
-    // Convert offset and limit to page and hits_per_page
-    let hits_per_page = if limit == 0 { 1 } else { limit };
-
-    let page = offset / hits_per_page + 1;
-
-    let results = {
-        let mut query = meilisearch_index.search();
-        query
-            .with_page(page)
-            .with_hits_per_page(hits_per_page)
-            .with_query(info.query.as_deref().unwrap_or_default())
-            .with_sort(&sort.1);
-
-        if let Some(new_filters) = info.new_filters.as_deref() {
-            query.with_filter(new_filters);
-        } else {
-            let facets = if let Some(facets) = &info.facets {
-                Some(serde_json::from_str::<Vec<Vec<Value>>>(facets)?)
-            } else {
-                None
-            };
-
-            let filters: Cow<_> =
-                match (info.filters.as_deref(), info.version.as_deref()) {
-                    (Some(f), Some(v)) => format!("({f}) AND ({v})").into(),
-                    (Some(f), None) => f.into(),
-                    (None, Some(v)) => v.into(),
-                    (None, None) => "".into(),
-                };
-
-            if let Some(facets) = facets {
-                // Search can now *optionally* have a third inner array: So Vec(AND)<Vec(OR)<Vec(AND)< _ >>>
-                // For every inner facet, we will check if it can be deserialized into a Vec<&str>, and do so.
-                // If not, we will assume it is a single facet and wrap it in a Vec.
-                let facets: Vec<Vec<Vec<String>>> = facets
-                    .into_iter()
-                    .map(|facets| {
-                        facets
-                            .into_iter()
-                            .map(|facet| {
-                                if facet.is_array() {
-                                    serde_json::from_value::<Vec<String>>(facet)
-                                        .unwrap_or_default()
-                                } else {
-                                    vec![
-                                        serde_json::from_value::<String>(facet)
-                                            .unwrap_or_default(),
-                                    ]
-                                }
-                            })
-                            .collect_vec()
-                    })
-                    .collect_vec();
-
-                filter_string.push('(');
-                for (index, facet_outer_list) in facets.iter().enumerate() {
-                    filter_string.push('(');
-
-                    for (facet_outer_index, facet_inner_list) in
-                        facet_outer_list.iter().enumerate()
-                    {
-                        filter_string.push('(');
-                        for (facet_inner_index, facet) in
-                            facet_inner_list.iter().enumerate()
-                        {
-                            filter_string.push_str(&facet.replace(':', " = "));
-                            if facet_inner_index != (facet_inner_list.len() - 1)
-                            {
-                                filter_string.push_str(" AND ")
-                            }
-                        }
-                        filter_string.push(')');
-
-                        if facet_outer_index != (facet_outer_list.len() - 1) {
-                            filter_string.push_str(" OR ")
-                        }
-                    }
-
-                    filter_string.push(')');
-
-                    if index != (facets.len() - 1) {
-                        filter_string.push_str(" AND ")
-                    }
-                }
-                filter_string.push(')');
-
-                if !filters.is_empty() {
-                    write!(filter_string, " AND ({filters})")?;
-                }
-            } else {
-                filter_string.push_str(&filters);
-            }
-
-            if !filter_string.is_empty() {
-                query.with_filter(&filter_string);
-            }
-        }
-
-        query.execute::<ResultSearchProject>().await?
+    let order_by = match index {
+        "relevance" | "downloads" => "downloads DESC",
+        "follows" => "follows DESC",
+        "updated" => "updated DESC",
+        "newest" => "COALESCE(approved, published) DESC",
+        i => return Err(SearchError::InvalidIndex(i.to_string())),
     };
 
+    let statuses: Vec<String> = ProjectStatus::iterator()
+        .filter(|x| x.is_searchable())
+        .map(|x| x.to_string())
+        .collect();
+
+    let search_pattern = format!("%{}%", info.query.as_deref().unwrap_or("").to_lowercase());
+    let sql = format!(
+        "SELECT id FROM mods WHERE status = ANY($1) AND (LOWER(name) LIKE $2 OR LOWER(summary) LIKE $2 OR LOWER(COALESCE(slug,'')) LIKE $2) ORDER BY {order_by} OFFSET $3 LIMIT $4"
+    );
+
+    let ids: Vec<DBProjectId> = sqlx::query(&sql)
+        .bind(&statuses)
+        .bind(&search_pattern)
+        .bind(offset as i64)
+        .bind(limit as i64)
+        .fetch_all(&pool)
+        .await?
+        .iter()
+        .map(|row| DBProjectId(row.get::<i64, _>("id")))
+        .collect();
+
+    let count_sql = "SELECT COUNT(*) FROM mods WHERE status = ANY($1) AND (LOWER(name) LIKE $2 OR LOWER(summary) LIKE $2 OR LOWER(COALESCE(slug,'')) LIKE $2)";
+    let total_hits: i64 = sqlx::query_scalar(count_sql)
+        .bind(&statuses)
+        .bind(&search_pattern)
+        .fetch_one(&pool)
+        .await?;
+
+    let projects = DBProject::get_many_ids(&ids, &pool, &redis).await?;
+
+    let ids_i64: Vec<i64> = ids.iter().map(|x| x.0).collect();
+    let org_owners = sqlx::query!(
+        "SELECT m.id mod_id, u.username FROM mods m INNER JOIN organizations o ON o.id = m.organization_id INNER JOIN team_members tm ON tm.is_owner = TRUE and tm.team_id = o.team_id INNER JOIN users u ON u.id = tm.user_id WHERE m.id = ANY($1)",
+        &ids_i64
+    )
+    .fetch_all(&pool)
+    .await?
+    .into_iter()
+    .map(|r| (DBProjectId(r.mod_id), r.username))
+    .collect::<HashMap<_, _>>();
+
+    let team_owners = sqlx::query!(
+        "SELECT m.id mod_id, u.username FROM mods m INNER JOIN team_members tm ON tm.is_owner = TRUE and tm.team_id = m.team_id INNER JOIN users u ON u.id = tm.user_id WHERE m.id = ANY($1)",
+        &ids_i64
+    )
+    .fetch_all(&pool)
+    .await?
+    .into_iter()
+    .map(|r| (DBProjectId(r.mod_id), r.username))
+    .collect::<HashMap<_, _>>();
+
+    let hits = projects
+        .into_iter()
+        .map(|p| {
+            let author = org_owners
+                .get(&p.inner.id)
+                .cloned()
+                .or_else(|| team_owners.get(&p.inner.id).cloned())
+                .unwrap_or_default();
+
+            let version_id = p
+                .versions
+                .last()
+                .map(|v| to_base62(v.0 as u64))
+                .unwrap_or_default();
+
+            let project_id = to_base62(p.inner.id.0 as u64);
+            let mut categories = p.categories.clone();
+            categories.extend(p.additional_categories.clone());
+            let display_categories = p.categories.clone();
+
+            let (featured_gallery, gallery) = {
+                let mut featured = None;
+                let mut gallery = Vec::new();
+                for item in &p.gallery_items {
+                    if item.featured && featured.is_none() {
+                        featured = Some(item.image_url.clone());
+                    } else {
+                        gallery.push(item.image_url.clone());
+                    }
+                }
+                (featured, gallery)
+            };
+
+            let project_loader_fields = from_duplicate_version_fields(p.aggregate_version_fields.clone());
+
+            ResultSearchProject {
+                version_id,
+                project_id,
+                project_types: p.project_types.clone(),
+                slug: p.inner.slug.clone(),
+                author,
+                name: p.inner.name.clone(),
+                summary: p.inner.summary.clone(),
+                categories,
+                display_categories,
+                downloads: p.inner.downloads,
+                follows: p.inner.follows,
+                icon_url: p.inner.icon_url.clone(),
+                date_created: p
+                    .inner
+                    .approved
+                    .unwrap_or(p.inner.published)
+                    .to_rfc3339(),
+                date_modified: p.inner.updated.to_rfc3339(),
+                license: p.inner.license.split_whitespace().next().unwrap_or(&p.inner.license).to_string(),
+                gallery,
+                featured_gallery,
+                color: p.inner.color,
+                loaders: p.inner.loaders.clone(),
+                project_loader_fields: project_loader_fields.clone(),
+                loader_fields: project_loader_fields,
+            }
+        })
+        .collect::<Vec<_>>();
+
     Ok(SearchResults {
-        hits: results.hits.into_iter().map(|r| r.result).collect(),
-        page: results.page.unwrap_or_default(),
-        hits_per_page: results.hits_per_page.unwrap_or_default(),
-        total_hits: results.total_hits.unwrap_or_default(),
+        hits,
+        page: offset / limit + 1,
+        hits_per_page: limit,
+        total_hits: total_hits as usize,
     })
 }
