@@ -43,10 +43,6 @@ import { handleSevereError } from '@/store/error'
 import { trackEvent } from '@/helpers/analytics'
 import type AccountsCard from '@/components/ui/AccountsCard.vue'
 import { arrayBufferToBase64 } from '@modrinth/utils'
-import capeModelUrl from '@/assets/models/cape.gltf?url'
-import wideModelUrl from '@/assets/models/classic_player.gltf?url'
-import slimModelUrl from '@/assets/models/slim_player.gltf?url'
-
 const editSkinModal = useTemplateRef('editSkinModal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
 const uploadSkinModal = useTemplateRef('uploadSkinModal')
@@ -320,9 +316,6 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
       </h1>
       <div class="preview-container">
         <SkinPreviewRenderer
-          :wide-model-src="wideModelUrl"
-          :slim-model-src="slimModelUrl"
-          :cape-model-src="capeModelUrl"
           :cape-src="capeTexture"
           :texture-src="skinTexture || ''"
           :variant="skinVariant"

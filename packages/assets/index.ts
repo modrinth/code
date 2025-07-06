@@ -83,4 +83,8 @@ export const TwitterIcon = _TwitterIcon
 export const WindowsIcon = _WindowsIcon
 export const YouTubeIcon = _YouTubeIcon
 
+export { default as CapeModel } from './models/cape.gltf?url'
+export { default as ClassicPlayerModel } from './models/classic-player.gltf?url'
+export { default as SlimPlayerModel } from './models/slim-player.gltf?url'
+
 export * from './generated-icons'
