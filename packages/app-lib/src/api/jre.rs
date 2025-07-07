@@ -174,7 +174,10 @@ pub async fn test_jre(
         }
     };
     let version = extract_java_version(&jre.version)?;
-    tracing::info!("Expected Java version {major_version}, and found {version} at {}", path.display());
+    tracing::info!(
+        "Expected Java version {major_version}, and found {version} at {}",
+        path.display()
+    );
     Ok(version == major_version)
 }
 
