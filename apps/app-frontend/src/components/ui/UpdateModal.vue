@@ -1,5 +1,5 @@
 <template>
-  <ModalWrapper ref="modal" :header="formatMessage(messages.header)">
+  <ModalWrapper ref="modal" :header="formatMessage(messages.header)" :on-hide="onHide">
     <div>{{ formatMessage(messages.bodyVersion, { version: update!.version }) }}</div>
     <div v-if="updateSize">
       {{ formatMessage(messages.bodySize, { size: formatBytes(updateSize) }) }}
@@ -91,9 +91,13 @@ async function show(newUpdate: UpdateData) {
   isOpen.value = true
 }
 
+function onHide() {
+  isOpen.value = false
+}
+
 function hide() {
   modal.value!.hide()
-  isOpen.value = false
+  onHide()
 }
 
 defineExpose({ show, isOpen })
