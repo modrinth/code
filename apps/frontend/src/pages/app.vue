@@ -119,15 +119,24 @@ const downloadLauncher = computed(() => {
   }
 });
 
-onBeforeMount(() => {
-  if (launcherUpdates.value?.platforms) {
-    macLinks.universal = launcherUpdates.value.platforms["darwin-aarch64"]?.install_urls[0] || null;
-    windowsLink.value = launcherUpdates.value.platforms["windows-x86_64"]?.install_urls[0] || null;
-    linuxLinks.appImage = launcherUpdates.value.platforms["linux-x86_64"]?.install_urls[1] || null;
-    linuxLinks.deb = launcherUpdates.value.platforms["linux-x86_64"]?.install_urls[0] || null;
-    linuxLinks.rpm = launcherUpdates.value.platforms["linux-x86_64"]?.install_urls[2] || null;
-  }
-});
+const handleDownload = () => {
+  downloadLauncher.value();
+};
+
+watch(
+  launcherUpdates,
+  (newData) => {
+    if (newData?.platforms) {
+      macLinks.universal = newData.platforms["darwin-aarch64"]?.install_urls[0] || null;
+      windowsLink.value = newData.platforms["windows-x86_64"]?.install_urls[0] || null;
+      linuxLinks.appImage = newData.platforms["linux-x86_64"]?.install_urls[1] || null;
+      linuxLinks.deb = newData.platforms["linux-x86_64"]?.install_urls[0] || null;
+      linuxLinks.rpm = newData.platforms["linux-x86_64"]?.install_urls[2] || null;
+    }
+  },
+  { immediate: true },
+);
+
 const scrollToSection = () => {
   nextTick(() => {
     if (downloadSection.value) {
@@ -168,7 +177,7 @@ useSeoMeta({
           v-if="os"
           class="iconified-button brand-button btn btn-large"
           rel="noopener nofollow"
-          @click="downloadLauncher"
+          @click="handleDownload"
         >
           <svg
             v-if="os === 'Linux'"
