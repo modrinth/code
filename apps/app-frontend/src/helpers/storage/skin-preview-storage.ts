@@ -1,4 +1,4 @@
-import type { RenderResult } from '../rendering/batch-skin-renderer'
+import type { RawRenderResult } from '../rendering/batch-skin-renderer'
 
 interface StoredPreview {
   forwards: Blob
@@ -30,18 +30,15 @@ export class SkinPreviewStorage {
     })
   }
 
-  async store(key: string, result: RenderResult): Promise<void> {
+  async store(key: string, result: RawRenderResult): Promise<void> {
     if (!this.db) await this.init()
-
-    const forwardsBlob = await fetch(result.forwards).then((r) => r.blob())
-    const backwardsBlob = await fetch(result.backwards).then((r) => r.blob())
 
     const transaction = this.db!.transaction(['previews'], 'readwrite')
     const store = transaction.objectStore('previews')
 
     const storedPreview: StoredPreview = {
-      forwards: forwardsBlob,
-      backwards: backwardsBlob,
+      forwards: result.forwards,
+      backwards: result.backwards,
       timestamp: Date.now(),
     }
 
@@ -53,7 +50,7 @@ export class SkinPreviewStorage {
     })
   }
 
-  async retrieve(key: string): Promise<RenderResult | null> {
+  async retrieve(key: string): Promise<RawRenderResult | null> {
     if (!this.db) await this.init()
 
     const transaction = this.db!.transaction(['previews'], 'readonly')
@@ -69,10 +66,8 @@ export class SkinPreviewStorage {
           resolve(null)
           return
         }
-
-        const forwards = URL.createObjectURL(result.forwards)
-        const backwards = URL.createObjectURL(result.backwards)
-        resolve({ forwards, backwards })
+        
+        resolve({ forwards: result.forwards, backwards: result.backwards })
       }
       request.onerror = () => reject(request.error)
     })
