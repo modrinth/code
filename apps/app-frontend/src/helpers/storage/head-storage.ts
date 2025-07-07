@@ -70,6 +70,50 @@ export class HeadStorage {
     })
   }
 
+  async batchRetrieve(keys: string[]): Promise<Record<string, Blob | null>> {
+    if (!this.db) await this.init()
+
+    const transaction = this.db!.transaction(['heads'], 'readonly')
+    const store = transaction.objectStore('heads')
+    const results: Record<string, Blob | null> = {}
+
+    return new Promise((resolve, _reject) => {
+      let completedRequests = 0
+
+      if (keys.length === 0) {
+        resolve(results)
+        return
+      }
+
+      for (const key of keys) {
+        const request = store.get(key)
+
+        request.onsuccess = () => {
+          const result = request.result as StoredHead | undefined
+
+          if (result) {
+            results[key] = result.blob
+          } else {
+            results[key] = null
+          }
+
+          completedRequests++
+          if (completedRequests === keys.length) {
+            resolve(results)
+          }
+        }
+
+        request.onerror = () => {
+          results[key] = null
+          completedRequests++
+          if (completedRequests === keys.length) {
+            resolve(results)
+          }
+        }
+      }
+    })
+  }
+
   async cleanupInvalidKeys(validKeys: Set<string>): Promise<number> {
     if (!this.db) await this.init()
 
@@ -111,7 +155,7 @@ export class HeadStorage {
 
     const transaction = this.db!.transaction(['heads'], 'readonly')
     const store = transaction.objectStore('heads')
-    
+
     let totalSize = 0
     let count = 0
     const entries: Array<{ key: string; size: number }> = []
@@ -125,14 +169,14 @@ export class HeadStorage {
         if (cursor) {
           const key = cursor.primaryKey as string
           const value = cursor.value as StoredHead
-          
+
           const entrySize = value.blob.size
           totalSize += entrySize
           count++
-          
+
           entries.push({
             key,
-            size: entrySize
+            size: entrySize,
           })
 
           cursor.continue()
@@ -140,14 +184,24 @@ export class HeadStorage {
           console.group('🗄️ Head Storage Debug Info')
           console.log(`Total entries: ${count}`)
           console.log(`Total size: ${(totalSize / 1024 / 1024).toFixed(2)} MB`)
-          console.log(`Average size per entry: ${count > 0 ? (totalSize / count / 1024).toFixed(2) : 0} KB`)
-          
+          console.log(
+            `Average size per entry: ${count > 0 ? (totalSize / count / 1024).toFixed(2) : 0} KB`,
+          )
+
           if (entries.length > 0) {
             const sortedEntries = entries.sort((a, b) => b.size - a.size)
-            console.log('Largest entry:', sortedEntries[0].key, '(' + (sortedEntries[0].size / 1024).toFixed(2) + ' KB)')
-            console.log('Smallest entry:', sortedEntries[sortedEntries.length - 1].key, '(' + (sortedEntries[sortedEntries.length - 1].size / 1024).toFixed(2) + ' KB)')
+            console.log(
+              'Largest entry:',
+              sortedEntries[0].key,
+              '(' + (sortedEntries[0].size / 1024).toFixed(2) + ' KB)',
+            )
+            console.log(
+              'Smallest entry:',
+              sortedEntries[sortedEntries.length - 1].key,
+              '(' + (sortedEntries[sortedEntries.length - 1].size / 1024).toFixed(2) + ' KB)',
+            )
           }
-          
+
           console.groupEnd()
           resolve()
         }

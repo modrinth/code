@@ -13,8 +13,8 @@ export interface RenderResult {
 }
 
 export interface RawRenderResult {
-  forwards: Blob,
-  backwards: Blob,
+  forwards: Blob
+  backwards: Blob
 }
 
 class BatchSkinRenderer {
@@ -138,12 +138,12 @@ class BatchSkinRenderer {
     while (this.scene.children.length > 0) {
       const child = this.scene.children[0]
       this.scene.remove(child)
-      
+
       if (child instanceof THREE.Mesh) {
         if (child.geometry) child.geometry.dispose()
         if (child.material) {
           if (Array.isArray(child.material)) {
-            child.material.forEach(material => material.dispose())
+            child.material.forEach((material) => material.dispose())
           } else {
             child.material.dispose()
           }
@@ -291,13 +291,17 @@ export async function generatePlayerHeadBlob(skinUrl: string, size: number = 64)
           outputCtx.drawImage(hatCanvas, 0, 0, 8, 8, 0, 0, size, size)
         }
 
-        outputCanvas.toBlob((blob) => {
-          if (blob) {
-            resolve(blob)
-          } else {
-            reject(new Error('Failed to create blob from canvas'))
-          }
-        }, 'image/webp', 0.9)
+        outputCanvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(blob)
+            } else {
+              reject(new Error('Failed to create blob from canvas'))
+            }
+          },
+          'image/webp',
+          0.9,
+        )
       } catch (error) {
         reject(error)
       }
@@ -324,16 +328,6 @@ async function generateHeadRender(skin: Skin): Promise<string> {
     }
   }
 
-  try {
-    const cached = await headStorage.retrieve(headKey)
-    if (cached) {
-      headBlobUrlMap.set(headKey, cached)
-      return cached
-    }
-  } catch (error) {
-    console.warn('Failed to retrieve cached head render:', error)
-  }
-
   const skinUrl = await get_normalized_skin_texture(skin)
   const headBlob = await generatePlayerHeadBlob(skinUrl, 64)
   const headUrl = URL.createObjectURL(headBlob)
@@ -355,6 +349,35 @@ export async function getPlayerHeadUrl(skin: Skin): Promise<string> {
 
 export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promise<void> {
   try {
+    const skinKeys = skins.map(
+      (skin) => `${skin.texture_key}+${skin.variant}+${skin.cape_id ?? 'no-cape'}`,
+    )
+    const headKeys = skins.map((skin) => `${skin.texture_key}-head`)
+
+    const [cachedSkinPreviews, cachedHeadPreviews] = await Promise.all([
+      skinPreviewStorage.batchRetrieve(skinKeys),
+      headStorage.batchRetrieve(headKeys),
+    ])
+
+    for (let i = 0; i < skins.length; i++) {
+      const skinKey = skinKeys[i]
+      const headKey = headKeys[i]
+
+      const rawCached = cachedSkinPreviews[skinKey]
+      if (rawCached) {
+        const cached: RenderResult = {
+          forwards: URL.createObjectURL(rawCached.forwards),
+          backwards: URL.createObjectURL(rawCached.backwards),
+        }
+        skinBlobUrlMap.set(skinKey, cached)
+      }
+
+      const cachedHead = cachedHeadPreviews[headKey]
+      if (cachedHead) {
+        headBlobUrlMap.set(headKey, URL.createObjectURL(cachedHead))
+      }
+    }
+
     for (const skin of skins) {
       const key = `${skin.texture_key}+${skin.variant}+${skin.cape_id ?? 'no-cape'}`
 
@@ -365,22 +388,6 @@ export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promis
           URL.revokeObjectURL(result.backwards)
           skinBlobUrlMap.delete(key)
         } else continue
-      }
-
-      try {
-        const rawCached = await skinPreviewStorage.retrieve(key)
-
-        const cached: RenderResult | null = rawCached ? {
-          forwards: URL.createObjectURL(rawCached.forwards),
-          backwards: URL.createObjectURL(rawCached.backwards),
-        } : null
-
-        if (cached) {
-          skinBlobUrlMap.set(key, cached)
-          continue
-        }
-      } catch (error) {
-        console.warn('Failed to retrieve cached skin preview:', error)
       }
 
       const renderer = getSharedRenderer()
@@ -417,12 +424,15 @@ export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promis
         console.warn('Failed to store skin preview in persistent storage:', error)
       }
 
-      await generateHeadRender(skin)
+      const headKey = `${skin.texture_key}-head`
+      if (!headBlobUrlMap.has(headKey)) {
+        await generateHeadRender(skin)
+      }
     }
   } finally {
-    disposeSharedRenderer();
+    disposeSharedRenderer()
     await cleanupUnusedPreviews(skins)
-    
+
     await skinPreviewStorage.debugCalculateStorage()
     await headStorage.debugCalculateStorage()
   }
