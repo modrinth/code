@@ -118,9 +118,12 @@ public final class MinecraftLaunch {
     }
 
     private static <T extends AccessibleObject> T forceAccessible(T object) throws ReflectiveOperationException {
-        final Method setAccessible0 = AccessibleObject.class.getDeclaredMethod("setAccessible0", boolean.class);
-        setAccessible0.setAccessible(true);
-        setAccessible0.invoke(object, true);
+        try {
+            final Method setAccessible0 = AccessibleObject.class.getDeclaredMethod("setAccessible0", boolean.class);
+            setAccessible0.setAccessible(true);
+            setAccessible0.invoke(object, true);
+        } catch (NoSuchMethodException e) {
+        }
         return object;
     }
 }
