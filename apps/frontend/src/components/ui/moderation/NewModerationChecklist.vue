@@ -323,11 +323,16 @@ import type {
 } from "@modrinth/moderation";
 import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
 
-const props = defineProps<{
-  project: Project;
-  futureProjects?: Project[];
-  collapsed: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    project: Project;
+    futureProjects?: Project[];
+    collapsed: boolean;
+  }>(),
+  {
+    futureProjects: () => [] as Project[],
+  },
+);
 
 const variables = computed(() => {
   return flattenProjectVariables(props.project);
