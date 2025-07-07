@@ -14,6 +14,9 @@ mod error;
 #[cfg(target_os = "macos")]
 mod macos;
 
+#[cfg(feature = "updater")]
+mod update_size_checker;
+
 // Should be called in launcher initialization
 #[tracing::instrument(skip_all)]
 #[tauri::command]
@@ -62,6 +65,15 @@ fn is_dev() -> bool {
 #[tauri::command]
 fn are_updates_enabled() -> bool {
     cfg!(feature = "updater")
+}
+
+#[cfg(feature = "updater")]
+pub use update_size_checker::get_update_size;
+
+#[cfg(not(feature = "updater"))]
+#[tauri::command]
+fn get_update_size() -> theseus::Result<()> {
+    Err(theseus::ErrorKind::OtherError("Updates are disabled in this build.".to_string()).into())
 }
 
 // Toggles decorations
@@ -204,6 +216,7 @@ fn main() {
             initialize_state,
             is_dev,
             are_updates_enabled,
+            get_update_size,
             toggle_decorations,
             show_window,
             restart_app,
