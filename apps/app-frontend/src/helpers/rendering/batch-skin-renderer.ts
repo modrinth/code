@@ -4,9 +4,7 @@ import { get_normalized_skin_texture, determineModelType } from '../skins'
 import { reactive } from 'vue'
 import { setupSkinModel, disposeCaches } from '@modrinth/utils'
 import { skinPreviewStorage } from '../storage/skin-preview-storage'
-import capeModelUrl from '@/assets/models/cape.gltf?url'
-import wideModelUrl from '@/assets/models/classic_player.gltf?url'
-import slimModelUrl from '@/assets/models/slim_player.gltf?url'
+import { CapeModel, ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
 
 export interface RenderResult {
   forwards: string
@@ -127,11 +125,11 @@ class BatchSkinRenderer {
 function getModelUrlForVariant(variant: string): string {
   switch (variant) {
     case 'SLIM':
-      return slimModelUrl
+      return SlimPlayerModel
     case 'CLASSIC':
     case 'UNKNOWN':
     default:
-      return wideModelUrl
+      return ClassicPlayerModel
   }
 }
 
@@ -281,6 +279,7 @@ async function generateHeadRender(skin: Skin): Promise<string> {
   headMap.set(headKey, headUrl)
 
   try {
+    // @ts-expect-error - skinPreviewStorage.store expects a RenderResult, but we are storing a string url.
     await skinPreviewStorage.store(headKey, headUrl)
   } catch (error) {
     console.warn('Failed to store head render in persistent storage:', error)
@@ -335,7 +334,7 @@ export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promis
         await get_normalized_skin_texture(skin),
         modelUrl,
         cape?.texture,
-        capeModelUrl,
+        CapeModel,
       )
 
       map.set(key, renderResult)

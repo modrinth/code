@@ -10,9 +10,6 @@ import {
 } from '@modrinth/ui'
 import { CheckIcon, XIcon } from '@modrinth/assets'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import capeModelUrl from '@/assets/models/cape.gltf?url'
-import wideModelUrl from '@/assets/models/classic_player.gltf?url'
-import slimModelUrl from '@/assets/models/slim_player.gltf?url'
 
 const modal = useTemplateRef('modal')
 
@@ -88,9 +85,6 @@ defineExpose({
         <div class="absolute top-[-4rem] left-0 h-[32rem] w-[16rem] flex-shrink-0">
           <SkinPreviewRenderer
             v-if="currentSkinTexture"
-            :slim-model-src="slimModelUrl"
-            :wide-model-src="wideModelUrl"
-            :cape-model-src="capeModelUrl"
             :cape-src="currentCapeTexture"
             :texture-src="currentSkinTexture"
             :variant="currentSkinVariant"
