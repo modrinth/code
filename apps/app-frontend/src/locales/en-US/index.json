@@ -21,16 +21,22 @@
     "message": "Resource management"
   },
   "app.update.later": {
-    "message": "Later"
+    "message": "Update on Next Restart"
   },
-  "app.update.modal-body": {
+  "app.update.modal-body-changelog": {
+    "message": "Click here to view the changelog."
+  },
+  "app.update.modal-body-size": {
+    "message": "The download is {size} in size."
+  },
+  "app.update.modal-body-version": {
     "message": "Version {version} of the Modrinth App is available for installation."
   },
   "app.update.modal-header": {
     "message": "An update is available!"
   },
   "app.update.restart": {
-    "message": "Restart Now"
+    "message": "Update Now"
   },
   "app.update.skip": {
     "message": "Skip This Update"

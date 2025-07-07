@@ -1,6 +1,14 @@
 <template>
   <ModalWrapper ref="modal" :header="formatMessage(messages.header)">
-    <div>{{ formatMessage(messages.body, { version: update!.version }) }}</div>
+    <div>{{ formatMessage(messages.bodyVersion, { version: update!.version }) }}</div>
+    <div v-if="updateSize">
+      {{ formatMessage(messages.bodySize, { size: formatBytes(updateSize) }) }}
+    </div>
+    <div>
+      <a href="https://modrinth.com/news/changelog?filter=app">{{
+        formatMessage(messages.bodyChangelog)
+      }}</a>
+    </div>
     <div class="mt-4 flex flex-wrap gap-2">
       <ButtonStyled color="green">
         <button>
@@ -26,9 +34,11 @@
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { useTemplateRef, ref } from 'vue'
-import type { Update } from '@tauri-apps/plugin-updater'
 import { ButtonStyled } from '@modrinth/ui'
 import { RefreshCwIcon } from '@modrinth/assets'
+import { getUpdateSize } from '@/helpers/utils'
+import { formatBytes } from '@modrinth/utils'
+import { handleError } from '@/store/notifications'
 
 const { formatMessage } = useVIntl()
 
@@ -37,17 +47,25 @@ const messages = defineMessages({
     id: 'app.update.modal-header',
     defaultMessage: 'An update is available!',
   },
-  body: {
-    id: 'app.update.modal-body',
+  bodyVersion: {
+    id: 'app.update.modal-body-version',
     defaultMessage: 'Version {version} of the Modrinth App is available for installation.',
+  },
+  bodySize: {
+    id: 'app.update.modal-body-size',
+    defaultMessage: 'The download is {size} in size.',
+  },
+  bodyChangelog: {
+    id: 'app.update.modal-body-changelog',
+    defaultMessage: 'Click here to view the changelog.',
   },
   restartNow: {
     id: 'app.update.restart',
-    defaultMessage: 'Restart Now',
+    defaultMessage: 'Update Now',
   },
   later: {
     id: 'app.update.later',
-    defaultMessage: 'Later',
+    defaultMessage: 'Update on Next Restart',
   },
   skip: {
     id: 'app.update.skip',
@@ -55,13 +73,20 @@ const messages = defineMessages({
   },
 })
 
-const update = ref<Update>()
+type UpdateData = {
+  rid: number
+  version: string
+}
+
+const update = ref<UpdateData>()
+const updateSize = ref<number>()
 
 const modal = useTemplateRef('modal')
 const isOpen = ref(false)
 
-function show(newUpdate: Update) {
+async function show(newUpdate: UpdateData) {
   update.value = newUpdate
+  updateSize.value = await getUpdateSize(newUpdate.rid).catch(handleError)
   modal.value!.show()
   isOpen.value = true
 }

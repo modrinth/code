@@ -9,6 +9,10 @@ export async function areUpdatesEnabled() {
   return await invoke('are_updates_enabled')
 }
 
+export async function getUpdateSize(updateRid) {
+  return await invoke('get_update_size', { rid: updateRid })
+}
+
 // One of 'Windows', 'Linux', 'MacOS'
 export async function getOS() {
   return await invoke('plugin:utils|get_os')

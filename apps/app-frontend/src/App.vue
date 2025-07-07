@@ -360,7 +360,7 @@ async function checkUpdates() {
       return
     }
 
-    const update = await check()
+    const update = await invoke('plugin:updater|check')
     updateAvailable.value = !!update
     if (updateAvailable.value) {
       console.log(`Update ${update.version} is available. Showing update modal.`)
