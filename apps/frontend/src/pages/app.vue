@@ -58,7 +58,7 @@ const rows = [
 ];
 
 const { data: launcherUpdates } = await useFetch<LauncherUpdates>(
-  "https://launcher-files.modrinth.com/updates.json",
+  "https://launcher-files.modrinth.com/updates.json?new",
   {
     server: false,
     getCachedData(key, nuxtApp) {
