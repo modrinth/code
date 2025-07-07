@@ -54,6 +54,7 @@
         </div>
         <div v-else-if="isModpackPermissionsStage">
           <ModpackPermissionsFlow
+            v-model="modpackJudgements"
             :project-id="project.id"
             @complete="handleModpackPermissionsComplete"
           />
@@ -213,6 +214,30 @@
             </div>
 
             <div v-else-if="generatedMessage" class="flex items-center gap-2">
+              <OverflowMenu :options="stageOptions" class="bg-transparent p-0">
+                <ButtonStyled circular>
+                  <button v-tooltip="`Stages`">
+                    <ListBulletedIcon />
+                  </button>
+                </ButtonStyled>
+
+                <template
+                  v-for="opt in stageOptions.filter(
+                    (opt) => 'id' in opt && 'text' in opt && 'icon' in opt,
+                  )"
+                  #[opt.id]
+                  :key="opt.id"
+                >
+                  <component :is="opt.icon" v-if="opt.icon" class="mr-2" />
+                  {{ opt.text }}
+                </template>
+              </OverflowMenu>
+              <ButtonStyled>
+                <button @click="goBackToStages">
+                  <LeftArrowIcon aria-hidden="true" />
+                  Edit
+                </button>
+              </ButtonStyled>
               <ButtonStyled color="red">
                 <button @click="sendMessage('rejected')">
                   <XIcon aria-hidden="true" />
@@ -310,7 +335,7 @@ import {
   DropdownSelect,
   MarkdownEditor,
 } from "@modrinth/ui";
-import { type Project, renderHighlightedString } from "@modrinth/utils";
+import { type Project, renderHighlightedString, type ModerationJudgements } from "@modrinth/utils";
 import { computedAsync, useLocalStorage } from "@vueuse/core";
 import type {
   Action,
@@ -339,6 +364,7 @@ const variables = computed(() => {
 });
 
 const modpackPermissionsComplete = ref(false);
+const modpackJudgements = ref<ModerationJudgements>({});
 const isModpackPermissionsStage = computed(() => {
   return currentStageObj.value.id === "modpack-permissions";
 });
@@ -348,16 +374,9 @@ const generatedMessage = ref(false);
 const loadingMessage = ref(false);
 const done = ref(false);
 
-async function handleModpackPermissionsComplete(judgements: any) {
-  try {
-    await console.log("DUMMY CALL: Modpack permissions judgements", judgements);
-
-    modpackPermissionsComplete.value = true;
-
-    nextStage();
-  } catch (error) {
-    console.error("Failed to submit modpack permissions:", error);
-  }
+function handleModpackPermissionsComplete() {
+  modpackPermissionsComplete.value = true;
+  nextStage();
 }
 
 const emit = defineEmits<{
@@ -379,6 +398,7 @@ function resetProgress() {
   localStorage.removeItem(`modpack-permissions-${props.project.id}`);
   localStorage.removeItem(`modpack-permissions-index-${props.project.id}`);
   modpackPermissionsComplete.value = false;
+  modpackJudgements.value = {};
 
   initializeAllStages();
 }
@@ -812,6 +832,20 @@ function nextStage() {
   }
 }
 
+function goBackToStages() {
+  generatedMessage.value = false;
+  message.value = "";
+
+  let targetStage = checklist.length - 1;
+  while (targetStage >= 0) {
+    if (shouldShowStageIndex(targetStage)) {
+      currentStage.value = targetStage;
+      return;
+    }
+    targetStage--;
+  }
+}
+
 async function generateMessage() {
   if (loadingMessage.value) return;
 
@@ -821,14 +855,15 @@ async function generateMessage() {
     const baseMessage = await assembleFullMessage();
     let fullMessage = baseMessage;
 
-    if (isModpackPermissionsStage.value) {
-      const modpackData = localStorage.getItem(`modpack-permissions-${props.project.id}`);
-      if (modpackData) {
-        const judgements = JSON.parse(modpackData);
-        const modpackMessage = await generateModpackMessage(judgements);
-        if (modpackMessage) {
-          fullMessage = baseMessage ? `${baseMessage}\n\n${modpackMessage}` : modpackMessage;
-        }
+    console.log(modpackJudgements.value);
+
+    if (
+      props.project.project_type === "modpack" &&
+      Object.keys(modpackJudgements.value).length > 0
+    ) {
+      const modpackMessage = generateModpackMessage(modpackJudgements.value);
+      if (modpackMessage) {
+        fullMessage = baseMessage ? `${baseMessage}\n\n${modpackMessage}` : modpackMessage;
       }
     }
 
@@ -846,39 +881,69 @@ async function generateMessage() {
   }
 }
 
-function generateModpackMessage(judgements: any) {
+function generateModpackMessage(judgements: ModerationJudgements) {
   const issues = [];
 
-  if (judgements.needsAttribution?.length > 0) {
-    issues.push(
-      "## Modpack Permissions - Attribution Required\n" +
-        "The following mods require attribution:\n" +
-        judgements.needsAttribution.map((mod: any) => `- ${mod.name}`).join("\n"),
-    );
+  const attributeMods = [];
+  const noMods = [];
+  const permanentNoMods = [];
+  const unidentifiedMods = [];
+
+  for (const [, judgement] of Object.entries(judgements)) {
+    let judgementItem = "Unknown mod";
+
+    if (judgement.type === "flame") {
+      judgementItem = `[${judgement.title}](${judgement.link}) (CurseForge)`;
+    } else if (judgement.type === "unknown") {
+      judgementItem = `\`${judgement.file_name}\` (Unknown source)`;
+    }
+
+    if (judgement.status === "with-attribution") {
+      attributeMods.push(judgementItem);
+    } else if (judgement.status === "no") {
+      noMods.push(judgementItem);
+    } else if (judgement.status === "permanent-no") {
+      permanentNoMods.push(judgementItem);
+    } else if (judgement.status === "unidentified") {
+      unidentifiedMods.push(judgementItem);
+    }
   }
 
-  if (judgements.noPermission?.length > 0) {
-    issues.push(
-      "## Modpack Permissions - No Permission\n" +
-        "The following mods do not have permission for redistribution:\n" +
-        judgements.noPermission.map((mod: any) => `- ${mod.name}`).join("\n"),
-    );
-  }
+  if (
+    attributeMods.length > 0 ||
+    noMods.length > 0 ||
+    permanentNoMods.length > 0 ||
+    unidentifiedMods.length > 0
+  ) {
+    issues.push("## Copyrighted content");
 
-  if (judgements.forbidden?.length > 0) {
-    issues.push(
-      "## Modpack Permissions - Forbidden\n" +
-        "The following mods are permanently forbidden from redistribution:\n" +
-        judgements.forbidden.map((mod: any) => `- ${mod.name}`).join("\n"),
-    );
-  }
+    if (attributeMods.length > 0) {
+      issues.push(
+        "The following content has attribution requirements, meaning that you must link back to the page where you originally found this content in your modpack description or version changelog (e.g. linking a mod's CurseForge page if you got it from CurseForge):\n" +
+          attributeMods.map((mod) => `- ${mod}`).join("\n"),
+      );
+    }
 
-  if (judgements.unidentified?.length > 0) {
-    issues.push(
-      "## Modpack Permissions - Unidentified\n" +
-        "The following mods could not be identified:\n" +
-        judgements.unidentified.map((mod: any) => `- ${mod.name}`).join("\n"),
-    );
+    if (noMods.length > 0) {
+      issues.push(
+        "The following content is not allowed in Modrinth modpacks due to licensing restrictions. Please contact the author(s) directly for permission or remove the content from your modpack:\n" +
+          noMods.map((mod) => `- ${mod}`).join("\n"),
+      );
+    }
+
+    if (permanentNoMods.length > 0) {
+      issues.push(
+        "The following content is not allowed in Modrinth modpacks, regardless of permission obtained. This may be because it breaks Modrinth's content rules or because the authors, upon being contacted for permission, have declined. Please remove the content from your modpack:\n" +
+          permanentNoMods.map((mod) => `- ${mod}`).join("\n"),
+      );
+    }
+
+    if (unidentifiedMods.length > 0) {
+      issues.push(
+        "The following content could not be identified. Please provide proof of its origin along with proof that you have permission to include it:\n" +
+          unidentifiedMods.map((mod) => `- ${mod}`).join("\n"),
+      );
+    }
   }
 
   return issues.join("\n\n");
@@ -901,13 +966,11 @@ async function sendMessage(status: "approved" | "rejected" | "withheld") {
       message: message.value,
     });
 
-    if (isModpackPermissionsStage.value) {
-      const modpackData = localStorage.getItem(`modpack-permissions-${props.project.id}`);
-      if (modpackData) {
-        const judgements = JSON.parse(modpackData);
-
-        await console.log("DUMMY CALL: Modpack permissions judgements", judgements);
-      }
+    if (
+      props.project.project_type === "modpack" &&
+      Object.keys(modpackJudgements.value).length > 0
+    ) {
+      await console.log("DUMMY CALL: Modpack permissions judgements", modpackJudgements.value);
     }
 
     done.value = true;
@@ -934,7 +997,7 @@ async function sendMessage(status: "approved" | "rejected" | "withheld") {
 }
 
 async function goToNextProject() {
-  const project = props.futureProjects[0];
+  const project = props.futureProjects![0];
 
   if (!project) {
     await navigateTo("/moderation/review");
@@ -944,11 +1007,12 @@ async function goToNextProject() {
     name: "type-id",
     params: {
       type: "project",
-      id: project,
+      id: project.id,
     },
     state: {
       showChecklist: true,
-      projects: props.futureProjects.slice(1),
+      // @ts-ignore
+      projects: props.futureProjects!.slice(1),
     },
   });
 }

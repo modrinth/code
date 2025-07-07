@@ -36,7 +36,7 @@
           </label>
           <input
             id="proof"
-            v-model="(modPackData[currentIndex] as UnknownModpackItem).proof"
+            v-model="(modPackData[currentIndex] as ModerationUnknownModpackItem).proof"
             type="text"
             autocomplete="off"
             placeholder="Enter proof of status..."
@@ -47,7 +47,7 @@
           </label>
           <input
             id="link"
-            v-model="(modPackData[currentIndex] as UnknownModpackItem).url"
+            v-model="(modPackData[currentIndex] as ModerationUnknownModpackItem).url"
             type="text"
             autocomplete="off"
             placeholder="Enter link of project..."
@@ -58,7 +58,7 @@
           </label>
           <input
             id="title"
-            v-model="(modPackData[currentIndex] as UnknownModpackItem).title"
+            v-model="(modPackData[currentIndex] as ModerationUnknownModpackItem).title"
             type="text"
             autocomplete="off"
             placeholder="Enter title of project..."
@@ -146,77 +146,30 @@
 
 <script setup lang="ts">
 import { LeftArrowIcon, RightArrowIcon } from "@modrinth/assets";
+import type {
+  ModerationJudgements,
+  ModerationModpackItem,
+  ModerationModpackResponse,
+  ModerationUnknownModpackItem,
+  ModerationFlameModpackItem,
+  ModerationApprovalType,
+  ModerationPermissionType,
+} from "@modrinth/utils";
 import { ButtonStyled } from "@modrinth/ui";
 import { ref, computed, watch, onMounted } from "vue";
 import { useLocalStorage } from "@vueuse/core";
 
-interface ApprovalType {
-  id: "yes" | "no" | "with-attribution" | "unidentified";
-  name: string;
-}
-
-interface PermissionType {
-  id: "yes" | "no";
-  name: string;
-}
-
-interface BaseModpackItem {
-  sha1: string;
-  file_name: string;
-  type: "unknown" | "flame";
-  status: ApprovalType["id"] | null;
-  approved: PermissionType["id"] | null;
-}
-
-interface UnknownModpackItem extends BaseModpackItem {
-  type: "unknown";
-  proof: string;
-  url: string;
-  title: string;
-}
-
-interface FlameModpackItem extends BaseModpackItem {
-  type: "flame";
-  id: string;
-  title: string;
-  url: string;
-}
-
-type ModpackItem = UnknownModpackItem | FlameModpackItem;
-
-interface ModpackResponse {
-  unknown_files?: Record<string, string>;
-  flame_files?: Record<
-    string,
-    {
-      file_name: string;
-      id: string;
-      title?: string;
-      url?: string;
-    }
-  >;
-}
-
-interface Judgements {
-  [sha1: string]: {
-    type: "flame" | "unknown";
-    status: string;
-    id?: string;
-    link?: string | null;
-    title?: string | null;
-    proof?: string | null;
-  };
-}
-
 const props = defineProps<{
   projectId: string;
+  modelValue?: ModerationJudgements;
 }>();
 
 const emit = defineEmits<{
-  complete: [judgements: Judgements];
+  complete: [];
+  "update:modelValue": [judgements: ModerationJudgements];
 }>();
 
-const persistedModPackData = useLocalStorage<ModpackItem[] | null>(
+const persistedModPackData = useLocalStorage<ModerationModpackItem[] | null>(
   `modpack-permissions-${props.projectId}`,
   null,
   {
@@ -229,17 +182,17 @@ const persistedModPackData = useLocalStorage<ModpackItem[] | null>(
 
 const persistedIndex = useLocalStorage<number>(`modpack-permissions-index-${props.projectId}`, 0);
 
-const modPackData = ref<ModpackItem[] | null>(null);
+const modPackData = ref<ModerationModpackItem[] | null>(null);
 const currentIndex = ref(0);
 
-const fileApprovalTypes: ApprovalType[] = [
+const fileApprovalTypes: ModerationApprovalType[] = [
   { id: "yes", name: "Yes, permission given" },
   { id: "no", name: "No permission given" },
   { id: "with-attribution", name: "With attribution only" },
   { id: "unidentified", name: "Cannot identify project" },
 ];
 
-const filePermissionTypes: PermissionType[] = [
+const filePermissionTypes: ModerationPermissionType[] = [
   { id: "yes", name: "Yes" },
   { id: "no", name: "No" },
 ];
@@ -277,11 +230,11 @@ async function fetchModPackData(): Promise<void> {
   try {
     const data = (await useBaseFetch(`moderation/project/${props.projectId}`, {
       internal: true,
-    })) as ModpackResponse;
-    const sortedData: ModpackItem[] = [
+    })) as ModerationModpackResponse;
+    const sortedData: ModerationModpackItem[] = [
       ...Object.entries(data.unknown_files || {})
         .map(
-          ([sha1, fileName]): UnknownModpackItem => ({
+          ([sha1, fileName]): ModerationUnknownModpackItem => ({
             sha1,
             file_name: fileName,
             type: "unknown",
@@ -295,7 +248,7 @@ async function fetchModPackData(): Promise<void> {
         .sort((a, b) => a.file_name.localeCompare(b.file_name)),
       ...Object.entries(data.flame_files || {})
         .map(
-          ([sha1, info]): FlameModpackItem => ({
+          ([sha1, info]): ModerationFlameModpackItem => ({
             sha1,
             file_name: info.file_name,
             type: "flame",
@@ -319,13 +272,13 @@ async function fetchModPackData(): Promise<void> {
             status: existing.status,
             approved: existing.approved,
             ...(item.type === "unknown" && {
-              proof: (existing as UnknownModpackItem).proof || "",
-              url: (existing as UnknownModpackItem).url || "",
-              title: (existing as UnknownModpackItem).title || "",
+              proof: (existing as ModerationUnknownModpackItem).proof || "",
+              url: (existing as ModerationUnknownModpackItem).url || "",
+              title: (existing as ModerationUnknownModpackItem).title || "",
             }),
             ...(item.type === "flame" && {
-              url: (existing as FlameModpackItem).url || item.url,
-              title: (existing as FlameModpackItem).title || item.title,
+              url: (existing as ModerationFlameModpackItem).url || item.url,
+              title: (existing as ModerationFlameModpackItem).title || item.title,
             }),
           });
         }
@@ -353,7 +306,9 @@ function goToNext(): void {
     currentIndex.value++;
 
     if (currentIndex.value >= modPackData.value.length) {
-      emit("complete", getJudgements());
+      const judgements = getJudgements();
+      emit("update:modelValue", judgements);
+      emit("complete");
       clearPersistedData();
     } else {
       persistAll();
@@ -361,18 +316,20 @@ function goToNext(): void {
   }
 }
 
-function setStatus(index: number, status: ApprovalType["id"]): void {
+function setStatus(index: number, status: ModerationApprovalType["id"]): void {
   if (modPackData.value && modPackData.value[index]) {
     modPackData.value[index].status = status;
     modPackData.value[index].approved = null;
     persistAll();
+    emit("update:modelValue", getJudgements());
   }
 }
 
-function setApproval(index: number, approved: PermissionType["id"]): void {
+function setApproval(index: number, approved: ModerationPermissionType["id"]): void {
   if (modPackData.value && modPackData.value[index]) {
     modPackData.value[index].approved = approved;
     persistAll();
+    emit("update:modelValue", getJudgements());
   }
 }
 
@@ -382,10 +339,10 @@ const canGoNext = computed(() => {
   return current.status !== null;
 });
 
-function getJudgements(): Judgements {
+function getJudgements(): ModerationJudgements {
   if (!modPackData.value) return {};
 
-  const judgements: Judgements = {};
+  const judgements: ModerationJudgements = {};
 
   modPackData.value.forEach((item) => {
     if (item.status && item.status !== "unidentified") {
@@ -396,14 +353,16 @@ function getJudgements(): Judgements {
           status: item.status,
           link: item.url,
           title: item.title,
+          file_name: item.file_name,
         };
       } else if (item.type === "unknown") {
         judgements[item.sha1] = {
           type: "unknown",
           status: item.status,
-          proof: item.proof || null,
-          link: item.url || null,
-          title: item.title || null,
+          proof: item.proof,
+          link: item.url,
+          title: item.title,
+          file_name: item.file_name,
         };
       }
     }
