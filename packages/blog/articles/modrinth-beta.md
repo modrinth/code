@@ -2,6 +2,7 @@
 title: Welcome to Modrinth Beta
 summary: 'After six months of work, Modrinth enters Beta, helping modders host their mods with ease!'
 date: 2020-12-01
+authors: ['Dc7EYhxG']
 ---
 
 After six months of work, Modrinth enters Beta, helping modders host their mods with ease!

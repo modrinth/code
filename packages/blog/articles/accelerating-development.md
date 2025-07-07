@@ -2,6 +2,7 @@
 title: Accelerating Modrinth's Development
 summary: Our fundraiser and the future of Modrinth!
 date: 2023-02-01T12:00:00-08:00
+authors: ['MpxzqsyW', 'Dc7EYhxG', '6plzAzU4']
 ---
 
 **Update: On [April 4, 2024](/news/article/capital-return) we announced that we had returned the remaining $800k in investor capital back to our investors to take a different path. [Read that announcement here](/news/article/capital-return). This article remains here for archival purposes.**

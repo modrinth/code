@@ -1,7 +1,8 @@
 ---
 title: 'This week in Modrinth development: Filters and Fixes'
-summary: 'After a great first week since Modrinth launched out of beta, we have continued to improve the user interface based on feedback.'
+summary: 'Continuing to improve the user interface after a great first week since Modrinth launched out of beta.'
 date: 2022-03-09
+authors: ['Dc7EYhxG']
 ---
 
 It's officially been a bit over a week since Modrinth launched out of beta. We have continued to make improvements to the user experience on [the website](https://modrinth.com).

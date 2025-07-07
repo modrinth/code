@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ButtonStyled } from "@modrinth/ui";
+import { Avatar, ButtonStyled } from "@modrinth/ui";
 import { RssIcon, GitGraphIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
 import { articles as rawArticles } from "@modrinth/blog";
 import { computed } from "vue";
+import type { User } from "@modrinth/utils";
 import ShareArticleButtons from "~/components/ui/ShareArticleButtons.vue";
 import NewsletterButton from "~/components/ui/NewsletterButton.vue";
 
@@ -20,7 +21,21 @@ if (!rawArticle) {
   });
 }
 
-const html = await rawArticle.html();
+const authorsUrl = `users?ids=${JSON.stringify(rawArticle.authors)}`;
+
+const [authors, html] = await Promise.all([
+  rawArticle.authors
+    ? useAsyncData(authorsUrl, () => useBaseFetch(authorsUrl)).then((data) => {
+        const users = data.data as Ref<User[]>;
+        users.value.sort((a, b) => {
+          return rawArticle.authors.indexOf(a.id) - rawArticle.authors.indexOf(b.id);
+        });
+
+        return users;
+      })
+    : Promise.resolve(),
+  rawArticle.html(),
+]);
 
 const article = computed(() => ({
   ...rawArticle,
@@ -33,6 +48,8 @@ const article = computed(() => ({
   date: rawArticle.date,
   html,
 }));
+
+const authorCount = computed(() => authors?.value?.length ?? 0);
 
 const articleTitle = computed(() => article.value.title);
 const articleUrl = computed(() => `https://modrinth.com/news/article/${route.params.slug}`);
@@ -83,9 +100,35 @@ useSeoMeta({
     <article class="mt-6 flex flex-col gap-4 px-6">
       <h2 class="m-0 text-2xl font-extrabold leading-tight sm:text-4xl">{{ article.title }}</h2>
       <p class="m-0 text-base leading-tight sm:text-lg">{{ article.summary }}</p>
-      <div class="mt-auto text-sm text-secondary sm:text-base">
-        Posted on {{ dayjsDate.format("MMMM D, YYYY") }}
+      <div class="mt-auto flex flex-wrap items-center gap-1 text-sm text-secondary sm:text-base">
+        <template v-for="(author, index) in authors" :key="`author-${author.id}`">
+          <span v-if="authorCount - 1 === index && authorCount > 1">and</span>
+          <span class="flex items-center">
+            <nuxt-link
+              :to="`/user/${author.id}`"
+              class="inline-flex items-center gap-1 font-semibold hover:underline hover:brightness-[--hover-brightness]"
+            >
+              <Avatar :src="author.avatar_url" circle size="24px" />
+              {{ author.username }}
+            </nuxt-link>
+            <span v-if="(authors?.length ?? 0) > 2 && index !== authorCount - 1">,</span>
+          </span>
+        </template>
+        <template v-if="!authors || authorCount === 0">
+          <nuxt-link
+            to="/organization/modrinth"
+            class="inline-flex items-center gap-1 font-semibold hover:underline hover:brightness-[--hover-brightness]"
+          >
+            <Avatar src="https://cdn-raw.modrinth.com/modrinth-icon-96.webp" size="24px" />
+            Modrinth Team
+          </nuxt-link>
+        </template>
+        <span class="hidden md:block">•</span>
+        <span class="hidden md:block"> {{ dayjsDate.format("MMMM D, YYYY") }}</span>
       </div>
+      <span class="text-sm text-secondary sm:text-base md:hidden">
+        Posted on {{ dayjsDate.format("MMMM D, YYYY") }}</span
+      >
       <ShareArticleButtons :title="article.title" :url="articleUrl" />
       <img
         :src="article.thumbnail"

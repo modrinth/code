@@ -5,6 +5,7 @@ export const article = {
   summary: 'December may be over, but we’re not done giving gifts.',
   date: '2024-01-06T20:00:00.000Z',
   slug: 'creator-update',
+  authors: ['6plzAzU4'],
   thumbnail: true,
   short_title: 'The Creator Update',
   short_summary: 'Adding analytics, orgs, collections, and more!',

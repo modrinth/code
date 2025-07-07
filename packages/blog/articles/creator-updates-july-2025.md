@@ -2,6 +2,7 @@
 title: Creator Updates, July 2025
 summary: Addressing recent growth and growing pains that have been affecting creators.
 date: 2025-07-01T21:20:00-07:00
+authors: ['MpxzqsyW']
 ---
 
 Hey all,

@@ -1,7 +1,8 @@
 ---
 title: 'Now showing on Modrinth: A new look!'
-summary: 'After months of relatively quiet development, Modrinth has released many new features and improvements, including a redesign. Read on to learn more!'
+summary: 'Releasing many new features and improvements, including a redesign!'
 date: 2022-02-27
+authors: ['6plzAzU4']
 ---
 
 After months of relatively quiet development, Modrinth has released many new features and improvements, including a redesign. While we've been a bit silent recently on the website and blog, our [Discord server][Discord] has activity on the daily. Join us there and follow along with the development channels for the very latest information!

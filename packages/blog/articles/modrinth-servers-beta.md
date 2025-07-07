@@ -4,6 +4,7 @@ short_title: Introducing Modrinth Servers
 summary: Fast, simple, reliable servers directly integrated into Modrinth.
 short_summary: Host your next Minecraft server with Modrinth.
 date: 2024-11-02T22:00:00-08:00
+authors: ['MpxzqsyW', 'Dc7EYhxG']
 ---
 
 It's been almost _four_ years since we publicly launched Modrinth Beta. Today, we're thrilled to unveil a new beta release of a product we've been eagerly developing: Modrinth Servers.

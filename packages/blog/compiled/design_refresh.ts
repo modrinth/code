@@ -5,6 +5,7 @@ export const article = {
   summary: 'Learn about this major update to Modrinth.',
   date: '2024-08-21T20:00:00.000Z',
   slug: 'design-refresh',
+  authors: ['MpxzqsyW', 'Dc7EYhxG'],
   thumbnail: true,
   short_title: 'Modrinth+ and New Ads',
   short_summary:
