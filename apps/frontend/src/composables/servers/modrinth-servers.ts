@@ -200,7 +200,7 @@ export class ModrinthServer {
     }
 
     const datacenter = this.general.datacenter;
-    const wsUrl = `wss://${datacenter}.nodes.modrinth.com/pingteqwdihst`;
+    const wsUrl = `wss://${datacenter}.nodes.modrinth.com/pingtest`;
 
     try {
       return await new Promise((resolve) => {
