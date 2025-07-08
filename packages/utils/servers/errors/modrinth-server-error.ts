@@ -54,6 +54,6 @@ export class ModrinthServerError extends Error {
     }
 
     super(errorMessage)
-    this.name = 'ModrinthServersFetchError'
+    this.name = 'PyroServersFetchError'
   }
 }
