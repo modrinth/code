@@ -197,10 +197,10 @@ const radialSpotlightShader = computed(() => ({
   uniforms: {
     innerColor: { value: new THREE.Color(0x000000) },
     outerColor: { value: new THREE.Color(0xffffff) },
-    innerOpacity: { value: 0.8 },
-    outerOpacity: { value: 0.01 },
-    falloffPower: { value: 0.6 },
-    shadowRadius: { value: 10 },
+    innerOpacity: { value: 0.3 },
+    outerOpacity: { value: 0.0 },
+    falloffPower: { value: 1.2 },
+    shadowRadius: { value: 7 },
   },
   vertexShader: `
     varying vec2 vUv;
