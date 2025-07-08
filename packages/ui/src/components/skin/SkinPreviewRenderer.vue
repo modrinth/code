@@ -23,7 +23,7 @@
     <TresCanvas
       shadows
       alpha
-      :antialias="antialias"
+      :antialias="true"
       :renderer-options="{
         outputColorSpace: THREE.SRGBColorSpace,
         toneMapping: THREE.NoToneMapping,
@@ -46,34 +46,37 @@
             <primitive v-if="scene" :object="scene" />
           </Group>
 
-          <TresMesh
+          <!-- <TresMesh
             :position="[0, -0.095 * scale, 2]"
             :rotation="[-Math.PI / 2, 0, 0]"
-            :scale="[0.5 * 0.75 * scale, 0.5 * 0.75 * scale, 0.5 * 0.75 * scale]"
+            :scale="[0.4 * 0.75 * scale, 0.4 * 0.75 * scale, 0.4 * 0.75 * scale]"
           >
             <TresCircleGeometry :args="[1, 128]" />
             <TresMeshBasicMaterial
               color="#000000"
-              :opacity="0.2"
+              :opacity="0.5"
               transparent
               :depth-write="false"
             />
-          </TresMesh>
-
-          <TresMesh
-            :position="[0, -0.1 * scale, 2]"
-            :rotation="[-Math.PI / 2, 0, 0]"
-            :scale="[0.75 * scale, 0.75 * scale, 0.75 * scale]"
-          >
-            <TresCircleGeometry :args="[1, 128]" />
-            <TresMeshBasicMaterial
-              :map="radialTexture"
-              transparent
-              :depth-write="false"
-              :blending="THREE.AdditiveBlending"
-            />
-          </TresMesh>
+          </TresMesh> -->
         </Group>
+      </Suspense>
+
+      <Suspense>
+        <EffectComposerPmndrs>
+          <FXAAPmndrs />
+        </EffectComposerPmndrs>
+      </Suspense>
+
+      <Suspense>
+        <TresMesh
+          :position="[0, -0.1 * scale, 2]"
+          :rotation="[-Math.PI / 2, 0, 0]"
+          :scale="[0.75 * scale, 0.75 * scale, 0.75 * scale]"
+        >
+          <TresCircleGeometry :args="[1, 128]" />
+          <TresShaderMaterial v-bind="radialSpotlightShader" />
+        </TresMesh>
       </Suspense>
 
       <TresPerspectiveCamera
@@ -101,6 +104,7 @@
 import * as THREE from 'three'
 import { useGLTF } from '@tresjs/cientos'
 import { useTexture, TresCanvas, useRenderLoop } from '@tresjs/core'
+import { EffectComposerPmndrs, FXAAPmndrs } from '@tresjs/post-processing'
 import {
   shallowRef,
   ref,
@@ -134,7 +138,6 @@ const props = withDefaults(
     capeSrc?: string
     variant?: 'SLIM' | 'CLASSIC' | 'UNKNOWN'
     nametag?: string
-    antialias?: boolean
     scale?: number
     fov?: number
     initialRotation?: number
@@ -142,7 +145,6 @@ const props = withDefaults(
   }>(),
   {
     variant: 'CLASSIC',
-    antialias: false,
     scale: 1,
     fov: 40,
     capeSrc: undefined,
@@ -190,6 +192,54 @@ const clock = new THREE.Clock()
 const currentAnimation = ref<string>('')
 const randomAnimationTimer = ref<number | null>(null)
 const lastRandomAnimation = ref<string>('')
+
+const radialSpotlightShader = computed(() => ({
+  uniforms: {
+    innerColor: { value: new THREE.Color(0x000000) },
+    outerColor: { value: new THREE.Color(0xffffff) },
+    innerOpacity: { value: 0.8 },
+    outerOpacity: { value: 0.01 },
+    falloffPower: { value: 0.6 },
+    shadowRadius: { value: 10 },
+  },
+  vertexShader: `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    uniform vec3 innerColor;
+    uniform vec3 outerColor;
+    uniform float innerOpacity;
+    uniform float outerOpacity;
+    uniform float falloffPower;
+    uniform float shadowRadius;
+    
+    varying vec2 vUv;
+    
+    void main() {
+      vec2 center = vec2(0.5, 0.5);
+      float dist = distance(vUv, center) * 2.0;
+      
+      // Create shadow in the center
+      float shadowFalloff = 1.0 - smoothstep(0.0, shadowRadius, dist);
+      
+      // Create overall spotlight falloff
+      float spotlightFalloff = 1.0 - smoothstep(0.0, 1.0, pow(dist, falloffPower));
+      
+      // Combine both effects
+      vec3 color = mix(outerColor, innerColor, shadowFalloff);
+      float opacity = mix(outerOpacity, innerOpacity * shadowFalloff, spotlightFalloff);
+      
+      gl_FragColor = vec4(color, opacity);
+    }
+  `,
+  transparent: true,
+  depthWrite: false,
+  depthTest: false,
+}))
 
 const { baseAnimation, randomAnimations } = toRefs(props.animationConfig)
 
@@ -498,23 +548,6 @@ function onCanvasClick() {
   }
 
   hasDragged.value = false
-}
-
-const radialTexture = createRadialTexture(512)
-radialTexture.minFilter = THREE.LinearFilter
-radialTexture.magFilter = THREE.LinearFilter
-radialTexture.wrapS = radialTexture.wrapT = THREE.ClampToEdgeWrapping
-
-function createRadialTexture(size: number): THREE.CanvasTexture {
-  const canvas = document.createElement('canvas')
-  canvas.width = canvas.height = size
-  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
-  const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
-  grad.addColorStop(0, 'rgba(119,119,119,0.1)')
-  grad.addColorStop(0.9, 'rgba(255,255,255,0)')
-  ctx.fillStyle = grad
-  ctx.fillRect(0, 0, size, size)
-  return new THREE.CanvasTexture(canvas)
 }
 
 watch(selectedModelSrc, (src) => loadModel(src))
