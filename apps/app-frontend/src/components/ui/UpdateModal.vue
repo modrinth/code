@@ -21,7 +21,7 @@
           {{ formatMessage(messages.later) }}
         </button>
       </ButtonStyled>
-      <ButtonStyled>
+      <ButtonStyled color="red">
         <button>
           {{ formatMessage(messages.skip) }}
         </button>
@@ -97,10 +97,9 @@ function onHide() {
 
 function hide() {
   modal.value!.hide()
-  onHide()
 }
 
-defineExpose({ show, isOpen })
+defineExpose({ show, hide, isOpen })
 </script>
 
 <style scoped lang="scss"></style>

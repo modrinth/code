@@ -346,7 +346,7 @@ async function handleCommand(e) {
   }
 }
 
-const updateAvailable = ref(false)
+const availableUpdate = ref(null)
 const updateModal = useTemplateRef('updateModal')
 async function checkUpdates() {
   if (!(await areUpdatesEnabled())) {
@@ -361,10 +361,14 @@ async function checkUpdates() {
     }
 
     const update = await invoke('plugin:updater|check')
-    updateAvailable.value = !!update
-    if (updateAvailable.value) {
-      console.log(`Update ${update.version} is available. Showing update modal.`)
-      updateModal.value.show(update)
+    if (!!update) {
+      console.log(`Update ${update.version} is available.`)
+      if (update.version === availableUpdate.value?.version) {
+        console.log('Skipping update modal because the new version is the same as the dismissed update')
+      } else {
+        availableUpdate.value = update;
+        updateModal.value.show(update)
+      }
     }
   }
 
@@ -471,8 +475,9 @@ function handleAuxClick(e) {
         <PlusIcon />
       </NavButton>
       <div class="flex flex-grow"></div>
-      <NavButton v-if="updateAvailable" v-tooltip.right="'Install update'" :to="() => restartApp()">
-        <DownloadIcon />
+      <NavButton v-if="!!availableUpdate" v-tooltip.right="'Update available'" :to="() => updateModal.show(availableUpdate)">
+        <!-- TODO: Gray if updating on next restart -->
+        <DownloadIcon class="text-brand-green" />
       </NavButton>
       <NavButton v-tooltip.right="'Settings'" :to="() => $refs.settingsModal.show()">
         <SettingsIcon />
