@@ -46,13 +46,18 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
       data.image = (await this.server.processImage(data.project?.icon_url)) ?? undefined;
     }
 
-    const motd = await this.getMotd();
-    if (motd === "A Minecraft Server") {
-      await this.setMotd(
-        `§b${data.project?.title || data.loader + " " + data.mc_version} §f♦ §aModrinth Servers`,
-      );
+    try {
+      const motd = await this.getMotd();
+      if (motd === "A Minecraft Server") {
+        await this.setMotd(
+          `§b${data.project?.title || data.loader + " " + data.mc_version} §f♦ §aModrinth Servers`,
+        );
+      }
+      data.motd = motd;
+    } catch {
+      console.error("[Modrinth Servers] [General] Failed to fetch MOTD.");
+      data.motd = undefined;
     }
-    data.motd = motd;
 
     // Copy data to this module
     Object.assign(this, data);

@@ -371,13 +371,14 @@ import DOMPurify from "dompurify";
 import { ButtonStyled, ErrorInformationCard, ServerNotice } from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
 import type { MessageDescriptor } from "@vintl/vintl";
-import type {
-  ServerState,
-  Stats,
-  WSEvent,
-  WSInstallationResultEvent,
-  Backup,
-  PowerAction,
+import {
+  type ServerState,
+  type Stats,
+  type WSEvent,
+  type WSInstallationResultEvent,
+  type Backup,
+  type PowerAction,
+  ModrinthServersFetchError,
 } from "@modrinth/utils";
 import { reloadNuxtApp, navigateTo } from "#app";
 import { useModrinthServersConsole } from "~/store/console.ts";
@@ -428,8 +429,11 @@ watch(
     if (server.general?.status === "suspended") return;
 
     const error = generalError?.error || wsError?.error;
-    if (error && error.statusCode !== 403) {
-      startPolling();
+    if (error && (error.statusCode ?? 0) >= 500 && (error.statusCode ?? 0) < 600) {
+      const now = Date.now();
+      if (!isPolling.value && now - lastPollingAttempt.value > POLLING_COOLDOWN) {
+        attemptStartPolling();
+      }
     }
   },
 );
@@ -453,6 +457,10 @@ const uptimeSeconds = ref(0);
 const firstConnect = ref(true);
 const copied = ref(false);
 const error = ref<Error | null>(null);
+
+const isPolling = ref(false);
+const lastPollingAttempt = ref(0);
+const POLLING_COOLDOWN = 10 * 1000;
 
 const initialConsoleMessage = [
   "   __________________________________________________",
@@ -1040,43 +1048,31 @@ const stopPolling = () => {
     clearTimeout(pollingIntervalId);
     pollingIntervalId = null;
   }
+  isPolling.value = false;
 };
 
-const startPolling = () => {
-  stopPolling();
+const attemptStartPolling = () => {
+  if (isPolling.value) return;
 
-  let retryCount = 0;
-  const maxRetries = 10;
+  isPolling.value = true;
+  lastPollingAttempt.value = Date.now();
 
   const poll = async () => {
     try {
-      await server.refresh(["general", "ws"]);
+      console.log("Polling started");
+      await server.refresh(["general", "ws"], {
+        preserveConnection: true,
+      });
 
       if (!server.moduleErrors?.general?.error) {
         stopPolling();
         connectWebSocket();
-        return;
-      }
-
-      retryCount++;
-      if (retryCount >= maxRetries) {
-        console.error("Max retries reached, stopping polling");
+      } else {
         stopPolling();
-        return;
       }
-
-      // Exponential backoff: 3s, 6s, 12s, 24s, etc.
-      const delay = Math.min(3000 * Math.pow(2, retryCount - 1), 60000);
-
-      pollingIntervalId = setTimeout(poll, delay);
     } catch (error) {
       console.error("Polling failed:", error);
-      retryCount++;
-
-      if (retryCount < maxRetries) {
-        const delay = Math.min(3000 * Math.pow(2, retryCount - 1), 60000);
-        pollingIntervalId = setTimeout(poll, delay);
-      }
+      stopPolling();
     }
   };
 
@@ -1244,7 +1240,7 @@ onMounted(() => {
   }
   if (server.moduleErrors.general?.error) {
     if (!server.moduleErrors.general?.error?.message?.includes("Forbidden")) {
-      startPolling();
+      attemptStartPolling();
     }
   } else {
     connectWebSocket();
@@ -1307,7 +1303,7 @@ watch(
 
     if (newStatus === "installing" && oldStatus !== "installing") {
       countdown.value = 15;
-      startPolling();
+      attemptStartPolling();
     }
   },
 );

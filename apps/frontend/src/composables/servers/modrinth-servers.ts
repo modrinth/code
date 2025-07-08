@@ -200,6 +200,8 @@ export class ModrinthServer {
         : (["general", "content", "backups", "network", "startup", "ws", "fs"] as ModuleName[]);
 
     for (const module of modulesToRefresh) {
+      this.errors[module] = undefined;
+
       try {
         switch (module) {
           case "general": {
