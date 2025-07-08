@@ -134,7 +134,7 @@ export async function useServersFetch<T>(
             ? errorMessages[statusCode]
             : `HTTP Error: ${statusCode || "unknown"} ${statusText}`;
 
-        const isRetryable = false;
+        const isRetryable = statusCode ? [408, 429, 500, 502, 504].includes(statusCode) : true;
 
         if (!isRetryable || attempts >= maxAttempts) {
           console.error("Fetch error:", error);
