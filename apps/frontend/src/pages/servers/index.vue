@@ -719,31 +719,32 @@ async function fetchCapacityStatuses(customProduct = null) {
             product.metadata.ram < min.metadata.ram ? product : min,
           ),
         ];
-    const capacityChecks = productsToCheck.map((product) =>
-      useServersFetch("stock", {
-        method: "POST",
-        body: {
-          cpu: product.metadata.cpu,
-          memory_mb: product.metadata.ram,
-          swap_mb: product.metadata.swap,
-          storage_mb: product.metadata.storage,
-        },
-        bypassAuth: true,
-      }),
-    );
-
-    const results = await Promise.all(capacityChecks);
+    const capacityChecks = [];
+    for (const product of productsToCheck) {
+      capacityChecks.push(
+        useServersFetch("stock", {
+          method: "POST",
+          body: {
+            cpu: product.metadata.cpu,
+            memory_mb: product.metadata.ram,
+            swap_mb: product.metadata.swap,
+            storage_mb: product.metadata.storage,
+          },
+          bypassAuth: true,
+        }),
+      );
+    }
 
     if (customProduct?.metadata) {
       return {
-        custom: results[0],
+        custom: await capacityChecks[0],
       };
     } else {
       return {
-        small: results[0],
-        medium: results[1],
-        large: results[2],
-        custom: results[3],
+        small: await capacityChecks[0],
+        medium: await capacityChecks[1],
+        large: await capacityChecks[2],
+        custom: await capacityChecks[3],
       };
     }
   } catch (error) {
@@ -760,6 +761,11 @@ async function fetchCapacityStatuses(customProduct = null) {
 const { data: capacityStatuses, refresh: refreshCapacity } = await useAsyncData(
   "ServerCapacityAll",
   fetchCapacityStatuses,
+  {
+    getCachedData() {
+      return null; // Dont cache stock data.
+    },
+  },
 );
 
 const isSmallAtCapacity = computed(() => capacityStatuses.value?.small?.available === 0);
