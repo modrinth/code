@@ -102,7 +102,7 @@ export class ModrinthServer {
       try {
         const fileData = await useServersFetch(`/download?path=/server-icon-original.png`, {
           override: auth,
-          retry: false,
+          retry: 1, // Reduce retries for optional resources
         });
 
         if (fileData instanceof Blob && import.meta.client) {
@@ -124,8 +124,14 @@ export class ModrinthServer {
           return dataURL;
         }
       } catch (error) {
-        if (error instanceof ModrinthServerError && error.statusCode === 404) {
-          if (iconUrl) {
+        if (error instanceof ModrinthServerError) {
+          if (error.statusCode && error.statusCode >= 500) {
+            console.debug("Service unavailable, skipping icon processing");
+            sharedImage.value = undefined;
+            return undefined;
+          }
+
+          if (error.statusCode === 404 && iconUrl) {
             try {
               const response = await fetch(iconUrl);
               if (!response.ok) throw new Error("Failed to fetch icon");
@@ -187,6 +193,45 @@ export class ModrinthServer {
     return undefined;
   }
 
+  async testNodeReachability(): Promise<boolean> {
+    if (!this.general?.datacenter) {
+      console.warn("No datacenter info available for ping test");
+      return false;
+    }
+
+    const datacenter = this.general.datacenter;
+    const wsUrl = `wss://${datacenter}.nodes.modrinth.com/pingtest`;
+
+    try {
+      return await new Promise((resolve) => {
+        const socket = new WebSocket(wsUrl);
+        const timeout = setTimeout(() => {
+          socket.close();
+          resolve(false);
+        }, 5000);
+
+        socket.onopen = () => {
+          clearTimeout(timeout);
+          socket.send(performance.now().toString());
+        };
+
+        socket.onmessage = () => {
+          clearTimeout(timeout);
+          socket.close();
+          resolve(true);
+        };
+
+        socket.onerror = () => {
+          clearTimeout(timeout);
+          resolve(false);
+        };
+      });
+    } catch (error) {
+      console.error(`Failed to ping node ${wsUrl}:`, error);
+      return false;
+    }
+  }
+
   async refresh(
     modules: ModuleName[] = [],
     options?: {
@@ -200,6 +245,8 @@ export class ModrinthServer {
         : (["general", "content", "backups", "network", "startup", "ws", "fs"] as ModuleName[]);
 
     for (const module of modulesToRefresh) {
+      this.errors[module] = undefined;
+
       try {
         switch (module) {
           case "general": {
@@ -250,7 +297,7 @@ export class ModrinthServer {
             continue;
           }
 
-          if (error.statusCode === 503) {
+          if (error.statusCode && error.statusCode >= 500) {
             console.debug(`Temporary ${module} unavailable:`, error.message);
             continue;
           }

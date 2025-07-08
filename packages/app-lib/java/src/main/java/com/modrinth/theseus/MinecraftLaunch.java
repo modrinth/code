@@ -123,6 +123,7 @@ public final class MinecraftLaunch {
             setAccessible0.setAccessible(true);
             setAccessible0.invoke(object, true);
         } catch (NoSuchMethodException e) {
+            object.setAccessible(true);
         }
         return object;
     }

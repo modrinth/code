@@ -108,7 +108,6 @@ async function testJava() {
   testingJava.value = true
   testingJavaSuccess.value = await test_jre(
     props.modelValue ? props.modelValue.path : '',
-    1,
     props.version,
   )
   testingJava.value = false
