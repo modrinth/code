@@ -100,12 +100,6 @@ jobs:
             dasel delete -f apps/app/tauri-release.conf.json 'bundle.windows.signCommand'
           fi
 
-      - name: 🗑️ Clean up cached bundles
-        shell: bash
-        run: |
-          rm -rf target/release/bundle
-          rm -rf target/*/release/bundle || true
-
       - name: 🔨 Build macOS app
         run: pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json
         if: startsWith(matrix.platform, 'macos')
@@ -147,5 +141,10 @@ jobs:
         with:
           name: App bundle (${{ matrix.artifact-target-name }})
           path: |
-            target/release/bundle/**
-            target/*/release/bundle/**
+            target/release/bundle/appimage/Modrinth App_*.AppImage*
+            target/release/bundle/deb/Modrinth App_*.deb*
+            target/release/bundle/rpm/Modrinth App-*.rpm*
+            target/universal-apple-darwin/release/bundle/macos/Modrinth App.app.tar.gz*
+            target/universal-apple-darwin/release/bundle/dmg/Modrinth App_*.dmg*
+            target/release/bundle/nsis/Modrinth App_*-setup.exe*
+            target/release/bundle/nsis/Modrinth App_*-setup.nsis.zip*
