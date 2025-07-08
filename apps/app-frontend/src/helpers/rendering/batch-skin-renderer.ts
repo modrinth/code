@@ -110,11 +110,7 @@ class BatchSkinRenderer {
     return await response.blob()
   }
 
-  private async setupModel(
-    modelUrl: string,
-    textureUrl: string,
-    capeUrl?: string,
-  ): Promise<void> {
+  private async setupModel(modelUrl: string, textureUrl: string, capeUrl?: string): Promise<void> {
     if (!this.scene) {
       throw new Error('Renderer not initialized')
     }
