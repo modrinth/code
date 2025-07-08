@@ -5,6 +5,6 @@ export class ModrinthServersFetchError extends Error {
     public originalError?: Error,
   ) {
     super(message)
-    this.name = 'PyroFetchError'
+    this.name = 'ModrinthFetchError'
   }
 }
