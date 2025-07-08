@@ -384,9 +384,11 @@ async function checkUpdates() {
     if (!!update) {
       console.log(`Update ${update.version} is available.`)
       if (update.version === availableUpdate.value?.version) {
-        console.log('Skipping update modal because the new version is the same as the dismissed update')
+        console.log(
+          'Skipping update modal because the new version is the same as the dismissed update',
+        )
       } else {
-        availableUpdate.value = update;
+        availableUpdate.value = update
         updateModal.value.show(update)
       }
     }
@@ -498,7 +500,11 @@ function handleAuxClick(e) {
         <PlusIcon />
       </NavButton>
       <div class="flex flex-grow"></div>
-      <NavButton v-if="!!availableUpdate" v-tooltip.right="'Update available'" :to="() => updateModal.show(availableUpdate)">
+      <NavButton
+        v-if="!!availableUpdate"
+        v-tooltip.right="'Update available'"
+        :to="() => updateModal.show(availableUpdate)"
+      >
         <!-- TODO: Gray if updating on next restart -->
         <DownloadIcon class="text-brand-green" />
       </NavButton>
