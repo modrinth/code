@@ -69,6 +69,7 @@ export async function useServersFetch<T>(
 
   const headers: Record<string, string> = {
     "User-Agent": "Modrinth/1.0 (https://modrinth.com)",
+    "X-Archon-Request": "true",
     Vary: "Accept, Origin",
   };
 
