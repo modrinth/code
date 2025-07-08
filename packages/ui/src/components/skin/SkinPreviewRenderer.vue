@@ -115,13 +115,11 @@ import {
 import {
   applyTexture,
   applyCapeTexture,
-  attachCapeToBody,
-  findBodyNode,
   createTransparentTexture,
   loadTexture as loadSkinTexture,
 } from '@modrinth/utils'
 import { useDynamicFontSize } from '../../composables'
-import { CapeModel, ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
+import { ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
 
 interface AnimationConfig {
   baseAnimation: string
@@ -177,9 +175,6 @@ const selectedModelSrc = computed(() =>
 )
 
 const scene = shallowRef<THREE.Object3D | null>(null)
-const capeScene = shallowRef<THREE.Object3D | null>(null)
-const bodyNode = shallowRef<THREE.Object3D | null>(null)
-const capeAttached = ref(false)
 const lastCapeSrc = ref<string | undefined>(undefined)
 const texture = shallowRef<THREE.Texture | null>(null)
 const capeTexture = shallowRef<THREE.Texture | null>(null)
@@ -400,11 +395,9 @@ async function loadModel(src: string) {
 
     if (texture.value) {
       applyTexture(scene.value, texture.value)
-      texture.value.needsUpdate = true
     }
 
-    bodyNode.value = findBodyNode(loadedScene)
-    capeAttached.value = false
+    applyCapeTexture(scene.value, capeTexture.value, transparentTexture)
 
     if (animations && animations.length > 0) {
       initializeAnimations(loadedScene, animations)
@@ -415,22 +408,6 @@ async function loadModel(src: string) {
   } catch (error) {
     console.error('Failed to load model:', error)
     isModelLoaded.value = false
-  }
-}
-
-async function loadCape() {
-  try {
-    const { scene: loadedCape } = await useGLTF(CapeModel)
-    capeScene.value = markRaw(loadedCape)
-
-    applyCapeTexture(capeScene.value, capeTexture.value, transparentTexture)
-
-    if (bodyNode.value && !capeAttached.value) {
-      attachCapeToBodyWrapper()
-    }
-  } catch (error) {
-    console.error('Failed to load cape:', error)
-    capeScene.value = null
   }
 }
 
@@ -465,25 +442,9 @@ async function loadAndApplyCapeTexture(src: string | undefined) {
     capeTexture.value = null
   }
 
-  if (capeScene.value) {
-    applyCapeTexture(capeScene.value, capeTexture.value, transparentTexture)
+  if (scene.value) {
+    applyCapeTexture(scene.value, capeTexture.value, transparentTexture)
   }
-
-  if (capeScene.value && bodyNode.value) {
-    if (!src && capeAttached.value && capeScene.value.parent) {
-      capeScene.value.parent.remove(capeScene.value)
-      capeAttached.value = false
-    } else if (src && !capeAttached.value) {
-      attachCapeToBodyWrapper()
-    }
-  }
-}
-
-function attachCapeToBodyWrapper() {
-  if (!bodyNode.value || !capeScene.value || capeAttached.value) return
-
-  attachCapeToBody(bodyNode.value, capeScene.value)
-  capeAttached.value = true
 }
 
 const centre = ref<[number, number, number]>([0, 1, 0])
@@ -556,22 +517,6 @@ function createRadialTexture(size: number): THREE.CanvasTexture {
   return new THREE.CanvasTexture(canvas)
 }
 
-watch(
-  [bodyNode, capeScene, isModelLoaded],
-  ([newBodyNode, newCapeScene, modelLoaded]) => {
-    if (newBodyNode && newCapeScene && modelLoaded && !capeAttached.value) {
-      attachCapeToBodyWrapper()
-    }
-  },
-  { immediate: true },
-)
-
-watch(capeScene, (newCapeScene) => {
-  if (newCapeScene && bodyNode.value && isModelLoaded.value && !capeAttached.value) {
-    attachCapeToBodyWrapper()
-  }
-})
-
 watch(selectedModelSrc, (src) => loadModel(src))
 watch(
   () => props.textureSrc,
@@ -587,7 +532,6 @@ watch(
 watch(
   () => props.capeSrc,
   async (newCapeSrc) => {
-    await loadCape()
     await loadAndApplyCapeTexture(newCapeSrc)
   },
 )
@@ -619,8 +563,6 @@ onBeforeMount(async () => {
     if (props.capeSrc) {
       await loadAndApplyCapeTexture(props.capeSrc)
     }
-
-    await loadCape()
   } catch (error) {
     console.error('Failed to initialize skin preview:', error)
   }

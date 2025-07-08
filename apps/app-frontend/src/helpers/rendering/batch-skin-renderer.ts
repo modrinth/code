@@ -2,10 +2,10 @@ import * as THREE from 'three'
 import type { Skin, Cape } from '../skins'
 import { get_normalized_skin_texture, determineModelType } from '../skins'
 import { reactive } from 'vue'
-import { setupSkinModel, disposeCaches } from '@modrinth/utils'
+import { setupSkinModel, disposeCaches, loadTexture, applyCapeTexture } from '@modrinth/utils'
 import { skinPreviewStorage } from '../storage/skin-preview-storage'
 import { headStorage } from '../storage/head-storage'
-import { CapeModel, ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
+import { ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
 
 export interface RenderResult {
   forwards: string
@@ -65,13 +65,12 @@ class BatchSkinRenderer {
     textureUrl: string,
     modelUrl: string,
     capeUrl?: string,
-    capeModelUrl?: string,
   ): Promise<RawRenderResult> {
     this.initializeRenderer()
 
     this.clearScene()
 
-    await this.setupModel(modelUrl, textureUrl, capeModelUrl, capeUrl)
+    await this.setupModel(modelUrl, textureUrl, capeUrl)
 
     const headPart = this.currentModel!.getObjectByName('Head')
     let lookAtTarget: [number, number, number]
@@ -114,14 +113,18 @@ class BatchSkinRenderer {
   private async setupModel(
     modelUrl: string,
     textureUrl: string,
-    capeModelUrl?: string,
     capeUrl?: string,
   ): Promise<void> {
     if (!this.scene) {
       throw new Error('Renderer not initialized')
     }
 
-    const { model } = await setupSkinModel(modelUrl, textureUrl, capeModelUrl, capeUrl)
+    const { model } = await setupSkinModel(modelUrl, textureUrl)
+
+    if (capeUrl) {
+      const capeTexture = await loadTexture(capeUrl)
+      applyCapeTexture(model, capeTexture)
+    }
 
     const group = new THREE.Group()
     group.add(model)
@@ -408,7 +411,6 @@ export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promis
         await get_normalized_skin_texture(skin),
         modelUrl,
         cape?.texture,
-        CapeModel,
       )
 
       const renderResult: RenderResult = {
