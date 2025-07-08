@@ -11,6 +11,34 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-07-08T11:10:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Reapplied error handling improvements, with more improvements.`,
+  },
+  {
+    date: `2025-07-07T22:20:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Fixed issue with Servers panel failing to load.`,
+  },
+  {
+    date: `2025-07-07T17:45:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Reverted error handling improvements.`,
+  },
+  {
+    date: `2025-07-07T01:10:00-07:00`,
+    product: 'app',
+    version: `0.10.3`,
+    body: `### Improvements
+- Added a workaround for Java 8 instances failing to load.
+
+### Known issues
+- Java installations will show as 'Failed' when you test them. This is a visual bug, and does not mean the Java installation is not working.`,
+  },
+  {
     date: `2025-07-06T16:30:00-07:00`,
     product: 'app',
     version: `0.10.2`,
@@ -19,7 +47,10 @@ const VERSIONS: VersionEntry[] = [
 - Fixed some parts of the player model on Skins page rendering incorrectly.
 - Fixed a number of issues with skin images not loading on macOS.
 - Fixed old Forge versions not loading properly.
-- Fixed a typo in Appearance settings for hiding Skins page nametag.`,
+- Fixed a typo in Appearance settings for hiding Skins page nametag.
+
+### Known issues
+- Java installations will show as 'Failed' when you test them. This is a visual bug, and does not mean the Java installation is not working.`,
   },
   {
     date: `2025-07-05T12:00:00-07:00`,
@@ -60,7 +91,8 @@ const VERSIONS: VersionEntry[] = [
     date: `2025-07-04T12:00:00-07:00`,
     product: 'web',
     body: `### Changed
-- Changed fallback ad placeholder from promoting Modrinth+ to Modrinth Servers.`,
+- Changed fallback ad placeholder from promoting Modrinth+ to Modrinth Servers.
+- Fixed news section rendering incorrectly in light mode on landing page and Modrinth App page.`,
   },
   {
     date: `2025-06-30T19:15:00-07:00`,
