@@ -193,6 +193,45 @@ export class ModrinthServer {
     return undefined;
   }
 
+  async testNodeReachability(): Promise<boolean> {
+    if (!this.general?.datacenter) {
+      console.warn("No datacenter info available for ping test");
+      return false;
+    }
+
+    const datacenter = this.general.datacenter;
+    const wsUrl = `wss://${datacenter}.nodes.modrinth.com/pingteqwdihst`;
+
+    try {
+      return await new Promise((resolve) => {
+        const socket = new WebSocket(wsUrl);
+        const timeout = setTimeout(() => {
+          socket.close();
+          resolve(false);
+        }, 5000);
+
+        socket.onopen = () => {
+          clearTimeout(timeout);
+          socket.send(performance.now().toString());
+        };
+
+        socket.onmessage = () => {
+          clearTimeout(timeout);
+          socket.close();
+          resolve(true);
+        };
+
+        socket.onerror = () => {
+          clearTimeout(timeout);
+          resolve(false);
+        };
+      });
+    } catch (error) {
+      console.error(`Failed to ping node ${wsUrl}:`, error);
+      return false;
+    }
+  }
+
   async refresh(
     modules: ModuleName[] = [],
     options?: {

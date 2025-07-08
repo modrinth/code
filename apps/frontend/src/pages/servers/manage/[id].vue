@@ -55,7 +55,7 @@
     />
   </div>
   <div
-    v-else-if="server.moduleErrors?.general?.error.statusCode === 503"
+    v-else-if="server.moduleErrors?.general?.error || !nodeAccessible"
     class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
   >
     <ErrorInformationCard
@@ -68,22 +68,22 @@
       <template #description>
         <div class="text-md space-y-4">
           <p class="leading-[170%] text-secondary">
-            Your server's node, where your Modrinth Server is physically hosted, is experiencing
-            issues. We are working with our datacenter to resolve the issue as quickly as possible.
+            Your server's node, where your Modrinth Server is physically hosted, is not accessible
+            at the moment. We are working to resolve the issue as quickly as possible.
           </p>
           <p class="leading-[170%] text-secondary">
             Your data is safe and will not be lost, and your server will be back online as soon as
             the issue is resolved.
           </p>
           <p class="leading-[170%] text-secondary">
-            For updates, please join the Modrinth Discord or contact Modrinth Support via the chat
+            If reloading does not work initially, please contact Modrinth Support via the chat
             bubble in the bottom right corner and we'll be happy to help.
           </p>
         </div>
       </template>
     </ErrorInformationCard>
   </div>
-  <div
+  <!-- <div
     v-else-if="server.moduleErrors?.general?.error"
     class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
   >
@@ -96,19 +96,14 @@
     >
       <template #description>
         <div class="space-y-4">
-          <div class="text-center text-secondary">
-            {{
-              formattedTime == "00" ? "Reconnecting..." : `Retrying in ${formattedTime} seconds...`
-            }}
-          </div>
           <p class="text-lg text-secondary">
             Something went wrong, and we couldn't connect to your server. This is likely due to a
-            temporary network issue. You'll be reconnected automatically.
+            temporary network issue.
           </p>
         </div>
       </template>
     </ErrorInformationCard>
-  </div>
+  </div> -->
   <!-- SERVER START -->
   <div
     v-else-if="serverData"
@@ -355,7 +350,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch, type Reactive } from "vue";
+import { ref, computed, onMounted, onUnmounted, type Reactive } from "vue";
 import {
   SettingsIcon,
   CopyIcon,
@@ -378,9 +373,8 @@ import {
   type WSInstallationResultEvent,
   type Backup,
   type PowerAction,
-  ModrinthServersFetchError,
 } from "@modrinth/utils";
-import { reloadNuxtApp, navigateTo } from "#app";
+import { reloadNuxtApp } from "#app";
 import { useModrinthServersConsole } from "~/store/console.ts";
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import { ModrinthServer, useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
@@ -393,7 +387,6 @@ const socket = ref<WebSocket | null>(null);
 const isReconnecting = ref(false);
 const isLoading = ref(true);
 const reconnectInterval = ref<ReturnType<typeof setInterval> | null>(null);
-const isFirstMount = ref(true);
 const isMounted = ref(true);
 const flags = useFeatureFlags();
 
@@ -423,21 +416,6 @@ const loadModulesPromise = Promise.resolve().then(() => {
 
 provide("modulesLoaded", loadModulesPromise);
 
-watch(
-  () => [server.moduleErrors?.general, server.moduleErrors?.ws],
-  ([generalError, wsError]) => {
-    if (server.general?.status === "suspended") return;
-
-    const error = generalError?.error || wsError?.error;
-    if (error && (error.statusCode ?? 0) >= 500 && (error.statusCode ?? 0) < 600) {
-      const now = Date.now();
-      if (!isPolling.value && now - lastPollingAttempt.value > POLLING_COOLDOWN) {
-        attemptStartPolling();
-      }
-    }
-  },
-);
-
 const errorTitle = ref("Error");
 const errorMessage = ref("An unexpected error occurred.");
 const errorLog = ref("");
@@ -457,10 +435,6 @@ const uptimeSeconds = ref(0);
 const firstConnect = ref(true);
 const copied = ref(false);
 const error = ref<Error | null>(null);
-
-const isPolling = ref(false);
-const lastPollingAttempt = ref(0);
-const POLLING_COOLDOWN = 10 * 1000;
 
 const initialConsoleMessage = [
   "   __________________________________________________",
@@ -705,7 +679,6 @@ const startUptimeUpdates = () => {
 const stopUptimeUpdates = () => {
   if (uptimeIntervalId) {
     clearInterval(uptimeIntervalId);
-    pollingIntervalId = null;
   }
 };
 
@@ -843,8 +816,6 @@ const handleInstallationResult = async (data: WSInstallationResultEvent) => {
   switch (data.result) {
     case "ok": {
       if (!serverData.value) break;
-
-      stopPolling();
 
       try {
         await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -1000,14 +971,6 @@ const notifyError = (title: string, text: string) => {
   });
 };
 
-let pollingIntervalId: ReturnType<typeof setInterval> | null = null;
-const countdown = ref(15);
-
-const formattedTime = computed(() => {
-  const seconds = countdown.value % 60;
-  return `${seconds.toString().padStart(2, "0")}`;
-});
-
 export type BackupInProgressReason = {
   type: string;
   tooltip: MessageDescriptor;
@@ -1043,42 +1006,6 @@ const backupInProgress = computed(() => {
   return undefined;
 });
 
-const stopPolling = () => {
-  if (pollingIntervalId) {
-    clearTimeout(pollingIntervalId);
-    pollingIntervalId = null;
-  }
-  isPolling.value = false;
-};
-
-const attemptStartPolling = () => {
-  if (isPolling.value) return;
-
-  isPolling.value = true;
-  lastPollingAttempt.value = Date.now();
-
-  const poll = async () => {
-    try {
-      console.log("Polling started");
-      await server.refresh(["general", "ws"], {
-        preserveConnection: true,
-      });
-
-      if (!server.moduleErrors?.general?.error) {
-        stopPolling();
-        connectWebSocket();
-      } else {
-        stopPolling();
-      }
-    } catch (error) {
-      console.error("Polling failed:", error);
-      stopPolling();
-    }
-  };
-
-  poll();
-};
-
 const nodeUnavailableDetails = computed(() => [
   {
     label: "Server ID",
@@ -1087,8 +1014,15 @@ const nodeUnavailableDetails = computed(() => [
   },
   {
     label: "Node",
-    value: server.general?.datacenter ?? "Unknown! Please contact support!",
+    value: server.general?.datacenter ?? "Unknown",
     type: "inline" as const,
+  },
+  {
+    label: "Error message",
+    value: nodeAccessible.value
+      ? server.moduleErrors?.general?.error.message ?? "Unknown"
+      : "Unable to reach node. Ping test failed.",
+    type: "block" as const,
   },
 ]);
 
@@ -1156,16 +1090,10 @@ const generalErrorAction = computed(() => ({
 }));
 
 const nodeUnavailableAction = computed(() => ({
-  label: "Join Modrinth Discord",
-  onClick: () => navigateTo("https://discord.modrinth.com", { external: true }),
-  color: "standard" as const,
-}));
-
-const connectionLostAction = computed(() => ({
   label: "Reload",
   onClick: () => reloadNuxtApp(),
   color: "brand" as const,
-  disabled: formattedTime.value !== "00",
+  disabled: false,
 }));
 
 const copyServerDebugInfo = () => {
@@ -1189,7 +1117,6 @@ const cleanup = () => {
 
   shutdown();
 
-  stopPolling();
   stopUptimeUpdates();
   if (reconnectInterval.value) {
     clearInterval(reconnectInterval.value);
@@ -1232,16 +1159,31 @@ async function dismissNotice(noticeId: number) {
   await server.refresh(["general"]);
 }
 
+const nodeAccessible = ref(true);
+
 onMounted(() => {
   isMounted.value = true;
   if (server.general?.status === "suspended") {
     isLoading.value = false;
     return;
   }
+
+  server
+    .testNodeReachability()
+    .then((result) => {
+      nodeAccessible.value = result;
+      if (!nodeAccessible.value) {
+        isLoading.value = false;
+      }
+    })
+    .catch((err) => {
+      console.error("Error testing node reachability:", err);
+      nodeAccessible.value = false;
+      isLoading.value = false;
+    });
+
   if (server.moduleErrors.general?.error) {
-    if (!server.moduleErrors.general?.error?.message?.includes("Forbidden")) {
-      attemptStartPolling();
-    }
+    isLoading.value = false;
   } else {
     connectWebSocket();
   }
@@ -1292,21 +1234,6 @@ onMounted(() => {
 onUnmounted(() => {
   cleanup();
 });
-
-watch(
-  () => serverData.value?.status,
-  (newStatus, oldStatus) => {
-    if (isFirstMount.value) {
-      isFirstMount.value = false;
-      return;
-    }
-
-    if (newStatus === "installing" && oldStatus !== "installing") {
-      countdown.value = 15;
-      attemptStartPolling();
-    }
-  },
-);
 
 definePageMeta({
   middleware: "auth",
