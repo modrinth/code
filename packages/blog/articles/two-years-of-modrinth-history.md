@@ -2,6 +2,7 @@
 title: 'Two years of Modrinth: a retrospective'
 summary: The history of Modrinth as we know it from December 2020 to December 2022.
 date: 2023-01-07
+authors: ['6plzAzU4']
 ---
 
 Let's rewind a bit and take a look at the past two years of Modrinth's history. We've come so far from our pre-beta HexFabric days to today. A good portion of our pre-beta history can be found in the [What is Modrinth](../what-is-modrinth) blog post, but Modrinth obviously is not the same platform it was two years ago.

@@ -6,5 +6,6 @@ export const article = {
     'Customize your look, save your favorite skins, and swap them out in a flash, all within Modrinth App.',
   date: '2025-07-06T23:45:00.000Z',
   slug: 'skins-now-in-modrinth-app',
+  authors: ['bOHH0P9Z', 'Dc7EYhxG'],
   thumbnail: true,
 }

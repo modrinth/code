@@ -2,6 +2,7 @@
 title: 'Skins — Now in Modrinth App!'
 summary: 'Customize your look, save your favorite skins, and swap them out in a flash, all within Modrinth App.'
 date: 2025-07-06T16:45:00-07:00
+authors: [bOHH0P9Z, Dc7EYhxG]
 ---
 
 We're thrilled to roll out Modrinth App **v0.10** with a beta release of one of our most highly requested features, the **Skins page**. The Skins page allows you to manage all of your Minecraft skins directly within Modrinth App. You can see all your saved custom skins and the default Minecraft skins in one convenient place.

@@ -2,6 +2,7 @@
 title: Modrinth's Anniversary Update
 summary: Marking two years of Modrinth and discussing our New Year's Resolutions for 2023.
 date: 2023-01-07
+authors: ['6plzAzU4']
 ---
 
 Modrinth initially [went into beta](../modrinth-beta) on November 30th, 2020. Just over a month ago was November 30th, 2022, marking **two years** since Modrinth was generally available as a platform for everyone to use. Today, we're proud to announce the Anniversary Update, celebrating both two years of Modrinth as well as the coming of the new year, and we'll be discussing our New Year's Resolutions for 2023.

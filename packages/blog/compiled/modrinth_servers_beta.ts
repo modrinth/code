@@ -5,6 +5,7 @@ export const article = {
   summary: 'Fast, simple, reliable servers directly integrated into Modrinth.',
   date: '2024-11-03T06:00:00.000Z',
   slug: 'modrinth-servers-beta',
+  authors: ['MpxzqsyW', 'Dc7EYhxG'],
   thumbnail: true,
   short_title: 'Introducing Modrinth Servers',
   short_summary: 'Host your next Minecraft server with Modrinth.',

@@ -4,6 +4,7 @@ short_title: The Creator Update
 summary: December may be over, but we’re not done giving gifts.
 short_summary: Adding analytics, orgs, collections, and more!
 date: 2024-01-06T12:00:00-08:00
+authors: ['6plzAzU4']
 ---
 
 December may be over, but that doesn’t mean we’re done giving gifts here at Modrinth. Over the past few months, we’ve been cooking up a whole bunch of new features for everyone to enjoy. Now seems like as good of a time as ever to bring you our Creator Update! Buckle up, because this is a big one.

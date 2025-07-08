@@ -1,9 +1,10 @@
 ---
 title: 'A Pride Month Success: Over $8,400 Raised for The Trevor Project!'
 short_title: Pride Month Fundraiser 2025
-summary: A reflection on our Pride Month fundraiser campaign, which raised thousands for LGBTQ+ youth.
+summary: Reflecting on our Pride Month fundraiser campaign for LGBTQ+ youth.
 short_summary: A reflection on our Pride Month fundraiser campaign.
 date: 2025-07-01T14:00:00-04:00
+authors: ['6plzAzU4', 'bOHH0P9Z', '2cqK8Q5p', 'vNcGR3Fd']
 ---
 
 What an incredible Pride Month! This June, we came together to support [The Trevor Project](https://www.thetrevorproject.org/), an essential organization providing crisis support and life-saving resources for LGBTQ+ young people. We are absolutely thrilled to announce that our community raised a stellar **$2,395**. That's not all, though — during the campaign, some donations were matched by H&M and the Trevor Project's Board of Directors up to **six times**, meaning the final impact of Modrinth's donations is a whopping **$8,464**. Our team was also in the top ten for most funds raised this year!

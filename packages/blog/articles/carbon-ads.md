@@ -1,7 +1,8 @@
 ---
 title: Modrinth's Carbon Ads experiment
-summary: "As a step towards implementing author payouts, we're experimenting with a couple different ad providers to see which one works the best for us."
+summary: 'Experimenting with a different ad providers to find one which one works for us.'
 date: 2022-09-08
+authors: ['6plzAzU4']
 ---
 
 **Update 10/24:** A month and a half ago we began testing Carbon Ads on Modrinth, and in the end, using Carbon did not work out. After disabling ads with tracking in them, the revenue was about equal to or worse than what we were generating previously with EthicalAds. Effective today, we are switching our ads provider back to EthicalAds for the time being.

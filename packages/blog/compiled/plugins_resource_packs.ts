@@ -6,5 +6,6 @@ export const article = {
     'A small update with a big impact: plugins and resource packs are now available on Modrinth!',
   date: '2022-08-27T00:00:00.000Z',
   slug: 'plugins-resource-packs',
+  authors: ['6plzAzU4'],
   thumbnail: true,
 }

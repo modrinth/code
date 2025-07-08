@@ -5,5 +5,6 @@ export const article = {
   summary: 'Modrinth Servers is now fully operated in-house by the Modrinth Team.',
   date: '2025-03-13T00:00:00.000Z',
   slug: 'a-new-chapter-for-modrinth-servers',
+  authors: ['MpxzqsyW', 'Dc7EYhxG'],
   thumbnail: true,
 }

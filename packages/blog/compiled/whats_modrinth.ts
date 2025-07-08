@@ -6,5 +6,6 @@ export const article = {
     "Hello, we are Modrinth – an open source mods hosting platform. Sounds dry, doesn't it? So let me tell you our story – and I promise, it won't be boring!",
   date: '2020-11-27T00:00:00.000Z',
   slug: 'whats-modrinth',
+  authors: ['aNd6VJql'],
   thumbnail: false,
 }

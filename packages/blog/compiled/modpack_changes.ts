@@ -5,5 +5,6 @@ export const article = {
   summary: 'CurseForge CDN links requested to be removed by the end of the month',
   date: '2022-05-28T00:00:00.000Z',
   slug: 'modpack-changes',
+  authors: ['MpxzqsyW', 'Dc7EYhxG'],
   thumbnail: true,
 }
