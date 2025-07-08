@@ -17,9 +17,11 @@ import {
   UserIcon,
   WrenchIcon,
 } from "@modrinth/assets";
+import { isAdmin } from "@modrinth/utils";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
 
+const auth = await useAuth();
 const route = useRoute();
 const serverId = route.params.id as string;
 
@@ -46,7 +48,9 @@ const navLinks = [
   {
     icon: CardIcon,
     label: "Billing",
-    href: `/settings/billing#server-${serverId}`,
+    href: isAdmin(auth.value.user)
+      ? `/admin/billing/${props.server.general.owner_id}`
+      : `/settings/billing#server-${serverId}`,
     external: true,
   },
   { icon: InfoIcon, label: "Info", href: `/servers/manage/${serverId}/options/info` },
