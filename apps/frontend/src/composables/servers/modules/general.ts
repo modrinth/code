@@ -183,7 +183,7 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
 
   async getMotd(): Promise<string | undefined> {
     try {
-      const props = await this.server.fs.downloadFile("/server.properties");
+      const props = await this.server.fs.downloadFile("/server.properties", false, true);
       if (props) {
         const lines = props.split("\n");
         for (const line of lines) {
