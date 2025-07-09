@@ -136,11 +136,7 @@ const filteredResults = computed(() => {
 
   if (sortBy.value === 'Game version') {
     instances.sort((a, b) => {
-      return a.game_version.localeCompare(
-        b.game_version,
-        undefined,
-        { numeric: true }
-      )
+      return a.game_version.localeCompare(b.game_version, undefined, { numeric: true })
     })
   }
 
@@ -227,7 +223,6 @@ const filteredResults = computed(() => {
     sortedEntries.forEach((entry) => {
       instanceMap.set(entry[0], entry[1])
     })
-
   }
 
   return instanceMap
