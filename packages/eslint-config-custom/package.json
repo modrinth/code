@@ -1,0 +1,15 @@
+{
+  "name": "eslint-config-custom",
+  "license": "MIT",
+  "version": "0.0.0",
+  "private": true,
+  "devDependencies": {
+    "@nuxtjs/eslint-config-typescript": "^12.1.0",
+    "@vue/eslint-config-typescript": "^13.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-turbo": "^2.0.7",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-unicorn": "^54.0.0",
+    "typescript": "^5.5.3"
+  }
+}

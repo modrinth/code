@@ -1,0 +1,61 @@
+[package]
+name = "theseus_gui"
+version = "1.0.0-local" # The actual version is set by the theseus-build workflow on tagging
+description = "The Modrinth App is a desktop application for managing your Minecraft mods"
+license = "GPL-3.0-only"
+repository = "https://github.com/modrinth/code/apps/app/"
+edition.workspace = true
+
+[build-dependencies]
+tauri-build = { workspace = true, features = ["codegen"] }
+
+[dependencies]
+theseus = { workspace = true, features = ["tauri"] }
+
+serde_json.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_with.workspace = true
+
+tauri = { workspace = true, features = ["devtools", "macos-private-api", "protocol-asset"] }
+tauri-plugin-deep-link.workspace = true
+tauri-plugin-dialog.workspace = true
+tauri-plugin-http.workspace = true
+tauri-plugin-opener.workspace = true
+tauri-plugin-os.workspace = true
+tauri-plugin-single-instance.workspace = true
+tauri-plugin-updater.workspace = true
+tauri-plugin-window-state.workspace = true
+
+tokio = { workspace = true, features = ["time"] }
+thiserror.workspace = true
+daedalus.workspace = true
+chrono.workspace = true
+either.workspace = true
+
+url.workspace = true
+urlencoding.workspace = true
+uuid = { workspace = true, features = ["serde", "v4"] }
+
+tracing.workspace = true
+tracing-error.workspace = true
+
+dashmap.workspace = true
+paste.workspace = true
+enumset = { workspace = true, features = ["serde"] }
+
+native-dialog.workspace = true
+
+[target.'cfg(target_os = "linux")'.dependencies]
+tauri-plugin-updater = { workspace = true, optional = true }
+
+[features]
+# by default Tauri runs in production mode
+# when `tauri dev` runs it is executed with `cargo run --no-default-features` if `devPath` is an URL
+default = ["custom-protocol"]
+# this feature is used for production builds where `devPath` points to the filesystem
+# DO NOT remove this
+custom-protocol = ["tauri/custom-protocol"]
+updater = []
+
+[lints]
+workspace = true

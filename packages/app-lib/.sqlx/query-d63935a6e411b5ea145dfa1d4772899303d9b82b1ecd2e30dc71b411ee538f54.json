@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            INSERT INTO cache (id, data_type, alias, data, expires)\n                SELECT\n                    json_extract(value, '$.id') AS id,\n                    json_extract(value, '$.data_type') AS data_type,\n                    json_extract(value, '$.alias') AS alias,\n                    json_extract(value, '$.data') AS data,\n                    json_extract(value, '$.expires') AS expires\n                FROM\n                    json_each($1)\n                WHERE TRUE\n            ON CONFLICT (id, data_type) DO UPDATE SET\n                alias = excluded.alias,\n                data = excluded.data,\n                expires = excluded.expires\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "d63935a6e411b5ea145dfa1d4772899303d9b82b1ecd2e30dc71b411ee538f54"
+}

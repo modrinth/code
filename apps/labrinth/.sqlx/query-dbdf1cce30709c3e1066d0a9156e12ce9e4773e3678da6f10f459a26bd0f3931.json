@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO payout_sources_balance (account_type, amount, pending, recorded)\n        SELECT * FROM UNNEST ($1::text[], $2::numeric[], $3::boolean[], $4::timestamptz[])\n        ON CONFLICT (recorded, account_type, pending)\n        DO UPDATE SET amount = EXCLUDED.amount\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "TextArray",
+        "NumericArray",
+        "BoolArray",
+        "TimestamptzArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "dbdf1cce30709c3e1066d0a9156e12ce9e4773e3678da6f10f459a26bd0f3931"
+}

@@ -1,0 +1,237 @@
+// Use border box on everything to preserve everyone's sanity
+* {
+  box-sizing: border-box;
+}
+
+body {
+  // Defaults
+  background-color: var(--color-bg);
+  color: var(--color-base);
+  --font-standard: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto,
+    Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  --mono-font: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+  font-family: var(--font-standard);
+  font-size: 16px;
+  font-weight: var(--font-weight-regular);
+  margin: 0;
+  padding: 0;
+
+  // Font Sizes
+  --font-size-xxs: 0.625rem; //10px
+  --font-size-xs: 0.75rem; //12px
+  --font-size-sm: 0.875rem; //14px
+  --font-size-nm: 1rem; //16px
+  --font-size-md: 1.125rem; //18px
+  --font-size-lg: 1.25rem; //20px
+  --font-size-xl: 1.5rem; //24px
+  --font-size-2xl: 2rem; //32px
+  --font-size-3xl: 3rem; //48px
+
+  // Font Weights
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  --font-weight-text: var(--font-weight-medium);
+  --font-weight-heading: var(--font-weight-extrabold);
+  --font-weight-title: var(--font-weight-extrabold);
+}
+
+a.uncolored {
+  color: inherit;
+}
+
+input[type='text'],
+input[type='url'],
+input[type='number'],
+input[type='password'],
+textarea,
+.input-text-inherit,
+.cm-content {
+  border-radius: var(--radius-md);
+  box-sizing: border-box;
+  // safari iOS rounds inputs by default
+  // set the appearance to none to prevent this
+  appearance: none !important;
+  background: var(--color-button-bg);
+  color: var(--color-base);
+  padding: 0.5rem 1rem;
+  font-weight: var(--font-weight-medium);
+  transition: box-shadow 0.1s ease-in-out;
+  min-height: 36px;
+  box-shadow:
+    var(--shadow-inset-sm),
+    0 0 0 0 transparent;
+  border: none;
+  outline: none;
+
+  &:focus,
+  &:focus-visible {
+    box-shadow:
+      inset 0 0 0 transparent,
+      0 0 0 0.25rem var(--color-brand-shadow);
+    color: var(--color-contrast);
+    outline: none;
+  }
+
+  &:disabled,
+  &[disabled] {
+    opacity: 0.6;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  &:focus::placeholder {
+    opacity: 0.8;
+  }
+
+  &::placeholder {
+    color: var(--color-base);
+    opacity: 0.6;
+  }
+}
+
+.cm-content {
+  white-space: pre-wrap !important;
+}
+
+input[type='number'] {
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+.dropdown-input {
+  display: flex;
+  flex-direction: row;
+  gap: 1px;
+  .animated-dropdown {
+    width: unset;
+
+    .selected {
+      border-radius: var(--radius-md) 0 0 var(--radius-md);
+
+      &.render-down {
+        border-radius: var(--radius-md) 0 0 0;
+      }
+
+      &.render-up {
+        border-radius: 0 0 0 var(--radius-md);
+      }
+    }
+  }
+
+  input {
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  }
+}
+
+.iconified-input {
+  align-items: center;
+  display: inline-flex;
+  position: relative;
+
+  input {
+    padding: 0 0.5rem 0 2.5rem;
+    width: 100%;
+  }
+
+  &:focus-within svg {
+    opacity: 1;
+    color: var(--color-contrast);
+  }
+
+  svg {
+    position: absolute;
+    left: 0.75rem;
+    height: 1.25rem;
+    width: 1.25rem;
+    z-index: 1;
+
+    color: var(--color-base);
+    opacity: 0.6;
+  }
+
+  .r-btn {
+    @extend .transparent, .icon-only;
+
+    position: absolute;
+    right: 0.125rem;
+    z-index: 1;
+
+    svg {
+      position: relative;
+      left: 0;
+    }
+  }
+}
+
+svg {
+  height: 1em;
+  width: 1em;
+}
+
+.chart {
+  svg {
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.button-animation {
+  transition:
+    opacity 0.5s ease-in-out,
+    filter 0.2s ease-in-out,
+    transform 0.05s ease-in-out,
+    outline 0.2s ease-in-out;
+
+  &:active:not(&:disabled) {
+    transform: scale(0.95);
+  }
+}
+
+input,
+button {
+  &:disabled {
+    cursor: not-allowed !important;
+  }
+}
+
+@media (prefers-reduced-motion) {
+  .button-animation,
+  button {
+    transform: none !important;
+  }
+}
+
+input,
+button {
+  &:disabled {
+    cursor: not-allowed !important;
+  }
+}
+
+@media (prefers-reduced-motion) {
+  .button-animation,
+  button {
+    transform: none !important;
+  }
+}
+
+h1 {
+  color: var(--color-contrast);
+}
+
+h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--color-contrast);
+}
+
+h3 {
+  margin-block: var(--gap-md) var(--gap-md);
+  color: var(--color-contrast);
+}

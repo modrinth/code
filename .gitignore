@@ -38,9 +38,6 @@ testem.log
 .DS_Store
 Thumbs.db
 
-.nx/cache
-.nx/workspace-data
-
 # Nuxt dev/build outputs
 .output
 .data
@@ -48,5 +45,19 @@ Thumbs.db
 .nitro
 .cache
 
-# knossos generated files
-apps/knossos/src/generated
+# frontend generated files
+apps/frontend/src/generated
+
+.turbo
+target
+generated
+.env
+
+# app testing dir
+app-playground-data/*
+
+# soley because i need the PORT to be 3002 due to WSL stuff
+.env
+apps/frontend/.env
+
+.astro

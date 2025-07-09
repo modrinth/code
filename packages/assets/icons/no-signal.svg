@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 24 24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+  <path d="M2 20h.01"/>
+  <path d="M7,20v-4" />
+  <path d="M12,20v-8" />
+  <path d="M17,20v-12" />
+  <path d="M22,4v16" />
+  <g stroke="var(--color-red)">
+    <line x1="2" y1="4" x2="7.1" y2="9.1" />
+    <line x1="2" y1="9.1" x2="7.1" y2="4" />
+  </g>
+</svg>

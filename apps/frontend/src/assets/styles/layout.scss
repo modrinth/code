@@ -1,0 +1,227 @@
+.columns {
+  display: flex;
+
+  @for $i from 1 through 5 {
+    .column-grow-#{$i} {
+      flex-grow: $i;
+    }
+  }
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+
+  @for $i from 1 through 4 {
+    .row-grow-#{$i} {
+      flex-grow: $i;
+    }
+  }
+}
+.page-container {
+  margin: var(--spacing-card-md);
+  margin-top: 0;
+
+  .page-contents {
+    display: flex;
+    flex-direction: column;
+    .content {
+      width: 100%;
+    }
+    @media screen and (min-width: 1024px) {
+      flex-direction: row;
+      //max-width: 1280px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+}
+
+.normal-page {
+  display: grid;
+  padding: 0 1.5rem;
+
+  grid-template:
+    "sidebar"
+    "content"
+    "info"
+    / 100%;
+
+  @media screen and (max-width: 1024px) {
+    margin-top: var(--spacing-card-md);
+  }
+
+  .normal-page__sidebar {
+    grid-area: sidebar;
+  }
+
+  .normal-page__info {
+    grid-area: info;
+  }
+
+  .normal-page__content {
+    grid-area: content;
+  }
+
+  .normal-page__header {
+    grid-area: header;
+  }
+}
+
+@media (min-width: 1024px) {
+  .full-page {
+    margin: 0 auto;
+    max-width: min(1280px, 100vw);
+    width: 80rem;
+  }
+
+  .normal-page {
+    margin: 0 auto;
+    max-width: 80rem;
+    column-gap: 0.75rem;
+
+    grid-template:
+      "sidebar content" auto
+      "info content" auto
+      "dummy content" 1fr
+      / 18.75rem 1fr;
+
+    &.alt-layout {
+      grid-template:
+        "content sidebar" auto
+        "content info" auto
+        "content dummy" 1fr
+        / 1fr 18.75rem;
+    }
+
+    &.no-sidebar {
+      grid-template:
+        "header header" auto
+        "content content" auto
+        "info info" auto
+        "dummy dummy" 1fr
+        / 1fr 1fr;
+
+      .normal-page__content {
+        grid-area: content;
+        max-width: 100%;
+      }
+    }
+  }
+
+  .normal-page__sidebar {
+    min-width: 18.75rem;
+    width: 18.75rem;
+  }
+
+  .normal-page__content {
+    max-width: calc(80rem - 18.75rem - 1.5rem);
+    //overflow-x: hidden;
+  }
+}
+
+.new-page {
+  display: grid;
+  margin: 0 auto;
+  max-width: 80rem;
+  column-gap: 0.75rem;
+  padding: 0 1.5rem;
+  padding-bottom: 1.5rem;
+
+  grid-template:
+    "header"
+    "content"
+    "sidebar"
+    / 100%;
+
+  .normal-page__ultimate-sidebar {
+    grid-area: ultimate-sidebar;
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 100;
+    max-width: calc(100% - 2rem);
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+
+    > div {
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  @media screen and (min-width: 1024px) {
+    &.sidebar {
+      grid-template:
+        "header header" auto
+        "content sidebar" auto
+        "content dummy" 1fr
+        / 1fr 18.75rem;
+
+      &.alt-layout {
+        grid-template:
+          "header header" auto
+          "sidebar content" auto
+          "dummy content" 1fr
+          / 18.75rem 1fr;
+      }
+    }
+
+    .normal-page__sidebar {
+      min-width: 18.75rem;
+      width: 18.75rem;
+    }
+  }
+
+  @media screen and (min-width: 1400px) {
+    &.ultimate-sidebar {
+      max-width: calc(80rem + 0.75rem + 600px);
+
+      grid-template:
+        "header header ultimate-sidebar" auto
+        "content sidebar ultimate-sidebar" auto
+        "content dummy ultimate-sidebar" 1fr
+        / 1fr 18.75rem auto;
+
+      .normal-page__header {
+        max-width: 80rem;
+      }
+
+      .normal-page__ultimate-sidebar {
+        position: sticky;
+        top: 4.5rem;
+        bottom: unset;
+        right: unset;
+        z-index: unset;
+        align-self: start;
+        display: flex;
+        height: calc(100vh - 4.5rem * 2);
+
+        > div {
+          box-shadow: none;
+        }
+      }
+
+      &.alt-layout {
+        grid-template:
+          "ultimate-sidebar header header" auto
+          "ultimate-sidebar sidebar content" auto
+          "ultimate-sidebar dummy content" 1fr
+          / auto 18.75rem 1fr;
+      }
+    }
+  }
+
+  .normal-page__sidebar {
+    grid-area: sidebar;
+  }
+
+  .normal-page__content {
+    grid-area: content;
+    max-width: calc(80rem - 18.75rem - 1.5rem);
+    //overflow-x: hidden;
+  }
+
+  .normal-page__header {
+    grid-area: header;
+  }
+}

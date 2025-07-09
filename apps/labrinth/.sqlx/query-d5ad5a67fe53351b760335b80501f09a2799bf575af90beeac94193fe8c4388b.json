@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT tm.user_id id\n                FROM team_members tm\n                WHERE tm.team_id = $1 AND tm.accepted\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "d5ad5a67fe53351b760335b80501f09a2799bf575af90beeac94193fe8c4388b"
+}

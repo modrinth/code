@@ -1,8 +1,0 @@
-{
-  "name": "theseus-gui",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "projectType": "application",
-  "sourceRoot": "apps/theseus-gui/src",
-  "// targets": "to see all targets run: nx show project theseus-gui --web",
-  "targets": {}
-}
