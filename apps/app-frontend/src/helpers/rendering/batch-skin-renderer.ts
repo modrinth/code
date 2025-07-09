@@ -2,7 +2,13 @@ import * as THREE from 'three'
 import type { Skin, Cape } from '../skins'
 import { get_normalized_skin_texture, determineModelType } from '../skins'
 import { reactive } from 'vue'
-import { setupSkinModel, disposeCaches, loadTexture, applyCapeTexture } from '@modrinth/utils'
+import {
+  setupSkinModel,
+  disposeCaches,
+  loadTexture,
+  applyCapeTexture,
+  createTransparentTexture,
+} from '@modrinth/utils'
 import { skinPreviewStorage } from '../storage/skin-preview-storage'
 import { headStorage } from '../storage/head-storage'
 import { ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
@@ -120,6 +126,9 @@ class BatchSkinRenderer {
     if (capeUrl) {
       const capeTexture = await loadTexture(capeUrl)
       applyCapeTexture(model, capeTexture)
+    } else {
+      const transparentTexture = createTransparentTexture()
+      applyCapeTexture(model, null, transparentTexture)
     }
 
     const group = new THREE.Group()
