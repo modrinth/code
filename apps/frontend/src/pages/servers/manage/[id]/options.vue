@@ -16,14 +16,15 @@ import {
   CardIcon,
   UserIcon,
   WrenchIcon,
+  ModrinthIcon,
 } from "@modrinth/assets";
-import { isAdmin } from "@modrinth/utils";
+import { isAdmin as isUserAdmin, type User } from "@modrinth/utils";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
 
-const auth = await useAuth();
 const route = useRoute();
 const serverId = route.params.id as string;
+const auth = await useAuth();
 
 const props = defineProps<{
   server: ModrinthServer;
@@ -34,7 +35,11 @@ useHead({
   title: `Options - ${props.server.general?.name ?? "Server"} - Modrinth`,
 });
 
-const navLinks = [
+const ownerId = computed(() => props.server.general?.owner_id ?? "Ghost");
+const isOwner = computed(() => (auth.value?.user as User | null)?.id === ownerId.value);
+const isAdmin = computed(() => isUserAdmin(auth.value?.user));
+
+const navLinks = computed(() => [
   { icon: SettingsIcon, label: "General", href: `/servers/manage/${serverId}/options` },
   { icon: WrenchIcon, label: "Platform", href: `/servers/manage/${serverId}/options/loader` },
   { icon: TextQuoteIcon, label: "Startup", href: `/servers/manage/${serverId}/options/startup` },
@@ -48,11 +53,17 @@ const navLinks = [
   {
     icon: CardIcon,
     label: "Billing",
-    href: isAdmin(auth.value.user)
-      ? `/admin/billing/${props.server.general.owner_id}`
-      : `/settings/billing#server-${serverId}`,
+    href: `/settings/billing#server-${serverId}`,
     external: true,
+    shown: isOwner.value,
+  },
+  {
+    icon: ModrinthIcon,
+    label: "Admin Billing",
+    href: `/admin/billing/${ownerId.value}`,
+    external: true,
+    shown: isAdmin.value,
   },
   { icon: InfoIcon, label: "Info", href: `/servers/manage/${serverId}/options/info` },
-];
+]);
 </script>
