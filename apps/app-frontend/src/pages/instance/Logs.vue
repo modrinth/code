@@ -483,7 +483,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  height: calc(100vh - 11rem);
+  height: 100vh;
 }
 
 .button-row {
