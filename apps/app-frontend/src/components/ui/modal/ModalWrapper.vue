@@ -48,7 +48,13 @@ function onModalHide() {
 </script>
 
 <template>
-  <Modal ref="modal" :header="header" :noblur="!themeStore.advancedRendering" @hide="onModalHide">
+  <Modal
+    ref="modal"
+    :header="header"
+    :noblur="!themeStore.advancedRendering"
+    @hide="onModalHide"
+    :closable="closable"
+  >
     <template #title>
       <slot name="title" />
     </template>
