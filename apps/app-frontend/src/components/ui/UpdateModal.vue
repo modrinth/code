@@ -1,5 +1,10 @@
 <template>
-  <ModalWrapper ref="modal" :header="formatMessage(messages.header)" :on-hide="onHide">
+  <ModalWrapper
+    ref="modal"
+    :header="formatMessage(messages.header)"
+    :on-hide="onHide"
+    :closable="!updateInProgress"
+  >
     <div>{{ formatMessage(messages.bodyVersion, { version: update!.version }) }}</div>
     <div v-if="updateSize">
       {{ formatMessage(messages.bodySize, { size: formatBytes(updateSize) }) }}
@@ -9,20 +14,23 @@
         formatMessage(messages.bodyChangelog)
       }}</a>
     </div>
+    <ProgressBar class="mt-4" :progress="downloadProgress" />
     <div class="mt-4 flex flex-wrap gap-2">
       <ButtonStyled color="green">
-        <button>
+        <button :disabled="updateInProgress" @click="installUpdateNow">
           <RefreshCwIcon />
           {{ formatMessage(messages.restartNow) }}
         </button>
       </ButtonStyled>
       <ButtonStyled>
-        <button @click="hide">
+        <button :disabled="updateInProgress">
+          <RightArrowIcon />
           {{ formatMessage(messages.later) }}
         </button>
       </ButtonStyled>
       <ButtonStyled color="red">
-        <button @click="skipUpdate">
+        <button :disabled="updateInProgress" @click="skipUpdate">
+          <XIcon />
           {{ formatMessage(messages.skip) }}
         </button>
       </ButtonStyled>
@@ -35,10 +43,12 @@ import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { useTemplateRef, ref } from 'vue'
 import { ButtonStyled } from '@modrinth/ui'
-import { RefreshCwIcon } from '@modrinth/assets'
+import { RefreshCwIcon, XIcon, RightArrowIcon } from '@modrinth/assets'
 import { getUpdateSize } from '@/helpers/utils'
 import { formatBytes } from '@modrinth/utils'
 import { handleError } from '@/store/notifications'
+import ProgressBar from '@/components/ui/ProgressBar.vue'
+import { Update } from '@tauri-apps/plugin-updater'
 
 const emit = defineEmits<{
   (e: 'updateSkipped', version: string): void
@@ -79,11 +89,17 @@ const messages = defineMessages({
 
 type UpdateData = {
   rid: number
+  currentVersion: string
   version: string
+  date?: string
+  body?: string
+  rawJson: Record<string, unknown>
 }
 
 const update = ref<UpdateData>()
 const updateSize = ref<number>()
+const updateInProgress = ref(false)
+const downloadProgress = ref(0)
 
 const modal = useTemplateRef('modal')
 const isOpen = ref(false)
@@ -104,6 +120,22 @@ function hide() {
 }
 
 defineExpose({ show, hide, isOpen })
+
+function installUpdateNow() {
+  updateInProgress.value = true
+  let totalSize = 0
+  let totalDownloaded = 0
+  new Update(update.value!).downloadAndInstall((event) => {
+    if (event.event === 'Started') {
+      totalSize = event.data.contentLength!
+    } else if (event.event === 'Progress') {
+      totalDownloaded += event.data.chunkLength
+    } else if (event.event === 'Finished') {
+      totalDownloaded = totalSize
+    }
+    downloadProgress.value = (totalDownloaded / totalSize) * 100
+  })
+}
 
 function skipUpdate() {
   hide()
