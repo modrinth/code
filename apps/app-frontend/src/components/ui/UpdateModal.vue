@@ -17,12 +17,12 @@
         </button>
       </ButtonStyled>
       <ButtonStyled>
-        <button @click="hide()">
+        <button @click="hide">
           {{ formatMessage(messages.later) }}
         </button>
       </ButtonStyled>
       <ButtonStyled color="red">
-        <button>
+        <button @click="skipUpdate">
           {{ formatMessage(messages.skip) }}
         </button>
       </ButtonStyled>
@@ -39,6 +39,10 @@ import { RefreshCwIcon } from '@modrinth/assets'
 import { getUpdateSize } from '@/helpers/utils'
 import { formatBytes } from '@modrinth/utils'
 import { handleError } from '@/store/notifications'
+
+const emit = defineEmits<{
+  (e: 'updateSkipped', version: string): void
+}>()
 
 const { formatMessage } = useVIntl()
 
@@ -100,6 +104,11 @@ function hide() {
 }
 
 defineExpose({ show, hide, isOpen })
+
+function skipUpdate() {
+  hide()
+  emit('updateSkipped', update.value!.version)
+}
 </script>
 
 <style scoped lang="scss"></style>
