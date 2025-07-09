@@ -485,13 +485,13 @@ function handleAuxClick(e) {
         <ModrinthAppLogo class="h-full w-auto text-contrast pointer-events-none" />
         <div class="flex items-center gap-1 ml-3">
           <button
-            class="cursor-pointer p-0 m-0 border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
+            class="cursor-pointer p-0 m-0 text-contrast border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
             @click="router.back()"
           >
             <LeftArrowIcon />
           </button>
           <button
-            class="cursor-pointer p-0 m-0 border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
+            class="cursor-pointer p-0 m-0 text-contrast border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
             @click="router.forward()"
           >
             <RightArrowIcon />
