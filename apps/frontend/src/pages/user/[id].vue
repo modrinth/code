@@ -1,168 +1,179 @@
 <template>
-  <div v-if="user">
+  <div v-if="user" class="experimental-styles-within">
     <ModalCreation ref="modal_creation" />
     <CollectionCreateModal ref="modal_collection_creation" />
-    <div class="user-header-wrapper">
-      <div class="user-header">
-        <Avatar :src="user.avatar_url" size="md" circle :alt="user.username" />
-        <h1 class="username">
-          {{ user.username }}
-        </h1>
-      </div>
-    </div>
-    <div class="normal-page">
-      <div class="normal-page__sidebar">
-        <div class="card sidebar">
-          <h1 class="mobile-username">
-            {{ user.username }}
-          </h1>
-          <div class="card__overlay">
-            <NuxtLink
-              v-if="auth.user && auth.user.id === user.id"
-              to="/settings/profile"
-              class="iconified-button"
-            >
-              <EditIcon />
-              {{ formatMessage(commonMessages.editButton) }}
-            </NuxtLink>
-            <button
-              v-else-if="auth.user"
-              class="iconified-button"
-              @click="() => reportUser(user.id)"
-            >
-              <ReportIcon aria-hidden="true" />
-              {{ formatMessage(messages.profileReportButton) }}
-            </button>
-            <nuxt-link v-else class="iconified-button" to="/auth/sign-in">
-              <ReportIcon aria-hidden="true" />
-              {{ formatMessage(messages.profileReportButton) }}
-            </nuxt-link>
-          </div>
-          <div class="sidebar__item">
-            <Badge v-if="tags.staffRoles.includes(user.role)" :type="user.role" />
-            <Badge v-else-if="projects.length > 0" type="creator" />
-          </div>
-          <span v-if="user.bio" class="sidebar__item bio">{{ user.bio }}</span>
-          <hr class="card-divider" />
-          <div class="primary-stat">
-            <DownloadIcon class="primary-stat__icon" aria-hidden="true" />
-            <div class="primary-stat__text">
-              <IntlFormatted
-                :message-id="messages.profileDownloadsStats"
-                :values="{ count: formatCompactNumber(sumDownloads) }"
-              >
-                <template #stat="{ children }">
-                  <span class="primary-stat__counter">
-                    <component :is="() => normalizeChildren(children)" />
-                  </span>
-                </template>
-              </IntlFormatted>
-            </div>
-          </div>
-          <div class="primary-stat">
-            <HeartIcon class="primary-stat__icon" aria-hidden="true" />
-            <div class="primary-stat__text">
-              <IntlFormatted
-                :message-id="messages.profileProjectsFollowersStats"
-                :values="{ count: formatCompactNumber(sumFollows) }"
-              >
-                <template #stat="{ children }">
-                  <span class="primary-stat__counter">
-                    <component :is="() => normalizeChildren(children)" />
-                  </span>
-                </template>
-              </IntlFormatted>
-            </div>
-          </div>
-          <div class="stats-block__item secondary-stat">
-            <SunriseIcon class="secondary-stat__icon" aria-hidden="true" />
+    <NewModal v-if="auth.user && isStaff(auth.user)" ref="userDetailsModal" header="User details">
+      <div class="flex flex-col gap-3">
+        <div class="flex flex-col gap-1">
+          <span class="text-lg font-bold text-primary">Email</span>
+          <div>
             <span
+              v-tooltip="user.email_verified ? 'Email verified' : 'Email not verified'"
+              class="flex w-fit items-center gap-1"
+            >
+              <span>{{ user.email }}</span>
+              <CheckIcon v-if="user.email_verified" class="h-4 w-4 text-brand" />
+              <XIcon v-else class="h-4 w-4 text-red" />
+            </span>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <span class="text-lg font-bold text-primary"> Auth providers </span>
+          <span>{{ user.auth_providers.join(", ") }}</span>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <span class="text-lg font-bold text-primary"> Payment methods</span>
+          <span>
+            <template v-if="user.payout_data?.paypal_address">
+              Paypal ({{ user.payout_data.paypal_address }} - {{ user.payout_data.paypal_country }})
+            </template>
+            <template v-if="user.payout_data?.paypal_address && user.payout_data?.venmo_address">
+              ,
+            </template>
+            <template v-if="user.payout_data?.venmo_address">
+              Venmo ({{ user.payout_data.venmo_address }})
+            </template>
+          </span>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <span class="text-lg font-bold text-primary"> Has password </span>
+          <span>
+            {{ user.has_password ? "Yes" : "No" }}
+          </span>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <span class="text-lg font-bold text-primary"> Has TOTP </span>
+          <span>
+            {{ user.has_totp ? "Yes" : "No" }}
+          </span>
+        </div>
+      </div>
+    </NewModal>
+    <div class="new-page sidebar" :class="{ 'alt-layout': cosmetics.leftContentLayout }">
+      <div class="normal-page__header py-4">
+        <ContentPageHeader>
+          <template #icon>
+            <Avatar :src="user.avatar_url" :alt="user.username" size="96px" circle />
+          </template>
+          <template #title>
+            {{ user.username }}
+          </template>
+          <template #summary>
+            {{
+              user.bio
+                ? user.bio
+                : projects.length === 0
+                  ? "A Modrinth user."
+                  : "A Modrinth creator."
+            }}
+          </template>
+          <template #stats>
+            <div
+              class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
+            >
+              <BoxIcon class="h-6 w-6 text-secondary" />
+              {{ formatCompactNumber(projects?.length || 0) }}
+              projects
+            </div>
+            <div
+              v-tooltip="sumDownloads.toLocaleString()"
+              class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
+            >
+              <DownloadIcon class="h-6 w-6 text-secondary" />
+              {{ formatCompactNumber(sumDownloads) }}
+              downloads
+            </div>
+            <div
               v-tooltip="
                 formatMessage(commonMessages.dateAtTimeTooltip, {
                   date: new Date(user.created),
                   time: new Date(user.created),
                 })
               "
-              class="secondary-stat__text date"
+              class="flex items-center gap-2 font-semibold"
             >
-              {{
-                formatMessage(messages.profileJoinedAt, { ago: formatRelativeTime(user.created) })
-              }}
-            </span>
-          </div>
-          <hr class="card-divider" />
-          <div class="stats-block__item secondary-stat">
-            <UserIcon class="secondary-stat__icon" aria-hidden="true" />
-            <span class="secondary-stat__text">
-              <IntlFormatted :message-id="messages.profileUserId">
-                <template #~id>
-                  <CopyCode :text="user.id" />
-                </template>
-              </IntlFormatted>
-            </span>
-          </div>
-          <template v-if="organizations.length > 0">
-            <hr class="card-divider" />
-            <div class="stats-block__item">
-              <IntlFormatted :message-id="messages.profileOrganizations" />
-              <div class="organizations-grid">
-                <nuxt-link
-                  v-for="org in organizations"
-                  :key="org.id"
-                  v-tooltip="org.name"
-                  class="organization"
-                  :to="`/organization/${org.slug}`"
-                >
-                  <Avatar :src="org.icon_url" :alt="'Icon for ' + org.name" size="xs" />
-                </nuxt-link>
-              </div>
+              <CalendarIcon class="h-6 w-6 text-secondary" />
+              Joined
+              {{ formatRelativeTime(user.created) }}
             </div>
           </template>
-        </div>
+          <template #actions>
+            <ButtonStyled size="large">
+              <NuxtLink v-if="auth.user && auth.user.id === user.id" to="/settings/profile">
+                <EditIcon aria-hidden="true" />
+                {{ formatMessage(commonMessages.editButton) }}
+              </NuxtLink>
+            </ButtonStyled>
+            <ButtonStyled size="large" circular type="transparent">
+              <OverflowMenu
+                :options="[
+                  {
+                    id: 'manage-projects',
+                    action: () => navigateTo('/dashboard/projects'),
+                    hoverOnly: true,
+                    shown: auth.user && auth.user.id === user.id,
+                  },
+                  { divider: true, shown: auth.user && auth.user.id === user.id },
+                  {
+                    id: 'report',
+                    action: () => (auth.user ? reportUser(user.id) : navigateTo('/auth/sign-in')),
+                    color: 'red',
+                    hoverOnly: true,
+                    shown: auth.user?.id !== user.id,
+                  },
+                  { id: 'copy-id', action: () => copyId() },
+                  { id: 'copy-permalink', action: () => copyPermalink() },
+                  {
+                    id: 'open-billing',
+                    action: () => navigateTo(`/admin/billing/${user.id}`),
+                    shown: auth.user && isStaff(auth.user),
+                  },
+                  {
+                    id: 'open-info',
+                    action: () => $refs.userDetailsModal.show(),
+                    shown: auth.user && isStaff(auth.user),
+                  },
+                ]"
+                aria-label="More options"
+              >
+                <MoreVerticalIcon aria-hidden="true" />
+                <template #manage-projects>
+                  <BoxIcon aria-hidden="true" />
+                  {{ formatMessage(messages.profileManageProjectsButton) }}
+                </template>
+                <template #report>
+                  <ReportIcon aria-hidden="true" />
+                  {{ formatMessage(commonMessages.reportButton) }}
+                </template>
+                <template #copy-id>
+                  <ClipboardCopyIcon aria-hidden="true" />
+                  {{ formatMessage(commonMessages.copyIdButton) }}
+                </template>
+                <template #copy-permalink>
+                  <ClipboardCopyIcon aria-hidden="true" />
+                  {{ formatMessage(commonMessages.copyPermalinkButton) }}
+                </template>
+                <template #open-billing>
+                  <CurrencyIcon aria-hidden="true" />
+                  {{ formatMessage(messages.billingButton) }}
+                </template>
+                <template #open-info>
+                  <InfoIcon aria-hidden="true" />
+                  {{ formatMessage(messages.infoButton) }}
+                </template>
+              </OverflowMenu>
+            </ButtonStyled>
+          </template>
+        </ContentPageHeader>
       </div>
       <div class="normal-page__content">
-        <Promotion :external="false" query-param="" />
-        <nav class="navigation-card">
-          <NavRow
-            :links="[
-              {
-                label: formatMessage(commonMessages.allProjectType),
-                href: `/user/${user.username}`,
-              },
-              ...projectTypes.map((x) => {
-                return {
-                  label: formatMessage(getProjectTypeMessage(x, true)),
-                  href: `/user/${user.username}/${x}s`,
-                };
-              }),
-            ]"
-          />
-          <div class="input-group">
-            <NuxtLink
-              v-if="auth.user && auth.user.id === user.id"
-              class="iconified-button"
-              to="/dashboard/projects"
-            >
-              <SettingsIcon />
-              {{ formatMessage(messages.profileManageProjectsButton) }}
-            </NuxtLink>
-            <button
-              v-if="route.params.projectType !== 'collections'"
-              v-tooltip="
-                formatMessage(commonMessages[`${cosmetics.searchDisplayMode.user}InputView`])
-              "
-              :aria-label="
-                formatMessage(commonMessages[`${cosmetics.searchDisplayMode.user}InputView`])
-              "
-              class="square-button"
-              @click="cycleSearchDisplayMode()"
-            >
-              <GridIcon v-if="cosmetics.searchDisplayMode.user === 'grid'" />
-              <ImageIcon v-else-if="cosmetics.searchDisplayMode.user === 'gallery'" />
-              <ListIcon v-else />
-            </button>
-          </div>
-        </nav>
+        <div v-if="navLinks.length >= 2" class="mb-4 max-w-full overflow-x-auto">
+          <NavTabs :links="navLinks" />
+        </div>
         <div v-if="projects.length > 0">
           <div
             v-if="route.params.projectType !== 'collections'"
@@ -204,7 +215,8 @@
           </div>
         </div>
         <div v-else-if="route.params.projectType !== 'collections'" class="error">
-          <UpToDate class="icon" /><br />
+          <UpToDate class="icon" />
+          <br />
           <span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
             <IntlFormatted :message-id="messages.profileNoProjectsAuthLabel">
               <template #create-link="{ children }">
@@ -218,7 +230,9 @@
         </div>
         <div v-if="['collections'].includes(route.params.projectType)" class="collections-grid">
           <nuxt-link
-            v-for="collection in collections"
+            v-for="collection in collections.sort(
+              (a, b) => new Date(b.created) - new Date(a.created),
+            )"
             :key="collection.id"
             :to="`/collection/${collection.id}`"
             class="card collection-item"
@@ -228,7 +242,7 @@
               <div class="details">
                 <h2 class="title">{{ collection.name }}</h2>
                 <div class="stats">
-                  <LibraryIcon />
+                  <LibraryIcon aria-hidden="true" />
                   Collection
                 </div>
               </div>
@@ -237,10 +251,15 @@
               {{ collection.description }}
             </div>
             <div class="stat-bar">
-              <div class="stats"><BoxIcon /> {{ collection.projects?.length || 0 }} projects</div>
+              <div class="stats">
+                <BoxIcon />
+                {{
+                  `${$formatNumber(collection.projects?.length || 0, false)} project${(collection.projects?.length || 0) !== 1 ? "s" : ""}`
+                }}
+              </div>
               <div class="stats">
                 <template v-if="collection.status === 'listed'">
-                  <WorldIcon />
+                  <GlobeIcon />
                   <span> Public </span>
                 </template>
                 <template v-else-if="collection.status === 'unlisted'">
@@ -263,11 +282,15 @@
           v-if="route.params.projectType === 'collections' && collections.length === 0"
           class="error"
         >
-          <UpToDate class="icon" /><br />
+          <UpToDate class="icon" />
+          <br />
           <span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
             <IntlFormatted :message-id="messages.profileNoCollectionsAuthLabel">
               <template #create-link="{ children }">
-                <a class="link" @click.prevent="$refs.modal_collection_creation.show()">
+                <a
+                  class="link"
+                  @click.prevent="(event) => $refs.modal_collection_creation.show(event)"
+                >
                   <component :is="() => children" />
                 </a>
               </template>
@@ -276,69 +299,136 @@
           <span v-else class="text">{{ formatMessage(messages.profileNoCollectionsLabel) }}</span>
         </div>
       </div>
+      <div class="normal-page__sidebar">
+        <div v-if="organizations.length > 0" class="card flex-card">
+          <h2 class="text-lg text-contrast">{{ formatMessage(messages.profileOrganizations) }}</h2>
+          <div class="flex flex-wrap gap-2">
+            <nuxt-link
+              v-for="org in sortedOrgs"
+              :key="org.id"
+              v-tooltip="org.name"
+              class="organization"
+              :to="`/organization/${org.slug}`"
+            >
+              <Avatar :src="org.icon_url" :alt="'Icon for ' + org.name" size="3rem" />
+            </nuxt-link>
+          </div>
+        </div>
+        <div v-if="badges.length > 0" class="card flex-card">
+          <h2 class="text-lg text-contrast">{{ formatMessage(messages.profileBadges) }}</h2>
+          <div class="flex flex-wrap gap-2">
+            <div v-for="badge in badges" :key="badge">
+              <StaffBadge v-if="badge === 'staff'" class="h-14 w-14" />
+              <ModBadge v-else-if="badge === 'mod'" class="h-14 w-14" />
+              <nuxt-link v-else-if="badge === 'plus'" to="/plus">
+                <PlusBadge class="h-14 w-14" />
+              </nuxt-link>
+              <TenMClubBadge v-else-if="badge === '10m-club'" class="h-14 w-14" />
+              <EarlyAdopterBadge v-else-if="badge === 'early-adopter'" class="h-14 w-14" />
+              <AlphaTesterBadge v-else-if="badge === 'alpha-tester'" class="h-14 w-14" />
+              <BetaTesterBadge v-else-if="badge === 'beta-tester'" class="h-14 w-14" />
+            </div>
+          </div>
+        </div>
+        <AdPlaceholder v-if="!auth.user" />
+      </div>
     </div>
   </div>
 </template>
 <script setup>
-import { LibraryIcon, BoxIcon, LinkIcon, LockIcon, XIcon } from "@modrinth/assets";
-import { Promotion } from "@modrinth/ui";
+import {
+  LibraryIcon,
+  BoxIcon,
+  LinkIcon,
+  LockIcon,
+  XIcon,
+  CalendarIcon,
+  DownloadIcon,
+  ClipboardCopyIcon,
+  MoreVerticalIcon,
+  CurrencyIcon,
+  InfoIcon,
+  CheckIcon,
+  ReportIcon,
+  EditIcon,
+  GlobeIcon,
+} from "@modrinth/assets";
+import {
+  Avatar,
+  OverflowMenu,
+  ButtonStyled,
+  ContentPageHeader,
+  commonMessages,
+  NewModal,
+  useRelativeTime,
+} from "@modrinth/ui";
+import { isStaff } from "~/helpers/users.js";
+import NavTabs from "~/components/ui/NavTabs.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
-import Badge from "~/components/ui/Badge.vue";
 import { reportUser } from "~/utils/report-helpers.ts";
 
-import ReportIcon from "~/assets/images/utils/report.svg?component";
-import SunriseIcon from "~/assets/images/utils/sunrise.svg?component";
-import DownloadIcon from "~/assets/images/utils/download.svg?component";
-import SettingsIcon from "~/assets/images/utils/settings.svg?component";
+import StaffBadge from "~/assets/images/badges/staff.svg?component";
+import ModBadge from "~/assets/images/badges/mod.svg?component";
+import PlusBadge from "~/assets/images/badges/plus.svg?component";
+import TenMClubBadge from "~/assets/images/badges/10m-club.svg?component";
+import EarlyAdopterBadge from "~/assets/images/badges/early-adopter.svg?component";
+import AlphaTesterBadge from "~/assets/images/badges/alpha-tester.svg?component";
+import BetaTesterBadge from "~/assets/images/badges/beta-tester.svg?component";
+
 import UpToDate from "~/assets/images/illustrations/up_to_date.svg?component";
-import UserIcon from "~/assets/images/utils/user.svg?component";
-import EditIcon from "~/assets/images/utils/edit.svg?component";
-import HeartIcon from "~/assets/images/utils/heart.svg?component";
-import GridIcon from "~/assets/images/utils/grid.svg?component";
-import ListIcon from "~/assets/images/utils/list.svg?component";
-import ImageIcon from "~/assets/images/utils/image.svg?component";
-import WorldIcon from "~/assets/images/utils/world.svg?component";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
-import NavRow from "~/components/ui/NavRow.vue";
-import CopyCode from "~/components/ui/CopyCode.vue";
-import Avatar from "~/components/ui/Avatar.vue";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
+import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const data = useNuxtApp();
 const route = useNativeRoute();
 const auth = await useAuth();
 const cosmetics = useCosmetics();
 const tags = useTags();
+const config = useRuntimeConfig();
 
 const vintl = useVIntl();
 const { formatMessage } = vintl;
 
-const formatCompactNumber = useCompactNumber();
+const formatCompactNumber = useCompactNumber(true);
 
 const formatRelativeTime = useRelativeTime();
 
 const messages = defineMessages({
+  profileProjectsStats: {
+    id: "profile.stats.projects",
+    defaultMessage:
+      "{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> projects}}",
+  },
   profileDownloadsStats: {
     id: "profile.stats.downloads",
     defaultMessage:
-      "{count, plural, one {<stat>{count}</stat> download} other {<stat>{count}</stat> downloads}}",
+      "{count, plural, one {<stat>{count}</stat> project download} other {<stat>{count}</stat> project downloads}}",
   },
   profileProjectsFollowersStats: {
     id: "profile.stats.projects-followers",
     defaultMessage:
-      "{count, plural, one {<stat>{count}</stat> follower} other {<stat>{count}</stat> followers}} of projects",
+      "{count, plural, one {<stat>{count}</stat> project follower} other {<stat>{count}</stat> project followers}}",
   },
   profileJoinedAt: {
     id: "profile.joined-at",
-    defaultMessage: "Joined {ago}",
+    defaultMessage: "Joined <date>{ago}</date>",
   },
   profileUserId: {
     id: "profile.user-id",
     defaultMessage: "User ID: {id}",
   },
+  profileDetails: {
+    id: "profile.label.details",
+    defaultMessage: "Details",
+  },
   profileOrganizations: {
     id: "profile.label.organizations",
     defaultMessage: "Organizations",
+  },
+  profileBadges: {
+    id: "profile.label.badges",
+    defaultMessage: "Badges",
   },
   profileManageProjectsButton: {
     id: "profile.button.manage-projects",
@@ -351,10 +441,6 @@ const messages = defineMessages({
   profileMetaDescriptionWithBio: {
     id: "profile.meta.description-with-bio",
     defaultMessage: "{bio} - Download {username}'s projects on Modrinth",
-  },
-  profileReportButton: {
-    id: "profile.button.report",
-    defaultMessage: "Report",
   },
   profileNoProjectsLabel: {
     id: "profile.label.no-projects",
@@ -373,6 +459,14 @@ const messages = defineMessages({
     id: "profile.label.no-collections-auth",
     defaultMessage:
       "You don't have any collections.\nWould you like to <create-link>create one</create-link>?",
+  },
+  billingButton: {
+    id: "profile.button.billing",
+    defaultMessage: "Manage user billing",
+  },
+  infoButton: {
+    id: "profile.button.info",
+    defaultMessage: "View user details",
   },
   userNotFoundError: {
     id: "profile.error.not-found",
@@ -419,6 +513,8 @@ try {
     message: formatMessage(messages.userNotFoundError),
   });
 }
+
+const sortedOrgs = computed(() => organizations.value.sort((a, b) => a.name.localeCompare(b.name)));
 
 if (!user.value) {
   throw createError({
@@ -474,23 +570,78 @@ const sumDownloads = computed(() => {
 
   return sum;
 });
-const sumFollows = computed(() => {
-  let sum = 0;
 
-  for (const project of projects.value) {
-    sum += project.followers;
+const joinDate = computed(() => new Date(user.value.created));
+const MODRINTH_BETA_END_DATE = new Date("2022-02-27T08:00:00.000Z");
+const MODRINTH_ALPHA_END_DATE = new Date("2020-11-30T08:00:00.000Z");
+
+const badges = computed(() => {
+  const badges = [];
+
+  if (user.value.role === "admin") {
+    badges.push("staff");
   }
 
-  return sum;
+  if (user.value.role === "moderator") {
+    badges.push("mod");
+  }
+
+  if (isPermission(user.value.badges, 1 << 0)) {
+    badges.push("plus");
+  }
+
+  if (sumDownloads.value > 10000000) {
+    badges.push("10m-club");
+  }
+
+  if (
+    isPermission(user.value.badges, 1 << 1) ||
+    isPermission(user.value.badges, 1 << 2) ||
+    isPermission(user.value.badges, 1 << 3)
+  ) {
+    badges.push("early-adopter");
+  }
+
+  if (isPermission(user.value.badges, 1 << 4) || joinDate.value < MODRINTH_ALPHA_END_DATE) {
+    badges.push("alpha-tester");
+  } else if (isPermission(user.value.badges, 1 << 4) || joinDate.value < MODRINTH_BETA_END_DATE) {
+    badges.push("beta-tester");
+  }
+
+  if (isPermission(user.value.badges, 1 << 5)) {
+    badges.push("contributor");
+  }
+
+  if (isPermission(user.value.badges, 1 << 6)) {
+    badges.push("translator");
+  }
+
+  return badges;
 });
 
-function cycleSearchDisplayMode() {
-  cosmetics.value.searchDisplayMode.user = data.$cycleValue(
-    cosmetics.value.searchDisplayMode.user,
-    tags.value.projectViewModes,
-  );
-  saveCosmetics();
+async function copyId() {
+  await navigator.clipboard.writeText(user.value.id);
 }
+
+async function copyPermalink() {
+  await navigator.clipboard.writeText(`${config.public.siteUrl}/user/${user.value.id}`);
+}
+
+const navLinks = computed(() => [
+  {
+    label: formatMessage(commonMessages.allProjectType),
+    href: `/user/${user.value.username}`,
+  },
+  ...projectTypes.value
+    .map((x) => {
+      return {
+        label: formatMessage(getProjectTypeMessage(x, true)),
+        href: `/user/${user.value.username}/${x}s`,
+      };
+    })
+    .slice()
+    .sort((a, b) => a.label.localeCompare(b.label)),
+]);
 </script>
 <script>
 export default defineNuxtComponent({
@@ -499,16 +650,6 @@ export default defineNuxtComponent({
 </script>
 
 <style lang="scss" scoped>
-.organizations-grid {
-  // 5 wide
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-
-  grid-gap: var(--gap-sm);
-  margin-top: 0.5rem;
-}
-
 .collections-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -517,12 +658,13 @@ export default defineNuxtComponent({
     grid-template-columns: repeat(1, 1fr);
   }
 
-  gap: var(--gap-lg);
+  gap: var(--gap-md);
 
   .collection-item {
     display: flex;
     flex-direction: column;
     gap: var(--gap-md);
+    margin-bottom: 0px;
   }
 
   .description {
@@ -571,115 +713,11 @@ export default defineNuxtComponent({
 
       .title {
         color: var(--color-contrast);
-        font-weight: 600;
+        font-weight: 700;
         font-size: var(--font-size-lg);
         margin: 0;
       }
     }
-  }
-}
-
-.user-header-wrapper {
-  display: flex;
-  margin: 0 auto -1.5rem;
-  max-width: 80rem;
-
-  .user-header {
-    position: relative;
-    z-index: 4;
-    display: flex;
-    width: 100%;
-    padding: 0 1rem;
-    gap: 1rem;
-    align-items: center;
-
-    .username {
-      display: none;
-      font-size: 2rem;
-      margin-bottom: 2.5rem;
-    }
-  }
-}
-
-.mobile-username {
-  margin: 0.25rem 0;
-}
-
-@media screen and (min-width: 501px) {
-  .mobile-username {
-    display: none;
-  }
-
-  .user-header-wrapper .user-header .username {
-    display: block;
-  }
-}
-
-.sidebar {
-  padding-top: 2.5rem;
-}
-
-.sidebar__item:not(:last-child) {
-  margin: 0 0 0.75rem 0;
-}
-
-.profile-picture {
-  border-radius: var(--size-rounded-lg);
-  height: 8rem;
-  width: 8rem;
-}
-
-.username {
-  font-size: var(--font-size-xl);
-}
-
-.bio {
-  display: block;
-  overflow-wrap: break-word;
-}
-
-.secondary-stat {
-  align-items: center;
-  display: flex;
-  margin-bottom: 0.8rem;
-}
-
-.secondary-stat__icon {
-  height: 1rem;
-  width: 1rem;
-}
-
-.secondary-stat__text {
-  margin-left: 0.4rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.date {
-  cursor: default;
-}
-
-.inputs {
-  margin-bottom: 1rem;
-
-  input {
-    margin-top: 0.5rem;
-    width: 100%;
-  }
-
-  label {
-    margin-bottom: 0;
-  }
-}
-
-.textarea-wrapper {
-  height: 10rem;
-}
-
-@media (max-width: 400px) {
-  .sidebar {
-    padding-top: 3rem;
   }
 }
 </style>

@@ -16,14 +16,14 @@
           {{ copied ? 'Copied' : 'Copy' }}
         </Button>
         <Button color="primary" :disabled="offline || !logs[selectedLogIndex]" @click="share">
-          <ShareIcon />
+          <ShareIcon aria-hidden="true" />
           Share
         </Button>
         <Button
           v-if="logs[selectedLogIndex] && logs[selectedLogIndex].live === true"
           @click="clearLiveLog()"
         >
-          <TrashIcon />
+          <TrashIcon aria-hidden="true" />
           Clear
         </Button>
 
@@ -33,7 +33,7 @@
           color="danger"
           @click="deleteLog()"
         >
-          <TrashIcon />
+          <TrashIcon aria-hidden="true" />
           Delete
         </Button>
       </div>
@@ -76,11 +76,12 @@
         </div>
       </RecycleScroller>
     </div>
-    <ShareModal
+    <ShareModalWrapper
       ref="shareModal"
       header="Share Log"
       share-title="Instance Log"
       share-text="Check out this log from an instance on the Modrinth App"
+      :open-in-new-tab="false"
       link
     />
   </Card>
@@ -88,7 +89,7 @@
 
 <script setup>
 import { CheckIcon, ClipboardCopyIcon, ShareIcon, TrashIcon } from '@modrinth/assets'
-import { Button, Card, ShareModal, Checkbox, DropdownSelect } from '@modrinth/ui'
+import { Button, Card, Checkbox, DropdownSelect } from '@modrinth/ui'
 import {
   delete_logs_by_filename,
   get_logs,
@@ -99,14 +100,14 @@ import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch
 import dayjs from 'dayjs'
 import isToday from 'dayjs/plugin/isToday'
 import isYesterday from 'dayjs/plugin/isYesterday'
-import { get_uuids_by_profile_path } from '@/helpers/process.js'
+import { get_by_profile_path } from '@/helpers/process.js'
 import { useRoute } from 'vue-router'
 import { process_listener } from '@/helpers/events.js'
 import { handleError } from '@/store/notifications.js'
 import { ofetch } from 'ofetch'
-
 import { RecycleScroller } from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
+import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 
 dayjs.extend(isToday)
 dayjs.extend(isYesterday)
@@ -116,15 +117,37 @@ const route = useRoute()
 const props = defineProps({
   instance: {
     type: Object,
-    required: true,
+    default() {
+      return {}
+    },
+  },
+  options: {
+    type: Object,
+    default() {
+      return {}
+    },
   },
   offline: {
     type: Boolean,
-    default: false,
+    default() {
+      return false
+    },
   },
   playing: {
     type: Boolean,
-    default: false,
+    default() {
+      return false
+    },
+  },
+  versions: {
+    type: Array,
+    required: true,
+  },
+  installed: {
+    type: Boolean,
+    default() {
+      return false
+    },
   },
 })
 
@@ -209,9 +232,9 @@ const processedLogs = computed(() => {
 
 async function getLiveStdLog() {
   if (route.params.id) {
-    const uuids = await get_uuids_by_profile_path(route.params.id).catch(handleError)
+    const processes = await get_by_profile_path(route.params.id).catch(handleError)
     let returnValue
-    if (uuids.length === 0) {
+    if (processes.length === 0) {
       returnValue = emptyText.join('\n')
     } else {
       const logCursor = await get_latest_log_cursor(
@@ -295,7 +318,7 @@ if (logs.value.length > 1 && !props.playing) {
 
 const deleteLog = async () => {
   if (logs.value[selectedLogIndex.value] && selectedLogIndex.value !== 0) {
-    let deleteIndex = selectedLogIndex.value
+    const deleteIndex = selectedLogIndex.value
     selectedLogIndex.value = deleteIndex - 1
     await delete_logs_by_filename(
       props.instance.path,
@@ -412,8 +435,8 @@ function handleUserScroll() {
 interval.value = setInterval(async () => {
   if (logs.value.length > 0) {
     logs.value[0] = await getLiveStdLog()
-
     const scroll = logContainer.value.getScroll()
+
     // Allow resetting of userScrolled if the user scrolls to the bottom
     if (selectedLogIndex.value === 0) {
       if (scroll.end >= logContainer.value.$el.scrollHeight - 10) userScrolled.value = false
@@ -489,10 +512,6 @@ onUnmounted(() => {
   white-space: nowrap; /* Keeps content on a single line */
   white-space: normal;
   color-scheme: dark;
-
-  .no-wrap {
-    white-space: pre;
-  }
 }
 
 .filter-checkbox {

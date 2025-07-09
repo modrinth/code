@@ -57,7 +57,7 @@
 </template>
 <script setup>
 import { XIcon } from "@modrinth/assets";
-import { commonSettingsMessages } from "~/utils/common-messages.ts";
+import { commonMessages, commonSettingsMessages, useRelativeTime } from "@modrinth/ui";
 
 definePageMeta({
   middleware: "auth",
@@ -119,7 +119,7 @@ async function revokeSession(id) {
     data.$notify({
       group: "main",
       title: formatMessage(commonMessages.errorNotificationTitle),
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
   }

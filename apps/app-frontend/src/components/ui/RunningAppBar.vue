@@ -1,29 +1,24 @@
 <template>
   <div class="action-groups">
-    <a href="https://support.modrinth.com" class="link">
-      <ChatIcon />
-      <span> Get support </span>
-    </a>
-    <Button
-      v-if="currentLoadingBars.length > 0"
-      ref="infoButton"
-      icon-only
-      class="icon-button show-card-icon"
-      @click="toggleCard()"
-    >
-      <DownloadIcon />
-    </Button>
+    <ButtonStyled v-if="currentLoadingBars.length > 0" color="brand" type="transparent" circular>
+      <button ref="infoButton" @click="toggleCard()">
+        <DownloadIcon />
+      </button>
+    </ButtonStyled>
     <div v-if="offline" class="status">
-      <span class="circle stopped" />
-      <div class="running-text clickable" @click="refreshInternet()">
+      <UnplugIcon />
+      <div class="running-text">
         <span> Offline </span>
       </div>
     </div>
-    <div v-if="selectedProfile" class="status">
+    <div v-if="selectedProcess" class="status">
       <span class="circle running" />
       <div ref="profileButton" class="running-text">
-        <router-link :to="`/instance/${encodeURIComponent(selectedProfile.path)}`">
-          {{ selectedProfile.metadata.name }}
+        <router-link
+          class="text-primary"
+          :to="`/instance/${encodeURIComponent(selectedProcess.profile.path)}`"
+        >
+          {{ selectedProcess.profile.name }}
         </router-link>
         <div
           v-if="currentProcesses.length > 1"
@@ -34,20 +29,16 @@
           <DropdownIcon />
         </div>
       </div>
-      <Button v-tooltip="'Stop instance'" icon-only class="icon-button stop" @click="stop()">
+      <Button
+        v-tooltip="'Stop instance'"
+        icon-only
+        class="icon-button stop"
+        @click="stop(selectedProcess)"
+      >
         <StopCircleIcon />
       </Button>
       <Button v-tooltip="'View logs'" icon-only class="icon-button" @click="goToTerminal()">
         <TerminalSquareIcon />
-      </Button>
-      <Button
-        v-if="currentLoadingBars.length > 0"
-        ref="infoButton"
-        icon-only
-        class="icon-button show-card-icon"
-        @click="toggleCard()"
-      >
-        <DownloadIcon />
       </Button>
     </div>
     <div v-else class="status">
@@ -75,17 +66,17 @@
       class="profile-card"
     >
       <Button
-        v-for="profile in currentProcesses"
-        :key="profile.id"
+        v-for="process in currentProcesses"
+        :key="process.uuid"
         class="profile-button"
-        @click="selectProfile(profile)"
+        @click="selectProcess(process)"
       >
-        <div class="text"><span class="circle running" /> {{ profile.metadata.name }}</div>
+        <div class="text"><span class="circle running" /> {{ process.profile.name }}</div>
         <Button
           v-tooltip="'Stop instance'"
           icon-only
           class="icon-button stop"
-          @click.stop="stop(profile.path)"
+          @click.stop="stop(process)"
         >
           <StopCircleIcon />
         </Button>
@@ -93,7 +84,7 @@
           v-tooltip="'View logs'"
           icon-only
           class="icon-button"
-          @click.stop="goToTerminal(profile.path)"
+          @click.stop="goToTerminal(process.profile.path)"
         >
           <TerminalSquareIcon />
         </Button>
@@ -103,22 +94,23 @@
 </template>
 
 <script setup>
-import { DownloadIcon, StopCircleIcon, TerminalSquareIcon, DropdownIcon } from '@modrinth/assets'
-import { Button, Card } from '@modrinth/ui'
-import { onBeforeUnmount, onMounted, ref } from 'vue'
 import {
-  get_all_running_profiles as getRunningProfiles,
-  kill_by_uuid as killProfile,
-  get_uuids_by_profile_path as getProfileProcesses,
-} from '@/helpers/process'
-import { loading_listener, process_listener, offline_listener } from '@/helpers/events'
+  DownloadIcon,
+  StopCircleIcon,
+  TerminalSquareIcon,
+  DropdownIcon,
+  UnplugIcon,
+} from '@modrinth/assets'
+import { Button, ButtonStyled, Card } from '@modrinth/ui'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { get_all as getRunningProcesses, kill as killProcess } from '@/helpers/process'
+import { loading_listener, process_listener } from '@/helpers/events'
 import { useRouter } from 'vue-router'
 import { progress_bars_list } from '@/helpers/state.js'
-import { refreshOffline, isOffline } from '@/helpers/utils.js'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { handleError } from '@/store/notifications.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
-import { ChatIcon } from '@/assets/icons'
+import { get_many } from '@/helpers/profile.js'
+import { trackEvent } from '@/helpers/analytics'
 
 const router = useRouter()
 const card = ref(null)
@@ -129,38 +121,43 @@ const showCard = ref(false)
 
 const showProfiles = ref(false)
 
-const currentProcesses = ref(await getRunningProfiles().catch(handleError))
-const selectedProfile = ref(currentProcesses.value[0])
+const currentProcesses = ref([])
+const selectedProcess = ref()
 
-const offline = ref(await isOffline().catch(handleError))
-const refreshInternet = async () => {
-  offline.value = await refreshOffline().catch(handleError)
+const refresh = async () => {
+  const processes = await getRunningProcesses().catch(handleError)
+  const profiles = await get_many(processes.map((x) => x.profile_path)).catch(handleError)
+
+  currentProcesses.value = processes.map((x) => ({
+    profile: profiles.find((prof) => x.profile_path === prof.path),
+    ...x,
+  }))
+  if (!selectedProcess.value || !currentProcesses.value.includes(selectedProcess.value)) {
+    selectedProcess.value = currentProcesses.value[0]
+  }
 }
+
+await refresh()
+
+const offline = ref(!navigator.onLine)
+window.addEventListener('offline', () => {
+  offline.value = true
+})
+window.addEventListener('online', () => {
+  offline.value = false
+})
 
 const unlistenProcess = await process_listener(async () => {
   await refresh()
 })
 
-const unlistenRefresh = await offline_listener(async (b) => {
-  offline.value = b
-  await refresh()
-})
-
-const refresh = async () => {
-  currentProcesses.value = await getRunningProfiles().catch(handleError)
-  if (!currentProcesses.value.includes(selectedProfile.value)) {
-    selectedProfile.value = currentProcesses.value[0]
-  }
-}
-
-const stop = async (path) => {
+const stop = async (process) => {
   try {
-    const processes = await getProfileProcesses(path ?? selectedProfile.value.path)
-    await killProfile(processes[0])
+    await killProcess(process.uuid).catch(handleError)
 
-    mixpanel_track('InstanceStop', {
-      loader: currentProcesses.value[0].metadata.loader,
-      game_version: currentProcesses.value[0].metadata.game_version,
+    trackEvent('InstanceStop', {
+      loader: process.profile.loader,
+      game_version: process.profile.game_version,
       source: 'AppBar',
     })
   } catch (e) {
@@ -170,7 +167,7 @@ const stop = async (path) => {
 }
 
 const goToTerminal = (path) => {
-  router.push(`/instance/${encodeURIComponent(path ?? selectedProfile.value.path)}/logs`)
+  router.push(`/instance/${encodeURIComponent(path ?? selectedProcess.value.profile.path)}/logs`)
 }
 
 const currentLoadingBars = ref([])
@@ -182,8 +179,8 @@ const refreshInfo = async () => {
       if (x.bar_type.type === 'java_download') {
         x.title = 'Downloading Java ' + x.bar_type.version
       }
-      if (x.bar_type.profile_name) {
-        x.title = x.bar_type.profile_name
+      if (x.bar_type.profile_path) {
+        x.title = x.bar_type.profile_path
       }
       if (x.bar_type.pack_name) {
         x.title = x.bar_type.pack_name
@@ -215,8 +212,8 @@ const unlistenLoading = await loading_listener(async () => {
   await refreshInfo()
 })
 
-const selectProfile = (profile) => {
-  selectedProfile.value = profile
+const selectProcess = (process) => {
+  selectedProcess.value = process
   showProfiles.value = false
 }
 
@@ -267,7 +264,6 @@ onBeforeUnmount(() => {
   window.removeEventListener('click', handleClickOutsideProfile)
   unlistenProcess()
   unlistenLoading()
-  unlistenRefresh()
 })
 </script>
 
@@ -335,8 +331,12 @@ onBeforeUnmount(() => {
   width: 1.25rem !important;
   height: 1.25rem !important;
 
+  svg {
+    min-width: 1.25rem;
+  }
+
   &.stop {
-    --text-color: var(--color-red) !important;
+    color: var(--color-red);
   }
 }
 
@@ -397,10 +397,6 @@ onBeforeUnmount(() => {
     width: 2.25rem;
     height: 2.25rem;
   }
-}
-
-.show-card-icon {
-  color: var(--color-brand);
 }
 
 .download-enter-active,

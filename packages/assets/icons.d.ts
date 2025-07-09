@@ -4,3 +4,13 @@ declare module '*.svg?component' {
   const src: FunctionalComponent<SVGAttributes>
   export default src
 }
+
+declare module '*.webp' {
+  const src: string
+  export default src
+}
+
+declare module '*?url' {
+  const src: string
+  export default src
+}

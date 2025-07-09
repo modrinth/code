@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            INSERT INTO modrinth_users (id, active, session_id, expires)\n            VALUES ($1, $2, $3, $4)\n            ON CONFLICT (id) DO UPDATE SET\n                active = $2,\n                session_id = $3,\n                expires = $4\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "81a80df2f3fdbbb78d45e7420609c3ae945bc499b4229906c487533d1dcb280c"
+}

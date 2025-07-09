@@ -1,46 +1,33 @@
 <script setup>
-import { Modal, Button } from '@modrinth/ui'
+import { Button } from '@modrinth/ui'
 import { ref } from 'vue'
-import { useFetch } from '@/helpers/fetch.js'
 import SearchCard from '@/components/ui/SearchCard.vue'
 import { get_categories } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'
-import { install as packInstall } from '@/helpers/pack.js'
-import mixpanel from 'mixpanel-browser'
-import ModInstallModal from '@/components/ui/ModInstallModal.vue'
+import { get_version, get_project } from '@/helpers/cache.js'
+import { install as installVersion } from '@/store/install.js'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 const confirmModal = ref(null)
 const project = ref(null)
 const version = ref(null)
 const categories = ref(null)
 const installing = ref(false)
-const modInstallModal = ref(null)
 
 defineExpose({
   async show(event) {
     if (event.event === 'InstallVersion') {
-      version.value = await useFetch(
-        `https://api.modrinth.com/v2/version/${encodeURIComponent(event.id)}`,
-        'version',
-      )
-      project.value = await useFetch(
-        `https://api.modrinth.com/v2/project/${encodeURIComponent(version.value.project_id)}`,
-        'project',
+      version.value = await get_version(event.id, 'must_revalidate').catch(handleError)
+      project.value = await get_project(version.value.project_id, 'must_revalidate').catch(
+        handleError,
       )
     } else {
-      project.value = await useFetch(
-        `https://api.modrinth.com/v2/project/${encodeURIComponent(event.id)}`,
-        'project',
-      )
-      version.value = await useFetch(
-        `https://api.modrinth.com/v2/version/${encodeURIComponent(project.value.versions[0])}`,
-        'version',
-      )
+      project.value = await get_project(event.id, 'must_revalidate').catch(handleError)
+      version.value = await get_version(
+        project.value.versions[project.value.versions.length - 1],
+        'must_revalidate',
+      ).catch(handleError)
     }
-    categories.value = (await get_categories().catch(handleError)).filter(
-      (cat) => project.value.categories.includes(cat.name) && cat.project_type === 'mod',
-    )
-    confirmModal.value.show()
     categories.value = (await get_categories().catch(handleError)).filter(
       (cat) => project.value.categories.includes(cat.name) && cat.project_type === 'mod',
     )
@@ -50,33 +37,12 @@ defineExpose({
 
 async function install() {
   confirmModal.value.hide()
-  if (project.value.project_type === 'modpack') {
-    await packInstall(
-      project.value.id,
-      version.value.id,
-      project.value.title,
-      project.value.icon_url,
-    ).catch(handleError)
-
-    mixpanel.track('PackInstall', {
-      id: project.value.id,
-      version_id: version.value.id,
-      title: project.value.title,
-      source: 'ProjectPage',
-    })
-  } else {
-    modInstallModal.value.show(
-      project.value.id,
-      [version.value],
-      project.value.title,
-      project.value.project_type,
-    )
-  }
+  await installVersion(project.value.id, version.value.id, null, 'URLConfirmModal')
 }
 </script>
 
 <template>
-  <Modal ref="confirmModal" :header="`Install ${project?.title}`">
+  <ModalWrapper ref="confirmModal" :header="`Install ${project?.title}`">
     <div class="modal-body">
       <SearchCard
         :project="project"
@@ -95,8 +61,7 @@ async function install() {
         </div>
       </div>
     </div>
-  </Modal>
-  <ModInstallModal ref="modInstallModal" />
+  </ModalWrapper>
 </template>
 
 <style scoped lang="scss">
@@ -106,7 +71,6 @@ async function install() {
   align-items: center;
   justify-content: center;
   gap: var(--gap-md);
-  padding: var(--gap-lg);
 }
 
 .button-row {

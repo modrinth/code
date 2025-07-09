@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                        UPDATE uploaded_images\n                        SET thread_message_id = $1\n                        WHERE id = $2\n                        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "45e3f7d3ae0396c0b0196ed959f9b60c57b7c57390758ddcc58fb2e0f276a426"
+}

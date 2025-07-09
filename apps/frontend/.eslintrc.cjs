@@ -1,4 +1,7 @@
 module.exports = {
   root: true,
-  extends: ["custom/nuxt"],
+  extends: ["../../packages/eslint-config-custom/nuxt.js"],
+  rules: {
+    "import/no-unresolved": "off",
+  },
 };

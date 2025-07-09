@@ -3,12 +3,7 @@
  * So, for example, addDefaultInstance creates a blank Profile object, where the Rust struct is serialized,
  *  and deserialized into a usable JS object.
  */
-import { invoke } from '@tauri-apps/api/tauri'
-
-// Gets tag bundle of all tags
-export async function get_tag_bundle() {
-  return await invoke('plugin:tags|tags_get_tag_bundle')
-}
+import { invoke } from '@tauri-apps/api/core'
 
 // Gets cached category tags
 export async function get_categories() {

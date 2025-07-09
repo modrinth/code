@@ -1,6 +1,6 @@
-use std::path::PathBuf;
-
 use crate::api::Result;
+use dashmap::DashMap;
+use std::path::PathBuf;
 use tauri::plugin::TauriPlugin;
 use theseus::prelude::JavaVersion;
 use theseus::prelude::*;
@@ -8,6 +8,8 @@ use theseus::prelude::*;
 pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
     tauri::plugin::Builder::new("jre")
         .invoke_handler(tauri::generate_handler![
+            get_java_versions,
+            set_java_version,
             jre_find_filtered_jres,
             jre_get_jre,
             jre_test_jre,
@@ -15,6 +17,17 @@ pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
             jre_get_max_memory,
         ])
         .build()
+}
+
+#[tauri::command]
+pub async fn get_java_versions() -> Result<DashMap<u32, JavaVersion>> {
+    Ok(jre::get_java_versions().await?)
+}
+
+#[tauri::command]
+pub async fn set_java_version(java_version: JavaVersion) -> Result<()> {
+    jre::set_java_version(java_version).await?;
+    Ok(())
 }
 
 // Finds the installation of Java 8, if it exists
@@ -28,8 +41,8 @@ pub async fn jre_find_filtered_jres(
 // Validates JRE at a given path
 // Returns None if the path is not a valid JRE
 #[tauri::command]
-pub async fn jre_get_jre(path: PathBuf) -> Result<Option<JavaVersion>> {
-    jre::check_jre(path).await.map_err(|e| e.into())
+pub async fn jre_get_jre(path: PathBuf) -> Result<JavaVersion> {
+    Ok(jre::check_jre(path).await?)
 }
 
 // Tests JRE of a certain version

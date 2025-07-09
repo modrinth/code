@@ -1,17 +1,19 @@
 {
   "name": "@modrinth/app",
   "scripts": {
+    "tauri": "tauri",
     "build": "tauri build",
     "dev": "tauri dev",
-    "test": "cargo test",
-    "lint": "cargo fmt --check && cargo clippy -- -D warnings",
-    "fix": "cargo fmt && cargo clippy --fix"
+    "test": "cargo nextest run --all-targets --no-fail-fast",
+    "lint": "cargo fmt --check && cargo clippy --all-targets",
+    "fix": "cargo clippy --all-targets --fix --allow-dirty && cargo fmt"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^1.6.0"
+    "@tauri-apps/cli": "2.5.0"
   },
   "dependencies": {
+    "@modrinth/app-frontend": "workspace:*",
     "@modrinth/app-lib": "workspace:*",
-    "@modrinth/app-frontend": "workspace:*"
+    "@modrinth/daedalus": "workspace:*"
   }
 }

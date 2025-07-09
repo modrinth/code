@@ -1,278 +1,144 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
-use crate::config::MODRINTH_API_URL;
-use crate::data::DirectoryInfo;
-use crate::event::emit::{emit_profile, emit_warning};
-use crate::event::ProfilePayloadType;
-use crate::prelude::JavaVersion;
-use crate::state::projects::Project;
-use crate::state::{ModrinthVersion, ProjectMetadata, ProjectType};
-use crate::util::fetch::{
-    fetch, fetch_json, write, write_cached_icon, IoSemaphore,
+use crate::profile::get_full_path;
+use crate::state::server_join_log::JoinLogEntry;
+use crate::state::{
+    CacheBehaviour, CachedEntry, CachedFileHash, cache_file_hash,
 };
-use crate::util::io::{self, IOError};
-use crate::State;
-use chrono::{DateTime, Utc};
-use daedalus::get_hash;
-use daedalus::modded::LoaderVersion;
-use futures::prelude::*;
-use notify::{RecommendedWatcher, RecursiveMode};
-use notify_debouncer_mini::Debouncer;
-use reqwest::Method;
+use crate::util;
+use crate::util::fetch::{FetchSemaphore, IoSemaphore, write_cached_icon};
+use crate::util::io::{self};
+use chrono::{DateTime, TimeDelta, TimeZone, Utc};
+use dashmap::DashMap;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::io::Cursor;
-use std::{
-    collections::HashMap,
-    path::{Path, PathBuf},
-};
-use uuid::Uuid;
+use sqlx::SqlitePool;
+use std::collections::HashSet;
+use std::convert::TryFrom;
+use std::convert::TryInto;
+use std::path::Path;
+use std::sync::LazyLock;
+use tokio::fs::DirEntry;
+use tokio::io::{AsyncBufReadExt, AsyncRead};
+use tokio::task::JoinSet;
 
-const PROFILE_JSON_PATH: &str = "profile.json";
+// Represent a Minecraft instance.
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct Profile {
+    pub path: String,
+    pub install_stage: ProfileInstallStage,
+    pub launcher_feature_version: LauncherFeatureVersion,
 
-pub(crate) struct Profiles(pub HashMap<ProfilePathId, Profile>);
+    pub name: String,
+    pub icon_path: Option<String>,
 
-#[derive(
-    Serialize, Deserialize, Clone, Copy, Debug, Default, Eq, PartialEq,
-)]
+    pub game_version: String,
+    pub protocol_version: Option<i32>,
+    pub loader: ModLoader,
+    pub loader_version: Option<String>,
+
+    pub groups: Vec<String>,
+
+    pub linked_data: Option<LinkedData>,
+
+    pub created: DateTime<Utc>,
+    pub modified: DateTime<Utc>,
+    pub last_played: Option<DateTime<Utc>>,
+
+    pub submitted_time_played: u64,
+    pub recent_time_played: u64,
+
+    pub java_path: Option<String>,
+    pub extra_launch_args: Option<Vec<String>>,
+    pub custom_env_vars: Option<Vec<(String, String)>>,
+
+    pub memory: Option<MemorySettings>,
+    pub force_fullscreen: Option<bool>,
+    pub game_resolution: Option<WindowSize>,
+    pub hooks: Hooks,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum ProfileInstallStage {
     /// Profile is installed
     Installed,
     /// Profile's minecraft game is still installing
-    Installing,
+    MinecraftInstalling,
+    /// Pack is installed, but Minecraft installation has not begun
+    PackInstalled,
     /// Profile created for pack, but the pack hasn't been fully installed yet
     PackInstalling,
     /// Profile is not installed
-    #[default]
     NotInstalled,
 }
 
-/// newtype wrapper over a Profile path, to be usable as a clear identifier for the kind of path used
-/// eg: for "a/b/c/profiles/My Mod", the ProfilePathId would be "My Mod" (a relative path)
-#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Hash)]
-#[serde(transparent)]
-pub struct ProfilePathId(PathBuf);
-
-impl ProfilePathId {
-    // Create a new ProfilePathId from a full file path
-    pub async fn from_fs_path(path: PathBuf) -> crate::Result<Self> {
-        let path: PathBuf = io::canonicalize(path)?;
-        let profiles_dir = io::canonicalize(
-            State::get().await?.directories.profiles_dir().await,
-        )?;
-        path.strip_prefix(profiles_dir)
-            .ok()
-            .and_then(|p| p.file_name())
-            .ok_or_else(|| {
-                crate::ErrorKind::FSError(format!(
-                    "Path {path:?} does not correspond to a profile",
-                    path = path
-                ))
-            })?;
-        Ok(Self(path))
+impl ProfileInstallStage {
+    pub fn as_str(&self) -> &'static str {
+        match *self {
+            Self::Installed => "installed",
+            Self::MinecraftInstalling => "minecraft_installing",
+            Self::PackInstalled => "pack_installed",
+            Self::PackInstalling => "pack_installing",
+            Self::NotInstalled => "not_installed",
+        }
     }
 
-    // Create a new ProfilePathId from a relative path
-    pub fn new(path: impl Into<PathBuf>) -> Self {
-        ProfilePathId(path.into())
-    }
-
-    pub async fn get_full_path(&self) -> crate::Result<PathBuf> {
-        let state = State::get().await?;
-        let profiles_dir = state.directories.profiles_dir().await;
-        Ok(profiles_dir.join(&self.0))
-    }
-
-    pub fn check_valid_utf(&self) -> crate::Result<&Self> {
-        self.0
-            .to_str()
-            .ok_or(crate::ErrorKind::UTFError(self.0.clone()).as_error())?;
-        Ok(self)
-    }
-
-    pub async fn profile_path(&self) -> crate::Result<ProfilePathId> {
-        if let Some(p) = crate::profile::get(self, None).await? {
-            Ok(p.profile_id())
-        } else {
-            Err(crate::ErrorKind::UnmanagedProfileError(self.to_string())
-                .into())
+    pub fn from_str(val: &str) -> Self {
+        match val {
+            "installed" => Self::Installed,
+            "minecraft_installing" => Self::MinecraftInstalling,
+            "installing" => Self::MinecraftInstalling, // Backwards compatibility
+            "pack_installed" => Self::PackInstalled,
+            "pack_installing" => Self::PackInstalling,
+            "not_installed" => Self::NotInstalled,
+            _ => Self::NotInstalled,
         }
     }
 }
-impl std::fmt::Display for ProfilePathId {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.display().fmt(f)
-    }
+
+#[derive(
+    Serialize, Deserialize, Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum LauncherFeatureVersion {
+    None,
+    MigratedServerLastPlayTime,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Hash)]
-#[serde(into = "RawProjectPath", from = "RawProjectPath")]
-pub struct InnerProjectPathUnix(pub String);
+impl LauncherFeatureVersion {
+    pub const MOST_RECENT: Self = Self::MigratedServerLastPlayTime;
 
-impl InnerProjectPathUnix {
-    pub fn get_topmost_two_components(&self) -> String {
-        self.to_string()
-            .split('/')
-            .take(2)
-            .collect::<Vec<_>>()
-            .join("/")
-    }
-}
-
-impl std::fmt::Display for InnerProjectPathUnix {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
-    }
-}
-
-impl From<RawProjectPath> for InnerProjectPathUnix {
-    fn from(value: RawProjectPath) -> Self {
-        // Convert windows path to unix path.
-        // .mrpacks no longer generate windows paths, but this is here for backwards compatibility before this was fixed
-        // https://github.com/modrinth/theseus/issues/595
-        InnerProjectPathUnix(value.0.replace('\\', "/"))
-    }
-}
-
-#[derive(Serialize, Deserialize)]
-#[serde(transparent)]
-struct RawProjectPath(pub String);
-
-impl From<InnerProjectPathUnix> for RawProjectPath {
-    fn from(value: InnerProjectPathUnix) -> Self {
-        RawProjectPath(value.0)
-    }
-}
-
-/// newtype wrapper over a Profile path, to be usable as a clear identifier for the kind of path used
-/// eg: for "a/b/c/profiles/My Mod/mods/myproj", the ProjectPathId would be "mods/myproj"
-#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Hash)]
-#[serde(transparent)]
-pub struct ProjectPathId(pub PathBuf);
-impl ProjectPathId {
-    // Create a new ProjectPathId from a full file path
-    pub async fn from_fs_path(path: &PathBuf) -> crate::Result<Self> {
-        // This is avoiding dunce::canonicalize deliberately. On Windows, paths will always be convert to UNC,
-        // but this is ok because we are stripping that with the prefix. Using std::fs avoids different behaviors with dunce that
-        // come with too-long paths
-        let profiles_dir: PathBuf = std::fs::canonicalize(
-            State::get().await?.directories.profiles_dir().await,
-        )?;
-        let path: PathBuf = std::fs::canonicalize(path)?;
-        let path = path
-            .strip_prefix(profiles_dir)
-            .ok()
-            .map(|p| p.components().skip(1).collect::<PathBuf>())
-            .ok_or_else(|| {
-                crate::ErrorKind::FSError(format!(
-                    "Path {path:?} does not correspond to a profile",
-                    path = path
-                ))
-            })?;
-        Ok(Self(path))
+    pub fn as_str(&self) -> &'static str {
+        match *self {
+            Self::None => "none",
+            Self::MigratedServerLastPlayTime => {
+                "migrated_server_last_play_time"
+            }
+        }
     }
 
-    pub async fn get_full_path(
-        &self,
-        profile: ProfilePathId,
-    ) -> crate::Result<PathBuf> {
-        let profile_dir = profile.get_full_path().await?;
-        Ok(profile_dir.join(&self.0))
+    pub fn from_str(val: &str) -> Self {
+        match val {
+            "none" => Self::None,
+            "migrated_server_last_play_time" => {
+                Self::MigratedServerLastPlayTime
+            }
+            _ => Self::None,
+        }
     }
-
-    // Gets inner path in unix convention as a String
-    // ie: 'mods\myproj' -> 'mods/myproj'
-    // Used for exporting to mrpack, which should have a singular convention
-    pub fn get_inner_path_unix(&self) -> InnerProjectPathUnix {
-        InnerProjectPathUnix(
-            self.0
-                .components()
-                .map(|c| c.as_os_str().to_string_lossy().to_string())
-                .collect::<Vec<_>>()
-                .join("/"),
-        )
-    }
-
-    // Create a new ProjectPathId from a relative path
-    pub fn new(path: &Path) -> Self {
-        ProjectPathId(PathBuf::from(path))
-    }
-}
-
-// Represent a Minecraft instance.
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct Profile {
-    pub uuid: Uuid, // todo: will be used in restructure to refer to profiles
-    #[serde(default)]
-    pub install_stage: ProfileInstallStage,
-    #[serde(default)]
-    pub path: PathBuf, // Relative path to the profile, to be used in ProfilePathId
-    pub metadata: ProfileMetadata,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub java: Option<JavaSettings>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub memory: Option<MemorySettings>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub resolution: Option<WindowSize>,
-    pub fullscreen: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub hooks: Option<Hooks>,
-    pub projects: HashMap<ProjectPathId, Project>,
-    #[serde(default)]
-    pub modrinth_update_version: Option<String>,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct ProfileMetadata {
-    pub name: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub icon: Option<PathBuf>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub icon_url: Option<String>,
-    #[serde(default)]
-    pub groups: Vec<String>,
-
-    pub game_version: String,
-    #[serde(default)]
-    pub loader: ModLoader,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub loader_version: Option<LoaderVersion>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub linked_data: Option<LinkedData>,
-
-    #[serde(default)]
-    pub date_created: DateTime<Utc>,
-    #[serde(default)]
-    pub date_modified: DateTime<Utc>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub last_played: Option<DateTime<Utc>>,
-    #[serde(default)]
-    pub submitted_time_played: u64,
-    #[serde(default)]
-    pub recent_time_played: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct LinkedData {
-    pub project_id: Option<String>,
-    pub version_id: Option<String>,
+    pub project_id: String,
+    pub version_id: String,
 
-    #[serde(default = "default_locked")]
-    pub locked: Option<bool>,
+    pub locked: bool,
 }
 
-// Called if linked_data is present but locked is not
-// Meaning this is a legacy profile, and we should consider it locked
-pub fn default_locked() -> Option<bool> {
-    Some(true)
-}
-
-#[derive(
-    Debug, Eq, PartialEq, Clone, Copy, Deserialize, Serialize, Default,
-)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum ModLoader {
-    #[default]
     Vanilla,
     Forge,
     Fabric,
@@ -280,20 +146,8 @@ pub enum ModLoader {
     NeoForge,
 }
 
-impl std::fmt::Display for ModLoader {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(match *self {
-            Self::Vanilla => "Vanilla",
-            Self::Forge => "Forge",
-            Self::Fabric => "Fabric",
-            Self::Quilt => "Quilt",
-            Self::NeoForge => "NeoForge",
-        })
-    }
-}
-
 impl ModLoader {
-    pub(crate) fn as_api_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &'static str {
         match *self {
             Self::Vanilla => "vanilla",
             Self::Forge => "forge",
@@ -302,65 +156,442 @@ impl ModLoader {
             Self::NeoForge => "neoforge",
         }
     }
+
+    pub fn as_meta_str(&self) -> &'static str {
+        match *self {
+            Self::Vanilla => "vanilla",
+            Self::Forge => "forge",
+            Self::Fabric => "fabric",
+            Self::Quilt => "quilt",
+            Self::NeoForge => "neo",
+        }
+    }
+
+    pub fn from_string(val: &str) -> Self {
+        match val {
+            "vanilla" => Self::Vanilla,
+            "forge" => Self::Forge,
+            "fabric" => Self::Fabric,
+            "quilt" => Self::Quilt,
+            "neoforge" => Self::NeoForge,
+            _ => Self::Vanilla,
+        }
+    }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct JavaSettings {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub override_version: Option<JavaVersion>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub extra_arguments: Option<Vec<String>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub custom_env_args: Option<Vec<(String, String)>>,
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ProfileFile {
+    pub hash: String,
+    pub file_name: String,
+    pub size: u64,
+    pub metadata: Option<FileMetadata>,
+    pub update_version_id: Option<String>,
+    pub project_type: ProjectType,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct FileMetadata {
+    pub project_id: String,
+    pub version_id: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Copy, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum ProjectType {
+    Mod,
+    DataPack,
+    ResourcePack,
+    ShaderPack,
+}
+
+impl ProjectType {
+    pub fn get_from_loaders(loaders: Vec<String>) -> Option<Self> {
+        if loaders
+            .iter()
+            .any(|x| ["fabric", "forge", "quilt", "neoforge"].contains(&&**x))
+        {
+            Some(ProjectType::Mod)
+        } else if loaders.iter().any(|x| x == "datapack") {
+            Some(ProjectType::DataPack)
+        } else if loaders.iter().any(|x| ["iris", "optifine"].contains(&&**x)) {
+            Some(ProjectType::ShaderPack)
+        } else if loaders
+            .iter()
+            .any(|x| ["vanilla", "canvas", "minecraft"].contains(&&**x))
+        {
+            Some(ProjectType::ResourcePack)
+        } else {
+            None
+        }
+    }
+
+    pub fn get_from_parent_folder(path: &Path) -> Option<Self> {
+        // Get parent folder
+        let path = path.parent()?.file_name()?;
+        match path.to_str()? {
+            "mods" => Some(ProjectType::Mod),
+            "datapacks" => Some(ProjectType::DataPack),
+            "resourcepacks" => Some(ProjectType::ResourcePack),
+            "shaderpacks" => Some(ProjectType::ShaderPack),
+            _ => None,
+        }
+    }
+
+    pub fn get_name(&self) -> &'static str {
+        match self {
+            ProjectType::Mod => "mod",
+            ProjectType::DataPack => "datapack",
+            ProjectType::ResourcePack => "resourcepack",
+            ProjectType::ShaderPack => "shader",
+        }
+    }
+
+    pub fn get_folder(&self) -> &'static str {
+        match self {
+            ProjectType::Mod => "mods",
+            ProjectType::DataPack => "datapacks",
+            ProjectType::ResourcePack => "resourcepacks",
+            ProjectType::ShaderPack => "shaderpacks",
+        }
+    }
+
+    pub fn get_loaders(&self) -> &'static [&'static str] {
+        match self {
+            ProjectType::Mod => &["fabric", "forge", "quilt", "neoforge"],
+            ProjectType::DataPack => &["datapack"],
+            ProjectType::ResourcePack => &["vanilla", "canvas", "minecraft"],
+            ProjectType::ShaderPack => &["iris", "optifine"],
+        }
+    }
+
+    pub fn iterator() -> impl Iterator<Item = ProjectType> {
+        [
+            ProjectType::Mod,
+            ProjectType::DataPack,
+            ProjectType::ResourcePack,
+            ProjectType::ShaderPack,
+        ]
+        .iter()
+        .copied()
+    }
+}
+
+struct ProfileQueryResult {
+    path: String,
+    install_stage: String,
+    name: String,
+    icon_path: Option<String>,
+    game_version: String,
+    mod_loader: String,
+    mod_loader_version: Option<String>,
+    groups: serde_json::Value,
+    linked_project_id: Option<String>,
+    linked_version_id: Option<String>,
+    locked: Option<i64>,
+    created: i64,
+    modified: i64,
+    last_played: Option<i64>,
+    submitted_time_played: i64,
+    recent_time_played: i64,
+    override_java_path: Option<String>,
+    override_extra_launch_args: serde_json::Value,
+    override_custom_env_vars: serde_json::Value,
+    override_mc_memory_max: Option<i64>,
+    override_mc_force_fullscreen: Option<i64>,
+    override_mc_game_resolution_x: Option<i64>,
+    override_mc_game_resolution_y: Option<i64>,
+    override_hook_pre_launch: Option<String>,
+    override_hook_wrapper: Option<String>,
+    override_hook_post_exit: Option<String>,
+    protocol_version: Option<i64>,
+    launcher_feature_version: String,
+}
+
+impl TryFrom<ProfileQueryResult> for Profile {
+    type Error = crate::Error;
+
+    fn try_from(x: ProfileQueryResult) -> Result<Self, Self::Error> {
+        Ok(Profile {
+            path: x.path,
+            install_stage: ProfileInstallStage::from_str(&x.install_stage),
+            launcher_feature_version: LauncherFeatureVersion::from_str(
+                &x.launcher_feature_version,
+            ),
+            name: x.name,
+            icon_path: x.icon_path,
+            game_version: x.game_version,
+            protocol_version: x.protocol_version.map(|x| x as i32),
+            loader: ModLoader::from_string(&x.mod_loader),
+            loader_version: x.mod_loader_version,
+            groups: serde_json::from_value(x.groups).unwrap_or_default(),
+            linked_data: if let Some(project_id) = x.linked_project_id {
+                if let Some(version_id) = x.linked_version_id {
+                    x.locked.map(|locked| LinkedData {
+                        project_id,
+                        version_id,
+                        locked: locked == 1,
+                    })
+                } else {
+                    None
+                }
+            } else {
+                None
+            },
+            created: Utc
+                .timestamp_opt(x.created, 0)
+                .single()
+                .unwrap_or_else(Utc::now),
+            modified: Utc
+                .timestamp_opt(x.modified, 0)
+                .single()
+                .unwrap_or_else(Utc::now),
+            last_played: x
+                .last_played
+                .and_then(|x| Utc.timestamp_opt(x, 0).single()),
+            submitted_time_played: x.submitted_time_played as u64,
+            recent_time_played: x.recent_time_played as u64,
+            java_path: x.override_java_path,
+            extra_launch_args: serde_json::from_value(
+                x.override_extra_launch_args,
+            )
+            .ok(),
+            custom_env_vars: serde_json::from_value(x.override_custom_env_vars)
+                .ok(),
+            memory: x
+                .override_mc_memory_max
+                .map(|x| MemorySettings { maximum: x as u32 }),
+            force_fullscreen: x.override_mc_force_fullscreen.map(|x| x == 1),
+            game_resolution: if let Some(x_res) =
+                x.override_mc_game_resolution_x
+            {
+                x.override_mc_game_resolution_y
+                    .map(|y_res| WindowSize(x_res as u16, y_res as u16))
+            } else {
+                None
+            },
+            hooks: Hooks {
+                pre_launch: x.override_hook_pre_launch,
+                wrapper: x.override_hook_wrapper,
+                post_exit: x.override_hook_post_exit,
+            },
+        })
+    }
+}
+
+macro_rules! select_profiles_with_predicate {
+    ($predicate:tt, $param:ident) => {
+        sqlx::query_as!(
+            ProfileQueryResult,
+            r#"
+            SELECT
+                path, install_stage, launcher_feature_version, name, icon_path,
+                game_version, protocol_version, mod_loader, mod_loader_version,
+                json(groups) as "groups!: serde_json::Value",
+                linked_project_id, linked_version_id, locked,
+                created, modified, last_played,
+                submitted_time_played, recent_time_played,
+                override_java_path,
+                json(override_extra_launch_args) as "override_extra_launch_args!: serde_json::Value", json(override_custom_env_vars) as "override_custom_env_vars!: serde_json::Value",
+                override_mc_memory_max, override_mc_force_fullscreen, override_mc_game_resolution_x, override_mc_game_resolution_y,
+                override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit
+            FROM profiles
+            "#
+                + $predicate,
+            $param
+        )
+    };
 }
 
 impl Profile {
-    #[tracing::instrument]
-    pub async fn new(
-        uuid: Uuid,
-        name: String,
-        version: String,
-    ) -> crate::Result<Self> {
-        if name.trim().is_empty() {
-            return Err(crate::ErrorKind::InputError(String::from(
-                "Empty name for instance!",
-            ))
-            .into());
-        }
-
-        Ok(Self {
-            uuid,
-            install_stage: ProfileInstallStage::NotInstalled,
-            path: PathBuf::new().join(&name),
-            metadata: ProfileMetadata {
-                name,
-                icon: None,
-                icon_url: None,
-                groups: vec![],
-                game_version: version,
-                loader: ModLoader::Vanilla,
-                loader_version: None,
-                linked_data: None,
-                date_created: Utc::now(),
-                date_modified: Utc::now(),
-                last_played: None,
-                submitted_time_played: 0,
-                recent_time_played: 0,
-            },
-            projects: HashMap::new(),
-            java: None,
-            memory: None,
-            resolution: None,
-            fullscreen: None,
-            hooks: None,
-            modrinth_update_version: None,
-        })
+    pub async fn get(
+        path: &str,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<Option<Self>> {
+        Ok(Self::get_many(&[path], exec).await?.into_iter().next())
     }
 
-    // Gets the ProfilePathId for this profile
-    #[inline]
-    pub fn profile_id(&self) -> ProfilePathId {
-        ProfilePathId::new(&self.path)
+    pub async fn get_many(
+        paths: &[&str],
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<Vec<Self>> {
+        let ids = serde_json::to_string(&paths)?;
+        let results = select_profiles_with_predicate!(
+            "WHERE path IN (SELECT value FROM json_each($1))",
+            ids
+        )
+        .fetch_all(exec)
+        .await?;
+
+        results
+            .into_iter()
+            .map(|r| r.try_into())
+            .collect::<crate::Result<Vec<_>>>()
+    }
+
+    pub async fn get_all(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<Vec<Self>> {
+        let true_val = 1;
+        let results = select_profiles_with_predicate!("WHERE 1=$1", true_val)
+            .fetch_all(exec)
+            .await?;
+
+        results
+            .into_iter()
+            .map(|r| r.try_into())
+            .collect::<crate::Result<Vec<_>>>()
+    }
+
+    pub async fn upsert(
+        &self,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<()> {
+        let install_stage = self.install_stage.as_str();
+        let launcher_feature_version = self.launcher_feature_version.as_str();
+
+        let mod_loader = self.loader.as_str();
+
+        let groups = serde_json::to_string(&self.groups)?;
+
+        let linked_data_project_id =
+            self.linked_data.as_ref().map(|x| x.project_id.clone());
+        let linked_data_version_id =
+            self.linked_data.as_ref().map(|x| x.version_id.clone());
+        let linked_data_locked = self.linked_data.as_ref().map(|x| x.locked);
+
+        let created = self.created.timestamp();
+        let modified = self.modified.timestamp();
+        let last_played = self.last_played.map(|x| x.timestamp());
+
+        let submitted_time_played = self.submitted_time_played as i64;
+        let recent_time_played = self.recent_time_played as i64;
+
+        let memory_max = self.memory.map(|x| x.maximum);
+
+        let game_resolution_x = self.game_resolution.map(|x| x.0);
+        let game_resolution_y = self.game_resolution.map(|x| x.1);
+
+        let extra_launch_args = serde_json::to_string(&self.extra_launch_args)?;
+        let custom_env_vars = serde_json::to_string(&self.custom_env_vars)?;
+
+        sqlx::query!(
+            "
+            INSERT INTO profiles (
+                path, install_stage, name, icon_path,
+                game_version, mod_loader, mod_loader_version,
+                groups,
+                linked_project_id, linked_version_id, locked,
+                created, modified, last_played,
+                submitted_time_played, recent_time_played,
+                override_java_path, override_extra_launch_args, override_custom_env_vars,
+                override_mc_memory_max, override_mc_force_fullscreen, override_mc_game_resolution_x, override_mc_game_resolution_y,
+                override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit,
+                protocol_version, launcher_feature_version
+            )
+            VALUES (
+                $1, $2, $3, $4,
+                $5, $6, $7,
+                jsonb($8),
+                $9, $10, $11,
+                $12, $13, $14,
+                $15, $16,
+                $17, jsonb($18), jsonb($19),
+                $20, $21, $22, $23,
+                $24, $25, $26,
+                $27, $28
+            )
+            ON CONFLICT (path) DO UPDATE SET
+                install_stage = $2,
+                name = $3,
+                icon_path = $4,
+
+                game_version = $5,
+                mod_loader = $6,
+                mod_loader_version = $7,
+
+                groups = jsonb($8),
+
+                linked_project_id = $9,
+                linked_version_id = $10,
+                locked = $11,
+
+                created = $12,
+                modified = $13,
+                last_played = $14,
+
+                submitted_time_played = $15,
+                recent_time_played = $16,
+
+                override_java_path = $17,
+                override_extra_launch_args = jsonb($18),
+                override_custom_env_vars = jsonb($19),
+                override_mc_memory_max = $20,
+                override_mc_force_fullscreen = $21,
+                override_mc_game_resolution_x = $22,
+                override_mc_game_resolution_y = $23,
+
+                override_hook_pre_launch = $24,
+                override_hook_wrapper = $25,
+                override_hook_post_exit = $26,
+
+                protocol_version = $27,
+                launcher_feature_version = $28
+            ",
+            self.path,
+            install_stage,
+            self.name,
+            self.icon_path,
+            self.game_version,
+            mod_loader,
+            self.loader_version,
+            groups,
+            linked_data_project_id,
+            linked_data_version_id,
+            linked_data_locked,
+            created,
+            modified,
+            last_played,
+            submitted_time_played,
+            recent_time_played,
+            self.java_path,
+            extra_launch_args,
+            custom_env_vars,
+            memory_max,
+            self.force_fullscreen,
+            game_resolution_x,
+            game_resolution_y,
+            self.hooks.pre_launch,
+            self.hooks.wrapper,
+            self.hooks.post_exit,
+            self.protocol_version,
+            launcher_feature_version
+        )
+            .execute(exec)
+            .await?;
+
+        Ok(())
+    }
+
+    pub async fn remove(
+        profile_path: &str,
+        pool: &SqlitePool,
+    ) -> crate::Result<()> {
+        sqlx::query!(
+            "
+            DELETE FROM profiles
+            WHERE path = $1
+            ",
+            profile_path
+        )
+        .execute(pool)
+        .await?;
+
+        if let Ok(path) = crate::api::profile::get_full_path(profile_path).await
+        {
+            io::remove_dir_all(&path).await?;
+        }
+
+        Ok(())
     }
 
     #[tracing::instrument(skip(self, semaphore, icon))]
@@ -373,191 +604,450 @@ impl Profile {
     ) -> crate::Result<()> {
         let file =
             write_cached_icon(file_name, cache_dir, icon, semaphore).await?;
-        self.metadata.icon = Some(file);
-        self.metadata.date_modified = Utc::now();
+        self.icon_path = Some(file.to_string_lossy().to_string());
+        self.modified = Utc::now();
         Ok(())
     }
 
-    pub fn crash_task(path: ProfilePathId) {
-        tokio::task::spawn(async move {
-            let res = async {
-                let profile = crate::api::profile::get(&path, None).await?;
+    pub(crate) async fn refresh_all() -> crate::Result<()> {
+        let state = crate::State::get().await?;
+        let mut all = Self::get_all(&state.pool).await?;
 
-                if let Some(profile) = profile {
-                    // Hide warning if profile is not yet installed
-                    if profile.install_stage == ProfileInstallStage::Installed {
-                        emit_warning(&format!("Profile {} has crashed! Visit the logs page to see a crash report.", profile.metadata.name)).await?;
+        let mut keys = vec![];
+        let mut migrations = JoinSet::new();
+
+        for profile in &mut all {
+            let path = get_full_path(&profile.path).await?;
+
+            for project_type in ProjectType::iterator() {
+                let folder = project_type.get_folder();
+                let path = path.join(folder);
+
+                if path.exists() {
+                    for subdirectory in std::fs::read_dir(&path)
+                        .map_err(|e| io::IOError::with_path(e, &path))?
+                    {
+                        let subdirectory =
+                            subdirectory.map_err(io::IOError::from)?.path();
+                        if subdirectory.is_file() {
+                            if let Some(file_name) = subdirectory
+                                .file_name()
+                                .and_then(|x| x.to_str())
+                            {
+                                let file_size = subdirectory
+                                    .metadata()
+                                    .map_err(io::IOError::from)?
+                                    .len();
+
+                                keys.push(format!(
+                                    "{file_size}-{}/{folder}/{file_name}",
+                                    profile.path
+                                ));
+                            }
+                        }
                     }
                 }
-
-                Ok::<(), crate::Error>(())
             }
-                .await;
 
-            match res {
-                Ok(()) => {}
-                Err(err) => {
-                    tracing::warn!(
-                        "Unable to send crash report to frontend: {err}"
-                    )
-                }
-            };
-        });
+            if profile.install_stage == ProfileInstallStage::MinecraftInstalling
+            {
+                profile.install_stage = ProfileInstallStage::PackInstalled;
+                profile.upsert(&state.pool).await?;
+            } else if profile.install_stage
+                == ProfileInstallStage::PackInstalling
+            {
+                profile.install_stage = ProfileInstallStage::NotInstalled;
+                profile.upsert(&state.pool).await?;
+            }
+
+            if profile.launcher_feature_version
+                < LauncherFeatureVersion::MOST_RECENT
+            {
+                let state = state.clone();
+                let profile_path = profile.path.clone();
+                migrations.spawn(async move {
+                    let Ok(Some(mut profile)) = Self::get(&profile_path, &state.pool).await else {
+                        tracing::error!("Failed to find instance '{}' for migration", profile_path);
+                        return;
+                    };
+                    drop(profile_path);
+
+                    tracing::info!(
+                        "Migrating profile '{}' from launcher feature version {:?} to {:?}",
+                        profile.path, profile.launcher_feature_version, LauncherFeatureVersion::MOST_RECENT
+                    );
+                    loop {
+                        let result = profile.perform_launcher_feature_migration(&state).await;
+                        if result.is_err() || profile.launcher_feature_version == LauncherFeatureVersion::MOST_RECENT {
+                            if let Err(err) = result {
+                                tracing::error!("Failed to migrate instance '{}': {}", profile.path, err);
+                                return;
+                            }
+                            if let Err(err) = profile.upsert(&state.pool).await {
+                                tracing::error!("Failed to update instance '{}' migration state: {}", profile.path, err);
+                                return;
+                            }
+                            break;
+                        }
+                    }
+                    tracing::info!("Finished migration for profile '{}'", profile.path);
+                });
+            }
+        }
+        migrations.join_all().await;
+
+        let file_hashes = CachedEntry::get_file_hash_many(
+            &keys.iter().map(|s| &**s).collect::<Vec<_>>(),
+            None,
+            &state.pool,
+            &state.fetch_semaphore,
+        )
+        .await?;
+
+        let file_updates = file_hashes
+            .iter()
+            .filter_map(|file| {
+                all.iter()
+                    .find(|prof| file.path.contains(&prof.path))
+                    .map(|profile| Self::get_cache_key(file, profile))
+            })
+            .collect::<Vec<_>>();
+
+        let file_hashes_ref =
+            file_hashes.iter().map(|x| &*x.hash).collect::<Vec<_>>();
+        let file_updates_ref =
+            file_updates.iter().map(|x| &**x).collect::<Vec<_>>();
+        tokio::try_join!(
+            CachedEntry::get_file_many(
+                &file_hashes_ref,
+                Some(CacheBehaviour::MustRevalidate),
+                &state.pool,
+                &state.fetch_semaphore,
+            ),
+            CachedEntry::get_file_update_many(
+                &file_updates_ref,
+                Some(CacheBehaviour::MustRevalidate),
+                &state.pool,
+                &state.fetch_semaphore,
+            )
+        )?;
+
+        Ok(())
     }
 
-    pub fn sync_projects_task(profile_path_id: ProfilePathId, force: bool) {
-        let span = tracing::span!(
-            tracing::Level::INFO,
-            "sync_projects_task",
-            ?profile_path_id,
-            ?force
-        );
-        tokio::task::spawn(async move {
-            let res = async {
-                let _span = span.enter();
-                let state = State::get().await?;
-                let profile = crate::api::profile::get(&profile_path_id, None).await?;
+    async fn perform_launcher_feature_migration(
+        &mut self,
+        state: &crate::State,
+    ) -> crate::Result<()> {
+        match self.launcher_feature_version {
+            LauncherFeatureVersion::None => {
+                if self.last_played.is_none() {
+                    self.launcher_feature_version =
+                        LauncherFeatureVersion::MigratedServerLastPlayTime;
+                    return Ok(());
+                }
+                let mut join_log_entry = JoinLogEntry {
+                    profile_path: self.path.clone(),
+                    ..Default::default()
+                };
+                let logs_path = state.directories.profile_logs_dir(&self.path);
+                let Ok(mut directory) = io::read_dir(&logs_path).await else {
+                    self.launcher_feature_version =
+                        LauncherFeatureVersion::MigratedServerLastPlayTime;
+                    return Ok(());
+                };
+                let existing_joins_map =
+                    super::server_join_log::get_joins(&self.path, &state.pool)
+                        .await?;
+                let existing_joins = existing_joins_map
+                    .keys()
+                    .map(|x| (&x.0 as &str, x.1))
+                    .collect::<HashSet<_>>();
+                while let Some(log_file) = directory.next_entry().await? {
+                    if let Err(err) = Self::parse_log_file(
+                        &log_file,
+                        |host, port| existing_joins.contains(&(host, port)),
+                        state,
+                        &mut join_log_entry,
+                    )
+                    .await
+                    {
+                        tracing::error!(
+                            "Failed to parse log file '{}': {}",
+                            log_file.path().display(),
+                            err
+                        );
+                    }
+                }
+                self.launcher_feature_version =
+                    LauncherFeatureVersion::MigratedServerLastPlayTime;
+            }
+            LauncherFeatureVersion::MOST_RECENT => unreachable!(
+                "LauncherFeatureVersion::MOST_RECENT was not updated"
+            ),
+        }
+        Ok(())
+    }
 
-                if let Some(profile) = profile {
-                    if profile.install_stage != ProfileInstallStage::PackInstalling || force {
-                        let paths = profile.get_profile_full_project_paths().await?;
+    // Parses a log file on a best-effort basis, using the log's creation time, rather than the
+    // actual times mentioned in the log file, which are missing date information.
+    async fn parse_log_file(
+        log_file: &DirEntry,
+        should_skip: impl Fn(&str, u16) -> bool,
+        state: &crate::State,
+        join_entry: &mut JoinLogEntry,
+    ) -> crate::Result<()> {
+        let file_name = log_file.file_name();
+        let Some(file_name) = file_name.to_str() else {
+            return Ok(());
+        };
+        let log_time = io::metadata(&log_file.path()).await?.created()?.into();
+        if file_name == "latest.log" {
+            let file = io::open_file(&log_file.path()).await?;
+            Self::parse_open_log_file(
+                file,
+                should_skip,
+                log_time,
+                state,
+                join_entry,
+            )
+            .await
+        } else if file_name.ends_with(".log.gz") {
+            let file = io::open_file(&log_file.path()).await?;
+            let file = tokio::io::BufReader::new(file);
+            let file =
+                async_compression::tokio::bufread::GzipDecoder::new(file);
+            Self::parse_open_log_file(
+                file,
+                should_skip,
+                log_time,
+                state,
+                join_entry,
+            )
+            .await
+        } else {
+            Ok(())
+        }
+    }
 
-                        let caches_dir = state.directories.caches_dir();
-                        let creds = state.credentials.read().await;
-                        let projects = crate::state::infer_data_from_files(
-                            profile.clone(),
-                            paths,
-                            caches_dir,
-                            &state.io_semaphore,
-                            &state.fetch_semaphore,
-                            &creds,
-                        )
-                            .await?;
-                        drop(creds);
+    async fn parse_open_log_file(
+        reader: impl AsyncRead + Unpin,
+        should_skip: impl Fn(&str, u16) -> bool,
+        mut log_time: DateTime<Utc>,
+        state: &crate::State,
+        join_entry: &mut JoinLogEntry,
+    ) -> crate::Result<()> {
+        static LOG_LINE_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+            Regex::new(r"^\[[0-9]{2}(?::[0-9]{2}){2}] \[.+?/[A-Z]+?]: Connecting to (.+?), ([1-9][0-9]{0,4})$").unwrap()
+        });
+        let reader = tokio::io::BufReader::new(reader);
+        let mut lines = reader.lines();
+        while let Some(log_line) = lines.next_line().await? {
+            let Some(log_line) = LOG_LINE_REGEX.captures(&log_line) else {
+                continue;
+            };
 
-                        let mut new_profiles = state.profiles.write().await;
-                        if let Some(profile) = new_profiles.0.get_mut(&profile_path_id) {
-                            profile.projects = projects;
+            let Some(host) = log_line.get(1) else {
+                continue;
+            };
+            let host = host.as_str();
+
+            let Some(port) = log_line.get(2) else {
+                continue;
+            };
+            let Ok(port) = port.as_str().parse::<u16>() else {
+                continue;
+            };
+
+            if should_skip(host, port) {
+                continue;
+            }
+
+            join_entry.host = host.to_string();
+            join_entry.port = port;
+            join_entry.join_time = log_time;
+            join_entry.upsert(&state.pool).await?;
+
+            log_time += TimeDelta::seconds(1);
+        }
+        Ok(())
+    }
+
+    pub async fn get_projects(
+        &self,
+        cache_behaviour: Option<CacheBehaviour>,
+        pool: &SqlitePool,
+        fetch_semaphore: &FetchSemaphore,
+    ) -> crate::Result<DashMap<String, ProfileFile>> {
+        let path = crate::api::profile::get_full_path(&self.path).await?;
+
+        struct InitialScanFile {
+            path: String,
+            file_name: String,
+            project_type: ProjectType,
+            size: u64,
+            cache_key: String,
+        }
+
+        let mut keys = vec![];
+
+        for project_type in ProjectType::iterator() {
+            let folder = project_type.get_folder();
+            let path = path.join(folder);
+
+            if path.exists() {
+                for subdirectory in std::fs::read_dir(&path)
+                    .map_err(|e| io::IOError::with_path(e, &path))?
+                {
+                    let subdirectory =
+                        subdirectory.map_err(io::IOError::from)?.path();
+                    if subdirectory.is_file() {
+                        if let Some(file_name) =
+                            subdirectory.file_name().and_then(|x| x.to_str())
+                        {
+                            let file_size = subdirectory
+                                .metadata()
+                                .map_err(io::IOError::from)?
+                                .len();
+
+                            keys.push(InitialScanFile {
+                                path: format!(
+                                    "{}/{folder}/{}",
+                                    self.path,
+                                    file_name.trim_end_matches(".disabled")
+                                ),
+                                file_name: file_name.to_string(),
+                                project_type,
+                                size: file_size,
+                                cache_key: format!(
+                                    "{file_size}-{}/{folder}/{file_name}",
+                                    self.path
+                                ),
+                            });
                         }
-                        emit_profile(
-                            profile.uuid,
-                            &profile_path_id,
-                            &profile.metadata.name,
-                            ProfilePayloadType::Synced,
-                        )
-                            .await?;
+                    }
+                }
+            }
+        }
+
+        let file_hashes = CachedEntry::get_file_hash_many(
+            &keys.iter().map(|s| &*s.cache_key).collect::<Vec<_>>(),
+            None,
+            pool,
+            fetch_semaphore,
+        )
+        .await?;
+
+        let file_updates = file_hashes
+            .iter()
+            .map(|x| Self::get_cache_key(x, self))
+            .collect::<Vec<_>>();
+
+        let file_hashes_ref =
+            file_hashes.iter().map(|x| &*x.hash).collect::<Vec<_>>();
+        let file_updates_ref =
+            file_updates.iter().map(|x| &**x).collect::<Vec<_>>();
+        let (mut file_info, file_updates) = tokio::try_join!(
+            CachedEntry::get_file_many(
+                &file_hashes_ref,
+                cache_behaviour,
+                pool,
+                fetch_semaphore,
+            ),
+            CachedEntry::get_file_update_many(
+                &file_updates_ref,
+                cache_behaviour,
+                pool,
+                fetch_semaphore,
+            )
+        )?;
+
+        let files = DashMap::new();
+
+        for hash in file_hashes {
+            let info_index = file_info.iter().position(|x| x.hash == hash.hash);
+            let file = info_index.map(|x| file_info.remove(x));
+
+            if let Some(initial_file_index) = keys
+                .iter()
+                .position(|x| x.path == hash.path.trim_end_matches(".disabled"))
+            {
+                let initial_file = keys.remove(initial_file_index);
+
+                let path = format!(
+                    "{}/{}",
+                    initial_file.project_type.get_folder(),
+                    initial_file.file_name
+                );
+
+                let update_version_id = if let Some(update) = file_updates
+                    .iter()
+                    .find(|x| x.hash == hash.hash)
+                    .map(|x| x.update_version_id.clone())
+                {
+                    if let Some(metadata) = &file {
+                        if metadata.version_id != update {
+                            Some(update)
+                        } else {
+                            None
+                        }
+                    } else {
+                        None
                     }
                 } else {
-                    tracing::warn!(
-                        "Unable to fetch single profile projects: path {profile_path_id} invalid",
-                    );
-                }
-                Ok::<(), crate::Error>(())
-            }.await;
-            match res {
-                Ok(()) => {}
-                Err(err) => {
-                    tracing::warn!(
-                        "Unable to fetch single profile projects: {err}"
-                    )
-                }
-            };
-        });
-    }
+                    None
+                };
 
-    // Get full path to profile
-    pub async fn get_profile_full_path(&self) -> crate::Result<PathBuf> {
-        let state = State::get().await?;
-        let profiles_dir = state.directories.profiles_dir().await;
-        Ok(profiles_dir.join(&self.path))
-    }
-
-    /// Gets paths to projects as their full paths, not just their relative paths
-    pub async fn get_profile_full_project_paths(
-        &self,
-    ) -> crate::Result<Vec<PathBuf>> {
-        let mut files = Vec::new();
-        let profile_path = self.get_profile_full_path().await?;
-        let mut read_paths = |path: &str| {
-            let new_path = profile_path.join(path);
-            if new_path.exists() {
-                for subpath in std::fs::read_dir(&new_path)
-                    .map_err(|e| IOError::with_path(e, &new_path))?
-                {
-                    let subpath = subpath.map_err(IOError::from)?.path();
-                    if subpath.is_file() {
-                        files.push(subpath);
-                    }
-                }
+                let file = ProfileFile {
+                    update_version_id,
+                    hash: hash.hash,
+                    file_name: initial_file.file_name,
+                    size: initial_file.size,
+                    metadata: file.map(|x| FileMetadata {
+                        project_id: x.project_id,
+                        version_id: x.version_id,
+                    }),
+                    project_type: initial_file.project_type,
+                };
+                files.insert(path, file);
             }
-            Ok::<(), crate::Error>(())
-        };
-
-        read_paths(ProjectType::Mod.get_folder())?;
-        read_paths(ProjectType::ShaderPack.get_folder())?;
-        read_paths(ProjectType::ResourcePack.get_folder())?;
-        read_paths(ProjectType::DataPack.get_folder())?;
+        }
 
         Ok(files)
     }
 
-    #[tracing::instrument(skip(watcher))]
-    #[theseus_macros::debug_pin]
-    pub async fn watch_fs(
-        profile_path: &Path,
-        watcher: &mut Debouncer<RecommendedWatcher>,
-    ) -> crate::Result<()> {
-        async fn watch_path(
-            profile_path: &Path,
-            watcher: &mut Debouncer<RecommendedWatcher>,
-            path: &str,
-        ) -> crate::Result<()> {
-            let path = profile_path.join(path);
-
-            io::create_dir_all(&path).await?;
-
-            watcher
-                .watcher()
-                .watch(&profile_path.join(path), RecursiveMode::Recursive)?;
-
-            Ok(())
-        }
-
-        watch_path(profile_path, watcher, ProjectType::Mod.get_folder())
-            .await?;
-        watch_path(profile_path, watcher, ProjectType::ShaderPack.get_folder())
-            .await?;
-        watch_path(
-            profile_path,
-            watcher,
-            ProjectType::ResourcePack.get_folder(),
+    fn get_cache_key(file: &CachedFileHash, profile: &Profile) -> String {
+        format!(
+            "{}-{}-{}",
+            file.hash,
+            file.project_type
+                .filter(|x| *x != ProjectType::Mod)
+                .map_or_else(
+                    || profile.loader.as_str().to_string(),
+                    |x| x.get_loaders().join("+")
+                ),
+            profile.game_version
         )
-        .await?;
-        watch_path(profile_path, watcher, ProjectType::DataPack.get_folder())
-            .await?;
-        watch_path(profile_path, watcher, "crash-reports").await?;
-
-        Ok(())
     }
 
-    #[tracing::instrument(skip(self))]
-    #[theseus_macros::debug_pin]
+    #[tracing::instrument(skip(pool))]
     pub async fn add_project_version(
-        &self,
-        version_id: String,
-    ) -> crate::Result<(ProjectPathId, ModrinthVersion)> {
-        let state = State::get().await?;
-        let creds = state.credentials.read().await;
-        let version = fetch_json::<ModrinthVersion>(
-            Method::GET,
-            &format!("{MODRINTH_API_URL}version/{version_id}"),
-            None,
-            None,
-            &state.fetch_semaphore,
-            &creds,
-        )
-        .await?;
-        drop(creds);
+        profile_path: &str,
+        version_id: &str,
+        pool: &SqlitePool,
+        fetch_semaphore: &FetchSemaphore,
+        io_semaphore: &IoSemaphore,
+    ) -> crate::Result<String> {
+        let version =
+            CachedEntry::get_version(version_id, None, pool, fetch_semaphore)
+                .await?
+                .ok_or_else(|| {
+                    crate::ErrorKind::InputError(format!(
+                        "Unable to install version id {version_id}. Not found."
+                    ))
+                    .as_error()
+                })?;
+
         let file = if let Some(file) = version.files.iter().find(|x| x.primary)
         {
             file
@@ -570,45 +1060,52 @@ impl Profile {
             .into());
         };
 
-        let creds = state.credentials.read().await;
-        let bytes = fetch(
+        let bytes = util::fetch::fetch(
             &file.url,
             file.hashes.get("sha1").map(|x| &**x),
-            &state.fetch_semaphore,
-            &creds,
+            fetch_semaphore,
+            pool,
         )
         .await?;
-        drop(creds);
-        let path = self
-            .add_project_bytes(
-                &file.filename,
-                bytes,
-                ProjectType::get_from_loaders(version.loaders.clone()),
-            )
-            .await?;
-        Ok((path, version))
+
+        let path = Self::add_project_bytes(
+            profile_path,
+            &file.filename,
+            bytes,
+            file.hashes.get("sha1").map(|x| &**x),
+            ProjectType::get_from_loaders(version.loaders.clone()),
+            io_semaphore,
+            pool,
+        )
+        .await?;
+        Ok(path)
     }
 
-    #[tracing::instrument(skip(self, bytes))]
-    #[theseus_macros::debug_pin]
+    #[tracing::instrument(skip(bytes))]
+
     pub async fn add_project_bytes(
-        &self,
+        profile_path: &str,
         file_name: &str,
         bytes: bytes::Bytes,
+        hash: Option<&str>,
         project_type: Option<ProjectType>,
-    ) -> crate::Result<ProjectPathId> {
+        io_semaphore: &IoSemaphore,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<String> {
         let project_type = if let Some(project_type) = project_type {
             project_type
         } else {
-            let cursor = Cursor::new(&*bytes);
+            let cursor = std::io::Cursor::new(&*bytes);
 
             let mut archive = zip::ZipArchive::new(cursor).map_err(|_| {
                 crate::ErrorKind::InputError(
                     "Unable to infer project type for input file".to_string(),
                 )
             })?;
+
             if archive.by_name("fabric.mod.json").is_ok()
                 || archive.by_name("quilt.mod.json").is_ok()
+                || archive.by_name("META-INF/neoforge.mods.toml").is_ok()
                 || archive.by_name("META-INF/mods.toml").is_ok()
                 || archive.by_name("mcmod.info").is_ok()
             {
@@ -619,6 +1116,8 @@ impl Profile {
                 } else {
                     ProjectType::ResourcePack
                 }
+            } else if archive.file_names().any(|x| x.starts_with("shaders/")) {
+                ProjectType::ShaderPack
             } else {
                 return Err(crate::ErrorKind::InputError(
                     "Unable to infer project type for input file".to_string(),
@@ -627,471 +1126,56 @@ impl Profile {
             }
         };
 
-        let state = State::get().await?;
-        let relative_name = PathBuf::new()
-            .join(project_type.get_folder())
-            .join(file_name);
-        let file_path = self
-            .get_profile_full_path()
-            .await?
-            .join(relative_name.clone());
-        let project_path_id = ProjectPathId::new(&relative_name);
-        write(&file_path, &bytes, &state.io_semaphore).await?;
+        let path = crate::api::profile::get_full_path(profile_path).await?;
+        let project_path =
+            format!("{}/{}", project_type.get_folder(), file_name);
 
-        let hash = get_hash(bytes).await?;
-        {
-            let mut profiles = state.profiles.write().await;
-
-            if let Some(profile) = profiles.0.get_mut(&self.profile_id()) {
-                profile.projects.insert(
-                    project_path_id.clone(),
-                    Project {
-                        sha512: hash,
-                        disabled: false,
-                        metadata: ProjectMetadata::Unknown,
-                        file_name: file_name.to_string(),
-                    },
-                );
-                profile.metadata.date_modified = Utc::now();
-            }
-        }
-
-        Ok(project_path_id)
-    }
-
-    /// Toggle a project's disabled state.
-    #[tracing::instrument(skip(self))]
-    #[theseus_macros::debug_pin]
-    pub async fn toggle_disable_project(
-        &self,
-        relative_path: &ProjectPathId,
-    ) -> crate::Result<ProjectPathId> {
-        let state = State::get().await?;
-        if let Some(mut project) = {
-            let mut profiles: tokio::sync::RwLockWriteGuard<'_, Profiles> =
-                state.profiles.write().await;
-
-            if let Some(profile) = profiles.0.get_mut(&self.profile_id()) {
-                profile.projects.remove(relative_path)
-            } else {
-                None
-            }
-        } {
-            // Get relative path from former ProjectPathId
-            let relative_path = relative_path.0.to_path_buf();
-            let mut new_path = relative_path.clone();
-
-            if relative_path
-                .extension()
-                .map_or(false, |ext| ext == "disabled")
-            {
-                project.disabled = false;
-                new_path.set_file_name(
-                    relative_path
-                        .file_name()
-                        .unwrap_or_default()
-                        .to_string_lossy()
-                        .replace(".disabled", ""),
-                );
-            } else {
-                new_path.set_file_name(format!(
-                    "{}.disabled",
-                    relative_path
-                        .file_name()
-                        .unwrap_or_default()
-                        .to_string_lossy()
-                ));
-                project.disabled = true;
-            }
-
-            let true_path =
-                self.get_profile_full_path().await?.join(&relative_path);
-            let true_new_path =
-                self.get_profile_full_path().await?.join(&new_path);
-            io::rename(&true_path, &true_new_path).await?;
-
-            let new_project_path_id = ProjectPathId::new(&new_path);
-
-            let mut profiles = state.profiles.write().await;
-            if let Some(profile) = profiles.0.get_mut(&self.profile_id()) {
-                profile
-                    .projects
-                    .insert(new_project_path_id.clone(), project);
-                profile.metadata.date_modified = Utc::now();
-            }
-
-            Ok(new_project_path_id)
-        } else {
-            Err(crate::ErrorKind::InputError(format!(
-                "Project path does not exist: {:?}",
-                relative_path
-            ))
-            .into())
-        }
-    }
-
-    pub async fn remove_project(
-        &self,
-        relative_path: &ProjectPathId,
-        dont_remove_arr: Option<bool>,
-    ) -> crate::Result<()> {
-        let state = State::get().await?;
-        if self.projects.contains_key(relative_path) {
-            io::remove_file(
-                self.get_profile_full_path()
-                    .await?
-                    .join(relative_path.0.clone()),
-            )
-            .await?;
-            if !dont_remove_arr.unwrap_or(false) {
-                let mut profiles = state.profiles.write().await;
-
-                if let Some(profile) = profiles.0.get_mut(&self.profile_id()) {
-                    profile.projects.remove(relative_path);
-                    profile.metadata.date_modified = Utc::now();
-                }
-            }
-        } else {
-            // If we are removing a project that doesn't exist, allow it to pass through without error, but warn
-            tracing::warn!(
-                "Attempted to remove non-existent project: {:?}",
-                relative_path
-            );
-        }
-
-        Ok(())
-    }
-}
-
-impl Profiles {
-    #[tracing::instrument(skip(file_watcher))]
-    #[theseus_macros::debug_pin]
-    pub async fn init(
-        dirs: &DirectoryInfo,
-        file_watcher: &mut Debouncer<RecommendedWatcher>,
-    ) -> crate::Result<Self> {
-        let mut profiles = HashMap::new();
-        let profiles_dir = dirs.profiles_dir().await;
-        io::create_dir_all(&&profiles_dir).await?;
-
-        file_watcher
-            .watcher()
-            .watch(&profiles_dir, RecursiveMode::NonRecursive)?;
-
-        let mut entries = io::read_dir(&dirs.profiles_dir().await).await?;
-        while let Some(entry) =
-            entries.next_entry().await.map_err(IOError::from)?
-        {
-            let path = entry.path();
-            if path.is_dir() {
-                let prof = match Self::read_profile_from_dir(&path, dirs).await
-                {
-                    Ok(prof) => Some(prof),
-                    Err(err) => {
-                        tracing::warn!(
-                            "Error loading profile: {err}. Skipping..."
-                        );
-                        None
-                    }
-                };
-
-                if let Some(profile) = prof {
-                    // Clear out modrinth_logs of all files in profiles folder (these are legacy)
-                    // TODO: should be removed in a future build
-                    let modrinth_logs = path.join("modrinth_logs");
-                    if modrinth_logs.exists() {
-                        let _ = std::fs::remove_dir_all(modrinth_logs);
-                    }
-
-                    let path = io::canonicalize(path)?;
-                    Profile::watch_fs(&path, file_watcher).await?;
-                    profiles.insert(profile.profile_id(), profile);
-                }
-            }
-        }
-
-        Ok(Self(profiles))
-    }
-
-    #[tracing::instrument]
-    #[theseus_macros::debug_pin]
-    pub async fn update_projects() {
-        let res = async {
-            let state = State::get().await?;
-
-            // profile, child paths
-            let mut files: Vec<(Profile, Vec<PathBuf>)> = Vec::new();
-            {
-                let profiles = state.profiles.read().await;
-                for (_profile_path, profile) in profiles.0.iter() {
-                    let paths =
-                        profile.get_profile_full_project_paths().await?;
-
-                    files.push((profile.clone(), paths));
-                }
-            }
-
-            let caches_dir = state.directories.caches_dir();
-            future::try_join_all(files.into_iter().map(
-                |(profile, files)| async {
-                    let profile_name = profile.profile_id();
-                    let creds = state.credentials.read().await;
-                    let inferred = super::projects::infer_data_from_files(
-                        profile,
-                        files,
-                        caches_dir.clone(),
-                        &state.io_semaphore,
-                        &state.fetch_semaphore,
-                        &creds,
-                    )
-                    .await?;
-                    drop(creds);
-
-                    let mut new_profiles = state.profiles.write().await;
-                    if let Some(profile) = new_profiles.0.get_mut(&profile_name)
-                    {
-                        profile.projects = inferred;
-                    }
-                    drop(new_profiles);
-
-                    Ok::<(), crate::Error>(())
-                },
-            ))
-            .await?;
-
-            {
-                let profiles = state.profiles.read().await;
-                profiles.sync().await?;
-            }
-
-            Ok::<(), crate::Error>(())
-        }
-        .await;
-
-        match res {
-            Ok(()) => {}
-            Err(err) => {
-                tracing::warn!("Unable to fetch profile projects: {err}")
-            }
-        };
-    }
-
-    #[tracing::instrument]
-    #[theseus_macros::debug_pin]
-    pub async fn update_modrinth_versions() {
-        let res = async {
-            let state = State::get().await?;
-            // Temporarily store all profiles that have modrinth linked data
-            let mut modrinth_updatables: Vec<(ProfilePathId, String)> =
-                Vec::new();
-            {
-                let profiles = state.profiles.read().await;
-                for (profile_path, profile) in profiles.0.iter() {
-                    if let Some(linked_data) = &profile.metadata.linked_data {
-                        if let Some(linked_project) = &linked_data.project_id {
-                            modrinth_updatables.push((
-                                profile_path.clone(),
-                                linked_project.clone(),
-                            ));
-                        }
-                    }
-                }
-            }
-
-            // Fetch online from Modrinth each latest version
-            future::try_join_all(modrinth_updatables.into_iter().map(
-                |(profile_path, linked_project)| {
-                    let state = state.clone();
-                    async move {
-                        let creds = state.credentials.read().await;
-                        let versions: Vec<ModrinthVersion> = fetch_json(
-                            Method::GET,
-                            &format!(
-                                "{}project/{}/version",
-                                MODRINTH_API_URL,
-                                linked_project.clone()
-                            ),
-                            None,
-                            None,
-                            &state.fetch_semaphore,
-                            &creds,
-                        )
-                        .await?;
-                        drop(creds);
-
-                        // Versions are pre-sorted in labrinth (by versions.sort_by(|a, b| b.inner.date_published.cmp(&a.inner.date_published));)
-                        // so we can just take the first one for which the loader matches
-                        let mut new_profiles = state.profiles.write().await;
-                        if let Some(profile) =
-                            new_profiles.0.get_mut(&profile_path)
-                        {
-                            let loader = profile.metadata.loader;
-                            let recent_version = versions.iter().find(|x| {
-                                x.loaders
-                                    .contains(&loader.as_api_str().to_string())
-                            });
-                            if let Some(recent_version) = recent_version {
-                                profile.modrinth_update_version =
-                                    Some(recent_version.id.clone());
-                            } else {
-                                profile.modrinth_update_version = None;
-                            }
-                        }
-                        drop(new_profiles);
-
-                        Ok::<(), crate::Error>(())
-                    }
-                },
-            ))
-            .await?;
-
-            {
-                let profiles = state.profiles.read().await;
-                profiles.sync().await?;
-            }
-
-            Ok::<(), crate::Error>(())
-        }
-        .await;
-
-        match res {
-            Ok(()) => {}
-            Err(err) => {
-                tracing::warn!("Unable to update modrinth versions: {err}")
-            }
-        };
-    }
-
-    #[tracing::instrument(skip(self, profile))]
-    #[theseus_macros::debug_pin]
-    pub async fn insert(
-        &mut self,
-        profile: Profile,
-        no_watch: bool,
-    ) -> crate::Result<&Self> {
-        emit_profile(
-            profile.uuid,
-            &profile.profile_id(),
-            &profile.metadata.name,
-            ProfilePayloadType::Added,
+        cache_file_hash(
+            bytes.clone(),
+            profile_path,
+            &project_path,
+            hash,
+            Some(project_type),
+            exec,
         )
         .await?;
 
-        if !no_watch {
-            let state = State::get().await?;
-            let mut file_watcher = state.file_watcher.write().await;
-            Profile::watch_fs(
-                &profile.get_profile_full_path().await?,
-                &mut file_watcher,
-            )
-            .await?;
-        }
-
-        let profile_name = profile.profile_id();
-        profile_name.check_valid_utf()?;
-        self.0.insert(profile_name, profile);
-        Ok(self)
-    }
-
-    #[tracing::instrument(skip(self))]
-    pub async fn remove(
-        &mut self,
-        profile_path: &ProfilePathId,
-    ) -> crate::Result<Option<Profile>> {
-        let profile = self.0.remove(profile_path);
-
-        let path = profile_path.get_full_path().await?;
-        if path.exists() {
-            io::remove_dir_all(&path).await?;
-        }
-
-        Ok(profile)
-    }
-
-    #[tracing::instrument(skip_all)]
-    pub async fn sync(&self) -> crate::Result<&Self> {
-        let _state = State::get().await?;
-        stream::iter(self.0.iter())
-            .map(Ok::<_, crate::Error>)
-            .try_for_each_concurrent(None, |(_, profile)| async move {
-                let json = serde_json::to_vec(&profile)?;
-
-                let json_path = profile
-                    .get_profile_full_path()
-                    .await?
-                    .join(PROFILE_JSON_PATH);
-
-                io::write(&json_path, &json).await?;
-                Ok::<_, crate::Error>(())
-            })
+        util::fetch::write(&path.join(&project_path), &bytes, io_semaphore)
             .await?;
 
-        Ok(self)
+        Ok(project_path)
     }
 
-    async fn read_profile_from_dir(
-        path: &Path,
-        dirs: &DirectoryInfo,
-    ) -> crate::Result<Profile> {
-        let json = io::read(&path.join(PROFILE_JSON_PATH)).await?;
-        let mut profile = serde_json::from_slice::<Profile>(&json)?;
+    /// Toggle a project's disabled state.
+    #[tracing::instrument]
+    pub async fn toggle_disable_project(
+        profile_path: &str,
+        project_path: &str,
+    ) -> crate::Result<String> {
+        let path = crate::api::profile::get_full_path(profile_path).await?;
 
-        // Get name from stripped path
-        profile.path =
-            PathBuf::from(path.strip_prefix(dirs.profiles_dir().await)?);
+        let new_path = if project_path.ends_with(".disabled") {
+            project_path.trim_end_matches(".disabled").to_string()
+        } else {
+            format!("{project_path}.disabled")
+        };
 
-        Ok(profile)
+        io::rename_or_move(&path.join(project_path), &path.join(&new_path))
+            .await?;
+
+        Ok(new_path)
     }
 
-    pub fn sync_available_profiles_task(profile_path_id: ProfilePathId) {
-        tokio::task::spawn(async move {
-            let span = tracing::span!(
-                tracing::Level::INFO,
-                "sync_available_profiles_task"
-            );
-            let res = async {
-                let _span = span.enter();
-                let state = State::get().await?;
-                let dirs = &state.directories;
-                let mut profiles = state.profiles.write().await;
+    #[tracing::instrument]
+    pub async fn remove_project(
+        profile_path: &str,
+        project_path: &str,
+    ) -> crate::Result<()> {
+        if let Ok(path) = crate::api::profile::get_full_path(profile_path).await
+        {
+            io::remove_file(path.join(project_path)).await?;
+        }
 
-                if let Some(profile) = profiles.0.get_mut(&profile_path_id) {
-                    if !profile.get_profile_full_path().await?.exists() {
-                        // if path exists in the state but no longer in the filesystem, remove it from the state list
-                        emit_profile(
-                            profile.uuid,
-                            &profile_path_id,
-                            &profile.metadata.name,
-                            ProfilePayloadType::Removed,
-                        )
-                        .await?;
-                        tracing::debug!("Removed!");
-                        profiles.0.remove(&profile_path_id);
-                    }
-                } else if profile_path_id.get_full_path().await?.exists() {
-                    // if it exists in the filesystem but no longer in the state, add it to the state list
-                    profiles
-                        .insert(
-                            Self::read_profile_from_dir(
-                                &profile_path_id.get_full_path().await?,
-                                dirs,
-                            )
-                            .await?,
-                            false,
-                        )
-                        .await?;
-                    Profile::sync_projects_task(profile_path_id, false);
-                }
-                Ok::<(), crate::Error>(())
-            }
-            .await;
-
-            match res {
-                Ok(()) => {}
-                Err(err) => {
-                    tracing::warn!("Unable to fetch all profiles: {err}")
-                }
-            };
-        });
+        Ok(())
     }
 }

@@ -1,5 +1,4 @@
 <template>
-  <Chips v-if="false" v-model="viewMode" :items="['open', 'archived']" />
   <ReportInfo
     v-for="report in reports.filter(
       (x) =>
@@ -17,9 +16,9 @@
   <p v-if="reports.length === 0">You don't have any active reports.</p>
 </template>
 <script setup>
-import Chips from "~/components/ui/Chips.vue";
 import ReportInfo from "~/components/ui/report/ReportInfo.vue";
 import { addReportMessage } from "~/helpers/threads.js";
+import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
 
 defineProps({
   moderation: {
@@ -35,7 +34,7 @@ defineProps({
 const viewMode = ref("open");
 const reports = ref([]);
 
-let { data: rawReports } = await useAsyncData("report", () => useBaseFetch("report"));
+let { data: rawReports } = await useAsyncData("report", () => useBaseFetch("report?count=1000"));
 
 rawReports = rawReports.value.map((report) => {
   report.item_id = report.item_id.replace(/"/g, "");
@@ -55,13 +54,13 @@ const threadIds = [
 
 const [{ data: users }, { data: versions }, { data: threads }] = await Promise.all([
   await useAsyncData(`users?ids=${JSON.stringify(userIds)}`, () =>
-    useBaseFetch(`users?ids=${encodeURIComponent(JSON.stringify(userIds))}`),
+    fetchSegmented(userIds, (ids) => `users?ids=${asEncodedJsonArray(ids)}`),
   ),
   await useAsyncData(`versions?ids=${JSON.stringify(versionIds)}`, () =>
-    useBaseFetch(`versions?ids=${encodeURIComponent(JSON.stringify(versionIds))}`),
+    fetchSegmented(versionIds, (ids) => `versions?ids=${asEncodedJsonArray(ids)}`),
   ),
   await useAsyncData(`threads?ids=${JSON.stringify(threadIds)}`, () =>
-    useBaseFetch(`threads?ids=${encodeURIComponent(JSON.stringify(threadIds))}`),
+    fetchSegmented(threadIds, (ids) => `threads?ids=${asEncodedJsonArray(ids)}`),
   ),
 ]);
 
@@ -72,7 +71,7 @@ const versionProjects = versions.value.map((version) => version.project_id);
 const projectIds = [...new Set(reportedProjects.concat(versionProjects))];
 
 const { data: projects } = await useAsyncData(`projects?ids=${JSON.stringify(projectIds)}`, () =>
-  useBaseFetch(`projects?ids=${encodeURIComponent(JSON.stringify(projectIds))}`),
+  fetchSegmented(projectIds, (ids) => `projects?ids=${asEncodedJsonArray(ids)}`),
 );
 
 reports.value = rawReports.map((report) => {

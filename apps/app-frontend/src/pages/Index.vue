@@ -1,120 +1,119 @@
-<script setup>
-import { ref, onUnmounted, shallowRef, computed } from 'vue'
+<script setup lang="ts">
+import { ref, onUnmounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import RowDisplay from '@/components/RowDisplay.vue'
 import { list } from '@/helpers/profile.js'
-import { offline_listener, profile_listener } from '@/helpers/events'
+import { profile_listener } from '@/helpers/events'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
 import dayjs from 'dayjs'
-import { isOffline } from '@/helpers/utils'
-
-const featuredModpacks = ref({})
-const featuredMods = ref({})
-const filter = ref('')
+import { get_search_results } from '@/helpers/cache.js'
+import type { SearchResult } from '@modrinth/utils'
+import RecentWorldsList from '@/components/ui/world/RecentWorldsList.vue'
+import type { GameInstance } from '@/helpers/types'
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
 
 breadcrumbs.setRootContext({ name: 'Home', link: route.path })
 
-const recentInstances = shallowRef([])
+const instances = ref<GameInstance[]>([])
 
-const offline = ref(await isOffline())
+const featuredModpacks = ref<SearchResult[]>([])
+const featuredMods = ref<SearchResult[]>([])
+const installedModpacksFilter = ref('')
 
-const getInstances = async () => {
-  const profiles = await list(true).catch(handleError)
-  recentInstances.value = Object.values(profiles).sort((a, b) => {
-    return dayjs(b.metadata.last_played ?? 0).diff(dayjs(a.metadata.last_played ?? 0))
-  })
+const recentInstances = computed(() =>
+  instances.value
+    .filter((x) => x.last_played)
+    .slice()
+    .sort((a, b) => dayjs(b.last_played).diff(dayjs(a.last_played))),
+)
 
-  let filters = []
-  for (const instance of recentInstances.value) {
-    if (instance.metadata.linked_data && instance.metadata.linked_data.project_id) {
-      filters.push(`NOT"project_id"="${instance.metadata.linked_data.project_id}"`)
+const hasFeaturedProjects = computed(
+  () => (featuredModpacks.value?.length ?? 0) + (featuredMods.value?.length ?? 0) > 0,
+)
+
+const offline = ref<boolean>(!navigator.onLine)
+window.addEventListener('offline', () => {
+  offline.value = true
+})
+window.addEventListener('online', () => {
+  offline.value = false
+})
+
+async function fetchInstances() {
+  instances.value = await list().catch(handleError)
+
+  const filters = []
+  for (const instance of instances.value) {
+    if (instance.linked_data && instance.linked_data.project_id) {
+      filters.push(`NOT"project_id"="${instance.linked_data.project_id}"`)
     }
   }
-  filter.value = filters.join(' AND ')
+  installedModpacksFilter.value = filters.join(' AND ')
 }
 
-const getFeaturedModpacks = async () => {
-  const response = await useFetch(
-    `https://api.modrinth.com/v2/search?facets=[["project_type:modpack"]]&limit=10&index=follows&filters=${filter.value}`,
-    'featured modpacks',
-    offline.value,
+async function fetchFeaturedModpacks() {
+  const response = await get_search_results(
+    `?facets=[["project_type:modpack"]]&limit=10&index=follows&filters=${installedModpacksFilter.value}`,
   )
+
   if (response) {
-    featuredModpacks.value = response.hits
-  } else {
-    featuredModpacks.value = []
-  }
-}
-const getFeaturedMods = async () => {
-  const response = await useFetch(
-    'https://api.modrinth.com/v2/search?facets=[["project_type:mod"]]&limit=10&index=follows',
-    'featured mods',
-    offline.value,
-  )
-  if (response) {
-    featuredMods.value = response.hits
+    featuredModpacks.value = response.result.hits
   } else {
     featuredModpacks.value = []
   }
 }
 
-await getInstances()
+async function fetchFeaturedMods() {
+  const response = await get_search_results('?facets=[["project_type:mod"]]&limit=10&index=follows')
 
-await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
-
-const unlistenProfile = await profile_listener(async (e) => {
-  await getInstances()
-  if (e.event === 'created' || e.event === 'removed') {
-    await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
+  if (response) {
+    featuredMods.value = response.result.hits
+  } else {
+    featuredModpacks.value = []
   }
-})
+}
 
-const unlistenOffline = await offline_listener(async (b) => {
-  offline.value = b
-  if (!b) {
-    await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
-  }
-})
+async function refreshFeaturedProjects() {
+  await Promise.all([fetchFeaturedModpacks(), fetchFeaturedMods()])
+}
 
-// computed sums of recentInstances, featuredModpacks, featuredMods, treating them as arrays if they are not
-const total = computed(() => {
-  return (
-    (recentInstances.value?.length ?? 0) +
-    (featuredModpacks.value?.length ?? 0) +
-    (featuredMods.value?.length ?? 0)
-  )
-})
+await fetchInstances()
+await refreshFeaturedProjects()
+
+const unlistenProfile = await profile_listener(
+  async (e: { event: string; profile_path_id: string }) => {
+    await fetchInstances()
+
+    if (e.event === 'added' || e.event === 'created' || e.event === 'removed') {
+      await refreshFeaturedProjects()
+    }
+  },
+)
 
 onUnmounted(() => {
   unlistenProfile()
-  unlistenOffline()
 })
 </script>
 
 <template>
-  <div class="page-container">
+  <div class="p-6 flex flex-col gap-2">
+    <h1 v-if="recentInstances?.length > 0" class="m-0 text-2xl font-extrabold">Welcome back!</h1>
+    <h1 v-else class="m-0 text-2xl font-extrabold">Welcome to Modrinth App!</h1>
+    <RecentWorldsList :recent-instances="recentInstances" />
     <RowDisplay
-      v-if="total > 0"
+      v-if="hasFeaturedProjects"
       :instances="[
         {
-          label: 'Jump back in',
-          route: '/library',
-          instances: recentInstances,
-          downloaded: true,
-        },
-        {
-          label: 'Popular packs',
+          label: 'Discover a modpack',
           route: '/browse/modpack',
           instances: featuredModpacks,
           downloaded: false,
         },
         {
-          label: 'Popular mods',
+          label: 'Discover mods',
           route: '/browse/mod',
           instances: featuredMods,
           downloaded: false,
@@ -124,13 +123,3 @@ onUnmounted(() => {
     />
   </div>
 </template>
-
-<style lang="scss" scoped>
-.page-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-}
-</style>

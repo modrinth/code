@@ -15,6 +15,7 @@ export const useBreadcrumbs = defineStore('breadcrumbsStore', {
     },
     // resets breadcrumbs to only included ones as to not have stale breadcrumbs
     resetToNames(breadcrumbs) {
+      if (!breadcrumbs) return
       // names is an array of every breadcrumb.name that starts with a ?
       const names = breadcrumbs
         .filter((breadcrumb) => breadcrumb.name.charAt(0) === '?')

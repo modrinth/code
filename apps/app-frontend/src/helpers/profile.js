@@ -3,7 +3,9 @@
  * So, for example, addDefaultInstance creates a blank Profile object, where the Rust struct is serialized,
  *  and deserialized into a usable JS object.
  */
-import { invoke } from '@tauri-apps/api/tauri'
+import { invoke } from '@tauri-apps/api/core'
+import { install_to_existing_profile } from '@/helpers/pack.js'
+import { handleError } from '@/store/notifications.js'
 
 /// Add instance
 /*
@@ -16,22 +18,22 @@ import { invoke } from '@tauri-apps/api/tauri'
     - icon is a path to an image file, which will be copied into the profile directory
 */
 
-export async function create(name, gameVersion, modloader, loaderVersion, icon, noWatch) {
+export async function create(name, gameVersion, modloader, loaderVersion, iconPath, skipInstall) {
   //Trim string name to avoid "Unable to find directory"
   name = name.trim()
-  return await invoke('plugin:profile_create|profile_create', {
+  return await invoke('plugin:profile-create|profile_create', {
     name,
     gameVersion,
     modloader,
     loaderVersion,
-    icon,
-    noWatch,
+    iconPath,
+    skipInstall,
   })
 }
 
 // duplicate a profile
 export async function duplicate(path) {
-  return await invoke('plugin:profile_create|profile_duplicate', { path })
+  return await invoke('plugin:profile-create|profile_duplicate', { path })
 }
 
 // Remove a profile
@@ -41,8 +43,18 @@ export async function remove(path) {
 
 // Get a profile by path
 // Returns a Profile
-export async function get(path, clearProjects) {
-  return await invoke('plugin:profile|profile_get', { path, clearProjects })
+export async function get(path) {
+  return await invoke('plugin:profile|profile_get', { path })
+}
+
+export async function get_many(paths) {
+  return await invoke('plugin:profile|profile_get_many', { paths })
+}
+
+// Get a profile's projects
+// Returns a map of a path to profile file
+export async function get_projects(path, cacheBehaviour) {
+  return await invoke('plugin:profile|profile_get_projects', { path, cacheBehaviour })
 }
 
 // Get a profile's full fs path
@@ -65,8 +77,8 @@ export async function get_optimal_jre_key(path) {
 
 // Get a copy of the profile set
 // Returns hashmap of path -> Profile
-export async function list(clearProjects) {
-  return await invoke('plugin:profile|profile_list', { clearProjects })
+export async function list() {
+  return await invoke('plugin:profile|profile_list')
 }
 
 export async function check_installed(path, projectId) {
@@ -163,10 +175,8 @@ export async function run(path) {
   return await invoke('plugin:profile|profile_run', { path })
 }
 
-// Run Minecraft using a pathed profile
-// Waits for end
-export async function run_wait(path) {
-  return await invoke('plugin:profile|profile_run_wait', { path })
+export async function kill(path) {
+  return await invoke('plugin:profile|profile_kill', { path })
 }
 
 // Edits a profile
@@ -177,4 +187,18 @@ export async function edit(path, editProfile) {
 // Edits a profile's icon
 export async function edit_icon(path, iconPath) {
   return await invoke('plugin:profile|profile_edit_icon', { path, iconPath })
+}
+
+export async function finish_install(instance) {
+  if (instance.install_stage !== 'pack_installed') {
+    let linkedData = instance.linked_data
+    await install_to_existing_profile(
+      linkedData.project_id,
+      linkedData.version_id,
+      instance.name,
+      instance.path,
+    ).catch(handleError)
+  } else {
+    await install(instance.path, false).catch(handleError)
+  }
 }

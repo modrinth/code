@@ -2,9 +2,14 @@
   <img
     v-if="src"
     ref="img"
-    :class="`avatar size-${size} ${circle ? 'circle' : ''} ${noShadow ? 'no-shadow' : ''} ${
-      pixelated ? 'pixelated' : ''
-    } ${raised ? 'raised' : ''}`"
+    class="`experimental-styles-within avatar"
+    :style="`--_size: ${cssSize}`"
+    :class="{
+      circle: circle,
+      'no-shadow': noShadow,
+      raised: raised,
+      pixelated: pixelated,
+    }"
     :src="src"
     :alt="alt"
     :loading="loading"
@@ -12,9 +17,14 @@
   />
   <svg
     v-else
-    :class="`avatar size-${size} ${circle ? 'circle' : ''} ${noShadow ? 'no-shadow' : ''} ${
-      raised ? 'raised' : ''
-    }`"
+    class="`experimental-styles-within avatar"
+    :style="`--_size: ${cssSize}${tint ? `;--_tint:oklch(50% 75% ${tint})` : ''}`"
+    :class="{
+      tint: tint,
+      circle: circle,
+      'no-shadow': noShadow,
+      raised: raised,
+    }"
     xml:space="preserve"
     fill-rule="evenodd"
     stroke-linecap="round"
@@ -35,12 +45,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 const pixelated = ref(false)
 const img = ref(null)
 
-defineProps({
+const props = defineProps({
   src: {
     type: String,
     default: null,
@@ -51,10 +61,7 @@ defineProps({
   },
   size: {
     type: String,
-    default: 'sm',
-    validator(value) {
-      return ['xxs', 'xs', 'sm', 'md', 'lg', 'none'].includes(value)
-    },
+    default: '2rem',
   },
   circle: {
     type: Boolean,
@@ -66,64 +73,72 @@ defineProps({
   },
   loading: {
     type: String,
-    default: 'lazy',
+    default: 'eager',
   },
   raised: {
     type: Boolean,
     default: false,
   },
+  tintBy: {
+    type: String,
+    default: null,
+  },
 })
 
+const LEGACY_PRESETS = {
+  xxs: '1.25rem',
+  xs: '2.5rem',
+  sm: '3rem',
+  md: '6rem',
+  lg: '9rem',
+}
+
+const cssSize = computed(() => LEGACY_PRESETS[props.size] ?? props.size)
+
 function updatePixelated() {
-  pixelated.value = Boolean(img.value && img.value.naturalWidth && img.value.naturalWidth <= 96)
+  if (img.value && img.value.naturalWidth && img.value.naturalWidth < 32) {
+    pixelated.value = true
+  } else {
+    pixelated.value = false
+  }
+}
+
+const tint = computed(() => {
+  if (props.tintBy) {
+    return hash(props.tintBy) % 360
+  } else {
+    return null
+  }
+})
+
+function hash(str) {
+  let hash = 0
+  for (let i = 0, len = str.length; i < len; i++) {
+    const chr = str.charCodeAt(i)
+    hash = (hash << 5) - hash + chr
+    hash |= 0
+  }
+  return hash
 }
 </script>
 
 <style lang="scss" scoped>
 .avatar {
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-inset-lg), var(--shadow-card);
-  min-height: var(--size) !important;
-  min-width: var(--size) !important;
+  @apply min-w-[--_size] min-h-[--_size] w-[--_size] h-[--_size];
+  --_size: 2rem;
+
+  border: 1px solid var(--color-button-border);
   background-color: var(--color-button-bg);
-  object-fit: cover;
-  max-width: var(--size) !important;
-  max-height: var(--size) !important;
-
-  &.size-xxs {
-    --size: 1.25rem;
-    box-shadow: var(--shadow-inset), var(--shadow-card);
-    border-radius: var(--radius-sm);
-  }
-
-  &.size-xs {
-    --size: 2.5rem;
-    box-shadow: var(--shadow-inset), var(--shadow-card);
-    border-radius: var(--radius-sm);
-  }
-
-  &.size-sm {
-    --size: 3rem;
-    box-shadow: var(--shadow-inset), var(--shadow-card);
-    border-radius: var(--radius-sm);
-  }
-
-  &.size-md {
-    --size: 6rem;
-    border-radius: var(--radius-lg);
-  }
-
-  &.size-lg {
-    --size: 9rem;
-    border-radius: var(--radius-lg);
-  }
-
-  &.size-none {
-    --size: unset;
-  }
+  object-fit: contain;
+  border-radius: calc(16 / 96 * var(--_size));
+  position: relative;
 
   &.circle {
     border-radius: 50%;
+  }
+
+  &:not(.no-shadow) {
+    box-shadow: var(--shadow-card);
   }
 
   &.no-shadow {
@@ -136,6 +151,10 @@ function updatePixelated() {
 
   &.raised {
     background-color: var(--color-raised-bg);
+  }
+
+  &.tint {
+    background-color: color-mix(in oklch, var(--color-button-bg) 100%, var(--_tint) 5%);
   }
 }
 </style>

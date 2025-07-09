@@ -1,88 +1,60 @@
 {
+  "$schema": "https://schema.tauri.app/config/2",
   "build": {
     "beforeDevCommand": "pnpm turbo run dev --filter=@modrinth/app-frontend",
     "beforeBuildCommand": "pnpm turbo run build --filter=@modrinth/app-frontend",
-    "devPath": "http://localhost:1420",
-    "distDir": "../app-frontend/dist",
-    "withGlobalTauri": false
+    "frontendDist": "../app-frontend/dist",
+    "devUrl": "http://localhost:1420"
   },
-  "package": {
-    "productName": "Modrinth App",
-    "version": "0.7.2"
-  },
-  "tauri": {
-    "allowlist": {
-      "dialog": {
-        "confirm": true,
-        "open": true
-      },
-      "protocol": {
-        "asset": true,
-        "assetScope": [
-          "$APPDATA/caches/icons/*",
-          "$APPCONFIG/caches/icons/*",
-          "$CONFIG/caches/icons/*"
-        ]
-      },
-      "shell": {
-        "open": true
-      },
-      "window": {
-        "create": true,
-        "close": true,
-        "hide": true,
-        "show": true,
-        "maximize": true,
-        "minimize": true,
-        "unmaximize": true,
-        "unminimize": true,
-        "startDragging": true,
-        "setDecorations": true
-      },
-      "os": {
-        "all": true
-      },
-      "app": {
-        "all": true
+  "bundle": {
+    "active": true,
+    "category": "Game",
+    "copyright": "",
+    "targets": "all",
+    "externalBin": [],
+    "icon": ["icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
+    "windows": {
+      "nsis": {
+        "installMode": "perMachine",
+        "installerHooks": "./nsis/hooks.nsi"
       }
     },
-    "macOSPrivateApi": true,
-    "bundle": {
-      "active": true,
-      "category": "Game",
-      "copyright": "",
+    "longDescription": "",
+    "macOS": {
+      "entitlements": "App.entitlements",
+      "exceptionDomain": "",
+      "frameworks": [],
+      "providerShortName": null,
+      "signingIdentity": null
+    },
+    "shortDescription": "",
+    "linux": {
       "deb": {
         "depends": []
-      },
-      "externalBin": [],
-      "icon": ["icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
-      "identifier": "com.modrinth.theseus",
-      "longDescription": "",
-      "macOS": {
-        "entitlements": "App.entitlements",
-        "exceptionDomain": "",
-        "frameworks": [],
-        "providerShortName": null,
-        "signingIdentity": null
-      },
-      "resources": [],
-      "shortDescription": "",
-      "targets": "all",
-      "windows": {
-        "certificateThumbprint": null,
-        "digestAlgorithm": "sha256",
-        "timestampUrl": "http://timestamp.digicert.com",
-        "wix": {
-          "template": "./msi/main.wxs"
-        }
       }
     },
-    "security": {
-      "csp": "default-src 'self'; connect-src https://modrinth.com https://*.modrinth.com https://mixpanel.com https://*.mixpanel.com https://*.cloudflare.com https://api.mclo.gs; font-src https://cdn-raw.modrinth.com/fonts/inter/; img-src tauri: https: data: blob: 'unsafe-inline' asset: https://asset.localhost; script-src https://*.cloudflare.com 'self'; frame-src https://*.cloudflare.com https://www.youtube.com https://www.youtube-nocookie.com https://discord.com 'self'; style-src unsafe-inline 'self'"
-    },
-    "updater": {
-      "active": false
-    },
+    "fileAssociations": [
+      {
+        "ext": ["mrpack"],
+        "mimeType": "application/x-modrinth-modpack+zip"
+      }
+    ]
+  },
+  "productName": "Modrinth App",
+  "version": "../app-frontend/package.json",
+  "mainBinaryName": "Modrinth App",
+  "identifier": "ModrinthApp",
+  "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": ["modrinth"]
+      },
+      "mobile": []
+    }
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "macOSPrivateApi": true,
     "windows": [
       {
         "titleBarStyle": "Overlay",
@@ -94,9 +66,34 @@
         "width": 1280,
         "minHeight": 700,
         "minWidth": 1100,
-        "visible": false,
+        "visible": true,
+        "zoomHotkeysEnabled": false,
         "decorations": false
       }
-    ]
+    ],
+    "security": {
+      "assetProtocol": {
+        "scope": [
+          "$APPDATA/caches/icons/*",
+          "$APPCONFIG/caches/icons/*",
+          "$CONFIG/caches/icons/*",
+          "$APPDATA/profiles/*/saves/*/icon.png",
+          "$APPCONFIG/profiles/*/saves/*/icon.png",
+          "$CONFIG/profiles/*/saves/*/icon.png"
+        ],
+        "enable": true
+      },
+      "capabilities": ["ads", "core", "plugins"],
+      "csp": {
+        "default-src": "'self' customprotocol: asset:",
+        "connect-src": "ipc: http://ipc.localhost https://modrinth.com https://*.modrinth.com https://*.posthog.com https://*.sentry.io https://api.mclo.gs 'self' data: blob:",
+        "font-src": ["https://cdn-raw.modrinth.com/fonts/"],
+        "img-src": "https: 'unsafe-inline' 'self' asset: http://asset.localhost http://textures.minecraft.net blob: data:",
+        "style-src": "'unsafe-inline' 'self'",
+        "script-src": "https://*.posthog.com 'self'",
+        "frame-src": "https://www.youtube.com https://www.youtube-nocookie.com https://discord.com 'self'",
+        "media-src": "https://*.githubusercontent.com"
+      }
+    }
   }
 }

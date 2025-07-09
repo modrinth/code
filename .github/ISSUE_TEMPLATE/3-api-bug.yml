@@ -1,12 +1,12 @@
 name: 🛠️ API issue (api.modrinth.com)
-description: Report an issue on the Modrinth website.
-labels: [bug, api]
+description: Report an issue regarding the Modrinth API.
+labels: [bug, backend]
 body:
   - type: checkboxes
     attributes:
       label: Please confirm the following.
       options:
-        - label: I checked the [existing issues](https://github.com/modrinth/code/issues) for duplicate problems
+        - label: I checked the [existing issues](https://github.com/modrinth/code/issues?q=is%3Aissue) for duplicate problems
           required: true
         - label: I have tried resolving the issue using the [support portal](https://support.modrinth.com)
           required: true

@@ -1,55 +1,45 @@
 //! Theseus profile management interface
-use crate::pack::install_from::CreatePackProfile;
-use crate::prelude::ProfilePathId;
-use crate::state::LinkedData;
+use crate::launcher::get_loader_version_from_profile;
+use crate::settings::Hooks;
+use crate::state::{LauncherFeatureVersion, LinkedData, ProfileInstallStage};
 use crate::util::io::{self, canonicalize};
+use crate::{ErrorKind, pack, profile};
+pub use crate::{State, state::Profile};
 use crate::{
-    event::{emit::emit_profile, ProfilePayloadType},
+    event::{ProfilePayloadType, emit::emit_profile},
     prelude::ModLoader,
 };
-use crate::{pack, profile, ErrorKind};
-pub use crate::{
-    state::{JavaSettings, Profile},
-    State,
-};
-use daedalus::modded::LoaderVersion;
+use chrono::Utc;
 use std::path::PathBuf;
-
 use tracing::{info, trace};
-use uuid::Uuid;
 
 // Creates a profile of a given name and adds it to the in-memory state
 // Returns relative filepath as ProfilePathId which can be used to access it in the State
 #[tracing::instrument]
-#[theseus_macros::debug_pin]
 #[allow(clippy::too_many_arguments)]
 pub async fn profile_create(
-    mut name: String, // the name of the profile, and relative path
+    name: String,         // the name of the profile, and relative path
     game_version: String, // the game version of the profile
     modloader: ModLoader, // the modloader to use
     loader_version: Option<String>, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader. defaults to latest
-    icon: Option<PathBuf>,          // the icon for the profile
-    icon_url: Option<String>, // the URL icon for a profile (ONLY USED FOR TEMPORARY PROFILES)
+    icon_path: Option<String>,      // the icon for the profile
     linked_data: Option<LinkedData>, // the linked project ID (mainly for modpacks)- used for updating
     skip_install_profile: Option<bool>,
-    no_watch: Option<bool>,
-) -> crate::Result<ProfilePathId> {
-    name = profile::sanitize_profile_name(&name);
-
+) -> crate::Result<String> {
     trace!("Creating new profile. {}", name);
     let state = State::get().await?;
-    let uuid = Uuid::new_v4();
 
-    let mut path = state.directories.profiles_dir().await.join(&name);
-
-    if path.exists() {
-        let mut new_name;
+    let mut path = profile::sanitize_profile_name(&name);
+    let mut full_path = state.directories.profiles_dir().join(&path);
+    if full_path.exists() {
         let mut new_path;
+        let mut new_full_path;
         let mut which = 1;
+
         loop {
-            new_name = format!("{name} ({which})");
-            new_path = state.directories.profiles_dir().await.join(&new_name);
-            if !new_path.exists() {
+            new_path = format!("{path} ({which})");
+            new_full_path = state.directories.profiles_dir().join(&new_path);
+            if !new_full_path.exists() {
                 break;
             }
             which += 1;
@@ -57,32 +47,62 @@ pub async fn profile_create(
 
         tracing::debug!(
             "Folder collision: {}, renaming to: {}",
-            path.display(),
-            new_path.display()
+            full_path.display(),
+            new_full_path.display()
         );
+
         path = new_path;
-        name = new_name;
+        full_path = new_full_path;
     }
-    io::create_dir_all(&path).await?;
+    io::create_dir_all(&full_path).await?;
 
     info!(
         "Creating profile at path {}",
-        &canonicalize(&path)?.display()
+        &canonicalize(&full_path)?.display()
     );
     let loader = if modloader != ModLoader::Vanilla {
-        get_loader_version_from_loader(
-            game_version.clone(),
+        get_loader_version_from_profile(
+            &game_version,
             modloader,
-            loader_version,
+            loader_version.as_deref(),
         )
         .await?
     } else {
         None
     };
 
-    let mut profile = Profile::new(uuid, name, game_version).await?;
+    let mut profile = Profile {
+        path: path.clone(),
+        install_stage: ProfileInstallStage::NotInstalled,
+        launcher_feature_version: LauncherFeatureVersion::MOST_RECENT,
+        name,
+        icon_path: None,
+        game_version,
+        protocol_version: None,
+        loader: modloader,
+        loader_version: loader.map(|x| x.id),
+        groups: Vec::new(),
+        linked_data,
+        created: Utc::now(),
+        modified: Utc::now(),
+        last_played: None,
+        submitted_time_played: 0,
+        recent_time_played: 0,
+        java_path: None,
+        extra_launch_args: None,
+        custom_env_vars: None,
+        memory: None,
+        force_fullscreen: None,
+        game_resolution: None,
+        hooks: Hooks {
+            pre_launch: None,
+            wrapper: None,
+            post_exit: None,
+        },
+    };
+
     let result = async {
-        if let Some(ref icon) = icon {
+        if let Some(ref icon) = icon_path {
             let bytes =
                 io::read(state.directories.caches_dir().join(icon)).await?;
             profile
@@ -90,93 +110,55 @@ pub async fn profile_create(
                     &state.directories.caches_dir(),
                     &state.io_semaphore,
                     bytes::Bytes::from(bytes),
-                    &icon.to_string_lossy(),
+                    icon,
                 )
                 .await?;
         }
 
-        profile.metadata.icon_url = icon_url;
-        if let Some(loader_version) = loader {
-            profile.metadata.loader = modloader;
-            profile.metadata.loader_version = Some(loader_version);
-        }
-
-        profile.metadata.linked_data = linked_data;
-        if let Some(linked_data) = &mut profile.metadata.linked_data {
-            linked_data.locked = Some(
-                linked_data.project_id.is_some()
-                    && linked_data.version_id.is_some(),
-            );
-        }
-
-        emit_profile(
-            uuid,
-            &profile.profile_id(),
-            &profile.metadata.name,
-            ProfilePayloadType::Created,
+        crate::state::fs_watcher::watch_profile(
+            &profile.path,
+            &state.file_watcher,
+            &state.directories,
         )
-        .await?;
+        .await;
 
-        {
-            let mut profiles = state.profiles.write().await;
-            profiles
-                .insert(profile.clone(), no_watch.unwrap_or_default())
-                .await?;
-        }
+        profile.upsert(&state.pool).await?;
+
+        emit_profile(&profile.path, ProfilePayloadType::Created).await?;
 
         if !skip_install_profile.unwrap_or(false) {
             crate::launcher::install_minecraft(&profile, None, false).await?;
         }
-        State::sync().await?;
 
-        Ok(profile.profile_id())
+        Ok(profile.path)
     }
     .await;
 
     match result {
         Ok(profile) => Ok(profile),
         Err(err) => {
-            let _ = crate::api::profile::remove(&profile.profile_id()).await;
+            let _ = profile::remove(&path).await;
 
             Err(err)
         }
     }
 }
 
-pub async fn profile_create_from_creator(
-    profile: CreatePackProfile,
-) -> crate::Result<ProfilePathId> {
-    profile_create(
-        profile.name,
-        profile.game_version,
-        profile.modloader,
-        profile.loader_version,
-        profile.icon,
-        profile.icon_url,
-        profile.linked_data,
-        profile.skip_install_profile,
-        profile.no_watch,
-    )
-    .await
-}
-
 pub async fn profile_create_from_duplicate(
-    copy_from: ProfilePathId,
-) -> crate::Result<ProfilePathId> {
+    copy_from: &str,
+) -> crate::Result<String> {
     // Original profile
-    let profile = profile::get(&copy_from, None).await?.ok_or_else(|| {
+    let profile = profile::get(copy_from).await?.ok_or_else(|| {
         ErrorKind::UnmanagedProfileError(copy_from.to_string())
     })?;
 
     let profile_path_id = profile_create(
-        profile.metadata.name.clone(),
-        profile.metadata.game_version.clone(),
-        profile.metadata.loader,
-        profile.metadata.loader_version.clone().map(|it| it.id),
-        profile.metadata.icon.clone(),
-        profile.metadata.icon_url.clone(),
-        profile.metadata.linked_data.clone(),
-        Some(true),
+        profile.name.clone(),
+        profile.game_version.clone(),
+        profile.loader,
+        profile.loader_version.clone(),
+        profile.icon_path.clone(),
+        profile.linked_data.clone(),
         Some(true),
     )
     .await?;
@@ -184,112 +166,24 @@ pub async fn profile_create_from_duplicate(
     // Copy it over using the import system (essentially importing from the same profile)
     let state = State::get().await?;
     let bar = pack::import::copy_dotminecraft(
-        profile_path_id.clone(),
-        copy_from.get_full_path().await?,
+        &profile_path_id,
+        profile::get_full_path(copy_from).await?,
         &state.io_semaphore,
         None,
     )
     .await?;
 
     let duplicated_profile =
-        profile::get(&profile_path_id, None).await?.ok_or_else(|| {
+        profile::get(&profile_path_id).await?.ok_or_else(|| {
             ErrorKind::UnmanagedProfileError(profile_path_id.to_string())
         })?;
 
     crate::launcher::install_minecraft(&duplicated_profile, Some(bar), false)
         .await?;
-    {
-        let state = State::get().await?;
-        let mut file_watcher = state.file_watcher.write().await;
-        Profile::watch_fs(
-            &profile.get_profile_full_path().await?,
-            &mut file_watcher,
-        )
-        .await?;
-    }
 
     // emit profile edited
-    emit_profile(
-        profile.uuid,
-        &profile.profile_id(),
-        &profile.metadata.name,
-        ProfilePayloadType::Edited,
-    )
-    .await?;
-    State::sync().await?;
+    emit_profile(&profile.path, ProfilePayloadType::Edited).await?;
     Ok(profile_path_id)
-}
-
-#[tracing::instrument]
-#[theseus_macros::debug_pin]
-pub(crate) async fn get_loader_version_from_loader(
-    game_version: String,
-    loader: ModLoader,
-    loader_version: Option<String>,
-) -> crate::Result<Option<LoaderVersion>> {
-    let state = State::get().await?;
-    let metadata = state.metadata.read().await;
-
-    let version = loader_version.unwrap_or_else(|| "latest".to_string());
-
-    let filter = |it: &LoaderVersion| match version.as_str() {
-        "latest" => true,
-        "stable" => it.stable,
-        id => {
-            it.id == *id
-                || format!("{}-{}", game_version, id) == it.id
-                || format!("{}-{}-{}", game_version, id, game_version) == it.id
-        }
-    };
-
-    let loader_data = match loader {
-        ModLoader::Forge => &metadata.forge,
-        ModLoader::Fabric => &metadata.fabric,
-        ModLoader::Quilt => &metadata.quilt,
-        ModLoader::NeoForge => &metadata.neoforge,
-        _ => {
-            return Err(
-                ProfileCreationError::NoManifest(loader.to_string()).into()
-            )
-        }
-    };
-
-    let loaders = &loader_data
-        .game_versions
-        .iter()
-        .find(|it| {
-            it.id
-                .replace(daedalus::modded::DUMMY_REPLACE_STRING, &game_version)
-                == game_version
-        })
-        .ok_or_else(|| {
-            ProfileCreationError::ModloaderUnsupported(
-                loader.to_string(),
-                game_version.clone(),
-            )
-        })?
-        .loaders;
-
-    let loader_version = loaders
-        .iter()
-        .find(|&x| filter(x))
-        .cloned()
-        .or(
-            // If stable was searched for but not found, return latest by default
-            if version == "stable" {
-                loaders.iter().next().cloned()
-            } else {
-                None
-            },
-        )
-        .ok_or_else(|| {
-            ProfileCreationError::InvalidVersionModloader(
-                version,
-                loader.to_string(),
-            )
-        })?;
-
-    Ok(Some(loader_version))
 }
 
 #[derive(thiserror::Error, Debug)]

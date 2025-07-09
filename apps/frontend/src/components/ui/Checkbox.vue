@@ -25,8 +25,7 @@
 </template>
 
 <script>
-import CheckIcon from "~/assets/images/utils/check.svg?component";
-import DropdownIcon from "~/assets/images/utils/dropdown.svg?component";
+import { CheckIcon, DropdownIcon } from "@modrinth/assets";
 
 export default {
   components: {
@@ -36,23 +35,28 @@ export default {
   props: {
     label: {
       type: String,
+      required: false,
       default: "",
     },
     disabled: {
       type: Boolean,
+      required: false,
       default: false,
     },
     description: {
       type: String,
+      required: false,
       default: null,
     },
     modelValue: Boolean,
     clickEvent: {
       type: Function,
+      required: false,
       default: () => {},
     },
     collapsingToggleStyle: {
       type: Boolean,
+      required: false,
       default: false,
     },
   },
@@ -114,7 +118,7 @@ export default {
   }
 
   svg {
-    color: var(--color-brand-inverted);
+    color: var(--color-accent-contrast, var(--color-brand-inverted));
     stroke-width: 0.2rem;
     height: 0.8rem;
     width: 0.8rem;

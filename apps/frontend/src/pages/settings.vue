@@ -12,7 +12,7 @@
               link="/settings"
               :label="formatMessage(commonSettingsMessages.appearance)"
             >
-              <PaintBrushIcon />
+              <PaintbrushIcon />
             </NavStackItem>
             <NavStackItem
               v-if="isStaging"
@@ -47,6 +47,12 @@
               >
                 <MonitorSmartphoneIcon />
               </NavStackItem>
+              <NavStackItem
+                link="/settings/billing"
+                :label="formatMessage(commonSettingsMessages.billing)"
+              >
+                <CardIcon />
+              </NavStackItem>
             </template>
             <template v-if="auth.user">
               <h3>Developer</h3>
@@ -76,17 +82,17 @@
 import {
   ServerIcon,
   GridIcon,
-  PaintBrushIcon,
+  PaintbrushIcon,
   UserIcon,
   ShieldIcon,
   KeyIcon,
   LanguagesIcon,
+  CardIcon,
+  MonitorSmartphoneIcon,
 } from "@modrinth/assets";
+import { commonMessages, commonSettingsMessages } from "@modrinth/ui";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
-import MonitorSmartphoneIcon from "~/assets/images/utils/monitor-smartphone.svg?component";
-
-import { commonMessages, commonSettingsMessages } from "~/utils/common-messages.ts";
 
 const { formatMessage } = useVIntl();
 

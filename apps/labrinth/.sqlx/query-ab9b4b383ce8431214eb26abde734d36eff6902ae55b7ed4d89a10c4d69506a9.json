@@ -1,0 +1,50 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT l.id id, l.loader loader, l.icon icon, l.metadata metadata,\n            ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,\n            ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games\n            FROM loaders l\n            LEFT OUTER JOIN loaders_project_types lpt ON joining_loader_id = l.id\n            LEFT OUTER JOIN project_types pt ON lpt.joining_project_type_id = pt.id\n            LEFT OUTER JOIN loaders_project_types_games lptg ON lptg.loader_id = lpt.joining_loader_id AND lptg.project_type_id = lpt.joining_project_type_id\n            LEFT OUTER JOIN games g ON lptg.game_id = g.id\n            GROUP BY l.id;\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "loader",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "icon",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "metadata",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 4,
+        "name": "project_types",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 5,
+        "name": "games",
+        "type_info": "VarcharArray"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      null,
+      null
+    ]
+  },
+  "hash": "ab9b4b383ce8431214eb26abde734d36eff6902ae55b7ed4d89a10c4d69506a9"
+}

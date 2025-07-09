@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import * as Pages from '@/pages'
 import * as Project from '@/pages/project'
 import * as Instance from '@/pages/instance'
+import * as Library from '@/pages/library'
 
 /**
  * Configures application routing. Add page to pages/index and then add to route table here.
@@ -18,28 +19,53 @@ export default new createRouter({
       },
     },
     {
+      path: '/worlds',
+      name: 'Worlds',
+      component: Pages.Worlds,
+      meta: {
+        breadcrumb: [{ name: 'Worlds' }],
+      },
+    },
+    {
       path: '/browse/:projectType',
-      name: 'Browse',
+      name: 'Discover content',
       component: Pages.Browse,
       meta: {
-        breadcrumb: [{ name: 'Browse' }],
+        breadcrumb: [{ name: 'Discover content' }],
+      },
+    },
+    {
+      path: '/skins',
+      name: 'Skins',
+      component: Pages.Skins,
+      meta: {
+        breadcrumb: [{ name: 'Skins' }],
       },
     },
     {
       path: '/library',
       name: 'Library',
-      component: Pages.Library,
+      component: Library.Index,
       meta: {
         breadcrumb: [{ name: 'Library' }],
       },
-    },
-    {
-      path: '/settings',
-      name: 'Settings',
-      component: Pages.Settings,
-      meta: {
-        breadcrumb: [{ name: 'Settings' }],
-      },
+      children: [
+        {
+          path: '',
+          name: 'Overview',
+          component: Library.Overview,
+        },
+        {
+          path: 'downloaded',
+          name: 'Downloaded',
+          component: Library.Downloaded,
+        },
+        {
+          path: 'custom',
+          name: 'Custom',
+          component: Library.Custom,
+        },
+      ],
     },
     {
       path: '/project/:id',
@@ -96,13 +122,31 @@ export default new createRouter({
       component: Instance.Index,
       props: true,
       children: [
+        // {
+        //   path: '',
+        //   name: 'Overview',
+        //   component: Instance.Overview,
+        //   meta: {
+        //     useRootContext: true,
+        //     breadcrumb: [{ name: '?Instance' }],
+        //   },
+        // },
+        {
+          path: 'worlds',
+          name: 'InstanceWorlds',
+          component: Instance.Worlds,
+          meta: {
+            useRootContext: true,
+            breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Worlds' }],
+          },
+        },
         {
           path: '',
           name: 'Mods',
           component: Instance.Mods,
           meta: {
             useRootContext: true,
-            breadcrumb: [{ name: '?Instance' }],
+            breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Content' }],
           },
         },
         {
@@ -111,16 +155,7 @@ export default new createRouter({
           component: Instance.Mods,
           meta: {
             useRootContext: true,
-            breadcrumb: [{ name: '?Instance' }],
-          },
-        },
-        {
-          path: 'options',
-          name: 'Options',
-          component: Instance.Options,
-          meta: {
-            useRootContext: true,
-            breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Options' }],
+            breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Content' }],
           },
         },
         {
@@ -139,9 +174,9 @@ export default new createRouter({
   linkExactActiveClass: 'router-link-exact-active',
   scrollBehavior() {
     // Sometimes Vue's scroll behavior is not working as expected, so we need to manually scroll to top (especially on Linux)
-    document.querySelector('.router-view').scrollTop = 0
+    document.querySelector('.app-viewport')?.scrollTo(0, 0)
     return {
-      el: '.router-view',
+      el: '.app-viewport',
       top: 0,
     }
   },

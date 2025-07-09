@@ -1,5 +1,3 @@
-import { useAutoRef, type AutoRef } from "./auto-ref.ts";
-
 const safeTags = new Map<string, string>();
 
 function safeTagFor(locale: string) {
@@ -59,7 +57,7 @@ export function createDisplayNames(
 
           try {
             return dict.of(lookup);
-          } catch (err) {
+          } catch {
             console.warn(
               `Failed to get display name for ${lookup} using dictionary for ${
                 this.resolvedOptions().locale
@@ -81,11 +79,14 @@ export function createDisplayNames(
 }
 
 export function useDisplayNames(
-  locale: AutoRef<string>,
-  options?: AutoRef<Intl.DisplayNamesOptions | undefined>,
+  locale: string | (() => string) | Ref<string>,
+  options?:
+    | (Intl.DisplayNamesOptions | undefined)
+    | (() => Intl.DisplayNamesOptions | undefined)
+    | Ref<Intl.DisplayNamesOptions | undefined>,
 ) {
-  const $locale = useAutoRef(locale);
-  const $options = useAutoRef(options);
+  const $locale = toRef(locale);
+  const $options = toRef(options);
 
   return computed(() => createDisplayNames($locale.value, $options.value));
 }

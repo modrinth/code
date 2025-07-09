@@ -1,5 +1,5 @@
 <template>
-  <Modal ref="modal" header="Create instance" :noblur="!themeStore.advancedRendering">
+  <ModalWrapper ref="modal" header="Creating an instance">
     <div class="modal-header">
       <Chips v-model="creationType" :items="['custom', 'from file', 'import from launcher']" />
     </div>
@@ -110,7 +110,7 @@
               placeholder="Path to launcher"
               @change="setPath"
             />
-            <Button @click="() => (selectedLauncherPath = '')">
+            <Button class="r-btn" @click="() => (selectedLauncherPath = '')">
               <XIcon />
             </Button>
           </div>
@@ -193,47 +193,39 @@
         />
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
 </template>
 
 <script setup>
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import {
-  PlusIcon,
-  UploadIcon,
-  XIcon,
   CodeIcon,
   FolderOpenIcon,
-  InfoIcon,
   FolderSearchIcon,
+  InfoIcon,
+  PlusIcon,
   UpdatedIcon,
+  UploadIcon,
+  XIcon,
 } from '@modrinth/assets'
-import { Avatar, Button, Chips, Modal, Checkbox } from '@modrinth/ui'
+import { Avatar, Button, Checkbox, Chips } from '@modrinth/ui'
 import { computed, onUnmounted, ref, shallowRef } from 'vue'
 import { get_loaders } from '@/helpers/tags'
 import { create } from '@/helpers/profile'
-import { open } from '@tauri-apps/api/dialog'
-import { tauri } from '@tauri-apps/api'
-import {
-  get_game_versions,
-  get_fabric_versions,
-  get_forge_versions,
-  get_quilt_versions,
-  get_neoforge_versions,
-} from '@/helpers/metadata'
+import { open } from '@tauri-apps/plugin-dialog'
+import { convertFileSrc } from '@tauri-apps/api/core'
+import { get_game_versions, get_loader_versions } from '@/helpers/metadata'
 import { handleError } from '@/store/notifications.js'
 import Multiselect from 'vue-multiselect'
-import { mixpanel_track } from '@/helpers/mixpanel'
-import { useTheming } from '@/store/state.js'
-import { listen } from '@tauri-apps/api/event'
-import { install_from_file } from '@/helpers/pack.js'
+import { trackEvent } from '@/helpers/analytics'
+import { create_profile_and_install_from_file } from '@/helpers/pack.js'
 import {
   get_default_launcher_path,
   get_importable_instances,
   import_instance,
 } from '@/helpers/import.js'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
-
-const themeStore = useTheming()
+import { getCurrentWebview } from '@tauri-apps/api/webview'
 
 const profile_name = ref('')
 const game_version = ref('')
@@ -245,7 +237,7 @@ const display_icon = ref(null)
 const showAdvanced = ref(false)
 const creating = ref(false)
 const showSnapshots = ref(false)
-const creationType = ref('from file')
+const creationType = ref('custom')
 const isShowing = ref(false)
 
 defineExpose({
@@ -263,20 +255,22 @@ defineExpose({
     isShowing.value = true
     modal.value.show()
 
-    unlistener.value = await listen('tauri://file-drop', async (event) => {
+    unlistener.value = await getCurrentWebview().onDragDropEvent(async (event) => {
       // Only if modal is showing
       if (!isShowing.value) return
+      if (event.payload.type !== 'drop') return
       if (creationType.value !== 'from file') return
       hide()
-      if (event.payload && event.payload.length > 0 && event.payload[0].endsWith('.mrpack')) {
-        await install_from_file(event.payload[0]).catch(handleError)
-        mixpanel_track('InstanceCreate', {
+      const { paths } = event.payload
+      if (paths && paths.length > 0 && paths[0].endsWith('.mrpack')) {
+        await create_profile_and_install_from_file(paths[0]).catch(handleError)
+        trackEvent('InstanceCreate', {
           source: 'CreationModalFileDrop',
         })
       }
     })
 
-    mixpanel_track('InstanceCreateStart', { source: 'CreationModal' })
+    trackEvent('InstanceCreateStart', { source: 'CreationModal' })
   },
 })
 
@@ -304,10 +298,10 @@ const [
   all_game_versions,
   loaders,
 ] = await Promise.all([
-  get_fabric_versions().then(shallowRef).catch(handleError),
-  get_forge_versions().then(shallowRef).catch(handleError),
-  get_quilt_versions().then(shallowRef).catch(handleError),
-  get_neoforge_versions().then(shallowRef).catch(handleError),
+  get_loader_versions('fabric').then(shallowRef).catch(handleError),
+  get_loader_versions('forge').then(shallowRef).catch(handleError),
+  get_loader_versions('quilt').then(shallowRef).catch(handleError),
+  get_loader_versions('neo').then(shallowRef).catch(handleError),
   get_game_versions().then(shallowRef).catch(handleError),
   get_loaders()
     .then((value) =>
@@ -366,7 +360,7 @@ const create_instance = async () => {
     icon.value,
   ).catch(handleError)
 
-  mixpanel_track('InstanceCreate', {
+  trackEvent('InstanceCreate', {
     profile_name: profile_name.value,
     game_version: game_version.value,
     loader: loader.value,
@@ -377,7 +371,7 @@ const create_instance = async () => {
 }
 
 const upload_icon = async () => {
-  icon.value = await open({
+  const res = await open({
     multiple: false,
     filters: [
       {
@@ -387,8 +381,10 @@ const upload_icon = async () => {
     ],
   })
 
+  icon.value = res.path ?? res
+
   if (!icon.value) return
-  display_icon.value = tauri.convertFileSrc(icon.value)
+  display_icon.value = convertFileSrc(icon.value)
 }
 
 const reset_icon = () => {
@@ -423,9 +419,9 @@ const openFile = async () => {
   const newProject = await open({ multiple: false })
   if (!newProject) return
   hide()
-  await install_from_file(newProject).catch(handleError)
+  await create_profile_and_install_from_file(newProject.path ?? newProject).catch(handleError)
 
-  mixpanel_track('InstanceCreate', {
+  trackEvent('InstanceCreate', {
     source: 'CreationModalFileOpen',
   })
 }
@@ -468,7 +464,7 @@ const promises = profileOptions.value.map(async (option) => {
       option.name,
       instances.map((name) => ({ name, selected: false })),
     )
-  } catch (error) {
+  } catch {
     // Allow failure silently
   }
 })
@@ -529,8 +525,8 @@ const next = async () => {
 .modal-body {
   display: flex;
   flex-direction: column;
-  padding: var(--gap-lg);
   gap: var(--gap-md);
+  margin-top: var(--gap-lg);
 }
 
 .input-label {
@@ -599,7 +595,6 @@ const next = async () => {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: var(--gap-lg);
   padding-bottom: 0;
 }
 

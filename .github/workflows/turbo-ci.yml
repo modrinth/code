@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize]
+  merge_group:
+    types: [checks_requested]
+
+jobs:
+  build:
+    name: Lint and Test
+    runs-on: ubuntu-22.04
+
+    env:
+      # Ensure pnpm output is colored in GitHub Actions logs
+      FORCE_COLOR: 3
+      # Make cargo nextest successfully ignore projects without tests
+      NEXTEST_NO_TESTS: pass
+
+    steps:
+      - name: 📥 Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: 🧰 Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -yq libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: 🧰 Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: 🧰 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: 🧰 Setup Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          rustflags: ''
+          components: clippy, rustfmt
+          cache: false
+
+      - name: 🧰 Setup nextest
+        uses: taiki-e/install-action@nextest
+
+      # cargo-binstall does not have pre-built binaries for sqlx-cli, so we fall
+      # back to a cached cargo install
+      - name: 🧰 Setup cargo-sqlx
+        uses: AlexTMjugador/cache-cargo-install-action@feat/features-support
+        with:
+          tool: sqlx-cli
+          locked: false
+          no-default-features: true
+          features: rustls,postgres
+
+      - name: 💨 Setup Turbo cache
+        uses: rharkor/caching-for-turbo@v1.8
+
+      - name: 🧰 Install dependencies
+        run: pnpm install
+
+      - name: ⚙️ Start services
+        run: docker compose up --wait
+
+      - name: ⚙️ Setup Labrinth environment and database
+        working-directory: apps/labrinth
+        run: |
+          cp .env.local .env
+          sqlx database setup
+
+      - name: 🔍 Lint and test
+        run: pnpm run ci

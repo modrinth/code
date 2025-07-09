@@ -4,69 +4,69 @@
 
     <!-- User roles -->
     <template v-else-if="type === 'admin'">
-      <ModrinthIcon /> {{ formatMessage(messages.modrinthTeamLabel) }}
+      <ModrinthIcon aria-hidden="true" /> {{ formatMessage(messages.modrinthTeamLabel) }}
     </template>
     <template v-else-if="type === 'moderator'">
-      <ScaleIcon /> {{ formatMessage(messages.moderatorLabel) }}
+      <ScaleIcon aria-hidden="true" /> {{ formatMessage(messages.moderatorLabel) }}
     </template>
     <template v-else-if="type === 'creator'">
-      <BoxIcon /> {{ formatMessage(messages.creatorLabel) }}
+      <BoxIcon aria-hidden="true" /> {{ formatMessage(messages.creatorLabel) }}
     </template>
 
     <!-- Project statuses -->
     <template v-else-if="type === 'approved'">
-      <ListIcon /> {{ formatMessage(messages.listedLabel) }}
+      <ListIcon aria-hidden="true" /> {{ formatMessage(messages.listedLabel) }}
     </template>
     <template v-else-if="type === 'approved-general'">
-      <CheckIcon /> {{ formatMessage(messages.approvedLabel) }}
+      <CheckIcon aria-hidden="true" /> {{ formatMessage(messages.approvedLabel) }}
     </template>
     <template v-else-if="type === 'unlisted'">
-      <EyeOffIcon /> {{ formatMessage(messages.unlistedLabel) }}
+      <EyeOffIcon aria-hidden="true" /> {{ formatMessage(messages.unlistedLabel) }}
     </template>
     <template v-else-if="type === 'withheld'">
-      <EyeOffIcon /> {{ formatMessage(messages.withheldLabel) }}
+      <EyeOffIcon aria-hidden="true" /> {{ formatMessage(messages.withheldLabel) }}
     </template>
     <template v-else-if="type === 'private'">
-      <LockIcon /> {{ formatMessage(messages.privateLabel) }}
+      <LockIcon aria-hidden="true" /> {{ formatMessage(messages.privateLabel) }}
     </template>
     <template v-else-if="type === 'scheduled'">
-      <CalendarIcon /> {{ formatMessage(messages.scheduledLabel) }}
+      <CalendarIcon aria-hidden="true" /> {{ formatMessage(messages.scheduledLabel) }}
     </template>
     <template v-else-if="type === 'draft'">
-      <FileTextIcon /> {{ formatMessage(messages.draftLabel) }}
+      <FileTextIcon aria-hidden="true" /> {{ formatMessage(messages.draftLabel) }}
     </template>
     <template v-else-if="type === 'archived'">
-      <ArchiveIcon /> {{ formatMessage(messages.archivedLabel) }}
+      <ArchiveIcon aria-hidden="true" /> {{ formatMessage(messages.archivedLabel) }}
     </template>
     <template v-else-if="type === 'rejected'">
-      <XIcon /> {{ formatMessage(messages.rejectedLabel) }}
+      <XIcon aria-hidden="true" /> {{ formatMessage(messages.rejectedLabel) }}
     </template>
     <template v-else-if="type === 'processing'">
-      <UpdatedIcon /> {{ formatMessage(messages.underReviewLabel) }}
+      <UpdatedIcon aria-hidden="true" /> {{ formatMessage(messages.underReviewLabel) }}
     </template>
 
     <!-- Team members -->
     <template v-else-if="type === 'accepted'">
-      <CheckIcon /> {{ formatMessage(messages.acceptedLabel) }}
+      <CheckIcon aria-hidden="true" /> {{ formatMessage(messages.acceptedLabel) }}
     </template>
     <template v-else-if="type === 'pending'">
-      <UpdatedIcon /> {{ formatMessage(messages.pendingLabel) }}
+      <UpdatedIcon aria-hidden="true" /> {{ formatMessage(messages.pendingLabel) }}
     </template>
 
     <!-- Transaction statuses (pending, processing reused) -->
     <template v-else-if="type === 'processed'">
-      <CheckIcon /> {{ formatMessage(messages.processedLabel) }}
+      <CheckIcon aria-hidden="true" /> {{ formatMessage(messages.processedLabel) }}
     </template>
     <template v-else-if="type === 'failed'">
-      <XIcon /> {{ formatMessage(messages.failedLabel) }}
+      <XIcon aria-hidden="true" /> {{ formatMessage(messages.failedLabel) }}
     </template>
     <template v-else-if="type === 'returned'">
-      <XIcon /> {{ formatMessage(messages.returnedLabel) }}
+      <XIcon aria-hidden="true" /> {{ formatMessage(messages.returnedLabel) }}
     </template>
 
     <!-- Report status -->
     <template v-else-if="type === 'closed'">
-      <XIcon /> {{ formatMessage(messages.closedLabel) }}
+      <XIcon aria-hidden="true" /> {{ formatMessage(messages.closedLabel) }}
     </template>
 
     <!-- Other -->
@@ -74,7 +74,7 @@
   </span>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
   ModrinthIcon,
   ScaleIcon,
@@ -172,16 +172,10 @@ const messages = defineMessages({
 })
 const { formatMessage } = useVIntl()
 
-defineProps({
-  type: {
-    type: String,
-    required: true,
-  },
-  color: {
-    type: String,
-    default: '',
-  },
-})
+defineProps<{
+  type: string
+  color?: string
+}>()
 </script>
 <style lang="scss" scoped>
 .version-badge {

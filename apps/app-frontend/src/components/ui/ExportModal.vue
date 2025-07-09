@@ -1,12 +1,12 @@
 <script setup>
 import { XIcon, PlusIcon } from '@modrinth/assets'
-import { Button, Checkbox, Modal } from '@modrinth/ui'
+import { Button, Checkbox } from '@modrinth/ui'
 import { PackageIcon, VersionIcon } from '@/assets/icons'
 import { ref } from 'vue'
 import { export_profile_mrpack, get_pack_export_candidates } from '@/helpers/profile.js'
-import { open } from '@tauri-apps/api/dialog'
+import { open } from '@tauri-apps/plugin-dialog'
 import { handleError } from '@/store/notifications.js'
-import { useTheming } from '@/store/theme'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 const props = defineProps({
   instance: {
@@ -23,14 +23,12 @@ defineExpose({
 })
 
 const exportModal = ref(null)
-const nameInput = ref(props.instance.metadata.name)
+const nameInput = ref(props.instance.name)
 const exportDescription = ref('')
 const versionInput = ref('1.0.0')
 const files = ref([])
 const folders = ref([])
 const showingFiles = ref(false)
-
-const themeStore = useTheming()
 
 const initFiles = async () => {
   const newFolders = new Map()
@@ -50,9 +48,9 @@ const initFiles = async () => {
         disabled:
           folder === 'profile.json' ||
           folder.startsWith('modrinth_logs') ||
-          folder.startsWith('.fabric') ||
-          folder.includes('.DS_Store'),
+          folder.startsWith('.fabric'),
       }))
+      .filter((pathData) => !pathData.path.includes('.DS_Store'))
       .forEach((pathData) => {
         const parent = pathData.path.split(sep).slice(0, -1).join(sep)
         if (parent !== '') {
@@ -106,14 +104,14 @@ const exportPack = async () => {
 </script>
 
 <template>
-  <Modal ref="exportModal" header="Export modpack" :noblur="!themeStore.advancedRendering">
+  <ModalWrapper ref="exportModal" header="Export modpack">
     <div class="modal-body">
       <div class="labeled_input">
         <p>Modpack Name</p>
         <div class="iconified-input">
           <PackageIcon />
           <input v-model="nameInput" type="text" placeholder="Modpack name" class="input" />
-          <Button @click="nameInput = ''">
+          <Button class="r-btn" @click="nameInput = ''">
             <XIcon />
           </Button>
         </div>
@@ -123,7 +121,7 @@ const exportPack = async () => {
         <div class="iconified-input">
           <VersionIcon />
           <input v-model="versionInput" type="text" placeholder="1.0.0" class="input" />
-          <Button @click="versionInput = ''">
+          <Button class="r-btn" @click="versionInput = ''">
             <XIcon />
           </Button>
         </div>
@@ -153,7 +151,7 @@ const exportPack = async () => {
           </div>
         </div>
         <div v-if="showingFiles" class="table-content">
-          <div v-for="[path, children] of folders" :key="path.name" class="table-row">
+          <div v-for="[path, children] in folders" :key="path.name" class="table-row">
             <div class="table-cell file-entry">
               <div class="file-primary">
                 <Checkbox
@@ -208,12 +206,11 @@ const exportPack = async () => {
         </Button>
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
 </template>
 
 <style scoped lang="scss">
 .modal-body {
-  padding: var(--gap-xl);
   display: flex;
   flex-direction: column;
   gap: var(--gap-md);
@@ -288,6 +285,7 @@ const exportPack = async () => {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
 }
 
 .textarea-wrapper {

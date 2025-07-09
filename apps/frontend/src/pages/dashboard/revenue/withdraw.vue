@@ -38,9 +38,13 @@
     <div class="withdraw-options-scroll">
       <div class="withdraw-options">
         <button
-          v-for="method in payoutMethods.filter((x) =>
-            x.name.toLowerCase().includes(search.toLowerCase()),
-          )"
+          v-for="method in payoutMethods
+            .filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
+            .sort((a, b) =>
+              a.type !== 'tremendous'
+                ? -1
+                : a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
+            )"
           :key="method.id"
           class="withdraw-option button-base"
           :class="{ selected: selectedMethodId === method.id }"
@@ -76,7 +80,7 @@
             </div>
           </div>
           <div class="label">
-            <RadioButtonChecked v-if="selectedMethodId === method.id" class="radio" />
+            <RadioButtonCheckedIcon v-if="selectedMethodId === method.id" class="radio" />
             <RadioButtonIcon v-else class="radio" />
             <span>{{ method.name }}</span>
           </div>
@@ -88,7 +92,7 @@
     <p>
       You are initiating a transfer of your revenue from Modrinth's Creator Monetization Program.
       How much of your
-      <strong>{{ $formatMoney(auth.user.payout_data.balance) }}</strong> balance would you like to
+      <strong>{{ $formatMoney(userBalance.available) }}</strong> balance would you like to transfer
       transfer to {{ selectedMethod.name }}?
     </p>
     <div class="confirmation-input">
@@ -135,8 +139,8 @@
       <template v-if="knownErrors.length === 0 && amount">
         <Checkbox v-if="fees > 0" v-model="agreedFees" description="Consent to fee">
           I acknowledge that an estimated
-          {{ $formatMoney(fees) }} will be deducted from the amount I receive to cover
-          {{ $formatWallet(selectedMethod.type) }} processing fees.
+          {{ formatMoney(fees) }} will be deducted from the amount I receive to cover
+          {{ formatWallet(selectedMethod.type) }} processing fees.
         </Checkbox>
         <Checkbox v-model="agreedTransfer" description="Confirm transfer">
           <template v-if="selectedMethod.type === 'tremendous'">
@@ -145,7 +149,7 @@
           </template>
           <template v-else>
             I confirm that I am initiating a transfer to the following
-            {{ $formatWallet(selectedMethod.type) }} account: {{ withdrawAccount }}
+            {{ formatWallet(selectedMethod.type) }} account: {{ withdrawAccount }}
           </template>
         </Checkbox>
         <Checkbox v-model="agreedTerms" class="rewards-checkbox">
@@ -188,12 +192,13 @@ import {
   PayPalIcon,
   SearchIcon,
   RadioButtonIcon,
-  RadioButtonChecked,
+  RadioButtonCheckedIcon,
   XIcon,
   TransferIcon,
 } from "@modrinth/assets";
 import { Chips, Checkbox, Breadcrumbs } from "@modrinth/ui";
 import { all } from "iso-3166-1";
+import { formatMoney, formatWallet } from "@modrinth/utils";
 import VenmoIcon from "~/assets/images/external/venmo.svg?component";
 
 const auth = await useAuth();
@@ -212,10 +217,13 @@ const country = ref(
   countries.value.find((x) => x.id === (auth.value.user.payout_data.paypal_region ?? "US")),
 );
 
-const { data: payoutMethods, refresh: refreshPayoutMethods } = await useAsyncData(
-  `payout/methods?country=${country.value.id}`,
-  () => useBaseFetch(`payout/methods?country=${country.value.id}`, { apiVersion: 3 }),
-);
+const [{ data: userBalance }, { data: payoutMethods, refresh: refreshPayoutMethods }] =
+  await Promise.all([
+    useAsyncData(`payout/balance`, () => useBaseFetch(`payout/balance`, { apiVersion: 3 })),
+    useAsyncData(`payout/methods?country=${country.value.id}`, () =>
+      useBaseFetch(`payout/methods?country=${country.value.id}`, { apiVersion: 3 }),
+    ),
+  ]);
 
 const selectedMethodId = ref(payoutMethods.value[0].id);
 const selectedMethod = computed(() =>
@@ -295,10 +303,10 @@ const knownErrors = computed(() => {
   if (!parsedAmount.value && amount.value.length > 0) {
     errors.push(`${amount.value} is not a valid amount`);
   } else if (
-    parsedAmount.value > auth.value.user.payout_data.balance ||
+    parsedAmount.value > userBalance.value.available ||
     parsedAmount.value > maxWithdrawAmount.value
   ) {
-    const maxAmount = Math.min(auth.value.user.payout_data.balance, maxWithdrawAmount.value);
+    const maxAmount = Math.min(userBalance.value.available, maxWithdrawAmount.value);
     errors.push(`The amount must be no more than ${data.$formatMoney(maxAmount)}`);
   } else if (parsedAmount.value <= fees.value || parsedAmount.value < minWithdrawAmount.value) {
     const minAmount = Math.max(fees.value + 0.01, minWithdrawAmount.value);
@@ -353,16 +361,14 @@ async function withdraw() {
       text:
         selectedMethod.value.type === "tremendous"
           ? "An email has been sent to your account with further instructions on how to redeem your payout!"
-          : `Payment has been sent to your ${data.$formatWallet(
-              selectedMethod.value.type,
-            )} account!`,
+          : `Payment has been sent to your ${formatWallet(selectedMethod.value.type)} account!`,
       type: "success",
     });
   } catch (err) {
     data.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
   }

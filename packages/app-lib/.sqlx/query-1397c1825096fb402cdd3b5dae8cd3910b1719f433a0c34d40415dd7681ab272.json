@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT\n                full_version, architecture, path\n            FROM java_versions\n            WHERE major_version = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "full_version",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "architecture",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "path",
+        "ordinal": 2,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "1397c1825096fb402cdd3b5dae8cd3910b1719f433a0c34d40415dd7681ab272"
+}

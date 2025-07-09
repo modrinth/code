@@ -2,16 +2,14 @@ use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 
-use crate::prelude::Profile;
-use crate::state::CredentialsStore;
 use crate::{
-    prelude::{ModLoader, ProfilePathId},
+    State,
+    prelude::ModLoader,
     state::ProfileInstallStage,
     util::{
         fetch::{fetch, write_cached_icon},
         io,
     },
-    State,
 };
 
 use super::{copy_dotminecraft, recache_icon};
@@ -38,33 +36,36 @@ pub struct InstalledModpack {
 
 // Check if folder has a minecraftinstance.json that parses
 pub async fn is_valid_curseforge(instance_folder: PathBuf) -> bool {
-    let minecraftinstance: String =
-        io::read_to_string(&instance_folder.join("minecraftinstance.json"))
-            .await
-            .unwrap_or("".to_string());
-    let minecraftinstance: Result<MinecraftInstance, serde_json::Error> =
-        serde_json::from_str::<MinecraftInstance>(&minecraftinstance);
-    minecraftinstance.is_ok()
+    let minecraft_instance = serde_json::from_str::<MinecraftInstance>(
+        &io::read_any_encoding_to_string(
+            &instance_folder.join("minecraftinstance.json"),
+        )
+        .await
+        .unwrap_or(("".into(), encoding_rs::UTF_8))
+        .0,
+    );
+    minecraft_instance.is_ok()
 }
 
 pub async fn import_curseforge(
     curseforge_instance_folder: PathBuf, // instance's folder
-    profile_path: ProfilePathId,         // path to profile
+    profile_path: &str,                  // path to profile
 ) -> crate::Result<()> {
     // Load minecraftinstance.json
-    let minecraft_instance: String = io::read_to_string(
-        &curseforge_instance_folder.join("minecraftinstance.json"),
-    )
-    .await?;
-    let minecraft_instance: MinecraftInstance =
-        serde_json::from_str::<MinecraftInstance>(&minecraft_instance)?;
-    let override_title: Option<String> = minecraft_instance.name.clone();
+    let minecraft_instance = serde_json::from_str::<MinecraftInstance>(
+        &io::read_any_encoding_to_string(
+            &curseforge_instance_folder.join("minecraftinstance.json"),
+        )
+        .await
+        .unwrap_or(("".into(), encoding_rs::UTF_8))
+        .0,
+    )?;
+    let override_title = minecraft_instance.name;
     let backup_name = format!(
         "Curseforge-{}",
         curseforge_instance_folder
             .file_name()
-            .map(|a| a.to_string_lossy().to_string())
-            .unwrap_or("Unknown".to_string())
+            .map_or("Unknown".to_string(), |a| a.to_string_lossy().to_string())
     );
 
     let state = State::get().await?;
@@ -77,14 +78,10 @@ pub async fn import_curseforge(
         thumbnail_url: Some(thumbnail_url),
     }) = minecraft_instance.installed_modpack.clone()
     {
-        let icon_bytes = fetch(
-            &thumbnail_url,
-            None,
-            &state.fetch_semaphore,
-            &CredentialsStore(None),
-        )
-        .await?;
-        let filename = thumbnail_url.rsplit('/').last();
+        let icon_bytes =
+            fetch(&thumbnail_url, None, &state.fetch_semaphore, &state.pool)
+                .await?;
+        let filename = thumbnail_url.rsplit('/').next_back();
         if let Some(filename) = filename {
             icon = Some(
                 write_cached_icon(
@@ -121,10 +118,10 @@ pub async fn import_curseforge(
         let mod_loader = mod_loader.unwrap_or(ModLoader::Vanilla);
 
         let loader_version = if mod_loader != ModLoader::Vanilla {
-            crate::profile::create::get_loader_version_from_loader(
-                game_version.clone(),
+            crate::launcher::get_loader_version_from_profile(
+                &game_version,
                 mod_loader,
-                loader_version,
+                loader_version.as_deref(),
             )
             .await?
         } else {
@@ -132,31 +129,32 @@ pub async fn import_curseforge(
         };
 
         // Set profile data to created default profile
-        crate::api::profile::edit(&profile_path, |prof| {
-            prof.metadata.name = override_title
+        crate::api::profile::edit(profile_path, |prof| {
+            prof.name = override_title
                 .clone()
                 .unwrap_or_else(|| backup_name.to_string());
             prof.install_stage = ProfileInstallStage::PackInstalling;
-            prof.metadata.icon.clone_from(&icon);
-            prof.metadata.game_version.clone_from(&game_version);
-            prof.metadata.loader_version.clone_from(&loader_version);
-            prof.metadata.loader = mod_loader;
+            prof.icon_path =
+                icon.clone().map(|x| x.to_string_lossy().to_string());
+            prof.game_version.clone_from(&game_version);
+            prof.loader_version = loader_version.clone().map(|x| x.id);
+            prof.loader = mod_loader;
 
             async { Ok(()) }
         })
         .await?;
     } else {
         // create a vanilla profile
-        crate::api::profile::edit(&profile_path, |prof| {
-            prof.metadata.name = override_title
+        crate::api::profile::edit(profile_path, |prof| {
+            prof.name = override_title
                 .clone()
                 .unwrap_or_else(|| backup_name.to_string());
-            prof.metadata.icon.clone_from(&icon);
-            prof.metadata
-                .game_version
+            prof.icon_path =
+                icon.clone().map(|x| x.to_string_lossy().to_string());
+            prof.game_version
                 .clone_from(&minecraft_instance.game_version);
-            prof.metadata.loader_version = None;
-            prof.metadata.loader = ModLoader::Vanilla;
+            prof.loader_version = None;
+            prof.loader = ModLoader::Vanilla;
 
             async { Ok(()) }
         })
@@ -166,33 +164,20 @@ pub async fn import_curseforge(
     // Copy in contained folders as overrides
     let state = State::get().await?;
     let loading_bar = copy_dotminecraft(
-        profile_path.clone(),
+        profile_path,
         curseforge_instance_folder,
         &state.io_semaphore,
         None,
     )
     .await?;
 
-    if let Some(profile_val) =
-        crate::api::profile::get(&profile_path, None).await?
-    {
+    if let Some(profile_val) = crate::api::profile::get(profile_path).await? {
         crate::launcher::install_minecraft(
             &profile_val,
             Some(loading_bar),
             false,
         )
         .await?;
-
-        {
-            let state = State::get().await?;
-            let mut file_watcher = state.file_watcher.write().await;
-            Profile::watch_fs(
-                &profile_val.get_profile_full_path().await?,
-                &mut file_watcher,
-            )
-            .await?;
-        }
-        State::sync().await?;
     }
 
     Ok(())

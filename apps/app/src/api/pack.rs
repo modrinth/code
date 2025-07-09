@@ -20,8 +20,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 #[tauri::command]
 pub async fn pack_install(
     location: CreatePackLocation,
-    profile: ProfilePathId,
-) -> Result<ProfilePathId> {
+    profile: String,
+) -> Result<String> {
     Ok(install_zipped_mrpack(location, profile).await?)
 }
 

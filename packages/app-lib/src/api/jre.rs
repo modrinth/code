@@ -1,18 +1,31 @@
 //! Authentication flow interface
+use crate::event::emit::{emit_loading, init_loading};
+use crate::state::JavaVersion;
+use crate::util::fetch::{fetch_advanced, fetch_json};
+use dashmap::DashMap;
 use reqwest::Method;
 use serde::Deserialize;
 use std::path::PathBuf;
-
-use crate::event::emit::{emit_loading, init_loading};
-use crate::state::CredentialsStore;
-use crate::util::fetch::{fetch_advanced, fetch_json};
+use sysinfo::{MemoryRefreshKind, RefreshKind};
 
 use crate::util::io;
-use crate::util::jre::extract_java_majorminor_version;
+use crate::util::jre::extract_java_version;
 use crate::{
-    util::jre::{self, JavaVersion},
     LoadingBarType, State,
+    util::jre::{self},
 };
+
+pub async fn get_java_versions() -> crate::Result<DashMap<u32, JavaVersion>> {
+    let state = State::get().await?;
+
+    JavaVersion::get_all(&state.pool).await
+}
+
+pub async fn set_java_version(java_version: JavaVersion) -> crate::Result<()> {
+    let state = State::get().await?;
+    java_version.upsert(&state.pool).await?;
+    Ok(())
+}
 
 // Searches for jres on the system given a java version (ex: 1.8, 1.17, 1.18)
 // Allow higher allows for versions higher than the given version to be returned ('at least')
@@ -25,9 +38,9 @@ pub async fn find_filtered_jres(
     Ok(if let Some(java_version) = java_version {
         jres.into_iter()
             .filter(|jre| {
-                let jre_version = extract_java_majorminor_version(&jre.version);
+                let jre_version = extract_java_version(&jre.version);
                 if let Ok(jre_version) = jre_version {
-                    jre_version.1 == java_version
+                    jre_version == java_version
                 } else {
                     false
                 }
@@ -38,7 +51,6 @@ pub async fn find_filtered_jres(
     })
 }
 
-#[theseus_macros::debug_pin]
 pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
     let state = State::get().await?;
 
@@ -57,7 +69,7 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
         pub name: PathBuf,
     }
 
-    emit_loading(&loading_bar, 0.0, Some("Fetching java version")).await?;
+    emit_loading(&loading_bar, 0.0, Some("Fetching java version"))?;
     let packages = fetch_json::<Vec<Package>>(
                 Method::GET,
                 &format!(
@@ -67,9 +79,9 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
                 None,
                 None,
                 &state.fetch_semaphore,
-                &CredentialsStore(None),
+                &state.pool,
             ).await?;
-    emit_loading(&loading_bar, 10.0, Some("Downloading java version")).await?;
+    emit_loading(&loading_bar, 10.0, Some("Downloading java version"))?;
 
     if let Some(download) = packages.first() {
         let file = fetch_advanced(
@@ -80,11 +92,11 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
             None,
             Some((&loading_bar, 80.0)),
             &state.fetch_semaphore,
-            &CredentialsStore(None),
+            &state.pool,
         )
         .await?;
 
-        let path = state.directories.java_versions_dir().await;
+        let path = state.directories.java_versions_dir();
 
         let mut archive = zip::ZipArchive::new(std::io::Cursor::new(file))
             .map_err(|_| {
@@ -104,13 +116,13 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
             }
         }
 
-        emit_loading(&loading_bar, 0.0, Some("Extracting java")).await?;
+        emit_loading(&loading_bar, 0.0, Some("Extracting java"))?;
         archive.extract(&path).map_err(|_| {
             crate::Error::from(crate::ErrorKind::InputError(
                 "Failed to extract java zip".to_string(),
             ))
         })?;
-        emit_loading(&loading_bar, 10.0, Some("Done extracting java")).await?;
+        emit_loading(&loading_bar, 10.0, Some("Done extracting java"))?;
         let mut base_path = path.join(
             download
                 .name
@@ -123,7 +135,7 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
         #[cfg(target_os = "macos")]
         {
             base_path = base_path
-                .join(format!("zulu-{}.jre", java_version))
+                .join(format!("zulu-{java_version}.jre"))
                 .join("Contents")
                 .join("Home")
                 .join("bin")
@@ -145,8 +157,8 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
 }
 
 // Validates JRE at a given at a given path
-pub async fn check_jre(path: PathBuf) -> crate::Result<Option<JavaVersion>> {
-    Ok(jre::check_java_at_filepath(&path).await)
+pub async fn check_jre(path: PathBuf) -> crate::Result<JavaVersion> {
+    jre::check_java_at_filepath(&path).await
 }
 
 // Test JRE at a given path
@@ -155,20 +167,26 @@ pub async fn test_jre(
     major_version: u32,
 ) -> crate::Result<bool> {
     let jre = match jre::check_java_at_filepath(&path).await {
-        Some(jre) => jre,
-        None => return Ok(false),
+        Ok(jre) => jre,
+        Err(e) => {
+            tracing::warn!("Invalid Java at {}: {e}", path.display());
+            return Ok(false);
+        }
     };
-    let (major, _) = extract_java_majorminor_version(&jre.version)?;
-    Ok(major == major_version)
+    let version = extract_java_version(&jre.version)?;
+    tracing::info!(
+        "Expected Java version {major_version}, and found {version} at {}",
+        path.display()
+    );
+    Ok(version == major_version)
 }
 
 // Gets maximum memory in KiB.
 pub async fn get_max_memory() -> crate::Result<u64> {
-    Ok(sys_info::mem_info()
-        .map_err(|_| {
-            crate::Error::from(crate::ErrorKind::LauncherError(
-                "Unable to get computer memory".to_string(),
-            ))
-        })?
-        .total)
+    Ok(sysinfo::System::new_with_specifics(
+        RefreshKind::nothing()
+            .with_memory(MemoryRefreshKind::nothing().with_ram()),
+    )
+    .total_memory()
+        / 1024)
 }

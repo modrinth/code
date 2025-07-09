@@ -1,9 +1,9 @@
 import MarkdownIt from 'markdown-it'
-import xss from 'xss'
+import { escapeAttrValue, FilterXSS, safeAttrValue, whiteList } from 'xss'
 
-export const configuredXss = new xss.FilterXSS({
+export const configuredXss = new FilterXSS({
   whiteList: {
-    ...xss.whiteList,
+    ...whiteList,
     summary: [],
     h1: ['id'],
     h2: ['id'],
@@ -14,14 +14,16 @@ export const configuredXss = new xss.FilterXSS({
     kbd: ['id'],
     input: ['checked', 'disabled', 'type'],
     iframe: ['width', 'height', 'allowfullscreen', 'frameborder', 'start', 'end'],
-    img: [...xss.whiteList.img, 'usemap', 'style'],
+    img: [...(whiteList.img || []), 'usemap', 'style', 'align'],
     map: ['name'],
-    area: [...xss.whiteList.a, 'coords'],
-    a: [...xss.whiteList.a, 'rel'],
-    td: [...xss.whiteList.td, 'style'],
-    th: [...xss.whiteList.th, 'style'],
+    area: [...(whiteList.a || []), 'coords'],
+    a: [...(whiteList.a || []), 'rel'],
+    td: [...(whiteList.td || []), 'style'],
+    th: [...(whiteList.th || []), 'style'],
     picture: [],
     source: ['media', 'sizes', 'src', 'srcset', 'type'],
+    p: [...(whiteList.p || []), 'align'],
+    div: [...(whiteList.p || []), 'align'],
   },
   css: {
     whiteList: {
@@ -35,39 +37,51 @@ export const configuredXss = new xss.FilterXSS({
     if (tag === 'iframe' && name === 'src') {
       const allowedSources = [
         {
-          regex:
-            /^https?:\/\/(www\.)?youtube(-nocookie)?\.com\/embed\/[a-zA-Z0-9_-]{11}(\?&autoplay=[0-1]{1})?$/,
-          remove: ['&autoplay=1'], // Prevents autoplay
+          url: /^https?:\/\/(www\.)?youtube(-nocookie)?\.com\/embed\/[a-zA-Z0-9_-]{11}/,
+          allowedParameters: [/start=\d+/, /end=\d+/],
         },
         {
-          regex: /^https?:\/\/(www\.)?discord\.com\/widget\?id=\d{18,19}(&theme=\w+)?$/,
-          remove: [/&theme=\w+/],
+          url: /^https?:\/\/(www\.)?discord\.com\/widget/,
+          allowedParameters: [/id=\d{18,19}/],
         },
       ]
 
+      const url = new URL(value)
+
       for (const source of allowedSources) {
-        if (source.regex.test(value)) {
-          for (const remove of source.remove) {
-            value = value.replace(remove, '')
-          }
-          return `${name}="${xss.escapeAttrValue(value)}"`
+        if (!source.url.test(url.href)) {
+          continue
         }
+
+        const newSearchParams = new URLSearchParams()
+        url.searchParams.forEach((value, key) => {
+          if (!source.allowedParameters.some((param) => param.test(`${key}=${value}`))) {
+            newSearchParams.delete(key)
+          }
+        })
+
+        url.search = newSearchParams.toString()
+        return `${name}="${escapeAttrValue(url.toString())}"`
       }
     }
 
     // For Highlight.JS
     if (name === 'class' && ['pre', 'code', 'span'].includes(tag)) {
-      const allowedClasses = []
+      const allowedClasses: string[] = []
       for (const className of value.split(/\s/g)) {
         if (className.startsWith('hljs-') || className.startsWith('language-')) {
           allowedClasses.push(className)
         }
       }
-      return `${name}="${xss.escapeAttrValue(allowedClasses.join(' '))}"`
+      return `${name}="${escapeAttrValue(allowedClasses.join(' '))}"`
     }
   },
   safeAttrValue(tag, name, value, cssFilter) {
-    if (tag === 'img' && name === 'src' && !value.startsWith('data:')) {
+    if (
+      (tag === 'img' || tag === 'video' || tag === 'audio' || tag === 'source') &&
+      (name === 'src' || name === 'srcset') &&
+      !value.startsWith('data:')
+    ) {
       try {
         const url = new URL(value)
 
@@ -92,7 +106,7 @@ export const configuredXss = new xss.FilterXSS({
         ]
 
         if (!allowedHostnames.includes(url.hostname)) {
-          return xss.safeAttrValue(
+          return safeAttrValue(
             tag,
             name,
             `https://wsrv.nl/?url=${encodeURIComponent(
@@ -101,13 +115,13 @@ export const configuredXss = new xss.FilterXSS({
             cssFilter,
           )
         }
-        return xss.safeAttrValue(tag, name, url.toString(), cssFilter)
-      } catch (err) {
+        return safeAttrValue(tag, name, url.toString(), cssFilter)
+      } catch {
         /* empty */
       }
     }
 
-    return xss.safeAttrValue(tag, name, value, cssFilter)
+    return safeAttrValue(tag, name, value, cssFilter)
   },
 })
 
@@ -129,7 +143,7 @@ export const md = (options = {}) => {
     const token = tokens[idx]
     const index = token.attrIndex('href')
 
-    if (index !== -1) {
+    if (token.attrs && index !== -1) {
       const href = token.attrs[index][1]
 
       try {
@@ -139,7 +153,7 @@ export const md = (options = {}) => {
         if (allowedHostnames.includes(url.hostname)) {
           return defaultLinkOpenRenderer(tokens, idx, options, env, self)
         }
-      } catch (err) {
+      } catch {
         /* empty */
       }
     }
@@ -152,4 +166,4 @@ export const md = (options = {}) => {
   return md
 }
 
-export const renderString = (string) => configuredXss.process(md().render(string))
+export const renderString = (string: string) => configuredXss.process(md().render(string))

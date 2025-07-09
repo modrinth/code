@@ -1,11 +1,11 @@
 <script setup>
 import { CheckIcon } from '@modrinth/assets'
-import { Button, Modal, Badge } from '@modrinth/ui'
+import { Button, Badge } from '@modrinth/ui'
 import { computed, ref } from 'vue'
-import { useTheming } from '@/store/theme'
 import { update_managed_modrinth_version } from '@/helpers/profile'
 import { releaseColor } from '@/helpers/utils'
 import { SwapIcon } from '@/assets/icons/index.js'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 const props = defineProps({
   versions: {
@@ -24,33 +24,41 @@ defineExpose({
   },
 })
 
+const emit = defineEmits(['finish-install'])
+
 const filteredVersions = computed(() => {
   return props.versions
 })
 
 const modpackVersionModal = ref(null)
-const installedVersion = computed(() => props.instance?.metadata?.linked_data?.version_id)
+const installedVersion = computed(() => props.instance?.linked_data?.version_id)
 const installing = computed(() => props.instance.install_stage !== 'installed')
 const inProgress = ref(false)
 
-const themeStore = useTheming()
-
 const switchVersion = async (versionId) => {
+  modpackVersionModal.value.hide()
   inProgress.value = true
   await update_managed_modrinth_version(props.instance.path, versionId)
   inProgress.value = false
+  emit('finish-install')
+}
+
+const onHide = () => {
+  if (!inProgress.value) {
+    emit('finish-install')
+  }
 }
 </script>
 
 <template>
-  <Modal
+  <ModalWrapper
     ref="modpackVersionModal"
     class="modpack-version-modal"
     header="Change modpack version"
-    :noblur="!themeStore.advancedRendering"
+    :on-hide="onHide"
   >
     <div class="modal-body">
-      <Card v-if="instance.metadata.linked_data" class="mod-card">
+      <div v-if="instance.linked_data" class="mod-card">
         <div class="table">
           <div class="table-row with-columns table-head">
             <div class="table-cell table-text download-cell" />
@@ -62,7 +70,7 @@ const switchVersion = async (versionId) => {
               v-for="version in filteredVersions"
               :key="version.id"
               class="table-row with-columns selectable"
-              @click="$router.push(`/project/${$route.params.id}/version/${version.id}`)"
+              @click="$router.push(`/project/${version.project_id}/version/${version.id}`)"
             >
               <div class="table-cell table-text">
                 <Button
@@ -109,9 +117,9 @@ const switchVersion = async (versionId) => {
             </div>
           </div>
         </div>
-      </Card>
+      </div>
     </div>
-  </Modal>
+  </ModalWrapper>
 </template>
 
 <style scoped lang="scss">
@@ -176,7 +184,6 @@ const switchVersion = async (versionId) => {
 }
 
 .modal-body {
-  padding: var(--gap-xl);
   display: flex;
   flex-direction: column;
   gap: var(--gap-md);

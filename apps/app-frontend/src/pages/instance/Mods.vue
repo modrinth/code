@@ -1,504 +1,459 @@
 <template>
-  <Card v-if="projects.length > 0" class="mod-card">
-    <div class="dropdown-input">
-      <DropdownSelect
-        v-model="selectedProjectType"
-        :options="Object.keys(selectableProjectTypes)"
-        default-value="All"
-        name="project-type-dropdown"
-        color="primary"
-      />
-      <div class="iconified-input">
-        <SearchIcon />
-        <input
-          v-model="searchFilter"
-          type="text"
-          :placeholder="`Search ${search.length} ${(['All', 'Other'].includes(selectedProjectType)
-            ? 'projects'
-            : selectedProjectType.toLowerCase()
-          ).slice(0, search.length === 1 ? -1 : 64)}...`"
-          class="text-input"
-          autocomplete="off"
-        />
-        <Button @click="() => (searchFilter = '')">
-          <XIcon />
-        </Button>
-      </div>
-    </div>
-    <Button
-      v-if="canUpdatePack"
-      :disabled="installing"
-      color="secondary"
-      @click="modpackVersionModal.show()"
-    >
-      <UpdatedIcon />
-      {{ installing ? 'Updating' : 'Update modpack' }}
-    </Button>
-    <Button v-else-if="!isPackLocked" @click="exportModal.show()">
-      <PackageIcon />
-      Export modpack
-    </Button>
-    <Button v-if="!isPackLocked && projects.some((m) => m.outdated)" @click="updateAll">
-      <UpdatedIcon />
-      Update all
-    </Button>
-
-    <!--    <DropdownButton-->
-    <!--      v-if="!isPackLocked"-->
-    <!--      :options="['search', 'from_file']"-->
-    <!--      default-value="search"-->
-    <!--      name="add-content-dropdown"-->
-    <!--      color="primary"-->
-    <!--      @option-click="handleContentOptionClick"-->
-    <!--    >-->
-    <!--      <template #search>-->
-    <!--        <SearchIcon />-->
-    <!--        <span class="no-wrap"> Add content </span>-->
-    <!--      </template>-->
-    <!--      <template #from_file>-->
-    <!--        <FolderOpenIcon />-->
-    <!--        <span class="no-wrap"> Add from file </span>-->
-    <!--      </template>-->
-    <!--    </DropdownButton>-->
-  </Card>
-  <Pagination
-    v-if="projects.length > 0"
-    :page="currentPage"
-    :count="Math.ceil(search.length / 20)"
-    class="pagination-before"
-    :link-function="(page) => `?page=${page}`"
-    @switch-page="switchPage"
-  />
-  <Card v-if="projects.length > 0" class="list-card">
-    <div class="table">
-      <div class="table-row table-head" :class="{ 'show-options': selected.length > 0 }">
-        <div class="table-cell table-text">
-          <Checkbox v-model="selectAll" class="select-checkbox" />
-        </div>
-        <div v-if="selected.length === 0" class="table-cell table-text name-cell actions-cell">
-          <Button class="transparent" @click="sortProjects('Name')">
-            Name
-            <DropdownIcon v-if="sortColumn === 'Name'" :class="{ down: ascending }" />
-          </Button>
-        </div>
-        <div v-if="selected.length === 0" class="table-cell table-text version">
-          <Button class="transparent" @click="sortProjects('Version')">
-            Version
-            <DropdownIcon v-if="sortColumn === 'Version'" :class="{ down: ascending }" />
-          </Button>
-        </div>
-        <div v-if="selected.length === 0" class="table-cell table-text actions-cell">
-          <Button class="transparent" @click="sortProjects('Enabled')">
-            Actions
-            <DropdownIcon v-if="sortColumn === 'Enabled'" :class="{ down: ascending }" />
-          </Button>
-        </div>
-        <div v-else class="options table-cell name-cell">
-          <div>
-            <Button
-              class="transparent share"
-              @click="() => (showingOptions = !showingOptions)"
-              @mouseover="selectedOption = 'Share'"
-            >
-              <MenuIcon :class="{ open: showingOptions }" />
-            </Button>
-          </div>
-          <Button
-            class="transparent share"
-            @click="shareNames()"
-            @mouseover="selectedOption = 'Share'"
-          >
-            <ShareIcon />
-            Share
-          </Button>
-          <div v-tooltip="isPackLocked ? 'Unlock this instance to remove mods' : ''">
-            <Button
-              :disabled="isPackLocked"
-              class="transparent trash"
-              @click="deleteWarning.show()"
-              @mouseover="selectedOption = 'Delete'"
-            >
-              <TrashIcon />
-              Delete
-            </Button>
-          </div>
-          <div v-tooltip="isPackLocked ? 'Unlock this instance to update mods' : ''">
-            <Button
-              :disabled="isPackLocked || offline"
-              class="transparent update"
-              @click="updateSelected()"
-              @mouseover="selectedOption = 'Update'"
-            >
-              <UpdatedIcon />
-              Update
-            </Button>
-          </div>
-          <div v-tooltip="isPackLocked ? 'Unlock this instance to toggle mods' : ''">
-            <Button
-              :disabled="isPackLocked"
-              class="transparent"
-              @click="toggleSelected()"
-              @mouseover="selectedOption = 'Toggle'"
-            >
-              <ToggleIcon />
-              Toggle
-            </Button>
-          </div>
-        </div>
-      </div>
-      <div v-if="showingOptions && selected.length > 0" class="more-box">
-        <section v-if="selectedOption === 'Share'" class="options">
-          <Button class="transparent" @click="shareNames()">
-            <TextInputIcon />
-            Share names
-          </Button>
-          <Button class="transparent" @click="shareUrls()">
-            <GlobeIcon />
-            Share URLs
-          </Button>
-          <Button class="transparent" @click="shareFileNames()">
-            <FileIcon />
-            Share file names
-          </Button>
-          <Button class="transparent" @click="shareMarkdown()">
-            <CodeIcon />
-            Share as markdown
-          </Button>
-        </section>
-        <section v-if="selectedOption === 'Delete'" class="options">
-          <Button class="transparent" @click="deleteWarning.show()">
-            <TrashIcon />
-            Delete selected
-          </Button>
-          <Button class="transparent" @click="deleteDisabledWarning.show()">
-            <ToggleIcon />
-            Delete disabled
-          </Button>
-        </section>
-        <section v-if="selectedOption === 'Update'" class="options">
-          <Button class="transparent" :disabled="offline" @click="updateAll()">
-            <UpdatedIcon />
-            Update all
-          </Button>
-          <Button class="transparent" @click="selectUpdatable()">
-            <CheckIcon />
-            Select updatable
-          </Button>
-        </section>
-        <section v-if="selectedOption === 'Toggle'" class="options">
-          <Button class="transparent" @click="enableAll()">
-            <CheckIcon />
-            Toggle on
-          </Button>
-          <Button class="transparent" @click="disableAll()">
-            <XIcon />
-            Toggle off
-          </Button>
-          <Button class="transparent" @click="hideShowAll()">
-            <EyeIcon v-if="hideNonSelected" />
-            <EyeOffIcon v-else />
-            {{ hideNonSelected ? 'Show' : 'Hide' }} untoggled
-          </Button>
-        </section>
-      </div>
-      <div
-        v-for="mod in search.slice((currentPage - 1) * 20, currentPage * 20)"
-        :key="mod.file_name"
-        class="table-row"
-        @contextmenu.prevent.stop="(c) => handleRightClick(c, mod)"
-      >
-        <div class="table-cell table-text checkbox">
-          <Checkbox
-            :model-value="selectionMap.get(mod.path)"
-            class="select-checkbox"
-            @update:model-value="(newValue) => selectionMap.set(mod.path, newValue)"
-          />
-        </div>
-        <div class="table-cell table-text name-cell">
-          <router-link
-            v-if="mod.slug"
-            :to="{ path: `/project/${mod.slug}/`, query: { i: props.instance.path } }"
-            :disabled="offline"
-            class="mod-content"
-          >
-            <Avatar :src="mod.icon" />
-            <div v-tooltip="`${mod.name} by ${mod.author}`" class="mod-text">
-              <div class="title">{{ mod.name }}</div>
-              <span class="no-wrap">by {{ mod.author }}</span>
-            </div>
-          </router-link>
-          <div v-else class="mod-content">
-            <Avatar :src="mod.icon" />
-            <span v-tooltip="`${mod.name}`" class="title">{{ mod.name }}</span>
-          </div>
-        </div>
-        <div class="table-cell table-text version">
-          <span v-tooltip="`${mod.version}`">{{ mod.version }}</span>
-        </div>
-        <div class="table-cell table-text manage">
-          <div v-tooltip="isPackLocked ? 'Unlock this instance to remove mods.' : 'Remove project'">
-            <Button :disabled="isPackLocked" icon-only @click="removeMod(mod)">
-              <TrashIcon />
-            </Button>
-          </div>
-          <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator"></AnimatedLogo>
-          <div
-            v-else
-            v-tooltip="isPackLocked ? 'Unlock this instance to update mods.' : 'Update project'"
-          >
-            <Button
-              :disabled="!mod.outdated || offline || isPackLocked"
-              icon-only
-              @click="updateProject(mod)"
-            >
-              <UpdatedIcon v-if="mod.outdated" />
-              <CheckIcon v-else />
-            </Button>
-          </div>
-          <div v-tooltip="isPackLocked ? 'Unlock this instance to toggle mods.' : ''">
-            <input
-              id="switch-1"
-              :disabled="isPackLocked"
-              autocomplete="off"
-              type="checkbox"
-              class="switch stylized-toggle"
-              :checked="!mod.disabled"
-              @change="toggleDisableMod(mod)"
-            />
-          </div>
-          <Button
-            v-tooltip="`Show ${mod.file_name}`"
-            icon-only
-            @click="highlightModInProfile(instance.path, mod.path)"
-          >
-            <FolderOpenIcon />
-          </Button>
-        </div>
-      </div>
-    </div>
-  </Card>
-  <div v-else class="empty-prompt">
-    <div class="empty-icon">
-      <AddProjectImage />
-    </div>
-    <h3>No projects found</h3>
-    <p class="empty-subtitle">Add a project to get started</p>
-    <div class="empty-action">
-      <DropdownButton
-        :options="['search', 'from_file']"
-        default-value="search"
-        name="add-content-dropdown-from-empty"
-        color="primary"
-        @option-click="handleContentOptionClick"
-      >
-        <template #search>
+  <div>
+    <template v-if="projects?.length > 0">
+      <div class="flex items-center gap-2 mb-4">
+        <div class="iconified-input flex-grow">
           <SearchIcon />
-          <span class="no-wrap"> Add content </span>
-        </template>
-        <template #from_file>
-          <FolderOpenIcon />
-          <span class="no-wrap"> Add from file </span>
-        </template>
-      </DropdownButton>
-    </div>
-  </div>
-  <Pagination
-    v-if="projects.length > 0"
-    :page="currentPage"
-    :count="Math.ceil(search.length / 20)"
-    class="pagination-after"
-    :link-function="(page) => `?page=${page}`"
-    @switch-page="switchPage"
-  />
-  <Modal ref="deleteWarning" header="Are you sure?">
-    <div class="modal-body">
-      <div class="markdown-body">
-        <p>
-          Are you sure you want to remove
-          <strong>{{ functionValues.length }} project(s)</strong> from {{ instance.metadata.name }}?
-          <br />
-          This action <strong>cannot</strong> be undone.
-        </p>
+          <input
+            v-model="searchFilter"
+            type="text"
+            :placeholder="`Search ${filteredProjects.length} project${filteredProjects.length === 1 ? '' : 's'}...`"
+            class="text-input search-input"
+            autocomplete="off"
+          />
+          <Button class="r-btn" @click="() => (searchFilter = '')">
+            <XIcon />
+          </Button>
+        </div>
+        <AddContentButton :instance="instance" />
       </div>
-      <div class="button-group push-right">
-        <Button @click="deleteWarning.hide()"> Cancel </Button>
-        <Button color="danger" @click="deleteSelected">
-          <TrashIcon />
-          Remove
-        </Button>
-      </div>
-    </div>
-  </Modal>
-  <Modal ref="deleteDisabledWarning" header="Are you sure?">
-    <div class="modal-body">
-      <div class="markdown-body">
-        <p>
-          Are you sure you want to remove
-          <strong
-            >{{ Array.from(projects.values()).filter((x) => x.disabled).length }} disabled
-            project(s)</strong
+      <div class="flex items-center justify-between">
+        <div v-if="filterOptions.length > 1" class="flex flex-wrap gap-1 items-center pb-4">
+          <FilterIcon class="text-secondary h-5 w-5 mr-1" />
+          <button
+            v-for="filter in filterOptions"
+            :key="`content-filter-${filter.id}`"
+            :class="`px-2 py-1 rounded-full font-semibold leading-none border-none cursor-pointer active:scale-[0.97] duration-100 transition-all ${selectedFilters.includes(filter.id) ? 'bg-brand-highlight text-brand' : 'bg-bg-raised text-secondary'}`"
+            @click="toggleArray(selectedFilters, filter.id)"
           >
-          from {{ instance.metadata.name }}?
-          <br />
-          This action <strong>cannot</strong> be undone.
-        </p>
+            {{ filter.formattedName }}
+          </button>
+        </div>
+        <Pagination
+          v-if="search.length > 0"
+          :page="currentPage"
+          :count="Math.ceil(search.length / 20)"
+          :link-function="(page) => `?page=${page}`"
+          @switch-page="(page) => (currentPage = page)"
+        />
       </div>
-      <div class="button-group push-right">
-        <Button @click="deleteDisabledWarning.hide()"> Cancel </Button>
-        <Button color="danger" @click="deleteDisabled">
-          <TrashIcon />
-          Remove
-        </Button>
+
+      <ContentListPanel
+        v-model="selectedFiles"
+        :locked="isPackLocked"
+        :items="
+          search.map((x) => {
+            const item: ContentItem<any> = {
+              path: x.path,
+              disabled: x.disabled,
+              filename: x.file_name,
+              icon: x.icon ?? undefined,
+              title: x.name,
+              data: x,
+            }
+
+            if (x.version) {
+              item.version = x.version
+              item.versionId = x.version
+            }
+
+            if (x.id) {
+              item.project = {
+                id: x.id,
+                link: { path: `/project/${x.id}`, query: { i: props.instance.path } },
+                linkProps: {},
+              }
+            }
+
+            if (x.author) {
+              item.creator = {
+                name: x.author.name,
+                type: x.author.type,
+                id: x.author.slug,
+                link: `https://modrinth.com/${x.author.type}/${x.author.slug}`,
+                linkProps: { target: '_blank' },
+              }
+            }
+
+            return item
+          })
+        "
+        :sort-column="sortColumn"
+        :sort-ascending="ascending"
+        :update-sort="sortProjects"
+        :current-page="currentPage"
+      >
+        <template v-if="selectedProjects.length > 0" #headers>
+          <div class="flex gap-2">
+            <ButtonStyled
+              v-if="!isPackLocked && selectedProjects.some((m) => m.outdated)"
+              color="brand"
+              color-fill="text"
+              hover-color-fill="text"
+            >
+              <button @click="updateSelected()"><DownloadIcon /> Update</button>
+            </ButtonStyled>
+            <ButtonStyled>
+              <OverflowMenu
+                :options="[
+                  {
+                    id: 'share-names',
+                    action: () => shareNames(),
+                  },
+                  {
+                    id: 'share-file-names',
+                    action: () => shareFileNames(),
+                  },
+                  {
+                    id: 'share-urls',
+                    action: () => shareUrls(),
+                  },
+                  {
+                    id: 'share-markdown',
+                    action: () => shareMarkdown(),
+                  },
+                ]"
+              >
+                <ShareIcon /> Share <DropdownIcon />
+                <template #share-names> <TextInputIcon /> Project names </template>
+                <template #share-file-names> <FileIcon /> File names </template>
+                <template #share-urls> <LinkIcon /> Project links </template>
+                <template #share-markdown> <CodeIcon /> Markdown links </template>
+              </OverflowMenu>
+            </ButtonStyled>
+            <ButtonStyled v-if="selectedProjects.some((m) => m.disabled)">
+              <button @click="enableAll()"><CheckCircleIcon /> Enable</button>
+            </ButtonStyled>
+            <ButtonStyled v-if="selectedProjects.some((m) => !m.disabled)">
+              <button @click="disableAll()"><SlashIcon /> Disable</button>
+            </ButtonStyled>
+            <ButtonStyled color="red">
+              <button @click="deleteSelected()"><TrashIcon /> Remove</button>
+            </ButtonStyled>
+          </div>
+        </template>
+        <template #header-actions>
+          <ButtonStyled type="transparent" color-fill="text" hover-color-fill="text">
+            <button :disabled="refreshingProjects" class="w-max" @click="refreshProjects">
+              <UpdatedIcon />
+              Refresh
+            </button>
+          </ButtonStyled>
+          <ButtonStyled
+            v-if="!isPackLocked && projects.some((m) => (m as any).outdated)"
+            type="transparent"
+            color="brand"
+            color-fill="text"
+            hover-color-fill="text"
+            @click="updateAll"
+          >
+            <button class="w-max"><DownloadIcon /> Update all</button>
+          </ButtonStyled>
+          <ButtonStyled
+            v-if="canUpdatePack"
+            type="transparent"
+            color="brand"
+            color-fill="text"
+            hover-color-fill="text"
+          >
+            <button class="w-max" :disabled="installing" @click="modpackVersionModal?.show()">
+              <DownloadIcon /> Update pack
+            </button>
+          </ButtonStyled>
+        </template>
+        <template #actions="{ item }">
+          <ButtonStyled
+            v-if="!isPackLocked && (item.data as any).outdated"
+            type="transparent"
+            color="brand"
+            circular
+          >
+            <button
+              v-tooltip="`Update`"
+              :disabled="(item.data as ProjectListEntry).updating"
+              @click="updateProject(item.data)"
+            >
+              <DownloadIcon />
+            </button>
+          </ButtonStyled>
+          <div v-else class="w-[36px]"></div>
+          <Toggle
+            class="!mx-2"
+            :model-value="!item.data.disabled"
+            @update:model-value="toggleDisableMod(item.data)"
+          />
+          <ButtonStyled type="transparent" circular>
+            <button v-tooltip="'Remove'" @click="removeMod(item)">
+              <TrashIcon />
+            </button>
+          </ButtonStyled>
+
+          <ButtonStyled type="transparent" circular>
+            <OverflowMenu
+              :options="[
+                {
+                  id: 'show-file',
+                  action: () => highlightModInProfile(instance.path, item.path),
+                },
+                {
+                  id: 'copy-link',
+                  shown: item.data !== undefined && item.data.slug !== undefined,
+                  action: () => copyModLink(item),
+                },
+              ]"
+              direction="left"
+            >
+              <MoreVerticalIcon />
+              <template #show-file> <ExternalIcon /> Show file </template>
+              <template #copy-link> <ClipboardCopyIcon /> Copy link </template>
+            </OverflowMenu>
+          </ButtonStyled>
+        </template>
+      </ContentListPanel>
+      <div class="flex justify-end mt-4">
+        <Pagination
+          v-if="search.length > 0"
+          :page="currentPage"
+          :count="Math.ceil(search.length / 20)"
+          :link-function="(page) => `?page=${page}`"
+          @switch-page="(page) => (currentPage = page)"
+        />
+      </div>
+    </template>
+    <div v-else class="w-full max-w-[48rem] mx-auto flex flex-col mt-6">
+      <RadialHeader class="">
+        <div class="flex items-center gap-6 w-[32rem] mx-auto">
+          <img src="@/assets/sad-modrinth-bot.webp" class="h-24" />
+          <span class="text-contrast font-bold text-xl"
+            >You haven't added any content to this instance yet.</span
+          >
+        </div>
+      </RadialHeader>
+      <div class="flex mt-4 mx-auto">
+        <AddContentButton :instance="instance" />
       </div>
     </div>
-  </Modal>
-  <ShareModal
-    ref="shareModal"
-    share-title="Sharing modpack content"
-    share-text="Check out the projects I'm using in my modpack!"
-  />
-  <ExportModal v-if="projects.length > 0" ref="exportModal" :instance="instance" />
-  <ModpackVersionModal
-    v-if="instance.metadata.linked_data"
-    ref="modpackVersionModal"
-    :instance="instance"
-    :versions="props.versions"
-  />
+    <ShareModalWrapper
+      ref="shareModal"
+      share-title="Sharing modpack content"
+      share-text="Check out the projects I'm using in my modpack!"
+      :open-in-new-tab="false"
+    />
+    <ExportModal v-if="projects.length > 0" ref="exportModal" :instance="instance" />
+    <ModpackVersionModal
+      v-if="instance.linked_data"
+      ref="modpackVersionModal"
+      :instance="instance"
+      :versions="props.versions"
+    />
+  </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import {
-  TrashIcon,
-  CheckIcon,
-  SearchIcon,
-  UpdatedIcon,
-  FolderOpenIcon,
-  // DropdownButton,
-  XIcon,
-  ShareIcon,
-  DropdownIcon,
-  GlobeIcon,
-  FileIcon,
-  EyeIcon,
-  EyeOffIcon,
+  CheckCircleIcon,
+  ClipboardCopyIcon,
   CodeIcon,
+  DownloadIcon,
+  DropdownIcon,
+  ExternalIcon,
+  FileIcon,
+  FilterIcon,
+  LinkIcon,
+  MoreVerticalIcon,
+  SearchIcon,
+  ShareIcon,
+  SlashIcon,
+  TrashIcon,
+  UpdatedIcon,
+  XIcon,
 } from '@modrinth/assets'
 import {
-  Pagination,
-  DropdownSelect,
-  ShareModal,
-  Modal,
-  Checkbox,
-  AnimatedLogo,
-  Avatar,
   Button,
-  Card,
+  ButtonStyled,
+  ContentListPanel,
+  OverflowMenu,
+  Pagination,
+  RadialHeader,
+  Toggle,
 } from '@modrinth/ui'
+import type { Organization, Project, TeamMember, Version } from '@modrinth/utils'
 import { formatProjectType } from '@modrinth/utils'
+import type { ComputedRef } from 'vue'
 import { computed, onUnmounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { defineMessages, useVIntl } from '@vintl/vintl'
 import {
   add_project_from_path,
-  get,
+  get_projects,
   remove_project,
   toggle_disable_project,
   update_all,
   update_project,
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
-import { open } from '@tauri-apps/api/dialog'
-import { listen } from '@tauri-apps/api/event'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
+import { trackEvent } from '@/helpers/analytics'
 import { highlightModInProfile } from '@/helpers/utils.js'
-import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage, PackageIcon } from '@/assets/icons'
+import { TextInputIcon } from '@/assets/icons'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
+import AddContentButton from '@/components/ui/AddContentButton.vue'
+import {
+  get_organization_many,
+  get_project_many,
+  get_team_many,
+  get_version_many,
+} from '@/helpers/cache.js'
+import { profile_listener } from '@/helpers/events.js'
+import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
+import { getCurrentWebview } from '@tauri-apps/api/webview'
+import dayjs from 'dayjs'
+import type { CacheBehaviour, ContentFile, GameInstance } from '@/helpers/types'
+import type ContextMenu from '@/components/ui/ContextMenu.vue'
+import type { ContentItem } from '@modrinth/ui/src/components/content/ContentListItem.vue'
 
-const router = useRouter()
+const props = defineProps<{
+  instance: GameInstance
+  options: InstanceType<typeof ContextMenu>
+  offline: boolean
+  playing: boolean
+  versions: Version[]
+  installed: boolean
+}>()
 
-const props = defineProps({
-  instance: {
-    type: Object,
-    default() {
-      return {}
-    },
-  },
-  options: {
-    type: Object,
-    default() {
-      return {}
-    },
-  },
-  offline: {
-    type: Boolean,
-    default() {
-      return false
-    },
-  },
-  versions: {
-    type: Array,
-    required: true,
-  },
-})
+type ProjectListEntryAuthor = {
+  name: string
+  slug: string
+  type: 'user' | 'organization'
+}
 
-const projects = ref([])
-const selectionMap = ref(new Map())
-const showingOptions = ref(false)
+type ProjectListEntry = {
+  path: string
+  name: string
+  slug?: string
+  author: ProjectListEntryAuthor | null
+  version: string | null
+  file_name: string
+  icon: string | undefined
+  disabled: boolean
+  updateVersion?: string
+  outdated: boolean
+  updated: dayjs.Dayjs
+  project_type: string
+  id?: string
+  updating?: boolean
+  selected?: boolean
+}
+
 const isPackLocked = computed(() => {
-  return props.instance.metadata.linked_data && props.instance.metadata.linked_data.locked
+  return props.instance.linked_data && props.instance.linked_data.locked
 })
 const canUpdatePack = computed(() => {
-  if (!props.instance.metadata.linked_data) return false
-  return props.instance.metadata.linked_data.version_id !== props.instance.modrinth_update_version
+  if (!props.instance.linked_data || !props.versions || !props.versions[0]) return false
+  return props.instance.linked_data.version_id !== props.versions[0].id
 })
 const exportModal = ref(null)
 
-const initProjects = (initInstance) => {
-  projects.value = []
-  if (!initInstance || !initInstance.projects) return
-  for (const [path, project] of Object.entries(initInstance.projects)) {
-    if (project.metadata.type === 'modrinth' && !props.offline) {
-      let owner = project.metadata.members.find((x) => x.role === 'Owner')
-      projects.value.push({
-        path,
-        name: project.metadata.project.title,
-        slug: project.metadata.project.slug,
-        author: owner ? owner.user.username : null,
-        version: project.metadata.version.version_number,
-        file_name: project.file_name,
-        icon: project.metadata.project.icon_url,
-        disabled: project.disabled,
-        updateVersion: project.metadata.update_version,
-        outdated: !!project.metadata.update_version,
-        project_type: project.metadata.project.project_type,
-        id: project.metadata.project.id,
-      })
-    } else if (project.metadata.type === 'inferred') {
-      projects.value.push({
-        path,
-        name: project.metadata.title ?? project.file_name,
-        author: project.metadata.authors[0],
-        version: project.metadata.version,
-        file_name: project.file_name,
-        icon: project.metadata.icon ? convertFileSrc(project.metadata.icon) : null,
-        disabled: project.disabled,
-        outdated: false,
-        project_type: project.metadata.project_type,
-      })
-    } else {
-      projects.value.push({
-        path,
-        name: project.file_name,
-        author: '',
-        version: null,
-        file_name: project.file_name,
-        icon: null,
-        disabled: project.disabled,
-        outdated: false,
-        project_type: null,
-      })
+const projects = ref<ProjectListEntry[]>([])
+const selectedFiles = ref<string[]>([])
+const selectedProjects = computed(() =>
+  projects.value.filter((x) => selectedFiles.value.includes(x.file_name)),
+)
+
+const selectionMap = ref(new Map())
+
+const initProjects = async (cacheBehaviour?: CacheBehaviour) => {
+  const newProjects: ProjectListEntry[] = []
+
+  const profileProjects = (await get_projects(props.instance.path, cacheBehaviour)) as Record<
+    string,
+    ContentFile
+  >
+  const fetchProjects = []
+  const fetchVersions = []
+
+  for (const value of Object.values(profileProjects)) {
+    if (value.metadata) {
+      fetchProjects.push(value.metadata.project_id)
+      fetchVersions.push(value.metadata.version_id)
     }
   }
+
+  const [modrinthProjects, modrinthVersions] = await Promise.all([
+    (await get_project_many(fetchProjects).catch(handleError)) as Project[],
+    (await get_version_many(fetchVersions).catch(handleError)) as Version[],
+  ])
+
+  const [modrinthTeams, modrinthOrganizations] = await Promise.all([
+    (await get_team_many(modrinthProjects.map((x) => x.team)).catch(handleError)) as TeamMember[][],
+    (await get_organization_many(
+      modrinthProjects.map((x) => x.organization).filter((x) => !!x),
+    ).catch(handleError)) as Organization[],
+  ])
+
+  for (const [path, file] of Object.entries(profileProjects)) {
+    if (file.metadata) {
+      const project = modrinthProjects.find((x) => file.metadata?.project_id === x.id)
+      const version = modrinthVersions.find((x) => file.metadata?.version_id === x.id)
+
+      if (project && version) {
+        const org = project.organization
+          ? modrinthOrganizations.find((x) => x.id === project.organization)
+          : null
+
+        const team = modrinthTeams.find((x) => x[0].team_id === project.team)
+
+        let author: ProjectListEntryAuthor | null = null
+        if (org) {
+          author = {
+            name: org.name,
+            slug: org.slug,
+            type: 'organization',
+          }
+        } else if (team) {
+          const teamMember = team.find((x) => x.is_owner)
+          if (teamMember) {
+            author = {
+              name: teamMember.user.username,
+              slug: teamMember.user.username,
+              type: 'user',
+            }
+          }
+        }
+
+        newProjects.push({
+          path,
+          name: project.title,
+          slug: project.slug,
+          author,
+          version: version.version_number,
+          file_name: file.file_name,
+          icon: project.icon_url,
+          disabled: file.file_name.endsWith('.disabled'),
+          updateVersion: file.update_version_id,
+          updated: dayjs(version.date_published),
+          outdated: !!file.update_version_id,
+          project_type: project.project_type,
+          id: project.id,
+        })
+      }
+
+      continue
+    }
+
+    newProjects.push({
+      path,
+      name: file.file_name.replace('.disabled', ''),
+      author: null,
+      version: null,
+      file_name: file.file_name,
+      icon: undefined,
+      disabled: file.file_name.endsWith('.disabled'),
+      outdated: false,
+      updated: dayjs(0),
+      project_type: file.project_type === 'shaderpack' ? 'shader' : file.project_type,
+    })
+  }
+
+  projects.value = newProjects ?? []
 
   const newSelectionMap = new Map()
   for (const project of projects.value) {
@@ -512,39 +467,105 @@ const initProjects = (initInstance) => {
   }
   selectionMap.value = newSelectionMap
 }
+await initProjects()
 
-initProjects(props.instance)
-
-watch(
-  () => props.instance.projects,
-  () => {
-    initProjects(props.instance)
-  },
-)
-
-watch(
-  () => props.offline,
-  () => {
-    if (props.instance) initProjects(props.instance)
-  },
-)
-
-const modpackVersionModal = ref(null)
+const modpackVersionModal = ref<InstanceType<typeof ModpackVersionModal> | null>()
 const installing = computed(() => props.instance.install_stage !== 'installed')
+
+const vintl = useVIntl()
+const { formatMessage } = vintl
+
+type FilterOption = {
+  id: string
+  formattedName: string
+}
+
+const messages = defineMessages({
+  updatesAvailableFilter: {
+    id: 'instance.filter.updates-available',
+    defaultMessage: 'Updates available',
+  },
+  disabledFilter: {
+    id: 'instance.filter.disabled',
+    defaultMessage: 'Disabled projects',
+  },
+})
+
+const filterOptions: ComputedRef<FilterOption[]> = computed(() => {
+  const options: FilterOption[] = []
+
+  const frequency = projects.value.reduce((map: Record<string, number>, item) => {
+    map[item.project_type] = (map[item.project_type] || 0) + 1
+    return map
+  }, {})
+
+  const types = Object.keys(frequency).sort((a, b) => frequency[b] - frequency[a])
+
+  types.forEach((type) => {
+    options.push({
+      id: type,
+      formattedName: formatProjectType(type) + 's',
+    })
+  })
+
+  if (!isPackLocked.value && projects.value.some((m) => m.outdated)) {
+    options.push({
+      id: 'updates',
+      formattedName: formatMessage(messages.updatesAvailableFilter),
+    })
+  }
+
+  if (projects.value.some((m) => m.disabled)) {
+    options.push({
+      id: 'disabled',
+      formattedName: formatMessage(messages.disabledFilter),
+    })
+  }
+
+  return options
+})
+
+const selectedFilters = ref<string[]>([])
+const filteredProjects = computed(() => {
+  const updatesFilter = selectedFilters.value.includes('updates')
+  const disabledFilter = selectedFilters.value.includes('disabled')
+
+  const typeFilters = selectedFilters.value.filter(
+    (filter) => filter !== 'updates' && filter !== 'disabled',
+  )
+
+  return projects.value.filter((project) => {
+    return (
+      (typeFilters.length === 0 || typeFilters.includes(project.project_type)) &&
+      (!updatesFilter || project.outdated) &&
+      (!disabledFilter || project.disabled)
+    )
+  })
+})
+
+watch(filterOptions, () => {
+  for (let i = 0; i < selectedFilters.value.length; i++) {
+    const option = selectedFilters.value[i]
+    if (!filterOptions.value.some((x) => x.id === option)) {
+      selectedFilters.value.splice(i, 1)
+    }
+  }
+})
+
+function toggleArray<T>(array: T[], value: T) {
+  if (array.includes(value)) {
+    array.splice(array.indexOf(value), 1)
+  } else {
+    array.push(value)
+  }
+}
 
 const searchFilter = ref('')
 const selectAll = ref(false)
-const selectedProjectType = ref('All')
-const deleteWarning = ref(null)
-const deleteDisabledWarning = ref(null)
-const hideNonSelected = ref(false)
-const selectedOption = ref('Share')
-const shareModal = ref(null)
+const shareModal = ref<InstanceType<typeof ShareModalWrapper> | null>()
 const ascending = ref(true)
 const sortColumn = ref('Name')
 const currentPage = ref(1)
-
-watch(searchFilter, () => (currentPage.value = 1))
 
 const selected = computed(() =>
   Array.from(selectionMap.value)
@@ -557,85 +578,32 @@ const selected = computed(() =>
 )
 
 const functionValues = computed(() =>
-  selected.value.length > 0 ? selected.value : Array.from(projects.value.values()),
+  selectedProjects.value.length > 0 ? selectedProjects.value : Array.from(projects.value.values()),
 )
 
-const selectableProjectTypes = computed(() => {
-  const obj = { All: 'all' }
-
-  for (const project of projects.value) {
-    obj[project.project_type ? formatProjectType(project.project_type) + 's' : 'Other'] =
-      project.project_type
-  }
-
-  return obj
-})
-
 const search = computed(() => {
-  const projectType = selectableProjectTypes.value[selectedProjectType.value]
-  const filtered = projects.value
-    .filter((mod) => {
-      return (
-        mod.name.toLowerCase().includes(searchFilter.value.toLowerCase()) &&
-        (projectType === 'all' || mod.project_type === projectType)
-      )
-    })
-    .filter((mod) => {
-      if (hideNonSelected.value) {
-        return !mod.disabled
-      }
-      return true
-    })
+  const filtered = filteredProjects.value.filter((mod) => {
+    return mod.name.toLowerCase().includes(searchFilter.value.toLowerCase())
+  })
 
-  return updateSort(filtered)
-})
-
-const updateSort = (projects) => {
   switch (sortColumn.value) {
-    case 'Version':
-      return projects.slice().sort((a, b) => {
-        if (a.version < b.version) {
-          return ascending.value ? -1 : 1
-        }
-        if (a.version > b.version) {
-          return ascending.value ? 1 : -1
-        }
-        return 0
-      })
-    case 'Author':
-      return projects.slice().sort((a, b) => {
-        if (a.author < b.author) {
-          return ascending.value ? -1 : 1
-        }
-        if (a.author > b.author) {
-          return ascending.value ? 1 : -1
-        }
-        return 0
-      })
-    case 'Enabled':
-      return projects.slice().sort((a, b) => {
-        if (a.disabled && !b.disabled) {
-          return ascending.value ? 1 : -1
-        }
-        if (!a.disabled && b.disabled) {
-          return ascending.value ? -1 : 1
-        }
-        return 0
+    case 'Updated':
+      return filtered.slice().sort((a, b) => {
+        const updated = a.updated.isAfter(b.updated) ? 1 : -1
+        return ascending.value ? -updated : updated
       })
     default:
-      return projects.slice().sort((a, b) => {
-        if (a.name < b.name) {
-          return ascending.value ? -1 : 1
-        }
-        if (a.name > b.name) {
-          return ascending.value ? 1 : -1
-        }
-        return 0
-      })
+      return filtered
+        .slice()
+        .sort((a, b) =>
+          ascending.value ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name),
+        )
   }
-}
+})
 
-const sortProjects = (filter) => {
+watch([sortColumn, ascending, selectedFilters.value, searchFilter], () => (currentPage.value = 1))
+
+const sortProjects = (filter: string) => {
   if (sortColumn.value === filter) {
     ascending.value = !ascending.value
   } else {
@@ -653,7 +621,7 @@ const updateAll = async () => {
     }
   }
 
-  const paths = await update_all(props.instance.path).catch(handleError)
+  const paths = (await update_all(props.instance.path).catch(handleError)) as Record<string, string>
 
   for (const [oldVal, newVal] of Object.entries(paths)) {
     const index = projects.value.findIndex((x) => x.path === oldVal)
@@ -662,94 +630,90 @@ const updateAll = async () => {
 
     if (projects.value[index].updateVersion) {
       projects.value[index].version = projects.value[index].updateVersion.version_number
-      projects.value[index].updateVersion = null
+      projects.value[index].updateVersion = undefined
     }
   }
   for (const project of setProjects) {
     projects.value[project].updating = false
   }
 
-  mixpanel_track('InstanceUpdateAll', {
-    loader: props.instance.metadata.loader,
-    game_version: props.instance.metadata.game_version,
+  trackEvent('InstanceUpdateAll', {
+    loader: props.instance.loader,
+    game_version: props.instance.game_version,
     count: setProjects.length,
     selected: selected.value.length > 1,
   })
 }
 
-const selectUpdatable = () => {
-  for (const project of projects.value) {
-    if (project.outdated) {
-      selectionMap.value.set(project.path, true)
-    }
-  }
-}
-
-const updateProject = async (mod) => {
+const updateProject = async (mod: ProjectListEntry) => {
   mod.updating = true
   await new Promise((resolve) => setTimeout(resolve, 0))
   mod.path = await update_project(props.instance.path, mod.path).catch(handleError)
   mod.updating = false
 
   mod.outdated = false
-  mod.version = mod.updateVersion.version_number
-  mod.updateVersion = null
+  mod.version = mod.updateVersion?.version_number
+  mod.updateVersion = undefined
 
-  mixpanel_track('InstanceProjectUpdate', {
-    loader: props.instance.metadata.loader,
-    game_version: props.instance.metadata.game_version,
+  trackEvent('InstanceProjectUpdate', {
+    loader: props.instance.loader,
+    game_version: props.instance.game_version,
     id: mod.id,
     name: mod.name,
     project_type: mod.project_type,
   })
 }
 
-let locks = {}
+const locks: Record<string, string | null> = {}
 
-const toggleDisableMod = async (mod) => {
+const toggleDisableMod = async (mod: ProjectListEntry) => {
   // Use mod's id as the key for the lock. If mod doesn't have a unique id, replace `mod.id` with some unique property.
-  if (!locks[mod.id]) {
-    locks[mod.id] = ref(null)
+  const lock = locks[mod.file_name]
+
+  while (lock) {
+    await new Promise((resolve) => {
+      setTimeout((value: unknown) => resolve(value), 100)
+    })
   }
 
-  let lock = locks[mod.id]
+  locks[mod.file_name] = 'lock'
 
-  while (lock.value) {
-    await lock.value
+  try {
+    mod.path = await toggle_disable_project(props.instance.path, mod.path)
+    mod.disabled = !mod.disabled
+
+    trackEvent('InstanceProjectDisable', {
+      loader: props.instance.loader,
+      game_version: props.instance.game_version,
+      id: mod.id,
+      name: mod.name,
+      project_type: mod.project_type,
+      disabled: mod.disabled,
+    })
+  } catch (err) {
+    handleError(err)
   }
 
-  lock.value = toggle_disable_project(props.instance.path, mod.path)
-    .then((newPath) => {
-      mod.path = newPath
-      mod.disabled = !mod.disabled
-      mixpanel_track('InstanceProjectDisable', {
-        loader: props.instance.metadata.loader,
-        game_version: props.instance.metadata.game_version,
-        id: mod.id,
-        name: mod.name,
-        project_type: mod.project_type,
-        disabled: mod.disabled,
-      })
-    })
-    .catch(handleError)
-    .finally(() => {
-      lock.value = null
-    })
-
-  await lock.value
+  locks[mod.file_name] = null
 }
 
-const removeMod = async (mod) => {
+const removeMod = async (mod: ContentItem<ProjectListEntry>) => {
   await remove_project(props.instance.path, mod.path).catch(handleError)
   projects.value = projects.value.filter((x) => mod.path !== x.path)
 
-  mixpanel_track('InstanceProjectRemove', {
-    loader: props.instance.metadata.loader,
-    game_version: props.instance.metadata.game_version,
-    id: mod.id,
-    name: mod.name,
-    project_type: mod.project_type,
+  trackEvent('InstanceProjectRemove', {
+    loader: props.instance.loader,
+    game_version: props.instance.game_version,
+    id: mod.data.id,
+    name: mod.data.name,
+    project_type: mod.data.project_type,
   })
+}
+
+const copyModLink = async (mod: ContentItem<ProjectListEntry>) => {
+  await navigator.clipboard.writeText(
+    `https://modrinth.com/${mod.data.project_type}/${mod.data.slug}`,
+  )
 }
 
 const deleteSelected = async () => {
@@ -758,28 +722,18 @@ const deleteSelected = async () => {
   }
 
   projects.value = projects.value.filter((x) => !x.selected)
-  deleteWarning.value.hide()
-}
-
-const deleteDisabled = async () => {
-  for (const project of Array.of(projects.value.values().filter((x) => x.disabled))) {
-    await remove_project(props.instance.path, project.path).catch(handleError)
-  }
-
-  projects.value = projects.value.filter((x) => !x.selected)
-  deleteDisabledWarning.value.hide()
 }
 
 const shareNames = async () => {
-  await shareModal.value.show(functionValues.value.map((x) => x.name).join('\n'))
+  await shareModal.value?.show(functionValues.value.map((x) => x.name).join('\n'))
 }
 
 const shareFileNames = async () => {
-  await shareModal.value.show(functionValues.value.map((x) => x.file_name).join('\n'))
+  await shareModal.value?.show(functionValues.value.map((x) => x.file_name).join('\n'))
 }
 
 const shareUrls = async () => {
-  await shareModal.value.show(
+  await shareModal.value?.show(
     functionValues.value
       .filter((x) => x.slug)
       .map((x) => `https://modrinth.com/${x.project_type}/${x.slug}`)
@@ -788,7 +742,7 @@ const shareUrls = async () => {
 }
 
 const shareMarkdown = async () => {
-  await shareModal.value.show(
+  await shareModal.value?.show(
     functionValues.value
       .map((x) => {
         if (x.slug) {
@@ -800,12 +754,6 @@ const shareMarkdown = async () => {
   )
 }
 
-const toggleSelected = async () => {
-  for (const project of functionValues.value) {
-    await toggleDisableMod(project, !project.disabled)
-  }
-}
-
 const updateSelected = async () => {
   const promises = []
   for (const project of functionValues.value) {
@@ -815,52 +763,23 @@ const updateSelected = async () => {
 }
 
 const enableAll = async () => {
+  const promises = []
   for (const project of functionValues.value) {
     if (project.disabled) {
-      await toggleDisableMod(project, false)
+      promises.push(toggleDisableMod(project))
     }
   }
+  await Promise.all(promises).catch(handleError)
 }
 
 const disableAll = async () => {
+  const promises = []
   for (const project of functionValues.value) {
     if (!project.disabled) {
-      await toggleDisableMod(project, false)
+      promises.push(toggleDisableMod(project))
     }
   }
-}
-
-const hideShowAll = async () => {
-  hideNonSelected.value = !hideNonSelected.value
-}
-
-const handleRightClick = (event, mod) => {
-  if (mod.slug && mod.project_type) {
-    props.options.showMenu(
-      event,
-      {
-        link: `https://modrinth.com/${mod.project_type}/${mod.slug}`,
-      },
-      [{ name: 'open_link' }, { name: 'copy_link' }],
-    )
-  }
-}
-
-const handleContentOptionClick = async (args) => {
-  if (args.option === 'search') {
-    await router.push({
-      path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
-      query: { i: props.instance.path },
-    })
-  } else if (args.option === 'from_file') {
-    const newProject = await open({ multiple: true })
-    if (!newProject) return
-
-    for (const project of newProject) {
-      await add_project_from_path(props.instance.path, project, 'mod').catch(handleError)
-    }
-    initProjects(await get(props.instance.path).catch(handleError))
-  }
+  await Promise.all(promises).catch(handleError)
 }
 
 watch(selectAll, () => {
@@ -871,20 +790,38 @@ watch(selectAll, () => {
   }
 })
 
-const unlisten = await listen('tauri://file-drop', async (event) => {
-  for (const file of event.payload) {
+const refreshingProjects = ref(false)
+async function refreshProjects() {
+  refreshingProjects.value = true
+  await initProjects('bypass')
+  refreshingProjects.value = false
+}
+
+const unlisten = await getCurrentWebview().onDragDropEvent(async (event) => {
+  if (event.payload.type !== 'drop') return
+
+  for (const file of event.payload.paths) {
     if (file.endsWith('.mrpack')) continue
-    await add_project_from_path(props.instance.path, file, 'mod').catch(handleError)
+    await add_project_from_path(props.instance.path, file).catch(handleError)
   }
-  initProjects(await get(props.instance.path).catch(handleError))
+  await initProjects()
 })
 
-const switchPage = (page) => {
-  currentPage.value = page
-}
+const unlistenProfiles = await profile_listener(
+  async (event: { event: string; profile_path_id: string }) => {
+    if (
+      event.profile_path_id === props.instance.path &&
+      event.event === 'synced' &&
+      props.instance.install_stage !== 'pack_installing'
+    ) {
+      await initProjects()
+    }
+  },
+)
 
 onUnmounted(() => {
   unlisten()
+  unlistenProfiles()
 })
 </script>
 
@@ -967,12 +904,20 @@ onUnmounted(() => {
     }
   }
 
-  .btn {
+  :deep(.btn) {
     height: 2.5rem;
   }
 
   .dropdown-input {
     flex-grow: 1;
+
+    .animated-dropdown {
+      width: unset;
+
+      :deep(.selected) {
+        border-radius: var(--radius-md) 0 0 var(--radius-md);
+      }
+    }
 
     .iconified-input {
       width: 100%;
@@ -1157,17 +1102,8 @@ onUnmounted(() => {
   }
 }
 </style>
+
 <style lang="scss">
-.updating-indicator {
-  svg {
-    margin-left: 0.5rem !important;
-  }
-}
-
-.v-popper--theme-tooltip .v-popper__inner {
-  background: #fff !important;
-}
-
 .select-checkbox {
   button.checkbox {
     border: none;
@@ -1175,13 +1111,23 @@ onUnmounted(() => {
   }
 }
 
-.dropdown-input {
-  .selected {
-    height: 2.5rem;
-  }
+.search-input {
+  min-height: 2.25rem;
+  background-color: var(--color-raised-bg);
 }
 
-.pagination-after {
-  margin-bottom: 5rem;
+.top-box {
+  background-image: radial-gradient(
+    50% 100% at 50% 100%,
+    var(--color-brand-highlight) 10%,
+    #ffffff00 100%
+  );
+}
+
+.top-box-divider {
+  background-image: linear-gradient(90deg, #ffffff00 0%, var(--color-brand) 50%, #ffffff00 100%);
+  width: 100%;
+  height: 1px;
+  opacity: 0.8;
 }
 </style>

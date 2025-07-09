@@ -12,13 +12,13 @@ import {
   SearchIcon,
   XIcon,
 } from '@modrinth/assets'
-import { ConfirmModal, Button, Card, DropdownSelect } from '@modrinth/ui'
+import { Button, DropdownSelect } from '@modrinth/ui'
 import { formatCategoryHeader } from '@modrinth/utils'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import dayjs from 'dayjs'
-import { useTheming } from '@/store/theme.js'
 import { duplicate, remove } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
+import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 
 const props = defineProps({
   instances: {
@@ -35,7 +35,6 @@ const props = defineProps({
 const instanceOptions = ref(null)
 const instanceComponents = ref(null)
 
-const themeStore = useTheming()
 const currentDeleteInstance = ref(null)
 const confirmModal = ref(null)
 
@@ -121,52 +120,41 @@ const handleOptionsClick = async (args) => {
 }
 
 const search = ref('')
-const group = ref('Category')
-const filters = ref('All profiles')
+const group = ref('Group')
 const sortBy = ref('Name')
 
 const filteredResults = computed(() => {
-  let instances = props.instances.filter((instance) => {
-    return instance.metadata.name.toLowerCase().includes(search.value.toLowerCase())
+  const instances = props.instances.filter((instance) => {
+    return instance.name.toLowerCase().includes(search.value.toLowerCase())
   })
 
   if (sortBy.value === 'Name') {
     instances.sort((a, b) => {
-      return a.metadata.name.localeCompare(b.metadata.name)
+      return a.name.localeCompare(b.name)
     })
   }
 
   if (sortBy.value === 'Game version') {
     instances.sort((a, b) => {
-      return a.metadata.game_version.localeCompare(b.metadata.game_version)
+      return a.game_version.localeCompare(b.game_version)
     })
   }
 
   if (sortBy.value === 'Last played') {
     instances.sort((a, b) => {
-      return dayjs(b.metadata.last_played ?? 0).diff(dayjs(a.metadata.last_played ?? 0))
+      return dayjs(b.last_played ?? 0).diff(dayjs(a.last_played ?? 0))
     })
   }
 
   if (sortBy.value === 'Date created') {
     instances.sort((a, b) => {
-      return dayjs(b.metadata.date_created).diff(dayjs(a.metadata.date_created))
+      return dayjs(b.date_created).diff(dayjs(a.date_created))
     })
   }
 
   if (sortBy.value === 'Date modified') {
     instances.sort((a, b) => {
-      return dayjs(b.metadata.date_modified).diff(dayjs(a.metadata.date_modified))
-    })
-  }
-
-  if (filters.value === 'Custom instances') {
-    instances = instances.filter((instance) => {
-      return !instance.metadata?.linked_data
-    })
-  } else if (filters.value === 'Downloaded modpacks') {
-    instances = instances.filter((instance) => {
-      return instance.metadata?.linked_data
+      return dayjs(b.date_modified).diff(dayjs(a.date_modified))
     })
   }
 
@@ -174,7 +162,7 @@ const filteredResults = computed(() => {
 
   if (group.value === 'Loader') {
     instances.forEach((instance) => {
-      const loader = formatCategoryHeader(instance.metadata.loader)
+      const loader = formatCategoryHeader(instance.loader)
       if (!instanceMap.has(loader)) {
         instanceMap.set(loader, [])
       }
@@ -183,19 +171,19 @@ const filteredResults = computed(() => {
     })
   } else if (group.value === 'Game version') {
     instances.forEach((instance) => {
-      if (!instanceMap.has(instance.metadata.game_version)) {
-        instanceMap.set(instance.metadata.game_version, [])
+      if (!instanceMap.has(instance.game_version)) {
+        instanceMap.set(instance.game_version, [])
       }
 
-      instanceMap.get(instance.metadata.game_version).push(instance)
+      instanceMap.get(instance.game_version).push(instance)
     })
-  } else if (group.value === 'Category') {
+  } else if (group.value === 'Group') {
     instances.forEach((instance) => {
-      if (instance.metadata.groups.length === 0) {
-        instance.metadata.groups.push('None')
+      if (instance.groups.length === 0) {
+        instance.groups.push('None')
       }
 
-      for (const category of instance.metadata.groups) {
+      for (const category of instance.groups) {
         if (!instanceMap.has(category)) {
           instanceMap.set(category, [])
         }
@@ -230,54 +218,37 @@ const filteredResults = computed(() => {
 })
 </script>
 <template>
-  <ConfirmModal
-    ref="confirmModal"
-    title="Are you sure you want to delete this instance?"
-    description="If you proceed, all data for your instance will be removed. You will not be able to recover it."
-    :has-to-type="false"
-    proceed-label="Delete"
-    :noblur="!themeStore.advancedRendering"
-    @proceed="deleteProfile"
-  />
-  <Card class="header">
-    <div class="iconified-input">
+  <div class="flex gap-2">
+    <div class="iconified-input flex-1">
       <SearchIcon />
-      <input v-model="search" type="text" placeholder="Search" class="search-input" />
-      <Button @click="() => (search = '')">
+      <input v-model="search" type="text" placeholder="Search" />
+      <Button class="r-btn" @click="() => (search = '')">
         <XIcon />
       </Button>
     </div>
-    <div class="labeled_button">
-      <span>Sort by</span>
-      <DropdownSelect
-        v-model="sortBy"
-        class="sort-dropdown"
-        name="Sort Dropdown"
-        :options="['Name', 'Last played', 'Date created', 'Date modified', 'Game version']"
-        placeholder="Select..."
-      />
-    </div>
-    <div class="labeled_button">
-      <span>Filter by</span>
-      <DropdownSelect
-        v-model="filters"
-        class="filter-dropdown"
-        name="Filter Dropdown"
-        :options="['All profiles', 'Custom instances', 'Downloaded modpacks']"
-        placeholder="Select..."
-      />
-    </div>
-    <div class="labeled_button">
-      <span>Group by</span>
-      <DropdownSelect
-        v-model="group"
-        class="group-dropdown"
-        name="Group Dropdown"
-        :options="['Category', 'Loader', 'Game version', 'None']"
-        placeholder="Select..."
-      />
-    </div>
-  </Card>
+    <DropdownSelect
+      v-slot="{ selected }"
+      v-model="sortBy"
+      name="Sort Dropdown"
+      class="max-w-[16rem]"
+      :options="['Name', 'Last played', 'Date created', 'Date modified', 'Game version']"
+      placeholder="Select..."
+    >
+      <span class="font-semibold text-primary">Sort by: </span>
+      <span class="font-semibold text-secondary">{{ selected }}</span>
+    </DropdownSelect>
+    <DropdownSelect
+      v-slot="{ selected }"
+      v-model="group"
+      class="max-w-[16rem]"
+      name="Group Dropdown"
+      :options="['Group', 'Loader', 'Game version', 'None']"
+      placeholder="Select..."
+    >
+      <span class="font-semibold text-primary">Group by: </span>
+      <span class="font-semibold text-secondary">{{ selected }}</span>
+    </DropdownSelect>
+  </div>
   <div
     v-for="instanceSection in Array.from(filteredResults, ([key, value]) => ({
       key,
@@ -300,6 +271,14 @@ const filteredResults = computed(() => {
       />
     </section>
   </div>
+  <ConfirmModalWrapper
+    ref="confirmModal"
+    title="Are you sure you want to delete this instance?"
+    description="If you proceed, all data for your instance will be removed. You will not be able to recover it."
+    :has-to-type="false"
+    proceed-label="Delete"
+    @proceed="deleteProfile"
+  />
   <ContextMenu ref="instanceOptions" @option-clicked="handleOptionsClick">
     <template #play> <PlayIcon /> Play </template>
     <template #stop> <StopCircleIcon /> Stop </template>
@@ -317,7 +296,6 @@ const filteredResults = computed(() => {
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
-  padding: 1rem;
 
   .divider {
     display: flex;
@@ -385,9 +363,9 @@ const filteredResults = computed(() => {
 
 .instances {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
   width: 100%;
-  gap: 1rem;
+  gap: 0.75rem;
   margin-right: auto;
   scroll-behavior: smooth;
   overflow-y: auto;

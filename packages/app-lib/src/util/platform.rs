@@ -1,6 +1,5 @@
 //! Platform-related code
 use daedalus::minecraft::{Os, OsRule};
-use regex::Regex;
 
 // OS detection
 pub trait OsExt {
@@ -9,9 +8,21 @@ pub trait OsExt {
 
     /// Gets the OS + Arch of the current system
     fn native_arch(java_arch: &str) -> Self;
+
+    /// Gets the OS from an OS + Arch
+    fn get_os(&self) -> Self;
 }
 
 impl OsExt for Os {
+    fn native() -> Self {
+        match std::env::consts::OS {
+            "windows" => Self::Windows,
+            "macos" => Self::Osx,
+            "linux" => Self::Linux,
+            _ => Self::Unknown,
+        }
+    }
+
     fn native_arch(java_arch: &str) -> Self {
         if std::env::consts::OS == "windows" {
             if java_arch == "aarch64" {
@@ -38,12 +49,13 @@ impl OsExt for Os {
         }
     }
 
-    fn native() -> Self {
-        match std::env::consts::OS {
-            "windows" => Self::Windows,
-            "macos" => Self::Osx,
-            "linux" => Self::Linux,
-            _ => Self::Unknown,
+    fn get_os(&self) -> Self {
+        match self {
+            Os::OsxArm64 => Os::Osx,
+            Os::LinuxArm32 => Os::Linux,
+            Os::LinuxArm64 => Os::Linux,
+            Os::WindowsArm64 => Os::Windows,
+            _ => self.clone(),
         }
     }
 }
@@ -72,19 +84,23 @@ pub fn os_rule(
         if minecraft_updated
             && (name != &Os::LinuxArm64 || name != &Os::LinuxArm32)
         {
-            rule_match &=
-                &Os::native() == name || &Os::native_arch(java_arch) == name;
+            rule_match &= Os::native() == name.get_os()
+                || &Os::native_arch(java_arch) == name;
         } else {
             rule_match &= &Os::native_arch(java_arch) == name;
         }
     }
 
-    if let Some(version) = &rule.version {
-        if let Ok(regex) = Regex::new(version.as_str()) {
-            rule_match &=
-                regex.is_match(&sys_info::os_release().unwrap_or_default());
-        }
-    }
+    // `rule.version` is ignored because it's not usually seen on real recent
+    // Minecraft version manifests, its alleged regex syntax is undefined and is
+    // likely to not match `Regex`'s, and the way to get the value to match it
+    // against is allegedly calling `System.getProperty("os.version")`, which
+    // on Windows the OpenJDK implements by fetching the kernel32.dll version,
+    // an approach that no public Rust library implements. Moreover, launchers
+    // such as PrismLauncher also ignore this field. Code references:
+    // - https://github.com/openjdk/jdk/blob/948ade8e7003a41683600428c8e3155c7ed798db/src/java.base/windows/native/libjava/java_props_md.c#L556
+    // - https://github.com/PrismLauncher/PrismLauncher/blob/1c20faccf88999474af70db098a4c10e7a03af33/launcher/minecraft/Rule.h#L77
+    // - https://github.com/FillZpp/sys-info-rs/blob/60ecf1470a5b7c90242f429934a3bacb6023ec4d/c/windows.c#L23-L38
 
     rule_match
 }

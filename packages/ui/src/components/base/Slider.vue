@@ -41,9 +41,12 @@
     <input
       ref="value"
       :value="currentValue"
-      type="text"
+      type="number"
       class="slider-input"
       :disabled="disabled"
+      :min="min"
+      :max="max"
+      :step="step"
       @change="onInput(($event.target as HTMLInputElement).value)"
     />
   </div>
@@ -80,17 +83,15 @@ const props = withDefaults(defineProps<Props>(), {
 
 const currentValue = ref(Math.max(props.min, props.modelValue))
 
-const inputValueValid = (newValue: number) => {
-  if (newValue < props.min) {
-    currentValue.value = props.min
-  } else if (newValue > props.max) {
-    currentValue.value = props.max
-  } else if (!newValue) {
-    currentValue.value = props.min
-  } else {
-    currentValue.value = newValue - (props.forceStep ? newValue % props.step : 0)
-  }
+const inputValueValid = (inputValue: number) => {
+  let newValue = inputValue || props.min
 
+  if (props.forceStep) {
+    newValue -= newValue % props.step
+  }
+  newValue = Math.max(props.min, Math.min(newValue, props.max))
+
+  currentValue.value = newValue
   emit('update:modelValue', currentValue.value)
 }
 
@@ -142,6 +143,9 @@ const onInput = (value: string) => {
   border-radius: var(--radius-sm);
   height: 0.25rem;
   width: 100%;
+  padding: 0;
+  min-height: 0px;
+  box-shadow: none;
 
   background: linear-gradient(
     to right,

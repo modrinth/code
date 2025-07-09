@@ -1,74 +1,79 @@
 use crate::api::Result;
+use chrono::{Duration, Utc};
 use tauri::plugin::TauriPlugin;
+use tauri::{Manager, Runtime, UserAttentionType};
 use theseus::prelude::*;
 
 pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
-    tauri::plugin::Builder::new("mr_auth")
-        .invoke_handler(tauri::generate_handler![
-            authenticate_begin_flow,
-            authenticate_await_completion,
-            cancel_flow,
-            login_pass,
-            login_2fa,
-            create_account,
-            refresh,
-            logout,
-            get,
-        ])
+    tauri::plugin::Builder::new("mr-auth")
+        .invoke_handler(tauri::generate_handler![modrinth_login, logout, get,])
         .build()
 }
 
 #[tauri::command]
-pub async fn authenticate_begin_flow(provider: &str) -> Result<String> {
-    Ok(theseus::mr_auth::authenticate_begin_flow(provider).await?)
-}
+pub async fn modrinth_login<R: Runtime>(
+    app: tauri::AppHandle<R>,
+) -> Result<Option<ModrinthCredentials>> {
+    let redirect_uri = mr_auth::authenticate_begin_flow();
 
-#[tauri::command]
-pub async fn authenticate_await_completion() -> Result<ModrinthCredentialsResult>
-{
-    Ok(theseus::mr_auth::authenticate_await_complete_flow().await?)
-}
+    let start = Utc::now();
 
-#[tauri::command]
-pub async fn cancel_flow() -> Result<()> {
-    Ok(theseus::mr_auth::cancel_flow().await?)
-}
+    if let Some(window) = app.get_webview_window("modrinth-signin") {
+        window.close()?;
+    }
 
-#[tauri::command]
-pub async fn login_pass(
-    username: &str,
-    password: &str,
-    challenge: &str,
-) -> Result<ModrinthCredentialsResult> {
-    Ok(theseus::mr_auth::login_password(username, password, challenge).await?)
-}
-
-#[tauri::command]
-pub async fn login_2fa(code: &str, flow: &str) -> Result<ModrinthCredentials> {
-    Ok(theseus::mr_auth::login_2fa(code, flow).await?)
-}
-
-#[tauri::command]
-pub async fn create_account(
-    username: &str,
-    email: &str,
-    password: &str,
-    challenge: &str,
-    sign_up_newsletter: bool,
-) -> Result<ModrinthCredentials> {
-    Ok(theseus::mr_auth::create_account(
-        username,
-        email,
-        password,
-        challenge,
-        sign_up_newsletter,
+    let window = tauri::WebviewWindowBuilder::new(
+        &app,
+        "modrinth-signin",
+        tauri::WebviewUrl::External(redirect_uri.parse().map_err(|_| {
+            theseus::ErrorKind::OtherError(
+                "Error parsing auth redirect URL".to_string(),
+            )
+            .as_error()
+        })?),
     )
-    .await?)
-}
+    .min_inner_size(420.0, 632.0)
+    .inner_size(420.0, 632.0)
+    .max_inner_size(420.0, 632.0)
+    .zoom_hotkeys_enabled(false)
+    .title("Sign into Modrinth")
+    .always_on_top(true)
+    .center()
+    .build()?;
 
-#[tauri::command]
-pub async fn refresh() -> Result<()> {
-    Ok(theseus::mr_auth::refresh().await?)
+    window.request_user_attention(Some(UserAttentionType::Critical))?;
+
+    while (Utc::now() - start) < Duration::minutes(10) {
+        if window.title().is_err() {
+            // user closed window, cancelling flow
+            return Ok(None);
+        }
+
+        if window
+            .url()?
+            .as_str()
+            .starts_with("https://launcher-files.modrinth.com")
+        {
+            let url = window.url()?;
+
+            let code = url.query_pairs().find(|(key, _)| key == "code");
+
+            window.close()?;
+
+            return if let Some((_, code)) = code {
+                let val = mr_auth::authenticate_finish_flow(&code).await?;
+
+                Ok(Some(val))
+            } else {
+                Ok(None)
+            };
+        }
+
+        tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+    }
+
+    window.close()?;
+    Ok(None)
 }
 
 #[tauri::command]

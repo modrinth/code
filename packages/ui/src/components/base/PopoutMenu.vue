@@ -1,218 +1,97 @@
 <template>
-  <div ref="dropdown" class="popup-container" tabindex="-1" :aria-expanded="dropdownVisible">
-    <button
-      v-bind="$attrs"
-      ref="dropdownButton"
-      :class="{ 'popout-open': dropdownVisible }"
-      tabindex="-1"
-      @click="toggleDropdown"
-    >
+  <Dropdown
+    ref="dropdown"
+    no-auto-focus
+    :aria-id="dropdownId || null"
+    placement="bottom-end"
+    :class="dropdownClass"
+    @apply-hide="focusTrigger"
+    @apply-show="focusMenuChild"
+  >
+    <button ref="trigger" v-bind="$attrs" v-tooltip="tooltip">
       <slot></slot>
     </button>
-    <div
-      class="popup-menu"
-      :class="`position-${position}-${direction} ${dropdownVisible ? 'visible' : ''}`"
-    >
-      <slot name="menu"> </slot>
-    </div>
-  </div>
+    <template #popper="{ hide: hideFunction }">
+      <button class="dummy-button" @focusin="hideAndFocusTrigger(hideFunction)"></button>
+      <div ref="menu" class="contents">
+        <slot name="menu"> </slot>
+      </div>
+      <button class="dummy-button" @focusin="hideAndFocusTrigger(hideFunction)"></button>
+    </template>
+  </Dropdown>
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { Dropdown } from 'floating-vue'
+import { ref } from 'vue'
 
-const props = defineProps({
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  position: {
+const trigger = ref()
+const menu = ref()
+const dropdown = ref()
+
+defineProps({
+  dropdownId: {
     type: String,
-    default: 'bottom',
+    default: null,
+    required: false,
   },
-  direction: {
+  dropdownClass: {
     type: String,
-    default: 'left',
+    default: null,
+    required: false,
+  },
+  tooltip: {
+    type: String,
+    default: null,
+    required: false,
   },
 })
+
+function focusMenuChild() {
+  setTimeout(() => {
+    if (menu.value && menu.value.children && menu.value.children.length > 0) {
+      menu.value.children[0].focus()
+    }
+  }, 50)
+}
+
+function hideAndFocusTrigger(hide) {
+  hide()
+  focusTrigger()
+}
+
+function focusTrigger() {
+  trigger.value.focus()
+}
+
 defineOptions({
   inheritAttrs: false,
 })
 
-const dropdownVisible = ref(false)
-const dropdown = ref(null)
-const dropdownButton = ref(null)
-
-const toggleDropdown = () => {
-  if (!props.disabled) {
-    dropdownVisible.value = !dropdownVisible.value
-    if (!dropdownVisible.value) {
-      dropdownButton.value.focus()
-    }
-  }
+function hide() {
+  dropdown.value.hide()
 }
 
-const hide = () => {
-  dropdownVisible.value = false
-  dropdownButton.value.focus()
-}
-
-const show = () => {
-  dropdownVisible.value = true
+function show() {
+  dropdown.value.show()
 }
 
 defineExpose({
   show,
   hide,
 })
-
-const handleClickOutside = (event) => {
-  const elements = document.elementsFromPoint(event.clientX, event.clientY)
-  if (
-    dropdown.value.$el !== event.target &&
-    !elements.includes(dropdown.value.$el) &&
-    !dropdown.value.contains(event.target)
-  ) {
-    dropdownVisible.value = false
-  }
-}
-
-onMounted(() => {
-  window.addEventListener('click', handleClickOutside)
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener('click', handleClickOutside)
-})
 </script>
-
-<style lang="scss" scoped>
-.popup-container {
-  position: relative;
-
-  .popup-menu {
-    --_animation-offset: -1rem;
-    position: absolute;
-    scale: 0.75;
-    border: 1px solid var(--color-button-bg);
-    padding: var(--gap-sm);
-    width: fit-content;
-    border-radius: var(--radius-md);
-    background-color: var(--color-raised-bg);
-    box-shadow: var(--shadow-floating);
-    z-index: 10;
-    opacity: 0;
-    transition:
-      bottom 0.125s ease-in-out,
-      top 0.125s ease-in-out,
-      left 0.125s ease-in-out,
-      right 0.125s ease-in-out,
-      opacity 0.125s ease-in-out,
-      scale 0.125s ease-in-out;
-
-    @media (prefers-reduced-motion) {
-      transition: none !important;
-    }
-
-    &.position-bottom-left {
-      top: calc(100% + var(--gap-sm) - 1rem);
-      right: -1rem;
-    }
-
-    &.position-bottom-right {
-      top: calc(100% + var(--gap-sm) - 1rem);
-      left: -1rem;
-    }
-
-    &.position-top-left {
-      bottom: calc(100% + var(--gap-sm) - 1rem);
-      right: -1rem;
-    }
-
-    &.position-top-right {
-      bottom: calc(100% + var(--gap-sm) - 1rem);
-      left: -1rem;
-    }
-
-    &.position-left-up {
-      bottom: -1rem;
-      right: calc(100% + var(--gap-sm) - 1rem);
-    }
-
-    &.position-left-down {
-      top: -1rem;
-      right: calc(100% + var(--gap-sm) - 1rem);
-    }
-
-    &.position-right-up {
-      bottom: -1rem;
-      left: calc(100% + var(--gap-sm) - 1rem);
-    }
-
-    &.position-right-down {
-      top: -1rem;
-      left: calc(100% + var(--gap-sm) - 1rem);
-    }
-
-    &:not(.visible):not(:focus-within) {
-      pointer-events: none;
-
-      *,
-      ::before,
-      ::after {
-        pointer-events: none;
-      }
-    }
-
-    &.visible,
-    &:focus-within {
-      opacity: 1;
-      scale: 1;
-
-      &.position-bottom-left {
-        top: calc(100% + var(--gap-sm));
-        right: 0;
-      }
-
-      &.position-bottom-right {
-        top: calc(100% + var(--gap-sm));
-        left: 0;
-      }
-
-      &.position-top-left {
-        bottom: calc(100% + var(--gap-sm));
-        right: 0;
-      }
-
-      &.position-top-right {
-        bottom: calc(100% + var(--gap-sm));
-        left: 0;
-      }
-
-      &.position-left-up {
-        bottom: 0rem;
-        right: calc(100% + var(--gap-sm));
-      }
-
-      &.position-left-down {
-        top: 0rem;
-        right: calc(100% + var(--gap-sm));
-      }
-
-      &.position-right-up {
-        bottom: 0rem;
-        left: calc(100% + var(--gap-sm));
-      }
-
-      &.position-right-down {
-        top: 0rem;
-        left: calc(100% + var(--gap-sm));
-      }
-    }
-
-    .btn {
-      white-space: nowrap;
-    }
-  }
+<style scoped>
+.dummy-button {
+  position: absolute;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  outline: none;
 }
 </style>

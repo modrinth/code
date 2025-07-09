@@ -28,7 +28,7 @@
       </Button>
       <Button :disabled="props.disabled" @click="autoDetect">
         <SearchIcon />
-        Auto detect
+        Detect
       </Button>
       <Button :disabled="props.disabled" @click="handleJavaFileInput()">
         <FolderSearchIcon />
@@ -63,10 +63,10 @@ import {
 import { Button } from '@modrinth/ui'
 import { auto_install_java, find_filtered_jres, get_jre, test_jre } from '@/helpers/jre.js'
 import { ref } from 'vue'
-import { open } from '@tauri-apps/api/dialog'
+import { open } from '@tauri-apps/plugin-dialog'
 import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
-import { mixpanel_track } from '@/helpers/mixpanel'
 import { handleError } from '@/store/state.js'
+import { trackEvent } from '@/helpers/analytics'
 
 const props = defineProps({
   version: {
@@ -108,12 +108,11 @@ async function testJava() {
   testingJava.value = true
   testingJavaSuccess.value = await test_jre(
     props.modelValue ? props.modelValue.path : '',
-    1,
     props.version,
   )
   testingJava.value = false
 
-  mixpanel_track('JavaTest', {
+  trackEvent('JavaTest', {
     path: props.modelValue ? props.modelValue.path : '',
     success: testingJavaSuccess.value,
   })
@@ -124,20 +123,19 @@ async function testJava() {
 }
 
 async function handleJavaFileInput() {
-  let filePath = await open()
+  const filePath = await open()
 
   if (filePath) {
-    let result = await get_jre(filePath)
+    let result = await get_jre(filePath.path ?? filePath).catch(handleError)
     if (!result) {
       result = {
-        path: filePath,
+        path: filePath.path ?? filePath,
         version: props.version.toString(),
         architecture: 'x86',
       }
     }
 
-    mixpanel_track('JavaManualSelect', {
-      path: filePath,
+    trackEvent('JavaManualSelect', {
       version: props.version,
     })
 
@@ -150,7 +148,7 @@ async function autoDetect() {
   if (!props.compact) {
     detectJavaModal.value.show(props.version, props.modelValue)
   } else {
-    let versions = await find_filtered_jres(props.version).catch(handleError)
+    const versions = await find_filtered_jres(props.version).catch(handleError)
     if (versions.length > 0) {
       emit('update:modelValue', versions[0])
     }
@@ -162,7 +160,6 @@ async function reinstallJava() {
   const path = await auto_install_java(props.version).catch(handleError)
   let result = await get_jre(path)
 
-  console.log('java result ' + result)
   if (!result) {
     result = {
       path: path,
@@ -171,7 +168,7 @@ async function reinstallJava() {
     }
   }
 
-  mixpanel_track('JavaReInstall', {
+  trackEvent('JavaReInstall', {
     path: path,
     version: props.version,
   })
@@ -189,6 +186,7 @@ async function reinstallJava() {
 
 .toggle-setting {
   display: flex;
+  flex-wrap: wrap;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
@@ -205,6 +203,10 @@ async function reinstallJava() {
   align-items: center;
   gap: 0.5rem;
   margin: 0;
+
+  .btn {
+    width: max-content;
+  }
 }
 
 .test-success {

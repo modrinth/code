@@ -19,19 +19,21 @@ const validateValues = <K extends PropertyKey>(flags: Record<K, FlagValue>) => f
 export const DEFAULT_FEATURE_FLAGS = validateValues({
   // Developer flags
   developerMode: false,
-
-  // In-development features, flags will be removed over time
-  newProjectLinks: true,
-  newProjectMembers: false,
-  newProjectDetails: true,
-  projectCompatibility: false,
-  removeFeaturedVersions: false,
-
-  // Alt layouts
-  // searchSidebarRight: false,
-  // projectSidebarRight: false,
+  showVersionFilesInTable: false,
+  showAdsWithPlus: false,
+  alwaysShowChecklistAsPopup: true,
 
   // Feature toggles
+  projectTypesPrimaryNav: false,
+  hidePlusPromoInUserMenu: false,
+  oldProjectCards: true,
+  newProjectCards: false,
+  projectBackground: false,
+  searchBackground: false,
+  advancedDebugInfo: false,
+  showProjectPageDownloadModalServersPromo: false,
+  showProjectPageCreateServersTooltip: true,
+  showProjectPageQuickServerButton: false,
   // advancedRendering: true,
   // externalLinksNewTab: true,
   // notUsingBlockers: false,

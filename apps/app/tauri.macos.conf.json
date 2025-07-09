@@ -1,5 +1,5 @@
 {
-  "tauri": {
+  "app": {
     "windows": [
       {
         "titleBarStyle": "Overlay",
@@ -12,7 +12,12 @@
         "minHeight": 700,
         "minWidth": 1100,
         "visible": false,
-        "decorations": true
+        "zoomHotkeysEnabled": false,
+        "decorations": true,
+        "trafficLightPosition": {
+          "x": 15.0,
+          "y": 22.0
+        }
       }
     ]
   }

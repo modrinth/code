@@ -19,7 +19,7 @@ export const useImageUpload = async (file: File, ctx: ImageUploadContext) => {
 
   // Make sure file is less than 1MB
   if (file.size > 1024 * 1024) {
-    throw new Error("File is too large");
+    throw new Error("File exceeds the 1MiB size limit");
   }
 
   const qs = new URLSearchParams();
