@@ -225,7 +225,7 @@
         </template>
       </div>
       <div class="preview">
-        <Toggle id="preview" v-model="previewMode" :checked="previewMode" />
+        <Toggle id="preview" v-model="previewMode" />
         <label class="label" for="preview"> Preview </label>
       </div>
     </div>
@@ -237,7 +237,7 @@
           >This editor supports
           <a
             class="markdown-resource-link"
-            href="https://docs.modrinth.com/markdown"
+            href="https://support.modrinth.com/en/articles/8801962-advanced-markdown-formatting"
             target="_blank"
             >Markdown formatting</a
           >.</span
@@ -263,31 +263,31 @@
 </template>
 
 <script setup lang="ts">
-import { type Component, computed, ref, onMounted, onBeforeUnmount, toRef, watch } from 'vue'
+import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, watch } from 'vue'
 import { Compartment, EditorState } from '@codemirror/state'
 import { EditorView, keymap, placeholder as cm_placeholder } from '@codemirror/view'
 import { markdown } from '@codemirror/lang-markdown'
-import { indentWithTab, historyKeymap, history } from '@codemirror/commands'
+import { history, historyKeymap, indentWithTab } from '@codemirror/commands'
 import {
+  AlignLeftIcon,
+  BoldIcon,
+  CodeIcon,
   Heading1Icon,
   Heading2Icon,
   Heading3Icon,
-  BoldIcon,
+  ImageIcon,
+  InfoIcon,
   ItalicIcon,
-  ScanEyeIcon,
-  StrikethroughIcon,
-  CodeIcon,
+  LinkIcon,
   ListBulletedIcon,
   ListOrderedIcon,
-  TextQuoteIcon,
-  LinkIcon,
-  ImageIcon,
-  YouTubeIcon,
-  AlignLeftIcon,
   PlusIcon,
-  XIcon,
+  ScanEyeIcon,
+  StrikethroughIcon,
+  TextQuoteIcon,
   UploadIcon,
-  InfoIcon,
+  XIcon,
+  YouTubeIcon,
 } from '@modrinth/assets'
 import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/utils/codemirror'
 import { renderHighlightedString } from '@modrinth/utils/highlight'
@@ -300,8 +300,8 @@ import Chips from './Chips.vue'
 const props = withDefaults(
   defineProps<{
     modelValue: string
-    disabled: boolean
-    headingButtons: boolean
+    disabled?: boolean
+    headingButtons?: boolean
     /**
      * @param file The file to upload
      * @throws If the file is invalid or the upload fails
@@ -368,7 +368,6 @@ onMounted(() => {
       if (clipboardData.files && clipboardData.files.length > 0 && props.onImageUpload) {
         // If the user is pasting a file, upload it if there's an included handler and insert the link.
         uploadImagesFromList(clipboardData.files)
-          // eslint-disable-next-line func-names -- who the fuck did this?
           .then(function (url) {
             const selection = markdownCommands.yankSelection(view)
             const altText = selection || 'Replace this with a description'
@@ -654,7 +653,7 @@ function cleanUrl(input: string): string {
   // Attempt to validate and parse the URL
   try {
     url = new URL(input)
-  } catch (e) {
+  } catch {
     throw new Error('Invalid URL. Make sure the URL is well-formed.')
   }
 
@@ -797,7 +796,7 @@ function openVideoModal() {
 
 .markdown-resource-link {
   cursor: pointer;
-  color: var(--color-link);
+  color: var(--color-blue);
 
   &:focus-visible,
   &:hover {
@@ -948,5 +947,9 @@ function openVideoModal() {
   opacity: 0.6;
   pointer-events: none;
   cursor: not-allowed;
+}
+
+:deep(.cm-content) {
+  overflow: auto;
 }
 </style>

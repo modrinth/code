@@ -74,12 +74,13 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime.js'
 import { defineComponent } from 'vue'
 import Categories from '../search/Categories.vue'
-import Badge from './Badge.vue'
+import Badge from './SimpleBadge.vue'
 import Avatar from './Avatar.vue'
 import EnvironmentIndicator from './EnvironmentIndicator.vue'
 </script>
 
 <script>
+import { useRelativeTime } from '../../composables'
 
 dayjs.extend(relativeTime)
 export default defineComponent({
@@ -192,6 +193,10 @@ export default defineComponent({
       default: null,
     },
   },
+  setup(_) {
+    const formatRelativeTime = useRelativeTime()
+    return { formatRelativeTime }
+  },
   computed: {
     toColor() {
       let color = this.color
@@ -200,19 +205,19 @@ export default defineComponent({
       const b = color & 0xff
       const g = (color & 0xff00) >>> 8
       const r = (color & 0xff0000) >>> 16
-      return `rgba(${  [r, g, b, 1].join(',')  })`
+      return `rgba(${[r, g, b, 1].join(',')})`
     },
     createdDate() {
       return dayjs(this.createdAt).format('MMMM D, YYYY [at] h:mm:ss A')
     },
     sinceCreation() {
-      return dayjs(this.createdAt).fromNow()
+      return this.formatRelativeTime(this.createdAt)
     },
     updatedDate() {
       return dayjs(this.updatedAt).format('MMMM D, YYYY [at] h:mm:ss A')
     },
     sinceUpdated() {
-      return dayjs(this.updatedAt).fromNow()
+      return this.formatRelativeTime(this.updatedAt)
     },
   },
   methods: {
@@ -301,7 +306,9 @@ export default defineComponent({
     img,
     svg {
       border-radius: var(--radius-lg);
-      box-shadow: -2px -2px 0 2px var(--color-raised-bg), 2px -2px 0 2px var(--color-raised-bg);
+      box-shadow:
+        -2px -2px 0 2px var(--color-raised-bg),
+        2px -2px 0 2px var(--color-raised-bg);
     }
   }
 

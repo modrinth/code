@@ -81,7 +81,7 @@ export default {
     pickLink() {
       this.activeIndex = this.query
         ? this.filteredLinks.findIndex(
-            (x) => (x.href === '' ? undefined : x.href) === this.$route.path[this.query]
+            (x) => (x.href === '' ? undefined : x.href) === this.$route.path[this.query],
           )
         : this.filteredLinks.findIndex((x) => x.href === decodeURIComponent(this.$route.path))
 

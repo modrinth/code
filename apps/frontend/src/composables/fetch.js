@@ -1,13 +1,12 @@
-/* eslint-disable no-undef */
 export const useBaseFetch = async (url, options = {}, skipAuth = false) => {
   const config = useRuntimeConfig();
-  let base = process.server ? config.apiBaseUrl : config.public.apiBaseUrl;
+  let base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl;
 
   if (!options.headers) {
     options.headers = {};
   }
 
-  if (process.server) {
+  if (import.meta.server) {
     options.headers["x-ratelimit-key"] = config.rateLimitKey;
   }
 

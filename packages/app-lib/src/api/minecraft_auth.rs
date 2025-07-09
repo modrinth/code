@@ -1,13 +1,13 @@
 //! Authentication flow interface
-use crate::state::{Credentials, MinecraftLoginFlow};
+
 use crate::State;
+use crate::state::{Credentials, MinecraftLoginFlow};
 
 #[tracing::instrument]
 pub async fn begin_login() -> crate::Result<MinecraftLoginFlow> {
     let state = State::get().await?;
-    let mut users = state.users.write().await;
 
-    users.login_begin().await
+    crate::state::login_begin(&state.pool).await
 }
 
 #[tracing::instrument]
@@ -16,34 +16,51 @@ pub async fn finish_login(
     flow: MinecraftLoginFlow,
 ) -> crate::Result<Credentials> {
     let state = State::get().await?;
-    let mut users = state.users.write().await;
 
-    users.login_finish(code, flow).await
+    crate::state::login_finish(code, flow, &state.pool).await
 }
 
 #[tracing::instrument]
 pub async fn get_default_user() -> crate::Result<Option<uuid::Uuid>> {
     let state = State::get().await?;
-    let users = state.users.read().await;
-    Ok(users.default_user)
+    let user = Credentials::get_active(&state.pool).await?;
+    Ok(user.map(|user| user.offline_profile.id))
 }
 
 #[tracing::instrument]
 pub async fn set_default_user(user: uuid::Uuid) -> crate::Result<()> {
-    let user = get_user(user).await?;
     let state = State::get().await?;
-    let mut users = state.users.write().await;
-    users.default_user = Some(user.id);
-    users.save().await?;
+    let users = Credentials::get_all(&state.pool).await?;
+    let (_, mut user) = users.remove(&user).ok_or_else(|| {
+        crate::ErrorKind::OtherError(format!(
+            "Tried to get nonexistent user with ID {user}"
+        ))
+        .as_error()
+    })?;
+
+    user.active = true;
+    user.upsert(&state.pool).await?;
+
     Ok(())
 }
 
 /// Remove a user account from the database
 #[tracing::instrument]
-pub async fn remove_user(user: uuid::Uuid) -> crate::Result<()> {
+pub async fn remove_user(uuid: uuid::Uuid) -> crate::Result<()> {
     let state = State::get().await?;
-    let mut users = state.users.write().await;
-    users.remove(user).await?;
+
+    let users = Credentials::get_all(&state.pool).await?;
+
+    if let Some((uuid, user)) = users.remove(&uuid) {
+        Credentials::remove(uuid, &state.pool).await?;
+
+        if user.active {
+            if let Some((_, mut user)) = users.into_iter().next() {
+                user.active = true;
+                user.upsert(&state.pool).await?;
+            }
+        }
+    }
 
     Ok(())
 }
@@ -52,25 +69,6 @@ pub async fn remove_user(user: uuid::Uuid) -> crate::Result<()> {
 #[tracing::instrument]
 pub async fn users() -> crate::Result<Vec<Credentials>> {
     let state = State::get().await?;
-    let users = state.users.read().await;
-    Ok(users.users.values().cloned().collect())
-}
-
-/// Get a specific user by user ID
-/// Prefer to use 'refresh' instead of this function
-#[tracing::instrument]
-pub async fn get_user(user: uuid::Uuid) -> crate::Result<Credentials> {
-    let state = State::get().await?;
-    let users = state.users.read().await;
-    let user = users
-        .users
-        .get(&user)
-        .ok_or_else(|| {
-            crate::ErrorKind::OtherError(format!(
-                "Tried to get nonexistent user with ID {user}"
-            ))
-            .as_error()
-        })?
-        .clone();
-    Ok(user)
+    let users = Credentials::get_all(&state.pool).await?;
+    Ok(users.into_iter().map(|x| x.1).collect())
 }

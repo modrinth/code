@@ -3,7 +3,7 @@ import { Card } from "@modrinth/ui";
 import VueApexCharts from "vue3-apexcharts";
 
 // let VueApexCharts
-// if (process.client) {
+// if (import.meta.client) {
 //   VueApexCharts = defineAsyncComponent(() => import('vue3-apexcharts'))
 // }
 

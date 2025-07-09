@@ -5,11 +5,10 @@ import { ref, watch, computed } from "vue";
 // note: build step can miss unix import for some reason, so
 // we have to import it like this
 
-const { unix } = dayjs;
+const { unix } = dayjs; // eslint-disable-line import/no-named-as-default-member
 
 export function useCountryNames(style = "long") {
   const formattingOptions = { type: "region", style };
-  // eslint-disable-next-line no-undef
   const { formats } = useVIntl();
   return function formatCountryName(code) {
     return formats.displayName(code, formattingOptions);
@@ -69,7 +68,7 @@ export const getDefaultColor = (value) => {
   return defaultColors[value % defaultColors.length];
 };
 
-export const intToRgba = (color, projectId = "Unknown", theme = "dark") => {
+export const intToRgba = (color, projectId = "Unknown", theme = "dark", alpha = "1") => {
   const hash = hashProjectId(projectId);
 
   if (!color || color === 0) {
@@ -111,7 +110,7 @@ export const intToRgba = (color, projectId = "Unknown", theme = "dark") => {
   g = Math.min(255, Math.max(0, g));
   b = Math.min(255, Math.max(0, b));
 
-  return `rgba(${r}, ${g}, ${b}, 1)`;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
 const emptyAnalytics = {
@@ -153,7 +152,7 @@ export const analyticsSetToCSVString = (analytics) => {
   return [header, ...data].join(newline);
 };
 
-export const processAnalytics = (category, projects, labelFn, sortFn, mapFn, chartName) => {
+export const processAnalytics = (category, projects, labelFn, sortFn, mapFn, chartName, theme) => {
   if (!category || !projects) {
     return emptyAnalytics;
   }
@@ -220,11 +219,9 @@ export const processAnalytics = (category, projects, labelFn, sortFn, mapFn, cha
         },
       ],
       colors: projectData.map((_, i) => {
-        // eslint-disable-next-line no-undef
-        const theme = useTheme();
         const project = chartData[i];
 
-        return intToRgba(project.color, project.id, theme.value);
+        return intToRgba(project.color, project.id, theme);
       }),
       defaultColors: projectData.map((_, i) => {
         const project = chartData[i];
@@ -265,8 +262,9 @@ export const processAnalyticsByCountry = (category, projects, sortFn) => {
 
   loadedProjectData.forEach((data) => {
     Object.entries(data).forEach(([country, value]) => {
-      const current = countrySums.get(country) || 0;
-      countrySums.set(country, current + value);
+      const countryCode = country || "XX";
+      const current = countrySums.get(countryCode) || 0;
+      countrySums.set(countryCode, current + value);
     });
   });
 
@@ -279,16 +277,15 @@ export const processAnalyticsByCountry = (category, projects, sortFn) => {
   };
 };
 
-// eslint-disable-next-line no-unused-vars
 const sortCount = ([_a, a], [_b, b]) => b - a;
 const sortTimestamp = ([a], [b]) => a - b;
 const roundValue = ([ts, value]) => [ts, Math.round(parseFloat(value) * 100) / 100];
 
 const processCountryAnalytics = (c, projects) => processAnalyticsByCountry(c, projects, sortCount);
-const processNumberAnalytics = (c, projects) =>
-  processAnalytics(c, projects, formatTimestamp, sortTimestamp, null, "Downloads");
-const processRevAnalytics = (c, projects) =>
-  processAnalytics(c, projects, formatTimestamp, sortTimestamp, roundValue, "Revenue");
+const processNumberAnalytics = (c, projects, theme) =>
+  processAnalytics(c, projects, formatTimestamp, sortTimestamp, null, "Downloads", theme);
+const processRevAnalytics = (c, projects, theme) =>
+  processAnalytics(c, projects, formatTimestamp, sortTimestamp, roundValue, "Revenue", theme);
 
 const useFetchAnalytics = (
   url,
@@ -296,7 +293,6 @@ const useFetchAnalytics = (
     apiVersion: 3,
   },
 ) => {
-  // eslint-disable-next-line no-undef
   return useBaseFetch(url, baseOptions);
 };
 
@@ -309,13 +305,10 @@ export const useFetchAllAnalytics = (
   projects,
   selectedProjects,
   personalRevenue = false,
+  startDate = ref(dayjs().subtract(30, "days")),
+  endDate = ref(dayjs()),
+  timeResolution = ref(1440),
 ) => {
-  const timeResolution = ref(1440); // 1 day
-  const timeRange = ref(43200); // 30 days
-
-  const startDate = ref(Date.now() - timeRange.value * 60 * 1000);
-  const endDate = ref(Date.now());
-
   const downloadData = ref(null);
   const viewData = ref(null);
   const revenueData = ref(null);
@@ -332,10 +325,12 @@ export const useFetchAllAnalytics = (
     viewsByCountry: processCountryAnalytics(viewsByCountry.value, selectedProjects.value),
   }));
 
+  const theme = useTheme();
+
   const totalData = computed(() => ({
-    downloads: processNumberAnalytics(downloadData.value, projects.value),
-    views: processNumberAnalytics(viewData.value, projects.value),
-    revenue: processRevAnalytics(revenueData.value, projects.value),
+    downloads: processNumberAnalytics(downloadData.value, projects.value, theme.active),
+    views: processNumberAnalytics(viewData.value, projects.value, theme.active),
+    revenue: processRevAnalytics(revenueData.value, projects.value, theme.active),
   }));
 
   const fetchData = async (query) => {
@@ -397,8 +392,8 @@ export const useFetchAllAnalytics = (
     [() => startDate.value, () => endDate.value, () => timeResolution.value, () => projects.value],
     async () => {
       const q = {
-        start_date: dayjs(startDate.value).toISOString(),
-        end_date: dayjs(endDate.value).toISOString(),
+        start_date: startDate.value.toISOString(),
+        end_date: endDate.value.toISOString(),
         resolution_minutes: timeResolution.value,
       };
 
@@ -445,7 +440,6 @@ export const useFetchAllAnalytics = (
   return {
     // Configuration
     timeResolution,
-    timeRange,
 
     startDate,
     endDate,

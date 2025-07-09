@@ -1,40 +1,37 @@
-//! Functions for fetching infromation from the Internet
-use crate::event::emit::emit_loading;
+//! Functions for fetching information from the Internet
+use super::io::{self, IOError};
+use crate::config::{MODRINTH_API_URL, MODRINTH_API_URL_V3};
 use crate::event::LoadingBarId;
-use crate::state::CredentialsStore;
+use crate::event::emit::emit_loading;
 use bytes::Bytes;
-use lazy_static::lazy_static;
 use reqwest::Method;
 use serde::de::DeserializeOwned;
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
-use std::time::{self, Duration};
-use tokio::sync::{RwLock, Semaphore};
+use std::sync::LazyLock;
+use std::time::{self};
+use tokio::sync::Semaphore;
 use tokio::{fs::File, io::AsyncWriteExt};
 
-use super::io::{self, IOError};
-
 #[derive(Debug)]
-pub struct IoSemaphore(pub RwLock<Semaphore>);
+pub struct IoSemaphore(pub Semaphore);
 #[derive(Debug)]
-pub struct FetchSemaphore(pub RwLock<Semaphore>);
+pub struct FetchSemaphore(pub Semaphore);
 
-lazy_static! {
-    pub static ref REQWEST_CLIENT: reqwest::Client = {
-        let mut headers = reqwest::header::HeaderMap::new();
-        let header = reqwest::header::HeaderValue::from_str(&format!(
-            "modrinth/theseus/{} (support@modrinth.com)",
-            env!("CARGO_PKG_VERSION")
-        ))
-        .unwrap();
-        headers.insert(reqwest::header::USER_AGENT, header);
-        reqwest::Client::builder()
-            .tcp_keepalive(Some(time::Duration::from_secs(10)))
-            .default_headers(headers)
-            .build()
-            .expect("Reqwest Client Building Failed")
-    };
-}
+pub static REQWEST_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
+    let mut headers = reqwest::header::HeaderMap::new();
+    let header = reqwest::header::HeaderValue::from_str(&format!(
+        "modrinth/theseus/{} (support@modrinth.com)",
+        env!("CARGO_PKG_VERSION")
+    ))
+    .unwrap();
+    headers.insert(reqwest::header::USER_AGENT, header);
+    reqwest::Client::builder()
+        .tcp_keepalive(Some(time::Duration::from_secs(10)))
+        .default_headers(headers)
+        .build()
+        .expect("Reqwest Client Building Failed")
+});
 const FETCH_ATTEMPTS: usize = 3;
 
 #[tracing::instrument(skip(semaphore))]
@@ -42,19 +39,10 @@ pub async fn fetch(
     url: &str,
     sha1: Option<&str>,
     semaphore: &FetchSemaphore,
-    credentials: &CredentialsStore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<Bytes> {
-    fetch_advanced(
-        Method::GET,
-        url,
-        sha1,
-        None,
-        None,
-        None,
-        semaphore,
-        credentials,
-    )
-    .await
+    fetch_advanced(Method::GET, url, sha1, None, None, None, semaphore, exec)
+        .await
 }
 
 #[tracing::instrument(skip(json_body, semaphore))]
@@ -64,20 +52,13 @@ pub async fn fetch_json<T>(
     sha1: Option<&str>,
     json_body: Option<serde_json::Value>,
     semaphore: &FetchSemaphore,
-    credentials: &CredentialsStore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<T>
 where
     T: DeserializeOwned,
 {
     let result = fetch_advanced(
-        method,
-        url,
-        sha1,
-        json_body,
-        None,
-        None,
-        semaphore,
-        credentials,
+        method, url, sha1, json_body, None, None, semaphore, exec,
     )
     .await?;
     let value = serde_json::from_slice(&result)?;
@@ -86,7 +67,6 @@ where
 
 /// Downloads a file with retry and checksum functionality
 #[tracing::instrument(skip(json_body, semaphore))]
-#[theseus_macros::debug_pin]
 #[allow(clippy::too_many_arguments)]
 pub async fn fetch_advanced(
     method: Method,
@@ -96,10 +76,21 @@ pub async fn fetch_advanced(
     header: Option<(&str, &str)>,
     loading_bar: Option<(&LoadingBarId, f64)>,
     semaphore: &FetchSemaphore,
-    credentials: &CredentialsStore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<Bytes> {
-    let io_semaphore = semaphore.0.read().await;
-    let _permit = io_semaphore.acquire().await?;
+    let _permit = semaphore.0.acquire().await?;
+
+    let creds = if header
+        .as_ref()
+        .is_none_or(|x| &*x.0.to_lowercase() != "authorization")
+        && (url.starts_with("https://cdn.modrinth.com")
+            || url.starts_with(MODRINTH_API_URL)
+            || url.starts_with(MODRINTH_API_URL_V3))
+    {
+        crate::state::ModrinthCredentials::get_active(exec).await?
+    } else {
+        None
+    };
 
     for attempt in 1..=(FETCH_ATTEMPTS + 1) {
         let mut req = REQWEST_CLIENT.request(method.clone(), url);
@@ -112,15 +103,26 @@ pub async fn fetch_advanced(
             req = req.header(header.0, header.1);
         }
 
-        if url.starts_with("https://cdn.modrinth.com") {
-            if let Some(creds) = &credentials.0 {
-                req = req.header("Authorization", &creds.session);
-            }
+        if let Some(ref creds) = creds {
+            req = req.header("Authorization", &creds.session);
         }
 
         let result = req.send().await;
         match result {
             Ok(x) => {
+                if x.status().is_server_error() {
+                    if attempt <= FETCH_ATTEMPTS {
+                        continue;
+                    } else {
+                        return Err(crate::Error::from(
+                            crate::ErrorKind::OtherError(
+                                "Server error when fetching content"
+                                    .to_string(),
+                            ),
+                        ));
+                    }
+                }
+
                 let bytes = if let Some((bar, total)) = &loading_bar {
                     let length = x.content_length();
                     if let Some(total_size) = length {
@@ -139,8 +141,7 @@ pub async fn fetch_advanced(
                                 (chunk.len() as f64 / total_size as f64)
                                     * total,
                                 None,
-                            )
-                            .await?;
+                            )?;
                         }
 
                         Ok(bytes::Bytes::from(bytes))
@@ -155,7 +156,7 @@ pub async fn fetch_advanced(
                     if let Some(sha1) = sha1 {
                         let hash = sha1_async(bytes.clone()).await?;
                         if &*hash != sha1 {
-                            if attempt <= 3 {
+                            if attempt <= FETCH_ATTEMPTS {
                                 continue;
                             } else {
                                 return Err(crate::ErrorKind::HashError(
@@ -169,13 +170,13 @@ pub async fn fetch_advanced(
 
                     tracing::trace!("Done downloading URL {url}");
                     return Ok(bytes);
-                } else if attempt <= 3 {
+                } else if attempt <= FETCH_ATTEMPTS {
                     continue;
                 } else if let Err(err) = bytes {
                     return Err(err.into());
                 }
             }
-            Err(_) if attempt <= 3 => continue,
+            Err(_) if attempt <= FETCH_ATTEMPTS => continue,
             Err(err) => {
                 return Err(err.into());
             }
@@ -187,12 +188,11 @@ pub async fn fetch_advanced(
 
 /// Downloads a file from specified mirrors
 #[tracing::instrument(skip(semaphore))]
-#[theseus_macros::debug_pin]
 pub async fn fetch_mirrors(
     mirrors: &[&str],
     sha1: Option<&str>,
     semaphore: &FetchSemaphore,
-    credentials: &CredentialsStore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
 ) -> crate::Result<Bytes> {
     if mirrors.is_empty() {
         return Err(crate::ErrorKind::InputError(
@@ -202,7 +202,7 @@ pub async fn fetch_mirrors(
     }
 
     for (index, mirror) in mirrors.iter().enumerate() {
-        let result = fetch(mirror, sha1, semaphore, credentials).await;
+        let result = fetch(mirror, sha1, semaphore, exec).await;
 
         if result.is_ok() || (result.is_err() && index == (mirrors.len() - 1)) {
             return result;
@@ -212,35 +212,24 @@ pub async fn fetch_mirrors(
     unreachable!()
 }
 
-/// Using labrinth API, checks if an internet response can be found, with a timeout in seconds
-#[tracing::instrument]
-#[theseus_macros::debug_pin]
-pub async fn check_internet(timeout: u64) -> bool {
-    REQWEST_CLIENT
-        .get("https://launcher-files.modrinth.com/detect.txt")
-        .timeout(Duration::from_secs(timeout))
-        .send()
-        .await
-        .is_ok()
-}
-
 /// Posts a JSON to a URL
 #[tracing::instrument(skip(json_body, semaphore))]
-#[theseus_macros::debug_pin]
 pub async fn post_json<T>(
     url: &str,
     json_body: serde_json::Value,
     semaphore: &FetchSemaphore,
-    credentials: &CredentialsStore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<T>
 where
     T: DeserializeOwned,
 {
-    let io_semaphore = semaphore.0.read().await;
-    let _permit = io_semaphore.acquire().await?;
+    let _permit = semaphore.0.acquire().await?;
 
     let mut req = REQWEST_CLIENT.post(url).json(&json_body);
-    if let Some(creds) = &credentials.0 {
+
+    if let Some(creds) =
+        crate::state::ModrinthCredentials::get_active(exec).await?
+    {
         req = req.header("Authorization", &creds.session);
     }
 
@@ -257,8 +246,7 @@ pub async fn read_json<T>(
 where
     T: DeserializeOwned,
 {
-    let io_semaphore = semaphore.0.read().await;
-    let _permit = io_semaphore.acquire().await?;
+    let _permit = semaphore.0.acquire().await?;
 
     let json = io::read(path).await?;
     let json = serde_json::from_slice::<T>(&json)?;
@@ -272,8 +260,7 @@ pub async fn write<'a>(
     bytes: &[u8],
     semaphore: &IoSemaphore,
 ) -> crate::Result<()> {
-    let io_semaphore = semaphore.0.read().await;
-    let _permit = io_semaphore.acquire().await?;
+    let _permit = semaphore.0.acquire().await?;
 
     if let Some(parent) = path.parent() {
         io::create_dir_all(parent).await?;
@@ -297,8 +284,7 @@ pub async fn copy(
     let src: &Path = src.as_ref();
     let dest = dest.as_ref();
 
-    let io_semaphore = semaphore.0.read().await;
-    let _permit = io_semaphore.acquire().await?;
+    let _permit = semaphore.0.acquire().await?;
 
     if let Some(parent) = dest.parent() {
         io::create_dir_all(parent).await?;
@@ -335,7 +321,7 @@ pub async fn write_cached_icon(
     Ok(path)
 }
 
-async fn sha1_async(bytes: Bytes) -> crate::Result<String> {
+pub async fn sha1_async(bytes: Bytes) -> crate::Result<String> {
     let hash = tokio::task::spawn_blocking(move || {
         sha1_smol::Sha1::from(bytes).hexdigest()
     })

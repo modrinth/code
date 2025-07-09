@@ -91,7 +91,7 @@
         :description="formatMessage(messages.subscribeLabel)"
       />
 
-      <p>
+      <p v-if="!route.query.launcher">
         <IntlFormatted :message-id="messages.legalDisclaimer">
           <template #terms-link="{ children }">
             <NuxtLink to="/legal/terms" class="text-link">
@@ -106,12 +106,7 @@
         </IntlFormatted>
       </p>
 
-      <NuxtTurnstile
-        ref="turnstile"
-        v-model="token"
-        class="turnstile"
-        :options="{ theme: $colorMode.value === 'light' ? 'light' : 'dark' }"
-      />
+      <HCaptcha ref="captcha" v-model="token" />
 
       <button
         class="btn btn-primary continue-btn centered-btn"
@@ -123,7 +118,13 @@
 
       <div class="auth-form__additional-options">
         {{ formatMessage(messages.alreadyHaveAccountLabel) }}
-        <NuxtLink class="text-link" :to="signInLink">
+        <NuxtLink
+          class="text-link"
+          :to="{
+            path: '/auth/sign-in',
+            query: route.query,
+          }"
+        >
           {{ formatMessage(commonMessages.signInButton) }}
         </NuxtLink>
       </div>
@@ -144,7 +145,8 @@ import {
   MailIcon,
   SSOGitLabIcon,
 } from "@modrinth/assets";
-import { Checkbox } from "@modrinth/ui";
+import { Checkbox, commonMessages } from "@modrinth/ui";
+import HCaptcha from "@/components/ui/HCaptcha.vue";
 
 const { formatMessage } = useVIntl();
 
@@ -205,19 +207,11 @@ const route = useNativeRoute();
 
 const redirectTarget = route.query.redirect;
 
-if (route.fullPath.includes("new_account=true")) {
-  await navigateTo(
-    `/auth/welcome?authToken=${route.query.code}${
-      route.query.redirect ? `&redirect=${encodeURIComponent(route.query.redirect)}` : ""
-    }`,
-  );
-}
-
 if (auth.value.user) {
   await navigateTo("/dashboard");
 }
 
-const turnstile = ref();
+const captcha = ref();
 
 const email = ref("");
 const username = ref("");
@@ -225,10 +219,6 @@ const password = ref("");
 const confirmPassword = ref("");
 const token = ref("");
 const subscribe = ref(true);
-
-const signInLink = computed(
-  () => `/auth/sign-in${route.query.redirect ? `?redirect=${route.query.redirect}` : ""}`,
-);
 
 async function createAccount() {
   startLoading();
@@ -243,7 +233,7 @@ async function createAccount() {
         }),
         type: "error",
       });
-      turnstile.value?.reset();
+      captcha.value?.reset();
     }
 
     const res = await useBaseFetch("auth/create", {
@@ -256,6 +246,13 @@ async function createAccount() {
         sign_up_newsletter: subscribe.value,
       },
     });
+
+    if (route.query.launcher) {
+      await navigateTo(`https://launcher-files.modrinth.com/?code=${res.session}`, {
+        external: true,
+      });
+      return;
+    }
 
     await useAuth(res.session);
     await useUser();
@@ -272,7 +269,7 @@ async function createAccount() {
       text: err.data ? err.data.description : err,
       type: "error",
     });
-    turnstile.value?.reset();
+    captcha.value?.reset();
   }
   stopLoading();
 }

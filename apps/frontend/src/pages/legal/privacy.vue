@@ -109,7 +109,7 @@
     <p>This data is used to deliver statistics.</p>
 
     <h3>Usage data</h3>
-    <p>When you interact with the Modrinth App or the Website, we collect through MixPanel:</p>
+    <p>When you interact with the Modrinth App or the Website, we collect through PostHog:</p>
     <ul>
       <li>Your IP address</li>
       <li>Your anonymized user ID</li>
@@ -122,8 +122,8 @@
     <h3>Creator Monetization Program data</h3>
     <p>
       When you sign up for our
-      <a href="https://blog.modrinth.com/p/creator-monetization-beta">
-        Creator Monetization Program</a
+      <nuxt-link to="/news/article/creator-monetization-beta">
+        Creator Monetization Program</nuxt-link
       >
       (the "CMP"), we collect:
     </p>
@@ -150,9 +150,10 @@
         <a href="https://www.cloudflare.com/en-gb/gdpr/introduction/"> Cloudflare </a>
       </li>
       <li><a href="https://sentry.io/trust/privacy/">Sentry</a></li>
-      <li><a href="https://mixpanel.com/legal/privacy-policy">MixPanel</a></li>
+      <li><a href="https://posthog.com/privacy">PostHog</a></li>
       <li><a href="https://www.beehiiv.com/privacy">BeeHiiv</a></li>
       <li><a href="https://www.paypal.com/us/legalhub/privacy-full">PayPal</a></li>
+      <li><a href="https://stripe.com/privacy">Stripe</a></li>
     </ul>
     <p>
       Data that we specifically collect isn't shared with any other third party. We do not sell any

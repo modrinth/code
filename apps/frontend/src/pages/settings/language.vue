@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import Fuse from "fuse.js/dist/fuse.basic";
-import RadioButtonIcon from "~/assets/images/utils/radio-button.svg?component";
-import RadioButtonCheckedIcon from "~/assets/images/utils/radio-button-checked.svg?component";
-import WarningIcon from "~/assets/images/utils/issues.svg?component";
+import { commonSettingsMessages } from "@modrinth/ui";
+import { RadioButtonIcon, RadioButtonCheckedIcon, IssuesIcon } from "@modrinth/assets";
 import { isModifierKeyDown } from "~/helpers/events.ts";
-import { commonSettingsMessages } from "~/utils/common-messages.ts";
 
 const vintl = useVIntl();
 const { formatMessage } = vintl;
@@ -226,7 +224,7 @@ async function changeLocale(value: string) {
   try {
     await vintl.changeLocale(value);
     $failedLocale.value = undefined;
-  } catch (err) {
+  } catch {
     $failedLocale.value = value;
   } finally {
     $changingTo.value = undefined;
@@ -376,7 +374,8 @@ function getItemLabel(locale: Locale) {
               :id="`language__${locale.tag}__fail`"
               class="language-load-error"
             >
-              <WarningIcon /> {{ formatMessage(messages.loadFailed) }}
+              <IssuesIcon />
+              {{ formatMessage(messages.loadFailed) }}
             </div>
           </template>
         </template>

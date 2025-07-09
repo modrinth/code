@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 export default defineNuxtPlugin(() => {
   const nuxtApp = useNuxtApp();
 

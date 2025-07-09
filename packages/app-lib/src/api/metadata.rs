@@ -1,43 +1,37 @@
 use crate::State;
+use crate::state::CachedEntry;
 pub use daedalus::minecraft::VersionManifest;
 pub use daedalus::modded::Manifest;
 
 #[tracing::instrument]
 pub async fn get_minecraft_versions() -> crate::Result<VersionManifest> {
     let state = State::get().await?;
-    let tags = state.metadata.read().await.minecraft.clone();
+    let minecraft_versions = CachedEntry::get_minecraft_manifest(
+        None,
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::NoValueFor("minecraft versions".to_string())
+    })?;
 
-    Ok(tags)
+    Ok(minecraft_versions)
 }
 
-#[tracing::instrument]
-pub async fn get_fabric_versions() -> crate::Result<Manifest> {
+// #[tracing::instrument]
+pub async fn get_loader_versions(loader: &str) -> crate::Result<Manifest> {
     let state = State::get().await?;
-    let tags = state.metadata.read().await.fabric.clone();
+    let loaders = CachedEntry::get_loader_manifest(
+        loader,
+        None,
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::NoValueFor(format!("{loader} loader versions"))
+    })?;
 
-    Ok(tags)
-}
-
-#[tracing::instrument]
-pub async fn get_forge_versions() -> crate::Result<Manifest> {
-    let state = State::get().await?;
-    let tags = state.metadata.read().await.forge.clone();
-
-    Ok(tags)
-}
-
-#[tracing::instrument]
-pub async fn get_quilt_versions() -> crate::Result<Manifest> {
-    let state = State::get().await?;
-    let tags = state.metadata.read().await.quilt.clone();
-
-    Ok(tags)
-}
-
-#[tracing::instrument]
-pub async fn get_neoforge_versions() -> crate::Result<Manifest> {
-    let state = State::get().await?;
-    let tags = state.metadata.read().await.neoforge.clone();
-
-    Ok(tags)
+    Ok(loaders.manifest)
 }

@@ -1,16 +1,10 @@
-use crate::config::MODRINTH_API_URL;
+use crate::State;
 use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
-use crate::prelude::ProfilePathId;
-use crate::state::{
-    LinkedData, ModrinthProject, ModrinthVersion, ProfileInstallStage, SideType,
-};
-use crate::util::fetch::{
-    fetch, fetch_advanced, fetch_json, write_cached_icon,
-};
+use crate::state::{CachedEntry, LinkedData, ProfileInstallStage, SideType};
+use crate::util::fetch::{fetch, fetch_advanced, write_cached_icon};
 use crate::util::io;
-use crate::{InnerProjectPathUnix, State};
 
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
@@ -33,7 +27,7 @@ pub struct PackFormat {
 #[derive(Serialize, Deserialize, Eq, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct PackFile {
-    pub path: InnerProjectPathUnix,
+    pub path: String,
     pub hashes: HashMap<PackFileHash, String>,
     pub env: Option<HashMap<EnvType, SideType>>,
     pub downloads: Vec<String>,
@@ -50,11 +44,11 @@ pub enum PackFileHash {
 
 impl From<String> for PackFileHash {
     fn from(s: String) -> Self {
-        return match s.as_str() {
+        match s.as_str() {
             "sha1" => PackFileHash::Sha1,
             "sha512" => PackFileHash::Sha512,
             _ => PackFileHash::Unknown(s),
-        };
+        }
     }
 }
 
@@ -84,7 +78,7 @@ pub enum PackDependency {
     Minecraft,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase", tag = "type")]
 pub enum CreatePackLocation {
     // Create a pack from a modrinth version ID (such as a modpack)
@@ -144,7 +138,7 @@ pub struct CreatePackDescription {
     pub project_id: Option<String>,
     pub version_id: Option<String>,
     pub existing_loading_bar: Option<LoadingBarId>,
-    pub profile_path: ProfilePathId,
+    pub profile_path: String,
 }
 
 pub fn get_profile_from_pack(
@@ -160,9 +154,9 @@ pub fn get_profile_from_pack(
             name: title,
             icon_url,
             linked_data: Some(LinkedData {
-                project_id: Some(project_id),
-                version_id: Some(version_id),
-                locked: Some(true),
+                project_id,
+                version_id,
+                locked: true,
             }),
             ..Default::default()
         },
@@ -182,13 +176,13 @@ pub fn get_profile_from_pack(
 }
 
 #[tracing::instrument]
-#[theseus_macros::debug_pin]
+
 pub async fn generate_pack_from_version_id(
     project_id: String,
     version_id: String,
     title: String,
     icon_url: Option<String>,
-    profile_path: ProfilePathId,
+    profile_path: String,
 
     // Existing loading bar. Unlike when existing_loading_bar is used, this one is pre-initialized with PackFileDownload
     // For example, you might use this if multiple packs are being downloaded at once and you want to use the same loading bar
@@ -197,12 +191,12 @@ pub async fn generate_pack_from_version_id(
     let state = State::get().await?;
 
     let loading_bar = if let Some(bar) = initialized_loading_bar {
-        emit_loading(&bar, 0.0, Some("Downloading pack file")).await?;
+        emit_loading(&bar, 0.0, Some("Downloading pack file"))?;
         bar
     } else {
         init_loading(
             LoadingBarType::PackFileDownload {
-                profile_path: profile_path.get_full_path().await?,
+                profile_path: profile_path.clone(),
                 pack_name: title,
                 icon: icon_url,
                 pack_version: version_id.clone(),
@@ -213,18 +207,20 @@ pub async fn generate_pack_from_version_id(
         .await?
     };
 
-    emit_loading(&loading_bar, 0.0, Some("Fetching version")).await?;
-    let creds = state.credentials.read().await;
-    let version: ModrinthVersion = fetch_json(
-        Method::GET,
-        &format!("{}version/{}", MODRINTH_API_URL, version_id),
+    emit_loading(&loading_bar, 0.0, Some("Fetching version"))?;
+    let version = CachedEntry::get_version(
+        &version_id,
         None,
-        None,
-        &state.fetch_semaphore,
-        &creds,
+        &state.pool,
+        &state.api_semaphore,
     )
-    .await?;
-    emit_loading(&loading_bar, 10.0, None).await?;
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError(
+            "Invalid version ID specified!".to_string(),
+        )
+    })?;
+    emit_loading(&loading_bar, 10.0, None)?;
 
     let (url, hash) =
         if let Some(file) = version.files.iter().find(|x| x.primary) {
@@ -249,27 +245,29 @@ pub async fn generate_pack_from_version_id(
         None,
         Some((&loading_bar, 70.0)),
         &state.fetch_semaphore,
-        &creds,
+        &state.pool,
     )
     .await?;
-    emit_loading(&loading_bar, 0.0, Some("Fetching project metadata")).await?;
+    emit_loading(&loading_bar, 0.0, Some("Fetching project metadata"))?;
 
-    let project: ModrinthProject = fetch_json(
-        Method::GET,
-        &format!("{}project/{}", MODRINTH_API_URL, version.project_id),
+    let project = CachedEntry::get_project(
+        &version.project_id,
         None,
-        None,
-        &state.fetch_semaphore,
-        &creds,
+        &state.pool,
+        &state.api_semaphore,
     )
-    .await?;
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError(
+            "Invalid project ID specified!".to_string(),
+        )
+    })?;
 
-    emit_loading(&loading_bar, 10.0, Some("Retrieving icon")).await?;
+    emit_loading(&loading_bar, 10.0, Some("Retrieving icon"))?;
     let icon = if let Some(icon_url) = project.icon_url {
         let state = State::get().await?;
         let icon_bytes =
-            fetch(&icon_url, None, &state.fetch_semaphore, &creds).await?;
-        drop(creds);
+            fetch(&icon_url, None, &state.fetch_semaphore, &state.pool).await?;
 
         let filename = icon_url.rsplit('/').next();
 
@@ -289,7 +287,7 @@ pub async fn generate_pack_from_version_id(
     } else {
         None
     };
-    emit_loading(&loading_bar, 10.0, None).await?;
+    emit_loading(&loading_bar, 10.0, None)?;
 
     Ok(CreatePack {
         file,
@@ -305,10 +303,10 @@ pub async fn generate_pack_from_version_id(
 }
 
 #[tracing::instrument]
-#[theseus_macros::debug_pin]
+
 pub async fn generate_pack_from_file(
     path: PathBuf,
-    profile_path: ProfilePathId,
+    profile_path: String,
 ) -> crate::Result<CreatePack> {
     let file = io::read(&path).await?;
     Ok(CreatePack {
@@ -326,9 +324,8 @@ pub async fn generate_pack_from_file(
 
 /// Sets generated profile attributes to the pack ones (using profile::edit)
 /// This includes the pack name, icon, game version, loader version, and loader
-#[theseus_macros::debug_pin]
 pub async fn set_profile_information(
-    profile_path: ProfilePathId,
+    profile_path: String,
     description: &CreatePackDescription,
     backup_name: &str,
     dependencies: &HashMap<PackDependency, String>,
@@ -360,9 +357,7 @@ pub async fn set_profile_information(
         }
     }
 
-    let game_version = if let Some(game_version) = game_version {
-        game_version
-    } else {
+    let Some(game_version) = game_version else {
         return Err(crate::ErrorKind::InputError(
             "Pack did not specify Minecraft version".to_string(),
         )
@@ -371,10 +366,10 @@ pub async fn set_profile_information(
 
     let mod_loader = mod_loader.unwrap_or(ModLoader::Vanilla);
     let loader_version = if mod_loader != ModLoader::Vanilla {
-        crate::profile::create::get_loader_version_from_loader(
-            game_version.clone(),
+        crate::launcher::get_loader_version_from_profile(
+            game_version,
             mod_loader,
-            loader_version.cloned(),
+            loader_version.cloned().as_deref(),
         )
         .await?
     } else {
@@ -382,35 +377,33 @@ pub async fn set_profile_information(
     };
     // Sets values in profile
     crate::api::profile::edit(&profile_path, |prof| {
-        prof.metadata.name = description
+        prof.name = description
             .override_title
             .clone()
             .unwrap_or_else(|| backup_name.to_string());
         prof.install_stage = ProfileInstallStage::PackInstalling;
 
-        let project_id = description.project_id.clone();
-        let version_id = description.version_id.clone();
+        if let Some(ref project_id) = description.project_id {
+            if let Some(ref version_id) = description.version_id {
+                prof.linked_data = Some(LinkedData {
+                    project_id: project_id.clone(),
+                    version_id: version_id.clone(),
+                    locked: if !ignore_lock {
+                        true
+                    } else {
+                        prof.linked_data.as_ref().is_none_or(|x| x.locked)
+                    },
+                })
+            }
+        }
 
-        prof.metadata.linked_data = if project_id.is_some()
-            && version_id.is_some()
-        {
-            Some(LinkedData {
-                project_id,
-                version_id,
-                locked: if !ignore_lock {
-                    Some(true)
-                } else {
-                    prof.metadata.linked_data.as_ref().and_then(|x| x.locked)
-                },
-            })
-        } else {
-            None
-        };
-
-        prof.metadata.icon = description.icon.clone();
-        prof.metadata.game_version = game_version.clone();
-        prof.metadata.loader_version = loader_version.clone();
-        prof.metadata.loader = mod_loader;
+        prof.icon_path = description
+            .icon
+            .clone()
+            .map(|x| x.to_string_lossy().to_string());
+        prof.game_version.clone_from(game_version);
+        prof.loader_version = loader_version.clone().map(|x| x.id);
+        prof.loader = mod_loader;
 
         async { Ok(()) }
     })

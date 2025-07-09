@@ -1,47 +1,56 @@
 <template>
-  <Modal ref="modal" header="Create a collection">
-    <div class="universal-modal modal-creation universal-labels">
-      <div class="markdown-body">
-        <p>
-          Your new collection will be created as a public collection with
-          {{ projectIds.length > 0 ? projectIds.length : "no" }}
-          {{ projectIds.length !== 1 ? "projects" : "project" }}.
-        </p>
+  <NewModal ref="modal" header="Creating a collection">
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2">
+        <label for="name">
+          <span class="text-lg font-semibold text-contrast">
+            Name
+            <span class="text-brand-red">*</span>
+          </span>
+        </label>
+        <input
+          id="name"
+          v-model="name"
+          type="text"
+          maxlength="64"
+          :placeholder="`Enter collection name...`"
+          autocomplete="off"
+        />
       </div>
-      <label for="name">
-        <span class="label__title">Name<span class="required">*</span></span>
-      </label>
-      <input
-        id="name"
-        v-model="name"
-        type="text"
-        maxlength="64"
-        :placeholder="`Enter collection name...`"
-        autocomplete="off"
-      />
-      <label for="additional-information">
-        <span class="label__title">Summary<span class="required">*</span></span>
-        <span class="label__description">This appears on your collection's page.</span>
-      </label>
-      <div class="textarea-wrapper">
-        <textarea id="additional-information" v-model="description" maxlength="256" />
+      <div class="flex flex-col gap-2">
+        <label for="additional-information" class="flex flex-col gap-1">
+          <span class="text-lg font-semibold text-contrast"> Summary </span>
+          <span>A sentence or two that describes your collection.</span>
+        </label>
+        <div class="textarea-wrapper">
+          <textarea id="additional-information" v-model="description" maxlength="256" />
+        </div>
       </div>
-      <div class="push-right input-group">
-        <Button @click="modal.hide()">
-          <CrossIcon />
-          Cancel
-        </Button>
-        <Button color="primary" @click="create">
-          <CheckIcon />
-          Continue
-        </Button>
+      <p class="m-0 max-w-[30rem]">
+        Your new collection will be created as a public collection with
+        {{ projectIds.length > 0 ? projectIds.length : "no" }}
+        {{ projectIds.length !== 1 ? "projects" : "project" }}.
+      </p>
+      <div class="flex gap-2">
+        <ButtonStyled color="brand">
+          <button @click="create">
+            <PlusIcon aria-hidden="true" />
+            Create collection
+          </button>
+        </ButtonStyled>
+        <ButtonStyled>
+          <button @click="modal.hide()">
+            <XIcon aria-hidden="true" />
+            Cancel
+          </button>
+        </ButtonStyled>
       </div>
     </div>
-  </Modal>
+  </NewModal>
 </template>
 <script setup>
-import { XIcon as CrossIcon, CheckIcon } from "@modrinth/assets";
-import { Modal, Button } from "@modrinth/ui";
+import { PlusIcon, XIcon } from "@modrinth/assets";
+import { ButtonStyled, NewModal } from "@modrinth/ui";
 
 const router = useNativeRouter();
 
@@ -66,7 +75,7 @@ async function create() {
       method: "POST",
       body: {
         name: name.value.trim(),
-        description: description.value.trim(),
+        description: description.value.trim() || undefined,
         projects: props.projectIds,
       },
       apiVersion: 3,
@@ -86,10 +95,10 @@ async function create() {
   }
   stopLoading();
 }
-function show() {
+function show(event) {
   name.value = "";
   description.value = "";
-  modal.value.show();
+  modal.value.show(event);
 }
 
 defineExpose({

@@ -76,7 +76,7 @@
             </span>
             <template v-if="payout.method">
               <span>⋅</span>
-              <span>{{ $formatWallet(payout.method) }} ({{ payout.method_address }})</span>
+              <span>{{ formatWallet(payout.method) }} ({{ payout.method_address }})</span>
             </template>
           </div>
         </div>
@@ -94,10 +94,9 @@
   </div>
 </template>
 <script setup>
-import { DropdownSelect } from "@modrinth/ui";
 import { XIcon, PayPalIcon, UnknownIcon } from "@modrinth/assets";
-import { capitalizeString } from "@modrinth/utils";
-import { Badge, Breadcrumbs } from "@modrinth/ui";
+import { capitalizeString, formatWallet } from "@modrinth/utils";
+import { Badge, Breadcrumbs, DropdownSelect } from "@modrinth/ui";
 import dayjs from "dayjs";
 import TremendousIcon from "~/assets/images/external/tremendous.svg?component";
 import VenmoIcon from "~/assets/images/external/venmo-small.svg?component";
@@ -159,7 +158,7 @@ async function cancelPayout(id) {
     data.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
   }

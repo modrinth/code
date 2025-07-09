@@ -1,43 +1,60 @@
 <template>
-  <Modal ref="modal" :header="title" :noblur="noblur">
-    <div class="modal-delete">
-      <div class="markdown-body" v-html="renderString(description)" />
-      <label v-if="hasToType" for="confirmation" class="confirmation-label">
+  <NewModal ref="modal" :noblur="noblur" :danger="danger" :on-hide="onHide">
+    <template #title>
+      <slot name="title">
+        <span class="font-extrabold text-contrast text-lg">{{ title }}</span>
+      </slot>
+    </template>
+    <div class="flex flex-col gap-4">
+      <template v-if="description">
+        <div
+          v-if="markdown"
+          class="markdown-body max-w-[35rem]"
+          v-html="renderString(description)"
+        />
+        <p v-else class="max-w-[35rem] m-0">
+          {{ description }}
+        </p>
+      </template>
+      <slot />
+      <label v-if="hasToType" for="confirmation">
         <span>
-          <strong>To verify, type</strong>
-          <em class="confirmation-text">{{ confirmationText }}</em>
-          <strong>below:</strong>
+          To confirm you want to proceed, type
+          <span class="italic font-bold">{{ confirmationText }}</span> below:
         </span>
       </label>
-      <div class="confirmation-input">
-        <input
-          v-if="hasToType"
-          id="confirmation"
-          v-model="confirmation_typed"
-          type="text"
-          placeholder="Type here..."
-          @input="type"
-        />
-      </div>
-      <div class="input-group push-right">
-        <button class="btn" @click="modal.hide()">
-          <XIcon />
-          Cancel
-        </button>
-        <button class="btn btn-danger" :disabled="action_disabled" @click="proceed">
-          <TrashIcon />
-          {{ proceedLabel }}
-        </button>
+      <input
+        v-if="hasToType"
+        id="confirmation"
+        v-model="confirmation_typed"
+        type="text"
+        placeholder="Type here..."
+        class="max-w-[20rem]"
+      />
+      <div class="flex gap-2">
+        <ButtonStyled :color="danger ? 'red' : 'brand'">
+          <button :disabled="action_disabled" @click="proceed">
+            <component :is="proceedIcon" />
+            {{ proceedLabel }}
+          </button>
+        </ButtonStyled>
+        <ButtonStyled>
+          <button @click="modal.hide()">
+            <XIcon />
+            Cancel
+          </button>
+        </ButtonStyled>
       </div>
     </div>
-  </Modal>
+  </NewModal>
 </template>
 
 <script setup>
 import { renderString } from '@modrinth/utils'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { TrashIcon, XIcon } from '@modrinth/assets'
-import Modal from './Modal.vue'
+import NewModal from './NewModal.vue'
+import ButtonStyled from '../base/ButtonStyled.vue'
 
 const props = defineProps({
   confirmationText: {
@@ -55,8 +72,12 @@ const props = defineProps({
   },
   description: {
     type: String,
-    default: 'No description defined',
-    required: true,
+    default: undefined,
+    required: false,
+  },
+  proceedIcon: {
+    type: Object,
+    default: TrashIcon,
   },
   proceedLabel: {
     type: String,
@@ -66,24 +87,37 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  danger: {
+    type: Boolean,
+    default: true,
+  },
+  onHide: {
+    type: Function,
+    default() {
+      return () => {}
+    },
+  },
+  markdown: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 const emit = defineEmits(['proceed'])
 const modal = ref(null)
 
-const action_disabled = ref(props.hasToType)
 const confirmation_typed = ref('')
+
+const action_disabled = computed(
+  () =>
+    props.hasToType &&
+    confirmation_typed.value.toLowerCase() !== props.confirmationText.toLowerCase(),
+)
 
 function proceed() {
   modal.value.hide()
+  confirmation_typed.value = ''
   emit('proceed')
-}
-
-function type() {
-  if (props.hasToType) {
-    action_disabled.value =
-      confirmation_typed.value.toLowerCase() !== props.confirmationText.toLowerCase()
-  }
 }
 
 function show() {
@@ -92,36 +126,3 @@ function show() {
 
 defineExpose({ show })
 </script>
-
-<style scoped lang="scss">
-.modal-delete {
-  padding: var(--gap-lg);
-  display: flex;
-  flex-direction: column;
-
-  .markdown-body {
-    margin-bottom: 1rem;
-  }
-
-  .confirmation-label {
-    margin-bottom: 0.5rem;
-  }
-
-  .confirmation-text {
-    padding-right: 0.25ch;
-    margin: 0 0.25rem;
-  }
-
-  .confirmation-input {
-    input {
-      width: 20rem;
-      max-width: 100%;
-    }
-  }
-
-  .button-group {
-    margin-left: auto;
-    margin-top: 1.5rem;
-  }
-}
-</style>

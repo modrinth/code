@@ -21,7 +21,7 @@ const props = withDefaults(
   }>(),
   {
     accept: '*',
-  }
+  },
 )
 
 const emit = defineEmits(['change'])
@@ -77,7 +77,9 @@ onMounted(() => {
   z-index: 10;
   visibility: hidden;
   background-color: hsla(0, 0%, 0%, 0.5);
-  transition: visibility 0.2s ease-in-out, background-color 0.1s ease-in-out;
+  transition:
+    visibility 0.2s ease-in-out,
+    background-color 0.1s ease-in-out;
   display: flex;
   &::before {
     --indent: 4rem;

@@ -1,66 +1,94 @@
+use dashmap::DashMap;
+use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use std::path::PathBuf;
 
-use crate::prelude::JavaVersion;
-use crate::util::jre;
-
-// All stored Java versions, chosen by the user
-// A wrapper over a Hashmap connecting key -> java version
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct JavaGlobals(HashMap<String, JavaVersion>);
-
-impl JavaGlobals {
-    pub fn new() -> JavaGlobals {
-        JavaGlobals(HashMap::new())
-    }
-
-    pub fn insert(&mut self, key: String, java: JavaVersion) {
-        self.0.insert(key, java);
-    }
-
-    pub fn remove(&mut self, key: &String) {
-        self.0.remove(key);
-    }
-
-    pub fn get(&self, key: &String) -> Option<&JavaVersion> {
-        self.0.get(key)
-    }
-
-    pub fn get_mut(&mut self, key: &String) -> Option<&mut JavaVersion> {
-        self.0.get_mut(key)
-    }
-
-    pub fn count(&self) -> usize {
-        self.0.len()
-    }
-
-    pub fn keys(&self) -> Vec<String> {
-        self.0.keys().cloned().collect()
-    }
-
-    // Validates that every path here is a valid Java version and that the version matches the version stored here
-    // If false, when checked, the user should be prompted to reselect the Java version
-    pub async fn is_all_valid(&self) -> bool {
-        for (_, java) in self.0.iter() {
-            let jre = jre::check_java_at_filepath(
-                PathBuf::from(&java.path).as_path(),
-            )
-            .await;
-            if let Some(jre) = jre {
-                if jre.version != java.version {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        }
-        true
-    }
+#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize, Clone)]
+pub struct JavaVersion {
+    pub parsed_version: u32,
+    pub version: String,
+    pub architecture: String,
+    pub path: String,
 }
 
-impl Default for JavaGlobals {
-    fn default() -> Self {
-        Self::new()
+impl JavaVersion {
+    pub async fn get(
+        major_version: u32,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<Option<JavaVersion>> {
+        let version = major_version as i32;
+
+        let res = sqlx::query!(
+            "
+            SELECT
+                full_version, architecture, path
+            FROM java_versions
+            WHERE major_version = $1
+            ",
+            version
+        )
+        .fetch_optional(exec)
+        .await?;
+
+        Ok(res.map(|x| JavaVersion {
+            parsed_version: major_version,
+            version: x.full_version,
+            architecture: x.architecture,
+            path: x.path,
+        }))
+    }
+
+    pub async fn get_all(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<DashMap<u32, Self>> {
+        let res = sqlx::query!(
+            "
+            SELECT
+                major_version, full_version, architecture, path
+            FROM java_versions
+            "
+        )
+        .fetch(exec)
+        .try_fold(DashMap::new(), |acc, x| {
+            acc.insert(
+                x.major_version as u32,
+                JavaVersion {
+                    parsed_version: x.major_version as u32,
+                    version: x.full_version,
+                    architecture: x.architecture,
+                    path: x.path,
+                },
+            );
+
+            async move { Ok(acc) }
+        })
+        .await?;
+
+        Ok(res)
+    }
+
+    pub async fn upsert(
+        &self,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<()> {
+        let major_version = self.parsed_version as i32;
+
+        sqlx::query!(
+            "
+            INSERT INTO java_versions (major_version, full_version, architecture, path)
+            VALUES ($1, $2, $3, $4)
+            ON CONFLICT (major_version) DO UPDATE SET
+                full_version = $2,
+                architecture = $3,
+                path = $4
+            ",
+            major_version,
+            self.version,
+            self.architecture,
+            self.path,
+        )
+            .execute(exec)
+            .await?;
+
+        Ok(())
     }
 }

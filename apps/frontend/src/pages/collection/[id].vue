@@ -1,7 +1,7 @@
 <template>
   <div>
-    <ModalConfirm
-      v-if="auth.user && auth.user.id === creator.id"
+    <ConfirmModal
+      v-if="canEdit"
       ref="deleteModal"
       :title="formatMessage(messages.deleteModalTitle)"
       :description="formatMessage(messages.deleteModalDescription)"
@@ -15,17 +15,18 @@
           <div class="card__overlay input-group">
             <template v-if="canEdit && isEditing === false">
               <Button @click="isEditing = true">
-                <EditIcon />
+                <EditIcon aria-hidden="true" />
                 {{ formatMessage(commonMessages.editButton) }}
               </Button>
               <Button id="delete-collection" @click="() => $refs.deleteModal.show()">
-                <TrashIcon />
+                <TrashIcon aria-hidden="true" />
                 {{ formatMessage(commonMessages.deleteLabel) }}
               </Button>
             </template>
             <template v-else-if="canEdit && isEditing === true">
-              <PopoutMenu class="btn" position="bottom" direction="right">
-                <EditIcon /> {{ formatMessage(messages.editIconButton) }}
+              <PopoutMenu class="btn">
+                <EditIcon aria-hidden="true" />
+                {{ formatMessage(messages.editIconButton) }}
                 <template #menu>
                   <span class="icon-edit-menu">
                     <FileInput
@@ -35,10 +36,10 @@
                       accept="image/png,image/jpeg,image/gif,image/webp"
                       class="btn btn-transparent upload"
                       style="white-space: nowrap"
-                      prompt=""
+                      aria-label="Upload icon"
                       @change="showPreviewImage"
                     >
-                      <UploadIcon />
+                      <UploadIcon aria-hidden="true" />
                       {{ formatMessage(messages.uploadIconButton) }}
                     </FileInput>
                     <Button
@@ -52,7 +53,7 @@
                         }
                       "
                     >
-                      <TrashIcon />
+                      <TrashIcon aria-hidden="true" />
                       {{ formatMessage(messages.deleteIconButton) }}
                     </Button>
                   </span>
@@ -103,11 +104,11 @@
             </div>
             <div class="push-right input-group">
               <Button @click="isEditing = false">
-                <XIcon />
+                <XIcon aria-hidden="true" />
                 {{ formatMessage(commonMessages.cancelButton) }}
               </Button>
               <Button color="primary" @click="saveChanges()">
-                <SaveIcon />
+                <SaveIcon aria-hidden="true" />
                 {{ formatMessage(commonMessages.saveButton) }}
               </Button>
             </div>
@@ -122,7 +123,7 @@
 
               <div>
                 <span class="collection-label">
-                  <BoxIcon /> {{ formatMessage(messages.collectionLabel) }}
+                  <BoxIcon aria-hidden="true" /> {{ formatMessage(messages.collectionLabel) }}
                 </span>
               </div>
 
@@ -135,7 +136,7 @@
 
                 <div v-if="canEdit" class="primary-stat">
                   <template v-if="collection.status === 'listed'">
-                    <WorldIcon class="primary-stat__icon" aria-hidden="true" />
+                    <GlobeIcon class="primary-stat__icon" aria-hidden="true" />
                     <div class="primary-stat__text">
                       <strong> {{ formatMessage(commonMessages.publicLabel) }} </strong>
                     </div>
@@ -187,7 +188,7 @@
                   "
                   class="date"
                 >
-                  <CalendarIcon />
+                  <CalendarIcon aria-hidden="true" />
                   <label>
                     {{
                       formatMessage(messages.createdAtLabel, {
@@ -208,7 +209,7 @@
                   "
                   class="date"
                 >
-                  <UpdatedIcon />
+                  <UpdatedIcon aria-hidden="true" />
                   <label>
                     {{
                       formatMessage(messages.updatedAtLabel, {
@@ -247,10 +248,9 @@
             </div>
           </template>
         </div>
+        <AdPlaceholder v-if="!auth.user" />
       </div>
       <div class="normal-page__content">
-        <Promotion :external="false" query-param="" />
-
         <nav class="navigation-card">
           <NavRow
             :links="[
@@ -331,7 +331,7 @@
                 }
               "
             >
-              <TrashIcon />
+              <TrashIcon aria-hidden="true" />
               {{ formatMessage(messages.removeProjectButton) }}
             </button>
             <button
@@ -339,13 +339,14 @@
               class="iconified-button"
               @click="unfollowProject(project)"
             >
-              <TrashIcon />
+              <TrashIcon aria-hidden="true" />
               {{ formatMessage(messages.unfollowProjectButton) }}
             </button>
           </ProjectCard>
         </div>
         <div v-else class="error">
-          <UpToDate class="icon" /><br />
+          <UpToDate class="icon" />
+          <br />
           <span v-if="auth.user && auth.user.id === creator.id" class="preserve-lines text">
             <IntlFormatted :message-id="messages.noProjectsAuthLabel">
               <template #create-link="{ children }">
@@ -364,29 +365,39 @@
 
 <script setup>
 import {
+  BoxIcon,
   CalendarIcon,
   EditIcon,
-  XIcon,
-  SaveIcon,
-  UploadIcon,
-  TrashIcon,
-  LinkIcon,
-  LockIcon,
   GridIcon,
   ImageIcon,
-  ListIcon,
-  UpdatedIcon,
   LibraryIcon,
-  BoxIcon,
+  LinkIcon,
+  ListIcon,
+  LockIcon,
+  SaveIcon,
+  TrashIcon,
+  UpdatedIcon,
+  UploadIcon,
+  XIcon,
+  GlobeIcon,
 } from "@modrinth/assets";
-import { PopoutMenu, FileInput, DropdownSelect, Promotion, Avatar, Button } from "@modrinth/ui";
+import {
+  Avatar,
+  Button,
+  commonMessages,
+  ConfirmModal,
+  DropdownSelect,
+  FileInput,
+  PopoutMenu,
+  useRelativeTime,
+} from "@modrinth/ui";
 
-import WorldIcon from "assets/images/utils/world.svg";
+import { isAdmin } from "@modrinth/utils";
 import UpToDate from "assets/images/illustrations/up_to_date.svg";
 import { addNotification } from "~/composables/notifs.js";
-import ModalConfirm from "~/components/ui/ModalConfirm.vue";
 import NavRow from "~/components/ui/NavRow.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
+import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const vintl = useVIntl();
 const { formatMessage } = vintl;
@@ -487,7 +498,6 @@ function cycleSearchDisplayMode() {
     cosmetics.value.searchDisplayMode.collection,
     tags.value.projectViewModes,
   );
-  saveCosmetics();
 }
 
 let collection, refreshCollection, creator, projects, refreshProjects;
@@ -587,7 +597,7 @@ useSeoMeta({
 const canEdit = computed(
   () =>
     auth.value.user &&
-    auth.value.user.id === collection.value.user &&
+    (auth.value.user.id === collection.value.user || isAdmin(auth.value.user)) &&
     collection.value.id !== "following",
 );
 
@@ -609,7 +619,7 @@ const visibility = ref(collection.value.status);
 const removeProjects = ref([]);
 
 async function unfollowProject(project) {
-  await userUnfollowProject(project);
+  await userFollowProject(project);
   projects.value = projects.value.filter((x) => x.id !== project.id);
 }
 
@@ -641,7 +651,7 @@ async function saveChanges() {
       method: "PATCH",
       body: {
         name: name.value,
-        description: summary.value,
+        description: summary.value || null,
         status: visibility.value,
         new_projects: newProjectIds,
       },
@@ -676,12 +686,16 @@ async function deleteCollection() {
       method: "DELETE",
       apiVersion: 3,
     });
-    await navigateTo("/dashboard/collections");
+    if (auth.value.user.id === collection.value.user) {
+      await navigateTo("/dashboard/collections");
+    } else {
+      await navigateTo(`/user/${collection.value.user}/collections`);
+    }
   } catch (err) {
     addNotification({
       group: "main",
       title: formatMessage(commonMessages.errorNotificationTitle),
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
   }

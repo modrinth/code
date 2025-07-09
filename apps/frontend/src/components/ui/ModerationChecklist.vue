@@ -1,331 +1,368 @@
 <template>
-  <div class="card moderation-checklist">
-    <h1>Moderation checklist</h1>
-    <div v-if="done">
-      <p>You are done moderating this project! There are {{ futureProjects.length }} left.</p>
+  <div
+    class="moderation-checklist flex w-[600px] max-w-full flex-col rounded-2xl border-[1px] border-solid border-orange bg-bg-raised p-4 transition-all delay-200 duration-200 ease-in-out"
+    :class="collapsed ? `sm:max-w-[300px]` : 'sm:max-w-[600px]'"
+  >
+    <div class="flex grow-0 items-center gap-2">
+      <h1 class="m-0 mr-auto flex items-center gap-2 text-2xl font-extrabold text-contrast">
+        <ScaleIcon class="text-orange" /> Moderation
+      </h1>
+      <ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
+        <button v-tooltip="`Exit moderation`" @click="exitModeration">
+          <XIcon />
+        </button>
+      </ButtonStyled>
+      <ButtonStyled circular>
+        <button v-tooltip="collapsed ? `Expand` : `Collapse`" @click="emit('toggleCollapsed')">
+          <DropdownIcon class="transition-transform" :class="{ 'rotate-180': collapsed }" />
+        </button>
+      </ButtonStyled>
     </div>
-    <div v-else-if="generatedMessage">
-      <p>
-        Enter your moderation message here. Remember to check the Moderation tab to answer any
-        questions an author might have!
-      </p>
-      <div class="markdown-editor-spacing">
-        <MarkdownEditor v-model="message" :placeholder="'Enter moderation message'" />
+    <Collapsible base-class="grow" class="flex grow flex-col" :collapsed="collapsed">
+      <div class="my-4 h-[1px] w-full bg-divider" />
+      <div v-if="done">
+        <p>You are done moderating this project! There are {{ futureProjects.length }} left.</p>
       </div>
-    </div>
-    <div v-else-if="steps[currentStepIndex].id === 'modpack-permissions'">
-      <h2 v-if="modPackData">
-        Modpack permissions
-        <template v-if="modPackIndex + 1 <= modPackData.length">
-          ({{ modPackIndex + 1 }} / {{ modPackData.length }})
-        </template>
-      </h2>
-      <div v-if="!modPackData">Loading data...</div>
-      <div v-else-if="modPackData.length === 0">
-        <p>All permissions obtained. You may skip this step!</p>
+      <div v-else-if="generatedMessage">
+        <p>
+          Enter your moderation message here. Remember to check the Moderation tab to answer any
+          questions an author might have!
+        </p>
+        <div class="markdown-editor-spacing">
+          <MarkdownEditor v-model="message" :placeholder="'Enter moderation message'" />
+        </div>
       </div>
-      <div v-else-if="!modPackData[modPackIndex]">
-        <p>All permission checks complete!</p>
-        <div class="input-group modpack-buttons">
-          <button class="btn" @click="modPackIndex -= 1">
-            <LeftArrowIcon />
-            Previous
-          </button>
+      <div v-else-if="steps[currentStepIndex].id === 'modpack-permissions'">
+        <h2 v-if="modPackData" class="m-0 mb-2 text-lg font-extrabold">
+          Modpack permissions
+          <template v-if="modPackIndex + 1 <= modPackData.length">
+            ({{ modPackIndex + 1 }} / {{ modPackData.length }})
+          </template>
+        </h2>
+        <div v-if="!modPackData">Loading data...</div>
+        <div v-else-if="modPackData.length === 0">
+          <p>All permissions obtained. You may skip this step!</p>
+        </div>
+        <div v-else-if="!modPackData[modPackIndex]">
+          <p>All permission checks complete!</p>
+          <div class="input-group modpack-buttons">
+            <ButtonStyled>
+              <button @click="modPackIndex -= 1">
+                <LeftArrowIcon aria-hidden="true" />
+                Previous
+              </button>
+            </ButtonStyled>
+          </div>
+        </div>
+        <div v-else>
+          <div v-if="modPackData[modPackIndex].type === 'unknown'">
+            <p>What is the approval type of {{ modPackData[modPackIndex].file_name }}?</p>
+            <div class="input-group">
+              <button
+                v-for="(option, index) in fileApprovalTypes"
+                :key="index"
+                class="btn"
+                :class="{
+                  'option-selected': modPackData[modPackIndex].status === option.id,
+                }"
+                @click="modPackData[modPackIndex].status = option.id"
+              >
+                {{ option.name }}
+              </button>
+            </div>
+            <div
+              v-if="modPackData[modPackIndex].status !== 'unidentified'"
+              class="flex flex-col gap-1"
+            >
+              <label for="proof">
+                <span class="label__title">Proof</span>
+              </label>
+              <input
+                id="proof"
+                v-model="modPackData[modPackIndex].proof"
+                type="text"
+                autocomplete="off"
+                placeholder="Enter proof of status..."
+              />
+              <label for="link">
+                <span class="label__title">Link</span>
+              </label>
+              <input
+                id="link"
+                v-model="modPackData[modPackIndex].url"
+                type="text"
+                autocomplete="off"
+                placeholder="Enter link of project..."
+              />
+              <label for="title">
+                <span class="label__title">Title</span>
+              </label>
+              <input
+                id="title"
+                v-model="modPackData[modPackIndex].title"
+                type="text"
+                autocomplete="off"
+                placeholder="Enter title of project..."
+              />
+            </div>
+          </div>
+          <div v-else-if="modPackData[modPackIndex].type === 'flame'">
+            <p>
+              What is the approval type of {{ modPackData[modPackIndex].title }} (<a
+                :href="modPackData[modPackIndex].url"
+                target="_blank"
+                class="text-link"
+                >{{ modPackData[modPackIndex].url }}</a
+              >?
+            </p>
+            <div class="input-group">
+              <button
+                v-for="(option, index) in fileApprovalTypes"
+                :key="index"
+                class="btn"
+                :class="{
+                  'option-selected': modPackData[modPackIndex].status === option.id,
+                }"
+                @click="modPackData[modPackIndex].status = option.id"
+              >
+                {{ option.name }}
+              </button>
+            </div>
+          </div>
+          <div
+            v-if="
+              ['unidentified', 'no', 'with-attribution'].includes(modPackData[modPackIndex].status)
+            "
+          >
+            <p v-if="modPackData[modPackIndex].status === 'unidentified'">
+              Does this project provide identification and permission for
+              <strong>{{ modPackData[modPackIndex].file_name }}</strong
+              >?
+            </p>
+            <p v-else-if="modPackData[modPackIndex].status === 'with-attribution'">
+              Does this project provide attribution for
+              <strong>{{ modPackData[modPackIndex].file_name }}</strong
+              >?
+            </p>
+            <p v-else>
+              Does this project provide proof of permission for
+              <strong>{{ modPackData[modPackIndex].file_name }}</strong
+              >?
+            </p>
+            <div class="input-group">
+              <button
+                v-for="(option, index) in filePermissionTypes"
+                :key="index"
+                class="btn"
+                :class="{
+                  'option-selected': modPackData[modPackIndex].approved === option.id,
+                }"
+                @click="modPackData[modPackIndex].approved = option.id"
+              >
+                {{ option.name }}
+              </button>
+            </div>
+          </div>
+          <div class="mt-4 flex gap-2">
+            <ButtonStyled>
+              <button :disabled="modPackIndex <= 0" @click="modPackIndex -= 1">
+                <LeftArrowIcon aria-hidden="true" />
+                Previous
+              </button>
+            </ButtonStyled>
+            <ButtonStyled color="blue">
+              <button :disabled="!modPackData[modPackIndex].status" @click="modPackIndex += 1">
+                <RightArrowIcon aria-hidden="true" />
+                Next project
+              </button>
+            </ButtonStyled>
+          </div>
         </div>
       </div>
       <div v-else>
-        <div v-if="modPackData[modPackIndex].type === 'unknown'">
-          <p>What is the approval type of {{ modPackData[modPackIndex].file_name }}?</p>
-          <div class="input-group">
-            <button
-              v-for="(option, index) in fileApprovalTypes"
-              :key="index"
-              class="btn"
-              :class="{
-                'option-selected': modPackData[modPackIndex].status === option.id,
-              }"
-              @click="modPackData[modPackIndex].status = option.id"
-            >
-              {{ option.name }}
-            </button>
-          </div>
-          <template v-if="modPackData[modPackIndex].status !== 'unidentified'">
-            <div class="universal-labels"></div>
-            <label for="proof">
-              <span class="label__title">Proof</span>
-            </label>
-            <input
-              id="proof"
-              v-model="modPackData[modPackIndex].proof"
-              type="text"
-              autocomplete="off"
-              placeholder="Enter proof of status..."
-            />
-            <label for="link">
-              <span class="label__title">Link</span>
-            </label>
-            <input
-              id="link"
-              v-model="modPackData[modPackIndex].url"
-              type="text"
-              autocomplete="off"
-              placeholder="Enter link of project..."
-            />
-            <label for="title">
-              <span class="label__title">Title</span>
-            </label>
-            <input
-              id="title"
-              v-model="modPackData[modPackIndex].title"
-              type="text"
-              autocomplete="off"
-              placeholder="Enter title of project..."
-            />
+        <h2 class="m-0 mb-2 text-lg font-extrabold">{{ steps[currentStepIndex].question }}</h2>
+        <template v-if="steps[currentStepIndex].rules && steps[currentStepIndex].rules.length > 0">
+          <strong>Guidance:</strong>
+          <ul class="mb-3 mt-2 leading-tight">
+            <li v-for="(rule, index) in steps[currentStepIndex].rules" :key="index">
+              {{ rule }}
+            </li>
+          </ul>
+        </template>
+        <template
+          v-if="steps[currentStepIndex].examples && steps[currentStepIndex].examples.length > 0"
+        >
+          <strong>Reject things like:</strong>
+          <ul class="mb-3 mt-2 leading-tight">
+            <li v-for="(example, index) in steps[currentStepIndex].examples" :key="index">
+              {{ example }}
+            </li>
+          </ul>
+        </template>
+        <template
+          v-if="steps[currentStepIndex].exceptions && steps[currentStepIndex].exceptions.length > 0"
+        >
+          <strong>Exceptions:</strong>
+          <ul class="mb-3 mt-2 leading-tight">
+            <li v-for="(exception, index) in steps[currentStepIndex].exceptions" :key="index">
+              {{ exception }}
+            </li>
+          </ul>
+        </template>
+        <p v-if="steps[currentStepIndex].id === 'title'">
+          <strong>Title:</strong> {{ project.title }}
+        </p>
+        <p v-if="steps[currentStepIndex].id === 'slug'">
+          <strong>Slug:</strong> {{ project.slug }}
+        </p>
+        <p v-if="steps[currentStepIndex].id === 'summary'">
+          <strong>Summary:</strong> {{ project.description }}
+        </p>
+        <p v-if="steps[currentStepIndex].id === 'links'">
+          <template v-if="project.issues_url">
+            <strong>Issues: </strong>
+            <a class="text-link" :href="project.issues_url">{{ project.issues_url }}</a> <br />
           </template>
-        </div>
-        <div v-else-if="modPackData[modPackIndex].type === 'flame'">
-          <p>
-            What is the approval type of {{ modPackData[modPackIndex].title }} (<a
-              :href="modPackData[modPackIndex].url"
-              target="_blank"
-              class="text-link"
-              >{{ modPackData[modPackIndex].url }}</a
-            >?
-          </p>
-          <div class="input-group">
-            <button
-              v-for="(option, index) in fileApprovalTypes"
-              :key="index"
-              class="btn"
-              :class="{
-                'option-selected': modPackData[modPackIndex].status === option.id,
-              }"
-              @click="modPackData[modPackIndex].status = option.id"
-            >
-              {{ option.name }}
-            </button>
-          </div>
+          <template v-if="project.source_url">
+            <strong>Source: </strong>
+            <a class="text-link" :href="project.source_url">{{ project.source_url }}</a> <br />
+          </template>
+          <template v-if="project.wiki_url">
+            <strong>Wiki: </strong>
+            <a class="text-link" :href="project.wiki_url">{{ project.wiki_url }}</a> <br />
+          </template>
+          <template v-if="project.discord_url">
+            <strong>Discord: </strong>
+            <a class="text-link" :href="project.discord_url">{{ project.discord_url }}</a>
+            <br />
+          </template>
+          <template v-for="(donation, index) in project.donation_urls" :key="index">
+            <strong>{{ donation.platform }}: </strong>
+            <a class="text-link" :href="donation.url">{{ donation.url }}</a>
+            <br />
+          </template>
+        </p>
+        <p v-if="steps[currentStepIndex].id === 'categories'">
+          <strong>Categories:</strong>
+          <Categories
+            :categories="project.categories.concat(project.additional_categories)"
+            :type="project.actualProjectType"
+            class="categories"
+          />
+        </p>
+        <p v-if="steps[currentStepIndex].id === 'side-types'">
+          <strong>Client side:</strong> {{ project.client_side }} <br />
+          <strong>Server side:</strong> {{ project.server_side }}
+        </p>
+        <div class="options input-group">
+          <button
+            v-for="(option, index) in steps[currentStepIndex].options.filter(
+              (x) => x.shown !== false,
+            )"
+            :key="index"
+            class="btn"
+            :class="{
+              'option-selected':
+                selectedOptions[steps[currentStepIndex].id] &&
+                selectedOptions[steps[currentStepIndex].id].find((x) => x.name === option.name),
+            }"
+            @click="toggleOption(steps[currentStepIndex].id, option)"
+          >
+            {{ option.name }}
+          </button>
         </div>
         <div
           v-if="
-            ['unidentified', 'no', 'with-attribution'].includes(modPackData[modPackIndex].status)
+            selectedOptions[steps[currentStepIndex].id] &&
+            selectedOptions[steps[currentStepIndex].id].length > 0
           "
+          class="inputs universal-labels"
         >
-          <p v-if="modPackData[modPackIndex].status === 'unidentified'">
-            Does this project provide identification and permission for
-            <strong>{{ modPackData[modPackIndex].file_name }}</strong
-            >?
-          </p>
-          <p v-else-if="modPackData[modPackIndex].status === 'with-attribution'">
-            Does this project provide attribution for
-            <strong>{{ modPackData[modPackIndex].file_name }}</strong
-            >?
-          </p>
-          <p v-else>
-            Does this project provide proof of permission for
-            <strong>{{ modPackData[modPackIndex].file_name }}</strong
-            >?
-          </p>
-          <div class="input-group">
-            <button
-              v-for="(option, index) in filePermissionTypes"
-              :key="index"
-              class="btn"
-              :class="{
-                'option-selected': modPackData[modPackIndex].approved === option.id,
-              }"
-              @click="modPackData[modPackIndex].approved = option.id"
-            >
-              {{ option.name }}
+          <div
+            v-for="(option, index) in selectedOptions[steps[currentStepIndex].id].filter(
+              (x) => x.fillers && x.fillers.length > 0,
+            )"
+            :key="index"
+          >
+            <div v-for="(filler, idx) in option.fillers" :key="idx">
+              <label :for="filler.id">
+                <span class="label__title">
+                  {{ filler.question }}
+                  <span v-if="filler.required" class="required">*</span>
+                </span>
+              </label>
+              <div v-if="filler.large" class="markdown-editor-spacing">
+                <MarkdownEditor v-model="filler.value" :placeholder="'Enter moderation message'" />
+              </div>
+              <input v-else :id="filler.id" v-model="filler.value" type="text" autocomplete="off" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-auto">
+        <div
+          class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
+        >
+          <div class="flex items-center gap-2">
+            <ButtonStyled v-if="!done">
+              <button aria-label="Skip" @click="goToNextProject">
+                <XIcon aria-hidden="true" />
+                <template v-if="futureProjects.length > 0">Skip</template>
+                <template v-else>Exit</template>
+              </button>
+            </ButtonStyled>
+            <ButtonStyled v-if="currentStepIndex > 0">
+              <button @click="previousPage() && !done">
+                <LeftArrowIcon aria-hidden="true" /> Previous
+              </button>
+            </ButtonStyled>
+          </div>
+          <div class="flex items-center gap-2">
+            <ButtonStyled v-if="currentStepIndex < steps.length - 1 && !done" color="brand">
+              <button @click="nextPage()"><RightArrowIcon aria-hidden="true" /> Next</button>
+            </ButtonStyled>
+            <ButtonStyled v-else-if="!generatedMessage" color="brand">
+              <button :disabled="loadingMessage" @click="generateMessage">
+                <UpdatedIcon aria-hidden="true" /> Generate message
+              </button>
+            </ButtonStyled>
+            <template v-if="generatedMessage && !done">
+              <ButtonStyled color="green">
+                <button @click="sendMessage(project.requested_status ?? 'approved')">
+                  <CheckIcon aria-hidden="true" /> Approve
+                </button>
+              </ButtonStyled>
+              <div class="joined-buttons">
+                <ButtonStyled color="red">
+                  <button @click="sendMessage('rejected')">
+                    <XIcon aria-hidden="true" /> Reject
+                  </button>
+                </ButtonStyled>
+                <ButtonStyled color="red">
+                  <OverflowMenu
+                    class="btn-dropdown-animation"
+                    :options="[
+                      {
+                        id: 'withhold',
+                        color: 'danger',
+                        action: () => sendMessage('withheld'),
+                        hoverFilled: true,
+                      },
+                    ]"
+                  >
+                    <DropdownIcon style="rotate: 180deg" />
+                    <template #withhold> <EyeOffIcon aria-hidden="true" /> Withhold </template>
+                  </OverflowMenu>
+                </ButtonStyled>
+              </div>
+            </template>
+            <button v-if="done" class="btn btn-primary next-project" @click="goToNextProject">
+              Next project
             </button>
           </div>
         </div>
-        <div class="input-group modpack-buttons">
-          <button class="btn" :disabled="modPackIndex <= 0" @click="modPackIndex -= 1">
-            <LeftArrowIcon />
-            Previous
-          </button>
-          <button
-            class="btn btn-blue"
-            :disabled="!modPackData[modPackIndex].status"
-            @click="modPackIndex += 1"
-          >
-            <RightArrowIcon />
-            Next project
-          </button>
-        </div>
       </div>
-    </div>
-    <div v-else>
-      <h2>{{ steps[currentStepIndex].question }}</h2>
-      <template v-if="steps[currentStepIndex].rules && steps[currentStepIndex].rules.length > 0">
-        <strong>Rules guidance:</strong>
-        <ul>
-          <li v-for="(rule, index) in steps[currentStepIndex].rules" :key="index">
-            {{ rule }}
-          </li>
-        </ul>
-      </template>
-      <template
-        v-if="steps[currentStepIndex].examples && steps[currentStepIndex].examples.length > 0"
-      >
-        <strong>Examples of what to reject:</strong>
-        <ul>
-          <li v-for="(example, index) in steps[currentStepIndex].examples" :key="index">
-            {{ example }}
-          </li>
-        </ul>
-      </template>
-      <template
-        v-if="steps[currentStepIndex].exceptions && steps[currentStepIndex].exceptions.length > 0"
-      >
-        <strong>Exceptions:</strong>
-        <ul>
-          <li v-for="(exception, index) in steps[currentStepIndex].exceptions" :key="index">
-            {{ exception }}
-          </li>
-        </ul>
-      </template>
-      <p v-if="steps[currentStepIndex].id === 'title'">
-        <strong>Title:</strong> {{ project.title }}
-      </p>
-      <p v-if="steps[currentStepIndex].id === 'slug'"><strong>Slug:</strong> {{ project.slug }}</p>
-      <p v-if="steps[currentStepIndex].id === 'summary'">
-        <strong>Summary:</strong> {{ project.description }}
-      </p>
-      <p v-if="steps[currentStepIndex].id === 'links'">
-        <template v-if="project.issues_url">
-          <strong>Issues: </strong>
-          <a class="text-link" :href="project.issues_url">{{ project.issues_url }}</a> <br />
-        </template>
-        <template v-if="project.source_url">
-          <strong>Source: </strong>
-          <a class="text-link" :href="project.source_url">{{ project.source_url }}</a> <br />
-        </template>
-        <template v-if="project.wiki_url">
-          <strong>Wiki: </strong>
-          <a class="text-link" :href="project.wiki_url">{{ project.wiki_url }}</a> <br />
-        </template>
-        <template v-if="project.discord_url">
-          <strong>Discord: </strong>
-          <a class="text-link" :href="project.discord_url">{{ project.discord_url }}</a>
-          <br />
-        </template>
-        <template v-for="(donation, index) in project.donation_urls" :key="index">
-          <strong>{{ donation.platform }}: </strong>
-          <a class="text-link" :href="donation.url">{{ donation.url }}</a>
-          <br />
-        </template>
-      </p>
-      <p v-if="steps[currentStepIndex].id === 'categories'">
-        <strong>Categories:</strong>
-        <Categories
-          :categories="project.categories.concat(project.additional_categories)"
-          :type="project.actualProjectType"
-          class="categories"
-        />
-      </p>
-      <p v-if="steps[currentStepIndex].id === 'side-types'">
-        <strong>Client side:</strong> {{ project.client_side }} <br />
-        <strong>Server side:</strong> {{ project.server_side }}
-      </p>
-      <div class="options input-group">
-        <button
-          v-for="(option, index) in steps[currentStepIndex].options"
-          :key="index"
-          class="btn"
-          :class="{
-            'option-selected':
-              selectedOptions[steps[currentStepIndex].id] &&
-              selectedOptions[steps[currentStepIndex].id].find((x) => x.name === option.name),
-          }"
-          @click="toggleOption(steps[currentStepIndex].id, option)"
-        >
-          {{ option.name }}
-        </button>
-      </div>
-      <div
-        v-if="
-          selectedOptions[steps[currentStepIndex].id] &&
-          selectedOptions[steps[currentStepIndex].id].length > 0
-        "
-        class="inputs universal-labels"
-      >
-        <div
-          v-for="(option, index) in selectedOptions[steps[currentStepIndex].id].filter(
-            (x) => x.fillers && x.fillers.length > 0,
-          )"
-          :key="index"
-        >
-          <div v-for="(filler, idx) in option.fillers" :key="idx">
-            <label :for="filler.id">
-              <span class="label__title">
-                {{ filler.question }}
-                <span v-if="filler.required" class="required">*</span>
-              </span>
-            </label>
-            <div v-if="filler.large" class="markdown-editor-spacing">
-              <MarkdownEditor v-model="filler.value" :placeholder="'Enter moderation message'" />
-            </div>
-            <input v-else :id="filler.id" v-model="filler.value" type="text" autocomplete="off" />
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="input-group modpack-buttons">
-      <button v-if="!done" class="btn skip-btn" @click="goToNextProject">
-        <ExitIcon />
-        <template v-if="futureProjects.length > 0">Skip</template>
-        <template v-else>Exit</template>
-      </button>
-      <button v-if="currentStepIndex > 0" class="btn" @click="previousPage() && !done">
-        <LeftArrowIcon /> Previous
-      </button>
-      <button
-        v-if="currentStepIndex < steps.length - 1 && !done"
-        class="btn btn-primary"
-        @click="nextPage()"
-      >
-        <RightArrowIcon /> Next
-      </button>
-      <button
-        v-else-if="!generatedMessage"
-        class="btn btn-primary"
-        :disabled="loadingMessage"
-        @click="generateMessage"
-      >
-        <UpdatedIcon /> Generate message
-      </button>
-      <template v-if="generatedMessage && !done">
-        <button class="btn btn-green" @click="sendMessage(project.requested_status ?? 'approved')">
-          <CheckIcon /> Approve
-        </button>
-        <div class="joined-buttons">
-          <button class="btn btn-danger" @click="sendMessage('rejected')">
-            <CrossIcon /> Reject
-          </button>
-          <OverflowMenu
-            class="btn btn-danger btn-dropdown-animation icon-only"
-            position="top"
-            direction="left"
-            :options="[
-              {
-                id: 'withhold',
-                color: 'danger',
-                action: () => sendMessage('withheld'),
-                hoverFilled: true,
-              },
-            ]"
-          >
-            <DropdownIcon style="rotate: 180deg" />
-            <template #withhold> <EyeOffIcon /> Withhold </template>
-          </OverflowMenu>
-        </div>
-      </template>
-      <button v-if="done" class="btn btn-primary next-project" @click="goToNextProject">
-        Next project
-      </button>
-    </div>
+    </Collapsible>
   </div>
 </template>
 
@@ -336,11 +373,11 @@ import {
   UpdatedIcon,
   CheckIcon,
   DropdownIcon,
-  XIcon as CrossIcon,
   EyeOffIcon,
-  ExitIcon,
+  XIcon,
+  ScaleIcon,
 } from "@modrinth/assets";
-import { MarkdownEditor, OverflowMenu } from "@modrinth/ui";
+import { ButtonStyled, MarkdownEditor, OverflowMenu, Collapsible } from "@modrinth/ui";
 import Categories from "~/components/ui/search/Categories.vue";
 
 const props = defineProps({
@@ -357,7 +394,13 @@ const props = defineProps({
     required: true,
     default: () => {},
   },
+  collapsed: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+const emit = defineEmits(["exit", "toggleCollapsed"]);
 
 const steps = computed(() =>
   [
@@ -383,6 +426,18 @@ const steps = computed(() =>
           name: "Contains useless info",
           resultingMessage: `## Misuse of Title
 Per section 5.2 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous) we ask that you limit the title to just the name of your project. Additional information, such as themes, tags, supported versions or loaders, etc. should be saved for the Summary or Description. When changing your project title, remember to also ensure that your project slug (URL) matches and accurately represents your project.`,
+        },
+        {
+          name: "Minecraft title",
+          resultingMessage: `## Project Title
+Projects must not use Minecraft's branding or include "Minecraft" as a significant part of the title.
+The title of your project may be confusingly similar to the game, and we encourage you to change your title to avoid a potential violation of Minecraft's Usage Guidelines.
+Abbreviations like "MC" or elaborate titles that do not make the name Minecraft a significant portion of the name are okay.`,
+        },
+        {
+          name: "Title similarities",
+          resultingMessage: `## Project Branding
+Per section 1.8 of [Modrinth's Content Rules](https://modrinth.com/legal/rules) we ask that you change your project title and other relevant branding to avoid causing confusion or implying association with existing projects.`,
         },
       ],
     },
@@ -413,19 +468,28 @@ Per section 5.2 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#m
           name: "Insufficient",
           resultingMessage: `## Insufficient Summary
 Per section 5.3 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous) Your project summary should provide a brief overview of your project that informs and entices users.
+
 This is the first thing most people will see about your mod other than the Logo, so it's important it be accurate, reasonably detailed, and exciting.`,
         },
         {
           name: "Repeat of title",
           resultingMessage: `## Insufficient Summary
 Per section 5.3 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous) your Summary can not be the same as your project's Title. Your project summary should provide a brief overview of your project that informs and entices users.
+
 This is the first thing most people will see about your mod other than the Logo, so it's important it be accurate, reasonably detailed, and exciting.`,
         },
         {
           name: "Formatting",
           resultingMessage: `## Insufficient Summary
 Per section 5.3 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous) your Summary can not include any extra formatting such as lists, or links. Your project summary should provide a brief overview of your project that informs and entices users.
+
 This is the first thing most people will see about your mod other than the Logo, so it's important it be accurate, reasonably detailed, and exciting.`,
+        },
+        {
+          name: "Non-english",
+          resultingMessage: `## No English Summary
+Per section 2.2 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#accessibility) a project's Summary and Description must be in English, unless meant exclusively for non-English use, such as translations.
+You may include your non-English Summary but we ask that you also add an English translation.`,
         },
       ],
     },
@@ -561,7 +625,9 @@ Per section 5.1 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#m
           name: "Inaccurate (modpack)",
           resultingMessage: `## Incorrect Environment Information
 Per section 5.1 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous), it is important that the metadata of your projects is accurate, including whether the project runs on the client or server side.
+
 For a brief rundown of how this works:
+
 Some modpacks can be client-side, usually aimed at providing utility and optimization while allowing the player to join an unmodded server, for instance, [Fabulously Optimized](https://modrinth.com/modpack/fabulously-optimized).
 Most other modpacks that change how the game is played are going to be required on both the client and server, like the modpack [Dying Light](https://modrinth.com/modpack/dying-light).
 When in doubt, test for yourself or check the requirements of the mods in your pack.`,
@@ -570,21 +636,32 @@ When in doubt, test for yourself or check the requirements of the mods in your p
           name: "Inaccurate (mod)",
           resultingMessage: `## Environment Information
 Per section 5.1 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous), it is important that the metadata of your projects is accurate, including whether the project runs on the client or server side.
+
 For a brief rundown of how this works:
-**Client side** refers to a mod that is only required by the client, like [Sodium](https://modrinth.com/mod/sodium).
-**Server side** mods change the behavior of the server without the client needing the mod, like Datapacks, recipes, or server-side behaviors, like [Falling Tree](https://modrinth.com/mod/fallingtree).
-A mod that adds features, entities, or new blocks and items, generally will be required on **both** the server and the client, for example [Cobblemon](https://modrinth.com/mod/cobblemon).`,
+- **Client side** refers to a mod that is only required by the client, like [Sodium](https://modrinth.com/mod/sodium).
+- **Server side** mods change the behavior of the server without the client needing the mod, like Datapacks, recipes, or server-side behaviors, like [Falling Tree](https://modrinth.com/mod/fallingtree).
+- A mod that adds features, entities, or new blocks and items, generally will be required on **both** the server and the client, for example [Cobblemon](https://modrinth.com/mod/cobblemon).`,
         },
       ],
     },
     {
       id: "gallery",
       navigate: `/${props.project.project_type}/${props.project.slug}/gallery`,
-      question: `Are the project's gallery images relevant?`,
-      shown: props.project.gallery.length > 0,
+      question: `Are this project's gallery images sufficient?`,
+      shown: true,
       options: [
         {
+          name: "Insufficient",
+          resultingMessage: `## Insufficient Gallery Images
+We ask that projects like yours show off their content using images in the Gallery, or optionally in the Description, in order to effectively and clearly inform users of its content per section 2.1 of [Modrinth's content rules](https://modrinth.com/legal/rules#general-expectations).
+Keep in mind that you should:
+- Set a featured image that best represents your project.
+- Ensure all your images have titles that accurately label the image, and optionally, details on the contents of the image in the images Description.
+- Upload any relevant images in your Description to your Gallery tab for best results.`,
+        },
+        {
           name: "Not relevant",
+          shown: props.project.gallery.length > 0,
           resultingMessage: `## Unrelated Gallery Images
 Per section 5.5 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous) any images in your project's Gallery must be relevant to the project and also include a Title.`,
         },
@@ -604,6 +681,7 @@ Per section 5.5 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#m
           name: "Incorrect additional files",
           resultingMessage: `## Incorrect Use of Additional Files
 It looks like you've uploaded multiple \`mod.jar\` files to one Version as Additional Files. Per section 5.7 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous) each Version of your project must include only one \`mod.jar\` that corresponds to its respective Minecraft and loader versions. This allows users to easily find and download the file they need for the version they're on with ease. The Additional Files feature can be used for things like a \`Sources.jar\`.
+
 Please upload each version of your mod separately, thank you.`,
         },
         {
@@ -631,7 +709,9 @@ It looks like you've selected loaders for your Resource Pack that are causing it
           name: "Re-upload",
           resultingMessage: `## Reuploads are forbidden
 This project appears to contain content from %ORIGINAL_PROJECT% by %ORIGINAL_AUTHOR%.
+
 Per section 4 of [Modrinth's Content Rules](https://modrinth.com/legal/rules) this is strictly forbidden.
+
 If you believe this is an error, or you can verify you are the creator and rightful owner of this content please let us know. Otherwise, we ask that you **do not resubmit this project**.`,
           fillers: [
             {
@@ -849,6 +929,7 @@ async function generateMessage() {
     for (const mod of mods) {
       message.value += `- ${mod}\n`;
     }
+    message.value += "\n";
   }
 
   if (modPackData.value && modPackData.value.length > 0) {
@@ -915,7 +996,7 @@ async function generateMessage() {
       permanentNoMods.length > 0 ||
       unidentifiedMods.length > 0
     ) {
-      message.value += "## Copyrighted Content \n";
+      message.value += "## Copyrighted content \n";
 
       printMods(
         attributeMods,
@@ -1000,6 +1081,20 @@ async function sendMessage(status) {
 
 const router = useNativeRouter();
 
+async function exitModeration() {
+  await router.push({
+    name: "type-id",
+    params: {
+      type: "project",
+      id: props.project.id,
+    },
+    state: {
+      showChecklist: false,
+    },
+  });
+  emit("exit");
+}
+
 async function goToNextProject() {
   const project = props.futureProjects[0];
 
@@ -1023,23 +1118,8 @@ async function goToNextProject() {
 
 <style scoped lang="scss">
 .moderation-checklist {
-  position: sticky;
-  bottom: 0;
-  left: 100vw;
-  z-index: 100;
-  border: 1px solid var(--color-bg-inverted);
-  width: 600px;
-
-  .skip-btn {
-    margin-right: auto;
-  }
-
-  .next-project {
-    margin-left: auto;
-  }
-
-  .modpack-buttons {
-    margin-top: 1rem;
+  @media (prefers-reduced-motion) {
+    transition: none !important;
   }
 
   .option-selected {

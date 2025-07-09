@@ -6,7 +6,6 @@ import { defineAsyncComponent, ref } from 'vue'
 import Button from '../base/Button.vue'
 import Checkbox from '../base/Checkbox.vue'
 
-
 const VueApexCharts = defineAsyncComponent(() => import('vue3-apexcharts'))
 
 const props = defineProps({
@@ -138,23 +137,22 @@ const chartOptions = ref({
     },
   },
   tooltip: {
-    custom ({ series, seriesIndex, dataPointIndex, w }) {
+    custom({ series, seriesIndex, dataPointIndex, w }) {
       console.log(seriesIndex, w)
       return (
         `<div class="bar-tooltip">` +
         `<div class="seperated-entry title">` +
-        `<div class="label">${
-        props.formatLabels(w.globals.lastXAxis.categories[dataPointIndex])
-        }</div>${
-        !props.hideTotal
-          ? `<div class="value">
+        `<div class="label">${props.formatLabels(
+          w.globals.lastXAxis.categories[dataPointIndex],
+        )}</div>${
+          !props.hideTotal
+            ? `<div class="value">
         ${props.prefix}
         ${formatNumber(series.reduce((a, b) => a + b[dataPointIndex], 0).toString(), false)}
         ${props.suffix}
         </div>`
-          : ``
-        }</div><hr class="card-divider" />${
-        series
+            : ``
+        }</div><hr class="card-divider" />${series
           .map((value, index) =>
             value[dataPointIndex] > 0
               ? `<div class="list-entry">
@@ -168,11 +166,10 @@ const chartOptions = ref({
                   ${props.suffix}
                 </div>
               </div>`
-              : ''
+              : '',
           )
           .reverse()
-          .reduce((a, b) => a + b)
-        }</div>`
+          .reduce((a, b) => a + b)}</div>`
       )
     },
   },
@@ -183,7 +180,7 @@ const chart = ref(null)
 const legendValues = ref(
   [...props.data].map((project, index) => {
     return { name: project.name, visible: true, color: props.colors[index] }
-  })
+  }),
 )
 
 const flipLegend = (legend, newVal) => {
@@ -192,11 +189,9 @@ const flipLegend = (legend, newVal) => {
 }
 
 const downloadCSV = () => {
-  const csvContent =
-    `data:text/csv;charset=utf-8,${
-    props.labels.join(',')
-    }\n${
-    props.data.map((project) => project.data.join(',')).reduce((a, b) => `${a  }\n${  b}`)}`
+  const csvContent = `data:text/csv;charset=utf-8,${props.labels.join(',')}\n${props.data
+    .map((project) => project.data.join(','))
+    .reduce((a, b) => `${a}\n${b}`)}`
 
   const encodedUri = encodeURI(csvContent)
   const link = document.createElement('a')

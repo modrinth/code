@@ -6,7 +6,7 @@
         <h2 class="header__title text-2xl">Organizations</h2>
         <div class="input-group">
           <button class="iconified-button brand-button" @click="openCreateOrgModal">
-            <PlusIcon />
+            <PlusIcon aria-hidden="true" />
             Create organization
           </button>
         </div>
@@ -14,7 +14,7 @@
       <template v-if="orgs?.length > 0">
         <div class="orgs-grid">
           <nuxt-link
-            v-for="org in orgs"
+            v-for="org in sortedOrgs"
             :key="org.id"
             :to="`/organization/${org.slug}`"
             class="universal-card button-base recessed org"
@@ -30,7 +30,7 @@
               </div>
               <span class="stat-bar">
                 <div class="stats">
-                  <UsersIcon />
+                  <UsersIcon aria-hidden="true" />
                   <span>
                     {{ onlyAcceptedMembers(org.members).length }} member<template
                       v-if="onlyAcceptedMembers(org.members).length !== 1"
@@ -67,6 +67,8 @@ const { data: orgs, error } = useAsyncData("organizations", () => {
   });
 });
 
+const sortedOrgs = computed(() => orgs.value.sort((a, b) => a.name.localeCompare(b.name)));
+
 const onlyAcceptedMembers = (members) => members.filter((member) => member?.accepted);
 
 if (error.value) {
@@ -76,8 +78,8 @@ if (error.value) {
   });
 }
 
-const openCreateOrgModal = () => {
-  createOrgModal.value?.show();
+const openCreateOrgModal = (event) => {
+  createOrgModal.value?.show(event);
 };
 </script>
 

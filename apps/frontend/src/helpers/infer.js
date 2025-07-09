@@ -1,4 +1,4 @@
-import TOML from "@ltd/j-toml";
+import { parse as parseTOML } from "@ltd/j-toml";
 import JSZip from "jszip";
 import yaml from "js-yaml";
 import { satisfies } from "semver";
@@ -95,9 +95,43 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
     .map((it) => it.version);
 
   const inferFunctions = {
-    // Forge 1.13+ and NeoForge
+    // NeoForge
+    "META-INF/neoforge.mods.toml": (file) => {
+      const metadata = parseTOML(file, { joiner: "\n" });
+      if (!metadata.mods || metadata.mods.length === 0) {
+        return {};
+      }
+
+      const neoForgeDependency = Object.values(metadata.dependencies)
+        .flat()
+        .find((dependency) => dependency.modId === "neoforge");
+      if (!neoForgeDependency) {
+        return {};
+      }
+
+      // https://docs.neoforged.net/docs/gettingstarted/versioning/#neoforge
+      const mcVersionRange = neoForgeDependency.versionRange
+        .replace("-beta", "")
+        .replace(/(\d+)(?:\.(\d+))?(?:\.(\d+)?)?/g, (_match, major, minor) => {
+          return `1.${major}${minor ? "." + minor : ""}`;
+        });
+      const gameVersions = getGameVersionsMatchingMavenRange(
+        mcVersionRange,
+        simplifiedGameVersions,
+      );
+
+      const versionNum = metadata.mods[0].version;
+      return {
+        name: `${project.title} ${versionNum}`,
+        version_number: versionNum,
+        loaders: ["neoforge"],
+        version_type: versionType(versionNum),
+        game_versions: gameVersions,
+      };
+    },
+    // Forge 1.13+
     "META-INF/mods.toml": async (file, zip) => {
-      const metadata = TOML.parse(file, { joiner: "\n" });
+      const metadata = parseTOML(file, { joiner: "\n" });
 
       if (metadata.mods && metadata.mods.length > 0) {
         let versionNum = metadata.mods[0].version;
@@ -130,31 +164,11 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
           );
         }
 
-        const hasNeoForge =
-          Object.values(metadata.dependencies)
-            .flat()
-            .filter((dependency) => dependency.modId === "neoforge").length > 0;
-
-        const hasForge =
-          Object.values(metadata.dependencies)
-            .flat()
-            .filter((dependency) => dependency.modId === "forge").length > 0;
-
-        // Checks if game version is below 1.20.2 as NeoForge full split and id change was in 1.20.2
-        const below1202 = getGameVersionsMatchingSemverRange("<=1.20.1", simplifiedGameVersions);
-
-        const isOlderThan1202 = below1202.some((r) => gameVersions.includes(r));
-
-        const loaders = [];
-
-        if (hasNeoForge) loaders.push("neoforge");
-        if (hasForge || isOlderThan1202) loaders.push("forge");
-
         return {
           name: `${project.title} ${versionNum}`,
           version_number: versionNum,
           version_type: versionType(versionNum),
-          loaders,
+          loaders: ["forge"],
           game_versions: gameVersions,
         };
       } else {
@@ -388,6 +402,99 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
             break;
           case 13:
             newGameVersions.push("1.19.4");
+            break;
+          case 14:
+            newGameVersions = getRange("23w14a", "23w16a");
+            break;
+          case 15:
+            newGameVersions = getRange("1.20", "1.20.1");
+            break;
+          case 16:
+            newGameVersions.push("23w31a");
+            break;
+          case 17:
+            newGameVersions = getRange("23w32a", "1.20.2-pre1");
+            break;
+          case 18:
+            newGameVersions.push("1.20.2");
+            break;
+          case 19:
+            newGameVersions.push("23w42a");
+            break;
+          case 20:
+            newGameVersions = getRange("23w43a", "23w44a");
+            break;
+          case 21:
+            newGameVersions = getRange("23w45a", "23w46a");
+            break;
+          case 22:
+            newGameVersions = getRange("1.20.3", "1.20.4");
+            break;
+          case 24:
+            newGameVersions = getRange("24w03a", "24w04a");
+            break;
+          case 25:
+            newGameVersions = getRange("24w05a", "24w05b");
+            break;
+          case 26:
+            newGameVersions = getRange("24w06a", "24w07a");
+            break;
+          case 28:
+            newGameVersions = getRange("24w09a", "24w10a");
+            break;
+          case 29:
+            newGameVersions.push("24w11a");
+            break;
+          case 30:
+            newGameVersions.push("24w12a");
+            break;
+          case 31:
+            newGameVersions = getRange("24w13a", "1.20.5-pre3");
+            break;
+          case 32:
+            newGameVersions = getRange("1.20.5", "1.20.6");
+            break;
+          case 33:
+            newGameVersions = getRange("24w18a", "24w20a");
+            break;
+          case 34:
+            newGameVersions = getRange("1.21", "1.21.1");
+            break;
+          case 35:
+            newGameVersions.push("24w33a");
+            break;
+          case 36:
+            newGameVersions = getRange("24w34a", "24w35a");
+            break;
+          case 37:
+            newGameVersions.push("24w36a");
+            break;
+          case 38:
+            newGameVersions.push("24w37a");
+            break;
+          case 39:
+            newGameVersions = getRange("24w38a", "24w39a");
+            break;
+          case 40:
+            newGameVersions.push("24w40a");
+            break;
+          case 41:
+            newGameVersions = getRange("1.21.2-pre1", "1.21.2-pre2");
+            break;
+          case 42:
+            newGameVersions = getRange("1.21.2", "1.21.3");
+            break;
+          case 43:
+            newGameVersions.push("24w44a");
+            break;
+          case 44:
+            newGameVersions.push("24w45a");
+            break;
+          case 45:
+            newGameVersions.push("24w46a");
+            break;
+          case 46:
+            newGameVersions.push("1.21.4");
             break;
           default:
         }

@@ -109,7 +109,6 @@ const chartOptions = ref({
   },
   tooltip: {
     custom({ series, seriesIndex, dataPointIndex, w }) {
-       
       console.log(seriesIndex, w)
       return `<div class="bar-tooltip">${series
         .map((value) =>
@@ -128,7 +127,7 @@ const chartOptions = ref({
                   ${props.suffix}
                 </div>
               </div>`
-            : ''
+            : '',
         )
         .reverse()
         .reduce((a, b) => a + b)}</div>`

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ModalConfirm
+    <ConfirmModal
       ref="modal_confirm"
       title="Are you sure you want to delete your account?"
       description="This will **immediately delete all of your user data and follows**. This will not delete your projects. Deleting your account cannot be reversed.<br><br>If you need help with your account, get support on the [Modrinth Discord](https://discord.modrinth.com)."
@@ -371,6 +371,22 @@
       </div>
     </section>
 
+    <section id="data-export" class="universal-card">
+      <h2>Data export</h2>
+      <p>
+        Request a copy of all your personal data you have uploaded to Modrinth. This may take
+        several minutes to complete.
+      </p>
+      <a v-if="generated" class="iconified-button" :href="generated" download="export.json">
+        <DownloadIcon />
+        Download export
+      </a>
+      <button v-else class="iconified-button" :disabled="generatingExport" @click="exportData">
+        <template v-if="generatingExport"> <UpdatedIcon /> Generating export... </template>
+        <template v-else> <UpdatedIcon /> Generate export </template>
+      </button>
+    </section>
+
     <section id="delete-account" class="universal-card">
       <h2>Delete account</h2>
       <p>
@@ -391,26 +407,28 @@
 
 <script setup>
 import {
-  EditIcon,
-  SaveIcon,
-  TrashIcon,
-  PlusIcon,
-  SettingsIcon,
-  XIcon,
-  LeftArrowIcon,
-  RightArrowIcon,
   CheckIcon,
+  EditIcon,
   ExternalIcon,
+  LeftArrowIcon,
+  PlusIcon,
+  RightArrowIcon,
+  SaveIcon,
+  SettingsIcon,
+  TrashIcon,
+  UpdatedIcon,
+  XIcon,
+  DownloadIcon,
 } from "@modrinth/assets";
 import QrcodeVue from "qrcode.vue";
-import GitHubIcon from "assets/icons/auth/sso-github.svg";
+import { ConfirmModal } from "@modrinth/ui";
+import GithubIcon from "assets/icons/auth/sso-github.svg";
 import MicrosoftIcon from "assets/icons/auth/sso-microsoft.svg";
 import GoogleIcon from "assets/icons/auth/sso-google.svg";
 import SteamIcon from "assets/icons/auth/sso-steam.svg";
 import DiscordIcon from "assets/icons/auth/sso-discord.svg";
 import KeyIcon from "assets/icons/auth/key.svg";
 import GitLabIcon from "assets/icons/auth/sso-gitlab.svg";
-import ModalConfirm from "~/components/ui/ModalConfirm.vue";
 import Modal from "~/components/ui/Modal.vue";
 
 useHead({
@@ -445,7 +463,7 @@ async function saveEmail() {
     data.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
   }
@@ -477,7 +495,7 @@ async function savePassword() {
     data.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
   }
@@ -514,7 +532,7 @@ async function showTwoFactorModal() {
     data.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
   }
@@ -538,7 +556,7 @@ async function verifyTwoFactorCode() {
     backupCodes.value = res.backup_codes;
     twoFactorStep.value = 2;
     await useAuth(auth.value.token);
-  } catch (err) {
+  } catch {
     twoFactorIncorrect.value = true;
   }
   stopLoading();
@@ -555,7 +573,7 @@ async function removeTwoFactor() {
     });
     manageTwoFactorModal.value.hide();
     await useAuth(auth.value.token);
-  } catch (err) {
+  } catch {
     twoFactorIncorrect.value = true;
   }
   stopLoading();
@@ -565,7 +583,7 @@ const authProviders = [
   {
     id: "github",
     display: "GitHub",
-    icon: GitHubIcon,
+    icon: GithubIcon,
   },
   {
     id: "gitlab",
@@ -604,7 +622,7 @@ async function deleteAccount() {
     data.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
   }
@@ -612,6 +630,34 @@ async function deleteAccount() {
   useCookie("auth-token").value = null;
   window.location.href = "/";
 
+  stopLoading();
+}
+
+const generatingExport = ref(false);
+const generated = ref();
+async function exportData() {
+  startLoading();
+  generatingExport.value = true;
+  try {
+    const res = await useBaseFetch("gdpr/export", {
+      method: "POST",
+      internal: true,
+    });
+
+    const jsonString = JSON.stringify(res, null, 2);
+
+    const blob = new Blob([jsonString], { type: "application/json" });
+    generated.value = URL.createObjectURL(blob);
+  } catch (err) {
+    data.$notify({
+      group: "main",
+      title: "An error occurred",
+      text: err.data ? err.data.description : err,
+      type: "error",
+    });
+  }
+
+  generatingExport.value = false;
   stopLoading();
 }
 </script>

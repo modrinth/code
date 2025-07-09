@@ -1,0 +1,413 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Developer mode enabled."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Appearance"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Default instance options"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Feature flags"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Java installations"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Privacy"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Resource management"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Add and play"
+  },
+  "instance.add-server.add-server": {
+    "message": "Add server"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Disabled"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Enabled"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Prompt"
+  },
+  "instance.add-server.title": {
+    "message": "Add a server"
+  },
+  "instance.edit-server.title": {
+    "message": "Edit server"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Hide from the Home page"
+  },
+  "instance.edit-world.name": {
+    "message": "Name"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft World"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Reset icon"
+  },
+  "instance.edit-world.title": {
+    "message": "Edit world"
+  },
+  "instance.filter.disabled": {
+    "message": "Disabled projects"
+  },
+  "instance.filter.updates-available": {
+    "message": "Updates available"
+  },
+  "instance.server-modal.address": {
+    "message": "Address"
+  },
+  "instance.server-modal.name": {
+    "message": "Name"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft Server"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Resource pack"
+  },
+  "instance.settings.tabs.general": {
+    "message": "General"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Delete instance"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Delete instance"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Permanently deletes an instance from your device, including your worlds, configs, and all installed content. Be careful, as once you delete a instance there is no way to recover it."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Deleting..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Duplicate"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "Cannot duplicate while installing."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "Duplicate instance"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Creates a copy of this instance, including worlds, configs, mods, etc."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Edit icon"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Remove icon"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Replace icon"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Select icon"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "Library groups"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "Create new group"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "Library groups allow you to organize your instances into different sections in your library."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "Enter group name"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Name"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "Launch hooks"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "Custom launch hooks"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "Hooks allow advanced users to run certain system commands before and after launching the game."
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "Post-exit"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "Ran after the game closes."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "Enter post-exit command..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Pre-launch"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Ran before the instance is launched."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "Enter pre-launch command..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "Game launch hooks"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "Wrapper"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "Wrapper command for launching Minecraft."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "Enter wrapper command..."
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Installation"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "{platform} {version} for Minecraft {game_version} already installed"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "Vanilla {game_version} already installed"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "Change version"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "Install"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "Installing"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "Fetching modpack versions"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "Installing new version"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "Currently installed"
+  },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": "Debug information:"
+  },
+  "instance.settings.tabs.installation.fetching-modpack-details": {
+    "message": "Fetching modpack details"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Game version"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "Install"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "Installation in progress"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "{loader} version"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecraft {version}"
+  },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "Cannot fetch linked modpack details. Please check your internet connection."
+  },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "{loader} is not available for Minecraft {version}. Try another mod loader."
+  },
+  "instance.settings.tabs.installation.no-modpack-found": {
+    "message": "This instance is linked to a modpack, but the modpack could not be found on Modrinth."
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "Platform"
+  },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "Reinstall modpack"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Reinstalling modpack"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "Reinstalling will reset all installed or modified content to what is provided by the modpack, removing any mods or content you have added on top of the original installation. This may fix unexpected behavior if changes have been made to the instance, but if your worlds now depend on additional installed content, it may break existing worlds."
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "Are you sure you want to reinstall this instance?"
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "Resets the instance's content to its original state, removing any mods or content you have added on top of the original modpack."
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "Reinstall modpack"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "Repair"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "Repairing"
+  },
+  "instance.settings.tabs.installation.repair.confirm.description": {
+    "message": "Repairing reinstalls Minecraft dependencies and checks for corruption. This may resolve issues if your game is not launching due to launcher-related errors, but will not resolve issues or crashes related to installed mods."
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "Repair instance?"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "Repair in progress"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "Reset to current"
+  },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "Show all versions"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "change version"
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "install"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "reinstall"
+  },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "repair"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "Cannot {action} while installing"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "Cannot {action} while offline"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "Cannot {action} while repairing"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(unknown version)"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "Unlink instance"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": "If you proceed, you will not be able to re-link it without creating an entirely new instance. You will no longer receive modpack updates and it will become a normal."
+  },
+  "instance.settings.tabs.installation.unlink.confirm.title": {
+    "message": "Are you sure you want to unlink this instance?"
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "This instance is linked to a modpack, which means mods can't be updated and you can't change the mod loader or Minecraft version. Unlinking will permanently disconnect this instance from the modpack."
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "Unlink from modpack"
+  },
+  "instance.settings.tabs.java": {
+    "message": "Java and memory"
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "Environment variables"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "Hooks"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Java arguments"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Java installation"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "Memory allocated"
+  },
+  "instance.settings.tabs.window": {
+    "message": "Window"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Custom window settings"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Fullscreen"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "Make the game start in full screen when launched (using options.txt)."
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "Height"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "The height of the game window when launched."
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "Enter height..."
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "Width"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "The width of the game window when launched."
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "Enter width..."
+  },
+  "instance.settings.title": {
+    "message": "Settings"
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "A Minecraft Server"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "Can't connect to server"
+  },
+  "instance.worlds.copy_address": {
+    "message": "Copy address"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "Don't show on Home"
+  },
+  "instance.worlds.filter.available": {
+    "message": "Available"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "Instance is already open"
+  },
+  "instance.worlds.hardcore": {
+    "message": "Hardcore mode"
+  },
+  "instance.worlds.no_quick_play": {
+    "message": "You can only jump straight into worlds on Minecraft 1.20+"
+  },
+  "instance.worlds.play_anyway": {
+    "message": "Play anyway"
+  },
+  "instance.worlds.play_instance": {
+    "message": "Play instance"
+  },
+  "instance.worlds.type.server": {
+    "message": "Server"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "Singleplayer"
+  },
+  "instance.worlds.view_instance": {
+    "message": "View instance"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "World is in use"
+  },
+  "search.filter.locked.instance": {
+    "message": "Provided by the instance"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "Game version is provided by the instance"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "Loader is provided by the instance"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "Sync with instance"
+  }
+}

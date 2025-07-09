@@ -29,6 +29,7 @@ async function copyText() {
 
 <style lang="scss" scoped>
 .code {
+  color: var(--color-text);
   display: inline-flex;
   grid-gap: 0.5rem;
   font-family: var(--mono-font);
@@ -36,20 +37,17 @@ async function copyText() {
   margin: 0;
   padding: 0.25rem 0.5rem;
   background-color: var(--color-button-bg);
-  width: min-content;
+  width: fit-content;
   border-radius: 10px;
   user-select: text;
-  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, transform 0.05s ease-in-out,
+  transition:
+    opacity 0.5s ease-in-out,
+    filter 0.2s ease-in-out,
+    transform 0.05s ease-in-out,
     outline 0.2s ease-in-out;
 
   @media (prefers-reduced-motion) {
     transition: none !important;
-  }
-
-  span {
-    max-width: 10rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   svg {

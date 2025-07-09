@@ -1,0 +1,160 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'bundled-minecraft-font-mrapp';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('https://cdn-raw.modrinth.com/fonts/minecraft/regular.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'bundled-minecraft-font-mrapp';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 400;
+  src: url('https://cdn-raw.modrinth.com/fonts/minecraft/italic.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'bundled-minecraft-font-mrapp';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url('https://cdn-raw.modrinth.com/fonts/minecraft/bold.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'bundled-minecraft-font-mrapp';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 600;
+  src: url('https://cdn-raw.modrinth.com/fonts/minecraft/bold-italic.otf') format('opentype');
+}
+
+.font-minecraft {
+  font-family: 'bundled-minecraft-font-mrapp', monospace;
+}
+
+:root {
+  font-family: var(--font-standard, sans-serif), sans-serif;
+  color-scheme: dark;
+  --view-width: calc(100% - 5rem);
+  --expanded-view-width: calc(100% - 13rem);
+}
+
+body {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.card-divider {
+  background-color: var(--color-button-bg);
+  border: none;
+  color: var(--color-button-bg);
+  height: 1px;
+  margin: var(--gap-sm) 0;
+}
+
+.no-wrap {
+  white-space: nowrap;
+}
+
+.no-select {
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+a {
+  color: var(--color-link);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+input {
+  border: none !important;
+}
+
+.badge {
+  display: flex;
+  border-radius: var(--radius-md);
+  white-space: nowrap;
+  align-items: center;
+  background-color: var(--color-bg);
+  padding-block: var(--gap-sm);
+  padding-inline: var(--gap-lg);
+  width: min-content;
+
+  svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-right: 0.5rem;
+  }
+
+  &.featured {
+    background-color: var(--color-brand-highlight);
+    color: var(--color-contrast);
+  }
+}
+
+* {
+  scrollbar-width: auto;
+  scrollbar-color: var(--color-scrollbar) var(--color-bg);
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 16px;
+  border: 3px solid transparent;
+  opacity: 0.5;
+  transition: opacity 0.2s ease-in-out;
+}
+
+*::-webkit-scrollbar:hover {
+  opacity: 1;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-scrollbar);
+  border-radius: var(--radius-lg);
+  border: 5px solid transparent;
+  background-clip: content-box;
+}
+
+.highlighted {
+  box-shadow: 0 0 1rem var(--color-brand) !important;
+}
+
+.gecko {
+  background-color: var(--color-raised-bg);
+  box-shadow: none !important;
+}
+
+img {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.card-shadow {
+  box-shadow: var(--shadow-card);
+}
+
+@import '@modrinth/assets/omorphia.scss';

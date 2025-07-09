@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 export const getProjectTypeForUrl = (type, categories) => {
   return getProjectTypeForUrlShorthand(type, categories);
 };
@@ -83,10 +82,14 @@ export const REJECTED_PROJECT_STATUSES = ["rejected", "withheld"];
 export const UNDER_REVIEW_PROJECT_STATUSES = ["processing"];
 export const DRAFT_PROJECT_STATUSES = ["draft"];
 
-export function getVersionsToDisplay(project, overrideTags) {
+export function getVersionsToDisplay(project) {
+  return formatVersionsForDisplay(project.game_versions.slice());
+}
+
+export function formatVersionsForDisplay(gameVersions, overrideTags) {
   const tags = overrideTags ?? useTags().value;
 
-  const projectVersions = project.game_versions.slice();
+  const inputVersions = gameVersions.slice();
   const allVersions = tags.gameVersions.slice();
 
   const allSnapshots = allVersions.filter((version) => version.version_type === "snapshot");
@@ -100,17 +103,17 @@ export function getVersionsToDisplay(project, overrideTags) {
       map[gameVersion.version] = index;
       return map;
     }, {});
-    projectVersions.sort((a, b) => indices[a] - indices[b]);
+    inputVersions.sort((a, b) => indices[a] - indices[b]);
   }
 
-  const releaseVersions = projectVersions.filter((projVer) =>
+  const releaseVersions = inputVersions.filter((projVer) =>
     allReleases.some((gameVer) => gameVer.version === projVer),
   );
 
   const latestReleaseVersionDate = Date.parse(
     allReleases.find((version) => version.version === releaseVersions[0])?.date,
   );
-  const latestSnapshot = projectVersions.find((projVer) =>
+  const latestSnapshot = inputVersions.find((projVer) =>
     allSnapshots.some(
       (gameVer) =>
         gameVer.version === projVer &&
@@ -141,7 +144,7 @@ export function getVersionsToDisplay(project, overrideTags) {
   });
 
   const legacyVersionsAsRanges = groupConsecutiveIndices(
-    projectVersions.filter((projVer) => allLegacy.some((gameVer) => gameVer.version === projVer)),
+    inputVersions.filter((projVer) => allLegacy.some((gameVer) => gameVer.version === projVer)),
     allLegacy,
   );
 
@@ -150,7 +153,7 @@ export function getVersionsToDisplay(project, overrideTags) {
   // show all snapshots if there's no release versions
   if (releaseVersionsAsRanges.length === 0) {
     const snapshotVersionsAsRanges = groupConsecutiveIndices(
-      projectVersions.filter((projVer) =>
+      inputVersions.filter((projVer) =>
         allSnapshots.some((gameVer) => gameVer.version === projVer),
       ),
       allSnapshots,
@@ -160,7 +163,7 @@ export function getVersionsToDisplay(project, overrideTags) {
     output = [...releaseVersionsAsRanges, ...output];
   }
 
-  if (latestSnapshot) {
+  if (latestSnapshot && !output.includes(latestSnapshot)) {
     output = [latestSnapshot, ...output];
   }
   return output;

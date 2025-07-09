@@ -5,20 +5,23 @@
       <Chips
         v-model="projectType"
         :items="projectTypes"
-        :format-label="(x) => (x === 'all' ? 'All' : $formatProjectType(x) + 's')"
+        :format-label="(x) => (x === 'all' ? 'All' : formatProjectType(x) + 's')"
       />
       <button v-if="oldestFirst" class="iconified-button push-right" @click="oldestFirst = false">
-        <SortDescIcon />Sorting by oldest
+        <SortDescIcon />
+        Sorting by oldest
       </button>
       <button v-else class="iconified-button push-right" @click="oldestFirst = true">
-        <SortAscIcon />Sorting by newest
+        <SortAscIcon />
+        Sorting by newest
       </button>
       <button
         class="btn btn-highlight"
         :disabled="projectsFiltered.length === 0"
         @click="goToProjects()"
       >
-        <ModerationIcon /> Start moderating
+        <ScaleIcon />
+        Start moderating
       </button>
     </div>
     <p v-if="projectType !== 'all'" class="project-count">
@@ -27,11 +30,13 @@
     </p>
     <p v-else class="project-count">There are {{ projects.length }} projects in the queue.</p>
     <p v-if="projectsOver24Hours.length > 0" class="warning project-count">
-      <WarningIcon /> {{ projectsOver24Hours.length }} {{ projectTypePlural }}
+      <IssuesIcon />
+      {{ projectsOver24Hours.length }} {{ projectTypePlural }}
       have been in the queue for over 24 hours.
     </p>
     <p v-if="projectsOver48Hours.length > 0" class="danger project-count">
-      <WarningIcon /> {{ projectsOver48Hours.length }} {{ projectTypePlural }}
+      <IssuesIcon />
+      {{ projectsOver48Hours.length }} {{ projectTypePlural }}
       have been in the queue for over 48 hours.
     </p>
     <div
@@ -47,14 +52,11 @@
     >
       <div class="project-title">
         <div class="mobile-row">
-          <nuxt-link
-            :to="`/${project.inferred_project_type}/${project.slug}`"
-            class="iconified-stacked-link"
-          >
+          <nuxt-link :to="`/project/${project.id}`" class="iconified-stacked-link">
             <Avatar :src="project.icon_url" size="xs" no-shadow raised />
             <span class="stacked">
               <span class="title">{{ project.name }}</span>
-              <span>{{ $formatProjectType(project.inferred_project_type) }}</span>
+              <span>{{ formatProjectType(project.inferred_project_type) }}</span>
             </span>
           </nuxt-link>
         </div>
@@ -62,7 +64,7 @@
           by
           <nuxt-link
             v-if="project.owner"
-            :to="`/user/${project.owner.user.username}`"
+            :to="`/user/${project.owner.user.id}`"
             class="iconified-link"
           >
             <Avatar :src="project.owner.user.avatar_url" circle size="xxs" raised />
@@ -70,7 +72,7 @@
           </nuxt-link>
           <nuxt-link
             v-else-if="project.org"
-            :to="`/organization/${project.org.slug}`"
+            :to="`/organization/${project.org.id}`"
             class="iconified-link"
           >
             <Avatar :src="project.org.icon_url" circle size="xxs" raised />
@@ -79,38 +81,41 @@
         </div>
         <div class="mobile-row">
           is requesting to be
-          <Badge :type="project.requested_status ? project.requested_status : 'approved'" />
+          <ProjectStatusBadge
+            :status="project.requested_status ? project.requested_status : 'approved'"
+          />
         </div>
       </div>
       <div class="input-group">
-        <nuxt-link
-          :to="`/${project.inferred_project_type}/${project.slug}`"
-          class="iconified-button raised-button"
-          ><EyeIcon /> View project</nuxt-link
-        >
+        <nuxt-link :to="`/project/${project.id}`" class="iconified-button raised-button">
+          <EyeIcon />
+          View project
+        </nuxt-link>
       </div>
       <span v-if="project.queued" :class="`submitter-info ${project.age_warning}`">
-        <WarningIcon v-if="project.age_warning" />
+        <IssuesIcon v-if="project.age_warning" />
         Submitted
         <span v-tooltip="$dayjs(project.queued).format('MMMM D, YYYY [at] h:mm A')">{{
-          fromNow(project.queued)
+          formatRelativeTime(project.queued)
         }}</span>
       </span>
       <span v-else class="submitter-info"><UnknownIcon /> Unknown queue date</span>
     </div>
   </section>
 </template>
+
 <script setup>
-import Chips from "~/components/ui/Chips.vue";
-import Avatar from "~/components/ui/Avatar.vue";
-import UnknownIcon from "~/assets/images/utils/unknown.svg?component";
-import EyeIcon from "~/assets/images/utils/eye.svg?component";
-import SortAscIcon from "~/assets/images/utils/sort-asc.svg?component";
-import SortDescIcon from "~/assets/images/utils/sort-desc.svg?component";
-import WarningIcon from "~/assets/images/utils/issues.svg?component";
-import ModerationIcon from "~/assets/images/sidebar/admin.svg?component";
-import Badge from "~/components/ui/Badge.vue";
-import { formatProjectType } from "~/plugins/shorthands.js";
+import { Avatar, ProjectStatusBadge, Chips, useRelativeTime } from "@modrinth/ui";
+import {
+  UnknownIcon,
+  EyeIcon,
+  SortAscIcon,
+  SortDescIcon,
+  IssuesIcon,
+  ScaleIcon,
+} from "@modrinth/assets";
+import { formatProjectType } from "@modrinth/utils";
+import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
 
 useHead({
   title: "Review projects - Modrinth",
@@ -123,6 +128,8 @@ const router = useRouter();
 const now = app.$dayjs();
 const TIME_24H = 86400000;
 const TIME_48H = TIME_24H * 2;
+
+const formatRelativeTime = useRelativeTime();
 
 const { data: projects } = await useAsyncData("moderation/projects?count=1000", () =>
   useBaseFetch("moderation/projects?count=1000", { internal: true }),
@@ -166,21 +173,27 @@ const projectTypes = computed(() => {
 
 if (projects.value) {
   const teamIds = projects.value.map((x) => x.team_id);
-  const organizationIds = projects.value.filter((x) => x.organization).map((x) => x.organization);
+  const orgIds = projects.value.filter((x) => x.organization).map((x) => x.organization);
 
-  const url = `teams?ids=${encodeURIComponent(JSON.stringify(teamIds))}`;
-  const orgUrl = `organizations?ids=${encodeURIComponent(JSON.stringify(organizationIds))}`;
-  const { data: result } = await useAsyncData(url, () => useBaseFetch(url));
-  const { data: orgs } = await useAsyncData(orgUrl, () => useBaseFetch(orgUrl, { apiVersion: 3 }));
+  const [{ data: teams }, { data: orgs }] = await Promise.all([
+    useAsyncData(`teams?ids=${asEncodedJsonArray(teamIds)}`, () =>
+      fetchSegmented(teamIds, (ids) => `teams?ids=${asEncodedJsonArray(ids)}`),
+    ),
+    useAsyncData(`organizations?ids=${asEncodedJsonArray(orgIds)}`, () =>
+      fetchSegmented(orgIds, (ids) => `organizations?ids=${asEncodedJsonArray(ids)}`, {
+        apiVersion: 3,
+      }),
+    ),
+  ]);
 
-  if (result.value) {
-    members.value = result.value;
+  if (teams.value) {
+    members.value = teams.value;
 
     projects.value = projects.value.map((project) => {
       project.owner = members.value
-        .flat()
-        .find((x) => x.team_id === project.team_id && x.role === "Owner");
-      project.org = orgs.value.find((x) => x.id === project.organization);
+        ? members.value.flat().find((x) => x.team_id === project.team_id && x.role === "Owner")
+        : null;
+      project.org = orgs.value ? orgs.value.find((x) => x.id === project.organization) : null;
       project.age = project.queued ? now - app.$dayjs(project.queued) : Number.MAX_VALUE;
       project.age_warning = "";
       if (project.age > TIME_24H * 2) {
@@ -196,6 +209,7 @@ if (projects.value) {
     });
   }
 }
+
 async function goToProjects() {
   const project = projectsFiltered.value[0];
   await router.push({

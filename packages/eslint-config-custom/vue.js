@@ -2,19 +2,17 @@ const { resolve } = require('node:path')
 
 const project = resolve(process.cwd(), 'tsconfig.json')
 
-/*
- * This is a custom ESLint configuration for use with
- * internal that utilize VueJS.
- *
- * This config extends the Vercel Engineering Style Guide.
- * For more information, see https://github.com/vercel/style-guide
- *
- */
-
 module.exports = {
-  extends: ['@vercel/style-guide/eslint/browser', '@vue/eslint-config-typescript'].map(
-    require.resolve,
-  ),
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:vue/vue3-recommended',
+    'plugin:prettier/recommended',
+    'prettier',
+    'plugin:import/recommended',
+    'plugin:import/typescript',
+    'turbo',
+  ],
   parserOptions: {
     ecmaVersion: 'latest',
   },
@@ -25,14 +23,17 @@ module.exports = {
       },
     },
   },
-  ignorePatterns: ['node_modules/', 'dist/', '.eslintrc.js'],
+  ignorePatterns: ['node_modules/', 'dist/', '.eslintrc.js', '*.d.ts'],
 
   rules: {
     'import/no-default-export': 'off',
     'vue/multi-word-component-names': 'off',
+    'vue/no-multiple-template-root': 'off',
     camelcase: 'off',
     'no-console': 'off',
     'no-bitwise': 'off',
-    // add specific rules configurations here
+    'unicorn/filename-case': 'off',
+    'comma-dangle': ['error', 'only-multiline'],
+    'vue/no-v-html': 'off',
   },
 }

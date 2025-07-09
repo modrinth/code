@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                UPDATE modrinth_users\n                SET active = FALSE\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": []
+  },
+  "hash": "45c692b305b36540139b5956dcff5bd5aeacec7d0a8abd640a7365902e57a2fd"
+}

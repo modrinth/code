@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ModalConfirm
+    <ConfirmModal
       ref="modal_confirm"
       title="Are you sure you want to delete this project?"
       description="If you proceed, all versions and any attached data will be removed from our servers. This may break other projects, so be careful."
@@ -33,10 +33,11 @@
             accept="image/png,image/jpeg,image/gif,image/webp"
             class="choose-image iconified-button"
             prompt="Upload icon"
+            aria-label="Upload icon"
             :disabled="!hasPermission"
             @change="showPreviewImage"
           >
-            <UploadIcon />
+            <UploadIcon aria-hidden="true" />
           </FileInput>
           <button
             v-if="!deletedIcon && (previewImage || project.icon_url)"
@@ -44,7 +45,7 @@
             :disabled="!hasPermission"
             @click="markIconForDeletion"
           >
-            <TrashIcon />
+            <TrashIcon aria-hidden="true" />
             Remove icon
           </button>
         </div>
@@ -103,7 +104,7 @@
             <span class="label__title">Client-side</span>
             <span class="label__description">
               Select based on if the
-              {{ $formatProjectType(project.project_type).toLowerCase() }} has functionality on the
+              {{ formatProjectType(project.project_type).toLowerCase() }} has functionality on the
               client side. Just because a mod works in Singleplayer doesn't mean it has actual
               client-side functionality.
             </span>
@@ -127,7 +128,7 @@
             <span class="label__title">Server-side</span>
             <span class="label__description">
               Select based on if the
-              {{ $formatProjectType(project.project_type).toLowerCase() }} has functionality on the
+              {{ formatProjectType(project.project_type).toLowerCase() }} has functionality on the
               <strong>logical</strong> server. Remember that Singleplayer contains an integrated
               server.
             </span>
@@ -151,7 +152,7 @@
         <label for="project-visibility">
           <span class="label__title">Visibility</span>
           <div class="label__description">
-            Listed and archived projects are visible in search. Unlisted projects are published, but
+            Public and archived projects are visible in search. Unlisted projects are published, but
             not visible in search or on user profiles. Private projects are only accessible by
             members of the project.
 
@@ -162,14 +163,11 @@
                   v-if="visibility === 'approved' || visibility === 'archived'"
                   class="good"
                 />
-                <ExitIcon v-else class="bad" />
+                <XIcon v-else class="bad" />
                 {{ hasModifiedVisibility() ? "Will be v" : "V" }}isible in search
               </li>
               <li>
-                <ExitIcon
-                  v-if="visibility === 'unlisted' || visibility === 'private'"
-                  class="bad"
-                />
+                <XIcon v-if="visibility === 'unlisted' || visibility === 'private'" class="bad" />
                 <CheckIcon v-else class="good" />
                 {{ hasModifiedVisibility() ? "Will be v" : "V" }}isible on profile
               </li>
@@ -196,7 +194,7 @@
           class="small-multiselect"
           placeholder="Select one"
           :options="tags.approvedStatuses"
-          :custom-label="(value) => $formatProjectStatus(value)"
+          :custom-label="(value) => formatProjectStatus(value)"
           :searchable="false"
           :close-on-select="true"
           :show-labels="false"
@@ -211,7 +209,7 @@
           :disabled="!hasChanges"
           @click="saveChanges()"
         >
-          <SaveIcon />
+          <SaveIcon aria-hidden="true" />
           Save changes
         </button>
       </div>
@@ -233,7 +231,7 @@
         :disabled="!hasDeletePermission"
         @click="$refs.modal_confirm.show()"
       >
-        <TrashIcon />
+        <TrashIcon aria-hidden="true" />
         Delete project
       </button>
     </section>
@@ -241,18 +239,11 @@
 </template>
 
 <script setup>
+import { formatProjectStatus, formatProjectType } from "@modrinth/utils";
+import { UploadIcon, SaveIcon, TrashIcon, XIcon, IssuesIcon, CheckIcon } from "@modrinth/assets";
 import { Multiselect } from "vue-multiselect";
-
-import Avatar from "~/components/ui/Avatar.vue";
-import ModalConfirm from "~/components/ui/ModalConfirm.vue";
+import { ConfirmModal, Avatar } from "@modrinth/ui";
 import FileInput from "~/components/ui/FileInput.vue";
-
-import UploadIcon from "~/assets/images/utils/upload.svg?component";
-import SaveIcon from "~/assets/images/utils/save.svg?component";
-import TrashIcon from "~/assets/images/utils/trash.svg?component";
-import ExitIcon from "~/assets/images/utils/x.svg?component";
-import IssuesIcon from "~/assets/images/utils/issues.svg?component";
-import CheckIcon from "~/assets/images/utils/check.svg?component";
 
 const props = defineProps({
   project: {
@@ -413,11 +404,17 @@ const deleteIcon = async () => {
 .visibility-info {
   padding: 0;
   list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-card-xs);
+  }
 }
 
 svg {
   &.good {
-    color: var(--color-brand-green);
+    color: var(--color-green);
   }
 
   &.bad {
@@ -436,5 +433,9 @@ svg {
 
 .small-multiselect {
   max-width: 15rem;
+}
+
+.button-group {
+  justify-content: flex-start;
 }
 </style>

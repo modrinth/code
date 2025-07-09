@@ -1,0 +1,118 @@
+name: Modrinth App release
+on:
+  workflow_dispatch:
+    inputs:
+      version-tag:
+        description: Version tag to release to the wide public
+        type: string
+        required: true
+      release-notes:
+        description: Release notes to include in the Tauri version manifest
+        default: A new release of the Modrinth App is available!
+        type: string
+        required: true
+
+jobs:
+  release:
+    name: Release Modrinth App
+    runs-on: ubuntu-latest
+
+    env:
+      LINUX_X64_BUNDLE_ARTIFACT_NAME: App bundle (x86_64-unknown-linux-gnu)
+      WINDOWS_X64_BUNDLE_ARTIFACT_NAME: App bundle (x86_64-pc-windows-msvc)
+      MACOS_UNIVERSAL_BUNDLE_ARTIFACT_NAME: App bundle (universal-apple-darwin)
+      LAUNCHER_FILES_BUCKET_BASE_URL: https://launcher-files.modrinth.com
+
+    steps:
+      - name: 📥 Download Modrinth App artifacts
+        uses: dawidd6/action-download-artifact@v11
+        with:
+          workflow: theseus-build.yml
+          workflow_conclusion: success
+          event: push
+          branch: ${{ inputs.version-tag }}
+          use_unzip: true
+
+      - name: 🛠️ Generate version manifest
+        env:
+          VERSION_TAG: ${{ inputs.version-tag }}
+          RELEASE_NOTES: ${{ inputs.release-notes }}
+        run: |
+          # Reference: https://tauri.app/plugin/updater/#server-support
+          jq -nc \
+            --arg versionTag "${VERSION_TAG#v}" \
+            --arg releaseNotes "$RELEASE_NOTES" \
+            --rawfile macOsAarch64UpdateArtifactSignature "${MACOS_UNIVERSAL_BUNDLE_ARTIFACT_NAME}/universal-apple-darwin/release/bundle/macos/Modrinth App.app.tar.gz.sig" \
+            --rawfile macOsX64UpdateArtifactSignature "${MACOS_UNIVERSAL_BUNDLE_ARTIFACT_NAME}/universal-apple-darwin/release/bundle/macos/Modrinth App.app.tar.gz.sig" \
+            --rawfile linuxX64UpdateArtifactSignature "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/appimage/Modrinth App_${VERSION_TAG#v}_amd64.AppImage.tar.gz.sig" \
+            --rawfile windowsX64UpdateArtifactSignature "${WINDOWS_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/nsis/Modrinth App_${VERSION_TAG#v}_x64-setup.nsis.zip.sig" \
+          '{
+            "version": $versionTag,
+            "notes": $releaseNotes,
+            "pub_date": now | todateiso8601,
+            "platforms": {
+              "darwin-aarch64": {
+                "signature": $macOsAarch64UpdateArtifactSignature,
+                "url": @uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/macos/\("Modrinth App.app.tar.gz")",
+                "install_urls": [@uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/macos/\("Modrinth App_" + $versionTag + "_universal.dmg")"]
+              },
+              "darwin-x86_64": {
+                "signature": $macOsX64UpdateArtifactSignature,
+                "url": @uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/macos/\("Modrinth App.app.tar.gz")",
+                "install_urls": [@uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/macos/\("Modrinth App_" + $versionTag + "_universal.dmg")"]
+              },
+              "linux-x86_64": {
+                "signature": $linuxX64UpdateArtifactSignature,
+                "url": @uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/linux/\("Modrinth App_" + $versionTag + "_amd64.AppImage.tar.gz")",
+                "install_urls": [
+                  @uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/linux/\("Modrinth App_" + $versionTag + "_amd64.deb")",
+                  @uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/linux/\("Modrinth App_" + $versionTag + "_amd64.AppImage")",
+                  @uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/linux/\("Modrinth App-" + $versionTag + "-1.x86_64.rpm")"
+                ]
+              },
+              "windows-x86_64": {
+                "signature": $windowsX64UpdateArtifactSignature,
+                "url": @uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/windows/\("Modrinth App_" + $versionTag + "_x64-setup.nsis.zip")",
+                "install_urls": [@uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/windows/\("Modrinth App_" + $versionTag + "_x64-setup.exe")"]
+              }
+            }
+          }' > updates.json
+
+          echo "Generated manifest for version ${VERSION_TAG}:"
+          cat updates.json
+
+      - name: 📤 Upload release artifacts
+        env:
+          VERSION_TAG: ${{ inputs.version-tag }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.LAUNCHER_FILES_BUCKET_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.LAUNCHER_FILES_BUCKET_SECRET_ACCESS_KEY }}
+          AWS_BUCKET: ${{ secrets.LAUNCHER_FILES_BUCKET_NAME }}
+          AWS_REGION: ${{ secrets.LAUNCHER_FILES_BUCKET_REGION }}
+          AWS_ENDPOINT_URL: ${{ secrets.LAUNCHER_FILES_BUCKET_ENDPOINT_URL }}
+          AWS_PAGER: ''
+          # Work around incompatible checksum behavior with some S3-like object storage providers,
+          # such as Cloudflare R2. See:
+          # - https://developers.cloudflare.com/r2/examples/aws/aws-cli/
+          # - https://developers.cloudflare.com/r2/examples/aws/aws-sdk-java/
+          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+        run: |
+          for macosBundleType in 'macos' 'dmg'; do
+            aws s3 cp --recursive \
+              "${MACOS_UNIVERSAL_BUNDLE_ARTIFACT_NAME}/universal-apple-darwin/release/bundle/${macosBundleType}" \
+              "s3://${AWS_BUCKET}/versions/${VERSION_TAG#v}/macos"
+          done
+
+          for linuxBundleType in 'appimage' 'deb' 'rpm'; do
+            aws s3 cp --recursive \
+              "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/${linuxBundleType}" \
+              "s3://${AWS_BUCKET}/versions/${VERSION_TAG#v}/linux"
+          done
+
+          for windowsBundleType in 'nsis'; do
+            aws s3 cp --recursive \
+              "${WINDOWS_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/${windowsBundleType}" \
+              "s3://${AWS_BUCKET}/versions/${VERSION_TAG#v}/windows"
+          done
+
+          aws s3 cp updates.json "s3://${AWS_BUCKET}"

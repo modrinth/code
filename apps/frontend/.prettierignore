@@ -1,3 +1,4 @@
 **/.nuxt
 **/dist
-**/node_modules
+**/.output
+src/generated/**

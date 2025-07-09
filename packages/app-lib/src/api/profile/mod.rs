@@ -1,33 +1,29 @@
 //! Theseus profile management interface
 
+use crate::event::LoadingBarType;
 use crate::event::emit::{
     emit_loading, init_loading, loading_try_for_each_concurrent,
 };
-use crate::event::LoadingBarType;
 use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
-use crate::prelude::{JavaVersion, ProfilePathId, ProjectPathId};
 use crate::state::{
-    Credentials, InnerProjectPathUnix, ProjectMetadata, SideType,
+    CacheBehaviour, CachedEntry, Credentials, JavaVersion, ProcessMetadata,
+    ProfileFile, ProfileInstallStage, ProjectType, SideType,
 };
 
+use crate::event::{ProfilePayloadType, emit::emit_profile};
 use crate::util::fetch;
 use crate::util::io::{self, IOError};
-use crate::{
-    event::{emit::emit_profile, ProfilePayloadType},
-    state::MinecraftChild,
-};
-pub use crate::{
-    state::{JavaSettings, Profile},
-    State,
-};
+pub use crate::{State, state::Profile};
 use async_zip::tokio::write::ZipFileWriter;
 use async_zip::{Compression, ZipEntryBuilder};
 use serde_json::json;
 
 use std::collections::{HashMap, HashSet};
 
+use crate::data::Settings;
+use dashmap::DashMap;
 use std::iter::FromIterator;
 use std::{
     future::Future,
@@ -40,207 +36,172 @@ use tokio::{fs::File, process::Command, sync::RwLock};
 pub mod create;
 pub mod update;
 
+#[derive(Debug, Clone)]
+pub enum QuickPlayType {
+    None,
+    Singleplayer(String),
+    Server(String),
+}
+
 /// Remove a profile
 #[tracing::instrument]
-pub async fn remove(path: &ProfilePathId) -> crate::Result<()> {
+pub async fn remove(path: &str) -> crate::Result<()> {
     let state = State::get().await?;
-    let mut profiles = state.profiles.write().await;
+    Profile::remove(path, &state.pool).await?;
 
-    if let Some(profile) = profiles.remove(path).await? {
-        emit_profile(
-            profile.uuid,
-            path,
-            &profile.metadata.name,
-            ProfilePayloadType::Removed,
-        )
-        .await?;
-    }
+    emit_profile(path, ProfilePayloadType::Removed).await?;
 
     Ok(())
 }
 
 /// Get a profile by relative path (or, name)
 #[tracing::instrument]
-pub async fn get(
-    path: &ProfilePathId,
-    clear_projects: Option<bool>,
-) -> crate::Result<Option<Profile>> {
+pub async fn get(path: &str) -> crate::Result<Option<Profile>> {
     let state = State::get().await?;
-    let profiles = state.profiles.read().await;
-    let mut profile = profiles.0.get(path).cloned();
-
-    if clear_projects.unwrap_or(false) {
-        if let Some(profile) = &mut profile {
-            profile.projects = HashMap::new();
-        }
-    }
+    let profile = Profile::get(path, &state.pool).await?;
 
     Ok(profile)
 }
 
-/// Get a profile by uuid
 #[tracing::instrument]
-pub async fn get_by_uuid(
-    uuid: uuid::Uuid,
-    clear_projects: Option<bool>,
-) -> crate::Result<Option<Profile>> {
+pub async fn get_many(paths: &[&str]) -> crate::Result<Vec<Profile>> {
+    let state = State::get().await?;
+    let profiles = Profile::get_many(paths, &state.pool).await?;
+    Ok(profiles)
+}
+
+#[tracing::instrument]
+pub async fn get_projects(
+    path: &str,
+    cache_behaviour: Option<CacheBehaviour>,
+) -> crate::Result<DashMap<String, ProfileFile>> {
     let state = State::get().await?;
 
-    let profiles = state.profiles.read().await;
-    let mut profile = profiles.0.values().find(|x| x.uuid == uuid).cloned();
+    if let Some(profile) = get(path).await? {
+        let files = profile
+            .get_projects(cache_behaviour, &state.pool, &state.api_semaphore)
+            .await?;
 
-    if clear_projects.unwrap_or(false) {
-        if let Some(profile) = &mut profile {
-            profile.projects = HashMap::new();
-        }
+        Ok(files)
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
+            .as_error())
     }
-
-    Ok(profile)
 }
 
 /// Get profile's full path in the filesystem
 #[tracing::instrument]
-pub async fn get_full_path(path: &ProfilePathId) -> crate::Result<PathBuf> {
-    let _ = get(path, Some(true)).await?.ok_or_else(|| {
-        crate::ErrorKind::OtherError(format!(
-            "Tried to get the full path of a nonexistent or unloaded profile at path {}!",
-            path
-        ))
-    })?;
-    let full_path = io::canonicalize(path.get_full_path().await?)?;
+pub async fn get_full_path(path: &str) -> crate::Result<PathBuf> {
+    let state = State::get().await?;
+    let profiles_dir = state.directories.profiles_dir();
+
+    let full_path = io::canonicalize(profiles_dir.join(path))?;
     Ok(full_path)
 }
 
 /// Get mod's full path in the filesystem
 #[tracing::instrument]
 pub async fn get_mod_full_path(
-    profile_path: &ProfilePathId,
-    project_path: &ProjectPathId,
+    profile_path: &str,
+    project_path: &str,
 ) -> crate::Result<PathBuf> {
-    if get(profile_path, Some(true)).await?.is_some() {
-        let full_path = io::canonicalize(
-            project_path.get_full_path(profile_path.clone()).await?,
-        )?;
-        return Ok(full_path);
-    }
+    let path = get_full_path(profile_path).await?;
 
-    Err(crate::ErrorKind::OtherError(format!(
-        "Tried to get the full path of a nonexistent or unloaded project at path {}!",
-        project_path.get_full_path(profile_path.clone()).await?.display()
-    ))
-    .into())
+    Ok(path.join(project_path))
 }
 
 /// Edit a profile using a given asynchronous closure
 pub async fn edit<Fut>(
-    path: &ProfilePathId,
+    path: &str,
     action: impl Fn(&mut Profile) -> Fut,
 ) -> crate::Result<()>
 where
     Fut: Future<Output = crate::Result<()>>,
 {
     let state = State::get().await?;
-    let mut profiles = state.profiles.write().await;
 
-    match profiles.0.get_mut(path) {
-        Some(ref mut profile) => {
-            action(profile).await?;
+    if let Some(mut profile) = get(path).await? {
+        action(&mut profile).await?;
+        profile.upsert(&state.pool).await?;
 
-            emit_profile(
-                profile.uuid,
-                path,
-                &profile.metadata.name,
-                ProfilePayloadType::Edited,
-            )
-            .await?;
+        emit_profile(path, ProfilePayloadType::Edited).await?;
 
-            Ok(())
-        }
-        None => Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
-            .as_error()),
+        Ok(())
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
+            .as_error())
     }
 }
 
 /// Edits a profile's icon
 pub async fn edit_icon(
-    path: &ProfilePathId,
+    path: &str,
     icon_path: Option<&Path>,
 ) -> crate::Result<()> {
     let state = State::get().await?;
 
-    let res = if let Some(icon) = icon_path {
-        let bytes = io::read(icon).await?;
+    if let Some(mut profile) = get(path).await? {
+        if let Some(icon) = icon_path {
+            let bytes = io::read(icon).await?;
 
-        let mut profiles = state.profiles.write().await;
-
-        match profiles.0.get_mut(path) {
-            Some(ref mut profile) => {
-                profile
-                    .set_icon(
-                        &state.directories.caches_dir(),
-                        &state.io_semaphore,
-                        bytes::Bytes::from(bytes),
-                        &icon.to_string_lossy(),
-                    )
-                    .await?;
-
-                emit_profile(
-                    profile.uuid,
-                    path,
-                    &profile.metadata.name,
-                    ProfilePayloadType::Edited,
+            profile
+                .set_icon(
+                    &state.directories.caches_dir(),
+                    &state.io_semaphore,
+                    bytes::Bytes::from(bytes),
+                    &icon.to_string_lossy(),
                 )
                 .await?;
-                Ok(())
-            }
-            None => {
-                Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
-                    .as_error())
-            }
+        } else {
+            profile.icon_path = None;
         }
-    } else {
-        edit(path, |profile| {
-            profile.metadata.icon = None;
-            async { Ok(()) }
-        })
-        .await?;
-        State::sync().await?;
+
+        profile.upsert(&state.pool).await?;
+
+        emit_profile(path, ProfilePayloadType::Edited).await?;
 
         Ok(())
-    };
-    State::sync().await?;
-    res
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
+            .as_error())
+    }
 }
 
 // Gets the optimal JRE key for the given profile, using Daedalus
 // Generally this would be used for profile_create, to get the optimal JRE key
 // this can be overwritten by the user a profile-by-profile basis
 pub async fn get_optimal_jre_key(
-    path: &ProfilePathId,
+    path: &str,
 ) -> crate::Result<Option<JavaVersion>> {
     let state = State::get().await?;
 
-    if let Some(profile) = get(path, None).await? {
-        let metadata = state.metadata.read().await;
+    if let Some(profile) = get(path).await? {
+        let minecraft = crate::api::metadata::get_minecraft_versions().await?;
 
         // Fetch version info from stored profile game_version
-        let version = metadata
-            .minecraft
+        let version = minecraft
             .versions
             .iter()
-            .find(|it| it.id == profile.metadata.game_version)
+            .find(|it| it.id == profile.game_version)
             .ok_or_else(|| {
                 crate::ErrorKind::LauncherError(format!(
                     "Invalid or unknown Minecraft version: {}",
-                    profile.metadata.game_version
+                    profile.game_version
                 ))
             })?;
+
+        let loader_version = crate::launcher::get_loader_version_from_profile(
+            &profile.game_version,
+            profile.loader,
+            profile.loader_version.as_deref(),
+        )
+        .await?;
 
         // Get detailed manifest info from Daedalus
         let version_info = crate::launcher::download::download_version_info(
             &state,
             version,
-            profile.metadata.loader_version.as_ref(),
+            loader_version.as_ref(),
             None,
             None,
         )
@@ -261,66 +222,60 @@ pub async fn get_optimal_jre_key(
 
 /// Get a copy of the profile set
 #[tracing::instrument]
-pub async fn list(
-    clear_projects: Option<bool>,
-) -> crate::Result<HashMap<ProfilePathId, Profile>> {
+pub async fn list() -> crate::Result<Vec<Profile>> {
     let state = State::get().await?;
-    let profiles = state.profiles.read().await;
-    Ok(profiles
-        .0
-        .clone()
-        .into_iter()
-        .map(|mut x| {
-            if clear_projects.unwrap_or(false) {
-                x.1.projects = HashMap::new();
-            }
-
-            x
-        })
-        .collect())
+    let profiles = Profile::get_all(&state.pool).await?;
+    Ok(profiles)
 }
 
 /// Installs/Repairs a profile
 #[tracing::instrument]
-pub async fn install(path: &ProfilePathId, force: bool) -> crate::Result<()> {
-    if let Some(profile) = get(path, None).await? {
-        crate::launcher::install_minecraft(&profile, None, force).await?;
+pub async fn install(path: &str, force: bool) -> crate::Result<()> {
+    if let Some(profile) = get(path).await? {
+        let result =
+            crate::launcher::install_minecraft(&profile, None, force).await;
+        if result.is_err()
+            && profile.install_stage != ProfileInstallStage::Installed
+        {
+            edit(path, |prof| {
+                prof.install_stage = ProfileInstallStage::NotInstalled;
+                async { Ok(()) }
+            })
+            .await?;
+        }
+        result?;
     } else {
         return Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
             .as_error());
     }
-    State::sync().await?;
     Ok(())
 }
 
 #[tracing::instrument]
-#[theseus_macros::debug_pin]
 pub async fn update_all_projects(
-    profile_path: &ProfilePathId,
-) -> crate::Result<HashMap<ProjectPathId, ProjectPathId>> {
-    if let Some(profile) = get(profile_path, None).await? {
+    profile_path: &str,
+) -> crate::Result<HashMap<String, String>> {
+    if let Some(profile) = get(profile_path).await? {
         let loading_bar = init_loading(
             LoadingBarType::ProfileUpdate {
-                profile_path: profile.get_profile_full_path().await?,
-                profile_name: profile.metadata.name.clone(),
+                profile_path: profile.path.clone(),
+                profile_name: profile.name.clone(),
             },
             100.0,
             "Updating profile",
         )
         .await?;
 
+        let state = State::get().await?;
         let keys = profile
-            .projects
+            .get_projects(
+                Some(CacheBehaviour::MustRevalidate),
+                &state.pool,
+                &state.api_semaphore,
+            )
+            .await?
             .into_iter()
-            .filter(|(_, project)| {
-                matches!(
-                    &project.metadata,
-                    ProjectMetadata::Modrinth {
-                        update_version: Some(_),
-                        ..
-                    }
-                )
-            })
+            .filter(|(_, project)| project.update_version_id.is_some())
             .map(|x| x.0)
             .collect::<Vec<_>>();
         let len = keys.len();
@@ -329,7 +284,7 @@ pub async fn update_all_projects(
 
         use futures::StreamExt;
         loading_try_for_each_concurrent(
-            futures::stream::iter(keys).map(Ok::<ProjectPathId, crate::Error>),
+            futures::stream::iter(keys).map(Ok::<String, crate::Error>),
             None,
             Some(&loading_bar),
             100.0,
@@ -352,14 +307,7 @@ pub async fn update_all_projects(
         )
         .await?;
 
-        emit_profile(
-            profile.uuid,
-            profile_path,
-            &profile.metadata.name,
-            ProfilePayloadType::Edited,
-        )
-        .await?;
-        State::sync().await?;
+        emit_profile(profile_path, ProfilePayloadType::Edited).await?;
 
         Ok(Arc::try_unwrap(map).unwrap().into_inner())
     } else {
@@ -373,59 +321,39 @@ pub async fn update_all_projects(
 /// Updates a project to the latest version
 /// Uses and returns the relative path to the project
 #[tracing::instrument]
-#[theseus_macros::debug_pin]
 pub async fn update_project(
-    profile_path: &ProfilePathId,
-    project_path: &ProjectPathId,
+    profile_path: &str,
+    project_path: &str,
     skip_send_event: Option<bool>,
-) -> crate::Result<ProjectPathId> {
-    if let Some(profile) = get(profile_path, None).await? {
-        if let Some(project) = profile.projects.get(project_path) {
-            if let ProjectMetadata::Modrinth {
-                update_version: Some(update_version),
-                ..
-            } = &project.metadata
-            {
-                let (path, new_version) = profile
-                    .add_project_version(update_version.id.clone())
-                    .await?;
+) -> crate::Result<String> {
+    if let Some(profile) = get(profile_path).await? {
+        let state = State::get().await?;
+        if let Some((_, file)) = profile
+            .get_projects(
+                Some(CacheBehaviour::MustRevalidate),
+                &state.pool,
+                &state.api_semaphore,
+            )
+            .await?
+            .remove(project_path)
+        {
+            if let Some(update_version) = &file.update_version_id {
+                let path = Profile::add_project_version(
+                    profile_path,
+                    update_version,
+                    &state.pool,
+                    &state.fetch_semaphore,
+                    &state.io_semaphore,
+                )
+                .await?;
 
-                if project.disabled {
-                    profile.toggle_disable_project(&path).await?;
+                if path != project_path {
+                    Profile::remove_project(profile_path, project_path).await?;
                 }
-
-                if path != project_path.clone() {
-                    profile.remove_project(project_path, Some(true)).await?;
-                }
-
-                let state = State::get().await?;
-                let mut profiles = state.profiles.write().await;
-                if let Some(profile) = profiles.0.get_mut(profile_path) {
-                    let value = profile.projects.remove(project_path);
-                    if let Some(mut project) = value {
-                        if let ProjectMetadata::Modrinth {
-                            ref mut version,
-                            ref mut update_version,
-                            ..
-                        } = project.metadata
-                        {
-                            *version = Box::new(new_version);
-                            *update_version = None;
-                        }
-                        profile.projects.insert(path.clone(), project);
-                    }
-                }
-                drop(profiles);
 
                 if !skip_send_event.unwrap_or(false) {
-                    emit_profile(
-                        profile.uuid,
-                        profile_path,
-                        &profile.metadata.name,
-                        ProfilePayloadType::Edited,
-                    )
-                    .await?;
-                    State::sync().await?;
+                    emit_profile(profile_path, ProfilePayloadType::Edited)
+                        .await?;
                 }
 
                 return Ok(path);
@@ -448,68 +376,53 @@ pub async fn update_project(
 /// Returns the relative path to the project as a ProjectPathId
 #[tracing::instrument]
 pub async fn add_project_from_version(
-    profile_path: &ProfilePathId,
-    version_id: String,
-) -> crate::Result<ProjectPathId> {
-    if let Some(profile) = get(profile_path, None).await? {
-        let (project_path, _) = profile.add_project_version(version_id).await?;
+    profile_path: &str,
+    version_id: &str,
+) -> crate::Result<String> {
+    let state = State::get().await?;
+    let project_path = Profile::add_project_version(
+        profile_path,
+        version_id,
+        &state.pool,
+        &state.fetch_semaphore,
+        &state.io_semaphore,
+    )
+    .await?;
 
-        emit_profile(
-            profile.uuid,
-            profile_path,
-            &profile.metadata.name,
-            ProfilePayloadType::Edited,
-        )
-        .await?;
-        Ok(project_path)
-    } else {
-        Err(
-            crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
-                .as_error(),
-        )
-    }
+    emit_profile(profile_path, ProfilePayloadType::Edited).await?;
+
+    Ok(project_path)
 }
 
 /// Add a project from an FS path
 /// Uses and returns the relative path to the project as a ProjectPathId
 #[tracing::instrument]
 pub async fn add_project_from_path(
-    profile_path: &ProfilePathId,
+    profile_path: &str,
     path: &Path,
-    project_type: Option<String>,
-) -> crate::Result<ProjectPathId> {
-    if let Some(profile) = get(profile_path, None).await? {
-        let file = io::read(path).await?;
-        let file_name = path
-            .file_name()
-            .unwrap_or_default()
-            .to_string_lossy()
-            .to_string();
+    project_type: Option<ProjectType>,
+) -> crate::Result<String> {
+    let state = State::get().await?;
 
-        let path = profile
-            .add_project_bytes(
-                &file_name,
-                bytes::Bytes::from(file),
-                project_type.and_then(|x| serde_json::from_str(&x).ok()),
-            )
-            .await?;
+    let file = io::read(path).await?;
+    let file_name = path
+        .file_name()
+        .unwrap_or_default()
+        .to_string_lossy()
+        .to_string();
 
-        emit_profile(
-            profile.uuid,
-            profile_path,
-            &profile.metadata.name,
-            ProfilePayloadType::Edited,
-        )
-        .await?;
-        State::sync().await?;
+    let path = Profile::add_project_bytes(
+        profile_path,
+        &file_name,
+        bytes::Bytes::from(file),
+        None,
+        project_type,
+        &state.io_semaphore,
+        &state.pool,
+    )
+    .await?;
 
-        Ok(path)
-    } else {
-        Err(
-            crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
-                .as_error(),
-        )
-    }
+    Ok(path)
 }
 
 /// Toggle whether a project is disabled or not
@@ -517,64 +430,35 @@ pub async fn add_project_from_path(
 /// returns the new state, relative to the profile
 #[tracing::instrument]
 pub async fn toggle_disable_project(
-    profile_path: &ProfilePathId,
-    project: &ProjectPathId,
-) -> crate::Result<ProjectPathId> {
-    if let Some(profile) = get(profile_path, None).await? {
-        let res = profile.toggle_disable_project(project).await?;
+    profile_path: &str,
+    project: &str,
+) -> crate::Result<String> {
+    let res = Profile::toggle_disable_project(profile_path, project).await?;
 
-        emit_profile(
-            profile.uuid,
-            profile_path,
-            &profile.metadata.name,
-            ProfilePayloadType::Edited,
-        )
-        .await?;
-        State::sync().await?;
+    emit_profile(profile_path, ProfilePayloadType::Edited).await?;
 
-        Ok(res)
-    } else {
-        Err(
-            crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
-                .as_error(),
-        )
-    }
+    Ok(res)
 }
 
 /// Remove a project from a profile
 /// Uses and returns the relative path to the project
 #[tracing::instrument]
 pub async fn remove_project(
-    profile_path: &ProfilePathId,
-    project: &ProjectPathId,
+    profile_path: &str,
+    project: &str,
 ) -> crate::Result<()> {
-    if let Some(profile) = get(profile_path, None).await? {
-        profile.remove_project(project, None).await?;
+    Profile::remove_project(profile_path, project).await?;
 
-        emit_profile(
-            profile.uuid,
-            profile_path,
-            &profile.metadata.name,
-            ProfilePayloadType::Edited,
-        )
-        .await?;
-        State::sync().await?;
+    emit_profile(profile_path, ProfilePayloadType::Edited).await?;
 
-        Ok(())
-    } else {
-        Err(
-            crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
-                .as_error(),
-        )
-    }
+    Ok(())
 }
 
 /// Exports the profile to a Modrinth-formatted .mrpack file
 // Version ID of uploaded version (ie 1.1.5), not the unique identifying ID of the version (nvrqJg44)
 #[tracing::instrument(skip_all)]
-#[theseus_macros::debug_pin]
 pub async fn export_mrpack(
-    profile_path: &ProfilePathId,
+    profile_path: &str,
     export_path: PathBuf,
     included_export_candidates: Vec<String>, // which folders/files to include in the export
     version_id: Option<String>,
@@ -582,12 +466,11 @@ pub async fn export_mrpack(
     _name: Option<String>,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let io_semaphore = state.io_semaphore.0.read().await;
-    let _permit: tokio::sync::SemaphorePermit = io_semaphore.acquire().await?;
-    let profile = get(profile_path, None).await?.ok_or_else(|| {
+    let _permit: tokio::sync::SemaphorePermit =
+        state.io_semaphore.0.acquire().await?;
+    let profile = get(profile_path).await?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
-            "Tried to export a nonexistent or unloaded profile at path {}!",
-            profile_path
+            "Tried to export a nonexistent or unloaded profile at path {profile_path}!"
         ))
     })?;
 
@@ -604,7 +487,7 @@ pub async fn export_mrpack(
         })
         .collect::<Vec<_>>();
 
-    let profile_base_path = &profile.get_profile_full_path().await?;
+    let profile_base_path = get_full_path(profile_path).await?;
 
     let mut file = File::create(&export_path)
         .await
@@ -617,19 +500,19 @@ pub async fn export_mrpack(
         create_mrpack_json(&profile, version_id, description).await?;
     let included_candidates_set =
         HashSet::<_>::from_iter(included_export_candidates.iter());
-    packfile.files.retain(|f| {
-        included_candidates_set.contains(&f.path.get_topmost_two_components())
-    });
+    packfile
+        .files
+        .retain(|f| included_candidates_set.contains(&f.path));
 
     // Build vec of all files in the folder
     let mut path_list = Vec::new();
-    add_all_recursive_folder_paths(profile_base_path, &mut path_list).await?;
+    add_all_recursive_folder_paths(&profile_base_path, &mut path_list).await?;
 
     // Initialize loading bar
     let loading_bar = init_loading(
         LoadingBarType::ZipExtract {
-            profile_path: profile.get_profile_full_path().await?,
-            profile_name: profile.metadata.name.clone(),
+            profile_path: profile.path.clone(),
+            profile_name: profile.name.clone(),
         },
         path_list.len() as f64,
         "Exporting profile to .mrpack",
@@ -639,14 +522,14 @@ pub async fn export_mrpack(
     // Iterate over every file in the folder
     // Every file that is NOT in the config file is added to the zip, in overrides
     for path in path_list {
-        emit_loading(&loading_bar, 1.0, None).await?;
+        emit_loading(&loading_bar, 1.0, None)?;
 
-        let relative_path = ProjectPathId::from_fs_path(&path)
-            .await?
-            .get_inner_path_unix();
+        let relative_path = pack_get_relative_path(&profile_base_path, &path)?;
+
         if packfile.files.iter().any(|f| f.path == relative_path)
             || !included_candidates_set
-                .contains(&relative_path.get_topmost_two_components())
+                .iter()
+                .any(|x| relative_path.starts_with(&**x))
         {
             continue;
         }
@@ -692,26 +575,18 @@ pub async fn export_mrpack(
 // => [folder1, folder2/innerfolder, folder2/folder2file, file1]
 #[tracing::instrument]
 pub async fn get_pack_export_candidates(
-    profile_path: &ProfilePathId,
-) -> crate::Result<Vec<InnerProjectPathUnix>> {
-    // First, get a dummy mrpack json for the files within
-    let profile: Profile = get(profile_path, None).await?.ok_or_else(|| {
-        crate::ErrorKind::OtherError(format!(
-            "Tried to export a nonexistent or unloaded profile at path {}!",
-            profile_path
-        ))
-    })?;
+    profile_path: &str,
+) -> crate::Result<Vec<String>> {
+    let mut path_list: Vec<String> = Vec::new();
 
-    let mut path_list: Vec<InnerProjectPathUnix> = Vec::new();
-
-    let profile_base_dir = profile.get_profile_full_path().await?;
+    let profile_base_dir = get_full_path(profile_path).await?;
     let mut read_dir = io::read_dir(&profile_base_dir).await?;
     while let Some(entry) = read_dir
         .next_entry()
         .await
         .map_err(|e| IOError::with_path(e, &profile_base_dir))?
     {
-        let path: PathBuf = entry.path();
+        let path = entry.path();
         if path.is_dir() {
             // Two layers of files/folders if its a folder
             let mut read_dir = io::read_dir(&path).await?;
@@ -720,70 +595,80 @@ pub async fn get_pack_export_candidates(
                 .await
                 .map_err(|e| IOError::with_path(e, &profile_base_dir))?
             {
-                let path: PathBuf = entry.path();
-                if let Ok(project_path) =
-                    ProjectPathId::from_fs_path(&path).await
-                {
-                    path_list.push(project_path.get_inner_path_unix());
-                }
+                path_list.push(pack_get_relative_path(
+                    &profile_base_dir,
+                    &entry.path(),
+                )?);
             }
         } else {
             // One layer of files/folders if its a file
-            if let Ok(project_path) = ProjectPathId::from_fs_path(&path).await {
-                path_list.push(project_path.get_inner_path_unix());
-            }
+            path_list.push(pack_get_relative_path(&profile_base_dir, &path)?);
         }
     }
     Ok(path_list)
+}
+
+fn pack_get_relative_path(
+    profile_path: &PathBuf,
+    path: &PathBuf,
+) -> crate::Result<String> {
+    Ok(path
+        .strip_prefix(profile_path)
+        .map_err(|_| {
+            crate::ErrorKind::FSError(format!(
+                "Path {path:?} does not correspond to a profile"
+            ))
+        })?
+        .components()
+        .map(|c| c.as_os_str().to_string_lossy().to_string())
+        .collect::<Vec<_>>()
+        .join("/"))
 }
 
 /// Run Minecraft using a profile and the default credentials, logged in credentials,
 /// failing with an error if no credentials are available
 #[tracing::instrument]
 pub async fn run(
-    path: &ProfilePathId,
-) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
+    path: &str,
+    quick_play_type: &QuickPlayType,
+) -> crate::Result<ProcessMetadata> {
     let state = State::get().await?;
 
-    // Get default account and refresh credentials (preferred way to log in)
-    let default_account = {
-        let mut write = state.users.write().await;
+    let default_account = Credentials::get_default_credential(&state.pool)
+        .await?
+        .ok_or_else(|| crate::ErrorKind::NoCredentialsError.as_error())?;
 
-        write
-            .get_default_credential()
-            .await?
-            .ok_or_else(|| crate::ErrorKind::NoCredentialsError.as_error())?
-    };
-
-    run_credentials(path, &default_account).await
+    run_credentials(path, &default_account, quick_play_type).await
 }
 
 /// Run Minecraft using a profile, and credentials for authentication
-/// Returns Arc pointer to RwLock to Child
 #[tracing::instrument(skip(credentials))]
-#[theseus_macros::debug_pin]
-pub async fn run_credentials(
-    path: &ProfilePathId,
+async fn run_credentials(
+    path: &str,
     credentials: &Credentials,
-) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
+    quick_play_type: &QuickPlayType,
+) -> crate::Result<ProcessMetadata> {
     let state = State::get().await?;
-    let settings = state.settings.read().await;
-    let profile = get(path, None).await?.ok_or_else(|| {
+    let settings = Settings::get(&state.pool).await?;
+    let profile = get(path).await?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
-            "Tried to run a nonexistent or unloaded profile at path {}!",
-            path
+            "Tried to run a nonexistent or unloaded profile at path {path}!"
         ))
     })?;
 
-    let pre_launch_hooks =
-        &profile.hooks.as_ref().unwrap_or(&settings.hooks).pre_launch;
+    let pre_launch_hooks = profile
+        .hooks
+        .pre_launch
+        .as_ref()
+        .or(settings.hooks.pre_launch.as_ref())
+        .filter(|hook_command| !hook_command.is_empty());
     if let Some(hook) = pre_launch_hooks {
         // TODO: hook parameters
         let mut cmd = hook.split(' ');
         if let Some(command) = cmd.next() {
-            let full_path = path.get_full_path().await?;
+            let full_path = get_full_path(&profile.path).await?;
             let result = Command::new(command)
-                .args(&cmd.collect::<Vec<&str>>())
+                .args(cmd)
                 .current_dir(&full_path)
                 .spawn()
                 .map_err(|e| IOError::with_path(e, &full_path))?
@@ -802,36 +687,37 @@ pub async fn run_credentials(
     }
 
     let java_args = profile
-        .java
-        .as_ref()
-        .and_then(|it| it.extra_arguments.as_ref())
-        .unwrap_or(&settings.custom_java_args);
+        .extra_launch_args
+        .clone()
+        .unwrap_or(settings.extra_launch_args);
 
     let wrapper = profile
         .hooks
-        .as_ref()
-        .map_or(&settings.hooks.wrapper, |it| &it.wrapper);
+        .wrapper
+        .clone()
+        .or(settings.hooks.wrapper)
+        .filter(|hook_command| !hook_command.is_empty());
 
     let memory = profile.memory.unwrap_or(settings.memory);
-    let resolution = profile.resolution.unwrap_or(settings.game_resolution);
+    let resolution =
+        profile.game_resolution.unwrap_or(settings.game_resolution);
 
     let env_args = profile
-        .java
-        .as_ref()
-        .and_then(|x| x.custom_env_args.as_ref())
-        .unwrap_or(&settings.custom_env_args);
+        .custom_env_vars
+        .clone()
+        .unwrap_or(settings.custom_env_vars);
 
     // Post post exit hooks
     let post_exit_hook = profile
         .hooks
-        .as_ref()
-        .unwrap_or(&settings.hooks)
         .post_exit
-        .clone();
+        .clone()
+        .or(settings.hooks.post_exit)
+        .filter(|hook_command| !hook_command.is_empty());
 
     // Any options.txt settings that we want set, add here
     let mut mc_set_options: Vec<(String, String)> = vec![];
-    if let Some(fullscreen) = profile.fullscreen {
+    if let Some(fullscreen) = profile.force_fullscreen {
         // Profile fullscreen setting takes priority
         mc_set_options.push(("fullscreen".to_string(), fullscreen.to_string()));
     } else if settings.force_fullscreen {
@@ -839,60 +725,72 @@ pub async fn run_credentials(
         mc_set_options.push(("fullscreen".to_string(), "true".to_string()));
     }
 
-    let mc_process = crate::launcher::launch_minecraft(
-        java_args,
-        env_args,
+    crate::launcher::launch_minecraft(
+        &java_args,
+        &env_args,
         &mc_set_options,
-        wrapper,
+        &wrapper,
         &memory,
         &resolution,
         credentials,
         post_exit_hook,
         &profile,
+        quick_play_type,
     )
-    .await?;
-    Ok(mc_process)
+    .await
+}
+
+pub async fn kill(path: &str) -> crate::Result<()> {
+    let state = State::get().await?;
+    let processes = crate::api::process::get_by_profile_path(path).await?;
+
+    for process in processes {
+        state.process_manager.kill(process.uuid).await?;
+    }
+
+    Ok(())
 }
 
 /// Update playtime- sending a request to the server to update the playtime
 #[tracing::instrument]
-#[theseus_macros::debug_pin]
-pub async fn try_update_playtime(path: &ProfilePathId) -> crate::Result<()> {
+pub async fn try_update_playtime(path: &str) -> crate::Result<()> {
     let state = State::get().await?;
 
-    let profile = get(path, None).await?.ok_or_else(|| {
+    let profile = get(path).await?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
-            "Tried to update playtime for a nonexistent or unloaded profile at path {}!",
-            path
+            "Tried to update playtime for a nonexistent or unloaded profile at path {path}!"
         ))
     })?;
-    let updated_recent_playtime = profile.metadata.recent_time_played;
+    let updated_recent_playtime = profile.recent_time_played;
 
     let res = if updated_recent_playtime > 0 {
         // Create update struct to send to Labrinth
         let modrinth_pack_version_id =
-            profile.metadata.linked_data.and_then(|l| l.version_id);
+            profile.linked_data.as_ref().map(|l| l.version_id.clone());
         let playtime_update_json = json!({
             "seconds": updated_recent_playtime,
-            "loader": profile.metadata.loader.to_string(),
-            "game_version": profile.metadata.game_version,
+            "loader": profile.loader.as_str(),
+            "game_version": profile.game_version,
             "parent": modrinth_pack_version_id,
         });
         // Copy this struct for every Modrinth project in the profile
         let mut hashmap: HashMap<String, serde_json::Value> = HashMap::new();
-        for (_, project) in profile.projects {
-            if let ProjectMetadata::Modrinth { version, .. } = project.metadata
-            {
-                hashmap.insert(version.id, playtime_update_json.clone());
+
+        for (_, project) in profile
+            .get_projects(None, &state.pool, &state.api_semaphore)
+            .await?
+        {
+            if let Some(metadata) = project.metadata {
+                hashmap
+                    .insert(metadata.version_id, playtime_update_json.clone());
             }
         }
 
-        let creds = state.credentials.read().await;
         fetch::post_json(
             "https://api.modrinth.com/analytics/playtime",
             serde_json::to_value(hashmap)?,
-            &state.fetch_semaphore,
-            &creds,
+            &state.api_semaphore,
+            &state.pool,
         )
         .await
     } else {
@@ -901,14 +799,14 @@ pub async fn try_update_playtime(path: &ProfilePathId) -> crate::Result<()> {
 
     // If successful, update the profile metadata to match submitted
     if res.is_ok() {
-        let mut profiles = state.profiles.write().await;
-        if let Some(profile) = profiles.0.get_mut(path) {
-            profile.metadata.submitted_time_played += updated_recent_playtime;
-            profile.metadata.recent_time_played = 0;
-        }
+        edit(&profile.path, |prof| {
+            prof.submitted_time_played += updated_recent_playtime;
+            prof.recent_time_played = 0;
+
+            async { Ok(()) }
+        })
+        .await?;
     }
-    // Sync either way
-    State::sync().await?;
 
     res
 }
@@ -923,136 +821,103 @@ pub async fn create_mrpack_json(
 ) -> crate::Result<PackFormat> {
     // Add loader version to dependencies
     let mut dependencies = HashMap::new();
-    match (
-        profile.metadata.loader,
-        profile.metadata.loader_version.clone(),
-    ) {
+    match (profile.loader, profile.loader_version.clone()) {
         (crate::prelude::ModLoader::Forge, Some(v)) => {
-            dependencies.insert(PackDependency::Forge, v.id)
+            dependencies.insert(PackDependency::Forge, v)
         }
         (crate::prelude::ModLoader::NeoForge, Some(v)) => {
-            dependencies.insert(PackDependency::NeoForge, v.id)
+            dependencies.insert(PackDependency::NeoForge, v)
         }
         (crate::prelude::ModLoader::Fabric, Some(v)) => {
-            dependencies.insert(PackDependency::FabricLoader, v.id)
+            dependencies.insert(PackDependency::FabricLoader, v)
         }
         (crate::prelude::ModLoader::Quilt, Some(v)) => {
-            dependencies.insert(PackDependency::QuiltLoader, v.id)
+            dependencies.insert(PackDependency::QuiltLoader, v)
         }
         (crate::prelude::ModLoader::Vanilla, _) => None,
         _ => {
             return Err(crate::ErrorKind::OtherError(
                 "Loader version mismatch".to_string(),
             )
-            .into())
+            .into());
         }
     };
-    dependencies.insert(
-        PackDependency::Minecraft,
-        profile.metadata.game_version.clone(),
-    );
+    dependencies
+        .insert(PackDependency::Minecraft, profile.game_version.clone());
 
-    // Converts a HashMap<String, String> to a HashMap<String, String>
-    // But the values are sanitized to only include the version number
-    let dependencies = dependencies
+    let state = State::get().await?;
+    let projects = profile
+        .get_projects(
+            Some(CacheBehaviour::MustRevalidate),
+            &state.pool,
+            &state.api_semaphore,
+        )
+        .await?
         .into_iter()
-        .map(|(k, v)| (k, sanitize_loader_version_string(&v, k).to_string()))
-        .collect::<HashMap<_, _>>();
-
-    let files: Result<Vec<PackFile>, crate::ErrorKind> = profile
-        .projects
-        .iter()
-        .filter_map(|(mod_path, project)| {
-            let path = mod_path.get_inner_path_unix();
-
-            // Only Modrinth projects have a modrinth metadata field for the modrinth.json
-            Some(Ok(match project.metadata {
-                crate::prelude::ProjectMetadata::Modrinth {
-                    ref version,
-                    ..
-                } => {
-                    let mut env = HashMap::new();
-                    // TODO: envtype should be a controllable option (in general or at least .mrpack exporting)
-                    // For now, assume required.
-                    // env.insert(EnvType::Client, project.client_side.clone());
-                    // env.insert(EnvType::Server, project.server_side.clone());
-                    env.insert(EnvType::Client, SideType::Required);
-                    env.insert(EnvType::Server, SideType::Required);
-
-                    let primary_file = if let Some(primary_file) =
-                        version.files.first()
-                    {
-                        primary_file
-                    } else {
-                        return Some(Err(crate::ErrorKind::OtherError(
-                            format!("No primary file found for mod at: {path}"),
-                        )));
-                    };
-
-                    let file_size = primary_file.size;
-                    let downloads = vec![primary_file.url.clone()];
-                    let hashes = primary_file
-                        .hashes
-                        .clone()
-                        .into_iter()
-                        .map(|(h1, h2)| (PackFileHash::from(h1), h2))
-                        .collect();
-
-                    PackFile {
-                        path,
-                        hashes,
-                        env: Some(env),
-                        downloads,
-                        file_size,
-                    }
-                }
-                // Inferred files are skipped for the modrinth.json
-                crate::prelude::ProjectMetadata::Inferred { .. } => {
-                    return None
-                }
-                // Unknown projects are skipped for the modrinth.json
-                crate::prelude::ProjectMetadata::Unknown => return None,
-            }))
+        .filter_map(|(path, file)| match file.metadata {
+            Some(metadata) => Some((path, metadata.version_id)),
+            _ => None,
         })
-        .collect();
-    let files = files?;
+        .collect::<Vec<_>>();
+    let versions = CachedEntry::get_version_many(
+        &projects.iter().map(|x| &*x.1).collect::<Vec<_>>(),
+        None,
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?;
+
+    let files = projects
+        .into_iter()
+        .filter_map(|(path, version_id)| {
+            if let Some(version) = versions.iter().find(|x| x.id == version_id)
+            {
+                let mut env = HashMap::new();
+                // TODO: envtype should be a controllable option (in general or at least .mrpack exporting)
+                // For now, assume required.
+                // env.insert(EnvType::Client, project.client_side.clone());
+                // env.insert(EnvType::Server, project.server_side.clone());
+                env.insert(EnvType::Client, SideType::Required);
+                env.insert(EnvType::Server, SideType::Required);
+
+                let Some(primary_file) = version.files.first() else {
+                    return Some(Err(crate::ErrorKind::OtherError(format!(
+                        "No primary file found for mod at: {path}"
+                    ))
+                    .as_error()));
+                };
+
+                let file_size = primary_file.size;
+                let downloads = vec![primary_file.url.clone()];
+                let hashes = primary_file
+                    .hashes
+                    .clone()
+                    .into_iter()
+                    .map(|(h1, h2)| (PackFileHash::from(h1), h2))
+                    .collect();
+
+                Some(Ok(PackFile {
+                    path,
+                    hashes,
+                    env: Some(env),
+                    downloads,
+                    file_size,
+                }))
+            } else {
+                None
+            }
+        })
+        .collect::<crate::Result<Vec<PackFile>>>()?;
 
     Ok(PackFormat {
         game: "minecraft".to_string(),
         format_version: 1,
         version_id,
-        name: profile.metadata.name.clone(),
+        name: profile.name.clone(),
         summary: description,
         files,
         dependencies,
     })
-}
-
-fn sanitize_loader_version_string(s: &str, loader: PackDependency) -> &str {
-    match loader {
-        // Split on '-'
-        // If two or more, take the second
-        // If one, take the first
-        // If none, take the whole thing
-        PackDependency::Forge | PackDependency::NeoForge => {
-            if s.starts_with("1.") {
-                let mut split: std::str::Split<'_, char> = s.split('-');
-                match split.next() {
-                    Some(first) => match split.next() {
-                        Some(second) => second,
-                        None => first,
-                    },
-                    None => s,
-                }
-            } else {
-                s
-            }
-        }
-        // For quilt, etc we take the whole thing, as it functions like: 0.20.0-beta.11 (and should not be split here)
-        PackDependency::QuiltLoader
-        | PackDependency::FabricLoader
-        | PackDependency::Minecraft => s,
-    }
 }
 
 // Given a folder path, populate a Vec of all the files in the folder, recursively
@@ -1078,5 +943,8 @@ pub async fn add_all_recursive_folder_paths(
 }
 
 pub fn sanitize_profile_name(input: &str) -> String {
-    input.replace(['/', '\\', '?', '*', ':', '\'', '\"', '|', '<', '>'], "_")
+    input.replace(
+        ['/', '\\', '?', '*', ':', '\'', '\"', '|', '<', '>', '!'],
+        "_",
+    )
 }

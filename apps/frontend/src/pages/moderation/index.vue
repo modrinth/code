@@ -32,7 +32,7 @@
   </div>
 </template>
 <script setup>
-import { formatNumber } from "~/plugins/shorthands.js";
+import { formatNumber } from "@modrinth/utils";
 
 useHead({
   title: "Staff overview - Modrinth",

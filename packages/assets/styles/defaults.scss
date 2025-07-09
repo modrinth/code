@@ -59,14 +59,18 @@ textarea,
   padding: 0.5rem 1rem;
   font-weight: var(--font-weight-medium);
   transition: box-shadow 0.1s ease-in-out;
-  min-height: 40px;
-  box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
+  min-height: 36px;
+  box-shadow:
+    var(--shadow-inset-sm),
+    0 0 0 0 transparent;
   border: none;
   outline: none;
 
   &:focus,
   &:focus-visible {
-    box-shadow: inset 0 0 0 transparent, 0 0 0 0.25rem var(--color-brand-shadow);
+    box-shadow:
+      inset 0 0 0 transparent,
+      0 0 0 0.25rem var(--color-brand-shadow);
     color: var(--color-contrast);
     outline: none;
   }
@@ -131,7 +135,7 @@ input[type='number'] {
   position: relative;
 
   input {
-    padding: 0 2.5rem;
+    padding: 0 0.5rem 0 2.5rem;
     width: 100%;
   }
 
@@ -155,7 +159,7 @@ input[type='number'] {
     @extend .transparent, .icon-only;
 
     position: absolute;
-    right: 0.25rem;
+    right: 0.125rem;
     z-index: 1;
 
     svg {
@@ -178,7 +182,10 @@ svg {
 }
 
 .button-animation {
-  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, transform 0.05s ease-in-out,
+  transition:
+    opacity 0.5s ease-in-out,
+    filter 0.2s ease-in-out,
+    transform 0.05s ease-in-out,
     outline 0.2s ease-in-out;
 
   &:active:not(&:disabled) {

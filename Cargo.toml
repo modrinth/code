@@ -1,27 +1,233 @@
 [workspace]
-resolver = '2'
+resolver = "2"
 members = [
-  './packages/app-lib',
-  './packages/app-macros',
-	'./apps/app-playground',
-  './apps/app/src-tauri'
+  "apps/app",
+  "apps/app-playground",
+  "apps/daedalus_client",
+  "apps/labrinth",
+  "packages/app-lib",
+  "packages/ariadne",
+  "packages/daedalus",
 ]
 
-[profile.dev]
-opt-level = 0
-debug = true
-debug-assertions = true
-overflow-checks = true
-lto = false
-panic = 'unwind'
-incremental = true
-codegen-units = 256
-rpath = false
+[workspace.package]
+edition = "2024"
+
+[workspace.dependencies]
+actix-cors = "0.7.1"
+actix-files = "0.6.6"
+actix-http = "3.11.0"
+actix-multipart = "0.7.2"
+actix-rt = "2.10.0"
+actix-web = "4.11.0"
+actix-web-prom = "0.10.0"
+actix-ws = "0.3.0"
+argon2 = { version = "0.5.3", features = ["std"] }
+ariadne = { path = "packages/ariadne" }
+async_zip = "0.0.17"
+async-compression = { version = "0.4.25", default-features = false }
+async-recursion = "1.1.1"
+async-stripe = { version = "0.41.0", default-features = false, features = [
+  "runtime-tokio-hyper-rustls",
+] }
+async-trait = "0.1.88"
+async-tungstenite = { version = "0.29.1", default-features = false, features = [
+  "futures-03-sink",
+] }
+async-walkdir = "2.1.0"
+base64 = "0.22.1"
+bitflags = "2.9.1"
+bytemuck = "1.23.0"
+bytes = "1.10.1"
+censor = "0.3.0"
+chardetng = "0.1.17"
+chrono = "0.4.41"
+clap = "4.5.40"
+clickhouse = "0.13.3"
+color-thief = "0.2.2"
+console-subscriber = "0.4.1"
+daedalus = { path = "packages/daedalus" }
+dashmap = "6.1.0"
+data-url = "0.3.1"
+deadpool-redis = "0.21.1"
+dirs = "6.0.0"
+discord-rich-presence = "0.2.5"
+dotenv-build = "0.1.1"
+dotenvy = "0.15.7"
+dunce = "1.0.5"
+either = "1.15.0"
+encoding_rs = "0.8.35"
+enumset = "1.1.6"
+flate2 = "1.1.2"
+fs4 = { version = "0.13.1", default-features = false }
+futures = { version = "0.3.31", default-features = false }
+futures-util = "0.3.31"
+hashlink = "0.10.0"
+heck = "0.5.0"
+hex = "0.4.3"
+hickory-resolver = "0.25.2"
+hmac = "0.12.1"
+hyper-tls = "0.6.0"
+hyper-util = "0.1.14"
+iana-time-zone = "0.1.63"
+image = { version = "0.25.6", default-features = false, features = ["rayon"] }
+indexmap = "2.9.0"
+indicatif = "0.17.11"
+itertools = "0.14.0"
+jemalloc_pprof = "0.7.0"
+json-patch = { version = "4.0.0", default-features = false }
+lettre = { version = "0.11.17", default-features = false, features = [
+  "builder",
+  "hostname",
+  "pool",
+  "ring",
+  "rustls",
+  "rustls-native-certs",
+  "smtp-transport",
+] }
+maxminddb = "0.26.0"
+meilisearch-sdk = { version = "0.28.0", default-features = false }
+murmur2 = "0.1.0"
+native-dialog = "0.9.0"
+notify = { version = "8.0.0", default-features = false }
+notify-debouncer-mini = { version = "0.6.0", default-features = false }
+p256 = "0.13.2"
+paste = "1.0.15"
+png = "0.17.16"
+prometheus = "0.14.0"
+quartz_nbt = "0.2.9"
+quick-xml = "0.37.5"
+rand = "=0.8.5"  # Locked on 0.8 until argon2 and p256 update to 0.9
+rand_chacha = "=0.3.1"  # Locked on 0.3 until we can update rand to 0.9
+redis = "=0.31.0"  # Locked on 0.31 until deadpool-redis updates to 0.32
+regex = "1.11.1"
+reqwest = { version = "0.12.20", default-features = false }
+rgb = "0.8.50"
+rust_decimal = { version = "1.37.2", features = [
+  "serde-with-float",
+  "serde-with-str",
+] }
+rust_iso3166 = "0.1.14"
+rust-s3 = { version = "0.35.1", default-features = false, features = [
+  "fail-on-err",
+  "tags",
+  "tokio-rustls-tls",
+] }
+rusty-money = "0.4.1"
+sentry = { version = "0.41.0", default-features = false, features = [
+  "backtrace",
+  "contexts",
+  "debug-images",
+  "panic",
+  "reqwest",
+  "rustls",
+] }
+sentry-actix = "0.41.0"
+serde = "1.0.219"
+serde_bytes = "0.11.17"
+serde_cbor = "0.11.2"
+serde_ini = "0.2.0"
+serde_json = "1.0.140"
+serde_with = "3.13.0"
+serde-xml-rs = "0.8.1"  # Also an XML (de)serializer, consider dropping yaserde in favor of this
+sha1 = "0.10.6"
+sha1_smol = { version = "1.0.1", features = ["std"] }
+sha2 = "0.10.9"
+spdx = "0.10.8"
+sqlx = { version = "0.8.6", default-features = false }
+sysinfo = { version = "0.35.2", default-features = false }
+tar = "0.4.44"
+tauri = "2.6.1"
+tauri-build = "2.3.0"
+tauri-plugin-deep-link = "2.4.0"
+tauri-plugin-dialog = "2.3.0"
+tauri-plugin-http = "2.5.0"
+tauri-plugin-opener = "2.4.0"
+tauri-plugin-os = "2.3.0"
+tauri-plugin-single-instance = "2.3.0"
+tauri-plugin-updater = { version = "2.9.0", default-features = false, features = [
+  "rustls-tls",
+  "zip",
+] }
+tauri-plugin-window-state = "2.3.0"
+tempfile = "3.20.0"
+theseus = { path = "packages/app-lib" }
+thiserror = "2.0.12"
+tikv-jemalloc-ctl = "0.6.0"
+tikv-jemallocator = "0.6.0"
+tokio = "1.45.1"
+tokio-stream = "0.1.17"
+tokio-util = "0.7.15"
+totp-rs = "5.7.0"
+tracing = "0.1.41"
+tracing-actix-web = "0.7.18"
+tracing-error = "0.2.1"
+tracing-subscriber = "0.3.19"
+url = "2.5.4"
+urlencoding = "2.1.3"
+uuid = "1.17.0"
+validator = "0.20.0"
+webp = { version = "0.3.0", default-features = false }
+whoami = "1.6.0"
+winreg = "0.55.0"
+woothee = "0.13.0"
+yaserde = "0.12.0"
+zip = { version = "4.2.0", default-features = false, features = [
+  "bzip2",
+  "deflate",
+  "deflate64",
+  "zstd",
+] }
+zxcvbn = "3.1.0"
+
+[workspace.lints.clippy]
+bool_to_int_with_if = "warn"
+borrow_as_ptr = "warn"
+cfg_not_test = "warn"
+clear_with_drain = "warn"
+cloned_instead_of_copied = "warn"
+collection_is_never_read = "warn"
+dbg_macro = "warn"
+default_trait_access = "warn"
+explicit_iter_loop = "warn"
+filter_map_next = "warn"
+flat_map_option = "warn"
+format_push_string = "warn"
+get_unwrap = "warn"
+large_include_file = "warn"
+large_stack_arrays = "warn"
+manual_assert = "warn"
+manual_instant_elapsed = "warn"
+manual_is_variant_and = "warn"
+manual_let_else = "warn"
+map_unwrap_or = "warn"
+match_bool = "warn"
+needless_collect = "warn"
+negative_feature_names = "warn"
+non_std_lazy_statics = "warn"
+pathbuf_init_then_push = "warn"
+read_zero_byte_vec = "warn"
+redundant_clone = "warn"
+redundant_feature_names = "warn"
+redundant_type_annotations = "warn"
+todo = "warn"
+unnested_or_patterns = "warn"
+wildcard_dependencies = "warn"
+
+[workspace.lints.rust]
+# Turn warnings into errors by default
+warnings = "deny"
+
+[patch.crates-io]
+wry = { git = "https://github.com/modrinth/wry", rev = "21db186" }
 
 # Optimize for speed and reduce size on release builds
 [profile.release]
-panic = "abort" # Strip expensive panic clean-up logic
-codegen-units = 1 # Compile crates one after another so the compiler can optimize better
-lto = true # Enables link to optimizations
-opt-level = "s" # Optimize for binary size
-strip = true # Remove debug symbols
+opt-level = "s"  # Optimize for binary size
+strip = true  # Remove debug symbols
+lto = true  # Enables link to optimizations
+panic = "abort"  # Strip expensive panic clean-up logic
+codegen-units = 1  # Compile crates one after another so the compiler can optimize better
+
+[profile.dev.package.sqlx-macros]
+opt-level = 3

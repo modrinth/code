@@ -48,6 +48,12 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  onHide: {
+    type: Function,
+    default() {
+      return () => {}
+    },
+  },
 })
 
 const shown = ref(false)
@@ -61,6 +67,7 @@ function show() {
 }
 
 function hide() {
+  props.onHide?.()
   actuallyShown.value = false
   setTimeout(() => {
     shown.value = false
@@ -141,8 +148,9 @@ defineExpose({
     position: fixed;
     box-shadow: var(--shadow-raised), var(--shadow-inset);
     border-radius: var(--radius-lg);
+    background-color: var(--color-raised-bg);
     max-height: calc(100% - 2 * var(--gap-lg));
-    overflow-y: auto;
+    overflow-y: visible;
     width: 600px;
     pointer-events: auto;
 
@@ -157,10 +165,6 @@ defineExpose({
         font-weight: bold;
         font-size: 1.25rem;
       }
-    }
-
-    .content {
-      background-color: var(--color-raised-bg);
     }
 
     transform: translateY(50vh);
