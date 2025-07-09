@@ -397,9 +397,10 @@ onMounted(() => {
 
         const selection = view.state.selection.main
         const selectionText = view.state.doc.sliceString(selection.from, selection.to)
-        const linkText = selectionText ? selectionText : url
-        const linkMarkdown = `[${linkText}](${url})`
-        return markdownCommands.replaceSelection(view, linkMarkdown)
+        if (selectionText) {
+          const linkMarkdown = `[${selectionText}](${url})`
+          return markdownCommands.replaceSelection(view, linkMarkdown)
+        }
       }
 
       // Check if the length of the document is greater than the max length. If it is, prevent the paste.
