@@ -8,7 +8,7 @@
               v-for="snapPoint in snapPoints"
               :key="snapPoint"
               class="snap-point"
-              :class="{ green: snapPoint <= currentValue }"
+              :class="{ green: snapPoint <= currentValue, 'opacity-0': disabled }"
               :style="{ left: ((snapPoint - min) / (max - min)) * 100 + '%' }"
             ></div>
           </div>
