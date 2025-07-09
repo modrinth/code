@@ -1,7 +1,11 @@
 <template>
-  <UiServersServerSidebar :route="route" :nav-links="navLinks" :server="props.server" />
+  <UiServersServerSidebar
+    :route="route"
+    :nav-links="navLinks"
+    :server="server"
+    :backup-in-progress="backupInProgress"
+  />
 </template>
-
 <script setup lang="ts">
 import {
   InfoIcon,
@@ -13,13 +17,15 @@ import {
   UserIcon,
   WrenchIcon,
 } from "@modrinth/assets";
-import type { Server } from "~/composables/pyroServers";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
 
 const route = useRoute();
 const serverId = route.params.id as string;
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: ModrinthServer;
+  backupInProgress?: BackupInProgressReason;
 }>();
 
 useHead({

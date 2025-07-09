@@ -1,14 +1,8 @@
-use super::ids::Base62Id;
 use crate::bitflags_serde_impl;
-use crate::models::ids::UserId;
+use crate::models::ids::PatId;
+use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-
-/// The ID of a team
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Hash, Debug)]
-#[serde(from = "Base62Id")]
-#[serde(into = "Base62Id")]
-pub struct PatId(pub u64);
 
 bitflags::bitflags! {
     #[derive(Copy, Clone, Debug)]
@@ -106,6 +100,24 @@ bitflags::bitflags! {
         // only accessible by modrinth-issued sessions
         const SESSION_ACCESS = 1 << 39;
 
+        // create a shared instance
+        const SHARED_INSTANCE_CREATE = 1 << 40;
+        // read a shared instance
+        const SHARED_INSTANCE_READ = 1 << 41;
+        // write to a shared instance
+        const SHARED_INSTANCE_WRITE = 1 << 42;
+        // delete a shared instance
+        const SHARED_INSTANCE_DELETE = 1 << 43;
+
+        // create a shared instance version
+        const SHARED_INSTANCE_VERSION_CREATE = 1 << 44;
+        // read a shared instance version
+        const SHARED_INSTANCE_VERSION_READ = 1 << 45;
+        // write to a shared instance version
+        const SHARED_INSTANCE_VERSION_WRITE = 1 << 46;
+        // delete a shared instance version
+        const SHARED_INSTANCE_VERSION_DELETE = 1 << 47;
+
         const NONE = 0b0;
     }
 }
@@ -161,7 +173,7 @@ pub struct PersonalAccessToken {
 
 impl PersonalAccessToken {
     pub fn from(
-        data: crate::database::models::pat_item::PersonalAccessToken,
+        data: crate::database::models::pat_item::DBPersonalAccessToken,
         include_token: bool,
     ) -> Self {
         Self {

@@ -18,11 +18,13 @@
     "lint": "turbo run lint --continue",
     "test": "turbo run test --continue",
     "fix": "turbo run fix --continue",
+    "ci": "turbo run lint test --continue",
     "intl:extract": "pnpm ui:intl:extract && pnpm web:intl:extract && pnpm app:intl:extract"
   },
   "devDependencies": {
+    "if-ci": "^3.0.0",
     "prettier": "^3.3.2",
-    "turbo": "^2.2.3",
+    "turbo": "^2.5.4",
     "vue": "^3.5.13"
   },
   "packageManager": "pnpm@9.15.0",

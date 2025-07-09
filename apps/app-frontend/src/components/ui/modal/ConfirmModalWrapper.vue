@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { ConfirmModal } from '@modrinth/ui'
 import { show_ads_window, hide_ads_window } from '@/helpers/ads.js'
-import { useTheming } from '@/store/theme.js'
+import { useTheming } from '@/store/theme.ts'
 
 const themeStore = useTheming()
 
@@ -38,6 +38,10 @@ const props = defineProps({
     default: true,
   },
   showAdOnClose: {
+    type: Boolean,
+    default: true,
+  },
+  markdown: {
     type: Boolean,
     default: true,
   },
@@ -80,6 +84,7 @@ function proceed() {
     :on-hide="onModalHide"
     :noblur="!themeStore.advancedRendering"
     :danger="danger"
+    :markdown="markdown"
     @proceed="proceed"
   />
 </template>

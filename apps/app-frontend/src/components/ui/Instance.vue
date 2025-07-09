@@ -9,7 +9,7 @@ import {
   StopCircleIcon,
   TimerIcon,
 } from '@modrinth/assets'
-import { Avatar, ButtonStyled } from '@modrinth/ui'
+import { Avatar, ButtonStyled, useRelativeTime } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { finish_install, kill, run } from '@/helpers/profile'
 import { get_by_profile_path } from '@/helpers/process'
@@ -19,10 +19,8 @@ import { showProfileInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
 import { trackEvent } from '@/helpers/analytics'
 import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import { formatCategory } from '@modrinth/utils'
 
-dayjs.extend(relativeTime)
+const formatRelativeTime = useRelativeTime()
 
 const props = defineProps({
   instance: {
@@ -173,7 +171,12 @@ onUnmounted(() => unlisten())
       </div>
       <div class="flex items-center col-span-3 gap-1 text-secondary font-semibold">
         <TimerIcon />
-        <span class="text-sm"> Played {{ dayjs(instance.last_played).fromNow() }} </span>
+        <span class="text-sm">
+          <template v-if="instance.last_played">
+            Played {{ formatRelativeTime(dayjs(instance.last_played).toISOString()) }}
+          </template>
+          <template v-else> Never played </template>
+        </span>
       </div>
     </div>
   </template>
@@ -236,8 +239,8 @@ onUnmounted(() => unlisten())
         </p>
         <div class="flex items-center col-span-3 gap-1 text-secondary font-semibold mt-auto">
           <GameIcon class="shrink-0" />
-          <span class="text-sm">
-            {{ formatCategory(instance.loader) }} {{ instance.game_version }}
+          <span class="text-sm capitalize">
+            {{ instance.loader }} {{ instance.game_version }}
           </span>
         </div>
       </div>

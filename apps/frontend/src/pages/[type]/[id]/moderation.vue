@@ -50,7 +50,7 @@
           Listed in search results
         </li>
         <li v-else>
-          <ExitIcon class="bad" />
+          <XIcon class="bad" />
           Not listed in search results
         </li>
         <li v-if="isListed(project)">
@@ -58,11 +58,11 @@
           Listed on the profiles of members
         </li>
         <li v-else>
-          <ExitIcon class="bad" />
+          <XIcon class="bad" />
           Not listed on the profiles of members
         </li>
         <li v-if="isPrivate(project)">
-          <ExitIcon class="bad" />
+          <XIcon class="bad" />
           Not accessible with a direct link
         </li>
         <li v-else>
@@ -77,7 +77,7 @@
         This is a private conversation thread with the Modrinth moderators. They may message you
         with issues concerning this project. This thread is only checked when you submit your
         project for review. For additional inquiries, contact
-        <a href="https://support.modrinth.com">Modrinth support</a>.
+        <a href="https://support.modrinth.com">Modrinth Support</a>.
       </p>
       <ConversationThread
         v-if="thread"
@@ -92,7 +92,7 @@
   </div>
 </template>
 <script setup>
-import { ExitIcon, CheckIcon, IssuesIcon } from "@modrinth/assets";
+import { XIcon, CheckIcon, IssuesIcon } from "@modrinth/assets";
 import { Badge } from "@modrinth/ui";
 import ConversationThread from "~/components/ui/thread/ConversationThread.vue";
 import {

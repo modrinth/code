@@ -9,7 +9,7 @@ use serde_json::json;
 
 use crate::{
     assert_status,
-    common::api_common::{request_data::ImageData, Api, AppendsOptionalPat},
+    common::api_common::{Api, AppendsOptionalPat, request_data::ImageData},
 };
 
 use super::ApiV3;
@@ -157,7 +157,7 @@ impl ApiV3 {
         pat: Option<&str>,
     ) -> ServiceResponse {
         let req = test::TestRequest::get()
-            .uri(&format!("/v3/user/{}/collections", user_id_or_username))
+            .uri(&format!("/v3/user/{user_id_or_username}/collections"))
             .append_pat(pat)
             .to_request();
         self.call(req).await

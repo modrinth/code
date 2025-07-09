@@ -4,20 +4,6 @@ use common::api_v3::ApiV3;
 use common::database::*;
 use common::dummy_data::DUMMY_CATEGORIES;
 
-use ariadne::ids::base62_impl::parse_base62;
-use common::environment::{
-    with_test_environment, with_test_environment_all, TestEnvironment,
-};
-use common::permissions::{PermissionsTest, PermissionsTestContext};
-use futures::StreamExt;
-use labrinth::database::models::project_item::{
-    PROJECTS_NAMESPACE, PROJECTS_SLUGS_NAMESPACE,
-};
-use labrinth::models::projects::ProjectId;
-use labrinth::models::teams::ProjectPermissions;
-use labrinth::util::actix::{MultipartSegment, MultipartSegmentData};
-use serde_json::json;
-
 use crate::common::api_common::models::CommonProject;
 use crate::common::api_common::request_data::ProjectCreationRequestData;
 use crate::common::api_common::{ApiProject, ApiTeams, ApiVersion};
@@ -25,7 +11,23 @@ use crate::common::dummy_data::{
     DummyImage, DummyOrganizationZeta, DummyProjectAlpha, DummyProjectBeta,
     TestFile,
 };
-mod common;
+use ariadne::ids::base62_impl::parse_base62;
+use common::environment::{
+    TestEnvironment, with_test_environment, with_test_environment_all,
+};
+use common::permissions::{PermissionsTest, PermissionsTestContext};
+use futures::StreamExt;
+use hex::ToHex;
+use labrinth::database::models::project_item::{
+    PROJECTS_NAMESPACE, PROJECTS_SLUGS_NAMESPACE,
+};
+use labrinth::models::ids::ProjectId;
+use labrinth::models::teams::ProjectPermissions;
+use labrinth::util::actix::{MultipartSegment, MultipartSegmentData};
+use serde_json::json;
+use sha1::Digest;
+
+pub mod common;
 
 #[actix_rt::test]
 async fn test_get_project() {
@@ -204,9 +206,8 @@ async fn test_add_remove_project() {
             let uploaded_version_id = project.versions[0];
 
             // Checks files to ensure they were uploaded and correctly identify the file
-            let hash = sha1::Sha1::from(basic_mod_file.bytes())
-                .digest()
-                .to_string();
+            let hash = sha1::Sha1::digest(basic_mod_file.bytes())
+                .encode_hex::<String>();
             let version = api
                 .get_version_from_hash_deserialized_common(
                     &hash,

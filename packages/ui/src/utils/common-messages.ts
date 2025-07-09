@@ -17,9 +17,21 @@ export const commonMessages = defineMessages({
     id: 'button.continue',
     defaultMessage: 'Continue',
   },
+  nextButton: {
+    id: 'button.next',
+    defaultMessage: 'Next',
+  },
+  backButton: {
+    id: 'button.back',
+    defaultMessage: 'Back',
+  },
   copyIdButton: {
     id: 'button.copy-id',
     defaultMessage: 'Copy ID',
+  },
+  copyPermalinkButton: {
+    id: 'button.copy-permalink',
+    defaultMessage: 'Copy permanent link',
   },
   changesSavedLabel: {
     id: 'label.changes-saved',
@@ -49,6 +61,14 @@ export const commonMessages = defineMessages({
     id: 'label.description',
     defaultMessage: 'Description',
   },
+  downloadButton: {
+    id: 'button.download',
+    defaultMessage: 'Download',
+  },
+  downloadingButton: {
+    id: 'button.downloading',
+    defaultMessage: 'Downloading',
+  },
   editButton: {
     id: 'button.edit',
     defaultMessage: 'Edit',
@@ -77,6 +97,10 @@ export const commonMessages = defineMessages({
     id: 'input.view.list',
     defaultMessage: 'Rows view',
   },
+  loadingLabel: {
+    id: 'label.loading',
+    defaultMessage: 'Loading...',
+  },
   moderationLabel: {
     id: 'label.moderation',
     defaultMessage: 'Moderation',
@@ -84,6 +108,14 @@ export const commonMessages = defineMessages({
   notificationsLabel: {
     id: 'label.notifications',
     defaultMessage: 'Notifications',
+  },
+  playButton: {
+    id: 'button.play',
+    defaultMessage: 'Play',
+  },
+  playedLabel: {
+    id: 'label.played',
+    defaultMessage: 'Played {time}',
   },
   privateLabel: {
     id: 'collection.label.private',
@@ -93,13 +125,25 @@ export const commonMessages = defineMessages({
     id: 'label.public',
     defaultMessage: 'Public',
   },
+  refreshButton: {
+    id: 'button.refresh',
+    defaultMessage: 'Refresh',
+  },
   rejectedLabel: {
     id: 'label.rejected',
     defaultMessage: 'Rejected',
   },
+  removeButton: {
+    id: 'button.remove',
+    defaultMessage: 'Remove',
+  },
   reportButton: {
     id: 'button.report',
     defaultMessage: 'Report',
+  },
+  openFolderButton: {
+    id: 'button.open-folder',
+    defaultMessage: 'Open folder',
   },
   passwordLabel: {
     id: 'label.password',
@@ -117,6 +161,10 @@ export const commonMessages = defineMessages({
     id: 'label.scopes',
     defaultMessage: 'Scopes',
   },
+  serverLabel: {
+    id: 'label.server',
+    defaultMessage: 'Server',
+  },
   serversLabel: {
     id: 'label.servers',
     defaultMessage: 'Servers',
@@ -133,6 +181,14 @@ export const commonMessages = defineMessages({
     id: 'button.sign-out',
     defaultMessage: 'Sign out',
   },
+  singleplayerLabel: {
+    id: 'label.singleplayer',
+    defaultMessage: 'Singleplayer',
+  },
+  stopButton: {
+    id: 'button.stop',
+    defaultMessage: 'Stop',
+  },
   titleLabel: {
     id: 'label.title',
     defaultMessage: 'Title',
@@ -145,6 +201,10 @@ export const commonMessages = defineMessages({
     id: 'button.upload-image',
     defaultMessage: 'Upload image',
   },
+  removeImageButton: {
+    id: 'button.remove-image',
+    defaultMessage: 'Remove image',
+  },
   visibilityLabel: {
     id: 'label.visibility',
     defaultMessage: 'Visibility',
@@ -152,6 +212,10 @@ export const commonMessages = defineMessages({
   visitYourProfile: {
     id: 'label.visit-your-profile',
     defaultMessage: 'Visit your profile',
+  },
+  paymentMethodCardDisplay: {
+    id: 'omorphia.component.purchase_modal.payment_method_card_display',
+    defaultMessage: '{card_brand} ending in {last_four}',
   },
 })
 
@@ -191,5 +255,53 @@ export const commonSettingsMessages = defineMessages({
   billing: {
     id: 'settings.billing.title',
     defaultMessage: 'Billing and subscriptions',
+  },
+})
+
+export const paymentMethodMessages = defineMessages({
+  visa: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.visa',
+    defaultMessage: 'Visa',
+  },
+  amex: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.amex',
+    defaultMessage: 'American Express',
+  },
+  diners: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.diners',
+    defaultMessage: 'Diners Club',
+  },
+  discover: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.discover',
+    defaultMessage: 'Discover',
+  },
+  eftpos: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.eftpos',
+    defaultMessage: 'EFTPOS',
+  },
+  jcb: { id: 'omorphia.component.purchase_modal.payment_method_type.jcb', defaultMessage: 'JCB' },
+  mastercard: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.mastercard',
+    defaultMessage: 'MasterCard',
+  },
+  unionpay: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.unionpay',
+    defaultMessage: 'UnionPay',
+  },
+  paypal: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.paypal',
+    defaultMessage: 'PayPal',
+  },
+  cashapp: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.cashapp',
+    defaultMessage: 'Cash App',
+  },
+  amazon_pay: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.amazon_pay',
+    defaultMessage: 'Amazon Pay',
+  },
+  unknown: {
+    id: 'omorphia.component.purchase_modal.payment_method_type.unknown',
+    defaultMessage: 'Unknown payment method',
   },
 })

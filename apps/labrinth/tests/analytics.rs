@@ -5,14 +5,14 @@ use common::permissions::PermissionsTestContext;
 use common::{
     api_v3::ApiV3,
     database::*,
-    environment::{with_test_environment, TestEnvironment},
+    environment::{TestEnvironment, with_test_environment},
 };
 use itertools::Itertools;
 use labrinth::models::teams::ProjectPermissions;
 use labrinth::queue::payouts;
-use rust_decimal::{prelude::ToPrimitive, Decimal};
+use rust_decimal::{Decimal, prelude::ToPrimitive};
 
-mod common;
+pub mod common;
 
 #[actix_rt::test]
 pub async fn analytics_revenue() {
@@ -50,7 +50,7 @@ pub async fn analytics_revenue() {
             ];
 
             let project_id = parse_base62(&alpha_project_id).unwrap() as i64;
-            for (money, time) in money_time_pairs.iter() {
+            for (money, time) in &money_time_pairs {
                 insert_user_ids.push(USER_USER_ID_PARSED);
                 insert_project_ids.push(project_id);
                 insert_payouts.push(Decimal::from_f64_retain(*money).unwrap());
@@ -87,9 +87,9 @@ pub async fn analytics_revenue() {
                 )
                 .await;
             assert_eq!(analytics.len(), 1); // 1 project
-            let project_analytics = analytics.get(&alpha_project_id).unwrap();
+            let project_analytics = &analytics[&alpha_project_id];
             assert_eq!(project_analytics.len(), 8); // 1 days cut off, and 2 points take place on the same day. note that the day exactly 14 days ago is included
-                                                    // sorted_by_key, values in the order of smallest to largest key
+            // sorted_by_key, values in the order of smallest to largest key
             let (sorted_keys, sorted_by_key): (Vec<i64>, Vec<Decimal>) =
                 project_analytics
                     .iter()
@@ -117,7 +117,7 @@ pub async fn analytics_revenue() {
                     USER_USER_PAT,
                 )
                 .await;
-            let project_analytics = analytics.get(&alpha_project_id).unwrap();
+            let project_analytics = &analytics[&alpha_project_id];
             assert_eq!(project_analytics.len(), 9); // and 2 points take place on the same day
             let (sorted_keys, sorted_by_key): (Vec<i64>, Vec<Decimal>) =
                 project_analytics

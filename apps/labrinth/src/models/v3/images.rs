@@ -1,17 +1,12 @@
 use super::{
-    ids::{Base62Id, ProjectId, ThreadMessageId, VersionId},
+    ids::{ProjectId, ThreadMessageId, VersionId},
     pats::Scopes,
-    reports::ReportId,
-    users::UserId,
 };
-use crate::database::models::image_item::Image as DBImage;
+use crate::database::models::image_item::DBImage;
+use crate::models::ids::{ImageId, ReportId};
+use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(from = "Base62Id")]
-#[serde(into = "Base62Id")]
-pub struct ImageId(pub u64);
 
 #[derive(Serialize, Deserialize)]
 pub struct Image {

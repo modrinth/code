@@ -34,7 +34,8 @@
           </nuxt-link>
           <ButtonStyled>
             <nuxt-link :to="`/servers/manage/${server.serverId}/content`">
-              <LeftArrowIcon /> Back to server
+              <LeftArrowIcon />
+              Back to server
             </nuxt-link>
           </ButtonStyled>
         </div>
@@ -54,12 +55,7 @@
       }"
       aria-label="Filters"
     >
-      <AdPlaceholder
-        v-if="
-          (!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus) &&
-          !server
-        "
-      />
+      <AdPlaceholder v-if="!auth.user && !server" />
       <div v-if="filtersMenuOpen" class="fixed inset-0 z-40 bg-bg"></div>
       <div
         class="flex flex-col gap-3"
@@ -139,7 +135,7 @@
           <template #locked-mod_loader>
             {{ formatMessage(messages.modLoaderProvidedByServer) }}
           </template>
-          <template #sync-button> {{ formatMessage(messages.syncFilterButton) }} </template>
+          <template #sync-button> {{ formatMessage(messages.syncFilterButton) }}</template>
         </SearchSidebarFilter>
       </div>
     </aside>
@@ -188,7 +184,10 @@
           </DropdownSelect>
           <div class="lg:hidden">
             <ButtonStyled>
-              <button @click="filtersMenuOpen = true"><FilterIcon /> Filter results...</button>
+              <button @click="filtersMenuOpen = true">
+                <FilterIcon />
+                Filter results...
+              </button>
             </ButtonStyled>
           </div>
           <ButtonStyled circular>
@@ -286,7 +285,7 @@
                 :to="`/${projectType.id}/${result.slug ? result.slug : result.project_id}`"
               >
                 <NewProjectCard :project="result" :categories="result.display_categories">
-                  <template v-if="false" #actions> </template>
+                  <template v-if="false" #actions></template>
                 </NewProjectCard>
               </NuxtLink>
             </template>
@@ -317,16 +316,22 @@ import {
   NewProjectCard,
   SearchFilterControl,
 } from "@modrinth/ui";
-import { CheckIcon, DownloadIcon, GameIcon, LeftArrowIcon, XIcon } from "@modrinth/assets";
+import {
+  CheckIcon,
+  DownloadIcon,
+  GameIcon,
+  LeftArrowIcon,
+  XIcon,
+  SearchIcon,
+  FilterIcon,
+  GridIcon,
+  ListIcon,
+  ImageIcon,
+} from "@modrinth/assets";
 import { computed } from "vue";
+import { useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import LogoAnimated from "~/components/brand/LogoAnimated.vue";
-
-import SearchIcon from "~/assets/images/utils/search.svg?component";
-import FilterIcon from "~/assets/images/utils/filter.svg?component";
-import GridIcon from "~/assets/images/utils/grid.svg?component";
-import ListIcon from "~/assets/images/utils/list.svg?component";
-import ImageIcon from "~/assets/images/utils/image.svg?component";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import NavTabs from "~/components/ui/NavTabs.vue";
 
@@ -344,6 +349,7 @@ const flags = useFeatureFlags();
 const auth = await useAuth();
 
 const projectType = ref();
+
 function setProjectType() {
   const projType = tags.value.projectTypes.find(
     (x) => x.id === route.path.replaceAll(/^\/|s\/?$/g, ""), // Removes prefix `/` and suffixes `s` and `s/`
@@ -353,6 +359,7 @@ function setProjectType() {
     projectType.value = projType;
   }
 }
+
 setProjectType();
 router.afterEach(() => {
   setProjectType();
@@ -377,7 +384,7 @@ async function updateServerContext() {
     if (!auth.value.user) {
       router.push("/auth/sign-in?redirect=" + encodeURIComponent(route.fullPath));
     } else if (route.query.sid !== null) {
-      server.value = await usePyroServer(route.query.sid, ["general", "content"], {
+      server.value = await useModrinthServers(route.query.sid, ["general", "content"], {
         waitForModules: true,
       });
     }
@@ -398,7 +405,7 @@ async function updateServerContext() {
 
 const serverFilters = computed(() => {
   const filters = [];
-  if (server.value) {
+  if (server.value && projectType.value.id !== "modpack") {
     const gameVersion = server.value.general?.mc_version;
     if (gameVersion) {
       filters.push({
@@ -414,6 +421,15 @@ const serverFilters = computed(() => {
     if (platform && modLoaders.includes(platform)) {
       filters.push({
         type: "mod_loader",
+        option: platform,
+      });
+    }
+
+    const pluginLoaders = ["paper", "purpur"];
+
+    if (platform && pluginLoaders.includes(platform)) {
+      filters.push({
+        type: "plugin_loader",
         option: platform,
       });
     }
@@ -499,7 +515,6 @@ async function serverInstall(project) {
 
     if (projectType.value.id === "modpack") {
       await server.value.general.reinstall(
-        server.value.serverId,
         false,
         project.project_id,
         version.id,

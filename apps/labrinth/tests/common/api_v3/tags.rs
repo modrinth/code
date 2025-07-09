@@ -14,8 +14,8 @@ use crate::{
     assert_status,
     common::{
         api_common::{
-            models::{CommonCategoryData, CommonLoaderData},
             Api, ApiTags, AppendsOptionalPat,
+            models::{CommonCategoryData, CommonLoaderData},
         },
         database::ADMIN_USER_PAT,
     },
@@ -76,7 +76,7 @@ impl ApiV3 {
         loader_field: &str,
     ) -> ServiceResponse {
         let req = TestRequest::get()
-            .uri(&format!("/v3/loader_field?loader_field={}", loader_field))
+            .uri(&format!("/v3/loader_field?loader_field={loader_field}"))
             .append_pat(ADMIN_USER_PAT)
             .to_request();
         self.call(req).await

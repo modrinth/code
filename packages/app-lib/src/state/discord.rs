@@ -1,13 +1,13 @@
-use std::sync::{atomic::AtomicBool, Arc};
+use std::sync::{Arc, atomic::AtomicBool};
 
 use discord_rich_presence::{
-    activity::{Activity, Assets},
     DiscordIpc, DiscordIpcClient,
+    activity::{Activity, Assets},
 };
 use tokio::sync::RwLock;
 
-use crate::state::Profile;
 use crate::State;
+use crate::state::Profile;
 
 pub struct DiscordGuard {
     client: Arc<RwLock<DiscordIpcClient>>,
@@ -21,8 +21,7 @@ impl DiscordGuard {
         let dipc =
             DiscordIpcClient::new("1123683254248148992").map_err(|e| {
                 crate::ErrorKind::OtherError(format!(
-                    "Could not create Discord client {}",
-                    e,
+                    "Could not create Discord client {e}",
                 ))
             })?;
 
@@ -90,8 +89,7 @@ impl DiscordGuard {
         let res = client.set_activity(activity.clone());
         let could_not_set_err = |e: Box<dyn serde::ser::StdError>| {
             crate::ErrorKind::OtherError(format!(
-                "Could not update Discord activity {}",
-                e,
+                "Could not update Discord activity {e}",
             ))
         };
 
@@ -99,8 +97,7 @@ impl DiscordGuard {
             if let Err(_e) = res {
                 client.reconnect().map_err(|e| {
                     crate::ErrorKind::OtherError(format!(
-                        "Could not reconnect to Discord IPC {}",
-                        e,
+                        "Could not reconnect to Discord IPC {e}",
                     ))
                 })?;
                 return Ok(client
@@ -131,8 +128,7 @@ impl DiscordGuard {
 
         let could_not_clear_err = |e: Box<dyn serde::ser::StdError>| {
             crate::ErrorKind::OtherError(format!(
-                "Could not clear Discord activity {}",
-                e,
+                "Could not clear Discord activity {e}",
             ))
         };
 
@@ -140,8 +136,7 @@ impl DiscordGuard {
             if res.is_err() {
                 client.reconnect().map_err(|e| {
                     crate::ErrorKind::OtherError(format!(
-                        "Could not reconnect to Discord IPC {}",
-                        e,
+                        "Could not reconnect to Discord IPC {e}",
                     ))
                 })?;
                 return Ok(client

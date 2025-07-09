@@ -220,6 +220,7 @@ async function refreshSearch() {
     }
   }
   results.value = rawResults.result
+  currentPage.value = Math.max(1, Math.min(pageCount.value, currentPage.value))
 
   const persistentParams: LocationQuery = {}
 

@@ -1,5 +1,5 @@
-use crate::state::CachedEntry;
 use crate::State;
+use crate::state::CachedEntry;
 pub use daedalus::minecraft::VersionManifest;
 pub use daedalus::modded::Manifest;
 
@@ -30,7 +30,7 @@ pub async fn get_loader_versions(loader: &str) -> crate::Result<Manifest> {
     )
     .await?
     .ok_or_else(|| {
-        crate::ErrorKind::NoValueFor(format!("{} loader versions", loader))
+        crate::ErrorKind::NoValueFor(format!("{loader} loader versions"))
     })?;
 
     Ok(loaders.manifest)

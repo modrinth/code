@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use native_dialog::{MessageDialog, MessageType};
+use native_dialog::{DialogBuilder, MessageLevel};
 use std::env;
 use tauri::{Listener, Manager};
 use theseus::prelude::*;
@@ -13,14 +13,6 @@ mod error;
 
 #[cfg(target_os = "macos")]
 mod macos;
-
-#[cfg(target_os = "macos")]
-#[macro_use]
-extern crate cocoa;
-
-#[cfg(target_os = "macos")]
-#[macro_use]
-extern crate objc;
 
 // Should be called in launcher initialization
 #[tracing::instrument(skip_all)]
@@ -113,14 +105,14 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
 fn show_window(app: tauri::AppHandle) {
     let win = app.get_window("main").unwrap();
     if let Err(e) = win.show() {
-        MessageDialog::new()
-            .set_type(MessageType::Error)
+        DialogBuilder::message()
+            .set_level(MessageLevel::Error)
             .set_title("Initialization error")
-            .set_text(&format!(
-                "Cannot display application window due to an error:\n{}",
-                e
+            .set_text(format!(
+                "Cannot display application window due to an error:\n{e}"
             ))
-            .show_alert()
+            .alert()
+            .show()
             .unwrap();
         panic!("cannot display application window")
     } else {
@@ -138,8 +130,7 @@ fn is_dev() -> bool {
 async fn toggle_decorations(b: bool, window: tauri::Window) -> api::Result<()> {
     window.set_decorations(b).map_err(|e| {
         theseus::Error::from(theseus::ErrorKind::OtherError(format!(
-            "Failed to toggle decorations: {}",
-            e
+            "Failed to toggle decorations: {e}"
         )))
     })?;
     Ok(())
@@ -192,6 +183,7 @@ fn main() {
                 let _ = win.set_focus();
             }
         }))
+        .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_deep_link::init())
@@ -206,7 +198,7 @@ fn main() {
             {
                 let payload = macos::deep_link::get_or_init_payload(app);
 
-                let mtx_copy = payload.payload.clone();
+                let mtx_copy = payload.payload;
                 app.listen("deep-link://new-url", move |url| {
                     let mtx_copy_copy = mtx_copy.clone();
                     let request = url.payload().to_owned();
@@ -238,13 +230,12 @@ fn main() {
                 tauri::async_runtime::spawn(api::utils::handle_command(
                     payload,
                 ));
-                dbg!(url);
             });
 
             #[cfg(not(target_os = "linux"))]
-            {
-                if let Some(window) = app.get_window("main") {
-                    window.set_shadow(true).unwrap();
+            if let Some(window) = app.get_window("main") {
+                if let Err(e) = window.set_shadow(true) {
+                    tracing::warn!("Failed to set window shadow: {e}");
                 }
             }
 
@@ -258,6 +249,7 @@ fn main() {
         .plugin(api::logs::init())
         .plugin(api::jre::init())
         .plugin(api::metadata::init())
+        .plugin(api::minecraft_skins::init())
         .plugin(api::pack::init())
         .plugin(api::process::init())
         .plugin(api::profile::init())
@@ -268,6 +260,7 @@ fn main() {
         .plugin(api::cache::init())
         .plugin(api::ads::init())
         .plugin(api::friends::init())
+        .plugin(api::worlds::init())
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             is_dev,
@@ -276,32 +269,27 @@ fn main() {
             restart_app,
         ]);
 
-    #[cfg(target_os = "macos")]
-    {
-        builder = builder.plugin(macos::window_ext::init());
-    }
-
     tracing::info!("Initializing app...");
     let app = builder.build(tauri::generate_context!());
 
     match app {
         Ok(app) => {
-            #[allow(unused_variables)]
             app.run(|app, event| {
+                #[cfg(not(target_os = "macos"))]
+                drop((app, event));
                 #[cfg(target_os = "macos")]
                 if let tauri::RunEvent::Opened { urls } = event {
                     tracing::info!("Handling webview open {urls:?}");
 
                     let file = urls
                         .into_iter()
-                        .filter_map(|url| url.to_file_path().ok())
-                        .next();
+                        .find_map(|url| url.to_file_path().ok());
 
                     if let Some(file) = file {
                         let payload =
                             macos::deep_link::get_or_init_payload(app);
 
-                        let mtx_copy = payload.payload.clone();
+                        let mtx_copy = payload.payload;
                         let request = file.to_string_lossy().to_string();
                         tauri::async_runtime::spawn(async move {
                             let mut payload = mtx_copy.lock().await;
@@ -319,28 +307,29 @@ fn main() {
             #[cfg(target_os = "windows")]
             {
                 // tauri doesn't expose runtime errors, so matching a string representation seems like the only solution
-                if format!("{:?}", e).contains(
+                if format!("{e:?}").contains(
                     "Runtime(CreateWebview(WebView2Error(WindowsError",
                 ) {
-                    MessageDialog::new()
-                        .set_type(MessageType::Error)
+                    DialogBuilder::message()
+                        .set_level(MessageLevel::Error)
                         .set_title("Initialization error")
                         .set_text("Your Microsoft Edge WebView2 installation is corrupt.\n\nMicrosoft Edge WebView2 is required to run Modrinth App.\n\nLearn how to repair it at https://support.modrinth.com/en/articles/8797765-corrupted-microsoft-edge-webview2-installation")
-                        .show_alert()
+                        .alert()
+                        .show()
                         .unwrap();
 
                     panic!("webview2 initialization failed")
                 }
             }
 
-            MessageDialog::new()
-                .set_type(MessageType::Error)
+            DialogBuilder::message()
+                .set_level(MessageLevel::Error)
                 .set_title("Initialization error")
-                .set_text(&format!(
-                    "Cannot initialize application due to an error:\n{:?}",
-                    e
+                .set_text(format!(
+                    "Cannot initialize application due to an error:\n{e:?}"
                 ))
-                .show_alert()
+                .alert()
+                .show()
                 .unwrap();
 
             tracing::error!("Error while running tauri application: {:?}", e);

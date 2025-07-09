@@ -7,7 +7,7 @@ use crate::models::v2::projects::LegacySideType;
 use crate::routes::v2_reroute::capitalize_first;
 use crate::routes::v3::tags::{LinkPlatformQueryData, LoaderFieldsEnumQuery};
 use crate::routes::{v2_reroute, v3};
-use actix_web::{get, web, HttpResponse};
+use actix_web::{HttpResponse, get, web};
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use sqlx::PgPool;

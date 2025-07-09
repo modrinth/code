@@ -11,7 +11,7 @@ use crate::models::v2::projects::LegacyVersion;
 use crate::queue::session::AuthQueue;
 use crate::routes::{v2_reroute, v3};
 use crate::search::SearchConfig;
-use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use validator::Validate;
@@ -219,7 +219,7 @@ pub struct EditVersion {
     pub name: Option<String>,
     #[validate(
         length(min = 1, max = 32),
-        regex = "crate::util::validate::RE_URL_SAFE"
+        regex(path = *crate::util::validate::RE_URL_SAFE)
     )]
     pub version_number: Option<String>,
     #[validate(length(max = 65536))]

@@ -1,4 +1,7 @@
 {
+  "button.back": {
+    "defaultMessage": "Back"
+  },
   "button.cancel": {
     "defaultMessage": "Cancel"
   },
@@ -8,11 +11,38 @@
   "button.copy-id": {
     "defaultMessage": "Copy ID"
   },
+  "button.copy-permalink": {
+    "defaultMessage": "Copy permanent link"
+  },
   "button.create-a-project": {
     "defaultMessage": "Create a project"
   },
+  "button.download": {
+    "defaultMessage": "Download"
+  },
+  "button.downloading": {
+    "defaultMessage": "Downloading"
+  },
   "button.edit": {
     "defaultMessage": "Edit"
+  },
+  "button.next": {
+    "defaultMessage": "Next"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Open folder"
+  },
+  "button.play": {
+    "defaultMessage": "Play"
+  },
+  "button.refresh": {
+    "defaultMessage": "Refresh"
+  },
+  "button.remove": {
+    "defaultMessage": "Remove"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Remove image"
   },
   "button.report": {
     "defaultMessage": "Report"
@@ -28,6 +58,9 @@
   },
   "button.sign-out": {
     "defaultMessage": "Sign out"
+  },
+  "button.stop": {
+    "defaultMessage": "Stop"
   },
   "button.upload-image": {
     "defaultMessage": "Upload image"
@@ -59,6 +92,21 @@
   "input.view.list": {
     "defaultMessage": "Rows view"
   },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "Adventure mode"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "Creative mode"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "Spectator mode"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "Survival mode"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "Unknown game mode"
+  },
   "label.changes-saved": {
     "defaultMessage": "Changes saved"
   },
@@ -83,6 +131,9 @@
   "label.followed-projects": {
     "defaultMessage": "Followed projects"
   },
+  "label.loading": {
+    "defaultMessage": "Loading..."
+  },
   "label.moderation": {
     "defaultMessage": "Moderation"
   },
@@ -91,6 +142,9 @@
   },
   "label.password": {
     "defaultMessage": "Password"
+  },
+  "label.played": {
+    "defaultMessage": "Played {time}"
   },
   "label.public": {
     "defaultMessage": "Public"
@@ -101,11 +155,17 @@
   "label.scopes": {
     "defaultMessage": "Scopes"
   },
+  "label.server": {
+    "defaultMessage": "Server"
+  },
   "label.servers": {
     "defaultMessage": "Servers"
   },
   "label.settings": {
     "defaultMessage": "Settings"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "Singleplayer"
   },
   "label.title": {
     "defaultMessage": "Title"
@@ -118,6 +178,12 @@
   },
   "label.visit-your-profile": {
     "defaultMessage": "Visit your profile"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "Add payment method"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "Adding a payment method"
   },
   "notification.error.title": {
     "defaultMessage": "An error occurred"
@@ -403,6 +469,63 @@
   },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
+  },
+  "servers.notice.dismiss": {
+    "defaultMessage": "Dismiss"
+  },
+  "servers.notice.dismissable": {
+    "defaultMessage": "Dismissable"
+  },
+  "servers.notice.heading.attention": {
+    "defaultMessage": "Attention"
+  },
+  "servers.notice.heading.info": {
+    "defaultMessage": "Info"
+  },
+  "servers.notice.level.critical.name": {
+    "defaultMessage": "Critical"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "Info"
+  },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "Survey"
+  },
+  "servers.notice.level.warn.name": {
+    "defaultMessage": "Warning"
+  },
+  "servers.notice.undismissable": {
+    "defaultMessage": "Undismissable"
+  },
+  "servers.purchase.step.payment.description": {
+    "defaultMessage": "You won't be charged yet."
+  },
+  "servers.purchase.step.payment.prompt": {
+    "defaultMessage": "Select a payment method"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "Payment method"
+  },
+  "servers.purchase.step.region.title": {
+    "defaultMessage": "Region"
+  },
+  "servers.purchase.step.review.title": {
+    "defaultMessage": "Review"
+  },
+  "servers.region.custom.prompt": {
+    "defaultMessage": "How much RAM do you want your server to have?"
+  },
+  "servers.region.europe": {
+    "defaultMessage": "Europe"
+  },
+  "servers.region.north-america": {
+    "defaultMessage": "North America"
+  },
+  "servers.region.prompt": {
+    "defaultMessage": "Where would you like your server to be located?"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "Region not listed? <link>Let us know where you'd like to see Modrinth Servers next!</link>"
   },
   "settings.account.title": {
     "defaultMessage": "Account and security"

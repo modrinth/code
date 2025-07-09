@@ -11,6 +11,392 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-07-08T14:00:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed Modrinth Servers showing as out of stock when navigating to the page directly.`,
+  },
+  {
+    date: `2025-07-08T11:10:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Reapplied error handling improvements, with more improvements.`,
+  },
+  {
+    date: `2025-07-07T22:20:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Fixed issue with Servers panel failing to load.`,
+  },
+  {
+    date: `2025-07-07T17:45:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Reverted error handling improvements.`,
+  },
+  {
+    date: `2025-07-07T01:10:00-07:00`,
+    product: 'app',
+    version: `0.10.3`,
+    body: `### Improvements
+- Added a workaround for Java 8 instances failing to load.
+
+### Known issues
+- Java installations will show as 'Failed' when you test them. This is a visual bug, and does not mean the Java installation is not working.`,
+  },
+  {
+    date: `2025-07-06T16:30:00-07:00`,
+    product: 'app',
+    version: `0.10.2`,
+    body: `### Improvements
+- Added additional default skins from free official Minecraft skin packs.
+- Fixed some parts of the player model on Skins page rendering incorrectly.
+- Fixed a number of issues with skin images not loading on macOS.
+- Fixed old Forge versions not loading properly.
+- Fixed a typo in Appearance settings for hiding Skins page nametag.
+
+### Known issues
+- Java installations will show as 'Failed' when you test them. This is a visual bug, and does not mean the Java installation is not working.`,
+  },
+  {
+    date: `2025-07-05T12:00:00-07:00`,
+    product: 'app',
+    version: `0.10.1`,
+    body: `### Improvements
+- News section will now only show up to 4 articles.
+- Fixed critical issue with updating on Windows.
+- Fixed search being broken after a query that yields no results.
+- Fixed 'Jump back in' section on Home page not working.
+- Fixed too many Quick Instance items on the sidebar causing the UI to overflow.`,
+  },
+  {
+    date: `2025-07-04T12:00:00-07:00`,
+    product: 'app',
+    version: `0.10.0`,
+    body: `**Note: This update is no longer available to download due to issues, you should use v0.10.1**
+
+### Added
+- Added Skins page as a beta feature. There may be some minor bugs with it, but we'd love to get user feedback on this feature as it's been one of our most highly requested features.
+  - Save as many of your own skins as you'd like to swap between them at any moment.
+  - Pick a default cape, or override the cape on any of your saved skin profiles to tailor each look perfectly.
+  - Choose between any of the default Minecraft skins.
+
+### Improvements
+- Updated News section to pull data from our new custom news feed.
+- Fixed videos from GitHub not working in project descriptions.
+- Fixed data related to a world not being deleted from the database when the world was deleted.
+- Standardized relative date timestamps across the app.
+- Fixed 'Reset icon' button for Singleplayer worlds state not being reset when opening the Edit interface.
+- Fixed 'Repair' button showing while an instance is installing.
+- Fixed instances with non-UTF8 text files failing to launch or import.
+- Fixed launch hooks being unable to be cleared on an instance.
+- Fixed search results breaking if page number goes out of bounds.
+- Fixed servers running old Minecraft versions not showing last played time.`,
+  },
+  {
+    date: `2025-07-04T12:00:00-07:00`,
+    product: 'web',
+    body: `### Changed
+- Changed fallback ad placeholder from promoting Modrinth+ to Modrinth Servers.
+- Fixed news section rendering incorrectly in light mode on landing page and Modrinth App page.`,
+  },
+  {
+    date: `2025-06-30T19:15:00-07:00`,
+    product: 'web',
+    body: `### Added
+- Added news page, with all our old blog posts now hosted on our website.
+
+### Improvements
+- Changed download count rounding to be more precise.
+- Fixed Creator Monetization Program page to show accurate information again.`,
+  },
+  {
+    date: `2025-06-30T19:15:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Progress will now show when installing Modrinth Pack (.mrpack) files.
+- Fixed storage stats not linking to Files page.
+- Fixed missing icons in some places.`,
+  },
+  {
+    date: `2025-06-29T16:30:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Removed ads for logged in users.
+- Fixed tooltips being unreadable sometimes.`,
+  },
+  {
+    date: `2025-06-26T11:00:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Fixed support bubble overlapping notifications sometimes.
+- Fixed race condition when creating backups.`,
+  },
+  {
+    date: `2025-06-26T11:00:00-07:00`,
+    product: 'web',
+    body: `### Added
+- Added a dismissable Modrinth Servers promotion to project Download interface to inform users of the service's availability.
+
+### Improvements
+- Added colors for the newly added legacy mod loaders
+- Improved file upload error message in some places.`,
+  },
+  {
+    date: `2025-06-16T11:00:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Rolled out hotfixes with the previous days' updates.
+- Failed subscriptions can now be cancelled.`,
+  },
+  {
+    date: `2025-06-16T11:00:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Improved error handling.
+- Rolled out hotfixes with the previous days' updates.'`,
+  },
+  {
+    date: `2025-06-15T16:25:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Fixed installing modpacks from search.
+- Fixed setting subdomains.`,
+  },
+  {
+    date: `2025-06-15T14:30:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Fixed various issues with the panel loading improperly in certain cases.
+- Fixed CPU icon being smaller than the rest.
+- Server panel performance should be a little faster now.`,
+  },
+  {
+    date: `2025-06-15T14:30:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Creator analytics charts will now show up to 15 projects in a tooltip instead of 5.
+- Made certain scrollable containers not have a fixed height, and allow them to be smaller if they have fewer items. (Contributed by [Erb3](https://github.com/modrinth/code/pull/2898))
+- Made organizations sort consistently alphabetically. (Contributed by [WorldWidePixel](https://github.com/modrinth/code/pull/3755))
+- Clarified the 'File too large' error message when uploading an image larger than 1MiB in the text editor. (Contributed by [IThundxr](https://github.com/modrinth/code/pull/3774))`,
+  },
+  {
+    date: `2025-06-03T14:35:00-07:00`,
+    product: 'servers',
+    body: `### Added
+- Added support for servers in Europe.
+- Added server setup for new servers upon opening the panel for the first time.`,
+  },
+  {
+    date: `2025-06-03T14:35:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Overhauled Modrinth Servers purchase flow.
+- Added the ability to donate creator rewards to charity.`,
+  },
+  {
+    date: `2025-05-08T09:00:00-07:00`,
+    product: 'servers',
+    body: `### Added
+- Added the ability to extract .zip files in the Files page.
+- Added the ability to extract a remote .zip file from a URL, or from a CurseForge modpack version URL.
+- Dependencies will now automatically be installed when installing a mod from Modrinth.`,
+  },
+  {
+    date: `2025-05-08T09:00:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed game version and loader selection when editing a version only showing up to 6 selected items, making it frustrating to remove a specific version.
+- Fixed organization URLs being case sensitive. (Contributed by [IMB11](https://github.com/modrinth/code/pull/3621))
+- Fixed notifications not loading sometimes. (Contributed by [IMB11](https://github.com/modrinth/code/pull/3624))
+- Fixed marking all notifications as read. (Contributed by [IMB11](https://github.com/modrinth/code/pull/3624))
+- Fixed relative time sometimes having poor rounding, and sometimes showing future dates unexpectedly. (Contributed by [IMB11](https://github.com/modrinth/code/pull/3612))
+- Fixed localized pricing not showing in some cases for Modrinth+. (Contributed by [IMB11](https://github.com/modrinth/code/pull/3623))
+- Fixed Modrinth changelog page link back to the full changelog not being clickable sometimes. (Contributed by [ThatGravyBoat](https://github.com/modrinth/code/pull/3593))
+- Fixed analytics 'Views' tab not having the updated display for 'Other' regions.`,
+  },
+  {
+    date: `2025-05-01T18:30:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Added a button to switch Modrinth+ billing between monthly and yearly.
+- Updated Modrinth App marketing page screenshots.`,
+  },
+  {
+    date: `2025-05-01T18:10:00-07:00`,
+    product: 'app',
+    version: `0.9.5`,
+    body: `### Improvements
+- Fixed certain mods with a large number of versions not being able to be installed or load their versions.
+- Fixed server descriptions not being rendered with the Minecraft font.
+- When installing a modpack, the page will now change to the instance once it's created.
+- Last played time for existing servers will now be loaded from log files instead of displaying "Never played".
+- Home page's "Jump back in" section will now display in multiple columns when the screen is very large.
+- Added the ability to launch the instance from a World entry on the Home page.
+- Added the ability to hide a world from the Home page.
+- Added an appearance setting to only show instances instead of worlds on the Home page.
+- Fixed Home page rendering being blocked by server pings.
+- Fixed Home page sometimes not sending the correct protocol version when fetching server data.
+- Fixed server data not being loaded immediately after adding it.
+- Fixed Worlds tab filters showing up in the wrong situations.
+- Fixed new Singleplayer worlds not being added to the Worlds tab without a refresh.
+- Fixed an excessive number of items showing up in "Jump back in" sometimes.
+- Fixed critical error modal cutting off long single-line error messages.`,
+  },
+  {
+    date: `2025-04-29T08:20:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed multiple 'Hidden' countries showing up in analytics, updated flag and changed to 'Other'.`,
+  },
+  {
+    date: `2025-04-28T19:45:00-07:00`,
+    product: 'servers',
+    body: `### Added
+- Added support for installing snapshot versions of Minecraft.
+
+### Improvements
+- Fixed a bug where the loader version wouldn't update after changing Minecraft version if the old loader version did not support the newly selected Minecraft version.
+- Improved wording of unprovisioned servers, to inform people that newly purchased servers may be unprovisioned for a small amount of time.`,
+  },
+  {
+    date: `2025-04-28T19:45:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Combined Apple Silicon and Intel download links for Modrinth App into one link.
+- Added an option to copy a permanent link (using IDs instead of changeable slugs) to projects, users, and organizations.
+- Fixed overflow issue with dev-mode Maven coordinates widget, and changed wording.`,
+  },
+  {
+    date: `2025-04-26T19:15:00-07:00`,
+    product: 'app',
+    version: `0.9.4`,
+    body: `### Added
+- Added a Worlds tab to instances that allow you to manage your worlds and servers directly from the app
+  - Server ping, play count, and descriptions will all show before having to open the game.
+  - Add, edit, and remove servers
+  - Edit and delete singleplayer worlds
+- Added 'Quick Play' functionality, allowing you to jump straight into worlds and servers from the app
+- Added new launcher-log.txt file to log stdout to a file, similar to the Minecraft Launcher which can be helpful for debugging.
+
+### Improvements
+- Overhauled the 'Jump back in' section of the Home page, showing recently played worlds instead of just instances.
+  - This supports the new 'Quick Play' functionality, allowing you to jump back into your recent worlds (on supported Minecraft versions 1.20+)
+- Improved the fatal error dialog to show debug information more prominently, and allow you to copy it to share with support.
+- Fixed the display of critical announcements that has been broken since 0.9.0.
+- Fixed content authors not displaying properly on Content page if the content was owned by an organization.
+- Fixed random errors on the Library page, causing no instances to load.
+- Fixed .mrpack file association on Linux.
+- Fixed occasional failures when moving app directory between disks.`,
+  },
+  {
+    date: `2025-04-25T19:45:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Added feedback survey upon Modrinth Servers cancellation.
+- Added FAQ question about the currency for Modrinth Servers subscription payments.`,
+  },
+  {
+    date: `2025-04-18T22:30:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Updated Modrinth Servers marketing page to be accurate to post-Pyro infrastructure.`,
+  },
+  {
+    date: `2025-04-17T02:25:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Completely overhauled the Backups interface and fixed them being non-functional.
+  - Backups will now show progress when creating and restoring.
+  - Backups now have a "Prepare download" phase, which will prepare a backup file for downloading.
+  - You can now cancel a backup in progress and retry a failed backup.
+- When a backup is in progress, you will no longer be allowed to modify the modpack or loader.
+- Removed the ability to create backups on install automatically, and replaced with a notice that you may want to create a backup before installing a new modpack or loader. This is because the previous implementation of backup on install was unreliable and buggy. We are working on a better implementation for this feature and plan for it to return in the future.
+- Temporarily disabled auto backups button, since they are currently not working.`,
+  },
+  {
+    date: `2025-04-15T16:35:00-07:00`,
+    product: 'servers',
+    body: `### Added
+- Added ability to send surveys to customers in the panel via notices.
+
+### Improvements
+- Added titles to notices.`,
+  },
+  {
+    date: `2025-04-12T22:10:00-07:00`,
+    product: 'servers',
+    body: `### Added
+- Added ability to notify customers in the panel with notices concerning their servers.`,
+  },
+  {
+    date: `2025-04-12T22:10:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fix missing dropdown icon in publishing checklist.`,
+  },
+  {
+    date: `2025-04-01T21:15:00-07:00`,
+    product: 'web',
+    body: `### Added
+- Reverted Modrinth Pizza due to issues in pizza processing leading to users being redirected to [this page](https://modrinth.com/pizza/error).
+- Fixed bug causing theme color to turn orange and corners turn sharp.`,
+  },
+  {
+    date: `2025-04-01T12:00:00`,
+    product: 'web',
+    body: `### Added
+- Added Modrinth Pizza.`,
+  },
+  {
+    date: `2025-04-01T00:00:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed project version field accepting more than 32 characters.`,
+  },
+  {
+    date: `2025-03-25T18:25:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed random 'displayName' error on search pages on some browsers such as Firefox.
+- Fixed 'Resubmit' icon in publishing checklist showing up when it hasn't been submitted before.`,
+  },
+  {
+    date: `2025-03-25T10:40:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed error with links on error pages.`,
+  },
+  {
+    date: `2025-03-24T22:30:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Fixed server plugin loaders not being populated when browsing for plugins
+- Fixed modpack search being filtered by Minecraft version when browsing for modpacks.`,
+  },
+  {
+    date: `2025-03-24T22:30:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Improved error handling, especially when the Modrinth API is down.`,
+  },
+  {
+    date: `2025-03-13T19:30:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Updated Modrinth Servers marketing page, removing Pyro branding.`,
+  },
+  {
+    date: `2025-03-12T10:15:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed low-res icons being pixelated.
+- Fixed mobile navbar hiding bottom of footer.
+- Updated CMP info page to correct some incorrect information.
+- Updated CCPA notice with updated information since Modrinth Servers and Modrinth+.
+- Fixed review page failing under edge case.`,
+  },
+  {
     date: `2025-03-05T17:40:00-08:00`,
     product: 'web',
     body: `### Improvements

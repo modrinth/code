@@ -14,7 +14,7 @@ import { ref, computed } from 'vue'
 import { login as login_flow, set_default_user } from '@/helpers/auth.js'
 import { handleError } from '@/store/notifications.js'
 import { handleSevereError } from '@/store/error.js'
-import { cancel_directory_change } from '@/helpers/settings.js'
+import { cancel_directory_change } from '@/helpers/settings.ts'
 import { install } from '@/helpers/profile.js'
 import { trackEvent } from '@/helpers/analytics'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
@@ -92,7 +92,7 @@ async function loginMinecraft() {
     const loggedIn = await login_flow()
 
     if (loggedIn) {
-      await set_default_user(loggedIn.id).catch(handleError)
+      await set_default_user(loggedIn.profile.id).catch(handleError)
     }
 
     await trackEvent('AccountLogIn', { source: 'ErrorModal' })
@@ -219,8 +219,8 @@ async function copyToClipboard(text) {
           <template v-else-if="metadata.notEnoughSpace">
             <h3>Not enough space</h3>
             <p>
-              It looks like there is not enough space on the disk containing the dirctory you
-              selected Please free up some space and try again or cancel the directory change.
+              It looks like there is not enough space on the disk containing the directory you
+              selected. Please free up some space and try again or cancel the directory change.
             </p>
           </template>
           <template v-else>

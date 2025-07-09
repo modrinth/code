@@ -64,6 +64,21 @@
               </template>
             </span>
             <template v-if="midasCharge">
+              <span
+                v-if="
+                  midasCharge.status === 'open' && midasCharge.subscription_interval === 'monthly'
+                "
+                class="text-sm text-purple"
+              >
+                Save
+                {{
+                  formatPrice(
+                    vintl.locale,
+                    midasCharge.amount * 12 - oppositePrice,
+                    midasCharge.currency_code,
+                  )
+                }}/year by switching to yearly billing!
+              </span>
               <span class="text-sm text-secondary">
                 Since {{ $dayjs(midasSubscription.created).format("MMMM D, YYYY") }}
               </span>
@@ -118,19 +133,46 @@
               </OverflowMenu>
             </ButtonStyled>
           </div>
-          <ButtonStyled v-else-if="midasCharge && midasCharge.status !== 'cancelled'">
-            <button
-              class="ml-auto"
-              @click="
-                () => {
-                  cancelSubscriptionId = midasSubscription.id;
-                  $refs.modalCancel.show();
-                }
-              "
+          <div
+            v-else-if="midasCharge && midasCharge.status !== 'cancelled'"
+            class="ml-auto flex gap-2"
+          >
+            <ButtonStyled>
+              <button
+                :disabled="changingInterval"
+                @click="
+                  () => {
+                    cancelSubscriptionId = midasSubscription.id;
+                    $refs.modalCancel.show();
+                  }
+                "
+              >
+                <XIcon /> Cancel
+              </button>
+            </ButtonStyled>
+            <ButtonStyled
+              :color="midasCharge.subscription_interval === 'yearly' ? 'standard' : 'purple'"
+              color-fill="text"
             >
-              <XIcon /> Cancel
-            </button>
-          </ButtonStyled>
+              <button
+                v-tooltip="
+                  midasCharge.subscription_interval === 'yearly'
+                    ? `Monthly billing will cost you an additional ${formatPrice(
+                        vintl.locale,
+                        oppositePrice * 12 - midasCharge.amount,
+                        midasCharge.currency_code,
+                      )} per year`
+                    : undefined
+                "
+                :disabled="changingInterval"
+                @click="switchMidasInterval(oppositeInterval)"
+              >
+                <SpinnerIcon v-if="changingInterval" class="animate-spin" />
+                <TransferIcon v-else /> {{ changingInterval ? "Switching" : "Switch" }} to
+                {{ oppositeInterval }}
+              </button>
+            </ButtonStyled>
+          </div>
           <ButtonStyled
             v-else-if="midasCharge && midasCharge.status === 'cancelled'"
             color="purple"
@@ -178,8 +220,12 @@
               />
               <div v-else class="w-fit">
                 <p>
-                  A linked server couldn't be found with this subscription. It may have been deleted
-                  or suspended. Please contact Modrinth support with the following information:
+                  A linked server couldn't be found for this subscription. There are a few possible
+                  explanations for this. If you just purchased your server, this is normal. It could
+                  take up to an hour for your server to be provisioned. Otherwise, if you purchased
+                  this server a while ago, it has likely since been suspended. If this is not what
+                  you were expecting, please contact Modrinth Support with the following
+                  information:
                 </p>
                 <div class="flex w-full flex-col gap-2">
                   <CopyCode
@@ -196,7 +242,10 @@
                 <div class="mt-2 flex flex-col gap-2">
                   <div class="flex items-center gap-2">
                     <CheckCircleIcon class="h-5 w-5 text-brand" />
-                    <span> {{ getPyroProduct(subscription)?.metadata?.cpu }} vCores (CPU) </span>
+                    <span>
+                      {{ getPyroProduct(subscription)?.metadata?.cpu / 2 }} Shared CPUs (Bursts up
+                      to {{ getPyroProduct(subscription)?.metadata?.cpu }} CPUs)
+                    </span>
                   </div>
                   <div class="flex items-center gap-2">
                     <CheckCircleIcon class="h-5 w-5 text-brand" />
@@ -281,11 +330,10 @@
                     <ButtonStyled
                       v-if="
                         getPyroCharge(subscription) &&
-                        getPyroCharge(subscription).status !== 'cancelled' &&
-                        getPyroCharge(subscription).status !== 'failed'
+                        getPyroCharge(subscription).status !== 'cancelled'
                       "
                     >
-                      <button @click="showPyroCancelModal(subscription.id)">
+                      <button @click="showCancellationSurvey(subscription)">
                         <XIcon />
                         Cancel
                       </button>
@@ -312,7 +360,14 @@
                       "
                       color="green"
                     >
-                      <button @click="resubscribePyro(subscription.id)">
+                      <button
+                        @click="
+                          resubscribePyro(
+                            subscription.id,
+                            $dayjs(getPyroCharge(subscription).due).isBefore($dayjs()),
+                          )
+                        "
+                      >
                         Resubscribe <RightArrowIcon />
                       </button>
                     </ButtonStyled>
@@ -388,39 +443,13 @@
       :return-url="`${config.public.siteUrl}/servers/manage`"
       :server-name="`${auth?.user?.username}'s server`"
     />
-    <NewModal ref="addPaymentMethodModal">
-      <template #title>
-        <span class="text-lg font-extrabold text-contrast">
-          {{ formatMessage(messages.paymentMethodTitle) }}
-        </span>
-      </template>
-      <div class="min-h-[16rem] md:w-[600px]">
-        <div
-          v-show="loadingPaymentMethodModal !== 2"
-          class="flex min-h-[16rem] items-center justify-center"
-        >
-          <AnimatedLogo class="w-[80px]" />
-        </div>
-        <div v-show="loadingPaymentMethodModal === 2" class="min-h-[16rem] p-1">
-          <div id="address-element"></div>
-          <div id="payment-element" class="mt-4"></div>
-        </div>
-        <div v-show="loadingPaymentMethodModal === 2" class="input-group mt-auto pt-4">
-          <ButtonStyled color="brand">
-            <button :disabled="loadingAddMethod" @click="submit">
-              <PlusIcon />
-              {{ formatMessage(messages.paymentMethodAdd) }}
-            </button>
-          </ButtonStyled>
-          <ButtonStyled>
-            <button @click="$refs.addPaymentMethodModal.hide()">
-              <XIcon />
-              {{ formatMessage(commonMessages.cancelButton) }}
-            </button>
-          </ButtonStyled>
-        </div>
-      </div>
-    </NewModal>
+    <AddPaymentMethodModal
+      ref="addPaymentMethodModal"
+      :publishable-key="config.public.stripePublishableKey"
+      :return-url="`${config.public.siteUrl}/settings/billing`"
+      :create-setup-intent="createSetupIntent"
+      :on-error="handleError"
+    />
     <div class="header__row">
       <div class="header__title">
         <h2 class="text-2xl">{{ formatMessage(messages.paymentMethodTitle) }}</h2>
@@ -534,9 +563,8 @@
 <script setup>
 import {
   ConfirmModal,
-  NewModal,
+  AddPaymentMethodModal,
   OverflowMenu,
-  AnimatedLogo,
   PurchaseModal,
   ButtonStyled,
   CopyCode,
@@ -544,6 +572,8 @@ import {
 } from "@modrinth/ui";
 import {
   PlusIcon,
+  TransferIcon,
+  SpinnerIcon,
   ArrowBigUpDashIcon,
   XIcon,
   CardIcon,
@@ -559,8 +589,9 @@ import {
   UpdatedIcon,
   HistoryIcon,
 } from "@modrinth/assets";
-import { calculateSavings, formatPrice, createStripeElements, getCurrency } from "@modrinth/utils";
+import { calculateSavings, formatPrice, getCurrency } from "@modrinth/utils";
 import { ref, computed } from "vue";
+import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import { products } from "~/generated/state.json";
 
 definePageMeta({
@@ -696,19 +727,6 @@ const paymentMethodTypes = defineMessages({
   },
 });
 
-let stripe = null;
-let elements = null;
-
-function loadStripe() {
-  try {
-    if (!stripe) {
-      stripe = Stripe(config.public.stripePublishableKey);
-    }
-  } catch (error) {
-    console.error("Error loading Stripe:", error);
-  }
-}
-
 const [
   { data: paymentMethods, refresh: refreshPaymentMethods },
   { data: charges, refresh: refreshCharges },
@@ -726,7 +744,7 @@ const [
     useBaseFetch("billing/subscriptions", { internal: true }),
   ),
   useAsyncData("billing/products", () => useBaseFetch("billing/products", { internal: true })),
-  useAsyncData("servers", () => usePyroFetch("servers")),
+  useAsyncData("servers", () => useServersFetch("servers")),
 ]);
 
 const midasProduct = ref(products.find((x) => x.metadata?.type === "midas"));
@@ -745,6 +763,13 @@ const midasCharge = computed(() =>
   midasSubscription.value
     ? charges.value?.find((x) => x.subscription_id === midasSubscription.value.id)
     : null,
+);
+
+const oppositePrice = computed(() =>
+  midasSubscription.value
+    ? midasProduct.value?.prices?.find((price) => price.id === midasSubscription.value.price_id)
+        ?.prices?.intervals?.[oppositeInterval.value]
+    : undefined,
 );
 
 const pyroSubscriptions = computed(() => {
@@ -777,72 +802,44 @@ const primaryPaymentMethodId = computed(() => {
 });
 
 const addPaymentMethodModal = ref();
-const loadingPaymentMethodModal = ref(0);
-async function addPaymentMethod() {
-  try {
-    loadingPaymentMethodModal.value = 0;
-    addPaymentMethodModal.value.show();
 
-    const result = await useBaseFetch("billing/payment_method", {
-      internal: true,
-      method: "POST",
-    });
-
-    loadStripe();
-    const {
-      elements: elementsVal,
-      addressElement,
-      paymentElement,
-    } = createStripeElements(stripe, paymentMethods.value, {
-      clientSecret: result.client_secret,
-    });
-
-    elements = elementsVal;
-    paymentElement.on("ready", () => {
-      loadingPaymentMethodModal.value += 1;
-    });
-    addressElement.on("ready", () => {
-      loadingPaymentMethodModal.value += 1;
-    });
-  } catch (err) {
-    data.$notify({
-      group: "main",
-      title: "An error occurred",
-      text: err.data ? err.data.description : err,
-      type: "error",
-    });
-  }
+function addPaymentMethod() {
+  addPaymentMethodModal.value.show(paymentMethods.value);
 }
 
-const loadingAddMethod = ref(false);
-async function submit() {
-  startLoading();
-  loadingAddMethod.value = true;
-
-  loadStripe();
-  const { error } = await stripe.confirmSetup({
-    elements,
-    confirmParams: {
-      return_url: `${config.public.siteUrl}/settings/billing`,
-    },
+async function createSetupIntent() {
+  return await useBaseFetch("billing/payment_method", {
+    internal: true,
+    method: "POST",
   });
-
-  if (error && error.type !== "validation_error") {
-    data.$notify({
-      group: "main",
-      title: "An error occurred",
-      text: error.message,
-      type: "error",
-    });
-  } else if (!error) {
-    await refresh();
-    addPaymentMethodModal.value.close();
-  }
-  loadingAddMethod.value = false;
-  stopLoading();
 }
 
 const removePaymentMethodIndex = ref();
+
+const changingInterval = ref(false);
+
+const oppositeInterval = computed(() =>
+  midasCharge.value?.subscription_interval === "yearly" ? "monthly" : "yearly",
+);
+
+async function switchMidasInterval(interval) {
+  changingInterval.value = true;
+  startLoading();
+  try {
+    await useBaseFetch(`billing/subscription/${midasSubscription.value.id}`, {
+      internal: true,
+      method: "PATCH",
+      body: {
+        interval,
+      },
+    });
+    await refresh();
+  } catch (error) {
+    console.error("Error switching Modrinth+ payment interval:", error);
+  }
+  stopLoading();
+  changingInterval.value = false;
+}
 
 async function editPaymentMethod(index, primary) {
   startLoading();
@@ -943,15 +940,6 @@ const getProductPrice = (product, interval) => {
 
 const modalCancel = ref(null);
 
-const showPyroCancelModal = (subscriptionId) => {
-  cancelSubscriptionId.value = subscriptionId;
-  if (modalCancel.value) {
-    modalCancel.value.show();
-  } else {
-    console.error("modalCancel ref is undefined");
-  }
-};
-
 const pyroPurchaseModal = ref();
 const currentSubscription = ref(null);
 const currentProduct = ref(null);
@@ -996,7 +984,7 @@ async function fetchCapacityStatuses(serverId, product) {
   if (product) {
     try {
       return {
-        custom: await usePyroFetch(`servers/${serverId}/upgrade-stock`, {
+        custom: await useServersFetch(`servers/${serverId}/upgrade-stock`, {
           method: "POST",
           body: {
             cpu: product.metadata.cpu,
@@ -1024,7 +1012,7 @@ async function fetchCapacityStatuses(serverId, product) {
   }
 }
 
-const resubscribePyro = async (subscriptionId) => {
+const resubscribePyro = async (subscriptionId, wasSuspended) => {
   try {
     await useBaseFetch(`billing/subscription/${subscriptionId}`, {
       internal: true,
@@ -1034,6 +1022,21 @@ const resubscribePyro = async (subscriptionId) => {
       },
     });
     await refresh();
+    if (wasSuspended) {
+      data.$notify({
+        group: "main",
+        title: "Resubscription request submitted",
+        text: "If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.",
+        type: "success",
+      });
+    } else {
+      data.$notify({
+        group: "main",
+        title: "Success",
+        text: "Server subscription resubscribed successfully",
+        type: "success",
+      });
+    }
   } catch {
     data.$notify({
       group: "main",
@@ -1054,4 +1057,66 @@ const refresh = async () => {
     refreshServers(),
   ]);
 };
+
+function showCancellationSurvey(subscription) {
+  if (!subscription) {
+    console.warn("No survey notice to open");
+    return;
+  }
+
+  const product = getPyroProduct(subscription);
+  const priceObj = product?.prices?.find((x) => x.id === subscription.price_id);
+  const price = priceObj?.prices?.intervals?.[subscription.interval];
+  const currency = priceObj?.currency_code;
+
+  const popupOptions = {
+    layout: "modal",
+    width: 700,
+    autoClose: 2000,
+    hideTitle: true,
+    hiddenFields: {
+      username: auth.value?.user?.username,
+      user_id: auth.value?.user?.id,
+      user_email: auth.value?.user?.email,
+      subscription_id: subscription.id,
+      price_id: subscription.price_id,
+      interval: subscription.interval,
+      started: subscription.created,
+      plan_ram: product?.metadata.ram / 1024,
+      plan_cpu: product?.metadata.cpu,
+      price: price ? `${price / 100}` : "unknown",
+      currency: currency ?? "unknown",
+    },
+    onOpen: () => console.log(`Opened cancellation survey for: ${subscription.id}`),
+    onClose: () => console.log(`Closed cancellation survey for: ${subscription.id}`),
+    onSubmit: (payload) => {
+      console.log("Form submitted, cancelling server.", payload);
+      cancelSubscription(subscription.id, true);
+    },
+  };
+
+  const formId = "mOr7lM";
+
+  try {
+    if (window.Tally?.openPopup) {
+      console.log(
+        `Opening Tally popup for servers subscription ${subscription.id} (form ID: ${formId})`,
+      );
+      window.Tally.openPopup(formId, popupOptions);
+    } else {
+      console.warn("Tally script not yet loaded");
+    }
+  } catch (e) {
+    console.error("Error opening Tally popup:", e);
+  }
+}
+
+useHead({
+  script: [
+    {
+      src: "https://tally.so/widgets/embed.js",
+      defer: true,
+    },
+  ],
+});
 </script>

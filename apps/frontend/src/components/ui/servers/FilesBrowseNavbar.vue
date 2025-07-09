@@ -117,7 +117,8 @@
       </div>
 
       <ButtonStyled type="transparent">
-        <UiServersTeleportOverflowMenu
+        <OverflowMenu
+          :dropdown-id="`create-new-${baseId}`"
           position="bottom"
           direction="left"
           aria-label="Create new..."
@@ -125,6 +126,10 @@
             { id: 'file', action: () => $emit('create', 'file') },
             { id: 'directory', action: () => $emit('create', 'directory') },
             { id: 'upload', action: () => $emit('upload') },
+            { divider: true },
+            { id: 'upload-zip', shown: false, action: () => $emit('upload-zip') },
+            { id: 'install-from-url', action: () => $emit('unzip-from-url', false) },
+            { id: 'install-cf-pack', action: () => $emit('unzip-from-url', true) },
           ]"
         >
           <PlusIcon aria-hidden="true" />
@@ -132,7 +137,16 @@
           <template #file> <BoxIcon aria-hidden="true" /> New file </template>
           <template #directory> <FolderOpenIcon aria-hidden="true" /> New folder </template>
           <template #upload> <UploadIcon aria-hidden="true" /> Upload file </template>
-        </UiServersTeleportOverflowMenu>
+          <template #upload-zip>
+            <FileArchiveIcon aria-hidden="true" /> Upload from .zip file
+          </template>
+          <template #install-from-url>
+            <LinkIcon aria-hidden="true" /> Upload from .zip URL
+          </template>
+          <template #install-cf-pack>
+            <CurseForgeIcon aria-hidden="true" /> Install CurseForge pack
+          </template>
+        </OverflowMenu>
       </ButtonStyled>
     </div>
   </header>
@@ -140,6 +154,9 @@
 
 <script setup lang="ts">
 import {
+  LinkIcon,
+  CurseForgeIcon,
+  FileArchiveIcon,
   BoxIcon,
   PlusIcon,
   UploadIcon,
@@ -150,7 +167,7 @@ import {
   ChevronRightIcon,
   FilterIcon,
 } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+import { ButtonStyled, OverflowMenu } from "@modrinth/ui";
 import { ref, computed } from "vue";
 import { useIntersectionObserver } from "@vueuse/core";
 
@@ -158,12 +175,14 @@ const props = defineProps<{
   breadcrumbSegments: string[];
   searchQuery: string;
   currentFilter: string;
+  baseId: string;
 }>();
 
 defineEmits<{
   (e: "navigate", index: number): void;
   (e: "create", type: "file" | "directory"): void;
-  (e: "upload"): void;
+  (e: "upload" | "upload-zip"): void;
+  (e: "unzip-from-url", cf: boolean): void;
   (e: "update:searchQuery", value: string): void;
   (e: "filter", type: string): void;
 }>();

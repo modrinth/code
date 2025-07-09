@@ -67,6 +67,7 @@ export interface Project {
 
   team: ModrinthId
   thread_id: ModrinthId
+  organization: ModrinthId
 
   issues_url?: string
   source_url?: string
@@ -124,6 +125,46 @@ export interface SearchResult {
 
   license: string
 }
+
+export type Organization = {
+  id: ModrinthId
+  slug: string
+  name: string
+  team_id: ModrinthId
+  description: string
+  icon_url: string
+  color: number
+  members: OrganizationMember[]
+}
+
+export type OrganizationPermissions = number
+
+export type OrganizationMember = {
+  team_id: ModrinthId
+  user: User
+  role: string
+  is_owner: boolean
+  permissions: TeamMemberPermissions
+  organization_permissions: OrganizationPermissions
+  accepted: boolean
+  payouts_split: number
+  ordering: number
+}
+
+export type Collection = {
+  id: ModrinthId
+  user: User
+  name: string
+  description: string
+  icon_url: string
+  color: number
+  status: CollectionStatus
+  created: string
+  updated: string
+  projects: ModrinthId[]
+}
+
+export type CollectionStatus = 'listed' | 'unlisted' | 'private' | 'unknown'
 
 export type DependencyType = 'required' | 'optional' | 'incompatible' | 'embedded'
 
@@ -239,6 +280,7 @@ export interface TeamMember {
   accepted: boolean
   payouts_split: number
   ordering: number
+  is_owner: boolean
 }
 
 export type Report = {

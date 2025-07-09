@@ -60,7 +60,7 @@
 
     <div class="relative h-full w-full overflow-y-auto">
       <div
-        v-if="server.network?.error"
+        v-if="server.moduleErrors.network"
         class="flex w-full flex-col items-center justify-center gap-4 p-4"
       >
         <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -73,7 +73,9 @@
             </div>
             <p class="text-lg text-secondary">
               We couldn't load your server's network settings. Here's what we know:
-              <span class="break-all font-mono">{{ JSON.stringify(server.network.error) }}</span>
+              <span class="break-all font-mono">{{
+                JSON.stringify(server.moduleErrors.network.error)
+              }}</span>
             </p>
             <ButtonStyled size="large" color="brand" @click="() => server.refresh(['network'])">
               <button class="mt-6 !w-full">Retry</button>
@@ -192,7 +194,7 @@
                   Primary allocation
                 </span>
 
-                <UiCopyCode :text="`${serverIP}:${serverPrimaryPort}`" />
+                <CopyCode :text="`${serverIP}:${serverPrimaryPort}`" />
               </div>
             </div>
 
@@ -226,7 +228,7 @@
                 </div>
 
                 <div class="flex w-full flex-row items-center gap-2 sm:w-auto">
-                  <UiCopyCode :text="`${serverIP}:${allocation.port}`" />
+                  <CopyCode :text="`${serverIP}:${allocation.port}`" />
                   <ButtonStyled icon-only>
                     <button
                       class="!w-full sm:!w-auto"
@@ -271,12 +273,12 @@ import {
   UploadIcon,
   IssuesIcon,
 } from "@modrinth/assets";
-import { ButtonStyled, NewModal, ConfirmModal } from "@modrinth/ui";
+import { ButtonStyled, NewModal, ConfirmModal, CopyCode } from "@modrinth/ui";
 import { ref, computed, nextTick } from "vue";
-import type { Server } from "~/composables/pyroServers";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: ModrinthServer;
 }>();
 
 const isUpdating = ref(false);

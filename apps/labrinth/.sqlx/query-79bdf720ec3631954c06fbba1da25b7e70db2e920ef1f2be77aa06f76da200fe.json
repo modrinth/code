@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE users_subscriptions\n                SET user_id = $1\n                WHERE user_id = $2\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "79bdf720ec3631954c06fbba1da25b7e70db2e920ef1f2be77aa06f76da200fe"
+}

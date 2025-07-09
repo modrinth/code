@@ -76,7 +76,8 @@
           </template>
           <template #title-suffix>
             <div class="ml-1 flex items-center gap-2 font-semibold">
-              <OrganizationIcon /> Organization
+              <OrganizationIcon />
+              Organization
             </div>
           </template>
           <template #summary>
@@ -97,7 +98,10 @@
               {{ formatCompactNumber(projects?.length || 0) }}
               projects
             </div>
-            <div class="flex items-center gap-2 font-semibold">
+            <div
+              v-tooltip="sumDownloads.toLocaleString()"
+              class="flex items-center gap-2 font-semibold"
+            >
               <DownloadIcon class="h-6 w-6 text-secondary" />
               {{ formatCompactNumber(sumDownloads) }}
               downloads
@@ -122,6 +126,7 @@
                   },
                   { divider: true, shown: auth.user && currentMember },
                   { id: 'copy-id', action: () => copyId() },
+                  { id: 'copy-permalink', action: () => copyPermalink() },
                 ]"
                 aria-label="More options"
               >
@@ -134,15 +139,17 @@
                   <ClipboardCopyIcon aria-hidden="true" />
                   {{ formatMessage(commonMessages.copyIdButton) }}
                 </template>
+                <template #copy-permalink>
+                  <ClipboardCopyIcon aria-hidden="true" />
+                  {{ formatMessage(commonMessages.copyPermalinkButton) }}
+                </template>
               </OverflowMenu>
             </ButtonStyled>
           </template>
         </ContentPageHeader>
       </div>
       <div class="normal-page__sidebar">
-        <AdPlaceholder
-          v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
-        />
+        <AdPlaceholder v-if="!auth.user" />
 
         <div class="card flex-card">
           <h2>Members</h2>
@@ -177,10 +184,12 @@
           <p>You have been invited to join {{ organization.name }}.</p>
           <div class="input-group">
             <button class="iconified-button brand-button" @click="onAcceptInvite">
-              <CheckIcon />Accept
+              <CheckIcon />
+              Accept
             </button>
             <button class="iconified-button danger-button" @click="onDeclineInvite">
-              <XIcon />Decline
+              <XIcon />
+              Decline
             </button>
           </div>
         </div>
@@ -227,7 +236,8 @@
         </template>
 
         <div v-else-if="true" class="error">
-          <UpToDate class="icon" /><br />
+          <UpToDate class="icon" />
+          <br />
           <span class="preserve-lines text">
             This organization doesn't have any projects yet.
             <template v-if="isPermission(currentMember?.organization_permissions, 1 << 4)">
@@ -251,6 +261,9 @@ import {
   CheckIcon,
   XIcon,
   ClipboardCopyIcon,
+  OrganizationIcon,
+  DownloadIcon,
+  CrownIcon,
 } from "@modrinth/assets";
 import {
   Avatar,
@@ -266,24 +279,20 @@ import ModalCreation from "~/components/ui/ModalCreation.vue";
 import UpToDate from "~/assets/images/illustrations/up_to_date.svg?component";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
-
-import OrganizationIcon from "~/assets/images/utils/organization.svg?component";
-import DownloadIcon from "~/assets/images/utils/download.svg?component";
-import CrownIcon from "~/assets/images/utils/crown.svg?component";
 import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
 import NavTabs from "~/components/ui/NavTabs.vue";
 
 const vintl = useVIntl();
 const { formatMessage } = vintl;
 
-const formatCompactNumber = useCompactNumber();
+const formatCompactNumber = useCompactNumber(true);
 
 const auth = await useAuth();
 const user = await useUser();
 const cosmetics = useCosmetics();
 const route = useNativeRoute();
 const tags = useTags();
-const flags = useFeatureFlags();
+const config = useRuntimeConfig();
 
 let orgId = useRouteId();
 
@@ -499,6 +508,12 @@ const navLinks = computed(() => [
 async function copyId() {
   await navigator.clipboard.writeText(organization.value.id);
 }
+
+async function copyPermalink() {
+  await navigator.clipboard.writeText(
+    `${config.public.siteUrl}/organization/${organization.value.id}`,
+  );
+}
 </script>
 
 <style scoped lang="scss">
@@ -535,9 +550,11 @@ async function copyId() {
   display: flex;
   flex-direction: column;
   padding: var(--gap-xl);
+
   h3 {
     margin: 0 0 var(--gap-sm);
   }
+
   .creator {
     display: grid;
     gap: var(--gap-xs);
@@ -549,9 +566,11 @@ async function copyId() {
       "avatar name" auto
       "avatar role" auto
       / auto 1fr;
+
     p {
       margin: 0;
     }
+
     .name {
       grid-area: name;
       align-self: flex-end;
@@ -619,9 +638,11 @@ async function copyId() {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   h3 {
     margin: 0;
   }
+
   a {
     display: flex;
     align-items: center;
@@ -629,25 +650,30 @@ async function copyId() {
     color: var(--color-blue);
   }
 }
+
 .project-overview {
   gap: var(--gap-md);
   padding: var(--gap-xl);
+
   .project-card {
     padding: 0;
     border-radius: 0;
     background-color: transparent;
     box-shadow: none;
+
     :deep(.title) {
       font-size: var(--font-size-nm) !important;
     }
   }
 }
+
 .popout-heading {
   padding: var(--gap-sm) var(--gap-md);
   margin: 0;
   font-size: var(--font-size-md);
   color: var(--color-text);
 }
+
 .popout-checkbox {
   padding: var(--gap-sm) var(--gap-md);
 }

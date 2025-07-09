@@ -1,0 +1,83 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT tm.id, tm.team_id, tm.user_id, tm.role, tm.is_owner, tm.permissions, tm.organization_permissions, tm.accepted, tm.payouts_split, tm.ordering, v.mod_id\n            FROM versions v\n            INNER JOIN mods m ON m.id = v.mod_id\n            INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.user_id = $2 AND tm.accepted = TRUE\n            WHERE v.id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "team_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "role",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "is_owner",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "permissions",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "organization_permissions",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 7,
+        "name": "accepted",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 8,
+        "name": "payouts_split",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 9,
+        "name": "ordering",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 10,
+        "name": "mod_id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "0fcbb92442bdab97fd1b44a0eecb28c05a4c6d482b3fa7874902ee8e846d20b0"
+}

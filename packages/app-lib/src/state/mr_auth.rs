@@ -1,6 +1,6 @@
 use crate::config::{MODRINTH_API_URL, MODRINTH_URL};
 use crate::state::{CacheBehaviour, CachedEntry};
-use crate::util::fetch::{fetch_advanced, FetchSemaphore};
+use crate::util::fetch::{FetchSemaphore, fetch_advanced};
 use chrono::{DateTime, Duration, TimeZone, Utc};
 use dashmap::DashMap;
 use futures::TryStreamExt;

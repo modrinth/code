@@ -80,7 +80,7 @@
             </div>
           </div>
           <div class="label">
-            <RadioButtonChecked v-if="selectedMethodId === method.id" class="radio" />
+            <RadioButtonCheckedIcon v-if="selectedMethodId === method.id" class="radio" />
             <RadioButtonIcon v-else class="radio" />
             <span>{{ method.name }}</span>
           </div>
@@ -139,8 +139,8 @@
       <template v-if="knownErrors.length === 0 && amount">
         <Checkbox v-if="fees > 0" v-model="agreedFees" description="Consent to fee">
           I acknowledge that an estimated
-          {{ $formatMoney(fees) }} will be deducted from the amount I receive to cover
-          {{ $formatWallet(selectedMethod.type) }} processing fees.
+          {{ formatMoney(fees) }} will be deducted from the amount I receive to cover
+          {{ formatWallet(selectedMethod.type) }} processing fees.
         </Checkbox>
         <Checkbox v-model="agreedTransfer" description="Confirm transfer">
           <template v-if="selectedMethod.type === 'tremendous'">
@@ -149,7 +149,7 @@
           </template>
           <template v-else>
             I confirm that I am initiating a transfer to the following
-            {{ $formatWallet(selectedMethod.type) }} account: {{ withdrawAccount }}
+            {{ formatWallet(selectedMethod.type) }} account: {{ withdrawAccount }}
           </template>
         </Checkbox>
         <Checkbox v-model="agreedTerms" class="rewards-checkbox">
@@ -192,12 +192,13 @@ import {
   PayPalIcon,
   SearchIcon,
   RadioButtonIcon,
-  RadioButtonChecked,
+  RadioButtonCheckedIcon,
   XIcon,
   TransferIcon,
 } from "@modrinth/assets";
 import { Chips, Checkbox, Breadcrumbs } from "@modrinth/ui";
 import { all } from "iso-3166-1";
+import { formatMoney, formatWallet } from "@modrinth/utils";
 import VenmoIcon from "~/assets/images/external/venmo.svg?component";
 
 const auth = await useAuth();
@@ -360,16 +361,14 @@ async function withdraw() {
       text:
         selectedMethod.value.type === "tremendous"
           ? "An email has been sent to your account with further instructions on how to redeem your payout!"
-          : `Payment has been sent to your ${data.$formatWallet(
-              selectedMethod.value.type,
-            )} account!`,
+          : `Payment has been sent to your ${formatWallet(selectedMethod.value.type)} account!`,
       type: "success",
     });
   } catch (err) {
     data.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
   }

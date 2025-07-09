@@ -3,11 +3,18 @@
     <div
       class="wrapper-wrapper"
       :class="{
-        'top-fade': !scrollableAtTop && !props.disableScrolling,
-        'bottom-fade': !scrollableAtBottom && !props.disableScrolling,
+        'top-fade': !scrollableAtTop && !disableScrolling,
+        'bottom-fade': !scrollableAtBottom && !disableScrolling,
       }"
     >
-      <div ref="scrollablePane" class="scrollable-pane" @scroll="onScroll">
+      <div
+        ref="scrollablePane"
+        :class="{
+          'max-h-[19rem]': !disableScrolling,
+        }"
+        class="scrollable-pane"
+        @scroll="onScroll"
+      >
         <slot />
       </div>
     </div>
@@ -17,7 +24,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     disableScrolling?: boolean
   }>(),
@@ -48,6 +55,7 @@ onUnmounted(() => {
   }
 })
 function updateFade(scrollTop, offsetHeight, scrollHeight) {
+  console.log(scrollTop, offsetHeight, scrollHeight)
   scrollableAtBottom.value = Math.ceil(scrollTop + offsetHeight) >= scrollHeight
   scrollableAtTop.value = scrollTop <= 0
 }
@@ -57,6 +65,18 @@ function onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
 </script>
 
 <style lang="scss" scoped>
+@property --_top-fade-height {
+  syntax: '<length-percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+@property --_bottom-fade-height {
+  syntax: '<length-percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
 .scrollable-pane-wrapper {
   display: flex;
   flex-direction: column;
@@ -68,27 +88,25 @@ function onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
   display: flex;
   overflow: hidden;
   position: relative;
+  transition:
+    --_top-fade-height 0.05s linear,
+    --_bottom-fade-height 0.05s linear;
 
-  --_fade-height: 4rem;
+  --_fade-height: 3rem;
+
+  mask-image: linear-gradient(
+    transparent,
+    rgb(0 0 0 / 100%) var(--_top-fade-height, 0%),
+    rgb(0 0 0 / 100%) calc(100% - var(--_bottom-fade-height, 0%)),
+    transparent 100%
+  );
 
   &.top-fade {
-    mask-image: linear-gradient(transparent, rgb(0 0 0 / 100%) var(--_fade-height));
+    --_top-fade-height: var(--_fade-height);
   }
 
   &.bottom-fade {
-    mask-image: linear-gradient(
-      rgb(0 0 0 / 100%) calc(100% - var(--_fade-height)),
-      transparent 100%
-    );
-  }
-
-  &.top-fade.bottom-fade {
-    mask-image: linear-gradient(
-      transparent,
-      rgb(0 0 0 / 100%) var(--_fade-height),
-      rgb(0 0 0 / 100%) calc(100% - var(--_fade-height)),
-      transparent 100%
-    );
+    --_bottom-fade-height: var(--_fade-height);
   }
 }
 .scrollable-pane {

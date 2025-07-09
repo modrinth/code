@@ -1,5 +1,6 @@
-use crate::models::ids::{ReportId, ThreadId, UserId};
+use crate::models::ids::{ReportId, ThreadId};
 use crate::models::reports::{ItemType, Report};
+use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 

@@ -1,243 +1,197 @@
 <template>
-  <div class="contents">
-    <div
-      v-if="serverData?.status === 'suspended' && serverData.suspension_reason === 'upgrading'"
-      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+  <div
+    v-if="filteredNotices.length > 0"
+    class="experimental-styles-within relative mx-auto flex w-full min-w-0 max-w-[1280px] flex-col gap-3 px-6"
+  >
+    <ServerNotice
+      v-for="notice in filteredNotices"
+      :key="`notice-${notice.id}`"
+      :level="notice.level"
+      :message="notice.message"
+      :dismissable="notice.dismissable"
+      :title="notice.title"
+      class="w-full"
+      @dismiss="() => dismissNotice(notice.id)"
+    />
+  </div>
+  <div
+    v-if="serverData?.status === 'suspended' && serverData.suspension_reason === 'upgrading'"
+    class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+  >
+    <ErrorInformationCard
+      title="Server upgrading"
+      description="Your server's hardware is currently being upgraded and will be back online shortly!"
+      :icon="TransferIcon"
+      icon-color="blue"
+      :action="generalErrorAction"
+    />
+  </div>
+  <div
+    v-else-if="serverData?.status === 'suspended'"
+    class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+  >
+    <ErrorInformationCard
+      title="Server suspended"
+      :description="suspendedDescription"
+      :icon="LockIcon"
+      icon-color="orange"
+      :action="suspendedAction"
+    />
+  </div>
+  <div
+    v-else-if="
+      server.moduleErrors?.general?.error.statusCode === 403 ||
+      server.moduleErrors?.general?.error.statusCode === 404
+    "
+    class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+  >
+    <ErrorInformationCard
+      title="An error occured."
+      description="Please contact Modrinth Support."
+      :icon="TransferIcon"
+      icon-color="orange"
+      :error-details="generalErrorDetails"
+      :action="generalErrorAction"
+    />
+  </div>
+  <div
+    v-else-if="server.moduleErrors?.general?.error || !nodeAccessible"
+    class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+  >
+    <ErrorInformationCard
+      title="Server Node Unavailable"
+      :icon="PanelErrorIcon"
+      icon-color="red"
+      :action="nodeUnavailableAction"
+      :error-details="nodeUnavailableDetails"
     >
-      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-        <div class="flex flex-col items-center text-center">
-          <div class="flex flex-col items-center gap-4">
-            <div class="grid place-content-center rounded-full bg-bg-blue p-4">
-              <TransferIcon class="size-12 text-blue" />
-            </div>
-            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server upgrading</h1>
-          </div>
-          <p class="text-lg text-secondary">
-            Your server's hardware is currently being upgraded and will be back online shortly!
+      <template #description>
+        <div class="text-md space-y-4">
+          <p class="leading-[170%] text-secondary">
+            Your server's node, where your Modrinth Server is physically hosted, is not accessible
+            at the moment. We are working to resolve the issue as quickly as possible.
           </p>
-        </div>
-      </div>
-    </div>
-    <div
-      v-if="serverData?.status === 'suspended' && serverData.suspension_reason === 'support'"
-      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
-    >
-      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-        <div class="flex flex-col items-center text-center">
-          <div class="flex flex-col items-center gap-4">
-            <div class="grid place-content-center rounded-full bg-bg-blue p-4">
-              <TransferIcon class="size-12 text-blue" />
-            </div>
-            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">We're working on your server</h1>
-          </div>
-          <p class="text-lg text-secondary">
-            You recently contacted Modrinth Support, and we're actively working on your server. It
-            will be back online shortly.
-          </p>
-        </div>
-      </div>
-    </div>
-    <div
-      v-else-if="serverData?.status === 'suspended' && serverData.suspension_reason !== 'upgrading'"
-      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
-    >
-      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-        <div class="flex flex-col items-center text-center">
-          <div class="flex flex-col items-center gap-4">
-            <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-              <LockIcon class="size-12 text-orange" />
-            </div>
-            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server suspended</h1>
-          </div>
-          <p class="text-lg text-secondary">
-            {{
-              serverData.suspension_reason === "cancelled"
-                ? "Your subscription has been cancelled."
-                : serverData.suspension_reason
-                  ? `Your server has been suspended: ${serverData.suspension_reason}`
-                  : "Your server has been suspended."
-            }}
-            <br />
-            Contact Modrinth support if you believe this is an error.
-          </p>
-        </div>
-        <ButtonStyled size="large" color="brand" @click="() => router.push('/settings/billing')">
-          <button class="mt-6 !w-full">Go to billing settings</button>
-        </ButtonStyled>
-      </div>
-    </div>
-    <div
-      v-else-if="
-        server.general?.error?.error.statusCode === 403 ||
-        server.general?.error?.error.statusCode === 404
-      "
-      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
-    >
-      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-        <div class="flex flex-col items-center text-center">
-          <div class="flex flex-col items-center gap-4">
-            <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-              <TransferIcon class="size-12 text-orange" />
-            </div>
-            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server not found</h1>
-          </div>
-          <p class="text-lg text-secondary">
-            You don't have permission to view this server or it no longer exists. If you believe
-            this is an error, please contact Modrinth support.
-          </p>
-        </div>
-        <UiCopyCode :text="JSON.stringify(server.general?.error)" />
-
-        <ButtonStyled size="large" color="brand" @click="() => router.push('/servers/manage')">
-          <button class="mt-6 !w-full">Go back to all servers</button>
-        </ButtonStyled>
-      </div>
-    </div>
-    <div
-      v-else-if="server.general?.error?.error.statusCode === 503"
-      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
-    >
-      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-        <div class="flex flex-col items-center text-center">
-          <div class="flex flex-col items-center gap-4">
-            <div class="grid place-content-center rounded-full bg-bg-red p-4">
-              <UiServersIconsPanelErrorIcon class="size-12 text-red" />
-            </div>
-            <h1 class="m-0 mb-4 w-fit text-4xl font-bold">Server Node Unavailable</h1>
-          </div>
-          <p class="m-0 mb-4 leading-[170%] text-secondary">
-            Your server's node, where your Modrinth Server is physically hosted, is experiencing
-            issues. We are working with our datacenter to resolve the issue as quickly as possible.
-          </p>
-          <p class="m-0 mb-4 leading-[170%] text-secondary">
+          <p class="leading-[170%] text-secondary">
             Your data is safe and will not be lost, and your server will be back online as soon as
             the issue is resolved.
           </p>
-          <p class="m-0 mb-4 leading-[170%] text-secondary">
-            For updates, please join the Modrinth Discord or contact Modrinth Support via the chat
+          <p class="leading-[170%] text-secondary">
+            If reloading does not work initially, please contact Modrinth Support via the chat
             bubble in the bottom right corner and we'll be happy to help.
           </p>
-
-          <div class="flex flex-col gap-2">
-            <UiCopyCode :text="'Server ID: ' + server.serverId" />
-            <UiCopyCode :text="'Node: ' + server.general?.datacenter" />
-          </div>
         </div>
-        <ButtonStyled
-          size="large"
-          color="standard"
-          @click="
-            () =>
-              navigateTo('https://discord.modrinth.com', {
-                external: true,
-              })
-          "
-        >
-          <button class="mt-6 !w-full">Join Modrinth Discord</button>
-        </ButtonStyled>
-        <ButtonStyled
-          :disabled="formattedTime !== '00'"
-          size="large"
-          color="standard"
-          @click="() => reloadNuxtApp()"
-        >
-          <button class="mt-3 !w-full">Reload</button>
-        </ButtonStyled>
-      </div>
-    </div>
-    <div
-      v-else-if="server.general?.error"
-      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+      </template>
+    </ErrorInformationCard>
+  </div>
+  <!-- <div
+    v-else-if="server.moduleErrors?.general?.error"
+    class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+  >
+    <ErrorInformationCard
+      title="Connection lost"
+      description=""
+      :icon="TransferIcon"
+      icon-color="orange"
+      :action="connectionLostAction"
     >
-      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-        <div class="flex flex-col items-center text-center">
-          <div class="flex flex-col items-center gap-4">
-            <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-              <TransferIcon class="size-12 text-orange" />
-            </div>
-            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Connection lost</h1>
-            <div class="text-center text-secondary">
-              {{
-                formattedTime == "00"
-                  ? "Reconnecting..."
-                  : `Retrying in ${formattedTime} seconds...`
-              }}
-            </div>
-          </div>
+      <template #description>
+        <div class="space-y-4">
           <p class="text-lg text-secondary">
             Something went wrong, and we couldn't connect to your server. This is likely due to a
-            temporary network issue. You'll be reconnected automatically.
+            temporary network issue.
           </p>
         </div>
-        <UiCopyCode :text="JSON.stringify(server.general?.error)" />
-        <ButtonStyled
-          :disabled="formattedTime !== '00'"
-          size="large"
-          color="brand"
-          @click="() => reloadNuxtApp()"
+      </template>
+    </ErrorInformationCard>
+  </div> -->
+  <!-- SERVER START -->
+  <div
+    v-else-if="serverData"
+    data-pyro-server-manager-root
+    class="experimental-styles-within mobile-blurred-servericon relative mx-auto mb-6 box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-6 transition-all duration-300"
+    :style="{
+      '--server-bg-image': serverData.image
+        ? `url(${serverData.image})`
+        : `linear-gradient(180deg, rgba(153,153,153,1) 0%, rgba(87,87,87,1) 100%)`,
+    }"
+  >
+    <div class="flex w-full min-w-0 select-none flex-col items-center gap-6 pt-4 sm:flex-row">
+      <UiServersServerIcon :image="serverData.image" class="drop-shadow-lg sm:drop-shadow-none" />
+      <div
+        class="flex min-w-0 flex-1 flex-col-reverse items-center gap-2 sm:flex-col sm:items-start"
+      >
+        <div class="hidden shrink-0 flex-row items-center gap-1 sm:flex">
+          <NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
+            <LeftArrowIcon />
+            All servers
+          </NuxtLink>
+        </div>
+        <div class="flex w-full flex-col items-center gap-4 sm:flex-row">
+          <h1
+            class="m-0 w-screen flex-shrink gap-3 truncate px-3 text-center text-4xl font-bold text-contrast sm:w-full sm:p-0 sm:text-left"
+          >
+            {{ serverData.name }}
+          </h1>
+          <div
+            v-if="isConnected"
+            data-pyro-server-action-buttons
+            class="server-action-buttons-anim flex w-fit flex-shrink-0"
+          >
+            <UiServersPanelServerActionButton
+              v-if="!serverData.flows?.intro"
+              class="flex-shrink-0"
+              :is-online="isServerRunning"
+              :is-actioning="isActioning"
+              :is-installing="serverData.status === 'installing'"
+              :disabled="isActioning || !!error"
+              :server-name="serverData.name"
+              :server-data="serverData"
+              :uptime-seconds="uptimeSeconds"
+              @action="sendPowerAction"
+            />
+          </div>
+        </div>
+
+        <div
+          v-if="serverData.flows?.intro"
+          class="flex items-center gap-2 font-semibold text-secondary"
         >
-          <button class="mt-6 !w-full">Reload</button>
-        </ButtonStyled>
+          <SettingsIcon /> Configuring server...
+        </div>
+        <UiServersServerInfoLabels
+          v-else
+          :server-data="serverData"
+          :show-game-label="showGameLabel"
+          :show-loader-label="showLoaderLabel"
+          :uptime-seconds="uptimeSeconds"
+          :linked="true"
+          class="server-action-buttons-anim flex min-w-0 flex-col flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
+        />
       </div>
     </div>
-    <!-- SERVER START -->
-    <div
-      v-else-if="serverData"
-      data-pyro-server-manager-root
-      class="experimental-styles-within mobile-blurred-servericon relative mx-auto box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-6 transition-all duration-300"
-      :style="{
-        '--server-bg-image': serverData.image
-          ? `url(${serverData.image})`
-          : `linear-gradient(180deg, rgba(153,153,153,1) 0%, rgba(87,87,87,1) 100%)`,
-      }"
-    >
-      <div class="flex w-full min-w-0 select-none flex-col items-center gap-6 pt-4 sm:flex-row">
-        <UiServersServerIcon :image="serverData.image" class="drop-shadow-lg sm:drop-shadow-none" />
-        <div
-          class="flex min-w-0 flex-1 flex-col-reverse items-center gap-2 sm:flex-col sm:items-start"
-        >
-          <div class="hidden shrink-0 flex-row items-center gap-1 sm:flex">
-            <NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
-              <LeftArrowIcon />
-              All servers
-            </NuxtLink>
-          </div>
-          <div class="flex w-full flex-col items-center gap-4 sm:flex-row">
-            <h1
-              class="m-0 w-screen flex-shrink gap-3 truncate px-3 text-center text-4xl font-bold text-contrast sm:w-full sm:p-0 sm:text-left"
-            >
-              {{ serverData.name }}
-            </h1>
-            <div
-              v-if="isConnected"
-              data-pyro-server-action-buttons
-              class="server-action-buttons-anim flex w-fit flex-shrink-0"
-            >
-              <UiServersPanelServerActionButton
-                class="flex-shrink-0"
-                :is-online="isServerRunning"
-                :is-actioning="isActioning"
-                :is-installing="serverData.status === 'installing'"
-                :disabled="isActioning || !!error"
-                :server-name="serverData.name"
-                :server-data="serverData"
-                :uptime-seconds="uptimeSeconds"
-                @action="sendPowerAction"
-              />
-            </div>
-          </div>
 
-          <UiServersServerInfoLabels
-            :server-data="serverData"
-            :show-game-label="showGameLabel"
-            :show-loader-label="showLoaderLabel"
-            :uptime-seconds="uptimeSeconds"
-            :linked="true"
-            class="server-action-buttons-anim flex min-w-0 flex-col flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
-          />
-        </div>
+    <template v-if="serverData.flows?.intro">
+      <div
+        v-if="serverData?.status === 'installing'"
+        class="w-50 h-50 flex items-center justify-center gap-2 text-center text-lg font-bold"
+      >
+        <LazyUiServersPanelSpinner class="size-10 animate-spin" /> Setting up your server...
       </div>
+      <div v-else>
+        <h2 class="my-4 text-xl font-extrabold">
+          What would you like to install on your new server?
+        </h2>
 
+        <ServerInstallation
+          :server="server as ModrinthServer"
+          :backup-in-progress="backupInProgress"
+          ignore-current-installation
+          @reinstall="onReinstall"
+        />
+      </div>
+    </template>
+
+    <template v-else>
       <div
         data-pyro-navigation
         class="isolate flex w-full select-none flex-col justify-between gap-4 overflow-auto md:flex-row md:items-center"
@@ -282,7 +236,7 @@
                       You can change the loader by clicking the "Change Loader" button.
                     </li>
                     <li>
-                      If you're stuck, please contact Modrinth support with the information below:
+                      If you're stuck, please contact Modrinth Support with the information below:
                     </li>
                   </ul>
                   <ButtonStyled>
@@ -304,7 +258,7 @@
                   An error occurred while installing your server because Modrinth Servers does not
                   support the version of Minecraft or the loader you specified. Try reinstalling
                   your server with a different version or loader, and if the problem persists,
-                  please contact Modrinth support with your server's debug information.
+                  please contact Modrinth Support with your server's debug information.
                 </div>
 
                 <div
@@ -378,18 +332,27 @@
           :power-state-details="powerStateDetails"
           :socket="socket"
           :server="server"
+          :backup-in-progress="backupInProgress"
           @reinstall="onReinstall"
         />
       </div>
-
-      <UiServersPoweredByPyro />
-    </div>
+    </template>
+  </div>
+  <div
+    v-if="flags.advancedDebugInfo"
+    class="experimental-styles-within relative mx-auto mt-6 box-border w-full min-w-0 max-w-[1280px] px-6"
+  >
+    <h2 class="m-0 text-lg font-extrabold text-contrast">Server data</h2>
+    <pre class="markdown-body w-full overflow-auto rounded-2xl bg-bg-raised p-4 text-sm">{{
+      JSON.stringify(server, null, "  ")
+    }}</pre>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from "vue";
+import { ref, computed, onMounted, onUnmounted, type Reactive } from "vue";
 import {
+  SettingsIcon,
   CopyIcon,
   IssuesIcon,
   LeftArrowIcon,
@@ -400,29 +363,41 @@ import {
   LockIcon,
 } from "@modrinth/assets";
 import DOMPurify from "dompurify";
-import { ButtonStyled } from "@modrinth/ui";
+import { ButtonStyled, ErrorInformationCard, ServerNotice } from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
-import { reloadNuxtApp, navigateTo } from "#app";
-import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
-import { usePyroConsole } from "~/store/console.ts";
+import type { MessageDescriptor } from "@vintl/vintl";
+import {
+  type ServerState,
+  type Stats,
+  type WSEvent,
+  type WSInstallationResultEvent,
+  type Backup,
+  type PowerAction,
+} from "@modrinth/utils";
+import { reloadNuxtApp } from "#app";
+import { useModrinthServersConsole } from "~/store/console.ts";
+import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
+import { ModrinthServer, useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
+import ServerInstallation from "~/components/ui/servers/ServerInstallation.vue";
+import PanelErrorIcon from "~/components/ui/servers/icons/PanelErrorIcon.vue";
+
+const app = useNuxtApp() as unknown as { $notify: any };
 
 const socket = ref<WebSocket | null>(null);
 const isReconnecting = ref(false);
 const isLoading = ref(true);
 const reconnectInterval = ref<ReturnType<typeof setInterval> | null>(null);
-const isFirstMount = ref(true);
 const isMounted = ref(true);
+const flags = useFeatureFlags();
 
 const INTERCOM_APP_ID = ref("ykeritl9");
-const auth = await useAuth();
-// @ts-expect-error - Auth is untyped
+const auth = (await useAuth()) as unknown as {
+  value: { user: { id: string; username: string; email: string; created: string } };
+};
 const userId = ref(auth.value?.user?.id ?? null);
-// @ts-expect-error - Auth is untyped
 const username = ref(auth.value?.user?.username ?? null);
-// @ts-expect-error - Auth is untyped
 const email = ref(auth.value?.user?.email ?? null);
 const createdAt = ref(
-  // @ts-expect-error - Auth is untyped
   auth.value?.user?.created ? Math.floor(new Date(auth.value.user.created).getTime() / 1000) : null,
 );
 
@@ -430,28 +405,16 @@ const route = useNativeRoute();
 const router = useRouter();
 const serverId = route.params.id as string;
 
-const server = await usePyroServer(serverId, ["general", "ws"]);
+const server: Reactive<ModrinthServer> = await useModrinthServers(serverId, ["general", "ws"]);
 
 const loadModulesPromise = Promise.resolve().then(() => {
   if (server.general?.status === "suspended") {
     return;
   }
-  return server.loadModules(["content", "backups", "network", "startup", "fs"]);
+  return server.refresh(["content", "backups", "network", "startup", "fs"]);
 });
 
 provide("modulesLoaded", loadModulesPromise);
-
-watch(
-  () => [server.general?.error, server.ws?.error],
-  ([generalError, wsError]) => {
-    if (server.general?.status === "suspended") return;
-
-    const error = generalError?.error || wsError?.error;
-    if (error && error.statusCode !== 403) {
-      startPolling();
-    }
-  },
-);
 
 const errorTitle = ref("Error");
 const errorMessage = ref("An unexpected error occurred.");
@@ -460,7 +423,7 @@ const errorLogFile = ref("");
 const serverData = computed(() => server.general);
 const isConnected = ref(false);
 const isWSAuthIncorrect = ref(false);
-const pyroConsole = usePyroConsole();
+const modrinthServersConsole = useModrinthServersConsole();
 const cpuData = ref<number[]>([]);
 const ramData = ref<number[]>([]);
 const isActioning = ref(false);
@@ -528,6 +491,99 @@ const navLinks = [
   },
 ];
 
+const filteredNotices = computed(
+  () => serverData.value?.notices?.filter((n) => n.level !== "survey") ?? [],
+);
+const surveyNotice = computed(() => serverData.value?.notices?.find((n) => n.level === "survey"));
+
+async function dismissSurvey() {
+  const noticeId = surveyNotice.value?.id;
+  if (noticeId === undefined) {
+    console.warn("No survey notice to dismiss");
+    return;
+  }
+  await dismissNotice(noticeId);
+  console.log(`Dismissed survey notice ${noticeId}`);
+}
+
+type TallyPopupOptions = {
+  key?: string;
+  layout?: "default" | "modal";
+  width?: number;
+  alignLeft?: boolean;
+  hideTitle?: boolean;
+  overlay?: boolean;
+  emoji?: {
+    text: string;
+    animation:
+      | "none"
+      | "wave"
+      | "tada"
+      | "heart-beat"
+      | "spin"
+      | "flash"
+      | "bounce"
+      | "rubber-band"
+      | "head-shake";
+  };
+  autoClose?: number;
+  showOnce?: boolean;
+  doNotShowAfterSubmit?: boolean;
+  customFormUrl?: string;
+  hiddenFields?: {
+    [key: string]: unknown;
+  };
+  onOpen?: () => void;
+  onClose?: () => void;
+  onPageView?: (page: number) => void;
+  onSubmit?: (payload: unknown) => void;
+};
+
+const popupOptions = computed(
+  () =>
+    ({
+      layout: "default",
+      width: 400,
+      autoClose: 2000,
+      hideTitle: true,
+      hiddenFields: {
+        username: auth.value?.user?.username,
+        user_id: auth.value?.user?.id,
+        user_email: auth.value?.user?.email,
+        server_id: serverData.value?.server_id,
+        loader: serverData.value?.loader,
+        game_version: serverData.value?.mc_version,
+        modpack_id: serverData.value?.project?.id,
+        modpack_name: serverData.value?.project?.title,
+      },
+      onOpen: () => console.log(`Opened survey notice: ${surveyNotice.value?.id}`),
+      onClose: async () => await dismissSurvey(),
+      onSubmit: (payload: any) => {
+        console.log("Form submitted:", payload);
+      },
+    }) satisfies TallyPopupOptions,
+);
+
+function showSurvey() {
+  if (!surveyNotice.value) {
+    console.warn("No survey notice to open");
+    return;
+  }
+
+  try {
+    if ((window as any).Tally?.openPopup) {
+      console.log(
+        `Opening Tally popup for survey notice ${surveyNotice.value?.id} (form ID: ${surveyNotice.value?.message})`,
+      );
+      (window as any).Tally.openPopup(surveyNotice.value?.message, popupOptions.value);
+    } else {
+      console.warn("Tally script not yet loaded");
+    }
+  } catch (e) {
+    console.error("Error opening Tally popup:", e);
+  }
+}
+
 const connectWebSocket = () => {
   if (!isMounted.value) return;
 
@@ -541,7 +597,7 @@ const connectWebSocket = () => {
         return;
       }
 
-      pyroConsole.clear();
+      modrinthServersConsole.clear();
       socket.value?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
       isConnected.value = true;
       isReconnecting.value = false;
@@ -549,7 +605,7 @@ const connectWebSocket = () => {
 
       if (firstConnect.value) {
         for (let i = 0; i < initialConsoleMessage.length; i++) {
-          pyroConsole.addLine(initialConsoleMessage[i]);
+          modrinthServersConsole.addLine(initialConsoleMessage[i]);
         }
       }
 
@@ -572,7 +628,9 @@ const connectWebSocket = () => {
 
     socket.value.onclose = () => {
       if (isMounted.value) {
-        pyroConsole.addLine("\nSomething went wrong with the connection, we're reconnecting...");
+        modrinthServersConsole.addLine(
+          "\nSomething went wrong with the connection, we're reconnecting...",
+        );
         isConnected.value = false;
         scheduleReconnect();
       }
@@ -621,7 +679,6 @@ const startUptimeUpdates = () => {
 const stopUptimeUpdates = () => {
   if (uptimeIntervalId) {
     clearInterval(uptimeIntervalId);
-    intervalId = null;
   }
 };
 
@@ -630,7 +687,7 @@ const handleWebSocketMessage = (data: WSEvent) => {
     case "log":
       // eslint-disable-next-line no-case-declarations
       const log = data.message.split("\n").filter((l) => l.trim());
-      pyroConsole.addLines(log);
+      modrinthServersConsole.addLines(log);
       break;
     case "stats":
       updateStats(data);
@@ -663,6 +720,65 @@ const handleWebSocketMessage = (data: WSEvent) => {
       uptimeSeconds.value = data.uptime;
       startUptimeUpdates();
       break;
+    case "backup-progress": {
+      // Update a backup's state
+      const curBackup = server.backups?.data.find((backup) => backup.id === data.id);
+
+      if (!curBackup) {
+        console.log(`Ignoring backup-progress event for unknown backup: ${data.id}`);
+      } else {
+        console.log(
+          `Handling backup progress for ${curBackup.name} (${data.id}) task: ${data.task} state: ${data.state} progress: ${data.progress}`,
+        );
+
+        if (!curBackup.task) {
+          curBackup.task = {};
+        }
+
+        curBackup.task[data.task] = {
+          progress: data.progress,
+          state: data.state,
+        };
+
+        curBackup.ongoing = data.task === "create" && data.state === "ongoing";
+      }
+
+      break;
+    }
+    case "filesystem-ops": {
+      if (!server.fs) {
+        console.error("FilesystemOps received, but server.fs is not available", data.all);
+        break;
+      }
+      if (JSON.stringify(server.fs.ops) !== JSON.stringify(data.all)) {
+        server.fs.ops = data.all;
+      }
+
+      server.fs.queuedOps = server.fs.queuedOps.filter(
+        (queuedOp) => !data.all.some((x) => x.src === queuedOp.src),
+      );
+
+      const cancelled = data.all.filter((x) => x.state === "cancelled");
+      Promise.all(cancelled.map((x) => server.fs?.modifyOp(x.id, "dismiss")));
+
+      const completed = data.all.filter((x) => x.state === "done");
+      if (completed.length > 0) {
+        setTimeout(
+          async () =>
+            await Promise.all(
+              completed.map((x) => {
+                if (!server.fs?.opsQueuedForModification.includes(x.id)) {
+                  server.fs?.opsQueuedForModification.push(x.id);
+                  return server.fs?.modifyOp(x.id, "dismiss");
+                }
+                return Promise.resolve();
+              }),
+            ),
+          3000,
+        );
+      }
+      break;
+    }
     default:
       console.warn("Unhandled WebSocket event:", data);
   }
@@ -673,6 +789,10 @@ const newLoaderVersion = ref<string | null>(null);
 const newMCVersion = ref<string | null>(null);
 
 const onReinstall = (potentialArgs: any) => {
+  if (serverData.value?.flows?.intro) {
+    server.general?.endIntro();
+  }
+
   if (!serverData.value) return;
 
   serverData.value.status = "installing";
@@ -696,8 +816,6 @@ const handleInstallationResult = async (data: WSInstallationResultEvent) => {
   switch (data.result) {
     case "ok": {
       if (!serverData.value) break;
-
-      stopPolling();
 
       try {
         await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -828,11 +946,11 @@ const toAdverb = (word: string) => {
   return word + "ing";
 };
 
-const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") => {
+const sendPowerAction = async (action: PowerAction) => {
   const actionName = action.charAt(0).toUpperCase() + action.slice(1);
   try {
     isActioning.value = true;
-    await server.general?.power(actionName);
+    await server.general?.power(action);
   } catch (error) {
     console.error(`Error ${toAdverb(actionName)} server:`, error);
     notifyError(
@@ -853,31 +971,130 @@ const notifyError = (title: string, text: string) => {
   });
 };
 
-let intervalId: ReturnType<typeof setInterval> | null = null;
-const countdown = ref(15);
+export type BackupInProgressReason = {
+  type: string;
+  tooltip: MessageDescriptor;
+};
 
-const formattedTime = computed(() => {
-  const seconds = countdown.value % 60;
-  return `${seconds.toString().padStart(2, "0")}`;
+const RestoreInProgressReason = {
+  type: "restore",
+  tooltip: defineMessage({
+    id: "servers.backup.restore.in-progress.tooltip",
+    defaultMessage: "Backup restore in progress",
+  }),
+} satisfies BackupInProgressReason;
+
+const CreateInProgressReason = {
+  type: "create",
+  tooltip: defineMessage({
+    id: "servers.backup.create.in-progress.tooltip",
+    defaultMessage: "Backup creation in progress",
+  }),
+} satisfies BackupInProgressReason;
+
+const backupInProgress = computed(() => {
+  const backups = server.backups?.data;
+  if (!backups) {
+    return undefined;
+  }
+  if (backups.find((backup: Backup) => backup?.task?.create?.state === "ongoing")) {
+    return CreateInProgressReason;
+  }
+  if (backups.find((backup: Backup) => backup?.task?.restore?.state === "ongoing")) {
+    return RestoreInProgressReason;
+  }
+  return undefined;
 });
 
-const stopPolling = () => {
-  if (intervalId) {
-    clearInterval(intervalId);
-    intervalId = null;
-  }
-};
+const nodeUnavailableDetails = computed(() => [
+  {
+    label: "Server ID",
+    value: server.serverId,
+    type: "inline" as const,
+  },
+  {
+    label: "Node",
+    value: server.general?.datacenter ?? "Unknown",
+    type: "inline" as const,
+  },
+  {
+    label: "Error message",
+    value: nodeAccessible.value
+      ? server.moduleErrors?.general?.error.message ?? "Unknown"
+      : "Unable to reach node. Ping test failed.",
+    type: "block" as const,
+  },
+]);
 
-const startPolling = () => {
-  countdown.value = 15;
-  intervalId = setInterval(() => {
-    if (countdown.value <= 0) {
-      reloadNuxtApp();
-    } else {
-      countdown.value--;
-    }
-  }, 1000);
-};
+const suspendedDescription = computed(() => {
+  if (serverData.value?.suspension_reason === "cancelled") {
+    return "Your subscription has been cancelled.\nContact Modrinth Support if you believe this is an error.";
+  }
+  if (serverData.value?.suspension_reason) {
+    return `Your server has been suspended: ${serverData.value.suspension_reason}\nContact Modrinth Support if you believe this is an error.`;
+  }
+  return "Your server has been suspended.\nContact Modrinth Support if you believe this is an error.";
+});
+
+const generalErrorDetails = computed(() => [
+  {
+    label: "Server ID",
+    value: server.serverId,
+    type: "inline" as const,
+  },
+  {
+    label: "Timestamp",
+    value: String(server.moduleErrors?.general?.timestamp),
+    type: "inline" as const,
+  },
+  {
+    label: "Error Name",
+    value: server.moduleErrors?.general?.error.name,
+    type: "inline" as const,
+  },
+  {
+    label: "Error Message",
+    value: server.moduleErrors?.general?.error.message,
+    type: "block" as const,
+  },
+  ...(server.moduleErrors?.general?.error.originalError
+    ? [
+        {
+          label: "Original Error",
+          value: String(server.moduleErrors.general.error.originalError),
+          type: "hidden" as const,
+        },
+      ]
+    : []),
+  ...(server.moduleErrors?.general?.error.stack
+    ? [
+        {
+          label: "Stack Trace",
+          value: server.moduleErrors.general.error.stack,
+          type: "hidden" as const,
+        },
+      ]
+    : []),
+]);
+
+const suspendedAction = computed(() => ({
+  label: "Go to billing settings",
+  onClick: () => router.push("/settings/billing"),
+  color: "brand" as const,
+}));
+
+const generalErrorAction = computed(() => ({
+  label: "Go back to all servers",
+  onClick: () => router.push("/servers/manage"),
+  color: "brand" as const,
+}));
+
+const nodeUnavailableAction = computed(() => ({
+  label: "Reload",
+  onClick: () => reloadNuxtApp(),
+  color: "brand" as const,
+  disabled: false,
+}));
 
 const copyServerDebugInfo = () => {
   const debugInfo = `Server ID: ${serverData.value?.server_id}\nError: ${errorMessage.value}\nKind: ${serverData.value?.upstream?.kind}\nProject ID: ${serverData.value?.upstream?.project_id}\nVersion ID: ${serverData.value?.upstream?.version_id}\nLog: ${errorLog.value}`;
@@ -900,7 +1117,6 @@ const cleanup = () => {
 
   shutdown();
 
-  stopPolling();
   stopUptimeUpdates();
   if (reconnectInterval.value) {
     clearInterval(reconnectInterval.value);
@@ -929,18 +1145,51 @@ const cleanup = () => {
   DOMPurify.removeHook("afterSanitizeAttributes");
 };
 
+async function dismissNotice(noticeId: number) {
+  await useServersFetch(`servers/${serverId}/notices/${noticeId}/dismiss`, {
+    method: "POST",
+  }).catch((err) => {
+    app.$notify({
+      group: "main",
+      title: "Error dismissing notice",
+      text: err,
+      type: "error",
+    });
+  });
+  await server.refresh(["general"]);
+}
+
+const nodeAccessible = ref(true);
+
 onMounted(() => {
   isMounted.value = true;
   if (server.general?.status === "suspended") {
     isLoading.value = false;
     return;
   }
-  if (server.error) {
-    if (!server.error.message.includes("Forbidden")) {
-      startPolling();
-    }
+
+  server
+    .testNodeReachability()
+    .then((result) => {
+      nodeAccessible.value = result;
+      if (!nodeAccessible.value) {
+        isLoading.value = false;
+      }
+    })
+    .catch((err) => {
+      console.error("Error testing node reachability:", err);
+      nodeAccessible.value = false;
+      isLoading.value = false;
+    });
+
+  if (server.moduleErrors.general?.error) {
+    isLoading.value = false;
   } else {
     connectWebSocket();
+  }
+
+  if (server.general?.flows?.intro && server.general?.project) {
+    server.general?.endIntro();
   }
 
   if (username.value && email.value && userId.value && createdAt.value) {
@@ -976,29 +1225,27 @@ onMounted(() => {
       }
     },
   );
+
+  if (surveyNotice.value) {
+    showSurvey();
+  }
 });
 
 onUnmounted(() => {
   cleanup();
 });
 
-watch(
-  () => serverData.value?.status,
-  (newStatus, oldStatus) => {
-    if (isFirstMount.value) {
-      isFirstMount.value = false;
-      return;
-    }
-
-    if (newStatus === "installing" && oldStatus !== "installing") {
-      countdown.value = 15;
-      startPolling();
-    }
-  },
-);
-
 definePageMeta({
   middleware: "auth",
+});
+
+useHead({
+  script: [
+    {
+      src: "https://tally.so/widgets/embed.js",
+      defer: true,
+    },
+  ],
 });
 </script>
 

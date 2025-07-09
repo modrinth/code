@@ -19,11 +19,27 @@ export default new createRouter({
       },
     },
     {
+      path: '/worlds',
+      name: 'Worlds',
+      component: Pages.Worlds,
+      meta: {
+        breadcrumb: [{ name: 'Worlds' }],
+      },
+    },
+    {
       path: '/browse/:projectType',
       name: 'Discover content',
       component: Pages.Browse,
       meta: {
         breadcrumb: [{ name: 'Discover content' }],
+      },
+    },
+    {
+      path: '/skins',
+      name: 'Skins',
+      component: Pages.Skins,
+      meta: {
+        breadcrumb: [{ name: 'Skins' }],
       },
     },
     {
@@ -106,13 +122,31 @@ export default new createRouter({
       component: Instance.Index,
       props: true,
       children: [
+        // {
+        //   path: '',
+        //   name: 'Overview',
+        //   component: Instance.Overview,
+        //   meta: {
+        //     useRootContext: true,
+        //     breadcrumb: [{ name: '?Instance' }],
+        //   },
+        // },
+        {
+          path: 'worlds',
+          name: 'InstanceWorlds',
+          component: Instance.Worlds,
+          meta: {
+            useRootContext: true,
+            breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Worlds' }],
+          },
+        },
         {
           path: '',
           name: 'Mods',
           component: Instance.Mods,
           meta: {
             useRootContext: true,
-            breadcrumb: [{ name: '?Instance' }],
+            breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Content' }],
           },
         },
         {
@@ -121,7 +155,7 @@ export default new createRouter({
           component: Instance.Mods,
           meta: {
             useRootContext: true,
-            breadcrumb: [{ name: '?Instance' }],
+            breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Content' }],
           },
         },
         {

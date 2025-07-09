@@ -5,9 +5,9 @@ use common::api_common::ApiProject;
 
 use common::api_v3::ApiV3;
 use common::database::USER_USER_PAT;
-use common::environment::{with_test_environment, TestEnvironment};
+use common::environment::{TestEnvironment, with_test_environment};
 
-mod common;
+pub mod common;
 
 #[actix_rt::test]
 pub async fn error_404_body() {

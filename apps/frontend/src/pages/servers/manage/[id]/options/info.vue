@@ -104,7 +104,7 @@
             <tr v-for="property in properties" :key="property.name">
               <td v-if="property.value !== 'Unknown'" class="py-3">{{ property.name }}</td>
               <td v-if="property.value !== 'Unknown'" class="px-4">
-                <UiCopyCode :text="property.value" />
+                <CopyCode :text="property.value" />
               </td>
             </tr>
           </tbody>
@@ -115,15 +115,12 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled } from "@modrinth/ui";
+import { ButtonStyled, CopyCode } from "@modrinth/ui";
 import { CopyIcon, ExternalIcon, EyeIcon, EyeOffIcon } from "@modrinth/assets";
-import type { Server } from "~/composables/pyroServers";
-
-const route = useNativeRoute();
-const serverId = route.params.id as string;
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: ModrinthServer;
 }>();
 
 const data = computed(() => props.server.general);
@@ -147,8 +144,8 @@ const copyToClipboard = (name: string, textToCopy?: string) => {
 };
 
 const properties = [
-  { name: "Server ID", value: serverId ?? "Unknown" },
-  { name: "Node", value: data.value?.datacenter ?? "Unknown" },
+  { name: "Server ID", value: props.server.serverId ?? "Unknown" },
+  { name: "Node", value: data.value?.node?.instance ?? "Unknown" },
   { name: "Kind", value: data.value?.upstream?.kind ?? data.value?.loader ?? "Unknown" },
   { name: "Project ID", value: data.value?.upstream?.project_id ?? "Unknown" },
   { name: "Version ID", value: data.value?.upstream?.version_id ?? "Unknown" },

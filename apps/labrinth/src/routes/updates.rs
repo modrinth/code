@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use actix_web::{get, web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, get, web};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
@@ -42,7 +42,7 @@ pub async fn forge_updates(
 
     let (id,) = info.into_inner();
 
-    let project = database::models::Project::get(&id, &**pool, &redis)
+    let project = database::models::DBProject::get(&id, &**pool, &redis)
         .await?
         .ok_or_else(|| ApiError::InvalidInput(ERROR.to_string()))?;
 
@@ -51,7 +51,7 @@ pub async fn forge_updates(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ]),
+        Scopes::PROJECT_READ,
     )
     .await
     .map(|x| x.1)
@@ -61,9 +61,12 @@ pub async fn forge_updates(
         return Err(ApiError::InvalidInput(ERROR.to_string()));
     }
 
-    let versions =
-        database::models::Version::get_many(&project.versions, &**pool, &redis)
-            .await?;
+    let versions = database::models::DBVersion::get_many(
+        &project.versions,
+        &**pool,
+        &redis,
+    )
+    .await?;
 
     let loaders = match &*neo.neoforge {
         "only" => |x: &String| *x == "neoforge",
@@ -116,7 +119,7 @@ pub async fn forge_updates(
             for game_version in &game_versions {
                 response
                     .promos
-                    .entry(format!("{}-recommended", game_version))
+                    .entry(format!("{game_version}-recommended"))
                     .or_insert_with(|| version.version_number.clone());
             }
         }
@@ -124,7 +127,7 @@ pub async fn forge_updates(
         for game_version in &game_versions {
             response
                 .promos
-                .entry(format!("{}-latest", game_version))
+                .entry(format!("{game_version}-latest"))
                 .or_insert_with(|| version.version_number.clone());
         }
     }

@@ -1,4 +1,3 @@
-use std::num::NonZeroU32;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -13,19 +12,17 @@ use tracing::{info, warn};
 
 extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
-use governor::middleware::StateInformationMiddleware;
-use governor::{Quota, RateLimiter};
 use util::cors::default_cors;
 
+use crate::background_task::update_versions;
 use crate::queue::moderation::AutomatedModerationQueue;
-use crate::util::ratelimit::KeyedRateLimiter;
-use crate::{
-    queue::payouts::process_payout,
-    search::indexing::index_projects,
-    util::env::{parse_strings_from_var, parse_var},
-};
+use crate::queue::payouts::insert_bank_balances;
+use crate::util::env::{parse_strings_from_var, parse_var};
+use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
+use sync::friends::handle_pubsub;
 
 pub mod auth;
+pub mod background_task;
 pub mod clickhouse;
 pub mod database;
 pub mod file_hosting;
@@ -34,6 +31,7 @@ pub mod queue;
 pub mod routes;
 pub mod scheduler;
 pub mod search;
+pub mod sync;
 pub mod util;
 pub mod validate;
 
@@ -57,10 +55,11 @@ pub struct LabrinthConfig {
     pub analytics_queue: Arc<AnalyticsQueue>,
     pub active_sockets: web::Data<ActiveSockets>,
     pub automated_moderation_queue: web::Data<AutomatedModerationQueue>,
-    pub rate_limiter: KeyedRateLimiter,
+    pub rate_limiter: web::Data<AsyncRateLimiter>,
     pub stripe_client: stripe::Client,
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn app_setup(
     pool: sqlx::Pool<Postgres>,
     redis_pool: RedisPool,
@@ -68,6 +67,8 @@ pub fn app_setup(
     clickhouse: &mut Client,
     file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
     maxmind: Arc<queue::maxmind::MaxMindIndexer>,
+    stripe_client: stripe::Client,
+    enable_background_tasks: bool,
 ) -> LabrinthConfig {
     info!(
         "Starting Labrinth on {}",
@@ -90,107 +91,102 @@ pub fn app_setup(
 
     let mut scheduler = scheduler::Scheduler::new();
 
-    let limiter: KeyedRateLimiter = Arc::new(
-        RateLimiter::keyed(Quota::per_minute(NonZeroU32::new(300).unwrap()))
-            .with_middleware::<StateInformationMiddleware>(),
-    );
-    let limiter_clone = Arc::clone(&limiter);
-    scheduler.run(Duration::from_secs(60), move || {
-        info!(
-            "Clearing ratelimiter, storage size: {}",
-            limiter_clone.len()
-        );
-        limiter_clone.retain_recent();
-        info!(
-            "Done clearing ratelimiter, storage size: {}",
-            limiter_clone.len()
-        );
-
-        async move {}
-    });
-
-    // The interval in seconds at which the local database is indexed
-    // for searching.  Defaults to 1 hour if unset.
-    let local_index_interval = std::time::Duration::from_secs(
-        parse_var("LOCAL_INDEX_INTERVAL").unwrap_or(3600),
-    );
-
-    let pool_ref = pool.clone();
-    let search_config_ref = search_config.clone();
-    let redis_pool_ref = redis_pool.clone();
-    scheduler.run(local_index_interval, move || {
-        let pool_ref = pool_ref.clone();
-        let redis_pool_ref = redis_pool_ref.clone();
-        let search_config_ref = search_config_ref.clone();
-        async move {
-            info!("Indexing local database");
-            let result = index_projects(
-                pool_ref,
-                redis_pool_ref.clone(),
-                &search_config_ref,
-            )
-            .await;
-            if let Err(e) = result {
-                warn!("Local project indexing failed: {:?}", e);
-            }
-            info!("Done indexing local database");
-        }
-    });
-
-    // Changes statuses of scheduled projects/versions
-    let pool_ref = pool.clone();
-    // TODO: Clear cache when these are run
-    scheduler.run(std::time::Duration::from_secs(60 * 5), move || {
-        let pool_ref = pool_ref.clone();
-        info!("Releasing scheduled versions/projects!");
-
-        async move {
-            let projects_results = sqlx::query!(
-                "
-                UPDATE mods
-                SET status = requested_status
-                WHERE status = $1 AND approved < CURRENT_DATE AND requested_status IS NOT NULL
-                ",
-                crate::models::projects::ProjectStatus::Scheduled.as_str(),
-            )
-            .execute(&pool_ref)
-            .await;
-
-            if let Err(e) = projects_results {
-                warn!("Syncing scheduled releases for projects failed: {:?}", e);
-            }
-
-            let versions_results = sqlx::query!(
-                "
-                UPDATE versions
-                SET status = requested_status
-                WHERE status = $1 AND date_published < CURRENT_DATE AND requested_status IS NOT NULL
-                ",
-                crate::models::projects::VersionStatus::Scheduled.as_str(),
-            )
-            .execute(&pool_ref)
-            .await;
-
-            if let Err(e) = versions_results {
-                warn!("Syncing scheduled releases for versions failed: {:?}", e);
-            }
-
-            info!("Finished releasing scheduled versions/projects");
-        }
-    });
-
-    scheduler::schedule_versions(
-        &mut scheduler,
-        pool.clone(),
+    let limiter = web::Data::new(AsyncRateLimiter::new(
         redis_pool.clone(),
-    );
+        GCRAParameters::new(300, 300),
+    ));
+
+    if enable_background_tasks {
+        // The interval in seconds at which the local database is indexed
+        // for searching.  Defaults to 1 hour if unset.
+        let local_index_interval = Duration::from_secs(
+            parse_var("LOCAL_INDEX_INTERVAL").unwrap_or(3600),
+        );
+        let pool_ref = pool.clone();
+        let search_config_ref = search_config.clone();
+        let redis_pool_ref = redis_pool.clone();
+        scheduler.run(local_index_interval, move || {
+            let pool_ref = pool_ref.clone();
+            let redis_pool_ref = redis_pool_ref.clone();
+            let search_config_ref = search_config_ref.clone();
+            async move {
+                background_task::index_search(
+                    pool_ref,
+                    redis_pool_ref,
+                    search_config_ref,
+                )
+                .await;
+            }
+        });
+
+        // Changes statuses of scheduled projects/versions
+        let pool_ref = pool.clone();
+        // TODO: Clear cache when these are run
+        scheduler.run(Duration::from_secs(60 * 5), move || {
+            let pool_ref = pool_ref.clone();
+            async move {
+                background_task::release_scheduled(pool_ref).await;
+            }
+        });
+
+        let version_index_interval = Duration::from_secs(
+            parse_var("VERSION_INDEX_INTERVAL").unwrap_or(1800),
+        );
+        let pool_ref = pool.clone();
+        let redis_pool_ref = redis_pool.clone();
+        scheduler.run(version_index_interval, move || {
+            let pool_ref = pool_ref.clone();
+            let redis = redis_pool_ref.clone();
+            async move {
+                update_versions(pool_ref, redis).await;
+            }
+        });
+
+        let pool_ref = pool.clone();
+        let client_ref = clickhouse.clone();
+        scheduler.run(Duration::from_secs(60 * 60 * 6), move || {
+            let pool_ref = pool_ref.clone();
+            let client_ref = client_ref.clone();
+            async move {
+                background_task::payouts(pool_ref, client_ref).await;
+            }
+        });
+
+        let pool_ref = pool.clone();
+        let redis_ref = redis_pool.clone();
+        let stripe_client_ref = stripe_client.clone();
+        actix_rt::spawn(async move {
+            loop {
+                routes::internal::billing::index_billing(
+                    stripe_client_ref.clone(),
+                    pool_ref.clone(),
+                    redis_ref.clone(),
+                )
+                .await;
+                tokio::time::sleep(Duration::from_secs(60 * 5)).await;
+            }
+        });
+
+        let pool_ref = pool.clone();
+        let redis_ref = redis_pool.clone();
+        actix_rt::spawn(async move {
+            loop {
+                routes::internal::billing::index_subscriptions(
+                    pool_ref.clone(),
+                    redis_ref.clone(),
+                )
+                .await;
+                tokio::time::sleep(Duration::from_secs(60 * 5)).await;
+            }
+        });
+    }
 
     let session_queue = web::Data::new(AuthQueue::new());
 
     let pool_ref = pool.clone();
     let redis_ref = redis_pool.clone();
     let session_queue_ref = session_queue.clone();
-    scheduler.run(std::time::Duration::from_secs(60 * 30), move || {
+    scheduler.run(Duration::from_secs(60 * 30), move || {
         let pool_ref = pool_ref.clone();
         let redis_ref = redis_ref.clone();
         let session_queue_ref = session_queue_ref.clone();
@@ -208,7 +204,7 @@ pub fn app_setup(
     let reader = maxmind.clone();
     {
         let reader_ref = reader;
-        scheduler.run(std::time::Duration::from_secs(60 * 60 * 24), move || {
+        scheduler.run(Duration::from_secs(60 * 60 * 24), move || {
             let reader_ref = reader_ref.clone();
 
             async move {
@@ -232,7 +228,7 @@ pub fn app_setup(
         let analytics_queue_ref = analytics_queue.clone();
         let pool_ref = pool.clone();
         let redis_ref = redis_pool.clone();
-        scheduler.run(std::time::Duration::from_secs(15), move || {
+        scheduler.run(Duration::from_secs(15), move || {
             let client_ref = client_ref.clone();
             let analytics_queue_ref = analytics_queue_ref.clone();
             let pool_ref = pool_ref.clone();
@@ -251,58 +247,40 @@ pub fn app_setup(
         });
     }
 
-    {
-        let pool_ref = pool.clone();
-        let client_ref = clickhouse.clone();
-        scheduler.run(std::time::Duration::from_secs(60 * 60 * 6), move || {
-            let pool_ref = pool_ref.clone();
-            let client_ref = client_ref.clone();
-
-            async move {
-                info!("Started running payouts");
-                let result = process_payout(&pool_ref, &client_ref).await;
-                if let Err(e) = result {
-                    warn!("Payouts run failed: {:?}", e);
-                }
-                info!("Done running payouts");
-            }
-        });
-    }
-
-    let stripe_client =
-        stripe::Client::new(dotenvy::var("STRIPE_API_KEY").unwrap());
-    {
-        let pool_ref = pool.clone();
-        let redis_ref = redis_pool.clone();
-        let stripe_client_ref = stripe_client.clone();
-
-        actix_rt::spawn(async move {
-            routes::internal::billing::task(
-                stripe_client_ref,
-                pool_ref,
-                redis_ref,
-            )
-            .await;
-        });
-    }
-
-    {
-        let pool_ref = pool.clone();
-        let redis_ref = redis_pool.clone();
-
-        actix_rt::spawn(async move {
-            routes::internal::billing::subscription_task(pool_ref, redis_ref)
-                .await;
-        });
-    }
-
     let ip_salt = Pepper {
         pepper: ariadne::ids::Base62Id(ariadne::ids::random_base62(11))
             .to_string(),
     };
 
     let payouts_queue = web::Data::new(PayoutsQueue::new());
+
+    let payouts_queue_ref = payouts_queue.clone();
+    let pool_ref = pool.clone();
+    scheduler.run(Duration::from_secs(60 * 60 * 6), move || {
+        let payouts_queue_ref = payouts_queue_ref.clone();
+        let pool_ref = pool_ref.clone();
+        async move {
+            info!("Started updating bank balances");
+            let result =
+                insert_bank_balances(&payouts_queue_ref, &pool_ref).await;
+            if let Err(e) = result {
+                warn!("Bank balance update failed: {:?}", e);
+            }
+            info!("Done updating bank balances");
+        }
+    });
+
     let active_sockets = web::Data::new(ActiveSockets::default());
+
+    {
+        let pool = pool.clone();
+        let redis_client = redis::Client::open(redis_pool.url.clone()).unwrap();
+        let sockets = active_sockets.clone();
+        actix_rt::spawn(async move {
+            let pubsub = redis_client.get_async_pubsub().await.unwrap();
+            handle_pubsub(pubsub, pool, sockets).await;
+        });
+    }
 
     LabrinthConfig {
         pool,
@@ -352,13 +330,17 @@ pub fn app_config(
     .app_data(labrinth_config.active_sockets.clone())
     .app_data(labrinth_config.automated_moderation_queue.clone())
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
-    .configure(
-        #[allow(unused_variables)]
-        |cfg| {
-            #[cfg(not(target_env = "msvc"))]
-            routes::debug::config(cfg)
-        },
-    )
+    .app_data(labrinth_config.rate_limiter.clone())
+    .configure({
+        #[cfg(target_os = "linux")]
+        {
+            |cfg| routes::debug::config(cfg)
+        }
+        #[cfg(not(target_os = "linux"))]
+        {
+            |_cfg| ()
+        }
+    })
     .configure(routes::v2::config)
     .configure(routes::v3::config)
     .configure(routes::internal::config)
@@ -370,7 +352,7 @@ pub fn app_config(
 pub fn check_env_vars() -> bool {
     let mut failed = false;
 
-    fn check_var<T: std::str::FromStr>(var: &'static str) -> bool {
+    fn check_var<T: std::str::FromStr>(var: &str) -> bool {
         let check = parse_var::<T>(var).is_none();
         if check {
             warn!(
@@ -397,23 +379,34 @@ pub fn check_env_vars() -> bool {
 
     let storage_backend = dotenvy::var("STORAGE_BACKEND").ok();
     match storage_backend.as_deref() {
-        Some("backblaze") => {
-            failed |= check_var::<String>("BACKBLAZE_KEY_ID");
-            failed |= check_var::<String>("BACKBLAZE_KEY");
-            failed |= check_var::<String>("BACKBLAZE_BUCKET_ID");
-        }
         Some("s3") => {
-            failed |= check_var::<String>("S3_ACCESS_TOKEN");
-            failed |= check_var::<String>("S3_SECRET");
-            failed |= check_var::<String>("S3_URL");
-            failed |= check_var::<String>("S3_REGION");
-            failed |= check_var::<String>("S3_BUCKET_NAME");
+            let mut check_var_set = |var_prefix| {
+                failed |= check_var::<String>(&format!(
+                    "S3_{var_prefix}_BUCKET_NAME"
+                ));
+                failed |= check_var::<bool>(&format!(
+                    "S3_{var_prefix}_USES_PATH_STYLE_BUCKET"
+                ));
+                failed |=
+                    check_var::<String>(&format!("S3_{var_prefix}_REGION"));
+                failed |= check_var::<String>(&format!("S3_{var_prefix}_URL"));
+                failed |= check_var::<String>(&format!(
+                    "S3_{var_prefix}_ACCESS_TOKEN"
+                ));
+                failed |=
+                    check_var::<String>(&format!("S3_{var_prefix}_SECRET"));
+            };
+
+            check_var_set("PUBLIC");
+            check_var_set("PRIVATE");
         }
         Some("local") => {
             failed |= check_var::<String>("MOCK_FILE_PATH");
         }
         Some(backend) => {
-            warn!("Variable `STORAGE_BACKEND` contains an invalid value: {}. Expected \"backblaze\", \"s3\", or \"local\".", backend);
+            warn!(
+                "Variable `STORAGE_BACKEND` contains an invalid value: {backend}. Expected \"s3\" or \"local\"."
+            );
             failed |= true;
         }
         _ => {
@@ -426,12 +419,16 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<usize>("VERSION_INDEX_INTERVAL");
 
     if parse_strings_from_var("WHITELISTED_MODPACK_DOMAINS").is_none() {
-        warn!("Variable `WHITELISTED_MODPACK_DOMAINS` missing in dotenv or not a json array of strings");
+        warn!(
+            "Variable `WHITELISTED_MODPACK_DOMAINS` missing in dotenv or not a json array of strings"
+        );
         failed |= true;
     }
 
     if parse_strings_from_var("ALLOWED_CALLBACK_URLS").is_none() {
-        warn!("Variable `ALLOWED_CALLBACK_URLS` missing in dotenv or not a json array of strings");
+        warn!(
+            "Variable `ALLOWED_CALLBACK_URLS` missing in dotenv or not a json array of strings"
+        );
         failed |= true;
     }
 
@@ -464,6 +461,8 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("SMTP_USERNAME");
     failed |= check_var::<String>("SMTP_PASSWORD");
     failed |= check_var::<String>("SMTP_HOST");
+    failed |= check_var::<u16>("SMTP_PORT");
+    failed |= check_var::<String>("SMTP_TLS");
 
     failed |= check_var::<String>("SITE_VERIFY_EMAIL_PATH");
     failed |= check_var::<String>("SITE_RESET_PASSWORD_PATH");

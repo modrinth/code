@@ -1,1 +1,35 @@
 * text=auto eol=lf
+
+# SQLx calculates a checksum of migration scripts at build time to compare
+# it with the checksum of the applied migration for the same version at
+# runtime, to know if the migration script has been changed, and thus the
+# DB schema went out of sync with the code.
+#
+# However, such checksum treats the script as a raw byte stream, taking
+# into account inconsequential differences like different line endings
+# in different OSes. When combined with Git's EOL conversion and mixed
+# native and cross-compilation scenarios, this leads to existing
+# migrations that didn't change having potentially different checksums
+# according to the environment they were built in, which can break the
+# migration system when deploying the Modrinth App, rendering it
+# unusable.
+#
+# The gitattribute above ensures that all text files are checked out
+# with LF line endings, but widely deployed app versions were built
+# without this attribute set, which left such line endings variable to
+# the platform. Thus, there is no perfect solution to this problem:
+# forcing CRLF here would break Linux and macOS users, forcing LF
+# breaks Windows users, and leaving it unspecified may still lead to
+# line ending differences when cross-compiling from Linux to Windows
+# or vice versa, or having Git configured with different line
+# conversion settings. Moreover, there is no `eol=native` attribute,
+# and using CI-only scripts to convert line endings would make the
+# builds differ between CI and most local environments. So, let's pick
+# the least bad option: let Git handle line endings using its
+# configuration by leaving it unspecified, which works fine as long as
+# people don't mess with Git's line ending settings, which is the vast
+# majority of cases.
+/packages/app-lib/migrations/20240711194701_init.sql !eol
+/packages/app-lib/migrations/20240813205023_drop-active-unique.sql !eol
+/packages/app-lib/migrations/20240930001852_disable-personalized-ads.sql !eol
+/packages/app-lib/migrations/20241222013857_feature-flags.sql !eol

@@ -33,7 +33,7 @@
           v-if="projectData?.title"
           class="m-0 flex flex-row items-center gap-2 text-sm font-medium text-secondary"
         >
-          <UiAvatar
+          <Avatar
             :src="iconUrl"
             no-shadow
             style="min-height: 20px; min-width: 20px; height: 20px; width: 20px"
@@ -43,7 +43,14 @@
         </div>
         <div v-else class="min-h-[20px]"></div>
 
+        <div
+          v-if="isConfiguring"
+          class="flex min-w-0 items-center gap-2 truncate text-sm font-semibold text-brand"
+        >
+          <SparklesIcon class="size-5 shrink-0" /> New server
+        </div>
         <UiServersServerInfoLabels
+          v-else
           :server-data="{ game, mc_version, loader, loader_version, net }"
           :show-game-label="showGameLabel"
           :show-loader-label="showLoaderLabel"
@@ -60,34 +67,28 @@
       Your server's hardware is currently being upgraded and will be back online shortly.
     </div>
     <div
-      v-if="status === 'suspended' && suspension_reason === 'support'"
-      class="relative -mt-4 flex w-full flex-row items-center gap-2 rounded-b-3xl bg-bg-blue p-4 text-sm font-bold text-contrast"
-    >
-      <HammerIcon />
-      You recently requested support for your server and we are actively working on it. It will be
-      back online shortly.
-    </div>
-    <div
-      v-else-if="status === 'suspended' && suspension_reason !== 'upgrading'"
+      v-else-if="status === 'suspended'"
       class="relative -mt-4 flex w-full flex-col gap-2 rounded-b-3xl bg-bg-red p-4 text-sm font-bold text-contrast"
     >
       <div class="flex flex-row gap-2">
         <UiServersIconsPanelErrorIcon class="!size-5" /> Your server has been suspended. Please
         update your billing information or contact Modrinth Support for more information.
       </div>
-      <UiCopyCode :text="`${props.server_id}`" class="ml-auto" />
+      <CopyCode :text="`${props.server_id}`" class="ml-auto" />
     </div>
   </NuxtLink>
 </template>
 
 <script setup lang="ts">
-import { ChevronRightIcon, HammerIcon, LockIcon } from "@modrinth/assets";
-import type { Project, Server } from "~/types/servers";
+import { ChevronRightIcon, LockIcon, SparklesIcon } from "@modrinth/assets";
+import type { Project, Server } from "@modrinth/utils";
+import { useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
+import { Avatar, CopyCode } from "@modrinth/ui";
 
 const props = defineProps<Partial<Server>>();
 
 if (props.server_id) {
-  await usePyroServer(props.server_id, ["general"]);
+  await useModrinthServers(props.server_id, ["general"]);
 }
 
 const showGameLabel = computed(() => !!props.game);
@@ -110,8 +111,9 @@ if (props.upstream) {
 const image = useState<string | undefined>(`server-icon-${props.server_id}`, () => undefined);
 
 if (import.meta.server && projectData.value?.icon_url) {
-  await usePyroServer(props.server_id!, ["general"]);
+  await useModrinthServers(props.server_id!, ["general"]);
 }
 
 const iconUrl = computed(() => projectData.value?.icon_url || undefined);
+const isConfiguring = computed(() => props.flows?.intro);
 </script>

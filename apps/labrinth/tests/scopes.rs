@@ -8,29 +8,28 @@ use crate::common::dummy_data::{
 };
 use actix_http::StatusCode;
 use actix_web::test;
+use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{Duration, Utc};
-use common::api_common::models::CommonItemType;
 use common::api_common::Api;
-use common::api_v3::request_data::get_public_project_creation_data;
+use common::api_common::models::CommonItemType;
 use common::api_v3::ApiV3;
+use common::api_v3::request_data::get_public_project_creation_data;
 use common::dummy_data::TestFile;
 use common::environment::{
-    with_test_environment, with_test_environment_all, TestEnvironment,
+    TestEnvironment, with_test_environment, with_test_environment_all,
 };
 use common::{database::*, scopes::ScopeTest};
+use labrinth::models::ids::ProjectId;
 use labrinth::models::pats::Scopes;
-use labrinth::models::projects::ProjectId;
-use labrinth::models::users::UserId;
 use serde_json::json;
-
 // For each scope, we (using test_scope):
 // - create a PAT with a given set of scopes for a function
 // - create a PAT with all other scopes for a function
 // - test the function with the PAT with the given scopes
 // - test the function with the PAT with all other scopes
 
-mod common;
+pub mod common;
 
 // Test for users, emails, and payout scopes (not user auth scope or notifs)
 #[actix_rt::test]
@@ -380,16 +379,20 @@ pub async fn project_version_reads_scopes() {
             .test(req_gen, read_project)
             .await
             .unwrap();
-        assert!(!failure
-            .as_array()
-            .unwrap()
-            .iter()
-            .any(|x| x["status"] == "processing"));
-        assert!(success
-            .as_array()
-            .unwrap()
-            .iter()
-            .any(|x| x["status"] == "processing"));
+        assert!(
+            !failure
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|x| x["status"] == "processing")
+        );
+        assert!(
+            success
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|x| x["status"] == "processing")
+        );
 
         // Project metadata reading
         let req_gen = |pat: Option<String>| async move {

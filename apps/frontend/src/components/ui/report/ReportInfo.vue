@@ -11,8 +11,8 @@
         <div class="stacked">
           <span class="title">{{ report.project.title }}</span>
           <span>{{
-            $formatProjectType(
-              $getProjectTypeForUrl(report.project.project_type, report.project.loaders),
+            formatProjectType(
+              getProjectTypeForUrl(report.project.project_type, report.project.loaders),
             )
           }}</span>
         </div>
@@ -31,7 +31,9 @@
         </div>
       </nuxt-link>
       <div v-else class="item-info">
-        <div class="backed-svg" :class="{ raised: raised }"><UnknownIcon /></div>
+        <div class="backed-svg" :class="{ raised: raised }">
+          <UnknownIcon />
+        </div>
         <span>Reported user not found: <CopyCode :text="report.item_id" /> </span>
       </div>
     </div>
@@ -40,7 +42,9 @@
         :to="`/project/${report.project.slug}/version/${report.version.id}`"
         class="iconified-link"
       >
-        <div class="backed-svg" :class="{ raised: raised }"><VersionIcon /></div>
+        <div class="backed-svg" :class="{ raised: raised }">
+          <VersionIcon />
+        </div>
         <span class="title">{{ report.version.name }}</span>
       </nuxt-link>
       of
@@ -49,15 +53,17 @@
         <div class="stacked">
           <span class="title">{{ report.project.title }}</span>
           <span>{{
-            $formatProjectType(
-              $getProjectTypeForUrl(report.project.project_type, report.project.loaders),
+            formatProjectType(
+              getProjectTypeForUrl(report.project.project_type, report.project.loaders),
             )
           }}</span>
         </div>
       </nuxt-link>
     </div>
     <div v-else class="item-info">
-      <div class="backed-svg" :class="{ raised: raised }"><UnknownIcon /></div>
+      <div class="backed-svg" :class="{ raised: raised }">
+        <UnknownIcon />
+      </div>
       <span>Unknown report type: {{ report.item_type }}</span>
     </div>
     <div class="report-type">
@@ -74,7 +80,8 @@
       :auth="auth"
     />
     <div class="reporter-info">
-      <ReportIcon class="inline-svg" /> Reported by
+      <ReportIcon class="inline-svg" />
+      Reported by
       <span v-if="auth.user.id === report.reporterUser.id">you</span>
       <nuxt-link v-else :to="`/user/${report.reporterUser.username}`" class="iconified-link">
         <Avatar
@@ -88,7 +95,7 @@
       </nuxt-link>
       <span>&nbsp;</span>
       <span v-tooltip="$dayjs(report.created).format('MMMM D, YYYY [at] h:mm A')">{{
-        fromNow(report.created)
+        formatRelativeTime(report.created)
       }}</span>
       <CopyCode v-if="flags.developerMode" :text="report.id" class="report-id" />
     </div>
@@ -96,14 +103,14 @@
 </template>
 
 <script setup>
+import { ReportIcon, UnknownIcon, VersionIcon } from "@modrinth/assets";
+import { Avatar, Badge, CopyCode, useRelativeTime } from "@modrinth/ui";
+import { formatProjectType } from "@modrinth/utils";
 import { renderHighlightedString } from "~/helpers/highlight.js";
-import Avatar from "~/components/ui/Avatar.vue";
-import Badge from "~/components/ui/Badge.vue";
-import ReportIcon from "~/assets/images/utils/report.svg?component";
-import UnknownIcon from "~/assets/images/utils/unknown.svg?component";
-import VersionIcon from "~/assets/images/utils/version.svg?component";
 import ThreadSummary from "~/components/ui/thread/ThreadSummary.vue";
-import CopyCode from "~/components/ui/CopyCode.vue";
+import { getProjectTypeForUrl } from "~/helpers/projects.js";
+
+const formatRelativeTime = useRelativeTime();
 
 defineProps({
   report: {

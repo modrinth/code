@@ -8,7 +8,7 @@ use crate::database::models::loader_fields::{
     Game, Loader, LoaderField, LoaderFieldEnumValue, LoaderFieldType,
 };
 use crate::database::redis::RedisPool;
-use actix_web::{web, HttpResponse};
+use actix_web::{HttpResponse, web};
 
 use itertools::Itertools;
 use serde_json::Value;
@@ -148,16 +148,15 @@ pub async fn loader_fields_list(
             ))
         })?;
 
-    let loader_field_enum_id = match loader_field.field_type {
-        LoaderFieldType::Enum(enum_id)
-        | LoaderFieldType::ArrayEnum(enum_id) => enum_id,
-        _ => {
-            return Err(ApiError::InvalidInput(format!(
-                "'{}' is not an enumerable field, but an '{}' field.",
-                query.loader_field,
-                loader_field.field_type.to_str()
-            )))
-        }
+    let (LoaderFieldType::Enum(loader_field_enum_id)
+    | LoaderFieldType::ArrayEnum(loader_field_enum_id)) =
+        loader_field.field_type
+    else {
+        return Err(ApiError::InvalidInput(format!(
+            "'{}' is not an enumerable field, but an '{}' field.",
+            query.loader_field,
+            loader_field.field_type.to_str()
+        )));
     };
 
     let results: Vec<_> = if let Some(filters) = query.filters {

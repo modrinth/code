@@ -1,10 +1,8 @@
-#![allow(dead_code)]
-
 use super::{
     api_common::{Api, ApiBuildable},
     environment::LocalService,
 };
-use actix_web::{dev::ServiceResponse, test, App};
+use actix_web::{App, dev::ServiceResponse, test};
 use async_trait::async_trait;
 use labrinth::LabrinthConfig;
 use std::rc::Rc;

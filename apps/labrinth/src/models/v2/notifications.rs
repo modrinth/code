@@ -1,14 +1,14 @@
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
-
+use crate::models::ids::{ThreadMessageId, VersionId};
 use crate::models::{
     ids::{
         NotificationId, OrganizationId, ProjectId, ReportId, TeamId, ThreadId,
-        ThreadMessageId, UserId, VersionId,
     },
     notifications::{Notification, NotificationAction, NotificationBody},
     projects::ProjectStatus,
 };
+use ariadne::ids::UserId;
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct LegacyNotification {

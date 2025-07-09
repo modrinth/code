@@ -1,29 +1,30 @@
 use std::{collections::HashMap, sync::Arc};
 
-use actix_web::{web, HttpRequest, HttpResponse};
-use lazy_static::lazy_static;
-use regex::Regex;
-use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
-use validator::Validate;
-
-use super::{oauth_clients::get_user_clients, ApiError};
+use super::{ApiError, oauth_clients::get_user_clients};
+use crate::file_hosting::FileHostPublicity;
 use crate::util::img::delete_old_images;
 use crate::{
     auth::{filter_visible_projects, get_user_from_headers},
-    database::{models::User, redis::RedisPool},
+    database::{models::DBUser, redis::RedisPool},
     file_hosting::FileHost,
     models::{
         collections::{Collection, CollectionStatus},
-        ids::UserId,
         notifications::Notification,
         pats::Scopes,
         projects::Project,
         users::{Badges, Role},
     },
     queue::session::AuthQueue,
-    util::{routes::read_from_payload, validate::validation_errors_to_string},
+    util::{
+        routes::read_limited_from_payload,
+        validate::validation_errors_to_string,
+    },
 };
+use actix_web::{HttpRequest, HttpResponse, web};
+use ariadne::ids::UserId;
+use serde::{Deserialize, Serialize};
+use sqlx::PgPool;
+use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.route("user", web::get().to(user_auth_get));
@@ -38,6 +39,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .route("{user_id}/organizations", web::get().to(orgs_list))
             .route("{id}", web::patch().to(user_edit))
             .route("{id}/icon", web::patch().to(user_icon_edit))
+            .route("{id}/icon", web::delete().to(user_icon_delete))
             .route("{id}", web::delete().to(user_delete))
             .route("{id}/follows", web::get().to(user_follows))
             .route("{id}/notifications", web::get().to(user_notifications))
@@ -62,7 +64,7 @@ pub async fn admin_user_email(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await
     .map(|x| x.1)?;
@@ -90,9 +92,12 @@ pub async fn admin_user_email(
         )
     })?;
 
-    let user =
-        User::get_id(crate::database::models::UserId(user_id), &**pool, &redis)
-            .await?;
+    let user = DBUser::get_id(
+        crate::database::models::DBUserId(user_id),
+        &**pool,
+        &redis,
+    )
+    .await?;
 
     if let Some(user) = user {
         Ok(HttpResponse::Ok().json(user))
@@ -113,18 +118,18 @@ pub async fn projects_list(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ]),
+        Scopes::PROJECT_READ,
     )
     .await
     .map(|x| x.1)
     .ok();
 
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
-        let project_data = User::get_projects(id, &**pool, &redis).await?;
+        let project_data = DBUser::get_projects(id, &**pool, &redis).await?;
 
-        let projects: Vec<_> = crate::database::Project::get_many_ids(
+        let projects: Vec<_> = crate::database::DBProject::get_many_ids(
             &project_data,
             &**pool,
             &redis,
@@ -149,7 +154,7 @@ pub async fn user_auth_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_READ]),
+        Scopes::USER_READ,
     )
     .await?;
 
@@ -176,7 +181,7 @@ pub async fn users_get(
 ) -> Result<HttpResponse, ApiError> {
     let user_ids = serde_json::from_str::<Vec<String>>(&ids.ids)?;
 
-    let users_data = User::get_many(&user_ids, &**pool, &redis).await?;
+    let users_data = DBUser::get_many(&user_ids, &**pool, &redis).await?;
 
     let users: Vec<crate::models::users::User> =
         users_data.into_iter().map(From::from).collect();
@@ -191,7 +196,7 @@ pub async fn user_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_data = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let user_data = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(data) = user_data {
         let auth_user = get_user_from_headers(
@@ -199,14 +204,14 @@ pub async fn user_get(
             &**pool,
             &redis,
             &session_queue,
-            Some(&[Scopes::SESSION_ACCESS]),
+            Scopes::SESSION_ACCESS,
         )
         .await
         .map(|x| x.1)
         .ok();
 
         let response: crate::models::users::User =
-            if auth_user.map(|x| x.role.is_admin()).unwrap_or(false) {
+            if auth_user.is_some_and(|x| x.role.is_admin()) {
                 crate::models::users::User::from_full(data)
             } else {
                 data.into()
@@ -230,24 +235,23 @@ pub async fn collections_list(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::COLLECTION_READ]),
+        Scopes::COLLECTION_READ,
     )
     .await
     .map(|x| x.1)
     .ok();
 
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
         let user_id: UserId = id.into();
 
-        let can_view_private = user
-            .map(|y| y.role.is_mod() || y.id == user_id)
-            .unwrap_or(false);
+        let can_view_private =
+            user.is_some_and(|y| y.role.is_mod() || y.id == user_id);
 
-        let project_data = User::get_collections(id, &**pool).await?;
+        let project_data = DBUser::get_collections(id, &**pool).await?;
 
-        let response: Vec<_> = crate::database::models::Collection::get_many(
+        let response: Vec<_> = crate::database::models::DBCollection::get_many(
             &project_data,
             &**pool,
             &redis,
@@ -278,19 +282,19 @@ pub async fn orgs_list(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PROJECT_READ]),
+        Scopes::PROJECT_READ,
     )
     .await
     .map(|x| x.1)
     .ok();
 
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
-        let org_data = User::get_organizations(id, &**pool).await?;
+        let org_data = DBUser::get_organizations(id, &**pool).await?;
 
         let organizations_data =
-            crate::database::models::organization_item::Organization::get_many_ids(
+            crate::database::models::organization_item::DBOrganization::get_many_ids(
                 &org_data, &**pool, &redis,
             )
             .await?;
@@ -301,11 +305,11 @@ pub async fn orgs_list(
             .collect::<Vec<_>>();
 
         let teams_data =
-            crate::database::models::TeamMember::get_from_team_full_many(
+            crate::database::models::DBTeamMember::get_from_team_full_many(
                 &team_ids, &**pool, &redis,
             )
             .await?;
-        let users = User::get_many_ids(
+        let users = DBUser::get_many_ids(
             &teams_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
             &**pool,
             &redis,
@@ -333,7 +337,7 @@ pub async fn orgs_list(
             let team_members: Vec<_> = members_data
                 .into_iter()
                 .filter(|x| logged_in || x.accepted || id == x.user_id)
-                .flat_map(|data| {
+                .filter_map(|data| {
                     users.iter().find(|x| x.id == data.user_id).map(|user| {
                         crate::models::teams::TeamMember::from(
                             data,
@@ -357,13 +361,9 @@ pub async fn orgs_list(
     }
 }
 
-lazy_static! {
-    static ref RE_URL_SAFE: Regex = Regex::new(r"^[a-zA-Z0-9_-]*$").unwrap();
-}
-
 #[derive(Serialize, Deserialize, Validate)]
 pub struct EditUser {
-    #[validate(length(min = 1, max = 39), regex = "RE_URL_SAFE")]
+    #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_USERNAME))]
     pub username: Option<String>,
     #[serde(
         default,
@@ -392,7 +392,7 @@ pub async fn user_edit(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_WRITE]),
+        Scopes::USER_WRITE,
     )
     .await?;
 
@@ -400,7 +400,7 @@ pub async fn user_edit(
         ApiError::Validation(validation_errors_to_string(err, None))
     })?;
 
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(actual_user) = id_option {
         let id = actual_user.id;
@@ -411,12 +411,11 @@ pub async fn user_edit(
 
             if let Some(username) = &new_user.username {
                 let existing_user_id_option =
-                    User::get(username, &**pool, &redis).await?;
+                    DBUser::get(username, &**pool, &redis).await?;
 
                 if existing_user_id_option
                     .map(|x| UserId::from(x.id))
-                    .map(|id| id == user.id)
-                    .unwrap_or(true)
+                    .is_none_or(|id| id == user.id)
                 {
                     sqlx::query!(
                         "
@@ -425,7 +424,7 @@ pub async fn user_edit(
                         WHERE (id = $2)
                         ",
                         username,
-                        id as crate::database::models::ids::UserId,
+                        id as crate::database::models::ids::DBUserId,
                     )
                     .execute(&mut *transaction)
                     .await?;
@@ -444,7 +443,7 @@ pub async fn user_edit(
                     WHERE (id = $2)
                     ",
                     bio.as_deref(),
-                    id as crate::database::models::ids::UserId,
+                    id as crate::database::models::ids::DBUserId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -467,7 +466,7 @@ pub async fn user_edit(
                     WHERE (id = $2)
                     ",
                     role,
-                    id as crate::database::models::ids::UserId,
+                    id as crate::database::models::ids::DBUserId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -488,7 +487,7 @@ pub async fn user_edit(
                     WHERE (id = $2)
                     ",
                     badges.bits() as i64,
-                    id as crate::database::models::ids::UserId,
+                    id as crate::database::models::ids::DBUserId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -509,7 +508,7 @@ pub async fn user_edit(
                     WHERE (id = $2)
                     ",
                     venmo_handle,
-                    id as crate::database::models::ids::UserId,
+                    id as crate::database::models::ids::DBUserId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -523,14 +522,14 @@ pub async fn user_edit(
                     WHERE (id = $2)
                     ",
                     allow_friend_requests,
-                    id as crate::database::models::ids::UserId,
+                    id as crate::database::models::ids::DBUserId,
                 )
                 .execute(&mut *transaction)
                 .await?;
             }
 
             transaction.commit().await?;
-            User::clear_caches(&[(id, Some(actual_user.username))], &redis)
+            DBUser::clear_caches(&[(id, Some(actual_user.username))], &redis)
                 .await?;
             Ok(HttpResponse::NoContent().body(""))
         } else {
@@ -564,11 +563,11 @@ pub async fn user_icon_edit(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_WRITE]),
+        Scopes::USER_WRITE,
     )
     .await?
     .1;
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(actual_user) = id_option {
         if user.id != actual_user.id.into() && !user.role.is_mod() {
@@ -581,11 +580,12 @@ pub async fn user_icon_edit(
         delete_old_images(
             actual_user.avatar_url,
             actual_user.raw_avatar_url,
+            FileHostPublicity::Public,
             &***file_host,
         )
         .await?;
 
-        let bytes = read_from_payload(
+        let bytes = read_limited_from_payload(
             &mut payload,
             262144,
             "Icons must be smaller than 256KiB",
@@ -594,7 +594,8 @@ pub async fn user_icon_edit(
 
         let user_id: UserId = actual_user.id.into();
         let upload_result = crate::util::img::upload_image_optimized(
-            &format!("data/{}", user_id),
+            &format!("data/{user_id}"),
+            FileHostPublicity::Public,
             bytes.freeze(),
             &ext.ext,
             Some(96),
@@ -611,11 +612,65 @@ pub async fn user_icon_edit(
             ",
             upload_result.url,
             upload_result.raw_url,
-            actual_user.id as crate::database::models::ids::UserId,
+            actual_user.id as crate::database::models::ids::DBUserId,
         )
         .execute(&**pool)
         .await?;
-        User::clear_caches(&[(actual_user.id, None)], &redis).await?;
+        DBUser::clear_caches(&[(actual_user.id, None)], &redis).await?;
+
+        Ok(HttpResponse::NoContent().body(""))
+    } else {
+        Err(ApiError::NotFound)
+    }
+}
+
+pub async fn user_icon_delete(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::USER_WRITE,
+    )
+    .await?
+    .1;
+    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
+
+    if let Some(actual_user) = id_option {
+        if user.id != actual_user.id.into() && !user.role.is_mod() {
+            return Err(ApiError::CustomAuthentication(
+                "You don't have permission to edit this user's icon."
+                    .to_string(),
+            ));
+        }
+
+        delete_old_images(
+            actual_user.avatar_url,
+            actual_user.raw_avatar_url,
+            FileHostPublicity::Public,
+            &***file_host,
+        )
+        .await?;
+
+        sqlx::query!(
+            "
+            UPDATE users
+            SET avatar_url = NULL, raw_avatar_url = NULL
+            WHERE (id = $1)
+            ",
+            actual_user.id as crate::database::models::ids::DBUserId,
+        )
+        .execute(&**pool)
+        .await?;
+
+        DBUser::clear_caches(&[(actual_user.id, None)], &redis).await?;
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
@@ -635,11 +690,11 @@ pub async fn user_delete(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_DELETE]),
+        Scopes::USER_DELETE,
     )
     .await?
     .1;
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
         if !user.role.is_admin() && user.id != id.into() {
@@ -650,7 +705,7 @@ pub async fn user_delete(
 
         let mut transaction = pool.begin().await?;
 
-        let result = User::remove(id, &mut transaction, &redis).await?;
+        let result = DBUser::remove(id, &mut transaction, &redis).await?;
 
         transaction.commit().await?;
 
@@ -676,11 +731,11 @@ pub async fn user_follows(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_READ]),
+        Scopes::USER_READ,
     )
     .await?
     .1;
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
         if !user.role.is_admin() && user.id != id.into() {
@@ -689,8 +744,8 @@ pub async fn user_follows(
             ));
         }
 
-        let project_ids = User::get_follows(id, &**pool).await?;
-        let projects: Vec<_> = crate::database::Project::get_many_ids(
+        let project_ids = DBUser::get_follows(id, &**pool).await?;
+        let projects: Vec<_> = crate::database::DBProject::get_many_ids(
             &project_ids,
             &**pool,
             &redis,
@@ -718,11 +773,11 @@ pub async fn user_notifications(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::NOTIFICATION_READ]),
+        Scopes::NOTIFICATION_READ,
     )
     .await?
     .1;
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
         if !user.role.is_admin() && user.id != id.into() {
@@ -732,7 +787,7 @@ pub async fn user_notifications(
         }
 
         let mut notifications: Vec<Notification> =
-            crate::database::models::notification_item::Notification::get_many_user(
+            crate::database::models::notification_item::DBNotification::get_many_user(
                 id, &**pool, &redis,
             )
             .await?

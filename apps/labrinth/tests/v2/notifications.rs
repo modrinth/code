@@ -2,7 +2,7 @@ use crate::common::{
     api_common::ApiTeams,
     api_v2::ApiV2,
     database::{FRIEND_USER_ID, FRIEND_USER_PAT, USER_USER_PAT},
-    environment::{with_test_environment, TestEnvironment},
+    environment::{TestEnvironment, with_test_environment},
 };
 
 #[actix_rt::test]

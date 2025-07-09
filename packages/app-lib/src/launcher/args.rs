@@ -1,17 +1,19 @@
 //! Minecraft CLI argument logic
 use crate::launcher::parse_rules;
+use crate::profile::QuickPlayType;
 use crate::state::Credentials;
 use crate::{
     state::{MemorySettings, WindowSize},
     util::{io::IOError, platform::classpath_separator},
 };
+use daedalus::minecraft::LoggingConfiguration;
 use daedalus::{
     get_path_from_artifact,
     minecraft::{Argument, ArgumentValue, Library, VersionType},
     modded::SidedDataEntry,
 };
 use dunce::canonicalize;
-use std::collections::HashSet;
+use hashlink::LinkedHashSet;
 use std::io::{BufRead, BufReader};
 use std::{collections::HashMap, path::Path};
 use uuid::Uuid;
@@ -22,7 +24,7 @@ const TEMPORARY_REPLACE_CHAR: &str = "\n";
 pub fn get_class_paths(
     libraries_path: &Path,
     libraries: &[Library],
-    client_path: &Path,
+    launcher_class_path: &[&Path],
     java_arch: &str,
     minecraft_updated: bool,
 ) -> crate::Result<String> {
@@ -30,7 +32,12 @@ pub fn get_class_paths(
         .iter()
         .filter_map(|library| {
             if let Some(rules) = &library.rules {
-                if !parse_rules(rules, java_arch, minecraft_updated) {
+                if !parse_rules(
+                    rules,
+                    java_arch,
+                    &QuickPlayType::None,
+                    minecraft_updated,
+                ) {
                     return None;
                 }
             }
@@ -41,20 +48,22 @@ pub fn get_class_paths(
 
             Some(get_lib_path(libraries_path, &library.name, false))
         })
-        .collect::<Result<HashSet<_>, _>>()?;
+        .collect::<Result<LinkedHashSet<_>, _>>()?;
 
-    cps.insert(
-        canonicalize(client_path)
-            .map_err(|_| {
-                crate::ErrorKind::LauncherError(format!(
-                    "Specified class path {} does not exist",
-                    client_path.to_string_lossy()
-                ))
-                .as_error()
-            })?
-            .to_string_lossy()
-            .to_string(),
-    );
+    for launcher_path in launcher_class_path {
+        cps.insert(
+            canonicalize(launcher_path)
+                .map_err(|_| {
+                    crate::ErrorKind::LauncherError(format!(
+                        "Specified class path {} does not exist",
+                        launcher_path.to_string_lossy()
+                    ))
+                    .as_error()
+                })?
+                .to_string_lossy()
+                .to_string(),
+        );
+    }
 
     Ok(cps
         .into_iter()
@@ -80,9 +89,9 @@ pub fn get_lib_path(
     lib: &str,
     allow_not_exist: bool,
 ) -> crate::Result<String> {
-    let mut path = libraries_path.to_path_buf();
-
-    path.push(get_path_from_artifact(lib)?);
+    let path = libraries_path
+        .to_path_buf()
+        .join(get_path_from_artifact(lib)?);
 
     if !path.exists() && allow_not_exist {
         return Ok(path.to_string_lossy().to_string());
@@ -104,11 +113,14 @@ pub fn get_jvm_arguments(
     arguments: Option<&[Argument]>,
     natives_path: &Path,
     libraries_path: &Path,
+    log_configs_path: &Path,
     class_paths: &str,
     version_name: &str,
     memory: MemorySettings,
     custom_args: Vec<String>,
     java_arch: &str,
+    quick_play_type: &QuickPlayType,
+    log_config: Option<&LoggingConfiguration>,
 ) -> crate::Result<Vec<String>> {
     let mut parsed_arguments = Vec::new();
 
@@ -127,6 +139,7 @@ pub fn get_jvm_arguments(
                 )
             },
             java_arch,
+            quick_play_type,
         )?;
     } else {
         parsed_arguments.push(format!(
@@ -143,6 +156,12 @@ pub fn get_jvm_arguments(
         parsed_arguments.push(class_paths.to_string());
     }
     parsed_arguments.push(format!("-Xmx{}M", memory.maximum));
+    if let Some(LoggingConfiguration::Log4j2Xml { argument, file }) = log_config
+    {
+        let full_path = log_configs_path.join(&file.id);
+        let full_path = full_path.to_string_lossy();
+        parsed_arguments.push(argument.replace("${path}", &full_path));
+    }
     for arg in custom_args {
         if !arg.is_empty() {
             parsed_arguments.push(arg);
@@ -194,7 +213,7 @@ fn parse_jvm_argument(
 }
 
 #[allow(clippy::too_many_arguments)]
-pub fn get_minecraft_arguments(
+pub async fn get_minecraft_arguments(
     arguments: Option<&[Argument]>,
     legacy_arguments: Option<&str>,
     credentials: &Credentials,
@@ -205,7 +224,11 @@ pub fn get_minecraft_arguments(
     version_type: &VersionType,
     resolution: WindowSize,
     java_arch: &str,
+    quick_play_type: &QuickPlayType,
 ) -> crate::Result<Vec<String>> {
+    let access_token = credentials.access_token.clone();
+    let profile = credentials.maybe_online_profile().await;
+
     if let Some(arguments) = arguments {
         let mut parsed_arguments = Vec::new();
 
@@ -215,18 +238,20 @@ pub fn get_minecraft_arguments(
             |arg| {
                 parse_minecraft_argument(
                     arg,
-                    &credentials.access_token,
-                    &credentials.username,
-                    credentials.id,
+                    &access_token,
+                    &profile.name,
+                    profile.id,
                     version,
                     asset_index_name,
                     game_directory,
                     assets_directory,
                     version_type,
                     resolution,
+                    quick_play_type,
                 )
             },
             java_arch,
+            quick_play_type,
         )?;
 
         Ok(parsed_arguments)
@@ -235,15 +260,16 @@ pub fn get_minecraft_arguments(
         for x in legacy_arguments.split(' ') {
             parsed_arguments.push(parse_minecraft_argument(
                 &x.replace(' ', TEMPORARY_REPLACE_CHAR),
-                &credentials.access_token,
-                &credentials.username,
-                credentials.id,
+                &access_token,
+                &profile.name,
+                profile.id,
                 version,
                 asset_index_name,
                 game_directory,
                 assets_directory,
                 version_type,
                 resolution,
+                quick_play_type,
             )?);
         }
         Ok(parsed_arguments)
@@ -264,6 +290,7 @@ fn parse_minecraft_argument(
     assets_directory: &Path,
     version_type: &VersionType,
     resolution: WindowSize,
+    quick_play_type: &QuickPlayType,
 ) -> crate::Result<String> {
     Ok(argument
         .replace("${accessToken}", access_token)
@@ -317,7 +344,21 @@ fn parse_minecraft_argument(
         )
         .replace("${version_type}", version_type.as_str())
         .replace("${resolution_width}", &resolution.0.to_string())
-        .replace("${resolution_height}", &resolution.1.to_string()))
+        .replace("${resolution_height}", &resolution.1.to_string())
+        .replace(
+            "${quickPlaySingleplayer}",
+            match quick_play_type {
+                QuickPlayType::Singleplayer(world) => world,
+                _ => "",
+            },
+        )
+        .replace(
+            "${quickPlayMultiplayer}",
+            match quick_play_type {
+                QuickPlayType::Server(address) => address,
+                _ => "",
+            },
+        ))
 }
 
 fn parse_arguments<F>(
@@ -325,6 +366,7 @@ fn parse_arguments<F>(
     parsed_arguments: &mut Vec<String>,
     parse_function: F,
     java_arch: &str,
+    quick_play_type: &QuickPlayType,
 ) -> crate::Result<()>
 where
     F: Fn(&str) -> crate::Result<String>,
@@ -339,7 +381,7 @@ where
                 }
             }
             Argument::Ruled { rules, value } => {
-                if parse_rules(rules, java_arch, true) {
+                if parse_rules(rules, java_arch, quick_play_type, true) {
                     match value {
                         ArgumentValue::Single(arg) => {
                             parsed_arguments.push(parse_function(
@@ -401,16 +443,14 @@ pub async fn get_processor_main_class(
             .map_err(|e| IOError::with_path(e, &path))?;
         let mut archive = zip::ZipArchive::new(zipfile).map_err(|_| {
             crate::ErrorKind::LauncherError(format!(
-                "Cannot read processor at {}",
-                path
+                "Cannot read processor at {path}"
             ))
             .as_error()
         })?;
 
         let file = archive.by_name("META-INF/MANIFEST.MF").map_err(|_| {
             crate::ErrorKind::LauncherError(format!(
-                "Cannot read processor manifest at {}",
-                path
+                "Cannot read processor manifest at {path}"
             ))
             .as_error()
         })?;

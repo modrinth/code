@@ -92,7 +92,7 @@
             <div class="mb-4 mt-2 flex w-full items-center gap-1 text-sm text-secondary">
               {{ formatCategory(subscription.interval) }} ⋅ {{ subscription.status }} ⋅
               {{ dayjs(subscription.created).format("MMMM D, YYYY [at] h:mma") }} ({{
-                dayjs(subscription.created).fromNow()
+                formatRelativeTime(subscription.created)
               }})
             </div>
           </div>
@@ -151,12 +151,9 @@
                 </span>
                 <span class="text-sm text-secondary">
                   {{ dayjs(charge.due).format("MMMM D, YYYY [at] h:mma") }}
-                  <span class="text-secondary">({{ dayjs(charge.due).fromNow() }}) </span>
+                  <span class="text-secondary">({{ formatRelativeTime(charge.due) }}) </span>
                 </span>
-                <div
-                  v-if="flags.developerMode"
-                  class="flex w-full items-center gap-1 text-xs text-secondary"
-                >
+                <div class="flex w-full items-center gap-1 text-xs text-secondary">
                   {{ charge.status }}
                   ⋅
                   {{ charge.type }}
@@ -196,7 +193,15 @@
   </div>
 </template>
 <script setup>
-import { Avatar, ButtonStyled, CopyCode, DropdownSelect, NewModal, Toggle } from "@modrinth/ui";
+import {
+  Avatar,
+  ButtonStyled,
+  CopyCode,
+  DropdownSelect,
+  NewModal,
+  Toggle,
+  useRelativeTime,
+} from "@modrinth/ui";
 import { formatCategory, formatPrice } from "@modrinth/utils";
 import {
   CheckIcon,
@@ -211,11 +216,12 @@ import dayjs from "dayjs";
 import { products } from "~/generated/state.json";
 import ModrinthServersIcon from "~/components/ui/servers/ModrinthServersIcon.vue";
 
-const flags = useFeatureFlags();
 const route = useRoute();
 const data = useNuxtApp();
 const vintl = useVIntl();
+
 const { formatMessage } = vintl;
+const formatRelativeTime = useRelativeTime();
 
 const messages = defineMessages({
   userNotFoundError: {
@@ -277,15 +283,15 @@ const refunding = ref(false);
 const refundModal = ref();
 const selectedCharge = ref(null);
 const refundType = ref("full");
-const refundTypes = ref(["full", "partial"]);
+const refundTypes = ref(["full", "partial", "none"]);
 const refundAmount = ref(0);
-const unprovision = ref(false);
+const unprovision = ref(true);
 
 function showRefundModal(charge) {
   selectedCharge.value = charge;
   refundType.value = "full";
   refundAmount.value = 0;
-  unprovision.value = false;
+  unprovision.value = true;
   refundModal.value.show();
 }
 

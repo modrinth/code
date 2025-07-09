@@ -1,0 +1,182 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT\n                path, install_stage, launcher_feature_version, name, icon_path,\n                game_version, protocol_version, mod_loader, mod_loader_version,\n                json(groups) as \"groups!: serde_json::Value\",\n                linked_project_id, linked_version_id, locked,\n                created, modified, last_played,\n                submitted_time_played, recent_time_played,\n                override_java_path,\n                json(override_extra_launch_args) as \"override_extra_launch_args!: serde_json::Value\", json(override_custom_env_vars) as \"override_custom_env_vars!: serde_json::Value\",\n                override_mc_memory_max, override_mc_force_fullscreen, override_mc_game_resolution_x, override_mc_game_resolution_y,\n                override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit\n            FROM profiles\n            WHERE 1=$1",
+  "describe": {
+    "columns": [
+      {
+        "name": "path",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "install_stage",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "launcher_feature_version",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "name",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "icon_path",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "game_version",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "protocol_version",
+        "ordinal": 6,
+        "type_info": "Integer"
+      },
+      {
+        "name": "mod_loader",
+        "ordinal": 7,
+        "type_info": "Text"
+      },
+      {
+        "name": "mod_loader_version",
+        "ordinal": 8,
+        "type_info": "Text"
+      },
+      {
+        "name": "groups!: serde_json::Value",
+        "ordinal": 9,
+        "type_info": "Null"
+      },
+      {
+        "name": "linked_project_id",
+        "ordinal": 10,
+        "type_info": "Text"
+      },
+      {
+        "name": "linked_version_id",
+        "ordinal": 11,
+        "type_info": "Text"
+      },
+      {
+        "name": "locked",
+        "ordinal": 12,
+        "type_info": "Integer"
+      },
+      {
+        "name": "created",
+        "ordinal": 13,
+        "type_info": "Integer"
+      },
+      {
+        "name": "modified",
+        "ordinal": 14,
+        "type_info": "Integer"
+      },
+      {
+        "name": "last_played",
+        "ordinal": 15,
+        "type_info": "Integer"
+      },
+      {
+        "name": "submitted_time_played",
+        "ordinal": 16,
+        "type_info": "Integer"
+      },
+      {
+        "name": "recent_time_played",
+        "ordinal": 17,
+        "type_info": "Integer"
+      },
+      {
+        "name": "override_java_path",
+        "ordinal": 18,
+        "type_info": "Text"
+      },
+      {
+        "name": "override_extra_launch_args!: serde_json::Value",
+        "ordinal": 19,
+        "type_info": "Null"
+      },
+      {
+        "name": "override_custom_env_vars!: serde_json::Value",
+        "ordinal": 20,
+        "type_info": "Null"
+      },
+      {
+        "name": "override_mc_memory_max",
+        "ordinal": 21,
+        "type_info": "Integer"
+      },
+      {
+        "name": "override_mc_force_fullscreen",
+        "ordinal": 22,
+        "type_info": "Integer"
+      },
+      {
+        "name": "override_mc_game_resolution_x",
+        "ordinal": 23,
+        "type_info": "Integer"
+      },
+      {
+        "name": "override_mc_game_resolution_y",
+        "ordinal": 24,
+        "type_info": "Integer"
+      },
+      {
+        "name": "override_hook_pre_launch",
+        "ordinal": 25,
+        "type_info": "Text"
+      },
+      {
+        "name": "override_hook_wrapper",
+        "ordinal": 26,
+        "type_info": "Text"
+      },
+      {
+        "name": "override_hook_post_exit",
+        "ordinal": 27,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      true,
+      null,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      null,
+      null,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "c108849d77c7627d6a11d5be34984938c41283e6091a1301fc3ca0b355ffcfa9"
+}

@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use chrono::Utc;
 use labrinth::{
     database::{self, models::generate_pat_id},
@@ -18,12 +16,12 @@ pub async fn create_test_pat(
 ) -> String {
     let mut transaction = db.pool.begin().await.unwrap();
     let id = generate_pat_id(&mut transaction).await.unwrap();
-    let pat = database::models::pat_item::PersonalAccessToken {
+    let pat = database::models::pat_item::DBPersonalAccessToken {
         id,
         name: format!("test_pat_{}", scopes.bits()),
         access_token: format!("mrp_{}", id.0),
         scopes,
-        user_id: database::models::ids::UserId(user_id),
+        user_id: database::models::ids::DBUserId(user_id),
         created: Utc::now(),
         expires: Utc::now() + chrono::Duration::days(1),
         last_used: None,

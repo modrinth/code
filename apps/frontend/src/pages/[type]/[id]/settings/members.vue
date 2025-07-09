@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ModalConfirm
+    <ConfirmModal
       ref="modal_remove"
       title="Are you sure you want to remove this project from the organization?"
       description="If you proceed, this project will no longer be managed by the organization."
@@ -55,7 +55,7 @@
           "
           @click="leaveProject()"
         >
-          <UserRemoveIcon />
+          <UserXIcon />
           Leave project
         </button>
       </div>
@@ -231,7 +231,7 @@
             :disabled="(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
             @click="removeTeamMember(index)"
           >
-            <UserRemoveIcon />
+            <UserXIcon />
             Remove member
           </button>
           <button
@@ -254,8 +254,9 @@
           This project is managed by {{ props.organization.name }}. The defaults for member
           permissions are set in the
           <nuxt-link :to="`/organization/${props.organization.slug}/settings/members`">
-            organization settings</nuxt-link
-          >. You may override them below.
+            organization settings
+          </nuxt-link>
+          . You may override them below.
         </p>
         <nuxt-link
           :to="`/organization/${props.organization.slug}`"
@@ -518,17 +519,18 @@
 
 <script setup>
 import { Multiselect } from "vue-multiselect";
-import { TransferIcon, CheckIcon, UsersIcon } from "@modrinth/assets";
-import { Avatar, Badge, Card, Checkbox } from "@modrinth/ui";
-
-import ModalConfirm from "~/components/ui/ModalConfirm.vue";
-import DropdownIcon from "~/assets/images/utils/dropdown.svg?component";
-import SaveIcon from "~/assets/images/utils/save.svg?component";
-import UserPlusIcon from "~/assets/images/utils/user-plus.svg?component";
-import UserRemoveIcon from "~/assets/images/utils/user-x.svg?component";
-import OrganizationIcon from "~/assets/images/utils/organization.svg?component";
-import CrownIcon from "~/assets/images/utils/crown.svg?component";
-
+import {
+  TransferIcon,
+  CheckIcon,
+  UsersIcon,
+  DropdownIcon,
+  SaveIcon,
+  UserPlusIcon,
+  UserXIcon,
+  OrganizationIcon,
+  CrownIcon,
+} from "@modrinth/assets";
+import { Avatar, Badge, Card, Checkbox, ConfirmModal } from "@modrinth/ui";
 import { removeSelfFromTeam } from "~/helpers/teams.js";
 
 const props = defineProps({
@@ -894,11 +896,14 @@ const updateMembers = async () => {
   .member-header {
     display: flex;
     justify-content: space-between;
+
     .info {
       display: flex;
+
       .text {
         margin: auto 0 auto 0.5rem;
         font-size: var(--font-size-sm);
+
         .name {
           font-weight: bold;
 
@@ -910,14 +915,17 @@ const updateMembers = async () => {
             color: var(--color-orange);
           }
         }
+
         p {
           margin: 0.2rem 0;
         }
       }
     }
+
     .side-buttons {
       display: flex;
       align-items: center;
+
       .dropdown-icon {
         margin-left: 1rem;
 
@@ -936,6 +944,7 @@ const updateMembers = async () => {
     .main-info {
       margin-bottom: var(--spacing-card-lg);
     }
+
     .permissions {
       margin-bottom: var(--spacing-card-md);
       max-width: 45rem;
@@ -951,6 +960,7 @@ const updateMembers = async () => {
         transform: rotate(180deg);
       }
     }
+
     .content {
       display: flex;
     }

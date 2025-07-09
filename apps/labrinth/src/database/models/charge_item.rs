@@ -1,5 +1,5 @@
 use crate::database::models::{
-    ChargeId, DatabaseError, ProductPriceId, UserId, UserSubscriptionId,
+    DBChargeId, DBProductPriceId, DBUserId, DBUserSubscriptionId, DatabaseError,
 };
 use crate::models::billing::{
     ChargeStatus, ChargeType, PaymentPlatform, PriceDuration,
@@ -7,10 +7,10 @@ use crate::models::billing::{
 use chrono::{DateTime, Utc};
 use std::convert::{TryFrom, TryInto};
 
-pub struct ChargeItem {
-    pub id: ChargeId,
-    pub user_id: UserId,
-    pub price_id: ProductPriceId,
+pub struct DBCharge {
+    pub id: DBChargeId,
+    pub user_id: DBUserId,
+    pub price_id: DBProductPriceId,
     pub amount: i64,
     pub currency_code: String,
     pub status: ChargeStatus,
@@ -18,19 +18,19 @@ pub struct ChargeItem {
     pub last_attempt: Option<DateTime<Utc>>,
 
     pub type_: ChargeType,
-    pub subscription_id: Option<UserSubscriptionId>,
+    pub subscription_id: Option<DBUserSubscriptionId>,
     pub subscription_interval: Option<PriceDuration>,
 
     pub payment_platform: PaymentPlatform,
     pub payment_platform_id: Option<String>,
 
-    pub parent_charge_id: Option<ChargeId>,
+    pub parent_charge_id: Option<DBChargeId>,
 
     // Net is always in USD
     pub net: Option<i64>,
 }
 
-struct ChargeResult {
+struct ChargeQueryResult {
     id: i64,
     user_id: i64,
     price_id: i64,
@@ -48,27 +48,27 @@ struct ChargeResult {
     net: Option<i64>,
 }
 
-impl TryFrom<ChargeResult> for ChargeItem {
+impl TryFrom<ChargeQueryResult> for DBCharge {
     type Error = serde_json::Error;
 
-    fn try_from(r: ChargeResult) -> Result<Self, Self::Error> {
-        Ok(ChargeItem {
-            id: ChargeId(r.id),
-            user_id: UserId(r.user_id),
-            price_id: ProductPriceId(r.price_id),
+    fn try_from(r: ChargeQueryResult) -> Result<Self, Self::Error> {
+        Ok(DBCharge {
+            id: DBChargeId(r.id),
+            user_id: DBUserId(r.user_id),
+            price_id: DBProductPriceId(r.price_id),
             amount: r.amount,
             currency_code: r.currency_code,
             status: ChargeStatus::from_string(&r.status),
             due: r.due,
             last_attempt: r.last_attempt,
             type_: ChargeType::from_string(&r.charge_type),
-            subscription_id: r.subscription_id.map(UserSubscriptionId),
+            subscription_id: r.subscription_id.map(DBUserSubscriptionId),
             subscription_interval: r
                 .subscription_interval
                 .map(|x| PriceDuration::from_string(&x)),
             payment_platform: PaymentPlatform::from_string(&r.payment_platform),
             payment_platform_id: r.payment_platform_id,
-            parent_charge_id: r.parent_charge_id.map(ChargeId),
+            parent_charge_id: r.parent_charge_id.map(DBChargeId),
             net: r.net,
         })
     }
@@ -77,7 +77,7 @@ impl TryFrom<ChargeResult> for ChargeItem {
 macro_rules! select_charges_with_predicate {
     ($predicate:tt, $param:ident) => {
         sqlx::query_as!(
-            ChargeResult,
+            ChargeQueryResult,
             r#"
             SELECT
                 id, user_id, price_id, amount, currency_code, status, due, last_attempt,
@@ -96,11 +96,11 @@ macro_rules! select_charges_with_predicate {
     };
 }
 
-impl ChargeItem {
+impl DBCharge {
     pub async fn upsert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<ChargeId, DatabaseError> {
+    ) -> Result<DBChargeId, DatabaseError> {
         sqlx::query!(
             r#"
             INSERT INTO charges (id, user_id, price_id, amount, currency_code, charge_type, status, due, last_attempt, subscription_id, subscription_interval, payment_platform, payment_platform_id, parent_charge_id, net)
@@ -144,9 +144,9 @@ impl ChargeItem {
     }
 
     pub async fn get(
-        id: ChargeId,
+        id: DBChargeId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Option<ChargeItem>, DatabaseError> {
+    ) -> Result<Option<DBCharge>, DatabaseError> {
         let id = id.0;
         let res = select_charges_with_predicate!("WHERE id = $1", id)
             .fetch_optional(exec)
@@ -156,9 +156,9 @@ impl ChargeItem {
     }
 
     pub async fn get_from_user(
-        user_id: UserId,
+        user_id: DBUserId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<ChargeItem>, DatabaseError> {
+    ) -> Result<Vec<DBCharge>, DatabaseError> {
         let user_id = user_id.0;
         let res = select_charges_with_predicate!(
             "WHERE user_id = $1 ORDER BY due DESC",
@@ -174,9 +174,9 @@ impl ChargeItem {
     }
 
     pub async fn get_children(
-        charge_id: ChargeId,
+        charge_id: DBChargeId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<ChargeItem>, DatabaseError> {
+    ) -> Result<Vec<DBCharge>, DatabaseError> {
         let charge_id = charge_id.0;
         let res = select_charges_with_predicate!(
             "WHERE parent_charge_id = $1",
@@ -192,9 +192,9 @@ impl ChargeItem {
     }
 
     pub async fn get_open_subscription(
-        user_subscription_id: UserSubscriptionId,
+        user_subscription_id: DBUserSubscriptionId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Option<ChargeItem>, DatabaseError> {
+    ) -> Result<Option<DBCharge>, DatabaseError> {
         let user_subscription_id = user_subscription_id.0;
         let res = select_charges_with_predicate!(
             "WHERE subscription_id = $1 AND (status = 'open' OR status = 'cancelled')",
@@ -208,7 +208,7 @@ impl ChargeItem {
 
     pub async fn get_chargeable(
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<ChargeItem>, DatabaseError> {
+    ) -> Result<Vec<DBCharge>, DatabaseError> {
         let charge_type = ChargeType::Subscription.as_str();
         let res = select_charges_with_predicate!(
             r#"
@@ -232,7 +232,7 @@ impl ChargeItem {
 
     pub async fn get_unprovision(
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<ChargeItem>, DatabaseError> {
+    ) -> Result<Vec<DBCharge>, DatabaseError> {
         let charge_type = ChargeType::Subscription.as_str();
         let res = select_charges_with_predicate!(
             r#"
@@ -254,8 +254,29 @@ impl ChargeItem {
             .collect::<Result<Vec<_>, serde_json::Error>>()?)
     }
 
+    pub async fn get_cancellable(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+    ) -> Result<Vec<DBCharge>, DatabaseError> {
+        let charge_type = ChargeType::Subscription.as_str();
+        let res = select_charges_with_predicate!(
+            r#"
+            WHERE
+                charge_type = $1 AND
+                status = 'failed' AND due < NOW() - INTERVAL '30 days'
+            "#,
+            charge_type
+        )
+        .fetch_all(exec)
+        .await?;
+
+        Ok(res
+            .into_iter()
+            .map(|r| r.try_into())
+            .collect::<Result<Vec<_>, serde_json::Error>>()?)
+    }
+
     pub async fn remove(
-        id: ChargeId,
+        id: DBChargeId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(

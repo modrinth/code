@@ -7,16 +7,17 @@
           type="text"
           placeholder="Search logs"
           class="h-12 !w-full !pl-10 !pr-48"
+          :disabled="loading"
           @keydown.escape="clearSearch"
         />
         <SearchIcon class="absolute left-4 top-1/2 -translate-y-1/2" />
-        <ButtonStyled v-if="searchInput" @click="clearSearch">
+        <ButtonStyled v-if="searchInput && !loading" @click="clearSearch">
           <button class="absolute right-2 top-1/2 -translate-y-1/2">
             <XIcon class="h-5 w-5" />
           </button>
         </ButtonStyled>
         <span
-          v-if="pyroConsole.filteredOutput.value.length && searchInput"
+          v-if="pyroConsole.filteredOutput.value.length && searchInput && !loading"
           class="pointer-events-none absolute right-12 top-1/2 -translate-y-1/2 select-none whitespace-pre text-sm"
         >
           {{ pyroConsole.filteredOutput.value.length }}
@@ -29,11 +30,13 @@
       :class="[
         'terminal-font console relative z-[1] flex h-full w-full flex-col items-center justify-between overflow-hidden rounded-t-xl px-1 text-sm transition-transform duration-300',
         { 'scale-fullscreen screen-fixed inset-0 z-50 !rounded-none': isFullScreen },
+        { 'pointer-events-none': loading },
       ]"
+      :aria-hidden="loading"
       tabindex="-1"
     >
       <div
-        v-if="cosmetics.advancedRendering"
+        v-if="cosmetics.advancedRendering && !loading"
         class="progressive-gradient pointer-events-none absolute -bottom-6 left-0 z-[2] h-[10rem] w-full overflow-hidden rounded-xl"
         :style="`--transparency: ${Math.max(0, lerp(100, 0, bottomThreshold * 8))}%`"
         aria-hidden="true"
@@ -47,7 +50,7 @@
         />
       </div>
       <div
-        v-else
+        v-else-if="!loading"
         class="pointer-events-none absolute bottom-0 left-0 right-0 z-[2] h-[196px] w-full"
         :style="
           bottomThreshold > 0
@@ -79,6 +82,7 @@
       </div>
       <div data-pyro-terminal-scroll-root class="relative h-full w-full">
         <div
+          v-if="!loading"
           ref="scrollbarTrack"
           data-pyro-terminal-scrollbar-track
           class="absolute -right-1 bottom-16 top-4 z-[4] w-4 overflow-hidden"
@@ -118,7 +122,12 @@
           class="scrollbar-none absolute left-0 top-0 h-full w-full select-text overflow-x-auto overflow-y-auto py-6 pb-[72px]"
           @scroll.passive="() => handleListScroll()"
         >
-          <div data-pyro-terminal-virtual-height-watcher :style="{ height: `${totalHeight}px` }">
+          <div v-if="loading" class="h-full w-full" />
+          <div
+            v-else
+            data-pyro-terminal-virtual-height-watcher
+            :style="{ height: `${totalHeight}px` }"
+          >
             <ul
               class="m-0 list-none p-0"
               data-pyro-terminal-virtual-list
@@ -205,6 +214,7 @@
         <slot />
       </div>
       <button
+        v-if="!loading"
         data-pyro-fullscreen
         :label="isFullScreen ? 'Exit full screen' : 'Enter full screen'"
         class="experimental-styles-within absolute right-4 top-4 z-[3] grid h-12 w-12 place-content-center rounded-full border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
@@ -217,7 +227,7 @@
 
       <Transition name="fade">
         <div
-          v-if="hasSelection || isSingleLineSelected"
+          v-if="(hasSelection || isSingleLineSelected) && !loading"
           class="absolute right-20 top-4 z-[3] flex flex-row items-center"
           :class="{ '!right-4': searchInput || hasSelection || isSingleLineSelected }"
         >
@@ -247,7 +257,7 @@
 
       <Transition name="scroll-to-bottom">
         <button
-          v-if="bottomThreshold > 0 && !isScrolledToBottom"
+          v-if="bottomThreshold > 0 && !isScrolledToBottom && !loading"
           data-pyro-scrolltobottom
           label="Scroll to bottom"
           class="scroll-to-bottom-btn experimental-styles-within absolute bottom-[4.5rem] right-4 z-[3] grid h-12 w-12 place-content-center rounded-full border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
@@ -291,13 +301,14 @@ import { useDebounceFn } from "@vueuse/core";
 import { NewModal } from "@modrinth/ui";
 import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
 import DOMPurify from "dompurify";
-import { usePyroConsole } from "~/store/console.ts";
+import { useModrinthServersConsole } from "~/store/console.ts";
 
 const { $cosmetics } = useNuxtApp();
 const cosmetics = $cosmetics;
 
 const props = defineProps<{
   fullScreen: boolean;
+  loading?: boolean;
 }>();
 
 const BUFFER_SIZE = 5;
@@ -307,8 +318,8 @@ const SEPARATOR_HEIGHT = 32;
 const SCROLL_END_DELAY = 150;
 const progressiveBlurIterations = ref(8);
 
-const pyroConsole = usePyroConsole();
-const consoleOutput = pyroConsole.output;
+const pyroConsole = useModrinthServersConsole();
+const consoleOutput = computed(() => (props.loading ? [] : pyroConsole.output.value));
 
 const scrollContainer = ref<HTMLElement | null>(null);
 

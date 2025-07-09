@@ -32,7 +32,7 @@
             <h1 class="wrap-as-needed">
               {{ project.title }}
             </h1>
-            <Badge :type="project.status" />
+            <ProjectStatusBadge :status="project.status" />
           </div>
         </div>
         <h2>Project settings</h2>
@@ -452,6 +452,16 @@
               {{ formatCategory(currentPlatform) }}.
             </p>
           </AutomaticAccordion>
+          <ServersPromo
+            v-if="flags.showProjectPageDownloadModalServersPromo"
+            :link="`/servers#plan`"
+            @close="
+              () => {
+                flags.showProjectPageDownloadModalServersPromo = false;
+                saveFeatureFlags();
+              }
+            "
+          />
         </div>
       </template>
     </NewModal>
@@ -495,6 +505,64 @@
                 </button>
               </ButtonStyled>
             </div>
+            <Tooltip
+              v-if="canCreateServerFrom && flags.showProjectPageQuickServerButton"
+              theme="dismissable-prompt"
+              :triggers="[]"
+              :shown="flags.showProjectPageCreateServersTooltip"
+              :auto-hide="false"
+              placement="bottom-start"
+            >
+              <ButtonStyled size="large" circular>
+                <nuxt-link
+                  v-tooltip="'Create a server'"
+                  :to="`/servers?project=${project.id}#plan`"
+                  @click="
+                    () => {
+                      flags.showProjectPageCreateServersTooltip = false;
+                      saveFeatureFlags();
+                    }
+                  "
+                >
+                  <ServerPlusIcon aria-hidden="true" />
+                </nuxt-link>
+              </ButtonStyled>
+              <template #popper>
+                <div class="experimental-styles-within flex max-w-60 flex-col gap-1">
+                  <div class="flex items-center justify-between gap-4">
+                    <h3 class="m-0 flex items-center gap-2 text-base font-bold text-contrast">
+                      Create a server
+                      <TagItem
+                        :style="{
+                          '--_color': 'var(--color-brand)',
+                          '--_bg-color': 'var(--color-brand-highlight)',
+                        }"
+                        >New</TagItem
+                      >
+                    </h3>
+                    <ButtonStyled size="small" circular>
+                      <button
+                        v-tooltip="`Don't show again`"
+                        @click="
+                          () => {
+                            flags.showProjectPageCreateServersTooltip = false;
+                            saveFeatureFlags();
+                          }
+                        "
+                      >
+                        <XIcon aria-hidden="true" />
+                      </button>
+                    </ButtonStyled>
+                  </div>
+                  <p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
+                    Modrinth Servers is the easiest way to play with your friends without hassle!
+                  </p>
+                  <p class="m-0 text-wrap text-sm font-bold text-primary">
+                    Starting at $5<span class="text-xs"> / month</span>
+                  </p>
+                </div>
+              </template>
+            </Tooltip>
             <ClientOnly>
               <ButtonStyled
                 size="large"
@@ -638,6 +706,7 @@
                     shown: !isMember,
                   },
                   { id: 'copy-id', action: () => copyId() },
+                  { id: 'copy-permalink', action: () => copyPermalink() },
                 ]"
                 aria-label="More options"
                 :dropdown-id="`${baseId}-more-options`"
@@ -658,6 +727,10 @@
                 <template #copy-id>
                   <ClipboardCopyIcon aria-hidden="true" />
                   Copy ID
+                </template>
+                <template #copy-permalink>
+                  <ClipboardCopyIcon aria-hidden="true" />
+                  Copy permanent link
                 </template>
               </OverflowMenu>
             </ButtonStyled>
@@ -689,12 +762,7 @@
           :tags="tags"
           class="card flex-card experimental-styles-within"
         />
-        <AdPlaceholder
-          v-if="
-            (!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus) &&
-            tags.approvedStatuses.includes(project.status)
-          "
-        />
+        <AdPlaceholder v-if="!auth.user && tags.approvedStatuses.includes(project.status)" />
         <ProjectSidebarLinks
           :project="project"
           :link-target="$external()"
@@ -845,11 +913,14 @@ import {
   ReportIcon,
   ScaleIcon,
   SearchIcon,
+  ServerPlusIcon,
   SettingsIcon,
   TagsIcon,
   UsersIcon,
   VersionIcon,
   WrenchIcon,
+  ModrinthIcon,
+  XIcon,
 } from "@modrinth/assets";
 import {
   Avatar,
@@ -864,17 +935,27 @@ import {
   ProjectSidebarCreators,
   ProjectSidebarDetails,
   ProjectSidebarLinks,
+  ProjectStatusBadge,
   ScrollablePanel,
+  TagItem,
+  ServersPromo,
+  useRelativeTime,
 } from "@modrinth/ui";
 import VersionSummary from "@modrinth/ui/src/components/version/VersionSummary.vue";
-import { formatCategory, isRejected, isStaff, isUnderReview, renderString } from "@modrinth/utils";
+import {
+  formatCategory,
+  formatProjectType,
+  isRejected,
+  isStaff,
+  isUnderReview,
+  renderString,
+} from "@modrinth/utils";
 import { navigateTo } from "#app";
 import dayjs from "dayjs";
-import ModrinthIcon from "~/assets/images/utils/modrinth.svg?component";
+import { Tooltip } from "floating-vue";
 import Accordion from "~/components/ui/Accordion.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import AutomaticAccordion from "~/components/ui/AutomaticAccordion.vue";
-import Badge from "~/components/ui/Badge.vue";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import MessageBanner from "~/components/ui/MessageBanner.vue";
@@ -885,9 +966,11 @@ import NavTabs from "~/components/ui/NavTabs.vue";
 import ProjectMemberHeader from "~/components/ui/ProjectMemberHeader.vue";
 import { userCollectProject } from "~/composables/user.js";
 import { reportProject } from "~/utils/report-helpers.ts";
+import { saveFeatureFlags } from "~/composables/featureFlags.ts";
 
 const data = useNuxtApp();
 const route = useNativeRoute();
+const config = useRuntimeConfig();
 
 const auth = await useAuth();
 const user = await useUser();
@@ -1105,14 +1188,19 @@ let project,
   featuredVersions,
   versions,
   organization,
-  resetOrganization;
+  resetOrganization,
+  projectError,
+  membersError,
+  dependenciesError,
+  featuredVersionsError,
+  versionsError;
 try {
   [
-    { data: project, refresh: resetProject },
-    { data: allMembers, refresh: resetMembers },
-    { data: dependencies },
-    { data: featuredVersions },
-    { data: versions },
+    { data: project, error: projectError, refresh: resetProject },
+    { data: allMembers, error: membersError, refresh: resetMembers },
+    { data: dependencies, error: dependenciesError },
+    { data: featuredVersions, error: featuredVersionsError },
+    { data: versions, error: versionsError },
     { data: organization, refresh: resetOrganization },
   ] = await Promise.all([
     useAsyncData(`project/${route.params.id}`, () => useBaseFetch(`project/${route.params.id}`), {
@@ -1159,13 +1247,29 @@ try {
 
   versions = shallowRef(toRaw(versions));
   featuredVersions = shallowRef(toRaw(featuredVersions));
-} catch {
+} catch (err) {
   throw createError({
     fatal: true,
-    statusCode: 404,
-    message: "Project not found",
+    statusCode: err.statusCode ?? 500,
+    message: "Error loading project data" + (err.message ? `: ${err.message}` : ""),
   });
 }
+
+function handleError(err, project = false) {
+  if (err.value && err.value.statusCode) {
+    throw createError({
+      fatal: true,
+      statusCode: err.value.statusCode,
+      message: err.value.statusCode === 404 && project ? "Project not found" : err.value.message,
+    });
+  }
+}
+
+handleError(projectError, true);
+handleError(membersError);
+handleError(dependenciesError);
+handleError(featuredVersionsError);
+handleError(versionsError);
 
 if (!project.value) {
   throw createError({
@@ -1258,7 +1362,7 @@ featuredVersions.value.sort((a, b) => {
 });
 
 const projectTypeDisplay = computed(() =>
-  data.$formatProjectType(
+  formatProjectType(
     data.$getProjectTypeForDisplay(project.value.project_type, project.value.loaders),
   ),
 );
@@ -1275,6 +1379,10 @@ const description = computed(
       project.value.title
     } by ${members.value.find((x) => x.is_owner)?.user?.username || "a Creator"} on Modrinth`,
 );
+
+const canCreateServerFrom = computed(() => {
+  return project.value.project_type === "modpack" && project.value.server_side !== "unsupported";
+});
 
 if (!route.name.startsWith("type-id-settings")) {
   useSeoMeta({
@@ -1325,7 +1433,7 @@ async function setProcessing() {
     data.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
   }
@@ -1368,7 +1476,7 @@ async function patchProject(resData, quiet = false) {
     data.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1405,7 +1513,7 @@ async function patchIcon(icon) {
     data.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
 
@@ -1435,6 +1543,10 @@ async function updateMembers() {
 
 async function copyId() {
   await navigator.clipboard.writeText(project.value.id);
+}
+
+async function copyPermalink() {
+  await navigator.clipboard.writeText(`${config.public.siteUrl}/project/${project.value.id}`);
 }
 
 const collapsedChecklist = ref(false);
@@ -1605,10 +1717,12 @@ const navLinks = computed(() => {
       width: 25rem;
       height: 25rem;
     }
+
     .animation-ring-2 {
       width: 50rem;
       height: 50rem;
     }
+
     .animation-ring-3 {
       width: 100rem;
       height: 100rem;
@@ -1636,6 +1750,35 @@ const navLinks = computed(() => {
 @media (hover: none) and (max-width: 767px) {
   .modrinth-app-section {
     display: none;
+  }
+}
+
+.servers-popup {
+  box-shadow:
+    0 0 12px 1px rgba(0, 175, 92, 0.6),
+    var(--shadow-floating);
+
+  &::before {
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid var(--color-button-bg);
+    content: " ";
+    position: absolute;
+    top: -7px;
+    left: 17px;
+  }
+  &::after {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid var(--color-raised-bg);
+    content: " ";
+    position: absolute;
+    top: -5px;
+    left: 18px;
   }
 }
 </style>

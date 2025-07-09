@@ -1,12 +1,12 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt::Write};
 
 use crate::{
     assert_status,
     common::{
         api_common::{
+            Api, ApiProject, AppendsOptionalPat,
             models::{CommonItemType, CommonProject, CommonVersion},
             request_data::{ImageData, ProjectCreationRequestData},
-            Api, ApiProject, AppendsOptionalPat,
         },
         dummy_data::TestFile,
     },
@@ -27,8 +27,8 @@ use serde_json::json;
 use crate::common::database::MOD_USER_PAT;
 
 use super::{
-    request_data::{self, get_public_project_creation_data},
     ApiV2,
+    request_data::{self, get_public_project_creation_data},
 };
 
 impl ApiV2 {
@@ -71,7 +71,7 @@ impl ApiV2 {
         };
 
         let req = test::TestRequest::get()
-            .uri(&format!("/v2/search?{}{}", query_field, facets_field))
+            .uri(&format!("/v2/search?{query_field}{facets_field}"))
             .append_pat(pat)
             .to_request();
         let resp = self.call(req).await;
@@ -99,7 +99,7 @@ impl ApiProject for ApiV2 {
 
         // Approve as a moderator.
         let req = TestRequest::patch()
-            .uri(&format!("/v2/project/{}", slug))
+            .uri(&format!("/v2/project/{slug}"))
             .append_pat(MOD_USER_PAT)
             .set_json(json!(
                 {
@@ -114,7 +114,7 @@ impl ApiProject for ApiV2 {
 
         // Get project's versions
         let req = TestRequest::get()
-            .uri(&format!("/v2/project/{}/version", slug))
+            .uri(&format!("/v2/project/{slug}/version"))
             .append_pat(pat)
             .to_request();
         let resp = self.call(req).await;
@@ -217,7 +217,7 @@ impl ApiProject for ApiV2 {
         pat: Option<&str>,
     ) -> ServiceResponse {
         let req = test::TestRequest::get()
-            .uri(&format!("/v2/user/{}/projects", user_id_or_username))
+            .uri(&format!("/v2/user/{user_id_or_username}/projects"))
             .append_pat(pat)
             .to_request();
         self.call(req).await
@@ -260,7 +260,7 @@ impl ApiProject for ApiV2 {
     ) -> ServiceResponse {
         let projects_str = ids_or_slugs
             .iter()
-            .map(|s| format!("\"{}\"", s))
+            .map(|s| format!("\"{s}\""))
             .collect::<Vec<_>>()
             .join(",");
         let req = test::TestRequest::patch()
@@ -490,13 +490,13 @@ impl ApiProject for ApiV2 {
             featured = featured
         );
         if let Some(title) = title {
-            url.push_str(&format!("&title={}", title));
+            write!(&mut url, "&title={title}").unwrap();
         }
         if let Some(description) = description {
-            url.push_str(&format!("&description={}", description));
+            write!(&mut url, "&description={description}").unwrap();
         }
         if let Some(ordering) = ordering {
-            url.push_str(&format!("&ordering={}", ordering));
+            write!(&mut url, "&ordering={ordering}").unwrap();
         }
 
         let req = test::TestRequest::post()
@@ -521,11 +521,12 @@ impl ApiProject for ApiV2 {
         );
 
         for (key, value) in patch {
-            url.push_str(&format!(
+            write!(
+                &mut url,
                 "&{key}={value}",
-                key = key,
                 value = urlencoding::encode(&value)
-            ));
+            )
+            .unwrap();
         }
 
         let req = test::TestRequest::patch()
@@ -542,10 +543,7 @@ impl ApiProject for ApiV2 {
         pat: Option<&str>,
     ) -> ServiceResponse {
         let req = test::TestRequest::delete()
-            .uri(&format!(
-                "/v2/project/{id_or_slug}/gallery?url={url}",
-                url = url
-            ))
+            .uri(&format!("/v2/project/{id_or_slug}/gallery?url={url}"))
             .append_pat(pat)
             .to_request();
 

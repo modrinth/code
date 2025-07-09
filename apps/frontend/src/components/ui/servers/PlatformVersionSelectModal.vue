@@ -20,9 +20,7 @@
         }"
       >
         {{
-          backupServer
-            ? "A backup will be created before proceeding with the reinstallation, then all data will be erased from your server. Are you sure you want to continue?"
-            : "This will reinstall your server and erase all data. Are you sure you want to continue?"
+          "This will reinstall your server and erase all data. Are you sure you want to continue?"
         }}
       </p>
       <div v-if="!isSecondPhase" class="flex flex-col gap-4">
@@ -55,7 +53,7 @@
         </div>
 
         <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
-          <div class="text-sm font-bold text-contrast">Minecraft version</div>
+          <div class="text-lg font-bold text-contrast">Minecraft version</div>
           <UiServersTeleportDropdownMenu
             v-model="selectedMCVersion"
             name="mcVersion"
@@ -63,6 +61,20 @@
             class="w-full max-w-[100%]"
             placeholder="Select Minecraft version..."
           />
+          <div class="mt-2 flex items-center justify-between gap-2">
+            <label for="toggle-snapshots" class="font-semibold"> Show snapshot versions </label>
+            <div
+              v-tooltip="
+                isSnapshotSelected ? 'A snapshot version is currently selected.' : undefined
+              "
+            >
+              <Toggle
+                id="toggle-snapshots"
+                v-model="showSnapshots"
+                :disabled="isSnapshotSelected"
+              />
+            </div>
+          </div>
         </div>
 
         <div
@@ -76,7 +88,7 @@
           }"
         >
           <div class="flex flex-col gap-2">
-            <div class="text-sm font-bold text-contrast">{{ selectedLoader }} version</div>
+            <div class="text-lg font-bold text-contrast">{{ selectedLoader }} version</div>
 
             <template v-if="!selectedMCVersion">
               <div
@@ -115,7 +127,10 @@
           </div>
         </div>
 
-        <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
+        <div
+          v-if="!initialSetup"
+          class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4"
+        >
           <div class="flex w-full flex-row items-center justify-between">
             <label class="w-full text-lg font-bold text-contrast" for="hard-reset">
               Erase all data
@@ -131,41 +146,31 @@
             Removes all data on your server, including your worlds, mods, and configuration files,
             then reinstalls it with the selected version.
           </div>
+          <div class="font-bold">This does not affect your backups, which are stored off-site.</div>
         </div>
 
-        <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
-          <div class="flex w-full flex-row items-center justify-between">
-            <label class="w-full text-lg font-bold text-contrast" for="backup-server">
-              Backup server
-            </label>
-            <input
-              id="backup-server"
-              v-model="backupServer"
-              class="switch stylized-toggle shrink-0"
-              type="checkbox"
-            />
-          </div>
-          <div>
-            Creates a backup of your server before proceeding with the installation or
-            reinstallation.
-          </div>
-        </div>
+        <BackupWarning
+          v-if="!initialSetup"
+          :backup-link="`/servers/manage/${props.server?.serverId}/backups`"
+        />
       </div>
 
       <div class="mt-4 flex justify-start gap-4">
         <ButtonStyled :color="isDangerous ? 'red' : 'brand'">
-          <button :disabled="canInstall" @click="handleReinstall">
+          <button
+            v-tooltip="backupInProgress ? formatMessage(backupInProgress.tooltip) : undefined"
+            :disabled="canInstall || !!backupInProgress"
+            @click="handleReinstall"
+          >
             <RightArrowIcon />
             {{
-              isBackingUp
-                ? "Backing up..."
-                : isLoading
-                  ? "Installing..."
-                  : isSecondPhase
-                    ? "Erase and install"
-                    : hardReset
-                      ? "Continue"
-                      : "Install"
+              isLoading
+                ? "Installing..."
+                : isSecondPhase
+                  ? "Erase and install"
+                  : hardReset
+                    ? "Continue"
+                    : "Install"
             }}
           </button>
         </ButtonStyled>
@@ -173,10 +178,12 @@
           <button
             :disabled="isLoading"
             @click="
-              if (isSecondPhase) {
-                isSecondPhase = false;
-              } else {
-                hide();
+              () => {
+                if (isSecondPhase) {
+                  isSecondPhase = false;
+                } else {
+                  hide();
+                }
               }
             "
           >
@@ -190,10 +197,14 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, NewModal } from "@modrinth/ui";
-import { RightArrowIcon, XIcon, ServerIcon, DropdownIcon } from "@modrinth/assets";
-import type { Server } from "~/composables/pyroServers";
-import type { Loaders } from "~/types/servers";
+import { BackupWarning, ButtonStyled, NewModal, Toggle } from "@modrinth/ui";
+import { DropdownIcon, RightArrowIcon, ServerIcon, XIcon } from "@modrinth/assets";
+import { $fetch } from "ofetch";
+import { type Loaders, ModrinthServersFetchError } from "@modrinth/utils";
+import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+
+const { formatMessage } = useVIntl();
 
 interface LoaderVersion {
   id: string;
@@ -209,8 +220,10 @@ type VersionMap = Record<string, LoaderVersion[]>;
 type VersionCache = Record<string, any>;
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: ModrinthServer;
   currentLoader: Loaders | undefined;
+  backupInProgress?: BackupInProgressReason;
+  initialSetup?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -220,11 +233,10 @@ const emit = defineEmits<{
 const versionSelectModal = ref();
 const isSecondPhase = ref(false);
 const hardReset = ref(false);
-const backupServer = ref(false);
 const isLoading = ref(false);
-const isBackingUp = ref(false);
 const loadingServerCheck = ref(false);
 const serverCheckError = ref("");
+const showSnapshots = ref(false);
 
 const selectedLoader = ref<Loaders>("Vanilla");
 const selectedMCVersion = ref("");
@@ -237,6 +249,22 @@ const cachedVersions = ref<VersionCache>({});
 
 const versionStrings = ["forge", "fabric", "quilt", "neo"] as const;
 
+const isSnapshotSelected = computed(() => {
+  if (selectedMCVersion.value) {
+    const selected = tags.value.gameVersions.find((x) => x.version === selectedMCVersion.value);
+    if (selected?.version_type !== "release") {
+      return true;
+    }
+  }
+  return false;
+});
+
+const getLoaderVersions = async (loader: string) => {
+  return await $fetch(
+    `https://launcher-meta.modrinth.com/${loader?.toLowerCase()}/v0/manifest.json`,
+  );
+};
+
 const fetchLoaderVersions = async () => {
   const versions = await Promise.all(
     versionStrings.map(async (loader) => {
@@ -245,7 +273,7 @@ const fetchLoaderVersions = async () => {
           throw new Error("Failed to fetch loader versions");
         }
         try {
-          const res = await $fetch(`/loader-versions?loader=${loader}`);
+          const res = await getLoaderVersions(loader);
           return { [loader]: (res as any).gameVersions };
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (_) {
@@ -288,11 +316,11 @@ const fetchPurpurVersions = async (mcVersion: string) => {
   }
 };
 
-const selectedLoaderVersions = computed(() => {
+const selectedLoaderVersions = computed<string[]>(() => {
   const loader = selectedLoader.value.toLowerCase();
 
   if (loader === "paper") {
-    return paperVersions.value[selectedMCVersion.value] || [];
+    return paperVersions.value[selectedMCVersion.value]?.map((x) => `${x}`) || [];
   }
 
   if (loader === "purpur") {
@@ -336,12 +364,21 @@ watch(selectedLoader, async () => {
 watch(
   selectedLoaderVersions,
   (newVersions) => {
-    if (newVersions.length > 0 && !selectedLoaderVersion.value) {
+    if (
+      newVersions.length > 0 &&
+      (!selectedLoaderVersion.value || !newVersions.includes(selectedLoaderVersion.value))
+    ) {
       selectedLoaderVersion.value = String(newVersions[0]);
     }
   },
   { immediate: true },
 );
+
+const getLoaderVersion = async (loader: string, version: string) => {
+  return await $fetch(
+    `https://launcher-meta.modrinth.com/${loader?.toLowerCase()}/v0/versions/${version}.json`,
+  );
+};
 
 const checkVersionAvailability = async (version: string) => {
   if (!version || version.trim().length < 3) return;
@@ -350,9 +387,7 @@ const checkVersionAvailability = async (version: string) => {
   loadingServerCheck.value = true;
 
   try {
-    const mcRes =
-      cachedVersions.value[version] ||
-      (await $fetch(`/loader-versions?loader=minecraft&version=${version}`));
+    const mcRes = cachedVersions.value[version] || (await getLoaderVersion("minecraft", version));
 
     cachedVersions.value[version] = mcRes;
 
@@ -388,13 +423,15 @@ onMounted(() => {
 });
 
 const tags = useTags();
-const mcVersions = tags.value.gameVersions
-  .filter((x) => x.version_type === "release")
-  .map((x) => x.version)
-  .filter((x) => {
-    const segment = parseInt(x.split(".")[1], 10);
-    return !isNaN(segment) && segment > 2;
-  });
+const mcVersions = computed(() =>
+  tags.value.gameVersions
+    .filter((x) =>
+      showSnapshots.value
+        ? x.version_type === "snapshot" || x.version_type === "release"
+        : x.version_type === "release",
+    )
+    .map((x) => x.version),
+);
 
 const isDangerous = computed(() => hardReset.value);
 const canInstall = computed(() => {
@@ -411,79 +448,21 @@ const canInstall = computed(() => {
   return conds || !selectedLoaderVersion.value;
 });
 
-const performBackup = async (): Promise<boolean> => {
-  try {
-    const date = new Date();
-    const format = date.toLocaleString(navigator.language || "en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-      timeZoneName: "short",
-    });
-    const backupName = `Reinstallation - ${format}`;
-    isLoading.value = true;
-    const backupId = await props.server.backups?.create(backupName);
-    isBackingUp.value = true;
-    let attempts = 0;
-    while (true) {
-      attempts++;
-      if (attempts > 100) {
-        addNotification({
-          group: "server",
-          title: "Backup Failed",
-          text: "An unexpected error occurred while backing up. Please try again later.",
-        });
-        return false;
-      }
-      await props.server.refresh(["backups"]);
-      const backups = await props.server.backups?.data;
-      const backup = backupId ? backups?.find((x) => x.id === backupId) : undefined;
-      if (backup && !backup.ongoing) {
-        isBackingUp.value = false;
-        break;
-      }
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-    }
-    return true;
-  } catch {
-    addNotification({
-      group: "server",
-      title: "Backup Failed",
-      text: "An unexpected error occurred while backing up. Please try again later.",
-    });
-    return false;
-  }
-};
-
 const handleReinstall = async () => {
   if (hardReset.value && !isSecondPhase.value) {
     isSecondPhase.value = true;
     return;
   }
 
-  if (backupServer.value) {
-    isBackingUp.value = true;
-    if (!(await performBackup())) {
-      isBackingUp.value = false;
-      isLoading.value = false;
-      return;
-    }
-    isBackingUp.value = false;
-  }
-
   isLoading.value = true;
 
   try {
     await props.server.general?.reinstall(
-      props.server.serverId,
       true,
       selectedLoader.value,
       selectedMCVersion.value,
       selectedLoader.value === "Vanilla" ? "" : selectedLoaderVersion.value,
-      hardReset.value,
+      props.initialSetup ? true : hardReset.value,
     );
 
     emit("reinstall", {
@@ -494,7 +473,7 @@ const handleReinstall = async () => {
 
     hide();
   } catch (error) {
-    if (error instanceof PyroFetchError && error.statusCode === 429) {
+    if (error instanceof ModrinthServersFetchError && (error as any)?.statusCode === 429) {
       addNotification({
         group: "server",
         title: "Cannot reinstall server",
@@ -516,11 +495,13 @@ const handleReinstall = async () => {
 
 const onShow = () => {
   selectedMCVersion.value = props.server.general?.mc_version || "";
+  if (isSnapshotSelected.value) {
+    showSnapshots.value = true;
+  }
 };
 
 const onHide = () => {
   hardReset.value = false;
-  backupServer.value = false;
   isSecondPhase.value = false;
   serverCheckError.value = "";
   loadingServerCheck.value = false;

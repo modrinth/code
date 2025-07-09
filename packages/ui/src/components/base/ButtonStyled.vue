@@ -4,9 +4,9 @@ import { computed } from 'vue'
 const props = withDefaults(
   defineProps<{
     color?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple'
-    size?: 'standard' | 'large'
+    size?: 'standard' | 'large' | 'small'
     circular?: boolean
-    type?: 'standard' | 'outlined' | 'transparent' | 'highlight'
+    type?: 'standard' | 'outlined' | 'transparent' | 'highlight' | 'highlight-colored-text'
     colorFill?: 'auto' | 'background' | 'text' | 'none'
     hoverColorFill?: 'auto' | 'background' | 'text' | 'none'
     highlightedStyle?: 'main-nav-primary' | 'main-nav-secondary'
@@ -24,20 +24,40 @@ const props = withDefaults(
   },
 )
 
+const highlightedColorVar = computed(() => {
+  switch (props.color) {
+    case 'brand':
+      return 'var(--color-brand-highlight)'
+    case 'red':
+      return 'var(--color-red-highlight)'
+    case 'orange':
+      return 'var(--color-orange-highlight)'
+    case 'green':
+      return 'var(--color-green-highlight)'
+    case 'blue':
+      return 'var(--color-blue-highlight)'
+    case 'purple':
+      return 'var(--color-purple-highlight)'
+    case 'standard':
+    default:
+      return null
+  }
+})
+
 const colorVar = computed(() => {
   switch (props.color) {
     case 'brand':
-      return props.type === 'highlight' ? 'var(--color-brand-highlight)' : 'var(--color-brand)'
+      return 'var(--color-brand)'
     case 'red':
-      return props.type === 'highlight' ? 'var(--color-red-highlight)' : 'var(--color-red)'
+      return 'var(--color-red)'
     case 'orange':
-      return props.type === 'highlight' ? 'var(--color-orange-highlight)' : 'var(--color-orange)'
+      return 'var(--color-orange)'
     case 'green':
-      return props.type === 'highlight' ? 'var(--color-green-highlight)' : 'var(--color-green)'
+      return 'var(--color-green)'
     case 'blue':
-      return props.type === 'highlight' ? 'var(--color-blue-highlight)' : 'var(--color-blue)'
+      return 'var(--color-blue)'
     case 'purple':
-      return props.type === 'highlight' ? 'var(--color-purple-highlight)' : 'var(--color-purple)'
+      return 'var(--color-purple)'
     case 'standard':
     default:
       return null
@@ -47,6 +67,8 @@ const colorVar = computed(() => {
 const height = computed(() => {
   if (props.size === 'large') {
     return '3rem'
+  } else if (props.size === 'small') {
+    return '1.5rem'
   }
   return '2.25rem'
 })
@@ -54,6 +76,8 @@ const height = computed(() => {
 const width = computed(() => {
   if (props.size === 'large') {
     return props.circular ? '3rem' : 'auto'
+  } else if (props.size === 'small') {
+    return props.circular ? '1.5rem' : 'auto'
   }
   return props.circular ? '2.25rem' : 'auto'
 })
@@ -62,6 +86,8 @@ const paddingX = computed(() => {
   let padding = props.circular ? '0.5rem' : '0.75rem'
   if (props.size === 'large') {
     padding = props.circular ? '0.75rem' : '1rem'
+  } else if (props.size === 'small') {
+    padding = props.circular ? '0.125rem' : '0.5rem'
   }
   return `calc(${padding} - 0.125rem)`
 })
@@ -76,6 +102,8 @@ const paddingY = computed(() => {
 const gap = computed(() => {
   if (props.size === 'large') {
     return '0.5rem'
+  } else if (props.size === 'small') {
+    return '0.25rem'
   }
   return '0.375rem'
 })
@@ -94,6 +122,8 @@ const radius = computed(() => {
 
   if (props.size === 'large') {
     return '1rem'
+  } else if (props.size === 'small') {
+    return '0.5rem'
   }
   return '0.75rem'
 })
@@ -101,6 +131,8 @@ const radius = computed(() => {
 const iconSize = computed(() => {
   if (props.size === 'large') {
     return '1.5rem'
+  } else if (props.size === 'small') {
+    return '1rem'
   }
   return '1.25rem'
 })
@@ -111,10 +143,14 @@ function setColorFill(
 ): { bg: string; text: string } {
   if (colorVar.value) {
     if (fill === 'background') {
-      colors.bg = colorVar.value
-      if (props.type === 'highlight') {
+      if (props.type === 'highlight' && highlightedColorVar.value) {
+        colors.bg = highlightedColorVar.value
         colors.text = 'var(--color-contrast)'
+      } else if (props.type === 'highlight-colored-text' && highlightedColorVar.value) {
+        colors.bg = highlightedColorVar.value
+        colors.text = colorVar.value
       } else {
+        colors.bg = colorVar.value
         colors.text = 'var(--color-accent-contrast)'
       }
     } else if (fill === 'text') {
@@ -168,12 +204,19 @@ const colorVariables = computed(() => {
 
   return `--_bg: ${colors.bg}; --_text: ${colors.text}; --_hover-bg: ${hoverColors.bg}; --_hover-text: ${hoverColors.text};`
 })
+
+const fontSize = computed(() => {
+  if (props.size === 'small') {
+    return 'text-sm'
+  }
+  return 'text-base'
+})
 </script>
 
 <template>
   <div
     class="btn-wrapper"
-    :class="{ outline: type === 'outlined' }"
+    :class="[{ outline: type === 'outlined' }, fontSize]"
     :style="`${colorVariables}--_height:${height};--_width:${width};--_radius: ${radius};--_padding-x:${paddingX};--_padding-y:${paddingY};--_gap:${gap};--_font-weight:${fontWeight};--_icon-size:${iconSize};`"
   >
     <slot />
@@ -195,7 +238,7 @@ const colorVariables = computed(() => {
   > *:first-child
   > *:first-child
   > :is(button, a, .button-like):first-child {
-  @apply flex cursor-pointer flex-row items-center justify-center border-solid border-2 border-transparent bg-[--_bg] text-[--_text] h-[--_height] min-w-[--_width] rounded-[--_radius] px-[--_padding-x] py-[--_padding-y] gap-[--_gap] font-[--_font-weight];
+  @apply flex cursor-pointer flex-row items-center justify-center border-solid border-2 border-transparent bg-[--_bg] text-[--_text] h-[--_height] min-w-[--_width] rounded-[--_radius] px-[--_padding-x] py-[--_padding-y] gap-[--_gap] font-[--_font-weight] whitespace-nowrap;
   transition:
     scale 0.125s ease-in-out,
     background-color 0.25s ease-in-out,
@@ -204,6 +247,7 @@ const colorVariables = computed(() => {
   svg:first-child {
     color: var(--_icon, var(--_text));
     transition: color 0.25s ease-in-out;
+    flex-shrink: 0;
   }
 
   &[disabled],
@@ -220,7 +264,7 @@ const colorVariables = computed(() => {
   }
 
   &:not([disabled]):not([disabled='true']):not(.disabled) {
-    @apply active:scale-95 hover:brightness-125 focus-visible:brightness-125 hover:bg-[--_hover-bg] hover:text-[--_hover-text] focus-visible:bg-[--_hover-bg] focus-visible:text-[--_hover-text];
+    @apply active:scale-95 hover:brightness-[--hover-brightness] focus-visible:brightness-[--hover-brightness] hover:bg-[--_hover-bg] hover:text-[--_hover-text] focus-visible:bg-[--_hover-bg] focus-visible:text-[--_hover-text];
 
     &:hover svg:first-child,
     &:focus-visible svg:first-child {

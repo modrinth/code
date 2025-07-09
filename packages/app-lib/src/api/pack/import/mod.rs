@@ -8,8 +8,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     event::{
-        emit::{emit_loading, init_or_edit_loading},
         LoadingBarId,
+        emit::{emit_loading, init_or_edit_loading},
     },
     util::{
         fetch::{self, IoSemaphore},
@@ -71,7 +71,7 @@ pub async fn get_importable_instances(
             return Err(crate::ErrorKind::InputError(
                 "Launcher type Unknown".to_string(),
             )
-            .into())
+            .into());
         }
     };
 
@@ -187,11 +187,7 @@ pub fn get_default_launcher_path(
         ImportLauncherType::Unknown => None,
     };
     let path = path?;
-    if path.exists() {
-        Some(path)
-    } else {
-        None
-    }
+    if path.exists() { Some(path) } else { None }
 }
 
 /// Checks if this PathBuf is a valid instance for the given launcher type

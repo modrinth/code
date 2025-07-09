@@ -1,5 +1,5 @@
 use crate::database::models::{
-    product_item, DatabaseError, ProductId, ProductPriceId,
+    DBProductId, DBProductPriceId, DatabaseError, product_item,
 };
 use crate::database::redis::RedisPool;
 use crate::models::billing::{Price, ProductMetadata};
@@ -11,13 +11,13 @@ use std::convert::TryInto;
 
 const PRODUCTS_NAMESPACE: &str = "products";
 
-pub struct ProductItem {
-    pub id: ProductId,
+pub struct DBProduct {
+    pub id: DBProductId,
     pub metadata: ProductMetadata,
     pub unitary: bool,
 }
 
-struct ProductResult {
+struct ProductQueryResult {
     id: i64,
     metadata: serde_json::Value,
     unitary: bool,
@@ -26,7 +26,7 @@ struct ProductResult {
 macro_rules! select_products_with_predicate {
     ($predicate:tt, $param:ident) => {
         sqlx::query_as!(
-            ProductResult,
+            ProductQueryResult,
             r#"
             SELECT id, metadata, unitary
             FROM products
@@ -37,30 +37,30 @@ macro_rules! select_products_with_predicate {
     };
 }
 
-impl TryFrom<ProductResult> for ProductItem {
+impl TryFrom<ProductQueryResult> for DBProduct {
     type Error = serde_json::Error;
 
-    fn try_from(r: ProductResult) -> Result<Self, Self::Error> {
-        Ok(ProductItem {
-            id: ProductId(r.id),
+    fn try_from(r: ProductQueryResult) -> Result<Self, Self::Error> {
+        Ok(DBProduct {
+            id: DBProductId(r.id),
             metadata: serde_json::from_value(r.metadata)?,
             unitary: r.unitary,
         })
     }
 }
 
-impl ProductItem {
+impl DBProduct {
     pub async fn get(
-        id: ProductId,
+        id: DBProductId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Option<ProductItem>, DatabaseError> {
+    ) -> Result<Option<DBProduct>, DatabaseError> {
         Ok(Self::get_many(&[id], exec).await?.into_iter().next())
     }
 
     pub async fn get_many(
-        ids: &[ProductId],
+        ids: &[DBProductId],
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<ProductItem>, DatabaseError> {
+    ) -> Result<Vec<DBProduct>, DatabaseError> {
         let ids = ids.iter().map(|id| id.0).collect_vec();
         let ids_ref: &[i64] = &ids;
         let results = select_products_with_predicate!(
@@ -78,7 +78,7 @@ impl ProductItem {
 
     pub async fn get_all(
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<ProductItem>, DatabaseError> {
+    ) -> Result<Vec<DBProduct>, DatabaseError> {
         let one = 1;
         let results = select_products_with_predicate!("WHERE 1 = $1", one)
             .fetch_all(exec)
@@ -92,24 +92,24 @@ impl ProductItem {
 }
 
 #[derive(Deserialize, Serialize)]
-pub struct QueryProduct {
-    pub id: ProductId,
+pub struct QueryProductWithPrices {
+    pub id: DBProductId,
     pub metadata: ProductMetadata,
     pub unitary: bool,
-    pub prices: Vec<ProductPriceItem>,
+    pub prices: Vec<DBProductPrice>,
 }
 
-impl QueryProduct {
+impl QueryProductWithPrices {
     pub async fn list<'a, E>(
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<QueryProduct>, DatabaseError>
+    ) -> Result<Vec<QueryProductWithPrices>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         let mut redis = redis.connect().await?;
 
-        let res: Option<Vec<QueryProduct>> = redis
+        let res: Option<Vec<QueryProductWithPrices>> = redis
             .get_deserialized_from_json(PRODUCTS_NAMESPACE, "all")
             .await?;
 
@@ -117,8 +117,8 @@ impl QueryProduct {
             return Ok(res);
         }
 
-        let all_products = product_item::ProductItem::get_all(exec).await?;
-        let prices = product_item::ProductPriceItem::get_all_products_prices(
+        let all_products = product_item::DBProduct::get_all(exec).await?;
+        let prices = product_item::DBProductPrice::get_all_products_prices(
             &all_products.iter().map(|x| x.id).collect::<Vec<_>>(),
             exec,
         )
@@ -126,7 +126,7 @@ impl QueryProduct {
 
         let products = all_products
             .into_iter()
-            .map(|x| QueryProduct {
+            .map(|x| QueryProductWithPrices {
                 id: x.id,
                 metadata: x.metadata,
                 prices: prices
@@ -134,7 +134,7 @@ impl QueryProduct {
                     .map(|x| x.1)
                     .unwrap_or_default()
                     .into_iter()
-                    .map(|x| ProductPriceItem {
+                    .map(|x| DBProductPrice {
                         id: x.id,
                         product_id: x.product_id,
                         prices: x.prices,
@@ -154,14 +154,14 @@ impl QueryProduct {
 }
 
 #[derive(Deserialize, Serialize)]
-pub struct ProductPriceItem {
-    pub id: ProductPriceId,
-    pub product_id: ProductId,
+pub struct DBProductPrice {
+    pub id: DBProductPriceId,
+    pub product_id: DBProductId,
     pub prices: Price,
     pub currency_code: String,
 }
 
-struct ProductPriceResult {
+struct ProductPriceQueryResult {
     id: i64,
     product_id: i64,
     prices: serde_json::Value,
@@ -171,7 +171,7 @@ struct ProductPriceResult {
 macro_rules! select_prices_with_predicate {
     ($predicate:tt, $param:ident) => {
         sqlx::query_as!(
-            ProductPriceResult,
+            ProductPriceQueryResult,
             r#"
             SELECT id, product_id, prices, currency_code
             FROM products_prices
@@ -182,31 +182,31 @@ macro_rules! select_prices_with_predicate {
     };
 }
 
-impl TryFrom<ProductPriceResult> for ProductPriceItem {
+impl TryFrom<ProductPriceQueryResult> for DBProductPrice {
     type Error = serde_json::Error;
 
-    fn try_from(r: ProductPriceResult) -> Result<Self, Self::Error> {
-        Ok(ProductPriceItem {
-            id: ProductPriceId(r.id),
-            product_id: ProductId(r.product_id),
+    fn try_from(r: ProductPriceQueryResult) -> Result<Self, Self::Error> {
+        Ok(DBProductPrice {
+            id: DBProductPriceId(r.id),
+            product_id: DBProductId(r.product_id),
             prices: serde_json::from_value(r.prices)?,
             currency_code: r.currency_code,
         })
     }
 }
 
-impl ProductPriceItem {
+impl DBProductPrice {
     pub async fn get(
-        id: ProductPriceId,
+        id: DBProductPriceId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Option<ProductPriceItem>, DatabaseError> {
+    ) -> Result<Option<DBProductPrice>, DatabaseError> {
         Ok(Self::get_many(&[id], exec).await?.into_iter().next())
     }
 
     pub async fn get_many(
-        ids: &[ProductPriceId],
+        ids: &[DBProductPriceId],
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<ProductPriceItem>, DatabaseError> {
+    ) -> Result<Vec<DBProductPrice>, DatabaseError> {
         let ids = ids.iter().map(|id| id.0).collect_vec();
         let ids_ref: &[i64] = &ids;
         let results = select_prices_with_predicate!(
@@ -223,18 +223,18 @@ impl ProductPriceItem {
     }
 
     pub async fn get_all_product_prices(
-        product_id: ProductId,
+        product_id: DBProductId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<ProductPriceItem>, DatabaseError> {
+    ) -> Result<Vec<DBProductPrice>, DatabaseError> {
         let res = Self::get_all_products_prices(&[product_id], exec).await?;
 
         Ok(res.remove(&product_id).map(|x| x.1).unwrap_or_default())
     }
 
     pub async fn get_all_products_prices(
-        product_ids: &[ProductId],
+        product_ids: &[DBProductId],
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<DashMap<ProductId, Vec<ProductPriceItem>>, DatabaseError> {
+    ) -> Result<DashMap<DBProductId, Vec<DBProductPrice>>, DatabaseError> {
         let ids = product_ids.iter().map(|id| id.0).collect_vec();
         let ids_ref: &[i64] = &ids;
 
@@ -246,9 +246,9 @@ impl ProductPriceItem {
         .fetch(exec)
         .try_fold(
             DashMap::new(),
-            |acc: DashMap<ProductId, Vec<ProductPriceItem>>, x| {
-                if let Ok(item) = <ProductPriceResult as TryInto<
-                    ProductPriceItem,
+            |acc: DashMap<DBProductId, Vec<DBProductPrice>>, x| {
+                if let Ok(item) = <ProductPriceQueryResult as TryInto<
+                    DBProductPrice,
                 >>::try_into(x)
                 {
                     acc.entry(item.product_id).or_default().push(item);

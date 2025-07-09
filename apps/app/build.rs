@@ -100,6 +100,24 @@ fn main() {
                     ),
             )
             .plugin(
+                "minecraft-skins",
+                InlinedPlugin::new()
+                    .commands(&[
+                        "get_available_capes",
+                        "get_available_skins",
+                        "add_and_equip_custom_skin",
+                        "set_default_cape",
+                        "equip_skin",
+                        "remove_custom_skin",
+                        "unequip_skin",
+                        "normalize_skin_texture",
+                        "get_dragged_skin_data",
+                    ])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
+            )
+            .plugin(
                 "mr-auth",
                 InlinedPlugin::new()
                     .commands(&["modrinth_login", "logout", "get"])
@@ -151,7 +169,6 @@ fn main() {
                         "profile_update_managed_modrinth_version",
                         "profile_repair_managed_modrinth",
                         "profile_run",
-                        "profile_run_credentials",
                         "profile_kill",
                         "profile_edit",
                         "profile_edit_icon",
@@ -236,6 +253,30 @@ fn main() {
                         "friend_statuses",
                         "add_friend",
                         "remove_friend",
+                    ])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
+            )
+            .plugin(
+                "worlds",
+                InlinedPlugin::new()
+                    .commands(&[
+                        "get_recent_worlds",
+                        "get_profile_worlds",
+                        "get_singleplayer_world",
+                        "set_world_display_status",
+                        "rename_world",
+                        "reset_world_icon",
+                        "backup_world",
+                        "delete_world",
+                        "add_server_to_profile",
+                        "edit_server_in_profile",
+                        "remove_server_from_profile",
+                        "get_profile_protocol_version",
+                        "get_server_status",
+                        "start_join_singleplayer_world",
+                        "start_join_server",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

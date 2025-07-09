@@ -12,8 +12,8 @@ use crate::{
     assert_status,
     common::{
         api_common::{
-            models::{CommonCategoryData, CommonLoaderData},
             Api, ApiTags, AppendsOptionalPat,
+            models::{CommonCategoryData, CommonLoaderData},
         },
         database::ADMIN_USER_PAT,
     },

@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use serde_json::json;
 
 use crate::common::{
@@ -7,10 +6,8 @@ use crate::common::{
     },
     dummy_data::TestFile,
 };
-use labrinth::{
-    models::projects::ProjectId,
-    util::actix::{MultipartSegment, MultipartSegmentData},
-};
+use labrinth::models::ids::ProjectId;
+use labrinth::util::actix::{MultipartSegment, MultipartSegmentData};
 
 pub fn get_public_project_creation_data(
     slug: &str,
@@ -76,10 +73,7 @@ pub fn get_public_version_creation_data_json(
 
         // Loader fields
         "game_versions": ["1.20.1"],
-        "singleplayer": true,
-        "client_and_server": true,
-        "client_only": true,
-        "server_only": false,
+        "environment": "client_only_server_optional",
     });
     if is_modpack {
         j["mrpack_loaders"] = json!(["fabric"]);

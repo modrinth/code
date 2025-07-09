@@ -1,14 +1,16 @@
 //! Downloader for Minecraft data
 
 use crate::launcher::parse_rules;
+use crate::profile::QuickPlayType;
 use crate::{
     event::{
-        emit::{emit_loading, loading_try_for_each_concurrent},
         LoadingBarId,
+        emit::{emit_loading, loading_try_for_each_concurrent},
     },
     state::State,
     util::{fetch::*, io, platform::OsExt},
 };
+use daedalus::minecraft::{LoggingConfiguration, LoggingSide};
 use daedalus::{
     self as d,
     minecraft::{
@@ -35,12 +37,7 @@ pub async fn download_minecraft(
     let assets_index =
         download_assets_index(st, version, Some(loading_bar), force).await?;
 
-    let amount = if version
-        .processors
-        .as_ref()
-        .map(|x| !x.is_empty())
-        .unwrap_or(false)
-    {
+    let amount = if version.processors.as_ref().is_some_and(|x| !x.is_empty()) {
         25.0
     } else {
         40.0
@@ -48,7 +45,8 @@ pub async fn download_minecraft(
 
     tokio::try_join! {
         // Total loading sums to 90/60
-        download_client(st, version, Some(loading_bar), force), // 10
+        download_client(st, version, Some(loading_bar), force), // 9
+        download_log_config(st, version, Some(loading_bar), force),
         download_assets(st, version.assets == "legacy", &assets_index, Some(loading_bar), amount, force), // 40
         download_libraries(st, version.libraries.as_slice(), &version.id, Some(loading_bar), amount, java_arch, force, minecraft_updated) // 40
     }?;
@@ -80,7 +78,11 @@ pub async fn download_version_info(
             .await
             .and_then(|ref it| Ok(serde_json::from_slice(it)?))
     } else {
-        tracing::info!("Downloading version info for version {}", &version.id);
+        tracing::info!(
+            "Downloading version info for version {} from {}",
+            &version.id,
+            version.url
+        );
         let mut info = fetch_json(
             Method::GET,
             &version.url,
@@ -289,7 +291,7 @@ pub async fn download_libraries(
         stream::iter(libraries.iter())
             .map(Ok::<&Library, crate::Error>), None, loading_bar,loading_amount,num_files, None,|library| async move {
                 if let Some(rules) = &library.rules {
-                    if !parse_rules(rules, java_arch, minecraft_updated) {
+                    if !parse_rules(rules, java_arch, &QuickPlayType::None, minecraft_updated) {
                         tracing::trace!("Skipped library {}", &library.name);
                         return Ok(());
                     }
@@ -374,5 +376,47 @@ pub async fn download_libraries(
         ).await?;
 
     tracing::debug!("Done loading libraries!");
+    Ok(())
+}
+
+#[tracing::instrument(skip_all)]
+pub async fn download_log_config(
+    st: &State,
+    version_info: &GameVersionInfo,
+    loading_bar: Option<&LoadingBarId>,
+    force: bool,
+) -> crate::Result<()> {
+    let log_download = version_info
+        .logging
+        .as_ref()
+        .and_then(|x| x.get(&LoggingSide::Client));
+    let Some(LoggingConfiguration::Log4j2Xml {
+        file: log_download, ..
+    }) = log_download
+    else {
+        if let Some(loading_bar) = loading_bar {
+            emit_loading(loading_bar, 1.0, None)?;
+        }
+        return Ok(());
+    };
+
+    let path = st.directories.log_configs_dir().join(&log_download.id);
+
+    if !path.exists() || force {
+        let bytes = fetch(
+            &log_download.url,
+            Some(&log_download.sha1),
+            &st.fetch_semaphore,
+            &st.pool,
+        )
+        .await?;
+        write(&path, &bytes, &st.io_semaphore).await?;
+        tracing::trace!("Fetched log config {}", log_download.id);
+    }
+    if let Some(loading_bar) = loading_bar {
+        emit_loading(loading_bar, 1.0, None)?;
+    }
+
+    tracing::debug!("Log config {} loaded", log_download.id);
     Ok(())
 }

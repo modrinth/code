@@ -5,6 +5,8 @@
       :type="newItemType"
       @create="handleCreateNewItem"
     />
+    <FilesUploadZipUrlModal ref="uploadZipModal" :server="server" />
+    <FilesUploadConflictModal ref="uploadConflictModal" @proceed="extractItem" />
 
     <LazyUiServersFilesRenameItemModal
       ref="renameItemModal"
@@ -35,9 +37,12 @@
             :breadcrumb-segments="breadcrumbSegments"
             :search-query="searchQuery"
             :current-filter="viewFilter"
+            :base-id="`browse-navbar-${baseId}`"
             @navigate="navigateToSegment"
             @create="showCreateModal"
             @upload="initiateFileUpload"
+            @upload-zip="() => {}"
+            @unzip-from-url="showUnzipFromUrlModal"
             @filter="handleFilter"
             @update:search-query="searchQuery = $event"
           />
@@ -46,6 +51,110 @@
             :sort-desc="sortDesc"
             @sort="handleSort"
           />
+          <div
+            v-for="op in ops"
+            :key="`fs-op-${op.op}-${op.src}`"
+            class="sticky top-20 z-20 grid grid-cols-[auto_1fr_auto] items-center gap-2 border-0 border-b-[1px] border-solid border-button-bg bg-table-alternateRow px-4 py-2 md:grid-cols-[auto_1fr_1fr_2fr_auto]"
+          >
+            <div>
+              <PackageOpenIcon class="h-5 w-5 text-secondary" />
+            </div>
+            <div class="flex flex-wrap gap-x-4 gap-y-1 md:contents">
+              <div class="flex items-center text-wrap break-all text-sm font-bold text-contrast">
+                Extracting {{ op.src.includes("https://") ? "modpack from URL" : op.src }}
+              </div>
+              <span
+                class="flex items-center gap-2 text-sm font-semibold"
+                :class="{
+                  'text-green': op.state === 'done',
+                  'text-red': op.state?.startsWith('fail'),
+                  'text-orange': !op.state?.startsWith('fail') && op.state !== 'done',
+                }"
+              >
+                <template v-if="op.state === 'done'">
+                  Done
+                  <CheckIcon style="stroke-width: 3px" />
+                </template>
+                <template v-else-if="op.state?.startsWith('fail')">
+                  Failed
+                  <XIcon style="stroke-width: 3px" />
+                </template>
+                <template v-else-if="op.state === 'cancelled'">
+                  <SpinnerIcon class="animate-spin" />
+                  Cancelling
+                </template>
+                <template v-else-if="op.state === 'queued'">
+                  <SpinnerIcon class="animate-spin" />
+                  Queued...
+                </template>
+                <template v-else-if="op.state === 'ongoing'">
+                  <SpinnerIcon class="animate-spin" />
+                  Extracting...
+                </template>
+                <template v-else>
+                  <UnknownIcon />
+                  Unknown state: {{ op.state }}
+                </template>
+              </span>
+              <div class="col-span-2 flex grow flex-col gap-1 md:col-span-1 md:items-end">
+                <div class="text-xs font-semibold text-contrast opacity-80">
+                  <span :class="{ invisible: 'current_file' in op && !op.current_file }">
+                    {{
+                      "current_file" in op
+                        ? op.current_file?.split("/")?.pop() ?? "unknown"
+                        : "unknown"
+                    }}
+                  </span>
+                </div>
+                <ProgressBar
+                  :progress="'progress' in op ? op.progress : 0"
+                  :max="1"
+                  :color="
+                    op.state === 'done'
+                      ? 'green'
+                      : op.state?.startsWith('fail')
+                        ? 'red'
+                        : op.state === 'cancelled'
+                          ? 'gray'
+                          : 'orange'
+                  "
+                  :waiting="op.state === 'queued' || !op.progress || op.progress === 0"
+                />
+                <div
+                  class="text-xs text-secondary opacity-80"
+                  :class="{ invisible: 'bytes_processed' in op && !op.bytes_processed }"
+                >
+                  {{ "bytes_processed" in op ? formatBytes(op.bytes_processed) : "0 B" }} extracted
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <ButtonStyled circular>
+                <button
+                  :disabled="!('id' in op) || !op.id"
+                  class="radial-progress-animation-overlay"
+                  :class="{ active: op.state === 'done' }"
+                  @click="
+                    () => {
+                      op.state === 'done'
+                        ? server.fs?.modifyOp(op.id, 'dismiss')
+                        : 'id' in op
+                          ? server.fs?.modifyOp(op.id, 'cancel')
+                          : () => {};
+                    }
+                  "
+                >
+                  <XIcon />
+                </button>
+              </ButtonStyled>
+            </div>
+            <pre
+              v-if="flags.advancedDebugInfo"
+              class="markdown-body col-span-full m-0 rounded-xl bg-button-bg text-xs"
+              >{{ op }}</pre
+            >
+          </div>
           <FilesUploadDropdown
             v-if="props.server.fs"
             ref="uploadDropdownRef"
@@ -55,7 +164,6 @@
             @upload-complete="refreshList()"
           />
         </div>
-
         <UiServersFilesEditingNavbar
           v-else
           :file-name="editingFile?.name"
@@ -97,10 +205,10 @@
           />
           <UiServersFilesImageViewer v-else :image-blob="imagePreview" />
         </div>
-
         <div v-else-if="items.length > 0" class="h-full w-full overflow-hidden rounded-b-2xl">
           <UiServersFileVirtualList
             :items="filteredItems"
+            @extract="handleExtractItem"
             @delete="showDeleteModal"
             @rename="showRenameModal"
             @download="downloadFile"
@@ -159,10 +267,27 @@
 
 <script setup lang="ts">
 import { useInfiniteScroll } from "@vueuse/core";
-import { UploadIcon, FolderOpenIcon } from "@modrinth/assets";
-import type { DirectoryResponse, DirectoryItem, Server } from "~/composables/pyroServers";
+import {
+  UnknownIcon,
+  XIcon,
+  SpinnerIcon,
+  PackageOpenIcon,
+  CheckIcon,
+  UploadIcon,
+  FolderOpenIcon,
+} from "@modrinth/assets";
+import { computed } from "vue";
+import { ButtonStyled, ProgressBar } from "@modrinth/ui";
+import { formatBytes, ModrinthServersFetchError } from "@modrinth/utils";
+import type { FilesystemOp, FSQueuedOp, DirectoryItem, DirectoryResponse } from "@modrinth/utils";
+import { handleError, ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
 import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
+import FilesUploadZipUrlModal from "~/components/ui/servers/FilesUploadZipUrlModal.vue";
+import FilesUploadConflictModal from "~/components/ui/servers/FilesUploadConflictModal.vue";
+
+const flags = useFeatureFlags();
+const baseId = useId();
 
 interface BaseOperation {
   type: "move" | "rename";
@@ -186,7 +311,7 @@ interface RenameOperation extends BaseOperation {
 type Operation = MoveOperation | RenameOperation;
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: ModrinthServer;
 }>();
 
 const modulesLoaded = inject<Promise<void>>("modulesLoaded");
@@ -217,6 +342,8 @@ const createItemModal = ref();
 const renameItemModal = ref();
 const moveItemModal = ref();
 const deleteItemModal = ref();
+const uploadZipModal = ref();
+const uploadConflictModal = ref();
 
 const newItemType = ref<"file" | "directory">("file");
 const selectedItem = ref<any>(null);
@@ -270,7 +397,7 @@ const fetchDirectoryContents = async (): Promise<DirectoryResponse> => {
     };
   } catch (error) {
     console.error("Error fetching directory contents:", error);
-    if (error instanceof PyroFetchError && error.statusCode === 400) {
+    if (error instanceof ModrinthServersFetchError && error.statusCode === 400) {
       return directoryData.value || { items: [], total: 0 };
     }
     throw error;
@@ -429,7 +556,7 @@ const handleRenameItem = async (newName: string) => {
     });
   } catch (error) {
     console.error("Error renaming item:", error);
-    if (error instanceof PyroFetchError) {
+    if (error instanceof ModrinthServersFetchError) {
       if (error.statusCode === 400) {
         addNotification({
           group: "files",
@@ -446,6 +573,33 @@ const handleRenameItem = async (newName: string) => {
         type: "error",
       });
     }
+  }
+};
+
+const extractItem = async (path: string) => {
+  try {
+    await props.server.fs?.extractFile(path, true, false);
+  } catch (error) {
+    console.error("Error extracting item:", error);
+    handleError(error);
+  }
+};
+
+const handleExtractItem = async (item: { name: string; type: string; path: string }) => {
+  try {
+    const dry = await props.server.fs?.extractFile(item.path, true, true, true);
+    if (dry) {
+      if (dry.conflicting_files.length === 0) {
+        await extractItem(item.path);
+      } else {
+        uploadConflictModal.value.show(item.path, dry.conflicting_files);
+      }
+    } else {
+      handleError(new Error("Error running dry run"));
+    }
+  } catch (error) {
+    console.error("Error extracting item:", error);
+    handleError(error);
   }
 };
 
@@ -536,6 +690,10 @@ const showCreateModal = (type: "file" | "directory") => {
   createItemModal.value?.show();
 };
 
+const showUnzipFromUrlModal = (cf: boolean) => {
+  uploadZipModal.value?.show(cf);
+};
+
 const showRenameModal = (item: any) => {
   selectedItem.value = item;
   renameItemModal.value?.show(item);
@@ -556,7 +714,7 @@ const showDeleteModal = (item: any) => {
 
 const handleCreateError = (error: any) => {
   console.error("Error creating item:", error);
-  if (error instanceof PyroFetchError) {
+  if (error instanceof ModrinthServersFetchError) {
     if (error.statusCode === 400) {
       addNotification({
         group: "files",
@@ -760,6 +918,8 @@ onMounted(async () => {
       redoLastOperation();
     }
   });
+
+  props.server.fs?.clearQueuedOps();
 });
 
 onUnmounted(() => {
@@ -767,6 +927,22 @@ onUnmounted(() => {
   window.removeEventListener("scroll", onScroll);
   document.removeEventListener("keydown", () => {});
 });
+
+const clientSideQueued = computed<FSQueuedOp[]>(() => props.server.fs?.queuedOps ?? []);
+
+type QueuedOpWithState = FSQueuedOp & { state: "queued" };
+
+const ops = computed<(QueuedOpWithState | FilesystemOp)[]>(() => [
+  ...clientSideQueued.value.map((x) => ({ ...x, state: "queued" }) satisfies QueuedOpWithState),
+  ...(props.server.fs?.ops ?? []),
+]);
+
+watch(
+  () => props.server.fs?.ops,
+  () => {
+    refreshList();
+  },
+);
 
 watch(
   () => route.query,
@@ -983,5 +1159,44 @@ const onScroll = () => {
 .status-icon-leave-from {
   transform: scale(1);
   opacity: 1;
+}
+
+.radial-progress-animation-overlay {
+  position: relative;
+}
+
+@property --_radial-percentage {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+.radial-progress-animation-overlay.active::before {
+  animation: radial-progress 3s linear forwards;
+}
+
+.radial-progress-animation-overlay::before {
+  content: "";
+  inset: -2px;
+  position: absolute;
+  border-radius: 50%;
+  box-sizing: content-box;
+  border: 2px solid var(--color-button-bg);
+  filter: brightness(var(--hover-brightness));
+  mask-image: conic-gradient(
+    black 0%,
+    black var(--_radial-percentage),
+    transparent var(--_radial-percentage),
+    transparent 100%
+  );
+}
+
+@keyframes radial-progress {
+  from {
+    --_radial-percentage: 0%;
+  }
+  to {
+    --_radial-percentage: 100%;
+  }
 }
 </style>

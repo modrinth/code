@@ -3,7 +3,7 @@ import { Checkbox, Toggle } from '@modrinth/ui'
 import { computed, ref, type Ref, watch } from 'vue'
 import { handleError } from '@/store/notifications'
 import { defineMessages, useVIntl } from '@vintl/vintl'
-import { get } from '@/helpers/settings'
+import { get } from '@/helpers/settings.ts'
 import { edit } from '@/helpers/profile'
 import type { AppSettings, InstanceSettingsTabProps } from '../../../helpers/types'
 

@@ -1,16 +1,9 @@
-use super::{
-    ids::{Base62Id, ProjectId},
-    users::UserId,
-};
+use super::ids::ProjectId;
 use crate::database;
+use crate::models::ids::CollectionId;
+use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-
-/// The ID of a specific collection, encoded as base62 for usage in the API
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(from = "Base62Id")]
-#[serde(into = "Base62Id")]
-pub struct CollectionId(pub u64);
 
 /// A collection returned from the API
 #[derive(Serialize, Deserialize, Clone)]
@@ -42,8 +35,8 @@ pub struct Collection {
     pub projects: Vec<ProjectId>,
 }
 
-impl From<database::models::Collection> for Collection {
-    fn from(c: database::models::Collection) -> Self {
+impl From<database::models::DBCollection> for Collection {
+    fn from(c: database::models::DBCollection) -> Self {
         Self {
             id: c.id.into(),
             user: c.user_id.into(),

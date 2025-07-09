@@ -70,7 +70,7 @@ const onHide = () => {
               v-for="version in filteredVersions"
               :key="version.id"
               class="table-row with-columns selectable"
-              @click="$router.push(`/project/${$route.params.id}/version/${version.id}`)"
+              @click="$router.push(`/project/${version.project_id}/version/${version.id}`)"
             >
               <div class="table-cell table-text">
                 <Button

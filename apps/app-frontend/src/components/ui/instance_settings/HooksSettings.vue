@@ -3,7 +3,7 @@ import { Checkbox } from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 import { handleError } from '@/store/notifications'
 import { defineMessages, useVIntl } from '@vintl/vintl'
-import { get } from '@/helpers/settings'
+import { get } from '@/helpers/settings.ts'
 import { edit } from '@/helpers/profile'
 import type { InstanceSettingsTabProps, AppSettings, Hooks } from '../../../helpers/types'
 
@@ -25,9 +25,8 @@ const editProfileObject = computed(() => {
     hooks?: Hooks
   } = {}
 
-  if (overrideHooks.value) {
-    editProfile.hooks = hooks.value
-  }
+  // When hooks are not overridden per-instance, we want to clear them
+  editProfile.hooks = overrideHooks.value ? hooks.value : {}
 
   return editProfile
 })

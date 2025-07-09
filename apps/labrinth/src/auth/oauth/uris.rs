@@ -1,9 +1,9 @@
 use super::errors::OAuthError;
 use crate::auth::oauth::OAuthErrorType;
-use crate::database::models::OAuthClientId;
+use crate::database::models::DBOAuthClientId;
 use serde::{Deserialize, Serialize};
 
-#[derive(derive_new::new, Serialize, Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct OAuthRedirectUris {
     pub original: Option<String>,
     pub validated: ValidatedRedirectUri,
@@ -16,7 +16,7 @@ impl ValidatedRedirectUri {
     pub fn validate<'a>(
         to_validate: &Option<String>,
         validate_against: impl IntoIterator<Item = &'a str> + Clone,
-        client_id: OAuthClientId,
+        client_id: DBOAuthClientId,
     ) -> Result<Self, OAuthError> {
         if let Some(first_client_redirect_uri) =
             validate_against.clone().into_iter().next()
@@ -61,7 +61,7 @@ mod tests {
         let validated = ValidatedRedirectUri::validate(
             &None,
             validate_against.clone(),
-            OAuthClientId(0),
+            DBOAuthClientId(0),
         )
         .unwrap();
 
@@ -82,7 +82,7 @@ mod tests {
         let validated = ValidatedRedirectUri::validate(
             &Some(to_validate.clone()),
             validate_against,
-            OAuthClientId(0),
+            DBOAuthClientId(0),
         )
         .unwrap();
 
@@ -97,11 +97,11 @@ mod tests {
         let validated = ValidatedRedirectUri::validate(
             &Some(to_validate),
             validate_against,
-            OAuthClientId(0),
+            DBOAuthClientId(0),
         );
 
         assert!(validated.is_err_and(|e| matches!(
-            e.error_type,
+            *e.error_type,
             OAuthErrorType::RedirectUriNotConfigured(_)
         )));
     }

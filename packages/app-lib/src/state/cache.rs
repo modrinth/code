@@ -1,6 +1,6 @@
 use crate::config::{META_URL, MODRINTH_API_URL, MODRINTH_API_URL_V3};
 use crate::state::ProjectType;
-use crate::util::fetch::{fetch_json, sha1_async, FetchSemaphore};
+use crate::util::fetch::{FetchSemaphore, fetch_json, sha1_async};
 use chrono::{DateTime, Utc};
 use dashmap::DashSet;
 use reqwest::Method;
@@ -461,8 +461,7 @@ impl CacheValue {
             CacheValue::Team(members) => members
                 .iter()
                 .next()
-                .map(|x| x.team_id.as_str())
-                .unwrap_or(DEFAULT_ID)
+                .map_or(DEFAULT_ID, |x| x.team_id.as_str())
                 .to_string(),
             CacheValue::Organization(org) => org.id.clone(),
             CacheValue::File(file) => file.hash.clone(),
@@ -556,7 +555,6 @@ macro_rules! impl_cache_methods {
             $(
                 paste::paste! {
                     #[tracing::instrument(skip(pool, fetch_semaphore))]
-                    #[allow(dead_code)]
                     pub async fn [<get_ $variant:snake>](
                         id: &str,
                         cache_behaviour: Option<CacheBehaviour>,
@@ -568,7 +566,6 @@ macro_rules! impl_cache_methods {
                     }
 
                     #[tracing::instrument(skip(pool, fetch_semaphore))]
-                    #[allow(dead_code)]
                     pub async fn [<get_ $variant:snake _many>](
                         ids: &[&str],
                         cache_behaviour: Option<CacheBehaviour>,
@@ -597,7 +594,6 @@ macro_rules! impl_cache_method_singular {
             $(
                 paste::paste! {
                     #[tracing::instrument(skip(pool, fetch_semaphore))]
-                    #[allow(dead_code)]
                     pub async fn [<get_ $variant:snake>] (
                         cache_behaviour: Option<CacheBehaviour>,
                         pool: &SqlitePool,
@@ -735,18 +731,13 @@ impl CachedEntry {
 
                 remaining_keys.retain(|x| {
                     x != &&*row.id
-                        && !row
-                            .alias
-                            .as_ref()
-                            .map(|y| {
-                                if type_.case_sensitive_alias().unwrap_or(true)
-                                {
-                                    x == y
-                                } else {
-                                    y.to_lowercase() == x.to_lowercase()
-                                }
-                            })
-                            .unwrap_or(false)
+                        && !row.alias.as_ref().is_some_and(|y| {
+                            if type_.case_sensitive_alias().unwrap_or(true) {
+                                x == y
+                            } else {
+                                y.to_lowercase() == x.to_lowercase()
+                            }
+                        })
                 });
 
                 if let Some(data) = parsed_data {
@@ -843,7 +834,7 @@ impl CachedEntry {
             fetch_semaphore: &FetchSemaphore,
             pool: &SqlitePool,
         ) -> crate::Result<Vec<T>> {
-            const MAX_REQUEST_SIZE: usize = 1000;
+            const MAX_REQUEST_SIZE: usize = 800;
 
             let urls = keys
                 .iter()
@@ -991,7 +982,7 @@ impl CachedEntry {
                     let key = key.to_string();
 
                     if let Some(position) = teams.iter().position(|x| {
-                        x.first().map(|x| x.team_id == key).unwrap_or(false)
+                        x.first().is_some_and(|x| x.team_id == key)
                     }) {
                         let team = teams.remove(position);
 
@@ -1072,7 +1063,7 @@ impl CachedEntry {
             CacheValueType::File => {
                 let mut versions = fetch_json::<HashMap<String, Version>>(
                     Method::POST,
-                    &format!("{}version_files", MODRINTH_API_URL),
+                    &format!("{MODRINTH_API_URL}version_files"),
                     None,
                     Some(serde_json::json!({
                         "algorithm": "sha1",
@@ -1285,7 +1276,7 @@ impl CachedEntry {
 
                         if let Some(values) =
                             filtered_keys.iter_mut().find(|x| {
-                                x.0 .0 == loaders_key && x.0 .1 == game_version
+                                x.0.0 == loaders_key && x.0.1 == game_version
                             })
                         {
                             values.1.push(hash.to_string());
@@ -1307,7 +1298,7 @@ impl CachedEntry {
                 });
 
                 let version_update_url =
-                    format!("{}version_files/update", MODRINTH_API_URL);
+                    format!("{MODRINTH_API_URL}version_files/update");
                 let variations =
                     futures::future::try_join_all(filtered_keys.iter().map(
                         |((loaders_key, game_version), hashes)| {
@@ -1481,7 +1472,7 @@ pub async fn cache_file_hash(
 
     CachedEntry::upsert_many(
         &[CacheValue::FileHash(CachedFileHash {
-            path: format!("{}/{}", profile_path, path),
+            path: format!("{profile_path}/{path}"),
             size: size as u64,
             hash,
             project_type,

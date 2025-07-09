@@ -13,7 +13,7 @@ impl ApiUser for ApiV3 {
         pat: Option<&str>,
     ) -> ServiceResponse {
         let req = test::TestRequest::get()
-            .uri(&format!("/v3/user/{}", user_id_or_username))
+            .uri(&format!("/v3/user/{user_id_or_username}"))
             .append_pat(pat)
             .to_request();
         self.call(req).await
@@ -34,7 +34,7 @@ impl ApiUser for ApiV3 {
         pat: Option<&str>,
     ) -> ServiceResponse {
         let req = test::TestRequest::patch()
-            .uri(&format!("/v3/user/{}", user_id_or_username))
+            .uri(&format!("/v3/user/{user_id_or_username}"))
             .append_pat(pat)
             .set_json(patch)
             .to_request();
@@ -48,7 +48,7 @@ impl ApiUser for ApiV3 {
         pat: Option<&str>,
     ) -> ServiceResponse {
         let req = test::TestRequest::delete()
-            .uri(&format!("/v3/user/{}", user_id_or_username))
+            .uri(&format!("/v3/user/{user_id_or_username}"))
             .append_pat(pat)
             .to_request();
         self.call(req).await
