@@ -62,6 +62,7 @@ export type AppSettings = {
 
   developer_mode: boolean
   feature_flags: Record<FeatureFlag, boolean>
+  skipped_update: string | null
 }
 
 // Get full settings object

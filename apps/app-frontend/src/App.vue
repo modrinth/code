@@ -25,9 +25,9 @@ import { get_user } from '@/helpers/cache.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { useFetch } from '@/helpers/fetch.js'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.js'
-import { get } from '@/helpers/settings.ts'
+import { get, get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
-import { areUpdatesEnabled, getOS, isDev, restartApp } from '@/helpers/utils.js'
+import { areUpdatesEnabled, getOS, isDev } from '@/helpers/utils.js'
 import { useError } from '@/store/error.js'
 import { useInstall } from '@/store/install.js'
 import { handleError } from '@/store/notifications.js'
@@ -67,7 +67,6 @@ import { invoke } from '@tauri-apps/api/core'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
-import { check } from '@tauri-apps/plugin-updater'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { computed, onMounted, onUnmounted, provide, ref, useTemplateRef, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
@@ -367,6 +366,7 @@ async function handleCommand(e) {
 }
 
 const availableUpdate = ref(null)
+const updateSkipped = ref(false)
 const updateModal = useTemplateRef('updateModal')
 async function checkUpdates() {
   if (!(await areUpdatesEnabled())) {
@@ -381,17 +381,30 @@ async function checkUpdates() {
     }
 
     const update = await invoke('plugin:updater|check')
-    if (!!update) {
-      console.log(`Update ${update.version} is available.`)
-      if (update.version === availableUpdate.value?.version) {
-        console.log(
-          'Skipping update modal because the new version is the same as the dismissed update',
-        )
-      } else {
-        availableUpdate.value = update
-        updateModal.value.show(update)
-      }
+    if (!update) {
+      return
     }
+
+    console.log(`Update ${update.version} is available.`)
+
+    if (update.version === availableUpdate.value?.version) {
+      console.log(
+        'Skipping update modal because the new version is the same as the dismissed update',
+      )
+      return
+    }
+
+    availableUpdate.value = update
+
+    const settings = await getSettings()
+    if (settings.skipped_update === update.version) {
+      updateSkipped.value = true
+      console.log('Skipping update modal because the user chose to skip this update')
+      return
+    }
+
+    updateSkipped.value = false
+    updateModal.value.show(update)
   }
 
   await performCheck()
@@ -402,6 +415,23 @@ async function checkUpdates() {
     // 5 * 60 * 1000,
     30 * 1000,
   )
+}
+
+async function skipUpdate(version) {
+  updateSkipped.value = true
+  let settings = await getSettings()
+  settings.skipped_update = version
+  await setSettings(settings)
+}
+
+async function forceOpenUpdateModal() {
+  if (updateSkipped.value) {
+    updateSkipped.value = false
+    let settings = await getSettings()
+    settings.skipped_update = null
+    await setSettings(settings)
+  }
+  updateModal.value.show(availableUpdate.value)
 }
 
 function handleClick(e) {
@@ -445,7 +475,7 @@ function handleAuxClick(e) {
   <div id="teleports"></div>
   <div v-if="stateInitialized" class="app-grid-layout experimental-styles-within relative">
     <Suspense @resolve="checkUpdates">
-      <UpdateModal ref="updateModal" />
+      <UpdateModal ref="updateModal" @update-skipped="skipUpdate" />
     </Suspense>
     <Suspense>
       <AppSettingsModal ref="settingsModal" />
@@ -503,10 +533,11 @@ function handleAuxClick(e) {
       <NavButton
         v-if="!!availableUpdate"
         v-tooltip.right="'Update available'"
-        :to="() => updateModal.show(availableUpdate)"
+        :to="forceOpenUpdateModal"
       >
-        <!-- TODO: Gray if updating on next restart -->
-        <DownloadIcon class="text-brand-green" />
+        <!-- TODO: Also gray if updating on next restart -->
+        <DownloadIcon v-if="updateSkipped" />
+        <DownloadIcon v-else class="text-brand-green" />
       </NavButton>
       <NavButton v-tooltip.right="'Settings'" :to="() => $refs.settingsModal.show()">
         <SettingsIcon />
