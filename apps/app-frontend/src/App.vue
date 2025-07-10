@@ -413,8 +413,7 @@ async function checkUpdates() {
     () => {
       checkUpdates()
     },
-    // 5 * 60 * 1000,
-    30 * 1000,
+    5 * 60 * 1000,
   )
 }
 
