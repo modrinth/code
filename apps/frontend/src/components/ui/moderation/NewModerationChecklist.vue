@@ -1080,17 +1080,34 @@ async function sendMessage(status: "approved" | "rejected" | "withheld") {
   }
 
   try {
-    await console.log("DUMMY CALL: Moderation decision", {
-      projectId: props.project.id,
-      status,
-      message: message.value,
+    await useBaseFetch(`project/${props.project.id}`, {
+      method: "PATCH",
+      body: {
+        status,
+      },
     });
+
+    if (message.value) {
+      await useBaseFetch(`thread/${props.project.thread_id}`, {
+        method: "POST",
+        body: {
+          body: {
+            type: "text",
+            body: message.value,
+          },
+        },
+      });
+    }
 
     if (
       props.project.project_type === "modpack" &&
       Object.keys(modpackJudgements.value).length > 0
     ) {
-      await console.log("DUMMY CALL: Modpack permissions judgements", modpackJudgements.value);
+      await useBaseFetch(`moderation/project`, {
+        internal: true,
+        method: "POST",
+        body: modpackJudgements.value,
+      });
     }
 
     done.value = true;
