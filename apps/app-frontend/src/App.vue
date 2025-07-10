@@ -25,7 +25,7 @@ import { get_user } from '@/helpers/cache.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { useFetch } from '@/helpers/fetch.js'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.js'
-import { get, get as getSettings, set as setSettings } from '@/helpers/settings.ts'
+import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
 import { areUpdatesEnabled, getOS, isDev } from '@/helpers/utils.js'
 import { useError } from '@/store/error.js'
@@ -129,7 +129,7 @@ async function setupApp() {
     toggle_sidebar,
     developer_mode,
     feature_flags,
-  } = await get()
+  } = await getSettings()
 
   if (default_page === 'Library') {
     await router.push('/library')
@@ -421,7 +421,7 @@ async function skipUpdate(version) {
   enqueuedUpdate.value = null
 
   updateSkipped.value = true
-  let settings = await getSettings()
+  const settings = await getSettings()
   settings.skipped_update = version
   await setSettings(settings)
 }
@@ -433,7 +433,7 @@ async function updateEnqueuedForLater(version) {
 async function forceOpenUpdateModal() {
   if (updateSkipped.value) {
     updateSkipped.value = false
-    let settings = await getSettings()
+    const settings = await getSettings()
     settings.skipped_update = null
     await setSettings(settings)
   }
