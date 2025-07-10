@@ -1823,6 +1823,7 @@ const navLinks = computed(() => {
   bottom: 1rem;
   right: 1rem;
   overflow-y: auto;
+  z-index: 50;
 
   > div {
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);

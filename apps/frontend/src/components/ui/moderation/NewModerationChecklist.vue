@@ -1,5 +1,6 @@
 <template>
   <div
+    tabindex="0"
     class="moderation-checklist flex w-[600px] max-w-full flex-col rounded-2xl border-[1px] border-solid border-orange bg-bg-raised p-4 transition-all delay-200 duration-200 ease-in-out"
     :class="collapsed ? '!w-fit' : ''"
   >
