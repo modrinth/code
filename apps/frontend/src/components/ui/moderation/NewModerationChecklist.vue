@@ -1146,7 +1146,7 @@ const isLastVisibleStage = computed(() => {
 });
 
 const stageOptions = computed<OverflowMenuOption[]>(() => {
-  return checklist
+  const options = checklist
     .map((stage, index) => {
       if (!shouldShowStage(stage)) return null;
 
@@ -1160,6 +1160,17 @@ const stageOptions = computed<OverflowMenuOption[]>(() => {
       } as OverflowMenuOption;
     })
     .filter((opt): opt is OverflowMenuOption => opt !== null);
+
+  options.push({
+    id: "generate-message",
+    action: () => generateMessage(),
+    text: "Generate Message",
+    color: generatedMessage.value ? "green" : undefined,
+    hoverFilled: true,
+    icon: CheckIcon,
+  } as OverflowMenuOption);
+
+  return options;
 });
 </script>
 
