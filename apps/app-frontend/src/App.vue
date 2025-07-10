@@ -33,7 +33,7 @@ import { useLoading, useTheming } from '@/store/state'
 import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
-import { get } from '@/helpers/settings.ts'
+import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
@@ -71,7 +71,6 @@ import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import UpdateModal from '@/components/ui/UpdateModal.vue'
 import { get_available_capes, get_available_skins } from './helpers/skins'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
-import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 
 const themeStore = useTheming()
 
@@ -123,7 +122,7 @@ async function setupApp() {
     toggle_sidebar,
     developer_mode,
     feature_flags,
-  } = await get()
+  } = await getSettings()
 
   if (default_page === 'Library') {
     await router.push('/library')
@@ -402,7 +401,7 @@ async function skipUpdate(version) {
   enqueuedUpdate.value = null
 
   updateSkipped.value = true
-  let settings = await getSettings()
+  const settings = await getSettings()
   settings.skipped_update = version
   await setSettings(settings)
 }
@@ -414,7 +413,7 @@ async function updateEnqueuedForLater(version) {
 async function forceOpenUpdateModal() {
   if (updateSkipped.value) {
     updateSkipped.value = false
-    let settings = await getSettings()
+    const settings = await getSettings()
     settings.skipped_update = null
     await setSettings(settings)
   }

@@ -52,8 +52,8 @@ function onModalHide() {
     ref="modal"
     :header="header"
     :noblur="!themeStore.advancedRendering"
-    @hide="onModalHide"
     :closable="closable"
+    @hide="onModalHide"
   >
     <template #title>
       <slot name="title" />

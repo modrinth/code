@@ -119,7 +119,7 @@ impl Settings {
                 .as_ref()
                 .and_then(|x| serde_json::from_str(x).ok())
                 .unwrap_or_default(),
-            skipped_update: res.skipped_update
+            skipped_update: res.skipped_update,
         })
     }
 
