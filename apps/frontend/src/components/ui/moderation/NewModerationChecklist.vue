@@ -776,10 +776,13 @@ async function assembleFullMessage() {
 
   messageParts.sort((a, b) => a.weight - b.weight);
 
-  const finalMessage = messageParts
-    .map((part) => part.content)
-    .filter((content) => content.trim().length > 0)
-    .join("\n\n");
+  const finalMessage = expandVariables(
+    messageParts
+      .map((part) => part.content)
+      .filter((content) => content.trim().length > 0)
+      .join("\n\n"),
+    props.project,
+  );
 
   return finalMessage;
 }
@@ -1154,7 +1157,7 @@ const stageOptions = computed<OverflowMenuOption[]>(() => {
         id: String(index),
         action: () => (currentStage.value = index),
         text: stage.id ? kebabToTitleCase(stage.id) : stage.title,
-        color: index === currentStage.value ? "green" : undefined,
+        color: index === currentStage.value && !generatedMessage.value ? "green" : undefined,
         hoverFilled: true,
         icon: stage.icon ? stage.icon : undefined,
       } as OverflowMenuOption;
