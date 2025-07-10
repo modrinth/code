@@ -3,7 +3,7 @@
     ref="modal"
     :header="formatMessage(messages.header)"
     :on-hide="onHide"
-    :closable="!updateInProgress"
+    :closable="!updatingImmediately"
   >
     <div>{{ formatMessage(messages.bodyVersion, { version: update!.version }) }}</div>
     <div v-if="updateSize">
@@ -17,19 +17,22 @@
     <ProgressBar class="mt-4" :progress="downloadProgress" />
     <div class="mt-4 flex flex-wrap gap-2">
       <ButtonStyled color="green">
-        <button :disabled="updateInProgress" @click="installUpdateNow">
+        <button :disabled="updatingImmediately" @click="installUpdateNow">
           <RefreshCwIcon />
           {{ formatMessage(messages.restartNow) }}
         </button>
       </ButtonStyled>
       <ButtonStyled>
-        <button :disabled="updateInProgress">
+        <button
+          :disabled="updatingImmediately || downloadInProgress || update!.version == enqueuedUpdate"
+          @click="updateAtNextExit"
+        >
           <RightArrowIcon />
           {{ formatMessage(messages.later) }}
         </button>
       </ButtonStyled>
       <ButtonStyled color="red">
-        <button :disabled="updateInProgress" @click="skipUpdate">
+        <button :disabled="updatingImmediately || downloadInProgress" @click="skipUpdate">
           <XIcon />
           {{ formatMessage(messages.skip) }}
         </button>
@@ -44,14 +47,16 @@ import { defineMessages, useVIntl } from '@vintl/vintl'
 import { useTemplateRef, ref } from 'vue'
 import { ButtonStyled } from '@modrinth/ui'
 import { RefreshCwIcon, XIcon, RightArrowIcon } from '@modrinth/assets'
-import { getUpdateSize } from '@/helpers/utils'
+import { enqueueUpdateForInstallation, getUpdateSize, removeEnqueuedUpdate } from '@/helpers/utils'
 import { formatBytes } from '@modrinth/utils'
 import { handleError } from '@/store/notifications'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
-import { Update } from '@tauri-apps/plugin-updater'
+import { loading_listener } from '@/helpers/events'
+import { getCurrentWindow } from '@tauri-apps/api/window'
 
 const emit = defineEmits<{
-  (e: 'updateSkipped', version: string): void
+  (e: 'updateSkipped', version: string): Promise<void>
+  (e: 'updateEnqueuedForLater', version: string | null): Promise<void>
 }>()
 
 const { formatMessage } = useVIntl()
@@ -98,15 +103,26 @@ type UpdateData = {
 
 const update = ref<UpdateData>()
 const updateSize = ref<number>()
-const updateInProgress = ref(false)
+
+const updatingImmediately = ref(false)
+const downloadInProgress = ref(false)
 const downloadProgress = ref(0)
+
+const enqueuedUpdate = ref<string | null>(null)
 
 const modal = useTemplateRef('modal')
 const isOpen = ref(false)
 
 async function show(newUpdate: UpdateData) {
+  const oldVersion = update.value?.version
+
   update.value = newUpdate
   updateSize.value = await getUpdateSize(newUpdate.rid).catch(handleError)
+
+  if (oldVersion !== update.value?.version) {
+    downloadProgress.value = 0
+  }
+
   modal.value!.show()
   isOpen.value = true
 }
@@ -121,25 +137,62 @@ function hide() {
 
 defineExpose({ show, hide, isOpen })
 
-function installUpdateNow() {
-  updateInProgress.value = true
-  let totalSize = 0
-  let totalDownloaded = 0
-  new Update(update.value!).downloadAndInstall((event) => {
-    if (event.event === 'Started') {
-      totalSize = event.data.contentLength!
-    } else if (event.event === 'Progress') {
-      totalDownloaded += event.data.chunkLength
-    } else if (event.event === 'Finished') {
-      totalDownloaded = totalSize
+loading_listener((event) => {
+  if (event.event.type === 'launcher_update') {
+    if (event.event.version === update.value!.version) {
+      downloadProgress.value = (event.fraction ?? 1.0) * 100
     }
-    downloadProgress.value = (totalDownloaded / totalSize) * 100
-  })
+  }
+})
+
+function installUpdateNow() {
+  updatingImmediately.value = true
+
+  if (enqueuedUpdate.value !== update.value!.version) {
+    downloadUpdate()
+  } else if (!downloadInProgress.value) {
+    // Update already downloaded. Simply close the app
+    getCurrentWindow().close()
+  }
+}
+
+function updateAtNextExit() {
+  enqueuedUpdate.value = update.value!.version
+  emit('updateEnqueuedForLater', update.value!.version)
+
+  downloadUpdate()
+  hide()
+}
+
+async function downloadUpdate() {
+  const versionToDownload = update.value!.version
+
+  downloadInProgress.value = true
+  try {
+    await enqueueUpdateForInstallation(update.value!.rid)
+  } catch (e) {
+    downloadInProgress.value = false
+
+    handleError(e)
+
+    enqueuedUpdate.value = null
+    updatingImmediately.value = false
+    await emit('updateEnqueuedForLater', null)
+    return
+  }
+  downloadInProgress.value = false
+
+  if (updatingImmediately.value && update.value!.version === versionToDownload) {
+    await getCurrentWindow().close()
+  }
 }
 
 function skipUpdate() {
-  hide()
+  enqueuedUpdate.value = null
   emit('updateSkipped', update.value!.version)
+
+  removeEnqueuedUpdate()
+  hide()
 }
 </script>
 

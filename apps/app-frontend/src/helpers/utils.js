@@ -13,6 +13,14 @@ export async function getUpdateSize(updateRid) {
   return await invoke('get_update_size', { rid: updateRid })
 }
 
+export async function enqueueUpdateForInstallation(updateRid) {
+  return await invoke('enqueue_update_for_installation', { rid: updateRid })
+}
+
+export async function removeEnqueuedUpdate() {
+  return await invoke('remove_enqueued_update')
+}
+
 // One of 'Windows', 'Linux', 'MacOS'
 export async function getOS() {
   return await invoke('plugin:utils|get_os')

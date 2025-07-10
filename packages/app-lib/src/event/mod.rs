@@ -176,7 +176,6 @@ pub enum LoadingBarType {
         import_location: PathBuf,
         profile_name: String,
     },
-    CheckingForUpdates,
     LauncherUpdate {
         version: String,
         current_version: String,
