@@ -264,7 +264,11 @@
             </div>
 
             <div v-else class="flex items-center gap-2">
-              <OverflowMenu :options="stageOptions" class="bg-transparent p-0">
+              <OverflowMenu
+                v-if="!generatedMessage"
+                :options="stageOptions"
+                class="bg-transparent p-0"
+              >
                 <ButtonStyled circular>
                   <button v-tooltip="`Stages`">
                     <ListBulletedIcon />
@@ -1070,15 +1074,6 @@ function generateModpackMessage(judgements: ModerationJudgements) {
 }
 
 async function sendMessage(status: "approved" | "rejected" | "withheld") {
-  if (!message.value.trim()) {
-    addNotification({
-      title: "No message generated",
-      message: "Please generate a message before submitting.",
-      type: "error",
-    });
-    return;
-  }
-
   try {
     await useBaseFetch(`project/${props.project.id}`, {
       method: "PATCH",
@@ -1111,6 +1106,13 @@ async function sendMessage(status: "approved" | "rejected" | "withheld") {
     }
 
     done.value = true;
+
+    // Clear local storage for future reviews
+    localStorage.removeItem(`modpack-permissions-${props.project.id}`);
+    localStorage.removeItem(`modpack-permissions-index-${props.project.id}`);
+    localStorage.removeItem(`moderation-actions-${props.project.slug}`);
+    localStorage.removeItem(`moderation-inputs-${props.project.slug}`);
+    actionStates.value = {};
 
     addNotification({
       title: "Moderation submitted",
