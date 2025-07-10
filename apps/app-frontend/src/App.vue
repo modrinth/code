@@ -348,6 +348,7 @@ async function handleCommand(e) {
 
 const availableUpdate = ref(null)
 const updateSkipped = ref(false)
+const enqueuedUpdate = ref(null)
 const updateModal = useTemplateRef('updateModal')
 async function checkUpdates() {
   if (!(await areUpdatesEnabled())) {
@@ -399,10 +400,16 @@ async function checkUpdates() {
 }
 
 async function skipUpdate(version) {
+  enqueuedUpdate.value = null
+
   updateSkipped.value = true
   let settings = await getSettings()
   settings.skipped_update = version
   await setSettings(settings)
+}
+
+async function updateEnqueuedForLater(version) {
+  enqueuedUpdate.value = version
 }
 
 async function forceOpenUpdateModal() {
@@ -456,7 +463,11 @@ function handleAuxClick(e) {
   <div id="teleports"></div>
   <div v-if="stateInitialized" class="app-grid-layout experimental-styles-within relative">
     <Suspense @resolve="checkUpdates">
-      <UpdateModal ref="updateModal" @update-skipped="skipUpdate" />
+      <UpdateModal
+        ref="updateModal"
+        @update-skipped="skipUpdate"
+        @update-enqueued-for-later="updateEnqueuedForLater"
+      />
     </Suspense>
     <Suspense>
       <AppSettingsModal ref="settingsModal" />
@@ -510,11 +521,14 @@ function handleAuxClick(e) {
       <div class="flex flex-grow"></div>
       <NavButton
         v-if="!!availableUpdate"
-        v-tooltip.right="'Update available'"
+        v-tooltip.right="
+          enqueuedUpdate === availableUpdate?.version
+            ? 'Update installation queued for next restart'
+            : 'Update available'
+        "
         :to="forceOpenUpdateModal"
       >
-        <!-- TODO: Also gray if updating on next restart -->
-        <DownloadIcon v-if="updateSkipped" />
+        <DownloadIcon v-if="updateSkipped || enqueuedUpdate === availableUpdate?.version" />
         <DownloadIcon v-else class="text-brand-green" />
       </NavButton>
       <NavButton v-tooltip.right="'Settings'" :to="() => $refs.settingsModal.show()">
