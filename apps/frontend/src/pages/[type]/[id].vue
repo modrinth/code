@@ -1577,7 +1577,7 @@ const showModerationChecklist = useLocalStorage(
 );
 const collapsedModerationChecklist = useLocalStorage("collapsed-moderation-checklist", false);
 
-const futureProjectIds = useLocalStorage('moderation-future-projects', []);
+const futureProjectIds = useLocalStorage("moderation-future-projects", []);
 
 watch(futureProjectIds, (newValue) => {
   console.log("Future project IDs updated:", newValue);

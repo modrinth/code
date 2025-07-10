@@ -1,4 +1,5 @@
 <template>
+  <KeybindsModal ref="keybindsModal" />
   <div
     tabindex="0"
     class="moderation-checklist flex w-[600px] max-w-full flex-col rounded-2xl border-[1px] border-solid border-orange bg-bg-raised p-4 transition-all delay-200 duration-200 ease-in-out"
@@ -8,6 +9,11 @@
       <h1 class="m-0 mr-auto flex items-center gap-2 text-2xl font-extrabold text-contrast">
         <ScaleIcon class="text-orange" /> Moderation
       </h1>
+      <ButtonStyled circular>
+        <button v-tooltip="`Keyboard shortcuts`" @click="keybindsModal?.show($event)">
+          <KeyboardIcon />
+        </button>
+      </ButtonStyled>
       <ButtonStyled circular>
         <a v-tooltip="`Stage guidance`" target="_blank" :href="currentStageObj.guidance_url">
           <FileTextIcon />
@@ -188,9 +194,7 @@
           class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
         >
           <div class="flex items-center gap-2">
-            <ButtonStyled
-              v-if="!done && !generatedMessage && futureProjectCount > 0"
-            >
+            <ButtonStyled v-if="!done && !generatedMessage && futureProjectCount > 0">
               <button @click="goToNextProject">
                 <XIcon aria-hidden="true" />
                 Skip
@@ -311,6 +315,7 @@ import {
   FileTextIcon,
   BrushCleaningIcon,
   CheckIcon,
+  KeyboardIcon,
   EyeOffIcon,
 } from "@modrinth/assets";
 import {
@@ -326,6 +331,8 @@ import {
   kebabToTitleCase,
   flattenProjectVariables,
   expandVariables,
+  handleKeybind,
+  keybinds,
 } from "@modrinth/moderation";
 import {
   ButtonStyled,
@@ -348,6 +355,9 @@ import type {
   Stage,
 } from "@modrinth/moderation";
 import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
+import KeybindsModal from "./ChecklistKeybindsModal.vue";
+
+const keybindsModal = ref<InstanceType<typeof KeybindsModal>>();
 
 const props = withDefaults(
   defineProps<{
@@ -366,7 +376,7 @@ const variables = computed(() => {
 
 // Computed property to get the count of future projects
 const futureProjectCount = computed(() => {
-  const ids = JSON.parse(localStorage.getItem('moderation-future-projects') || '[]');
+  const ids = JSON.parse(localStorage.getItem("moderation-future-projects") || "[]");
   return ids.length;
 });
 
@@ -464,7 +474,108 @@ interface MessagePart {
   stageIndex: number;
 }
 
+function handleKeybinds(event: KeyboardEvent) {
+  const focusedActionIndex = ref<number | null>(null);
+
+  return handleKeybind(
+    event,
+    {
+      project: props.project,
+      state: {
+        currentStage: currentStage.value,
+        totalStages: checklist.length,
+        currentStageId: currentStageObj.value.id,
+        currentStageTitle: currentStageObj.value.title,
+
+        isCollapsed: props.collapsed,
+        isDone: done.value,
+        hasGeneratedMessage: generatedMessage.value,
+        isLoadingMessage: loadingMessage.value,
+        isModpackPermissionsStage: isModpackPermissionsStage.value,
+
+        futureProjectCount: futureProjectCount.value,
+        visibleActionsCount: visibleActions.value.length,
+
+        focusedActionIndex: focusedActionIndex.value,
+        focusedActionType:
+          focusedActionIndex.value !== null
+            ? (visibleActions.value[focusedActionIndex.value]?.type as any)
+            : null,
+      },
+      actions: {
+        tryGoNext: nextStage,
+        tryGoBack: previousStage,
+        tryGenerateMessage: generateMessage,
+        trySkipProject: goToNextProject,
+
+        tryToggleCollapse: () => emit("toggleCollapsed"),
+        tryResetProgress: resetProgress,
+        tryExitModeration: () => emit("exit"),
+
+        tryApprove: () => sendMessage("approved"),
+        tryReject: () => sendMessage("rejected"),
+        tryWithhold: () => sendMessage("withheld"),
+        tryEditMessage: goBackToStages,
+
+        tryToggleAction: (actionIndex: number) => {
+          const action = visibleActions.value[actionIndex];
+          if (action) {
+            toggleAction(action);
+          }
+        },
+        trySelectDropdownOption: (actionIndex: number, optionIndex: number) => {
+          const action = visibleActions.value[actionIndex] as DropdownAction;
+          if (action && action.type === "dropdown" && action.options[optionIndex]) {
+            selectDropdownOption(action, action.options[optionIndex]);
+          }
+        },
+        tryToggleChip: (actionIndex: number, chipIndex: number) => {
+          const action = visibleActions.value[actionIndex] as MultiSelectChipsAction;
+          if (action && action.type === "multi-select-chips") {
+            toggleChip(action, chipIndex);
+          }
+        },
+
+        tryFocusNextAction: () => {
+          if (visibleActions.value.length === 0) return;
+          if (focusedActionIndex.value === null) {
+            focusedActionIndex.value = 0;
+          } else {
+            focusedActionIndex.value = (focusedActionIndex.value + 1) % visibleActions.value.length;
+          }
+        },
+        tryFocusPreviousAction: () => {
+          if (visibleActions.value.length === 0) return;
+          if (focusedActionIndex.value === null) {
+            focusedActionIndex.value = visibleActions.value.length - 1;
+          } else {
+            focusedActionIndex.value =
+              focusedActionIndex.value === 0
+                ? visibleActions.value.length - 1
+                : focusedActionIndex.value - 1;
+          }
+        },
+        tryActivateFocusedAction: () => {
+          if (focusedActionIndex.value === null) return;
+          const action = visibleActions.value[focusedActionIndex.value];
+          if (!action) return;
+
+          if (
+            action.type === "button" ||
+            action.type === "conditional-button" ||
+            action.type === "toggle"
+          ) {
+            toggleAction(action);
+          }
+        },
+      },
+    },
+    keybinds,
+  );
+}
+
 onMounted(() => {
+  window.addEventListener("keydown", handleKeybinds);
   initializeAllStages();
 });
 
@@ -997,7 +1108,7 @@ async function sendMessage(status: "approved" | "rejected" | "withheld") {
 }
 
 async function goToNextProject() {
-  const currentIds = JSON.parse(localStorage.getItem('moderation-future-projects') || '[]');
+  const currentIds = JSON.parse(localStorage.getItem("moderation-future-projects") || "[]");
 
   if (currentIds.length === 0) {
     await navigateTo("/moderation/review");
@@ -1007,7 +1118,7 @@ async function goToNextProject() {
   const nextProjectId = currentIds[0];
   const remainingIds = currentIds.slice(1);
 
-  localStorage.setItem('moderation-future-projects', JSON.stringify(remainingIds));
+  localStorage.setItem("moderation-future-projects", JSON.stringify(remainingIds));
 
   await router.push({
     name: "type-id",
