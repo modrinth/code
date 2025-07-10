@@ -3,40 +3,49 @@
     ref="modal"
     :header="formatMessage(messages.header)"
     :on-hide="onHide"
-    :closable="!updatingImmediately"
+    :closable="!updatingImmediately && !downloadInProgress"
   >
-    <div>{{ formatMessage(messages.bodyVersion, { version: update!.version }) }}</div>
-    <div v-if="updateSize">
-      {{ formatMessage(messages.bodySize, { size: formatBytes(updateSize) }) }}
-    </div>
-    <div>
-      <a href="https://modrinth.com/news/changelog?filter=app">{{
-        formatMessage(messages.bodyChangelog)
-      }}</a>
-    </div>
-    <ProgressBar class="mt-4" :progress="downloadProgress" :error="downloadError" />
-    <div class="mt-4 flex flex-wrap gap-2">
-      <ButtonStyled color="green">
-        <button :disabled="updatingImmediately" @click="installUpdateNow">
-          <RefreshCwIcon />
-          {{ formatMessage(messages.restartNow) }}
-        </button>
-      </ButtonStyled>
-      <ButtonStyled>
-        <button
-          :disabled="updatingImmediately || downloadInProgress || update!.version == enqueuedUpdate"
-          @click="updateAtNextExit"
-        >
-          <RightArrowIcon />
-          {{ formatMessage(messages.later) }}
-        </button>
-      </ButtonStyled>
-      <ButtonStyled color="red">
-        <button :disabled="updatingImmediately || downloadInProgress" @click="skipUpdate">
-          <XIcon />
-          {{ formatMessage(messages.skip) }}
-        </button>
-      </ButtonStyled>
+    <div class="flex flex-col gap-4">
+      <AppearingProgressBar
+        :max-value="shouldShowProgress ? updateSize || 0 : 0"
+        :current-value="shouldShowProgress ? downloadedBytes : 0"
+        color="green"
+        class="w-full"
+      />
+
+      <div class="flex flex-col gap-4 max-w-[500px]">
+        <div class="flex items-center gap-2 mx-auto">
+          <span
+            class="inline-flex items-center px-2 py-0.5 rounded text-lg font-semibold bg-red text-bg-raised border border-red"
+          >
+            v{{ update!.currentVersion }}
+          </span>
+          <RightArrowIcon class="size-6 text-secondary" />
+          <span
+            class="inline-flex items-center px-2 py-0.5 rounded text-lg font-semibold bg-brand text-bg-raised border border-green"
+          >
+            v{{ update!.version }}
+          </span>
+        </div>
+        <div>{{ formatMessage(messages.bodyVersion) }}</div>
+        <div>
+          {{ formatMessage(messages.downloadSize, { size: formatBytes(updateSize) }) }}
+        </div>
+        <div class="flex flex-wrap gap-2 w-full">
+          <JoinedButtons
+            :actions="installActions"
+            :disabled="updatingImmediately || downloadInProgress"
+            color="green"
+          />
+          <div>
+            <ButtonStyled>
+              <a href="https://modrinth.com/news/changelog?filter=app" target="_blank">
+                <ExternalIcon /> {{ formatMessage(messages.changelog) }}
+              </a>
+            </ButtonStyled>
+          </div>
+        </div>
+      </div>
     </div>
   </ModalWrapper>
 </template>
@@ -44,13 +53,19 @@
 <script setup lang="ts">
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { defineMessages, useVIntl } from '@vintl/vintl'
-import { useTemplateRef, ref } from 'vue'
-import { ButtonStyled } from '@modrinth/ui'
-import { RefreshCwIcon, XIcon, RightArrowIcon } from '@modrinth/assets'
+import { useTemplateRef, ref, computed } from 'vue'
+import { AppearingProgressBar, ButtonStyled, JoinedButtons } from '@modrinth/ui'
+import type { JoinedButtonAction } from '@modrinth/ui'
+import {
+  ExternalIcon,
+  RefreshCwIcon,
+  RightArrowIcon,
+  TimerIcon,
+  XCircleIcon,
+} from '@modrinth/assets'
 import { enqueueUpdateForInstallation, getUpdateSize, removeEnqueuedUpdate } from '@/helpers/utils'
 import { formatBytes } from '@modrinth/utils'
 import { handleError } from '@/store/notifications'
-import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { loading_listener } from '@/helpers/events'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 
@@ -64,31 +79,32 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
   header: {
     id: 'app.update.modal-header',
-    defaultMessage: 'An update is available!',
+    defaultMessage: 'A new app update is available!',
   },
   bodyVersion: {
     id: 'app.update.modal-body-version',
-    defaultMessage: 'Version {version} of the Modrinth App is available for installation.',
+    defaultMessage:
+      'We recommend updating as soon as possible so you can enjoy the latest features and improvements.',
   },
-  bodySize: {
-    id: 'app.update.modal-body-size',
-    defaultMessage: 'The download is {size} in size.',
+  downloadSize: {
+    id: 'app.update.download-size',
+    defaultMessage: 'The download size of the update is {size}.',
   },
-  bodyChangelog: {
-    id: 'app.update.modal-body-changelog',
-    defaultMessage: 'Click here to view the changelog.',
+  changelog: {
+    id: 'app.update.changelog',
+    defaultMessage: 'Changelog',
   },
   restartNow: {
     id: 'app.update.restart',
-    defaultMessage: 'Update Now',
+    defaultMessage: 'Update now',
   },
   later: {
     id: 'app.update.later',
-    defaultMessage: 'Update on Next Restart',
+    defaultMessage: 'Update on next restart',
   },
   skip: {
     id: 'app.update.skip',
-    defaultMessage: 'Skip This Update',
+    defaultMessage: 'Skip this update',
   },
 })
 
@@ -111,6 +127,37 @@ const downloadError = ref(false)
 
 const enqueuedUpdate = ref<string | null>(null)
 
+const installActions = computed<JoinedButtonAction[]>(() => [
+  {
+    id: 'install-now',
+    label: formatMessage(messages.restartNow),
+    icon: RefreshCwIcon,
+    action: installUpdateNow,
+    color: 'green',
+  },
+  {
+    id: 'install-later',
+    label: formatMessage(messages.later),
+    icon: TimerIcon,
+    action: updateAtNextExit,
+  },
+  {
+    id: 'skip',
+    label: formatMessage(messages.skip),
+    action: skipUpdate,
+    icon: XCircleIcon,
+    color: 'red',
+  },
+])
+
+const downloadedBytes = computed(() => {
+  return updateSize.value ? Math.round((downloadProgress.value / 100) * updateSize.value) : 0
+})
+
+const shouldShowProgress = computed(() => {
+  return downloadInProgress.value || updatingImmediately.value
+})
+
 const modal = useTemplateRef('modal')
 const isOpen = ref(false)
 
@@ -124,7 +171,7 @@ async function show(newUpdate: UpdateData) {
     downloadProgress.value = 0
   }
 
-  modal.value!.show()
+  modal.value!.show(new MouseEvent('click'))
   isOpen.value = true
 }
 
@@ -138,7 +185,16 @@ function hide() {
 
 defineExpose({ show, hide, isOpen })
 
-loading_listener((event) => {
+// TODO: Migrate to common events.ts helper when events/listeners are refactored
+interface LoadingListenerEvent {
+  event: {
+    type: 'launcher_update'
+    version: string
+  }
+  fraction?: number
+}
+
+loading_listener((event: LoadingListenerEvent) => {
   if (event.event.type === 'launcher_update') {
     if (event.event.version === update.value!.version) {
       downloadProgress.value = (event.fraction ?? 1.0) * 100
