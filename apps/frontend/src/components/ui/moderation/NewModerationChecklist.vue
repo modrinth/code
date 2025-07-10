@@ -287,7 +287,7 @@
                   <LeftArrowIcon aria-hidden="true" /> Previous
                 </button>
               </ButtonStyled>
-              <ButtonStyled v-if="currentStage < checklist.length - 1" color="brand">
+              <ButtonStyled v-if="!isLastVisibleStage" color="brand">
                 <button @click="nextStage"><RightArrowIcon aria-hidden="true" /> Next</button>
               </ButtonStyled>
               <ButtonStyled v-else color="brand" :disabled="loadingMessage">
@@ -1009,6 +1009,9 @@ function generateModpackMessage(judgements: ModerationJudgements) {
   for (const [, judgement] of Object.entries(judgements)) {
     let judgementItem = "Unknown mod";
 
+    // TODO: Links & de-duplicate exact files.
+    // Move these messages to a constant ts file.
+
     if (judgement.type === "flame") {
       judgementItem = `[${judgement.title}](${judgement.link}) (CurseForge)`;
     } else if (judgement.type === "unknown") {
@@ -1036,22 +1039,19 @@ function generateModpackMessage(judgements: ModerationJudgements) {
 
     if (attributeMods.length > 0) {
       issues.push(
-        "The following content has attribution requirements, meaning that you must link back to the page where you originally found this content in your modpack description or version changelog (e.g. linking a mod's CurseForge page if you got it from CurseForge):\n" +
-          attributeMods.map((mod) => `- ${mod}`).join("\n"),
+        `The following content has attribution requirements, meaning that you must link back to the page where you originally found this content in your modpack description or version changelog (e.g. linking a mod's CurseForge page if you got it from CurseForge):\n${attributeMods.map((mod) => `- ${mod}`).join("\n")}`,
       );
     }
 
     if (noMods.length > 0) {
       issues.push(
-        "The following content is not allowed in Modrinth modpacks due to licensing restrictions. Please contact the author(s) directly for permission or remove the content from your modpack:\n" +
-          noMods.map((mod) => `- ${mod}`).join("\n"),
+        `The following content is not allowed in Modrinth modpacks due to licensing restrictions. Please contact the author(s) directly for permission or remove the content from your modpack:\n${noMods.map((mod) => `- ${mod}`).join("\n")}`,
       );
     }
 
     if (permanentNoMods.length > 0) {
       issues.push(
-        "The following content is not allowed in Modrinth modpacks, regardless of permission obtained. This may be because it breaks Modrinth's content rules or because the authors, upon being contacted for permission, have declined. Please remove the content from your modpack:\n" +
-          permanentNoMods.map((mod) => `- ${mod}`).join("\n"),
+        `The following content is not allowed in Modrinth modpacks, regardless of permission obtained. This may be because it breaks Modrinth's content rules or because the authors, upon being contacted for permission, have declined. Please remove the content from your modpack:\n${permanentNoMods.map((mod) => `- ${mod}`).join("\n")}`,
       );
     }
 
@@ -1135,6 +1135,15 @@ async function goToNextProject() {
 async function exitModeration() {
   await navigateTo("/moderation/review");
 }
+
+const isLastVisibleStage = computed(() => {
+  for (let i = currentStage.value + 1; i < checklist.length; i++) {
+    if (shouldShowStageIndex(i)) {
+      return false;
+    }
+  }
+  return true;
+});
 
 const stageOptions = computed<OverflowMenuOption[]>(() => {
   return checklist
