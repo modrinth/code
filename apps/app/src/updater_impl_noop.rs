@@ -2,7 +2,7 @@ use crate::api::Result;
 use theseus::ErrorKind;
 
 #[derive(Default)]
-pub struct PendingUpdateData;
+pub struct PendingUpdateData(());
 
 #[tauri::command]
 pub fn get_update_size() -> Result<()> {
