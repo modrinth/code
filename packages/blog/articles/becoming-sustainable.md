@@ -4,6 +4,7 @@ short_title: Becoming Sustainable
 summary: Announcing an update to our monetization program, creator split, and more!
 short_summary: Announcing 5x creator revenue and updates to the monetization program.
 date: 2024-09-13T12:00:00-08:00
+authors: ['MpxzqsyW', 'Dc7EYhxG']
 ---
 
 Just over 3 weeks ago, we [launched](/news/article/introducing-modrinth-refreshed-site-look-new-advertising-system) our new ads powered by [Aditude](https://www.aditude.com/). These ads have allowed us to improve creator revenue drastically and become sustainable. Read on for more info!

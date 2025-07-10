@@ -166,10 +166,18 @@ pub async fn test_jre(
     path: PathBuf,
     major_version: u32,
 ) -> crate::Result<bool> {
-    let Ok(jre) = jre::check_java_at_filepath(&path).await else {
-        return Ok(false);
+    let jre = match jre::check_java_at_filepath(&path).await {
+        Ok(jre) => jre,
+        Err(e) => {
+            tracing::warn!("Invalid Java at {}: {e}", path.display());
+            return Ok(false);
+        }
     };
     let version = extract_java_version(&jre.version)?;
+    tracing::info!(
+        "Expected Java version {major_version}, and found {version} at {}",
+        path.display()
+    );
     Ok(version == major_version)
 }
 

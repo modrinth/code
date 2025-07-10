@@ -5,6 +5,7 @@ export const article = {
   summary: "Welcome to the new era of Modrinth. We can't wait to hear your feedback.",
   date: '2023-04-01T08:00:00.000Z',
   slug: 'new-site-beta',
+  authors: [],
   thumbnail: true,
   short_title: '(April Fools 2023) Modrinth Technologies™️ beta launch!',
   short_summary: 'Power up your experience.',

@@ -43,7 +43,7 @@ jobs:
       - name: 📥 Check out code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: 🧰 Setup Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -77,9 +77,9 @@ jobs:
 
       - name: ⚙️ Set application version
         shell: bash
-        env:
-          APP_VERSION: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('v1.0.0-canary+{0}', github.sha) }}
         run: |
+          APP_VERSION="$(git describe --tags --always | sed -E 's/-([0-9]+)-(g[0-9a-fA-F]+)$/-canary+\1.\2/')"
+          echo "Setting application version to $APP_VERSION"
           dasel put -f apps/app/Cargo.toml -t string -v "${APP_VERSION#v}" 'package.version'
           dasel put -f packages/app-lib/Cargo.toml -t string -v "${APP_VERSION#v}" 'package.version'
           dasel put -f apps/app-frontend/package.json -t string -v "${APP_VERSION#v}" 'version'
@@ -99,12 +99,6 @@ jobs:
           else
             dasel delete -f apps/app/tauri-release.conf.json 'bundle.windows.signCommand'
           fi
-
-      - name: 🗑️ Clean up cached bundles
-        shell: bash
-        run: |
-          rm -rf target/release/bundle
-          rm -rf target/*/release/bundle || true
 
       - name: 🔨 Build macOS app
         run: pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json
@@ -147,5 +141,10 @@ jobs:
         with:
           name: App bundle (${{ matrix.artifact-target-name }})
           path: |
-            target/release/bundle/**
-            target/*/release/bundle/**
+            target/release/bundle/appimage/Modrinth App_*.AppImage*
+            target/release/bundle/deb/Modrinth App_*.deb*
+            target/release/bundle/rpm/Modrinth App-*.rpm*
+            target/universal-apple-darwin/release/bundle/macos/Modrinth App.app.tar.gz*
+            target/universal-apple-darwin/release/bundle/dmg/Modrinth App_*.dmg*
+            target/release/bundle/nsis/Modrinth App_*-setup.exe*
+            target/release/bundle/nsis/Modrinth App_*-setup.nsis.zip*

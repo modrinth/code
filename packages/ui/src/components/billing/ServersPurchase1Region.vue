@@ -40,7 +40,7 @@ const selectedPrice = computed(() => {
   return amount ? amount / monthsInInterval[props.interval] : undefined
 })
 
-const regionOrder: string[] = ['us-vin', 'eu-lim']
+const regionOrder: string[] = ['us-vin', 'eu-cov', 'eu-lim']
 
 const sortedRegions = computed(() => {
   return props.regions.slice().sort((a, b) => {

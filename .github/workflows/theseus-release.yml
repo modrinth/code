@@ -67,7 +67,7 @@ jobs:
                 "install_urls": [
                   @uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/linux/\("Modrinth App_" + $versionTag + "_amd64.deb")",
                   @uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/linux/\("Modrinth App_" + $versionTag + "_amd64.AppImage")",
-                  @uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/linux/\("Modrinth App_" + $versionTag + "-1.x86_64.rpm")"
+                  @uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/linux/\("Modrinth App-" + $versionTag + "-1.x86_64.rpm")"
                 ]
               },
               "windows-x86_64": {

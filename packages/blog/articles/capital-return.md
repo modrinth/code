@@ -2,6 +2,7 @@
 title: A Sustainable Path Forward for Modrinth
 summary: Our capital return and what’s next.
 date: 2024-04-04T12:00:00-08:00
+authors: ['MpxzqsyW']
 ---
 
 Over three years ago, I started Modrinth: a new Minecraft modding platform built on community principles, a fully open-source codebase, and a focus on creators.

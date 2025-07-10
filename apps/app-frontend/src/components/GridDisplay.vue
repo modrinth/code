@@ -136,7 +136,7 @@ const filteredResults = computed(() => {
 
   if (sortBy.value === 'Game version') {
     instances.sort((a, b) => {
-      return a.game_version.localeCompare(b.game_version)
+      return a.game_version.localeCompare(b.game_version, undefined, { numeric: true })
     })
   }
 
@@ -207,6 +207,17 @@ const filteredResults = computed(() => {
         return 1
       }
       return a[0].localeCompare(b[0])
+    })
+    instanceMap.clear()
+    sortedEntries.forEach((entry) => {
+      instanceMap.set(entry[0], entry[1])
+    })
+  }
+  // default sorting would do 1.20.4 < 1.8.9 because 2 < 8
+  // localeCompare with numeric=true puts 1.8.9 < 1.20.4 because 8 < 20
+  if (group.value === 'Game version') {
+    const sortedEntries = [...instanceMap.entries()].sort((a, b) => {
+      return a[0].localeCompare(b[0], undefined, { numeric: true })
     })
     instanceMap.clear()
     sortedEntries.forEach((entry) => {

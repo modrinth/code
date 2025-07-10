@@ -6,5 +6,6 @@ export const article = {
     "After over a year of development, we're happy to announce that modpack support is now in alpha testing.",
   date: '2022-05-15T00:00:00.000Z',
   slug: 'modpacks-alpha',
+  authors: ['6plzAzU4'],
   thumbnail: true,
 }

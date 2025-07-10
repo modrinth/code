@@ -59,7 +59,7 @@ async function compileArticles() {
     const src = await fs.readFile(file, 'utf8')
     const { content, data } = matter(src)
 
-    const { title, summary, date, slug: frontSlug, ...rest } = data
+    const { title, summary, date, slug: frontSlug, authors: authorsData, ...rest } = data
     if (!title || !summary || !date) {
       console.error(`❌  Missing required frontmatter in ${file}. Required: title, summary, date`)
       process.exit(1)
@@ -70,6 +70,8 @@ async function compileArticles() {
       collapseWhitespace: true,
       removeComments: true,
     })
+
+    const authors = authorsData ? authorsData : []
 
     const slug = frontSlug || path.basename(file, '.md')
     const varName = toVarName(slug)
@@ -91,6 +93,7 @@ export const article = {
   summary: ${JSON.stringify(summary)},
   date: ${JSON.stringify(date)},
   slug: ${JSON.stringify(slug)},
+  authors: ${JSON.stringify(authors)},
   thumbnail: ${thumbnailPresent},
   ${Object.keys(rest)
     .map((k) => `${k}: ${JSON.stringify(rest[k])},`)

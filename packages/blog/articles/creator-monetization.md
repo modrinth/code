@@ -1,7 +1,8 @@
 ---
 title: Creators can now make money on Modrinth!
-summary: "Yes, you read the title correctly: Modrinth's creator monetization program, also known as payouts, is now in an open beta phase. Read on for more information!"
+summary: 'Introducing the Creator Monetization Program allowing creators to earn revenue from their projects.'
 date: 2022-11-12
+authors: ['6plzAzU4']
 ---
 
 Yes, you read the title correctly: Modrinth's Creator Monetization Program, also known as payouts, is now in an open beta phase. All of the money that project owners have earned since August 1st is available to claim **right now**!

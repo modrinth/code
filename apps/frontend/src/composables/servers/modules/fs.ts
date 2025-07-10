@@ -22,26 +22,49 @@ export class FSModule extends ServerModule {
     this.opsQueuedForModification = [];
   }
 
-  private async retryWithAuth<T>(requestFn: () => Promise<T>): Promise<T> {
+  private async retryWithAuth<T>(
+    requestFn: () => Promise<T>,
+    ignoreFailure: boolean = false,
+  ): Promise<T> {
     try {
       return await requestFn();
     } catch (error) {
       if (error instanceof ModrinthServerError && error.statusCode === 401) {
+        console.debug("Auth failed, refreshing JWT and retrying");
         await this.fetch(); // Refresh auth
         return await requestFn();
       }
+
+      const available = await this.server.testNodeReachability();
+      if (!available && !ignoreFailure) {
+        this.server.moduleErrors.general = {
+          error: new ModrinthServerError(
+            "Unable to reach node. FS operation failed and subsequent ping test failed.",
+            500,
+            error as Error,
+            "fs",
+          ),
+          timestamp: Date.now(),
+        };
+      }
+
       throw error;
     }
   }
 
-  listDirContents(path: string, page: number, pageSize: number): Promise<DirectoryResponse> {
+  listDirContents(
+    path: string,
+    page: number,
+    pageSize: number,
+    ignoreFailure: boolean = false,
+  ): Promise<DirectoryResponse> {
     return this.retryWithAuth(async () => {
       const encodedPath = encodeURIComponent(path);
       return await useServersFetch(`/list?path=${encodedPath}&page=${page}&page_size=${pageSize}`, {
         override: this.auth,
         retry: false,
       });
-    });
+    }, ignoreFailure);
   }
 
   createFileOrFolder(path: string, type: "file" | "directory"): Promise<void> {
@@ -150,7 +173,7 @@ export class FSModule extends ServerModule {
     });
   }
 
-  downloadFile(path: string, raw?: boolean): Promise<any> {
+  downloadFile(path: string, raw: boolean = false, ignoreFailure: boolean = false): Promise<any> {
     return this.retryWithAuth(async () => {
       const encodedPath = encodeURIComponent(path);
       const fileData = await useServersFetch(`/download?path=${encodedPath}`, {
@@ -161,7 +184,7 @@ export class FSModule extends ServerModule {
         return raw ? fileData : await fileData.text();
       }
       return fileData;
-    });
+    }, ignoreFailure);
   }
 
   extractFile(

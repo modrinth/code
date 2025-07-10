@@ -1,13 +1,10 @@
-import type { RawRenderResult } from '../rendering/batch-skin-renderer'
-
-interface StoredPreview {
-  forwards: Blob
-  backwards: Blob
+interface StoredHead {
+  blob: Blob
   timestamp: number
 }
 
-export class SkinPreviewStorage {
-  private dbName = 'skin-previews'
+export class HeadStorage {
+  private dbName = 'head-storage'
   private version = 1
   private db: IDBDatabase | null = null
 
@@ -23,62 +20,62 @@ export class SkinPreviewStorage {
 
       request.onupgradeneeded = () => {
         const db = request.result
-        if (!db.objectStoreNames.contains('previews')) {
-          db.createObjectStore('previews')
+        if (!db.objectStoreNames.contains('heads')) {
+          db.createObjectStore('heads')
         }
       }
     })
   }
 
-  async store(key: string, result: RawRenderResult): Promise<void> {
+  async store(key: string, blob: Blob): Promise<void> {
     if (!this.db) await this.init()
 
-    const transaction = this.db!.transaction(['previews'], 'readwrite')
-    const store = transaction.objectStore('previews')
+    const transaction = this.db!.transaction(['heads'], 'readwrite')
+    const store = transaction.objectStore('heads')
 
-    const storedPreview: StoredPreview = {
-      forwards: result.forwards,
-      backwards: result.backwards,
+    const storedHead: StoredHead = {
+      blob,
       timestamp: Date.now(),
     }
 
     return new Promise((resolve, reject) => {
-      const request = store.put(storedPreview, key)
+      const request = store.put(storedHead, key)
 
       request.onsuccess = () => resolve()
       request.onerror = () => reject(request.error)
     })
   }
 
-  async retrieve(key: string): Promise<RawRenderResult | null> {
+  async retrieve(key: string): Promise<string | null> {
     if (!this.db) await this.init()
 
-    const transaction = this.db!.transaction(['previews'], 'readonly')
-    const store = transaction.objectStore('previews')
+    const transaction = this.db!.transaction(['heads'], 'readonly')
+    const store = transaction.objectStore('heads')
 
     return new Promise((resolve, reject) => {
       const request = store.get(key)
 
       request.onsuccess = () => {
-        const result = request.result as StoredPreview | undefined
+        const result = request.result as StoredHead | undefined
 
         if (!result) {
           resolve(null)
           return
         }
 
-        resolve({ forwards: result.forwards, backwards: result.backwards })
+        const url = URL.createObjectURL(result.blob)
+        resolve(url)
       }
       request.onerror = () => reject(request.error)
     })
   }
 
-  async batchRetrieve(keys: string[]): Promise<Record<string, RawRenderResult | null>> {
+  async batchRetrieve(keys: string[]): Promise<Record<string, Blob | null>> {
     if (!this.db) await this.init()
 
-    const transaction = this.db!.transaction(['previews'], 'readonly')
-    const store = transaction.objectStore('previews')
-    const results: Record<string, RawRenderResult | null> = {}
+    const transaction = this.db!.transaction(['heads'], 'readonly')
+    const store = transaction.objectStore('heads')
+    const results: Record<string, Blob | null> = {}
 
     return new Promise((resolve, _reject) => {
       let completedRequests = 0
@@ -92,10 +89,10 @@ export class SkinPreviewStorage {
         const request = store.get(key)
 
         request.onsuccess = () => {
-          const result = request.result as StoredPreview | undefined
+          const result = request.result as StoredHead | undefined
 
           if (result) {
-            results[key] = { forwards: result.forwards, backwards: result.backwards }
+            results[key] = result.blob
           } else {
             results[key] = null
           }
@@ -120,8 +117,8 @@ export class SkinPreviewStorage {
   async cleanupInvalidKeys(validKeys: Set<string>): Promise<number> {
     if (!this.db) await this.init()
 
-    const transaction = this.db!.transaction(['previews'], 'readwrite')
-    const store = transaction.objectStore('previews')
+    const transaction = this.db!.transaction(['heads'], 'readwrite')
+    const store = transaction.objectStore('heads')
     let deletedCount = 0
 
     return new Promise((resolve, reject) => {
@@ -139,7 +136,7 @@ export class SkinPreviewStorage {
               deletedCount++
             }
             deleteRequest.onerror = () => {
-              console.warn('Failed to delete invalid entry:', key)
+              console.warn('Failed to delete invalid head entry:', key)
             }
           }
 
@@ -156,8 +153,8 @@ export class SkinPreviewStorage {
   async debugCalculateStorage(): Promise<void> {
     if (!this.db) await this.init()
 
-    const transaction = this.db!.transaction(['previews'], 'readonly')
-    const store = transaction.objectStore('previews')
+    const transaction = this.db!.transaction(['heads'], 'readonly')
+    const store = transaction.objectStore('heads')
 
     let totalSize = 0
     let count = 0
@@ -171,9 +168,9 @@ export class SkinPreviewStorage {
 
         if (cursor) {
           const key = cursor.primaryKey as string
-          const value = cursor.value as StoredPreview
+          const value = cursor.value as StoredHead
 
-          const entrySize = value.forwards.size + value.backwards.size
+          const entrySize = value.blob.size
           totalSize += entrySize
           count++
 
@@ -184,7 +181,7 @@ export class SkinPreviewStorage {
 
           cursor.continue()
         } else {
-          console.group('🗄️ Skin Preview Storage Debug Info')
+          console.group('🗄️ Head Storage Debug Info')
           console.log(`Total entries: ${count}`)
           console.log(`Total size: ${(totalSize / 1024 / 1024).toFixed(2)} MB`)
           console.log(
@@ -213,6 +210,20 @@ export class SkinPreviewStorage {
       request.onerror = () => reject(request.error)
     })
   }
+
+  async clearAll(): Promise<void> {
+    if (!this.db) await this.init()
+
+    const transaction = this.db!.transaction(['heads'], 'readwrite')
+    const store = transaction.objectStore('heads')
+
+    return new Promise((resolve, reject) => {
+      const request = store.clear()
+
+      request.onsuccess = () => resolve()
+      request.onerror = () => reject(request.error)
+    })
+  }
 }
 
-export const skinPreviewStorage = new SkinPreviewStorage()
+export const headStorage = new HeadStorage()

@@ -6,5 +6,6 @@ export const article = {
     'After six months of work, Modrinth enters Beta, helping modders host their mods with ease!',
   date: '2020-12-01T00:00:00.000Z',
   slug: 'modrinth-beta',
+  authors: ['Dc7EYhxG'],
   thumbnail: true,
 }

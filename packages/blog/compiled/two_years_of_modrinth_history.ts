@@ -5,5 +5,6 @@ export const article = {
   summary: 'The history of Modrinth as we know it from December 2020 to December 2022.',
   date: '2023-01-07T00:00:00.000Z',
   slug: 'two-years-of-modrinth-history',
+  authors: ['6plzAzU4'],
   thumbnail: false,
 }
