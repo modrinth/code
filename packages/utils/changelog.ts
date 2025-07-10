@@ -11,6 +11,14 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-07-09T22:15:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed pasted links being unnecessarily wrapped in Markdown formatting in Markdown editor.
+- Added a security.txt file to the site.
+- Changed the Europe location for Modrinth Servers to show as Central Europe with the flag of Germany to reflect its location better.`,
+  },
+  {
     date: `2025-07-08T14:00:00-07:00`,
     product: 'web',
     body: `### Improvements
