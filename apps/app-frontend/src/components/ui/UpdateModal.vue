@@ -14,7 +14,7 @@
         formatMessage(messages.bodyChangelog)
       }}</a>
     </div>
-    <ProgressBar class="mt-4" :progress="downloadProgress" />
+    <ProgressBar class="mt-4" :progress="downloadProgress" :error="downloadError" />
     <div class="mt-4 flex flex-wrap gap-2">
       <ButtonStyled color="green">
         <button :disabled="updatingImmediately" @click="installUpdateNow">
@@ -107,6 +107,7 @@ const updateSize = ref<number>()
 const updatingImmediately = ref(false)
 const downloadInProgress = ref(false)
 const downloadProgress = ref(0)
+const downloadError = ref(false)
 
 const enqueuedUpdate = ref<string | null>(null)
 
@@ -165,6 +166,9 @@ function updateAtNextExit() {
 }
 
 async function downloadUpdate() {
+  downloadError.value = false
+  downloadProgress.value = 0
+
   const versionToDownload = update.value!.version
 
   downloadInProgress.value = true
@@ -172,6 +176,7 @@ async function downloadUpdate() {
     await enqueueUpdateForInstallation(update.value!.rid)
   } catch (e) {
     downloadInProgress.value = false
+    downloadError.value = true
 
     handleError(e)
 
