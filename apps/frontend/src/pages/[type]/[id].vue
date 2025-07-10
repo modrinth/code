@@ -900,7 +900,7 @@
   >
     <NewModerationChecklist
       :project="project"
-      :future-projects="futureProjects"
+      :future-project-ids="futureProjectIds"
       :collapsed="collapsedModerationChecklist"
       @exit="showModerationChecklist = false"
       @toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
@@ -1577,7 +1577,11 @@ const showModerationChecklist = useLocalStorage(
 );
 const collapsedModerationChecklist = useLocalStorage("collapsed-moderation-checklist", false);
 
-const futureProjects = ref([]);
+const futureProjectIds = useLocalStorage('moderation-future-projects', []);
+
+watch(futureProjectIds, (newValue) => {
+  console.log("Future project IDs updated:", newValue);
+});
 
 watch(
   showModerationChecklist,
@@ -1589,7 +1593,6 @@ watch(
 
 if (import.meta.client && history && history.state && history.state.showChecklist) {
   showModerationChecklist.value = true;
-  futureProjects.value = history.state.projects;
 }
 
 function closeDownloadModal(event) {

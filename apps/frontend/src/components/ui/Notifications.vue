@@ -86,7 +86,6 @@ import {
 } from "@modrinth/assets";
 const notifications = useNotifications();
 const { isVisible: moveNotificationsRight } = useNotificationRightwards();
-console.log(moveNotificationsRight.value);
 
 const isIntercomPresent = ref(false);
 

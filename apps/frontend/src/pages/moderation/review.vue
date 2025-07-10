@@ -212,6 +212,10 @@ if (projects.value) {
 
 async function goToProjects() {
   const project = projectsFiltered.value[0];
+  const remainingProjectIds = projectsFiltered.value.slice(1).map((p) => p.id);
+
+  localStorage.setItem("moderation-future-projects", JSON.stringify(remainingProjectIds));
+
   await router.push({
     name: "type-id",
     params: {
@@ -220,7 +224,6 @@ async function goToProjects() {
     },
     state: {
       showChecklist: true,
-      projects: projectsFiltered.value.slice(1).map((x) => (x.slug ? x.slug : x.id)),
     },
   });
 }

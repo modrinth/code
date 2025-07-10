@@ -35,9 +35,9 @@
         <div v-if="done">
           <p>
             You are done moderating this project!
-            <template v-if="(futureProjects || []).length > 0">
+            <template v-if="futureProjectCount > 0">
               There are
-              {{ (futureProjects || []).length }} left.
+              {{ futureProjectCount }} left.
             </template>
           </p>
         </div>
@@ -188,7 +188,7 @@
         >
           <div class="flex items-center gap-2">
             <ButtonStyled
-              v-if="!done && !generatedMessage && futureProjects && futureProjects.length > 0"
+              v-if="!done && !generatedMessage && futureProjectCount > 0"
             >
               <button @click="goToNextProject">
                 <XIcon aria-hidden="true" />
@@ -199,7 +199,7 @@
 
           <div class="flex items-center gap-2">
             <div v-if="done">
-              <ButtonStyled v-if="(futureProjects || []).length > 0" color="brand">
+              <ButtonStyled v-if="futureProjectCount > 0" color="brand">
                 <button @click="goToNextProject">
                   <RightArrowIcon aria-hidden="true" />
                   Next Project
@@ -351,16 +351,22 @@ import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
 const props = withDefaults(
   defineProps<{
     project: Project;
-    futureProjects?: Project[];
+    futureProjectIds?: string[];
     collapsed: boolean;
   }>(),
   {
-    futureProjects: () => [] as Project[],
+    futureProjectIds: () => [] as string[],
   },
 );
 
 const variables = computed(() => {
   return flattenProjectVariables(props.project);
+});
+
+// Computed property to get the count of future projects
+const futureProjectCount = computed(() => {
+  const ids = JSON.parse(localStorage.getItem('moderation-future-projects') || '[]');
+  return ids.length;
 });
 
 const modpackPermissionsComplete = ref(false);
@@ -382,7 +388,6 @@ function handleModpackPermissionsComplete() {
 const emit = defineEmits<{
   exit: [];
   toggleCollapsed: [];
-  "update:futureProjects": [projects: Project[]];
 }>();
 
 function resetProgress() {
@@ -980,12 +985,6 @@ async function sendMessage(status: "approved" | "rejected" | "withheld") {
       message: `Project ${status} successfully.`,
       type: "success",
     });
-
-    if (props.futureProjects && props.futureProjects.length > 0) {
-      setTimeout(() => {
-        goToNextProject();
-      }, 1000);
-    }
   } catch (error) {
     console.error("Error submitting moderation:", error);
     addNotification({
@@ -997,22 +996,26 @@ async function sendMessage(status: "approved" | "rejected" | "withheld") {
 }
 
 async function goToNextProject() {
-  const project = props.futureProjects![0];
+  const currentIds = JSON.parse(localStorage.getItem('moderation-future-projects') || '[]');
 
-  if (!project) {
+  if (currentIds.length === 0) {
     await navigateTo("/moderation/review");
+    return;
   }
+
+  const nextProjectId = currentIds[0];
+  const remainingIds = currentIds.slice(1);
+
+  localStorage.setItem('moderation-future-projects', JSON.stringify(remainingIds));
 
   await router.push({
     name: "type-id",
     params: {
       type: "project",
-      id: project.id,
+      id: nextProjectId,
     },
     state: {
       showChecklist: true,
-      // @ts-ignore
-      projects: props.futureProjects!.slice(1),
     },
   });
 }
