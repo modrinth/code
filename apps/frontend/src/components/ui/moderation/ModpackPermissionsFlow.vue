@@ -186,10 +186,30 @@ const modPackData = ref<ModerationModpackItem[] | null>(null);
 const currentIndex = ref(0);
 
 const fileApprovalTypes: ModerationApprovalType[] = [
-  { id: "yes", name: "Yes, permission given" },
-  { id: "no", name: "No permission given" },
-  { id: "with-attribution", name: "With attribution only" },
-  { id: "unidentified", name: "Cannot identify project" },
+  {
+    id: "yes",
+    name: "Yes",
+  },
+  {
+    id: "with-attribution-and-source",
+    name: "With attribution and source",
+  },
+  {
+    id: "with-attribution",
+    name: "With attribution",
+  },
+  {
+    id: "no",
+    name: "No",
+  },
+  {
+    id: "permanent-no",
+    name: "Permanent no",
+  },
+  {
+    id: "unidentified",
+    name: "Unidentified",
+  },
 ];
 
 const filePermissionTypes: ModerationPermissionType[] = [

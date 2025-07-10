@@ -297,7 +297,13 @@ export type Report = {
 
 // Moderation
 export interface ModerationApprovalType {
-  id: 'yes' | 'no' | 'with-attribution' | 'unidentified'
+  id:
+    | 'yes'
+    | 'no'
+    | 'with-attribution'
+    | 'unidentified'
+    | 'with-attribution-and-source'
+    | 'permanent-no'
   name: string
 }
 
