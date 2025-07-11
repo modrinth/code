@@ -1360,6 +1360,8 @@ const currentMember = computed(() => {
     };
   }
 
+  console.log("Current member:", val);
+
   return val;
 });
 
