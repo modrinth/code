@@ -29,30 +29,6 @@
     <div class="flex max-w-full flex-wrap items-center gap-x-6 gap-y-4">
       <div class="flex flex-auto flex-wrap items-center gap-x-6 gap-y-4">
         <h2 class="my-0 mr-auto">Publishing checklist</h2>
-        <div class="flex w-fit max-w-full flex-row flex-wrap items-center gap-2">
-          <span class="mr-2 font-bold text-dark">Progress:</span>
-          <div class="flex w-fit max-w-full flex-row items-center gap-2">
-            <div
-              v-for="nag in applicableNags"
-              :key="`checklist-${nag.id}`"
-              v-tooltip="nag.title"
-              :aria-label="nag.title"
-              :class="[
-                'flex h-8 w-8 items-center justify-center rounded-full transition-colors',
-                isNagComplete(nag)
-                  ? 'bg-green text-inverted'
-                  : nag.status === 'required'
-                    ? 'bg-bg text-red'
-                    : nag.status === 'warning'
-                      ? 'bg-bg text-orange'
-                      : 'bg-bg text-purple',
-              ]"
-            >
-              <CheckIcon v-if="isNagComplete(nag)" class="h-4 w-4" />
-              <component :is="nag.icon || getDefaultIcon(nag.status)" v-else class="h-4 w-4" />
-            </div>
-          </div>
-        </div>
       </div>
       <div class="input-group">
         <button
@@ -63,9 +39,9 @@
         </button>
       </div>
     </div>
-    <div v-if="!collapsed" class="grid-display width-16">
+    <div v-if="!collapsed" class="grid-display width-16 mt-4">
       <div v-for="nag in visibleNags" :key="nag.id" class="grid-display__item">
-        <span class="flex items-center gap-2">
+        <span class="flex items-center gap-2 font-semibold">
           <component
             :is="nag.icon || getDefaultIcon(nag.status)"
             v-tooltip="getStatusTooltip(nag.status)"
@@ -166,12 +142,13 @@ const nagContext = computed<NagContext>(() => ({
 
 const applicableNags = computed<Nag[]>(() => {
   return nags.filter((nag) => {
-    return !nag.shouldShow || nag.shouldShow(nagContext.value);
+    return nag.shouldShow(nagContext.value);
   });
 });
 
 const isNagComplete = (nag: Nag): boolean => {
   const context = nagContext.value;
+  return !nag.shouldShow(context);
 };
 
 const visibleNags = computed<Nag[]>(() => {
@@ -179,9 +156,7 @@ const visibleNags = computed<Nag[]>(() => {
 });
 
 const shouldShowLink = (nag: Nag): boolean => {
-  if (!nag.link) return false;
-  if (!nag.link.shouldShow) return true;
-  return nag.link.shouldShow(nagContext.value);
+  return nag.link?.shouldShow ? nag.link.shouldShow(nagContext.value) : false;
 };
 
 const getDefaultIcon = (status: NagStatus): Component => {
@@ -212,7 +187,7 @@ const getStatusTooltip = (status: NagStatus): string => {
 
 const showInvitation = computed<boolean>(() => {
   if (props.allMembers && props.auth) {
-    const member = props.allMembers.find((x) => x.user.id === props.auth.user.id);
+    const member = props.allMembers.find((x) => x?.user?.id === props.auth.user.id);
     return !!member && !member.accepted;
   }
   return false;
