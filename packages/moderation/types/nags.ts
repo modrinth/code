@@ -78,10 +78,11 @@ export interface Nag {
    * If not specified it will use the default icon associated with the nag status.
    */
   icon?: FunctionalComponent<SVGAttributes>
+
   /**
    * A function that determines whether the nag should be shown based on the context.
    */
-  shouldShow?: (context: NagContext) => boolean
+  shouldShow: (context: NagContext) => boolean
   /**
    * An optional link associated with the nag.
    * If provided, it should be displayed alongside the nag.
