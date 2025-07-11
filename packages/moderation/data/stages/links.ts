@@ -9,13 +9,13 @@ const links: Stage = {
   guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
   navigate: '/settings/links',
   shouldShow: (project) =>
-    project.issues_url ||
-    project.source_url ||
-    project.wiki_url ||
-    project.discord_url ||
-    project.donation_urls.length > 0
-      ? true
-      : false,
+    Boolean(
+      project.issues_url ||
+        project.source_url ||
+        project.wiki_url ||
+        project.discord_url ||
+        project.donation_urls.length > 0,
+    ),
   actions: [
     {
       id: 'links_misused',

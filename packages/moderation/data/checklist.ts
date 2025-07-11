@@ -12,7 +12,7 @@ import summary from './stages/summary'
 import title from './stages/title'
 import versions from './stages/versions'
 import license from './stages/license'
-import undefined from './stages/undefined'
+import undefinedProject from './stages/undefined-project'
 
 export default [
   title,
@@ -27,6 +27,6 @@ export default [
   versions,
   copyright,
   ruleFollowing,
-  undefined,
+  undefinedProject,
   modpackPermissionsStage,
 ] as ReadonlyArray<Stage>

@@ -1,9 +1,9 @@
 import { BookOpenIcon } from '@modrinth/assets'
 import type { Stage } from '../../types/stage'
 
-const undefinedStage: Stage = {
+const undefinedProjectStage: Stage = {
   title: 'This project is undefined!',
-  id: 'undefined',
+  id: 'undefined project',
   icon: BookOpenIcon,
   guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
   navigate: '/versions',
@@ -20,4 +20,4 @@ const undefinedStage: Stage = {
   ],
 }
 
-export default undefinedStage
+export default undefinedProjectStage
