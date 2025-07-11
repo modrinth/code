@@ -9,7 +9,11 @@
         @mouseenter="stopTimer(item)"
         @mouseleave="setNotificationTimer(item)"
       >
-        <div class="vue-notification-template vue-notification" :class="{ [item.type]: true }" @click="item.clickAction">
+        <div
+          class="vue-notification-template vue-notification"
+          :class="{ [item.type]: true }"
+          @click="item.clickAction"
+        >
           <div class="notification-title" v-html="item.title"></div>
           <div class="notification-content" v-html="item.text"></div>
         </div>
