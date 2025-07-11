@@ -9,7 +9,7 @@
         @mouseenter="stopTimer(item)"
         @mouseleave="setNotificationTimer(item)"
       >
-        <div class="vue-notification-template vue-notification" :class="{ [item.type]: true }">
+        <div class="vue-notification-template vue-notification" :class="{ [item.type]: true }" @click="item.clickAction">
           <div class="notification-title" v-html="item.title"></div>
           <div class="notification-content" v-html="item.text"></div>
         </div>
@@ -31,11 +31,14 @@ const notifications = ref([])
 
 defineExpose({
   addNotification: (notification) => {
+    notification.clickAction = notification.clickAction ?? (() => {})
+
     const existingNotif = notifications.value.find(
       (x) =>
         x.text === notification.text &&
         x.title === notification.title &&
-        x.type === notification.type,
+        x.type === notification.type &&
+        x.clickAction === notification.clickAction,
     )
     if (existingNotif) {
       setNotificationTimer(existingNotif)
