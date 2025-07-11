@@ -99,7 +99,13 @@ export function handleKeybind(
   ctx: ModerationContext,
   keybinds: KeybindListener[],
 ): boolean {
-  if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+  if (
+    event.target instanceof HTMLInputElement ||
+    event.target instanceof HTMLTextAreaElement ||
+    (event.target as HTMLElement)?.closest('.cm-editor') ||
+    (event.target as HTMLElement)?.classList?.contains('cm-content') ||
+    (event.target as HTMLElement)?.classList?.contains('cm-line')
+  ) {
     return false
   }
 
