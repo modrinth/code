@@ -929,27 +929,19 @@ async function processAction(
 }
 
 function shouldShowStage(stage: Stage): boolean {
-  if (stage.shouldShow === true) {
-    return true;
-  }
-
   if (typeof stage.shouldShow === "function") {
     return stage.shouldShow(props.project);
   }
 
-  return false;
+  return true;
 }
 
 function shouldShowAction(action: Action): boolean {
-  if (action.shouldShow === true) {
-    return true;
-  }
-
   if (typeof action.shouldShow === "function") {
     return action.shouldShow(props.project);
   }
 
-  return false;
+  return true;
 }
 
 function shouldShowStageIndex(stageIndex: number): boolean {

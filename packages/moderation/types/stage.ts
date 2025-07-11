@@ -48,5 +48,5 @@ export interface Stage {
    *
    * By default, it returns `true`, meaning the stage is always shown.
    */
-  shouldShow?: ((project: Project) => boolean) | true
+  shouldShow?: (project: Project) => boolean
 }

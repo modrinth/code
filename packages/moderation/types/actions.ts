@@ -59,7 +59,7 @@ export interface BaseAction {
    *
    * By default, it returns `true`, meaning the action is always shown.
    */
-  shouldShow?: ((project: Project) => boolean) | true
+  shouldShow?: (project: Project) => boolean
 }
 
 /**
