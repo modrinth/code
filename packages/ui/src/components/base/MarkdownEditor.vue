@@ -41,7 +41,7 @@
         <div
           style="width: 100%"
           class="markdown-body"
-          v-html="renderHighlightedString(currentValue ?? '')"
+          v-html="renderHighlightedString(linkMarkdown)"
         />
       </div>
       <div class="input-group push-right">
