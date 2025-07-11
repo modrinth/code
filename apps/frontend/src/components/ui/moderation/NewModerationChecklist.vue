@@ -1005,6 +1005,8 @@ async function generateMessage() {
 
   loadingMessage.value = true;
 
+  router.push(`/${props.project.project_type}/${props.project.slug}/moderation`);
+
   try {
     const baseMessage = await assembleFullMessage();
     let fullMessage = baseMessage;
