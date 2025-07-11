@@ -3,11 +3,7 @@ import type { Stage } from '../../types/stage'
 
 const titleStage: Stage = {
   title: 'Is this title free of useless information?',
-
-  // Obviously can import markdown snippets like actions but not really a point for something
-  // this small/simple.
   text: async () => '**Title:** `%PROJECT_TITLE%`',
-
   id: 'title',
   icon: BookOpenIcon,
   guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',

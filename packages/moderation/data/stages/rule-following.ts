@@ -3,16 +3,16 @@ import type { ButtonAction } from '../../types/actions'
 import { ListBulletedIcon } from '@modrinth/assets'
 
 const ruleFollowing: Stage = {
-  title: 'Does this project follow our content rules?',
+  title: 'Does this project break our content rules?',
   id: 'rule-following',
   icon: ListBulletedIcon,
   guidance_url: 'https://modrinth.com/legal/rules',
   navigate: '/',
   actions: [
     {
-      id: 'rule_following_no',
+      id: 'rule_breaking_yes',
       type: 'button',
-      label: 'No',
+      label: 'Yes',
       weight: 10,
       suggestedStatus: 'rejected',
       severity: 'critical',
@@ -22,6 +22,7 @@ const ruleFollowing: Stage = {
           label: 'Please explain to the user how it infringes on our content rules.',
           variable: 'MESSAGE',
           required: true,
+          large: true,
         },
       ],
     } as ButtonAction,

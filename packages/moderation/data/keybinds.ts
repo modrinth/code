@@ -17,10 +17,8 @@ const keybinds: KeybindListener[] = [
   },
   {
     id: 'generate-message',
-    keybind: 'Ctrl+Enter',
+    keybind: 'Ctrl+Shift+E',
     description: 'Generate moderation message',
-    enabled: (ctx) =>
-      !ctx.state.isLoadingMessage && ctx.state.currentStage === ctx.state.totalStages - 1,
     action: (ctx) => ctx.actions.tryGenerateMessage(),
   },
   {
@@ -34,20 +32,6 @@ const keybinds: KeybindListener[] = [
     keybind: 'Ctrl+Shift+R',
     description: 'Reset moderation progress',
     action: (ctx) => ctx.actions.tryResetProgress(),
-  },
-  {
-    id: 'quick-approve',
-    keybind: 'Ctrl+Shift+A',
-    description: 'Quick approve',
-    enabled: (ctx) => ctx.state.hasGeneratedMessage,
-    action: (ctx) => ctx.actions.tryApprove(),
-  },
-  {
-    id: 'quick-reject',
-    keybind: 'Ctrl+Shift+X',
-    description: 'Quick reject',
-    enabled: (ctx) => ctx.state.hasGeneratedMessage,
-    action: (ctx) => ctx.actions.tryReject(),
   },
   {
     id: 'skip-project',

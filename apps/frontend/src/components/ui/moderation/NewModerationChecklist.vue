@@ -167,20 +167,39 @@
                   :key="`input-${getActionId(action)}-${inputIndex}`"
                   class="mt-2"
                 >
-                  <label :for="`input-${getActionId(action)}-${inputIndex}`">
-                    <span class="label__title">
-                      {{ input.label }}
-                      <span v-if="input.required" class="required">*</span>
-                    </span>
-                  </label>
-                  <input
-                    :id="`input-${getActionId(action)}-${inputIndex}`"
-                    v-model="textInputValues[`${getActionId(action)}-${inputIndex}`]"
-                    type="text"
-                    :placeholder="input.placeholder"
-                    autocomplete="off"
-                    @input="persistState"
-                  />
+                  <template v-if="input.large">
+                    <label :for="`input-${getActionId(action)}-${inputIndex}`">
+                      <span class="label__title">
+                        {{ input.label }}
+                        <span v-if="input.required" class="required">*</span>
+                      </span>
+                    </label>
+                    <MarkdownEditor
+                      :id="`input-${getActionId(action)}-${inputIndex}`"
+                      v-model="textInputValues[`${getActionId(action)}-${inputIndex}`]"
+                      :placeholder="input.placeholder"
+                      :max-height="300"
+                      :disabled="false"
+                      :heading-buttons="false"
+                      @input="persistState"
+                    />
+                  </template>
+                  <template v-else>
+                    <label :for="`input-${getActionId(action)}-${inputIndex}`">
+                      <span class="label__title">
+                        {{ input.label }}
+                        <span v-if="input.required" class="required">*</span>
+                      </span>
+                    </label>
+                    <input
+                      :id="`input-${getActionId(action)}-${inputIndex}`"
+                      v-model="textInputValues[`${getActionId(action)}-${inputIndex}`]"
+                      type="text"
+                      :placeholder="input.placeholder"
+                      autocomplete="off"
+                      @input="persistState"
+                    />
+                  </template>
                 </div>
               </div>
             </template>
@@ -287,7 +306,7 @@
                 </template>
               </OverflowMenu>
               <ButtonStyled>
-                <button :disabled="!(currentStage > 0)" @click="previousStage">
+                <button :disabled="!hasValidPreviousStage" @click="previousStage">
                   <LeftArrowIcon aria-hidden="true" /> Previous
                 </button>
               </ButtonStyled>
@@ -360,6 +379,7 @@ import type {
 } from "@modrinth/moderation";
 import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
 import KeybindsModal from "./ChecklistKeybindsModal.vue";
+import { finalPermissionMessages } from "@modrinth/moderation/data/modpack-permissions-stage";
 
 const keybindsModal = ref<InstanceType<typeof KeybindsModal>>();
 
@@ -378,7 +398,6 @@ const variables = computed(() => {
   return flattenProjectVariables(props.project);
 });
 
-// Computed property to get the count of future projects
 const futureProjectCount = computed(() => {
   const ids = JSON.parse(localStorage.getItem("moderation-future-projects") || "[]");
   return ids.length;
@@ -406,7 +425,7 @@ const emit = defineEmits<{
 }>();
 
 function resetProgress() {
-  currentStage.value = 0;
+  currentStage.value = findFirstValidStage();
   actionStates.value = {};
   textInputValues.value = {};
 
@@ -423,8 +442,19 @@ function resetProgress() {
   initializeAllStages();
 }
 
+function findFirstValidStage(): number {
+  for (let i = 0; i < checklist.length; i++) {
+    if (shouldShowStageIndex(i)) {
+      return i;
+    }
+  }
+  return 0;
+}
+
 const currentStageObj = computed(() => checklist[currentStage.value]);
-const currentStage = useLocalStorage(`moderation-stage-${props.project.slug}`, () => 0);
+const currentStage = useLocalStorage(`moderation-stage-${props.project.slug}`, () =>
+  findFirstValidStage(),
+);
 
 const stageTextExpanded = computedAsync(async () => {
   const stageIndex = currentStage.value;
@@ -979,8 +1009,6 @@ async function generateMessage() {
     const baseMessage = await assembleFullMessage();
     let fullMessage = baseMessage;
 
-    console.log(modpackJudgements.value);
-
     if (
       props.project.project_type === "modpack" &&
       Object.keys(modpackJudgements.value).length > 0
@@ -1014,25 +1042,14 @@ function generateModpackMessage(judgements: ModerationJudgements) {
   const unidentifiedMods = [];
 
   for (const [, judgement] of Object.entries(judgements)) {
-    let judgementItem = "Unknown mod";
-
-    // TODO: Links & de-duplicate exact files.
-    // Move these messages to a constant ts file.
-
-    if (judgement.type === "flame") {
-      judgementItem = `[${judgement.title}](${judgement.link}) (CurseForge)`;
-    } else if (judgement.type === "unknown") {
-      judgementItem = `\`${judgement.file_name}\` (Unknown source)`;
-    }
-
     if (judgement.status === "with-attribution") {
-      attributeMods.push(judgementItem);
+      attributeMods.push(judgement.file_name);
     } else if (judgement.status === "no") {
-      noMods.push(judgementItem);
+      noMods.push(judgement.file_name);
     } else if (judgement.status === "permanent-no") {
-      permanentNoMods.push(judgementItem);
+      permanentNoMods.push(judgement.file_name);
     } else if (judgement.status === "unidentified") {
-      unidentifiedMods.push(judgementItem);
+      unidentifiedMods.push(judgement.file_name);
     }
   }
 
@@ -1046,26 +1063,23 @@ function generateModpackMessage(judgements: ModerationJudgements) {
 
     if (attributeMods.length > 0) {
       issues.push(
-        `The following content has attribution requirements, meaning that you must link back to the page where you originally found this content in your modpack description or version changelog (e.g. linking a mod's CurseForge page if you got it from CurseForge):\n${attributeMods.map((mod) => `- ${mod}`).join("\n")}`,
+        `${finalPermissionMessages["with-attribution"]}\n${attributeMods.map((mod) => `- ${mod}`).join("\n")}`,
       );
     }
 
     if (noMods.length > 0) {
-      issues.push(
-        `The following content is not allowed in Modrinth modpacks due to licensing restrictions. Please contact the author(s) directly for permission or remove the content from your modpack:\n${noMods.map((mod) => `- ${mod}`).join("\n")}`,
-      );
+      issues.push(`${finalPermissionMessages.no}\n${noMods.map((mod) => `- ${mod}`).join("\n")}`);
     }
 
     if (permanentNoMods.length > 0) {
       issues.push(
-        `The following content is not allowed in Modrinth modpacks, regardless of permission obtained. This may be because it breaks Modrinth's content rules or because the authors, upon being contacted for permission, have declined. Please remove the content from your modpack:\n${permanentNoMods.map((mod) => `- ${mod}`).join("\n")}`,
+        `${finalPermissionMessages["permanent-no"]}\n${permanentNoMods.map((mod) => `- ${mod}`).join("\n")}`,
       );
     }
 
     if (unidentifiedMods.length > 0) {
       issues.push(
-        "The following content could not be identified. Please provide proof of its origin along with proof that you have permission to include it:\n" +
-          unidentifiedMods.map((mod) => `- ${mod}`).join("\n"),
+        `${finalPermissionMessages["unidentified"]}\n${unidentifiedMods.map((mod) => `- ${mod}`).join("\n")}`,
       );
     }
   }
@@ -1165,6 +1179,15 @@ const isLastVisibleStage = computed(() => {
     }
   }
   return true;
+});
+
+const hasValidPreviousStage = computed(() => {
+  for (let i = currentStage.value - 1; i >= 0; i--) {
+    if (shouldShowStageIndex(i)) {
+      return true;
+    }
+  }
+  return false;
 });
 
 const stageOptions = computed<OverflowMenuOption[]>(() => {

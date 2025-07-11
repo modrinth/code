@@ -296,7 +296,7 @@ export type Report = {
 }
 
 // Moderation
-export interface ModerationApprovalType {
+export interface ModerationModpackPermissionApprovalType {
   id:
     | 'yes'
     | 'no'
@@ -316,7 +316,7 @@ export interface ModerationBaseModpackItem {
   sha1: string
   file_name: string
   type: 'unknown' | 'flame'
-  status: ModerationApprovalType['id'] | null
+  status: ModerationModpackPermissionApprovalType['id'] | null
   approved: ModerationPermissionType['id'] | null
 }
 
@@ -349,14 +349,16 @@ export interface ModerationModpackResponse {
   >
 }
 
+export interface ModerationJudgement {
+  type: 'flame' | 'unknown'
+  status: string
+  id?: string
+  link?: string
+  title?: string
+  proof?: string
+  file_name?: string
+}
+
 export interface ModerationJudgements {
-  [sha1: string]: {
-    type: 'flame' | 'unknown'
-    status: string
-    id?: string
-    link?: string
-    title?: string
-    proof?: string
-    file_name?: string
-  }
+  [sha1: string]: ModerationJudgement
 }

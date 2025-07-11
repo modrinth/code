@@ -189,7 +189,6 @@ export function expandVariables(
   project: Project,
   variables?: Record<string, string>,
 ): string {
-  console.log(template)
   if (!variables) {
     variables = flattenProjectVariables(project)
   }

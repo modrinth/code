@@ -212,6 +212,11 @@ export interface AdditionalTextInput {
   required?: boolean
 
   /**
+   * Whether the text input should use the full markdown editor rather than a simple text input.
+   */
+  large?: boolean
+
+  /**
    * The variable name that will be replaced in the message with the input value.
    * For example, if variable is "MESSAGE", then "%MESSAGE%" in the action message
    * will be replaced with the input value.

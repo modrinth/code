@@ -152,7 +152,7 @@ import type {
   ModerationModpackResponse,
   ModerationUnknownModpackItem,
   ModerationFlameModpackItem,
-  ModerationApprovalType,
+  ModerationModpackPermissionApprovalType,
   ModerationPermissionType,
 } from "@modrinth/utils";
 import { ButtonStyled } from "@modrinth/ui";
@@ -185,7 +185,7 @@ const persistedIndex = useLocalStorage<number>(`modpack-permissions-index-${prop
 const modPackData = ref<ModerationModpackItem[] | null>(null);
 const currentIndex = ref(0);
 
-const fileApprovalTypes: ModerationApprovalType[] = [
+const fileApprovalTypes: ModerationModpackPermissionApprovalType[] = [
   {
     id: "yes",
     name: "Yes",
@@ -336,7 +336,7 @@ function goToNext(): void {
   }
 }
 
-function setStatus(index: number, status: ModerationApprovalType["id"]): void {
+function setStatus(index: number, status: ModerationModpackPermissionApprovalType["id"]): void {
   if (modPackData.value && modPackData.value[index]) {
     modPackData.value[index].status = status;
     modPackData.value[index].approved = null;

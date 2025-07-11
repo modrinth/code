@@ -12,7 +12,7 @@ const description: Stage = {
     {
       id: 'description_insufficient',
       type: 'button',
-      label: 'Insufficient',
+      label: 'Insufficient (custom)',
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'medium',
@@ -21,6 +21,7 @@ const description: Stage = {
         {
           label: 'Please elaborate on how the author can improve their description.',
           variable: 'EXPLAINER',
+          large: true,
           required: true,
         },
       ],
@@ -28,7 +29,7 @@ const description: Stage = {
     {
       id: 'description_insufficient_packs',
       type: 'button',
-      label: 'Insufficient (default)',
+      label: 'Insufficient',
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'medium',
@@ -39,7 +40,7 @@ const description: Stage = {
     {
       id: 'description_insufficient_projects',
       type: 'button',
-      label: 'Insufficient (default)',
+      label: 'Insufficient',
       weight: 10,
       suggestedStatus: 'flagged',
       severity: 'medium',
