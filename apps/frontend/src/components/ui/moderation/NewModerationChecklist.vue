@@ -511,7 +511,7 @@ interface MessagePart {
 function handleKeybinds(event: KeyboardEvent) {
   const focusedActionIndex = ref<number | null>(null);
 
-  return handleKeybind(
+  handleKeybind(
     event,
     {
       project: props.project,
@@ -1004,6 +1004,8 @@ async function generateMessage() {
   if (loadingMessage.value) return;
 
   loadingMessage.value = true;
+
+  router.push(`/${props.project.project_type}/${props.project.slug}/moderation`);
 
   try {
     const baseMessage = await assembleFullMessage();
