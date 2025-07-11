@@ -55,9 +55,9 @@
           />
           <div>
             <ButtonStyled>
-              <a href="https://modrinth.com/news/changelog?filter=app" target="_blank">
+              <button @click="() => openUrl('https://modrinth.com/news/changelog?filter=app')">
                 <ExternalIcon /> {{ formatMessage(messages.changelog) }}
-              </a>
+              </button>
             </ButtonStyled>
           </div>
         </div>
@@ -85,6 +85,7 @@ import { formatBytes } from '@modrinth/utils'
 import { handleError } from '@/store/notifications'
 import { loading_listener } from '@/helpers/events'
 import { getCurrentWindow } from '@tauri-apps/api/window'
+import { openUrl } from '@tauri-apps/plugin-opener'
 
 const emit = defineEmits<{
   (e: 'updateSkipped', version: string): Promise<void>
