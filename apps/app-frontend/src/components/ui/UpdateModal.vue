@@ -93,7 +93,6 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
-
 const messages = defineMessages({
   header: {
     id: 'app.update.modal-header',
