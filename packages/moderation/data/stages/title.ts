@@ -3,7 +3,7 @@ import type { Stage } from '../../types/stage'
 
 const titleStage: Stage = {
   title: 'Is this title free of useless information?',
-  text: async () => '**Title:** `%PROJECT_TITLE%`',
+  text: async () => '**Title:** %PROJECT_TITLE%',
   id: 'title',
   icon: BookOpenIcon,
   guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
@@ -33,6 +33,19 @@ const titleStage: Stage = {
       weight: 100,
       suggestedStatus: 'flagged',
       severity: 'medium',
+      enablesActions: [
+        {
+          id: 'title_similarities-modpack',
+          type: 'button',
+          label: 'Modpack named after a mod',
+          weight: 100,
+          suggestedStatus: 'flagged',
+          severity: 'medium',
+          shouldShow: (project) => project.project_type === 'modpack',
+          message: async () =>
+            (await import('../messages/title/similarities-modpack.md?raw')).default,
+        },
+      ],
       message: async () => (await import('../messages/title/similarities.md?raw')).default,
     },
   ],

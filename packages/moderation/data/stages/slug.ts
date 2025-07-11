@@ -4,6 +4,7 @@ import type { Stage } from '../../types/stage'
 const slugStage: Stage = {
   title: 'Is the slug accurate and appropriate?',
   id: 'slug',
+  text: async () => '**Slug:** %PROJECT_SLUG%',
   icon: HashIcon,
   guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
   navigate: '/settings',
