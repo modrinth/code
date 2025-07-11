@@ -3,7 +3,7 @@ import type { ButtonAction } from '../../types/actions'
 import { LinkIcon } from '@modrinth/assets'
 
 const links: Stage = {
-  title: "Are the project's links accessible and not misleading?",
+  title: "Are the project's links accurate and accessible?",
   id: 'links',
   icon: LinkIcon,
   guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
@@ -16,6 +16,30 @@ const links: Stage = {
         project.discord_url ||
         project.donation_urls.length > 0,
     ),
+  text: async (project) => {
+    let text = ''
+    if (project.issues_url)
+      text += (await import('../messages/checklist-text/links/issues.md?raw')).default
+    if (project.source_url)
+      text += (await import('../messages/checklist-text/links/source.md?raw')).default
+    if (project.wiki_url)
+      text += (await import('../messages/checklist-text/links/wiki.md?raw')).default
+    if (project.discord_url)
+      text += (await import('../messages/checklist-text/links/discord.md?raw')).default
+
+    if (project.donation_urls.length > 0) {
+      text += (await import('../messages/checklist-text/links/donation/donations.md?raw')).default
+
+      for (const donation of project.donation_urls) {
+        text += (await import(`../messages/checklist-text/links/donation/donation.md?raw`)).default
+          .replace('{URL}', donation.url)
+          .replace('{PLATFORM}', donation.platform)
+      }
+    }
+
+    if (text !== '') return text
+    return 'No links provided.'
+  },
   actions: [
     {
       id: 'links_misused',
