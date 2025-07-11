@@ -224,6 +224,9 @@ importers:
       '@modrinth/blog':
         specifier: workspace:*
         version: link:../../packages/blog
+      '@modrinth/moderation':
+        specifier: workspace:*
+        version: link:../../packages/moderation
       '@modrinth/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -451,6 +454,28 @@ importers:
       typescript:
         specifier: ^5.5.3
         version: 5.5.4
+
+  packages/moderation:
+    dependencies:
+      '@modrinth/assets':
+        specifier: workspace:*
+        version: link:../assets
+      '@modrinth/utils':
+        specifier: workspace:*
+        version: link:../utils
+      vue:
+        specifier: ^3.5.13
+        version: 3.5.13(typescript@5.8.3)
+    devDependencies:
+      eslint:
+        specifier: ^8.57.0
+        version: 8.57.0
+      eslint-config-custom:
+        specifier: workspace:*
+        version: link:../eslint-config-custom
+      tsconfig:
+        specifier: workspace:*
+        version: link:../tsconfig
 
   packages/tsconfig:
     devDependencies:

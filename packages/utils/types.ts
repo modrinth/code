@@ -294,3 +294,71 @@ export type Report = {
   created: string
   body: string
 }
+
+// Moderation
+export interface ModerationModpackPermissionApprovalType {
+  id:
+    | 'yes'
+    | 'no'
+    | 'with-attribution'
+    | 'unidentified'
+    | 'with-attribution-and-source'
+    | 'permanent-no'
+  name: string
+}
+
+export interface ModerationPermissionType {
+  id: 'yes' | 'no'
+  name: string
+}
+
+export interface ModerationBaseModpackItem {
+  sha1: string
+  file_name: string
+  type: 'unknown' | 'flame'
+  status: ModerationModpackPermissionApprovalType['id'] | null
+  approved: ModerationPermissionType['id'] | null
+}
+
+export interface ModerationUnknownModpackItem extends ModerationBaseModpackItem {
+  type: 'unknown'
+  proof: string
+  url: string
+  title: string
+}
+
+export interface ModerationFlameModpackItem extends ModerationBaseModpackItem {
+  type: 'flame'
+  id: string
+  title: string
+  url: string
+}
+
+export type ModerationModpackItem = ModerationUnknownModpackItem | ModerationFlameModpackItem
+
+export interface ModerationModpackResponse {
+  unknown_files?: Record<string, string>
+  flame_files?: Record<
+    string,
+    {
+      file_name: string
+      id: string
+      title?: string
+      url?: string
+    }
+  >
+}
+
+export interface ModerationJudgement {
+  type: 'flame' | 'unknown'
+  status: string
+  id?: string
+  link?: string
+  title?: string
+  proof?: string
+  file_name?: string
+}
+
+export interface ModerationJudgements {
+  [sha1: string]: ModerationJudgement
+}

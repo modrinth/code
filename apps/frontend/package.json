@@ -41,6 +41,7 @@
     "@modrinth/ui": "workspace:*",
     "@modrinth/utils": "workspace:*",
     "@modrinth/blog": "workspace:*",
+    "@modrinth/moderation": "workspace:*",
     "@pinia/nuxt": "^0.5.1",
     "@types/three": "^0.172.0",
     "@vintl/vintl": "^4.4.1",

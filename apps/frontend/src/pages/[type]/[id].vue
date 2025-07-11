@@ -470,9 +470,13 @@
       class="new-page sidebar"
       :class="{
         'alt-layout': cosmetics.leftContentLayout,
-        'ultimate-sidebar':
+        'checklist-open':
           showModerationChecklist &&
           !collapsedModerationChecklist &&
+          !flags.alwaysShowChecklistAsPopup,
+        'checklist-collapsed':
+          showModerationChecklist &&
+          collapsedModerationChecklist &&
           !flags.alwaysShowChecklistAsPopup,
       }"
     >
@@ -878,7 +882,8 @@
         />
       </div>
       <div class="normal-page__ultimate-sidebar">
-        <ModerationChecklist
+        <!-- Uncomment this to enable the old moderation checklist. -->
+        <!-- <ModerationChecklist
           v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
           :project="project"
           :future-projects="futureProjects"
@@ -886,9 +891,21 @@
           :collapsed="collapsedModerationChecklist"
           @exit="showModerationChecklist = false"
           @toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
-        />
+        /> -->
       </div>
     </div>
+  </div>
+  <div
+    v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
+    class="moderation-checklist"
+  >
+    <NewModerationChecklist
+      :project="project"
+      :future-project-ids="futureProjectIds"
+      :collapsed="collapsedModerationChecklist"
+      @exit="showModerationChecklist = false"
+      @toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
+    />
   </div>
 </template>
 <script setup>
@@ -950,16 +967,16 @@ import {
   isUnderReview,
   renderString,
 } from "@modrinth/utils";
-import { navigateTo } from "#app";
 import dayjs from "dayjs";
 import { Tooltip } from "floating-vue";
+import { useLocalStorage } from "@vueuse/core";
+import { navigateTo } from "#app";
 import Accordion from "~/components/ui/Accordion.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import AutomaticAccordion from "~/components/ui/AutomaticAccordion.vue";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import MessageBanner from "~/components/ui/MessageBanner.vue";
-import ModerationChecklist from "~/components/ui/ModerationChecklist.vue";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
 import NavTabs from "~/components/ui/NavTabs.vue";
@@ -967,6 +984,7 @@ import ProjectMemberHeader from "~/components/ui/ProjectMemberHeader.vue";
 import { userCollectProject } from "~/composables/user.js";
 import { reportProject } from "~/utils/report-helpers.ts";
 import { saveFeatureFlags } from "~/composables/featureFlags.ts";
+import NewModerationChecklist from "~/components/ui/moderation/NewModerationChecklist.vue";
 
 const data = useNuxtApp();
 const route = useNativeRoute();
@@ -980,6 +998,7 @@ const flags = useFeatureFlags();
 const cosmetics = useCosmetics();
 
 const { formatMessage } = useVIntl();
+const { setVisible } = useNotificationRightwards();
 
 const settingsModal = ref();
 const downloadModal = ref();
@@ -1551,12 +1570,30 @@ async function copyPermalink() {
 
 const collapsedChecklist = ref(false);
 
-const showModerationChecklist = ref(false);
-const collapsedModerationChecklist = ref(false);
-const futureProjects = ref([]);
+console.log(project.value.id);
+
+const showModerationChecklist = useLocalStorage(
+  `show-moderation-checklist-${project.value.id}`,
+  false,
+);
+const collapsedModerationChecklist = useLocalStorage("collapsed-moderation-checklist", false);
+
+const futureProjectIds = useLocalStorage("moderation-future-projects", []);
+
+watch(futureProjectIds, (newValue) => {
+  console.log("Future project IDs updated:", newValue);
+});
+
+watch(
+  showModerationChecklist,
+  (newValue) => {
+    setVisible(newValue);
+  },
+  { immediate: true },
+);
+
 if (import.meta.client && history && history.state && history.state.showChecklist) {
   showModerationChecklist.value = true;
-  futureProjects.value = history.state.projects;
 }
 
 function closeDownloadModal(event) {
@@ -1779,6 +1816,18 @@ const navLinks = computed(() => {
     position: absolute;
     top: -5px;
     left: 18px;
+  }
+}
+
+.moderation-checklist {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  overflow-y: auto;
+  z-index: 50;
+
+  > div {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
   }
 }
 </style>
