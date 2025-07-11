@@ -8,14 +8,18 @@
     </p>
     <p v-else>You've been invited to join this project. Please accept or decline the invitation.</p>
     <div class="input-group">
-      <button class="iconified-button brand-button" @click="acceptInvite()">
-        <CheckIcon />
-        Accept
-      </button>
-      <button class="iconified-button danger-button" @click="declineInvite()">
-        <XIcon />
-        Decline
-      </button>
+      <ButtonStyled color="brand">
+        <button class="brand-button" @click="acceptInvite()">
+          <CheckIcon />
+          Accept
+        </button>
+      </ButtonStyled>
+      <ButtonStyled color="red">
+        <button @click="declineInvite">
+          <XIcon />
+          Decline
+        </button>
+      </ButtonStyled>
     </div>
   </div>
   <div
@@ -31,12 +35,11 @@
         <h2 class="my-0 mr-auto">Publishing checklist</h2>
       </div>
       <div class="input-group">
-        <button
-          :class="['square-button', !collapsed && '[&>svg]:rotate-180']"
-          @click="toggleCollapsed()"
-        >
-          <DropdownIcon class="duration-250 transition-transform ease-in-out" />
-        </button>
+        <ButtonStyled circular>
+          <button :class="!collapsed && '[&>svg]:rotate-180'" @click="toggleCollapsed()">
+            <DropdownIcon class="duration-250 transition-transform ease-in-out" />
+          </button>
+        </ButtonStyled>
       </div>
     </div>
     <div v-if="!collapsed" class="grid-display width-16 mt-4">
@@ -80,9 +83,11 @@ import {
   LightBulbIcon,
   TriangleAlertIcon,
   DropdownIcon,
+  SendIcon,
 } from "@modrinth/assets";
 import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
 import { nags } from "@modrinth/moderation";
+import { ButtonStyled } from "@modrinth/ui";
 import type { Nag, NagContext, NagStatus } from "@modrinth/moderation";
 import type { Project, User, Version } from "@modrinth/utils";
 import type { Component } from "vue";
@@ -138,7 +143,18 @@ const nagContext = computed<NagContext>(() => ({
   versions: props.versions,
   currentMember: props.currentMember as User,
   currentRoute: props.routeName,
+  tags: props.tags,
+  submitProject: submitForReview,
 }));
+
+const submitForReview = async () => {
+  if (
+    !props.acknowledgedMessage ||
+    nags.value.filter((x) => x.condition && x.status === "required").length === 0
+  ) {
+    await props.setProcessing();
+  }
+};
 
 const applicableNags = computed<Nag[]>(() => {
   return nags.filter((nag) => {

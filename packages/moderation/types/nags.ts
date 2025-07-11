@@ -32,6 +32,8 @@ export interface NagContext {
    * The current route in the application.
    */
   currentRoute: string
+  tags: any
+  submitProject: (...any: any) => any
 }
 
 /**

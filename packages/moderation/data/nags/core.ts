@@ -3,6 +3,20 @@ import { formatProjectType } from '@modrinth/utils'
 
 export const coreNags: Nag[] = [
   {
+    id: 'moderator-feedback',
+    title: 'Review moderator feedback',
+    description: () =>
+      'Review any feedback from moderators regarding your project before resubmitting.',
+    status: 'suggestion',
+    shouldShow: (context: NagContext) =>
+      context.tags.rejectedStatuses.includes(context.project.status),
+    link: {
+      path: 'moderation',
+      title: 'Visit moderation thread',
+      shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-moderation',
+    },
+  },
+  {
     id: 'upload-version',
     title: 'Upload a version',
     description: () => 'At least one version is required for a project to be submitted for review.',
