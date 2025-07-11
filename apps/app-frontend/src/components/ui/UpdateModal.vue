@@ -7,6 +7,7 @@
   >
     <div class="flex flex-col gap-4">
       <AppearingProgressBar
+        v-if="!downloadError"
         :max-value="shouldShowProgress ? updateSize || 0 : 0"
         :current-value="shouldShowProgress ? downloadedBytes : 0"
         color="green"
@@ -30,6 +31,21 @@
         <div>{{ formatMessage(messages.bodyVersion) }}</div>
         <div>
           {{ formatMessage(messages.downloadSize, { size: formatBytes(updateSize) }) }}
+        </div>
+        <div v-if="downloadError" class="flex flex-col gap-2">
+          <div class="text-red font-medium">
+            {{ formatMessage(messages.downloadError) }}
+          </div>
+          <ButtonStyled color="red">
+            <button @click="copyError">
+              <ClipboardCopyIcon />
+              {{
+                copiedError
+                  ? formatMessage(messages.copiedError)
+                  : formatMessage(messages.copyError)
+              }}
+            </button>
+          </ButtonStyled>
         </div>
         <div class="flex flex-wrap gap-2 w-full">
           <JoinedButtons
@@ -62,6 +78,7 @@ import {
   RightArrowIcon,
   TimerIcon,
   XCircleIcon,
+  ClipboardCopyIcon,
 } from '@modrinth/assets'
 import { enqueueUpdateForInstallation, getUpdateSize, removeEnqueuedUpdate } from '@/helpers/utils'
 import { formatBytes } from '@modrinth/utils'
@@ -80,6 +97,10 @@ const messages = defineMessages({
   header: {
     id: 'app.update.modal-header',
     defaultMessage: 'A new app update is available!',
+  },
+  copiedError: {
+    id: 'app.update.copied-error',
+    defaultMessage: 'Copied to clipboard!',
   },
   bodyVersion: {
     id: 'app.update.modal-body-version',
@@ -106,6 +127,15 @@ const messages = defineMessages({
     id: 'app.update.skip',
     defaultMessage: 'Skip this update',
   },
+  downloadError: {
+    id: 'app.update.download-error',
+    defaultMessage:
+      'An error occurred while downloading the update. Please try again later. Contact support if the issue persists.',
+  },
+  copyError: {
+    id: 'app.update.copy-error',
+    defaultMessage: 'Copy error',
+  },
 })
 
 type UpdateData = {
@@ -123,7 +153,8 @@ const updateSize = ref<number>()
 const updatingImmediately = ref(false)
 const downloadInProgress = ref(false)
 const downloadProgress = ref(0)
-const downloadError = ref(false)
+const copiedError = ref(false)
+const downloadError = ref<Error | null>(null)
 
 const enqueuedUpdate = ref<string | null>(null)
 
@@ -185,6 +216,29 @@ function hide() {
 
 defineExpose({ show, hide, isOpen })
 
+async function copyError() {
+  if (downloadError.value) {
+    copiedError.value = true
+    const errorData = {
+      message: downloadError.value.message,
+      stack: downloadError.value.stack,
+      name: downloadError.value.name,
+      timestamp: new Date().toISOString(),
+      updateVersion: update.value?.version,
+    }
+
+    setTimeout(() => {
+      copiedError.value = false
+    }, 3000)
+
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(errorData, null, 2))
+    } catch (e) {
+      console.error('Failed to copy error to clipboard:', e)
+    }
+  }
+}
+
 // TODO: Migrate to common events.ts helper when events/listeners are refactored
 interface LoadingListenerEvent {
   event: {
@@ -222,7 +276,7 @@ function updateAtNextExit() {
 }
 
 async function downloadUpdate() {
-  downloadError.value = false
+  downloadError.value = null
   downloadProgress.value = 0
 
   const versionToDownload = update.value!.version
@@ -232,7 +286,7 @@ async function downloadUpdate() {
     await enqueueUpdateForInstallation(update.value!.rid)
   } catch (e) {
     downloadInProgress.value = false
-    downloadError.value = true
+    downloadError.value = e instanceof Error ? e : new Error(String(e))
 
     handleError(e)
 
