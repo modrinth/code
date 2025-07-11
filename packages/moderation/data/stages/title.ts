@@ -6,7 +6,7 @@ const titleStage: Stage = {
 
   // Obviously can import markdown snippets like actions but not really a point for something
   // this small/simple.
-  text: async () => '**Title:** `%PROJECT_TITLE%`',
+  text: async () => '**Title:** %PROJECT_TITLE%',
 
   id: 'title',
   icon: BookOpenIcon,
@@ -37,6 +37,19 @@ const titleStage: Stage = {
       weight: 100,
       suggestedStatus: 'flagged',
       severity: 'medium',
+      enablesActions: [
+        {
+          id: 'title_similarities-modpack',
+          type: 'button',
+          label: 'Modpack named after a mod',
+          weight: 100,
+          suggestedStatus: 'flagged',
+          severity: 'medium',
+          shouldShow: (project) => project.project_type === 'modpack',
+          message: async () =>
+            (await import('../messages/title/similarities-modpack.md?raw')).default,
+        },
+      ],
       message: async () => (await import('../messages/title/similarities.md?raw')).default,
     },
   ],
