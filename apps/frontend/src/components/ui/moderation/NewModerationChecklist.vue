@@ -511,7 +511,7 @@ interface MessagePart {
 function handleKeybinds(event: KeyboardEvent) {
   const focusedActionIndex = ref<number | null>(null);
 
-  return handleKeybind(
+  handleKeybind(
     event,
     {
       project: props.project,
