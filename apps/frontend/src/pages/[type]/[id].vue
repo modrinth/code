@@ -882,6 +882,7 @@
         />
       </div>
       <div class="normal-page__ultimate-sidebar">
+        <!-- Uncomment this to enable the old moderation checklist. -->
         <!-- <ModerationChecklist
           v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
           :project="project"
