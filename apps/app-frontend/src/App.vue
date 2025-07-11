@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref, watch, provide } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch, useTemplateRef, provide } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import {
   ArrowBigUpDashIcon,
@@ -33,7 +33,7 @@ import { useLoading, useTheming } from '@/store/state'
 import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
-import { get } from '@/helpers/settings.ts'
+import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
@@ -42,7 +42,7 @@ import ModrinthLoadingIndicator from '@/components/LoadingIndicatorBar.vue'
 import { handleError, useNotifications } from '@/store/notifications.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { type } from '@tauri-apps/plugin-os'
-import { getOS, isDev, restartApp } from '@/helpers/utils.js'
+import { areUpdatesEnabled, getOS, isDev } from '@/helpers/utils.js'
 import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { getVersion } from '@tauri-apps/api/app'
@@ -59,7 +59,6 @@ import { get_opening_command, initialize_state } from '@/helpers/state'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { renderString } from '@modrinth/utils'
 import { useFetch } from '@/helpers/fetch.js'
-import { check } from '@tauri-apps/plugin-updater'
 import NavButton from '@/components/ui/NavButton.vue'
 import { get as getCreds, login, logout } from '@/helpers/mr_auth.js'
 import { get_user } from '@/helpers/cache.js'
@@ -69,6 +68,7 @@ import { hide_ads_window, init_ads_window } from '@/helpers/ads.js'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
+import UpdateModal from '@/components/ui/UpdateModal.vue'
 import { get_available_capes, get_available_skins } from './helpers/skins'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
 
@@ -122,7 +122,7 @@ async function setupApp() {
     toggle_sidebar,
     developer_mode,
     feature_flags,
-  } = await get()
+  } = await getSettings()
 
   if (default_page === 'Library') {
     await router.push('/library')
@@ -209,7 +209,6 @@ async function setupApp() {
     })
 
   get_opening_command().then(handleCommand)
-  checkUpdates()
   fetchCredentials()
 
   try {
@@ -346,17 +345,79 @@ async function handleCommand(e) {
   }
 }
 
-const updateAvailable = ref(false)
+const availableUpdate = ref(null)
+const updateSkipped = ref(false)
+const enqueuedUpdate = ref(null)
+const updateModal = useTemplateRef('updateModal')
 async function checkUpdates() {
-  const update = await check()
-  updateAvailable.value = !!update
+  if (!(await areUpdatesEnabled())) {
+    console.log('Skipping update check as updates are disabled in this build')
+    return
+  }
 
+  async function performCheck() {
+    if (updateModal.value.isOpen) {
+      console.log('Skipping update check because the update modal is already open')
+      return
+    }
+
+    const update = await invoke('plugin:updater|check')
+    if (!update) {
+      return
+    }
+
+    console.log(`Update ${update.version} is available.`)
+
+    if (update.version === availableUpdate.value?.version) {
+      console.log(
+        'Skipping update modal because the new version is the same as the dismissed update',
+      )
+      return
+    }
+
+    availableUpdate.value = update
+
+    const settings = await getSettings()
+    if (settings.skipped_update === update.version) {
+      updateSkipped.value = true
+      console.log('Skipping update modal because the user chose to skip this update')
+      return
+    }
+
+    updateSkipped.value = false
+    updateModal.value.show(update)
+  }
+
+  await performCheck()
   setTimeout(
     () => {
       checkUpdates()
     },
-    5 * 1000 * 60,
+    5 * 60 * 1000,
   )
+}
+
+async function skipUpdate(version) {
+  enqueuedUpdate.value = null
+
+  updateSkipped.value = true
+  const settings = await getSettings()
+  settings.skipped_update = version
+  await setSettings(settings)
+}
+
+async function updateEnqueuedForLater(version) {
+  enqueuedUpdate.value = version
+}
+
+async function forceOpenUpdateModal() {
+  if (updateSkipped.value) {
+    updateSkipped.value = false
+    const settings = await getSettings()
+    settings.skipped_update = null
+    await setSettings(settings)
+  }
+  updateModal.value.show(availableUpdate.value)
 }
 
 function handleClick(e) {
@@ -399,6 +460,13 @@ function handleAuxClick(e) {
   <SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
   <div id="teleports"></div>
   <div v-if="stateInitialized" class="app-grid-layout experimental-styles-within relative">
+    <Suspense @resolve="checkUpdates">
+      <UpdateModal
+        ref="updateModal"
+        @update-skipped="skipUpdate"
+        @update-enqueued-for-later="updateEnqueuedForLater"
+      />
+    </Suspense>
     <Suspense>
       <AppSettingsModal ref="settingsModal" />
     </Suspense>
@@ -449,8 +517,17 @@ function handleAuxClick(e) {
         <PlusIcon />
       </NavButton>
       <div class="flex flex-grow"></div>
-      <NavButton v-if="updateAvailable" v-tooltip.right="'Install update'" :to="() => restartApp()">
-        <DownloadIcon />
+      <NavButton
+        v-if="!!availableUpdate"
+        v-tooltip.right="
+          enqueuedUpdate === availableUpdate?.version
+            ? 'Update installation queued for next restart'
+            : 'Update available'
+        "
+        :to="forceOpenUpdateModal"
+      >
+        <DownloadIcon v-if="updateSkipped || enqueuedUpdate === availableUpdate?.version" />
+        <DownloadIcon v-else class="text-brand-green" />
       </NavButton>
       <NavButton v-tooltip.right="'Settings'" :to="() => $refs.settingsModal.show()">
         <SettingsIcon />

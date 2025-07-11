@@ -20,6 +20,36 @@
   "app.settings.tabs.resource-management": {
     "message": "Resource management"
   },
+  "app.update.changelog": {
+    "message": "Changelog"
+  },
+  "app.update.copied-error": {
+    "message": "Copied to clipboard!"
+  },
+  "app.update.copy-error": {
+    "message": "Copy error"
+  },
+  "app.update.download-error": {
+    "message": "An error occurred while downloading the update. Please try again later. Contact support if the issue persists."
+  },
+  "app.update.download-size": {
+    "message": "The download size of the update is {size}."
+  },
+  "app.update.later": {
+    "message": "Update on next restart"
+  },
+  "app.update.modal-body-version": {
+    "message": "We recommend updating as soon as possible so you can enjoy the latest features and improvements."
+  },
+  "app.update.modal-header": {
+    "message": "A new app update is available!"
+  },
+  "app.update.restart": {
+    "message": "Update now"
+  },
+  "app.update.skip": {
+    "message": "Skip this update"
+  },
   "instance.add-server.add-and-play": {
     "message": "Add and play"
   },
