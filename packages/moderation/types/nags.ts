@@ -8,7 +8,7 @@ import type { FunctionalComponent, SVGAttributes } from 'vue'
  * - `warning` indicates that the nag is important but not critical, and can be ignored. It is often used for issues that should be resolved but do not block project submission.
  * - `suggestion` indicates that the nag is a recommendation and can be ignored.
  */
-export type NagStatus = 'required' | 'warning' | 'suggestion'
+export type NagStatus = 'required' | 'warning' | 'suggestion' | 'special-submit-action'
 
 /**
  * Interface representing the context in which a nag is displayed.

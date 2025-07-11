@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showInvitation" class="universal-card information invited">
+  <div v-if="showInvitation" class="universal-card information invited my-4">
     <h2>Invitation to join project</h2>
     <p v-if="currentMember?.project_role">
       You've been invited be a member of this project with the role of '{{
@@ -28,7 +28,7 @@
       visibleNags.length > 0 &&
       (project.status === 'draft' || tags.rejectedStatuses.includes(project.status))
     "
-    class="universal-card mb-4"
+    class="universal-card my-4"
   >
     <div class="flex max-w-full flex-wrap items-center gap-x-6 gap-y-4">
       <div class="flex flex-auto flex-wrap items-center gap-x-6 gap-y-4">
@@ -69,6 +69,23 @@
           {{ nag.link.title }}
           <ChevronRightIcon aria-hidden="true" class="featured-header-chevron" />
         </NuxtLink>
+        <ButtonStyled
+          v-if="nag.status === 'special-submit-action' && nag.id === 'submit-for-review'"
+          color="orange"
+          @click="submitForReview"
+        >
+          <button
+            :disabled="!canSubmitForReview"
+            v-tooltip="
+              !canSubmitForReview
+                ? 'You must complete the required steps in the publishing checklist!'
+                : undefined
+            "
+          >
+            <SendIcon />
+            Submit for review
+          </button>
+        </ButtonStyled>
       </div>
     </div>
   </div>
@@ -84,6 +101,7 @@ import {
   TriangleAlertIcon,
   DropdownIcon,
   SendIcon,
+  ScaleIcon,
 } from "@modrinth/assets";
 import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
 import { nags } from "@modrinth/moderation";
@@ -147,14 +165,18 @@ const nagContext = computed<NagContext>(() => ({
   submitProject: submitForReview,
 }));
 
-const submitForReview = async () => {
-  if (
-    !props.acknowledgedMessage ||
-    nags.value.filter((x) => x.condition && x.status === "required").length === 0
-  ) {
-    await props.setProcessing();
+const canSubmitForReview = computed(() => {
+  return (
+    applicableNags.value.filter((nag) => nag.status === "required" && !isNagComplete(nag))
+      .length === 0
+  );
+});
+
+async function submitForReview() {
+  if (canSubmitForReview) {
+    await setProcessing(true);
   }
-};
+}
 
 const applicableNags = computed<Nag[]>(() => {
   return nags.filter((nag) => {
@@ -162,20 +184,49 @@ const applicableNags = computed<Nag[]>(() => {
   });
 });
 
-const isNagComplete = (nag: Nag): boolean => {
+function isNagComplete(nag: Nag): boolean {
   const context = nagContext.value;
   return !nag.shouldShow(context);
-};
+}
 
 const visibleNags = computed<Nag[]>(() => {
-  return applicableNags.value.filter((nag) => !isNagComplete(nag));
+  const finalNags = applicableNags.value.filter((nag) => !isNagComplete(nag));
+
+  if (props.project.status === "draft") {
+    finalNags.push({
+      id: "submit-for-review",
+      title: "Submit for review",
+      description: () =>
+        "Your project is only viewable by members of the project. It must be reviewed by moderators in order to be published.",
+      status: "special-submit-action",
+      shouldShow: (ctx) => ctx.project.status === "draft",
+    });
+  }
+
+  if (props.tags.rejectedStatuses.includes(props.project.status)) {
+    finalNags.push({
+      id: "resubmit-for-review",
+      title: "Resubmit for review",
+      description: (ctx) =>
+        `Your project has been ${ctx.project.status} by Modrinth's staff. In most cases, you can resubmit for review after addressing the staff's message.`,
+      status: "special-submit-action",
+      shouldShow: (ctx) => ctx.tags.rejectedStatuses.includes(ctx.project.status),
+      link: {
+        path: "moderation",
+        title: "Visit moderation page",
+        shouldShow: () => props.routeName !== "type-id-moderation",
+      },
+    });
+  }
+
+  return finalNags;
 });
 
-const shouldShowLink = (nag: Nag): boolean => {
+function shouldShowLink(nag: Nag): boolean {
   return nag.link?.shouldShow ? nag.link.shouldShow(nagContext.value) : false;
-};
+}
 
-const getDefaultIcon = (status: NagStatus): Component => {
+function getDefaultIcon(status: NagStatus): Component {
   switch (status) {
     case "required":
       return AsteriskIcon;
@@ -183,12 +234,14 @@ const getDefaultIcon = (status: NagStatus): Component => {
       return TriangleAlertIcon;
     case "suggestion":
       return LightBulbIcon;
+    case "special-submit-action":
+      return ScaleIcon;
     default:
       return AsteriskIcon;
   }
-};
+}
 
-const getStatusTooltip = (status: NagStatus): string => {
+function getStatusTooltip(status: NagStatus): string {
   switch (status) {
     case "required":
       return "Required";
@@ -199,7 +252,7 @@ const getStatusTooltip = (status: NagStatus): string => {
     default:
       return "Required";
   }
-};
+}
 
 const showInvitation = computed<boolean>(() => {
   if (props.allMembers && props.auth) {
@@ -209,31 +262,31 @@ const showInvitation = computed<boolean>(() => {
   return false;
 });
 
-const toggleCollapsed = (): void => {
+function toggleCollapsed(): void {
   if (props.toggleCollapsed) {
     props.toggleCollapsed();
   } else {
     emit("toggleCollapsed");
   }
-};
+}
 
-const updateMembers = async (): Promise<void> => {
+async function updateMembers(): Promise<void> {
   if (props.updateMembers) {
     await props.updateMembers();
   } else {
     emit("updateMembers");
   }
-};
+}
 
-const setProcessing = (processing: boolean): void => {
+function setProcessing(processing: boolean): void {
   if (props.setProcessing) {
     props.setProcessing(processing);
   } else {
     emit("setProcessing", processing);
   }
-};
+}
 
-const acceptInvite = async (): Promise<void> => {
+async function acceptInvite(): Promise<void> {
   try {
     setProcessing(true);
     await acceptTeamInvite(props.project.team);
@@ -254,9 +307,9 @@ const acceptInvite = async (): Promise<void> => {
   } finally {
     setProcessing(false);
   }
-};
+}
 
-const declineInvite = async (): Promise<void> => {
+async function declineInvite(): Promise<void> {
   try {
     setProcessing(true);
     await removeTeamMember(props.project.team, props.auth.user.id);
@@ -277,7 +330,7 @@ const declineInvite = async (): Promise<void> => {
   } finally {
     setProcessing(false);
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
