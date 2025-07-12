@@ -103,10 +103,11 @@ impl ProfileInstallStage {
 pub enum LauncherFeatureVersion {
     None,
     MigratedServerLastPlayTime,
+    MigratedWrapperHook,
 }
 
 impl LauncherFeatureVersion {
-    pub const MOST_RECENT: Self = Self::MigratedServerLastPlayTime;
+    pub const MOST_RECENT: Self = Self::MigratedWrapperHook;
 
     pub fn as_str(&self) -> &'static str {
         match *self {
@@ -114,6 +115,7 @@ impl LauncherFeatureVersion {
             Self::MigratedServerLastPlayTime => {
                 "migrated_server_last_play_time"
             }
+            Self::MigratedWrapperHook => "migrated_wrapper_hook",
         }
     }
 
@@ -123,6 +125,7 @@ impl LauncherFeatureVersion {
             "migrated_server_last_play_time" => {
                 Self::MigratedServerLastPlayTime
             }
+            "migrated_wrapper_hook" => Self::MigratedWrapperHook,
             _ => Self::None,
         }
     }
@@ -781,6 +784,20 @@ impl Profile {
                 }
                 self.launcher_feature_version =
                     LauncherFeatureVersion::MigratedServerLastPlayTime;
+            }
+            LauncherFeatureVersion::MigratedServerLastPlayTime => {
+                if let Some(wrapper) = self.hooks.wrapper.as_ref() {
+                    self.hooks.wrapper = Some(
+                        shlex::Quoter::new()
+                            .allow_nul(true)
+                            .quote(wrapper)
+                            .unwrap()
+                            .to_string(),
+                    )
+                }
+
+                self.launcher_feature_version =
+                    LauncherFeatureVersion::MigratedWrapperHook;
             }
             LauncherFeatureVersion::MOST_RECENT => unreachable!(
                 "LauncherFeatureVersion::MOST_RECENT was not updated"
