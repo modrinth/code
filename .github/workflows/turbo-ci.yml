@@ -76,3 +76,8 @@ jobs:
 
       - name: 🔍 Lint and test
         run: pnpm run ci
+
+      - name: 🔍 Verify intl:extract has been run
+        run: |
+          pnpm intl:extract
+          git diff --exit-code */*/src/locales/en-US/index.json
