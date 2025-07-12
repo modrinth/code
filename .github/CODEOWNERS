@@ -1,0 +1,25 @@
+/apps/frontend/ @modrinth/frontend
+/apps/app-frontend/ @modrinth/frontend
+/apps/daedalus_client/ @modrinth/backend
+/apps/docs/ @modrinth/support @modrinth/platform @modrinth/servers
+/apps/labrinth @modrinth/backend
+/apps/app @modrinth/backend
+
+/packages/app-lib/ @modrinth/backend
+/packages/ariadne/ @modrinth/backend
+/packages/assets/ @modrinth/frontend
+/packages/daedalus/ @modrinth/backend
+/packages/eslint-config-custom/ @modrinth/frontend
+/packages/tsconfig/ @modrinth/frontend
+/packages/ui/ @modrinth/frontend
+/packages/utils/ @modrinth/frontend
+
+README.md @modrinth/support
+
+LICENSE @Geometrically @Prospector
+/COPYING.md @Geometrically @Prospector
+/apps/frontend/src/pages/legal/ @Geometrically @Prospector
+
+/.github/ @Geometrically @Prospector
+
+/docker-compose.yml @modrinth/backend
