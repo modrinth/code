@@ -563,7 +563,19 @@ pub async fn launch_minecraft(
     let args = version_info.arguments.clone().unwrap_or_default();
     let mut command = match wrapper {
         Some(hook) => {
-            let mut command = Command::new(hook);
+            let mut hook = shlex::split(hook)
+                .ok_or(crate::ErrorKind::LauncherError(
+                    "Unable to parse wrapper hook".to_string(),
+                ))?
+                .into_iter();
+            let cmd = hook.next().ok_or(crate::ErrorKind::LauncherError(
+                "Empty wrapper hook".to_string(),
+            ))?;
+
+            let mut command = Command::new(cmd);
+            hook.for_each(|arg| {
+                command.arg(arg);
+            });
             command.arg(&java_version.path);
             command
         }

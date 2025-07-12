@@ -62,7 +62,7 @@ impl Settings {
                 onboarded,
                 json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,
                 mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,
-                hook_pre_launch, hook_wrapper, hook_post_exit,
+                hook_pre_launch, hook_wrapper, hook_wrapper_type, hook_post_exit,
                 custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar
             FROM settings
             "
@@ -107,6 +107,7 @@ impl Settings {
             hooks: Hooks {
                 pre_launch: res.hook_pre_launch,
                 wrapper: res.hook_wrapper,
+                wrapper_type: WrapperType::from_string(&res.hook_wrapper_type),
                 post_exit: res.hook_post_exit,
             },
             custom_dir: res.custom_dir,
@@ -130,6 +131,7 @@ impl Settings {
         let default_page = self.default_page.as_str();
         let extra_launch_args = serde_json::to_string(&self.extra_launch_args)?;
         let custom_env_vars = serde_json::to_string(&self.custom_env_vars)?;
+        let hook_wrapper_type = self.hooks.wrapper_type.as_str();
         let feature_flags = serde_json::to_string(&self.feature_flags)?;
 
         sqlx::query!(
@@ -162,15 +164,16 @@ impl Settings {
 
                 hook_pre_launch = $20,
                 hook_wrapper = $21,
-                hook_post_exit = $22,
+                hook_wrapper_type = $22,
+                hook_post_exit = $23,
 
-                custom_dir = $23,
-                prev_custom_dir = $24,
-                migrated = $25,
+                custom_dir = $24,
+                prev_custom_dir = $25,
+                migrated = $26,
 
-                toggle_sidebar = $26,
-                feature_flags = $27,
-                hide_nametag_skins_page = $28
+                toggle_sidebar = $27,
+                feature_flags = $28,
+                hide_nametag_skins_page = $29
             ",
             max_concurrent_writes,
             max_concurrent_downloads,
@@ -193,6 +196,7 @@ impl Settings {
             self.hide_on_process_start,
             self.hooks.pre_launch,
             self.hooks.wrapper,
+            hook_wrapper_type,
             self.hooks.post_exit,
             self.custom_dir,
             self.prev_custom_dir,
@@ -249,6 +253,31 @@ pub struct MemorySettings {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub struct WindowSize(pub u16, pub u16);
 
+/// Should wrapper string be interpreted as a full command or direct path to executable
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "snake_case")]
+pub enum WrapperType {
+    Path,
+    Command,
+}
+
+impl WrapperType {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            WrapperType::Path => "path",
+            WrapperType::Command => "command",
+        }
+    }
+
+    pub fn from_string(string: &str) -> Self {
+        match string {
+            "path" => Self::Path,
+            "command" => Self::Command,
+            _ => Self::Path,
+        }
+    }
+}
+
 /// Game initialization hooks
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde_with::serde_as]
@@ -257,6 +286,7 @@ pub struct Hooks {
     pub pre_launch: Option<String>,
     #[serde_as(as = "serde_with::NoneAsEmptyString")]
     pub wrapper: Option<String>,
+    pub wrapper_type: WrapperType,
     #[serde_as(as = "serde_with::NoneAsEmptyString")]
     pub post_exit: Option<String>,
 }

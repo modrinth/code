@@ -1,0 +1,44 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                SELECT id, data_type, json(data) as \"data?: serde_json::Value\", alias, expires\n                FROM cache\n                WHERE data_type = $1 AND (\n                    id IN (SELECT value FROM json_each($2))\n                    OR\n                    alias IN (SELECT value FROM json_each($3))\n                )\n                ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "data_type",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "data?: serde_json::Value",
+        "ordinal": 2,
+        "type_info": "Null"
+      },
+      {
+        "name": "alias",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "expires",
+        "ordinal": 4,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": [
+      false,
+      false,
+      null,
+      true,
+      false
+    ]
+  },
+  "hash": "28b3e3132d75e551c1fa14b8d3be36adca581f8ad1b90f85d3ec3d92ec61e65e"
+}

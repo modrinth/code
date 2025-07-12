@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT\n                id, active, session_id, expires\n            FROM modrinth_users\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "active",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "session_id",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "expires",
+        "ordinal": 3,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "6d7ebc0f233dc730fa8c99c750421065f5e35f321954a9d5ae9cde907d5ce823"
+}
