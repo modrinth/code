@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                max_concurrent_writes, max_concurrent_downloads,\n                theme, default_page, collapsed_navigation, hide_nametag_skins_page, advanced_rendering, native_decorations,\n                discord_rpc, developer_mode, telemetry, personalized_ads,\n                onboarded,\n                json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,\n                mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,\n                hook_pre_launch, hook_wrapper, hook_wrapper_type, hook_post_exit,\n                custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar\n            FROM settings\n            ",
+  "query": "\n            SELECT\n                max_concurrent_writes, max_concurrent_downloads,\n                theme, default_page, collapsed_navigation, hide_nametag_skins_page, advanced_rendering, native_decorations,\n                discord_rpc, developer_mode, telemetry, personalized_ads,\n                onboarded,\n                json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,\n                mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,\n                hook_pre_launch, hook_wrapper, hook_post_exit,\n                custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar\n            FROM settings\n            ",
   "describe": {
     "columns": [
       {
@@ -114,38 +114,33 @@
         "type_info": "Text"
       },
       {
-        "name": "hook_wrapper_type",
+        "name": "hook_post_exit",
         "ordinal": 22,
         "type_info": "Text"
       },
       {
-        "name": "hook_post_exit",
+        "name": "custom_dir",
         "ordinal": 23,
         "type_info": "Text"
       },
       {
-        "name": "custom_dir",
+        "name": "prev_custom_dir",
         "ordinal": 24,
         "type_info": "Text"
       },
       {
-        "name": "prev_custom_dir",
-        "ordinal": 25,
-        "type_info": "Text"
-      },
-      {
         "name": "migrated",
-        "ordinal": 26,
+        "ordinal": 25,
         "type_info": "Integer"
       },
       {
         "name": "feature_flags",
-        "ordinal": 27,
+        "ordinal": 26,
         "type_info": "Text"
       },
       {
         "name": "toggle_sidebar",
-        "ordinal": 28,
+        "ordinal": 27,
         "type_info": "Integer"
       }
     ],
@@ -175,7 +170,6 @@
       false,
       true,
       true,
-      false,
       true,
       true,
       true,
@@ -184,5 +178,5 @@
       false
     ]
   },
-  "hash": "dc30d239cd7856920b7bcbdfa317972c7085cacc3f4da5edfb6fcda6c68ea14a"
+  "hash": "5193f519f021b2e7013cdb67a6e1a31ae4bd7532d02f8b00b43d5645351941ca"
 }

@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                path, install_stage, launcher_feature_version, name, icon_path,\n                game_version, protocol_version, mod_loader, mod_loader_version,\n                json(groups) as \"groups!: serde_json::Value\",\n                linked_project_id, linked_version_id, locked,\n                created, modified, last_played,\n                submitted_time_played, recent_time_played,\n                override_java_path,\n                json(override_extra_launch_args) as \"override_extra_launch_args!: serde_json::Value\", json(override_custom_env_vars) as \"override_custom_env_vars!: serde_json::Value\",\n                override_mc_memory_max, override_mc_force_fullscreen, override_mc_game_resolution_x, override_mc_game_resolution_y,\n                override_hook_pre_launch, override_hook_wrapper, override_hook_wrapper_type, override_hook_post_exit\n            FROM profiles\n            WHERE 1=$1",
+  "query": "\n            SELECT\n                path, install_stage, launcher_feature_version, name, icon_path,\n                game_version, protocol_version, mod_loader, mod_loader_version,\n                json(groups) as \"groups!: serde_json::Value\",\n                linked_project_id, linked_version_id, locked,\n                created, modified, last_played,\n                submitted_time_played, recent_time_played,\n                override_java_path,\n                json(override_extra_launch_args) as \"override_extra_launch_args!: serde_json::Value\", json(override_custom_env_vars) as \"override_custom_env_vars!: serde_json::Value\",\n                override_mc_memory_max, override_mc_force_fullscreen, override_mc_game_resolution_x, override_mc_game_resolution_y,\n                override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit\n            FROM profiles\n            WHERE path IN (SELECT value FROM json_each($1))",
   "describe": {
     "columns": [
       {
@@ -139,13 +139,8 @@
         "type_info": "Text"
       },
       {
-        "name": "override_hook_wrapper_type",
-        "ordinal": 27,
-        "type_info": "Text"
-      },
-      {
         "name": "override_hook_post_exit",
-        "ordinal": 28,
+        "ordinal": 27,
         "type_info": "Text"
       }
     ],
@@ -180,9 +175,8 @@
       true,
       true,
       true,
-      false,
       true
     ]
   },
-  "hash": "59a3cf1f46cb2e6f6c7deb2063729cdd6a9c539f473f4391d8dca4339c45cb81"
+  "hash": "6a434cc55635b6e325e9e5f06d21b787af281db4402c8ff45fe6a77b5be6c929"
 }

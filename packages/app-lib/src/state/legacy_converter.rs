@@ -1,7 +1,7 @@
 use crate::data::{Dependency, ProjectType, User, Version};
 use crate::jre::check_jre;
 use crate::prelude::ModLoader;
-use crate::state::{self, WrapperType};
+use crate::state;
 use crate::state::{
     CacheValue, CachedEntry, CachedFile, CachedFileHash, CachedFileUpdate,
     Credentials, DefaultPage, DependencyType, DeviceToken, DeviceTokenKey,
@@ -379,7 +379,6 @@ where
                             .hooks
                             .as_ref()
                             .and_then(|x| x.wrapper.clone()),
-                        wrapper_type: WrapperType::Path,
                         post_exit: profile.hooks.and_then(|x| x.post_exit),
                     },
                 }
