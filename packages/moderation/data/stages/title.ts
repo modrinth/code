@@ -35,15 +35,38 @@ const titleStage: Stage = {
       severity: 'medium',
       enablesActions: [
         {
-          id: 'title_similarities-modpack',
-          type: 'button',
-          label: 'Modpack named after a mod',
-          weight: 100,
-          suggestedStatus: 'flagged',
-          severity: 'medium',
+          id: 'title_similarities_select_modpack',
+          type: 'multi-select-chips',
+          label: 'Similarities additional info',
           shouldShow: (project) => project.project_type === 'modpack',
-          message: async () =>
-            (await import('../messages/title/similarities-modpack.md?raw')).default,
+          options: [
+            {
+              label: 'Modpack named after mod',
+              weight: 100,
+              message: async () =>
+                (await import('../messages/title/similarities-modpack.md?raw')).default,
+            },
+            {
+              label: 'Forked project',
+              weight: 100,
+              message: async () =>
+                (await import('../messages/title/similarities-fork.md?raw')).default,
+            },
+          ],
+        },
+        {
+          id: 'title_similarities_select_not_modpack',
+          type: 'multi-select-chips',
+          label: 'Similarities additional info',
+          shouldShow: (project) => project.project_type !== 'modpack',
+          options: [
+            {
+              label: 'Forked project',
+              weight: 100,
+              message: async () =>
+                (await import('../messages/title/similarities-fork.md?raw')).default,
+            },
+          ],
         },
       ],
       message: async () => (await import('../messages/title/similarities.md?raw')).default,

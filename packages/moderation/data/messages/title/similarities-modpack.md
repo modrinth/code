@@ -1,3 +1,1 @@
-  
-You may reference the source work in the Description of your fork, however, you must do so in a way that is unlikely to cause confusion or imply association with or endorsement from the author of the source work.  
-Additionally, per section 4 of [Modrinth's Content Rules](https://modrinth.com/legal/rules), we ask that you ensure your project's Name and Branding abide by the license of the source work.
+You may reference the projects that make up the focus point of your modpack, however, you must do so in a way that is unlikely to cause confusion or imply association with or endorsement from the author of that content.  
