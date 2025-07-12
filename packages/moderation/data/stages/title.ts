@@ -33,6 +33,7 @@ const titleStage: Stage = {
       weight: 100,
       suggestedStatus: 'flagged',
       severity: 'medium',
+      message: async () => (await import('../messages/title/similarities.md?raw')).default,
       enablesActions: [
         {
           id: 'title_similarities_select_modpack',
@@ -69,7 +70,6 @@ const titleStage: Stage = {
           ],
         },
       ],
-      message: async () => (await import('../messages/title/similarities.md?raw')).default,
     },
   ],
 }

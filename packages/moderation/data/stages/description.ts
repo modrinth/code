@@ -65,13 +65,6 @@ const description: Stage = {
       suggestedStatus: 'flagged',
       severity: 'low',
       message: async () => (await import('../messages/description/unfinished.md?raw')).default,
-      relevantExtraInput: [
-        {
-          label: 'Please specify the reason the description appears unfinished.',
-          variable: 'REASON',
-          required: true,
-        },
-      ],
     } as ButtonAction,
     {
       id: 'description_headers_as_body',
