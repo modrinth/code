@@ -13,6 +13,7 @@ import title from './stages/title'
 import versions from './stages/versions'
 import license from './stages/license'
 import undefinedProject from './stages/undefined-project'
+import statusAlerts from './stages/status-alerts'
 
 export default [
   title,
@@ -28,5 +29,6 @@ export default [
   copyright,
   ruleFollowing,
   undefinedProject,
+  statusAlerts,
   modpackPermissionsStage,
 ] as ReadonlyArray<Stage>
