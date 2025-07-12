@@ -2,6 +2,7 @@ package com.modrinth.theseus;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -76,14 +77,14 @@ public final class MinecraftLaunch {
 
             Object thisObject = null;
             if (!Modifier.isStatic(mainMethod.getModifiers())) {
-                thisObject = mainClass.getDeclaredConstructor().newInstance();
+                thisObject = forceAccessible(mainClass.getDeclaredConstructor()).newInstance();
             }
 
             final Object[] parameters = mainMethod.getParameterCount() > 0 ? new Object[] {args} : new Object[] {};
 
             mainMethod.invoke(thisObject, parameters);
         } else {
-            findSimpleMainMethod(mainClass).invoke(null, new Object[] {args});
+            forceAccessible(findSimpleMainMethod(mainClass)).invoke(null, new Object[] {args});
         }
     }
 
@@ -114,5 +115,16 @@ public final class MinecraftLaunch {
 
     private static Method findSimpleMainMethod(Class<?> mainClass) throws NoSuchMethodException {
         return mainClass.getMethod("main", String[].class);
+    }
+
+    private static <T extends AccessibleObject> T forceAccessible(T object) throws ReflectiveOperationException {
+        try {
+            final Method setAccessible0 = AccessibleObject.class.getDeclaredMethod("setAccessible0", boolean.class);
+            setAccessible0.setAccessible(true);
+            setAccessible0.invoke(object, true);
+        } catch (NoSuchMethodException e) {
+            object.setAccessible(true);
+        }
+        return object;
     }
 }

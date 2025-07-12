@@ -4,6 +4,7 @@ short_title: Modrinth App Beta and Upgraded Authentication
 summary: Changing the modded Minecraft landscape with the new Modrinth App, alongside several other major features.
 short_summary: Launching Modrinth App Beta and upgrading authentication.
 date: 2023-08-05T12:00:00-08:00
+authors: ['6plzAzU4']
 ---
 
 The past few months have been a bit quiet on our part, but that doesn’t mean we haven’t been working on anything. In fact, this is quite possibly our biggest update yet, bringing the much-anticipated Modrinth App to general availability, alongside several other major features. Let’s get right into it!

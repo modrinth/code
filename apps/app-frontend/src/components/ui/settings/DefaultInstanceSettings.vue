@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { get, set } from '@/helpers/settings.ts'
 import { ref, watch } from 'vue'
-import { get_max_memory } from '@/helpers/jre'
-import { handleError } from '@/store/notifications'
 import { Slider, Toggle } from '@modrinth/ui'
+import useMemorySlider from '@/composables/useMemorySlider'
 
 const fetchSettings = await get()
 fetchSettings.launchArgs = fetchSettings.extra_launch_args.join(' ')
@@ -11,7 +10,7 @@ fetchSettings.envVars = fetchSettings.custom_env_vars.map((x) => x.join('=')).jo
 
 const settings = ref(fetchSettings)
 
-const maxMemory = ref(Math.floor((await get_max_memory().catch(handleError)) / 1024))
+const { maxMemory, snapPoints } = await useMemorySlider()
 
 watch(
   settings,
@@ -107,6 +106,8 @@ watch(
       :min="512"
       :max="maxMemory"
       :step="64"
+      :snap-points="snapPoints"
+      :snap-range="512"
       unit="MB"
     />
 

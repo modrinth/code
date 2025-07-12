@@ -11,10 +11,79 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
-    date: `2025-07-03T12:30:00-07:00`,
+    date: `2025-07-09T22:15:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed pasted links being unnecessarily wrapped in Markdown formatting in Markdown editor.
+- Added a security.txt file to the site.
+- Changed the Europe location for Modrinth Servers to show as Central Europe with the flag of Germany to reflect its location better.`,
+  },
+  {
+    date: `2025-07-08T14:00:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed Modrinth Servers showing as out of stock when navigating to the page directly.`,
+  },
+  {
+    date: `2025-07-08T11:10:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Reapplied error handling improvements, with more improvements.`,
+  },
+  {
+    date: `2025-07-07T22:20:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Fixed issue with Servers panel failing to load.`,
+  },
+  {
+    date: `2025-07-07T17:45:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Reverted error handling improvements.`,
+  },
+  {
+    date: `2025-07-07T01:10:00-07:00`,
+    product: 'app',
+    version: `0.10.3`,
+    body: `### Improvements
+- Added a workaround for Java 8 instances failing to load.
+
+### Known issues
+- Java installations will show as 'Failed' when you test them. This is a visual bug, and does not mean the Java installation is not working.`,
+  },
+  {
+    date: `2025-07-06T16:30:00-07:00`,
+    product: 'app',
+    version: `0.10.2`,
+    body: `### Improvements
+- Added additional default skins from free official Minecraft skin packs.
+- Fixed some parts of the player model on Skins page rendering incorrectly.
+- Fixed a number of issues with skin images not loading on macOS.
+- Fixed old Forge versions not loading properly.
+- Fixed a typo in Appearance settings for hiding Skins page nametag.
+
+### Known issues
+- Java installations will show as 'Failed' when you test them. This is a visual bug, and does not mean the Java installation is not working.`,
+  },
+  {
+    date: `2025-07-05T12:00:00-07:00`,
+    product: 'app',
+    version: `0.10.1`,
+    body: `### Improvements
+- News section will now only show up to 4 articles.
+- Fixed critical issue with updating on Windows.
+- Fixed search being broken after a query that yields no results.
+- Fixed 'Jump back in' section on Home page not working.
+- Fixed too many Quick Instance items on the sidebar causing the UI to overflow.`,
+  },
+  {
+    date: `2025-07-04T12:00:00-07:00`,
     product: 'app',
     version: `0.10.0`,
-    body: `### Added
+    body: `**Note: This update is no longer available to download due to issues, you should use v0.10.1**
+
+### Added
 - Added Skins page as a beta feature. There may be some minor bugs with it, but we'd love to get user feedback on this feature as it's been one of our most highly requested features.
   - Save as many of your own skins as you'd like to swap between them at any moment.
   - Pick a default cape, or override the cape on any of your saved skin profiles to tailor each look perfectly.
@@ -31,6 +100,13 @@ const VERSIONS: VersionEntry[] = [
 - Fixed launch hooks being unable to be cleared on an instance.
 - Fixed search results breaking if page number goes out of bounds.
 - Fixed servers running old Minecraft versions not showing last played time.`,
+  },
+  {
+    date: `2025-07-04T12:00:00-07:00`,
+    product: 'web',
+    body: `### Changed
+- Changed fallback ad placeholder from promoting Modrinth+ to Modrinth Servers.
+- Fixed news section rendering incorrectly in light mode on landing page and Modrinth App page.`,
   },
   {
     date: `2025-06-30T19:15:00-07:00`,

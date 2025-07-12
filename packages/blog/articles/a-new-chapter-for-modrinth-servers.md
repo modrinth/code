@@ -2,6 +2,7 @@
 title: A New Chapter for Modrinth Servers
 summary: Modrinth Servers is now fully operated in-house by the Modrinth Team.
 date: 2025-03-13T00:00:00+00:00
+authors: ['MpxzqsyW', 'Dc7EYhxG']
 ---
 
 Over the few months, Modrinth has seen incredible interest towards our Servers product, and with significant growth, our vision for what Modrinth Servers can be has evolved alongside it. To continue striving towards our goal of providing the best place to get your own Minecraft multiplayer server, we’ve made the decision to bring our server hosting fully in-house.

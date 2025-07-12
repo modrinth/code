@@ -2,6 +2,7 @@
 title: Plugins and Resource Packs now have a home on Modrinth
 summary: 'A small update with a big impact: plugins and resource packs are now available on Modrinth!'
 date: 2022-08-27
+authors: ['6plzAzU4']
 ---
 
 With the addition of modpacks, creating new project types has become a lot easier. Our first additions to our new system are plugins and resource packs. We'll also be working on adding datapacks, shader packs, and worlds after payouts are released.

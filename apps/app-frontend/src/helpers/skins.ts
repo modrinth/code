@@ -97,7 +97,11 @@ export async function fixUnknownSkins(list: Skin[]) {
 
 export function filterDefaultSkins(list: Skin[]) {
   return list
-    .filter((s) => s.source === 'default' && (!s.name || s.variant === DEFAULT_MODELS[s.name]))
+    .filter(
+      (s) =>
+        s.source === 'default' &&
+        (!s.name || !(s.name in DEFAULT_MODELS) || s.variant === DEFAULT_MODELS[s.name]),
+    )
     .sort((a, b) => {
       const aIndex = a.name ? DEFAULT_MODEL_SORTING.indexOf(a.name) : -1
       const bIndex = b.name ? DEFAULT_MODEL_SORTING.indexOf(b.name) : -1

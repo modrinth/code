@@ -6,5 +6,6 @@ export const article = {
     "Software licenses; the nitty-gritty legal aspect of software development. They're more important than you think.",
   date: '2021-05-16T00:00:00.000Z',
   slug: 'licensing-guide',
+  authors: ['6plzAzU4', 'aNd6VJql'],
   thumbnail: true,
 }

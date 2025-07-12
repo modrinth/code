@@ -4,6 +4,7 @@ short_title: Modrinth+ and New Ads
 summary: Learn about this major update to Modrinth.
 short_summary: Introducing a new ad system, a subscription to remove ads, and a redesign of the website!
 date: 2024-08-21T12:00:00-08:00
+authors: ['MpxzqsyW', 'Dc7EYhxG']
 ---
 
 We’ve got a big launch with tons of new stuff today and some important updates about Modrinth. Read on, because we have a lot to cover!

@@ -2,6 +2,7 @@
 title: 'Modrinth Modpacks: Now in alpha testing'
 summary: After over a year of development, we're happy to announce that modpack support is now in alpha testing.
 date: 2022-05-15
+authors: ['6plzAzU4']
 ---
 
 After over a year of development, Modrinth is happy to announce that modpack support is now in alpha testing!

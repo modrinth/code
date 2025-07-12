@@ -5,5 +5,6 @@ export const article = {
   summary: 'Our fundraiser and the future of Modrinth!',
   date: '2023-02-01T20:00:00.000Z',
   slug: 'accelerating-development',
+  authors: ['MpxzqsyW', 'Dc7EYhxG', '6plzAzU4'],
   thumbnail: false,
 }

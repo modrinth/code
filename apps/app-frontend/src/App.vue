@@ -19,6 +19,7 @@ import {
   SettingsIcon,
   WorldIcon,
   XIcon,
+  NewspaperIcon,
 } from '@modrinth/assets'
 import {
   Avatar,
@@ -194,14 +195,16 @@ async function setupApp() {
     .then((res) => {
       if (res && res.articles) {
         // Format expected by NewsArticleCard component.
-        news.value = res.articles.map((article) => ({
-          ...article,
-          path: article.link,
-          thumbnail: article.thumbnail,
-          title: article.title,
-          summary: article.summary,
-          date: article.date,
-        }))
+        news.value = res.articles
+          .map((article) => ({
+            ...article,
+            path: article.link,
+            thumbnail: article.thumbnail,
+            title: article.title,
+            summary: article.summary,
+            date: article.date,
+          }))
+          .slice(0, 4)
       }
     })
 
@@ -482,13 +485,13 @@ function handleAuxClick(e) {
         <ModrinthAppLogo class="h-full w-auto text-contrast pointer-events-none" />
         <div class="flex items-center gap-1 ml-3">
           <button
-            class="cursor-pointer p-0 m-0 border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
+            class="cursor-pointer p-0 m-0 text-contrast border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
             @click="router.back()"
           >
             <LeftArrowIcon />
           </button>
           <button
-            class="cursor-pointer p-0 m-0 border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
+            class="cursor-pointer p-0 m-0 text-contrast border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
             @click="router.forward()"
           >
             <RightArrowIcon />
@@ -610,6 +613,11 @@ function handleAuxClick(e) {
                 :key="`news-${index}`"
                 :article="item"
               />
+              <ButtonStyled color="brand" size="large">
+                <a href="https://modrinth.com/news" target="_blank" class="my-4">
+                  <NewspaperIcon /> View all news
+                </a>
+              </ButtonStyled>
             </div>
           </div>
         </div>

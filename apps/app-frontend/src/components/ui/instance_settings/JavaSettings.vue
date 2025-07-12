@@ -6,9 +6,9 @@ import { edit, get_optimal_jre_key } from '@/helpers/profile'
 import { handleError } from '@/store/notifications'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
-import { get_max_memory } from '@/helpers/jre'
 import { get } from '@/helpers/settings.ts'
 import type { InstanceSettingsTabProps, AppSettings, MemorySettings } from '../../../helpers/types'
+import useMemorySlider from '@/composables/useMemorySlider'
 
 const { formatMessage } = useVIntl()
 
@@ -34,7 +34,7 @@ const envVars = ref(
 
 const overrideMemorySettings = ref(!!props.instance.memory)
 const memory = ref(props.instance.memory ?? globalSettings.memory)
-const maxMemory = Math.floor((await get_max_memory().catch(handleError)) / 1024)
+const { maxMemory, snapPoints } = await useMemorySlider()
 
 const editProfileObject = computed(() => {
   const editProfile: {
@@ -156,6 +156,8 @@ const messages = defineMessages({
       :min="512"
       :max="maxMemory"
       :step="64"
+      :snap-points="snapPoints"
+      :snap-range="512"
       unit="MB"
     />
     <h2 id="project-name" class="mt-4 mb-1 text-lg font-extrabold text-contrast block">

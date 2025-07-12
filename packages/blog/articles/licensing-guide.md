@@ -2,6 +2,7 @@
 title: Beginner's Guide to Licensing your Mods
 summary: Software licenses; the nitty-gritty legal aspect of software development. They're more important than you think.
 date: 2021-05-16
+authors: ['6plzAzU4', 'aNd6VJql']
 ---
 
 Why do you need to license your software? What are those licenses for anyway? These questions are more important than you think

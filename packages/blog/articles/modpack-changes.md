@@ -2,6 +2,7 @@
 title: 'Changes to Modrinth Modpacks'
 summary: 'CurseForge CDN links requested to be removed by the end of the month'
 date: 2022-05-28
+authors: ['MpxzqsyW', 'Dc7EYhxG']
 ---
 
 CurseForge CDN links requested to be removed by the end of the month
