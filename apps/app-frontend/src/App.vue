@@ -68,6 +68,7 @@ import { getCurrentWindow } from '@tauri-apps/api/window'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
+import { defineMessages, useVIntl } from '@vintl/vintl'
 import { computed, onMounted, onUnmounted, provide, ref, useTemplateRef, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import { create_profile_and_install_from_file } from './helpers/pack'
@@ -116,6 +117,18 @@ onUnmounted(() => {
   document.querySelector('body').removeEventListener('auxclick', handleAuxClick)
 })
 
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+  updateInstalledToastTitle: {
+    id: 'app.update.complete-toast.title',
+    defaultMessage: 'Version {version} was successfully installed!',
+  },
+  updateInstalledToastText: {
+    id: 'app.update.complete-toast.text',
+    defaultMessage: 'Click here to view the changelog.',
+  },
+})
+
 async function setupApp() {
   stateInitialized.value = true
   const {
@@ -129,6 +142,7 @@ async function setupApp() {
     toggle_sidebar,
     developer_mode,
     feature_flags,
+    pending_update_toast_for_version,
   } = await getSettings()
 
   if (default_page === 'Library') {
@@ -224,6 +238,22 @@ async function setupApp() {
     generateSkinPreviews(skins, capes)
   } catch (error) {
     console.warn('Failed to generate skin previews in app setup.', error)
+  }
+
+  if (pending_update_toast_for_version !== null) {
+    const settings = await getSettings()
+    settings.pending_update_toast_for_version = null
+    await setSettings(settings)
+
+    const version = await getVersion()
+    if (pending_update_toast_for_version === version) {
+      notifications.addNotification({
+        type: 'success',
+        title: formatMessage(messages.updateInstalledToastTitle, { version }),
+        text: formatMessage(messages.updateInstalledToastText),
+        clickAction: () => openUrl('https://modrinth.com/news/changelog?filter=app'),
+      })
+    }
   }
 }
 

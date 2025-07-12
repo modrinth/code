@@ -262,8 +262,22 @@ fn main() {
                 if matches!(event, tauri::RunEvent::Exit) {
                     let update_data = app.state::<PendingUpdateData>().inner();
                     if let Some((update, data)) = &*update_data.0.lock().unwrap() {
+                        fn set_changelog_toast(version: Option<String>) {
+                            let toast_result: theseus::Result<()> = tauri::async_runtime::block_on(async move {
+                                let mut settings = settings::get().await?;
+                                settings.pending_update_toast_for_version = version;
+                                settings::set(settings).await?;
+                                Ok(())
+                            });
+                            if let Err(e) = toast_result {
+                                tracing::warn!("Failed to set pending_update_toast: {e}")
+                            }
+                        }
+
+                        set_changelog_toast(Some(update.version.clone()));
                         if let Err(e) = update.install(data) {
                             tracing::error!("Error while updating: {e}");
+                            set_changelog_toast(None);
 
                             DialogBuilder::message()
                                 .set_level(MessageLevel::Error)

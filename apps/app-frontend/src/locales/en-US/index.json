@@ -23,6 +23,12 @@
   "app.update.changelog": {
     "message": "Changelog"
   },
+  "app.update.complete-toast.text": {
+    "message": "Click here to view the changelog."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Version {version} was successfully installed!"
+  },
   "app.update.copied-error": {
     "message": "Copied to clipboard!"
   },
