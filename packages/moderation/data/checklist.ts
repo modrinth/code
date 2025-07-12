@@ -11,6 +11,8 @@ import slug from './stages/slug'
 import summary from './stages/summary'
 import title from './stages/title'
 import versions from './stages/versions'
+import license from './stages/license'
+import undefinedProject from './stages/undefined-project'
 
 export default [
   title,
@@ -18,11 +20,13 @@ export default [
   summary,
   description,
   links,
+  license,
   categories,
   sideTypes,
   gallery,
   versions,
   copyright,
   ruleFollowing,
+  undefinedProject,
   modpackPermissionsStage,
 ] as ReadonlyArray<Stage>

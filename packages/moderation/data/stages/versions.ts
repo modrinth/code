@@ -26,7 +26,7 @@ const versions: Stage = {
       weight: 10,
       suggestedStatus: 'rejected',
       severity: 'medium',
-      shouldShow: (project) => project.project_type === 'modpack',
+      shouldShow: (project) => project.project_type !== 'modpack',
       message: async () => (await import('../messages/versions/invalid-modpacks.md?raw')).default,
     } as ButtonAction,
     {
@@ -36,7 +36,7 @@ const versions: Stage = {
       weight: 10,
       suggestedStatus: 'rejected',
       severity: 'medium',
-      shouldShow: (project) => project.project_type === 'resourcepack',
+      shouldShow: (project) => project.project_type !== 'resourcepack',
       message: async () =>
         (await import('../messages/versions/invalid-resourcepacks.md?raw')).default,
     } as ButtonAction,

@@ -3,7 +3,7 @@ import type { ButtonAction } from '../../types/actions'
 import { LibraryIcon } from '@modrinth/assets'
 
 const description: Stage = {
-  title: "Is the project's description sufficient?",
+  title: 'Is the description sufficient, accurate, and accessable?',
   id: 'description',
   icon: LibraryIcon,
   guidance_url: 'https://modrinth.com/legal/rules#general-expectations',
@@ -65,13 +65,6 @@ const description: Stage = {
       suggestedStatus: 'flagged',
       severity: 'low',
       message: async () => (await import('../messages/description/unfinished.md?raw')).default,
-      relevantExtraInput: [
-        {
-          label: 'Please specify the reason the description appears unfinished.',
-          variable: 'REASON',
-          required: true,
-        },
-      ],
     } as ButtonAction,
     {
       id: 'description_headers_as_body',

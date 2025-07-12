@@ -31,6 +31,15 @@ const copyright: Stage = {
         },
       ],
     } as ButtonAction,
+    {
+      id: 'copyright_insifficient_fork',
+      type: 'button',
+      label: 'Insufficient Fork',
+      weight: 10,
+      suggestedStatus: 'flagged',
+      severity: 'medium',
+      message: async () => (await import('../messages/copyright/insufficient_fork.md?raw')).default,
+    },
   ],
 }
 

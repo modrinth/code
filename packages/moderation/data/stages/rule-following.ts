@@ -6,8 +6,9 @@ const ruleFollowing: Stage = {
   title: 'Does this project break our content rules?',
   id: 'rule-following',
   icon: ListBulletedIcon,
-  guidance_url: 'https://modrinth.com/legal/rules',
-  navigate: '/',
+  guidance_url:
+    'https://www.notion.so/Creator-Communication-Guide-1b65ee711bf080ec9337e3ccdded146c',
+  navigate: '/moderation',
   actions: [
     {
       id: 'rule_breaking_yes',

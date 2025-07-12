@@ -4,6 +4,8 @@ import { AlignLeftIcon } from '@modrinth/assets'
 
 const summary: Stage = {
   title: "Is the project's summary sufficient?",
+  // There is no project summary placeholder yet.
+  text: async () => '**Summary:** ```%PROJECT_SUMMARY%```',
   id: 'summary',
   icon: AlignLeftIcon,
   guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',

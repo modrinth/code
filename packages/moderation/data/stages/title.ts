@@ -3,7 +3,7 @@ import type { Stage } from '../../types/stage'
 
 const titleStage: Stage = {
   title: 'Is this title free of useless information?',
-  text: async () => '**Title:** `%PROJECT_TITLE%`',
+  text: async () => '**Title:** %PROJECT_TITLE%',
   id: 'title',
   icon: BookOpenIcon,
   guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
@@ -34,6 +34,42 @@ const titleStage: Stage = {
       suggestedStatus: 'flagged',
       severity: 'medium',
       message: async () => (await import('../messages/title/similarities.md?raw')).default,
+      enablesActions: [
+        {
+          id: 'title_similarities_select_modpack',
+          type: 'multi-select-chips',
+          label: 'Similarities additional info',
+          shouldShow: (project) => project.project_type === 'modpack',
+          options: [
+            {
+              label: 'Modpack named after mod',
+              weight: 100,
+              message: async () =>
+                (await import('../messages/title/similarities-modpack.md?raw')).default,
+            },
+            {
+              label: 'Forked project',
+              weight: 100,
+              message: async () =>
+                (await import('../messages/title/similarities-fork.md?raw')).default,
+            },
+          ],
+        },
+        {
+          id: 'title_similarities_select_not_modpack',
+          type: 'multi-select-chips',
+          label: 'Similarities additional info',
+          shouldShow: (project) => project.project_type !== 'modpack',
+          options: [
+            {
+              label: 'Forked project',
+              weight: 100,
+              message: async () =>
+                (await import('../messages/title/similarities-fork.md?raw')).default,
+            },
+          ],
+        },
+      ],
     },
   ],
 }
