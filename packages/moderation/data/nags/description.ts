@@ -122,7 +122,7 @@ export const descriptionNags: Nag[] = [
   {
     id: 'minecraft-title-clause',
     title: 'Title contains "Minecraft"',
-    description: (context: NagContext) =>
+    description: () =>
       `Please remove "Minecraft" from your title. You cannot use "Minecraft" in your title for legal reasons.`,
     status: 'required',
     shouldShow: (context: NagContext) => {
@@ -138,7 +138,7 @@ export const descriptionNags: Nag[] = [
   {
     id: 'title-contains-technical-info',
     title: 'Title contains loader or version info',
-    description: (context: NagContext) => {
+    description: () => {
       return `Removing these helps keep titles clean and makes your project easier to find. Version and loader information is automatically displayed alongside your project.`
     },
     status: 'warning',
@@ -147,7 +147,7 @@ export const descriptionNags: Nag[] = [
       if (!title) return false
 
       const loaderNames =
-        context.tags.loaders?.map((loader: any) => loader.name?.toLowerCase()) || []
+        context.tags.loaders?.map((loader: { name: string }) => loader.name?.toLowerCase()) || []
       const hasLoader = loaderNames.some((loader) => loader && title.includes(loader.toLowerCase()))
       const versionPatterns = [/\b1\.\d+(\.\d+)?\b/]
       const hasVersionPattern = versionPatterns.some((pattern) => pattern.test(title))
@@ -163,7 +163,7 @@ export const descriptionNags: Nag[] = [
   {
     id: 'summary-same-as-title',
     title: 'Summary is project name',
-    description: (context: NagContext) =>
+    description: () =>
       `Your summary is the same as your project name. Please change it. It's recommended to have a unique summary to provide more context about your project.`,
     status: 'required',
     shouldShow: (context: NagContext) => {

@@ -1,9 +1,17 @@
+import type { Project } from '@modrinth/utils'
 import type { Nag, NagContext } from '../../types/nags'
 
-function getCategories(project: any, tags: any) {
+function getCategories(
+  project: Project & { actualProjectType: string },
+  tags: {
+    categories?: {
+      project_type: string
+    }[]
+  },
+) {
   return (
     tags.categories?.filter(
-      (category: any) => category.project_type === project.actualProjectType,
+      (category: { project_type: string }) => category.project_type === project.actualProjectType,
     ) ?? []
   )
 }
@@ -57,14 +65,20 @@ export const tagsNags: Nag[] = [
     id: 'all-tags-selected',
     title: 'All tags selected',
     description: (context: NagContext) => {
-      const categoriesForProjectType = getCategories(context.project, context.tags)
+      const categoriesForProjectType = getCategories(
+        context.project as Project & { actualProjectType: string },
+        context.tags,
+      )
       console.log('categoriesForProjectType', categoriesForProjectType)
       const totalAvailableTags = categoriesForProjectType.length
       return `You've selected all ${totalAvailableTags} available tags. This defeats the purpose of tags, which are meant to help users find relevant projects. Please select only the tags that truly apply to your project.`
     },
     status: 'required',
     shouldShow: (context: NagContext) => {
-      const categoriesForProjectType = getCategories(context.project, context.tags)
+      const categoriesForProjectType = getCategories(
+        context.project as Project & { actualProjectType: string },
+        context.tags,
+      )
       const totalSelectedTags =
         context.project.categories.length + (context.project.additional_categories?.length || 0)
       return totalSelectedTags === categoriesForProjectType.length

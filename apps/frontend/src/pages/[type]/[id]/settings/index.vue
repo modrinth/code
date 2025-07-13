@@ -255,8 +255,8 @@ import {
 } from "@modrinth/assets";
 import { Multiselect } from "vue-multiselect";
 import { ConfirmModal, Avatar } from "@modrinth/ui";
-import FileInput from "~/components/ui/FileInput.vue";
 import { MIN_SUMMARY_CHARS } from "@modrinth/moderation";
+import FileInput from "~/components/ui/FileInput.vue";
 
 const props = defineProps({
   project: {

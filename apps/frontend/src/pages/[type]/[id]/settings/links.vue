@@ -14,8 +14,8 @@
         </label>
         <TriangleAlertIcon
           v-if="!isIssuesUrlCommon"
-          class="size-6 animate-pulse text-orange"
           v-tooltip="`You're using a link which isn't common for this link type.`"
+          class="size-6 animate-pulse text-orange"
         />
         <input
           id="project-issue-tracker"
@@ -38,8 +38,8 @@
         </label>
         <TriangleAlertIcon
           v-if="!isSourceUrlCommon"
-          class="size-6 animate-pulse text-orange"
           v-tooltip="`You're using a link which isn't common for this link type.`"
+          class="size-6 animate-pulse text-orange"
         />
         <input
           id="project-source-code"
@@ -76,8 +76,8 @@
         </label>
         <TriangleAlertIcon
           v-if="!isDiscordUrlCommon"
-          class="size-6 animate-pulse text-orange"
           v-tooltip="`You're using a link which isn't common for this link type.`"
+          class="size-6 animate-pulse text-orange"
         />
         <input
           id="project-discord-invite"
@@ -170,17 +170,17 @@ const wikiUrl = ref(props.project.wiki_url);
 const discordUrl = ref(props.project.discord_url);
 
 const isIssuesUrlCommon = computed(() => {
-  if (issuesUrl.value?.trim().length ?? 0 === 0) return true;
+  if (!issuesUrl.value || issuesUrl.value.trim().length === 0) return true;
   return isCommonUrl(issuesUrl.value, commonLinkDomains.issues);
 });
 
 const isSourceUrlCommon = computed(() => {
-  if (sourceUrl.value?.trim().length ?? 0 === 0) return true;
+  if (!sourceUrl.value || sourceUrl.value.trim().length === 0) return true;
   return isCommonUrl(sourceUrl.value, commonLinkDomains.source);
 });
 
 const isDiscordUrlCommon = computed(() => {
-  if (discordUrl.value?.trim().length ?? 0 === 0) return true;
+  if (!discordUrl.value || discordUrl.value.trim().length === 0) return true;
   return isCommonUrl(discordUrl.value, commonLinkDomains.discord);
 });
 

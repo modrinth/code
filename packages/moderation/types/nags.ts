@@ -32,8 +32,10 @@ export interface NagContext {
    * The current route in the application.
    */
   currentRoute: string
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   tags: any
   submitProject: (...any: any) => any
+  /* eslint-enable @typescript-eslint/no-explicit-any */
 }
 
 /**
