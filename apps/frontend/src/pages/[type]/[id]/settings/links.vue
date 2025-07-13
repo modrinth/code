@@ -170,17 +170,17 @@ const wikiUrl = ref(props.project.wiki_url);
 const discordUrl = ref(props.project.discord_url);
 
 const isIssuesUrlCommon = computed(() => {
-  if (issuesUrl.value.trim() === "") return true;
+  if (issuesUrl.value?.trim().length ?? 0 === 0) return true;
   return isCommonUrl(issuesUrl.value, commonLinkDomains.issues);
 });
 
 const isSourceUrlCommon = computed(() => {
-  if (sourceUrl.value.trim() === "") return true;
+  if (sourceUrl.value?.trim().length ?? 0 === 0) return true;
   return isCommonUrl(sourceUrl.value, commonLinkDomains.source);
 });
 
 const isDiscordUrlCommon = computed(() => {
-  if (discordUrl.value.trim() === "") return true;
+  if (discordUrl.value?.trim().length ?? 0 === 0) return true;
   return isCommonUrl(discordUrl.value, commonLinkDomains.discord);
 });
 

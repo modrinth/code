@@ -5,6 +5,25 @@ export const commonLinkDomains = {
   source: ['github.com', 'gitlab.com', 'bitbucket.org', 'codeberg.org', 'git.sr.ht'],
   issues: ['github.com', 'gitlab.com', 'bitbucket.org', 'codeberg.org'],
   discord: ['discord.gg', 'discord.com'],
+  licenseBlocklist: [
+    'youtube.com',
+    'youtu.be',
+    'modrinth.com',
+    'curseforge.com',
+    'twitter.com',
+    'x.com',
+    'discord.gg',
+    'discord.com',
+    'instagram.com',
+    'facebook.com',
+    'tiktok.com',
+    'reddit.com',
+    'twitch.tv',
+    'patreon.com',
+    'ko-fi.com',
+    'paypal.com',
+    'buymeacoffee.com',
+  ],
 }
 
 export function isCommonUrl(url: string | undefined, commonDomains: string[]): boolean {
@@ -15,6 +34,16 @@ export function isCommonUrl(url: string | undefined, commonDomains: string[]): b
     return commonDomains.some((allowed) => domain.includes(allowed))
   } catch {
     return true
+  }
+}
+
+export function isUncommonLicenseUrl(url: string | undefined, domains: string[]): boolean {
+  if (!url) return false
+  try {
+    const domain = new URL(url).hostname.toLowerCase()
+    return domains.some((uncommonDomain) => domain.includes(uncommonDomain))
+  } catch {
+    return false
   }
 }
 
@@ -36,6 +65,40 @@ export const linksNags: Nag[] = [
       path: 'settings/links',
       title: 'Visit links settings',
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-links',
+    },
+  },
+  {
+    id: 'invalid-license-url',
+    title: 'Invalid license URL',
+    description: (context: NagContext) => {
+      const licenseUrl = context.project.license.url
+      if (!licenseUrl) return 'License URL is invalid.'
+
+      try {
+        const domain = new URL(licenseUrl).hostname.toLowerCase()
+        return `Your license URL points to ${domain}, which is not appropriate for license information. License URLs should link to the actual license text or legal documentation, not social media, gaming platforms etc.`
+      } catch {
+        return 'Your license URL appears to be malformed. Please provide a valid URL to your license text.'
+      }
+    },
+    status: 'required',
+    shouldShow: (context: NagContext) => {
+      const licenseUrl = context.project.license.url
+      if (!licenseUrl) return false
+
+      const isBlocklisted = isUncommonLicenseUrl(licenseUrl, commonLinkDomains.licenseBlocklist)
+
+      try {
+        new URL(licenseUrl)
+        return isBlocklisted
+      } catch {
+        return true
+      }
+    },
+    link: {
+      path: 'settings',
+      title: 'Edit license',
+      shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
     },
   },
   {

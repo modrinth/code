@@ -3,6 +3,36 @@ import type { Nag, NagContext } from '../../types/nags'
 export const MIN_DESCRIPTION_CHARS = 500
 export const MIN_SUMMARY_CHARS = 125
 
+function analyzeHeaderLength(markdown: string): { hasLongHeaders: boolean; longHeaders: string[] } {
+  if (!markdown) return { hasLongHeaders: false, longHeaders: [] }
+
+  const withoutCodeBlocks = markdown.replace(/```[\s\S]*?```/g, '').replace(/`[^`]*`/g, '')
+
+  const headerRegex = /^(#{1,3})\s+(.+)$/gm
+  const headers = [...withoutCodeBlocks.matchAll(headerRegex)]
+
+  const longHeaders: string[] = []
+
+  headers.forEach((match) => {
+    const headerText = match[2].trim()
+    const sentenceEnders = /[.!?]+/g
+    const sentences = headerText.split(sentenceEnders).filter((s) => s.trim().length > 0)
+
+    const hasSentenceEnders = sentenceEnders.test(headerText)
+    const isVeryLong = headerText.length > 100
+    const hasMultipleSentences = sentences.length > 1
+
+    if (hasSentenceEnders || isVeryLong || hasMultipleSentences) {
+      longHeaders.push(headerText)
+    }
+  })
+
+  return {
+    hasLongHeaders: longHeaders.length > 0,
+    longHeaders,
+  }
+}
+
 function analyzeImageContent(markdown: string): { imageHeavy: boolean; hasEmptyAltText: boolean } {
   if (!markdown) return { imageHeavy: false, hasEmptyAltText: false }
 
@@ -54,6 +84,26 @@ export const descriptionNags: Nag[] = [
     },
   },
   {
+    id: 'long-headers',
+    title: 'Headers are too long',
+    description: (context: NagContext) => {
+      const { longHeaders } = analyzeHeaderLength(context.project.body || '')
+      const count = longHeaders.length
+
+      return `${count} header${count > 1 ? 's' : ''} in your description ${count > 1 ? 'are' : 'is'} too long. Headers should be concise and act as section titles, not full sentences.`
+    },
+    status: 'warning',
+    shouldShow: (context: NagContext) => {
+      const { hasLongHeaders } = analyzeHeaderLength(context.project.body || '')
+      return hasLongHeaders
+    },
+    link: {
+      path: 'settings/description',
+      title: 'Edit description',
+      shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-description',
+    },
+  },
+  {
     id: 'summary-too-short',
     title: 'Summary may be insufficient',
     description: (context: NagContext) =>
@@ -62,6 +112,64 @@ export const descriptionNags: Nag[] = [
     shouldShow: (context: NagContext) => {
       const summaryLength = context.project.description?.trim()?.length || 0
       return summaryLength < MIN_SUMMARY_CHARS && summaryLength !== 0
+    },
+    link: {
+      path: 'settings',
+      title: 'Edit summary',
+      shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
+    },
+  },
+  {
+    id: 'minecraft-title-clause',
+    title: 'Title contains "Minecraft"',
+    description: (context: NagContext) =>
+      `Please remove "Minecraft" from your title. You cannot use "Minecraft" in your title for legal reasons.`,
+    status: 'required',
+    shouldShow: (context: NagContext) => {
+      const title = context.project.title?.toLowerCase() || ''
+      return title.includes('minecraft') && title.length > 0
+    },
+    link: {
+      path: 'settings',
+      title: 'Edit title',
+      shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
+    },
+  },
+  {
+    id: 'title-contains-technical-info',
+    title: 'Title contains loader or version info',
+    description: (context: NagContext) => {
+      return `Removing these helps keep titles clean and makes your project easier to find. Version and loader information is automatically displayed alongside your project.`
+    },
+    status: 'warning',
+    shouldShow: (context: NagContext) => {
+      const title = context.project.title?.toLowerCase() || ''
+      if (!title) return false
+
+      const loaderNames =
+        context.tags.loaders?.map((loader: any) => loader.name?.toLowerCase()) || []
+      const hasLoader = loaderNames.some((loader) => loader && title.includes(loader.toLowerCase()))
+      const versionPatterns = [/\b1\.\d+(\.\d+)?\b/]
+      const hasVersionPattern = versionPatterns.some((pattern) => pattern.test(title))
+
+      return hasLoader || hasVersionPattern
+    },
+    link: {
+      path: 'settings',
+      title: 'Edit title',
+      shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
+    },
+  },
+  {
+    id: 'summary-same-as-title',
+    title: 'Summary is project name',
+    description: (context: NagContext) =>
+      `Your summary is the same as your project name. Please change it. It's recommended to have a unique summary to provide more context about your project.`,
+    status: 'required',
+    shouldShow: (context: NagContext) => {
+      const title = context.project.title?.trim() || ''
+      const summary = context.project.description?.trim() || ''
+      return title === summary && title.length > 0 && summary.length > 0
     },
     link: {
       path: 'settings',
