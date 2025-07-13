@@ -4,6 +4,7 @@ import { useScreenshots } from '@/composables/useScreenshots.js'
 import RenameFileModal from '@/components/ui/RenameFileModal.vue'
 import ScreenshotGrid from '@/components/ui/ScreenshotGrid.vue'
 import ScreenshotModal from '@/components/ui/ScreenshotModal.vue'
+import SearchBar from '@/components/ui/SearchBar.vue'
 
 // Use the composable with a filter for custom instances only
 const {
@@ -14,6 +15,7 @@ const {
   showModal,
   groupByInstance,
   renameModal,
+  searchQuery,
   hasPrevious,
   hasNext,
   toggleGrouping,
@@ -28,6 +30,7 @@ const {
   showInExplorer,
   showRenameModal,
   onFileRenamed,
+  clearSearch,
 } = useScreenshots({
   filterScreenshots: (allScreenshots, instances) => {
     const customInstances = instances.filter((i) => !i.linked_data)
@@ -48,13 +51,20 @@ const hasCustomInstances = computed(() => instances.value.some((i) => !i.linked_
     <div v-if="screenshots.length > 0" class="screenshots-section">
       <div class="section-header">
         <h2 class="text-xl font-semibold">Screenshots from Custom Instances</h2>
-        <button
-          class="group-toggle-btn"
-          :class="{ 'bg-bg-raised': groupByInstance }"
-          @click="toggleGrouping"
-        >
-          {{ groupByInstance ? 'Sort by Newest' : 'Group by Instance' }}
-        </button>
+        <div class="header-controls">
+          <SearchBar
+            v-model="searchQuery"
+            placeholder="Search screenshots..."
+            @clear="clearSearch"
+          />
+          <button
+            class="group-toggle-btn"
+            :class="{ 'bg-bg-raised': groupByInstance }"
+            @click="toggleGrouping"
+          >
+            {{ groupByInstance ? 'Sort by Newest' : 'Group by Instance' }}
+          </button>
+        </div>
       </div>
 
       <ScreenshotGrid
@@ -110,6 +120,14 @@ const hasCustomInstances = computed(() => instances.value.some((i) => !i.linked_
   justify-content: space-between;
   align-items: center;
   margin-bottom: var(--gap-lg);
+  gap: var(--gap-lg);
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-md);
+  flex: 1;
 }
 
 .group-toggle-btn {

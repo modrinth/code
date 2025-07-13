@@ -1,4 +1,4 @@
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { list, getAllScreenshots, showInFolder } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
 import { convertFileSrc } from '@tauri-apps/api/core'
@@ -18,13 +18,38 @@ export function useScreenshots({ filterScreenshots, defaultGrouping = false } = 
   const groupByInstance = ref(defaultGrouping)
   const collapsedInstances = ref(new Set())
   const renameModal = ref(null)
+  const searchQuery = ref('')
+  const debouncedSearchQuery = ref('')
+
+  // Debounce search query to improve performance
+  let searchTimeout = null
+  watch(searchQuery, (newQuery) => {
+    if (searchTimeout) {
+      clearTimeout(searchTimeout)
+    }
+    searchTimeout = setTimeout(() => {
+      debouncedSearchQuery.value = newQuery
+    }, 300) // 300ms debounce
+  }, { immediate: true })
 
   // Computed property to organize screenshots based on grouping preference
   const organizedScreenshots = computed(() => {
+    // Filter screenshots based on debounced search query
+    let filteredScreenshots = screenshots.value
+    if (debouncedSearchQuery.value.trim()) {
+      const query = debouncedSearchQuery.value.toLowerCase().trim()
+      filteredScreenshots = screenshots.value.filter(screenshot => {
+        return (
+          screenshot.filename.toLowerCase().includes(query) ||
+          screenshot.profile_path.toLowerCase().includes(query)
+        )
+      })
+    }
+
     if (groupByInstance.value) {
       // Group screenshots by instance
       const grouped = {}
-      screenshots.value.forEach((screenshot) => {
+      filteredScreenshots.forEach((screenshot) => {
         const instancePath = screenshot.profile_path
         if (!grouped[instancePath]) {
           grouped[instancePath] = []
@@ -40,7 +65,7 @@ export function useScreenshots({ filterScreenshots, defaultGrouping = false } = 
       return grouped
     } else {
       // Return flat array sorted by newest first
-      return [...screenshots.value].sort((a, b) => b.created - a.created)
+      return [...filteredScreenshots].sort((a, b) => b.created - a.created)
     }
   })
 
@@ -188,6 +213,15 @@ export function useScreenshots({ filterScreenshots, defaultGrouping = false } = 
     }
   }
 
+  const clearSearch = () => {
+    searchQuery.value = ''
+    debouncedSearchQuery.value = ''
+    if (searchTimeout) {
+      clearTimeout(searchTimeout)
+      searchTimeout = null
+    }
+  }
+
   const loadScreenshots = async () => {
     try {
       // Load instances and screenshots
@@ -225,6 +259,7 @@ export function useScreenshots({ filterScreenshots, defaultGrouping = false } = 
     groupByInstance,
     collapsedInstances,
     renameModal,
+    searchQuery,
 
     // Computed
     organizedScreenshots,
@@ -245,5 +280,6 @@ export function useScreenshots({ filterScreenshots, defaultGrouping = false } = 
     showRenameModal,
     onFileRenamed,
     loadScreenshots,
+    clearSearch,
   }
 }

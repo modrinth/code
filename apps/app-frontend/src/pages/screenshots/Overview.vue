@@ -13,6 +13,7 @@ const {
   showModal,
   groupByInstance,
   renameModal,
+  searchQuery,
   hasPrevious,
   hasNext,
   toggleGrouping,
@@ -27,6 +28,7 @@ const {
   showInExplorer,
   showRenameModal,
   onFileRenamed,
+  clearSearch,
 } = useScreenshots({
   filterScreenshots: (allScreenshots) =>
     allScreenshots.sort((a, b) => b.created - a.created).slice(0, 12),
