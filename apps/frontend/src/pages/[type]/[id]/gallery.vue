@@ -716,6 +716,9 @@ export default defineNuxtComponent({
 
       p {
         margin: 0 0 0.5rem 0;
+        max-width: 250px;
+        text-overflow: ellipsis;
+        overflow: hidden;
       }
     }
   }
