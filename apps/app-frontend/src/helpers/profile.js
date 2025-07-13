@@ -202,3 +202,28 @@ export async function finish_install(instance) {
     await install(instance.path, false).catch(handleError)
   }
 }
+
+// Get screenshots from a specific profile
+export async function getScreenshots(path) {
+  return await invoke('plugin:profile|profile_get_screenshots', { path })
+}
+
+// Get screenshots from all profiles
+export async function getAllScreenshots() {
+  return await invoke('plugin:profile|profile_get_all_screenshots')
+}
+
+// Open screenshots folder for a profile
+export async function openScreenshotsFolder(path) {
+  return await invoke('plugin:profile|profile_open_screenshots_folder', { path })
+}
+
+// Show file in explorer/finder
+export async function showInFolder(path) {
+  return await invoke('plugin:profile|show_in_folder', { path })
+}
+
+// Rename a file
+export async function renameFile(oldPath, newPath) {
+  return await invoke('plugin:profile|rename_file', { oldPath, newPath })
+}

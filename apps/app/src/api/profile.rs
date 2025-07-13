@@ -33,6 +33,11 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_edit_icon,
             profile_export_mrpack,
             profile_get_pack_export_candidates,
+            profile_get_screenshots,
+            profile_get_all_screenshots,
+            profile_open_screenshots_folder,
+            show_in_folder,
+            rename_file,
         ])
         .build()
 }
@@ -392,4 +397,227 @@ pub async fn profile_edit_icon(
 ) -> Result<()> {
     profile::edit_icon(path, icon_path).await?;
     Ok(())
+}
+
+// Get screenshots from a profile's screenshots folder
+// invoke('plugin:profile|profile_get_screenshots')
+#[tauri::command]
+pub async fn profile_get_screenshots(path: &str) -> Result<Vec<Screenshot>> {
+    let full_path = profile::get_full_path(path).await?;
+    let screenshots_path = full_path.join("screenshots");
+
+    let mut screenshots = Vec::new();
+
+    if screenshots_path.exists() && screenshots_path.is_dir() {
+        let mut entries = tokio::fs::read_dir(&screenshots_path).await?;
+
+        while let Some(entry) = entries.next_entry().await? {
+            let entry_path = entry.path();
+
+            if entry_path.is_file() {
+                if let Some(extension) = entry_path.extension() {
+                    let ext = extension.to_string_lossy().to_lowercase();
+                    if matches!(
+                        ext.as_str(),
+                        "png" | "jpg" | "jpeg" | "gif" | "bmp" | "webp"
+                    ) {
+                        if let Some(filename) = entry_path.file_name() {
+                            let metadata = entry.metadata().await?;
+                            let modified = metadata
+                                .modified()
+                                .unwrap_or(std::time::SystemTime::UNIX_EPOCH);
+                            let created = metadata
+                                .created()
+                                .unwrap_or(std::time::SystemTime::UNIX_EPOCH);
+
+                            screenshots.push(Screenshot {
+                                filename: filename
+                                    .to_string_lossy()
+                                    .to_string(),
+                                path: entry_path.to_string_lossy().to_string(),
+                                size: metadata.len(),
+                                modified: modified
+                                    .duration_since(
+                                        std::time::SystemTime::UNIX_EPOCH,
+                                    )
+                                    .unwrap_or_default()
+                                    .as_secs(),
+                                created: created
+                                    .duration_since(
+                                        std::time::SystemTime::UNIX_EPOCH,
+                                    )
+                                    .unwrap_or_default()
+                                    .as_secs(),
+                                profile_path: path.to_string(),
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Sort by creation time, newest first
+    screenshots.sort_by(|a, b| b.created.cmp(&a.created));
+
+    Ok(screenshots)
+}
+
+// Get screenshots from all profiles
+// invoke('plugin:profile|profile_get_all_screenshots')
+#[tauri::command]
+pub async fn profile_get_all_screenshots() -> Result<Vec<Screenshot>> {
+    let profiles = profile::list().await?;
+    let mut all_screenshots = Vec::new();
+
+    for profile in profiles {
+        match profile_get_screenshots(&profile.path).await {
+            Ok(mut screenshots) => {
+                all_screenshots.append(&mut screenshots);
+            }
+            Err(_) => {
+                // Continue if a profile fails, don't break the whole operation
+            }
+        }
+    }
+
+    // Sort all screenshots by creation time, newest first
+    all_screenshots.sort_by(|a, b| b.created.cmp(&a.created));
+
+    Ok(all_screenshots)
+}
+
+// Opens the screenshots folder of a profile
+// invoke('plugin:profile|profile_open_screenshots_folder', path)
+#[tauri::command]
+pub async fn profile_open_screenshots_folder(path: &str) -> Result<()> {
+    let full_path = profile::get_full_path(path).await?;
+    let screenshots_path = full_path.join("screenshots");
+
+    // Create the screenshots folder if it doesn't exist
+    if !screenshots_path.exists() {
+        tokio::fs::create_dir_all(&screenshots_path).await?;
+    }
+
+    // Open the folder using the system's default file manager
+    #[cfg(target_os = "windows")]
+    {
+        std::process::Command::new("explorer")
+            .arg(&screenshots_path)
+            .spawn()?;
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        std::process::Command::new("open")
+            .arg(&screenshots_path)
+            .spawn()?;
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        std::process::Command::new("xdg-open")
+            .arg(&screenshots_path)
+            .spawn()?;
+    }
+
+    Ok(())
+}
+
+// Shows a specific file in the system's file explorer
+// invoke('show_in_folder', { path: '/path/to/file.png' })
+#[tauri::command]
+pub async fn show_in_folder(path: &str) -> Result<()> {
+    let file_path = std::path::Path::new(path);
+
+    if !file_path.exists() {
+        return Err(theseus::Error::from(theseus::ErrorKind::FSError(
+            "File does not exist".to_string(),
+        ))
+        .into());
+    }
+
+    // Open the file in the system's default file manager and select it
+    #[cfg(target_os = "windows")]
+    {
+        std::process::Command::new("explorer")
+            .args(["/select,", path])
+            .spawn()?;
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        std::process::Command::new("open")
+            .args(["-R", path])
+            .spawn()?;
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        // For Linux, we'll open the parent directory since most file managers
+        // don't support selecting a specific file
+        if let Some(parent_dir) = file_path.parent() {
+            std::process::Command::new("xdg-open")
+                .arg(parent_dir)
+                .spawn()?;
+        }
+    }
+
+    Ok(())
+}
+
+// Rename a file from old path to new path
+// invoke('rename_file', { oldPath: '/path/to/old.png', newPath: '/path/to/new.png' })
+#[tauri::command]
+pub async fn rename_file(old_path: &str, new_path: &str) -> Result<()> {
+    let old_file_path = std::path::Path::new(old_path);
+    let new_file_path = std::path::Path::new(new_path);
+
+    // Check if the old file exists
+    if !old_file_path.exists() {
+        return Err(theseus::Error::from(theseus::ErrorKind::FSError(
+            "Source file does not exist".to_string(),
+        ))
+        .into());
+    }
+
+    // Check if the new file already exists
+    if new_file_path.exists() {
+        return Err(theseus::Error::from(theseus::ErrorKind::FSError(
+            "Target file already exists".to_string(),
+        ))
+        .into());
+    }
+
+    // Ensure the parent directory exists for the new path
+    if let Some(parent_dir) = new_file_path.parent() {
+        if !parent_dir.exists() {
+            std::fs::create_dir_all(parent_dir).map_err(|e| {
+                theseus::Error::from(theseus::ErrorKind::FSError(format!(
+                    "Failed to create parent directory: {}",
+                    e
+                )))
+            })?;
+        }
+    }
+
+    // Rename/move the file
+    std::fs::rename(old_path, new_path).map_err(|e| {
+        theseus::Error::from(theseus::ErrorKind::FSError(format!(
+            "Failed to rename file: {}",
+            e
+        )))
+    })?;
+
+    Ok(())
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Screenshot {
+    pub filename: String,
+    pub path: String,
+    pub size: u64,
+    pub modified: u64,
+    pub created: u64,
+    pub profile_path: String,
 }
