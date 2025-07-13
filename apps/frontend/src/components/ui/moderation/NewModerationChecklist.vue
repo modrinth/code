@@ -869,9 +869,23 @@ async function processAction(
   stageIndex: number,
   messageParts: MessagePart[],
 ) {
+  const allValidActionIds: string[] = [];
+  checklist.forEach((stage, stageIdx) => {
+    stage.actions.forEach((stageAction, actionIdx) => {
+      allValidActionIds.push(getActionIdForStage(stageAction, stageIdx, actionIdx));
+      if (stageAction.enablesActions) {
+        stageAction.enablesActions.forEach((enabledAction, enabledIdx) => {
+          allValidActionIds.push(
+            getActionIdForStage(enabledAction, stageIdx, actionIdx, enabledIdx),
+          );
+        });
+      }
+    });
+  });
+
   if (action.type === "button" || action.type === "toggle") {
     const buttonAction = action as ButtonAction | ToggleAction;
-    const message = await getActionMessage(buttonAction, selectedActionIds);
+    const message = await getActionMessage(buttonAction, selectedActionIds, allValidActionIds);
     if (message) {
       messageParts.push({
         weight: buttonAction.weight,
@@ -885,6 +899,7 @@ async function processAction(
     const matchingVariant = findMatchingVariant(
       conditionalAction.messageVariants,
       selectedActionIds,
+      allValidActionIds,
     );
     if (matchingVariant) {
       const message = (await matchingVariant.message()) as string;
