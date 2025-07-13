@@ -205,7 +205,6 @@ const categoryLists = computed(() => {
   return lists;
 });
 
-// Warning computeds based on the nags
 const tooManyTagsWarning = computed(() => {
   const tagCount = selectedTags.value.length;
   if (tagCount > 5) {
