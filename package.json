@@ -37,5 +37,5 @@
       "readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
     }
   },
-  "prettier": "@modrinth/tooling-config/prettier"
+  "prettier": "@modrinth/tooling-config/prettier.config.js"
 }

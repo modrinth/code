@@ -11,8 +11,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "lib": ["ESNext", "DOM"],
-    "allowSyntheticDefaultImports": true,
-    "noImplicitAny": false
+    "lib": ["esnext", "dom"],
+    "allowSyntheticDefaultImports": true
   }
 }

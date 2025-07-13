@@ -5,7 +5,9 @@
   "description": "Unified tooling configuration for Modrinth monorepo",
   "main": "./index.js",
   "exports": {
-    "./*": "./*"
+    "./eslint/*": "./eslint/*",
+    "./typescript/*": "./typescript/*",
+    "./prettier.config.js": "./prettier.config.js"
   },
   "files": [
     "eslint/",
