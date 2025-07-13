@@ -1,16 +1,27 @@
 import type { Nag, NagContext } from '../../types/nags'
 
+function getCategories(project: any, tags: any) {
+  return (
+    tags.categories?.filter(
+      (category: any) => category.project_type === project.actualProjectType,
+    ) ?? []
+  )
+}
+
 export const tagsNags: Nag[] = [
   {
     id: 'too-many-tags',
     title: 'Too many tags selected',
     description: (context: NagContext) => {
-      const tagCount = context.project.categories.length
-      return `You've selected ${tagCount} tags. Consider reducing to 3 or fewer to keep your project focused and easier to discover.`
+      const tagCount =
+        context.project.categories.length + context.project.additional_categories?.length || 0
+      return `You've selected ${tagCount} tags. Consider reducing to 5 or fewer to keep your project focused and easier to discover.`
     },
     status: 'warning',
     shouldShow: (context: NagContext) => {
-      return context.project.categories.length > 3
+      const tagCount =
+        context.project.categories.length + context.project.additional_categories?.length || 0
+      return tagCount > 5
     },
     link: {
       path: 'settings/tags',
@@ -46,14 +57,17 @@ export const tagsNags: Nag[] = [
     id: 'all-tags-selected',
     title: 'All tags selected',
     description: (context: NagContext) => {
-      const totalAvailableTags = context.tags.categories?.length || 0
+      const categoriesForProjectType = getCategories(context.project, context.tags)
+      console.log('categoriesForProjectType', categoriesForProjectType)
+      const totalAvailableTags = categoriesForProjectType.length
       return `You've selected all ${totalAvailableTags} available tags. This defeats the purpose of tags, which are meant to help users find relevant projects. Please select only the tags that truly apply to your project.`
     },
     status: 'required',
     shouldShow: (context: NagContext) => {
-      const totalAvailableTags = context.tags.categories?.length || 0
-      const selectedTags = context.project.categories.length
-      return totalAvailableTags > 0 && selectedTags === totalAvailableTags
+      const categoriesForProjectType = getCategories(context.project, context.tags)
+      const totalSelectedTags =
+        context.project.categories.length + (context.project.additional_categories?.length || 0)
+      return totalSelectedTags === categoriesForProjectType.length
     },
     link: {
       path: 'settings/tags',
