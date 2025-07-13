@@ -29,6 +29,6 @@ export default [
   copyright,
   ruleFollowing,
   undefinedProject,
-  statusAlerts,
   modpackPermissionsStage,
+  statusAlerts,
 ] as ReadonlyArray<Stage>
