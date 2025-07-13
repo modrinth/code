@@ -72,7 +72,7 @@ onUnmounted(() => {
   padding: var(--gap-sm);
   border-radius: var(--radius-sm);
   margin-bottom: var(--gap-md);
-  
+
   p {
     margin: 0;
     font-size: 0.875rem;
@@ -85,7 +85,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   height: 200px;
-  
+
   p {
     margin: 0;
     color: var(--color-text-secondary);
@@ -144,7 +144,9 @@ onUnmounted(() => {
   border-radius: var(--radius-md);
   overflow: hidden;
   background: var(--color-bg-secondary);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
     transform: translateY(-2px);

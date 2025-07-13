@@ -594,8 +594,7 @@ pub async fn rename_file(old_path: &str, new_path: &str) -> Result<()> {
         if !parent_dir.exists() {
             std::fs::create_dir_all(parent_dir).map_err(|e| {
                 theseus::Error::from(theseus::ErrorKind::FSError(format!(
-                    "Failed to create parent directory: {}",
-                    e
+                    "Failed to create parent directory: {e}"
                 )))
             })?;
         }
@@ -604,8 +603,7 @@ pub async fn rename_file(old_path: &str, new_path: &str) -> Result<()> {
     // Rename/move the file
     std::fs::rename(old_path, new_path).map_err(|e| {
         theseus::Error::from(theseus::ErrorKind::FSError(format!(
-            "Failed to rename file: {}",
-            e
+            "Failed to rename file: {e}"
         )))
     })?;
 

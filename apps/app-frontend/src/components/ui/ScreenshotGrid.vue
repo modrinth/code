@@ -1,25 +1,29 @@
 <template>
   <!-- Grouped view -->
   <div v-if="groupByInstance && typeof organizedScreenshots === 'object'">
-    <div v-for="(screenshots, instancePath) in organizedScreenshots" :key="instancePath" class="instance-group">
+    <div
+      v-for="(screenshots, instancePath) in organizedScreenshots"
+      :key="instancePath"
+      class="instance-group"
+    >
       <div class="instance-header" @click="toggleInstanceCollapse(instancePath)">
         <h3 class="instance-title">{{ instancePath }}</h3>
         <div class="collapse-icon" :class="{ collapsed: isInstanceCollapsed(instancePath) }">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M8 12l-4-4h8l-4 4z"/>
+            <path d="M8 12l-4-4h8l-4 4z" />
           </svg>
         </div>
       </div>
       <div v-if="!isInstanceCollapsed(instancePath)" class="screenshots-grid instance-screenshots">
-        <div 
-          v-for="screenshot in screenshots" 
-          :key="screenshot.path" 
+        <div
+          v-for="screenshot in screenshots"
+          :key="screenshot.path"
           class="screenshot-card"
           @click="openModal(screenshot)"
         >
           <div class="screenshot-image">
-            <img 
-              :src="getScreenshotUrl(screenshot.path)" 
+            <img
+              :src="getScreenshotUrl(screenshot.path)"
               :alt="screenshot.filename"
               loading="lazy"
             />
@@ -33,25 +37,23 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Flat view (newest first) -->
   <div v-else class="screenshots-grid">
-    <div 
-      v-for="screenshot in organizedScreenshots" 
-      :key="screenshot.path" 
+    <div
+      v-for="screenshot in organizedScreenshots"
+      :key="screenshot.path"
       class="screenshot-card"
       @click="openModal(screenshot)"
     >
       <div class="screenshot-image">
-        <img 
-          :src="getScreenshotUrl(screenshot.path)" 
-          :alt="screenshot.filename"
-          loading="lazy"
-        />
+        <img :src="getScreenshotUrl(screenshot.path)" :alt="screenshot.filename" loading="lazy" />
       </div>
       <div class="screenshot-info bg-bg-raised">
         <p class="screenshot-filename">{{ screenshot.filename }}</p>
-        <p v-if="showInstancePath && !groupByInstance" class="screenshot-instance">{{ screenshot.profile_path }}</p>
+        <p v-if="showInstancePath && !groupByInstance" class="screenshot-instance">
+          {{ screenshot.profile_path }}
+        </p>
         <p class="screenshot-date">{{ formatDate(screenshot.created) }}</p>
       </div>
     </div>
@@ -62,36 +64,36 @@
 defineProps({
   organizedScreenshots: {
     type: [Object, Array],
-    required: true
+    required: true,
   },
   groupByInstance: {
     type: Boolean,
-    required: true
+    required: true,
   },
   showInstancePath: {
     type: Boolean,
-    default: true
+    default: true,
   },
   toggleInstanceCollapse: {
     type: Function,
-    required: true
+    required: true,
   },
   isInstanceCollapsed: {
     type: Function,
-    required: true
+    required: true,
   },
   openModal: {
     type: Function,
-    required: true
+    required: true,
   },
   getScreenshotUrl: {
     type: Function,
-    required: true
+    required: true,
   },
   formatDate: {
     type: Function,
-    required: true
-  }
+    required: true,
+  },
 })
 </script>
 
@@ -163,7 +165,9 @@ defineProps({
   border-radius: var(--radius-md);
   overflow: hidden;
   background: var(--color-bg-secondary);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   cursor: pointer;
   will-change: transform;
   contain: layout style;

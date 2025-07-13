@@ -3,9 +3,9 @@
     <SearchIcon />
     <input
       :value="modelValue"
-      @input="$emit('update:modelValue', $event.target.value)"
       type="text"
       :placeholder="placeholder"
+      @input="$emit('update:modelValue', $event.target.value)"
     />
     <Button v-if="modelValue" class="r-btn" @click="$emit('clear')">
       <XIcon />

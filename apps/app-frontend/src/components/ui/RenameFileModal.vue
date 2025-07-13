@@ -73,7 +73,7 @@ const isScreenshot = ref(true)
 const emit = defineEmits(['renamed', 'cancelled'])
 
 // Extract just the filename without extension
-const filenameWithoutExt = computed(() => {
+const __filenameWithoutExt = computed(() => {
   const filename = newFilename.value || originalFilename.value
   const lastDotIndex = filename.lastIndexOf('.')
   return lastDotIndex > 0 ? filename.substring(0, lastDotIndex) : filename

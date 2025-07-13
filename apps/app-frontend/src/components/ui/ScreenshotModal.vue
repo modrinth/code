@@ -6,8 +6,8 @@
     <button
       v-if="hasPrevious"
       class="nav-btn nav-prev"
-      @click.stop="goToPrevious"
       title="Previous image"
+      @click.stop="goToPrevious"
     >
       <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
         <path
@@ -17,7 +17,7 @@
       </svg>
     </button>
 
-    <button v-if="hasNext" class="nav-btn nav-next" @click.stop="goToNext" title="Next image">
+    <button v-if="hasNext" class="nav-btn nav-next" title="Next image" @click.stop="goToNext">
       <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
         <path
           fill-rule="evenodd"
@@ -39,8 +39,8 @@
         <div class="modal-actions">
           <button
             class="action-btn"
-            @click="showInExplorer(selectedScreenshot.path)"
             title="Show in File Explorer"
+            @click="showInExplorer(selectedScreenshot.path)"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
               <path
@@ -54,8 +54,8 @@
           </button>
           <button
             class="action-btn"
-            @click="showRenameModal(selectedScreenshot)"
             title="Rename File"
+            @click="showRenameModal(selectedScreenshot)"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
               <path

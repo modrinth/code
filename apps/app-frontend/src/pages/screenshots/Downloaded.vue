@@ -14,7 +14,7 @@ const {
   showModal,
   groupByInstance,
   renameModal,
-  searchQuery,
+  __searchQuery,
   hasPrevious,
   hasNext,
   toggleGrouping,
@@ -29,7 +29,7 @@ const {
   showInExplorer,
   showRenameModal,
   onFileRenamed,
-  clearSearch,
+  __clearSearch,
 } = useScreenshots({
   filterScreenshots: (allScreenshots, instances) => {
     const downloadedInstances = instances.filter((i) => i.linked_data)

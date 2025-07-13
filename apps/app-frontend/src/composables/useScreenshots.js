@@ -23,14 +23,18 @@ export function useScreenshots({ filterScreenshots, defaultGrouping = false } = 
 
   // Debounce search query to improve performance
   let searchTimeout = null
-  watch(searchQuery, (newQuery) => {
-    if (searchTimeout) {
-      clearTimeout(searchTimeout)
-    }
-    searchTimeout = setTimeout(() => {
-      debouncedSearchQuery.value = newQuery
-    }, 300) // 300ms debounce
-  }, { immediate: true })
+  watch(
+    searchQuery,
+    (newQuery) => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout)
+      }
+      searchTimeout = setTimeout(() => {
+        debouncedSearchQuery.value = newQuery
+      }, 300) // 300ms debounce
+    },
+    { immediate: true },
+  )
 
   // Computed property to organize screenshots based on grouping preference
   const organizedScreenshots = computed(() => {
@@ -38,7 +42,7 @@ export function useScreenshots({ filterScreenshots, defaultGrouping = false } = 
     let filteredScreenshots = screenshots.value
     if (debouncedSearchQuery.value.trim()) {
       const query = debouncedSearchQuery.value.toLowerCase().trim()
-      filteredScreenshots = screenshots.value.filter(screenshot => {
+      filteredScreenshots = screenshots.value.filter((screenshot) => {
         return (
           screenshot.filename.toLowerCase().includes(query) ||
           screenshot.profile_path.toLowerCase().includes(query)
