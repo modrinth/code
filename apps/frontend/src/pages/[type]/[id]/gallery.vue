@@ -705,9 +705,9 @@ export default defineNuxtComponent({
   }
 
   .gallery-body {
-    flex-grow: 1;
     width: calc(100% - 2 * var(--spacing-card-md));
     padding: var(--spacing-card-sm) var(--spacing-card-md);
+    overflow-wrap: anywhere;
 
     .gallery-info {
       h2 {
@@ -716,8 +716,6 @@ export default defineNuxtComponent({
 
       p {
         margin: 0 0 0.5rem 0;
-        max-width: 250px;
-        overflow-wrap: break-word;
       }
     }
   }
