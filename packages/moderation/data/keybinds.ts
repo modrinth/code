@@ -23,7 +23,7 @@ const keybinds: KeybindListener[] = [
   },
   {
     id: 'toggle-collapse',
-    keybind: 'Ctrl+Shift+C',
+    keybind: 'Shift+C',
     description: 'Toggle collapse/expand',
     action: (ctx) => ctx.actions.tryToggleCollapse(),
   },
