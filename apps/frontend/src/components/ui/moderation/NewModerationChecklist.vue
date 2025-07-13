@@ -119,7 +119,7 @@
                       :max-visible-options="3"
                       render-up
                       :name="`dropdown-${getActionId(action)}`"
-                      :options="action.options"
+                      :options="getVisibleDropdownOptions(action)"
                       :model-value="getDropdownValue(action)"
                       :placeholder="'Select an option'"
                       :disabled="false"
@@ -140,7 +140,7 @@
                   <div class="mb-2 font-semibold">{{ action.label }}</div>
                   <div class="flex flex-wrap gap-2">
                     <ButtonStyled
-                      v-for="(option, optIndex) in action.options"
+                      v-for="(option, optIndex) in getVisibleMultiSelectOptions(action)"
                       :key="`${getActionId(action)}-chip-${optIndex}`"
                       :color="isChipSelected(action, optIndex) ? 'brand' : 'standard'"
                       @click="toggleChip(action, optIndex)"
@@ -561,14 +561,20 @@ function handleKeybinds(event: KeyboardEvent) {
         },
         trySelectDropdownOption: (actionIndex: number, optionIndex: number) => {
           const action = visibleActions.value[actionIndex] as DropdownAction;
-          if (action && action.type === "dropdown" && action.options[optionIndex]) {
-            selectDropdownOption(action, action.options[optionIndex]);
+          if (action && action.type === "dropdown") {
+            const visibleOptions = getVisibleDropdownOptions(action);
+            if (optionIndex < visibleOptions.length) {
+              selectDropdownOption(action, visibleOptions[optionIndex]);
+            }
           }
         },
         tryToggleChip: (actionIndex: number, chipIndex: number) => {
           const action = visibleActions.value[actionIndex] as MultiSelectChipsAction;
           if (action && action.type === "multi-select-chips") {
-            toggleChip(action, chipIndex);
+            const visibleOptions = getVisibleMultiSelectOptions(action);
+            if (chipIndex < visibleOptions.length) {
+              toggleChip(action, chipIndex);
+            }
           }
         },
 
@@ -735,13 +741,17 @@ const multiSelectActions = computed(() =>
 
 function getDropdownValue(action: DropdownAction) {
   const actionId = getActionId(action);
+  const visibleOptions = getVisibleDropdownOptions(action);
   const currentValue = actionStates.value[actionId]?.value ?? action.defaultOption ?? 0;
 
-  if (action.options && action.options[currentValue]) {
-    return action.options[currentValue];
+  const allOptions = action.options;
+  const storedOption = allOptions[currentValue];
+
+  if (storedOption && visibleOptions.includes(storedOption)) {
+    return storedOption;
   }
 
-  return action.options?.[0] || null;
+  return visibleOptions[0] || null;
 }
 
 function isActionSelected(action: Action): boolean {
@@ -777,20 +787,31 @@ function selectDropdownOption(action: DropdownAction, selected: any) {
 function isChipSelected(action: MultiSelectChipsAction, optionIndex: number): boolean {
   const actionId = getActionId(action);
   const selectedSet = actionStates.value[actionId]?.value as Set<number> | undefined;
-  return selectedSet?.has(optionIndex) || false;
+
+  const visibleOptions = getVisibleMultiSelectOptions(action);
+  const visibleOption = visibleOptions[optionIndex];
+  const originalIndex = action.options.findIndex((opt) => opt === visibleOption);
+
+  return selectedSet?.has(originalIndex) || false;
 }
 
 function toggleChip(action: MultiSelectChipsAction, optionIndex: number) {
   const actionId = getActionId(action);
   const state = actionStates.value[actionId];
   if (state && state.value instanceof Set) {
-    if (state.value.has(optionIndex)) {
-      state.value.delete(optionIndex);
-    } else {
-      state.value.add(optionIndex);
+    const visibleOptions = getVisibleMultiSelectOptions(action);
+    const visibleOption = visibleOptions[optionIndex];
+    const originalIndex = action.options.findIndex((opt) => opt === visibleOption);
+
+    if (originalIndex !== -1) {
+      if (state.value.has(originalIndex)) {
+        state.value.delete(originalIndex);
+      } else {
+        state.value.add(originalIndex);
+      }
+      state.selected = state.value.size > 0;
+      persistState();
     }
-    state.selected = state.value.size > 0;
-    persistState();
   }
 }
 
@@ -959,6 +980,24 @@ function shouldShowAction(action: Action): boolean {
   }
 
   return true;
+}
+
+function getVisibleDropdownOptions(action: DropdownAction) {
+  return action.options.filter((option) => {
+    if (typeof option.shouldShow === "function") {
+      return option.shouldShow(props.project);
+    }
+    return true;
+  });
+}
+
+function getVisibleMultiSelectOptions(action: MultiSelectChipsAction) {
+  return action.options.filter((option) => {
+    if (typeof option.shouldShow === "function") {
+      return option.shouldShow(props.project);
+    }
+    return true;
+  });
 }
 
 function shouldShowStageIndex(stageIndex: number): boolean {
