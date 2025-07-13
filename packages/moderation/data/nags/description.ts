@@ -1,6 +1,7 @@
 import type { Nag, NagContext } from '../../types/nags'
 
 export const MIN_DESCRIPTION_CHARS = 500
+export const MAX_HEADER_LENGTH = 100
 export const MIN_SUMMARY_CHARS = 125
 
 function analyzeHeaderLength(markdown: string): { hasLongHeaders: boolean; longHeaders: string[] } {
@@ -19,7 +20,7 @@ function analyzeHeaderLength(markdown: string): { hasLongHeaders: boolean; longH
     const sentences = headerText.split(sentenceEnders).filter((s) => s.trim().length > 0)
 
     const hasSentenceEnders = sentenceEnders.test(headerText)
-    const isVeryLong = headerText.length > 100
+    const isVeryLong = headerText.length > MAX_HEADER_LENGTH
     const hasMultipleSentences = sentences.length > 1
 
     if (hasSentenceEnders || isVeryLong || hasMultipleSentences) {

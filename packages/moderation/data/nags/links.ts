@@ -30,10 +30,9 @@ export function isCommonUrl(url: string | undefined, commonDomains: string[]): b
   if (!url) return false
   try {
     const domain = new URL(url).hostname.toLowerCase()
-    console.log(domain)
     return commonDomains.some((allowed) => domain.includes(allowed))
   } catch {
-    return true
+    return false
   }
 }
 

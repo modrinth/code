@@ -69,7 +69,6 @@ export const tagsNags: Nag[] = [
         context.project as Project & { actualProjectType: string },
         context.tags,
       )
-      console.log('categoriesForProjectType', categoriesForProjectType)
       const totalAvailableTags = categoriesForProjectType.length
       return `You've selected all ${totalAvailableTags} available tags. This defeats the purpose of tags, which are meant to help users find relevant projects. Please select only the tags that truly apply to your project.`
     },
