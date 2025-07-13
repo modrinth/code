@@ -1,5 +1,4 @@
-use hyper_tls::{HttpsConnector, native_tls};
-use hyper_util::client::legacy::connect::HttpConnector;
+use hyper_rustls::HttpsConnectorBuilder;
 use hyper_util::rt::TokioExecutor;
 
 mod fetch;
@@ -15,13 +14,11 @@ pub async fn init_client_with_database(
     database: &str,
 ) -> clickhouse::error::Result<clickhouse::Client> {
     let client = {
-        let mut http_connector = HttpConnector::new();
-        http_connector.enforce_http(false); // allow https URLs
-
-        let tls_connector =
-            native_tls::TlsConnector::builder().build().unwrap().into();
-        let https_connector =
-            HttpsConnector::from((http_connector, tls_connector));
+        let https_connector = HttpsConnectorBuilder::new()
+            .with_native_roots()?
+            .https_or_http()
+            .enable_all_versions()
+            .build();
         let hyper_client =
             hyper_util::client::legacy::Client::builder(TokioExecutor::new())
                 .build(https_connector);

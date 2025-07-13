@@ -153,6 +153,13 @@ export interface DropdownActionOption extends WeightedMessage {
    * The label of the option, which is displayed to the moderator.
    */
   label: string
+
+  /**
+   * A function that determines whether this option should be shown for a given project.
+   *
+   * By default, it returns `true`, meaning the option is always shown.
+   */
+  shouldShow?: (project: Project) => boolean
 }
 
 export interface DropdownAction extends BaseAction {
@@ -179,6 +186,13 @@ export interface MultiSelectChipsOption extends WeightedMessage {
    * The label of the chip, which is displayed to the moderator.
    */
   label: string
+
+  /**
+   * A function that determines whether this option should be shown for a given project.
+   *
+   * By default, it returns `true`, meaning the option is always shown.
+   */
+  shouldShow?: (project: Project) => boolean
 }
 
 export interface MultiSelectChipsAction extends BaseAction {

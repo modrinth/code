@@ -125,13 +125,19 @@ export function processMessage(
 export function findMatchingVariant(
   variants: ConditionalMessage[],
   selectedActionIds: string[],
+  allValidActionIds?: string[],
 ): ConditionalMessage | null {
   for (const variant of variants) {
     const conditions = variant.conditions
 
     const meetsRequired =
       !conditions.requiredActions ||
-      conditions.requiredActions.every((id) => selectedActionIds.includes(id))
+      conditions.requiredActions.every((id) => {
+        if (allValidActionIds && !allValidActionIds.includes(id)) {
+          return false
+        }
+        return selectedActionIds.includes(id)
+      })
 
     const meetsExcluded =
       !conditions.excludedActions ||
@@ -148,9 +154,14 @@ export function findMatchingVariant(
 export async function getActionMessage(
   action: ButtonAction | ToggleAction,
   selectedActionIds: string[],
+  allValidActionIds?: string[],
 ): Promise<string> {
   if (action.conditionalMessages && action.conditionalMessages.length > 0) {
-    const matchingConditional = findMatchingVariant(action.conditionalMessages, selectedActionIds)
+    const matchingConditional = findMatchingVariant(
+      action.conditionalMessages,
+      selectedActionIds,
+      allValidActionIds,
+    )
     if (matchingConditional) {
       return (await matchingConditional.message()) as string
     }

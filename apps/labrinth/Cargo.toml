@@ -36,7 +36,7 @@ paste.workspace = true
 meilisearch-sdk = { workspace = true, features = ["reqwest"] }
 rust-s3.workspace = true
 reqwest = { workspace = true, features = ["http2", "rustls-tls-webpki-roots", "json", "multipart"] }
-hyper-tls.workspace = true
+hyper-rustls.workspace = true
 hyper-util.workspace = true
 
 serde = { workspace = true, features = ["derive"] }
