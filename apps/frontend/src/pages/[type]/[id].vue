@@ -29,12 +29,11 @@
             class="settings-header__icon"
           />
           <div class="settings-header__text">
-            <h1 class="wrap-as-needed">
-              {{ project.title }}
-            </h1>
+            <h1 class="wrap-as-needed">{{ project.title }}</h1>
             <ProjectStatusBadge :status="project.status" />
           </div>
         </div>
+
         <h2>Project settings</h2>
         <NavStack>
           <NavStackItem
@@ -111,6 +110,7 @@
         </NavStack>
       </aside>
     </div>
+
     <div class="normal-page__content">
       <ProjectMemberHeader
         v-if="currentMember"
@@ -145,6 +145,7 @@
       />
     </div>
   </div>
+
   <div v-else class="experimental-styles-within">
     <NewModal ref="settingsModal">
       <template #title>
@@ -174,9 +175,11 @@
         <div
           class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
         ></div>
+
         <div
           class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
         ></div>
+
         <div
           class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight"
         >
@@ -219,8 +222,7 @@
                   :href="`modrinth://mod/${project.slug}`"
                   @click="() => installWithApp()"
                 >
-                  <ModrinthIcon aria-hidden="true" />
-                  Install with Modrinth App
+                  <ModrinthIcon aria-hidden="true" /> Install with Modrinth App
                   <ExternalIcon aria-hidden="true" />
                 </a>
               </ButtonStyled>
@@ -240,6 +242,7 @@
               <div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
             </div>
           </div>
+
           <div class="mx-auto flex w-fit flex-col gap-2">
             <ButtonStyled v-if="project.game_versions.length === 1">
               <div class="disabled button-like">
@@ -327,8 +330,7 @@
                       }
                     "
                   >
-                    {{ gameVersion }}
-                    <CheckIcon v-if="userSelectedGameVersion === gameVersion" />
+                    {{ gameVersion }} <CheckIcon v-if="userSelectedGameVersion === gameVersion" />
                   </button>
                 </ButtonStyled>
               </ScrollablePanel>
@@ -419,7 +421,6 @@
               </ScrollablePanel>
             </Accordion>
           </div>
-
           <AutomaticAccordion div class="flex flex-col gap-2">
             <VersionSummary
               v-if="filteredRelease"
@@ -489,11 +490,11 @@
                 :color="route.name === 'type-id-version-version' ? `standard` : `brand`"
               >
                 <button @click="(event) => downloadModal.show(event)">
-                  <DownloadIcon aria-hidden="true" />
-                  Download
+                  <DownloadIcon aria-hidden="true" /> Download
                 </button>
               </ButtonStyled>
             </div>
+
             <div class="contents sm:hidden">
               <ButtonStyled
                 size="large"
@@ -558,9 +559,11 @@
                       </button>
                     </ButtonStyled>
                   </div>
+
                   <p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
                     Modrinth Servers is the easiest way to play with your friends without hassle!
                   </p>
+
                   <p class="m-0 text-wrap text-sm font-bold text-primary">
                     Starting at $5<span class="text-xs"> / month</span>
                   </p>
@@ -625,6 +628,7 @@
                         {{ option.name }}
                       </Checkbox>
                     </div>
+
                     <div v-else class="menu-text">
                       <p class="popout-text">No collections found.</p>
                     </div>
@@ -632,8 +636,7 @@
                       class="btn collection-button"
                       @click="(event) => $refs.modal_collection.show(event)"
                     >
-                      <PlusIcon aria-hidden="true" />
-                      Create new collection
+                      <PlusIcon aria-hidden="true" /> Create new collection
                     </button>
                   </template>
                 </PopoutMenu>
@@ -716,25 +719,14 @@
                 :dropdown-id="`${baseId}-more-options`"
               >
                 <MoreVerticalIcon aria-hidden="true" />
-                <template #analytics>
-                  <ChartIcon aria-hidden="true" />
-                  Analytics
-                </template>
+                <template #analytics> <ChartIcon aria-hidden="true" /> Analytics </template>
                 <template #moderation-checklist>
-                  <ScaleIcon aria-hidden="true" />
-                  Review project
+                  <ScaleIcon aria-hidden="true" /> Review project
                 </template>
-                <template #report>
-                  <ReportIcon aria-hidden="true" />
-                  Report
-                </template>
-                <template #copy-id>
-                  <ClipboardCopyIcon aria-hidden="true" />
-                  Copy ID
-                </template>
+                <template #report> <ReportIcon aria-hidden="true" /> Report </template>
+                <template #copy-id> <ClipboardCopyIcon aria-hidden="true" /> Copy ID </template>
                 <template #copy-permalink>
-                  <ClipboardCopyIcon aria-hidden="true" />
-                  Copy permanent link
+                  <ClipboardCopyIcon aria-hidden="true" /> Copy permanent link
                 </template>
               </OverflowMenu>
             </ButtonStyled>
@@ -760,6 +752,7 @@
           updates unless the author decides to unarchive the project.
         </MessageBanner>
       </div>
+
       <div class="normal-page__sidebar">
         <ProjectSidebarCompatibility
           :project="project"
@@ -789,6 +782,7 @@
         />
         <div class="card flex-card experimental-styles-within">
           <h2>{{ formatMessage(detailsMessages.title) }}</h2>
+
           <div class="details-list">
             <div class="details-list__item">
               <BookTextIcon aria-hidden="true" />
@@ -817,53 +811,48 @@
                 <span v-else>{{ licenseIdDisplay }}</span>
               </div>
             </div>
+
             <div
               v-if="project.approved"
               v-tooltip="$dayjs(project.approved).format('MMMM D, YYYY [at] h:mm A')"
               class="details-list__item"
             >
               <CalendarIcon aria-hidden="true" />
-              <div>
-                {{ formatMessage(detailsMessages.published, { date: publishedDate }) }}
-              </div>
+              <div>{{ formatMessage(detailsMessages.published, { date: publishedDate }) }}</div>
             </div>
+
             <div
               v-else
               v-tooltip="$dayjs(project.published).format('MMMM D, YYYY [at] h:mm A')"
               class="details-list__item"
             >
               <CalendarIcon aria-hidden="true" />
-              <div>
-                {{ formatMessage(detailsMessages.created, { date: createdDate }) }}
-              </div>
+              <div>{{ formatMessage(detailsMessages.created, { date: createdDate }) }}</div>
             </div>
+
             <div
               v-if="project.status === 'processing' && project.queued"
               v-tooltip="$dayjs(project.queued).format('MMMM D, YYYY [at] h:mm A')"
               class="details-list__item"
             >
               <ScaleIcon aria-hidden="true" />
-              <div>
-                {{ formatMessage(detailsMessages.submitted, { date: submittedDate }) }}
-              </div>
+              <div>{{ formatMessage(detailsMessages.submitted, { date: submittedDate }) }}</div>
             </div>
+
             <div
               v-if="versions.length > 0 && project.updated"
               v-tooltip="$dayjs(project.updated).format('MMMM D, YYYY [at] h:mm A')"
               class="details-list__item"
             >
               <VersionIcon aria-hidden="true" />
-              <div>
-                {{ formatMessage(detailsMessages.updated, { date: updatedDate }) }}
-              </div>
+              <div>{{ formatMessage(detailsMessages.updated, { date: updatedDate }) }}</div>
             </div>
           </div>
         </div>
       </div>
+
       <div class="normal-page__content">
-        <div class="overflow-x-auto">
-          <NavTabs :links="navLinks" class="mb-4" />
-        </div>
+        <div class="overflow-x-auto"><NavTabs :links="navLinks" class="mb-4" /></div>
         <NuxtPage
           v-model:project="project"
           v-model:versions="versions"
@@ -881,6 +870,7 @@
           @delete-version="deleteVersion"
         />
       </div>
+
       <div class="normal-page__ultimate-sidebar">
         <!-- Uncomment this to enable the old moderation checklist. -->
         <!-- <ModerationChecklist
@@ -895,6 +885,7 @@
       </div>
     </div>
   </div>
+
   <div
     v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
     class="moderation-checklist"
@@ -908,6 +899,7 @@
     />
   </div>
 </template>
+
 <script setup>
 import {
   BookmarkIcon,
@@ -1570,8 +1562,6 @@ async function copyPermalink() {
 
 const collapsedChecklist = ref(false);
 
-console.log(project.value.id);
-
 const showModerationChecklist = useLocalStorage(
   `show-moderation-checklist-${project.value.id}`,
   false,
@@ -1663,6 +1653,7 @@ const navLinks = computed(() => {
   ];
 });
 </script>
+
 <style lang="scss" scoped>
 .settings-header {
   display: flex;
