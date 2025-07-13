@@ -116,6 +116,8 @@
                       <span class="label__title">{{ action.label }}</span>
                     </label>
                     <DropdownSelect
+                      :max-visible-options="3"
+                      render-up
                       :name="`dropdown-${getActionId(action)}`"
                       :options="action.options"
                       :model-value="getDropdownValue(action)"
