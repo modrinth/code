@@ -22,21 +22,20 @@
     "intl:extract": "pnpm ui:intl:extract && pnpm web:intl:extract && pnpm app:intl:extract"
   },
   "devDependencies": {
+    "eslint": "^9.31.0",
     "if-ci": "^3.0.0",
-    "prettier": "^3.3.2",
+    "prettier": "^3.6.2",
     "turbo": "^2.5.4",
     "vue": "^3.5.13"
   },
   "packageManager": "pnpm@9.15.0",
   "pnpm": {
+    "overrides": {
+      "eslint": "^9.31.0"
+    },
     "patchedDependencies": {
       "readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
     }
   },
-  "prettier": {
-    "printWidth": 100,
-    "semi": false,
-    "singleQuote": true,
-    "endOfLine": "auto"
-  }
+  "prettier": "@modrinth/tooling-config/prettier"
 }
