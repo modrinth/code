@@ -967,7 +967,6 @@ async function processAction(
 }
 
 function shouldShowStage(stage: Stage): boolean {
-
   let hasVisibleActions = false;
 
   for (const a of stage.actions) {
@@ -975,7 +974,7 @@ function shouldShowStage(stage: Stage): boolean {
       hasVisibleActions = true;
     }
   }
-  
+
   if (!hasVisibleActions) {
     return false;
   }
