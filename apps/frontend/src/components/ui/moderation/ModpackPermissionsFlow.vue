@@ -365,7 +365,7 @@ function getJudgements(): ModerationJudgements {
   const judgements: ModerationJudgements = {};
 
   modPackData.value.forEach((item) => {
-    if (item.status && item.status !== "unidentified") {
+    if (item.status) {
       if (item.type === "flame") {
         judgements[item.sha1] = {
           type: "flame",
