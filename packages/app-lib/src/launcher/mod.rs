@@ -573,9 +573,7 @@ pub async fn launch_minecraft(
             ))?;
 
             let mut command = Command::new(cmd);
-            hook.for_each(|arg| {
-                command.arg(arg);
-            });
+            command.args(hook);
             command.arg(&java_version.path);
             command
         }
