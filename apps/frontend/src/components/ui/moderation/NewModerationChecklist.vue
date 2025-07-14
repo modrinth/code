@@ -382,6 +382,7 @@ import type {
 import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
 import KeybindsModal from "./ChecklistKeybindsModal.vue";
 import { finalPermissionMessages } from "@modrinth/moderation/data/modpack-permissions-stage";
+import prettier from "prettier";
 
 const keybindsModal = ref<InstanceType<typeof KeybindsModal>>();
 
@@ -923,16 +924,28 @@ async function processAction(
       conditionalAction.messageVariants,
       selectedActionIds,
       allValidActionIds,
+      stageIndex,
     );
+
+    let message: string;
+    let weight: number;
+
     if (matchingVariant) {
-      const message = (await matchingVariant.message()) as string;
-      messageParts.push({
-        weight: matchingVariant.weight,
-        content: processMessage(message, action, stageIndex, textInputValues.value),
-        actionId,
-        stageIndex,
-      });
+      message = (await matchingVariant.message()) as string;
+      weight = matchingVariant.weight;
+    } else if (conditionalAction.fallbackMessage) {
+      message = (await conditionalAction.fallbackMessage()) as string;
+      weight = conditionalAction.fallbackWeight ?? 0;
+    } else {
+      return;
     }
+
+    messageParts.push({
+      weight,
+      content: processMessage(message, action, stageIndex, textInputValues.value),
+      actionId,
+      stageIndex,
+    });
   } else if (action.type === "dropdown") {
     const dropdownAction = action as DropdownAction;
     const selectedIndex = state.value ?? 0;
@@ -1089,7 +1102,20 @@ async function generateMessage() {
       }
     }
 
-    message.value = fullMessage;
+    try {
+      const formattedMessage = await prettier.format(fullMessage, {
+        parser: "markdown",
+        printWidth: 80,
+        proseWrap: "always",
+        tabWidth: 2,
+        useTabs: false,
+      });
+      message.value = formattedMessage;
+    } catch (formattingError) {
+      console.warn("Failed to format markdown, using original:", formattingError);
+      message.value = fullMessage;
+    }
+
     generatedMessage.value = true;
   } catch (error) {
     console.error("Error generating message:", error);

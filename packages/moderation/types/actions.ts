@@ -80,11 +80,6 @@ export interface ConditionalMessage extends WeightedMessage {
      */
     excludedActions?: string[]
   }
-
-  /**
-   * Fallback message if conditions are not met.
-   */
-  fallbackMessage?: () => Promise<typeof import('*.md?raw') | string>
 }
 
 /**
@@ -146,6 +141,16 @@ export interface ConditionalButtonAction extends BaseAction {
    * Different message configurations based on conditions.
    */
   messageVariants: ConditionalMessage[]
+
+  /**
+   * Global fallback message if no variants match their conditions.
+   */
+  fallbackMessage?: () => Promise<string>
+
+  /**
+   * The weight of the action's fallback message, used to determine the place where the message is placed in the final moderation message.
+   */
+  fallbackWeight?: number
 }
 
 export interface DropdownActionOption extends WeightedMessage {

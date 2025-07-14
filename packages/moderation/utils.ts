@@ -126,6 +126,7 @@ export function findMatchingVariant(
   variants: ConditionalMessage[],
   selectedActionIds: string[],
   allValidActionIds?: string[],
+  currentStageIndex?: number,
 ): ConditionalMessage | null {
   for (const variant of variants) {
     const conditions = variant.conditions
@@ -133,22 +134,33 @@ export function findMatchingVariant(
     const meetsRequired =
       !conditions.requiredActions ||
       conditions.requiredActions.every((id) => {
-        if (allValidActionIds && !allValidActionIds.includes(id)) {
+        let fullId = id
+        if (currentStageIndex !== undefined && !id.startsWith('stage-')) {
+          fullId = `stage-${currentStageIndex}-${id}`
+        }
+
+        if (allValidActionIds && !allValidActionIds.includes(fullId)) {
           return false
         }
-        return selectedActionIds.includes(id)
+        return selectedActionIds.includes(fullId)
       })
 
     const meetsExcluded =
       !conditions.excludedActions ||
-      !conditions.excludedActions.some((id) => selectedActionIds.includes(id))
+      !conditions.excludedActions.some((id) => {
+        let fullId = id
+        if (currentStageIndex !== undefined && !id.startsWith('stage-')) {
+          fullId = `stage-${currentStageIndex}-${id}`
+        }
+        return selectedActionIds.includes(fullId)
+      })
 
     if (meetsRequired && meetsExcluded) {
       return variant
     }
   }
 
-  return variants.find((v) => v.fallbackMessage) || null
+  return null
 }
 
 export async function getActionMessage(
