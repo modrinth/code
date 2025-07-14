@@ -13,7 +13,7 @@ const slugStage: Stage = {
       id: 'slug_misused',
       type: 'button',
       label: 'Misused',
-      weight: 100,
+      weight: 200,
       suggestedStatus: 'flagged',
       severity: 'low',
       message: async () => (await import('../messages/slug/misused.md?raw')).default,

@@ -30,7 +30,7 @@ const titleStage: Stage = {
       id: 'title_similarities',
       type: 'button',
       label: 'Title similarities',
-      weight: 100,
+      weight: 110,
       suggestedStatus: 'flagged',
       severity: 'medium',
       message: async () => (await import('../messages/title/similarities.md?raw')).default,
@@ -43,13 +43,13 @@ const titleStage: Stage = {
           options: [
             {
               label: 'Modpack named after mod',
-              weight: 100,
+              weight: 111,
               message: async () =>
                 (await import('../messages/title/similarities-modpack.md?raw')).default,
             },
             {
               label: 'Forked project',
-              weight: 100,
+              weight: 112,
               message: async () =>
                 (await import('../messages/title/similarities-fork.md?raw')).default,
             },
@@ -63,7 +63,7 @@ const titleStage: Stage = {
           options: [
             {
               label: 'Forked project',
-              weight: 100,
+              weight: 112,
               message: async () =>
                 (await import('../messages/title/similarities-fork.md?raw')).default,
             },

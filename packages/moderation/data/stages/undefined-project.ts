@@ -13,7 +13,7 @@ const undefinedProjectStage: Stage = {
       id: 'undefined_no_versions',
       type: 'button',
       label: 'No Versions',
-      weight: 100,
+      weight: -100,
       suggestedStatus: 'rejected',
       message: async () => (await import('../messages/undefined/no_versions.md?raw')).default,
     },

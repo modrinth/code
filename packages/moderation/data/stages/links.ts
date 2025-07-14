@@ -45,7 +45,7 @@ const links: Stage = {
       id: 'links_misused',
       type: 'button',
       label: 'Links are misused',
-      weight: 10,
+      weight: 500,
       suggestedStatus: 'flagged',
       severity: 'low',
       message: async () => (await import('../messages/links/misused.md?raw')).default,
@@ -61,7 +61,7 @@ const links: Stage = {
       id: 'links_unaccessible',
       type: 'button',
       label: 'Links or unaccessible',
-      weight: 10,
+      weight: 510,
       suggestedStatus: 'flagged',
       // Theoretically a conditional could go here to prevent overlap of misuse and unaccessible messages repeating while still allowing for a multi-select in each.
       // if links_misused was selected, send nothing.
@@ -74,14 +74,14 @@ const links: Stage = {
           options: [
             {
               label: 'Source',
-              weight: 11,
+              weight: 511,
               shouldShow: (project) => Boolean(project.source_url),
               message: async () =>
                 (await import('../messages/links/not_accessible-source.md?raw')).default,
             },
             {
               label: 'Discord',
-              weight: 12,
+              weight: 512,
               shouldShow: (project) => Boolean(project.discord_url),
               message: async () =>
                 (await import('../messages/links/not_accessible-discord.md?raw')).default,

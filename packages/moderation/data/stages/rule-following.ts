@@ -14,7 +14,7 @@ const ruleFollowing: Stage = {
       id: 'rule_breaking_yes',
       type: 'button',
       label: 'Yes',
-      weight: 10,
+      weight: 0,
       suggestedStatus: 'rejected',
       severity: 'critical',
       message: async () => (await import('../messages/rule-breaking.md?raw')).default,

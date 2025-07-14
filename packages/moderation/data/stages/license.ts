@@ -15,10 +15,10 @@ const licenseStage: Stage = {
       id: 'license_invalid_link',
       type: 'button',
       label: 'Invalid License Link',
-      weight: 100,
+      weight: 600,
       suggestedStatus: 'flagged',
       severity: 'medium',
-      shouldShow: (project) => (project.license.url ? true : false),
+      shouldShow: (project) => Boolean(project.license.url),
       message: async () => (await import('../messages/license/invalid_link.md?raw')).default,
 
       enablesActions: [
@@ -26,7 +26,7 @@ const licenseStage: Stage = {
           id: 'license_invalid_link-custom_license',
           type: 'button',
           label: 'Custom License',
-          weight: 100,
+          weight: 601,
           suggestedStatus: 'flagged',
           severity: 'medium',
           message: async () =>
