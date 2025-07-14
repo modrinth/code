@@ -103,11 +103,11 @@ impl ProfileInstallStage {
 pub enum LauncherFeatureVersion {
     None,
     MigratedServerLastPlayTime,
-    MigratedWrapperHook,
+    MigratedLaunchHooks,
 }
 
 impl LauncherFeatureVersion {
-    pub const MOST_RECENT: Self = Self::MigratedWrapperHook;
+    pub const MOST_RECENT: Self = Self::MigratedLaunchHooks;
 
     pub fn as_str(&self) -> &'static str {
         match *self {
@@ -115,7 +115,7 @@ impl LauncherFeatureVersion {
             Self::MigratedServerLastPlayTime => {
                 "migrated_server_last_play_time"
             }
-            Self::MigratedWrapperHook => "migrated_wrapper_hook",
+            Self::MigratedLaunchHooks => "migrated_launch_hooks",
         }
     }
 
@@ -125,7 +125,7 @@ impl LauncherFeatureVersion {
             "migrated_server_last_play_time" => {
                 Self::MigratedServerLastPlayTime
             }
-            "migrated_wrapper_hook" => Self::MigratedWrapperHook,
+            "migrated_launch_hooks" => Self::MigratedLaunchHooks,
             _ => Self::None,
         }
     }
@@ -786,18 +786,28 @@ impl Profile {
                     LauncherFeatureVersion::MigratedServerLastPlayTime;
             }
             LauncherFeatureVersion::MigratedServerLastPlayTime => {
+                let q = shlex::Quoter::new().allow_nul(true);
+
+                // Previously split by spaces
+                if let Some(pre_launch) = self.hooks.pre_launch.as_ref() {
+                    self.hooks.pre_launch =
+                        Some(q.join(pre_launch.split(' ')).unwrap())
+                }
+
+                // Previously treated as complete path to command
                 if let Some(wrapper) = self.hooks.wrapper.as_ref() {
-                    self.hooks.wrapper = Some(
-                        shlex::Quoter::new()
-                            .allow_nul(true)
-                            .quote(wrapper)
-                            .unwrap()
-                            .to_string(),
-                    )
+                    self.hooks.wrapper =
+                        Some(q.quote(wrapper).unwrap().to_string())
+                }
+
+                // Previously split by spaces
+                if let Some(post_exit) = self.hooks.post_exit.as_ref() {
+                    self.hooks.post_exit =
+                        Some(q.join(post_exit.split(' ')).unwrap())
                 }
 
                 self.launcher_feature_version =
-                    LauncherFeatureVersion::MigratedWrapperHook;
+                    LauncherFeatureVersion::MigratedLaunchHooks;
             }
             LauncherFeatureVersion::MOST_RECENT => unreachable!(
                 "LauncherFeatureVersion::MOST_RECENT was not updated"
