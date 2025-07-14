@@ -1,10 +1,10 @@
-import { BookOpenIcon } from '@modrinth/assets'
+import { XIcon } from '@modrinth/assets'
 import type { Stage } from '../../types/stage'
 
 const undefinedProjectStage: Stage = {
   title: 'This project is undefined!',
   id: 'undefined project',
-  icon: BookOpenIcon,
+  icon: XIcon,
   guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
   navigate: '/versions',
   shouldShow: (project) => project.versions.length === 0,

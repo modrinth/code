@@ -6,7 +6,7 @@ const links: Stage = {
   title: "Are the project's links accurate and accessible?",
   id: 'links',
   icon: LinkIcon,
-  guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
+  guidance_url: 'https://modrinth.com/legal/rules',
   navigate: '/settings/links',
   shouldShow: (project) =>
     Boolean(

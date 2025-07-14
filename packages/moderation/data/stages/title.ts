@@ -3,8 +3,8 @@ import type { Stage } from '../../types/stage'
 
 const titleStage: Stage = {
   title: 'Is this title free of useless information?',
-  text: async () => '**Title:** %PROJECT_TITLE%',
   id: 'title',
+  text: async () => '**Title:** %PROJECT_TITLE%',
   icon: BookOpenIcon,
   guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
   actions: [
