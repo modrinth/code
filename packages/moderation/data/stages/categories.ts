@@ -8,6 +8,16 @@ const categories: Stage = {
   icon: TagsIcon,
   guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
   navigate: '/settings/tags',
+  shouldShow: (project) =>
+    project.categories.length > 0 || project.additional_categories.length > 0,
+  text: async (project) => {
+    let text = ''
+    if (project.categories.length > 0)
+      text += (await import('../messages/checklist-text/categories/featured.md?raw')).default
+    if (project.additional_categories.length > 0)
+      text += (await import('../messages/checklist-text/categories/additional.md?raw')).default
+    return text
+  },
   actions: [
     {
       id: 'categories_inaccurate',
@@ -26,6 +36,7 @@ const categories: Stage = {
       weight: 701,
       suggestedStatus: 'flagged',
       severity: 'low',
+      shouldShow: (project) => project.categories.includes('optimization'),
       message: async () =>
         (await import('../messages/categories/inaccurate.md?raw')).default +
         (await import('../messages/categories/optimization_misused.md?raw')).default,

@@ -300,8 +300,13 @@ export function flattenProjectVariables(project: Project): Record<string, string
   //navigation related variables
   vars[`PROJECT_PERMANENT_LINK`] = `https://modrinth.com/project/${project.id}`
   vars[`PROJECT_SETTINGS_LINK`] = `https://modrinth.com/project/${project.id}/settings`
+  vars[`PROJECT_SETTINGS_FLINK`] = `[Settings](https://modrinth.com/project/${project.id}/settings)`
   vars[`PROJECT_LINKS_LINK`] = `https://modrinth.com/project/${project.id}/settings/links`
   vars[`PROJECT_LINKS_FLINK`] = `[Links](https://modrinth.com/project/${project.id}/settings/links)`
+  vars[`PROJECT_DESCRIPTION_LINK`] =
+    `https://modrinth.com/project/${project.id}/settings/description`
+  vars[`PROJECT_DESCRIPTION_FLINK`] =
+    `[Description](https://modrinth.com/project/${project.id}/settings/description)`
 
   return vars
 }
