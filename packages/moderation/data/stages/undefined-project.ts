@@ -3,7 +3,7 @@ import type { Stage } from '../../types/stage'
 
 const undefinedProjectStage: Stage = {
   title: 'This project is undefined!',
-  id: 'undefined project',
+  id: 'undefined-project',
   icon: XIcon,
   guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
   navigate: '/versions',

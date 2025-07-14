@@ -3,7 +3,7 @@ import type { Stage } from '../../types/stage'
 
 const titleSlug: Stage = {
   title: 'Are the Name and URL accurate and appropriate?',
-  id: 'title',
+  id: 'title-&-slug',
   text: async () =>
     (await import('../messages/checklist-text/title_slug/title.md?raw')).default +
     (await import('../messages/checklist-text/title_slug/slug.md?raw')).default +
