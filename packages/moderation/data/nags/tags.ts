@@ -1,5 +1,8 @@
 import type { Project } from '@modrinth/utils'
 import type { Nag, NagContext } from '../../types/nags'
+import { useVIntl } from '@vintl/vintl'
+
+import messages from './tags.i18n'
 
 function getCategories(
   project: Project & { actualProjectType: string },
@@ -19,32 +22,41 @@ function getCategories(
 export const tagsNags: Nag[] = [
   {
     id: 'too-many-tags',
-    title: 'Too many tags selected',
+    title: messages.tooManyTagsTitle,
     description: (context: NagContext) => {
+      const { formatMessage } = useVIntl()
       const tagCount =
-        context.project.categories.length + context.project.additional_categories?.length || 0
-      return `You've selected ${tagCount} tags. Consider reducing to 5 or fewer to keep your project focused and easier to discover.`
+        context.project.categories.length + (context.project.additional_categories?.length || 0)
+
+      return formatMessage(messages.tooManyTagsDescription, {
+        tagCount,
+      })
     },
     status: 'warning',
     shouldShow: (context: NagContext) => {
       const tagCount =
-        context.project.categories.length + context.project.additional_categories?.length || 0
+        context.project.categories.length + (context.project.additional_categories?.length || 0)
       return tagCount > 5
     },
     link: {
       path: 'settings/tags',
-      title: 'Edit tags',
+      title: messages.editTagsTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-tags',
     },
   },
   {
     id: 'multiple-resolution-tags',
-    title: 'Multiple resolution tags selected',
+    title: messages.multipleResolutionTagsTitle,
     description: (context: NagContext) => {
+      const { formatMessage } = useVIntl()
       const resolutionTags = context.project.categories.filter((tag: string) =>
         ['16x', '32x', '48x', '64x', '128x', '256x', '512x', '1024x'].includes(tag),
       )
-      return `You've selected ${resolutionTags.length} resolution tags (${resolutionTags.join(', ')}). Resource packs should typically only have one resolution tag that matches their primary resolution.`
+
+      return formatMessage(messages.multipleResolutionTagsDescription, {
+        count: resolutionTags.length,
+        tags: resolutionTags.join(', '),
+      })
     },
     status: 'warning',
     shouldShow: (context: NagContext) => {
@@ -57,20 +69,24 @@ export const tagsNags: Nag[] = [
     },
     link: {
       path: 'settings/tags',
-      title: 'Edit tags',
+      title: messages.editTagsTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-tags',
     },
   },
   {
     id: 'all-tags-selected',
-    title: 'All tags selected',
+    title: messages.allTagsSelectedTitle,
     description: (context: NagContext) => {
+      const { formatMessage } = useVIntl()
       const categoriesForProjectType = getCategories(
         context.project as Project & { actualProjectType: string },
         context.tags,
       )
       const totalAvailableTags = categoriesForProjectType.length
-      return `You've selected all ${totalAvailableTags} available tags. This defeats the purpose of tags, which are meant to help users find relevant projects. Please select only the tags that truly apply to your project.`
+
+      return formatMessage(messages.allTagsSelectedDescription, {
+        totalAvailableTags,
+      })
     },
     status: 'required',
     shouldShow: (context: NagContext) => {
@@ -84,7 +100,7 @@ export const tagsNags: Nag[] = [
     },
     link: {
       path: 'settings/tags',
-      title: 'Edit tags',
+      title: messages.editTagsTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-tags',
     },
   },

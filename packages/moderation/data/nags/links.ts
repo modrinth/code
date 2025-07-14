@@ -1,5 +1,8 @@
 import type { Nag, NagContext } from '../../types/nags'
 import { formatProjectType } from '@modrinth/utils'
+import { useVIntl } from '@vintl/vintl'
+
+import messages from './links.i18n'
 
 export const commonLinkDomains = {
   source: ['github.com', 'gitlab.com', 'bitbucket.org', 'codeberg.org', 'git.sr.ht'],
@@ -49,9 +52,8 @@ export function isUncommonLicenseUrl(url: string | undefined, domains: string[])
 export const linksNags: Nag[] = [
   {
     id: 'verify-external-links',
-    title: 'Verify external links',
-    description: () =>
-      `Some of your external links may be using domains that aren't recognized as common for their link type.`,
+    title: messages.verifyExternalLinksTitle,
+    description: messages.verifyExternalLinksDescription,
     status: 'warning',
     shouldShow: (context: NagContext) => {
       return (
@@ -62,22 +64,26 @@ export const linksNags: Nag[] = [
     },
     link: {
       path: 'settings/links',
-      title: 'Visit links settings',
+      title: messages.visitLinksSettingsTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-links',
     },
   },
   {
     id: 'invalid-license-url',
-    title: 'Invalid license URL',
+    title: messages.invalidLicenseUrlTitle,
     description: (context: NagContext) => {
+      const { formatMessage } = useVIntl()
       const licenseUrl = context.project.license.url
-      if (!licenseUrl) return 'License URL is invalid.'
+
+      if (!licenseUrl) {
+        return formatMessage(messages.invalidLicenseUrlDescriptionDefault)
+      }
 
       try {
         const domain = new URL(licenseUrl).hostname.toLowerCase()
-        return `Your license URL points to ${domain}, which is not appropriate for license information. License URLs should link to the actual license text or legal documentation, not social media, gaming platforms etc.`
+        return formatMessage(messages.invalidLicenseUrlDescriptionDomain, { domain })
       } catch {
-        return 'Your license URL appears to be malformed. Please provide a valid URL to your license text.'
+        return formatMessage(messages.invalidLicenseUrlDescriptionMalformed)
       }
     },
     status: 'required',
@@ -96,15 +102,20 @@ export const linksNags: Nag[] = [
     },
     link: {
       path: 'settings',
-      title: 'Edit license',
+      title: messages.editLicenseTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
     },
   },
   {
     id: 'gpl-license-source-required',
-    title: 'GPL license requires source',
-    description: (context: NagContext) =>
-      `Your ${formatProjectType(context.project.project_type).toLowerCase()} uses a GPL license which requires source code to be available. Please provide a source code link or consider using a different license.`,
+    title: messages.gplLicenseSourceRequiredTitle,
+    description: (context: NagContext) => {
+      const { formatMessage } = useVIntl()
+
+      return formatMessage(messages.gplLicenseSourceRequiredDescription, {
+        projectType: formatProjectType(context.project.project_type).toLowerCase(),
+      })
+    },
     status: 'required',
     shouldShow: (context: NagContext) => {
       const gplLicenses = [
@@ -137,7 +148,7 @@ export const linksNags: Nag[] = [
     },
     link: {
       path: 'settings/links',
-      title: 'Visit links settings',
+      title: messages.visitLinksSettingsTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-links',
     },
   },

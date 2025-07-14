@@ -1,4 +1,5 @@
 import type { Project, User, Version } from '@modrinth/utils'
+import type { MessageDescriptor } from '@vintl/vintl'
 import type { FunctionalComponent, SVGAttributes } from 'vue'
 
 /**
@@ -49,7 +50,7 @@ export interface NagLink {
   /**
    * The text to display for the nag's link.
    */
-  title: string
+  title: MessageDescriptor | string
   /**
    * The status of the nag, which can be 'required', 'warning', or 'suggestion'.
    */
@@ -67,12 +68,12 @@ export interface Nag {
   /**
    * The title of the nag.
    */
-  title: string
+  title: MessageDescriptor | string
   /**
    * A function that returns the description of the nag.
    * It can accept a context to provide dynamic descriptions.
    */
-  description: (context: NagContext) => string
+  description: MessageDescriptor | ((context: NagContext) => string)
   /**
    * The status of the nag, which can be 'required', 'warning', or 'suggestion'.
    */

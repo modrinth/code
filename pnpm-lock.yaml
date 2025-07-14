@@ -467,6 +467,12 @@ importers:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.8.3)
     devDependencies:
+      '@formatjs/cli':
+        specifier: ^6.2.12
+        version: 6.2.12(@vue/compiler-core@3.5.13)(vue@3.5.13(typescript@5.8.3))
+      '@vintl/vintl':
+        specifier: ^4.4.1
+        version: 4.4.1(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3))
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -8898,6 +8904,10 @@ snapshots:
     dependencies:
       vue: 3.5.13(typescript@5.5.4)
 
+  '@braw/async-computed@5.0.2(vue@3.5.13(typescript@5.8.3))':
+    dependencies:
+      vue: 3.5.13(typescript@5.8.3)
+
   '@cloudflare/kv-asset-handler@0.3.4':
     dependencies:
       mime: 3.0.0
@@ -9425,6 +9435,11 @@ snapshots:
       '@vue/compiler-core': 3.5.13
       vue: 3.5.13(typescript@5.5.4)
 
+  '@formatjs/cli@6.2.12(@vue/compiler-core@3.5.13)(vue@3.5.13(typescript@5.8.3))':
+    optionalDependencies:
+      '@vue/compiler-core': 3.5.13
+      vue: 3.5.13(typescript@5.8.3)
+
   '@formatjs/ecma402-abstract@1.18.3':
     dependencies:
       '@formatjs/intl-localematcher': 0.5.4
@@ -9481,6 +9496,18 @@ snapshots:
       tslib: 2.6.3
     optionalDependencies:
       typescript: 5.5.4
+
+  '@formatjs/intl@2.10.4(typescript@5.8.3)':
+    dependencies:
+      '@formatjs/ecma402-abstract': 2.0.0
+      '@formatjs/fast-memoize': 2.2.0
+      '@formatjs/icu-messageformat-parser': 2.7.8
+      '@formatjs/intl-displaynames': 6.6.8
+      '@formatjs/intl-listformat': 7.5.7
+      intl-messageformat: 10.5.14
+      tslib: 2.6.3
+    optionalDependencies:
+      typescript: 5.8.3
 
   '@formatjs/ts-transformer@3.13.14':
     dependencies:
@@ -11141,6 +11168,17 @@ snapshots:
       '@formatjs/intl-localematcher': 0.4.2
       intl-messageformat: 10.5.14
       vue: 3.5.13(typescript@5.5.4)
+    transitivePeerDependencies:
+      - typescript
+
+  '@vintl/vintl@4.4.1(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3))':
+    dependencies:
+      '@braw/async-computed': 5.0.2(vue@3.5.13(typescript@5.8.3))
+      '@formatjs/icu-messageformat-parser': 2.7.8
+      '@formatjs/intl': 2.10.4(typescript@5.8.3)
+      '@formatjs/intl-localematcher': 0.4.2
+      intl-messageformat: 10.5.14
+      vue: 3.5.13(typescript@5.8.3)
     transitivePeerDependencies:
       - typescript
 

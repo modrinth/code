@@ -1,4 +1,7 @@
 import type { Nag, NagContext } from '../../types/nags'
+import { useVIntl } from '@vintl/vintl'
+
+import messages from './description.i18n'
 
 export const MIN_DESCRIPTION_CHARS = 500
 export const MAX_HEADER_LENGTH = 100
@@ -70,9 +73,15 @@ function analyzeImageContent(markdown: string): { imageHeavy: boolean; hasEmptyA
 export const descriptionNags: Nag[] = [
   {
     id: 'description-too-short',
-    title: 'Description may be insufficient',
-    description: (context: NagContext) =>
-      `Your description is ${context.project.body?.length || 0} characters. It's recommended to have at least ${MIN_DESCRIPTION_CHARS} characters to provide users with enough information about your project.`,
+    title: messages.descriptionTooShortTitle,
+    description: (context: NagContext) => {
+      const { formatMessage } = useVIntl()
+
+      return formatMessage(messages.descriptionTooShortDescription, {
+        length: context.project.body?.length || 0,
+        minChars: MIN_DESCRIPTION_CHARS,
+      })
+    },
     status: 'warning',
     shouldShow: (context: NagContext) => {
       const bodyLength = context.project.body?.trim()?.length || 0
@@ -80,18 +89,21 @@ export const descriptionNags: Nag[] = [
     },
     link: {
       path: 'settings/description',
-      title: 'Edit description',
+      title: messages.editDescriptionTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-description',
     },
   },
   {
     id: 'long-headers',
-    title: 'Headers are too long',
+    title: messages.longHeadersTitle,
     description: (context: NagContext) => {
+      const { formatMessage } = useVIntl()
       const { longHeaders } = analyzeHeaderLength(context.project.body || '')
       const count = longHeaders.length
 
-      return `${count} header${count > 1 ? 's' : ''} in your description ${count > 1 ? 'are' : 'is'} too long. Headers should be concise and act as section titles, not full sentences.`
+      return formatMessage(messages.longHeadersDescription, {
+        count,
+      })
     },
     status: 'warning',
     shouldShow: (context: NagContext) => {
@@ -100,15 +112,21 @@ export const descriptionNags: Nag[] = [
     },
     link: {
       path: 'settings/description',
-      title: 'Edit description',
+      title: messages.editDescriptionTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-description',
     },
   },
   {
     id: 'summary-too-short',
-    title: 'Summary may be insufficient',
-    description: (context: NagContext) =>
-      `Your summary is ${context.project.description?.length || 0} characters. It's recommended to have at least ${MIN_SUMMARY_CHARS} characters to provide users with enough information about your project.`,
+    title: messages.summaryTooShortTitle,
+    description: (context: NagContext) => {
+      const { formatMessage } = useVIntl()
+
+      return formatMessage(messages.summaryTooShortDescription, {
+        length: context.project.description?.length || 0,
+        minChars: MIN_SUMMARY_CHARS,
+      })
+    },
     status: 'warning',
     shouldShow: (context: NagContext) => {
       const summaryLength = context.project.description?.trim()?.length || 0
@@ -116,15 +134,14 @@ export const descriptionNags: Nag[] = [
     },
     link: {
       path: 'settings',
-      title: 'Edit summary',
+      title: messages.editSummaryTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
     },
   },
   {
     id: 'minecraft-title-clause',
-    title: 'Title contains "Minecraft"',
-    description: () =>
-      `Please remove "Minecraft" from your title. You cannot use "Minecraft" in your title for legal reasons.`,
+    title: messages.minecraftTitleClauseTitle,
+    description: messages.minecraftTitleClauseDescription,
     status: 'required',
     shouldShow: (context: NagContext) => {
       const title = context.project.title?.toLowerCase() || ''
@@ -132,16 +149,14 @@ export const descriptionNags: Nag[] = [
     },
     link: {
       path: 'settings',
-      title: 'Edit title',
+      title: messages.editTitleTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
     },
   },
   {
     id: 'title-contains-technical-info',
-    title: 'Title contains loader or version info',
-    description: () => {
-      return `Removing these helps keep titles clean and makes your project easier to find. Version and loader information is automatically displayed alongside your project.`
-    },
+    title: messages.titleContainsTechnicalInfoTitle,
+    description: messages.titleContainsTechnicalInfoDescription,
     status: 'warning',
     shouldShow: (context: NagContext) => {
       const title = context.project.title?.toLowerCase() || ''
@@ -157,15 +172,14 @@ export const descriptionNags: Nag[] = [
     },
     link: {
       path: 'settings',
-      title: 'Edit title',
+      title: messages.editTitleTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
     },
   },
   {
     id: 'summary-same-as-title',
-    title: 'Summary is project name',
-    description: () =>
-      `Your summary is the same as your project name. Please change it. It's recommended to have a unique summary to provide more context about your project.`,
+    title: messages.summarySameAsTitleTitle,
+    description: messages.summarySameAsTitleDescription,
     status: 'required',
     shouldShow: (context: NagContext) => {
       const title = context.project.title?.trim() || ''
@@ -174,15 +188,14 @@ export const descriptionNags: Nag[] = [
     },
     link: {
       path: 'settings',
-      title: 'Edit summary',
+      title: messages.editSummaryTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
     },
   },
   {
     id: 'image-heavy-description',
-    title: 'Description is mostly images',
-    description: () =>
-      `Please add more descriptive text to help users understand your project, especially those using screen readers or with slow internet connections.`,
+    title: messages.imageHeavyDescriptionTitle,
+    description: messages.imageHeavyDescriptionDescription,
     status: 'warning',
     shouldShow: (context: NagContext) => {
       const { imageHeavy } = analyzeImageContent(context.project.body || '')
@@ -190,15 +203,14 @@ export const descriptionNags: Nag[] = [
     },
     link: {
       path: 'settings/description',
-      title: 'Edit description',
+      title: messages.editDescriptionTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-description',
     },
   },
   {
     id: 'missing-alt-text',
-    title: 'Images missing alt text',
-    description: () =>
-      `Some of your images are missing alt text, which is important for accessibility, especially for visually impaired users.`,
+    title: messages.missingAltTextTitle,
+    description: messages.missingAltTextDescription,
     status: 'warning',
     shouldShow: (context: NagContext) => {
       const { hasEmptyAltText } = analyzeImageContent(context.project.body || '')
@@ -206,7 +218,7 @@ export const descriptionNags: Nag[] = [
     },
     link: {
       path: 'settings/description',
-      title: 'Edit description',
+      title: messages.editDescriptionTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-description',
     },
   },

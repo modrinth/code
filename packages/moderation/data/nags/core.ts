@@ -1,64 +1,64 @@
 import type { Nag, NagContext } from '../../types/nags'
 import { formatProjectType } from '@modrinth/utils'
+import { useVIntl } from '@vintl/vintl'
+
+import messages from './core.i18n'
 
 export const coreNags: Nag[] = [
   {
     id: 'moderator-feedback',
-    title: 'Review moderator feedback',
-    description: () =>
-      'Review any feedback from moderators regarding your project before resubmitting.',
+    title: messages.moderatorFeedbackTitle,
+    description: messages.moderatorFeedbackDescription,
     status: 'suggestion',
     shouldShow: (context: NagContext) =>
       context.tags.rejectedStatuses.includes(context.project.status),
     link: {
       path: 'moderation',
-      title: 'Visit moderation thread',
+      title: messages.moderationTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-moderation',
     },
   },
   {
     id: 'upload-version',
-    title: 'Upload a version',
-    description: () => 'At least one version is required for a project to be submitted for review.',
+    title: messages.uploadVersionTitle,
+    description: messages.uploadVersionDescription,
     status: 'required',
     shouldShow: (context: NagContext) => context.versions.length < 1,
     link: {
       path: 'versions',
-      title: 'Visit versions page',
+      title: messages.versionsTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-versions',
     },
   },
   {
     id: 'add-description',
-    title: 'Add a description',
-    description: () =>
-      "A description that clearly describes the project's purpose and function is required.",
+    title: messages.addDescriptionTitle,
+    description: messages.addDescriptionDescription,
     status: 'required',
     shouldShow: (context: NagContext) =>
       context.project.body === '' || context.project.body.startsWith('# Placeholder description'),
     link: {
       path: 'settings/description',
-      title: 'Visit description settings',
+      title: messages.settingsDescriptionTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-description',
     },
   },
   {
     id: 'add-icon',
-    title: 'Add an icon',
-    description: () =>
-      'Your project should have a nice-looking icon to uniquely identify your project at a glance.',
+    title: messages.addIconTitle,
+    description: messages.addIconDescription,
     status: 'suggestion',
     shouldShow: (context: NagContext) => !context.project.icon_url,
     link: {
       path: 'settings',
-      title: 'Visit general settings',
+      title: messages.settingsTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
     },
   },
   {
     id: 'feature-gallery-image',
-    title: 'Feature a gallery image',
-    description: () => 'Featured gallery images may be the first impression of many users.',
+    title: messages.featureGalleryImageTitle,
+    description: messages.featureGalleryImageDescription,
     status: 'suggestion',
     shouldShow: (context: NagContext) => {
       const featuredGalleryImage = context.project.gallery?.find((img) => img.featured)
@@ -66,28 +66,27 @@ export const coreNags: Nag[] = [
     },
     link: {
       path: 'gallery',
-      title: 'Visit gallery page',
+      title: messages.galleryTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-gallery',
     },
   },
   {
     id: 'select-tags',
-    title: 'Select tags',
-    description: () => 'Select all tags that apply to your project.',
+    title: messages.selectTagsTitle,
+    description: messages.selectTagsDescription,
     status: 'suggestion',
     shouldShow: (context: NagContext) =>
       context.project.versions.length > 0 && context.project.categories.length < 1,
     link: {
       path: 'settings/tags',
-      title: 'Visit tag settings',
+      title: messages.settingsTagsTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-tags',
     },
   },
   {
     id: 'add-links',
-    title: 'Add external links',
-    description: () =>
-      'Add any relevant links targeted outside of Modrinth, such as sources, issues, or a Discord invite.',
+    title: messages.addLinksTitle,
+    description: messages.addLinksDescription,
     status: 'suggestion',
     shouldShow: (context: NagContext) =>
       !(
@@ -99,15 +98,20 @@ export const coreNags: Nag[] = [
       ),
     link: {
       path: 'settings/links',
-      title: 'Visit links settings',
+      title: messages.settingsLinksTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-links',
     },
   },
   {
     id: 'select-environments',
-    title: 'Select supported environments',
-    description: (context: NagContext) =>
-      `Select if the ${formatProjectType(context.project.project_type).toLowerCase()} functions on the client-side and/or server-side.`,
+    title: messages.selectEnvironmentsTitle,
+    description: (context: NagContext) => {
+      const { formatMessage } = useVIntl()
+
+      return formatMessage(messages.selectEnvironmentsDescription, {
+        projectType: formatProjectType(context.project.project_type).toLowerCase(),
+      })
+    },
     status: 'required',
     shouldShow: (context: NagContext) => {
       const excludedTypes = ['resourcepack', 'plugin', 'shader', 'datapack']
@@ -122,20 +126,25 @@ export const coreNags: Nag[] = [
     },
     link: {
       path: 'settings',
-      title: 'Visit general settings',
+      title: messages.settingsEnvironmentsTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
     },
   },
   {
     id: 'select-license',
-    title: 'Select license',
-    description: (context: NagContext) =>
-      `Select the license your ${formatProjectType(context.project.project_type).toLowerCase()} is distributed under.`,
+    title: messages.selectLicenseTitle,
+    description: (context: NagContext) => {
+      const { formatMessage } = useVIntl()
+
+      return formatMessage(messages.selectLicenseDescription, {
+        projectType: formatProjectType(context.project.project_type).toLowerCase(),
+      })
+    },
     status: 'required',
     shouldShow: (context: NagContext) => context.project.license.id === 'LicenseRef-Unknown',
     link: {
       path: 'settings/license',
-      title: 'Visit license settings',
+      title: messages.settingsLicenseTitle,
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-license',
     },
   },
