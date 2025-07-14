@@ -220,8 +220,6 @@ export function kebabToTitleCase(input: string): string {
 export function flattenProjectVariables(project: Project): Record<string, string> {
   const vars: Record<string, string> = {}
 
-  vars['RULES'] = "[Modrinth's Content Rules](https://modrinth.com/legal/rules)"
-
   vars['PROJECT_ID'] = project.id
   vars['PROJECT_TYPE'] = project.project_type
   vars['PROJECT_SLUG'] = project.slug
@@ -283,6 +281,15 @@ export function flattenProjectVariables(project: Project): Record<string, string
     vars[`PROJECT_GALLERY_${index}_DESCRIPTION`] = image.description || ''
     vars[`PROJECT_GALLERY_${index}_FEATURED`] = image.featured.toString()
   })
+
+  //Static time saving stuff
+  vars['RULES'] = "[Modrinth's Content Rules](https://modrinth.com/legal/rules)"
+
+  //navigation related variables
+  vars[`PROJECT_PERMANENT_LINK`] = `https://modrinth.com/project/${project.id}`
+  vars[`PROJECT_SETTINGS_LINK`] = `https://modrinth.com/project/${project.id}/settings`
+  vars[`PROJECT_LINKS_LINK`] = `https://modrinth.com/project/${project.id}/settings/links`
+  vars[`PROJECT_LINKS_FLINK`] = `[Links](https://modrinth.com/project/${project.id}/settings/links)`
 
   return vars
 }
