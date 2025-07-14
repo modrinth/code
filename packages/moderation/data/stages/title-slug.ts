@@ -1,10 +1,13 @@
 import { BookOpenIcon } from '@modrinth/assets'
 import type { Stage } from '../../types/stage'
 
-const titleStage: Stage = {
-  title: 'Is this title free of useless information?',
+const titleSlug: Stage = {
+  title: 'Are the Name and URL accurate and appropriate?',
   id: 'title',
-  text: async () => '**Title:** %PROJECT_TITLE%',
+  text: async () =>
+    (await import('../messages/checklist-text/title_slug/title.md?raw')).default +
+    (await import('../messages/checklist-text/title_slug/slug.md?raw')).default +
+    (await import('../messages/checklist-text/title_slug/title_prompt.md?raw')).default,
   icon: BookOpenIcon,
   guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
   actions: [
@@ -36,14 +39,14 @@ const titleStage: Stage = {
       message: async () => (await import('../messages/title/similarities.md?raw')).default,
       enablesActions: [
         {
-          id: 'title_similarities_select_modpack',
+          id: 'title_similarities_options',
           type: 'multi-select-chips',
           label: 'Similarities additional info',
-          shouldShow: (project) => project.project_type === 'modpack',
           options: [
             {
               label: 'Modpack named after mod',
               weight: 111,
+              shouldShow: (project) => project.project_type === 'modpack',
               message: async () =>
                 (await import('../messages/title/similarities-modpack.md?raw')).default,
             },
@@ -55,23 +58,23 @@ const titleStage: Stage = {
             },
           ],
         },
+      ],
+    },
+    {
+      id: 'slug_misused_options',
+      type: 'multi-select-chips',
+      label: 'Slug issues?',
+      suggestedStatus: 'rejected',
+      severity: 'low',
+      options: [
         {
-          id: 'title_similarities_select_not_modpack',
-          type: 'multi-select-chips',
-          label: 'Similarities additional info',
-          shouldShow: (project) => project.project_type !== 'modpack',
-          options: [
-            {
-              label: 'Forked project',
-              weight: 112,
-              message: async () =>
-                (await import('../messages/title/similarities-fork.md?raw')).default,
-            },
-          ],
+          label: 'Misused',
+          weight: 200,
+          message: async () => (await import('../messages/slug/misused.md?raw')).default,
         },
       ],
     },
   ],
 }
 
-export default titleStage
+export default titleSlug

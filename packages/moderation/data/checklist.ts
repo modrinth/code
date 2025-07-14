@@ -7,17 +7,15 @@ import gallery from './stages/gallery'
 import links from './stages/links'
 import ruleFollowing from './stages/rule-following'
 import sideTypes from './stages/side-types'
-import slug from './stages/slug'
 import summary from './stages/summary'
-import title from './stages/title'
+import titleSlug from './stages/title-slug'
 import versions from './stages/versions'
 import license from './stages/license'
 import undefinedProject from './stages/undefined-project'
 import statusAlerts from './stages/status-alerts'
 
 export default [
-  title,
-  slug,
+  titleSlug,
   summary,
   description,
   links,

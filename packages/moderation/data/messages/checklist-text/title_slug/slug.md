@@ -1,0 +1,1 @@
+**Slug:** `%PROJECT_SLUG%`

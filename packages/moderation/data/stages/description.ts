@@ -3,7 +3,7 @@ import type { ButtonAction } from '../../types/actions'
 import { LibraryIcon } from '@modrinth/assets'
 
 const description: Stage = {
-  title: 'Is the description sufficient, accurate, and accessable?',
+  title: 'Is the description sufficient, accurate, and accessible?',
   id: 'description',
   icon: LibraryIcon,
   guidance_url: 'https://modrinth.com/legal/rules#general-expectations',
