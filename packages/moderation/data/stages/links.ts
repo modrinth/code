@@ -49,29 +49,44 @@ const links: Stage = {
       suggestedStatus: 'flagged',
       severity: 'low',
       message: async () => (await import('../messages/links/misused.md?raw')).default,
-    } as ButtonAction,
-    {
-      id: 'links_not_accessible_source',
-      type: 'button',
-      label: 'Not accessible (source)',
-      weight: 10,
-      suggestedStatus: 'flagged',
-      severity: 'low',
-      message: async () => (await import('../messages/links/not-accessible-source.md?raw')).default,
-    } as ButtonAction,
-    {
-      id: 'links_not_accessible_other',
-      type: 'button',
-      label: 'Not accessible (other)',
-      weight: 10,
-      suggestedStatus: 'flagged',
-      severity: 'low',
-      message: async () => (await import('../messages/links/not-accessible-other.md?raw')).default,
       relevantExtraInput: [
         {
-          label: 'Please specify the link type that is inaccessible.',
-          variable: 'LINK',
-          required: true,
+          label: 'What links are misused?',
+          variable: 'MISUSED_LINKS',
+          required: false,
+        },
+      ],
+    } as ButtonAction,
+    {
+      id: 'links_unaccessible',
+      type: 'button',
+      label: 'Links or unaccessible',
+      weight: 10,
+      suggestedStatus: 'flagged',
+      // Theoretically a conditional could go here to prevent overlap of misuse and unaccessible messages repeating while still allowing for a multi-select in each.
+      // if links_misused was selected, send nothing.
+      message: async () => (await import('../messages/links/not_accessible.md?raw')).default,
+      enablesActions: [
+        {
+          id: 'links_unaccessible_options',
+          type: 'multi-select-chips',
+          label: 'Warn of unaccessible link?',
+          options: [
+            {
+              label: 'Source',
+              weight: 11,
+              shouldShow: (project) => Boolean(project.source_url),
+              message: async () =>
+                (await import('../messages/links/not_accessible-source.md?raw')).default,
+            },
+            {
+              label: 'Discord',
+              weight: 12,
+              shouldShow: (project) => Boolean(project.discord_url),
+              message: async () =>
+                (await import('../messages/links/not_accessible-discord.md?raw')).default,
+            },
+          ],
         },
       ],
     } as ButtonAction,

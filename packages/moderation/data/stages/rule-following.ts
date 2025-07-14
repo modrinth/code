@@ -3,7 +3,7 @@ import type { ButtonAction } from '../../types/actions'
 import { ListBulletedIcon } from '@modrinth/assets'
 
 const ruleFollowing: Stage = {
-  title: 'Does this project break our content rules?',
+  title: 'Does this project violate the rules?',
   id: 'rule-following',
   icon: ListBulletedIcon,
   guidance_url:
