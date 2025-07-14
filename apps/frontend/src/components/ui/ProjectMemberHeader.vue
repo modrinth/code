@@ -1,23 +1,21 @@
 <template>
   <div v-if="showInvitation" class="universal-card information invited my-4">
-    <h2>Invitation to join project</h2>
+    <h2>{{ getFormattedMessage(messages.invitationTitle) }}</h2>
     <p v-if="currentMember?.project_role">
-      You've been invited be a member of this project with the role of '{{
-        currentMember.project_role
-      }}'.
+      {{ formatMessage(messages.invitationWithRole, { role: currentMember.project_role }) }}
     </p>
-    <p v-else>You've been invited to join this project. Please accept or decline the invitation.</p>
+    <p v-else>{{ getFormattedMessage(messages.invitationNoRole) }}</p>
     <div class="input-group">
       <ButtonStyled color="brand">
         <button class="brand-button" @click="acceptInvite()">
           <CheckIcon />
-          Accept
+          {{ getFormattedMessage(messages.accept) }}
         </button>
       </ButtonStyled>
       <ButtonStyled color="red">
         <button @click="declineInvite">
           <XIcon />
-          Decline
+          {{ getFormattedMessage(messages.decline) }}
         </button>
       </ButtonStyled>
     </div>
@@ -32,7 +30,7 @@
   >
     <div class="flex max-w-full flex-wrap items-center gap-x-6 gap-y-4">
       <div class="flex flex-auto flex-wrap items-center gap-x-6 gap-y-4">
-        <h2 class="my-0 mr-auto">Publishing checklist</h2>
+        <h2 class="my-0 mr-auto">{{ getFormattedMessage(messages.publishingChecklist) }}</h2>
       </div>
       <div class="input-group">
         <ButtonStyled circular>
@@ -56,9 +54,9 @@
             ]"
             :aria-label="getStatusTooltip(nag.status)"
           />
-          {{ nag.title }}
+          {{ getFormattedMessage(nag.title) }}
         </span>
-        {{ nag.description(nagContext) }}
+        {{ getNagDescription(nag) }}
         <NuxtLink
           v-if="nag.link && shouldShowLink(nag)"
           :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/${
@@ -66,7 +64,7 @@
           }`"
           class="goto-link"
         >
-          {{ nag.link.title }}
+          {{ getFormattedMessage(nag.link.title) }}
           <ChevronRightIcon aria-hidden="true" class="featured-header-chevron" />
         </NuxtLink>
         <ButtonStyled
@@ -77,13 +75,11 @@
           <button
             :disabled="!canSubmitForReview"
             v-tooltip="
-              !canSubmitForReview
-                ? 'You must complete the required steps in the publishing checklist!'
-                : undefined
+              !canSubmitForReview ? getFormattedMessage(messages.submitChecklistTooltip) : undefined
             "
           >
             <SendIcon />
-            Submit for review
+            {{ getFormattedMessage(messages.submitForReview) }}
           </button>
         </ButtonStyled>
       </div>
@@ -106,6 +102,7 @@ import {
 import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
 import { nags } from "@modrinth/moderation";
 import { ButtonStyled } from "@modrinth/ui";
+import { useVIntl, defineMessages, type MessageDescriptor } from "@vintl/vintl";
 import type { Nag, NagContext, NagStatus } from "@modrinth/moderation";
 import type { Project, User, Version } from "@modrinth/utils";
 import type { Component } from "vue";
@@ -139,6 +136,112 @@ interface Props {
   setProcessing?: (processing: boolean) => void;
   toggleCollapsed?: () => void;
   updateMembers?: () => void | Promise<void>;
+}
+
+const messages = defineMessages({
+  invitationTitle: {
+    id: "project-member-header.invitation-title",
+    defaultMessage: "Invitation to join project",
+  },
+  invitationWithRole: {
+    id: "project-member-header.invitation-with-role",
+    defaultMessage: "You've been invited be a member of this project with the role of '{role}'.",
+  },
+  invitationNoRole: {
+    id: "project-member-header.invitation-no-role",
+    defaultMessage:
+      "You've been invited to join this project. Please accept or decline the invitation.",
+  },
+  accept: {
+    id: "project-member-header.accept",
+    defaultMessage: "Accept",
+  },
+  decline: {
+    id: "project-member-header.decline",
+    defaultMessage: "Decline",
+  },
+  publishingChecklist: {
+    id: "project-member-header.publishing-checklist",
+    defaultMessage: "Publishing checklist",
+  },
+  submitForReview: {
+    id: "project-member-header.submit-for-review",
+    defaultMessage: "Submit for review",
+  },
+  submitForReviewDesc: {
+    id: "project-member-header.submit-for-review-desc",
+    defaultMessage:
+      "Your project is only viewable by members of the project. It must be reviewed by moderators in order to be published.",
+  },
+  resubmitForReview: {
+    id: "project-member-header.resubmit-for-review",
+    defaultMessage: "Resubmit for review",
+  },
+  resubmitForReviewDesc: {
+    id: "project-member-header.resubmit-for-review-desc",
+    defaultMessage:
+      "Your project has been {status} by Modrinth's staff. In most cases, you can resubmit for review after addressing the staff's message.",
+  },
+  visitModerationPage: {
+    id: "project-member-header.visit-moderation-page",
+    defaultMessage: "Visit moderation page",
+  },
+  submitChecklistTooltip: {
+    id: "project-member-header.submit-checklist-tooltip",
+    defaultMessage: "You must complete the required steps in the publishing checklist!",
+  },
+  successJoin: {
+    id: "project-member-header.success-join",
+    defaultMessage: "You have joined the project team",
+  },
+  errorJoin: {
+    id: "project-member-header.error-join",
+    defaultMessage: "Failed to accept team invitation",
+  },
+  successDecline: {
+    id: "project-member-header.success-decline",
+    defaultMessage: "You have declined the team invitation",
+  },
+  errorDecline: {
+    id: "project-member-header.error-decline",
+    defaultMessage: "Failed to decline team invitation",
+  },
+  success: {
+    id: "project-member-header.success",
+    defaultMessage: "Success",
+  },
+  error: {
+    id: "project-member-header.error",
+    defaultMessage: "Error",
+  },
+  required: {
+    id: "project-member-header.required",
+    defaultMessage: "Required",
+  },
+  warning: {
+    id: "project-member-header.warning",
+    defaultMessage: "Warning",
+  },
+  suggestion: {
+    id: "project-member-header.suggestion",
+    defaultMessage: "Suggestion",
+  },
+});
+
+const { formatMessage } = useVIntl();
+
+function getNagDescription(nag: Nag): string {
+  if (typeof nag.description === "function") {
+    return nag.description(nagContext.value);
+  }
+  return formatMessage(nag.description);
+}
+
+function getFormattedMessage(message: string | MessageDescriptor): string {
+  if (typeof message === "string") {
+    return message;
+  }
+  return formatMessage(message);
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -195,9 +298,8 @@ const visibleNags = computed<Nag[]>(() => {
   if (props.project.status === "draft") {
     finalNags.push({
       id: "submit-for-review",
-      title: "Submit for review",
-      description: () =>
-        "Your project is only viewable by members of the project. It must be reviewed by moderators in order to be published.",
+      title: messages.submitForReview,
+      description: () => formatMessage(messages.submitForReviewDesc),
       status: "special-submit-action",
       shouldShow: (ctx) => ctx.project.status === "draft",
     });
@@ -206,14 +308,14 @@ const visibleNags = computed<Nag[]>(() => {
   if (props.tags.rejectedStatuses.includes(props.project.status)) {
     finalNags.push({
       id: "resubmit-for-review",
-      title: "Resubmit for review",
+      title: messages.resubmitForReview,
       description: (ctx) =>
-        `Your project has been ${ctx.project.status} by Modrinth's staff. In most cases, you can resubmit for review after addressing the staff's message.`,
+        formatMessage(messages.resubmitForReviewDesc, { status: ctx.project.status }),
       status: "special-submit-action",
       shouldShow: (ctx) => ctx.tags.rejectedStatuses.includes(ctx.project.status),
       link: {
         path: "moderation",
-        title: "Visit moderation page",
+        title: messages.visitModerationPage,
         shouldShow: () => props.routeName !== "type-id-moderation",
       },
     });
@@ -244,13 +346,13 @@ function getDefaultIcon(status: NagStatus): Component {
 function getStatusTooltip(status: NagStatus): string {
   switch (status) {
     case "required":
-      return "Required";
+      return formatMessage(messages.required);
     case "warning":
-      return "Warning";
+      return formatMessage(messages.warning);
     case "suggestion":
-      return "Suggestion";
+      return formatMessage(messages.suggestion);
     default:
-      return "Required";
+      return formatMessage(messages.required);
   }
 }
 
@@ -293,15 +395,15 @@ async function acceptInvite(): Promise<void> {
     await updateMembers();
     addNotification({
       group: "main",
-      title: "Success",
-      text: "You have joined the project team",
+      title: formatMessage(messages.success),
+      text: formatMessage(messages.successJoin),
       type: "success",
     });
   } catch (error) {
     addNotification({
       group: "main",
-      title: "Error",
-      text: "Failed to accept team invitation",
+      title: formatMessage(messages.error),
+      text: formatMessage(messages.errorJoin),
       type: "error",
     });
   } finally {
@@ -316,15 +418,15 @@ async function declineInvite(): Promise<void> {
     await updateMembers();
     addNotification({
       group: "main",
-      title: "Success",
-      text: "You have declined the team invitation",
+      title: formatMessage(messages.success),
+      text: formatMessage(messages.successDecline),
       type: "success",
     });
   } catch (error) {
     addNotification({
       group: "main",
-      title: "Error",
-      text: "Failed to decline team invitation",
+      title: formatMessage(messages.error),
+      text: formatMessage(messages.errorDecline),
       type: "error",
     });
   } finally {
