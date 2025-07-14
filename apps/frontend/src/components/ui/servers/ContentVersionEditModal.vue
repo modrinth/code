@@ -31,9 +31,9 @@
                 class="flex cursor-pointer items-center gap-1 bg-transparent p-0"
                 @click="
                   versionFilter &&
-                    (unlockFilterAccordion.isOpen
-                      ? unlockFilterAccordion.close()
-                      : unlockFilterAccordion.open())
+                  (unlockFilterAccordion.isOpen
+                    ? unlockFilterAccordion.close()
+                    : unlockFilterAccordion.open())
                 "
               >
                 <TagItem
