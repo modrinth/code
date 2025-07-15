@@ -143,6 +143,8 @@ pub enum ApiError {
     RateLimitError(u128, u32),
     #[error("Error while interacting with payment processor: {0}")]
     Stripe(#[from] stripe::StripeError),
+    #[error("Error during webauthn registration")]
+    WebauthnRegistration
 }
 
 impl ApiError {
@@ -176,6 +178,7 @@ impl ApiError {
                 ApiError::Io(..) => "io_error",
                 ApiError::RateLimitError(..) => "ratelimit_error",
                 ApiError::Stripe(..) => "stripe_error",
+                ApiError::WebauthnRegistration => "webauthn_registration_error",
             },
             description: self.to_string(),
         }
@@ -212,6 +215,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::Io(..) => StatusCode::BAD_REQUEST,
             ApiError::RateLimitError(..) => StatusCode::TOO_MANY_REQUESTS,
             ApiError::Stripe(..) => StatusCode::FAILED_DEPENDENCY,
+            ApiError::WebauthnRegistration => StatusCode::BAD_REQUEST,
         }
     }
 

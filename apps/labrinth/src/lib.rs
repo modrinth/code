@@ -19,6 +19,7 @@ use crate::queue::moderation::AutomatedModerationQueue;
 use crate::util::env::{parse_strings_from_var, parse_var};
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use sync::friends::handle_pubsub;
+use crate::auth::webauthn;
 
 pub mod auth;
 pub mod background_task;
@@ -313,6 +314,7 @@ pub fn app_config(
     .app_data(labrinth_config.automated_moderation_queue.clone())
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
     .app_data(labrinth_config.rate_limiter.clone())
+    .app_data(webauthn::startup().clone())
     .configure(
         #[allow(unused_variables)]
         |cfg| {

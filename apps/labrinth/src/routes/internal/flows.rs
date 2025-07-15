@@ -1,7 +1,7 @@
 use crate::auth::email::send_email;
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::auth::{AuthProvider, AuthenticationError, get_user_from_headers};
-use crate::database::models::DBUser;
+use crate::database::models::{DBUser, DBUserId};
 use crate::database::models::flow_item::DBFlow;
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
@@ -31,7 +31,9 @@ use sqlx::postgres::PgPool;
 use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::Arc;
+use uuid::Uuid;
 use validator::Validate;
+use webauthn_rs::Webauthn;
 use zxcvbn::Score;
 
 pub fn config(cfg: &mut ServiceConfig) {
@@ -48,6 +50,7 @@ pub fn config(cfg: &mut ServiceConfig) {
             .service(remove_2fa)
             .service(reset_password_begin)
             .service(change_password)
+            .service(webauthn_registration)
             .service(resend_verify_email)
             .service(set_email)
             .service(verify_email)
@@ -2154,6 +2157,57 @@ pub async fn change_password(
         .await?;
 
     Ok(HttpResponse::Ok().finish())
+}
+
+#[post("webauthn/register/{username}")]
+pub async fn webauthn_registration(
+    username: web::Path<String>,
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    session_queue: Data<AuthQueue>,
+    webauthn: Data<Webauthn>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::USER_AUTH_WRITE,
+    )
+    .await?
+    .1;
+
+    let db_user_id: DBUserId = user.id.into();
+
+    // Convert i64 user id to uuid
+    let user_uuid = Uuid::from_u128(db_user_id.0 as u128);
+
+    let (ccr, reg_state) = webauthn
+        .start_passkey_registration(
+            user_uuid,
+            &username,
+            &username,
+            None
+            //exclude_credentials,
+        )
+        .map_err(|_| {
+            // TODO - Error handling
+            ApiError::WebauthnRegistration
+        })?;
+
+    let flow = DBFlow::InitializeWebauthn {
+            username: username.into_inner(),
+            user_id: db_user_id.clone(),
+            reg_state,
+        }
+        .insert(Duration::minutes(30), &redis)
+        .await?;
+
+    Ok(HttpResponse::Ok().json(serde_json::json!({
+        "challenge": ccr,
+        "flow": flow,
+    })))
 }
 
 #[derive(Deserialize, Validate)]

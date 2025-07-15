@@ -161,6 +161,7 @@ import _SaveIcon from './icons/save.svg?component'
 import _ScaleIcon from './icons/scale.svg?component'
 import _ScanEyeIcon from './icons/scan-eye.svg?component'
 import _SearchIcon from './icons/search.svg?component'
+import _SecurityKeyIcon from './icons/security-key.svg?component'
 import _SendIcon from './icons/send.svg?component'
 import _ServerIcon from './icons/server.svg?component'
 import _SettingsIcon from './icons/settings.svg?component'
@@ -381,6 +382,7 @@ export const SaveIcon = _SaveIcon
 export const ScaleIcon = _ScaleIcon
 export const ScanEyeIcon = _ScanEyeIcon
 export const SearchIcon = _SearchIcon
+export const SecurityKeyIcon = _SecurityKeyIcon
 export const SendIcon = _SendIcon
 export const ServerIcon = _ServerIcon
 export const SettingsIcon = _SettingsIcon

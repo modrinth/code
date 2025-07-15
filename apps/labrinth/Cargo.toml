@@ -83,7 +83,7 @@ sqlx = { workspace = true, features = [
     "macros",
     "migrate",
     "rust_decimal",
-    "json",
+    "json"
 ] }
 rust_decimal = { workspace = true, features = [
     "serde-with-float",

@@ -357,6 +357,20 @@
       </div>
       <div class="adjacent-input">
         <label for="theme-selector">
+          <span class="label__title">Hardware security key</span>
+          <span class="label__description">
+            Add an additional and more secure method of security to your account during login.
+          </span>
+        </label>
+        <div>
+          <button class="iconified-button" @click="showWebauthnModal">
+            <template v-if="auth.user.has_webauthn"> <TrashIcon /> Remove Hardware Security Key </template>
+            <template v-else> <SecurityKeyIcon /> Setup Hardware Security Key </template>
+          </button>
+        </div>
+      </div>
+      <div class="adjacent-input">
+        <label for="theme-selector">
           <span class="label__title">Manage authentication providers</span>
           <span class="label__description">
             Add or remove sign-on methods from your account, including GitHub, GitLab, Microsoft,
@@ -577,6 +591,81 @@ async function removeTwoFactor() {
     twoFactorIncorrect.value = true;
   }
   stopLoading();
+}
+
+const mangeWebauthnModal = ref();
+const webauthnSecret = ref(null);
+const webauthnFlow = ref(null);
+const webauthnStep = ref(0);
+async function showWebauthnModal() {
+  webauthnStep.value = 0;
+  // twoFactorCode.value = null;
+  // twoFactorIncorrect.value = false;
+  if (auth.value.user.has_webauthn) {
+    mangeWebauthnModal.value.show();
+    return;
+  }
+
+  webauthnSecret.value = null;
+  webauthnFlow.value = null;
+  // backupCodes.value = [];
+  mangeWebauthnModal.value.show();
+
+  startLoading();
+  try {
+    const res = await useBaseFetch(`auth/webauthn/register/${auth.value.user.username}`, {
+      method: "POST",
+      internal: true
+    });
+
+    webauthnSecret.value = res.secret;
+    webauthnFlow.value = res.flow;
+  } catch (err) {
+    data.$notify({
+      group: "main",
+      title: "An error occurred",
+      text: err.data ? err.data.description : err,
+      type: "error",
+    });
+  }
+  stopLoading();
+}
+
+// TODO - webauthn
+async function createCredential(ccr) {
+  const publicKeyOptions = convertCcrToPublicKeyOptions(ccr);
+
+  try {
+    const credential = await navigator.credentials.create({
+      publicKey: publicKeyOptions,
+    });
+
+    console.log("created cred", credential);
+    return credential;
+  } catch (err) {
+    console.error("failed to create cred", err);
+    throw err;
+  }
+}
+
+function convertCcrToPublicKeyOptions(ccr) {
+  return {
+    challenge: Uint8Array.from(atob(ccr.challenge), c => c.charCodeAt(0)),
+    rp: {
+      name: ccr.rp.name,
+      id: ccr.rp.id,
+    },
+    user: {
+      id: Uint8Array.from(atob(ccr.user.id), c => c.charCodeAt(0)),
+      name: ccr.user.name,
+      displayName: ccr.user.displayName,
+    },
+    pubKeyCredParams: ccr.pubKeyCredParams,
+    timeout: ccr.timeout,
+    attestation: ccr.attestation,
+    authenticatorSelection: ccr.authenticatorSelection,
+    extensions: ccr.extensions,
+  };
 }
 
 const authProviders = [

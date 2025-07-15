@@ -46,6 +46,7 @@ pub struct User {
     pub email_verified: Option<bool>,
     pub has_password: Option<bool>,
     pub has_totp: Option<bool>,
+    pub has_webauthn: Option<bool>,
     pub payout_data: Option<UserPayoutData>,
     pub stripe_customer_id: Option<String>,
     pub allow_friend_requests: Option<bool>,
@@ -80,9 +81,10 @@ impl From<DBUser> for User {
             auth_providers: None,
             has_password: None,
             has_totp: None,
+            has_webauthn: None,
             github_id: None,
             stripe_customer_id: None,
-            allow_friend_requests: None,
+            allow_friend_requests: None
         }
     }
 }
@@ -126,6 +128,7 @@ impl User {
             auth_providers: Some(auth_providers),
             has_password: Some(db_user.password.is_some()),
             has_totp: Some(db_user.totp_secret.is_some()),
+            has_webauthn: Some(false), // TODO - webauthn
             github_id: None,
             payout_data: Some(UserPayoutData {
                 paypal_address: db_user.paypal_email,
@@ -189,7 +192,7 @@ impl Role {
 pub struct UserFriend {
     // The user who accepted the friend request
     pub id: UserId,
-    /// THe user who sent the friend request
+    /// The user who sent the friend request
     pub friend_id: UserId,
     pub accepted: bool,
     pub created: DateTime<Utc>,

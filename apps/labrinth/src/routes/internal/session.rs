@@ -16,6 +16,8 @@ use rand::distributions::Alphanumeric;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
 use sqlx::PgPool;
+use uuid::Uuid;
+use webauthn_rs::prelude::{PasskeyAuthentication, PasskeyRegistration};
 use woothee::parser::Parser;
 
 pub fn config(cfg: &mut ServiceConfig) {
@@ -27,6 +29,17 @@ pub fn config(cfg: &mut ServiceConfig) {
     );
 }
 
+pub struct PasskeyRegistrationState {
+    pub username: String,
+    pub id: Uuid,
+    pub passkey_registration: PasskeyRegistration,
+}
+
+pub struct PasskeyAuthenticationState {
+    pub user_id: Uuid,
+    pub passkey_authentication: PasskeyAuthentication,
+}
+
 pub struct SessionMetadata {
     pub city: Option<String>,
     pub country: Option<String>,
@@ -35,6 +48,9 @@ pub struct SessionMetadata {
     pub os: Option<String>,
     pub platform: Option<String>,
     pub user_agent: String,
+
+    pub passkey_registration_state: Option<PasskeyRegistrationState>,
+    pub passkey_authentication_state: Option<PasskeyAuthenticationState>,
 }
 
 pub async fn get_session_metadata(
@@ -80,6 +96,9 @@ pub async fn get_session_metadata(
             .ok_or_else(|| AuthenticationError::InvalidCredentials)?
             .to_string(),
         user_agent: user_agent.to_string(),
+        // TODO - Webauthn
+        passkey_registration_state: None,
+        passkey_authentication_state: None,
     })
 }
 
