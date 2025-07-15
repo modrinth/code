@@ -7,7 +7,8 @@ export default {
   title: 'Modpack Permissions',
   icon: PackageOpenIcon,
   // Replace me please.
-  guidance_url: 'https://docs.modrinth.com/moderation/modpack-permissions',
+  guidance_url:
+    'https://www.notion.so/Content-Moderation-Cheat-Sheets-22d5ee711bf081a4920ef08879fe6bf5?source=copy_link#22d5ee711bf08116bd8bc1186f357062',
   shouldShow: (project: Project) => project.project_type === 'modpack',
   actions: [
     {
