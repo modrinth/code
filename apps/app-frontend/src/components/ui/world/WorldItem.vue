@@ -130,7 +130,7 @@ const messages = defineMessages({
   },
   noContact: {
     id: 'instance.worlds.no_contact',
-    defaultMessage: 'Server couldn\'t be contacted',
+    defaultMessage: "Server couldn't be contacted",
   },
   incompatibleServer: {
     id: 'instance.worlds.incompatible_server',
