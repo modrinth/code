@@ -443,8 +443,9 @@
                 Where are Modrinth Servers located? Can I choose a region?
               </summary>
               <p class="m-0 ml-6 leading-[160%]">
-                We have servers in both North America in Vint Hill, Virginia, and Europe in Limburg,
-                Germany. More regions to come in the future!
+                We have servers available in North America and Europe at the moment that you can
+                choose upon purchase. More regions to come in the future! If you'd like to switch
+                your region, please contact support.
               </p>
             </details>
 
