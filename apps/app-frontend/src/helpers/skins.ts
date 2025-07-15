@@ -71,16 +71,13 @@ export async function determineModelType(texture: string): Promise<'SLIM' | 'CLA
 
       for (let y = 0; y < armHeight; y++) {
         const alphaIndex = y * armWidth * 2 + alphaIndexInRgba
-        console.log(alphaIndex)
         if (imageData[alphaIndex] !== 0) {
-          console.log('CLASSIC')
           resolve('CLASSIC')
           return
         }
       }
 
       canvas.remove()
-      console.log('SLIM')
       resolve('SLIM')
     }
 
