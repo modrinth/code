@@ -1,1 +1,1 @@
-**Source:** %PROJECT_SOURCE_URL%  
+**Source:** %PROJECT_SOURCE_URL%

@@ -4,10 +4,7 @@ import type { Stage } from '../../types/stage'
 const titleSlug: Stage = {
   title: 'Are the Name and URL accurate and appropriate?',
   id: 'title-&-slug',
-  text: async () =>
-    (await import('../messages/checklist-text/title-slug/title.md?raw')).default +
-    (await import('../messages/checklist-text/title-slug/slug.md?raw')).default +
-    (await import('../messages/checklist-text/title-slug/title_prompt.md?raw')).default,
+  text: async () => (await import('../messages/checklist-text/title-slug.md?raw')).default,
   icon: BookOpenIcon,
   guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
   actions: [

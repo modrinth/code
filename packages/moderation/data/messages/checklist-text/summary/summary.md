@@ -1,2 +1,2 @@
 **Summary:**  
-`%PROJECT_SUMMARY%`  
+`%PROJECT_SUMMARY%`

@@ -1,1 +1,1 @@
-**Discord:** %PROJECT_DISCORD_URL%  
+**Discord:** %PROJECT_DISCORD_URL%

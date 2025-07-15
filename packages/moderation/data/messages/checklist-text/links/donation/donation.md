@@ -1,1 +1,1 @@
-> **{PLATFORM}:** {URL}  
+> **{PLATFORM}:** {URL}

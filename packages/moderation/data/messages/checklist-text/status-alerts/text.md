@@ -1,1 +1,1 @@
-**Applying for:** `%PROJECT_REQUESTED_STATUS%`  
+**Applying for:** `%PROJECT_REQUESTED_STATUS%`

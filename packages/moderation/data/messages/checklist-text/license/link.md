@@ -1,1 +1,1 @@
-**License Link:** %PROJECT_LICENSE_URL%  
+**License Link:** %PROJECT_LICENSE_URL%

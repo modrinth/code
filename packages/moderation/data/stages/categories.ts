@@ -10,13 +10,8 @@ const categories: Stage = {
   navigate: '/settings/tags',
   shouldShow: (project) =>
     project.categories.length > 0 || project.additional_categories.length > 0,
-  text: async (project) => {
-    let text = ''
-    if (project.categories.length > 0)
-      text += (await import('../messages/checklist-text/categories/featured.md?raw')).default
-    if (project.additional_categories.length > 0)
-      text += (await import('../messages/checklist-text/categories/additional.md?raw')).default
-    return text
+  text: async () => {
+    return (await import('../messages/checklist-text/categories.md?raw')).default
   },
   actions: [
     {

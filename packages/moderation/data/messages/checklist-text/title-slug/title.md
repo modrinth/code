@@ -1,1 +1,0 @@
-**Title:** %PROJECT_TITLE%  

@@ -1,1 +1,1 @@
-**Wiki:** %PROJECT_WIKI_URL%  
+**Wiki:** %PROJECT_WIKI_URL%

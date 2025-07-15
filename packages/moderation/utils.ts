@@ -229,6 +229,10 @@ export function kebabToTitleCase(input: string): string {
     .join(' ')
 }
 
+export function arrayOrNone(arr: string[]): string {
+  return arr.length > 0 ? arr.join(', ') : 'None'
+}
+
 export function flattenProjectVariables(project: Project): Record<string, string> {
   const vars: Record<string, string> = {}
 
@@ -268,11 +272,11 @@ export function flattenProjectVariables(project: Project): Record<string, string
   vars['PROJECT_LICENSE_NAME'] = project.license.name
   vars['PROJECT_LICENSE_URL'] = project.license.url || ''
 
-  vars['PROJECT_CATEGORIES'] = project.categories.join(', ')
-  vars['PROJECT_ADDITIONAL_CATEGORIES'] = project.additional_categories.join(', ')
-  vars['PROJECT_GAME_VERSIONS'] = project.game_versions.join(', ')
-  vars['PROJECT_LOADERS'] = project.loaders.join(', ')
-  vars['PROJECT_VERSIONS'] = project.versions.join(', ')
+  vars['PROJECT_CATEGORIES'] = arrayOrNone(project.categories)
+  vars['PROJECT_ADDITIONAL_CATEGORIES'] = arrayOrNone(project.additional_categories)
+  vars['PROJECT_GAME_VERSIONS'] = arrayOrNone(project.game_versions)
+  vars['PROJECT_LOADERS'] = arrayOrNone(project.loaders)
+  vars['PROJECT_VERSIONS'] = arrayOrNone(project.versions)
 
   vars['PROJECT_CATEGORIES_COUNT'] = project.categories.length.toString()
   vars['PROJECT_GAME_VERSIONS_COUNT'] = project.game_versions.length.toString()

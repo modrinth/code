@@ -1,1 +1,1 @@
-**Issues:** %PROJECT_ISSUES_URL%  
+**Issues:** %PROJECT_ISSUES_URL%
