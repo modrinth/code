@@ -1,7 +1,7 @@
 import type { Stage } from '../types/stage'
 import modpackPermissionsStage from './modpack-permissions-stage'
 import categories from './stages/categories'
-import copyright from './stages/copyright'
+import reupload from './stages/reupload'
 import description from './stages/description'
 import gallery from './stages/gallery'
 import links from './stages/links'
@@ -24,7 +24,7 @@ export default [
   sideTypes,
   gallery,
   versions,
-  copyright,
+  reupload,
   ruleFollowing,
   modpackPermissionsStage,
   statusAlerts,

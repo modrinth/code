@@ -295,18 +295,41 @@ export function flattenProjectVariables(project: Project): Record<string, string
   })
 
   //Static time saving stuff
-  vars['RULES'] = "[Modrinth's Content Rules](https://modrinth.com/legal/rules)"
+  vars[`RULES`] = `[Modrinth's Content Rules](https://modrinth.com/legal/rules)`
+  vars[`TOS`] = `[Terms of Use](https://modrinth.com/legal/terms)`
+  vars[`COPYRIGHT_POLICY`] = `[Copyright Policy](https://modrinth.com/legal/copyright)`
+  vars[`SUPPORT`] =
+    `please visit the [Modrinth Help Center](https://support.modrinth.com/) and click the green bubble to contact support.`
+  vars[`MODPACK_PERMISSIONS_GUIDE`] =
+    `our guide to [Obtaining Modpack Permissions](https://support.modrinth.com/en/articles/8797527-obtaining-modpack-permissions)`
+  vars[`MODPACKS_ON_MODRINTH`] =
+    `[Modpacks on Modrinth](https://support.modrinth.com/en/articles/8802250-modpacks-on-modrinth)`
+  vars[`ADVANCED_MARKDOWN`] =
+    `[Markdown Formatting Guide](https://support.modrinth.com/en/articles/8801962-advanced-markdown-formatting)`
+  vars[`LICENSING_GUIDE`] =
+    `our guide to [Guide to Licensing your Mods](https://modrinth.com/news/article/licensing-guide)`
 
   //navigation related variables
   vars[`PROJECT_PERMANENT_LINK`] = `https://modrinth.com/project/${project.id}`
   vars[`PROJECT_SETTINGS_LINK`] = `https://modrinth.com/project/${project.id}/settings`
   vars[`PROJECT_SETTINGS_FLINK`] = `[Settings](https://modrinth.com/project/${project.id}/settings)`
-  vars[`PROJECT_LINKS_LINK`] = `https://modrinth.com/project/${project.id}/settings/links`
-  vars[`PROJECT_LINKS_FLINK`] = `[Links](https://modrinth.com/project/${project.id}/settings/links)`
+  vars[`PROJECT_TAGS_LINK`] = `https://modrinth.com/project/${project.id}/settings/tags`
+  vars[`PROJECT_TAGS_FLINK`] = `[Tags](https://modrinth.com/project/${project.id}/settings/tags)`
   vars[`PROJECT_DESCRIPTION_LINK`] =
     `https://modrinth.com/project/${project.id}/settings/description`
   vars[`PROJECT_DESCRIPTION_FLINK`] =
     `[Description](https://modrinth.com/project/${project.id}/settings/description)`
+  vars[`PROJECT_LICENSE_LINK`] = `https://modrinth.com/project/${project.id}/license`
+  vars[`PROJECT_LICENSE_FLINK`] = `[License](https://modrinth.com/project/${project.id}/license`
+  vars[`PROJECT_LINKS_LINK`] = `https://modrinth.com/project/${project.id}/settings/links`
+  vars[`PROJECT_LINKS_FLINK`] = `[Links](https://modrinth.com/project/${project.id}/settings/links)`
+  vars[`PROJECT_GALLERY_LINK`] = `https://modrinth.com/project/${project.id}/gallery`
+  vars[`PROJECT_GALLERY_FLINK`] = `[Gallery](https://modrinth.com/project/${project.id}/gallery)`
+  vars[`PROJECT_VERSIONS_LINK`] = `https://modrinth.com/project/${project.id}/versions`
+  vars[`PROJECT_VERSIONS_FLINK`] = `[Versions](https://modrinth.com/project/${project.id}/versions)`
+  vars[`PROJECT_MODERATION_LINK`] = `https://modrinth.com/project/${project.id}/moderation`
+  vars[`PROJECT_MODERATION_FLINK`] =
+    `[moderation tab](https://modrinth.com/project/${project.id}/moderation)`
 
   return vars
 }
