@@ -427,11 +427,8 @@
                 Do Modrinth Servers have DDoS protection?
               </summary>
               <p class="m-0 ml-6 leading-[160%]">
-                Yes. All Modrinth Servers come with DDoS protection powered by
-                <a href="https://us.ovhcloud.com/security/anti-ddos/" target="_blank"
-                  >OVHcloud® Anti-DDoS infrastructure</a
-                >
-                which has over 17Tbps capacity. Your server is safe on Modrinth.
+                Yes. All Modrinth Servers come with DDoS protection, with up to 17Tbps capacity in
+                some locations.
               </p>
             </details>
 
