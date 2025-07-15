@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-07-15T08:20:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed gallery images from overflowing with long words in their descriptions.`,
+  },
+  {
     date: `2025-07-09T22:15:00-07:00`,
     product: 'web',
     body: `### Improvements
