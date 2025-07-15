@@ -36,7 +36,7 @@ const licenseStage: Stage = {
     {
       id: 'license_invalid_link',
       type: 'button',
-      label: 'Invalid License Link',
+      label: 'Invalid Link',
       weight: 600,
       suggestedStatus: 'flagged',
       severity: 'medium',
@@ -45,8 +45,8 @@ const licenseStage: Stage = {
       enablesActions: [
         {
           id: 'license_invalid_link-custom_license',
-          type: 'button',
-          label: 'Custom License',
+          type: 'toggle',
+          label: 'Invalid Link: Custom License',
           weight: 601,
           suggestedStatus: 'flagged',
           severity: 'medium',
@@ -85,8 +85,8 @@ const licenseStage: Stage = {
       enablesActions: [
         {
           id: 'license_no_source-fork',
-          type: 'button',
-          label: 'Fork',
+          type: 'toggle',
+          label: 'No Source: Fork',
           weight: 602,
           suggestedStatus: 'rejected',
           severity: 'high',
