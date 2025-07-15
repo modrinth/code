@@ -3,9 +3,9 @@ use regex::Regex;
 use webauthn_rs::{Webauthn, WebauthnBuilder};
 
 pub fn startup() -> Data<Webauthn> {
-    let url = url::Url::parse(&dotenvy::var("SITE_URL").unwrap_or_default())
-        .unwrap();
-    
+    let url =
+        url::Url::parse(&dotenvy::var("SITE_URL").unwrap_or_default()).unwrap();
+
     let rp_id = dotenvy::var("SITE_URL")
         .ok()
         .and_then(|s| {
@@ -17,14 +17,10 @@ pub fn startup() -> Data<Webauthn> {
         })
         .unwrap_or_default();
 
-    let builder = WebauthnBuilder::new(&rp_id, &url)
-        .expect("Invalid configuration");
-    
+    let builder =
+        WebauthnBuilder::new(&rp_id, &url).expect("Invalid configuration");
+
     let builder = builder.rp_name("Actix-web modrinth");
 
-
-    let webauthn = Data::new(builder.build()
-        .expect("Invalid configuration"));
-
-    webauthn
+    Data::new(builder.build().expect("Invalid configuration"))
 }

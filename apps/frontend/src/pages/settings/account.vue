@@ -364,7 +364,9 @@
         </label>
         <div>
           <button class="iconified-button" @click="showWebauthnModal">
-            <template v-if="auth.user.has_webauthn"> <TrashIcon /> Remove Hardware Security Key </template>
+            <template v-if="auth.user.has_webauthn">
+              <TrashIcon /> Remove Hardware Security Key
+            </template>
             <template v-else> <SecurityKeyIcon /> Setup Hardware Security Key </template>
           </button>
         </div>
@@ -428,6 +430,7 @@ import {
   PlusIcon,
   RightArrowIcon,
   SaveIcon,
+  SecurityKeyIcon,
   SettingsIcon,
   TrashIcon,
   UpdatedIcon,
@@ -594,32 +597,47 @@ async function removeTwoFactor() {
 }
 
 const mangeWebauthnModal = ref();
-const webauthnSecret = ref(null);
-const webauthnFlow = ref(null);
-const webauthnStep = ref(0);
 async function showWebauthnModal() {
-  webauthnStep.value = 0;
-  // twoFactorCode.value = null;
-  // twoFactorIncorrect.value = false;
   if (auth.value.user.has_webauthn) {
     mangeWebauthnModal.value.show();
     return;
   }
 
-  webauthnSecret.value = null;
-  webauthnFlow.value = null;
-  // backupCodes.value = [];
-  mangeWebauthnModal.value.show();
-
   startLoading();
   try {
-    const res = await useBaseFetch(`auth/webauthn/register/${auth.value.user.username}`, {
+    const res = await useBaseFetch(`auth/webauthn/register/start/${auth.value.user.username}`, {
       method: "POST",
-      internal: true
+      internal: true,
     });
 
-    webauthnSecret.value = res.secret;
-    webauthnFlow.value = res.flow;
+    const publicKey = res.challenge.publicKey;
+    publicKey.challenge = b64urlToUint8Array(publicKey.challenge);
+    publicKey.user.id = b64urlToUint8Array(publicKey.user.id);
+
+    const credential = await navigator.credentials.create({ publicKey });
+
+    console.log("Created webauthn credential", credential);
+
+    const jsonCredential = {
+      id: credential.id,
+      rawId: uint8ArrayToB64url(credential.rawId),
+      type: credential.type,
+      response: {
+        clientDataJSON: uint8ArrayToB64url(credential.response.clientDataJSON),
+        attestationObject: uint8ArrayToB64url(credential.response.attestationObject),
+      },
+    };
+
+    await useBaseFetch("auth/webauthn/register/finish", {
+      method: "POST",
+      internal: true,
+      body: {
+        cred: jsonCredential,
+        flow: res.flow
+      },
+    });
+
+    mangeWebauthnModal.value.show();
   } catch (err) {
     data.$notify({
       group: "main",
@@ -631,41 +649,23 @@ async function showWebauthnModal() {
   stopLoading();
 }
 
-// TODO - webauthn
-async function createCredential(ccr) {
-  const publicKeyOptions = convertCcrToPublicKeyOptions(ccr);
-
-  try {
-    const credential = await navigator.credentials.create({
-      publicKey: publicKeyOptions,
-    });
-
-    console.log("created cred", credential);
-    return credential;
-  } catch (err) {
-    console.error("failed to create cred", err);
-    throw err;
-  }
+function b64urlToUint8Array(b64url) {
+  const base64 = b64url
+      .replace(/-/g, '+')
+      .replace(/_/g, '/')
+      .padEnd(b64url.length + (4 - b64url.length % 4) % 4, '=');
+  const binary = atob(base64);
+  return Uint8Array.from(binary, c => c.charCodeAt(0));
 }
 
-function convertCcrToPublicKeyOptions(ccr) {
-  return {
-    challenge: Uint8Array.from(atob(ccr.challenge), c => c.charCodeAt(0)),
-    rp: {
-      name: ccr.rp.name,
-      id: ccr.rp.id,
-    },
-    user: {
-      id: Uint8Array.from(atob(ccr.user.id), c => c.charCodeAt(0)),
-      name: ccr.user.name,
-      displayName: ccr.user.displayName,
-    },
-    pubKeyCredParams: ccr.pubKeyCredParams,
-    timeout: ccr.timeout,
-    attestation: ccr.attestation,
-    authenticatorSelection: ccr.authenticatorSelection,
-    extensions: ccr.extensions,
-  };
+function uint8ArrayToB64url(buf) {
+  let binary = "";
+  const bytes = new Uint8Array(buf);
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  const base64 = btoa(binary);
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
 const authProviders = [

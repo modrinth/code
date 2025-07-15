@@ -84,7 +84,7 @@ impl From<DBUser> for User {
             has_webauthn: None,
             github_id: None,
             stripe_customer_id: None,
-            allow_friend_requests: None
+            allow_friend_requests: None,
         }
     }
 }
@@ -128,7 +128,7 @@ impl User {
             auth_providers: Some(auth_providers),
             has_password: Some(db_user.password.is_some()),
             has_totp: Some(db_user.totp_secret.is_some()),
-            has_webauthn: Some(false), // TODO - webauthn
+            has_webauthn: Some(db_user.webauthn_passkey.is_some()),
             github_id: None,
             payout_data: Some(UserPayoutData {
                 paypal_address: db_user.paypal_email,

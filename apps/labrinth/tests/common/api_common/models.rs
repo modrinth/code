@@ -239,6 +239,7 @@ pub struct CommonUser {
     pub email_verified: Option<bool>,
     pub has_password: Option<bool>,
     pub has_totp: Option<bool>,
+    pub has_webauthn: Option<bool>,
     pub payout_data: Option<UserPayoutData>,
     pub github_id: Option<u64>,
 }

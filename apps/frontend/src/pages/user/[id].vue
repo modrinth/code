@@ -51,6 +51,13 @@
             {{ user.has_totp ? "Yes" : "No" }}
           </span>
         </div>
+
+        <div class="flex flex-col gap-1">
+          <span class="text-lg font-bold text-primary"> Has Hardware Security Key </span>
+          <span>
+            {{ user.has_webauthn ? "Yes" : "No" }}
+          </span>
+        </div>
       </div>
     </NewModal>
     <div class="new-page sidebar" :class="{ 'alt-layout': cosmetics.leftContentLayout }">

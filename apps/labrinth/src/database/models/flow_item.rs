@@ -11,7 +11,6 @@ use rand_chacha::ChaCha20Rng;
 use rand_chacha::rand_core::SeedableRng;
 use serde::{Deserialize, Serialize};
 use webauthn_rs::prelude::PasskeyRegistration;
-use crate::routes::internal::session::PasskeyRegistrationState;
 
 const FLOWS_NAMESPACE: &str = "flows";
 

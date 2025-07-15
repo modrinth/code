@@ -144,7 +144,7 @@ pub enum ApiError {
     #[error("Error while interacting with payment processor: {0}")]
     Stripe(#[from] stripe::StripeError),
     #[error("Error during webauthn registration")]
-    WebauthnRegistration
+    WebauthnRegistration,
 }
 
 impl ApiError {

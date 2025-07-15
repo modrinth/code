@@ -1,8 +1,8 @@
 use crate::auth::email::send_email;
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::auth::{AuthProvider, AuthenticationError, get_user_from_headers};
-use crate::database::models::{DBUser, DBUserId};
 use crate::database::models::flow_item::DBFlow;
+use crate::database::models::{DBUser, DBUserId};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::pats::Scopes;
@@ -33,6 +33,7 @@ use std::str::FromStr;
 use std::sync::Arc;
 use uuid::Uuid;
 use validator::Validate;
+use webauthn_rs::prelude::{RegisterPublicKeyCredential};
 use webauthn_rs::Webauthn;
 use zxcvbn::Score;
 
@@ -50,7 +51,8 @@ pub fn config(cfg: &mut ServiceConfig) {
             .service(remove_2fa)
             .service(reset_password_begin)
             .service(change_password)
-            .service(webauthn_registration)
+            .service(webauthn_register_start)
+            .service(webauthn_register_finish)
             .service(resend_verify_email)
             .service(set_email)
             .service(verify_email)
@@ -223,6 +225,7 @@ impl TempUser {
                 venmo_handle: None,
                 stripe_customer_id: None,
                 totp_secret: None,
+                webauthn_passkey: None,
                 username,
                 email: self.email,
                 email_verified: true,
@@ -1416,6 +1419,7 @@ pub async fn create_account_with_password(
         venmo_handle: None,
         stripe_customer_id: None,
         totp_secret: None,
+        webauthn_passkey: None,
         username: new_account.username.clone(),
         email: Some(new_account.email.clone()),
         email_verified: false,
@@ -2159,8 +2163,14 @@ pub async fn change_password(
     Ok(HttpResponse::Ok().finish())
 }
 
-#[post("webauthn/register/{username}")]
-pub async fn webauthn_registration(
+#[derive(Deserialize, Validate)]
+pub struct SetupWebauthnFinish {
+    pub cred: RegisterPublicKeyCredential,
+    pub flow: String,
+}
+
+#[post("webauthn/register/start/{username}")]
+pub async fn webauthn_register_start(
     username: web::Path<String>,
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -2185,29 +2195,68 @@ pub async fn webauthn_registration(
 
     let (ccr, reg_state) = webauthn
         .start_passkey_registration(
-            user_uuid,
-            &username,
-            &username,
-            None
-            //exclude_credentials,
+            user_uuid, &username, &username, None, //exclude_credentials, TODO
         )
-        .map_err(|_| {
-            // TODO - Error handling
+        .map_err(|e| {
+            tracing::error!("Encountered error while starting passkey reg: {e}");
             ApiError::WebauthnRegistration
         })?;
 
     let flow = DBFlow::InitializeWebauthn {
-            username: username.into_inner(),
-            user_id: db_user_id.clone(),
-            reg_state,
-        }
-        .insert(Duration::minutes(30), &redis)
-        .await?;
+        username: username.into_inner(),
+        user_id: db_user_id,
+        reg_state,
+    }
+    .insert(Duration::minutes(30), &redis)
+    .await?;
 
     Ok(HttpResponse::Ok().json(serde_json::json!({
         "challenge": ccr,
         "flow": flow,
     })))
+}
+
+#[post("webauthn/register/finish")]
+pub async fn webauthn_register_finish(
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    login: web::Json<SetupWebauthnFinish>,
+    webauthn: Data<Webauthn>,
+) -> Result<HttpResponse, ApiError> {
+    let flow = DBFlow::get(&login.flow, &redis)
+        .await?
+        .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+
+    if let DBFlow::InitializeWebauthn { user_id, reg_state, .. } = flow {
+        let sk = webauthn
+            .finish_passkey_registration(&login.cred, &reg_state)
+            .map_err(|e| {
+                tracing::error!("Encountered error while finishing passkey reg: {e}");
+                ApiError::WebauthnRegistration
+            })?;
+
+        let sk_json = serde_json::to_value(&sk)
+            .map_err(|_| ApiError::WebauthnRegistration)?;
+
+        sqlx::query!(
+            "
+            UPDATE users
+            SET webauthn_passkey = $2
+            WHERE (id = $1)
+            ",
+            user_id.0,
+            sk_json
+        )
+            .execute(&**pool)
+            .await?;
+
+
+        Ok(HttpResponse::Ok().finish())
+    } else {
+        Err(ApiError::Authentication(
+            AuthenticationError::InvalidCredentials,
+        ))
+    }
 }
 
 #[derive(Deserialize, Validate)]

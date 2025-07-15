@@ -14,12 +14,12 @@ extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
 use util::cors::default_cors;
 
+use crate::auth::webauthn;
 use crate::background_task::update_versions;
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::util::env::{parse_strings_from_var, parse_var};
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use sync::friends::handle_pubsub;
-use crate::auth::webauthn;
 
 pub mod auth;
 pub mod background_task;
