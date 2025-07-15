@@ -62,22 +62,25 @@ export async function determineModelType(texture: string): Promise<'SLIM' | 'CLA
 
       context.drawImage(image, 0, 0)
 
-      const armX = 44
-      const armY = 16
-      const armWidth = 4
+      const armX = 54
+      const armY = 20
+      const armWidth = 2
       const armHeight = 12
-
+      const alphaIndexInRgba = 3
       const imageData = context.getImageData(armX, armY, armWidth, armHeight).data
 
       for (let y = 0; y < armHeight; y++) {
-        const alphaIndex = (3 + y * armWidth) * 4 + 3
+        const alphaIndex = y * armWidth * 2 + alphaIndexInRgba
+        console.log(alphaIndex)
         if (imageData[alphaIndex] !== 0) {
+          console.log('CLASSIC')
           resolve('CLASSIC')
           return
         }
       }
 
       canvas.remove()
+      console.log('SLIM')
       resolve('SLIM')
     }
 
