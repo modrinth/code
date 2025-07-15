@@ -9,33 +9,36 @@
         <h3 class="text-lg font-semibold">
           {{ project.title }}
         </h3>
-        <div class="flex items-center gap-2 text-sm">
-          <template v-if="project.owner">
-            <Avatar :src="project.owner.user.avatar_url" circle size="16px" class="inline-block" />
-            <span>{{ project.owner.user.username }}</span>
-          </template>
-          <template v-else-if="project.org">
-            <Avatar :src="project.org.icon_url" circle size="16px" class="inline-block" />
-            <span>{{ project.org.name }}</span>
-          </template>
-          <template v-else>
-            <div class="h-4 w-4 rounded-full bg-gray-300"></div>
-            <span>Unknown</span>
-          </template>
-
-          <span class="bg-blue-100 text-blue-800 rounded px-2 py-0.5 text-xs">
-            {{
-              formatProjectType(
-                project.inferred_project_type || project.project_types?.[0] || "unknown",
-              )
-            }}
-          </span>
-        </div>
+          <nuxt-link target="_blank" v-if="enrichedProject.owner" class="flex items-center gap-1 text-sm align-middle hover:text-brand" :to="`/user/${enrichedProject.owner.user.username}`">
+              <Avatar
+                :src="enrichedProject.owner.user.avatar_url"
+                circle
+                size="16px"
+                class="inline-block"
+              />
+              <span>{{ enrichedProject.owner.user.username }}</span>
+          </nuxt-link>
+            <nuxt-link target="_blank" v-else-if="enrichedProject.org" class="flex items-center gap-1 text-sm align-middle hover:text-brand" :to="`/organization/${enrichedProject.org.slug}`">
+              <Avatar
+                :src="enrichedProject.org.icon_url"
+                circle
+                size="16px"
+                class="inline-block"
+              />
+              <span>{{ enrichedProject.org.name }}</span>
+            </nuxt-link>
       </div>
     </div>
 
     <div class="flex items-center gap-4">
-      <span class="text-sm">
+      <span class="text-sm flex items-center gap-1">
+        <BoxIcon class="size-4" aria-hidden="true" v-if="enrichedProject.project_type === 'mod'" />
+        <PaintbrushIcon class="size-4" aria-hidden="true" v-else-if="enrichedProject.project_type === 'resourcepack'" />
+        <BracesIcon class="size-4" aria-hidden="true" v-else-if="enrichedProject.project_type === 'datapack'" />
+        <PackageOpenIcon class="size-4" aria-hidden="true" v-else-if="enrichedProject.project_type === 'modpack'" />
+        <GlassesIcon class="size-4" aria-hidden="true" v-else-if="enrichedProject.project_type === 'shader'" />
+        <PlugIcon class="size-4" aria-hidden="true" v-else-if="enrichedProject.project_type === 'plugin'" />
+        {{ formatProjectType(project.project_type)}} &#x2022;
         {{ getSubmittedTime(project) }}
       </span>
 
@@ -58,15 +61,24 @@
 
 <script setup lang="ts">
 import dayjs from "dayjs";
-import { EyeIcon, ScaleIcon } from "@modrinth/assets";
+import {EyeIcon, PaintbrushIcon, ScaleIcon, BoxIcon, GlassesIcon, PlugIcon, PackageOpenIcon, BracesIcon} from "@modrinth/assets";
 import { useRelativeTime, Avatar, ButtonStyled } from "@modrinth/ui";
-import { formatProjectType } from "@modrinth/utils";
+import {formatProjectType, type Organization, type TeamMember} from "@modrinth/utils";
+import { computed } from "vue";
 
 const formatRelativeTime = useRelativeTime();
 
-const props = defineProps<{ project: any }>();
+const props = defineProps<{
+  project: any;
+  owner?: TeamMember | null;
+  org?: Organization | null;
+}>();
 
-console.log(props.project);
+const enrichedProject = computed(() => ({
+  ...props.project,
+  owner: props.owner,
+  org: props.org,
+}));
 
 function getSubmittedTime(project: any): string {
   const date = project.queued || project.published || project.created;

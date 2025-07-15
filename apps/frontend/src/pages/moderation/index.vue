@@ -22,13 +22,13 @@
       <DropdownSelect
         v-slot="{ selected }"
         v-model="currentFilterType"
-        class="!w-[250px] flex-grow md:flex-grow-0"
+        class="!w-[280px] flex-grow md:flex-grow-0"
         :name="formatMessage(messages.filterBy)"
         :options="filterTypes as unknown[]"
         @change="updateSearchResults()"
       >
         <span class="flex flex-row gap-2 align-middle font-semibold text-secondary"
-          ><FilterIcon class="size-4" />{{ selected }}</span
+          ><FilterIcon class="size-4" />{{ selected }} ({{ filteredProjects.length }})</span
         >
       </DropdownSelect>
       <DropdownSelect
@@ -40,8 +40,8 @@
         @change="updateSearchResults()"
       >
         <span class="flex flex-row gap-2 align-middle font-semibold text-secondary"
-          ><SortAscIcon class="size-4" v-if="selected === 'Oldest'" />
-          <SortDescIcon class="size-4" v-else />{{ selected }}</span
+          ><SortAscIcon v-if="selected === 'Oldest'" class="size-4" />
+          <SortDescIcon v-else class="size-4" />{{ selected }}</span
         >
       </DropdownSelect>
       <ButtonStyled color="orange">
@@ -53,12 +53,14 @@
   </div>
   <div class="mt-4 flex flex-col gap-2">
     <ModerationQueueCard
-      v-for="project in paginatedProjects"
-      :key="project.id"
-      :project="project"
+      v-for="item in enrichedProjects"
+      :key="item.project.id"
+      :project="item.project"
+      :owner="item.owner"
+      :org="item.org"
     />
     <div
-      v-if="!paginatedProjects || paginatedProjects.length === 0"
+      v-if="!enrichedProjects || enrichedProjects.length === 0"
       class="universal-card h-24 animate-pulse"
     ></div>
   </div>
@@ -78,7 +80,7 @@ import {
 } from "@modrinth/assets";
 import { defineMessages, useVIntl } from "@vintl/vintl";
 import { useLocalStorage } from "@vueuse/core";
-import type { Project } from "@modrinth/utils";
+import type { Project, TeamMember, Organization } from "@modrinth/utils";
 import ModerationQueueCard from "~/components/ui/moderation/ModerationQueueCard.vue";
 import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
 
@@ -123,7 +125,7 @@ const filterTypes: readonly string[] = readonly([
 const currentSortType = useLocalStorage("moderation-current-sort-type", () => "Oldest");
 const sortTypes: readonly string[] = readonly(["Oldest", "Newest"]);
 const currentPage = ref(1);
-const itemsPerPage = 5;
+const itemsPerPage = 15;
 const totalPages = computed(() => Math.ceil((filteredProjects.value?.length || 0) / itemsPerPage));
 
 const filteredProjects = computed(() => {
@@ -172,23 +174,23 @@ const filteredProjects = computed(() => {
   return filtered;
 });
 
-const paginatedProjectsBase = computed(() => {
+const paginatedProjects = computed(() => {
   if (!filteredProjects.value) return [];
   const start = (currentPage.value - 1) * itemsPerPage;
   const end = start + itemsPerPage;
   return filteredProjects.value.slice(start, end);
 });
 
-const { data: paginatedProjects } = await useAsyncData(
-  `moderation-projects-page-${currentPage.value}-${query.value}-${currentFilterType.value}-${currentSortType.value}`,
+const { data: enrichedProjects } = await useAsyncData(
+  `moderation-enriched-${currentPage.value}-${query.value}-${currentFilterType.value}-${currentSortType.value}`,
   async () => {
-    const projects = paginatedProjectsBase.value;
-    if (!projects || projects.length === 0) return [];
+    const projects = paginatedProjects.value;
+    if (!projects.length) return [];
 
-    const teamIds = projects.map((x: any) => x.team_id).filter(Boolean);
-    const orgIds = projects.filter((x: any) => x.organization).map((x: any) => x.organization);
+    const teamIds = [...new Set(projects.map(p => p.team).filter(Boolean))];
+    const orgIds = [...new Set(projects.map(p => p.organization).filter(Boolean))];
 
-    const [teams, orgs] = await Promise.all([
+    const [teamsData, orgsData]: [TeamMember[][], Organization[]] = await Promise.all([
       teamIds.length > 0
         ? fetchSegmented(teamIds, (ids) => `teams?ids=${asEncodedJsonArray(ids)}`)
         : Promise.resolve([]),
@@ -199,24 +201,52 @@ const { data: paginatedProjects } = await useAsyncData(
         : Promise.resolve([]),
     ]);
 
-    return projects.map((project: any) => {
-      const owner =
-        teams.length > 0
-          ? teams.flat().find((x: any) => x.team_id === project.team_id && x.role === "Owner")
-          : null;
-      const org = orgs.length > 0 ? orgs.find((x: any) => x.id === project.organization) : null;
+    const teamMap = new Map<string, TeamMember[]>();
+    const orgMap = new Map<string, Organization>();
+
+    teamsData.forEach((team) => {
+      let teamId = null;
+
+      // dont use [0]
+      for (const member of team) {
+        teamId = member.team_id;
+        if (!teamMap.has(teamId)) {
+          teamMap.set(teamId, team);
+          break;
+        }
+      }
+    });
+
+    orgsData.forEach((org: Organization) => {
+      orgMap.set(org.id, org);
+    });
+
+    return projects.map(project => {
+      let owner: TeamMember | null = null;
+      let org: Organization | null = null;
+
+      if (project.team) {
+        const teamMembers = teamMap.get(project.team);
+        if (teamMembers) {
+          owner = teamMembers.find(member => member.role === "Owner") || null;
+        }
+      }
+
+      if (project.organization) {
+        org = orgMap.get(project.organization) || null;
+      }
 
       return {
-        ...project,
+        project,
         owner,
         org,
-        inferred_project_type: project.project_type,
       };
     });
   },
   {
-    watch: [paginatedProjectsBase, currentPage, query, currentFilterType, currentSortType],
-  },
+    default: () => [],
+    watch: [paginatedProjects],
+  }
 );
 
 function updateSearchResults() {
