@@ -175,7 +175,7 @@ A nag represents a specific issue or suggestion for improvement. Each nag has:
 
 ### Internationalization
 
-The nag system uses Vue I18n for internationalization. Each nag category has a corresponding `.i18n.ts` file containing message definitions:
+Each nag category has a corresponding `.i18n.ts` file containing message definitions:
 
 ```typescript
 // Example from core.i18n.ts

@@ -145,7 +145,8 @@ export const descriptionNags: Nag[] = [
     status: 'required',
     shouldShow: (context: NagContext) => {
       const title = context.project.title?.toLowerCase() || ''
-      return title.includes('minecraft') && title.length > 0
+      const wordsInTitle = title.split(' ').filter((word) => word.length > 0)
+      return title.includes('minecraft') && title.length > 0 && wordsInTitle.length <= 3
     },
     link: {
       path: 'settings',
