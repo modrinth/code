@@ -241,24 +241,6 @@
             </div>
 
             <div v-else-if="generatedMessage" class="flex items-center gap-2">
-              <OverflowMenu :options="stageOptions" class="bg-transparent p-0">
-                <ButtonStyled circular>
-                  <button v-tooltip="`Stages`">
-                    <ListBulletedIcon />
-                  </button>
-                </ButtonStyled>
-
-                <template
-                  v-for="opt in stageOptions.filter(
-                    (opt) => 'id' in opt && 'text' in opt && 'icon' in opt,
-                  )"
-                  #[opt.id]
-                  :key="opt.id"
-                >
-                  <component :is="opt.icon" v-if="opt.icon" class="mr-2" />
-                  {{ opt.text }}
-                </template>
-              </OverflowMenu>
               <ButtonStyled>
                 <button @click="goBackToStages">
                   <LeftArrowIcon aria-hidden="true" />
@@ -414,7 +396,13 @@ const futureProjectCount = computed(() => {
 
 const modpackPermissionsComplete = ref(false);
 const modpackJudgements = ref<ModerationJudgements>({});
-const allModpackFiles = ref<ModerationModpackItem[]>([]);
+const allModpackFiles = ref<{
+  interactive: ModerationModpackItem[];
+  permanentNo: ModerationModpackItem[];
+}>({
+  interactive: [],
+  permanentNo: [],
+});
 const isModpackPermissionsStage = computed(() => {
   return currentStageObj.value.id === "modpack-permissions";
 });
@@ -448,7 +436,7 @@ function resetProgress() {
   localStorage.removeItem(`modpack-permissions-index-${props.project.id}`);
   modpackPermissionsComplete.value = false;
   modpackJudgements.value = {};
-  allModpackFiles.value = [];
+  allModpackFiles.value = { interactive: [], permanentNo: [] };
 
   initializeAllStages();
 }
@@ -1088,7 +1076,10 @@ async function generateMessage() {
     const baseMessage = await assembleFullMessage();
     let fullMessage = baseMessage;
 
-    if (props.project.project_type === "modpack" && allModpackFiles.value.length > 0) {
+    if (
+      props.project.project_type === "modpack" &&
+      (allModpackFiles.value.interactive.length > 0 || allModpackFiles.value.permanentNo.length > 0)
+    ) {
       const modpackMessage = generateModpackMessage(allModpackFiles.value);
       if (modpackMessage) {
         fullMessage = baseMessage ? `${baseMessage}\n\n${modpackMessage}` : modpackMessage;
@@ -1122,7 +1113,10 @@ async function generateMessage() {
   }
 }
 
-function generateModpackMessage(allFiles: ModerationModpackItem[]) {
+function generateModpackMessage(allFiles: {
+  interactive: ModerationModpackItem[];
+  permanentNo: ModerationModpackItem[];
+}) {
   const issues = [];
 
   const attributeMods: string[] = [];
@@ -1130,16 +1124,18 @@ function generateModpackMessage(allFiles: ModerationModpackItem[]) {
   const permanentNoMods: string[] = [];
   const unidentifiedMods: string[] = [];
 
-  allFiles.forEach((file) => {
+  allFiles.interactive.forEach((file) => {
     if (file.status === "with-attribution" && !file.approved) {
       attributeMods.push(file.file_name);
     } else if (file.status === "no" && !file.approved) {
       noMods.push(file.file_name);
-    } else if (file.status === "permanent-no") {
-      permanentNoMods.push(file.file_name);
     } else if (file.status === "unidentified" && !file.approved) {
       unidentifiedMods.push(file.file_name);
     }
+  });
+
+  allFiles.permanentNo.forEach((file) => {
+    permanentNoMods.push(file.file_name);
   });
 
   if (

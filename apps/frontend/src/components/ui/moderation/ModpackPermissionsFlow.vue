@@ -167,7 +167,9 @@ const props = defineProps<{
 const emit = defineEmits<{
   complete: [];
   "update:modelValue": [judgements: ModerationJudgements];
-  "update:allFiles": [allFiles: ModerationModpackItem[]];
+  "update:allFiles": [
+    allFiles: { interactive: ModerationModpackItem[]; permanentNo: ModerationModpackItem[] },
+  ];
 }>();
 
 const persistedModPackData = useLocalStorage<ModerationModpackItem[] | null>(
@@ -184,6 +186,7 @@ const persistedModPackData = useLocalStorage<ModerationModpackItem[] | null>(
 const persistedIndex = useLocalStorage<number>(`modpack-permissions-index-${props.projectId}`, 0);
 
 const modPackData = ref<ModerationModpackItem[] | null>(null);
+const permanentNoFiles = ref<ModerationModpackItem[]>([]);
 const currentIndex = ref(0);
 
 const fileApprovalTypes: ModerationModpackPermissionApprovalType[] = [
@@ -252,10 +255,29 @@ async function fetchModPackData(): Promise<void> {
     const data = (await useBaseFetch(`moderation/project/${props.projectId}`, {
       internal: true,
     })) as ModerationModpackResponse;
+
+    const permanentNoItems: ModerationModpackItem[] = Object.entries(data.identified || {})
+      .filter(([_, file]) => file.status === "permanent-no")
+      .map(
+        ([sha1, file]): ModerationModpackItem => ({
+          sha1,
+          file_name: file.file_name,
+          type: "identified",
+          status: file.status,
+          approved: null,
+        }),
+      )
+      .sort((a, b) => a.file_name.localeCompare(b.file_name));
+
+    permanentNoFiles.value = permanentNoItems;
+
     const sortedData: ModerationModpackItem[] = [
       ...Object.entries(data.identified || {})
         .filter(
-          ([_, file]) => file.status !== "yes" && file.status !== "with-attribution-and-source",
+          ([_, file]) =>
+            file.status !== "yes" &&
+            file.status !== "with-attribution-and-source" &&
+            file.status !== "permanent-no",
         )
         .map(
           ([sha1, file]): ModerationModpackItem => ({
@@ -330,6 +352,7 @@ async function fetchModPackData(): Promise<void> {
   } catch (error) {
     console.error("Failed to fetch modpack data:", error);
     modPackData.value = [];
+    permanentNoFiles.value = [];
     persistAll();
   }
 }
@@ -343,7 +366,10 @@ function goToPrevious(): void {
 
 function emitAllFiles(): void {
   if (modPackData.value) {
-    emit("update:allFiles", modPackData.value);
+    emit("update:allFiles", {
+      interactive: modPackData.value,
+      permanentNo: permanentNoFiles.value,
+    });
   }
 }
 
