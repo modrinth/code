@@ -116,7 +116,17 @@ fn main() {
 
     #[cfg(feature = "updater")]
     {
-        builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
+        use tauri_plugin_http::reqwest::header::{HeaderValue, USER_AGENT};
+        use theseus::LAUNCHER_USER_AGENT;
+        builder = builder.plugin(
+            tauri_plugin_updater::Builder::new()
+                .header(
+                    USER_AGENT,
+                    HeaderValue::from_str(LAUNCHER_USER_AGENT).unwrap(),
+                )
+                .unwrap()
+                .build(),
+        );
     }
 
     builder = builder

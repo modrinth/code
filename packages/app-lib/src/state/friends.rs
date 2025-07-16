@@ -1,3 +1,5 @@
+use crate::LAUNCHER_USER_AGENT;
+use crate::config::{MODRINTH_API_URL_V3, MODRINTH_SOCKET_URL};
 use crate::data::ModrinthCredentials;
 use crate::event::FriendPayload;
 use crate::event::emit::emit_friend;
@@ -81,13 +83,9 @@ impl FriendsSocket {
             )
             .into_client_request()?;
 
-            let user_agent = format!(
-                "modrinth/theseus/{} (support@modrinth.com)",
-                env!("CARGO_PKG_VERSION")
-            );
             request.headers_mut().insert(
                 "User-Agent",
-                HeaderValue::from_str(&user_agent).unwrap(),
+                HeaderValue::from_str(LAUNCHER_USER_AGENT).unwrap(),
             );
 
             let res = connect_async(request).await;
