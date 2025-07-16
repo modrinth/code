@@ -240,33 +240,8 @@ fn main() {
     match app {
         Ok(app) => {
             app.run(|app, event| {
-                #[cfg(not(any(target_os = "macos", feature = "updater")))]
+                #[cfg(not(any(feature = "updater", target_os = "macos")))]
                 drop((app, event));
-
-                #[cfg(target_os = "macos")]
-                if let tauri::RunEvent::Opened { urls } = event {
-                    tracing::info!("Handling webview open {urls:?}");
-
-                    let file = urls
-                        .into_iter()
-                        .find_map(|url| url.to_file_path().ok());
-
-                    if let Some(file) = file {
-                        let payload =
-                            macos::deep_link::get_or_init_payload(app);
-
-                        let mtx_copy = payload.payload;
-                        let request = file.to_string_lossy().to_string();
-                        tauri::async_runtime::spawn(async move {
-                            let mut payload = mtx_copy.lock().await;
-                            if payload.is_none() {
-                                *payload = Some(request.clone());
-                            }
-
-                            let _ = api::utils::handle_command(request).await;
-                        });
-                    }
-                }
 
                 #[cfg(feature = "updater")]
                 if matches!(event, tauri::RunEvent::Exit) {
@@ -297,6 +272,31 @@ fn main() {
                                 .show()
                                 .unwrap();
                         }
+                    }
+                }
+
+                #[cfg(target_os = "macos")]
+                if let tauri::RunEvent::Opened { urls } = event {
+                    tracing::info!("Handling webview open {urls:?}");
+
+                    let file = urls
+                        .into_iter()
+                        .find_map(|url| url.to_file_path().ok());
+
+                    if let Some(file) = file {
+                        let payload =
+                            macos::deep_link::get_or_init_payload(app);
+
+                        let mtx_copy = payload.payload;
+                        let request = file.to_string_lossy().to_string();
+                        tauri::async_runtime::spawn(async move {
+                            let mut payload = mtx_copy.lock().await;
+                            if payload.is_none() {
+                                *payload = Some(request.clone());
+                            }
+
+                            let _ = api::utils::handle_command(request).await;
+                        });
                     }
                 }
             });
