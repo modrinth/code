@@ -14,7 +14,7 @@ export interface Stage {
   /**
    * An optional description or additional text for the stage.
    */
-  text?: () => Promise<string>
+  text?: (project: Project) => Promise<string>
 
   /**
    * Optional id for the stage, used for identification in the checklist. Will be used in the stage list as well instead of the title.
