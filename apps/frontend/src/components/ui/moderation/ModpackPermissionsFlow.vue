@@ -363,6 +363,7 @@ function goToNext(): void {
     if (currentIndex.value >= modPackData.value.length) {
       const judgements = getJudgements();
       emit("update:modelValue", judgements);
+      emitAllFiles();
       emit("complete");
       clearPersistedData();
     } else {
