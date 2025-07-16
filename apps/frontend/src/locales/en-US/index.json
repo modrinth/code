@@ -461,9 +461,6 @@
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
-  "layout.footer.social.tumblr": {
-    "message": "Tumblr"
-  },
   "layout.footer.social.x": {
     "message": "X"
   },
