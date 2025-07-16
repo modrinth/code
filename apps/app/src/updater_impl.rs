@@ -41,7 +41,7 @@ pub async fn get_update_size<R: Runtime>(
     }
     let response = request
         .build()?
-        .get(update.download_url.clone())
+        .head(update.download_url.clone())
         .headers(headers)
         .send()
         .await?;
