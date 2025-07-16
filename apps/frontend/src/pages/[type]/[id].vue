@@ -29,12 +29,11 @@
             class="settings-header__icon"
           />
           <div class="settings-header__text">
-            <h1 class="wrap-as-needed">
-              {{ project.title }}
-            </h1>
+            <h1 class="wrap-as-needed">{{ project.title }}</h1>
             <ProjectStatusBadge :status="project.status" />
           </div>
         </div>
+
         <h2>Project settings</h2>
         <NavStack>
           <NavStackItem
@@ -111,6 +110,7 @@
         </NavStack>
       </aside>
     </div>
+
     <div class="normal-page__content">
       <ProjectMemberHeader
         v-if="currentMember"
@@ -145,6 +145,7 @@
       />
     </div>
   </div>
+
   <div v-else class="experimental-styles-within">
     <NewModal ref="settingsModal">
       <template #title>
@@ -174,9 +175,11 @@
         <div
           class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
         ></div>
+
         <div
           class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
         ></div>
+
         <div
           class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight"
         >
@@ -219,8 +222,7 @@
                   :href="`modrinth://mod/${project.slug}`"
                   @click="() => installWithApp()"
                 >
-                  <ModrinthIcon aria-hidden="true" />
-                  Install with Modrinth App
+                  <ModrinthIcon aria-hidden="true" /> Install with Modrinth App
                   <ExternalIcon aria-hidden="true" />
                 </a>
               </ButtonStyled>
@@ -240,6 +242,7 @@
               <div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
             </div>
           </div>
+
           <div class="mx-auto flex w-fit flex-col gap-2">
             <ButtonStyled v-if="project.game_versions.length === 1">
               <div class="disabled button-like">
@@ -327,8 +330,7 @@
                       }
                     "
                   >
-                    {{ gameVersion }}
-                    <CheckIcon v-if="userSelectedGameVersion === gameVersion" />
+                    {{ gameVersion }} <CheckIcon v-if="userSelectedGameVersion === gameVersion" />
                   </button>
                 </ButtonStyled>
               </ScrollablePanel>
@@ -419,7 +421,6 @@
               </ScrollablePanel>
             </Accordion>
           </div>
-
           <AutomaticAccordion div class="flex flex-col gap-2">
             <VersionSummary
               v-if="filteredRelease"
@@ -470,9 +471,13 @@
       class="new-page sidebar"
       :class="{
         'alt-layout': cosmetics.leftContentLayout,
-        'ultimate-sidebar':
+        'checklist-open':
           showModerationChecklist &&
           !collapsedModerationChecklist &&
+          !flags.alwaysShowChecklistAsPopup,
+        'checklist-collapsed':
+          showModerationChecklist &&
+          collapsedModerationChecklist &&
           !flags.alwaysShowChecklistAsPopup,
       }"
     >
@@ -485,11 +490,11 @@
                 :color="route.name === 'type-id-version-version' ? `standard` : `brand`"
               >
                 <button @click="(event) => downloadModal.show(event)">
-                  <DownloadIcon aria-hidden="true" />
-                  Download
+                  <DownloadIcon aria-hidden="true" /> Download
                 </button>
               </ButtonStyled>
             </div>
+
             <div class="contents sm:hidden">
               <ButtonStyled
                 size="large"
@@ -554,9 +559,11 @@
                       </button>
                     </ButtonStyled>
                   </div>
+
                   <p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
                     Modrinth Servers is the easiest way to play with your friends without hassle!
                   </p>
+
                   <p class="m-0 text-wrap text-sm font-bold text-primary">
                     Starting at $5<span class="text-xs"> / month</span>
                   </p>
@@ -621,6 +628,7 @@
                         {{ option.name }}
                       </Checkbox>
                     </div>
+
                     <div v-else class="menu-text">
                       <p class="popout-text">No collections found.</p>
                     </div>
@@ -628,8 +636,7 @@
                       class="btn collection-button"
                       @click="(event) => $refs.modal_collection.show(event)"
                     >
-                      <PlusIcon aria-hidden="true" />
-                      Create new collection
+                      <PlusIcon aria-hidden="true" /> Create new collection
                     </button>
                   </template>
                 </PopoutMenu>
@@ -712,25 +719,14 @@
                 :dropdown-id="`${baseId}-more-options`"
               >
                 <MoreVerticalIcon aria-hidden="true" />
-                <template #analytics>
-                  <ChartIcon aria-hidden="true" />
-                  Analytics
-                </template>
+                <template #analytics> <ChartIcon aria-hidden="true" /> Analytics </template>
                 <template #moderation-checklist>
-                  <ScaleIcon aria-hidden="true" />
-                  Review project
+                  <ScaleIcon aria-hidden="true" /> Review project
                 </template>
-                <template #report>
-                  <ReportIcon aria-hidden="true" />
-                  Report
-                </template>
-                <template #copy-id>
-                  <ClipboardCopyIcon aria-hidden="true" />
-                  Copy ID
-                </template>
+                <template #report> <ReportIcon aria-hidden="true" /> Report </template>
+                <template #copy-id> <ClipboardCopyIcon aria-hidden="true" /> Copy ID </template>
                 <template #copy-permalink>
-                  <ClipboardCopyIcon aria-hidden="true" />
-                  Copy permanent link
+                  <ClipboardCopyIcon aria-hidden="true" /> Copy permanent link
                 </template>
               </OverflowMenu>
             </ButtonStyled>
@@ -756,6 +752,7 @@
           updates unless the author decides to unarchive the project.
         </MessageBanner>
       </div>
+
       <div class="normal-page__sidebar">
         <ProjectSidebarCompatibility
           :project="project"
@@ -785,6 +782,7 @@
         />
         <div class="card flex-card experimental-styles-within">
           <h2>{{ formatMessage(detailsMessages.title) }}</h2>
+
           <div class="details-list">
             <div class="details-list__item">
               <BookTextIcon aria-hidden="true" />
@@ -813,53 +811,48 @@
                 <span v-else>{{ licenseIdDisplay }}</span>
               </div>
             </div>
+
             <div
               v-if="project.approved"
               v-tooltip="$dayjs(project.approved).format('MMMM D, YYYY [at] h:mm A')"
               class="details-list__item"
             >
               <CalendarIcon aria-hidden="true" />
-              <div>
-                {{ formatMessage(detailsMessages.published, { date: publishedDate }) }}
-              </div>
+              <div>{{ formatMessage(detailsMessages.published, { date: publishedDate }) }}</div>
             </div>
+
             <div
               v-else
               v-tooltip="$dayjs(project.published).format('MMMM D, YYYY [at] h:mm A')"
               class="details-list__item"
             >
               <CalendarIcon aria-hidden="true" />
-              <div>
-                {{ formatMessage(detailsMessages.created, { date: createdDate }) }}
-              </div>
+              <div>{{ formatMessage(detailsMessages.created, { date: createdDate }) }}</div>
             </div>
+
             <div
               v-if="project.status === 'processing' && project.queued"
               v-tooltip="$dayjs(project.queued).format('MMMM D, YYYY [at] h:mm A')"
               class="details-list__item"
             >
               <ScaleIcon aria-hidden="true" />
-              <div>
-                {{ formatMessage(detailsMessages.submitted, { date: submittedDate }) }}
-              </div>
+              <div>{{ formatMessage(detailsMessages.submitted, { date: submittedDate }) }}</div>
             </div>
+
             <div
               v-if="versions.length > 0 && project.updated"
               v-tooltip="$dayjs(project.updated).format('MMMM D, YYYY [at] h:mm A')"
               class="details-list__item"
             >
               <VersionIcon aria-hidden="true" />
-              <div>
-                {{ formatMessage(detailsMessages.updated, { date: updatedDate }) }}
-              </div>
+              <div>{{ formatMessage(detailsMessages.updated, { date: updatedDate }) }}</div>
             </div>
           </div>
         </div>
       </div>
+
       <div class="normal-page__content">
-        <div class="overflow-x-auto">
-          <NavTabs :links="navLinks" class="mb-4" />
-        </div>
+        <div class="overflow-x-auto"><NavTabs :links="navLinks" class="mb-4" /></div>
         <NuxtPage
           v-model:project="project"
           v-model:versions="versions"
@@ -877,8 +870,10 @@
           @delete-version="deleteVersion"
         />
       </div>
+
       <div class="normal-page__ultimate-sidebar">
-        <ModerationChecklist
+        <!-- Uncomment this to enable the old moderation checklist. -->
+        <!-- <ModerationChecklist
           v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
           :project="project"
           :future-projects="futureProjects"
@@ -886,11 +881,25 @@
           :collapsed="collapsedModerationChecklist"
           @exit="showModerationChecklist = false"
           @toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
-        />
+        /> -->
       </div>
     </div>
   </div>
+
+  <div
+    v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
+    class="moderation-checklist"
+  >
+    <NewModerationChecklist
+      :project="project"
+      :future-project-ids="futureProjectIds"
+      :collapsed="collapsedModerationChecklist"
+      @exit="showModerationChecklist = false"
+      @toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
+    />
+  </div>
 </template>
+
 <script setup>
 import {
   BookmarkIcon,
@@ -950,16 +959,16 @@ import {
   isUnderReview,
   renderString,
 } from "@modrinth/utils";
-import { navigateTo } from "#app";
 import dayjs from "dayjs";
 import { Tooltip } from "floating-vue";
+import { useLocalStorage } from "@vueuse/core";
+import { navigateTo } from "#app";
 import Accordion from "~/components/ui/Accordion.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import AutomaticAccordion from "~/components/ui/AutomaticAccordion.vue";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import MessageBanner from "~/components/ui/MessageBanner.vue";
-import ModerationChecklist from "~/components/ui/ModerationChecklist.vue";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
 import NavTabs from "~/components/ui/NavTabs.vue";
@@ -967,6 +976,7 @@ import ProjectMemberHeader from "~/components/ui/ProjectMemberHeader.vue";
 import { userCollectProject } from "~/composables/user.js";
 import { reportProject } from "~/utils/report-helpers.ts";
 import { saveFeatureFlags } from "~/composables/featureFlags.ts";
+import NewModerationChecklist from "~/components/ui/moderation/NewModerationChecklist.vue";
 
 const data = useNuxtApp();
 const route = useNativeRoute();
@@ -980,6 +990,7 @@ const flags = useFeatureFlags();
 const cosmetics = useCosmetics();
 
 const { formatMessage } = useVIntl();
+const { setVisible } = useNotificationRightwards();
 
 const settingsModal = ref();
 const downloadModal = ref();
@@ -1551,12 +1562,28 @@ async function copyPermalink() {
 
 const collapsedChecklist = ref(false);
 
-const showModerationChecklist = ref(false);
-const collapsedModerationChecklist = ref(false);
-const futureProjects = ref([]);
+const showModerationChecklist = useLocalStorage(
+  `show-moderation-checklist-${project.value.id}`,
+  false,
+);
+const collapsedModerationChecklist = useLocalStorage("collapsed-moderation-checklist", false);
+
+const futureProjectIds = useLocalStorage("moderation-future-projects", []);
+
+watch(futureProjectIds, (newValue) => {
+  console.log("Future project IDs updated:", newValue);
+});
+
+watch(
+  showModerationChecklist,
+  (newValue) => {
+    setVisible(newValue);
+  },
+  { immediate: true },
+);
+
 if (import.meta.client && history && history.state && history.state.showChecklist) {
   showModerationChecklist.value = true;
-  futureProjects.value = history.state.projects;
 }
 
 function closeDownloadModal(event) {
@@ -1626,6 +1653,7 @@ const navLinks = computed(() => {
   ];
 });
 </script>
+
 <style lang="scss" scoped>
 .settings-header {
   display: flex;
@@ -1779,6 +1807,18 @@ const navLinks = computed(() => {
     position: absolute;
     top: -5px;
     left: 18px;
+  }
+}
+
+.moderation-checklist {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  overflow-y: auto;
+  z-index: 50;
+
+  > div {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
   }
 }
 </style>

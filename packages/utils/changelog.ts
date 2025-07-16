@@ -11,6 +11,33 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-07-15T13:55:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Updated language around DDoS protection of Modrinth Servers products.`,
+  },
+  {
+    date: `2025-07-15T12:40:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Added copyright policy and DMCA links to footer.
+- Updated Modrinth Servers FAQ to include the new UK location.`,
+  },
+  {
+    date: `2025-07-15T08:20:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed gallery images from overflowing with long words in their descriptions.`,
+  },
+  {
+    date: `2025-07-09T22:15:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed pasted links being unnecessarily wrapped in Markdown formatting in Markdown editor.
+- Added a security.txt file to the site.
+- Changed the Europe location for Modrinth Servers to show as Central Europe with the flag of Germany to reflect its location better.`,
+  },
+  {
     date: `2025-07-08T14:00:00-07:00`,
     product: 'web',
     body: `### Improvements

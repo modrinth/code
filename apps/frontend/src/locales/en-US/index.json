@@ -404,6 +404,9 @@
   "layout.footer.legal-disclaimer": {
     "message": "NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT."
   },
+  "layout.footer.legal.copyright-policy": {
+    "message": "Copyright Policy and DMCA"
+  },
   "layout.footer.legal.privacy-policy": {
     "message": "Privacy Policy"
   },

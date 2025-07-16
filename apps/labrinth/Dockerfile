@@ -11,7 +11,7 @@ LABEL org.opencontainers.image.description="Modrinth API"
 LABEL org.opencontainers.image.licenses=AGPL-3.0
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends ca-certificates openssl dumb-init curl \
+  && apt-get install -y --no-install-recommends ca-certificates dumb-init curl \
   && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /usr/src/labrinth/target/release/labrinth /labrinth/labrinth

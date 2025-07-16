@@ -1020,7 +1020,7 @@ const nodeUnavailableDetails = computed(() => [
   {
     label: "Error message",
     value: nodeAccessible.value
-      ? server.moduleErrors?.general?.error.message ?? "Unknown"
+      ? (server.moduleErrors?.general?.error.message ?? "Unknown")
       : "Unable to reach node. Ping test failed.",
     type: "block" as const,
   },
@@ -1277,7 +1277,8 @@ useHead({
   background-repeat: no-repeat;
   filter: blur(1rem);
   content: "";
-  background-image: linear-gradient(
+  background-image:
+    linear-gradient(
       to bottom,
       rgba(from var(--color-raised-bg) r g b / 0.2),
       rgb(from var(--color-raised-bg) r g b / 0.8)

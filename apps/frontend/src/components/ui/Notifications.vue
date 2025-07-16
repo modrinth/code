@@ -1,7 +1,10 @@
 <template>
   <div
     class="vue-notification-group experimental-styles-within"
-    :class="{ 'intercom-present': isIntercomPresent }"
+    :class="{
+      'intercom-present': isIntercomPresent,
+      rightwards: moveNotificationsRight,
+    }"
   >
     <transition-group name="notifs">
       <div
@@ -82,6 +85,7 @@ import {
   CopyIcon,
 } from "@modrinth/assets";
 const notifications = useNotifications();
+const { isVisible: moveNotificationsRight } = useNotificationRightwards();
 
 const isIntercomPresent = ref(false);
 
@@ -158,6 +162,15 @@ function copyToClipboard(notif) {
 
   &.intercom-present {
     bottom: 5rem;
+  }
+
+  &.rightwards {
+    right: unset !important;
+    left: 1.5rem;
+
+    @media screen and (max-width: 500px) {
+      left: 0.75rem;
+    }
   }
 
   .vue-notification-wrapper {

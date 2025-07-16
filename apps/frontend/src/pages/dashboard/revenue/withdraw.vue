@@ -266,12 +266,12 @@ const getRangeOfMethod = (method) => {
 
 const maxWithdrawAmount = computed(() => {
   const interval = selectedMethod.value.interval;
-  return interval?.standard ? interval.standard.max : interval?.fixed?.values.slice(-1)[0] ?? 0;
+  return interval?.standard ? interval.standard.max : (interval?.fixed?.values.slice(-1)[0] ?? 0);
 });
 
 const minWithdrawAmount = computed(() => {
   const interval = selectedMethod.value.interval;
-  return interval?.standard ? interval.standard.min : interval?.fixed?.values?.[0] ?? fees.value;
+  return interval?.standard ? interval.standard.min : (interval?.fixed?.values?.[0] ?? fees.value);
 });
 
 const withdrawAccount = computed(() => {

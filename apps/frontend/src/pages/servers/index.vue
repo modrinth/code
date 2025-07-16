@@ -427,11 +427,8 @@
                 Do Modrinth Servers have DDoS protection?
               </summary>
               <p class="m-0 ml-6 leading-[160%]">
-                Yes. All Modrinth Servers come with DDoS protection powered by
-                <a href="https://us.ovhcloud.com/security/anti-ddos/" target="_blank"
-                  >OVHcloud® Anti-DDoS infrastructure</a
-                >
-                which has over 17Tbps capacity. Your server is safe on Modrinth.
+                Yes. All Modrinth Servers come with DDoS protection, with up to 17Tbps capacity in
+                some locations.
               </p>
             </details>
 
@@ -443,8 +440,9 @@
                 Where are Modrinth Servers located? Can I choose a region?
               </summary>
               <p class="m-0 ml-6 leading-[160%]">
-                We have servers in both North America in Vint Hill, Virginia, and Europe in Limburg,
-                Germany. More regions to come in the future!
+                We have servers available in North America and Europe at the moment that you can
+                choose upon purchase. More regions to come in the future! If you'd like to switch
+                your region, please contact support.
               </p>
             </details>
 

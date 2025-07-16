@@ -112,7 +112,8 @@ export async function useServersFetch<T>(
       const response = await $fetch<T>(fullUrl, {
         method,
         headers,
-        body: body && contentType === "application/json" ? JSON.stringify(body) : body ?? undefined,
+        body:
+          body && contentType === "application/json" ? JSON.stringify(body) : (body ?? undefined),
         timeout: 10000,
       });
 
