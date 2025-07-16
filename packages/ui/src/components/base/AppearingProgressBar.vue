@@ -10,7 +10,7 @@
     <div v-if="isVisible" class="w-full">
       <div class="mb-2 flex justify-between text-sm">
         <Transition name="phrase-fade" mode="out-in">
-          <span :key="currentPhrase" class="text-lg font-medium text-contrast">{{
+          <span :key="currentPhrase" class="text-md font-semibold">{{
             currentPhrase
           }}</span>
         </Transition>

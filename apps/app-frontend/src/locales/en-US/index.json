@@ -21,7 +21,7 @@
     "message": "Resource management"
   },
   "app.update.changelog": {
-    "message": "Changelog"
+    "message": "View changelog"
   },
   "app.update.complete-toast.text": {
     "message": "Click here to view the changelog."
@@ -39,22 +39,22 @@
     "message": "An error occurred while downloading the update. Please try again later. Contact support if the issue persists."
   },
   "app.update.download-size": {
-    "message": "The download size of the update is {size}."
+    "message": "The update is {size}."
   },
   "app.update.later": {
-    "message": "Update on next restart"
+    "message": "Update on exit"
   },
   "app.update.modal-body-version": {
-    "message": "We recommend updating as soon as possible so you can enjoy the latest features and improvements."
+    "message": "We recommend updating as soon as possible so you can enjoy the latest features, fixes, and improvements."
   },
   "app.update.modal-header": {
-    "message": "A new app update is available!"
+    "message": "An update is available!"
   },
   "app.update.restart": {
     "message": "Update now"
   },
-  "app.update.skip": {
-    "message": "Skip this update"
+  "app.update.try-again": {
+    "message": "Try again"
   },
   "instance.add-server.add-and-play": {
     "message": "Add and play"

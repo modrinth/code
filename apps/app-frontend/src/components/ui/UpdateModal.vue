@@ -6,52 +6,54 @@
     :closable="!updatingImmediately && !downloadInProgress"
   >
     <div class="flex flex-col gap-4">
-      <AppearingProgressBar
-        v-if="!downloadError"
-        :max-value="shouldShowProgress ? updateSize || 0 : 0"
-        :current-value="shouldShowProgress ? downloadedBytes : 0"
-        color="green"
-        class="w-full"
-      />
-
-      <div class="flex flex-col gap-4 max-w-[500px]">
-        <div class="flex items-center gap-2 mx-auto">
-          <span
-            class="inline-flex items-center px-2 py-0.5 rounded text-lg font-semibold bg-red text-bg-raised border border-red"
-          >
-            v{{ update!.currentVersion }}
-          </span>
-          <RightArrowIcon class="size-6 text-secondary" />
-          <span
-            class="inline-flex items-center px-2 py-0.5 rounded text-lg font-semibold bg-brand text-bg-raised border border-green"
-          >
-            v{{ update!.version }}
-          </span>
-        </div>
-        <div>{{ formatMessage(messages.bodyVersion) }}</div>
-        <div>
-          {{ formatMessage(messages.downloadSize, { size: formatBytes(updateSize) }) }}
-        </div>
-        <div v-if="downloadError" class="flex flex-col gap-2">
-          <div class="text-red font-medium">
+      <div class="max-w-[500px]">
+        <div class="font-extrabold text-contrast text-xl mb-1">Modrinth App v{{ update!.version }}</div>
+        <template v-if="!downloadInProgress && !downloadError">
+          <div  class="mb-4 leading-tight">{{ formatMessage(messages.bodyVersion) }}</div>
+          <div  class="text-sm text-secondary mb-3">
+            {{ formatMessage(messages.downloadSize, { size: formatBytes(updateSize) }) }}
+          </div>
+        </template>
+        <AppearingProgressBar
+          v-if="!downloadError"
+          :max-value="shouldShowProgress ? updateSize || 0 : 0"
+          :current-value="shouldShowProgress ? downloadedBytes : 0"
+          color="green"
+          class="w-full mb-4 mt-2"
+        />
+        <div v-if="downloadError" class="leading-tight">
+          <div class="text-red font-medium mb-4">
             {{ formatMessage(messages.downloadError) }}
           </div>
-          <ButtonStyled color="red">
-            <button @click="copyError">
-              <ClipboardCopyIcon />
-              {{
-                copiedError
-                  ? formatMessage(messages.copiedError)
-                  : formatMessage(messages.copyError)
-              }}
-            </button>
-          </ButtonStyled>
+          <div class="flex flex-wrap gap-2">
+            <ButtonStyled color="brand">
+              <button @click="installUpdateNow">
+                <DownloadIcon />
+                {{
+                  formatMessage(messages.tryAgain)
+                }}
+              </button>
+            </ButtonStyled>
+            <ButtonStyled>
+              <button @click="copyError">
+                <ClipboardCopyIcon />
+                {{
+                  copiedError
+                    ? formatMessage(messages.copiedError)
+                    : formatMessage(messages.copyError)
+                }}
+              </button>
+            </ButtonStyled>
+            <ButtonStyled>
+              <a href="https://support.modrinth.com"><ChatIcon /> Get support</a>
+            </ButtonStyled>
+          </div>
         </div>
-        <div class="flex flex-wrap gap-2 w-full">
+        <div v-if="!downloadError" class="flex flex-wrap gap-2 w-full mb-2">
           <JoinedButtons
             :actions="installActions"
             :disabled="updatingImmediately || downloadInProgress"
-            color="green"
+            color="brand"
           />
           <div>
             <ButtonStyled>
@@ -74,21 +76,20 @@ import { AppearingProgressBar, ButtonStyled, JoinedButtons } from '@modrinth/ui'
 import type { JoinedButtonAction } from '@modrinth/ui'
 import {
   ExternalIcon,
-  RefreshCwIcon,
+  DownloadIcon,
   RightArrowIcon,
-  TimerIcon,
-  XCircleIcon,
+  RedoIcon,
   ClipboardCopyIcon,
 } from '@modrinth/assets'
-import { enqueueUpdateForInstallation, getUpdateSize, removeEnqueuedUpdate } from '@/helpers/utils'
+import { enqueueUpdateForInstallation, getUpdateSize } from '@/helpers/utils'
 import { formatBytes } from '@modrinth/utils'
 import { handleError } from '@/store/notifications'
 import { loading_listener } from '@/helpers/events'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { openUrl } from '@tauri-apps/plugin-opener'
+import { ChatIcon } from '@/assets/icons'
 
 const emit = defineEmits<{
-  (e: 'updateSkipped', version: string): Promise<void>
   (e: 'updateEnqueuedForLater', version: string | null): Promise<void>
 }>()
 
@@ -96,7 +97,7 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
   header: {
     id: 'app.update.modal-header',
-    defaultMessage: 'A new app update is available!',
+    defaultMessage: 'An update is available!',
   },
   copiedError: {
     id: 'app.update.copied-error',
@@ -105,15 +106,15 @@ const messages = defineMessages({
   bodyVersion: {
     id: 'app.update.modal-body-version',
     defaultMessage:
-      'We recommend updating as soon as possible so you can enjoy the latest features and improvements.',
+      'We recommend updating as soon as possible so you can enjoy the latest features, fixes, and improvements.',
   },
   downloadSize: {
     id: 'app.update.download-size',
-    defaultMessage: 'The download size of the update is {size}.',
+    defaultMessage: 'The update is {size}.',
   },
   changelog: {
     id: 'app.update.changelog',
-    defaultMessage: 'Changelog',
+    defaultMessage: 'View changelog',
   },
   restartNow: {
     id: 'app.update.restart',
@@ -121,11 +122,7 @@ const messages = defineMessages({
   },
   later: {
     id: 'app.update.later',
-    defaultMessage: 'Update on next restart',
-  },
-  skip: {
-    id: 'app.update.skip',
-    defaultMessage: 'Skip this update',
+    defaultMessage: 'Update on exit',
   },
   downloadError: {
     id: 'app.update.download-error',
@@ -135,6 +132,10 @@ const messages = defineMessages({
   copyError: {
     id: 'app.update.copy-error',
     defaultMessage: 'Copy error',
+  },
+  tryAgain: {
+    id: 'app.update.try-again',
+    defaultMessage: 'Try again',
   },
 })
 
@@ -151,7 +152,7 @@ const update = ref<UpdateData>()
 const updateSize = ref<number>()
 
 const updatingImmediately = ref(false)
-const downloadInProgress = ref(false)
+const downloadInProgress = ref(true)
 const downloadProgress = ref(0)
 const copiedError = ref(false)
 const downloadError = ref<Error | null>(null)
@@ -162,22 +163,15 @@ const installActions = computed<JoinedButtonAction[]>(() => [
   {
     id: 'install-now',
     label: formatMessage(messages.restartNow),
-    icon: RefreshCwIcon,
+    icon: DownloadIcon,
     action: installUpdateNow,
     color: 'green',
   },
   {
     id: 'install-later',
     label: formatMessage(messages.later),
-    icon: TimerIcon,
+    icon: RedoIcon,
     action: updateAtNextExit,
-  },
-  {
-    id: 'skip',
-    label: formatMessage(messages.skip),
-    action: skipUpdate,
-    icon: XCircleIcon,
-    color: 'red',
   },
 ])
 
@@ -300,14 +294,6 @@ async function downloadUpdate() {
   if (updatingImmediately.value && update.value!.version === versionToDownload) {
     await getCurrentWindow().close()
   }
-}
-
-function skipUpdate() {
-  enqueuedUpdate.value = null
-  emit('updateSkipped', update.value!.version)
-
-  removeEnqueuedUpdate()
-  hide()
 }
 </script>
 
