@@ -64,6 +64,7 @@
             v-model="modpackJudgements"
             :project-id="project.id"
             @complete="handleModpackPermissionsComplete"
+            @update:allFiles="allModpackFiles = $event"
           />
         </div>
         <div v-else>
@@ -368,7 +369,12 @@ import {
   DropdownSelect,
   MarkdownEditor,
 } from "@modrinth/ui";
-import { type Project, renderHighlightedString, type ModerationJudgements } from "@modrinth/utils";
+import {
+  type Project,
+  renderHighlightedString,
+  type ModerationJudgements,
+  type ModerationModpackItem,
+} from "@modrinth/utils";
 import { computedAsync, useLocalStorage } from "@vueuse/core";
 import type {
   Action,
@@ -408,6 +414,7 @@ const futureProjectCount = computed(() => {
 
 const modpackPermissionsComplete = ref(false);
 const modpackJudgements = ref<ModerationJudgements>({});
+const allModpackFiles = ref<ModerationModpackItem[]>([]);
 const isModpackPermissionsStage = computed(() => {
   return currentStageObj.value.id === "modpack-permissions";
 });
@@ -441,6 +448,7 @@ function resetProgress() {
   localStorage.removeItem(`modpack-permissions-index-${props.project.id}`);
   modpackPermissionsComplete.value = false;
   modpackJudgements.value = {};
+  allModpackFiles.value = [];
 
   initializeAllStages();
 }
@@ -1080,11 +1088,8 @@ async function generateMessage() {
     const baseMessage = await assembleFullMessage();
     let fullMessage = baseMessage;
 
-    if (
-      props.project.project_type === "modpack" &&
-      Object.keys(modpackJudgements.value).length > 0
-    ) {
-      const modpackMessage = generateModpackMessage(modpackJudgements.value);
+    if (props.project.project_type === "modpack" && allModpackFiles.value.length > 0) {
+      const modpackMessage = generateModpackMessage(allModpackFiles.value);
       if (modpackMessage) {
         fullMessage = baseMessage ? `${baseMessage}\n\n${modpackMessage}` : modpackMessage;
       }
@@ -1117,25 +1122,25 @@ async function generateMessage() {
   }
 }
 
-function generateModpackMessage(judgements: ModerationJudgements) {
+function generateModpackMessage(allFiles: ModerationModpackItem[]) {
   const issues = [];
 
-  const attributeMods = [];
-  const noMods = [];
-  const permanentNoMods = [];
-  const unidentifiedMods = [];
+  const attributeMods: string[] = [];
+  const noMods: string[] = [];
+  const permanentNoMods: string[] = [];
+  const unidentifiedMods: string[] = [];
 
-  for (const [, judgement] of Object.entries(judgements)) {
-    if (judgement.status === "with-attribution") {
-      attributeMods.push(judgement.file_name);
-    } else if (judgement.status === "no") {
-      noMods.push(judgement.file_name);
-    } else if (judgement.status === "permanent-no") {
-      permanentNoMods.push(judgement.file_name);
-    } else if (judgement.status === "unidentified") {
-      unidentifiedMods.push(judgement.file_name);
+  allFiles.forEach((file) => {
+    if (file.status === "with-attribution" && !file.approved) {
+      attributeMods.push(file.file_name);
+    } else if (file.status === "no" && !file.approved) {
+      noMods.push(file.file_name);
+    } else if (file.status === "permanent-no") {
+      permanentNoMods.push(file.file_name);
+    } else if (file.status === "unidentified" && !file.approved) {
+      unidentifiedMods.push(file.file_name);
     }
-  }
+  });
 
   if (
     attributeMods.length > 0 ||

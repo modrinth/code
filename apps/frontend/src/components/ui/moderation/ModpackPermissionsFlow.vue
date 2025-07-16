@@ -167,6 +167,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   complete: [];
   "update:modelValue": [judgements: ModerationJudgements];
+  "update:allFiles": [allFiles: ModerationModpackItem[]];
 }>();
 
 const persistedModPackData = useLocalStorage<ModerationModpackItem[] | null>(
@@ -252,6 +253,25 @@ async function fetchModPackData(): Promise<void> {
       internal: true,
     })) as ModerationModpackResponse;
     const sortedData: ModerationModpackItem[] = [
+      ...Object.entries(data.identified || {})
+        .filter(
+          ([_, file]) => file.status !== "yes" && file.status !== "with-attribution-and-source",
+        )
+        .map(
+          ([sha1, file]): ModerationModpackItem => ({
+            sha1,
+            file_name: file.file_name,
+            type: "identified",
+            status: file.status,
+            approved: null,
+            ...(file.status === "unidentified" && {
+              proof: "",
+              url: "",
+              title: "",
+            }),
+          }),
+        )
+        .sort((a, b) => a.file_name.localeCompare(b.file_name)),
       ...Object.entries(data.unknown_files || {})
         .map(
           ([sha1, fileName]): ModerationUnknownModpackItem => ({
@@ -321,6 +341,21 @@ function goToPrevious(): void {
   }
 }
 
+function emitAllFiles(): void {
+  if (modPackData.value) {
+    emit("update:allFiles", modPackData.value);
+  }
+}
+
+watch(
+  modPackData,
+  (newValue) => {
+    persistedModPackData.value = newValue;
+    emitAllFiles();
+  },
+  { deep: true },
+);
+
 function goToNext(): void {
   if (modPackData.value && currentIndex.value < modPackData.value.length) {
     currentIndex.value++;
@@ -342,6 +377,7 @@ function setStatus(index: number, status: ModerationModpackPermissionApprovalTyp
     modPackData.value[index].approved = null;
     persistAll();
     emit("update:modelValue", getJudgements());
+    emitAllFiles();
   }
 }
 
@@ -350,6 +386,7 @@ function setApproval(index: number, approved: ModerationPermissionType["id"]): v
     modPackData.value[index].approved = approved;
     persistAll();
     emit("update:modelValue", getJudgements());
+    emitAllFiles();
   }
 }
 
