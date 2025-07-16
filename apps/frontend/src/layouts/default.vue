@@ -700,7 +700,6 @@ import {
   PackageOpenIcon,
   DiscordIcon,
   BlueskyIcon,
-  TumblrIcon,
   TwitterIcon,
   MastodonIcon,
   GithubIcon,
