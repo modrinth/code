@@ -7,11 +7,10 @@ use tauri_plugin_http::reqwest;
 use tauri_plugin_http::reqwest::ClientBuilder;
 use tauri_plugin_updater::Error;
 use tauri_plugin_updater::Update;
-use theseus::{LoadingBarType, emit_loading, init_loading};
+use theseus::{
+    LAUNCHER_USER_AGENT, LoadingBarType, emit_loading, init_loading,
+};
 use tokio::time::Instant;
-
-const UPDATER_USER_AGENT: &str =
-    concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
 
 #[derive(Default)]
 pub struct PendingUpdateData(pub Mutex<Option<(Arc<Update>, Vec<u8>)>>);
@@ -32,7 +31,7 @@ pub async fn get_update_size<R: Runtime>(
         );
     }
 
-    let mut request = ClientBuilder::new().user_agent(UPDATER_USER_AGENT);
+    let mut request = ClientBuilder::new().user_agent(LAUNCHER_USER_AGENT);
     if let Some(timeout) = update.timeout {
         request = request.timeout(timeout);
     }
