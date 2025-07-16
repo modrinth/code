@@ -1346,6 +1346,15 @@ const footerLinks = [
           }),
         ),
       },
+      {
+        href: "/legal/copyright",
+        label: formatMessage(
+          defineMessage({
+            id: "layout.footer.legal.copyright-policy",
+            defaultMessage: "Copyright Policy and DMCA",
+          }),
+        ),
+      },
     ],
   },
 ];

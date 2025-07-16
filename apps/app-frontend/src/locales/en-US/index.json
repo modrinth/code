@@ -377,6 +377,12 @@
   "instance.worlds.hardcore": {
     "message": "Hardcore mode"
   },
+  "instance.worlds.incompatible_server": {
+    "message": "Server is incompatible"
+  },
+  "instance.worlds.no_contact": {
+    "message": "Server couldn't be contacted"
+  },
   "instance.worlds.no_quick_play": {
     "message": "You can only jump straight into worlds on Minecraft 1.20+"
   },

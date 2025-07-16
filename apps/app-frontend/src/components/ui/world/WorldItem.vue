@@ -128,6 +128,14 @@ const messages = defineMessages({
     id: 'instance.worlds.game_already_open',
     defaultMessage: 'Instance is already open',
   },
+  noContact: {
+    id: 'instance.worlds.no_contact',
+    defaultMessage: "Server couldn't be contacted",
+  },
+  incompatibleServer: {
+    id: 'instance.worlds.incompatible_server',
+    defaultMessage: 'Server is incompatible',
+  },
   copyAddress: {
     id: 'instance.worlds.copy_address',
     defaultMessage: 'Copy address',
@@ -302,39 +310,33 @@ const messages = defineMessages({
         </template>
       </div>
       <div class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
-        <template v-if="world.type === 'singleplayer' || serverStatus">
-          <ButtonStyled
-            v-if="(playingWorld || (locked && playingInstance)) && !startingInstance"
-            color="red"
-          >
-            <button @click="emit('stop')">
-              <StopCircleIcon aria-hidden="true" />
-              {{ formatMessage(commonMessages.stopButton) }}
-            </button>
-          </ButtonStyled>
-          <ButtonStyled v-else>
-            <button
-              v-tooltip="
-                serverIncompatible
-                  ? 'Server is incompatible'
+        <ButtonStyled
+          v-if="(playingWorld || (locked && playingInstance)) && !startingInstance"
+          color="red"
+        >
+          <button @click="emit('stop')">
+            <StopCircleIcon aria-hidden="true" />
+            {{ formatMessage(commonMessages.stopButton) }}
+          </button>
+        </ButtonStyled>
+        <ButtonStyled v-else>
+          <button
+            v-tooltip="
+              !serverStatus
+                ? formatMessage(messages.noContact)
+                : serverIncompatible
+                  ? formatMessage(messages.incompatibleServer)
                   : !supportsQuickPlay
                     ? formatMessage(messages.noQuickPlay)
                     : playingOtherWorld || locked
                       ? formatMessage(messages.gameAlreadyOpen)
                       : null
-              "
-              :disabled="!supportsQuickPlay || playingOtherWorld || startingInstance"
-              @click="emit('play')"
-            >
-              <SpinnerIcon v-if="startingInstance && playingWorld" class="animate-spin" />
-              <PlayIcon v-else aria-hidden="true" />
-              {{ formatMessage(commonMessages.playButton) }}
-            </button>
-          </ButtonStyled>
-        </template>
-        <ButtonStyled v-else>
-          <button class="invisible">
-            <PlayIcon aria-hidden="true" />
+            "
+            :disabled="!supportsQuickPlay || playingOtherWorld || startingInstance"
+            @click="emit('play')"
+          >
+            <SpinnerIcon v-if="startingInstance && playingWorld" class="animate-spin" />
+            <PlayIcon v-else aria-hidden="true" />
             {{ formatMessage(commonMessages.playButton) }}
           </button>
         </ButtonStyled>

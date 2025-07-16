@@ -125,32 +125,55 @@ export function processMessage(
 export function findMatchingVariant(
   variants: ConditionalMessage[],
   selectedActionIds: string[],
+  allValidActionIds?: string[],
+  currentStageIndex?: number,
 ): ConditionalMessage | null {
   for (const variant of variants) {
     const conditions = variant.conditions
 
     const meetsRequired =
       !conditions.requiredActions ||
-      conditions.requiredActions.every((id) => selectedActionIds.includes(id))
+      conditions.requiredActions.every((id) => {
+        let fullId = id
+        if (currentStageIndex !== undefined && !id.startsWith('stage-')) {
+          fullId = `stage-${currentStageIndex}-${id}`
+        }
+
+        if (allValidActionIds && !allValidActionIds.includes(fullId)) {
+          return false
+        }
+        return selectedActionIds.includes(fullId)
+      })
 
     const meetsExcluded =
       !conditions.excludedActions ||
-      !conditions.excludedActions.some((id) => selectedActionIds.includes(id))
+      !conditions.excludedActions.some((id) => {
+        let fullId = id
+        if (currentStageIndex !== undefined && !id.startsWith('stage-')) {
+          fullId = `stage-${currentStageIndex}-${id}`
+        }
+        return selectedActionIds.includes(fullId)
+      })
 
     if (meetsRequired && meetsExcluded) {
       return variant
     }
   }
 
-  return variants.find((v) => v.fallbackMessage) || null
+  return null
 }
 
 export async function getActionMessage(
   action: ButtonAction | ToggleAction,
   selectedActionIds: string[],
+  allValidActionIds?: string[],
 ): Promise<string> {
   if (action.conditionalMessages && action.conditionalMessages.length > 0) {
-    const matchingConditional = findMatchingVariant(action.conditionalMessages, selectedActionIds)
+    const matchingConditional = findMatchingVariant(
+      action.conditionalMessages,
+      selectedActionIds,
+      allValidActionIds,
+    )
     if (matchingConditional) {
       return (await matchingConditional.message()) as string
     }
