@@ -578,7 +578,7 @@ importers:
         version: 7.3.1
       '@vintl/unplugin':
         specifier: ^1.5.1
-        version: 1.5.2(@vue/compiler-core@3.5.13)(rollup@3.29.4)(vite@4.5.3(@types/node@22.4.1)(sass@1.77.6)(terser@5.43.1))(vue@3.5.13(typescript@5.5.4))(webpack@5.92.1)
+        version: 1.5.2(@vue/compiler-core@3.5.13)(rollup@3.29.4)(vite@4.5.3(@types/node@22.4.1)(sass@1.77.6)(terser@5.42.0))(vue@3.5.13(typescript@5.5.4))(webpack@5.92.1)
       '@vintl/vintl':
         specifier: ^4.4.1
         version: 4.4.1(typescript@5.5.4)(vue@3.5.13(typescript@5.5.4))
