@@ -51,7 +51,7 @@ const links: Stage = {
     {
       id: 'links_unaccessible',
       type: 'button',
-      label: 'Links or unaccessible',
+      label: 'Links are inaccessible',
       weight: 510,
       suggestedStatus: 'flagged',
       // Theoretically a conditional could go here to prevent overlap of misuse and unaccessible messages repeating while still allowing for a multi-select in each.
