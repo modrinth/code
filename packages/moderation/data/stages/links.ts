@@ -17,15 +17,7 @@ const links: Stage = {
         project.donation_urls.length > 0,
     ),
   text: async (project) => {
-    let text = ''
-    if (project.issues_url)
-      text += (await import('../messages/checklist-text/links/issues.md?raw')).default
-    if (project.source_url)
-      text += (await import('../messages/checklist-text/links/source.md?raw')).default
-    if (project.wiki_url)
-      text += (await import('../messages/checklist-text/links/wiki.md?raw')).default
-    if (project.discord_url)
-      text += (await import('../messages/checklist-text/links/discord.md?raw')).default
+    let text = (await import('../messages/checklist-text/links/base.md?raw')).default
 
     if (project.donation_urls.length > 0) {
       text += (await import('../messages/checklist-text/links/donation/donations.md?raw')).default
@@ -37,8 +29,7 @@ const links: Stage = {
       }
     }
 
-    if (text !== '') return text
-    return 'No links provided.'
+    return text
   },
   actions: [
     {

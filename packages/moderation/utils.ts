@@ -247,10 +247,10 @@ export function flattenProjectVariables(project: Project): Record<string, string
   vars['PROJECT_BODY'] = project.body
 
   vars['PROJECT_ICON_URL'] = project.icon_url || ''
-  vars['PROJECT_ISSUES_URL'] = project.issues_url || ''
-  vars['PROJECT_SOURCE_URL'] = project.source_url || ''
-  vars['PROJECT_WIKI_URL'] = project.wiki_url || ''
-  vars['PROJECT_DISCORD_URL'] = project.discord_url || ''
+  vars['PROJECT_ISSUES_URL'] = project.issues_url || 'None'
+  vars['PROJECT_SOURCE_URL'] = project.source_url || 'None'
+  vars['PROJECT_WIKI_URL'] = project.wiki_url || 'None'
+  vars['PROJECT_DISCORD_URL'] = project.discord_url || 'None'
 
   vars['PROJECT_DOWNLOADS'] = project.downloads.toString()
   vars['PROJECT_FOLLOWERS'] = project.followers.toString()
@@ -270,7 +270,7 @@ export function flattenProjectVariables(project: Project): Record<string, string
 
   vars['PROJECT_LICENSE_ID'] = project.license.id
   vars['PROJECT_LICENSE_NAME'] = project.license.name
-  vars['PROJECT_LICENSE_URL'] = project.license.url || ''
+  vars['PROJECT_LICENSE_URL'] = project.license.url || 'None'
 
   vars['PROJECT_CATEGORIES'] = arrayOrNone(project.categories)
   vars['PROJECT_ADDITIONAL_CATEGORIES'] = arrayOrNone(project.additional_categories)
@@ -298,7 +298,7 @@ export function flattenProjectVariables(project: Project): Record<string, string
     vars[`PROJECT_GALLERY_${index}_FEATURED`] = image.featured.toString()
   })
 
-  //Static time saving stuff
+  // Static time saving stuff
   vars[`RULES`] = `[Modrinth's Content Rules](https://modrinth.com/legal/rules)`
   vars[`TOS`] = `[Terms of Use](https://modrinth.com/legal/terms)`
   vars[`COPYRIGHT_POLICY`] = `[Copyright Policy](https://modrinth.com/legal/copyright)`
@@ -313,7 +313,7 @@ export function flattenProjectVariables(project: Project): Record<string, string
   vars[`LICENSING_GUIDE`] =
     `our guide to [Guide to Licensing your Mods](https://modrinth.com/news/article/licensing-guide)`
 
-  //navigation related variables
+  // Navigation related variables
   vars[`PROJECT_PERMANENT_LINK`] = `https://modrinth.com/project/${project.id}`
   vars[`PROJECT_SETTINGS_LINK`] = `https://modrinth.com/project/${project.id}/settings`
   vars[`PROJECT_SETTINGS_FLINK`] = `[Settings](https://modrinth.com/project/${project.id}/settings)`
