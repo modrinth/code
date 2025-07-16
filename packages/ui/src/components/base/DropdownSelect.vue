@@ -103,6 +103,10 @@ const props = defineProps({
     type: Function,
     default: undefined,
   },
+  maxVisibleOptions: {
+    type: Number,
+    default: undefined,
+  },
 })
 
 function getOptionLabel(option) {
@@ -263,7 +267,7 @@ const isChildOfDropdown = (element) => {
 
   .options {
     z-index: 10;
-    max-height: 18.75rem;
+    max-height: v-bind('maxVisibleOptions ? `calc(${maxVisibleOptions} * 3rem)` : "18.75rem"');
     overflow-y: auto;
     box-shadow:
       var(--shadow-inset-sm),

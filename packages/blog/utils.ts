@@ -8,7 +8,7 @@ export function getRepoRoot(): string {
 }
 
 export function repoPath(...segments: string[]): string {
-  return path.join(getRepoRoot(), ...segments)
+  return path.posix.join(getRepoRoot(), ...segments)
 }
 
 export async function copyDir(
@@ -20,8 +20,8 @@ export async function copyDir(
   await fs.mkdir(dest, { recursive: true })
   const entries = await fs.readdir(src, { withFileTypes: true })
   for (const entry of entries) {
-    const srcPath = path.join(src, entry.name)
-    const destPath = path.join(dest, entry.name)
+    const srcPath = path.posix.join(src, entry.name)
+    const destPath = path.posix.join(dest, entry.name)
     if (entry.isDirectory()) {
       await copyDir(srcPath, destPath, logFn)
     } else if (entry.isFile()) {

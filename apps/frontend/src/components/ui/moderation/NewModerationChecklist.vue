@@ -116,8 +116,10 @@
                       <span class="label__title">{{ action.label }}</span>
                     </label>
                     <DropdownSelect
+                      :max-visible-options="3"
+                      render-up
                       :name="`dropdown-${getActionId(action)}`"
-                      :options="action.options"
+                      :options="getVisibleDropdownOptions(action)"
                       :model-value="getDropdownValue(action)"
                       :placeholder="'Select an option'"
                       :disabled="false"
@@ -138,7 +140,7 @@
                   <div class="mb-2 font-semibold">{{ action.label }}</div>
                   <div class="flex flex-wrap gap-2">
                     <ButtonStyled
-                      v-for="(option, optIndex) in action.options"
+                      v-for="(option, optIndex) in getVisibleMultiSelectOptions(action)"
                       :key="`${getActionId(action)}-chip-${optIndex}`"
                       :color="isChipSelected(action, optIndex) ? 'brand' : 'standard'"
                       @click="toggleChip(action, optIndex)"
@@ -380,6 +382,7 @@ import type {
 import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
 import KeybindsModal from "./ChecklistKeybindsModal.vue";
 import { finalPermissionMessages } from "@modrinth/moderation/data/modpack-permissions-stage";
+import prettier from "prettier";
 
 const keybindsModal = ref<InstanceType<typeof KeybindsModal>>();
 
@@ -461,7 +464,7 @@ const stageTextExpanded = computedAsync(async () => {
   const stage = checklist[stageIndex];
   if (stage.text) {
     return renderHighlightedString(
-      expandVariables(await stage.text(), props.project, variables.value),
+      expandVariables(await stage.text(props.project), props.project, variables.value),
     );
   }
   return null;
@@ -559,14 +562,20 @@ function handleKeybinds(event: KeyboardEvent) {
         },
         trySelectDropdownOption: (actionIndex: number, optionIndex: number) => {
           const action = visibleActions.value[actionIndex] as DropdownAction;
-          if (action && action.type === "dropdown" && action.options[optionIndex]) {
-            selectDropdownOption(action, action.options[optionIndex]);
+          if (action && action.type === "dropdown") {
+            const visibleOptions = getVisibleDropdownOptions(action);
+            if (optionIndex < visibleOptions.length) {
+              selectDropdownOption(action, visibleOptions[optionIndex]);
+            }
           }
         },
         tryToggleChip: (actionIndex: number, chipIndex: number) => {
           const action = visibleActions.value[actionIndex] as MultiSelectChipsAction;
           if (action && action.type === "multi-select-chips") {
-            toggleChip(action, chipIndex);
+            const visibleOptions = getVisibleMultiSelectOptions(action);
+            if (chipIndex < visibleOptions.length) {
+              toggleChip(action, chipIndex);
+            }
           }
         },
 
@@ -733,13 +742,17 @@ const multiSelectActions = computed(() =>
 
 function getDropdownValue(action: DropdownAction) {
   const actionId = getActionId(action);
+  const visibleOptions = getVisibleDropdownOptions(action);
   const currentValue = actionStates.value[actionId]?.value ?? action.defaultOption ?? 0;
 
-  if (action.options && action.options[currentValue]) {
-    return action.options[currentValue];
+  const allOptions = action.options;
+  const storedOption = allOptions[currentValue];
+
+  if (storedOption && visibleOptions.includes(storedOption)) {
+    return storedOption;
   }
 
-  return action.options?.[0] || null;
+  return visibleOptions[0] || null;
 }
 
 function isActionSelected(action: Action): boolean {
@@ -775,20 +788,31 @@ function selectDropdownOption(action: DropdownAction, selected: any) {
 function isChipSelected(action: MultiSelectChipsAction, optionIndex: number): boolean {
   const actionId = getActionId(action);
   const selectedSet = actionStates.value[actionId]?.value as Set<number> | undefined;
-  return selectedSet?.has(optionIndex) || false;
+
+  const visibleOptions = getVisibleMultiSelectOptions(action);
+  const visibleOption = visibleOptions[optionIndex];
+  const originalIndex = action.options.findIndex((opt) => opt === visibleOption);
+
+  return selectedSet?.has(originalIndex) || false;
 }
 
 function toggleChip(action: MultiSelectChipsAction, optionIndex: number) {
   const actionId = getActionId(action);
   const state = actionStates.value[actionId];
   if (state && state.value instanceof Set) {
-    if (state.value.has(optionIndex)) {
-      state.value.delete(optionIndex);
-    } else {
-      state.value.add(optionIndex);
+    const visibleOptions = getVisibleMultiSelectOptions(action);
+    const visibleOption = visibleOptions[optionIndex];
+    const originalIndex = action.options.findIndex((opt) => opt === visibleOption);
+
+    if (originalIndex !== -1) {
+      if (state.value.has(originalIndex)) {
+        state.value.delete(originalIndex);
+      } else {
+        state.value.add(originalIndex);
+      }
+      state.selected = state.value.size > 0;
+      persistState();
     }
-    state.selected = state.value.size > 0;
-    persistState();
   }
 }
 
@@ -869,9 +893,23 @@ async function processAction(
   stageIndex: number,
   messageParts: MessagePart[],
 ) {
+  const allValidActionIds: string[] = [];
+  checklist.forEach((stage, stageIdx) => {
+    stage.actions.forEach((stageAction, actionIdx) => {
+      allValidActionIds.push(getActionIdForStage(stageAction, stageIdx, actionIdx));
+      if (stageAction.enablesActions) {
+        stageAction.enablesActions.forEach((enabledAction, enabledIdx) => {
+          allValidActionIds.push(
+            getActionIdForStage(enabledAction, stageIdx, actionIdx, enabledIdx),
+          );
+        });
+      }
+    });
+  });
+
   if (action.type === "button" || action.type === "toggle") {
     const buttonAction = action as ButtonAction | ToggleAction;
-    const message = await getActionMessage(buttonAction, selectedActionIds);
+    const message = await getActionMessage(buttonAction, selectedActionIds, allValidActionIds);
     if (message) {
       messageParts.push({
         weight: buttonAction.weight,
@@ -885,16 +923,29 @@ async function processAction(
     const matchingVariant = findMatchingVariant(
       conditionalAction.messageVariants,
       selectedActionIds,
+      allValidActionIds,
+      stageIndex,
     );
+
+    let message: string;
+    let weight: number;
+
     if (matchingVariant) {
-      const message = (await matchingVariant.message()) as string;
-      messageParts.push({
-        weight: matchingVariant.weight,
-        content: processMessage(message, action, stageIndex, textInputValues.value),
-        actionId,
-        stageIndex,
-      });
+      message = (await matchingVariant.message()) as string;
+      weight = matchingVariant.weight;
+    } else if (conditionalAction.fallbackMessage) {
+      message = (await conditionalAction.fallbackMessage()) as string;
+      weight = conditionalAction.fallbackWeight ?? 0;
+    } else {
+      return;
     }
+
+    messageParts.push({
+      weight,
+      content: processMessage(message, action, stageIndex, textInputValues.value),
+      actionId,
+      stageIndex,
+    });
   } else if (action.type === "dropdown") {
     const dropdownAction = action as DropdownAction;
     const selectedIndex = state.value ?? 0;
@@ -929,6 +980,18 @@ async function processAction(
 }
 
 function shouldShowStage(stage: Stage): boolean {
+  let hasVisibleActions = false;
+
+  for (const a of stage.actions) {
+    if (shouldShowAction(a)) {
+      hasVisibleActions = true;
+    }
+  }
+
+  if (!hasVisibleActions) {
+    return false;
+  }
+
   if (typeof stage.shouldShow === "function") {
     return stage.shouldShow(props.project);
   }
@@ -942,6 +1005,24 @@ function shouldShowAction(action: Action): boolean {
   }
 
   return true;
+}
+
+function getVisibleDropdownOptions(action: DropdownAction) {
+  return action.options.filter((option) => {
+    if (typeof option.shouldShow === "function") {
+      return option.shouldShow(props.project);
+    }
+    return true;
+  });
+}
+
+function getVisibleMultiSelectOptions(action: MultiSelectChipsAction) {
+  return action.options.filter((option) => {
+    if (typeof option.shouldShow === "function") {
+      return option.shouldShow(props.project);
+    }
+    return true;
+  });
 }
 
 function shouldShowStageIndex(stageIndex: number): boolean {
@@ -1021,7 +1102,20 @@ async function generateMessage() {
       }
     }
 
-    message.value = fullMessage;
+    try {
+      const formattedMessage = await prettier.format(fullMessage, {
+        parser: "markdown",
+        printWidth: 80,
+        proseWrap: "always",
+        tabWidth: 2,
+        useTabs: false,
+      });
+      message.value = formattedMessage;
+    } catch (formattingError) {
+      console.warn("Failed to format markdown, using original:", formattingError);
+      message.value = fullMessage;
+    }
+
     generatedMessage.value = true;
   } catch (error) {
     console.error("Error generating message:", error);
