@@ -64,7 +64,16 @@ import { XIcon, SearchIcon, SortAscIcon, SortDescIcon, FilterIcon } from "@modri
 import { defineMessages, useVIntl } from "@vintl/vintl";
 import { useLocalStorage } from "@vueuse/core";
 import ReportCard from "~/components/ui/moderation/ReportCard.vue";
-import type { Project, Report, Thread, User, Version } from "@modrinth/utils";
+import type {
+  Project,
+  Report,
+  Thread,
+  User,
+  Version,
+  TeamMember,
+  Organization,
+} from "@modrinth/utils";
+import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
 import Fuse from "fuse.js";
 
 const { formatMessage } = useVIntl();
@@ -84,12 +93,20 @@ const messages = defineMessages({
   },
 });
 
+export interface OwnershipTarget {
+  name: string;
+  slug: string;
+  avatar_url?: string;
+  type: "user" | "organization";
+}
+
 export interface ExtendedReport extends Report {
   thread: Thread;
   reporter_user: User;
   project?: Project;
   user?: User;
   version?: Version;
+  target?: OwnershipTarget;
 }
 
 const { data: allReports } = await useAsyncData("moderation-reports", async () => {
@@ -113,39 +130,165 @@ const { data: allReports } = await useAsyncData("moderation-reports", async () =
     .filter((report) => report.item_type === "project")
     .map((report) => report.item_id);
 
-  const fullUserIds = new Set([...userIDs, ...reports.map((report) => report.reporter)]);
+  const versions = (await fetchSegmented(
+    versionIDs,
+    (ids) => `versions?ids=${asEncodedJsonArray(ids)}`,
+  )) as Version[];
 
-  const [users, versions, projects] = await Promise.all([
-    fetchSegmented(
-      Array.from(fullUserIds),
-      (ids) => `users?ids=${asEncodedJsonArray(ids)}`,
-    ) as Promise<User[]>,
-    fetchSegmented(versionIDs, (ids) => `versions?ids=${asEncodedJsonArray(ids)}`) as Promise<
-      Version[]
-    >,
-    fetchSegmented(projectIDs, (ids) => `projects?ids=${asEncodedJsonArray(ids)}`) as Promise<
-      Project[]
-    >,
+  const fullProjectIds = new Set([
+    ...projectIDs,
+    ...versions.map((v) => v.project_id).filter(Boolean),
   ]);
+
+  const projects = (await fetchSegmented(
+    Array.from(fullProjectIds),
+    (ids) => `projects?ids=${asEncodedJsonArray(ids)}`,
+  )) as Project[];
+
+  const teamIds = [...new Set(projects.map((p) => p.team).filter(Boolean))];
+  const orgIds = [...new Set(projects.map((p) => p.organization).filter(Boolean))];
+
+  const [teamsData, orgsData]: [TeamMember[][], Organization[]] = await Promise.all([
+    teamIds.length > 0
+      ? fetchSegmented(teamIds, (ids) => `teams?ids=${asEncodedJsonArray(ids)}`)
+      : Promise.resolve([]),
+    orgIds.length > 0
+      ? fetchSegmented(orgIds, (ids) => `organizations?ids=${asEncodedJsonArray(ids)}`, {
+          apiVersion: 3,
+        })
+      : Promise.resolve([]),
+  ]);
+
+  const orgTeamIds = orgsData.map((org) => org.team_id).filter(Boolean);
+  const orgTeamsData: TeamMember[][] =
+    orgTeamIds.length > 0
+      ? await fetchSegmented(orgTeamIds, (ids) => `teams?ids=${asEncodedJsonArray(ids)}`)
+      : [];
+
+  const ownerUserIds = new Set<string>();
+
+  teamsData.flat().forEach((member) => {
+    if (member.role === "Owner") {
+      ownerUserIds.add(member.user.id);
+    }
+  });
+
+  orgTeamsData.flat().forEach((member) => {
+    if (member.role === "Owner") {
+      ownerUserIds.add(member.user.id);
+    }
+  });
+
+  const fullUserIds = new Set([
+    ...userIDs,
+    ...reports.map((report) => report.reporter),
+    ...ownerUserIds,
+  ]);
+
+  const users = (await fetchSegmented(
+    Array.from(fullUserIds),
+    (ids) => `users?ids=${asEncodedJsonArray(ids)}`,
+  )) as User[];
+
+  const teamMap = new Map<string, TeamMember[]>();
+  const orgMap = new Map<string, Organization>();
+
+  teamsData.forEach((team) => {
+    let teamId = null;
+    for (const member of team) {
+      teamId = member.team_id;
+      if (!teamMap.has(teamId)) {
+        teamMap.set(teamId, team);
+        break;
+      }
+    }
+  });
+
+  orgTeamsData.forEach((team) => {
+    let teamId = null;
+    for (const member of team) {
+      teamId = member.team_id;
+      if (!teamMap.has(teamId)) {
+        teamMap.set(teamId, team);
+        break;
+      }
+    }
+  });
+
+  orgsData.forEach((org: Organization) => {
+    orgMap.set(org.id, org);
+  });
 
   const extendedReports: ExtendedReport[] = reports.map((report) => {
     const thread = threads.find((t) => t.id === report.thread_id) || ({} as Thread);
+    const version =
+      report.item_type === "version"
+        ? versions.find((v: { id: string }) => v.id === report.item_id)
+        : undefined;
+
+    const project =
+      report.item_type === "project"
+        ? projects.find((p: { id: string }) => p.id === report.item_id)
+        : report.item_type === "version" && version
+          ? projects.find((p: { id: string }) => p.id === version.project_id)
+          : undefined;
+
+    let target: OwnershipTarget | undefined;
+
+    if (report.item_type === "user") {
+      const targetUser = users.find((u: { id: string }) => u.id === report.item_id);
+      if (targetUser) {
+        target = {
+          name: targetUser.username,
+          slug: targetUser.username,
+          avatar_url: targetUser.avatar_url,
+          type: "user",
+        };
+      }
+    } else if (project) {
+      let owner: TeamMember | null = null;
+      let org: Organization | null = null;
+
+      if (project.team) {
+        const teamMembers = teamMap.get(project.team);
+        if (teamMembers) {
+          owner = teamMembers.find((member) => member.role === "Owner") || null;
+        }
+      }
+
+      if (project.organization) {
+        org = orgMap.get(project.organization) || null;
+      }
+
+      // Prioritize organization over individual owner
+      if (org) {
+        target = {
+          name: org.name,
+          avatar_url: org.icon_url,
+          type: "organization",
+          slug: org.slug,
+        };
+      } else if (owner) {
+        target = {
+          name: owner.user.username,
+          avatar_url: owner.user.avatar_url,
+          type: "user",
+          slug: owner.user.username,
+        };
+      }
+    }
+
     return {
       ...report,
       thread,
       reporter_user: users.find((user) => user.id === report.reporter) || ({} as User),
-      project:
-        report.item_type === "project"
-          ? projects.find((p: { id: string }) => p.id === report.item_id)
-          : undefined,
+      project,
       user:
         report.item_type === "user"
           ? users.find((u: { id: string }) => u.id === report.item_id)
           : undefined,
-      version:
-        report.item_type === "version"
-          ? versions.find((v: { id: string }) => v.id === report.item_id)
-          : undefined,
+      version,
+      target,
     };
   });
 

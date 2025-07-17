@@ -131,11 +131,13 @@ function getDaysQueued(date: Date): number {
 }
 
 const queuedDate = computed(() => {
-  return dayjs(enrichedProject.value.queued).toDate();
+  return dayjs(
+    enrichedProject.value.queued || enrichedProject.value.created || enrichedProject.value.updated,
+  );
 });
 
 const daysInQueue = computed(() => {
-  return getDaysQueued(queuedDate.value);
+  return getDaysQueued(queuedDate.value.toDate());
 });
 
 function openProjectForReview() {
@@ -153,7 +155,7 @@ function openProjectForReview() {
 }
 
 function getSubmittedTime(project: any): string {
-  const date = project.queued || project.published || project.created;
+  const date = project.queued || project.created || project.updated;
   if (!date) return "Unknown";
 
   try {
