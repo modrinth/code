@@ -11,7 +11,6 @@ and launching Modrinth mod packs
 mod util;
 
 mod api;
-mod config;
 mod error;
 mod event;
 mod launcher;
