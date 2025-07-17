@@ -689,7 +689,10 @@
                   },
                   {
                     id: 'moderation-checklist',
-                    action: () => (showModerationChecklist = true),
+                    action: () => {
+                      moderationStore.setSingleProject(project.value.id);
+                      showModerationChecklist = true;
+                    },
                     color: 'orange',
                     hoverOnly: true,
                     shown:
@@ -892,7 +895,6 @@
   >
     <NewModerationChecklist
       :project="project"
-      :future-project-ids="futureProjectIds"
       :collapsed="collapsedModerationChecklist"
       @exit="showModerationChecklist = false"
       @toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
@@ -977,10 +979,12 @@ import { userCollectProject } from "~/composables/user.js";
 import { reportProject } from "~/utils/report-helpers.ts";
 import { saveFeatureFlags } from "~/composables/featureFlags.ts";
 import NewModerationChecklist from "~/components/ui/moderation/NewModerationChecklist.vue";
+import { useModerationStore } from "~/store/moderation";
 
 const data = useNuxtApp();
 const route = useNativeRoute();
 const config = useRuntimeConfig();
+const moderationStore = useModerationStore();
 
 const auth = await useAuth();
 const user = await useUser();
@@ -1567,12 +1571,6 @@ const showModerationChecklist = useLocalStorage(
   false,
 );
 const collapsedModerationChecklist = useLocalStorage("collapsed-moderation-checklist", false);
-
-const futureProjectIds = useLocalStorage("moderation-future-projects", []);
-
-watch(futureProjectIds, (newValue) => {
-  console.log("Future project IDs updated:", newValue);
-});
 
 watch(
   showModerationChecklist,

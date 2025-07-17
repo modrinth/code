@@ -17,6 +17,7 @@
     </div>
     <div v-if="totalPages > 1" class="flex justify-center">
       <Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
+      <ConfettiExplosion v-if="visible" />
     </div>
     <div class="flex flex-row justify-end gap-2">
       <DropdownSelect
@@ -81,10 +82,23 @@ import {
 import { defineMessages, useVIntl } from "@vintl/vintl";
 import { useLocalStorage } from "@vueuse/core";
 import type { Project, TeamMember, Organization } from "@modrinth/utils";
+import ConfettiExplosion from "vue-confetti-explosion";
 import ModerationQueueCard from "~/components/ui/moderation/ModerationQueueCard.vue";
 import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
 
 const { formatMessage } = useVIntl();
+
+const visible = ref(false);
+if (import.meta.client && history && history.state && history.state.confetti) {
+  setTimeout(async () => {
+    history.state.confetti = false;
+    visible.value = true;
+    await nextTick();
+    setTimeout(() => {
+      visible.value = false;
+    }, 5000);
+  }, 1000);
+}
 
 const messages = defineMessages({
   searchPlaceholder: {
@@ -187,8 +201,8 @@ const { data: enrichedProjects } = await useAsyncData(
     const projects = paginatedProjects.value;
     if (!projects.length) return [];
 
-    const teamIds = [...new Set(projects.map(p => p.team).filter(Boolean))];
-    const orgIds = [...new Set(projects.map(p => p.organization).filter(Boolean))];
+    const teamIds = [...new Set(projects.map((p) => p.team).filter(Boolean))];
+    const orgIds = [...new Set(projects.map((p) => p.organization).filter(Boolean))];
 
     const [teamsData, orgsData]: [TeamMember[][], Organization[]] = await Promise.all([
       teamIds.length > 0
@@ -221,14 +235,14 @@ const { data: enrichedProjects } = await useAsyncData(
       orgMap.set(org.id, org);
     });
 
-    return projects.map(project => {
+    return projects.map((project) => {
       let owner: TeamMember | null = null;
       let org: Organization | null = null;
 
       if (project.team) {
         const teamMembers = teamMap.get(project.team);
         if (teamMembers) {
-          owner = teamMembers.find(member => member.role === "Owner") || null;
+          owner = teamMembers.find((member) => member.role === "Owner") || null;
         }
       }
 
@@ -246,7 +260,7 @@ const { data: enrichedProjects } = await useAsyncData(
   {
     default: () => [],
     watch: [paginatedProjects],
-  }
+  },
 );
 
 function updateSearchResults() {
