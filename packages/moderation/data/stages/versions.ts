@@ -110,7 +110,7 @@ const versions: Stage = {
               weight: 1002,
               suggestedStatus: 'rejected',
               severity: 'high',
-              shouldShow: (project) => project.project_type === `modpack`,
+              shouldShow: (project) => project.project_type === 'modpack',
               message: async () =>
                 (await import('../messages/versions/alternate_versions-zip.md?raw')).default,
             } as DropdownActionOption,
