@@ -69,7 +69,17 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { defineMessages, useVIntl } from '@vintl/vintl'
-import { computed, onMounted, onUnmounted, provide, ref, useTemplateRef, watch } from 'vue'
+import { createTooltip, destroyTooltip } from 'floating-vue'
+import {
+  computed,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  provide,
+  ref,
+  useTemplateRef,
+  watch,
+} from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import { create_profile_and_install_from_file } from './helpers/pack'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
@@ -470,6 +480,20 @@ async function forceOpenUpdateModal() {
   updateModal.value.show(availableUpdate.value)
 }
 
+const updateButton = useTemplateRef('updateButton')
+async function showUpdateButtonTooltip() {
+  await nextTick()
+  const tooltip = createTooltip(updateButton.value.$el, {
+    placement: 'right',
+    content: 'Click here to view the update again.',
+  })
+  tooltip.show()
+  setTimeout(() => {
+    tooltip.hide()
+    destroyTooltip(updateButton.value.$el)
+  }, 3500)
+}
+
 function handleClick(e) {
   let target = e.target
   while (target != null) {
@@ -515,6 +539,7 @@ function handleAuxClick(e) {
         ref="updateModal"
         @update-skipped="skipUpdate"
         @update-enqueued-for-later="updateEnqueuedForLater"
+        @modal-hidden="showUpdateButtonTooltip"
       />
     </Suspense>
     <Suspense>
@@ -572,6 +597,7 @@ function handleAuxClick(e) {
       <div class="flex flex-grow"></div>
       <NavButton
         v-if="!!availableUpdate"
+        ref="updateButton"
         v-tooltip.right="
           enqueuedUpdate === availableUpdate?.version
             ? 'Update installation queued for next restart'
