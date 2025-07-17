@@ -17,7 +17,6 @@ definePageMeta({
 });
 
 const { formatMessage } = useVIntl();
-const auth = await useAuth();
 
 const messages = defineMessages({
   projectsTitle: {

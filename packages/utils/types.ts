@@ -295,6 +295,60 @@ export type Report = {
   body: string
 }
 
+// Threads
+export interface Thread {
+  id: string
+  type: ThreadType
+  project_id: string | null
+  report_id: string | null
+  messages: ThreadMessage[]
+  members: User[]
+}
+
+export type ThreadType = 'project' | 'report' | 'direct_message'
+
+export interface ThreadMessage {
+  id: string
+  author_id: string | null
+  body: MessageBody
+  created: string
+  hide_identity: boolean
+}
+
+export type MessageBody =
+  | TextMessageBody
+  | StatusChangeMessageBody
+  | ThreadClosureMessageBody
+  | ThreadReopenMessageBody
+  | DeletedMessageBody
+
+export interface TextMessageBody {
+  type: 'text'
+  body: string
+  private: boolean
+  replying_to: string | null
+  associated_images: string[]
+}
+
+export interface StatusChangeMessageBody {
+  type: 'status_change'
+  new_status: ProjectStatus
+  old_status: ProjectStatus
+}
+
+export interface ThreadClosureMessageBody {
+  type: 'thread_closure'
+}
+
+export interface ThreadReopenMessageBody {
+  type: 'thread_reopen'
+}
+
+export interface DeletedMessageBody {
+  type: 'deleted'
+  private: boolean
+}
+
 // Moderation
 export interface ModerationModpackPermissionApprovalType {
   id:
