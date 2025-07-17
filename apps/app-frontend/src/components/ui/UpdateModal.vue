@@ -7,10 +7,12 @@
   >
     <div class="flex flex-col gap-4">
       <div class="max-w-[500px]">
-        <div class="font-extrabold text-contrast text-xl mb-1">Modrinth App v{{ update!.version }}</div>
+        <div class="font-extrabold text-contrast text-xl mb-1">
+          Modrinth App v{{ update!.version }}
+        </div>
         <template v-if="!downloadInProgress && !downloadError">
-          <div  class="mb-4 leading-tight">{{ formatMessage(messages.bodyVersion) }}</div>
-          <div  class="text-sm text-secondary mb-3">
+          <div class="mb-4 leading-tight">{{ formatMessage(messages.bodyVersion) }}</div>
+          <div class="text-sm text-secondary mb-3">
             {{ formatMessage(messages.downloadSize, { size: formatBytes(updateSize) }) }}
           </div>
         </template>
@@ -29,9 +31,7 @@
             <ButtonStyled color="brand">
               <button @click="installUpdateNow">
                 <DownloadIcon />
-                {{
-                  formatMessage(messages.tryAgain)
-                }}
+                {{ formatMessage(messages.tryAgain) }}
               </button>
             </ButtonStyled>
             <ButtonStyled>
@@ -74,13 +74,7 @@ import { defineMessages, useVIntl } from '@vintl/vintl'
 import { useTemplateRef, ref, computed } from 'vue'
 import { AppearingProgressBar, ButtonStyled, JoinedButtons } from '@modrinth/ui'
 import type { JoinedButtonAction } from '@modrinth/ui'
-import {
-  ExternalIcon,
-  DownloadIcon,
-  RightArrowIcon,
-  RedoIcon,
-  ClipboardCopyIcon,
-} from '@modrinth/assets'
+import { ExternalIcon, DownloadIcon, RedoIcon, ClipboardCopyIcon } from '@modrinth/assets'
 import { enqueueUpdateForInstallation, getUpdateSize } from '@/helpers/utils'
 import { formatBytes } from '@modrinth/utils'
 import { handleError } from '@/store/notifications'
