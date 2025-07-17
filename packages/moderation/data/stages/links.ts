@@ -61,7 +61,8 @@ const links: Stage = {
         {
           id: 'links_unaccessible_options',
           type: 'multi-select-chips',
-          label: 'Warn of unaccessible link?',
+          label: 'Warn of inaccessible link?',
+          shouldShow: (project) => Boolean(project.source_url || project.discord_url),
           options: [
             {
               label: 'Source',
