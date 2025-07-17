@@ -172,6 +172,7 @@ const flags = useFeatureFlags();
 
   .markdown-body {
     grid-area: body;
+    max-width: 100%;
   }
 
   .reporter-info {

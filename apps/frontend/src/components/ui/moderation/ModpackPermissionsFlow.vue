@@ -365,26 +365,24 @@ function getJudgements(): ModerationJudgements {
   const judgements: ModerationJudgements = {};
 
   modPackData.value.forEach((item) => {
-    if (item.status && item.status !== "unidentified") {
-      if (item.type === "flame") {
-        judgements[item.sha1] = {
-          type: "flame",
-          id: item.id,
-          status: item.status,
-          link: item.url,
-          title: item.title,
-          file_name: item.file_name,
-        };
-      } else if (item.type === "unknown") {
-        judgements[item.sha1] = {
-          type: "unknown",
-          status: item.status,
-          proof: item.proof,
-          link: item.url,
-          title: item.title,
-          file_name: item.file_name,
-        };
-      }
+    if (item.type === "flame") {
+      judgements[item.sha1] = {
+        type: "flame",
+        id: item.id,
+        status: item.status,
+        link: item.url,
+        title: item.title,
+        file_name: item.file_name,
+      };
+    } else if (item.type === "unknown") {
+      judgements[item.sha1] = {
+        type: "unknown",
+        status: item.status,
+        proof: item.proof,
+        link: item.url,
+        title: item.title,
+        file_name: item.file_name,
+      };
     }
   });
 

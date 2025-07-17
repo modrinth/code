@@ -700,7 +700,6 @@ import {
   PackageOpenIcon,
   DiscordIcon,
   BlueskyIcon,
-  TumblrIcon,
   TwitterIcon,
   MastodonIcon,
   GithubIcon,
@@ -1186,13 +1185,6 @@ const socialLinks = [
     rel: "me",
   },
   {
-    label: formatMessage(
-      defineMessage({ id: "layout.footer.social.tumblr", defaultMessage: "Tumblr" }),
-    ),
-    href: "https://tumblr.com/modrinth",
-    icon: TumblrIcon,
-  },
-  {
     label: formatMessage(defineMessage({ id: "layout.footer.social.x", defaultMessage: "X" })),
     href: "https://x.com/modrinth",
     icon: TwitterIcon,
@@ -1343,6 +1335,15 @@ const footerLinks = [
           defineMessage({
             id: "layout.footer.legal.security-notice",
             defaultMessage: "Security Notice",
+          }),
+        ),
+      },
+      {
+        href: "/legal/copyright",
+        label: formatMessage(
+          defineMessage({
+            id: "layout.footer.legal.copyright-policy",
+            defaultMessage: "Copyright Policy and DMCA",
           }),
         ),
       },
