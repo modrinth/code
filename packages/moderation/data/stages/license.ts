@@ -20,7 +20,7 @@ const licensesNotRequiringSource: string[] = [
 
 const licenseStage: Stage = {
   title: 'Is this license and link valid?',
-  text: async (project) => (await import('../messages/checklist-text/licensing.md?raw')).default,
+  text: async () => (await import('../messages/checklist-text/licensing.md?raw')).default,
   id: 'license',
   icon: BookTextIcon,
   guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
