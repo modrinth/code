@@ -60,7 +60,7 @@ export const useModerationStore = defineStore("moderation", {
       };
     },
 
-    async completeCurrentProject(projectId: string, status: "completed" | "skipped" = "completed") {
+    completeCurrentProject(projectId: string, status: "completed" | "skipped" = "completed") {
       if (status === "completed") {
         this.currentQueue.completed++;
       } else {

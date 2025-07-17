@@ -83,10 +83,10 @@ import { defineMessages, useVIntl } from "@vintl/vintl";
 import { useLocalStorage } from "@vueuse/core";
 import type { Project, TeamMember, Organization } from "@modrinth/utils";
 import ConfettiExplosion from "vue-confetti-explosion";
+import Fuse from "fuse.js";
 import ModerationQueueCard from "~/components/ui/moderation/ModerationQueueCard.vue";
 import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
-import { useModerationStore } from "~/store/moderation";
-import Fuse from "fuse.js";
+import { useModerationStore } from "~/store/moderation.ts";
 
 const { formatMessage } = useVIntl();
 const moderationStore = useModerationStore();

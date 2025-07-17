@@ -70,6 +70,68 @@
         </div>
       </div>
     </div>
+    <div
+      class="relative my-4 overflow-hidden rounded-xl border-[2px] border-solid border-divider shadow-lg"
+      :class="{ 'max-h-32': isCollapsed }"
+    >
+      <div
+        class="px-4 pb-16 pt-4"
+        :class="{
+          'content-disabled': isCollapsed,
+          'cursor-default': isCollapsed,
+        }"
+        :style="
+          isCollapsed
+            ? 'user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;'
+            : ''
+        "
+      >
+        <div class="markdown-body max-w-[95%]" v-html="renderHighlightedString(report.body)"></div>
+        <ReportThread
+          v-if="report.thread"
+          :thread="report.thread"
+          :report="report"
+          @update-thread="updateThread"
+        />
+      </div>
+
+      <div
+        v-if="isCollapsed"
+        class="absolute inset-0 z-10"
+        @click.stop.prevent
+        @keydown.stop.prevent
+        @focus.stop.prevent
+        @mousedown.stop.prevent
+        @mouseup.stop.prevent
+        @selectstart.stop.prevent
+        @dragstart.stop.prevent
+        style="
+          user-select: none;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+        "
+      ></div>
+
+      <div
+        v-if="isCollapsed"
+        class="pointer-events-none absolute inset-0"
+        style="
+          background: linear-gradient(to bottom, transparent 20%, var(--color-bg-raised) 100%);
+          mask: linear-gradient(to bottom, transparent 20%, black 100%);
+          -webkit-mask: linear-gradient(to bottom, transparent 20%, black 100%);
+          backdrop-filter: blur(2px);
+        "
+      ></div>
+
+      <div class="absolute right-5 top-5 z-20">
+        <ButtonStyled size="large" circular>
+          <button @click="toggleCollapsed">
+            <ExpandIcon />
+          </button>
+        </ButtonStyled>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -83,7 +145,9 @@ import {
 } from "@modrinth/ui";
 import type { ExtendedReport } from "~/pages/moderation/reports.vue";
 import ChevronDownIcon from "../servers/icons/ChevronDownIcon.vue";
-import { EllipsisVerticalIcon, OrganizationIcon, EyeIcon } from "@modrinth/assets";
+import { EllipsisVerticalIcon, OrganizationIcon, EyeIcon, ExpandIcon } from "@modrinth/assets";
+import ReportThread from "../thread/ReportThread.vue";
+import { renderHighlightedString } from "@modrinth/utils";
 
 const props = defineProps<{
   report: ExtendedReport;
@@ -100,6 +164,17 @@ const quickReplies: readonly QuickReply[] = readonly([
   { label: "Invalid", message: "Your **report** is invalid. Please do not do this." },
   { label: "Duplicate", message: "This report is a duplicate." },
 ]);
+
+const isCollapsed = ref(true);
+function toggleCollapsed() {
+  isCollapsed.value = !isCollapsed.value;
+}
+
+function updateThread(newThread: any) {
+  if (props.report.thread) {
+    Object.assign(props.report.thread, newThread);
+  }
+}
 
 const quickReplyOptions: OverflowMenuOption[] = quickReplies.map((reply) => ({
   id: reply.label,
@@ -152,3 +227,31 @@ const formattedReportType = computed(() => {
   return words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
 });
 </script>
+
+<style lang="scss" scoped>
+.content-disabled {
+  pointer-events: none;
+  user-select: none;
+
+  :deep(*) {
+    pointer-events: none !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+  }
+
+  :deep(button),
+  :deep(input),
+  :deep(textarea),
+  :deep(select),
+  :deep(a),
+  :deep([tabindex]) {
+    tabindex: -1 !important;
+  }
+
+  :deep(*:focus) {
+    outline: none !important;
+  }
+}
+</style>

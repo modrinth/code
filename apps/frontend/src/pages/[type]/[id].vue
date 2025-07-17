@@ -979,7 +979,7 @@ import { userCollectProject } from "~/composables/user.js";
 import { reportProject } from "~/utils/report-helpers.ts";
 import { saveFeatureFlags } from "~/composables/featureFlags.ts";
 import NewModerationChecklist from "~/components/ui/moderation/NewModerationChecklist.vue";
-import { useModerationStore } from "~/store/moderation";
+import { useModerationStore } from "~/store/moderation.ts";
 
 const data = useNuxtApp();
 const route = useNativeRoute();

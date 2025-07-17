@@ -47,7 +47,7 @@
     </div>
   </div>
   <div class="mt-4 flex flex-col gap-2">
-    <ReportCard :key="report.id" v-for="report in paginatedReports" :report="report" />
+    <ReportCard v-for="report in paginatedReports" :key="report.id" :report="report" />
     <div
       v-if="!paginatedReports || paginatedReports.length === 0"
       class="universal-card h-24 animate-pulse"
@@ -63,7 +63,6 @@ import { DropdownSelect, Button, Pagination } from "@modrinth/ui";
 import { XIcon, SearchIcon, SortAscIcon, SortDescIcon, FilterIcon } from "@modrinth/assets";
 import { defineMessages, useVIntl } from "@vintl/vintl";
 import { useLocalStorage } from "@vueuse/core";
-import ReportCard from "~/components/ui/moderation/ReportCard.vue";
 import type {
   Project,
   Report,
@@ -73,8 +72,9 @@ import type {
   TeamMember,
   Organization,
 } from "@modrinth/utils";
-import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
 import Fuse from "fuse.js";
+import ReportCard from "~/components/ui/moderation/ReportCard.vue";
+import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
 
 const { formatMessage } = useVIntl();
 
