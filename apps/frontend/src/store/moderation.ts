@@ -11,6 +11,8 @@ export interface ModerationQueue {
 
 const EMPTY_QUEUE: Partial<ModerationQueue> = {
   items: [],
+
+  // TODO: Consider some form of displaying this in the checklist, maybe at the end
   total: 0,
   completed: 0,
   skipped: 0,

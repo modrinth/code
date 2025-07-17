@@ -1250,6 +1250,17 @@ async function endChecklist(status?: string) {
         type: "success",
       });
     }
+  } else {
+    navigateTo({
+      name: "type-id",
+      params: {
+        type: "project",
+        id: moderationStore.getCurrentProjectId(),
+      },
+      state: {
+        showChecklist: true,
+      },
+    });
   }
 }
 

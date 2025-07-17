@@ -295,7 +295,7 @@
               {
                 id: 'review-projects',
                 color: 'orange',
-                link: '/moderation/review',
+                link: '/moderation',
               },
               {
                 id: 'review-reports',
@@ -993,7 +993,7 @@ const userMenuOptions = computed(() => {
       {
         id: "moderation",
         color: "orange",
-        link: "/moderation/review",
+        link: "/moderation",
       },
     ];
   }

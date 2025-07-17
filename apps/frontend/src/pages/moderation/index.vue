@@ -46,7 +46,7 @@
         >
       </DropdownSelect>
       <ButtonStyled color="orange">
-        <button class="!h-[40px]">
+        <button class="!h-[40px]" @click="moderateAllInFilter()">
           <ScaleIcon class="size-4" /> {{ formatMessage(messages.moderate) }}
         </button>
       </ButtonStyled>
@@ -85,8 +85,10 @@ import type { Project, TeamMember, Organization } from "@modrinth/utils";
 import ConfettiExplosion from "vue-confetti-explosion";
 import ModerationQueueCard from "~/components/ui/moderation/ModerationQueueCard.vue";
 import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
+import { useModerationStore } from "~/store/moderation";
 
 const { formatMessage } = useVIntl();
+const moderationStore = useModerationStore();
 
 const visible = ref(false);
 if (import.meta.client && history && history.state && history.state.confetti) {
@@ -265,6 +267,20 @@ const { data: enrichedProjects } = await useAsyncData(
 
 function updateSearchResults() {
   currentPage.value = 1;
+}
+
+function moderateAllInFilter() {
+  moderationStore.setQueue(filteredProjects.value.map((p) => p.id));
+  navigateTo({
+    name: "type-id",
+    params: {
+      type: "project",
+      id: moderationStore.getCurrentProjectId(),
+    },
+    state: {
+      showChecklist: true,
+    },
+  });
 }
 
 function goToPage(page: number) {
