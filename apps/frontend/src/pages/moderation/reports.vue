@@ -47,10 +47,7 @@
     </div>
   </div>
   <div class="mt-4 flex flex-col gap-2">
-    <!-- Report cards will be rendered here based on paginatedReports -->
-    <div v-for="report in paginatedReports" :key="report.id">
-      <!-- Report card component goes here -->
-    </div>
+    <div v-for="report in paginatedReports" :key="report.id"></div>
     <div
       v-if="!paginatedReports || paginatedReports.length === 0"
       class="universal-card h-24 animate-pulse"
@@ -85,7 +82,7 @@ const messages = defineMessages({
   },
 });
 
-interface ExtendedReport extends Report {
+export interface ExtendedReport extends Report {
   thread: Thread;
   project?: Project;
   user?: User;
@@ -142,8 +139,6 @@ const { data: allReports } = await useAsyncData("moderation-reports", async () =
           : undefined,
     };
   });
-
-  console.log("Extended reports:", extendedReports);
 
   return extendedReports;
 });
