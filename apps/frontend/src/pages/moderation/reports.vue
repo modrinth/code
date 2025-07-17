@@ -47,7 +47,7 @@
     </div>
   </div>
   <div class="mt-4 flex flex-col gap-2">
-    <div v-for="report in paginatedReports" :key="report.id"></div>
+    <ReportCard :key="report.id" v-for="report in paginatedReports" :report="report" />
     <div
       v-if="!paginatedReports || paginatedReports.length === 0"
       class="universal-card h-24 animate-pulse"
@@ -63,6 +63,7 @@ import { DropdownSelect, Button, Pagination } from "@modrinth/ui";
 import { XIcon, SearchIcon, SortAscIcon, SortDescIcon, FilterIcon } from "@modrinth/assets";
 import { defineMessages, useVIntl } from "@vintl/vintl";
 import { useLocalStorage } from "@vueuse/core";
+import ReportCard from "~/components/ui/moderation/ReportCard.vue";
 import type { Project, Report, Thread, User, Version } from "@modrinth/utils";
 
 const { formatMessage } = useVIntl();
@@ -84,6 +85,7 @@ const messages = defineMessages({
 
 export interface ExtendedReport extends Report {
   thread: Thread;
+  reporter_user: User;
   project?: Project;
   user?: User;
   version?: Version;
@@ -110,8 +112,13 @@ const { data: allReports } = await useAsyncData("moderation-reports", async () =
     .filter((report) => report.item_type === "project")
     .map((report) => report.item_id);
 
+  const fullUserIds = new Set([...userIDs, ...reports.map((report) => report.reporter)]);
+
   const [users, versions, projects] = await Promise.all([
-    fetchSegmented(userIDs, (ids) => `users?ids=${asEncodedJsonArray(ids)}`) as Promise<User[]>,
+    fetchSegmented(
+      Array.from(fullUserIds),
+      (ids) => `users?ids=${asEncodedJsonArray(ids)}`,
+    ) as Promise<User[]>,
     fetchSegmented(versionIDs, (ids) => `versions?ids=${asEncodedJsonArray(ids)}`) as Promise<
       Version[]
     >,
@@ -125,6 +132,7 @@ const { data: allReports } = await useAsyncData("moderation-reports", async () =
     return {
       ...report,
       thread,
+      reporter_user: users.find((user) => user.id === report.reporter) || ({} as User),
       project:
         report.item_type === "project"
           ? projects.find((p: { id: string }) => p.id === report.item_id)
