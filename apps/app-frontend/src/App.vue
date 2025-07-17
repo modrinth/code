@@ -1,5 +1,14 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref, watch, useTemplateRef, provide } from 'vue'
+import {
+  computed,
+  onMounted,
+  onUnmounted,
+  ref,
+  watch,
+  useTemplateRef,
+  provide,
+  nextTick,
+} from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import {
   ArrowBigUpDashIcon,
@@ -72,6 +81,7 @@ import UpdateModal from '@/components/ui/UpdateModal.vue'
 import { get_available_capes, get_available_skins } from './helpers/skins'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
 import { defineMessages, useVIntl } from '@vintl/vintl'
+import { createTooltip, destroyTooltip } from 'floating-vue'
 
 const themeStore = useTheming()
 
@@ -450,6 +460,20 @@ async function forceOpenUpdateModal() {
   updateModal.value.show(availableUpdate.value)
 }
 
+const updateButton = useTemplateRef('updateButton')
+async function showUpdateButtonTooltip() {
+  await nextTick()
+  const tooltip = createTooltip(updateButton.value.$el, {
+    placement: 'right',
+    content: 'Click here to view the update again.',
+  })
+  tooltip.show()
+  setTimeout(() => {
+    tooltip.hide()
+    destroyTooltip(updateButton.value.$el)
+  }, 3500)
+}
+
 function handleClick(e) {
   let target = e.target
   while (target != null) {
@@ -495,6 +519,7 @@ function handleAuxClick(e) {
         ref="updateModal"
         @update-skipped="skipUpdate"
         @update-enqueued-for-later="updateEnqueuedForLater"
+        @modal-hidden="showUpdateButtonTooltip"
       />
     </Suspense>
     <Suspense>
@@ -549,6 +574,7 @@ function handleAuxClick(e) {
       <div class="flex flex-grow"></div>
       <NavButton
         v-if="!!availableUpdate"
+        ref="updateButton"
         v-tooltip.right="
           enqueuedUpdate === availableUpdate?.version
             ? 'Update installation queued for next restart'

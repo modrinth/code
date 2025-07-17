@@ -1,18 +1,13 @@
 <template>
-  <ModalWrapper
-    ref="modal"
-    :header="formatMessage(messages.header)"
-    :on-hide="onHide"
-    :closable="!updatingImmediately && !downloadInProgress"
-  >
+  <ModalWrapper ref="modal" hide-header :closable="false" :on-hide="onHide">
     <div class="flex flex-col gap-4">
-      <div class="max-w-[500px]">
-        <div class="font-extrabold text-contrast text-xl mb-1">
-          Modrinth App v{{ update!.version }}
+      <div class="w-[500px]">
+        <div class="font-extrabold text-contrast text-xl">
+          {{ formatMessage(messages.header) }} Modrinth App v{{ update!.version }}
         </div>
         <template v-if="!downloadInProgress && !downloadError">
-          <div class="mb-4 leading-tight">{{ formatMessage(messages.bodyVersion) }}</div>
-          <div class="text-sm text-secondary mb-3">
+          <div class="mb-1 leading-tight">{{ formatMessage(messages.bodyVersion) }}</div>
+          <div class="text-sm text-secondary mb-2">
             {{ formatMessage(messages.downloadSize, { size: formatBytes(updateSize) }) }}
           </div>
         </template>
@@ -49,7 +44,7 @@
             </ButtonStyled>
           </div>
         </div>
-        <div v-if="!downloadError" class="flex flex-wrap gap-2 w-full mb-2">
+        <div v-if="!downloadError" class="flex flex-wrap gap-2 w-full">
           <JoinedButtons
             :actions="installActions"
             :disabled="updatingImmediately || downloadInProgress"
@@ -74,7 +69,7 @@ import { defineMessages, useVIntl } from '@vintl/vintl'
 import { useTemplateRef, ref, computed } from 'vue'
 import { AppearingProgressBar, ButtonStyled, JoinedButtons } from '@modrinth/ui'
 import type { JoinedButtonAction } from '@modrinth/ui'
-import { ExternalIcon, DownloadIcon, RedoIcon, ClipboardCopyIcon } from '@modrinth/assets'
+import { ExternalIcon, DownloadIcon, RedoIcon, ClipboardCopyIcon, XIcon } from '@modrinth/assets'
 import { enqueueUpdateForInstallation, getUpdateSize } from '@/helpers/utils'
 import { formatBytes } from '@modrinth/utils'
 import { handleError } from '@/store/notifications'
@@ -85,13 +80,14 @@ import { ChatIcon } from '@/assets/icons'
 
 const emit = defineEmits<{
   (e: 'updateEnqueuedForLater', version: string | null): Promise<void>
+  (e: 'modalHidden'): void
 }>()
 
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
   header: {
     id: 'app.update.modal-header',
-    defaultMessage: 'An update is available!',
+    defaultMessage: 'Update available - ',
   },
   copiedError: {
     id: 'app.update.copied-error',
@@ -131,6 +127,10 @@ const messages = defineMessages({
     id: 'app.update.try-again',
     defaultMessage: 'Try again',
   },
+  hide: {
+    id: 'app.update.hide',
+    defaultMessage: 'Hide update reminder',
+  },
 })
 
 type UpdateData = {
@@ -146,7 +146,7 @@ const update = ref<UpdateData>()
 const updateSize = ref<number>()
 
 const updatingImmediately = ref(false)
-const downloadInProgress = ref(true)
+const downloadInProgress = ref(false)
 const downloadProgress = ref(0)
 const copiedError = ref(false)
 const downloadError = ref<Error | null>(null)
@@ -166,6 +166,15 @@ const installActions = computed<JoinedButtonAction[]>(() => [
     label: formatMessage(messages.later),
     icon: RedoIcon,
     action: updateAtNextExit,
+  },
+  {
+    id: 'hide',
+    label: formatMessage(messages.hide),
+    action: () => {
+      hide()
+      emit('modalHidden')
+    },
+    icon: XIcon,
   },
 ])
 

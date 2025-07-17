@@ -11,6 +11,10 @@ const props = defineProps({
     type: String,
     default: null,
   },
+  hideHeader: {
+    type: Boolean,
+    default: false,
+  },
   closable: {
     type: Boolean,
     default: true,
@@ -53,6 +57,7 @@ function onModalHide() {
     :header="header"
     :noblur="!themeStore.advancedRendering"
     :closable="closable"
+    :hide-header="hideHeader"
     @hide="onModalHide"
   >
     <template #title>
