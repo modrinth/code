@@ -64,7 +64,14 @@
           v-else-if="enrichedProject.project_type === 'plugin'"
         />
         {{ formatProjectType(project.project_type) }} &#x2022;
-        {{ getSubmittedTime(project) }}
+        <span
+          :class="{
+            'text-red': daysInQueue > 4,
+            'text-orange': daysInQueue > 2,
+          }"
+          v-tooltip="`Since ${queuedDate.toLocaleString()}`"
+          >{{ getSubmittedTime(project) }}</span
+        >
       </span>
 
       <div class="flex items-center gap-2">
@@ -116,6 +123,20 @@ const enrichedProject = computed(() => ({
   owner: props.owner,
   org: props.org,
 }));
+
+function getDaysQueued(date: Date): number {
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  return Math.floor(diff / (1000 * 60 * 60 * 24));
+}
+
+const queuedDate = computed(() => {
+  return dayjs(enrichedProject.value.queued).toDate();
+});
+
+const daysInQueue = computed(() => {
+  return getDaysQueued(queuedDate.value);
+});
 
 function openProjectForReview() {
   moderationStore.setSingleProject(props.project.id);

@@ -65,6 +65,7 @@ import { defineMessages, useVIntl } from "@vintl/vintl";
 import { useLocalStorage } from "@vueuse/core";
 import ReportCard from "~/components/ui/moderation/ReportCard.vue";
 import type { Project, Report, Thread, User, Version } from "@modrinth/utils";
+import Fuse from "fuse.js";
 
 const { formatMessage } = useVIntl();
 
@@ -162,18 +163,33 @@ const currentPage = ref(1);
 const itemsPerPage = 15;
 const totalPages = computed(() => Math.ceil((filteredReports.value?.length || 0) / itemsPerPage));
 
+const fuse = computed(() => {
+  if (!allReports.value || allReports.value.length === 0) return null;
+  return new Fuse(allReports.value, {
+    keys: [
+      "body",
+      "report_type",
+      "reporter_user.username",
+      "item_id",
+      "project.name",
+      "user.username",
+      "version.name",
+    ],
+    includeScore: true,
+    threshold: 0.4,
+  });
+});
+
 const filteredReports = computed(() => {
   if (!allReports.value) return [];
 
-  let filtered = [...allReports.value];
+  let filtered;
 
-  if (query.value) {
-    filtered = filtered.filter(
-      (report) =>
-        report.body?.toLowerCase().includes(query.value.toLowerCase()) ||
-        report.report_type?.toLowerCase().includes(query.value.toLowerCase()) ||
-        report.item_id?.toLowerCase().includes(query.value.toLowerCase()),
-    );
+  if (query.value && fuse.value) {
+    const results = fuse.value.search(query.value);
+    filtered = results.map((result) => result.item);
+  } else {
+    filtered = [...allReports.value];
   }
 
   if (currentFilterType.value !== "All") {

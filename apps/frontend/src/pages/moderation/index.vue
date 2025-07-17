@@ -54,14 +54,14 @@
   </div>
   <div class="mt-4 flex flex-col gap-2">
     <ModerationQueueCard
-      v-for="item in enrichedProjects"
+      v-for="item in paginatedProjects"
       :key="item.project.id"
       :project="item.project"
       :owner="item.owner"
       :org="item.org"
     />
     <div
-      v-if="!enrichedProjects || enrichedProjects.length === 0"
+      v-if="!paginatedProjects || paginatedProjects.length === 0"
       class="universal-card h-24 animate-pulse"
     ></div>
   </div>
@@ -86,6 +86,7 @@ import ConfettiExplosion from "vue-confetti-explosion";
 import ModerationQueueCard from "~/components/ui/moderation/ModerationQueueCard.vue";
 import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
 import { useModerationStore } from "~/store/moderation";
+import Fuse from "fuse.js";
 
 const { formatMessage } = useVIntl();
 const moderationStore = useModerationStore();
@@ -121,10 +122,69 @@ const messages = defineMessages({
   },
 });
 
-const { data: allProjects } = await useAsyncData(
-  "moderation-projects",
-  async () => (await useBaseFetch("moderation/projects?count=10000")) as Project[],
-);
+interface ModerationProject {
+  project: Project;
+  owner: TeamMember | null;
+  org: Organization | null;
+}
+
+const { data: allProjects } = await useAsyncData("moderation-projects", async () => {
+  const projects = (await useBaseFetch("moderation/projects?count=10000")) as Project[];
+
+  const teamIds = [...new Set(projects.map((p) => p.team).filter(Boolean))];
+  const orgIds = [...new Set(projects.map((p) => p.organization).filter(Boolean))];
+
+  const [teamsData, orgsData]: [TeamMember[][], Organization[]] = await Promise.all([
+    teamIds.length > 0
+      ? fetchSegmented(teamIds, (ids) => `teams?ids=${asEncodedJsonArray(ids)}`)
+      : Promise.resolve([]),
+    orgIds.length > 0
+      ? fetchSegmented(orgIds, (ids) => `organizations?ids=${asEncodedJsonArray(ids)}`, {
+          apiVersion: 3,
+        })
+      : Promise.resolve([]),
+  ]);
+
+  const teamMap = new Map<string, TeamMember[]>();
+  const orgMap = new Map<string, Organization>();
+
+  teamsData.forEach((team) => {
+    let teamId = null;
+    for (const member of team) {
+      teamId = member.team_id;
+      if (!teamMap.has(teamId)) {
+        teamMap.set(teamId, team);
+        break;
+      }
+    }
+  });
+
+  orgsData.forEach((org: Organization) => {
+    orgMap.set(org.id, org);
+  });
+
+  return projects.map((project) => {
+    let owner: TeamMember | null = null;
+    let org: Organization | null = null;
+
+    if (project.team) {
+      const teamMembers = teamMap.get(project.team);
+      if (teamMembers) {
+        owner = teamMembers.find((member) => member.role === "Owner") || null;
+      }
+    }
+
+    if (project.organization) {
+      org = orgMap.get(project.organization) || null;
+    }
+
+    return {
+      project,
+      owner,
+      org,
+    } as ModerationProject;
+  });
+});
 
 const query = useLocalStorage("moderation-query", "");
 const currentFilterType = useLocalStorage("moderation-current-filter-type", () => "All");
@@ -144,17 +204,25 @@ const currentPage = ref(1);
 const itemsPerPage = 15;
 const totalPages = computed(() => Math.ceil((filteredProjects.value?.length || 0) / itemsPerPage));
 
+const fuse = computed(() => {
+  if (!allProjects.value || allProjects.value.length === 0) return null;
+  return new Fuse(allProjects.value, {
+    keys: ["title", "description", "project_type", "slug"],
+    includeScore: true,
+    threshold: 0.4,
+  });
+});
+
 const filteredProjects = computed(() => {
   if (!allProjects.value) return [];
 
-  let filtered = [...allProjects.value];
+  let filtered;
 
-  if (query.value) {
-    filtered = filtered.filter(
-      (project) =>
-        project.title?.toLowerCase().includes(query.value.toLowerCase()) ||
-        project.description?.toLowerCase().includes(query.value.toLowerCase()),
-    );
+  if (query.value && fuse.value) {
+    const results = fuse.value.search(query.value);
+    filtered = results.map((result) => result.item);
+  } else {
+    filtered = [...allProjects.value];
   }
 
   if (currentFilterType.value !== "All projects") {
@@ -169,20 +237,20 @@ const filteredProjects = computed(() => {
 
     const projectType = filterMap[currentFilterType.value];
     if (projectType) {
-      filtered = filtered.filter((project) => project.project_type === projectType);
+      filtered = filtered.filter((queueItem) => queueItem.project.project_type === projectType);
     }
   }
 
   if (currentSortType.value === "Oldest") {
     filtered.sort((a, b) => {
-      const dateA = new Date(a.queued || a.published || 0).getTime();
-      const dateB = new Date(b.queued || b.published || 0).getTime();
+      const dateA = new Date(a.project.queued || a.project.published || 0).getTime();
+      const dateB = new Date(b.project.queued || b.project.published || 0).getTime();
       return dateA - dateB;
     });
   } else {
     filtered.sort((a, b) => {
-      const dateA = new Date(a.queued || a.published || 0).getTime();
-      const dateB = new Date(b.queued || b.published || 0).getTime();
+      const dateA = new Date(a.project.queued || a.project.published || 0).getTime();
+      const dateB = new Date(b.project.queued || b.project.published || 0).getTime();
       return dateB - dateA;
     });
   }
@@ -197,80 +265,12 @@ const paginatedProjects = computed(() => {
   return filteredProjects.value.slice(start, end);
 });
 
-const { data: enrichedProjects } = await useAsyncData(
-  `moderation-enriched-${currentPage.value}-${query.value}-${currentFilterType.value}-${currentSortType.value}`,
-  async () => {
-    const projects = paginatedProjects.value;
-    if (!projects.length) return [];
-
-    const teamIds = [...new Set(projects.map((p) => p.team).filter(Boolean))];
-    const orgIds = [...new Set(projects.map((p) => p.organization).filter(Boolean))];
-
-    const [teamsData, orgsData]: [TeamMember[][], Organization[]] = await Promise.all([
-      teamIds.length > 0
-        ? fetchSegmented(teamIds, (ids) => `teams?ids=${asEncodedJsonArray(ids)}`)
-        : Promise.resolve([]),
-      orgIds.length > 0
-        ? fetchSegmented(orgIds, (ids) => `organizations?ids=${asEncodedJsonArray(ids)}`, {
-            apiVersion: 3,
-          })
-        : Promise.resolve([]),
-    ]);
-
-    const teamMap = new Map<string, TeamMember[]>();
-    const orgMap = new Map<string, Organization>();
-
-    teamsData.forEach((team) => {
-      let teamId = null;
-
-      // dont use [0]
-      for (const member of team) {
-        teamId = member.team_id;
-        if (!teamMap.has(teamId)) {
-          teamMap.set(teamId, team);
-          break;
-        }
-      }
-    });
-
-    orgsData.forEach((org: Organization) => {
-      orgMap.set(org.id, org);
-    });
-
-    return projects.map((project) => {
-      let owner: TeamMember | null = null;
-      let org: Organization | null = null;
-
-      if (project.team) {
-        const teamMembers = teamMap.get(project.team);
-        if (teamMembers) {
-          owner = teamMembers.find((member) => member.role === "Owner") || null;
-        }
-      }
-
-      if (project.organization) {
-        org = orgMap.get(project.organization) || null;
-      }
-
-      return {
-        project,
-        owner,
-        org,
-      };
-    });
-  },
-  {
-    default: () => [],
-    watch: [paginatedProjects],
-  },
-);
-
 function updateSearchResults() {
   currentPage.value = 1;
 }
 
 function moderateAllInFilter() {
-  moderationStore.setQueue(filteredProjects.value.map((p) => p.id));
+  moderationStore.setQueue(filteredProjects.value.map((queueItem) => queueItem.project.id));
   navigateTo({
     name: "type-id",
     params: {
