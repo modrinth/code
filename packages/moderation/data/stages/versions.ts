@@ -25,6 +25,8 @@ const versions: Stage = {
       label: 'Incorrect Project Type',
       suggestedStatus: 'rejected',
       severity: 'medium',
+      weight: -999999,
+      message: async () => '',
       enablesActions: [
         {
           id: 'versions_incorrect_project_type_options',
@@ -62,6 +64,8 @@ const versions: Stage = {
       label: 'Alternate Versions',
       suggestedStatus: 'flagged',
       severity: 'medium',
+      weight: -999999,
+      message: async () => '',
       enablesActions: [
         {
           id: 'versions_incorrect_project_type_options',
