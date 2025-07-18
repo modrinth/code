@@ -50,6 +50,8 @@ const statusAlerts: Stage = {
         project.project_type === 'mod' ||
         project.project_type === 'shader' ||
         project.project_type.toString() === 'plugin',
+      weight: -999999,
+      message: async () => '',
       enablesActions: [
         {
           id: 'status_tec_source_request_options',
