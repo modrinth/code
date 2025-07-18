@@ -80,4 +80,4 @@ jobs:
       - name: 🔍 Verify intl:extract has been run
         run: |
           pnpm intl:extract
-          git diff --exit-code */*/src/locales/en-US/index.json
+          git diff --exit-code --color */*/src/locales/en-US/index.json
