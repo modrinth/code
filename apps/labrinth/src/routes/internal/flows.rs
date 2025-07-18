@@ -223,8 +223,8 @@ impl TempUser {
                 stripe_customer_id: None,
                 totp_secret: None,
                 username,
-                email: self.email,
-                email_verified: true,
+                email: self.email.clone(),
+                email_verified: self.email.is_some(),
                 avatar_url,
                 raw_avatar_url,
                 bio: self.bio,
@@ -1419,15 +1419,15 @@ pub async fn create_account_with_password(
         .hash_password(new_account.password.as_bytes(), &salt)?
         .to_string();
 
-    if crate::database::models::DBUser::get_by_email(
+    if !crate::database::models::DBUser::get_by_case_insensitive_email(
         &new_account.email,
         &**pool,
     )
     .await?
-    .is_some()
+    .is_empty()
     {
         return Err(ApiError::InvalidInput(
-            "Email is already registered on Modrinth!".to_string(),
+            "Email is already registered on Modrinth! Try 'Forgot password' to access your account.".to_string(),
         ));
     }
 
@@ -2219,6 +2219,18 @@ pub async fn set_email(
     )
     .await?
     .1;
+
+    if !crate::database::models::DBUser::get_by_case_insensitive_email(
+        &email.email,
+        &**pool,
+    )
+    .await?
+    .is_empty()
+    {
+        return Err(ApiError::InvalidInput(
+            "Email is already registered on Modrinth! Try 'Forgot password' in incognito to access and delete your other account.".to_string(),
+        ));
+    }
 
     let mut transaction = pool.begin().await?;
 
