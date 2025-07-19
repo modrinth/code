@@ -7,6 +7,7 @@ import {
   CompassIcon,
   DownloadIcon,
   HomeIcon,
+  ImageIcon,
   LeftArrowIcon,
   LibraryIcon,
   LogInIcon,
@@ -424,6 +425,18 @@ function handleAuxClick(e) {
       </NavButton>
       <NavButton v-tooltip.right="'Skins (Beta)'" to="/skins">
         <ChangeSkinIcon />
+      </NavButton>
+      <NavButton
+        v-tooltip.right="'Screen Shots (Alpha)'"
+        to="/screenshots"
+        :is-subpage="
+          () =>
+            route.path.startsWith('/instance') ||
+            ((route.path.startsWith('/browse') || route.path.startsWith('/project')) &&
+              route.query.i)
+        "
+      >
+        <ImageIcon />
       </NavButton>
       <NavButton
         v-tooltip.right="'Library'"
