@@ -5,8 +5,8 @@
     "build": "tauri build",
     "dev": "tauri dev",
     "test": "cargo nextest run --all-targets --no-fail-fast",
-    "lint": "cargo fmt --check && cargo clippy --all-targets",
-    "fix": "cargo clippy --all-targets --fix --allow-dirty && cargo fmt"
+    "lint": "cargo fmt --check && cargo clippy --all-targets && cargo clippy --all-targets --features updater",
+    "fix": "cargo clippy --all-targets --fix --allow-dirty && cargo clippy --all-targets --features updater --fix --allow-dirty && cargo fmt"
   },
   "devDependencies": {
     "@tauri-apps/cli": "2.5.0"

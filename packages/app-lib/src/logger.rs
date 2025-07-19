@@ -25,12 +25,11 @@ pub fn start_logger() -> Option<()> {
         .unwrap_or_else(|_| {
             tracing_subscriber::EnvFilter::new("theseus=info,theseus_gui=info")
         });
-    let subscriber = tracing_subscriber::registry()
+    tracing_subscriber::registry()
         .with(tracing_subscriber::fmt::layer())
         .with(filter)
-        .with(tracing_error::ErrorLayer::default());
-    tracing::subscriber::set_global_default(subscriber)
-        .expect("setting default subscriber failed");
+        .with(tracing_error::ErrorLayer::default())
+        .init();
     Some(())
 }
 
@@ -76,7 +75,7 @@ pub fn start_logger() -> Option<()> {
     let filter = tracing_subscriber::EnvFilter::try_from_default_env()
         .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("theseus=info"));
 
-    let subscriber = tracing_subscriber::registry()
+    tracing_subscriber::registry()
         .with(
             tracing_subscriber::fmt::layer()
                 .with_writer(file)
@@ -84,10 +83,8 @@ pub fn start_logger() -> Option<()> {
                 .with_timer(ChronoLocal::rfc_3339()),
         )
         .with(filter)
-        .with(tracing_error::ErrorLayer::default());
-
-    tracing::subscriber::set_global_default(subscriber)
-        .expect("Setting default subscriber failed");
+        .with(tracing_error::ErrorLayer::default())
+        .init();
 
     Some(())
 }
