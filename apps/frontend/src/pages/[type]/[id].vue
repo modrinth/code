@@ -965,7 +965,7 @@ import ProjectMemberHeader from "~/components/ui/ProjectMemberHeader.vue";
 import { userCollectProject } from "~/composables/user.js";
 import { reportProject } from "~/utils/report-helpers.ts";
 import { saveFeatureFlags } from "~/composables/featureFlags.ts";
-import ModerationChecklist from "~/components/ui/moderation/ModerationChecklist.vue";
+import ModerationChecklist from "~/components/ui/moderation/checklist/ModerationChecklist.vue";
 import { useModerationStore } from "~/store/moderation.ts";
 
 const data = useNuxtApp();

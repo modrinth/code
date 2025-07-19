@@ -5,7 +5,10 @@
       <CopyCode :text="thread.id" />
     </div>
 
-    <div v-if="sortedMessages.length > 0" class="bg-raised flex flex-col space-y-4 rounded-xl p-4">
+    <div
+      v-if="sortedMessages.length > 0"
+      class="bg-raised flex flex-col space-y-4 rounded-xl p-3 sm:p-4"
+    >
       <ThreadMessage
         v-for="message in sortedMessages"
         :key="'message-' + message.id"
@@ -21,8 +24,11 @@
 
     <template v-if="report && report.closed">
       <p class="text-secondary">This thread is closed and new messages cannot be sent to it.</p>
-      <ButtonStyled color="green" v-if="isStaff(auth.user)" class="mt-2">
-        <button @click="reopenReport()">
+      <ButtonStyled v-if="isStaff(auth.user)" color="green" class="mt-2 w-full sm:w-auto">
+        <button
+          class="flex w-full items-center justify-center gap-2 sm:w-auto"
+          @click="reopenReport()"
+        >
           <CheckCircleIcon class="size-4" />
           Reopen Thread
         </button>
@@ -38,39 +44,60 @@
         />
       </div>
 
-      <div class="mt-4 flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <ButtonStyled v-if="sortedMessages.length > 0" color="brand">
-            <button :disabled="!replyBody" @click="sendReply()">
+      <div
+        class="mt-4 flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center sm:gap-2"
+      >
+        <div class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
+          <ButtonStyled v-if="sortedMessages.length > 0" color="brand" class="w-full sm:w-auto">
+            <button
+              :disabled="!replyBody"
+              class="flex w-full items-center justify-center gap-2 sm:w-auto"
+              @click="sendReply()"
+            >
               <ReplyIcon class="size-4" />
               Reply
             </button>
           </ButtonStyled>
-          <ButtonStyled v-else color="brand">
-            <button :disabled="!replyBody" @click="sendReply()">
+          <ButtonStyled v-else color="brand" class="w-full sm:w-auto">
+            <button
+              :disabled="!replyBody"
+              class="flex w-full items-center justify-center gap-2 sm:w-auto"
+              @click="sendReply()"
+            >
               <SendIcon class="size-4" />
               Send
             </button>
           </ButtonStyled>
-
-          <ButtonStyled v-if="isStaff(auth.user)">
-            <button :disabled="!replyBody" @click="sendReply(null, true)">
+          <ButtonStyled v-if="isStaff(auth.user)" class="w-full sm:w-auto">
+            <button
+              :disabled="!replyBody"
+              class="flex w-full items-center justify-center gap-2 sm:w-auto"
+              @click="sendReply(true)"
+            >
               <ScaleIcon class="size-4" />
-              Add private note
+              <span class="hidden sm:inline">Add private note</span>
+              <span class="sm:hidden">Private note</span>
             </button>
           </ButtonStyled>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
           <template v-if="isStaff(auth.user)">
-            <ButtonStyled v-if="replyBody" color="red">
-              <button @click="closeReport(true)">
+            <ButtonStyled v-if="replyBody" color="red" class="w-full sm:w-auto">
+              <button
+                class="flex w-full items-center justify-center gap-2 sm:w-auto"
+                @click="closeReport(true)"
+              >
                 <CheckCircleIcon class="size-4" />
-                Close with reply
+                <span class="hidden sm:inline">Close with reply</span>
+                <span class="sm:hidden">Close & reply</span>
               </button>
             </ButtonStyled>
-            <ButtonStyled v-else color="red">
-              <button @click="closeReport()">
+            <ButtonStyled v-else color="red" class="w-full sm:w-auto">
+              <button
+                class="flex w-full items-center justify-center gap-2 sm:w-auto"
+                @click="closeReport()"
+              >
                 <CheckCircleIcon class="size-4" />
                 Close thread
               </button>
@@ -85,11 +112,11 @@
 <script setup lang="ts">
 import { CopyCode, MarkdownEditor, ButtonStyled } from "@modrinth/ui";
 import { ReplyIcon, SendIcon, CheckCircleIcon, ScaleIcon } from "@modrinth/assets";
+import type { Thread, Report, User } from "@modrinth/utils";
+import dayjs from "dayjs";
 import { useImageUpload } from "~/composables/image-upload.ts";
 import ThreadMessage from "~/components/ui/thread/ThreadMessage.vue";
 import { isStaff } from "~/helpers/users.js";
-import type { Thread, Report, User } from "@modrinth/utils";
-import dayjs from "dayjs";
 
 const props = defineProps<{
   thread: Thread;
@@ -118,7 +145,7 @@ const sortedMessages = computed(() => {
   const messages = [];
   if (props.thread) {
     messages.push(
-      ...props.thread.messages.sort(
+      ...[...props.thread.messages].sort(
         (a, b) => dayjs(a.created).toDate().getTime() - dayjs(b.created).toDate().getTime(),
       ),
     );
@@ -150,7 +177,7 @@ async function onUploadImage(file: File) {
   return response.url;
 }
 
-async function sendReply(status: string | null = null, privateMessage = false) {
+async function sendReply(privateMessage = false) {
   try {
     const body: any = {
       body: {

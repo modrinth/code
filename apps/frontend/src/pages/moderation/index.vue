@@ -1,72 +1,94 @@
 <template>
-  <div class="flex flex-row justify-between gap-3">
-    <div class="iconified-input">
-      <SearchIcon aria-hidden="true" class="text-lg" />
-      <input
-        v-model="query"
-        class="h-[40px]"
-        autocomplete="off"
-        spellcheck="false"
-        type="text"
-        :placeholder="formatMessage(messages.searchPlaceholder)"
-        @input="updateSearchResults()"
-      />
-      <Button v-if="query" class="r-btn" @click="() => (query = '')">
-        <XIcon />
-      </Button>
+  <div class="flex flex-col gap-3">
+    <div class="flex flex-col justify-between gap-3 lg:flex-row">
+      <div class="iconified-input flex-1 lg:max-w-md">
+        <SearchIcon aria-hidden="true" class="text-lg" />
+        <input
+          v-model="query"
+          class="h-[40px]"
+          autocomplete="off"
+          spellcheck="false"
+          type="text"
+          :placeholder="formatMessage(messages.searchPlaceholder)"
+          @input="updateSearchResults()"
+        />
+        <Button v-if="query" class="r-btn" @click="() => (query = '')">
+          <XIcon />
+        </Button>
+      </div>
+
+      <div v-if="totalPages > 1" class="hidden flex-1 justify-center lg:flex">
+        <Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
+        <ConfettiExplosion v-if="visible" />
+      </div>
+
+      <div class="flex flex-col justify-end gap-2 sm:flex-row lg:flex-shrink-0">
+        <div class="flex flex-col gap-2 sm:flex-row">
+          <DropdownSelect
+            v-slot="{ selected }"
+            v-model="currentFilterType"
+            class="!w-full flex-grow sm:!w-[280px] sm:flex-grow-0 lg:!w-[280px]"
+            :name="formatMessage(messages.filterBy)"
+            :options="filterTypes as unknown[]"
+            @change="updateSearchResults()"
+          >
+            <span class="flex flex-row gap-2 align-middle font-semibold text-secondary">
+              <FilterIcon class="size-4 flex-shrink-0" />
+              <span class="truncate">{{ selected }} ({{ filteredProjects.length }})</span>
+            </span>
+          </DropdownSelect>
+
+          <DropdownSelect
+            v-slot="{ selected }"
+            v-model="currentSortType"
+            class="!w-full flex-grow sm:!w-[150px] sm:flex-grow-0 lg:!w-[150px]"
+            :name="formatMessage(messages.sortBy)"
+            :options="sortTypes as unknown[]"
+            @change="updateSearchResults()"
+          >
+            <span class="flex flex-row gap-2 align-middle font-semibold text-secondary">
+              <SortAscIcon v-if="selected === 'Oldest'" class="size-4 flex-shrink-0" />
+              <SortDescIcon v-else class="size-4 flex-shrink-0" />
+              <span class="truncate">{{ selected }}</span>
+            </span>
+          </DropdownSelect>
+        </div>
+
+        <ButtonStyled color="orange" class="w-full sm:w-auto">
+          <button
+            class="flex !h-[40px] w-full items-center justify-center gap-2 sm:w-auto"
+            @click="moderateAllInFilter()"
+          >
+            <ScaleIcon class="size-4 flex-shrink-0" />
+            <span class="hidden sm:inline">{{ formatMessage(messages.moderate) }}</span>
+            <span class="sm:hidden">Moderate</span>
+          </button>
+        </ButtonStyled>
+      </div>
     </div>
-    <div v-if="totalPages > 1" class="flex justify-center">
+
+    <div v-if="totalPages > 1" class="flex justify-center lg:hidden">
       <Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
       <ConfettiExplosion v-if="visible" />
     </div>
-    <div class="flex flex-row justify-end gap-2">
-      <DropdownSelect
-        v-slot="{ selected }"
-        v-model="currentFilterType"
-        class="!w-[280px] flex-grow md:flex-grow-0"
-        :name="formatMessage(messages.filterBy)"
-        :options="filterTypes as unknown[]"
-        @change="updateSearchResults()"
-      >
-        <span class="flex flex-row gap-2 align-middle font-semibold text-secondary"
-          ><FilterIcon class="size-4" />{{ selected }} ({{ filteredProjects.length }})</span
-        >
-      </DropdownSelect>
-      <DropdownSelect
-        v-slot="{ selected }"
-        v-model="currentSortType"
-        class="!w-[150px] flex-grow md:flex-grow-0"
-        :name="formatMessage(messages.sortBy)"
-        :options="sortTypes as unknown[]"
-        @change="updateSearchResults()"
-      >
-        <span class="flex flex-row gap-2 align-middle font-semibold text-secondary"
-          ><SortAscIcon v-if="selected === 'Oldest'" class="size-4" />
-          <SortDescIcon v-else class="size-4" />{{ selected }}</span
-        >
-      </DropdownSelect>
-      <ButtonStyled color="orange">
-        <button class="!h-[40px]" @click="moderateAllInFilter()">
-          <ScaleIcon class="size-4" /> {{ formatMessage(messages.moderate) }}
-        </button>
-      </ButtonStyled>
+
+    <div class="mt-4 flex flex-col gap-2">
+      <ModerationQueueCard
+        v-for="item in paginatedProjects"
+        :key="item.project.id"
+        :project="item.project"
+        :owner="item.owner"
+        :org="item.org"
+      />
+      <div
+        v-if="!paginatedProjects || paginatedProjects.length === 0"
+        class="universal-card h-24 animate-pulse"
+      ></div>
     </div>
-  </div>
-  <div class="mt-4 flex flex-col gap-2">
-    <ModerationQueueCard
-      v-for="item in paginatedProjects"
-      :key="item.project.id"
-      :project="item.project"
-      :owner="item.owner"
-      :org="item.org"
-    />
-    <div
-      v-if="!paginatedProjects || paginatedProjects.length === 0"
-      class="universal-card h-24 animate-pulse"
-    ></div>
-  </div>
-  <div v-if="totalPages > 1" class="mt-4 flex justify-center">
-    <Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
+
+    <div v-if="totalPages > 1" class="mt-4 flex justify-center">
+      <Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
+    </div>
   </div>
 </template>
 <script setup lang="ts">

@@ -58,7 +58,11 @@
     </div>
 
     <div class="mt-4 flex flex-col gap-2">
-      <ReportCard v-for="report in paginatedReports" :key="report.id" :report="report" />
+      <DelphiReportCard
+        v-for="report in paginatedReports"
+        :key="report.version.id"
+        :report="report"
+      />
       <div
         v-if="!paginatedReports || paginatedReports.length === 0"
         class="universal-card h-24 animate-pulse"
@@ -76,18 +80,10 @@ import { DropdownSelect, Button, Pagination } from "@modrinth/ui";
 import { XIcon, SearchIcon, SortAscIcon, SortDescIcon, FilterIcon } from "@modrinth/assets";
 import { defineMessages, useVIntl } from "@vintl/vintl";
 import { useLocalStorage } from "@vueuse/core";
-import type {
-  Project,
-  Report,
-  Thread,
-  User,
-  Version,
-  TeamMember,
-  Organization,
-} from "@modrinth/utils";
+import type { TeamMember, Organization, DelphiReport, Project, Version } from "@modrinth/utils";
 import Fuse from "fuse.js";
-import type { OwnershipTarget, ExtendedReport } from "@modrinth/moderation";
-import ReportCard from "~/components/ui/moderation/ModerationReportCard.vue";
+import type { OwnershipTarget, ExtendedDelphiReport } from "@modrinth/moderation";
+import DelphiReportCard from "~/components/ui/moderation/ModerationDelphiReportCard.vue";
 import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
 
 const { formatMessage } = useVIntl();
@@ -96,8 +92,8 @@ const router = useRouter();
 
 const messages = defineMessages({
   searchPlaceholder: {
-    id: "moderation.search.placeholder",
-    defaultMessage: "Search...",
+    id: "moderation.technical.search.placeholder",
+    defaultMessage: "Search tech reviews...",
   },
   filterBy: {
     id: "moderation.filter.by",
@@ -109,44 +105,56 @@ const messages = defineMessages({
   },
 });
 
-const { data: allReports } = await useAsyncData("moderation-reports", async () => {
-  const reports = (await useBaseFetch("report?all=true&count=10000", {
-    apiVersion: 3,
-  })) as Report[];
+async function getProjectQuicklyForMock(projectId: string): Promise<Project> {
+  return (await useBaseFetch(`project/${projectId}`)) as Project;
+}
 
-  const threadIDs = reports.map((report) => report.thread_id).filter(Boolean);
-  const threads = (await fetchSegmented(
-    threadIDs,
-    (ids) => `threads?ids=${asEncodedJsonArray(ids)}`,
-  )) as Thread[];
+async function getVersionQuicklyForMock(versionId: string): Promise<Version> {
+  return (await useBaseFetch(`version/${versionId}`)) as Version;
+}
 
-  const userIDs = reports
-    .filter((report) => report.item_type === "user")
-    .map((report) => report.item_id);
-  const versionIDs = reports
-    .filter((report) => report.item_type === "version")
-    .map((report) => report.item_id);
-  const projectIDs = reports
-    .filter((report) => report.item_type === "project")
-    .map((report) => report.item_id);
+const mockDelphiReports: DelphiReport[] = [
+  {
+    project: await getProjectQuicklyForMock("7MoE34WK"),
+    version: await getVersionQuicklyForMock("cTkKLWgA"),
+    trace_type: "url_usage",
+    file_path: "me/decce/gnetum/ASMEventHandlerHelper.java",
+    priority_score: 29,
+    status: "pending",
+    detected_at: "2025-04-01T12:00:00Z",
+  } as DelphiReport,
+  {
+    project: await getProjectQuicklyForMock("7MoE34WK"),
+    version: await getVersionQuicklyForMock("cTkKLWgA"),
+    trace_type: "url_usage",
+    file_path: "me/decce/gnetum/SomeOtherFile.java",
+    priority_score: 48,
+    status: "rejected",
+    detected_at: "2025-03-02T12:00:00Z",
+  } as DelphiReport,
+  {
+    project: await getProjectQuicklyForMock("7MoE34WK"),
+    version: await getVersionQuicklyForMock("cTkKLWgA"),
+    trace_type: "url_usage",
+    file_path: "me/decce/gnetum/YetAnotherFile.java",
+    priority_score: 15,
+    status: "approved",
+    detected_at: "2025-02-03T12:00:00Z",
+  } as DelphiReport,
+];
 
-  const versions = (await fetchSegmented(
-    versionIDs,
-    (ids) => `versions?ids=${asEncodedJsonArray(ids)}`,
-  )) as Version[];
+const { data: allReports } = await useAsyncData("moderation-tech-reviews", async () => {
+  // TODO: replace with actual API call
+  const delphiReports = mockDelphiReports;
 
-  const fullProjectIds = new Set([
-    ...projectIDs,
-    ...versions.map((v) => v.project_id).filter(Boolean),
-  ]);
+  if (delphiReports.length === 0) {
+    return [];
+  }
 
-  const projects = (await fetchSegmented(
-    Array.from(fullProjectIds),
-    (ids) => `projects?ids=${asEncodedJsonArray(ids)}`,
-  )) as Project[];
-
-  const teamIds = [...new Set(projects.map((p) => p.team).filter(Boolean))];
-  const orgIds = [...new Set(projects.map((p) => p.organization).filter(Boolean))];
+  const teamIds = [...new Set(delphiReports.map((report) => report.project.team).filter(Boolean))];
+  const orgIds = [
+    ...new Set(delphiReports.map((report) => report.project.organization).filter(Boolean)),
+  ];
 
   const [teamsData, orgsData]: [TeamMember[][], Organization[]] = await Promise.all([
     teamIds.length > 0
@@ -164,31 +172,6 @@ const { data: allReports } = await useAsyncData("moderation-reports", async () =
     orgTeamIds.length > 0
       ? await fetchSegmented(orgTeamIds, (ids) => `teams?ids=${asEncodedJsonArray(ids)}`)
       : [];
-
-  const ownerUserIds = new Set<string>();
-
-  teamsData.flat().forEach((member) => {
-    if (member.role === "Owner") {
-      ownerUserIds.add(member.user.id);
-    }
-  });
-
-  orgTeamsData.flat().forEach((member) => {
-    if (member.role === "Owner") {
-      ownerUserIds.add(member.user.id);
-    }
-  });
-
-  const fullUserIds = new Set([
-    ...userIDs,
-    ...reports.map((report) => report.reporter),
-    ...ownerUserIds,
-  ]);
-
-  const users = (await fetchSegmented(
-    Array.from(fullUserIds),
-    (ids) => `users?ids=${asEncodedJsonArray(ids)}`,
-  )) as User[];
 
   const teamMap = new Map<string, TeamMember[]>();
   const orgMap = new Map<string, Organization>();
@@ -219,33 +202,11 @@ const { data: allReports } = await useAsyncData("moderation-reports", async () =
     orgMap.set(org.id, org);
   });
 
-  const extendedReports: ExtendedReport[] = reports.map((report) => {
-    const thread = threads.find((t) => t.id === report.thread_id) || ({} as Thread);
-    const version =
-      report.item_type === "version"
-        ? versions.find((v: { id: string }) => v.id === report.item_id)
-        : undefined;
-
-    const project =
-      report.item_type === "project"
-        ? projects.find((p: { id: string }) => p.id === report.item_id)
-        : report.item_type === "version" && version
-          ? projects.find((p: { id: string }) => p.id === version.project_id)
-          : undefined;
-
+  const extendedReports: ExtendedDelphiReport[] = delphiReports.map((report) => {
     let target: OwnershipTarget | undefined;
+    const project = report.project;
 
-    if (report.item_type === "user") {
-      const targetUser = users.find((u: { id: string }) => u.id === report.item_id);
-      if (targetUser) {
-        target = {
-          name: targetUser.username,
-          slug: targetUser.username,
-          avatar_url: targetUser.avatar_url,
-          type: "user",
-        };
-      }
-    } else if (project) {
+    if (project) {
       let owner: TeamMember | null = null;
       let org: Organization | null = null;
 
@@ -260,7 +221,6 @@ const { data: allReports } = await useAsyncData("moderation-reports", async () =
         org = orgMap.get(project.organization) || null;
       }
 
-      // Prioritize organization over individual owner
       if (org) {
         target = {
           name: org.name,
@@ -280,17 +240,11 @@ const { data: allReports } = await useAsyncData("moderation-reports", async () =
 
     return {
       ...report,
-      thread,
-      reporter_user: users.find((user) => user.id === report.reporter) || ({} as User),
-      project,
-      user:
-        report.item_type === "user"
-          ? users.find((u: { id: string }) => u.id === report.item_id)
-          : undefined,
-      version,
       target,
     };
   });
+
+  extendedReports.sort((a, b) => b.priority_score - a.priority_score);
 
   return extendedReports;
 });
@@ -324,11 +278,11 @@ watch(
   },
 );
 
-const currentFilterType = useLocalStorage("moderation-reports-filter-type", () => "All");
-const filterTypes: readonly string[] = readonly(["All", "Unread", "Read"]);
+const currentFilterType = useLocalStorage("moderation-tech-reviews-filter-type", () => "Pending");
+const filterTypes: readonly string[] = readonly(["All", "Pending", "Approved", "Rejected"]);
 
-const currentSortType = useLocalStorage("moderation-reports-sort-type", () => "Oldest");
-const sortTypes: readonly string[] = readonly(["Oldest", "Newest"]);
+const currentSortType = useLocalStorage("moderation-tech-reviews-sort-type", () => "Priority");
+const sortTypes: readonly string[] = readonly(["Priority", "Oldest", "Newest"]);
 
 const currentPage = ref(1);
 const itemsPerPage = 15;
@@ -339,29 +293,35 @@ const fuse = computed(() => {
   return new Fuse(allReports.value, {
     keys: [
       {
-        name: "id",
+        name: "version.id",
         weight: 3,
       },
       {
-        name: "body",
+        name: "version.version_number",
         weight: 3,
       },
       {
-        name: "report_type",
+        name: "project.title",
         weight: 3,
       },
       {
-        name: "item_id",
+        name: "project.slug",
+        weight: 3,
+      },
+      {
+        name: "version.files.filename",
         weight: 2,
       },
       {
-        name: "reporter_user.username",
+        name: "trace_type",
         weight: 2,
       },
-      "project.name",
-      "project.slug",
-      "user.username",
-      "version.name",
+      {
+        name: "content",
+        weight: 0.5,
+      },
+      "file_path",
+      "project.id",
       "target.name",
       "target.slug",
     ],
@@ -382,40 +342,26 @@ const filteredReports = computed(() => {
     filtered = [...allReports.value];
   }
 
-  if (currentFilterType.value !== "All") {
-    filtered = filtered.filter((report) => {
-      const messages = report.thread?.messages ?? [];
-      if (messages.length === 0) return false;
-      const lastMessage = messages[messages.length - 1];
-      if (currentFilterType.value === "Read") {
-        return (
-          lastMessage.author_id &&
-          report.thread.members.some(
-            (member) => member.id === lastMessage.author_id && member.role === "moderator",
-          )
-        );
-      } else if (currentFilterType.value === "Unread") {
-        return (
-          lastMessage.author_id &&
-          report.thread.members.some(
-            (member) => member.id === lastMessage.author_id && member.role !== "moderator",
-          )
-        );
-      }
-      return true;
-    });
+  if (currentFilterType.value === "Pending") {
+    filtered = filtered.filter((report) => report.status === "pending");
+  } else if (currentFilterType.value === "Approved") {
+    filtered = filtered.filter((report) => report.status === "approved");
+  } else if (currentFilterType.value === "Rejected") {
+    filtered = filtered.filter((report) => report.status === "rejected");
   }
 
-  if (currentSortType.value === "Oldest") {
+  if (currentSortType.value === "Priority") {
+    filtered.sort((a, b) => b.priority_score - a.priority_score);
+  } else if (currentSortType.value === "Oldest") {
     filtered.sort((a, b) => {
-      const dateA = new Date(a.created).getTime();
-      const dateB = new Date(b.created).getTime();
+      const dateA = new Date(a.detected_at).getTime();
+      const dateB = new Date(b.detected_at).getTime();
       return dateA - dateB;
     });
   } else {
     filtered.sort((a, b) => {
-      const dateA = new Date(a.created).getTime();
-      const dateB = new Date(b.created).getTime();
+      const dateA = new Date(a.detected_at).getTime();
+      const dateB = new Date(b.detected_at).getTime();
       return dateB - dateA;
     });
   }

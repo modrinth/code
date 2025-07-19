@@ -379,11 +379,11 @@ import type {
   ConditionalButtonAction,
   Stage,
 } from "@modrinth/moderation";
+import { finalPermissionMessages } from "@modrinth/moderation/data/modpack-permissions-stage";
+import * as prettier from "prettier";
 import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
 import KeybindsModal from "./ChecklistKeybindsModal.vue";
-import { finalPermissionMessages } from "@modrinth/moderation/data/modpack-permissions-stage";
-import prettier from "prettier";
-import { useModerationStore } from "~/store/moderation";
+import { useModerationStore } from "~/store/moderation.ts";
 
 const keybindsModal = ref<InstanceType<typeof KeybindsModal>>();
 
@@ -1167,7 +1167,7 @@ function generateModpackMessage(judgements: ModerationJudgements) {
 
     if (unidentifiedMods.length > 0) {
       issues.push(
-        `${finalPermissionMessages["unidentified"]}\n${unidentifiedMods.map((mod) => `- ${mod}`).join("\n")}`,
+        `${finalPermissionMessages.unidentified}\n${unidentifiedMods.map((mod) => `- ${mod}`).join("\n")}`,
       );
     }
   }
