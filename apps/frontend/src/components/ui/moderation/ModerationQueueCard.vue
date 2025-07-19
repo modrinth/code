@@ -82,6 +82,13 @@
 
         <span class="hidden text-sm sm:inline">&#x2022;</span>
 
+        <div class="flex flex-row gap-2 text-sm">
+          Requesting
+          <Badge v-if="project.requested_status" :type="project.requested_status" class="status" />
+        </div>
+
+        <span class="hidden text-sm sm:inline">&#x2022;</span>
+
         <span
           v-tooltip="`Since ${queuedDate.toLocaleString()}`"
           class="truncate text-sm"
@@ -123,7 +130,7 @@ import {
   PackageOpenIcon,
   BracesIcon,
 } from "@modrinth/assets";
-import { useRelativeTime, Avatar, ButtonStyled } from "@modrinth/ui";
+import { useRelativeTime, Avatar, ButtonStyled, Badge } from "@modrinth/ui";
 import { formatProjectType, type Organization, type TeamMember } from "@modrinth/utils";
 import { computed } from "vue";
 import { useModerationStore } from "~/store/moderation.ts";
@@ -142,6 +149,8 @@ const enrichedProject = computed(() => ({
   owner: props.owner,
   org: props.org,
 }));
+
+console.log("Enriched project:", enrichedProject.value);
 
 function getDaysQueued(date: Date): number {
   const now = new Date();
