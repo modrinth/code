@@ -99,7 +99,7 @@
                 @click="closeReport()"
               >
                 <CheckCircleIcon class="size-4" />
-                Close thread
+                Close report
               </button>
             </ButtonStyled>
           </template>
