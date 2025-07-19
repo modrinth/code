@@ -46,8 +46,8 @@
               />
               <span
                 ><OrganizationIcon
-                  class="align-middle"
                   v-if="report.target.type === 'organization'"
+                  class="align-middle"
                 />
                 {{ report.target.name || "Unknown User" }}</span
               >
@@ -75,18 +75,13 @@
       :class="{ 'max-h-32': isCollapsed }"
     >
       <div
-        class="px-4 pb-16 pt-4"
+        class="px-4 pt-4"
         :class="{
-          'content-disabled': isCollapsed,
-          'cursor-default': isCollapsed,
+          'content-disabled pb-16': isCollapsed,
+          'pb-4': !isCollapsed,
         }"
-        :style="
-          isCollapsed
-            ? 'user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;'
-            : ''
-        "
       >
-        <div class="markdown-body max-w-[95%]" v-html="renderHighlightedString(report.body)"></div>
+        <div class="markdown-body" v-html="renderHighlightedString(report.body)"></div>
         <ReportThread
           v-if="report.thread"
           :thread="report.thread"
@@ -97,37 +92,15 @@
 
       <div
         v-if="isCollapsed"
-        class="absolute inset-0 z-10"
-        @click.stop.prevent
-        @keydown.stop.prevent
-        @focus.stop.prevent
-        @mousedown.stop.prevent
-        @mouseup.stop.prevent
-        @selectstart.stop.prevent
-        @dragstart.stop.prevent
-        style="
-          user-select: none;
-          -webkit-user-select: none;
-          -moz-user-select: none;
-          -ms-user-select: none;
-        "
+        class="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent to-button-bg"
       ></div>
 
-      <div
-        v-if="isCollapsed"
-        class="pointer-events-none absolute inset-0"
-        style="
-          background: linear-gradient(to bottom, transparent 20%, var(--color-bg-raised) 100%);
-          mask: linear-gradient(to bottom, transparent 20%, black 100%);
-          -webkit-mask: linear-gradient(to bottom, transparent 20%, black 100%);
-          backdrop-filter: blur(2px);
-        "
-      ></div>
-
-      <div class="absolute right-5 top-5 z-20">
-        <ButtonStyled size="large" circular>
-          <button @click="toggleCollapsed">
-            <ExpandIcon />
+      <div class="absolute bottom-4 left-1/2 z-20 -translate-x-1/2">
+        <ButtonStyled circular type="transparent">
+          <button class="flex items-center gap-1 text-xs" @click="toggleCollapsed">
+            <ExpandIcon v-if="isCollapsed" />
+            <CollapseIcon v-else />
+            {{ isCollapsed ? "Expand" : "Collapse" }}
           </button>
         </ButtonStyled>
       </div>
@@ -143,11 +116,17 @@ import {
   type OverflowMenuOption,
   ButtonStyled,
 } from "@modrinth/ui";
-import type { ExtendedReport } from "~/pages/moderation/reports.vue";
-import ChevronDownIcon from "../servers/icons/ChevronDownIcon.vue";
-import { EllipsisVerticalIcon, OrganizationIcon, EyeIcon, ExpandIcon } from "@modrinth/assets";
-import ReportThread from "../thread/ReportThread.vue";
+import {
+  EllipsisVerticalIcon,
+  OrganizationIcon,
+  EyeIcon,
+  ExpandIcon,
+  CollapseIcon,
+} from "@modrinth/assets";
 import { renderHighlightedString } from "@modrinth/utils";
+import ChevronDownIcon from "../servers/icons/ChevronDownIcon.vue";
+import ReportThread from "../thread/ReportThread.vue";
+import type { ExtendedReport } from "~/pages/moderation/reports.vue";
 
 const props = defineProps<{
   report: ExtendedReport;
@@ -232,6 +211,9 @@ const formattedReportType = computed(() => {
 .content-disabled {
   pointer-events: none;
   user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 
   :deep(*) {
     pointer-events: none !important;

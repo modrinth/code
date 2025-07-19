@@ -38,6 +38,7 @@ import _CodeIcon from './icons/code.svg?component'
 import _CoffeeIcon from './icons/coffee.svg?component'
 import _CogIcon from './icons/cog.svg?component'
 import _CoinsIcon from './icons/coins.svg?component'
+import _CollapseIcon from './icons/collapse.svg?component'
 import _CollectionIcon from './icons/collection.svg?component'
 import _CompassIcon from './icons/compass.svg?component'
 import _ContractIcon from './icons/contract.svg?component'
@@ -230,6 +231,7 @@ export const CodeIcon = _CodeIcon
 export const CoffeeIcon = _CoffeeIcon
 export const CogIcon = _CogIcon
 export const CoinsIcon = _CoinsIcon
+export const CollapseIcon = _CollapseIcon
 export const CollectionIcon = _CollectionIcon
 export const CompassIcon = _CompassIcon
 export const ContractIcon = _ContractIcon
