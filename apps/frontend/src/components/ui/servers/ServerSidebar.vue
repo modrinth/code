@@ -2,7 +2,10 @@
   <div class="static w-full grid-cols-1 md:relative md:flex">
     <div class="static h-full flex-col pb-4 md:flex md:pb-0 md:pr-4">
       <div class="z-10 flex select-none flex-col gap-2 rounded-2xl bg-bg-raised p-4 md:w-[16rem]">
-        <div v-for="link in navLinks" :key="link.label">
+        <div
+          v-for="link in navLinks.filter((x) => x.shown === undefined || x.shown)"
+          :key="link.label"
+        >
           <NuxtLink
             :to="link.href"
             class="flex items-center gap-2 rounded-xl p-2 hover:bg-button-bg"
@@ -40,7 +43,7 @@ import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 const emit = defineEmits(["reinstall"]);
 
 defineProps<{
-  navLinks: { label: string; href: string; icon: Component; external?: boolean }[];
+  navLinks: { label: string; href: string; icon: Component; external?: boolean; shown?: boolean }[];
   route: RouteLocationNormalized;
   server: ModrinthServer;
   backupInProgress?: BackupInProgressReason;
