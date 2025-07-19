@@ -873,19 +873,6 @@
           @delete-version="deleteVersion"
         />
       </div>
-
-      <div class="normal-page__ultimate-sidebar">
-        <!-- Uncomment this to enable the old moderation checklist. -->
-        <!-- <ModerationChecklist
-          v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
-          :project="project"
-          :future-projects="futureProjects"
-          :reset-project="resetProject"
-          :collapsed="collapsedModerationChecklist"
-          @exit="showModerationChecklist = false"
-          @toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
-        /> -->
-      </div>
     </div>
   </div>
 
@@ -893,7 +880,7 @@
     v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
     class="moderation-checklist"
   >
-    <NewModerationChecklist
+    <ModerationChecklist
       :project="project"
       :collapsed="collapsedModerationChecklist"
       @exit="showModerationChecklist = false"
@@ -978,7 +965,7 @@ import ProjectMemberHeader from "~/components/ui/ProjectMemberHeader.vue";
 import { userCollectProject } from "~/composables/user.js";
 import { reportProject } from "~/utils/report-helpers.ts";
 import { saveFeatureFlags } from "~/composables/featureFlags.ts";
-import NewModerationChecklist from "~/components/ui/moderation/NewModerationChecklist.vue";
+import ModerationChecklist from "~/components/ui/moderation/ModerationChecklist.vue";
 import { useModerationStore } from "~/store/moderation.ts";
 
 const data = useNuxtApp();
