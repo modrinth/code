@@ -8930,6 +8930,7 @@ dependencies = [
  "data-url",
  "dirs",
  "discord-rich-presence",
+ "dotenvy",
  "dunce",
  "either",
  "encoding_rs",

@@ -1,4 +1,3 @@
-use crate::config::{MODRINTH_API_URL, MODRINTH_URL};
 use crate::state::{CacheBehaviour, CachedEntry};
 use crate::util::fetch::{FetchSemaphore, fetch_advanced};
 use chrono::{DateTime, Duration, TimeZone, Utc};
@@ -31,7 +30,7 @@ impl ModrinthCredentials {
 
                 let resp = fetch_advanced(
                     Method::POST,
-                    &format!("{MODRINTH_API_URL}session/refresh"),
+                    concat!(env!("MODRINTH_API_URL"), "session/refresh"),
                     None,
                     None,
                     Some(("Authorization", &*creds.session)),
@@ -190,8 +189,8 @@ impl ModrinthCredentials {
     }
 }
 
-pub fn get_login_url() -> String {
-    format!("{MODRINTH_URL}auth/sign-in?launcher=true")
+pub const fn get_login_url() -> &'static str {
+    concat!(env!("MODRINTH_URL"), "auth/sign-in?launcher=true")
 }
 
 pub async fn finish_login_flow(
@@ -216,7 +215,7 @@ async fn fetch_info(
 ) -> crate::Result<crate::state::cache::User> {
     let result = fetch_advanced(
         Method::GET,
-        &format!("{MODRINTH_API_URL}user"),
+        concat!(env!("MODRINTH_API_URL"), "user"),
         None,
         None,
         Some(("Authorization", token)),

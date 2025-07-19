@@ -74,6 +74,10 @@ jobs:
           cp .env.local .env
           sqlx database setup
 
+      - name: ⚙️ Set app environment
+        working-directory: packages/app-lib
+        run: cp .env.staging .env
+
       - name: 🔍 Lint and test
         run: pnpm run ci
 

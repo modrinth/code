@@ -82,6 +82,7 @@ ariadne.workspace = true
 winreg.workspace = true
 
 [build-dependencies]
+dotenvy.workspace = true
 dunce.workspace = true
 
 [features]
