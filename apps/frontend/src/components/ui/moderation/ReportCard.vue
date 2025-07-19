@@ -17,13 +17,17 @@
       </span>
       <div class="flex flex-row items-center gap-2">
         <span class="text-md text-secondary">{{ formatRelativeTime(report.created) }}</span>
-        <ButtonStyled circular>
-          <OverflowMenu :options="quickReplyOptions">Quick Reply <ChevronDownIcon /> </OverflowMenu>
+        <ButtonStyled v-if="visibleQuickReplies.length > 0" circular>
+          <OverflowMenu :options="visibleQuickReplies"
+            >Quick Reply <ChevronDownIcon />
+          </OverflowMenu>
         </ButtonStyled>
         <ButtonStyled circular>
-          <button>
-            <EllipsisVerticalIcon />
-          </button>
+          <OverflowMenu :options="quickActions"
+            ><template #default> <EllipsisVerticalIcon /></template
+            ><template #copy-id> <ClipboardCopyIcon />Copy ID </template
+            ><template #copy-link> <LinkIcon /> Copy link </template></OverflowMenu
+          >
         </ButtonStyled>
       </div>
     </div>
@@ -91,11 +95,21 @@ import {
   CollapsibleRegion,
   ButtonStyled,
 } from "@modrinth/ui";
-import { EllipsisVerticalIcon, OrganizationIcon, EyeIcon } from "@modrinth/assets";
+import {
+  EllipsisVerticalIcon,
+  OrganizationIcon,
+  EyeIcon,
+  ClipboardCopyIcon,
+  LinkIcon,
+} from "@modrinth/assets";
 import { renderHighlightedString } from "@modrinth/utils";
+import {
+  type ExtendedReport,
+  reportQuickReplies,
+  type ReportQuickReply,
+} from "@modrinth/moderation";
 import ChevronDownIcon from "../servers/icons/ChevronDownIcon.vue";
 import ReportThread from "../thread/ReportThread.vue";
-import type { ExtendedReport } from "~/pages/moderation/reports.vue";
 
 const props = defineProps<{
   report: ExtendedReport;
@@ -103,28 +117,61 @@ const props = defineProps<{
 
 const formatRelativeTime = useRelativeTime();
 
-interface QuickReply {
-  label: string;
-  message: string;
-}
-
-const quickReplies: readonly QuickReply[] = readonly([
-  { label: "Invalid", message: "Your **report** is invalid. Please do not do this." },
-  { label: "Duplicate", message: "This report is a duplicate." },
-]);
-
 function updateThread(newThread: any) {
   if (props.report.thread) {
     Object.assign(props.report.thread, newThread);
   }
 }
 
-const quickReplyOptions: OverflowMenuOption[] = quickReplies.map((reply) => ({
-  id: reply.label,
-  action: () => handleQuickReply(reply),
-}));
+const quickActions: OverflowMenuOption[] = [
+  {
+    id: "copy-link",
+    action: () => {
+      const base = window.location.origin;
+      const reportUrl = `${base}/moderation/reports?q=${props.report.id}`;
+      navigator.clipboard.writeText(reportUrl).then(() => {
+        addNotification({
+          type: "success",
+          title: "Report link copied",
+          text: "The link to this report has been copied to your clipboard.",
+        });
+      });
+    },
+  },
+  {
+    id: "copy-id",
+    action: () => {
+      navigator.clipboard.writeText(props.report.id).then(() => {
+        addNotification({
+          type: "success",
+          title: "Report ID copied",
+          text: "The ID of this report has been copied to your clipboard.",
+        });
+      });
+    },
+  },
+];
 
-function handleQuickReply(reply: QuickReply) {
+const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
+  return reportQuickReplies
+    .filter((reply) => {
+      if (reply.shouldShow === undefined) return true;
+      if (typeof reply.shouldShow === "function") {
+        return reply.shouldShow(props.report);
+      }
+
+      return reply.shouldShow;
+    })
+    .map(
+      (reply) =>
+        ({
+          id: reply.label,
+          action: () => handleQuickReply(reply),
+        }) as OverflowMenuOption,
+    );
+});
+
+function handleQuickReply(reply: ReportQuickReply) {
   console.log(`Quick reply sent: ${reply.message}`);
 }
 

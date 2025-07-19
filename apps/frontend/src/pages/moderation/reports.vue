@@ -73,10 +73,13 @@ import type {
   Organization,
 } from "@modrinth/utils";
 import Fuse from "fuse.js";
+import type { OwnershipTarget, ExtendedReport } from "@modrinth/moderation";
 import ReportCard from "~/components/ui/moderation/ReportCard.vue";
 import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
 
 const { formatMessage } = useVIntl();
+const route = useRoute();
+const router = useRouter();
 
 const messages = defineMessages({
   searchPlaceholder: {
@@ -92,22 +95,6 @@ const messages = defineMessages({
     defaultMessage: "Sort by",
   },
 });
-
-export interface OwnershipTarget {
-  name: string;
-  slug: string;
-  avatar_url?: string;
-  type: "user" | "organization";
-}
-
-export interface ExtendedReport extends Report {
-  thread: Thread;
-  reporter_user: User;
-  project?: Project;
-  user?: User;
-  version?: Version;
-  target?: OwnershipTarget;
-}
 
 const { data: allReports } = await useAsyncData("moderation-reports", async () => {
   const reports = (await useBaseFetch("report?all=true&count=10000", {
@@ -295,7 +282,35 @@ const { data: allReports } = await useAsyncData("moderation-reports", async () =
   return extendedReports;
 });
 
-const query = useLocalStorage("moderation-reports-query", "");
+const query = ref(route.query.q?.toString() || "");
+watch(
+  query,
+  (newQuery) => {
+    const currentQuery = { ...route.query };
+    if (newQuery) {
+      currentQuery.q = newQuery;
+    } else {
+      delete currentQuery.q;
+    }
+
+    router.replace({
+      path: route.path,
+      query: currentQuery,
+    });
+  },
+  { immediate: false },
+);
+
+watch(
+  () => route.query.q,
+  (newQueryParam) => {
+    const newValue = newQueryParam?.toString() || "";
+    if (query.value !== newValue) {
+      query.value = newValue;
+    }
+  },
+);
+
 const currentFilterType = useLocalStorage("moderation-reports-filter-type", () => "All");
 const filterTypes: readonly string[] = readonly(["All", "Unread", "Read"]);
 
@@ -310,13 +325,32 @@ const fuse = computed(() => {
   if (!allReports.value || allReports.value.length === 0) return null;
   return new Fuse(allReports.value, {
     keys: [
-      "body",
-      "report_type",
-      "reporter_user.username",
-      "item_id",
+      {
+        name: "id",
+        weight: 3,
+      },
+      {
+        name: "body",
+        weight: 3,
+      },
+      {
+        name: "report_type",
+        weight: 3,
+      },
+      {
+        name: "item_id",
+        weight: 2,
+      },
+      {
+        name: "reporter_user.username",
+        weight: 2,
+      },
       "project.name",
+      "project.slug",
       "user.username",
       "version.name",
+      "target.name",
+      "target.slug",
     ],
     includeScore: true,
     threshold: 0.4,
