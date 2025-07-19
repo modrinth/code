@@ -419,6 +419,7 @@ export interface ModerationJudgements {
 
 // Delphi
 export interface DelphiReport {
+  id: string
   project: Project
   version: Version
   priority_score: number
