@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div
     class="moderation-checklist flex w-[600px] max-w-full flex-col rounded-2xl border-[1px] border-solid border-orange bg-bg-raised p-4 transition-all delay-200 duration-200 ease-in-out"
     :class="collapsed ? `sm:max-w-[300px]` : 'sm:max-w-[600px]'"
@@ -1130,4 +1130,4 @@ async function goToNextProject() {
       0 0 0 2px var(--color-brand);
   }
 }
-</style>
+</style> -->
