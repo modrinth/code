@@ -387,7 +387,7 @@ export default defineNuxtConfig({
       },
     },
   },
-  modules: ["@vintl/nuxt", "@pinia/nuxt"],
+  modules: ["@vintl/nuxt", "@pinia/nuxt", "pinia-plugin-persistedstate/nuxt"],
   vintl: {
     defaultLocale: "en-US",
     locales: [
