@@ -190,7 +190,7 @@ impl ModrinthCredentials {
 }
 
 pub const fn get_login_url() -> &'static str {
-    concat!(env!("MODRINTH_URL"), "auth/sign-in?launcher=true")
+    concat!(env!("MODRINTH_URL"), "auth/sign-in")
 }
 
 pub async fn finish_login_flow(
@@ -198,6 +198,12 @@ pub async fn finish_login_flow(
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<ModrinthCredentials> {
+    // The authorization code actually is the access token, since Labrinth doesn't
+    // issue separate authorization codes. Therefore, this is equivalent to an
+    // implicit OAuth grant flow, and no additional exchanging or finalization is
+    // needed. TODO not do this for the reasons outlined at
+    // https://oauth.net/2/grant-types/implicit/
+
     let info = fetch_info(code, semaphore, exec).await?;
 
     Ok(ModrinthCredentials {

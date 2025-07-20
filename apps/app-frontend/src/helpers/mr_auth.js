@@ -16,3 +16,7 @@ export async function logout() {
 export async function get() {
   return await invoke('plugin:mr-auth|get')
 }
+
+export async function cancelLogin() {
+  return await invoke('plugin:mr-auth|cancel_modrinth_login')
+}
