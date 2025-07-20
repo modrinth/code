@@ -131,7 +131,7 @@ async fn handle_reply(
     let auth_code = req.uri().query().and_then(|query_string| {
         query_string
             .split('&')
-            .flat_map(|query_pair| query_pair.split_once('='))
+            .filter_map(|query_pair| query_pair.split_once('='))
             .find_map(|(key, value)| (key == "code").then_some(value))
     });
 
