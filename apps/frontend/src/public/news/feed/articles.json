@@ -99,18 +99,18 @@
       "link": "https://modrinth.com/news/article/accelerating-development"
     },
     {
-      "title": "Two years of Modrinth: a retrospective",
-      "summary": "The history of Modrinth as we know it from December 2020 to December 2022.",
-      "thumbnail": "https://modrinth.com/news/default.webp",
-      "date": "2023-01-07T00:00:00.000Z",
-      "link": "https://modrinth.com/news/article/two-years-of-modrinth-history"
-    },
-    {
       "title": "Modrinth's Anniversary Update",
       "summary": "Marking two years of Modrinth and discussing our New Year's Resolutions for 2023.",
       "thumbnail": "https://modrinth.com/news/article/two-years-of-modrinth/thumbnail.webp",
       "date": "2023-01-07T00:00:00.000Z",
       "link": "https://modrinth.com/news/article/two-years-of-modrinth"
+    },
+    {
+      "title": "Two years of Modrinth: a retrospective",
+      "summary": "The history of Modrinth as we know it from December 2020 to December 2022.",
+      "thumbnail": "https://modrinth.com/news/default.webp",
+      "date": "2023-01-07T00:00:00.000Z",
+      "link": "https://modrinth.com/news/article/two-years-of-modrinth-history"
     },
     {
       "title": "Creators can now make money on Modrinth!",

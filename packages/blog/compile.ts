@@ -1,12 +1,12 @@
 import { promises as fs } from 'fs'
 import * as path from 'path'
-import fg from 'fast-glob'
 import matter from 'gray-matter'
 import { md } from '@modrinth/utils'
 import { minify } from 'html-minifier-terser'
 import { copyDir, toVarName } from './utils'
 import RSS from 'rss'
 import { parseStringPromise } from 'xml2js'
+import { glob } from 'glob'
 
 import {
   ARTICLES_GLOB,
@@ -24,7 +24,7 @@ async function ensureCompiledDir() {
 }
 
 async function hasThumbnail(slug: string): Promise<boolean> {
-  const thumbnailPath = path.join(PUBLIC_SRC, slug, 'thumbnail.webp')
+  const thumbnailPath = path.posix.join(PUBLIC_SRC, slug, 'thumbnail.webp')
   try {
     await fs.access(thumbnailPath)
     return true
@@ -48,7 +48,7 @@ function getThumbnailUrl(slug: string, hasThumb: boolean): string {
 async function compileArticles() {
   await ensureCompiledDir()
 
-  const files = await fg([ARTICLES_GLOB])
+  const files = await glob(ARTICLES_GLOB)
   console.log(`🔎  Found ${files.length} markdown articles!`)
   const articleExports: string[] = []
   const articlesArray: string[] = []
@@ -75,8 +75,8 @@ async function compileArticles() {
 
     const slug = frontSlug || path.basename(file, '.md')
     const varName = toVarName(slug)
-    const exportFile = path.join(COMPILED_DIR, `${varName}.ts`)
-    const contentFile = path.join(COMPILED_DIR, `${varName}.content.ts`)
+    const exportFile = path.posix.join(COMPILED_DIR, `${varName}.ts`)
+    const contentFile = path.posix.join(COMPILED_DIR, `${varName}.content.ts`)
     const thumbnailPresent = await hasThumbnail(slug)
 
     const contentTs = `
@@ -221,7 +221,7 @@ async function deleteDirContents(dir: string) {
     const entries = await fs.readdir(dir, { withFileTypes: true })
     await Promise.all(
       entries.map(async (entry) => {
-        const fullPath = path.join(dir, entry.name)
+        const fullPath = path.posix.join(dir, entry.name)
         if (entry.isDirectory()) {
           await fs.rm(fullPath, { recursive: true, force: true })
         } else {

@@ -12,8 +12,8 @@ const sideTypes: Stage = {
     {
       id: 'side_types_inaccurate_modpack',
       type: 'button',
-      label: 'Inaccurate (modpack)',
-      weight: 10,
+      label: 'Inaccurate',
+      weight: 800,
       suggestedStatus: 'flagged',
       severity: 'low',
       shouldShow: (project) => project.project_type === 'modpack',
@@ -23,8 +23,8 @@ const sideTypes: Stage = {
     {
       id: 'side_types_inaccurate_mod',
       type: 'button',
-      label: 'Inaccurate (mod)',
-      weight: 10,
+      label: 'Inaccurate',
+      weight: 800,
       suggestedStatus: 'flagged',
       severity: 'low',
       shouldShow: (project) => project.project_type === 'mod',

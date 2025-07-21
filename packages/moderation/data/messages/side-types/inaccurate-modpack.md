@@ -1,6 +1,6 @@
 ## Incorrect Environment Information
 
-Per section 5.1 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous), it is important that the metadata of your projects is accurate, including whether the project runs on the client or server side.
+Per section 5.1 of %RULES%, it is important that the metadata of your projects is accurate, including whether the project runs on the client or server side.
 
 For a brief rundown of how this works:
 

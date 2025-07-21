@@ -43,7 +43,9 @@ pub enum AuthenticationError {
     InvalidAuthMethod,
     #[error("GitHub Token from incorrect Client ID")]
     InvalidClientId,
-    #[error("User email/account is already registered on Modrinth")]
+    #[error(
+        "User email is already registered on Modrinth. Try 'Forgot password' to access your account."
+    )]
     DuplicateUser,
     #[error("Invalid state sent, you probably need to get a new websocket")]
     SocketError,

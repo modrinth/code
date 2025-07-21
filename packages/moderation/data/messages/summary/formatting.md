@@ -1,6 +1,6 @@
 ## Insufficient Summary
 
-Per section 5.3 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous) your Summary can not include any extra formatting such as lists, or links.
+Per section 5.3 of %RULES% your Summary can not include any extra formatting such as lists, or links.
 
 Your project summary should provide a brief overview of your project that informs and entices users.
 

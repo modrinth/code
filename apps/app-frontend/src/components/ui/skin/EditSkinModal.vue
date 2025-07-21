@@ -118,6 +118,7 @@ import {
   type Cape,
   type SkinModel,
   get_normalized_skin_texture,
+  determineModelType,
 } from '@/helpers/skins.ts'
 import { handleError } from '@/store/notifications'
 import {
@@ -253,7 +254,7 @@ async function showNew(e: MouseEvent, skinTextureUrl: string) {
   mode.value = 'new'
   currentSkin.value = null
   uploadedTextureUrl.value = skinTextureUrl
-  variant.value = 'CLASSIC'
+  variant.value = await determineModelType(skinTextureUrl)
   selectedCape.value = undefined
   visibleCapeList.value = []
   initVisibleCapeList()

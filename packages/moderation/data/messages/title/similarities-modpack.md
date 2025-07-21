@@ -1,0 +1,1 @@
+You may reference the projects that make up the focus point of your modpack, however, you must do so in a way that is unlikely to cause confusion or imply association with or endorsement from the author of that content.

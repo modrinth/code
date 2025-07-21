@@ -284,6 +284,12 @@ async fn import_mmc_unmanaged(
                     component.version.clone().unwrap_or_default(),
                 ));
             }
+            if component.uid.starts_with("net.neoforged") {
+                return Some((
+                    PackDependency::NeoForge,
+                    component.version.clone().unwrap_or_default(),
+                ));
+            }
             if component.uid.starts_with("org.quiltmc.quilt-loader") {
                 return Some((
                     PackDependency::QuiltLoader,

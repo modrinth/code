@@ -194,13 +194,12 @@ export class ModrinthServer {
   }
 
   async testNodeReachability(): Promise<boolean> {
-    if (!this.general?.datacenter) {
-      console.warn("No datacenter info available for ping test");
+    if (!this.general?.node?.instance) {
+      console.warn("No node instance available for ping test");
       return false;
     }
 
-    const datacenter = this.general.datacenter;
-    const wsUrl = `wss://${datacenter}.nodes.modrinth.com/pingtest`;
+    const wsUrl = `wss://${this.general.node.instance}/pingtest`;
 
     try {
       return await new Promise((resolve) => {
