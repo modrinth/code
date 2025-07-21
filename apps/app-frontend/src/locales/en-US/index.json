@@ -41,6 +41,9 @@
   "app.update.download-size": {
     "message": "The update is {size}."
   },
+  "app.update.hide": {
+    "message": "Hide update reminder"
+  },
   "app.update.later": {
     "message": "Update on exit"
   },
@@ -48,7 +51,7 @@
     "message": "We recommend updating as soon as possible so you can enjoy the latest features, fixes, and improvements."
   },
   "app.update.modal-header": {
-    "message": "An update is available!"
+    "message": "Update available - "
   },
   "app.update.restart": {
     "message": "Update now"
