@@ -20,6 +20,7 @@ const reupload: Stage = {
         'reupload_unclear_fork',
         'reupload_insufficient_fork',
         'reupload_request_proof',
+        'reupload_identity_verification',
       ],
       relevantExtraInput: [
         {
@@ -44,11 +45,12 @@ const reupload: Stage = {
       suggestedStatus: 'rejected',
       severity: 'high',
       message: async () => (await import('../messages/reupload/fork.md?raw')).default,
-      //      disablesActions: [
-      //        'reupload_reupload',
-      //        'reupload_insufficient_fork',
-      //        'reupload_request_proof',
-      //      ],
+      disablesActions: [
+        'reupload_reupload',
+        'reupload_insufficient_fork',
+        'reupload_request_proof',
+        'reupload_identity_verification',
+      ],
     } as ButtonAction,
     {
       id: 'reupload_insufficient_fork',
@@ -58,7 +60,12 @@ const reupload: Stage = {
       suggestedStatus: 'rejected',
       severity: 'high',
       message: async () => (await import('../messages/reupload/insufficient_fork.md?raw')).default,
-      //      disablesActions: ['reupload_unclear_fork', 'reupload_reupload', 'reupload_request_proof'],
+      disablesActions: [
+        'reupload_unclear_fork',
+        'reupload_reupload',
+        'reupload_request_proof',
+        'reupload_identity_verification',
+      ],
     } as ButtonAction,
     {
       id: 'reupload_request_proof',
@@ -69,7 +76,34 @@ const reupload: Stage = {
       severity: 'high',
       message: async () =>
         (await import('../messages/reupload/proof_of_permissions.md?raw')).default,
-      //      disablesActions: ['reupload_reupload', 'reupload_unclear_fork', 'reupload_insufficient_fork'],
+      disablesActions: [
+        'reupload_reupload',
+        'reupload_unclear_fork',
+        'reupload_insufficient_fork',
+        'reupload_identity_verification',
+      ],
+    },
+    {
+      id: 'reupload_identity_verification',
+      type: 'button',
+      label: 'Verify Identity',
+      weight: 1100,
+      suggestedStatus: 'rejected',
+      severity: 'high',
+      message: async () =>
+        (await import('../messages/reupload/identity_verification.md?raw')).default,
+      relevantExtraInput: [
+        {
+          label: 'Where else can the project be found?',
+          variable: 'PLATFORM',
+          required: true,
+        },
+      ],
+      disablesActions: [
+        'reupload_reupload',
+        'reupload_insufficient_fork',
+        'reupload_request_proof',
+      ],
     },
   ],
 }

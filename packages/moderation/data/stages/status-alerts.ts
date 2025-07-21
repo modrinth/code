@@ -1,5 +1,5 @@
 import type { Stage } from '../../types/stage'
-import type { ButtonAction } from '../../types/actions'
+import type { ButtonAction, DropdownAction, DropdownActionOption } from '../../types/actions'
 import { TriangleAlertIcon } from '@modrinth/assets'
 
 const statusAlerts: Stage = {
@@ -38,6 +38,41 @@ const statusAlerts: Stage = {
       disablesActions: ['status_corrections_applied', 'status_private_use'],
       message: async () =>
         (await import('../messages/status-alerts/account_issues.md?raw')).default,
+    } as ButtonAction,
+    {
+      id: 'status_tec_source_request',
+      type: 'button',
+      label: `Request Source`,
+      suggestedStatus: 'rejected',
+      severity: 'critical',
+      disablesActions: ['status_corrections_applied', 'status_private_use'],
+      shouldShow: (project) =>
+        project.project_type === 'mod' ||
+        project.project_type === 'shader' ||
+        project.project_type.toString() === 'plugin',
+      weight: -999999,
+      message: async () => '',
+      enablesActions: [
+        {
+          id: 'status_tec_source_request_options',
+          type: 'dropdown',
+          label: 'Why are you requesting source?',
+          options: [
+            {
+              label: 'Obfuscated',
+              weight: 999999,
+              message: async () =>
+                (await import('../messages/status-alerts/tec/source_request-obfs.md?raw')).default,
+            } as DropdownActionOption,
+            {
+              label: 'Binaries',
+              weight: 999000,
+              message: async () =>
+                (await import('../messages/status-alerts/tec/source_request-bins.md?raw')).default,
+            } as DropdownActionOption,
+          ],
+        } as DropdownAction,
+      ],
     } as ButtonAction,
     {
       id: 'status_automod_confusion',

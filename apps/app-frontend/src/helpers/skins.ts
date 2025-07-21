@@ -67,9 +67,8 @@ export async function determineModelType(texture: string): Promise<'SLIM' | 'CLA
       const armWidth = 2
       const armHeight = 12
       const imageData = context.getImageData(armX, armY, armWidth, armHeight).data
-      for (let index = 1; index <= imageData.length; index++) {
-        //every fourth value in RGBA is the alpha channel
-        if (index % 4 == 0 && imageData[index - 1] !== 0) {
+      for (let alphaIndex = 3; alphaIndex < imageData.length; alphaIndex += 4) {
+        if (imageData[alphaIndex] !== 0) {
           resolve('CLASSIC')
           return
         }

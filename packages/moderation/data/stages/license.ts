@@ -20,14 +20,7 @@ const licensesNotRequiringSource: string[] = [
 
 const licenseStage: Stage = {
   title: 'Is this license and link valid?',
-  text: async (project) => {
-    let text = ''
-    text += (await import('../messages/checklist-text/license/id.md?raw')).default
-    if (project.license.url)
-      text += (await import('../messages/checklist-text/license/link.md?raw')).default
-
-    return text
-  },
+  text: async () => (await import('../messages/checklist-text/licensing.md?raw')).default,
   id: 'license',
   icon: BookTextIcon,
   guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
@@ -55,33 +48,24 @@ const licenseStage: Stage = {
         },
       ],
     },
-    //    {
-    //      id: 'license_no_source',
-    //      type: 'conditional-button',
-    //      label: 'No Source',
-    //      fallbackWeight: 602,
-    //      suggestedStatus: 'rejected',
-    //      severity: 'medium',
-    //      fallbackMessage: async () => (await import('../messages/license/no_source.md?raw')).default,
-    //      messageVariants: [
-    //        {
-    //          conditions: {
-    //            requiredActions: ['reupload_unclear_fork'],
-    //          },
-    //          weight: 602,
-    //          message: async () => (await import('../messages/license/no_source-fork.md?raw')).default,
-    //        },
-    //      ],
-    //    },
     {
       id: 'license_no_source',
-      type: 'button',
+      type: 'conditional-button',
       label: 'No Source',
-      weight: 602,
       suggestedStatus: 'rejected',
       severity: 'medium',
       shouldShow: (project) => !licensesNotRequiringSource.includes(project.license.id),
-      message: async () => (await import('../messages/license/no_source.md?raw')).default,
+      messageVariants: [
+        {
+          conditions: {
+            excludedActions: ['license_no_source-fork'],
+          },
+          weight: 602,
+          message: async () => (await import('../messages/license/no_source.md?raw')).default,
+        },
+      ],
+      fallbackWeight: 602,
+      fallbackMessage: async () => '',
       enablesActions: [
         {
           id: 'license_no_source-fork',
