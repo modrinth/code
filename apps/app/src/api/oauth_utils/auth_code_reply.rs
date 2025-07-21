@@ -11,7 +11,6 @@
 //! [RFC 8252]: https://datatracker.ietf.org/doc/html/rfc8252
 
 use std::{
-    convert::Infallible,
     net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr},
     sync::{LazyLock, Mutex},
     time::Duration,
@@ -117,13 +116,12 @@ pub fn stop_listeners() {
 async fn handle_reply(
     req: hyper::Request<Incoming>,
     auth_code_out: &Mutex<Option<String>>,
-) -> Result<hyper::Response<String>, Infallible> {
+) -> Result<hyper::Response<String>, hyper::http::Error> {
     if req.method() != hyper::Method::GET {
-        return Ok(hyper::Response::builder()
+        return hyper::Response::builder()
             .status(hyper::StatusCode::METHOD_NOT_ALLOWED)
             .header("Allow", "GET")
-            .body("".into())
-            .unwrap());
+            .body("".into());
     }
 
     // The authorization code is guaranteed to be sent as a "code" query parameter
@@ -155,8 +153,7 @@ async fn handle_reply(
                     .replace("{{title}}", "Error")
                     .replace("{{message}}", "Authorization code not found. Please try signing in again."),
             )
-    }
-    .unwrap();
+    }?;
 
     Ok(response)
 }
