@@ -1,6 +1,12 @@
 <template>
-  <div>
-    <template v-if="flow">
+  <div v-if="subtleLauncherRedirectUri">
+    <iframe
+      :src="subtleLauncherRedirectUri"
+      class="fixed left-0 top-0 z-[9999] m-0 h-full w-full border-0 p-0"
+    ></iframe>
+  </div>
+  <div v-else>
+    <template v-if="flow && !subtleLauncherRedirectUri">
       <label for="two-factor-code">
         <span class="label__title">{{ formatMessage(messages.twoFactorCodeLabel) }}</span>
         <span class="label__description">
@@ -189,6 +195,7 @@ const auth = await useAuth();
 const route = useNativeRoute();
 
 const redirectTarget = route.query.redirect || "";
+const subtleLauncherRedirectUri = ref();
 
 if (route.query.code && !route.fullPath.includes("new_account=true")) {
   await finishSignIn();
@@ -262,7 +269,32 @@ async function begin2FASignIn() {
 
 async function finishSignIn(token) {
   if (route.query.launcher) {
-    await navigateTo(`https://launcher-files.modrinth.com/?code=${token}`, { external: true });
+    if (!token) {
+      token = auth.value.token;
+    }
+
+    const usesLocalhostRedirectionScheme =
+      ["4", "6"].includes(route.query.ipver) && Number(route.query.port) < 65536;
+
+    const redirectUrl = usesLocalhostRedirectionScheme
+      ? `http://${route.query.ipver === "4" ? "127.0.0.1" : "[::1]"}:${route.query.port}/?code=${token}`
+      : `https://launcher-files.modrinth.com/?code=${token}`;
+
+    if (usesLocalhostRedirectionScheme) {
+      // When using this redirection scheme, the auth token is very visible in the URL to the user.
+      // While we could make it harder to find with a POST request, such is security by obscurity:
+      // the user and other applications would still be able to sniff the token in the request body.
+      // So, to make the UX a little better by not changing the displayed URL, while keeping the
+      // token hidden from very casual observation and keeping the protocol as close to OAuth's
+      // standard flows as possible, let's execute the redirect within an iframe that visually
+      // covers the entire page.
+      subtleLauncherRedirectUri.value = redirectUrl;
+    } else {
+      await navigateTo(redirectUrl, {
+        external: true,
+      });
+    }
+
     return;
   }
 
