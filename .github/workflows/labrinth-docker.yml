@@ -41,5 +41,5 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
-          cache-from: type=gha,scope=labrinth
-          cache-to: type=gha,mode=max,ignore-error=true,scope=labrinth
+          cache-from: type=registry,ref=ghcr.io/modrinth/labrinth:main
+          cache-to: type=inline

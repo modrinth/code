@@ -43,5 +43,5 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
-          cache-from: type=gha,scope=daedalus_client
-          cache-to: type=gha,mode=max,ignore-error=true,scope=daedalus_client
+          cache-from: type=registry,ref=ghcr.io/modrinth/daedalus:main
+          cache-to: type=inline
