@@ -61,10 +61,10 @@
         </div>
         <div v-else-if="isModpackPermissionsStage">
           <ModpackPermissionsFlow
+            ref="modpackPermissionsFlow"
             v-model="modpackJudgements"
             :project-id="project.id"
             @complete="handleModpackPermissionsComplete"
-            @update:allFiles="allModpackFiles = $event"
           />
         </div>
         <div v-else>
@@ -366,13 +366,14 @@ import type {
   ToggleAction,
   ConditionalButtonAction,
   Stage,
+  finalPermissionMessages,
 } from "@modrinth/moderation";
+import * as prettier from "prettier";
 import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
 import KeybindsModal from "./ChecklistKeybindsModal.vue";
-import { finalPermissionMessages } from "@modrinth/moderation/data/modpack-permissions-stage";
-import prettier from "prettier";
 
 const keybindsModal = ref<InstanceType<typeof KeybindsModal>>();
+const modpackPermissionsFlow = ref<InstanceType<typeof ModpackPermissionsFlow>>();
 
 const props = withDefaults(
   defineProps<{
@@ -396,13 +397,6 @@ const futureProjectCount = computed(() => {
 
 const modpackPermissionsComplete = ref(false);
 const modpackJudgements = ref<ModerationJudgements>({});
-const allModpackFiles = ref<{
-  interactive: ModerationModpackItem[];
-  permanentNo: ModerationModpackItem[];
-}>({
-  interactive: [],
-  permanentNo: [],
-});
 const isModpackPermissionsStage = computed(() => {
   return currentStageObj.value.id === "modpack-permissions";
 });
@@ -436,7 +430,6 @@ function resetProgress() {
   localStorage.removeItem(`modpack-permissions-index-${props.project.id}`);
   modpackPermissionsComplete.value = false;
   modpackJudgements.value = {};
-  allModpackFiles.value = { interactive: [], permanentNo: [] };
 
   initializeAllStages();
 }
@@ -1088,13 +1081,17 @@ async function generateMessage() {
     const baseMessage = await assembleFullMessage();
     let fullMessage = baseMessage;
 
-    if (
-      props.project.project_type === "modpack" &&
-      (allModpackFiles.value.interactive.length > 0 || allModpackFiles.value.permanentNo.length > 0)
-    ) {
-      const modpackMessage = generateModpackMessage(allModpackFiles.value);
-      if (modpackMessage) {
-        fullMessage = baseMessage ? `${baseMessage}\n\n${modpackMessage}` : modpackMessage;
+    if (props.project.project_type === "modpack") {
+      const modpackFilesData = modpackPermissionsFlow.value?.getModpackFiles() ?? {
+        interactive: [],
+        permanentNo: [],
+      };
+
+      if (modpackFilesData.interactive.length > 0 || modpackFilesData.permanentNo.length > 0) {
+        const modpackMessage = generateModpackMessage(modpackFilesData);
+        if (modpackMessage) {
+          fullMessage = baseMessage ? `${baseMessage}\n\n${modpackMessage}` : modpackMessage;
+        }
       }
     }
 
@@ -1158,6 +1155,12 @@ function generateModpackMessage(allFiles: {
   ) {
     issues.push("## Copyrighted content");
 
+    if (unidentifiedMods.length > 0) {
+      issues.push(
+        `${finalPermissionMessages.unidentified}\n${unidentifiedMods.map((mod) => `- ${mod}`).join("\n")}`,
+      );
+    }
+
     if (attributeMods.length > 0) {
       issues.push(
         `${finalPermissionMessages["with-attribution"]}\n${attributeMods.map((mod) => `- ${mod}`).join("\n")}`,
@@ -1171,12 +1174,6 @@ function generateModpackMessage(allFiles: {
     if (permanentNoMods.length > 0) {
       issues.push(
         `${finalPermissionMessages["permanent-no"]}\n${permanentNoMods.map((mod) => `- ${mod}`).join("\n")}`,
-      );
-    }
-
-    if (unidentifiedMods.length > 0) {
-      issues.push(
-        `${finalPermissionMessages["unidentified"]}\n${unidentifiedMods.map((mod) => `- ${mod}`).join("\n")}`,
       );
     }
   }

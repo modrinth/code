@@ -167,9 +167,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   complete: [];
   "update:modelValue": [judgements: ModerationJudgements];
-  "update:allFiles": [
-    allFiles: { interactive: ModerationModpackItem[]; permanentNo: ModerationModpackItem[] },
-  ];
 }>();
 
 const persistedModPackData = useLocalStorage<ModerationModpackItem[] | null>(
@@ -364,20 +361,10 @@ function goToPrevious(): void {
   }
 }
 
-function emitAllFiles(): void {
-  if (modPackData.value) {
-    emit("update:allFiles", {
-      interactive: modPackData.value,
-      permanentNo: permanentNoFiles.value,
-    });
-  }
-}
-
 watch(
   modPackData,
   (newValue) => {
     persistedModPackData.value = newValue;
-    emitAllFiles();
   },
   { deep: true },
 );
@@ -389,7 +376,6 @@ function goToNext(): void {
     if (currentIndex.value >= modPackData.value.length) {
       const judgements = getJudgements();
       emit("update:modelValue", judgements);
-      emitAllFiles();
       emit("complete");
       clearPersistedData();
     } else {
@@ -404,7 +390,6 @@ function setStatus(index: number, status: ModerationModpackPermissionApprovalTyp
     modPackData.value[index].approved = null;
     persistAll();
     emit("update:modelValue", getJudgements());
-    emitAllFiles();
   }
 }
 
@@ -413,7 +398,6 @@ function setApproval(index: number, approved: ModerationPermissionType["id"]): v
     modPackData.value[index].approved = approved;
     persistAll();
     emit("update:modelValue", getJudgements());
-    emitAllFiles();
   }
 }
 
@@ -470,6 +454,20 @@ watch(
     }
   },
 );
+
+function getModpackFiles(): {
+  interactive: ModerationModpackItem[];
+  permanentNo: ModerationModpackItem[];
+} {
+  return {
+    interactive: modPackData.value || [],
+    permanentNo: permanentNoFiles.value,
+  };
+}
+
+defineExpose({
+  getModpackFiles,
+});
 </script>
 
 <style scoped>
