@@ -358,14 +358,14 @@ import {
   type ModerationModpackItem,
 } from "@modrinth/utils";
 import { computedAsync, useLocalStorage } from "@vueuse/core";
-import type {
-  Action,
-  MultiSelectChipsAction,
-  DropdownAction,
-  ButtonAction,
-  ToggleAction,
-  ConditionalButtonAction,
-  Stage,
+import {
+  type Action,
+  type MultiSelectChipsAction,
+  type DropdownAction,
+  type ButtonAction,
+  type ToggleAction,
+  type ConditionalButtonAction,
+  type Stage,
   finalPermissionMessages,
 } from "@modrinth/moderation";
 import * as prettier from "prettier";
