@@ -157,7 +157,7 @@ import type {
 } from "@modrinth/utils";
 import { ButtonStyled } from "@modrinth/ui";
 import { ref, computed, watch, onMounted } from "vue";
-import { useLocalStorage } from "@vueuse/core";
+import { useLocalStorage, useSessionStorage } from "@vueuse/core";
 
 const props = defineProps<{
   projectId: string;
@@ -182,8 +182,26 @@ const persistedModPackData = useLocalStorage<ModerationModpackItem[] | null>(
 
 const persistedIndex = useLocalStorage<number>(`modpack-permissions-index-${props.projectId}`, 0);
 
-const modPackData = ref<ModerationModpackItem[] | null>(null);
-const permanentNoFiles = ref<ModerationModpackItem[]>([]);
+const modPackData = useSessionStorage<ModerationModpackItem[] | null>(
+  `modpack-permissions-data-${props.projectId}`,
+  null,
+  {
+    serializer: {
+      read: (v: any) => (v ? JSON.parse(v) : null),
+      write: (v: any) => JSON.stringify(v),
+    },
+  },
+);
+const permanentNoFiles = useSessionStorage<ModerationModpackItem[]>(
+  `modpack-permissions-permanent-no-${props.projectId}`,
+  [],
+  {
+    serializer: {
+      read: (v: any) => (v ? JSON.parse(v) : []),
+      write: (v: any) => JSON.stringify(v),
+    },
+  },
+);
 const currentIndex = ref(0);
 
 const fileApprovalTypes: ModerationModpackPermissionApprovalType[] = [

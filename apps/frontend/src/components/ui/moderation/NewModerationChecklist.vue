@@ -61,7 +61,6 @@
         </div>
         <div v-else-if="isModpackPermissionsStage">
           <ModpackPermissionsFlow
-            ref="modpackPermissionsFlow"
             v-model="modpackJudgements"
             :project-id="project.id"
             @complete="handleModpackPermissionsComplete"
@@ -373,7 +372,6 @@ import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
 import KeybindsModal from "./ChecklistKeybindsModal.vue";
 
 const keybindsModal = ref<InstanceType<typeof KeybindsModal>>();
-const modpackPermissionsFlow = ref<InstanceType<typeof ModpackPermissionsFlow>>();
 
 const props = withDefaults(
   defineProps<{
@@ -812,6 +810,31 @@ const isAnyVisibleInputs = computed(() => {
   });
 });
 
+function getModpackFilesFromStorage(): {
+  interactive: ModerationModpackItem[];
+  permanentNo: ModerationModpackItem[];
+} {
+  try {
+    const sessionData = sessionStorage.getItem(`modpack-permissions-data-${props.project.id}`);
+    const interactive = sessionData ? (JSON.parse(sessionData) as ModerationModpackItem[]) : [];
+
+    const permanentNoData = sessionStorage.getItem(
+      `modpack-permissions-permanent-no-${props.project.id}`,
+    );
+    const permanentNo = permanentNoData
+      ? (JSON.parse(permanentNoData) as ModerationModpackItem[])
+      : [];
+
+    return {
+      interactive: interactive || [],
+      permanentNo: permanentNo || [],
+    };
+  } catch (error) {
+    console.warn("Failed to parse session storage modpack data:", error);
+    return { interactive: [], permanentNo: [] };
+  }
+}
+
 async function assembleFullMessage() {
   const messageParts: MessagePart[] = [];
 
@@ -1082,10 +1105,7 @@ async function generateMessage() {
     let fullMessage = baseMessage;
 
     if (props.project.project_type === "modpack") {
-      const modpackFilesData = modpackPermissionsFlow.value?.getModpackFiles() ?? {
-        interactive: [],
-        permanentNo: [],
-      };
+      const modpackFilesData = getModpackFilesFromStorage();
 
       if (modpackFilesData.interactive.length > 0 || modpackFilesData.permanentNo.length > 0) {
         const modpackMessage = generateModpackMessage(modpackFilesData);
@@ -1134,12 +1154,14 @@ function generateModpackMessage(allFiles: {
   const unidentifiedMods: string[] = [];
 
   allFiles.interactive.forEach((file) => {
-    if (file.status === "with-attribution" && !file.approved) {
+    if (file.status === "unidentified") {
+      if (file.approved === "no") {
+        unidentifiedMods.push(file.file_name);
+      }
+    } else if (file.status === "with-attribution" && file.approved === "no") {
       attributeMods.push(file.file_name);
-    } else if (file.status === "no" && !file.approved) {
+    } else if (file.status === "no" && file.approved === "no") {
       noMods.push(file.file_name);
-    } else if (file.status === "unidentified" && !file.approved) {
-      unidentifiedMods.push(file.file_name);
     }
   });
 
