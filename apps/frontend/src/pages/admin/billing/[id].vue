@@ -58,6 +58,41 @@
       </div>
     </div>
   </NewModal>
+  <NewModal ref="modifyModal">
+    <template #title>
+      <span class="text-lg font-extrabold text-contrast">Modify charge</span>
+    </template>
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2">
+        <label for="cancel" class="flex flex-col gap-1">
+          <span class="text-lg font-semibold text-contrast">
+            Cancel server
+            <span class="text-brand-red">*</span>
+          </span>
+          <span>
+            Whether or not the subscription should be cancelled. Submitting this as "true" will
+            cancel the subscription, while submitting it as "false" will force another charge
+            attempt to be made.
+          </span>
+        </label>
+        <Toggle id="cancel" v-model="cancel" />
+      </div>
+      <div class="flex gap-2">
+        <ButtonStyled color="brand">
+          <button :disabled="modifying" @click="modifyCharge">
+            <CheckIcon aria-hidden="true" />
+            Modify charge
+          </button>
+        </ButtonStyled>
+        <ButtonStyled>
+          <button @click="modifyModal.hide()">
+            <XIcon aria-hidden="true" />
+            Cancel
+          </button>
+        </ButtonStyled>
+      </div>
+    </div>
+  </NewModal>
   <div class="page experimental-styles-within">
     <div
       class="mb-4 flex items-center justify-between border-0 border-b border-solid border-divider pb-4"
@@ -201,6 +236,12 @@
                     Refund options
                   </button>
                 </ButtonStyled>
+                <ButtonStyled v-else-if="charge.status === 'failed'" color="red" color-fill="text">
+                  <button @click="showModifyModal(subscription)">
+                    <CurrencyIcon />
+                    Modify charge
+                  </button>
+                </ButtonStyled>
               </div>
             </div>
           </div>
@@ -304,12 +345,22 @@ const refundTypes = ref(["full", "partial", "none"]);
 const refundAmount = ref(0);
 const unprovision = ref(true);
 
+const modifying = ref(false);
+const modifyModal = ref();
+const cancel = ref(false);
+
 function showRefundModal(charge) {
   selectedCharge.value = charge;
   refundType.value = "full";
   refundAmount.value = 0;
   unprovision.value = true;
   refundModal.value.show();
+}
+
+function showModifyModal(charge) {
+  selectedCharge.value = charge;
+  cancel.value = false;
+  modifyModal.value.show();
 }
 
 async function refundCharge() {
@@ -335,6 +386,34 @@ async function refundCharge() {
     });
   }
   refunding.value = false;
+}
+
+async function modifyCharge() {
+  modifying.value = true;
+  try {
+    await useBaseFetch(`billing/subscription/${selectedCharge.value.id}`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        cancelled: cancel.value,
+      }),
+      internal: true,
+    });
+    data.$notify({
+      group: "main",
+      title: "Resubscription request submitted",
+      text: "If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.",
+      type: "success",
+    });
+    await refreshCharges();
+  } catch (err) {
+    data.$notify({
+      group: "main",
+      title: "Error reattempting charge",
+      text: err.data?.description ?? err,
+      type: "error",
+    });
+  }
+  modifying.value = false;
 }
 
 const chargeStatuses = {
