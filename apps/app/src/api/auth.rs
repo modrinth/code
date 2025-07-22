@@ -33,7 +33,7 @@ pub async fn login<R: Runtime>(
     let window = tauri::WebviewWindowBuilder::new(
         &app,
         "signin",
-        tauri::WebviewUrl::External(flow.redirect_uri.parse().map_err(
+        tauri::WebviewUrl::External(flow.auth_request_uri.parse().map_err(
             |_| {
                 theseus::ErrorKind::OtherError(
                     "Error parsing auth redirect URL".to_string(),
@@ -77,6 +77,7 @@ pub async fn login<R: Runtime>(
     window.close()?;
     Ok(None)
 }
+
 #[tauri::command]
 pub async fn remove_user(user: uuid::Uuid) -> Result<()> {
     Ok(minecraft_auth::remove_user(user).await?)
