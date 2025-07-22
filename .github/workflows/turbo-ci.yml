@@ -52,7 +52,7 @@ jobs:
       # cargo-binstall does not have pre-built binaries for sqlx-cli, so we fall
       # back to a cached cargo install
       - name: 🧰 Setup cargo-sqlx
-        uses: AlexTMjugador/cache-cargo-install-action@feat/features-support
+        uses: taiki-e/cache-cargo-install-action@v2
         with:
           tool: sqlx-cli
           locked: false
