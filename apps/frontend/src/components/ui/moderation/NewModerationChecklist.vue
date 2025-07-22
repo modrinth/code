@@ -460,7 +460,7 @@ const stageTextExpanded = computedAsync(async () => {
   const stage = checklist[stageIndex];
   if (stage.text) {
     return renderHighlightedString(
-      expandVariables(await stage.text(), props.project, variables.value),
+      expandVariables(await stage.text(props.project), props.project, variables.value),
     );
   }
   return null;
@@ -976,6 +976,18 @@ async function processAction(
 }
 
 function shouldShowStage(stage: Stage): boolean {
+  let hasVisibleActions = false;
+
+  for (const a of stage.actions) {
+    if (shouldShowAction(a)) {
+      hasVisibleActions = true;
+    }
+  }
+
+  if (!hasVisibleActions) {
+    return false;
+  }
+
   if (typeof stage.shouldShow === "function") {
     return stage.shouldShow(props.project);
   }

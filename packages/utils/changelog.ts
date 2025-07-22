@@ -11,6 +11,19 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-07-19T15:20:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Removed Tumblr icon from footer as we no longer use it.
+- Reverted changes to publishing checklist since they need more work.`,
+  },
+  {
+    date: `2025-07-16T12:40:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed report body overflowing with large images.`,
+  },
+  {
     date: `2025-07-15T13:55:00-07:00`,
     product: 'web',
     body: `### Improvements
