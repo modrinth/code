@@ -1,4 +1,3 @@
-use crate::config::{META_URL, MODRINTH_API_URL, MODRINTH_API_URL_V3};
 use crate::state::ProjectType;
 use crate::util::fetch::{FetchSemaphore, fetch_json, sha1_async};
 use chrono::{DateTime, Utc};
@@ -8,6 +7,7 @@ use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
 use std::collections::HashMap;
+use std::env;
 use std::fmt::Display;
 use std::hash::Hash;
 use std::path::{Path, PathBuf};
@@ -945,7 +945,7 @@ impl CachedEntry {
             CacheValueType::Project => {
                 fetch_original_values!(
                     Project,
-                    MODRINTH_API_URL,
+                    env!("MODRINTH_API_URL"),
                     "projects",
                     CacheValue::Project
                 )
@@ -953,7 +953,7 @@ impl CachedEntry {
             CacheValueType::Version => {
                 fetch_original_values!(
                     Version,
-                    MODRINTH_API_URL,
+                    env!("MODRINTH_API_URL"),
                     "versions",
                     CacheValue::Version
                 )
@@ -961,7 +961,7 @@ impl CachedEntry {
             CacheValueType::User => {
                 fetch_original_values!(
                     User,
-                    MODRINTH_API_URL,
+                    env!("MODRINTH_API_URL"),
                     "users",
                     CacheValue::User
                 )
@@ -969,7 +969,7 @@ impl CachedEntry {
             CacheValueType::Team => {
                 let mut teams = fetch_many_batched::<Vec<TeamMember>>(
                     Method::GET,
-                    MODRINTH_API_URL_V3,
+                    env!("MODRINTH_API_URL_V3"),
                     "teams?ids=",
                     &keys,
                     fetch_semaphore,
@@ -1008,7 +1008,7 @@ impl CachedEntry {
             CacheValueType::Organization => {
                 let mut orgs = fetch_many_batched::<Organization>(
                     Method::GET,
-                    MODRINTH_API_URL_V3,
+                    env!("MODRINTH_API_URL_V3"),
                     "organizations?ids=",
                     &keys,
                     fetch_semaphore,
@@ -1063,7 +1063,7 @@ impl CachedEntry {
             CacheValueType::File => {
                 let mut versions = fetch_json::<HashMap<String, Version>>(
                     Method::POST,
-                    &format!("{MODRINTH_API_URL}version_files"),
+                    concat!(env!("MODRINTH_API_URL"), "version_files"),
                     None,
                     Some(serde_json::json!({
                         "algorithm": "sha1",
@@ -1119,7 +1119,11 @@ impl CachedEntry {
                     .map(|x| {
                         (
                             x.key().to_string(),
-                            format!("{META_URL}{}/v0/manifest.json", x.key()),
+                            format!(
+                                "{}{}/v0/manifest.json",
+                                env!("MODRINTH_LAUNCHER_META_URL"),
+                                x.key()
+                            ),
                         )
                     })
                     .collect::<Vec<_>>();
@@ -1154,7 +1158,7 @@ impl CachedEntry {
             CacheValueType::MinecraftManifest => {
                 fetch_original_value!(
                     MinecraftManifest,
-                    META_URL,
+                    env!("MODRINTH_LAUNCHER_META_URL"),
                     format!(
                         "minecraft/v{}/manifest.json",
                         daedalus::minecraft::CURRENT_FORMAT_VERSION
@@ -1165,7 +1169,7 @@ impl CachedEntry {
             CacheValueType::Categories => {
                 fetch_original_value!(
                     Categories,
-                    MODRINTH_API_URL,
+                    env!("MODRINTH_API_URL"),
                     "tag/category",
                     CacheValue::Categories
                 )
@@ -1173,7 +1177,7 @@ impl CachedEntry {
             CacheValueType::ReportTypes => {
                 fetch_original_value!(
                     ReportTypes,
-                    MODRINTH_API_URL,
+                    env!("MODRINTH_API_URL"),
                     "tag/report_type",
                     CacheValue::ReportTypes
                 )
@@ -1181,7 +1185,7 @@ impl CachedEntry {
             CacheValueType::Loaders => {
                 fetch_original_value!(
                     Loaders,
-                    MODRINTH_API_URL,
+                    env!("MODRINTH_API_URL"),
                     "tag/loader",
                     CacheValue::Loaders
                 )
@@ -1189,7 +1193,7 @@ impl CachedEntry {
             CacheValueType::GameVersions => {
                 fetch_original_value!(
                     GameVersions,
-                    MODRINTH_API_URL,
+                    env!("MODRINTH_API_URL"),
                     "tag/game_version",
                     CacheValue::GameVersions
                 )
@@ -1197,7 +1201,7 @@ impl CachedEntry {
             CacheValueType::DonationPlatforms => {
                 fetch_original_value!(
                     DonationPlatforms,
-                    MODRINTH_API_URL,
+                    env!("MODRINTH_API_URL"),
                     "tag/donation_platform",
                     CacheValue::DonationPlatforms
                 )
@@ -1297,14 +1301,12 @@ impl CachedEntry {
                     }
                 });
 
-                let version_update_url =
-                    format!("{MODRINTH_API_URL}version_files/update");
                 let variations =
                     futures::future::try_join_all(filtered_keys.iter().map(
                         |((loaders_key, game_version), hashes)| {
                             fetch_json::<HashMap<String, Version>>(
                                 Method::POST,
-                                &version_update_url,
+                                concat!(env!("MODRINTH_API_URL"), "version_files/update"),
                                 None,
                                 Some(serde_json::json!({
                                     "algorithm": "sha1",
@@ -1368,7 +1370,11 @@ impl CachedEntry {
                     .map(|x| {
                         (
                             x.key().to_string(),
-                            format!("{MODRINTH_API_URL}search{}", x.key()),
+                            format!(
+                                "{}search{}",
+                                env!("MODRINTH_API_URL"),
+                                x.key()
+                            ),
                         )
                     })
                     .collect::<Vec<_>>();

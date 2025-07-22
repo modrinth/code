@@ -1,5 +1,4 @@
 use crate::LAUNCHER_USER_AGENT;
-use crate::config::{MODRINTH_API_URL_V3, MODRINTH_SOCKET_URL};
 use crate::data::ModrinthCredentials;
 use crate::event::FriendPayload;
 use crate::event::emit::emit_friend;
@@ -78,7 +77,8 @@ impl FriendsSocket {
 
         if let Some(credentials) = credentials {
             let mut request = format!(
-                "{MODRINTH_SOCKET_URL}_internal/launcher_socket?code={}",
+                "{}_internal/launcher_socket?code={}",
+                env!("MODRINTH_SOCKET_URL"),
                 credentials.session
             )
             .into_client_request()?;
@@ -300,7 +300,7 @@ impl FriendsSocket {
     ) -> crate::Result<Vec<UserFriend>> {
         fetch_json(
             Method::GET,
-            &format!("{MODRINTH_API_URL_V3}friends"),
+            concat!(env!("MODRINTH_API_URL_V3"), "friends"),
             None,
             None,
             semaphore,
@@ -325,7 +325,7 @@ impl FriendsSocket {
     ) -> crate::Result<()> {
         fetch_advanced(
             Method::POST,
-            &format!("{MODRINTH_API_URL_V3}friend/{user_id}"),
+            &format!("{}friend/{user_id}", env!("MODRINTH_API_URL_V3")),
             None,
             None,
             None,
@@ -346,7 +346,7 @@ impl FriendsSocket {
     ) -> crate::Result<()> {
         fetch_advanced(
             Method::DELETE,
-            &format!("{MODRINTH_API_URL_V3}friend/{user_id}"),
+            &format!("{}friend/{user_id}", env!("MODRINTH_API_URL_V3")),
             None,
             None,
             None,

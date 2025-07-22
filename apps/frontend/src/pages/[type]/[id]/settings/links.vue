@@ -7,16 +7,11 @@
           id="project-issue-tracker"
           title="A place for users to report bugs, issues, and concerns about your project."
         >
-          <span class="label__title">Issue tracker </span>
+          <span class="label__title">Issue tracker</span>
           <span class="label__description">
             A place for users to report bugs, issues, and concerns about your project.
           </span>
         </label>
-        <TriangleAlertIcon
-          v-if="!isIssuesUrlCommon"
-          v-tooltip="`You're using a link which isn't common for this link type.`"
-          class="size-6 animate-pulse text-orange"
-        />
         <input
           id="project-issue-tracker"
           v-model="issuesUrl"
@@ -31,16 +26,11 @@
           id="project-source-code"
           title="A page/repository containing the source code for your project"
         >
-          <span class="label__title">Source code </span>
+          <span class="label__title">Source code</span>
           <span class="label__description">
             A page/repository containing the source code for your project
           </span>
         </label>
-        <TriangleAlertIcon
-          v-if="!isSourceUrlCommon"
-          v-tooltip="`You're using a link which isn't common for this link type.`"
-          class="size-6 animate-pulse text-orange"
-        />
         <input
           id="project-source-code"
           v-model="sourceUrl"
@@ -71,14 +61,9 @@
       </div>
       <div class="adjacent-input">
         <label id="project-discord-invite" title="An invitation link to your Discord server.">
-          <span class="label__title">Discord invite </span>
+          <span class="label__title">Discord invite</span>
           <span class="label__description"> An invitation link to your Discord server. </span>
         </label>
-        <TriangleAlertIcon
-          v-if="!isDiscordUrlCommon"
-          v-tooltip="`You're using a link which isn't common for this link type.`"
-          class="size-6 animate-pulse text-orange"
-        />
         <input
           id="project-discord-invite"
           v-model="discordUrl"
@@ -138,8 +123,7 @@
 
 <script setup>
 import { DropdownSelect } from "@modrinth/ui";
-import { SaveIcon, TriangleAlertIcon } from "@modrinth/assets";
-import { isCommonUrl, commonLinkDomains } from "@modrinth/moderation";
+import { SaveIcon } from "@modrinth/assets";
 
 const tags = useTags();
 
@@ -168,21 +152,6 @@ const issuesUrl = ref(props.project.issues_url);
 const sourceUrl = ref(props.project.source_url);
 const wikiUrl = ref(props.project.wiki_url);
 const discordUrl = ref(props.project.discord_url);
-
-const isIssuesUrlCommon = computed(() => {
-  if (!issuesUrl.value || issuesUrl.value.trim().length === 0) return true;
-  return isCommonUrl(issuesUrl.value, commonLinkDomains.issues);
-});
-
-const isSourceUrlCommon = computed(() => {
-  if (!sourceUrl.value || sourceUrl.value.trim().length === 0) return true;
-  return isCommonUrl(sourceUrl.value, commonLinkDomains.source);
-});
-
-const isDiscordUrlCommon = computed(() => {
-  if (!discordUrl.value || discordUrl.value.trim().length === 0) return true;
-  return isCommonUrl(discordUrl.value, commonLinkDomains.discord);
-});
 
 const rawDonationLinks = JSON.parse(JSON.stringify(props.project.donation_urls));
 rawDonationLinks.push({

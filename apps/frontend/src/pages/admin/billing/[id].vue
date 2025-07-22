@@ -150,8 +150,25 @@
                   </template>
                 </span>
                 <span class="text-sm text-secondary">
+                  <span
+                    v-if="charge.status === 'cancelled' && $dayjs(charge.due).isBefore($dayjs())"
+                    class="font-bold"
+                  >
+                    Ended:
+                  </span>
+                  <span v-else-if="charge.status === 'cancelled'" class="font-bold">Ends:</span>
+                  <span v-else-if="charge.type === 'refund'" class="font-bold">Issued:</span>
+                  <span v-else class="font-bold">Due:</span>
                   {{ dayjs(charge.due).format("MMMM D, YYYY [at] h:mma") }}
                   <span class="text-secondary">({{ formatRelativeTime(charge.due) }}) </span>
+                </span>
+                <span v-if="charge.last_attempt != null" class="text-sm text-secondary">
+                  <span v-if="charge.status === 'failed'" class="font-bold">Last attempt:</span>
+                  <span v-else class="font-bold">Charged:</span>
+                  {{ dayjs(charge.last_attempt).format("MMMM D, YYYY [at] h:mma") }}
+                  <span class="text-secondary"
+                    >({{ formatRelativeTime(charge.last_attempt) }})
+                  </span>
                 </span>
                 <div class="flex w-full items-center gap-1 text-xs text-secondary">
                   {{ charge.status }}
