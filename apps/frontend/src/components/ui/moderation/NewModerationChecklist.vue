@@ -240,24 +240,6 @@
             </div>
 
             <div v-else-if="generatedMessage" class="flex items-center gap-2">
-              <OverflowMenu :options="stageOptions" class="bg-transparent p-0">
-                <ButtonStyled circular>
-                  <button v-tooltip="`Stages`">
-                    <ListBulletedIcon />
-                  </button>
-                </ButtonStyled>
-
-                <template
-                  v-for="opt in stageOptions.filter(
-                    (opt) => 'id' in opt && 'text' in opt && 'icon' in opt,
-                  )"
-                  #[opt.id]
-                  :key="opt.id"
-                >
-                  <component :is="opt.icon" v-if="opt.icon" class="mr-2" />
-                  {{ opt.text }}
-                </template>
-              </OverflowMenu>
               <ButtonStyled>
                 <button @click="goBackToStages">
                   <LeftArrowIcon aria-hidden="true" />
@@ -368,21 +350,26 @@ import {
   DropdownSelect,
   MarkdownEditor,
 } from "@modrinth/ui";
-import { type Project, renderHighlightedString, type ModerationJudgements } from "@modrinth/utils";
+import {
+  type Project,
+  renderHighlightedString,
+  type ModerationJudgements,
+  type ModerationModpackItem,
+} from "@modrinth/utils";
 import { computedAsync, useLocalStorage } from "@vueuse/core";
-import type {
-  Action,
-  MultiSelectChipsAction,
-  DropdownAction,
-  ButtonAction,
-  ToggleAction,
-  ConditionalButtonAction,
-  Stage,
+import {
+  type Action,
+  type MultiSelectChipsAction,
+  type DropdownAction,
+  type ButtonAction,
+  type ToggleAction,
+  type ConditionalButtonAction,
+  type Stage,
+  finalPermissionMessages,
 } from "@modrinth/moderation";
+import * as prettier from "prettier";
 import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
 import KeybindsModal from "./ChecklistKeybindsModal.vue";
-import { finalPermissionMessages } from "@modrinth/moderation/data/modpack-permissions-stage";
-import prettier from "prettier";
 
 const keybindsModal = ref<InstanceType<typeof KeybindsModal>>();
 
@@ -419,7 +406,6 @@ const done = ref(false);
 
 function handleModpackPermissionsComplete() {
   modpackPermissionsComplete.value = true;
-  nextStage();
 }
 
 const emit = defineEmits<{
@@ -823,6 +809,31 @@ const isAnyVisibleInputs = computed(() => {
   });
 });
 
+function getModpackFilesFromStorage(): {
+  interactive: ModerationModpackItem[];
+  permanentNo: ModerationModpackItem[];
+} {
+  try {
+    const sessionData = sessionStorage.getItem(`modpack-permissions-data-${props.project.id}`);
+    const interactive = sessionData ? (JSON.parse(sessionData) as ModerationModpackItem[]) : [];
+
+    const permanentNoData = sessionStorage.getItem(
+      `modpack-permissions-permanent-no-${props.project.id}`,
+    );
+    const permanentNo = permanentNoData
+      ? (JSON.parse(permanentNoData) as ModerationModpackItem[])
+      : [];
+
+    return {
+      interactive: interactive || [],
+      permanentNo: permanentNo || [],
+    };
+  } catch (error) {
+    console.warn("Failed to parse session storage modpack data:", error);
+    return { interactive: [], permanentNo: [] };
+  }
+}
+
 async function assembleFullMessage() {
   const messageParts: MessagePart[] = [];
 
@@ -1092,13 +1103,14 @@ async function generateMessage() {
     const baseMessage = await assembleFullMessage();
     let fullMessage = baseMessage;
 
-    if (
-      props.project.project_type === "modpack" &&
-      Object.keys(modpackJudgements.value).length > 0
-    ) {
-      const modpackMessage = generateModpackMessage(modpackJudgements.value);
-      if (modpackMessage) {
-        fullMessage = baseMessage ? `${baseMessage}\n\n${modpackMessage}` : modpackMessage;
+    if (props.project.project_type === "modpack") {
+      const modpackFilesData = getModpackFilesFromStorage();
+
+      if (modpackFilesData.interactive.length > 0 || modpackFilesData.permanentNo.length > 0) {
+        const modpackMessage = generateModpackMessage(modpackFilesData);
+        if (modpackMessage) {
+          fullMessage = baseMessage ? `${baseMessage}\n\n${modpackMessage}` : modpackMessage;
+        }
       }
     }
 
@@ -1129,25 +1141,32 @@ async function generateMessage() {
   }
 }
 
-function generateModpackMessage(judgements: ModerationJudgements) {
+function generateModpackMessage(allFiles: {
+  interactive: ModerationModpackItem[];
+  permanentNo: ModerationModpackItem[];
+}) {
   const issues = [];
 
-  const attributeMods = [];
-  const noMods = [];
-  const permanentNoMods = [];
-  const unidentifiedMods = [];
+  const attributeMods: string[] = [];
+  const noMods: string[] = [];
+  const permanentNoMods: string[] = [];
+  const unidentifiedMods: string[] = [];
 
-  for (const [, judgement] of Object.entries(judgements)) {
-    if (judgement.status === "with-attribution") {
-      attributeMods.push(judgement.file_name);
-    } else if (judgement.status === "no") {
-      noMods.push(judgement.file_name);
-    } else if (judgement.status === "permanent-no") {
-      permanentNoMods.push(judgement.file_name);
-    } else if (judgement.status === "unidentified") {
-      unidentifiedMods.push(judgement.file_name);
+  allFiles.interactive.forEach((file) => {
+    if (file.status === "unidentified") {
+      if (file.approved === "no") {
+        unidentifiedMods.push(file.file_name);
+      }
+    } else if (file.status === "with-attribution" && file.approved === "no") {
+      attributeMods.push(file.file_name);
+    } else if (file.status === "no" && file.approved === "no") {
+      noMods.push(file.file_name);
     }
-  }
+  });
+
+  allFiles.permanentNo.forEach((file) => {
+    permanentNoMods.push(file.file_name);
+  });
 
   if (
     attributeMods.length > 0 ||
@@ -1156,6 +1175,12 @@ function generateModpackMessage(judgements: ModerationJudgements) {
     unidentifiedMods.length > 0
   ) {
     issues.push("## Copyrighted content");
+
+    if (unidentifiedMods.length > 0) {
+      issues.push(
+        `${finalPermissionMessages.unidentified}\n${unidentifiedMods.map((mod) => `- ${mod}`).join("\n")}`,
+      );
+    }
 
     if (attributeMods.length > 0) {
       issues.push(
@@ -1170,12 +1195,6 @@ function generateModpackMessage(judgements: ModerationJudgements) {
     if (permanentNoMods.length > 0) {
       issues.push(
         `${finalPermissionMessages["permanent-no"]}\n${permanentNoMods.map((mod) => `- ${mod}`).join("\n")}`,
-      );
-    }
-
-    if (unidentifiedMods.length > 0) {
-      issues.push(
-        `${finalPermissionMessages["unidentified"]}\n${unidentifiedMods.map((mod) => `- ${mod}`).join("\n")}`,
       );
     }
   }
