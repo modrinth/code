@@ -1,6 +1,5 @@
 //! Functions for fetching information from the Internet
 use super::io::{self, IOError};
-use crate::config::{MODRINTH_API_URL, MODRINTH_API_URL_V3};
 use crate::event::LoadingBarId;
 use crate::event::emit::emit_loading;
 use bytes::Bytes;
@@ -84,8 +83,8 @@ pub async fn fetch_advanced(
         .as_ref()
         .is_none_or(|x| &*x.0.to_lowercase() != "authorization")
         && (url.starts_with("https://cdn.modrinth.com")
-            || url.starts_with(MODRINTH_API_URL)
-            || url.starts_with(MODRINTH_API_URL_V3))
+            || url.starts_with(env!("MODRINTH_API_URL"))
+            || url.starts_with(env!("MODRINTH_API_URL_V3")))
     {
         crate::state::ModrinthCredentials::get_active(exec).await?
     } else {
