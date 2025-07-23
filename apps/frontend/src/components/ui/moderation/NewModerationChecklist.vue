@@ -406,7 +406,6 @@ const done = ref(false);
 
 function handleModpackPermissionsComplete() {
   modpackPermissionsComplete.value = true;
-  nextStage();
 }
 
 const emit = defineEmits<{

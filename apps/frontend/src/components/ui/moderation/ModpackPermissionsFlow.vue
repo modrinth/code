@@ -8,7 +8,7 @@
     <div v-if="!modPackData">Loading data...</div>
 
     <div v-else-if="modPackData.length === 0">
-      <p>All permissions obtained. You may skip this step!</p>
+      <p>All permissions already obtained.</p>
     </div>
 
     <div v-else-if="!modPackData[currentIndex]">
@@ -461,6 +461,17 @@ onMounted(() => {
     fetchModPackData();
   }
 });
+
+watch(
+  modPackData,
+  (newValue) => {
+    if (newValue && newValue.length === 0) {
+      emit("complete");
+      clearPersistedData();
+    }
+  },
+  { immediate: true },
+);
 
 watch(
   () => props.projectId,
