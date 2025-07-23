@@ -369,7 +369,7 @@ export interface ModerationPermissionType {
 export interface ModerationBaseModpackItem {
   sha1: string
   file_name: string
-  type: 'unknown' | 'flame'
+  type: 'unknown' | 'flame' | 'identified'
   status: ModerationModpackPermissionApprovalType['id'] | null
   approved: ModerationPermissionType['id'] | null
 }
@@ -388,9 +388,26 @@ export interface ModerationFlameModpackItem extends ModerationBaseModpackItem {
   url: string
 }
 
-export type ModerationModpackItem = ModerationUnknownModpackItem | ModerationFlameModpackItem
+export interface ModerationIdentifiedModpackItem extends ModerationBaseModpackItem {
+  type: 'identified'
+  proof?: string
+  url?: string
+  title?: string
+}
+
+export type ModerationModpackItem =
+  | ModerationUnknownModpackItem
+  | ModerationFlameModpackItem
+  | ModerationIdentifiedModpackItem
 
 export interface ModerationModpackResponse {
+  identified?: Record<
+    string,
+    {
+      file_name: string
+      status: ModerationModpackPermissionApprovalType['id']
+    }
+  >
   unknown_files?: Record<string, string>
   flame_files?: Record<
     string,
@@ -404,8 +421,8 @@ export interface ModerationModpackResponse {
 }
 
 export interface ModerationJudgement {
-  type: 'flame' | 'unknown'
-  status: string
+  type: 'flame' | 'unknown' | 'identified'
+  status: string | null
   id?: string
   link?: string
   title?: string
