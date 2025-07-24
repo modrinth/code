@@ -276,7 +276,11 @@ pub async fn refund_charge(
             subscription_interval: charge.subscription_interval,
             payment_platform: charge.payment_platform,
             payment_platform_id: id,
-            parent_charge_id: Some(charge.id),
+            parent_charge_id: if refund_amount != 0 {
+                Some(charge.id)
+            } else {
+                None
+            },
             net,
         }
         .upsert(&mut transaction)
