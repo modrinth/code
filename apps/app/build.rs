@@ -52,11 +52,12 @@ fn main() {
                         "import_instance",
                         "is_valid_importable_instance",
                         "get_default_launcher_path",
+                        "fetch_curseforge_profile_metadata",
+                        "import_curseforge_profile",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
-                    )
-                    .permission("allow-fetch-curseforge-profile-metadata", DefaultPermissionRule::AllowAllCommands),
+                    ),
             )
             .plugin(
                 "jre",
