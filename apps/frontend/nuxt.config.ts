@@ -34,7 +34,7 @@ const enabledLocales: string[] = [];
 /**
  * Overrides for the categories of the certain locales.
  */
-const localesCategoriesOverrides: Partial<Record<string, "fun" | "experimental">> = {
+const localesCategoriesOverrides: Partial = {
   "en-x-pirate": "fun",
   "en-x-updown": "fun",
   "en-x-lolcat": "fun",
@@ -260,21 +260,28 @@ export default defineNuxtConfig({
         const omorphiaLocales: string[] = [];
         const omorphiaLocaleSets = new Map<string, { files: { from: string }[] }>();
 
-        for await (const localeDir of globIterate("node_modules/@modrinth/ui/src/locales/*", {
-          posix: true,
-        })) {
-          const tag = basename(localeDir);
-          omorphiaLocales.push(tag);
+        const externalLocales = [
+          "node_modules/@modrinth/ui/src/locales/en-US",
+          "node_modules/@modrinth/moderation/locales/en-US",
+        ];
 
-          const localeFiles: { from: string; format?: string }[] = [];
+        for (const localePath of externalLocales) {
+          for await (const localeDir of globIterate(localePath, {
+            posix: true,
+          })) {
+            const tag = basename(localeDir);
+            omorphiaLocales.push(tag);
 
-          omorphiaLocaleSets.set(tag, { files: localeFiles });
+            const localeFiles: { from: string; format?: string }[] = [];
 
-          for await (const localeFile of globIterate(`${localeDir}/*`, { posix: true })) {
-            localeFiles.push({
-              from: pathToFileURL(localeFile).toString(),
-              format: "default",
-            });
+            omorphiaLocaleSets.set(tag, { files: localeFiles });
+
+            for await (const localeFile of globIterate(`${localeDir}/*`, { posix: true })) {
+              localeFiles.push({
+                from: pathToFileURL(localeFile).toString(),
+                format: "default",
+              });
+            }
           }
         }
 
@@ -301,7 +308,7 @@ export default defineNuxtConfig({
               format: "crowdin",
             });
           } else if (fileName === "meta.json") {
-            const meta: Record<string, { message: string }> = await fs
+            const meta: Record = await fs
               .readFile(localeFile, "utf8")
               .then((date) => JSON.parse(date));
             const localeMeta = (locale.meta ??= {});
