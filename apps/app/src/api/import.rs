@@ -2,6 +2,11 @@ use std::path::PathBuf;
 
 use crate::api::Result;
 use theseus::pack::import::ImportLauncherType;
+use theseus::pack::import::curseforge_profile::{
+    CurseForgeProfileMetadata,
+    fetch_curseforge_profile_metadata as fetch_cf_metadata,
+    import_curseforge_profile as import_cf_profile,
+};
 
 use theseus::pack::import;
 
@@ -12,6 +17,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             import_instance,
             is_valid_importable_instance,
             get_default_launcher_path,
+            fetch_curseforge_profile_metadata,
+            import_curseforge_profile,
         ])
         .build()
 }
@@ -67,4 +74,25 @@ pub async fn get_default_launcher_path(
     launcher_type: ImportLauncherType,
 ) -> Result<Option<PathBuf>> {
     Ok(import::get_default_launcher_path(launcher_type))
+}
+
+/// Fetch CurseForge profile metadata from profile code
+/// eg: fetch_curseforge_profile_metadata("eSrNlKNo")
+#[tauri::command]
+pub async fn fetch_curseforge_profile_metadata(
+    profile_code: String,
+) -> Result<CurseForgeProfileMetadata> {
+    Ok(fetch_cf_metadata(&profile_code).await?)
+}
+
+/// Import a CurseForge profile from profile code
+/// profile_path should be a blank profile for this purpose- if the function fails, it will be deleted
+/// eg: import_curseforge_profile("profile-path", "eSrNlKNo")
+#[tauri::command]
+pub async fn import_curseforge_profile(
+    profile_path: String,
+    profile_code: String,
+) -> Result<()> {
+    import_cf_profile(&profile_code, &profile_path).await?;
+    Ok(())
 }

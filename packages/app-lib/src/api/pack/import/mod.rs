@@ -19,6 +19,7 @@ use crate::{
 
 pub mod atlauncher;
 pub mod curseforge;
+pub mod curseforge_profile;
 pub mod gdlauncher;
 pub mod mmc;
 

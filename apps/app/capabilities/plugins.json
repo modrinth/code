@@ -30,6 +30,8 @@
 
     "auth:default",
     "import:default",
+    "import:allow-fetch-curseforge-profile-metadata",
+    "import:allow-import-curseforge-profile",
     "jre:default",
     "logs:default",
     "metadata:default",
