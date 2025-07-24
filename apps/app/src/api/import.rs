@@ -87,7 +87,7 @@ pub async fn fetch_curseforge_profile_metadata(
 
 /// Import a CurseForge profile from profile code
 /// profile_path should be a blank profile for this purpose- if the function fails, it will be deleted
-/// eg: import_curseforge_profile("profile-path", "eSrNlKNo")
+/// eg: import_curseforge_profile("profile-path")
 #[tauri::command]
 pub async fn import_curseforge_profile(
     profile_path: String,
