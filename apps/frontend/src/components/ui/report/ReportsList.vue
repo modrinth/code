@@ -5,7 +5,7 @@
       There are at least {{ MAX_REPORTS }} open reports. This page is at its max reports and will
       not show any more recent ones.
     </p>
-    <p v-if="reasonFilter === 'All'">There are {{ filteredReports.length }} open reports.</p>
+    <p v-else-if="reasonFilter === 'All'">There are {{ filteredReports.length }} open reports.</p>
     <p v-else>
       There are {{ filteredReports.length }}/{{ reports.length }} open '{{ reasonFilter }}' reports.
     </p>
