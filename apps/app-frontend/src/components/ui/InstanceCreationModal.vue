@@ -164,6 +164,14 @@
       </div>
       <div class="button-row">
         <Button
+          v-if="selectedProfileType.name === 'Curseforge'"
+          @click="showCurseForgeProfileModal"
+          :disabled="loading"
+        >
+          <CodeIcon />
+          Import from Profile Code
+        </Button>
+        <Button
           :disabled="
             loading ||
             !Array.from(profiles.values())
@@ -194,10 +202,12 @@
       </div>
     </div>
   </ModalWrapper>
+  <CurseForgeProfileImportModal ref="curseforgeProfileModal" :close-parent="hide" />
 </template>
 
 <script setup>
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import CurseForgeProfileImportModal from '@/components/ui/CurseForgeProfileImportModal.vue'
 import {
   CodeIcon,
   FolderOpenIcon,
@@ -283,6 +293,11 @@ const hide = () => {
     unlistener.value = null
   }
 }
+
+const showCurseForgeProfileModal = () => {
+  curseforgeProfileModal.value?.show()
+}
+
 onUnmounted(() => {
   if (unlistener.value) {
     unlistener.value()
@@ -338,6 +353,7 @@ const game_versions = computed(() => {
 })
 
 const modal = ref(null)
+const curseforgeProfileModal = ref(null)
 
 const check_valid = computed(() => {
   return (
