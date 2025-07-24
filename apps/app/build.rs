@@ -55,7 +55,8 @@ fn main() {
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
-                    ),
+                    )
+                    .permission("allow-fetch-curseforge-profile-metadata", DefaultPermissionRule::AllowAllCommands),
             )
             .plugin(
                 "jre",
