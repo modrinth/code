@@ -55,28 +55,23 @@ pub struct CurseForgeProfileMetadata {
     pub download_url: String,
 }
 
-/// Fetch CurseForge profile metadata from profile code
 pub async fn fetch_curseforge_profile_metadata(
     profile_code: &str,
 ) -> crate::Result<CurseForgeProfileMetadata> {
     let state = State::get().await?;
 
-    // Make initial request to get redirect URL
     let url = format!(
         "https://api.curseforge.com/v1/shared-profile/{}",
         profile_code
     );
 
-    // Try to fetch the profile - the CurseForge API should redirect to the ZIP file
     let response = fetch(&url, None, &state.fetch_semaphore, &state.pool).await;
 
     let download_url = match response {
         Ok(_bytes) => {
-            // If we get bytes back, use the original URL
             url
         }
         Err(e) => {
-            // If we get an error, it might contain redirect information
             let error_msg = format!("{:?}", e);
             if let Some(redirect_start) =
                 error_msg.find("https://shared-profile-media.forgecdn.net/")
@@ -96,11 +91,9 @@ pub async fn fetch_curseforge_profile_metadata(
         }
     };
 
-    // Now fetch the ZIP file and extract the name from manifest.json
     let zip_bytes =
         fetch(&download_url, None, &state.fetch_semaphore, &state.pool).await?;
 
-    // Create a cursor for the ZIP data
     let cursor = std::io::Cursor::new(zip_bytes);
     let mut zip_reader =
         ZipFileReader::with_tokio(cursor).await.map_err(|e| {
@@ -110,7 +103,6 @@ pub async fn fetch_curseforge_profile_metadata(
             ))
         })?;
 
-    // Find and extract manifest.json
     let manifest_index = zip_reader
         .file()
         .entries()
@@ -137,7 +129,6 @@ pub async fn fetch_curseforge_profile_metadata(
 
     reader.read_to_string_checked(&mut manifest_content).await?;
 
-    // Parse the manifest to get the actual name
     let manifest: CurseForgeManifest = serde_json::from_str(&manifest_content)?;
 
     let profile_name = if manifest.name.is_empty() {
@@ -152,7 +143,6 @@ pub async fn fetch_curseforge_profile_metadata(
     })
 }
 
-/// Import a CurseForge profile from profile code
 pub async fn import_curseforge_profile(
     profile_code: &str,
     profile_path: &str,
@@ -169,7 +159,6 @@ pub async fn import_curseforge_profile(
     )
     .await?;
 
-    // First, fetch the profile metadata to get the download URL
     crate::event::emit::emit_loading(
         &loading_bar,
         10.0,
@@ -177,7 +166,6 @@ pub async fn import_curseforge_profile(
     )?;
     let metadata = fetch_curseforge_profile_metadata(profile_code).await?;
 
-    // Download the profile ZIP file
     crate::event::emit::emit_loading(
         &loading_bar,
         5.0,
@@ -191,7 +179,6 @@ pub async fn import_curseforge_profile(
     )
     .await?;
 
-    // Create a cursor for the ZIP data
     crate::event::emit::emit_loading(
         &loading_bar,
         5.0,
@@ -206,7 +193,6 @@ pub async fn import_curseforge_profile(
             ))
         })?;
 
-    // Find and extract manifest.json
     let manifest_index = zip_reader
         .file()
         .entries()
@@ -233,7 +219,6 @@ pub async fn import_curseforge_profile(
 
     reader.read_to_string_checked(&mut manifest_content).await?;
 
-    // Parse the manifest
     crate::event::emit::emit_loading(
         &loading_bar,
         5.0,
@@ -241,7 +226,6 @@ pub async fn import_curseforge_profile(
     )?;
     let manifest: CurseForgeManifest = serde_json::from_str(&manifest_content)?;
 
-    // Determine modloader and version
     crate::event::emit::emit_loading(
         &loading_bar,
         5.0,
@@ -259,7 +243,6 @@ pub async fn import_curseforge_profile(
 
     let game_version = manifest.minecraft.version.clone();
 
-    // Get appropriate loader version if needed
     let final_loader_version = if mod_loader != ModLoader::Vanilla {
         crate::launcher::get_loader_version_from_profile(
             &game_version,
@@ -271,7 +254,6 @@ pub async fn import_curseforge_profile(
         None
     };
 
-    // Set profile data
     crate::api::profile::edit(profile_path, |prof| {
         prof.name = if manifest.name.is_empty() {
             format!("CurseForge Profile {}", profile_code)
@@ -283,7 +265,6 @@ pub async fn import_curseforge_profile(
         prof.loader_version = final_loader_version.clone().map(|x| x.id);
         prof.loader = mod_loader;
 
-        // Set linked data for modpack management
         prof.linked_data = Some(LinkedData {
             project_id: String::new(),
             version_id: String::new(),
@@ -294,14 +275,12 @@ pub async fn import_curseforge_profile(
     })
     .await?;
 
-    // Create a temporary directory to extract overrides
     let temp_dir = state
         .directories
         .caches_dir()
         .join(format!("curseforge_profile_{}", profile_code));
     tokio::fs::create_dir_all(&temp_dir).await?;
 
-    // Extract overrides directory if it exists
     crate::event::emit::emit_loading(
         &loading_bar,
         10.0,
@@ -329,19 +308,16 @@ pub async fn import_curseforge_profile(
             .collect()
     };
 
-    // Now extract each file
     for (index, file_path) in entries_to_extract {
         let relative_path = file_path
             .strip_prefix(&format!("{}/", manifest.overrides))
             .unwrap();
         let output_path = overrides_dir.join(relative_path);
 
-        // Create parent directories
         if let Some(parent) = output_path.parent() {
             tokio::fs::create_dir_all(parent).await?;
         }
 
-        // Extract file
         let mut reader =
             zip_reader.reader_with_entry(index).await.map_err(|e| {
                 crate::ErrorKind::InputError(format!(
@@ -356,7 +332,6 @@ pub async fn import_curseforge_profile(
         tokio::fs::write(&output_path, file_content).await?;
     }
 
-    // Copy overrides to profile
     crate::event::emit::emit_loading(
         &loading_bar,
         5.0,
@@ -370,7 +345,6 @@ pub async fn import_curseforge_profile(
     )
     .await?;
 
-    // Download and install mods from CurseForge
     crate::event::emit::emit_loading(
         &loading_bar,
         10.0,
@@ -387,7 +361,6 @@ pub async fn import_curseforge_profile(
     // Clean up temporary directory
     tokio::fs::remove_dir_all(&temp_dir).await.ok();
 
-    // Install Minecraft if needed
     crate::event::emit::emit_loading(
         &loading_bar,
         20.0,
@@ -402,7 +375,6 @@ pub async fn import_curseforge_profile(
         .await?;
     }
 
-    // Mark the profile as fully installed
     crate::event::emit::emit_loading(
         &loading_bar,
         20.0,
@@ -414,7 +386,6 @@ pub async fn import_curseforge_profile(
     })
     .await?;
 
-    // Emit profile sync event to trigger file system watcher refresh
     crate::event::emit::emit_profile(profile_path, ProfilePayloadType::Synced)
         .await?;
 
@@ -428,7 +399,6 @@ pub async fn import_curseforge_profile(
     Ok(())
 }
 
-/// Parse CurseForge modloader ID into ModLoader and version
 fn parse_modloader(id: &str) -> (ModLoader, Option<String>) {
     if id.starts_with("forge-") {
         let version = id.strip_prefix("forge-").unwrap_or("").to_string();
@@ -447,7 +417,6 @@ fn parse_modloader(id: &str) -> (ModLoader, Option<String>) {
     }
 }
 
-/// Install mods from CurseForge files list
 async fn install_curseforge_mods(
     files: &[CurseForgeFile],
     profile_path: &str,
@@ -463,7 +432,6 @@ async fn install_curseforge_mods(
 
     // Download mods sequentially to track progress properly
     for (index, file) in files.iter().enumerate() {
-        // Update progress message with current mod
         let progress_message =
             format!("Downloading mod {} of {}", index + 1, num_files);
         crate::event::emit::emit_loading(
@@ -486,26 +454,22 @@ async fn install_curseforge_mods(
     Ok(())
 }
 
-/// Download a single mod from CurseForge
 async fn download_curseforge_mod(
     file: &CurseForgeFile,
     profile_path: &str,
     _state: &State,
 ) -> crate::Result<()> {
-    // Log the download attempt
     tracing::info!(
         "Downloading CurseForge mod: project_id={}, file_id={}",
         file.project_id,
         file.file_id
     );
 
-    // Get profile path and create mods directory first
     let profile_full_path =
         crate::api::profile::get_full_path(profile_path).await?;
     let mods_dir = profile_full_path.join("mods");
     tokio::fs::create_dir_all(&mods_dir).await?;
 
-    // First, get the file metadata to get the correct filename
     let metadata_url = format!(
         "https://www.curseforge.com/api/v1/mods/{}/files/{}",
         file.project_id, file.file_id
@@ -532,7 +496,6 @@ async fn download_curseforge_mod(
         .into());
     }
 
-    // Parse the metadata JSON to get the filename
     let metadata_json: serde_json::Value =
         metadata_response.json().await.map_err(|e| {
             crate::ErrorKind::InputError(format!(
@@ -553,7 +516,6 @@ async fn download_curseforge_mod(
 
     tracing::info!("Original filename: {}", original_filename);
 
-    // Now download the mod using the direct download URL
     let download_url = format!(
         "https://www.curseforge.com/api/v1/mods/{}/files/{}/download",
         file.project_id, file.file_id
@@ -578,7 +540,6 @@ async fn download_curseforge_mod(
         .into());
     }
 
-    // Write the file with its original name
     let final_path = mods_dir.join(&original_filename);
     let bytes = response.bytes().await.map_err(|e| {
         crate::ErrorKind::InputError(format!(
