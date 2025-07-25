@@ -25,6 +25,7 @@ on:
 jobs:
   build:
     name: Build
+    if: github.repository == 'modrinth/code'
     strategy:
       fail-fast: false
       matrix:
@@ -96,61 +97,47 @@ jobs:
         if: startsWith(matrix.platform, 'windows')
         shell: bash
         run: |
-          if [ '${{ startsWith(github.ref, 'refs/tags/v') || inputs.sign-windows-binaries }}' = 'true' ] && [ '${{ github.repository }}' = 'modrinth/code' ]; then
+          if [ '${{ startsWith(github.ref, 'refs/tags/v') || inputs.sign-windows-binaries }}' = 'true' ]; then
             choco install jsign --ignore-dependencies # GitHub runners come with a global Java installation already
           else
             dasel delete -f apps/app/tauri-release.conf.json 'bundle.windows.signCommand'
           fi
 
       - name: 🔨 Build macOS app
-        run: |
-          if [ '${{ github.repository }}' = 'modrinth/code' ]; then
-            pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json
-          else
-            pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json --bundles app
-          fi
+        run: pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json
         if: startsWith(matrix.platform, 'macos')
         env:
-          ENABLE_CODE_SIGNING: ${{ github.repository == 'modrinth/code' && secrets.APPLE_CERTIFICATE || '' }}
-          APPLE_CERTIFICATE: ${{ github.repository == 'modrinth/code' && secrets.APPLE_CERTIFICATE || '' }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ github.repository == 'modrinth/code' && secrets.APPLE_CERTIFICATE_PASSWORD || '' }}
-          APPLE_SIGNING_IDENTITY: ${{ github.repository == 'modrinth/code' && secrets.APPLE_SIGNING_IDENTITY || '' }}
-          APPLE_ID: ${{ github.repository == 'modrinth/code' && secrets.APPLE_ID || '' }}
-          APPLE_TEAM_ID: ${{ github.repository == 'modrinth/code' && secrets.APPLE_TEAM_ID || '' }}
-          APPLE_PASSWORD: ${{ github.repository == 'modrinth/code' && secrets.APPLE_PASSWORD || '' }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ github.repository == 'modrinth/code' && secrets.TAURI_PRIVATE_KEY || '' }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ github.repository == 'modrinth/code' && secrets.TAURI_KEY_PASSWORD || '' }}
+          ENABLE_CODE_SIGNING: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
       - name: 🔨 Build Linux app
-        run: |
-          if [ '${{ github.repository }}' = 'modrinth/code' ]; then
-            pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json
-          else
-            pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json --bundles appimage,deb
-          fi
+        run: pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json
         if: startsWith(matrix.platform, 'ubuntu')
         env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ github.repository == 'modrinth/code' && secrets.TAURI_PRIVATE_KEY || '' }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ github.repository == 'modrinth/code' && secrets.TAURI_KEY_PASSWORD || '' }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
       - name: 🔨 Build Windows app
         run: |
-          if ('${{ github.repository }}' -eq 'modrinth/code') {
-            [System.Convert]::FromBase64String("$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64") | Set-Content -Path signer-client-cert.p12 -AsByteStream
-            $env:DIGICERT_ONE_SIGNER_CREDENTIALS = "$env:DIGICERT_ONE_SIGNER_API_KEY|$PWD\signer-client-cert.p12|$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD"
-            $env:JAVA_HOME = "$env:JAVA_HOME_11_X64"
-            pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json --verbose --bundles 'nsis,updater'
-            Remove-Item -Path signer-client-cert.p12 -ErrorAction SilentlyContinue
-          } else {
-            pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json --verbose --bundles 'nsis'
-          }
+          [System.Convert]::FromBase64String("$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64") | Set-Content -Path signer-client-cert.p12 -AsByteStream
+          $env:DIGICERT_ONE_SIGNER_CREDENTIALS = "$env:DIGICERT_ONE_SIGNER_API_KEY|$PWD\signer-client-cert.p12|$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD"
+          $env:JAVA_HOME = "$env:JAVA_HOME_11_X64"
+          pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json --verbose --bundles 'nsis,updater'
+          Remove-Item -Path signer-client-cert.p12 -ErrorAction SilentlyContinue
         if: startsWith(matrix.platform, 'windows')
         env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ github.repository == 'modrinth/code' && secrets.TAURI_PRIVATE_KEY || '' }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ github.repository == 'modrinth/code' && secrets.TAURI_KEY_PASSWORD || '' }}
-          DIGICERT_ONE_SIGNER_API_KEY: ${{ github.repository == 'modrinth/code' && secrets.DIGICERT_ONE_SIGNER_API_KEY || '' }}
-          DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64: ${{ github.repository == 'modrinth/code' && secrets.DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64 || '' }}
-          DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD: ${{ github.repository == 'modrinth/code' && secrets.DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD || '' }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          DIGICERT_ONE_SIGNER_API_KEY: ${{ secrets.DIGICERT_ONE_SIGNER_API_KEY }}
+          DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64: ${{ secrets.DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64 }}
+          DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD: ${{ secrets.DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD }}
 
       - name: 📤 Upload app bundles
         uses: actions/upload-artifact@v4
@@ -163,4 +150,4 @@ jobs:
             target/universal-apple-darwin/release/bundle/macos/Modrinth App.app.tar.gz*
             target/universal-apple-darwin/release/bundle/dmg/Modrinth App_*.dmg*
             target/release/bundle/nsis/Modrinth App_*-setup.exe*
-            ${{ github.repository == 'modrinth/code' && 'target/release/bundle/nsis/Modrinth App_*-setup.nsis.zip*' || '' }}
+            target/release/bundle/nsis/Modrinth App_*-setup.nsis.zip*
