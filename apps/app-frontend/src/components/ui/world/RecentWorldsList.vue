@@ -122,11 +122,8 @@ async function populateJumpBackIn() {
       }
     })
 
-    // fetch each server's data
-    Promise.all(
-      servers.map(({ instancePath, address }) =>
-        refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address),
-      ),
+    servers.forEach(({ instancePath, address }) =>
+      refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address),
     )
   }
 
@@ -151,8 +148,8 @@ async function populateJumpBackIn() {
     .slice(0, MAX_JUMP_BACK_IN)
 }
 
-async function refreshServer(address: string, instancePath: string) {
-  await refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address)
+function refreshServer(address: string, instancePath: string) {
+  refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address)
 }
 
 async function joinWorld(world: WorldWithProfile) {

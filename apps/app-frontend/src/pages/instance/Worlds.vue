@@ -249,7 +249,7 @@ async function refreshAllWorlds() {
   worlds.value = await refreshWorlds(instance.value.path).finally(
     () => (refreshingAll.value = false),
   )
-  await refreshServers(worlds.value, serverData.value, protocolVersion.value)
+  refreshServers(worlds.value, serverData.value, protocolVersion.value)
 
   const hasNoWorlds = worlds.value.length === 0
 
