@@ -109,7 +109,8 @@ const serverIncompatible = computed(
     !!props.serverStatus &&
     !!props.serverStatus.version?.protocol &&
     !!props.currentProtocol &&
-    props.serverStatus.version.protocol !== props.currentProtocol.version,
+    (props.serverStatus.version.protocol !== props.currentProtocol.version ||
+      props.serverStatus.version.legacy !== props.currentProtocol.legacy),
 )
 
 const locked = computed(() => props.world.type === 'singleplayer' && props.world.locked)

@@ -51,6 +51,7 @@ export type ServerStatus = {
   version?: {
     name: string
     protocol: number
+    legacy: boolean
   }
   favicon?: string
   enforces_secure_chat: boolean

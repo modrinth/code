@@ -5,7 +5,8 @@ use crate::state::attached_world_data::AttachedWorldData;
 use crate::state::{
     Profile, ProfileInstallStage, attached_world_data, server_join_log,
 };
-use crate::util::protocol_version::{OLD_PROTOCOL_VERSIONS, ProtocolVersion};
+use crate::util::protocol_version::OLD_PROTOCOL_VERSIONS;
+pub use crate::util::protocol_version::ProtocolVersion;
 pub use crate::util::server_ping::{
     ServerGameProfile, ServerPlayers, ServerStatus, ServerVersion,
 };
@@ -912,7 +913,7 @@ pub async fn get_server_status(
     server_ping::get_server_status(
         &(&host as &str, port),
         (original_host, original_port),
-        protocol_version.filter(|v| !v.legacy).map(|v| v.version),
+        protocol_version,
     )
     .await
 }
