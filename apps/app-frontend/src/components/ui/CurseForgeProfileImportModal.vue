@@ -21,49 +21,41 @@
           </Button>
         </div>
       </div>
-      
+
       <div v-if="metadata && !importing" class="profile-info">
         <h3>Profile Information</h3>
         <p><strong>Name:</strong> {{ metadata.name }}</p>
       </div>
-      
+
       <div v-if="error" class="error-message">
         <p>{{ error }}</p>
       </div>
-      
+
       <div v-if="importing && importProgress.visible" class="progress-section">
         <div class="progress-info">
           <span class="progress-text">{{ importProgress.message }}</span>
           <span class="progress-percentage">{{ Math.floor(importProgress.percentage) }}%</span>
         </div>
         <div class="progress-bar-container">
-          <div
-            class="progress-bar" 
-            :style="{ width: `${importProgress.percentage}%` }"
-          ></div>
+          <div class="progress-bar" :style="{ width: `${importProgress.percentage}%` }"></div>
         </div>
       </div>
-      
+
       <div class="button-row">
         <Button :disabled="importing" @click="hide">
           <XIcon />
           Cancel
         </Button>
-        <Button 
-          v-if="!metadata" 
+        <Button
+          v-if="!metadata"
           :disabled="!profileCode.trim() || fetching"
           color="secondary"
-          @click="fetchMetadata" 
+          @click="fetchMetadata"
         >
           <SearchIcon v-if="!fetching" />
           {{ fetching ? 'Checking...' : 'Check Profile' }}
         </Button>
-        <Button 
-          v-if="metadata" 
-          :disabled="importing"
-          color="primary"
-          @click="importProfile" 
-        >
+        <Button v-if="metadata" :disabled="importing" color="primary" @click="importProfile">
           <DownloadIcon v-if="!importing" />
           {{ importing ? 'Importing...' : 'Import Profile' }}
         </Button>
@@ -77,15 +69,8 @@ import { ref, nextTick, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { Button } from '@modrinth/ui'
-import { 
-  XIcon, 
-  SearchIcon, 
-  DownloadIcon 
-} from '@modrinth/assets'
-import { 
-  fetch_curseforge_profile_metadata, 
-  import_curseforge_profile 
-} from '@/helpers/import.js'
+import { XIcon, SearchIcon, DownloadIcon } from '@modrinth/assets'
+import { fetch_curseforge_profile_metadata, import_curseforge_profile } from '@/helpers/import.js'
 import { handleError } from '@/store/notifications.js'
 import { trackEvent } from '@/helpers/analytics'
 import { loading_listener } from '@/helpers/events.js'
@@ -93,8 +78,8 @@ import { loading_listener } from '@/helpers/events.js'
 const props = defineProps({
   closeParent: {
     type: Function,
-    default: null
-  }
+    default: null,
+  },
 })
 
 const router = useRouter()
@@ -110,7 +95,7 @@ const importProgress = ref({
   percentage: 0,
   message: 'Starting import...',
   totalMods: 0,
-  downloadedMods: 0
+  downloadedMods: 0,
 })
 
 let unlistenLoading = null
@@ -129,16 +114,16 @@ defineExpose({
       percentage: 0,
       message: 'Starting import...',
       totalMods: 0,
-      downloadedMods: 0
+      downloadedMods: 0,
     }
     modal.value?.show()
-    
+
     nextTick(() => {
       setTimeout(() => {
         codeInput.value?.focus()
       }, 100)
     })
-    
+
     trackEvent('CurseForgeProfileImportStart', { source: 'ImportModal' })
   },
 })
@@ -149,15 +134,15 @@ const hide = () => {
 
 const fetchMetadata = async () => {
   if (!profileCode.value.trim()) return
-  
+
   fetching.value = true
   error.value = ''
-  
+
   try {
     const result = await fetch_curseforge_profile_metadata(profileCode.value.trim())
     metadata.value = result
-    trackEvent('CurseForgeProfileMetadataFetched', { 
-      profileCode: profileCode.value.trim() 
+    trackEvent('CurseForgeProfileMetadataFetched', {
+      profileCode: profileCode.value.trim(),
     })
   } catch (err) {
     console.error('Failed to fetch CurseForge profile metadata:', err)
@@ -170,7 +155,7 @@ const fetchMetadata = async () => {
 
 const importProfile = async () => {
   if (!profileCode.value.trim()) return
-  
+
   importing.value = true
   error.value = ''
   activeLoadingBarId = null // Reset for new import session
@@ -179,9 +164,9 @@ const importProfile = async () => {
     percentage: 0,
     message: 'Starting import...',
     totalMods: 0,
-    downloadedMods: 0
+    downloadedMods: 0,
   }
-  
+
   // Fallback progress timer in case loading events don't work
   progressFallbackTimer = setInterval(() => {
     if (importing.value && importProgress.value.percentage < 90) {
@@ -189,21 +174,21 @@ const importProfile = async () => {
       importProgress.value.percentage = Math.min(90, importProgress.value.percentage + 1)
     }
   }, 1000)
-  
+
   try {
     const { profilePath } = await import_curseforge_profile(profileCode.value.trim())
-    
-    trackEvent('CurseForgeProfileImported', { 
-      profileCode: profileCode.value.trim() 
+
+    trackEvent('CurseForgeProfileImported', {
+      profileCode: profileCode.value.trim(),
     })
-    
+
     hide()
-    
+
     // Close the parent modal if provided
     if (props.closeParent) {
       props.closeParent()
     }
-    
+
     // Navigate to the imported profile
     await router.push(`/instance/${encodeURIComponent(profilePath)}`)
   } catch (err) {
@@ -225,30 +210,33 @@ onMounted(async () => {
   // Listen for loading events to update progress
   unlistenLoading = await loading_listener((event) => {
     console.log('Loading event received:', event) // Debug log
-    
+
     // Handle all loading events that could be related to CurseForge profile import
     const isCurseForgeEvent = event.event?.type === 'curseforge_profile_download'
     const hasProfileName = event.event?.profile_name && importing.value
-    
+
     if ((isCurseForgeEvent || hasProfileName) && importing.value) {
       // Store the loading bar ID for this import session
       if (!activeLoadingBarId) {
         activeLoadingBarId = event.loader_uuid
       }
-      
+
       // Only process events for our current import session
       if (event.loader_uuid === activeLoadingBarId) {
         if (event.fraction !== null && event.fraction !== undefined) {
           const baseProgress = (event.fraction || 0) * 100
-          
+
           // Calculate custom progress based on the message
           let finalProgress = baseProgress
           const message = event.message || 'Importing profile...'
-          
+
           // Custom progress calculation for different stages
           if (message.includes('Fetching') || message.includes('metadata')) {
             finalProgress = Math.min(10, baseProgress)
-          } else if (message.includes('Downloading profile ZIP') || message.includes('profile ZIP')) {
+          } else if (
+            message.includes('Downloading profile ZIP') ||
+            message.includes('profile ZIP')
+          ) {
             finalProgress = Math.min(15, 10 + (baseProgress - 10) * 0.5)
           } else if (message.includes('Extracting') || message.includes('ZIP')) {
             finalProgress = Math.min(20, 15 + (baseProgress - 15) * 0.5)
@@ -279,7 +267,7 @@ onMounted(async () => {
             // Default: use the base progress but ensure minimum progression
             finalProgress = Math.max(importProgress.value.percentage, baseProgress)
           }
-          
+
           importProgress.value.percentage = Math.min(100, Math.max(0, finalProgress))
           importProgress.value.message = message
         } else {
@@ -328,12 +316,12 @@ onUnmounted(() => {
   border: 1px solid var(--color-button);
   border-radius: var(--radius-md);
   padding: 1rem;
-  
+
   h3 {
     margin: 0 0 0.5rem 0;
     color: var(--color-contrast);
   }
-  
+
   p {
     margin: 0.25rem 0;
     color: var(--color-base);
@@ -345,7 +333,7 @@ onUnmounted(() => {
   border: 1px solid var(--color-red);
   border-radius: var(--radius-md);
   padding: 0.75rem;
-  
+
   p {
     margin: 0;
     color: var(--color-contrast);
@@ -363,12 +351,12 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  
+
   .progress-text {
     color: var(--color-base);
     font-size: 0.875rem;
   }
-  
+
   .progress-percentage {
     color: var(--color-contrast);
     font-size: 0.875rem;
