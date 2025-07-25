@@ -2,6 +2,7 @@ export * from './types/actions'
 export * from './types/messages'
 export * from './types/stage'
 export * from './types/keybinds'
+export * from './types/reports'
 export * from './utils'
 
 export { finalPermissionMessages } from './data/modpack-permissions-stage'
