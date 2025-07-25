@@ -24,4 +24,5 @@ export interface ReportQuickReply {
   label: string
   message: string | ((report: ExtendedReport) => string)
   shouldShow?: (report: ExtendedReport) => boolean
+  private?: boolean
 }

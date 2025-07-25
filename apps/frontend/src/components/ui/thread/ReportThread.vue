@@ -22,7 +22,7 @@
       />
     </div>
 
-    <template v-if="report && report.closed">
+    <template v-if="reportClosed">
       <p class="text-secondary">This thread is closed and new messages cannot be sent to it.</p>
       <ButtonStyled v-if="isStaff(auth.user)" color="green" class="mt-2 w-full sm:w-auto">
         <button
@@ -35,7 +35,7 @@
       </ButtonStyled>
     </template>
 
-    <template v-else-if="!report || !report.closed">
+    <template v-else>
       <div class="mt-4">
         <MarkdownEditor
           v-model="replyBody"
@@ -227,6 +227,11 @@ async function sendReply(privateMessage = false) {
   }
 }
 
+const didCloseReport = ref(false);
+const reportClosed = computed(() => {
+  return didCloseReport.value || (props.report && props.report.closed);
+});
+
 async function closeReport(reply = false) {
   if (reply) {
     await sendReply();
@@ -240,6 +245,7 @@ async function closeReport(reply = false) {
       },
     });
     await updateThreadLocal();
+    didCloseReport.value = true;
   } catch (err: any) {
     addNotification({
       title: "Error closing report",
