@@ -243,11 +243,14 @@ mod legacy {
         original_address: (&str, u16),
         protocol_version: Option<u8>,
     ) -> crate::Result<ServerStatus> {
-        let protocol_version = protocol_version.unwrap_or(0x4a);
+        let protocol_version = protocol_version.unwrap_or(74);
 
         let mut packet = vec![0xfe];
         if protocol_version >= 47 {
-            packet.extend_from_slice(&[0x01, 0xfa]);
+            packet.push(0x01);
+        }
+        if protocol_version >= 73 {
+            packet.push(0xfa);
             write_legacy(&mut packet, "MC|PingHost");
 
             let (host, port) = original_address;
