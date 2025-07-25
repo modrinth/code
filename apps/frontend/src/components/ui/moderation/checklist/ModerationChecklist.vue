@@ -42,9 +42,9 @@
         <div v-if="done">
           <p>
             You are done moderating this project!
-            <template v-if="futureProjectCount > 0">
+            <template v-if="moderationStore.hasItems">
               There are
-              {{ futureProjectCount }} left.
+              {{ moderationStore.queueLength }} left.
             </template>
           </p>
         </div>
@@ -215,26 +215,26 @@
           class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
         >
           <div class="flex items-center gap-2">
-            <ButtonStyled v-if="!done && !generatedMessage && futureProjectCount > 0">
-              <button @click="goToNextProject">
+            <ButtonStyled v-if="!done && !generatedMessage && moderationStore.hasItems">
+              <button @click="skipCurrentProject">
                 <XIcon aria-hidden="true" />
-                Skip
+                Skip ({{ moderationStore.queueLength }} left)
               </button>
             </ButtonStyled>
           </div>
 
           <div class="flex items-center gap-2">
             <div v-if="done">
-              <ButtonStyled v-if="futureProjectCount > 0" color="brand">
-                <button @click="goToNextProject">
-                  <RightArrowIcon aria-hidden="true" />
-                  Next Project
-                </button>
-              </ButtonStyled>
-              <ButtonStyled v-else color="brand">
-                <button @click="exitModeration">
-                  <CheckIcon aria-hidden="true" />
-                  Done
+              <ButtonStyled color="brand">
+                <button @click="endChecklist(undefined)">
+                  <template v-if="hasNextProject">
+                    <RightArrowIcon aria-hidden="true" />
+                    Next Project ({{ moderationStore.queueLength }} left)
+                  </template>
+                  <template v-else>
+                    <CheckIcon aria-hidden="true" />
+                    All Done!
+                  </template>
                 </button>
               </ButtonStyled>
             </div>
@@ -370,27 +370,19 @@ import {
 import * as prettier from "prettier";
 import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
 import KeybindsModal from "./ChecklistKeybindsModal.vue";
+import { useModerationStore } from "~/store/moderation.ts";
 
 const keybindsModal = ref<InstanceType<typeof KeybindsModal>>();
 
-const props = withDefaults(
-  defineProps<{
-    project: Project;
-    futureProjectIds?: string[];
-    collapsed: boolean;
-  }>(),
-  {
-    futureProjectIds: () => [] as string[],
-  },
-);
+const props = defineProps<{
+  project: Project;
+  collapsed: boolean;
+}>();
+
+const moderationStore = useModerationStore();
 
 const variables = computed(() => {
   return flattenProjectVariables(props.project);
-});
-
-const futureProjectCount = computed(() => {
-  const ids = JSON.parse(localStorage.getItem("moderation-future-projects") || "[]");
-  return ids.length;
 });
 
 const modpackPermissionsComplete = ref(false);
@@ -516,7 +508,7 @@ function handleKeybinds(event: KeyboardEvent) {
         isLoadingMessage: loadingMessage.value,
         isModpackPermissionsStage: isModpackPermissionsStage.value,
 
-        futureProjectCount: futureProjectCount.value,
+        futureProjectCount: moderationStore.queueLength,
         visibleActionsCount: visibleActions.value.length,
 
         focusedActionIndex: focusedActionIndex.value,
@@ -529,7 +521,7 @@ function handleKeybinds(event: KeyboardEvent) {
         tryGoNext: nextStage,
         tryGoBack: previousStage,
         tryGenerateMessage: generateMessage,
-        trySkipProject: goToNextProject,
+        trySkipProject: skipCurrentProject,
 
         tryToggleCollapse: () => emit("toggleCollapsed"),
         tryResetProgress: resetProgress,
@@ -1056,7 +1048,7 @@ function nextStage() {
   if (isModpackPermissionsStage.value && !modpackPermissionsComplete.value) {
     addNotification({
       title: "Modpack permissions stage unfinished",
-      message: "Please complete the modpack permissions stage before proceeding.",
+      text: "Please complete the modpack permissions stage before proceeding.",
       type: "error",
     });
 
@@ -1133,7 +1125,7 @@ async function generateMessage() {
     console.error("Error generating message:", error);
     addNotification({
       title: "Error generating message",
-      message: "Failed to generate moderation message. Please try again.",
+      text: "Failed to generate moderation message. Please try again.",
       type: "error",
     });
   } finally {
@@ -1202,6 +1194,7 @@ function generateModpackMessage(allFiles: {
   return issues.join("\n\n");
 }
 
+const hasNextProject = ref(false);
 async function sendMessage(status: "approved" | "rejected" | "withheld") {
   try {
     await useBaseFetch(`project/${props.project.id}`, {
@@ -1236,55 +1229,73 @@ async function sendMessage(status: "approved" | "rejected" | "withheld") {
 
     done.value = true;
 
-    // Clear local storage for future reviews
-    localStorage.removeItem(`modpack-permissions-${props.project.id}`);
-    localStorage.removeItem(`modpack-permissions-index-${props.project.id}`);
-    localStorage.removeItem(`moderation-actions-${props.project.slug}`);
-    localStorage.removeItem(`moderation-inputs-${props.project.slug}`);
-    actionStates.value = {};
-
-    addNotification({
-      title: "Moderation submitted",
-      message: `Project ${status} successfully.`,
-      type: "success",
-    });
+    hasNextProject.value = await moderationStore.completeCurrentProject(
+      props.project.id,
+      "completed",
+    );
   } catch (error) {
     console.error("Error submitting moderation:", error);
     addNotification({
       title: "Error submitting moderation",
-      message: "Failed to submit moderation decision. Please try again.",
+      text: "Failed to submit moderation decision. Please try again.",
       type: "error",
     });
   }
 }
 
-async function goToNextProject() {
-  const currentIds = JSON.parse(localStorage.getItem("moderation-future-projects") || "[]");
+async function endChecklist(status?: string) {
+  clearProjectLocalStorage();
 
-  if (currentIds.length === 0) {
-    await navigateTo("/moderation/review");
-    return;
+  if (!hasNextProject.value) {
+    await navigateTo({
+      name: "moderation",
+      state: {
+        confetti: true,
+      },
+    });
+
+    await nextTick();
+
+    if (moderationStore.currentQueue.total > 1) {
+      addNotification({
+        title: "Moderation completed",
+        text: `You have completed the moderation queue.`,
+        type: "success",
+      });
+    } else {
+      addNotification({
+        title: "Moderation submitted",
+        text: `Project ${status ?? "completed successfully"}.`,
+        type: "success",
+      });
+    }
+  } else {
+    navigateTo({
+      name: "type-id",
+      params: {
+        type: "project",
+        id: moderationStore.getCurrentProjectId(),
+      },
+      state: {
+        showChecklist: true,
+      },
+    });
   }
-
-  const nextProjectId = currentIds[0];
-  const remainingIds = currentIds.slice(1);
-
-  localStorage.setItem("moderation-future-projects", JSON.stringify(remainingIds));
-
-  await router.push({
-    name: "type-id",
-    params: {
-      type: "project",
-      id: nextProjectId,
-    },
-    state: {
-      showChecklist: true,
-    },
-  });
 }
 
-async function exitModeration() {
-  await navigateTo("/moderation/review");
+async function skipCurrentProject() {
+  hasNextProject.value = await moderationStore.completeCurrentProject(props.project.id, "skipped");
+
+  await endChecklist("skipped");
+}
+
+function clearProjectLocalStorage() {
+  localStorage.removeItem(`modpack-permissions-${props.project.id}`);
+  localStorage.removeItem(`modpack-permissions-index-${props.project.id}`);
+  localStorage.removeItem(`moderation-actions-${props.project.slug}`);
+  localStorage.removeItem(`moderation-inputs-${props.project.slug}`);
+  localStorage.removeItem(`moderation-stage-${props.project.slug}`);
+  actionStates.value = {};
 }
 
 const isLastVisibleStage = computed(() => {
