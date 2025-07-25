@@ -62,10 +62,8 @@ pub async fn fetch_curseforge_profile_metadata(
     let state = State::get().await?;
 
     // Make initial request to get redirect URL
-    let url = format!(
-        "https://api.curseforge.com/v1/shared-profile/{}",
-        profile_code
-    );
+    let url =
+        format!("https://api.curseforge.com/v1/shared-profile/{profile_code}");
 
     // Try to fetch the profile - the CurseForge API should redirect to the ZIP file
     let response = fetch(&url, None, &state.fetch_semaphore, &state.pool).await;
@@ -77,7 +75,7 @@ pub async fn fetch_curseforge_profile_metadata(
         }
         Err(e) => {
             // If we get an error, it might contain redirect information
-            let error_msg = format!("{:?}", e);
+            let error_msg = format!("{e:?}");
             if let Some(redirect_start) =
                 error_msg.find("https://shared-profile-media.forgecdn.net/")
             {
@@ -88,8 +86,7 @@ pub async fn fetch_curseforge_profile_metadata(
                     .to_string()
             } else {
                 return Err(crate::ErrorKind::InputError(format!(
-                    "Failed to fetch CurseForge profile metadata: {}",
-                    e
+                    "Failed to fetch CurseForge profile metadata: {e}"
                 ))
                 .into());
             }
@@ -105,8 +102,7 @@ pub async fn fetch_curseforge_profile_metadata(
     let mut zip_reader =
         ZipFileReader::with_tokio(cursor).await.map_err(|e| {
             crate::ErrorKind::InputError(format!(
-                "Failed to read profile ZIP: {}",
-                e
+                "Failed to read profile ZIP: {e}"
             ))
         })?;
 
@@ -130,8 +126,7 @@ pub async fn fetch_curseforge_profile_metadata(
         .await
         .map_err(|e| {
             crate::ErrorKind::InputError(format!(
-                "Failed to read manifest.json: {}",
-                e
+                "Failed to read manifest.json: {e}"
             ))
         })?;
 
@@ -141,9 +136,9 @@ pub async fn fetch_curseforge_profile_metadata(
     let manifest: CurseForgeManifest = serde_json::from_str(&manifest_content)?;
 
     let profile_name = if manifest.name.is_empty() {
-        format!("CurseForge Profile {}", profile_code)
+        format!("CurseForge Profile {profile_code}")
     } else {
-        manifest.name.clone()
+        manifest.name
     };
 
     Ok(CurseForgeProfileMetadata {
@@ -201,8 +196,7 @@ pub async fn import_curseforge_profile(
     let mut zip_reader =
         ZipFileReader::with_tokio(cursor).await.map_err(|e| {
             crate::ErrorKind::InputError(format!(
-                "Failed to read profile ZIP: {}",
-                e
+                "Failed to read profile ZIP: {e}"
             ))
         })?;
 
@@ -226,8 +220,7 @@ pub async fn import_curseforge_profile(
         .await
         .map_err(|e| {
             crate::ErrorKind::InputError(format!(
-                "Failed to read manifest.json: {}",
-                e
+                "Failed to read manifest.json: {e}"
             ))
         })?;
 
@@ -274,7 +267,7 @@ pub async fn import_curseforge_profile(
     // Set profile data
     crate::api::profile::edit(profile_path, |prof| {
         prof.name = if manifest.name.is_empty() {
-            format!("CurseForge Profile {}", profile_code)
+            format!("CurseForge Profile {profile_code}")
         } else {
             manifest.name.clone()
         };
@@ -295,10 +288,13 @@ pub async fn import_curseforge_profile(
     .await?;
 
     // Create a temporary directory to extract overrides
-    let temp_dir = state
-        .directories
-        .caches_dir()
-        .join(format!("curseforge_profile_{}", profile_code));
+    let temp_dir = dirs::cache_dir()
+        .ok_or_else(|| {
+            crate::ErrorKind::FSError("No cache directory found".to_string())
+        })?
+        .join("theseus")
+        .join("caches")
+        .join(format!("curseforge_profile_{profile_code}"));
     tokio::fs::create_dir_all(&temp_dir).await?;
 
     // Extract overrides directory if it exists
@@ -345,8 +341,7 @@ pub async fn import_curseforge_profile(
         let mut reader =
             zip_reader.reader_with_entry(index).await.map_err(|e| {
                 crate::ErrorKind::InputError(format!(
-                    "Failed to read file {}: {}",
-                    file_path, e
+                    "Failed to read file {file_path}: {e}"
                 ))
             })?;
 
@@ -545,11 +540,13 @@ async fn download_curseforge_mod(
         .get("data")
         .and_then(|data| data.get("fileName"))
         .and_then(|name| name.as_str())
-        .map(|s| s.to_string())
-        .unwrap_or_else(|| {
-            // Fallback to the old format if API response is unexpected
-            format!("mod_{}_{}.jar", file.project_id, file.file_id)
-        });
+        .map_or_else(
+            || {
+                // Fallback to the old format if API response is unexpected
+                format!("mod_{}_{}.jar", file.project_id, file.file_id)
+            },
+            |s| s.to_string(),
+        );
 
     tracing::info!("Original filename: {}", original_filename);
 
@@ -589,8 +586,7 @@ async fn download_curseforge_mod(
 
     tokio::fs::write(&final_path, &bytes).await.map_err(|e| {
         crate::ErrorKind::InputError(format!(
-            "Failed to write mod file {:?}: {}",
-            final_path, e
+            "Failed to write mod file {final_path:?}: {e}"
         ))
     })?;
 
