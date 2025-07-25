@@ -48,7 +48,7 @@ pub struct ServerVersion {
 pub async fn get_server_status(
     address: &impl ToSocketAddrs,
     original_address: (&str, u16),
-    protocol_version: Option<i32>,
+    protocol_version: Option<u32>,
 ) -> Result<ServerStatus> {
     select! {
         res = modern::status(address, original_address, protocol_version) => res,
@@ -68,7 +68,7 @@ mod modern {
     pub async fn status(
         address: &impl ToSocketAddrs,
         original_address: (&str, u16),
-        protocol_version: Option<i32>,
+        protocol_version: Option<u32>,
     ) -> crate::Result<ServerStatus> {
         let mut stream = TcpStream::connect(address).await?;
         handshake(&mut stream, original_address, protocol_version).await?;
@@ -80,10 +80,10 @@ mod modern {
     async fn handshake(
         stream: &mut TcpStream,
         original_address: (&str, u16),
-        protocol_version: Option<i32>,
+        protocol_version: Option<u32>,
     ) -> crate::Result<()> {
         let (host, port) = original_address;
-        let protocol_version = protocol_version.unwrap_or(-1);
+        let protocol_version = protocol_version.map_or(-1, |x| x as i32);
 
         const PACKET_ID: i32 = 0;
         const NEXT_STATE: i32 = 1;

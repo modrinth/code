@@ -134,6 +134,7 @@ import {
 } from '@modrinth/ui'
 import { PlusIcon, SpinnerIcon, UpdatedIcon, SearchIcon, XIcon } from '@modrinth/assets'
 import {
+  type ProtocolVersion,
   type SingleplayerWorld,
   type World,
   type ServerWorld,
@@ -210,7 +211,9 @@ const worldPlaying = ref<World>()
 const worlds = ref<World[]>([])
 const serverData = ref<Record<string, ServerData>>({})
 
-const protocolVersion = ref<number | null>(await get_profile_protocol_version(instance.value.path))
+const protocolVersion = ref<ProtocolVersion | null>(
+  await get_profile_protocol_version(instance.value.path),
+)
 
 const unlistenProfile = await profile_listener(async (e: ProfileEvent) => {
   if (e.profile_path_id !== instance.value.path) return

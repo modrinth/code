@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  type ProtocolVersion,
   type ServerWorld,
   type ServerData,
   type WorldWithProfile,
@@ -33,7 +34,7 @@ const theme = useTheming()
 
 const jumpBackInItems = ref<JumpBackInItem[]>([])
 const serverData = ref<Record<string, ServerData>>({})
-const protocolVersions = ref<Record<string, number | null>>({})
+const protocolVersions = ref<Record<string, ProtocolVersion | null>>({})
 
 const MIN_JUMP_BACK_IN = 3
 const MAX_JUMP_BACK_IN = 6

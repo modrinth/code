@@ -5,6 +5,9 @@ use crate::state::attached_world_data::AttachedWorldData;
 use crate::state::{
     Profile, ProfileInstallStage, attached_world_data, server_join_log,
 };
+use crate::util::old_protocol_versions::{
+    LEGACY_OLD_PROTOCOL_VERSIONS, OLD_PROTOCOL_VERSIONS,
+};
 pub use crate::util::server_ping::{
     ServerGameProfile, ServerPlayers, ServerStatus, ServerVersion,
 };
@@ -176,6 +179,28 @@ impl From<ServerPackStatus> for Option<bool> {
             ServerPackStatus::Enabled => Some(true),
             ServerPackStatus::Disabled => Some(false),
             ServerPackStatus::Prompt => None,
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct ProtocolVersion {
+    pub version: u32,
+    pub legacy: bool,
+}
+
+impl ProtocolVersion {
+    pub fn new(version: u32) -> Self {
+        Self {
+            version,
+            legacy: false,
+        }
+    }
+
+    pub fn new_legacy(version: u32) -> Self {
+        Self {
+            version,
+            legacy: true,
         }
     }
 }
@@ -835,7 +860,7 @@ mod servers_data {
 
 pub async fn get_profile_protocol_version(
     profile: &str,
-) -> Result<Option<i32>> {
+) -> Result<Option<ProtocolVersion>> {
     let mut profile = super::profile::get(profile).await?.ok_or_else(|| {
         ErrorKind::UnmanagedProfileError(format!(
             "Could not find profile {profile}"
@@ -846,7 +871,17 @@ pub async fn get_profile_protocol_version(
     }
 
     if let Some(protocol_version) = profile.protocol_version {
-        return Ok(Some(protocol_version));
+        return Ok(Some(ProtocolVersion::new(protocol_version)));
+    }
+    if let Some(protocol_version) =
+        OLD_PROTOCOL_VERSIONS.get(&profile.game_version)
+    {
+        return Ok(Some(ProtocolVersion::new(*protocol_version)));
+    }
+    if let Some(protocol_version) =
+        LEGACY_OLD_PROTOCOL_VERSIONS.get(&profile.game_version)
+    {
+        return Ok(Some(ProtocolVersion::new_legacy(*protocol_version)));
     }
 
     let minecraft = crate::api::metadata::get_minecraft_versions().await?;
@@ -890,12 +925,12 @@ pub async fn get_profile_protocol_version(
         profile.protocol_version = version;
         profile.upsert(&state.pool).await?;
     }
-    Ok(version)
+    Ok(version.map(ProtocolVersion::new))
 }
 
 pub async fn get_server_status(
     address: &str,
-    protocol_version: Option<i32>,
+    protocol_version: Option<ProtocolVersion>,
 ) -> Result<ServerStatus> {
     let (original_host, original_port) = parse_server_address(address)?;
     let (host, port) =
@@ -903,7 +938,7 @@ pub async fn get_server_status(
     server_ping::get_server_status(
         &(&host as &str, port),
         (original_host, original_port),
-        protocol_version,
+        protocol_version.filter(|v| !v.legacy).map(|v| v.version),
     )
     .await
 }

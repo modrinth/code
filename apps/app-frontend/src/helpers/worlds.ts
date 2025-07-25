@@ -75,6 +75,11 @@ export type ServerData = {
   renderedMotd?: string
 }
 
+export type ProtocolVersion = {
+  version: number
+  legacy: boolean
+}
+
 export async function get_recent_worlds(
   limit: number,
   displayStatuses?: DisplayStatus[],
@@ -156,13 +161,13 @@ export async function remove_server_from_profile(path: string, index: number): P
   return await invoke('plugin:worlds|remove_server_from_profile', { path, index })
 }
 
-export async function get_profile_protocol_version(path: string): Promise<number | null> {
+export async function get_profile_protocol_version(path: string): Promise<ProtocolVersion | null> {
   return await invoke('plugin:worlds|get_profile_protocol_version', { path })
 }
 
 export async function get_server_status(
   address: string,
-  protocolVersion: number | null = null,
+  protocolVersion: ProtocolVersion | null = null,
 ): Promise<ServerStatus> {
   return await invoke('plugin:worlds|get_server_status', { address, protocolVersion })
 }
@@ -206,7 +211,7 @@ export function isServerWorld(world: World): world is ServerWorld {
 
 export async function refreshServerData(
   serverData: ServerData,
-  protocolVersion: number | null,
+  protocolVersion: ProtocolVersion | null,
   address: string,
 ): Promise<void> {
   serverData.refreshing = true
@@ -229,7 +234,7 @@ export async function refreshServerData(
 export async function refreshServers(
   worlds: World[],
   serverData: Record<string, ServerData>,
-  protocolVersion: number | null,
+  protocolVersion: ProtocolVersion | null,
 ) {
   const servers = worlds.filter(isServerWorld)
   servers.forEach((server) => {
