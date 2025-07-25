@@ -8,7 +8,7 @@
     <div v-if="!modPackData">Loading data...</div>
 
     <div v-else-if="modPackData.length === 0">
-      <p>All permissions obtained. You may skip this step!</p>
+      <p>All permissions already obtained.</p>
     </div>
 
     <div v-else-if="!modPackData[currentIndex]">
@@ -157,7 +157,7 @@ import type {
 } from "@modrinth/utils";
 import { ButtonStyled } from "@modrinth/ui";
 import { ref, computed, watch, onMounted } from "vue";
-import { useLocalStorage } from "@vueuse/core";
+import { useLocalStorage, useSessionStorage } from "@vueuse/core";
 
 const props = defineProps<{
   projectId: string;
@@ -182,7 +182,26 @@ const persistedModPackData = useLocalStorage<ModerationModpackItem[] | null>(
 
 const persistedIndex = useLocalStorage<number>(`modpack-permissions-index-${props.projectId}`, 0);
 
-const modPackData = ref<ModerationModpackItem[] | null>(null);
+const modPackData = useSessionStorage<ModerationModpackItem[] | null>(
+  `modpack-permissions-data-${props.projectId}`,
+  null,
+  {
+    serializer: {
+      read: (v: any) => (v ? JSON.parse(v) : null),
+      write: (v: any) => JSON.stringify(v),
+    },
+  },
+);
+const permanentNoFiles = useSessionStorage<ModerationModpackItem[]>(
+  `modpack-permissions-permanent-no-${props.projectId}`,
+  [],
+  {
+    serializer: {
+      read: (v: any) => (v ? JSON.parse(v) : []),
+      write: (v: any) => JSON.stringify(v),
+    },
+  },
+);
 const currentIndex = ref(0);
 
 const fileApprovalTypes: ModerationModpackPermissionApprovalType[] = [
@@ -251,7 +270,45 @@ async function fetchModPackData(): Promise<void> {
     const data = (await useBaseFetch(`moderation/project/${props.projectId}`, {
       internal: true,
     })) as ModerationModpackResponse;
+
+    const permanentNoItems: ModerationModpackItem[] = Object.entries(data.identified || {})
+      .filter(([_, file]) => file.status === "permanent-no")
+      .map(
+        ([sha1, file]): ModerationModpackItem => ({
+          sha1,
+          file_name: file.file_name,
+          type: "identified",
+          status: file.status,
+          approved: null,
+        }),
+      )
+      .sort((a, b) => a.file_name.localeCompare(b.file_name));
+
+    permanentNoFiles.value = permanentNoItems;
+
     const sortedData: ModerationModpackItem[] = [
+      ...Object.entries(data.identified || {})
+        .filter(
+          ([_, file]) =>
+            file.status !== "yes" &&
+            file.status !== "with-attribution-and-source" &&
+            file.status !== "permanent-no",
+        )
+        .map(
+          ([sha1, file]): ModerationModpackItem => ({
+            sha1,
+            file_name: file.file_name,
+            type: "identified",
+            status: file.status,
+            approved: null,
+            ...(file.status === "unidentified" && {
+              proof: "",
+              url: "",
+              title: "",
+            }),
+          }),
+        )
+        .sort((a, b) => a.file_name.localeCompare(b.file_name)),
       ...Object.entries(data.unknown_files || {})
         .map(
           ([sha1, fileName]): ModerationUnknownModpackItem => ({
@@ -310,6 +367,7 @@ async function fetchModPackData(): Promise<void> {
   } catch (error) {
     console.error("Failed to fetch modpack data:", error);
     modPackData.value = [];
+    permanentNoFiles.value = [];
     persistAll();
   }
 }
@@ -320,6 +378,14 @@ function goToPrevious(): void {
     persistAll();
   }
 }
+
+watch(
+  modPackData,
+  (newValue) => {
+    persistedModPackData.value = newValue;
+  },
+  { deep: true },
+);
 
 function goToNext(): void {
   if (modPackData.value && currentIndex.value < modPackData.value.length) {
@@ -397,6 +463,17 @@ onMounted(() => {
 });
 
 watch(
+  modPackData,
+  (newValue) => {
+    if (newValue && newValue.length === 0) {
+      emit("complete");
+      clearPersistedData();
+    }
+  },
+  { immediate: true },
+);
+
+watch(
   () => props.projectId,
   () => {
     clearPersistedData();
@@ -406,6 +483,20 @@ watch(
     }
   },
 );
+
+function getModpackFiles(): {
+  interactive: ModerationModpackItem[];
+  permanentNo: ModerationModpackItem[];
+} {
+  return {
+    interactive: modPackData.value || [],
+    permanentNo: permanentNoFiles.value,
+  };
+}
+
+defineExpose({
+  getModpackFiles,
+});
 </script>
 
 <style scoped>
