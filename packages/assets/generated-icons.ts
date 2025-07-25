@@ -53,6 +53,7 @@ import _DatabaseIcon from './icons/database.svg?component'
 import _DownloadIcon from './icons/download.svg?component'
 import _DropdownIcon from './icons/dropdown.svg?component'
 import _EditIcon from './icons/edit.svg?component'
+import _EllipsisVerticalIcon from './icons/ellipsis-vertical.svg?component'
 import _ExpandIcon from './icons/expand.svg?component'
 import _ExternalIcon from './icons/external.svg?component'
 import _EyeOffIcon from './icons/eye-off.svg?component'
@@ -245,6 +246,7 @@ export const DatabaseIcon = _DatabaseIcon
 export const DownloadIcon = _DownloadIcon
 export const DropdownIcon = _DropdownIcon
 export const EditIcon = _EditIcon
+export const EllipsisVerticalIcon = _EllipsisVerticalIcon
 export const ExpandIcon = _ExpandIcon
 export const ExternalIcon = _ExternalIcon
 export const EyeOffIcon = _EyeOffIcon

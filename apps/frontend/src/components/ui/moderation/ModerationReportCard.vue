@@ -121,12 +121,13 @@
     </div>
 
     <CollapsibleRegion class="my-4">
-      <div class="markdown-body break-words" v-html="renderHighlightedString(report.body)"></div>
+      <!-- <div class="markdown-body break-words" v-html="renderHighlightedString(report.body)"></div> -->
       <ReportThread
         v-if="report.thread"
         class="mb-16 sm:mb-0"
         :thread="report.thread"
         :report="report"
+        :reporter="report.reporter_user"
         @update-thread="updateThread"
       />
     </CollapsibleRegion>

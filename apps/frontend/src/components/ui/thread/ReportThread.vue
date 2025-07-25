@@ -112,7 +112,7 @@
 <script setup lang="ts">
 import { CopyCode, MarkdownEditor, ButtonStyled } from "@modrinth/ui";
 import { ReplyIcon, SendIcon, CheckCircleIcon, ScaleIcon } from "@modrinth/assets";
-import type { Thread, Report, User } from "@modrinth/utils";
+import type { Thread, Report, User, ThreadMessage as TypeThreadMessage } from "@modrinth/utils";
 import dayjs from "dayjs";
 import ThreadMessage from "./ThreadMessage.vue";
 import { useImageUpload } from "~/composables/image-upload.ts";
@@ -120,6 +120,7 @@ import { isStaff } from "~/helpers/users.js";
 
 const props = defineProps<{
   thread: Thread;
+  reporter: User;
   report: Report;
 }>();
 
@@ -132,7 +133,9 @@ const emit = defineEmits<{
 const flags = useFeatureFlags();
 
 const members = computed(() => {
-  const membersMap: Record<string, User> = {};
+  const membersMap: Record<string, User> = {
+    [props.reporter.id]: props.reporter,
+  };
   for (const member of props.thread.members) {
     membersMap[member.id] = member;
   }
@@ -142,7 +145,21 @@ const members = computed(() => {
 const replyBody = ref("");
 
 const sortedMessages = computed(() => {
-  const messages = [];
+  const messages: TypeThreadMessage[] = [
+    {
+      id: null,
+      author_id: props.reporter.id,
+      body: {
+        type: "text",
+        body: props.report.body || "Report opened.",
+        private: false,
+        replying_to: null,
+        associated_images: [],
+      },
+      created: props.report.created,
+      hide_identity: false,
+    },
+  ];
   if (props.thread) {
     messages.push(
       ...[...props.thread.messages].sort(

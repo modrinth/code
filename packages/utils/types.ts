@@ -308,7 +308,7 @@ export interface Thread {
 export type ThreadType = 'project' | 'report' | 'direct_message'
 
 export interface ThreadMessage {
-  id: string
+  id: string | null
   author_id: string | null
   body: MessageBody
   created: string
