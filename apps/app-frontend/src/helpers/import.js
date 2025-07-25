@@ -71,21 +71,17 @@ export async function fetch_curseforge_profile_metadata(profileCode) {
 /// Import a CurseForge profile from profile code
 /// eg: import_curseforge_profile("eSrNlKNo")
 export async function import_curseforge_profile(profileCode) {
-  try {
-    // First, fetch the profile metadata to get the actual name
-    const metadata = await fetch_curseforge_profile_metadata(profileCode)
+  // First, fetch the profile metadata to get the actual name
+  const metadata = await fetch_curseforge_profile_metadata(profileCode)
 
-    // create a basic, empty instance using the actual profile name
-    const profilePath = await create(metadata.name, '1.19.4', 'vanilla', 'latest', null, true)
+  // create a basic, empty instance using the actual profile name
+  const profilePath = await create(metadata.name, '1.19.4', 'vanilla', 'latest', null, true)
 
-    const result = await invoke('plugin:import|import_curseforge_profile', {
-      profilePath,
-      profileCode,
-    })
+  const result = await invoke('plugin:import|import_curseforge_profile', {
+    profilePath,
+    profileCode,
+  })
 
-    // Return the profile path for navigation
-    return { result, profilePath }
-  } catch (error) {
-    throw error
-  }
+  // Return the profile path for navigation
+  return { result, profilePath }
 }

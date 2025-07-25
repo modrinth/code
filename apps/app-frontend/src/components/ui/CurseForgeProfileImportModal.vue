@@ -45,24 +45,24 @@
       </div>
       
       <div class="button-row">
-        <Button @click="hide" :disabled="importing">
+        <Button :disabled="importing" @click="hide">
           <XIcon />
           Cancel
         </Button>
         <Button 
           v-if="!metadata" 
-          @click="fetchMetadata" 
           :disabled="!profileCode.trim() || fetching"
           color="secondary"
+          @click="fetchMetadata" 
         >
           <SearchIcon v-if="!fetching" />
           {{ fetching ? 'Checking...' : 'Check Profile' }}
         </Button>
         <Button 
           v-if="metadata" 
-          @click="importProfile" 
           :disabled="importing"
           color="primary"
+          @click="importProfile" 
         >
           <DownloadIcon v-if="!importing" />
           {{ importing ? 'Importing...' : 'Import Profile' }}
@@ -191,7 +191,7 @@ const importProfile = async () => {
   }, 1000)
   
   try {
-    const { result, profilePath } = await import_curseforge_profile(profileCode.value.trim())
+    const { profilePath } = await import_curseforge_profile(profileCode.value.trim())
     
     trackEvent('CurseForgeProfileImported', { 
       profileCode: profileCode.value.trim() 

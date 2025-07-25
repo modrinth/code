@@ -165,8 +165,8 @@
       <div class="button-row">
         <Button
           v-if="selectedProfileType.name === 'Curseforge'"
-          @click="showCurseForgeProfileModal"
           :disabled="loading"
+          @click="showCurseForgeProfileModal"
         >
           <CodeIcon />
           Import from Profile Code
