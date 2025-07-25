@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  type ProtocolVersion,
   type ServerWorld,
   type ServerData,
   type WorldWithProfile,
@@ -33,7 +34,7 @@ const theme = useTheming()
 
 const jumpBackInItems = ref<JumpBackInItem[]>([])
 const serverData = ref<Record<string, ServerData>>({})
-const protocolVersions = ref<Record<string, number | null>>({})
+const protocolVersions = ref<Record<string, ProtocolVersion | null>>({})
 
 const MIN_JUMP_BACK_IN = 3
 const MAX_JUMP_BACK_IN = 6
@@ -121,11 +122,8 @@ async function populateJumpBackIn() {
       }
     })
 
-    // fetch each server's data
-    Promise.all(
-      servers.map(({ instancePath, address }) =>
-        refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address),
-      ),
+    servers.forEach(({ instancePath, address }) =>
+      refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address),
     )
   }
 
@@ -150,8 +148,8 @@ async function populateJumpBackIn() {
     .slice(0, MAX_JUMP_BACK_IN)
 }
 
-async function refreshServer(address: string, instancePath: string) {
-  await refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address)
+function refreshServer(address: string, instancePath: string) {
+  refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address)
 }
 
 async function joinWorld(world: WorldWithProfile) {

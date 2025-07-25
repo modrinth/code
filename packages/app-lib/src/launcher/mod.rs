@@ -419,7 +419,7 @@ pub async fn install_minecraft(
 
 pub async fn read_protocol_version_from_jar(
     path: PathBuf,
-) -> crate::Result<Option<i32>> {
+) -> crate::Result<Option<u32>> {
     let zip = async_zip::tokio::read::fs::ZipFileReader::new(path).await?;
     let Some(entry_index) = zip
         .file()
@@ -432,7 +432,7 @@ pub async fn read_protocol_version_from_jar(
 
     #[derive(Deserialize, Debug)]
     struct VersionData {
-        protocol_version: Option<i32>,
+        protocol_version: Option<u32>,
     }
 
     let mut data = vec![];
