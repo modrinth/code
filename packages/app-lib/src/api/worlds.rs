@@ -5,9 +5,7 @@ use crate::state::attached_world_data::AttachedWorldData;
 use crate::state::{
     Profile, ProfileInstallStage, attached_world_data, server_join_log,
 };
-use crate::util::old_protocol_versions::{
-    LEGACY_OLD_PROTOCOL_VERSIONS, OLD_PROTOCOL_VERSIONS,
-};
+use crate::util::protocol_version::{OLD_PROTOCOL_VERSIONS, ProtocolVersion};
 pub use crate::util::server_ping::{
     ServerGameProfile, ServerPlayers, ServerStatus, ServerVersion,
 };
@@ -179,28 +177,6 @@ impl From<ServerPackStatus> for Option<bool> {
             ServerPackStatus::Enabled => Some(true),
             ServerPackStatus::Disabled => Some(false),
             ServerPackStatus::Prompt => None,
-        }
-    }
-}
-
-#[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct ProtocolVersion {
-    pub version: u32,
-    pub legacy: bool,
-}
-
-impl ProtocolVersion {
-    pub fn new(version: u32) -> Self {
-        Self {
-            version,
-            legacy: false,
-        }
-    }
-
-    pub fn new_legacy(version: u32) -> Self {
-        Self {
-            version,
-            legacy: true,
         }
     }
 }
@@ -871,17 +847,12 @@ pub async fn get_profile_protocol_version(
     }
 
     if let Some(protocol_version) = profile.protocol_version {
-        return Ok(Some(ProtocolVersion::new(protocol_version)));
+        return Ok(Some(ProtocolVersion::modern(protocol_version)));
     }
     if let Some(protocol_version) =
         OLD_PROTOCOL_VERSIONS.get(&profile.game_version)
     {
-        return Ok(Some(ProtocolVersion::new(*protocol_version)));
-    }
-    if let Some(protocol_version) =
-        LEGACY_OLD_PROTOCOL_VERSIONS.get(&profile.game_version)
-    {
-        return Ok(Some(ProtocolVersion::new_legacy(*protocol_version)));
+        return Ok(Some(*protocol_version));
     }
 
     let minecraft = crate::api::metadata::get_minecraft_versions().await?;
@@ -889,7 +860,7 @@ pub async fn get_profile_protocol_version(
         .versions
         .iter()
         .position(|it| it.id == profile.game_version)
-        .ok_or(crate::ErrorKind::LauncherError(format!(
+        .ok_or(ErrorKind::LauncherError(format!(
             "Invalid game version: {}",
             profile.game_version
         )))?;
@@ -925,7 +896,7 @@ pub async fn get_profile_protocol_version(
         profile.protocol_version = version;
         profile.upsert(&state.pool).await?;
     }
-    Ok(version.map(ProtocolVersion::new))
+    Ok(version.map(ProtocolVersion::modern))
 }
 
 pub async fn get_server_status(
@@ -935,6 +906,9 @@ pub async fn get_server_status(
     let (original_host, original_port) = parse_server_address(address)?;
     let (host, port) =
         resolve_server_address(original_host, original_port).await?;
+    tracing::debug!(
+        "Pinging {address} with protocol version {protocol_version:?}"
+    );
     server_ping::get_server_status(
         &(&host as &str, port),
         (original_host, original_port),
