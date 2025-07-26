@@ -25,6 +25,7 @@ on:
 jobs:
   build:
     name: Build
+    if: github.repository == 'modrinth/code'
     strategy:
       fail-fast: false
       matrix:

@@ -176,6 +176,9 @@ pub enum LoadingBarType {
         import_location: PathBuf,
         profile_name: String,
     },
+    CurseForgeProfileDownload {
+        profile_name: String,
+    },
     CheckingForUpdates,
     LauncherUpdate {
         version: String,

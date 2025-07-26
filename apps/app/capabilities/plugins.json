@@ -22,10 +22,7 @@
     
     {
       "identifier": "http:default",
-      "allow": [
-        { "url": "https://modrinth.com/*" },
-        { "url": "https://*.modrinth.com/*" }
-      ]
+      "allow": [{ "url": "https://modrinth.com/*" }, { "url": "https://*.modrinth.com/*" }]
     },
 
     "auth:default",
