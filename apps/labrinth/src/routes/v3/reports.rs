@@ -222,12 +222,14 @@ pub async fn report_create(
 #[derive(Deserialize)]
 pub struct ReportsRequestOptions {
     #[serde(default = "default_count")]
-    pub count: i16,
+    pub count: u16,
+    #[serde(default)]
+    pub offset: u32,
     #[serde(default = "default_all")]
     pub all: bool,
 }
 
-fn default_count() -> i16 {
+fn default_count() -> u16 {
     100
 }
 fn default_all() -> bool {
@@ -238,7 +240,7 @@ pub async fn reports(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    count: web::Query<ReportsRequestOptions>,
+    request_opts: web::Query<ReportsRequestOptions>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -253,15 +255,17 @@ pub async fn reports(
 
     use futures::stream::TryStreamExt;
 
-    let report_ids = if user.role.is_mod() && count.all {
+    let report_ids = if user.role.is_mod() && request_opts.all {
         sqlx::query!(
             "
             SELECT id FROM reports
             WHERE closed = FALSE
             ORDER BY created ASC
-            LIMIT $1;
+            OFFSET $2
+            LIMIT $1
             ",
-            count.count as i64
+            request_opts.count as i64,
+            request_opts.offset as i64
         )
         .fetch(&**pool)
         .map_ok(|m| crate::database::models::ids::DBReportId(m.id))
@@ -273,10 +277,12 @@ pub async fn reports(
             SELECT id FROM reports
             WHERE closed = FALSE AND reporter = $1
             ORDER BY created ASC
-            LIMIT $2;
+            OFFSET $3
+            LIMIT $2
             ",
             user.id.0 as i64,
-            count.count as i64
+            request_opts.count as i64,
+            request_opts.offset as i64
         )
         .fetch(&**pool)
         .map_ok(|m| crate::database::models::ids::DBReportId(m.id))
