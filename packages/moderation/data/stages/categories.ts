@@ -31,7 +31,9 @@ const categories: Stage = {
       weight: 701,
       suggestedStatus: 'flagged',
       severity: 'low',
-      shouldShow: (project) => project.categories.includes('optimization'),
+      shouldShow: (project) =>
+        project.categories.includes('optimization') ||
+        project.additional_categories.includes('optimization'),
       message: async () =>
         (await import('../messages/categories/inaccurate.md?raw')).default +
         (await import('../messages/categories/optimization_misused.md?raw')).default,

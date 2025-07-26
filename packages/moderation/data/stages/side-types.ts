@@ -7,7 +7,8 @@ const sideTypes: Stage = {
   id: 'environment',
   icon: GlobeIcon,
   guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
-  navigate: '/settings#side-types',
+  navigate: '/settings',
+  text: async () => (await import('../messages/checklist-text/side_types.md?raw')).default,
   actions: [
     {
       id: 'side_types_inaccurate_modpack',

@@ -150,7 +150,24 @@ const versions: Stage = {
       severity: `medium`,
       weight: 1004,
       message: async () => (await import('../messages/versions/broken_version.md?raw')).default,
-    },
+    } as ButtonAction,
+    {
+      id: 'unsupported_project_type',
+      type: 'button',
+      label: `Unsupported`,
+      suggestedStatus: `rejected`,
+      severity: `medium`,
+      weight: 1005,
+      message: async () =>
+        (await import('../messages/versions/unsupported_project.md?raw')).default,
+      relevantExtraInput: [
+        {
+          label: 'Project Type',
+          required: true,
+          variable: 'INVALID_TYPE',
+        },
+      ],
+    } as ButtonAction,
   ],
 }
 
