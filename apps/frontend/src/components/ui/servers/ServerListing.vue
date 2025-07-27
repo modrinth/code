@@ -67,6 +67,27 @@
       Your server's hardware is currently being upgraded and will be back online shortly.
     </div>
     <div
+      v-else-if="status === 'suspended' && suspension_reason === 'cancelled'"
+      class="relative -mt-4 flex w-full flex-col gap-2 rounded-b-3xl bg-bg-red p-4 text-sm font-bold text-contrast"
+    >
+      <div class="flex flex-row gap-2">
+        <UiServersIconsPanelErrorIcon class="!size-5" /> Your server has been cancelled. Please
+        update your billing information or contact Modrinth Support for more information.
+      </div>
+      <CopyCode :text="`${props.server_id}`" class="ml-auto" />
+    </div>
+    <div
+      v-else-if="status === 'suspended' && suspension_reason"
+      class="relative -mt-4 flex w-full flex-col gap-2 rounded-b-3xl bg-bg-red p-4 text-sm font-bold text-contrast"
+    >
+      <div class="flex flex-row gap-2">
+        <UiServersIconsPanelErrorIcon class="!size-5" /> Your server has been suspended:
+        {{ suspension_reason }}. Please update your billing information or contact Modrinth Support
+        for more information.
+      </div>
+      <CopyCode :text="`${props.server_id}`" class="ml-auto" />
+    </div>
+    <div
       v-else-if="status === 'suspended'"
       class="relative -mt-4 flex w-full flex-col gap-2 rounded-b-3xl bg-bg-red p-4 text-sm font-bold text-contrast"
     >
@@ -87,7 +108,8 @@ import { Avatar, CopyCode } from "@modrinth/ui";
 
 const props = defineProps<Partial<Server>>();
 
-if (props.server_id) {
+if (props.server_id && props.status === "available") {
+  // Necessary only to get server icon
   await useModrinthServers(props.server_id, ["general"]);
 }
 
@@ -109,11 +131,6 @@ if (props.upstream) {
 }
 
 const image = useState<string | undefined>(`server-icon-${props.server_id}`, () => undefined);
-
-if (import.meta.server && projectData.value?.icon_url) {
-  await useModrinthServers(props.server_id!, ["general"]);
-}
-
 const iconUrl = computed(() => projectData.value?.icon_url || undefined);
 const isConfiguring = computed(() => props.flows?.intro);
 </script>
