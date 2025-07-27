@@ -59,7 +59,7 @@
 
     <div class="mt-4 flex flex-col gap-2">
       <div v-if="paginatedReports.length === 0" class="universal-card h-24 animate-pulse"></div>
-      <ReportCard v-else v-for="report in paginatedReports" :key="report.id" :report="report" />
+      <ReportCard v-for="report in paginatedReports" v-else :key="report.id" :report="report" />
     </div>
 
     <div v-if="totalPages > 1" class="mt-4 flex justify-center">

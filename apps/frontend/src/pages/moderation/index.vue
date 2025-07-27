@@ -75,10 +75,10 @@
     <div class="mt-4 flex flex-col gap-2">
       <div v-if="paginatedProjects.length === 0" class="universal-card h-24 animate-pulse"></div>
       <ModerationQueueCard
-        v-else
         v-for="item in paginatedProjects"
+        v-else
         :key="item.project.id"
-        :queueEntry="item"
+        :queue-entry="item"
         :owner="item.owner"
         :org="item.org"
       />
