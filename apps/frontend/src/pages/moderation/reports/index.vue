@@ -58,11 +58,8 @@
     </div>
 
     <div class="mt-4 flex flex-col gap-2">
-      <ReportCard v-for="report in paginatedReports" :key="report.id" :report="report" />
-      <div
-        v-if="!paginatedReports || paginatedReports.length === 0"
-        class="universal-card h-24 animate-pulse"
-      ></div>
+      <div v-if="paginatedReports.length === 0" class="universal-card h-24 animate-pulse"></div>
+      <ReportCard v-else v-for="report in paginatedReports" :key="report.id" :report="report" />
     </div>
 
     <div v-if="totalPages > 1" class="mt-4 flex justify-center">
@@ -76,19 +73,11 @@ import { DropdownSelect, Button, Pagination } from "@modrinth/ui";
 import { XIcon, SearchIcon, SortAscIcon, SortDescIcon, FilterIcon } from "@modrinth/assets";
 import { defineMessages, useVIntl } from "@vintl/vintl";
 import { useLocalStorage } from "@vueuse/core";
-import type {
-  Project,
-  Report,
-  Thread,
-  User,
-  Version,
-  TeamMember,
-  Organization,
-} from "@modrinth/utils";
+import type { Report } from "@modrinth/utils";
 import Fuse from "fuse.js";
-import type { OwnershipTarget, ExtendedReport } from "@modrinth/moderation";
+import type { ExtendedReport } from "@modrinth/moderation";
 import ReportCard from "~/components/ui/moderation/ModerationReportCard.vue";
-import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
+import { enrichReportBatch } from "~/helpers/moderation";
 
 const { formatMessage } = useVIntl();
 const route = useRoute();
@@ -109,190 +98,46 @@ const messages = defineMessages({
   },
 });
 
-const { data: allReports } = await useAsyncData("moderation-reports", async () => {
-  const reports = (await useBaseFetch("report?all=true&count=10000", {
-    apiVersion: 3,
-  })) as Report[];
+const { data: allReports } = await useLazyAsyncData("new-moderation-reports", async () => {
+  const startTime = performance.now();
+  let currentOffset = 0;
+  const REPORT_ENDPOINT_COUNT = 350;
+  const allReports: ExtendedReport[] = [];
 
-  const threadIDs = reports.map((report) => report.thread_id).filter(Boolean);
-  const threads = (await fetchSegmented(
-    threadIDs,
-    (ids) => `threads?ids=${asEncodedJsonArray(ids)}`,
-  )) as Thread[];
+  const enrichmentPromises: Promise<ExtendedReport[]>[] = [];
 
-  const userIDs = reports
-    .filter((report) => report.item_type === "user")
-    .map((report) => report.item_id);
-  const versionIDs = reports
-    .filter((report) => report.item_type === "version")
-    .map((report) => report.item_id);
-  const projectIDs = reports
-    .filter((report) => report.item_type === "project")
-    .map((report) => report.item_id);
+  while (true) {
+    const reports = (await useBaseFetch(
+      `report?count=${REPORT_ENDPOINT_COUNT}&offset=${currentOffset}`,
+      { apiVersion: 3 },
+    )) as Report[];
 
-  const versions = (await fetchSegmented(
-    versionIDs,
-    (ids) => `versions?ids=${asEncodedJsonArray(ids)}`,
-  )) as Version[];
+    if (reports.length === 0) break;
 
-  const fullProjectIds = new Set([
-    ...projectIDs,
-    ...versions.map((v) => v.project_id).filter(Boolean),
-  ]);
+    const enrichmentPromise = enrichReportBatch(reports);
+    enrichmentPromises.push(enrichmentPromise);
 
-  const projects = (await fetchSegmented(
-    Array.from(fullProjectIds),
-    (ids) => `projects?ids=${asEncodedJsonArray(ids)}`,
-  )) as Project[];
+    currentOffset += reports.length;
 
-  const teamIds = [...new Set(projects.map((p) => p.team).filter(Boolean))];
-  const orgIds = [...new Set(projects.map((p) => p.organization).filter(Boolean))];
-
-  const [teamsData, orgsData]: [TeamMember[][], Organization[]] = await Promise.all([
-    teamIds.length > 0
-      ? fetchSegmented(teamIds, (ids) => `teams?ids=${asEncodedJsonArray(ids)}`)
-      : Promise.resolve([]),
-    orgIds.length > 0
-      ? fetchSegmented(orgIds, (ids) => `organizations?ids=${asEncodedJsonArray(ids)}`, {
-          apiVersion: 3,
-        })
-      : Promise.resolve([]),
-  ]);
-
-  const orgTeamIds = orgsData.map((org) => org.team_id).filter(Boolean);
-  const orgTeamsData: TeamMember[][] =
-    orgTeamIds.length > 0
-      ? await fetchSegmented(orgTeamIds, (ids) => `teams?ids=${asEncodedJsonArray(ids)}`)
-      : [];
-
-  const ownerUserIds = new Set<string>();
-
-  teamsData.flat().forEach((member) => {
-    if (member.role === "Owner") {
-      ownerUserIds.add(member.user.id);
-    }
-  });
-
-  orgTeamsData.flat().forEach((member) => {
-    if (member.role === "Owner") {
-      ownerUserIds.add(member.user.id);
-    }
-  });
-
-  const fullUserIds = new Set([
-    ...userIDs,
-    ...reports.map((report) => report.reporter),
-    ...ownerUserIds,
-  ]);
-
-  const users = (await fetchSegmented(
-    Array.from(fullUserIds),
-    (ids) => `users?ids=${asEncodedJsonArray(ids)}`,
-  )) as User[];
-
-  const teamMap = new Map<string, TeamMember[]>();
-  const orgMap = new Map<string, Organization>();
-
-  teamsData.forEach((team) => {
-    let teamId = null;
-    for (const member of team) {
-      teamId = member.team_id;
-      if (!teamMap.has(teamId)) {
-        teamMap.set(teamId, team);
-        break;
-      }
-    }
-  });
-
-  orgTeamsData.forEach((team) => {
-    let teamId = null;
-    for (const member of team) {
-      teamId = member.team_id;
-      if (!teamMap.has(teamId)) {
-        teamMap.set(teamId, team);
-        break;
-      }
-    }
-  });
-
-  orgsData.forEach((org: Organization) => {
-    orgMap.set(org.id, org);
-  });
-
-  const extendedReports: ExtendedReport[] = reports.map((report) => {
-    const thread = threads.find((t) => t.id === report.thread_id) || ({} as Thread);
-    const version =
-      report.item_type === "version"
-        ? versions.find((v: { id: string }) => v.id === report.item_id)
-        : undefined;
-
-    const project =
-      report.item_type === "project"
-        ? projects.find((p: { id: string }) => p.id === report.item_id)
-        : report.item_type === "version" && version
-          ? projects.find((p: { id: string }) => p.id === version.project_id)
-          : undefined;
-
-    let target: OwnershipTarget | undefined;
-
-    if (report.item_type === "user") {
-      const targetUser = users.find((u: { id: string }) => u.id === report.item_id);
-      if (targetUser) {
-        target = {
-          name: targetUser.username,
-          slug: targetUser.username,
-          avatar_url: targetUser.avatar_url,
-          type: "user",
-        };
-      }
-    } else if (project) {
-      let owner: TeamMember | null = null;
-      let org: Organization | null = null;
-
-      if (project.team) {
-        const teamMembers = teamMap.get(project.team);
-        if (teamMembers) {
-          owner = teamMembers.find((member) => member.role === "Owner") || null;
-        }
-      }
-
-      if (project.organization) {
-        org = orgMap.get(project.organization) || null;
-      }
-
-      // Prioritize organization over individual owner
-      if (org) {
-        target = {
-          name: org.name,
-          avatar_url: org.icon_url,
-          type: "organization",
-          slug: org.slug,
-        };
-      } else if (owner) {
-        target = {
-          name: owner.user.username,
-          avatar_url: owner.user.avatar_url,
-          type: "user",
-          slug: owner.user.username,
-        };
-      }
+    if (enrichmentPromises.length >= 3) {
+      const completed = await Promise.all(enrichmentPromises.splice(0, 2));
+      allReports.push(...completed.flat());
     }
 
-    return {
-      ...report,
-      thread,
-      reporter_user: users.find((user) => user.id === report.reporter) || ({} as User),
-      project,
-      user:
-        report.item_type === "user"
-          ? users.find((u: { id: string }) => u.id === report.item_id)
-          : undefined,
-      version,
-      target,
-    };
-  });
+    if (reports.length < REPORT_ENDPOINT_COUNT) break;
+  }
 
-  return extendedReports;
+  const remainingBatches = await Promise.all(enrichmentPromises);
+  allReports.push(...remainingBatches.flat());
+
+  const endTime = performance.now();
+  const duration = endTime - startTime;
+
+  console.debug(
+    `Reports fetched and processed in ${duration.toFixed(2)}ms (${(duration / 1000).toFixed(2)}s)`,
+  );
+
+  return allReports;
 });
 
 const query = ref(route.query.q?.toString() || "");
@@ -384,8 +229,12 @@ const filteredReports = computed(() => {
 
   if (currentFilterType.value !== "All") {
     filtered = filtered.filter((report) => {
-      const messages = report.thread?.messages ?? [];
-      if (messages.length === 0) return false;
+      const messages = [...report.thread?.messages];
+
+      if (messages.length === 0) {
+        return currentFilterType.value === "Unread";
+      }
+
       const lastMessage = messages[messages.length - 1];
       if (currentFilterType.value === "Read") {
         return (

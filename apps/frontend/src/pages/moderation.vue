@@ -61,7 +61,7 @@ const selectedChip = computed({
     const path = route.path;
     if (path === "/moderation/technical-review") {
       return formatMessage(messages.technicalReviewTitle);
-    } else if (path === "/moderation/reports") {
+    } else if (path.startsWith("/moderation/reports/")) {
       return formatMessage(messages.reportsTitle);
     } else {
       return formatMessage(messages.projectsTitle);

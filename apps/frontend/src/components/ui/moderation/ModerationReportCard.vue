@@ -173,7 +173,7 @@ const quickActions: OverflowMenuOption[] = [
     id: "copy-link",
     action: () => {
       const base = window.location.origin;
-      const reportUrl = `${base}/moderation/reports?q=${props.report.id}`;
+      const reportUrl = `${base}/moderation/reports/${props.report.id}`;
       navigator.clipboard.writeText(reportUrl).then(() => {
         addNotification({
           type: "success",
