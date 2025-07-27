@@ -59,6 +59,7 @@
     "markdown-it": "14.1.0",
     "pathe": "^1.1.2",
     "pinia": "^2.1.7",
+    "pinia-plugin-persistedstate": "^4.4.1",
     "prettier": "^3.6.2",
     "qrcode.vue": "^3.4.0",
     "semver": "^7.5.4",
