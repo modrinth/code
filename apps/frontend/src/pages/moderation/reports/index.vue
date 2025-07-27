@@ -10,7 +10,7 @@
           spellcheck="false"
           type="text"
           :placeholder="formatMessage(messages.searchPlaceholder)"
-          @input="updateSearchResults()"
+          @input="goToPage(1)"
         />
         <Button v-if="query" class="r-btn" @click="() => (query = '')">
           <XIcon />
@@ -28,7 +28,7 @@
           class="!w-full flex-grow sm:!w-[280px] sm:flex-grow-0 lg:!w-[280px]"
           :name="formatMessage(messages.filterBy)"
           :options="filterTypes as unknown[]"
-          @change="updateSearchResults()"
+          @change="goToPage(1)"
         >
           <span class="flex flex-row gap-2 align-middle font-semibold text-secondary">
             <FilterIcon class="size-4 flex-shrink-0" />
@@ -42,7 +42,7 @@
           class="!w-full flex-grow sm:!w-[150px] sm:flex-grow-0 lg:!w-[150px]"
           :name="formatMessage(messages.sortBy)"
           :options="sortTypes as unknown[]"
-          @change="updateSearchResults()"
+          @change="goToPage(1)"
         >
           <span class="flex flex-row gap-2 align-middle font-semibold text-secondary">
             <SortAscIcon v-if="selected === 'Oldest'" class="size-4 flex-shrink-0" />
@@ -72,7 +72,7 @@
 import { DropdownSelect, Button, Pagination } from "@modrinth/ui";
 import { XIcon, SearchIcon, SortAscIcon, SortDescIcon, FilterIcon } from "@modrinth/assets";
 import { defineMessages, useVIntl } from "@vintl/vintl";
-import { useLocalStorage } from "@vueuse/core";
+import { useLocalStorage, useDebounceFn } from "@vueuse/core";
 import type { Report } from "@modrinth/utils";
 import Fuse from "fuse.js";
 import type { ExtendedReport } from "@modrinth/moderation";
@@ -141,6 +141,7 @@ const { data: allReports } = await useLazyAsyncData("new-moderation-reports", as
 });
 
 const query = ref(route.query.q?.toString() || "");
+
 watch(
   query,
   (newQuery) => {
@@ -215,58 +216,62 @@ const fuse = computed(() => {
   });
 });
 
-const filteredReports = computed(() => {
+const memberRoleMap = computed(() => {
+  if (!allReports.value?.length) return new Map();
+
+  const map = new Map();
+  for (const report of allReports.value) {
+    if (report.thread?.members?.length) {
+      const roleMap = new Map();
+      for (const member of report.thread.members) {
+        roleMap.set(member.id, member.role);
+      }
+      map.set(report.id, roleMap);
+    }
+  }
+  return map;
+});
+
+const searchResults = computed(() => {
+  if (!query.value || !fuse.value) return null;
+  return fuse.value.search(query.value).map((result) => result.item);
+});
+
+const baseFiltered = computed(() => {
   if (!allReports.value) return [];
+  return query.value && searchResults.value ? searchResults.value : [...allReports.value];
+});
 
-  let filtered;
+const typeFiltered = computed(() => {
+  if (currentFilterType.value === "All") return baseFiltered.value;
 
-  if (query.value && fuse.value) {
-    const results = fuse.value.search(query.value);
-    filtered = results.map((result) => result.item);
-  } else {
-    filtered = [...allReports.value];
-  }
+  return baseFiltered.value.filter((report) => {
+    const messages = report.thread?.messages || [];
 
-  if (currentFilterType.value !== "All") {
-    filtered = filtered.filter((report) => {
-      const messages = [...report.thread?.messages];
+    if (messages.length === 0) {
+      return currentFilterType.value === "Unread";
+    }
 
-      if (messages.length === 0) {
-        return currentFilterType.value === "Unread";
-      }
+    const lastMessage = messages[messages.length - 1];
+    if (!lastMessage.author_id) return false;
 
-      const lastMessage = messages[messages.length - 1];
-      if (currentFilterType.value === "Read") {
-        return (
-          lastMessage.author_id &&
-          report.thread.members.some(
-            (member) => member.id === lastMessage.author_id && member.role === "moderator",
-          )
-        );
-      } else if (currentFilterType.value === "Unread") {
-        return (
-          lastMessage.author_id &&
-          report.thread.members.some(
-            (member) => member.id === lastMessage.author_id && member.role !== "moderator",
-          )
-        );
-      }
-      return true;
-    });
-  }
+    const roleMap = memberRoleMap.value.get(report.id);
+    if (!roleMap) return false;
+
+    const authorRole = roleMap.get(lastMessage.author_id);
+    const isModeratorMessage = authorRole === "moderator";
+
+    return currentFilterType.value === "Read" ? isModeratorMessage : !isModeratorMessage;
+  });
+});
+
+const filteredReports = computed(() => {
+  const filtered = [...typeFiltered.value];
 
   if (currentSortType.value === "Oldest") {
-    filtered.sort((a, b) => {
-      const dateA = new Date(a.created).getTime();
-      const dateB = new Date(b.created).getTime();
-      return dateA - dateB;
-    });
+    filtered.sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime());
   } else {
-    filtered.sort((a, b) => {
-      const dateA = new Date(a.created).getTime();
-      const dateB = new Date(b.created).getTime();
-      return dateB - dateA;
-    });
+    filtered.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
   }
 
   return filtered;
@@ -278,10 +283,6 @@ const paginatedReports = computed(() => {
   const end = start + itemsPerPage;
   return filteredReports.value.slice(start, end);
 });
-
-function updateSearchResults() {
-  currentPage.value = 1;
-}
 
 function goToPage(page: number) {
   currentPage.value = page;
