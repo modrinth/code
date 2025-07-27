@@ -18,7 +18,7 @@ export type DonationPlatform =
   | { short: 'ko-fi'; name: 'Ko-fi' }
   | { short: 'other'; name: 'Other' }
 
-export type ProjectType = 'mod' | 'modpack' | 'resourcepack' | 'shader'
+export type ProjectType = 'mod' | 'modpack' | 'resourcepack' | 'shader' | 'plugin' | 'datapack'
 export type MonetizationStatus = 'monetized' | 'demonetized' | 'force-demonetized'
 
 export type GameVersion = string
@@ -65,7 +65,8 @@ export interface Project {
   client_side: Environment
   server_side: Environment
 
-  team: ModrinthId
+  team?: ModrinthId
+  team_id: ModrinthId
   thread_id: ModrinthId
   organization: ModrinthId
 
@@ -76,6 +77,7 @@ export interface Project {
   donation_urls: DonationLink<DonationPlatform>[]
 
   published: string
+  created?: string
   updated: string
   approved: string
   queued: string

@@ -10,7 +10,7 @@
           spellcheck="false"
           type="text"
           :placeholder="formatMessage(messages.searchPlaceholder)"
-          @input="updateSearchResults()"
+          @input="goToPage(1)"
         />
         <Button v-if="query" class="r-btn" @click="() => (query = '')">
           <XIcon />
@@ -30,7 +30,7 @@
             class="!w-full flex-grow sm:!w-[280px] sm:flex-grow-0 lg:!w-[280px]"
             :name="formatMessage(messages.filterBy)"
             :options="filterTypes as unknown[]"
-            @change="updateSearchResults()"
+            @change="goToPage(1)"
           >
             <span class="flex flex-row gap-2 align-middle font-semibold text-secondary">
               <FilterIcon class="size-4 flex-shrink-0" />
@@ -44,7 +44,7 @@
             class="!w-full flex-grow sm:!w-[150px] sm:flex-grow-0 lg:!w-[150px]"
             :name="formatMessage(messages.sortBy)"
             :options="sortTypes as unknown[]"
-            @change="updateSearchResults()"
+            @change="goToPage(1)"
           >
             <span class="flex flex-row gap-2 align-middle font-semibold text-secondary">
               <SortAscIcon v-if="selected === 'Oldest'" class="size-4 flex-shrink-0" />
@@ -73,17 +73,15 @@
     </div>
 
     <div class="mt-4 flex flex-col gap-2">
+      <div v-if="paginatedProjects.length === 0" class="universal-card h-24 animate-pulse"></div>
       <ModerationQueueCard
+        v-else
         v-for="item in paginatedProjects"
         :key="item.project.id"
-        :project="item.project"
+        :queueEntry="item"
         :owner="item.owner"
         :org="item.org"
       />
-      <div
-        v-if="!paginatedProjects || paginatedProjects.length === 0"
-        class="universal-card h-24 animate-pulse"
-      ></div>
     </div>
 
     <div v-if="totalPages > 1" class="mt-4 flex justify-center">
@@ -103,15 +101,16 @@ import {
 } from "@modrinth/assets";
 import { defineMessages, useVIntl } from "@vintl/vintl";
 import { useLocalStorage } from "@vueuse/core";
-import type { Project, TeamMember, Organization } from "@modrinth/utils";
 import ConfettiExplosion from "vue-confetti-explosion";
 import Fuse from "fuse.js";
 import ModerationQueueCard from "~/components/ui/moderation/ModerationQueueCard.vue";
-import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
 import { useModerationStore } from "~/store/moderation.ts";
+import { enrichProjectBatch, type ModerationProject } from "~/helpers/moderation";
 
 const { formatMessage } = useVIntl();
 const moderationStore = useModerationStore();
+const route = useRoute();
+const router = useRouter();
 
 const visible = ref(false);
 if (import.meta.client && history && history.state && history.state.confetti) {
@@ -144,72 +143,79 @@ const messages = defineMessages({
   },
 });
 
-interface ModerationProject {
-  project: Project;
-  owner: TeamMember | null;
-  org: Organization | null;
-}
+const { data: allProjects } = await useLazyAsyncData("moderation-projects", async () => {
+  const startTime = performance.now();
+  let currentOffset = 0;
+  const PROJECT_ENDPOINT_COUNT = 350;
+  const allProjects: ModerationProject[] = [];
 
-const { data: allProjects } = await useAsyncData("moderation-projects", async () => {
-  const projects = (await useBaseFetch("moderation/projects?count=10000")) as Project[];
+  const enrichmentPromises: Promise<ModerationProject[]>[] = [];
 
-  const teamIds = [...new Set(projects.map((p) => p.team).filter(Boolean))];
-  const orgIds = [...new Set(projects.map((p) => p.organization).filter(Boolean))];
+  while (true) {
+    const projects = (await useBaseFetch(
+      `moderation/projects?count=${PROJECT_ENDPOINT_COUNT}&offset=${currentOffset}`,
+      { internal: true },
+    )) as any[];
 
-  const [teamsData, orgsData]: [TeamMember[][], Organization[]] = await Promise.all([
-    teamIds.length > 0
-      ? fetchSegmented(teamIds, (ids) => `teams?ids=${asEncodedJsonArray(ids)}`)
-      : Promise.resolve([]),
-    orgIds.length > 0
-      ? fetchSegmented(orgIds, (ids) => `organizations?ids=${asEncodedJsonArray(ids)}`, {
-          apiVersion: 3,
-        })
-      : Promise.resolve([]),
-  ]);
+    if (projects.length === 0) break;
 
-  const teamMap = new Map<string, TeamMember[]>();
-  const orgMap = new Map<string, Organization>();
+    const enrichmentPromise = enrichProjectBatch(projects);
+    enrichmentPromises.push(enrichmentPromise);
 
-  teamsData.forEach((team) => {
-    let teamId = null;
-    for (const member of team) {
-      teamId = member.team_id;
-      if (!teamMap.has(teamId)) {
-        teamMap.set(teamId, team);
-        break;
-      }
-    }
-  });
+    currentOffset += projects.length;
 
-  orgsData.forEach((org: Organization) => {
-    orgMap.set(org.id, org);
-  });
-
-  return projects.map((project) => {
-    let owner: TeamMember | null = null;
-    let org: Organization | null = null;
-
-    if (project.team) {
-      const teamMembers = teamMap.get(project.team);
-      if (teamMembers) {
-        owner = teamMembers.find((member) => member.role === "Owner") || null;
-      }
+    if (enrichmentPromises.length >= 3) {
+      const completed = await Promise.all(enrichmentPromises.splice(0, 2));
+      allProjects.push(...completed.flat());
     }
 
-    if (project.organization) {
-      org = orgMap.get(project.organization) || null;
-    }
+    if (projects.length < PROJECT_ENDPOINT_COUNT) break;
+  }
 
-    return {
-      project,
-      owner,
-      org,
-    } as ModerationProject;
-  });
+  const remainingBatches = await Promise.all(enrichmentPromises);
+  allProjects.push(...remainingBatches.flat());
+
+  const endTime = performance.now();
+  const duration = endTime - startTime;
+
+  console.debug(
+    `Projects fetched and processed in ${duration.toFixed(2)}ms (${(duration / 1000).toFixed(2)}s)`,
+  );
+
+  return allProjects;
 });
 
-const query = useLocalStorage("moderation-query", "");
-const currentFilterType = useLocalStorage("moderation-current-filter-type", () => "All");
+const query = ref(route.query.q?.toString() || "");
+
+watch(
+  query,
+  (newQuery) => {
+    const currentQuery = { ...route.query };
+    if (newQuery) {
+      currentQuery.q = newQuery;
+    } else {
+      delete currentQuery.q;
+    }
+
+    router.replace({
+      path: route.path,
+      query: currentQuery,
+    });
+  },
+  { immediate: false },
+);
+
+watch(
+  () => route.query.q,
+  (newQueryParam) => {
+    const newValue = newQueryParam?.toString() || "";
+    if (query.value !== newValue) {
+      query.value = newValue;
+    }
+  },
+);
+
+const currentFilterType = useLocalStorage("moderation-current-filter-type", () => "All projects");
 const filterTypes: readonly string[] = readonly([
   "All projects",
   "Modpacks",
@@ -222,6 +228,7 @@ const filterTypes: readonly string[] = readonly([
 
 const currentSortType = useLocalStorage("moderation-current-sort-type", () => "Oldest");
 const sortTypes: readonly string[] = readonly(["Oldest", "Newest"]);
+
 const currentPage = ref(1);
 const itemsPerPage = 15;
 const totalPages = computed(() => Math.ceil((filteredProjects.value?.length || 0) / itemsPerPage));
@@ -229,39 +236,64 @@ const totalPages = computed(() => Math.ceil((filteredProjects.value?.length || 0
 const fuse = computed(() => {
   if (!allProjects.value || allProjects.value.length === 0) return null;
   return new Fuse(allProjects.value, {
-    keys: ["title", "description", "project_type", "slug"],
+    keys: [
+      {
+        name: "project.title",
+        weight: 3,
+      },
+      {
+        name: "project.slug",
+        weight: 2,
+      },
+      {
+        name: "project.description",
+        weight: 2,
+      },
+      {
+        name: "project.project_type",
+        weight: 1,
+      },
+      "owner.user.username",
+      "org.name",
+      "org.slug",
+    ],
     includeScore: true,
     threshold: 0.4,
   });
 });
 
-const filteredProjects = computed(() => {
+const searchResults = computed(() => {
+  if (!query.value || !fuse.value) return null;
+  return fuse.value.search(query.value).map((result) => result.item);
+});
+
+const baseFiltered = computed(() => {
   if (!allProjects.value) return [];
+  return query.value && searchResults.value ? searchResults.value : [...allProjects.value];
+});
 
-  let filtered;
+const typeFiltered = computed(() => {
+  if (currentFilterType.value === "All projects") return baseFiltered.value;
 
-  if (query.value && fuse.value) {
-    const results = fuse.value.search(query.value);
-    filtered = results.map((result) => result.item);
-  } else {
-    filtered = [...allProjects.value];
-  }
+  const filterMap: Record<string, string> = {
+    Modpacks: "modpack",
+    Mods: "mod",
+    "Resource Packs": "resourcepack",
+    "Data Packs": "datapack",
+    Plugins: "plugin",
+    Shaders: "shader",
+  };
 
-  if (currentFilterType.value !== "All projects") {
-    const filterMap: Record<string, string> = {
-      Modpacks: "modpack",
-      Mods: "mod",
-      "Resource Packs": "resourcepack",
-      "Data Packs": "datapack",
-      Plugins: "plugin",
-      Shaders: "shader",
-    };
+  const projectType = filterMap[currentFilterType.value];
+  if (!projectType) return baseFiltered.value;
 
-    const projectType = filterMap[currentFilterType.value];
-    if (projectType) {
-      filtered = filtered.filter((queueItem) => queueItem.project.project_type === projectType);
-    }
-  }
+  return baseFiltered.value.filter((queueItem) =>
+    queueItem.project.project_types.includes(projectType),
+  );
+});
+
+const filteredProjects = computed(() => {
+  const filtered = [...typeFiltered.value];
 
   if (currentSortType.value === "Oldest") {
     filtered.sort((a, b) => {
@@ -287,8 +319,8 @@ const paginatedProjects = computed(() => {
   return filteredProjects.value.slice(start, end);
 });
 
-function updateSearchResults() {
-  currentPage.value = 1;
+function goToPage(page: number) {
+  currentPage.value = page;
 }
 
 function moderateAllInFilter() {
@@ -303,9 +335,5 @@ function moderateAllInFilter() {
       showChecklist: true,
     },
   });
-}
-
-function goToPage(page: number) {
-  currentPage.value = page;
 }
 </script>
