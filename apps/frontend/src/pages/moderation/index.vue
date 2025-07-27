@@ -105,7 +105,7 @@ import ConfettiExplosion from "vue-confetti-explosion";
 import Fuse from "fuse.js";
 import ModerationQueueCard from "~/components/ui/moderation/ModerationQueueCard.vue";
 import { useModerationStore } from "~/store/moderation.ts";
-import { enrichProjectBatch, type ModerationProject } from "~/helpers/moderation";
+import { enrichProjectBatch, type ModerationProject } from "~/helpers/moderation.ts";
 
 const { formatMessage } = useVIntl();
 const moderationStore = useModerationStore();

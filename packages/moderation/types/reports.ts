@@ -22,7 +22,7 @@ export interface ExtendedDelphiReport extends DelphiReport {
 
 export interface ReportQuickReply {
   label: string
-  message: string | ((report: ExtendedReport) => string)
+  message: string | ((report: ExtendedReport) => Promise<string> | string)
   shouldShow?: (report: ExtendedReport) => boolean
   private?: boolean
 }

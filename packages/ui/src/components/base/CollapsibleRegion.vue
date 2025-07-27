@@ -53,6 +53,16 @@ const isCollapsed = ref(props.initiallyCollapsed)
 function toggleCollapsed() {
   isCollapsed.value = !isCollapsed.value
 }
+
+function setCollapsed(value: boolean) {
+  isCollapsed.value = value
+}
+
+defineExpose({
+  isCollapsed,
+  setCollapsed,
+  toggleCollapsed,
+})
 </script>
 
 <style lang="scss" scoped>

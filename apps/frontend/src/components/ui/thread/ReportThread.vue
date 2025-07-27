@@ -143,6 +143,13 @@ const members = computed(() => {
 });
 
 const replyBody = ref("");
+function setReplyContent(content: string) {
+  replyBody.value = content;
+}
+
+defineExpose({
+  setReplyContent,
+});
 
 const sortedMessages = computed(() => {
   const messages: TypeThreadMessage[] = [

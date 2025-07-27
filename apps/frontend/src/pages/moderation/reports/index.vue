@@ -72,12 +72,12 @@
 import { DropdownSelect, Button, Pagination } from "@modrinth/ui";
 import { XIcon, SearchIcon, SortAscIcon, SortDescIcon, FilterIcon } from "@modrinth/assets";
 import { defineMessages, useVIntl } from "@vintl/vintl";
-import { useLocalStorage, useDebounceFn } from "@vueuse/core";
+import { useLocalStorage } from "@vueuse/core";
 import type { Report } from "@modrinth/utils";
 import Fuse from "fuse.js";
 import type { ExtendedReport } from "@modrinth/moderation";
 import ReportCard from "~/components/ui/moderation/ModerationReportCard.vue";
-import { enrichReportBatch } from "~/helpers/moderation";
+import { enrichReportBatch } from "~/helpers/moderation.ts";
 
 const { formatMessage } = useVIntl();
 const route = useRoute();

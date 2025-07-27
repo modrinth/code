@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ButtonStyled } from "@modrinth/ui";
 import type { Report } from "@modrinth/utils";
 import { enrichReportBatch } from "~/helpers/moderation.ts";
 import ModerationReportCard from "~/components/ui/moderation/ModerationReportCard.vue";
@@ -13,6 +12,7 @@ const { data: report } = await useAsyncData(`moderation-report-${reportId}`, asy
     const enrichedReport = (await enrichReportBatch([report]))[0];
     return enrichedReport;
   } catch (error) {
+    console.error("Error fetching report:", error);
     throw createError({
       statusCode: 404,
       statusMessage: "Report not found",

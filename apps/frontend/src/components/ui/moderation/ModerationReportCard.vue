@@ -120,9 +120,10 @@
       </div>
     </div>
 
-    <CollapsibleRegion class="my-4">
+    <CollapsibleRegion class="my-4" ref="collapsibleRegion">
       <ReportThread
         v-if="report.thread"
+        ref="reportThread"
         class="mb-16 sm:mb-0"
         :thread="report.thread"
         :report="report"
@@ -159,6 +160,9 @@ import ReportThread from "../thread/ReportThread.vue";
 const props = defineProps<{
   report: ExtendedReport;
 }>();
+
+const reportThread = ref<InstanceType<typeof ReportThread> | null>(null);
+const collapsibleRegion = ref<InstanceType<typeof CollapsibleRegion> | null>(null);
 
 const formatRelativeTime = useRelativeTime();
 
@@ -217,49 +221,12 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 });
 
 async function handleQuickReply(reply: ReportQuickReply) {
-  if (!props.report.thread) {
-    addNotification({
-      title: "Error",
-      text: "No thread available for this report",
-      type: "error",
-    });
-    return;
-  }
+  const message =
+    typeof reply.message === "function" ? await reply.message(props.report) : reply.message;
 
-  try {
-    await useBaseFetch(`thread/${props.report.thread.id}`, {
-      method: "POST",
-      body: {
-        body: {
-          type: "text",
-          body: reply.message,
-          private: reply.private || false,
-        },
-      },
-    });
-
-    const threadId = props.report.thread_id;
-    if (threadId) {
-      try {
-        const updatedThread = (await useBaseFetch(`thread/${threadId}`)) as any;
-        updateThread(updatedThread);
-      } catch (error) {
-        console.error("Failed to update thread:", error);
-      }
-    }
-
-    addNotification({
-      title: "Reply sent",
-      text: "Quick reply has been sent successfully",
-      type: "success",
-    });
-  } catch (err: any) {
-    addNotification({
-      title: "Error sending quick reply",
-      text: err.data ? err.data.description : err,
-      type: "error",
-    });
-  }
+  collapsibleRegion.value?.setCollapsed(false);
+  await nextTick();
+  reportThread.value?.setReplyContent(message);
 }
 
 const reportItemAvatarUrl = computed(() => {
