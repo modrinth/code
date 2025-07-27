@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled } from '@modrinth/ui'
+import ButtonStyled from './ButtonStyled.vue'
 import { ExpandIcon, CollapseIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
