@@ -208,15 +208,7 @@
             <div class="flex flex-col gap-2">
               <UiServersServerListing
                 v-if="subscription.serverInfo"
-                :server_id="subscription.serverInfo.server_id"
-                :name="subscription.serverInfo.name"
-                :status="subscription.serverInfo.status"
-                :game="subscription.serverInfo.game"
-                :loader="subscription.serverInfo.loader"
-                :loader_version="subscription.serverInfo.loader_version"
-                :mc_version="subscription.serverInfo.mc_version"
-                :upstream="subscription.serverInfo.upstream"
-                :net="subscription.serverInfo.net"
+                v-bind="subscription.serverInfo"
               />
               <div v-else class="w-fit">
                 <p>
