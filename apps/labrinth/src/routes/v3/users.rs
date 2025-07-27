@@ -9,7 +9,6 @@ use crate::{
     database::{models::DBUser, redis::RedisPool},
     file_hosting::{FileHost, FileHostPublicity},
     models::{
-        collections::CollectionStatus,
         notifications::Notification,
         pats::Scopes,
         projects::Project,
@@ -252,12 +251,10 @@ pub async fn collections_list(
             &**pool,
             &redis,
         )
-        .await?
-        .into_iter()
-        .filter(|x| matches!(x.status, CollectionStatus::Listed))
-        .collect();
+        .await?;
 
-        let collections = filter_visible_collections(response, &user).await?;
+        let collections =
+            filter_visible_collections(response, &user, true).await?;
 
         Ok(HttpResponse::Ok().json(collections))
     } else {
