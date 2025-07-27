@@ -275,7 +275,6 @@ import { products } from "~/generated/state.json";
 import ModrinthServersIcon from "~/components/ui/servers/ModrinthServersIcon.vue";
 
 const route = useRoute();
-const data = useNuxtApp();
 const vintl = useVIntl();
 
 const { formatMessage } = vintl;
@@ -378,8 +377,7 @@ async function refundCharge() {
     await refreshCharges();
     refundModal.value.hide();
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "Error refunding",
       text: err.data?.description ?? err,
       type: "error",
@@ -398,16 +396,14 @@ async function modifyCharge() {
       }),
       internal: true,
     });
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "Resubscription request submitted",
       text: "If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.",
       type: "success",
     });
     await refreshCharges();
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "Error reattempting charge",
       text: err.data?.description ?? err,
       type: "error",
