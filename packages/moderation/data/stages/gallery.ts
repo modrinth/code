@@ -25,6 +25,7 @@ const gallery: Stage = {
       weight: 901,
       suggestedStatus: 'flagged',
       severity: 'low',
+      shouldShow: (project) => project.gallery && project.gallery.length > 0,
       message: async () => (await import('../messages/gallery/not-relevant.md?raw')).default,
     } as ButtonAction,
   ],
