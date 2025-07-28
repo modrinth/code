@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import type { ServerStatus, ServerWorld, SingleplayerWorld, World } from '@/helpers/worlds.ts'
-import { set_world_display_status, getWorldIdentifier } from '@/helpers/worlds.ts'
+import type {
+  ProtocolVersion,
+  ServerStatus,
+  ServerWorld,
+  SingleplayerWorld,
+  World,
+  set_world_display_status,
+  getWorldIdentifier,
+} from '@/helpers/worlds.ts'
 import { formatNumber, getPingLevel } from '@modrinth/utils'
 import {
   useRelativeTime,
@@ -55,7 +62,7 @@ const props = withDefaults(
     playingWorld?: boolean
     startingInstance?: boolean
     supportsQuickPlay?: boolean
-    currentProtocol?: number | null
+    currentProtocol?: ProtocolVersion | null
     highlighted?: boolean
 
     // Server only
@@ -102,7 +109,8 @@ const serverIncompatible = computed(
     !!props.serverStatus &&
     !!props.serverStatus.version?.protocol &&
     !!props.currentProtocol &&
-    props.serverStatus.version.protocol !== props.currentProtocol,
+    (props.serverStatus.version.protocol !== props.currentProtocol.version ||
+      props.serverStatus.version.legacy !== props.currentProtocol.legacy),
 )
 
 const locked = computed(() => props.world.type === 'singleplayer' && props.world.locked)
