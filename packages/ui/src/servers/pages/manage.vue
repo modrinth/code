@@ -72,9 +72,6 @@ import { ButtonStyled, RaisedBadge } from '@modrinth/ui'
 import ServerCard from '../components/management/ServerCard.vue'
 import { PlusIcon, ServerIcon } from '@modrinth/assets'
 
-const isMobile = ref(false)
-const isRefreshing = ref(false)
-
 const servers = ref([
   {
     id: 'server-1',
@@ -121,23 +118,4 @@ const servers = ref([
     ip: 'valiant-apple.modrinth.gg',
   },
 ])
-
-const checkMobile = () => {
-  isMobile.value = window.innerWidth < 640
-}
-
-const handlePullToRefresh = () => {
-  if (window.scrollY === 0) {
-    isRefreshing.value = true
-    setTimeout(() => {
-      isRefreshing.value = false
-    }, 1500)
-  }
-}
-
-onMounted(() => {
-  checkMobile()
-  window.addEventListener('resize', checkMobile)
-  window.addEventListener('scroll', handlePullToRefresh)
-})
 </script>
