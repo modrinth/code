@@ -1,8 +1,6 @@
 import type { Project } from '@modrinth/utils'
 import type { Nag, NagContext } from '../../types/nags'
-import { useVIntl } from '@vintl/vintl'
-
-import messages from './tags.i18n'
+import { useVIntl, defineMessage } from '@vintl/vintl'
 
 function getCategories(
   project: Project & { actualProjectType: string },
@@ -22,15 +20,25 @@ function getCategories(
 export const tagsNags: Nag[] = [
   {
     id: 'too-many-tags',
-    title: messages.tooManyTagsTitle,
+    title: defineMessage({
+      id: 'nags.too-many-tags.title',
+      defaultMessage: 'Too many tags selected',
+    }),
     description: (context: NagContext) => {
       const { formatMessage } = useVIntl()
       const tagCount =
         context.project.categories.length + (context.project.additional_categories?.length || 0)
 
-      return formatMessage(messages.tooManyTagsDescription, {
-        tagCount,
-      })
+      return formatMessage(
+        defineMessage({
+          id: 'nags.too-many-tags.description',
+          defaultMessage:
+            "You've selected {tagCount} tags. Consider reducing to 5 or fewer to keep your project focused and easier to discover.",
+        }),
+        {
+          tagCount,
+        },
+      )
     },
     status: 'warning',
     shouldShow: (context: NagContext) => {
@@ -40,23 +48,36 @@ export const tagsNags: Nag[] = [
     },
     link: {
       path: 'settings/tags',
-      title: messages.editTagsTitle,
+      title: defineMessage({
+        id: 'nags.edit-tags.title',
+        defaultMessage: 'Edit tags',
+      }),
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-tags',
     },
   },
   {
     id: 'multiple-resolution-tags',
-    title: messages.multipleResolutionTagsTitle,
+    title: defineMessage({
+      id: 'nags.multiple-resolution-tags.title',
+      defaultMessage: 'Multiple resolution tags selected',
+    }),
     description: (context: NagContext) => {
       const { formatMessage } = useVIntl()
       const resolutionTags = context.project.categories.filter((tag: string) =>
         ['16x', '32x', '48x', '64x', '128x', '256x', '512x', '1024x'].includes(tag),
       )
 
-      return formatMessage(messages.multipleResolutionTagsDescription, {
-        count: resolutionTags.length,
-        tags: resolutionTags.join(', '),
-      })
+      return formatMessage(
+        defineMessage({
+          id: 'nags.multiple-resolution-tags.description',
+          defaultMessage:
+            "You've selected {count} resolution tags ({tags}). Resource packs should typically only have one resolution tag that matches their primary resolution.",
+        }),
+        {
+          count: resolutionTags.length,
+          tags: resolutionTags.join(', '),
+        },
+      )
     },
     status: 'warning',
     shouldShow: (context: NagContext) => {
@@ -69,13 +90,19 @@ export const tagsNags: Nag[] = [
     },
     link: {
       path: 'settings/tags',
-      title: messages.editTagsTitle,
+      title: defineMessage({
+        id: 'nags.edit-tags.title',
+        defaultMessage: 'Edit tags',
+      }),
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-tags',
     },
   },
   {
     id: 'all-tags-selected',
-    title: messages.allTagsSelectedTitle,
+    title: defineMessage({
+      id: 'nags.all-tags-selected.title',
+      defaultMessage: 'All tags selected',
+    }),
     description: (context: NagContext) => {
       const { formatMessage } = useVIntl()
       const categoriesForProjectType = getCategories(
@@ -84,9 +111,16 @@ export const tagsNags: Nag[] = [
       )
       const totalAvailableTags = categoriesForProjectType.length
 
-      return formatMessage(messages.allTagsSelectedDescription, {
-        totalAvailableTags,
-      })
+      return formatMessage(
+        defineMessage({
+          id: 'nags.all-tags-selected.description',
+          defaultMessage:
+            "You've selected all {totalAvailableTags} available tags. This defeats the purpose of tags, which are meant to help users find relevant projects. Please select only the tags that truly apply to your project.",
+        }),
+        {
+          totalAvailableTags,
+        },
+      )
     },
     status: 'required',
     shouldShow: (context: NagContext) => {
@@ -100,7 +134,10 @@ export const tagsNags: Nag[] = [
     },
     link: {
       path: 'settings/tags',
-      title: messages.editTagsTitle,
+      title: defineMessage({
+        id: 'nags.edit-tags.title',
+        defaultMessage: 'Edit tags',
+      }),
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-tags',
     },
   },

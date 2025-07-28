@@ -1,8 +1,6 @@
 import type { Nag, NagContext } from '../../types/nags'
 import { formatProjectType } from '@modrinth/utils'
-import { useVIntl } from '@vintl/vintl'
-
-import messages from './links.i18n'
+import { useVIntl, defineMessage } from '@vintl/vintl'
 
 export const commonLinkDomains = {
   source: ['github.com', 'gitlab.com', 'bitbucket.org', 'codeberg.org', 'git.sr.ht'],
@@ -52,8 +50,15 @@ export function isUncommonLicenseUrl(url: string | undefined, domains: string[])
 export const linksNags: Nag[] = [
   {
     id: 'verify-external-links',
-    title: messages.verifyExternalLinksTitle,
-    description: messages.verifyExternalLinksDescription,
+    title: defineMessage({
+      id: 'nags.verify-external-links.title',
+      defaultMessage: 'Verify external links',
+    }),
+    description: defineMessage({
+      id: 'nags.verify-external-links.description',
+      defaultMessage:
+        "Some of your external links may be using domains that aren't recognized as common for their link type.",
+    }),
     status: 'warning',
     shouldShow: (context: NagContext) => {
       return (
@@ -64,26 +69,50 @@ export const linksNags: Nag[] = [
     },
     link: {
       path: 'settings/links',
-      title: messages.visitLinksSettingsTitle,
+      title: defineMessage({
+        id: 'nags.visit-links-settings.title',
+        defaultMessage: 'Visit links settings',
+      }),
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-links',
     },
   },
   {
     id: 'invalid-license-url',
-    title: messages.invalidLicenseUrlTitle,
+    title: defineMessage({
+      id: 'nags.invalid-license-url.title',
+      defaultMessage: 'Invalid license URL',
+    }),
     description: (context: NagContext) => {
       const { formatMessage } = useVIntl()
       const licenseUrl = context.project.license.url
 
       if (!licenseUrl) {
-        return formatMessage(messages.invalidLicenseUrlDescriptionDefault)
+        return formatMessage(
+          defineMessage({
+            id: 'nags.invalid-license-url.description.default',
+            defaultMessage: 'License URL is invalid.',
+          }),
+        )
       }
 
       try {
         const domain = new URL(licenseUrl).hostname.toLowerCase()
-        return formatMessage(messages.invalidLicenseUrlDescriptionDomain, { domain })
+        return formatMessage(
+          defineMessage({
+            id: 'nags.invalid-license-url.description.domain',
+            defaultMessage:
+              'Your license URL points to {domain}, which is not appropriate for license information. License URLs should link to the actual license text or legal documentation, not social media, gaming platforms etc.',
+          }),
+          { domain },
+        )
       } catch {
-        return formatMessage(messages.invalidLicenseUrlDescriptionMalformed)
+        return formatMessage(
+          defineMessage({
+            id: 'nags.invalid-license-url.description.malformed',
+            defaultMessage:
+              'Your license URL appears to be malformed. Please provide a valid URL to your license text.',
+          }),
+        )
       }
     },
     status: 'required',
@@ -102,19 +131,32 @@ export const linksNags: Nag[] = [
     },
     link: {
       path: 'settings',
-      title: messages.editLicenseTitle,
+      title: defineMessage({
+        id: 'nags.edit-license.title',
+        defaultMessage: 'Edit license',
+      }),
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
     },
   },
   {
     id: 'gpl-license-source-required',
-    title: messages.gplLicenseSourceRequiredTitle,
+    title: defineMessage({
+      id: 'nags.gpl-license-source-required.title',
+      defaultMessage: 'GPL license requires source',
+    }),
     description: (context: NagContext) => {
       const { formatMessage } = useVIntl()
 
-      return formatMessage(messages.gplLicenseSourceRequiredDescription, {
-        projectType: formatProjectType(context.project.project_type).toLowerCase(),
-      })
+      return formatMessage(
+        defineMessage({
+          id: 'nags.gpl-license-source-required.description',
+          defaultMessage:
+            'Your {projectType} uses a GPL license which requires source code to be available. Please provide a source code link or consider using a different license.',
+        }),
+        {
+          projectType: formatProjectType(context.project.project_type).toLowerCase(),
+        },
+      )
     },
     status: 'required',
     shouldShow: (context: NagContext) => {
@@ -148,7 +190,10 @@ export const linksNags: Nag[] = [
     },
     link: {
       path: 'settings/links',
-      title: messages.visitLinksSettingsTitle,
+      title: defineMessage({
+        id: 'nags.visit-links-settings.title',
+        defaultMessage: 'Visit links settings',
+      }),
       shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-links',
     },
   },
