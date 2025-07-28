@@ -49,6 +49,7 @@ import _CubeIcon from './icons/cube.svg?component'
 import _CurrencyIcon from './icons/currency.svg?component'
 import _DashboardIcon from './icons/dashboard.svg?component'
 import _DatabaseIcon from './icons/database.svg?component'
+import _DotIcon from './icons/dot.svg?component'
 import _DownloadIcon from './icons/download.svg?component'
 import _DropdownIcon from './icons/dropdown.svg?component'
 import _EditIcon from './icons/edit.svg?component'
@@ -240,6 +241,7 @@ export const CubeIcon = _CubeIcon
 export const CurrencyIcon = _CurrencyIcon
 export const DashboardIcon = _DashboardIcon
 export const DatabaseIcon = _DatabaseIcon
+export const DotIcon = _DotIcon
 export const DownloadIcon = _DownloadIcon
 export const DropdownIcon = _DropdownIcon
 export const EditIcon = _EditIcon
