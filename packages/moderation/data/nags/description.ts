@@ -3,7 +3,7 @@ import { useVIntl, defineMessage } from '@vintl/vintl'
 
 export const MIN_DESCRIPTION_CHARS = 500
 export const MAX_HEADER_LENGTH = 100
-export const MIN_SUMMARY_CHARS = 125
+export const MIN_SUMMARY_CHARS = 35
 
 function analyzeHeaderLength(markdown: string): { hasLongHeaders: boolean; longHeaders: string[] } {
   if (!markdown) return { hasLongHeaders: false, longHeaders: [] }
