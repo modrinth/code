@@ -476,6 +476,30 @@
   "layout.nav.search": {
     "message": "Search"
   },
+  "moderation.filter.by": {
+    "message": "Filter by"
+  },
+  "moderation.moderate": {
+    "message": "Moderate"
+  },
+  "moderation.page.projects": {
+    "message": "Projects"
+  },
+  "moderation.page.reports": {
+    "message": "Reports"
+  },
+  "moderation.page.technicalReview": {
+    "message": "Technical Review"
+  },
+  "moderation.search.placeholder": {
+    "message": "Search..."
+  },
+  "moderation.sort.by": {
+    "message": "Sort by"
+  },
+  "moderation.technical.search.placeholder": {
+    "message": "Search tech reviews..."
+  },
   "profile.button.billing": {
     "message": "Manage user billing"
   },
