@@ -50,22 +50,27 @@ const container = ref(null);
 const showLabels = ref(false);
 
 const locations = ref([
-  // Active locations
-  { name: "New York", lat: 40.7128, lng: -74.006, active: true, clicked: false },
-  { name: "Los Angeles", lat: 34.0522, lng: -118.2437, active: true, clicked: false },
-  { name: "Miami", lat: 25.7617, lng: -80.1918, active: true, clicked: false },
-  { name: "Spokane", lat: 47.667309, lng: -117.411922, active: true, clicked: false },
-  { name: "Dallas", lat: 32.78372, lng: -96.7947, active: true, clicked: false },
-  // Future Locations
-  // { name: "London", lat: 51.5074, lng: -0.1278, active: false, clicked: false },
-  // { name: "Frankfurt", lat: 50.1109, lng: 8.6821, active: false, clicked: false },
-  // { name: "Amsterdam", lat: 52.3676, lng: 4.9041, active: false, clicked: false },
-  // { name: "Paris", lat: 48.8566, lng: 2.3522, active: false, clicked: false },
-  // { name: "Singapore", lat: 1.3521, lng: 103.8198, active: false, clicked: false },
-  // { name: "Tokyo", lat: 35.6762, lng: 139.6503, active: false, clicked: false },
-  // { name: "Sydney", lat: -33.8688, lng: 151.2093, active: false, clicked: false },
-  // { name: "São Paulo", lat: -23.5505, lng: -46.6333, active: false, clicked: false },
-  // { name: "Toronto", lat: 43.6532, lng: -79.3832, active: false, clicked: false },
+  {
+    name: "Vint Hill",
+    lat: 38.74724876915715,
+    lng: -77.67436507922152,
+    active: true,
+    clicked: false,
+  },
+  {
+    name: "Coventry",
+    lat: 52.39751276904742,
+    lng: -1.5777183894453757,
+    active: true,
+    clicked: false,
+  },
+  {
+    name: "Limburg",
+    lat: 50.40863558430334,
+    lng: 8.062427315007714,
+    active: true,
+    clicked: false,
+  },
 ]);
 
 const isLocationVisible = (location) => {
