@@ -182,9 +182,6 @@
   "collection.button.unfollow-project": {
     "message": "Unfollow project"
   },
-  "collection.button.upload-icon": {
-    "message": "Upload icon"
-  },
   "collection.delete-modal.description": {
     "message": "This will remove this collection forever. This action cannot be undone."
   },

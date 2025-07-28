@@ -27,6 +27,7 @@ hashlink.workspace = true
 png.workspace = true
 bytemuck.workspace = true
 rgb.workspace = true
+phf.workspace = true
 
 chrono = { workspace = true, features = ["serde"] }
 daedalus.workspace = true
@@ -82,6 +83,7 @@ ariadne.workspace = true
 winreg.workspace = true
 
 [build-dependencies]
+dotenvy.workspace = true
 dunce.workspace = true
 
 [features]

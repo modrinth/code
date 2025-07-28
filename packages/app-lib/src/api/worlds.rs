@@ -5,6 +5,8 @@ use crate::state::attached_world_data::AttachedWorldData;
 use crate::state::{
     Profile, ProfileInstallStage, attached_world_data, server_join_log,
 };
+use crate::util::protocol_version::OLD_PROTOCOL_VERSIONS;
+pub use crate::util::protocol_version::ProtocolVersion;
 pub use crate::util::server_ping::{
     ServerGameProfile, ServerPlayers, ServerStatus, ServerVersion,
 };
@@ -835,7 +837,7 @@ mod servers_data {
 
 pub async fn get_profile_protocol_version(
     profile: &str,
-) -> Result<Option<i32>> {
+) -> Result<Option<ProtocolVersion>> {
     let mut profile = super::profile::get(profile).await?.ok_or_else(|| {
         ErrorKind::UnmanagedProfileError(format!(
             "Could not find profile {profile}"
@@ -846,7 +848,12 @@ pub async fn get_profile_protocol_version(
     }
 
     if let Some(protocol_version) = profile.protocol_version {
-        return Ok(Some(protocol_version));
+        return Ok(Some(ProtocolVersion::modern(protocol_version)));
+    }
+    if let Some(protocol_version) =
+        OLD_PROTOCOL_VERSIONS.get(&profile.game_version)
+    {
+        return Ok(Some(*protocol_version));
     }
 
     let minecraft = crate::api::metadata::get_minecraft_versions().await?;
@@ -854,7 +861,7 @@ pub async fn get_profile_protocol_version(
         .versions
         .iter()
         .position(|it| it.id == profile.game_version)
-        .ok_or(crate::ErrorKind::LauncherError(format!(
+        .ok_or(ErrorKind::LauncherError(format!(
             "Invalid game version: {}",
             profile.game_version
         )))?;
@@ -890,16 +897,19 @@ pub async fn get_profile_protocol_version(
         profile.protocol_version = version;
         profile.upsert(&state.pool).await?;
     }
-    Ok(version)
+    Ok(version.map(ProtocolVersion::modern))
 }
 
 pub async fn get_server_status(
     address: &str,
-    protocol_version: Option<i32>,
+    protocol_version: Option<ProtocolVersion>,
 ) -> Result<ServerStatus> {
     let (original_host, original_port) = parse_server_address(address)?;
     let (host, port) =
         resolve_server_address(original_host, original_port).await?;
+    tracing::debug!(
+        "Pinging {address} with protocol version {protocol_version:?}"
+    );
     server_ping::get_server_status(
         &(&host as &str, port),
         (original_host, original_port),

@@ -951,14 +951,7 @@ import {
   useRelativeTime,
 } from "@modrinth/ui";
 import VersionSummary from "@modrinth/ui/src/components/version/VersionSummary.vue";
-import {
-  formatCategory,
-  formatProjectType,
-  isRejected,
-  isStaff,
-  isUnderReview,
-  renderString,
-} from "@modrinth/utils";
+import { formatCategory, formatProjectType, renderString } from "@modrinth/utils";
 import dayjs from "dayjs";
 import { Tooltip } from "floating-vue";
 import { useLocalStorage } from "@vueuse/core";
@@ -1646,9 +1639,7 @@ const navLinks = computed(() => {
     {
       label: formatMessage(messages.moderationTab),
       href: `${projectUrl}/moderation`,
-      shown:
-        !!currentMember.value &&
-        (isRejected(project.value) || isUnderReview(project.value) || isStaff(auth.value.user)),
+      shown: !!currentMember.value,
     },
   ];
 });

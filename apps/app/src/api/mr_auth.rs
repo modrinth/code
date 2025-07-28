@@ -1,79 +1,70 @@
 use crate::api::Result;
-use chrono::{Duration, Utc};
+use crate::api::TheseusSerializableError;
+use crate::api::oauth_utils;
+use tauri::Manager;
+use tauri::Runtime;
 use tauri::plugin::TauriPlugin;
-use tauri::{Manager, Runtime, UserAttentionType};
+use tauri_plugin_opener::OpenerExt;
 use theseus::prelude::*;
+use tokio::sync::oneshot;
 
 pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
     tauri::plugin::Builder::new("mr-auth")
-        .invoke_handler(tauri::generate_handler![modrinth_login, logout, get,])
+        .invoke_handler(tauri::generate_handler![
+            modrinth_login,
+            logout,
+            get,
+            cancel_modrinth_login,
+        ])
         .build()
 }
 
 #[tauri::command]
 pub async fn modrinth_login<R: Runtime>(
     app: tauri::AppHandle<R>,
-) -> Result<Option<ModrinthCredentials>> {
-    let redirect_uri = mr_auth::authenticate_begin_flow();
+) -> Result<ModrinthCredentials> {
+    let (auth_code_recv_socket_tx, auth_code_recv_socket) = oneshot::channel();
+    let auth_code = tokio::spawn(oauth_utils::auth_code_reply::listen(
+        auth_code_recv_socket_tx,
+    ));
 
-    let start = Utc::now();
+    let auth_code_recv_socket = auth_code_recv_socket.await.unwrap()?;
 
-    if let Some(window) = app.get_webview_window("modrinth-signin") {
-        window.close()?;
-    }
+    let auth_request_uri = format!(
+        "{}?launcher=true&ipver={}&port={}",
+        mr_auth::authenticate_begin_flow(),
+        if auth_code_recv_socket.is_ipv4() {
+            "4"
+        } else {
+            "6"
+        },
+        auth_code_recv_socket.port()
+    );
 
-    let window = tauri::WebviewWindowBuilder::new(
-        &app,
-        "modrinth-signin",
-        tauri::WebviewUrl::External(redirect_uri.parse().map_err(|_| {
-            theseus::ErrorKind::OtherError(
-                "Error parsing auth redirect URL".to_string(),
+    app.opener()
+        .open_url(auth_request_uri, None::<&str>)
+        .map_err(|e| {
+            TheseusSerializableError::Theseus(
+                theseus::ErrorKind::OtherError(format!(
+                    "Failed to open auth request URI: {e}"
+                ))
+                .into(),
             )
-            .as_error()
-        })?),
-    )
-    .min_inner_size(420.0, 632.0)
-    .inner_size(420.0, 632.0)
-    .max_inner_size(420.0, 632.0)
-    .zoom_hotkeys_enabled(false)
-    .title("Sign into Modrinth")
-    .always_on_top(true)
-    .center()
-    .build()?;
+        })?;
 
-    window.request_user_attention(Some(UserAttentionType::Critical))?;
+    let Some(auth_code) = auth_code.await.unwrap()? else {
+        return Err(TheseusSerializableError::Theseus(
+            theseus::ErrorKind::OtherError("Login canceled".into()).into(),
+        ));
+    };
 
-    while (Utc::now() - start) < Duration::minutes(10) {
-        if window.title().is_err() {
-            // user closed window, cancelling flow
-            return Ok(None);
-        }
+    let credentials = mr_auth::authenticate_finish_flow(&auth_code).await?;
 
-        if window
-            .url()?
-            .as_str()
-            .starts_with("https://launcher-files.modrinth.com")
-        {
-            let url = window.url()?;
-
-            let code = url.query_pairs().find(|(key, _)| key == "code");
-
-            window.close()?;
-
-            return if let Some((_, code)) = code {
-                let val = mr_auth::authenticate_finish_flow(&code).await?;
-
-                Ok(Some(val))
-            } else {
-                Ok(None)
-            };
-        }
-
-        tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+    if let Some(main_window) = app.get_window("main") {
+        main_window.set_focus().ok();
     }
 
-    window.close()?;
-    Ok(None)
+    Ok(credentials)
 }
 
 #[tauri::command]
@@ -84,4 +75,9 @@ pub async fn logout() -> Result<()> {
 #[tauri::command]
 pub async fn get() -> Result<Option<ModrinthCredentials>> {
     Ok(theseus::mr_auth::get_credentials().await?)
+}
+
+#[tauri::command]
+pub fn cancel_modrinth_login() {
+    oauth_utils::auth_code_reply::stop_listeners();
 }

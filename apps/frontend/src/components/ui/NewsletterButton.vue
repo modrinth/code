@@ -1,29 +1,28 @@
 <script setup lang="ts">
 import { ButtonStyled } from "@modrinth/ui";
 import { MailIcon, CheckIcon } from "@modrinth/assets";
-import { ref, watchEffect } from "vue";
+import { ref } from "vue";
 import { useBaseFetch } from "~/composables/fetch.js";
 
 const auth = await useAuth();
 const showSubscriptionConfirmation = ref(false);
-const subscribed = ref(false);
-
-async function checkSubscribed() {
-  if (auth.value?.user) {
-    try {
-      const { data } = await useBaseFetch("auth/email/subscribe", {
-        method: "GET",
-      });
-      subscribed.value = data?.subscribed || false;
-    } catch {
-      subscribed.value = false;
+const showSubscribeButton = useAsyncData(
+  async () => {
+    if (auth.value?.user) {
+      try {
+        const { subscribed } = await useBaseFetch("auth/email/subscribe", {
+          method: "GET",
+        });
+        return !subscribed;
+      } catch {
+        return true;
+      }
+    } else {
+      return false;
     }
-  }
-}
-
-watchEffect(() => {
-  checkSubscribed();
-});
+  },
+  { watch: [auth], server: false },
+);
 
 async function subscribe() {
   try {
@@ -35,14 +34,19 @@ async function subscribe() {
   } finally {
     setTimeout(() => {
       showSubscriptionConfirmation.value = false;
-      subscribed.value = true;
+      showSubscribeButton.status.value = "success";
+      showSubscribeButton.data.value = false;
     }, 2500);
   }
 }
 </script>
 
 <template>
-  <ButtonStyled v-if="auth?.user && !subscribed" color="brand" type="outlined">
+  <ButtonStyled
+    v-if="showSubscribeButton.status.value === 'success' && showSubscribeButton.data.value"
+    color="brand"
+    type="outlined"
+  >
     <button v-tooltip="`Subscribe to the Modrinth newsletter`" @click="subscribe">
       <template v-if="!showSubscriptionConfirmation"> <MailIcon /> Subscribe </template>
       <template v-else> <CheckIcon /> Subscribed! </template>

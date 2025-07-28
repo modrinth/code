@@ -5,8 +5,8 @@ use tauri::{AppHandle, Manager, Runtime};
 use theseus::prelude::ProcessMetadata;
 use theseus::profile::{QuickPlayType, get_full_path};
 use theseus::worlds::{
-    DisplayStatus, ServerPackStatus, ServerStatus, World, WorldType,
-    WorldWithProfile,
+    DisplayStatus, ProtocolVersion, ServerPackStatus, ServerStatus, World,
+    WorldType, WorldWithProfile,
 };
 use theseus::{profile, worlds};
 
@@ -183,14 +183,16 @@ pub async fn remove_server_from_profile(
 }
 
 #[tauri::command]
-pub async fn get_profile_protocol_version(path: &str) -> Result<Option<i32>> {
+pub async fn get_profile_protocol_version(
+    path: &str,
+) -> Result<Option<ProtocolVersion>> {
     Ok(worlds::get_profile_protocol_version(path).await?)
 }
 
 #[tauri::command]
 pub async fn get_server_status(
     address: &str,
-    protocol_version: Option<i32>,
+    protocol_version: Option<ProtocolVersion>,
 ) -> Result<ServerStatus> {
     Ok(worlds::get_server_status(address, protocol_version).await?)
 }

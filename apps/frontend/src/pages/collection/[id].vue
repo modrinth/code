@@ -40,7 +40,6 @@
                       @change="showPreviewImage"
                     >
                       <UploadIcon aria-hidden="true" />
-                      {{ formatMessage(messages.uploadIconButton) }}
                     </FileInput>
                     <Button
                       v-if="!deletedIcon && (previewImage || collection.icon_url)"
@@ -478,10 +477,6 @@ const messages = defineMessages({
   updatedAtLabel: {
     id: "collection.label.updated-at",
     defaultMessage: "Updated {ago}",
-  },
-  uploadIconButton: {
-    id: "collection.button.upload-icon",
-    defaultMessage: "Upload icon",
   },
 });
 

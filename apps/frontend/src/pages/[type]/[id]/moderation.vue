@@ -76,8 +76,15 @@
       <p>
         This is a private conversation thread with the Modrinth moderators. They may message you
         with issues concerning this project. This thread is only checked when you submit your
-        project for review. For additional inquiries, contact
-        <a href="https://support.modrinth.com">Modrinth Support</a>.
+        project for review. For additional inquiries, please go to the
+        <a class="text-link" href="https://support.modrinth.com" target="_blank">
+          Modrinth Help Center
+        </a>
+        and click the green bubble to contact support.
+      </p>
+      <p v-if="isApproved(project)" class="warning">
+        <IssuesIcon /> The moderators do not actively monitor this chat. However, they may still see
+        messages here if there is a problem with your project.
       </p>
       <ConversationThread
         v-if="thread"

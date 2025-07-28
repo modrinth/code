@@ -4,6 +4,7 @@ export * from './types/stage'
 export * from './types/keybinds'
 export * from './types/nags'
 export * from './utils'
+export { finalPermissionMessages } from './data/modpack-permissions-stage'
 
 export * from './data/nags/index'
 export { default as checklist } from './data/checklist'
