@@ -26,6 +26,13 @@ mod args;
 
 pub mod download;
 
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
+pub enum QuickPlayVersion {
+    Modern,
+    Middle,
+    Legacy,
+}
+
 // All nones -> disallowed
 // 1+ true -> allowed
 // 1+ false -> disallowed
@@ -457,7 +464,7 @@ pub async fn launch_minecraft(
     credentials: &Credentials,
     post_exit_hook: Option<String>,
     profile: &Profile,
-    quick_play_type: &QuickPlayType,
+    mut quick_play_type: QuickPlayType,
 ) -> crate::Result<ProcessMetadata> {
     if profile.install_stage == ProfileInstallStage::PackInstalling
         || profile.install_stage == ProfileInstallStage::MinecraftInstalling
@@ -589,6 +596,34 @@ pub async fn launch_minecraft(
         io::create_dir_all(&natives_dir).await?;
     }
 
+    let quick_play_version = if version_index
+        <= minecraft
+            .versions
+            .iter()
+            .position(|x| x.id == "23w14a")
+            .unwrap_or(0)
+    {
+        QuickPlayVersion::Modern
+    } else if version_index
+        <= minecraft
+            .versions
+            .iter()
+            .position(|x| x.id == "13w17a")
+            .unwrap_or(0)
+    {
+        QuickPlayVersion::Middle
+    } else {
+        QuickPlayVersion::Legacy
+    };
+    if let QuickPlayType::Server(address) = &mut quick_play_type
+        && matches!(
+            quick_play_version,
+            QuickPlayVersion::Middle | QuickPlayVersion::Legacy
+        )
+    {
+        address.resolve().await?;
+    }
+
     let (main_class_keep_alive, main_class_path) =
         get_resource_file!(env "JAVA_JARS_DIR" / "theseus.jar")?;
 
@@ -610,7 +645,8 @@ pub async fn launch_minecraft(
             *memory,
             Vec::from(java_args),
             &java_version.architecture,
-            quick_play_type,
+            &quick_play_type,
+            quick_play_version,
             version_info
                 .logging
                 .as_ref()
@@ -646,7 +682,8 @@ pub async fn launch_minecraft(
                 &version.type_,
                 *resolution,
                 &java_version.architecture,
-                quick_play_type,
+                &quick_play_type,
+                quick_play_version,
             )
             .await?
             .into_iter(),

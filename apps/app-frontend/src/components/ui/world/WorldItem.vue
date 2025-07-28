@@ -61,7 +61,7 @@ const props = withDefaults(
     playingInstance?: boolean
     playingWorld?: boolean
     startingInstance?: boolean
-    supportsQuickPlay?: boolean
+    supportsWorldQuickPlay?: boolean
     currentProtocol?: ProtocolVersion | null
     highlighted?: boolean
 
@@ -85,7 +85,7 @@ const props = withDefaults(
     playingInstance: false,
     playingWorld: false,
     startingInstance: false,
-    supportsQuickPlay: false,
+    supportsWorldQuickPlay: false,
     currentProtocol: null,
 
     refreshing: false,
@@ -130,7 +130,7 @@ const messages = defineMessages({
   },
   noQuickPlay: {
     id: 'instance.worlds.no_quick_play',
-    defaultMessage: 'You can only jump straight into worlds on Minecraft 1.20+',
+    defaultMessage: 'You can only jump straight into singleplayer worlds on Minecraft 1.20+',
   },
   gameAlreadyOpen: {
     id: 'instance.worlds.game_already_open',
@@ -334,13 +334,17 @@ const messages = defineMessages({
                 ? formatMessage(messages.noContact)
                 : serverIncompatible
                   ? formatMessage(messages.incompatibleServer)
-                  : !supportsQuickPlay
+                  : world.type == 'singleplayer' && !supportsWorldQuickPlay
                     ? formatMessage(messages.noQuickPlay)
                     : playingOtherWorld || locked
                       ? formatMessage(messages.gameAlreadyOpen)
                       : null
             "
-            :disabled="!supportsQuickPlay || playingOtherWorld || startingInstance"
+            :disabled="
+              playingOtherWorld ||
+              startingInstance ||
+              (world.type == 'singleplayer' && !supportsWorldQuickPlay)
+            "
             @click="emit('play')"
           >
             <SpinnerIcon v-if="startingInstance && playingWorld" class="animate-spin" />
@@ -359,7 +363,7 @@ const messages = defineMessages({
               },
               {
                 id: 'play-anyway',
-                shown: serverIncompatible && !playingInstance && supportsQuickPlay,
+                shown: serverIncompatible && !playingInstance && supportsWorldQuickPlay,
                 action: () => emit('play'),
               },
               {

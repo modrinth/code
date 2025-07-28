@@ -313,7 +313,7 @@ export async function refreshWorlds(instancePath: string): Promise<World[]> {
 
 const FIRST_QUICK_PLAY_VERSION = '23w14a'
 
-export function hasQuickPlaySupport(gameVersions: GameVersion[], currentVersion: string) {
+export function hasWorldQuickPlaySupport(gameVersions: GameVersion[], currentVersion: string) {
   if (!gameVersions.length) {
     return false
   }

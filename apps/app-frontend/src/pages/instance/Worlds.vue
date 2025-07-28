@@ -67,7 +67,7 @@
         :key="`world-${world.type}-${world.type == 'singleplayer' ? world.path : `${world.address}-${world.index}`}`"
         :world="world"
         :highlighted="highlightedWorld === getWorldIdentifier(world)"
-        :supports-quick-play="supportsQuickPlay"
+        :supports-world-quick-play="supportsWorldQuickPlay"
         :current-protocol="protocolVersion"
         :playing-instance="playing"
         :playing-world="worldsMatch(world, worldPlaying)"
@@ -150,7 +150,7 @@ import {
   refreshWorld,
   sortWorlds,
   refreshServers,
-  hasQuickPlaySupport,
+  hasWorldQuickPlaySupport,
   refreshWorlds,
   handleDefaultProfileUpdateEvent,
   showWorldInFolder,
@@ -355,8 +355,8 @@ function worldsMatch(world: World, other: World | undefined) {
 }
 
 const gameVersions = ref<GameVersion[]>(await get_game_versions().catch(() => []))
-const supportsQuickPlay = computed(() =>
-  hasQuickPlaySupport(gameVersions.value, instance.value.game_version),
+const supportsWorldQuickPlay = computed(() =>
+  hasWorldQuickPlaySupport(gameVersions.value, instance.value.game_version),
 )
 
 const filterOptions = computed(() => {

@@ -1,5 +1,5 @@
 //! Minecraft CLI argument logic
-use crate::launcher::parse_rules;
+use crate::launcher::{QuickPlayVersion, parse_rules};
 use crate::profile::QuickPlayType;
 use crate::state::Credentials;
 use crate::{
@@ -120,6 +120,7 @@ pub fn get_jvm_arguments(
     custom_args: Vec<String>,
     java_arch: &str,
     quick_play_type: &QuickPlayType,
+    quick_play_version: QuickPlayVersion,
     log_config: Option<&LoggingConfiguration>,
 ) -> crate::Result<Vec<String>> {
     let mut parsed_arguments = Vec::new();
@@ -155,12 +156,27 @@ pub fn get_jvm_arguments(
         parsed_arguments.push("-cp".to_string());
         parsed_arguments.push(class_paths.to_string());
     }
+
     parsed_arguments.push(format!("-Xmx{}M", memory.maximum));
     if let Some(LoggingConfiguration::Log4j2Xml { argument, file }) = log_config
     {
         let full_path = log_configs_path.join(&file.id);
         let full_path = full_path.to_string_lossy();
         parsed_arguments.push(argument.replace("${path}", &full_path));
+    }
+    match (quick_play_type, quick_play_version) {
+        (
+            QuickPlayType::Singleplayer(world),
+            QuickPlayVersion::Middle | QuickPlayVersion::Legacy,
+        ) => {
+            parsed_arguments.push(format!("-Dmodrinth.quickPlayWorld={world}"));
+        }
+        (QuickPlayType::Server(server), QuickPlayVersion::Legacy) => {
+            let (host, port) = server.require_resolved()?;
+            parsed_arguments.push(format!("-Dmodrinth.quickPlayHost={host}"));
+            parsed_arguments.push(format!("-Dmodrinth.quickPlayPort={port}"));
+        }
+        _ => {}
     }
     for arg in custom_args {
         if !arg.is_empty() {
@@ -225,13 +241,13 @@ pub async fn get_minecraft_arguments(
     resolution: WindowSize,
     java_arch: &str,
     quick_play_type: &QuickPlayType,
+    quick_play_version: QuickPlayVersion,
 ) -> crate::Result<Vec<String>> {
     let access_token = credentials.access_token.clone();
     let profile = credentials.maybe_online_profile().await;
+    let mut parsed_arguments = Vec::new();
 
     if let Some(arguments) = arguments {
-        let mut parsed_arguments = Vec::new();
-
         parse_arguments(
             arguments,
             &mut parsed_arguments,
@@ -253,10 +269,7 @@ pub async fn get_minecraft_arguments(
             java_arch,
             quick_play_type,
         )?;
-
-        Ok(parsed_arguments)
     } else if let Some(legacy_arguments) = legacy_arguments {
-        let mut parsed_arguments = Vec::new();
         for x in legacy_arguments.split(' ') {
             parsed_arguments.push(parse_minecraft_argument(
                 &x.replace(' ', TEMPORARY_REPLACE_CHAR),
@@ -272,10 +285,21 @@ pub async fn get_minecraft_arguments(
                 quick_play_type,
             )?);
         }
-        Ok(parsed_arguments)
-    } else {
-        Ok(Vec::new())
     }
+
+    if let QuickPlayType::Server(server) = quick_play_type
+        && quick_play_version == QuickPlayVersion::Middle
+    {
+        let (host, port) = server.require_resolved()?;
+        parsed_arguments.extend_from_slice(&[
+            "--server".to_string(),
+            host.to_string(),
+            "--port".to_string(),
+            port.to_string(),
+        ]);
+    }
+
+    Ok(parsed_arguments)
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -354,9 +378,9 @@ fn parse_minecraft_argument(
         )
         .replace(
             "${quickPlayMultiplayer}",
-            match quick_play_type {
-                QuickPlayType::Server(address) => address,
-                _ => "",
+            &match quick_play_type {
+                QuickPlayType::Server(address) => address.to_string(),
+                _ => "".to_string(),
             },
         ))
 }
