@@ -5,7 +5,7 @@
       <span class="text-sm sm:text-base text-secondary">View and manage all your servers</span>
     </div>
     <div class="sm:ml-auto">
-      <ButtonStyled color="green" :size="isMobile ? 'standard' : 'large'" class="w-full sm:w-auto">
+      <ButtonStyled color="green" size="large" class="w-full sm:w-auto">
         <button class="flex items-center justify-center gap-2">
           <PlusIcon class="size-4" />
           <span>New server</span>
