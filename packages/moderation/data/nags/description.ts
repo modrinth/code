@@ -153,7 +153,7 @@ export const descriptionNags: Nag[] = [
         defineMessage({
           id: 'nags.summary-too-short.description',
           defaultMessage:
-            "Your summary is {length} characters. It's recommended to have at least {minChars} characters to provide users with enough information about your project.",
+            'Your summary is {length} characters. It should ideally be around {minChars} characters, one short sentence about your project.',
         }),
         {
           length: context.project.description?.length || 0,

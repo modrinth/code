@@ -27,8 +27,8 @@ export const commonLinkDomains = {
   ],
 }
 
-export function isCommonUrl(url: string | undefined, commonDomains: string[]): boolean {
-  if (!url) return false
+export function isCommonUrl(url: string | null, commonDomains: string[]): boolean {
+  if (url === null || url === '') return true
   try {
     const domain = new URL(url).hostname.toLowerCase()
     return commonDomains.some((allowed) => domain.includes(allowed))
@@ -37,8 +37,8 @@ export function isCommonUrl(url: string | undefined, commonDomains: string[]): b
   }
 }
 
-export function isUncommonLicenseUrl(url: string | undefined, domains: string[]): boolean {
-  if (!url) return false
+export function isUncommonLicenseUrl(url: string | null, domains: string[]): boolean {
+  if (url === null || url === '') return false
   try {
     const domain = new URL(url).hostname.toLowerCase()
     return domains.some((uncommonDomain) => domain.includes(uncommonDomain))

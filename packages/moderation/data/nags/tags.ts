@@ -130,7 +130,10 @@ export const tagsNags: Nag[] = [
       )
       const totalSelectedTags =
         context.project.categories.length + (context.project.additional_categories?.length || 0)
-      return totalSelectedTags === categoriesForProjectType.length
+      return (
+        totalSelectedTags === categoriesForProjectType.length &&
+        context.project.project_type !== 'project'
+      )
     },
     link: {
       path: 'settings/tags',
