@@ -981,23 +981,6 @@ const userMenuOptions = computed(() => {
     },
   ];
 
-  if (
-    (auth.value && auth.value.user && auth.value.user.role === "moderator") ||
-    auth.value.user.role === "admin"
-  ) {
-    options = [
-      ...options,
-      {
-        divider: true,
-      },
-      {
-        id: "moderation",
-        color: "orange",
-        link: "/moderation/review",
-      },
-    ];
-  }
-
   options = [
     ...options,
     {
