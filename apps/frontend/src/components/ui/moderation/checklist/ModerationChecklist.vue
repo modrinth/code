@@ -1164,6 +1164,8 @@ function generateModpackMessage(allFiles: {
       attributeMods.push(file.file_name);
     } else if (file.status === "no" && file.approved === "no") {
       noMods.push(file.file_name);
+    } else if (file.status === "permanent-no") {
+      permanentNoMods.push(file.file_name);
     }
   });
 

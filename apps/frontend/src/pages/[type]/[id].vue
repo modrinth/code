@@ -690,7 +690,7 @@
                   {
                     id: 'moderation-checklist',
                     action: () => {
-                      moderationStore.setSingleProject(project.value.id);
+                      moderationStore.setSingleProject(project.id);
                       showModerationChecklist = true;
                     },
                     color: 'orange',
