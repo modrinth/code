@@ -1,5 +1,6 @@
 package com.modrinth.theseus.agent;
 
+import com.modrinth.theseus.agent.transformers.MinecraftTransformer;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.instrument.Instrumentation;
