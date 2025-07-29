@@ -259,7 +259,7 @@ const typeFiltered = computed(() => {
     if (!roleMap) return false;
 
     const authorRole = roleMap.get(lastMessage.author_id);
-    const isModeratorMessage = authorRole === "moderator";
+    const isModeratorMessage = authorRole === "moderator" || authorRole === "admin";
 
     return currentFilterType.value === "Read" ? isModeratorMessage : !isModeratorMessage;
   });
