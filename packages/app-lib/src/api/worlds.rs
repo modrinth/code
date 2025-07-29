@@ -3,13 +3,15 @@ use crate::launcher::get_loader_version_from_profile;
 use crate::profile::get_full_path;
 use crate::state::attached_world_data::AttachedWorldData;
 use crate::state::{
-    attached_world_data, server_join_log, Profile, ProfileInstallStage,
+    Profile, ProfileInstallStage, attached_world_data, server_join_log,
 };
+use crate::util::protocol_version::OLD_PROTOCOL_VERSIONS;
+pub use crate::util::protocol_version::ProtocolVersion;
 pub use crate::util::server_ping::{
     ServerGameProfile, ServerPlayers, ServerStatus, ServerVersion,
 };
 use crate::util::{io, server_ping};
-use crate::{launcher, Error, ErrorKind, Result, State};
+use crate::{Error, ErrorKind, Result, State, launcher};
 use async_walkdir::WalkDir;
 use async_zip::{Compression, ZipEntryBuilder};
 use chrono::{DateTime, Local, TimeZone, Utc};
@@ -17,7 +19,6 @@ use either::Either;
 use enumset::{EnumSet, EnumSetType};
 use fs4::tokio::AsyncFileExt;
 use futures::StreamExt;
-use lazy_static::lazy_static;
 use quartz_nbt::{NbtCompound, NbtTag};
 use regex::{Regex, RegexBuilder};
 use serde::{Deserialize, Serialize};
@@ -25,7 +26,10 @@ use std::cmp::Reverse;
 use std::io::Cursor;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::path::{Path, PathBuf};
+use std::sync::LazyLock;
 use tokio::io::AsyncWriteExt;
+use tokio::sync::Semaphore;
+use tokio::task::JoinSet;
 use tokio_util::compat::FuturesAsyncWriteCompatExt;
 use url::Url;
 
@@ -255,7 +259,7 @@ async fn get_all_worlds_in_profile(
         AttachedWorldData::get_all_for_instance(profile_path, &state.pool)
             .await?;
     if !attached_data.is_empty() {
-        for world in worlds.iter_mut() {
+        for world in &mut worlds {
             if let Some(data) = attached_data
                 .get(&(world.world_type(), world.world_id().to_owned()))
             {
@@ -394,25 +398,27 @@ async fn get_server_worlds_in_profile(
         .await
         .ok();
 
+    let first_server_index = worlds.len();
     for (index, server) in servers.into_iter().enumerate() {
         if server.hidden {
             // TODO: Figure out whether we want to hide or show direct connect servers
             continue;
         }
-        let icon = server.icon.and_then(|icon| {
-            Url::parse(&format!("data:image/png;base64,{icon}")).ok()
-        });
-        let last_played = join_log
-            .as_ref()
-            .and_then(|log| {
-                let address = parse_server_address(&server.ip).ok()?;
-                log.get(&(address.0.to_owned(), address.1))
-            })
-            .copied();
         let world = World {
             name: server.name,
-            last_played,
-            icon: icon.map(Either::Right),
+            last_played: join_log
+                .as_ref()
+                .and_then(|log| {
+                    let (host, port) = parse_server_address(&server.ip).ok()?;
+                    log.get(&(host.to_owned(), port))
+                })
+                .copied(),
+            icon: server
+                .icon
+                .and_then(|icon| {
+                    Url::parse(&format!("data:image/png;base64,{icon}")).ok()
+                })
+                .map(Either::Right),
             display_status: DisplayStatus::Normal,
             details: WorldDetails::Server {
                 index,
@@ -421,6 +427,30 @@ async fn get_server_worlds_in_profile(
             },
         };
         worlds.push(world);
+    }
+
+    if let Some(join_log) = join_log {
+        let mut futures = JoinSet::new();
+        for (index, world) in worlds.iter().enumerate().skip(first_server_index)
+        {
+            if world.last_played.is_some() {
+                continue;
+            }
+            if let WorldDetails::Server { address, .. } = &world.details
+                && let Ok((host, port)) = parse_server_address(address)
+            {
+                let host = host.to_owned();
+                futures.spawn(async move {
+                    resolve_server_address(&host, port)
+                        .await
+                        .ok()
+                        .map(|x| (index, x))
+                });
+            }
+        }
+        for (index, address) in futures.join_all().await.into_iter().flatten() {
+            worlds[index].last_played = join_log.get(&address).copied();
+        }
     }
 
     Ok(())
@@ -548,17 +578,19 @@ pub async fn backup_world(instance: &Path, world: &str) -> Result<u64> {
 }
 
 fn find_available_name(dir: &Path, file_name: &str, extension: &str) -> String {
-    lazy_static! {
-        static ref RESERVED_WINDOWS_FILENAMES: Regex = RegexBuilder::new(r#"^.*\.|(?:COM|CLOCK\$|CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\..*)?$"#)
+    static RESERVED_WINDOWS_FILENAMES: LazyLock<Regex> = LazyLock::new(|| {
+        RegexBuilder::new(r#"^.*\.|(?:COM|CLOCK\$|CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\..*)?$"#)
             .case_insensitive(true)
             .build()
-            .unwrap();
-        static ref COPY_COUNTER_PATTERN: Regex = RegexBuilder::new(r#"^(?<name>.*) \((?<count>\d*)\)$"#)
+            .unwrap()
+    });
+    static COPY_COUNTER_PATTERN: LazyLock<Regex> = LazyLock::new(|| {
+        RegexBuilder::new(r#"^(?<name>.*) \((?<count>\d*)\)$"#)
             .case_insensitive(true)
             .unicode(true)
             .build()
-            .unwrap();
-    }
+            .unwrap()
+    });
 
     let mut file_name = file_name.replace(
         [
@@ -743,8 +775,8 @@ pub async fn remove_server_from_profile(
 }
 
 mod servers_data {
-    use crate::util::io;
     use crate::Result;
+    use crate::util::io;
     use serde::{Deserialize, Serialize};
     use std::path::Path;
 
@@ -805,7 +837,7 @@ mod servers_data {
 
 pub async fn get_profile_protocol_version(
     profile: &str,
-) -> Result<Option<i32>> {
+) -> Result<Option<ProtocolVersion>> {
     let mut profile = super::profile::get(profile).await?.ok_or_else(|| {
         ErrorKind::UnmanagedProfileError(format!(
             "Could not find profile {profile}"
@@ -816,7 +848,12 @@ pub async fn get_profile_protocol_version(
     }
 
     if let Some(protocol_version) = profile.protocol_version {
-        return Ok(Some(protocol_version));
+        return Ok(Some(ProtocolVersion::modern(protocol_version)));
+    }
+    if let Some(protocol_version) =
+        OLD_PROTOCOL_VERSIONS.get(&profile.game_version)
+    {
+        return Ok(Some(*protocol_version));
     }
 
     let minecraft = crate::api::metadata::get_minecraft_versions().await?;
@@ -824,7 +861,7 @@ pub async fn get_profile_protocol_version(
         .versions
         .iter()
         .position(|it| it.id == profile.game_version)
-        .ok_or(crate::ErrorKind::LauncherError(format!(
+        .ok_or(ErrorKind::LauncherError(format!(
             "Invalid game version: {}",
             profile.game_version
         )))?;
@@ -860,16 +897,19 @@ pub async fn get_profile_protocol_version(
         profile.protocol_version = version;
         profile.upsert(&state.pool).await?;
     }
-    Ok(version)
+    Ok(version.map(ProtocolVersion::modern))
 }
 
 pub async fn get_server_status(
     address: &str,
-    protocol_version: Option<i32>,
+    protocol_version: Option<ProtocolVersion>,
 ) -> Result<ServerStatus> {
     let (original_host, original_port) = parse_server_address(address)?;
     let (host, port) =
         resolve_server_address(original_host, original_port).await?;
+    tracing::debug!(
+        "Pinging {address} with protocol version {protocol_version:?}"
+    );
     server_ping::get_server_status(
         &(&host as &str, port),
         (original_host, original_port),
@@ -941,9 +981,13 @@ async fn resolve_server_address(
     host: &str,
     port: u16,
 ) -> Result<(String, u16)> {
+    static SIMULTANEOUS_DNS_QUERIES: Semaphore = Semaphore::const_new(24);
+
     if host.parse::<Ipv4Addr>().is_ok() || host.parse::<Ipv6Addr>().is_ok() {
         return Ok((host.to_owned(), port));
     }
+
+    let _permit = SIMULTANEOUS_DNS_QUERIES.acquire().await?;
     let resolver = hickory_resolver::TokioResolver::builder_tokio()?.build();
     Ok(
         match resolver.srv_lookup(format!("_minecraft._tcp.{host}")).await {

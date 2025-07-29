@@ -1,15 +1,15 @@
 use super::ValidatedRedirectUri;
 use crate::auth::AuthenticationError;
 use crate::models::error::ApiError;
-use actix_web::http::{header::LOCATION, StatusCode};
 use actix_web::HttpResponse;
+use actix_web::http::{StatusCode, header::LOCATION};
 use ariadne::ids::DecodingError;
 
 #[derive(thiserror::Error, Debug)]
 #[error("{}", .error_type)]
 pub struct OAuthError {
     #[source]
-    pub error_type: OAuthErrorType,
+    pub error_type: Box<OAuthErrorType>,
 
     pub state: Option<String>,
     pub valid_redirect_uri: Option<ValidatedRedirectUri>,
@@ -32,7 +32,7 @@ impl OAuthError {
     /// See: IETF RFC 6749 4.1.2.1 (https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1)
     pub fn error(error_type: impl Into<OAuthErrorType>) -> Self {
         Self {
-            error_type: error_type.into(),
+            error_type: Box::new(error_type.into()),
             valid_redirect_uri: None,
             state: None,
         }
@@ -48,7 +48,7 @@ impl OAuthError {
         valid_redirect_uri: &ValidatedRedirectUri,
     ) -> Self {
         Self {
-            error_type: err.into(),
+            error_type: Box::new(err.into()),
             state: state.clone(),
             valid_redirect_uri: Some(valid_redirect_uri.clone()),
         }
@@ -57,7 +57,7 @@ impl OAuthError {
 
 impl actix_web::ResponseError for OAuthError {
     fn status_code(&self) -> StatusCode {
-        match self.error_type {
+        match *self.error_type {
             OAuthErrorType::AuthenticationError(_)
             | OAuthErrorType::FailedScopeParse(_)
             | OAuthErrorType::ScopesTooBroad
@@ -116,13 +116,15 @@ pub enum OAuthErrorType {
     AuthenticationError(#[from] AuthenticationError),
     #[error("Client {} has no redirect URIs specified", .client_id.0)]
     ClientMissingRedirectURI {
-        client_id: crate::database::models::OAuthClientId,
+        client_id: crate::database::models::DBOAuthClientId,
     },
     #[error(
         "The provided redirect URI did not match any configured in the client"
     )]
     RedirectUriNotConfigured(String),
-    #[error("The provided scope was malformed or did not correspond to known scopes ({0})")]
+    #[error(
+        "The provided scope was malformed or did not correspond to known scopes ({0})"
+    )]
     FailedScopeParse(bitflags::parser::ParseError),
     #[error(
         "The provided scope requested scopes broader than the developer app is configured with"
@@ -131,16 +133,20 @@ pub enum OAuthErrorType {
     #[error("The provided flow id was invalid")]
     InvalidAcceptFlowId,
     #[error("The provided client id was invalid")]
-    InvalidClientId(crate::database::models::OAuthClientId),
+    InvalidClientId(crate::database::models::DBOAuthClientId),
     #[error("The provided ID could not be decoded: {0}")]
     MalformedId(#[from] DecodingError),
     #[error("Failed to authenticate client")]
     ClientAuthenticationFailed,
     #[error("The provided authorization grant code was invalid")]
     InvalidAuthCode,
-    #[error("The provided client id did not match the id this authorization code was granted to")]
+    #[error(
+        "The provided client id did not match the id this authorization code was granted to"
+    )]
     UnauthorizedClient,
-    #[error("The provided redirect URI did not exactly match the uri originally provided when this flow began")]
+    #[error(
+        "The provided redirect URI did not exactly match the uri originally provided when this flow began"
+    )]
     RedirectUriChanged(Option<String>),
     #[error("The provided grant type ({0}) must be \"authorization_code\"")]
     OnlySupportsAuthorizationCodeGrant(String),

@@ -1,12 +1,23 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import type { ServerStatus, ServerWorld, World } from '@/helpers/worlds.ts'
-import {
+import type {
+  ProtocolVersion,
+  ServerStatus,
+  ServerWorld,
+  SingleplayerWorld,
+  World,
   set_world_display_status,
   getWorldIdentifier,
-  showWorldInFolder,
 } from '@/helpers/worlds.ts'
-import { formatNumber } from '@modrinth/utils'
+import { formatNumber, getPingLevel } from '@modrinth/utils'
+import {
+  useRelativeTime,
+  Avatar,
+  ButtonStyled,
+  commonMessages,
+  OverflowMenu,
+  SmartClickable,
+} from '@modrinth/ui'
 import {
   IssuesIcon,
   EyeIcon,
@@ -25,7 +36,6 @@ import {
   UserIcon,
   XIcon,
 } from '@modrinth/assets'
-import { Avatar, ButtonStyled, commonMessages, OverflowMenu, SmartClickable } from '@modrinth/ui'
 import type { MessageDescriptor } from '@vintl/vintl'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import type { Component } from 'vue'
@@ -36,11 +46,13 @@ import { useRouter } from 'vue-router'
 import { Tooltip } from 'floating-vue'
 
 const { formatMessage } = useVIntl()
+const formatRelativeTime = useRelativeTime()
 
 const router = useRouter()
 
 const emit = defineEmits<{
   (e: 'play' | 'play-instance' | 'update' | 'stop' | 'refresh' | 'edit' | 'delete'): void
+  (e: 'open-folder', world: SingleplayerWorld): void
 }>()
 
 const props = withDefaults(
@@ -50,7 +62,7 @@ const props = withDefaults(
     playingWorld?: boolean
     startingInstance?: boolean
     supportsQuickPlay?: boolean
-    currentProtocol?: number | null
+    currentProtocol?: ProtocolVersion | null
     highlighted?: boolean
 
     // Server only
@@ -97,22 +109,9 @@ const serverIncompatible = computed(
     !!props.serverStatus &&
     !!props.serverStatus.version?.protocol &&
     !!props.currentProtocol &&
-    props.serverStatus.version.protocol !== props.currentProtocol,
+    (props.serverStatus.version.protocol !== props.currentProtocol.version ||
+      props.serverStatus.version.legacy !== props.currentProtocol.legacy),
 )
-
-function getPingLevel(ping: number) {
-  if (ping < 150) {
-    return 5
-  } else if (ping < 300) {
-    return 4
-  } else if (ping < 600) {
-    return 3
-  } else if (ping < 1000) {
-    return 2
-  } else {
-    return 1
-  }
-}
 
 const locked = computed(() => props.world.type === 'singleplayer' && props.world.locked)
 
@@ -136,6 +135,14 @@ const messages = defineMessages({
   gameAlreadyOpen: {
     id: 'instance.worlds.game_already_open',
     defaultMessage: 'Instance is already open',
+  },
+  noContact: {
+    id: 'instance.worlds.no_contact',
+    defaultMessage: "Server couldn't be contacted",
+  },
+  incompatibleServer: {
+    id: 'instance.worlds.incompatible_server',
+    defaultMessage: 'Server is incompatible',
   },
   copyAddress: {
     id: 'instance.worlds.copy_address',
@@ -255,7 +262,7 @@ const messages = defineMessages({
             <template v-if="world.last_played">
               {{
                 formatMessage(commonMessages.playedLabel, {
-                  time: dayjs(world.last_played).fromNow(),
+                  time: formatRelativeTime(dayjs(world.last_played).toISOString()),
                 })
               }}
             </template>
@@ -311,39 +318,33 @@ const messages = defineMessages({
         </template>
       </div>
       <div class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
-        <template v-if="world.type === 'singleplayer' || serverStatus">
-          <ButtonStyled
-            v-if="(playingWorld || (locked && playingInstance)) && !startingInstance"
-            color="red"
-          >
-            <button @click="emit('stop')">
-              <StopCircleIcon aria-hidden="true" />
-              {{ formatMessage(commonMessages.stopButton) }}
-            </button>
-          </ButtonStyled>
-          <ButtonStyled v-else>
-            <button
-              v-tooltip="
-                serverIncompatible
-                  ? 'Server is incompatible'
+        <ButtonStyled
+          v-if="(playingWorld || (locked && playingInstance)) && !startingInstance"
+          color="red"
+        >
+          <button @click="emit('stop')">
+            <StopCircleIcon aria-hidden="true" />
+            {{ formatMessage(commonMessages.stopButton) }}
+          </button>
+        </ButtonStyled>
+        <ButtonStyled v-else>
+          <button
+            v-tooltip="
+              !serverStatus
+                ? formatMessage(messages.noContact)
+                : serverIncompatible
+                  ? formatMessage(messages.incompatibleServer)
                   : !supportsQuickPlay
                     ? formatMessage(messages.noQuickPlay)
                     : playingOtherWorld || locked
                       ? formatMessage(messages.gameAlreadyOpen)
                       : null
-              "
-              :disabled="!supportsQuickPlay || playingOtherWorld || startingInstance"
-              @click="emit('play')"
-            >
-              <SpinnerIcon v-if="startingInstance && playingWorld" class="animate-spin" />
-              <PlayIcon v-else aria-hidden="true" />
-              {{ formatMessage(commonMessages.playButton) }}
-            </button>
-          </ButtonStyled>
-        </template>
-        <ButtonStyled v-else>
-          <button class="invisible">
-            <PlayIcon aria-hidden="true" />
+            "
+            :disabled="!supportsQuickPlay || playingOtherWorld || startingInstance"
+            @click="emit('play')"
+          >
+            <SpinnerIcon v-if="startingInstance && playingWorld" class="animate-spin" />
+            <PlayIcon v-else aria-hidden="true" />
             {{ formatMessage(commonMessages.playButton) }}
           </button>
         </ButtonStyled>
@@ -386,8 +387,7 @@ const messages = defineMessages({
               {
                 id: 'open-folder',
                 shown: world.type === 'singleplayer',
-                action: () =>
-                  world.type === 'singleplayer' ? showWorldInFolder(instancePath, world.path) : {},
+                action: () => (world.type === 'singleplayer' ? emit('open-folder', world) : {}),
               },
               {
                 divider: true,

@@ -218,7 +218,7 @@ const username = ref("");
 const password = ref("");
 const confirmPassword = ref("");
 const token = ref("");
-const subscribe = ref(true);
+const subscribe = ref(false);
 
 async function createAccount() {
   startLoading();
@@ -247,15 +247,13 @@ async function createAccount() {
       },
     });
 
-    if (route.query.launcher) {
-      await navigateTo(`https://launcher-files.modrinth.com/?code=${res.session}`, {
-        external: true,
-      });
-      return;
-    }
-
     await useAuth(res.session);
     await useUser();
+
+    if (route.query.launcher) {
+      await navigateTo({ path: "/auth/sign-in", query: route.query });
+      return;
+    }
 
     if (route.query.redirect) {
       await navigateTo(route.query.redirect);

@@ -63,6 +63,7 @@ const props = defineProps<{
     loader: string | null;
     loader_version: string | null;
   };
+  ignoreCurrentInstallation?: boolean;
   isInstalling?: boolean;
 }>();
 

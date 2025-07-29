@@ -1,9 +1,8 @@
 use crate::routes::{
-    v2_reroute,
+    ApiError, v2_reroute,
     v3::{self, statistics::V3Stats},
-    ApiError,
 };
-use actix_web::{get, web, HttpResponse};
+use actix_web::{HttpResponse, get, web};
 use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {

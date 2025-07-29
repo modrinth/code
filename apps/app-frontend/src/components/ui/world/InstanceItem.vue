@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import {
   EyeIcon,
@@ -8,7 +9,14 @@ import {
   SpinnerIcon,
   StopCircleIcon,
 } from '@modrinth/assets'
-import { Avatar, ButtonStyled, commonMessages, OverflowMenu, SmartClickable } from '@modrinth/ui'
+import {
+  Avatar,
+  ButtonStyled,
+  commonMessages,
+  OverflowMenu,
+  SmartClickable,
+  useRelativeTime,
+} from '@modrinth/ui'
 import { useVIntl } from '@vintl/vintl'
 import { computed, nextTick, ref, onMounted, onUnmounted } from 'vue'
 import { showProfileInFolder } from '@/helpers/utils'
@@ -25,6 +33,7 @@ import { handleError } from '@/store/notifications'
 import { process_listener } from '@/helpers/events'
 
 const { formatMessage } = useVIntl()
+const formatRelativeTime = useRelativeTime()
 
 const router = useRouter()
 
@@ -34,6 +43,7 @@ const emit = defineEmits<{
 
 const props = defineProps<{
   instance: GameInstance
+  last_played: Dayjs
 }>()
 
 const loadingModpack = ref(!!props.instance.linked_data)
@@ -139,12 +149,12 @@ onUnmounted(() => {
                 : null
             "
             class="w-fit shrink-0"
-            :class="{ 'cursor-help smart-clickable:allow-pointer-events': instance.last_played }"
+            :class="{ 'cursor-help smart-clickable:allow-pointer-events': last_played }"
           >
-            <template v-if="instance.last_played">
+            <template v-if="last_played">
               {{
                 formatMessage(commonMessages.playedLabel, {
-                  time: dayjs(instance.last_played).fromNow(),
+                  time: formatRelativeTime(last_played.toISOString?.()),
                 })
               }}
             </template>

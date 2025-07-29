@@ -1,12 +1,12 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt::Write};
 
 use crate::{
     assert_status,
     common::{
         api_common::{
+            Api, ApiProject, AppendsOptionalPat,
             models::{CommonItemType, CommonProject, CommonVersion},
             request_data::{ImageData, ProjectCreationRequestData},
-            Api, ApiProject, AppendsOptionalPat,
         },
         dummy_data::TestFile,
     },
@@ -27,8 +27,8 @@ use serde_json::json;
 use crate::common::database::MOD_USER_PAT;
 
 use super::{
-    request_data::{self, get_public_project_creation_data},
     ApiV2,
+    request_data::{self, get_public_project_creation_data},
 };
 
 impl ApiV2 {
@@ -490,13 +490,13 @@ impl ApiProject for ApiV2 {
             featured = featured
         );
         if let Some(title) = title {
-            url.push_str(&format!("&title={title}"));
+            write!(&mut url, "&title={title}").unwrap();
         }
         if let Some(description) = description {
-            url.push_str(&format!("&description={description}"));
+            write!(&mut url, "&description={description}").unwrap();
         }
         if let Some(ordering) = ordering {
-            url.push_str(&format!("&ordering={ordering}"));
+            write!(&mut url, "&ordering={ordering}").unwrap();
         }
 
         let req = test::TestRequest::post()
@@ -521,11 +521,12 @@ impl ApiProject for ApiV2 {
         );
 
         for (key, value) in patch {
-            url.push_str(&format!(
+            write!(
+                &mut url,
                 "&{key}={value}",
-                key = key,
                 value = urlencoding::encode(&value)
-            ));
+            )
+            .unwrap();
         }
 
         let req = test::TestRequest::patch()

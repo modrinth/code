@@ -12,7 +12,7 @@
           <h2 v-else class="text-2xl">Notifications</h2>
         </div>
         <template v-if="!history">
-          <Button v-if="hasRead" @click="updateRoute()">
+          <Button v-if="data.hasRead" @click="updateRoute()">
             <HistoryIcon />
             View history
           </Button>
@@ -26,7 +26,7 @@
         v-if="notifTypes.length > 1"
         v-model="selectedType"
         :items="notifTypes"
-        :format-label="(x) => (x === 'all' ? 'All' : $formatProjectType(x).replace('_', ' ') + 's')"
+        :format-label="(x) => (x === 'all' ? 'All' : formatProjectType(x).replace('_', ' ') + 's')"
         :capitalize="false"
       />
       <p v-if="pending">Loading notifications...</p>
@@ -49,114 +49,92 @@
         />
       </template>
       <p v-else>You don't have any unread notifications.</p>
-      <Pagination :page="page" :count="pages" @switch-page="changePage" />
+      <div class="flex justify-end">
+        <Pagination :page="page" :count="pages" @switch-page="changePage" />
+      </div>
     </section>
   </div>
 </template>
 <script setup>
-import { Button, Chips } from "@modrinth/ui";
+import { Button, Pagination, Chips } from "@modrinth/ui";
 import { HistoryIcon, CheckCheckIcon } from "@modrinth/assets";
+import { formatProjectType } from "@modrinth/utils";
 import {
   fetchExtraNotificationData,
   groupNotifications,
   markAsRead,
-} from "~/helpers/notifications.js";
+} from "~/helpers/notifications.ts";
 import NotificationItem from "~/components/ui/NotificationItem.vue";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
-import Pagination from "~/components/ui/Pagination.vue";
 
 useHead({
   title: "Notifications - Modrinth",
 });
 
 const auth = await useAuth();
-
 const route = useNativeRoute();
 const router = useNativeRouter();
 
-const history = computed(() => {
-  return route.name === "dashboard-notifications-history";
-});
-
+const history = computed(() => route.name === "dashboard-notifications-history");
 const selectedType = ref("all");
 const page = ref(1);
-
 const perPage = ref(50);
 
 const { data, pending, error, refresh } = await useAsyncData(
   async () => {
     const pageNum = page.value - 1;
-
-    const notifications = await useBaseFetch(`user/${auth.value.user.id}/notifications`);
     const showRead = history.value;
-    const hasRead = notifications.some((notif) => notif.read);
+    const notifications = await useBaseFetch(`user/${auth.value.user.id}/notifications`);
 
-    const types = [
-      ...new Set(
-        notifications
-          .filter((notification) => {
-            return showRead || !notification.read;
-          })
-          .map((notification) => notification.type),
-      ),
+    const typesInFeed = [
+      ...new Set(notifications.filter((n) => showRead || !n.read).map((n) => n.type)),
     ];
 
-    const filteredNotifications = notifications.filter(
-      (notification) =>
-        (selectedType.value === "all" || notification.type === selectedType.value) &&
-        (showRead || !notification.read),
+    const filtered = notifications.filter(
+      (n) =>
+        (selectedType.value === "all" || n.type === selectedType.value) && (showRead || !n.read),
     );
-    const pages = Math.ceil(filteredNotifications.length / perPage.value);
+
+    const pages = Math.max(1, Math.ceil(filtered.length / perPage.value));
 
     return fetchExtraNotificationData(
-      filteredNotifications.slice(pageNum * perPage.value, perPage.value + pageNum * perPage.value),
-    ).then((notifications) => {
-      return {
-        notifications,
-        types: types.length > 1 ? ["all", ...types] : types,
-        pages,
-        hasRead,
-      };
-    });
+      filtered.slice(pageNum * perPage.value, pageNum * perPage.value + perPage.value),
+    ).then((notifs) => ({
+      notifications: notifs,
+      notifTypes: typesInFeed.length > 1 ? ["all", ...typesInFeed] : typesInFeed,
+      pages,
+      hasRead: notifications.some((n) => n.read),
+    }));
   },
   { watch: [page, history, selectedType] },
 );
 
-const notifications = computed(() => {
-  if (data.value === null) {
-    return [];
-  }
-  return groupNotifications(data.value.notifications, history.value);
-});
-const notifTypes = computed(() => data.value.types);
-const pages = computed(() => data.value.pages);
-const hasRead = computed(() => data.value.hasRead);
+const notifications = computed(() =>
+  data.value ? groupNotifications(data.value.notifications, history.value) : [],
+);
+
+const notifTypes = computed(() => data.value?.notifTypes || []);
+const pages = computed(() => data.value?.pages ?? 1);
 
 function updateRoute() {
-  if (history.value) {
-    router.push("/dashboard/notifications");
-  } else {
-    router.push("/dashboard/notifications/history");
-  }
+  router.push(history.value ? "/dashboard/notifications" : "/dashboard/notifications/history");
   selectedType.value = "all";
   page.value = 1;
 }
 
 async function readAll() {
-  const ids = notifications.value.flatMap((notification) => [
-    notification.id,
-    ...(notification.grouped_notifs ? notification.grouped_notifs.map((notif) => notif.id) : []),
+  const ids = notifications.value.flatMap((n) => [
+    n.id,
+    ...(n.grouped_notifs ? n.grouped_notifs.map((g) => g.id) : []),
   ]);
 
-  const updateNotifs = await markAsRead(ids);
-  allNotifs.value = updateNotifs(allNotifs.value);
+  await markAsRead(ids);
+  await refresh();
 }
 
 function changePage(newPage) {
   page.value = newPage;
-  if (import.meta.client) {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
+  if (import.meta.client) window.scrollTo({ top: 0, behavior: "smooth" });
 }
 </script>
 <style lang="scss" scoped>

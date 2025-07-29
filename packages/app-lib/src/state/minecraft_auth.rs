@@ -1,30 +1,42 @@
-use crate::util::fetch::REQWEST_CLIENT;
 use crate::ErrorKind;
-use base64::prelude::{BASE64_STANDARD, BASE64_URL_SAFE_NO_PAD};
+use crate::util::fetch::REQWEST_CLIENT;
 use base64::Engine;
-use byteorder::BigEndian;
+use base64::prelude::{BASE64_STANDARD, BASE64_URL_SAFE_NO_PAD};
 use chrono::{DateTime, Duration, TimeZone, Utc};
 use dashmap::DashMap;
 use futures::TryStreamExt;
+use heck::ToTitleCase;
 use p256::ecdsa::signature::Signer;
 use p256::ecdsa::{Signature, SigningKey, VerifyingKey};
 use p256::pkcs8::{DecodePrivateKey, EncodePrivateKey, LineEnding};
-use rand::rngs::OsRng;
 use rand::Rng;
+use rand::rngs::OsRng;
 use reqwest::header::HeaderMap;
-use reqwest::Response;
+use reqwest::{Response, StatusCode};
 use serde::de::DeserializeOwned;
-use serde::{Deserialize, Serialize};
+use serde::ser::SerializeStruct;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_json::json;
 use sha2::Digest;
+use std::borrow::Cow;
 use std::collections::HashMap;
+use std::collections::hash_map::Entry;
 use std::future::Future;
+use std::hash::{BuildHasherDefault, DefaultHasher};
+use std::io;
+use std::ops::Deref;
+use std::sync::Arc;
+use std::time::Instant;
+use tokio::runtime::{Handle, RuntimeFlavor};
+use tokio::sync::Mutex;
+use tokio::task;
+use url::Url;
 use uuid::Uuid;
 
 #[derive(Debug, Clone, Copy)]
 pub enum MinecraftAuthStep {
     GetDeviceToken,
-    SisuAuthenicate,
+    SisuAuthenticate,
     GetOAuthToken,
     RefreshOAuthToken,
     SisuAuthorize,
@@ -54,19 +66,13 @@ pub enum MinecraftAuthenticationError {
         raw: String,
         #[source]
         source: serde_json::Error,
-        status_code: reqwest::StatusCode,
+        status_code: StatusCode,
     },
     #[error("Request failed during step {step:?}: {source}")]
     Request {
         step: MinecraftAuthStep,
         #[source]
         source: reqwest::Error,
-    },
-    #[error("Error creating signed request buffer {step:?}: {source}")]
-    ConstructingSignedRequest {
-        step: MinecraftAuthStep,
-        #[source]
-        source: std::io::Error,
     },
     #[error("Error reading XBOX Session ID header")]
     NoSessionId,
@@ -79,21 +85,18 @@ pub struct MinecraftLoginFlow {
     pub verifier: String,
     pub challenge: String,
     pub session_id: String,
-    pub redirect_uri: String,
+    pub auth_request_uri: String,
 }
 
 #[tracing::instrument]
 pub async fn login_begin(
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
 ) -> crate::Result<MinecraftLoginFlow> {
-    let (pair, current_date, valid_date) =
-        DeviceTokenPair::refresh_and_get_device_token(Utc::now(), false, exec)
-            .await?;
+    let (pair, current_date) =
+        DeviceTokenPair::refresh_and_get_device_token(Utc::now(), exec).await?;
 
     let verifier = generate_oauth_challenge();
-    let mut hasher = sha2::Sha256::new();
-    hasher.update(&verifier);
-    let result = hasher.finalize();
+    let result = sha2::Sha256::digest(&verifier);
     let challenge = BASE64_URL_SAFE_NO_PAD.encode(result);
 
     match sisu_authenticate(
@@ -104,46 +107,15 @@ pub async fn login_begin(
     )
     .await
     {
-        Ok((session_id, redirect_uri)) => Ok(MinecraftLoginFlow {
-            verifier,
-            challenge,
-            session_id,
-            redirect_uri: redirect_uri.value.msa_oauth_redirect,
-        }),
-        Err(err) => {
-            if !valid_date {
-                let (pair, current_date, _) =
-                    DeviceTokenPair::refresh_and_get_device_token(
-                        Utc::now(),
-                        false,
-                        exec,
-                    )
-                    .await?;
-
-                let verifier = generate_oauth_challenge();
-                let mut hasher = sha2::Sha256::new();
-                hasher.update(&verifier);
-                let result = hasher.finalize();
-                let challenge = BASE64_URL_SAFE_NO_PAD.encode(result);
-
-                let (session_id, redirect_uri) = sisu_authenticate(
-                    &pair.token.token,
-                    &challenge,
-                    &pair.key,
-                    current_date,
-                )
-                .await?;
-
-                Ok(MinecraftLoginFlow {
-                    verifier,
-                    challenge,
-                    session_id,
-                    redirect_uri: redirect_uri.value.msa_oauth_redirect,
-                })
-            } else {
-                Err(crate::ErrorKind::from(err).into())
-            }
+        Ok((session_id, redirect_uri)) => {
+            return Ok(MinecraftLoginFlow {
+                verifier,
+                challenge,
+                session_id,
+                auth_request_uri: redirect_uri.value.msa_oauth_redirect,
+            });
         }
+        Err(err) => return Err(crate::ErrorKind::from(err).into()),
     }
 }
 
@@ -153,9 +125,8 @@ pub async fn login_finish(
     flow: MinecraftLoginFlow,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
 ) -> crate::Result<Credentials> {
-    let (pair, _, _) =
-        DeviceTokenPair::refresh_and_get_device_token(Utc::now(), false, exec)
-            .await?;
+    let (pair, _) =
+        DeviceTokenPair::refresh_and_get_device_token(Utc::now(), exec).await?;
 
     let oauth_token = oauth_token(code, &flow.verifier).await?;
     let sisu_authorize = sisu_authorize(
@@ -179,41 +150,91 @@ pub async fn login_finish(
     minecraft_entitlements(&minecraft_token.access_token).await?;
 
     let mut credentials = Credentials {
-        id: Uuid::default(),
-        username: String::default(),
+        offline_profile: MinecraftProfile::default(),
         access_token: minecraft_token.access_token,
         refresh_token: oauth_token.value.refresh_token,
         expires: oauth_token.date
             + Duration::seconds(oauth_token.value.expires_in as i64),
         active: true,
     };
-    credentials.get_profile().await?;
+
+    // During login, we need to fetch the online profile at least once to get the
+    // player UUID and name to use for the offline profile, in order for that offline
+    // profile to make sense. It's also important to modify the returned credentials
+    // object, as otherwise continued usage of it will skip the profile cache due to
+    // the dummy UUID
+    let online_profile = credentials
+        .online_profile()
+        .await
+        .ok_or(io::Error::other("Failed to fetch player profile"))?;
+    credentials.offline_profile = MinecraftProfile {
+        id: online_profile.id,
+        name: online_profile.name.clone(),
+        ..credentials.offline_profile
+    };
 
     credentials.upsert(exec).await?;
 
     Ok(credentials)
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct Credentials {
-    pub id: Uuid,
-    pub username: String,
+    /// The offline profile of the user these credentials are for.
+    ///
+    /// Such a profile can only be relied upon to have a proper player UUID, which is
+    /// never changed. A potentially stale username may be available, but no other data
+    /// such as skins or capes is available.
+    #[serde(rename = "profile")]
+    pub offline_profile: MinecraftProfile,
     pub access_token: String,
     pub refresh_token: String,
     pub expires: DateTime<Utc>,
     pub active: bool,
 }
 
+/// An entry in the player profile cache, keyed by player UUID.
+pub(super) enum ProfileCacheEntry {
+    /// A cached profile that is valid, even though it may be stale.
+    Hit(Arc<MinecraftProfile>),
+    /// A negative profile fetch result due to an authentication error,
+    /// from which we're recovering by holding off from repeatedly
+    /// attempting to fetch the profile until the token is refreshed
+    /// or some time has passed.
+    AuthErrorBackoff {
+        likely_expired_token: String,
+        last_attempt: Instant,
+    },
+}
+
+/// A thread-safe cache of online profiles, used to avoid fetching the
+/// same profile multiple times as long as they don't get too stale.
+///
+/// The cache has to be static because credential objects are short lived
+/// and disposable, and in the future several threads may be interested in
+/// profile data.
+pub(super) static PROFILE_CACHE: Mutex<
+    HashMap<Uuid, ProfileCacheEntry, BuildHasherDefault<DefaultHasher>>,
+> = Mutex::const_new(HashMap::with_hasher(BuildHasherDefault::new()));
+
 impl Credentials {
+    /// Refreshes the authentication tokens for this user if they are expired, or
+    /// very close to expiration.
     async fn refresh(
         &mut self,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
     ) -> crate::Result<()> {
+        // Use a margin of 5 minutes to give e.g. Minecraft and potentially
+        // other operations that depend on a fresh token 5 minutes to complete
+        // from now, and deal with some classes of clock skew
+        if self.expires > Utc::now() + Duration::minutes(5) {
+            return Ok(());
+        }
+
         let oauth_token = oauth_refresh(&self.refresh_token).await?;
-        let (pair, current_date, _) =
+        let (pair, current_date) =
             DeviceTokenPair::refresh_and_get_device_token(
                 oauth_token.date,
-                false,
                 exec,
             )
             .await?;
@@ -242,22 +263,118 @@ impl Credentials {
         self.expires = oauth_token.date
             + Duration::seconds(oauth_token.value.expires_in as i64);
 
-        self.get_profile().await?;
-
         self.upsert(exec).await?;
 
         Ok(())
     }
 
-    async fn get_profile(&mut self) -> crate::Result<()> {
-        let profile = minecraft_profile(&self.access_token).await?;
+    #[tracing::instrument(skip(self))]
+    pub async fn online_profile(&self) -> Option<Arc<MinecraftProfile>> {
+        let mut profile_cache = PROFILE_CACHE.lock().await;
 
-        self.id = profile.id.unwrap_or_default();
-        self.username = profile.name;
+        loop {
+            match profile_cache.entry(self.offline_profile.id) {
+                Entry::Occupied(entry) => {
+                    match entry.get() {
+                        ProfileCacheEntry::Hit(profile)
+                            if profile.is_fresh() =>
+                        {
+                            return Some(Arc::clone(profile));
+                        }
+                        ProfileCacheEntry::Hit(_) => {
+                            // The profile is stale, so remove it and try again
+                            entry.remove();
+                            continue;
+                        }
+                        // Auth errors must be handled with a backoff strategy because it
+                        // has been experimentally found that Mojang quickly rate limits
+                        // the profile data endpoint on repeated attempts with bad auth
+                        ProfileCacheEntry::AuthErrorBackoff {
+                            likely_expired_token,
+                            last_attempt,
+                        } if &self.access_token != likely_expired_token
+                            || Instant::now()
+                                .saturating_duration_since(*last_attempt)
+                                > std::time::Duration::from_secs(60) =>
+                        {
+                            entry.remove();
+                            continue;
+                        }
+                        ProfileCacheEntry::AuthErrorBackoff { .. } => {
+                            return None;
+                        }
+                    }
+                }
+                Entry::Vacant(entry) => {
+                    match minecraft_profile(&self.access_token).await {
+                        Ok(profile) => {
+                            let profile = Arc::new(profile);
+                            let cache_entry =
+                                ProfileCacheEntry::Hit(Arc::clone(&profile));
 
-        Ok(())
+                            // When fetching a profile for the first time, the player UUID may
+                            // be unknown (i.e., set to a dummy value), so make sure we don't
+                            // cache it in the wrong place
+                            if entry.key() != &profile.id {
+                                profile_cache.insert(profile.id, cache_entry);
+                            } else {
+                                entry.insert(cache_entry);
+                            }
+
+                            return Some(profile);
+                        }
+                        Err(
+                            err @ MinecraftAuthenticationError::DeserializeResponse {
+                                status_code: StatusCode::UNAUTHORIZED,
+                                ..
+                            },
+                        ) => {
+                            tracing::warn!(
+                                "Failed to fetch online profile for UUID {} likely due to stale credentials, backing off: {err}",
+                                self.offline_profile.id
+                            );
+
+                            // We have to assume the player UUID key we have is correct here, which
+                            // should always be the case assuming a non-adversarial server. In any
+                            // case, any cache poisoning is inconsequential due to the entry expiration
+                            // and the fact that we use at most one single dummy UUID
+                            entry.insert(ProfileCacheEntry::AuthErrorBackoff {
+                                likely_expired_token: self.access_token.clone(),
+                                last_attempt: Instant::now(),
+                            });
+
+                            return None;
+                        }
+                        Err(err) => {
+                            tracing::warn!(
+                                "Failed to fetch online profile for UUID {}: {err}",
+                                self.offline_profile.id
+                            );
+
+                            return None;
+                        }
+                    }
+                }
+            }
+        }
     }
 
+    /// Attempts to fetch the online profile for this user if possible, and if that fails
+    /// falls back to the known offline profile data.
+    ///
+    /// See also the [`online_profile`](Self::online_profile) method.
+    pub async fn maybe_online_profile(
+        &self,
+    ) -> MaybeOnlineMinecraftProfile<'_> {
+        let online_profile = self.online_profile().await;
+        online_profile.map_or_else(
+            || MaybeOnlineMinecraftProfile::Offline(&self.offline_profile),
+            MaybeOnlineMinecraftProfile::Online,
+        )
+    }
+
+    /// Like [`get_active`](Self::get_active), but enforces credentials to be
+    /// successfully refreshed unless the network is unreachable or times out.
     #[tracing::instrument]
     pub async fn get_default_credential(
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
@@ -265,37 +382,35 @@ impl Credentials {
         let credentials = Self::get_active(exec).await?;
 
         if let Some(mut creds) = credentials {
-            if creds.expires < Utc::now() {
-                let res = creds.refresh(exec).await;
+            let res = creds.refresh(exec).await;
 
-                match res {
-                    Ok(_) => Ok(Some(creds)),
-                    Err(err) => {
-                        if let ErrorKind::MinecraftAuthenticationError(
-                            MinecraftAuthenticationError::Request {
-                                ref source,
-                                ..
-                            },
-                        ) = *err.raw
-                        {
-                            if source.is_connect() || source.is_timeout() {
-                                return Ok(Some(creds));
-                            }
+            match res {
+                Ok(_) => Ok(Some(creds)),
+                Err(err) => {
+                    if let ErrorKind::MinecraftAuthenticationError(
+                        MinecraftAuthenticationError::Request {
+                            ref source,
+                            ..
+                        },
+                    ) = *err.raw
+                    {
+                        if source.is_connect() || source.is_timeout() {
+                            return Ok(Some(creds));
                         }
-
-                        Err(err)
                     }
+
+                    Err(err)
                 }
-            } else {
-                Ok(Some(creds))
             }
         } else {
             Ok(None)
         }
     }
 
+    /// Fetches the currently selected credentials from the database, attempting
+    /// to refresh them if they are expired.
     pub async fn get_active(
-        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
     ) -> crate::Result<Option<Self>> {
         let res = sqlx::query!(
             "
@@ -308,21 +423,31 @@ impl Credentials {
         .fetch_optional(exec)
         .await?;
 
-        Ok(res.map(|x| Self {
-            id: Uuid::parse_str(&x.uuid).unwrap_or_default(),
-            username: x.username,
-            access_token: x.access_token,
-            refresh_token: x.refresh_token,
-            expires: Utc
-                .timestamp_opt(x.expires, 0)
-                .single()
-                .unwrap_or_else(Utc::now),
-            active: x.active == 1,
-        }))
+        Ok(match res {
+            Some(x) => {
+                let mut credentials = Self {
+                    offline_profile: MinecraftProfile {
+                        id: Uuid::parse_str(&x.uuid).unwrap_or_default(),
+                        name: x.username,
+                        ..MinecraftProfile::default()
+                    },
+                    access_token: x.access_token,
+                    refresh_token: x.refresh_token,
+                    expires: Utc
+                        .timestamp_opt(x.expires, 0)
+                        .single()
+                        .unwrap_or_else(Utc::now),
+                    active: x.active == 1,
+                };
+                credentials.refresh(exec).await.ok();
+                Some(credentials)
+            }
+            None => None,
+        })
     }
 
     pub async fn get_all(
-        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
     ) -> crate::Result<DashMap<Uuid, Self>> {
         let res = sqlx::query!(
             "
@@ -334,23 +459,27 @@ impl Credentials {
         .fetch(exec)
         .try_fold(DashMap::new(), |acc, x| {
             let uuid = Uuid::parse_str(&x.uuid).unwrap_or_default();
-
-            acc.insert(
-                uuid,
-                Self {
+            let mut credentials = Self {
+                offline_profile: MinecraftProfile {
                     id: uuid,
-                    username: x.username,
-                    access_token: x.access_token,
-                    refresh_token: x.refresh_token,
-                    expires: Utc
-                        .timestamp_opt(x.expires, 0)
-                        .single()
-                        .unwrap_or_else(Utc::now),
-                    active: x.active == 1,
+                    name: x.username,
+                    ..MinecraftProfile::default()
                 },
-            );
+                access_token: x.access_token,
+                refresh_token: x.refresh_token,
+                expires: Utc
+                    .timestamp_opt(x.expires, 0)
+                    .single()
+                    .unwrap_or_else(Utc::now),
+                active: x.active == 1,
+            };
 
-            async move { Ok(acc) }
+            async move {
+                credentials.refresh(exec).await.ok();
+                acc.insert(uuid, credentials);
+
+                Ok(acc)
+            }
         })
         .await?;
 
@@ -361,8 +490,9 @@ impl Credentials {
         &self,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
     ) -> crate::Result<()> {
+        let profile = self.maybe_online_profile().await;
         let expires = self.expires.timestamp();
-        let uuid = self.id.as_hyphenated().to_string();
+        let uuid = profile.id.as_hyphenated().to_string();
 
         if self.active {
             sqlx::query!(
@@ -388,7 +518,7 @@ impl Credentials {
             ",
             uuid,
             self.active,
-            self.username,
+            profile.name,
             self.access_token,
             self.refresh_token,
             expires,
@@ -418,6 +548,46 @@ impl Credentials {
     }
 }
 
+impl Serialize for Credentials {
+    fn serialize<S: Serializer>(
+        &self,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error> {
+        // Opportunistically hydrate the profile with its online data if possible for frontend
+        // consumption, transparently handling all the possible Tokio runtime states the current
+        // thread may be in the most efficient way
+        let profile = match Handle::try_current().ok() {
+            Some(runtime)
+                if runtime.runtime_flavor() == RuntimeFlavor::CurrentThread =>
+            {
+                runtime.block_on(self.maybe_online_profile())
+            }
+            Some(runtime) => task::block_in_place(|| {
+                runtime.block_on(self.maybe_online_profile())
+            }),
+            None => tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+                .map_or_else(
+                    |_| {
+                        MaybeOnlineMinecraftProfile::Offline(
+                            &self.offline_profile,
+                        )
+                    },
+                    |runtime| runtime.block_on(self.maybe_online_profile()),
+                ),
+        };
+
+        let mut ser = serializer.serialize_struct("Credentials", 5)?;
+        ser.serialize_field("profile", &*profile)?;
+        ser.serialize_field("access_token", &self.access_token)?;
+        ser.serialize_field("refresh_token", &self.refresh_token)?;
+        ser.serialize_field("expires", &self.expires)?;
+        ser.serialize_field("active", &self.active)?;
+        ser.end()
+    }
+}
+
 pub struct DeviceTokenPair {
     pub token: DeviceToken,
     pub key: DeviceTokenKey,
@@ -427,21 +597,20 @@ impl DeviceTokenPair {
     #[tracing::instrument(skip(exec))]
     async fn refresh_and_get_device_token(
         current_date: DateTime<Utc>,
-        force_generate: bool,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
-    ) -> crate::Result<(Self, DateTime<Utc>, bool)> {
+    ) -> crate::Result<(Self, DateTime<Utc>)> {
         let pair = Self::get(exec).await?;
 
         if let Some(mut pair) = pair {
-            if pair.token.not_after > Utc::now() && !force_generate {
-                Ok((pair, current_date, false))
+            if pair.token.not_after > current_date {
+                Ok((pair, current_date))
             } else {
                 let res = device_token(&pair.key, current_date).await?;
 
                 pair.token = res.value;
                 pair.upsert(exec).await?;
 
-                Ok((pair, res.date, true))
+                Ok((pair, res.date))
             }
         } else {
             let key = generate_key()?;
@@ -454,7 +623,7 @@ impl DeviceTokenPair {
 
             pair.upsert(exec).await?;
 
-            Ok((pair, res.date, true))
+            Ok((pair, res.date))
         }
     }
 
@@ -552,8 +721,8 @@ impl DeviceTokenPair {
 }
 
 const MICROSOFT_CLIENT_ID: &str = "00000000402b5328";
-const REDIRECT_URL: &str = "https://login.live.com/oauth20_desktop.srf";
-const REQUESTED_SCOPES: &str = "service::user.auth.xboxlive.com::MBI_SSL";
+const AUTH_REPLY_URL: &str = "https://login.live.com/oauth20_desktop.srf";
+const REQUESTED_SCOPE: &str = "service::user.auth.xboxlive.com::MBI_SSL";
 
 struct RequestWithDate<T> {
     pub date: DateTime<Utc>,
@@ -632,7 +801,7 @@ async fn sisu_authenticate(
           "AppId": MICROSOFT_CLIENT_ID,
           "DeviceToken": token,
           "Offers": [
-            REQUESTED_SCOPES
+            REQUESTED_SCOPE
           ],
           "Query": {
             "code_challenge": challenge,
@@ -640,13 +809,13 @@ async fn sisu_authenticate(
             "state": generate_oauth_challenge(),
             "prompt": "select_account"
           },
-          "RedirectUri": REDIRECT_URL,
+          "RedirectUri": AUTH_REPLY_URL,
           "Sandbox": "RETAIL",
           "TokenType": "code",
           "TitleId": "1794566092",
         }),
         key,
-        MinecraftAuthStep::SisuAuthenicate,
+        MinecraftAuthStep::SisuAuthenticate,
         current_date,
     )
     .await?;
@@ -684,12 +853,12 @@ async fn oauth_token(
     verifier: &str,
 ) -> Result<RequestWithDate<OAuthToken>, MinecraftAuthenticationError> {
     let mut query = HashMap::new();
-    query.insert("client_id", "00000000402b5328");
+    query.insert("client_id", MICROSOFT_CLIENT_ID);
     query.insert("code", code);
     query.insert("code_verifier", verifier);
     query.insert("grant_type", "authorization_code");
-    query.insert("redirect_uri", "https://login.live.com/oauth20_desktop.srf");
-    query.insert("scope", "service::user.auth.xboxlive.com::MBI_SSL");
+    query.insert("redirect_uri", AUTH_REPLY_URL);
+    query.insert("scope", REQUESTED_SCOPE);
 
     let res = auth_retry(|| {
         REQWEST_CLIENT
@@ -733,11 +902,11 @@ async fn oauth_refresh(
     refresh_token: &str,
 ) -> Result<RequestWithDate<OAuthToken>, MinecraftAuthenticationError> {
     let mut query = HashMap::new();
-    query.insert("client_id", "00000000402b5328");
+    query.insert("client_id", MICROSOFT_CLIENT_ID);
     query.insert("refresh_token", refresh_token);
     query.insert("grant_type", "refresh_token");
-    query.insert("redirect_uri", "https://login.live.com/oauth20_desktop.srf");
-    query.insert("scope", "service::user.auth.xboxlive.com::MBI_SSL");
+    query.insert("redirect_uri", AUTH_REPLY_URL);
+    query.insert("scope", REQUESTED_SCOPE);
 
     let res = auth_retry(|| {
         REQWEST_CLIENT
@@ -801,7 +970,7 @@ async fn sisu_authorize(
         "/authorize",
         json!({
             "AccessToken": format!("t={access_token}"),
-            "AppId": "00000000402b5328",
+            "AppId": MICROSOFT_CLIENT_ID,
             "DeviceToken": device_token,
             "ProofKey": {
                 "kty": "EC",
@@ -918,13 +1087,197 @@ async fn minecraft_token(
     })
 }
 
-#[derive(Deserialize)]
-struct MinecraftProfile {
-    pub id: Option<Uuid>,
-    pub name: String,
+#[derive(
+    sqlx::Type, Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq,
+)]
+#[serde(rename_all = "UPPERCASE")]
+#[sqlx(rename_all = "UPPERCASE")]
+pub enum MinecraftSkinVariant {
+    /// The classic player model, with arms that are 4 pixels wide.
+    Classic,
+    /// The slim player model, with arms that are 3 pixels wide.
+    Slim,
+    /// The player model is unknown.
+    #[serde(other)]
+    Unknown, // Defensive handling of unexpected Mojang API return values to
+             // prevent breaking the entire profile parsing
 }
 
-#[tracing::instrument]
+#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq)]
+#[serde(rename_all = "UPPERCASE")]
+pub enum MinecraftCharacterExpressionState {
+    /// This expression is selected for being displayed ingame.
+    ///
+    /// At the moment, at most one expression can be selected at a time.
+    Active,
+    /// This expression is not selected for being displayed ingame.
+    Inactive,
+    /// The expression selection status is unknown.
+    #[serde(other)]
+    Unknown, // Defensive handling of unexpected Mojang API return values to
+             // prevent breaking the entire profile parsing
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct MinecraftSkin {
+    /// The UUID of this skin object.
+    ///
+    /// As of 2025-04-08, in the production Mojang profile endpoint this UUID
+    /// changes every time the player changes their skin, even if the skin
+    /// texture is the same as before.
+    pub id: Uuid,
+    /// The selection state of the skin.
+    ///
+    /// As of 2025-04-08, in the production Mojang profile endpoint this
+    /// is always `ACTIVE`, as only a single skin representing the current
+    /// skin is returned.
+    pub state: MinecraftCharacterExpressionState,
+    /// The URL to the skin texture.
+    ///
+    /// As of 2025-04-08, in the production Mojang profile endpoint the file
+    /// name for this URL is a hash of the skin texture, so that different
+    /// players using the same skin texture will share a texture URL.
+    pub url: Arc<Url>,
+    /// A hash of the skin texture.
+    ///
+    /// As of 2025-04-08, in the production Mojang profile endpoint this
+    /// is always set and the same as the file name of the skin texture URL.
+    #[serde(
+        default, // Defensive handling of unexpected Mojang API return values to
+                 // prevent breaking the entire profile parsing
+        rename = "textureKey"
+    )]
+    pub texture_key: Option<Arc<str>>,
+    /// The player model variant this skin is for.
+    pub variant: MinecraftSkinVariant,
+    /// User-friendly name for the skin.
+    ///
+    /// As of 2025-04-08, in the production Mojang profile endpoint this is
+    /// only set if the player has not set a custom skin, and this skin object
+    /// is therefore the default skin for the player's UUID.
+    #[serde(
+        default,
+        rename = "alias",
+        deserialize_with = "normalize_skin_alias_case"
+    )]
+    pub name: Option<String>,
+}
+
+impl MinecraftSkin {
+    /// Robustly computes the texture key for this skin, falling back to its
+    /// URL file name and finally to the skin UUID when necessary.
+    pub fn texture_key(&self) -> Arc<str> {
+        self.texture_key.as_ref().cloned().unwrap_or_else(|| {
+            self.url
+                .path_segments()
+                .and_then(|mut path_segments| {
+                    path_segments.next_back().map(String::from)
+                })
+                .unwrap_or_else(|| self.id.as_simple().to_string())
+                .into()
+        })
+    }
+}
+
+fn normalize_skin_alias_case<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> Result<Option<String>, D::Error> {
+    // Skin aliases have been spotted to be returned in all caps, so make sure
+    // they are normalized to a prettier title case
+    Ok(<Option<Cow<'_, str>>>::deserialize(deserializer)?
+        .map(|alias| alias.to_title_case()))
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct MinecraftCape {
+    /// The UUID of the cape.
+    pub id: Uuid,
+    /// The selection state of the cape.
+    pub state: MinecraftCharacterExpressionState,
+    /// The URL to the cape texture.
+    pub url: Arc<Url>,
+    /// The user-friendly name for the cape.
+    #[serde(rename = "alias")]
+    pub name: Arc<str>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Default, Clone)]
+pub struct MinecraftProfile {
+    /// The UUID of the player.
+    #[serde(default)]
+    pub id: Uuid,
+    /// The username of the player.
+    pub name: String,
+    /// The skins the player is known to have.
+    ///
+    /// As of 2025-04-08, in the production Mojang profile endpoint every
+    /// player has a single skin.
+    pub skins: Vec<MinecraftSkin>,
+    /// The capes the player is known to have.
+    pub capes: Vec<MinecraftCape>,
+    /// The instant when the profile was fetched. See also [Self::is_fresh].
+    #[serde(skip)]
+    pub fetch_time: Option<Instant>,
+}
+
+impl MinecraftProfile {
+    /// Checks whether the profile data is fresh (i.e., highly likely to be
+    /// up-to-date because it was fetched recently) or stale. If it is not
+    /// known when this profile data has been fetched from Mojang servers (i.e.,
+    /// `fetch_time` is `None`), the profile is considered stale.
+    ///
+    /// This can be used to determine if the profile data should be fetched again
+    /// from the Mojang API: the vanilla launcher was seen refreshing profile
+    /// data every 60 seconds when re-entering the skin selection screen, and
+    /// external applications may change this data at any time.
+    fn is_fresh(&self) -> bool {
+        self.fetch_time.is_some_and(|last_profile_fetch_time| {
+            Instant::now().saturating_duration_since(last_profile_fetch_time)
+                < std::time::Duration::from_secs(60)
+        })
+    }
+
+    /// Returns the currently selected skin for this profile.
+    pub fn current_skin(&self) -> crate::Result<&MinecraftSkin> {
+        Ok(self
+            .skins
+            .iter()
+            .find(|skin| {
+                skin.state == MinecraftCharacterExpressionState::Active
+            })
+            // There should always be one active skin, even when the player uses their default skin
+            .ok_or_else(|| {
+                ErrorKind::OtherError("No active skin found".into())
+            })?)
+    }
+
+    /// Returns the currently selected cape for this profile.
+    pub fn current_cape(&self) -> Option<&MinecraftCape> {
+        self.capes.iter().find(|cape| {
+            cape.state == MinecraftCharacterExpressionState::Active
+        })
+    }
+}
+
+pub enum MaybeOnlineMinecraftProfile<'profile> {
+    /// An online profile, fetched from the Mojang API.
+    Online(Arc<MinecraftProfile>),
+    /// An offline profile, which has not been fetched from the Mojang API.
+    Offline(&'profile MinecraftProfile),
+}
+
+impl Deref for MaybeOnlineMinecraftProfile<'_> {
+    type Target = MinecraftProfile;
+
+    fn deref(&self) -> &Self::Target {
+        match self {
+            Self::Online(profile) => profile,
+            Self::Offline(profile) => profile,
+        }
+    }
+}
+
+#[tracing::instrument(skip(token))]
 async fn minecraft_profile(
     token: &str,
 ) -> Result<MinecraftProfile, MinecraftAuthenticationError> {
@@ -933,6 +1286,9 @@ async fn minecraft_profile(
             .get("https://api.minecraftservices.com/minecraft/profile")
             .header("Accept", "application/json")
             .bearer_auth(token)
+            // Profiles may be refreshed periodically in response to user actions,
+            // so we want each refresh to be fast
+            .timeout(std::time::Duration::from_secs(10))
             .send()
     })
     .await
@@ -949,14 +1305,23 @@ async fn minecraft_profile(
         }
     })?;
 
-    serde_json::from_str(&text).map_err(|source| {
-        MinecraftAuthenticationError::DeserializeResponse {
-            source,
-            raw: text,
-            step: MinecraftAuthStep::MinecraftProfile,
-            status_code: status,
-        }
-    })
+    let mut profile =
+        serde_json::from_str::<MinecraftProfile>(&text).map_err(|source| {
+            MinecraftAuthenticationError::DeserializeResponse {
+                source,
+                raw: text,
+                step: MinecraftAuthStep::MinecraftProfile,
+                status_code: status,
+            }
+        })?;
+    profile.fetch_time = Some(Instant::now());
+
+    tracing::debug!(
+        "Successfully fetched Minecraft profile for {}",
+        profile.name
+    );
+
+    Ok(profile)
 }
 
 #[derive(Deserialize)]
@@ -974,7 +1339,7 @@ async fn minecraft_entitlements(
             .bearer_auth(token)
             .send()
     })
-        .await.map_err(|source| MinecraftAuthenticationError::Request { source, step: MinecraftAuthStep::MinecraftEntitlements })?;
+    .await.map_err(|source| MinecraftAuthenticationError::Request { source, step: MinecraftAuthStep::MinecraftEntitlements })?;
 
     let status = res.status();
     let text = res.text().await.map_err(|source| {
@@ -1087,56 +1452,25 @@ async fn send_signed_request<T: DeserializeOwned>(
     let time: u128 =
         { ((current_date.timestamp() as u128) + 11644473600) * 10000000 };
 
-    use byteorder::WriteBytesExt;
     let mut buffer = Vec::new();
-    buffer.write_u32::<BigEndian>(1).map_err(|source| {
-        MinecraftAuthenticationError::ConstructingSignedRequest { source, step }
-    })?;
-    buffer.write_u8(0).map_err(|source| {
-        MinecraftAuthenticationError::ConstructingSignedRequest { source, step }
-    })?;
-    buffer
-        .write_u64::<BigEndian>(time as u64)
-        .map_err(|source| {
-            MinecraftAuthenticationError::ConstructingSignedRequest {
-                source,
-                step,
-            }
-        })?;
-    buffer.write_u8(0).map_err(|source| {
-        MinecraftAuthenticationError::ConstructingSignedRequest { source, step }
-    })?;
+    buffer.extend_from_slice(&1_u32.to_be_bytes()[..]);
+    buffer.push(0_u8);
+    buffer.extend_from_slice(&(time as u64).to_be_bytes()[..]);
+    buffer.push(0_u8);
     buffer.extend_from_slice("POST".as_bytes());
-    buffer.write_u8(0).map_err(|source| {
-        MinecraftAuthenticationError::ConstructingSignedRequest { source, step }
-    })?;
+    buffer.push(0_u8);
     buffer.extend_from_slice(url_path.as_bytes());
-    buffer.write_u8(0).map_err(|source| {
-        MinecraftAuthenticationError::ConstructingSignedRequest { source, step }
-    })?;
+    buffer.push(0_u8);
     buffer.extend_from_slice(&auth);
-    buffer.write_u8(0).map_err(|source| {
-        MinecraftAuthenticationError::ConstructingSignedRequest { source, step }
-    })?;
+    buffer.push(0_u8);
     buffer.extend_from_slice(&body);
-    buffer.write_u8(0).map_err(|source| {
-        MinecraftAuthenticationError::ConstructingSignedRequest { source, step }
-    })?;
+    buffer.push(0_u8);
 
     let ecdsa_sig: Signature = key.key.sign(&buffer);
 
     let mut sig_buffer = Vec::new();
-    sig_buffer.write_i32::<BigEndian>(1).map_err(|source| {
-        MinecraftAuthenticationError::ConstructingSignedRequest { source, step }
-    })?;
-    sig_buffer
-        .write_u64::<BigEndian>(time as u64)
-        .map_err(|source| {
-            MinecraftAuthenticationError::ConstructingSignedRequest {
-                source,
-                step,
-            }
-        })?;
+    sig_buffer.extend_from_slice(&1_i32.to_be_bytes()[..]);
+    sig_buffer.extend_from_slice(&(time as u64).to_be_bytes()[..]);
     sig_buffer.extend_from_slice(&ecdsa_sig.r().to_bytes());
     sig_buffer.extend_from_slice(&ecdsa_sig.s().to_bytes());
 
@@ -1192,15 +1526,13 @@ fn get_date_header(headers: &HeaderMap) -> DateTime<Utc> {
         .get(reqwest::header::DATE)
         .and_then(|x| x.to_str().ok())
         .and_then(|x| DateTime::parse_from_rfc2822(x).ok())
-        .map(|x| x.with_timezone(&Utc))
-        .unwrap_or(Utc::now())
+        .map_or(Utc::now(), |x| x.with_timezone(&Utc))
 }
 
 #[tracing::instrument]
-#[allow(clippy::format_collect)]
 fn generate_oauth_challenge() -> String {
     let mut rng = rand::thread_rng();
 
-    let bytes: Vec<u8> = (0..64).map(|_| rng.gen::<u8>()).collect();
+    let bytes: Vec<u8> = (0..64).map(|_| rng.r#gen::<u8>()).collect();
     bytes.iter().map(|byte| format!("{byte:02x}")).collect()
 }

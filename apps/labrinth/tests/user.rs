@@ -5,7 +5,7 @@ use common::{
     environment::with_test_environment_all,
 };
 
-mod common;
+pub mod common;
 
 // user GET (permissions, different users)
 // users GET
@@ -94,9 +94,11 @@ pub async fn get_user_projects_after_joining_team_shows_team_projects() {
                 FRIEND_USER_PAT,
             )
             .await;
-        assert!(projects
-            .iter()
-            .any(|p| p.id.to_string() == *alpha_project_id));
+        assert!(
+            projects
+                .iter()
+                .any(|p| p.id.to_string() == *alpha_project_id)
+        );
     })
     .await;
 }
@@ -131,9 +133,11 @@ pub async fn get_user_projects_after_leaving_team_shows_no_team_projects() {
                 FRIEND_USER_PAT,
             )
             .await;
-        assert!(!projects
-            .iter()
-            .any(|p| p.id.to_string() == *alpha_project_id));
+        assert!(
+            !projects
+                .iter()
+                .any(|p| p.id.to_string() == *alpha_project_id)
+        );
     })
     .await;
 }

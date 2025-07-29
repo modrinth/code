@@ -295,21 +295,87 @@ export type Report = {
   body: string
 }
 
-export type ServerNotice = {
-  id: number
-  message: string
+// Moderation
+export interface ModerationModpackPermissionApprovalType {
+  id:
+    | 'yes'
+    | 'no'
+    | 'with-attribution'
+    | 'unidentified'
+    | 'with-attribution-and-source'
+    | 'permanent-no'
+  name: string
+}
+
+export interface ModerationPermissionType {
+  id: 'yes' | 'no'
+  name: string
+}
+
+export interface ModerationBaseModpackItem {
+  sha1: string
+  file_name: string
+  type: 'unknown' | 'flame' | 'identified'
+  status: ModerationModpackPermissionApprovalType['id'] | null
+  approved: ModerationPermissionType['id'] | null
+}
+
+export interface ModerationUnknownModpackItem extends ModerationBaseModpackItem {
+  type: 'unknown'
+  proof: string
+  url: string
+  title: string
+}
+
+export interface ModerationFlameModpackItem extends ModerationBaseModpackItem {
+  type: 'flame'
+  id: string
+  title: string
+  url: string
+}
+
+export interface ModerationIdentifiedModpackItem extends ModerationBaseModpackItem {
+  type: 'identified'
+  proof?: string
+  url?: string
   title?: string
-  level: 'info' | 'warn' | 'critical' | 'survey'
-  dismissable: boolean
-  announce_at: string
-  expires: string
-  assigned: {
-    kind: 'server' | 'node'
-    id: string
-    name: string
-  }[]
-  dismissed_by: {
-    server: string
-    dismissed_on: string
-  }[]
+}
+
+export type ModerationModpackItem =
+  | ModerationUnknownModpackItem
+  | ModerationFlameModpackItem
+  | ModerationIdentifiedModpackItem
+
+export interface ModerationModpackResponse {
+  identified?: Record<
+    string,
+    {
+      file_name: string
+      status: ModerationModpackPermissionApprovalType['id']
+    }
+  >
+  unknown_files?: Record<string, string>
+  flame_files?: Record<
+    string,
+    {
+      file_name: string
+      id: string
+      title?: string
+      url?: string
+    }
+  >
+}
+
+export interface ModerationJudgement {
+  type: 'flame' | 'unknown' | 'identified'
+  status: string | null
+  id?: string
+  link?: string
+  title?: string
+  proof?: string
+  file_name?: string
+}
+
+export interface ModerationJudgements {
+  [sha1: string]: ModerationJudgement
 }

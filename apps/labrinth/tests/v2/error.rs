@@ -8,7 +8,7 @@ use bytes::Bytes;
 use crate::common::database::USER_USER_PAT;
 use crate::common::{
     api_v2::ApiV2,
-    environment::{with_test_environment, TestEnvironment},
+    environment::{TestEnvironment, with_test_environment},
 };
 #[actix_rt::test]
 pub async fn error_404_empty() {

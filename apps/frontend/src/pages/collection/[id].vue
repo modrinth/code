@@ -40,7 +40,6 @@
                       @change="showPreviewImage"
                     >
                       <UploadIcon aria-hidden="true" />
-                      {{ formatMessage(messages.uploadIconButton) }}
                     </FileInput>
                     <Button
                       v-if="!deletedIcon && (previewImage || collection.icon_url)"
@@ -248,9 +247,7 @@
             </div>
           </template>
         </div>
-        <AdPlaceholder
-          v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
-        />
+        <AdPlaceholder v-if="!auth.user" />
       </div>
       <div class="normal-page__content">
         <nav class="navigation-card">
@@ -391,6 +388,7 @@ import {
   DropdownSelect,
   FileInput,
   PopoutMenu,
+  useRelativeTime,
 } from "@modrinth/ui";
 
 import { isAdmin } from "@modrinth/utils";
@@ -480,10 +478,6 @@ const messages = defineMessages({
     id: "collection.label.updated-at",
     defaultMessage: "Updated {ago}",
   },
-  uploadIconButton: {
-    id: "collection.button.upload-icon",
-    defaultMessage: "Upload icon",
-  },
 });
 
 const data = useNuxtApp();
@@ -491,7 +485,6 @@ const route = useNativeRoute();
 const auth = await useAuth();
 const cosmetics = useCosmetics();
 const tags = useTags();
-const flags = useFeatureFlags();
 
 const isEditing = ref(false);
 

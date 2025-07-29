@@ -11,7 +11,7 @@
   />
 
   <div
-    v-if="server.content?.error"
+    v-if="server.moduleErrors.content"
     class="flex w-full flex-col items-center justify-center gap-4 p-4"
   >
     <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -24,7 +24,9 @@
         </div>
         <p class="text-lg text-secondary">
           We couldn't load your server's {{ type.toLowerCase() }}s. Here's what we know:
-          <span class="break-all font-mono">{{ JSON.stringify(server.content.error) }}</span>
+          <span class="break-all font-mono">{{
+            JSON.stringify(server.moduleErrors.content.error)
+          }}</span>
         </p>
         <ButtonStyled size="large" color="brand" @click="() => server.refresh(['content'])">
           <button class="mt-6 !w-full">Retry</button>
@@ -134,7 +136,7 @@
                       class="flex min-w-0 flex-1 items-center gap-2 rounded-xl p-2"
                       draggable="false"
                     >
-                      <UiAvatar
+                      <Avatar
                         :src="mod.icon_url"
                         size="sm"
                         alt="Server Icon"
@@ -347,15 +349,16 @@ import {
   FileIcon,
   IssuesIcon,
 } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+import { Avatar, ButtonStyled } from "@modrinth/ui";
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
+import type { Mod } from "@modrinth/utils";
 import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
 import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
-import type { Server } from "~/composables/pyroServers";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: ModrinthServer;
 }>();
 
 const type = computed(() => {

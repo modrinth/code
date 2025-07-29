@@ -12,18 +12,18 @@ pub struct NotificationBuilder {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct Notification {
-    pub id: NotificationId,
-    pub user_id: UserId,
+pub struct DBNotification {
+    pub id: DBNotificationId,
+    pub user_id: DBUserId,
     pub body: NotificationBody,
     pub read: bool,
     pub created: DateTime<Utc>,
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct NotificationAction {
+pub struct DBNotificationAction {
     pub id: NotificationActionId,
-    pub notification_id: NotificationId,
+    pub notification_id: DBNotificationId,
     pub name: String,
     pub action_route_method: String,
     pub action_route: String,
@@ -32,7 +32,7 @@ pub struct NotificationAction {
 impl NotificationBuilder {
     pub async fn insert(
         &self,
-        user: UserId,
+        user: DBUserId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
@@ -41,7 +41,7 @@ impl NotificationBuilder {
 
     pub async fn insert_many(
         &self,
-        users: Vec<UserId>,
+        users: Vec<DBUserId>,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
@@ -72,15 +72,15 @@ impl NotificationBuilder {
         .execute(&mut **transaction)
         .await?;
 
-        Notification::clear_user_notifications_cache(&users, redis).await?;
+        DBNotification::clear_user_notifications_cache(&users, redis).await?;
 
         Ok(())
     }
 }
 
-impl Notification {
+impl DBNotification {
     pub async fn get<'a, 'b, E>(
-        id: NotificationId,
+        id: DBNotificationId,
         executor: E,
     ) -> Result<Option<Self>, sqlx::error::Error>
     where
@@ -92,9 +92,9 @@ impl Notification {
     }
 
     pub async fn get_many<'a, E>(
-        notification_ids: &[NotificationId],
+        notification_ids: &[DBNotificationId],
         exec: E,
-    ) -> Result<Vec<Notification>, sqlx::Error>
+    ) -> Result<Vec<DBNotification>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -114,11 +114,11 @@ impl Notification {
         )
             .fetch(exec)
             .map_ok(|row| {
-                let id = NotificationId(row.id);
+                let id = DBNotificationId(row.id);
 
-                Notification {
+                DBNotification {
                     id,
-                    user_id: UserId(row.user_id),
+                    user_id: DBUserId(row.user_id),
                     read: row.read,
                     created: row.created,
                     body: row.body.clone().and_then(|x| serde_json::from_value(x).ok()).unwrap_or_else(|| {
@@ -140,21 +140,21 @@ impl Notification {
                     }),
                 }
             })
-            .try_collect::<Vec<Notification>>()
+            .try_collect::<Vec<DBNotification>>()
             .await
     }
 
     pub async fn get_many_user<'a, E>(
-        user_id: UserId,
+        user_id: DBUserId,
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<Notification>, DatabaseError>
+    ) -> Result<Vec<DBNotification>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         let mut redis = redis.connect().await?;
 
-        let cached_notifications: Option<Vec<Notification>> = redis
+        let cached_notifications: Option<Vec<DBNotification>> = redis
             .get_deserialized_from_json(
                 USER_NOTIFICATIONS_NAMESPACE,
                 &user_id.0.to_string(),
@@ -174,15 +174,15 @@ impl Notification {
             WHERE n.user_id = $1
             GROUP BY n.id, n.user_id;
             ",
-            user_id as UserId
+            user_id as DBUserId
         )
             .fetch(exec)
             .map_ok(|row| {
-                let id = NotificationId(row.id);
+                let id = DBNotificationId(row.id);
 
-                Notification {
+                DBNotification {
                     id,
-                    user_id: UserId(row.user_id),
+                    user_id: DBUserId(row.user_id),
                     read: row.read,
                     created: row.created,
                     body: row.body.clone().and_then(|x| serde_json::from_value(x).ok()).unwrap_or_else(|| {
@@ -204,7 +204,7 @@ impl Notification {
                     }),
                 }
             })
-            .try_collect::<Vec<Notification>>()
+            .try_collect::<Vec<DBNotification>>()
             .await?;
 
         redis
@@ -220,7 +220,7 @@ impl Notification {
     }
 
     pub async fn read(
-        id: NotificationId,
+        id: DBNotificationId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
@@ -228,7 +228,7 @@ impl Notification {
     }
 
     pub async fn read_many(
-        notification_ids: &[NotificationId],
+        notification_ids: &[DBNotificationId],
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
@@ -245,11 +245,11 @@ impl Notification {
             &notification_ids_parsed
         )
         .fetch(&mut **transaction)
-        .map_ok(|x| UserId(x.user_id))
+        .map_ok(|x| DBUserId(x.user_id))
         .try_collect::<Vec<_>>()
         .await?;
 
-        Notification::clear_user_notifications_cache(
+        DBNotification::clear_user_notifications_cache(
             affected_users.iter(),
             redis,
         )
@@ -259,7 +259,7 @@ impl Notification {
     }
 
     pub async fn remove(
-        id: NotificationId,
+        id: DBNotificationId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
@@ -267,7 +267,7 @@ impl Notification {
     }
 
     pub async fn remove_many(
-        notification_ids: &[NotificationId],
+        notification_ids: &[DBNotificationId],
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
@@ -293,11 +293,11 @@ impl Notification {
             &notification_ids_parsed
         )
         .fetch(&mut **transaction)
-        .map_ok(|x| UserId(x.user_id))
+        .map_ok(|x| DBUserId(x.user_id))
         .try_collect::<Vec<_>>()
         .await?;
 
-        Notification::clear_user_notifications_cache(
+        DBNotification::clear_user_notifications_cache(
             affected_users.iter(),
             redis,
         )
@@ -307,7 +307,7 @@ impl Notification {
     }
 
     pub async fn clear_user_notifications_cache(
-        user_ids: impl IntoIterator<Item = &UserId>,
+        user_ids: impl IntoIterator<Item = &DBUserId>,
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;

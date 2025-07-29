@@ -1,25 +1,24 @@
-#![allow(dead_code)]
 use std::io::{Cursor, Write};
-
-use actix_http::StatusCode;
-use actix_web::test::{self, TestRequest};
-use labrinth::models::{
-    oauth_clients::OAuthClient,
-    organizations::Organization,
-    pats::Scopes,
-    projects::{Project, ProjectId, Version},
-};
-use serde_json::json;
-use sqlx::Executor;
-use zip::{write::FileOptions, CompressionMethod, ZipWriter};
 
 use crate::{
     assert_status,
     common::{api_common::Api, api_v3, database::USER_USER_PAT},
 };
+use actix_http::StatusCode;
+use actix_web::test::{self, TestRequest};
+use labrinth::models::ids::ProjectId;
+use labrinth::models::{
+    oauth_clients::OAuthClient,
+    organizations::Organization,
+    pats::Scopes,
+    projects::{Project, Version},
+};
+use serde_json::json;
+use sqlx::Executor;
+use zip::{CompressionMethod, ZipWriter, write::FileOptions};
 
 use super::{
-    api_common::{request_data::ImageData, ApiProject, AppendsOptionalPat},
+    api_common::{ApiProject, AppendsOptionalPat, request_data::ImageData},
     api_v3::ApiV3,
     database::TemporaryDatabase,
 };
@@ -28,7 +27,6 @@ use super::{database::USER_USER_ID, get_json_val_str};
 
 pub const DUMMY_DATA_UPDATE: i64 = 7;
 
-#[allow(dead_code)]
 pub const DUMMY_CATEGORIES: &[&str] = &[
     "combat",
     "decoration",
@@ -41,7 +39,6 @@ pub const DUMMY_CATEGORIES: &[&str] = &[
 
 pub const DUMMY_OAUTH_CLIENT_ALPHA_SECRET: &str = "abcdefghijklmnopqrstuvwxyz";
 
-#[allow(dead_code)]
 #[derive(Clone)]
 pub enum TestFile {
     DummyProjectAlpha,
@@ -98,7 +95,7 @@ impl TestFile {
             let mut zip = ZipWriter::new(&mut cursor);
             zip.start_file(
                 "fabric.mod.json",
-                FileOptions::default()
+                FileOptions::<()>::default()
                     .compression_method(CompressionMethod::Stored),
             )
             .unwrap();
@@ -106,7 +103,7 @@ impl TestFile {
 
             zip.start_file(
                 "META-INF/mods.toml",
-                FileOptions::default()
+                FileOptions::<()>::default()
                     .compression_method(CompressionMethod::Stored),
             )
             .unwrap();
@@ -159,7 +156,7 @@ impl TestFile {
             let mut zip = ZipWriter::new(&mut cursor);
             zip.start_file(
                 "modrinth.index.json",
-                FileOptions::default()
+                FileOptions::<()>::default()
                     .compression_method(CompressionMethod::Stored),
             )
             .unwrap();
@@ -173,7 +170,6 @@ impl TestFile {
 }
 
 #[derive(Clone)]
-#[allow(dead_code)]
 pub enum DummyImage {
     SmallIcon, // 200x200
 }

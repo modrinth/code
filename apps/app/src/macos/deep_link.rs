@@ -11,7 +11,8 @@ pub fn get_or_init_payload<R: Runtime, M: Manager<R>>(
     manager: &M,
 ) -> InitialPayload {
     let initial_payload = manager.try_state::<InitialPayload>();
-    let mtx = if let Some(initial_payload) = initial_payload {
+
+    if let Some(initial_payload) = initial_payload {
         initial_payload.inner().clone()
     } else {
         tracing::info!("No initial payload found, creating new");
@@ -22,7 +23,5 @@ pub fn get_or_init_payload<R: Runtime, M: Manager<R>>(
         manager.manage(payload.clone());
 
         payload
-    };
-
-    mtx
+    }
 }

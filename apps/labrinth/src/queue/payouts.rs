@@ -5,7 +5,7 @@ use crate::models::payouts::{
 use crate::models::projects::MonetizationStatus;
 use crate::routes::ApiError;
 use base64::Engine;
-use chrono::{DateTime, Datelike, Duration, TimeZone, Utc};
+use chrono::{DateTime, Datelike, Duration, NaiveTime, TimeZone, Utc};
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use reqwest::Method;
@@ -13,8 +13,8 @@ use rust_decimal::Decimal;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use sqlx::postgres::PgQueryResult;
 use sqlx::PgPool;
+use sqlx::postgres::PgQueryResult;
 use std::collections::HashMap;
 use tokio::sync::RwLock;
 
@@ -193,9 +193,12 @@ impl PayoutsQueue {
                 pub error_description: String,
             }
 
-            if let Ok(error) =
+            if let Ok(mut error) =
                 serde_json::from_value::<PayPalError>(value.clone())
             {
+                if error.name == "INSUFFICIENT_FUNDS" {
+                    error.message = "We're currently transferring funds to our PayPal account. Please try again in a couple days.".to_string();
+                }
                 return Err(ApiError::Payments(format!(
                     "error name: {}, message: {}",
                     error.name, error.message
@@ -387,6 +390,7 @@ impl PayoutsQueue {
                     "bank",
                     "ach",
                     "visa_card",
+                    "charity",
                 ];
 
                 if !SUPPORTED_METHODS.contains(&&*product.category)
@@ -437,8 +441,8 @@ impl PayoutsQueue {
                         }
                     } else {
                         PayoutMethodFee {
-                            percentage: Default::default(),
-                            min: Default::default(),
+                            percentage: Decimal::default(),
+                            min: Decimal::default(),
                             max: None,
                         }
                     },
@@ -735,6 +739,18 @@ pub async fn process_payout(
     pool: &PgPool,
     client: &clickhouse::Client,
 ) -> Result<(), ApiError> {
+    sqlx::query!(
+        "
+        UPDATE payouts
+        SET status = $1
+        WHERE status = $2 AND created < NOW() - INTERVAL '30 days'
+        ",
+        crate::models::payouts::PayoutStatus::Failed.as_str(),
+        crate::models::payouts::PayoutStatus::InTransit.as_str(),
+    )
+    .execute(pool)
+    .await?;
+
     let start: DateTime<Utc> = DateTime::from_naive_utc_and_offset(
         (Utc::now() - Duration::days(1))
             .date_naive()
@@ -817,7 +833,7 @@ pub async fn process_payout(
         .map(|x| (x.project_id, x.page_views))
         .collect::<HashMap<u64, u64>>();
 
-    for (key, value) in downloads_values.iter() {
+    for (key, value) in &downloads_values {
         let counter = views_values.entry(*key).or_insert(0);
         *counter += *value;
     }
@@ -1055,4 +1071,64 @@ pub async fn insert_payouts(
     )
     .execute(&mut **transaction)
     .await
+}
+
+pub async fn insert_bank_balances(
+    payouts: &PayoutsQueue,
+    pool: &PgPool,
+) -> Result<(), ApiError> {
+    let mut transaction = pool.begin().await?;
+
+    let (paypal, brex, tremendous) = futures::future::try_join3(
+        PayoutsQueue::get_paypal_balance(),
+        PayoutsQueue::get_brex_balance(),
+        payouts.get_tremendous_balance(),
+    )
+    .await?;
+
+    let mut insert_account_types = Vec::new();
+    let mut insert_amounts = Vec::new();
+    let mut insert_pending = Vec::new();
+    let mut insert_recorded = Vec::new();
+
+    let now = Utc::now();
+    let today = now.date_naive().and_time(NaiveTime::MIN).and_utc();
+
+    let mut add_balance =
+        |account_type: &str, balance: Option<AccountBalance>| {
+            if let Some(balance) = balance {
+                insert_account_types.push(account_type.to_string());
+                insert_amounts.push(balance.available);
+                insert_pending.push(false);
+                insert_recorded.push(today);
+
+                insert_account_types.push(account_type.to_string());
+                insert_amounts.push(balance.pending);
+                insert_pending.push(true);
+                insert_recorded.push(today);
+            }
+        };
+
+    add_balance("paypal", paypal);
+    add_balance("brex", brex);
+    add_balance("tremendous", tremendous);
+
+    sqlx::query!(
+        "
+        INSERT INTO payout_sources_balance (account_type, amount, pending, recorded)
+        SELECT * FROM UNNEST ($1::text[], $2::numeric[], $3::boolean[], $4::timestamptz[])
+        ON CONFLICT (recorded, account_type, pending)
+        DO UPDATE SET amount = EXCLUDED.amount
+        ",
+        &insert_account_types[..],
+        &insert_amounts[..],
+        &insert_pending[..],
+        &insert_recorded[..],
+    )
+        .execute(&mut *transaction)
+        .await?;
+
+    transaction.commit().await?;
+
+    Ok(())
 }

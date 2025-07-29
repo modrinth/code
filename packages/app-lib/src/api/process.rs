@@ -2,8 +2,8 @@
 
 use crate::state::ProcessMetadata;
 pub use crate::{
-    state::{Hooks, MemorySettings, Profile, Settings, WindowSize},
     State,
+    state::{Hooks, MemorySettings, Profile, Settings, WindowSize},
 };
 use uuid::Uuid;
 

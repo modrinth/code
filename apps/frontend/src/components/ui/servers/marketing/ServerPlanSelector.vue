@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ButtonStyled } from "@modrinth/ui";
-import { RightArrowIcon, SparklesIcon, UnknownIcon } from "@modrinth/assets";
+import { ButtonStyled, ServersSpecs } from "@modrinth/ui";
 import type { MessageDescriptor } from "@vintl/vintl";
+import { formatPrice } from "@modrinth/utils";
 
-const { formatMessage } = useVIntl();
+const { formatMessage, locale } = useVIntl();
 
 const emit = defineEmits<{
   (e: "select" | "scroll-to-faq"): void;
@@ -18,8 +18,8 @@ const plans: Record<
     accentText: string;
     accentBg: string;
     name: MessageDescriptor;
-    symbol: MessageDescriptor;
     description: MessageDescriptor;
+    mostPopular: boolean;
   }
 > = {
   small: {
@@ -30,15 +30,11 @@ const plans: Record<
       id: "servers.plan.small.name",
       defaultMessage: "Small",
     }),
-    symbol: defineMessage({
-      id: "servers.plan.small.symbol",
-      defaultMessage: "S",
-    }),
     description: defineMessage({
       id: "servers.plan.small.description",
-      defaultMessage:
-        "Perfect for vanilla multiplayer, small friend groups, SMPs, and light modding.",
+      defaultMessage: "Perfect for 1–5 friends with a few light mods.",
     }),
+    mostPopular: false,
   },
   medium: {
     buttonColor: "green",
@@ -48,14 +44,11 @@ const plans: Record<
       id: "servers.plan.medium.name",
       defaultMessage: "Medium",
     }),
-    symbol: defineMessage({
-      id: "servers.plan.medium.symbol",
-      defaultMessage: "M",
-    }),
     description: defineMessage({
       id: "servers.plan.medium.description",
-      defaultMessage: "Great for modded multiplayer and small communities.",
+      defaultMessage: "Great for 6–15 players and multiple mods.",
     }),
+    mostPopular: true,
   },
   large: {
     buttonColor: "purple",
@@ -65,14 +58,11 @@ const plans: Record<
       id: "servers.plan.large.name",
       defaultMessage: "Large",
     }),
-    symbol: defineMessage({
-      id: "servers.plan.large.symbol",
-      defaultMessage: "L",
-    }),
     description: defineMessage({
       id: "servers.plan.large.description",
-      defaultMessage: "Ideal for larger communities, modpacks, and heavy modding.",
+      defaultMessage: "Ideal for 15–25 players, modpacks, or heavy modding.",
     }),
+    mostPopular: false,
   },
 };
 
@@ -83,42 +73,30 @@ const props = defineProps<{
   storage: number;
   cpus: number;
   price: number;
+  interval: "monthly" | "quarterly" | "yearly";
+  currency: string;
+  isUsa: boolean;
 }>();
 
 const outOfStock = computed(() => {
   return !props.capacity || props.capacity === 0;
 });
 
-const lowStock = computed(() => {
-  return !props.capacity || props.capacity < 8;
-});
-
-const formattedRam = computed(() => {
-  return props.ram / 1024;
-});
-
-const formattedStorage = computed(() => {
-  return props.storage / 1024;
-});
-
-const sharedCpus = computed(() => {
-  return props.cpus / 2;
+const billingMonths = computed(() => {
+  if (props.interval === "yearly") {
+    return 12;
+  } else if (props.interval === "quarterly") {
+    return 3;
+  }
+  return 1;
 });
 </script>
 
 <template>
-  <li class="relative flex w-full flex-col justify-between pt-12 lg:w-1/3">
-    <div
-      v-if="lowStock"
-      class="absolute left-0 right-0 top-[-2px] rounded-t-2xl p-4 text-center font-bold"
-      :class="outOfStock ? 'bg-bg-red' : 'bg-bg-orange'"
-    >
-      <template v-if="outOfStock"> Out of stock! </template>
-      <template v-else> Only {{ capacity }} left in stock! </template>
-    </div>
+  <li class="relative flex w-full flex-col justify-between">
     <div
       :style="
-        plan === 'medium'
+        plans[plan].mostPopular
           ? {
               background: `radial-gradient(
                   86.12% 101.64% at 95.97% 94.07%,
@@ -131,55 +109,41 @@ const sharedCpus = computed(() => {
           : undefined
       "
       class="flex w-full flex-col justify-between gap-4 rounded-2xl bg-bg p-8 text-left"
-      :class="{ '!rounded-t-none': lowStock }"
     >
-      <div class="flex flex-col gap-4">
-        <div class="flex flex-row items-center justify-between">
+      <div class="flex flex-col gap-2">
+        <div class="flex flex-row flex-wrap items-center gap-3">
           <h1 class="m-0">{{ formatMessage(plans[plan].name) }}</h1>
           <div
-            class="grid size-8 place-content-center rounded-full text-xs font-bold"
-            :class="`${plans[plan].accentBg} ${plans[plan].accentText}`"
+            v-if="plans[plan].mostPopular"
+            class="rounded-full bg-brand-highlight px-2 py-1 text-xs font-bold text-brand"
           >
-            {{ formatMessage(plans[plan].symbol) }}
+            Most popular
           </div>
         </div>
-        <p class="m-0">{{ formatMessage(plans[plan].description) }}</p>
-        <div
-          class="flex flex-row flex-wrap items-center gap-2 text-nowrap text-secondary xl:justify-between"
-        >
-          <p class="m-0">{{ formattedRam }} GB RAM</p>
-          <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-          <p class="m-0">{{ formattedStorage }} GB SSD</p>
-          <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-          <p class="m-0">{{ sharedCpus }} Shared CPUs</p>
-        </div>
-        <div class="flex items-center gap-2 text-secondary">
-          <SparklesIcon /> Bursts up to {{ cpus }} CPUs
-          <nuxt-link
-            v-tooltip="
-              `CPU bursting allows your server to temporarily use additional threads to help mitigate TPS spikes. Click for more info.`
-            "
-            to="/servers#cpu-burst"
-            @click="() => emit('scroll-to-faq')"
-          >
-            <UnknownIcon class="h-4 w-4 text-secondary opacity-80" />
-          </nuxt-link>
-        </div>
         <span class="m-0 text-2xl font-bold text-contrast">
-          ${{ price / 100 }}<span class="text-lg font-semibold text-secondary">/month</span>
+          {{ formatPrice(locale, price / billingMonths, currency, true) }}
+          {{ isUsa ? "" : currency }}
+          <span class="text-lg font-semibold text-secondary">
+            / month<template v-if="interval !== 'monthly'">, billed {{ interval }}</template>
+          </span>
         </span>
+        <p class="m-0 max-w-[18rem]">{{ formatMessage(plans[plan].description) }}</p>
       </div>
       <ButtonStyled
         :color="plans[plan].buttonColor"
-        :type="plan === 'medium' ? 'standard' : 'highlight-colored-text'"
+        :type="plans[plan].mostPopular ? 'standard' : 'highlight-colored-text'"
         size="large"
       >
         <span v-if="outOfStock" class="button-like disabled"> Out of Stock </span>
-        <button v-else @click="() => emit('select')">
-          Get Started
-          <RightArrowIcon class="shrink-0" />
-        </button>
+        <button v-else @click="() => emit('select')">Select plan</button>
       </ButtonStyled>
+      <ServersSpecs
+        :ram="ram"
+        :storage="storage"
+        :cpus="cpus"
+        :bursting-link="'/servers#cpu-burst'"
+        @click-bursting-link="() => emit('scroll-to-faq')"
+      />
     </div>
   </li>
 </template>

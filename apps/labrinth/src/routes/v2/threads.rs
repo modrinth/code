@@ -2,12 +2,12 @@ use std::sync::Arc;
 
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
-use crate::models::ids::ThreadMessageId;
-use crate::models::threads::{MessageBody, Thread, ThreadId};
+use crate::models::ids::{ThreadId, ThreadMessageId};
+use crate::models::threads::{MessageBody, Thread};
 use crate::models::v2::threads::LegacyThread;
 use crate::queue::session::AuthQueue;
-use crate::routes::{v2_reroute, v3, ApiError};
-use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
+use crate::routes::{ApiError, v2_reroute, v3};
+use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use serde::Deserialize;
 use sqlx::PgPool;
 

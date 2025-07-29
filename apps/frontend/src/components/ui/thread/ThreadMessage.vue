@@ -103,10 +103,8 @@ import {
   ModrinthIcon,
   ScaleIcon,
 } from "@modrinth/assets";
-import { AutoLink, OverflowMenu } from "@modrinth/ui";
+import { AutoLink, Avatar, Badge, OverflowMenu, useRelativeTime } from "@modrinth/ui";
 import { renderString } from "@modrinth/utils";
-import Avatar from "~/components/ui/Avatar.vue";
-import Badge from "~/components/ui/Badge.vue";
 import { isStaff } from "~/helpers/users.js";
 
 const props = defineProps({

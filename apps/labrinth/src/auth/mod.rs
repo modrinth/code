@@ -15,8 +15,8 @@ pub use validate::{check_is_moderator_from_headers, get_user_from_headers};
 
 use crate::file_hosting::FileHostingError;
 use crate::models::error::ApiError;
-use actix_web::http::StatusCode;
 use actix_web::HttpResponse;
+use actix_web::http::StatusCode;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -43,7 +43,9 @@ pub enum AuthenticationError {
     InvalidAuthMethod,
     #[error("GitHub Token from incorrect Client ID")]
     InvalidClientId,
-    #[error("User email/account is already registered on Modrinth")]
+    #[error(
+        "User email is already registered on Modrinth. Try 'Forgot password' to access your account."
+    )]
     DuplicateUser,
     #[error("Invalid state sent, you probably need to get a new websocket")]
     SocketError,

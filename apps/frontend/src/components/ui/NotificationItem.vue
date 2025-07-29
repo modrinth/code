@@ -104,13 +104,13 @@
         </nuxt-link>
         <template v-if="tags.rejectedStatuses.includes(notification.body.new_status)">
           has been
-          <Badge :type="notification.body.new_status" />
+          <ProjectStatusBadge :status="notification.body.new_status" />
         </template>
         <template v-else>
           updated from
-          <Badge :type="notification.body.old_status" />
+          <ProjectStatusBadge :status="notification.body.old_status" />
           to
-          <Badge :type="notification.body.new_status" />
+          <ProjectStatusBadge :status="notification.body.new_status" />
         </template>
         by the moderators.
       </template>
@@ -184,7 +184,7 @@
               "
               class="date"
             >
-              {{ fromNow(notif.extra_data.version.date_published) }}
+              {{ formatRelativeTime(notif.extra_data.version.date_published) }}
             </span>
           </span>
         </div>
@@ -201,7 +201,7 @@
         v-tooltip="$dayjs(notification.created).format('MMMM D, YYYY [at] h:mm A')"
         class="inline-flex"
       >
-        <CalendarIcon class="mr-1" /> Received {{ fromNow(notification.created) }}
+        <CalendarIcon class="mr-1" /> Received {{ formatRelativeTime(notification.created) }}
       </span>
     </span>
     <div v-if="compact" class="notification__actions">
@@ -331,19 +331,19 @@ import {
   XIcon,
   ExternalIcon,
 } from "@modrinth/assets";
+import { Avatar, ProjectStatusBadge, CopyCode, useRelativeTime } from "@modrinth/ui";
 import ThreadSummary from "~/components/ui/thread/ThreadSummary.vue";
 import { getProjectLink, getVersionLink } from "~/helpers/projects.js";
 import { getUserLink } from "~/helpers/users.js";
 import { acceptTeamInvite, removeSelfFromTeam } from "~/helpers/teams.js";
-import { markAsRead } from "~/helpers/notifications.js";
+import { markAsRead } from "~/helpers/notifications.ts";
 import DoubleIcon from "~/components/ui/DoubleIcon.vue";
-import Avatar from "~/components/ui/Avatar.vue";
-import Badge from "~/components/ui/Badge.vue";
-import CopyCode from "~/components/ui/CopyCode.vue";
 import Categories from "~/components/ui/search/Categories.vue";
 
 const app = useNuxtApp();
 const emit = defineEmits(["update:notifications"]);
+
+const formatRelativeTime = useRelativeTime();
 
 const props = defineProps({
   notification: {

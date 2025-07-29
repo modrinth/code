@@ -2,14 +2,13 @@ use super::settings::{Hooks, MemorySettings, WindowSize};
 use crate::profile::get_full_path;
 use crate::state::server_join_log::JoinLogEntry;
 use crate::state::{
-    cache_file_hash, CacheBehaviour, CachedEntry, CachedFileHash,
+    CacheBehaviour, CachedEntry, CachedFileHash, cache_file_hash,
 };
 use crate::util;
-use crate::util::fetch::{write_cached_icon, FetchSemaphore, IoSemaphore};
+use crate::util::fetch::{FetchSemaphore, IoSemaphore, write_cached_icon};
 use crate::util::io::{self};
 use chrono::{DateTime, TimeDelta, TimeZone, Utc};
 use dashmap::DashMap;
-use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
@@ -17,6 +16,7 @@ use std::collections::HashSet;
 use std::convert::TryFrom;
 use std::convert::TryInto;
 use std::path::Path;
+use std::sync::LazyLock;
 use tokio::fs::DirEntry;
 use tokio::io::{AsyncBufReadExt, AsyncRead};
 use tokio::task::JoinSet;
@@ -32,7 +32,7 @@ pub struct Profile {
     pub icon_path: Option<String>,
 
     pub game_version: String,
-    pub protocol_version: Option<i32>,
+    pub protocol_version: Option<u32>,
     pub loader: ModLoader,
     pub loader_version: Option<String>,
 
@@ -320,7 +320,7 @@ impl TryFrom<ProfileQueryResult> for Profile {
             name: x.name,
             icon_path: x.icon_path,
             game_version: x.game_version,
-            protocol_version: x.protocol_version.map(|x| x as i32),
+            protocol_version: x.protocol_version.map(|x| x as u32),
             loader: ModLoader::from_string(&x.mod_loader),
             loader_version: x.mod_loader_version,
             groups: serde_json::from_value(x.groups).unwrap_or_default(),
@@ -837,9 +837,9 @@ impl Profile {
         state: &crate::State,
         join_entry: &mut JoinLogEntry,
     ) -> crate::Result<()> {
-        lazy_static! {
-            static ref LOG_LINE_REGEX: Regex = Regex::new(r"^\[[0-9]{2}(?::[0-9]{2}){2}] \[.+?/[A-Z]+?]: Connecting to (.+?), ([1-9][0-9]{0,4})$").unwrap();
-        }
+        static LOG_LINE_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+            Regex::new(r"^\[[0-9]{2}(?::[0-9]{2}){2}] \[.+?/[A-Z]+?]: Connecting to (.+?), ([1-9][0-9]{0,4})$").unwrap()
+        });
         let reader = tokio::io::BufReader::new(reader);
         let mut lines = reader.lines();
         while let Some(log_line) = lines.next_line().await? {
@@ -1022,8 +1022,10 @@ impl Profile {
             file.hash,
             file.project_type
                 .filter(|x| *x != ProjectType::Mod)
-                .map(|x| x.get_loaders().join("+"))
-                .unwrap_or_else(|| profile.loader.as_str().to_string()),
+                .map_or_else(
+                    || profile.loader.as_str().to_string(),
+                    |x| x.get_loaders().join("+")
+                ),
             profile.game_version
         )
     }

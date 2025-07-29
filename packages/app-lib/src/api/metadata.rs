@@ -1,5 +1,5 @@
-use crate::state::CachedEntry;
 use crate::State;
+use crate::state::CachedEntry;
 pub use daedalus::minecraft::VersionManifest;
 pub use daedalus::modded::Manifest;
 

@@ -27,76 +27,90 @@
     </div>
   </div>
   <div ref="main_page" class="layout" :class="{ 'expanded-mobile-nav': isBrowseMenuOpen }">
-    <div
+    <PagewideBanner
       v-if="auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email'"
-      class="email-nag"
+      variant="warning"
     >
-      <template v-if="auth.user.email">
-        <span>{{ formatMessage(verifyEmailBannerMessages.title) }}</span>
-        <button class="btn" @click="resendVerifyEmail">
+      <template #title>
+        <span>
+          {{
+            auth?.user?.email
+              ? formatMessage(verifyEmailBannerMessages.title)
+              : formatMessage(addEmailBannerMessages.title)
+          }}
+        </span>
+      </template>
+      <template #description>
+        <span>
+          {{
+            auth?.user?.email
+              ? formatMessage(verifyEmailBannerMessages.description)
+              : formatMessage(addEmailBannerMessages.description)
+          }}
+        </span>
+      </template>
+      <template #actions>
+        <button v-if="auth?.user?.email" class="btn" @click="resendVerifyEmail">
           {{ formatMessage(verifyEmailBannerMessages.action) }}
         </button>
-      </template>
-      <template v-else>
-        <span>{{ formatMessage(addEmailBannerMessages.title) }}</span>
-        <nuxt-link class="btn" to="/settings/account">
+        <nuxt-link v-else class="btn" to="/settings/account">
           <SettingsIcon aria-hidden="true" />
           {{ formatMessage(addEmailBannerMessages.action) }}
         </nuxt-link>
       </template>
-    </div>
-    <div
+    </PagewideBanner>
+    <PagewideBanner
       v-if="
-        user &&
-        user.subscriptions &&
         user.subscriptions.some((x) => x.status === 'payment-failed') &&
         route.path !== '/settings/billing'
       "
-      class="email-nag"
+      variant="error"
     >
-      <span>{{ formatMessage(subscriptionPaymentFailedBannerMessages.title) }}</span>
-      <nuxt-link class="btn" to="/settings/billing">
-        <SettingsIcon aria-hidden="true" />
-        {{ formatMessage(subscriptionPaymentFailedBannerMessages.action) }}
-      </nuxt-link>
-    </div>
-    <div
+      <template #title>
+        <span>{{ formatMessage(subscriptionPaymentFailedBannerMessages.title) }}</span>
+      </template>
+      <template #description>
+        <span>{{ formatMessage(subscriptionPaymentFailedBannerMessages.description) }}</span>
+      </template>
+      <template #actions>
+        <nuxt-link class="btn" to="/settings/billing">
+          <SettingsIcon aria-hidden="true" />
+          {{ formatMessage(subscriptionPaymentFailedBannerMessages.action) }}
+        </nuxt-link>
+      </template>
+    </PagewideBanner>
+    <PagewideBanner
       v-if="
         config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com') &&
         !cosmetics.hideStagingBanner
       "
-      class="site-banner site-banner--warning [&>*]:z-[6]"
+      variant="warning"
     >
-      <div class="site-banner__title">
-        <IssuesIcon aria-hidden="true" />
+      <template #title>
         <span>{{ formatMessage(stagingBannerMessages.title) }}</span>
-      </div>
-      <div class="site-banner__description">
+      </template>
+      <template #description>
         {{ formatMessage(stagingBannerMessages.description) }}
-      </div>
-      <div class="site-banner__actions">
-        <Button transparent icon-only :action="hideStagingBanner" aria-label="Close banner"
-          ><XIcon aria-hidden="true"
-        /></Button>
-      </div>
-    </div>
-    <div
-      v-if="generatedStateErrors && generatedStateErrors.length > 0"
-      class="site-banner site-banner--warning [&>*]:z-[6]"
-    >
-      <div class="site-banner__title">
-        <IssuesIcon aria-hidden="true" />
+      </template>
+      <template #actions_right>
+        <Button transparent icon-only aria-label="Close" @click="hideStagingBanner">
+          <XIcon aria-hidden="true" />
+        </Button>
+      </template>
+    </PagewideBanner>
+    <PagewideBanner v-if="generatedStateErrors?.length" variant="error">
+      <template #title>
         <span>{{ formatMessage(failedToBuildBannerMessages.title) }}</span>
-      </div>
-      <div class="site-banner__description">
+      </template>
+      <template #description>
         {{
           formatMessage(failedToBuildBannerMessages.description, {
             errors: generatedStateErrors,
             url: config.public.apiBaseUrl,
           })
         }}
-      </div>
-    </div>
+      </template>
+    </PagewideBanner>
     <header
       class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
     >
@@ -128,7 +142,7 @@
             "
           >
             <nuxt-link to="/resourcepacks">
-              <PaintBrushIcon aria-hidden="true" /> Resource Packs
+              <PaintbrushIcon aria-hidden="true" /> Resource Packs
             </nuxt-link>
           </ButtonStyled>
           <ButtonStyled
@@ -207,7 +221,7 @@
                 v-if="route.name === 'search-mods' || route.path.startsWith('/mod/')"
                 aria-hidden="true"
               />
-              <PaintBrushIcon
+              <PaintbrushIcon
                 v-else-if="
                   route.name === 'search-resourcepacks' || route.path.startsWith('/resourcepack/')
                 "
@@ -236,7 +250,7 @@
 
               <template #mods> <BoxIcon aria-hidden="true" /> Mods </template>
               <template #resourcepacks>
-                <PaintBrushIcon aria-hidden="true" /> Resource Packs
+                <PaintbrushIcon aria-hidden="true" /> Resource Packs
               </template>
               <template #datapacks> <BracesIcon aria-hidden="true" /> Data Packs </template>
               <template #plugins> <PlugIcon aria-hidden="true" /> Plugins </template>
@@ -682,17 +696,23 @@ import {
   CurrencyIcon,
   BracesIcon,
   GlassesIcon,
-  PaintBrushIcon,
+  PaintbrushIcon,
   PackageOpenIcon,
   DiscordIcon,
   BlueskyIcon,
-  TumblrIcon,
   TwitterIcon,
   MastodonIcon,
-  GitHubIcon,
+  GithubIcon,
   ScaleIcon,
 } from "@modrinth/assets";
-import { Button, ButtonStyled, OverflowMenu, Avatar, commonMessages } from "@modrinth/ui";
+import {
+  Button,
+  ButtonStyled,
+  OverflowMenu,
+  PagewideBanner,
+  Avatar,
+  commonMessages,
+} from "@modrinth/ui";
 import { isAdmin, isStaff } from "@modrinth/utils";
 import { errors as generatedStateErrors } from "~/generated/state.json";
 
@@ -720,8 +740,13 @@ const basePopoutId = useId();
 
 const verifyEmailBannerMessages = defineMessages({
   title: {
-    id: "layout.banner.verify-email.title",
-    defaultMessage: "For security purposes, please verify your email address on Modrinth.",
+    id: "layout.banner.account-action",
+    defaultMessage: "Account action required",
+  },
+  description: {
+    id: "layout.banner.verify-email.description",
+    defaultMessage:
+      "For security reasons, Modrinth needs you to verify the email address associated with your account.",
   },
   action: {
     id: "layout.banner.verify-email.action",
@@ -731,8 +756,13 @@ const verifyEmailBannerMessages = defineMessages({
 
 const addEmailBannerMessages = defineMessages({
   title: {
-    id: "layout.banner.add-email.title",
-    defaultMessage: "For security purposes, please enter your email on Modrinth.",
+    id: "layout.banner.account-action",
+    defaultMessage: "Account action required",
+  },
+  description: {
+    id: "layout.banner.add-email.description",
+    defaultMessage:
+      "For security reasons, Modrinth needs you to register an email address to your account.",
   },
   action: {
     id: "layout.banner.add-email.button",
@@ -743,8 +773,12 @@ const addEmailBannerMessages = defineMessages({
 const subscriptionPaymentFailedBannerMessages = defineMessages({
   title: {
     id: "layout.banner.subscription-payment-failed.title",
+    defaultMessage: "Billing action required.",
+  },
+  description: {
+    id: "layout.banner.subscription-payment-failed.description",
     defaultMessage:
-      "Your subscription failed to renew. Please update your payment method to prevent losing access.",
+      "One or more subscriptions failed to renew. Please update your payment method to prevent losing access!",
   },
   action: {
     id: "layout.banner.subscription-payment-failed.button",
@@ -755,7 +789,7 @@ const subscriptionPaymentFailedBannerMessages = defineMessages({
 const stagingBannerMessages = defineMessages({
   title: {
     id: "layout.banner.staging.title",
-    defaultMessage: "You’re viewing Modrinth’s staging environment.",
+    defaultMessage: "You’re viewing Modrinth’s staging environment",
   },
   description: {
     id: "layout.banner.staging.description",
@@ -1052,7 +1086,6 @@ watch(
       document.body.removeAttribute("tabindex");
     }
 
-    updateCurrentDate();
     runAnalytics();
   },
 );
@@ -1152,13 +1185,6 @@ const socialLinks = [
     rel: "me",
   },
   {
-    label: formatMessage(
-      defineMessage({ id: "layout.footer.social.tumblr", defaultMessage: "Tumblr" }),
-    ),
-    href: "https://tumblr.com/modrinth",
-    icon: TumblrIcon,
-  },
-  {
     label: formatMessage(defineMessage({ id: "layout.footer.social.x", defaultMessage: "X" })),
     href: "https://x.com/modrinth",
     icon: TwitterIcon,
@@ -1168,7 +1194,7 @@ const socialLinks = [
       defineMessage({ id: "layout.footer.social.github", defaultMessage: "GitHub" }),
     ),
     href: "https://github.com/modrinth",
-    icon: GitHubIcon,
+    icon: GithubIcon,
   },
 ];
 
@@ -1177,9 +1203,9 @@ const footerLinks = [
     label: formatMessage(defineMessage({ id: "layout.footer.about", defaultMessage: "About" })),
     links: [
       {
-        href: "https://blog.modrinth.com",
+        href: "/news",
         label: formatMessage(
-          defineMessage({ id: "layout.footer.about.blog", defaultMessage: "Blog" }),
+          defineMessage({ id: "layout.footer.about.news", defaultMessage: "News" }),
         ),
       },
       {
@@ -1312,6 +1338,15 @@ const footerLinks = [
           }),
         ),
       },
+      {
+        href: "/legal/copyright",
+        label: formatMessage(
+          defineMessage({
+            id: "layout.footer.legal.copyright-policy",
+            defaultMessage: "Copyright Policy and DMCA",
+          }),
+        ),
+      },
     ],
   },
 ];
@@ -1345,72 +1380,6 @@ const footerLinks = [
         }
       }
     }
-  }
-}
-
-.email-nag {
-  z-index: 6;
-  position: relative;
-  background-color: var(--color-raised-bg);
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  padding: 0.5rem 1rem;
-}
-
-.site-banner--warning {
-  // On some pages, there's gradient backgrounds that seep underneath
-  // the banner, so we need to add a solid color underlay.
-  background-color: black;
-  border-bottom: 2px solid var(--color-red);
-  display: grid;
-  gap: 0.5rem;
-  grid-template: "title actions" "description actions";
-  padding-block: var(--gap-xl);
-  padding-inline: max(calc((100% - 80rem) / 2 + var(--gap-md)), var(--gap-xl));
-  z-index: 4;
-  position: relative;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--color-red-bg);
-    z-index: 5;
-  }
-
-  .site-banner__title {
-    grid-area: title;
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    font-weight: bold;
-    font-size: var(--font-size-md);
-    color: var(--color-contrast);
-
-    svg {
-      color: var(--color-red);
-      width: 1.5rem;
-      height: 1.5rem;
-      flex-shrink: 0;
-    }
-  }
-
-  .site-banner__description {
-    grid-area: description;
-  }
-
-  .site-banner__actions {
-    grid-area: actions;
-  }
-
-  a {
-    color: var(--color-red);
   }
 }
 

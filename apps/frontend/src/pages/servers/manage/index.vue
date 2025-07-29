@@ -1,7 +1,7 @@
 <template>
   <div
     data-pyro-server-list-root
-    class="experimental-styles-within relative mx-auto flex min-h-screen w-full max-w-[1280px] flex-col px-6"
+    class="experimental-styles-within relative mx-auto mb-6 flex min-h-screen w-full max-w-[1280px] flex-col px-6"
   >
     <div
       v-if="hasError || fetchError"
@@ -35,8 +35,8 @@
 
             <li v-if="fetchError" class="text-red">
               <p>Error details:</p>
-              <UiCopyCode
-                :text="(fetchError as PyroFetchError).message || 'Unknown error'"
+              <CopyCode
+                :text="(fetchError as ModrinthServersFetchError).message || 'Unknown error'"
                 :copyable="false"
                 :selectable="false"
                 :language="'json'"
@@ -89,19 +89,14 @@
         </div>
       </div>
 
-      <ul v-if="filteredData.length > 0" class="m-0 flex flex-col gap-4 p-0">
+      <ul
+        v-if="filteredData.length > 0 || isPollingForNewServers"
+        class="m-0 flex flex-col gap-4 p-0"
+      >
         <UiServersServerListing
           v-for="server in filteredData"
           :key="server.server_id"
-          :server_id="server.server_id"
-          :name="server.name"
-          :status="server.status"
-          :game="server.game"
-          :loader="server.loader"
-          :loader_version="server.loader_version"
-          :mc_version="server.mc_version"
-          :upstream="server.upstream"
-          :net="server.net"
+          v-bind="server"
         />
         <LazyUiServersServerListingSkeleton v-if="isPollingForNewServers" />
       </ul>
@@ -116,10 +111,10 @@
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import Fuse from "fuse.js";
 import { HammerIcon, PlusIcon, SearchIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+import { ButtonStyled, CopyCode } from "@modrinth/ui";
+import type { Server, ModrinthServersFetchError } from "@modrinth/utils";
 import { reloadNuxtApp } from "#app";
-import type { PyroFetchError } from "~/composables/pyroFetch";
-import type { Server } from "~/types/servers";
+import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 
 definePageMeta({
   middleware: "auth",
@@ -133,6 +128,7 @@ interface ServerResponse {
   servers: Server[];
 }
 
+const router = useRouter();
 const route = useRoute();
 const hasError = ref(false);
 const isPollingForNewServers = ref(false);
@@ -141,7 +137,9 @@ const {
   data: serverResponse,
   error: fetchError,
   refresh,
-} = await useAsyncData<ServerResponse>("ServerList", () => usePyroFetch<ServerResponse>("servers"));
+} = await useAsyncData<ServerResponse>("ServerList", () =>
+  useServersFetch<ServerResponse>("servers"),
+);
 
 watch([fetchError, serverResponse], ([error, response]) => {
   hasError.value = !!error || !response;
@@ -163,11 +161,19 @@ const fuse = computed(() => {
   });
 });
 
+function introToTop(array: Server[]): Server[] {
+  return array.slice().sort((a, b) => {
+    return Number(b.flows?.intro) - Number(a.flows?.intro);
+  });
+}
+
 const filteredData = computed(() => {
   if (!searchInput.value.trim()) {
-    return serverList.value;
+    return introToTop(serverList.value);
   }
-  return fuse.value ? fuse.value.search(searchInput.value).map((result) => result.item) : [];
+  return fuse.value
+    ? introToTop(fuse.value.search(searchInput.value).map((result) => result.item))
+    : [];
 });
 
 const previousServerList = ref<Server[]>([]);
@@ -179,6 +185,7 @@ const checkForNewServers = async () => {
   if (JSON.stringify(previousServerList.value) !== JSON.stringify(serverList.value)) {
     isPollingForNewServers.value = false;
     clearInterval(intervalId);
+    router.replace({ query: {} });
   } else if (refreshCount.value >= 5) {
     isPollingForNewServers.value = false;
     clearInterval(intervalId);

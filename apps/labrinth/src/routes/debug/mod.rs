@@ -1,7 +1,7 @@
 use crate::routes::ApiError;
 use crate::util::cors::default_cors;
 use crate::util::guards::admin_key_guard;
-use actix_web::{get, HttpResponse};
+use actix_web::{HttpResponse, get};
 use prometheus::{IntGauge, Registry};
 use std::time::Duration;
 
@@ -50,7 +50,7 @@ fn require_profiling_activated(
     }
 }
 
-pub fn jemalloc_mmeory_stats(
+pub fn jemalloc_memory_stats(
     registry: &Registry,
 ) -> Result<(), prometheus::Error> {
     let allocated_mem = IntGauge::new(

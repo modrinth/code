@@ -7,10 +7,8 @@ use crate::models::v2::notifications::LegacyNotification;
 use crate::models::v2::projects::LegacyProject;
 use crate::models::v2::user::LegacyUser;
 use crate::queue::session::AuthQueue;
-use crate::routes::{v2_reroute, v3, ApiError};
-use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
-use lazy_static::lazy_static;
-use regex::Regex;
+use crate::routes::{ApiError, v2_reroute, v3};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::sync::Arc;
@@ -135,20 +133,16 @@ pub async fn projects_list(
     }
 }
 
-lazy_static! {
-    static ref RE_URL_SAFE: Regex = Regex::new(r"^[a-zA-Z0-9_-]*$").unwrap();
-}
-
 #[derive(Serialize, Deserialize, Validate)]
 pub struct EditUser {
-    #[validate(length(min = 1, max = 39), regex = "RE_URL_SAFE")]
+    #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_USERNAME))]
     pub username: Option<String>,
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
         with = "::serde_with::rust::double_option"
     )]
-    #[validate(length(min = 1, max = 64), regex = "RE_URL_SAFE")]
+    #[validate(length(min = 1, max = 64), regex(path = *crate::util::validate::RE_USERNAME))]
     pub name: Option<Option<String>>,
     #[serde(
         default,

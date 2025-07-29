@@ -86,6 +86,7 @@
             world.type === 'server' ? editServerModal?.show(world) : editWorldModal?.show(world)
         "
         @delete="() => promptToRemoveWorld(world)"
+        @open-folder="(world: SingleplayerWorld) => showWorldInFolder(instance.path, world.path)"
       />
     </div>
   </div>
@@ -133,6 +134,7 @@ import {
 } from '@modrinth/ui'
 import { PlusIcon, SpinnerIcon, UpdatedIcon, SearchIcon, XIcon } from '@modrinth/assets'
 import {
+  type ProtocolVersion,
   type SingleplayerWorld,
   type World,
   type ServerWorld,
@@ -151,6 +153,7 @@ import {
   hasQuickPlaySupport,
   refreshWorlds,
   handleDefaultProfileUpdateEvent,
+  showWorldInFolder,
 } from '@/helpers/worlds.ts'
 import AddServerModal from '@/components/ui/world/modal/AddServerModal.vue'
 import EditServerModal from '@/components/ui/world/modal/EditServerModal.vue'
@@ -208,7 +211,9 @@ const worldPlaying = ref<World>()
 const worlds = ref<World[]>([])
 const serverData = ref<Record<string, ServerData>>({})
 
-const protocolVersion = ref<number | null>(await get_profile_protocol_version(instance.value.path))
+const protocolVersion = ref<ProtocolVersion | null>(
+  await get_profile_protocol_version(instance.value.path),
+)
 
 const unlistenProfile = await profile_listener(async (e: ProfileEvent) => {
   if (e.profile_path_id !== instance.value.path) return
@@ -244,7 +249,7 @@ async function refreshAllWorlds() {
   worlds.value = await refreshWorlds(instance.value.path).finally(
     () => (refreshingAll.value = false),
   )
-  await refreshServers(worlds.value, serverData.value, protocolVersion.value)
+  refreshServers(worlds.value, serverData.value, protocolVersion.value)
 
   const hasNoWorlds = worlds.value.length === 0
 

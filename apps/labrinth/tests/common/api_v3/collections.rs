@@ -9,7 +9,7 @@ use serde_json::json;
 
 use crate::{
     assert_status,
-    common::api_common::{request_data::ImageData, Api, AppendsOptionalPat},
+    common::api_common::{Api, AppendsOptionalPat, request_data::ImageData},
 };
 
 use super::ApiV3;

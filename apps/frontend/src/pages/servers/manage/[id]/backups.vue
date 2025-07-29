@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="server.backups?.error"
+    v-if="server.moduleErrors.backups"
     class="flex w-full flex-col items-center justify-center gap-4 p-4"
   >
     <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -15,7 +15,9 @@
           We couldn't load your server's backups. Here's what went wrong:
         </p>
         <p>
-          <span class="break-all font-mono">{{ JSON.stringify(server.backups.error) }}</span>
+          <span class="break-all font-mono">{{
+            JSON.stringify(server.moduleErrors.backups.error)
+          }}</span>
         </p>
         <ButtonStyled size="large" color="brand" @click="() => server.refresh(['backups'])">
           <button class="mt-6 !w-full">Retry</button>
@@ -56,8 +58,7 @@
           </TagItem>
         </div>
         <p class="m-0">
-          You can have up to {{ data.backup_quota }} backups at once, securely off-site with
-          Backblaze.
+          You can have up to {{ data.backup_quota }} backups at once, stored securely off-site.
         </p>
       </div>
       <div
@@ -153,16 +154,17 @@ import { ButtonStyled, TagItem } from "@modrinth/ui";
 import { useStorage } from "@vueuse/core";
 import { SpinnerIcon, PlusIcon, DownloadIcon, SettingsIcon, IssuesIcon } from "@modrinth/assets";
 import { ref, computed } from "vue";
-import type { Server } from "~/composables/pyroServers";
+import type { Backup } from "@modrinth/utils";
 import BackupItem from "~/components/ui/servers/BackupItem.vue";
 import BackupRenameModal from "~/components/ui/servers/BackupRenameModal.vue";
 import BackupCreateModal from "~/components/ui/servers/BackupCreateModal.vue";
 import BackupRestoreModal from "~/components/ui/servers/BackupRestoreModal.vue";
 import BackupDeleteModal from "~/components/ui/servers/BackupDeleteModal.vue";
 import BackupSettingsModal from "~/components/ui/servers/BackupSettingsModal.vue";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: ModrinthServer;
   isServerRunning: boolean;
 }>();
 

@@ -8,7 +8,7 @@ use serde_json::json;
 
 use crate::common::api_common::AppendsOptionalPat;
 
-mod common;
+pub mod common;
 
 // Full pat test:
 // - create a PAT and ensure it can be used for the scope

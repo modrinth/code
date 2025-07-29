@@ -3,6 +3,8 @@
     data-pyro-server-stats
     style="font-variant-numeric: tabular-nums"
     class="flex select-none flex-col items-center gap-6 md:flex-row"
+    :class="{ 'pointer-events-none': loading }"
+    :aria-hidden="loading"
   >
     <div
       v-for="(metric, index) in metrics"
@@ -18,7 +20,7 @@
           <h3 class="flex items-center gap-2 text-base font-normal text-secondary">
             {{ metric.title }}
             <IssuesIcon
-              v-if="metric.warning"
+              v-if="metric.warning && !loading"
               v-tooltip="metric.warning"
               class="size-5"
               :style="{ color: 'var(--color-orange)' }"
@@ -28,51 +30,75 @@
         <div class="absolute -left-8 -top-4 h-28 w-56 rounded-full bg-bg-raised blur-lg" />
       </div>
 
-      <component :is="metric.icon" class="absolute right-10 top-10 z-10" />
-      <ClientOnly>
-        <VueApexCharts
-          v-if="metric.showGraph"
-          type="area"
-          height="142"
-          :options="getChartOptions(metric.warning)"
-          :series="[{ name: metric.title, data: metric.data }]"
-          class="chart absolute bottom-0 left-0 right-0 w-full opacity-0"
-        />
-      </ClientOnly>
-    </div>
+      <component
+        :is="metric.icon"
+        class="absolute right-10 top-10 z-10 size-8"
+        style="width: 2rem; height: 2rem"
+      />
 
-    <NuxtLink
-      :to="`/servers/manage/${serverId}/files`"
-      class="relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8 transition-transform duration-100 hover:scale-105 active:scale-100"
+      <div class="chart-space absolute bottom-0 left-0 right-0">
+        <ClientOnly>
+          <VueApexCharts
+            v-if="metric.showGraph && !loading"
+            type="area"
+            height="142"
+            :options="getChartOptions(metric.warning, index)"
+            :series="[{ name: metric.title, data: metric.data }]"
+            class="chart"
+            :class="chartsReady.has(index) ? 'opacity-100' : 'opacity-0'"
+          />
+        </ClientOnly>
+      </div>
+    </div>
+    <nuxt-link
+      :to="loading ? undefined : `/servers/manage/${serverId}/files`"
+      class="relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+      :class="loading ? '' : 'transition-transform duration-100 hover:scale-105 active:scale-100'"
     >
       <div class="flex flex-row items-center gap-2">
         <h2 class="m-0 -ml-0.5 mt-1 text-3xl font-extrabold text-contrast">
-          {{ formatBytes(stats.storage_usage_bytes) }}
+          {{ loading ? "0 B" : formatBytes(stats.storage_usage_bytes) }}
         </h2>
       </div>
       <h3 class="text-base font-normal text-secondary">Storage usage</h3>
       <FolderOpenIcon class="absolute right-10 top-10 size-8" />
-    </NuxtLink>
+    </nuxt-link>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, shallowRef } from "vue";
-import { FolderOpenIcon, CPUIcon, DBIcon, IssuesIcon } from "@modrinth/assets";
+import { FolderOpenIcon, CpuIcon, DatabaseIcon, IssuesIcon } from "@modrinth/assets";
 import { useStorage } from "@vueuse/core";
-import type { Stats } from "~/types/servers";
+import type { Stats } from "@modrinth/utils";
 
+const flags = useFeatureFlags();
 const route = useNativeRoute();
 const serverId = route.params.id;
 const VueApexCharts = defineAsyncComponent(() => import("vue3-apexcharts"));
+
+const chartsReady = ref(new Set<number>());
 
 const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
   ramAsNumber: false,
 });
 
-const props = defineProps<{ data: Stats }>();
+const props = withDefaults(defineProps<{ data?: Stats; loading?: boolean }>(), {
+  loading: false,
+});
 
-const stats = shallowRef(props.data.current);
+const stats = shallowRef(
+  props.data?.current || {
+    cpu_percent: 0,
+    ram_usage_bytes: 0,
+    ram_total_bytes: 1, // Avoid division by zero
+    storage_usage_bytes: 0,
+  },
+);
+
+const onChartReady = (index: number) => {
+  chartsReady.value.add(index);
+};
 
 const formatBytes = (bytes: number) => {
   const units = ["B", "KB", "MB", "GB"];
@@ -94,6 +120,29 @@ const updateGraphData = (arr: number[], newValue: number) => {
 };
 
 const metrics = computed(() => {
+  if (props.loading) {
+    return [
+      {
+        title: "CPU usage",
+        value: "0.00%",
+        max: "100%",
+        icon: CpuIcon,
+        data: cpuData.value,
+        showGraph: false,
+        warning: null,
+      },
+      {
+        title: "Memory usage",
+        value: "0.00%",
+        max: "100%",
+        icon: DatabaseIcon,
+        data: ramData.value,
+        showGraph: false,
+        warning: null,
+      },
+    ];
+  }
+
   const ramPercent = Math.min(
     (stats.value.ram_usage_bytes / stats.value.ram_total_bytes) * 100,
     100,
@@ -108,18 +157,22 @@ const metrics = computed(() => {
       title: "CPU usage",
       value: `${cpuPercent.toFixed(2)}%`,
       max: "100%",
-      icon: CPUIcon,
+      icon: CpuIcon,
       data: cpuData.value,
       showGraph: true,
       warning: cpuPercent >= 90 ? "CPU usage is very high" : null,
     },
     {
       title: "Memory usage",
-      value: userPreferences.value.ramAsNumber
-        ? formatBytes(stats.value.ram_usage_bytes)
-        : `${ramPercent.toFixed(2)}%`,
-      max: userPreferences.value.ramAsNumber ? formatBytes(stats.value.ram_total_bytes) : "100%",
-      icon: DBIcon,
+      value:
+        userPreferences.value.ramAsNumber || flags.developerMode
+          ? formatBytes(stats.value.ram_usage_bytes)
+          : `${ramPercent.toFixed(2)}%`,
+      max:
+        userPreferences.value.ramAsNumber || flags.developerMode
+          ? formatBytes(stats.value.ram_total_bytes)
+          : "100%",
+      icon: DatabaseIcon,
       data: ramData.value,
       showGraph: true,
       warning: ramPercent >= 90 ? "Memory usage is very high" : null,
@@ -127,7 +180,7 @@ const metrics = computed(() => {
   ];
 });
 
-const getChartOptions = (hasWarning: string | null) => ({
+const getChartOptions = (hasWarning: string | null, index: number) => ({
   chart: {
     type: "area",
     animations: { enabled: false },
@@ -138,6 +191,10 @@ const getChartOptions = (hasWarning: string | null) => ({
       right: -10,
       top: 0,
       bottom: 0,
+    },
+    events: {
+      mounted: () => onChartReady(index),
+      updated: () => onChartReady(index),
     },
   },
   stroke: { curve: "smooth", width: 3 },
@@ -172,24 +229,26 @@ const getChartOptions = (hasWarning: string | null) => ({
 });
 
 watch(
-  () => props.data.current,
+  () => props.data?.current,
   (newStats) => {
-    stats.value = newStats;
+    if (newStats) {
+      stats.value = newStats;
+    }
   },
 );
 </script>
 
 <style scoped>
-.chart {
-  animation: fadeIn 0.2s ease-out 0.2s forwards;
+.chart-space {
+  height: 142px;
+  width: calc(100% + 48px);
   margin-left: -24px;
   margin-right: -24px;
-  width: calc(100% + 48px) !important;
 }
 
-@keyframes fadeIn {
-  to {
-    opacity: 1;
-  }
+.chart {
+  width: 100% !important;
+  height: 142px !important;
+  transition: opacity 0.3s ease-out;
 }
 </style>

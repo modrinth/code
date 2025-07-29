@@ -6,12 +6,12 @@ use crate::routes::ApiError;
 
 use crate::database::redis::RedisPool;
 use actix_web::web::{self, Data};
-use actix_web::{delete, get, patch, post, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post};
 use chrono::{DateTime, Utc};
-use rand::distributions::Alphanumeric;
 use rand::Rng;
-use rand_chacha::rand_core::SeedableRng;
+use rand::distributions::Alphanumeric;
 use rand_chacha::ChaCha20Rng;
+use rand_chacha::rand_core::SeedableRng;
 
 use crate::models::pats::{PersonalAccessToken, Scopes};
 use crate::queue::session::AuthQueue;
@@ -39,19 +39,19 @@ pub async fn get_pats(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PAT_READ]),
+        Scopes::PAT_READ,
     )
     .await?
     .1;
 
     let pat_ids =
-        database::models::pat_item::PersonalAccessToken::get_user_pats(
+        database::models::pat_item::DBPersonalAccessToken::get_user_pats(
             user.id.into(),
             &**pool,
             &redis,
         )
         .await?;
-    let pats = database::models::pat_item::PersonalAccessToken::get_many_ids(
+    let pats = database::models::pat_item::DBPersonalAccessToken::get_many_ids(
         &pat_ids, &**pool, &redis,
     )
     .await?;
@@ -99,7 +99,7 @@ pub async fn create_pat(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PAT_CREATE]),
+        Scopes::PAT_CREATE,
     )
     .await?
     .1;
@@ -116,7 +116,7 @@ pub async fn create_pat(
     let token = format!("mrp_{token}");
 
     let name = info.name.clone();
-    database::models::pat_item::PersonalAccessToken {
+    database::models::pat_item::DBPersonalAccessToken {
         id,
         name: name.clone(),
         access_token: token.clone(),
@@ -130,7 +130,7 @@ pub async fn create_pat(
     .await?;
 
     transaction.commit().await?;
-    database::models::pat_item::PersonalAccessToken::clear_cache(
+    database::models::pat_item::DBPersonalAccessToken::clear_cache(
         vec![(None, None, Some(user.id.into()))],
         &redis,
     )
@@ -174,13 +174,13 @@ pub async fn edit_pat(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PAT_WRITE]),
+        Scopes::PAT_WRITE,
     )
     .await?
     .1;
 
     let id = id.into_inner().0;
-    let pat = database::models::pat_item::PersonalAccessToken::get(
+    let pat = database::models::pat_item::DBPersonalAccessToken::get(
         &id, &**pool, &redis,
     )
     .await?;
@@ -242,7 +242,7 @@ pub async fn edit_pat(
             }
 
             transaction.commit().await?;
-            database::models::pat_item::PersonalAccessToken::clear_cache(
+            database::models::pat_item::DBPersonalAccessToken::clear_cache(
                 vec![(Some(pat.id), Some(pat.access_token), Some(pat.user_id))],
                 &redis,
             )
@@ -266,12 +266,12 @@ pub async fn delete_pat(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::PAT_DELETE]),
+        Scopes::PAT_DELETE,
     )
     .await?
     .1;
     let id = id.into_inner().0;
-    let pat = database::models::pat_item::PersonalAccessToken::get(
+    let pat = database::models::pat_item::DBPersonalAccessToken::get(
         &id, &**pool, &redis,
     )
     .await?;
@@ -279,13 +279,13 @@ pub async fn delete_pat(
     if let Some(pat) = pat {
         if pat.user_id == user.id.into() {
             let mut transaction = pool.begin().await?;
-            database::models::pat_item::PersonalAccessToken::remove(
+            database::models::pat_item::DBPersonalAccessToken::remove(
                 pat.id,
                 &mut transaction,
             )
             .await?;
             transaction.commit().await?;
-            database::models::pat_item::PersonalAccessToken::clear_cache(
+            database::models::pat_item::DBPersonalAccessToken::clear_cache(
                 vec![(Some(pat.id), Some(pat.access_token), Some(pat.user_id))],
                 &redis,
             )

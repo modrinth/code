@@ -1,11 +1,11 @@
 use crate::util::fetch_json;
 use crate::{
-    util::download_file, util::format_url, util::sha1_async, Error,
-    MirrorArtifact, UploadFile,
+    Error, MirrorArtifact, UploadFile, util::download_file, util::format_url,
+    util::sha1_async,
 };
 use daedalus::minecraft::{
-    merge_partial_library, Library, PartialLibrary, VersionInfo,
-    VersionManifest, VERSION_MANIFEST_URL,
+    Library, PartialLibrary, VERSION_MANIFEST_URL, VersionInfo,
+    VersionManifest, merge_partial_library,
 };
 use dashmap::DashMap;
 use serde::Deserialize;
@@ -52,8 +52,7 @@ pub async fn fetch(
                     if modrinth_version
                         .original_sha1
                         .as_ref()
-                        .map(|x| x == &version.sha1)
-                        .unwrap_or(false)
+                        .is_some_and(|x| x == &version.sha1)
                     {
                         existing_versions.push(modrinth_version);
                     } else {

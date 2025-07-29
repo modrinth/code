@@ -1,14 +1,15 @@
+use std::{fmt::Write, sync::LazyLock};
+
 use itertools::Itertools;
-use lazy_static::lazy_static;
 use regex::Regex;
 use validator::{ValidationErrors, ValidationErrorsKind};
 
 use crate::models::pats::Scopes;
 
-lazy_static! {
-    pub static ref RE_URL_SAFE: Regex =
-        Regex::new(r#"^[a-zA-Z0-9!@$()`.+,_"-]*$"#).unwrap();
-}
+pub static RE_URL_SAFE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r#"^[a-zA-Z0-9!@$()`.+,_"-]*$"#).unwrap());
+pub static RE_USERNAME: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r#"^[a-zA-Z0-9_-]*$"#).unwrap());
 
 //TODO: In order to ensure readability, only the first error is printed, this may need to be expanded on in the future!
 pub fn validation_errors_to_string(
@@ -19,7 +20,7 @@ pub fn validation_errors_to_string(
 
     let map = errors.into_errors();
 
-    let key_option = map.keys().next().copied();
+    let key_option = map.keys().next();
 
     if let Some(field) = key_option {
         if let Some(error) = map.get(field) {
@@ -43,15 +44,17 @@ pub fn validation_errors_to_string(
                 ValidationErrorsKind::Field(errors) => {
                     if let Some(error) = errors.first() {
                         if let Some(adder) = adder {
-                            output.push_str(&format!(
-                                "Field {} {} failed validation with error: {}",
-                                field, adder, error.code
-                            ));
+                            write!(
+                                &mut output,
+                                "Field {field} {adder} failed validation with error: {}",
+                                error.code
+                            ).unwrap();
                         } else {
-                            output.push_str(&format!(
-                                "Field {} failed validation with error: {}",
-                                field, error.code
-                            ));
+                            write!(
+                                &mut output,
+                                "Field {field} failed validation with error: {}",
+                                error.code
+                            ).unwrap();
                         }
                     }
 
@@ -72,10 +75,8 @@ pub fn validate_deps(
         .duplicates_by(|x| {
             format!(
                 "{}-{}-{}",
-                x.version_id
-                    .unwrap_or(crate::models::projects::VersionId(0)),
-                x.project_id
-                    .unwrap_or(crate::models::projects::ProjectId(0)),
+                x.version_id.unwrap_or(crate::models::ids::VersionId(0)),
+                x.project_id.unwrap_or(crate::models::ids::ProjectId(0)),
                 x.file_name.as_deref().unwrap_or_default()
             )
         })

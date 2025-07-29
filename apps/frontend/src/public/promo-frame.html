@@ -95,15 +95,6 @@
       });
 
       document.addEventListener("contextmenu", (event) => event.preventDefault());
-
-      const plusLink = document.getElementById("plus-link");
-      plusLink.addEventListener("click", function () {
-        window.__TAURI_INTERNALS__.invoke("plugin:ads|record_ads_click", {});
-        window.__TAURI_INTERNALS__.invoke("plugin:ads|open_link", {
-          path: "https://modrinth.com/plus",
-          origin: "https://modrinth.com",
-        });
-      });
     </script>
   </body>
 </html>

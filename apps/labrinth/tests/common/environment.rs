@@ -1,10 +1,8 @@
-#![allow(dead_code)]
-
 use super::{
-    api_common::{generic::GenericApi, Api, ApiBuildable},
+    api_common::{Api, ApiBuildable, generic::GenericApi},
     api_v2::ApiV2,
     api_v3::ApiV3,
-    database::{TemporaryDatabase, FRIEND_USER_ID, USER_USER_PAT},
+    database::{FRIEND_USER_ID, TemporaryDatabase, USER_USER_PAT},
     dummy_data,
 };
 use crate::{assert_status, common::setup};
@@ -146,18 +144,18 @@ pub trait LocalService {
     ) -> std::pin::Pin<
         Box<
             dyn std::future::Future<
-                Output = Result<ServiceResponse, actix_web::Error>,
-            >,
+                    Output = Result<ServiceResponse, actix_web::Error>,
+                >,
         >,
     >;
 }
 impl<S> LocalService for S
 where
     S: actix_web::dev::Service<
-        actix_http::Request,
-        Response = ServiceResponse,
-        Error = actix_web::Error,
-    >,
+            actix_http::Request,
+            Response = ServiceResponse,
+            Error = actix_web::Error,
+        >,
     S::Future: 'static,
 {
     fn call(
@@ -166,8 +164,8 @@ where
     ) -> std::pin::Pin<
         Box<
             dyn std::future::Future<
-                Output = Result<ServiceResponse, actix_web::Error>,
-            >,
+                    Output = Result<ServiceResponse, actix_web::Error>,
+                >,
         >,
     > {
         Box::pin(self.call(req))

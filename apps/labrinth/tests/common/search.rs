@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use std::{collections::HashMap, sync::Arc};
 
 use actix_http::StatusCode;
@@ -10,7 +8,7 @@ use crate::{
     common::{
         api_common::{Api, ApiProject, ApiVersion},
         database::{FRIEND_USER_PAT, MOD_USER_PAT, USER_USER_PAT},
-        dummy_data::{TestFile, DUMMY_CATEGORIES},
+        dummy_data::{DUMMY_CATEGORIES, TestFile},
     },
 };
 
@@ -65,7 +63,7 @@ pub async fn setup_search_projects(
     let id = 0;
     let modify_json = serde_json::from_value(json!([
         { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[4..6] },
-        { "op": "add", "path": "/initial_versions/0/server_only", "value": true },
+        { "op": "add", "path": "/initial_versions/0/environment", "value": "server_only" },
         { "op": "add", "path": "/license_id", "value": "LGPL-3.0-or-later" },
     ]))
     .unwrap();
@@ -80,7 +78,7 @@ pub async fn setup_search_projects(
     let id = 1;
     let modify_json = serde_json::from_value(json!([
         { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[0..2] },
-        { "op": "add", "path": "/initial_versions/0/client_only", "value": false },
+        { "op": "add", "path": "/initial_versions/0/environment", "value": "client_or_server" },
     ]))
     .unwrap();
     project_creation_futures.push(create_async_future(
@@ -94,7 +92,7 @@ pub async fn setup_search_projects(
     let id = 2;
     let modify_json = serde_json::from_value(json!([
         { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[0..2] },
-        { "op": "add", "path": "/initial_versions/0/server_only", "value": true },
+        { "op": "add", "path": "/initial_versions/0/environment", "value": "server_only" },
         { "op": "add", "path": "/name", "value": "Mysterious Project" },
     ]))
     .unwrap();
@@ -109,7 +107,7 @@ pub async fn setup_search_projects(
     let id = 3;
     let modify_json = serde_json::from_value(json!([
         { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[0..3] },
-        { "op": "add", "path": "/initial_versions/0/server_only", "value": true },
+        { "op": "add", "path": "/initial_versions/0/environment", "value": "server_only" },
         { "op": "add", "path": "/initial_versions/0/game_versions", "value": ["1.20.4"] },
         { "op": "add", "path": "/name", "value": "Mysterious Project" },
         { "op": "add", "path": "/license_id", "value": "LicenseRef-All-Rights-Reserved" },
@@ -126,7 +124,7 @@ pub async fn setup_search_projects(
     let id = 4;
     let modify_json = serde_json::from_value(json!([
         { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[0..3] },
-        { "op": "add", "path": "/initial_versions/0/client_only", "value": false },
+        { "op": "add", "path": "/initial_versions/0/environment", "value": "client_or_server" },
         { "op": "add", "path": "/initial_versions/0/game_versions", "value": ["1.20.5"] },
     ]))
     .unwrap();
@@ -141,7 +139,7 @@ pub async fn setup_search_projects(
     let id = 5;
     let modify_json = serde_json::from_value(json!([
         { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[5..6] },
-        { "op": "add", "path": "/initial_versions/0/client_only", "value": false },
+        { "op": "add", "path": "/initial_versions/0/environment", "value": "client_or_server" },
         { "op": "add", "path": "/initial_versions/0/game_versions", "value": ["1.20.5"] },
         { "op": "add", "path": "/license_id", "value": "LGPL-3.0-or-later" },
     ]))
@@ -157,8 +155,7 @@ pub async fn setup_search_projects(
     let id = 6;
     let modify_json = serde_json::from_value(json!([
         { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[5..6] },
-        { "op": "add", "path": "/initial_versions/0/client_only", "value": false },
-        { "op": "add", "path": "/initial_versions/0/server_only", "value": true },
+        { "op": "add", "path": "/initial_versions/0/environment", "value": "client_or_server_prefers_both" },
         { "op": "add", "path": "/license_id", "value": "LGPL-3.0-or-later" },
     ]))
     .unwrap();
@@ -175,8 +172,7 @@ pub async fn setup_search_projects(
     let id = 7;
     let modify_json = serde_json::from_value(json!([
         { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[5..6] },
-        { "op": "add", "path": "/initial_versions/0/client_only", "value": false },
-        { "op": "add", "path": "/initial_versions/0/server_only", "value": true },
+        { "op": "add", "path": "/initial_versions/0/environment", "value": "client_or_server_prefers_both" },
         { "op": "add", "path": "/license_id", "value": "LGPL-3.0-or-later" },
         { "op": "add", "path": "/initial_versions/0/loaders", "value": ["forge"] },
         { "op": "add", "path": "/initial_versions/0/game_versions", "value": ["1.20.2"] },

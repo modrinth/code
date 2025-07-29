@@ -80,6 +80,7 @@
               projects
             </div>
             <div
+              v-tooltip="sumDownloads.toLocaleString()"
               class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
             >
               <DownloadIcon class="h-6 w-6 text-secondary" />
@@ -303,7 +304,7 @@
           <h2 class="text-lg text-contrast">{{ formatMessage(messages.profileOrganizations) }}</h2>
           <div class="flex flex-wrap gap-2">
             <nuxt-link
-              v-for="org in organizations"
+              v-for="org in sortedOrgs"
               :key="org.id"
               v-tooltip="org.name"
               class="organization"
@@ -329,9 +330,7 @@
             </div>
           </div>
         </div>
-        <AdPlaceholder
-          v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
-        />
+        <AdPlaceholder v-if="!auth.user" />
       </div>
     </div>
   </div>
@@ -355,11 +354,13 @@ import {
   GlobeIcon,
 } from "@modrinth/assets";
 import {
+  Avatar,
   OverflowMenu,
   ButtonStyled,
   ContentPageHeader,
   commonMessages,
   NewModal,
+  useRelativeTime,
 } from "@modrinth/ui";
 import { isStaff } from "~/helpers/users.js";
 import NavTabs from "~/components/ui/NavTabs.vue";
@@ -376,7 +377,6 @@ import BetaTesterBadge from "~/assets/images/badges/beta-tester.svg?component";
 
 import UpToDate from "~/assets/images/illustrations/up_to_date.svg?component";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
-import Avatar from "~/components/ui/Avatar.vue";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
@@ -385,13 +385,12 @@ const route = useNativeRoute();
 const auth = await useAuth();
 const cosmetics = useCosmetics();
 const tags = useTags();
-const flags = useFeatureFlags();
 const config = useRuntimeConfig();
 
 const vintl = useVIntl();
 const { formatMessage } = vintl;
 
-const formatCompactNumber = useCompactNumber();
+const formatCompactNumber = useCompactNumber(true);
 
 const formatRelativeTime = useRelativeTime();
 
@@ -514,6 +513,8 @@ try {
     message: formatMessage(messages.userNotFoundError),
   });
 }
+
+const sortedOrgs = computed(() => organizations.value.sort((a, b) => a.name.localeCompare(b.name)));
 
 if (!user.value) {
   throw createError({

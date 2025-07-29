@@ -13,7 +13,7 @@ use daedalus::{
     modded::SidedDataEntry,
 };
 use dunce::canonicalize;
-use std::collections::HashSet;
+use hashlink::LinkedHashSet;
 use std::io::{BufRead, BufReader};
 use std::{collections::HashMap, path::Path};
 use uuid::Uuid;
@@ -24,7 +24,7 @@ const TEMPORARY_REPLACE_CHAR: &str = "\n";
 pub fn get_class_paths(
     libraries_path: &Path,
     libraries: &[Library],
-    client_path: &Path,
+    launcher_class_path: &[&Path],
     java_arch: &str,
     minecraft_updated: bool,
 ) -> crate::Result<String> {
@@ -48,20 +48,22 @@ pub fn get_class_paths(
 
             Some(get_lib_path(libraries_path, &library.name, false))
         })
-        .collect::<Result<HashSet<_>, _>>()?;
+        .collect::<Result<LinkedHashSet<_>, _>>()?;
 
-    cps.insert(
-        canonicalize(client_path)
-            .map_err(|_| {
-                crate::ErrorKind::LauncherError(format!(
-                    "Specified class path {} does not exist",
-                    client_path.to_string_lossy()
-                ))
-                .as_error()
-            })?
-            .to_string_lossy()
-            .to_string(),
-    );
+    for launcher_path in launcher_class_path {
+        cps.insert(
+            canonicalize(launcher_path)
+                .map_err(|_| {
+                    crate::ErrorKind::LauncherError(format!(
+                        "Specified class path {} does not exist",
+                        launcher_path.to_string_lossy()
+                    ))
+                    .as_error()
+                })?
+                .to_string_lossy()
+                .to_string(),
+        );
+    }
 
     Ok(cps
         .into_iter()
@@ -87,9 +89,9 @@ pub fn get_lib_path(
     lib: &str,
     allow_not_exist: bool,
 ) -> crate::Result<String> {
-    let mut path = libraries_path.to_path_buf();
-
-    path.push(get_path_from_artifact(lib)?);
+    let path = libraries_path
+        .to_path_buf()
+        .join(get_path_from_artifact(lib)?);
 
     if !path.exists() && allow_not_exist {
         return Ok(path.to_string_lossy().to_string());
@@ -211,7 +213,7 @@ fn parse_jvm_argument(
 }
 
 #[allow(clippy::too_many_arguments)]
-pub fn get_minecraft_arguments(
+pub async fn get_minecraft_arguments(
     arguments: Option<&[Argument]>,
     legacy_arguments: Option<&str>,
     credentials: &Credentials,
@@ -224,6 +226,9 @@ pub fn get_minecraft_arguments(
     java_arch: &str,
     quick_play_type: &QuickPlayType,
 ) -> crate::Result<Vec<String>> {
+    let access_token = credentials.access_token.clone();
+    let profile = credentials.maybe_online_profile().await;
+
     if let Some(arguments) = arguments {
         let mut parsed_arguments = Vec::new();
 
@@ -233,9 +238,9 @@ pub fn get_minecraft_arguments(
             |arg| {
                 parse_minecraft_argument(
                     arg,
-                    &credentials.access_token,
-                    &credentials.username,
-                    credentials.id,
+                    &access_token,
+                    &profile.name,
+                    profile.id,
                     version,
                     asset_index_name,
                     game_directory,
@@ -255,9 +260,9 @@ pub fn get_minecraft_arguments(
         for x in legacy_arguments.split(' ') {
             parsed_arguments.push(parse_minecraft_argument(
                 &x.replace(' ', TEMPORARY_REPLACE_CHAR),
-                &credentials.access_token,
-                &credentials.username,
-                credentials.id,
+                &access_token,
+                &profile.name,
+                profile.id,
                 version,
                 asset_index_name,
                 game_directory,

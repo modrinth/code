@@ -2,15 +2,12 @@
 import dayjs from "dayjs";
 import { ButtonStyled, commonMessages, CopyCode, ServerNotice, TagItem } from "@modrinth/ui";
 import { EditIcon, SettingsIcon, TrashIcon } from "@modrinth/assets";
-import { ServerNotice as ServerNoticeType } from "@modrinth/utils";
-import {
-  DISMISSABLE,
-  getDismissableMetadata,
-  NOTICE_LEVELS,
-} from "@modrinth/ui/src/utils/notices.ts";
+import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
+import { useRelativeTime, getDismissableMetadata, NOTICE_LEVELS } from "@modrinth/ui";
 import { useVIntl } from "@vintl/vintl";
 
 const { formatMessage } = useVIntl();
+const formatRelativeTime = useRelativeTime();
 
 const props = defineProps<{
   notice: ServerNoticeType;
@@ -25,7 +22,7 @@ const props = defineProps<{
       <div class="text-sm">
         <span v-if="notice.announce_at">
           {{ dayjs(notice.announce_at).format("MMM D, YYYY [at] h:mm A") }} ({{
-            dayjs(notice.announce_at).fromNow()
+            formatRelativeTime(notice.announce_at)
           }})
         </span>
         <template v-else> Never begins </template>
@@ -35,7 +32,7 @@ const props = defineProps<{
           v-if="notice.expires"
           v-tooltip="dayjs(notice.expires).format('MMMM D, YYYY [at] h:mm A')"
         >
-          {{ dayjs(notice.expires).fromNow() }}
+          {{ formatRelativeTime(notice.expires) }}
         </span>
         <template v-else> Never expires </template>
       </div>

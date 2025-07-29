@@ -1,20 +1,19 @@
+use crate::assert_status;
+use crate::common::api_common::{ApiProject, ApiVersion};
+use crate::common::api_v2::ApiV2;
 use actix_http::StatusCode;
 use actix_web::test;
 use futures::StreamExt;
-use labrinth::models::projects::VersionId;
+use labrinth::models::ids::VersionId;
 use labrinth::{
     models::projects::{Loader, VersionStatus, VersionType},
     routes::v2::version_file::FileUpdateData,
 };
 use serde_json::json;
 
-use crate::assert_status;
-use crate::common::api_common::{ApiProject, ApiVersion};
-use crate::common::api_v2::ApiV2;
-
 use crate::common::api_v2::request_data::get_public_project_creation_data;
 use crate::common::dummy_data::{DummyProjectAlpha, DummyProjectBeta};
-use crate::common::environment::{with_test_environment, TestEnvironment};
+use crate::common::environment::{TestEnvironment, with_test_environment};
 use crate::common::{
     database::{ENEMY_USER_PAT, USER_USER_PAT},
     dummy_data::TestFile,
@@ -220,7 +219,7 @@ async fn version_updates() {
 
             // Add 3 new versions, 1 before, and 2 after, with differing game_version/version_types/loaders
             let mut update_ids = vec![];
-            for (version_number, patch_value) in [
+            for (version_number, patch_value) in &[
                 (
                     "0.9.9",
                     json!({
@@ -242,9 +241,7 @@ async fn version_updates() {
                         "version_type": "beta"
                     }),
                 ),
-            ]
-            .iter()
-            {
+            ] {
                 let version = api
                     .add_public_version_deserialized_common(
                         *alpha_project_id_parsed,
@@ -470,10 +467,10 @@ async fn add_version_project_types_v2() {
                 )
                 .await;
             assert_eq!(test_project.project_type, "project"); // No project_type set, as no versions are set
-                                                              // Default to 'project' if none are found
-                                                              // This is a known difference between older v2 ,but is acceptable.
-                                                              // This would be the appropriate test on older v2:
-                                                              // assert_eq!(test_project.project_type, "modpack");
+            // Default to 'project' if none are found
+            // This is a known difference between older v2 ,but is acceptable.
+            // This would be the appropriate test on older v2:
+            // assert_eq!(test_project.project_type, "modpack");
 
             // Create a version with a modpack file attached
             let test_version = api

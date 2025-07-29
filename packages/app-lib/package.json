@@ -2,8 +2,8 @@
   "name": "@modrinth/app-lib",
   "scripts": {
     "build": "cargo build --release",
-    "lint": "cargo fmt --check && cargo clippy --all-targets -- -D warnings",
-    "fix": "cargo fmt && cargo clippy --fix",
-    "test": "cargo test"
+    "lint": "cargo fmt --check && cargo clippy --all-targets",
+    "fix": "cargo clippy --all-targets --fix --allow-dirty && cargo fmt",
+    "test": "cargo nextest run --all-targets --no-fail-fast"
   }
 }

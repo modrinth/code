@@ -29,7 +29,7 @@
           {{ author }}
         </nuxt-link>
       </p>
-      <Badge v-if="status && status !== 'approved'" :type="status" class="status" />
+      <ProjectStatusBadge v-if="status && status !== 'approved'" :status="status" class="status" />
     </div>
     <p class="description">
       {{ description }}
@@ -75,7 +75,7 @@
         class="stat date"
       >
         <UpdatedIcon aria-hidden="true" />
-        <span class="date-label">Updated </span>{{ fromNow(updatedAt) }}
+        <span class="date-label">Updated </span>{{ formatRelativeTime(updatedAt) }}
       </div>
       <div
         v-else-if="showCreatedDate"
@@ -83,7 +83,7 @@
         class="stat date"
       >
         <CalendarIcon aria-hidden="true" />
-        <span class="date-label">Published </span>{{ fromNow(createdAt) }}
+        <span class="date-label">Published </span>{{ formatRelativeTime(createdAt) }}
       </div>
     </div>
   </article>
@@ -91,17 +91,16 @@
 
 <script>
 import { CalendarIcon, UpdatedIcon, DownloadIcon, HeartIcon } from "@modrinth/assets";
+import { Avatar, ProjectStatusBadge, useRelativeTime } from "@modrinth/ui";
 import Categories from "~/components/ui/search/Categories.vue";
-import Badge from "~/components/ui/Badge.vue";
 import EnvironmentIndicator from "~/components/ui/EnvironmentIndicator.vue";
-import Avatar from "~/components/ui/Avatar.vue";
 
 export default {
   components: {
+    ProjectStatusBadge,
     EnvironmentIndicator,
     Avatar,
     Categories,
-    Badge,
     CalendarIcon,
     UpdatedIcon,
     DownloadIcon,
@@ -213,8 +212,9 @@ export default {
   },
   setup() {
     const tags = useTags();
+    const formatRelativeTime = useRelativeTime();
 
-    return { tags };
+    return { tags, formatRelativeTime };
   },
   computed: {
     projectTypeDisplay() {

@@ -1,7 +1,7 @@
 <template>
   <div class="relative h-full w-full">
     <div
-      v-if="server.startup?.error"
+      v-if="server.moduleErrors.startup"
       class="flex w-full flex-col items-center justify-center gap-4 p-4"
     >
       <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -16,7 +16,9 @@
             We couldn't load your server's startup settings. Here's what we know:
           </p>
           <p>
-            <span class="break-all font-mono">{{ JSON.stringify(server.startup.error) }}</span>
+            <span class="break-all font-mono">{{
+              JSON.stringify(server.moduleErrors.startup.error)
+            }}</span>
           </p>
           <ButtonStyled size="large" color="brand" @click="() => server.refresh(['startup'])">
             <button class="mt-6 !w-full">Retry</button>
@@ -112,10 +114,10 @@
 <script setup lang="ts">
 import { UpdatedIcon, IssuesIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
-import type { Server } from "~/composables/pyroServers";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: ModrinthServer;
 }>();
 
 const data = computed(() => props.server.general);

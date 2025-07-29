@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize, Clone)]
 pub struct JavaVersion {
-    pub major_version: u32,
+    pub parsed_version: u32,
     pub version: String,
     pub architecture: String,
     pub path: String,
@@ -30,7 +30,7 @@ impl JavaVersion {
         .await?;
 
         Ok(res.map(|x| JavaVersion {
-            major_version,
+            parsed_version: major_version,
             version: x.full_version,
             architecture: x.architecture,
             path: x.path,
@@ -52,7 +52,7 @@ impl JavaVersion {
             acc.insert(
                 x.major_version as u32,
                 JavaVersion {
-                    major_version: x.major_version as u32,
+                    parsed_version: x.major_version as u32,
                     version: x.full_version,
                     architecture: x.architecture,
                     path: x.path,
@@ -70,7 +70,7 @@ impl JavaVersion {
         &self,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<()> {
-        let major_version = self.major_version as i32;
+        let major_version = self.parsed_version as i32;
 
         sqlx::query!(
             "

@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 use crate::database::redis::RedisPool;
 
-use super::ids::*;
 use super::DatabaseError;
+use super::ids::*;
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 

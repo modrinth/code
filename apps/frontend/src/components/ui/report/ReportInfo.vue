@@ -11,8 +11,8 @@
         <div class="stacked">
           <span class="title">{{ report.project.title }}</span>
           <span>{{
-            $formatProjectType(
-              $getProjectTypeForUrl(report.project.project_type, report.project.loaders),
+            formatProjectType(
+              getProjectTypeForUrl(report.project.project_type, report.project.loaders),
             )
           }}</span>
         </div>
@@ -53,8 +53,8 @@
         <div class="stacked">
           <span class="title">{{ report.project.title }}</span>
           <span>{{
-            $formatProjectType(
-              $getProjectTypeForUrl(report.project.project_type, report.project.loaders),
+            formatProjectType(
+              getProjectTypeForUrl(report.project.project_type, report.project.loaders),
             )
           }}</span>
         </div>
@@ -95,7 +95,7 @@
       </nuxt-link>
       <span>&nbsp;</span>
       <span v-tooltip="$dayjs(report.created).format('MMMM D, YYYY [at] h:mm A')">{{
-        fromNow(report.created)
+        formatRelativeTime(report.created)
       }}</span>
       <CopyCode v-if="flags.developerMode" :text="report.id" class="report-id" />
     </div>
@@ -104,11 +104,13 @@
 
 <script setup>
 import { ReportIcon, UnknownIcon, VersionIcon } from "@modrinth/assets";
+import { Avatar, Badge, CopyCode, useRelativeTime } from "@modrinth/ui";
+import { formatProjectType } from "@modrinth/utils";
 import { renderHighlightedString } from "~/helpers/highlight.js";
-import Avatar from "~/components/ui/Avatar.vue";
-import Badge from "~/components/ui/Badge.vue";
 import ThreadSummary from "~/components/ui/thread/ThreadSummary.vue";
-import CopyCode from "~/components/ui/CopyCode.vue";
+import { getProjectTypeForUrl } from "~/helpers/projects.js";
+
+const formatRelativeTime = useRelativeTime();
 
 defineProps({
   report: {
@@ -170,6 +172,7 @@ const flags = useFeatureFlags();
 
   .markdown-body {
     grid-area: body;
+    max-width: 100%;
   }
 
   .reporter-info {

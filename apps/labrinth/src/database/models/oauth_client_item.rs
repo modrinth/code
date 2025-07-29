@@ -3,32 +3,32 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sha2::Digest;
 
-use super::{DatabaseError, OAuthClientId, OAuthRedirectUriId, UserId};
+use super::{DBOAuthClientId, DBOAuthRedirectUriId, DBUserId, DatabaseError};
 use crate::models::pats::Scopes;
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
-pub struct OAuthRedirectUri {
-    pub id: OAuthRedirectUriId,
-    pub client_id: OAuthClientId,
+pub struct DBOAuthRedirectUri {
+    pub id: DBOAuthRedirectUriId,
+    pub client_id: DBOAuthClientId,
     pub uri: String,
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
-pub struct OAuthClient {
-    pub id: OAuthClientId,
+pub struct DBOAuthClient {
+    pub id: DBOAuthClientId,
     pub name: String,
     pub icon_url: Option<String>,
     pub raw_icon_url: Option<String>,
     pub max_scopes: Scopes,
     pub secret_hash: String,
-    pub redirect_uris: Vec<OAuthRedirectUri>,
+    pub redirect_uris: Vec<DBOAuthRedirectUri>,
     pub created: DateTime<Utc>,
-    pub created_by: UserId,
+    pub created_by: DBUserId,
     pub url: Option<String>,
     pub description: Option<String>,
 }
 
-struct ClientQueryResult {
+struct OAuthClientQueryResult {
     id: i64,
     name: String,
     icon_url: Option<String>,
@@ -49,7 +49,7 @@ macro_rules! select_clients_with_predicate {
         // the combination of the JOIN and filter using ANY makes sqlx think all columns are nullable
         // https://docs.rs/sqlx/latest/sqlx/macro.query.html#force-nullable
         sqlx::query_as!(
-            ClientQueryResult,
+            OAuthClientQueryResult,
             r#"
             SELECT
                 clients.id as "id!",
@@ -77,18 +77,18 @@ macro_rules! select_clients_with_predicate {
     };
 }
 
-impl OAuthClient {
+impl DBOAuthClient {
     pub async fn get(
-        id: OAuthClientId,
+        id: DBOAuthClientId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Option<OAuthClient>, DatabaseError> {
+    ) -> Result<Option<DBOAuthClient>, DatabaseError> {
         Ok(Self::get_many(&[id], exec).await?.into_iter().next())
     }
 
     pub async fn get_many(
-        ids: &[OAuthClientId],
+        ids: &[DBOAuthClientId],
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<OAuthClient>, DatabaseError> {
+    ) -> Result<Vec<DBOAuthClient>, DatabaseError> {
         let ids = ids.iter().map(|id| id.0).collect_vec();
         let ids_ref: &[i64] = &ids;
         let results = select_clients_with_predicate!(
@@ -102,9 +102,9 @@ impl OAuthClient {
     }
 
     pub async fn get_all_user_clients(
-        user_id: UserId,
+        user_id: DBUserId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<OAuthClient>, DatabaseError> {
+    ) -> Result<Vec<DBOAuthClient>, DatabaseError> {
         let user_id_param = user_id.0;
         let clients = select_clients_with_predicate!(
             "WHERE created_by = $1",
@@ -117,7 +117,7 @@ impl OAuthClient {
     }
 
     pub async fn remove(
-        id: OAuthClientId,
+        id: DBOAuthClientId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<(), DatabaseError> {
         // Cascades to oauth_client_redirect_uris, oauth_client_authorizations
@@ -189,7 +189,7 @@ impl OAuthClient {
     }
 
     pub async fn remove_redirect_uris(
-        ids: impl IntoIterator<Item = OAuthRedirectUriId>,
+        ids: impl IntoIterator<Item = DBOAuthRedirectUriId>,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<(), DatabaseError> {
         let ids = ids.into_iter().map(|id| id.0).collect_vec();
@@ -208,7 +208,7 @@ impl OAuthClient {
     }
 
     pub async fn insert_redirect_uris(
-        uris: &[OAuthRedirectUri],
+        uris: &[DBOAuthRedirectUri],
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<(), DatabaseError> {
         let (ids, client_ids, uris): (Vec<_>, Vec<_>, Vec<_>) = uris
@@ -235,16 +235,16 @@ impl OAuthClient {
     }
 }
 
-impl From<ClientQueryResult> for OAuthClient {
-    fn from(r: ClientQueryResult) -> Self {
+impl From<OAuthClientQueryResult> for DBOAuthClient {
+    fn from(r: OAuthClientQueryResult) -> Self {
         let redirects = if let (Some(ids), Some(uris)) =
             (r.uri_ids.as_ref(), r.uri_vals.as_ref())
         {
             ids.iter()
                 .zip(uris.iter())
-                .map(|(id, uri)| OAuthRedirectUri {
-                    id: OAuthRedirectUriId(*id),
-                    client_id: OAuthClientId(r.id),
+                .map(|(id, uri)| DBOAuthRedirectUri {
+                    id: DBOAuthRedirectUriId(*id),
+                    client_id: DBOAuthClientId(r.id),
                     uri: uri.to_string(),
                 })
                 .collect()
@@ -252,8 +252,8 @@ impl From<ClientQueryResult> for OAuthClient {
             vec![]
         };
 
-        OAuthClient {
-            id: OAuthClientId(r.id),
+        DBOAuthClient {
+            id: DBOAuthClientId(r.id),
             name: r.name,
             icon_url: r.icon_url,
             raw_icon_url: r.raw_icon_url,
@@ -261,7 +261,7 @@ impl From<ClientQueryResult> for OAuthClient {
             secret_hash: r.secret_hash,
             redirect_uris: redirects,
             created: r.created,
-            created_by: UserId(r.created_by),
+            created_by: DBUserId(r.created_by),
             url: r.url,
             description: r.description,
         }

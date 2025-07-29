@@ -9,7 +9,7 @@
       </h1>
       <ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
         <button v-tooltip="`Exit moderation`" @click="exitModeration">
-          <CrossIcon />
+          <XIcon />
         </button>
       </ButtonStyled>
       <ButtonStyled circular>
@@ -256,7 +256,9 @@
         </p>
         <div class="options input-group">
           <button
-            v-for="(option, index) in steps[currentStepIndex].options"
+            v-for="(option, index) in steps[currentStepIndex].options.filter(
+              (x) => x.shown !== false,
+            )"
             :key="index"
             class="btn"
             :class="{
@@ -304,7 +306,7 @@
           <div class="flex items-center gap-2">
             <ButtonStyled v-if="!done">
               <button aria-label="Skip" @click="goToNextProject">
-                <ExitIcon aria-hidden="true" />
+                <XIcon aria-hidden="true" />
                 <template v-if="futureProjects.length > 0">Skip</template>
                 <template v-else>Exit</template>
               </button>
@@ -333,7 +335,7 @@
               <div class="joined-buttons">
                 <ButtonStyled color="red">
                   <button @click="sendMessage('rejected')">
-                    <CrossIcon aria-hidden="true" /> Reject
+                    <XIcon aria-hidden="true" /> Reject
                   </button>
                 </ButtonStyled>
                 <ButtonStyled color="red">
@@ -371,9 +373,8 @@ import {
   UpdatedIcon,
   CheckIcon,
   DropdownIcon,
-  XIcon as CrossIcon,
   EyeOffIcon,
-  ExitIcon,
+  XIcon,
   ScaleIcon,
 } from "@modrinth/assets";
 import { ButtonStyled, MarkdownEditor, OverflowMenu, Collapsible } from "@modrinth/ui";
@@ -426,6 +427,18 @@ const steps = computed(() =>
           resultingMessage: `## Misuse of Title
 Per section 5.2 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous) we ask that you limit the title to just the name of your project. Additional information, such as themes, tags, supported versions or loaders, etc. should be saved for the Summary or Description. When changing your project title, remember to also ensure that your project slug (URL) matches and accurately represents your project.`,
         },
+        {
+          name: "Minecraft title",
+          resultingMessage: `## Project Title
+Projects must not use Minecraft's branding or include "Minecraft" as a significant part of the title.
+The title of your project may be confusingly similar to the game, and we encourage you to change your title to avoid a potential violation of Minecraft's Usage Guidelines.
+Abbreviations like "MC" or elaborate titles that do not make the name Minecraft a significant portion of the name are okay.`,
+        },
+        {
+          name: "Title similarities",
+          resultingMessage: `## Project Branding
+Per section 1.8 of [Modrinth's Content Rules](https://modrinth.com/legal/rules) we ask that you change your project title and other relevant branding to avoid causing confusion or implying association with existing projects.`,
+        },
       ],
     },
     {
@@ -471,6 +484,12 @@ This is the first thing most people will see about your mod other than the Logo,
 Per section 5.3 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous) your Summary can not include any extra formatting such as lists, or links. Your project summary should provide a brief overview of your project that informs and entices users.
 
 This is the first thing most people will see about your mod other than the Logo, so it's important it be accurate, reasonably detailed, and exciting.`,
+        },
+        {
+          name: "Non-english",
+          resultingMessage: `## No English Summary
+Per section 2.2 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#accessibility) a project's Summary and Description must be in English, unless meant exclusively for non-English use, such as translations.
+You may include your non-English Summary but we ask that you also add an English translation.`,
         },
       ],
     },
@@ -628,11 +647,21 @@ For a brief rundown of how this works:
     {
       id: "gallery",
       navigate: `/${props.project.project_type}/${props.project.slug}/gallery`,
-      question: `Are the project's gallery images relevant?`,
-      shown: props.project.gallery.length > 0,
+      question: `Are this project's gallery images sufficient?`,
+      shown: true,
       options: [
         {
+          name: "Insufficient",
+          resultingMessage: `## Insufficient Gallery Images
+We ask that projects like yours show off their content using images in the Gallery, or optionally in the Description, in order to effectively and clearly inform users of its content per section 2.1 of [Modrinth's content rules](https://modrinth.com/legal/rules#general-expectations).
+Keep in mind that you should:
+- Set a featured image that best represents your project.
+- Ensure all your images have titles that accurately label the image, and optionally, details on the contents of the image in the images Description.
+- Upload any relevant images in your Description to your Gallery tab for best results.`,
+        },
+        {
           name: "Not relevant",
+          shown: props.project.gallery.length > 0,
           resultingMessage: `## Unrelated Gallery Images
 Per section 5.5 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous) any images in your project's Gallery must be relevant to the project and also include a Title.`,
         },

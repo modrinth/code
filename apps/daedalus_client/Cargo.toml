@@ -2,39 +2,32 @@
 name = "daedalus_client"
 version = "0.2.2"
 authors = ["Jai A <jai@modrinth.com>"]
-edition = "2021"
+edition.workspace = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-daedalus = { path = "../../packages/daedalus" }
-tokio = { version = "1", features = ["full"] }
-futures = "0.3.25"
-dotenvy = "0.15.6"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-serde-xml-rs = "0.6.0"
-lazy_static = "1.4.0"
-thiserror = "1.0"
-reqwest = { version = "0.12.5", default-features = false, features = [
-    "stream",
-    "json",
-    "rustls-tls-native-roots",
-] }
-async_zip = { version = "0.0.17", features = ["full"] }
-chrono = { version = "0.4", features = ["serde"] }
-bytes = "1.6.0"
-rust-s3 = { version = "0.33.0", default-features = false, features = [
-    "fail-on-err",
-    "tags",
-    "tokio-rustls-tls",
-    "reqwest",
-] }
-dashmap = "5.5.3"
-sha1_smol = { version = "1.0.0", features = ["std"] }
-indexmap = { version = "2.2.6", features = ["serde"] }
-itertools = "0.13.0"
-tracing-error = "0.2.0"
+daedalus.workspace = true
+tokio = { workspace = true, features = ["sync", "macros", "rt-multi-thread"] }
+futures.workspace = true
+dotenvy.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+serde-xml-rs.workspace = true
+thiserror.workspace = true
+reqwest = { workspace = true, features = ["stream", "json", "rustls-tls-native-roots"] }
+async_zip = { workspace = true, features = ["chrono", "tokio-fs", "deflate", "bzip2", "zstd", "deflate64"] }
+chrono = { workspace = true, features = ["serde"] }
+bytes.workspace = true
+rust-s3.workspace = true
+dashmap.workspace = true
+sha1_smol.workspace = true
+indexmap = { workspace = true, features = ["serde"] }
+itertools.workspace = true
+tracing-error.workspace = true
 
-tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing.workspace = true
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
+
+[lints]
+workspace = true

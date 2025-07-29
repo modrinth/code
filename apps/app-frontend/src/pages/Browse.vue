@@ -220,6 +220,7 @@ async function refreshSearch() {
     }
   }
   results.value = rawResults.result
+  currentPage.value = 1
 
   const persistentParams: LocationQuery = {}
 
@@ -265,6 +266,7 @@ async function onSearchChangeToTop() {
 
 function clearSearch() {
   query.value = ''
+  currentPage.value = 1
 }
 
 watch(

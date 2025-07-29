@@ -1,18 +1,18 @@
 use std::collections::HashMap;
 
-use super::v3::project_creation::CreateError;
 use super::ApiError;
+use super::v3::project_creation::CreateError;
 use crate::models::v2::projects::LegacySideType;
 use crate::util::actix::{
-    generate_multipart, MultipartSegment, MultipartSegmentData,
+    MultipartSegment, MultipartSegmentData, generate_multipart,
 };
 use actix_multipart::Multipart;
+use actix_web::HttpResponse;
 use actix_web::http::header::{
     ContentDisposition, HeaderMap, TryIntoHeaderPair,
 };
-use actix_web::HttpResponse;
-use futures::{stream, Future, StreamExt};
-use serde_json::{json, Value};
+use futures::{Future, StreamExt, stream};
+use serde_json::{Value, json};
 
 pub async fn extract_ok_json<T>(
     response: HttpResponse,
@@ -73,7 +73,7 @@ where
 
     if let Some(field) = multipart.next().await {
         let mut field = field?;
-        let content_disposition = field.content_disposition().clone();
+        let content_disposition = field.content_disposition().unwrap().clone();
         let field_name = content_disposition.get_name().unwrap_or("");
         let field_filename = content_disposition.get_filename();
         let field_content_type = field.content_type();
@@ -100,7 +100,7 @@ where
 
     while let Some(field) = multipart.next().await {
         let mut field = field?;
-        let content_disposition = field.content_disposition().clone();
+        let content_disposition = field.content_disposition().unwrap().clone();
         let field_name = content_disposition.get_name().unwrap_or("");
         let field_filename = content_disposition.get_filename();
         let field_content_type = field.content_type();
@@ -164,69 +164,46 @@ where
     Ok(new_multipart)
 }
 
-// Converts a "client_side" and "server_side" pair into the new v3 corresponding fields
-pub fn convert_side_types_v3(
+/// Converts V2 side types to V3 side types.
+pub fn convert_v2_side_types_to_v3_side_types(
     client_side: LegacySideType,
     server_side: LegacySideType,
 ) -> HashMap<String, Value> {
-    use LegacySideType::{Optional, Required};
+    use LegacySideType::{Optional, Required, Unsupported};
 
-    let singleplayer = client_side == Required
-        || client_side == Optional
-        || server_side == Required
-        || server_side == Optional;
-    let client_and_server = singleplayer;
-    let client_only = (client_side == Required || client_side == Optional)
-        && server_side != Required;
-    let server_only = (server_side == Required || server_side == Optional)
-        && client_side != Required;
+    let environment = match (client_side, server_side) {
+        (Required, Required) => "client_and_server", // Or "singleplayer_only"
+        (Required, Unsupported) => "client_only",
+        (Required, Optional) => "client_only_server_optional",
+        (Unsupported, Required) => "server_only", // Or "dedicated_server_only"
+        (Optional, Required) => "server_only_client_optional",
+        (Optional, Optional) => "client_or_server", // Or "client_or_server_prefers_both"
+        _ => "unknown",
+    };
 
-    let mut fields = HashMap::new();
-    fields.insert("singleplayer".to_string(), json!(singleplayer));
-    fields.insert("client_and_server".to_string(), json!(client_and_server));
-    fields.insert("client_only".to_string(), json!(client_only));
-    fields.insert("server_only".to_string(), json!(server_only));
-    fields
+    [("environment".to_string(), json!(environment))]
+        .into_iter()
+        .collect()
 }
 
-// Convert search facets from V3 back to v2
-// this is not lossless. (See tests)
-pub fn convert_side_types_v2(
+/// Converts a V3 side types map into the corresponding V2 side types.
+pub fn convert_v3_side_types_to_v2_side_types(
     side_types: &HashMap<String, Value>,
     project_type: Option<&str>,
 ) -> (LegacySideType, LegacySideType) {
-    let client_and_server = side_types
-        .get("client_and_server")
-        .and_then(|x| x.as_bool())
-        .unwrap_or(false);
-    let singleplayer = side_types
-        .get("singleplayer")
-        .and_then(|x| x.as_bool())
-        .unwrap_or(client_and_server);
-    let client_only = side_types
-        .get("client_only")
-        .and_then(|x| x.as_bool())
-        .unwrap_or(false);
-    let server_only = side_types
-        .get("server_only")
-        .and_then(|x| x.as_bool())
-        .unwrap_or(false);
-
-    convert_side_types_v2_bools(
-        Some(singleplayer),
-        client_only,
-        server_only,
-        Some(client_and_server),
+    convert_v3_environment_to_v2_side_types(
+        side_types
+            .get("environment")
+            .and_then(|x| x.as_str())
+            .unwrap_or("unknown"),
         project_type,
     )
 }
 
-// Client side, server side
-pub fn convert_side_types_v2_bools(
-    singleplayer: Option<bool>,
-    client_only: bool,
-    server_only: bool,
-    client_and_server: Option<bool>,
+/// Converts a V3 environment and project type into the corresponding V2 side types.
+/// The first side type is for the client, the second is for the server.
+pub fn convert_v3_environment_to_v2_side_types(
+    environment: &str,
     project_type: Option<&str>,
 ) -> (LegacySideType, LegacySideType) {
     use LegacySideType::{Optional, Required, Unknown, Unsupported};
@@ -236,39 +213,27 @@ pub fn convert_side_types_v2_bools(
         Some("datapack") => (Optional, Required),
         Some("shader") => (Required, Unsupported),
         Some("resourcepack") => (Required, Unsupported),
-        _ => {
-            let singleplayer =
-                singleplayer.or(client_and_server).unwrap_or(false);
-
-            match (singleplayer, client_only, server_only) {
-                // Only singleplayer
-                (true, false, false) => (Required, Required),
-
-                // Client only and not server only
-                (false, true, false) => (Required, Unsupported),
-                (true, true, false) => (Required, Unsupported),
-
-                // Server only and not client only
-                (false, false, true) => (Unsupported, Required),
-                (true, false, true) => (Unsupported, Required),
-
-                // Both server only and client only
-                (true, true, true) => (Optional, Optional),
-                (false, true, true) => (Optional, Optional),
-
-                // Bad type
-                (false, false, false) => (Unknown, Unknown),
-            }
-        }
+        _ => match environment {
+            "client_and_server" => (Required, Required),
+            "client_only" => (Required, Unsupported),
+            "client_only_server_optional" => (Required, Optional),
+            "singleplayer_only" => (Required, Required),
+            "server_only" => (Unsupported, Required),
+            "server_only_client_optional" => (Optional, Required),
+            "dedicated_server_only" => (Unsupported, Required),
+            "client_or_server" => (Optional, Optional),
+            "client_or_server_prefers_both" => (Optional, Optional),
+            _ => (Unknown, Unknown), // "unknown"
+        },
     }
 }
 
 pub fn capitalize_first(input: &str) -> String {
-    let mut result = input.to_owned();
-    if let Some(first_char) = result.get_mut(0..1) {
-        first_char.make_ascii_uppercase();
-    }
-    result
+    input
+        .chars()
+        .enumerate()
+        .map(|(i, c)| if i == 0 { c.to_ascii_uppercase() } else { c })
+        .collect()
 }
 
 #[cfg(test)]
@@ -279,13 +244,14 @@ mod tests {
     };
 
     #[test]
-    fn convert_types() {
-        // Converting types from V2 to V3 and back should be idempotent- for certain pairs
+    fn v2_v3_side_type_conversion() {
+        // Only nonsensical V2 side types cannot be round-tripped from V2 to V3 and back.
+        // When converting from V3 to V2, only additional information about the
+        // singleplayer-only, multiplayer-only, or install on both sides nature of the
+        // project is lost.
         let lossy_pairs = [
             (Optional, Unsupported),
             (Unsupported, Optional),
-            (Required, Optional),
-            (Optional, Required),
             (Unsupported, Unsupported),
         ];
 
@@ -294,10 +260,13 @@ mod tests {
                 if lossy_pairs.contains(&(client_side, server_side)) {
                     continue;
                 }
-                let side_types =
-                    convert_side_types_v3(client_side, server_side);
+                let side_types = convert_v2_side_types_to_v3_side_types(
+                    client_side,
+                    server_side,
+                );
                 let (client_side2, server_side2) =
-                    convert_side_types_v2(&side_types, None);
+                    convert_v3_side_types_to_v2_side_types(&side_types, None);
+
                 assert_eq!(client_side, client_side2);
                 assert_eq!(server_side, server_side2);
             }

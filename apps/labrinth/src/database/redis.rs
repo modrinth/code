@@ -3,15 +3,15 @@ use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{TimeZone, Utc};
 use dashmap::DashMap;
 use deadpool_redis::{Config, Runtime};
+use futures::future::Either;
 use prometheus::{IntGauge, Registry};
-use redis::{cmd, Cmd, ExistenceCheck, SetExpiry, SetOptions};
+use redis::{Cmd, ExistenceCheck, SetExpiry, SetOptions, cmd};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt::{Debug, Display};
 use std::future::Future;
 use std::hash::Hash;
-use std::pin::Pin;
 use std::time::Duration;
 
 const DEFAULT_EXPIRY: i64 = 60 * 60 * 12; // 12 hours
@@ -378,22 +378,10 @@ impl RedisPool {
             }
         }
 
-        #[allow(clippy::type_complexity)]
-        let mut fetch_tasks: Vec<
-            Pin<
-                Box<
-                    dyn Future<
-                        Output = Result<
-                            HashMap<K, RedisValue<T, K, S>>,
-                            DatabaseError,
-                        >,
-                    >,
-                >,
-            >,
-        > = Vec::new();
+        let mut fetch_tasks = Vec::new();
 
         if !ids.is_empty() {
-            fetch_tasks.push(Box::pin(async {
+            fetch_tasks.push(Either::Left(async {
                 let fetch_ids =
                     ids.iter().map(|x| x.value().clone()).collect::<Vec<_>>();
 
@@ -491,7 +479,7 @@ impl RedisPool {
         }
 
         if !subscribe_ids.is_empty() {
-            fetch_tasks.push(Box::pin(async {
+            fetch_tasks.push(Either::Right(async {
                 let mut interval =
                     tokio::time::interval(Duration::from_millis(100));
                 let start = Utc::now();

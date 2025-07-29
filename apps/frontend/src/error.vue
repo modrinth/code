@@ -5,12 +5,7 @@
         <Logo404 />
       </div>
       <div class="error-box" :class="{ 'has-bot': !is404 }">
-        <img
-          v-if="!is404"
-          src="https://cdn-raw.modrinth.com/sad-bot.webp"
-          alt="Sad Modrinth bot"
-          class="error-box__sad-bot"
-        />
+        <img v-if="!is404" :src="SadRinthbot" alt="Sad Modrinth bot" class="error-box__sad-bot" />
         <div v-if="!is404" class="error-box__top-glow" />
         <div class="error-box__body">
           <h1 class="error-box__title">{{ formatMessage(errorMessages.title) }}</h1>
@@ -55,6 +50,7 @@
 
 <script setup>
 import { defineMessage, useVIntl } from "@vintl/vintl";
+import { SadRinthbot } from "@modrinth/assets";
 import Logo404 from "~/assets/images/404.svg";
 
 const { formatMessage } = useVIntl();
@@ -272,6 +268,19 @@ const routeMessages = [
   }
 }
 
+.error-graphic {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: center;
+
+  svg {
+    fill: var(--color-text);
+    color: var(--color-text);
+    width: min(15rem, 100%);
+    height: auto;
+  }
+}
+
 .error-box {
   background-color: var(--color-raised-bg);
   border-radius: 1.25rem;
@@ -281,105 +290,96 @@ const routeMessages = [
   gap: 1.25rem;
   box-shadow: var(--shadow-card);
   position: relative;
-}
 
-.error-box.has-bot {
-  margin-block: 120px;
-}
+  &.has-bot {
+    margin-block: 120px;
+  }
 
-.error-box p {
-  margin: 0;
-}
+  p {
+    margin: 0;
+  }
 
-.error-box a {
-  color: var(--color-brand);
-  font-weight: 600;
-}
+  a {
+    color: var(--color-brand);
+    font-weight: 600;
 
-.error-box a:hover,
-.error-box a:focus {
-  filter: brightness(1.125);
-  text-decoration: underline;
-}
+    &:hover,
+    &:focus {
+      filter: brightness(1.125);
+      text-decoration: underline;
+    }
+  }
 
-.error-graphic {
-  margin-bottom: 2rem;
-  display: flex;
-  justify-content: center;
-}
+  &__sad-bot {
+    --_bot-height: 112px;
+    position: absolute;
+    top: calc(-1 * var(--_bot-height));
+    right: 5rem;
+    width: auto;
+    height: var(--_bot-height);
 
-.error-graphic svg {
-  fill: var(--color-text);
-  color: var(--color-text);
+    @media screen and (max-width: 768px) {
+      --_bot-height: 70px;
+      right: 2rem;
+    }
+  }
 
-  width: min(15rem, 100%);
-  height: auto;
-}
+  &__top-glow {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent 2rem,
+      var(--color-green) calc(100% - 13rem),
+      var(--color-green) calc(100% - 5rem),
+      transparent calc(100% - 2rem)
+    );
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0.4;
+  }
 
-.error-box__sad-bot {
-  --_bot-height: 112px;
-  position: absolute;
-  top: calc(-1 * var(--_bot-height));
-  right: 5rem;
-  width: auto;
-  height: var(--_bot-height);
-}
+  &__title {
+    font-size: 2rem;
+    font-weight: 900;
+    margin: 0;
+  }
 
-.error-box__top-glow {
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(
-    to right,
-    transparent 2rem,
-    var(--color-green) calc(100% - 13rem),
-    var(--color-green) calc(100% - 5rem),
-    transparent calc(100% - 2rem)
-  );
-  position: absolute;
-  top: 0;
-  left: 0;
-  opacity: 0.4;
-}
+  &__subtitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
 
-.error-box__title {
-  font-size: 2rem;
-  font-weight: 900;
-  margin: 0;
-}
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
 
-.error-box__subtitle {
-  font-size: 1.25rem;
-  font-weight: 600;
-}
+  &__list-title {
+    font-weight: 600;
+  }
 
-.error-box__body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
+  &__list {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding-left: 1.25rem;
+  }
 
-.error-box__list-title {
-  font-weight: 600;
-}
+  li {
+    line-height: 1.5;
+  }
 
-.error-box__list {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  padding-left: 1.25rem;
-}
-
-.error-box li {
-  line-height: 1.5;
-}
-
-.error-box__details {
-  display: flex;
-  flex-direction: column;
-  color: var(--color-secondary);
-  gap: 0.25rem;
-  font-weight: 500;
-  font-size: 0.875rem;
+  &__details {
+    display: flex;
+    flex-direction: column;
+    color: var(--color-secondary);
+    gap: 0.25rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+  }
 }
 </style>

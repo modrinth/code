@@ -1,17 +1,17 @@
 use crate::auth::get_user_from_headers;
-use crate::database::models::UserId;
+use crate::database::models::DBUserId;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::models::users::UserFriend;
 use crate::queue::session::AuthQueue;
 use crate::queue::socket::ActiveSockets;
+use crate::routes::ApiError;
 use crate::routes::internal::statuses::{
     broadcast_friends_message, send_message_to_user,
 };
-use crate::routes::ApiError;
 use crate::sync::friends::RedisFriendsMessage;
 use crate::sync::status::get_user_status;
-use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use ariadne::networking::message::ServerToClientMessage;
 use chrono::Utc;
 use sqlx::PgPool;
@@ -36,20 +36,20 @@ pub async fn add_friend(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_WRITE]),
+        Scopes::USER_WRITE,
     )
     .await?
     .1;
 
     let string = info.into_inner().0;
     let friend =
-        crate::database::models::User::get(&string, &**pool, &redis).await?;
+        crate::database::models::DBUser::get(&string, &**pool, &redis).await?;
 
     if let Some(friend) = friend {
         let mut transaction = pool.begin().await?;
 
         if let Some(friend) =
-            crate::database::models::friend_item::FriendItem::get_friend(
+            crate::database::models::friend_item::DBFriend::get_friend(
                 user.id.into(),
                 friend.id,
                 &**pool,
@@ -68,7 +68,7 @@ pub async fn add_friend(
                 ));
             }
 
-            crate::database::models::friend_item::FriendItem::update_friend(
+            crate::database::models::friend_item::DBFriend::update_friend(
                 friend.user_id,
                 friend.friend_id,
                 true,
@@ -77,8 +77,8 @@ pub async fn add_friend(
             .await?;
 
             async fn send_friend_status(
-                user_id: UserId,
-                friend_id: UserId,
+                user_id: DBUserId,
+                friend_id: DBUserId,
                 sockets: &ActiveSockets,
                 redis: &RedisPool,
             ) -> Result<(), ApiError> {
@@ -115,7 +115,7 @@ pub async fn add_friend(
                 ));
             }
 
-            crate::database::models::friend_item::FriendItem {
+            crate::database::models::friend_item::DBFriend {
                 user_id: user.id.into(),
                 friend_id: friend.id,
                 created: Utc::now(),
@@ -154,19 +154,19 @@ pub async fn remove_friend(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_WRITE]),
+        Scopes::USER_WRITE,
     )
     .await?
     .1;
 
     let string = info.into_inner().0;
     let friend =
-        crate::database::models::User::get(&string, &**pool, &redis).await?;
+        crate::database::models::DBUser::get(&string, &**pool, &redis).await?;
 
     if let Some(friend) = friend {
         let mut transaction = pool.begin().await?;
 
-        crate::database::models::friend_item::FriendItem::remove(
+        crate::database::models::friend_item::DBFriend::remove(
             user.id.into(),
             friend.id,
             &mut transaction,
@@ -200,13 +200,13 @@ pub async fn friends(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::USER_READ]),
+        Scopes::USER_READ,
     )
     .await?
     .1;
 
     let friends =
-        crate::database::models::friend_item::FriendItem::get_user_friends(
+        crate::database::models::friend_item::DBFriend::get_user_friends(
             user.id.into(),
             None,
             &**pool,

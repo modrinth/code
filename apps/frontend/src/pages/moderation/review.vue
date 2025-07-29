@@ -5,14 +5,14 @@
       <Chips
         v-model="projectType"
         :items="projectTypes"
-        :format-label="(x) => (x === 'all' ? 'All' : $formatProjectType(x) + 's')"
+        :format-label="(x) => (x === 'all' ? 'All' : formatProjectType(x) + 's')"
       />
       <button v-if="oldestFirst" class="iconified-button push-right" @click="oldestFirst = false">
-        <SortDescendingIcon />
+        <SortDescIcon />
         Sorting by oldest
       </button>
       <button v-else class="iconified-button push-right" @click="oldestFirst = true">
-        <SortAscendingIcon />
+        <SortAscIcon />
         Sorting by newest
       </button>
       <button
@@ -56,7 +56,7 @@
             <Avatar :src="project.icon_url" size="xs" no-shadow raised />
             <span class="stacked">
               <span class="title">{{ project.name }}</span>
-              <span>{{ $formatProjectType(project.inferred_project_type) }}</span>
+              <span>{{ formatProjectType(project.inferred_project_type) }}</span>
             </span>
           </nuxt-link>
         </div>
@@ -81,7 +81,9 @@
         </div>
         <div class="mobile-row">
           is requesting to be
-          <Badge :type="project.requested_status ? project.requested_status : 'approved'" />
+          <ProjectStatusBadge
+            :status="project.requested_status ? project.requested_status : 'approved'"
+          />
         </div>
       </div>
       <div class="input-group">
@@ -94,7 +96,7 @@
         <IssuesIcon v-if="project.age_warning" />
         Submitted
         <span v-tooltip="$dayjs(project.queued).format('MMMM D, YYYY [at] h:mm A')">{{
-          fromNow(project.queued)
+          formatRelativeTime(project.queued)
         }}</span>
       </span>
       <span v-else class="submitter-info"><UnknownIcon /> Unknown queue date</span>
@@ -103,18 +105,17 @@
 </template>
 
 <script setup>
-import { Chips } from "@modrinth/ui";
+import { Avatar, ProjectStatusBadge, Chips, useRelativeTime } from "@modrinth/ui";
 import {
   UnknownIcon,
   EyeIcon,
-  SortAscendingIcon,
-  SortDescendingIcon,
+  SortAscIcon,
+  SortDescIcon,
   IssuesIcon,
   ScaleIcon,
 } from "@modrinth/assets";
-import Avatar from "~/components/ui/Avatar.vue";
-import Badge from "~/components/ui/Badge.vue";
-import { formatProjectType } from "~/plugins/shorthands.js";
+import { formatProjectType } from "@modrinth/utils";
+import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
 
 useHead({
   title: "Review projects - Modrinth",
@@ -127,6 +128,8 @@ const router = useRouter();
 const now = app.$dayjs();
 const TIME_24H = 86400000;
 const TIME_48H = TIME_24H * 2;
+
+const formatRelativeTime = useRelativeTime();
 
 const { data: projects } = await useAsyncData("moderation/projects?count=1000", () =>
   useBaseFetch("moderation/projects?count=1000", { internal: true }),
@@ -167,28 +170,6 @@ const projectTypes = computed(() => {
 
   return [...set];
 });
-
-function segmentData(data, segmentSize = 800) {
-  return data.reduce((acc, curr, index) => {
-    const segment = Math.floor(index / segmentSize);
-
-    if (!acc[segment]) {
-      acc[segment] = [];
-    }
-    acc[segment].push(curr);
-    return acc;
-  }, []);
-}
-
-function fetchSegmented(data, createUrl, options = {}) {
-  return Promise.all(segmentData(data).map((ids) => useBaseFetch(createUrl(ids), options))).then(
-    (results) => results.flat(),
-  );
-}
-
-function asEncodedJsonArray(data) {
-  return encodeURIComponent(JSON.stringify(data));
-}
 
 if (projects.value) {
   const teamIds = projects.value.map((x) => x.team_id);
@@ -231,6 +212,10 @@ if (projects.value) {
 
 async function goToProjects() {
   const project = projectsFiltered.value[0];
+  const remainingProjectIds = projectsFiltered.value.slice(1).map((p) => p.id);
+
+  localStorage.setItem("moderation-future-projects", JSON.stringify(remainingProjectIds));
+
   await router.push({
     name: "type-id",
     params: {
@@ -239,7 +224,6 @@ async function goToProjects() {
     },
     state: {
       showChecklist: true,
-      projects: projectsFiltered.value.slice(1).map((x) => (x.slug ? x.slug : x.id)),
     },
   });
 }

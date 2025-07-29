@@ -1,7 +1,5 @@
-#![allow(dead_code)]
-
 use labrinth::{database::redis::RedisPool, search};
-use sqlx::{postgres::PgPoolOptions, PgPool};
+use sqlx::{PgPool, postgres::PgPoolOptions};
 use std::time::Duration;
 use url::Url;
 
@@ -161,7 +159,9 @@ impl TemporaryDatabase {
                     let needs_update = dummy_data_update
                         .is_none_or(|d| d != DUMMY_DATA_UPDATE);
                     if needs_update {
-                        println!("Dummy data updated, so template DB tables will be dropped and re-created");
+                        println!(
+                            "Dummy data updated, so template DB tables will be dropped and re-created"
+                        );
                         // Drop all tables in the database so they can be re-created and later filled with updated dummy data
                         sqlx::query("DROP SCHEMA public CASCADE;")
                             .execute(&pool)

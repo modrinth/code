@@ -13,6 +13,7 @@ pub struct Settings {
     pub theme: Theme,
     pub default_page: DefaultPage,
     pub collapsed_navigation: bool,
+    pub hide_nametag_skins_page: bool,
     pub advanced_rendering: bool,
     pub native_decorations: bool,
     pub toggle_sidebar: bool,
@@ -56,7 +57,7 @@ impl Settings {
             "
             SELECT
                 max_concurrent_writes, max_concurrent_downloads,
-                theme, default_page, collapsed_navigation, advanced_rendering, native_decorations,
+                theme, default_page, collapsed_navigation, hide_nametag_skins_page, advanced_rendering, native_decorations,
                 discord_rpc, developer_mode, telemetry, personalized_ads,
                 onboarded,
                 json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,
@@ -75,6 +76,7 @@ impl Settings {
             theme: Theme::from_string(&res.theme),
             default_page: DefaultPage::from_string(&res.default_page),
             collapsed_navigation: res.collapsed_navigation == 1,
+            hide_nametag_skins_page: res.hide_nametag_skins_page == 1,
             advanced_rendering: res.advanced_rendering == 1,
             native_decorations: res.native_decorations == 1,
             toggle_sidebar: res.toggle_sidebar == 1,
@@ -167,7 +169,8 @@ impl Settings {
                 migrated = $25,
 
                 toggle_sidebar = $26,
-                feature_flags = $27
+                feature_flags = $27,
+                hide_nametag_skins_page = $28
             ",
             max_concurrent_writes,
             max_concurrent_downloads,
@@ -195,7 +198,8 @@ impl Settings {
             self.prev_custom_dir,
             self.migrated,
             self.toggle_sidebar,
-            feature_flags
+            feature_flags,
+            self.hide_nametag_skins_page
         )
         .execute(exec)
         .await?;
@@ -247,9 +251,13 @@ pub struct WindowSize(pub u16, pub u16);
 
 /// Game initialization hooks
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde_with::serde_as]
 pub struct Hooks {
+    #[serde_as(as = "serde_with::NoneAsEmptyString")]
     pub pre_launch: Option<String>,
+    #[serde_as(as = "serde_with::NoneAsEmptyString")]
     pub wrapper: Option<String>,
+    #[serde_as(as = "serde_with::NoneAsEmptyString")]
     pub post_exit: Option<String>,
 }
 

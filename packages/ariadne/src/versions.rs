@@ -1,8 +1,7 @@
-use lazy_static::lazy_static;
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::LazyLock};
 
-lazy_static! {
-    static ref SPECIAL_PARENTS: HashMap<&'static str, &'static str> = {
+static SPECIAL_PARENTS: LazyLock<HashMap<&'static str, &'static str>> =
+    LazyLock::new(|| {
         let mut m = HashMap::new();
         m.insert("15w14a", "1.8.3");
         m.insert("1.RV-Pre1", "1.9.2");
@@ -12,8 +11,7 @@ lazy_static! {
         m.insert("23w13a_or_b", "23w13a");
         m.insert("24w14potato", "24w12a");
         m
-    };
-}
+    });
 
 pub fn is_feature_supported_in(
     version: &str,

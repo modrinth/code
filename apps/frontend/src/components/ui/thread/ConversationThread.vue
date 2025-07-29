@@ -34,6 +34,38 @@
         </div>
       </div>
     </Modal>
+    <Modal ref="modalReply" header="Reply to thread">
+      <div class="modal-submit universal-body">
+        <span>
+          Your project is already approved. As such, the moderation team does not actively monitor
+          this thread. However, they may still see your message if there is a problem with your
+          project.
+        </span>
+        <span>
+          If you need to get in contact with the moderation team, please use the
+          <a class="text-link" href="https://support.modrinth.com" target="_blank">
+            Modrinth Help Center
+          </a>
+          and click the green bubble to contact support.
+        </span>
+        <Checkbox
+          v-model="replyConfirmation"
+          description="Confirm moderators do not actively monitor this"
+        >
+          I acknowledge that the moderators do not actively monitor the thread.
+        </Checkbox>
+        <div class="input-group push-right">
+          <button
+            class="btn btn-primary"
+            :disabled="!replyConfirmation"
+            @click="sendReplyFromModal()"
+          >
+            <ReplyIcon aria-hidden="true" />
+            Reply to thread
+          </button>
+        </div>
+      </div>
+    </Modal>
     <div v-if="flags.developerMode" class="thread-id">
       Thread ID:
       <CopyCode :text="thread.id" />
@@ -71,12 +103,17 @@
           v-if="sortedMessages.length > 0"
           class="btn btn-primary"
           :disabled="!replyBody"
-          @click="sendReply()"
+          @click="isApproved(project) && !isStaff(auth.user) ? openReplyModal() : sendReply()"
         >
           <ReplyIcon aria-hidden="true" />
           Reply
         </button>
-        <button v-else class="btn btn-primary" :disabled="!replyBody" @click="sendReply()">
+        <button
+          v-else
+          class="btn btn-primary"
+          :disabled="!replyBody"
+          @click="isApproved(project) && !isStaff(auth.user) ? openReplyModal() : sendReply()"
+        >
           <SendIcon aria-hidden="true" />
           Send
         </button>
@@ -214,7 +251,7 @@
 </template>
 
 <script setup>
-import { OverflowMenu, MarkdownEditor } from "@modrinth/ui";
+import { CopyCode, OverflowMenu, MarkdownEditor } from "@modrinth/ui";
 import {
   DropdownIcon,
   ReplyIcon,
@@ -226,7 +263,6 @@ import {
   ScaleIcon,
 } from "@modrinth/assets";
 import { useImageUpload } from "~/composables/image-upload.ts";
-import CopyCode from "~/components/ui/CopyCode.vue";
 import ThreadMessage from "~/components/ui/thread/ThreadMessage.vue";
 import { isStaff } from "~/helpers/users.js";
 import { isApproved, isRejected } from "~/helpers/projects.js";
@@ -290,6 +326,7 @@ const sortedMessages = computed(() => {
 });
 
 const modalSubmit = ref(null);
+const modalReply = ref(null);
 
 async function updateThreadLocal() {
   let threadId = null;
@@ -315,6 +352,11 @@ async function onUploadImage(file) {
   imageIDs.value = imageIDs.value.slice(-10);
 
   return response.url;
+}
+
+async function sendReplyFromModal(status = null, privateMessage = false) {
+  modalReply.value.hide();
+  await sendReply(status, privateMessage);
 }
 
 async function sendReply(status = null, privateMessage = false) {
@@ -399,11 +441,17 @@ async function reopenReport() {
 
 const replyWithSubmission = ref(false);
 const submissionConfirmation = ref(false);
+const replyConfirmation = ref(false);
 
 function openResubmitModal(reply) {
   submissionConfirmation.value = false;
   replyWithSubmission.value = reply;
   modalSubmit.value.show();
+}
+
+function openReplyModal(reply) {
+  replyConfirmation.value = false;
+  modalReply.value.show();
 }
 
 async function resubmit() {

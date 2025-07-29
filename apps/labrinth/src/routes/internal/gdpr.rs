@@ -3,7 +3,7 @@ use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use actix_web::{post, web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, post, web};
 use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -22,7 +22,7 @@ pub async fn export(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
+        Scopes::SESSION_ACCESS,
     )
     .await?
     .1;
@@ -30,9 +30,9 @@ pub async fn export(
     let user_id = user.id.into();
 
     let collection_ids =
-        crate::database::models::User::get_collections(user_id, &**pool)
+        crate::database::models::DBUser::get_collections(user_id, &**pool)
             .await?;
-    let collections = crate::database::models::Collection::get_many(
+    let collections = crate::database::models::DBCollection::get_many(
         &collection_ids,
         &**pool,
         &redis,
@@ -42,24 +42,25 @@ pub async fn export(
     .map(crate::models::collections::Collection::from)
     .collect::<Vec<_>>();
 
-    let follows = crate::database::models::User::get_follows(user_id, &**pool)
-        .await?
-        .into_iter()
-        .map(crate::models::ids::ProjectId::from)
-        .collect::<Vec<_>>();
+    let follows =
+        crate::database::models::DBUser::get_follows(user_id, &**pool)
+            .await?
+            .into_iter()
+            .map(crate::models::ids::ProjectId::from)
+            .collect::<Vec<_>>();
 
     let projects =
-        crate::database::models::User::get_projects(user_id, &**pool, &redis)
+        crate::database::models::DBUser::get_projects(user_id, &**pool, &redis)
             .await?
             .into_iter()
             .map(crate::models::ids::ProjectId::from)
             .collect::<Vec<_>>();
 
     let org_ids =
-        crate::database::models::User::get_organizations(user_id, &**pool)
+        crate::database::models::DBUser::get_organizations(user_id, &**pool)
             .await?;
     let orgs =
-        crate::database::models::organization_item::Organization::get_many_ids(
+        crate::database::models::organization_item::DBOrganization::get_many_ids(
             &org_ids, &**pool, &redis,
         )
         .await?
@@ -68,7 +69,7 @@ pub async fn export(
         .map(|x| crate::models::organizations::Organization::from(x, vec![]))
         .collect::<Vec<_>>();
 
-    let notifs = crate::database::models::notification_item::Notification::get_many_user(
+    let notifs = crate::database::models::notification_item::DBNotification::get_many_user(
         user_id, &**pool, &redis,
     )
     .await?
@@ -77,7 +78,7 @@ pub async fn export(
     .collect::<Vec<_>>();
 
     let oauth_clients =
-        crate::database::models::oauth_client_item::OAuthClient::get_all_user_clients(
+        crate::database::models::oauth_client_item::DBOAuthClient::get_all_user_clients(
             user_id, &**pool,
         )
         .await?
@@ -85,7 +86,7 @@ pub async fn export(
         .map(crate::models::oauth_clients::OAuthClient::from)
         .collect::<Vec<_>>();
 
-    let oauth_authorizations = crate::database::models::oauth_client_authorization_item::OAuthClientAuthorization::get_all_for_user(
+    let oauth_authorizations = crate::database::models::oauth_client_authorization_item::DBOAuthClientAuthorization::get_all_for_user(
         user_id, &**pool,
     )
         .await?
@@ -94,12 +95,12 @@ pub async fn export(
         .collect::<Vec<_>>();
 
     let pat_ids =
-        crate::database::models::pat_item::PersonalAccessToken::get_user_pats(
+        crate::database::models::pat_item::DBPersonalAccessToken::get_user_pats(
             user_id, &**pool, &redis,
         )
         .await?;
     let pats =
-        crate::database::models::pat_item::PersonalAccessToken::get_many_ids(
+        crate::database::models::pat_item::DBPersonalAccessToken::get_many_ids(
             &pat_ids, &**pool, &redis,
         )
         .await?
@@ -108,12 +109,12 @@ pub async fn export(
         .collect::<Vec<_>>();
 
     let payout_ids =
-        crate::database::models::payout_item::Payout::get_all_for_user(
+        crate::database::models::payout_item::DBPayout::get_all_for_user(
             user_id, &**pool,
         )
         .await?;
 
-    let payouts = crate::database::models::payout_item::Payout::get_many(
+    let payouts = crate::database::models::payout_item::DBPayout::get_many(
         &payout_ids,
         &**pool,
     )
@@ -122,10 +123,11 @@ pub async fn export(
     .map(crate::models::payouts::Payout::from)
     .collect::<Vec<_>>();
 
-    let report_ids =
-        crate::database::models::user_item::User::get_reports(user_id, &**pool)
-            .await?;
-    let reports = crate::database::models::report_item::Report::get_many(
+    let report_ids = crate::database::models::user_item::DBUser::get_reports(
+        user_id, &**pool,
+    )
+    .await?;
+    let reports = crate::database::models::report_item::DBReport::get_many(
         &report_ids,
         &**pool,
     )
@@ -143,11 +145,11 @@ pub async fn export(
     .fetch_all(pool.as_ref())
     .await?
     .into_iter()
-    .map(|x| crate::database::models::ids::ThreadMessageId(x.id))
+    .map(|x| crate::database::models::ids::DBThreadMessageId(x.id))
     .collect::<Vec<_>>();
 
     let messages =
-        crate::database::models::thread_item::ThreadMessage::get_many(
+        crate::database::models::thread_item::DBThreadMessage::get_many(
             &message_ids,
             &**pool,
         )
@@ -163,21 +165,22 @@ pub async fn export(
     .fetch_all(pool.as_ref())
     .await?
     .into_iter()
-    .map(|x| crate::database::models::ids::ImageId(x.id))
+    .map(|x| crate::database::models::ids::DBImageId(x.id))
     .collect::<Vec<_>>();
 
-    let uploaded_images = crate::database::models::image_item::Image::get_many(
-        &uploaded_images_ids,
-        &**pool,
-        &redis,
-    )
-    .await?
-    .into_iter()
-    .map(crate::models::images::Image::from)
-    .collect::<Vec<_>>();
+    let uploaded_images =
+        crate::database::models::image_item::DBImage::get_many(
+            &uploaded_images_ids,
+            &**pool,
+            &redis,
+        )
+        .await?
+        .into_iter()
+        .map(crate::models::images::Image::from)
+        .collect::<Vec<_>>();
 
     let subscriptions =
-        crate::database::models::user_subscription_item::UserSubscriptionItem::get_all_user(
+        crate::database::models::user_subscription_item::DBUserSubscription::get_all_user(
             user_id, &**pool,
         )
         .await?

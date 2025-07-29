@@ -16,6 +16,7 @@ use util::cors::default_cors;
 
 use crate::background_task::update_versions;
 use crate::queue::moderation::AutomatedModerationQueue;
+use crate::queue::payouts::insert_bank_balances;
 use crate::util::env::{parse_strings_from_var, parse_var};
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use sync::friends::handle_pubsub;
@@ -252,6 +253,23 @@ pub fn app_setup(
     };
 
     let payouts_queue = web::Data::new(PayoutsQueue::new());
+
+    let payouts_queue_ref = payouts_queue.clone();
+    let pool_ref = pool.clone();
+    scheduler.run(Duration::from_secs(60 * 60 * 6), move || {
+        let payouts_queue_ref = payouts_queue_ref.clone();
+        let pool_ref = pool_ref.clone();
+        async move {
+            info!("Started updating bank balances");
+            let result =
+                insert_bank_balances(&payouts_queue_ref, &pool_ref).await;
+            if let Err(e) = result {
+                warn!("Bank balance update failed: {:?}", e);
+            }
+            info!("Done updating bank balances");
+        }
+    });
+
     let active_sockets = web::Data::new(ActiveSockets::default());
 
     {
@@ -313,13 +331,16 @@ pub fn app_config(
     .app_data(labrinth_config.automated_moderation_queue.clone())
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
     .app_data(labrinth_config.rate_limiter.clone())
-    .configure(
-        #[allow(unused_variables)]
-        |cfg| {
-            #[cfg(not(target_env = "msvc"))]
-            routes::debug::config(cfg)
-        },
-    )
+    .configure({
+        #[cfg(target_os = "linux")]
+        {
+            |cfg| routes::debug::config(cfg)
+        }
+        #[cfg(not(target_os = "linux"))]
+        {
+            |_cfg| ()
+        }
+    })
     .configure(routes::v2::config)
     .configure(routes::v3::config)
     .configure(routes::internal::config)
@@ -331,7 +352,7 @@ pub fn app_config(
 pub fn check_env_vars() -> bool {
     let mut failed = false;
 
-    fn check_var<T: std::str::FromStr>(var: &'static str) -> bool {
+    fn check_var<T: std::str::FromStr>(var: &str) -> bool {
         let check = parse_var::<T>(var).is_none();
         if check {
             warn!(
@@ -358,23 +379,34 @@ pub fn check_env_vars() -> bool {
 
     let storage_backend = dotenvy::var("STORAGE_BACKEND").ok();
     match storage_backend.as_deref() {
-        Some("backblaze") => {
-            failed |= check_var::<String>("BACKBLAZE_KEY_ID");
-            failed |= check_var::<String>("BACKBLAZE_KEY");
-            failed |= check_var::<String>("BACKBLAZE_BUCKET_ID");
-        }
         Some("s3") => {
-            failed |= check_var::<String>("S3_ACCESS_TOKEN");
-            failed |= check_var::<String>("S3_SECRET");
-            failed |= check_var::<String>("S3_URL");
-            failed |= check_var::<String>("S3_REGION");
-            failed |= check_var::<String>("S3_BUCKET_NAME");
+            let mut check_var_set = |var_prefix| {
+                failed |= check_var::<String>(&format!(
+                    "S3_{var_prefix}_BUCKET_NAME"
+                ));
+                failed |= check_var::<bool>(&format!(
+                    "S3_{var_prefix}_USES_PATH_STYLE_BUCKET"
+                ));
+                failed |=
+                    check_var::<String>(&format!("S3_{var_prefix}_REGION"));
+                failed |= check_var::<String>(&format!("S3_{var_prefix}_URL"));
+                failed |= check_var::<String>(&format!(
+                    "S3_{var_prefix}_ACCESS_TOKEN"
+                ));
+                failed |=
+                    check_var::<String>(&format!("S3_{var_prefix}_SECRET"));
+            };
+
+            check_var_set("PUBLIC");
+            check_var_set("PRIVATE");
         }
         Some("local") => {
             failed |= check_var::<String>("MOCK_FILE_PATH");
         }
         Some(backend) => {
-            warn!("Variable `STORAGE_BACKEND` contains an invalid value: {}. Expected \"backblaze\", \"s3\", or \"local\".", backend);
+            warn!(
+                "Variable `STORAGE_BACKEND` contains an invalid value: {backend}. Expected \"s3\" or \"local\"."
+            );
             failed |= true;
         }
         _ => {
@@ -387,12 +419,16 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<usize>("VERSION_INDEX_INTERVAL");
 
     if parse_strings_from_var("WHITELISTED_MODPACK_DOMAINS").is_none() {
-        warn!("Variable `WHITELISTED_MODPACK_DOMAINS` missing in dotenv or not a json array of strings");
+        warn!(
+            "Variable `WHITELISTED_MODPACK_DOMAINS` missing in dotenv or not a json array of strings"
+        );
         failed |= true;
     }
 
     if parse_strings_from_var("ALLOWED_CALLBACK_URLS").is_none() {
-        warn!("Variable `ALLOWED_CALLBACK_URLS` missing in dotenv or not a json array of strings");
+        warn!(
+            "Variable `ALLOWED_CALLBACK_URLS` missing in dotenv or not a json array of strings"
+        );
         failed |= true;
     }
 

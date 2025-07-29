@@ -1,14 +1,14 @@
-use crate::database::models::UserId;
+use crate::database::models::DBUserId;
 use chrono::{DateTime, Utc};
 
-pub struct FriendItem {
-    pub user_id: UserId,
-    pub friend_id: UserId,
+pub struct DBFriend {
+    pub user_id: DBUserId,
+    pub friend_id: DBUserId,
     pub created: DateTime<Utc>,
     pub accepted: bool,
 }
 
-impl FriendItem {
+impl DBFriend {
     pub async fn insert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -30,10 +30,10 @@ impl FriendItem {
     }
 
     pub async fn get_friend<'a, E>(
-        user_id: UserId,
-        friend_id: UserId,
+        user_id: DBUserId,
+        friend_id: DBUserId,
         exec: E,
-    ) -> Result<Option<FriendItem>, sqlx::Error>
+    ) -> Result<Option<DBFriend>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -48,9 +48,9 @@ impl FriendItem {
         )
         .fetch_optional(exec)
         .await?
-            .map(|row| FriendItem {
-                user_id: UserId(row.user_id),
-                friend_id: UserId(row.friend_id),
+            .map(|row| DBFriend {
+                user_id: DBUserId(row.user_id),
+                friend_id: DBUserId(row.friend_id),
                 created: row.created,
                 accepted: row.accepted,
             });
@@ -59,8 +59,8 @@ impl FriendItem {
     }
 
     pub async fn update_friend(
-        user_id: UserId,
-        friend_id: UserId,
+        user_id: DBUserId,
+        friend_id: DBUserId,
         accepted: bool,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), sqlx::Error> {
@@ -81,10 +81,10 @@ impl FriendItem {
     }
 
     pub async fn get_user_friends<'a, E>(
-        user_id: UserId,
+        user_id: DBUserId,
         accepted: Option<bool>,
         exec: E,
-    ) -> Result<Vec<FriendItem>, sqlx::Error>
+    ) -> Result<Vec<DBFriend>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -99,21 +99,21 @@ impl FriendItem {
         .fetch_all(exec)
         .await?
         .into_iter()
-        .map(|row| FriendItem {
-            user_id: UserId(row.user_id),
-            friend_id: UserId(row.friend_id),
+        .map(|row| DBFriend {
+            user_id: DBUserId(row.user_id),
+            friend_id: DBUserId(row.friend_id),
             created: row.created,
             accepted: row.accepted,
         })
-        .filter(|x| accepted.map(|y| y == x.accepted).unwrap_or(true))
+        .filter(|x| accepted.is_none_or(|y| y == x.accepted))
         .collect::<Vec<_>>();
 
         Ok(friends)
     }
 
     pub async fn remove(
-        user_id: UserId,
-        friend_id: UserId,
+        user_id: DBUserId,
+        friend_id: DBUserId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), sqlx::Error> {
         sqlx::query!(

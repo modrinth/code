@@ -127,7 +127,10 @@
           </div>
         </div>
 
-        <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
+        <div
+          v-if="!initialSetup"
+          class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4"
+        >
           <div class="flex w-full flex-row items-center justify-between">
             <label class="w-full text-lg font-bold text-contrast" for="hard-reset">
               Erase all data
@@ -146,7 +149,10 @@
           <div class="font-bold">This does not affect your backups, which are stored off-site.</div>
         </div>
 
-        <BackupWarning :backup-link="`/servers/manage/${props.server?.serverId}/backups`" />
+        <BackupWarning
+          v-if="!initialSetup"
+          :backup-link="`/servers/manage/${props.server?.serverId}/backups`"
+        />
       </div>
 
       <div class="mt-4 flex justify-start gap-4">
@@ -194,9 +200,9 @@
 import { BackupWarning, ButtonStyled, NewModal, Toggle } from "@modrinth/ui";
 import { DropdownIcon, RightArrowIcon, ServerIcon, XIcon } from "@modrinth/assets";
 import { $fetch } from "ofetch";
-import type { Server } from "~/composables/pyroServers";
-import type { Loaders } from "~/types/servers";
+import { type Loaders, ModrinthServersFetchError } from "@modrinth/utils";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const { formatMessage } = useVIntl();
 
@@ -214,9 +220,10 @@ type VersionMap = Record<string, LoaderVersion[]>;
 type VersionCache = Record<string, any>;
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: ModrinthServer;
   currentLoader: Loaders | undefined;
   backupInProgress?: BackupInProgressReason;
+  initialSetup?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -313,7 +320,7 @@ const selectedLoaderVersions = computed<string[]>(() => {
   const loader = selectedLoader.value.toLowerCase();
 
   if (loader === "paper") {
-    return paperVersions.value[selectedMCVersion.value].map((x) => `${x}`) || [];
+    return paperVersions.value[selectedMCVersion.value]?.map((x) => `${x}`) || [];
   }
 
   if (loader === "purpur") {
@@ -451,12 +458,11 @@ const handleReinstall = async () => {
 
   try {
     await props.server.general?.reinstall(
-      props.server.serverId,
       true,
       selectedLoader.value,
       selectedMCVersion.value,
       selectedLoader.value === "Vanilla" ? "" : selectedLoaderVersion.value,
-      hardReset.value,
+      props.initialSetup ? true : hardReset.value,
     );
 
     emit("reinstall", {
@@ -467,7 +473,7 @@ const handleReinstall = async () => {
 
     hide();
   } catch (error) {
-    if (error instanceof PyroFetchError && error.statusCode === 429) {
+    if (error instanceof ModrinthServersFetchError && (error as any)?.statusCode === 429) {
       addNotification({
         group: "server",
         title: "Cannot reinstall server",

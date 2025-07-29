@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt::Write};
 
 use actix_http::StatusCode;
 use actix_web::{
@@ -20,9 +20,9 @@ use crate::{
     assert_status,
     common::{
         api_common::{
+            Api, ApiProject, AppendsOptionalPat,
             models::{CommonItemType, CommonProject, CommonVersion},
             request_data::{ImageData, ProjectCreationRequestData},
-            Api, ApiProject, AppendsOptionalPat,
         },
         database::MOD_USER_PAT,
         dummy_data::TestFile,
@@ -30,8 +30,8 @@ use crate::{
 };
 
 use super::{
-    request_data::{self, get_public_project_creation_data},
     ApiV3,
+    request_data::{self, get_public_project_creation_data},
 };
 
 #[async_trait(?Send)]
@@ -363,13 +363,13 @@ impl ApiProject for ApiV3 {
             featured = featured
         );
         if let Some(title) = title {
-            url.push_str(&format!("&title={title}"));
+            write!(&mut url, "&title={title}").unwrap();
         }
         if let Some(description) = description {
-            url.push_str(&format!("&description={description}"));
+            write!(&mut url, "&description={description}").unwrap();
         }
         if let Some(ordering) = ordering {
-            url.push_str(&format!("&ordering={ordering}"));
+            write!(&mut url, "&ordering={ordering}").unwrap();
         }
 
         let req = test::TestRequest::post()
@@ -394,11 +394,12 @@ impl ApiProject for ApiV3 {
         );
 
         for (key, value) in patch {
-            url.push_str(&format!(
+            write!(
+                &mut url,
                 "&{key}={value}",
-                key = key,
                 value = urlencoding::encode(&value)
-            ));
+            )
+            .unwrap();
         }
 
         let req = test::TestRequest::patch()
@@ -593,17 +594,17 @@ impl ApiV3 {
             let start_date = start_date.to_rfc3339();
             // let start_date = serde_json::to_string(&start_date).unwrap();
             let start_date = urlencoding::encode(&start_date);
-            extra_args.push_str(&format!("&start_date={start_date}"));
+            write!(&mut extra_args, "&start_date={start_date}").unwrap();
         }
         if let Some(end_date) = end_date {
             let end_date = end_date.to_rfc3339();
             // let end_date = serde_json::to_string(&end_date).unwrap();
             let end_date = urlencoding::encode(&end_date);
-            extra_args.push_str(&format!("&end_date={end_date}"));
+            write!(&mut extra_args, "&end_date={end_date}").unwrap();
         }
         if let Some(resolution_minutes) = resolution_minutes {
-            extra_args
-                .push_str(&format!("&resolution_minutes={resolution_minutes}"));
+            write!(&mut extra_args, "&resolution_minutes={resolution_minutes}")
+                .unwrap();
         }
 
         let req = test::TestRequest::get()

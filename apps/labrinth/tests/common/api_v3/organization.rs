@@ -1,18 +1,16 @@
+use crate::{
+    assert_status,
+    common::api_common::{Api, AppendsOptionalPat, request_data::ImageData},
+};
 use actix_http::StatusCode;
 use actix_web::{
     dev::ServiceResponse,
     test::{self, TestRequest},
 };
+use ariadne::ids::UserId;
 use bytes::Bytes;
-use labrinth::models::{
-    organizations::Organization, users::UserId, v3::projects::Project,
-};
+use labrinth::models::{organizations::Organization, v3::projects::Project};
 use serde_json::json;
-
-use crate::{
-    assert_status,
-    common::api_common::{request_data::ImageData, Api, AppendsOptionalPat},
-};
 
 use super::ApiV3;
 

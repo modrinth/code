@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use serde_json::json;
 
 use crate::common::{
@@ -7,10 +6,8 @@ use crate::common::{
     },
     dummy_data::TestFile,
 };
-use labrinth::{
-    models::projects::ProjectId,
-    util::actix::{MultipartSegment, MultipartSegmentData},
-};
+use labrinth::models::ids::ProjectId;
+use labrinth::util::actix::{MultipartSegment, MultipartSegmentData};
 
 pub fn get_public_project_creation_data(
     slug: &str,
@@ -92,7 +89,7 @@ pub fn get_public_project_creation_data_json(
         {
             "title": format!("Test Project {slug}"),
             "slug": slug,
-            "project_type": version_jar.as_ref().map(|f| f.project_type()).unwrap_or("mod".to_string()),
+            "project_type": version_jar.as_ref().map_or("mod".to_string(), |f| f.project_type()),
             "description": "A dummy project for testing with.",
             "body": "This project is approved, and versions are listed.",
             "client_side": "required",

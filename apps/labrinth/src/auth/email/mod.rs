@@ -1,8 +1,8 @@
-use lettre::message::header::ContentType;
 use lettre::message::Mailbox;
+use lettre::message::header::ContentType;
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::transport::smtp::client::{Tls, TlsParameters};
-use lettre::{Address, Message, SmtpTransport, Transport};
+use lettre::{Message, SmtpTransport, Transport};
 use thiserror::Error;
 use tracing::warn;
 
@@ -23,11 +23,13 @@ pub fn send_email_raw(
     subject: String,
     body: String,
 ) -> Result<(), MailError> {
+    let from_name = dotenvy::var("SMTP_FROM_NAME")
+        .unwrap_or_else(|_| "Modrinth".to_string());
+    let from_address = dotenvy::var("SMTP_FROM_ADDRESS")
+        .unwrap_or_else(|_| "no-reply@mail.modrinth.com".to_string());
+
     let email = Message::builder()
-        .from(Mailbox::new(
-            Some("Modrinth".to_string()),
-            Address::new("no-reply", "mail.modrinth.com")?,
-        ))
+        .from(Mailbox::new(Some(from_name), from_address.parse()?))
         .to(to.parse()?)
         .subject(subject)
         .header(ContentType::TEXT_HTML)

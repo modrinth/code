@@ -3,10 +3,10 @@ use crate::models::ids::NotificationId;
 use crate::models::notifications::Notification;
 use crate::models::v2::notifications::LegacyNotification;
 use crate::queue::session::AuthQueue;
+use crate::routes::ApiError;
 use crate::routes::v2_reroute;
 use crate::routes::v3;
-use crate::routes::ApiError;
-use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 

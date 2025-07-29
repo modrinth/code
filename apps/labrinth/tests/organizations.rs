@@ -1,30 +1,28 @@
 use crate::common::{
     api_common::{ApiProject, ApiTeams},
     database::{
-        generate_random_name, ADMIN_USER_PAT, ENEMY_USER_ID_PARSED,
-        ENEMY_USER_PAT, FRIEND_USER_ID_PARSED, MOD_USER_ID, MOD_USER_PAT,
-        USER_USER_ID, USER_USER_ID_PARSED,
+        ADMIN_USER_PAT, ENEMY_USER_ID_PARSED, ENEMY_USER_PAT,
+        FRIEND_USER_ID_PARSED, MOD_USER_ID, MOD_USER_PAT, USER_USER_ID,
+        USER_USER_ID_PARSED, generate_random_name,
     },
     dummy_data::{
         DummyImage, DummyOrganizationZeta, DummyProjectAlpha, DummyProjectBeta,
     },
 };
 use actix_http::StatusCode;
+use ariadne::ids::UserId;
 use common::{
     api_v3::ApiV3,
     database::{FRIEND_USER_ID, FRIEND_USER_PAT, USER_USER_PAT},
     environment::{
-        with_test_environment, with_test_environment_all, TestEnvironment,
+        TestEnvironment, with_test_environment, with_test_environment_all,
     },
     permissions::{PermissionsTest, PermissionsTestContext},
 };
-use labrinth::models::{
-    teams::{OrganizationPermissions, ProjectPermissions},
-    users::UserId,
-};
+use labrinth::models::teams::{OrganizationPermissions, ProjectPermissions};
 use serde_json::json;
 
-mod common;
+pub mod common;
 
 #[actix_rt::test]
 async fn create_organization() {
@@ -372,9 +370,11 @@ async fn add_remove_organization_projects() {
                     USER_USER_PAT,
                 )
                 .await;
-            assert!(projects
-                .iter()
-                .any(|p| p.id.to_string() == alpha_project_id));
+            assert!(
+                projects
+                    .iter()
+                    .any(|p| p.id.to_string() == alpha_project_id)
+            );
 
             // Add/remove project to organization, first by ID, then by slug
             for alpha in [alpha_project_id, alpha_project_slug] {
@@ -411,9 +411,11 @@ async fn add_remove_organization_projects() {
                         USER_USER_PAT,
                     )
                     .await;
-                assert!(!projects
-                    .iter()
-                    .any(|p| p.id.to_string() == alpha_project_id));
+                assert!(
+                    !projects
+                        .iter()
+                        .any(|p| p.id.to_string() == alpha_project_id)
+                );
 
                 // Remove project from organization
                 let resp = test_env
@@ -437,9 +439,11 @@ async fn add_remove_organization_projects() {
                         USER_USER_PAT,
                     )
                     .await;
-                assert!(projects
-                    .iter()
-                    .any(|p| p.id.to_string() == alpha_project_id));
+                assert!(
+                    projects
+                        .iter()
+                        .any(|p| p.id.to_string() == alpha_project_id)
+                );
 
                 // Get organization projects
                 let projects = test_env
@@ -579,9 +583,7 @@ async fn add_remove_organization_project_ownership_to_user() {
                 .await;
             assert_eq!(members.len(), 1);
             assert_eq!(members[0].user.id.to_string(), FRIEND_USER_ID);
-            let user_member =
-                members.iter().filter(|m| m.is_owner).collect::<Vec<_>>();
-            assert_eq!(user_member.len(), 0);
+            assert_eq!(members.iter().filter(|m| m.is_owner).count(), 0);
 
             // Beta project should have:
             // - No members
@@ -832,9 +834,7 @@ async fn delete_organization_means_all_projects_to_org_owner() {
                 .api
                 .get_team_members_deserialized(alpha_team_id, USER_USER_PAT)
                 .await;
-            let user_member =
-                members.iter().filter(|m| m.is_owner).collect::<Vec<_>>();
-            assert_eq!(user_member.len(), 0);
+            assert_eq!(members.iter().filter(|m| m.is_owner).count(), 0);
 
             // Transfer ownership of zeta organization to FRIEND
             let resp = test_env
@@ -852,9 +852,7 @@ async fn delete_organization_means_all_projects_to_org_owner() {
                 .api
                 .get_team_members_deserialized(alpha_team_id, USER_USER_PAT)
                 .await;
-            let user_member =
-                members.iter().filter(|m| m.is_owner).collect::<Vec<_>>();
-            assert_eq!(user_member.len(), 0);
+            assert_eq!(members.iter().filter(|m| m.is_owner).count(), 0);
 
             // Delete organization
             let resp = test_env

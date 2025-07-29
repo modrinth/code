@@ -3,17 +3,15 @@ use std::convert::TryFrom;
 use std::collections::HashMap;
 
 use super::super::ids::OrganizationId;
-use super::super::teams::TeamId;
-use super::super::users::UserId;
-use crate::database::models::{version_item, DatabaseError};
+use crate::database::models::{DatabaseError, version_item};
 use crate::database::redis::RedisPool;
-use crate::models::ids::{ProjectId, VersionId};
+use crate::models::ids::{ProjectId, TeamId, ThreadId, VersionId};
 use crate::models::projects::{
     Dependency, License, Link, Loader, ModeratorMessage, MonetizationStatus,
     Project, ProjectStatus, Version, VersionFile, VersionStatus, VersionType,
 };
-use crate::models::threads::ThreadId;
 use crate::routes::v2_reroute::{self, capitalize_first};
+use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -105,7 +103,7 @@ impl LegacyProject {
     // It's safe to use a db version_item for this as the only info is side types, game versions, and loader fields (for loaders), which used to be public on project anyway.
     pub fn from(
         data: Project,
-        versions_item: Option<version_item::QueryVersion>,
+        versions_item: Option<version_item::VersionQueryResult>,
     ) -> Self {
         let mut client_side = LegacySideType::Unknown;
         let mut server_side = LegacySideType::Unknown;
@@ -129,7 +127,7 @@ impl LegacyProject {
             .collect();
 
         if let Some(versions_item) = versions_item {
-            // Extract side types from remaining fields (singleplayer, client_only, etc)
+            // Extract side types from remaining fields
             let fields = versions_item
                 .version_fields
                 .iter()
@@ -137,10 +135,11 @@ impl LegacyProject {
                     (f.field_name.clone(), f.value.clone().serialize_internal())
                 })
                 .collect::<HashMap<_, _>>();
-            (client_side, server_side) = v2_reroute::convert_side_types_v2(
-                &fields,
-                Some(&*og_project_type),
-            );
+            (client_side, server_side) =
+                v2_reroute::convert_v3_side_types_to_v2_side_types(
+                    &fields,
+                    Some(&*og_project_type),
+                );
 
             // - if loader is mrpack, this is a modpack
             // the loaders are whatever the corresponding loader fields are
@@ -239,7 +238,8 @@ impl LegacyProject {
             .filter_map(|p| p.versions.first().map(|i| (*i).into()))
             .collect();
         let example_versions =
-            version_item::Version::get_many(&version_ids, exec, redis).await?;
+            version_item::DBVersion::get_many(&version_ids, exec, redis)
+                .await?;
         let mut legacy_projects = Vec::new();
         for project in data {
             let version_item = example_versions

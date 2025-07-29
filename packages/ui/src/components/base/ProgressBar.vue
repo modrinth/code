@@ -49,7 +49,10 @@ const colors = {
 const percent = computed(() => props.progress / props.max)
 </script>
 <template>
-  <div class="flex w-[15rem] h-1 rounded-full overflow-hidden" :class="colors[props.color].bg">
+  <div
+    class="flex w-full max-w-[15rem] h-1 rounded-full overflow-hidden"
+    :class="colors[props.color].bg"
+  >
     <div
       class="rounded-full progress-bar"
       :class="[colors[props.color].fg, { 'progress-bar--waiting': waiting }]"

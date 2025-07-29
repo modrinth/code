@@ -68,6 +68,8 @@
   --color-button-bg-selected: var(--color-brand);
   --color-button-text-selected: var(--color-accent-contrast);
 
+  --color-gradient-button-bg: linear-gradient(180deg, #f8f9fa 0%, #dce0e6 100%);
+
   --loading-bar-gradient: linear-gradient(to right, var(--color-brand) 0%, #00af5c 100%);
 
   --color-platform-fabric: #8a7b71;
@@ -84,6 +86,10 @@
   --color-platform-velocity: #4b98b0;
   --color-platform-waterfall: #5f83cb;
   --color-platform-sponge: #c49528;
+  --color-platform-ornithe: #6097ca;
+  --color-platform-bta-babric: #5ba938;
+  --color-platform-legacy-fabric: #6879f6;
+  --color-platform-nilloader: #dd5088;
 
   --hover-brightness: 0.9;
 }
@@ -182,6 +188,8 @@ html {
   --color-button-bg-selected: var(--color-brand-highlight);
   --color-button-text-selected: var(--color-brand);
 
+  --color-gradient-button-bg: linear-gradient(180deg, #3a3d47 0%, #33363d 100%);
+
   --loading-bar-gradient: linear-gradient(to right, var(--color-brand) 0%, #1ffa9a 100%);
 
   --color-platform-fabric: #dbb69b;
@@ -198,8 +206,14 @@ html {
   --color-platform-velocity: #83d5ef;
   --color-platform-waterfall: #78a4fb;
   --color-platform-sponge: #f9e580;
+  --color-platform-ornithe: #87c7ff;
+  --color-platform-bta-babric: #72cc4a;
+  --color-platform-legacy-fabric: #6879f6;
+  --color-platform-nilloader: #f45e9a;
 
   --hover-brightness: 1.25;
+
+  --experimental-color-button-bg: #33363d;
 }
 
 .oled-mode {
@@ -220,6 +234,8 @@ html {
     rgba(9, 18, 14, 0.6) 10%,
     rgba(19, 31, 23, 0.5) 100%
   );
+
+  --color-gradient-button-bg: linear-gradient(180deg, #1b1b20 0%, #25262b 100%);
 }
 
 .retro-mode {
@@ -257,7 +273,7 @@ html {
 }
 
 .dark-experiments {
-  --color-button-bg: #33363d;
+  --color-button-bg: var(--experimental-color-button-bg);
 }
 
 .dark-mode:not(.oled-mode),

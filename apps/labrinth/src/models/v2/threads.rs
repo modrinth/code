@@ -2,7 +2,8 @@ use crate::models::ids::{
     ImageId, ProjectId, ReportId, ThreadId, ThreadMessageId,
 };
 use crate::models::projects::ProjectStatus;
-use crate::models::users::{User, UserId};
+use crate::models::users::User;
+use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 

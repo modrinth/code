@@ -1,4 +1,7 @@
 {
+  "button.back": {
+    "defaultMessage": "Back"
+  },
   "button.cancel": {
     "defaultMessage": "Cancel"
   },
@@ -22,6 +25,9 @@
   },
   "button.edit": {
     "defaultMessage": "Edit"
+  },
+  "button.next": {
+    "defaultMessage": "Next"
   },
   "button.open-folder": {
     "defaultMessage": "Open folder"
@@ -172,6 +178,12 @@
   },
   "label.visit-your-profile": {
     "defaultMessage": "Visit your profile"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "Add payment method"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "Adding a payment method"
   },
   "notification.error.title": {
     "defaultMessage": "An error occurred"
@@ -484,6 +496,39 @@
   },
   "servers.notice.undismissable": {
     "defaultMessage": "Undismissable"
+  },
+  "servers.purchase.step.payment.description": {
+    "defaultMessage": "You won't be charged yet."
+  },
+  "servers.purchase.step.payment.prompt": {
+    "defaultMessage": "Select a payment method"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "Payment method"
+  },
+  "servers.purchase.step.region.title": {
+    "defaultMessage": "Region"
+  },
+  "servers.purchase.step.review.title": {
+    "defaultMessage": "Review"
+  },
+  "servers.region.central-europe": {
+    "defaultMessage": "Central Europe"
+  },
+  "servers.region.custom.prompt": {
+    "defaultMessage": "How much RAM do you want your server to have?"
+  },
+  "servers.region.north-america": {
+    "defaultMessage": "North America"
+  },
+  "servers.region.prompt": {
+    "defaultMessage": "Where would you like your server to be located?"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "Region not listed? <link>Let us know where you'd like to see Modrinth Servers next!</link>"
+  },
+  "servers.region.western-europe": {
+    "defaultMessage": "Western Europe"
   },
   "settings.account.title": {
     "defaultMessage": "Account and security"

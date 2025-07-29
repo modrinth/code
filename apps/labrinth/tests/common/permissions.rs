@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use actix_http::StatusCode;
 use actix_web::{dev::ServiceResponse, test};
 use futures::Future;
@@ -8,7 +7,7 @@ use serde_json::json;
 
 use crate::common::{
     api_common::ApiTeams,
-    database::{generate_random_name, ADMIN_USER_PAT},
+    database::{ADMIN_USER_PAT, generate_random_name},
 };
 
 use super::{

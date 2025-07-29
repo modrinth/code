@@ -15,14 +15,14 @@ use common::database::USER_USER_PAT;
 use common::environment::{with_test_environment, with_test_environment_all};
 use futures::StreamExt;
 use labrinth::database::models::version_item::VERSIONS_NAMESPACE;
+use labrinth::models::ids::VersionId;
 use labrinth::models::projects::{
-    Dependency, DependencyType, VersionId, VersionStatus, VersionType,
+    Dependency, DependencyType, VersionStatus, VersionType,
 };
 use labrinth::routes::v3::version_file::FileUpdateData;
 use serde_json::json;
 
-// importing common module.
-mod common;
+pub mod common;
 
 #[actix_rt::test]
 async fn test_get_version() {
@@ -163,7 +163,7 @@ async fn version_updates() {
 
             // Add 3 new versions, 1 before, and 2 after, with differing game_version/version_types/loaders
             let mut update_ids = vec![];
-            for (version_number, patch_value) in [
+            for (version_number, patch_value) in &[
                 (
                     "0.9.9",
                     json!({
@@ -185,9 +185,7 @@ async fn version_updates() {
                         "version_type": "beta"
                     }),
                 ),
-            ]
-            .iter()
-            {
+            ] {
                 let version = api
                     .add_public_version_deserialized(
                         *alpha_project_id_parsed,

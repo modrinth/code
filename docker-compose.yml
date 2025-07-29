@@ -1,4 +1,3 @@
-version: '3'
 services:
   postgres_db:
     image: postgres:alpine
@@ -7,10 +6,14 @@ services:
     ports:
       - '5432:5432'
     environment:
-      POSTGRES_DB: postgres
       POSTGRES_USER: labrinth
       POSTGRES_PASSWORD: labrinth
       POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+      test: ['CMD', 'pg_isready']
+      interval: 3s
+      timeout: 5s
+      retries: 3
   meilisearch:
     image: getmeili/meilisearch:v1.12.0
     restart: on-failure
@@ -21,6 +24,11 @@ services:
     environment:
       MEILI_MASTER_KEY: modrinth
       MEILI_HTTP_PAYLOAD_SIZE_LIMIT: 107374182400
+    healthcheck:
+      test: ['CMD', 'curl', '--fail', 'http://localhost:7700/health']
+      interval: 3s
+      timeout: 5s
+      retries: 3
   redis:
     image: redis:alpine
     restart: on-failure
@@ -28,6 +36,11 @@ services:
       - '6379:6379'
     volumes:
       - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'PING']
+      interval: 3s
+      timeout: 5s
+      retries: 3
   clickhouse:
     image: clickhouse/clickhouse-server
     ports:
@@ -35,6 +48,11 @@ services:
     environment:
       CLICKHOUSE_USER: default
       CLICKHOUSE_PASSWORD: default
+    healthcheck:
+      test: ['CMD', 'clickhouse-client', '--query', 'SELECT 1']
+      interval: 3s
+      timeout: 5s
+      retries: 3
 volumes:
   meilisearch-data:
   db-data:

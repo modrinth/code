@@ -1,14 +1,15 @@
 use std::collections::HashMap;
+use std::fmt::Write;
 
 use super::{
-    request_data::{self, get_public_version_creation_data},
     ApiV2,
+    request_data::{self, get_public_version_creation_data},
 };
 use crate::{
     assert_status,
     common::{
         api_common::{
-            models::CommonVersion, Api, ApiVersion, AppendsOptionalPat,
+            Api, ApiVersion, AppendsOptionalPat, models::CommonVersion,
         },
         dummy_data::TestFile,
     },
@@ -19,11 +20,9 @@ use actix_web::{
     test::{self, TestRequest},
 };
 use async_trait::async_trait;
+use labrinth::models::ids::ProjectId;
 use labrinth::{
-    models::{
-        projects::{ProjectId, VersionType},
-        v2::projects::LegacyVersion,
-    },
+    models::{projects::VersionType, v2::projects::LegacyVersion},
     routes::v2::version_file::FileUpdateData,
     util::actix::AppendsMultipart,
 };
@@ -385,32 +384,36 @@ impl ApiVersion for ApiV2 {
     ) -> ServiceResponse {
         let mut query_string = String::new();
         if let Some(game_versions) = game_versions {
-            query_string.push_str(&format!(
+            write!(
+                &mut query_string,
                 "&game_versions={}",
                 urlencoding::encode(
                     &serde_json::to_string(&game_versions).unwrap()
                 )
-            ));
+            )
+            .unwrap();
         }
         if let Some(loaders) = loaders {
-            query_string.push_str(&format!(
+            write!(
+                &mut query_string,
                 "&loaders={}",
                 urlencoding::encode(&serde_json::to_string(&loaders).unwrap())
-            ));
+            )
+            .unwrap();
         }
         if let Some(featured) = featured {
-            query_string.push_str(&format!("&featured={featured}"));
+            write!(&mut query_string, "&featured={featured}").unwrap();
         }
         if let Some(version_type) = version_type {
-            query_string.push_str(&format!("&version_type={version_type}"));
+            write!(&mut query_string, "&version_type={version_type}").unwrap();
         }
         if let Some(limit) = limit {
             let limit = limit.to_string();
-            query_string.push_str(&format!("&limit={limit}"));
+            write!(&mut query_string, "&limit={limit}").unwrap();
         }
         if let Some(offset) = offset {
             let offset = offset.to_string();
-            query_string.push_str(&format!("&offset={offset}"));
+            write!(&mut query_string, "&offset={offset}").unwrap();
         }
 
         let req = test::TestRequest::get()

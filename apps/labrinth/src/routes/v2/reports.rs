@@ -2,8 +2,8 @@ use crate::database::redis::RedisPool;
 use crate::models::reports::Report;
 use crate::models::v2::reports::LegacyReport;
 use crate::queue::session::AuthQueue;
-use crate::routes::{v2_reroute, v3, ApiError};
-use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
+use crate::routes::{ApiError, v2_reroute, v3};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use serde::Deserialize;
 use sqlx::PgPool;
 use validator::Validate;
@@ -43,12 +43,12 @@ pub async fn report_create(
 #[derive(Deserialize)]
 pub struct ReportsRequestOptions {
     #[serde(default = "default_count")]
-    count: i16,
+    count: u16,
     #[serde(default = "default_all")]
     all: bool,
 }
 
-fn default_count() -> i16 {
+fn default_count() -> u16 {
     100
 }
 fn default_all() -> bool {
@@ -60,7 +60,7 @@ pub async fn reports(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    count: web::Query<ReportsRequestOptions>,
+    request_opts: web::Query<ReportsRequestOptions>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::reports::reports(
@@ -68,8 +68,9 @@ pub async fn reports(
         pool,
         redis,
         web::Query(v3::reports::ReportsRequestOptions {
-            count: count.count,
-            all: count.all,
+            count: request_opts.count,
+            offset: 0,
+            all: request_opts.all,
         }),
         session_queue,
     )
@@ -126,7 +127,7 @@ pub async fn report_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    info: web::Path<(crate::models::reports::ReportId,)>,
+    info: web::Path<(crate::models::ids::ReportId,)>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let response =
@@ -156,7 +157,7 @@ pub async fn report_edit(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    info: web::Path<(crate::models::reports::ReportId,)>,
+    info: web::Path<(crate::models::ids::ReportId,)>,
     session_queue: web::Data<AuthQueue>,
     edit_report: web::Json<EditReport>,
 ) -> Result<HttpResponse, ApiError> {
@@ -181,7 +182,7 @@ pub async fn report_edit(
 pub async fn report_delete(
     req: HttpRequest,
     pool: web::Data<PgPool>,
-    info: web::Path<(crate::models::reports::ReportId,)>,
+    info: web::Path<(crate::models::ids::ReportId,)>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {

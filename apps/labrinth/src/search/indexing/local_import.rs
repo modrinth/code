@@ -11,8 +11,8 @@ use crate::database::models::loader_fields::{
     VersionField,
 };
 use crate::database::models::{
-    LoaderFieldEnumId, LoaderFieldEnumValueId, LoaderFieldId, ProjectId,
-    VersionId,
+    DBProjectId, DBVersionId, LoaderFieldEnumId, LoaderFieldEnumValueId,
+    LoaderFieldId,
 };
 use crate::models::projects::from_duplicate_version_fields;
 use crate::models::v2::projects::LegacyProject;
@@ -27,7 +27,7 @@ pub async fn index_local(
 
     // todo: loaders, project type, game versions
     struct PartialProject {
-        id: ProjectId,
+        id: DBProjectId,
         name: String,
         summary: String,
         downloads: i32,
@@ -56,7 +56,7 @@ pub async fn index_local(
         .fetch(pool)
         .map_ok(|m| {
             PartialProject {
-                id: ProjectId(m.id),
+                id: DBProjectId(m.id),
                 name: m.name,
                 summary: m.summary,
                 downloads: m.downloads,
@@ -82,7 +82,7 @@ pub async fn index_local(
 
     info!("Indexing local gallery!");
 
-    let mods_gallery: DashMap<ProjectId, Vec<PartialGallery>> = sqlx::query!(
+    let mods_gallery: DashMap<DBProjectId, Vec<PartialGallery>> = sqlx::query!(
         "
         SELECT mod_id, image_url, featured, ordering
         FROM mods_gallery
@@ -93,14 +93,14 @@ pub async fn index_local(
     .fetch(pool)
     .try_fold(
         DashMap::new(),
-        |acc: DashMap<ProjectId, Vec<PartialGallery>>, m| {
-            acc.entry(ProjectId(m.mod_id))
-                .or_default()
-                .push(PartialGallery {
+        |acc: DashMap<DBProjectId, Vec<PartialGallery>>, m| {
+            acc.entry(DBProjectId(m.mod_id)).or_default().push(
+                PartialGallery {
                     url: m.image_url,
                     featured: m.featured.unwrap_or(false),
                     ordering: m.ordering,
-                });
+                },
+            );
             async move { Ok(acc) }
         },
     )
@@ -108,7 +108,7 @@ pub async fn index_local(
 
     info!("Indexing local categories!");
 
-    let categories: DashMap<ProjectId, Vec<(String, bool)>> = sqlx::query!(
+    let categories: DashMap<DBProjectId, Vec<(String, bool)>> = sqlx::query!(
         "
         SELECT mc.joining_mod_id mod_id, c.category name, mc.is_additional is_additional
         FROM mods_categories mc
@@ -120,8 +120,8 @@ pub async fn index_local(
     .fetch(pool)
     .try_fold(
         DashMap::new(),
-        |acc: DashMap<ProjectId, Vec<(String, bool)>>, m| {
-            acc.entry(ProjectId(m.mod_id))
+        |acc: DashMap<DBProjectId, Vec<(String, bool)>>, m| {
+            acc.entry(DBProjectId(m.mod_id))
                 .or_default()
                 .push((m.name, m.is_additional));
             async move { Ok(acc) }
@@ -134,7 +134,7 @@ pub async fn index_local(
 
     info!("Indexing local org owners!");
 
-    let mods_org_owners: DashMap<ProjectId, String> = sqlx::query!(
+    let mods_org_owners: DashMap<DBProjectId, String> = sqlx::query!(
         "
         SELECT m.id mod_id, u.username
         FROM mods m
@@ -146,15 +146,15 @@ pub async fn index_local(
         &*project_ids,
     )
     .fetch(pool)
-    .try_fold(DashMap::new(), |acc: DashMap<ProjectId, String>, m| {
-        acc.insert(ProjectId(m.mod_id), m.username);
+    .try_fold(DashMap::new(), |acc: DashMap<DBProjectId, String>, m| {
+        acc.insert(DBProjectId(m.mod_id), m.username);
         async move { Ok(acc) }
     })
     .await?;
 
     info!("Indexing local team owners!");
 
-    let mods_team_owners: DashMap<ProjectId, String> = sqlx::query!(
+    let mods_team_owners: DashMap<DBProjectId, String> = sqlx::query!(
         "
         SELECT m.id mod_id, u.username
         FROM mods m
@@ -165,8 +165,8 @@ pub async fn index_local(
         &project_ids,
     )
     .fetch(pool)
-    .try_fold(DashMap::new(), |acc: DashMap<ProjectId, String>, m| {
-        acc.insert(ProjectId(m.mod_id), m.username);
+    .try_fold(DashMap::new(), |acc: DashMap<DBProjectId, String>, m| {
+        acc.insert(DBProjectId(m.mod_id), m.username);
         async move { Ok(acc) }
     })
     .await?;
@@ -362,7 +362,7 @@ pub async fn index_local(
                 let (_, v2_og_project_type) =
                     LegacyProject::get_project_type(&project_types);
                 let (client_side, server_side) =
-                    v2_reroute::convert_side_types_v2(
+                    v2_reroute::convert_v3_side_types_to_v2_side_types(
                         &unvectorized_loader_fields,
                         Some(&v2_og_project_type),
                     );
@@ -416,7 +416,7 @@ pub async fn index_local(
 }
 
 struct PartialVersion {
-    id: VersionId,
+    id: DBVersionId,
     loaders: Vec<String>,
     project_types: Vec<String>,
     version_fields: Vec<QueryVersionField>,
@@ -425,8 +425,8 @@ struct PartialVersion {
 async fn index_versions(
     pool: &PgPool,
     project_ids: Vec<i64>,
-) -> Result<HashMap<ProjectId, Vec<PartialVersion>>, IndexingError> {
-    let versions: HashMap<ProjectId, Vec<VersionId>> = sqlx::query!(
+) -> Result<HashMap<DBProjectId, Vec<PartialVersion>>, IndexingError> {
+    let versions: HashMap<DBProjectId, Vec<DBVersionId>> = sqlx::query!(
         "
         SELECT v.id, v.mod_id
         FROM versions v
@@ -437,10 +437,10 @@ async fn index_versions(
     .fetch(pool)
     .try_fold(
         HashMap::new(),
-        |mut acc: HashMap<ProjectId, Vec<VersionId>>, m| {
-            acc.entry(ProjectId(m.mod_id))
+        |mut acc: HashMap<DBProjectId, Vec<DBVersionId>>, m| {
+            acc.entry(DBProjectId(m.mod_id))
                 .or_default()
-                .push(VersionId(m.id));
+                .push(DBVersionId(m.id));
             async move { Ok(acc) }
         },
     )
@@ -459,7 +459,7 @@ async fn index_versions(
         .map(|x| x.0)
         .collect::<Vec<i64>>();
 
-    let loaders_ptypes: DashMap<VersionId, VersionLoaderData> = sqlx::query!(
+    let loaders_ptypes: DashMap<DBVersionId, VersionLoaderData> = sqlx::query!(
         "
         SELECT DISTINCT version_id,
             ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
@@ -476,7 +476,7 @@ async fn index_versions(
     )
     .fetch(pool)
     .map_ok(|m| {
-        let version_id = VersionId(m.version_id);
+        let version_id = DBVersionId(m.version_id);
 
         let version_loader_data = VersionLoaderData {
             loaders: m.loaders.unwrap_or_default(),
@@ -488,7 +488,7 @@ async fn index_versions(
     .await?;
 
     // Get version fields
-    let version_fields: DashMap<VersionId, Vec<QueryVersionField>> =
+    let version_fields: DashMap<DBVersionId, Vec<QueryVersionField>> =
         sqlx::query!(
             "
         SELECT version_id, field_id, int_value, enum_value, string_value
@@ -500,9 +500,9 @@ async fn index_versions(
         .fetch(pool)
         .try_fold(
             DashMap::new(),
-            |acc: DashMap<VersionId, Vec<QueryVersionField>>, m| {
+            |acc: DashMap<DBVersionId, Vec<QueryVersionField>>, m| {
                 let qvf = QueryVersionField {
-                    version_id: VersionId(m.version_id),
+                    version_id: DBVersionId(m.version_id),
                     field_id: LoaderFieldId(m.field_id),
                     int_value: m.int_value,
                     enum_value: if m.enum_value == -1 {
@@ -513,16 +513,16 @@ async fn index_versions(
                     string_value: m.string_value,
                 };
 
-                acc.entry(VersionId(m.version_id)).or_default().push(qvf);
+                acc.entry(DBVersionId(m.version_id)).or_default().push(qvf);
                 async move { Ok(acc) }
             },
         )
         .await?;
 
     // Convert to partial versions
-    let mut res_versions: HashMap<ProjectId, Vec<PartialVersion>> =
+    let mut res_versions: HashMap<DBProjectId, Vec<PartialVersion>> =
         HashMap::new();
-    for (project_id, version_ids) in versions.iter() {
+    for (project_id, version_ids) in &versions {
         for version_id in version_ids {
             // Extract version-specific data fetched
             // We use 'remove' as every version is only in the map once

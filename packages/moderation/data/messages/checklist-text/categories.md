@@ -1,0 +1,2 @@
+**Featured Tags:** %PROJECT_CATEGORIES% \
+**Additional Tags:** %PROJECT_ADDITIONAL_CATEGORIES%

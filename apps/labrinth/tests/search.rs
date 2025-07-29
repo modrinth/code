@@ -5,8 +5,8 @@ use common::database::*;
 use common::dummy_data::DUMMY_CATEGORIES;
 
 use ariadne::ids::base62_impl::parse_base62;
-use common::environment::with_test_environment;
 use common::environment::TestEnvironment;
+use common::environment::with_test_environment;
 use common::search::setup_search_projects;
 use futures::stream::StreamExt;
 use serde_json::json;
@@ -14,7 +14,7 @@ use serde_json::json;
 use crate::common::api_common::Api;
 use crate::common::api_common::ApiProject;
 
-mod common;
+pub mod common;
 
 // TODO: Revisit this wit   h the new modify_json in the version maker
 // That change here should be able to simplify it vastly
@@ -52,8 +52,11 @@ async fn search_projects() {
                     vec![1, 2, 3, 4],
                 ),
                 (json!([["project_types:modpack"]]), vec![4]),
-                (json!([["client_only:true"]]), vec![0, 2, 3, 7, 9]),
-                (json!([["server_only:true"]]), vec![0, 2, 3, 6, 7]),
+                (json!([["environment:server_only"]]), vec![0, 2, 3]),
+                (
+                    json!([["environment:client_or_server_prefers_both"]]),
+                    vec![6, 7],
+                ),
                 (json!([["open_source:true"]]), vec![0, 1, 2, 4, 5, 6, 7, 9]),
                 (json!([["license:MIT"]]), vec![1, 2, 4, 9]),
                 (json!([[r#"name:'Mysterious Project'"#]]), vec![2, 3]),
@@ -151,7 +154,7 @@ async fn index_swaps() {
                 test_env.api.remove_project("alpha", USER_USER_PAT).await;
             assert_status!(&resp, StatusCode::NO_CONTENT);
 
-            // We should not get any results, because the project has been deleted
+            // We should wait for deletions to be indexed
             let projects = test_env
                 .api
                 .search_deserialized(
@@ -162,21 +165,7 @@ async fn index_swaps() {
                 .await;
             assert_eq!(projects.total_hits, 0);
 
-            // But when we reindex, it should be gone
-            let resp = test_env.api.reset_search_index().await;
-            assert_status!(&resp, StatusCode::NO_CONTENT);
-
-            let projects = test_env
-                .api
-                .search_deserialized(
-                    None,
-                    Some(json!([["categories:fabric"]])),
-                    USER_USER_PAT,
-                )
-                .await;
-            assert_eq!(projects.total_hits, 0);
-
-            // Reindex again, should still be gone
+            // When we reindex, it should be still gone
             let resp = test_env.api.reset_search_index().await;
             assert_status!(&resp, StatusCode::NO_CONTENT);
 

@@ -1,13 +1,10 @@
-use crate::models::ids::Base62Id;
-use crate::models::ids::UserId;
+use crate::models::ids::{
+    ChargeId, ProductId, ProductPriceId, UserSubscriptionId,
+};
+use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Debug)]
-#[serde(from = "Base62Id")]
-#[serde(into = "Base62Id")]
-pub struct ProductId(pub u64);
 
 #[derive(Serialize, Deserialize)]
 pub struct Product {
@@ -28,11 +25,6 @@ pub enum ProductMetadata {
         storage: u32,
     },
 }
-
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Debug)]
-#[serde(from = "Base62Id")]
-#[serde(into = "Base62Id")]
-pub struct ProductPriceId(pub u64);
 
 #[derive(Serialize, Deserialize)]
 pub struct ProductPrice {
@@ -57,6 +49,7 @@ pub enum Price {
 #[serde(rename_all = "kebab-case")]
 pub enum PriceDuration {
     Monthly,
+    Quarterly,
     Yearly,
 }
 
@@ -64,6 +57,7 @@ impl PriceDuration {
     pub fn duration(&self) -> chrono::Duration {
         match self {
             PriceDuration::Monthly => chrono::Duration::days(30),
+            PriceDuration::Quarterly => chrono::Duration::days(90),
             PriceDuration::Yearly => chrono::Duration::days(365),
         }
     }
@@ -71,26 +65,29 @@ impl PriceDuration {
     pub fn from_string(string: &str) -> PriceDuration {
         match string {
             "monthly" => PriceDuration::Monthly,
+            "quarterly" => PriceDuration::Quarterly,
             "yearly" => PriceDuration::Yearly,
             _ => PriceDuration::Monthly,
         }
     }
+
     pub fn as_str(&self) -> &'static str {
         match self {
             PriceDuration::Monthly => "monthly",
+            PriceDuration::Quarterly => "quarterly",
             PriceDuration::Yearly => "yearly",
         }
     }
 
     pub fn iterator() -> impl Iterator<Item = PriceDuration> {
-        vec![PriceDuration::Monthly, PriceDuration::Yearly].into_iter()
+        vec![
+            PriceDuration::Monthly,
+            PriceDuration::Quarterly,
+            PriceDuration::Yearly,
+        ]
+        .into_iter()
     }
 }
-
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Debug)]
-#[serde(from = "Base62Id")]
-#[serde(into = "Base62Id")]
-pub struct UserSubscriptionId(pub u64);
 
 #[derive(Serialize, Deserialize)]
 pub struct UserSubscription {
@@ -103,11 +100,11 @@ pub struct UserSubscription {
     pub metadata: Option<SubscriptionMetadata>,
 }
 
-impl From<crate::database::models::user_subscription_item::UserSubscriptionItem>
+impl From<crate::database::models::user_subscription_item::DBUserSubscription>
     for UserSubscription
 {
     fn from(
-        x: crate::database::models::user_subscription_item::UserSubscriptionItem,
+        x: crate::database::models::user_subscription_item::DBUserSubscription,
     ) -> Self {
         Self {
             id: x.id.into(),
@@ -148,13 +145,8 @@ impl SubscriptionStatus {
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum SubscriptionMetadata {
-    Pyro { id: String },
+    Pyro { id: String, region: Option<String> },
 }
-
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Debug)]
-#[serde(from = "Base62Id")]
-#[serde(into = "Base62Id")]
-pub struct ChargeId(pub u64);
 
 #[derive(Serialize, Deserialize)]
 pub struct Charge {

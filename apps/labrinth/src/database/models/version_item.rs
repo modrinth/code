@@ -1,6 +1,6 @@
+use super::DatabaseError;
 use super::ids::*;
 use super::loader_fields::VersionField;
-use super::DatabaseError;
 use crate::database::models::loader_fields::{
     QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
 };
@@ -20,9 +20,9 @@ const VERSION_FILES_NAMESPACE: &str = "versions_files";
 
 #[derive(Clone)]
 pub struct VersionBuilder {
-    pub version_id: VersionId,
-    pub project_id: ProjectId,
-    pub author_id: UserId,
+    pub version_id: DBVersionId,
+    pub project_id: DBProjectId,
+    pub author_id: DBUserId,
     pub name: String,
     pub version_number: String,
     pub changelog: String,
@@ -39,8 +39,8 @@ pub struct VersionBuilder {
 
 #[derive(Clone)]
 pub struct DependencyBuilder {
-    pub project_id: Option<ProjectId>,
-    pub version_id: Option<VersionId>,
+    pub project_id: Option<DBProjectId>,
+    pub version_id: Option<DBVersionId>,
     pub file_name: Option<String>,
     pub dependency_type: String,
 }
@@ -48,11 +48,11 @@ pub struct DependencyBuilder {
 impl DependencyBuilder {
     pub async fn insert_many(
         builders: Vec<Self>,
-        version_id: VersionId,
+        version_id: DBVersionId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), DatabaseError> {
         let mut project_ids = Vec::new();
-        for dependency in builders.iter() {
+        for dependency in &builders {
             project_ids.push(
                 dependency
                     .try_get_project_id(transaction)
@@ -97,7 +97,7 @@ impl DependencyBuilder {
     async fn try_get_project_id(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<Option<ProjectId>, DatabaseError> {
+    ) -> Result<Option<DBProjectId>, DatabaseError> {
         Ok(if let Some(project_id) = self.project_id {
             Some(project_id)
         } else if let Some(version_id) = self.version_id {
@@ -105,11 +105,11 @@ impl DependencyBuilder {
                 "
                 SELECT mod_id FROM versions WHERE id = $1
                 ",
-                version_id as VersionId,
+                version_id as DBVersionId,
             )
             .fetch_optional(&mut **transaction)
             .await?
-            .map(|x| ProjectId(x.mod_id))
+            .map(|x| DBProjectId(x.mod_id))
         } else {
             None
         })
@@ -129,9 +129,9 @@ pub struct VersionFileBuilder {
 impl VersionFileBuilder {
     pub async fn insert(
         self,
-        version_id: VersionId,
+        version_id: DBVersionId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<FileId, DatabaseError> {
+    ) -> Result<DBFileId, DatabaseError> {
         let file_id = generate_file_id(&mut *transaction).await?;
 
         sqlx::query!(
@@ -139,8 +139,8 @@ impl VersionFileBuilder {
             INSERT INTO files (id, version_id, url, filename, is_primary, size, file_type)
             VALUES ($1, $2, $3, $4, $5, $6, $7)
             ",
-            file_id as FileId,
-            version_id as VersionId,
+            file_id as DBFileId,
+            version_id as DBVersionId,
             self.url,
             self.filename,
             self.primary,
@@ -156,7 +156,7 @@ impl VersionFileBuilder {
                 INSERT INTO hashes (file_id, algorithm, hash)
                 VALUES ($1, $2, $3)
                 ",
-                file_id as FileId,
+                file_id as DBFileId,
                 hash.algorithm,
                 hash.hash,
             )
@@ -178,8 +178,8 @@ impl VersionBuilder {
     pub async fn insert(
         self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<VersionId, DatabaseError> {
-        let version = Version {
+    ) -> Result<DBVersionId, DatabaseError> {
+        let version = DBVersion {
             id: self.version_id,
             project_id: self.project_id,
             author_id: self.author_id,
@@ -203,7 +203,7 @@ impl VersionBuilder {
             SET updated = NOW()
             WHERE id = $1
             ",
-            self.project_id as ProjectId,
+            self.project_id as DBProjectId,
         )
         .execute(&mut **transaction)
         .await?;
@@ -229,9 +229,12 @@ impl VersionBuilder {
 
         let loader_versions = loaders
             .iter()
-            .map(|l| LoaderVersion::new(*l, version_id))
+            .map(|&loader_id| DBLoaderVersion {
+                loader_id,
+                version_id,
+            })
             .collect_vec();
-        LoaderVersion::insert_many(loader_versions, transaction).await?;
+        DBLoaderVersion::insert_many(loader_versions, transaction).await?;
 
         VersionField::insert_many(self.version_fields, transaction).await?;
 
@@ -239,13 +242,13 @@ impl VersionBuilder {
     }
 }
 
-#[derive(derive_new::new, Serialize, Deserialize)]
-pub struct LoaderVersion {
+#[derive(Serialize, Deserialize)]
+pub struct DBLoaderVersion {
     pub loader_id: LoaderId,
-    pub version_id: VersionId,
+    pub version_id: DBVersionId,
 }
 
-impl LoaderVersion {
+impl DBLoaderVersion {
     pub async fn insert_many(
         items: Vec<Self>,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -270,10 +273,10 @@ impl LoaderVersion {
 }
 
 #[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
-pub struct Version {
-    pub id: VersionId,
-    pub project_id: ProjectId,
-    pub author_id: UserId,
+pub struct DBVersion {
+    pub id: DBVersionId,
+    pub project_id: DBProjectId,
+    pub author_id: DBUserId,
     pub name: String,
     pub version_number: String,
     pub changelog: String,
@@ -286,7 +289,7 @@ pub struct Version {
     pub ordering: Option<i32>,
 }
 
-impl Version {
+impl DBVersion {
     pub async fn insert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -304,9 +307,9 @@ impl Version {
                 $9, $10, $11, $12
             )
             ",
-            self.id as VersionId,
-            self.project_id as ProjectId,
-            self.author_id as UserId,
+            self.id as DBVersionId,
+            self.project_id as DBProjectId,
+            self.author_id as DBUserId,
             &self.name,
             &self.version_number,
             self.changelog,
@@ -324,19 +327,17 @@ impl Version {
     }
 
     pub async fn remove_full(
-        id: VersionId,
+        id: DBVersionId,
         redis: &RedisPool,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Option<()>, DatabaseError> {
         let result = Self::get(id, &mut **transaction, redis).await?;
 
-        let result = if let Some(result) = result {
-            result
-        } else {
+        let Some(result) = result else {
             return Ok(None);
         };
 
-        Version::clear_cache(&result, redis).await?;
+        DBVersion::clear_cache(&result, redis).await?;
 
         sqlx::query!(
             "
@@ -344,7 +345,7 @@ impl Version {
             SET version_id = NULL
             WHERE version_id = $1
             ",
-            id as VersionId,
+            id as DBVersionId,
         )
         .execute(&mut **transaction)
         .await?;
@@ -354,7 +355,7 @@ impl Version {
             DELETE FROM version_fields vf
             WHERE vf.version_id = $1
             ",
-            id as VersionId,
+            id as DBVersionId,
         )
         .execute(&mut **transaction)
         .await?;
@@ -364,7 +365,7 @@ impl Version {
             DELETE FROM loaders_versions
             WHERE loaders_versions.version_id = $1
             ",
-            id as VersionId,
+            id as DBVersionId,
         )
         .execute(&mut **transaction)
         .await?;
@@ -378,7 +379,7 @@ impl Version {
                     (hashes.file_id = files.id)
             )
             ",
-            id as VersionId
+            id as DBVersionId
         )
         .execute(&mut **transaction)
         .await?;
@@ -388,7 +389,7 @@ impl Version {
             DELETE FROM files
             WHERE files.version_id = $1
             ",
-            id as VersionId,
+            id as DBVersionId,
         )
         .execute(&mut **transaction)
         .await?;
@@ -399,7 +400,7 @@ impl Version {
             "
             SELECT mod_id FROM versions WHERE id = $1
             ",
-            id as VersionId,
+            id as DBVersionId,
         )
         .fetch_one(&mut **transaction)
         .await?;
@@ -410,7 +411,7 @@ impl Version {
             SET dependency_id = NULL, mod_dependency_id = $2
             WHERE dependency_id = $1
             ",
-            id as VersionId,
+            id as DBVersionId,
             project_id.mod_id,
         )
         .execute(&mut **transaction)
@@ -428,7 +429,7 @@ impl Version {
             "
             DELETE FROM dependencies WHERE dependent_id = $1
             ",
-            id as VersionId,
+            id as DBVersionId,
         )
         .execute(&mut **transaction)
         .await?;
@@ -439,13 +440,13 @@ impl Version {
             "
             DELETE FROM versions WHERE id = $1
             ",
-            id as VersionId,
+            id as DBVersionId,
         )
         .execute(&mut **transaction)
         .await?;
 
-        crate::database::models::Project::clear_cache(
-            ProjectId(project_id.mod_id),
+        crate::database::models::DBProject::clear_cache(
+            DBProjectId(project_id.mod_id),
             None,
             None,
             redis,
@@ -456,10 +457,10 @@ impl Version {
     }
 
     pub async fn get<'a, 'b, E>(
-        id: VersionId,
+        id: DBVersionId,
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Option<QueryVersion>, DatabaseError>
+    ) -> Result<Option<VersionQueryResult>, DatabaseError>
     where
         E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
     {
@@ -469,10 +470,10 @@ impl Version {
     }
 
     pub async fn get_many<'a, E>(
-        version_ids: &[VersionId],
+        version_ids: &[DBVersionId],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<QueryVersion>, DatabaseError>
+    ) -> Result<Vec<VersionQueryResult>, DatabaseError>
     where
         E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
     {
@@ -483,7 +484,7 @@ impl Version {
                 let mut exec = exec.acquire().await?;
 
                 let loader_field_enum_value_ids = DashSet::new();
-                let version_fields: DashMap<VersionId, Vec<QueryVersionField>> = sqlx::query!(
+                let version_fields: DashMap<DBVersionId, Vec<QueryVersionField>> = sqlx::query!(
                     "
                     SELECT version_id, field_id, int_value, enum_value, string_value
                     FROM version_fields
@@ -494,9 +495,9 @@ impl Version {
                     .fetch(&mut *exec)
                     .try_fold(
                         DashMap::new(),
-                        |acc: DashMap<VersionId, Vec<QueryVersionField>>, m| {
+                        |acc: DashMap<DBVersionId, Vec<QueryVersionField>>, m| {
                             let qvf = QueryVersionField {
-                                version_id: VersionId(m.version_id),
+                                version_id: DBVersionId(m.version_id),
                                 field_id: LoaderFieldId(m.field_id),
                                 int_value: m.int_value,
                                 enum_value: if m.enum_value == -1  { None } else { Some(LoaderFieldEnumValueId(m.enum_value)) },
@@ -507,7 +508,7 @@ impl Version {
                                 loader_field_enum_value_ids.insert(LoaderFieldEnumValueId(m.enum_value));
                             }
 
-                            acc.entry(VersionId(m.version_id)).or_default().push(qvf);
+                            acc.entry(DBVersionId(m.version_id)).or_default().push(qvf);
                             async move { Ok(acc) }
                         },
                     )
@@ -522,7 +523,7 @@ impl Version {
                 }
 
                 let loader_field_ids = DashSet::new();
-                let loaders_ptypes_games: DashMap<VersionId, VersionLoaderData> = sqlx::query!(
+                let loaders_ptypes_games: DashMap<DBVersionId, VersionLoaderData> = sqlx::query!(
                     "
                     SELECT DISTINCT version_id,
                         ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
@@ -543,11 +544,11 @@ impl Version {
                     &version_ids
                 ).fetch(&mut *exec)
                     .map_ok(|m| {
-                        let version_id = VersionId(m.version_id);
+                        let version_id = DBVersionId(m.version_id);
 
                         // Add loader fields to the set we need to fetch
                         let loader_loader_field_ids = m.loader_fields.unwrap_or_default().into_iter().map(LoaderFieldId).collect::<Vec<_>>();
-                        for loader_field_id in loader_loader_field_ids.iter() {
+                        for loader_field_id in &loader_loader_field_ids {
                             loader_field_ids.insert(*loader_field_id);
                         }
 
@@ -611,14 +612,14 @@ impl Version {
 
                 #[derive(Deserialize)]
                 struct Hash {
-                    pub file_id: FileId,
+                    pub file_id: DBFileId,
                     pub algorithm: String,
                     pub hash: String,
                 }
 
                 #[derive(Deserialize)]
                 struct File {
-                    pub id: FileId,
+                    pub id: DBFileId,
                     pub url: String,
                     pub filename: String,
                     pub primary: bool,
@@ -628,7 +629,7 @@ impl Version {
 
                 let file_ids = DashSet::new();
                 let reverse_file_map = DashMap::new();
-                let files : DashMap<VersionId, Vec<File>> = sqlx::query!(
+                let files : DashMap<DBVersionId, Vec<File>> = sqlx::query!(
                     "
                     SELECT DISTINCT version_id, f.id, f.url, f.filename, f.is_primary, f.size, f.file_type
                     FROM files f
@@ -636,9 +637,9 @@ impl Version {
                     ",
                     &version_ids
                 ).fetch(&mut *exec)
-                    .try_fold(DashMap::new(), |acc : DashMap<VersionId, Vec<File>>, m| {
+                    .try_fold(DashMap::new(), |acc : DashMap<DBVersionId, Vec<File>>, m| {
                         let file = File {
-                            id: FileId(m.id),
+                            id: DBFileId(m.id),
                             url: m.url,
                             filename: m.filename,
                             primary: m.is_primary,
@@ -646,17 +647,17 @@ impl Version {
                             file_type: m.file_type.map(|x| FileType::from_string(&x)),
                         };
 
-                        file_ids.insert(FileId(m.id));
-                        reverse_file_map.insert(FileId(m.id), VersionId(m.version_id));
+                        file_ids.insert(DBFileId(m.id));
+                        reverse_file_map.insert(DBFileId(m.id), DBVersionId(m.version_id));
 
-                        acc.entry(VersionId(m.version_id))
+                        acc.entry(DBVersionId(m.version_id))
                             .or_default()
                             .push(file);
                         async move { Ok(acc) }
                     }
                     ).await?;
 
-                let hashes: DashMap<VersionId, Vec<Hash>> = sqlx::query!(
+                let hashes: DashMap<DBVersionId, Vec<Hash>> = sqlx::query!(
                     "
                     SELECT DISTINCT file_id, algorithm, encode(hash, 'escape') hash
                     FROM hashes
@@ -665,15 +666,15 @@ impl Version {
                     &file_ids.iter().map(|x| x.0).collect::<Vec<_>>()
                 )
                     .fetch(&mut *exec)
-                    .try_fold(DashMap::new(), |acc: DashMap<VersionId, Vec<Hash>>, m| {
+                    .try_fold(DashMap::new(), |acc: DashMap<DBVersionId, Vec<Hash>>, m| {
                         if let Some(found_hash) = m.hash {
                             let hash = Hash {
-                                file_id: FileId(m.file_id),
+                                file_id: DBFileId(m.file_id),
                                 algorithm: m.algorithm,
                                 hash: found_hash,
                             };
 
-                            if let Some(version_id) = reverse_file_map.get(&FileId(m.file_id)) {
+                            if let Some(version_id) = reverse_file_map.get(&DBFileId(m.file_id)) {
                                 acc.entry(*version_id).or_default().push(hash);
                             }
                         }
@@ -681,7 +682,7 @@ impl Version {
                     })
                     .await?;
 
-                let dependencies : DashMap<VersionId, Vec<QueryDependency>> = sqlx::query!(
+                let dependencies : DashMap<DBVersionId, Vec<DependencyQueryResult>> = sqlx::query!(
                     "
                     SELECT DISTINCT dependent_id as version_id, d.mod_dependency_id as dependency_project_id, d.dependency_id as dependency_version_id, d.dependency_file_name as file_name, d.dependency_type as dependency_type
                     FROM dependencies d
@@ -689,15 +690,15 @@ impl Version {
                     ",
                     &version_ids
                 ).fetch(&mut *exec)
-                    .try_fold(DashMap::new(), |acc : DashMap<_,Vec<QueryDependency>>, m| {
-                        let dependency = QueryDependency {
-                            project_id: m.dependency_project_id.map(ProjectId),
-                            version_id: m.dependency_version_id.map(VersionId),
+                    .try_fold(DashMap::new(), |acc : DashMap<_,Vec<DependencyQueryResult>>, m| {
+                        let dependency = DependencyQueryResult {
+                            project_id: m.dependency_project_id.map(DBProjectId),
+                            version_id: m.dependency_version_id.map(DBVersionId),
                             file_name: m.file_name,
                             dependency_type: m.dependency_type,
                         };
 
-                        acc.entry(VersionId(m.version_id))
+                        acc.entry(DBVersionId(m.version_id))
                             .or_default()
                             .push(dependency);
                         async move { Ok(acc) }
@@ -716,7 +717,7 @@ impl Version {
                 )
                     .fetch(&mut *exec)
                     .try_fold(DashMap::new(), |acc, v| {
-                        let version_id = VersionId(v.id);
+                        let version_id = DBVersionId(v.id);
                         let VersionLoaderData {
                             loaders,
                             project_types,
@@ -732,11 +733,11 @@ impl Version {
                             .filter(|x| loader_loader_field_ids.contains(&x.id))
                             .collect::<Vec<_>>();
 
-                        let query_version = QueryVersion {
-                            inner: Version {
-                                id: VersionId(v.id),
-                                project_id: ProjectId(v.mod_id),
-                                author_id: UserId(v.author_id),
+                        let query_version = VersionQueryResult {
+                            inner: DBVersion {
+                                id: DBVersionId(v.id),
+                                project_id: DBProjectId(v.mod_id),
+                                author_id: DBUserId(v.author_id),
                                 name: v.version_name,
                                 version_number: v.version_number,
                                 changelog: v.changelog,
@@ -753,7 +754,7 @@ impl Version {
                                 let mut files = files.into_iter().map(|x| {
                                     let mut file_hashes = HashMap::new();
 
-                                    for hash in hashes.iter() {
+                                    for hash in &hashes {
                                         if hash.file_id == x.id {
                                             file_hashes.insert(
                                                 hash.algorithm.clone(),
@@ -762,7 +763,7 @@ impl Version {
                                         }
                                     }
 
-                                    QueryFile {
+                                    FileQueryResult {
                                         id: x.id,
                                         url: x.url.clone(),
                                         filename: x.filename.clone(),
@@ -809,10 +810,10 @@ impl Version {
     pub async fn get_file_from_hash<'a, 'b, E>(
         algo: String,
         hash: String,
-        version_id: Option<VersionId>,
+        version_id: Option<DBVersionId>,
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Option<SingleFile>, DatabaseError>
+    ) -> Result<Option<DBFile>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -829,7 +830,7 @@ impl Version {
         hashes: &[String],
         executor: E,
         redis: &RedisPool,
-    ) -> Result<Vec<SingleFile>, DatabaseError>
+    ) -> Result<Vec<DBFile>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -849,7 +850,7 @@ impl Version {
                     ORDER BY v.date_published
                     ",
                     algorithm,
-                    &file_ids.into_iter().flat_map(|x| x.split('_').last().map(|x| x.as_bytes().to_vec())).collect::<Vec<_>>(),
+                    &file_ids.into_iter().filter_map(|x| x.split('_').last().map(|x| x.as_bytes().to_vec())).collect::<Vec<_>>(),
                 )
                     .fetch(executor)
                     .try_fold(DashMap::new(), |acc, f| {
@@ -869,10 +870,10 @@ impl Version {
                         if let Some(hash) = hashes.get(&algorithm) {
                             let key = format!("{algorithm}_{hash}");
 
-                            let file = SingleFile {
-                                id: FileId(f.id),
-                                version_id: VersionId(f.version_id),
-                                project_id: ProjectId(f.mod_id),
+                            let file = DBFile {
+                                id: DBFileId(f.id),
+                                version_id: DBVersionId(f.version_id),
+                                project_id: DBProjectId(f.mod_id),
                                 url: f.url,
                                 filename: f.filename,
                                 hashes,
@@ -896,7 +897,7 @@ impl Version {
     }
 
     pub async fn clear_cache(
-        version: &QueryVersion,
+        version: &VersionQueryResult,
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
@@ -924,28 +925,28 @@ impl Version {
 }
 
 #[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
-pub struct QueryVersion {
-    pub inner: Version,
+pub struct VersionQueryResult {
+    pub inner: DBVersion,
 
-    pub files: Vec<QueryFile>,
+    pub files: Vec<FileQueryResult>,
     pub version_fields: Vec<VersionField>,
     pub loaders: Vec<String>,
     pub project_types: Vec<String>,
     pub games: Vec<String>,
-    pub dependencies: Vec<QueryDependency>,
+    pub dependencies: Vec<DependencyQueryResult>,
 }
 
 #[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
-pub struct QueryDependency {
-    pub project_id: Option<ProjectId>,
-    pub version_id: Option<VersionId>,
+pub struct DependencyQueryResult {
+    pub project_id: Option<DBProjectId>,
+    pub version_id: Option<DBVersionId>,
     pub file_name: Option<String>,
     pub dependency_type: String,
 }
 
 #[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
-pub struct QueryFile {
-    pub id: FileId,
+pub struct FileQueryResult {
+    pub id: DBFileId,
     pub url: String,
     pub filename: String,
     pub hashes: HashMap<String, String>,
@@ -955,10 +956,10 @@ pub struct QueryFile {
 }
 
 #[derive(Clone, Deserialize, Serialize)]
-pub struct SingleFile {
-    pub id: FileId,
-    pub version_id: VersionId,
-    pub project_id: ProjectId,
+pub struct DBFile {
+    pub id: DBFileId,
+    pub version_id: DBVersionId,
+    pub project_id: DBProjectId,
     pub url: String,
     pub filename: String,
     pub hashes: HashMap<String, String>,
@@ -967,19 +968,19 @@ pub struct SingleFile {
     pub file_type: Option<FileType>,
 }
 
-impl std::cmp::Ord for QueryVersion {
+impl std::cmp::Ord for VersionQueryResult {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.inner.cmp(&other.inner)
     }
 }
 
-impl std::cmp::PartialOrd for QueryVersion {
+impl std::cmp::PartialOrd for VersionQueryResult {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl std::cmp::Ord for Version {
+impl std::cmp::Ord for DBVersion {
     fn cmp(&self, other: &Self) -> Ordering {
         let ordering_order = match (self.ordering, other.ordering) {
             (None, None) => Ordering::Equal,
@@ -995,7 +996,7 @@ impl std::cmp::Ord for Version {
     }
 }
 
-impl std::cmp::PartialOrd for Version {
+impl std::cmp::PartialOrd for DBVersion {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
@@ -1032,21 +1033,21 @@ mod tests {
         id: i64,
         ordering: Option<i32>,
         date_published: DateTime<Utc>,
-    ) -> Version {
-        Version {
-            id: VersionId(id),
+    ) -> DBVersion {
+        DBVersion {
+            id: DBVersionId(id),
             ordering,
             date_published,
-            project_id: ProjectId(0),
-            author_id: UserId(0),
-            name: Default::default(),
-            version_number: Default::default(),
-            changelog: Default::default(),
-            downloads: Default::default(),
-            version_type: Default::default(),
-            featured: Default::default(),
+            project_id: DBProjectId(0),
+            author_id: DBUserId(0),
+            name: String::new(),
+            version_number: String::new(),
+            changelog: String::new(),
+            downloads: 0,
+            version_type: String::new(),
+            featured: false,
             status: VersionStatus::Listed,
-            requested_status: Default::default(),
+            requested_status: None,
         }
     }
 }

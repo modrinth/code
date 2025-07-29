@@ -114,11 +114,10 @@
 <script setup lang="ts">
 import { EditIcon, TransferIcon } from "@modrinth/assets";
 import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
-
-import type { Server } from "~/composables/pyroServers";
+import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: ModrinthServer;
 }>();
 
 const data = computed(() => props.server.general);
@@ -156,26 +155,18 @@ const saveGeneral = async () => {
     if (serverSubdomain.value !== data.value?.net?.domain) {
       try {
         // type shit backend makes me do
-        const response = await props.server.network?.checkSubdomainAvailability(
+        const available = await props.server.network?.checkSubdomainAvailability(
           serverSubdomain.value,
         );
-        if (response === undefined) {
-          throw new Error("Failed to check subdomain availability");
-        }
 
-        if (typeof response === "object" && response !== null && "available" in response) {
-          const typedResponse = response as { available: boolean };
-          if (!typedResponse.available) {
-            addNotification({
-              group: "serverOptions",
-              type: "error",
-              title: "Subdomain not available",
-              text: "The subdomain you entered is already in use.",
-            });
-            return;
-          }
-        } else {
-          throw new Error("Invalid response format from availability check");
+        if (!available) {
+          addNotification({
+            group: "serverOptions",
+            type: "error",
+            title: "Subdomain not available",
+            text: "The subdomain you entered is already in use.",
+          });
+          return;
         }
 
         await props.server.network?.changeSubdomain(serverSubdomain.value);
