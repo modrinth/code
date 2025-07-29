@@ -1,9 +1,9 @@
 import type { Nag, NagContext } from '../../types/nags'
 import { useVIntl, defineMessage } from '@vintl/vintl'
 
-export const MIN_DESCRIPTION_CHARS = 500
-export const MAX_HEADER_LENGTH = 100
-export const MIN_SUMMARY_CHARS = 35
+export const MIN_DESCRIPTION_CHARS = 200
+export const MAX_HEADER_LENGTH = 80
+export const MIN_SUMMARY_CHARS = 30
 
 function analyzeHeaderLength(markdown: string): { hasLongHeaders: boolean; longHeaders: string[] } {
   if (!markdown) return { hasLongHeaders: false, longHeaders: [] }
