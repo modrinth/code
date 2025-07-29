@@ -1,3 +1,4 @@
+import { renderHighlightedString } from '@modrinth/utils'
 import type { Nag, NagContext } from '../../types/nags'
 import { useVIntl, defineMessage } from '@vintl/vintl'
 
@@ -5,7 +6,10 @@ export const MIN_DESCRIPTION_CHARS = 200
 export const MAX_HEADER_LENGTH = 80
 export const MIN_SUMMARY_CHARS = 30
 
-function analyzeHeaderLength(markdown: string): { hasLongHeaders: boolean; longHeaders: string[] } {
+export function analyzeHeaderLength(markdown: string): {
+  hasLongHeaders: boolean
+  longHeaders: string[]
+} {
   if (!markdown) return { hasLongHeaders: false, longHeaders: [] }
 
   const withoutCodeBlocks = markdown.replace(/```[\s\S]*?```/g, '').replace(/`[^`]*`/g, '')
@@ -34,7 +38,10 @@ function analyzeHeaderLength(markdown: string): { hasLongHeaders: boolean; longH
   }
 }
 
-function analyzeImageContent(markdown: string): { imageHeavy: boolean; hasEmptyAltText: boolean } {
+export function analyzeImageContent(markdown: string): {
+  imageHeavy: boolean
+  hasEmptyAltText: boolean
+} {
   if (!markdown) return { imageHeavy: false, hasEmptyAltText: false }
 
   const withoutCodeBlocks = markdown.replace(/```[\s\S]*?```/g, '').replace(/`[^`]*`/g, '')
@@ -67,6 +74,25 @@ function analyzeImageContent(markdown: string): { imageHeavy: boolean; hasEmptyA
   return { imageHeavy, hasEmptyAltText }
 }
 
+export function countText(markdown: string): number {
+  const htmlString = renderHighlightedString(markdown)
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(htmlString, 'text/html')
+  const walker = document.createTreeWalker(doc, NodeFilter.SHOW_TEXT)
+
+  const textList: string[] = []
+  let currentNode: Node | null = walker.currentNode
+
+  while (currentNode) {
+    if (currentNode.textContent !== null) {
+      textList.push(currentNode.textContent)
+    }
+    currentNode = walker.nextNode()
+  }
+
+  return textList.join(' ').trim().length
+}
+
 export const descriptionNags: Nag[] = [
   {
     id: 'description-too-short',
@@ -76,23 +102,24 @@ export const descriptionNags: Nag[] = [
     }),
     description: (context: NagContext) => {
       const { formatMessage } = useVIntl()
+      const readableLength = countText(context.project.body || '')
 
       return formatMessage(
         defineMessage({
           id: 'nags.description-too-short.description',
           defaultMessage:
-            'Your description is {length} characters. At least {minChars} characters is recommended to create a clear and informative Description.',
+            'Your description is {length} readable characters. At least {minChars} characters is recommended to create a clear and informative Description.',
         }),
         {
-          length: context.project.body?.length || 0,
+          length: readableLength,
           minChars: MIN_DESCRIPTION_CHARS,
         },
       )
     },
     status: 'warning',
     shouldShow: (context: NagContext) => {
-      const bodyLength = context.project.body?.trim()?.length || 0
-      return bodyLength < MIN_DESCRIPTION_CHARS && bodyLength !== 0
+      const readableLength = countText(context.project.body || '')
+      return readableLength < MIN_DESCRIPTION_CHARS && readableLength > 0
     },
     link: {
       path: 'settings/description',
