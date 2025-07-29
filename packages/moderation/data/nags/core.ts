@@ -11,10 +11,9 @@ export const coreNags: Nag[] = [
     }),
     description: defineMessage({
       id: 'nags.moderator-feedback.description',
-      defaultMessage:
-        'Review any feedback from moderators regarding your project before resubmitting.',
+      defaultMessage: 'Review and address all concerns from Moderation before resubmitting.',
     }),
-    status: 'suggestion',
+    status: 'warning',
     shouldShow: (context: NagContext) =>
       context.tags.rejectedStatuses.includes(context.project.status),
     link: {
@@ -59,8 +58,7 @@ export const coreNags: Nag[] = [
         "A description that clearly describes the project's purpose and function is required.",
     }),
     status: 'required',
-    shouldShow: (context: NagContext) =>
-      context.project.body === '' || context.project.body.startsWith('# Placeholder description'),
+    shouldShow: (context: NagContext) => context.project.body === '',
     link: {
       path: 'settings/description',
       title: defineMessage({
@@ -79,7 +77,7 @@ export const coreNags: Nag[] = [
     description: defineMessage({
       id: 'nags.add-icon.description',
       defaultMessage:
-        'Your project should have a nice-looking icon to uniquely identify your project at a glance.',
+        'Adding a unique, relevant, and engaging icon makes your project identifiable and helps it stand out.',
     }),
     status: 'suggestion',
     shouldShow: (context: NagContext) => !context.project.icon_url,
@@ -100,7 +98,8 @@ export const coreNags: Nag[] = [
     }),
     description: defineMessage({
       id: 'nags.feature-gallery-image.description',
-      defaultMessage: 'Featured gallery images may be the first impression of many users.',
+      defaultMessage:
+        'The featured gallery image is often how your project makes its first impression.',
     }),
     status: 'suggestion',
     shouldShow: (context: NagContext) => {
@@ -124,7 +123,8 @@ export const coreNags: Nag[] = [
     }),
     description: defineMessage({
       id: 'nags.select-tags.description',
-      defaultMessage: 'Select all tags that apply to your project.',
+      defaultMessage:
+        'Select the tags that correctly apply to your project to make sure the right users find it.',
     }),
     status: 'suggestion',
     shouldShow: (context: NagContext) =>
