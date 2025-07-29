@@ -43,7 +43,7 @@
 
 <script lang="ts" setup>
 import { SaveIcon, TriangleAlertIcon } from "@modrinth/assets";
-import { MIN_DESCRIPTION_CHARS } from "@modrinth/moderation";
+import { countText, MIN_DESCRIPTION_CHARS } from "@modrinth/moderation";
 import { MarkdownEditor } from "@modrinth/ui";
 import { type Project, type TeamMember, TeamMemberPermission } from "@modrinth/utils";
 import { computed, ref } from "vue";
@@ -60,10 +60,10 @@ const description = ref(props.project.body);
 
 const descriptionWarning = computed(() => {
   const text = description.value?.trim() || "";
-  const charCount = text.length;
+  const charCount = countText(text);
 
   if (charCount < MIN_DESCRIPTION_CHARS) {
-    return `It's recommended to have a description with at least ${MIN_DESCRIPTION_CHARS} characters. (${charCount}/${MIN_DESCRIPTION_CHARS})`;
+    return `It's recommended to have a description with at least ${MIN_DESCRIPTION_CHARS} readable characters. (${charCount}/${MIN_DESCRIPTION_CHARS})`;
   }
 
   return null;
