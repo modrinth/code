@@ -115,7 +115,7 @@ export const linksNags: Nag[] = [
         )
       }
     },
-    status: 'required',
+    status: 'warning',
     shouldShow: (context: NagContext) => {
       const licenseUrl = context.project.license.url
       if (!licenseUrl) return false
