@@ -98,7 +98,7 @@
             <div v-if="toggleActions.length > 0" class="toggle-actions-group space-y-3">
               <template v-for="action in toggleActions" :key="getActionKey(action)">
                 <Checkbox
-                  :model-value="actionStates[getActionId(action)]?.selected ?? false"
+                  :model-value="isActionSelected(action)"
                   :label="action.label"
                   :description="action.description"
                   :disabled="false"
@@ -644,12 +644,17 @@ function initializeStageActions(stage: Stage, stageIndex: number) {
 }
 
 function getActionId(action: Action, index?: number): string {
+  // If index is not provided, find it in the current stage's actions
+  if (index === undefined) {
+    index = currentStageObj.value.actions.indexOf(action);
+  }
   return getActionIdForStage(action, currentStage.value, index);
 }
 
 function getActionKey(action: Action): string {
-  const index = visibleActions.value.indexOf(action);
-  return `${currentStage.value}-${index}-${getActionId(action)}`;
+  // Find the actual index of this action in the current stage's actions array
+  const index = currentStageObj.value.actions.indexOf(action);
+  return `${currentStage.value}-${index}-${getActionId(action, index)}`;
 }
 
 const visibleActions = computed(() => {
@@ -719,7 +724,8 @@ const multiSelectActions = computed(() =>
 );
 
 function getDropdownValue(action: DropdownAction) {
-  const actionId = getActionId(action);
+  const actionIndex = currentStageObj.value.actions.indexOf(action);
+  const actionId = getActionId(action, actionIndex);
   const visibleOptions = getVisibleDropdownOptions(action);
   const currentValue = actionStates.value[actionId]?.value ?? action.defaultOption ?? 0;
 
@@ -734,12 +740,14 @@ function getDropdownValue(action: DropdownAction) {
 }
 
 function isActionSelected(action: Action): boolean {
-  const actionId = getActionId(action);
+  const actionIndex = currentStageObj.value.actions.indexOf(action);
+  const actionId = getActionId(action, actionIndex);
   return actionStates.value[actionId]?.selected || false;
 }
 
 function toggleAction(action: Action) {
-  const actionId = getActionId(action);
+  const actionIndex = currentStageObj.value.actions.indexOf(action);
+  const actionId = getActionId(action, actionIndex);
   const state = actionStates.value[actionId];
   if (state) {
     state.selected = !state.selected;
@@ -748,7 +756,8 @@ function toggleAction(action: Action) {
 }
 
 function selectDropdownOption(action: DropdownAction, selected: any) {
-  const actionId = getActionId(action);
+  const actionIndex = currentStageObj.value.actions.indexOf(action);
+  const actionId = getActionId(action, actionIndex);
   const state = actionStates.value[actionId];
   if (state && selected !== undefined && selected !== null) {
     const optionIndex = action.options.findIndex(
@@ -764,7 +773,8 @@ function selectDropdownOption(action: DropdownAction, selected: any) {
 }
 
 function isChipSelected(action: MultiSelectChipsAction, optionIndex: number): boolean {
-  const actionId = getActionId(action);
+  const actionIndex = currentStageObj.value.actions.indexOf(action);
+  const actionId = getActionId(action, actionIndex);
   const selectedSet = actionStates.value[actionId]?.value as Set<number> | undefined;
 
   const visibleOptions = getVisibleMultiSelectOptions(action);
@@ -775,7 +785,8 @@ function isChipSelected(action: MultiSelectChipsAction, optionIndex: number): bo
 }
 
 function toggleChip(action: MultiSelectChipsAction, optionIndex: number) {
-  const actionId = getActionId(action);
+  const actionIndex = currentStageObj.value.actions.indexOf(action);
+  const actionId = getActionId(action, actionIndex);
   const state = actionStates.value[actionId];
   if (state && state.value instanceof Set) {
     const visibleOptions = getVisibleMultiSelectOptions(action);
