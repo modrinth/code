@@ -20,11 +20,10 @@ function analyzeHeaderLength(markdown: string): { hasLongHeaders: boolean; longH
     const sentenceEnders = /[.!?]+/g
     const sentences = headerText.split(sentenceEnders).filter((s) => s.trim().length > 0)
 
-    const hasSentenceEnders = sentenceEnders.test(headerText)
     const isVeryLong = headerText.length > MAX_HEADER_LENGTH
     const hasMultipleSentences = sentences.length > 1
 
-    if (hasSentenceEnders || isVeryLong || hasMultipleSentences) {
+    if (isVeryLong || hasMultipleSentences) {
       longHeaders.push(headerText)
     }
   })
