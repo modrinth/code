@@ -29,7 +29,8 @@ public final class MinecraftTransformer extends ClassNodeTransformer {
     private static void addServerJoinSupport(ClassNode classNode) {
         String setServerName = null;
         for (final MethodNode method : classNode.methods) {
-            if (method.desc.equals(SET_SERVER_NAME_DESC)) {
+            if (method.desc.equals(SET_SERVER_NAME_DESC) && method.name.indexOf('$') == -1) {
+                // Check for $ is because Mixin-injected methods should have $ in it
                 if (setServerName == null) {
                     setServerName = method.name;
                 } else {
