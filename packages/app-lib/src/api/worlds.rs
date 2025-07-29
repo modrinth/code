@@ -1,4 +1,3 @@
-use crate::api::server_address;
 use crate::data::ModLoader;
 use crate::launcher::get_loader_version_from_profile;
 use crate::profile::get_full_path;

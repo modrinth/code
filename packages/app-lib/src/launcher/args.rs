@@ -115,6 +115,7 @@ pub fn get_jvm_arguments(
     libraries_path: &Path,
     log_configs_path: &Path,
     class_paths: &str,
+    agent_path: &Path,
     version_name: &str,
     memory: MemorySettings,
     custom_args: Vec<String>,
@@ -164,6 +165,18 @@ pub fn get_jvm_arguments(
         let full_path = full_path.to_string_lossy();
         parsed_arguments.push(argument.replace("${path}", &full_path));
     }
+    parsed_arguments.push(format!(
+        "-javaagent:{}",
+        canonicalize(agent_path)
+            .map_err(|_| {
+                crate::ErrorKind::LauncherError(format!(
+                    "Specified Java Agent path {} does not exist",
+                    libraries_path.to_string_lossy()
+                ))
+                .as_error()
+            })?
+            .to_string_lossy()
+    ));
     match (quick_play_type, quick_play_version) {
         (
             QuickPlayType::Singleplayer(world),

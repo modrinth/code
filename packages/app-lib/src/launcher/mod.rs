@@ -641,6 +641,7 @@ pub async fn launch_minecraft(
                 &java_version.architecture,
                 minecraft_updated,
             )?,
+            &main_class_path,
             &version_jar,
             *memory,
             Vec::from(java_args),
