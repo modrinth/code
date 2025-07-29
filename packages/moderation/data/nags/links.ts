@@ -1,10 +1,10 @@
 import type { Nag, NagContext } from '../../types/nags'
-import { formatProjectType } from '@modrinth/utils'
+import { formatProjectType, type Project } from '@modrinth/utils'
 import { useVIntl, defineMessage } from '@vintl/vintl'
 
 export const commonLinkDomains = {
   source: ['github.com', 'gitlab.com', 'bitbucket.org', 'codeberg.org', 'git.sr.ht'],
-  issues: ['github.com', 'gitlab.com', 'bitbucket.org', 'codeberg.org'],
+  issues: ['github.com', 'gitlab.com', 'bitbucket.org', 'codeberg.org', 'docs.google.com'],
   discord: ['discord.gg', 'discord.com'],
   licenseBlocklist: [
     'youtube.com',
@@ -101,7 +101,7 @@ export const linksNags: Nag[] = [
           defineMessage({
             id: 'nags.invalid-license-url.description.domain',
             defaultMessage:
-              'Your license URL points to {domain}, which is not appropriate for license information. License URLs should link to the actual license text or legal documentation, not social media, gaming platforms etc.',
+              'Your license URL points to {domain}, which is not appropriate for license information. License URLs should link directly to your license file, not social media, gaming platforms etc.',
           }),
           { domain },
         )
@@ -142,7 +142,7 @@ export const linksNags: Nag[] = [
     id: 'gpl-license-source-required',
     title: defineMessage({
       id: 'nags.gpl-license-source-required.title',
-      defaultMessage: 'GPL license requires source',
+      defaultMessage: 'License requires source',
     }),
     description: (context: NagContext) => {
       const { formatMessage } = useVIntl()
@@ -151,7 +151,7 @@ export const linksNags: Nag[] = [
         defineMessage({
           id: 'nags.gpl-license-source-required.description',
           defaultMessage:
-            'Your {projectType} uses a GPL license which requires source code to be available. Please provide a source code link or consider using a different license.',
+            'Your {projectType} uses a license which requires source code to be available. Please provide a source code link or sources file, or consider using a different license.',
         }),
         {
           projectType: formatProjectType(context.project.project_type).toLowerCase(),
@@ -181,12 +181,17 @@ export const linksNags: Nag[] = [
         'AGPL-3.0+',
         'AGPL-3.0-only',
         'AGPL-3.0-or-later',
+        'MPL-2.0',
       ]
 
       const isGplLicense = gplLicenses.includes(context.project.license.id)
       const hasSourceUrl = !!context.project.source_url
+      const notSourceAsDistributed = (context) => {
+        let project = context.project as Project & { actualProjectType: string }
+        return context.project.project_type === 'mod' || project.actualProjectType === 'plugin'
+      }
 
-      return isGplLicense && !hasSourceUrl
+      return isGplLicense && notSourceAsDistributed(context) && !hasSourceUrl
     },
     link: {
       path: 'settings/links',
