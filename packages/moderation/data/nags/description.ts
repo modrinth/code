@@ -152,7 +152,7 @@ export const descriptionNags: Nag[] = [
         defineMessage({
           id: 'nags.summary-too-short.description',
           defaultMessage:
-            'Your summary is {length} characters. It should ideally be around {minChars} characters, one short sentence about your project.',
+            'Your summary is {length} characters. At least {minChars} characters is recommended to create an informative and enticing Summary.',
         }),
         {
           length: context.project.description?.length || 0,
@@ -182,10 +182,9 @@ export const descriptionNags: Nag[] = [
     }),
     description: defineMessage({
       id: 'nags.minecraft-title-clause.description',
-      defaultMessage:
-        'Please remove "Minecraft" from your title. You cannot use "Minecraft" in your title for legal reasons.',
+      defaultMessage: `Projects must not use Minecraft's branding or include "Minecraft" as a significant part of the Name.`,
     }),
-    status: 'required',
+    status: 'warning',
     shouldShow: (context: NagContext) => {
       const title = context.project.title?.toLowerCase() || ''
       const wordsInTitle = title.split(' ').filter((word) => word.length > 0)
@@ -204,12 +203,12 @@ export const descriptionNags: Nag[] = [
     id: 'title-contains-technical-info',
     title: defineMessage({
       id: 'nags.title-contains-technical-info.title',
-      defaultMessage: 'Title contains loader or version info',
+      defaultMessage: 'Title contains unnecessary information',
     }),
     description: defineMessage({
       id: 'nags.title-contains-technical-info.description',
       defaultMessage:
-        'Removing these helps keep titles clean and makes your project easier to find. Version and loader information is automatically displayed alongside your project.',
+        "Keeping your project's Name clean and makes it memorable easier to find. Version and loader information is automatically displayed alongside your project.",
     }),
     status: 'warning',
     shouldShow: (context: NagContext) => {
@@ -242,7 +241,7 @@ export const descriptionNags: Nag[] = [
     description: defineMessage({
       id: 'nags.summary-same-as-title.description',
       defaultMessage:
-        "Your summary is the same as your project name. Please change it. It's recommended to have a unique summary to provide more context about your project.",
+        "Your summary can not be the same as your project's Name. It's important to create an informative and enticing Summary.",
     }),
     status: 'required',
     shouldShow: (context: NagContext) => {
@@ -268,7 +267,7 @@ export const descriptionNags: Nag[] = [
     description: defineMessage({
       id: 'nags.image-heavy-description.description',
       defaultMessage:
-        'Please add more descriptive text to help users understand your project, especially those using screen readers or with slow internet connections.',
+        'Your Description should contain sufficient plain text or image alt-text, keeping it accessible to those using screen readers or with slow internet connections.',
     }),
     status: 'warning',
     shouldShow: (context: NagContext) => {
