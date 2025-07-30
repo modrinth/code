@@ -1,28 +1,20 @@
 package com.modrinth.theseus.agent.transformers;
 
-import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.ClassNode;
 
-public abstract class ClassNodeTransformer extends ClassVisitor {
-    private final ClassNode classNode;
-    private final ClassVisitor parent;
-
-    private ClassNodeTransformer(int api, ClassNode classNode, ClassVisitor parent) {
-        super(api, classNode);
-        this.classNode = classNode;
-        this.parent = parent;
-    }
-
-    protected ClassNodeTransformer(int api, ClassVisitor parent) {
-        this(api, new ClassNode(api), parent);
-    }
-
-    protected abstract void transformClass(ClassNode classNode);
+public abstract class ClassNodeTransformer extends ClassTransformer {
+    protected abstract boolean transform(ClassNode classNode);
 
     @Override
-    public void visitEnd() {
-        super.visitEnd();
-        transformClass(classNode);
-        classNode.accept(parent);
+    public final boolean transform(ClassReader reader, ClassWriter writer) {
+        final ClassNode classNode = new ClassNode();
+        reader.accept(classNode, 0);
+        if (!transform(classNode)) {
+            return false;
+        }
+        classNode.accept(writer);
+        return true;
     }
 }

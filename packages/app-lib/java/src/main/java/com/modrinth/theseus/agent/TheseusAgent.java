@@ -1,5 +1,6 @@
 package com.modrinth.theseus.agent;
 
+import com.modrinth.theseus.agent.transformers.ClassTransformer;
 import com.modrinth.theseus.agent.transformers.MinecraftTransformer;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -12,9 +13,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.UnaryOperator;
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 
 @SuppressWarnings({"NullableProblems", "CallToPrintStackTrace"})
@@ -50,21 +49,23 @@ public final class TheseusAgent {
                     "===== Quick play singleplayer version: " + QuickPlaySingleplayerVersion.CURRENT + " =====");
         }
 
-        final Map<String, UnaryOperator<ClassVisitor>> transformers = new HashMap<>();
-        transformers.put("net/minecraft/client/Minecraft", MinecraftTransformer::new);
+        final Map<String, ClassTransformer> transformers = new HashMap<>();
+        transformers.put("net/minecraft/client/Minecraft", new MinecraftTransformer());
 
         instrumentation.addTransformer((loader, className, classBeingRedefined, protectionDomain, classData) -> {
-            final UnaryOperator<ClassVisitor> transformer = transformers.get(className);
+            final ClassTransformer transformer = transformers.get(className);
             if (transformer == null) {
                 return null;
             }
             final ClassReader reader = new ClassReader(classData);
-            // I would rather not COMPUTE_FRAMES, but manual framing is different between Java 1.5
-            // and Java 1.6, so doing it manually is not feasible.
-            final ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+            final ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS);
             try {
-                final ClassVisitor visitor = transformer.apply(writer);
-                reader.accept(visitor, 0);
+                if (!transformer.transform(reader, writer)) {
+                    if (DEBUG_AGENT) {
+                        System.out.println("Not writing " + className + " as its transformer returned false");
+                    }
+                    return null;
+                }
             } catch (Throwable t) {
                 new IllegalStateException("Failed to transform " + className, t).printStackTrace();
                 return null;
@@ -73,9 +74,9 @@ public final class TheseusAgent {
             if (DEBUG_AGENT) {
                 try {
                     final Path path = debugPath.resolve(className + ".class");
-                    System.out.println("Dumped class to " + path.toAbsolutePath());
                     Files.createDirectories(path.getParent());
                     Files.write(path, result);
+                    System.out.println("Dumped class to " + path.toAbsolutePath());
                 } catch (IOException e) {
                     new UncheckedIOException("Failed to dump class " + className, e).printStackTrace();
                 }

@@ -3,10 +3,10 @@ package com.modrinth.theseus.agent.transformers;
 import com.modrinth.theseus.agent.InsnPattern;
 import com.modrinth.theseus.agent.QuickPlayServerVersion;
 import java.util.ListIterator;
-import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FrameNode;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
@@ -19,15 +19,14 @@ public final class MinecraftTransformer extends ClassNodeTransformer {
     private static final String SET_SERVER_NAME_DESC = "(Ljava/lang/String;I)V";
     private static final InsnPattern[] INITIALIZE_THIS_PATTERN = {InsnPattern.opcode(Opcodes.INVOKESPECIAL)};
 
-    public MinecraftTransformer(ClassVisitor parent) {
-        super(Opcodes.ASM9, parent);
-    }
-
     @Override
-    protected void transformClass(ClassNode classNode) {
+    protected boolean transform(ClassNode classNode) {
+        boolean transformed = false;
         if (QuickPlayServerVersion.CURRENT == QuickPlayServerVersion.INJECTED) {
             addServerJoinSupport(classNode);
+            transformed = true;
         }
+        return transformed;
     }
 
     private static void addServerJoinSupport(ClassNode classNode) {
@@ -81,10 +80,16 @@ public final class MinecraftTransformer extends ClassNodeTransformer {
         //
         it.add(new JumpInsnNode(Opcodes.GOTO, doneQuickPlayLabel));
         it.add(noQuickPlayLabel);
+        if (needsStackMap(classNode)) {
+            it.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
+        }
         // String
         it.add(new InsnNode(Opcodes.POP));
         //
         it.add(doneQuickPlayLabel);
+        if (needsStackMap(classNode)) {
+            it.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
+        }
         //
     }
 }
