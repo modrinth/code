@@ -246,10 +246,8 @@ export const linksNags: Nag[] = [
         })
         return hasAdditional
       }
-      const notSourceAsDistributed = (context: NagContext) => {
-        let project = context.project as Project & { actualProjectType: string }
-        return context.project.project_type === 'mod' || project.actualProjectType === 'plugin'
-      }
+      const notSourceAsDistributed = (context: NagContext) =>
+        context.project.project_type === 'mod' || context.project.project_type === 'plugin'
 
       return (
         isGplLicense &&
