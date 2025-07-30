@@ -1,4 +1,4 @@
----
+## Warnings from AutoMod
 
 Unfortunately, our AutoMod cannot read your project's Description or your messages to moderation.  
 AutoMod will warn both you and our Moderation Staff about potential issues, but if you've already followed the necessary steps these warnings can safely be ignored.  
