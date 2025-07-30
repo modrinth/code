@@ -4,6 +4,9 @@ use crate::event::emit::{emit_loading, init_or_edit_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
 use crate::launcher::download::download_log_config;
 use crate::launcher::io::IOError;
+use crate::launcher::quick_play_version::{
+    QuickPlayServerVersion, QuickPlayVersion,
+};
 use crate::profile::QuickPlayType;
 use crate::state::{
     Credentials, JavaVersion, ProcessMetadata, ProfileInstallStage,
@@ -25,13 +28,7 @@ use tokio::process::Command;
 mod args;
 
 pub mod download;
-
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
-pub enum QuickPlayVersion {
-    Modern,
-    Middle,
-    Legacy,
-}
+pub mod quick_play_version;
 
 // All nones -> disallowed
 // 1+ true -> allowed
@@ -596,30 +593,14 @@ pub async fn launch_minecraft(
         io::create_dir_all(&natives_dir).await?;
     }
 
-    let quick_play_version = if version_index
-        <= minecraft
-            .versions
-            .iter()
-            .position(|x| x.id == "23w14a")
-            .unwrap_or(0)
-    {
-        QuickPlayVersion::Modern
-    } else if version_index
-        <= minecraft
-            .versions
-            .iter()
-            .position(|x| x.id == "13w17a")
-            .unwrap_or(0)
-    {
-        QuickPlayVersion::Middle
-    } else {
-        QuickPlayVersion::Legacy
-    };
+    let quick_play_version =
+        QuickPlayVersion::find_version(version_index, &minecraft.versions);
+    tracing::debug!(
+        "Found QuickPlayVersion for {}: {quick_play_version:?}",
+        profile.game_version
+    );
     if let QuickPlayType::Server(address) = &mut quick_play_type
-        && matches!(
-            quick_play_version,
-            QuickPlayVersion::Middle | QuickPlayVersion::Legacy
-        )
+        && quick_play_version.server >= QuickPlayServerVersion::BuiltinLegacy
     {
         address.resolve().await?;
     }

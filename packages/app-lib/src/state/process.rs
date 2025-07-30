@@ -493,8 +493,15 @@ impl Process {
                     if let Err(e) = Self::append_to_log_file(&log_path, &line) {
                         tracing::warn!("Failed to write to log file: {}", e);
                     }
-                    if let Err(e) = Self::maybe_handle_old_server_join_logging(profile_path, line.trim_ascii_end()).await {
-                        tracing::error!("Failed to handle old server join logging: {e}");
+                    if let Err(e) = Self::maybe_handle_old_server_join_logging(
+                        profile_path,
+                        line.trim_ascii_end(),
+                    )
+                    .await
+                    {
+                        tracing::error!(
+                            "Failed to handle old server join logging: {e}"
+                        );
                     }
                 }
 
@@ -558,23 +565,35 @@ impl Process {
                     )
                 })
             })?;
-        Self::parse_and_insert_server_join(profile_path, message, timestamp).await
+        Self::parse_and_insert_server_join(profile_path, message, timestamp)
+            .await
     }
 
-    async fn maybe_handle_old_server_join_logging(profile_path: &str, line: &str) -> crate::Result<()> {
-        if let Some((timestamp, message)) = line.split_once(" [CLIENT] [INFO] ") {
-            let timestamp = NaiveDateTime::parse_from_str(timestamp, "%Y-%m-%d %H:%M:%S")?
-                .and_local_timezone(chrono::Local)
-                .map(|x| x.to_utc())
-                .single()
-                .unwrap_or_else(Utc::now);
-            Self::parse_and_insert_server_join(profile_path, message, timestamp).await
+    async fn maybe_handle_old_server_join_logging(
+        profile_path: &str,
+        line: &str,
+    ) -> crate::Result<()> {
+        if let Some((timestamp, message)) = line.split_once(" [CLIENT] [INFO] ")
+        {
+            let timestamp =
+                NaiveDateTime::parse_from_str(timestamp, "%Y-%m-%d %H:%M:%S")?
+                    .and_local_timezone(chrono::Local)
+                    .map(|x| x.to_utc())
+                    .single()
+                    .unwrap_or_else(Utc::now);
+            Self::parse_and_insert_server_join(profile_path, message, timestamp)
+                .await
         } else {
-            Self::parse_and_insert_server_join(profile_path, line, Utc::now()).await
+            Self::parse_and_insert_server_join(profile_path, line, Utc::now())
+                .await
         }
     }
 
-    async fn parse_and_insert_server_join(profile_path: &str, message: &str, timestamp: DateTime<Utc>) -> crate::Result<()> {
+    async fn parse_and_insert_server_join(
+        profile_path: &str,
+        message: &str,
+        timestamp: DateTime<Utc>,
+    ) -> crate::Result<()> {
         let Some(host_port_string) = message.strip_prefix("Connecting to ")
         else {
             return Ok(());
@@ -594,8 +613,8 @@ impl Process {
             port,
             join_time: timestamp,
         }
-            .upsert(&state.pool)
-            .await?;
+        .upsert(&state.pool)
+        .await?;
         {
             let profile_path = profile_path.to_owned();
             let host = host.to_owned();
@@ -608,7 +627,7 @@ impl Process {
                         timestamp,
                     },
                 )
-                    .await;
+                .await;
             });
         }
 

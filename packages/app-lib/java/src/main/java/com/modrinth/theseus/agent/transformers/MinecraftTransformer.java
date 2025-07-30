@@ -54,7 +54,7 @@ public final class MinecraftTransformer extends ClassNodeTransformer {
 
         final LabelNode noQuickPlayLabel = new LabelNode();
         final LabelNode doneQuickPlayLabel = new LabelNode();
-        it.add(new LdcInsnNode("modrinth.quickPlayHost"));
+        it.add(new LdcInsnNode("modrinth.internal.quickPlayHost"));
         // String
         it.add(new MethodInsnNode(
                 Opcodes.INVOKESTATIC, "java/lang/System", "getProperty", "(Ljava/lang/String;)Ljava/lang/String;"));
@@ -67,7 +67,7 @@ public final class MinecraftTransformer extends ClassNodeTransformer {
         // String Minecraft
         it.add(new InsnNode(Opcodes.SWAP));
         // Minecraft String
-        it.add(new LdcInsnNode("modrinth.quickPlayPort"));
+        it.add(new LdcInsnNode("modrinth.internal.quickPlayPort"));
         // Minecraft String String
         it.add(new MethodInsnNode(
                 Opcodes.INVOKESTATIC, "java/lang/System", "getProperty", "(Ljava/lang/String;)Ljava/lang/String;"));

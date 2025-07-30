@@ -1,4 +1,7 @@
 //! Minecraft CLI argument logic
+use crate::launcher::quick_play_version::{
+    QuickPlayServerVersion, QuickPlaySingleplayerVersion,
+};
 use crate::launcher::{QuickPlayVersion, parse_rules};
 use crate::profile::QuickPlayType;
 use crate::state::Credentials;
@@ -178,16 +181,31 @@ pub fn get_jvm_arguments(
             .to_string_lossy()
     ));
     match (quick_play_type, quick_play_version) {
-        (
-            QuickPlayType::Singleplayer(world),
-            QuickPlayVersion::Middle | QuickPlayVersion::Legacy,
-        ) => {
-            parsed_arguments.push(format!("-Dmodrinth.quickPlayWorld={world}"));
+        (QuickPlayType::Singleplayer(world), _)
+            if quick_play_version.singleplayer
+                != QuickPlaySingleplayerVersion::Builtin =>
+        {
+            parsed_arguments
+                .push(format!("-Dmodrinth.internal.quickPlayWorld={world}"));
+            parsed_arguments.push(format!(
+                "-Dmodrinth.internal.quickPlayWorldVersion={}",
+                serde_json::to_value(quick_play_version.singleplayer)?
+                    .as_str()
+                    .unwrap()
+            ));
         }
-        (QuickPlayType::Server(server), QuickPlayVersion::Legacy) => {
+        (
+            QuickPlayType::Server(server),
+            QuickPlayVersion {
+                server: QuickPlayServerVersion::Injected,
+                ..
+            },
+        ) => {
             let (host, port) = server.require_resolved()?;
-            parsed_arguments.push(format!("-Dmodrinth.quickPlayHost={host}"));
-            parsed_arguments.push(format!("-Dmodrinth.quickPlayPort={port}"));
+            parsed_arguments
+                .push(format!("-Dmodrinth.internal.quickPlayHost={host}"));
+            parsed_arguments
+                .push(format!("-Dmodrinth.internal.quickPlayPort={port}"));
         }
         _ => {}
     }
@@ -301,7 +319,7 @@ pub async fn get_minecraft_arguments(
     }
 
     if let QuickPlayType::Server(server) = quick_play_type
-        && quick_play_version == QuickPlayVersion::Middle
+        && quick_play_version.server == QuickPlayServerVersion::BuiltinLegacy
     {
         let (host, port) = server.require_resolved()?;
         parsed_arguments.extend_from_slice(&[
