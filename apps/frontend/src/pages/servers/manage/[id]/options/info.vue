@@ -115,10 +115,11 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, CopyCode } from "@modrinth/ui";
 import { CopyIcon, ExternalIcon, EyeIcon, EyeOffIcon } from "@modrinth/assets";
+import { ButtonStyled, CopyCode, injectNotificationManager } from "@modrinth/ui";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
+const { addNotification } = injectNotificationManager();
 const props = defineProps<{
   server: ModrinthServer;
 }>();

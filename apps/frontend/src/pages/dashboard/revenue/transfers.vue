@@ -94,13 +94,14 @@
   </div>
 </template>
 <script setup>
-import { XIcon, PayPalIcon, UnknownIcon } from "@modrinth/assets";
+import { PayPalIcon, UnknownIcon, XIcon } from "@modrinth/assets";
+import { Badge, Breadcrumbs, DropdownSelect, injectNotificationManager } from "@modrinth/ui";
 import { capitalizeString, formatWallet } from "@modrinth/utils";
-import { Badge, Breadcrumbs, DropdownSelect } from "@modrinth/ui";
 import dayjs from "dayjs";
 import TremendousIcon from "~/assets/images/external/tremendous.svg?component";
 import VenmoIcon from "~/assets/images/external/venmo-small.svg?component";
 
+const { addNotification } = injectNotificationManager();
 const vintl = useVIntl();
 const { formatMessage } = vintl;
 
@@ -155,8 +156,7 @@ async function cancelPayout(id) {
     await refresh();
     await useAuth(auth.value.token);
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",

@@ -63,7 +63,7 @@ import {
   fetchExtraNotificationData,
   groupNotifications,
   markAsRead,
-} from "~/helpers/notifications.ts";
+} from "~/helpers/platform-notifications";
 import NotificationItem from "~/components/ui/NotificationItem.vue";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
 

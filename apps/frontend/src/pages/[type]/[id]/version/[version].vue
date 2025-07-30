@@ -631,45 +631,46 @@
 </template>
 <script>
 import {
-  Avatar,
-  Badge,
-  CopyCode,
-  Checkbox,
-  ButtonStyled,
-  ConfirmModal,
-  MarkdownEditor,
-} from "@modrinth/ui";
-import {
-  FileIcon,
-  TrashIcon,
-  EditIcon,
+  BoxIcon,
+  ChevronRightIcon,
   DownloadIcon,
-  StarIcon,
-  ReportIcon,
-  SaveIcon,
-  XIcon,
+  EditIcon,
+  FileIcon,
   HashIcon,
   PlusIcon,
-  TransferIcon,
-  UploadIcon,
-  BoxIcon,
+  ReportIcon,
   RightArrowIcon,
-  ChevronRightIcon,
+  SaveIcon,
+  StarIcon,
+  TransferIcon,
+  TrashIcon,
+  UploadIcon,
+  XIcon,
 } from "@modrinth/assets";
-import { Multiselect } from "vue-multiselect";
+import {
+  Avatar,
+  Badge,
+  ButtonStyled,
+  Checkbox,
+  ConfirmModal,
+  CopyCode,
+  injectNotificationManager,
+  MarkdownEditor,
+} from "@modrinth/ui";
 import { formatBytes, formatCategory } from "@modrinth/utils";
+import { Multiselect } from "vue-multiselect";
+import { useImageUpload } from "~/composables/image-upload.ts";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
+import { renderHighlightedString } from "~/helpers/highlight.js";
 import { inferVersionInfo } from "~/helpers/infer.js";
 import { createDataPackVersion } from "~/helpers/package.js";
-import { renderHighlightedString } from "~/helpers/highlight.js";
 import { reportVersion } from "~/utils/report-helpers.ts";
-import { useImageUpload } from "~/composables/image-upload.ts";
 
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
-import Categories from "~/components/ui/search/Categories.vue";
 import FileInput from "~/components/ui/FileInput.vue";
 import Modal from "~/components/ui/Modal.vue";
+import Categories from "~/components/ui/search/Categories.vue";
 
 export default defineNuxtComponent({
   components: {
@@ -997,8 +998,8 @@ export default defineNuxtComponent({
           const project = await useBaseFetch(`project/${newDependencyId}`);
 
           if (this.version.dependencies.some((dep) => project.id === dep.project_id)) {
-            this.$notify({
-              group: "main",
+            const { addNotification } = injectNotificationManager();
+            addNotification({
               title: "Dependency already added",
               text: "You cannot add the same dependency twice.",
               type: "error",
@@ -1022,8 +1023,8 @@ export default defineNuxtComponent({
           const project = await useBaseFetch(`project/${version.project_id}`);
 
           if (this.version.dependencies.some((dep) => version.id === dep.version_id)) {
-            this.$notify({
-              group: "main",
+            const { addNotification } = injectNotificationManager();
+            addNotification({
               title: "Dependency already added",
               text: "You cannot add the same dependency twice.",
               type: "error",
@@ -1050,8 +1051,8 @@ export default defineNuxtComponent({
         this.newDependencyId = "";
       } catch {
         if (!hideErrors) {
-          this.$notify({
-            group: "main",
+          const { addNotification } = injectNotificationManager();
+          addNotification({
             title: "Invalid Dependency",
             text: "The specified dependency could not be found",
             type: "error",
@@ -1144,8 +1145,8 @@ export default defineNuxtComponent({
           )}`,
         );
       } catch (err) {
-        this.$notify({
-          group: "main",
+        const { addNotification } = injectNotificationManager();
+        addNotification({
           title: "An error occurred",
           text: err.data ? err.data.description : err,
           type: "error",
@@ -1169,8 +1170,8 @@ export default defineNuxtComponent({
       try {
         await this.createVersionRaw(this.version);
       } catch (err) {
-        this.$notify({
-          group: "main",
+        const { addNotification } = injectNotificationManager();
+        addNotification({
           title: "An error occurred",
           text: err.data ? err.data.description : err,
           type: "error",
@@ -1293,15 +1294,15 @@ export default defineNuxtComponent({
 
         this.$refs.modal_package_mod.hide();
 
-        this.$notify({
-          group: "main",
+        const { addNotification } = injectNotificationManager();
+        addNotification({
           title: "Packaging Success",
           text: "Your data pack was successfully packaged as a mod! Make sure to playtest to check for errors.",
           type: "success",
         });
       } catch (err) {
-        this.$notify({
-          group: "main",
+        const { addNotification } = injectNotificationManager();
+        addNotification({
           title: "An error occurred",
           text: err.data ? err.data.description : err,
           type: "error",

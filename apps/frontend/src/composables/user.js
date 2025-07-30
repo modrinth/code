@@ -1,3 +1,5 @@
+import { injectNotificationManager } from "@modrinth/ui";
+
 export const useUser = async (force = false) => {
   const user = useState("user", () => {});
 
@@ -135,7 +137,7 @@ export const userFollowProject = async (project) => {
   }
 };
 export const resendVerifyEmail = async () => {
-  const app = useNuxtApp();
+  const { addNotification } = injectNotificationManager();
 
   startLoading();
   try {
@@ -144,15 +146,13 @@ export const resendVerifyEmail = async () => {
     });
 
     const auth = await useAuth();
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "Email sent",
       text: `An email with a link to verify your account has been sent to ${auth.value.user.email}.`,
       type: "success",
     });
   } catch (err) {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data.description,
       type: "error",

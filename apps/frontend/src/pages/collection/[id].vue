@@ -367,6 +367,7 @@ import {
   BoxIcon,
   CalendarIcon,
   EditIcon,
+  GlobeIcon,
   GridIcon,
   ImageIcon,
   LibraryIcon,
@@ -378,7 +379,6 @@ import {
   UpdatedIcon,
   UploadIcon,
   XIcon,
-  GlobeIcon,
 } from "@modrinth/assets";
 import {
   Avatar,
@@ -387,17 +387,17 @@ import {
   ConfirmModal,
   DropdownSelect,
   FileInput,
+  injectNotificationManager,
   PopoutMenu,
   useRelativeTime,
 } from "@modrinth/ui";
-
 import { isAdmin } from "@modrinth/utils";
 import UpToDate from "assets/images/illustrations/up_to_date.svg";
-import { addNotification } from "~/composables/notifs.js";
+import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import NavRow from "~/components/ui/NavRow.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
-import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
+const { addNotification } = injectNotificationManager();
 const vintl = useVIntl();
 const { formatMessage } = vintl;
 const formatRelativeTime = useRelativeTime();
@@ -664,7 +664,6 @@ async function saveChanges() {
     isEditing.value = false;
   } catch (err) {
     addNotification({
-      group: "main",
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err,
       type: "error",
@@ -688,7 +687,6 @@ async function deleteCollection() {
     }
   } catch (err) {
     addNotification({
-      group: "main",
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: "error",

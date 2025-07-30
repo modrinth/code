@@ -298,25 +298,34 @@
 </template>
 
 <script setup>
-import { Multiselect } from "vue-multiselect";
 import {
   BoxIcon,
-  SettingsIcon,
-  TrashIcon,
+  EditIcon,
   IssuesIcon,
   PlusIcon,
-  XIcon,
-  EditIcon,
   SaveIcon,
+  SettingsIcon,
   SortAscIcon,
   SortDescIcon,
+  TrashIcon,
+  XIcon,
 } from "@modrinth/assets";
-import { Button, Modal, Avatar, CopyCode, Badge, Checkbox, commonMessages } from "@modrinth/ui";
-
+import {
+  Avatar,
+  Badge,
+  Button,
+  Checkbox,
+  commonMessages,
+  CopyCode,
+  injectNotificationManager,
+  Modal,
+} from "@modrinth/ui";
 import { formatProjectType } from "@modrinth/utils";
+import { Multiselect } from "vue-multiselect";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import OrganizationProjectTransferModal from "~/components/ui/OrganizationProjectTransferModal.vue";
 
+const { addNotification } = injectNotificationManager();
 const { formatMessage } = useVIntl();
 
 const { organization, projects, refresh } = inject("organizationContext");
@@ -375,14 +384,12 @@ const onProjectTransferSubmit = async (projects) => {
     await refreshUserProjects();
 
     addNotification({
-      group: "main",
       title: "Success",
       text: "Transferred selected projects to organization.",
       type: "success",
     });
   } catch (err) {
     addNotification({
-      group: "main",
       title: "An error occurred",
       text: err?.data?.description || err?.message || err || "Unknown error",
       type: "error",
@@ -511,7 +518,6 @@ const onBulkEditLinks = useClientTry(async () => {
   editLinksModal.value.hide();
 
   addNotification({
-    group: "main",
     title: "Success",
     text: "Bulk edited selected project's links.",
     type: "success",

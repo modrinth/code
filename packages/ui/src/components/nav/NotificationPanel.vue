@@ -1,10 +1,7 @@
 <template>
   <div
     class="vue-notification-group experimental-styles-within"
-    :class="{
-      'intercom-present': isIntercomPresent,
-      rightwards: moveNotificationsRight,
-    }"
+    :class="{ 'intercom-present': isIntercomPresent }"
   >
     <transition-group name="notifs">
       <div
@@ -53,7 +50,7 @@
                 </button>
               </ButtonStyled>
               <ButtonStyled circular size="small">
-                <button v-tooltip="`Dismiss`" @click="notifications.splice(index, 1)">
+                <button v-tooltip="`Dismiss`" @click="dismissNotification(index)">
                   <XIcon />
                 </button>
               </ButtonStyled>
@@ -73,8 +70,10 @@
     </transition-group>
   </div>
 </template>
-<script setup>
-import { ButtonStyled } from "@modrinth/ui";
+
+<script setup lang="ts">
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
+import { ButtonStyled, injectNotificationManager, type WebNotification } from '@modrinth/ui'
 import {
   XCircleIcon,
   CheckCircleIcon,
@@ -83,69 +82,55 @@ import {
   IssuesIcon,
   XIcon,
   CopyIcon,
-} from "@modrinth/assets";
-const notifications = useNotifications();
-const { isVisible: moveNotificationsRight } = useNotificationRightwards();
+} from '@modrinth/assets'
 
-const isIntercomPresent = ref(false);
+const notificationManager = injectNotificationManager()
+const notifications = computed<WebNotification[]>(() => notificationManager.getNotifications())
 
-function stopTimer(notif) {
-  clearTimeout(notif.timer);
+const isIntercomPresent = ref<boolean>(false)
+const copied = ref<Record<string, boolean>>({})
+
+const stopTimer = (n: WebNotification) => notificationManager.stopNotificationTimer(n)
+const setNotificationTimer = (n: WebNotification) => notificationManager.setNotificationTimer(n)
+const dismissNotification = (n: number) => notificationManager.removeNotificationByIndex(n)
+
+function createNotifText(notif: WebNotification): string {
+  return [notif.title, notif.text, notif.errorCode].filter(Boolean).join('\n')
 }
 
-const copied = ref({});
+function checkIntercomPresence(): void {
+  isIntercomPresent.value = !!document.querySelector('.intercom-lightweight-app')
+}
 
-const createNotifText = (notif) => {
-  let text = "";
-  if (notif.title) {
-    text += notif.title;
-  }
-  if (notif.text) {
-    if (text.length > 0) {
-      text += "\n";
-    }
-    text += notif.text;
-  }
-  if (notif.errorCode) {
-    if (text.length > 0) {
-      text += "\n";
-    }
-    text += notif.errorCode;
-  }
-  return text;
-};
+function copyToClipboard(notif: WebNotification): void {
+  const text = createNotifText(notif)
 
-function checkIntercomPresence() {
-  isIntercomPresent.value = !!document.querySelector(".intercom-lightweight-app");
+  copied.value[text] = true
+  navigator.clipboard.writeText(text)
+
+  setTimeout(() => {
+    delete copied.value[text]
+  }, 2000)
 }
 
 onMounted(() => {
-  checkIntercomPresence();
+  checkIntercomPresence()
 
   const observer = new MutationObserver(() => {
-    checkIntercomPresence();
-  });
+    checkIntercomPresence()
+  })
 
   observer.observe(document.body, {
     childList: true,
     subtree: true,
-  });
+  })
 
   onBeforeUnmount(() => {
-    observer.disconnect();
-  });
-});
-
-function copyToClipboard(notif) {
-  const text = createNotifText(notif);
-
-  copied.value[text] = true;
-  navigator.clipboard.writeText(text);
-  setTimeout(() => {
-    delete copied.value[text];
-  }, 2000);
-}
+    observer.disconnect()
+  })
+})
 </script>
+
 <style lang="scss" scoped>
 .vue-notification-group {
   position: fixed;
@@ -162,15 +147,6 @@ function copyToClipboard(notif) {
 
   &.intercom-present {
     bottom: 5rem;
-  }
-
-  &.rightwards {
-    right: unset !important;
-    left: 1.5rem;
-
-    @media screen and (max-width: 500px) {
-      left: 0.75rem;
-    }
   }
 
   .vue-notification-wrapper {

@@ -71,10 +71,11 @@
   </NewModal>
 </template>
 <script setup>
-import { XIcon, PlusIcon } from "@modrinth/assets";
+import { PlusIcon, XIcon } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 
 const router = useNativeRouter();
+const { addNotification } = injectNotificationManager();
 
 const name = ref("");
 const slug = ref("");
@@ -104,7 +105,6 @@ async function createOrganization() {
   } catch (err) {
     console.error(err);
     addNotification({
-      group: "main",
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",

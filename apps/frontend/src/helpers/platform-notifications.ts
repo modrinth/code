@@ -1,4 +1,4 @@
-import { useNuxtApp } from "#imports";
+import { injectNotificationManager } from "@modrinth/ui";
 
 // TODO: There needs to be a standardized way to get these types, eg; @modrinth/types generated from api schema. Later problem.
 type Project = { id: string };
@@ -173,9 +173,8 @@ export async function markAsRead(
       return newNotifs;
     };
   } catch (err: any) {
-    const app: any = useNuxtApp();
-    app.$notify({
-      group: "main",
+    const { addNotification } = injectNotificationManager();
+    addNotification({
       title: "Error marking notification as read",
       text: err?.data?.description ?? err,
       type: "error",

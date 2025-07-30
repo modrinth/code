@@ -666,65 +666,65 @@
 </template>
 <script setup>
 import {
-  ModrinthIcon,
   ArrowBigUpDashIcon,
-  BookmarkIcon,
-  ServerIcon,
-  LogInIcon,
-  DownloadIcon,
-  LibraryIcon,
-  XIcon,
-  IssuesIcon,
-  ReportIcon,
-  CompassIcon,
-  HamburgerIcon,
-  SearchIcon,
   BellIcon,
-  SettingsIcon,
+  BlueskyIcon,
+  BookmarkIcon,
+  BoxIcon,
+  BracesIcon,
+  ChartIcon,
+  CollectionIcon,
+  CompassIcon,
+  CurrencyIcon,
+  DiscordIcon,
+  DownloadIcon,
+  DropdownIcon,
+  GithubIcon,
+  GlassesIcon,
+  HamburgerIcon,
   HomeIcon,
+  IssuesIcon,
+  LibraryIcon,
+  LogInIcon,
+  LogOutIcon,
+  MastodonIcon,
+  ModrinthIcon,
   MoonIcon,
-  SunIcon,
+  OrganizationIcon,
+  PackageOpenIcon,
+  PaintbrushIcon,
   PlugIcon,
   PlusIcon,
-  DropdownIcon,
-  LogOutIcon,
-  ChartIcon,
-  BoxIcon,
-  CollectionIcon,
-  OrganizationIcon,
-  UserIcon,
-  CurrencyIcon,
-  BracesIcon,
-  GlassesIcon,
-  PaintbrushIcon,
-  PackageOpenIcon,
-  DiscordIcon,
-  BlueskyIcon,
-  TwitterIcon,
-  MastodonIcon,
-  GithubIcon,
+  ReportIcon,
   ScaleIcon,
+  SearchIcon,
+  ServerIcon,
+  SettingsIcon,
+  SunIcon,
+  TwitterIcon,
+  UserIcon,
+  XIcon,
 } from "@modrinth/assets";
 import {
+  Avatar,
   Button,
   ButtonStyled,
+  commonMessages,
+  injectNotificationManager,
   OverflowMenu,
   PagewideBanner,
-  Avatar,
-  commonMessages,
 } from "@modrinth/ui";
 import { isAdmin, isStaff } from "@modrinth/utils";
-import { errors as generatedStateErrors } from "~/generated/state.json";
-
-import ModalCreation from "~/components/ui/ModalCreation.vue";
-import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
+import ModalCreation from "~/components/ui/ModalCreation.vue";
 import OrganizationCreateModal from "~/components/ui/OrganizationCreateModal.vue";
 import TeleportOverflowMenu from "~/components/ui/servers/TeleportOverflowMenu.vue";
+import { errors as generatedStateErrors } from "~/generated/state.json";
+import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
 
+const { addNotification } = injectNotificationManager();
 const { formatMessage } = useVIntl();
 
-const app = useNuxtApp();
 const auth = await useAuth();
 const user = await useUser();
 
@@ -1079,15 +1079,13 @@ function developerModeIncrement() {
     developerModeCounter.value = 0;
     saveFeatureFlags();
     if (flags.value.developerMode) {
-      app.$notify({
-        group: "main",
+      addNotification({
         title: "Developer mode activated",
         text: "Developer mode has been enabled",
         type: "success",
       });
     } else {
-      app.$notify({
-        group: "main",
+      addNotification({
         title: "Developer mode deactivated",
         text: "Developer mode has been disabled",
         type: "success",

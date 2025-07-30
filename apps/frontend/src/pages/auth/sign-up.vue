@@ -133,21 +133,22 @@
 </template>
 
 <script setup>
+import HCaptcha from "@/components/ui/HCaptcha.vue";
 import {
-  RightArrowIcon,
-  UserIcon,
-  SSOGitHubIcon,
-  SSOMicrosoftIcon,
-  SSOGoogleIcon,
-  SSOSteamIcon,
-  SSODiscordIcon,
   KeyIcon,
   MailIcon,
+  RightArrowIcon,
+  SSODiscordIcon,
+  SSOGitHubIcon,
   SSOGitLabIcon,
+  SSOGoogleIcon,
+  SSOMicrosoftIcon,
+  SSOSteamIcon,
+  UserIcon,
 } from "@modrinth/assets";
-import { Checkbox, commonMessages } from "@modrinth/ui";
-import HCaptcha from "@/components/ui/HCaptcha.vue";
+import { Checkbox, commonMessages, injectNotificationManager } from "@modrinth/ui";
 
+const { addNotification } = injectNotificationManager();
 const { formatMessage } = useVIntl();
 
 const messages = defineMessages({
@@ -225,7 +226,6 @@ async function createAccount() {
   try {
     if (confirmPassword.value !== password.value) {
       addNotification({
-        group: "main",
         title: formatMessage(commonMessages.errorNotificationTitle),
         text: formatMessage({
           id: "auth.sign-up.notification.password-mismatch.text",
@@ -262,7 +262,6 @@ async function createAccount() {
     }
   } catch (err) {
     addNotification({
-      group: "main",
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: "error",
