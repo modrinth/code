@@ -10,17 +10,21 @@ export interface WebNotification {
   timer?: NodeJS.Timeout
 }
 
+export type WebNotificationLocation = 'left' | 'right'
+
 export abstract class AbstractWebNotificationManager {
   protected readonly AUTO_DISMISS_DELAY_MS = 30 * 1000
 
   abstract getNotifications(): WebNotification[]
+  abstract getNotificationLocation(): WebNotificationLocation
+  abstract setNotificationLocation(location: WebNotificationLocation): void
 
   protected abstract addNotificationToStorage(notification: WebNotification): void
   protected abstract removeNotificationFromStorage(id: string | number): void
   protected abstract removeNotificationFromStorageByIndex(index: number): void
   protected abstract clearAllNotificationsFromStorage(): void
 
-  addNotification(notification: Partial<WebNotification>): void {
+  addNotification = (notification: Partial<WebNotification>): void => {
     const existingNotif = this.findExistingNotification(notification)
 
     if (existingNotif) {
@@ -34,7 +38,7 @@ export abstract class AbstractWebNotificationManager {
     this.addNotificationToStorage(newNotification)
   }
 
-  removeNotification(id: string | number): void {
+  removeNotification = (id: string | number): void => {
     const notifications = this.getNotifications()
     const notification = notifications.find((n) => n.id === id)
 
@@ -44,7 +48,7 @@ export abstract class AbstractWebNotificationManager {
     }
   }
 
-  removeNotificationByIndex(index: number): void {
+  removeNotificationByIndex = (index: number): void => {
     const notifications = this.getNotifications()
 
     if (index >= 0 && index < notifications.length) {
@@ -54,7 +58,7 @@ export abstract class AbstractWebNotificationManager {
     }
   }
 
-  clearAllNotifications(): void {
+  clearAllNotifications = (): void => {
     const notifications = this.getNotifications()
     notifications.forEach((notification) => {
       this.clearNotificationTimer(notification)
@@ -62,7 +66,7 @@ export abstract class AbstractWebNotificationManager {
     this.clearAllNotificationsFromStorage()
   }
 
-  setNotificationTimer(notification: WebNotification): void {
+  setNotificationTimer = (notification: WebNotification): void => {
     if (!notification) return
 
     this.clearNotificationTimer(notification)
@@ -72,7 +76,7 @@ export abstract class AbstractWebNotificationManager {
     }, this.AUTO_DISMISS_DELAY_MS)
   }
 
-  stopNotificationTimer(notification: WebNotification): void {
+  stopNotificationTimer = (notification: WebNotification): void => {
     this.clearNotificationTimer(notification)
   }
 

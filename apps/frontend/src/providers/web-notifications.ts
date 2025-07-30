@@ -1,26 +1,30 @@
-import { type WebNotification, AbstractWebNotificationManager } from "@modrinth/ui";
 import { useState } from "#app";
+import {
+  type WebNotification,
+  type WebNotificationLocation,
+  AbstractWebNotificationManager,
+} from "@modrinth/ui";
 
 export class FrontendNotificationManager extends AbstractWebNotificationManager {
   private readonly state: Ref<WebNotification[]>;
-  private readonly isRightwards: Ref<boolean>;
+  private readonly locationState: Ref<WebNotificationLocation>;
 
   public constructor() {
     super();
     this.state = useState<WebNotification[]>("notifications", () => []);
-    this.isRightwards = useState<boolean>("notifications.isRightwards", () => true);
+    this.locationState = useState<WebNotificationLocation>("notifications.location", () => "right");
+  }
+
+  public getNotificationLocation(): WebNotificationLocation {
+    return this.locationState.value;
+  }
+
+  public setNotificationLocation(location: WebNotificationLocation): void {
+    this.locationState.value = location;
   }
 
   public getNotifications(): WebNotification[] {
     return this.state.value;
-  }
-
-  public isNotificationsPanelRightwards(): boolean {
-    return this.isRightwards.value;
-  }
-
-  public setNotificationsPanelRightwards(isRightwards: boolean): void {
-    this.isRightwards.value = isRightwards;
   }
 
   protected addNotificationToStorage(notification: WebNotification): void {

@@ -1,7 +1,11 @@
 <template>
   <div
     class="vue-notification-group experimental-styles-within"
-    :class="{ 'intercom-present': isIntercomPresent }"
+    :class="{
+      'intercom-present': isIntercomPresent,
+      'location-left': notificationLocation === 'left',
+      'location-right': notificationLocation === 'right',
+    }"
   >
     <transition-group name="notifs">
       <div
@@ -72,20 +76,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
-import { ButtonStyled, injectNotificationManager, type WebNotification } from '@modrinth/ui'
 import {
-  XCircleIcon,
   CheckCircleIcon,
   CheckIcon,
+  CopyIcon,
   InfoIcon,
   IssuesIcon,
+  XCircleIcon,
   XIcon,
-  CopyIcon,
 } from '@modrinth/assets'
+import { ButtonStyled, injectNotificationManager, type WebNotification } from '@modrinth/ui'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 const notificationManager = injectNotificationManager()
 const notifications = computed<WebNotification[]>(() => notificationManager.getNotifications())
+const notificationLocation = computed(() => notificationManager.getNotificationLocation())
 
 const isIntercomPresent = ref<boolean>(false)
 const copied = ref<Record<string, boolean>>({})
@@ -134,15 +139,31 @@ onMounted(() => {
 <style lang="scss" scoped>
 .vue-notification-group {
   position: fixed;
-  right: 1.5rem;
   bottom: 1.5rem;
   z-index: 200;
   width: 450px;
 
+  &.location-right {
+    right: 1.5rem;
+  }
+
+  &.location-left {
+    left: 1.5rem;
+  }
+
   @media screen and (max-width: 500px) {
     width: calc(100% - 0.75rem * 2);
-    right: 0.75rem;
     bottom: 0.75rem;
+
+    &.location-right {
+      right: 0.75rem;
+      left: auto;
+    }
+
+    &.location-left {
+      left: 0.75rem;
+      right: auto;
+    }
   }
 
   &.intercom-present {
@@ -184,6 +205,12 @@ onMounted(() => {
 }
 
 .notifs-leave-to {
-  transform: translateX(100%) scale(0.8);
+  .location-right & {
+    transform: translateX(100%) scale(0.8);
+  }
+
+  .location-left & {
+    transform: translateX(-100%) scale(0.8);
+  }
 }
 </style>
