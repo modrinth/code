@@ -108,7 +108,6 @@ useHead({
   title: () => `${formatMessage(commonSettingsMessages.sessions)} - Modrinth`,
 });
 
-const data = useNuxtApp();
 const { data: sessions, refresh } = await useAsyncData("session/list", () =>
   useBaseFetch("session/list"),
 );

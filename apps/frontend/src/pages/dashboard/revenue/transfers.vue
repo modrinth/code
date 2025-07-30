@@ -109,7 +109,6 @@ useHead({
   title: "Transfer history - Modrinth",
 });
 
-const data = await useNuxtApp();
 const auth = await useAuth();
 
 const { data: payouts, refresh } = await useAsyncData(`payout`, () =>

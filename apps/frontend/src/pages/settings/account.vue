@@ -421,6 +421,7 @@ import {
   XIcon,
 } from "@modrinth/assets";
 import { ConfirmModal, injectNotificationManager } from "@modrinth/ui";
+import QrcodeVue from "qrcode.vue";
 import KeyIcon from "assets/icons/auth/key.svg";
 import DiscordIcon from "assets/icons/auth/sso-discord.svg";
 import GithubIcon from "assets/icons/auth/sso-github.svg";
@@ -428,7 +429,6 @@ import GitLabIcon from "assets/icons/auth/sso-gitlab.svg";
 import GoogleIcon from "assets/icons/auth/sso-google.svg";
 import MicrosoftIcon from "assets/icons/auth/sso-microsoft.svg";
 import SteamIcon from "assets/icons/auth/sso-steam.svg";
-import QrcodeVue from "qrcode.vue";
 import Modal from "~/components/ui/Modal.vue";
 
 useHead({

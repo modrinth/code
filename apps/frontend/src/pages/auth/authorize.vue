@@ -80,10 +80,10 @@
 </template>
 
 <script setup>
-import { useAuth } from "@/composables/auth.js";
-import { useBaseFetch } from "@/composables/fetch.js";
 import { CheckIcon, XIcon } from "@modrinth/assets";
 import { Avatar, Button, commonMessages, injectNotificationManager } from "@modrinth/ui";
+import { useAuth } from "@/composables/auth.js";
+import { useBaseFetch } from "@/composables/fetch.js";
 
 import { useScopes } from "@/composables/auth/scopes.ts";
 
@@ -117,8 +117,6 @@ const messages = defineMessages({
     defaultMessage: "Authorize {appName}",
   },
 });
-
-const data = useNuxtApp();
 
 const router = useNativeRoute();
 const auth = await useAuth();

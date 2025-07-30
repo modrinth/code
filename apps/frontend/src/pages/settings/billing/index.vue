@@ -603,7 +603,6 @@ useHead({
   ],
 });
 
-const data = useNuxtApp();
 const config = useRuntimeConfig();
 
 const vintl = useVIntl();

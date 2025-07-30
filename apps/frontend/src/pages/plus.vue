@@ -121,7 +121,6 @@ useHead({
 
 const vintl = useVIntl();
 
-const data = useNuxtApp();
 const config = useRuntimeConfig();
 
 const auth = await useAuth();

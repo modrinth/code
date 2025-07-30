@@ -129,7 +129,6 @@
 </template>
 
 <script setup>
-import HCaptcha from "@/components/ui/HCaptcha.vue";
 import {
   KeyIcon,
   MailIcon,
@@ -142,6 +141,7 @@ import {
   SSOSteamIcon,
 } from "@modrinth/assets";
 import { commonMessages, injectNotificationManager } from "@modrinth/ui";
+import HCaptcha from "@/components/ui/HCaptcha.vue";
 
 const { addNotification } = injectNotificationManager();
 const { formatMessage } = useVIntl();

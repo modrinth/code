@@ -246,7 +246,6 @@ useHead({
   title: "Applications - Modrinth",
 });
 
-const data = useNuxtApp();
 const { scopesToLabels } = useScopes();
 
 const appModal = ref();
