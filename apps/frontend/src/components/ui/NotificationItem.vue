@@ -329,11 +329,11 @@ import {
   UserPlusIcon,
   VersionIcon,
   XIcon,
-} from "@modrinth/ars.js";
+} from "@modrinth/assets";
+import { injectNotificationManager } from "@modrinth/ui";
 
-const app = useNuxtApp();
+const { addNotification } = injectNotificationManager();
 const emit = defineEmits(["update:notifications"]);
-
 const formatRelativeTime = useRelativeTime();
 
 const props = defineProps({

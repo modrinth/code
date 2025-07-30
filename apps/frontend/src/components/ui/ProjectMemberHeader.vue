@@ -122,8 +122,6 @@ import { injectNotificationManager } from "@modrinth/ui";
 import { formatProjectType } from "@modrinth/utils";
 import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
 
-const { addNotification } = injectNotificationManager();
-
 const props = defineProps({
   project: {
     type: Object,
@@ -167,6 +165,7 @@ const props = defineProps({
     type: Function,
     default() {
       return () => {
+        const { addNotification } = injectNotificationManager();
         addNotification({
           title: "An error occurred",
           text: "setProcessing function not found",
@@ -179,6 +178,7 @@ const props = defineProps({
     type: Function,
     default() {
       return () => {
+        const { addNotification } = injectNotificationManager();
         addNotification({
           title: "An error occurred",
           text: "toggleCollapsed function not found",
@@ -191,6 +191,7 @@ const props = defineProps({
     type: Function,
     default() {
       return () => {
+        const { addNotification } = injectNotificationManager();
         addNotification({
           title: "An error occurred",
           text: "updateMembers function not found",
