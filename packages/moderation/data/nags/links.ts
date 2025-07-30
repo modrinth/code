@@ -5,7 +5,7 @@ import { useVIntl, defineMessage } from '@vintl/vintl'
 export const commonLinkDomains = {
   source: ['github.com', 'gitlab.com', 'bitbucket.org', 'codeberg.org', 'git.sr.ht'],
   issues: ['github.com', 'gitlab.com', 'bitbucket.org', 'codeberg.org', 'docs.google.com'],
-  discord: ['discord.gg', 'discord.com'],
+  discord: ['discord.gg', 'discord.com', 'dsc.gg'],
   licenseBlocklist: [
     'youtube.com',
     'youtu.be',
@@ -24,7 +24,10 @@ export const commonLinkDomains = {
     'ko-fi.com',
     'paypal.com',
     'buymeacoffee.com',
+    'google.com',
+    'example.com',
   ],
+  linkShorteners: ['bit.ly', 'adf.ly', 'tinyurl.com', 'short.io', 'is.gd'],
 }
 
 export function isCommonUrl(url: string | null, commonDomains: string[]): boolean {
@@ -37,14 +40,21 @@ export function isCommonUrl(url: string | null, commonDomains: string[]): boolea
   }
 }
 
-export function isUncommonLicenseUrl(url: string | null, domains: string[]): boolean {
+export function isCommonUrlOfType(url: string | null, commonDomains: string[]): boolean {
   if (url === null || url === '') return false
-  try {
-    const domain = new URL(url).hostname.toLowerCase()
-    return domains.some((uncommonDomain) => domain.includes(uncommonDomain))
-  } catch {
-    return false
-  }
+  return isCommonUrl(url, commonDomains)
+}
+
+export function isDiscordUrl(url: string | null): boolean {
+  return isCommonUrlOfType(url, commonLinkDomains.discord)
+}
+
+export function isLinkShortener(url: string | null): boolean {
+  return isCommonUrlOfType(url, commonLinkDomains.linkShorteners)
+}
+
+export function isUncommonLicenseUrl(url: string | null): boolean {
+  return isCommonUrlOfType(url, commonLinkDomains.licenseBlocklist)
 }
 
 export const linksNags: Nag[] = [
@@ -77,6 +87,49 @@ export const linksNags: Nag[] = [
     },
   },
   {
+    id: 'misused-discord-link',
+    title: defineMessage({
+      id: 'nags.misused-discord-link.title',
+      defaultMessage: 'Misplaced Discord invite',
+    }),
+    description: defineMessage({
+      id: 'nags.misused-discord-link-description',
+      defaultMessage:
+        'Discord invites can not be used for other link types. Please put your Discord link in the Discord Invite link field.',
+    }),
+    status: 'required',
+    shouldShow: (context: NagContext) =>
+      isDiscordUrl(context.project.source_url) ||
+      isDiscordUrl(context.project.issues_url) ||
+      isDiscordUrl(context.project.wiki_url),
+    link: {
+      path: 'settings/links',
+      title: defineMessage({
+        id: 'nags.visit-links-settings.title',
+        defaultMessage: 'Visit links settings',
+      }),
+      shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-links',
+    },
+  },
+  {
+    id: 'link-shortener-usage',
+    title: defineMessage({
+      id: 'nags.link-shortener-usage.title',
+      defaultMessage: 'Use of link shorteners is prohibited',
+    }),
+    description: defineMessage({
+      id: 'nags.link-shortener-usage.description',
+      defaultMessage:
+        'Use of link shorteners or other methods to obscure where a link may lead in your external links or license link is prohibited, please only use appropriate full length links.',
+    }),
+    status: 'required',
+    shouldShow: (context: NagContext) =>
+      isLinkShortener(context.project.source_url) ||
+      isLinkShortener(context.project.issues_url) ||
+      isLinkShortener(context.project.wiki_url) ||
+      Boolean(context.project.license.url && isLinkShortener(context.project.license.url)),
+  },
+  {
     id: 'invalid-license-url',
     title: defineMessage({
       id: 'nags.invalid-license-url.title',
@@ -101,7 +154,7 @@ export const linksNags: Nag[] = [
           defineMessage({
             id: 'nags.invalid-license-url.description.domain',
             defaultMessage:
-              'Your license URL points to {domain}, which is not appropriate for license information. License URLs should link directly to your license file, not social media, gaming platforms etc.',
+              'Your license URL points to {domain}, which is not appropriate for license information. License URLs should link directly to your license file, not social media, gaming platforms, etc.',
           }),
           { domain },
         )
@@ -120,7 +173,7 @@ export const linksNags: Nag[] = [
       const licenseUrl = context.project.license.url
       if (!licenseUrl) return false
 
-      const isBlocklisted = isUncommonLicenseUrl(licenseUrl, commonLinkDomains.licenseBlocklist)
+      const isBlocklisted = isUncommonLicenseUrl(licenseUrl)
 
       try {
         new URL(licenseUrl)
@@ -186,12 +239,24 @@ export const linksNags: Nag[] = [
 
       const isGplLicense = gplLicenses.includes(context.project.license.id)
       const hasSourceUrl = !!context.project.source_url
-      const notSourceAsDistributed = (context) => {
+      const hasAdditionalFiles = (context: NagContext) => {
+        let hasAdditional = true
+        context.versions.forEach((version) => {
+          if (version.files.length < 2) hasAdditional = false
+        })
+        return hasAdditional
+      }
+      const notSourceAsDistributed = (context: NagContext) => {
         let project = context.project as Project & { actualProjectType: string }
         return context.project.project_type === 'mod' || project.actualProjectType === 'plugin'
       }
 
-      return isGplLicense && notSourceAsDistributed(context) && !hasSourceUrl
+      return (
+        isGplLicense &&
+        notSourceAsDistributed(context) &&
+        !hasSourceUrl &&
+        !hasAdditionalFiles(context)
+      )
     },
     link: {
       path: 'settings/links',
