@@ -1,4 +1,4 @@
-package com.modrinth.theseus.agent;
+package com.modrinth.theseus.agent.transformers;
 
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.tree.ClassNode;

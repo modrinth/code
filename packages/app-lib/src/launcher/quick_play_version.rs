@@ -1,6 +1,7 @@
 use daedalus::minecraft::Version;
 use serde::{Deserialize, Serialize};
 
+// If modified, also update QuickPlayServerVersion.java
 #[derive(
     Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Serialize, Deserialize,
 )]
@@ -29,6 +30,7 @@ impl QuickPlayServerVersion {
     }
 }
 
+// If modified, also update QuickPlaySingleplayerVersion.java
 #[derive(
     Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Serialize, Deserialize,
 )]

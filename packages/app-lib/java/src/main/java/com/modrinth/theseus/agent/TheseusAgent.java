@@ -45,6 +45,9 @@ public final class TheseusAgent {
                     new UncheckedIOException("Failed to delete " + debugPath, e).printStackTrace();
                 }
             }
+            System.out.println("===== Quick play server version: " + QuickPlayServerVersion.CURRENT + " =====");
+            System.out.println(
+                    "===== Quick play singleplayer version: " + QuickPlaySingleplayerVersion.CURRENT + " =====");
         }
 
         final Map<String, UnaryOperator<ClassVisitor>> transformers = new HashMap<>();

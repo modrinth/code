@@ -162,12 +162,14 @@ pub fn get_jvm_arguments(
     }
 
     parsed_arguments.push(format!("-Xmx{}M", memory.maximum));
+
     if let Some(LoggingConfiguration::Log4j2Xml { argument, file }) = log_config
     {
         let full_path = log_configs_path.join(&file.id);
         let full_path = full_path.to_string_lossy();
         parsed_arguments.push(argument.replace("${path}", &full_path));
     }
+
     parsed_arguments.push(format!(
         "-javaagent:{}",
         canonicalize(agent_path)
@@ -180,6 +182,19 @@ pub fn get_jvm_arguments(
             })?
             .to_string_lossy()
     ));
+
+    parsed_arguments.push(format!(
+        "-Dmodrinth.internal.quickPlayServerVersion={}",
+        serde_json::to_value(quick_play_version.server)?
+            .as_str()
+            .unwrap()
+    ));
+    parsed_arguments.push(format!(
+        "-Dmodrinth.internal.quickPlaySingleplayerVersion={}",
+        serde_json::to_value(quick_play_version.singleplayer)?
+            .as_str()
+            .unwrap()
+    ));
     match (quick_play_type, quick_play_version) {
         (QuickPlayType::Singleplayer(world), _)
             if quick_play_version.singleplayer
@@ -187,12 +202,6 @@ pub fn get_jvm_arguments(
         {
             parsed_arguments
                 .push(format!("-Dmodrinth.internal.quickPlayWorld={world}"));
-            parsed_arguments.push(format!(
-                "-Dmodrinth.internal.quickPlayWorldVersion={}",
-                serde_json::to_value(quick_play_version.singleplayer)?
-                    .as_str()
-                    .unwrap()
-            ));
         }
         (
             QuickPlayType::Server(server),
@@ -209,6 +218,7 @@ pub fn get_jvm_arguments(
         }
         _ => {}
     }
+
     for arg in custom_args {
         if !arg.is_empty() {
             parsed_arguments.push(arg);

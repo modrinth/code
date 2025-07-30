@@ -1,7 +1,7 @@
 package com.modrinth.theseus.agent.transformers;
 
-import com.modrinth.theseus.agent.ClassNodeTransformer;
 import com.modrinth.theseus.agent.InsnPattern;
+import com.modrinth.theseus.agent.QuickPlayServerVersion;
 import java.util.ListIterator;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
@@ -25,7 +25,9 @@ public final class MinecraftTransformer extends ClassNodeTransformer {
 
     @Override
     protected void transformClass(ClassNode classNode) {
-        addServerJoinSupport(classNode);
+        if (QuickPlayServerVersion.CURRENT == QuickPlayServerVersion.INJECTED) {
+            addServerJoinSupport(classNode);
+        }
     }
 
     private static void addServerJoinSupport(ClassNode classNode) {
