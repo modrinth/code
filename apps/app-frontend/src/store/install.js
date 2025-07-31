@@ -1,4 +1,6 @@
-import { defineStore } from 'pinia'
+import { trackEvent } from '@/helpers/analytics.js'
+import { get_project, get_version_many } from '@/helpers/cache.js'
+import { create_profile_and_install as packInstall } from '@/helpers/pack.js'
 import {
   add_project_from_version,
   check_installed,
@@ -7,11 +9,9 @@ import {
   list,
   remove_project,
 } from '@/helpers/profile.js'
-import { handleError } from '@/store/notifications.js'
-import { get_project, get_version_many } from '@/helpers/cache.js'
-import { create_profile_and_install as packInstall } from '@/helpers/pack.js'
-import { trackEvent } from '@/helpers/analytics.js'
+import { injectNotificationManager } from '@modrinth/ui'
 import dayjs from 'dayjs'
+import { defineStore } from 'pinia'
 
 export const useInstall = defineStore('installStore', {
   state: () => ({
@@ -49,6 +49,7 @@ export const install = async (
   callback = () => {},
   createInstanceCallback = () => {},
 ) => {
+  const { handleError } = injectNotificationManager()
   const project = await get_project(projectId, 'must_revalidate').catch(handleError)
 
   if (project.project_type === 'modpack') {
@@ -160,6 +161,7 @@ export const install = async (
 }
 
 export const installVersionDependencies = async (profile, version) => {
+  const { handleError } = injectNotificationManager()
   for (const dep of version.dependencies) {
     if (dep.dependency_type !== 'required') continue
     // disallow fabric api install on quilt

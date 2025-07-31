@@ -120,54 +120,55 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, onUnmounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import type { GameInstance } from '@/helpers/types'
-import {
-  Button,
-  ButtonStyled,
-  RadialHeader,
-  FilterBar,
-  type FilterBarOption,
-  type GameVersion,
-  GAME_MODES,
-} from '@modrinth/ui'
-import { PlusIcon, SpinnerIcon, UpdatedIcon, SearchIcon, XIcon } from '@modrinth/assets'
-import {
-  type ProtocolVersion,
-  type SingleplayerWorld,
-  type World,
-  type ServerWorld,
-  type ServerData,
-  type ProfileEvent,
-  get_profile_protocol_version,
-  remove_server_from_profile,
-  delete_world,
-  start_join_server,
-  start_join_singleplayer_world,
-  getWorldIdentifier,
-  refreshServerData,
-  refreshWorld,
-  sortWorlds,
-  refreshServers,
-  hasQuickPlaySupport,
-  refreshWorlds,
-  handleDefaultProfileUpdateEvent,
-  showWorldInFolder,
-} from '@/helpers/worlds.ts'
+import type ContextMenu from '@/components/ui/ContextMenu.vue'
+import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import AddServerModal from '@/components/ui/world/modal/AddServerModal.vue'
 import EditServerModal from '@/components/ui/world/modal/EditServerModal.vue'
 import EditWorldModal from '@/components/ui/world/modal/EditSingleplayerWorldModal.vue'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
-
-import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
-import { handleError } from '@/store/notifications'
-import type ContextMenu from '@/components/ui/ContextMenu.vue'
-import type { Version } from '@modrinth/utils'
 import { profile_listener } from '@/helpers/events'
 import { get_game_versions } from '@/helpers/tags'
+import type { GameInstance } from '@/helpers/types'
+import {
+  type ProfileEvent,
+  type ProtocolVersion,
+  type ServerData,
+  type ServerWorld,
+  type SingleplayerWorld,
+  type World,
+  delete_world,
+  getWorldIdentifier,
+  get_profile_protocol_version,
+  handleDefaultProfileUpdateEvent,
+  hasQuickPlaySupport,
+  refreshServerData,
+  refreshServers,
+  refreshWorld,
+  refreshWorlds,
+  remove_server_from_profile,
+  showWorldInFolder,
+  sortWorlds,
+  start_join_server,
+  start_join_singleplayer_world,
+} from '@/helpers/worlds.ts'
+import type { AppNotificationManager } from '@/providers/app-notifications'
+import { PlusIcon, SearchIcon, SpinnerIcon, UpdatedIcon, XIcon } from '@modrinth/assets'
+import {
+  Button,
+  ButtonStyled,
+  FilterBar,
+  type FilterBarOption,
+  GAME_MODES,
+  type GameVersion,
+  RadialHeader,
+  injectNotificationManager,
+} from '@modrinth/ui'
+import type { Version } from '@modrinth/utils'
 import { defineMessages } from '@vintl/vintl'
+import { computed, onUnmounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 
+const { handleError } = injectNotificationManager() as AppNotificationManager
 const route = useRoute()
 
 const addServerModal = ref<InstanceType<typeof AddServerModal>>()

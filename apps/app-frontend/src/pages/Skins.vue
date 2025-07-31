@@ -1,4 +1,27 @@
 <script setup lang="ts">
+import type AccountsCard from '@/components/ui/AccountsCard.vue'
+import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
+import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
+import UploadSkinModal from '@/components/ui/skin/UploadSkinModal.vue'
+import { trackEvent } from '@/helpers/analytics'
+import { get_default_user, login as login_flow, users } from '@/helpers/auth'
+import type { RenderResult } from '@/helpers/rendering/batch-skin-renderer.ts'
+import { generateSkinPreviews, skinBlobUrlMap } from '@/helpers/rendering/batch-skin-renderer.ts'
+import { get as getSettings } from '@/helpers/settings.ts'
+import type { Cape, Skin } from '@/helpers/skins.ts'
+import {
+  equip_skin,
+  filterDefaultSkins,
+  filterSavedSkins,
+  get_available_capes,
+  get_available_skins,
+  get_normalized_skin_texture,
+  normalize_skin_texture,
+  remove_custom_skin,
+  set_default_cape,
+} from '@/helpers/skins.ts'
+import type { AppNotificationManager } from '@/providers/app-notifications'
+import { handleSevereError } from '@/store/error'
 import {
   EditIcon,
   ExcitedRinthbot,
@@ -12,42 +35,21 @@ import {
   Button,
   ButtonStyled,
   ConfirmModal,
+  injectNotificationManager,
   SkinButton,
   SkinLikeTextButton,
   SkinPreviewRenderer,
 } from '@modrinth/ui'
+import { arrayBufferToBase64 } from '@modrinth/utils'
 import { computedAsync } from '@vueuse/core'
 import type { Ref } from 'vue'
 import { computed, inject, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue'
-import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
-import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
-import UploadSkinModal from '@/components/ui/skin/UploadSkinModal.vue'
-import { handleError, useNotifications } from '@/store/notifications'
-import type { Cape, Skin } from '@/helpers/skins.ts'
-import {
-  normalize_skin_texture,
-  equip_skin,
-  filterDefaultSkins,
-  filterSavedSkins,
-  get_available_capes,
-  get_available_skins,
-  get_normalized_skin_texture,
-  remove_custom_skin,
-  set_default_cape,
-} from '@/helpers/skins.ts'
-import { get as getSettings } from '@/helpers/settings.ts'
-import { get_default_user, login as login_flow, users } from '@/helpers/auth'
-import type { RenderResult } from '@/helpers/rendering/batch-skin-renderer.ts'
-import { generateSkinPreviews, skinBlobUrlMap } from '@/helpers/rendering/batch-skin-renderer.ts'
-import { handleSevereError } from '@/store/error'
-import { trackEvent } from '@/helpers/analytics'
-import type AccountsCard from '@/components/ui/AccountsCard.vue'
-import { arrayBufferToBase64 } from '@modrinth/utils'
 const editSkinModal = useTemplateRef('editSkinModal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
 const uploadSkinModal = useTemplateRef('uploadSkinModal')
 
-const notifications = useNotifications()
+const notifications = injectNotificationManager() as AppNotificationManager
+const { handleError } = notifications
 
 const settings = ref(await getSettings())
 const skins = ref<Skin[]>([])
@@ -113,7 +115,7 @@ async function loadCapes() {
     defaultCape.value = capes.value.find((c) => c.is_equipped)
     originalDefaultCape.value = defaultCape.value
   } catch (error) {
-    if (currentUser.value) {
+    if (currentUser.value && error instanceof Error) {
       handleError(error)
     }
   }
@@ -126,7 +128,7 @@ async function loadSkins() {
     selectedSkin.value = skins.value.find((s) => s.is_equipped) ?? null
     originalSelectedSkin.value = selectedSkin.value
   } catch (error) {
-    if (currentUser.value) {
+    if (currentUser.value && error instanceof Error) {
       handleError(error)
     }
   }
@@ -161,7 +163,7 @@ async function changeSkin(newSkin: Skin) {
         text: "You're changing your skin too frequently. Mojang's servers have temporarily blocked further requests. Please wait a moment before trying again.",
       })
     } else {
-      handleError(error)
+      handleError(error as Error)
     }
   }
 }
@@ -190,7 +192,7 @@ async function handleCapeSelected(cape: Cape | undefined) {
         text: "You're changing your cape too frequently. Mojang's servers have temporarily blocked further requests. Please wait a moment before trying again.",
       })
     } else {
-      handleError(error)
+      handleError(error as Error)
     }
   }
 }
@@ -207,7 +209,7 @@ async function loadCurrentUser() {
     const allAccounts = await users()
     currentUser.value = allAccounts.find((acc) => acc.profile.id === defaultId)
   } catch (e) {
-    handleError(e)
+    handleError(e as Error)
     currentUser.value = undefined
     currentUserId.value = undefined
   }
@@ -276,7 +278,7 @@ async function checkUserChanges() {
       await loadSkins()
     }
   } catch (error) {
-    if (currentUser.value) {
+    if (currentUser.value && error instanceof Error) {
       handleError(error)
     }
   }
@@ -376,7 +378,7 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
                 color="green"
                 aria-label="Edit skin"
                 class="pointer-events-auto"
-                @click.stop="(e) => editSkinModal?.show(e, skin)"
+                @click.stop="(e: MouseEvent) => editSkinModal?.show(e, skin)"
               >
                 <EditIcon /> Edit
               </Button>

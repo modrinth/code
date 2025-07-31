@@ -1,13 +1,14 @@
 <script setup>
+import NavButton from '@/components/ui/NavButton.vue'
+import { profile_listener } from '@/helpers/events.js'
 import { list } from '@/helpers/profile'
-import { handleError } from '@/store/notifications'
+import { SpinnerIcon } from '@modrinth/assets'
+import { Avatar, injectNotificationManager } from '@modrinth/ui'
+import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 import { onUnmounted, ref } from 'vue'
-import { profile_listener } from '@/helpers/events.js'
-import NavButton from '@/components/ui/NavButton.vue'
-import { Avatar } from '@modrinth/ui'
-import { convertFileSrc } from '@tauri-apps/api/core'
-import { SpinnerIcon } from '@modrinth/assets'
+
+const { handleError } = injectNotificationManager()
 
 const recentInstances = ref([])
 const getInstances = async () => {

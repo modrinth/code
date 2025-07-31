@@ -57,14 +57,15 @@
 
 <script setup>
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import { XIcon, DownloadIcon } from '@modrinth/assets'
-import { Button } from '@modrinth/ui'
-import { formatCategory } from '@modrinth/utils'
-import { add_project_from_version as installMod } from '@/helpers/profile'
-import { ref } from 'vue'
-import { handleError } from '@/store/state.js'
 import { trackEvent } from '@/helpers/analytics'
+import { add_project_from_version as installMod } from '@/helpers/profile'
+import { DownloadIcon, XIcon } from '@modrinth/assets'
+import { Button, injectNotificationManager } from '@modrinth/ui'
+import { formatCategory } from '@modrinth/utils'
+import { ref } from 'vue'
 import Multiselect from 'vue-multiselect'
+
+const { handleError } = injectNotificationManager()
 
 const instance = ref(null)
 const project = ref(null)
