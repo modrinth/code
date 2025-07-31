@@ -68,7 +68,7 @@ const versions: Stage = {
       message: async () => '',
       enablesActions: [
         {
-          id: 'versions_incorrect_project_type_options',
+          id: 'versions_alternate_versions_options',
           type: 'dropdown',
           label: 'How are the alternate versions distributed?',
           options: [

@@ -218,7 +218,7 @@ const username = ref("");
 const password = ref("");
 const confirmPassword = ref("");
 const token = ref("");
-const subscribe = ref(true);
+const subscribe = ref(false);
 
 async function createAccount() {
   startLoading();

@@ -36,7 +36,7 @@
           v-tooltip="'Modrinth Team'"
         />
         <MicrophoneIcon
-          v-if="report && message.author_id === report.reporterUser.id"
+          v-if="report && message.author_id === report.reporter_user?.id"
           v-tooltip="'Reporter'"
           class="reporter-icon"
         />
