@@ -657,7 +657,7 @@ function handleAuxClick(e) {
     </div>
   </div>
   <URLConfirmModal ref="urlModal" />
-  <NotificationPanel />
+  <NotificationPanel has-sidebar />
   <ErrorModal ref="errorModal" />
   <ModInstallModal ref="modInstallModal" />
   <IncompatibilityWarningModal ref="incompatibilityWarningModal" />

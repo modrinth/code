@@ -5,6 +5,7 @@
       'intercom-present': isIntercomPresent,
       'location-left': notificationLocation === 'left',
       'location-right': notificationLocation === 'right',
+      'has-sidebar': hasSidebar,
     }"
   >
     <transition-group name="notifs">
@@ -134,6 +135,15 @@ onMounted(() => {
     observer.disconnect()
   })
 })
+
+withDefaults(
+  defineProps<{
+    hasSidebar: boolean
+  }>(),
+  {
+    hasSidebar: false,
+  },
+)
 </script>
 
 <style lang="scss" scoped>
@@ -145,6 +155,10 @@ onMounted(() => {
 
   &.location-right {
     right: 1.5rem;
+
+    &.has-sidebar {
+      right: 325px;
+    }
   }
 
   &.location-left {
