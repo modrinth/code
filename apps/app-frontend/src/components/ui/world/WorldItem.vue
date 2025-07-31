@@ -86,6 +86,7 @@ const props = withDefaults(
     playingInstance: false,
     playingWorld: false,
     startingInstance: false,
+    supportsServerQuickPlay: true,
     supportsWorldQuickPlay: false,
     currentProtocol: null,
 
