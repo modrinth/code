@@ -1,4 +1,4 @@
-## Insufficient Summary
+## Invalid Summary Formatting
 
 Per section 5.3 of %RULES%, your Summary can not include any extra formatting such as lists, or links.
 
