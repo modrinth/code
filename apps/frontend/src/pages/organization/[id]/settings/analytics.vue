@@ -16,8 +16,9 @@
 
 <script setup>
 import ChartDisplay from "~/components/ui/charts/ChartDisplay.vue";
+import { injectOrganizationContext } from "~/providers/organization-context.ts";
 
-const { projects } = inject("organizationContext");
+const { projects } = injectOrganizationContext();
 </script>
 
 <style scoped lang="scss">

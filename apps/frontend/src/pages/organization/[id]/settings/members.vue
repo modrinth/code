@@ -230,10 +230,11 @@ import {
 import { Avatar, Badge, Button, Checkbox, injectNotificationManager } from "@modrinth/ui";
 import { ref } from "vue";
 import { removeTeamMember } from "~/helpers/teams.js";
+import { injectOrganizationContext } from "~/providers/organization-context.ts";
 import { isPermission } from "~/utils/permissions.ts";
 
 const { addNotification } = injectNotificationManager();
-const { organization, refresh: refreshOrganization, currentMember } = inject("organizationContext");
+const { organization, refresh: refreshOrganization, currentMember } = injectOrganizationContext();
 
 const auth = await useAuth();
 

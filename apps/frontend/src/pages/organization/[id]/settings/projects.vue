@@ -324,11 +324,12 @@ import { formatProjectType } from "@modrinth/utils";
 import { Multiselect } from "vue-multiselect";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import OrganizationProjectTransferModal from "~/components/ui/OrganizationProjectTransferModal.vue";
+import { injectOrganizationContext } from "~/providers/organization-context.ts";
 
 const { addNotification } = injectNotificationManager();
 const { formatMessage } = useVIntl();
 
-const { organization, projects, refresh } = inject("organizationContext");
+const { organization, projects, refresh } = injectOrganizationContext();
 
 const auth = await useAuth();
 

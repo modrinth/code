@@ -1,6 +1,7 @@
 <script setup>
 import { SaveIcon, TrashIcon, UploadIcon } from "@modrinth/assets";
 import { Avatar, Button, ConfirmModal, FileInput, injectNotificationManager } from "@modrinth/ui";
+import { injectOrganizationContext } from "~/providers/organization-context.ts";
 
 const { addNotification } = injectNotificationManager();
 const {
@@ -10,7 +11,7 @@ const {
   deleteIcon,
   patchIcon,
   patchOrganization,
-} = inject("organizationContext");
+} = injectOrganizationContext();
 
 const icon = ref(null);
 const deletedIcon = ref(false);
