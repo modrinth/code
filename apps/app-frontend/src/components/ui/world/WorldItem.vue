@@ -158,10 +158,6 @@ const messages = defineMessages({
     id: 'instance.worlds.view_instance',
     defaultMessage: 'View instance',
   },
-  playAnyway: {
-    id: 'instance.worlds.play_anyway',
-    defaultMessage: 'Play anyway',
-  },
   playInstance: {
     id: 'instance.worlds.play_instance',
     defaultMessage: 'Play instance',
@@ -371,11 +367,6 @@ const messages = defineMessages({
                 action: () => emit('play-instance'),
               },
               {
-                id: 'play-anyway',
-                shown: serverIncompatible && !playingInstance && supportsWorldQuickPlay,
-                action: () => emit('play'),
-              },
-              {
                 id: 'open-instance',
                 shown: !!instancePath,
                 action: () => router.push(encodeURI(`/instance/${instancePath}`)),
@@ -439,10 +430,6 @@ const messages = defineMessages({
             <template #play-instance>
               <PlayIcon aria-hidden="true" />
               {{ formatMessage(messages.playInstance) }}
-            </template>
-            <template #play-anyway>
-              <PlayIcon aria-hidden="true" />
-              {{ formatMessage(messages.playAnyway) }}
             </template>
             <template #open-instance>
               <EyeIcon aria-hidden="true" />

@@ -389,9 +389,6 @@
   "instance.worlds.no_singleplayer_quick_play": {
     "message": "You can only jump straight into singleplayer worlds on Minecraft 1.20+"
   },
-  "instance.worlds.play_anyway": {
-    "message": "Play anyway"
-  },
   "instance.worlds.play_instance": {
     "message": "Play instance"
   },
