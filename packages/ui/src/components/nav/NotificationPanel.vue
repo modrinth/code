@@ -115,7 +115,8 @@ function copyToClipboard(notif: WebNotification): void {
   navigator.clipboard.writeText(text)
 
   setTimeout(() => {
-    delete copied.value[text]
+    const { [text]: _, ...rest } = copied.value
+    copied.value = rest
   }, 2000)
 }
 
