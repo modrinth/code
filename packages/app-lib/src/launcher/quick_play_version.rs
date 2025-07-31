@@ -10,6 +10,7 @@ pub enum QuickPlayServerVersion {
     Builtin,
     BuiltinLegacy,
     Injected,
+    Unsupported,
 }
 
 impl QuickPlayServerVersion {
@@ -17,7 +18,8 @@ impl QuickPlayServerVersion {
         match self {
             Self::Builtin => Some("23w14a"),
             Self::BuiltinLegacy => Some("13w17a"),
-            Self::Injected => None,
+            Self::Injected => Some("a1.0.5_01"),
+            Self::Unsupported => None,
         }
     }
 
@@ -25,7 +27,8 @@ impl QuickPlayServerVersion {
         match self {
             Self::Builtin => Some(Self::BuiltinLegacy),
             Self::BuiltinLegacy => Some(Self::Injected),
-            Self::Injected => None,
+            Self::Injected => Some(Self::Unsupported),
+            Self::Unsupported => None,
         }
     }
 }
@@ -37,21 +40,21 @@ impl QuickPlayServerVersion {
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum QuickPlaySingleplayerVersion {
     Builtin,
-    InStartGame,
+    Unsupported,
 }
 
 impl QuickPlaySingleplayerVersion {
     pub fn min_version(&self) -> Option<&'static str> {
         match self {
             Self::Builtin => Some("23w14a"),
-            Self::InStartGame => None,
+            Self::Unsupported => None,
         }
     }
 
     pub fn older_version(&self) -> Option<Self> {
         match self {
-            Self::Builtin => Some(Self::InStartGame),
-            Self::InStartGame => None,
+            Self::Builtin => Some(Self::Unsupported),
+            Self::Unsupported => None,
         }
     }
 }

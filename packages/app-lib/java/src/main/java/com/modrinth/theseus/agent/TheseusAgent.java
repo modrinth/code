@@ -45,8 +45,6 @@ public final class TheseusAgent {
                 }
             }
             System.out.println("===== Quick play server version: " + QuickPlayServerVersion.CURRENT + " =====");
-            System.out.println(
-                    "===== Quick play singleplayer version: " + QuickPlaySingleplayerVersion.CURRENT + " =====");
         }
 
         final Map<String, ClassTransformer> transformers = new HashMap<>();

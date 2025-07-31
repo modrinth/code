@@ -67,6 +67,7 @@
         :key="`world-${world.type}-${world.type == 'singleplayer' ? world.path : `${world.address}-${world.index}`}`"
         :world="world"
         :highlighted="highlightedWorld === getWorldIdentifier(world)"
+        :supports-server-quick-play="supportsServerQuickPlay"
         :supports-world-quick-play="supportsWorldQuickPlay"
         :current-protocol="protocolVersion"
         :playing-instance="playing"
@@ -154,6 +155,7 @@ import {
   refreshWorlds,
   handleDefaultProfileUpdateEvent,
   showWorldInFolder,
+  hasServerQuickPlaySupport,
 } from '@/helpers/worlds.ts'
 import AddServerModal from '@/components/ui/world/modal/AddServerModal.vue'
 import EditServerModal from '@/components/ui/world/modal/EditServerModal.vue'
@@ -355,6 +357,9 @@ function worldsMatch(world: World, other: World | undefined) {
 }
 
 const gameVersions = ref<GameVersion[]>(await get_game_versions().catch(() => []))
+const supportsServerQuickPlay = computed(() =>
+  hasServerQuickPlaySupport(gameVersions.value, instance.value.game_version),
+)
 const supportsWorldQuickPlay = computed(() =>
   hasWorldQuickPlaySupport(gameVersions.value, instance.value.game_version),
 )

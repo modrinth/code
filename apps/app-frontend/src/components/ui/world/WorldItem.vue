@@ -61,6 +61,7 @@ const props = withDefaults(
     playingInstance?: boolean
     playingWorld?: boolean
     startingInstance?: boolean
+    supportsServerQuickPlay?: boolean
     supportsWorldQuickPlay?: boolean
     currentProtocol?: ProtocolVersion | null
     highlighted?: boolean
@@ -128,8 +129,12 @@ const messages = defineMessages({
     id: 'instance.worlds.a_minecraft_server',
     defaultMessage: 'A Minecraft Server',
   },
-  noQuickPlay: {
-    id: 'instance.worlds.no_quick_play',
+  noServerQuickPlay: {
+    id: 'instance.worlds.no_server_quick_play',
+    defaultMessage: 'You can only jump straight into servers on Minecraft Alpha 1.0.5+',
+  },
+  noSingleplayerQuickPlay: {
+    id: 'instance.worlds.no_singleplayer_quick_play',
     defaultMessage: 'You can only jump straight into singleplayer worlds on Minecraft 1.20+',
   },
   gameAlreadyOpen: {
@@ -334,15 +339,18 @@ const messages = defineMessages({
                 ? formatMessage(messages.noContact)
                 : serverIncompatible
                   ? formatMessage(messages.incompatibleServer)
-                  : world.type == 'singleplayer' && !supportsWorldQuickPlay
-                    ? formatMessage(messages.noQuickPlay)
-                    : playingOtherWorld || locked
-                      ? formatMessage(messages.gameAlreadyOpen)
-                      : null
+                  : world.type == 'server' && !supportsServerQuickPlay
+                    ? formatMessage(messages.noServerQuickPlay)
+                    : world.type == 'singleplayer' && !supportsWorldQuickPlay
+                      ? formatMessage(messages.noSingleplayerQuickPlay)
+                      : playingOtherWorld || locked
+                        ? formatMessage(messages.gameAlreadyOpen)
+                        : null
             "
             :disabled="
               playingOtherWorld ||
               startingInstance ||
+              (world.type == 'server' && !supportsServerQuickPlay) ||
               (world.type == 'singleplayer' && !supportsWorldQuickPlay)
             "
             @click="emit('play')"

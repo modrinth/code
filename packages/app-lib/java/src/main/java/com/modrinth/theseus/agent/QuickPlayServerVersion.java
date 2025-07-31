@@ -4,8 +4,9 @@ package com.modrinth.theseus.agent;
 public enum QuickPlayServerVersion {
     BUILTIN,
     BUILTIN_LEGACY,
-    INJECTED;
+    INJECTED,
+    UNSUPPORTED;
 
     public static final QuickPlayServerVersion CURRENT =
-            valueOf(System.getProperty("modrinth.internal.quickPlayServerVersion"));
+            valueOf(System.getProperty("modrinth.internal.quickPlay.serverVersion"));
 }

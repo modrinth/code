@@ -1,7 +1,5 @@
 //! Minecraft CLI argument logic
-use crate::launcher::quick_play_version::{
-    QuickPlayServerVersion, QuickPlaySingleplayerVersion,
-};
+use crate::launcher::quick_play_version::QuickPlayServerVersion;
 use crate::launcher::{QuickPlayVersion, parse_rules};
 use crate::profile::QuickPlayType;
 use crate::state::Credentials;
@@ -184,39 +182,19 @@ pub fn get_jvm_arguments(
     ));
 
     parsed_arguments.push(format!(
-        "-Dmodrinth.internal.quickPlayServerVersion={}",
+        "-Dmodrinth.internal.quickPlay.serverVersion={}",
         serde_json::to_value(quick_play_version.server)?
             .as_str()
             .unwrap()
     ));
-    parsed_arguments.push(format!(
-        "-Dmodrinth.internal.quickPlaySingleplayerVersion={}",
-        serde_json::to_value(quick_play_version.singleplayer)?
-            .as_str()
-            .unwrap()
-    ));
-    match (quick_play_type, quick_play_version) {
-        (QuickPlayType::Singleplayer(world), _)
-            if quick_play_version.singleplayer
-                != QuickPlaySingleplayerVersion::Builtin =>
-        {
-            parsed_arguments
-                .push(format!("-Dmodrinth.internal.quickPlayWorld={world}"));
-        }
-        (
-            QuickPlayType::Server(server),
-            QuickPlayVersion {
-                server: QuickPlayServerVersion::Injected,
-                ..
-            },
-        ) => {
-            let (host, port) = server.require_resolved()?;
-            parsed_arguments
-                .push(format!("-Dmodrinth.internal.quickPlayHost={host}"));
-            parsed_arguments
-                .push(format!("-Dmodrinth.internal.quickPlayPort={port}"));
-        }
-        _ => {}
+    if let QuickPlayType::Server(server) = quick_play_type
+        && quick_play_version.server == QuickPlayServerVersion::Injected
+    {
+        let (host, port) = server.require_resolved()?;
+        parsed_arguments.extend_from_slice(&[
+            format!("-Dmodrinth.internal.quickPlay.host={host}"),
+            format!("-Dmodrinth.internal.quickPlay.port={port}"),
+        ]);
     }
 
     for arg in custom_args {

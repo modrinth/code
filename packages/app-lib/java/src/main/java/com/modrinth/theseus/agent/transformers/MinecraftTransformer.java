@@ -21,15 +21,13 @@ public final class MinecraftTransformer extends ClassNodeTransformer {
 
     @Override
     protected boolean transform(ClassNode classNode) {
-        boolean transformed = false;
         if (QuickPlayServerVersion.CURRENT == QuickPlayServerVersion.INJECTED) {
-            addServerJoinSupport(classNode);
-            transformed = true;
+            return addServerJoinSupport(classNode);
         }
-        return transformed;
+        return false;
     }
 
-    private static void addServerJoinSupport(ClassNode classNode) {
+    private static boolean addServerJoinSupport(ClassNode classNode) {
         String setServerName = null;
         MethodNode constructor = null;
         for (final MethodNode method : classNode.methods) {
@@ -44,18 +42,22 @@ public final class MinecraftTransformer extends ClassNodeTransformer {
                     // know which is real, just return so we don't call something we shouldn't.
                     // Note this can't happen unless some other mod is adding a method with this
                     // same descriptor.
-                    return;
+                    return false;
                 }
             }
         }
-        if (constructor == null) return;
+        if (constructor == null) {
+            return false;
+        }
 
         final ListIterator<AbstractInsnNode> it = constructor.instructions.iterator();
-        if (!InsnPattern.findAndSkip(it, INITIALIZE_THIS_PATTERN)) return;
+        if (!InsnPattern.findAndSkip(it, INITIALIZE_THIS_PATTERN)) {
+            return true;
+        }
 
         final LabelNode noQuickPlayLabel = new LabelNode();
         final LabelNode doneQuickPlayLabel = new LabelNode();
-        it.add(new LdcInsnNode("modrinth.internal.quickPlayHost"));
+        it.add(new LdcInsnNode("modrinth.internal.quickPlay.host"));
         // String
         it.add(new MethodInsnNode(
                 Opcodes.INVOKESTATIC, "java/lang/System", "getProperty", "(Ljava/lang/String;)Ljava/lang/String;"));
@@ -68,7 +70,7 @@ public final class MinecraftTransformer extends ClassNodeTransformer {
         // String Minecraft
         it.add(new InsnNode(Opcodes.SWAP));
         // Minecraft String
-        it.add(new LdcInsnNode("modrinth.internal.quickPlayPort"));
+        it.add(new LdcInsnNode("modrinth.internal.quickPlay.port"));
         // Minecraft String String
         it.add(new MethodInsnNode(
                 Opcodes.INVOKESTATIC, "java/lang/System", "getProperty", "(Ljava/lang/String;)Ljava/lang/String;"));
@@ -91,5 +93,7 @@ public final class MinecraftTransformer extends ClassNodeTransformer {
             it.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
         }
         //
+
+        return true;
     }
 }
