@@ -612,6 +612,7 @@
               </ButtonStyled>
             </div>
             <div class="mt-auto flex flex-wrap justify-center gap-3 md:flex-col">
+              <div id="inmobi-injected-link"></div>
               <p class="m-0">
                 <IntlFormatted :message-id="footerMessages.openSource">
                   <template #github-link="{ children }">
