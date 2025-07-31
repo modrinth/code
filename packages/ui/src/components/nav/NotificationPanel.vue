@@ -139,7 +139,7 @@ onMounted(() => {
 
 withDefaults(
   defineProps<{
-    hasSidebar: boolean
+    hasSidebar?: boolean
   }>(),
   {
     hasSidebar: false,

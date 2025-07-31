@@ -7,8 +7,8 @@
 </template>
 <script setup lang="ts">
 import { NotificationPanel, provideNotificationManager } from "@modrinth/ui";
-import { FrontendNotificationManager } from "./providers/web-notifications.ts";
 import ModrinthLoadingIndicator from "~/components/ui/modrinth-loading-indicator.ts";
+import { FrontendNotificationManager } from "./providers/frontend-notifications.ts";
 
 provideNotificationManager(new FrontendNotificationManager());
 </script>
