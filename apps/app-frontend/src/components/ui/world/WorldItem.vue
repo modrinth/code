@@ -6,9 +6,8 @@ import type {
   ServerWorld,
   SingleplayerWorld,
   World,
-  set_world_display_status,
-  getWorldIdentifier,
 } from '@/helpers/worlds.ts'
+import { set_world_display_status, getWorldIdentifier } from '@/helpers/worlds.ts'
 import { formatNumber, getPingLevel } from '@modrinth/utils'
 import {
   useRelativeTime,
