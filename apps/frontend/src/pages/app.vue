@@ -7,157 +7,157 @@ import {
   SearchIcon,
   SendIcon,
   TrashIcon,
-} from "@modrinth/assets";
-import { Avatar, Badge,Checkbox } from "@modrinth/ui";
+} from '@modrinth/assets'
+import { Avatar, Badge, Checkbox } from '@modrinth/ui'
 
-import ATLauncher from "~/assets/images/external/atlauncher.svg?component";
-import CurseForge from "~/assets/images/external/curseforge.svg?component";
-import PrismIcon from "~/assets/images/external/prism.svg?component";
-import LogoAnimated from "~/components/brand/LogoAnimated.vue";
-import LatestNewsRow from "~/components/ui/news/LatestNewsRow.vue";
-import { homePageProjects } from "~/generated/state.json";
+import ATLauncher from '~/assets/images/external/atlauncher.svg?component'
+import CurseForge from '~/assets/images/external/curseforge.svg?component'
+import PrismIcon from '~/assets/images/external/prism.svg?component'
+import LogoAnimated from '~/components/brand/LogoAnimated.vue'
+import LatestNewsRow from '~/components/ui/news/LatestNewsRow.vue'
+import { homePageProjects } from '~/generated/state.json'
 
 interface LauncherPlatform {
-  install_urls: string[];
+  install_urls: string[]
 }
 
 interface LauncherUpdates {
   platforms: {
-    "darwin-aarch64": LauncherPlatform;
-    "windows-x86_64": LauncherPlatform;
-    "linux-x86_64": LauncherPlatform;
-  };
+    'darwin-aarch64': LauncherPlatform
+    'windows-x86_64': LauncherPlatform
+    'linux-x86_64': LauncherPlatform
+  }
 }
 
-type OSType = "Mac" | "Windows" | "Linux" | null;
+type OSType = 'Mac' | 'Windows' | 'Linux' | null
 
-const downloadWindows = ref<HTMLAnchorElement | null>(null);
-const downloadLinux = ref<HTMLAnchorElement | null>(null);
-const downloadSection = ref<HTMLElement | null>(null);
-const windowsLink = ref<string | null>(null);
+const downloadWindows = ref<HTMLAnchorElement | null>(null)
+const downloadLinux = ref<HTMLAnchorElement | null>(null)
+const downloadSection = ref<HTMLElement | null>(null)
+const windowsLink = ref<string | null>(null)
 
 const linuxLinks = reactive({
   appImage: null as string | null,
   deb: null as string | null,
   rpm: null as string | null,
-  thirdParty: "https://support.modrinth.com/en/articles/9298760",
-});
+  thirdParty: 'https://support.modrinth.com/en/articles/9298760',
+})
 
 const macLinks = reactive({
   universal: null as string | null,
-});
+})
 
-const newProjects = homePageProjects.slice(0, 40);
-const val = Math.ceil(newProjects.length / 6);
+const newProjects = homePageProjects.slice(0, 40)
+const val = Math.ceil(newProjects.length / 6)
 const rows = [
   newProjects.slice(0, val),
   newProjects.slice(val, val * 2),
   newProjects.slice(val * 2, val * 3),
   newProjects.slice(val * 3, val * 4),
   newProjects.slice(val * 4, val * 5),
-];
+]
 
 const { data: launcherUpdates } = await useFetch<LauncherUpdates>(
-  "https://launcher-files.modrinth.com/updates.json?new",
+  'https://launcher-files.modrinth.com/updates.json?new',
   {
     server: false,
     getCachedData(key, nuxtApp) {
-      const cached = (nuxtApp.ssrContext?.cache as any)?.[key] || nuxtApp.payload.data[key];
-      if (!cached) return;
+      const cached = (nuxtApp.ssrContext?.cache as any)?.[key] || nuxtApp.payload.data[key]
+      if (!cached) return
 
-      const now = Date.now();
-      const cacheTime = cached._cacheTime || 0;
-      const maxAge = 5 * 60 * 1000;
+      const now = Date.now()
+      const cacheTime = cached._cacheTime || 0
+      const maxAge = 5 * 60 * 1000
 
       if (now - cacheTime > maxAge) {
-        return null;
+        return null
       }
 
-      return cached;
+      return cached
     },
     transform(data) {
       return {
         ...data,
         _cacheTime: Date.now(),
-      };
+      }
     },
   },
-);
+)
 
 const platform = computed<string>(() => {
   if (import.meta.server) {
-    const headers = useRequestHeaders();
-    return headers["user-agent"] || "";
+    const headers = useRequestHeaders()
+    return headers['user-agent'] || ''
   } else {
-    return navigator.userAgent || "";
+    return navigator.userAgent || ''
   }
-});
+})
 const os = computed<OSType>(() => {
-  if (platform.value.includes("Mac")) {
-    return "Mac";
-  } else if (platform.value.includes("Win")) {
-    return "Windows";
-  } else if (platform.value.includes("Linux")) {
-    return "Linux";
+  if (platform.value.includes('Mac')) {
+    return 'Mac'
+  } else if (platform.value.includes('Win')) {
+    return 'Windows'
+  } else if (platform.value.includes('Linux')) {
+    return 'Linux'
   } else {
-    return null;
+    return null
   }
-});
+})
 const downloadLauncher = computed(() => {
-  if (os.value === "Windows") {
+  if (os.value === 'Windows') {
     return () => {
-      downloadWindows.value?.click();
-    };
-  } else if (os.value === "Linux") {
+      downloadWindows.value?.click()
+    }
+  } else if (os.value === 'Linux') {
     return () => {
-      downloadLinux.value?.click();
-    };
+      downloadLinux.value?.click()
+    }
   } else {
     return () => {
-      scrollToSection();
-    };
+      scrollToSection()
+    }
   }
-});
+})
 
 const handleDownload = () => {
-  downloadLauncher.value();
-};
+  downloadLauncher.value()
+}
 
 watch(
   launcherUpdates,
   (newData) => {
     if (newData?.platforms) {
-      macLinks.universal = newData.platforms["darwin-aarch64"]?.install_urls[0] || null;
-      windowsLink.value = newData.platforms["windows-x86_64"]?.install_urls[0] || null;
-      linuxLinks.appImage = newData.platforms["linux-x86_64"]?.install_urls[1] || null;
-      linuxLinks.deb = newData.platforms["linux-x86_64"]?.install_urls[0] || null;
-      linuxLinks.rpm = newData.platforms["linux-x86_64"]?.install_urls[2] || null;
+      macLinks.universal = newData.platforms['darwin-aarch64']?.install_urls[0] || null
+      windowsLink.value = newData.platforms['windows-x86_64']?.install_urls[0] || null
+      linuxLinks.appImage = newData.platforms['linux-x86_64']?.install_urls[1] || null
+      linuxLinks.deb = newData.platforms['linux-x86_64']?.install_urls[0] || null
+      linuxLinks.rpm = newData.platforms['linux-x86_64']?.install_urls[2] || null
     }
   },
   { immediate: true },
-);
+)
 
 const scrollToSection = () => {
   nextTick(() => {
     if (downloadSection.value) {
       window.scrollTo({
         top: downloadSection.value.offsetTop,
-        behavior: "smooth",
-      });
+        behavior: 'smooth',
+      })
     }
-  });
-};
+  })
+}
 
-const title = "Download the Modrinth App!";
+const title = 'Download the Modrinth App!'
 const description =
-  "The Modrinth App is a unique, open source launcher that allows you to play your favorite mods, and keep them up to date, all in one neat little package.";
+  'The Modrinth App is a unique, open source launcher that allows you to play your favorite mods, and keep them up to date, all in one neat little package.'
 
 useSeoMeta({
   title,
   description,
   ogTitle: title,
   ogDescription: description,
-});
+})
 </script>
 
 <template>
@@ -166,7 +166,7 @@ useSeoMeta({
       <h1 class="main-header">
         Download Modrinth <br v-if="os" />
         App
-        {{ os ? `for ${os}` : "" }}
+        {{ os ? `for ${os}` : '' }}
       </h1>
       <h2 class="main-subheader">
         The Modrinth App is a unique, open source launcher that allows you to play your favorite
@@ -500,7 +500,7 @@ useSeoMeta({
               </div>
               <div class="cell important">Modrinth App</div>
               <div class="cell important">Small</div>
-              <div class="cell important">{{ "< 150 MB" }}</div>
+              <div class="cell important">{{ '< 150 MB' }}</div>
             </div>
             <div class="row">
               <div class="cell">
@@ -939,7 +939,7 @@ useSeoMeta({
 <style scoped lang="scss">
 .landing-hero {
   position: relative;
-  background: #0f1121 url("https://cdn-raw.modrinth.com/app-landing/cube-black.png") no-repeat
+  background: #0f1121 url('https://cdn-raw.modrinth.com/app-landing/cube-black.png') no-repeat
     center 4rem;
   background-size: cover;
   padding: 6rem 1rem 12rem 1rem;
@@ -1950,7 +1950,7 @@ useSeoMeta({
   border-radius: var(--radius-lg);
 
   &:before {
-    content: "";
+    content: '';
     position: absolute;
     inset: 0;
     padding: 1px;
@@ -2124,7 +2124,7 @@ useSeoMeta({
   }
 
   .landing-hero {
-    background: url("https://cdn-raw.modrinth.com/app-landing/cube-light.png") no-repeat center 4rem;
+    background: url('https://cdn-raw.modrinth.com/app-landing/cube-light.png') no-repeat center 4rem;
     background-size: cover;
   }
 

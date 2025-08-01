@@ -80,13 +80,13 @@
                 }}/year by switching to yearly billing!
               </span>
               <span class="text-sm text-secondary">
-                Since {{ $dayjs(midasSubscription.created).format("MMMM D, YYYY") }}
+                Since {{ $dayjs(midasSubscription.created).format('MMMM D, YYYY') }}
               </span>
               <span v-if="midasCharge.status === 'open'" class="text-sm text-secondary">
-                Renews {{ $dayjs(midasCharge.due).format("MMMM D, YYYY") }}
+                Renews {{ $dayjs(midasCharge.due).format('MMMM D, YYYY') }}
               </span>
               <span v-else-if="midasCharge.status === 'cancelled'" class="text-sm text-secondary">
-                Expires {{ $dayjs(midasCharge.due).format("MMMM D, YYYY") }}
+                Expires {{ $dayjs(midasCharge.due).format('MMMM D, YYYY') }}
               </span>
             </template>
 
@@ -107,7 +107,7 @@
               <button
                 @click="
                   () => {
-                    $refs.midasPurchaseModal.show();
+                    $refs.midasPurchaseModal.show()
                   }
                 "
               >
@@ -122,8 +122,8 @@
                   {
                     id: 'cancel',
                     action: () => {
-                      cancelSubscriptionId = midasSubscription.id;
-                      $refs.modalCancel.show();
+                      cancelSubscriptionId = midasSubscription.id
+                      $refs.modalCancel.show()
                     },
                   },
                 ]"
@@ -142,8 +142,8 @@
                 :disabled="changingInterval"
                 @click="
                   () => {
-                    cancelSubscriptionId = midasSubscription.id;
-                    $refs.modalCancel.show();
+                    cancelSubscriptionId = midasSubscription.id
+                    $refs.modalCancel.show()
                   }
                 "
               >
@@ -168,7 +168,7 @@
                 @click="switchMidasInterval(oppositeInterval)"
               >
                 <SpinnerIcon v-if="changingInterval" class="animate-spin" />
-                <TransferIcon v-else /> {{ changingInterval ? "Switching" : "Switch" }} to
+                <TransferIcon v-else /> {{ changingInterval ? 'Switching' : 'Switch' }} to
                 {{ oppositeInterval }}
               </button>
             </ButtonStyled>
@@ -186,7 +186,7 @@
               class="ml-auto"
               @click="
                 () => {
-                  $refs.midasPurchaseModal.show();
+                  $refs.midasPurchaseModal.show()
                 }
               "
             >
@@ -244,8 +244,8 @@
                     <span>
                       {{
                         getPyroProduct(subscription)?.metadata?.ram
-                          ? getPyroProduct(subscription).metadata.ram / 1024 + " GB RAM"
-                          : ""
+                          ? getPyroProduct(subscription).metadata.ram / 1024 + ' GB RAM'
+                          : ''
                       }}
                     </span>
                   </div>
@@ -254,8 +254,8 @@
                     <span>
                       {{
                         getPyroProduct(subscription)?.metadata?.swap
-                          ? getPyroProduct(subscription).metadata.swap / 1024 + " GB Swap"
-                          : ""
+                          ? getPyroProduct(subscription).metadata.swap / 1024 + ' GB Swap'
+                          : ''
                       }}
                     </span>
                   </div>
@@ -264,8 +264,8 @@
                     <span>
                       {{
                         getPyroProduct(subscription)?.metadata?.storage
-                          ? getPyroProduct(subscription).metadata.storage / 1024 + " GB SSD"
-                          : ""
+                          ? getPyroProduct(subscription).metadata.storage / 1024 + ' GB SSD'
+                          : ''
                       }}
                     </span>
                   </div>
@@ -284,17 +284,17 @@
                           )
                         }}
                       </span>
-                      <span>/{{ subscription.interval.replace("ly", "") }}</span>
+                      <span>/{{ subscription.interval.replace('ly', '') }}</span>
                     </div>
                     <div v-if="getPyroCharge(subscription)" class="mb-4 flex flex-col items-end">
                       <span class="text-sm text-secondary">
-                        Since {{ $dayjs(subscription.created).format("MMMM D, YYYY") }}
+                        Since {{ $dayjs(subscription.created).format('MMMM D, YYYY') }}
                       </span>
                       <span
                         v-if="getPyroCharge(subscription).status === 'open'"
                         class="text-sm text-secondary"
                       >
-                        Renews {{ $dayjs(getPyroCharge(subscription).due).format("MMMM D, YYYY") }}
+                        Renews {{ $dayjs(getPyroCharge(subscription).due).format('MMMM D, YYYY') }}
                       </span>
                       <span
                         v-else-if="getPyroCharge(subscription).status === 'processing'"
@@ -307,7 +307,7 @@
                         v-else-if="getPyroCharge(subscription).status === 'cancelled'"
                         class="text-sm text-secondary"
                       >
-                        Expires {{ $dayjs(getPyroCharge(subscription).due).format("MMMM D, YYYY") }}
+                        Expires {{ $dayjs(getPyroCharge(subscription).due).format('MMMM D, YYYY') }}
                       </span>
                       <span
                         v-else-if="getPyroCharge(subscription).status === 'failed'"
@@ -524,8 +524,8 @@
               {
                 id: 'remove',
                 action: () => {
-                  removePaymentMethodIndex = index;
-                  $refs.modal_confirm.show();
+                  removePaymentMethodIndex = index
+                  $refs.modal_confirm.show()
                 },
                 color: 'red',
                 hoverOnly: true,
@@ -571,7 +571,7 @@ import {
   TrashIcon,
   UpdatedIcon,
   XIcon,
-} from "@modrinth/assets";
+} from '@modrinth/assets'
 import {
   AddPaymentMethodModal,
   ButtonStyled,
@@ -580,145 +580,145 @@ import {
   CopyCode,
   OverflowMenu,
   PurchaseModal,
-} from "@modrinth/ui";
-import { calculateSavings, formatPrice, getCurrency } from "@modrinth/utils";
-import { computed,ref } from "vue";
+} from '@modrinth/ui'
+import { calculateSavings, formatPrice, getCurrency } from '@modrinth/utils'
+import { computed, ref } from 'vue'
 
-import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
-import { products } from "~/generated/state.json";
+import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
+import { products } from '~/generated/state.json'
 
 definePageMeta({
-  middleware: "auth",
-});
+  middleware: 'auth',
+})
 
-const app = useNuxtApp();
-const auth = await useAuth();
-const baseId = useId();
+const app = useNuxtApp()
+const auth = await useAuth()
+const baseId = useId()
 
 useHead({
   script: [
     {
-      src: "https://js.stripe.com/v3/",
+      src: 'https://js.stripe.com/v3/',
       defer: true,
       async: true,
     },
   ],
-});
+})
 
-const data = useNuxtApp();
-const config = useRuntimeConfig();
+const data = useNuxtApp()
+const config = useRuntimeConfig()
 
-const vintl = useVIntl();
-const { formatMessage } = vintl;
+const vintl = useVIntl()
+const { formatMessage } = vintl
 
 const deleteModalMessages = defineMessages({
   title: {
-    id: "settings.billing.modal.delete.title",
-    defaultMessage: "Are you sure you want to remove this payment method?",
+    id: 'settings.billing.modal.delete.title',
+    defaultMessage: 'Are you sure you want to remove this payment method?',
   },
   description: {
-    id: "settings.billing.modal.delete.description",
-    defaultMessage: "This will remove this payment method forever (like really forever).",
+    id: 'settings.billing.modal.delete.description',
+    defaultMessage: 'This will remove this payment method forever (like really forever).',
   },
   action: {
-    id: "settings.billing.modal.delete.action",
-    defaultMessage: "Remove this payment method",
+    id: 'settings.billing.modal.delete.action',
+    defaultMessage: 'Remove this payment method',
   },
-});
+})
 
 const cancelModalMessages = defineMessages({
   title: {
-    id: "settings.billing.modal.cancel.title",
-    defaultMessage: "Are you sure you want to cancel your subscription?",
+    id: 'settings.billing.modal.cancel.title',
+    defaultMessage: 'Are you sure you want to cancel your subscription?',
   },
   description: {
-    id: "settings.billing.modal.cancel.description",
+    id: 'settings.billing.modal.cancel.description',
     defaultMessage:
-      "This will cancel your subscription. You will retain your perks until the end of the current billing cycle.",
+      'This will cancel your subscription. You will retain your perks until the end of the current billing cycle.',
   },
   action: {
-    id: "settings.billing.modal.cancel.action",
-    defaultMessage: "Cancel subscription",
+    id: 'settings.billing.modal.cancel.action',
+    defaultMessage: 'Cancel subscription',
   },
-});
+})
 
 const messages = defineMessages({
   subscriptionTitle: {
-    id: "settings.billing.subscription.title",
-    defaultMessage: "Subscriptions",
+    id: 'settings.billing.subscription.title',
+    defaultMessage: 'Subscriptions',
   },
   subscriptionDescription: {
-    id: "settings.billing.subscription.description",
-    defaultMessage: "Manage your Modrinth subscriptions.",
+    id: 'settings.billing.subscription.description',
+    defaultMessage: 'Manage your Modrinth subscriptions.',
   },
   paymentMethodTitle: {
-    id: "settings.billing.payment_method.title",
-    defaultMessage: "Payment methods",
+    id: 'settings.billing.payment_method.title',
+    defaultMessage: 'Payment methods',
   },
   paymentMethodNone: {
-    id: "settings.billing.payment_method.none",
-    defaultMessage: "You have not added any payment methods.",
+    id: 'settings.billing.payment_method.none',
+    defaultMessage: 'You have not added any payment methods.',
   },
   paymentMethodHistory: {
-    id: "settings.billing.payment_method.action.history",
-    defaultMessage: "View past charges",
+    id: 'settings.billing.payment_method.action.history',
+    defaultMessage: 'View past charges',
   },
   paymentMethodAdd: {
-    id: "settings.billing.payment_method.action.add",
-    defaultMessage: "Add payment method",
+    id: 'settings.billing.payment_method.action.add',
+    defaultMessage: 'Add payment method',
   },
   paymentMethodPrimary: {
-    id: "settings.billing.payment_method.primary",
-    defaultMessage: "Primary",
+    id: 'settings.billing.payment_method.primary',
+    defaultMessage: 'Primary',
   },
   paymentMethodMakePrimary: {
-    id: "settings.billing.payment_method.action.primary",
-    defaultMessage: "Make primary",
+    id: 'settings.billing.payment_method.action.primary',
+    defaultMessage: 'Make primary',
   },
   paymentMethodCardDisplay: {
-    id: "settings.billing.payment_method.card_display",
-    defaultMessage: "{card_brand} ending in {last_four}",
+    id: 'settings.billing.payment_method.card_display',
+    defaultMessage: '{card_brand} ending in {last_four}',
   },
   paymentMethodCardExpiry: {
-    id: "settings.billing.payment_method.card_expiry",
-    defaultMessage: "Expires {month}/{year}",
+    id: 'settings.billing.payment_method.card_expiry',
+    defaultMessage: 'Expires {month}/{year}',
   },
   pyroSubscriptionTitle: {
-    id: "settings.billing.pyro_subscription.title",
-    defaultMessage: "Modrinth Server Subscriptions",
+    id: 'settings.billing.pyro_subscription.title',
+    defaultMessage: 'Modrinth Server Subscriptions',
   },
   pyroSubscriptionDescription: {
-    id: "settings.billing.pyro_subscription.description",
-    defaultMessage: "Manage your Modrinth Server subscriptions.",
+    id: 'settings.billing.pyro_subscription.description',
+    defaultMessage: 'Manage your Modrinth Server subscriptions.',
   },
-});
+})
 
 const paymentMethodTypes = defineMessages({
   visa: {
-    id: "settings.billing.payment_method_type.visa",
-    defaultMessage: "Visa",
+    id: 'settings.billing.payment_method_type.visa',
+    defaultMessage: 'Visa',
   },
-  amex: { id: "settings.billing.payment_method_type.amex", defaultMessage: "American Express" },
-  diners: { id: "settings.billing.payment_method_type.diners", defaultMessage: "Diners Club" },
-  discover: { id: "settings.billing.payment_method_type.discover", defaultMessage: "Discover" },
-  eftpos: { id: "settings.billing.payment_method_type.eftpos", defaultMessage: "EFTPOS" },
-  jcb: { id: "settings.billing.payment_method_type.jcb", defaultMessage: "JCB" },
+  amex: { id: 'settings.billing.payment_method_type.amex', defaultMessage: 'American Express' },
+  diners: { id: 'settings.billing.payment_method_type.diners', defaultMessage: 'Diners Club' },
+  discover: { id: 'settings.billing.payment_method_type.discover', defaultMessage: 'Discover' },
+  eftpos: { id: 'settings.billing.payment_method_type.eftpos', defaultMessage: 'EFTPOS' },
+  jcb: { id: 'settings.billing.payment_method_type.jcb', defaultMessage: 'JCB' },
   mastercard: {
-    id: "settings.billing.payment_method_type.mastercard",
-    defaultMessage: "MasterCard",
+    id: 'settings.billing.payment_method_type.mastercard',
+    defaultMessage: 'MasterCard',
   },
-  unionpay: { id: "settings.billing.payment_method_type.unionpay", defaultMessage: "UnionPay" },
-  paypal: { id: "settings.billing.payment_method_type.paypal", defaultMessage: "PayPal" },
-  cashapp: { id: "settings.billing.payment_method_type.cashapp", defaultMessage: "Cash App" },
+  unionpay: { id: 'settings.billing.payment_method_type.unionpay', defaultMessage: 'UnionPay' },
+  paypal: { id: 'settings.billing.payment_method_type.paypal', defaultMessage: 'PayPal' },
+  cashapp: { id: 'settings.billing.payment_method_type.cashapp', defaultMessage: 'Cash App' },
   amazon_pay: {
-    id: "settings.billing.payment_method_type.amazon_pay",
-    defaultMessage: "Amazon Pay",
+    id: 'settings.billing.payment_method_type.amazon_pay',
+    defaultMessage: 'Amazon Pay',
   },
   unknown: {
-    id: "settings.billing.payment_method_type.unknown",
-    defaultMessage: "Unknown payment method",
+    id: 'settings.billing.payment_method_type.unknown',
+    defaultMessage: 'Unknown payment method',
   },
-});
+})
 
 const [
   { data: paymentMethods, refresh: refreshPaymentMethods },
@@ -728,257 +728,257 @@ const [
   { data: productsData, refresh: refreshProducts },
   { data: serversData, refresh: refreshServers },
 ] = await Promise.all([
-  useAsyncData("billing/payment_methods", () =>
-    useBaseFetch("billing/payment_methods", { internal: true }),
+  useAsyncData('billing/payment_methods', () =>
+    useBaseFetch('billing/payment_methods', { internal: true }),
   ),
-  useAsyncData("billing/payments", () => useBaseFetch("billing/payments", { internal: true })),
-  useAsyncData("billing/customer", () => useBaseFetch("billing/customer", { internal: true })),
-  useAsyncData("billing/subscriptions", () =>
-    useBaseFetch("billing/subscriptions", { internal: true }),
+  useAsyncData('billing/payments', () => useBaseFetch('billing/payments', { internal: true })),
+  useAsyncData('billing/customer', () => useBaseFetch('billing/customer', { internal: true })),
+  useAsyncData('billing/subscriptions', () =>
+    useBaseFetch('billing/subscriptions', { internal: true }),
   ),
-  useAsyncData("billing/products", () => useBaseFetch("billing/products", { internal: true })),
-  useAsyncData("servers", () => useServersFetch("servers")),
-]);
+  useAsyncData('billing/products', () => useBaseFetch('billing/products', { internal: true })),
+  useAsyncData('servers', () => useServersFetch('servers')),
+])
 
-const midasProduct = ref(products.find((x) => x.metadata?.type === "midas"));
+const midasProduct = ref(products.find((x) => x.metadata?.type === 'midas'))
 const midasSubscription = computed(() =>
   subscriptions.value?.find(
     (x) =>
-      x.status === "provisioned" && midasProduct.value?.prices?.find((y) => y.id === x.price_id),
+      x.status === 'provisioned' && midasProduct.value?.prices?.find((y) => y.id === x.price_id),
   ),
-);
+)
 const midasSubscriptionPrice = computed(() =>
   midasSubscription.value
     ? midasProduct.value?.prices?.find((x) => x.id === midasSubscription.value.price_id)
     : null,
-);
+)
 const midasCharge = computed(() =>
   midasSubscription.value
     ? charges.value?.find((x) => x.subscription_id === midasSubscription.value.id)
     : null,
-);
+)
 
 const oppositePrice = computed(() =>
   midasSubscription.value
     ? midasProduct.value?.prices?.find((price) => price.id === midasSubscription.value.price_id)
         ?.prices?.intervals?.[oppositeInterval.value]
     : undefined,
-);
+)
 
 const pyroSubscriptions = computed(() => {
-  const pyroSubs = subscriptions.value?.filter((s) => s?.metadata?.type === "pyro") || [];
-  const servers = serversData.value?.servers || [];
+  const pyroSubs = subscriptions.value?.filter((s) => s?.metadata?.type === 'pyro') || []
+  const servers = serversData.value?.servers || []
 
   return pyroSubs.map((subscription) => {
-    const server = servers.find((s) => s.server_id === subscription.metadata.id);
+    const server = servers.find((s) => s.server_id === subscription.metadata.id)
     return {
       ...subscription,
       serverInfo: server,
-    };
-  });
-});
+    }
+  })
+})
 
-const midasPurchaseModal = ref();
-const country = useUserCountry();
+const midasPurchaseModal = ref()
+const country = useUserCountry()
 const price = computed(() =>
   midasProduct.value?.prices?.find((x) => x.currency_code === getCurrency(country.value)),
-);
+)
 
 const primaryPaymentMethodId = computed(() => {
   if (customer.value?.invoice_settings?.default_payment_method) {
-    return customer.value.invoice_settings.default_payment_method;
+    return customer.value.invoice_settings.default_payment_method
   } else if (paymentMethods.value?.[0]?.id) {
-    return paymentMethods.value[0].id;
+    return paymentMethods.value[0].id
   } else {
-    return null;
+    return null
   }
-});
+})
 
-const addPaymentMethodModal = ref();
+const addPaymentMethodModal = ref()
 
 function addPaymentMethod() {
-  addPaymentMethodModal.value.show(paymentMethods.value);
+  addPaymentMethodModal.value.show(paymentMethods.value)
 }
 
 async function createSetupIntent() {
-  return await useBaseFetch("billing/payment_method", {
+  return await useBaseFetch('billing/payment_method', {
     internal: true,
-    method: "POST",
-  });
+    method: 'POST',
+  })
 }
 
-const removePaymentMethodIndex = ref();
+const removePaymentMethodIndex = ref()
 
-const changingInterval = ref(false);
+const changingInterval = ref(false)
 
 const oppositeInterval = computed(() =>
-  midasCharge.value?.subscription_interval === "yearly" ? "monthly" : "yearly",
-);
+  midasCharge.value?.subscription_interval === 'yearly' ? 'monthly' : 'yearly',
+)
 
 async function switchMidasInterval(interval) {
-  changingInterval.value = true;
-  startLoading();
+  changingInterval.value = true
+  startLoading()
   try {
     await useBaseFetch(`billing/subscription/${midasSubscription.value.id}`, {
       internal: true,
-      method: "PATCH",
+      method: 'PATCH',
       body: {
         interval,
       },
-    });
-    await refresh();
+    })
+    await refresh()
   } catch (error) {
-    console.error("Error switching Modrinth+ payment interval:", error);
+    console.error('Error switching Modrinth+ payment interval:', error)
   }
-  stopLoading();
-  changingInterval.value = false;
+  stopLoading()
+  changingInterval.value = false
 }
 
 async function editPaymentMethod(index, primary) {
-  startLoading();
+  startLoading()
   try {
     await useBaseFetch(`billing/payment_method/${paymentMethods.value[index].id}`, {
       internal: true,
-      method: "PATCH",
+      method: 'PATCH',
       data: {
         primary,
       },
-    });
-    await refresh();
+    })
+    await refresh()
   } catch (err) {
     data.$notify({
-      group: "main",
-      title: "An error occurred",
+      group: 'main',
+      title: 'An error occurred',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  stopLoading();
+  stopLoading()
 }
 
 async function removePaymentMethod(index) {
-  startLoading();
+  startLoading()
   try {
     await useBaseFetch(`billing/payment_method/${paymentMethods.value[index].id}`, {
       internal: true,
-      method: "DELETE",
-    });
-    await refresh();
+      method: 'DELETE',
+    })
+    await refresh()
   } catch (err) {
     data.$notify({
-      group: "main",
-      title: "An error occurred",
+      group: 'main',
+      title: 'An error occurred',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  stopLoading();
+  stopLoading()
 }
 
-const cancelSubscriptionId = ref(null);
+const cancelSubscriptionId = ref(null)
 async function cancelSubscription(id, cancelled) {
-  startLoading();
+  startLoading()
   try {
     await useBaseFetch(`billing/subscription/${id}`, {
       internal: true,
-      method: "PATCH",
+      method: 'PATCH',
       body: {
         cancelled,
       },
-    });
-    await refresh();
+    })
+    await refresh()
   } catch (err) {
     data.$notify({
-      group: "main",
-      title: "An error occurred",
+      group: 'main',
+      title: 'An error occurred',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  stopLoading();
+  stopLoading()
 }
 
 const getPyroProduct = (subscription) => {
-  if (!subscription || !productsData.value) return null;
-  return productsData.value.find((p) => p.prices?.some((x) => x.id === subscription.price_id));
-};
+  if (!subscription || !productsData.value) return null
+  return productsData.value.find((p) => p.prices?.some((x) => x.id === subscription.price_id))
+}
 
 const getPyroCharge = (subscription) => {
-  if (!subscription || !charges.value) return null;
+  if (!subscription || !charges.value) return null
   return charges.value.find(
-    (charge) => charge.subscription_id === subscription.id && charge.status !== "succeeded",
-  );
-};
+    (charge) => charge.subscription_id === subscription.id && charge.status !== 'succeeded',
+  )
+}
 
 const getProductSize = (product) => {
-  if (!product || !product.metadata) return "Unknown";
-  const ramSize = product.metadata.ram;
-  if (ramSize === 4096) return "Small";
-  if (ramSize === 6144) return "Medium";
-  if (ramSize === 8192) return "Large";
-  return "Custom";
-};
+  if (!product || !product.metadata) return 'Unknown'
+  const ramSize = product.metadata.ram
+  if (ramSize === 4096) return 'Small'
+  if (ramSize === 6144) return 'Medium'
+  if (ramSize === 8192) return 'Large'
+  return 'Custom'
+}
 
 const getProductPrice = (product, interval) => {
-  if (!product || !product.prices) return null;
-  const countryValue = country.value;
+  if (!product || !product.prices) return null
+  const countryValue = country.value
   return (
     product.prices.find(
       (p) => p.currency_code === getCurrency(countryValue) && p.prices?.intervals?.[interval],
     ) ??
-    product.prices.find((p) => p.currency_code === "USD" && p.prices?.intervals?.[interval]) ??
+    product.prices.find((p) => p.currency_code === 'USD' && p.prices?.intervals?.[interval]) ??
     product.prices[0]
-  );
-};
+  )
+}
 
-const modalCancel = ref(null);
+const modalCancel = ref(null)
 
-const pyroPurchaseModal = ref();
-const currentSubscription = ref(null);
-const currentProduct = ref(null);
-const upgradeProducts = ref([]);
-upgradeProducts.value.metadata = { type: "pyro" };
+const pyroPurchaseModal = ref()
+const currentSubscription = ref(null)
+const currentProduct = ref(null)
+const upgradeProducts = ref([])
+upgradeProducts.value.metadata = { type: 'pyro' }
 
-const currentSubRenewalDate = ref();
+const currentSubRenewalDate = ref()
 
 const showPyroUpgradeModal = async (subscription) => {
-  currentSubscription.value = subscription;
-  currentSubRenewalDate.value = getPyroCharge(subscription).due;
-  currentProduct.value = getPyroProduct(subscription);
+  currentSubscription.value = subscription
+  currentSubRenewalDate.value = getPyroCharge(subscription).due
+  currentProduct.value = getPyroProduct(subscription)
   upgradeProducts.value = products.filter(
     (p) =>
-      p.metadata.type === "pyro" &&
+      p.metadata.type === 'pyro' &&
       (!currentProduct.value || p.metadata.ram > currentProduct.value.metadata.ram),
-  );
-  upgradeProducts.value.metadata = { type: "pyro" };
+  )
+  upgradeProducts.value.metadata = { type: 'pyro' }
 
-  await nextTick();
+  await nextTick()
 
   if (!currentProduct.value) {
-    console.error("Could not find product for current subscription");
+    console.error('Could not find product for current subscription')
     data.$notify({
-      group: "main",
-      title: "An error occurred",
-      text: "Could not find product for current subscription",
-      type: "error",
-    });
-    return;
+      group: 'main',
+      title: 'An error occurred',
+      text: 'Could not find product for current subscription',
+      type: 'error',
+    })
+    return
   }
 
   if (!pyroPurchaseModal.value) {
-    console.error("pyroPurchaseModal ref is undefined");
-    return;
+    console.error('pyroPurchaseModal ref is undefined')
+    return
   }
 
-  pyroPurchaseModal.value.show();
-};
+  pyroPurchaseModal.value.show()
+}
 
 async function fetchCapacityStatuses(serverId, product) {
   if (product) {
     try {
       return {
         custom: await useServersFetch(`servers/${serverId}/upgrade-stock`, {
-          method: "POST",
+          method: 'POST',
           body: {
             cpu: product.metadata.cpu,
             memory_mb: product.metadata.ram,
@@ -986,21 +986,21 @@ async function fetchCapacityStatuses(serverId, product) {
             storage_mb: product.metadata.storage,
           },
         }),
-      };
+      }
     } catch (error) {
-      console.error("Error checking server capacities:", error);
+      console.error('Error checking server capacities:', error)
       app.$notify({
-        group: "main",
-        title: "Error checking server capacities",
+        group: 'main',
+        title: 'Error checking server capacities',
         text: error,
-        type: "error",
-      });
+        type: 'error',
+      })
       return {
         custom: { available: 0 },
         small: { available: 0 },
         medium: { available: 0 },
         large: { available: 0 },
-      };
+      }
     }
   }
 }
@@ -1009,36 +1009,36 @@ const resubscribePyro = async (subscriptionId, wasSuspended) => {
   try {
     await useBaseFetch(`billing/subscription/${subscriptionId}`, {
       internal: true,
-      method: "PATCH",
+      method: 'PATCH',
       body: {
         cancelled: false,
       },
-    });
-    await refresh();
+    })
+    await refresh()
     if (wasSuspended) {
       data.$notify({
-        group: "main",
-        title: "Resubscription request submitted",
-        text: "If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.",
-        type: "success",
-      });
+        group: 'main',
+        title: 'Resubscription request submitted',
+        text: 'If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.',
+        type: 'success',
+      })
     } else {
       data.$notify({
-        group: "main",
-        title: "Success",
-        text: "Server subscription resubscribed successfully",
-        type: "success",
-      });
+        group: 'main',
+        title: 'Success',
+        text: 'Server subscription resubscribed successfully',
+        type: 'success',
+      })
     }
   } catch {
     data.$notify({
-      group: "main",
-      title: "Error resubscribing",
-      text: "An error occurred while resubscribing to your Modrinth server.",
-      type: "error",
-    });
+      group: 'main',
+      title: 'Error resubscribing',
+      text: 'An error occurred while resubscribing to your Modrinth server.',
+      type: 'error',
+    })
   }
-};
+}
 
 const refresh = async () => {
   await Promise.all([
@@ -1048,22 +1048,22 @@ const refresh = async () => {
     refreshSubscriptions(),
     refreshProducts(),
     refreshServers(),
-  ]);
-};
+  ])
+}
 
 function showCancellationSurvey(subscription) {
   if (!subscription) {
-    console.warn("No survey notice to open");
-    return;
+    console.warn('No survey notice to open')
+    return
   }
 
-  const product = getPyroProduct(subscription);
-  const priceObj = product?.prices?.find((x) => x.id === subscription.price_id);
-  const price = priceObj?.prices?.intervals?.[subscription.interval];
-  const currency = priceObj?.currency_code;
+  const product = getPyroProduct(subscription)
+  const priceObj = product?.prices?.find((x) => x.id === subscription.price_id)
+  const price = priceObj?.prices?.intervals?.[subscription.interval]
+  const currency = priceObj?.currency_code
 
   const popupOptions = {
-    layout: "modal",
+    layout: 'modal',
     width: 700,
     autoClose: 2000,
     hideTitle: true,
@@ -1077,39 +1077,39 @@ function showCancellationSurvey(subscription) {
       started: subscription.created,
       plan_ram: product?.metadata.ram / 1024,
       plan_cpu: product?.metadata.cpu,
-      price: price ? `${price / 100}` : "unknown",
-      currency: currency ?? "unknown",
+      price: price ? `${price / 100}` : 'unknown',
+      currency: currency ?? 'unknown',
     },
     onOpen: () => console.log(`Opened cancellation survey for: ${subscription.id}`),
     onClose: () => console.log(`Closed cancellation survey for: ${subscription.id}`),
     onSubmit: (payload) => {
-      console.log("Form submitted, cancelling server.", payload);
-      cancelSubscription(subscription.id, true);
+      console.log('Form submitted, cancelling server.', payload)
+      cancelSubscription(subscription.id, true)
     },
-  };
+  }
 
-  const formId = "mOr7lM";
+  const formId = 'mOr7lM'
 
   try {
     if (window.Tally?.openPopup) {
       console.log(
         `Opening Tally popup for servers subscription ${subscription.id} (form ID: ${formId})`,
-      );
-      window.Tally.openPopup(formId, popupOptions);
+      )
+      window.Tally.openPopup(formId, popupOptions)
     } else {
-      console.warn("Tally script not yet loaded");
+      console.warn('Tally script not yet loaded')
     }
   } catch (e) {
-    console.error("Error opening Tally popup:", e);
+    console.error('Error opening Tally popup:', e)
   }
 }
 
 useHead({
   script: [
     {
-      src: "https://tally.so/widgets/embed.js",
+      src: 'https://tally.so/widgets/embed.js',
       defer: true,
     },
   ],
-});
+})
 </script>

@@ -326,9 +326,14 @@ import {
   XIcon,
 } from '@modrinth/assets'
 import {
+  type Action,
+  type ButtonAction,
   checklist,
+  type ConditionalButtonAction,
   deserializeActionStates,
+  type DropdownAction,
   expandVariables,
+  finalPermissionMessages,
   findMatchingVariant,
   flattenProjectVariables,
   getActionIdForStage,
@@ -338,16 +343,9 @@ import {
   initializeActionState,
   kebabToTitleCase,
   keybinds,
+  type MultiSelectChipsAction,
   processMessage,
   serializeActionStates,
-} from '@modrinth/moderation'
-import {
-  type Action,
-  type ButtonAction,
-  type ConditionalButtonAction,
-  type DropdownAction,
-  finalPermissionMessages,
-  type MultiSelectChipsAction,
   type Stage,
   type ToggleAction,
 } from '@modrinth/moderation'
@@ -363,8 +361,8 @@ import {
 import {
   type ModerationJudgements,
   type ModerationModpackItem,
-  type ProjectStatus,
   type Project,
+  type ProjectStatus,
   renderHighlightedString,
 } from '@modrinth/utils'
 import { computedAsync, useLocalStorage } from '@vueuse/core'

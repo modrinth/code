@@ -1,150 +1,150 @@
 <script setup lang="ts">
-import { IssuesIcon,RadioButtonCheckedIcon, RadioButtonIcon } from "@modrinth/assets";
-import { commonSettingsMessages } from "@modrinth/ui";
-import Fuse from "fuse.js/dist/fuse.basic";
+import { IssuesIcon, RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
+import { commonSettingsMessages } from '@modrinth/ui'
+import Fuse from 'fuse.js/dist/fuse.basic'
 
-import { isModifierKeyDown } from "~/helpers/events.ts";
+import { isModifierKeyDown } from '~/helpers/events.ts'
 
-const vintl = useVIntl();
-const { formatMessage } = vintl;
+const vintl = useVIntl()
+const { formatMessage } = vintl
 
 const messages = defineMessages({
   languagesDescription: {
-    id: "settings.language.description",
+    id: 'settings.language.description',
     defaultMessage:
-      "Choose your preferred language for the site. Translations are contributed by volunteers <crowdin-link>on Crowdin</crowdin-link>.",
+      'Choose your preferred language for the site. Translations are contributed by volunteers <crowdin-link>on Crowdin</crowdin-link>.',
   },
   automaticLocale: {
-    id: "settings.language.languages.automatic",
-    defaultMessage: "Sync with the system language",
+    id: 'settings.language.languages.automatic',
+    defaultMessage: 'Sync with the system language',
   },
   noResults: {
-    id: "settings.language.languages.search.no-results",
-    defaultMessage: "No languages match your search.",
+    id: 'settings.language.languages.search.no-results',
+    defaultMessage: 'No languages match your search.',
   },
   searchFieldDescription: {
-    id: "settings.language.languages.search-field.description",
-    defaultMessage: "Submit to focus the first search result",
+    id: 'settings.language.languages.search-field.description',
+    defaultMessage: 'Submit to focus the first search result',
   },
   searchFieldPlaceholder: {
-    id: "settings.language.languages.search-field.placeholder",
-    defaultMessage: "Search for a language...",
+    id: 'settings.language.languages.search-field.placeholder',
+    defaultMessage: 'Search for a language...',
   },
   searchResultsAnnouncement: {
-    id: "settings.language.languages.search-results-announcement",
+    id: 'settings.language.languages.search-results-announcement',
     defaultMessage:
-      "{matches, plural, =0 {No languages match} one {# language matches} other {# languages match}} your search.",
+      '{matches, plural, =0 {No languages match} one {# language matches} other {# languages match}} your search.',
   },
   loadFailed: {
-    id: "settings.language.languages.load-failed",
-    defaultMessage: "Cannot load this language. Try again in a bit.",
+    id: 'settings.language.languages.load-failed',
+    defaultMessage: 'Cannot load this language. Try again in a bit.',
   },
   languageLabelApplying: {
-    id: "settings.language.languages.language-label-applying",
-    defaultMessage: "{label}. Applying...",
+    id: 'settings.language.languages.language-label-applying',
+    defaultMessage: '{label}. Applying...',
   },
   languageLabelError: {
-    id: "settings.language.languages.language-label-error",
-    defaultMessage: "{label}. Error",
+    id: 'settings.language.languages.language-label-error',
+    defaultMessage: '{label}. Error',
   },
-});
+})
 
 const categoryNames = defineMessages({
   auto: {
-    id: "settings.language.categories.auto",
-    defaultMessage: "Automatic",
+    id: 'settings.language.categories.auto',
+    defaultMessage: 'Automatic',
   },
   default: {
-    id: "settings.language.categories.default",
-    defaultMessage: "Standard languages",
+    id: 'settings.language.categories.default',
+    defaultMessage: 'Standard languages',
   },
   fun: {
-    id: "settings.language.categories.fun",
-    defaultMessage: "Fun languages",
+    id: 'settings.language.categories.fun',
+    defaultMessage: 'Fun languages',
   },
   experimental: {
-    id: "settings.language.categories.experimental",
-    defaultMessage: "Experimental languages",
+    id: 'settings.language.categories.experimental',
+    defaultMessage: 'Experimental languages',
   },
   searchResult: {
-    id: "settings.language.categories.search-result",
-    defaultMessage: "Search results",
+    id: 'settings.language.categories.search-result',
+    defaultMessage: 'Search results',
   },
-});
+})
 
-type Category = keyof typeof categoryNames;
+type Category = keyof typeof categoryNames
 
-const categoryOrder: Category[] = ["auto", "default", "fun", "experimental"];
+const categoryOrder: Category[] = ['auto', 'default', 'fun', 'experimental']
 
 function normalizeCategoryName(name?: string): keyof typeof categoryNames {
   switch (name) {
-    case "auto":
-    case "fun":
-    case "experimental":
-      return name;
+    case 'auto':
+    case 'fun':
+    case 'experimental':
+      return name
     default:
-      return "default";
+      return 'default'
   }
 }
 
 type LocaleBase = {
-  category: Category;
-  tag: string;
-  searchTerms?: string[];
-};
+  category: Category
+  tag: string
+  searchTerms?: string[]
+}
 
 type AutomaticLocale = LocaleBase & {
-  auto: true;
-};
+  auto: true
+}
 
 type CommonLocale = LocaleBase & {
-  auto?: never;
-  displayName: string;
-  defaultName: string;
-  translatedName: string;
-};
+  auto?: never
+  displayName: string
+  defaultName: string
+  translatedName: string
+}
 
-type Locale = AutomaticLocale | CommonLocale;
+type Locale = AutomaticLocale | CommonLocale
 
-const $defaultNames = useDisplayNames(() => vintl.defaultLocale);
+const $defaultNames = useDisplayNames(() => vintl.defaultLocale)
 
-const $translatedNames = useDisplayNames(() => vintl.locale);
+const $translatedNames = useDisplayNames(() => vintl.locale)
 
 const $locales = computed(() => {
-  const locales: Locale[] = [];
+  const locales: Locale[] = []
 
   locales.push({
     auto: true,
-    tag: "auto",
-    category: "auto",
+    tag: 'auto',
+    category: 'auto',
     searchTerms: [
-      "automatic",
-      "Sync with the system language",
+      'automatic',
+      'Sync with the system language',
       formatMessage(messages.automaticLocale),
     ],
-  });
+  })
 
   for (const locale of vintl.availableLocales) {
-    let displayName = locale.meta?.displayName;
+    let displayName = locale.meta?.displayName
 
     if (displayName == null) {
-      displayName = createDisplayNames(locale.tag).of(locale.tag) ?? locale.tag;
+      displayName = createDisplayNames(locale.tag).of(locale.tag) ?? locale.tag
     }
 
-    let defaultName = vintl.defaultResources["languages.json"]?.[locale.tag];
+    let defaultName = vintl.defaultResources['languages.json']?.[locale.tag]
 
     if (defaultName == null) {
-      defaultName = $defaultNames.value.of(locale.tag) ?? locale.tag;
+      defaultName = $defaultNames.value.of(locale.tag) ?? locale.tag
     }
 
-    let translatedName = vintl.resources["languages.json"]?.[locale.tag];
+    let translatedName = vintl.resources['languages.json']?.[locale.tag]
 
     if (translatedName == null) {
-      translatedName = $translatedNames.value.of(locale.tag) ?? locale.tag;
+      translatedName = $translatedNames.value.of(locale.tag) ?? locale.tag
     }
 
-    let searchTerms = locale.meta?.searchTerms;
-    if (searchTerms === "-") searchTerms = undefined;
+    let searchTerms = locale.meta?.searchTerms
+    if (searchTerms === '-') searchTerms = undefined
 
     locales.push({
       tag: locale.tag,
@@ -152,132 +152,132 @@ const $locales = computed(() => {
       displayName,
       defaultName,
       translatedName,
-      searchTerms: searchTerms?.split("\n"),
-    });
+      searchTerms: searchTerms?.split('\n'),
+    })
   }
 
-  return locales;
-});
+  return locales
+})
 
-const $query = ref("");
+const $query = ref('')
 
-const isQueryEmpty = () => $query.value.trim().length === 0;
+const isQueryEmpty = () => $query.value.trim().length === 0
 
 const fuse = new Fuse<Locale>([], {
-  keys: ["tag", "displayName", "translatedName", "englishName", "searchTerms"],
+  keys: ['tag', 'displayName', 'translatedName', 'englishName', 'searchTerms'],
   threshold: 0.4,
   distance: 100,
-});
+})
 
-watchSyncEffect(() => fuse.setCollection($locales.value));
+watchSyncEffect(() => fuse.setCollection($locales.value))
 
 const $categories = computed(() => {
-  const categories = new Map<Category, Locale[]>();
+  const categories = new Map<Category, Locale[]>()
 
-  for (const category of categoryOrder) categories.set(category, []);
+  for (const category of categoryOrder) categories.set(category, [])
 
   for (const locale of $locales.value) {
-    let categoryLocales = categories.get(locale.category);
+    let categoryLocales = categories.get(locale.category)
 
     if (categoryLocales == null) {
-      categoryLocales = [];
-      categories.set(locale.category, categoryLocales);
+      categoryLocales = []
+      categories.set(locale.category, categoryLocales)
     }
 
-    categoryLocales.push(locale);
+    categoryLocales.push(locale)
   }
 
   for (const categoryKey of [...categories.keys()]) {
     if (categories.get(categoryKey)?.length === 0) {
-      categories.delete(categoryKey);
+      categories.delete(categoryKey)
     }
   }
 
-  return categories;
-});
+  return categories
+})
 
 const $searchResults = computed(() => {
   return new Map<Category, Locale[]>([
-    ["searchResult", isQueryEmpty() ? [] : fuse.search($query.value).map(({ item }) => item)],
-  ]);
-});
+    ['searchResult', isQueryEmpty() ? [] : fuse.search($query.value).map(({ item }) => item)],
+  ])
+})
 
 const $displayCategories = computed(() =>
   isQueryEmpty() ? $categories.value : $searchResults.value,
-);
+)
 
-const $changingTo = ref<string | undefined>();
+const $changingTo = ref<string | undefined>()
 
-const isChanging = () => $changingTo.value != null;
+const isChanging = () => $changingTo.value != null
 
-const $failedLocale = ref<string>();
+const $failedLocale = ref<string>()
 
 const $activeLocale = computed(() => {
-  if ($changingTo.value != null) return $changingTo.value;
-  return vintl.automatic ? "auto" : vintl.locale;
-});
+  if ($changingTo.value != null) return $changingTo.value
+  return vintl.automatic ? 'auto' : vintl.locale
+})
 
 async function changeLocale(value: string) {
-  if ($activeLocale.value === value) return;
+  if ($activeLocale.value === value) return
 
-  $changingTo.value = value;
+  $changingTo.value = value
 
   try {
-    await vintl.changeLocale(value);
-    $failedLocale.value = undefined;
+    await vintl.changeLocale(value)
+    $failedLocale.value = undefined
   } catch {
-    $failedLocale.value = value;
+    $failedLocale.value = value
   } finally {
-    $changingTo.value = undefined;
+    $changingTo.value = undefined
   }
 }
 
-const $languagesList = ref<HTMLDivElement | undefined>();
+const $languagesList = ref<HTMLDivElement | undefined>()
 
 function onSearchKeydown(e: KeyboardEvent) {
-  if (e.key !== "Enter" || isModifierKeyDown(e)) return;
+  if (e.key !== 'Enter' || isModifierKeyDown(e)) return
 
   const focusableTarget = $languagesList.value?.querySelector(
     'input, [tabindex]:not([tabindex="-1"])',
-  ) as HTMLElement | undefined;
+  ) as HTMLElement | undefined
 
-  focusableTarget?.focus();
+  focusableTarget?.focus()
 }
 
 function onItemKeydown(e: KeyboardEvent, locale: Locale) {
   switch (e.key) {
-    case "Enter":
-    case " ":
-      break;
+    case 'Enter':
+    case ' ':
+      break
     default:
-      return;
+      return
   }
 
-  if (isModifierKeyDown(e) || isChanging()) return;
+  if (isModifierKeyDown(e) || isChanging()) return
 
-  changeLocale(locale.tag);
+  changeLocale(locale.tag)
 }
 
 function onItemClick(e: MouseEvent, locale: Locale) {
-  if (isModifierKeyDown(e) || isChanging()) return;
+  if (isModifierKeyDown(e) || isChanging()) return
 
-  changeLocale(locale.tag);
+  changeLocale(locale.tag)
 }
 
 function getItemLabel(locale: Locale) {
   const label = locale.auto
     ? formatMessage(messages.automaticLocale)
-    : `${locale.translatedName}. ${locale.displayName}`;
+    : `${locale.translatedName}. ${locale.displayName}`
 
   if ($changingTo.value === locale.tag) {
-    return formatMessage(messages.languageLabelApplying, { label });
+    return formatMessage(messages.languageLabelApplying, { label })
   }
 
   if ($failedLocale.value === locale.tag) {
-    return formatMessage(messages.languageLabelError, { label });
+    return formatMessage(messages.languageLabelError, { label })
   }
 
-  return label;
+  return label
 }
 </script>
 
@@ -316,9 +316,9 @@ function getItemLabel(locale: Locale) {
         <div id="language-search-results-announcements" class="visually-hidden" aria-live="polite">
           {{
             isQueryEmpty()
-              ? ""
+              ? ''
               : formatMessage(messages.searchResultsAnnouncement, {
-                  matches: $searchResults.get("searchResult")?.length ?? 0,
+                  matches: $searchResults.get('searchResult')?.length ?? 0,
                 })
           }}
         </div>
@@ -404,7 +404,7 @@ function getItemLabel(locale: Locale) {
   position: relative;
   overflow: hidden;
 
-  &:not([aria-disabled="true"]):hover {
+  &:not([aria-disabled='true']):hover {
     border-color: var(--color-button-bg-hover);
   }
 
@@ -422,7 +422,7 @@ function getItemLabel(locale: Locale) {
   }
 
   &.pending::after {
-    content: "";
+    content: '';
     position: absolute;
     top: 0;
     left: 0;
@@ -465,7 +465,7 @@ function getItemLabel(locale: Locale) {
     }
   }
 
-  &[aria-disabled="true"]:not(.pending) {
+  &[aria-disabled='true']:not(.pending) {
     opacity: 0.8;
     pointer-events: none;
     cursor: default;

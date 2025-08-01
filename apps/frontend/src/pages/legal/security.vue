@@ -54,12 +54,12 @@
 
 <script setup>
 const description =
-  "The Security Notice of Modrinth, an open source modding platform focused on Minecraft.";
+  'The Security Notice of Modrinth, an open source modding platform focused on Minecraft.'
 
 useSeoMeta({
-  title: "Security Notice - Modrinth",
+  title: 'Security Notice - Modrinth',
   description,
-  ogTitle: "Security Notice",
+  ogTitle: 'Security Notice',
   ogDescription: description,
-});
+})
 </script>

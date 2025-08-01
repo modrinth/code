@@ -272,222 +272,219 @@ import {
   TrashIcon,
   UploadIcon,
   VersionIcon,
-} from "@modrinth/assets";
-import { ButtonStyled, ConfirmModal, CopyCode,NewModal } from "@modrinth/ui";
-import { computed, nextTick,ref } from "vue";
+} from '@modrinth/assets'
+import { ButtonStyled, ConfirmModal, CopyCode, NewModal } from '@modrinth/ui'
+import { computed, nextTick, ref } from 'vue'
 
-import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const props = defineProps<{
-  server: ModrinthServer;
-}>();
+  server: ModrinthServer
+}>()
 
-const isUpdating = ref(false);
-const data = computed(() => props.server.general);
+const isUpdating = ref(false)
+const data = computed(() => props.server.general)
 
-const serverIP = ref(data?.value?.net?.ip ?? "");
-const serverSubdomain = ref(data?.value?.net?.domain ?? "");
-const serverPrimaryPort = ref(data?.value?.net?.port ?? 0);
-const userDomain = ref("");
-const exampleDomain = "play.example.com";
+const serverIP = ref(data?.value?.net?.ip ?? '')
+const serverSubdomain = ref(data?.value?.net?.domain ?? '')
+const serverPrimaryPort = ref(data?.value?.net?.port ?? 0)
+const userDomain = ref('')
+const exampleDomain = 'play.example.com'
 
-const network = computed(() => props.server.network);
-const allocations = computed(() => network.value?.allocations);
+const network = computed(() => props.server.network)
+const allocations = computed(() => network.value?.allocations)
 
-const newAllocationModal = ref<typeof NewModal>();
-const editAllocationModal = ref<typeof NewModal>();
-const confirmDeleteModal = ref<typeof ConfirmModal>();
-const newAllocationInput = ref<HTMLInputElement | null>(null);
-const editAllocationInput = ref<HTMLInputElement | null>(null);
-const newAllocationName = ref("");
-const newAllocationPort = ref(0);
-const allocationToDelete = ref<number | null>(null);
+const newAllocationModal = ref<typeof NewModal>()
+const editAllocationModal = ref<typeof NewModal>()
+const confirmDeleteModal = ref<typeof ConfirmModal>()
+const newAllocationInput = ref<HTMLInputElement | null>(null)
+const editAllocationInput = ref<HTMLInputElement | null>(null)
+const newAllocationName = ref('')
+const newAllocationPort = ref(0)
+const allocationToDelete = ref<number | null>(null)
 
-const hasUnsavedChanges = computed(() => serverSubdomain.value !== data?.value?.net?.domain);
+const hasUnsavedChanges = computed(() => serverSubdomain.value !== data?.value?.net?.domain)
 
-const isValidSubdomain = computed(() => /^[a-zA-Z0-9-]{5,}$/.test(serverSubdomain.value));
+const isValidSubdomain = computed(() => /^[a-zA-Z0-9-]{5,}$/.test(serverSubdomain.value))
 
 const addNewAllocation = async () => {
-  if (!newAllocationName.value) return;
+  if (!newAllocationName.value) return
 
   try {
-    await props.server.network?.reserveAllocation(newAllocationName.value);
-    await props.server.refresh(["network"]);
+    await props.server.network?.reserveAllocation(newAllocationName.value)
+    await props.server.refresh(['network'])
 
-    newAllocationModal.value?.hide();
-    newAllocationName.value = "";
+    newAllocationModal.value?.hide()
+    newAllocationName.value = ''
 
     addNotification({
-      group: "serverOptions",
-      type: "success",
-      title: "Allocation reserved",
-      text: "Your allocation has been reserved.",
-    });
+      group: 'serverOptions',
+      type: 'success',
+      title: 'Allocation reserved',
+      text: 'Your allocation has been reserved.',
+    })
   } catch (error) {
-    console.error("Failed to reserve new allocation:", error);
+    console.error('Failed to reserve new allocation:', error)
   }
-};
+}
 
 const showNewAllocationModal = () => {
-  newAllocationName.value = "";
-  newAllocationModal.value?.show();
+  newAllocationName.value = ''
+  newAllocationModal.value?.show()
   nextTick(() => {
     setTimeout(() => {
-      newAllocationInput.value?.focus();
-    }, 100);
-  });
-};
+      newAllocationInput.value?.focus()
+    }, 100)
+  })
+}
 
 const showEditAllocationModal = (port: number) => {
-  newAllocationPort.value = port;
-  editAllocationModal.value?.show();
+  newAllocationPort.value = port
+  editAllocationModal.value?.show()
   nextTick(() => {
     setTimeout(() => {
-      editAllocationInput.value?.focus();
-    }, 100);
-  });
-};
+      editAllocationInput.value?.focus()
+    }, 100)
+  })
+}
 
 const showConfirmDeleteModal = (port: number) => {
-  allocationToDelete.value = port;
-  confirmDeleteModal.value?.show();
-};
+  allocationToDelete.value = port
+  confirmDeleteModal.value?.show()
+}
 
 const confirmDeleteAllocation = async () => {
-  if (allocationToDelete.value === null) return;
+  if (allocationToDelete.value === null) return
 
-  await props.server.network?.deleteAllocation(allocationToDelete.value);
-  await props.server.refresh(["network"]);
+  await props.server.network?.deleteAllocation(allocationToDelete.value)
+  await props.server.refresh(['network'])
 
   addNotification({
-    group: "serverOptions",
-    type: "success",
-    title: "Allocation removed",
-    text: "Your allocation has been removed.",
-  });
+    group: 'serverOptions',
+    type: 'success',
+    title: 'Allocation removed',
+    text: 'Your allocation has been removed.',
+  })
 
-  allocationToDelete.value = null;
-};
+  allocationToDelete.value = null
+}
 
 const editAllocation = async () => {
-  if (!newAllocationName.value) return;
+  if (!newAllocationName.value) return
 
   try {
-    await props.server.network?.updateAllocation(newAllocationPort.value, newAllocationName.value);
-    await props.server.refresh(["network"]);
+    await props.server.network?.updateAllocation(newAllocationPort.value, newAllocationName.value)
+    await props.server.refresh(['network'])
 
-    editAllocationModal.value?.hide();
-    newAllocationName.value = "";
+    editAllocationModal.value?.hide()
+    newAllocationName.value = ''
 
     addNotification({
-      group: "serverOptions",
-      type: "success",
-      title: "Allocation updated",
-      text: "Your allocation has been updated.",
-    });
+      group: 'serverOptions',
+      type: 'success',
+      title: 'Allocation updated',
+      text: 'Your allocation has been updated.',
+    })
   } catch (error) {
-    console.error("Failed to reserve new allocation:", error);
+    console.error('Failed to reserve new allocation:', error)
   }
-};
+}
 
 const saveNetwork = async () => {
-  if (!isValidSubdomain.value) return;
+  if (!isValidSubdomain.value) return
 
   try {
-    isUpdating.value = true;
-    const available = await props.server.network?.checkSubdomainAvailability(serverSubdomain.value);
+    isUpdating.value = true
+    const available = await props.server.network?.checkSubdomainAvailability(serverSubdomain.value)
     if (!available) {
       addNotification({
-        group: "serverOptions",
-        type: "error",
-        title: "Subdomain not available",
-        text: "The subdomain you entered is already in use.",
-      });
-      return;
+        group: 'serverOptions',
+        type: 'error',
+        title: 'Subdomain not available',
+        text: 'The subdomain you entered is already in use.',
+      })
+      return
     }
     if (serverSubdomain.value !== data?.value?.net?.domain) {
-      await props.server.network?.changeSubdomain(serverSubdomain.value);
+      await props.server.network?.changeSubdomain(serverSubdomain.value)
     }
     if (serverPrimaryPort.value !== data?.value?.net?.port) {
-      await props.server.network?.updateAllocation(
-        serverPrimaryPort.value,
-        newAllocationName.value,
-      );
+      await props.server.network?.updateAllocation(serverPrimaryPort.value, newAllocationName.value)
     }
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    await props.server.refresh();
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    await props.server.refresh()
     addNotification({
-      group: "serverOptions",
-      type: "success",
-      title: "Server settings updated",
-      text: "Your server settings were successfully changed.",
-    });
+      group: 'serverOptions',
+      type: 'success',
+      title: 'Server settings updated',
+      text: 'Your server settings were successfully changed.',
+    })
   } catch (error) {
-    console.error(error);
+    console.error(error)
     addNotification({
-      group: "serverOptions",
-      type: "error",
-      title: "Failed to update server settings",
-      text: "An error occurred while attempting to update your server settings.",
-    });
+      group: 'serverOptions',
+      type: 'error',
+      title: 'Failed to update server settings',
+      text: 'An error occurred while attempting to update your server settings.',
+    })
   } finally {
-    isUpdating.value = false;
+    isUpdating.value = false
   }
-};
+}
 
 const resetNetwork = () => {
-  serverSubdomain.value = data?.value?.net?.domain ?? "";
-};
+  serverSubdomain.value = data?.value?.net?.domain ?? ''
+}
 
 const dnsRecords = computed(() => {
-  const domain = userDomain.value === "" ? exampleDomain : userDomain.value;
+  const domain = userDomain.value === '' ? exampleDomain : userDomain.value
   return [
     {
-      type: "A",
+      type: 'A',
       name: `${domain}`,
-      content: data.value?.net?.ip ?? "",
+      content: data.value?.net?.ip ?? '',
     },
     {
-      type: "SRV",
+      type: 'SRV',
       name: `_minecraft._tcp.${domain}`,
       content: `0 10 ${data.value?.net?.port} ${domain}`,
     },
-  ];
-});
+  ]
+})
 
 const exportDnsRecords = () => {
   const records = dnsRecords.value.reduce(
     (acc, record) => {
-      const type = record.type;
+      const type = record.type
       if (!acc[type]) {
-        acc[type] = [];
+        acc[type] = []
       }
-      acc[type].push(record);
-      return acc;
+      acc[type].push(record)
+      return acc
     },
     {} as Record<string, any[]>,
-  );
+  )
 
   const text = Object.entries(records)
     .map(([type, records]) => {
-      return `; ${type} Records\n${records.map((record) => `${record.name}.	1	IN	${record.type} ${record.content}${record.type === "SRV" ? "." : ""}`).join("\n")}\n`;
+      return `; ${type} Records\n${records.map((record) => `${record.name}.	1	IN	${record.type} ${record.content}${record.type === 'SRV' ? '.' : ''}`).join('\n')}\n`
     })
-    .join("\n");
-  const blob = new Blob([text], { type: "text/plain" });
-  const a = document.createElement("a");
-  a.href = window.URL.createObjectURL(blob);
-  a.download = `${userDomain.value}.txt`;
-  a.click();
-  a.remove();
-};
+    .join('\n')
+  const blob = new Blob([text], { type: 'text/plain' })
+  const a = document.createElement('a')
+  a.href = window.URL.createObjectURL(blob)
+  a.download = `${userDomain.value}.txt`
+  a.click()
+  a.remove()
+}
 
 const copyText = (text: string) => {
-  navigator.clipboard.writeText(text);
+  navigator.clipboard.writeText(text)
   addNotification({
-    group: "serverOptions",
-    type: "success",
-    title: "Text copied",
+    group: 'serverOptions',
+    type: 'success',
+    title: 'Text copied',
     text: `${text} has been copied to your clipboard`,
-  });
-};
+  })
+}
 </script>

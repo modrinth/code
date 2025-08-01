@@ -56,74 +56,74 @@
   </div>
 </template>
 <script setup>
-import { XIcon } from "@modrinth/assets";
-import { commonMessages, commonSettingsMessages, useRelativeTime } from "@modrinth/ui";
+import { XIcon } from '@modrinth/assets'
+import { commonMessages, commonSettingsMessages, useRelativeTime } from '@modrinth/ui'
 
 definePageMeta({
-  middleware: "auth",
-});
+  middleware: 'auth',
+})
 
-const { formatMessage } = useVIntl();
-const formatRelativeTime = useRelativeTime();
+const { formatMessage } = useVIntl()
+const formatRelativeTime = useRelativeTime()
 
 const messages = defineMessages({
   currentSessionLabel: {
-    id: "settings.sessions.current-session",
-    defaultMessage: "Current session",
+    id: 'settings.sessions.current-session',
+    defaultMessage: 'Current session',
   },
   revokeSessionButton: {
-    id: "settings.sessions.action.revoke-session",
-    defaultMessage: "Revoke session",
+    id: 'settings.sessions.action.revoke-session',
+    defaultMessage: 'Revoke session',
   },
   createdAgoLabel: {
-    id: "settings.sessions.created-ago",
-    defaultMessage: "Created {ago}",
+    id: 'settings.sessions.created-ago',
+    defaultMessage: 'Created {ago}',
   },
   sessionsDescription: {
-    id: "settings.sessions.description",
+    id: 'settings.sessions.description',
     defaultMessage:
       "Here are all the devices that are currently logged in with your Modrinth account. You can log out of each one individually.\n\nIf you see an entry you don't recognize, log out of that device and change your Modrinth account password immediately.",
   },
   lastAccessedAgoLabel: {
-    id: "settings.sessions.last-accessed-ago",
-    defaultMessage: "Last accessed {ago}",
+    id: 'settings.sessions.last-accessed-ago',
+    defaultMessage: 'Last accessed {ago}',
   },
   unknownOsLabel: {
-    id: "settings.sessions.unknown-os",
-    defaultMessage: "Unknown OS",
+    id: 'settings.sessions.unknown-os',
+    defaultMessage: 'Unknown OS',
   },
   unknownPlatformLabel: {
-    id: "settings.sessions.unknown-platform",
-    defaultMessage: "Unknown platform",
+    id: 'settings.sessions.unknown-platform',
+    defaultMessage: 'Unknown platform',
   },
-});
+})
 
 useHead({
   title: () => `${formatMessage(commonSettingsMessages.sessions)} - Modrinth`,
-});
+})
 
-const data = useNuxtApp();
-const { data: sessions, refresh } = await useAsyncData("session/list", () =>
-  useBaseFetch("session/list"),
-);
+const data = useNuxtApp()
+const { data: sessions, refresh } = await useAsyncData('session/list', () =>
+  useBaseFetch('session/list'),
+)
 
 async function revokeSession(id) {
-  startLoading();
+  startLoading()
   try {
-    sessions.value = sessions.value.filter((x) => x.id !== id);
+    sessions.value = sessions.value.filter((x) => x.id !== id)
     await useBaseFetch(`session/${id}`, {
-      method: "DELETE",
-    });
-    await refresh();
+      method: 'DELETE',
+    })
+    await refresh()
   } catch (err) {
     data.$notify({
-      group: "main",
+      group: 'main',
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  stopLoading();
+  stopLoading()
 }
 </script>
 <style lang="scss" scoped>

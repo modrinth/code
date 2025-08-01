@@ -75,8 +75,8 @@
           icon-only
           @click="
             () => {
-              revokingId = authorization.app_id;
-              $refs.modal_confirm.show();
+              revokingId = authorization.app_id
+              $refs.modal_confirm.show()
             }
           "
         >
@@ -88,49 +88,49 @@
   </div>
 </template>
 <script setup>
-import { CheckIcon,TrashIcon } from "@modrinth/assets";
-import { Avatar, Button, commonSettingsMessages,ConfirmModal } from "@modrinth/ui";
+import { CheckIcon, TrashIcon } from '@modrinth/assets'
+import { Avatar, Button, commonSettingsMessages, ConfirmModal } from '@modrinth/ui'
 
-import { useScopes } from "~/composables/auth/scopes.ts";
+import { useScopes } from '~/composables/auth/scopes.ts'
 
-const { formatMessage } = useVIntl();
+const { formatMessage } = useVIntl()
 
-const { scopesToDefinitions } = useScopes();
+const { scopesToDefinitions } = useScopes()
 
-const revokingId = ref(null);
+const revokingId = ref(null)
 
 definePageMeta({
-  middleware: "auth",
-});
+  middleware: 'auth',
+})
 
 useHead({
-  title: "Authorizations - Modrinth",
-});
+  title: 'Authorizations - Modrinth',
+})
 
-const { data: usersApps, refresh } = await useAsyncData("userAuthorizations", () =>
+const { data: usersApps, refresh } = await useAsyncData('userAuthorizations', () =>
   useBaseFetch(`oauth/authorizations`, {
     internal: true,
   }),
-);
+)
 
 const { data: appInformation } = await useAsyncData(
-  "appInfo",
+  'appInfo',
   () =>
-    useBaseFetch("oauth/apps", {
+    useBaseFetch('oauth/apps', {
       internal: true,
       query: {
-        ids: usersApps.value.map((c) => c.app_id).join(","),
+        ids: usersApps.value.map((c) => c.app_id).join(','),
       },
     }),
   {
     watch: usersApps,
   },
-);
+)
 
 const { data: appCreatorsInformation } = await useAsyncData(
-  "appCreatorsInfo",
+  'appCreatorsInfo',
   () =>
-    useBaseFetch("users", {
+    useBaseFetch('users', {
       query: {
         ids: JSON.stringify(appInformation.value.map((c) => c.created_by)),
       },
@@ -138,38 +138,38 @@ const { data: appCreatorsInformation } = await useAsyncData(
   {
     watch: appInformation,
   },
-);
+)
 
 const appInfoLookup = computed(() => {
   return usersApps.value.map((app) => {
-    const info = appInformation.value.find((c) => c.id === app.app_id);
-    const owner = appCreatorsInformation.value.find((c) => c.id === info.created_by);
+    const info = appInformation.value.find((c) => c.id === app.app_id)
+    const owner = appCreatorsInformation.value.find((c) => c.id === info.created_by)
     return {
       ...app,
       app: info || null,
       owner: owner || null,
-    };
-  });
-});
+    }
+  })
+})
 
 async function revokeApp(id) {
   try {
     await useBaseFetch(`oauth/authorizations`, {
       internal: true,
-      method: "DELETE",
+      method: 'DELETE',
       query: {
         client_id: id,
       },
-    });
-    revokingId.value = null;
-    await refresh();
+    })
+    revokingId.value = null
+    await refresh()
   } catch (err) {
     data.$notify({
-      group: "main",
-      title: "An error occurred",
+      group: 'main',
+      title: 'An error occurred',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
 }
 </script>

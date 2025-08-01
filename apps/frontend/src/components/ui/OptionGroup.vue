@@ -31,88 +31,88 @@
 </template>
 
 <script setup lang="ts" generic="T">
-import { computed, onMounted,ref } from "vue";
+import { computed, onMounted, ref } from 'vue'
 
-const modelValue = defineModel<T>({ required: true });
+const modelValue = defineModel<T>({ required: true })
 
 const props = defineProps<{
-  options: T[];
-}>();
+  options: T[]
+}>()
 
-const scrollContainer = ref<HTMLElement | null>(null);
+const scrollContainer = ref<HTMLElement | null>(null)
 
-const sliderLeft = ref(4);
-const sliderTop = ref(4);
-const sliderRight = ref(4);
-const sliderBottom = ref(4);
+const sliderLeft = ref(4)
+const sliderTop = ref(4)
+const sliderRight = ref(4)
+const sliderBottom = ref(4)
 
-const sliderLeftPx = computed(() => `${sliderLeft.value}px`);
-const sliderTopPx = computed(() => `${sliderTop.value}px`);
-const sliderRightPx = computed(() => `${sliderRight.value}px`);
-const sliderBottomPx = computed(() => `${sliderBottom.value}px`);
+const sliderLeftPx = computed(() => `${sliderLeft.value}px`)
+const sliderTopPx = computed(() => `${sliderTop.value}px`)
+const sliderRightPx = computed(() => `${sliderRight.value}px`)
+const sliderBottomPx = computed(() => `${sliderBottom.value}px`)
 
-const optionButtons = ref();
+const optionButtons = ref()
 
-const initialized = ref(false);
+const initialized = ref(false)
 
 function setOption(option: T) {
-  modelValue.value = option;
+  modelValue.value = option
 }
 
 watch(modelValue, () => {
-  startAnimation(props.options.indexOf(modelValue.value));
-});
+  startAnimation(props.options.indexOf(modelValue.value))
+})
 
 function startAnimation(index: number) {
-  const el = optionButtons.value[index];
+  const el = optionButtons.value[index]
 
-  if (!el || !el.offsetParent) return;
+  if (!el || !el.offsetParent) return
 
   const newValues = {
     left: el.offsetLeft,
     top: el.offsetTop,
     right: el.offsetParent.offsetWidth - el.offsetLeft - el.offsetWidth,
     bottom: el.offsetParent.offsetHeight - el.offsetTop - el.offsetHeight,
-  };
+  }
 
   if (sliderLeft.value === 4 && sliderRight.value === 4) {
-    sliderLeft.value = newValues.left;
-    sliderRight.value = newValues.right;
-    sliderTop.value = newValues.top;
-    sliderBottom.value = newValues.bottom;
+    sliderLeft.value = newValues.left
+    sliderRight.value = newValues.right
+    sliderTop.value = newValues.top
+    sliderBottom.value = newValues.bottom
   } else {
-    const delay = 200;
+    const delay = 200
 
     if (newValues.left < sliderLeft.value) {
-      sliderLeft.value = newValues.left;
+      sliderLeft.value = newValues.left
       setTimeout(() => {
-        sliderRight.value = newValues.right;
-      }, delay);
+        sliderRight.value = newValues.right
+      }, delay)
     } else {
-      sliderRight.value = newValues.right;
+      sliderRight.value = newValues.right
       setTimeout(() => {
-        sliderLeft.value = newValues.left;
-      }, delay);
+        sliderLeft.value = newValues.left
+      }, delay)
     }
 
     if (newValues.top < sliderTop.value) {
-      sliderTop.value = newValues.top;
+      sliderTop.value = newValues.top
       setTimeout(() => {
-        sliderBottom.value = newValues.bottom;
-      }, delay);
+        sliderBottom.value = newValues.bottom
+      }, delay)
     } else {
-      sliderBottom.value = newValues.bottom;
+      sliderBottom.value = newValues.bottom
       setTimeout(() => {
-        sliderTop.value = newValues.top;
-      }, delay);
+        sliderTop.value = newValues.top
+      }, delay)
     }
   }
-  initialized.value = true;
+  initialized.value = true
 }
 
 onMounted(() => {
-  startAnimation(props.options.indexOf(modelValue.value));
-});
+  startAnimation(props.options.indexOf(modelValue.value))
+})
 </script>
 
 <style scoped>

@@ -114,9 +114,9 @@
         @lock="
           () => {
             if (backup.locked) {
-              unlockBackup(backup.id);
+              unlockBackup(backup.id)
             } else {
-              lockBackup(backup.id);
+              lockBackup(backup.id)
             }
           }
         "
@@ -150,144 +150,144 @@
 </template>
 
 <script setup lang="ts">
-import { DownloadIcon, IssuesIcon,PlusIcon, SettingsIcon, SpinnerIcon } from "@modrinth/assets";
-import { ButtonStyled, TagItem } from "@modrinth/ui";
-import type { Backup } from "@modrinth/utils";
-import { useStorage } from "@vueuse/core";
-import { computed,ref } from "vue";
+import { DownloadIcon, IssuesIcon, PlusIcon, SettingsIcon, SpinnerIcon } from '@modrinth/assets'
+import { ButtonStyled, TagItem } from '@modrinth/ui'
+import type { Backup } from '@modrinth/utils'
+import { useStorage } from '@vueuse/core'
+import { computed, ref } from 'vue'
 
-import BackupCreateModal from "~/components/ui/servers/BackupCreateModal.vue";
-import BackupDeleteModal from "~/components/ui/servers/BackupDeleteModal.vue";
-import BackupItem from "~/components/ui/servers/BackupItem.vue";
-import BackupRenameModal from "~/components/ui/servers/BackupRenameModal.vue";
-import BackupRestoreModal from "~/components/ui/servers/BackupRestoreModal.vue";
-import BackupSettingsModal from "~/components/ui/servers/BackupSettingsModal.vue";
-import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import BackupCreateModal from '~/components/ui/servers/BackupCreateModal.vue'
+import BackupDeleteModal from '~/components/ui/servers/BackupDeleteModal.vue'
+import BackupItem from '~/components/ui/servers/BackupItem.vue'
+import BackupRenameModal from '~/components/ui/servers/BackupRenameModal.vue'
+import BackupRestoreModal from '~/components/ui/servers/BackupRestoreModal.vue'
+import BackupSettingsModal from '~/components/ui/servers/BackupSettingsModal.vue'
+import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const props = defineProps<{
-  server: ModrinthServer;
-  isServerRunning: boolean;
-}>();
+  server: ModrinthServer
+  isServerRunning: boolean
+}>()
 
-const route = useNativeRoute();
-const serverId = route.params.id;
+const route = useNativeRoute()
+const serverId = route.params.id
 
 const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
   backupWhileRunning: false,
-});
+})
 
-defineEmits(["onDownload"]);
+defineEmits(['onDownload'])
 
-const data = computed(() => props.server.general);
+const data = computed(() => props.server.general)
 const backups = computed(() => {
-  if (!props.server.backups?.data) return [];
+  if (!props.server.backups?.data) return []
 
   return [...props.server.backups.data].sort((a, b) => {
-    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-  });
-});
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  })
+})
 
 useHead({
-  title: `Backups - ${data.value?.name ?? "Server"} - Modrinth`,
-});
+  title: `Backups - ${data.value?.name ?? 'Server'} - Modrinth`,
+})
 
-const overTheTopDownloadAnimation = ref();
+const overTheTopDownloadAnimation = ref()
 
-const createBackupModal = ref<InstanceType<typeof BackupCreateModal>>();
-const renameBackupModal = ref<InstanceType<typeof BackupRenameModal>>();
-const restoreBackupModal = ref<InstanceType<typeof BackupRestoreModal>>();
-const deleteBackupModal = ref<InstanceType<typeof BackupDeleteModal>>();
-const backupSettingsModal = ref<InstanceType<typeof BackupSettingsModal>>();
+const createBackupModal = ref<InstanceType<typeof BackupCreateModal>>()
+const renameBackupModal = ref<InstanceType<typeof BackupRenameModal>>()
+const restoreBackupModal = ref<InstanceType<typeof BackupRestoreModal>>()
+const deleteBackupModal = ref<InstanceType<typeof BackupDeleteModal>>()
+const backupSettingsModal = ref<InstanceType<typeof BackupSettingsModal>>()
 
 const backupCreationDisabled = computed(() => {
   if (props.isServerRunning && !userPreferences.value.backupWhileRunning) {
-    return "Cannot create backup while server is running";
+    return 'Cannot create backup while server is running'
   }
   if (
     data.value?.used_backup_quota !== undefined &&
     data.value?.backup_quota !== undefined &&
     data.value?.used_backup_quota >= data.value?.backup_quota
   ) {
-    return `All ${data.value.backup_quota} of your backup slots are in use`;
+    return `All ${data.value.backup_quota} of your backup slots are in use`
   }
-  if (backups.value.some((backup) => backup.task?.create?.state === "ongoing")) {
-    return "A backup is already in progress";
+  if (backups.value.some((backup) => backup.task?.create?.state === 'ongoing')) {
+    return 'A backup is already in progress'
   }
-  if (props.server.general?.status === "installing") {
-    return "Cannot create backup while server is installing";
+  if (props.server.general?.status === 'installing') {
+    return 'Cannot create backup while server is installing'
   }
-  return undefined;
-});
+  return undefined
+})
 
 const showCreateModel = () => {
-  createBackupModal.value?.show();
-};
+  createBackupModal.value?.show()
+}
 
 const showbackupSettingsModal = () => {
-  backupSettingsModal.value?.show();
-};
+  backupSettingsModal.value?.show()
+}
 
 function triggerDownloadAnimation() {
-  overTheTopDownloadAnimation.value = true;
-  setTimeout(() => (overTheTopDownloadAnimation.value = false), 500);
+  overTheTopDownloadAnimation.value = true
+  setTimeout(() => (overTheTopDownloadAnimation.value = false), 500)
 }
 
 const prepareDownload = async (backupId: string) => {
   try {
-    await props.server.backups?.prepare(backupId);
+    await props.server.backups?.prepare(backupId)
   } catch (error) {
-    console.error("Failed to prepare download:", error);
-    addNotification({ type: "error", title: "Failed to prepare backup for download", text: error });
+    console.error('Failed to prepare download:', error)
+    addNotification({ type: 'error', title: 'Failed to prepare backup for download', text: error })
   }
-};
+}
 
 const lockBackup = async (backupId: string) => {
   try {
-    await props.server.backups?.lock(backupId);
-    await props.server.refresh(["backups"]);
+    await props.server.backups?.lock(backupId)
+    await props.server.refresh(['backups'])
   } catch (error) {
-    console.error("Failed to toggle lock:", error);
+    console.error('Failed to toggle lock:', error)
   }
-};
+}
 
 const unlockBackup = async (backupId: string) => {
   try {
-    await props.server.backups?.unlock(backupId);
-    await props.server.refresh(["backups"]);
+    await props.server.backups?.unlock(backupId)
+    await props.server.refresh(['backups'])
   } catch (error) {
-    console.error("Failed to toggle lock:", error);
+    console.error('Failed to toggle lock:', error)
   }
-};
+}
 
 const retryBackup = async (backupId: string) => {
   try {
-    await props.server.backups?.retry(backupId);
-    await props.server.refresh(["backups"]);
+    await props.server.backups?.retry(backupId)
+    await props.server.refresh(['backups'])
   } catch (error) {
-    console.error("Failed to retry backup:", error);
+    console.error('Failed to retry backup:', error)
   }
-};
+}
 
 async function deleteBackup(backup?: Backup) {
   if (!backup) {
     addNotification({
-      type: "error",
-      title: "Error deleting backup",
-      text: "Backup is null",
-    });
-    return;
+      type: 'error',
+      title: 'Error deleting backup',
+      text: 'Backup is null',
+    })
+    return
   }
 
   try {
-    await props.server.backups?.delete(backup.id);
-    await props.server.refresh();
+    await props.server.backups?.delete(backup.id)
+    await props.server.refresh()
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+    const message = error instanceof Error ? error.message : String(error)
     addNotification({
-      type: "error",
-      title: "Error deleting backup",
+      type: 'error',
+      title: 'Error deleting backup',
       text: message,
-    });
+    })
   }
 }
 </script>

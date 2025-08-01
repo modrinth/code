@@ -66,7 +66,7 @@
                 hoverFilled: true,
                 link: getPrimaryFile(version).url,
                 action: () => {
-                  emit('onDownload');
+                  emit('onDownload')
                 },
               },
               {
@@ -102,14 +102,14 @@
               {
                 id: 'copy-id',
                 action: () => {
-                  copyToClipboard(version.id);
+                  copyToClipboard(version.id)
                 },
                 shown: currentMember || flags.developerMode,
               },
               {
                 id: 'copy-maven',
                 action: () => {
-                  copyToClipboard(`maven.modrinth:${project.slug}:${version.id}`);
+                  copyToClipboard(`maven.modrinth:${project.slug}:${version.id}`)
                 },
                 shown: flags.developerMode,
               },
@@ -126,8 +126,8 @@
                 color: 'red',
                 hoverFilled: true,
                 action: () => {
-                  selectedVersion = version.id;
-                  deleteVersionModal.show();
+                  selectedVersion = version.id
+                  deleteVersionModal.show()
                 },
                 shown: currentMember,
               },
@@ -191,76 +191,76 @@ import {
   ShareIcon,
   TrashIcon,
   UploadIcon,
-} from "@modrinth/assets";
+} from '@modrinth/assets'
 import {
   ButtonStyled,
   ConfirmModal,
   FileInput,
   OverflowMenu,
   ProjectPageVersions,
-} from "@modrinth/ui";
+} from '@modrinth/ui'
 
-import DropArea from "~/components/ui/DropArea.vue";
-import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
+import DropArea from '~/components/ui/DropArea.vue'
+import { acceptFileFromProjectType } from '~/helpers/fileUtils.js'
 
 const props = defineProps({
   project: {
     type: Object,
     default() {
-      return {};
+      return {}
     },
   },
   versions: {
     type: Array,
     default() {
-      return [];
+      return []
     },
   },
   currentMember: {
     type: Object,
     default() {
-      return null;
+      return null
     },
   },
-});
+})
 
-const tags = useTags();
-const flags = useFeatureFlags();
-const auth = await useAuth();
+const tags = useTags()
+const flags = useFeatureFlags()
+const auth = await useAuth()
 
-const deleteVersionModal = ref();
-const selectedVersion = ref(null);
+const deleteVersionModal = ref()
+const selectedVersion = ref(null)
 
-const emit = defineEmits(["onDownload", "deleteVersion"]);
+const emit = defineEmits(['onDownload', 'deleteVersion'])
 
-const router = useNativeRouter();
+const router = useNativeRouter()
 
-const baseDropdownId = useId();
+const baseDropdownId = useId()
 
 function getPrimaryFile(version) {
-  return version.files.find((x) => x.primary) || version.files[0];
+  return version.files.find((x) => x.primary) || version.files[0]
 }
 
 async function handleFiles(files) {
   await router.push({
-    name: "type-id-version-version",
+    name: 'type-id-version-version',
     params: {
       type: props.project.project_type,
       id: props.project.slug ? props.project.slug : props.project.id,
-      version: "create",
+      version: 'create',
     },
     state: {
       newPrimaryFile: files[0],
     },
-  });
+  })
 }
 
 async function copyToClipboard(text) {
-  await navigator.clipboard.writeText(text);
+  await navigator.clipboard.writeText(text)
 }
 
 function deleteVersion() {
-  emit("deleteVersion", selectedVersion.value);
-  selectedVersion.value = null;
+  emit('deleteVersion', selectedVersion.value)
+  selectedVersion.value = null
 }
 </script>

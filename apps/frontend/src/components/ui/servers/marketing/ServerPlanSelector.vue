@@ -1,95 +1,95 @@
 <script setup lang="ts">
-import { ButtonStyled, ServersSpecs } from "@modrinth/ui";
-import { formatPrice } from "@modrinth/utils";
-import type { MessageDescriptor } from "@vintl/vintl";
+import { ButtonStyled, ServersSpecs } from '@modrinth/ui'
+import { formatPrice } from '@modrinth/utils'
+import type { MessageDescriptor } from '@vintl/vintl'
 
-const { formatMessage, locale } = useVIntl();
+const { formatMessage, locale } = useVIntl()
 
 const emit = defineEmits<{
-  (e: "select" | "scroll-to-faq"): void;
-}>();
+  (e: 'select' | 'scroll-to-faq'): void
+}>()
 
-type Plan = "small" | "medium" | "large";
+type Plan = 'small' | 'medium' | 'large'
 
 const plans: Record<
   Plan,
   {
-    buttonColor: "blue" | "green" | "purple";
-    accentText: string;
-    accentBg: string;
-    name: MessageDescriptor;
-    description: MessageDescriptor;
-    mostPopular: boolean;
+    buttonColor: 'blue' | 'green' | 'purple'
+    accentText: string
+    accentBg: string
+    name: MessageDescriptor
+    description: MessageDescriptor
+    mostPopular: boolean
   }
 > = {
   small: {
-    buttonColor: "blue",
-    accentText: "text-blue",
-    accentBg: "bg-bg-blue",
+    buttonColor: 'blue',
+    accentText: 'text-blue',
+    accentBg: 'bg-bg-blue',
     name: defineMessage({
-      id: "servers.plan.small.name",
-      defaultMessage: "Small",
+      id: 'servers.plan.small.name',
+      defaultMessage: 'Small',
     }),
     description: defineMessage({
-      id: "servers.plan.small.description",
-      defaultMessage: "Perfect for 1–5 friends with a few light mods.",
+      id: 'servers.plan.small.description',
+      defaultMessage: 'Perfect for 1–5 friends with a few light mods.',
     }),
     mostPopular: false,
   },
   medium: {
-    buttonColor: "green",
-    accentText: "text-green",
-    accentBg: "bg-bg-green",
+    buttonColor: 'green',
+    accentText: 'text-green',
+    accentBg: 'bg-bg-green',
     name: defineMessage({
-      id: "servers.plan.medium.name",
-      defaultMessage: "Medium",
+      id: 'servers.plan.medium.name',
+      defaultMessage: 'Medium',
     }),
     description: defineMessage({
-      id: "servers.plan.medium.description",
-      defaultMessage: "Great for 6–15 players and multiple mods.",
+      id: 'servers.plan.medium.description',
+      defaultMessage: 'Great for 6–15 players and multiple mods.',
     }),
     mostPopular: true,
   },
   large: {
-    buttonColor: "purple",
-    accentText: "text-purple",
-    accentBg: "bg-bg-purple",
+    buttonColor: 'purple',
+    accentText: 'text-purple',
+    accentBg: 'bg-bg-purple',
     name: defineMessage({
-      id: "servers.plan.large.name",
-      defaultMessage: "Large",
+      id: 'servers.plan.large.name',
+      defaultMessage: 'Large',
     }),
     description: defineMessage({
-      id: "servers.plan.large.description",
-      defaultMessage: "Ideal for 15–25 players, modpacks, or heavy modding.",
+      id: 'servers.plan.large.description',
+      defaultMessage: 'Ideal for 15–25 players, modpacks, or heavy modding.',
     }),
     mostPopular: false,
   },
-};
+}
 
 const props = defineProps<{
-  capacity?: number;
-  plan: Plan;
-  ram: number;
-  storage: number;
-  cpus: number;
-  price: number;
-  interval: "monthly" | "quarterly" | "yearly";
-  currency: string;
-  isUsa: boolean;
-}>();
+  capacity?: number
+  plan: Plan
+  ram: number
+  storage: number
+  cpus: number
+  price: number
+  interval: 'monthly' | 'quarterly' | 'yearly'
+  currency: string
+  isUsa: boolean
+}>()
 
 const outOfStock = computed(() => {
-  return !props.capacity || props.capacity === 0;
-});
+  return !props.capacity || props.capacity === 0
+})
 
 const billingMonths = computed(() => {
-  if (props.interval === "yearly") {
-    return 12;
-  } else if (props.interval === "quarterly") {
-    return 3;
+  if (props.interval === 'yearly') {
+    return 12
+  } else if (props.interval === 'quarterly') {
+    return 3
   }
-  return 1;
-});
+  return 1
+})
 </script>
 
 <template>
@@ -122,7 +122,7 @@ const billingMonths = computed(() => {
         </div>
         <span class="m-0 text-2xl font-bold text-contrast">
           {{ formatPrice(locale, price / billingMonths, currency, true) }}
-          {{ isUsa ? "" : currency }}
+          {{ isUsa ? '' : currency }}
           <span class="text-lg font-semibold text-secondary">
             / month<template v-if="interval !== 'monthly'">, billed {{ interval }}</template>
           </span>

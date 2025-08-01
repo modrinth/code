@@ -198,210 +198,210 @@
 </template>
 
 <script setup lang="ts">
-import { CodeIcon, RadioButtonCheckedIcon, RadioButtonIcon } from "@modrinth/assets";
-import { Button, ThemeSelector } from "@modrinth/ui";
-import { formatProjectType } from "@modrinth/utils";
+import { CodeIcon, RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
+import { Button, ThemeSelector } from '@modrinth/ui'
+import { formatProjectType } from '@modrinth/utils'
 
-import MessageBanner from "~/components/ui/MessageBanner.vue";
-import type { DisplayLocation } from "~/plugins/cosmetics";
-import { isDarkTheme, type Theme } from "~/plugins/theme/index.ts";
+import MessageBanner from '~/components/ui/MessageBanner.vue'
+import type { DisplayLocation } from '~/plugins/cosmetics'
+import { isDarkTheme, type Theme } from '~/plugins/theme/index.ts'
 
 useHead({
-  title: "Display settings - Modrinth",
-});
+  title: 'Display settings - Modrinth',
+})
 
-const { formatMessage } = useVIntl();
+const { formatMessage } = useVIntl()
 
 const developerModeBanner = defineMessages({
   description: {
-    id: "settings.display.banner.developer-mode.description",
+    id: 'settings.display.banner.developer-mode.description',
     defaultMessage:
       "<strong>Developer mode</strong> is active. This will allow you to view the internal IDs of various things throughout Modrinth that may be helpful if you're a developer using the Modrinth API. Click on the Modrinth logo at the bottom of the page 5 times to toggle developer mode.",
   },
   deactivate: {
-    id: "settings.display.banner.developer-mode.button",
-    defaultMessage: "Deactivate developer mode",
+    id: 'settings.display.banner.developer-mode.button',
+    defaultMessage: 'Deactivate developer mode',
   },
-});
+})
 
 const colorTheme = defineMessages({
   title: {
-    id: "settings.display.theme.title",
-    defaultMessage: "Color theme",
+    id: 'settings.display.theme.title',
+    defaultMessage: 'Color theme',
   },
   description: {
-    id: "settings.display.theme.description",
-    defaultMessage: "Select your preferred color theme for Modrinth on this device.",
+    id: 'settings.display.theme.description',
+    defaultMessage: 'Select your preferred color theme for Modrinth on this device.',
   },
-});
+})
 
 const projectListLayouts = defineMessages({
   title: {
-    id: "settings.display.project-list-layouts.title",
-    defaultMessage: "Project list layouts",
+    id: 'settings.display.project-list-layouts.title',
+    defaultMessage: 'Project list layouts',
   },
   description: {
-    id: "settings.display.project-list-layouts.description",
+    id: 'settings.display.project-list-layouts.description',
     defaultMessage:
-      "Select your preferred layout for each page that displays project lists on this device.",
+      'Select your preferred layout for each page that displays project lists on this device.',
   },
   mod: {
-    id: "settings.display.project-list-layouts.mod",
-    defaultMessage: "Mods page",
+    id: 'settings.display.project-list-layouts.mod',
+    defaultMessage: 'Mods page',
   },
   plugin: {
-    id: "settings.display.project-list-layouts.plugin",
-    defaultMessage: "Plugins page",
+    id: 'settings.display.project-list-layouts.plugin',
+    defaultMessage: 'Plugins page',
   },
   datapack: {
-    id: "settings.display.project-list-layouts.datapack",
-    defaultMessage: "Data Packs page",
+    id: 'settings.display.project-list-layouts.datapack',
+    defaultMessage: 'Data Packs page',
   },
   shader: {
-    id: "settings.display.project-list-layouts.shader",
-    defaultMessage: "Shaders page",
+    id: 'settings.display.project-list-layouts.shader',
+    defaultMessage: 'Shaders page',
   },
   resourcepack: {
-    id: "settings.display.project-list-layouts.resourcepack",
-    defaultMessage: "Resource Packs page",
+    id: 'settings.display.project-list-layouts.resourcepack',
+    defaultMessage: 'Resource Packs page',
   },
   modpack: {
-    id: "settings.display.project-list-layouts.modpack",
-    defaultMessage: "Modpacks page",
+    id: 'settings.display.project-list-layouts.modpack',
+    defaultMessage: 'Modpacks page',
   },
   user: {
-    id: "settings.display.project-list-layouts.user",
-    defaultMessage: "User profile pages",
+    id: 'settings.display.project-list-layouts.user',
+    defaultMessage: 'User profile pages',
   },
   collection: {
-    id: "settings.display.project-list.layouts.collection",
-    defaultMessage: "Collection",
+    id: 'settings.display.project-list.layouts.collection',
+    defaultMessage: 'Collection',
   },
-});
+})
 
 const toggleFeatures = defineMessages({
   title: {
-    id: "settings.display.flags.title",
-    defaultMessage: "Toggle features",
+    id: 'settings.display.flags.title',
+    defaultMessage: 'Toggle features',
   },
   description: {
-    id: "settings.display.flags.description",
-    defaultMessage: "Enable or disable certain features on this device.",
+    id: 'settings.display.flags.description',
+    defaultMessage: 'Enable or disable certain features on this device.',
   },
   advancedRenderingTitle: {
-    id: "settings.display.sidebar.advanced-rendering.title",
-    defaultMessage: "Advanced rendering",
+    id: 'settings.display.sidebar.advanced-rendering.title',
+    defaultMessage: 'Advanced rendering',
   },
   advancedRenderingDescription: {
-    id: "settings.display.sidebar.advanced-rendering.description",
+    id: 'settings.display.sidebar.advanced-rendering.description',
     defaultMessage:
-      "Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering.",
+      'Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering.',
   },
   externalLinksNewTabTitle: {
-    id: "settings.display.sidebar.external-links-new-tab.title",
-    defaultMessage: "Open external links in new tab",
+    id: 'settings.display.sidebar.external-links-new-tab.title',
+    defaultMessage: 'Open external links in new tab',
   },
   externalLinksNewTabDescription: {
-    id: "settings.display.sidebar.external-links-new-tab.description",
+    id: 'settings.display.sidebar.external-links-new-tab.description',
     defaultMessage:
-      "Make links which go outside of Modrinth open in a new tab. No matter this setting, links on the same domain and in Markdown descriptions will open in the same tab, and links on ads and edit pages will open in a new tab.",
+      'Make links which go outside of Modrinth open in a new tab. No matter this setting, links on the same domain and in Markdown descriptions will open in the same tab, and links on ads and edit pages will open in a new tab.',
   },
   hideModrinthAppPromosTitle: {
-    id: "settings.display.sidebar.hide-app-promos.title",
-    defaultMessage: "Hide Modrinth App promotions",
+    id: 'settings.display.sidebar.hide-app-promos.title',
+    defaultMessage: 'Hide Modrinth App promotions',
   },
   hideModrinthAppPromosDescription: {
-    id: "settings.display.sidebar.hide-app-promos.description",
+    id: 'settings.display.sidebar.hide-app-promos.description',
     defaultMessage:
       'Hides the "Get Modrinth App" buttons from primary navigation. The Modrinth App page can still be found on the landing page or in the footer.',
   },
   rightAlignedFiltersSidebarTitle: {
-    id: "settings.display.sidebar.right-aligned-filters-sidebar.title",
-    defaultMessage: "Right-aligned filters sidebar on search pages",
+    id: 'settings.display.sidebar.right-aligned-filters-sidebar.title',
+    defaultMessage: 'Right-aligned filters sidebar on search pages',
   },
   rightAlignedFiltersSidebarDescription: {
-    id: "settings.display.sidebar.right-aligned-filters-sidebar.description",
-    defaultMessage: "Aligns the filters sidebar to the right of the search results.",
+    id: 'settings.display.sidebar.right-aligned-filters-sidebar.description',
+    defaultMessage: 'Aligns the filters sidebar to the right of the search results.',
   },
   leftAlignedContentSidebarTitle: {
-    id: "settings.display.sidebar.left-aligned-content-sidebar.title",
-    defaultMessage: "Left-aligned sidebar on content pages",
+    id: 'settings.display.sidebar.left-aligned-content-sidebar.title',
+    defaultMessage: 'Left-aligned sidebar on content pages',
   },
   leftAlignedContentSidebarDescription: {
-    id: "settings.display.sidebar.right-aligned-content-sidebar.description",
+    id: 'settings.display.sidebar.right-aligned-content-sidebar.description',
     defaultMessage: "Aligns the sidebar to the left of the page's content.",
   },
-});
+})
 
-const cosmetics = useCosmetics();
-const flags = useFeatureFlags();
-const tags = useTags();
+const cosmetics = useCosmetics()
+const flags = useFeatureFlags()
+const tags = useTags()
 
-const theme = useTheme();
+const theme = useTheme()
 
 // On the server the value of native theme can be 'unknown'. To hydrate
 // correctly, we need to make sure we aren't using 'unknown' and values between
 // server and client renders are in sync.
 
 const serverSystemTheme = useState(() => {
-  const theme_ = theme.native;
-  if (theme_ === "unknown") return "light";
-  return theme_;
-});
+  const theme_ = theme.native
+  if (theme_ === 'unknown') return 'light'
+  return theme_
+})
 
 const systemTheme = useMountedValue((mounted): Theme => {
-  const systemTheme_ = mounted ? theme.native : serverSystemTheme.value;
-  return systemTheme_ === "light" ? theme.preferences.light : theme.preferences.dark;
-});
+  const systemTheme_ = mounted ? theme.native : serverSystemTheme.value
+  return systemTheme_ === 'light' ? theme.preferences.light : theme.preferences.dark
+})
 
 const themeOptions = computed(() => {
-  const options: ("system" | Theme)[] = ["system", "light", "dark", "oled"];
-  if (flags.value.developerMode || theme.preferred === "retro") {
-    options.push("retro");
+  const options: ('system' | Theme)[] = ['system', 'light', 'dark', 'oled']
+  if (flags.value.developerMode || theme.preferred === 'retro') {
+    options.push('retro')
   }
-  return options;
-});
+  return options
+})
 
-function updateColorTheme(value: Theme | "system") {
-  if (value !== "system") {
+function updateColorTheme(value: Theme | 'system') {
+  if (value !== 'system') {
     if (isDarkTheme(value)) {
-      theme.preferences.dark = value;
+      theme.preferences.dark = value
     } else {
-      theme.preferences.light = value;
+      theme.preferences.light = value
     }
   }
 
-  theme.preferred = value;
+  theme.preferred = value
 }
 
 function disableDeveloperMode() {
-  flags.value.developerMode = !flags.value.developerMode;
-  saveFeatureFlags();
+  flags.value.developerMode = !flags.value.developerMode
+  saveFeatureFlags()
   addNotification({
-    group: "main",
-    title: "Developer mode deactivated",
-    text: "Developer mode has been disabled",
-    type: "success",
-  });
+    group: 'main',
+    title: 'Developer mode deactivated',
+    text: 'Developer mode has been disabled',
+    type: 'success',
+  })
 }
 
 const listTypes = computed(() => {
   const types = tags.value.projectTypes.map((type) => {
     return {
       id: type.id as DisplayLocation,
-      name: formatProjectType(type.id) + "s",
-      display: "the " + formatProjectType(type.id).toLowerCase() + "s search page",
-    };
-  });
+      name: formatProjectType(type.id) + 's',
+      display: 'the ' + formatProjectType(type.id).toLowerCase() + 's search page',
+    }
+  })
 
   types.push({
-    id: "user" as DisplayLocation,
-    name: "User profiles",
-    display: "user pages",
-  });
+    id: 'user' as DisplayLocation,
+    name: 'User profiles',
+    display: 'user pages',
+  })
 
-  return types;
-});
+  return types
+})
 </script>
 <style scoped lang="scss">
 .project-lists {

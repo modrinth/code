@@ -1,42 +1,42 @@
 <script setup lang="ts">
-import { GitGraphIcon,RssIcon } from "@modrinth/assets";
-import { articles as rawArticles } from "@modrinth/blog";
-import { Avatar, ButtonStyled } from "@modrinth/ui";
-import type { User } from "@modrinth/utils";
-import dayjs from "dayjs";
-import { computed } from "vue";
+import { GitGraphIcon, RssIcon } from '@modrinth/assets'
+import { articles as rawArticles } from '@modrinth/blog'
+import { Avatar, ButtonStyled } from '@modrinth/ui'
+import type { User } from '@modrinth/utils'
+import dayjs from 'dayjs'
+import { computed } from 'vue'
 
-import NewsletterButton from "~/components/ui/NewsletterButton.vue";
-import ShareArticleButtons from "~/components/ui/ShareArticleButtons.vue";
+import NewsletterButton from '~/components/ui/NewsletterButton.vue'
+import ShareArticleButtons from '~/components/ui/ShareArticleButtons.vue'
 
-const config = useRuntimeConfig();
-const route = useRoute();
+const config = useRuntimeConfig()
+const route = useRoute()
 
-const rawArticle = rawArticles.find((article) => article.slug === route.params.slug);
+const rawArticle = rawArticles.find((article) => article.slug === route.params.slug)
 
 if (!rawArticle) {
   throw createError({
     fatal: true,
     statusCode: 404,
-    message: "The requested article could not be found.",
-  });
+    message: 'The requested article could not be found.',
+  })
 }
 
-const authorsUrl = `users?ids=${JSON.stringify(rawArticle.authors)}`;
+const authorsUrl = `users?ids=${JSON.stringify(rawArticle.authors)}`
 
 const [authors, html] = await Promise.all([
   rawArticle.authors
     ? useAsyncData(authorsUrl, () => useBaseFetch(authorsUrl)).then((data) => {
-        const users = data.data as Ref<User[]>;
+        const users = data.data as Ref<User[]>
         users.value.sort((a, b) => {
-          return rawArticle.authors.indexOf(a.id) - rawArticle.authors.indexOf(b.id);
-        });
+          return rawArticle.authors.indexOf(a.id) - rawArticle.authors.indexOf(b.id)
+        })
 
-        return users;
+        return users
       })
     : Promise.resolve(),
   rawArticle.html(),
-]);
+])
 
 const article = computed(() => ({
   ...rawArticle,
@@ -48,32 +48,32 @@ const article = computed(() => ({
   summary: rawArticle.summary,
   date: rawArticle.date,
   html,
-}));
+}))
 
-const authorCount = computed(() => authors?.value?.length ?? 0);
+const authorCount = computed(() => authors?.value?.length ?? 0)
 
-const articleTitle = computed(() => article.value.title);
-const articleUrl = computed(() => `https://modrinth.com/news/article/${route.params.slug}`);
+const articleTitle = computed(() => article.value.title)
+const articleUrl = computed(() => `https://modrinth.com/news/article/${route.params.slug}`)
 
 const thumbnailPath = computed(() =>
   article.value.thumbnail
     ? `${config.public.siteUrl}${article.value.thumbnail}`
     : `${config.public.siteUrl}/news/default.jpg`,
-);
+)
 
-const dayjsDate = computed(() => dayjs(article.value.date));
+const dayjsDate = computed(() => dayjs(article.value.date))
 
 useSeoMeta({
   title: () => `${articleTitle.value} - Modrinth News`,
   ogTitle: () => articleTitle.value,
   description: () => article.value.summary,
   ogDescription: () => article.value.summary,
-  ogType: "article",
+  ogType: 'article',
   ogImage: () => thumbnailPath.value,
   articlePublishedTime: () => dayjsDate.value.toISOString(),
-  twitterCard: "summary_large_image",
+  twitterCard: 'summary_large_image',
   twitterImage: () => thumbnailPath.value,
-});
+})
 </script>
 
 <template>
@@ -125,10 +125,10 @@ useSeoMeta({
           </nuxt-link>
         </template>
         <span class="hidden md:block">•</span>
-        <span class="hidden md:block"> {{ dayjsDate.format("MMMM D, YYYY") }}</span>
+        <span class="hidden md:block"> {{ dayjsDate.format('MMMM D, YYYY') }}</span>
       </div>
       <span class="text-sm text-secondary sm:text-base md:hidden">
-        Posted on {{ dayjsDate.format("MMMM D, YYYY") }}</span
+        Posted on {{ dayjsDate.format('MMMM D, YYYY') }}</span
       >
       <ShareArticleButtons :title="article.title" :url="articleUrl" />
       <img

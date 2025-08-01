@@ -143,187 +143,187 @@
 </template>
 
 <script setup lang="ts">
-import { EyeIcon, IssuesIcon,SearchIcon } from "@modrinth/assets";
-import Fuse from "fuse.js";
-import { computed, inject,ref, watch } from "vue";
+import { EyeIcon, IssuesIcon, SearchIcon } from '@modrinth/assets'
+import Fuse from 'fuse.js'
+import { computed, inject, ref, watch } from 'vue'
 
-import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const props = defineProps<{
-  server: ModrinthServer;
-}>();
+  server: ModrinthServer
+}>()
 
-const tags = useTags();
+const tags = useTags()
 
-const isUpdating = ref(false);
+const isUpdating = ref(false)
 
-const searchInput = ref("");
+const searchInput = ref('')
 
-const data = computed(() => props.server.general);
-const modulesLoaded = inject<Promise<void>>("modulesLoaded");
-const { data: propsData, status } = await useAsyncData("ServerProperties", async () => {
-  await modulesLoaded;
-  const rawProps = await props.server.fs?.downloadFile("server.properties");
-  if (!rawProps) return null;
+const data = computed(() => props.server.general)
+const modulesLoaded = inject<Promise<void>>('modulesLoaded')
+const { data: propsData, status } = await useAsyncData('ServerProperties', async () => {
+  await modulesLoaded
+  const rawProps = await props.server.fs?.downloadFile('server.properties')
+  if (!rawProps) return null
 
-  const properties: Record<string, any> = {};
-  const lines = rawProps.split("\n");
+  const properties: Record<string, any> = {}
+  const lines = rawProps.split('\n')
 
   for (const line of lines) {
-    if (line.startsWith("#") || !line.includes("=")) continue;
-    const [key, ...valueParts] = line.split("=");
-    let value = valueParts.join("=");
+    if (line.startsWith('#') || !line.includes('=')) continue
+    const [key, ...valueParts] = line.split('=')
+    let value = valueParts.join('=')
 
-    if (value.toLowerCase() === "true" || value.toLowerCase() === "false") {
-      value = value.toLowerCase() === "true";
-    } else if (!isNaN(value as any) && value !== "") {
-      value = Number(value);
+    if (value.toLowerCase() === 'true' || value.toLowerCase() === 'false') {
+      value = value.toLowerCase() === 'true'
+    } else if (!isNaN(value as any) && value !== '') {
+      value = Number(value)
     }
 
-    properties[key.trim()] = value;
+    properties[key.trim()] = value
   }
 
-  return properties;
-});
+  return properties
+})
 
-const liveProperties = ref<Record<string, any>>({});
-const originalProperties = ref<Record<string, any>>({});
+const liveProperties = ref<Record<string, any>>({})
+const originalProperties = ref<Record<string, any>>({})
 
 watch(
   propsData,
   (newPropsData) => {
     if (newPropsData) {
-      liveProperties.value = JSON.parse(JSON.stringify(newPropsData));
-      originalProperties.value = JSON.parse(JSON.stringify(newPropsData));
+      liveProperties.value = JSON.parse(JSON.stringify(newPropsData))
+      originalProperties.value = JSON.parse(JSON.stringify(newPropsData))
     }
   },
   { immediate: true },
-);
+)
 
 const hasUnsavedChanges = computed(() => {
   return Object.keys(liveProperties.value).some(
     (key) =>
       JSON.stringify(liveProperties.value[key]) !== JSON.stringify(originalProperties.value[key]),
-  );
-});
+  )
+})
 
 const getDifficultyOptions = () => {
   const pre113Versions = tags.value.gameVersions
     .filter((v) => {
-      const versionNumbers = v.version.split(".").map(Number);
-      return versionNumbers[0] === 1 && versionNumbers[1] < 13;
+      const versionNumbers = v.version.split('.').map(Number)
+      return versionNumbers[0] === 1 && versionNumbers[1] < 13
     })
-    .map((v) => v.version);
+    .map((v) => v.version)
   if (data.value?.mc_version && pre113Versions.includes(data.value.mc_version)) {
-    return ["0", "1", "2", "3"];
+    return ['0', '1', '2', '3']
   } else {
-    return ["peaceful", "easy", "normal", "hard"];
+    return ['peaceful', 'easy', 'normal', 'hard']
   }
-};
+}
 
 const overrides: { [key: string]: { type: string; options?: string[]; info?: string } } = {
   difficulty: {
-    type: "dropdown",
+    type: 'dropdown',
     options: getDifficultyOptions(),
   },
   gamemode: {
-    type: "dropdown",
-    options: ["survival", "creative", "adventure", "spectator"],
+    type: 'dropdown',
+    options: ['survival', 'creative', 'adventure', 'spectator'],
   },
-};
+}
 
 const fuse = computed(() => {
-  if (!liveProperties.value) return null;
+  if (!liveProperties.value) return null
 
   const propertiesToFuse = Object.entries(liveProperties.value).map(([key, value]) => ({
     key,
     value: String(value),
-  }));
+  }))
 
   return new Fuse(propertiesToFuse, {
-    keys: ["key", "value"],
+    keys: ['key', 'value'],
     threshold: 0.2,
-  });
-});
+  })
+})
 
 const filteredProperties = computed(() => {
   if (!searchInput.value?.trim()) {
-    return liveProperties.value;
+    return liveProperties.value
   }
 
-  const results = fuse.value?.search(searchInput.value) ?? [];
+  const results = fuse.value?.search(searchInput.value) ?? []
 
-  return Object.fromEntries(results.map(({ item }) => [item.key, liveProperties.value[item.key]]));
-});
+  return Object.fromEntries(results.map(({ item }) => [item.key, liveProperties.value[item.key]]))
+})
 
 const constructServerProperties = (): string => {
-  const properties = liveProperties.value;
+  const properties = liveProperties.value
 
-  let fileContent = `#Minecraft server properties\n#${new Date().toUTCString()}\n`;
+  let fileContent = `#Minecraft server properties\n#${new Date().toUTCString()}\n`
 
   for (const [key, value] of Object.entries(properties)) {
-    if (typeof value === "object") {
-      fileContent += `${key}=${JSON.stringify(value)}\n`;
-    } else if (typeof value === "boolean") {
-      fileContent += `${key}=${value ? "true" : "false"}\n`;
+    if (typeof value === 'object') {
+      fileContent += `${key}=${JSON.stringify(value)}\n`
+    } else if (typeof value === 'boolean') {
+      fileContent += `${key}=${value ? 'true' : 'false'}\n`
     } else {
-      fileContent += `${key}=${value}\n`;
+      fileContent += `${key}=${value}\n`
     }
   }
 
-  return fileContent;
-};
+  return fileContent
+}
 
 const saveProperties = async () => {
   try {
-    isUpdating.value = true;
-    await props.server.fs?.updateFile("server.properties", constructServerProperties());
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    originalProperties.value = JSON.parse(JSON.stringify(liveProperties.value));
-    await props.server.refresh();
+    isUpdating.value = true
+    await props.server.fs?.updateFile('server.properties', constructServerProperties())
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    originalProperties.value = JSON.parse(JSON.stringify(liveProperties.value))
+    await props.server.refresh()
     addNotification({
-      group: "serverOptions",
-      type: "success",
-      title: "Server properties updated",
-      text: "Your server properties were successfully changed.",
-    });
+      group: 'serverOptions',
+      type: 'success',
+      title: 'Server properties updated',
+      text: 'Your server properties were successfully changed.',
+    })
   } catch (error) {
-    console.error("Error updating server properties:", error);
+    console.error('Error updating server properties:', error)
     addNotification({
-      group: "serverOptions",
-      type: "error",
-      title: "Failed to update server properties",
-      text: "An error occurred while attempting to update your server properties.",
-    });
+      group: 'serverOptions',
+      type: 'error',
+      title: 'Failed to update server properties',
+      text: 'An error occurred while attempting to update your server properties.',
+    })
   } finally {
-    isUpdating.value = false;
+    isUpdating.value = false
   }
-};
+}
 
 const resetProperties = async () => {
-  liveProperties.value = JSON.parse(JSON.stringify(originalProperties.value));
-  await new Promise((resolve) => setTimeout(resolve, 200));
-};
+  liveProperties.value = JSON.parse(JSON.stringify(originalProperties.value))
+  await new Promise((resolve) => setTimeout(resolve, 200))
+}
 
 const formatPropertyName = (propertyName: string): string => {
   return propertyName
     .split(/[-.]/)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-};
+    .join(' ')
+}
 
 const isComplexProperty = (property: any): boolean => {
   return (
-    typeof property === "object" ||
-    (typeof property === "string" &&
-      (property.includes(",") ||
-        property.includes("{") ||
-        property.includes("}") ||
-        property.includes("[") ||
-        property.includes("]") ||
+    typeof property === 'object' ||
+    (typeof property === 'string' &&
+      (property.includes(',') ||
+        property.includes('{') ||
+        property.includes('}') ||
+        property.includes('[') ||
+        property.includes(']') ||
         property.length > 30))
-  );
-};
+  )
+}
 </script>
 
 <style scoped>

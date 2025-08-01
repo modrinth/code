@@ -65,7 +65,7 @@
             <div class="flex h-8 items-center justify-between">
               <span class="font-bold text-contrast">
                 {{
-                  showPassword ? data?.sftp_password : "*".repeat(data?.sftp_password?.length ?? 0)
+                  showPassword ? data?.sftp_password : '*'.repeat(data?.sftp_password?.length ?? 0)
                 }}
               </span>
 
@@ -115,40 +115,40 @@
 </template>
 
 <script setup lang="ts">
-import { CopyIcon, ExternalIcon, EyeIcon, EyeOffIcon } from "@modrinth/assets";
-import { ButtonStyled, CopyCode } from "@modrinth/ui";
+import { CopyIcon, ExternalIcon, EyeIcon, EyeOffIcon } from '@modrinth/assets'
+import { ButtonStyled, CopyCode } from '@modrinth/ui'
 
-import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const props = defineProps<{
-  server: ModrinthServer;
-}>();
+  server: ModrinthServer
+}>()
 
-const data = computed(() => props.server.general);
-const showPassword = ref(false);
+const data = computed(() => props.server.general)
+const showPassword = ref(false)
 
 const openSftp = () => {
-  const sftpUrl = `sftp://${data.value?.sftp_username}@${data.value?.sftp_host}`;
-  window.open(sftpUrl, "_blank");
-};
+  const sftpUrl = `sftp://${data.value?.sftp_username}@${data.value?.sftp_host}`
+  window.open(sftpUrl, '_blank')
+}
 
 const togglePassword = () => {
-  showPassword.value = !showPassword.value;
-};
+  showPassword.value = !showPassword.value
+}
 
 const copyToClipboard = (name: string, textToCopy?: string) => {
-  navigator.clipboard.writeText(textToCopy || "");
+  navigator.clipboard.writeText(textToCopy || '')
   addNotification({
-    type: "success",
+    type: 'success',
     title: `${name} copied to clipboard!`,
-  });
-};
+  })
+}
 
 const properties = [
-  { name: "Server ID", value: props.server.serverId ?? "Unknown" },
-  { name: "Node", value: data.value?.node?.instance ?? "Unknown" },
-  { name: "Kind", value: data.value?.upstream?.kind ?? data.value?.loader ?? "Unknown" },
-  { name: "Project ID", value: data.value?.upstream?.project_id ?? "Unknown" },
-  { name: "Version ID", value: data.value?.upstream?.version_id ?? "Unknown" },
-];
+  { name: 'Server ID', value: props.server.serverId ?? 'Unknown' },
+  { name: 'Node', value: data.value?.node?.instance ?? 'Unknown' },
+  { name: 'Kind', value: data.value?.upstream?.kind ?? data.value?.loader ?? 'Unknown' },
+  { name: 'Project ID', value: data.value?.upstream?.project_id ?? 'Unknown' },
+  { name: 'Version ID', value: data.value?.upstream?.version_id ?? 'Unknown' },
+]
 </script>

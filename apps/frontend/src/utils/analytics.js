@@ -1,116 +1,116 @@
-import dayjs from "dayjs";
-import { computed,ref, watch } from "vue";
+import dayjs from 'dayjs'
+import { computed, ref, watch } from 'vue'
 
 // note: build step can miss unix import for some reason, so
 // we have to import it like this
 
-const { unix } = dayjs;  
+const { unix } = dayjs
 
-export function useCountryNames(style = "long") {
-  const formattingOptions = { type: "region", style };
-  const { formats } = useVIntl();
+export function useCountryNames(style = 'long') {
+  const formattingOptions = { type: 'region', style }
+  const { formats } = useVIntl()
   return function formatCountryName(code) {
-    return formats.displayName(code, formattingOptions);
-  };
+    return formats.displayName(code, formattingOptions)
+  }
 }
 
 export const countryCodeToName = (code) => {
-  const formatCountryName = useCountryNames();
+  const formatCountryName = useCountryNames()
 
-  return formatCountryName(code);
-};
+  return formatCountryName(code)
+}
 
 export const countryCodeToFlag = (code) => {
-  if (code === "XX") {
-    return undefined;
+  if (code === 'XX') {
+    return undefined
   }
-  return `https://flagcdn.com/h240/${code.toLowerCase()}.png`;
-};
+  return `https://flagcdn.com/h240/${code.toLowerCase()}.png`
+}
 
 export const formatTimestamp = (timestamp) => {
-  return unix(timestamp).format();
-};
+  return unix(timestamp).format()
+}
 
 export const formatPercent = (value, sum) => {
-  return `${((value / sum) * 100).toFixed(2)}%`;
-};
+  return `${((value / sum) * 100).toFixed(2)}%`
+}
 
 const hashProjectId = (projectId) => {
-  return projectId.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) % 30;
-};
+  return projectId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 30
+}
 
 export const defaultColors = [
-  "#ff496e", // Original: Bright pink
-  "#ffa347", // Original: Bright orange
-  "#1bd96a", // Original: Bright green
-  "#4f9cff", // Original: Bright blue
-  "#c78aff", // Original: Bright purple
-  "#ffeb3b", // Added: Bright yellow
-  "#00bcd4", // Added: Bright cyan
-  "#ff5722", // Added: Bright red-orange
-  "#9c27b0", // Added: Bright deep purple
-  "#3f51b5", // Added: Bright indigo
-  "#009688", // Added: Bright teal
-  "#cddc39", // Added: Bright lime
-  "#795548", // Added: Bright brown
-  "#607d8b", // Added: Bright blue-grey
-];
+  '#ff496e', // Original: Bright pink
+  '#ffa347', // Original: Bright orange
+  '#1bd96a', // Original: Bright green
+  '#4f9cff', // Original: Bright blue
+  '#c78aff', // Original: Bright purple
+  '#ffeb3b', // Added: Bright yellow
+  '#00bcd4', // Added: Bright cyan
+  '#ff5722', // Added: Bright red-orange
+  '#9c27b0', // Added: Bright deep purple
+  '#3f51b5', // Added: Bright indigo
+  '#009688', // Added: Bright teal
+  '#cddc39', // Added: Bright lime
+  '#795548', // Added: Bright brown
+  '#607d8b', // Added: Bright blue-grey
+]
 
 /**
  * @param {string | number} value
  * @returns {string} color
  */
 export const getDefaultColor = (value) => {
-  if (typeof value === "string") {
-    value = hashProjectId(value);
+  if (typeof value === 'string') {
+    value = hashProjectId(value)
   }
-  return defaultColors[value % defaultColors.length];
-};
+  return defaultColors[value % defaultColors.length]
+}
 
-export const intToRgba = (color, projectId = "Unknown", theme = "dark", alpha = "1") => {
-  const hash = hashProjectId(projectId);
+export const intToRgba = (color, projectId = 'Unknown', theme = 'dark', alpha = '1') => {
+  const hash = hashProjectId(projectId)
 
   if (!color || color === 0) {
-    return getDefaultColor(hash);
+    return getDefaultColor(hash)
   }
 
   // if color is a string, return that instead
-  if (typeof color === "string") {
-    return color;
+  if (typeof color === 'string') {
+    return color
   }
 
   // Extract RGB values
-  let r = (color >> 16) & 255;
-  let g = (color >> 8) & 255;
-  let b = color & 255;
+  let r = (color >> 16) & 255
+  let g = (color >> 8) & 255
+  let b = color & 255
 
   // Hash function to alter color slightly based on project_id
-  r = (r + hash) % 256;
-  g = (g + hash) % 256;
-  b = (b + hash) % 256;
+  r = (r + hash) % 256
+  g = (g + hash) % 256
+  b = (b + hash) % 256
 
   // Adjust brightness for theme
-  const brightness = r * 0.299 + g * 0.587 + b * 0.114;
-  const threshold = theme === "dark" ? 50 : 200;
-  if (theme === "dark" && brightness < threshold) {
+  const brightness = r * 0.299 + g * 0.587 + b * 0.114
+  const threshold = theme === 'dark' ? 50 : 200
+  if (theme === 'dark' && brightness < threshold) {
     // Increase brightness for dark theme
-    r += threshold / 2;
-    g += threshold / 2;
-    b += threshold / 2;
-  } else if (theme === "light" && brightness > threshold) {
+    r += threshold / 2
+    g += threshold / 2
+    b += threshold / 2
+  } else if (theme === 'light' && brightness > threshold) {
     // Decrease brightness for light theme
-    r -= threshold / 4;
-    g -= threshold / 4;
-    b -= threshold / 4;
+    r -= threshold / 4
+    g -= threshold / 4
+    b -= threshold / 4
   }
 
   // Ensure RGB values are within 0-255
-  r = Math.min(255, Math.max(0, r));
-  g = Math.min(255, Math.max(0, g));
-  b = Math.min(255, Math.max(0, b));
+  r = Math.min(255, Math.max(0, r))
+  g = Math.min(255, Math.max(0, g))
+  b = Math.min(255, Math.max(0, b))
 
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-};
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
 
 const emptyAnalytics = {
   sum: 0,
@@ -120,7 +120,7 @@ const emptyAnalytics = {
     data: [],
     sumData: [
       {
-        name: "",
+        name: '',
         data: [],
       },
     ],
@@ -128,78 +128,78 @@ const emptyAnalytics = {
     defaultColors: [],
   },
   projectIds: [],
-};
+}
 
 export const analyticsSetToCSVString = (analytics) => {
   if (!analytics) {
-    return "";
+    return ''
   }
 
-  const newline = "\n";
-  const labels = analytics.chart.labels;
-  const projects = analytics.chart.data;
+  const newline = '\n'
+  const labels = analytics.chart.labels
+  const projects = analytics.chart.data
 
-  const projectNames = projects.map((p) => p.name);
+  const projectNames = projects.map((p) => p.name)
 
-  const header = ["Date", ...projectNames].join(",");
+  const header = ['Date', ...projectNames].join(',')
 
   const data = labels.map((label, i) => {
-    const values = projects.map((p) => p.data?.[i] || "");
-    return [label, ...values].join(",");
-  });
+    const values = projects.map((p) => p.data?.[i] || '')
+    return [label, ...values].join(',')
+  })
 
-  return [header, ...data].join(newline);
-};
+  return [header, ...data].join(newline)
+}
 
 export const processAnalytics = (category, projects, labelFn, sortFn, mapFn, chartName, theme) => {
   if (!category || !projects) {
-    return emptyAnalytics;
+    return emptyAnalytics
   }
 
   // Get an intersection of category keys and project ids
-  const projectIds = projects.map((p) => p.id);
-  const loadedProjectIds = Object.keys(category).filter((id) => projectIds.includes(id));
+  const projectIds = projects.map((p) => p.id)
+  const loadedProjectIds = Object.keys(category).filter((id) => projectIds.includes(id))
 
   if (!loadedProjectIds?.length) {
-    return emptyAnalytics;
+    return emptyAnalytics
   }
 
-  const loadedProjectData = loadedProjectIds.map((id) => category[id]);
+  const loadedProjectData = loadedProjectIds.map((id) => category[id])
 
   // Convert each project's data into a list of [unix_ts_str, number] pairs
   const projectData = loadedProjectData
     .map((data) => Object.entries(data))
     .map((data) => data.sort(sortFn))
-    .map((data) => (mapFn ? data.map(mapFn) : data));
+    .map((data) => (mapFn ? data.map(mapFn) : data))
 
   // Each project may not include the same timestamps, so we should use the union of all timestamps
   const timestamps = Array.from(
     new Set(projectData.flatMap((data) => data.map(([ts]) => ts))),
-  ).sort();
+  ).sort()
 
   const chartData = projectData
     .map((data, i) => {
-      const project = projects.find((p) => p.id === loadedProjectIds[i]);
+      const project = projects.find((p) => p.id === loadedProjectIds[i])
       if (!project) {
-        throw new Error(`Project ${loadedProjectIds[i]} not found`);
+        throw new Error(`Project ${loadedProjectIds[i]} not found`)
       }
 
       return {
         name: `${project.title}`,
         data: timestamps.map((ts) => {
-          const entry = data.find(([ets]) => ets === ts);
-          return entry ? entry[1] : 0;
+          const entry = data.find(([ets]) => ets === ts)
+          return entry ? entry[1] : 0
         }),
         id: project.id,
         color: project.color,
-      };
+      }
     })
     .sort(
       (a, b) =>
         b.data.reduce((acc, cur) => acc + cur, 0) - a.data.reduce((acc, cur) => acc + cur, 0),
-    );
+    )
 
-  const projectIdsSortedBySum = chartData.map((p) => p.id);
+  const projectIdsSortedBySum = chartData.map((p) => p.id)
 
   return {
     // The total count of all the values across all projects
@@ -212,24 +212,24 @@ export const processAnalytics = (category, projects, labelFn, sortFn, mapFn, cha
         {
           name: chartName,
           data: timestamps.map((ts) => {
-            const entries = projectData.flat().filter(([ets]) => ets === ts);
-            return entries.reduce((acc, cur) => acc + cur[1], 0);
+            const entries = projectData.flat().filter(([ets]) => ets === ts)
+            return entries.reduce((acc, cur) => acc + cur[1], 0)
           }),
         },
       ],
       colors: projectData.map((_, i) => {
-        const project = chartData[i];
+        const project = chartData[i]
 
-        return intToRgba(project.color, project.id, theme);
+        return intToRgba(project.color, project.id, theme)
       }),
       defaultColors: projectData.map((_, i) => {
-        const project = chartData[i];
-        return getDefaultColor(project.id);
+        const project = chartData[i]
+        return getDefaultColor(project.id)
       }),
     },
     projectIds: projectIdsSortedBySum,
-  };
-};
+  }
+}
 
 export const processAnalyticsByCountry = (category, projects, sortFn) => {
   if (!category || !projects) {
@@ -237,54 +237,54 @@ export const processAnalyticsByCountry = (category, projects, sortFn) => {
       sum: 0,
       len: 0,
       data: [],
-    };
+    }
   }
 
   // Get an intersection of category keys and project ids
-  const projectIds = projects.map((p) => p.id);
-  const loadedProjectIds = Object.keys(category).filter((id) => projectIds.includes(id));
+  const projectIds = projects.map((p) => p.id)
+  const loadedProjectIds = Object.keys(category).filter((id) => projectIds.includes(id))
 
   if (!loadedProjectIds?.length) {
     return {
       sum: 0,
       len: 0,
       data: [],
-    };
+    }
   }
 
-  const loadedProjectData = loadedProjectIds.map((id) => category[id]);
+  const loadedProjectData = loadedProjectIds.map((id) => category[id])
 
   // Convert each project's data into a list of [countrycode, number] pairs
   // Fold into a single list with summed values for each country over all projects
 
-  const countrySums = new Map();
+  const countrySums = new Map()
 
   loadedProjectData.forEach((data) => {
     Object.entries(data).forEach(([country, value]) => {
-      const countryCode = country || "XX";
-      const current = countrySums.get(countryCode) || 0;
-      countrySums.set(countryCode, current + value);
-    });
-  });
+      const countryCode = country || 'XX'
+      const current = countrySums.get(countryCode) || 0
+      countrySums.set(countryCode, current + value)
+    })
+  })
 
-  const entries = Array.from(countrySums.entries());
+  const entries = Array.from(countrySums.entries())
 
   return {
     sum: entries.reduce((acc, cur) => acc + cur[1], 0),
     len: entries.length,
     data: entries.sort(sortFn),
-  };
-};
+  }
+}
 
-const sortCount = ([, a], [, b]) => b - a;
-const sortTimestamp = ([a], [b]) => a - b;
-const roundValue = ([ts, value]) => [ts, Math.round(parseFloat(value) * 100) / 100];
+const sortCount = ([, a], [, b]) => b - a
+const sortTimestamp = ([a], [b]) => a - b
+const roundValue = ([ts, value]) => [ts, Math.round(parseFloat(value) * 100) / 100]
 
-const processCountryAnalytics = (c, projects) => processAnalyticsByCountry(c, projects, sortCount);
+const processCountryAnalytics = (c, projects) => processAnalyticsByCountry(c, projects, sortCount)
 const processNumberAnalytics = (c, projects, theme) =>
-  processAnalytics(c, projects, formatTimestamp, sortTimestamp, null, "Downloads", theme);
+  processAnalytics(c, projects, formatTimestamp, sortTimestamp, null, 'Downloads', theme)
 const processRevAnalytics = (c, projects, theme) =>
-  processAnalytics(c, projects, formatTimestamp, sortTimestamp, roundValue, "Revenue", theme);
+  processAnalytics(c, projects, formatTimestamp, sortTimestamp, roundValue, 'Revenue', theme)
 
 const useFetchAnalytics = (
   url,
@@ -292,8 +292,8 @@ const useFetchAnalytics = (
     apiVersion: 3,
   },
 ) => {
-  return useBaseFetch(url, baseOptions);
-};
+  return useBaseFetch(url, baseOptions)
+}
 
 /**
  * @param {Ref<any[]>} projects
@@ -304,17 +304,17 @@ export const useFetchAllAnalytics = (
   projects,
   selectedProjects,
   personalRevenue = false,
-  startDate = ref(dayjs().subtract(30, "days")),
+  startDate = ref(dayjs().subtract(30, 'days')),
   endDate = ref(dayjs()),
   timeResolution = ref(1440),
 ) => {
-  const downloadData = ref(null);
-  const viewData = ref(null);
-  const revenueData = ref(null);
-  const downloadsByCountry = ref(null);
-  const viewsByCountry = ref(null);
-  const loading = ref(true);
-  const error = ref(null);
+  const downloadData = ref(null)
+  const viewData = ref(null)
+  const revenueData = ref(null)
+  const downloadsByCountry = ref(null)
+  const viewsByCountry = ref(null)
+  const loading = ref(true)
+  const error = ref(null)
 
   const formattedData = computed(() => ({
     downloads: processNumberAnalytics(downloadData.value, selectedProjects.value),
@@ -322,30 +322,30 @@ export const useFetchAllAnalytics = (
     revenue: processRevAnalytics(revenueData.value, selectedProjects.value),
     downloadsByCountry: processCountryAnalytics(downloadsByCountry.value, selectedProjects.value),
     viewsByCountry: processCountryAnalytics(viewsByCountry.value, selectedProjects.value),
-  }));
+  }))
 
-  const theme = useTheme();
+  const theme = useTheme()
 
   const totalData = computed(() => ({
     downloads: processNumberAnalytics(downloadData.value, projects.value, theme.active),
     views: processNumberAnalytics(viewData.value, projects.value, theme.active),
     revenue: processRevAnalytics(revenueData.value, projects.value, theme.active),
-  }));
+  }))
 
   const fetchData = async (query) => {
-    const normalQuery = new URLSearchParams(query);
-    const revenueQuery = new URLSearchParams(query);
+    const normalQuery = new URLSearchParams(query)
+    const revenueQuery = new URLSearchParams(query)
 
     if (personalRevenue) {
-      revenueQuery.delete("project_ids");
+      revenueQuery.delete('project_ids')
     }
 
-    const qs = normalQuery.toString();
-    const revenueQs = revenueQuery.toString();
+    const qs = normalQuery.toString()
+    const revenueQs = revenueQuery.toString()
 
     try {
-      loading.value = true;
-      error.value = null;
+      loading.value = true
+      error.value = null
 
       const responses = await Promise.all([
         useFetchAnalytics(`analytics/downloads?${qs}`),
@@ -353,39 +353,39 @@ export const useFetchAllAnalytics = (
         useFetchAnalytics(`analytics/revenue?${revenueQs}`),
         useFetchAnalytics(`analytics/countries/downloads?${qs}`),
         useFetchAnalytics(`analytics/countries/views?${qs}`),
-      ]);
+      ])
 
       // collect project ids from projects.value into a set
-      const projectIds = new Set();
+      const projectIds = new Set()
       if (projects.value) {
-        projects.value.forEach((p) => projectIds.add(p.id));
+        projects.value.forEach((p) => projectIds.add(p.id))
       } else {
         // if projects.value is not set, we assume that we want all project ids
-        Object.keys(responses[0] || {}).forEach((id) => projectIds.add(id));
+        Object.keys(responses[0] || {}).forEach((id) => projectIds.add(id))
       }
 
       const filterProjectIds = (data) => {
-        const filtered = {};
+        const filtered = {}
         Object.entries(data).forEach(([id, values]) => {
           if (projectIds.has(id)) {
-            filtered[id] = values;
+            filtered[id] = values
           }
-        });
-        return filtered;
-      };
+        })
+        return filtered
+      }
 
-      downloadData.value = filterProjectIds(responses[0] || {});
-      viewData.value = filterProjectIds(responses[1] || {});
-      revenueData.value = filterProjectIds(responses[2] || {});
+      downloadData.value = filterProjectIds(responses[0] || {})
+      viewData.value = filterProjectIds(responses[1] || {})
+      revenueData.value = filterProjectIds(responses[2] || {})
 
-      downloadsByCountry.value = responses[3] || {};
-      viewsByCountry.value = responses[4] || {};
+      downloadsByCountry.value = responses[3] || {}
+      viewsByCountry.value = responses[4] || {}
     } catch (e) {
-      error.value = e;
+      error.value = e
     } finally {
-      loading.value = false;
+      loading.value = false
     }
-  };
+  }
 
   watch(
     [() => startDate.value, () => endDate.value, () => timeResolution.value, () => projects.value],
@@ -394,32 +394,32 @@ export const useFetchAllAnalytics = (
         start_date: startDate.value.toISOString(),
         end_date: endDate.value.toISOString(),
         resolution_minutes: timeResolution.value,
-      };
-
-      if (projects.value?.length) {
-        q.project_ids = JSON.stringify(projects.value.map((p) => p.id));
       }
 
-      await fetchData(q);
+      if (projects.value?.length) {
+        q.project_ids = JSON.stringify(projects.value.map((p) => p.id))
+      }
+
+      await fetchData(q)
 
       if (onDataRefresh) {
-        onDataRefresh();
+        onDataRefresh()
       }
     },
     {
       immediate: true,
     },
-  );
+  )
 
   const validProjectIds = computed(() => {
-    const ids = new Set();
+    const ids = new Set()
 
     if (downloadData.value) {
-      Object.keys(downloadData.value).forEach((id) => ids.add(id));
+      Object.keys(downloadData.value).forEach((id) => ids.add(id))
     }
 
     if (viewData.value) {
-      Object.keys(viewData.value).forEach((id) => ids.add(id));
+      Object.keys(viewData.value).forEach((id) => ids.add(id))
     }
 
     if (revenueData.value) {
@@ -427,14 +427,14 @@ export const useFetchAllAnalytics = (
       Object.entries(revenueData.value).forEach(([id, data]) => {
         if (Object.keys(data).length) {
           if (Object.values(data).some((v) => v >= 0.01)) {
-            ids.add(id);
+            ids.add(id)
           }
         }
-      });
+      })
     }
 
-    return Array.from(ids);
-  });
+    return Array.from(ids)
+  })
 
   return {
     // Configuration
@@ -456,5 +456,5 @@ export const useFetchAllAnalytics = (
     totalData,
     loading,
     error,
-  };
-};
+  }
+}

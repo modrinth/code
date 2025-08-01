@@ -15,9 +15,9 @@
 </template>
 
 <script setup>
-import ChartDisplay from "~/components/ui/charts/ChartDisplay.vue";
+import ChartDisplay from '~/components/ui/charts/ChartDisplay.vue'
 
-const { projects } = inject("organizationContext");
+const { projects } = inject('organizationContext')
 </script>
 
 <style scoped lang="scss">

@@ -56,86 +56,86 @@
   </div>
 </template>
 <script setup>
-import { CheckCheckIcon,HistoryIcon } from "@modrinth/assets";
-import { Button, Chips,Pagination } from "@modrinth/ui";
-import { formatProjectType } from "@modrinth/utils";
+import { CheckCheckIcon, HistoryIcon } from '@modrinth/assets'
+import { Button, Chips, Pagination } from '@modrinth/ui'
+import { formatProjectType } from '@modrinth/utils'
 
-import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
-import NotificationItem from "~/components/ui/NotificationItem.vue";
+import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
+import NotificationItem from '~/components/ui/NotificationItem.vue'
 import {
   fetchExtraNotificationData,
   groupNotifications,
   markAsRead,
-} from "~/helpers/notifications.ts";
+} from '~/helpers/notifications.ts'
 
 useHead({
-  title: "Notifications - Modrinth",
-});
+  title: 'Notifications - Modrinth',
+})
 
-const auth = await useAuth();
-const route = useNativeRoute();
-const router = useNativeRouter();
+const auth = await useAuth()
+const route = useNativeRoute()
+const router = useNativeRouter()
 
-const history = computed(() => route.name === "dashboard-notifications-history");
-const selectedType = ref("all");
-const page = ref(1);
-const perPage = ref(50);
+const history = computed(() => route.name === 'dashboard-notifications-history')
+const selectedType = ref('all')
+const page = ref(1)
+const perPage = ref(50)
 
 const { data, pending, error, refresh } = await useAsyncData(
   async () => {
-    const pageNum = page.value - 1;
-    const showRead = history.value;
-    const notifications = await useBaseFetch(`user/${auth.value.user.id}/notifications`);
+    const pageNum = page.value - 1
+    const showRead = history.value
+    const notifications = await useBaseFetch(`user/${auth.value.user.id}/notifications`)
 
     const typesInFeed = [
       ...new Set(notifications.filter((n) => showRead || !n.read).map((n) => n.type)),
-    ];
+    ]
 
     const filtered = notifications.filter(
       (n) =>
-        (selectedType.value === "all" || n.type === selectedType.value) && (showRead || !n.read),
-    );
+        (selectedType.value === 'all' || n.type === selectedType.value) && (showRead || !n.read),
+    )
 
-    const pages = Math.max(1, Math.ceil(filtered.length / perPage.value));
+    const pages = Math.max(1, Math.ceil(filtered.length / perPage.value))
 
     return fetchExtraNotificationData(
       filtered.slice(pageNum * perPage.value, pageNum * perPage.value + perPage.value),
     ).then((notifs) => ({
       notifications: notifs,
-      notifTypes: typesInFeed.length > 1 ? ["all", ...typesInFeed] : typesInFeed,
+      notifTypes: typesInFeed.length > 1 ? ['all', ...typesInFeed] : typesInFeed,
       pages,
       hasRead: notifications.some((n) => n.read),
-    }));
+    }))
   },
   { watch: [page, history, selectedType] },
-);
+)
 
 const notifications = computed(() =>
   data.value ? groupNotifications(data.value.notifications, history.value) : [],
-);
+)
 
-const notifTypes = computed(() => data.value?.notifTypes || []);
-const pages = computed(() => data.value?.pages ?? 1);
+const notifTypes = computed(() => data.value?.notifTypes || [])
+const pages = computed(() => data.value?.pages ?? 1)
 
 function updateRoute() {
-  router.push(history.value ? "/dashboard/notifications" : "/dashboard/notifications/history");
-  selectedType.value = "all";
-  page.value = 1;
+  router.push(history.value ? '/dashboard/notifications' : '/dashboard/notifications/history')
+  selectedType.value = 'all'
+  page.value = 1
 }
 
 async function readAll() {
   const ids = notifications.value.flatMap((n) => [
     n.id,
     ...(n.grouped_notifs ? n.grouped_notifs.map((g) => g.id) : []),
-  ]);
+  ])
 
-  await markAsRead(ids);
-  await refresh();
+  await markAsRead(ids)
+  await refresh()
 }
 
 function changePage(newPage) {
-  page.value = newPage;
-  if (import.meta.client) window.scrollTo({ top: 0, behavior: "smooth" });
+  page.value = newPage
+  if (import.meta.client) window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 </script>
 <style lang="scss" scoped>

@@ -21,10 +21,10 @@
   </div>
 </template>
 <script setup>
-import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
-import ReportInfo from "~/components/ui/report/ReportInfo.vue";
-import ConversationThread from "~/components/ui/thread/ConversationThread.vue";
-import { addReportMessage } from "~/helpers/threads.js";
+import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
+import ReportInfo from '~/components/ui/report/ReportInfo.vue'
+import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
+import { addReportMessage } from '~/helpers/threads.js'
 
 const props = defineProps({
   reportId: {
@@ -39,76 +39,76 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-});
+})
 
-const report = ref(null);
+const report = ref(null)
 
 await fetchReport().then((result) => {
-  report.value = result;
-});
+  report.value = result
+})
 
 const { data: rawThread } = await useAsyncData(`thread/${report.value.thread_id}`, () =>
   useBaseFetch(`thread/${report.value.thread_id}`),
-);
-const thread = computed(() => addReportMessage(rawThread.value, report.value));
+)
+const thread = computed(() => addReportMessage(rawThread.value, report.value))
 
 async function updateThread(newThread) {
-  rawThread.value = newThread;
-  report.value = await fetchReport();
+  rawThread.value = newThread
+  report.value = await fetchReport()
 }
 
 async function fetchReport() {
   const { data: rawReport } = await useAsyncData(`report/${props.reportId}`, () =>
     useBaseFetch(`report/${props.reportId}`),
-  );
-  rawReport.value.item_id = rawReport.value.item_id.replace(/"/g, "");
+  )
+  rawReport.value.item_id = rawReport.value.item_id.replace(/"/g, '')
 
-  const userIds = [];
-  userIds.push(rawReport.value.reporter);
-  if (rawReport.value.item_type === "user") {
-    userIds.push(rawReport.value.item_id);
+  const userIds = []
+  userIds.push(rawReport.value.reporter)
+  if (rawReport.value.item_type === 'user') {
+    userIds.push(rawReport.value.item_id)
   }
 
-  const versionId = rawReport.value.item_type === "version" ? rawReport.value.item_id : null;
+  const versionId = rawReport.value.item_type === 'version' ? rawReport.value.item_id : null
 
-  let users = [];
+  let users = []
   if (userIds.length > 0) {
     const { data: usersVal } = await useAsyncData(`users?ids=${JSON.stringify(userIds)}`, () =>
       useBaseFetch(`users?ids=${encodeURIComponent(JSON.stringify(userIds))}`),
-    );
-    users = usersVal.value;
+    )
+    users = usersVal.value
   }
 
-  let version = null;
+  let version = null
   if (versionId) {
     const { data: versionVal } = await useAsyncData(`version/${versionId}`, () =>
       useBaseFetch(`version/${versionId}`),
-    );
-    version = versionVal.value;
+    )
+    version = versionVal.value
   }
 
   const projectId = version
     ? version.project_id
-    : rawReport.value.item_type === "project"
+    : rawReport.value.item_type === 'project'
       ? rawReport.value.item_id
-      : null;
+      : null
 
-  let project = null;
+  let project = null
   if (projectId) {
     const { data: projectVal } = await useAsyncData(`project/${projectId}`, () =>
       useBaseFetch(`project/${projectId}`),
-    );
-    project = projectVal.value;
+    )
+    project = projectVal.value
   }
 
-  const reportData = rawReport.value;
-  reportData.project = project;
-  reportData.version = version;
-  reportData.reporterUser = users.find((user) => user.id === rawReport.value.reporter);
-  if (rawReport.value.item_type === "user") {
-    reportData.user = users.find((user) => user.id === rawReport.value.item_id);
+  const reportData = rawReport.value
+  reportData.project = project
+  reportData.version = version
+  reportData.reporterUser = users.find((user) => user.id === rawReport.value.reporter)
+  if (rawReport.value.item_type === 'user') {
+    reportData.user = users.find((user) => user.id === rawReport.value.item_id)
   }
-  return reportData;
+  return reportData
 }
 </script>
 <style lang="scss" scoped>

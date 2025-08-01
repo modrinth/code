@@ -32,30 +32,30 @@
   </div>
 </template>
 <script setup lang="ts">
-import { MailIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+import { MailIcon } from '@modrinth/assets'
+import { ButtonStyled } from '@modrinth/ui'
 
-const userEmail = ref("");
+const userEmail = ref('')
 
 async function getUserFromEmail() {
-  startLoading();
+  startLoading()
 
   try {
     const result = await useBaseFetch(`user_email?email=${encodeURIComponent(userEmail.value)}`, {
-      method: "GET",
+      method: 'GET',
       apiVersion: 3,
-    });
+    })
 
-    await navigateTo(`/user/${result.username}`);
+    await navigateTo(`/user/${result.username}`)
   } catch (err) {
-    console.error(err);
+    console.error(err)
     addNotification({
-      group: "main",
-      title: "An error occurred",
+      group: 'main',
+      title: 'An error occurred',
       text: err.data.description,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  stopLoading();
+  stopLoading()
 }
 </script>

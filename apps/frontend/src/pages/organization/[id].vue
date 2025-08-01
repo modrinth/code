@@ -170,7 +170,7 @@
                     />
                   </span>
                   <span class="details-list__item__text--style-secondary">
-                    {{ member.role ? member.role : "Member" }}
+                    {{ member.role ? member.role : 'Member' }}
                   </span>
                 </div>
               </nuxt-link>
@@ -264,7 +264,7 @@ import {
   SettingsIcon,
   UsersIcon,
   XIcon,
-} from "@modrinth/assets";
+} from '@modrinth/assets'
 import {
   Avatar,
   Breadcrumbs,
@@ -272,33 +272,33 @@ import {
   commonMessages,
   ContentPageHeader,
   OverflowMenu,
-} from "@modrinth/ui";
+} from '@modrinth/ui'
 
-import UpToDate from "~/assets/images/illustrations/up_to_date.svg?component";
-import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
-import ModalCreation from "~/components/ui/ModalCreation.vue";
-import NavStack from "~/components/ui/NavStack.vue";
-import NavStackItem from "~/components/ui/NavStackItem.vue";
-import NavTabs from "~/components/ui/NavTabs.vue";
-import ProjectCard from "~/components/ui/ProjectCard.vue";
-import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
+import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
+import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
+import ModalCreation from '~/components/ui/ModalCreation.vue'
+import NavStack from '~/components/ui/NavStack.vue'
+import NavStackItem from '~/components/ui/NavStackItem.vue'
+import NavTabs from '~/components/ui/NavTabs.vue'
+import ProjectCard from '~/components/ui/ProjectCard.vue'
+import { acceptTeamInvite, removeTeamMember } from '~/helpers/teams.js'
 
-const vintl = useVIntl();
-const { formatMessage } = vintl;
+const vintl = useVIntl()
+const { formatMessage } = vintl
 
-const formatCompactNumber = useCompactNumber(true);
+const formatCompactNumber = useCompactNumber(true)
 
-const auth = await useAuth();
-const user = await useUser();
-const cosmetics = useCosmetics();
-const route = useNativeRoute();
-const tags = useTags();
-const config = useRuntimeConfig();
+const auth = await useAuth()
+const user = await useUser()
+const cosmetics = useCosmetics()
+const route = useNativeRoute()
+const tags = useTags()
+const config = useRuntimeConfig()
 
-let orgId = useRouteId();
+let orgId = useRouteId()
 
 // hacky way to show the edit button on the corner of the card.
-const routeHasSettings = computed(() => route.path.includes("settings"));
+const routeHasSettings = computed(() => route.path.includes('settings'))
 
 const [
   { data: organization, refresh: refreshOrganization },
@@ -313,162 +313,162 @@ const [
     {
       transform: (projects) => {
         for (const project of projects) {
-          project.categories = project.categories.concat(project.loaders);
+          project.categories = project.categories.concat(project.loaders)
 
           if (project.mrpack_loaders) {
-            project.categories = project.categories.concat(project.mrpack_loaders);
+            project.categories = project.categories.concat(project.mrpack_loaders)
           }
 
-          const singleplayer = project.singleplayer && project.singleplayer[0];
-          const clientAndServer = project.client_and_server && project.client_and_server[0];
-          const clientOnly = project.client_only && project.client_only[0];
-          const serverOnly = project.server_only && project.server_only[0];
+          const singleplayer = project.singleplayer && project.singleplayer[0]
+          const clientAndServer = project.client_and_server && project.client_and_server[0]
+          const clientOnly = project.client_only && project.client_only[0]
+          const serverOnly = project.server_only && project.server_only[0]
 
           // quick and dirty hack to show envs as legacy
           if (singleplayer && clientAndServer && !clientOnly && !serverOnly) {
-            project.client_side = "required";
-            project.server_side = "required";
+            project.client_side = 'required'
+            project.server_side = 'required'
           } else if (singleplayer && clientAndServer && clientOnly && !serverOnly) {
-            project.client_side = "required";
-            project.server_side = "unsupported";
+            project.client_side = 'required'
+            project.server_side = 'unsupported'
           } else if (singleplayer && clientAndServer && !clientOnly && serverOnly) {
-            project.client_side = "unsupported";
-            project.server_side = "required";
+            project.client_side = 'unsupported'
+            project.server_side = 'required'
           } else if (singleplayer && clientAndServer && clientOnly && serverOnly) {
-            project.client_side = "optional";
-            project.server_side = "optional";
+            project.client_side = 'optional'
+            project.server_side = 'optional'
           }
         }
 
-        return projects;
+        return projects
       },
     },
   ),
-]);
+])
 
 const refresh = async () => {
-  await Promise.all([refreshOrganization(), refreshProjects()]);
-};
+  await Promise.all([refreshOrganization(), refreshProjects()])
+}
 
 if (!organization.value) {
   throw createError({
     fatal: true,
     statusCode: 404,
-    message: "Organization not found",
-  });
+    message: 'Organization not found',
+  })
 }
 
 // Filter accepted, sort by role, then by name and Owner role always goes first
 const acceptedMembers = computed(() => {
-  const acceptedMembers = organization.value.members?.filter((x) => x.accepted);
-  const owner = acceptedMembers.find((x) => x.is_owner);
-  const rest = acceptedMembers.filter((x) => !x.is_owner) || [];
+  const acceptedMembers = organization.value.members?.filter((x) => x.accepted)
+  const owner = acceptedMembers.find((x) => x.is_owner)
+  const rest = acceptedMembers.filter((x) => !x.is_owner) || []
 
   rest.sort((a, b) => {
     if (a.role === b.role) {
-      return a.user.username.localeCompare(b.user.username);
+      return a.user.username.localeCompare(b.user.username)
     } else {
-      return a.role.localeCompare(b.role);
+      return a.role.localeCompare(b.role)
     }
-  });
+  })
 
-  return [owner, ...rest];
-});
+  return [owner, ...rest]
+})
 
 const currentMember = computed(() => {
   if (auth.value.user && organization.value) {
-    const member = organization.value.members.find((x) => x.user.id === auth.value.user.id);
+    const member = organization.value.members.find((x) => x.user.id === auth.value.user.id)
 
     if (member) {
-      return member;
+      return member
     }
 
     if (tags.value.staffRoles.includes(auth.value.user.role)) {
       return {
         user: auth.value.user,
         role: auth.value.user.role,
-        permissions: auth.value.user.role === "admin" ? 1023 : 12,
+        permissions: auth.value.user.role === 'admin' ? 1023 : 12,
         accepted: true,
         payouts_split: 0,
         avatar_url: auth.value.user.avatar_url,
         name: auth.value.user.username,
-      };
+      }
     }
   }
 
-  return null;
-});
+  return null
+})
 
 const hasPermission = computed(() => {
-  const EDIT_DETAILS = 1 << 2;
-  return currentMember.value && (currentMember.value.permissions & EDIT_DETAILS) === EDIT_DETAILS;
-});
+  const EDIT_DETAILS = 1 << 2
+  return currentMember.value && (currentMember.value.permissions & EDIT_DETAILS) === EDIT_DETAILS
+})
 
 const isInvited = computed(() => {
-  return currentMember.value?.accepted === false;
-});
+  return currentMember.value?.accepted === false
+})
 
 const projectTypes = computed(() => {
-  const obj = {};
+  const obj = {}
 
   for (const project of projects.value) {
-    obj[project.project_types[0] ?? "project"] = true;
+    obj[project.project_types[0] ?? 'project'] = true
   }
 
-  delete obj.project;
+  delete obj.project
 
-  return Object.keys(obj);
-});
+  return Object.keys(obj)
+})
 const sumDownloads = computed(() => {
-  let sum = 0;
+  let sum = 0
 
   for (const project of projects.value) {
-    sum += project.downloads;
+    sum += project.downloads
   }
 
-  return sum;
-});
+  return sum
+})
 
 const patchIcon = async (icon) => {
-  const ext = icon.name.split(".").pop();
+  const ext = icon.name.split('.').pop()
   await useBaseFetch(`organization/${organization.value.id}/icon`, {
-    method: "PATCH",
+    method: 'PATCH',
     body: icon,
     query: { ext },
     apiVersion: 3,
-  });
-};
+  })
+}
 
 const deleteIcon = async () => {
   await useBaseFetch(`organization/${organization.value.id}/icon`, {
-    method: "DELETE",
+    method: 'DELETE',
     apiVersion: 3,
-  });
-};
+  })
+}
 
 const patchOrganization = async (id, newData) => {
   await useBaseFetch(`organization/${id}`, {
-    method: "PATCH",
+    method: 'PATCH',
     body: newData,
     apiVersion: 3,
-  });
+  })
 
   if (newData.slug) {
-    orgId = newData.slug;
+    orgId = newData.slug
   }
-};
+}
 
 const onAcceptInvite = useClientTry(async () => {
-  await acceptTeamInvite(organization.value.team_id);
-  await refreshOrganization();
-});
+  await acceptTeamInvite(organization.value.team_id)
+  await refreshOrganization()
+})
 
 const onDeclineInvite = useClientTry(async () => {
-  await removeTeamMember(organization.value.team_id, auth.value?.user.id);
-  await refreshOrganization();
-});
+  await removeTeamMember(organization.value.team_id, auth.value?.user.id)
+  await refreshOrganization()
+})
 
-provide("organizationContext", {
+provide('organizationContext', {
   organization,
   projects,
   refresh,
@@ -477,18 +477,18 @@ provide("organizationContext", {
   patchIcon,
   deleteIcon,
   patchOrganization,
-});
+})
 
-const title = `${organization.value.name} - Organization`;
-const description = `${organization.value.description} - View the organization ${organization.value.name} on Modrinth`;
+const title = `${organization.value.name} - Organization`
+const description = `${organization.value.description} - View the organization ${organization.value.name} on Modrinth`
 
 useSeoMeta({
   title,
   description,
   ogTitle: title,
   ogDescription: organization.value.description,
-  ogImage: organization.value.icon_url ?? "https://cdn.modrinth.com/placeholder.png",
-});
+  ogImage: organization.value.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
+})
 
 const navLinks = computed(() => [
   {
@@ -500,20 +500,20 @@ const navLinks = computed(() => [
       return {
         label: formatMessage(getProjectTypeMessage(x, true)),
         href: `/organization/${organization.value.slug}/${x}s`,
-      };
+      }
     })
     .slice()
     .sort((a, b) => a.label.localeCompare(b.label)),
-]);
+])
 
 async function copyId() {
-  await navigator.clipboard.writeText(organization.value.id);
+  await navigator.clipboard.writeText(organization.value.id)
 }
 
 async function copyPermalink() {
   await navigator.clipboard.writeText(
     `${config.public.siteUrl}/organization/${organization.value.id}`,
-  );
+  )
 }
 </script>
 
@@ -564,8 +564,8 @@ async function copyPermalink() {
     margin-left: -0.5rem;
     border-radius: var(--radius-lg);
     grid-template:
-      "avatar name" auto
-      "avatar role" auto
+      'avatar name' auto
+      'avatar role' auto
       / auto 1fr;
 
     p {

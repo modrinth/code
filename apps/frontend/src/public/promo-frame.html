@@ -47,27 +47,27 @@
       <div id="modrinth-rail-1"></div>
     </div>
     <script>
-      window.tude = window.tude || { cmd: [] };
+      window.tude = window.tude || { cmd: [] }
 
-      window.Raven = window.Raven || { cmd: [] };
+      window.Raven = window.Raven || { cmd: [] }
 
       window.Raven.cmd.push(({ config }) => {
         config.setCustom({
-          param1: "app",
-        });
-      });
+          param1: 'app',
+        })
+      })
 
       tude.cmd.push(function () {
         tude.refreshAdsViaDivMappings([
           {
-            divId: "modrinth-rail-1",
-            baseDivId: "pb-slot-square-2",
+            divId: 'modrinth-rail-1',
+            baseDivId: 'pb-slot-square-2',
             targeting: {
-              location: "app",
+              location: 'app',
             },
           },
-        ]);
-      });
+        ])
+      })
 
       // window.addEventListener(
       //   "message",
@@ -86,15 +86,15 @@
       //   false,
       // );
 
-      window.addEventListener("mousewheel", (event) => {
+      window.addEventListener('mousewheel', (event) => {
         if (window.__TAURI_INTERNALS__) {
-          window.__TAURI_INTERNALS__.invoke("plugin:ads|scroll_ads_window", {
+          window.__TAURI_INTERNALS__.invoke('plugin:ads|scroll_ads_window', {
             scroll: event.deltaY,
-          });
+          })
         }
-      });
+      })
 
-      document.addEventListener("contextmenu", (event) => event.preventDefault());
+      document.addEventListener('contextmenu', (event) => event.preventDefault())
     </script>
   </body>
 </html>
