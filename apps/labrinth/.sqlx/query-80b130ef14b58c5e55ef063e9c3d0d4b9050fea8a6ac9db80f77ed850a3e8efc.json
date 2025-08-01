@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE users\n            SET webauthn_passkey = $2\n            WHERE (id = $1)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "80b130ef14b58c5e55ef063e9c3d0d4b9050fea8a6ac9db80f77ed850a3e8efc"
+}
