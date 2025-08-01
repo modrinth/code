@@ -37,6 +37,7 @@ pub fn get_os() -> OS {
     let os = OS::MacOS;
     os
 }
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[allow(clippy::enum_variant_names)]
 pub enum OS {

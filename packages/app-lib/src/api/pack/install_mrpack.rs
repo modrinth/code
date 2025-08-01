@@ -152,8 +152,7 @@ pub async fn install_zipped_mrpack_files(
                     if let Some(env) = project.env {
                         if env
                             .get(&EnvType::Client)
-                            .map(|x| x == &SideType::Unsupported)
-                            .unwrap_or(false)
+                            .is_some_and(|x| x == &SideType::Unsupported)
                         {
                             return Ok(());
                         }

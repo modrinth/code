@@ -25,12 +25,12 @@ pub struct GDLauncherLoader {
 
 // Check if folder has a config.json that parses
 pub async fn is_valid_gdlauncher(instance_folder: PathBuf) -> bool {
-    let config: String =
-        io::read_to_string(&instance_folder.join("config.json"))
+    let config = serde_json::from_str::<GDLauncherConfig>(
+        &io::read_any_encoding_to_string(&instance_folder.join("config.json"))
             .await
-            .unwrap_or("".to_string());
-    let config: Result<GDLauncherConfig, serde_json::Error> =
-        serde_json::from_str::<GDLauncherConfig>(&config);
+            .unwrap_or(("".into(), encoding_rs::UTF_8))
+            .0,
+    );
     config.is_ok()
 }
 
@@ -39,18 +39,20 @@ pub async fn import_gdlauncher(
     profile_path: &str,                  // path to profile
 ) -> crate::Result<()> {
     // Load config.json
-    let config: String =
-        io::read_to_string(&gdlauncher_instance_folder.join("config.json"))
-            .await?;
-    let config: GDLauncherConfig =
-        serde_json::from_str::<GDLauncherConfig>(&config)?;
-    let override_title: Option<String> = config.loader.source_name.clone();
+    let config = serde_json::from_str::<GDLauncherConfig>(
+        &io::read_any_encoding_to_string(
+            &gdlauncher_instance_folder.join("config.json"),
+        )
+        .await
+        .unwrap_or(("".into(), encoding_rs::UTF_8))
+        .0,
+    )?;
+    let override_title = config.loader.source_name;
     let backup_name = format!(
         "GDLauncher-{}",
         gdlauncher_instance_folder
             .file_name()
-            .map(|a| a.to_string_lossy().to_string())
-            .unwrap_or("Unknown".to_string())
+            .map_or("Unknown".to_string(), |a| a.to_string_lossy().to_string())
     );
 
     // Re-cache icon

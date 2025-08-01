@@ -16,6 +16,7 @@ export { default as DoubleIcon } from './base/DoubleIcon.vue'
 export { default as DropArea } from './base/DropArea.vue'
 export { default as DropdownSelect } from './base/DropdownSelect.vue'
 export { default as EnvironmentIndicator } from './base/EnvironmentIndicator.vue'
+export { default as ErrorInformationCard } from './base/ErrorInformationCard.vue'
 export { default as FileInput } from './base/FileInput.vue'
 export { default as FilterBar } from './base/FilterBar.vue'
 export type { FilterBarOption } from './base/FilterBar.vue'
@@ -25,6 +26,7 @@ export { default as ManySelect } from './base/ManySelect.vue'
 export { default as MarkdownEditor } from './base/MarkdownEditor.vue'
 export { default as Notifications } from './base/Notifications.vue'
 export { default as OverflowMenu } from './base/OverflowMenu.vue'
+export type { Option as OverflowMenuOption } from './base/OverflowMenu.vue'
 export { default as Page } from './base/Page.vue'
 export { default as Pagination } from './base/Pagination.vue'
 export { default as PopoutMenu } from './base/PopoutMenu.vue'
@@ -57,6 +59,8 @@ export { default as CompactChart } from './chart/CompactChart.vue'
 
 // Content
 export { default as ContentListPanel } from './content/ContentListPanel.vue'
+export { default as NewsArticleCard } from './content/NewsArticleCard.vue'
+export type { Article as NewsArticle } from './content/NewsArticleCard.vue'
 
 // Modals
 export { default as NewModal } from './modal/NewModal.vue'
@@ -99,6 +103,13 @@ export { default as PurchaseModal } from './billing/PurchaseModal.vue'
 export { default as AddPaymentMethodModal } from './billing/AddPaymentMethodModal.vue'
 export { default as ModrinthServersPurchaseModal } from './billing/ModrinthServersPurchaseModal.vue'
 
+// Skins
+export { default as SkinPreviewRenderer } from './skin/SkinPreviewRenderer.vue'
+export { default as CapeButton } from './skin/CapeButton.vue'
+export { default as CapeLikeTextButton } from './skin/CapeLikeTextButton.vue'
+export { default as SkinButton } from './skin/SkinButton.vue'
+export { default as SkinLikeTextButton } from './skin/SkinLikeTextButton.vue'
+
 // Version
 export { default as VersionChannelIndicator } from './version/VersionChannelIndicator.vue'
 export { default as VersionFilterControl } from './version/VersionFilterControl.vue'
@@ -108,5 +119,6 @@ export { default as VersionSummary } from './version/VersionSummary.vue'
 export { default as ThemeSelector } from './settings/ThemeSelector.vue'
 
 // Servers
+export { default as ServersPromo } from './servers/ServersPromo.vue'
 export { default as BackupWarning } from './servers/backups/BackupWarning.vue'
 export { default as ServersSpecs } from './billing/ServersSpecs.vue'

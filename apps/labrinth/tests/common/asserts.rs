@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use crate::common::get_json_val_str;
 use itertools::Itertools;
 use labrinth::models::v3::projects::Version;

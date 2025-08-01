@@ -1022,8 +1022,10 @@ impl Profile {
             file.hash,
             file.project_type
                 .filter(|x| *x != ProjectType::Mod)
-                .map(|x| x.get_loaders().join("+"))
-                .unwrap_or_else(|| profile.loader.as_str().to_string()),
+                .map_or_else(
+                    || profile.loader.as_str().to_string(),
+                    |x| x.get_loaders().join("+")
+                ),
             profile.game_version
         )
     }

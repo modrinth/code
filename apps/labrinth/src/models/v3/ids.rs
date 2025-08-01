@@ -17,6 +17,8 @@ base62_id!(ProductPriceId);
 base62_id!(ProjectId);
 base62_id!(ReportId);
 base62_id!(SessionId);
+base62_id!(SharedInstanceId);
+base62_id!(SharedInstanceVersionId);
 base62_id!(TeamId);
 base62_id!(TeamMemberId);
 base62_id!(ThreadId);

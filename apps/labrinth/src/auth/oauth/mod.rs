@@ -1,3 +1,5 @@
+use std::fmt::Write;
+
 use crate::auth::get_user_from_headers;
 use crate::auth::oauth::uris::{OAuthRedirectUris, ValidatedRedirectUri};
 use crate::auth::validate::extract_authorization_header;
@@ -17,7 +19,7 @@ use crate::queue::session::AuthQueue;
 use actix_web::http::header::{CACHE_CONTROL, LOCATION, PRAGMA};
 use actix_web::web::{Data, Query, ServiceConfig};
 use actix_web::{HttpRequest, HttpResponse, get, post, web};
-use chrono::Duration;
+use chrono::{DateTime, Duration};
 use rand::distributions::Alphanumeric;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
@@ -280,8 +282,8 @@ pub async fn request_token(
                 authorization_id,
                 token_hash,
                 scopes,
-                created: Default::default(),
-                expires: Default::default(),
+                created: DateTime::default(),
+                expires: DateTime::default(),
                 last_used: None,
                 client_id,
                 user_id,
@@ -456,7 +458,7 @@ fn append_params_to_uri(uri: &str, params: &[impl AsRef<str>]) -> String {
     let mut uri = uri.to_string();
     let mut connector = if uri.contains('?') { "&" } else { "?" };
     for param in params {
-        uri.push_str(&format!("{}{}", connector, param.as_ref()));
+        write!(&mut uri, "{connector}{}", param.as_ref()).unwrap();
         connector = "&";
     }
 

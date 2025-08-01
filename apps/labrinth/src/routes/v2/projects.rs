@@ -84,7 +84,7 @@ pub async fn project_search(
                                     val
                                 )
                             } else {
-                                facet.to_string()
+                                facet
                             }
                         })
                         .collect::<Vec<_>>()
@@ -558,6 +558,7 @@ pub async fn project_edit(
         moderation_message: v2_new_project.moderation_message,
         moderation_message_body: v2_new_project.moderation_message_body,
         monetization_status: v2_new_project.monetization_status,
+        side_types_migration_review_status: None, // Not to be exposed in v2
     };
 
     // This returns 204 or failure so we don't need to do anything with it
@@ -594,10 +595,12 @@ pub async fn project_edit(
             let version = Version::from(version);
             let mut fields = version.fields;
             let (current_client_side, current_server_side) =
-                v2_reroute::convert_side_types_v2(&fields, None);
+                v2_reroute::convert_v3_side_types_to_v2_side_types(
+                    &fields, None,
+                );
             let client_side = client_side.unwrap_or(current_client_side);
             let server_side = server_side.unwrap_or(current_server_side);
-            fields.extend(v2_reroute::convert_side_types_v3(
+            fields.extend(v2_reroute::convert_v2_side_types_to_v3_side_types(
                 client_side,
                 server_side,
             ));

@@ -201,8 +201,8 @@
                 icon-only
                 @click="updateDescending()"
               >
-                <SortDescendingIcon v-if="descending" />
-                <SortAscendingIcon v-else />
+                <SortDescIcon v-if="descending" />
+                <SortAscIcon v-else />
               </Button>
             </div>
           </div>
@@ -272,7 +272,7 @@
             <div class="table-cell">
               <BoxIcon />
               <span>{{
-                $formatProjectType(
+                formatProjectType(
                   $getProjectTypeForDisplay(project.project_types[0] ?? "project", project.loaders),
                 )
               }}</span>
@@ -308,11 +308,12 @@ import {
   XIcon,
   EditIcon,
   SaveIcon,
-  SortAscendingIcon,
-  SortDescendingIcon,
+  SortAscIcon,
+  SortDescIcon,
 } from "@modrinth/assets";
 import { Button, Modal, Avatar, CopyCode, Badge, Checkbox, commonMessages } from "@modrinth/ui";
 
+import { formatProjectType } from "@modrinth/utils";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import OrganizationProjectTransferModal from "~/components/ui/OrganizationProjectTransferModal.vue";
 

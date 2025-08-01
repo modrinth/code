@@ -10,6 +10,10 @@ export default defineNuxtPlugin((nuxtApp) => {
         instantMove: true,
         distance: 8,
       },
+      "dismissable-prompt": {
+        $extend: "dropdown",
+        placement: "bottom-start",
+      },
     },
   });
 });

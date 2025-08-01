@@ -19,6 +19,8 @@ use std::path::PathBuf;
 use tokio::sync::Semaphore;
 use uuid::Uuid;
 
+use super::MinecraftProfile;
+
 pub async fn migrate_legacy_data<'a, E>(exec: E) -> crate::Result<()>
 where
     E: sqlx::Executor<'a, Database = sqlx::Sqlite> + Copy,
@@ -29,9 +31,7 @@ where
         return Ok(());
     };
 
-    let old_launcher_root = if let Some(dir) = default_settings_dir() {
-        dir
-    } else {
+    let Some(old_launcher_root) = default_settings_dir() else {
         return Ok(());
     };
     let old_launcher_root_str = old_launcher_root.to_string_lossy().to_string();
@@ -85,7 +85,7 @@ where
         settings.prev_custom_dir = Some(old_launcher_root_str.clone());
 
         for (_, legacy_version) in legacy_settings.java_globals.0 {
-            if let Ok(Some(java_version)) =
+            if let Ok(java_version) =
                 check_jre(PathBuf::from(legacy_version.path)).await
             {
                 java_version.upsert(exec).await?;
@@ -119,13 +119,16 @@ where
         .await
         {
             let minecraft_users_len = minecraft_auth.users.len();
-            for (uuid, credential) in minecraft_auth.users {
+            for (uuid, legacy_credentials) in minecraft_auth.users {
                 Credentials {
-                    id: credential.id,
-                    username: credential.username,
-                    access_token: credential.access_token,
-                    refresh_token: credential.refresh_token,
-                    expires: credential.expires,
+                    offline_profile: MinecraftProfile {
+                        id: legacy_credentials.id,
+                        name: legacy_credentials.username,
+                        ..MinecraftProfile::default()
+                    },
+                    access_token: legacy_credentials.access_token,
+                    refresh_token: legacy_credentials.refresh_token,
+                    expires: legacy_credentials.expires,
                     active: minecraft_auth.default_user == Some(uuid)
                         || minecraft_users_len == 1,
                 }
@@ -177,12 +180,10 @@ where
 
                 let profile_path = entry.path().join("profile.json");
 
-                let profile = if let Ok(profile) =
+                let Ok(profile) =
                     read_json::<LegacyProfile>(&profile_path, &io_semaphore)
                         .await
-                {
-                    profile
-                } else {
+                else {
                     continue;
                 };
 
@@ -285,7 +286,7 @@ where
 
                                         TeamMember {
                                             team_id: x.team_id,
-                                            user: user.clone(),
+                                            user,
                                             is_owner: x.role == "Owner",
                                             role: x.role,
                                             ordering: x.ordering,

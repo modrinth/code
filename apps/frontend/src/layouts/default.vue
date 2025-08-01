@@ -142,7 +142,7 @@
             "
           >
             <nuxt-link to="/resourcepacks">
-              <PaintBrushIcon aria-hidden="true" /> Resource Packs
+              <PaintbrushIcon aria-hidden="true" /> Resource Packs
             </nuxt-link>
           </ButtonStyled>
           <ButtonStyled
@@ -221,7 +221,7 @@
                 v-if="route.name === 'search-mods' || route.path.startsWith('/mod/')"
                 aria-hidden="true"
               />
-              <PaintBrushIcon
+              <PaintbrushIcon
                 v-else-if="
                   route.name === 'search-resourcepacks' || route.path.startsWith('/resourcepack/')
                 "
@@ -250,7 +250,7 @@
 
               <template #mods> <BoxIcon aria-hidden="true" /> Mods </template>
               <template #resourcepacks>
-                <PaintBrushIcon aria-hidden="true" /> Resource Packs
+                <PaintbrushIcon aria-hidden="true" /> Resource Packs
               </template>
               <template #datapacks> <BracesIcon aria-hidden="true" /> Data Packs </template>
               <template #plugins> <PlugIcon aria-hidden="true" /> Plugins </template>
@@ -696,14 +696,14 @@ import {
   CurrencyIcon,
   BracesIcon,
   GlassesIcon,
-  PaintBrushIcon,
+  PaintbrushIcon,
   PackageOpenIcon,
   DiscordIcon,
   BlueskyIcon,
   TumblrIcon,
   TwitterIcon,
   MastodonIcon,
-  GitHubIcon,
+  GithubIcon,
   ScaleIcon,
 } from "@modrinth/assets";
 import {
@@ -1202,7 +1202,7 @@ const socialLinks = [
       defineMessage({ id: "layout.footer.social.github", defaultMessage: "GitHub" }),
     ),
     href: "https://github.com/modrinth",
-    icon: GitHubIcon,
+    icon: GithubIcon,
   },
 ];
 
@@ -1211,9 +1211,9 @@ const footerLinks = [
     label: formatMessage(defineMessage({ id: "layout.footer.about", defaultMessage: "About" })),
     links: [
       {
-        href: "https://blog.modrinth.com",
+        href: "/news",
         label: formatMessage(
-          defineMessage({ id: "layout.footer.about.blog", defaultMessage: "Blog" }),
+          defineMessage({ id: "layout.footer.about.news", defaultMessage: "News" }),
         ),
       },
       {

@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use super::{
     api_common::{Api, ApiBuildable},
     environment::LocalService,

@@ -1,7 +1,7 @@
 use crate::minecraft::{
     Argument, ArgumentType, Library, VersionInfo, VersionType,
 };
-use chrono::{DateTime, TimeZone, Utc};
+use chrono::{DateTime, NaiveDateTime, Utc};
 use serde::{Deserialize, Deserializer, Serialize};
 use std::collections::HashMap;
 
@@ -26,7 +26,6 @@ pub struct SidedDataEntry {
     pub server: String,
 }
 
-#[allow(deprecated)]
 fn deserialize_date<'de, D>(deserializer: D) -> Result<DateTime<Utc>, D::Error>
 where
     D: Deserializer<'de>,
@@ -34,7 +33,10 @@ where
     let s = String::deserialize(deserializer)?;
 
     serde_json::from_str::<DateTime<Utc>>(&format!("\"{s}\""))
-        .or_else(|_| Utc.datetime_from_str(&s, "%Y-%m-%dT%H:%M:%S%.9f"))
+        .or_else(|_| {
+            NaiveDateTime::parse_from_str(&s, "%Y-%m-%dT%H:%M:%S%.9f")
+                .map(|date| date.and_utc())
+        })
         .map_err(serde::de::Error::custom)
 }
 

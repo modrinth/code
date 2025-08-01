@@ -457,20 +457,16 @@ pub async fn edit_subscription(
                     )
                 })?;
 
-            // Plan downgrade, update future charge
-            if current_amount > amount {
+            // First branch: Plan downgrade, update future charge
+            // Second branch: For small transactions (under 30 cents), we make a loss on the
+            // proration due to fees. In these situations, just give it to them for free, because
+            // their next charge will be in a day or two anyway.
+            if current_amount > amount || proration < 30 {
                 open_charge.price_id = product_price.id;
                 open_charge.amount = amount as i64;
 
                 None
             } else {
-                // For small transactions (under 30 cents), we make a loss on the proration due to fees
-                if proration < 30 {
-                    return Err(ApiError::InvalidInput(
-                        "Proration is too small!".to_string(),
-                    ));
-                }
-
                 let charge_id = generate_charge_id(&mut transaction).await?;
 
                 let customer_id = get_or_create_customer(
@@ -531,11 +527,9 @@ pub async fn edit_subscription(
 
                 if let Some(payment_method) = &edit_subscription.payment_method
                 {
-                    let payment_method_id = if let Ok(id) =
+                    let Ok(payment_method_id) =
                         PaymentMethodId::from_str(payment_method)
-                    {
-                        id
-                    } else {
+                    else {
                         return Err(ApiError::InvalidInput(
                             "Invalid payment method id".to_string(),
                         ));
@@ -743,9 +737,7 @@ pub async fn edit_payment_method(
 
     let (id,) = info.into_inner();
 
-    let payment_method_id = if let Ok(id) = PaymentMethodId::from_str(&id) {
-        id
-    } else {
+    let Ok(payment_method_id) = PaymentMethodId::from_str(&id) else {
         return Err(ApiError::NotFound);
     };
 
@@ -766,10 +758,7 @@ pub async fn edit_payment_method(
     )
     .await?;
 
-    if payment_method
-        .customer
-        .map(|x| x.id() == customer)
-        .unwrap_or(false)
+    if payment_method.customer.is_some_and(|x| x.id() == customer)
         || user.role.is_admin()
     {
         stripe::Customer::update(
@@ -812,9 +801,7 @@ pub async fn remove_payment_method(
 
     let (id,) = info.into_inner();
 
-    let payment_method_id = if let Ok(id) = PaymentMethodId::from_str(&id) {
-        id
-    } else {
+    let Ok(payment_method_id) = PaymentMethodId::from_str(&id) else {
         return Err(ApiError::NotFound);
     };
 
@@ -864,10 +851,7 @@ pub async fn remove_payment_method(
         }
     }
 
-    if payment_method
-        .customer
-        .map(|x| x.id() == customer)
-        .unwrap_or(false)
+    if payment_method.customer.is_some_and(|x| x.id() == customer)
         || user.role.is_admin()
     {
         stripe::PaymentMethod::detach(&stripe_client, &payment_method_id)
@@ -1437,8 +1421,6 @@ pub async fn stripe_webhook(
             pub user_subscription_item:
                 Option<user_subscription_item::DBUserSubscription>,
             pub payment_metadata: Option<PaymentRequestMetadata>,
-            #[allow(dead_code)]
-            pub charge_type: ChargeType,
         }
 
         #[allow(clippy::too_many_arguments)]
@@ -1453,24 +1435,20 @@ pub async fn stripe_webhook(
             transaction: &mut Transaction<'_, Postgres>,
         ) -> Result<PaymentIntentMetadata, ApiError> {
             'metadata: {
-                let user_id = if let Some(user_id) = metadata
+                let Some(user_id) = metadata
                     .get("modrinth_user_id")
                     .and_then(|x| parse_base62(x).ok())
                     .map(|x| crate::database::models::ids::DBUserId(x as i64))
-                {
-                    user_id
-                } else {
+                else {
                     break 'metadata;
                 };
 
-                let user = if let Some(user) =
+                let Some(user) =
                     crate::database::models::user_item::DBUser::get_id(
                         user_id, pool, redis,
                     )
                     .await?
-                {
-                    user
-                } else {
+                else {
                     break 'metadata;
                 };
 
@@ -1478,22 +1456,20 @@ pub async fn stripe_webhook(
                     .get("modrinth_payment_metadata")
                     .and_then(|x| serde_json::from_str(x).ok());
 
-                let charge_id = if let Some(charge_id) = metadata
+                let Some(charge_id) = metadata
                     .get("modrinth_charge_id")
                     .and_then(|x| parse_base62(x).ok())
-                    .map(|x| crate::database::models::ids::DBChargeId(x as i64))
-                {
-                    charge_id
-                } else {
+                    .map(|x| {
+                        crate::database::models::ids::DBChargeId(x as i64)
+                    })
+                else {
                     break 'metadata;
                 };
 
-                let charge_type = if let Some(charge_type) = metadata
+                let Some(charge_type) = metadata
                     .get("modrinth_charge_type")
                     .map(|x| ChargeType::from_string(x))
-                {
-                    charge_type
-                } else {
+                else {
                     break 'metadata;
                 };
 
@@ -1505,21 +1481,19 @@ pub async fn stripe_webhook(
                     )
                     .await?
                 {
-                    let price = if let Some(price) =
-                        product_item::DBProductPrice::get(charge.price_id, pool)
-                            .await?
-                    {
-                        price
-                    } else {
+                    let Some(price) = product_item::DBProductPrice::get(
+                        charge.price_id,
+                        pool,
+                    )
+                    .await?
+                    else {
                         break 'metadata;
                     };
 
-                    let product = if let Some(product) =
+                    let Some(product) =
                         product_item::DBProduct::get(price.product_id, pool)
                             .await?
-                    {
-                        product
-                    } else {
+                    else {
                         break 'metadata;
                     };
 
@@ -1530,15 +1504,13 @@ pub async fn stripe_webhook(
                     charge.upsert(transaction).await?;
 
                     if let Some(subscription_id) = charge.subscription_id {
-                        let mut subscription = if let Some(subscription) =
+                        let Some(mut subscription) =
                             user_subscription_item::DBUserSubscription::get(
                                 subscription_id,
                                 pool,
                             )
                             .await?
-                        {
-                            subscription
-                        } else {
+                        else {
                             break 'metadata;
                         };
 
@@ -1567,58 +1539,49 @@ pub async fn stripe_webhook(
                         (charge, price, product, None)
                     }
                 } else {
-                    let price_id = if let Some(price_id) = metadata
+                    let Some(price_id) = metadata
                         .get("modrinth_price_id")
                         .and_then(|x| parse_base62(x).ok())
                         .map(|x| {
                             crate::database::models::ids::DBProductPriceId(
                                 x as i64,
                             )
-                        }) {
-                        price_id
-                    } else {
+                        })
+                    else {
                         break 'metadata;
                     };
 
-                    let price = if let Some(price) =
+                    let Some(price) =
                         product_item::DBProductPrice::get(price_id, pool)
                             .await?
-                    {
-                        price
-                    } else {
+                    else {
                         break 'metadata;
                     };
 
-                    let product = if let Some(product) =
+                    let Some(product) =
                         product_item::DBProduct::get(price.product_id, pool)
                             .await?
-                    {
-                        product
-                    } else {
+                    else {
                         break 'metadata;
                     };
 
                     let subscription = match &price.prices {
                         Price::OneTime { .. } => None,
                         Price::Recurring { intervals } => {
-                            let interval = if let Some(interval) = metadata
+                            let Some(interval) = metadata
                                 .get("modrinth_subscription_interval")
                                 .map(|x| PriceDuration::from_string(x))
-                            {
-                                interval
-                            } else {
+                            else {
                                 break 'metadata;
                             };
 
                             if intervals.get(&interval).is_some() {
-                                let subscription_id = if let Some(subscription_id) = metadata
+                                let Some(subscription_id) = metadata
                                     .get("modrinth_subscription_id")
                                     .and_then(|x| parse_base62(x).ok())
                                     .map(|x| {
                                         crate::database::models::ids::DBUserSubscriptionId(x as i64)
-                                    }) {
-                                    subscription_id
-                                } else {
+                                    }) else {
                                     break 'metadata;
                                 };
 
@@ -1687,7 +1650,6 @@ pub async fn stripe_webhook(
                     charge_item: charge,
                     user_subscription_item: subscription,
                     payment_metadata,
-                    charge_type,
                 });
             }
 
@@ -2049,10 +2011,9 @@ pub async fn stripe_webhook(
                         )
                         .await?;
 
-                        if !customer
+                        if customer
                             .invoice_settings
-                            .map(|x| x.default_payment_method.is_some())
-                            .unwrap_or(false)
+                            .is_none_or(|x| x.default_payment_method.is_none())
                         {
                             stripe::Customer::update(
                                 &stripe_client,
@@ -2187,12 +2148,10 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
         .await?;
 
         for charge in all_charges {
-            let subscription = if let Some(subscription) = all_subscriptions
+            let Some(subscription) = all_subscriptions
                 .iter_mut()
                 .find(|x| Some(x.id) == charge.subscription_id)
-            {
-                subscription
-            } else {
+            else {
                 continue;
             };
 
@@ -2200,29 +2159,23 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
                 continue;
             }
 
-            let product_price = if let Some(product_price) = subscription_prices
+            let Some(product_price) = subscription_prices
                 .iter()
                 .find(|x| x.id == subscription.price_id)
-            {
-                product_price
-            } else {
+            else {
                 continue;
             };
 
-            let product = if let Some(product) = subscription_products
+            let Some(product) = subscription_products
                 .iter()
                 .find(|x| x.id == product_price.product_id)
-            {
-                product
-            } else {
+            else {
                 continue;
             };
 
-            let user = if let Some(user) =
+            let Some(user) =
                 users.iter().find(|x| x.id == subscription.user_id)
-            {
-                user
-            } else {
+            else {
                 continue;
             };
 
@@ -2350,19 +2303,14 @@ pub async fn index_billing(
         .await?;
 
         for mut charge in charges_to_do {
-            let product_price = if let Some(price) =
+            let Some(product_price) =
                 prices.iter().find(|x| x.id == charge.price_id)
-            {
-                price
-            } else {
+            else {
                 continue;
             };
 
-            let user = if let Some(user) =
-                users.iter().find(|x| x.id == charge.user_id)
-            {
-                user
-            } else {
+            let Some(user) = users.iter().find(|x| x.id == charge.user_id)
+            else {
                 continue;
             };
 
@@ -2399,17 +2347,14 @@ pub async fn index_billing(
                 )
                 .await?;
 
-                let currency = match Currency::from_str(
+                let Ok(currency) = Currency::from_str(
                     &product_price.currency_code.to_lowercase(),
-                ) {
-                    Ok(x) => x,
-                    Err(_) => {
-                        warn!(
-                            "Could not find currency for {}",
-                            product_price.currency_code
-                        );
-                        continue;
-                    }
+                ) else {
+                    warn!(
+                        "Could not find currency for {}",
+                        product_price.currency_code
+                    );
+                    continue;
                 };
 
                 let mut intent =

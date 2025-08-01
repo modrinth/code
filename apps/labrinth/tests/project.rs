@@ -27,7 +27,7 @@ use labrinth::util::actix::{MultipartSegment, MultipartSegmentData};
 use serde_json::json;
 use sha1::Digest;
 
-mod common;
+pub mod common;
 
 #[actix_rt::test]
 async fn test_get_project() {

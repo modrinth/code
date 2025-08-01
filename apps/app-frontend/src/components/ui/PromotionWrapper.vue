@@ -32,8 +32,33 @@ function updateAdPosition() {
 
 <template>
   <div ref="adsWrapper" class="ad-parent relative flex w-full justify-center cursor-pointer bg-bg">
-    <div class="flex max-h-[250px] min-h-[250px] min-w-[300px] max-w-[300px] flex-col gap-4 p-6">
-      <p class="m-0 text-2xl font-bold text-contrast">75% of ad revenue goes to creators</p>
-    </div>
+    <a
+      href="https://modrinth.gg?from=app-placeholder"
+      target="_blank"
+      class="flex max-h-[250px] min-h-[250px] min-w-[300px] max-w-[300px] flex-col gap-4 rounded-[inherit]"
+    >
+      <img
+        src="https://cdn-raw.modrinth.com/modrinth-servers-placeholder-light.webp"
+        alt="Host your next server with Modrinth Servers"
+        class="hidden light-image rounded-[inherit]"
+      />
+      <img
+        src="https://cdn-raw.modrinth.com/modrinth-servers-placeholder-dark.webp"
+        alt="Host your next server with Modrinth Servers"
+        class="dark-image rounded-[inherit]"
+      />
+    </a>
   </div>
 </template>
+<style lang="scss" scoped>
+.light,
+.light-mode {
+  .dark-image {
+    display: none;
+  }
+
+  .light-image {
+    display: block;
+  }
+}
+</style>

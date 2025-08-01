@@ -200,9 +200,9 @@
 <script setup lang="ts">
 import { CodeIcon, RadioButtonCheckedIcon, RadioButtonIcon } from "@modrinth/assets";
 import { Button, ThemeSelector } from "@modrinth/ui";
+import { formatProjectType } from "@modrinth/utils";
 import MessageBanner from "~/components/ui/MessageBanner.vue";
 import type { DisplayLocation } from "~/plugins/cosmetics";
-import { formatProjectType } from "~/plugins/shorthands.js";
 import { isDarkTheme, type Theme } from "~/plugins/theme/index.ts";
 
 useHead({

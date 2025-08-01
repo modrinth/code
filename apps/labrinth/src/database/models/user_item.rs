@@ -163,7 +163,7 @@ impl DBUser {
             |ids| async move {
                 let user_ids: Vec<i64> = ids
                     .iter()
-                    .flat_map(|x| parse_base62(&x.to_string()).ok())
+                    .filter_map(|x| parse_base62(&x.to_string()).ok())
                     .map(|x| x as i64)
                     .collect();
                 let slugs = ids
@@ -504,6 +504,18 @@ impl DBUser {
                 UPDATE versions
                 SET author_id = $1
                 WHERE (author_id = $2)
+                ",
+                deleted_user as DBUserId,
+                id as DBUserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                UPDATE shared_instances
+                SET owner_id = $1
+                WHERE owner_id = $2
                 ",
                 deleted_user as DBUserId,
                 id as DBUserId,

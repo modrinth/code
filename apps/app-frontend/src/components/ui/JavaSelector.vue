@@ -108,7 +108,6 @@ async function testJava() {
   testingJava.value = true
   testingJavaSuccess.value = await test_jre(
     props.modelValue ? props.modelValue.path : '',
-    1,
     props.version,
   )
   testingJava.value = false
@@ -127,7 +126,7 @@ async function handleJavaFileInput() {
   const filePath = await open()
 
   if (filePath) {
-    let result = await get_jre(filePath.path ?? filePath)
+    let result = await get_jre(filePath.path ?? filePath).catch(handleError)
     if (!result) {
       result = {
         path: filePath.path ?? filePath,

@@ -1,5 +1,11 @@
 <template>
-  <div class="vue-notification-group experimental-styles-within">
+  <div
+    class="vue-notification-group experimental-styles-within"
+    :class="{
+      'intercom-present': isIntercomPresent,
+      rightwards: moveNotificationsRight,
+    }"
+  >
     <transition-group name="notifs">
       <div
         v-for="(item, index) in notifications"
@@ -79,6 +85,9 @@ import {
   CopyIcon,
 } from "@modrinth/assets";
 const notifications = useNotifications();
+const { isVisible: moveNotificationsRight } = useNotificationRightwards();
+
+const isIntercomPresent = ref(false);
 
 function stopTimer(notif) {
   clearTimeout(notif.timer);
@@ -106,6 +115,27 @@ const createNotifText = (notif) => {
   return text;
 };
 
+function checkIntercomPresence() {
+  isIntercomPresent.value = !!document.querySelector(".intercom-lightweight-app");
+}
+
+onMounted(() => {
+  checkIntercomPresence();
+
+  const observer = new MutationObserver(() => {
+    checkIntercomPresence();
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
+
+  onBeforeUnmount(() => {
+    observer.disconnect();
+  });
+});
+
 function copyToClipboard(notif) {
   const text = createNotifText(notif);
 
@@ -128,6 +158,19 @@ function copyToClipboard(notif) {
     width: calc(100% - 0.75rem * 2);
     right: 0.75rem;
     bottom: 0.75rem;
+  }
+
+  &.intercom-present {
+    bottom: 5rem;
+  }
+
+  &.rightwards {
+    right: unset !important;
+    left: 1.5rem;
+
+    @media screen and (max-width: 500px) {
+      left: 0.75rem;
+    }
   }
 
   .vue-notification-wrapper {

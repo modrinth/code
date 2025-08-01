@@ -52,8 +52,7 @@ pub async fn fetch(
                     if modrinth_version
                         .original_sha1
                         .as_ref()
-                        .map(|x| x == &version.sha1)
-                        .unwrap_or(false)
+                        .is_some_and(|x| x == &version.sha1)
                     {
                         existing_versions.push(modrinth_version);
                     } else {

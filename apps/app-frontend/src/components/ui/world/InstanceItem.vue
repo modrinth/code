@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import {
   EyeIcon,
@@ -42,6 +43,7 @@ const emit = defineEmits<{
 
 const props = defineProps<{
   instance: GameInstance
+  last_played: Dayjs
 }>()
 
 const loadingModpack = ref(!!props.instance.linked_data)
@@ -147,12 +149,12 @@ onUnmounted(() => {
                 : null
             "
             class="w-fit shrink-0"
-            :class="{ 'cursor-help smart-clickable:allow-pointer-events': instance.last_played }"
+            :class="{ 'cursor-help smart-clickable:allow-pointer-events': last_played }"
           >
-            <template v-if="instance.last_played">
+            <template v-if="last_played">
               {{
                 formatMessage(commonMessages.playedLabel, {
-                  time: formatRelativeTime(instance.last_played.toISOString()),
+                  time: formatRelativeTime(last_played.toISOString?.()),
                 })
               }}
             </template>

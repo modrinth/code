@@ -362,7 +362,7 @@ pub async fn index_local(
                 let (_, v2_og_project_type) =
                     LegacyProject::get_project_type(&project_types);
                 let (client_side, server_side) =
-                    v2_reroute::convert_side_types_v2(
+                    v2_reroute::convert_v3_side_types_to_v2_side_types(
                         &unvectorized_loader_fields,
                         Some(&v2_og_project_type),
                     );
@@ -522,7 +522,7 @@ async fn index_versions(
     // Convert to partial versions
     let mut res_versions: HashMap<DBProjectId, Vec<PartialVersion>> =
         HashMap::new();
-    for (project_id, version_ids) in versions.iter() {
+    for (project_id, version_ids) in &versions {
         for version_id in version_ids {
             // Extract version-specific data fetched
             // We use 'remove' as every version is only in the map once

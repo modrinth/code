@@ -2,7 +2,7 @@
 name = "daedalus_client"
 version = "0.2.2"
 authors = ["Jai A <jai@modrinth.com>"]
-edition = "2024"
+edition.workspace = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -28,3 +28,6 @@ tracing-error.workspace = true
 
 tracing.workspace = true
 tracing-subscriber = { workspace = true, features = ["env-filter"] }
+
+[lints]
+workspace = true

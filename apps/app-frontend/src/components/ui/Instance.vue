@@ -19,7 +19,6 @@ import { showProfileInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
 import { trackEvent } from '@/helpers/analytics'
 import dayjs from 'dayjs'
-import { formatCategory } from '@modrinth/utils'
 
 const formatRelativeTime = useRelativeTime()
 
@@ -173,7 +172,10 @@ onUnmounted(() => unlisten())
       <div class="flex items-center col-span-3 gap-1 text-secondary font-semibold">
         <TimerIcon />
         <span class="text-sm">
-          Played {{ formatRelativeTime(dayjs(instance.last_played).toISOString()) }}
+          <template v-if="instance.last_played">
+            Played {{ formatRelativeTime(dayjs(instance.last_played).toISOString()) }}
+          </template>
+          <template v-else> Never played </template>
         </span>
       </div>
     </div>
@@ -237,8 +239,8 @@ onUnmounted(() => unlisten())
         </p>
         <div class="flex items-center col-span-3 gap-1 text-secondary font-semibold mt-auto">
           <GameIcon class="shrink-0" />
-          <span class="text-sm">
-            {{ formatCategory(instance.loader) }} {{ instance.game_version }}
+          <span class="text-sm capitalize">
+            {{ instance.loader }} {{ instance.game_version }}
           </span>
         </div>
       </div>

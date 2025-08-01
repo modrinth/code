@@ -55,12 +55,7 @@
       }"
       aria-label="Filters"
     >
-      <AdPlaceholder
-        v-if="
-          (!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus) &&
-          !server
-        "
-      />
+      <AdPlaceholder v-if="!auth.user && !server" />
       <div v-if="filtersMenuOpen" class="fixed inset-0 z-40 bg-bg"></div>
       <div
         class="flex flex-col gap-3"
@@ -334,6 +329,7 @@ import {
   ImageIcon,
 } from "@modrinth/assets";
 import { computed } from "vue";
+import { useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import LogoAnimated from "~/components/brand/LogoAnimated.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
@@ -388,7 +384,7 @@ async function updateServerContext() {
     if (!auth.value.user) {
       router.push("/auth/sign-in?redirect=" + encodeURIComponent(route.fullPath));
     } else if (route.query.sid !== null) {
-      server.value = await usePyroServer(route.query.sid, ["general", "content"], {
+      server.value = await useModrinthServers(route.query.sid, ["general", "content"], {
         waitForModules: true,
       });
     }
@@ -519,7 +515,6 @@ async function serverInstall(project) {
 
     if (projectType.value.id === "modpack") {
       await server.value.general.reinstall(
-        server.value.serverId,
         false,
         project.project_id,
         version.id,

@@ -42,9 +42,8 @@ impl DirectoryInfo {
             ))
         })?;
 
-        let config_dir = config_dir
-            .map(PathBuf::from)
-            .unwrap_or_else(|| settings_dir.clone());
+        let config_dir =
+            config_dir.map_or_else(|| settings_dir.clone(), PathBuf::from);
 
         Ok(Self {
             settings_dir,
@@ -193,8 +192,7 @@ impl DirectoryInfo {
             let move_dir = settings
                 .custom_dir
                 .as_ref()
-                .map(PathBuf::from)
-                .unwrap_or_else(|| app_dir.clone());
+                .map_or_else(|| app_dir.clone(), PathBuf::from);
 
             async fn is_dir_writeable(
                 new_config_dir: &Path,
@@ -220,7 +218,7 @@ impl DirectoryInfo {
 
                 let disks = sysinfo::Disks::new_with_refreshed_list();
 
-                for disk in disks.iter() {
+                for disk in &disks {
                     if path.starts_with(disk.mount_point()) {
                         return Ok(Some(disk.available_space()));
                     }

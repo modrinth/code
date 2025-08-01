@@ -1,12 +1,12 @@
 {
   "name": "@modrinth/app",
   "scripts": {
-    "build": "tauri build",
     "tauri": "tauri",
+    "build": "tauri build",
     "dev": "tauri dev",
-    "test": "cargo test",
-    "lint": "cargo fmt --check && cargo clippy --all-targets -- -D warnings",
-    "fix": "cargo fmt && cargo clippy --fix"
+    "test": "cargo nextest run --all-targets --no-fail-fast",
+    "lint": "cargo fmt --check && cargo clippy --all-targets",
+    "fix": "cargo clippy --all-targets --fix --allow-dirty && cargo fmt"
   },
   "devDependencies": {
     "@tauri-apps/cli": "2.5.0"

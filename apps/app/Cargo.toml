@@ -1,11 +1,10 @@
 [package]
 name = "theseus_gui"
-version = "0.9.5"
+version = "1.0.0-local" # The actual version is set by the theseus-build workflow on tagging
 description = "The Modrinth App is a desktop application for managing your Minecraft mods"
 license = "GPL-3.0-only"
 repository = "https://github.com/modrinth/code/apps/app/"
-edition = "2024"
-build = "build.rs"
+edition.workspace = true
 
 [build-dependencies]
 tauri-build = { workspace = true, features = ["codegen"] }
@@ -17,14 +16,15 @@ serde_json.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_with.workspace = true
 
-tauri = { workspace = true, features = ["devtools", "macos-private-api", "protocol-asset", "unstable"] }
-tauri-plugin-window-state.workspace = true
+tauri = { workspace = true, features = ["devtools", "macos-private-api", "protocol-asset"] }
 tauri-plugin-deep-link.workspace = true
-tauri-plugin-os.workspace = true
-tauri-plugin-opener.workspace = true
 tauri-plugin-dialog.workspace = true
-tauri-plugin-updater.workspace = true
+tauri-plugin-http.workspace = true
+tauri-plugin-opener.workspace = true
+tauri-plugin-os.workspace = true
 tauri-plugin-single-instance.workspace = true
+tauri-plugin-updater.workspace = true
+tauri-plugin-window-state.workspace = true
 
 tokio = { workspace = true, features = ["time"] }
 thiserror.workspace = true
@@ -56,3 +56,6 @@ default = ["custom-protocol"]
 # DO NOT remove this
 custom-protocol = ["tauri/custom-protocol"]
 updater = []
+
+[lints]
+workspace = true

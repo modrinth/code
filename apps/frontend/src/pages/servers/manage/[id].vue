@@ -18,48 +18,25 @@
     v-if="serverData?.status === 'suspended' && serverData.suspension_reason === 'upgrading'"
     class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
   >
-    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-      <div class="flex flex-col items-center text-center">
-        <div class="flex flex-col items-center gap-4">
-          <div class="grid place-content-center rounded-full bg-bg-blue p-4">
-            <TransferIcon class="size-12 text-blue" />
-          </div>
-          <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server upgrading</h1>
-        </div>
-        <p class="text-lg text-secondary">
-          Your server's hardware is currently being upgraded and will be back online shortly!
-        </p>
-      </div>
-    </div>
+    <ErrorInformationCard
+      title="Server upgrading"
+      description="Your server's hardware is currently being upgraded and will be back online shortly!"
+      :icon="TransferIcon"
+      icon-color="blue"
+      :action="generalErrorAction"
+    />
   </div>
   <div
     v-else-if="serverData?.status === 'suspended'"
     class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
   >
-    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-      <div class="flex flex-col items-center text-center">
-        <div class="flex flex-col items-center gap-4">
-          <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-            <LockIcon class="size-12 text-orange" />
-          </div>
-          <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server suspended</h1>
-        </div>
-        <p class="text-lg text-secondary">
-          {{
-            serverData.suspension_reason === "cancelled"
-              ? "Your subscription has been cancelled."
-              : serverData.suspension_reason
-                ? `Your server has been suspended: ${serverData.suspension_reason}`
-                : "Your server has been suspended."
-          }}
-          <br />
-          Contact Modrinth Support if you believe this is an error.
-        </p>
-      </div>
-      <ButtonStyled size="large" color="brand" @click="() => router.push('/settings/billing')">
-        <button class="mt-6 !w-full">Go to billing settings</button>
-      </ButtonStyled>
-    </div>
+    <ErrorInformationCard
+      title="Server suspended"
+      :description="suspendedDescription"
+      :icon="LockIcon"
+      icon-color="orange"
+      :action="suspendedAction"
+    />
   </div>
   <div
     v-else-if="
@@ -68,111 +45,65 @@
     "
     class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
   >
-    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-      <div class="flex flex-col items-center text-center">
-        <div class="flex flex-col items-center gap-4">
-          <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-            <TransferIcon class="size-12 text-orange" />
-          </div>
-          <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server not found</h1>
-        </div>
-        <p class="text-lg text-secondary">
-          You don't have permission to view this server or it no longer exists. If you believe this
-          is an error, please contact Modrinth Support.
-        </p>
-      </div>
-      <UiCopyCode :text="JSON.stringify(server.moduleErrors?.general?.error)" />
-
-      <ButtonStyled size="large" color="brand" @click="() => router.push('/servers/manage')">
-        <button class="mt-6 !w-full">Go back to all servers</button>
-      </ButtonStyled>
-    </div>
+    <ErrorInformationCard
+      title="An error occured."
+      description="Please contact Modrinth Support."
+      :icon="TransferIcon"
+      icon-color="orange"
+      :error-details="generalErrorDetails"
+      :action="generalErrorAction"
+    />
   </div>
   <div
-    v-else-if="server.moduleErrors?.general?.error.statusCode === 503"
+    v-else-if="server.moduleErrors?.general?.error || !nodeAccessible"
     class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
   >
-    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-      <div class="flex flex-col items-center text-center">
-        <div class="flex flex-col items-center gap-4">
-          <div class="grid place-content-center rounded-full bg-bg-red p-4">
-            <UiServersIconsPanelErrorIcon class="size-12 text-red" />
-          </div>
-          <h1 class="m-0 mb-4 w-fit text-4xl font-bold">Server Node Unavailable</h1>
+    <ErrorInformationCard
+      title="Server Node Unavailable"
+      :icon="PanelErrorIcon"
+      icon-color="red"
+      :action="nodeUnavailableAction"
+      :error-details="nodeUnavailableDetails"
+    >
+      <template #description>
+        <div class="text-md space-y-4">
+          <p class="leading-[170%] text-secondary">
+            Your server's node, where your Modrinth Server is physically hosted, is not accessible
+            at the moment. We are working to resolve the issue as quickly as possible.
+          </p>
+          <p class="leading-[170%] text-secondary">
+            Your data is safe and will not be lost, and your server will be back online as soon as
+            the issue is resolved.
+          </p>
+          <p class="leading-[170%] text-secondary">
+            If reloading does not work initially, please contact Modrinth Support via the chat
+            bubble in the bottom right corner and we'll be happy to help.
+          </p>
         </div>
-        <p class="m-0 mb-4 leading-[170%] text-secondary">
-          Your server's node, where your Modrinth Server is physically hosted, is experiencing
-          issues. We are working with our datacenter to resolve the issue as quickly as possible.
-        </p>
-        <p class="m-0 mb-4 leading-[170%] text-secondary">
-          Your data is safe and will not be lost, and your server will be back online as soon as the
-          issue is resolved.
-        </p>
-        <p class="m-0 mb-4 leading-[170%] text-secondary">
-          For updates, please join the Modrinth Discord or contact Modrinth Support via the chat
-          bubble in the bottom right corner and we'll be happy to help.
-        </p>
-
-        <div class="flex flex-col gap-2">
-          <UiCopyCode :text="'Server ID: ' + server.serverId" />
-          <UiCopyCode :text="'Node: ' + server.general?.datacenter" />
-        </div>
-      </div>
-      <ButtonStyled
-        size="large"
-        color="standard"
-        @click="
-          () =>
-            navigateTo('https://discord.modrinth.com', {
-              external: true,
-            })
-        "
-      >
-        <button class="mt-6 !w-full">Join Modrinth Discord</button>
-      </ButtonStyled>
-      <ButtonStyled
-        :disabled="formattedTime !== '00'"
-        size="large"
-        color="standard"
-        @click="() => reloadNuxtApp()"
-      >
-        <button class="mt-3 !w-full">Reload</button>
-      </ButtonStyled>
-    </div>
+      </template>
+    </ErrorInformationCard>
   </div>
-  <div
+  <!-- <div
     v-else-if="server.moduleErrors?.general?.error"
     class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
   >
-    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-      <div class="flex flex-col items-center text-center">
-        <div class="flex flex-col items-center gap-4">
-          <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-            <TransferIcon class="size-12 text-orange" />
-          </div>
-          <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Connection lost</h1>
-          <div class="text-center text-secondary">
-            {{
-              formattedTime == "00" ? "Reconnecting..." : `Retrying in ${formattedTime} seconds...`
-            }}
-          </div>
+    <ErrorInformationCard
+      title="Connection lost"
+      description=""
+      :icon="TransferIcon"
+      icon-color="orange"
+      :action="connectionLostAction"
+    >
+      <template #description>
+        <div class="space-y-4">
+          <p class="text-lg text-secondary">
+            Something went wrong, and we couldn't connect to your server. This is likely due to a
+            temporary network issue.
+          </p>
         </div>
-        <p class="text-lg text-secondary">
-          Something went wrong, and we couldn't connect to your server. This is likely due to a
-          temporary network issue. You'll be reconnected automatically.
-        </p>
-      </div>
-      <UiCopyCode :text="JSON.stringify(server.moduleErrors?.general?.error)" />
-      <ButtonStyled
-        :disabled="formattedTime !== '00'"
-        size="large"
-        color="brand"
-        @click="() => reloadNuxtApp()"
-      >
-        <button class="mt-6 !w-full">Reload</button>
-      </ButtonStyled>
-    </div>
-  </div>
+      </template>
+    </ErrorInformationCard>
+  </div> -->
   <!-- SERVER START -->
   <div
     v-else-if="serverData"
@@ -419,7 +350,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch, type Reactive } from "vue";
+import { ref, computed, onMounted, onUnmounted, type Reactive } from "vue";
 import {
   SettingsIcon,
   CopyIcon,
@@ -432,22 +363,23 @@ import {
   LockIcon,
 } from "@modrinth/assets";
 import DOMPurify from "dompurify";
-import { ButtonStyled, ServerNotice } from "@modrinth/ui";
+import { ButtonStyled, ErrorInformationCard, ServerNotice } from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
 import type { MessageDescriptor } from "@vintl/vintl";
-import type {
-  ServerState,
-  Stats,
-  WSEvent,
-  WSInstallationResultEvent,
-  Backup,
-  PowerAction,
+import {
+  type ServerState,
+  type Stats,
+  type WSEvent,
+  type WSInstallationResultEvent,
+  type Backup,
+  type PowerAction,
 } from "@modrinth/utils";
-import { reloadNuxtApp, navigateTo } from "#app";
+import { reloadNuxtApp } from "#app";
 import { useModrinthServersConsole } from "~/store/console.ts";
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import { ModrinthServer, useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
 import ServerInstallation from "~/components/ui/servers/ServerInstallation.vue";
+import PanelErrorIcon from "~/components/ui/servers/icons/PanelErrorIcon.vue";
 
 const app = useNuxtApp() as unknown as { $notify: any };
 
@@ -455,7 +387,6 @@ const socket = ref<WebSocket | null>(null);
 const isReconnecting = ref(false);
 const isLoading = ref(true);
 const reconnectInterval = ref<ReturnType<typeof setInterval> | null>(null);
-const isFirstMount = ref(true);
 const isMounted = ref(true);
 const flags = useFeatureFlags();
 
@@ -484,18 +415,6 @@ const loadModulesPromise = Promise.resolve().then(() => {
 });
 
 provide("modulesLoaded", loadModulesPromise);
-
-watch(
-  () => [server.moduleErrors?.general, server.moduleErrors?.ws],
-  ([generalError, wsError]) => {
-    if (server.general?.status === "suspended") return;
-
-    const error = generalError?.error || wsError?.error;
-    if (error && error.statusCode !== 403) {
-      startPolling();
-    }
-  },
-);
 
 const errorTitle = ref("Error");
 const errorMessage = ref("An unexpected error occurred.");
@@ -760,7 +679,6 @@ const startUptimeUpdates = () => {
 const stopUptimeUpdates = () => {
   if (uptimeIntervalId) {
     clearInterval(uptimeIntervalId);
-    intervalId = null;
   }
 };
 
@@ -898,8 +816,6 @@ const handleInstallationResult = async (data: WSInstallationResultEvent) => {
   switch (data.result) {
     case "ok": {
       if (!serverData.value) break;
-
-      stopPolling();
 
       try {
         await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -1055,14 +971,6 @@ const notifyError = (title: string, text: string) => {
   });
 };
 
-let intervalId: ReturnType<typeof setInterval> | null = null;
-const countdown = ref(15);
-
-const formattedTime = computed(() => {
-  const seconds = countdown.value % 60;
-  return `${seconds.toString().padStart(2, "0")}`;
-});
-
 export type BackupInProgressReason = {
   type: string;
   tooltip: MessageDescriptor;
@@ -1098,23 +1006,95 @@ const backupInProgress = computed(() => {
   return undefined;
 });
 
-const stopPolling = () => {
-  if (intervalId) {
-    clearInterval(intervalId);
-    intervalId = null;
-  }
-};
+const nodeUnavailableDetails = computed(() => [
+  {
+    label: "Server ID",
+    value: server.serverId,
+    type: "inline" as const,
+  },
+  {
+    label: "Node",
+    value: server.general?.datacenter ?? "Unknown",
+    type: "inline" as const,
+  },
+  {
+    label: "Error message",
+    value: nodeAccessible.value
+      ? (server.moduleErrors?.general?.error.message ?? "Unknown")
+      : "Unable to reach node. Ping test failed.",
+    type: "block" as const,
+  },
+]);
 
-const startPolling = () => {
-  countdown.value = 15;
-  intervalId = setInterval(() => {
-    if (countdown.value <= 0) {
-      reloadNuxtApp();
-    } else {
-      countdown.value--;
-    }
-  }, 1000);
-};
+const suspendedDescription = computed(() => {
+  if (serverData.value?.suspension_reason === "cancelled") {
+    return "Your subscription has been cancelled.\nContact Modrinth Support if you believe this is an error.";
+  }
+  if (serverData.value?.suspension_reason) {
+    return `Your server has been suspended: ${serverData.value.suspension_reason}\nContact Modrinth Support if you believe this is an error.`;
+  }
+  return "Your server has been suspended.\nContact Modrinth Support if you believe this is an error.";
+});
+
+const generalErrorDetails = computed(() => [
+  {
+    label: "Server ID",
+    value: server.serverId,
+    type: "inline" as const,
+  },
+  {
+    label: "Timestamp",
+    value: String(server.moduleErrors?.general?.timestamp),
+    type: "inline" as const,
+  },
+  {
+    label: "Error Name",
+    value: server.moduleErrors?.general?.error.name,
+    type: "inline" as const,
+  },
+  {
+    label: "Error Message",
+    value: server.moduleErrors?.general?.error.message,
+    type: "block" as const,
+  },
+  ...(server.moduleErrors?.general?.error.originalError
+    ? [
+        {
+          label: "Original Error",
+          value: String(server.moduleErrors.general.error.originalError),
+          type: "hidden" as const,
+        },
+      ]
+    : []),
+  ...(server.moduleErrors?.general?.error.stack
+    ? [
+        {
+          label: "Stack Trace",
+          value: server.moduleErrors.general.error.stack,
+          type: "hidden" as const,
+        },
+      ]
+    : []),
+]);
+
+const suspendedAction = computed(() => ({
+  label: "Go to billing settings",
+  onClick: () => router.push("/settings/billing"),
+  color: "brand" as const,
+}));
+
+const generalErrorAction = computed(() => ({
+  label: "Go back to all servers",
+  onClick: () => router.push("/servers/manage"),
+  color: "brand" as const,
+}));
+
+const nodeUnavailableAction = computed(() => ({
+  label: "Reload",
+  onClick: () => reloadNuxtApp(),
+  color: "brand" as const,
+  disabled: false,
+}));
 
 const copyServerDebugInfo = () => {
   const debugInfo = `Server ID: ${serverData.value?.server_id}\nError: ${errorMessage.value}\nKind: ${serverData.value?.upstream?.kind}\nProject ID: ${serverData.value?.upstream?.project_id}\nVersion ID: ${serverData.value?.upstream?.version_id}\nLog: ${errorLog.value}`;
@@ -1137,7 +1117,6 @@ const cleanup = () => {
 
   shutdown();
 
-  stopPolling();
   stopUptimeUpdates();
   if (reconnectInterval.value) {
     clearInterval(reconnectInterval.value);
@@ -1180,16 +1159,31 @@ async function dismissNotice(noticeId: number) {
   await server.refresh(["general"]);
 }
 
+const nodeAccessible = ref(true);
+
 onMounted(() => {
   isMounted.value = true;
   if (server.general?.status === "suspended") {
     isLoading.value = false;
     return;
   }
+
+  server
+    .testNodeReachability()
+    .then((result) => {
+      nodeAccessible.value = result;
+      if (!nodeAccessible.value) {
+        isLoading.value = false;
+      }
+    })
+    .catch((err) => {
+      console.error("Error testing node reachability:", err);
+      nodeAccessible.value = false;
+      isLoading.value = false;
+    });
+
   if (server.moduleErrors.general?.error) {
-    if (!server.moduleErrors.general?.error?.message?.includes("Forbidden")) {
-      startPolling();
-    }
+    isLoading.value = false;
   } else {
     connectWebSocket();
   }
@@ -1241,21 +1235,6 @@ onUnmounted(() => {
   cleanup();
 });
 
-watch(
-  () => serverData.value?.status,
-  (newStatus, oldStatus) => {
-    if (isFirstMount.value) {
-      isFirstMount.value = false;
-      return;
-    }
-
-    if (newStatus === "installing" && oldStatus !== "installing") {
-      countdown.value = 15;
-      startPolling();
-    }
-  },
-);
-
 definePageMeta({
   middleware: "auth",
 });
@@ -1298,7 +1277,8 @@ useHead({
   background-repeat: no-repeat;
   filter: blur(1rem);
   content: "";
-  background-image: linear-gradient(
+  background-image:
+    linear-gradient(
       to bottom,
       rgba(from var(--color-raised-bg) r g b / 0.2),
       rgb(from var(--color-raised-bg) r g b / 0.8)

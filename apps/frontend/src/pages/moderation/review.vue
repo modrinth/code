@@ -5,14 +5,14 @@
       <Chips
         v-model="projectType"
         :items="projectTypes"
-        :format-label="(x) => (x === 'all' ? 'All' : $formatProjectType(x) + 's')"
+        :format-label="(x) => (x === 'all' ? 'All' : formatProjectType(x) + 's')"
       />
       <button v-if="oldestFirst" class="iconified-button push-right" @click="oldestFirst = false">
-        <SortDescendingIcon />
+        <SortDescIcon />
         Sorting by oldest
       </button>
       <button v-else class="iconified-button push-right" @click="oldestFirst = true">
-        <SortAscendingIcon />
+        <SortAscIcon />
         Sorting by newest
       </button>
       <button
@@ -56,7 +56,7 @@
             <Avatar :src="project.icon_url" size="xs" no-shadow raised />
             <span class="stacked">
               <span class="title">{{ project.name }}</span>
-              <span>{{ $formatProjectType(project.inferred_project_type) }}</span>
+              <span>{{ formatProjectType(project.inferred_project_type) }}</span>
             </span>
           </nuxt-link>
         </div>
@@ -81,7 +81,9 @@
         </div>
         <div class="mobile-row">
           is requesting to be
-          <Badge :type="project.requested_status ? project.requested_status : 'approved'" />
+          <ProjectStatusBadge
+            :status="project.requested_status ? project.requested_status : 'approved'"
+          />
         </div>
       </div>
       <div class="input-group">
@@ -103,18 +105,16 @@
 </template>
 
 <script setup>
-import { Chips, useRelativeTime } from "@modrinth/ui";
+import { Avatar, ProjectStatusBadge, Chips, useRelativeTime } from "@modrinth/ui";
 import {
   UnknownIcon,
   EyeIcon,
-  SortAscendingIcon,
-  SortDescendingIcon,
+  SortAscIcon,
+  SortDescIcon,
   IssuesIcon,
   ScaleIcon,
 } from "@modrinth/assets";
-import Avatar from "~/components/ui/Avatar.vue";
-import Badge from "~/components/ui/Badge.vue";
-import { formatProjectType } from "~/plugins/shorthands.js";
+import { formatProjectType } from "@modrinth/utils";
 import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
 
 useHead({
@@ -212,6 +212,10 @@ if (projects.value) {
 
 async function goToProjects() {
   const project = projectsFiltered.value[0];
+  const remainingProjectIds = projectsFiltered.value.slice(1).map((p) => p.id);
+
+  localStorage.setItem("moderation-future-projects", JSON.stringify(remainingProjectIds));
+
   await router.push({
     name: "type-id",
     params: {
@@ -220,7 +224,6 @@ async function goToProjects() {
     },
     state: {
       showChecklist: true,
-      projects: projectsFiltered.value.slice(1).map((x) => (x.slug ? x.slug : x.id)),
     },
   });
 }

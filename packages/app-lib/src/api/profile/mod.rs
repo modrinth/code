@@ -586,7 +586,7 @@ pub async fn get_pack_export_candidates(
         .await
         .map_err(|e| IOError::with_path(e, &profile_base_dir))?
     {
-        let path: PathBuf = entry.path();
+        let path = entry.path();
         if path.is_dir() {
             // Two layers of files/folders if its a folder
             let mut read_dir = io::read_dir(&path).await?;
@@ -595,10 +595,10 @@ pub async fn get_pack_export_candidates(
                 .await
                 .map_err(|e| IOError::with_path(e, &profile_base_dir))?
             {
-                let path: PathBuf = entry.path();
-
-                path_list
-                    .push(pack_get_relative_path(&profile_base_dir, &path)?);
+                path_list.push(pack_get_relative_path(
+                    &profile_base_dir,
+                    &entry.path(),
+                )?);
             }
         } else {
             // One layer of files/folders if its a file
@@ -642,10 +642,8 @@ pub async fn run(
 }
 
 /// Run Minecraft using a profile, and credentials for authentication
-/// Returns Arc pointer to RwLock to Child
 #[tracing::instrument(skip(credentials))]
-
-pub async fn run_credentials(
+async fn run_credentials(
     path: &str,
     credentials: &Credentials,
     quick_play_type: &QuickPlayType,
@@ -662,14 +660,15 @@ pub async fn run_credentials(
         .hooks
         .pre_launch
         .as_ref()
-        .or(settings.hooks.pre_launch.as_ref());
+        .or(settings.hooks.pre_launch.as_ref())
+        .filter(|hook_command| !hook_command.is_empty());
     if let Some(hook) = pre_launch_hooks {
         // TODO: hook parameters
         let mut cmd = hook.split(' ');
         if let Some(command) = cmd.next() {
             let full_path = get_full_path(&profile.path).await?;
             let result = Command::new(command)
-                .args(cmd.collect::<Vec<&str>>())
+                .args(cmd)
                 .current_dir(&full_path)
                 .spawn()
                 .map_err(|e| IOError::with_path(e, &full_path))?
@@ -692,7 +691,12 @@ pub async fn run_credentials(
         .clone()
         .unwrap_or(settings.extra_launch_args);
 
-    let wrapper = profile.hooks.wrapper.clone().or(settings.hooks.wrapper);
+    let wrapper = profile
+        .hooks
+        .wrapper
+        .clone()
+        .or(settings.hooks.wrapper)
+        .filter(|hook_command| !hook_command.is_empty());
 
     let memory = profile.memory.unwrap_or(settings.memory);
     let resolution =
@@ -704,8 +708,12 @@ pub async fn run_credentials(
         .unwrap_or(settings.custom_env_vars);
 
     // Post post exit hooks
-    let post_exit_hook =
-        profile.hooks.post_exit.clone().or(settings.hooks.post_exit);
+    let post_exit_hook = profile
+        .hooks
+        .post_exit
+        .clone()
+        .or(settings.hooks.post_exit)
+        .filter(|hook_command| !hook_command.is_empty());
 
     // Any options.txt settings that we want set, add here
     let mut mc_set_options: Vec<(String, String)> = vec![];
@@ -872,15 +880,12 @@ pub async fn create_mrpack_json(
                 env.insert(EnvType::Client, SideType::Required);
                 env.insert(EnvType::Server, SideType::Required);
 
-                let primary_file =
-                    if let Some(primary_file) = version.files.first() {
-                        primary_file
-                    } else {
-                        return Some(Err(crate::ErrorKind::OtherError(
-                            format!("No primary file found for mod at: {path}"),
-                        )
-                        .as_error()));
-                    };
+                let Some(primary_file) = version.files.first() else {
+                    return Some(Err(crate::ErrorKind::OtherError(format!(
+                        "No primary file found for mod at: {path}"
+                    ))
+                    .as_error()));
+                };
 
                 let file_size = primary_file.size;
                 let downloads = vec![primary_file.url.clone()];

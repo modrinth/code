@@ -28,6 +28,8 @@ pub use self::discord::*;
 mod minecraft_auth;
 pub use self::minecraft_auth::*;
 
+pub mod minecraft_skins;
+
 mod cache;
 pub use self::cache::*;
 

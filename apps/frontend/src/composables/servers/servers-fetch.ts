@@ -42,6 +42,23 @@ export async function useServersFetch<T>(
     retry = method === "GET" ? 3 : 0,
   } = options;
 
+  const circuitBreakerKey = `${module || "default"}_${path}`;
+  const failureCount = useState<number>(`fetch_failures_${circuitBreakerKey}`, () => 0);
+  const lastFailureTime = useState<number>(`last_failure_${circuitBreakerKey}`, () => 0);
+
+  const now = Date.now();
+  if (failureCount.value >= 3 && now - lastFailureTime.value < 30000) {
+    const error = new ModrinthServersFetchError(
+      "[Modrinth Servers] Circuit breaker open - too many recent failures",
+      503,
+    );
+    throw new ModrinthServerError("Service temporarily unavailable", 503, error, module);
+  }
+
+  if (now - lastFailureTime.value > 30000) {
+    failureCount.value = 0;
+  }
+
   const base = (import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl)?.replace(
     /\/$/,
     "",
@@ -69,6 +86,7 @@ export async function useServersFetch<T>(
 
   const headers: Record<string, string> = {
     "User-Agent": "Modrinth/1.0 (https://modrinth.com)",
+    "X-Archon-Request": "true",
     Vary: "Accept, Origin",
   };
 
@@ -94,10 +112,12 @@ export async function useServersFetch<T>(
       const response = await $fetch<T>(fullUrl, {
         method,
         headers,
-        body: body && contentType === "application/json" ? JSON.stringify(body) : body ?? undefined,
+        body:
+          body && contentType === "application/json" ? JSON.stringify(body) : (body ?? undefined),
         timeout: 10000,
       });
 
+      failureCount.value = 0;
       return response;
     } catch (error) {
       lastError = error as Error;
@@ -106,6 +126,11 @@ export async function useServersFetch<T>(
       if (error instanceof FetchError) {
         const statusCode = error.response?.status;
         const statusText = error.response?.statusText || "Unknown error";
+
+        if (statusCode && statusCode >= 500) {
+          failureCount.value++;
+          lastFailureTime.value = now;
+        }
 
         let v1Error: V1ErrorInfo | undefined;
         if (error.data?.error && error.data?.description) {
@@ -134,9 +159,11 @@ export async function useServersFetch<T>(
             ? errorMessages[statusCode]
             : `HTTP Error: ${statusCode || "unknown"} ${statusText}`;
 
-        const isRetryable = statusCode ? [408, 429, 500, 502, 504].includes(statusCode) : true;
+        const isRetryable = statusCode ? [408, 429].includes(statusCode) : false;
+        const is5xxRetryable =
+          statusCode && statusCode >= 500 && statusCode < 600 && method === "GET" && attempts === 1;
 
-        if (!isRetryable || attempts >= maxAttempts) {
+        if (!(isRetryable || is5xxRetryable) || attempts >= maxAttempts) {
           console.error("Fetch error:", error);
 
           const fetchError = new ModrinthServersFetchError(
@@ -147,7 +174,8 @@ export async function useServersFetch<T>(
           throw new ModrinthServerError(error.message, statusCode, fetchError, module, v1Error);
         }
 
-        const delay = Math.min(1000 * Math.pow(2, attempts - 1) + Math.random() * 1000, 10000);
+        const baseDelay = statusCode && statusCode >= 500 ? 5000 : 1000;
+        const delay = Math.min(baseDelay * Math.pow(2, attempts - 1) + Math.random() * 1000, 15000);
         console.warn(`Retrying request in ${delay}ms (attempt ${attempts}/${maxAttempts - 1})`);
         await new Promise((resolve) => setTimeout(resolve, delay));
         continue;

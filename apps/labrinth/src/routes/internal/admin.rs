@@ -8,16 +8,16 @@ use crate::models::threads::MessageBody;
 use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::maxmind::MaxMindIndexer;
 use crate::queue::moderation::AUTOMOD_ID;
-use crate::queue::payouts::PayoutsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::search::SearchConfig;
 use crate::util::date::get_current_tenths_of_ms;
 use crate::util::guards::admin_key_guard;
-use actix_web::{HttpRequest, HttpResponse, get, patch, post, web};
+use actix_web::{HttpRequest, HttpResponse, patch, post, web};
 use serde::Deserialize;
 use sqlx::PgPool;
 use std::collections::HashMap;
+use std::fmt::Write;
 use std::net::Ipv4Addr;
 use std::sync::Arc;
 use tracing::info;
@@ -27,7 +27,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         web::scope("admin")
             .service(count_download)
             .service(force_reindex)
-            .service(get_balances)
             .service(delphi_result_ingest),
     );
 }
@@ -165,24 +164,6 @@ pub async fn force_reindex(
     Ok(HttpResponse::NoContent().finish())
 }
 
-#[get("/_balances", guard = "admin_key_guard")]
-pub async fn get_balances(
-    payouts: web::Data<PayoutsQueue>,
-) -> Result<HttpResponse, ApiError> {
-    let (paypal, brex, tremendous) = futures::future::try_join3(
-        PayoutsQueue::get_paypal_balance(),
-        PayoutsQueue::get_brex_balance(),
-        payouts.get_tremendous_balance(),
-    )
-    .await?;
-
-    Ok(HttpResponse::Ok().json(serde_json::json!({
-        "paypal": paypal,
-        "brex": brex,
-        "tremendous": tremendous,
-    })))
-}
-
 #[derive(Deserialize)]
 pub struct DelphiIngest {
     pub url: String,
@@ -221,9 +202,11 @@ pub async fn delphi_result_ingest(
 
     for (issue, trace) in &body.issues {
         for (path, code) in trace {
-            header.push_str(&format!(
+            write!(
+                &mut header,
                 "\n issue {issue} found at file {path}: \n ```\n{code}\n```"
-            ));
+            )
+            .unwrap();
         }
     }
 
@@ -244,12 +227,15 @@ pub async fn delphi_result_ingest(
 
     for (issue, trace) in &body.issues {
         for path in trace.keys() {
-            thread_header
-                .push_str(&format!("\n\n- issue {issue} found at file {path}"));
+            write!(
+                &mut thread_header,
+                "\n\n- issue {issue} found at file {path}"
+            )
+            .unwrap();
         }
 
         if trace.is_empty() {
-            thread_header.push_str(&format!("\n\n- issue {issue} found",));
+            write!(&mut thread_header, "\n\n- issue {issue} found").unwrap();
         }
     }
 

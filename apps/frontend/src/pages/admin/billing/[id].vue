@@ -153,10 +153,7 @@
                   {{ dayjs(charge.due).format("MMMM D, YYYY [at] h:mma") }}
                   <span class="text-secondary">({{ formatRelativeTime(charge.due) }}) </span>
                 </span>
-                <div
-                  v-if="flags.developerMode"
-                  class="flex w-full items-center gap-1 text-xs text-secondary"
-                >
+                <div class="flex w-full items-center gap-1 text-xs text-secondary">
                   {{ charge.status }}
                   ⋅
                   {{ charge.type }}
@@ -219,7 +216,6 @@ import dayjs from "dayjs";
 import { products } from "~/generated/state.json";
 import ModrinthServersIcon from "~/components/ui/servers/ModrinthServersIcon.vue";
 
-const flags = useFeatureFlags();
 const route = useRoute();
 const data = useNuxtApp();
 const vintl = useVIntl();
@@ -289,13 +285,13 @@ const selectedCharge = ref(null);
 const refundType = ref("full");
 const refundTypes = ref(["full", "partial", "none"]);
 const refundAmount = ref(0);
-const unprovision = ref(false);
+const unprovision = ref(true);
 
 function showRefundModal(charge) {
   selectedCharge.value = charge;
   refundType.value = "full";
   refundAmount.value = 0;
-  unprovision.value = false;
+  unprovision.value = true;
   refundModal.value.show();
 }
 

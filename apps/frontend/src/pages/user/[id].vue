@@ -80,6 +80,7 @@
               projects
             </div>
             <div
+              v-tooltip="sumDownloads.toLocaleString()"
               class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
             >
               <DownloadIcon class="h-6 w-6 text-secondary" />
@@ -329,9 +330,7 @@
             </div>
           </div>
         </div>
-        <AdPlaceholder
-          v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
-        />
+        <AdPlaceholder v-if="!auth.user" />
       </div>
     </div>
   </div>
@@ -355,6 +354,7 @@ import {
   GlobeIcon,
 } from "@modrinth/assets";
 import {
+  Avatar,
   OverflowMenu,
   ButtonStyled,
   ContentPageHeader,
@@ -377,7 +377,6 @@ import BetaTesterBadge from "~/assets/images/badges/beta-tester.svg?component";
 
 import UpToDate from "~/assets/images/illustrations/up_to_date.svg?component";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
-import Avatar from "~/components/ui/Avatar.vue";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
@@ -386,13 +385,12 @@ const route = useNativeRoute();
 const auth = await useAuth();
 const cosmetics = useCosmetics();
 const tags = useTags();
-const flags = useFeatureFlags();
 const config = useRuntimeConfig();
 
 const vintl = useVIntl();
 const { formatMessage } = vintl;
 
-const formatCompactNumber = useCompactNumber();
+const formatCompactNumber = useCompactNumber(true);
 
 const formatRelativeTime = useRelativeTime();
 

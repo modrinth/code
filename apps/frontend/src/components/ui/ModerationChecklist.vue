@@ -9,7 +9,7 @@
       </h1>
       <ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
         <button v-tooltip="`Exit moderation`" @click="exitModeration">
-          <CrossIcon />
+          <XIcon />
         </button>
       </ButtonStyled>
       <ButtonStyled circular>
@@ -306,7 +306,7 @@
           <div class="flex items-center gap-2">
             <ButtonStyled v-if="!done">
               <button aria-label="Skip" @click="goToNextProject">
-                <ExitIcon aria-hidden="true" />
+                <XIcon aria-hidden="true" />
                 <template v-if="futureProjects.length > 0">Skip</template>
                 <template v-else>Exit</template>
               </button>
@@ -335,7 +335,7 @@
               <div class="joined-buttons">
                 <ButtonStyled color="red">
                   <button @click="sendMessage('rejected')">
-                    <CrossIcon aria-hidden="true" /> Reject
+                    <XIcon aria-hidden="true" /> Reject
                   </button>
                 </ButtonStyled>
                 <ButtonStyled color="red">
@@ -373,9 +373,8 @@ import {
   UpdatedIcon,
   CheckIcon,
   DropdownIcon,
-  XIcon as CrossIcon,
   EyeOffIcon,
-  ExitIcon,
+  XIcon,
   ScaleIcon,
 } from "@modrinth/assets";
 import { ButtonStyled, MarkdownEditor, OverflowMenu, Collapsible } from "@modrinth/ui";
@@ -654,11 +653,11 @@ For a brief rundown of how this works:
         {
           name: "Insufficient",
           resultingMessage: `## Insufficient Gallery Images
-        We ask that projects like yours show off their content using images in the Gallery, or optionally in the Description, in order to effectively and clearly inform users of its content per section 2.1 of [Modrinth's content rules](https://modrinth.com/legal/rules#general-expectations).
-        Keep in mind that you should:
-        - Set a featured image that best represents your project.
-        - Ensure all your images have titles that accurately label the image, and optionally, details on the contents of the image in the images Description.
-        - Upload any relevant images in your Description to your Gallery tab for best results.`,
+We ask that projects like yours show off their content using images in the Gallery, or optionally in the Description, in order to effectively and clearly inform users of its content per section 2.1 of [Modrinth's content rules](https://modrinth.com/legal/rules#general-expectations).
+Keep in mind that you should:
+- Set a featured image that best represents your project.
+- Ensure all your images have titles that accurately label the image, and optionally, details on the contents of the image in the images Description.
+- Upload any relevant images in your Description to your Gallery tab for best results.`,
         },
         {
           name: "Not relevant",

@@ -46,13 +46,18 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
       data.image = (await this.server.processImage(data.project?.icon_url)) ?? undefined;
     }
 
-    const motd = await this.getMotd();
-    if (motd === "A Minecraft Server") {
-      await this.setMotd(
-        `§b${data.project?.title || data.loader + " " + data.mc_version} §f♦ §aModrinth Servers`,
-      );
+    try {
+      const motd = await this.getMotd();
+      if (motd === "A Minecraft Server") {
+        await this.setMotd(
+          `§b${data.project?.title || data.loader + " " + data.mc_version} §f♦ §aModrinth Servers`,
+        );
+      }
+      data.motd = motd;
+    } catch {
+      console.error("[Modrinth Servers] [General] Failed to fetch MOTD.");
+      data.motd = undefined;
     }
-    data.motd = motd;
 
     // Copy data to this module
     Object.assign(this, data);
@@ -98,28 +103,67 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
     }
   }
 
-  async reinstallFromMrpack(mrpack: File, hardReset: boolean = false): Promise<void> {
+  reinstallFromMrpack(
+    mrpack: File,
+    hardReset: boolean = false,
+  ): {
+    promise: Promise<void>;
+    onProgress: (cb: (p: { loaded: number; total: number; progress: number }) => void) => void;
+  } {
     const hardResetParam = hardReset ? "true" : "false";
-    const auth = await useServersFetch<JWTAuth>(`servers/${this.serverId}/reinstallFromMrpack`);
 
-    const formData = new FormData();
-    formData.append("file", mrpack);
+    const progressSubject = new EventTarget();
 
-    const response = await fetch(
-      `https://${auth.url}/reinstallMrpackMultiparted?hard=${hardResetParam}`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${auth.token}`,
-        },
-        body: formData,
-        signal: AbortSignal.timeout(30 * 60 * 1000),
-      },
-    );
+    const uploadPromise = (async () => {
+      try {
+        const auth = await useServersFetch<JWTAuth>(`servers/${this.serverId}/reinstallFromMrpack`);
 
-    if (!response.ok) {
-      throw new Error(`[pyroservers] native fetch err status: ${response.status}`);
-    }
+        await new Promise<void>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+
+          xhr.upload.addEventListener("progress", (e) => {
+            if (e.lengthComputable) {
+              progressSubject.dispatchEvent(
+                new CustomEvent("progress", {
+                  detail: {
+                    loaded: e.loaded,
+                    total: e.total,
+                    progress: (e.loaded / e.total) * 100,
+                  },
+                }),
+              );
+            }
+          });
+
+          xhr.onload = () =>
+            xhr.status >= 200 && xhr.status < 300
+              ? resolve()
+              : reject(new Error(`[pyroservers] XHR error status: ${xhr.status}`));
+
+          xhr.onerror = () => reject(new Error("[pyroservers] .mrpack upload failed"));
+          xhr.onabort = () => reject(new Error("[pyroservers] .mrpack upload cancelled"));
+          xhr.ontimeout = () => reject(new Error("[pyroservers] .mrpack upload timed out"));
+          xhr.timeout = 30 * 60 * 1000;
+
+          xhr.open("POST", `https://${auth.url}/reinstallMrpackMultiparted?hard=${hardResetParam}`);
+          xhr.setRequestHeader("Authorization", `Bearer ${auth.token}`);
+
+          const formData = new FormData();
+          formData.append("file", mrpack);
+          xhr.send(formData);
+        });
+      } catch (err) {
+        console.error("Error reinstalling from mrpack:", err);
+        throw err;
+      }
+    })();
+
+    return {
+      promise: uploadPromise,
+      onProgress: (cb: (p: { loaded: number; total: number; progress: number }) => void) =>
+        progressSubject.addEventListener("progress", ((e: CustomEvent) =>
+          cb(e.detail)) as EventListener),
+    };
   }
 
   async suspend(status: boolean): Promise<void> {
@@ -139,7 +183,7 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
 
   async getMotd(): Promise<string | undefined> {
     try {
-      const props = await this.server.fs.downloadFile("/server.properties");
+      const props = await this.server.fs.downloadFile("/server.properties", false, true);
       if (props) {
         const lines = props.split("\n");
         for (const line of lines) {
@@ -155,19 +199,25 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
   }
 
   async setMotd(motd: string): Promise<void> {
-    const props = (await this.server.fetchConfigFile("ServerProperties")) as any;
-    if (props) {
-      props.motd = motd;
-      const newProps = this.server.constructServerProperties(props);
-      const octetStream = new Blob([newProps], { type: "application/octet-stream" });
-      const auth = await useServersFetch<JWTAuth>(`servers/${this.serverId}/fs`);
+    try {
+      const props = (await this.server.fetchConfigFile("ServerProperties")) as any;
+      if (props) {
+        props.motd = motd;
+        const newProps = this.server.constructServerProperties(props);
+        const octetStream = new Blob([newProps], { type: "application/octet-stream" });
+        const auth = await useServersFetch<JWTAuth>(`servers/${this.serverId}/fs`);
 
-      await useServersFetch(`/update?path=/server.properties`, {
-        method: "PUT",
-        contentType: "application/octet-stream",
-        body: octetStream,
-        override: auth,
-      });
+        await useServersFetch(`/update?path=/server.properties`, {
+          method: "PUT",
+          contentType: "application/octet-stream",
+          body: octetStream,
+          override: auth,
+        });
+      }
+    } catch {
+      console.error(
+        "[Modrinth Servers] [General] Failed to set MOTD due to lack of server properties file.",
+      );
     }
   }
 }

@@ -6,11 +6,11 @@ export const regionOverrides = {
     flag: 'https://flagcdn.com/us.svg',
   },
   'eu-lim': {
-    name: defineMessage({ id: 'servers.region.europe', defaultMessage: 'Europe' }),
-    flag: 'https://flagcdn.com/eu.svg',
+    name: defineMessage({ id: 'servers.region.central-europe', defaultMessage: 'Central Europe' }),
+    flag: 'https://flagcdn.com/de.svg',
   },
-  'de-fra': {
-    name: defineMessage({ id: 'servers.region.europe', defaultMessage: 'Europe' }),
-    flag: 'https://flagcdn.com/eu.svg',
+  'eu-cov': {
+    name: defineMessage({ id: 'servers.region.western-europe', defaultMessage: 'Western Europe' }),
+    flag: 'https://flagcdn.com/gb.svg',
   },
 } satisfies Record<string, { name?: MessageDescriptor; flag?: string }>

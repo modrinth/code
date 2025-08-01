@@ -56,18 +56,15 @@ impl AsyncRateLimiter {
     }
 
     pub async fn check_rate_limit(&self, key: &str) -> RateLimitDecision {
-        let mut conn = match self.redis_pool.connect().await {
-            Ok(conn) => conn,
-            Err(_) => {
-                // If Redis is unavailable, allow the request but with reduced limit
-                return RateLimitDecision {
-                    allowed: true,
-                    limit: self.params.burst_size,
-                    remaining: 1,
-                    reset_after_ms: 60_000, // 1 minute
-                    retry_after_ms: None,
-                };
-            }
+        let Ok(mut conn) = self.redis_pool.connect().await else {
+            // If Redis is unavailable, allow the request but with reduced limit
+            return RateLimitDecision {
+                allowed: true,
+                limit: self.params.burst_size,
+                remaining: 1,
+                reset_after_ms: 60_000, // 1 minute
+                retry_after_ms: None,
+            };
         };
 
         // Get current time in nanoseconds since UNIX epoch

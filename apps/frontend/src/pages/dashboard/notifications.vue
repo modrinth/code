@@ -26,7 +26,7 @@
         v-if="notifTypes.length > 1"
         v-model="selectedType"
         :items="notifTypes"
-        :format-label="(x) => (x === 'all' ? 'All' : $formatProjectType(x).replace('_', ' ') + 's')"
+        :format-label="(x) => (x === 'all' ? 'All' : formatProjectType(x).replace('_', ' ') + 's')"
         :capitalize="false"
       />
       <p v-if="pending">Loading notifications...</p>
@@ -49,13 +49,16 @@
         />
       </template>
       <p v-else>You don't have any unread notifications.</p>
-      <Pagination :page="page" :count="pages" @switch-page="changePage" />
+      <div class="flex justify-end">
+        <Pagination :page="page" :count="pages" @switch-page="changePage" />
+      </div>
     </section>
   </div>
 </template>
 <script setup>
-import { Button, Chips } from "@modrinth/ui";
+import { Button, Pagination, Chips } from "@modrinth/ui";
 import { HistoryIcon, CheckCheckIcon } from "@modrinth/assets";
+import { formatProjectType } from "@modrinth/utils";
 import {
   fetchExtraNotificationData,
   groupNotifications,
@@ -63,7 +66,6 @@ import {
 } from "~/helpers/notifications.ts";
 import NotificationItem from "~/components/ui/NotificationItem.vue";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
-import Pagination from "~/components/ui/Pagination.vue";
 
 useHead({
   title: "Notifications - Modrinth",
