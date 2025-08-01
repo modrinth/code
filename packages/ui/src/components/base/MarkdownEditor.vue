@@ -267,11 +267,10 @@
 </template>
 
 <script setup lang="ts">
-import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, watch } from 'vue'
+import { history, historyKeymap, indentWithTab } from '@codemirror/commands'
+import { markdown } from '@codemirror/lang-markdown'
 import { Compartment, EditorState } from '@codemirror/state'
 import { EditorView, keymap, placeholder as cm_placeholder } from '@codemirror/view'
-import { markdown } from '@codemirror/lang-markdown'
-import { history, historyKeymap, indentWithTab } from '@codemirror/commands'
 import {
   AlignLeftIcon,
   BoldIcon,
@@ -295,11 +294,13 @@ import {
 } from '@modrinth/assets'
 import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/utils/codemirror'
 import { renderHighlightedString } from '@modrinth/utils/highlight'
+import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, watch } from 'vue'
+
 import Modal from '../modal/Modal.vue'
 import Button from './Button.vue'
-import Toggle from './Toggle.vue'
-import FileInput from './FileInput.vue'
 import Chips from './Chips.vue'
+import FileInput from './FileInput.vue'
+import Toggle from './Toggle.vue'
 
 const props = withDefaults(
   defineProps<{

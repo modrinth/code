@@ -28,8 +28,9 @@
 </template>
 
 <script setup lang="ts">
-import Accordion from '../base/Accordion.vue'
 import { computed } from 'vue'
+
+import Accordion from '../base/Accordion.vue'
 
 interface FilterOption<T> {
   id: string

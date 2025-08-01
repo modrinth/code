@@ -101,8 +101,8 @@
 
 <script setup lang="ts" generic="OptionValue extends string | number | Record<string, any>">
 import { DropdownIcon } from '@modrinth/assets'
-import { computed, ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import type { CSSProperties } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 const ITEM_HEIGHT = 44
 const BUFFER_ITEMS = 5

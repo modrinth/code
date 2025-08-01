@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ButtonStyled, NewModal } from '../index'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import AddPaymentMethod from './AddPaymentMethod.vue'
-import type { AddPaymentMethodProps } from './AddPaymentMethod.vue'
-import { commonMessages } from '../../utils'
 import { PlusIcon, XIcon } from '@modrinth/assets'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+
+import { commonMessages } from '../../utils'
+import { ButtonStyled, NewModal } from '../index'
+import type { AddPaymentMethodProps } from './AddPaymentMethod.vue'
+import AddPaymentMethod from './AddPaymentMethod.vue'
 
 const { formatMessage } = useVIntl()
 

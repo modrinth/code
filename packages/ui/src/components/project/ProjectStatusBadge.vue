@@ -4,21 +4,22 @@
 
 <script setup lang="ts">
 import {
-  FileTextIcon,
   ArchiveIcon,
-  UpdatedIcon,
-  LockIcon,
   CalendarIcon,
+  FileTextIcon,
   GlobeIcon,
   LinkIcon,
+  LockIcon,
   UnknownIcon,
+  UpdatedIcon,
   XIcon,
 } from '@modrinth/assets'
-import { useVIntl, defineMessage, type MessageDescriptor } from '@vintl/vintl'
+import type { ProjectStatus } from '@modrinth/utils'
+import { defineMessage, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import type { Component } from 'vue'
 import { computed } from 'vue'
+
 import Badge from '../base/SimpleBadge.vue'
-import type { ProjectStatus } from '@modrinth/utils'
 
 const props = defineProps<{
   status: ProjectStatus

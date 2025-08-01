@@ -149,21 +149,22 @@
 </template>
 
 <script setup lang="ts">
-import Accordion from '../base/Accordion.vue'
-import type { FilterOption, FilterType, FilterValue } from '../../utils/search'
 import {
   BanIcon,
-  SearchIcon,
-  XIcon,
-  UpdatedIcon,
-  LockOpenIcon,
   DropdownIcon,
+  LockOpenIcon,
+  SearchIcon,
+  UpdatedIcon,
+  XIcon,
 } from '@modrinth/assets'
-import { Button, Checkbox, ScrollablePanel } from '../index'
-import { computed, ref } from 'vue'
-import ButtonStyled from '../base/ButtonStyled.vue'
-import SearchFilterOption from './SearchFilterOption.vue'
 import { defineMessages, useVIntl } from '@vintl/vintl'
+import { computed, ref } from 'vue'
+
+import type { FilterOption, FilterType, FilterValue } from '../../utils/search'
+import Accordion from '../base/Accordion.vue'
+import ButtonStyled from '../base/ButtonStyled.vue'
+import { Button, Checkbox, ScrollablePanel } from '../index'
+import SearchFilterOption from './SearchFilterOption.vue'
 
 const { formatMessage } = useVIntl()
 

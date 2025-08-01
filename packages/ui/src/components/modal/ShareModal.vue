@@ -1,16 +1,17 @@
 <script setup>
 import {
   ClipboardCopyIcon,
-  LinkIcon,
-  ShareIcon,
-  MailIcon,
   GlobeIcon,
-  TwitterIcon,
+  LinkIcon,
+  MailIcon,
   MastodonIcon,
   RedditIcon,
+  ShareIcon,
+  TwitterIcon,
 } from '@modrinth/assets'
-import { computed, ref, nextTick } from 'vue'
 import QrcodeVue from 'qrcode.vue'
+import { computed, nextTick, ref } from 'vue'
+
 import { Button, Modal } from '../index'
 
 const props = defineProps({
