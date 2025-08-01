@@ -1,6 +1,7 @@
-import type { Stage } from '../../types/stage'
-import type { ButtonAction } from '../../types/actions'
 import { CopyrightIcon } from '@modrinth/assets'
+
+import type { ButtonAction } from '../../types/actions'
+import type { Stage } from '../../types/stage'
 
 const reupload: Stage = {
   title: 'Does the author have proper permissions to post this project?',

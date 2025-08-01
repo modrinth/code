@@ -1,6 +1,7 @@
 import type { Project } from '@modrinth/utils'
-import type { Action } from './actions'
 import type { FunctionalComponent, SVGAttributes } from 'vue'
+
+import type { Action } from './actions'
 
 /**
  * Represents a moderation stage with associated actions and optional navigation logic.
