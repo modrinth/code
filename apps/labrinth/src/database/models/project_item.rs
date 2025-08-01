@@ -19,6 +19,7 @@ use std::hash::Hash;
 pub const PROJECTS_NAMESPACE: &str = "projects";
 pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs";
 const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies";
+const PROJECTS_DEPENDENTS_NAMESPACE: &str = "projects_dependents";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct LinkUrl {
@@ -343,8 +344,14 @@ impl DBProject {
         let project = Self::get_id(id, &mut **transaction, redis).await?;
 
         if let Some(project) = project {
-            DBProject::clear_cache(id, project.inner.slug, Some(true), redis)
-                .await?;
+            DBProject::clear_cache(
+                id,
+                project.inner.slug,
+                Some(true),
+                Some(true),
+                redis,
+            )
+            .await?;
 
             sqlx::query!(
                 "
@@ -932,10 +939,60 @@ impl DBProject {
         Ok(dependencies)
     }
 
+    pub async fn get_dependents<'a, E>(
+        id: DBProjectId,
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<Vec<(DBVersionId, DBProjectId)>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        type Dependents = Vec<(DBVersionId, DBProjectId)>;
+
+        let mut redis = redis.connect().await?;
+
+        let dependents = redis
+            .get_deserialized_from_json::<Dependents>(
+                PROJECTS_DEPENDENTS_NAMESPACE,
+                &id.0.to_string(),
+            )
+            .await?;
+        if let Some(dependents) = dependents {
+            return Ok(dependents);
+        }
+
+        //             SELECT d.dependency_id, COALESCE(vd.mod_id, 0) mod_id, d.mod_dependency_id
+        let dependents: Dependents = sqlx::query!(
+            "
+            SELECT DISTINCT version.id version_id, mod.id FROM versions version
+                INNER JOIN mods mod ON version.mod_id = mod.id
+                INNER JOIN dependencies d ON version.id = d.dependent_id
+            WHERE mod.status = 'approved' AND d.mod_dependency_id = $1
+            ORDER BY mod.id;
+            ",
+            id as DBProjectId
+        )
+        .fetch(exec)
+        .map_ok(|x| (DBVersionId(x.version_id), DBProjectId(x.id)))
+        .try_collect::<Dependents>()
+        .await?;
+
+        redis
+            .set_serialized_to_json(
+                PROJECTS_DEPENDENTS_NAMESPACE,
+                id.0,
+                &dependents,
+                None,
+            )
+            .await?;
+        Ok(dependents)
+    }
+
     pub async fn clear_cache(
         id: DBProjectId,
         slug: Option<String>,
         clear_dependencies: Option<bool>,
+        clear_dependents: Option<bool>,
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
@@ -947,6 +1004,14 @@ impl DBProject {
                 (
                     PROJECTS_DEPENDENCIES_NAMESPACE,
                     if clear_dependencies.unwrap_or(false) {
+                        Some(id.0.to_string())
+                    } else {
+                        None
+                    },
+                ),
+                (
+                    PROJECTS_DEPENDENTS_NAMESPACE,
+                    if clear_dependents.unwrap_or(false) {
                         Some(id.0.to_string())
                     } else {
                         None

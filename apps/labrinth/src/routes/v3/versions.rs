@@ -528,6 +528,7 @@ pub async fn version_edit_helper(
                     version_item.inner.project_id,
                     None,
                     None,
+                    None,
                     &redis,
                 )
                 .await?;
@@ -687,6 +688,7 @@ pub async fn version_edit_helper(
             database::models::DBProject::clear_cache(
                 version_item.inner.project_id,
                 None,
+                Some(true),
                 Some(true),
                 &redis,
             )
@@ -965,6 +967,7 @@ pub async fn version_delete(
     database::models::DBProject::clear_cache(
         version.inner.project_id,
         None,
+        Some(true),
         Some(true),
         &redis,
     )

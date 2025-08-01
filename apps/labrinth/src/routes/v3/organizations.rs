@@ -830,6 +830,7 @@ pub async fn organization_projects_add(
             project_item.inner.id,
             project_item.inner.slug,
             None,
+            None,
             &redis,
         )
         .await?;
@@ -1017,6 +1018,7 @@ pub async fn organization_projects_remove(
         database::models::DBProject::clear_cache(
             project_item.inner.id,
             project_item.inner.slug,
+            None,
             None,
             &redis,
         )

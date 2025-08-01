@@ -451,6 +451,7 @@ impl DBVersion {
             DBProjectId(project_id.mod_id),
             None,
             None,
+            None,
             redis,
         )
         .await?;

@@ -513,7 +513,14 @@ async fn version_create_inner(
         }
     }
 
-    models::DBProject::clear_cache(project_id, None, Some(true), redis).await?;
+    models::DBProject::clear_cache(
+        project_id,
+        None,
+        Some(true),
+        Some(true),
+        redis,
+    )
+    .await?;
 
     let project_status = sqlx::query!(
         "SELECT status FROM mods WHERE id = $1",
