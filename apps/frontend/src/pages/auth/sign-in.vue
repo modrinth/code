@@ -139,147 +139,147 @@ import {
   SSOGoogleIcon,
   SSOMicrosoftIcon,
   SSOSteamIcon,
-} from "@modrinth/assets";
-import { commonMessages } from "@modrinth/ui";
+} from '@modrinth/assets'
+import { commonMessages } from '@modrinth/ui'
 
-import HCaptcha from "@/components/ui/HCaptcha.vue";
+import HCaptcha from '@/components/ui/HCaptcha.vue'
 
-const { formatMessage } = useVIntl();
+const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
   additionalOptionsLabel: {
-    id: "auth.sign-in.additional-options",
+    id: 'auth.sign-in.additional-options',
     defaultMessage:
-      "<forgot-password-link>Forgot password?</forgot-password-link> • <create-account-link>Create an account</create-account-link>",
+      '<forgot-password-link>Forgot password?</forgot-password-link> • <create-account-link>Create an account</create-account-link>',
   },
   emailUsernameLabel: {
-    id: "auth.sign-in.email-username.label",
-    defaultMessage: "Email or username",
+    id: 'auth.sign-in.email-username.label',
+    defaultMessage: 'Email or username',
   },
   passwordLabel: {
-    id: "auth.sign-in.password.label",
-    defaultMessage: "Password",
+    id: 'auth.sign-in.password.label',
+    defaultMessage: 'Password',
   },
   signInWithLabel: {
-    id: "auth.sign-in.sign-in-with",
-    defaultMessage: "Sign in with",
+    id: 'auth.sign-in.sign-in-with',
+    defaultMessage: 'Sign in with',
   },
   signInTitle: {
-    id: "auth.sign-in.title",
-    defaultMessage: "Sign In",
+    id: 'auth.sign-in.title',
+    defaultMessage: 'Sign In',
   },
   twoFactorCodeInputPlaceholder: {
-    id: "auth.sign-in.2fa.placeholder",
-    defaultMessage: "Enter code...",
+    id: 'auth.sign-in.2fa.placeholder',
+    defaultMessage: 'Enter code...',
   },
   twoFactorCodeLabel: {
-    id: "auth.sign-in.2fa.label",
-    defaultMessage: "Enter two-factor code",
+    id: 'auth.sign-in.2fa.label',
+    defaultMessage: 'Enter two-factor code',
   },
   twoFactorCodeLabelDescription: {
-    id: "auth.sign-in.2fa.description",
-    defaultMessage: "Please enter a two-factor code to proceed.",
+    id: 'auth.sign-in.2fa.description',
+    defaultMessage: 'Please enter a two-factor code to proceed.',
   },
   usePasswordLabel: {
-    id: "auth.sign-in.use-password",
-    defaultMessage: "Or use a password",
+    id: 'auth.sign-in.use-password',
+    defaultMessage: 'Or use a password',
   },
-});
+})
 
 useHead({
   title() {
-    return `${formatMessage(messages.signInTitle)} - Modrinth`;
+    return `${formatMessage(messages.signInTitle)} - Modrinth`
   },
-});
+})
 
-const auth = await useAuth();
-const route = useNativeRoute();
+const auth = await useAuth()
+const route = useNativeRoute()
 
-const redirectTarget = route.query.redirect || "";
-const subtleLauncherRedirectUri = ref();
+const redirectTarget = route.query.redirect || ''
+const subtleLauncherRedirectUri = ref()
 
-if (route.query.code && !route.fullPath.includes("new_account=true")) {
-  await finishSignIn();
+if (route.query.code && !route.fullPath.includes('new_account=true')) {
+  await finishSignIn()
 }
 
 if (auth.value.user) {
-  await finishSignIn();
+  await finishSignIn()
 }
 
-const captcha = ref();
+const captcha = ref()
 
-const email = ref("");
-const password = ref("");
-const token = ref("");
+const email = ref('')
+const password = ref('')
+const token = ref('')
 
-const flow = ref(route.query.flow);
+const flow = ref(route.query.flow)
 
 async function beginPasswordSignIn() {
-  startLoading();
+  startLoading()
   try {
-    const res = await useBaseFetch("auth/login", {
-      method: "POST",
+    const res = await useBaseFetch('auth/login', {
+      method: 'POST',
       body: {
         username: email.value,
         password: password.value,
         challenge: token.value,
       },
-    });
+    })
 
     if (res.flow) {
-      flow.value = res.flow;
+      flow.value = res.flow
     } else {
-      await finishSignIn(res.session);
+      await finishSignIn(res.session)
     }
   } catch (err) {
     addNotification({
-      group: "main",
+      group: 'main',
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
-    captcha.value?.reset();
+      type: 'error',
+    })
+    captcha.value?.reset()
   }
-  stopLoading();
+  stopLoading()
 }
 
-const twoFactorCode = ref(null);
+const twoFactorCode = ref(null)
 async function begin2FASignIn() {
-  startLoading();
+  startLoading()
   try {
-    const res = await useBaseFetch("auth/login/2fa", {
-      method: "POST",
+    const res = await useBaseFetch('auth/login/2fa', {
+      method: 'POST',
       body: {
         flow: flow.value,
         code: twoFactorCode.value ? twoFactorCode.value.toString() : twoFactorCode.value,
       },
-    });
+    })
 
-    await finishSignIn(res.session);
+    await finishSignIn(res.session)
   } catch (err) {
     addNotification({
-      group: "main",
+      group: 'main',
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
-    captcha.value?.reset();
+      type: 'error',
+    })
+    captcha.value?.reset()
   }
-  stopLoading();
+  stopLoading()
 }
 
 async function finishSignIn(token) {
   if (route.query.launcher) {
     if (!token) {
-      token = auth.value.token;
+      token = auth.value.token
     }
 
     const usesLocalhostRedirectionScheme =
-      ["4", "6"].includes(route.query.ipver) && Number(route.query.port) < 65536;
+      ['4', '6'].includes(route.query.ipver) && Number(route.query.port) < 65536
 
     const redirectUrl = usesLocalhostRedirectionScheme
-      ? `http://${route.query.ipver === "4" ? "127.0.0.1" : "[::1]"}:${route.query.port}/?code=${token}`
-      : `https://launcher-files.modrinth.com/?code=${token}`;
+      ? `http://${route.query.ipver === '4' ? '127.0.0.1' : '[::1]'}:${route.query.port}/?code=${token}`
+      : `https://launcher-files.modrinth.com/?code=${token}`
 
     if (usesLocalhostRedirectionScheme) {
       // When using this redirection scheme, the auth token is very visible in the URL to the user.
@@ -289,28 +289,28 @@ async function finishSignIn(token) {
       // token hidden from very casual observation and keeping the protocol as close to OAuth's
       // standard flows as possible, let's execute the redirect within an iframe that visually
       // covers the entire page.
-      subtleLauncherRedirectUri.value = redirectUrl;
+      subtleLauncherRedirectUri.value = redirectUrl
     } else {
       await navigateTo(redirectUrl, {
         external: true,
-      });
+      })
     }
 
-    return;
+    return
   }
 
   if (token) {
-    await useAuth(token);
-    await useUser();
+    await useAuth(token)
+    await useUser()
   }
 
   if (route.query.redirect) {
-    const redirect = decodeURIComponent(route.query.redirect);
+    const redirect = decodeURIComponent(route.query.redirect)
     await navigateTo(redirect, {
       replace: true,
-    });
+    })
   } else {
-    await navigateTo("/dashboard");
+    await navigateTo('/dashboard')
   }
 }
 </script>

@@ -31,53 +31,53 @@ useHead({
     // },
     {
       // Aditude
-      src: "https://dn0qt3r0xannq.cloudfront.net/modrinth-7JfmkEIXEp/modrinth-longform/prebid-load.js",
+      src: 'https://dn0qt3r0xannq.cloudfront.net/modrinth-7JfmkEIXEp/modrinth-longform/prebid-load.js',
       async: true,
     },
     {
       // Optima
-      src: "https://bservr.com/o.js?uid=8118d1fdb2e0d6f32180bd27",
+      src: 'https://bservr.com/o.js?uid=8118d1fdb2e0d6f32180bd27',
       async: true,
     },
     {
-      src: "/inmobi.js",
+      src: '/inmobi.js',
       async: true,
     },
   ],
   link: [
     {
-      rel: "preload",
-      as: "script",
-      href: "https://www.googletagservices.com/tag/js/gpt.js",
+      rel: 'preload',
+      as: 'script',
+      href: 'https://www.googletagservices.com/tag/js/gpt.js',
     },
   ],
-});
+})
 
 onMounted(() => {
-  window.tude = window.tude || { cmd: [] };
-  window.Raven = window.Raven || { cmd: [] };
+  window.tude = window.tude || { cmd: [] }
+  window.Raven = window.Raven || { cmd: [] }
 
   window.Raven.cmd.push(({ config }) => {
     config.setCustom({
-      param1: "web",
-    });
-  });
+      param1: 'web',
+    })
+  })
 
   tude.cmd.push(function () {
     tude.refreshAdsViaDivMappings([
       {
-        divId: "modrinth-rail-1",
-        baseDivId: "pb-slot-square-2",
+        divId: 'modrinth-rail-1',
+        baseDivId: 'pb-slot-square-2',
         targeting: {
-          location: "web",
+          location: 'web',
         },
       },
-    ]);
-  });
-});
+    ])
+  })
+})
 </script>
 <style>
-iframe[id^="google_ads_iframe"] {
+iframe[id^='google_ads_iframe'] {
   color-scheme: normal;
   background: transparent;
 }
@@ -96,21 +96,21 @@ iframe[id^="google_ads_iframe"] {
   background: var(--color-raised-bg);
 }
 
-#qc-cmp2-ui button[mode="primary"] {
+#qc-cmp2-ui button[mode='primary'] {
   background: var(--color-brand);
   color: var(--color-accent-contrast);
   border-radius: var(--radius-lg);
   border: none;
 }
 
-#qc-cmp2-ui button[mode="secondary"] {
+#qc-cmp2-ui button[mode='secondary'] {
   background: var(--color-button-bg);
   color: var(--color-base);
   border-radius: var(--radius-lg);
   border: none;
 }
 
-#qc-cmp2-ui button[mode="link"] {
+#qc-cmp2-ui button[mode='link'] {
   color: var(--color-link);
 }
 
@@ -129,7 +129,7 @@ iframe[id^="google_ads_iframe"] {
   font-family: var(--font-standard);
 }
 
-#qc-cmp2-ui .qc-cmp2-toggle[aria-checked="true"] {
+#qc-cmp2-ui .qc-cmp2-toggle[aria-checked='true'] {
   background-color: var(--color-brand);
   border: 1px solid var(--color-brand);
 }

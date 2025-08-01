@@ -29,56 +29,56 @@
 </template>
 
 <script setup lang="ts">
-import { type KeybindListener, keybinds, normalizeKeybind } from "@modrinth/moderation";
-import NewModal from "@modrinth/ui/src/components/modal/NewModal.vue";
-import { ref } from "vue";
+import { type KeybindListener, keybinds, normalizeKeybind } from '@modrinth/moderation'
+import NewModal from '@modrinth/ui/src/components/modal/NewModal.vue'
+import { ref } from 'vue'
 
-const modal = ref<InstanceType<typeof NewModal>>();
+const modal = ref<InstanceType<typeof NewModal>>()
 
-function parseKeybindDisplay(keybind: KeybindListener["keybind"]): string[] {
-  const keybinds = Array.isArray(keybind) ? keybind : [keybind];
-  const normalized = keybinds[0];
-  const def = normalizeKeybind(normalized);
+function parseKeybindDisplay(keybind: KeybindListener['keybind']): string[] {
+  const keybinds = Array.isArray(keybind) ? keybind : [keybind]
+  const normalized = keybinds[0]
+  const def = normalizeKeybind(normalized)
 
-  const keys = [];
+  const keys = []
 
   if (def.ctrl || def.meta) {
-    keys.push(isMac() ? "CMD" : "CTRL");
+    keys.push(isMac() ? 'CMD' : 'CTRL')
   }
-  if (def.shift) keys.push("SHIFT");
-  if (def.alt) keys.push("ALT");
+  if (def.shift) keys.push('SHIFT')
+  if (def.alt) keys.push('ALT')
 
   const mainKey = def.key
-    .replace("ArrowLeft", "←")
-    .replace("ArrowRight", "→")
-    .replace("ArrowUp", "↑")
-    .replace("ArrowDown", "↓")
-    .replace("Enter", "↵")
-    .replace("Space", "SPACE")
-    .replace("Escape", "ESC")
-    .toUpperCase();
+    .replace('ArrowLeft', '←')
+    .replace('ArrowRight', '→')
+    .replace('ArrowUp', '↑')
+    .replace('ArrowDown', '↓')
+    .replace('Enter', '↵')
+    .replace('Space', 'SPACE')
+    .replace('Escape', 'ESC')
+    .toUpperCase()
 
-  keys.push(mainKey);
+  keys.push(mainKey)
 
-  return keys;
+  return keys
 }
 
 function isMac() {
-  return navigator.platform.toUpperCase().includes("MAC");
+  return navigator.platform.toUpperCase().includes('MAC')
 }
 
 function show(event?: MouseEvent) {
-  modal.value?.show(event);
+  modal.value?.show(event)
 }
 
 function hide() {
-  modal.value?.hide();
+  modal.value?.hide()
 }
 
 defineExpose({
   show,
   hide,
-});
+})
 </script>
 
 <style scoped lang="scss">

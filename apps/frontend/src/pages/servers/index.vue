@@ -56,7 +56,7 @@
             <ButtonStyled color="brand" size="large">
               <nuxt-link class="w-fit" to="#plan">
                 <GameIcon aria-hidden="true" />
-                {{ hasServers ? "Start a new server" : "Start your server" }}
+                {{ hasServers ? 'Start a new server' : 'Start your server' }}
               </nuxt-link>
             </ButtonStyled>
             <ButtonStyled v-if="hasServers" type="outlined" size="large">
@@ -640,91 +640,91 @@ import {
   TerminalSquareIcon,
   TransferIcon,
   VersionIcon,
-} from "@modrinth/assets";
-import { ButtonStyled, ModrinthServersPurchaseModal } from "@modrinth/ui";
-import { monthsInInterval } from "@modrinth/ui/src/utils/billing.ts";
-import { formatPrice } from "@modrinth/utils";
-import { useVIntl } from "@vintl/vintl";
-import { computed } from "vue";
+} from '@modrinth/assets'
+import { ButtonStyled, ModrinthServersPurchaseModal } from '@modrinth/ui'
+import { monthsInInterval } from '@modrinth/ui/src/utils/billing.ts'
+import { formatPrice } from '@modrinth/utils'
+import { useVIntl } from '@vintl/vintl'
+import { computed } from 'vue'
 
-import OptionGroup from "~/components/ui/OptionGroup.vue";
-import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
-import ServerPlanSelector from "~/components/ui/servers/marketing/ServerPlanSelector.vue";
-import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
-import { products } from "~/generated/state.json";
+import OptionGroup from '~/components/ui/OptionGroup.vue'
+import LoaderIcon from '~/components/ui/servers/icons/LoaderIcon.vue'
+import ServerPlanSelector from '~/components/ui/servers/marketing/ServerPlanSelector.vue'
+import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
+import { products } from '~/generated/state.json'
 
-const { locale } = useVIntl();
+const { locale } = useVIntl()
 
-const billingPeriods = ref(["monthly", "quarterly"]);
-const billingPeriod = ref(billingPeriods.value.includes("quarterly") ? "quarterly" : "monthly");
+const billingPeriods = ref(['monthly', 'quarterly'])
+const billingPeriod = ref(billingPeriods.value.includes('quarterly') ? 'quarterly' : 'monthly')
 
 const pyroProducts = products
-  .filter((p) => p.metadata.type === "pyro")
-  .sort((a, b) => a.metadata.ram - b.metadata.ram);
+  .filter((p) => p.metadata.type === 'pyro')
+  .sort((a, b) => a.metadata.ram - b.metadata.ram)
 const pyroPlanProducts = pyroProducts.filter(
   (p) => p.metadata.ram === 4096 || p.metadata.ram === 6144 || p.metadata.ram === 8192,
-);
+)
 
 const lowestPrice = computed(() => {
   const amount = pyroProducts[0]?.prices?.find(
     (price) => price.currency_code === selectedCurrency.value,
-  )?.prices?.intervals?.[billingPeriod.value];
-  return amount ? amount / monthsInInterval[billingPeriod.value] : undefined;
-});
+  )?.prices?.intervals?.[billingPeriod.value]
+  return amount ? amount / monthsInInterval[billingPeriod.value] : undefined
+})
 
-const title = "Modrinth Servers";
+const title = 'Modrinth Servers'
 const description =
-  "Start your own Minecraft server directly on Modrinth. Play your favorite mods, plugins, and datapacks — without the hassle of setup.";
+  'Start your own Minecraft server directly on Modrinth. Play your favorite mods, plugins, and datapacks — without the hassle of setup.'
 
 useSeoMeta({
   title,
   description,
   ogTitle: title,
   ogDescription: description,
-});
+})
 
-const auth = await useAuth();
-const data = useNuxtApp();
-const config = useRuntimeConfig();
-const purchaseModal = ref(null);
-const country = useUserCountry();
-const customer = ref(null);
-const paymentMethods = ref([]);
-const selectedProduct = ref(null);
-const customServer = ref(false);
-const showModal = ref(false);
-const modalKey = ref(0);
+const auth = await useAuth()
+const data = useNuxtApp()
+const config = useRuntimeConfig()
+const purchaseModal = ref(null)
+const country = useUserCountry()
+const customer = ref(null)
+const paymentMethods = ref([])
+const selectedProduct = ref(null)
+const customServer = ref(false)
+const showModal = ref(false)
+const modalKey = ref(0)
 
-const words = ["my-smp", "medieval-masters", "create-server", "mega-smp", "spookypack"];
-const currentWordIndex = ref(0);
-const currentText = ref("");
-const isDeleting = ref(false);
-const typingSpeed = 75;
-const deletingSpeed = 25;
-const pauseTime = 2000;
-const selectedCurrency = ref("USD");
+const words = ['my-smp', 'medieval-masters', 'create-server', 'mega-smp', 'spookypack']
+const currentWordIndex = ref(0)
+const currentText = ref('')
+const isDeleting = ref(false)
+const typingSpeed = 75
+const deletingSpeed = 25
+const pauseTime = 2000
+const selectedCurrency = ref('USD')
 
-const loggedOut = computed(() => !auth.value.user);
-const outOfStockUrl = "https://discord.modrinth.com";
+const loggedOut = computed(() => !auth.value.user)
+const outOfStockUrl = 'https://discord.modrinth.com'
 
-const { data: hasServers } = await useAsyncData("ServerListCountCheck", async () => {
+const { data: hasServers } = await useAsyncData('ServerListCountCheck', async () => {
   try {
-    if (!auth.value.user) return false;
-    const response = await useServersFetch("servers");
-    return response.servers && response.servers.length > 0;
+    if (!auth.value.user) return false
+    const response = await useServersFetch('servers')
+    return response.servers && response.servers.length > 0
   } catch {
-    return false;
+    return false
   }
-});
+})
 
 function fetchStock(region, request) {
   return useServersFetch(`stock?region=${region.shortcode}`, {
-    method: "POST",
+    method: 'POST',
     body: {
       ...request,
     },
     bypassAuth: true,
-  }).then((res) => res.available);
+  }).then((res) => res.available)
 }
 
 async function fetchCapacityStatuses(customProduct = null) {
@@ -736,12 +736,12 @@ async function fetchCapacityStatuses(customProduct = null) {
           pyroProducts.reduce((min, product) =>
             product.metadata.ram < min.metadata.ram ? product : min,
           ),
-        ];
-    const capacityChecks = [];
+        ]
+    const capacityChecks = []
     for (const product of productsToCheck) {
       capacityChecks.push(
-        useServersFetch("stock", {
-          method: "POST",
+        useServersFetch('stock', {
+          method: 'POST',
           body: {
             cpu: product.metadata.cpu,
             memory_mb: product.metadata.ram,
@@ -750,296 +750,296 @@ async function fetchCapacityStatuses(customProduct = null) {
           },
           bypassAuth: true,
         }),
-      );
+      )
     }
 
     if (customProduct?.metadata) {
       return {
         custom: await capacityChecks[0],
-      };
+      }
     } else {
       return {
         small: await capacityChecks[0],
         medium: await capacityChecks[1],
         large: await capacityChecks[2],
         custom: await capacityChecks[3],
-      };
+      }
     }
   } catch (error) {
-    console.error("Error checking server capacities:", error);
+    console.error('Error checking server capacities:', error)
     return {
       custom: { available: 0 },
       small: { available: 0 },
       medium: { available: 0 },
       large: { available: 0 },
-    };
+    }
   }
 }
 
 const { data: capacityStatuses, refresh: refreshCapacity } = await useAsyncData(
-  "ServerCapacityAll",
+  'ServerCapacityAll',
   fetchCapacityStatuses,
   {
     getCachedData() {
-      return null; // Dont cache stock data.
+      return null // Dont cache stock data.
     },
   },
-);
+)
 
-const isSmallAtCapacity = computed(() => capacityStatuses.value?.small?.available === 0);
-const isMediumAtCapacity = computed(() => capacityStatuses.value?.medium?.available === 0);
-const isLargeAtCapacity = computed(() => capacityStatuses.value?.large?.available === 0);
-const isCustomAtCapacity = computed(() => capacityStatuses.value?.custom?.available === 0);
+const isSmallAtCapacity = computed(() => capacityStatuses.value?.small?.available === 0)
+const isMediumAtCapacity = computed(() => capacityStatuses.value?.medium?.available === 0)
+const isLargeAtCapacity = computed(() => capacityStatuses.value?.large?.available === 0)
+const isCustomAtCapacity = computed(() => capacityStatuses.value?.custom?.available === 0)
 
 const startTyping = () => {
-  const currentWord = words[currentWordIndex.value];
+  const currentWord = words[currentWordIndex.value]
   if (isDeleting.value) {
     if (currentText.value.length > 0) {
-      currentText.value = currentText.value.slice(0, -1);
-      setTimeout(startTyping, deletingSpeed);
+      currentText.value = currentText.value.slice(0, -1)
+      setTimeout(startTyping, deletingSpeed)
     } else {
-      isDeleting.value = false;
-      currentWordIndex.value = (currentWordIndex.value + 1) % words.length;
-      setTimeout(startTyping, typingSpeed);
+      isDeleting.value = false
+      currentWordIndex.value = (currentWordIndex.value + 1) % words.length
+      setTimeout(startTyping, typingSpeed)
     }
   } else if (currentText.value.length < currentWord.length) {
-    currentText.value = currentWord.slice(0, currentText.value.length + 1);
-    setTimeout(startTyping, typingSpeed);
+    currentText.value = currentWord.slice(0, currentText.value.length + 1)
+    setTimeout(startTyping, typingSpeed)
   } else {
-    isDeleting.value = true;
-    setTimeout(startTyping, pauseTime);
-  }
-};
-
-const handleError = (err) => {
-  addNotification({
-    group: "main",
-    title: "An error occurred",
-    type: "error",
-    text: err.message ?? (err.data ? err.data.description : err),
-  });
-};
-
-async function fetchPaymentData() {
-  if (!auth.value.user) return;
-  try {
-    const [customerData, paymentMethodsData] = await Promise.all([
-      useBaseFetch("billing/customer", { internal: true }),
-      useBaseFetch("billing/payment_methods", { internal: true }),
-    ]);
-    customer.value = customerData;
-    paymentMethods.value = paymentMethodsData;
-  } catch (error) {
-    console.error("Error fetching payment data:", error);
-    addNotification({
-      group: "main",
-      title: "Error fetching payment data",
-      type: "error",
-      text: error.message || "An unexpected error occurred",
-    });
+    isDeleting.value = true
+    setTimeout(startTyping, pauseTime)
   }
 }
 
-const selectedProjectId = ref();
+const handleError = (err) => {
+  addNotification({
+    group: 'main',
+    title: 'An error occurred',
+    type: 'error',
+    text: err.message ?? (err.data ? err.data.description : err),
+  })
+}
 
-const route = useRoute();
+async function fetchPaymentData() {
+  if (!auth.value.user) return
+  try {
+    const [customerData, paymentMethodsData] = await Promise.all([
+      useBaseFetch('billing/customer', { internal: true }),
+      useBaseFetch('billing/payment_methods', { internal: true }),
+    ])
+    customer.value = customerData
+    paymentMethods.value = paymentMethodsData
+  } catch (error) {
+    console.error('Error fetching payment data:', error)
+    addNotification({
+      group: 'main',
+      title: 'Error fetching payment data',
+      type: 'error',
+      text: error.message || 'An unexpected error occurred',
+    })
+  }
+}
+
+const selectedProjectId = ref()
+
+const route = useRoute()
 const isAtCapacity = computed(
   () => isSmallAtCapacity.value && isMediumAtCapacity.value && isLargeAtCapacity.value,
-);
+)
 
 const scrollToFaq = () => {
   if (route.hash) {
     // where pyro-hash === route.hash
-    const faq = document.querySelector(`[pyro-hash="${route.hash.slice(1)}"]`);
+    const faq = document.querySelector(`[pyro-hash="${route.hash.slice(1)}"]`)
     if (faq) {
-      faq.open = true;
-      const top = faq.getBoundingClientRect().top;
-      const offset = window.innerHeight / 2 - faq.clientHeight / 2;
-      window.scrollTo({ top: window.scrollY + top - offset, behavior: "smooth" });
+      faq.open = true
+      const top = faq.getBoundingClientRect().top
+      const offset = window.innerHeight / 2 - faq.clientHeight / 2
+      window.scrollTo({ top: window.scrollY + top - offset, behavior: 'smooth' })
     }
   }
-};
+}
 
 onMounted(() => {
-  scrollToFaq();
+  scrollToFaq()
   if (route.query?.project) {
-    selectedProjectId.value = route.query?.project;
+    selectedProjectId.value = route.query?.project
   }
-});
+})
 
-watch(() => route.hash, scrollToFaq);
+watch(() => route.hash, scrollToFaq)
 
 const plans = {
   small: pyroPlanProducts?.[0],
   medium: pyroPlanProducts?.[1],
   large: pyroPlanProducts?.[2],
   custom: pyroProducts || [],
-};
+}
 
 const selectProduct = async (product) => {
   if (loggedOut.value) {
-    data.$router.push(`/auth/sign-in?redirect=${encodeURIComponent("/servers?plan=" + product)}`);
-    return;
+    data.$router.push(`/auth/sign-in?redirect=${encodeURIComponent('/servers?plan=' + product)}`)
+    return
   }
 
-  await refreshCapacity();
-  console.log(capacityStatuses.value);
+  await refreshCapacity()
+  console.log(capacityStatuses.value)
 
-  if ((product === "custom" && isCustomAtCapacity.value) || isAtCapacity.value) {
+  if ((product === 'custom' && isCustomAtCapacity.value) || isAtCapacity.value) {
     addNotification({
-      group: "main",
-      title: "Server Capacity Full",
-      type: "error",
-      text: "We are currently at capacity. Please try again later.",
-    });
-    return;
+      group: 'main',
+      title: 'Server Capacity Full',
+      type: 'error',
+      text: 'We are currently at capacity. Please try again later.',
+    })
+    return
   }
 
-  const selectedPlan = plans[product];
-  if (!selectedPlan) return;
+  const selectedPlan = plans[product]
+  if (!selectedPlan) return
 
   if (
-    (product === "custom" && !selectedPlan.length) ||
-    (product !== "custom" && !selectedPlan.metadata)
+    (product === 'custom' && !selectedPlan.length) ||
+    (product !== 'custom' && !selectedPlan.metadata)
   ) {
     addNotification({
-      group: "main",
-      title: "Invalid product",
-      type: "error",
-      text: "The selected product was found but lacks necessary data. Please contact support.",
-    });
-    return;
+      group: 'main',
+      title: 'Invalid product',
+      type: 'error',
+      text: 'The selected product was found but lacks necessary data. Please contact support.',
+    })
+    return
   }
 
   // required for the purchase modal
   if (!pyroProducts.metadata) {
-    pyroProducts.metadata = {};
+    pyroProducts.metadata = {}
   }
-  pyroProducts.metadata.type = "pyro";
+  pyroProducts.metadata.type = 'pyro'
 
-  customServer.value = product === "custom";
-  selectedProduct.value = selectedPlan;
-  showModal.value = true;
-  modalKey.value++;
-  await nextTick();
+  customServer.value = product === 'custom'
+  selectedProduct.value = selectedPlan
+  showModal.value = true
+  modalKey.value++
+  await nextTick()
 
-  if (product === "custom") {
-    purchaseModal.value?.show(billingPeriod.value, undefined, selectedProjectId.value);
+  if (product === 'custom') {
+    purchaseModal.value?.show(billingPeriod.value, undefined, selectedProjectId.value)
   } else {
-    purchaseModal.value?.show(billingPeriod.value, selectedProduct.value, selectedProjectId.value);
+    purchaseModal.value?.show(billingPeriod.value, selectedProduct.value, selectedProjectId.value)
   }
-};
+}
 
 const planQuery = () => {
   if (route.query.plan) {
-    document.getElementById("plan").scrollIntoView();
-    selectProduct(route.query.plan);
+    document.getElementById('plan').scrollIntoView()
+    selectProduct(route.query.plan)
   }
-};
+}
 
-const regions = ref([]);
-const regionPings = ref([]);
+const regions = ref([])
+const regionPings = ref([])
 
 function pingRegions() {
-  useServersFetch("regions", {
-    method: "GET",
+  useServersFetch('regions', {
+    method: 'GET',
     version: 1,
     bypassAuth: true,
   }).then((res) => {
-    regions.value = res;
+    regions.value = res
     regions.value.forEach((region) => {
-      runPingTest(region);
-    });
-  });
+      runPingTest(region)
+    })
+  })
 }
 
-const PING_COUNT = 20;
-const PING_INTERVAL = 200;
-const MAX_PING_TIME = 1000;
+const PING_COUNT = 20
+const PING_INTERVAL = 200
+const MAX_PING_TIME = 1000
 
 function runPingTest(region, index = 1) {
   if (index > 10) {
     regionPings.value.push({
       region: region.shortcode,
       ping: -1,
-    });
-    return;
+    })
+    return
   }
 
-  const wsUrl = `wss://${region.shortcode}${index}.${region.zone}/pingtest`;
+  const wsUrl = `wss://${region.shortcode}${index}.${region.zone}/pingtest`
   try {
-    const socket = new WebSocket(wsUrl);
-    const pings = [];
+    const socket = new WebSocket(wsUrl)
+    const pings = []
 
     socket.onopen = () => {
       for (let i = 0; i < PING_COUNT; i++) {
         setTimeout(() => {
-          socket.send(performance.now());
-        }, i * PING_INTERVAL);
+          socket.send(performance.now())
+        }, i * PING_INTERVAL)
       }
       setTimeout(
         () => {
-          socket.close();
+          socket.close()
 
-          const median = Math.round([...pings].sort((a, b) => a - b)[Math.floor(pings.length / 2)]);
+          const median = Math.round([...pings].sort((a, b) => a - b)[Math.floor(pings.length / 2)])
           if (median) {
             regionPings.value.push({
               region: region.shortcode,
               ping: median,
-            });
+            })
           }
         },
         PING_COUNT * PING_INTERVAL + MAX_PING_TIME,
-      );
-    };
+      )
+    }
 
     socket.onmessage = (event) => {
-      pings.push(performance.now() - event.data);
-    };
+      pings.push(performance.now() - event.data)
+    }
 
     socket.onerror = (event) => {
       console.error(
         `Failed to connect pingtest WebSocket with ${wsUrl}, trying index ${index + 1}:`,
         event,
-      );
-      runPingTest(region, index + 1);
-    };
+      )
+      runPingTest(region, index + 1)
+    }
   } catch (error) {
-    console.error(`Failed to connect pingtest WebSocket with ${wsUrl}:`, error);
+    console.error(`Failed to connect pingtest WebSocket with ${wsUrl}:`, error)
   }
 }
 
 onMounted(() => {
-  startTyping();
-  planQuery();
-  pingRegions();
-});
+  startTyping()
+  planQuery()
+  pingRegions()
+})
 
 watch(customer, (newCustomer) => {
-  if (newCustomer) planQuery();
-});
+  if (newCustomer) planQuery()
+})
 
 onMounted(() => {
-  document.body.style.background = "var(--color-accent-contrast)";
-  document.body.style.overflowX = "hidden !important";
-  const layoutDiv = document.querySelector(".layout");
+  document.body.style.background = 'var(--color-accent-contrast)'
+  document.body.style.overflowX = 'hidden !important'
+  const layoutDiv = document.querySelector('.layout')
   if (layoutDiv) {
-    layoutDiv.style.background = "var(--color-accent-contrast)";
+    layoutDiv.style.background = 'var(--color-accent-contrast)'
   }
-  fetchPaymentData();
-});
+  fetchPaymentData()
+})
 
 onUnmounted(() => {
-  document.body.style.background = "";
-  document.body.style.overflowX = "";
-  const layoutDiv = document.querySelector(".layout");
+  document.body.style.background = ''
+  document.body.style.overflowX = ''
+  const layoutDiv = document.querySelector('.layout')
   if (layoutDiv) {
-    layoutDiv.style.background = "";
+    layoutDiv.style.background = ''
   }
   if (window.Stripe) {
-    window.Stripe = null;
+    window.Stripe = null
   }
-});
+})
 </script>
 
 <style scoped>

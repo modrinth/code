@@ -46,7 +46,7 @@
           </div>
           <div class="flex flex-grow flex-col">
             <span class="font-extrabold text-contrast">{{
-              file.primary ? "Primary file" : "Supplementary resource"
+              file.primary ? 'Primary file' : 'Supplementary resource'
             }}</span>
             <span class="text-sm font-semibold text-secondary"
               >{{ file.filename }} • {{ formatBytes(file.size) }}</span
@@ -82,83 +82,83 @@ import {
   FileIcon,
   MoreVerticalIcon,
   ShareIcon,
-} from "@modrinth/assets";
-import { ButtonStyled, VersionChannelIndicator } from "@modrinth/ui";
-import { formatBytes, renderHighlightedString } from "@modrinth/utils";
+} from '@modrinth/assets'
+import { ButtonStyled, VersionChannelIndicator } from '@modrinth/ui'
+import { formatBytes, renderHighlightedString } from '@modrinth/utils'
 
-const router = useRouter();
+const router = useRouter()
 
 const props = defineProps<{
-  project: Project;
-  versions: Version[];
-  featuredVersions: Version[];
-  members: User[];
-  currentMember: User;
-  dependencies: Dependency[];
-  resetProject: (opts?: { dedupe?: "cancel" | "defer" }) => Promise<void>;
-}>();
+  project: Project
+  versions: Version[]
+  featuredVersions: Version[]
+  members: User[]
+  currentMember: User
+  dependencies: Dependency[]
+  resetProject: (opts?: { dedupe?: 'cancel' | 'defer' }) => Promise<void>
+}>()
 
 const version = computed(() => {
-  let version: Version | undefined;
+  let version: Version | undefined
 
-  if (route.params.version === "latest") {
-    let versionList = props.versions;
+  if (route.params.version === 'latest') {
+    let versionList = props.versions
     if (route.query.loader) {
-      versionList = versionList.filter((x) => x.loaders.includes(route.query.loader));
+      versionList = versionList.filter((x) => x.loaders.includes(route.query.loader))
     }
     if (route.query.version) {
-      versionList = versionList.filter((x) => x.game_versions.includes(route.query.version));
+      versionList = versionList.filter((x) => x.game_versions.includes(route.query.version))
     }
-    version = versionList.reduce((a, b) => (a.date_published > b.date_published ? a : b));
+    version = versionList.reduce((a, b) => (a.date_published > b.date_published ? a : b))
   } else {
     version = props.versions.find(
       (x) => x.id === route.params.version || x.displayUrlEnding === route.params.version,
-    );
+    )
   }
 
   if (!version) {
     throw createError({
       fatal: true,
       statusCode: 404,
-      message: "Version not found",
-    });
+      message: 'Version not found',
+    })
   }
 
-  return version;
-});
+  return version
+})
 
 // const data = useNuxtApp();
-const route = useNativeRoute();
+const route = useNativeRoute()
 
 // const auth = await useAuth();
 // const tags = useTags();
 
 const versionsListLink = computed(() => {
   if (router.options.history.state.back) {
-    if (router.options.history.state.back.includes("/versions")) {
-      return router.options.history.state.back;
+    if (router.options.history.state.back.includes('/versions')) {
+      return router.options.history.state.back
     }
   }
   return `/${props.project.project_type}/${
     props.project.slug ? props.project.slug : props.project.id
-  }/versions`;
-});
+  }/versions`
+})
 
 const hasBackLink = computed(
   () =>
-    router.options.history.state.back && router.options.history.state.back.endsWith("/versions"),
-);
+    router.options.history.state.back && router.options.history.state.back.endsWith('/versions'),
+)
 
-const { formatMessage } = useVIntl();
+const { formatMessage } = useVIntl()
 const messages = defineMessages({
   backToVersions: {
-    id: "project.version.back-to-versions",
-    defaultMessage: "Back to versions",
+    id: 'project.version.back-to-versions',
+    defaultMessage: 'Back to versions',
   },
   allVersions: {
-    id: "project.version.all-versions",
-    defaultMessage: "All versions",
+    id: 'project.version.all-versions',
+    defaultMessage: 'All versions',
   },
-});
+})
 </script>
 <style lang="scss"></style>

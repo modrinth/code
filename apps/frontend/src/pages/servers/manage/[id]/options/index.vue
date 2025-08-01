@@ -112,226 +112,224 @@
 </template>
 
 <script setup lang="ts">
-import { EditIcon, TransferIcon } from "@modrinth/assets";
-import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
+import { EditIcon, TransferIcon } from '@modrinth/assets'
+import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
 
-import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const props = defineProps<{
-  server: ModrinthServer;
-}>();
+  server: ModrinthServer
+}>()
 
-const data = computed(() => props.server.general);
-const serverName = ref(data.value?.name);
-const serverSubdomain = ref(data.value?.net?.domain ?? "");
-const isValidLengthSubdomain = computed(() => serverSubdomain.value.length >= 5);
-const isValidCharsSubdomain = computed(() => /^[a-zA-Z0-9-]+$/.test(serverSubdomain.value));
-const isValidSubdomain = computed(
-  () => isValidLengthSubdomain.value && isValidCharsSubdomain.value,
-);
-const icon = computed(() => data.value?.image);
+const data = computed(() => props.server.general)
+const serverName = ref(data.value?.name)
+const serverSubdomain = ref(data.value?.net?.domain ?? '')
+const isValidLengthSubdomain = computed(() => serverSubdomain.value.length >= 5)
+const isValidCharsSubdomain = computed(() => /^[a-zA-Z0-9-]+$/.test(serverSubdomain.value))
+const isValidSubdomain = computed(() => isValidLengthSubdomain.value && isValidCharsSubdomain.value)
+const icon = computed(() => data.value?.image)
 
-const isUpdating = ref(false);
+const isUpdating = ref(false)
 const hasUnsavedChanges = computed(
   () =>
     (serverName.value && serverName.value !== data.value?.name) ||
     serverSubdomain.value !== data.value?.net?.domain,
-);
-const isValidServerName = computed(() => (serverName.value?.length ?? 0) > 0);
+)
+const isValidServerName = computed(() => (serverName.value?.length ?? 0) > 0)
 
 watch(serverName, (oldValue) => {
   if (!isValidServerName.value) {
-    serverName.value = oldValue;
+    serverName.value = oldValue
   }
-});
+})
 
 const saveGeneral = async () => {
-  if (!isValidServerName.value || !isValidSubdomain.value) return;
+  if (!isValidServerName.value || !isValidSubdomain.value) return
 
   try {
-    isUpdating.value = true;
+    isUpdating.value = true
     if (serverName.value !== data.value?.name) {
-      await data.value?.updateName(serverName.value ?? "");
+      await data.value?.updateName(serverName.value ?? '')
     }
     if (serverSubdomain.value !== data.value?.net?.domain) {
       try {
         // type shit backend makes me do
         const available = await props.server.network?.checkSubdomainAvailability(
           serverSubdomain.value,
-        );
+        )
 
         if (!available) {
           addNotification({
-            group: "serverOptions",
-            type: "error",
-            title: "Subdomain not available",
-            text: "The subdomain you entered is already in use.",
-          });
-          return;
+            group: 'serverOptions',
+            type: 'error',
+            title: 'Subdomain not available',
+            text: 'The subdomain you entered is already in use.',
+          })
+          return
         }
 
-        await props.server.network?.changeSubdomain(serverSubdomain.value);
+        await props.server.network?.changeSubdomain(serverSubdomain.value)
       } catch (error) {
-        console.error("Error checking subdomain availability:", error);
+        console.error('Error checking subdomain availability:', error)
         addNotification({
-          group: "serverOptions",
-          type: "error",
-          title: "Error checking availability",
-          text: "Failed to verify if the subdomain is available.",
-        });
-        return;
+          group: 'serverOptions',
+          type: 'error',
+          title: 'Error checking availability',
+          text: 'Failed to verify if the subdomain is available.',
+        })
+        return
       }
     }
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    await props.server.refresh();
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    await props.server.refresh()
     addNotification({
-      group: "serverOptions",
-      type: "success",
-      title: "Server settings updated",
-      text: "Your server settings were successfully changed.",
-    });
+      group: 'serverOptions',
+      type: 'success',
+      title: 'Server settings updated',
+      text: 'Your server settings were successfully changed.',
+    })
   } catch (error) {
-    console.error(error);
+    console.error(error)
     addNotification({
-      group: "serverOptions",
-      type: "error",
-      title: "Failed to update server settings",
-      text: "An error occurred while attempting to update your server settings.",
-    });
+      group: 'serverOptions',
+      type: 'error',
+      title: 'Failed to update server settings',
+      text: 'An error occurred while attempting to update your server settings.',
+    })
   } finally {
-    isUpdating.value = false;
+    isUpdating.value = false
   }
-};
+}
 
 const resetGeneral = () => {
-  serverName.value = data.value?.name || "";
-  serverSubdomain.value = data.value?.net?.domain ?? "";
-};
+  serverName.value = data.value?.name || ''
+  serverSubdomain.value = data.value?.net?.domain ?? ''
+}
 
 const uploadFile = async (e: Event) => {
-  const file = (e.target as HTMLInputElement).files?.[0];
+  const file = (e.target as HTMLInputElement).files?.[0]
   if (!file) {
     addNotification({
-      group: "serverOptions",
-      type: "error",
-      title: "No file selected",
-      text: "Please select a file to upload.",
-    });
-    return;
+      group: 'serverOptions',
+      type: 'error',
+      title: 'No file selected',
+      text: 'Please select a file to upload.',
+    })
+    return
   }
 
   const scaledFile = await new Promise<File>((resolve, reject) => {
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    const img = new Image();
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    const img = new Image()
     img.onload = () => {
-      canvas.width = 64;
-      canvas.height = 64;
-      ctx?.drawImage(img, 0, 0, 64, 64);
+      canvas.width = 64
+      canvas.height = 64
+      ctx?.drawImage(img, 0, 0, 64, 64)
       canvas.toBlob((blob) => {
         if (blob) {
-          resolve(new File([blob], "server-icon.png", { type: "image/png" }));
+          resolve(new File([blob], 'server-icon.png', { type: 'image/png' }))
         } else {
-          reject(new Error("Canvas toBlob failed"));
+          reject(new Error('Canvas toBlob failed'))
         }
-      }, "image/png");
-      URL.revokeObjectURL(img.src);
-    };
-    img.onerror = reject;
-    img.src = URL.createObjectURL(file);
-  });
+      }, 'image/png')
+      URL.revokeObjectURL(img.src)
+    }
+    img.onerror = reject
+    img.src = URL.createObjectURL(file)
+  })
 
   try {
     if (data.value?.image) {
-      await props.server.fs?.deleteFileOrFolder("/server-icon.png", false);
-      await props.server.fs?.deleteFileOrFolder("/server-icon-original.png", false);
+      await props.server.fs?.deleteFileOrFolder('/server-icon.png', false)
+      await props.server.fs?.deleteFileOrFolder('/server-icon-original.png', false)
     }
 
-    await props.server.fs?.uploadFile("/server-icon.png", scaledFile);
-    await props.server.fs?.uploadFile("/server-icon-original.png", file);
+    await props.server.fs?.uploadFile('/server-icon.png', scaledFile)
+    await props.server.fs?.uploadFile('/server-icon-original.png', file)
 
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    const img = new Image();
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    const img = new Image()
     await new Promise<void>((resolve) => {
       img.onload = () => {
-        canvas.width = 512;
-        canvas.height = 512;
-        ctx?.drawImage(img, 0, 0, 512, 512);
-        const dataURL = canvas.toDataURL("image/png");
-        useState(`server-icon-${props.server.serverId}`).value = dataURL;
-        if (data.value) data.value.image = dataURL;
-        resolve();
-        URL.revokeObjectURL(img.src);
-      };
-      img.src = URL.createObjectURL(file);
-    });
+        canvas.width = 512
+        canvas.height = 512
+        ctx?.drawImage(img, 0, 0, 512, 512)
+        const dataURL = canvas.toDataURL('image/png')
+        useState(`server-icon-${props.server.serverId}`).value = dataURL
+        if (data.value) data.value.image = dataURL
+        resolve()
+        URL.revokeObjectURL(img.src)
+      }
+      img.src = URL.createObjectURL(file)
+    })
 
     addNotification({
-      group: "serverOptions",
-      type: "success",
-      title: "Server icon updated",
-      text: "Your server icon was successfully changed.",
-    });
+      group: 'serverOptions',
+      type: 'success',
+      title: 'Server icon updated',
+      text: 'Your server icon was successfully changed.',
+    })
   } catch (error) {
-    console.error("Error uploading icon:", error);
+    console.error('Error uploading icon:', error)
     addNotification({
-      group: "serverOptions",
-      type: "error",
-      title: "Upload failed",
-      text: "Failed to upload server icon.",
-    });
+      group: 'serverOptions',
+      type: 'error',
+      title: 'Upload failed',
+      text: 'Failed to upload server icon.',
+    })
   }
-};
+}
 
 const resetIcon = async () => {
   if (data.value?.image) {
     try {
-      await props.server.fs?.deleteFileOrFolder("/server-icon.png", false);
-      await props.server.fs?.deleteFileOrFolder("/server-icon-original.png", false);
+      await props.server.fs?.deleteFileOrFolder('/server-icon.png', false)
+      await props.server.fs?.deleteFileOrFolder('/server-icon-original.png', false)
 
-      useState(`server-icon-${props.server.serverId}`).value = undefined;
-      if (data.value) data.value.image = undefined;
+      useState(`server-icon-${props.server.serverId}`).value = undefined
+      if (data.value) data.value.image = undefined
 
-      await props.server.refresh(["general"]);
+      await props.server.refresh(['general'])
 
       addNotification({
-        group: "serverOptions",
-        type: "success",
-        title: "Server icon reset",
-        text: "Your server icon was successfully reset.",
-      });
+        group: 'serverOptions',
+        type: 'success',
+        title: 'Server icon reset',
+        text: 'Your server icon was successfully reset.',
+      })
     } catch (error) {
-      console.error("Error resetting icon:", error);
+      console.error('Error resetting icon:', error)
       addNotification({
-        group: "serverOptions",
-        type: "error",
-        title: "Reset failed",
-        text: "Failed to reset server icon.",
-      });
+        group: 'serverOptions',
+        type: 'error',
+        title: 'Reset failed',
+        text: 'Failed to reset server icon.',
+      })
     }
   }
-};
+}
 
 const onDragOver = (e: DragEvent) => {
-  e.preventDefault();
-};
+  e.preventDefault()
+}
 
 const onDragLeave = (e: DragEvent) => {
-  e.preventDefault();
-};
+  e.preventDefault()
+}
 
 const onDrop = (e: DragEvent) => {
-  e.preventDefault();
-  uploadFile(e);
-};
+  e.preventDefault()
+  uploadFile(e)
+}
 
 const triggerFileInput = () => {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.id = "server-icon-field";
-  input.accept = "image/png,image/jpeg,image/gif,image/webp";
-  input.onchange = uploadFile;
-  input.click();
-};
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.id = 'server-icon-field'
+  input.accept = 'image/png,image/jpeg,image/gif,image/webp'
+  input.onchange = uploadFile
+  input.click()
+}
 </script>

@@ -162,31 +162,31 @@
 </template>
 
 <script lang="ts" setup>
-import { formatDate, formatMoney } from "@modrinth/utils";
-import dayjs from "dayjs";
-import { computed, ref } from "vue";
+import { formatDate, formatMoney } from '@modrinth/utils'
+import dayjs from 'dayjs'
+import { computed, ref } from 'vue'
 
 const description =
-  "Information about the Rewards Program of Modrinth, an open source modding platform focused on Minecraft.";
+  'Information about the Rewards Program of Modrinth, an open source modding platform focused on Minecraft.'
 
 useSeoMeta({
-  title: "Rewards Program Information - Modrinth",
+  title: 'Rewards Program Information - Modrinth',
   description,
-  ogTitle: "Rewards Program Information",
+  ogTitle: 'Rewards Program Information',
   ogDescription: description,
-});
+})
 
-const rawSelectedDate = ref(dayjs().format("YYYY-MM-DD"));
-const selectedDate = computed(() => dayjs(rawSelectedDate.value));
-const endOfMonthDate = computed(() => selectedDate.value.endOf("month"));
-const withdrawalDate = computed(() => endOfMonthDate.value.add(60, "days"));
+const rawSelectedDate = ref(dayjs().format('YYYY-MM-DD'))
+const selectedDate = computed(() => dayjs(rawSelectedDate.value))
+const endOfMonthDate = computed(() => selectedDate.value.endOf('month'))
+const withdrawalDate = computed(() => endOfMonthDate.value.add(60, 'days'))
 
-const { data: transparencyInformation } = await useAsyncData("payout/platform_revenue", () =>
-  useBaseFetch("payout/platform_revenue", {
+const { data: transparencyInformation } = await useAsyncData('payout/platform_revenue', () =>
+  useBaseFetch('payout/platform_revenue', {
     apiVersion: 3,
   }),
-);
+)
 
-const platformRevenue = (transparencyInformation.value as any)?.all_time;
-const platformRevenueData = (transparencyInformation.value as any)?.data?.slice(0, 5) ?? [];
+const platformRevenue = (transparencyInformation.value as any)?.all_time
+const platformRevenueData = (transparencyInformation.value as any)?.data?.slice(0, 5) ?? []
 </script>

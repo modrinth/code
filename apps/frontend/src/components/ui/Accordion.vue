@@ -19,43 +19,43 @@
 </template>
 
 <script setup lang="ts">
-import { DropdownIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+import { DropdownIcon } from '@modrinth/assets'
+import { ButtonStyled } from '@modrinth/ui'
 
 const props = withDefaults(
   defineProps<{
-    openByDefault?: boolean;
-    type?: "standard" | "outlined" | "transparent";
+    openByDefault?: boolean
+    type?: 'standard' | 'outlined' | 'transparent'
   }>(),
   {
-    type: "standard",
+    type: 'standard',
     openByDefault: false,
   },
-);
+)
 
-const isOpen = ref(props.openByDefault);
-const emit = defineEmits(["onOpen", "onClose"]);
+const isOpen = ref(props.openByDefault)
+const emit = defineEmits(['onOpen', 'onClose'])
 
-const slots = useSlots();
+const slots = useSlots()
 
 function open() {
-  isOpen.value = true;
-  emit("onOpen");
+  isOpen.value = true
+  emit('onOpen')
 }
 function close() {
-  isOpen.value = false;
-  emit("onClose");
+  isOpen.value = false
+  emit('onClose')
 }
 
 defineExpose({
   open,
   close,
   isOpen,
-});
+})
 
 defineOptions({
   inheritAttrs: false,
-});
+})
 </script>
 <style scoped>
 .accordion-content {

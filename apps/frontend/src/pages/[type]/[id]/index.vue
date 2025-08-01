@@ -7,32 +7,32 @@
 </template>
 
 <script setup>
-import { ProjectPageDescription } from "@modrinth/ui";
+import { ProjectPageDescription } from '@modrinth/ui'
 
 defineProps({
   project: {
     type: Object,
     default() {
-      return {};
+      return {}
     },
   },
   versions: {
     type: Array,
     default() {
-      return {};
+      return {}
     },
   },
   members: {
     type: Array,
     default() {
-      return {};
+      return {}
     },
   },
   organization: {
     type: Object,
     default() {
-      return {};
+      return {}
     },
   },
-});
+})
 </script>

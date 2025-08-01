@@ -17,69 +17,69 @@
 </template>
 
 <script setup lang="ts">
-import { Chips } from "@modrinth/ui";
-import { defineMessages, useVIntl } from "@vintl/vintl";
+import { Chips } from '@modrinth/ui'
+import { defineMessages, useVIntl } from '@vintl/vintl'
 
-import NavTabs from "@/components/ui/NavTabs.vue";
+import NavTabs from '@/components/ui/NavTabs.vue'
 
 definePageMeta({
-  middleware: "auth",
-});
+  middleware: 'auth',
+})
 
-const { formatMessage } = useVIntl();
-const route = useRoute();
-const router = useRouter();
+const { formatMessage } = useVIntl()
+const route = useRoute()
+const router = useRouter()
 
 const messages = defineMessages({
   projectsTitle: {
-    id: "moderation.page.projects",
-    defaultMessage: "Projects",
+    id: 'moderation.page.projects',
+    defaultMessage: 'Projects',
   },
   technicalReviewTitle: {
-    id: "moderation.page.technicalReview",
-    defaultMessage: "Technical Review",
+    id: 'moderation.page.technicalReview',
+    defaultMessage: 'Technical Review',
   },
   reportsTitle: {
-    id: "moderation.page.reports",
-    defaultMessage: "Reports",
+    id: 'moderation.page.reports',
+    defaultMessage: 'Reports',
   },
-});
+})
 
 const moderationLinks = [
-  { label: formatMessage(messages.projectsTitle), href: "/moderation" },
-  { label: formatMessage(messages.technicalReviewTitle), href: "/moderation/technical-review" },
-  { label: formatMessage(messages.reportsTitle), href: "/moderation/reports" },
-];
+  { label: formatMessage(messages.projectsTitle), href: '/moderation' },
+  { label: formatMessage(messages.technicalReviewTitle), href: '/moderation/technical-review' },
+  { label: formatMessage(messages.reportsTitle), href: '/moderation/reports' },
+]
 
 const mobileNavOptions = [
   formatMessage(messages.projectsTitle),
   formatMessage(messages.technicalReviewTitle),
   formatMessage(messages.reportsTitle),
-];
+]
 
 const selectedChip = computed({
   get() {
-    const path = route.path;
-    if (path === "/moderation/technical-review") {
-      return formatMessage(messages.technicalReviewTitle);
-    } else if (path.startsWith("/moderation/reports/")) {
-      return formatMessage(messages.reportsTitle);
+    const path = route.path
+    if (path === '/moderation/technical-review') {
+      return formatMessage(messages.technicalReviewTitle)
+    } else if (path.startsWith('/moderation/reports/')) {
+      return formatMessage(messages.reportsTitle)
     } else {
-      return formatMessage(messages.projectsTitle);
+      return formatMessage(messages.projectsTitle)
     }
   },
   set(value: string) {
-    navigateToPage(value);
+    navigateToPage(value)
   },
-});
+})
 
 function navigateToPage(selectedOption: string) {
   if (selectedOption === formatMessage(messages.technicalReviewTitle)) {
-    router.push("/moderation/technical-review");
+    router.push('/moderation/technical-review')
   } else if (selectedOption === formatMessage(messages.reportsTitle)) {
-    router.push("/moderation/reports");
+    router.push('/moderation/reports')
   } else {
-    router.push("/moderation");
+    router.push('/moderation')
   }
 }
 </script>

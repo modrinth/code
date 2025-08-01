@@ -80,11 +80,11 @@
         class="btn btn-primary"
         @click="
           () => {
-            name = null;
-            scopesVal = 0;
-            expires = null;
-            editPatIndex = null;
-            $refs.patModal.show();
+            name = null
+            scopesVal = 0
+            expires = null
+            editPatIndex = null
+            $refs.patModal.show()
           }
         "
       >
@@ -176,11 +176,11 @@
           class="iconified-button raised-button"
           @click="
             () => {
-              editPatIndex = index;
-              name = pat.name;
-              scopesVal = pat.scopes;
-              expires = $dayjs(pat.expires).format('YYYY-MM-DD');
-              $refs.patModal.show();
+              editPatIndex = index
+              name = pat.name
+              scopesVal = pat.scopes
+              expires = $dayjs(pat.expires).format('YYYY-MM-DD')
+              $refs.patModal.show()
             }
           "
         >
@@ -190,8 +190,8 @@
           class="iconified-button raised-button"
           @click="
             () => {
-              deletePatIndex = pat.id;
-              $refs.modal_confirm.show();
+              deletePatIndex = pat.id
+              $refs.modal_confirm.show()
             }
           "
         >
@@ -202,7 +202,7 @@
   </div>
 </template>
 <script setup>
-import { EditIcon, PlusIcon, SaveIcon,TrashIcon, XIcon } from "@modrinth/assets";
+import { EditIcon, PlusIcon, SaveIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import {
   Checkbox,
   commonMessages,
@@ -210,195 +210,195 @@ import {
   ConfirmModal,
   CopyCode,
   useRelativeTime,
-} from "@modrinth/ui";
+} from '@modrinth/ui'
 
-import Modal from "~/components/ui/Modal.vue";
+import Modal from '~/components/ui/Modal.vue'
 import {
   getScopeValue,
   hasScope,
   scopeList,
   toggleScope,
   useScopes,
-} from "~/composables/auth/scopes.ts";
+} from '~/composables/auth/scopes.ts'
 
-const { formatMessage } = useVIntl();
+const { formatMessage } = useVIntl()
 
-const formatRelativeTime = useRelativeTime();
+const formatRelativeTime = useRelativeTime()
 
 const createModalMessages = defineMessages({
   createTitle: {
-    id: "settings.pats.modal.create.title",
-    defaultMessage: "Create personal access token",
+    id: 'settings.pats.modal.create.title',
+    defaultMessage: 'Create personal access token',
   },
   editTitle: {
-    id: "settings.pats.modal.edit.title",
-    defaultMessage: "Edit personal access token",
+    id: 'settings.pats.modal.edit.title',
+    defaultMessage: 'Edit personal access token',
   },
   nameLabel: {
-    id: "settings.pats.modal.create.name.label",
-    defaultMessage: "Name",
+    id: 'settings.pats.modal.create.name.label',
+    defaultMessage: 'Name',
   },
   namePlaceholder: {
-    id: "settings.pats.modal.create.name.placeholder",
+    id: 'settings.pats.modal.create.name.placeholder',
     defaultMessage: "Enter the PAT's name...",
   },
   expiresLabel: {
-    id: "settings.pats.modal.create.expires.label",
-    defaultMessage: "Expires",
+    id: 'settings.pats.modal.create.expires.label',
+    defaultMessage: 'Expires',
   },
   action: {
-    id: "settings.pats.modal.create.action",
-    defaultMessage: "Create PAT",
+    id: 'settings.pats.modal.create.action',
+    defaultMessage: 'Create PAT',
   },
-});
+})
 
 const deleteModalMessages = defineMessages({
   title: {
-    id: "settings.pats.modal.delete.title",
-    defaultMessage: "Are you sure you want to delete this token?",
+    id: 'settings.pats.modal.delete.title',
+    defaultMessage: 'Are you sure you want to delete this token?',
   },
   description: {
-    id: "settings.pats.modal.delete.description",
-    defaultMessage: "This will remove this token forever (like really forever).",
+    id: 'settings.pats.modal.delete.description',
+    defaultMessage: 'This will remove this token forever (like really forever).',
   },
   action: {
-    id: "settings.pats.modal.delete.action",
-    defaultMessage: "Delete this token",
+    id: 'settings.pats.modal.delete.action',
+    defaultMessage: 'Delete this token',
   },
-});
+})
 
 const messages = defineMessages({
   description: {
-    id: "settings.pats.description",
+    id: 'settings.pats.description',
     defaultMessage:
       "PATs can be used to access Modrinth's API. For more information, see <doc-link>Modrinth's API documentation</doc-link>. They can be created and revoked at any time.",
   },
   create: {
-    id: "settings.pats.action.create",
-    defaultMessage: "Create a PAT",
+    id: 'settings.pats.action.create',
+    defaultMessage: 'Create a PAT',
   },
-});
+})
 
 const tokenMessages = defineMessages({
   edit: {
-    id: "settings.pats.token.action.edit",
-    defaultMessage: "Edit token",
+    id: 'settings.pats.token.action.edit',
+    defaultMessage: 'Edit token',
   },
   revoke: {
-    id: "settings.pats.token.action.revoke",
-    defaultMessage: "Revoke token",
+    id: 'settings.pats.token.action.revoke',
+    defaultMessage: 'Revoke token',
   },
   lastUsed: {
-    id: "settings.pats.token.last-used",
-    defaultMessage: "Last used {ago}",
+    id: 'settings.pats.token.last-used',
+    defaultMessage: 'Last used {ago}',
   },
   neverUsed: {
-    id: "settings.pats.token.never-used",
-    defaultMessage: "Never used",
+    id: 'settings.pats.token.never-used',
+    defaultMessage: 'Never used',
   },
   expiresIn: {
-    id: "settings.pats.token.expires-in",
-    defaultMessage: "Expires {inTime}",
+    id: 'settings.pats.token.expires-in',
+    defaultMessage: 'Expires {inTime}',
   },
   expiredAgo: {
-    id: "settings.pats.token.expired-ago",
-    defaultMessage: "Expired {ago}",
+    id: 'settings.pats.token.expired-ago',
+    defaultMessage: 'Expired {ago}',
   },
-});
+})
 
 definePageMeta({
-  middleware: "auth",
-});
+  middleware: 'auth',
+})
 
 useHead({
   title: `${formatMessage(commonSettingsMessages.pats)} - Modrinth`,
-});
+})
 
-const data = useNuxtApp();
-const { scopesToLabels } = useScopes();
-const patModal = ref();
+const data = useNuxtApp()
+const { scopesToLabels } = useScopes()
+const patModal = ref()
 
-const editPatIndex = ref(null);
+const editPatIndex = ref(null)
 
-const name = ref(null);
-const scopesVal = ref(BigInt(0));
-const expires = ref(null);
+const name = ref(null)
+const scopesVal = ref(BigInt(0))
+const expires = ref(null)
 
-const deletePatIndex = ref(null);
+const deletePatIndex = ref(null)
 
-const loading = ref(false);
+const loading = ref(false)
 
-const { data: pats, refresh } = await useAsyncData("pat", () => useBaseFetch("pat"));
+const { data: pats, refresh } = await useAsyncData('pat', () => useBaseFetch('pat'))
 
 async function createPat() {
-  startLoading();
-  loading.value = true;
+  startLoading()
+  loading.value = true
   try {
-    const res = await useBaseFetch("pat", {
-      method: "POST",
+    const res = await useBaseFetch('pat', {
+      method: 'POST',
       body: {
         name: name.value,
         scopes: Number(scopesVal.value),
         expires: data.$dayjs(expires.value).toISOString(),
       },
-    });
-    pats.value.push(res);
-    patModal.value.hide();
+    })
+    pats.value.push(res)
+    patModal.value.hide()
   } catch (err) {
     data.$notify({
-      group: "main",
+      group: 'main',
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  loading.value = false;
-  stopLoading();
+  loading.value = false
+  stopLoading()
 }
 
 async function editPat() {
-  startLoading();
-  loading.value = true;
+  startLoading()
+  loading.value = true
   try {
     await useBaseFetch(`pat/${pats.value[editPatIndex.value].id}`, {
-      method: "PATCH",
+      method: 'PATCH',
       body: {
         name: name.value,
         scopes: Number(scopesVal.value),
         expires: data.$dayjs(expires.value).toISOString(),
       },
-    });
-    await refresh();
-    patModal.value.hide();
+    })
+    await refresh()
+    patModal.value.hide()
   } catch (err) {
     data.$notify({
-      group: "main",
+      group: 'main',
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  loading.value = false;
-  stopLoading();
+  loading.value = false
+  stopLoading()
 }
 
 async function removePat(id) {
-  startLoading();
+  startLoading()
   try {
-    pats.value = pats.value.filter((x) => x.id !== id);
+    pats.value = pats.value.filter((x) => x.id !== id)
     await useBaseFetch(`pat/${id}`, {
-      method: "DELETE",
-    });
-    await refresh();
+      method: 'DELETE',
+    })
+    await refresh()
   } catch (err) {
     data.$notify({
-      group: "main",
+      group: 'main',
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  stopLoading();
+  stopLoading()
 }
 </script>
 <style lang="scss" scoped>

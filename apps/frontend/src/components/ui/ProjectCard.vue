@@ -90,11 +90,11 @@
 </template>
 
 <script>
-import { CalendarIcon, DownloadIcon, HeartIcon,UpdatedIcon } from "@modrinth/assets";
-import { Avatar, ProjectStatusBadge, useRelativeTime } from "@modrinth/ui";
+import { CalendarIcon, DownloadIcon, HeartIcon, UpdatedIcon } from '@modrinth/assets'
+import { Avatar, ProjectStatusBadge, useRelativeTime } from '@modrinth/ui'
 
-import EnvironmentIndicator from "~/components/ui/EnvironmentIndicator.vue";
-import Categories from "~/components/ui/search/Categories.vue";
+import EnvironmentIndicator from '~/components/ui/EnvironmentIndicator.vue'
+import Categories from '~/components/ui/search/Categories.vue'
 
 export default {
   components: {
@@ -110,15 +110,15 @@ export default {
   props: {
     id: {
       type: String,
-      default: "modrinth-0",
+      default: 'modrinth-0',
     },
     type: {
       type: String,
-      default: "mod",
+      default: 'mod',
     },
     name: {
       type: String,
-      default: "Project Name",
+      default: 'Project Name',
     },
     author: {
       type: String,
@@ -126,11 +126,11 @@ export default {
     },
     description: {
       type: String,
-      default: "A _type description",
+      default: 'A _type description',
     },
     iconUrl: {
       type: String,
-      default: "#",
+      default: '#',
       required: false,
     },
     downloads: {
@@ -145,7 +145,7 @@ export default {
     },
     createdAt: {
       type: String,
-      default: "0000-00-00",
+      default: '0000-00-00',
     },
     updatedAt: {
       type: String,
@@ -154,7 +154,7 @@ export default {
     categories: {
       type: Array,
       default() {
-        return [];
+        return []
       },
     },
     status: {
@@ -168,12 +168,12 @@ export default {
     serverSide: {
       type: String,
       required: false,
-      default: "",
+      default: '',
     },
     clientSide: {
       type: String,
       required: false,
-      default: "",
+      default: '',
     },
     moderation: {
       type: Boolean,
@@ -212,26 +212,26 @@ export default {
     },
   },
   setup() {
-    const tags = useTags();
-    const formatRelativeTime = useRelativeTime();
+    const tags = useTags()
+    const formatRelativeTime = useRelativeTime()
 
-    return { tags, formatRelativeTime };
+    return { tags, formatRelativeTime }
   },
   computed: {
     projectTypeDisplay() {
-      return this.$getProjectTypeForDisplay(this.type, this.categories);
+      return this.$getProjectTypeForDisplay(this.type, this.categories)
     },
     toColor() {
-      let color = this.color;
+      let color = this.color
 
-      color >>>= 0;
-      const b = color & 0xff;
-      const g = (color & 0xff00) >>> 8;
-      const r = (color & 0xff0000) >>> 16;
-      return "rgba(" + [r, g, b, 1].join(",") + ")";
+      color >>>= 0
+      const b = color & 0xff
+      const g = (color & 0xff00) >>> 8
+      const r = (color & 0xff0000) >>> 16
+      return 'rgba(' + [r, g, b, 1].join(',') + ')'
     },
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>
@@ -244,9 +244,9 @@ export default {
 
 .display-mode--list .project-card {
   grid-template:
-    "icon title stats"
-    "icon description stats"
-    "icon tags stats";
+    'icon title stats'
+    'icon description stats'
+    'icon tags stats';
   grid-template-columns: min-content 1fr auto;
   grid-template-rows: min-content 1fr min-content;
   column-gap: var(--spacing-card-md);
@@ -255,20 +255,20 @@ export default {
 
   @media screen and (max-width: 750px) {
     grid-template:
-      "icon title"
-      "icon description"
-      "icon tags"
-      "stats stats";
+      'icon title'
+      'icon description'
+      'icon tags'
+      'stats stats';
     grid-template-columns: min-content auto;
     grid-template-rows: min-content 1fr min-content min-content;
   }
 
   @media screen and (max-width: 550px) {
     grid-template:
-      "icon title"
-      "icon description"
-      "tags tags"
-      "stats stats";
+      'icon title'
+      'icon description'
+      'tags tags'
+      'stats stats';
     grid-template-columns: min-content auto;
     grid-template-rows: min-content 1fr min-content min-content;
   }
@@ -277,7 +277,7 @@ export default {
 .display-mode--gallery .project-card,
 .display-mode--grid .project-card {
   padding: 0 0 var(--spacing-card-bg) 0;
-  grid-template: "gallery gallery" "icon title" "description  description" "tags tags" "stats stats";
+  grid-template: 'gallery gallery' 'icon title' 'description  description' 'tags tags' 'stats stats';
   grid-template-columns: min-content 1fr;
   grid-template-rows: min-content min-content 1fr min-content min-content;
   row-gap: var(--spacing-card-sm);
@@ -501,10 +501,10 @@ export default {
 .small-mode {
   @media screen and (min-width: 750px) {
     grid-template:
-      "icon title"
-      "icon description"
-      "icon tags"
-      "stats stats" !important;
+      'icon title'
+      'icon description'
+      'icon tags'
+      'stats stats' !important;
     grid-template-columns: min-content auto !important;
     grid-template-rows: min-content 1fr min-content min-content !important;
 

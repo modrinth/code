@@ -39,7 +39,7 @@
             style="min-height: 20px; min-width: 20px; height: 20px; width: 20px"
             alt="Server Icon"
           />
-          Using {{ projectData?.title || "Unknown" }}
+          Using {{ projectData?.title || 'Unknown' }}
         </div>
         <div v-else class="min-h-[20px]"></div>
 
@@ -101,37 +101,37 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronRightIcon, LockIcon, SparklesIcon } from "@modrinth/assets";
-import { Avatar, CopyCode } from "@modrinth/ui";
-import type { Project, Server } from "@modrinth/utils";
+import { ChevronRightIcon, LockIcon, SparklesIcon } from '@modrinth/assets'
+import { Avatar, CopyCode } from '@modrinth/ui'
+import type { Project, Server } from '@modrinth/utils'
 
-import { useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
+import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'
 
-const props = defineProps<Partial<Server>>();
+const props = defineProps<Partial<Server>>()
 
-if (props.server_id && props.status === "available") {
+if (props.server_id && props.status === 'available') {
   // Necessary only to get server icon
-  await useModrinthServers(props.server_id, ["general"]);
+  await useModrinthServers(props.server_id, ['general'])
 }
 
-const showGameLabel = computed(() => !!props.game);
-const showLoaderLabel = computed(() => !!props.loader);
+const showGameLabel = computed(() => !!props.game)
+const showLoaderLabel = computed(() => !!props.loader)
 
-let projectData: Ref<Project | null>;
+let projectData: Ref<Project | null>
 if (props.upstream) {
   const { data } = await useAsyncData<Project>(
     `server-project-${props.server_id}`,
     async (): Promise<Project> => {
-      const result = await useBaseFetch(`project/${props.upstream?.project_id}`);
-      return result as Project;
+      const result = await useBaseFetch(`project/${props.upstream?.project_id}`)
+      return result as Project
     },
-  );
-  projectData = data;
+  )
+  projectData = data
 } else {
-  projectData = ref(null);
+  projectData = ref(null)
 }
 
-const image = useState<string | undefined>(`server-icon-${props.server_id}`, () => undefined);
-const iconUrl = computed(() => projectData.value?.icon_url || undefined);
-const isConfiguring = computed(() => props.flows?.intro);
+const image = useState<string | undefined>(`server-icon-${props.server_id}`, () => undefined)
+const iconUrl = computed(() => projectData.value?.icon_url || undefined)
+const isConfiguring = computed(() => props.flows?.intro)
 </script>

@@ -134,13 +134,13 @@
         class="btn btn-primary"
         @click="
           () => {
-            name = null;
-            icon = null;
-            scopesVal = 0;
-            redirectUris = [''];
-            editingId = null;
-            expires = null;
-            $refs.appModal.show();
+            name = null
+            icon = null
+            scopesVal = 0
+            redirectUris = ['']
+            editingId = null
+            expires = null
+            $refs.appModal.show()
           }
         "
       >
@@ -189,8 +189,8 @@
               setForm({
                 ...app,
                 redirect_uris: app.redirect_uris.map((u) => u.uri) || [],
-              });
-              $refs.appModal.show();
+              })
+              $refs.appModal.show()
             }
           "
         >
@@ -202,8 +202,8 @@
           icon-only
           @click="
             () => {
-              editingId = app.id;
-              $refs.modal_confirm.show();
+              editingId = app.id
+              $refs.modal_confirm.show()
             }
           "
         >
@@ -215,7 +215,7 @@
   </div>
 </template>
 <script setup>
-import { EditIcon, PlusIcon, SaveIcon,TrashIcon, UploadIcon, XIcon } from "@modrinth/assets";
+import { EditIcon, PlusIcon, SaveIcon, TrashIcon, UploadIcon, XIcon } from '@modrinth/assets'
 import {
   Avatar,
   Button,
@@ -224,50 +224,50 @@ import {
   ConfirmModal,
   CopyCode,
   FileInput,
-} from "@modrinth/ui";
+} from '@modrinth/ui'
 
-import Modal from "~/components/ui/Modal.vue";
+import Modal from '~/components/ui/Modal.vue'
 import {
   getScopeValue,
   hasScope,
   scopeList,
   toggleScope,
   useScopes,
-} from "~/composables/auth/scopes.ts";
+} from '~/composables/auth/scopes.ts'
 
-const { formatMessage } = useVIntl();
+const { formatMessage } = useVIntl()
 
 definePageMeta({
-  middleware: "auth",
-});
+  middleware: 'auth',
+})
 
 useHead({
-  title: "Applications - Modrinth",
-});
+  title: 'Applications - Modrinth',
+})
 
-const data = useNuxtApp();
-const { scopesToLabels } = useScopes();
+const data = useNuxtApp()
+const { scopesToLabels } = useScopes()
 
-const appModal = ref();
+const appModal = ref()
 
 // Any apps created in the current state will be stored here
 // Users can copy Client Secrets and such before the page reloads
-const createdApps = ref([]);
+const createdApps = ref([])
 
-const editingId = ref(null);
-const name = ref(null);
-const icon = ref(null);
-const scopesVal = ref(BigInt(0));
-const redirectUris = ref([""]);
-const url = ref(null);
-const description = ref(null);
+const editingId = ref(null)
+const name = ref(null)
+const icon = ref(null)
+const scopesVal = ref(BigInt(0))
+const redirectUris = ref([''])
+const url = ref(null)
+const description = ref(null)
 
-const loading = ref(false);
+const loading = ref(false)
 
-const auth = await useAuth();
+const auth = await useAuth()
 
 const { data: usersApps, refresh } = await useAsyncData(
-  "usersApps",
+  'usersApps',
   () =>
     useBaseFetch(`user/${auth.value.user.id}/oauth_apps`, {
       apiVersion: 3,
@@ -275,89 +275,89 @@ const { data: usersApps, refresh } = await useAsyncData(
   {
     watch: [auth],
   },
-);
+)
 
 const setForm = (app) => {
   if (app?.id) {
-    editingId.value = app.id;
+    editingId.value = app.id
   } else {
-    editingId.value = null;
+    editingId.value = null
   }
-  name.value = app?.name || "";
-  icon.value = app?.icon_url || "";
-  scopesVal.value = app?.max_scopes || BigInt(0);
-  url.value = app?.url || "";
-  description.value = app?.description || "";
+  name.value = app?.name || ''
+  icon.value = app?.icon_url || ''
+  scopesVal.value = app?.max_scopes || BigInt(0)
+  url.value = app?.url || ''
+  description.value = app?.description || ''
 
   if (app?.redirect_uris) {
-    redirectUris.value = app.redirect_uris.map((uri) => uri?.uri || uri);
+    redirectUris.value = app.redirect_uris.map((uri) => uri?.uri || uri)
   } else {
-    redirectUris.value = [""];
+    redirectUris.value = ['']
   }
-};
+}
 
 const canSubmit = computed(() => {
   // Make sure name, scopes, and return uri are at least filled in
   const filledIn =
-    name.value && name.value !== "" && name.value?.length > 2 && redirectUris.value.length > 0;
+    name.value && name.value !== '' && name.value?.length > 2 && redirectUris.value.length > 0
   // Make sure the redirect uris are either one empty string or all filled in with valid urls
-  const oneValid = redirectUris.value.length === 1 && redirectUris.value[0] === "";
-  let allValid;
+  const oneValid = redirectUris.value.length === 1 && redirectUris.value[0] === ''
+  let allValid
   try {
     allValid = redirectUris.value.every((uri) => {
-      const url = new URL(uri);
-      return !!url;
-    });
+      const url = new URL(uri)
+      return !!url
+    })
   } catch {
-    allValid = false;
+    allValid = false
   }
-  return filledIn && (oneValid || allValid);
-});
+  return filledIn && (oneValid || allValid)
+})
 
 const clientCreatedInState = (id) => {
-  return createdApps.value.find((app) => app.id === id);
-};
+  return createdApps.value.find((app) => app.id === id)
+}
 
 async function onImageSelection(files) {
   if (!editingId.value) {
-    throw new Error("No editing id");
+    throw new Error('No editing id')
   }
 
   if (files.length > 0) {
-    const file = files[0];
-    const extFromType = file.type.split("/")[1];
+    const file = files[0]
+    const extFromType = file.type.split('/')[1]
 
-    await useBaseFetch("oauth/app/" + editingId.value + "/icon", {
-      method: "PATCH",
+    await useBaseFetch('oauth/app/' + editingId.value + '/icon', {
+      method: 'PATCH',
       internal: true,
       body: file,
       query: {
         ext: extFromType,
       },
-    });
+    })
 
-    await refresh();
+    await refresh()
 
-    const app = usersApps.value.find((app) => app.id === editingId.value);
+    const app = usersApps.value.find((app) => app.id === editingId.value)
     if (app) {
-      setForm(app);
+      setForm(app)
     }
 
     data.$notify({
-      group: "main",
-      title: "Icon updated",
-      text: "Your application icon has been updated.",
-      type: "success",
-    });
+      group: 'main',
+      title: 'Icon updated',
+      text: 'Your application icon has been updated.',
+      type: 'success',
+    })
   }
 }
 
 async function createApp() {
-  startLoading();
-  loading.value = true;
+  startLoading()
+  loading.value = true
   try {
-    const createdAppInfo = await useBaseFetch("oauth/app", {
-      method: "POST",
+    const createdAppInfo = await useBaseFetch('oauth/app', {
+      method: 'POST',
       internal: true,
       body: {
         name: name.value,
@@ -365,38 +365,38 @@ async function createApp() {
         max_scopes: Number(scopesVal.value), // JS is 52 bit for ints so we're good for now
         redirect_uris: redirectUris.value,
       },
-    });
+    })
 
-    createdApps.value.push(createdAppInfo);
+    createdApps.value.push(createdAppInfo)
 
-    setForm(null);
-    appModal.value.hide();
+    setForm(null)
+    appModal.value.hide()
 
-    await refresh();
+    await refresh()
   } catch (err) {
     data.$notify({
-      group: "main",
-      title: "An error occurred",
+      group: 'main',
+      title: 'An error occurred',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  loading.value = false;
-  stopLoading();
+  loading.value = false
+  stopLoading()
 }
 
 async function editApp() {
-  startLoading();
-  loading.value = true;
+  startLoading()
+  loading.value = true
   try {
     if (!editingId.value) {
-      throw new Error("No editing id");
+      throw new Error('No editing id')
     }
 
     // check if there's any difference between the current app and the one in the state
-    const app = usersApps.value.find((app) => app.id === editingId.value);
+    const app = usersApps.value.find((app) => app.id === editingId.value)
     if (!app) {
-      throw new Error("No app found");
+      throw new Error('No app found')
     }
 
     if (
@@ -407,74 +407,74 @@ async function editApp() {
       app.url === url.value &&
       app.description === description.value
     ) {
-      setForm(null);
-      editingId.value = null;
-      appModal.value.hide();
-      throw new Error("No changes detected");
+      setForm(null)
+      editingId.value = null
+      appModal.value.hide()
+      throw new Error('No changes detected')
     }
 
     const body = {
       name: name.value,
       max_scopes: Number(scopesVal.value), // JS is 52 bit for ints so we're good for now
       redirect_uris: redirectUris.value,
-    };
+    }
 
     if (url.value && url.value?.length > 0) {
-      body.url = url.value;
+      body.url = url.value
     }
 
     if (description.value && description.value?.length > 0) {
-      body.description = description.value;
+      body.description = description.value
     }
 
     if (icon.value && icon.value?.length > 0) {
-      body.icon_url = icon.value;
+      body.icon_url = icon.value
     }
 
-    await useBaseFetch("oauth/app/" + editingId.value, {
-      method: "PATCH",
+    await useBaseFetch('oauth/app/' + editingId.value, {
+      method: 'PATCH',
       internal: true,
       body,
-    });
+    })
 
-    await refresh();
-    setForm(null);
-    editingId.value = null;
+    await refresh()
+    setForm(null)
+    editingId.value = null
 
-    appModal.value.hide();
+    appModal.value.hide()
   } catch (err) {
     data.$notify({
-      group: "main",
-      title: "An error occurred",
+      group: 'main',
+      title: 'An error occurred',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  loading.value = false;
-  stopLoading();
+  loading.value = false
+  stopLoading()
 }
 
 async function removeApp() {
-  startLoading();
+  startLoading()
   try {
     if (!editingId.value) {
-      throw new Error("No editing id");
+      throw new Error('No editing id')
     }
     await useBaseFetch(`oauth/app/${editingId.value}`, {
       internal: true,
-      method: "DELETE",
-    });
-    await refresh();
-    editingId.value = null;
+      method: 'DELETE',
+    })
+    await refresh()
+    editingId.value = null
   } catch (err) {
     data.$notify({
-      group: "main",
-      title: "An error occurred",
+      group: 'main',
+      title: 'An error occurred',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  stopLoading();
+  stopLoading()
 }
 </script>
 <style lang="scss" scoped>

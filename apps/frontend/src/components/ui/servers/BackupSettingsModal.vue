@@ -40,7 +40,7 @@
           <ButtonStyled color="brand">
             <button :disabled="!hasChanges || isSaving" @click="saveSettings">
               <SaveIcon class="h-5 w-5" />
-              {{ isSaving ? "Saving..." : "Save changes" }}
+              {{ isSaving ? 'Saving...' : 'Save changes' }}
             </button>
           </ButtonStyled>
           <ButtonStyled>
@@ -56,114 +56,114 @@
 </template>
 
 <script setup lang="ts">
-import { SaveIcon,XIcon } from "@modrinth/assets";
-import { ButtonStyled, NewModal } from "@modrinth/ui";
-import { computed,ref } from "vue";
+import { SaveIcon, XIcon } from '@modrinth/assets'
+import { ButtonStyled, NewModal } from '@modrinth/ui'
+import { computed, ref } from 'vue'
 
-import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const props = defineProps<{
-  server: ModrinthServer;
-}>();
+  server: ModrinthServer
+}>()
 
-const modal = ref<InstanceType<typeof NewModal>>();
+const modal = ref<InstanceType<typeof NewModal>>()
 
-const initialSettings = ref<{ interval: number; enabled: boolean } | null>(null);
-const autoBackupEnabled = ref(false);
-const isLoadingSettings = ref(true);
-const isSaving = ref(false);
+const initialSettings = ref<{ interval: number; enabled: boolean } | null>(null)
+const autoBackupEnabled = ref(false)
+const isLoadingSettings = ref(true)
+const isSaving = ref(false)
 
 const backupIntervals = {
-  "Every 3 hours": 3,
-  "Every 6 hours": 6,
-  "Every 12 hours": 12,
+  'Every 3 hours': 3,
+  'Every 6 hours': 6,
+  'Every 12 hours': 12,
   Daily: 24,
-};
+}
 
-const backupIntervalsLabel = ref<keyof typeof backupIntervals>("Every 6 hours");
+const backupIntervalsLabel = ref<keyof typeof backupIntervals>('Every 6 hours')
 
 const autoBackupInterval = computed({
   get: () => backupIntervals[backupIntervalsLabel.value],
   set: (value) => {
     const [label] =
-      Object.entries(backupIntervals).find(([_, interval]) => interval === value) || [];
-    if (label) backupIntervalsLabel.value = label as keyof typeof backupIntervals;
+      Object.entries(backupIntervals).find(([_, interval]) => interval === value) || []
+    if (label) backupIntervalsLabel.value = label as keyof typeof backupIntervals
   },
-});
+})
 
 const hasChanges = computed(() => {
-  if (!initialSettings.value) return false;
+  if (!initialSettings.value) return false
 
   return (
     autoBackupEnabled.value !== initialSettings.value.enabled ||
     (initialSettings.value.enabled && autoBackupInterval.value !== initialSettings.value.interval)
-  );
-});
+  )
+})
 
 const fetchSettings = async () => {
-  isLoadingSettings.value = true;
+  isLoadingSettings.value = true
   try {
-    const settings = await props.server.backups?.getAutoBackup();
-    initialSettings.value = settings as { interval: number; enabled: boolean };
-    autoBackupEnabled.value = settings?.enabled ?? false;
-    autoBackupInterval.value = settings?.interval || 6;
-    return true;
+    const settings = await props.server.backups?.getAutoBackup()
+    initialSettings.value = settings as { interval: number; enabled: boolean }
+    autoBackupEnabled.value = settings?.enabled ?? false
+    autoBackupInterval.value = settings?.interval || 6
+    return true
   } catch (error) {
-    console.error("Error fetching backup settings:", error);
+    console.error('Error fetching backup settings:', error)
     addNotification({
-      group: "server",
-      title: "Error",
-      text: "Failed to load backup settings",
-      type: "error",
-    });
-    return false;
+      group: 'server',
+      title: 'Error',
+      text: 'Failed to load backup settings',
+      type: 'error',
+    })
+    return false
   } finally {
-    isLoadingSettings.value = false;
+    isLoadingSettings.value = false
   }
-};
+}
 
 const saveSettings = async () => {
-  isSaving.value = true;
+  isSaving.value = true
   try {
     await props.server.backups?.updateAutoBackup(
-      autoBackupEnabled.value ? "enable" : "disable",
+      autoBackupEnabled.value ? 'enable' : 'disable',
       autoBackupInterval.value,
-    );
+    )
 
     initialSettings.value = {
       enabled: autoBackupEnabled.value,
       interval: autoBackupInterval.value,
-    };
+    }
 
     addNotification({
-      group: "server",
-      title: "Success",
-      text: "Backup settings updated successfully",
-      type: "success",
-    });
+      group: 'server',
+      title: 'Success',
+      text: 'Backup settings updated successfully',
+      type: 'success',
+    })
 
-    modal.value?.hide();
+    modal.value?.hide()
   } catch (error) {
-    console.error("Error saving backup settings:", error);
+    console.error('Error saving backup settings:', error)
     addNotification({
-      group: "server",
-      title: "Error",
-      text: "Failed to save backup settings",
-      type: "error",
-    });
+      group: 'server',
+      title: 'Error',
+      text: 'Failed to save backup settings',
+      type: 'error',
+    })
   } finally {
-    isSaving.value = false;
+    isSaving.value = false
   }
-};
+}
 
 defineExpose({
   show: async () => {
-    const success = await fetchSettings();
+    const success = await fetchSettings()
     if (success) {
-      modal.value?.show();
+      modal.value?.show()
     }
   },
-});
+})
 </script>
 
 <style scoped>

@@ -304,28 +304,28 @@
 </template>
 
 <script setup lang="ts">
-import { DownloadIcon,UpdatedIcon } from "@modrinth/assets";
-import { Button, Card, DropdownSelect } from "@modrinth/ui";
-import { formatCategoryHeader,formatMoney, formatNumber } from "@modrinth/utils";
-import dayjs from "dayjs";
-import { computed } from "vue";
+import { DownloadIcon, UpdatedIcon } from '@modrinth/assets'
+import { Button, Card, DropdownSelect } from '@modrinth/ui'
+import { formatCategoryHeader, formatMoney, formatNumber } from '@modrinth/utils'
+import dayjs from 'dayjs'
+import { computed } from 'vue'
 
-import { UiChartsChart as Chart,UiChartsCompactChart as CompactChart } from "#components";
-import PaletteIcon from "~/assets/icons/palette.svg?component";
-import { analyticsSetToCSVString, intToRgba } from "~/utils/analytics.js";
+import { UiChartsChart as Chart, UiChartsCompactChart as CompactChart } from '#components'
+import PaletteIcon from '~/assets/icons/palette.svg?component'
+import { analyticsSetToCSVString, intToRgba } from '~/utils/analytics.js'
 
-const router = useNativeRouter();
-const theme = useTheme();
+const router = useNativeRouter()
+const theme = useTheme()
 
 const props = withDefaults(
   defineProps<{
-    projects?: any[];
+    projects?: any[]
     /**
      * @deprecated Use `ranges` instead
      */
-    resoloutions?: Record<string, number>;
-    ranges?: RangeObject[];
-    personal?: boolean;
+    resoloutions?: Record<string, number>
+    ranges?: RangeObject[]
+    personal?: boolean
   }>(),
   {
     projects: undefined,
@@ -333,19 +333,19 @@ const props = withDefaults(
     ranges: () => defaultRanges,
     personal: false,
   },
-);
+)
 
-const projects = ref(props.projects || []);
+const projects = ref(props.projects || [])
 
 // const selectedChart = ref('downloads')
 const selectedChart = computed({
   get: () => {
-    const id = (router.currentRoute.value.query?.chart as string | undefined) || "downloads";
+    const id = (router.currentRoute.value.query?.chart as string | undefined) || 'downloads'
     // if the id is anything but the 3 charts we have or undefined, throw an error
-    if (!["downloads", "views", "revenue"].includes(id)) {
-      throw new Error(`Unknown chart ${id}`);
+    if (!['downloads', 'views', 'revenue'].includes(id)) {
+      throw new Error(`Unknown chart ${id}`)
     }
-    return id;
+    return id
   },
   set: (chart) => {
     router.push({
@@ -353,119 +353,119 @@ const selectedChart = computed({
         ...router.currentRoute.value.query,
         chart,
       },
-    });
+    })
   },
-});
+})
 
 // Chart refs
-const downloadsChart = ref();
-const viewsChart = ref();
-const revenueChart = ref();
-const tinyDownloadChart = ref();
-const tinyViewChart = ref();
-const tinyRevenueChart = ref();
+const downloadsChart = ref()
+const viewsChart = ref()
+const revenueChart = ref()
+const tinyDownloadChart = ref()
+const tinyViewChart = ref()
+const tinyRevenueChart = ref()
 
-const selectedDisplayProjects = ref(props.projects || []);
+const selectedDisplayProjects = ref(props.projects || [])
 
 const removeProjectFromDisplay = (id: string) => {
-  selectedDisplayProjects.value = selectedDisplayProjects.value.filter((p) => p.id !== id);
-};
+  selectedDisplayProjects.value = selectedDisplayProjects.value.filter((p) => p.id !== id)
+}
 
 const addProjectToDisplay = (id: string) => {
   selectedDisplayProjects.value = [
     ...selectedDisplayProjects.value,
     props.projects?.find((p) => p.id === id),
-  ].filter(Boolean);
-};
+  ].filter(Boolean)
+}
 
 const projectIsOnDisplay = (id: string) => {
-  return selectedDisplayProjects.value?.some((p) => p.id === id) ?? false;
-};
+  return selectedDisplayProjects.value?.some((p) => p.id === id) ?? false
+}
 
 const resetCharts = () => {
-  downloadsChart.value?.resetChart();
-  viewsChart.value?.resetChart();
-  revenueChart.value?.resetChart();
+  downloadsChart.value?.resetChart()
+  viewsChart.value?.resetChart()
+  revenueChart.value?.resetChart()
 
-  tinyDownloadChart.value?.resetChart();
-  tinyViewChart.value?.resetChart();
-  tinyRevenueChart.value?.resetChart();
-};
+  tinyDownloadChart.value?.resetChart()
+  tinyViewChart.value?.resetChart()
+  tinyRevenueChart.value?.resetChart()
+}
 
 const isUsingProjectColors = computed({
   get: () => {
     return (
-      router.currentRoute.value.query?.colors === "true" ||
+      router.currentRoute.value.query?.colors === 'true' ||
       router.currentRoute.value.query?.colors === undefined
-    );
+    )
   },
   set: (newValue) => {
     router.push({
       query: {
         ...router.currentRoute.value.query,
-        colors: newValue ? "true" : "false",
+        colors: newValue ? 'true' : 'false',
       },
-    });
+    })
   },
-});
+})
 
-const startDate = ref(dayjs().startOf("day"));
-const endDate = ref(dayjs().endOf("day"));
-const timeResolution = ref(30);
+const startDate = ref(dayjs().startOf('day'))
+const endDate = ref(dayjs().endOf('day'))
+const timeResolution = ref(30)
 
 onBeforeMount(() => {
   // Load cached data and range from localStorage - cache.
   if (import.meta.client) {
-    const rangeLabel = localStorage.getItem("analyticsSelectedRange");
+    const rangeLabel = localStorage.getItem('analyticsSelectedRange')
     if (rangeLabel) {
-      const range = props.ranges.find((r) => r.getLabel([dayjs(), dayjs()]) === rangeLabel)!;
+      const range = props.ranges.find((r) => r.getLabel([dayjs(), dayjs()]) === rangeLabel)!
 
       if (range !== undefined) {
-        internalRange.value = range;
-        const ranges = range.getDates(dayjs());
-        timeResolution.value = range.timeResolution;
-        startDate.value = ranges.startDate;
-        endDate.value = ranges.endDate;
+        internalRange.value = range
+        const ranges = range.getDates(dayjs())
+        timeResolution.value = range.timeResolution
+        startDate.value = ranges.startDate
+        endDate.value = ranges.endDate
       }
     }
   }
-});
+})
 
 onMounted(() => {
   if (internalRange.value === null) {
     internalRange.value = props.ranges.find(
-      (r) => r.getLabel([dayjs(), dayjs()]) === "Previous 30 days",
-    )!;
+      (r) => r.getLabel([dayjs(), dayjs()]) === 'Previous 30 days',
+    )!
   }
 
-  const ranges = selectedRange.value.getDates(dayjs());
-  startDate.value = ranges.startDate;
-  endDate.value = ranges.endDate;
-  timeResolution.value = selectedRange.value.timeResolution;
-});
+  const ranges = selectedRange.value.getDates(dayjs())
+  startDate.value = ranges.startDate
+  endDate.value = ranges.endDate
+  timeResolution.value = selectedRange.value.timeResolution
+})
 
-const internalRange: Ref<RangeObject> = ref(null as unknown as RangeObject);
+const internalRange: Ref<RangeObject> = ref(null as unknown as RangeObject)
 
 const selectedRange = computed({
   get: () => {
-    return internalRange.value;
+    return internalRange.value
   },
   set: (newRange) => {
-    const ranges = newRange.getDates(dayjs());
-    startDate.value = ranges.startDate;
-    endDate.value = ranges.endDate;
-    timeResolution.value = newRange.timeResolution;
+    const ranges = newRange.getDates(dayjs())
+    startDate.value = ranges.startDate
+    endDate.value = ranges.endDate
+    timeResolution.value = newRange.timeResolution
 
-    internalRange.value = newRange;
+    internalRange.value = newRange
 
     if (import.meta.client) {
       localStorage.setItem(
-        "analyticsSelectedRange",
-        internalRange.value?.getLabel([dayjs(), dayjs()]) ?? "Previous 30 days",
-      );
+        'analyticsSelectedRange',
+        internalRange.value?.getLabel([dayjs(), dayjs()]) ?? 'Previous 30 days',
+      )
     }
   },
-});
+})
 
 const analytics = useFetchAllAnalytics(
   resetCharts,
@@ -475,53 +475,53 @@ const analytics = useFetchAllAnalytics(
   startDate,
   endDate,
   timeResolution,
-);
+)
 
 const formattedCategorySubtitle = computed(() => {
   return (
-    selectedRange.value?.getLabel([dayjs(startDate.value), dayjs(endDate.value)]) ?? "Loading..."
-  );
-});
+    selectedRange.value?.getLabel([dayjs(startDate.value), dayjs(endDate.value)]) ?? 'Loading...'
+  )
+})
 
 const selectedDataSet = computed(() => {
   switch (selectedChart.value) {
-    case "downloads":
-      return analytics.totalData.value.downloads;
-    case "views":
-      return analytics.totalData.value.views;
-    case "revenue":
-      return analytics.totalData.value.revenue;
+    case 'downloads':
+      return analytics.totalData.value.downloads
+    case 'views':
+      return analytics.totalData.value.views
+    case 'revenue':
+      return analytics.totalData.value.revenue
     default:
-      throw new Error(`Unknown chart ${selectedChart.value}`);
+      throw new Error(`Unknown chart ${selectedChart.value}`)
   }
-});
+})
 const selectedDataSetProjects = computed(() => {
   return selectedDataSet.value.projectIds
     .map((id) => props.projects?.find((p) => p?.id === id))
-    .filter(Boolean);
-});
+    .filter(Boolean)
+})
 
 const downloadSelectedSetAsCSV = () => {
-  const selectedChartName = selectedChart.value;
+  const selectedChartName = selectedChart.value
 
-  const csv = analyticsSetToCSVString(selectedDataSet.value);
+  const csv = analyticsSetToCSVString(selectedDataSet.value)
 
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
 
-  const link = document.createElement("a");
-  const url = URL.createObjectURL(blob);
-  link.setAttribute("href", url);
-  link.setAttribute("download", `${selectedChartName}-data.csv`);
-  link.style.visibility = "hidden";
-  document.body.appendChild(link);
+  const link = document.createElement('a')
+  const url = URL.createObjectURL(blob)
+  link.setAttribute('href', url)
+  link.setAttribute('download', `${selectedChartName}-data.csv`)
+  link.style.visibility = 'hidden'
+  document.body.appendChild(link)
 
-  link.click();
-};
+  link.click()
+}
 
-const onDownloadSetAsCSV = useClientTry(async () => await downloadSelectedSetAsCSV());
+const onDownloadSetAsCSV = useClientTry(async () => await downloadSelectedSetAsCSV())
 const onToggleColors = () => {
-  isUsingProjectColors.value = !isUsingProjectColors.value;
-};
+  isUsingProjectColors.value = !isUsingProjectColors.value
+}
 </script>
 
 <script lang="ts">
@@ -529,177 +529,177 @@ const onToggleColors = () => {
  * @deprecated Use `ranges` instead
  */
 const defaultResoloutions: Record<string, number> = {
-  "5 minutes": 5,
-  "30 minutes": 30,
-  "An hour": 60,
-  "12 hours": 720,
-  "A day": 1440,
-  "A week": 10080,
-};
+  '5 minutes': 5,
+  '30 minutes': 30,
+  'An hour': 60,
+  '12 hours': 720,
+  'A day': 1440,
+  'A week': 10080,
+}
 
-type DateRange = { startDate: dayjs.Dayjs; endDate: dayjs.Dayjs };
+type DateRange = { startDate: dayjs.Dayjs; endDate: dayjs.Dayjs }
 
 type RangeObject = {
-  getLabel: (dateRange: [dayjs.Dayjs, dayjs.Dayjs]) => string;
-  getDates: (currentDate: dayjs.Dayjs) => DateRange;
+  getLabel: (dateRange: [dayjs.Dayjs, dayjs.Dayjs]) => string
+  getDates: (currentDate: dayjs.Dayjs) => DateRange
   // A time resolution in minutes.
-  timeResolution: number;
-};
+  timeResolution: number
+}
 
 const defaultRanges: RangeObject[] = [
   {
-    getLabel: () => "Previous 30 minutes",
+    getLabel: () => 'Previous 30 minutes',
     getDates: (currentDate: dayjs.Dayjs) => ({
-      startDate: dayjs(currentDate).subtract(30, "minute"),
+      startDate: dayjs(currentDate).subtract(30, 'minute'),
       endDate: currentDate,
     }),
     timeResolution: 1,
   },
   {
-    getLabel: () => "Previous hour",
+    getLabel: () => 'Previous hour',
     getDates: (currentDate: dayjs.Dayjs) => ({
-      startDate: dayjs(currentDate).subtract(1, "hour"),
+      startDate: dayjs(currentDate).subtract(1, 'hour'),
       endDate: currentDate,
     }),
     timeResolution: 5,
   },
   {
-    getLabel: () => "Previous 12 hours",
+    getLabel: () => 'Previous 12 hours',
     getDates: (currentDate: dayjs.Dayjs) => ({
-      startDate: dayjs(currentDate).subtract(12, "hour"),
+      startDate: dayjs(currentDate).subtract(12, 'hour'),
       endDate: currentDate,
     }),
     timeResolution: 12,
   },
   {
-    getLabel: () => "Previous 24 hours",
+    getLabel: () => 'Previous 24 hours',
     getDates: (currentDate: dayjs.Dayjs) => ({
-      startDate: dayjs(currentDate).subtract(1, "day"),
+      startDate: dayjs(currentDate).subtract(1, 'day'),
       endDate: currentDate,
     }),
     timeResolution: 30,
   },
   {
-    getLabel: () => "Today",
+    getLabel: () => 'Today',
     getDates: (currentDate: dayjs.Dayjs) => ({
-      startDate: dayjs(currentDate).startOf("day"),
+      startDate: dayjs(currentDate).startOf('day'),
       endDate: currentDate,
     }),
     timeResolution: 30,
   },
   {
-    getLabel: () => "Yesterday",
+    getLabel: () => 'Yesterday',
     getDates: (currentDate: dayjs.Dayjs) => ({
-      startDate: dayjs(currentDate).subtract(1, "day").startOf("day"),
-      endDate: dayjs(currentDate).startOf("day").subtract(1, "second"),
+      startDate: dayjs(currentDate).subtract(1, 'day').startOf('day'),
+      endDate: dayjs(currentDate).startOf('day').subtract(1, 'second'),
     }),
     timeResolution: 30,
   },
   {
-    getLabel: () => "This week",
+    getLabel: () => 'This week',
     getDates: (currentDate: dayjs.Dayjs) => ({
-      startDate: dayjs(currentDate).startOf("week").add(1, "hour"),
+      startDate: dayjs(currentDate).startOf('week').add(1, 'hour'),
       endDate: currentDate,
     }),
     timeResolution: 360,
   },
   {
-    getLabel: () => "Last week",
+    getLabel: () => 'Last week',
     getDates: (currentDate: dayjs.Dayjs) => ({
-      startDate: dayjs(currentDate).subtract(1, "week").startOf("week").add(1, "hour"),
-      endDate: dayjs(currentDate).startOf("week").subtract(1, "second"),
+      startDate: dayjs(currentDate).subtract(1, 'week').startOf('week').add(1, 'hour'),
+      endDate: dayjs(currentDate).startOf('week').subtract(1, 'second'),
     }),
     timeResolution: 1440,
   },
   {
-    getLabel: () => "Previous 7 days",
+    getLabel: () => 'Previous 7 days',
     getDates: (currentDate: dayjs.Dayjs) => ({
-      startDate: dayjs(currentDate).startOf("day").subtract(7, "day").add(1, "hour"),
-      endDate: currentDate.startOf("day"),
+      startDate: dayjs(currentDate).startOf('day').subtract(7, 'day').add(1, 'hour'),
+      endDate: currentDate.startOf('day'),
     }),
     timeResolution: 720,
   },
   {
-    getLabel: () => "This month",
+    getLabel: () => 'This month',
     getDates: (currentDate: dayjs.Dayjs) => ({
-      startDate: dayjs(currentDate).startOf("month").add(1, "hour"),
+      startDate: dayjs(currentDate).startOf('month').add(1, 'hour'),
       endDate: currentDate,
     }),
     timeResolution: 1440,
   },
   {
-    getLabel: () => "Last month",
+    getLabel: () => 'Last month',
     getDates: (currentDate: dayjs.Dayjs) => ({
-      startDate: dayjs(currentDate).subtract(1, "month").startOf("month").add(1, "hour"),
-      endDate: dayjs(currentDate).startOf("month").subtract(1, "second"),
+      startDate: dayjs(currentDate).subtract(1, 'month').startOf('month').add(1, 'hour'),
+      endDate: dayjs(currentDate).startOf('month').subtract(1, 'second'),
     }),
     timeResolution: 1440,
   },
   {
-    getLabel: () => "Previous 30 days",
+    getLabel: () => 'Previous 30 days',
     getDates: (currentDate: dayjs.Dayjs) => ({
-      startDate: dayjs(currentDate).startOf("day").subtract(30, "day").add(1, "hour"),
-      endDate: currentDate.startOf("day"),
+      startDate: dayjs(currentDate).startOf('day').subtract(30, 'day').add(1, 'hour'),
+      endDate: currentDate.startOf('day'),
     }),
     timeResolution: 1440,
   },
   {
-    getLabel: () => "This quarter",
+    getLabel: () => 'This quarter',
     getDates: (currentDate: dayjs.Dayjs) => ({
-      startDate: dayjs(currentDate).startOf("quarter").add(1, "hour"),
+      startDate: dayjs(currentDate).startOf('quarter').add(1, 'hour'),
       endDate: currentDate,
     }),
     timeResolution: 1440,
   },
   {
-    getLabel: () => "Last quarter",
+    getLabel: () => 'Last quarter',
     getDates: (currentDate: dayjs.Dayjs) => ({
-      startDate: dayjs(currentDate).subtract(1, "quarter").startOf("quarter").add(1, "hour"),
-      endDate: dayjs(currentDate).startOf("quarter").subtract(1, "second"),
+      startDate: dayjs(currentDate).subtract(1, 'quarter').startOf('quarter').add(1, 'hour'),
+      endDate: dayjs(currentDate).startOf('quarter').subtract(1, 'second'),
     }),
     timeResolution: 1440,
   },
   {
-    getLabel: () => "This year",
+    getLabel: () => 'This year',
     getDates: (currentDate: dayjs.Dayjs) => ({
-      startDate: dayjs(currentDate).startOf("year"),
+      startDate: dayjs(currentDate).startOf('year'),
       endDate: currentDate,
     }),
     timeResolution: 20160,
   },
   {
-    getLabel: () => "Last year",
+    getLabel: () => 'Last year',
     getDates: (currentDate: dayjs.Dayjs) => ({
-      startDate: dayjs(currentDate).subtract(1, "year").startOf("year"),
-      endDate: dayjs(currentDate).startOf("year").subtract(1, "second"),
+      startDate: dayjs(currentDate).subtract(1, 'year').startOf('year'),
+      endDate: dayjs(currentDate).startOf('year').subtract(1, 'second'),
     }),
     timeResolution: 20160,
   },
   {
-    getLabel: () => "Previous year",
+    getLabel: () => 'Previous year',
     getDates: (currentDate: dayjs.Dayjs) => ({
-      startDate: dayjs(currentDate).subtract(1, "year"),
+      startDate: dayjs(currentDate).subtract(1, 'year'),
       endDate: dayjs(currentDate),
     }),
     timeResolution: 40320,
   },
   {
-    getLabel: () => "Previous two years",
+    getLabel: () => 'Previous two years',
     getDates: (currentDate: dayjs.Dayjs) => ({
-      startDate: dayjs(currentDate).subtract(2, "year"),
+      startDate: dayjs(currentDate).subtract(2, 'year'),
       endDate: currentDate,
     }),
     timeResolution: 40320,
   },
   {
-    getLabel: () => "All Time",
+    getLabel: () => 'All Time',
     getDates: (currentDate: dayjs.Dayjs) => ({
       startDate: dayjs(0),
       endDate: currentDate,
     }),
     timeResolution: 40320,
   },
-];
+]
 </script>
 
 <style scoped lang="scss">
@@ -885,7 +885,7 @@ const defaultRanges: RangeObject[] = [
 
 .country-value {
   display: grid;
-  grid-template-areas: "flag text bar";
+  grid-template-areas: 'flag text bar';
   grid-template-columns: auto 1fr 10rem;
   align-items: center;
   justify-content: space-between;

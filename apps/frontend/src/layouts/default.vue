@@ -532,8 +532,8 @@
             :title="formatMessage(commonMessages.notificationsLabel)"
             @click="
               () => {
-                isMobileMenuOpen = false;
-                isBrowseMenuOpen = false;
+                isMobileMenuOpen = false
+                isBrowseMenuOpen = false
               }
             "
           >
@@ -704,7 +704,7 @@ import {
   TwitterIcon,
   UserIcon,
   XIcon,
-} from "@modrinth/assets";
+} from '@modrinth/assets'
 import {
   Avatar,
   Button,
@@ -712,250 +712,250 @@ import {
   commonMessages,
   OverflowMenu,
   PagewideBanner,
-} from "@modrinth/ui";
-import { isAdmin, isStaff } from "@modrinth/utils";
+} from '@modrinth/ui'
+import { isAdmin, isStaff } from '@modrinth/utils'
 
-import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
-import ModalCreation from "~/components/ui/ModalCreation.vue";
-import OrganizationCreateModal from "~/components/ui/OrganizationCreateModal.vue";
-import TeleportOverflowMenu from "~/components/ui/servers/TeleportOverflowMenu.vue";
-import { errors as generatedStateErrors } from "~/generated/state.json";
-import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
+import CollectionCreateModal from '~/components/ui/CollectionCreateModal.vue'
+import ModalCreation from '~/components/ui/ModalCreation.vue'
+import OrganizationCreateModal from '~/components/ui/OrganizationCreateModal.vue'
+import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
+import { errors as generatedStateErrors } from '~/generated/state.json'
+import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 
-const { formatMessage } = useVIntl();
+const { formatMessage } = useVIntl()
 
-const app = useNuxtApp();
-const auth = await useAuth();
-const user = await useUser();
+const app = useNuxtApp()
+const auth = await useAuth()
+const user = await useUser()
 
-const cosmetics = useCosmetics();
-const flags = useFeatureFlags();
+const cosmetics = useCosmetics()
+const flags = useFeatureFlags()
 
-const config = useRuntimeConfig();
-const route = useNativeRoute();
-const router = useNativeRouter();
-const link = config.public.siteUrl + route.path.replace(/\/+$/, "");
+const config = useRuntimeConfig()
+const route = useNativeRoute()
+const router = useNativeRouter()
+const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
 
-const basePopoutId = useId();
+const basePopoutId = useId()
 
 const verifyEmailBannerMessages = defineMessages({
   title: {
-    id: "layout.banner.account-action",
-    defaultMessage: "Account action required",
+    id: 'layout.banner.account-action',
+    defaultMessage: 'Account action required',
   },
   description: {
-    id: "layout.banner.verify-email.description",
+    id: 'layout.banner.verify-email.description',
     defaultMessage:
-      "For security reasons, Modrinth needs you to verify the email address associated with your account.",
+      'For security reasons, Modrinth needs you to verify the email address associated with your account.',
   },
   action: {
-    id: "layout.banner.verify-email.action",
-    defaultMessage: "Re-send verification email",
+    id: 'layout.banner.verify-email.action',
+    defaultMessage: 'Re-send verification email',
   },
-});
+})
 
 const addEmailBannerMessages = defineMessages({
   title: {
-    id: "layout.banner.account-action",
-    defaultMessage: "Account action required",
+    id: 'layout.banner.account-action',
+    defaultMessage: 'Account action required',
   },
   description: {
-    id: "layout.banner.add-email.description",
+    id: 'layout.banner.add-email.description',
     defaultMessage:
-      "For security reasons, Modrinth needs you to register an email address to your account.",
+      'For security reasons, Modrinth needs you to register an email address to your account.',
   },
   action: {
-    id: "layout.banner.add-email.button",
-    defaultMessage: "Visit account settings",
+    id: 'layout.banner.add-email.button',
+    defaultMessage: 'Visit account settings',
   },
-});
+})
 
 const subscriptionPaymentFailedBannerMessages = defineMessages({
   title: {
-    id: "layout.banner.subscription-payment-failed.title",
-    defaultMessage: "Billing action required.",
+    id: 'layout.banner.subscription-payment-failed.title',
+    defaultMessage: 'Billing action required.',
   },
   description: {
-    id: "layout.banner.subscription-payment-failed.description",
+    id: 'layout.banner.subscription-payment-failed.description',
     defaultMessage:
-      "One or more subscriptions failed to renew. Please update your payment method to prevent losing access!",
+      'One or more subscriptions failed to renew. Please update your payment method to prevent losing access!',
   },
   action: {
-    id: "layout.banner.subscription-payment-failed.button",
-    defaultMessage: "Update billing info",
+    id: 'layout.banner.subscription-payment-failed.button',
+    defaultMessage: 'Update billing info',
   },
-});
+})
 
 const stagingBannerMessages = defineMessages({
   title: {
-    id: "layout.banner.staging.title",
-    defaultMessage: "You’re viewing Modrinth’s staging environment",
+    id: 'layout.banner.staging.title',
+    defaultMessage: 'You’re viewing Modrinth’s staging environment',
   },
   description: {
-    id: "layout.banner.staging.description",
+    id: 'layout.banner.staging.description',
     defaultMessage:
-      "The staging environment is completely separate from the production Modrinth database. This is used for testing and debugging purposes, and may be running in-development versions of the Modrinth backend or frontend newer than the production instance.",
+      'The staging environment is completely separate from the production Modrinth database. This is used for testing and debugging purposes, and may be running in-development versions of the Modrinth backend or frontend newer than the production instance.',
   },
-});
+})
 
 const failedToBuildBannerMessages = defineMessages({
   title: {
-    id: "layout.banner.build-fail.title",
-    defaultMessage: "Error generating state from API when building.",
+    id: 'layout.banner.build-fail.title',
+    defaultMessage: 'Error generating state from API when building.',
   },
   description: {
-    id: "layout.banner.build-fail.description",
+    id: 'layout.banner.build-fail.description',
     defaultMessage:
       "This deploy of Modrinth's frontend failed to generate state from the API. This may be due to an outage or an error in configuration. Rebuild when the API is available. Error codes: {errors}; Current API URL is: {url}",
   },
-});
+})
 
 const navMenuMessages = defineMessages({
   home: {
-    id: "layout.nav.home",
-    defaultMessage: "Home",
+    id: 'layout.nav.home',
+    defaultMessage: 'Home',
   },
   search: {
-    id: "layout.nav.search",
-    defaultMessage: "Search",
+    id: 'layout.nav.search',
+    defaultMessage: 'Search',
   },
-});
+})
 
 const messages = defineMessages({
   toggleMenu: {
-    id: "layout.menu-toggle.action",
-    defaultMessage: "Toggle menu",
+    id: 'layout.menu-toggle.action',
+    defaultMessage: 'Toggle menu',
   },
   yourAvatarAlt: {
-    id: "layout.avatar.alt",
-    defaultMessage: "Your avatar",
+    id: 'layout.avatar.alt',
+    defaultMessage: 'Your avatar',
   },
   getModrinthApp: {
-    id: "layout.action.get-modrinth-app",
-    defaultMessage: "Get Modrinth App",
+    id: 'layout.action.get-modrinth-app',
+    defaultMessage: 'Get Modrinth App',
   },
   changeTheme: {
-    id: "layout.action.change-theme",
-    defaultMessage: "Change theme",
+    id: 'layout.action.change-theme',
+    defaultMessage: 'Change theme',
   },
-});
+})
 
 const footerMessages = defineMessages({
   openSource: {
-    id: "layout.footer.open-source",
-    defaultMessage: "Modrinth is <github-link>open source</github-link>.",
+    id: 'layout.footer.open-source',
+    defaultMessage: 'Modrinth is <github-link>open source</github-link>.',
   },
   legalDisclaimer: {
-    id: "layout.footer.legal-disclaimer",
+    id: 'layout.footer.legal-disclaimer',
     defaultMessage:
-      "NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.",
+      'NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.',
   },
-});
+})
 
 useHead({
   link: [
     {
-      rel: "canonical",
+      rel: 'canonical',
       href: link,
     },
   ],
-});
+})
 useSeoMeta({
-  title: "Modrinth",
+  title: 'Modrinth',
   description: () =>
     formatMessage({
-      id: "layout.meta.description",
+      id: 'layout.meta.description',
       defaultMessage:
-        "Download Minecraft mods, plugins, datapacks, shaders, resourcepacks, and modpacks on Modrinth. " +
-        "Discover and publish projects on Modrinth with a modern, easy to use interface and API.",
+        'Download Minecraft mods, plugins, datapacks, shaders, resourcepacks, and modpacks on Modrinth. ' +
+        'Discover and publish projects on Modrinth with a modern, easy to use interface and API.',
     }),
-  publisher: "Modrinth",
-  themeColor: "#1bd96a",
-  colorScheme: "dark light",
+  publisher: 'Modrinth',
+  themeColor: '#1bd96a',
+  colorScheme: 'dark light',
 
   // OpenGraph
-  ogTitle: "Modrinth",
-  ogSiteName: "Modrinth",
+  ogTitle: 'Modrinth',
+  ogSiteName: 'Modrinth',
   ogDescription: () =>
     formatMessage({
-      id: "layout.meta.og-description",
-      defaultMessage: "Discover and publish Minecraft content!",
+      id: 'layout.meta.og-description',
+      defaultMessage: 'Discover and publish Minecraft content!',
     }),
-  ogType: "website",
-  ogImage: "https://cdn.modrinth.com/modrinth-new.png",
+  ogType: 'website',
+  ogImage: 'https://cdn.modrinth.com/modrinth-new.png',
   ogUrl: link,
 
   // Twitter
-  twitterCard: "summary",
-  twitterSite: "@modrinth",
-});
+  twitterCard: 'summary',
+  twitterSite: '@modrinth',
+})
 
-const developerModeCounter = ref(0);
+const developerModeCounter = ref(0)
 
-const isMobileMenuOpen = ref(false);
-const isBrowseMenuOpen = ref(false);
+const isMobileMenuOpen = ref(false)
+const isBrowseMenuOpen = ref(false)
 const navRoutes = computed(() => [
   {
-    id: "mods",
-    label: formatMessage(getProjectTypeMessage("mod", true)),
-    href: "/mods",
+    id: 'mods',
+    label: formatMessage(getProjectTypeMessage('mod', true)),
+    href: '/mods',
   },
   {
-    label: formatMessage(getProjectTypeMessage("plugin", true)),
-    href: "/plugins",
+    label: formatMessage(getProjectTypeMessage('plugin', true)),
+    href: '/plugins',
   },
   {
-    label: formatMessage(getProjectTypeMessage("datapack", true)),
-    href: "/datapacks",
+    label: formatMessage(getProjectTypeMessage('datapack', true)),
+    href: '/datapacks',
   },
   {
-    label: formatMessage(getProjectTypeMessage("shader", true)),
-    href: "/shaders",
+    label: formatMessage(getProjectTypeMessage('shader', true)),
+    href: '/shaders',
   },
   {
-    label: formatMessage(getProjectTypeMessage("resourcepack", true)),
-    href: "/resourcepacks",
+    label: formatMessage(getProjectTypeMessage('resourcepack', true)),
+    href: '/resourcepacks',
   },
   {
-    label: formatMessage(getProjectTypeMessage("modpack", true)),
-    href: "/modpacks",
+    label: formatMessage(getProjectTypeMessage('modpack', true)),
+    href: '/modpacks',
   },
-]);
+])
 
 const userMenuOptions = computed(() => {
   let options = [
     {
-      id: "profile",
+      id: 'profile',
       link: `/user/${auth.value.user.username}`,
     },
     {
-      id: "plus",
-      link: "/plus",
-      color: "purple",
+      id: 'plus',
+      link: '/plus',
+      color: 'purple',
       shown: !flags.value.hidePlusPromoInUserMenu && !isPermission(auth.value.user.badges, 1 << 0),
     },
     {
-      id: "notifications",
-      link: "/dashboard/notifications",
+      id: 'notifications',
+      link: '/dashboard/notifications',
     },
     {
-      id: "saved",
-      link: "/dashboard/collections",
+      id: 'saved',
+      link: '/dashboard/collections',
     },
     {
-      id: "servers",
-      link: "/servers/manage",
+      id: 'servers',
+      link: '/servers/manage',
     },
     {
-      id: "flags",
-      link: "/flags",
+      id: 'flags',
+      link: '/flags',
       shown: flags.value.developerMode,
     },
     {
-      id: "settings",
-      link: "/settings",
+      id: 'settings',
+      link: '/settings',
     },
-  ];
+  ]
 
   // TODO: Only show if user has projects
   options = [
@@ -964,22 +964,22 @@ const userMenuOptions = computed(() => {
       divider: true,
     },
     {
-      id: "projects",
-      link: "/dashboard/projects",
+      id: 'projects',
+      link: '/dashboard/projects',
     },
     {
-      id: "organizations",
-      link: "/dashboard/organizations",
+      id: 'organizations',
+      link: '/dashboard/organizations',
     },
     {
-      id: "revenue",
-      link: "/dashboard/revenue",
+      id: 'revenue',
+      link: '/dashboard/revenue',
     },
     {
-      id: "analytics",
-      link: "/dashboard/analytics",
+      id: 'analytics',
+      link: '/dashboard/analytics',
     },
-  ];
+  ]
 
   options = [
     ...options,
@@ -987,129 +987,129 @@ const userMenuOptions = computed(() => {
       divider: true,
     },
     {
-      id: "sign-out",
-      color: "danger",
+      id: 'sign-out',
+      color: 'danger',
       action: () => logoutUser(),
       hoverFilled: true,
     },
-  ];
-  return options;
-});
+  ]
+  return options
+})
 
 const isDiscovering = computed(
-  () => route.name && route.name.startsWith("search-") && !route.query.sid,
-);
+  () => route.name && route.name.startsWith('search-') && !route.query.sid,
+)
 
 const isDiscoveringSubpage = computed(
-  () => route.name && route.name.startsWith("type-id") && !route.query.sid,
-);
+  () => route.name && route.name.startsWith('type-id') && !route.query.sid,
+)
 
-const rCount = ref(0);
+const rCount = ref(0)
 
-const randomProjects = ref([]);
-const disableRandomProjects = ref(false);
+const randomProjects = ref([])
+const disableRandomProjects = ref(false)
 
 const disableRandomProjectsForRoute = computed(
   () =>
-    route.name.startsWith("servers") ||
-    route.name.includes("settings") ||
-    route.name.includes("admin"),
-);
+    route.name.startsWith('servers') ||
+    route.name.includes('settings') ||
+    route.name.includes('admin'),
+)
 
 async function onKeyDown(event) {
   if (disableRandomProjects.value || disableRandomProjectsForRoute.value) {
-    return;
+    return
   }
 
-  if (event.key === "r") {
-    rCount.value++;
+  if (event.key === 'r') {
+    rCount.value++
 
     if (randomProjects.value.length < 3) {
-      randomProjects.value = await useBaseFetch("projects_random?count=50").catch((err) => {
-        console.error(err);
-        return [];
-      });
+      randomProjects.value = await useBaseFetch('projects_random?count=50').catch((err) => {
+        console.error(err)
+        return []
+      })
     }
   }
 
   if (rCount.value >= 40) {
-    rCount.value = 0;
-    const randomProject = randomProjects.value[0];
-    await router.push(`/project/${randomProject.slug}`);
-    randomProjects.value.splice(0, 1);
+    rCount.value = 0
+    const randomProject = randomProjects.value[0]
+    await router.push(`/project/${randomProject.slug}`)
+    randomProjects.value.splice(0, 1)
   }
 }
 
 function onKeyUp(event) {
-  if (event.key === "r") {
-    rCount.value = 0;
+  if (event.key === 'r') {
+    rCount.value = 0
   }
 }
 
 onMounted(() => {
   if (window && import.meta.client) {
-    window.history.scrollRestoration = "auto";
+    window.history.scrollRestoration = 'auto'
   }
 
-  runAnalytics();
+  runAnalytics()
 
-  window.addEventListener("keydown", onKeyDown);
-  window.addEventListener("keyup", onKeyUp);
-});
+  window.addEventListener('keydown', onKeyDown)
+  window.addEventListener('keyup', onKeyUp)
+})
 
 watch(
   () => route.path,
   () => {
-    isMobileMenuOpen.value = false;
-    isBrowseMenuOpen.value = false;
+    isMobileMenuOpen.value = false
+    isBrowseMenuOpen.value = false
 
     if (import.meta.client) {
-      document.body.style.overflowY = "scroll";
-      document.body.setAttribute("tabindex", "-1");
-      document.body.removeAttribute("tabindex");
+      document.body.style.overflowY = 'scroll'
+      document.body.setAttribute('tabindex', '-1')
+      document.body.removeAttribute('tabindex')
     }
 
-    runAnalytics();
+    runAnalytics()
   },
-);
+)
 
 function developerModeIncrement() {
   if (developerModeCounter.value >= 5) {
-    flags.value.developerMode = !flags.value.developerMode;
-    developerModeCounter.value = 0;
-    saveFeatureFlags();
+    flags.value.developerMode = !flags.value.developerMode
+    developerModeCounter.value = 0
+    saveFeatureFlags()
     if (flags.value.developerMode) {
       app.$notify({
-        group: "main",
-        title: "Developer mode activated",
-        text: "Developer mode has been enabled",
-        type: "success",
-      });
+        group: 'main',
+        title: 'Developer mode activated',
+        text: 'Developer mode has been enabled',
+        type: 'success',
+      })
     } else {
       app.$notify({
-        group: "main",
-        title: "Developer mode deactivated",
-        text: "Developer mode has been disabled",
-        type: "success",
-      });
+        group: 'main',
+        title: 'Developer mode deactivated',
+        text: 'Developer mode has been disabled',
+        type: 'success',
+      })
     }
   } else {
-    developerModeCounter.value++;
+    developerModeCounter.value++
   }
 }
 
 async function logoutUser() {
-  await logout();
+  await logout()
 }
 
 function runAnalytics() {
-  const config = useRuntimeConfig();
-  const replacedUrl = config.public.apiBaseUrl.replace("v2/", "");
+  const config = useRuntimeConfig()
+  const replacedUrl = config.public.apiBaseUrl.replace('v2/', '')
 
   try {
     setTimeout(() => {
       $fetch(`${replacedUrl}analytics/view`, {
-        method: "POST",
+        method: 'POST',
         body: {
           url: window.location.href,
         },
@@ -1118,103 +1118,103 @@ function runAnalytics() {
         },
       })
         .then(() => {})
-        .catch(() => {});
-    });
+        .catch(() => {})
+    })
   } catch (e) {
-    console.error(`Sending analytics failed (CORS error? If so, ignore)`, e);
+    console.error(`Sending analytics failed (CORS error? If so, ignore)`, e)
   }
 }
 function toggleMobileMenu() {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value;
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
   if (isMobileMenuOpen.value) {
-    isBrowseMenuOpen.value = false;
+    isBrowseMenuOpen.value = false
   }
 }
 function toggleBrowseMenu() {
-  isBrowseMenuOpen.value = !isBrowseMenuOpen.value;
+  isBrowseMenuOpen.value = !isBrowseMenuOpen.value
 
   if (isBrowseMenuOpen.value) {
-    isMobileMenuOpen.value = false;
+    isMobileMenuOpen.value = false
   }
 }
 
-const { cycle: changeTheme } = useTheme();
+const { cycle: changeTheme } = useTheme()
 
 function hideStagingBanner() {
-  cosmetics.value.hideStagingBanner = true;
+  cosmetics.value.hideStagingBanner = true
 }
 
 const socialLinks = [
   {
     label: formatMessage(
-      defineMessage({ id: "layout.footer.social.discord", defaultMessage: "Discord" }),
+      defineMessage({ id: 'layout.footer.social.discord', defaultMessage: 'Discord' }),
     ),
-    href: "https://discord.modrinth.com",
+    href: 'https://discord.modrinth.com',
     icon: DiscordIcon,
   },
   {
     label: formatMessage(
-      defineMessage({ id: "layout.footer.social.bluesky", defaultMessage: "Bluesky" }),
+      defineMessage({ id: 'layout.footer.social.bluesky', defaultMessage: 'Bluesky' }),
     ),
-    href: "https://bsky.app/profile/modrinth.com",
+    href: 'https://bsky.app/profile/modrinth.com',
     icon: BlueskyIcon,
   },
   {
     label: formatMessage(
-      defineMessage({ id: "layout.footer.social.mastodon", defaultMessage: "Mastodon" }),
+      defineMessage({ id: 'layout.footer.social.mastodon', defaultMessage: 'Mastodon' }),
     ),
-    href: "https://floss.social/@modrinth",
+    href: 'https://floss.social/@modrinth',
     icon: MastodonIcon,
-    rel: "me",
+    rel: 'me',
   },
   {
-    label: formatMessage(defineMessage({ id: "layout.footer.social.x", defaultMessage: "X" })),
-    href: "https://x.com/modrinth",
+    label: formatMessage(defineMessage({ id: 'layout.footer.social.x', defaultMessage: 'X' })),
+    href: 'https://x.com/modrinth',
     icon: TwitterIcon,
   },
   {
     label: formatMessage(
-      defineMessage({ id: "layout.footer.social.github", defaultMessage: "GitHub" }),
+      defineMessage({ id: 'layout.footer.social.github', defaultMessage: 'GitHub' }),
     ),
-    href: "https://github.com/modrinth",
+    href: 'https://github.com/modrinth',
     icon: GithubIcon,
   },
-];
+]
 
 const footerLinks = [
   {
-    label: formatMessage(defineMessage({ id: "layout.footer.about", defaultMessage: "About" })),
+    label: formatMessage(defineMessage({ id: 'layout.footer.about', defaultMessage: 'About' })),
     links: [
       {
-        href: "/news",
+        href: '/news',
         label: formatMessage(
-          defineMessage({ id: "layout.footer.about.news", defaultMessage: "News" }),
+          defineMessage({ id: 'layout.footer.about.news', defaultMessage: 'News' }),
         ),
       },
       {
-        href: "/news/changelog",
+        href: '/news/changelog',
         label: formatMessage(
-          defineMessage({ id: "layout.footer.about.changelog", defaultMessage: "Changelog" }),
+          defineMessage({ id: 'layout.footer.about.changelog', defaultMessage: 'Changelog' }),
         ),
       },
       {
-        href: "https://status.modrinth.com",
+        href: 'https://status.modrinth.com',
         label: formatMessage(
-          defineMessage({ id: "layout.footer.about.status", defaultMessage: "Status" }),
+          defineMessage({ id: 'layout.footer.about.status', defaultMessage: 'Status' }),
         ),
       },
       {
-        href: "https://careers.modrinth.com",
+        href: 'https://careers.modrinth.com',
         label: formatMessage(
-          defineMessage({ id: "layout.footer.about.careers", defaultMessage: "Careers" }),
+          defineMessage({ id: 'layout.footer.about.careers', defaultMessage: 'Careers' }),
         ),
       },
       {
-        href: "/legal/cmp-info",
+        href: '/legal/cmp-info',
         label: formatMessage(
           defineMessage({
-            id: "layout.footer.about.rewards-program",
-            defaultMessage: "Rewards Program",
+            id: 'layout.footer.about.rewards-program',
+            defaultMessage: 'Rewards Program',
           }),
         ),
       },
@@ -1222,27 +1222,27 @@ const footerLinks = [
   },
   {
     label: formatMessage(
-      defineMessage({ id: "layout.footer.products", defaultMessage: "Products" }),
+      defineMessage({ id: 'layout.footer.products', defaultMessage: 'Products' }),
     ),
     links: [
       {
-        href: "/plus",
+        href: '/plus',
         label: formatMessage(
-          defineMessage({ id: "layout.footer.products.plus", defaultMessage: "Modrinth+" }),
+          defineMessage({ id: 'layout.footer.products.plus', defaultMessage: 'Modrinth+' }),
         ),
       },
       {
-        href: "/app",
+        href: '/app',
         label: formatMessage(
-          defineMessage({ id: "layout.footer.products.app", defaultMessage: "Modrinth App" }),
+          defineMessage({ id: 'layout.footer.products.app', defaultMessage: 'Modrinth App' }),
         ),
       },
       {
-        href: "/servers",
+        href: '/servers',
         label: formatMessage(
           defineMessage({
-            id: "layout.footer.products.servers",
-            defaultMessage: "Modrinth Servers",
+            id: 'layout.footer.products.servers',
+            defaultMessage: 'Modrinth Servers',
           }),
         ),
       },
@@ -1250,93 +1250,93 @@ const footerLinks = [
   },
   {
     label: formatMessage(
-      defineMessage({ id: "layout.footer.resources", defaultMessage: "Resources" }),
+      defineMessage({ id: 'layout.footer.resources', defaultMessage: 'Resources' }),
     ),
     links: [
       {
-        href: "https://support.modrinth.com",
+        href: 'https://support.modrinth.com',
         label: formatMessage(
           defineMessage({
-            id: "layout.footer.resources.help-center",
-            defaultMessage: "Help Center",
+            id: 'layout.footer.resources.help-center',
+            defaultMessage: 'Help Center',
           }),
         ),
       },
       {
-        href: "https://crowdin.com/project/modrinth",
+        href: 'https://crowdin.com/project/modrinth',
         label: formatMessage(
-          defineMessage({ id: "layout.footer.resources.translate", defaultMessage: "Translate" }),
+          defineMessage({ id: 'layout.footer.resources.translate', defaultMessage: 'Translate' }),
         ),
       },
       {
-        href: "https://github.com/modrinth/code/issues",
+        href: 'https://github.com/modrinth/code/issues',
         label: formatMessage(
           defineMessage({
-            id: "layout.footer.resources.report-issues",
-            defaultMessage: "Report issues",
+            id: 'layout.footer.resources.report-issues',
+            defaultMessage: 'Report issues',
           }),
         ),
       },
       {
-        href: "https://docs.modrinth.com/api/",
+        href: 'https://docs.modrinth.com/api/',
         label: formatMessage(
           defineMessage({
-            id: "layout.footer.resources.api-docs",
-            defaultMessage: "API documentation",
+            id: 'layout.footer.resources.api-docs',
+            defaultMessage: 'API documentation',
           }),
         ),
       },
     ],
   },
   {
-    label: formatMessage(defineMessage({ id: "layout.footer.legal", defaultMessage: "Legal" })),
+    label: formatMessage(defineMessage({ id: 'layout.footer.legal', defaultMessage: 'Legal' })),
     links: [
       {
-        href: "/legal/rules",
+        href: '/legal/rules',
         label: formatMessage(
-          defineMessage({ id: "layout.footer.legal.rules", defaultMessage: "Content Rules" }),
+          defineMessage({ id: 'layout.footer.legal.rules', defaultMessage: 'Content Rules' }),
         ),
       },
       {
-        href: "/legal/terms",
+        href: '/legal/terms',
         label: formatMessage(
-          defineMessage({ id: "layout.footer.legal.terms-of-use", defaultMessage: "Terms of Use" }),
+          defineMessage({ id: 'layout.footer.legal.terms-of-use', defaultMessage: 'Terms of Use' }),
         ),
       },
       {
-        href: "/legal/privacy",
+        href: '/legal/privacy',
         label: formatMessage(
           defineMessage({
-            id: "layout.footer.legal.privacy-policy",
-            defaultMessage: "Privacy Policy",
+            id: 'layout.footer.legal.privacy-policy',
+            defaultMessage: 'Privacy Policy',
           }),
         ),
       },
       {
-        href: "/legal/security",
+        href: '/legal/security',
         label: formatMessage(
           defineMessage({
-            id: "layout.footer.legal.security-notice",
-            defaultMessage: "Security Notice",
+            id: 'layout.footer.legal.security-notice',
+            defaultMessage: 'Security Notice',
           }),
         ),
       },
       {
-        href: "/legal/copyright",
+        href: '/legal/copyright',
         label: formatMessage(
           defineMessage({
-            id: "layout.footer.legal.copyright-policy",
-            defaultMessage: "Copyright Policy and DMCA",
+            id: 'layout.footer.legal.copyright-policy',
+            defaultMessage: 'Copyright Policy and DMCA',
           }),
         ),
       },
     ],
   },
-];
+]
 </script>
 
 <style lang="scss">
-@import "~/assets/styles/global.scss";
+@import '~/assets/styles/global.scss';
 // @import '@modrinth/assets';
 
 .layout {
@@ -1505,7 +1505,7 @@ const footerLinks = [
         &::after {
           background-color: var(--color-brand);
           border-radius: var(--size-rounded-max);
-          content: "";
+          content: '';
           height: 0.5rem;
           position: absolute;
           left: 1.5rem;

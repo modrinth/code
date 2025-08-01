@@ -51,15 +51,15 @@
 </template>
 
 <script setup lang="ts">
-import ChevronDownIcon from "./icons/ChevronDownIcon.vue";
-import ChevronUpIcon from "./icons/ChevronUpIcon.vue";
+import ChevronDownIcon from './icons/ChevronDownIcon.vue'
+import ChevronUpIcon from './icons/ChevronUpIcon.vue'
 
 defineProps<{
-  sortField: string;
-  sortDesc: boolean;
-}>();
+  sortField: string
+  sortDesc: boolean
+}>()
 
 defineEmits<{
-  (e: "sort", field: string): void;
-}>();
+  (e: 'sort', field: string): void
+}>()
 </script>

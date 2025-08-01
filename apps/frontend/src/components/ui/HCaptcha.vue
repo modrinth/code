@@ -1,40 +1,40 @@
 <script setup>
-const token = defineModel();
-const id = ref(null);
+const token = defineModel()
+const id = ref(null)
 
 function hCaptchaUpdateToken(newToken) {
-  token.value = newToken;
+  token.value = newToken
 }
 
 function hCaptchaReady() {
-  window.hCaptchaUpdateToken = hCaptchaUpdateToken;
-  id.value = window.hcaptcha.render("h-captcha");
+  window.hCaptchaUpdateToken = hCaptchaUpdateToken
+  id.value = window.hcaptcha.render('h-captcha')
 }
 
 onMounted(() => {
   if (window.hcaptcha) {
-    hCaptchaReady();
+    hCaptchaReady()
   } else {
-    window.hCaptchaReady = hCaptchaReady;
+    window.hCaptchaReady = hCaptchaReady
 
     useHead({
       script: [
         {
-          src: "https://js.hcaptcha.com/1/api.js?render=explicit&onload=hCaptchaReady",
+          src: 'https://js.hcaptcha.com/1/api.js?render=explicit&onload=hCaptchaReady',
           async: true,
           defer: true,
         },
       ],
-    });
+    })
   }
-});
+})
 
 defineExpose({
   reset: () => {
-    token.value = null;
-    window.hcaptcha.reset(id.value);
+    token.value = null
+    window.hcaptcha.reset(id.value)
   },
-});
+})
 </script>
 
 <template>

@@ -39,37 +39,37 @@
 </template>
 
 <script setup lang="ts">
-import type { ServerState } from "@modrinth/utils";
-import { ref } from "vue";
+import type { ServerState } from '@modrinth/utils'
+import { ref } from 'vue'
 
 const STATUS_CLASSES = {
-  running: { main: "bg-brand", bg: "bg-bg-green" },
-  stopped: { main: "", bg: "" },
-  crashed: { main: "bg-brand-red", bg: "bg-bg-red" },
-  unknown: { main: "", bg: "" },
-} as const;
+  running: { main: 'bg-brand', bg: 'bg-bg-green' },
+  stopped: { main: '', bg: '' },
+  crashed: { main: 'bg-brand-red', bg: 'bg-bg-red' },
+  unknown: { main: '', bg: '' },
+} as const
 
 const STATUS_TEXTS: Partial<Record<ServerState, string>> = {
-  running: "Running",
-  stopped: "",
-  crashed: "Crashed",
-  unknown: "Unknown",
-} as const;
+  running: 'Running',
+  stopped: '',
+  crashed: 'Crashed',
+  unknown: 'Unknown',
+} as const
 
 defineProps<{
-  state: ServerState;
-}>();
+  state: ServerState
+}>()
 
-const isExpanded = ref(false);
+const isExpanded = ref(false)
 
 function getStatusClass(state: ServerState) {
   if (state in STATUS_CLASSES) {
-    return STATUS_CLASSES[state as keyof typeof STATUS_CLASSES];
+    return STATUS_CLASSES[state as keyof typeof STATUS_CLASSES]
   }
-  return STATUS_CLASSES.unknown;
+  return STATUS_CLASSES.unknown
 }
 
 function getStatusText(state: ServerState) {
-  return STATUS_TEXTS[state] ?? STATUS_TEXTS.unknown;
+  return STATUS_TEXTS[state] ?? STATUS_TEXTS.unknown
 }
 </script>

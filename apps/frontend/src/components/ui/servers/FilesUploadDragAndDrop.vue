@@ -16,7 +16,7 @@
       <div class="text-center">
         <UploadIcon class="mx-auto h-16 w-16" />
         <p class="mt-2 text-xl">
-          Drop {{ type ? type.toLocaleLowerCase() : "file" }}s here to upload
+          Drop {{ type ? type.toLocaleLowerCase() : 'file' }}s here to upload
         </p>
       </div>
     </div>
@@ -24,52 +24,52 @@
 </template>
 
 <script setup lang="ts">
-import { UploadIcon } from "@modrinth/assets";
-import { ref } from "vue";
+import { UploadIcon } from '@modrinth/assets'
+import { ref } from 'vue'
 
 const emit = defineEmits<{
-  (event: "filesDropped", files: File[]): void;
-}>();
+  (event: 'filesDropped', files: File[]): void
+}>()
 
 defineProps<{
-  overlayClass?: string;
-  type?: string;
-}>();
+  overlayClass?: string
+  type?: string
+}>()
 
-const isDragging = ref(false);
-const dragCounter = ref(0);
+const isDragging = ref(false)
+const dragCounter = ref(0)
 
 const handleDragEnter = (event: DragEvent) => {
-  event.preventDefault();
-  if (!event.dataTransfer?.types.includes("application/pyro-file-move")) {
-    dragCounter.value++;
-    isDragging.value = true;
+  event.preventDefault()
+  if (!event.dataTransfer?.types.includes('application/pyro-file-move')) {
+    dragCounter.value++
+    isDragging.value = true
   }
-};
+}
 
 const handleDragOver = (event: DragEvent) => {
-  event.preventDefault();
-};
+  event.preventDefault()
+}
 
 const handleDragLeave = (event: DragEvent) => {
-  event.preventDefault();
-  dragCounter.value--;
+  event.preventDefault()
+  dragCounter.value--
   if (dragCounter.value === 0) {
-    isDragging.value = false;
+    isDragging.value = false
   }
-};
+}
 
 const handleDrop = (event: DragEvent) => {
-  event.preventDefault();
-  isDragging.value = false;
-  dragCounter.value = 0;
+  event.preventDefault()
+  isDragging.value = false
+  dragCounter.value = 0
 
-  const isInternalMove = event.dataTransfer?.types.includes("application/pyro-file-move");
-  if (isInternalMove) return;
+  const isInternalMove = event.dataTransfer?.types.includes('application/pyro-file-move')
+  if (isInternalMove) return
 
-  const files = event.dataTransfer?.files;
+  const files = event.dataTransfer?.files
   if (files) {
-    emit("filesDropped", Array.from(files));
+    emit('filesDropped', Array.from(files))
   }
-};
+}
 </script>

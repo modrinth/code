@@ -14,12 +14,12 @@
             </ButtonStyled>
             <ButtonStyled type="standard" :color="props.restart ? 'standard' : 'brand'">
               <button :disabled="props.isUpdating" @click="props.save">
-                {{ props.isUpdating ? "Saving..." : "Save" }}
+                {{ props.isUpdating ? 'Saving...' : 'Save' }}
               </button>
             </ButtonStyled>
             <ButtonStyled v-if="props.restart" type="standard" color="brand">
               <button :disabled="props.isUpdating" @click="saveAndRestart">
-                {{ props.isUpdating ? "Saving..." : "Save & restart" }}
+                {{ props.isUpdating ? 'Saving...' : 'Save & restart' }}
               </button>
             </ButtonStyled>
           </div>
@@ -30,23 +30,23 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled } from "@modrinth/ui";
+import { ButtonStyled } from '@modrinth/ui'
 
-import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const props = defineProps<{
-  isUpdating: boolean;
-  restart?: boolean;
-  save: () => void;
-  reset: () => void;
-  isVisible: boolean;
-  server: ModrinthServer;
-}>();
+  isUpdating: boolean
+  restart?: boolean
+  save: () => void
+  reset: () => void
+  isVisible: boolean
+  server: ModrinthServer
+}>()
 
 const saveAndRestart = async () => {
-  props.save();
-  await props.server.general?.power("Restart");
-};
+  props.save()
+  await props.server.general?.power('Restart')
+}
 </script>
 
 <style scoped>

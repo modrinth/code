@@ -19,54 +19,54 @@
 </template>
 
 <script setup lang="ts">
-import Convert from "ansi-to-html";
-import DOMPurify from "dompurify";
-import { computed, onMounted, onUnmounted,ref } from "vue";
+import Convert from 'ansi-to-html'
+import DOMPurify from 'dompurify'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 const props = defineProps<{
-  log: string;
-}>();
+  log: string
+}>()
 
 defineEmits<{
-  "show-full-log": [log: string];
-}>();
+  'show-full-log': [log: string]
+}>()
 
-const logContent = ref<HTMLElement | null>(null);
-const isOverflowing = ref(false);
+const logContent = ref<HTMLElement | null>(null)
+const isOverflowing = ref(false)
 
 const checkOverflow = () => {
   if (logContent.value && !isOverflowing.value) {
-    isOverflowing.value = logContent.value.scrollWidth > logContent.value.clientWidth;
+    isOverflowing.value = logContent.value.scrollWidth > logContent.value.clientWidth
   }
-};
+}
 
 const convert = new Convert({
-  fg: "#FFF",
-  bg: "#000",
+  fg: '#FFF',
+  bg: '#000',
   newline: false,
   escapeXML: true,
   stream: false,
-});
+})
 
 const sanitizedLog = computed(() =>
   DOMPurify.sanitize(convert.toHtml(props.log), {
-    ALLOWED_TAGS: ["span"],
-    ALLOWED_ATTR: ["style"],
+    ALLOWED_TAGS: ['span'],
+    ALLOWED_ATTR: ['style'],
     USE_PROFILES: { html: true },
   }),
-);
+)
 
 const preventSelection = (e: MouseEvent) => {
-  e.preventDefault();
-};
+  e.preventDefault()
+}
 
 onMounted(() => {
-  logContent.value?.addEventListener("mousedown", preventSelection);
-});
+  logContent.value?.addEventListener('mousedown', preventSelection)
+})
 
 onUnmounted(() => {
-  logContent.value?.removeEventListener("mousedown", preventSelection);
-});
+  logContent.value?.removeEventListener('mousedown', preventSelection)
+})
 </script>
 
 <style scoped>

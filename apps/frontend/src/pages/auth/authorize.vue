@@ -80,161 +80,159 @@
 </template>
 
 <script setup>
-import { CheckIcon,XIcon } from "@modrinth/assets";
-import { Avatar, Button, commonMessages } from "@modrinth/ui";
+import { CheckIcon, XIcon } from '@modrinth/assets'
+import { Avatar, Button, commonMessages } from '@modrinth/ui'
 
-import { useAuth } from "@/composables/auth.js";
-import { useScopes } from "@/composables/auth/scopes.ts";
-import { useBaseFetch } from "@/composables/fetch.js";
+import { useAuth } from '@/composables/auth.js'
+import { useScopes } from '@/composables/auth/scopes.ts'
+import { useBaseFetch } from '@/composables/fetch.js'
 
-const { formatMessage } = useVIntl();
+const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
   appInfo: {
-    id: "auth.authorize.app-info",
+    id: 'auth.authorize.app-info',
     defaultMessage:
-      "<strong>{appName}</strong> by <creator-link>{creator}</creator-link> will be able to:",
+      '<strong>{appName}</strong> by <creator-link>{creator}</creator-link> will be able to:',
   },
   authorize: {
-    id: "auth.authorize.action.authorize",
-    defaultMessage: "Authorize",
+    id: 'auth.authorize.action.authorize',
+    defaultMessage: 'Authorize',
   },
   decline: {
-    id: "auth.authorize.action.decline",
-    defaultMessage: "Decline",
+    id: 'auth.authorize.action.decline',
+    defaultMessage: 'Decline',
   },
   noRedirectUrlError: {
-    id: "auth.authorize.error.no-redirect-url",
-    defaultMessage: "No redirect location found in response",
+    id: 'auth.authorize.error.no-redirect-url',
+    defaultMessage: 'No redirect location found in response',
   },
   redirectUrl: {
-    id: "auth.authorize.redirect-url",
-    defaultMessage: "You will be redirected to <redirect-url>{url}</redirect-url>",
+    id: 'auth.authorize.redirect-url',
+    defaultMessage: 'You will be redirected to <redirect-url>{url}</redirect-url>',
   },
   title: {
-    id: "auth.authorize.authorize-app-name",
-    defaultMessage: "Authorize {appName}",
+    id: 'auth.authorize.authorize-app-name',
+    defaultMessage: 'Authorize {appName}',
   },
-});
+})
 
-const data = useNuxtApp();
+const data = useNuxtApp()
 
-const router = useNativeRoute();
-const auth = await useAuth();
-const { scopesToDefinitions } = useScopes();
+const router = useNativeRoute()
+const auth = await useAuth()
+const { scopesToDefinitions } = useScopes()
 
-const clientId = router.query?.client_id || false;
-const redirectUri = router.query?.redirect_uri || false;
-const scope = router.query?.scope || false;
-const state = router.query?.state || false;
+const clientId = router.query?.client_id || false
+const redirectUri = router.query?.redirect_uri || false
+const scope = router.query?.scope || false
+const state = router.query?.state || false
 
 const getFlowIdAuthorization = async () => {
   const query = {
     client_id: clientId,
     redirect_uri: redirectUri,
     scope,
-  };
+  }
   if (state) {
-    query.state = state;
+    query.state = state
   }
 
-  const authorization = await useBaseFetch("oauth/authorize", {
-    method: "GET",
+  const authorization = await useBaseFetch('oauth/authorize', {
+    method: 'GET',
     internal: true,
     query,
-  }); // This will contain the flow_id and oauth_client_id for accepting the oauth on behalf of the user
+  }) // This will contain the flow_id and oauth_client_id for accepting the oauth on behalf of the user
 
-  if (typeof authorization === "string") {
+  if (typeof authorization === 'string') {
     await navigateTo(authorization, {
       external: true,
-    });
+    })
   }
 
-  return authorization;
-};
+  return authorization
+}
 
 const {
   data: authorizationData,
   pending,
   error,
-} = await useAsyncData("authorization", getFlowIdAuthorization);
+} = await useAsyncData('authorization', getFlowIdAuthorization)
 
-const { data: app } = await useAsyncData("oauth/app/" + clientId, () =>
-  useBaseFetch("oauth/app/" + clientId, {
-    method: "GET",
+const { data: app } = await useAsyncData('oauth/app/' + clientId, () =>
+  useBaseFetch('oauth/app/' + clientId, {
+    method: 'GET',
     internal: true,
   }),
-);
+)
 
-const scopeDefinitions = scopesToDefinitions(
-  BigInt(authorizationData.value?.requested_scopes || 0),
-);
+const scopeDefinitions = scopesToDefinitions(BigInt(authorizationData.value?.requested_scopes || 0))
 
-const { data: createdBy } = await useAsyncData("user/" + app.value.created_by, () =>
-  useBaseFetch("user/" + app.value.created_by, {
-    method: "GET",
+const { data: createdBy } = await useAsyncData('user/' + app.value.created_by, () =>
+  useBaseFetch('user/' + app.value.created_by, {
+    method: 'GET',
     apiVersion: 3,
   }),
-);
+)
 
 const onAuthorize = async () => {
   try {
-    const res = await useBaseFetch("oauth/accept", {
-      method: "POST",
+    const res = await useBaseFetch('oauth/accept', {
+      method: 'POST',
       internal: true,
       body: {
         flow: authorizationData.value.flow_id,
       },
-    });
+    })
 
-    if (typeof res === "string") {
+    if (typeof res === 'string') {
       navigateTo(res, {
         external: true,
-      });
-      return;
+      })
+      return
     }
 
-    throw new Error(formatMessage(messages.noRedirectUrlError));
+    throw new Error(formatMessage(messages.noRedirectUrlError))
   } catch {
     data.$notify({
-      group: "main",
+      group: 'main',
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-};
+}
 
 const onReject = async () => {
   try {
-    const res = await useBaseFetch("oauth/reject", {
-      method: "POST",
+    const res = await useBaseFetch('oauth/reject', {
+      method: 'POST',
       body: {
         flow: authorizationData.value.flow_id,
       },
-    });
+    })
 
-    if (typeof res === "string") {
+    if (typeof res === 'string') {
       navigateTo(res, {
         external: true,
-      });
-      return;
+      })
+      return
     }
 
-    throw new Error(formatMessage(messages.noRedirectUrlError));
+    throw new Error(formatMessage(messages.noRedirectUrlError))
   } catch {
     data.$notify({
-      group: "main",
+      group: 'main',
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-};
+}
 
 definePageMeta({
-  middleware: "auth",
-});
+  middleware: 'auth',
+})
 </script>
 
 <style scoped lang="scss">

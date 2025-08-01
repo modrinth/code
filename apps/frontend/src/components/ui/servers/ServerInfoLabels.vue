@@ -28,13 +28,13 @@
 
 <script setup lang="ts">
 interface ServerInfoLabelsProps {
-  serverData: Record<string, any>;
-  showGameLabel: boolean;
-  showLoaderLabel: boolean;
-  uptimeSeconds?: number;
-  column?: boolean;
-  linked?: boolean;
+  serverData: Record<string, any>
+  showGameLabel: boolean
+  showLoaderLabel: boolean
+  uptimeSeconds?: number
+  column?: boolean
+  linked?: boolean
 }
 
-defineProps<ServerInfoLabelsProps>();
+defineProps<ServerInfoLabelsProps>()
 </script>

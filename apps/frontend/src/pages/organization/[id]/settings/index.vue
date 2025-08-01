@@ -1,6 +1,6 @@
 <script setup>
-import { SaveIcon, TrashIcon,UploadIcon } from "@modrinth/assets";
-import { Avatar, Button, ConfirmModal,FileInput } from "@modrinth/ui";
+import { SaveIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
+import { Avatar, Button, ConfirmModal, FileInput } from '@modrinth/ui'
 
 const {
   organization,
@@ -9,93 +9,93 @@ const {
   deleteIcon,
   patchIcon,
   patchOrganization,
-} = inject("organizationContext");
+} = inject('organizationContext')
 
-const icon = ref(null);
-const deletedIcon = ref(false);
-const previewImage = ref(null);
+const icon = ref(null)
+const deletedIcon = ref(false)
+const previewImage = ref(null)
 
-const name = ref(organization.value.name);
-const slug = ref(organization.value.slug);
+const name = ref(organization.value.name)
+const slug = ref(organization.value.slug)
 
-const summary = ref(organization.value.description);
+const summary = ref(organization.value.description)
 
 const patchData = computed(() => {
-  const data = {};
+  const data = {}
   if (name.value !== organization.value.name) {
-    data.name = name.value;
+    data.name = name.value
   }
   if (slug.value !== organization.value.slug) {
-    data.slug = slug.value;
+    data.slug = slug.value
   }
   if (summary.value !== organization.value.description) {
-    data.description = summary.value;
+    data.description = summary.value
   }
-  return data;
-});
+  return data
+})
 
 const hasChanges = computed(() => {
-  return Object.keys(patchData.value).length > 0 || deletedIcon.value || icon.value;
-});
+  return Object.keys(patchData.value).length > 0 || deletedIcon.value || icon.value
+})
 
 const markIconForDeletion = () => {
-  deletedIcon.value = true;
-  icon.value = null;
-  previewImage.value = null;
-};
+  deletedIcon.value = true
+  icon.value = null
+  previewImage.value = null
+}
 
 const showPreviewImage = (files) => {
-  const reader = new FileReader();
+  const reader = new FileReader()
 
-  icon.value = files[0];
-  deletedIcon.value = false;
+  icon.value = files[0]
+  deletedIcon.value = false
 
-  reader.readAsDataURL(icon.value);
+  reader.readAsDataURL(icon.value)
   reader.onload = (event) => {
-    previewImage.value = event.target.result;
-  };
-};
+    previewImage.value = event.target.result
+  }
+}
 
-const orgId = useRouteId();
+const orgId = useRouteId()
 
 const onSaveChanges = useClientTry(async () => {
   if (hasChanges.value) {
-    await patchOrganization(orgId, patchData.value);
+    await patchOrganization(orgId, patchData.value)
   }
 
   if (deletedIcon.value) {
-    await deleteIcon();
-    deletedIcon.value = false;
+    await deleteIcon()
+    deletedIcon.value = false
   } else if (icon.value) {
-    await patchIcon(icon.value);
-    icon.value = null;
+    await patchIcon(icon.value)
+    icon.value = null
   }
 
-  await refreshOrganization();
+  await refreshOrganization()
 
   addNotification({
-    group: "main",
-    title: "Organization updated",
-    text: "Your organization has been updated.",
-    type: "success",
-  });
-});
+    group: 'main',
+    title: 'Organization updated',
+    text: 'Your organization has been updated.',
+    type: 'success',
+  })
+})
 
 const onDeleteOrganization = useClientTry(async () => {
   await useBaseFetch(`organization/${orgId}`, {
-    method: "DELETE",
+    method: 'DELETE',
     apiVersion: 3,
-  });
+  })
 
   addNotification({
-    group: "main",
-    title: "Organization deleted",
-    text: "Your organization has been deleted.",
-    type: "success",
-  });
+    group: 'main',
+    title: 'Organization deleted',
+    text: 'Your organization has been deleted.',
+    type: 'success',
+  })
 
-  await navigateTo("/dashboard/organizations");
-});
+  await navigateTo('/dashboard/organizations')
+})
 </script>
 
 <template>

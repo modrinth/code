@@ -60,36 +60,36 @@
 <script setup lang="ts">
 const props = defineProps<{
   data: {
-    loader: string | null;
-    loader_version: string | null;
-  };
-  ignoreCurrentInstallation?: boolean;
-  isInstalling?: boolean;
-}>();
+    loader: string | null
+    loader_version: string | null
+  }
+  ignoreCurrentInstallation?: boolean
+  isInstalling?: boolean
+}>()
 
 const emit = defineEmits<{
-  (e: "selectLoader", loader: string): void;
-}>();
+  (e: 'selectLoader', loader: string): void
+}>()
 
-const vanillaLoaders = [{ name: "Vanilla" as const, displayName: "Vanilla" }];
+const vanillaLoaders = [{ name: 'Vanilla' as const, displayName: 'Vanilla' }]
 
 const modLoaders = [
-  { name: "Fabric" as const, displayName: "Fabric" },
-  { name: "Quilt" as const, displayName: "Quilt" },
-  { name: "Forge" as const, displayName: "Forge" },
-  { name: "NeoForge" as const, displayName: "NeoForge" },
-];
+  { name: 'Fabric' as const, displayName: 'Fabric' },
+  { name: 'Quilt' as const, displayName: 'Quilt' },
+  { name: 'Forge' as const, displayName: 'Forge' },
+  { name: 'NeoForge' as const, displayName: 'NeoForge' },
+]
 
 const pluginLoaders = [
-  { name: "Paper" as const, displayName: "Paper" },
-  { name: "Purpur" as const, displayName: "Purpur" },
-];
+  { name: 'Paper' as const, displayName: 'Paper' },
+  { name: 'Purpur' as const, displayName: 'Purpur' },
+]
 
 const isCurrentLoader = (loaderName: string) => {
-  return props.data.loader?.toLowerCase() === loaderName.toLowerCase();
-};
+  return props.data.loader?.toLowerCase() === loaderName.toLowerCase()
+}
 
 const selectLoader = (loader: string) => {
-  emit("selectLoader", loader);
-};
+  emit('selectLoader', loader)
+}
 </script>

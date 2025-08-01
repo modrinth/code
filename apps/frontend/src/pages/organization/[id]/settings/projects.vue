@@ -120,7 +120,7 @@
         <p>
           Changes will be applied to
           <strong>{{ selectedProjects.length }}</strong> project{{
-            selectedProjects.length > 1 ? "s" : ""
+            selectedProjects.length > 1 ? 's' : ''
           }}.
         </p>
         <ul>
@@ -273,7 +273,7 @@
               <BoxIcon />
               <span>{{
                 formatProjectType(
-                  $getProjectTypeForDisplay(project.project_types[0] ?? "project", project.loaders),
+                  $getProjectTypeForDisplay(project.project_types[0] ?? 'project', project.loaders),
                 )
               }}</span>
             </div>
@@ -309,19 +309,19 @@ import {
   SortDescIcon,
   TrashIcon,
   XIcon,
-} from "@modrinth/assets";
-import { Avatar, Badge, Button, Checkbox, commonMessages,CopyCode, Modal } from "@modrinth/ui";
-import { formatProjectType } from "@modrinth/utils";
-import { Multiselect } from "vue-multiselect";
+} from '@modrinth/assets'
+import { Avatar, Badge, Button, Checkbox, commonMessages, CopyCode, Modal } from '@modrinth/ui'
+import { formatProjectType } from '@modrinth/utils'
+import { Multiselect } from 'vue-multiselect'
 
-import ModalCreation from "~/components/ui/ModalCreation.vue";
-import OrganizationProjectTransferModal from "~/components/ui/OrganizationProjectTransferModal.vue";
+import ModalCreation from '~/components/ui/ModalCreation.vue'
+import OrganizationProjectTransferModal from '~/components/ui/OrganizationProjectTransferModal.vue'
 
-const { formatMessage } = useVIntl();
+const { formatMessage } = useVIntl()
 
-const { organization, projects, refresh } = inject("organizationContext");
+const { organization, projects, refresh } = inject('organizationContext')
 
-const auth = await useAuth();
+const auth = await useAuth()
 
 const { data: userProjects, refresh: refreshUserProjects } = await useAsyncData(
   `user/${auth.value.user.id}/projects`,
@@ -329,197 +329,197 @@ const { data: userProjects, refresh: refreshUserProjects } = await useAsyncData(
   {
     watch: [auth],
   },
-);
+)
 
-const usersOwnedProjects = ref([]);
+const usersOwnedProjects = ref([])
 
 watch(
   () => userProjects.value,
   async () => {
-    if (!userProjects.value) return;
-    if (!userProjects.value.length) return;
+    if (!userProjects.value) return
+    if (!userProjects.value.length) return
 
-    const projects = userProjects.value.filter((project) => project.organization === null);
+    const projects = userProjects.value.filter((project) => project.organization === null)
 
-    const teamIds = projects.map((project) => project?.team).filter((x) => x);
+    const teamIds = projects.map((project) => project?.team).filter((x) => x)
     // Shape of teams is member[][]
     const teams = await useBaseFetch(`teams?ids=${JSON.stringify(teamIds)}`, {
       apiVersion: 3,
-    });
+    })
     // for each team id, figure out if the user is a member, and is_owner. Then filter the projects to only include those that are owned by the user
     const ownedTeamIds = teamIds.filter((_tid, i) => {
-      const team = teams?.[i];
-      if (!team) return false;
-      const member = team.find((member) => member.user.id === auth.value.user.id);
-      return member && member.is_owner;
-    });
-    const ownedProjects = projects.filter((project) => ownedTeamIds.includes(project.team));
-    usersOwnedProjects.value = ownedProjects;
+      const team = teams?.[i]
+      if (!team) return false
+      const member = team.find((member) => member.user.id === auth.value.user.id)
+      return member && member.is_owner
+    })
+    const ownedProjects = projects.filter((project) => ownedTeamIds.includes(project.team))
+    usersOwnedProjects.value = ownedProjects
   }, // watch options
   { immediate: true, deep: true },
-);
+)
 
 const onProjectTransferSubmit = async (projects) => {
   try {
     for (const project of projects) {
       await useBaseFetch(`organization/${organization.value.id}/projects`, {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify({
           project_id: project.id,
         }),
         apiVersion: 3,
-      });
+      })
     }
 
-    await refresh();
-    await refreshUserProjects();
+    await refresh()
+    await refreshUserProjects()
 
     addNotification({
-      group: "main",
-      title: "Success",
-      text: "Transferred selected projects to organization.",
-      type: "success",
-    });
+      group: 'main',
+      title: 'Success',
+      text: 'Transferred selected projects to organization.',
+      type: 'success',
+    })
   } catch (err) {
     addNotification({
-      group: "main",
-      title: "An error occurred",
-      text: err?.data?.description || err?.message || err || "Unknown error",
-      type: "error",
-    });
-    console.error(err);
+      group: 'main',
+      title: 'An error occurred',
+      text: err?.data?.description || err?.message || err || 'Unknown error',
+      type: 'error',
+    })
+    console.error(err)
   }
-};
+}
 
-const EDIT_DETAILS = 1 << 2;
+const EDIT_DETAILS = 1 << 2
 
 const updateSort = (inputProjects, sort, descending) => {
-  let sortedArray = inputProjects;
+  let sortedArray = inputProjects
   switch (sort) {
-    case "Name":
+    case 'Name':
       sortedArray = inputProjects.slice().sort((a, b) => {
-        return a.name.localeCompare(b.name);
-      });
-      break;
-    case "Status":
+        return a.name.localeCompare(b.name)
+      })
+      break
+    case 'Status':
       sortedArray = inputProjects.slice().sort((a, b) => {
         if (a.status < b.status) {
-          return -1;
+          return -1
         }
         if (a.status > b.status) {
-          return 1;
+          return 1
         }
-        return 0;
-      });
-      break;
-    case "Type":
+        return 0
+      })
+      break
+    case 'Type':
       sortedArray = inputProjects.slice().sort((a, b) => {
         if (a.project_type < b.project_type) {
-          return -1;
+          return -1
         }
         if (a.project_type > b.project_type) {
-          return 1;
+          return 1
         }
-        return 0;
-      });
-      break;
+        return 0
+      })
+      break
     default:
-      break;
+      break
   }
 
   if (descending) {
-    sortedArray = sortedArray.reverse();
+    sortedArray = sortedArray.reverse()
   }
 
-  return sortedArray;
-};
+  return sortedArray
+}
 
-const sortedProjects = ref(updateSort(projects.value, "Name"));
-const selectedProjects = ref([]);
-const sortBy = ref("Name");
-const descending = ref(false);
-const editLinksModal = ref(null);
+const sortedProjects = ref(updateSort(projects.value, 'Name'))
+const selectedProjects = ref([])
+const sortBy = ref('Name')
+const descending = ref(false)
+const editLinksModal = ref(null)
 
 watch(
   () => projects.value,
   (newVal) => {
-    sortedProjects.value = updateSort(newVal, sortBy.value, descending.value);
+    sortedProjects.value = updateSort(newVal, sortBy.value, descending.value)
   },
-);
+)
 
 const emptyLinksData = {
   showAffected: false,
   source: {
-    val: "",
+    val: '',
     clear: false,
   },
   discord: {
-    val: "",
+    val: '',
     clear: false,
   },
   wiki: {
-    val: "",
+    val: '',
     clear: false,
   },
   issues: {
-    val: "",
+    val: '',
     clear: false,
   },
-};
+}
 
-const editLinks = ref(emptyLinksData);
+const editLinks = ref(emptyLinksData)
 
 const updateDescending = () => {
-  descending.value = !descending.value;
-  sortedProjects.value = updateSort(sortedProjects.value, sortBy.value, descending.value);
-};
+  descending.value = !descending.value
+  sortedProjects.value = updateSort(sortedProjects.value, sortBy.value, descending.value)
+}
 
 const onBulkEditLinks = useClientTry(async () => {
-  const linkData = editLinks.value;
+  const linkData = editLinks.value
 
-  const baseData = {};
+  const baseData = {}
 
   if (linkData.issues.clear) {
-    baseData.issues_url = null;
+    baseData.issues_url = null
   } else if (linkData.issues.val.trim().length > 0) {
-    baseData.issues_url = linkData.issues.val.trim();
+    baseData.issues_url = linkData.issues.val.trim()
   }
 
   if (linkData.source.clear) {
-    baseData.source_url = null;
+    baseData.source_url = null
   } else if (linkData.source.val.trim().length > 0) {
-    baseData.source_url = linkData.source.val.trim();
+    baseData.source_url = linkData.source.val.trim()
   }
 
   if (linkData.wiki.clear) {
-    baseData.wiki_url = null;
+    baseData.wiki_url = null
   } else if (linkData.wiki.val.trim().length > 0) {
-    baseData.wiki_url = linkData.wiki.val.trim();
+    baseData.wiki_url = linkData.wiki.val.trim()
   }
 
   if (linkData.discord.clear) {
-    baseData.discord_url = null;
+    baseData.discord_url = null
   } else if (linkData.discord.val.trim().length > 0) {
-    baseData.discord_url = linkData.discord.val.trim();
+    baseData.discord_url = linkData.discord.val.trim()
   }
 
   await useBaseFetch(`projects?ids=${JSON.stringify(selectedProjects.value.map((x) => x.id))}`, {
-    method: "PATCH",
+    method: 'PATCH',
     body: JSON.stringify(baseData),
-  });
+  })
 
-  editLinksModal.value.hide();
+  editLinksModal.value.hide()
 
   addNotification({
-    group: "main",
-    title: "Success",
+    group: 'main',
+    title: 'Success',
     text: "Bulk edited selected project's links.",
-    type: "success",
-  });
+    type: 'success',
+  })
 
-  selectedProjects.value = [];
-  editLinks.value = emptyLinksData;
-});
+  selectedProjects.value = []
+  editLinks.value = emptyLinksData
+})
 </script>
 <style lang="scss" scoped>
 .table {
@@ -552,7 +552,7 @@ const onBulkEditLinks = useClientTry(async () => {
 
     .table-row {
       display: grid;
-      grid-template: "checkbox icon name type settings" "checkbox icon id status settings";
+      grid-template: 'checkbox icon name type settings' 'checkbox icon id status settings';
       grid-template-columns:
         min-content min-content minmax(min-content, 2fr)
         minmax(min-content, 1fr) min-content;
@@ -589,7 +589,7 @@ const onBulkEditLinks = useClientTry(async () => {
     }
 
     .table-head {
-      grid-template: "checkbox settings";
+      grid-template: 'checkbox settings';
       grid-template-columns: min-content minmax(min-content, 1fr);
 
       :nth-child(2),
@@ -605,7 +605,7 @@ const onBulkEditLinks = useClientTry(async () => {
   @media screen and (max-width: 560px) {
     .table-row {
       display: grid;
-      grid-template: "checkbox icon name settings" "checkbox icon id settings" "checkbox icon type settings" "checkbox icon status settings";
+      grid-template: 'checkbox icon name settings' 'checkbox icon id settings' 'checkbox icon type settings' 'checkbox icon status settings';
       grid-template-columns: min-content min-content minmax(min-content, 1fr) min-content;
 
       :nth-child(5) {
@@ -614,7 +614,7 @@ const onBulkEditLinks = useClientTry(async () => {
     }
 
     .table-head {
-      grid-template: "checkbox settings";
+      grid-template: 'checkbox settings';
       grid-template-columns: min-content minmax(min-content, 1fr);
     }
   }
@@ -653,7 +653,7 @@ const onBulkEditLinks = useClientTry(async () => {
   width: -moz-fit-content;
 }
 
-.label-button[data-active="true"] {
+.label-button[data-active='true'] {
   --background-color: var(--color-red);
   --text-color: var(--color-brand-inverted);
 }

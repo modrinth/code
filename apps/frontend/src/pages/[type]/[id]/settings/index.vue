@@ -164,12 +164,12 @@
                   class="good"
                 />
                 <XIcon v-else class="bad" />
-                {{ hasModifiedVisibility() ? "Will be v" : "V" }}isible in search
+                {{ hasModifiedVisibility() ? 'Will be v' : 'V' }}isible in search
               </li>
               <li>
                 <XIcon v-if="visibility === 'unlisted' || visibility === 'private'" class="bad" />
                 <CheckIcon v-else class="good" />
-                {{ hasModifiedVisibility() ? "Will be v" : "V" }}isible on profile
+                {{ hasModifiedVisibility() ? 'Will be v' : 'V' }}isible on profile
               </li>
               <li>
                 <CheckIcon v-if="visibility !== 'private'" class="good" />
@@ -183,7 +183,7 @@
                   }"
                   class="warn"
                 />
-                {{ hasModifiedVisibility() ? "Will be v" : "V" }}isible via URL
+                {{ hasModifiedVisibility() ? 'Will be v' : 'V' }}isible via URL
               </li>
             </ul>
           </div>
@@ -239,12 +239,12 @@
 </template>
 
 <script setup>
-import { CheckIcon,IssuesIcon, SaveIcon, TrashIcon, UploadIcon, XIcon } from "@modrinth/assets";
-import { Avatar,ConfirmModal } from "@modrinth/ui";
-import { formatProjectStatus, formatProjectType } from "@modrinth/utils";
-import { Multiselect } from "vue-multiselect";
+import { CheckIcon, IssuesIcon, SaveIcon, TrashIcon, UploadIcon, XIcon } from '@modrinth/assets'
+import { Avatar, ConfirmModal } from '@modrinth/ui'
+import { formatProjectStatus, formatProjectType } from '@modrinth/utils'
+import { Multiselect } from 'vue-multiselect'
 
-import FileInput from "~/components/ui/FileInput.vue";
+import FileInput from '~/components/ui/FileInput.vue'
 
 const props = defineProps({
   project: {
@@ -272,134 +272,134 @@ const props = defineProps({
     required: true,
     default: () => {},
   },
-});
+})
 
-const tags = useTags();
-const router = useNativeRouter();
+const tags = useTags()
+const router = useNativeRouter()
 
-const name = ref(props.project.title);
-const slug = ref(props.project.slug);
-const summary = ref(props.project.description);
-const icon = ref(null);
-const previewImage = ref(null);
-const clientSide = ref(props.project.client_side);
-const serverSide = ref(props.project.server_side);
-const deletedIcon = ref(false);
+const name = ref(props.project.title)
+const slug = ref(props.project.slug)
+const summary = ref(props.project.description)
+const icon = ref(null)
+const previewImage = ref(null)
+const clientSide = ref(props.project.client_side)
+const serverSide = ref(props.project.server_side)
+const deletedIcon = ref(false)
 const visibility = ref(
   tags.value.approvedStatuses.includes(props.project.status)
     ? props.project.status
     : props.project.requested_status,
-);
+)
 
 const hasPermission = computed(() => {
-  const EDIT_DETAILS = 1 << 2;
-  return (props.currentMember.permissions & EDIT_DETAILS) === EDIT_DETAILS;
-});
+  const EDIT_DETAILS = 1 << 2
+  return (props.currentMember.permissions & EDIT_DETAILS) === EDIT_DETAILS
+})
 
 const hasDeletePermission = computed(() => {
-  const DELETE_PROJECT = 1 << 7;
-  return (props.currentMember.permissions & DELETE_PROJECT) === DELETE_PROJECT;
-});
+  const DELETE_PROJECT = 1 << 7
+  return (props.currentMember.permissions & DELETE_PROJECT) === DELETE_PROJECT
+})
 
-const sideTypes = ["required", "optional", "unsupported"];
+const sideTypes = ['required', 'optional', 'unsupported']
 
 const patchData = computed(() => {
-  const data = {};
+  const data = {}
 
   if (name.value !== props.project.title) {
-    data.title = name.value.trim();
+    data.title = name.value.trim()
   }
   if (slug.value !== props.project.slug) {
-    data.slug = slug.value.trim();
+    data.slug = slug.value.trim()
   }
   if (summary.value !== props.project.description) {
-    data.description = summary.value.trim();
+    data.description = summary.value.trim()
   }
   if (clientSide.value !== props.project.client_side) {
-    data.client_side = clientSide.value;
+    data.client_side = clientSide.value
   }
   if (serverSide.value !== props.project.server_side) {
-    data.server_side = serverSide.value;
+    data.server_side = serverSide.value
   }
   if (tags.value.approvedStatuses.includes(props.project.status)) {
     if (visibility.value !== props.project.status) {
-      data.status = visibility.value;
+      data.status = visibility.value
     }
   } else if (visibility.value !== props.project.requested_status) {
-    data.requested_status = visibility.value;
+    data.requested_status = visibility.value
   }
 
-  return data;
-});
+  return data
+})
 
 const hasChanges = computed(() => {
-  return Object.keys(patchData.value).length > 0 || deletedIcon.value || icon.value;
-});
+  return Object.keys(patchData.value).length > 0 || deletedIcon.value || icon.value
+})
 
 const hasModifiedVisibility = () => {
   const originalVisibility = tags.value.approvedStatuses.includes(props.project.status)
     ? props.project.status
-    : props.project.requested_status;
+    : props.project.requested_status
 
-  return originalVisibility !== visibility.value;
-};
+  return originalVisibility !== visibility.value
+}
 
 const saveChanges = async () => {
   if (hasChanges.value) {
-    await props.patchProject(patchData.value);
+    await props.patchProject(patchData.value)
   }
 
   if (deletedIcon.value) {
-    await deleteIcon();
-    deletedIcon.value = false;
+    await deleteIcon()
+    deletedIcon.value = false
   } else if (icon.value) {
-    await props.patchIcon(icon.value);
-    icon.value = null;
+    await props.patchIcon(icon.value)
+    icon.value = null
   }
-};
+}
 
 const showPreviewImage = (files) => {
-  const reader = new FileReader();
-  icon.value = files[0];
-  deletedIcon.value = false;
-  reader.readAsDataURL(icon.value);
+  const reader = new FileReader()
+  icon.value = files[0]
+  deletedIcon.value = false
+  reader.readAsDataURL(icon.value)
   reader.onload = (event) => {
-    previewImage.value = event.target.result;
-  };
-};
+    previewImage.value = event.target.result
+  }
+}
 
 const deleteProject = async () => {
   await useBaseFetch(`project/${props.project.id}`, {
-    method: "DELETE",
-  });
-  await initUserProjects();
-  await router.push("/dashboard/projects");
+    method: 'DELETE',
+  })
+  await initUserProjects()
+  await router.push('/dashboard/projects')
   addNotification({
-    group: "main",
-    title: "Project deleted",
-    text: "Your project has been deleted.",
-    type: "success",
-  });
-};
+    group: 'main',
+    title: 'Project deleted',
+    text: 'Your project has been deleted.',
+    type: 'success',
+  })
+}
 
 const markIconForDeletion = () => {
-  deletedIcon.value = true;
-  icon.value = null;
-  previewImage.value = null;
-};
+  deletedIcon.value = true
+  icon.value = null
+  previewImage.value = null
+}
 
 const deleteIcon = async () => {
   await useBaseFetch(`project/${props.project.id}/icon`, {
-    method: "DELETE",
-  });
-  await props.resetProject();
+    method: 'DELETE',
+  })
+  await props.resetProject()
   addNotification({
-    group: "main",
-    title: "Project icon removed",
+    group: 'main',
+    title: 'Project icon removed',
     text: "Your project's icon has been removed.",
-    type: "success",
-  });
-};
+    type: 'success',
+  })
+}
 </script>
 <style lang="scss" scoped>
 .visibility-info {

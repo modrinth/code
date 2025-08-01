@@ -1,7 +1,7 @@
 <script setup lang="ts">
 definePageMeta({
-  middleware: ["launcher-auth"],
-});
+  middleware: ['launcher-auth'],
+})
 </script>
 <template>
   <NuxtPage class="auth-container universal-card" />

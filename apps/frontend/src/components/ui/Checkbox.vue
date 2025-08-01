@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { CheckIcon, DropdownIcon } from "@modrinth/assets";
+import { CheckIcon, DropdownIcon } from '@modrinth/assets'
 
 export default {
   components: {
@@ -36,7 +36,7 @@ export default {
     label: {
       type: String,
       required: false,
-      default: "",
+      default: '',
     },
     disabled: {
       type: Boolean,
@@ -60,15 +60,15 @@ export default {
       default: false,
     },
   },
-  emits: ["update:modelValue"],
+  emits: ['update:modelValue'],
   methods: {
     toggle() {
       if (!this.disabled) {
-        this.$emit("update:modelValue", !this.modelValue);
+        this.$emit('update:modelValue', !this.modelValue)
       }
     },
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>

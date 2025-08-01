@@ -144,101 +144,101 @@ import {
   SSOMicrosoftIcon,
   SSOSteamIcon,
   UserIcon,
-} from "@modrinth/assets";
-import { Checkbox, commonMessages } from "@modrinth/ui";
+} from '@modrinth/assets'
+import { Checkbox, commonMessages } from '@modrinth/ui'
 
-import HCaptcha from "@/components/ui/HCaptcha.vue";
+import HCaptcha from '@/components/ui/HCaptcha.vue'
 
-const { formatMessage } = useVIntl();
+const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
   title: {
-    id: "auth.sign-up.title",
-    defaultMessage: "Sign Up",
+    id: 'auth.sign-up.title',
+    defaultMessage: 'Sign Up',
   },
   signUpWithTitle: {
-    id: "auth.sign-up.title.sign-up-with",
-    defaultMessage: "Sign up with",
+    id: 'auth.sign-up.title.sign-up-with',
+    defaultMessage: 'Sign up with',
   },
   createAccountTitle: {
-    id: "auth.sign-up.title.create-account",
-    defaultMessage: "Or create an account yourself",
+    id: 'auth.sign-up.title.create-account',
+    defaultMessage: 'Or create an account yourself',
   },
   emailLabel: {
-    id: "auth.sign-up.email.label",
-    defaultMessage: "Email",
+    id: 'auth.sign-up.email.label',
+    defaultMessage: 'Email',
   },
   usernameLabel: {
-    id: "auth.sign-up.label.username",
-    defaultMessage: "Username",
+    id: 'auth.sign-up.label.username',
+    defaultMessage: 'Username',
   },
   passwordLabel: {
-    id: "auth.sign-up.password.label",
-    defaultMessage: "Password",
+    id: 'auth.sign-up.password.label',
+    defaultMessage: 'Password',
   },
   confirmPasswordLabel: {
-    id: "auth.sign-up.confirm-password.label",
-    defaultMessage: "Confirm password",
+    id: 'auth.sign-up.confirm-password.label',
+    defaultMessage: 'Confirm password',
   },
   subscribeLabel: {
-    id: "auth.sign-up.subscribe.label",
-    defaultMessage: "Subscribe to updates about Modrinth",
+    id: 'auth.sign-up.subscribe.label',
+    defaultMessage: 'Subscribe to updates about Modrinth',
   },
   legalDisclaimer: {
-    id: "auth.sign-up.legal-dislaimer",
+    id: 'auth.sign-up.legal-dislaimer',
     defaultMessage:
       "By creating an account, you agree to Modrinth's <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>.",
   },
   createAccountButton: {
-    id: "auth.sign-up.action.create-account",
-    defaultMessage: "Create account",
+    id: 'auth.sign-up.action.create-account',
+    defaultMessage: 'Create account',
   },
   alreadyHaveAccountLabel: {
-    id: "auth.sign-up.sign-in-option.title",
-    defaultMessage: "Already have an account?",
+    id: 'auth.sign-up.sign-in-option.title',
+    defaultMessage: 'Already have an account?',
   },
-});
+})
 
 useHead({
   title: () => `${formatMessage(messages.title)} - Modrinth`,
-});
+})
 
-const auth = await useAuth();
-const route = useNativeRoute();
+const auth = await useAuth()
+const route = useNativeRoute()
 
-const redirectTarget = route.query.redirect;
+const redirectTarget = route.query.redirect
 
 if (auth.value.user) {
-  await navigateTo("/dashboard");
+  await navigateTo('/dashboard')
 }
 
-const captcha = ref();
+const captcha = ref()
 
-const email = ref("");
-const username = ref("");
-const password = ref("");
-const confirmPassword = ref("");
-const token = ref("");
-const subscribe = ref(false);
+const email = ref('')
+const username = ref('')
+const password = ref('')
+const confirmPassword = ref('')
+const token = ref('')
+const subscribe = ref(false)
 
 async function createAccount() {
-  startLoading();
+  startLoading()
   try {
     if (confirmPassword.value !== password.value) {
       addNotification({
-        group: "main",
+        group: 'main',
         title: formatMessage(commonMessages.errorNotificationTitle),
         text: formatMessage({
-          id: "auth.sign-up.notification.password-mismatch.text",
-          defaultMessage: "Passwords do not match!",
+          id: 'auth.sign-up.notification.password-mismatch.text',
+          defaultMessage: 'Passwords do not match!',
         }),
-        type: "error",
-      });
-      captcha.value?.reset();
+        type: 'error',
+      })
+      captcha.value?.reset()
     }
 
-    const res = await useBaseFetch("auth/create", {
-      method: "POST",
+    const res = await useBaseFetch('auth/create', {
+      method: 'POST',
       body: {
         username: username.value,
         password: password.value,
@@ -246,30 +246,30 @@ async function createAccount() {
         challenge: token.value,
         sign_up_newsletter: subscribe.value,
       },
-    });
+    })
 
-    await useAuth(res.session);
-    await useUser();
+    await useAuth(res.session)
+    await useUser()
 
     if (route.query.launcher) {
-      await navigateTo({ path: "/auth/sign-in", query: route.query });
-      return;
+      await navigateTo({ path: '/auth/sign-in', query: route.query })
+      return
     }
 
     if (route.query.redirect) {
-      await navigateTo(route.query.redirect);
+      await navigateTo(route.query.redirect)
     } else {
-      await navigateTo("/dashboard");
+      await navigateTo('/dashboard')
     }
   } catch (err) {
     addNotification({
-      group: "main",
+      group: 'main',
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
-    captcha.value?.reset();
+      type: 'error',
+    })
+    captcha.value?.reset()
   }
-  stopLoading();
+  stopLoading()
 }
 </script>

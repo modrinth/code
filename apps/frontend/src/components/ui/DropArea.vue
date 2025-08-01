@@ -4,10 +4,10 @@
     class="drop-area"
     @drop.stop.prevent="
       (event) => {
-        $refs.drop_area.style.visibility = 'hidden';
+        $refs.drop_area.style.visibility = 'hidden'
 
         if (event.dataTransfer && event.dataTransfer.files && fileAllowed) {
-          $emit('change', event.dataTransfer.files);
+          $emit('change', event.dataTransfer.files)
         }
       }
     "
@@ -22,45 +22,45 @@ export default {
   props: {
     accept: {
       type: String,
-      default: "",
+      default: '',
     },
   },
-  emits: ["change"],
+  emits: ['change'],
   data() {
     return {
       fileAllowed: false,
-    };
+    }
   },
   mounted() {
-    document.addEventListener("dragenter", this.allowDrag);
+    document.addEventListener('dragenter', this.allowDrag)
   },
   methods: {
     allowDrag(event) {
-      const file = event.dataTransfer?.items[0];
+      const file = event.dataTransfer?.items[0]
 
       if (
         file &&
         this.accept
-          .split(",")
-          .reduce((acc, t) => acc || file.type.startsWith(t) || file.type === t || t === "*", false)
+          .split(',')
+          .reduce((acc, t) => acc || file.type.startsWith(t) || file.type === t || t === '*', false)
       ) {
-        this.fileAllowed = true;
-        event.dataTransfer.dropEffect = "copy";
-        event.preventDefault();
+        this.fileAllowed = true
+        event.dataTransfer.dropEffect = 'copy'
+        event.preventDefault()
 
         if (this.$refs.drop_area) {
-          this.$refs.drop_area.style.visibility = "visible";
+          this.$refs.drop_area.style.visibility = 'visible'
         }
       } else {
-        this.fileAllowed = false;
+        this.fileAllowed = false
 
         if (this.$refs.drop_area) {
-          this.$refs.drop_area.style.visibility = "hidden";
+          this.$refs.drop_area.style.visibility = 'hidden'
         }
       }
     },
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>
@@ -81,7 +81,7 @@ export default {
   &::before {
     --indent: 4rem;
 
-    content: " ";
+    content: ' ';
     position: relative;
     top: var(--indent);
     left: var(--indent);

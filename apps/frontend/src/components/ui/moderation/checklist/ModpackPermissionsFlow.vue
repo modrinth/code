@@ -137,7 +137,7 @@
       <ButtonStyled v-if="modPackData && currentIndex < modPackData.length" color="blue">
         <button :disabled="!canGoNext" @click="goToNext">
           <RightArrowIcon aria-hidden="true" />
-          {{ currentIndex + 1 >= modPackData.length ? "Complete" : "Next" }}
+          {{ currentIndex + 1 >= modPackData.length ? 'Complete' : 'Next' }}
         </button>
       </ButtonStyled>
     </div>
@@ -145,8 +145,8 @@
 </template>
 
 <script setup lang="ts">
-import { LeftArrowIcon, RightArrowIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+import { LeftArrowIcon, RightArrowIcon } from '@modrinth/assets'
+import { ButtonStyled } from '@modrinth/ui'
 import type {
   ModerationFlameModpackItem,
   ModerationJudgements,
@@ -155,19 +155,19 @@ import type {
   ModerationModpackResponse,
   ModerationPermissionType,
   ModerationUnknownModpackItem,
-} from "@modrinth/utils";
-import { useLocalStorage, useSessionStorage } from "@vueuse/core";
-import { computed, onMounted,ref, watch } from "vue";
+} from '@modrinth/utils'
+import { useLocalStorage, useSessionStorage } from '@vueuse/core'
+import { computed, onMounted, ref, watch } from 'vue'
 
 const props = defineProps<{
-  projectId: string;
-  modelValue?: ModerationJudgements;
-}>();
+  projectId: string
+  modelValue?: ModerationJudgements
+}>()
 
 const emit = defineEmits<{
-  complete: [];
-  "update:modelValue": [judgements: ModerationJudgements];
-}>();
+  complete: []
+  'update:modelValue': [judgements: ModerationJudgements]
+}>()
 
 const persistedModPackData = useLocalStorage<ModerationModpackItem[] | null>(
   `modpack-permissions-${props.projectId}`,
@@ -178,9 +178,9 @@ const persistedModPackData = useLocalStorage<ModerationModpackItem[] | null>(
       write: (v: any) => JSON.stringify(v),
     },
   },
-);
+)
 
-const persistedIndex = useLocalStorage<number>(`modpack-permissions-index-${props.projectId}`, 0);
+const persistedIndex = useLocalStorage<number>(`modpack-permissions-index-${props.projectId}`, 0)
 
 const modPackData = useSessionStorage<ModerationModpackItem[] | null>(
   `modpack-permissions-data-${props.projectId}`,
@@ -191,7 +191,7 @@ const modPackData = useSessionStorage<ModerationModpackItem[] | null>(
       write: (v: any) => JSON.stringify(v),
     },
   },
-);
+)
 const permanentNoFiles = useSessionStorage<ModerationModpackItem[]>(
   `modpack-permissions-permanent-no-${props.projectId}`,
   [],
@@ -201,110 +201,110 @@ const permanentNoFiles = useSessionStorage<ModerationModpackItem[]>(
       write: (v: any) => JSON.stringify(v),
     },
   },
-);
-const currentIndex = ref(0);
+)
+const currentIndex = ref(0)
 
 const fileApprovalTypes: ModerationModpackPermissionApprovalType[] = [
   {
-    id: "yes",
-    name: "Yes",
+    id: 'yes',
+    name: 'Yes',
   },
   {
-    id: "with-attribution-and-source",
-    name: "With attribution and source",
+    id: 'with-attribution-and-source',
+    name: 'With attribution and source',
   },
   {
-    id: "with-attribution",
-    name: "With attribution",
+    id: 'with-attribution',
+    name: 'With attribution',
   },
   {
-    id: "no",
-    name: "No",
+    id: 'no',
+    name: 'No',
   },
   {
-    id: "permanent-no",
-    name: "Permanent no",
+    id: 'permanent-no',
+    name: 'Permanent no',
   },
   {
-    id: "unidentified",
-    name: "Unidentified",
+    id: 'unidentified',
+    name: 'Unidentified',
   },
-];
+]
 
 const filePermissionTypes: ModerationPermissionType[] = [
-  { id: "yes", name: "Yes" },
-  { id: "no", name: "No" },
-];
+  { id: 'yes', name: 'Yes' },
+  { id: 'no', name: 'No' },
+]
 
 function persistAll() {
-  persistedModPackData.value = modPackData.value;
-  persistedIndex.value = currentIndex.value;
+  persistedModPackData.value = modPackData.value
+  persistedIndex.value = currentIndex.value
 }
 
 watch(
   modPackData,
   (newValue) => {
-    persistedModPackData.value = newValue;
+    persistedModPackData.value = newValue
   },
   { deep: true },
-);
+)
 
 watch(currentIndex, (newValue) => {
-  persistedIndex.value = newValue;
-});
+  persistedIndex.value = newValue
+})
 
 function loadPersistedData(): void {
   if (persistedModPackData.value) {
-    modPackData.value = persistedModPackData.value;
+    modPackData.value = persistedModPackData.value
   }
-  currentIndex.value = persistedIndex.value;
+  currentIndex.value = persistedIndex.value
 }
 
 function clearPersistedData(): void {
-  persistedModPackData.value = null;
-  persistedIndex.value = 0;
+  persistedModPackData.value = null
+  persistedIndex.value = 0
 }
 
 async function fetchModPackData(): Promise<void> {
   try {
     const data = (await useBaseFetch(`moderation/project/${props.projectId}`, {
       internal: true,
-    })) as ModerationModpackResponse;
+    })) as ModerationModpackResponse
 
     const permanentNoItems: ModerationModpackItem[] = Object.entries(data.identified || {})
-      .filter(([_, file]) => file.status === "permanent-no")
+      .filter(([_, file]) => file.status === 'permanent-no')
       .map(
         ([sha1, file]): ModerationModpackItem => ({
           sha1,
           file_name: file.file_name,
-          type: "identified",
+          type: 'identified',
           status: file.status,
           approved: null,
         }),
       )
-      .sort((a, b) => a.file_name.localeCompare(b.file_name));
+      .sort((a, b) => a.file_name.localeCompare(b.file_name))
 
-    permanentNoFiles.value = permanentNoItems;
+    permanentNoFiles.value = permanentNoItems
 
     const sortedData: ModerationModpackItem[] = [
       ...Object.entries(data.identified || {})
         .filter(
           ([_, file]) =>
-            file.status !== "yes" &&
-            file.status !== "with-attribution-and-source" &&
-            file.status !== "permanent-no",
+            file.status !== 'yes' &&
+            file.status !== 'with-attribution-and-source' &&
+            file.status !== 'permanent-no',
         )
         .map(
           ([sha1, file]): ModerationModpackItem => ({
             sha1,
             file_name: file.file_name,
-            type: "identified",
+            type: 'identified',
             status: file.status,
             approved: null,
-            ...(file.status === "unidentified" && {
-              proof: "",
-              url: "",
-              title: "",
+            ...(file.status === 'unidentified' && {
+              proof: '',
+              url: '',
+              title: '',
             }),
           }),
         )
@@ -314,12 +314,12 @@ async function fetchModPackData(): Promise<void> {
           ([sha1, fileName]): ModerationUnknownModpackItem => ({
             sha1,
             file_name: fileName,
-            type: "unknown",
+            type: 'unknown',
             status: null,
             approved: null,
-            proof: "",
-            url: "",
-            title: "",
+            proof: '',
+            url: '',
+            title: '',
           }),
         )
         .sort((a, b) => a.file_name.localeCompare(b.file_name)),
@@ -328,7 +328,7 @@ async function fetchModPackData(): Promise<void> {
           ([sha1, info]): ModerationFlameModpackItem => ({
             sha1,
             file_name: info.file_name,
-            type: "flame",
+            type: 'flame',
             status: null,
             approved: null,
             id: info.id,
@@ -337,166 +337,166 @@ async function fetchModPackData(): Promise<void> {
           }),
         )
         .sort((a, b) => a.file_name.localeCompare(b.file_name)),
-    ];
+    ]
 
     if (modPackData.value) {
-      const existingMap = new Map(modPackData.value.map((item) => [item.sha1, item]));
+      const existingMap = new Map(modPackData.value.map((item) => [item.sha1, item]))
 
       sortedData.forEach((item) => {
-        const existing = existingMap.get(item.sha1);
+        const existing = existingMap.get(item.sha1)
         if (existing) {
           Object.assign(item, {
             status: existing.status,
             approved: existing.approved,
-            ...(item.type === "unknown" && {
-              proof: (existing as ModerationUnknownModpackItem).proof || "",
-              url: (existing as ModerationUnknownModpackItem).url || "",
-              title: (existing as ModerationUnknownModpackItem).title || "",
+            ...(item.type === 'unknown' && {
+              proof: (existing as ModerationUnknownModpackItem).proof || '',
+              url: (existing as ModerationUnknownModpackItem).url || '',
+              title: (existing as ModerationUnknownModpackItem).title || '',
             }),
-            ...(item.type === "flame" && {
+            ...(item.type === 'flame' && {
               url: (existing as ModerationFlameModpackItem).url || item.url,
               title: (existing as ModerationFlameModpackItem).title || item.title,
             }),
-          });
+          })
         }
-      });
+      })
     }
 
-    modPackData.value = sortedData;
-    persistAll();
+    modPackData.value = sortedData
+    persistAll()
   } catch (error) {
-    console.error("Failed to fetch modpack data:", error);
-    modPackData.value = [];
-    permanentNoFiles.value = [];
-    persistAll();
+    console.error('Failed to fetch modpack data:', error)
+    modPackData.value = []
+    permanentNoFiles.value = []
+    persistAll()
   }
 }
 
 function goToPrevious(): void {
   if (currentIndex.value > 0) {
-    currentIndex.value--;
-    persistAll();
+    currentIndex.value--
+    persistAll()
   }
 }
 
 watch(
   modPackData,
   (newValue) => {
-    persistedModPackData.value = newValue;
+    persistedModPackData.value = newValue
   },
   { deep: true },
-);
+)
 
 function goToNext(): void {
   if (modPackData.value && currentIndex.value < modPackData.value.length) {
-    currentIndex.value++;
+    currentIndex.value++
 
     if (currentIndex.value >= modPackData.value.length) {
-      const judgements = getJudgements();
-      emit("update:modelValue", judgements);
-      emit("complete");
-      clearPersistedData();
+      const judgements = getJudgements()
+      emit('update:modelValue', judgements)
+      emit('complete')
+      clearPersistedData()
     } else {
-      persistAll();
+      persistAll()
     }
   }
 }
 
-function setStatus(index: number, status: ModerationModpackPermissionApprovalType["id"]): void {
+function setStatus(index: number, status: ModerationModpackPermissionApprovalType['id']): void {
   if (modPackData.value && modPackData.value[index]) {
-    modPackData.value[index].status = status;
-    modPackData.value[index].approved = null;
-    persistAll();
-    emit("update:modelValue", getJudgements());
+    modPackData.value[index].status = status
+    modPackData.value[index].approved = null
+    persistAll()
+    emit('update:modelValue', getJudgements())
   }
 }
 
-function setApproval(index: number, approved: ModerationPermissionType["id"]): void {
+function setApproval(index: number, approved: ModerationPermissionType['id']): void {
   if (modPackData.value && modPackData.value[index]) {
-    modPackData.value[index].approved = approved;
-    persistAll();
-    emit("update:modelValue", getJudgements());
+    modPackData.value[index].approved = approved
+    persistAll()
+    emit('update:modelValue', getJudgements())
   }
 }
 
 const canGoNext = computed(() => {
-  if (!modPackData.value || !modPackData.value[currentIndex.value]) return false;
-  const current = modPackData.value[currentIndex.value];
-  return current.status !== null;
-});
+  if (!modPackData.value || !modPackData.value[currentIndex.value]) return false
+  const current = modPackData.value[currentIndex.value]
+  return current.status !== null
+})
 
 function getJudgements(): ModerationJudgements {
-  if (!modPackData.value) return {};
+  if (!modPackData.value) return {}
 
-  const judgements: ModerationJudgements = {};
+  const judgements: ModerationJudgements = {}
 
   modPackData.value.forEach((item) => {
-    if (item.type === "flame") {
+    if (item.type === 'flame') {
       judgements[item.sha1] = {
-        type: "flame",
+        type: 'flame',
         id: item.id,
         status: item.status,
         link: item.url,
         title: item.title,
         file_name: item.file_name,
-      };
-    } else if (item.type === "unknown") {
+      }
+    } else if (item.type === 'unknown') {
       judgements[item.sha1] = {
-        type: "unknown",
+        type: 'unknown',
         status: item.status,
         proof: item.proof,
         link: item.url,
         title: item.title,
         file_name: item.file_name,
-      };
+      }
     }
-  });
+  })
 
-  return judgements;
+  return judgements
 }
 
 onMounted(() => {
-  loadPersistedData();
+  loadPersistedData()
   if (!modPackData.value) {
-    fetchModPackData();
+    fetchModPackData()
   }
-});
+})
 
 watch(
   modPackData,
   (newValue) => {
     if (newValue && newValue.length === 0) {
-      emit("complete");
-      clearPersistedData();
+      emit('complete')
+      clearPersistedData()
     }
   },
   { immediate: true },
-);
+)
 
 watch(
   () => props.projectId,
   () => {
-    clearPersistedData();
-    loadPersistedData();
+    clearPersistedData()
+    loadPersistedData()
     if (!modPackData.value) {
-      fetchModPackData();
+      fetchModPackData()
     }
   },
-);
+)
 
 function getModpackFiles(): {
-  interactive: ModerationModpackItem[];
-  permanentNo: ModerationModpackItem[];
+  interactive: ModerationModpackItem[]
+  permanentNo: ModerationModpackItem[]
 } {
   return {
     interactive: modPackData.value || [],
     permanentNo: permanentNoFiles.value,
-  };
+  }
 }
 
 defineExpose({
   getModpackFiles,
-});
+})
 </script>
 
 <style scoped>

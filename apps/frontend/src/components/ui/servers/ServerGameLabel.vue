@@ -26,14 +26,14 @@
 </template>
 
 <script setup lang="ts">
-import { GameIcon } from "@modrinth/assets";
+import { GameIcon } from '@modrinth/assets'
 
 defineProps<{
-  game: string;
-  mcVersion: string;
-  isLink?: boolean;
-}>();
+  game: string
+  mcVersion: string
+  isLink?: boolean
+}>()
 
-const route = useNativeRoute();
-const serverId = route.params.id as string;
+const route = useNativeRoute()
+const serverId = route.params.id as string
 </script>

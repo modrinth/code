@@ -51,17 +51,17 @@ import {
   ListIcon,
   OrganizationIcon,
   ReportIcon,
-} from "@modrinth/assets";
-import { commonMessages } from "@modrinth/ui";
+} from '@modrinth/assets'
+import { commonMessages } from '@modrinth/ui'
 
-import NavStack from "~/components/ui/NavStack.vue";
-import NavStackItem from "~/components/ui/NavStackItem.vue";
+import NavStack from '~/components/ui/NavStack.vue'
+import NavStackItem from '~/components/ui/NavStackItem.vue'
 
-const { formatMessage } = useVIntl();
+const { formatMessage } = useVIntl()
 
 definePageMeta({
-  middleware: "auth",
-});
+  middleware: 'auth',
+})
 
-const route = useNativeRoute();
+const route = useNativeRoute()
 </script>

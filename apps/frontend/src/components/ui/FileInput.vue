@@ -18,14 +18,14 @@
 </template>
 
 <script>
-import { fileIsValid } from "~/helpers/fileUtils.js";
+import { fileIsValid } from '~/helpers/fileUtils.js'
 
 export default {
   components: {},
   props: {
     prompt: {
       type: String,
-      default: "Select file",
+      default: 'Select file',
     },
     multiple: {
       type: Boolean,
@@ -59,33 +59,33 @@ export default {
       default: false,
     },
   },
-  emits: ["change"],
+  emits: ['change'],
   data() {
     return {
       files: [],
-    };
+    }
   },
   methods: {
     addFiles(files, shouldNotReset) {
       if (!shouldNotReset || this.shouldAlwaysReset) {
-        this.files = files;
+        this.files = files
       }
 
-      const validationOptions = { maxSize: this.maxSize, alertOnInvalid: true };
-      this.files = [...this.files].filter((file) => fileIsValid(file, validationOptions));
+      const validationOptions = { maxSize: this.maxSize, alertOnInvalid: true }
+      this.files = [...this.files].filter((file) => fileIsValid(file, validationOptions))
 
       if (this.files.length > 0) {
-        this.$emit("change", this.files);
+        this.$emit('change', this.files)
       }
     },
     handleDrop(e) {
-      this.addFiles(e.dataTransfer.files);
+      this.addFiles(e.dataTransfer.files)
     },
     handleChange(e) {
-      this.addFiles(e.target.files);
+      this.addFiles(e.target.files)
     },
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>

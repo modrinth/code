@@ -35,12 +35,12 @@
 
 <script setup lang="ts">
 defineProps<{
-  noSeparator?: boolean;
-  loader?: "Fabric" | "Quilt" | "Forge" | "NeoForge" | "Paper" | "Spigot" | "Bukkit" | "Vanilla";
-  loaderVersion?: string;
-  isLink?: boolean;
-}>();
+  noSeparator?: boolean
+  loader?: 'Fabric' | 'Quilt' | 'Forge' | 'NeoForge' | 'Paper' | 'Spigot' | 'Bukkit' | 'Vanilla'
+  loaderVersion?: string
+  isLink?: boolean
+}>()
 
-const route = useNativeRoute();
-const serverId = route.params.id as string;
+const route = useNativeRoute()
+const serverId = route.params.id as string
 </script>

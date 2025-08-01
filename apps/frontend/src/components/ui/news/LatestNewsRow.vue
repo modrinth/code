@@ -25,10 +25,10 @@
 </template>
 
 <script setup lang="ts">
-import { NewspaperIcon } from "@modrinth/assets";
-import { articles as rawArticles } from "@modrinth/blog";
-import { ButtonStyled, NewsArticleCard } from "@modrinth/ui";
-import { computed,ref } from "vue";
+import { NewspaperIcon } from '@modrinth/assets'
+import { articles as rawArticles } from '@modrinth/blog'
+import { ButtonStyled, NewsArticleCard } from '@modrinth/ui'
+import { computed, ref } from 'vue'
 
 const articles = ref(
   rawArticles
@@ -43,7 +43,7 @@ const articles = ref(
       date: article.date,
     }))
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
-);
+)
 
-const latestArticles = computed(() => articles.value.slice(0, 3));
+const latestArticles = computed(() => articles.value.slice(0, 3))
 </script>

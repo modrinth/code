@@ -86,67 +86,61 @@
   </div>
 </template>
 <script setup>
-import {
-  HeartIcon,
-  ModrinthPlusIcon,
-  SettingsIcon,
-  SparklesIcon,
-  StarIcon,
-} from "@modrinth/assets";
-import { PurchaseModal } from "@modrinth/ui";
-import { calculateSavings, formatPrice, getCurrency } from "@modrinth/utils";
+import { HeartIcon, ModrinthPlusIcon, SettingsIcon, SparklesIcon, StarIcon } from '@modrinth/assets'
+import { PurchaseModal } from '@modrinth/ui'
+import { calculateSavings, formatPrice, getCurrency } from '@modrinth/utils'
 
-import { products } from "~/generated/state.json";
+import { products } from '~/generated/state.json'
 
-const title = "Subscribe to Modrinth Plus!";
+const title = 'Subscribe to Modrinth Plus!'
 const description =
-  "Subscribe to Modrinth Plus to go ad-free, support Modrinth's development, and get an exclusive profile badge! Half your subscription goes directly to Modrinth creators.";
+  "Subscribe to Modrinth Plus to go ad-free, support Modrinth's development, and get an exclusive profile badge! Half your subscription goes directly to Modrinth creators."
 
 useSeoMeta({
   title,
   description,
   ogTitle: title,
   ogDescription: description,
-});
+})
 
 useHead({
   script: [
     {
-      src: "https://js.stripe.com/v3/",
+      src: 'https://js.stripe.com/v3/',
       defer: true,
       async: true,
     },
   ],
-});
+})
 
-const vintl = useVIntl();
+const vintl = useVIntl()
 
-const data = useNuxtApp();
-const config = useRuntimeConfig();
+const data = useNuxtApp()
+const config = useRuntimeConfig()
 
-const auth = await useAuth();
-const purchaseModal = ref();
-const midasProduct = ref(products.find((x) => x.metadata.type === "midas"));
-const country = useUserCountry();
+const auth = await useAuth()
+const purchaseModal = ref()
+const midasProduct = ref(products.find((x) => x.metadata.type === 'midas'))
+const country = useUserCountry()
 const price = computed(() =>
   midasProduct.value.prices.find((x) => x.currency_code === getCurrency(country.value)),
-);
-const customer = ref();
-const paymentMethods = ref([]);
+)
+const customer = ref()
+const paymentMethods = ref([])
 
 async function fetchPaymentData() {
-  [customer.value, paymentMethods.value] = await Promise.all([
-    useBaseFetch("billing/customer", { internal: true }),
-    useBaseFetch("billing/payment_methods", { internal: true }),
-  ]);
+  ;[customer.value, paymentMethods.value] = await Promise.all([
+    useBaseFetch('billing/customer', { internal: true }),
+    useBaseFetch('billing/payment_methods', { internal: true }),
+  ])
 }
 
-const route = useRoute();
+const route = useRoute()
 onMounted(() => {
   if (route.query.showModal) {
-    purchaseModal.value.show();
+    purchaseModal.value.show()
   }
-});
+})
 </script>
 <style lang="scss" scoped>
 .main-hero {

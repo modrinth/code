@@ -13,35 +13,35 @@
 <script setup lang="ts">
 defineOptions({
   inheritAttrs: false,
-});
+})
 
-const slotContainer = ref();
+const slotContainer = ref()
 
-const hasContent = ref(false);
+const hasContent = ref(false)
 
-const mutationObserver = ref<MutationObserver | null>(null);
+const mutationObserver = ref<MutationObserver | null>(null)
 
 function updateContent() {
-  if (!slotContainer.value) return false;
+  if (!slotContainer.value) return false
 
-  hasContent.value = slotContainer.value ? slotContainer.value.children.length > 0 : false;
+  hasContent.value = slotContainer.value ? slotContainer.value.children.length > 0 : false
 }
 
 onMounted(() => {
-  mutationObserver.value = new MutationObserver(updateContent);
+  mutationObserver.value = new MutationObserver(updateContent)
 
   mutationObserver.value.observe(slotContainer.value, {
     childList: true,
-  });
+  })
 
-  updateContent();
-});
+  updateContent()
+})
 
 onUnmounted(() => {
   if (mutationObserver.value) {
-    mutationObserver.value.disconnect();
+    mutationObserver.value.disconnect()
   }
-});
+})
 </script>
 <style scoped>
 .accordion-content {

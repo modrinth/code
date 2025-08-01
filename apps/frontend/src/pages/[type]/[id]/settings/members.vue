@@ -528,35 +528,35 @@ import {
   UserPlusIcon,
   UsersIcon,
   UserXIcon,
-} from "@modrinth/assets";
-import { Avatar, Badge, Card, Checkbox, ConfirmModal } from "@modrinth/ui";
-import { Multiselect } from "vue-multiselect";
+} from '@modrinth/assets'
+import { Avatar, Badge, Card, Checkbox, ConfirmModal } from '@modrinth/ui'
+import { Multiselect } from 'vue-multiselect'
 
-import { removeSelfFromTeam } from "~/helpers/teams.js";
+import { removeSelfFromTeam } from '~/helpers/teams.js'
 
 const props = defineProps({
   project: {
     type: Object,
     default() {
-      return {};
+      return {}
     },
   },
   organization: {
     type: Object,
     default() {
-      return {};
+      return {}
     },
   },
   allMembers: {
     type: Array,
     default() {
-      return [];
+      return []
     },
   },
   currentMember: {
     type: Object,
     default() {
-      return null;
+      return null
     },
   },
   resetProject: {
@@ -574,39 +574,39 @@ const props = defineProps({
     required: true,
     default: () => {},
   },
-});
+})
 
-const cosmetics = useCosmetics();
-const auth = await useAuth();
+const cosmetics = useCosmetics()
+const auth = await useAuth()
 
-const allTeamMembers = ref([]);
-const allOrgMembers = ref([]);
+const allTeamMembers = ref([])
+const allOrgMembers = ref([])
 
 const acceptedOrgMembers = computed(() => {
-  return props.organization?.members?.filter((x) => x.accepted) || [];
-});
+  return props.organization?.members?.filter((x) => x.accepted) || []
+})
 
 function initMembers() {
-  const orgMembers = props.organization?.members || [];
+  const orgMembers = props.organization?.members || []
 
   const selectedMembersForOrg = orgMembers.map((partialOrgMember) => {
-    const foundMember = props.allMembers.find((tM) => tM.user.id === partialOrgMember.user.id);
-    const returnVal = foundMember ?? partialOrgMember;
+    const foundMember = props.allMembers.find((tM) => tM.user.id === partialOrgMember.user.id)
+    const returnVal = foundMember ?? partialOrgMember
 
     // If replacing a partial with a full member, we need to mark as such.
-    returnVal.override = !!foundMember;
-    returnVal.oldOverride = !!foundMember;
+    returnVal.override = !!foundMember
+    returnVal.oldOverride = !!foundMember
 
-    returnVal.is_owner = partialOrgMember.is_owner;
+    returnVal.is_owner = partialOrgMember.is_owner
 
-    return returnVal;
-  });
+    return returnVal
+  })
 
-  allOrgMembers.value = selectedMembersForOrg;
+  allOrgMembers.value = selectedMembersForOrg
 
   allTeamMembers.value = props.allMembers.filter(
     (x) => !selectedMembersForOrg.some((y) => y.user.id === x.user.id),
-  );
+  )
 }
 
 watch(
@@ -617,128 +617,128 @@ watch(
     () => props.currentMember,
   ],
   initMembers,
-);
-initMembers();
+)
+initMembers()
 
-const currentUsername = ref("");
-const openTeamMembers = ref([]);
-const selectedOrganization = ref(null);
+const currentUsername = ref('')
+const openTeamMembers = ref([])
+const selectedOrganization = ref(null)
 
-const { data: organizations } = useAsyncData("organizations", () => {
-  return useBaseFetch("user/" + auth.value?.user.id + "/organizations", {
+const { data: organizations } = useAsyncData('organizations', () => {
+  return useBaseFetch('user/' + auth.value?.user.id + '/organizations', {
     apiVersion: 3,
-  });
-});
+  })
+})
 
-const UPLOAD_VERSION = 1 << 0;
-const DELETE_VERSION = 1 << 1;
-const EDIT_DETAILS = 1 << 2;
-const EDIT_BODY = 1 << 3;
-const MANAGE_INVITES = 1 << 4;
-const REMOVE_MEMBER = 1 << 5;
-const EDIT_MEMBER = 1 << 6;
-const DELETE_PROJECT = 1 << 7;
-const VIEW_ANALYTICS = 1 << 8;
-const VIEW_PAYOUTS = 1 << 9;
+const UPLOAD_VERSION = 1 << 0
+const DELETE_VERSION = 1 << 1
+const EDIT_DETAILS = 1 << 2
+const EDIT_BODY = 1 << 3
+const MANAGE_INVITES = 1 << 4
+const REMOVE_MEMBER = 1 << 5
+const EDIT_MEMBER = 1 << 6
+const DELETE_PROJECT = 1 << 7
+const VIEW_ANALYTICS = 1 << 8
+const VIEW_PAYOUTS = 1 << 9
 
 const onAddToOrg = useClientTry(async () => {
-  if (!selectedOrganization.value) return;
+  if (!selectedOrganization.value) return
 
   await useBaseFetch(`organization/${selectedOrganization.value.id}/projects`, {
-    method: "POST",
+    method: 'POST',
     body: JSON.stringify({
       project_id: props.project.id,
     }),
     apiVersion: 3,
-  });
+  })
 
-  await updateMembers();
+  await updateMembers()
 
   addNotification({
-    group: "main",
-    title: "Project transferred",
-    text: "Your project has been transferred to the organization.",
-    type: "success",
-  });
-});
+    group: 'main',
+    title: 'Project transferred',
+    text: 'Your project has been transferred to the organization.',
+    type: 'success',
+  })
+})
 
 const onRemoveFromOrg = useClientTry(async () => {
-  if (!props.project.organization || !auth.value?.user?.id) return;
+  if (!props.project.organization || !auth.value?.user?.id) return
 
   await useBaseFetch(`organization/${props.project.organization}/projects/${props.project.id}`, {
-    method: "DELETE",
+    method: 'DELETE',
     body: JSON.stringify({
       new_owner: auth.value.user.id,
     }),
     apiVersion: 3,
-  });
+  })
 
-  await updateMembers();
+  await updateMembers()
 
   addNotification({
-    group: "main",
-    title: "Project removed",
-    text: "Your project has been removed from the organization.",
-    type: "success",
-  });
-});
+    group: 'main',
+    title: 'Project removed',
+    text: 'Your project has been removed from the organization.',
+    type: 'success',
+  })
+})
 
 const leaveProject = async () => {
-  await removeSelfFromTeam(props.project.team);
-  navigateTo("/dashboard/projects");
-};
+  await removeSelfFromTeam(props.project.team)
+  navigateTo('/dashboard/projects')
+}
 
 const inviteTeamMember = async () => {
-  startLoading();
+  startLoading()
 
   try {
-    const user = await useBaseFetch(`user/${currentUsername.value}`);
+    const user = await useBaseFetch(`user/${currentUsername.value}`)
     const data = {
       user_id: user.id.trim(),
-    };
+    }
     await useBaseFetch(`team/${props.project.team}/members`, {
-      method: "POST",
+      method: 'POST',
       body: data,
-    });
-    currentUsername.value = "";
-    await updateMembers();
+    })
+    currentUsername.value = ''
+    await updateMembers()
   } catch (err) {
     addNotification({
-      group: "main",
-      title: "An error occurred",
-      text: err?.data?.description || err?.message || err || "Unknown error",
-      type: "error",
-    });
+      group: 'main',
+      title: 'An error occurred',
+      text: err?.data?.description || err?.message || err || 'Unknown error',
+      type: 'error',
+    })
   }
 
-  stopLoading();
-};
+  stopLoading()
+}
 
 const removeTeamMember = async (index) => {
-  startLoading();
+  startLoading()
 
   try {
     await useBaseFetch(
       `team/${props.project.team}/members/${allTeamMembers.value[index].user.id}`,
       {
-        method: "DELETE",
+        method: 'DELETE',
       },
-    );
-    await updateMembers();
+    )
+    await updateMembers()
   } catch (err) {
     addNotification({
-      group: "main",
-      title: "An error occurred",
-      text: err?.data?.description || err?.message || err || "Unknown error",
-      type: "error",
-    });
+      group: 'main',
+      title: 'An error occurred',
+      text: err?.data?.description || err?.message || err || 'Unknown error',
+      type: 'error',
+    })
   }
 
-  stopLoading();
-};
+  stopLoading()
+}
 
 const updateTeamMember = async (index) => {
-  startLoading();
+  startLoading()
 
   try {
     const data = !allTeamMembers.value[index].is_owner
@@ -750,107 +750,107 @@ const updateTeamMember = async (index) => {
       : {
           payouts_split: allTeamMembers.value[index].payouts_split,
           role: allTeamMembers.value[index].role,
-        };
+        }
 
     await useBaseFetch(
       `team/${props.project.team}/members/${allTeamMembers.value[index].user.id}`,
       {
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       },
-    );
-    await updateMembers();
+    )
+    await updateMembers()
     addNotification({
-      group: "main",
-      title: "Member(s) updated",
+      group: 'main',
+      title: 'Member(s) updated',
       text: "Your project's member(s) has been updated.",
-      type: "success",
-    });
+      type: 'success',
+    })
   } catch (err) {
     addNotification({
-      group: "main",
-      title: "An error occurred",
-      text: err?.data?.description || err?.message || err || "Unknown error",
-      type: "error",
-    });
+      group: 'main',
+      title: 'An error occurred',
+      text: err?.data?.description || err?.message || err || 'Unknown error',
+      type: 'error',
+    })
   }
 
-  stopLoading();
-};
+  stopLoading()
+}
 
 const transferOwnership = async (index) => {
-  startLoading();
+  startLoading()
 
   try {
     await useBaseFetch(`team/${props.project.team}/owner`, {
-      method: "PATCH",
+      method: 'PATCH',
       body: {
         user_id: allTeamMembers.value[index].user.id,
       },
-    });
-    await updateMembers();
+    })
+    await updateMembers()
   } catch (err) {
     addNotification({
-      group: "main",
-      title: "An error occurred",
-      text: err?.data?.description || err?.message || err || "Unknown error",
-      type: "error",
-    });
+      group: 'main',
+      title: 'An error occurred',
+      text: err?.data?.description || err?.message || err || 'Unknown error',
+      type: 'error',
+    })
   }
 
-  stopLoading();
-};
+  stopLoading()
+}
 
 async function updateOrgMember(index) {
-  startLoading();
+  startLoading()
 
   try {
     if (allOrgMembers.value[index].override && !allOrgMembers.value[index].oldOverride) {
       await useBaseFetch(`team/${props.project.team}/members`, {
-        method: "POST",
+        method: 'POST',
         body: {
           permissions: allOrgMembers.value[index].permissions,
           role: allOrgMembers.value[index].role,
           payouts_split: allOrgMembers.value[index].payouts_split,
           user_id: allOrgMembers.value[index].user.id,
         },
-      });
+      })
     } else if (!allOrgMembers.value[index].override && allOrgMembers.value[index].oldOverride) {
       await useBaseFetch(
         `team/${props.project.team}/members/${allOrgMembers.value[index].user.id}`,
         {
-          method: "DELETE",
+          method: 'DELETE',
         },
-      );
+      )
     } else {
       await useBaseFetch(
         `team/${props.project.team}/members/${allOrgMembers.value[index].user.id}`,
         {
-          method: "PATCH",
+          method: 'PATCH',
           body: {
             permissions: allOrgMembers.value[index].permissions,
             role: allOrgMembers.value[index].role,
             payouts_split: allOrgMembers.value[index].payouts_split,
           },
         },
-      );
+      )
     }
-    await updateMembers();
+    await updateMembers()
   } catch (err) {
     addNotification({
-      group: "main",
-      title: "An error occurred",
-      text: err?.data?.description || err?.message || err || "Unknown error",
-      type: "error",
-    });
+      group: 'main',
+      title: 'An error occurred',
+      text: err?.data?.description || err?.message || err || 'Unknown error',
+      type: 'error',
+    })
   }
 
-  stopLoading();
+  stopLoading()
 }
 
 const updateMembers = async () => {
-  await Promise.all([props.resetProject(), props.resetOrganization(), props.resetMembers()]);
-};
+  await Promise.all([props.resetProject(), props.resetOrganization(), props.resetMembers()])
+}
 </script>
 
 <style lang="scss" scoped>

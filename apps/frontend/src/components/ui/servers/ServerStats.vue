@@ -57,7 +57,7 @@
     >
       <div class="flex flex-row items-center gap-2">
         <h2 class="m-0 -ml-0.5 mt-1 text-3xl font-extrabold text-contrast">
-          {{ loading ? "0 B" : formatBytes(stats.storage_usage_bytes) }}
+          {{ loading ? '0 B' : formatBytes(stats.storage_usage_bytes) }}
         </h2>
       </div>
       <h3 class="text-base font-normal text-secondary">Storage usage</h3>
@@ -67,25 +67,25 @@
 </template>
 
 <script setup lang="ts">
-import { CpuIcon, DatabaseIcon, FolderOpenIcon, IssuesIcon } from "@modrinth/assets";
-import type { Stats } from "@modrinth/utils";
-import { useStorage } from "@vueuse/core";
-import { computed, ref, shallowRef } from "vue";
+import { CpuIcon, DatabaseIcon, FolderOpenIcon, IssuesIcon } from '@modrinth/assets'
+import type { Stats } from '@modrinth/utils'
+import { useStorage } from '@vueuse/core'
+import { computed, ref, shallowRef } from 'vue'
 
-const flags = useFeatureFlags();
-const route = useNativeRoute();
-const serverId = route.params.id;
-const VueApexCharts = defineAsyncComponent(() => import("vue3-apexcharts"));
+const flags = useFeatureFlags()
+const route = useNativeRoute()
+const serverId = route.params.id
+const VueApexCharts = defineAsyncComponent(() => import('vue3-apexcharts'))
 
-const chartsReady = ref(new Set<number>());
+const chartsReady = ref(new Set<number>())
 
 const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
   ramAsNumber: false,
-});
+})
 
 const props = withDefaults(defineProps<{ data?: Stats; loading?: boolean }>(), {
   loading: false,
-});
+})
 
 const stats = shallowRef(
   props.data?.current || {
@@ -94,76 +94,76 @@ const stats = shallowRef(
     ram_total_bytes: 1, // Avoid division by zero
     storage_usage_bytes: 0,
   },
-);
+)
 
 const onChartReady = (index: number) => {
-  chartsReady.value.add(index);
-};
+  chartsReady.value.add(index)
+}
 
 const formatBytes = (bytes: number) => {
-  const units = ["B", "KB", "MB", "GB"];
-  let value = bytes;
-  let unit = 0;
+  const units = ['B', 'KB', 'MB', 'GB']
+  let value = bytes
+  let unit = 0
   while (value >= 1024 && unit < units.length - 1) {
-    value /= 1024;
-    unit++;
+    value /= 1024
+    unit++
   }
-  return `${Math.round(value * 10) / 10} ${units[unit]}`;
-};
+  return `${Math.round(value * 10) / 10} ${units[unit]}`
+}
 
-const cpuData = ref<number[]>(Array(20).fill(0));
-const ramData = ref<number[]>(Array(20).fill(0));
+const cpuData = ref<number[]>(Array(20).fill(0))
+const ramData = ref<number[]>(Array(20).fill(0))
 
 const updateGraphData = (arr: number[], newValue: number) => {
-  arr.push(newValue);
-  arr.shift();
-};
+  arr.push(newValue)
+  arr.shift()
+}
 
 const metrics = computed(() => {
   if (props.loading) {
     return [
       {
-        title: "CPU usage",
-        value: "0.00%",
-        max: "100%",
+        title: 'CPU usage',
+        value: '0.00%',
+        max: '100%',
         icon: CpuIcon,
         data: cpuData.value,
         showGraph: false,
         warning: null,
       },
       {
-        title: "Memory usage",
-        value: "0.00%",
-        max: "100%",
+        title: 'Memory usage',
+        value: '0.00%',
+        max: '100%',
         icon: DatabaseIcon,
         data: ramData.value,
         showGraph: false,
         warning: null,
       },
-    ];
+    ]
   }
 
   const ramPercent = Math.min(
     (stats.value.ram_usage_bytes / stats.value.ram_total_bytes) * 100,
     100,
-  );
-  const cpuPercent = Math.min(stats.value.cpu_percent, 100);
+  )
+  const cpuPercent = Math.min(stats.value.cpu_percent, 100)
 
-  updateGraphData(cpuData.value, cpuPercent);
-  updateGraphData(ramData.value, ramPercent);
+  updateGraphData(cpuData.value, cpuPercent)
+  updateGraphData(ramData.value, ramPercent)
 
   return [
     {
-      title: "CPU usage",
+      title: 'CPU usage',
       value: `${cpuPercent.toFixed(2)}%`,
-      max: "100%",
+      max: '100%',
       icon: CpuIcon,
       data: cpuData.value,
       showGraph: true,
-      warning: cpuPercent >= 90 ? "CPU usage is very high" : null,
+      warning: cpuPercent >= 90 ? 'CPU usage is very high' : null,
     },
     {
-      title: "Memory usage",
+      title: 'Memory usage',
       value:
         userPreferences.value.ramAsNumber || flags.developerMode
           ? formatBytes(stats.value.ram_usage_bytes)
@@ -171,18 +171,18 @@ const metrics = computed(() => {
       max:
         userPreferences.value.ramAsNumber || flags.developerMode
           ? formatBytes(stats.value.ram_total_bytes)
-          : "100%",
+          : '100%',
       icon: DatabaseIcon,
       data: ramData.value,
       showGraph: true,
-      warning: ramPercent >= 90 ? "Memory usage is very high" : null,
+      warning: ramPercent >= 90 ? 'Memory usage is very high' : null,
     },
-  ];
-});
+  ]
+})
 
 const getChartOptions = (hasWarning: string | null, index: number) => ({
   chart: {
-    type: "area",
+    type: 'area',
     animations: { enabled: false },
     sparkline: { enabled: true },
     toolbar: { show: false },
@@ -197,9 +197,9 @@ const getChartOptions = (hasWarning: string | null, index: number) => ({
       updated: () => onChartReady(index),
     },
   },
-  stroke: { curve: "smooth", width: 3 },
+  stroke: { curve: 'smooth', width: 3 },
   fill: {
-    type: "gradient",
+    type: 'gradient',
     gradient: {
       shadeIntensity: 1,
       opacityFrom: 0.25,
@@ -212,7 +212,7 @@ const getChartOptions = (hasWarning: string | null, index: number) => ({
   xaxis: {
     labels: { show: false },
     axisBorder: { show: false },
-    type: "numeric",
+    type: 'numeric',
     tickAmount: 20,
     range: 20,
   },
@@ -222,20 +222,20 @@ const getChartOptions = (hasWarning: string | null, index: number) => ({
     max: 100,
     forceNiceScale: false,
   },
-  colors: [hasWarning ? "var(--color-orange)" : "var(--color-brand)"],
+  colors: [hasWarning ? 'var(--color-orange)' : 'var(--color-brand)'],
   dataLabels: {
     enabled: false,
   },
-});
+})
 
 watch(
   () => props.data?.current,
   (newStats) => {
     if (newStats) {
-      stats.value = newStats;
+      stats.value = newStats
     }
   },
-);
+)
 </script>
 
 <style scoped>

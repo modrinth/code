@@ -1,33 +1,33 @@
 <script setup lang="ts">
-import { ChevronLeftIcon } from "@modrinth/assets";
-import { ChangelogEntry, Timeline } from "@modrinth/ui";
-import { getChangelog } from "@modrinth/utils";
+import { ChevronLeftIcon } from '@modrinth/assets'
+import { ChangelogEntry, Timeline } from '@modrinth/ui'
+import { getChangelog } from '@modrinth/utils'
 
-const route = useRoute();
+const route = useRoute()
 
 const changelogEntry = computed(() =>
   route.params.date
     ? getChangelog().find((x) => {
         if (x.product === route.params.product) {
-          console.log("Found matching product!");
+          console.log('Found matching product!')
 
           if (x.version && x.version === route.params.date) {
-            console.log("Found matching version!");
-            return x;
+            console.log('Found matching version!')
+            return x
           } else if (x.date.unix() === Number(route.params.date as string)) {
-            console.log("Found matching date!");
-            return x;
+            console.log('Found matching date!')
+            return x
           }
         }
-        return undefined;
+        return undefined
       })
     : undefined,
-);
+)
 
-const isFirst = computed(() => changelogEntry.value?.date === getChangelog()[0].date);
+const isFirst = computed(() => changelogEntry.value?.date === getChangelog()[0].date)
 
 if (!changelogEntry.value) {
-  createError({ statusCode: 404, statusMessage: "Version not found" });
+  createError({ statusCode: 404, statusMessage: 'Version not found' })
 }
 </script>
 

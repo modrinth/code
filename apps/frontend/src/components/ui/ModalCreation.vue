@@ -84,11 +84,11 @@
 </template>
 
 <script setup>
-import { PlusIcon,XIcon } from "@modrinth/assets";
-import { ButtonStyled, DropdownSelect,NewModal } from "@modrinth/ui";
+import { PlusIcon, XIcon } from '@modrinth/assets'
+import { ButtonStyled, DropdownSelect, NewModal } from '@modrinth/ui'
 
-const router = useRouter();
-const app = useNuxtApp();
+const router = useRouter()
+const app = useNuxtApp()
 
 const props = defineProps({
   organizationId: {
@@ -96,120 +96,120 @@ const props = defineProps({
     required: false,
     default: null,
   },
-});
+})
 
-const modal = ref();
+const modal = ref()
 
-const name = ref("");
-const slug = ref("");
-const description = ref("");
-const manualSlug = ref(false);
+const name = ref('')
+const slug = ref('')
+const description = ref('')
+const manualSlug = ref(false)
 const visibilities = ref([
   {
-    actual: "approved",
-    display: "Public",
+    actual: 'approved',
+    display: 'Public',
   },
   {
-    actual: "unlisted",
-    display: "Unlisted",
+    actual: 'unlisted',
+    display: 'Unlisted',
   },
   {
-    actual: "private",
-    display: "Private",
+    actual: 'private',
+    display: 'Private',
   },
-]);
+])
 const visibility = ref({
-  actual: "approved",
-  display: "Public",
-});
+  actual: 'approved',
+  display: 'Public',
+})
 
 const cancel = () => {
-  modal.value.hide();
-};
+  modal.value.hide()
+}
 
 async function createProject() {
-  startLoading();
+  startLoading()
 
-  const formData = new FormData();
+  const formData = new FormData()
 
-  const auth = await useAuth();
+  const auth = await useAuth()
 
   const projectData = {
     title: name.value.trim(),
-    project_type: "mod",
+    project_type: 'mod',
     slug: slug.value,
     description: description.value.trim(),
-    body: "",
+    body: '',
     requested_status: visibility.value.actual,
     initial_versions: [],
     team_members: [
       {
         user_id: auth.value.user.id,
         name: auth.value.user.username,
-        role: "Owner",
+        role: 'Owner',
       },
     ],
     categories: [],
-    client_side: "required",
-    server_side: "required",
-    license_id: "LicenseRef-Unknown",
+    client_side: 'required',
+    server_side: 'required',
+    license_id: 'LicenseRef-Unknown',
     is_draft: true,
-  };
+  }
 
   if (props.organizationId) {
-    projectData.organization_id = props.organizationId;
+    projectData.organization_id = props.organizationId
   }
 
-  formData.append("data", JSON.stringify(projectData));
+  formData.append('data', JSON.stringify(projectData))
 
   try {
-    await useBaseFetch("project", {
-      method: "POST",
+    await useBaseFetch('project', {
+      method: 'POST',
       body: formData,
       headers: {
-        "Content-Disposition": formData,
+        'Content-Disposition': formData,
       },
-    });
+    })
 
-    modal.value.hide();
+    modal.value.hide()
     await router.push({
-      name: "type-id",
+      name: 'type-id',
       params: {
-        type: "project",
+        type: 'project',
         id: slug.value,
       },
-    });
+    })
   } catch (err) {
     app.$notify({
-      group: "main",
-      title: "An error occurred",
+      group: 'main',
+      title: 'An error occurred',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  stopLoading();
+  stopLoading()
 }
 
 function show(event) {
-  name.value = "";
-  slug.value = "";
-  description.value = "";
-  manualSlug.value = false;
-  modal.value.show(event);
+  name.value = ''
+  slug.value = ''
+  description.value = ''
+  manualSlug.value = false
+  modal.value.show(event)
 }
 
 defineExpose({
   show,
-});
+})
 
 function updatedName() {
   if (!manualSlug.value) {
     slug.value = name.value
       .trim()
       .toLowerCase()
-      .replaceAll(" ", "-")
-      .replaceAll(/[^a-zA-Z0-9!@$()`.+,_"-]/g, "")
-      .replaceAll(/--+/gm, "-");
+      .replaceAll(' ', '-')
+      .replaceAll(/[^a-zA-Z0-9!@$()`.+,_"-]/g, '')
+      .replaceAll(/--+/gm, '-')
   }
 }
 </script>

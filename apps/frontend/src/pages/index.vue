@@ -171,7 +171,7 @@
                       {{ notification.title }} has been updated!
                     </nuxt-link>
                     <p class="notif-desc">
-                      Version {{ ["1.1.2", "1.0.3", "15.1"][index] }} has been released for
+                      Version {{ ['1.1.2', '1.0.3', '15.1'][index] }} has been released for
                       {{
                         $capitalizeString(
                           notification.display_categories[
@@ -432,27 +432,27 @@ import {
   LogInIcon,
   ModrinthIcon,
   SearchIcon,
-} from "@modrinth/assets";
-import { Avatar, ButtonStyled, useRelativeTime } from "@modrinth/ui";
-import { ref } from "vue";
-import { Multiselect } from "vue-multiselect";
+} from '@modrinth/assets'
+import { Avatar, ButtonStyled, useRelativeTime } from '@modrinth/ui'
+import { ref } from 'vue'
+import { Multiselect } from 'vue-multiselect'
 
-import ATLauncherLogo from "~/assets/images/external/atlauncher.svg?component";
-import PrismLauncherLogo from "~/assets/images/external/prism.svg?component";
-import LatestNewsRow from "~/components/ui/news/LatestNewsRow.vue";
-import ProjectCard from "~/components/ui/ProjectCard.vue";
-import { homePageNotifs,homePageProjects, homePageSearch } from "~/generated/state.json";
+import ATLauncherLogo from '~/assets/images/external/atlauncher.svg?component'
+import PrismLauncherLogo from '~/assets/images/external/prism.svg?component'
+import LatestNewsRow from '~/components/ui/news/LatestNewsRow.vue'
+import ProjectCard from '~/components/ui/ProjectCard.vue'
+import { homePageNotifs, homePageProjects, homePageSearch } from '~/generated/state.json'
 
-const formatRelativeTime = useRelativeTime();
+const formatRelativeTime = useRelativeTime()
 
-const searchQuery = ref("leave");
-const sortType = ref("relevance");
+const searchQuery = ref('leave')
+const sortType = ref('relevance')
 
-const auth = await useAuth();
-const tags = useTags();
+const auth = await useAuth()
+const tags = useTags()
 
-const newProjects = homePageProjects?.slice(0, 40);
-const val = Math.ceil(newProjects?.length / 3);
+const newProjects = homePageProjects?.slice(0, 40)
+const val = Math.ceil(newProjects?.length / 3)
 const rows = ref(
   newProjects.length > 0
     ? [
@@ -461,17 +461,17 @@ const rows = ref(
         newProjects.slice(val * 2, val * 3),
       ]
     : undefined,
-);
+)
 
-const notifications = ref(homePageNotifs?.hits ?? []);
-const searchProjects = ref(homePageSearch?.hits ?? []);
+const notifications = ref(homePageNotifs?.hits ?? [])
+const searchProjects = ref(homePageSearch?.hits ?? [])
 
 async function updateSearchProjects() {
   const res = await useBaseFetch(
     `search?limit=3&query=${searchQuery.value}&index=${sortType.value}`,
-  );
+  )
 
-  searchProjects.value = res?.hits ?? [];
+  searchProjects.value = res?.hits ?? []
 }
 </script>
 
@@ -518,7 +518,7 @@ async function updateSearchProjects() {
   width: 100%;
 
   &:before {
-    content: "";
+    content: '';
     position: absolute;
     z-index: 1;
     inset: 0;
@@ -722,7 +722,7 @@ async function updateSearchProjects() {
         z-index: 1;
 
         &:after {
-          content: "";
+          content: '';
           position: absolute;
           z-index: -1;
           inset: 0 0 -0.75rem -0.75rem;
@@ -996,7 +996,7 @@ async function updateSearchProjects() {
   border-radius: 1rem;
 
   &:before {
-    content: "";
+    content: '';
     position: absolute;
     inset: 0;
     padding: 1px;

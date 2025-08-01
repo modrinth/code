@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-const route = useNativeRoute();
+const route = useNativeRoute()
 
 const props = defineProps({
   links: {
@@ -35,59 +35,59 @@ const props = defineProps({
     default: null,
     type: String,
   },
-});
+})
 
-const sliderPositionX = ref(0);
-const sliderPositionY = ref(18);
-const selectedElementWidth = ref(0);
-const activeIndex = ref(-1);
-const oldIndex = ref(-1);
+const sliderPositionX = ref(0)
+const sliderPositionY = ref(18)
+const selectedElementWidth = ref(0)
+const activeIndex = ref(-1)
+const oldIndex = ref(-1)
 
 const filteredLinks = computed(() =>
   props.links.filter((x) => (x.shown === undefined ? true : x.shown)),
-);
-const positionToMoveX = computed(() => `${sliderPositionX.value}px`);
-const positionToMoveY = computed(() => `${sliderPositionY.value}px`);
-const sliderWidth = computed(() => `${selectedElementWidth.value}px`);
+)
+const positionToMoveX = computed(() => `${sliderPositionX.value}px`)
+const positionToMoveY = computed(() => `${sliderPositionY.value}px`)
+const sliderWidth = computed(() => `${selectedElementWidth.value}px`)
 
 function pickLink() {
   activeIndex.value = props.query
     ? filteredLinks.value.findIndex(
-        (x) => (x.href === "" ? undefined : x.href) === route.path[props.query],
+        (x) => (x.href === '' ? undefined : x.href) === route.path[props.query],
       )
-    : filteredLinks.value.findIndex((x) => x.href === decodeURIComponent(route.path));
+    : filteredLinks.value.findIndex((x) => x.href === decodeURIComponent(route.path))
 
   if (activeIndex.value !== -1) {
-    startAnimation();
+    startAnimation()
   } else {
-    oldIndex.value = -1;
-    sliderPositionX.value = 0;
-    selectedElementWidth.value = 0;
+    oldIndex.value = -1
+    sliderPositionX.value = 0
+    selectedElementWidth.value = 0
   }
 }
 
-const rowLinkElements = ref();
+const rowLinkElements = ref()
 
 function startAnimation() {
-  const el = rowLinkElements.value[activeIndex.value].$el;
+  const el = rowLinkElements.value[activeIndex.value].$el
 
-  if (!el || !el.offsetParent) return;
+  if (!el || !el.offsetParent) return
 
-  sliderPositionX.value = el.offsetLeft;
-  sliderPositionY.value = el.offsetTop + el.offsetHeight;
-  selectedElementWidth.value = el.offsetWidth;
+  sliderPositionX.value = el.offsetLeft
+  sliderPositionY.value = el.offsetTop + el.offsetHeight
+  selectedElementWidth.value = el.offsetWidth
 }
 
 onMounted(() => {
-  window.addEventListener("resize", pickLink);
-  pickLink();
-});
+  window.addEventListener('resize', pickLink)
+  pickLink()
+})
 
 onUnmounted(() => {
-  window.removeEventListener("resize", pickLink);
-});
+  window.removeEventListener('resize', pickLink)
+})
 
-watch(route, () => pickLink());
+watch(route, () => pickLink())
 </script>
 
 <style lang="scss" scoped>

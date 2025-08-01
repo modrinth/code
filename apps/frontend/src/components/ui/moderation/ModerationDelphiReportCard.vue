@@ -47,7 +47,7 @@
                 <span class="max-w-[200px] truncate font-mono text-xs sm:max-w-none">
                   {{
                     report.version.files.find((file) => file.primary)?.filename ||
-                    "Unknown primary file"
+                    'Unknown primary file'
                   }}
                 </span>
               </div>
@@ -124,56 +124,56 @@ import {
   EyeIcon,
   LinkIcon,
   OrganizationIcon,
-} from "@modrinth/assets";
-import type { ExtendedDelphiReport } from "@modrinth/moderation";
+} from '@modrinth/assets'
+import type { ExtendedDelphiReport } from '@modrinth/moderation'
 import {
   Avatar,
   ButtonStyled,
   OverflowMenu,
   type OverflowMenuOption,
   useRelativeTime,
-} from "@modrinth/ui";
-import dayjs from "dayjs";
+} from '@modrinth/ui'
+import dayjs from 'dayjs'
 
 const props = defineProps<{
-  report: ExtendedDelphiReport;
-}>();
+  report: ExtendedDelphiReport
+}>()
 
-const formatRelativeTime = useRelativeTime();
-const isPending = computed(() => props.report.status === "pending");
+const formatRelativeTime = useRelativeTime()
+const isPending = computed(() => props.report.status === 'pending')
 
 const quickActions: OverflowMenuOption[] = [
   {
-    id: "copy-link",
+    id: 'copy-link',
     action: () => {
-      const base = window.location.origin;
-      const reviewUrl = `${base}/moderation/tech-reviews?q=${props.report.version.id}`;
+      const base = window.location.origin
+      const reviewUrl = `${base}/moderation/tech-reviews?q=${props.report.version.id}`
       navigator.clipboard.writeText(reviewUrl).then(() => {
         addNotification({
-          type: "success",
-          title: "Tech review link copied",
-          text: "The link to this tech review has been copied to your clipboard.",
-        });
-      });
+          type: 'success',
+          title: 'Tech review link copied',
+          text: 'The link to this tech review has been copied to your clipboard.',
+        })
+      })
     },
   },
   {
-    id: "copy-id",
+    id: 'copy-id',
     action: () => {
       navigator.clipboard.writeText(props.report.version.id).then(() => {
         addNotification({
-          type: "success",
-          title: "Version ID copied",
-          text: "The ID of this version has been copied to your clipboard.",
-        });
-      });
+          type: 'success',
+          title: 'Version ID copied',
+          text: 'The ID of this version has been copied to your clipboard.',
+        })
+      })
     },
   },
-];
+]
 
 const versionUrl = computed(() => {
-  return `/${props.report.project.project_type}/${props.report.project.slug}/versions/${props.report.version.id}`;
-});
+  return `/${props.report.project.project_type}/${props.report.project.slug}/versions/${props.report.version.id}`
+})
 </script>
 
 <style lang="scss" scoped></style>

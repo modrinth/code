@@ -17,49 +17,49 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed } from 'vue'
 
 const props = defineProps<{
-  uptimeSeconds: number;
-  noSeparator?: boolean;
-}>();
+  uptimeSeconds: number
+  noSeparator?: boolean
+}>()
 
 const formattedUptime = computed(() => {
-  const days = Math.floor(props.uptimeSeconds / (24 * 3600));
-  const hours = Math.floor((props.uptimeSeconds % (24 * 3600)) / 3600);
-  const minutes = Math.floor((props.uptimeSeconds % 3600) / 60);
-  const seconds = props.uptimeSeconds % 60;
+  const days = Math.floor(props.uptimeSeconds / (24 * 3600))
+  const hours = Math.floor((props.uptimeSeconds % (24 * 3600)) / 3600)
+  const minutes = Math.floor((props.uptimeSeconds % 3600) / 60)
+  const seconds = props.uptimeSeconds % 60
 
-  let formatted = "";
+  let formatted = ''
   if (days > 0) {
-    formatted += `${days}d `;
+    formatted += `${days}d `
   }
   if (hours > 0 || days > 0) {
-    formatted += `${hours}h `;
+    formatted += `${hours}h `
   }
-  formatted += `${minutes}m ${seconds}s`;
+  formatted += `${minutes}m ${seconds}s`
 
-  return formatted.trim();
-});
+  return formatted.trim()
+})
 
 const verboseUptime = computed(() => {
-  const days = Math.floor(props.uptimeSeconds / (24 * 3600));
-  const hours = Math.floor((props.uptimeSeconds % (24 * 3600)) / 3600);
-  const minutes = Math.floor((props.uptimeSeconds % 3600) / 60);
-  const seconds = props.uptimeSeconds % 60;
+  const days = Math.floor(props.uptimeSeconds / (24 * 3600))
+  const hours = Math.floor((props.uptimeSeconds % (24 * 3600)) / 3600)
+  const minutes = Math.floor((props.uptimeSeconds % 3600) / 60)
+  const seconds = props.uptimeSeconds % 60
 
-  let verbose = "";
+  let verbose = ''
   if (days > 0) {
-    verbose += `${days} day${days > 1 ? "s" : ""} `;
+    verbose += `${days} day${days > 1 ? 's' : ''} `
   }
   if (hours > 0) {
-    verbose += `${hours} hour${hours > 1 ? "s" : ""} `;
+    verbose += `${hours} hour${hours > 1 ? 's' : ''} `
   }
   if (minutes > 0) {
-    verbose += `${minutes} minute${minutes > 1 ? "s" : ""} `;
+    verbose += `${minutes} minute${minutes > 1 ? 's' : ''} `
   }
-  verbose += `${seconds} second${seconds > 1 ? "s" : ""}`;
+  verbose += `${seconds} second${seconds > 1 ? 's' : ''}`
 
-  return verbose.trim();
-});
+  return verbose.trim()
+})
 </script>

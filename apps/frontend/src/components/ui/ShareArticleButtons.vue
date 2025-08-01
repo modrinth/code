@@ -64,23 +64,23 @@ import {
   MailIcon,
   MastodonIcon,
   TwitterIcon,
-} from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+} from '@modrinth/assets'
+import { ButtonStyled } from '@modrinth/ui'
 
 const props = defineProps<{
-  title?: string;
-  url: string;
-}>();
+  title?: string
+  url: string
+}>()
 
-const copied = ref(false);
-const encodedUrl = computed(() => encodeURIComponent(props.url));
-const encodedTitle = computed(() => (props.title ? encodeURIComponent(props.title) : undefined));
+const copied = ref(false)
+const encodedUrl = computed(() => encodeURIComponent(props.url))
+const encodedTitle = computed(() => (props.title ? encodeURIComponent(props.title) : undefined))
 
 async function copyToClipboard(text: string) {
-  await navigator.clipboard.writeText(text);
-  copied.value = true;
+  await navigator.clipboard.writeText(text)
+  copied.value = true
   setTimeout(() => {
-    copied.value = false;
-  }, 3000);
+    copied.value = false
+  }, 3000)
 }
 </script>

@@ -76,86 +76,86 @@
 </template>
 
 <script setup lang="ts">
-import { FilterIcon,SearchIcon, SortAscIcon, SortDescIcon, XIcon } from "@modrinth/assets";
-import type { ExtendedDelphiReport,OwnershipTarget } from "@modrinth/moderation";
-import { Button, DropdownSelect, Pagination } from "@modrinth/ui";
-import type { DelphiReport, Organization, Project, TeamMember, Version } from "@modrinth/utils";
-import { defineMessages, useVIntl } from "@vintl/vintl";
-import { useLocalStorage } from "@vueuse/core";
-import Fuse from "fuse.js";
+import { FilterIcon, SearchIcon, SortAscIcon, SortDescIcon, XIcon } from '@modrinth/assets'
+import type { ExtendedDelphiReport, OwnershipTarget } from '@modrinth/moderation'
+import { Button, DropdownSelect, Pagination } from '@modrinth/ui'
+import type { DelphiReport, Organization, Project, TeamMember, Version } from '@modrinth/utils'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+import { useLocalStorage } from '@vueuse/core'
+import Fuse from 'fuse.js'
 
-import DelphiReportCard from "~/components/ui/moderation/ModerationDelphiReportCard.vue";
-import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
+import DelphiReportCard from '~/components/ui/moderation/ModerationDelphiReportCard.vue'
+import { asEncodedJsonArray, fetchSegmented } from '~/utils/fetch-helpers.ts'
 
-const { formatMessage } = useVIntl();
-const route = useRoute();
-const router = useRouter();
+const { formatMessage } = useVIntl()
+const route = useRoute()
+const router = useRouter()
 
 const messages = defineMessages({
   searchPlaceholder: {
-    id: "moderation.technical.search.placeholder",
-    defaultMessage: "Search tech reviews...",
+    id: 'moderation.technical.search.placeholder',
+    defaultMessage: 'Search tech reviews...',
   },
   filterBy: {
-    id: "moderation.filter.by",
-    defaultMessage: "Filter by",
+    id: 'moderation.filter.by',
+    defaultMessage: 'Filter by',
   },
   sortBy: {
-    id: "moderation.sort.by",
-    defaultMessage: "Sort by",
+    id: 'moderation.sort.by',
+    defaultMessage: 'Sort by',
   },
-});
+})
 
 async function getProjectQuicklyForMock(projectId: string): Promise<Project> {
-  return (await useBaseFetch(`project/${projectId}`)) as Project;
+  return (await useBaseFetch(`project/${projectId}`)) as Project
 }
 
 async function getVersionQuicklyForMock(versionId: string): Promise<Version> {
-  return (await useBaseFetch(`version/${versionId}`)) as Version;
+  return (await useBaseFetch(`version/${versionId}`)) as Version
 }
 
 const mockDelphiReports: DelphiReport[] = [
   {
-    project: await getProjectQuicklyForMock("7MoE34WK"),
-    version: await getVersionQuicklyForMock("cTkKLWgA"),
-    trace_type: "url_usage",
-    file_path: "me/decce/gnetum/ASMEventHandlerHelper.java",
+    project: await getProjectQuicklyForMock('7MoE34WK'),
+    version: await getVersionQuicklyForMock('cTkKLWgA'),
+    trace_type: 'url_usage',
+    file_path: 'me/decce/gnetum/ASMEventHandlerHelper.java',
     priority_score: 29,
-    status: "pending",
-    detected_at: "2025-04-01T12:00:00Z",
+    status: 'pending',
+    detected_at: '2025-04-01T12:00:00Z',
   } as DelphiReport,
   {
-    project: await getProjectQuicklyForMock("7MoE34WK"),
-    version: await getVersionQuicklyForMock("cTkKLWgA"),
-    trace_type: "url_usage",
-    file_path: "me/decce/gnetum/SomeOtherFile.java",
+    project: await getProjectQuicklyForMock('7MoE34WK'),
+    version: await getVersionQuicklyForMock('cTkKLWgA'),
+    trace_type: 'url_usage',
+    file_path: 'me/decce/gnetum/SomeOtherFile.java',
     priority_score: 48,
-    status: "rejected",
-    detected_at: "2025-03-02T12:00:00Z",
+    status: 'rejected',
+    detected_at: '2025-03-02T12:00:00Z',
   } as DelphiReport,
   {
-    project: await getProjectQuicklyForMock("7MoE34WK"),
-    version: await getVersionQuicklyForMock("cTkKLWgA"),
-    trace_type: "url_usage",
-    file_path: "me/decce/gnetum/YetAnotherFile.java",
+    project: await getProjectQuicklyForMock('7MoE34WK'),
+    version: await getVersionQuicklyForMock('cTkKLWgA'),
+    trace_type: 'url_usage',
+    file_path: 'me/decce/gnetum/YetAnotherFile.java',
     priority_score: 15,
-    status: "approved",
-    detected_at: "2025-02-03T12:00:00Z",
+    status: 'approved',
+    detected_at: '2025-02-03T12:00:00Z',
   } as DelphiReport,
-];
+]
 
-const { data: allReports } = await useAsyncData("moderation-tech-reviews", async () => {
+const { data: allReports } = await useAsyncData('moderation-tech-reviews', async () => {
   // TODO: replace with actual API call
-  const delphiReports = mockDelphiReports;
+  const delphiReports = mockDelphiReports
 
   if (delphiReports.length === 0) {
-    return [];
+    return []
   }
 
-  const teamIds = [...new Set(delphiReports.map((report) => report.project.team).filter(Boolean))];
+  const teamIds = [...new Set(delphiReports.map((report) => report.project.team).filter(Boolean))]
   const orgIds = [
     ...new Set(delphiReports.map((report) => report.project.organization).filter(Boolean)),
-  ];
+  ]
 
   const [teamsData, orgsData]: [TeamMember[][], Organization[]] = await Promise.all([
     teamIds.length > 0
@@ -166,222 +166,222 @@ const { data: allReports } = await useAsyncData("moderation-tech-reviews", async
           apiVersion: 3,
         })
       : Promise.resolve([]),
-  ]);
+  ])
 
-  const orgTeamIds = orgsData.map((org) => org.team_id).filter(Boolean);
+  const orgTeamIds = orgsData.map((org) => org.team_id).filter(Boolean)
   const orgTeamsData: TeamMember[][] =
     orgTeamIds.length > 0
       ? await fetchSegmented(orgTeamIds, (ids) => `teams?ids=${asEncodedJsonArray(ids)}`)
-      : [];
+      : []
 
-  const teamMap = new Map<string, TeamMember[]>();
-  const orgMap = new Map<string, Organization>();
+  const teamMap = new Map<string, TeamMember[]>()
+  const orgMap = new Map<string, Organization>()
 
   teamsData.forEach((team) => {
-    let teamId = null;
+    let teamId = null
     for (const member of team) {
-      teamId = member.team_id;
+      teamId = member.team_id
       if (!teamMap.has(teamId)) {
-        teamMap.set(teamId, team);
-        break;
+        teamMap.set(teamId, team)
+        break
       }
     }
-  });
+  })
 
   orgTeamsData.forEach((team) => {
-    let teamId = null;
+    let teamId = null
     for (const member of team) {
-      teamId = member.team_id;
+      teamId = member.team_id
       if (!teamMap.has(teamId)) {
-        teamMap.set(teamId, team);
-        break;
+        teamMap.set(teamId, team)
+        break
       }
     }
-  });
+  })
 
   orgsData.forEach((org: Organization) => {
-    orgMap.set(org.id, org);
-  });
+    orgMap.set(org.id, org)
+  })
 
   const extendedReports: ExtendedDelphiReport[] = delphiReports.map((report) => {
-    let target: OwnershipTarget | undefined;
-    const project = report.project;
+    let target: OwnershipTarget | undefined
+    const project = report.project
 
     if (project) {
-      let owner: TeamMember | null = null;
-      let org: Organization | null = null;
+      let owner: TeamMember | null = null
+      let org: Organization | null = null
 
       if (project.team) {
-        const teamMembers = teamMap.get(project.team);
+        const teamMembers = teamMap.get(project.team)
         if (teamMembers) {
-          owner = teamMembers.find((member) => member.role === "Owner") || null;
+          owner = teamMembers.find((member) => member.role === 'Owner') || null
         }
       }
 
       if (project.organization) {
-        org = orgMap.get(project.organization) || null;
+        org = orgMap.get(project.organization) || null
       }
 
       if (org) {
         target = {
           name: org.name,
           avatar_url: org.icon_url,
-          type: "organization",
+          type: 'organization',
           slug: org.slug,
-        };
+        }
       } else if (owner) {
         target = {
           name: owner.user.username,
           avatar_url: owner.user.avatar_url,
-          type: "user",
+          type: 'user',
           slug: owner.user.username,
-        };
+        }
       }
     }
 
     return {
       ...report,
       target,
-    };
-  });
+    }
+  })
 
-  extendedReports.sort((a, b) => b.priority_score - a.priority_score);
+  extendedReports.sort((a, b) => b.priority_score - a.priority_score)
 
-  return extendedReports;
-});
+  return extendedReports
+})
 
-const query = ref(route.query.q?.toString() || "");
+const query = ref(route.query.q?.toString() || '')
 watch(
   query,
   (newQuery) => {
-    const currentQuery = { ...route.query };
+    const currentQuery = { ...route.query }
     if (newQuery) {
-      currentQuery.q = newQuery;
+      currentQuery.q = newQuery
     } else {
-      delete currentQuery.q;
+      delete currentQuery.q
     }
 
     router.replace({
       path: route.path,
       query: currentQuery,
-    });
+    })
   },
   { immediate: false },
-);
+)
 
 watch(
   () => route.query.q,
   (newQueryParam) => {
-    const newValue = newQueryParam?.toString() || "";
+    const newValue = newQueryParam?.toString() || ''
     if (query.value !== newValue) {
-      query.value = newValue;
+      query.value = newValue
     }
   },
-);
+)
 
-const currentFilterType = useLocalStorage("moderation-tech-reviews-filter-type", () => "Pending");
-const filterTypes: readonly string[] = readonly(["All", "Pending", "Approved", "Rejected"]);
+const currentFilterType = useLocalStorage('moderation-tech-reviews-filter-type', () => 'Pending')
+const filterTypes: readonly string[] = readonly(['All', 'Pending', 'Approved', 'Rejected'])
 
-const currentSortType = useLocalStorage("moderation-tech-reviews-sort-type", () => "Priority");
-const sortTypes: readonly string[] = readonly(["Priority", "Oldest", "Newest"]);
+const currentSortType = useLocalStorage('moderation-tech-reviews-sort-type', () => 'Priority')
+const sortTypes: readonly string[] = readonly(['Priority', 'Oldest', 'Newest'])
 
-const currentPage = ref(1);
-const itemsPerPage = 15;
-const totalPages = computed(() => Math.ceil((filteredReports.value?.length || 0) / itemsPerPage));
+const currentPage = ref(1)
+const itemsPerPage = 15
+const totalPages = computed(() => Math.ceil((filteredReports.value?.length || 0) / itemsPerPage))
 
 const fuse = computed(() => {
-  if (!allReports.value || allReports.value.length === 0) return null;
+  if (!allReports.value || allReports.value.length === 0) return null
   return new Fuse(allReports.value, {
     keys: [
       {
-        name: "version.id",
+        name: 'version.id',
         weight: 3,
       },
       {
-        name: "version.version_number",
+        name: 'version.version_number',
         weight: 3,
       },
       {
-        name: "project.title",
+        name: 'project.title',
         weight: 3,
       },
       {
-        name: "project.slug",
+        name: 'project.slug',
         weight: 3,
       },
       {
-        name: "version.files.filename",
+        name: 'version.files.filename',
         weight: 2,
       },
       {
-        name: "trace_type",
+        name: 'trace_type',
         weight: 2,
       },
       {
-        name: "content",
+        name: 'content',
         weight: 0.5,
       },
-      "file_path",
-      "project.id",
-      "target.name",
-      "target.slug",
+      'file_path',
+      'project.id',
+      'target.name',
+      'target.slug',
     ],
     includeScore: true,
     threshold: 0.4,
-  });
-});
+  })
+})
 
 const filteredReports = computed(() => {
-  if (!allReports.value) return [];
+  if (!allReports.value) return []
 
-  let filtered;
+  let filtered
 
   if (query.value && fuse.value) {
-    const results = fuse.value.search(query.value);
-    filtered = results.map((result) => result.item);
+    const results = fuse.value.search(query.value)
+    filtered = results.map((result) => result.item)
   } else {
-    filtered = [...allReports.value];
+    filtered = [...allReports.value]
   }
 
-  if (currentFilterType.value === "Pending") {
-    filtered = filtered.filter((report) => report.status === "pending");
-  } else if (currentFilterType.value === "Approved") {
-    filtered = filtered.filter((report) => report.status === "approved");
-  } else if (currentFilterType.value === "Rejected") {
-    filtered = filtered.filter((report) => report.status === "rejected");
+  if (currentFilterType.value === 'Pending') {
+    filtered = filtered.filter((report) => report.status === 'pending')
+  } else if (currentFilterType.value === 'Approved') {
+    filtered = filtered.filter((report) => report.status === 'approved')
+  } else if (currentFilterType.value === 'Rejected') {
+    filtered = filtered.filter((report) => report.status === 'rejected')
   }
 
-  if (currentSortType.value === "Priority") {
-    filtered.sort((a, b) => b.priority_score - a.priority_score);
-  } else if (currentSortType.value === "Oldest") {
+  if (currentSortType.value === 'Priority') {
+    filtered.sort((a, b) => b.priority_score - a.priority_score)
+  } else if (currentSortType.value === 'Oldest') {
     filtered.sort((a, b) => {
-      const dateA = new Date(a.detected_at).getTime();
-      const dateB = new Date(b.detected_at).getTime();
-      return dateA - dateB;
-    });
+      const dateA = new Date(a.detected_at).getTime()
+      const dateB = new Date(b.detected_at).getTime()
+      return dateA - dateB
+    })
   } else {
     filtered.sort((a, b) => {
-      const dateA = new Date(a.detected_at).getTime();
-      const dateB = new Date(b.detected_at).getTime();
-      return dateB - dateA;
-    });
+      const dateA = new Date(a.detected_at).getTime()
+      const dateB = new Date(b.detected_at).getTime()
+      return dateB - dateA
+    })
   }
 
-  return filtered;
-});
+  return filtered
+})
 
 const paginatedReports = computed(() => {
-  if (!filteredReports.value) return [];
-  const start = (currentPage.value - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return filteredReports.value.slice(start, end);
-});
+  if (!filteredReports.value) return []
+  const start = (currentPage.value - 1) * itemsPerPage
+  const end = start + itemsPerPage
+  return filteredReports.value.slice(start, end)
+})
 
 function updateSearchResults() {
-  currentPage.value = 1;
+  currentPage.value = 1
 }
 
 function goToPage(page: number) {
-  currentPage.value = page;
+  currentPage.value = page
 }
 </script>

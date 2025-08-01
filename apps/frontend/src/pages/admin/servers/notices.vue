@@ -2,7 +2,7 @@
   <NewModal ref="createNoticeModal">
     <template #title>
       <span class="text-lg font-extrabold text-contrast">{{
-        editingNotice ? `Editing notice #${editingNotice?.id}` : "Creating a notice"
+        editingNotice ? `Editing notice #${editingNotice?.id}` : 'Creating a notice'
       }}</span>
     </template>
     <div class="flex w-[700px] flex-col gap-3">
@@ -35,7 +35,7 @@
       <div class="flex flex-col gap-2">
         <label for="notice-message" class="flex flex-col gap-1">
           <span class="text-lg font-semibold text-contrast">
-            {{ newNoticeSurvey ? "Survey ID" : "Message" }}
+            {{ newNoticeSurvey ? 'Survey ID' : 'Message' }}
             <span class="text-brand-red">*</span>
           </span>
         </label>
@@ -155,7 +155,7 @@
             </div>
             <div class="text-sm">
               <span v-if="notice.announce_at">
-                {{ dayjs(notice.announce_at).format("MMM D, YYYY [at] h:mm A") }} ({{
+                {{ dayjs(notice.announce_at).format('MMM D, YYYY [at] h:mm A') }} ({{
                   formatRelativeTime(notice.announce_at)
                 }})
               </span>
@@ -227,16 +227,16 @@
               >
               <span v-else-if="!notice.assigned.some((n) => n.kind === 'server')">
                 Assigned to
-                {{ notice.assigned.filter((n) => n.kind === "node").length }} nodes
+                {{ notice.assigned.filter((n) => n.kind === 'node').length }} nodes
               </span>
               <span v-else-if="!notice.assigned.some((n) => n.kind === 'node')">
                 Assigned to
-                {{ notice.assigned.filter((n) => n.kind === "server").length }} servers
+                {{ notice.assigned.filter((n) => n.kind === 'server').length }} servers
               </span>
               <span v-else>
                 Assigned to
-                {{ notice.assigned.filter((n) => n.kind === "server").length }} servers and
-                {{ notice.assigned.filter((n) => n.kind === "node").length }} nodes
+                {{ notice.assigned.filter((n) => n.kind === 'server').length }} servers and
+                {{ notice.assigned.filter((n) => n.kind === 'node').length }} nodes
               </span>
               •
               <button
@@ -258,7 +258,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { EditIcon, PlusIcon, SaveIcon, SettingsIcon, TrashIcon, XIcon } from "@modrinth/assets";
+import { EditIcon, PlusIcon, SaveIcon, SettingsIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import {
   ButtonStyled,
   commonMessages,
@@ -269,141 +269,141 @@ import {
   TeleportDropdownMenu,
   Toggle,
   useRelativeTime,
-} from "@modrinth/ui";
-import { NOTICE_LEVELS } from "@modrinth/ui/src/utils/notices.ts";
-import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
-import { useVIntl } from "@vintl/vintl";
-import dayjs from "dayjs";
-import { computed } from "vue";
+} from '@modrinth/ui'
+import { NOTICE_LEVELS } from '@modrinth/ui/src/utils/notices.ts'
+import type { ServerNotice as ServerNoticeType } from '@modrinth/utils'
+import { useVIntl } from '@vintl/vintl'
+import dayjs from 'dayjs'
+import { computed } from 'vue'
 
-import AssignNoticeModal from "~/components/ui/servers/notice/AssignNoticeModal.vue";
-import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
+import AssignNoticeModal from '~/components/ui/servers/notice/AssignNoticeModal.vue'
+import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 
-const { formatMessage } = useVIntl();
-const formatRelativeTime = useRelativeTime();
+const { formatMessage } = useVIntl()
+const formatRelativeTime = useRelativeTime()
 
-const app = useNuxtApp() as unknown as { $notify: any };
+const app = useNuxtApp() as unknown as { $notify: any }
 
-const notices = ref<ServerNoticeType[]>([]);
-const createNoticeModal = ref<InstanceType<typeof NewModal>>();
-const assignNoticeModal = ref<InstanceType<typeof AssignNoticeModal>>();
+const notices = ref<ServerNoticeType[]>([])
+const createNoticeModal = ref<InstanceType<typeof NewModal>>()
+const assignNoticeModal = ref<InstanceType<typeof AssignNoticeModal>>()
 
-await refreshNotices();
+await refreshNotices()
 
 async function refreshNotices() {
-  await useServersFetch("notices").then((res) => {
-    notices.value = res as ServerNoticeType[];
+  await useServersFetch('notices').then((res) => {
+    notices.value = res as ServerNoticeType[]
     notices.value.sort((a, b) => {
-      const dateDiff = dayjs(b.announce_at).diff(dayjs(a.announce_at));
+      const dateDiff = dayjs(b.announce_at).diff(dayjs(a.announce_at))
       if (dateDiff === 0) {
-        return b.id - a.id;
+        return b.id - a.id
       }
 
-      return dateDiff;
-    });
-  });
+      return dateDiff
+    })
+  })
 }
 
 const levelOptions = Object.keys(NOTICE_LEVELS).map((x) => ({
   id: x,
   ...NOTICE_LEVELS[x],
-}));
+}))
 
-const DATE_TIME_FORMAT = "YYYY-MM-DDTHH:mm";
+const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm'
 
-const newNoticeLevel = ref(levelOptions[0]);
-const newNoticeDismissable = ref(false);
-const newNoticeMessage = ref("");
-const newNoticeScheduledDate = ref<string>();
-const newNoticeTitle = ref<string>();
-const newNoticeExpiresDate = ref<string>();
+const newNoticeLevel = ref(levelOptions[0])
+const newNoticeDismissable = ref(false)
+const newNoticeMessage = ref('')
+const newNoticeScheduledDate = ref<string>()
+const newNoticeTitle = ref<string>()
+const newNoticeExpiresDate = ref<string>()
 
 function openNewNoticeModal() {
-  newNoticeLevel.value = levelOptions[0];
-  newNoticeDismissable.value = false;
-  newNoticeMessage.value = "";
-  newNoticeScheduledDate.value = undefined;
-  newNoticeExpiresDate.value = undefined;
-  editingNotice.value = undefined;
-  createNoticeModal.value?.show();
+  newNoticeLevel.value = levelOptions[0]
+  newNoticeDismissable.value = false
+  newNoticeMessage.value = ''
+  newNoticeScheduledDate.value = undefined
+  newNoticeExpiresDate.value = undefined
+  editingNotice.value = undefined
+  createNoticeModal.value?.show()
 }
 
-const editingNotice = ref<undefined | ServerNoticeType>();
+const editingNotice = ref<undefined | ServerNoticeType>()
 
 function startEditing(notice: ServerNoticeType, assignments: boolean = false) {
-  newNoticeLevel.value = levelOptions.find((x) => x.id === notice.level) ?? levelOptions[0];
-  newNoticeDismissable.value = notice.dismissable;
-  newNoticeMessage.value = notice.message;
-  newNoticeTitle.value = notice.title;
-  newNoticeScheduledDate.value = dayjs(notice.announce_at).format(DATE_TIME_FORMAT);
+  newNoticeLevel.value = levelOptions.find((x) => x.id === notice.level) ?? levelOptions[0]
+  newNoticeDismissable.value = notice.dismissable
+  newNoticeMessage.value = notice.message
+  newNoticeTitle.value = notice.title
+  newNoticeScheduledDate.value = dayjs(notice.announce_at).format(DATE_TIME_FORMAT)
   newNoticeExpiresDate.value = notice.expires
     ? dayjs(notice.expires).format(DATE_TIME_FORMAT)
-    : undefined;
-  editingNotice.value = notice;
+    : undefined
+  editingNotice.value = notice
   if (assignments) {
-    assignNoticeModal.value?.show?.(notice);
+    assignNoticeModal.value?.show?.(notice)
   } else {
-    createNoticeModal.value?.show();
+    createNoticeModal.value?.show()
   }
 }
 
 async function deleteNotice(notice: ServerNoticeType) {
   await useServersFetch(`notices/${notice.id}`, {
-    method: "DELETE",
+    method: 'DELETE',
   })
     .then(() => {
       app.$notify({
-        group: "main",
+        group: 'main',
         title: `Successfully deleted notice #${notice.id}`,
-        type: "success",
-      });
+        type: 'success',
+      })
     })
     .catch((err) => {
       app.$notify({
-        group: "main",
-        title: "Error deleting notice",
+        group: 'main',
+        title: 'Error deleting notice',
         text: err,
-        type: "error",
-      });
-    });
-  await refreshNotices();
+        type: 'error',
+      })
+    })
+  await refreshNotices()
 }
 
-const trimmedMessage = computed(() => newNoticeMessage.value?.trim());
-const trimmedTitle = computed(() => newNoticeTitle.value?.trim());
-const newNoticeSurvey = computed(() => newNoticeLevel.value.id === "survey");
+const trimmedMessage = computed(() => newNoticeMessage.value?.trim())
+const trimmedTitle = computed(() => newNoticeTitle.value?.trim())
+const newNoticeSurvey = computed(() => newNoticeLevel.value.id === 'survey')
 
 const noticeSubmitError = computed(() => {
-  let error: undefined | string;
+  let error: undefined | string
   if (!trimmedMessage.value || trimmedMessage.value.length === 0) {
-    error = "Notice message is required";
+    error = 'Notice message is required'
   }
   if (!newNoticeLevel.value) {
-    error = "Notice level is required";
+    error = 'Notice level is required'
   }
-  return error;
-});
+  return error
+})
 
 function validateSubmission(message: string) {
   if (noticeSubmitError.value) {
     addNotification({
-      group: "main",
+      group: 'main',
       title: message,
       text: noticeSubmitError.value,
-      type: "error",
-    });
-    return false;
+      type: 'error',
+    })
+    return false
   }
-  return true;
+  return true
 }
 
 async function saveChanges() {
-  if (!validateSubmission("Error saving notice")) {
-    return;
+  if (!validateSubmission('Error saving notice')) {
+    return
   }
 
   await useServersFetch(`notices/${editingNotice.value?.id}`, {
-    method: "PATCH",
+    method: 'PATCH',
     body: {
       message: newNoticeMessage.value,
       title: newNoticeSurvey.value ? undefined : trimmedTitle.value,
@@ -418,23 +418,23 @@ async function saveChanges() {
     },
   }).catch((err) => {
     app.$notify({
-      group: "main",
-      title: "Error saving changes to notice",
+      group: 'main',
+      title: 'Error saving changes to notice',
       text: err,
-      type: "error",
-    });
-  });
-  await refreshNotices();
-  createNoticeModal.value?.hide();
+      type: 'error',
+    })
+  })
+  await refreshNotices()
+  createNoticeModal.value?.hide()
 }
 
 async function createNotice() {
-  if (!validateSubmission("Error creating notice")) {
-    return;
+  if (!validateSubmission('Error creating notice')) {
+    return
   }
 
-  await useServersFetch("notices", {
-    method: "POST",
+  await useServersFetch('notices', {
+    method: 'POST',
     body: {
       message: newNoticeMessage.value,
       title: newNoticeSurvey.value ? undefined : trimmedTitle.value,
@@ -449,54 +449,54 @@ async function createNotice() {
     },
   }).catch((err) => {
     app.$notify({
-      group: "main",
-      title: "Error creating notice",
+      group: 'main',
+      title: 'Error creating notice',
       text: err,
-      type: "error",
-    });
-  });
-  await refreshNotices();
-  createNoticeModal.value?.hide();
+      type: 'error',
+    })
+  })
+  await refreshNotices()
+  createNoticeModal.value?.hide()
 }
 
 const messages = defineMessages({
   createNotice: {
-    id: "servers.notices.create-notice",
-    defaultMessage: "Create notice",
+    id: 'servers.notices.create-notice',
+    defaultMessage: 'Create notice',
   },
   noNotices: {
-    id: "servers.notices.no-notices",
-    defaultMessage: "No notices",
+    id: 'servers.notices.no-notices',
+    defaultMessage: 'No notices',
   },
   dismissable: {
-    id: "servers.notice.dismissable",
-    defaultMessage: "Dismissable",
+    id: 'servers.notice.dismissable',
+    defaultMessage: 'Dismissable',
   },
   undismissable: {
-    id: "servers.notice.undismissable",
-    defaultMessage: "Undismissable",
+    id: 'servers.notice.undismissable',
+    defaultMessage: 'Undismissable',
   },
   id: {
-    id: "servers.notice.id",
-    defaultMessage: "ID",
+    id: 'servers.notice.id',
+    defaultMessage: 'ID',
   },
   begins: {
-    id: "servers.notice.begins",
-    defaultMessage: "Begins",
+    id: 'servers.notice.begins',
+    defaultMessage: 'Begins',
   },
   expires: {
-    id: "servers.notice.expires",
-    defaultMessage: "Expires",
+    id: 'servers.notice.expires',
+    defaultMessage: 'Expires',
   },
   actions: {
-    id: "servers.notice.actions",
-    defaultMessage: "Actions",
+    id: 'servers.notice.actions',
+    defaultMessage: 'Actions',
   },
   level: {
-    id: "servers.notice.level",
-    defaultMessage: "Level",
+    id: 'servers.notice.level',
+    defaultMessage: 'Level',
   },
-});
+})
 </script>
 <style lang="scss" scoped>
 .page {

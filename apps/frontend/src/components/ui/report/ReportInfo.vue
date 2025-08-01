@@ -103,15 +103,15 @@
 </template>
 
 <script setup>
-import { ReportIcon, UnknownIcon, VersionIcon } from "@modrinth/assets";
-import { Avatar, Badge, CopyCode, useRelativeTime } from "@modrinth/ui";
-import { formatProjectType } from "@modrinth/utils";
+import { ReportIcon, UnknownIcon, VersionIcon } from '@modrinth/assets'
+import { Avatar, Badge, CopyCode, useRelativeTime } from '@modrinth/ui'
+import { formatProjectType } from '@modrinth/utils'
 
-import ThreadSummary from "~/components/ui/thread/ThreadSummary.vue";
-import { renderHighlightedString } from "~/helpers/highlight.js";
-import { getProjectTypeForUrl } from "~/helpers/projects.js";
+import ThreadSummary from '~/components/ui/thread/ThreadSummary.vue'
+import { renderHighlightedString } from '~/helpers/highlight.js'
+import { getProjectTypeForUrl } from '~/helpers/projects.js'
 
-const formatRelativeTime = useRelativeTime();
+const formatRelativeTime = useRelativeTime()
 
 defineProps({
   report: {
@@ -138,9 +138,9 @@ defineProps({
     type: Object,
     required: true,
   },
-});
+})
 
-const flags = useFeatureFlags();
+const flags = useFeatureFlags()
 </script>
 
 <style lang="scss" scoped>

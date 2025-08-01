@@ -49,12 +49,12 @@
 </template>
 
 <script setup>
-import { SadRinthbot } from "@modrinth/assets";
-import { defineMessage, useVIntl } from "@vintl/vintl";
+import { SadRinthbot } from '@modrinth/assets'
+import { defineMessage, useVIntl } from '@vintl/vintl'
 
-import Logo404 from "~/assets/images/404.svg";
+import Logo404 from '~/assets/images/404.svg'
 
-const { formatMessage } = useVIntl();
+const { formatMessage } = useVIntl()
 
 const props = defineProps({
   error: {
@@ -62,73 +62,73 @@ const props = defineProps({
     default() {
       return {
         statusCode: 1000,
-        message: "Unknown error",
-      };
+        message: 'Unknown error',
+      }
     },
   },
-});
+})
 
-const is404 = computed(() => props.error.statusCode === 404);
+const is404 = computed(() => props.error.statusCode === 404)
 const errorMessages = computed(
   () =>
     routeMessages.find((x) => x.match(route))?.messages[props.error.statusCode] ??
     messages[props.error.statusCode] ??
     messages.default,
-);
+)
 
-const route = useRoute();
+const route = useRoute()
 
 watch(route, () => {
-  console.log(route);
-});
+  console.log(route)
+})
 
 const messages = {
   404: {
     title: defineMessage({
-      id: "error.generic.404.title",
-      defaultMessage: "Page not found",
+      id: 'error.generic.404.title',
+      defaultMessage: 'Page not found',
     }),
     subtitle: defineMessage({
-      id: "error.generic.404.subtitle",
+      id: 'error.generic.404.subtitle',
       defaultMessage: "The page you were looking for doesn't seem to exist.",
     }),
   },
   default: {
     title: defineMessage({
-      id: "error.generic.default.title",
-      defaultMessage: "Uh oh!",
+      id: 'error.generic.default.title',
+      defaultMessage: 'Uh oh!',
     }),
     subtitle: defineMessage({
-      id: "error.generic.default.subtitle",
-      defaultMessage: "Something went wrong.",
+      id: 'error.generic.default.subtitle',
+      defaultMessage: 'Something went wrong.',
     }),
     list_title: defineMessage({
-      id: "error.generic.default.list_title",
-      defaultMessage: "Please try again in a few minutes.",
+      id: 'error.generic.default.list_title',
+      defaultMessage: 'Please try again in a few minutes.',
     }),
     list_items: [
       defineMessage({
-        id: "error.generic.default.list_item.1",
-        defaultMessage: "Check if Modrinth is down on our <status-link>Status page</status-link>.",
+        id: 'error.generic.default.list_item.1',
+        defaultMessage: 'Check if Modrinth is down on our <status-link>Status page</status-link>.',
       }),
       defineMessage({
-        id: "error.generic.default.list_item.2",
+        id: 'error.generic.default.list_item.2',
         defaultMessage:
-          "If this keeps happening, you may want to let the Modrinth Team know by joining our <discord-link>Discord server</discord-link>.",
+          'If this keeps happening, you may want to let the Modrinth Team know by joining our <discord-link>Discord server</discord-link>.',
       }),
     ],
   },
-};
+}
 
 const PROJECT_PATH_PREFIXES = [
-  "/mod/",
-  "/datapack/",
-  "/resourcepack/",
-  "/plugin/",
-  "/shader/",
-  "/modpack/",
-  "/project/",
-];
+  '/mod/',
+  '/datapack/',
+  '/resourcepack/',
+  '/plugin/',
+  '/shader/',
+  '/modpack/',
+  '/project/',
+]
 
 const routeMessages = [
   {
@@ -136,25 +136,25 @@ const routeMessages = [
     messages: {
       404: {
         title: defineMessage({
-          id: "error.project.404.title",
-          defaultMessage: "Project not found",
+          id: 'error.project.404.title',
+          defaultMessage: 'Project not found',
         }),
         list_title: defineMessage({
-          id: "error.project.404.list_title",
-          defaultMessage: "Why?",
+          id: 'error.project.404.list_title',
+          defaultMessage: 'Why?',
         }),
         list_items: [
           defineMessage({
-            id: "error.project.404.list_item.1",
+            id: 'error.project.404.list_item.1',
             defaultMessage: "You may have mistyped the project's URL.",
           }),
           defineMessage({
-            id: "error.project.404.list_item.2",
+            id: 'error.project.404.list_item.2',
             defaultMessage:
               "The project's owner may have changed the URL, made the project private, or deleted it.",
           }),
           defineMessage({
-            id: "error.project.404.list_item.3",
+            id: 'error.project.404.list_item.3',
             defaultMessage:
               "The project may have been taken down by Modrinth's moderation team for violating our <tou-link>Terms of Use</tou-link>.",
           }),
@@ -163,28 +163,28 @@ const routeMessages = [
     },
   },
   {
-    match: (route) => route.path.startsWith("/user/"),
+    match: (route) => route.path.startsWith('/user/'),
     messages: {
       404: {
         title: defineMessage({
-          id: "error.user.404.title",
-          defaultMessage: "User not found",
+          id: 'error.user.404.title',
+          defaultMessage: 'User not found',
         }),
         list_title: defineMessage({
-          id: "error.user.404.list_title",
-          defaultMessage: "Why?",
+          id: 'error.user.404.list_title',
+          defaultMessage: 'Why?',
         }),
         list_items: [
           defineMessage({
-            id: "error.user.404.list_item.1",
+            id: 'error.user.404.list_item.1',
             defaultMessage: "You may have mistyped the user's username.",
           }),
           defineMessage({
-            id: "error.user.404.list_item.2",
-            defaultMessage: "The user may have changed their username or deleted their account.",
+            id: 'error.user.404.list_item.2',
+            defaultMessage: 'The user may have changed their username or deleted their account.',
           }),
           defineMessage({
-            id: "error.user.404.list_item.3",
+            id: 'error.user.404.list_item.3',
             defaultMessage:
               "The user's account may have been terminated for violating Modrinth's <tou-link>Terms of Use</tou-link>.",
           }),
@@ -193,28 +193,28 @@ const routeMessages = [
     },
   },
   {
-    match: (route) => route.path.startsWith("/organization/"),
+    match: (route) => route.path.startsWith('/organization/'),
     messages: {
       404: {
         title: defineMessage({
-          id: "error.organization.404.title",
-          defaultMessage: "Organization not found",
+          id: 'error.organization.404.title',
+          defaultMessage: 'Organization not found',
         }),
         list_title: defineMessage({
-          id: "error.organization.404.list_title",
-          defaultMessage: "Why?",
+          id: 'error.organization.404.list_title',
+          defaultMessage: 'Why?',
         }),
         list_items: [
           defineMessage({
-            id: "error.organization.404.list_item.1",
+            id: 'error.organization.404.list_item.1',
             defaultMessage: "You may have mistyped the organization's URL.",
           }),
           defineMessage({
-            id: "error.organization.404.list_item.2",
+            id: 'error.organization.404.list_item.2',
             defaultMessage: "The organization's owner may have changed the URL or deleted it.",
           }),
           defineMessage({
-            id: "error.organization.404.list_item.3",
+            id: 'error.organization.404.list_item.3',
             defaultMessage:
               "The organization may have been removed by Modrinth's moderation team for violating our <tou-link>Terms of Use</tou-link>.",
           }),
@@ -223,28 +223,28 @@ const routeMessages = [
     },
   },
   {
-    match: (route) => route.path.startsWith("/collection/"),
+    match: (route) => route.path.startsWith('/collection/'),
     messages: {
       404: {
         title: defineMessage({
-          id: "error.collection.404.title",
-          defaultMessage: "Collection not found",
+          id: 'error.collection.404.title',
+          defaultMessage: 'Collection not found',
         }),
         list_title: defineMessage({
-          id: "error.collection.404.list_title",
-          defaultMessage: "Why?",
+          id: 'error.collection.404.list_title',
+          defaultMessage: 'Why?',
         }),
         list_items: [
           defineMessage({
-            id: "error.collection.404.list_item.1",
+            id: 'error.collection.404.list_item.1',
             defaultMessage: "You may have mistyped the collection's URL.",
           }),
           defineMessage({
-            id: "error.collection.404.list_item.2",
-            defaultMessage: "The collection may be private.",
+            id: 'error.collection.404.list_item.2',
+            defaultMessage: 'The collection may be private.',
           }),
           defineMessage({
-            id: "error.collection.404.list_item.3",
+            id: 'error.collection.404.list_item.3',
             defaultMessage:
               "The collection may have been taken down by Modrinth's moderation team for violating our <tou-link>Terms of Use</tou-link>.",
           }),
@@ -252,7 +252,7 @@ const routeMessages = [
       },
     },
   },
-];
+]
 </script>
 
 <style lang="scss" scoped>

@@ -327,11 +327,11 @@
             class="iconified-button"
             @click="
               () => {
-                oldPassword = '';
-                newPassword = '';
-                confirmNewPassword = '';
-                removePasswordMode = false;
-                $refs.managePasswordModal.show();
+                oldPassword = ''
+                newPassword = ''
+                confirmNewPassword = ''
+                removePasswordMode = false
+                $refs.managePasswordModal.show()
               }
             "
           >
@@ -419,247 +419,247 @@ import {
   TrashIcon,
   UpdatedIcon,
   XIcon,
-} from "@modrinth/assets";
-import { ConfirmModal } from "@modrinth/ui";
-import KeyIcon from "assets/icons/auth/key.svg";
-import DiscordIcon from "assets/icons/auth/sso-discord.svg";
-import GithubIcon from "assets/icons/auth/sso-github.svg";
-import GitLabIcon from "assets/icons/auth/sso-gitlab.svg";
-import GoogleIcon from "assets/icons/auth/sso-google.svg";
-import MicrosoftIcon from "assets/icons/auth/sso-microsoft.svg";
-import SteamIcon from "assets/icons/auth/sso-steam.svg";
-import QrcodeVue from "qrcode.vue";
+} from '@modrinth/assets'
+import { ConfirmModal } from '@modrinth/ui'
+import KeyIcon from 'assets/icons/auth/key.svg'
+import DiscordIcon from 'assets/icons/auth/sso-discord.svg'
+import GithubIcon from 'assets/icons/auth/sso-github.svg'
+import GitLabIcon from 'assets/icons/auth/sso-gitlab.svg'
+import GoogleIcon from 'assets/icons/auth/sso-google.svg'
+import MicrosoftIcon from 'assets/icons/auth/sso-microsoft.svg'
+import SteamIcon from 'assets/icons/auth/sso-steam.svg'
+import QrcodeVue from 'qrcode.vue'
 
-import Modal from "~/components/ui/Modal.vue";
+import Modal from '~/components/ui/Modal.vue'
 
 useHead({
-  title: "Account settings - Modrinth",
-});
+  title: 'Account settings - Modrinth',
+})
 
 definePageMeta({
-  middleware: "auth",
-});
+  middleware: 'auth',
+})
 
-const data = useNuxtApp();
-const auth = await useAuth();
+const data = useNuxtApp()
+const auth = await useAuth()
 
-const changeEmailModal = ref();
-const email = ref(auth.value.user.email);
+const changeEmailModal = ref()
+const email = ref(auth.value.user.email)
 async function saveEmail() {
   if (!email.value) {
-    return;
+    return
   }
 
-  startLoading();
+  startLoading()
   try {
     await useBaseFetch(`auth/email`, {
-      method: "PATCH",
+      method: 'PATCH',
       body: {
         email: email.value,
       },
-    });
-    changeEmailModal.value.hide();
-    await useAuth(auth.value.token);
+    })
+    changeEmailModal.value.hide()
+    await useAuth(auth.value.token)
   } catch (err) {
     data.$notify({
-      group: "main",
-      title: "An error occurred",
+      group: 'main',
+      title: 'An error occurred',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  stopLoading();
+  stopLoading()
 }
 
-const managePasswordModal = ref();
-const removePasswordMode = ref(false);
-const oldPassword = ref("");
-const newPassword = ref("");
-const confirmNewPassword = ref("");
+const managePasswordModal = ref()
+const removePasswordMode = ref(false)
+const oldPassword = ref('')
+const newPassword = ref('')
+const confirmNewPassword = ref('')
 async function savePassword() {
   if (newPassword.value !== confirmNewPassword.value) {
-    return;
+    return
   }
 
-  startLoading();
+  startLoading()
   try {
     await useBaseFetch(`auth/password`, {
-      method: "PATCH",
+      method: 'PATCH',
       body: {
         old_password: auth.value.user.has_password ? oldPassword.value : null,
         new_password: removePasswordMode.value ? null : newPassword.value,
       },
-    });
-    managePasswordModal.value.hide();
-    await useAuth(auth.value.token);
+    })
+    managePasswordModal.value.hide()
+    await useAuth(auth.value.token)
   } catch (err) {
     data.$notify({
-      group: "main",
-      title: "An error occurred",
+      group: 'main',
+      title: 'An error occurred',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  stopLoading();
+  stopLoading()
 }
 
-const manageTwoFactorModal = ref();
-const twoFactorSecret = ref(null);
-const twoFactorFlow = ref(null);
-const twoFactorStep = ref(0);
+const manageTwoFactorModal = ref()
+const twoFactorSecret = ref(null)
+const twoFactorFlow = ref(null)
+const twoFactorStep = ref(0)
 async function showTwoFactorModal() {
-  twoFactorStep.value = 0;
-  twoFactorCode.value = null;
-  twoFactorIncorrect.value = false;
+  twoFactorStep.value = 0
+  twoFactorCode.value = null
+  twoFactorIncorrect.value = false
   if (auth.value.user.has_totp) {
-    manageTwoFactorModal.value.show();
-    return;
+    manageTwoFactorModal.value.show()
+    return
   }
 
-  twoFactorSecret.value = null;
-  twoFactorFlow.value = null;
-  backupCodes.value = [];
-  manageTwoFactorModal.value.show();
+  twoFactorSecret.value = null
+  twoFactorFlow.value = null
+  backupCodes.value = []
+  manageTwoFactorModal.value.show()
 
-  startLoading();
+  startLoading()
   try {
-    const res = await useBaseFetch("auth/2fa/get_secret", {
-      method: "POST",
-    });
+    const res = await useBaseFetch('auth/2fa/get_secret', {
+      method: 'POST',
+    })
 
-    twoFactorSecret.value = res.secret;
-    twoFactorFlow.value = res.flow;
+    twoFactorSecret.value = res.secret
+    twoFactorFlow.value = res.flow
   } catch (err) {
     data.$notify({
-      group: "main",
-      title: "An error occurred",
+      group: 'main',
+      title: 'An error occurred',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  stopLoading();
+  stopLoading()
 }
 
-const twoFactorIncorrect = ref(false);
-const twoFactorCode = ref(null);
-const backupCodes = ref([]);
+const twoFactorIncorrect = ref(false)
+const twoFactorCode = ref(null)
+const backupCodes = ref([])
 async function verifyTwoFactorCode() {
-  startLoading();
+  startLoading()
   try {
-    const res = await useBaseFetch("auth/2fa", {
-      method: "POST",
+    const res = await useBaseFetch('auth/2fa', {
+      method: 'POST',
       body: {
-        code: twoFactorCode.value ? twoFactorCode.value : "",
+        code: twoFactorCode.value ? twoFactorCode.value : '',
         flow: twoFactorFlow.value,
       },
-    });
+    })
 
-    backupCodes.value = res.backup_codes;
-    twoFactorStep.value = 2;
-    await useAuth(auth.value.token);
+    backupCodes.value = res.backup_codes
+    twoFactorStep.value = 2
+    await useAuth(auth.value.token)
   } catch {
-    twoFactorIncorrect.value = true;
+    twoFactorIncorrect.value = true
   }
-  stopLoading();
+  stopLoading()
 }
 
 async function removeTwoFactor() {
-  startLoading();
+  startLoading()
   try {
-    await useBaseFetch("auth/2fa", {
-      method: "DELETE",
+    await useBaseFetch('auth/2fa', {
+      method: 'DELETE',
       body: {
-        code: twoFactorCode.value ? twoFactorCode.value.toString() : "",
+        code: twoFactorCode.value ? twoFactorCode.value.toString() : '',
       },
-    });
-    manageTwoFactorModal.value.hide();
-    await useAuth(auth.value.token);
+    })
+    manageTwoFactorModal.value.hide()
+    await useAuth(auth.value.token)
   } catch {
-    twoFactorIncorrect.value = true;
+    twoFactorIncorrect.value = true
   }
-  stopLoading();
+  stopLoading()
 }
 
 const authProviders = [
   {
-    id: "github",
-    display: "GitHub",
+    id: 'github',
+    display: 'GitHub',
     icon: GithubIcon,
   },
   {
-    id: "gitlab",
-    display: "GitLab",
+    id: 'gitlab',
+    display: 'GitLab',
     icon: GitLabIcon,
   },
   {
-    id: "steam",
-    display: "Steam",
+    id: 'steam',
+    display: 'Steam',
     icon: SteamIcon,
   },
   {
-    id: "discord",
-    display: "Discord",
+    id: 'discord',
+    display: 'Discord',
     icon: DiscordIcon,
   },
   {
-    id: "microsoft",
-    display: "Microsoft",
+    id: 'microsoft',
+    display: 'Microsoft',
     icon: MicrosoftIcon,
   },
   {
-    id: "google",
-    display: "Google",
+    id: 'google',
+    display: 'Google',
     icon: GoogleIcon,
   },
-];
+]
 
 async function deleteAccount() {
-  startLoading();
+  startLoading()
   try {
     await useBaseFetch(`user/${auth.value.user.id}`, {
-      method: "DELETE",
-    });
+      method: 'DELETE',
+    })
   } catch (err) {
     data.$notify({
-      group: "main",
-      title: "An error occurred",
+      group: 'main',
+      title: 'An error occurred',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
 
-  useCookie("auth-token").value = null;
-  window.location.href = "/";
+  useCookie('auth-token').value = null
+  window.location.href = '/'
 
-  stopLoading();
+  stopLoading()
 }
 
-const generatingExport = ref(false);
-const generated = ref();
+const generatingExport = ref(false)
+const generated = ref()
 async function exportData() {
-  startLoading();
-  generatingExport.value = true;
+  startLoading()
+  generatingExport.value = true
   try {
-    const res = await useBaseFetch("gdpr/export", {
-      method: "POST",
+    const res = await useBaseFetch('gdpr/export', {
+      method: 'POST',
       internal: true,
-    });
+    })
 
-    const jsonString = JSON.stringify(res, null, 2);
+    const jsonString = JSON.stringify(res, null, 2)
 
-    const blob = new Blob([jsonString], { type: "application/json" });
-    generated.value = URL.createObjectURL(blob);
+    const blob = new Blob([jsonString], { type: 'application/json' })
+    generated.value = URL.createObjectURL(blob)
   } catch (err) {
     data.$notify({
-      group: "main",
-      title: "An error occurred",
+      group: 'main',
+      title: 'An error occurred',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
 
-  generatingExport.value = false;
-  stopLoading();
+  generatingExport.value = false
+  stopLoading()
 }
 </script>
 <style lang="scss" scoped>

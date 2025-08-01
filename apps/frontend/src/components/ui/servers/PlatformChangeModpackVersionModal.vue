@@ -8,7 +8,7 @@
     <div class="flex flex-col gap-4 md:w-[600px]">
       <div class="flex flex-col gap-2">
         <p class="m-0">
-          Select the version of {{ props.project?.title || "the modpack" }} you want to install on
+          Select the version of {{ props.project?.title || 'the modpack' }} you want to install on
           your server.
         </p>
         <p v-if="props.currentVersion" class="m-0 text-sm text-secondary">
@@ -51,7 +51,7 @@
               @click="handleReinstall"
             >
               <DownloadIcon class="size-4" />
-              {{ isLoading ? "Installing..." : hardReset ? "Erase and install" : "Install" }}
+              {{ isLoading ? 'Installing...' : hardReset ? 'Erase and install' : 'Install' }}
             </button>
           </ButtonStyled>
           <ButtonStyled>
@@ -67,38 +67,38 @@
 </template>
 
 <script setup lang="ts">
-import { DownloadIcon, XIcon } from "@modrinth/assets";
-import { ButtonStyled, NewModal } from "@modrinth/ui";
-import { ModrinthServersFetchError } from "@modrinth/utils";
+import { DownloadIcon, XIcon } from '@modrinth/assets'
+import { ButtonStyled, NewModal } from '@modrinth/ui'
+import { ModrinthServersFetchError } from '@modrinth/utils'
 
-import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const props = defineProps<{
-  server: ModrinthServer;
-  project: any;
-  versions: any[];
-  currentVersion?: any;
-  currentVersionId?: string;
-  serverStatus?: string;
-}>();
+  server: ModrinthServer
+  project: any
+  versions: any[]
+  currentVersion?: any
+  currentVersionId?: string
+  serverStatus?: string
+}>()
 
 const emit = defineEmits<{
-  reinstall: [any?];
-}>();
+  reinstall: [any?]
+}>()
 
-const modal = ref();
-const hardReset = ref(false);
-const isLoading = ref(false);
-const selectedVersion = ref("");
+const modal = ref()
+const hardReset = ref(false)
+const isLoading = ref(false)
+const selectedVersion = ref('')
 
-const versionOptions = computed(() => props.versions?.map((v) => v.version_number) || []);
+const versionOptions = computed(() => props.versions?.map((v) => v.version_number) || [])
 
 const handleReinstall = async () => {
-  if (!selectedVersion.value || !props.project?.id) return;
+  if (!selectedVersion.value || !props.project?.id) return
 
-  isLoading.value = true;
+  isLoading.value = true
   try {
-    const versionId = props.versions.find((v) => v.version_number === selectedVersion.value)?.id;
+    const versionId = props.versions.find((v) => v.version_number === selectedVersion.value)?.id
 
     await props.server.general.reinstall(
       false,
@@ -106,56 +106,56 @@ const handleReinstall = async () => {
       versionId,
       undefined,
       hardReset.value,
-    );
+    )
 
-    emit("reinstall");
-    hide();
+    emit('reinstall')
+    hide()
   } catch (error) {
     if (error instanceof ModrinthServersFetchError && error.statusCode === 429) {
       addNotification({
-        group: "server",
-        title: "Cannot reinstall server",
-        text: "You are being rate limited. Please try again later.",
-        type: "error",
-      });
+        group: 'server',
+        title: 'Cannot reinstall server',
+        text: 'You are being rate limited. Please try again later.',
+        type: 'error',
+      })
     } else {
       addNotification({
-        group: "server",
-        title: "Reinstall Failed",
-        text: "An unexpected error occurred while reinstalling. Please try again later.",
-        type: "error",
-      });
+        group: 'server',
+        title: 'Reinstall Failed',
+        text: 'An unexpected error occurred while reinstalling. Please try again later.',
+        type: 'error',
+      })
     }
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-};
+}
 
 watch(
   () => props.serverStatus,
   (newStatus) => {
-    if (newStatus === "installing") {
-      hide();
+    if (newStatus === 'installing') {
+      hide()
     }
   },
-);
+)
 
 const onShow = () => {
-  hardReset.value = false;
+  hardReset.value = false
   selectedVersion.value =
-    props.currentVersion?.version_number ?? props.versions?.[0]?.version_number ?? "";
-};
+    props.currentVersion?.version_number ?? props.versions?.[0]?.version_number ?? ''
+}
 
 const onHide = () => {
-  hardReset.value = false;
-  selectedVersion.value = "";
-  isLoading.value = false;
-};
+  hardReset.value = false
+  selectedVersion.value = ''
+  isLoading.value = false
+}
 
-const show = () => modal.value?.show();
-const hide = () => modal.value?.hide();
+const show = () => modal.value?.show()
+const hide = () => modal.value?.hide()
 
-defineExpose({ show, hide });
+defineExpose({ show, hide })
 </script>
 
 <style scoped>

@@ -8,5 +8,5 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled } from "@modrinth/ui";
+import { ButtonStyled } from '@modrinth/ui'
 </script>

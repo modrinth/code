@@ -12,9 +12,9 @@
               <FolderOpenIcon class="size-4" />
               <span>
                 <span class="capitalize">
-                  {{ props.fileType ? props.fileType : "File" }} uploads
+                  {{ props.fileType ? props.fileType : 'File' }} uploads
                 </span>
-                <span>{{ activeUploads.length > 0 ? ` - ${activeUploads.length} left` : "" }}</span>
+                <span>{{ activeUploads.length > 0 ? ` - ${activeUploads.length} left` : '' }}</span>
               </span>
             </div>
           </div>
@@ -59,7 +59,7 @@
                 </template>
                 <template v-else-if="item.status === 'error-generic'">
                   <span class="text-red"
-                    >Failed - {{ item.error?.message || "An unexpected error occured." }}</span
+                    >Failed - {{ item.error?.message || 'An unexpected error occured.' }}</span
                   >
                 </template>
                 <template v-else-if="item.status === 'incorrect-type'">
@@ -101,118 +101,118 @@
 </template>
 
 <script setup lang="ts">
-import { CheckCircleIcon, FolderOpenIcon, XCircleIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
-import { computed, nextTick,ref, watch } from "vue";
+import { CheckCircleIcon, FolderOpenIcon, XCircleIcon } from '@modrinth/assets'
+import { ButtonStyled } from '@modrinth/ui'
+import { computed, nextTick, ref, watch } from 'vue'
 
-import type { FSModule } from "~/composables/servers/modules/fs.ts";
+import type { FSModule } from '~/composables/servers/modules/fs.ts'
 
 interface UploadItem {
-  file: File;
-  progress: number;
+  file: File
+  progress: number
   status:
-    | "pending"
-    | "uploading"
-    | "completed"
-    | "error-file-exists"
-    | "error-generic"
-    | "cancelled"
-    | "incorrect-type";
-  size: string;
-  uploader?: any;
-  error?: Error;
+    | 'pending'
+    | 'uploading'
+    | 'completed'
+    | 'error-file-exists'
+    | 'error-generic'
+    | 'cancelled'
+    | 'incorrect-type'
+  size: string
+  uploader?: any
+  error?: Error
 }
 
 interface Props {
-  currentPath: string;
-  fileType?: string;
-  marginBottom?: number;
-  acceptedTypes?: Array<string>;
-  fs: FSModule;
+  currentPath: string
+  fileType?: string
+  marginBottom?: number
+  acceptedTypes?: Array<string>
+  fs: FSModule
 }
 
 defineOptions({
   inheritAttrs: false,
-});
+})
 
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  (e: "uploadComplete"): void;
-}>();
+  (e: 'uploadComplete'): void
+}>()
 
-const uploadStatusRef = ref<HTMLElement | null>(null);
-const statusContentRef = ref<HTMLElement | null>(null);
-const uploadQueue = ref<UploadItem[]>([]);
+const uploadStatusRef = ref<HTMLElement | null>(null)
+const statusContentRef = ref<HTMLElement | null>(null)
+const uploadQueue = ref<UploadItem[]>([])
 
-const isUploading = computed(() => uploadQueue.value.length > 0);
+const isUploading = computed(() => uploadQueue.value.length > 0)
 const activeUploads = computed(() =>
-  uploadQueue.value.filter((item) => item.status === "pending" || item.status === "uploading"),
-);
+  uploadQueue.value.filter((item) => item.status === 'pending' || item.status === 'uploading'),
+)
 
 const onUploadStatusEnter = (el: Element) => {
-  const height = (el as HTMLElement).scrollHeight + (props.marginBottom || 0);
-  (el as HTMLElement).style.height = "0";
-   
-  void (el as HTMLElement).offsetHeight;
-  (el as HTMLElement).style.height = `${height}px`;
-};
+  const height = (el as HTMLElement).scrollHeight + (props.marginBottom || 0)
+  ;(el as HTMLElement).style.height = '0'
+
+  void (el as HTMLElement).offsetHeight
+  ;(el as HTMLElement).style.height = `${height}px`
+}
 
 const onUploadStatusLeave = (el: Element) => {
-  const height = (el as HTMLElement).scrollHeight + (props.marginBottom || 0);
-  (el as HTMLElement).style.height = `${height}px`;
-   
-  void (el as HTMLElement).offsetHeight;
-  (el as HTMLElement).style.height = "0";
-};
+  const height = (el as HTMLElement).scrollHeight + (props.marginBottom || 0)
+  ;(el as HTMLElement).style.height = `${height}px`
+
+  void (el as HTMLElement).offsetHeight
+  ;(el as HTMLElement).style.height = '0'
+}
 
 watch(
   uploadQueue,
   () => {
-    if (!uploadStatusRef.value) return;
-    const el = uploadStatusRef.value;
-    const itemsHeight = uploadQueue.value.length * 32;
-    const headerHeight = 12;
-    const gap = 8;
-    const padding = 32;
-    const totalHeight = padding + headerHeight + gap + itemsHeight + (props.marginBottom || 0);
-    el.style.height = `${totalHeight}px`;
+    if (!uploadStatusRef.value) return
+    const el = uploadStatusRef.value
+    const itemsHeight = uploadQueue.value.length * 32
+    const headerHeight = 12
+    const gap = 8
+    const padding = 32
+    const totalHeight = padding + headerHeight + gap + itemsHeight + (props.marginBottom || 0)
+    el.style.height = `${totalHeight}px`
   },
   { deep: true },
-);
+)
 
 const formatFileSize = (bytes: number): string => {
-  if (bytes < 1024) return bytes + " B";
-  if (bytes < 1024 ** 2) return (bytes / 1024).toFixed(1) + " KB";
-  if (bytes < 1024 ** 3) return (bytes / 1024 ** 2).toFixed(1) + " MB";
-  return (bytes / 1024 ** 3).toFixed(1) + " GB";
-};
+  if (bytes < 1024) return bytes + ' B'
+  if (bytes < 1024 ** 2) return (bytes / 1024).toFixed(1) + ' KB'
+  if (bytes < 1024 ** 3) return (bytes / 1024 ** 2).toFixed(1) + ' MB'
+  return (bytes / 1024 ** 3).toFixed(1) + ' GB'
+}
 
 const cancelUpload = (item: UploadItem) => {
-  if (item.uploader && item.status === "uploading") {
-    item.uploader.cancel();
-    item.status = "cancelled";
+  if (item.uploader && item.status === 'uploading') {
+    item.uploader.cancel()
+    item.status = 'cancelled'
 
     setTimeout(async () => {
-      const index = uploadQueue.value.findIndex((qItem) => qItem.file.name === item.file.name);
+      const index = uploadQueue.value.findIndex((qItem) => qItem.file.name === item.file.name)
       if (index !== -1) {
-        uploadQueue.value.splice(index, 1);
-        await nextTick();
+        uploadQueue.value.splice(index, 1)
+        await nextTick()
       }
-    }, 5000);
+    }, 5000)
   }
-};
+}
 
-const badFileTypeMsg = "Upload had incorrect file type";
+const badFileTypeMsg = 'Upload had incorrect file type'
 const uploadFile = async (file: File) => {
   const uploadItem: UploadItem = {
     file,
     progress: 0,
-    status: "pending",
+    status: 'pending',
     size: formatFileSize(file.size),
-  };
+  }
 
-  uploadQueue.value.push(uploadItem);
+  uploadQueue.value.push(uploadItem)
 
   try {
     if (
@@ -220,82 +220,82 @@ const uploadFile = async (file: File) => {
       !props.acceptedTypes.includes(file.type) &&
       !props.acceptedTypes.some((type) => file.name.endsWith(type))
     ) {
-      throw new Error(badFileTypeMsg);
+      throw new Error(badFileTypeMsg)
     }
 
-    uploadItem.status = "uploading";
-    const filePath = `${props.currentPath}/${file.name}`.replace("//", "/");
-    const uploader = await props.fs.uploadFile(filePath, file);
-    uploadItem.uploader = uploader;
+    uploadItem.status = 'uploading'
+    const filePath = `${props.currentPath}/${file.name}`.replace('//', '/')
+    const uploader = await props.fs.uploadFile(filePath, file)
+    uploadItem.uploader = uploader
 
     if (uploader?.onProgress) {
       uploader.onProgress(({ progress }: { progress: number }) => {
-        const index = uploadQueue.value.findIndex((item) => item.file.name === file.name);
+        const index = uploadQueue.value.findIndex((item) => item.file.name === file.name)
         if (index !== -1) {
-          uploadQueue.value[index].progress = Math.round(progress);
+          uploadQueue.value[index].progress = Math.round(progress)
         }
-      });
+      })
     }
 
-    await uploader?.promise;
-    const index = uploadQueue.value.findIndex((item) => item.file.name === file.name);
-    if (index !== -1 && uploadQueue.value[index].status !== "cancelled") {
-      uploadQueue.value[index].status = "completed";
-      uploadQueue.value[index].progress = 100;
+    await uploader?.promise
+    const index = uploadQueue.value.findIndex((item) => item.file.name === file.name)
+    if (index !== -1 && uploadQueue.value[index].status !== 'cancelled') {
+      uploadQueue.value[index].status = 'completed'
+      uploadQueue.value[index].progress = 100
     }
 
-    await nextTick();
+    await nextTick()
 
     setTimeout(async () => {
-      const removeIndex = uploadQueue.value.findIndex((item) => item.file.name === file.name);
+      const removeIndex = uploadQueue.value.findIndex((item) => item.file.name === file.name)
       if (removeIndex !== -1) {
-        uploadQueue.value.splice(removeIndex, 1);
-        await nextTick();
+        uploadQueue.value.splice(removeIndex, 1)
+        await nextTick()
       }
-    }, 5000);
+    }, 5000)
 
-    emit("uploadComplete");
+    emit('uploadComplete')
   } catch (error) {
-    console.error("Error uploading file:", error);
-    const index = uploadQueue.value.findIndex((item) => item.file.name === file.name);
-    if (index !== -1 && uploadQueue.value[index].status !== "cancelled") {
-      const target = uploadQueue.value[index];
+    console.error('Error uploading file:', error)
+    const index = uploadQueue.value.findIndex((item) => item.file.name === file.name)
+    if (index !== -1 && uploadQueue.value[index].status !== 'cancelled') {
+      const target = uploadQueue.value[index]
 
       if (error instanceof Error) {
         if (error.message === badFileTypeMsg) {
-          target.status = "incorrect-type";
-        } else if (target.progress === 100 && error.message.includes("401")) {
-          target.status = "error-file-exists";
+          target.status = 'incorrect-type'
+        } else if (target.progress === 100 && error.message.includes('401')) {
+          target.status = 'error-file-exists'
         } else {
-          target.status = "error-generic";
-          target.error = error;
+          target.status = 'error-generic'
+          target.error = error
         }
       }
     }
 
     setTimeout(async () => {
-      const removeIndex = uploadQueue.value.findIndex((item) => item.file.name === file.name);
+      const removeIndex = uploadQueue.value.findIndex((item) => item.file.name === file.name)
       if (removeIndex !== -1) {
-        uploadQueue.value.splice(removeIndex, 1);
-        await nextTick();
+        uploadQueue.value.splice(removeIndex, 1)
+        await nextTick()
       }
-    }, 5000);
+    }, 5000)
 
-    if (error instanceof Error && error.message !== "Upload cancelled") {
+    if (error instanceof Error && error.message !== 'Upload cancelled') {
       addNotification({
-        group: "files",
-        title: "Upload failed",
+        group: 'files',
+        title: 'Upload failed',
         text: `Failed to upload ${file.name}`,
-        type: "error",
-      });
+        type: 'error',
+      })
     }
   }
-};
+}
 
 defineExpose({
   uploadFile,
   cancelUpload,
-});
+})
 </script>
 
 <style scoped>

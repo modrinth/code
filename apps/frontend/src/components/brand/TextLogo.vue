@@ -54,21 +54,21 @@
 </template>
 
 <script setup>
-const loading = useLoading();
+const loading = useLoading()
 
-const config = useRuntimeConfig();
+const config = useRuntimeConfig()
 
 const api = computed(() => {
-  const apiUrl = config.public.apiBaseUrl;
-  if (apiUrl.startsWith("https://api.modrinth.com")) {
-    return "prod";
-  } else if (apiUrl.startsWith("https://staging-api.modrinth.com")) {
-    return "staging";
-  } else if (apiUrl.startsWith("localhost") || apiUrl.startsWith("127.0.0.1")) {
-    return "localhost";
+  const apiUrl = config.public.apiBaseUrl
+  if (apiUrl.startsWith('https://api.modrinth.com')) {
+    return 'prod'
+  } else if (apiUrl.startsWith('https://staging-api.modrinth.com')) {
+    return 'staging'
+  } else if (apiUrl.startsWith('localhost') || apiUrl.startsWith('127.0.0.1')) {
+    return 'localhost'
   }
-  return "foreign";
-});
+  return 'foreign'
+})
 </script>
 
 <style lang="scss" scoped>
