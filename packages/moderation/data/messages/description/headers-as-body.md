@@ -1,6 +1,6 @@
 ## Description Accessibility
 
-In accordance with section 2.2 of [Modrinth's Content Rules](https://modrinth.com/legal/rules) we request that `# header`s not be used as body text.
+In accordance with section 2.2 of %RULES%, we request that `# header`s not be used as body text.
 
 Headers are interpreted differently by screen-readers and thus should generally only be used for things like separating sections of your Description.
 
