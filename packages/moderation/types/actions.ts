@@ -1,4 +1,5 @@
 import type { Project } from '@modrinth/utils'
+
 import type { WeightedMessage } from './messages'
 
 export type ActionType =

@@ -1,6 +1,7 @@
-import type { Stage } from '../../types/stage'
-import type { ButtonAction } from '../../types/actions'
 import { AlignLeftIcon } from '@modrinth/assets'
+
+import type { ButtonAction } from '../../types/actions'
+import type { Stage } from '../../types/stage'
 
 const summary: Stage = {
   title: "Is the project's summary sufficient?",

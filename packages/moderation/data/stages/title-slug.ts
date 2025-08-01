@@ -1,4 +1,5 @@
 import { BookOpenIcon } from '@modrinth/assets'
+
 import type { Stage } from '../../types/stage'
 
 const titleSlug: Stage = {
