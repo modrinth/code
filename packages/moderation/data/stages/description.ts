@@ -94,6 +94,15 @@ const description: Stage = {
       message: async () =>
         (await import('../messages/description/non-standard-text.md?raw')).default,
     } as ButtonAction,
+    {
+      id: 'description_clarity',
+      type: 'button',
+      label: 'Unclear / Misleading',
+      weight: 407,
+      suggestedStatus: 'rejected',
+      severity: 'high',
+      message: async () => (await import('../messages/description/clarity.md?raw')).default,
+    } as ButtonAction,
   ],
 }
 
