@@ -305,12 +305,16 @@ const [
   get_game_versions().then(shallowRef).catch(handleError),
   get_loaders()
     .then((value) =>
-      value
-        .filter((item) => item.supported_project_types.includes('modpack'))
-        .map((item) => item.name.toLowerCase()),
+      ref(
+        value
+          .filter((item) => item.supported_project_types.includes('modpack'))
+          .map((item) => item.name.toLowerCase()),
+      ),
     )
-    .then(ref)
-    .catch(handleError),
+    .catch((err) => {
+      handleError(err)
+      return ref([])
+    }),
 ])
 loaders.value.unshift('vanilla')
 

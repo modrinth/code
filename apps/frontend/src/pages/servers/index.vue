@@ -45,8 +45,9 @@
         <h2
           class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[1.2rem]"
         >
-          Modrinth Servers is the easiest way to host your own Minecraft server. Seamlessly install
-          and play your favorite mods and modpacks, all within the Modrinth platform.
+          Modrinth Servers is the easiest way to host your own Minecraft: Java Edition server.
+          Seamlessly install and play your favorite mods and modpacks, all within the Modrinth
+          platform.
         </h2>
         <div class="relative flex w-full flex-wrap items-center gap-8 align-middle sm:w-fit">
           <div
@@ -427,11 +428,8 @@
                 Do Modrinth Servers have DDoS protection?
               </summary>
               <p class="m-0 ml-6 leading-[160%]">
-                Yes. All Modrinth Servers come with DDoS protection powered by
-                <a href="https://us.ovhcloud.com/security/anti-ddos/" target="_blank"
-                  >OVHcloud® Anti-DDoS infrastructure</a
-                >
-                which has over 17Tbps capacity. Your server is safe on Modrinth.
+                Yes. All Modrinth Servers come with DDoS protection, with up to 17Tbps capacity in
+                some locations.
               </p>
             </details>
 
@@ -443,8 +441,9 @@
                 Where are Modrinth Servers located? Can I choose a region?
               </summary>
               <p class="m-0 ml-6 leading-[160%]">
-                We have servers in both North America in Vint Hill, Virginia, and Europe in Limburg,
-                Germany. More regions to come in the future!
+                We have servers available in North America and Europe at the moment that you can
+                choose upon purchase. More regions to come in the future! If you'd like to switch
+                your region, please contact support.
               </p>
             </details>
 
@@ -461,7 +460,7 @@
               </p>
             </details>
 
-            <details pyro-hash="players" class="group" :open="$route.hash === '#players'">
+            <details pyro-hash="performance" class="group" :open="$route.hash === '#performance'">
               <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
@@ -482,7 +481,7 @@
               </p>
             </details>
 
-            <details pyro-hash="players" class="group" :open="$route.hash === '#prices'">
+            <details pyro-hash="prices" class="group" :open="$route.hash === '#prices'">
               <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
@@ -491,6 +490,24 @@
               </summary>
               <p class="m-0 ml-6 leading-[160%]">
                 All prices are listed in United States Dollars (USD).
+              </p>
+            </details>
+
+            <details pyro-hash="versions" class="group" :open="$route.hash === '#versions'">
+              <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
+                <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
+                  <RightArrowIcon />
+                </span>
+                What Minecraft versions and loaders can be used?
+              </summary>
+              <p class="m-0 ml-6 leading-[160%]">
+                Modrinth Servers can run any version of Minecraft: Java Edition going all the way
+                back to version 1.2.5, including snapshot versions.
+              </p>
+              <p class="m-0 ml-6 mt-3 leading-[160%]">
+                We also support a wide range of mod and plugin loaders, including Fabric, Quilt,
+                Forge, and NeoForge for mods, as well as Paper and Purpur for plugins. Availability
+                depends on whether the mod or plugin loader supports the selected Minecraft version.
               </p>
             </details>
           </div>

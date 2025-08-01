@@ -1,13 +1,21 @@
 <template>
+  <template v-if="moderation">
+    <Chips v-model="reasonFilter" :items="reasons" />
+    <p v-if="reports.length === MAX_REPORTS" class="text-red">
+      There are at least {{ MAX_REPORTS }} open reports. This page is at its max reports and will
+      not show any more recent ones.
+    </p>
+    <p v-else-if="reasonFilter === 'All'">There are {{ filteredReports.length }} open reports.</p>
+    <p v-else>
+      There are {{ filteredReports.length }}/{{ reports.length }} open '{{ reasonFilter }}' reports.
+    </p>
+  </template>
   <ReportInfo
-    v-for="report in reports.filter(
-      (x) =>
-        (moderation || x.reporterUser.id === auth.user.id) &&
-        (viewMode === 'open' ? x.open : !x.open),
-    )"
+    v-for="report in filteredReports"
     :key="report.id"
     :report="report"
     :thread="report.thread"
+    :show-message="false"
     :moderation="moderation"
     raised
     :auth="auth"
@@ -16,11 +24,12 @@
   <p v-if="reports.length === 0">You don't have any active reports.</p>
 </template>
 <script setup>
+import { Chips } from "@modrinth/ui";
 import ReportInfo from "~/components/ui/report/ReportInfo.vue";
 import { addReportMessage } from "~/helpers/threads.js";
 import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
 
-defineProps({
+const props = defineProps({
   moderation: {
     type: Boolean,
     default: false,
@@ -32,9 +41,14 @@ defineProps({
 });
 
 const viewMode = ref("open");
+const reasonFilter = ref("All");
 const reports = ref([]);
 
-let { data: rawReports } = await useAsyncData("report", () => useBaseFetch("report?count=1000"));
+const MAX_REPORTS = 1500;
+
+let { data: rawReports } = await useAsyncData("report", () =>
+  useBaseFetch(`report?count=${MAX_REPORTS}`),
+);
 
 rawReports = rawReports.value.map((report) => {
   report.item_id = report.item_id.replace(/"/g, "");
@@ -51,6 +65,7 @@ const userIds = [...new Set(reporterUsers.concat(reportedUsers))];
 const threadIds = [
   ...new Set(rawReports.filter((report) => report.thread_id).map((report) => report.thread_id)),
 ];
+const reasons = ["All", ...new Set(rawReports.map((report) => report.report_type))];
 
 const [{ data: users }, { data: versions }, { data: threads }] = await Promise.all([
   await useAsyncData(`users?ids=${JSON.stringify(userIds)}`, () =>
@@ -93,4 +108,13 @@ reports.value = rawReports.map((report) => {
   report.open = true;
   return report;
 });
+
+const filteredReports = computed(() =>
+  reports.value?.filter(
+    (x) =>
+      (props.moderation || x.reporterUser.id === props.auth.user.id) &&
+      (viewMode.value === "open" ? x.open : !x.open) &&
+      (reasonFilter.value === "All" || reasonFilter.value === x.report_type),
+  ),
+);
 </script>

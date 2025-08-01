@@ -61,9 +61,10 @@ import { renderString } from '@modrinth/utils'
 import { useFetch } from '@/helpers/fetch.js'
 import { check } from '@tauri-apps/plugin-updater'
 import NavButton from '@/components/ui/NavButton.vue'
-import { get as getCreds, login, logout } from '@/helpers/mr_auth.js'
+import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.js'
 import { get_user } from '@/helpers/cache.js'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
+import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import { hide_ads_window, init_ads_window } from '@/helpers/ads.js'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
@@ -263,6 +264,8 @@ const incompatibilityWarningModal = ref()
 
 const credentials = ref()
 
+const modrinthLoginFlowWaitModal = ref()
+
 async function fetchCredentials() {
   const creds = await getCreds().catch(handleError)
   if (creds && creds.user_id) {
@@ -272,8 +275,24 @@ async function fetchCredentials() {
 }
 
 async function signIn() {
-  await login().catch(handleError)
-  await fetchCredentials()
+  modrinthLoginFlowWaitModal.value.show()
+
+  try {
+    await login()
+    await fetchCredentials()
+  } catch (error) {
+    if (
+      typeof error === 'object' &&
+      typeof error['message'] === 'string' &&
+      error.message.includes('Login canceled')
+    ) {
+      // Not really an error due to being a result of user interaction, show nothing
+    } else {
+      handleError(error)
+    }
+  } finally {
+    modrinthLoginFlowWaitModal.value.hide()
+  }
 }
 
 async function logOut() {
@@ -401,6 +420,9 @@ function handleAuxClick(e) {
   <div v-if="stateInitialized" class="app-grid-layout experimental-styles-within relative">
     <Suspense>
       <AppSettingsModal ref="settingsModal" />
+    </Suspense>
+    <Suspense>
+      <AuthGrantFlowWaitModal ref="modrinthLoginFlowWaitModal" @flow-cancel="cancelLogin" />
     </Suspense>
     <Suspense>
       <InstanceCreationModal ref="installationModal" />

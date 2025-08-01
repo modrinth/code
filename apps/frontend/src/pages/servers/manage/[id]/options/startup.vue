@@ -42,7 +42,7 @@
             </label>
             <ButtonStyled>
               <button
-                :disabled="invocation === startupSettings?.original_invocation"
+                :disabled="invocation === originalInvocation"
                 class="!w-full sm:!w-auto"
                 @click="resetToDefault"
               >
@@ -120,8 +120,9 @@ const props = defineProps<{
   server: ModrinthServer;
 }>();
 
+await props.server.startup.fetch();
+
 const data = computed(() => props.server.general);
-const startupSettings = computed(() => props.server.startup);
 const showAllVersions = ref(false);
 
 const jdkVersionMap = [
@@ -137,33 +138,15 @@ const jdkBuildMap = [
   { value: "graal", label: "GraalVM" },
 ];
 
-const invocation = ref("");
-const jdkVersion = ref("");
-const jdkBuild = ref("");
-
-const originalInvocation = ref("");
-const originalJdkVersion = ref("");
-const originalJdkBuild = ref("");
-
-watch(
-  startupSettings,
-  (newSettings) => {
-    if (newSettings) {
-      invocation.value = newSettings.invocation;
-      originalInvocation.value = newSettings.invocation;
-
-      const jdkVersionLabel =
-        jdkVersionMap.find((v) => v.value === newSettings.jdk_version)?.label || "";
-      jdkVersion.value = jdkVersionLabel;
-      originalJdkVersion.value = jdkVersionLabel;
-
-      const jdkBuildLabel = jdkBuildMap.find((v) => v.value === newSettings.jdk_build)?.label || "";
-      jdkBuild.value = jdkBuildLabel;
-      originalJdkBuild.value = jdkBuildLabel;
-    }
-  },
-  { immediate: true },
+const invocation = ref(props.server.startup.invocation);
+const jdkVersion = ref(
+  jdkVersionMap.find((v) => v.value === props.server.startup.jdk_version)?.label,
 );
+const jdkBuild = ref(jdkBuildMap.find((v) => v.value === props.server.startup.jdk_build)?.label);
+
+const originalInvocation = ref(invocation.value);
+const originalJdkVersion = ref(jdkVersion.value);
+const originalJdkBuild = ref(jdkBuild.value);
 
 const hasUnsavedChanges = computed(
   () =>
@@ -195,7 +178,7 @@ const displayedJavaVersions = computed(() => {
   return showAllVersions.value ? jdkVersionMap.map((v) => v.label) : compatibleJavaVersions.value;
 });
 
-const saveStartup = async () => {
+async function saveStartup() {
   try {
     isUpdating.value = true;
     const invocationValue = invocation.value ?? "";
@@ -232,17 +215,17 @@ const saveStartup = async () => {
   } finally {
     isUpdating.value = false;
   }
-};
+}
 
-const resetStartup = () => {
+function resetStartup() {
   invocation.value = originalInvocation.value;
   jdkVersion.value = originalJdkVersion.value;
   jdkBuild.value = originalJdkBuild.value;
-};
+}
 
-const resetToDefault = () => {
-  invocation.value = startupSettings.value?.original_invocation ?? "";
-};
+function resetToDefault() {
+  invocation.value = originalInvocation.value ?? "";
+}
 </script>
 
 <style scoped>

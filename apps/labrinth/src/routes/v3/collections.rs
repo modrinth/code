@@ -163,7 +163,8 @@ pub async fn collections_get(
     .ok();
 
     let collections =
-        filter_visible_collections(collections_data, &user_option).await?;
+        filter_visible_collections(collections_data, &user_option, false)
+            .await?;
 
     Ok(HttpResponse::Ok().json(collections))
 }
@@ -192,7 +193,7 @@ pub async fn collection_get(
     .ok();
 
     if let Some(data) = collection_data {
-        if is_visible_collection(&data, &user_option).await? {
+        if is_visible_collection(&data, &user_option, false).await? {
             return Ok(HttpResponse::Ok().json(Collection::from(data)));
         }
     }

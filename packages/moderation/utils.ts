@@ -229,6 +229,10 @@ export function kebabToTitleCase(input: string): string {
     .join(' ')
 }
 
+export function arrayOrNone(arr: string[]): string {
+  return arr.length > 0 ? arr.join(', ') : 'None'
+}
+
 export function flattenProjectVariables(project: Project): Record<string, string> {
   const vars: Record<string, string> = {}
 
@@ -236,17 +240,17 @@ export function flattenProjectVariables(project: Project): Record<string, string
   vars['PROJECT_TYPE'] = project.project_type
   vars['PROJECT_SLUG'] = project.slug
   vars['PROJECT_TITLE'] = project.title
-  vars['PROJECT_DESCRIPTION'] = project.description
+  vars['PROJECT_SUMMARY'] = project.description
   vars['PROJECT_STATUS'] = project.status
   vars['PROJECT_REQUESTED_STATUS'] = project.requested_status
   vars['PROJECT_MONETIZATION_STATUS'] = project.monetization_status
   vars['PROJECT_BODY'] = project.body
 
   vars['PROJECT_ICON_URL'] = project.icon_url || ''
-  vars['PROJECT_ISSUES_URL'] = project.issues_url || ''
-  vars['PROJECT_SOURCE_URL'] = project.source_url || ''
-  vars['PROJECT_WIKI_URL'] = project.wiki_url || ''
-  vars['PROJECT_DISCORD_URL'] = project.discord_url || ''
+  vars['PROJECT_ISSUES_URL'] = project.issues_url || 'None'
+  vars['PROJECT_SOURCE_URL'] = project.source_url || 'None'
+  vars['PROJECT_WIKI_URL'] = project.wiki_url || 'None'
+  vars['PROJECT_DISCORD_URL'] = project.discord_url || 'None'
 
   vars['PROJECT_DOWNLOADS'] = project.downloads.toString()
   vars['PROJECT_FOLLOWERS'] = project.followers.toString()
@@ -255,7 +259,7 @@ export function flattenProjectVariables(project: Project): Record<string, string
   vars['PROJECT_CLIENT_SIDE'] = project.client_side
   vars['PROJECT_SERVER_SIDE'] = project.server_side
 
-  vars['PROJECT_TEAM'] = project.team
+  vars['PROJECT_TEAM'] = project.team || 'None'
   vars['PROJECT_THREAD_ID'] = project.thread_id
   vars['PROJECT_ORGANIZATION'] = project.organization
 
@@ -266,13 +270,13 @@ export function flattenProjectVariables(project: Project): Record<string, string
 
   vars['PROJECT_LICENSE_ID'] = project.license.id
   vars['PROJECT_LICENSE_NAME'] = project.license.name
-  vars['PROJECT_LICENSE_URL'] = project.license.url || ''
+  vars['PROJECT_LICENSE_URL'] = project.license.url || 'None'
 
-  vars['PROJECT_CATEGORIES'] = project.categories.join(', ')
-  vars['PROJECT_ADDITIONAL_CATEGORIES'] = project.additional_categories.join(', ')
-  vars['PROJECT_GAME_VERSIONS'] = project.game_versions.join(', ')
-  vars['PROJECT_LOADERS'] = project.loaders.join(', ')
-  vars['PROJECT_VERSIONS'] = project.versions.join(', ')
+  vars['PROJECT_CATEGORIES'] = arrayOrNone(project.categories)
+  vars['PROJECT_ADDITIONAL_CATEGORIES'] = arrayOrNone(project.additional_categories)
+  vars['PROJECT_GAME_VERSIONS'] = arrayOrNone(project.game_versions)
+  vars['PROJECT_LOADERS'] = arrayOrNone(project.loaders)
+  vars['PROJECT_VERSIONS'] = arrayOrNone(project.versions)
 
   vars['PROJECT_CATEGORIES_COUNT'] = project.categories.length.toString()
   vars['PROJECT_GAME_VERSIONS_COUNT'] = project.game_versions.length.toString()
@@ -293,6 +297,49 @@ export function flattenProjectVariables(project: Project): Record<string, string
     vars[`PROJECT_GALLERY_${index}_DESCRIPTION`] = image.description || ''
     vars[`PROJECT_GALLERY_${index}_FEATURED`] = image.featured.toString()
   })
+
+  // Static time saving stuff
+  vars[`RULES`] = `[Modrinth's Content Rules](https://modrinth.com/legal/rules)`
+  vars[`TOS`] = `[Terms of Use](https://modrinth.com/legal/terms)`
+  vars[`COPYRIGHT_POLICY`] = `[Copyright Policy](https://modrinth.com/legal/copyright)`
+  vars[`SUPPORT`] =
+    `please visit the [Modrinth Help Center](https://support.modrinth.com/) and click the green bubble to contact support.`
+  vars[`MODPACK_PERMISSIONS_GUIDE`] =
+    `our guide to [Obtaining Modpack Permissions](https://support.modrinth.com/en/articles/8797527-obtaining-modpack-permissions)`
+  vars[`MODPACKS_ON_MODRINTH`] =
+    `[Modpacks on Modrinth](https://support.modrinth.com/en/articles/8802250-modpacks-on-modrinth)`
+  vars[`ADVANCED_MARKDOWN`] =
+    `[Markdown Formatting Guide](https://support.modrinth.com/en/articles/8801962-advanced-markdown-formatting)`
+  vars[`LICENSING_GUIDE`] =
+    `our guide to [Guide to Licensing your Mods](https://modrinth.com/news/article/licensing-guide)`
+
+  // Navigation related variables
+  vars[`PROJECT_PERMANENT_LINK`] = `https://modrinth.com/project/${project.id}`
+  vars[`PROJECT_SETTINGS_LINK`] = `https://modrinth.com/project/${project.id}/settings`
+  vars[`PROJECT_SETTINGS_FLINK`] = `[Settings](https://modrinth.com/project/${project.id}/settings)`
+  vars[`PROJECT_TITLE_FLINK`] = `[Name](https://modrinth.com/project/${project.id}/settings)`
+  vars[`PROJECT_SLUG_FLINK`] = `[URL](https://modrinth.com/project/${project.id}/settings)`
+  vars[`PROJECT_SUMMARY_FLINK`] = `[Summary](https://modrinth.com/project/${project.id}/settings)`
+  vars[`PROJECT_ENVIRONMENT_FLINK`] =
+    `[Environment Information](https://modrinth.com/project/${project.id}/settings)`
+  vars[`PROJECT_TAGS_LINK`] = `https://modrinth.com/project/${project.id}/settings/tags`
+  vars[`PROJECT_TAGS_FLINK`] = `[Tags](https://modrinth.com/project/${project.id}/settings/tags)`
+  vars[`PROJECT_DESCRIPTION_LINK`] =
+    `https://modrinth.com/project/${project.id}/settings/description`
+  vars[`PROJECT_DESCRIPTION_FLINK`] =
+    `[Description](https://modrinth.com/project/${project.id}/settings/description)`
+  vars[`PROJECT_LICENSE_LINK`] = `https://modrinth.com/project/${project.id}/license`
+  vars[`PROJECT_LICENSE_FLINK`] = `[License](https://modrinth.com/project/${project.id}/license)`
+  vars[`PROJECT_LINKS_LINK`] = `https://modrinth.com/project/${project.id}/settings/links`
+  vars[`PROJECT_LINKS_FLINK`] =
+    `[External Links](https://modrinth.com/project/${project.id}/settings/links)`
+  vars[`PROJECT_GALLERY_LINK`] = `https://modrinth.com/project/${project.id}/gallery`
+  vars[`PROJECT_GALLERY_FLINK`] = `[Gallery](https://modrinth.com/project/${project.id}/gallery)`
+  vars[`PROJECT_VERSIONS_LINK`] = `https://modrinth.com/project/${project.id}/versions`
+  vars[`PROJECT_VERSIONS_FLINK`] = `[Versions](https://modrinth.com/project/${project.id}/versions)`
+  vars[`PROJECT_MODERATION_LINK`] = `https://modrinth.com/project/${project.id}/moderation`
+  vars[`PROJECT_MODERATION_FLINK`] =
+    `[moderation tab](https://modrinth.com/project/${project.id}/moderation)`
 
   return vars
 }
