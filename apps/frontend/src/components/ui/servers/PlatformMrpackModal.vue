@@ -144,18 +144,19 @@
 </template>
 
 <script setup lang="ts">
-import { BackupWarning, ButtonStyled, NewModal } from "@modrinth/ui";
 import {
-  UploadIcon,
-  RightArrowIcon,
-  XIcon,
-  ServerIcon,
   ArrowBigRightDashIcon,
+  RightArrowIcon,
+  ServerIcon,
+  UploadIcon,
+  XIcon,
 } from "@modrinth/assets";
+import { BackupWarning, ButtonStyled, NewModal } from "@modrinth/ui";
 import { formatBytes, ModrinthServersFetchError } from "@modrinth/utils";
 import { onMounted, onUnmounted } from "vue";
-import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
+
 import type { ModrinthServer } from "~/composables/servers/modrinth-servers";
+import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
 
 const handleBeforeUnload = (event: BeforeUnloadEvent) => {
   if (isLoading.value) {

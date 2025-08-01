@@ -1,5 +1,6 @@
 import "@vintl/vintl";
-import { CompactNumber } from "@vintl/compact-number/dist/index.mjs";
+
+import type { CompactNumber } from "@vintl/compact-number/dist/index.mjs";
 
 declare global {
   namespace VueIntlController {

@@ -25,6 +25,7 @@
 </template>
 <script setup>
 import { Chips } from "@modrinth/ui";
+
 import ReportInfo from "~/components/ui/report/ReportInfo.vue";
 import { addReportMessage } from "~/helpers/threads.js";
 import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";

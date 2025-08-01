@@ -80,12 +80,12 @@
 </template>
 
 <script setup>
-import { Button, Avatar, commonMessages } from "@modrinth/ui";
-import { XIcon, CheckIcon } from "@modrinth/assets";
-import { useBaseFetch } from "@/composables/fetch.js";
-import { useAuth } from "@/composables/auth.js";
+import { CheckIcon,XIcon } from "@modrinth/assets";
+import { Avatar, Button, commonMessages } from "@modrinth/ui";
 
+import { useAuth } from "@/composables/auth.js";
 import { useScopes } from "@/composables/auth/scopes.ts";
+import { useBaseFetch } from "@/composables/fetch.js";
 
 const { formatMessage } = useVIntl();
 

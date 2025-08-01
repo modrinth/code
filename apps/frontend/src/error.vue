@@ -49,8 +49,9 @@
 </template>
 
 <script setup>
-import { defineMessage, useVIntl } from "@vintl/vintl";
 import { SadRinthbot } from "@modrinth/assets";
+import { defineMessage, useVIntl } from "@vintl/vintl";
+
 import Logo404 from "~/assets/images/404.svg";
 
 const { formatMessage } = useVIntl();

@@ -298,22 +298,22 @@
 </template>
 
 <script setup>
-import { Multiselect } from "vue-multiselect";
 import {
   BoxIcon,
-  SettingsIcon,
-  TrashIcon,
+  EditIcon,
   IssuesIcon,
   PlusIcon,
-  XIcon,
-  EditIcon,
   SaveIcon,
+  SettingsIcon,
   SortAscIcon,
   SortDescIcon,
+  TrashIcon,
+  XIcon,
 } from "@modrinth/assets";
-import { Button, Modal, Avatar, CopyCode, Badge, Checkbox, commonMessages } from "@modrinth/ui";
-
+import { Avatar, Badge, Button, Checkbox, commonMessages,CopyCode, Modal } from "@modrinth/ui";
 import { formatProjectType } from "@modrinth/utils";
+import { Multiselect } from "vue-multiselect";
+
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import OrganizationProjectTransferModal from "~/components/ui/OrganizationProjectTransferModal.vue";
 

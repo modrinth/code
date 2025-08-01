@@ -67,10 +67,11 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { DownloadIcon, XIcon } from "@modrinth/assets";
+import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { ModrinthServersFetchError } from "@modrinth/utils";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+
+import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
   server: ModrinthServer;

@@ -264,18 +264,19 @@
 
 <script setup lang="ts">
 import {
-  PlusIcon,
-  TrashIcon,
   EditIcon,
-  VersionIcon,
-  SaveIcon,
   InfoIcon,
-  UploadIcon,
   IssuesIcon,
+  PlusIcon,
+  SaveIcon,
+  TrashIcon,
+  UploadIcon,
+  VersionIcon,
 } from "@modrinth/assets";
-import { ButtonStyled, NewModal, ConfirmModal, CopyCode } from "@modrinth/ui";
-import { ref, computed, nextTick } from "vue";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { ButtonStyled, ConfirmModal, CopyCode,NewModal } from "@modrinth/ui";
+import { computed, nextTick,ref } from "vue";
+
+import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
   server: ModrinthServer;

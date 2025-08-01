@@ -1,17 +1,25 @@
 <script setup lang="ts">
-import dayjs from "dayjs";
-import { ButtonStyled, commonMessages, CopyCode, ServerNotice, TagItem } from "@modrinth/ui";
-import { EditIcon, SettingsIcon, TrashIcon } from "@modrinth/assets";
-import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
-import { useRelativeTime, getDismissableMetadata, NOTICE_LEVELS } from "@modrinth/ui";
-import { useVIntl } from "@vintl/vintl";
+import { EditIcon, SettingsIcon, TrashIcon } from '@modrinth/assets'
+import {
+  ButtonStyled,
+  commonMessages,
+  CopyCode,
+  getDismissableMetadata,
+  NOTICE_LEVELS,
+  ServerNotice,
+  TagItem,
+  useRelativeTime,
+} from '@modrinth/ui'
+import type { ServerNotice as ServerNoticeType } from '@modrinth/utils'
+import { useVIntl } from '@vintl/vintl'
+import dayjs from 'dayjs'
 
-const { formatMessage } = useVIntl();
-const formatRelativeTime = useRelativeTime();
+const { formatMessage } = useVIntl()
+const formatRelativeTime = useRelativeTime()
 
-const props = defineProps<{
-  notice: ServerNoticeType;
-}>();
+defineProps<{
+  notice: ServerNoticeType
+}>()
 </script>
 <template>
   <div class="col-span-full grid grid-cols-subgrid gap-4 rounded-2xl bg-bg-raised p-4">
@@ -21,7 +29,7 @@ const props = defineProps<{
       </div>
       <div class="text-sm">
         <span v-if="notice.announce_at">
-          {{ dayjs(notice.announce_at).format("MMM D, YYYY [at] h:mm A") }} ({{
+          {{ dayjs(notice.announce_at).format('MMM D, YYYY [at] h:mm A') }} ({{
             formatRelativeTime(notice.announce_at)
           }})
         </span>
@@ -91,16 +99,16 @@ const props = defineProps<{
         >
         <span v-else-if="!notice.assigned.some((n) => n.kind === 'server')">
           Assigned to
-          {{ notice.assigned.filter((n) => n.kind === "node").length }} nodes
+          {{ notice.assigned.filter((n) => n.kind === 'node').length }} nodes
         </span>
         <span v-else-if="!notice.assigned.some((n) => n.kind === 'node')">
           Assigned to
-          {{ notice.assigned.filter((n) => n.kind === "server").length }} servers
+          {{ notice.assigned.filter((n) => n.kind === 'server').length }} servers
         </span>
         <span v-else>
           Assigned to
-          {{ notice.assigned.filter((n) => n.kind === "server").length }} servers and
-          {{ notice.assigned.filter((n) => n.kind === "node").length }} nodes
+          {{ notice.assigned.filter((n) => n.kind === 'server').length }} servers and
+          {{ notice.assigned.filter((n) => n.kind === 'node').length }} nodes
         </span>
         •
         <button

@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import { PlusIcon, XIcon } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
-import { ref, computed, nextTick } from "vue";
+import { computed, nextTick,ref } from "vue";
 
 const props = defineProps<{
   type: "file" | "directory";

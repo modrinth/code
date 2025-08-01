@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import {
-  TrashIcon,
-  SearchIcon,
   BoxIcon,
-  SendIcon,
-  EditIcon,
   DownloadIcon,
+  EditIcon,
   LinkIcon,
+  SearchIcon,
+  SendIcon,
+  TrashIcon,
 } from "@modrinth/assets";
-import { Avatar, Checkbox, Badge } from "@modrinth/ui";
-import LogoAnimated from "~/components/brand/LogoAnimated.vue";
-import PrismIcon from "~/assets/images/external/prism.svg?component";
+import { Avatar, Badge,Checkbox } from "@modrinth/ui";
+
 import ATLauncher from "~/assets/images/external/atlauncher.svg?component";
 import CurseForge from "~/assets/images/external/curseforge.svg?component";
+import PrismIcon from "~/assets/images/external/prism.svg?component";
+import LogoAnimated from "~/components/brand/LogoAnimated.vue";
 import LatestNewsRow from "~/components/ui/news/LatestNewsRow.vue";
-
 import { homePageProjects } from "~/generated/state.json";
 
 interface LauncherPlatform {

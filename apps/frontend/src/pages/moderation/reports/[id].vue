@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { Report } from "@modrinth/utils";
-import { enrichReportBatch } from "~/helpers/moderation.ts";
+
 import ModerationReportCard from "~/components/ui/moderation/ModerationReportCard.vue";
+import { enrichReportBatch } from "~/helpers/moderation.ts";
 
 const { params } = useRoute();
 const reportId = params.id as string;

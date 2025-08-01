@@ -73,11 +73,13 @@
 </template>
 
 <script setup lang="ts">
-import { ExternalIcon, SpinnerIcon, DownloadIcon, XIcon } from "@modrinth/assets";
+import { DownloadIcon, ExternalIcon, SpinnerIcon, XIcon } from "@modrinth/assets";
 import { BackupWarning, ButtonStyled, NewModal } from "@modrinth/ui";
 import { ModrinthServersFetchError } from "@modrinth/utils";
-import { ref, computed, nextTick } from "vue";
-import { handleError, ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { computed, nextTick,ref } from "vue";
+
+import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { handleError } from "~/composables/servers/modrinth-servers.ts";
 
 const cf = ref(false);
 

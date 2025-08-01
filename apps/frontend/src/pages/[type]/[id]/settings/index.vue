@@ -239,10 +239,11 @@
 </template>
 
 <script setup>
+import { CheckIcon,IssuesIcon, SaveIcon, TrashIcon, UploadIcon, XIcon } from "@modrinth/assets";
+import { Avatar,ConfirmModal } from "@modrinth/ui";
 import { formatProjectStatus, formatProjectType } from "@modrinth/utils";
-import { UploadIcon, SaveIcon, TrashIcon, XIcon, IssuesIcon, CheckIcon } from "@modrinth/assets";
 import { Multiselect } from "vue-multiselect";
-import { ConfirmModal, Avatar } from "@modrinth/ui";
+
 import FileInput from "~/components/ui/FileInput.vue";
 
 const props = defineProps({

@@ -80,17 +80,18 @@
 </template>
 <script setup>
 import {
-  ServerIcon,
+  CardIcon,
   GridIcon,
-  PaintbrushIcon,
-  UserIcon,
-  ShieldIcon,
   KeyIcon,
   LanguagesIcon,
-  CardIcon,
   MonitorSmartphoneIcon,
+  PaintbrushIcon,
+  ServerIcon,
+  ShieldIcon,
+  UserIcon,
 } from "@modrinth/assets";
 import { commonMessages, commonSettingsMessages } from "@modrinth/ui";
+
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
 

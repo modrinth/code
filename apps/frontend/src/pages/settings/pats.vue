@@ -202,25 +202,24 @@
   </div>
 </template>
 <script setup>
-import { PlusIcon, XIcon, TrashIcon, EditIcon, SaveIcon } from "@modrinth/assets";
+import { EditIcon, PlusIcon, SaveIcon,TrashIcon, XIcon } from "@modrinth/assets";
 import {
   Checkbox,
-  CopyCode,
-  ConfirmModal,
-  commonSettingsMessages,
   commonMessages,
+  commonSettingsMessages,
+  ConfirmModal,
+  CopyCode,
   useRelativeTime,
 } from "@modrinth/ui";
 
+import Modal from "~/components/ui/Modal.vue";
 import {
+  getScopeValue,
   hasScope,
   scopeList,
   toggleScope,
   useScopes,
-  getScopeValue,
 } from "~/composables/auth/scopes.ts";
-
-import Modal from "~/components/ui/Modal.vue";
 
 const { formatMessage } = useVIntl();
 

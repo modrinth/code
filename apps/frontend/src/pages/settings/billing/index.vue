@@ -554,35 +554,36 @@
 
 <script setup>
 import {
-  ConfirmModal,
+  ArrowBigUpDashIcon,
+  CardIcon,
+  CheckCircleIcon,
+  CurrencyIcon,
+  EditIcon,
+  HistoryIcon,
+  ModrinthPlusIcon,
+  MoreVerticalIcon,
+  PayPalIcon,
+  PlusIcon,
+  RightArrowIcon,
+  SpinnerIcon,
+  StarIcon,
+  TransferIcon,
+  TrashIcon,
+  UpdatedIcon,
+  XIcon,
+} from "@modrinth/assets";
+import {
   AddPaymentMethodModal,
+  ButtonStyled,
+  commonMessages,
+  ConfirmModal,
+  CopyCode,
   OverflowMenu,
   PurchaseModal,
-  ButtonStyled,
-  CopyCode,
-  commonMessages,
 } from "@modrinth/ui";
-import {
-  PlusIcon,
-  TransferIcon,
-  SpinnerIcon,
-  ArrowBigUpDashIcon,
-  XIcon,
-  CardIcon,
-  MoreVerticalIcon,
-  TrashIcon,
-  EditIcon,
-  StarIcon,
-  PayPalIcon,
-  CurrencyIcon,
-  CheckCircleIcon,
-  RightArrowIcon,
-  ModrinthPlusIcon,
-  UpdatedIcon,
-  HistoryIcon,
-} from "@modrinth/assets";
 import { calculateSavings, formatPrice, getCurrency } from "@modrinth/utils";
-import { ref, computed } from "vue";
+import { computed,ref } from "vue";
+
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import { products } from "~/generated/state.json";
 

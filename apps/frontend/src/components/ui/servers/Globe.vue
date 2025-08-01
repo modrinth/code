@@ -44,7 +44,7 @@
 <script setup>
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { ref, onMounted, onUnmounted } from "vue";
+import { onMounted, onUnmounted,ref } from "vue";
 
 const container = ref(null);
 const showLabels = ref(false);

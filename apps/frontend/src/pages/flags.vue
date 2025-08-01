@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
-  type FeatureFlag,
   DEFAULT_FEATURE_FLAGS,
+  type FeatureFlag,
   saveFeatureFlags,
 } from "~/composables/featureFlags.ts";
 

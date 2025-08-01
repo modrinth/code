@@ -8,16 +8,17 @@
 </template>
 <script setup lang="ts">
 import {
+  CardIcon,
   InfoIcon,
   ListIcon,
   SettingsIcon,
   TextQuoteIcon,
-  VersionIcon,
-  CardIcon,
   UserIcon,
+  VersionIcon,
   WrenchIcon,
 } from "@modrinth/assets";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+
+import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
 
 const route = useRoute();

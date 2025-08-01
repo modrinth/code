@@ -34,6 +34,7 @@ export default tseslint.config(
           allowGenerics: 'always',
         },
       ],
+      '@typescript-eslint/ban-ts-comment': 'off',
     },
   },
 )

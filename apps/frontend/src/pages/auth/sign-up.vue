@@ -134,18 +134,19 @@
 
 <script setup>
 import {
-  RightArrowIcon,
-  UserIcon,
-  SSOGitHubIcon,
-  SSOMicrosoftIcon,
-  SSOGoogleIcon,
-  SSOSteamIcon,
-  SSODiscordIcon,
   KeyIcon,
   MailIcon,
+  RightArrowIcon,
+  SSODiscordIcon,
+  SSOGitHubIcon,
   SSOGitLabIcon,
+  SSOGoogleIcon,
+  SSOMicrosoftIcon,
+  SSOSteamIcon,
+  UserIcon,
 } from "@modrinth/assets";
 import { Checkbox, commonMessages } from "@modrinth/ui";
+
 import HCaptcha from "@/components/ui/HCaptcha.vue";
 
 const { formatMessage } = useVIntl();

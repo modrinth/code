@@ -1,6 +1,6 @@
 import { parse as parseTOML } from "@ltd/j-toml";
-import JSZip from "jszip";
 import yaml from "js-yaml";
+import JSZip from "jszip";
 import { satisfies } from "semver";
 
 export const inferVersionInfo = async function (rawFile, project, gameVersions) {
@@ -139,7 +139,7 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
         // ${file.jarVersion} -> Implementation-Version from manifest
         const manifestFile = zip.file("META-INF/MANIFEST.MF");
         if (
-          // eslint-disable-next-line no-template-curly-in-string
+           
           metadata.mods[0].version.includes("${file.jarVersion}") &&
           manifestFile !== null
         ) {
@@ -147,7 +147,7 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
           const regex = /Implementation-Version: (.*)$/m;
           const match = manifestText.match(regex);
           if (match) {
-            // eslint-disable-next-line no-template-curly-in-string
+             
             versionNum = versionNum.replace("${file.jarVersion}", match[1]);
           }
         }

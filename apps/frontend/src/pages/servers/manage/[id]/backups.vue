@@ -150,18 +150,19 @@
 </template>
 
 <script setup lang="ts">
+import { DownloadIcon, IssuesIcon,PlusIcon, SettingsIcon, SpinnerIcon } from "@modrinth/assets";
 import { ButtonStyled, TagItem } from "@modrinth/ui";
-import { useStorage } from "@vueuse/core";
-import { SpinnerIcon, PlusIcon, DownloadIcon, SettingsIcon, IssuesIcon } from "@modrinth/assets";
-import { ref, computed } from "vue";
 import type { Backup } from "@modrinth/utils";
+import { useStorage } from "@vueuse/core";
+import { computed,ref } from "vue";
+
+import BackupCreateModal from "~/components/ui/servers/BackupCreateModal.vue";
+import BackupDeleteModal from "~/components/ui/servers/BackupDeleteModal.vue";
 import BackupItem from "~/components/ui/servers/BackupItem.vue";
 import BackupRenameModal from "~/components/ui/servers/BackupRenameModal.vue";
-import BackupCreateModal from "~/components/ui/servers/BackupCreateModal.vue";
 import BackupRestoreModal from "~/components/ui/servers/BackupRestoreModal.vue";
-import BackupDeleteModal from "~/components/ui/servers/BackupDeleteModal.vue";
 import BackupSettingsModal from "~/components/ui/servers/BackupSettingsModal.vue";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
   server: ModrinthServer;

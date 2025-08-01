@@ -17,11 +17,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { ConfirmModal, NewModal } from "@modrinth/ui";
+import type { NewModal } from "@modrinth/ui";
+import { ConfirmModal } from "@modrinth/ui";
 import type { Backup } from "@modrinth/utils";
+import { ref } from "vue";
+
 import BackupItem from "~/components/ui/servers/BackupItem.vue";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
   server: ModrinthServer;

@@ -48,62 +48,64 @@
 </template>
 
 <script setup>
-import { Checkbox, commonMessages } from "@modrinth/ui";
-import { RightArrowIcon, WavingRinthbot } from "@modrinth/assets";
+import { RightArrowIcon, WavingRinthbot } from '@modrinth/assets'
+import { Checkbox, commonMessages } from '@modrinth/ui'
 
-const route = useRoute();
+const route = useRoute()
 
-const { formatMessage } = useVIntl();
+const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
   subscribeCheckbox: {
-    id: "auth.welcome.checkbox.subscribe",
-    defaultMessage: "Subscribe to updates about Modrinth",
+    id: 'auth.welcome.checkbox.subscribe',
+    defaultMessage: 'Subscribe to updates about Modrinth',
   },
   tosLabel: {
-    id: "auth.welcome.label.tos",
+    id: 'auth.welcome.label.tos',
     defaultMessage:
       "By creating an account, you have agreed to Modrinth's <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>.",
   },
   welcomeDescription: {
-    id: "auth.welcome.description",
+    id: 'auth.welcome.description',
     defaultMessage:
-      "You’re now part of the awesome community of creators & explorers already building, downloading, and staying up-to-date with awazing mods.",
+      'You’re now part of the awesome community of creators & explorers already building, downloading, and staying up-to-date with awazing mods.',
   },
   welcomeLongTitle: {
-    id: "auth.welcome.long-title",
-    defaultMessage: "Welcome to Modrinth!",
+    id: 'auth.welcome.long-title',
+    defaultMessage: 'Welcome to Modrinth!',
   },
   welcomeTitle: {
-    id: "auth.welcome.title",
-    defaultMessage: "Welcome",
+    id: 'auth.welcome.title',
+    defaultMessage: 'Welcome',
   },
-});
+})
 
 useHead({
   title: () => `${formatMessage(messages.welcomeTitle)} - Modrinth`,
-});
+})
 
-const subscribe = ref(true);
+const subscribe = ref(true)
 
 onMounted(async () => {
-  await useAuth(route.query.authToken);
-  await useUser();
-});
+  await useAuth(route.query.authToken)
+  await useUser()
+})
 
 async function continueSignUp() {
   if (subscribe.value) {
     try {
-      await useBaseFetch("auth/email/subscribe", {
-        method: "POST",
-      });
-    } catch {}
+      await useBaseFetch('auth/email/subscribe', {
+        method: 'POST',
+      })
+    } catch {
+      // Error ignored
+    }
   }
 
   if (route.query.redirect) {
-    await navigateTo(route.query.redirect);
+    await navigateTo(route.query.redirect)
   } else {
-    await navigateTo("/dashboard");
+    await navigateTo('/dashboard')
   }
 }
 </script>
