@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { getChangelog } from "@modrinth/utils";
-import { ChangelogEntry, Timeline } from "@modrinth/ui";
 import { ChevronLeftIcon } from "@modrinth/assets";
+import { ChangelogEntry, Timeline } from "@modrinth/ui";
+import { getChangelog } from "@modrinth/utils";
 
 const route = useRoute();
 

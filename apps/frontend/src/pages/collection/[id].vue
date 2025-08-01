@@ -367,6 +367,7 @@ import {
   BoxIcon,
   CalendarIcon,
   EditIcon,
+  GlobeIcon,
   GridIcon,
   ImageIcon,
   LibraryIcon,
@@ -378,7 +379,6 @@ import {
   UpdatedIcon,
   UploadIcon,
   XIcon,
-  GlobeIcon,
 } from "@modrinth/assets";
 import {
   Avatar,
@@ -390,13 +390,13 @@ import {
   PopoutMenu,
   useRelativeTime,
 } from "@modrinth/ui";
-
 import { isAdmin } from "@modrinth/utils";
 import UpToDate from "assets/images/illustrations/up_to_date.svg";
-import { addNotification } from "~/composables/notifs.js";
+
+import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import NavRow from "~/components/ui/NavRow.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
-import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
+import { addNotification } from "~/composables/notifs.js";
 
 const vintl = useVIntl();
 const { formatMessage } = vintl;

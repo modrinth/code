@@ -65,27 +65,28 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled } from "@modrinth/ui";
 import {
-  MoreHorizontalIcon,
-  EditIcon,
   DownloadIcon,
-  TrashIcon,
-  FolderOpenIcon,
-  FileIcon,
-  RightArrowIcon,
-  PackageOpenIcon,
+  EditIcon,
   FileArchiveIcon,
+  FileIcon,
+  FolderOpenIcon,
+  MoreHorizontalIcon,
+  PackageOpenIcon,
+  RightArrowIcon,
+  TrashIcon,
 } from "@modrinth/assets";
-import { computed, shallowRef, ref } from "vue";
+import { ButtonStyled } from "@modrinth/ui";
+import { computed, ref,shallowRef } from "vue";
 import { renderToString } from "vue/server-renderer";
-import { useRouter, useRoute } from "vue-router";
+import { useRoute,useRouter } from "vue-router";
+
 import {
+  UiServersIconsCodeFileIcon,
   UiServersIconsCogFolderIcon,
   UiServersIconsEarthIcon,
-  UiServersIconsCodeFileIcon,
-  UiServersIconsTextFileIcon,
   UiServersIconsImageFileIcon,
+  UiServersIconsTextFileIcon,
 } from "#components";
 import PaletteIcon from "~/assets/icons/palette.svg?component";
 

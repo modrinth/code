@@ -215,24 +215,24 @@
   </div>
 </template>
 <script setup>
-import { UploadIcon, PlusIcon, XIcon, TrashIcon, EditIcon, SaveIcon } from "@modrinth/assets";
+import { EditIcon, PlusIcon, SaveIcon,TrashIcon, UploadIcon, XIcon } from "@modrinth/assets";
 import {
-  CopyCode,
-  ConfirmModal,
+  Avatar,
   Button,
   Checkbox,
-  Avatar,
-  FileInput,
   commonSettingsMessages,
+  ConfirmModal,
+  CopyCode,
+  FileInput,
 } from "@modrinth/ui";
-import Modal from "~/components/ui/Modal.vue";
 
+import Modal from "~/components/ui/Modal.vue";
 import {
-  scopeList,
+  getScopeValue,
   hasScope,
+  scopeList,
   toggleScope,
   useScopes,
-  getScopeValue,
 } from "~/composables/auth/scopes.ts";
 
 const { formatMessage } = useVIntl();

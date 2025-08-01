@@ -27,9 +27,9 @@
 </template>
 
 <script setup lang="ts">
+import { CheckIcon,XIcon } from "@modrinth/assets";
 import { ConfirmModal } from "@modrinth/ui";
 import { ref } from "vue";
-import { XIcon, CheckIcon } from "@modrinth/assets";
 
 const path = ref("");
 const files = ref<string[]>([]);

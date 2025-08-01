@@ -102,8 +102,8 @@
 
 <script setup lang="ts">
 import { ButtonStyled } from "@modrinth/ui";
-import { ref, onMounted, onUnmounted, watch, nextTick, computed } from "vue";
 import { onClickOutside, useElementHover } from "@vueuse/core";
+import { computed,nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 
 interface Option {
   id: string;

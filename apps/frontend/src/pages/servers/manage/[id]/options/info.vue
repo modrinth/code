@@ -115,9 +115,10 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, CopyCode } from "@modrinth/ui";
 import { CopyIcon, ExternalIcon, EyeIcon, EyeOffIcon } from "@modrinth/assets";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { ButtonStyled, CopyCode } from "@modrinth/ui";
+
+import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
   server: ModrinthServer;

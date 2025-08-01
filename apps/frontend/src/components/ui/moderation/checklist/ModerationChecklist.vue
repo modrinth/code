@@ -322,7 +322,7 @@
               <ButtonStyled v-else color="brand" :disabled="loadingMessage">
                 <button @click="generateMessage">
                   <CheckIcon aria-hidden="true" />
-                  {{ loadingMessage ? "Generating..." : "Generate Message" }}
+                  {{ loadingMessage ? 'Generating...' : 'Generate Message' }}
                 </button>
               </ButtonStyled>
             </div>
@@ -335,147 +335,147 @@
 
 <script lang="ts" setup>
 import {
-  LeftArrowIcon,
-  RightArrowIcon,
-  DropdownIcon,
-  XIcon,
-  ScaleIcon,
-  ListBulletedIcon,
-  FileTextIcon,
   BrushCleaningIcon,
   CheckIcon,
-  KeyboardIcon,
+  DropdownIcon,
   EyeOffIcon,
-  ToggleLeftIcon,
-  ToggleRightIcon,
-} from "@modrinth/assets";
+  FileTextIcon,
+  KeyboardIcon,
+  LeftArrowIcon,
+  ListBulletedIcon,
+  RightArrowIcon,
+  ScaleIcon,
+  XIcon,
+} from '@modrinth/assets'
 import {
   checklist,
-  getActionIdForStage,
-  initializeActionState,
-  getActionMessage,
-  findMatchingVariant,
-  processMessage,
-  getVisibleInputs,
-  serializeActionStates,
   deserializeActionStates,
-  kebabToTitleCase,
-  flattenProjectVariables,
   expandVariables,
+  findMatchingVariant,
+  flattenProjectVariables,
+  getActionIdForStage,
+  getActionMessage,
+  getVisibleInputs,
   handleKeybind,
+  initializeActionState,
+  kebabToTitleCase,
   keybinds,
-} from "@modrinth/moderation";
+  processMessage,
+  serializeActionStates,
+} from '@modrinth/moderation'
+import {
+  type Action,
+  type ButtonAction,
+  type ConditionalButtonAction,
+  type DropdownAction,
+  finalPermissionMessages,
+  type MultiSelectChipsAction,
+  type Stage,
+  type ToggleAction,
+} from '@modrinth/moderation'
 import {
   ButtonStyled,
-  Collapsible,
-  OverflowMenu,
-  type OverflowMenuOption,
   Checkbox,
+  Collapsible,
   DropdownSelect,
   MarkdownEditor,
-} from "@modrinth/ui";
+  OverflowMenu,
+  type OverflowMenuOption,
+} from '@modrinth/ui'
 import {
-  type Project,
-  renderHighlightedString,
   type ModerationJudgements,
   type ModerationModpackItem,
   type ProjectStatus,
-} from "@modrinth/utils";
-import { computedAsync, useLocalStorage } from "@vueuse/core";
-import {
-  type Action,
-  type MultiSelectChipsAction,
-  type DropdownAction,
-  type ButtonAction,
-  type ToggleAction,
-  type ConditionalButtonAction,
-  type Stage,
-  finalPermissionMessages,
-} from "@modrinth/moderation";
-import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
-import KeybindsModal from "./ChecklistKeybindsModal.vue";
-import { useModerationStore } from "~/store/moderation.ts";
+  type Project,
+  renderHighlightedString,
+} from '@modrinth/utils'
+import { computedAsync, useLocalStorage } from '@vueuse/core'
+import * as prettier from 'prettier'
 
-const keybindsModal = ref<InstanceType<typeof KeybindsModal>>();
+import { useModerationStore } from '~/store/moderation.ts'
+
+import KeybindsModal from './ChecklistKeybindsModal.vue'
+import ModpackPermissionsFlow from './ModpackPermissionsFlow.vue'
+
+const keybindsModal = ref<InstanceType<typeof KeybindsModal>>()
 
 const props = defineProps<{
-  project: Project;
-  collapsed: boolean;
-}>();
+  project: Project
+  collapsed: boolean
+}>()
 
-const moderationStore = useModerationStore();
+const moderationStore = useModerationStore()
 
 const variables = computed(() => {
-  return flattenProjectVariables(props.project);
-});
+  return flattenProjectVariables(props.project)
+})
 
-const modpackPermissionsComplete = ref(false);
-const modpackJudgements = ref<ModerationJudgements>({});
+const modpackPermissionsComplete = ref(false)
+const modpackJudgements = ref<ModerationJudgements>({})
 const isModpackPermissionsStage = computed(() => {
-  return currentStageObj.value.id === "modpack-permissions";
-});
+  return currentStageObj.value.id === 'modpack-permissions'
+})
 
-const useSimpleEditor = ref(false);
-const message = ref("");
-const generatedMessage = ref(false);
-const loadingMessage = ref(false);
-const done = ref(false);
+const message = ref('')
+const generatedMessage = ref(false)
+const loadingMessage = ref(false)
+const done = ref(false)
 
 function handleModpackPermissionsComplete() {
-  modpackPermissionsComplete.value = true;
+  modpackPermissionsComplete.value = true
 }
 
 const emit = defineEmits<{
-  exit: [];
-  toggleCollapsed: [];
-}>();
+  exit: []
+  toggleCollapsed: []
+}>()
 
 function resetProgress() {
-  currentStage.value = findFirstValidStage();
-  actionStates.value = {};
-  textInputValues.value = {};
+  currentStage.value = findFirstValidStage()
+  actionStates.value = {}
+  textInputValues.value = {}
 
-  done.value = false;
-  generatedMessage.value = false;
-  message.value = "";
-  loadingMessage.value = false;
+  done.value = false
+  generatedMessage.value = false
+  message.value = ''
+  loadingMessage.value = false
 
-  localStorage.removeItem(`modpack-permissions-${props.project.id}`);
-  localStorage.removeItem(`modpack-permissions-index-${props.project.id}`);
-  modpackPermissionsComplete.value = false;
-  modpackJudgements.value = {};
+  localStorage.removeItem(`modpack-permissions-${props.project.id}`)
+  localStorage.removeItem(`modpack-permissions-index-${props.project.id}`)
+  modpackPermissionsComplete.value = false
+  modpackJudgements.value = {}
 
-  initializeAllStages();
+  initializeAllStages()
 }
 
 function findFirstValidStage(): number {
   for (let i = 0; i < checklist.length; i++) {
     if (shouldShowStageIndex(i)) {
-      return i;
+      return i
     }
   }
-  return 0;
+  return 0
 }
 
-const currentStageObj = computed(() => checklist[currentStage.value]);
+const currentStageObj = computed(() => checklist[currentStage.value])
 const currentStage = useLocalStorage(`moderation-stage-${props.project.slug}`, () =>
   findFirstValidStage(),
-);
+)
 
 const stageTextExpanded = computedAsync(async () => {
-  const stageIndex = currentStage.value;
-  const stage = checklist[stageIndex];
+  const stageIndex = currentStage.value
+  const stage = checklist[stageIndex]
   if (stage.text) {
     return renderHighlightedString(
       expandVariables(await stage.text(props.project), props.project, variables.value),
-    );
+    )
   }
-  return null;
-}, null);
+  return null
+}, null)
 
 interface ActionState {
-  selected: boolean;
-  value?: any;
+  selected: boolean
+  value?: any
 }
 
 const persistedActionStates = useLocalStorage(
@@ -487,35 +487,35 @@ const persistedActionStates = useLocalStorage(
       write: (v: any) => serializeActionStates(v),
     },
   },
-);
+)
 
-const router = useRouter();
+const router = useRouter()
 
 const persistedTextInputs = useLocalStorage(
   `moderation-inputs-${props.project.slug}`,
   {} as Record<string, string>,
-);
+)
 
-const actionStates = ref<Record<string, ActionState>>(persistedActionStates.value);
-const textInputValues = ref<Record<string, string>>(persistedTextInputs.value);
+const actionStates = ref<Record<string, ActionState>>(persistedActionStates.value)
+const textInputValues = ref<Record<string, string>>(persistedTextInputs.value)
 
 const persistState = () => {
-  persistedActionStates.value = actionStates.value;
-  persistedTextInputs.value = textInputValues.value;
-};
+  persistedActionStates.value = actionStates.value
+  persistedTextInputs.value = textInputValues.value
+}
 
-watch(actionStates, persistState, { deep: true });
-watch(textInputValues, persistState, { deep: true });
+watch(actionStates, persistState, { deep: true })
+watch(textInputValues, persistState, { deep: true })
 
 interface MessagePart {
-  weight: number;
-  content: string;
-  actionId: string;
-  stageIndex: number;
+  weight: number
+  content: string
+  actionId: string
+  stageIndex: number
 }
 
 function handleKeybinds(event: KeyboardEvent) {
-  const focusedActionIndex = ref<number | null>(null);
+  const focusedActionIndex = ref<number | null>(null)
 
   handleKeybind(
     event,
@@ -548,366 +548,366 @@ function handleKeybinds(event: KeyboardEvent) {
         tryGenerateMessage: generateMessage,
         trySkipProject: skipCurrentProject,
 
-        tryToggleCollapse: () => emit("toggleCollapsed"),
+        tryToggleCollapse: () => emit('toggleCollapsed'),
         tryResetProgress: resetProgress,
-        tryExitModeration: () => emit("exit"),
+        tryExitModeration: () => emit('exit'),
 
         tryApprove: () => sendMessage(props.project.requested_status),
-        tryReject: () => sendMessage("rejected"),
-        tryWithhold: () => sendMessage("withheld"),
+        tryReject: () => sendMessage('rejected'),
+        tryWithhold: () => sendMessage('withheld'),
         tryEditMessage: goBackToStages,
 
         tryToggleAction: (actionIndex: number) => {
-          const action = visibleActions.value[actionIndex];
+          const action = visibleActions.value[actionIndex]
           if (action) {
-            toggleAction(action);
+            toggleAction(action)
           }
         },
         trySelectDropdownOption: (actionIndex: number, optionIndex: number) => {
-          const action = visibleActions.value[actionIndex] as DropdownAction;
-          if (action && action.type === "dropdown") {
-            const visibleOptions = getVisibleDropdownOptions(action);
+          const action = visibleActions.value[actionIndex] as DropdownAction
+          if (action && action.type === 'dropdown') {
+            const visibleOptions = getVisibleDropdownOptions(action)
             if (optionIndex < visibleOptions.length) {
-              selectDropdownOption(action, visibleOptions[optionIndex]);
+              selectDropdownOption(action, visibleOptions[optionIndex])
             }
           }
         },
         tryToggleChip: (actionIndex: number, chipIndex: number) => {
-          const action = visibleActions.value[actionIndex] as MultiSelectChipsAction;
-          if (action && action.type === "multi-select-chips") {
-            const visibleOptions = getVisibleMultiSelectOptions(action);
+          const action = visibleActions.value[actionIndex] as MultiSelectChipsAction
+          if (action && action.type === 'multi-select-chips') {
+            const visibleOptions = getVisibleMultiSelectOptions(action)
             if (chipIndex < visibleOptions.length) {
-              toggleChip(action, chipIndex);
+              toggleChip(action, chipIndex)
             }
           }
         },
 
         tryFocusNextAction: () => {
-          if (visibleActions.value.length === 0) return;
+          if (visibleActions.value.length === 0) return
           if (focusedActionIndex.value === null) {
-            focusedActionIndex.value = 0;
+            focusedActionIndex.value = 0
           } else {
-            focusedActionIndex.value = (focusedActionIndex.value + 1) % visibleActions.value.length;
+            focusedActionIndex.value = (focusedActionIndex.value + 1) % visibleActions.value.length
           }
         },
         tryFocusPreviousAction: () => {
-          if (visibleActions.value.length === 0) return;
+          if (visibleActions.value.length === 0) return
           if (focusedActionIndex.value === null) {
-            focusedActionIndex.value = visibleActions.value.length - 1;
+            focusedActionIndex.value = visibleActions.value.length - 1
           } else {
             focusedActionIndex.value =
               focusedActionIndex.value === 0
                 ? visibleActions.value.length - 1
-                : focusedActionIndex.value - 1;
+                : focusedActionIndex.value - 1
           }
         },
         tryActivateFocusedAction: () => {
-          if (focusedActionIndex.value === null) return;
-          const action = visibleActions.value[focusedActionIndex.value];
-          if (!action) return;
+          if (focusedActionIndex.value === null) return
+          const action = visibleActions.value[focusedActionIndex.value]
+          if (!action) return
 
           if (
-            action.type === "button" ||
-            action.type === "conditional-button" ||
-            action.type === "toggle"
+            action.type === 'button' ||
+            action.type === 'conditional-button' ||
+            action.type === 'toggle'
           ) {
-            toggleAction(action);
+            toggleAction(action)
           }
         },
       },
     },
     keybinds,
-  );
+  )
 }
 
 onMounted(() => {
-  window.addEventListener("keydown", handleKeybinds);
-  initializeAllStages();
-});
+  window.addEventListener('keydown', handleKeybinds)
+  initializeAllStages()
+})
 
 function initializeAllStages() {
   checklist.forEach((stage, stageIndex) => {
-    initializeStageActions(stage, stageIndex);
-  });
+    initializeStageActions(stage, stageIndex)
+  })
 }
 
 function initializeCurrentStage() {
-  initializeStageActions(currentStageObj.value, currentStage.value);
+  initializeStageActions(currentStageObj.value, currentStage.value)
 }
 
 watch(
   currentStage,
   (newIndex) => {
-    const stage = checklist[newIndex];
+    const stage = checklist[newIndex]
     if (stage?.navigate) {
-      router.push(`/${props.project.project_type}/${props.project.slug}${stage.navigate}`);
+      router.push(`/${props.project.project_type}/${props.project.slug}${stage.navigate}`)
     }
 
-    initializeCurrentStage();
+    initializeCurrentStage()
   },
   { immediate: true },
-);
+)
 
 function initializeStageActions(stage: Stage, stageIndex: number) {
   stage.actions.forEach((action, index) => {
-    const actionId = getActionIdForStage(action, stageIndex, index);
+    const actionId = getActionIdForStage(action, stageIndex, index)
     if (!actionStates.value[actionId]) {
-      actionStates.value[actionId] = initializeActionState(action);
+      actionStates.value[actionId] = initializeActionState(action)
     }
-  });
+  })
 
   stage.actions.forEach((action) => {
     if (action.enablesActions) {
       action.enablesActions.forEach((enabledAction, index) => {
-        const actionId = getActionIdForStage(enabledAction, currentStage.value, index);
+        const actionId = getActionIdForStage(enabledAction, currentStage.value, index)
         if (!actionStates.value[actionId]) {
-          actionStates.value[actionId] = initializeActionState(enabledAction);
+          actionStates.value[actionId] = initializeActionState(enabledAction)
         }
-      });
+      })
     }
-  });
+  })
 }
 
 function getActionId(action: Action, index?: number): string {
   // If index is not provided, find it in the current stage's actions
   if (index === undefined) {
-    index = currentStageObj.value.actions.indexOf(action);
+    index = currentStageObj.value.actions.indexOf(action)
   }
-  return getActionIdForStage(action, currentStage.value, index);
+  return getActionIdForStage(action, currentStage.value, index)
 }
 
 function getActionKey(action: Action): string {
   // Find the actual index of this action in the current stage's actions array
-  const index = currentStageObj.value.actions.indexOf(action);
-  return `${currentStage.value}-${index}-${getActionId(action, index)}`;
+  const index = currentStageObj.value.actions.indexOf(action)
+  return `${currentStage.value}-${index}-${getActionId(action, index)}`
 }
 
 const visibleActions = computed(() => {
   const selectedActionIds = Object.entries(actionStates.value)
     .filter(([_, state]) => state.selected)
-    .map(([id]) => id);
+    .map(([id]) => id)
 
-  const allActions: Action[] = [];
-  const actionSources = new Map<Action, { enabledBy?: Action; actionIndex?: number }>();
+  const allActions: Action[] = []
+  const actionSources = new Map<Action, { enabledBy?: Action; actionIndex?: number }>()
 
   currentStageObj.value.actions.forEach((action, actionIndex) => {
     if (shouldShowAction(action)) {
-      allActions.push(action);
-      actionSources.set(action, { actionIndex });
+      allActions.push(action)
+      actionSources.set(action, { actionIndex })
 
       if (action.enablesActions) {
         action.enablesActions.forEach((enabledAction) => {
           if (shouldShowAction(enabledAction)) {
-            allActions.push(enabledAction);
-            actionSources.set(enabledAction, { enabledBy: action, actionIndex });
+            allActions.push(enabledAction)
+            actionSources.set(enabledAction, { enabledBy: action, actionIndex })
           }
-        });
+        })
       }
     }
-  });
+  })
 
   return allActions.filter((action) => {
-    const source = actionSources.get(action);
+    const source = actionSources.get(action)
 
     if (source?.enabledBy) {
-      const enablerId = getActionId(source.enabledBy, source.actionIndex);
+      const enablerId = getActionId(source.enabledBy, source.actionIndex)
       if (!selectedActionIds.includes(enablerId)) {
-        return false;
+        return false
       }
     }
 
     const disabledByOthers = currentStageObj.value.actions.some((otherAction, otherIndex) => {
-      const otherId = getActionId(otherAction, otherIndex);
+      const otherId = getActionId(otherAction, otherIndex)
       return (
         selectedActionIds.includes(otherId) &&
         otherAction.disablesActions?.includes(
           action.id || `action-${currentStage.value}-${source?.actionIndex}`,
         )
-      );
-    });
+      )
+    })
 
-    return !disabledByOthers;
-  });
-});
+    return !disabledByOthers
+  })
+})
 
 const buttonActions = computed(() =>
   visibleActions.value.filter(
-    (action) => action.type === "button" || action.type === "conditional-button",
+    (action) => action.type === 'button' || action.type === 'conditional-button',
   ),
-);
+)
 
 const toggleActions = computed(() =>
-  visibleActions.value.filter((action) => action.type === "toggle"),
-);
+  visibleActions.value.filter((action) => action.type === 'toggle'),
+)
 
 const dropdownActions = computed(() =>
-  visibleActions.value.filter((action) => action.type === "dropdown"),
-);
+  visibleActions.value.filter((action) => action.type === 'dropdown'),
+)
 
 const multiSelectActions = computed(() =>
-  visibleActions.value.filter((action) => action.type === "multi-select-chips"),
-);
+  visibleActions.value.filter((action) => action.type === 'multi-select-chips'),
+)
 
 function getDropdownValue(action: DropdownAction) {
-  const actionIndex = currentStageObj.value.actions.indexOf(action);
-  const actionId = getActionId(action, actionIndex);
-  const visibleOptions = getVisibleDropdownOptions(action);
-  const currentValue = actionStates.value[actionId]?.value ?? action.defaultOption ?? 0;
+  const actionIndex = currentStageObj.value.actions.indexOf(action)
+  const actionId = getActionId(action, actionIndex)
+  const visibleOptions = getVisibleDropdownOptions(action)
+  const currentValue = actionStates.value[actionId]?.value ?? action.defaultOption ?? 0
 
-  const allOptions = action.options;
-  const storedOption = allOptions[currentValue];
+  const allOptions = action.options
+  const storedOption = allOptions[currentValue]
 
   if (storedOption && visibleOptions.includes(storedOption)) {
-    return storedOption;
+    return storedOption
   }
 
-  return visibleOptions[0] || null;
+  return visibleOptions[0] || null
 }
 
 function isActionSelected(action: Action): boolean {
-  const actionIndex = currentStageObj.value.actions.indexOf(action);
-  const actionId = getActionId(action, actionIndex);
-  return actionStates.value[actionId]?.selected || false;
+  const actionIndex = currentStageObj.value.actions.indexOf(action)
+  const actionId = getActionId(action, actionIndex)
+  return actionStates.value[actionId]?.selected || false
 }
 
 function toggleAction(action: Action) {
-  const actionIndex = currentStageObj.value.actions.indexOf(action);
-  const actionId = getActionId(action, actionIndex);
-  const state = actionStates.value[actionId];
+  const actionIndex = currentStageObj.value.actions.indexOf(action)
+  const actionId = getActionId(action, actionIndex)
+  const state = actionStates.value[actionId]
   if (state) {
-    state.selected = !state.selected;
-    persistState();
+    state.selected = !state.selected
+    persistState()
   }
 }
 
 function selectDropdownOption(action: DropdownAction, selected: any) {
-  const actionIndex = currentStageObj.value.actions.indexOf(action);
-  const actionId = getActionId(action, actionIndex);
-  const state = actionStates.value[actionId];
+  const actionIndex = currentStageObj.value.actions.indexOf(action)
+  const actionId = getActionId(action, actionIndex)
+  const state = actionStates.value[actionId]
   if (state && selected !== undefined && selected !== null) {
     const optionIndex = action.options.findIndex(
       (opt) => opt === selected || (opt?.label && selected?.label && opt.label === selected.label),
-    );
+    )
 
     if (optionIndex !== -1) {
-      state.value = optionIndex;
-      state.selected = true;
-      persistState();
+      state.value = optionIndex
+      state.selected = true
+      persistState()
     }
   }
 }
 
 function isChipSelected(action: MultiSelectChipsAction, optionIndex: number): boolean {
-  const actionIndex = currentStageObj.value.actions.indexOf(action);
-  const actionId = getActionId(action, actionIndex);
-  const selectedSet = actionStates.value[actionId]?.value as Set<number> | undefined;
+  const actionIndex = currentStageObj.value.actions.indexOf(action)
+  const actionId = getActionId(action, actionIndex)
+  const selectedSet = actionStates.value[actionId]?.value as Set<number> | undefined
 
-  const visibleOptions = getVisibleMultiSelectOptions(action);
-  const visibleOption = visibleOptions[optionIndex];
-  const originalIndex = action.options.findIndex((opt) => opt === visibleOption);
+  const visibleOptions = getVisibleMultiSelectOptions(action)
+  const visibleOption = visibleOptions[optionIndex]
+  const originalIndex = action.options.findIndex((opt) => opt === visibleOption)
 
-  return selectedSet?.has(originalIndex) || false;
+  return selectedSet?.has(originalIndex) || false
 }
 
 function toggleChip(action: MultiSelectChipsAction, optionIndex: number) {
-  const actionIndex = currentStageObj.value.actions.indexOf(action);
-  const actionId = getActionId(action, actionIndex);
-  const state = actionStates.value[actionId];
+  const actionIndex = currentStageObj.value.actions.indexOf(action)
+  const actionId = getActionId(action, actionIndex)
+  const state = actionStates.value[actionId]
   if (state && state.value instanceof Set) {
-    const visibleOptions = getVisibleMultiSelectOptions(action);
-    const visibleOption = visibleOptions[optionIndex];
-    const originalIndex = action.options.findIndex((opt) => opt === visibleOption);
+    const visibleOptions = getVisibleMultiSelectOptions(action)
+    const visibleOption = visibleOptions[optionIndex]
+    const originalIndex = action.options.findIndex((opt) => opt === visibleOption)
 
     if (originalIndex !== -1) {
       if (state.value.has(originalIndex)) {
-        state.value.delete(originalIndex);
+        state.value.delete(originalIndex)
       } else {
-        state.value.add(originalIndex);
+        state.value.add(originalIndex)
       }
-      state.selected = state.value.size > 0;
-      persistState();
+      state.selected = state.value.size > 0
+      persistState()
     }
   }
 }
 
 const isAnyVisibleInputs = computed(() => {
   return visibleActions.value.some((action) => {
-    const visibleInputs = getVisibleInputs(action, actionStates.value);
-    return visibleInputs.length > 0 && isActionSelected(action);
-  });
-});
+    const visibleInputs = getVisibleInputs(action, actionStates.value)
+    return visibleInputs.length > 0 && isActionSelected(action)
+  })
+})
 
 function getModpackFilesFromStorage(): {
-  interactive: ModerationModpackItem[];
-  permanentNo: ModerationModpackItem[];
+  interactive: ModerationModpackItem[]
+  permanentNo: ModerationModpackItem[]
 } {
   try {
-    const sessionData = sessionStorage.getItem(`modpack-permissions-data-${props.project.id}`);
-    const interactive = sessionData ? (JSON.parse(sessionData) as ModerationModpackItem[]) : [];
+    const sessionData = sessionStorage.getItem(`modpack-permissions-data-${props.project.id}`)
+    const interactive = sessionData ? (JSON.parse(sessionData) as ModerationModpackItem[]) : []
 
     const permanentNoData = sessionStorage.getItem(
       `modpack-permissions-permanent-no-${props.project.id}`,
-    );
+    )
     const permanentNo = permanentNoData
       ? (JSON.parse(permanentNoData) as ModerationModpackItem[])
-      : [];
+      : []
 
     return {
       interactive: interactive || [],
       permanentNo: permanentNo || [],
-    };
+    }
   } catch (error) {
-    console.warn("Failed to parse session storage modpack data:", error);
-    return { interactive: [], permanentNo: [] };
+    console.warn('Failed to parse session storage modpack data:', error)
+    return { interactive: [], permanentNo: [] }
   }
 }
 
 async function assembleFullMessage() {
-  const messageParts: MessagePart[] = [];
+  const messageParts: MessagePart[] = []
 
   for (let stageIndex = 0; stageIndex < checklist.length; stageIndex++) {
-    const stage = checklist[stageIndex];
+    const stage = checklist[stageIndex]
 
-    await processStageActions(stage, stageIndex, messageParts);
+    await processStageActions(stage, stageIndex, messageParts)
   }
 
-  messageParts.sort((a, b) => a.weight - b.weight);
+  messageParts.sort((a, b) => a.weight - b.weight)
 
   const finalMessage = expandVariables(
     messageParts
       .map((part) => part.content)
       .filter((content) => content.trim().length > 0)
-      .join("\n\n"),
+      .join('\n\n'),
     props.project,
-  );
+  )
 
-  return finalMessage;
+  return finalMessage
 }
 
 async function processStageActions(stage: Stage, stageIndex: number, messageParts: MessagePart[]) {
   const selectedActionIds = Object.entries(actionStates.value)
     .filter(([_, state]) => state.selected)
-    .map(([id]) => id);
+    .map(([id]) => id)
 
   for (let actionIndex = 0; actionIndex < stage.actions.length; actionIndex++) {
-    const action = stage.actions[actionIndex];
-    const actionId = getActionIdForStage(action, stageIndex, actionIndex);
-    const state = actionStates.value[actionId];
+    const action = stage.actions[actionIndex]
+    const actionId = getActionIdForStage(action, stageIndex, actionIndex)
+    const state = actionStates.value[actionId]
 
-    if (!state?.selected) continue;
+    if (!state?.selected) continue
 
-    await processAction(action, actionId, state, selectedActionIds, stageIndex, messageParts);
+    await processAction(action, actionId, state, selectedActionIds, stageIndex, messageParts)
 
     if (action.enablesActions) {
       for (let enabledIndex = 0; enabledIndex < action.enablesActions.length; enabledIndex++) {
-        const enabledAction = action.enablesActions[enabledIndex];
+        const enabledAction = action.enablesActions[enabledIndex]
         const enabledActionId = getActionIdForStage(
           enabledAction,
           stageIndex,
           actionIndex,
           enabledIndex,
-        );
-        const enabledState = actionStates.value[enabledActionId];
+        )
+        const enabledState = actionStates.value[enabledActionId]
 
         if (enabledState?.selected) {
           await processAction(
@@ -917,7 +917,7 @@ async function processStageActions(stage: Stage, stageIndex: number, messagePart
             selectedActionIds,
             stageIndex,
             messageParts,
-          );
+          )
         }
       }
     }
@@ -932,51 +932,51 @@ async function processAction(
   stageIndex: number,
   messageParts: MessagePart[],
 ) {
-  const allValidActionIds: string[] = [];
+  const allValidActionIds: string[] = []
   checklist.forEach((stage, stageIdx) => {
     stage.actions.forEach((stageAction, actionIdx) => {
-      allValidActionIds.push(getActionIdForStage(stageAction, stageIdx, actionIdx));
+      allValidActionIds.push(getActionIdForStage(stageAction, stageIdx, actionIdx))
       if (stageAction.enablesActions) {
         stageAction.enablesActions.forEach((enabledAction, enabledIdx) => {
           allValidActionIds.push(
             getActionIdForStage(enabledAction, stageIdx, actionIdx, enabledIdx),
-          );
-        });
+          )
+        })
       }
-    });
-  });
+    })
+  })
 
-  if (action.type === "button" || action.type === "toggle") {
-    const buttonAction = action as ButtonAction | ToggleAction;
-    const message = await getActionMessage(buttonAction, selectedActionIds, allValidActionIds);
+  if (action.type === 'button' || action.type === 'toggle') {
+    const buttonAction = action as ButtonAction | ToggleAction
+    const message = await getActionMessage(buttonAction, selectedActionIds, allValidActionIds)
     if (message) {
       messageParts.push({
         weight: buttonAction.weight,
         content: processMessage(message, action, stageIndex, textInputValues.value),
         actionId,
         stageIndex,
-      });
+      })
     }
-  } else if (action.type === "conditional-button") {
-    const conditionalAction = action as ConditionalButtonAction;
+  } else if (action.type === 'conditional-button') {
+    const conditionalAction = action as ConditionalButtonAction
     const matchingVariant = findMatchingVariant(
       conditionalAction.messageVariants,
       selectedActionIds,
       allValidActionIds,
       stageIndex,
-    );
+    )
 
-    let message: string;
-    let weight: number;
+    let message: string
+    let weight: number
 
     if (matchingVariant) {
-      message = (await matchingVariant.message()) as string;
-      weight = matchingVariant.weight;
+      message = (await matchingVariant.message()) as string
+      weight = matchingVariant.weight
     } else if (conditionalAction.fallbackMessage) {
-      message = (await conditionalAction.fallbackMessage()) as string;
-      weight = conditionalAction.fallbackWeight ?? 0;
+      message = (await conditionalAction.fallbackMessage()) as string
+      weight = conditionalAction.fallbackWeight ?? 0
     } else {
-      return;
+      return
     }
 
     messageParts.push({
@@ -984,207 +984,219 @@ async function processAction(
       content: processMessage(message, action, stageIndex, textInputValues.value),
       actionId,
       stageIndex,
-    });
-  } else if (action.type === "dropdown") {
-    const dropdownAction = action as DropdownAction;
-    const selectedIndex = state.value ?? 0;
-    const selectedOption = dropdownAction.options[selectedIndex];
+    })
+  } else if (action.type === 'dropdown') {
+    const dropdownAction = action as DropdownAction
+    const selectedIndex = state.value ?? 0
+    const selectedOption = dropdownAction.options[selectedIndex]
 
-    if (selectedOption && "message" in selectedOption && "weight" in selectedOption) {
-      const message = (await selectedOption.message()) as string;
+    if (selectedOption && 'message' in selectedOption && 'weight' in selectedOption) {
+      const message = (await selectedOption.message()) as string
       messageParts.push({
         weight: selectedOption.weight,
         content: processMessage(message, action, stageIndex, textInputValues.value),
         actionId,
         stageIndex,
-      });
+      })
     }
-  } else if (action.type === "multi-select-chips") {
-    const multiSelectAction = action as MultiSelectChipsAction;
-    const selectedIndices = state.value as Set<number>;
+  } else if (action.type === 'multi-select-chips') {
+    const multiSelectAction = action as MultiSelectChipsAction
+    const selectedIndices = state.value as Set<number>
 
     for (const index of selectedIndices) {
-      const option = multiSelectAction.options[index];
-      if (option && "message" in option && "weight" in option) {
-        const message = (await option.message()) as string;
+      const option = multiSelectAction.options[index]
+      if (option && 'message' in option && 'weight' in option) {
+        const message = (await option.message()) as string
         messageParts.push({
           weight: option.weight,
           content: processMessage(message, action, stageIndex, textInputValues.value),
           actionId: `${actionId}-option-${index}`,
           stageIndex,
-        });
+        })
       }
     }
   }
 }
 
 function shouldShowStage(stage: Stage): boolean {
-  let hasVisibleActions = false;
+  let hasVisibleActions = false
 
   for (const a of stage.actions) {
     if (shouldShowAction(a)) {
-      hasVisibleActions = true;
+      hasVisibleActions = true
     }
   }
 
   if (!hasVisibleActions) {
-    return false;
+    return false
   }
 
-  if (typeof stage.shouldShow === "function") {
-    return stage.shouldShow(props.project);
+  if (typeof stage.shouldShow === 'function') {
+    return stage.shouldShow(props.project)
   }
 
-  return true;
+  return true
 }
 
 function shouldShowAction(action: Action): boolean {
-  if (typeof action.shouldShow === "function") {
-    return action.shouldShow(props.project);
+  if (typeof action.shouldShow === 'function') {
+    return action.shouldShow(props.project)
   }
 
-  return true;
+  return true
 }
 
 function getVisibleDropdownOptions(action: DropdownAction) {
   return action.options.filter((option) => {
-    if (typeof option.shouldShow === "function") {
-      return option.shouldShow(props.project);
+    if (typeof option.shouldShow === 'function') {
+      return option.shouldShow(props.project)
     }
-    return true;
-  });
+    return true
+  })
 }
 
 function getVisibleMultiSelectOptions(action: MultiSelectChipsAction) {
   return action.options.filter((option) => {
-    if (typeof option.shouldShow === "function") {
-      return option.shouldShow(props.project);
+    if (typeof option.shouldShow === 'function') {
+      return option.shouldShow(props.project)
     }
-    return true;
-  });
+    return true
+  })
 }
 
 function shouldShowStageIndex(stageIndex: number): boolean {
-  return shouldShowStage(checklist[stageIndex]);
+  return shouldShowStage(checklist[stageIndex])
 }
 
 function previousStage() {
-  let targetStage = currentStage.value - 1;
+  let targetStage = currentStage.value - 1
 
   while (targetStage >= 0) {
     if (shouldShowStageIndex(targetStage)) {
-      currentStage.value = targetStage;
-      return;
+      currentStage.value = targetStage
+      return
     }
-    targetStage--;
+    targetStage--
   }
 }
 
 function nextStage() {
   if (isModpackPermissionsStage.value && !modpackPermissionsComplete.value) {
     addNotification({
-      title: "Modpack permissions stage unfinished",
-      text: "Please complete the modpack permissions stage before proceeding.",
-      type: "error",
-    });
+      title: 'Modpack permissions stage unfinished',
+      text: 'Please complete the modpack permissions stage before proceeding.',
+      type: 'error',
+    })
 
-    return;
+    return
   }
 
-  let targetStage = currentStage.value + 1;
+  let targetStage = currentStage.value + 1
 
   while (targetStage < checklist.length) {
     if (shouldShowStageIndex(targetStage)) {
-      currentStage.value = targetStage;
+      currentStage.value = targetStage
       if (!isModpackPermissionsStage.value) {
-        modpackPermissionsComplete.value = false;
+        modpackPermissionsComplete.value = false
       }
 
-      return;
+      return
     }
-    targetStage++;
+    targetStage++
   }
 }
 
 function goBackToStages() {
-  generatedMessage.value = false;
-  message.value = "";
+  generatedMessage.value = false
+  message.value = ''
 
-  let targetStage = checklist.length - 1;
+  let targetStage = checklist.length - 1
   while (targetStage >= 0) {
     if (shouldShowStageIndex(targetStage)) {
-      currentStage.value = targetStage;
-      return;
+      currentStage.value = targetStage
+      return
     }
-    targetStage--;
+    targetStage--
   }
 }
 
 async function generateMessage() {
-  if (loadingMessage.value) return;
+  if (loadingMessage.value) return
 
-  loadingMessage.value = true;
+  loadingMessage.value = true
 
-  router.push(`/${props.project.project_type}/${props.project.slug}/moderation`);
+  router.push(`/${props.project.project_type}/${props.project.slug}/moderation`)
 
   try {
-    const baseMessage = await assembleFullMessage();
-    let fullMessage = baseMessage;
+    const baseMessage = await assembleFullMessage()
+    let fullMessage = baseMessage
 
-    if (props.project.project_type === "modpack") {
-      const modpackFilesData = getModpackFilesFromStorage();
+    if (props.project.project_type === 'modpack') {
+      const modpackFilesData = getModpackFilesFromStorage()
 
       if (modpackFilesData.interactive.length > 0 || modpackFilesData.permanentNo.length > 0) {
-        const modpackMessage = generateModpackMessage(modpackFilesData);
+        const modpackMessage = generateModpackMessage(modpackFilesData)
         if (modpackMessage) {
-          fullMessage = baseMessage ? `${baseMessage}\n\n${modpackMessage}` : modpackMessage;
+          fullMessage = baseMessage ? `${baseMessage}\n\n${modpackMessage}` : modpackMessage
         }
       }
     }
 
-    message.value = fullMessage;
+    try {
+      const formattedMessage = await prettier.format(fullMessage, {
+        parser: 'markdown',
+        printWidth: 80,
+        proseWrap: 'always',
+        tabWidth: 2,
+        useTabs: false,
+      })
+      message.value = formattedMessage
+    } catch (formattingError) {
+      console.warn('Failed to format markdown, using original:', formattingError)
+      message.value = fullMessage
+    }
 
-    generatedMessage.value = true;
+    generatedMessage.value = true
   } catch (error) {
-    console.error("Error generating message:", error);
+    console.error('Error generating message:', error)
     addNotification({
-      title: "Error generating message",
-      text: "Failed to generate moderation message. Please try again.",
-      type: "error",
-    });
+      title: 'Error generating message',
+      text: 'Failed to generate moderation message. Please try again.',
+      type: 'error',
+    })
   } finally {
-    loadingMessage.value = false;
+    loadingMessage.value = false
   }
 }
 
 function generateModpackMessage(allFiles: {
-  interactive: ModerationModpackItem[];
-  permanentNo: ModerationModpackItem[];
+  interactive: ModerationModpackItem[]
+  permanentNo: ModerationModpackItem[]
 }) {
-  const issues = [];
+  const issues = []
 
-  const attributeMods: string[] = [];
-  const noMods: string[] = [];
-  const permanentNoMods: string[] = [];
-  const unidentifiedMods: string[] = [];
+  const attributeMods: string[] = []
+  const noMods: string[] = []
+  const permanentNoMods: string[] = []
+  const unidentifiedMods: string[] = []
 
   allFiles.interactive.forEach((file) => {
-    if (file.status === "unidentified") {
-      if (file.approved === "no") {
-        unidentifiedMods.push(file.file_name);
+    if (file.status === 'unidentified') {
+      if (file.approved === 'no') {
+        unidentifiedMods.push(file.file_name)
       }
-    } else if (file.status === "with-attribution" && file.approved === "no") {
-      attributeMods.push(file.file_name);
-    } else if (file.status === "no" && file.approved === "no") {
-      noMods.push(file.file_name);
-    } else if (file.status === "permanent-no") {
-      permanentNoMods.push(file.file_name);
+    } else if (file.status === 'with-attribution' && file.approved === 'no') {
+      attributeMods.push(file.file_name)
+    } else if (file.status === 'no' && file.approved === 'no') {
+      noMods.push(file.file_name)
+    } else if (file.status === 'permanent-no') {
+      permanentNoMods.push(file.file_name)
     }
-  });
+  })
 
   allFiles.permanentNo.forEach((file) => {
-    permanentNoMods.push(file.file_name);
-  });
+    permanentNoMods.push(file.file_name)
+  })
 
   if (
     attributeMods.length > 0 ||
@@ -1192,183 +1204,183 @@ function generateModpackMessage(allFiles: {
     permanentNoMods.length > 0 ||
     unidentifiedMods.length > 0
   ) {
-    issues.push("## Copyrighted content");
+    issues.push('## Copyrighted content')
 
     if (unidentifiedMods.length > 0) {
       issues.push(
-        `${finalPermissionMessages.unidentified}\n${unidentifiedMods.map((mod) => `- ${mod}`).join("\n")}`,
-      );
+        `${finalPermissionMessages.unidentified}\n${unidentifiedMods.map((mod) => `- ${mod}`).join('\n')}`,
+      )
     }
 
     if (attributeMods.length > 0) {
       issues.push(
-        `${finalPermissionMessages["with-attribution"]}\n${attributeMods.map((mod) => `- ${mod}`).join("\n")}`,
-      );
+        `${finalPermissionMessages['with-attribution']}\n${attributeMods.map((mod) => `- ${mod}`).join('\n')}`,
+      )
     }
 
     if (noMods.length > 0) {
-      issues.push(`${finalPermissionMessages.no}\n${noMods.map((mod) => `- ${mod}`).join("\n")}`);
+      issues.push(`${finalPermissionMessages.no}\n${noMods.map((mod) => `- ${mod}`).join('\n')}`)
     }
 
     if (permanentNoMods.length > 0) {
       issues.push(
-        `${finalPermissionMessages["permanent-no"]}\n${permanentNoMods.map((mod) => `- ${mod}`).join("\n")}`,
-      );
+        `${finalPermissionMessages['permanent-no']}\n${permanentNoMods.map((mod) => `- ${mod}`).join('\n')}`,
+      )
     }
   }
 
-  return issues.join("\n\n");
+  return issues.join('\n\n')
 }
 
-const hasNextProject = ref(false);
+const hasNextProject = ref(false)
 async function sendMessage(status: ProjectStatus) {
   try {
     await useBaseFetch(`project/${props.project.id}`, {
-      method: "PATCH",
+      method: 'PATCH',
       body: {
         status,
       },
-    });
+    })
 
     if (message.value) {
       await useBaseFetch(`thread/${props.project.thread_id}`, {
-        method: "POST",
+        method: 'POST',
         body: {
           body: {
-            type: "text",
+            type: 'text',
             body: message.value,
           },
         },
-      });
+      })
     }
 
     if (
-      props.project.project_type === "modpack" &&
+      props.project.project_type === 'modpack' &&
       Object.keys(modpackJudgements.value).length > 0
     ) {
       await useBaseFetch(`moderation/project`, {
         internal: true,
-        method: "POST",
+        method: 'POST',
         body: modpackJudgements.value,
-      });
+      })
     }
 
-    done.value = true;
+    done.value = true
 
     hasNextProject.value = await moderationStore.completeCurrentProject(
       props.project.id,
-      "completed",
-    );
+      'completed',
+    )
   } catch (error) {
-    console.error("Error submitting moderation:", error);
+    console.error('Error submitting moderation:', error)
     addNotification({
-      title: "Error submitting moderation",
-      text: "Failed to submit moderation decision. Please try again.",
-      type: "error",
-    });
+      title: 'Error submitting moderation',
+      text: 'Failed to submit moderation decision. Please try again.',
+      type: 'error',
+    })
   }
 }
 
 async function endChecklist(status?: string) {
-  clearProjectLocalStorage();
+  clearProjectLocalStorage()
 
   if (!hasNextProject.value) {
     await navigateTo({
-      name: "moderation",
+      name: 'moderation',
       state: {
         confetti: true,
       },
-    });
+    })
 
-    await nextTick();
+    await nextTick()
 
     if (moderationStore.currentQueue.total > 1) {
       addNotification({
-        title: "Moderation completed",
+        title: 'Moderation completed',
         text: `You have completed the moderation queue.`,
-        type: "success",
-      });
+        type: 'success',
+      })
     } else {
       addNotification({
-        title: "Moderation submitted",
-        text: `Project ${status ?? "completed successfully"}.`,
-        type: "success",
-      });
+        title: 'Moderation submitted',
+        text: `Project ${status ?? 'completed successfully'}.`,
+        type: 'success',
+      })
     }
   } else {
     navigateTo({
-      name: "type-id",
+      name: 'type-id',
       params: {
-        type: "project",
+        type: 'project',
         id: moderationStore.getCurrentProjectId(),
       },
       state: {
         showChecklist: true,
       },
-    });
+    })
   }
 }
 
 async function skipCurrentProject() {
-  hasNextProject.value = await moderationStore.completeCurrentProject(props.project.id, "skipped");
+  hasNextProject.value = await moderationStore.completeCurrentProject(props.project.id, 'skipped')
 
-  await endChecklist("skipped");
+  await endChecklist('skipped')
 }
 
 function clearProjectLocalStorage() {
-  localStorage.removeItem(`modpack-permissions-${props.project.id}`);
-  localStorage.removeItem(`modpack-permissions-index-${props.project.id}`);
-  localStorage.removeItem(`moderation-actions-${props.project.slug}`);
-  localStorage.removeItem(`moderation-inputs-${props.project.slug}`);
-  localStorage.removeItem(`moderation-stage-${props.project.slug}`);
-  actionStates.value = {};
+  localStorage.removeItem(`modpack-permissions-${props.project.id}`)
+  localStorage.removeItem(`modpack-permissions-index-${props.project.id}`)
+  localStorage.removeItem(`moderation-actions-${props.project.slug}`)
+  localStorage.removeItem(`moderation-inputs-${props.project.slug}`)
+  localStorage.removeItem(`moderation-stage-${props.project.slug}`)
+  actionStates.value = {}
 }
 
 const isLastVisibleStage = computed(() => {
   for (let i = currentStage.value + 1; i < checklist.length; i++) {
     if (shouldShowStageIndex(i)) {
-      return false;
+      return false
     }
   }
-  return true;
-});
+  return true
+})
 
 const hasValidPreviousStage = computed(() => {
   for (let i = currentStage.value - 1; i >= 0; i--) {
     if (shouldShowStageIndex(i)) {
-      return true;
+      return true
     }
   }
-  return false;
-});
+  return false
+})
 
 const stageOptions = computed<OverflowMenuOption[]>(() => {
   const options = checklist
     .map((stage, index) => {
-      if (!shouldShowStage(stage)) return null;
+      if (!shouldShowStage(stage)) return null
 
       return {
         id: String(index),
         action: () => (currentStage.value = index),
         text: stage.id ? kebabToTitleCase(stage.id) : stage.title,
-        color: index === currentStage.value && !generatedMessage.value ? "green" : undefined,
+        color: index === currentStage.value && !generatedMessage.value ? 'green' : undefined,
         hoverFilled: true,
         icon: stage.icon ? stage.icon : undefined,
-      } as OverflowMenuOption;
+      } as OverflowMenuOption
     })
-    .filter((opt): opt is OverflowMenuOption => opt !== null);
+    .filter((opt): opt is OverflowMenuOption => opt !== null)
 
   options.push({
-    id: "generate-message",
+    id: 'generate-message',
     action: () => generateMessage(),
-    text: "Generate Message",
-    color: generatedMessage.value ? "green" : undefined,
+    text: 'Generate Message',
+    color: generatedMessage.value ? 'green' : undefined,
     hoverFilled: true,
     icon: CheckIcon,
-  } as OverflowMenuOption);
+  } as OverflowMenuOption)
 
-  return options;
-});
+  return options
+})
 </script>
 
 <style scoped lang="scss">

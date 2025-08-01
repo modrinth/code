@@ -425,23 +425,23 @@
   </div>
 </template>
 <script setup>
-import { Multiselect } from "vue-multiselect";
-import { Avatar, ButtonStyled, useRelativeTime } from "@modrinth/ui";
 import {
-  CompassIcon,
-  LogInIcon,
-  DashboardIcon,
-  SearchIcon,
   CalendarIcon,
+  CompassIcon,
+  DashboardIcon,
+  LogInIcon,
   ModrinthIcon,
+  SearchIcon,
 } from "@modrinth/assets";
+import { Avatar, ButtonStyled, useRelativeTime } from "@modrinth/ui";
 import { ref } from "vue";
-import PrismLauncherLogo from "~/assets/images/external/prism.svg?component";
-import ATLauncherLogo from "~/assets/images/external/atlauncher.svg?component";
-import ProjectCard from "~/components/ui/ProjectCard.vue";
-import LatestNewsRow from "~/components/ui/news/LatestNewsRow.vue";
+import { Multiselect } from "vue-multiselect";
 
-import { homePageProjects, homePageSearch, homePageNotifs } from "~/generated/state.json";
+import ATLauncherLogo from "~/assets/images/external/atlauncher.svg?component";
+import PrismLauncherLogo from "~/assets/images/external/prism.svg?component";
+import LatestNewsRow from "~/components/ui/news/LatestNewsRow.vue";
+import ProjectCard from "~/components/ui/ProjectCard.vue";
+import { homePageNotifs,homePageProjects, homePageSearch } from "~/generated/state.json";
 
 const formatRelativeTime = useRelativeTime();
 

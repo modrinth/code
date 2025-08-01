@@ -25,8 +25,8 @@
       </div>
       <p>
         {{
-          selectedYear !== "all"
-            ? selectedMethod !== "all"
+          selectedYear !== 'all'
+            ? selectedMethod !== 'all'
               ? formatMessage(messages.transfersTotalYearMethod, {
                   amount: $formatMoney(totalAmount),
                   year: selectedYear,
@@ -36,7 +36,7 @@
                   amount: $formatMoney(totalAmount),
                   year: selectedYear,
                 })
-            : selectedMethod !== "all"
+            : selectedMethod !== 'all'
               ? formatMessage(messages.transfersTotalMethod, {
                   amount: $formatMoney(totalAmount),
                   method: selectedMethod,
@@ -58,7 +58,7 @@
         <div class="payout-info">
           <div>
             <strong>
-              {{ $dayjs(payout.created).format("MMMM D, YYYY [at] h:mm A") }}
+              {{ $dayjs(payout.created).format('MMMM D, YYYY [at] h:mm A') }}
             </strong>
           </div>
           <div>
@@ -94,95 +94,96 @@
   </div>
 </template>
 <script setup>
-import { XIcon, PayPalIcon, UnknownIcon } from "@modrinth/assets";
-import { capitalizeString, formatWallet } from "@modrinth/utils";
-import { Badge, Breadcrumbs, DropdownSelect } from "@modrinth/ui";
-import dayjs from "dayjs";
-import TremendousIcon from "~/assets/images/external/tremendous.svg?component";
-import VenmoIcon from "~/assets/images/external/venmo-small.svg?component";
+import { PayPalIcon, UnknownIcon, XIcon } from '@modrinth/assets'
+import { Badge, Breadcrumbs, DropdownSelect } from '@modrinth/ui'
+import { capitalizeString, formatWallet } from '@modrinth/utils'
+import dayjs from 'dayjs'
 
-const vintl = useVIntl();
-const { formatMessage } = vintl;
+import TremendousIcon from '~/assets/images/external/tremendous.svg?component'
+import VenmoIcon from '~/assets/images/external/venmo-small.svg?component'
+
+const vintl = useVIntl()
+const { formatMessage } = vintl
 
 useHead({
-  title: "Transfer history - Modrinth",
-});
+  title: 'Transfer history - Modrinth',
+})
 
-const data = await useNuxtApp();
-const auth = await useAuth();
+const data = await useNuxtApp()
+const auth = await useAuth()
 
 const { data: payouts, refresh } = await useAsyncData(`payout`, () =>
   useBaseFetch(`payout`, {
     apiVersion: 3,
   }),
-);
+)
 
 const sortedPayouts = computed(() =>
-  payouts.value.sort((a, b) => dayjs(b.created) - dayjs(a.created)),
-);
+  payouts.value.slice().sort((a, b) => dayjs(b.created) - dayjs(a.created)),
+)
 
 const years = computed(() => {
-  const values = sortedPayouts.value.map((x) => dayjs(x.created).year());
-  return ["all", ...new Set(values)];
-});
+  const values = sortedPayouts.value.map((x) => dayjs(x.created).year())
+  return ['all', ...new Set(values)]
+})
 
-const selectedYear = ref("all");
+const selectedYear = ref('all')
 
 const methods = computed(() => {
-  const values = sortedPayouts.value.filter((x) => x.method).map((x) => x.method);
-  return ["all", ...new Set(values)];
-});
+  const values = sortedPayouts.value.filter((x) => x.method).map((x) => x.method)
+  return ['all', ...new Set(values)]
+})
 
-const selectedMethod = ref("all");
+const selectedMethod = ref('all')
 
 const filteredPayouts = computed(() =>
   sortedPayouts.value
-    .filter((x) => selectedYear.value === "all" || dayjs(x.created).year() === selectedYear.value)
-    .filter((x) => selectedMethod.value === "all" || x.method === selectedMethod.value),
-);
+    .filter((x) => selectedYear.value === 'all' || dayjs(x.created).year() === selectedYear.value)
+    .filter((x) => selectedMethod.value === 'all' || x.method === selectedMethod.value),
+)
 
 const totalAmount = computed(() =>
   filteredPayouts.value.reduce((sum, payout) => sum + payout.amount, 0),
-);
+)
 
 async function cancelPayout(id) {
-  startLoading();
+  startLoading()
   try {
     await useBaseFetch(`payout/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
       apiVersion: 3,
-    });
-    await refresh();
-    await useAuth(auth.value.token);
+    })
+    await refresh()
+    await useAuth(auth.value.token)
   } catch (err) {
     data.$notify({
-      group: "main",
-      title: "An error occurred",
+      group: 'main',
+      title: 'An error occurred',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  stopLoading();
+  stopLoading()
 }
 
 const messages = defineMessages({
   transfersTotal: {
-    id: "revenue.transfers.total",
-    defaultMessage: "You have withdrawn {amount} in total.",
+    id: 'revenue.transfers.total',
+    defaultMessage: 'You have withdrawn {amount} in total.',
   },
   transfersTotalYear: {
-    id: "revenue.transfers.total.year",
-    defaultMessage: "You have withdrawn {amount} in {year}.",
+    id: 'revenue.transfers.total.year',
+    defaultMessage: 'You have withdrawn {amount} in {year}.',
   },
   transfersTotalMethod: {
-    id: "revenue.transfers.total.method",
-    defaultMessage: "You have withdrawn {amount} through {method}.",
+    id: 'revenue.transfers.total.method',
+    defaultMessage: 'You have withdrawn {amount} through {method}.',
   },
   transfersTotalYearMethod: {
-    id: "revenue.transfers.total.year_method",
-    defaultMessage: "You have withdrawn {amount} in {year} through {method}.",
+    id: 'revenue.transfers.total.year_method',
+    defaultMessage: 'You have withdrawn {amount} in {year} through {method}.',
   },
-});
+})
 </script>
 <style lang="scss" scoped>
 .payout {

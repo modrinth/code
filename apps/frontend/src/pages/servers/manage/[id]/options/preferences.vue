@@ -43,7 +43,8 @@
 
 <script setup lang="ts">
 import { useStorage } from "@vueuse/core";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+
+import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;

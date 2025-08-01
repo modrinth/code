@@ -197,12 +197,13 @@
 </template>
 
 <script setup lang="ts">
-import { BackupWarning, ButtonStyled, NewModal, Toggle } from "@modrinth/ui";
 import { DropdownIcon, RightArrowIcon, ServerIcon, XIcon } from "@modrinth/assets";
-import { $fetch } from "ofetch";
+import { BackupWarning, ButtonStyled, NewModal, Toggle } from "@modrinth/ui";
 import { type Loaders, ModrinthServersFetchError } from "@modrinth/utils";
+import { $fetch } from "ofetch";
+
+import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const { formatMessage } = useVIntl();
 
@@ -337,7 +338,7 @@ const selectedLoaderVersions = computed<string[]>(() => {
   }
 
   const backwardsCompatibleVersion = loaderVersions.value[apiLoader]?.find(
-    // eslint-disable-next-line no-template-curly-in-string
+     
     (x) => x.id === "${modrinth.gameVersion}",
   );
 

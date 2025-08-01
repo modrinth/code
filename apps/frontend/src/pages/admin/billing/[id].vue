@@ -252,6 +252,15 @@
 </template>
 <script setup>
 import {
+  CheckIcon,
+  CurrencyIcon,
+  ExternalIcon,
+  ModrinthPlusIcon,
+  ServerIcon,
+  UserIcon,
+  XIcon,
+} from "@modrinth/assets";
+import {
   Avatar,
   ButtonStyled,
   CopyCode,
@@ -261,18 +270,10 @@ import {
   useRelativeTime,
 } from "@modrinth/ui";
 import { formatCategory, formatPrice } from "@modrinth/utils";
-import {
-  CheckIcon,
-  XIcon,
-  UserIcon,
-  ModrinthPlusIcon,
-  ServerIcon,
-  ExternalIcon,
-  CurrencyIcon,
-} from "@modrinth/assets";
 import dayjs from "dayjs";
-import { products } from "~/generated/state.json";
+
 import ModrinthServersIcon from "~/components/ui/servers/ModrinthServersIcon.vue";
+import { products } from "~/generated/state.json";
 
 const route = useRoute();
 const vintl = useVIntl();

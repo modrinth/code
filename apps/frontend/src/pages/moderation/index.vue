@@ -90,251 +90,250 @@
   </div>
 </template>
 <script setup lang="ts">
-import { DropdownSelect, Button, ButtonStyled, Pagination } from "@modrinth/ui";
 import {
-  XIcon,
+  FilterIcon,
+  ScaleIcon,
   SearchIcon,
   SortAscIcon,
   SortDescIcon,
-  FilterIcon,
-  ScaleIcon,
-} from "@modrinth/assets";
-import { defineMessages, useVIntl } from "@vintl/vintl";
-import ConfettiExplosion from "vue-confetti-explosion";
-import Fuse from "fuse.js";
-import ModerationQueueCard from "~/components/ui/moderation/ModerationQueueCard.vue";
-import { useModerationStore } from "~/store/moderation.ts";
-import { enrichProjectBatch, type ModerationProject } from "~/helpers/moderation.ts";
+  XIcon,
+} from '@modrinth/assets'
+import { Button, ButtonStyled, DropdownSelect, Pagination } from '@modrinth/ui'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+import { useLocalStorage } from '@vueuse/core'
+import Fuse from 'fuse.js'
+import ConfettiExplosion from 'vue-confetti-explosion'
 
-const { formatMessage } = useVIntl();
-const moderationStore = useModerationStore();
-const route = useRoute();
-const router = useRouter();
+import ModerationQueueCard from '~/components/ui/moderation/ModerationQueueCard.vue'
+import { enrichProjectBatch, type ModerationProject } from '~/helpers/moderation.ts'
+import { useModerationStore } from '~/store/moderation.ts'
 
-const visible = ref(false);
+const { formatMessage } = useVIntl()
+const moderationStore = useModerationStore()
+const route = useRoute()
+const router = useRouter()
+
+const visible = ref(false)
 if (import.meta.client && history && history.state && history.state.confetti) {
   setTimeout(async () => {
-    history.state.confetti = false;
-    visible.value = true;
-    await nextTick();
+    history.state.confetti = false
+    visible.value = true
+    await nextTick()
     setTimeout(() => {
-      visible.value = false;
-    }, 5000);
-  }, 1000);
+      visible.value = false
+    }, 5000)
+  }, 1000)
 }
 
 const messages = defineMessages({
   searchPlaceholder: {
-    id: "moderation.search.placeholder",
-    defaultMessage: "Search...",
+    id: 'moderation.search.placeholder',
+    defaultMessage: 'Search...',
   },
   filterBy: {
-    id: "moderation.filter.by",
-    defaultMessage: "Filter by",
+    id: 'moderation.filter.by',
+    defaultMessage: 'Filter by',
   },
   sortBy: {
-    id: "moderation.sort.by",
-    defaultMessage: "Sort by",
+    id: 'moderation.sort.by',
+    defaultMessage: 'Sort by',
   },
   moderate: {
-    id: "moderation.moderate",
-    defaultMessage: "Moderate",
+    id: 'moderation.moderate',
+    defaultMessage: 'Moderate',
   },
-});
+})
 
-const { data: allProjects } = await useLazyAsyncData("moderation-projects", async () => {
-  const startTime = performance.now();
-  let currentOffset = 0;
-  const PROJECT_ENDPOINT_COUNT = 350;
-  const allProjects: ModerationProject[] = [];
+const { data: allProjects } = await useLazyAsyncData('moderation-projects', async () => {
+  const startTime = performance.now()
+  let currentOffset = 0
+  const PROJECT_ENDPOINT_COUNT = 350
+  const allProjects: ModerationProject[] = []
 
-  const enrichmentPromises: Promise<ModerationProject[]>[] = [];
+  const enrichmentPromises: Promise<ModerationProject[]>[] = []
 
-  while (true) {
-    const projects = (await useBaseFetch(
+  let projects
+  do {
+    projects = (await useBaseFetch(
       `moderation/projects?count=${PROJECT_ENDPOINT_COUNT}&offset=${currentOffset}`,
       { internal: true },
-    )) as any[];
+    )) as any[]
 
-    if (projects.length === 0) break;
+    if (projects.length === 0) break
 
-    const enrichmentPromise = enrichProjectBatch(projects);
-    enrichmentPromises.push(enrichmentPromise);
+    const enrichmentPromise = enrichProjectBatch(projects)
+    enrichmentPromises.push(enrichmentPromise)
 
-    currentOffset += projects.length;
+    currentOffset += projects.length
 
     if (enrichmentPromises.length >= 3) {
-      const completed = await Promise.all(enrichmentPromises.splice(0, 2));
-      allProjects.push(...completed.flat());
+      const completed = await Promise.all(enrichmentPromises.splice(0, 2))
+      allProjects.push(...completed.flat())
     }
+  } while (projects.length < PROJECT_ENDPOINT_COUNT)
 
-    if (projects.length < PROJECT_ENDPOINT_COUNT) break;
-  }
+  const remainingBatches = await Promise.all(enrichmentPromises)
+  allProjects.push(...remainingBatches.flat())
 
-  const remainingBatches = await Promise.all(enrichmentPromises);
-  allProjects.push(...remainingBatches.flat());
-
-  const endTime = performance.now();
-  const duration = endTime - startTime;
+  const endTime = performance.now()
+  const duration = endTime - startTime
 
   console.debug(
     `Projects fetched and processed in ${duration.toFixed(2)}ms (${(duration / 1000).toFixed(2)}s)`,
-  );
+  )
 
-  return allProjects;
-});
+  return allProjects
+})
 
-const query = ref(route.query.q?.toString() || "");
+const query = ref(route.query.q?.toString() || '')
 
 watch(
   query,
   (newQuery) => {
-    const currentQuery = { ...route.query };
+    const currentQuery = { ...route.query }
     if (newQuery) {
-      currentQuery.q = newQuery;
+      currentQuery.q = newQuery
     } else {
-      delete currentQuery.q;
+      delete currentQuery.q
     }
 
     router.replace({
       path: route.path,
       query: currentQuery,
-    });
+    })
   },
   { immediate: false },
-);
+)
 
 watch(
   () => route.query.q,
   (newQueryParam) => {
-    const newValue = newQueryParam?.toString() || "";
+    const newValue = newQueryParam?.toString() || ''
     if (query.value !== newValue) {
-      query.value = newValue;
+      query.value = newValue
     }
   },
-);
+)
 
-const currentFilterType = ref("All projects");
+const currentFilterType = useLocalStorage('moderation-current-filter-type', () => 'All projects')
 const filterTypes: readonly string[] = readonly([
-  "All projects",
-  "Modpacks",
-  "Mods",
-  "Resource Packs",
-  "Data Packs",
-  "Plugins",
-  "Shaders",
-]);
+  'All projects',
+  'Modpacks',
+  'Mods',
+  'Resource Packs',
+  'Data Packs',
+  'Plugins',
+  'Shaders',
+])
 
-const currentSortType = ref("Oldest");
-const sortTypes: readonly string[] = readonly(["Oldest", "Newest"]);
+const currentSortType = useLocalStorage('moderation-current-sort-type', () => 'Oldest')
+const sortTypes: readonly string[] = readonly(['Oldest', 'Newest'])
 
-const currentPage = ref(1);
-const itemsPerPage = 15;
-const totalPages = computed(() => Math.ceil((filteredProjects.value?.length || 0) / itemsPerPage));
+const currentPage = ref(1)
+const itemsPerPage = 15
+const totalPages = computed(() => Math.ceil((filteredProjects.value?.length || 0) / itemsPerPage))
 
 const fuse = computed(() => {
-  if (!allProjects.value || allProjects.value.length === 0) return null;
+  if (!allProjects.value || allProjects.value.length === 0) return null
   return new Fuse(allProjects.value, {
     keys: [
       {
-        name: "project.title",
+        name: 'project.title',
         weight: 3,
       },
       {
-        name: "project.slug",
+        name: 'project.slug',
         weight: 2,
       },
       {
-        name: "project.description",
+        name: 'project.description',
         weight: 2,
       },
       {
-        name: "project.project_type",
+        name: 'project.project_type',
         weight: 1,
       },
-      "owner.user.username",
-      "org.name",
-      "org.slug",
+      'owner.user.username',
+      'org.name',
+      'org.slug',
     ],
     includeScore: true,
     threshold: 0.4,
-  });
-});
+  })
+})
 
 const searchResults = computed(() => {
-  if (!query.value || !fuse.value) return null;
-  return fuse.value.search(query.value).map((result) => result.item);
-});
+  if (!query.value || !fuse.value) return null
+  return fuse.value.search(query.value).map((result) => result.item)
+})
 
 const baseFiltered = computed(() => {
-  if (!allProjects.value) return [];
-  return query.value && searchResults.value ? searchResults.value : [...allProjects.value];
-});
+  if (!allProjects.value) return []
+  return query.value && searchResults.value ? searchResults.value : [...allProjects.value]
+})
 
 const typeFiltered = computed(() => {
-  if (currentFilterType.value === "All projects") return baseFiltered.value;
+  if (currentFilterType.value === 'All projects') return baseFiltered.value
 
   const filterMap: Record<string, string> = {
-    Modpacks: "modpack",
-    Mods: "mod",
-    "Resource Packs": "resourcepack",
-    "Data Packs": "datapack",
-    Plugins: "plugin",
-    Shaders: "shader",
-  };
-
-  const projectType = filterMap[currentFilterType.value];
-  if (!projectType) return baseFiltered.value;
-
-  return baseFiltered.value.filter(
-    (queueItem) =>
-      queueItem.project.project_types.length > 0 &&
-      queueItem.project.project_types[0] === projectType,
-  );
-});
-
-const filteredProjects = computed(() => {
-  const filtered = [...typeFiltered.value];
-
-  if (currentSortType.value === "Oldest") {
-    filtered.sort((a, b) => {
-      const dateA = new Date(a.project.queued || a.project.published || 0).getTime();
-      const dateB = new Date(b.project.queued || b.project.published || 0).getTime();
-      return dateA - dateB;
-    });
-  } else {
-    filtered.sort((a, b) => {
-      const dateA = new Date(a.project.queued || a.project.published || 0).getTime();
-      const dateB = new Date(b.project.queued || b.project.published || 0).getTime();
-      return dateB - dateA;
-    });
+    Modpacks: 'modpack',
+    Mods: 'mod',
+    'Resource Packs': 'resourcepack',
+    'Data Packs': 'datapack',
+    Plugins: 'plugin',
+    Shaders: 'shader',
   }
 
-  return filtered;
-});
+  const projectType = filterMap[currentFilterType.value]
+  if (!projectType) return baseFiltered.value
+
+  return baseFiltered.value.filter((queueItem) =>
+    queueItem.project.project_types.includes(projectType),
+  )
+})
+
+const filteredProjects = computed(() => {
+  const filtered = [...typeFiltered.value]
+
+  if (currentSortType.value === 'Oldest') {
+    filtered.sort((a, b) => {
+      const dateA = new Date(a.project.queued || a.project.published || 0).getTime()
+      const dateB = new Date(b.project.queued || b.project.published || 0).getTime()
+      return dateA - dateB
+    })
+  } else {
+    filtered.sort((a, b) => {
+      const dateA = new Date(a.project.queued || a.project.published || 0).getTime()
+      const dateB = new Date(b.project.queued || b.project.published || 0).getTime()
+      return dateB - dateA
+    })
+  }
+
+  return filtered
+})
 
 const paginatedProjects = computed(() => {
-  if (!filteredProjects.value) return [];
-  const start = (currentPage.value - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return filteredProjects.value.slice(start, end);
-});
+  if (!filteredProjects.value) return []
+  const start = (currentPage.value - 1) * itemsPerPage
+  const end = start + itemsPerPage
+  return filteredProjects.value.slice(start, end)
+})
 
 function goToPage(page: number) {
-  currentPage.value = page;
+  currentPage.value = page
 }
 
 function moderateAllInFilter() {
-  moderationStore.setQueue(filteredProjects.value.map((queueItem) => queueItem.project.id));
+  moderationStore.setQueue(filteredProjects.value.map((queueItem) => queueItem.project.id))
   navigateTo({
-    name: "type-id",
+    name: 'type-id',
     params: {
-      type: "project",
+      type: 'project',
       id: moderationStore.getCurrentProjectId(),
     },
     state: {
       showChecklist: true,
     },
-  });
+  })
 }
 </script>

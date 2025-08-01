@@ -37,7 +37,7 @@
         </div>
       </div>
 
-      <div class="adjacent-input" v-if="license.requiresOnlyOrLater">
+      <div v-if="license.requiresOnlyOrLater" class="adjacent-input">
         <label for="or-later-checkbox">
           <span class="label__title">Later editions</span>
           <span class="label__description">
@@ -60,11 +60,11 @@
       <div class="adjacent-input">
         <label for="license-url">
           <span class="label__title">License URL</span>
-          <span class="label__description" v-if="license?.friendly !== 'Custom'">
+          <span v-if="license?.friendly !== 'Custom'" class="label__description">
             The web location of the full license text. If you don't provide a link, the license text
             will be displayed instead.
           </span>
-          <span class="label__description" v-else>
+          <span v-else class="label__description">
             The web location of the full license text. You have to provide a link since this is a
             custom license.
           </span>
@@ -83,8 +83,8 @@
         </div>
       </div>
 
-      <div class="adjacent-input" v-if="license?.friendly === 'Custom'">
-        <label for="license-spdx" v-if="!nonSpdxLicense">
+      <div v-if="license?.friendly === 'Custom'" class="adjacent-input">
+        <label v-if="!nonSpdxLicense" for="license-spdx">
           <span class="label__title">SPDX identifier</span>
           <span class="label__description">
             If your license does not have an offical
@@ -93,7 +93,7 @@
             >, check the box and enter the name of the license instead.
           </span>
         </label>
-        <label for="license-name" v-else>
+        <label v-else for="license-name">
           <span class="label__title">License name</span>
           <span class="label__description"
             >The full name of the license. If the license has a SPDX identifier, please uncheck the
@@ -104,8 +104,8 @@
         <div class="input-stack w-1/2">
           <input
             v-if="!nonSpdxLicense"
-            v-model="license.short"
             id="license-spdx"
+            v-model="license.short"
             class="w-full"
             type="text"
             maxlength="128"
@@ -114,8 +114,8 @@
           />
           <input
             v-else
-            v-model="license.short"
             id="license-name"
+            v-model="license.short"
             class="w-full"
             type="text"
             maxlength="128"
@@ -154,22 +154,22 @@
 </template>
 
 <script setup lang="ts">
-import { Checkbox, DropdownSelect } from "@modrinth/ui";
 import { SaveIcon } from "@modrinth/assets";
+import { Checkbox, DropdownSelect } from "@modrinth/ui";
 import {
-  TeamMemberPermission,
+  type BuiltinLicense,
   builtinLicenses,
   formatProjectType,
-  type BuiltinLicense,
   type Project,
   type TeamMember,
+  TeamMemberPermission,
 } from "@modrinth/utils";
-import { computed, ref, type Ref } from "vue";
+import { computed, type Ref,ref } from "vue";
 
 const props = defineProps<{
   project: Project;
   currentMember: TeamMember | undefined;
-  patchProject: (payload: Object, quiet?: boolean) => Object;
+  patchProject: (payload: object, quiet?: boolean) => object;
 }>();
 
 const licenseUrl = ref(props.project.license.url);
@@ -215,7 +215,7 @@ const licenseId = computed(() => {
   let id = "";
 
   if (
-    (nonSpdxLicense && license.value.friendly === "Custom") ||
+    (nonSpdxLicense.value && license.value.friendly === "Custom") ||
     license.value.short === "All-Rights-Reserved" ||
     license.value.short === "Unknown"
   ) {
@@ -227,7 +227,7 @@ const licenseId = computed(() => {
     id += allowOrLater.value ? "-or-later" : "-only";
   }
 
-  if (nonSpdxLicense && license.value.friendly === "Custom") {
+  if (nonSpdxLicense.value && license.value.friendly === "Custom") {
     id = id.replaceAll(" ", "-");
   }
 

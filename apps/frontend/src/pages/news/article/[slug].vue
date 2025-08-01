@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { Avatar, ButtonStyled } from "@modrinth/ui";
-import { RssIcon, GitGraphIcon } from "@modrinth/assets";
-import dayjs from "dayjs";
+import { GitGraphIcon,RssIcon } from "@modrinth/assets";
 import { articles as rawArticles } from "@modrinth/blog";
-import { computed } from "vue";
+import { Avatar, ButtonStyled } from "@modrinth/ui";
 import type { User } from "@modrinth/utils";
-import ShareArticleButtons from "~/components/ui/ShareArticleButtons.vue";
+import dayjs from "dayjs";
+import { computed } from "vue";
+
 import NewsletterButton from "~/components/ui/NewsletterButton.vue";
+import ShareArticleButtons from "~/components/ui/ShareArticleButtons.vue";
 
 const config = useRuntimeConfig();
 const route = useRoute();

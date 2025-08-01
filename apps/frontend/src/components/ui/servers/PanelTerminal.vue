@@ -295,12 +295,13 @@
 </template>
 
 <script setup lang="ts">
-import { RightArrowIcon, CopyIcon, XIcon, SearchIcon, EyeIcon } from "@modrinth/assets";
-import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
-import { useDebounceFn } from "@vueuse/core";
+import { CopyIcon, EyeIcon,RightArrowIcon, SearchIcon, XIcon } from "@modrinth/assets";
 import { NewModal } from "@modrinth/ui";
 import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
+import { useDebounceFn } from "@vueuse/core";
 import DOMPurify from "dompurify";
+import { computed, nextTick,onMounted, onUnmounted, ref, watch } from "vue";
+
 import { useModrinthServersConsole } from "~/store/console.ts";
 
 const { $cosmetics } = useNuxtApp();

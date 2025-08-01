@@ -39,8 +39,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import type { ServerState } from "@modrinth/utils";
+import { ref } from "vue";
 
 const STATUS_CLASSES = {
   running: { main: "bg-brand", bg: "bg-bg-green" },

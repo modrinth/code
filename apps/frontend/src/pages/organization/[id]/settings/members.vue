@@ -220,15 +220,16 @@
 
 <script setup>
 import {
+  CrownIcon,
+  DropdownIcon,
   SaveIcon,
   TransferIcon,
   UserPlusIcon,
   UserXIcon as UserRemoveIcon,
-  DropdownIcon,
-  CrownIcon,
 } from "@modrinth/assets";
-import { Button, Badge, Avatar, Checkbox } from "@modrinth/ui";
+import { Avatar, Badge, Button, Checkbox } from "@modrinth/ui";
 import { ref } from "vue";
+
 import { removeTeamMember } from "~/helpers/teams.js";
 import { isPermission } from "~/utils/permissions.ts";
 

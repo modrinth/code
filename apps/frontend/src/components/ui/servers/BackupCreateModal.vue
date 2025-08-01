@@ -42,11 +42,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, computed } from "vue";
-import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { IssuesIcon, PlusIcon, XIcon } from "@modrinth/assets";
+import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { ModrinthServersFetchError, type ServerBackup } from "@modrinth/utils";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { computed,nextTick, ref } from "vue";
+
+import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
   server: ModrinthServer;

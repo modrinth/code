@@ -42,6 +42,7 @@ import { SaveIcon } from "@modrinth/assets";
 import { MarkdownEditor } from "@modrinth/ui";
 import { type Project, type TeamMember, TeamMemberPermission } from "@modrinth/utils";
 import { computed, ref } from "vue";
+
 import { useImageUpload } from "~/composables/image-upload.ts";
 
 const props = defineProps<{

@@ -146,18 +146,18 @@
 
 <script setup lang="ts">
 import { LeftArrowIcon, RightArrowIcon } from "@modrinth/assets";
+import { ButtonStyled } from "@modrinth/ui";
 import type {
+  ModerationFlameModpackItem,
   ModerationJudgements,
   ModerationModpackItem,
-  ModerationModpackResponse,
-  ModerationUnknownModpackItem,
-  ModerationFlameModpackItem,
   ModerationModpackPermissionApprovalType,
+  ModerationModpackResponse,
   ModerationPermissionType,
+  ModerationUnknownModpackItem,
 } from "@modrinth/utils";
-import { ButtonStyled } from "@modrinth/ui";
-import { ref, computed, watch, onMounted } from "vue";
 import { useLocalStorage, useSessionStorage } from "@vueuse/core";
+import { computed, onMounted,ref, watch } from "vue";
 
 const props = defineProps<{
   projectId: string;

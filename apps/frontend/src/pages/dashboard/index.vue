@@ -98,6 +98,7 @@
 <script setup>
 import { ChevronRightIcon, HistoryIcon } from "@modrinth/assets";
 import { Avatar } from "@modrinth/ui";
+
 import NotificationItem from "~/components/ui/NotificationItem.vue";
 import { fetchExtraNotificationData, groupNotifications } from "~/helpers/notifications.ts";
 

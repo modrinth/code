@@ -47,8 +47,8 @@
                 {{ props.powerStateDetails.exit_code }}.
                 {{
                   props.powerStateDetails.exit_code === 1
-                    ? "There may be a mod or plugin causing the issue, or an issue with your server configuration."
-                    : ""
+                    ? 'There may be a mod or plugin causing the issue, or an issue with your server configuration.'
+                    : ''
                 }}
               </template>
               <template v-else> We could not determine the specific cause of the crash. </template>
@@ -128,7 +128,7 @@
                 class="pointer-events-none absolute left-[26px] transform select-none text-gray-400"
               >
                 <span class="ml-[23.5px] whitespace-pre">{{
-                  " ".repeat(commandInput.length - 1)
+                  ' '.repeat(commandInput.length - 1)
                 }}</span>
                 <span> {{ bestSuggestion }} </span>
                 <button
@@ -187,116 +187,116 @@
 </template>
 
 <script setup lang="ts">
-import { TerminalSquareIcon, XIcon, IssuesIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
-import type { ServerState, Stats } from "@modrinth/utils";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { IssuesIcon, TerminalSquareIcon, XIcon } from '@modrinth/assets'
+import { ButtonStyled } from '@modrinth/ui'
+import type { ServerState, Stats } from '@modrinth/utils'
+
+import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 type ServerProps = {
-  socket: WebSocket | null;
-  isConnected: boolean;
-  isWsAuthIncorrect: boolean;
-  stats: Stats;
-  serverPowerState: ServerState;
+  socket: WebSocket | null
+  isConnected: boolean
+  isWsAuthIncorrect: boolean
+  stats: Stats
+  serverPowerState: ServerState
   powerStateDetails?: {
-    oom_killed?: boolean;
-    exit_code?: number;
-  };
-  isServerRunning: boolean;
-  server: ModrinthServer;
-};
-
-const props = defineProps<ServerProps>();
-
-interface ErrorData {
-  id: string;
-  name: string;
-  type: string;
-  version: string;
-  title: string;
-  analysis: {
-    problems: Array<{
-      message: string;
-      counter: number;
-      entry: {
-        level: number;
-        time: string | null;
-        prefix: string;
-        lines: Array<{ number: number; content: string }>;
-      };
-      solutions: Array<{ message: string }>;
-    }>;
-    information: Array<{
-      message: string;
-      counter: number;
-      label: string;
-      value: string;
-      entry: {
-        level: number;
-        time: string | null;
-        prefix: string;
-        lines: Array<{ number: number; content: string }>;
-      };
-    }>;
-  };
+    oom_killed?: boolean
+    exit_code?: number
+  }
+  isServerRunning: boolean
+  server: ModrinthServer
 }
 
-const inspectingError = ref<ErrorData | null>(null);
+const props = defineProps<ServerProps>()
+
+interface ErrorData {
+  id: string
+  name: string
+  type: string
+  version: string
+  title: string
+  analysis: {
+    problems: Array<{
+      message: string
+      counter: number
+      entry: {
+        level: number
+        time: string | null
+        prefix: string
+        lines: Array<{ number: number; content: string }>
+      }
+      solutions: Array<{ message: string }>
+    }>
+    information: Array<{
+      message: string
+      counter: number
+      label: string
+      value: string
+      entry: {
+        level: number
+        time: string | null
+        prefix: string
+        lines: Array<{ number: number; content: string }>
+      }
+    }>
+  }
+}
+
+const inspectingError = ref<ErrorData | null>(null)
 
 const inspectError = async () => {
   try {
-    const log = await props.server.fs?.downloadFile("logs/latest.log");
-    if (!log) return;
+    const log = await props.server.fs?.downloadFile('logs/latest.log')
+    if (!log) return
 
-    // @ts-ignore
     const response = await $fetch(`https://api.mclo.gs/1/analyse`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
         content: log,
       }),
-    });
+    })
 
-    // @ts-ignore
+    // @ts-expect-error
     if (response && response.analysis && Array.isArray(response.analysis.problems)) {
-      inspectingError.value = response as ErrorData;
+      inspectingError.value = response as ErrorData
     } else {
-      inspectingError.value = null;
+      inspectingError.value = null
     }
   } catch (error) {
-    console.error("Failed to analyze logs:", error);
-    inspectingError.value = null;
+    console.error('Failed to analyze logs:', error)
+    inspectingError.value = null
   }
-};
+}
 
 const clearError = () => {
-  inspectingError.value = null;
-};
+  inspectingError.value = null
+}
 
 watch(
   () => props.serverPowerState,
   (newVal) => {
-    if (newVal === "crashed" && !props.powerStateDetails?.oom_killed) {
-      inspectError();
+    if (newVal === 'crashed' && !props.powerStateDetails?.oom_killed) {
+      inspectError()
     } else {
-      clearError();
+      clearError()
     }
   },
-);
+)
 
-if (props.serverPowerState === "crashed" && !props.powerStateDetails?.oom_killed) {
-  inspectError();
+if (props.serverPowerState === 'crashed' && !props.powerStateDetails?.oom_killed) {
+  inspectError()
 }
 
-const socket = ref(props.socket);
+const socket = ref(props.socket)
 
 watch(props, (newAttrs) => {
-  socket.value = newAttrs.socket;
-});
+  socket.value = newAttrs.socket
+})
 
-const DYNAMIC_ARG = Symbol("DYNAMIC_ARG");
+const DYNAMIC_ARG = Symbol('DYNAMIC_ARG')
 
 const commandTree: any = {
   advancement: {
@@ -579,164 +579,163 @@ const commandTree: any = {
     },
   },
   xp: null,
-};
+}
 
-const fullScreen = ref(false);
-const commandInput = ref("");
-const suggestions = ref<string[]>([]);
-const selectedSuggestionIndex = ref(0);
+const fullScreen = ref(false)
+const commandInput = ref('')
+const suggestions = ref<string[]>([])
+const selectedSuggestionIndex = ref(0)
 
-const serverData = computed(() => props.server.general);
+const serverData = computed(() => props.server.general)
 // const serverIP = computed(() => serverData.value?.net.ip ?? "");
 // const serverPort = computed(() => serverData.value?.net.port ?? 0);
 // const serverDomain = computed(() => serverData.value?.net.domain ?? "");
 
-const suggestionsList = ref<HTMLUListElement | null>(null);
+const suggestionsList = ref<HTMLUListElement | null>(null)
 
 useHead({
-  title: `Overview - ${serverData.value?.name ?? "Server"} - Modrinth`,
-});
+  title: `Overview - ${serverData.value?.name ?? 'Server'} - Modrinth`,
+})
 
 const bestSuggestion = computed(() => {
-  if (!suggestions.value.length) return "";
-  const inputTokens = commandInput.value.trim().split(/\s+/);
-  let lastInputToken = inputTokens[inputTokens.length - 1] || "";
-  if (inputTokens.length - 1 === 0 && lastInputToken.startsWith("/")) {
-    lastInputToken = lastInputToken.slice(1);
+  if (!suggestions.value.length) return ''
+  const inputTokens = commandInput.value.trim().split(/\s+/)
+  let lastInputToken = inputTokens[inputTokens.length - 1] || ''
+  if (inputTokens.length - 1 === 0 && lastInputToken.startsWith('/')) {
+    lastInputToken = lastInputToken.slice(1)
   }
-  const selectedSuggestion = suggestions.value[selectedSuggestionIndex.value];
-  const suggestionTokens = selectedSuggestion.split(/\s+/);
-  const lastSuggestionToken = suggestionTokens[suggestionTokens.length - 1] || "";
+  const selectedSuggestion = suggestions.value[selectedSuggestionIndex.value]
+  const suggestionTokens = selectedSuggestion.split(/\s+/)
+  const lastSuggestionToken = suggestionTokens[suggestionTokens.length - 1] || ''
   if (lastSuggestionToken.toLowerCase().startsWith(lastInputToken.toLowerCase())) {
-    return lastSuggestionToken.slice(lastInputToken.length);
+    return lastSuggestionToken.slice(lastInputToken.length)
   }
-  return "";
-});
+  return ''
+})
 
 const getSuggestions = (input: string): string[] => {
-  const trimmedInput = input.trim();
-  const inputWithoutSlash = trimmedInput.startsWith("/") ? trimmedInput.slice(1) : trimmedInput;
-  const tokens = inputWithoutSlash.split(/\s+/);
-  let currentLevel: any = commandTree;
+  const trimmedInput = input.trim()
+  const inputWithoutSlash = trimmedInput.startsWith('/') ? trimmedInput.slice(1) : trimmedInput
+  const tokens = inputWithoutSlash.split(/\s+/)
+  let currentLevel: any = commandTree
 
   for (let i = 0; i < tokens.length; i++) {
-    const token = tokens[i].toLowerCase();
+    const token = tokens[i].toLowerCase()
     if (currentLevel?.[token]) {
-      currentLevel = currentLevel[token] as any;
+      currentLevel = currentLevel[token] as any
     } else if (currentLevel?.[DYNAMIC_ARG]) {
-      currentLevel = currentLevel[DYNAMIC_ARG] as any;
+      currentLevel = currentLevel[DYNAMIC_ARG] as any
     } else {
       if (i === tokens.length - 1) {
-        break;
+        break
       }
-      currentLevel = null;
-      break;
+      currentLevel = null
+      break
     }
   }
 
   if (currentLevel) {
-    const lastToken = tokens[tokens.length - 1]?.toLowerCase() || "";
-    const possibleKeys = Object.keys(currentLevel);
+    const lastToken = tokens[tokens.length - 1]?.toLowerCase() || ''
+    const possibleKeys = Object.keys(currentLevel)
     if (currentLevel[DYNAMIC_ARG]) {
-      possibleKeys.push("<arg>");
+      possibleKeys.push('<arg>')
     }
     return possibleKeys
-      .filter((key) => key === "<arg>" || key.toLowerCase().startsWith(lastToken))
+      .filter((key) => key === '<arg>' || key.toLowerCase().startsWith(lastToken))
       .filter((k) => k !== lastToken.trim())
       .map((key) => {
-        if (key === "<arg>") {
-          return [...tokens.slice(0, -1), "<arg>"].join(" ");
+        if (key === '<arg>') {
+          return [...tokens.slice(0, -1), '<arg>'].join(' ')
         }
-        const newTokens = [...tokens.slice(0, -1), key];
-        return newTokens.join(" ");
-      });
+        const newTokens = [...tokens.slice(0, -1), key]
+        return newTokens.join(' ')
+      })
   }
 
-  return [];
-};
+  return []
+}
 
 const sendCommand = () => {
-  const cmd = commandInput.value.trim();
-  if (!socket || !cmd) return;
+  const cmd = commandInput.value.trim()
+  if (!socket.value || !cmd) return
   try {
-    sendConsoleCommand(cmd);
-    commandInput.value = "";
-    suggestions.value = [];
-    selectedSuggestionIndex.value = 0;
+    sendConsoleCommand(cmd)
+    commandInput.value = ''
+    suggestions.value = []
+    selectedSuggestionIndex.value = 0
   } catch (error) {
-    console.error("Error sending command:", error);
+    console.error('Error sending command:', error)
   }
-};
+}
 
 const sendConsoleCommand = (cmd: string) => {
   try {
-    socket.value?.send(JSON.stringify({ event: "command", cmd }));
+    socket.value?.send(JSON.stringify({ event: 'command', cmd }))
   } catch (error) {
-    console.error("Error sending command:", error);
+    console.error('Error sending command:', error)
   }
-};
+}
 
 watch(
   () => selectedSuggestionIndex.value,
   (newVal) => {
     if (suggestionsList.value) {
-      const selectedSuggestion = suggestionsList.value.querySelector(`#suggestion-${newVal}`);
+      const selectedSuggestion = suggestionsList.value.querySelector(`#suggestion-${newVal}`)
       if (selectedSuggestion) {
-        selectedSuggestion.scrollIntoView({ block: "nearest" });
+        selectedSuggestion.scrollIntoView({ block: 'nearest' })
       }
     }
   },
-);
+)
 
 watch(
   () => commandInput.value,
   (newVal) => {
-    const trimmed = newVal.trim();
+    const trimmed = newVal.trim()
     if (!trimmed) {
-      suggestions.value = [];
-      return;
+      suggestions.value = []
+      return
     }
-    suggestions.value = getSuggestions(newVal);
-    selectedSuggestionIndex.value = 0;
+    suggestions.value = getSuggestions(newVal)
+    selectedSuggestionIndex.value = 0
   },
-);
+)
 
 const selectNextSuggestion = () => {
-  if (suggestions.value.length === 0) return;
-  selectedSuggestionIndex.value = (selectedSuggestionIndex.value + 1) % suggestions.value.length;
-};
+  if (suggestions.value.length === 0) return
+  selectedSuggestionIndex.value = (selectedSuggestionIndex.value + 1) % suggestions.value.length
+}
 
 const selectPrevSuggestion = () => {
-  if (suggestions.value.length === 0) return;
+  if (suggestions.value.length === 0) return
   selectedSuggestionIndex.value =
-    (selectedSuggestionIndex.value - 1 + suggestions.value.length) % suggestions.value.length;
-};
+    (selectedSuggestionIndex.value - 1 + suggestions.value.length) % suggestions.value.length
+}
 
 const acceptSuggestion = () => {
-  if (suggestions.value.filter((s) => s !== "<arg>").length === 0) return;
-  const selected = suggestions.value[selectedSuggestionIndex.value];
-  const currentTokens = commandInput.value.trim().split(" ");
-  const suggestionTokens = selected.split(/\s+/).filter(Boolean);
+  if (suggestions.value.filter((s) => s !== '<arg>').length === 0) return
+  const selected = suggestions.value[selectedSuggestionIndex.value]
+  const currentTokens = commandInput.value.trim().split(' ')
+  const suggestionTokens = selected.split(/\s+/).filter(Boolean)
 
   // check if last current token is in command tree if so just add to the end
   if (currentTokens[currentTokens.length - 1].toLowerCase() === suggestionTokens[0].toLowerCase()) {
     /* empty */
   } else {
-    const offset =
-      currentTokens.length - 1 === 0 && currentTokens[0].trim().startsWith("/") ? 1 : 0;
+    const offset = currentTokens.length - 1 === 0 && currentTokens[0].trim().startsWith('/') ? 1 : 0
     commandInput.value =
       commandInput.value +
       suggestionTokens[suggestionTokens.length - 1].substring(
         currentTokens[currentTokens.length - 1].length - offset,
       ) +
-      " ";
-    suggestions.value = getSuggestions(commandInput.value);
-    selectedSuggestionIndex.value = 0;
+      ' '
+    suggestions.value = getSuggestions(commandInput.value)
+    selectedSuggestionIndex.value = 0
   }
-};
+}
 
 const selectSuggestion = (index: number) => {
-  selectedSuggestionIndex.value = index;
-  acceptSuggestion();
-};
+  selectedSuggestionIndex.value = index
+  acceptSuggestion()
+}
 </script>

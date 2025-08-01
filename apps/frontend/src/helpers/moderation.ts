@@ -1,12 +1,12 @@
 import type { ExtendedReport, OwnershipTarget } from "@modrinth/moderation";
 import type {
-  Thread,
-  Version,
-  User,
-  Project,
-  TeamMember,
   Organization,
+  Project,
   Report,
+  TeamMember,
+  Thread,
+  User,
+  Version,
 } from "@modrinth/utils";
 
 export const useModerationCache = () => ({

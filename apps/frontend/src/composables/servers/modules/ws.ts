@@ -1,4 +1,5 @@
 import type { JWTAuth } from "@modrinth/utils";
+
 import { useServersFetch } from "../servers-fetch.ts";
 import { ServerModule } from "./base.ts";
 

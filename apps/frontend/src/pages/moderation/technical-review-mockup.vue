@@ -76,13 +76,14 @@
 </template>
 
 <script setup lang="ts">
-import { DropdownSelect, Button, Pagination } from "@modrinth/ui";
-import { XIcon, SearchIcon, SortAscIcon, SortDescIcon, FilterIcon } from "@modrinth/assets";
+import { FilterIcon,SearchIcon, SortAscIcon, SortDescIcon, XIcon } from "@modrinth/assets";
+import type { ExtendedDelphiReport,OwnershipTarget } from "@modrinth/moderation";
+import { Button, DropdownSelect, Pagination } from "@modrinth/ui";
+import type { DelphiReport, Organization, Project, TeamMember, Version } from "@modrinth/utils";
 import { defineMessages, useVIntl } from "@vintl/vintl";
 import { useLocalStorage } from "@vueuse/core";
-import type { TeamMember, Organization, DelphiReport, Project, Version } from "@modrinth/utils";
 import Fuse from "fuse.js";
-import type { OwnershipTarget, ExtendedDelphiReport } from "@modrinth/moderation";
+
 import DelphiReportCard from "~/components/ui/moderation/ModerationDelphiReportCard.vue";
 import { asEncodedJsonArray, fetchSegmented } from "~/utils/fetch-helpers.ts";
 

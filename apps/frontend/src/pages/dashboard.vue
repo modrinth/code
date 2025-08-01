@@ -43,16 +43,17 @@
 </template>
 <script setup>
 import {
-  DashboardIcon,
-  CurrencyIcon,
-  ListIcon,
-  ReportIcon,
   BellIcon as NotificationsIcon,
-  OrganizationIcon,
-  LibraryIcon,
   ChartIcon,
+  CurrencyIcon,
+  DashboardIcon,
+  LibraryIcon,
+  ListIcon,
+  OrganizationIcon,
+  ReportIcon,
 } from "@modrinth/assets";
 import { commonMessages } from "@modrinth/ui";
+
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
 

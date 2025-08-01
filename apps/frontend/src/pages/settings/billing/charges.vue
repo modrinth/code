@@ -38,8 +38,9 @@
   </div>
 </template>
 <script setup>
-import { Breadcrumbs, Badge } from "@modrinth/ui";
+import { Badge,Breadcrumbs } from "@modrinth/ui";
 import { formatPrice } from "@modrinth/utils";
+
 import { products } from "~/generated/state.json";
 
 definePageMeta({

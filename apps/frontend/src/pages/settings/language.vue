@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import Fuse from "fuse.js/dist/fuse.basic";
+import { IssuesIcon,RadioButtonCheckedIcon, RadioButtonIcon } from "@modrinth/assets";
 import { commonSettingsMessages } from "@modrinth/ui";
-import { RadioButtonIcon, RadioButtonCheckedIcon, IssuesIcon } from "@modrinth/assets";
+import Fuse from "fuse.js/dist/fuse.basic";
+
 import { isModifierKeyDown } from "~/helpers/events.ts";
 
 const vintl = useVIntl();

@@ -99,8 +99,9 @@
   </div>
 </template>
 <script setup>
-import { XIcon, CheckIcon, IssuesIcon } from "@modrinth/assets";
+import { CheckIcon, IssuesIcon,XIcon } from "@modrinth/assets";
 import { Badge } from "@modrinth/ui";
+
 import ConversationThread from "~/components/ui/thread/ConversationThread.vue";
 import {
   getProjectLink,

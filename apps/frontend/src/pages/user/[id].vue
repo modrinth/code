@@ -20,7 +20,7 @@
 
         <div class="flex flex-col gap-1">
           <span class="text-lg font-bold text-primary"> Auth providers </span>
-          <span>{{ user.auth_providers.join(", ") }}</span>
+          <span>{{ user.auth_providers.join(', ') }}</span>
         </div>
 
         <div class="flex flex-col gap-1">
@@ -41,14 +41,14 @@
         <div class="flex flex-col gap-1">
           <span class="text-lg font-bold text-primary"> Has password </span>
           <span>
-            {{ user.has_password ? "Yes" : "No" }}
+            {{ user.has_password ? 'Yes' : 'No' }}
           </span>
         </div>
 
         <div class="flex flex-col gap-1">
           <span class="text-lg font-bold text-primary"> Has TOTP </span>
           <span>
-            {{ user.has_totp ? "Yes" : "No" }}
+            {{ user.has_totp ? 'Yes' : 'No' }}
           </span>
         </div>
       </div>
@@ -67,8 +67,8 @@
               user.bio
                 ? user.bio
                 : projects.length === 0
-                  ? "A Modrinth user."
-                  : "A Modrinth creator."
+                  ? 'A Modrinth user.'
+                  : 'A Modrinth creator.'
             }}
           </template>
           <template #stats>
@@ -254,7 +254,7 @@
               <div class="stats">
                 <BoxIcon />
                 {{
-                  `${$formatNumber(collection.projects?.length || 0, false)} project${(collection.projects?.length || 0) !== 1 ? "s" : ""}`
+                  `${$formatNumber(collection.projects?.length || 0, false)} project${(collection.projects?.length || 0) !== 1 ? 's' : ''}`
                 }}
               </div>
               <div class="stats">
@@ -337,146 +337,145 @@
 </template>
 <script setup>
 import {
-  LibraryIcon,
   BoxIcon,
-  LinkIcon,
-  LockIcon,
-  XIcon,
   CalendarIcon,
-  DownloadIcon,
-  ClipboardCopyIcon,
-  MoreVerticalIcon,
-  CurrencyIcon,
-  InfoIcon,
   CheckIcon,
-  ReportIcon,
+  ClipboardCopyIcon,
+  CurrencyIcon,
+  DownloadIcon,
   EditIcon,
   GlobeIcon,
-} from "@modrinth/assets";
+  InfoIcon,
+  LibraryIcon,
+  LinkIcon,
+  LockIcon,
+  MoreVerticalIcon,
+  ReportIcon,
+  XIcon,
+} from '@modrinth/assets'
 import {
   Avatar,
-  OverflowMenu,
   ButtonStyled,
-  ContentPageHeader,
   commonMessages,
+  ContentPageHeader,
   NewModal,
+  OverflowMenu,
   useRelativeTime,
-} from "@modrinth/ui";
-import { isStaff } from "~/helpers/users.js";
-import NavTabs from "~/components/ui/NavTabs.vue";
-import ProjectCard from "~/components/ui/ProjectCard.vue";
-import { reportUser } from "~/utils/report-helpers.ts";
+} from '@modrinth/ui'
 
-import StaffBadge from "~/assets/images/badges/staff.svg?component";
-import ModBadge from "~/assets/images/badges/mod.svg?component";
-import PlusBadge from "~/assets/images/badges/plus.svg?component";
-import TenMClubBadge from "~/assets/images/badges/10m-club.svg?component";
-import EarlyAdopterBadge from "~/assets/images/badges/early-adopter.svg?component";
-import AlphaTesterBadge from "~/assets/images/badges/alpha-tester.svg?component";
-import BetaTesterBadge from "~/assets/images/badges/beta-tester.svg?component";
+import TenMClubBadge from '~/assets/images/badges/10m-club.svg?component'
+import AlphaTesterBadge from '~/assets/images/badges/alpha-tester.svg?component'
+import BetaTesterBadge from '~/assets/images/badges/beta-tester.svg?component'
+import EarlyAdopterBadge from '~/assets/images/badges/early-adopter.svg?component'
+import ModBadge from '~/assets/images/badges/mod.svg?component'
+import PlusBadge from '~/assets/images/badges/plus.svg?component'
+import StaffBadge from '~/assets/images/badges/staff.svg?component'
+import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
+import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
+import CollectionCreateModal from '~/components/ui/CollectionCreateModal.vue'
+import ModalCreation from '~/components/ui/ModalCreation.vue'
+import NavTabs from '~/components/ui/NavTabs.vue'
+import ProjectCard from '~/components/ui/ProjectCard.vue'
+import { isStaff } from '~/helpers/users.js'
+import { reportUser } from '~/utils/report-helpers.ts'
 
-import UpToDate from "~/assets/images/illustrations/up_to_date.svg?component";
-import ModalCreation from "~/components/ui/ModalCreation.vue";
-import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
-import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
+const data = useNuxtApp()
+const route = useNativeRoute()
+const auth = await useAuth()
+const cosmetics = useCosmetics()
+const tags = useTags()
+const config = useRuntimeConfig()
 
-const data = useNuxtApp();
-const route = useNativeRoute();
-const auth = await useAuth();
-const cosmetics = useCosmetics();
-const tags = useTags();
-const config = useRuntimeConfig();
+const vintl = useVIntl()
+const { formatMessage } = vintl
 
-const vintl = useVIntl();
-const { formatMessage } = vintl;
+const formatCompactNumber = useCompactNumber(true)
 
-const formatCompactNumber = useCompactNumber(true);
-
-const formatRelativeTime = useRelativeTime();
+const formatRelativeTime = useRelativeTime()
 
 const messages = defineMessages({
   profileProjectsStats: {
-    id: "profile.stats.projects",
+    id: 'profile.stats.projects',
     defaultMessage:
-      "{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> projects}}",
+      '{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> projects}}',
   },
   profileDownloadsStats: {
-    id: "profile.stats.downloads",
+    id: 'profile.stats.downloads',
     defaultMessage:
-      "{count, plural, one {<stat>{count}</stat> project download} other {<stat>{count}</stat> project downloads}}",
+      '{count, plural, one {<stat>{count}</stat> project download} other {<stat>{count}</stat> project downloads}}',
   },
   profileProjectsFollowersStats: {
-    id: "profile.stats.projects-followers",
+    id: 'profile.stats.projects-followers',
     defaultMessage:
-      "{count, plural, one {<stat>{count}</stat> project follower} other {<stat>{count}</stat> project followers}}",
+      '{count, plural, one {<stat>{count}</stat> project follower} other {<stat>{count}</stat> project followers}}',
   },
   profileJoinedAt: {
-    id: "profile.joined-at",
-    defaultMessage: "Joined <date>{ago}</date>",
+    id: 'profile.joined-at',
+    defaultMessage: 'Joined <date>{ago}</date>',
   },
   profileUserId: {
-    id: "profile.user-id",
-    defaultMessage: "User ID: {id}",
+    id: 'profile.user-id',
+    defaultMessage: 'User ID: {id}',
   },
   profileDetails: {
-    id: "profile.label.details",
-    defaultMessage: "Details",
+    id: 'profile.label.details',
+    defaultMessage: 'Details',
   },
   profileOrganizations: {
-    id: "profile.label.organizations",
-    defaultMessage: "Organizations",
+    id: 'profile.label.organizations',
+    defaultMessage: 'Organizations',
   },
   profileBadges: {
-    id: "profile.label.badges",
-    defaultMessage: "Badges",
+    id: 'profile.label.badges',
+    defaultMessage: 'Badges',
   },
   profileManageProjectsButton: {
-    id: "profile.button.manage-projects",
-    defaultMessage: "Manage projects",
+    id: 'profile.button.manage-projects',
+    defaultMessage: 'Manage projects',
   },
   profileMetaDescription: {
-    id: "profile.meta.description",
+    id: 'profile.meta.description',
     defaultMessage: "Download {username}'s projects on Modrinth",
   },
   profileMetaDescriptionWithBio: {
-    id: "profile.meta.description-with-bio",
+    id: 'profile.meta.description-with-bio',
     defaultMessage: "{bio} - Download {username}'s projects on Modrinth",
   },
   profileNoProjectsLabel: {
-    id: "profile.label.no-projects",
-    defaultMessage: "This user has no projects!",
+    id: 'profile.label.no-projects',
+    defaultMessage: 'This user has no projects!',
   },
   profileNoProjectsAuthLabel: {
-    id: "profile.label.no-projects-auth",
+    id: 'profile.label.no-projects-auth',
     defaultMessage:
       "You don't have any projects.\nWould you like to <create-link>create one</create-link>?",
   },
   profileNoCollectionsLabel: {
-    id: "profile.label.no-collections",
-    defaultMessage: "This user has no collections!",
+    id: 'profile.label.no-collections',
+    defaultMessage: 'This user has no collections!',
   },
   profileNoCollectionsAuthLabel: {
-    id: "profile.label.no-collections-auth",
+    id: 'profile.label.no-collections-auth',
     defaultMessage:
       "You don't have any collections.\nWould you like to <create-link>create one</create-link>?",
   },
   billingButton: {
-    id: "profile.button.billing",
-    defaultMessage: "Manage user billing",
+    id: 'profile.button.billing',
+    defaultMessage: 'Manage user billing',
   },
   infoButton: {
-    id: "profile.button.info",
-    defaultMessage: "View user details",
+    id: 'profile.button.info',
+    defaultMessage: 'View user details',
   },
   userNotFoundError: {
-    id: "profile.error.not-found",
-    defaultMessage: "User not found",
+    id: 'profile.error.not-found',
+    defaultMessage: 'User not found',
   },
-});
+})
 
-let user, projects, organizations, collections;
+let user, projects, organizations, collections
 try {
-  [{ data: user }, { data: projects }, { data: organizations }, { data: collections }] =
+  ;[{ data: user }, { data: projects }, { data: organizations }, { data: collections }] =
     await Promise.all([
       useAsyncData(`user/${route.params.id}`, () => useBaseFetch(`user/${route.params.id}`)),
       useAsyncData(
@@ -485,15 +484,15 @@ try {
         {
           transform: (projects) => {
             for (const project of projects) {
-              project.categories = project.categories.concat(project.loaders);
+              project.categories = project.categories.concat(project.loaders)
               project.project_type = data.$getProjectTypeForUrl(
                 project.project_type,
                 project.categories,
                 tags.value,
-              );
+              )
             }
 
-            return projects;
+            return projects
           },
         },
       ),
@@ -505,30 +504,32 @@ try {
       useAsyncData(`user/${route.params.id}/collections`, () =>
         useBaseFetch(`user/${route.params.id}/collections`, { apiVersion: 3 }),
       ),
-    ]);
+    ])
 } catch {
   throw createError({
     fatal: true,
     statusCode: 404,
     message: formatMessage(messages.userNotFoundError),
-  });
+  })
 }
 
-const sortedOrgs = computed(() => organizations.value.sort((a, b) => a.name.localeCompare(b.name)));
+const sortedOrgs = computed(() =>
+  organizations.value.slice().sort((a, b) => a.name.localeCompare(b.name)),
+)
 
 if (!user.value) {
   throw createError({
     fatal: true,
     statusCode: 404,
     message: formatMessage(messages.userNotFoundError),
-  });
+  })
 }
 
 if (user.value.username !== route.params.id) {
-  await navigateTo(`/user/${user.value.username}`, { redirectCode: 301 });
+  await navigateTo(`/user/${user.value.username}`, { redirectCode: 301 })
 }
 
-const title = computed(() => `${user.value.username} - Modrinth`);
+const title = computed(() => `${user.value.username} - Modrinth`)
 const description = computed(() =>
   user.value.bio
     ? formatMessage(messages.profileMetaDescriptionWithBio, {
@@ -536,62 +537,62 @@ const description = computed(() =>
         username: user.value.username,
       })
     : formatMessage(messages.profileMetaDescription, { username: user.value.username }),
-);
+)
 
 useSeoMeta({
   title: () => title.value,
   description: () => description.value,
   ogTitle: () => title.value,
   ogDescription: () => description.value,
-  ogImage: () => user.value.avatar_url ?? "https://cdn.modrinth.com/placeholder.png",
-});
+  ogImage: () => user.value.avatar_url ?? 'https://cdn.modrinth.com/placeholder.png',
+})
 
 const projectTypes = computed(() => {
-  const obj = {};
+  const obj = {}
 
   if (collections.value.length > 0) {
-    obj.collection = true;
+    obj.collection = true
   }
 
   for (const project of projects.value) {
-    obj[project.project_type] = true;
+    obj[project.project_type] = true
   }
 
-  delete obj.project;
+  delete obj.project
 
-  return Object.keys(obj);
-});
+  return Object.keys(obj)
+})
 const sumDownloads = computed(() => {
-  let sum = 0;
+  let sum = 0
 
   for (const project of projects.value) {
-    sum += project.downloads;
+    sum += project.downloads
   }
 
-  return sum;
-});
+  return sum
+})
 
-const joinDate = computed(() => new Date(user.value.created));
-const MODRINTH_BETA_END_DATE = new Date("2022-02-27T08:00:00.000Z");
-const MODRINTH_ALPHA_END_DATE = new Date("2020-11-30T08:00:00.000Z");
+const joinDate = computed(() => new Date(user.value.created))
+const MODRINTH_BETA_END_DATE = new Date('2022-02-27T08:00:00.000Z')
+const MODRINTH_ALPHA_END_DATE = new Date('2020-11-30T08:00:00.000Z')
 
 const badges = computed(() => {
-  const badges = [];
+  const badges = []
 
-  if (user.value.role === "admin") {
-    badges.push("staff");
+  if (user.value.role === 'admin') {
+    badges.push('staff')
   }
 
-  if (user.value.role === "moderator") {
-    badges.push("mod");
+  if (user.value.role === 'moderator') {
+    badges.push('mod')
   }
 
   if (isPermission(user.value.badges, 1 << 0)) {
-    badges.push("plus");
+    badges.push('plus')
   }
 
   if (sumDownloads.value > 10000000) {
-    badges.push("10m-club");
+    badges.push('10m-club')
   }
 
   if (
@@ -599,32 +600,32 @@ const badges = computed(() => {
     isPermission(user.value.badges, 1 << 2) ||
     isPermission(user.value.badges, 1 << 3)
   ) {
-    badges.push("early-adopter");
+    badges.push('early-adopter')
   }
 
   if (isPermission(user.value.badges, 1 << 4) || joinDate.value < MODRINTH_ALPHA_END_DATE) {
-    badges.push("alpha-tester");
+    badges.push('alpha-tester')
   } else if (isPermission(user.value.badges, 1 << 4) || joinDate.value < MODRINTH_BETA_END_DATE) {
-    badges.push("beta-tester");
+    badges.push('beta-tester')
   }
 
   if (isPermission(user.value.badges, 1 << 5)) {
-    badges.push("contributor");
+    badges.push('contributor')
   }
 
   if (isPermission(user.value.badges, 1 << 6)) {
-    badges.push("translator");
+    badges.push('translator')
   }
 
-  return badges;
-});
+  return badges
+})
 
 async function copyId() {
-  await navigator.clipboard.writeText(user.value.id);
+  await navigator.clipboard.writeText(user.value.id)
 }
 
 async function copyPermalink() {
-  await navigator.clipboard.writeText(`${config.public.siteUrl}/user/${user.value.id}`);
+  await navigator.clipboard.writeText(`${config.public.siteUrl}/user/${user.value.id}`)
 }
 
 const navLinks = computed(() => [
@@ -637,16 +638,16 @@ const navLinks = computed(() => [
       return {
         label: formatMessage(getProjectTypeMessage(x, true)),
         href: `/user/${user.value.username}/${x}s`,
-      };
+      }
     })
     .slice()
     .sort((a, b) => a.label.localeCompare(b.label)),
-]);
+])
 </script>
 <script>
 export default defineNuxtComponent({
   methods: {},
-});
+})
 </script>
 
 <style lang="scss" scoped>

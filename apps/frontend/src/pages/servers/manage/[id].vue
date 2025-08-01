@@ -350,36 +350,38 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, type Reactive } from "vue";
+import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
 import {
-  SettingsIcon,
+  CheckIcon,
   CopyIcon,
+  FileIcon,
   IssuesIcon,
   LeftArrowIcon,
-  RightArrowIcon,
-  CheckIcon,
-  FileIcon,
-  TransferIcon,
   LockIcon,
+  RightArrowIcon,
+  SettingsIcon,
+  TransferIcon,
 } from "@modrinth/assets";
-import DOMPurify from "dompurify";
 import { ButtonStyled, ErrorInformationCard, ServerNotice } from "@modrinth/ui";
-import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
-import type { MessageDescriptor } from "@vintl/vintl";
-import {
-  type ServerState,
-  type Stats,
-  type WSEvent,
-  type WSInstallationResultEvent,
-  type Backup,
-  type PowerAction,
+import type {
+  Backup,
+  PowerAction,
+  ServerState,
+  Stats,
+  WSEvent,
+  WSInstallationResultEvent,
 } from "@modrinth/utils";
+import type { MessageDescriptor } from "@vintl/vintl";
+import DOMPurify from "dompurify";
+import { computed, onMounted, onUnmounted, type Reactive,ref } from "vue";
+
 import { reloadNuxtApp } from "#app";
-import { useModrinthServersConsole } from "~/store/console.ts";
-import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
-import { ModrinthServer, useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
-import ServerInstallation from "~/components/ui/servers/ServerInstallation.vue";
 import PanelErrorIcon from "~/components/ui/servers/icons/PanelErrorIcon.vue";
+import ServerInstallation from "~/components/ui/servers/ServerInstallation.vue";
+import type { ModrinthServer} from "~/composables/servers/modrinth-servers.ts";
+import { useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
+import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
+import { useModrinthServersConsole } from "~/store/console.ts";
 
 const app = useNuxtApp() as unknown as { $notify: any };
 

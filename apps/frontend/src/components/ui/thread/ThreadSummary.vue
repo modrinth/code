@@ -25,6 +25,7 @@
 
 <script setup>
 import { ChevronRightIcon } from "@modrinth/assets";
+
 import ThreadMessage from "~/components/ui/thread/ThreadMessage.vue";
 
 const props = defineProps({

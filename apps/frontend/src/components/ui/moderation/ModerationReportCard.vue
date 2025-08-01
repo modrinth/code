@@ -87,7 +87,7 @@
                     v-if="report.target.type === 'organization'"
                     class="align-middle"
                   />
-                  {{ report.target.name || "Unknown User" }}
+                  {{ report.target.name || 'Unknown User' }}
                 </span>
               </nuxt-link>
 
@@ -102,7 +102,7 @@
                   class="max-w-[200px] truncate font-mono text-xs sm:max-w-none"
                 >
                   {{
-                    report.version.files.find((file) => file.primary)?.filename || "Unknown Version"
+                    report.version.files.find((file) => file.primary)?.filename || 'Unknown Version'
                   }}
                 </span>
               </div>
@@ -120,7 +120,7 @@
       </div>
     </div>
 
-    <CollapsibleRegion class="my-4" ref="collapsibleRegion">
+    <CollapsibleRegion ref="collapsibleRegion" class="my-4">
       <ReportThread
         v-if="report.thread"
         ref="reportThread"
@@ -135,81 +135,82 @@
 </template>
 <script setup lang="ts">
 import {
-  Avatar,
-  useRelativeTime,
-  OverflowMenu,
-  type OverflowMenuOption,
-  CollapsibleRegion,
-  ButtonStyled,
-} from "@modrinth/ui";
-import {
-  EllipsisVerticalIcon,
-  OrganizationIcon,
-  EyeIcon,
   ClipboardCopyIcon,
+  EllipsisVerticalIcon,
+  EyeIcon,
   LinkIcon,
-} from "@modrinth/assets";
+  OrganizationIcon,
+} from '@modrinth/assets'
 import {
   type ExtendedReport,
   reportQuickReplies,
   type ReportQuickReply,
-} from "@modrinth/moderation";
-import ChevronDownIcon from "../servers/icons/ChevronDownIcon.vue";
-import ReportThread from "../thread/ReportThread.vue";
+} from '@modrinth/moderation'
+import {
+  Avatar,
+  ButtonStyled,
+  CollapsibleRegion,
+  OverflowMenu,
+  type OverflowMenuOption,
+  useRelativeTime,
+} from '@modrinth/ui'
+
+import ChevronDownIcon from '../servers/icons/ChevronDownIcon.vue'
+import ReportThread from '../thread/ReportThread.vue'
 
 const props = defineProps<{
-  report: ExtendedReport;
-}>();
+  report: ExtendedReport
+}>()
 
-const reportThread = ref<InstanceType<typeof ReportThread> | null>(null);
-const collapsibleRegion = ref<InstanceType<typeof CollapsibleRegion> | null>(null);
+const reportThread = ref<InstanceType<typeof ReportThread> | null>(null)
+const collapsibleRegion = ref<InstanceType<typeof CollapsibleRegion> | null>(null)
 
-const formatRelativeTime = useRelativeTime();
+const formatRelativeTime = useRelativeTime()
 
 function updateThread(newThread: any) {
   if (props.report.thread) {
-    Object.assign(props.report.thread, newThread);
+    Object.assign(props.report.thread, newThread)
   }
 }
 
 const quickActions: OverflowMenuOption[] = [
   {
-    id: "copy-link",
+    id: 'copy-link',
     action: () => {
-      const base = window.location.origin;
-      const reportUrl = `${base}/moderation/reports/${props.report.id}`;
+      const base = window.location.origin
+      const reportUrl = `${base}/moderation/reports/${props.report.id}`
       navigator.clipboard.writeText(reportUrl).then(() => {
         addNotification({
-          type: "success",
-          title: "Report link copied",
-          text: "The link to this report has been copied to your clipboard.",
-        });
-      });
+          type: 'success',
+          title: 'Report link copied',
+          text: 'The link to this report has been copied to your clipboard.',
+        })
+      })
     },
   },
   {
-    id: "copy-id",
+    id: 'copy-id',
     action: () => {
       navigator.clipboard.writeText(props.report.id).then(() => {
         addNotification({
-          type: "success",
-          title: "Report ID copied",
-          text: "The ID of this report has been copied to your clipboard.",
-        });
-      });
+          type: 'success',
+          title: 'Report ID copied',
+          text: 'The ID of this report has been copied to your clipboard.',
+        })
+      })
     },
   },
-];
+]
 
 const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
   return reportQuickReplies
     .filter((reply) => {
-      if (reply.shouldShow === undefined) return true;
-      if (typeof reply.shouldShow === "function") {
-        return reply.shouldShow(props.report);
+      if (reply.shouldShow === undefined) return true
+      if (typeof reply.shouldShow === 'function') {
+        return reply.shouldShow(props.report)
       }
 
-      return reply.shouldShow;
+      return reply.shouldShow
     })
     .map(
       (reply) =>
@@ -217,59 +218,61 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
           id: reply.label,
           action: () => handleQuickReply(reply),
         }) as OverflowMenuOption,
-    );
-});
+    )
+})
 
 async function handleQuickReply(reply: ReportQuickReply) {
   const message =
-    typeof reply.message === "function" ? await reply.message(props.report) : reply.message;
+    typeof reply.message === 'function' ? await reply.message(props.report) : reply.message
 
-  collapsibleRegion.value?.setCollapsed(false);
-  await nextTick();
-  reportThread.value?.setReplyContent(message);
+  collapsibleRegion.value?.setCollapsed(false)
+  await nextTick()
+  reportThread.value?.setReplyContent(message)
 }
 
 const reportItemAvatarUrl = computed(() => {
   switch (props.report.item_type) {
-    case "project":
-    case "version":
-      return props.report.project?.icon_url || "";
-    case "user":
-      return props.report.user?.avatar_url || "";
+    case 'project':
+    case 'version':
+      return props.report.project?.icon_url || ''
+    case 'user':
+      return props.report.user?.avatar_url || ''
     default:
-      return undefined;
+      return undefined
   }
-});
+})
 
 const reportItemTitle = computed(() => {
-  if (props.report.item_type === "user") return props.report.user?.username || "Unknown User";
+  if (props.report.item_type === 'user') return props.report.user?.username || 'Unknown User'
 
-  return props.report.project?.title || "Unknown Project";
-});
+  return props.report.project?.title || 'Unknown Project'
+})
 
 const reportItemUrl = computed(() => {
   switch (props.report.item_type) {
-    case "user":
-      return `/user/${props.report.user?.username}`;
-    case "project":
-      return `/${props.report.project?.project_type}/${props.report.project?.slug}`;
-    case "version":
-      return `/${props.report.project?.project_type}/${props.report.project?.slug}/versions/${props.report.version?.id}`;
+    case 'user':
+      return `/user/${props.report.user?.username}`
+    case 'project':
+      return `/${props.report.project?.project_type}/${props.report.project?.slug}`
+    case 'version':
+      return `/${props.report.project?.project_type}/${props.report.project?.slug}/versions/${props.report.version?.id}`
+    default:
+      return ''
   }
-});
+})
 
 const formattedItemType = computed(() => {
-  const itemType = props.report.item_type;
-  return itemType.charAt(0).toUpperCase() + itemType.slice(1);
-});
+  const itemType = props.report.item_type
+  return itemType.charAt(0).toUpperCase() + itemType.slice(1)
+})
 
 const formattedReportType = computed(() => {
-  const reportType = props.report.report_type;
+  const reportType = props.report.report_type
 
   // some are split by -, some are split by " "
-  const words = reportType.includes("-") ? reportType.split("-") : reportType.split(" ");
-  return words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
-});
+  const words = reportType.includes('-') ? reportType.split('-') : reportType.split(' ')
+  return words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+})
 </script>
 
 <style lang="scss" scoped></style>

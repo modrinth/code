@@ -119,7 +119,7 @@
         <p>
           Changes will be applied to
           <strong>{{ selectedProjects.length }}</strong> project{{
-            selectedProjects.length > 1 ? "s" : ""
+            selectedProjects.length > 1 ? 's' : ''
           }}.
         </p>
         <ul>
@@ -301,31 +301,31 @@
 </template>
 
 <script>
-import { Multiselect } from "vue-multiselect";
 import {
-  SettingsIcon,
-  TrashIcon,
-  PlusIcon,
-  XIcon,
-  IssuesIcon,
   EditIcon,
+  IssuesIcon,
+  PlusIcon,
   SaveIcon,
+  SettingsIcon,
   SortAscIcon,
   SortDescIcon,
-} from "@modrinth/assets";
+  TrashIcon,
+  XIcon,
+} from '@modrinth/assets'
 import {
   Avatar,
   ButtonStyled,
   Checkbox,
+  commonMessages,
   CopyCode,
   ProjectStatusBadge,
-  commonMessages,
-} from "@modrinth/ui";
-import { formatProjectType } from "@modrinth/utils";
+} from '@modrinth/ui'
+import { formatProjectType } from '@modrinth/utils'
+import { Multiselect } from 'vue-multiselect'
 
-import Modal from "~/components/ui/Modal.vue";
-import ModalCreation from "~/components/ui/ModalCreation.vue";
-import { getProjectTypeForUrl } from "~/helpers/projects.js";
+import Modal from '~/components/ui/Modal.vue'
+import ModalCreation from '~/components/ui/ModalCreation.vue'
+import { getProjectTypeForUrl } from '~/helpers/projects.js'
 
 export default defineNuxtComponent({
   components: {
@@ -348,100 +348,100 @@ export default defineNuxtComponent({
     SortDescIcon,
   },
   async setup() {
-    const { formatMessage } = useVIntl();
+    const { formatMessage } = useVIntl()
 
-    const user = await useUser();
-    await initUserProjects();
-    return { formatMessage, user: ref(user) };
+    const user = await useUser()
+    await initUserProjects()
+    return { formatMessage, user: ref(user) }
   },
   data() {
     return {
-      projects: this.updateSort(this.user.projects, "Name"),
+      projects: this.updateSort(this.user.projects, 'Name'),
       versions: [],
       selectedProjects: [],
-      sortBy: "Name",
+      sortBy: 'Name',
       descending: false,
       editLinks: {
         showAffected: false,
         source: {
-          val: "",
+          val: '',
           clear: false,
         },
         discord: {
-          val: "",
+          val: '',
           clear: false,
         },
         wiki: {
-          val: "",
+          val: '',
           clear: false,
         },
         issues: {
-          val: "",
+          val: '',
           clear: false,
         },
       },
       commonMessages,
-    };
+    }
   },
   head: {
-    title: "Projects - Modrinth",
+    title: 'Projects - Modrinth',
   },
   created() {
-    this.UPLOAD_VERSION = 1 << 0;
-    this.DELETE_VERSION = 1 << 1;
-    this.EDIT_DETAILS = 1 << 2;
-    this.EDIT_BODY = 1 << 3;
-    this.MANAGE_INVITES = 1 << 4;
-    this.REMOVE_MEMBER = 1 << 5;
-    this.EDIT_MEMBER = 1 << 6;
-    this.DELETE_PROJECT = 1 << 7;
+    this.UPLOAD_VERSION = 1 << 0
+    this.DELETE_VERSION = 1 << 1
+    this.EDIT_DETAILS = 1 << 2
+    this.EDIT_BODY = 1 << 3
+    this.MANAGE_INVITES = 1 << 4
+    this.REMOVE_MEMBER = 1 << 5
+    this.EDIT_MEMBER = 1 << 6
+    this.DELETE_PROJECT = 1 << 7
   },
   methods: {
     getProjectTypeForUrl,
     formatProjectType,
     updateDescending() {
-      this.descending = !this.descending;
-      this.projects = this.updateSort(this.projects, this.sortBy, this.descending);
+      this.descending = !this.descending
+      this.projects = this.updateSort(this.projects, this.sortBy, this.descending)
     },
     updateSort(projects, sort, descending) {
-      let sortedArray = projects;
+      let sortedArray = projects
       switch (sort) {
-        case "Name":
+        case 'Name':
           sortedArray = projects.slice().sort((a, b) => {
-            return a.title.localeCompare(b.title);
-          });
-          break;
-        case "Status":
+            return a.title.localeCompare(b.title)
+          })
+          break
+        case 'Status':
           sortedArray = projects.slice().sort((a, b) => {
             if (a.status < b.status) {
-              return -1;
+              return -1
             }
             if (a.status > b.status) {
-              return 1;
+              return 1
             }
-            return 0;
-          });
-          break;
-        case "Type":
+            return 0
+          })
+          break
+        case 'Type':
           sortedArray = projects.slice().sort((a, b) => {
             if (a.project_type < b.project_type) {
-              return -1;
+              return -1
             }
             if (a.project_type > b.project_type) {
-              return 1;
+              return 1
             }
-            return 0;
-          });
-          break;
+            return 0
+          })
+          break
         default:
-          break;
+          break
       }
 
       if (descending) {
-        sortedArray = sortedArray.reverse();
+        sortedArray = sortedArray.reverse()
       }
 
-      return sortedArray;
+      return sortedArray
     },
     async bulkEditLinks() {
       try {
@@ -450,60 +450,60 @@ export default defineNuxtComponent({
           source_url: this.editLinks.source.clear ? null : this.editLinks.source.val.trim(),
           wiki_url: this.editLinks.wiki.clear ? null : this.editLinks.wiki.val.trim(),
           discord_url: this.editLinks.discord.clear ? null : this.editLinks.discord.val.trim(),
-        };
-
-        if (!baseData.issues_url?.length ?? 1 > 0) {
-          delete baseData.issues_url;
         }
 
-        if (!baseData.source_url?.length ?? 1 > 0) {
-          delete baseData.source_url;
+        if (!baseData.issues_url?.length || baseData.issues_url.length === 0) {
+          delete baseData.issues_url
         }
 
-        if (!baseData.wiki_url?.length ?? 1 > 0) {
-          delete baseData.wiki_url;
+        if (!baseData.source_url?.length || baseData.source_url.length === 0) {
+          delete baseData.source_url
         }
 
-        if (!baseData.discord_url?.length ?? 1 > 0) {
-          delete baseData.discord_url;
+        if (!baseData.wiki_url?.length || baseData.wiki_url.length === 0) {
+          delete baseData.wiki_url
+        }
+
+        if (!baseData.discord_url?.length || baseData.discord_url.length === 0) {
+          delete baseData.discord_url
         }
 
         await useBaseFetch(
           `projects?ids=${JSON.stringify(this.selectedProjects.map((x) => x.id))}`,
           {
-            method: "PATCH",
+            method: 'PATCH',
             body: baseData,
           },
-        );
+        )
 
-        this.$refs.editLinksModal.hide();
+        this.$refs.editLinksModal.hide()
         this.$notify({
-          group: "main",
-          title: "Success",
+          group: 'main',
+          title: 'Success',
           text: "Bulk edited selected project's links.",
-          type: "success",
-        });
-        this.selectedProjects = [];
+          type: 'success',
+        })
+        this.selectedProjects = []
 
-        this.editLinks.issues.val = "";
-        this.editLinks.source.val = "";
-        this.editLinks.wiki.val = "";
-        this.editLinks.discord.val = "";
-        this.editLinks.issues.clear = false;
-        this.editLinks.source.clear = false;
-        this.editLinks.wiki.clear = false;
-        this.editLinks.discord.clear = false;
+        this.editLinks.issues.val = ''
+        this.editLinks.source.val = ''
+        this.editLinks.wiki.val = ''
+        this.editLinks.discord.val = ''
+        this.editLinks.issues.clear = false
+        this.editLinks.source.clear = false
+        this.editLinks.wiki.clear = false
+        this.editLinks.discord.clear = false
       } catch (e) {
         this.$notify({
-          group: "main",
-          title: "An error occurred",
+          group: 'main',
+          title: 'An error occurred',
           text: e,
-          type: "error",
-        });
+          type: 'error',
+        })
       }
     },
   },
-});
+})
 </script>
 <style lang="scss" scoped>
 .grid-table {
@@ -555,7 +555,7 @@ export default defineNuxtComponent({
 
     .grid-table__row {
       display: grid;
-      grid-template: "checkbox icon name type settings" "checkbox icon id status settings";
+      grid-template: 'checkbox icon name type settings' 'checkbox icon id status settings';
       grid-template-columns:
         min-content min-content minmax(min-content, 2fr)
         minmax(min-content, 1fr) min-content;
@@ -592,7 +592,7 @@ export default defineNuxtComponent({
     }
 
     .grid-table__header {
-      grid-template: "checkbox settings";
+      grid-template: 'checkbox settings';
       grid-template-columns: min-content minmax(min-content, 1fr);
 
       :nth-child(2),
@@ -608,7 +608,7 @@ export default defineNuxtComponent({
   @media screen and (max-width: 560px) {
     .grid-table__row {
       display: grid;
-      grid-template: "checkbox icon name settings" "checkbox icon id settings" "checkbox icon type settings" "checkbox icon status settings";
+      grid-template: 'checkbox icon name settings' 'checkbox icon id settings' 'checkbox icon type settings' 'checkbox icon status settings';
       grid-template-columns: min-content min-content minmax(min-content, 1fr) min-content;
 
       :nth-child(5) {
@@ -617,7 +617,7 @@ export default defineNuxtComponent({
     }
 
     .grid-table__header {
-      grid-template: "checkbox settings";
+      grid-template: 'checkbox settings';
       grid-template-columns: min-content minmax(min-content, 1fr);
     }
   }
@@ -656,7 +656,7 @@ export default defineNuxtComponent({
   width: fit-content;
 }
 
-.label-button[data-active="true"] {
+.label-button[data-active='true'] {
   --background-color: var(--color-red);
   --text-color: var(--color-brand-inverted);
 }

@@ -266,25 +266,27 @@
 </template>
 
 <script setup lang="ts">
-import { useInfiniteScroll } from "@vueuse/core";
 import {
-  UnknownIcon,
-  XIcon,
-  SpinnerIcon,
-  PackageOpenIcon,
   CheckIcon,
-  UploadIcon,
   FolderOpenIcon,
+  PackageOpenIcon,
+  SpinnerIcon,
+  UnknownIcon,
+  UploadIcon,
+  XIcon,
 } from "@modrinth/assets";
-import { computed } from "vue";
 import { ButtonStyled, ProgressBar } from "@modrinth/ui";
+import type { DirectoryItem, DirectoryResponse,FilesystemOp, FSQueuedOp } from "@modrinth/utils";
 import { formatBytes, ModrinthServersFetchError } from "@modrinth/utils";
-import type { FilesystemOp, FSQueuedOp, DirectoryItem, DirectoryResponse } from "@modrinth/utils";
-import { handleError, ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { useInfiniteScroll } from "@vueuse/core";
+import { computed } from "vue";
+
+import FilesUploadConflictModal from "~/components/ui/servers/FilesUploadConflictModal.vue";
 import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
 import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
 import FilesUploadZipUrlModal from "~/components/ui/servers/FilesUploadZipUrlModal.vue";
-import FilesUploadConflictModal from "~/components/ui/servers/FilesUploadConflictModal.vue";
+import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { handleError } from "~/composables/servers/modrinth-servers.ts";
 
 const flags = useFeatureFlags();
 const baseId = useId();

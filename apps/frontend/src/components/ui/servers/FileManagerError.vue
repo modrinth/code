@@ -25,16 +25,15 @@
 </template>
 
 <script setup lang="ts">
-import { FileIcon, HomeIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+import { FileIcon, HomeIcon } from '@modrinth/assets'
+import { ButtonStyled } from '@modrinth/ui'
 
 defineProps<{
-  title: string;
-  message: string;
-}>();
+  title: string
+  message: string
+}>()
 
 defineEmits<{
-  (e: "refetch"): void;
-  (e: "home"): void;
-}>();
+  (e: 'refetch' | 'home'): void
+}>()
 </script>

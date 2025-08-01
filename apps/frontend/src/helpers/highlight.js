@@ -1,19 +1,19 @@
-import hljs from "highlight.js/lib/core";
-// Scripting
-import javascript from "highlight.js/lib/languages/javascript";
-import lua from "highlight.js/lib/languages/lua";
-import python from "highlight.js/lib/languages/python";
-// Coding
-import groovy from "highlight.js/lib/languages/groovy";
-import java from "highlight.js/lib/languages/java";
-import kotlin from "highlight.js/lib/languages/kotlin";
-import scala from "highlight.js/lib/languages/scala";
 // Configs
 import { configuredXss, md } from "@modrinth/utils";
+import hljs from "highlight.js/lib/core";
 import gradle from "highlight.js/lib/languages/gradle";
+// Coding
+import groovy from "highlight.js/lib/languages/groovy";
 import ini from "highlight.js/lib/languages/ini";
+import java from "highlight.js/lib/languages/java";
+// Scripting
+import javascript from "highlight.js/lib/languages/javascript";
 import json from "highlight.js/lib/languages/json";
+import kotlin from "highlight.js/lib/languages/kotlin";
+import lua from "highlight.js/lib/languages/lua";
 import properties from "highlight.js/lib/languages/properties";
+import python from "highlight.js/lib/languages/python";
+import scala from "highlight.js/lib/languages/scala";
 import xml from "highlight.js/lib/languages/xml";
 import yaml from "highlight.js/lib/languages/yaml";
 

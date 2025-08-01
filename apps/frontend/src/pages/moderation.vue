@@ -17,8 +17,9 @@
 </template>
 
 <script setup lang="ts">
-import { defineMessages, useVIntl } from "@vintl/vintl";
 import { Chips } from "@modrinth/ui";
+import { defineMessages, useVIntl } from "@vintl/vintl";
+
 import NavTabs from "@/components/ui/NavTabs.vue";
 
 definePageMeta({

@@ -104,23 +104,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
 import {
-  PlayIcon,
-  UpdatedIcon,
-  StopCircleIcon,
-  SlashIcon,
-  XIcon,
   CheckIcon,
-  ServerIcon,
+  ClipboardCopyIcon,
   InfoIcon,
   MoreVerticalIcon,
-  ClipboardCopyIcon,
+  PlayIcon,
+  ServerIcon,
+  SlashIcon,
+  StopCircleIcon,
+  UpdatedIcon,
+  XIcon,
 } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
-import { useRouter } from "vue-router";
-import { useStorage } from "@vueuse/core";
 import type { PowerAction as ServerPowerAction, ServerState } from "@modrinth/utils";
+import { useStorage } from "@vueuse/core";
+import { computed,ref } from "vue";
+import { useRouter } from "vue-router";
 
 const flags = useFeatureFlags();
 

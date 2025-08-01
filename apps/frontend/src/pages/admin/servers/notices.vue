@@ -258,25 +258,26 @@
   </div>
 </template>
 <script setup lang="ts">
+import { EditIcon, PlusIcon, SaveIcon, SettingsIcon, TrashIcon, XIcon } from "@modrinth/assets";
 import {
-  CopyCode,
-  TagItem,
   ButtonStyled,
-  ServerNotice,
   commonMessages,
+  CopyCode,
   NewModal,
+  ServerNotice,
+  TagItem,
   TeleportDropdownMenu,
   Toggle,
   useRelativeTime,
 } from "@modrinth/ui";
-import { SettingsIcon, PlusIcon, SaveIcon, TrashIcon, EditIcon, XIcon } from "@modrinth/assets";
-import dayjs from "dayjs";
-import { useVIntl } from "@vintl/vintl";
-import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
-import { computed } from "vue";
 import { NOTICE_LEVELS } from "@modrinth/ui/src/utils/notices.ts";
-import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
+import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
+import { useVIntl } from "@vintl/vintl";
+import dayjs from "dayjs";
+import { computed } from "vue";
+
 import AssignNoticeModal from "~/components/ui/servers/notice/AssignNoticeModal.vue";
+import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 
 const { formatMessage } = useVIntl();
 const formatRelativeTime = useRelativeTime();

@@ -108,11 +108,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from "vue";
-import Fuse from "fuse.js";
 import { HammerIcon, PlusIcon, SearchIcon } from "@modrinth/assets";
 import { ButtonStyled, CopyCode } from "@modrinth/ui";
-import type { Server, ModrinthServersFetchError } from "@modrinth/utils";
+import type { ModrinthServersFetchError,Server } from "@modrinth/utils";
+import Fuse from "fuse.js";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+
 import { reloadNuxtApp } from "#app";
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 

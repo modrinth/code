@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from "vue";
+import { computed, onMounted,ref, watch } from "vue";
 
 const route = useNativeRoute();
 

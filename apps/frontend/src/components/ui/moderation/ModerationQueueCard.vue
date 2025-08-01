@@ -75,10 +75,10 @@
             aria-hidden="true"
           />
           <span class="hidden sm:inline">{{
-            props.queueEntry.project.project_types.map(formatProjectType).join(", ")
+            props.queueEntry.project.project_types.map(formatProjectType).join(', ')
           }}</span>
           <span class="sm:hidden">{{
-            formatProjectType(props.queueEntry.project.project_type ?? "project").substring(0, 3)
+            formatProjectType(props.queueEntry.project.project_type ?? 'project').substring(0, 3)
           }}</span>
         </span>
 
@@ -105,7 +105,7 @@
         >
           <span class="hidden sm:inline">{{ getSubmittedTime(queueEntry) }}</span>
           <span class="sm:hidden">{{
-            getSubmittedTime(queueEntry).replace("Submitted ", "")
+            getSubmittedTime(queueEntry).replace('Submitted ', '')
           }}</span>
         </span>
       </div>
@@ -127,39 +127,35 @@
 </template>
 
 <script setup lang="ts">
-import dayjs from "dayjs";
 import {
-  EyeIcon,
-  PaintbrushIcon,
-  ScaleIcon,
   BoxIcon,
-  GlassesIcon,
-  PlugIcon,
-  PackageOpenIcon,
   BracesIcon,
-} from "@modrinth/assets";
-import { useRelativeTime, Avatar, ButtonStyled, Badge } from "@modrinth/ui";
-import {
-  formatProjectType,
-  type Organization,
-  type Project,
-  type TeamMember,
-} from "@modrinth/utils";
-import { computed } from "vue";
-import { useModerationStore } from "~/store/moderation.ts";
-import type { ModerationProject } from "~/helpers/moderation";
+  EyeIcon,
+  GlassesIcon,
+  PackageOpenIcon,
+  PaintbrushIcon,
+  PlugIcon,
+  ScaleIcon,
+} from '@modrinth/assets'
+import { Avatar, Badge, ButtonStyled, useRelativeTime } from '@modrinth/ui'
+import { formatProjectType } from '@modrinth/utils'
+import dayjs from 'dayjs'
+import { computed } from 'vue'
 
-const formatRelativeTime = useRelativeTime();
-const moderationStore = useModerationStore();
+import type { ModerationProject } from '~/helpers/moderation'
+import { useModerationStore } from '~/store/moderation.ts'
+
+const formatRelativeTime = useRelativeTime()
+const moderationStore = useModerationStore()
 
 const props = defineProps<{
-  queueEntry: ModerationProject;
-}>();
+  queueEntry: ModerationProject
+}>()
 
 function getDaysQueued(date: Date): number {
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-  return Math.floor(diff / (1000 * 60 * 60 * 24));
+  const now = new Date()
+  const diff = now.getTime() - date.getTime()
+  return Math.floor(diff / (1000 * 60 * 60 * 24))
 }
 
 const queuedDate = computed(() => {
@@ -167,38 +163,38 @@ const queuedDate = computed(() => {
     props.queueEntry.project.queued ||
       props.queueEntry.project.created ||
       props.queueEntry.project.updated,
-  );
-});
+  )
+})
 
 const daysInQueue = computed(() => {
-  return getDaysQueued(queuedDate.value.toDate());
-});
+  return getDaysQueued(queuedDate.value.toDate())
+})
 
 function openProjectForReview() {
-  moderationStore.setSingleProject(props.queueEntry.project.id);
+  moderationStore.setSingleProject(props.queueEntry.project.id)
   navigateTo({
-    name: "type-id",
+    name: 'type-id',
     params: {
-      type: "project",
+      type: 'project',
       id: props.queueEntry.project.id,
     },
     state: {
       showChecklist: true,
     },
-  });
+  })
 }
 
-function getSubmittedTime(project: any): string {
+function getSubmittedTime(): string {
   const date =
     props.queueEntry.project.queued ||
     props.queueEntry.project.created ||
-    props.queueEntry.project.updated;
-  if (!date) return "Unknown";
+    props.queueEntry.project.updated
+  if (!date) return 'Unknown'
 
   try {
-    return `Submitted ${formatRelativeTime(dayjs(date).toISOString())}`;
+    return `Submitted ${formatRelativeTime(dayjs(date).toISOString())}`
   } catch {
-    return "Unknown";
+    return 'Unknown'
   }
 }
 </script>

@@ -110,7 +110,7 @@
 
 <script setup>
 import { BoxIcon, SettingsIcon, TransferIcon, XIcon } from "@modrinth/assets";
-import { Button, Modal, Checkbox, CopyCode, Avatar } from "@modrinth/ui";
+import { Avatar,Button, Checkbox, CopyCode, Modal } from "@modrinth/ui";
 import { formatProjectType } from "@modrinth/utils";
 
 const modalOpen = ref(null);

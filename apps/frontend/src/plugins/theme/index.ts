@@ -1,8 +1,9 @@
 import { ref } from "vue";
-import { isDarkTheme } from "./themes.ts";
+
 import { useNativeTheme } from "./native-theme.ts";
 import { usePreferredThemes } from "./preferred-theme.ts";
 import { useThemeSettings } from "./theme-settings.ts";
+import { isDarkTheme } from "./themes.ts";
 
 export * from "./themes.ts";
 

@@ -74,76 +74,77 @@
   </div>
 </template>
 <script setup>
-import { ButtonStyled } from "@modrinth/ui";
 import {
-  XCircleIcon,
   CheckCircleIcon,
   CheckIcon,
+  CopyIcon,
   InfoIcon,
   IssuesIcon,
+  XCircleIcon,
   XIcon,
-  CopyIcon,
-} from "@modrinth/assets";
-const notifications = useNotifications();
-const { isVisible: moveNotificationsRight } = useNotificationRightwards();
+} from '@modrinth/assets'
+import { ButtonStyled } from '@modrinth/ui'
+const notifications = useNotifications()
+const { isVisible: moveNotificationsRight } = useNotificationRightwards()
 
-const isIntercomPresent = ref(false);
+const isIntercomPresent = ref(false)
 
 function stopTimer(notif) {
-  clearTimeout(notif.timer);
+  clearTimeout(notif.timer)
 }
 
-const copied = ref({});
+const copied = ref({})
 
 const createNotifText = (notif) => {
-  let text = "";
+  let text = ''
   if (notif.title) {
-    text += notif.title;
+    text += notif.title
   }
   if (notif.text) {
     if (text.length > 0) {
-      text += "\n";
+      text += '\n'
     }
-    text += notif.text;
+    text += notif.text
   }
   if (notif.errorCode) {
     if (text.length > 0) {
-      text += "\n";
+      text += '\n'
     }
-    text += notif.errorCode;
+    text += notif.errorCode
   }
-  return text;
-};
+  return text
+}
 
 function checkIntercomPresence() {
-  isIntercomPresent.value = !!document.querySelector(".intercom-lightweight-app");
+  isIntercomPresent.value = !!document.querySelector('.intercom-lightweight-app')
 }
 
 onMounted(() => {
-  checkIntercomPresence();
+  checkIntercomPresence()
 
   const observer = new MutationObserver(() => {
-    checkIntercomPresence();
-  });
+    checkIntercomPresence()
+  })
 
   observer.observe(document.body, {
     childList: true,
     subtree: true,
-  });
+  })
 
   onBeforeUnmount(() => {
-    observer.disconnect();
-  });
-});
+    observer.disconnect()
+  })
+})
 
 function copyToClipboard(notif) {
-  const text = createNotifText(notif);
+  const text = createNotifText(notif)
 
-  copied.value[text] = true;
-  navigator.clipboard.writeText(text);
+  copied.value[text] = true
+  navigator.clipboard.writeText(text)
   setTimeout(() => {
-    delete copied.value[text];
-  }, 2000);
+    const { [text]: _, ...newCopied } = copied.value
+    copied.value = newCopied
+  }, 2000)
 }
 </script>
 <style lang="scss" scoped>

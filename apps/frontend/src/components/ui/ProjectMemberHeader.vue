@@ -109,16 +109,17 @@
 
 <script setup>
 import {
-  ChevronRightIcon,
-  CheckIcon,
-  XIcon,
   AsteriskIcon,
-  LightBulbIcon,
-  SendIcon,
-  ScaleIcon,
+  CheckIcon,
+  ChevronRightIcon,
   DropdownIcon,
+  LightBulbIcon,
+  ScaleIcon,
+  SendIcon,
+  XIcon,
 } from "@modrinth/assets";
 import { formatProjectType } from "@modrinth/utils";
+
 import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
 
 const props = defineProps({
@@ -244,7 +245,7 @@ const nags = computed(() => [
     },
   },
   {
-    condition: props.project.gallery.length === 0 || !featuredGalleryImage,
+    condition: props.project.gallery.length === 0 || !featuredGalleryImage.value,
     title: "Feature a gallery image",
     id: "feature-gallery-image",
     description: "Featured gallery images may be the first impression of many users.",

@@ -96,15 +96,16 @@
 
 <script setup>
 import {
-  MoreHorizontalIcon,
-  TrashIcon,
-  MicrophoneIcon,
   LockIcon,
+  MicrophoneIcon,
   ModrinthIcon,
+  MoreHorizontalIcon,
   ScaleIcon,
+  TrashIcon,
 } from "@modrinth/assets";
 import { AutoLink, Avatar, Badge, OverflowMenu, useRelativeTime } from "@modrinth/ui";
 import { renderString } from "@modrinth/utils";
+
 import { isStaff } from "~/helpers/users.js";
 
 const props = defineProps({

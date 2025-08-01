@@ -67,10 +67,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, shallowRef } from "vue";
-import { FolderOpenIcon, CpuIcon, DatabaseIcon, IssuesIcon } from "@modrinth/assets";
-import { useStorage } from "@vueuse/core";
+import { CpuIcon, DatabaseIcon, FolderOpenIcon, IssuesIcon } from "@modrinth/assets";
 import type { Stats } from "@modrinth/utils";
+import { useStorage } from "@vueuse/core";
+import { computed, ref, shallowRef } from "vue";
 
 const flags = useFeatureFlags();
 const route = useNativeRoute();

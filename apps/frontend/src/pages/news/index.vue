@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ButtonStyled, NewsArticleCard } from "@modrinth/ui";
-import { ChevronRightIcon, RssIcon, GitGraphIcon } from "@modrinth/assets";
-import dayjs from "dayjs";
+import { ChevronRightIcon, GitGraphIcon,RssIcon } from "@modrinth/assets";
 import { articles as rawArticles } from "@modrinth/blog";
+import { ButtonStyled, NewsArticleCard } from "@modrinth/ui";
+import dayjs from "dayjs";
 import { computed, ref } from "vue";
+
 import NewsletterButton from "~/components/ui/NewsletterButton.vue";
 
 const articles = ref(

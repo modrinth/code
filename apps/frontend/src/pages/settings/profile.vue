@@ -90,8 +90,8 @@
 </template>
 
 <script setup>
-import { UserIcon, SaveIcon, UploadIcon, UndoIcon, XIcon, TrashIcon } from "@modrinth/assets";
-import { Avatar, FileInput, Button, commonMessages } from "@modrinth/ui";
+import { SaveIcon, TrashIcon,UndoIcon, UploadIcon, UserIcon, XIcon } from "@modrinth/assets";
+import { Avatar, Button, commonMessages,FileInput } from "@modrinth/ui";
 
 useHead({
   title: "Profile settings - Modrinth",

@@ -118,22 +118,22 @@
 </template>
 
 <script setup lang="ts">
-import dayjs from "dayjs";
 import {
-  Avatar,
-  useRelativeTime,
-  OverflowMenu,
-  type OverflowMenuOption,
-  ButtonStyled,
-} from "@modrinth/ui";
-import {
-  EllipsisVerticalIcon,
-  OrganizationIcon,
-  EyeIcon,
   ClipboardCopyIcon,
+  EllipsisVerticalIcon,
+  EyeIcon,
   LinkIcon,
+  OrganizationIcon,
 } from "@modrinth/assets";
 import type { ExtendedDelphiReport } from "@modrinth/moderation";
+import {
+  Avatar,
+  ButtonStyled,
+  OverflowMenu,
+  type OverflowMenuOption,
+  useRelativeTime,
+} from "@modrinth/ui";
+import dayjs from "dayjs";
 
 const props = defineProps<{
   report: ExtendedDelphiReport;

@@ -143,10 +143,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, inject } from "vue";
-import { EyeIcon, SearchIcon, IssuesIcon } from "@modrinth/assets";
+import { EyeIcon, IssuesIcon,SearchIcon } from "@modrinth/assets";
 import Fuse from "fuse.js";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { computed, inject,ref, watch } from "vue";
+
+import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
   server: ModrinthServer;

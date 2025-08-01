@@ -56,10 +56,11 @@
 </template>
 
 <script setup lang="ts">
+import { SaveIcon,XIcon } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
-import { XIcon, SaveIcon } from "@modrinth/assets";
-import { ref, computed } from "vue";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { computed,ref } from "vue";
+
+import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
   server: ModrinthServer;
