@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts" generic="T">
-import { ref, computed, onMounted } from "vue";
+import { computed, onMounted,ref } from "vue";
 
 const modelValue = defineModel<T>({ required: true });
 

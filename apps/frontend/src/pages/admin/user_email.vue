@@ -32,8 +32,8 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ButtonStyled } from "@modrinth/ui";
 import { MailIcon } from "@modrinth/assets";
+import { ButtonStyled } from "@modrinth/ui";
 
 const userEmail = ref("");
 

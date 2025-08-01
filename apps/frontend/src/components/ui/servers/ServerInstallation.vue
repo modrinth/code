@@ -158,31 +158,32 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, NewProjectCard } from "@modrinth/ui";
-import { TransferIcon, UploadIcon, InfoIcon, CompassIcon, SettingsIcon } from "@modrinth/assets";
-import type { Loaders } from "@modrinth/utils";
-import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { CompassIcon, InfoIcon, SettingsIcon, TransferIcon, UploadIcon } from '@modrinth/assets'
+import { ButtonStyled, NewProjectCard } from '@modrinth/ui'
+import type { Loaders } from '@modrinth/utils'
 
-const { formatMessage } = useVIntl();
+import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
+import type { BackupInProgressReason } from '~/pages/servers/manage/[id].vue'
+
+const { formatMessage } = useVIntl()
 
 const props = defineProps<{
-  server: ModrinthServer;
-  ignoreCurrentInstallation?: boolean;
-  backupInProgress?: BackupInProgressReason;
-}>();
+  server: ModrinthServer
+  ignoreCurrentInstallation?: boolean
+  backupInProgress?: BackupInProgressReason
+}>()
 
 const emit = defineEmits<{
-  reinstall: [any?];
-}>();
+  reinstall: [any?]
+}>()
 
-const isInstalling = computed(() => props.server.general?.status === "installing");
+const isInstalling = computed(() => props.server.general?.status === 'installing')
 
-const versionSelectModal = ref();
-const mrpackModal = ref();
-const modpackVersionModal = ref();
+const versionSelectModal = ref()
+const mrpackModal = ref()
+const modpackVersionModal = ref()
 
-const data = computed(() => props.server.general);
+const data = computed(() => props.server.general)
 
 const {
   data: versions,
@@ -191,17 +192,17 @@ const {
 } = await useAsyncData(
   `content-loader-versions-${data.value?.upstream?.project_id}`,
   async () => {
-    if (!data.value?.upstream?.project_id) return [];
+    if (!data.value?.upstream?.project_id) return []
     try {
-      const result = await useBaseFetch(`project/${data.value.upstream.project_id}/version`);
-      return result || [];
+      const result = await useBaseFetch(`project/${data.value.upstream.project_id}/version`)
+      return result || []
     } catch (e) {
-      console.error("couldnt fetch all versions:", e);
-      throw new Error("Failed to load modpack versions.");
+      console.error('couldnt fetch all versions:', e)
+      throw new Error('Failed to load modpack versions.')
     }
   },
   { default: () => [] },
-);
+)
 
 const {
   data: currentVersion,
@@ -210,17 +211,17 @@ const {
 } = await useAsyncData(
   `content-loader-version-${data.value?.upstream?.version_id}`,
   async () => {
-    if (!data.value?.upstream?.version_id) return null;
+    if (!data.value?.upstream?.version_id) return null
     try {
-      const result = await useBaseFetch(`version/${data.value.upstream.version_id}`);
-      return result || null;
+      const result = await useBaseFetch(`version/${data.value.upstream.version_id}`)
+      return result || null
     } catch (e) {
-      console.error("couldnt fetch version:", e);
-      throw new Error("Failed to load modpack version.");
+      console.error('couldnt fetch version:', e)
+      throw new Error('Failed to load modpack version.')
     }
   },
   { default: () => null },
-);
+)
 
 const projectCardData = computed(() => ({
   icon_url: data.value?.project?.icon_url,
@@ -228,43 +229,43 @@ const projectCardData = computed(() => ({
   description: data.value?.project?.description,
   downloads: data.value?.project?.downloads,
   follows: data.value?.project?.followers,
-  // @ts-ignore
+  // @ts-expect-error
   date_modified: currentVersion.value?.date_published || data.value?.project?.updated,
-}));
+}))
 
 const selectLoader = (loader: string) => {
-  versionSelectModal.value?.show(loader as Loaders);
-};
+  versionSelectModal.value?.show(loader as Loaders)
+}
 
 const refreshData = async () => {
-  await Promise.all([refreshVersions(), refreshCurrentVersion()]);
-};
+  await Promise.all([refreshVersions(), refreshCurrentVersion()])
+}
 
 const updateAvailable = computed(() => {
   // so sorry
-  // @ts-ignore
+  // @ts-expect-error
   if (!data.value?.upstream || !versions.value?.length || !currentVersion.value) {
-    return false;
+    return false
   }
 
-  // @ts-ignore
-  const latestVersion = versions.value[0];
-  // @ts-ignore
-  return latestVersion.id !== currentVersion.value.id;
-});
+  // @ts-expect-error
+  const latestVersion = versions.value[0]
+  // @ts-expect-error
+  return latestVersion.id !== currentVersion.value.id
+})
 
 watch(
   () => props.server.general?.status,
   async (newStatus, oldStatus) => {
-    if (oldStatus === "installing" && newStatus === "available") {
+    if (oldStatus === 'installing' && newStatus === 'available') {
       await Promise.all([
         refreshVersions(),
         refreshCurrentVersion(),
-        props.server.refresh(["general"]),
-      ]);
+        props.server.refresh(['general']),
+      ])
     }
   },
-);
+)
 </script>
 
 <style scoped>

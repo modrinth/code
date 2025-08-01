@@ -304,17 +304,15 @@
 </template>
 
 <script setup lang="ts">
+import { DownloadIcon,UpdatedIcon } from "@modrinth/assets";
 import { Button, Card, DropdownSelect } from "@modrinth/ui";
-import { formatMoney, formatNumber, formatCategoryHeader } from "@modrinth/utils";
-import { UpdatedIcon, DownloadIcon } from "@modrinth/assets";
+import { formatCategoryHeader,formatMoney, formatNumber } from "@modrinth/utils";
 import dayjs from "dayjs";
 import { computed } from "vue";
 
-import { analyticsSetToCSVString, intToRgba } from "~/utils/analytics.js";
-
-import { UiChartsCompactChart as CompactChart, UiChartsChart as Chart } from "#components";
-
+import { UiChartsChart as Chart,UiChartsCompactChart as CompactChart } from "#components";
 import PaletteIcon from "~/assets/icons/palette.svg?component";
+import { analyticsSetToCSVString, intToRgba } from "~/utils/analytics.js";
 
 const router = useNativeRouter();
 const theme = useTheme();

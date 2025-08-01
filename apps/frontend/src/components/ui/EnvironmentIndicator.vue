@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-import { InfoIcon, ClientIcon, GlobeIcon, ServerIcon } from "@modrinth/assets";
+import { ClientIcon, GlobeIcon, InfoIcon, ServerIcon } from "@modrinth/assets";
 
 defineProps({
   type: {

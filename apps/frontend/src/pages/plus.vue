@@ -87,14 +87,15 @@
 </template>
 <script setup>
 import {
-  ModrinthPlusIcon,
   HeartIcon,
+  ModrinthPlusIcon,
+  SettingsIcon,
   SparklesIcon,
   StarIcon,
-  SettingsIcon,
 } from "@modrinth/assets";
 import { PurchaseModal } from "@modrinth/ui";
 import { calculateSavings, formatPrice, getCurrency } from "@modrinth/utils";
+
 import { products } from "~/generated/state.json";
 
 const title = "Subscribe to Modrinth Plus!";

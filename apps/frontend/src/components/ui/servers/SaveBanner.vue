@@ -31,7 +31,8 @@
 
 <script setup lang="ts">
 import { ButtonStyled } from "@modrinth/ui";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+
+import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<{
   isUpdating: boolean;

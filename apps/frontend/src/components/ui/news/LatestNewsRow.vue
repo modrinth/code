@@ -28,7 +28,7 @@
 import { NewspaperIcon } from "@modrinth/assets";
 import { articles as rawArticles } from "@modrinth/blog";
 import { ButtonStyled, NewsArticleCard } from "@modrinth/ui";
-import { ref, computed } from "vue";
+import { computed,ref } from "vue";
 
 const articles = ref(
   rawArticles

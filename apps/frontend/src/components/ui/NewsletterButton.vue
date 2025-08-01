@@ -1,42 +1,44 @@
 <script setup lang="ts">
-import { ButtonStyled } from "@modrinth/ui";
-import { MailIcon, CheckIcon } from "@modrinth/assets";
-import { ref } from "vue";
-import { useBaseFetch } from "~/composables/fetch.js";
+import { CheckIcon, MailIcon } from '@modrinth/assets'
+import { ButtonStyled } from '@modrinth/ui'
+import { ref } from 'vue'
 
-const auth = await useAuth();
-const showSubscriptionConfirmation = ref(false);
+import { useBaseFetch } from '~/composables/fetch.js'
+
+const auth = await useAuth()
+const showSubscriptionConfirmation = ref(false)
 const showSubscribeButton = useAsyncData(
   async () => {
     if (auth.value?.user) {
       try {
-        const { subscribed } = await useBaseFetch("auth/email/subscribe", {
-          method: "GET",
-        });
-        return !subscribed;
+        const { subscribed } = await useBaseFetch('auth/email/subscribe', {
+          method: 'GET',
+        })
+        return !subscribed
       } catch {
-        return true;
+        return true
       }
     } else {
-      return false;
+      return false
     }
   },
   { watch: [auth], server: false },
-);
+)
 
 async function subscribe() {
   try {
-    await useBaseFetch("auth/email/subscribe", {
-      method: "POST",
-    });
-    showSubscriptionConfirmation.value = true;
+    await useBaseFetch('auth/email/subscribe', {
+      method: 'POST',
+    })
+    showSubscriptionConfirmation.value = true
   } catch {
+    // TODO: Use addNotification when DI pr is merged.
   } finally {
     setTimeout(() => {
-      showSubscriptionConfirmation.value = false;
-      showSubscribeButton.status.value = "success";
-      showSubscribeButton.data.value = false;
-    }, 2500);
+      showSubscriptionConfirmation.value = false
+      showSubscribeButton.status.value = 'success'
+      showSubscribeButton.data.value = false
+    }, 2500)
   }
 }
 </script>

@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { Accordion, ButtonStyled, NewModal, ServerNotice, TagItem } from "@modrinth/ui";
 import { PlusIcon, XIcon } from "@modrinth/assets";
+import { Accordion, ButtonStyled, NewModal, ServerNotice, TagItem } from "@modrinth/ui";
 import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
 import { ref } from "vue";
+
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 
 const app = useNuxtApp() as unknown as { $notify: any };

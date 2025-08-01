@@ -1,4 +1,5 @@
-import type { Backup, AutoBackupSettings } from "@modrinth/utils";
+import type { AutoBackupSettings,Backup } from "@modrinth/utils";
+
 import { useServersFetch } from "../servers-fetch.ts";
 import { ServerModule } from "./base.ts";
 

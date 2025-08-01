@@ -113,8 +113,9 @@
 </template>
 
 <script>
-import { StarIcon, SaveIcon } from "@modrinth/assets";
+import { SaveIcon,StarIcon } from "@modrinth/assets";
 import { formatCategory, formatCategoryHeader, formatProjectType } from "@modrinth/utils";
+
 import Checkbox from "~/components/ui/Checkbox.vue";
 
 export default defineNuxtComponent({

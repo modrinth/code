@@ -162,9 +162,9 @@
 </template>
 
 <script lang="ts" setup>
+import { formatDate, formatMoney } from "@modrinth/utils";
 import dayjs from "dayjs";
 import { computed, ref } from "vue";
-import { formatDate, formatMoney } from "@modrinth/utils";
 
 const description =
   "Information about the Rewards Program of Modrinth, an open source modding platform focused on Minecraft.";

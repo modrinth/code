@@ -7,9 +7,9 @@
 </template>
 
 <script setup lang="ts">
-import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
 import ServerInstallation from "~/components/ui/servers/ServerInstallation.vue";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
 
 const props = defineProps<{
   server: ModrinthServer;

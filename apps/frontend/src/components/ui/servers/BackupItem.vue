@@ -1,23 +1,23 @@
 <script setup lang="ts">
-import dayjs from "dayjs";
 import {
-  MoreVerticalIcon,
-  HistoryIcon,
-  DownloadIcon,
-  SpinnerIcon,
-  EditIcon,
-  LockIcon,
-  TrashIcon,
-  FolderArchiveIcon,
   BotIcon,
-  XIcon,
+  DownloadIcon,
+  EditIcon,
+  FolderArchiveIcon,
+  HistoryIcon,
+  LockIcon,
   LockOpenIcon,
+  MoreVerticalIcon,
   RotateCounterClockwiseIcon,
+  SpinnerIcon,
+  TrashIcon,
+  XIcon,
 } from "@modrinth/assets";
 import { ButtonStyled, commonMessages, OverflowMenu, ProgressBar } from "@modrinth/ui";
-import { defineMessages, useVIntl } from "@vintl/vintl";
-import { ref, computed } from "vue";
 import type { Backup } from "@modrinth/utils";
+import { defineMessages, useVIntl } from "@vintl/vintl";
+import dayjs from "dayjs";
+import { computed,ref } from "vue";
 
 const flags = useFeatureFlags();
 const { formatMessage } = useVIntl();

@@ -305,35 +305,36 @@
 </template>
 <script setup>
 import {
-  Pagination,
-  Checkbox,
-  Avatar,
-  SearchSidebarFilter,
-  useSearch,
-  DropdownSelect,
-  Button,
-  ButtonStyled,
-  NewProjectCard,
-  SearchFilterControl,
-} from "@modrinth/ui";
-import {
   CheckIcon,
   DownloadIcon,
-  GameIcon,
-  LeftArrowIcon,
-  XIcon,
-  SearchIcon,
   FilterIcon,
+  GameIcon,
   GridIcon,
-  ListIcon,
   ImageIcon,
+  LeftArrowIcon,
+  ListIcon,
+  SearchIcon,
+  XIcon,
 } from "@modrinth/assets";
+import {
+  Avatar,
+  Button,
+  ButtonStyled,
+  Checkbox,
+  DropdownSelect,
+  NewProjectCard,
+  Pagination,
+  SearchFilterControl,
+  SearchSidebarFilter,
+  useSearch,
+} from "@modrinth/ui";
 import { computed } from "vue";
-import { useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
-import ProjectCard from "~/components/ui/ProjectCard.vue";
+
 import LogoAnimated from "~/components/brand/LogoAnimated.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import NavTabs from "~/components/ui/NavTabs.vue";
+import ProjectCard from "~/components/ui/ProjectCard.vue";
+import { useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
 
 const { formatMessage } = useVIntl();
 

@@ -229,17 +229,18 @@
 
 <script setup lang="ts">
 import {
-  DropdownIcon,
-  XIcon,
   CheckIcon,
-  LockOpenIcon,
-  GameIcon,
+  DropdownIcon,
   ExternalIcon,
+  GameIcon,
+  LockOpenIcon,
+  XIcon,
 } from "@modrinth/assets";
 import { Admonition, Avatar, ButtonStyled, CopyCode, NewModal } from "@modrinth/ui";
 import TagItem from "@modrinth/ui/src/components/base/TagItem.vue";
-import { ref, computed } from "vue";
 import { formatCategory, formatVersionsForDisplay, type Mod, type Version } from "@modrinth/utils";
+import { computed,ref } from "vue";
+
 import Accordion from "~/components/ui/Accordion.vue";
 import Checkbox from "~/components/ui/Checkbox.vue";
 import ContentVersionFilter, {

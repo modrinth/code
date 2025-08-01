@@ -1,7 +1,7 @@
 import { createConfigForNuxt } from '@nuxt/eslint-config/flat'
 import { fixupPluginRules } from '@eslint/compat'
 import turboPlugin from 'eslint-plugin-turbo'
-import simpleImportSort from "eslint-plugin-simple-import-sort";
+import simpleImportSort from 'eslint-plugin-simple-import-sort'
 
 export const configurationNuxtToAppend = [
   {
@@ -27,13 +27,18 @@ export const configurationNuxtToAppend = [
   },
   {
     plugins: {
-      "simple-import-sort": simpleImportSort,
+      'simple-import-sort': simpleImportSort,
     },
     rules: {
-      "simple-import-sort/imports": "error",
-      "simple-import-sort/exports": "error",
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
     },
   },
-];
+  {
+    rules: {
+      '@typescript-eslint/ban-ts-comment': 'off',
+    },
+  },
+]
 
-export default createConfigForNuxt().append(configurationNuxtToAppend);
+export default createConfigForNuxt().append(configurationNuxtToAppend)

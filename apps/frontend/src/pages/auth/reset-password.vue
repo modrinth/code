@@ -67,8 +67,9 @@
   </div>
 </template>
 <script setup>
-import { SendIcon, MailIcon, KeyIcon } from "@modrinth/assets";
+import { KeyIcon,MailIcon, SendIcon } from "@modrinth/assets";
 import { commonMessages } from "@modrinth/ui";
+
 import HCaptcha from "@/components/ui/HCaptcha.vue";
 
 const { formatMessage } = useVIntl();

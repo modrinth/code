@@ -19,9 +19,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from "vue";
 import Convert from "ansi-to-html";
 import DOMPurify from "dompurify";
+import { computed, onMounted, onUnmounted,ref } from "vue";
 
 const props = defineProps<{
   log: string;

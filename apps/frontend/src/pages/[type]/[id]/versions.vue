@@ -180,25 +180,26 @@
 
 <script setup>
 import {
-  ButtonStyled,
-  OverflowMenu,
-  FileInput,
-  ProjectPageVersions,
-  ConfirmModal,
-} from "@modrinth/ui";
-import {
-  DownloadIcon,
-  MoreVerticalIcon,
-  TrashIcon,
-  ExternalIcon,
-  LinkIcon,
-  ShareIcon,
-  EditIcon,
-  ReportIcon,
-  UploadIcon,
-  InfoIcon,
   ClipboardCopyIcon,
+  DownloadIcon,
+  EditIcon,
+  ExternalIcon,
+  InfoIcon,
+  LinkIcon,
+  MoreVerticalIcon,
+  ReportIcon,
+  ShareIcon,
+  TrashIcon,
+  UploadIcon,
 } from "@modrinth/assets";
+import {
+  ButtonStyled,
+  ConfirmModal,
+  FileInput,
+  OverflowMenu,
+  ProjectPageVersions,
+} from "@modrinth/ui";
+
 import DropArea from "~/components/ui/DropArea.vue";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
 

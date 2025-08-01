@@ -518,19 +518,20 @@
 </template>
 
 <script setup>
-import { Multiselect } from "vue-multiselect";
 import {
-  TransferIcon,
   CheckIcon,
-  UsersIcon,
-  DropdownIcon,
-  SaveIcon,
-  UserPlusIcon,
-  UserXIcon,
-  OrganizationIcon,
   CrownIcon,
+  DropdownIcon,
+  OrganizationIcon,
+  SaveIcon,
+  TransferIcon,
+  UserPlusIcon,
+  UsersIcon,
+  UserXIcon,
 } from "@modrinth/assets";
 import { Avatar, Badge, Card, Checkbox, ConfirmModal } from "@modrinth/ui";
+import { Multiselect } from "vue-multiselect";
+
 import { removeSelfFromTeam } from "~/helpers/teams.js";
 
 const props = defineProps({

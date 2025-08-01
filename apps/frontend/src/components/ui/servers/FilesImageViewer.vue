@@ -53,9 +53,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { ZoomInIcon, ZoomOutIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 
 const ZOOM_MIN = 0.1;
 const ZOOM_MAX = 5;

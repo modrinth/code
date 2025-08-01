@@ -891,6 +891,7 @@
 
 <script setup>
 import {
+  AlignLeftIcon as DescriptionIcon,
   BookmarkIcon,
   BookTextIcon,
   CalendarIcon,
@@ -898,14 +899,14 @@ import {
   CheckIcon,
   ClipboardCopyIcon,
   CopyrightIcon,
-  AlignLeftIcon as DescriptionIcon,
   DownloadIcon,
   ExternalIcon,
-  ImageIcon as GalleryIcon,
   GameIcon,
   HeartIcon,
+  ImageIcon as GalleryIcon,
   InfoIcon,
   LinkIcon as LinksIcon,
+  ModrinthIcon,
   MoreVerticalIcon,
   PlusIcon,
   ReportIcon,
@@ -917,7 +918,6 @@ import {
   UsersIcon,
   VersionIcon,
   WrenchIcon,
-  ModrinthIcon,
   XIcon,
 } from "@modrinth/assets";
 import {
@@ -935,15 +935,16 @@ import {
   ProjectSidebarLinks,
   ProjectStatusBadge,
   ScrollablePanel,
-  TagItem,
   ServersPromo,
+  TagItem,
   useRelativeTime,
 } from "@modrinth/ui";
 import VersionSummary from "@modrinth/ui/src/components/version/VersionSummary.vue";
 import { formatCategory, formatProjectType, renderString } from "@modrinth/utils";
+import { useLocalStorage } from "@vueuse/core";
 import dayjs from "dayjs";
 import { Tooltip } from "floating-vue";
-import { useLocalStorage } from "@vueuse/core";
+
 import { navigateTo } from "#app";
 import Accordion from "~/components/ui/Accordion.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
@@ -951,15 +952,15 @@ import AutomaticAccordion from "~/components/ui/AutomaticAccordion.vue";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import MessageBanner from "~/components/ui/MessageBanner.vue";
+import ModerationChecklist from "~/components/ui/moderation/checklist/ModerationChecklist.vue";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
 import NavTabs from "~/components/ui/NavTabs.vue";
 import ProjectMemberHeader from "~/components/ui/ProjectMemberHeader.vue";
-import { userCollectProject } from "~/composables/user.js";
-import { reportProject } from "~/utils/report-helpers.ts";
 import { saveFeatureFlags } from "~/composables/featureFlags.ts";
-import ModerationChecklist from "~/components/ui/moderation/checklist/ModerationChecklist.vue";
+import { userCollectProject } from "~/composables/user.js";
 import { useModerationStore } from "~/store/moderation.ts";
+import { reportProject } from "~/utils/report-helpers.ts";
 
 const data = useNuxtApp();
 const route = useNativeRoute();

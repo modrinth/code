@@ -1,5 +1,5 @@
-import JSZip from "jszip";
 import TOML from "@ltd/j-toml";
+import JSZip from "jszip";
 
 export const createDataPackVersion = async function (
   project,
@@ -141,12 +141,12 @@ export const createDataPackVersion = async function (
     primaryZipReader.file("quilt.mod.json", JSON.stringify(quiltModJson));
   }
   if (loaders.includes("forge")) {
-    primaryZipReader.file("META-INF/mods.toml", TOML.stringify(forgeModsToml, { newline: "\n" })); // eslint-disable-line import/no-named-as-default-member
+    primaryZipReader.file("META-INF/mods.toml", TOML.stringify(forgeModsToml, { newline: "\n" }));  
   }
   if (loaders.includes("neoforge")) {
     primaryZipReader.file(
       "META-INF/neoforge.mods.toml",
-      TOML.stringify(neoModsToml, { newline: "\n" }), // eslint-disable-line import/no-named-as-default-member
+      TOML.stringify(neoModsToml, { newline: "\n" }),  
     );
   }
 

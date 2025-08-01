@@ -49,38 +49,39 @@
 </template>
 
 <script setup>
-import { PlusIcon, UsersIcon } from "@modrinth/assets";
-import { Avatar } from "@modrinth/ui";
-import { useAuth } from "~/composables/auth.js";
-import OrganizationCreateModal from "~/components/ui/OrganizationCreateModal.vue";
+import { PlusIcon, UsersIcon } from '@modrinth/assets'
+import { Avatar } from '@modrinth/ui'
 
-const createOrgModal = ref(null);
+import OrganizationCreateModal from '~/components/ui/OrganizationCreateModal.vue'
+import { useAuth } from '~/composables/auth.js'
 
-const auth = await useAuth();
-const uid = computed(() => auth.value.user?.id || null);
+const createOrgModal = ref(null)
 
-const { data: orgs, error } = useAsyncData("organizations", () => {
-  if (!uid.value) return Promise.resolve(null);
+const auth = await useAuth()
+const uid = computed(() => auth.value.user?.id || null)
 
-  return useBaseFetch("user/" + uid.value + "/organizations", {
+const { data: orgs, error } = useAsyncData('organizations', () => {
+  if (!uid.value) return Promise.resolve(null)
+
+  return useBaseFetch('user/' + uid.value + '/organizations', {
     apiVersion: 3,
-  });
-});
+  })
+})
 
-const sortedOrgs = computed(() => orgs.value.sort((a, b) => a.name.localeCompare(b.name)));
+const sortedOrgs = computed(() => orgs.value.slice().sort((a, b) => a.name.localeCompare(b.name)))
 
-const onlyAcceptedMembers = (members) => members.filter((member) => member?.accepted);
+const onlyAcceptedMembers = (members) => members.filter((member) => member?.accepted)
 
 if (error.value) {
   createError({
     statusCode: 500,
-    message: "Failed to fetch organizations",
-  });
+    message: 'Failed to fetch organizations',
+  })
 }
 
 const openCreateOrgModal = (event) => {
-  createOrgModal.value?.show(event);
-};
+  createOrgModal.value?.show(event)
+}
 </script>
 
 <style scoped lang="scss">

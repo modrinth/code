@@ -631,45 +631,45 @@
 </template>
 <script>
 import {
-  Avatar,
-  Badge,
-  CopyCode,
-  Checkbox,
-  ButtonStyled,
-  ConfirmModal,
-  MarkdownEditor,
-} from "@modrinth/ui";
-import {
-  FileIcon,
-  TrashIcon,
-  EditIcon,
+  BoxIcon,
+  ChevronRightIcon,
   DownloadIcon,
-  StarIcon,
-  ReportIcon,
-  SaveIcon,
-  XIcon,
+  EditIcon,
+  FileIcon,
   HashIcon,
   PlusIcon,
-  TransferIcon,
-  UploadIcon,
-  BoxIcon,
+  ReportIcon,
   RightArrowIcon,
-  ChevronRightIcon,
+  SaveIcon,
+  StarIcon,
+  TransferIcon,
+  TrashIcon,
+  UploadIcon,
+  XIcon,
 } from "@modrinth/assets";
-import { Multiselect } from "vue-multiselect";
+import {
+  Avatar,
+  Badge,
+  ButtonStyled,
+  Checkbox,
+  ConfirmModal,
+  CopyCode,
+  MarkdownEditor,
+} from "@modrinth/ui";
 import { formatBytes, formatCategory } from "@modrinth/utils";
-import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
-import { inferVersionInfo } from "~/helpers/infer.js";
-import { createDataPackVersion } from "~/helpers/package.js";
-import { renderHighlightedString } from "~/helpers/highlight.js";
-import { reportVersion } from "~/utils/report-helpers.ts";
-import { useImageUpload } from "~/composables/image-upload.ts";
+import { Multiselect } from "vue-multiselect";
 
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
-import Categories from "~/components/ui/search/Categories.vue";
 import FileInput from "~/components/ui/FileInput.vue";
 import Modal from "~/components/ui/Modal.vue";
+import Categories from "~/components/ui/search/Categories.vue";
+import { useImageUpload } from "~/composables/image-upload.ts";
+import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
+import { renderHighlightedString } from "~/helpers/highlight.js";
+import { inferVersionInfo } from "~/helpers/infer.js";
+import { createDataPackVersion } from "~/helpers/package.js";
+import { reportVersion } from "~/utils/report-helpers.ts";
 
 export default defineNuxtComponent({
   components: {

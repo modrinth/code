@@ -101,10 +101,11 @@
 </template>
 
 <script setup lang="ts">
-import { FolderOpenIcon, CheckCircleIcon, XCircleIcon } from "@modrinth/assets";
+import { CheckCircleIcon, FolderOpenIcon, XCircleIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
-import { ref, computed, watch, nextTick } from "vue";
-import { FSModule } from "~/composables/servers/modules/fs.ts";
+import { computed, nextTick,ref, watch } from "vue";
+
+import type { FSModule } from "~/composables/servers/modules/fs.ts";
 
 interface UploadItem {
   file: File;
@@ -152,7 +153,7 @@ const activeUploads = computed(() =>
 const onUploadStatusEnter = (el: Element) => {
   const height = (el as HTMLElement).scrollHeight + (props.marginBottom || 0);
   (el as HTMLElement).style.height = "0";
-  // eslint-disable-next-line no-void
+   
   void (el as HTMLElement).offsetHeight;
   (el as HTMLElement).style.height = `${height}px`;
 };
@@ -160,7 +161,7 @@ const onUploadStatusEnter = (el: Element) => {
 const onUploadStatusLeave = (el: Element) => {
   const height = (el as HTMLElement).scrollHeight + (props.marginBottom || 0);
   (el as HTMLElement).style.height = `${height}px`;
-  // eslint-disable-next-line no-void
+   
   void (el as HTMLElement).offsetHeight;
   (el as HTMLElement).style.height = "0";
 };

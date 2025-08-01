@@ -122,8 +122,8 @@
 </template>
 
 <script setup>
-import { DropdownSelect } from "@modrinth/ui";
 import { SaveIcon } from "@modrinth/assets";
+import { DropdownSelect } from "@modrinth/ui";
 
 const tags = useTags();
 

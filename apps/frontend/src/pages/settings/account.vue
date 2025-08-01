@@ -408,6 +408,7 @@
 <script setup>
 import {
   CheckIcon,
+  DownloadIcon,
   EditIcon,
   ExternalIcon,
   LeftArrowIcon,
@@ -418,17 +419,17 @@ import {
   TrashIcon,
   UpdatedIcon,
   XIcon,
-  DownloadIcon,
 } from "@modrinth/assets";
-import QrcodeVue from "qrcode.vue";
 import { ConfirmModal } from "@modrinth/ui";
-import GithubIcon from "assets/icons/auth/sso-github.svg";
-import MicrosoftIcon from "assets/icons/auth/sso-microsoft.svg";
-import GoogleIcon from "assets/icons/auth/sso-google.svg";
-import SteamIcon from "assets/icons/auth/sso-steam.svg";
-import DiscordIcon from "assets/icons/auth/sso-discord.svg";
 import KeyIcon from "assets/icons/auth/key.svg";
+import DiscordIcon from "assets/icons/auth/sso-discord.svg";
+import GithubIcon from "assets/icons/auth/sso-github.svg";
 import GitLabIcon from "assets/icons/auth/sso-gitlab.svg";
+import GoogleIcon from "assets/icons/auth/sso-google.svg";
+import MicrosoftIcon from "assets/icons/auth/sso-microsoft.svg";
+import SteamIcon from "assets/icons/auth/sso-steam.svg";
+import QrcodeVue from "qrcode.vue";
+
 import Modal from "~/components/ui/Modal.vue";
 
 useHead({

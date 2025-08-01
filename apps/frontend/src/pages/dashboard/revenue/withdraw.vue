@@ -187,18 +187,19 @@
 </template>
 
 <script setup>
-import { Multiselect } from "vue-multiselect";
 import {
   PayPalIcon,
-  SearchIcon,
-  RadioButtonIcon,
   RadioButtonCheckedIcon,
-  XIcon,
+  RadioButtonIcon,
+  SearchIcon,
   TransferIcon,
+  XIcon,
 } from "@modrinth/assets";
-import { Chips, Checkbox, Breadcrumbs } from "@modrinth/ui";
-import { all } from "iso-3166-1";
+import { Breadcrumbs,Checkbox, Chips } from "@modrinth/ui";
 import { formatMoney, formatWallet } from "@modrinth/utils";
+import { all } from "iso-3166-1";
+import { Multiselect } from "vue-multiselect";
+
 import VenmoIcon from "~/assets/images/external/venmo.svg?component";
 
 const auth = await useAuth();

@@ -254,33 +254,34 @@
 <script setup>
 import {
   BoxIcon,
-  MoreVerticalIcon,
-  UsersIcon,
-  SettingsIcon,
   ChartIcon,
   CheckIcon,
-  XIcon,
   ClipboardCopyIcon,
-  OrganizationIcon,
-  DownloadIcon,
   CrownIcon,
+  DownloadIcon,
+  MoreVerticalIcon,
+  OrganizationIcon,
+  SettingsIcon,
+  UsersIcon,
+  XIcon,
 } from "@modrinth/assets";
 import {
   Avatar,
-  ButtonStyled,
   Breadcrumbs,
+  ButtonStyled,
+  commonMessages,
   ContentPageHeader,
   OverflowMenu,
-  commonMessages,
 } from "@modrinth/ui";
+
+import UpToDate from "~/assets/images/illustrations/up_to_date.svg?component";
+import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
+import ModalCreation from "~/components/ui/ModalCreation.vue";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
-import ModalCreation from "~/components/ui/ModalCreation.vue";
-import UpToDate from "~/assets/images/illustrations/up_to_date.svg?component";
-import ProjectCard from "~/components/ui/ProjectCard.vue";
-import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
-import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
 import NavTabs from "~/components/ui/NavTabs.vue";
+import ProjectCard from "~/components/ui/ProjectCard.vue";
+import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
 
 const vintl = useVIntl();
 const { formatMessage } = vintl;
