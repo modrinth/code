@@ -329,7 +329,7 @@ export function flattenProjectVariables(project: Project): Record<string, string
   vars[`PROJECT_DESCRIPTION_FLINK`] =
     `[Description](https://modrinth.com/project/${project.id}/settings/description)`
   vars[`PROJECT_LICENSE_LINK`] = `https://modrinth.com/project/${project.id}/license`
-  vars[`PROJECT_LICENSE_FLINK`] = `[License](https://modrinth.com/project/${project.id}/license`
+  vars[`PROJECT_LICENSE_FLINK`] = `[License](https://modrinth.com/project/${project.id}/license)`
   vars[`PROJECT_LINKS_LINK`] = `https://modrinth.com/project/${project.id}/settings/links`
   vars[`PROJECT_LINKS_FLINK`] =
     `[External Links](https://modrinth.com/project/${project.id}/settings/links)`
