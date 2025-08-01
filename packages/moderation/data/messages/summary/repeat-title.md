@@ -1,6 +1,6 @@
 ## Insufficient Summary
 
-Per section 5.3 of %RULES% your Summary can not be the same as your project's Title.
+Per section 5.3 of %RULES%, your Summary can not be the same as your project's Title.
 
 Your project summary should provide a brief overview of your project that informs and entices users.
 
