@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { TeleportDropdownMenu, ThemeSelector, Toggle } from '@modrinth/ui'
-import { useTheming } from '@/store/state'
-import { get, set } from '@/helpers/settings.ts'
 import { ref, watch } from 'vue'
+
+import { get, set } from '@/helpers/settings.ts'
 import { getOS } from '@/helpers/utils'
+import { useTheming } from '@/store/state'
 import type { ColorTheme } from '@/store/theme.ts'
 
 const themeStore = useTheming()

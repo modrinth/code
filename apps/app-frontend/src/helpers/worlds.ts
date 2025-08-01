@@ -1,9 +1,10 @@
+import { autoToHTML } from '@geometrically/minecraft-motd-parser'
+import type { GameVersion } from '@modrinth/ui'
 import { invoke } from '@tauri-apps/api/core'
+import dayjs from 'dayjs'
+
 import { get_full_path } from '@/helpers/profile'
 import { openPath } from '@/helpers/utils'
-import { autoToHTML } from '@geometrically/minecraft-motd-parser'
-import dayjs from 'dayjs'
-import type { GameVersion } from '@modrinth/ui'
 
 type BaseWorld = {
   name: string

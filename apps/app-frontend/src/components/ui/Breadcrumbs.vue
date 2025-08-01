@@ -42,11 +42,12 @@
 </template>
 
 <script setup>
-import { ChevronRightIcon, ChevronLeftIcon } from '@modrinth/assets'
+import { ChevronLeftIcon, ChevronRightIcon } from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { useRoute } from 'vue-router'
 import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+
+import { useBreadcrumbs } from '@/store/breadcrumbs'
 
 const route = useRoute()
 

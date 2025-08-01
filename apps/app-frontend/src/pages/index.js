@@ -1,6 +1,6 @@
-import Index from './Index.vue'
 import Browse from './Browse.vue'
-import Worlds from './Worlds.vue'
+import Index from './Index.vue'
 import Skins from './Skins.vue'
+import Worlds from './Worlds.vue'
 
-export { Index, Browse, Worlds, Skins }
+export { Browse, Index, Skins, Worlds }
