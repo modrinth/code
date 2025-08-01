@@ -1,6 +1,4 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref, watch, provide } from 'vue'
-import { RouterView, useRoute, useRouter } from 'vue-router'
 import {
   ArrowBigUpDashIcon,
   ChangeSkinIcon,
@@ -13,65 +11,69 @@ import {
   LogOutIcon,
   MaximizeIcon,
   MinimizeIcon,
+  NewspaperIcon,
   PlusIcon,
   RestoreIcon,
   RightArrowIcon,
   SettingsIcon,
   WorldIcon,
   XIcon,
-  NewspaperIcon,
 } from '@modrinth/assets'
 import {
   Avatar,
   Button,
   ButtonStyled,
+  NewsArticleCard,
   Notifications,
   OverflowMenu,
-  NewsArticleCard,
 } from '@modrinth/ui'
-import { useLoading, useTheming } from '@/store/state'
-import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
-import AccountsCard from '@/components/ui/AccountsCard.vue'
-import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
-import { get } from '@/helpers/settings.ts'
-import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
-import RunningAppBar from '@/components/ui/RunningAppBar.vue'
-import SplashScreen from '@/components/ui/SplashScreen.vue'
-import ErrorModal from '@/components/ui/ErrorModal.vue'
-import ModrinthLoadingIndicator from '@/components/LoadingIndicatorBar.vue'
-import { handleError, useNotifications } from '@/store/notifications.js'
-import { command_listener, warning_listener } from '@/helpers/events.js'
-import { type } from '@tauri-apps/plugin-os'
-import { getOS, isDev, restartApp } from '@/helpers/utils.js'
-import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
-import { getCurrentWindow } from '@tauri-apps/api/window'
+import { renderString } from '@modrinth/utils'
 import { getVersion } from '@tauri-apps/api/app'
-import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
-import { create_profile_and_install_from_file } from './helpers/pack'
-import { useError } from '@/store/error.js'
-import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
-import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
+import { invoke } from '@tauri-apps/api/core'
+import { getCurrentWindow } from '@tauri-apps/api/window'
+import { openUrl } from '@tauri-apps/plugin-opener'
+import { type } from '@tauri-apps/plugin-os'
+import { check } from '@tauri-apps/plugin-updater'
+import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
+import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
+import { RouterView, useRoute, useRouter } from 'vue-router'
+
+import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
+import ModrinthLoadingIndicator from '@/components/LoadingIndicatorBar.vue'
+import AccountsCard from '@/components/ui/AccountsCard.vue'
+import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
+import ErrorModal from '@/components/ui/ErrorModal.vue'
+import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
 import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
-import { useInstall } from '@/store/install.js'
-import { invoke } from '@tauri-apps/api/core'
-import { get_opening_command, initialize_state } from '@/helpers/state'
-import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
-import { renderString } from '@modrinth/utils'
-import { useFetch } from '@/helpers/fetch.js'
-import { check } from '@tauri-apps/plugin-updater'
-import NavButton from '@/components/ui/NavButton.vue'
-import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.js'
-import { get_user } from '@/helpers/cache.js'
+import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
+import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
+import NavButton from '@/components/ui/NavButton.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
-import { hide_ads_window, init_ads_window } from '@/helpers/ads.js'
-import FriendsList from '@/components/ui/friends/FriendsList.vue'
-import { openUrl } from '@tauri-apps/plugin-opener'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
-import { get_available_capes, get_available_skins } from './helpers/skins'
+import RunningAppBar from '@/components/ui/RunningAppBar.vue'
+import SplashScreen from '@/components/ui/SplashScreen.vue'
+import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
+import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
+import { hide_ads_window, init_ads_window } from '@/helpers/ads.js'
+import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
+import { get_user } from '@/helpers/cache.js'
+import { command_listener, warning_listener } from '@/helpers/events.js'
+import { useFetch } from '@/helpers/fetch.js'
+import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.js'
+import { get } from '@/helpers/settings.ts'
+import { get_opening_command, initialize_state } from '@/helpers/state'
+import { getOS, isDev, restartApp } from '@/helpers/utils.js'
+import { useError } from '@/store/error.js'
+import { useInstall } from '@/store/install.js'
+import { handleError, useNotifications } from '@/store/notifications.js'
+import { useLoading, useTheming } from '@/store/state'
+
+import { create_profile_and_install_from_file } from './helpers/pack'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
+import { get_available_capes, get_available_skins } from './helpers/skins'
 
 const themeStore = useTheming()
 

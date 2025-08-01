@@ -4,8 +4,9 @@
  *  and deserialized into a usable JS object.
  */
 import { invoke } from '@tauri-apps/api/core'
-import type { ColorTheme, FeatureFlag } from '@/store/theme.ts'
+
 import type { Hooks, MemorySettings, WindowSize } from '@/helpers/types'
+import type { ColorTheme, FeatureFlag } from '@/store/theme.ts'
 
 // Settings object
 /*

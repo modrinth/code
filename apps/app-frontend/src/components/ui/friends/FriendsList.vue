@@ -1,22 +1,23 @@
 <script setup lang="ts">
-import { Avatar, ButtonStyled, OverflowMenu, useRelativeTime } from '@modrinth/ui'
 import {
-  UserPlusIcon,
-  MoreVerticalIcon,
   MailIcon,
+  MoreVerticalIcon,
   SettingsIcon,
   TrashIcon,
+  UserPlusIcon,
   XIcon,
 } from '@modrinth/assets'
-import { ref, onUnmounted, watch, computed } from 'vue'
-import { friend_listener } from '@/helpers/events'
-import { friends, friend_statuses, add_friend, remove_friend } from '@/helpers/friends'
-import { get_user_many } from '@/helpers/cache'
-import { handleError } from '@/store/notifications.js'
-import ContextMenu from '@/components/ui/ContextMenu.vue'
+import { Avatar, ButtonStyled, OverflowMenu, useRelativeTime } from '@modrinth/ui'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
+import { computed, onUnmounted, ref, watch } from 'vue'
+
+import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { get_user_many } from '@/helpers/cache'
+import { friend_listener } from '@/helpers/events'
+import { add_friend, friend_statuses, friends, remove_friend } from '@/helpers/friends'
+import { handleError } from '@/store/notifications.js'
 
 const formatRelativeTime = useRelativeTime()
 

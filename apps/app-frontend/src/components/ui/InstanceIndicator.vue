@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { convertFileSrc } from '@tauri-apps/api/core'
-import { formatCategory } from '@modrinth/utils'
 import { GameIcon, LeftArrowIcon } from '@modrinth/assets'
 import { Avatar, ButtonStyled } from '@modrinth/ui'
+import { formatCategory } from '@modrinth/utils'
+import { convertFileSrc } from '@tauri-apps/api/core'
 
 type Instance = {
   game_version: string

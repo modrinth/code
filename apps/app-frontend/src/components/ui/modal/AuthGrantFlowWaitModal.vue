@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { LogInIcon, SpinnerIcon } from '@modrinth/assets'
 import { ref } from 'vue'
+
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 defineProps({

@@ -1,15 +1,16 @@
 <script setup>
-import { onUnmounted, ref, shallowRef } from 'vue'
-import { list } from '@/helpers/profile.js'
-import { useRoute } from 'vue-router'
-import { useBreadcrumbs } from '@/store/breadcrumbs.js'
-import { profile_listener } from '@/helpers/events.js'
-import { handleError } from '@/store/notifications.js'
-import { Button } from '@modrinth/ui'
 import { PlusIcon } from '@modrinth/assets'
-import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
+import { Button } from '@modrinth/ui'
+import { onUnmounted, ref, shallowRef } from 'vue'
+import { useRoute } from 'vue-router'
+
 import { NewInstanceImage } from '@/assets/icons'
+import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
+import { profile_listener } from '@/helpers/events.js'
+import { list } from '@/helpers/profile.js'
+import { useBreadcrumbs } from '@/store/breadcrumbs.js'
+import { handleError } from '@/store/notifications.js'
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()

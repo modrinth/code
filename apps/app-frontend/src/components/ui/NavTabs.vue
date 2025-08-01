@@ -30,7 +30,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
-import { useRoute, RouterLink } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 
 const route = useRoute()
 

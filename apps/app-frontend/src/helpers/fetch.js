@@ -1,6 +1,7 @@
-import { fetch } from '@tauri-apps/plugin-http'
-import { handleError } from '@/store/state.js'
 import { getVersion } from '@tauri-apps/api/app'
+import { fetch } from '@tauri-apps/plugin-http'
+
+import { handleError } from '@/store/state.js'
 
 export const useFetch = async (url, item, isSilent) => {
   try {

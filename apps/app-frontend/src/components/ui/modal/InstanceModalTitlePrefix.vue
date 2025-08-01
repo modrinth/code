@@ -2,6 +2,7 @@
 import { ChevronRightIcon } from '@modrinth/assets'
 import { Avatar } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
+
 import type { GameInstance } from '@/helpers/types'
 
 defineProps<{

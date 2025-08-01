@@ -1,4 +1,5 @@
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
+
 import { get_max_memory } from '@/helpers/jre.js'
 import { handleError } from '@/store/notifications.js'
 
