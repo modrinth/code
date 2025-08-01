@@ -1,23 +1,23 @@
-import { promises as fs } from 'fs'
-import * as path from 'path'
-import matter from 'gray-matter'
 import { md } from '@modrinth/utils'
+import { promises as fs } from 'fs'
+import { glob } from 'glob'
+import matter from 'gray-matter'
 import { minify } from 'html-minifier-terser'
-import { copyDir, toVarName } from './utils'
+import * as path from 'path'
 import RSS from 'rss'
 import { parseStringPromise } from 'xml2js'
-import { glob } from 'glob'
 
 import {
   ARTICLES_GLOB,
   COMPILED_DIR,
-  ROOT_FILE,
-  PUBLIC_SRC,
-  PUBLIC_LOCATIONS,
-  RSS_PATH,
   JSON_PATH,
+  PUBLIC_LOCATIONS,
+  PUBLIC_SRC,
+  ROOT_FILE,
+  RSS_PATH,
   SITE_URL,
 } from './blog.config'
+import { copyDir, toVarName } from './utils'
 
 async function ensureCompiledDir() {
   await fs.mkdir(COMPILED_DIR, { recursive: true })
