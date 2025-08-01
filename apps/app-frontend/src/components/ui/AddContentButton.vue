@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { DropdownIcon, PlusIcon, FolderOpenIcon } from '@modrinth/assets'
+import { DropdownIcon, FolderOpenIcon, PlusIcon } from '@modrinth/assets'
 import { ButtonStyled, OverflowMenu } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
+import { useRouter } from 'vue-router'
+
 import { add_project_from_path } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
-import { useRouter } from 'vue-router'
 
 const props = defineProps({
   instance: {

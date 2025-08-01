@@ -35,13 +35,14 @@
   </ModalWrapper>
 </template>
 <script setup>
-import { PlusIcon, CheckIcon, XIcon } from '@modrinth/assets'
+import { CheckIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
 import { ref } from 'vue'
+
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { trackEvent } from '@/helpers/analytics'
 import { find_filtered_jres } from '@/helpers/jre.js'
 import { handleError } from '@/store/notifications.js'
-import { trackEvent } from '@/helpers/analytics'
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 const chosenInstallOptions = ref([])
 const detectJavaModal = ref(null)

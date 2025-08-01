@@ -27,12 +27,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onBeforeUnmount, watch } from 'vue'
 import { UploadIcon } from '@modrinth/assets'
-import { useNotifications } from '@/store/state'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
+import { onBeforeUnmount, ref, watch } from 'vue'
+
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { get_dragged_skin_data } from '@/helpers/skins'
+import { useNotifications } from '@/store/state'
 
 const notifications = useNotifications()
 

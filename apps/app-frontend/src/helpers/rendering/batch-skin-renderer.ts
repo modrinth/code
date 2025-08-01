@@ -1,17 +1,18 @@
-import * as THREE from 'three'
-import type { Skin, Cape } from '../skins'
-import { get_normalized_skin_texture, determineModelType } from '../skins'
-import { reactive } from 'vue'
+import { ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
 import {
-  setupSkinModel,
-  disposeCaches,
-  loadTexture,
   applyCapeTexture,
   createTransparentTexture,
+  disposeCaches,
+  loadTexture,
+  setupSkinModel,
 } from '@modrinth/utils'
-import { skinPreviewStorage } from '../storage/skin-preview-storage'
+import * as THREE from 'three'
+import { reactive } from 'vue'
+
+import type { Cape, Skin } from '../skins'
+import { determineModelType, get_normalized_skin_texture } from '../skins'
 import { headStorage } from '../storage/head-storage'
-import { ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
+import { skinPreviewStorage } from '../storage/skin-preview-storage'
 
 export interface RenderResult {
   forwards: string

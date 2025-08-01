@@ -1,8 +1,7 @@
+import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
 import svgLoader from 'vite-svg-loader'
-
-import vue from '@vitejs/plugin-vue'
 
 import tauriConf from '../app/tauri.conf.json'
 

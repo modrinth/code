@@ -182,15 +182,16 @@
 </template>
 
 <script setup>
-import { DownloadIcon, FileIcon, ReportIcon, ExternalIcon, CheckIcon } from '@modrinth/assets'
+import { CheckIcon, DownloadIcon, ExternalIcon, FileIcon, ReportIcon } from '@modrinth/assets'
+import { Avatar, Badge, Breadcrumbs, Button, Card, CopyCode } from '@modrinth/ui'
 import { formatBytes, renderString } from '@modrinth/utils'
-import { Breadcrumbs, Badge, Avatar, Card, Button, CopyCode } from '@modrinth/ui'
-import { releaseColor } from '@/helpers/utils'
-import { ref, watch, computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
+
 import { SwapIcon } from '@/assets/icons'
 import { get_project_many, get_version_many } from '@/helpers/cache.js'
+import { releaseColor } from '@/helpers/utils'
+import { useBreadcrumbs } from '@/store/breadcrumbs'
 
 const breadcrumbs = useBreadcrumbs()
 

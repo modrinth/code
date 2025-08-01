@@ -121,54 +121,53 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, onUnmounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import type { GameInstance } from '@/helpers/types'
-import {
-  Button,
-  ButtonStyled,
-  RadialHeader,
-  FilterBar,
-  type FilterBarOption,
-  type GameVersion,
-  GAME_MODES,
-} from '@modrinth/ui'
-import { PlusIcon, SpinnerIcon, UpdatedIcon, SearchIcon, XIcon } from '@modrinth/assets'
-import {
-  type ProtocolVersion,
-  type SingleplayerWorld,
-  type World,
-  type ServerWorld,
-  type ServerData,
-  type ProfileEvent,
-  get_profile_protocol_version,
-  remove_server_from_profile,
-  delete_world,
-  start_join_server,
-  start_join_singleplayer_world,
-  getWorldIdentifier,
-  refreshServerData,
-  refreshWorld,
-  sortWorlds,
-  refreshServers,
-  hasWorldQuickPlaySupport,
-  refreshWorlds,
-  handleDefaultProfileUpdateEvent,
-  showWorldInFolder,
-  hasServerQuickPlaySupport,
-} from '@/helpers/worlds.ts'
+import ContextMenu from '@/components/ui/ContextMenu.vue'
+import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import AddServerModal from '@/components/ui/world/modal/AddServerModal.vue'
 import EditServerModal from '@/components/ui/world/modal/EditServerModal.vue'
 import EditWorldModal from '@/components/ui/world/modal/EditSingleplayerWorldModal.vue'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
-
-import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
-import { handleError } from '@/store/notifications'
-import type ContextMenu from '@/components/ui/ContextMenu.vue'
-import type { Version } from '@modrinth/utils'
 import { profile_listener } from '@/helpers/events'
 import { get_game_versions } from '@/helpers/tags'
+import type { GameInstance } from '@/helpers/types'
+import {
+  delete_world,
+  get_profile_protocol_version,
+  getWorldIdentifier,
+  handleDefaultProfileUpdateEvent,
+  hasServerQuickPlaySupport,
+  hasWorldQuickPlaySupport,
+  type ProfileEvent,
+  type ProtocolVersion,
+  refreshServerData,
+  refreshServers,
+  refreshWorld,
+  refreshWorlds,
+  remove_server_from_profile,
+  type ServerData,
+  type ServerWorld,
+  showWorldInFolder,
+  type SingleplayerWorld,
+  sortWorlds,
+  start_join_server,
+  start_join_singleplayer_world,
+  type World,
+} from '@/helpers/worlds.ts'
+import { handleError } from '@/store/notifications'
+import { PlusIcon, SearchIcon, SpinnerIcon, UpdatedIcon, XIcon } from '@modrinth/assets'
+import {
+  Button,
+  ButtonStyled,
+  FilterBar,
+  type FilterBarOption,
+  GAME_MODES,
+  type GameVersion,
+  RadialHeader,
+} from '@modrinth/ui'
+import { Version } from '@modrinth/utils'
 import { defineMessages } from '@vintl/vintl'
+import { computed, onUnmounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
 

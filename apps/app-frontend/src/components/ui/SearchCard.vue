@@ -117,14 +117,15 @@
 </template>
 
 <script setup>
-import { TagsIcon, DownloadIcon, HeartIcon, PlusIcon, CheckIcon } from '@modrinth/assets'
-import { ButtonStyled, Avatar } from '@modrinth/ui'
-import { formatNumber, formatCategory } from '@modrinth/utils'
+import { CheckIcon, DownloadIcon, HeartIcon, PlusIcon, TagsIcon } from '@modrinth/assets'
+import { Avatar, ButtonStyled } from '@modrinth/ui'
+import { formatCategory, formatNumber } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { ref, computed } from 'vue'
-import { install as installVersion } from '@/store/install.js'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+
+import { install as installVersion } from '@/store/install.js'
 dayjs.extend(relativeTime)
 
 const router = useRouter()

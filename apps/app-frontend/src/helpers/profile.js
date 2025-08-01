@@ -4,6 +4,7 @@
  *  and deserialized into a usable JS object.
  */
 import { invoke } from '@tauri-apps/api/core'
+
 import { install_to_existing_profile } from '@/helpers/pack.js'
 import { handleError } from '@/store/notifications.js'
 

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { Toggle } from '@modrinth/ui'
-import { useTheming } from '@/store/state'
 import { ref, watch } from 'vue'
+
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
+import { useTheming } from '@/store/state'
 import { DEFAULT_FEATURE_FLAGS, type FeatureFlag } from '@/store/theme.ts'
 
 const themeStore = useTheming()

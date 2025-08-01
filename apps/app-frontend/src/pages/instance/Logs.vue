@@ -88,26 +88,28 @@
 </template>
 
 <script setup>
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
+
 import { CheckIcon, ClipboardCopyIcon, ShareIcon, TrashIcon } from '@modrinth/assets'
 import { Button, Card, Checkbox, DropdownSelect } from '@modrinth/ui'
-import {
-  delete_logs_by_filename,
-  get_logs,
-  get_output_by_filename,
-  get_latest_log_cursor,
-} from '@/helpers/logs.js'
-import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import dayjs from 'dayjs'
 import isToday from 'dayjs/plugin/isToday'
 import isYesterday from 'dayjs/plugin/isYesterday'
-import { get_by_profile_path } from '@/helpers/process.js'
-import { useRoute } from 'vue-router'
-import { process_listener } from '@/helpers/events.js'
-import { handleError } from '@/store/notifications.js'
 import { ofetch } from 'ofetch'
+import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { RecycleScroller } from 'vue-virtual-scroller'
-import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
+
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
+import { process_listener } from '@/helpers/events.js'
+import {
+  delete_logs_by_filename,
+  get_latest_log_cursor,
+  get_logs,
+  get_output_by_filename,
+} from '@/helpers/logs.js'
+import { get_by_profile_path } from '@/helpers/process.js'
+import { handleError } from '@/store/notifications.js'
 
 dayjs.extend(isToday)
 dayjs.extend(isYesterday)

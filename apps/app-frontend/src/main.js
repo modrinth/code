@@ -1,12 +1,14 @@
-import { createApp } from 'vue'
-import router from '@/routes'
-import App from '@/App.vue'
-import { createPinia } from 'pinia'
-import FloatingVue from 'floating-vue'
 import 'floating-vue/dist/style.css'
-import { createPlugin } from '@vintl/vintl/plugin'
+
 import * as Sentry from '@sentry/vue'
 import { VueScanPlugin } from '@taijased/vue-render-tracker'
+import { createPlugin } from '@vintl/vintl/plugin'
+import FloatingVue from 'floating-vue'
+import { createPinia } from 'pinia'
+import { createApp } from 'vue'
+
+import App from '@/App.vue'
+import router from '@/routes'
 
 const VIntlPlugin = createPlugin({
   controllerOpts: {

@@ -16,33 +16,34 @@ import {
   SkinLikeTextButton,
   SkinPreviewRenderer,
 } from '@modrinth/ui'
+import { arrayBufferToBase64 } from '@modrinth/utils'
 import { computedAsync } from '@vueuse/core'
 import type { Ref } from 'vue'
 import { computed, inject, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue'
+
+import type AccountsCard from '@/components/ui/AccountsCard.vue'
 import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
 import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
 import UploadSkinModal from '@/components/ui/skin/UploadSkinModal.vue'
-import { handleError, useNotifications } from '@/store/notifications'
+import { trackEvent } from '@/helpers/analytics'
+import { get_default_user, login as login_flow, users } from '@/helpers/auth'
+import type { RenderResult } from '@/helpers/rendering/batch-skin-renderer.ts'
+import { generateSkinPreviews, skinBlobUrlMap } from '@/helpers/rendering/batch-skin-renderer.ts'
+import { get as getSettings } from '@/helpers/settings.ts'
 import type { Cape, Skin } from '@/helpers/skins.ts'
 import {
-  normalize_skin_texture,
   equip_skin,
   filterDefaultSkins,
   filterSavedSkins,
   get_available_capes,
   get_available_skins,
   get_normalized_skin_texture,
+  normalize_skin_texture,
   remove_custom_skin,
   set_default_cape,
 } from '@/helpers/skins.ts'
-import { get as getSettings } from '@/helpers/settings.ts'
-import { get_default_user, login as login_flow, users } from '@/helpers/auth'
-import type { RenderResult } from '@/helpers/rendering/batch-skin-renderer.ts'
-import { generateSkinPreviews, skinBlobUrlMap } from '@/helpers/rendering/batch-skin-renderer.ts'
 import { handleSevereError } from '@/store/error'
-import { trackEvent } from '@/helpers/analytics'
-import type AccountsCard from '@/components/ui/AccountsCard.vue'
-import { arrayBufferToBase64 } from '@modrinth/utils'
+import { handleError, useNotifications } from '@/store/notifications'
 const editSkinModal = useTemplateRef('editSkinModal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
 const uploadSkinModal = useTemplateRef('uploadSkinModal')

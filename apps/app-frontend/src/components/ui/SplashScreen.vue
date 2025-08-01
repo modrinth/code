@@ -82,11 +82,12 @@
 </template>
 
 <script setup>
+import { MaximizeIcon, MinimizeIcon, XIcon } from '@modrinth/assets'
+import { getCurrentWindow } from '@tauri-apps/api/window'
 import { ref, watch } from 'vue'
+
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { loading_listener } from '@/helpers/events.js'
-import { getCurrentWindow } from '@tauri-apps/api/window'
-import { XIcon, MaximizeIcon, MinimizeIcon } from '@modrinth/assets'
 import { getOS } from '@/helpers/utils.js'
 import { useLoading } from '@/store/loading.js'
 

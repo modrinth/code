@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { ConfirmModal } from '@modrinth/ui'
-import { show_ads_window, hide_ads_window } from '@/helpers/ads.js'
+import { ref } from 'vue'
+
+import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { useTheming } from '@/store/theme.ts'
 
 const themeStore = useTheming()

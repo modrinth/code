@@ -1,23 +1,16 @@
 <script setup lang="ts">
 import {
-  TransferIcon,
-  IssuesIcon,
-  HammerIcon,
   DownloadIcon,
-  WrenchIcon,
-  UndoIcon,
+  HammerIcon,
+  IssuesIcon,
   SpinnerIcon,
-  UnplugIcon,
+  TransferIcon,
+  UndoIcon,
   UnlinkIcon,
+  UnplugIcon,
+  WrenchIcon,
 } from '@modrinth/assets'
-import { Avatar, Checkbox, Chips, ButtonStyled, TeleportDropdownMenu } from '@modrinth/ui'
-import { computed, type ComputedRef, type Ref, ref, shallowRef, watch } from 'vue'
-import { edit, install, update_repair_modrinth } from '@/helpers/profile'
-import { handleError } from '@/store/notifications'
-import { trackEvent } from '@/helpers/analytics'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { get_loader_versions } from '@/helpers/metadata'
-import { get_game_versions, get_loaders } from '@/helpers/tags'
+import { Avatar, ButtonStyled, Checkbox, Chips, TeleportDropdownMenu } from '@modrinth/ui'
 import {
   formatCategory,
   type GameVersionTag,
@@ -25,14 +18,23 @@ import {
   type Project,
   type Version,
 } from '@modrinth/utils'
-import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
-import { get_project, get_version_many } from '@/helpers/cache'
-import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
+import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
+import { computed, type ComputedRef, type Ref, ref, shallowRef, watch } from 'vue'
+
+import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
+import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
+import { trackEvent } from '@/helpers/analytics'
+import { get_project, get_version_many } from '@/helpers/cache'
+import { get_loader_versions } from '@/helpers/metadata'
+import { edit, install, update_repair_modrinth } from '@/helpers/profile'
+import { get_game_versions, get_loaders } from '@/helpers/tags'
+import { handleError } from '@/store/notifications'
+
 import type {
   InstanceSettingsTabProps,
-  ManifestLoaderVersion,
   Manifest,
+  ManifestLoaderVersion,
 } from '../../../helpers/types'
 
 const { formatMessage } = useVIntl()

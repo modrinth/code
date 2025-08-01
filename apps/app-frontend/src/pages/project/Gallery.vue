@@ -83,18 +83,19 @@
 
 <script setup>
 import {
-  ExpandIcon,
-  RightArrowIcon,
-  LeftArrowIcon,
-  ExternalIcon,
-  ContractIcon,
-  XIcon,
   CalendarIcon,
+  ContractIcon,
+  ExpandIcon,
+  ExternalIcon,
+  LeftArrowIcon,
+  RightArrowIcon,
+  XIcon,
 } from '@modrinth/assets'
 import { Button, Card } from '@modrinth/ui'
 import { ref } from 'vue'
+
+import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { trackEvent } from '@/helpers/analytics'
-import { show_ads_window, hide_ads_window } from '@/helpers/ads.js'
 
 const props = defineProps({
   project: {

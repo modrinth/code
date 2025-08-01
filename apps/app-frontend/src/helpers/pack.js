@@ -4,6 +4,7 @@
  *  and deserialized into a usable JS object.
  */
 import { invoke } from '@tauri-apps/api/core'
+
 import { create } from './profile'
 
 // Installs pack from a version ID

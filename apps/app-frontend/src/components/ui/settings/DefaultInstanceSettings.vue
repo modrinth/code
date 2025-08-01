@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { get, set } from '@/helpers/settings.ts'
-import { ref, watch } from 'vue'
 import { Slider, Toggle } from '@modrinth/ui'
+import { ref, watch } from 'vue'
+
 import useMemorySlider from '@/composables/useMemorySlider'
+import { get, set } from '@/helpers/settings.ts'
 
 const fetchSettings = await get()
 fetchSettings.launchArgs = fetchSettings.extra_launch_args.join(' ')

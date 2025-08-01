@@ -56,15 +56,16 @@
 </template>
 
 <script setup>
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import { XIcon, DownloadIcon } from '@modrinth/assets'
+import { DownloadIcon, XIcon } from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
 import { formatCategory } from '@modrinth/utils'
-import { add_project_from_version as installMod } from '@/helpers/profile'
 import { ref } from 'vue'
-import { handleError } from '@/store/state.js'
-import { trackEvent } from '@/helpers/analytics'
 import Multiselect from 'vue-multiselect'
+
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { trackEvent } from '@/helpers/analytics'
+import { add_project_from_version as installMod } from '@/helpers/profile'
+import { handleError } from '@/store/state.js'
 
 const instance = ref(null)
 const project = ref(null)
