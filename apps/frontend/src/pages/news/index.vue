@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ChevronRightIcon, GitGraphIcon,RssIcon } from "@modrinth/assets";
-import { articles as rawArticles } from "@modrinth/blog";
-import { ButtonStyled, NewsArticleCard } from "@modrinth/ui";
-import dayjs from "dayjs";
-import { computed, ref } from "vue";
+import { ChevronRightIcon, GitGraphIcon, RssIcon } from '@modrinth/assets'
+import { articles as rawArticles } from '@modrinth/blog'
+import { ButtonStyled, NewsArticleCard } from '@modrinth/ui'
+import dayjs from 'dayjs'
+import { computed, ref } from 'vue'
 
-import NewsletterButton from "~/components/ui/NewsletterButton.vue";
+import NewsletterButton from '~/components/ui/NewsletterButton.vue'
 
 const articles = ref(
   rawArticles
@@ -20,21 +20,21 @@ const articles = ref(
       date: article.date,
     }))
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
-);
+)
 
-const featuredArticle = computed(() => articles.value?.[0]);
-const config = useRuntimeConfig();
+const featuredArticle = computed(() => articles.value?.[0])
+const config = useRuntimeConfig()
 
 useSeoMeta({
-  title: "Modrinth News",
-  ogTitle: "Modrinth News",
-  description: "Keep up-to-date on the latest news from Modrinth.",
-  ogDescription: "Keep up-to-date on the latest news from Modrinth.",
-  ogType: "website",
+  title: 'Modrinth News',
+  ogTitle: 'Modrinth News',
+  description: 'Keep up-to-date on the latest news from Modrinth.',
+  ogDescription: 'Keep up-to-date on the latest news from Modrinth.',
+  ogType: 'website',
   ogImage: () => `${config.public.siteUrl}/news/thumbnail.webp`,
-  twitterCard: "summary_large_image",
+  twitterCard: 'summary_large_image',
   twitterImage: () => `${config.public.siteUrl}/news/thumbnail.webp`,
-});
+})
 </script>
 
 <template>
@@ -81,7 +81,7 @@ useSeoMeta({
               </h3>
               <p class="m-0 text-lg leading-tight">{{ featuredArticle?.summary }}</p>
               <div class="mt-auto text-secondary">
-                {{ dayjs(featuredArticle?.date).format("MMMM D, YYYY") }}
+                {{ dayjs(featuredArticle?.date).format('MMMM D, YYYY') }}
               </div>
             </div>
           </article>

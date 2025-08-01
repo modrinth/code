@@ -157,7 +157,7 @@
       <template #title>
         <Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" no-shadow />
         <span class="text-lg font-extrabold text-contrast">
-          {{ project.license.name ? project.license.name : "License" }}
+          {{ project.license.name ? project.license.name : 'License' }}
         </span>
       </template>
       <div
@@ -191,12 +191,12 @@
       ref="downloadModal"
       :on-show="
         () => {
-          navigateTo({ query: route.query, hash: '#download' });
+          navigateTo({ query: route.query, hash: '#download' })
         }
       "
       :on-hide="
         () => {
-          navigateTo({ query: route.query, hash: '' });
+          navigateTo({ query: route.query, hash: '' })
         }
       "
     >
@@ -250,7 +250,7 @@
                 {{
                   currentGameVersion
                     ? `Game version: ${currentGameVersion}`
-                    : "Error: no game versions found"
+                    : 'Error: no game versions found'
                 }}
                 <InfoIcon
                   v-tooltip="`${project.title} is only available for ${currentGameVersion}`"
@@ -265,7 +265,7 @@
               @on-open="
                 () => {
                   if (platformAccordion) {
-                    platformAccordion.close();
+                    platformAccordion.close()
                   }
                 }
               "
@@ -273,7 +273,7 @@
               <template #title>
                 <GameIcon aria-hidden="true" />
                 {{
-                  currentGameVersion ? `Game version: ${currentGameVersion}` : "Select game version"
+                  currentGameVersion ? `Game version: ${currentGameVersion}` : 'Select game version'
                 }}
               </template>
               <div class="iconified-input mb-2 flex w-full">
@@ -313,10 +313,10 @@
                     }"
                     @click="
                       () => {
-                        userSelectedGameVersion = gameVersion;
-                        gameVersionAccordion.close();
+                        userSelectedGameVersion = gameVersion
+                        gameVersionAccordion.close()
                         if (!currentPlatform && platformAccordion) {
-                          platformAccordion.open();
+                          platformAccordion.open()
                         }
 
                         navigateTo({
@@ -326,7 +326,7 @@
                             ...(userSelectedPlatform && { loader: userSelectedPlatform }),
                           },
                           hash: route.hash,
-                        });
+                        })
                       }
                     "
                   >
@@ -349,7 +349,7 @@
                 {{
                   currentPlatform
                     ? `Platform: ${formatCategory(currentPlatform)}`
-                    : "Error: no platforms found"
+                    : 'Error: no platforms found'
                 }}
                 <InfoIcon
                   v-tooltip="
@@ -366,7 +366,7 @@
               @on-open="
                 () => {
                   if (gameVersionAccordion) {
-                    gameVersionAccordion.close();
+                    gameVersionAccordion.close()
                   }
                 }
               "
@@ -376,7 +376,7 @@
                 {{
                   currentPlatform
                     ? `Platform: ${formatCategory(currentPlatform)}`
-                    : "Select platform"
+                    : 'Select platform'
                 }}
               </template>
               <ScrollablePanel :class="project.loaders.length > 4 ? 'h-[15rem]' : ''">
@@ -396,11 +396,11 @@
                     }"
                     @click="
                       () => {
-                        userSelectedPlatform = platform;
+                        userSelectedPlatform = platform
 
-                        platformAccordion.close();
+                        platformAccordion.close()
                         if (!currentGameVersion && gameVersionAccordion) {
-                          gameVersionAccordion.open();
+                          gameVersionAccordion.open()
                         }
 
                         navigateTo({
@@ -410,7 +410,7 @@
                             ...(userSelectedPlatform && { loader: userSelectedPlatform }),
                           },
                           hash: route.hash,
-                        });
+                        })
                       }
                     "
                   >
@@ -458,8 +458,8 @@
             :link="`/servers#plan`"
             @close="
               () => {
-                flags.showProjectPageDownloadModalServersPromo = false;
-                saveFeatureFlags();
+                flags.showProjectPageDownloadModalServersPromo = false
+                saveFeatureFlags()
               }
             "
           />
@@ -524,8 +524,8 @@
                   :to="`/servers?project=${project.id}#plan`"
                   @click="
                     () => {
-                      flags.showProjectPageCreateServersTooltip = false;
-                      saveFeatureFlags();
+                      flags.showProjectPageCreateServersTooltip = false
+                      saveFeatureFlags()
                     }
                   "
                 >
@@ -550,8 +550,8 @@
                         v-tooltip="`Don't show again`"
                         @click="
                           () => {
-                            flags.showProjectPageCreateServersTooltip = false;
-                            saveFeatureFlags();
+                            flags.showProjectPageCreateServersTooltip = false
+                            saveFeatureFlags()
                           }
                         "
                       >
@@ -690,8 +690,8 @@
                   {
                     id: 'moderation-checklist',
                     action: () => {
-                      moderationStore.setSingleProject(project.id);
-                      showModerationChecklist = true;
+                      moderationStore.setSingleProject(project.id)
+                      showModerationChecklist = true
                     },
                     color: 'orange',
                     hoverOnly: true,
@@ -919,7 +919,7 @@ import {
   VersionIcon,
   WrenchIcon,
   XIcon,
-} from "@modrinth/assets";
+} from '@modrinth/assets'
 import {
   Avatar,
   ButtonStyled,
@@ -938,159 +938,159 @@ import {
   ServersPromo,
   TagItem,
   useRelativeTime,
-} from "@modrinth/ui";
-import VersionSummary from "@modrinth/ui/src/components/version/VersionSummary.vue";
-import { formatCategory, formatProjectType, renderString } from "@modrinth/utils";
-import { useLocalStorage } from "@vueuse/core";
-import dayjs from "dayjs";
-import { Tooltip } from "floating-vue";
+} from '@modrinth/ui'
+import VersionSummary from '@modrinth/ui/src/components/version/VersionSummary.vue'
+import { formatCategory, formatProjectType, renderString } from '@modrinth/utils'
+import { useLocalStorage } from '@vueuse/core'
+import dayjs from 'dayjs'
+import { Tooltip } from 'floating-vue'
 
-import { navigateTo } from "#app";
-import Accordion from "~/components/ui/Accordion.vue";
-import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
-import AutomaticAccordion from "~/components/ui/AutomaticAccordion.vue";
-import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
-import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
-import MessageBanner from "~/components/ui/MessageBanner.vue";
-import ModerationChecklist from "~/components/ui/moderation/checklist/ModerationChecklist.vue";
-import NavStack from "~/components/ui/NavStack.vue";
-import NavStackItem from "~/components/ui/NavStackItem.vue";
-import NavTabs from "~/components/ui/NavTabs.vue";
-import ProjectMemberHeader from "~/components/ui/ProjectMemberHeader.vue";
-import { saveFeatureFlags } from "~/composables/featureFlags.ts";
-import { userCollectProject } from "~/composables/user.js";
-import { useModerationStore } from "~/store/moderation.ts";
-import { reportProject } from "~/utils/report-helpers.ts";
+import { navigateTo } from '#app'
+import Accordion from '~/components/ui/Accordion.vue'
+import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
+import AutomaticAccordion from '~/components/ui/AutomaticAccordion.vue'
+import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
+import CollectionCreateModal from '~/components/ui/CollectionCreateModal.vue'
+import MessageBanner from '~/components/ui/MessageBanner.vue'
+import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
+import NavStack from '~/components/ui/NavStack.vue'
+import NavStackItem from '~/components/ui/NavStackItem.vue'
+import NavTabs from '~/components/ui/NavTabs.vue'
+import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
+import { saveFeatureFlags } from '~/composables/featureFlags.ts'
+import { userCollectProject } from '~/composables/user.js'
+import { useModerationStore } from '~/store/moderation.ts'
+import { reportProject } from '~/utils/report-helpers.ts'
 
-const data = useNuxtApp();
-const route = useNativeRoute();
-const config = useRuntimeConfig();
-const moderationStore = useModerationStore();
+const data = useNuxtApp()
+const route = useNativeRoute()
+const config = useRuntimeConfig()
+const moderationStore = useModerationStore()
 
-const auth = await useAuth();
-const user = await useUser();
+const auth = await useAuth()
+const user = await useUser()
 
-const tags = useTags();
-const flags = useFeatureFlags();
-const cosmetics = useCosmetics();
+const tags = useTags()
+const flags = useFeatureFlags()
+const cosmetics = useCosmetics()
 
-const { formatMessage } = useVIntl();
-const { setVisible } = useNotificationRightwards();
+const { formatMessage } = useVIntl()
+const { setVisible } = useNotificationRightwards()
 
-const settingsModal = ref();
-const downloadModal = ref();
-const overTheTopDownloadAnimation = ref();
+const settingsModal = ref()
+const downloadModal = ref()
+const overTheTopDownloadAnimation = ref()
 
-const userSelectedGameVersion = ref(null);
-const userSelectedPlatform = ref(null);
-const showAllVersions = ref(false);
+const userSelectedGameVersion = ref(null)
+const userSelectedPlatform = ref(null)
+const showAllVersions = ref(false)
 
-const gameVersionFilterInput = ref();
+const gameVersionFilterInput = ref()
 
-const versionFilter = ref("");
+const versionFilter = ref('')
 
-const baseId = useId();
+const baseId = useId()
 
 const currentGameVersion = computed(() => {
   return (
     userSelectedGameVersion.value ||
     (project.value.game_versions.length === 1 && project.value.game_versions[0])
-  );
-});
+  )
+})
 
 const possibleGameVersions = computed(() => {
   return versions.value
     .filter((x) => !currentPlatform.value || x.loaders.includes(currentPlatform.value))
-    .flatMap((x) => x.game_versions);
-});
+    .flatMap((x) => x.game_versions)
+})
 
 const possiblePlatforms = computed(() => {
   return versions.value
     .filter((x) => !currentGameVersion.value || x.game_versions.includes(currentGameVersion.value))
-    .flatMap((x) => x.loaders);
-});
+    .flatMap((x) => x.loaders)
+})
 
 const currentPlatform = computed(() => {
   return (
     userSelectedPlatform.value || (project.value.loaders.length === 1 && project.value.loaders[0])
-  );
-});
+  )
+})
 
 function installWithApp() {
   setTimeout(() => {
-    getModrinthAppAccordion.value.open();
-  }, 1500);
+    getModrinthAppAccordion.value.open()
+  }, 1500)
 }
 
-const gameVersionAccordion = ref();
-const platformAccordion = ref();
-const getModrinthAppAccordion = ref();
+const gameVersionAccordion = ref()
+const platformAccordion = ref()
+const getModrinthAppAccordion = ref()
 
-const formatRelativeTime = useRelativeTime();
+const formatRelativeTime = useRelativeTime()
 
 const detailsMessages = defineMessages({
   title: {
-    id: "project.about.details.title",
-    defaultMessage: "Details",
+    id: 'project.about.details.title',
+    defaultMessage: 'Details',
   },
   licensed: {
-    id: "project.about.details.licensed",
-    defaultMessage: "Licensed {license}",
+    id: 'project.about.details.licensed',
+    defaultMessage: 'Licensed {license}',
   },
   created: {
-    id: "project.about.details.created",
-    defaultMessage: "Created {date}",
+    id: 'project.about.details.created',
+    defaultMessage: 'Created {date}',
   },
   submitted: {
-    id: "project.about.details.submitted",
-    defaultMessage: "Submitted {date}",
+    id: 'project.about.details.submitted',
+    defaultMessage: 'Submitted {date}',
   },
   published: {
-    id: "project.about.details.published",
-    defaultMessage: "Published {date}",
+    id: 'project.about.details.published',
+    defaultMessage: 'Published {date}',
   },
   updated: {
-    id: "project.about.details.updated",
-    defaultMessage: "Updated {date}",
+    id: 'project.about.details.updated',
+    defaultMessage: 'Updated {date}',
   },
-});
+})
 
-const modalLicense = ref(null);
-const licenseText = ref("");
+const modalLicense = ref(null)
+const licenseText = ref('')
 
 const createdDate = computed(() =>
-  project.value.published ? formatRelativeTime(project.value.published) : "unknown",
-);
+  project.value.published ? formatRelativeTime(project.value.published) : 'unknown',
+)
 const submittedDate = computed(() =>
-  project.value.queued ? formatRelativeTime(project.value.queued) : "unknown",
-);
+  project.value.queued ? formatRelativeTime(project.value.queued) : 'unknown',
+)
 const publishedDate = computed(() =>
-  project.value.approved ? formatRelativeTime(project.value.approved) : "unknown",
-);
+  project.value.approved ? formatRelativeTime(project.value.approved) : 'unknown',
+)
 const updatedDate = computed(() =>
-  project.value.updated ? formatRelativeTime(project.value.updated) : "unknown",
-);
+  project.value.updated ? formatRelativeTime(project.value.updated) : 'unknown',
+)
 
 const licenseIdDisplay = computed(() => {
-  const id = project.value.license.id;
+  const id = project.value.license.id
 
-  if (id === "LicenseRef-All-Rights-Reserved") {
-    return "ARR";
-  } else if (id.includes("LicenseRef")) {
-    return id.replaceAll("LicenseRef-", "").replaceAll("-", " ");
+  if (id === 'LicenseRef-All-Rights-Reserved') {
+    return 'ARR'
+  } else if (id.includes('LicenseRef')) {
+    return id.replaceAll('LicenseRef-', '').replaceAll('-', ' ')
   } else {
-    return id;
+    return id
   }
-});
+})
 
 async function getLicenseData(event) {
-  modalLicense.value.show(event);
+  modalLicense.value.show(event)
 
   try {
-    const text = await useBaseFetch(`tag/license/${project.value.license.id}`);
-    licenseText.value = text.body || "License text could not be retrieved.";
+    const text = await useBaseFetch(`tag/license/${project.value.license.id}`)
+    licenseText.value = text.body || 'License text could not be retrieved.'
   } catch {
-    licenseText.value = "License text could not be retrieved.";
+    licenseText.value = 'License text could not be retrieved.'
   }
 }
 
@@ -1099,81 +1099,81 @@ const filteredVersions = computed(() => {
     (x) =>
       x.game_versions.includes(currentGameVersion.value) &&
       x.loaders.includes(currentPlatform.value),
-  );
-});
+  )
+})
 
 const filteredRelease = computed(() => {
-  return filteredVersions.value.find((x) => x.version_type === "release");
-});
+  return filteredVersions.value.find((x) => x.version_type === 'release')
+})
 
 const filteredBeta = computed(() => {
   return filteredVersions.value.find(
     (x) =>
-      x.version_type === "beta" &&
+      x.version_type === 'beta' &&
       (!filteredRelease.value ||
         dayjs(x.date_published).isAfter(dayjs(filteredRelease.value.date_published))),
-  );
-});
+  )
+})
 
 const filteredAlpha = computed(() => {
   return filteredVersions.value.find(
     (x) =>
-      x.version_type === "alpha" &&
+      x.version_type === 'alpha' &&
       (!filteredRelease.value ||
         dayjs(x.date_published).isAfter(dayjs(filteredRelease.value.date_published))) &&
       (!filteredBeta.value ||
         dayjs(x.date_published).isAfter(dayjs(filteredBeta.value.date_published))),
-  );
-});
+  )
+})
 
 const messages = defineMessages({
   downloadsStat: {
-    id: "project.stats.downloads-label",
-    defaultMessage: "download{count, plural, one {} other {s}}",
+    id: 'project.stats.downloads-label',
+    defaultMessage: 'download{count, plural, one {} other {s}}',
   },
   followersStat: {
-    id: "project.stats.followers-label",
-    defaultMessage: "follower{count, plural, one {} other {s}}",
+    id: 'project.stats.followers-label',
+    defaultMessage: 'follower{count, plural, one {} other {s}}',
   },
   descriptionTab: {
-    id: "project.description.title",
-    defaultMessage: "Description",
+    id: 'project.description.title',
+    defaultMessage: 'Description',
   },
   galleryTab: {
-    id: "project.gallery.title",
-    defaultMessage: "Gallery",
+    id: 'project.gallery.title',
+    defaultMessage: 'Gallery',
   },
   versionsTab: {
-    id: "project.versions.title",
-    defaultMessage: "Versions",
+    id: 'project.versions.title',
+    defaultMessage: 'Versions',
   },
   moderationTab: {
-    id: "project.moderation.title",
-    defaultMessage: "Moderation",
+    id: 'project.moderation.title',
+    defaultMessage: 'Moderation',
   },
-});
+})
 
-const displayCollectionsSearch = ref("");
+const displayCollectionsSearch = ref('')
 const collections = computed(() =>
   user.value && user.value.collections
     ? user.value.collections.filter((x) =>
         x.name.toLowerCase().includes(displayCollectionsSearch.value.toLowerCase()),
       )
     : [],
-);
+)
 
 if (
   !route.params.id ||
   !(
     tags.value.projectTypes.find((x) => x.id === route.params.type) ||
-    route.params.type === "project"
+    route.params.type === 'project'
   )
 ) {
   throw createError({
     fatal: true,
     statusCode: 404,
-    message: "The page could not be found",
-  });
+    message: 'The page could not be found',
+  })
 }
 
 let project,
@@ -1189,9 +1189,9 @@ let project,
   membersError,
   dependenciesError,
   featuredVersionsError,
-  versionsError;
+  versionsError
 try {
-  [
+  ;[
     { data: project, error: projectError, refresh: resetProject },
     { data: allMembers, error: membersError, refresh: resetMembers },
     { data: dependencies, error: dependenciesError },
@@ -1202,15 +1202,15 @@ try {
     useAsyncData(`project/${route.params.id}`, () => useBaseFetch(`project/${route.params.id}`), {
       transform: (project) => {
         if (project) {
-          project.actualProjectType = JSON.parse(JSON.stringify(project.project_type));
+          project.actualProjectType = JSON.parse(JSON.stringify(project.project_type))
           project.project_type = data.$getProjectTypeForUrl(
             project.project_type,
             project.loaders,
             tags.value,
-          );
+          )
         }
 
-        return project;
+        return project
       },
     }),
     useAsyncData(
@@ -1219,11 +1219,11 @@ try {
       {
         transform: (members) => {
           members.forEach((it, index) => {
-            members[index].avatar_url = it.user.avatar_url;
-            members[index].name = it.user.username;
-          });
+            members[index].avatar_url = it.user.avatar_url
+            members[index].name = it.user.username
+          })
 
-          return members;
+          return members
         },
       },
     ),
@@ -1239,16 +1239,16 @@ try {
     useAsyncData(`project/${route.params.id}/organization`, () =>
       useBaseFetch(`project/${route.params.id}/organization`, { apiVersion: 3 }),
     ),
-  ]);
+  ])
 
-  versions = shallowRef(toRaw(versions));
-  featuredVersions = shallowRef(toRaw(featuredVersions));
+  versions = shallowRef(toRaw(versions))
+  featuredVersions = shallowRef(toRaw(featuredVersions))
 } catch (err) {
   throw createError({
     fatal: true,
     statusCode: err.statusCode ?? 500,
-    message: "Error loading project data" + (err.message ? `: ${err.message}` : ""),
-  });
+    message: 'Error loading project data' + (err.message ? `: ${err.message}` : ''),
+  })
 }
 
 function handleError(err, project = false) {
@@ -1256,72 +1256,72 @@ function handleError(err, project = false) {
     throw createError({
       fatal: true,
       statusCode: err.value.statusCode,
-      message: err.value.statusCode === 404 && project ? "Project not found" : err.value.message,
-    });
+      message: err.value.statusCode === 404 && project ? 'Project not found' : err.value.message,
+    })
   }
 }
 
-handleError(projectError, true);
-handleError(membersError);
-handleError(dependenciesError);
-handleError(featuredVersionsError);
-handleError(versionsError);
+handleError(projectError, true)
+handleError(membersError)
+handleError(dependenciesError)
+handleError(featuredVersionsError)
+handleError(versionsError)
 
 if (!project.value) {
   throw createError({
     fatal: true,
     statusCode: 404,
-    message: "Project not found",
-  });
+    message: 'Project not found',
+  })
 }
 
 if (project.value.project_type !== route.params.type || route.params.id !== project.value.slug) {
-  let path = route.fullPath.split("/");
-  path.splice(0, 3);
-  path = path.filter((x) => x);
+  let path = route.fullPath.split('/')
+  path.splice(0, 3)
+  path = path.filter((x) => x)
 
   await navigateTo(
     `/${project.value.project_type}/${project.value.slug}${
-      path.length > 0 ? `/${path.join("/")}` : ""
+      path.length > 0 ? `/${path.join('/')}` : ''
     }`,
     { redirectCode: 301, replace: true },
-  );
+  )
 }
 
 // Members should be an array of all members, without the accepted ones, and with the user with the Owner role at the start
 // The rest of the members should be sorted by role, then by name
 const members = computed(() => {
-  const acceptedMembers = allMembers.value.filter((x) => x.accepted);
+  const acceptedMembers = allMembers.value.filter((x) => x.accepted)
   const owner = acceptedMembers.find((x) =>
     organization.value
       ? organization.value.members.some(
           (orgMember) => orgMember.user.id === x.user.id && orgMember.is_owner,
         )
       : x.is_owner,
-  );
+  )
 
-  const rest = acceptedMembers.filter((x) => !owner || x.user.id !== owner.user.id) || [];
+  const rest = acceptedMembers.filter((x) => !owner || x.user.id !== owner.user.id) || []
 
   rest.sort((a, b) => {
     if (a.role === b.role) {
-      return a.user.username.localeCompare(b.user.username);
+      return a.user.username.localeCompare(b.user.username)
     } else {
-      return a.role.localeCompare(b.role);
+      return a.role.localeCompare(b.role)
     }
-  });
+  })
 
-  return owner ? [owner, ...rest] : rest;
-});
+  return owner ? [owner, ...rest] : rest
+})
 
 const isMember = computed(
   () => auth.value.user && allMembers.value.some((x) => x.user.id === auth.value.user.id),
-);
+)
 
 const currentMember = computed(() => {
-  let val = auth.value.user ? allMembers.value.find((x) => x.user.id === auth.value.user.id) : null;
+  let val = auth.value.user ? allMembers.value.find((x) => x.user.id === auth.value.user.id) : null
 
   if (!val && auth.value.user && organization.value && organization.value.members) {
-    val = organization.value.members.find((x) => x.user.id === auth.value.user.id);
+    val = organization.value.members.find((x) => x.user.id === auth.value.user.id)
   }
 
   if (!val && auth.value.user && tags.value.staffRoles.includes(auth.value.user.role)) {
@@ -1329,195 +1329,195 @@ const currentMember = computed(() => {
       team_id: project.team_id,
       user: auth.value.user,
       role: auth.value.role,
-      permissions: auth.value.user.role === "admin" ? 1023 : 12,
+      permissions: auth.value.user.role === 'admin' ? 1023 : 12,
       accepted: true,
       payouts_split: 0,
       avatar_url: auth.value.user.avatar_url,
       name: auth.value.user.username,
-    };
+    }
   }
 
-  return val;
-});
+  return val
+})
 
-versions.value = data.$computeVersions(versions.value, allMembers.value);
+versions.value = data.$computeVersions(versions.value, allMembers.value)
 
 // Q: Why do this instead of computing the versions of featuredVersions?
 // A: It will incorrectly generate the version slugs because it doesn't have the full context of
 //    all the versions. For example, if version 1.1.0 for Forge is featured but 1.1.0 for Fabric
 //    is not, but the Fabric one was uploaded first, the Forge version would link to the Fabric
 ///   version
-const featuredIds = featuredVersions.value.map((x) => x.id);
-featuredVersions.value = versions.value.filter((version) => featuredIds.includes(version.id));
+const featuredIds = featuredVersions.value.map((x) => x.id)
+featuredVersions.value = versions.value.filter((version) => featuredIds.includes(version.id))
 
 featuredVersions.value.sort((a, b) => {
-  const aLatest = a.game_versions[a.game_versions.length - 1];
-  const bLatest = b.game_versions[b.game_versions.length - 1];
-  const gameVersions = tags.value.gameVersions.map((e) => e.version);
-  return gameVersions.indexOf(aLatest) - gameVersions.indexOf(bLatest);
-});
+  const aLatest = a.game_versions[a.game_versions.length - 1]
+  const bLatest = b.game_versions[b.game_versions.length - 1]
+  const gameVersions = tags.value.gameVersions.map((e) => e.version)
+  return gameVersions.indexOf(aLatest) - gameVersions.indexOf(bLatest)
+})
 
 const projectTypeDisplay = computed(() =>
   formatProjectType(
     data.$getProjectTypeForDisplay(project.value.project_type, project.value.loaders),
   ),
-);
+)
 
 const following = computed(
   () =>
     user.value && user.value.follows && user.value.follows.find((x) => x.id === project.value.id),
-);
+)
 
-const title = computed(() => `${project.value.title} - Minecraft ${projectTypeDisplay.value}`);
+const title = computed(() => `${project.value.title} - Minecraft ${projectTypeDisplay.value}`)
 const description = computed(
   () =>
     `${project.value.description} - Download the Minecraft ${projectTypeDisplay.value} ${
       project.value.title
-    } by ${members.value.find((x) => x.is_owner)?.user?.username || "a Creator"} on Modrinth`,
-);
+    } by ${members.value.find((x) => x.is_owner)?.user?.username || 'a Creator'} on Modrinth`,
+)
 
 const canCreateServerFrom = computed(() => {
-  return project.value.project_type === "modpack" && project.value.server_side !== "unsupported";
-});
+  return project.value.project_type === 'modpack' && project.value.server_side !== 'unsupported'
+})
 
-if (!route.name.startsWith("type-id-settings")) {
+if (!route.name.startsWith('type-id-settings')) {
   useSeoMeta({
     title: () => title.value,
     description: () => description.value,
     ogTitle: () => title.value,
     ogDescription: () => project.value.description,
-    ogImage: () => project.value.icon_url ?? "https://cdn.modrinth.com/placeholder.png",
+    ogImage: () => project.value.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
     robots: () =>
-      project.value.status === "approved" || project.value.status === "archived"
-        ? "all"
-        : "noindex",
-  });
+      project.value.status === 'approved' || project.value.status === 'archived'
+        ? 'all'
+        : 'noindex',
+  })
 }
 
-const onUserCollectProject = useClientTry(userCollectProject);
+const onUserCollectProject = useClientTry(userCollectProject)
 
-const { version, loader } = route.query;
+const { version, loader } = route.query
 if (version !== undefined && project.value.game_versions.includes(version)) {
-  userSelectedGameVersion.value = version;
+  userSelectedGameVersion.value = version
 }
 if (loader !== undefined && project.value.loaders.includes(loader)) {
-  userSelectedPlatform.value = loader;
+  userSelectedPlatform.value = loader
 }
 
 watch(downloadModal, (modal) => {
-  if (!modal) return;
+  if (!modal) return
 
   // route.hash returns everything in the hash string, including the # itself
-  if (route.hash === "#download") {
-    modal.show();
+  if (route.hash === '#download') {
+    modal.show()
   }
-});
+})
 
 async function setProcessing() {
-  startLoading();
+  startLoading()
 
   try {
     await useBaseFetch(`project/${project.value.id}`, {
-      method: "PATCH",
+      method: 'PATCH',
       body: {
-        status: "processing",
+        status: 'processing',
       },
-    });
+    })
 
-    project.value.status = "processing";
+    project.value.status = 'processing'
   } catch (err) {
     data.$notify({
-      group: "main",
-      title: "An error occurred",
+      group: 'main',
+      title: 'An error occurred',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
 
-  stopLoading();
+  stopLoading()
 }
 
 async function patchProject(resData, quiet = false) {
-  let result = false;
-  startLoading();
+  let result = false
+  startLoading()
 
   try {
     await useBaseFetch(`project/${project.value.id}`, {
-      method: "PATCH",
+      method: 'PATCH',
       body: resData,
-    });
+    })
 
     for (const key in resData) {
-      project.value[key] = resData[key];
+      project.value[key] = resData[key]
     }
 
     if (resData.license_id) {
-      project.value.license.id = resData.license_id;
+      project.value.license.id = resData.license_id
     }
     if (resData.license_url) {
-      project.value.license.url = resData.license_url;
+      project.value.license.url = resData.license_url
     }
 
-    result = true;
+    result = true
     if (!quiet) {
       data.$notify({
-        group: "main",
-        title: "Project updated",
-        text: "Your project has been updated.",
-        type: "success",
-      });
-      window.scrollTo({ top: 0, behavior: "smooth" });
+        group: 'main',
+        title: 'Project updated',
+        text: 'Your project has been updated.',
+        type: 'success',
+      })
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   } catch (err) {
     data.$notify({
-      group: "main",
-      title: "An error occurred",
+      group: 'main',
+      title: 'An error occurred',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
-    window.scrollTo({ top: 0, behavior: "smooth" });
+      type: 'error',
+    })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  stopLoading();
+  stopLoading()
 
-  return result;
+  return result
 }
 
 async function patchIcon(icon) {
-  let result = false;
-  startLoading();
+  let result = false
+  startLoading()
 
   try {
     await useBaseFetch(
       `project/${project.value.id}/icon?ext=${
-        icon.type.split("/")[icon.type.split("/").length - 1]
+        icon.type.split('/')[icon.type.split('/').length - 1]
       }`,
       {
-        method: "PATCH",
+        method: 'PATCH',
         body: icon,
       },
-    );
-    await resetProject();
-    result = true;
+    )
+    await resetProject()
+    result = true
     data.$notify({
-      group: "main",
-      title: "Project icon updated",
+      group: 'main',
+      title: 'Project icon updated',
       text: "Your project's icon has been updated.",
-      type: "success",
-    });
+      type: 'success',
+    })
   } catch (err) {
     data.$notify({
-      group: "main",
-      title: "An error occurred",
+      group: 'main',
+      title: 'An error occurred',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  stopLoading();
-  return result;
+  stopLoading()
+  return result
 }
 
 async function updateMembers() {
@@ -1527,79 +1527,79 @@ async function updateMembers() {
     {
       transform: (members) => {
         members.forEach((it, index) => {
-          members[index].avatar_url = it.user.avatar_url;
-          members[index].name = it.user.username;
-        });
+          members[index].avatar_url = it.user.avatar_url
+          members[index].name = it.user.username
+        })
 
-        return members;
+        return members
       },
     },
-  );
+  )
 }
 
 async function copyId() {
-  await navigator.clipboard.writeText(project.value.id);
+  await navigator.clipboard.writeText(project.value.id)
 }
 
 async function copyPermalink() {
-  await navigator.clipboard.writeText(`${config.public.siteUrl}/project/${project.value.id}`);
+  await navigator.clipboard.writeText(`${config.public.siteUrl}/project/${project.value.id}`)
 }
 
-const collapsedChecklist = ref(false);
+const collapsedChecklist = ref(false)
 
 const showModerationChecklist = useLocalStorage(
   `show-moderation-checklist-${project.value.id}`,
   false,
-);
-const collapsedModerationChecklist = useLocalStorage("collapsed-moderation-checklist", false);
+)
+const collapsedModerationChecklist = useLocalStorage('collapsed-moderation-checklist', false)
 
 watch(
   showModerationChecklist,
   (newValue) => {
-    setVisible(newValue);
+    setVisible(newValue)
   },
   { immediate: true },
-);
+)
 
 if (import.meta.client && history && history.state && history.state.showChecklist) {
-  showModerationChecklist.value = true;
+  showModerationChecklist.value = true
 }
 
 function closeDownloadModal(event) {
-  downloadModal.value.hide(event);
-  userSelectedPlatform.value = null;
-  userSelectedGameVersion.value = null;
-  showAllVersions.value = false;
+  downloadModal.value.hide(event)
+  userSelectedPlatform.value = null
+  userSelectedGameVersion.value = null
+  showAllVersions.value = false
 }
 
 function triggerDownloadAnimation() {
-  overTheTopDownloadAnimation.value = true;
-  setTimeout(() => (overTheTopDownloadAnimation.value = false), 500);
+  overTheTopDownloadAnimation.value = true
+  setTimeout(() => (overTheTopDownloadAnimation.value = false), 500)
 }
 
 function onDownload(event) {
-  triggerDownloadAnimation();
+  triggerDownloadAnimation()
   setTimeout(() => {
-    closeDownloadModal(event);
-  }, 400);
+    closeDownloadModal(event)
+  }, 400)
 }
 
 async function deleteVersion(id) {
-  if (!id) return;
+  if (!id) return
 
-  startLoading();
+  startLoading()
 
   await useBaseFetch(`version/${id}`, {
-    method: "DELETE",
-  });
+    method: 'DELETE',
+  })
 
-  versions.value = versions.value.filter((x) => x.id !== id);
+  versions.value = versions.value.filter((x) => x.id !== id)
 
-  stopLoading();
+  stopLoading()
 }
 
 const navLinks = computed(() => {
-  const projectUrl = `/${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}`;
+  const projectUrl = `/${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}`
 
   return [
     {
@@ -1612,7 +1612,7 @@ const navLinks = computed(() => {
       shown: project.value.gallery.length > 0 || !!currentMember.value,
     },
     {
-      label: "Changelog",
+      label: 'Changelog',
       href: `${projectUrl}/changelog`,
       shown: versions.value.length > 0,
     },
@@ -1627,8 +1627,8 @@ const navLinks = computed(() => {
       href: `${projectUrl}/moderation`,
       shown: !!currentMember.value,
     },
-  ];
-});
+  ]
+})
 </script>
 
 <style lang="scss" scoped>
@@ -1769,7 +1769,7 @@ const navLinks = computed(() => {
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
     border-bottom: 6px solid var(--color-button-bg);
-    content: " ";
+    content: ' ';
     position: absolute;
     top: -7px;
     left: 17px;
@@ -1780,7 +1780,7 @@ const navLinks = computed(() => {
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
     border-bottom: 5px solid var(--color-raised-bg);
-    content: " ";
+    content: ' ';
     position: absolute;
     top: -5px;
     left: 18px;

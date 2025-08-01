@@ -108,104 +108,104 @@
 </template>
 
 <script setup lang="ts">
-import { HammerIcon, PlusIcon, SearchIcon } from "@modrinth/assets";
-import { ButtonStyled, CopyCode } from "@modrinth/ui";
-import type { ModrinthServersFetchError,Server } from "@modrinth/utils";
-import Fuse from "fuse.js";
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { HammerIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
+import { ButtonStyled, CopyCode } from '@modrinth/ui'
+import type { ModrinthServersFetchError, Server } from '@modrinth/utils'
+import Fuse from 'fuse.js'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
-import { reloadNuxtApp } from "#app";
-import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
+import { reloadNuxtApp } from '#app'
+import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 
 definePageMeta({
-  middleware: "auth",
-});
+  middleware: 'auth',
+})
 
 useHead({
-  title: "Servers - Modrinth",
-});
+  title: 'Servers - Modrinth',
+})
 
 interface ServerResponse {
-  servers: Server[];
+  servers: Server[]
 }
 
-const router = useRouter();
-const route = useRoute();
-const hasError = ref(false);
-const isPollingForNewServers = ref(false);
+const router = useRouter()
+const route = useRoute()
+const hasError = ref(false)
+const isPollingForNewServers = ref(false)
 
 const {
   data: serverResponse,
   error: fetchError,
   refresh,
-} = await useAsyncData<ServerResponse>("ServerList", () =>
-  useServersFetch<ServerResponse>("servers"),
-);
+} = await useAsyncData<ServerResponse>('ServerList', () =>
+  useServersFetch<ServerResponse>('servers'),
+)
 
 watch([fetchError, serverResponse], ([error, response]) => {
-  hasError.value = !!error || !response;
-});
+  hasError.value = !!error || !response
+})
 
 const serverList = computed(() => {
-  if (!serverResponse.value) return [];
-  return serverResponse.value.servers;
-});
+  if (!serverResponse.value) return []
+  return serverResponse.value.servers
+})
 
-const searchInput = ref("");
+const searchInput = ref('')
 
 const fuse = computed(() => {
-  if (serverList.value.length === 0) return null;
+  if (serverList.value.length === 0) return null
   return new Fuse(serverList.value, {
-    keys: ["name", "loader", "mc_version", "game", "state"],
+    keys: ['name', 'loader', 'mc_version', 'game', 'state'],
     includeScore: true,
     threshold: 0.4,
-  });
-});
+  })
+})
 
 function introToTop(array: Server[]): Server[] {
   return array.slice().sort((a, b) => {
-    return Number(b.flows?.intro) - Number(a.flows?.intro);
-  });
+    return Number(b.flows?.intro) - Number(a.flows?.intro)
+  })
 }
 
 const filteredData = computed(() => {
   if (!searchInput.value.trim()) {
-    return introToTop(serverList.value);
+    return introToTop(serverList.value)
   }
   return fuse.value
     ? introToTop(fuse.value.search(searchInput.value).map((result) => result.item))
-    : [];
-});
+    : []
+})
 
-const previousServerList = ref<Server[]>([]);
-const refreshCount = ref(0);
+const previousServerList = ref<Server[]>([])
+const refreshCount = ref(0)
 
 const checkForNewServers = async () => {
-  await refresh();
-  refreshCount.value += 1;
+  await refresh()
+  refreshCount.value += 1
   if (JSON.stringify(previousServerList.value) !== JSON.stringify(serverList.value)) {
-    isPollingForNewServers.value = false;
-    clearInterval(intervalId);
-    router.replace({ query: {} });
+    isPollingForNewServers.value = false
+    clearInterval(intervalId)
+    router.replace({ query: {} })
   } else if (refreshCount.value >= 5) {
-    isPollingForNewServers.value = false;
-    clearInterval(intervalId);
+    isPollingForNewServers.value = false
+    clearInterval(intervalId)
   }
-};
+}
 
-let intervalId: ReturnType<typeof setInterval> | undefined;
+let intervalId: ReturnType<typeof setInterval> | undefined
 
 onMounted(() => {
-  if (route.query.redirect_status === "succeeded") {
-    isPollingForNewServers.value = true;
-    previousServerList.value = [...serverList.value];
-    intervalId = setInterval(checkForNewServers, 5000);
+  if (route.query.redirect_status === 'succeeded') {
+    isPollingForNewServers.value = true
+    previousServerList.value = [...serverList.value]
+    intervalId = setInterval(checkForNewServers, 5000)
   }
-});
+})
 
 onUnmounted(() => {
   if (intervalId) {
-    clearInterval(intervalId);
+    clearInterval(intervalId)
   }
-});
+})
 </script>

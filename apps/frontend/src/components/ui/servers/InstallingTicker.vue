@@ -14,31 +14,31 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted,ref } from "vue";
+import { onMounted, onUnmounted, ref } from 'vue'
 
 const msgs = [
-  "Organizing files...",
-  "Downloading mods...",
-  "Configuring server...",
-  "Setting up environment...",
-  "Adding Java...",
-];
+  'Organizing files...',
+  'Downloading mods...',
+  'Configuring server...',
+  'Setting up environment...',
+  'Adding Java...',
+]
 
-const currentIndex = ref(0);
+const currentIndex = ref(0)
 
-let intervalId: NodeJS.Timeout | null = null;
+let intervalId: NodeJS.Timeout | null = null
 
 onMounted(() => {
   intervalId = setInterval(() => {
-    currentIndex.value = (currentIndex.value + 1) % msgs.length;
-  }, 3000);
-});
+    currentIndex.value = (currentIndex.value + 1) % msgs.length
+  }, 3000)
+})
 
 onUnmounted(() => {
   if (intervalId) {
-    clearInterval(intervalId);
+    clearInterval(intervalId)
   }
-});
+})
 </script>
 
 <style scoped>

@@ -49,22 +49,22 @@
 </template>
 
 <script setup>
-import { ClientIcon, GlobeIcon, InfoIcon, ServerIcon } from "@modrinth/assets";
+import { ClientIcon, GlobeIcon, InfoIcon, ServerIcon } from '@modrinth/assets'
 
 defineProps({
   type: {
     type: String,
-    default: "mod",
+    default: 'mod',
   },
   serverSide: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   clientSide: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   typeOnly: {
     type: Boolean,
@@ -85,12 +85,12 @@ defineProps({
     type: Array,
     required: false,
     default() {
-      return [];
+      return []
     },
   },
-});
+})
 
-const tags = useTags();
+const tags = useTags()
 </script>
 <style lang="scss" scoped>
 .environment {

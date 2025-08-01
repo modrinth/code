@@ -57,8 +57,8 @@
                   {{
                     getRangeOfMethod(method)
                       .map($formatMoney)
-                      .map((i) => i.replace(".00", ""))
-                      .join("–")
+                      .map((i) => i.replace('.00', ''))
+                      .join('–')
                   }}
                 </span>
               </div>
@@ -194,29 +194,29 @@ import {
   SearchIcon,
   TransferIcon,
   XIcon,
-} from "@modrinth/assets";
-import { Breadcrumbs,Checkbox, Chips } from "@modrinth/ui";
-import { formatMoney, formatWallet } from "@modrinth/utils";
-import { all } from "iso-3166-1";
-import { Multiselect } from "vue-multiselect";
+} from '@modrinth/assets'
+import { Breadcrumbs, Checkbox, Chips } from '@modrinth/ui'
+import { formatMoney, formatWallet } from '@modrinth/utils'
+import { all } from 'iso-3166-1'
+import { Multiselect } from 'vue-multiselect'
 
-import VenmoIcon from "~/assets/images/external/venmo.svg?component";
+import VenmoIcon from '~/assets/images/external/venmo.svg?component'
 
-const auth = await useAuth();
-const data = useNuxtApp();
+const auth = await useAuth()
+const data = useNuxtApp()
 
 const countries = computed(() =>
   all().map((x) => ({
     id: x.alpha2,
-    name: x.alpha2 === "TW" ? "Taiwan" : x.country,
+    name: x.alpha2 === 'TW' ? 'Taiwan' : x.country,
   })),
-);
-const search = ref("");
+)
+const search = ref('')
 
-const amount = ref("");
+const amount = ref('')
 const country = ref(
-  countries.value.find((x) => x.id === (auth.value.user.payout_data.paypal_region ?? "US")),
-);
+  countries.value.find((x) => x.id === (auth.value.user.payout_data.paypal_region ?? 'US')),
+)
 
 const [{ data: userBalance }, { data: payoutMethods, refresh: refreshPayoutMethods }] =
   await Promise.all([
@@ -224,18 +224,18 @@ const [{ data: userBalance }, { data: payoutMethods, refresh: refreshPayoutMetho
     useAsyncData(`payout/methods?country=${country.value.id}`, () =>
       useBaseFetch(`payout/methods?country=${country.value.id}`, { apiVersion: 3 }),
     ),
-  ]);
+  ])
 
-const selectedMethodId = ref(payoutMethods.value[0].id);
+const selectedMethodId = ref(payoutMethods.value[0].id)
 const selectedMethod = computed(() =>
   payoutMethods.value.find((x) => x.id === selectedMethodId.value),
-);
+)
 
 const parsedAmount = computed(() => {
-  const regex = /^\$?(\d*(\.\d{2})?)$/gm;
-  const matches = regex.exec(amount.value);
-  return matches && matches[1] ? parseFloat(matches[1]) : 0.0;
-});
+  const regex = /^\$?(\d*(\.\d{2})?)$/gm
+  const matches = regex.exec(amount.value)
+  return matches && matches[1] ? parseFloat(matches[1]) : 0.0
+})
 const fees = computed(() => {
   return Math.min(
     Math.max(
@@ -243,137 +243,137 @@ const fees = computed(() => {
       selectedMethod.value.fee.percentage * parsedAmount.value,
     ),
     selectedMethod.value.fee.max ?? Number.MAX_VALUE,
-  );
-});
+  )
+})
 
 const getIntervalRange = (intervalType) => {
   if (!intervalType) {
-    return [];
+    return []
   }
 
-  const { min, max, values } = intervalType;
+  const { min, max, values } = intervalType
   if (values) {
-    const first = values[0];
-    const last = values.slice(-1)[0];
-    return first === last ? [first] : [first, last];
+    const first = values[0]
+    const last = values.slice(-1)[0]
+    return first === last ? [first] : [first, last]
   }
 
-  return min === max ? [min] : [min, max];
-};
+  return min === max ? [min] : [min, max]
+}
 
 const getRangeOfMethod = (method) => {
-  return getIntervalRange(method.interval?.fixed || method.interval?.standard);
-};
+  return getIntervalRange(method.interval?.fixed || method.interval?.standard)
+}
 
 const maxWithdrawAmount = computed(() => {
-  const interval = selectedMethod.value.interval;
-  return interval?.standard ? interval.standard.max : (interval?.fixed?.values.slice(-1)[0] ?? 0);
-});
+  const interval = selectedMethod.value.interval
+  return interval?.standard ? interval.standard.max : (interval?.fixed?.values.slice(-1)[0] ?? 0)
+})
 
 const minWithdrawAmount = computed(() => {
-  const interval = selectedMethod.value.interval;
-  return interval?.standard ? interval.standard.min : (interval?.fixed?.values?.[0] ?? fees.value);
-});
+  const interval = selectedMethod.value.interval
+  return interval?.standard ? interval.standard.min : (interval?.fixed?.values?.[0] ?? fees.value)
+})
 
 const withdrawAccount = computed(() => {
-  if (selectedMethod.value.type === "paypal") {
-    return auth.value.user.payout_data.paypal_address;
-  } else if (selectedMethod.value.type === "venmo") {
-    return auth.value.user.payout_data.venmo_handle;
+  if (selectedMethod.value.type === 'paypal') {
+    return auth.value.user.payout_data.paypal_address
+  } else if (selectedMethod.value.type === 'venmo') {
+    return auth.value.user.payout_data.venmo_handle
   } else {
-    return auth.value.user.email;
+    return auth.value.user.email
   }
-});
+})
 const knownErrors = computed(() => {
-  const errors = [];
-  if (selectedMethod.value.type === "paypal" && !auth.value.user.payout_data.paypal_address) {
-    errors.push("Please link your PayPal account in the dashboard to proceed.");
+  const errors = []
+  if (selectedMethod.value.type === 'paypal' && !auth.value.user.payout_data.paypal_address) {
+    errors.push('Please link your PayPal account in the dashboard to proceed.')
   }
-  if (selectedMethod.value.type === "venmo" && !auth.value.user.payout_data.venmo_handle) {
-    errors.push("Please set your Venmo handle in the dashboard to proceed.");
+  if (selectedMethod.value.type === 'venmo' && !auth.value.user.payout_data.venmo_handle) {
+    errors.push('Please set your Venmo handle in the dashboard to proceed.')
   }
-  if (selectedMethod.value.type === "tremendous") {
+  if (selectedMethod.value.type === 'tremendous') {
     if (!auth.value.user.email) {
-      errors.push("Please set your email address in your account settings to proceed.");
+      errors.push('Please set your email address in your account settings to proceed.')
     }
     if (!auth.value.user.email_verified) {
-      errors.push("Please verify your email address to proceed.");
+      errors.push('Please verify your email address to proceed.')
     }
   }
 
   if (!parsedAmount.value && amount.value.length > 0) {
-    errors.push(`${amount.value} is not a valid amount`);
+    errors.push(`${amount.value} is not a valid amount`)
   } else if (
     parsedAmount.value > userBalance.value.available ||
     parsedAmount.value > maxWithdrawAmount.value
   ) {
-    const maxAmount = Math.min(userBalance.value.available, maxWithdrawAmount.value);
-    errors.push(`The amount must be no more than ${data.$formatMoney(maxAmount)}`);
+    const maxAmount = Math.min(userBalance.value.available, maxWithdrawAmount.value)
+    errors.push(`The amount must be no more than ${data.$formatMoney(maxAmount)}`)
   } else if (parsedAmount.value <= fees.value || parsedAmount.value < minWithdrawAmount.value) {
-    const minAmount = Math.max(fees.value + 0.01, minWithdrawAmount.value);
-    errors.push(`The amount must be at least ${data.$formatMoney(minAmount)}`);
+    const minAmount = Math.max(fees.value + 0.01, minWithdrawAmount.value)
+    errors.push(`The amount must be at least ${data.$formatMoney(minAmount)}`)
   }
 
-  return errors;
-});
+  return errors
+})
 
-const agreedTransfer = ref(false);
-const agreedFees = ref(false);
-const agreedTerms = ref(false);
+const agreedTransfer = ref(false)
+const agreedFees = ref(false)
+const agreedTerms = ref(false)
 
 watch(country, async () => {
-  await refreshPayoutMethods();
+  await refreshPayoutMethods()
   if (payoutMethods.value && payoutMethods.value[0]) {
-    selectedMethodId.value = payoutMethods.value[0].id;
+    selectedMethodId.value = payoutMethods.value[0].id
   }
-});
+})
 
 watch(selectedMethod, () => {
   if (selectedMethod.value.interval?.fixed) {
-    amount.value = selectedMethod.value.interval.fixed.values[0];
+    amount.value = selectedMethod.value.interval.fixed.values[0]
   }
   if (maxWithdrawAmount.value === minWithdrawAmount.value) {
-    amount.value = maxWithdrawAmount.value;
+    amount.value = maxWithdrawAmount.value
   }
-  agreedTransfer.value = false;
-  agreedFees.value = false;
-  agreedTerms.value = false;
-});
+  agreedTransfer.value = false
+  agreedFees.value = false
+  agreedTerms.value = false
+})
 
 async function withdraw() {
-  startLoading();
+  startLoading()
   try {
-    const auth = await useAuth();
+    const auth = await useAuth()
 
     await useBaseFetch(`payout`, {
-      method: "POST",
+      method: 'POST',
       body: {
         amount: parsedAmount.value,
         method: selectedMethod.value.type,
         method_id: selectedMethod.value.id,
       },
       apiVersion: 3,
-    });
-    await useAuth(auth.value.token);
-    await navigateTo("/dashboard/revenue");
+    })
+    await useAuth(auth.value.token)
+    await navigateTo('/dashboard/revenue')
     data.$notify({
-      group: "main",
-      title: "Withdrawal complete",
+      group: 'main',
+      title: 'Withdrawal complete',
       text:
-        selectedMethod.value.type === "tremendous"
-          ? "An email has been sent to your account with further instructions on how to redeem your payout!"
+        selectedMethod.value.type === 'tremendous'
+          ? 'An email has been sent to your account with further instructions on how to redeem your payout!'
           : `Payment has been sent to your ${formatWallet(selectedMethod.value.type)} account!`,
-      type: "success",
-    });
+      type: 'success',
+    })
   } catch (err) {
     data.$notify({
-      group: "main",
-      title: "An error occurred",
+      group: 'main',
+      title: 'An error occurred',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  stopLoading();
+  stopLoading()
 }
 </script>
 

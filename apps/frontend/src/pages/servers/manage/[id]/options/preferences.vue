@@ -42,51 +42,51 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage } from "@vueuse/core";
+import { useStorage } from '@vueuse/core'
 
-import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
-const route = useNativeRoute();
-const serverId = route.params.id as string;
+const route = useNativeRoute()
+const serverId = route.params.id as string
 
 const props = defineProps<{
-  server: ModrinthServer;
-}>();
+  server: ModrinthServer
+}>()
 
 const preferences = {
   ramAsNumber: {
-    displayName: "RAM as bytes",
+    displayName: 'RAM as bytes',
     description:
       "When enabled, RAM will be displayed as bytes instead of a percentage in your server's Overview.",
     implemented: true,
   },
   hideSubdomainLabel: {
-    displayName: "Hide subdomain label",
-    description: "When enabled, the subdomain label will be hidden from the server header.",
+    displayName: 'Hide subdomain label',
+    description: 'When enabled, the subdomain label will be hidden from the server header.',
     implemented: true,
   },
   autoRestart: {
-    displayName: "Auto restart",
-    description: "When enabled, your server will automatically restart if it crashes.",
+    displayName: 'Auto restart',
+    description: 'When enabled, your server will automatically restart if it crashes.',
     implemented: false,
   },
   powerDontAskAgain: {
-    displayName: "Power actions confirmation",
-    description: "When enabled, you will be prompted before stopping and restarting your server.",
+    displayName: 'Power actions confirmation',
+    description: 'When enabled, you will be prompted before stopping and restarting your server.',
     implemented: true,
   },
   backupWhileRunning: {
-    displayName: "Create backups while running",
-    description: "When enabled, backups will be created even if the server is running.",
+    displayName: 'Create backups while running',
+    description: 'When enabled, backups will be created even if the server is running.',
     implemented: true,
   },
-} as const;
+} as const
 
-type PreferenceKeys = keyof typeof preferences;
+type PreferenceKeys = keyof typeof preferences
 
 type UserPreferences = {
-  [K in PreferenceKeys]: boolean;
-};
+  [K in PreferenceKeys]: boolean
+}
 
 const defaultPreferences: UserPreferences = {
   ramAsNumber: false,
@@ -94,32 +94,32 @@ const defaultPreferences: UserPreferences = {
   autoRestart: false,
   powerDontAskAgain: false,
   backupWhileRunning: false,
-};
+}
 
 const userPreferences = useStorage<UserPreferences>(
   `pyro-server-${serverId}-preferences`,
   defaultPreferences,
-);
+)
 
-const newUserPreferences = ref<UserPreferences>(JSON.parse(JSON.stringify(userPreferences.value)));
+const newUserPreferences = ref<UserPreferences>(JSON.parse(JSON.stringify(userPreferences.value)))
 
 const hasUnsavedChanges = computed(() => {
-  return JSON.stringify(newUserPreferences.value) !== JSON.stringify(userPreferences.value);
-});
+  return JSON.stringify(newUserPreferences.value) !== JSON.stringify(userPreferences.value)
+})
 
 const savePreferences = () => {
-  userPreferences.value = { ...newUserPreferences.value };
+  userPreferences.value = { ...newUserPreferences.value }
   addNotification({
-    group: "serverOptions",
-    type: "success",
-    title: "Preferences saved",
-    text: "Your preferences have been saved.",
-  });
-};
+    group: 'serverOptions',
+    type: 'success',
+    title: 'Preferences saved',
+    text: 'Your preferences have been saved.',
+  })
+}
 
 const resetPreferences = () => {
-  newUserPreferences.value = { ...userPreferences.value };
-};
+  newUserPreferences.value = { ...userPreferences.value }
+}
 </script>
 
 <style scoped>

@@ -1,1 +1,1 @@
-export { useRoute as useNativeRoute, useRouter as useNativeRouter } from "vue-router";
+export { useRoute as useNativeRoute, useRouter as useNativeRouter } from 'vue-router'

@@ -38,49 +38,49 @@
 </template>
 
 <script lang="ts" setup>
-import { SaveIcon } from "@modrinth/assets";
-import { MarkdownEditor } from "@modrinth/ui";
-import { type Project, type TeamMember, TeamMemberPermission } from "@modrinth/utils";
-import { computed, ref } from "vue";
+import { SaveIcon } from '@modrinth/assets'
+import { MarkdownEditor } from '@modrinth/ui'
+import { type Project, type TeamMember, TeamMemberPermission } from '@modrinth/utils'
+import { computed, ref } from 'vue'
 
-import { useImageUpload } from "~/composables/image-upload.ts";
+import { useImageUpload } from '~/composables/image-upload.ts'
 
 const props = defineProps<{
-  project: Project;
-  allMembers: TeamMember[];
-  currentMember: TeamMember | undefined;
-  patchProject: (payload: object, quiet?: boolean) => object;
-}>();
+  project: Project
+  allMembers: TeamMember[]
+  currentMember: TeamMember | undefined
+  patchProject: (payload: object, quiet?: boolean) => object
+}>()
 
-const description = ref(props.project.body);
+const description = ref(props.project.body)
 
 const patchRequestPayload = computed(() => {
   const payload: {
-    body?: string;
-  } = {};
+    body?: string
+  } = {}
 
   if (description.value !== props.project.body) {
-    payload.body = description.value;
+    payload.body = description.value
   }
 
-  return payload;
-});
+  return payload
+})
 
 const hasChanges = computed(() => {
-  return Object.keys(patchRequestPayload.value).length > 0;
-});
+  return Object.keys(patchRequestPayload.value).length > 0
+})
 
 function saveChanges() {
-  props.patchProject(patchRequestPayload.value);
+  props.patchProject(patchRequestPayload.value)
 }
 
 async function onUploadHandler(file: File) {
   const response = await useImageUpload(file, {
-    context: "project",
+    context: 'project',
     projectID: props.project.id,
-  });
+  })
 
-  return response.url;
+  return response.url
 }
 </script>
 

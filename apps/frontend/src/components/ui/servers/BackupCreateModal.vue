@@ -42,83 +42,83 @@
 </template>
 
 <script setup lang="ts">
-import { IssuesIcon, PlusIcon, XIcon } from "@modrinth/assets";
-import { ButtonStyled, NewModal } from "@modrinth/ui";
-import { ModrinthServersFetchError, type ServerBackup } from "@modrinth/utils";
-import { computed,nextTick, ref } from "vue";
+import { IssuesIcon, PlusIcon, XIcon } from '@modrinth/assets'
+import { ButtonStyled, NewModal } from '@modrinth/ui'
+import { ModrinthServersFetchError, type ServerBackup } from '@modrinth/utils'
+import { computed, nextTick, ref } from 'vue'
 
-import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const props = defineProps<{
-  server: ModrinthServer;
-}>();
+  server: ModrinthServer
+}>()
 
-const modal = ref<InstanceType<typeof NewModal>>();
-const input = ref<HTMLInputElement>();
-const isCreating = ref(false);
-const isRateLimited = ref(false);
-const backupName = ref("");
+const modal = ref<InstanceType<typeof NewModal>>()
+const input = ref<HTMLInputElement>()
+const isCreating = ref(false)
+const isRateLimited = ref(false)
+const backupName = ref('')
 const newBackupAmount = computed(() =>
   props.server.backups?.data?.length === undefined ? 1 : props.server.backups?.data?.length + 1,
-);
+)
 
-const trimmedName = computed(() => backupName.value.trim());
+const trimmedName = computed(() => backupName.value.trim())
 
 const nameExists = computed(() => {
-  if (!props.server.backups?.data) return false;
+  if (!props.server.backups?.data) return false
   return props.server.backups.data.some(
     (backup: ServerBackup) => backup.name.trim().toLowerCase() === trimmedName.value.toLowerCase(),
-  );
-});
+  )
+})
 
 const focusInput = () => {
   nextTick(() => {
     setTimeout(() => {
-      input.value?.focus();
-    }, 100);
-  });
-};
+      input.value?.focus()
+    }, 100)
+  })
+}
 
 function show() {
-  backupName.value = "";
-  isCreating.value = false;
-  modal.value?.show();
+  backupName.value = ''
+  isCreating.value = false
+  modal.value?.show()
 }
 
 const hideModal = () => {
-  modal.value?.hide();
-};
+  modal.value?.hide()
+}
 
 const createBackup = async () => {
   if (backupName.value.trim().length === 0) {
-    backupName.value = `Backup #${newBackupAmount.value}`;
+    backupName.value = `Backup #${newBackupAmount.value}`
   }
 
-  isCreating.value = true;
-  isRateLimited.value = false;
+  isCreating.value = true
+  isRateLimited.value = false
   try {
-    await props.server.backups?.create(trimmedName.value);
-    hideModal();
-    await props.server.refresh();
+    await props.server.backups?.create(trimmedName.value)
+    hideModal()
+    await props.server.refresh()
   } catch (error) {
     if (error instanceof ModrinthServersFetchError && error?.statusCode === 429) {
-      isRateLimited.value = true;
+      isRateLimited.value = true
       addNotification({
-        type: "error",
-        title: "Error creating backup",
+        type: 'error',
+        title: 'Error creating backup',
         text: "You're creating backups too fast.",
-      });
+      })
     } else {
-      const message = error instanceof Error ? error.message : String(error);
-      addNotification({ type: "error", title: "Error creating backup", text: message });
+      const message = error instanceof Error ? error.message : String(error)
+      addNotification({ type: 'error', title: 'Error creating backup', text: message })
     }
   } finally {
-    isCreating.value = false;
+    isCreating.value = false
   }
-};
+}
 
 defineExpose({
   show,
   hide: hideModal,
-});
+})
 </script>

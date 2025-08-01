@@ -72,8 +72,8 @@
             <button
               @click="
                 () => {
-                  filtersMenuOpen = false;
-                  scrollToTop('instant');
+                  filtersMenuOpen = false
+                  scrollToTop('instant')
                 }
               "
             >
@@ -315,7 +315,7 @@ import {
   ListIcon,
   SearchIcon,
   XIcon,
-} from "@modrinth/assets";
+} from '@modrinth/assets'
 import {
   Avatar,
   Button,
@@ -327,140 +327,140 @@ import {
   SearchFilterControl,
   SearchSidebarFilter,
   useSearch,
-} from "@modrinth/ui";
-import { computed } from "vue";
+} from '@modrinth/ui'
+import { computed } from 'vue'
 
-import LogoAnimated from "~/components/brand/LogoAnimated.vue";
-import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
-import NavTabs from "~/components/ui/NavTabs.vue";
-import ProjectCard from "~/components/ui/ProjectCard.vue";
-import { useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
+import LogoAnimated from '~/components/brand/LogoAnimated.vue'
+import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
+import NavTabs from '~/components/ui/NavTabs.vue'
+import ProjectCard from '~/components/ui/ProjectCard.vue'
+import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'
 
-const { formatMessage } = useVIntl();
+const { formatMessage } = useVIntl()
 
-const filtersMenuOpen = ref(false);
+const filtersMenuOpen = ref(false)
 
-const data = useNuxtApp();
-const route = useNativeRoute();
-const router = useNativeRouter();
+const data = useNuxtApp()
+const route = useNativeRoute()
+const router = useNativeRouter()
 
-const cosmetics = useCosmetics();
-const tags = useTags();
-const flags = useFeatureFlags();
-const auth = await useAuth();
+const cosmetics = useCosmetics()
+const tags = useTags()
+const flags = useFeatureFlags()
+const auth = await useAuth()
 
-const projectType = ref();
+const projectType = ref()
 
 function setProjectType() {
   const projType = tags.value.projectTypes.find(
-    (x) => x.id === route.path.replaceAll(/^\/|s\/?$/g, ""), // Removes prefix `/` and suffixes `s` and `s/`
-  );
+    (x) => x.id === route.path.replaceAll(/^\/|s\/?$/g, ''), // Removes prefix `/` and suffixes `s` and `s/`
+  )
 
   if (projType) {
-    projectType.value = projType;
+    projectType.value = projType
   }
 }
 
-setProjectType();
+setProjectType()
 router.afterEach(() => {
-  setProjectType();
-});
+  setProjectType()
+})
 
-const projectTypes = computed(() => [projectType.value.id]);
+const projectTypes = computed(() => [projectType.value.id])
 
-const server = ref();
-const serverHideInstalled = ref(false);
-const eraseDataOnInstall = ref(false);
+const server = ref()
+const serverHideInstalled = ref(false)
+const eraseDataOnInstall = ref(false)
 
-const PERSISTENT_QUERY_PARAMS = ["sid", "shi"];
+const PERSISTENT_QUERY_PARAMS = ['sid', 'shi']
 
-await updateServerContext();
+await updateServerContext()
 
 watch(route, () => {
-  updateServerContext();
-});
+  updateServerContext()
+})
 
 async function updateServerContext() {
   if (route.query.sid && (!server.value || server.value.serverId !== route.query.sid)) {
     if (!auth.value.user) {
-      router.push("/auth/sign-in?redirect=" + encodeURIComponent(route.fullPath));
+      router.push('/auth/sign-in?redirect=' + encodeURIComponent(route.fullPath))
     } else if (route.query.sid !== null) {
-      server.value = await useModrinthServers(route.query.sid, ["general", "content"], {
+      server.value = await useModrinthServers(route.query.sid, ['general', 'content'], {
         waitForModules: true,
-      });
+      })
     }
   }
 
   if (
     server.value &&
     server.value.serverId !== route.query.sid &&
-    route.name.startsWith("search")
+    route.name.startsWith('search')
   ) {
-    server.value = undefined;
+    server.value = undefined
   }
 
-  if (route.query.shi && projectType.value.id !== "modpack" && server.value) {
-    serverHideInstalled.value = route.query.shi === "true";
+  if (route.query.shi && projectType.value.id !== 'modpack' && server.value) {
+    serverHideInstalled.value = route.query.shi === 'true'
   }
 }
 
 const serverFilters = computed(() => {
-  const filters = [];
-  if (server.value && projectType.value.id !== "modpack") {
-    const gameVersion = server.value.general?.mc_version;
+  const filters = []
+  if (server.value && projectType.value.id !== 'modpack') {
+    const gameVersion = server.value.general?.mc_version
     if (gameVersion) {
       filters.push({
-        type: "game_version",
+        type: 'game_version',
         option: gameVersion,
-      });
+      })
     }
 
-    const platform = server.value.general?.loader?.toLowerCase();
+    const platform = server.value.general?.loader?.toLowerCase()
 
-    const modLoaders = ["fabric", "forge", "quilt", "neoforge"];
+    const modLoaders = ['fabric', 'forge', 'quilt', 'neoforge']
 
     if (platform && modLoaders.includes(platform)) {
       filters.push({
-        type: "mod_loader",
+        type: 'mod_loader',
         option: platform,
-      });
+      })
     }
 
-    const pluginLoaders = ["paper", "purpur"];
+    const pluginLoaders = ['paper', 'purpur']
 
     if (platform && pluginLoaders.includes(platform)) {
       filters.push({
-        type: "plugin_loader",
+        type: 'plugin_loader',
         option: platform,
-      });
+      })
     }
 
     if (serverHideInstalled.value) {
       const installedMods = server.value.content?.data
         .filter((x) => x.project_id)
-        .map((x) => x.project_id);
+        .map((x) => x.project_id)
 
       installedMods
         ?.map((x) => ({
-          type: "project_id",
+          type: 'project_id',
           option: `project_id:${x}`,
           negative: true,
         }))
-        .forEach((x) => filters.push(x));
+        .forEach((x) => filters.push(x))
     }
   }
-  return filters;
-});
+  return filters
+})
 
 const maxResultsForView = ref({
   list: [5, 10, 15, 20, 50, 100],
   grid: [6, 12, 18, 24, 48, 96],
   gallery: [6, 10, 16, 20, 50, 100],
-});
+})
 
 const currentMaxResultsOptions = computed(
   () => maxResultsForView.value[cosmetics.value.searchDisplayMode[projectType.value.id]],
-);
+)
 
 const {
   // Selections
@@ -481,175 +481,175 @@ const {
 
   // Functions
   createPageParams,
-} = useSearch(projectTypes, tags, serverFilters);
+} = useSearch(projectTypes, tags, serverFilters)
 
 const messages = defineMessages({
   gameVersionProvidedByServer: {
-    id: "search.filter.locked.server-game-version.title",
-    defaultMessage: "Game version is provided by the server",
+    id: 'search.filter.locked.server-game-version.title',
+    defaultMessage: 'Game version is provided by the server',
   },
   modLoaderProvidedByServer: {
-    id: "search.filter.locked.server-loader.title",
-    defaultMessage: "Loader is provided by the server",
+    id: 'search.filter.locked.server-loader.title',
+    defaultMessage: 'Loader is provided by the server',
   },
   providedByServer: {
-    id: "search.filter.locked.server",
-    defaultMessage: "Provided by the server",
+    id: 'search.filter.locked.server',
+    defaultMessage: 'Provided by the server',
   },
   syncFilterButton: {
-    id: "search.filter.locked.server.sync",
-    defaultMessage: "Sync with server",
+    id: 'search.filter.locked.server.sync',
+    defaultMessage: 'Sync with server',
   },
-});
+})
 
 async function serverInstall(project) {
-  project.installing = true;
+  project.installing = true
   try {
-    const versions = await useBaseFetch(`project/${project.project_id}/version`, {}, false, true);
+    const versions = await useBaseFetch(`project/${project.project_id}/version`, {}, false, true)
 
     const version =
       versions.find(
         (x) =>
           x.game_versions.includes(server.value.general.mc_version) &&
           x.loaders.includes(server.value.general.loader.toLowerCase()),
-      ) ?? versions[0];
+      ) ?? versions[0]
 
-    if (projectType.value.id === "modpack") {
+    if (projectType.value.id === 'modpack') {
       await server.value.general.reinstall(
         false,
         project.project_id,
         version.id,
         undefined,
         eraseDataOnInstall.value,
-      );
-      project.installed = true;
-      navigateTo(`/servers/manage/${server.value.serverId}/options/loader`);
-    } else if (projectType.value.id === "mod") {
-      await server.value.content.install("mod", version.project_id, version.id);
-      await server.value.refresh(["content"]);
-      project.installed = true;
-    } else if (projectType.value.id === "plugin") {
-      await server.value.content.install("plugin", version.project_id, version.id);
-      await server.value.refresh(["content"]);
-      project.installed = true;
+      )
+      project.installed = true
+      navigateTo(`/servers/manage/${server.value.serverId}/options/loader`)
+    } else if (projectType.value.id === 'mod') {
+      await server.value.content.install('mod', version.project_id, version.id)
+      await server.value.refresh(['content'])
+      project.installed = true
+    } else if (projectType.value.id === 'plugin') {
+      await server.value.content.install('plugin', version.project_id, version.id)
+      await server.value.refresh(['content'])
+      project.installed = true
     }
   } catch (e) {
-    console.error(e);
+    console.error(e)
   }
-  project.installing = false;
+  project.installing = false
 }
 
-const noLoad = ref(false);
+const noLoad = ref(false)
 const {
   data: rawResults,
   refresh: refreshSearch,
   pending: searchLoading,
 } = useLazyFetch(
   () => {
-    const config = useRuntimeConfig();
-    const base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl;
+    const config = useRuntimeConfig()
+    const base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl
 
-    return `${base}search${requestParams.value}`;
+    return `${base}search${requestParams.value}`
   },
   {
     transform: (hits) => {
-      noLoad.value = false;
-      return hits;
+      noLoad.value = false
+      return hits
     },
   },
-);
+)
 
-const results = shallowRef(toRaw(rawResults));
+const results = shallowRef(toRaw(rawResults))
 const pageCount = computed(() =>
   results.value ? Math.ceil(results.value.total_hits / results.value.limit) : 1,
-);
+)
 
-function scrollToTop(behavior = "smooth") {
-  window.scrollTo({ top: 0, behavior });
+function scrollToTop(behavior = 'smooth') {
+  window.scrollTo({ top: 0, behavior })
 }
 
 function updateSearchResults(pageNumber) {
-  currentPage.value = pageNumber || 1;
-  scrollToTop();
-  noLoad.value = true;
+  currentPage.value = pageNumber || 1
+  scrollToTop()
+  noLoad.value = true
 
   if (query.value === null) {
-    return;
+    return
   }
 
-  refreshSearch();
+  refreshSearch()
 
   if (import.meta.client) {
-    const persistentParams = {};
+    const persistentParams = {}
 
     for (const [key, value] of Object.entries(route.query)) {
       if (PERSISTENT_QUERY_PARAMS.includes(key)) {
-        persistentParams[key] = value;
+        persistentParams[key] = value
       }
     }
 
     if (serverHideInstalled.value) {
-      persistentParams.shi = "true";
+      persistentParams.shi = 'true'
     } else {
-      delete persistentParams.shi;
+      delete persistentParams.shi
     }
 
     const params = {
       ...persistentParams,
       ...createPageParams(),
-    };
+    }
 
-    router.replace({ path: route.path, query: params });
+    router.replace({ path: route.path, query: params })
   }
 }
 
 watch([currentFilters], () => {
-  updateSearchResults(1);
-});
+  updateSearchResults(1)
+})
 
 function cycleSearchDisplayMode() {
   cosmetics.value.searchDisplayMode[projectType.value.id] = data.$cycleValue(
     cosmetics.value.searchDisplayMode[projectType.value.id],
     tags.value.projectViewModes,
-  );
-  setClosestMaxResults();
+  )
+  setClosestMaxResults()
 }
 
 function setClosestMaxResults() {
-  const view = cosmetics.value.searchDisplayMode[projectType.value.id];
-  const maxResultsOptions = maxResultsForView.value[view] ?? [20];
-  const currentMax = maxResults.value;
+  const view = cosmetics.value.searchDisplayMode[projectType.value.id]
+  const maxResultsOptions = maxResultsForView.value[view] ?? [20]
+  const currentMax = maxResults.value
   if (!maxResultsOptions.includes(currentMax)) {
     maxResults.value = maxResultsOptions.reduce(function (prev, curr) {
-      return Math.abs(curr - currentMax) <= Math.abs(prev - currentMax) ? curr : prev;
-    });
+      return Math.abs(curr - currentMax) <= Math.abs(prev - currentMax) ? curr : prev
+    })
   }
 }
 
 const selectableProjectTypes = computed(() => {
   return [
-    { label: "Mods", href: `/mods` },
-    { label: "Resource Packs", href: `/resourcepacks` },
-    { label: "Data Packs", href: `/datapacks` },
-    { label: "Shaders", href: `/shaders` },
-    { label: "Modpacks", href: `/modpacks` },
-    { label: "Plugins", href: `/plugins` },
-  ];
-});
+    { label: 'Mods', href: `/mods` },
+    { label: 'Resource Packs', href: `/resourcepacks` },
+    { label: 'Data Packs', href: `/datapacks` },
+    { label: 'Shaders', href: `/shaders` },
+    { label: 'Modpacks', href: `/modpacks` },
+    { label: 'Plugins', href: `/plugins` },
+  ]
+})
 
 const ogTitle = computed(
-  () => `Search ${projectType.value.display}s${query.value ? " | " + query.value : ""}`,
-);
+  () => `Search ${projectType.value.display}s${query.value ? ' | ' + query.value : ''}`,
+)
 const description = computed(
   () =>
     `Search and browse thousands of Minecraft ${projectType.value.display}s on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft ${projectType.value.display}s.`,
-);
+)
 
 useSeoMeta({
   description,
   ogTitle,
   ogDescription: description,
-});
+})
 </script>
 
 <style lang="scss" scoped>
@@ -860,7 +860,7 @@ useSeoMeta({
 .search-background {
   width: 100%;
   height: 20rem;
-  background-image: url("https://minecraft.wiki/images/The_Garden_Awakens_Key_Art_No_Creaking.jpg?9968c");
+  background-image: url('https://minecraft.wiki/images/The_Garden_Awakens_Key_Art_No_Creaking.jpg?9968c');
   background-size: cover;
   background-position: center;
   pointer-events: none;

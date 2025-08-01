@@ -47,8 +47,8 @@
                       transparent
                       @click="
                         () => {
-                          deletedIcon = true;
-                          previewImage = null;
+                          deletedIcon = true
+                          previewImage = null
                         }
                       "
                     >
@@ -94,8 +94,8 @@
                 :multiple="false"
                 :display-name="
                   (s) => {
-                    if (s === 'listed') return formatMessage(commonMessages.publicLabel);
-                    return formatMessage(commonMessages[`${s}Label`]);
+                    if (s === 'listed') return formatMessage(commonMessages.publicLabel)
+                    return formatMessage(commonMessages[`${s}Label`])
                   }
                 "
                 :searchable="false"
@@ -261,7 +261,7 @@
                 return {
                   label: formatMessage(getProjectTypeMessage(x, true)),
                   href: `/collection/${collection.id}/${x}s`,
-                };
+                }
               }),
             ]"
           />
@@ -325,8 +325,8 @@
               class="iconified-button remove-btn"
               @click="
                 () => {
-                  removeProjects = [project];
-                  saveChanges();
+                  removeProjects = [project]
+                  saveChanges()
                 }
               "
             >
@@ -379,7 +379,7 @@ import {
   UpdatedIcon,
   UploadIcon,
   XIcon,
-} from "@modrinth/assets";
+} from '@modrinth/assets'
 import {
   Avatar,
   Button,
@@ -389,150 +389,150 @@ import {
   FileInput,
   PopoutMenu,
   useRelativeTime,
-} from "@modrinth/ui";
-import { isAdmin } from "@modrinth/utils";
-import UpToDate from "assets/images/illustrations/up_to_date.svg";
+} from '@modrinth/ui'
+import { isAdmin } from '@modrinth/utils'
+import UpToDate from 'assets/images/illustrations/up_to_date.svg'
 
-import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
-import NavRow from "~/components/ui/NavRow.vue";
-import ProjectCard from "~/components/ui/ProjectCard.vue";
-import { addNotification } from "~/composables/notifs.js";
+import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
+import NavRow from '~/components/ui/NavRow.vue'
+import ProjectCard from '~/components/ui/ProjectCard.vue'
+import { addNotification } from '~/composables/notifs.js'
 
-const vintl = useVIntl();
-const { formatMessage } = vintl;
-const formatRelativeTime = useRelativeTime();
-const formatCompactNumber = useCompactNumber();
+const vintl = useVIntl()
+const { formatMessage } = vintl
+const formatRelativeTime = useRelativeTime()
+const formatCompactNumber = useCompactNumber()
 
 const messages = defineMessages({
   collectionDescription: {
-    id: "collection.description",
-    defaultMessage: "{description} - View the collection {name} by {username} on Modrinth",
+    id: 'collection.description',
+    defaultMessage: '{description} - View the collection {name} by {username} on Modrinth',
   },
   collectionLabel: {
-    id: "collection.label.collection",
-    defaultMessage: "Collection",
+    id: 'collection.label.collection',
+    defaultMessage: 'Collection',
   },
   collectionTitle: {
-    id: "collection.title",
-    defaultMessage: "{name} - Collection",
+    id: 'collection.title',
+    defaultMessage: '{name} - Collection',
   },
   editIconButton: {
-    id: "collection.button.edit-icon",
-    defaultMessage: "Edit icon",
+    id: 'collection.button.edit-icon',
+    defaultMessage: 'Edit icon',
   },
   deleteIconButton: {
-    id: "collection.button.delete-icon",
-    defaultMessage: "Delete icon",
+    id: 'collection.button.delete-icon',
+    defaultMessage: 'Delete icon',
   },
   createdAtLabel: {
-    id: "collection.label.created-at",
-    defaultMessage: "Created {ago}",
+    id: 'collection.label.created-at',
+    defaultMessage: 'Created {ago}',
   },
   collectionNotFoundError: {
-    id: "collection.error.not-found",
-    defaultMessage: "Collection not found",
+    id: 'collection.error.not-found',
+    defaultMessage: 'Collection not found',
   },
   curatedByLabel: {
-    id: "collection.label.curated-by",
-    defaultMessage: "Curated by",
+    id: 'collection.label.curated-by',
+    defaultMessage: 'Curated by',
   },
   deleteModalDescription: {
-    id: "collection.delete-modal.description",
-    defaultMessage: "This will remove this collection forever. This action cannot be undone.",
+    id: 'collection.delete-modal.description',
+    defaultMessage: 'This will remove this collection forever. This action cannot be undone.',
   },
   deleteModalTitle: {
-    id: "collection.delete-modal.title",
-    defaultMessage: "Are you sure you want to delete this collection?",
+    id: 'collection.delete-modal.title',
+    defaultMessage: 'Are you sure you want to delete this collection?',
   },
   followingCollectionDescription: {
-    id: "collection.description.following",
+    id: 'collection.description.following',
     defaultMessage: "Auto-generated collection of all the projects you're following.",
   },
   noProjectsLabel: {
-    id: "collection.label.no-projects",
-    defaultMessage: "This collection has no projects!",
+    id: 'collection.label.no-projects',
+    defaultMessage: 'This collection has no projects!',
   },
   noProjectsAuthLabel: {
-    id: "collection.label.no-projects-auth",
+    id: 'collection.label.no-projects-auth',
     defaultMessage:
       "You don't have any projects.\nWould you like to <create-link>add one</create-link>?",
   },
   ownerLabel: {
-    id: "collection.label.owner",
-    defaultMessage: "Owner",
+    id: 'collection.label.owner',
+    defaultMessage: 'Owner',
   },
   projectsCountLabel: {
-    id: "collection.label.projects-count",
+    id: 'collection.label.projects-count',
     defaultMessage:
-      "{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> projects}}",
+      '{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> projects}}',
   },
   removeProjectButton: {
-    id: "collection.button.remove-project",
-    defaultMessage: "Remove project",
+    id: 'collection.button.remove-project',
+    defaultMessage: 'Remove project',
   },
   unfollowProjectButton: {
-    id: "collection.button.unfollow-project",
-    defaultMessage: "Unfollow project",
+    id: 'collection.button.unfollow-project',
+    defaultMessage: 'Unfollow project',
   },
   updatedAtLabel: {
-    id: "collection.label.updated-at",
-    defaultMessage: "Updated {ago}",
+    id: 'collection.label.updated-at',
+    defaultMessage: 'Updated {ago}',
   },
-});
+})
 
-const data = useNuxtApp();
-const route = useNativeRoute();
-const auth = await useAuth();
-const cosmetics = useCosmetics();
-const tags = useTags();
+const data = useNuxtApp()
+const route = useNativeRoute()
+const auth = await useAuth()
+const cosmetics = useCosmetics()
+const tags = useTags()
 
-const isEditing = ref(false);
+const isEditing = ref(false)
 
 function cycleSearchDisplayMode() {
   cosmetics.value.searchDisplayMode.collection = data.$cycleValue(
     cosmetics.value.searchDisplayMode.collection,
     tags.value.projectViewModes,
-  );
+  )
 }
 
-let collection, refreshCollection, creator, projects, refreshProjects;
+let collection, refreshCollection, creator, projects, refreshProjects
 
 try {
-  if (route.params.id === "following") {
+  if (route.params.id === 'following') {
     collection = ref({
-      id: "following",
-      icon_url: "https://cdn.modrinth.com/follow-collection.png",
+      id: 'following',
+      icon_url: 'https://cdn.modrinth.com/follow-collection.png',
       name: formatMessage(commonMessages.followedProjectsLabel),
       description: formatMessage(messages.followingCollectionDescription),
-      status: "private",
+      status: 'private',
       user: auth.value.user.id,
       created: auth.value.user.created,
       updated: auth.value.user.created,
-    });
-    [{ data: projects, refresh: refreshProjects }] = await Promise.all([
+    })
+    ;[{ data: projects, refresh: refreshProjects }] = await Promise.all([
       useAsyncData(
         `user/${auth.value.user.id}/follows`,
         () => useBaseFetch(`user/${auth.value.user.id}/follows`),
         {
           transform: (projects) => {
             for (const project of projects) {
-              project.categories = project.categories.concat(project.loaders);
+              project.categories = project.categories.concat(project.loaders)
             }
 
-            return projects;
+            return projects
           },
         },
       ),
-    ]);
-    creator = ref(auth.value.user);
-    refreshCollection = async () => {};
+    ])
+    creator = ref(auth.value.user)
+    refreshCollection = async () => {}
   } else {
     const val = await useAsyncData(`collection/${route.params.id}`, () =>
       useBaseFetch(`collection/${route.params.id}`, { apiVersion: 3 }),
-    );
-    collection = val.data;
-    refreshCollection = val.refresh;
-    [{ data: creator }, { data: projects, refresh: refreshProjects }] = await Promise.all([
+    )
+    collection = val.data
+    refreshCollection = val.refresh
+    ;[{ data: creator }, { data: projects, refresh: refreshProjects }] = await Promise.all([
       await useAsyncData(`user/${collection.value.user}`, () =>
         useBaseFetch(`user/${collection.value.user}`),
       ),
@@ -545,22 +545,22 @@ try {
         {
           transform: (projects) => {
             for (const project of projects) {
-              project.categories = project.categories.concat(project.loaders);
+              project.categories = project.categories.concat(project.loaders)
             }
 
-            return projects;
+            return projects
           },
         },
       ),
-    ]);
+    ])
   }
 } catch (err) {
-  console.error(err);
+  console.error(err)
   throw createError({
     fatal: true,
     statusCode: 404,
     message: formatMessage(messages.collectionNotFoundError),
-  });
+  })
 }
 
 if (!collection.value) {
@@ -568,12 +568,12 @@ if (!collection.value) {
     fatal: true,
     statusCode: 404,
     message: formatMessage(messages.collectionNotFoundError),
-  });
+  })
 }
 
 const title = computed(() =>
   formatMessage(messages.collectionTitle, { name: collection.value.name }),
-);
+)
 
 useSeoMeta({
   title,
@@ -585,65 +585,65 @@ useSeoMeta({
     }),
   ogTitle: title,
   ogDescription: collection.value.description,
-  ogImage: collection.value.icon_url ?? "https://cdn.modrinth.com/placeholder.png",
-  robots: collection.value.status === "listed" ? "all" : "noindex",
-});
+  ogImage: collection.value.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
+  robots: collection.value.status === 'listed' ? 'all' : 'noindex',
+})
 
 const canEdit = computed(
   () =>
     auth.value.user &&
     (auth.value.user.id === collection.value.user || isAdmin(auth.value.user)) &&
-    collection.value.id !== "following",
-);
+    collection.value.id !== 'following',
+)
 
 const projectTypes = computed(() => {
   const projectSet = new Set(
     projects.value?.map((project) => project?.project_type).filter((x) => x !== undefined) || [],
-  );
-  projectSet.delete("project");
-  return Array.from(projectSet);
-});
+  )
+  projectSet.delete('project')
+  return Array.from(projectSet)
+})
 
-const icon = ref(null);
-const deletedIcon = ref(false);
-const previewImage = ref(null);
+const icon = ref(null)
+const deletedIcon = ref(false)
+const previewImage = ref(null)
 
-const name = ref(collection.value.name);
-const summary = ref(collection.value.description);
-const visibility = ref(collection.value.status);
-const removeProjects = ref([]);
+const name = ref(collection.value.name)
+const summary = ref(collection.value.description)
+const visibility = ref(collection.value.status)
+const removeProjects = ref([])
 
 async function unfollowProject(project) {
-  await userFollowProject(project);
-  projects.value = projects.value.filter((x) => x.id !== project.id);
+  await userFollowProject(project)
+  projects.value = projects.value.filter((x) => x.id !== project.id)
 }
 
 async function saveChanges() {
-  startLoading();
+  startLoading()
   try {
     if (deletedIcon.value) {
       await useBaseFetch(`collection/${collection.value.id}/icon`, {
-        method: "DELETE",
+        method: 'DELETE',
         apiVersion: 3,
-      });
+      })
     } else if (icon.value) {
-      const ext = icon.value?.type?.split("/").pop();
-      if (!ext) throw new Error("Invalid file type");
+      const ext = icon.value?.type?.split('/').pop()
+      if (!ext) throw new Error('Invalid file type')
       await useBaseFetch(`collection/${collection.value.id}/icon?ext=${ext}`, {
-        method: "PATCH",
+        method: 'PATCH',
         body: icon.value,
         apiVersion: 3,
-      });
+      })
     }
 
-    const projectsToRemove = removeProjects.value?.map((p) => p.id) ?? [];
+    const projectsToRemove = removeProjects.value?.map((p) => p.id) ?? []
     const newProjects = projects.value
       .filter((p) => !projectsToRemove.includes(p.id))
-      .map((p) => p.id);
-    const newProjectIds = projectsToRemove.length > 0 ? newProjects : undefined;
+      .map((p) => p.id)
+    const newProjectIds = projectsToRemove.length > 0 ? newProjects : undefined
 
     await useBaseFetch(`collection/${collection.value.id}`, {
-      method: "PATCH",
+      method: 'PATCH',
       body: {
         name: name.value,
         description: summary.value || null,
@@ -651,61 +651,61 @@ async function saveChanges() {
         new_projects: newProjectIds,
       },
       apiVersion: 3,
-    });
+    })
 
-    await refreshCollection();
-    await refreshProjects();
+    await refreshCollection()
+    await refreshProjects()
 
-    name.value = collection.value.name;
-    summary.value = collection.value.description;
-    visibility.value = collection.value.status;
-    removeProjects.value = [];
+    name.value = collection.value.name
+    summary.value = collection.value.description
+    visibility.value = collection.value.status
+    removeProjects.value = []
 
-    isEditing.value = false;
+    isEditing.value = false
   } catch (err) {
     addNotification({
-      group: "main",
+      group: 'main',
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  await initUserCollections();
-  stopLoading();
+  await initUserCollections()
+  stopLoading()
 }
 
 async function deleteCollection() {
-  startLoading();
+  startLoading()
   try {
     await useBaseFetch(`collection/${collection.value.id}`, {
-      method: "DELETE",
+      method: 'DELETE',
       apiVersion: 3,
-    });
+    })
     if (auth.value.user.id === collection.value.user) {
-      await navigateTo("/dashboard/collections");
+      await navigateTo('/dashboard/collections')
     } else {
-      await navigateTo(`/user/${collection.value.user}/collections`);
+      await navigateTo(`/user/${collection.value.user}/collections`)
     }
   } catch (err) {
     addNotification({
-      group: "main",
+      group: 'main',
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  await initUserCollections();
-  stopLoading();
+  await initUserCollections()
+  stopLoading()
 }
 
 function showPreviewImage(files) {
-  const reader = new FileReader();
-  icon.value = files[0];
-  deletedIcon.value = false;
-  reader.readAsDataURL(icon.value);
+  const reader = new FileReader()
+  icon.value = files[0]
+  deletedIcon.value = false
+  reader.readAsDataURL(icon.value)
   reader.onload = (event) => {
-    previewImage.value = event.target.result;
-  };
+    previewImage.value = event.target.result
+  }
 }
 </script>
 

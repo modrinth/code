@@ -154,8 +154,8 @@
 </template>
 
 <script setup lang="ts">
-import { SaveIcon } from "@modrinth/assets";
-import { Checkbox, DropdownSelect } from "@modrinth/ui";
+import { SaveIcon } from '@modrinth/assets'
+import { Checkbox, DropdownSelect } from '@modrinth/ui'
 import {
   type BuiltinLicense,
   builtinLicenses,
@@ -163,99 +163,99 @@ import {
   type Project,
   type TeamMember,
   TeamMemberPermission,
-} from "@modrinth/utils";
-import { computed, type Ref,ref } from "vue";
+} from '@modrinth/utils'
+import { computed, type Ref, ref } from 'vue'
 
 const props = defineProps<{
-  project: Project;
-  currentMember: TeamMember | undefined;
-  patchProject: (payload: object, quiet?: boolean) => object;
-}>();
+  project: Project
+  currentMember: TeamMember | undefined
+  patchProject: (payload: object, quiet?: boolean) => object
+}>()
 
-const licenseUrl = ref(props.project.license.url);
+const licenseUrl = ref(props.project.license.url)
 const license: Ref<{
-  friendly: string;
-  short: string;
-  requiresOnlyOrLater?: boolean;
+  friendly: string
+  short: string
+  requiresOnlyOrLater?: boolean
 }> = ref({
-  friendly: "",
-  short: "",
+  friendly: '',
+  short: '',
   requiresOnlyOrLater: false,
-});
+})
 
-const allowOrLater = ref(props.project.license.id.includes("-or-later"));
-const nonSpdxLicense = ref(props.project.license.id.includes("LicenseRef-"));
+const allowOrLater = ref(props.project.license.id.includes('-or-later'))
+const nonSpdxLicense = ref(props.project.license.id.includes('LicenseRef-'))
 
-const oldLicenseId = props.project.license.id;
+const oldLicenseId = props.project.license.id
 const trimmedLicenseId = oldLicenseId
-  .replaceAll("-only", "")
-  .replaceAll("-or-later", "")
-  .replaceAll("LicenseRef-", "");
+  .replaceAll('-only', '')
+  .replaceAll('-or-later', '')
+  .replaceAll('LicenseRef-', '')
 
 license.value = builtinLicenses.find((x) => x.short === trimmedLicenseId) ?? {
-  friendly: "Custom",
-  short: oldLicenseId.replaceAll("LicenseRef-", ""),
-  requiresOnlyOrLater: oldLicenseId.includes("-or-later"),
-};
+  friendly: 'Custom',
+  short: oldLicenseId.replaceAll('LicenseRef-', ''),
+  requiresOnlyOrLater: oldLicenseId.includes('-or-later'),
+}
 
-if (oldLicenseId === "LicenseRef-Unknown") {
+if (oldLicenseId === 'LicenseRef-Unknown') {
   // Mark it as not having a license, forcing the user to select one
   license.value = {
-    friendly: "",
-    short: oldLicenseId.replaceAll("LicenseRef-", ""),
+    friendly: '',
+    short: oldLicenseId.replaceAll('LicenseRef-', ''),
     requiresOnlyOrLater: false,
-  };
+  }
 }
 
 const hasPermission = computed(() => {
-  return (props.currentMember?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS;
-});
+  return (props.currentMember?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS
+})
 
 const licenseId = computed(() => {
-  let id = "";
+  let id = ''
 
   if (
-    (nonSpdxLicense.value && license.value.friendly === "Custom") ||
-    license.value.short === "All-Rights-Reserved" ||
-    license.value.short === "Unknown"
+    (nonSpdxLicense.value && license.value.friendly === 'Custom') ||
+    license.value.short === 'All-Rights-Reserved' ||
+    license.value.short === 'Unknown'
   ) {
-    id += "LicenseRef-";
+    id += 'LicenseRef-'
   }
 
-  id += license.value.short;
+  id += license.value.short
   if (license.value.requiresOnlyOrLater) {
-    id += allowOrLater.value ? "-or-later" : "-only";
+    id += allowOrLater.value ? '-or-later' : '-only'
   }
 
-  if (nonSpdxLicense.value && license.value.friendly === "Custom") {
-    id = id.replaceAll(" ", "-");
+  if (nonSpdxLicense.value && license.value.friendly === 'Custom') {
+    id = id.replaceAll(' ', '-')
   }
 
-  return id;
-});
+  return id
+})
 
 const patchRequestPayload = computed(() => {
   const payload: {
-    license_id?: string;
-    license_url?: string | null; // null = remove url
-  } = {};
+    license_id?: string
+    license_url?: string | null // null = remove url
+  } = {}
 
   if (licenseId.value !== props.project.license.id) {
-    payload.license_id = licenseId.value;
+    payload.license_id = licenseId.value
   }
 
   if (licenseUrl.value !== props.project.license.url) {
-    payload.license_url = licenseUrl.value ? licenseUrl.value : null;
+    payload.license_url = licenseUrl.value ? licenseUrl.value : null
   }
 
-  return payload;
-});
+  return payload
+})
 
 const hasChanges = computed(() => {
-  return Object.keys(patchRequestPayload.value).length > 0;
-});
+  return Object.keys(patchRequestPayload.value).length > 0
+})
 
 function saveChanges() {
-  props.patchProject(patchRequestPayload.value);
+  props.patchProject(patchRequestPayload.value)
 }
 </script>

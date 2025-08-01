@@ -52,101 +52,101 @@
   </div>
 </template>
 <script setup>
-import { RightArrowIcon,SettingsIcon } from "@modrinth/assets";
+import { RightArrowIcon, SettingsIcon } from '@modrinth/assets'
 
-const { formatMessage } = useVIntl();
+const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
   title: {
-    id: "auth.verify-email.title",
-    defaultMessage: "Verify Email",
+    id: 'auth.verify-email.title',
+    defaultMessage: 'Verify Email',
   },
   accountSettings: {
-    id: "auth.verify-email.action.account-settings",
-    defaultMessage: "Account settings",
+    id: 'auth.verify-email.action.account-settings',
+    defaultMessage: 'Account settings',
   },
   signIn: {
-    id: "auth.verify-email.action.sign-in",
-    defaultMessage: "Sign in",
+    id: 'auth.verify-email.action.sign-in',
+    defaultMessage: 'Sign in',
   },
-});
+})
 
 const alreadyVerifiedMessages = defineMessages({
   title: {
-    id: "auth.verify-email.already-verified.title",
-    defaultMessage: "Email already verified",
+    id: 'auth.verify-email.already-verified.title',
+    defaultMessage: 'Email already verified',
   },
   description: {
-    id: "auth.verify-email.already-verified.description",
-    defaultMessage: "Your email is already verified!",
+    id: 'auth.verify-email.already-verified.description',
+    defaultMessage: 'Your email is already verified!',
   },
-});
+})
 
 const postVerificationMessages = defineMessages({
   title: {
-    id: "auth.verify-email.post-verification.title",
-    defaultMessage: "Email verification",
+    id: 'auth.verify-email.post-verification.title',
+    defaultMessage: 'Email verification',
   },
   description: {
-    id: "auth.verify-email.post-verification.description",
-    defaultMessage: "Your email address has been successfully verified!",
+    id: 'auth.verify-email.post-verification.description',
+    defaultMessage: 'Your email address has been successfully verified!',
   },
-});
+})
 
 const failedVerificationMessages = defineMessages({
   title: {
-    id: "auth.verify-email.failed-verification.title",
-    defaultMessage: "Email verification failed",
+    id: 'auth.verify-email.failed-verification.title',
+    defaultMessage: 'Email verification failed',
   },
   description: {
-    id: "auth.verify-email.failed-verification.description",
+    id: 'auth.verify-email.failed-verification.description',
     defaultMessage:
-      "We were unable to verify your email. Try re-sending the verification email through your dashboard by signing in.",
+      'We were unable to verify your email. Try re-sending the verification email through your dashboard by signing in.',
   },
   loggedInDescription: {
-    id: "auth.verify-email.failed-verification.description.logged-in",
+    id: 'auth.verify-email.failed-verification.description.logged-in',
     defaultMessage:
-      "We were unable to verify your email. Try re-sending the verification email through the button below.",
+      'We were unable to verify your email. Try re-sending the verification email through the button below.',
   },
   action: {
-    id: "auth.verify-email.failed-verification.action",
-    defaultMessage: "Resend verification email",
+    id: 'auth.verify-email.failed-verification.action',
+    defaultMessage: 'Resend verification email',
   },
-});
+})
 
 useHead({
   title: () => `${formatMessage(messages.title)} - Modrinth`,
-});
+})
 
-const auth = await useAuth();
+const auth = await useAuth()
 
-const success = ref(false);
-const route = useNativeRoute();
+const success = ref(false)
+const route = useNativeRoute()
 
 if (route.query.flow) {
   try {
-    const emailVerified = useState("emailVerified", () => null);
+    const emailVerified = useState('emailVerified', () => null)
 
     if (emailVerified.value === null) {
-      await useBaseFetch("auth/email/verify", {
-        method: "POST",
+      await useBaseFetch('auth/email/verify', {
+        method: 'POST',
         body: {
           flow: route.query.flow,
         },
-      });
-      emailVerified.value = true;
-      success.value = true;
+      })
+      emailVerified.value = true
+      success.value = true
     }
 
     if (emailVerified.value) {
-      success.value = true;
+      success.value = true
 
       if (auth.value.token) {
-        await useAuth(auth.value.token);
+        await useAuth(auth.value.token)
       }
     }
   } catch {
-    success.value = false;
+    success.value = false
   }
 }
 </script>

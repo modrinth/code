@@ -7,12 +7,12 @@
 </template>
 
 <script lang="ts" setup>
-type MessageType = "information" | "warning";
+type MessageType = 'information' | 'warning'
 const props = withDefaults(defineProps<{ messageType?: MessageType }>(), {
-  messageType: "information",
-});
-const cardClassByType = computed(() => `message-banner__content_${props.messageType}`);
-const ariaLabelByType = computed(() => `Banner with ${props.messageType} message`);
+  messageType: 'information',
+})
+const cardClassByType = computed(() => `message-banner__content_${props.messageType}`)
+const ariaLabelByType = computed(() => `Banner with ${props.messageType} message`)
 </script>
 
 <style lang="css" scoped>

@@ -348,56 +348,56 @@ import {
   SearchIcon,
   TrashIcon,
   WrenchIcon,
-} from "@modrinth/assets";
-import { Avatar, ButtonStyled } from "@modrinth/ui";
-import type { Mod } from "@modrinth/utils";
-import { computed, onMounted, onUnmounted,ref, watch } from "vue";
+} from '@modrinth/assets'
+import { Avatar, ButtonStyled } from '@modrinth/ui'
+import type { Mod } from '@modrinth/utils'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
-import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
-import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
-import type { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
-import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
+import FilesUploadDragAndDrop from '~/components/ui/servers/FilesUploadDragAndDrop.vue'
+import FilesUploadDropdown from '~/components/ui/servers/FilesUploadDropdown.vue'
+import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
+import { acceptFileFromProjectType } from '~/helpers/fileUtils.js'
 
 const props = defineProps<{
-  server: ModrinthServer;
-}>();
+  server: ModrinthServer
+}>()
 
 const type = computed(() => {
-  const loader = props.server.general?.loader?.toLowerCase();
-  return loader === "paper" || loader === "purpur" ? "Plugin" : "Mod";
-});
+  const loader = props.server.general?.loader?.toLowerCase()
+  return loader === 'paper' || loader === 'purpur' ? 'Plugin' : 'Mod'
+})
 
 interface ContentItem extends Mod {
-  changing?: boolean;
+  changing?: boolean
 }
 
-const ITEM_HEIGHT = 72;
-const BUFFER_SIZE = 5;
+const ITEM_HEIGHT = 72
+const BUFFER_SIZE = 5
 
-const listContainer = ref<HTMLElement | null>(null);
-const windowScrollY = ref(0);
-const windowHeight = ref(0);
+const listContainer = ref<HTMLElement | null>(null)
+const windowScrollY = ref(0)
+const windowHeight = ref(0)
 
-const localMods = ref<ContentItem[]>([]);
+const localMods = ref<ContentItem[]>([])
 
-const searchInput = ref("");
-const modSearchInput = ref("");
-const filterMethod = ref("all");
+const searchInput = ref('')
+const modSearchInput = ref('')
+const filterMethod = ref('all')
 
-const uploadDropdownRef = ref();
+const uploadDropdownRef = ref()
 
-const versionEditModal = ref();
-const currentEditMod = ref<ContentItem | null>(null);
+const versionEditModal = ref()
+const currentEditMod = ref<ContentItem | null>(null)
 const invalidModal = computed(
   () => !props.server.general?.mc_version || !props.server.general?.loader,
-);
+)
 async function changeModVersion(event: string) {
-  const mod = currentEditMod.value;
+  const mod = currentEditMod.value
 
-  if (mod) mod.changing = true;
+  if (mod) mod.changing = true
 
   try {
-    versionEditModal.value.hide();
+    versionEditModal.value.hide()
 
     // This will be used instead once backend implementation is done
     // await props.server.content?.reinstall(
@@ -407,241 +407,241 @@ async function changeModVersion(event: string) {
     // );
 
     await props.server.content?.install(
-      type.value.toLowerCase() as "mod" | "plugin",
-      mod?.project_id || "",
+      type.value.toLowerCase() as 'mod' | 'plugin',
+      mod?.project_id || '',
       event,
-    );
+    )
 
-    await props.server.content?.remove(`/${type.value.toLowerCase()}s/${mod?.filename}`);
+    await props.server.content?.remove(`/${type.value.toLowerCase()}s/${mod?.filename}`)
 
-    await props.server.refresh(["general", "content"]);
+    await props.server.refresh(['general', 'content'])
   } catch (error) {
-    const errmsg = `Error changing mod version: ${error}`;
-    console.error(errmsg);
+    const errmsg = `Error changing mod version: ${error}`
+    console.error(errmsg)
     addNotification({
       text: errmsg,
-      type: "error",
-    });
-    return;
+      type: 'error',
+    })
+    return
   }
-  if (mod) mod.changing = false;
+  if (mod) mod.changing = false
 }
 
 function showVersionModal(mod: ContentItem) {
   if (invalidModal.value || !mod?.project_id || !mod?.filename) {
     const errmsg = invalidModal.value
-      ? "Data required for changing mod version was not found."
-      : `${!mod?.project_id ? "No mod project ID found" : "No mod filename found"} for ${friendlyModName(mod!)}`;
-    console.error(errmsg);
+      ? 'Data required for changing mod version was not found.'
+      : `${!mod?.project_id ? 'No mod project ID found' : 'No mod filename found'} for ${friendlyModName(mod!)}`
+    console.error(errmsg)
     addNotification({
       text: errmsg,
-      type: "error",
-    });
-    return;
+      type: 'error',
+    })
+    return
   }
 
-  currentEditMod.value = mod;
-  versionEditModal.value.show(mod);
+  currentEditMod.value = mod
+  versionEditModal.value.show(mod)
 }
 
 const handleDroppedFiles = (files: File[]) => {
   files.forEach((file) => {
-    uploadDropdownRef.value?.uploadFile(file);
-  });
-};
+    uploadDropdownRef.value?.uploadFile(file)
+  })
+}
 
 const initiateFileUpload = () => {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = acceptFileFromProjectType(type.value.toLowerCase());
-  input.multiple = true;
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = acceptFileFromProjectType(type.value.toLowerCase())
+  input.multiple = true
   input.onchange = () => {
     if (input.files) {
       Array.from(input.files).forEach((file) => {
-        uploadDropdownRef.value?.uploadFile(file);
-      });
+        uploadDropdownRef.value?.uploadFile(file)
+      })
     }
-  };
-  input.click();
-};
+  }
+  input.click()
+}
 
 const showAll = () => {
-  searchInput.value = "";
-  modSearchInput.value = "";
-  filterMethod.value = "all";
-};
+  searchInput.value = ''
+  modSearchInput.value = ''
+  filterMethod.value = 'all'
+}
 
 const filterMethodLabel = computed(() => {
   switch (filterMethod.value) {
-    case "disabled":
-      return "Only disabled";
-    case "enabled":
-      return "Only enabled";
+    case 'disabled':
+      return 'Only disabled'
+    case 'enabled':
+      return 'Only enabled'
     default:
-      return `All ${type.value.toLocaleLowerCase()}s`;
+      return `All ${type.value.toLocaleLowerCase()}s`
   }
-});
+})
 
 const totalHeight = computed(() => {
-  const itemsHeight = filteredMods.value.length * ITEM_HEIGHT;
-  return itemsHeight;
-});
+  const itemsHeight = filteredMods.value.length * ITEM_HEIGHT
+  return itemsHeight
+})
 
 const getVisibleRange = () => {
-  if (!listContainer.value) return { start: 0, end: 0 };
+  if (!listContainer.value) return { start: 0, end: 0 }
 
-  const containerTop = listContainer.value.getBoundingClientRect().top + window.scrollY;
-  const scrollTop = Math.max(0, windowScrollY.value - containerTop);
+  const containerTop = listContainer.value.getBoundingClientRect().top + window.scrollY
+  const scrollTop = Math.max(0, windowScrollY.value - containerTop)
 
-  const start = Math.floor(scrollTop / ITEM_HEIGHT);
-  const visibleCount = Math.ceil(windowHeight.value / ITEM_HEIGHT);
+  const start = Math.floor(scrollTop / ITEM_HEIGHT)
+  const visibleCount = Math.ceil(windowHeight.value / ITEM_HEIGHT)
 
   return {
     start: Math.max(0, start - BUFFER_SIZE),
     end: Math.min(filteredMods.value.length, start + visibleCount + BUFFER_SIZE * 2),
-  };
-};
+  }
+}
 
 const visibleTop = computed(() => {
-  const range = getVisibleRange();
-  return range.start * ITEM_HEIGHT;
-});
+  const range = getVisibleRange()
+  return range.start * ITEM_HEIGHT
+})
 
 const visibleItems = computed(() => {
-  const range = getVisibleRange();
-  const items = filteredMods.value;
+  const range = getVisibleRange()
+  const items = filteredMods.value
 
   return {
     items: items.slice(Math.max(0, range.start), Math.min(items.length, range.end)),
-  };
-});
+  }
+})
 
 const handleScroll = () => {
-  windowScrollY.value = window.scrollY;
-};
+  windowScrollY.value = window.scrollY
+}
 
 const handleResize = () => {
-  windowHeight.value = window.innerHeight;
-};
+  windowHeight.value = window.innerHeight
+}
 
 onMounted(() => {
-  windowHeight.value = window.innerHeight;
-  window.addEventListener("scroll", handleScroll, { passive: true });
-  window.addEventListener("resize", handleResize, { passive: true });
-  handleScroll();
-});
+  windowHeight.value = window.innerHeight
+  window.addEventListener('scroll', handleScroll, { passive: true })
+  window.addEventListener('resize', handleResize, { passive: true })
+  handleScroll()
+})
 
 onUnmounted(() => {
-  window.removeEventListener("scroll", handleScroll);
-  window.removeEventListener("resize", handleResize);
-});
+  window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('resize', handleResize)
+})
 
 watch(
   () => props.server.content?.data,
   (newMods) => {
     if (newMods) {
-      localMods.value = [...newMods];
+      localMods.value = [...newMods]
     }
   },
   { immediate: true },
-);
+)
 
 const debounce = <T extends (...args: any[]) => void>(
   func: T,
   wait: number,
 ): ((...args: Parameters<T>) => void) => {
-  let timeout: ReturnType<typeof setTimeout>;
+  let timeout: ReturnType<typeof setTimeout>
   return function (...args: Parameters<T>): void {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
-};
+    clearTimeout(timeout)
+    timeout = setTimeout(() => func(...args), wait)
+  }
+}
 
-const pyroContentSentinel = ref<HTMLElement | null>(null);
+const pyroContentSentinel = ref<HTMLElement | null>(null)
 const debouncedSearch = debounce(() => {
-  modSearchInput.value = searchInput.value;
+  modSearchInput.value = searchInput.value
 
   if (pyroContentSentinel.value) {
-    const sentinelRect = pyroContentSentinel.value.getBoundingClientRect();
+    const sentinelRect = pyroContentSentinel.value.getBoundingClientRect()
     if (sentinelRect.top < 0 || sentinelRect.bottom > window.innerHeight) {
       pyroContentSentinel.value.scrollIntoView({
         // behavior: "smooth",
-        block: "start",
-      });
+        block: 'start',
+      })
     }
   }
-}, 300);
+}, 300)
 
 function friendlyModName(mod: ContentItem) {
-  if (mod.name) return mod.name;
+  if (mod.name) return mod.name
 
   // remove .disabled if at the end of the filename
-  let cleanName = mod.filename.endsWith(".disabled") ? mod.filename.slice(0, -9) : mod.filename;
+  let cleanName = mod.filename.endsWith('.disabled') ? mod.filename.slice(0, -9) : mod.filename
 
   // remove everything after the last dot
-  const lastDotIndex = cleanName.lastIndexOf(".");
-  if (lastDotIndex !== -1) cleanName = cleanName.substring(0, lastDotIndex);
-  return cleanName;
+  const lastDotIndex = cleanName.lastIndexOf('.')
+  if (lastDotIndex !== -1) cleanName = cleanName.substring(0, lastDotIndex)
+  return cleanName
 }
 
 async function toggleMod(mod: ContentItem) {
-  mod.changing = true;
+  mod.changing = true
 
-  const originalFilename = mod.filename;
+  const originalFilename = mod.filename
   try {
-    const newFilename = mod.filename.endsWith(".disabled")
+    const newFilename = mod.filename.endsWith('.disabled')
       ? mod.filename.slice(0, -9)
-      : `${mod.filename}.disabled`;
+      : `${mod.filename}.disabled`
 
-    const folder = `${type.value.toLocaleLowerCase()}s`;
-    const sourcePath = `/${folder}/${mod.filename}`;
-    const destinationPath = `/${folder}/${newFilename}`;
+    const folder = `${type.value.toLocaleLowerCase()}s`
+    const sourcePath = `/${folder}/${mod.filename}`
+    const destinationPath = `/${folder}/${newFilename}`
 
-    mod.disabled = newFilename.endsWith(".disabled");
-    mod.filename = newFilename;
+    mod.disabled = newFilename.endsWith('.disabled')
+    mod.filename = newFilename
 
-    await props.server.fs?.moveFileOrFolder(sourcePath, destinationPath);
+    await props.server.fs?.moveFileOrFolder(sourcePath, destinationPath)
 
-    await props.server.refresh(["general", "content"]);
+    await props.server.refresh(['general', 'content'])
   } catch (error) {
-    mod.filename = originalFilename;
-    mod.disabled = originalFilename.endsWith(".disabled");
+    mod.filename = originalFilename
+    mod.disabled = originalFilename.endsWith('.disabled')
 
-    console.error("Error toggling mod:", error);
+    console.error('Error toggling mod:', error)
     addNotification({
       text: `Something went wrong toggling ${friendlyModName(mod)}`,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
 
-  mod.changing = false;
+  mod.changing = false
 }
 
 async function removeMod(mod: ContentItem) {
-  mod.changing = true;
+  mod.changing = true
 
   try {
-    await props.server.content?.remove(`/${type.value.toLowerCase()}s/${mod.filename}`);
-    await props.server.refresh(["general", "content"]);
+    await props.server.content?.remove(`/${type.value.toLowerCase()}s/${mod.filename}`)
+    await props.server.refresh(['general', 'content'])
   } catch (error) {
-    console.error("Error removing mod:", error);
+    console.error('Error removing mod:', error)
 
     addNotification({
       text: `couldn't remove ${mod.name || mod.filename}`,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
 
-  mod.changing = false;
+  mod.changing = false
 }
 
 const hasMods = computed(() => {
-  return localMods.value?.length > 0;
-});
+  return localMods.value?.length > 0
+})
 
 const hasFilteredMods = computed(() => {
-  return filteredMods.value?.length > 0;
-});
+  return filteredMods.value?.length > 0
+})
 
 const filteredMods = computed(() => {
   const mods = modSearchInput.value.trim()
@@ -650,23 +650,23 @@ const filteredMods = computed(() => {
           mod.name?.toLowerCase().includes(modSearchInput.value.toLowerCase()) ||
           mod.filename.toLowerCase().includes(modSearchInput.value.toLowerCase()),
       )
-    : localMods.value;
+    : localMods.value
 
   const statusFilteredMods = (() => {
     switch (filterMethod.value) {
-      case "disabled":
-        return mods.filter((mod) => mod.disabled);
-      case "enabled":
-        return mods.filter((mod) => !mod.disabled);
+      case 'disabled':
+        return mods.filter((mod) => mod.disabled)
+      case 'enabled':
+        return mods.filter((mod) => !mod.disabled)
       default:
-        return mods;
+        return mods
     }
-  })();
+  })()
 
   return statusFilteredMods.sort((a, b) => {
-    return friendlyModName(a).localeCompare(friendlyModName(b));
-  });
-});
+    return friendlyModName(a).localeCompare(friendlyModName(b))
+  })
+})
 </script>
 
 <style scoped>

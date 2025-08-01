@@ -99,10 +99,10 @@
   </div>
 </template>
 <script setup>
-import { CheckIcon, IssuesIcon,XIcon } from "@modrinth/assets";
-import { Badge } from "@modrinth/ui";
+import { CheckIcon, IssuesIcon, XIcon } from '@modrinth/assets'
+import { Badge } from '@modrinth/ui'
 
-import ConversationThread from "~/components/ui/thread/ConversationThread.vue";
+import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
 import {
   getProjectLink,
   isApproved,
@@ -110,19 +110,19 @@ import {
   isPrivate,
   isRejected,
   isUnderReview,
-} from "~/helpers/projects.js";
+} from '~/helpers/projects.js'
 
 const props = defineProps({
   project: {
     type: Object,
     default() {
-      return {};
+      return {}
     },
   },
   currentMember: {
     type: Object,
     default() {
-      return null;
+      return null
     },
   },
   resetProject: {
@@ -130,39 +130,39 @@ const props = defineProps({
     required: true,
     default: () => {},
   },
-});
+})
 
-const app = useNuxtApp();
-const auth = await useAuth();
+const app = useNuxtApp()
+const auth = await useAuth()
 
 const { data: thread } = await useAsyncData(`thread/${props.project.thread_id}`, () =>
   useBaseFetch(`thread/${props.project.thread_id}`),
-);
+)
 async function setStatus(status) {
-  startLoading();
+  startLoading()
 
   try {
-    const data = {};
-    data.status = status;
+    const data = {}
+    data.status = status
     await useBaseFetch(`project/${props.project.id}`, {
-      method: "PATCH",
+      method: 'PATCH',
       body: data,
-    });
+    })
 
-    const project = props.project;
-    project.status = status;
-    await props.resetProject();
-    thread.value = await useBaseFetch(`thread/${thread.value.id}`);
+    const project = props.project
+    project.status = status
+    await props.resetProject()
+    thread.value = await useBaseFetch(`thread/${thread.value.id}`)
   } catch (err) {
     app.$notify({
-      group: "main",
-      title: "An error occurred",
+      group: 'main',
+      title: 'An error occurred',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
 
-  stopLoading();
+  stopLoading()
 }
 </script>
 <style lang="scss" scoped>

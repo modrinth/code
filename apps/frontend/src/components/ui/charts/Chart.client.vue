@@ -1,7 +1,7 @@
 <script setup>
-import { formatMoney,formatNumber } from "@modrinth/utils";
-import dayjs from "dayjs";
-import VueApexCharts from "vue3-apexcharts";
+import { formatMoney, formatNumber } from '@modrinth/utils'
+import dayjs from 'dayjs'
+import VueApexCharts from 'vue3-apexcharts'
 
 const props = defineProps({
   name: {
@@ -18,7 +18,7 @@ const props = defineProps({
   },
   formatLabels: {
     type: Function,
-    default: (label) => dayjs(label).format("MMM D"),
+    default: (label) => dayjs(label).format('MMM D'),
   },
   colors: {
     type: Array,
@@ -26,11 +26,11 @@ const props = defineProps({
   },
   prefix: {
     type: String,
-    default: "",
+    default: '',
   },
   suffix: {
     type: String,
-    default: "",
+    default: '',
   },
   hideToolbar: {
     type: Boolean,
@@ -46,7 +46,7 @@ const props = defineProps({
   },
   type: {
     type: String,
-    default: "bar",
+    default: 'bar',
   },
   hideTotal: {
     type: Boolean,
@@ -58,11 +58,11 @@ const props = defineProps({
   },
   legendPosition: {
     type: String,
-    default: "right",
+    default: 'right',
   },
   xAxisType: {
     type: String,
-    default: "datetime",
+    default: 'datetime',
   },
   percentStacked: {
     type: Boolean,
@@ -76,14 +76,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-});
+})
 
 function formatTooltipValue(value, props) {
-  return props.isMoney ? formatMoney(value, false) : formatNumber(value, false);
+  return props.isMoney ? formatMoney(value, false) : formatNumber(value, false)
 }
 
 function generateListEntry(value, index, _, w, props) {
-  const color = w.globals.colors?.[index];
+  const color = w.globals.colors?.[index]
 
   return `<div class="list-entry">
     <span class="circle" style="background-color: ${color}"></span>
@@ -93,35 +93,35 @@ function generateListEntry(value, index, _, w, props) {
     <div class="value">
       ${props.prefix}${formatTooltipValue(value, props)}${props.suffix}
     </div>
-  </div>`;
+  </div>`
 }
 
 function generateTooltip({ series, seriesIndex, dataPointIndex, w }, props) {
-  const label = w.globals.lastXAxis.categories?.[dataPointIndex];
+  const label = w.globals.lastXAxis.categories?.[dataPointIndex]
 
-  const formattedLabel = props.formatLabels(label);
+  const formattedLabel = props.formatLabels(label)
 
   let tooltip = `<div class="bar-tooltip">
     <div class="seperated-entry title">
-      <div class="label">${formattedLabel}</div>`;
+      <div class="label">${formattedLabel}</div>`
 
   // Logic for total and percent stacked
   if (!props.hideTotal) {
     if (props.percentStacked) {
-      const total = series.reduce((a, b) => a + (b?.[dataPointIndex] || 0), 0);
-      const percentValue = (100 * series[seriesIndex][dataPointIndex]) / total;
+      const total = series.reduce((a, b) => a + (b?.[dataPointIndex] || 0), 0)
+      const percentValue = (100 * series[seriesIndex][dataPointIndex]) / total
       tooltip += `<div class="value">${props.prefix}${formatNumber(percentValue)}%${
         props.suffix
-      }</div>`;
+      }</div>`
     } else {
-      const totalValue = series.reduce((a, b) => a + (b?.[dataPointIndex] || 0), 0);
+      const totalValue = series.reduce((a, b) => a + (b?.[dataPointIndex] || 0), 0)
       tooltip += `<div class="value">${props.prefix}${formatTooltipValue(totalValue, props)}${
         props.suffix
-      }</div>`;
+      }</div>`
     }
   }
 
-  tooltip += '</div><hr class="card-divider" />';
+  tooltip += '</div><hr class="card-divider" />'
 
   // Logic for generating list entries
   if (props.percentStacked) {
@@ -131,9 +131,9 @@ function generateTooltip({ series, seriesIndex, dataPointIndex, w }, props) {
       seriesIndex,
       w,
       props,
-    );
+    )
   } else {
-    const returnTopN = 15;
+    const returnTopN = 15
 
     const listEntries = series
       .map((value, index) => [
@@ -144,13 +144,13 @@ function generateTooltip({ series, seriesIndex, dataPointIndex, w }, props) {
       .sort((a, b) => b[0] - a[0])
       .slice(0, returnTopN) // Return only the top X entries
       .map((value) => value[1])
-      .join("");
+      .join('')
 
-    tooltip += listEntries;
+    tooltip += listEntries
   }
 
-  tooltip += "</div>";
-  return tooltip;
+  tooltip += '</div>'
+  return tooltip
 }
 
 const chartOptions = computed(() => {
@@ -158,19 +158,19 @@ const chartOptions = computed(() => {
     chart: {
       id: props.name,
       fontFamily:
-        "Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif",
-      foreColor: "var(--color-base)",
+        'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
+      foreColor: 'var(--color-base)',
       selection: {
         enabled: true,
         fill: {
-          color: "var(--color-brand)",
+          color: 'var(--color-brand)',
         },
       },
       toolbar: {
         show: false,
       },
       stacked: props.stacked,
-      stackType: props.percentStacked ? "100%" : "normal",
+      stackType: props.percentStacked ? '100%' : 'normal',
       zoom: {
         autoScaleYaxis: true,
       },
@@ -183,7 +183,7 @@ const chartOptions = computed(() => {
       categories: props.labels,
       labels: {
         style: {
-          borderRadius: "var(--radius-sm)",
+          borderRadius: 'var(--radius-sm)',
         },
       },
       axisTicks: {
@@ -207,8 +207,8 @@ const chartOptions = computed(() => {
       },
     },
     grid: {
-      borderColor: "var(--color-button-bg)",
-      tickColor: "var(--color-button-bg)",
+      borderColor: 'var(--color-button-bg)',
+      tickColor: 'var(--color-button-bg)',
     },
     legend: {
       show: !props.hideLegend,
@@ -216,16 +216,16 @@ const chartOptions = computed(() => {
       showForZeroSeries: false,
       showForSingleSeries: false,
       showForNullSeries: false,
-      fontSize: "var(--font-size-nm)",
+      fontSize: 'var(--font-size-nm)',
       fontFamily:
-        "Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif",
+        'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
       onItemClick: {
         toggleDataSeries: true,
       },
     },
     markers: {
       size: 0,
-      strokeColor: "var(--color-contrast)",
+      strokeColor: 'var(--color-contrast)',
       strokeWidth: 3,
       strokeOpacity: 1,
       fillOpacity: 1,
@@ -236,29 +236,29 @@ const chartOptions = computed(() => {
     plotOptions: {
       bar: {
         horizontal: props.horizontalBar,
-        columnWidth: "80%",
-        endingShape: "rounded",
+        columnWidth: '80%',
+        endingShape: 'rounded',
         borderRadius: 5,
-        borderRadiusApplication: "end",
-        borderRadiusWhenStacked: "last",
+        borderRadiusApplication: 'end',
+        borderRadiusWhenStacked: 'last',
       },
     },
     stroke: {
-      curve: "smooth",
+      curve: 'smooth',
       width: 2,
     },
     tooltip: {
       custom: (d) => generateTooltip(d, props),
     },
     fill:
-      props.type === "area"
+      props.type === 'area'
         ? {
             colors: props.colors,
-            type: "gradient",
+            type: 'gradient',
             opacity: 1,
             gradient: {
-              shade: "light",
-              type: "vertical",
+              shade: 'light',
+              type: 'vertical',
               shadeIntensity: 0,
               gradientToColors: props.colors,
               inverseColors: true,
@@ -269,40 +269,40 @@ const chartOptions = computed(() => {
             },
           }
         : {},
-  };
-});
+  }
+})
 
-const chart = ref(null);
+const chart = ref(null)
 
 const legendValues = ref(
   [...props.data].map((project, index) => {
-    return { name: project.name, visible: true, color: props.colors[index] };
+    return { name: project.name, visible: true, color: props.colors[index] }
   }),
-);
+)
 
 const flipLegend = (legend, newVal) => {
-  legend.visible = newVal;
-  chart.value.toggleSeries(legend.name);
-};
+  legend.visible = newVal
+  chart.value.toggleSeries(legend.name)
+}
 
 const resetChart = () => {
-  if (!chart.value) return;
-  chart.value.updateSeries([...props.data]);
+  if (!chart.value) return
+  chart.value.updateSeries([...props.data])
   chart.value.updateOptions({
     xaxis: {
       categories: props.labels,
     },
-  });
-  chart.value.resetSeries();
+  })
+  chart.value.resetSeries()
   legendValues.value.forEach((legend) => {
-    legend.visible = true;
-  });
-};
+    legend.visible = true
+  })
+}
 
 defineExpose({
   resetChart,
   flipLegend,
-});
+})
 </script>
 
 <template>

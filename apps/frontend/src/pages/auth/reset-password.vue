@@ -67,166 +67,166 @@
   </div>
 </template>
 <script setup>
-import { KeyIcon,MailIcon, SendIcon } from "@modrinth/assets";
-import { commonMessages } from "@modrinth/ui";
+import { KeyIcon, MailIcon, SendIcon } from '@modrinth/assets'
+import { commonMessages } from '@modrinth/ui'
 
-import HCaptcha from "@/components/ui/HCaptcha.vue";
+import HCaptcha from '@/components/ui/HCaptcha.vue'
 
-const { formatMessage } = useVIntl();
+const { formatMessage } = useVIntl()
 
 const methodChoiceMessages = defineMessages({
   description: {
-    id: "auth.reset-password.method-choice.description",
+    id: 'auth.reset-password.method-choice.description',
     defaultMessage:
       "Enter your email below and we'll send a recovery link to allow you to recover your account.",
   },
   emailUsernameLabel: {
-    id: "auth.reset-password.method-choice.email-username.label",
-    defaultMessage: "Email or username",
+    id: 'auth.reset-password.method-choice.email-username.label',
+    defaultMessage: 'Email or username',
   },
   emailUsernamePlaceholder: {
-    id: "auth.reset-password.method-choice.email-username.placeholder",
-    defaultMessage: "Email",
+    id: 'auth.reset-password.method-choice.email-username.placeholder',
+    defaultMessage: 'Email',
   },
   action: {
-    id: "auth.reset-password.method-choice.action",
-    defaultMessage: "Send recovery email",
+    id: 'auth.reset-password.method-choice.action',
+    defaultMessage: 'Send recovery email',
   },
-});
+})
 
 const postChallengeMessages = defineMessages({
   description: {
-    id: "auth.reset-password.post-challenge.description",
-    defaultMessage: "Enter your new password below to gain access to your account.",
+    id: 'auth.reset-password.post-challenge.description',
+    defaultMessage: 'Enter your new password below to gain access to your account.',
   },
   confirmPasswordLabel: {
-    id: "auth.reset-password.post-challenge.confirm-password.label",
-    defaultMessage: "Confirm password",
+    id: 'auth.reset-password.post-challenge.confirm-password.label',
+    defaultMessage: 'Confirm password',
   },
   action: {
-    id: "auth.reset-password.post-challenge.action",
-    defaultMessage: "Reset password",
+    id: 'auth.reset-password.post-challenge.action',
+    defaultMessage: 'Reset password',
   },
-});
+})
 
 // NOTE(Brawaru): Vite uses esbuild for minification so can't combine these
 // because it'll keep the original prop names compared to consts, which names
 // will be mangled.
 const emailSentNotificationMessages = defineMessages({
   title: {
-    id: "auth.reset-password.notification.email-sent.title",
-    defaultMessage: "Email sent",
+    id: 'auth.reset-password.notification.email-sent.title',
+    defaultMessage: 'Email sent',
   },
   text: {
-    id: "auth.reset-password.notification.email-sent.text",
+    id: 'auth.reset-password.notification.email-sent.text',
     defaultMessage:
-      "An email with instructions has been sent to you if the email was previously saved on your account.",
+      'An email with instructions has been sent to you if the email was previously saved on your account.',
   },
-});
+})
 
 const passwordResetNotificationMessages = defineMessages({
   title: {
-    id: "auth.reset-password.notification.password-reset.title",
-    defaultMessage: "Password successfully reset",
+    id: 'auth.reset-password.notification.password-reset.title',
+    defaultMessage: 'Password successfully reset',
   },
   text: {
-    id: "auth.reset-password.notification.password-reset.text",
-    defaultMessage: "You can now log-in into your account with your new password.",
+    id: 'auth.reset-password.notification.password-reset.text',
+    defaultMessage: 'You can now log-in into your account with your new password.',
   },
-});
+})
 
 const messages = defineMessages({
   title: {
-    id: "auth.reset-password.title",
-    defaultMessage: "Reset Password",
+    id: 'auth.reset-password.title',
+    defaultMessage: 'Reset Password',
   },
   longTitle: {
-    id: "auth.reset-password.title.long",
-    defaultMessage: "Reset your password",
+    id: 'auth.reset-password.title.long',
+    defaultMessage: 'Reset your password',
   },
-});
+})
 
 useHead({
   title: () => `${formatMessage(messages.title)} - Modrinth`,
-});
+})
 
-const auth = await useAuth();
+const auth = await useAuth()
 if (auth.value.user) {
-  await navigateTo("/dashboard");
+  await navigateTo('/dashboard')
 }
 
-const route = useNativeRoute();
+const route = useNativeRoute()
 
-const step = ref("choose_method");
+const step = ref('choose_method')
 
 if (route.query.flow) {
-  step.value = "passed_challenge";
+  step.value = 'passed_challenge'
 }
 
-const captcha = ref();
+const captcha = ref()
 
-const email = ref("");
-const token = ref("");
+const email = ref('')
+const token = ref('')
 
 async function recovery() {
-  startLoading();
+  startLoading()
   try {
-    await useBaseFetch("auth/password/reset", {
-      method: "POST",
+    await useBaseFetch('auth/password/reset', {
+      method: 'POST',
       body: {
         username: email.value,
         challenge: token.value,
       },
-    });
+    })
 
     addNotification({
-      group: "main",
+      group: 'main',
       title: formatMessage(emailSentNotificationMessages.title),
       text: formatMessage(emailSentNotificationMessages.text),
-      type: "success",
-    });
+      type: 'success',
+    })
   } catch (err) {
     addNotification({
-      group: "main",
+      group: 'main',
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
-    captcha.value?.reset();
+      type: 'error',
+    })
+    captcha.value?.reset()
   }
-  stopLoading();
+  stopLoading()
 }
 
-const newPassword = ref("");
-const confirmNewPassword = ref("");
+const newPassword = ref('')
+const confirmNewPassword = ref('')
 
 async function changePassword() {
-  startLoading();
+  startLoading()
   try {
-    await useBaseFetch("auth/password", {
-      method: "PATCH",
+    await useBaseFetch('auth/password', {
+      method: 'PATCH',
       body: {
         new_password: newPassword.value,
         flow: route.query.flow,
       },
-    });
+    })
 
     addNotification({
-      group: "main",
+      group: 'main',
       title: formatMessage(passwordResetNotificationMessages.title),
       text: formatMessage(passwordResetNotificationMessages.text),
-      type: "success",
-    });
-    await navigateTo("/auth/sign-in");
+      type: 'success',
+    })
+    await navigateTo('/auth/sign-in')
   } catch (err) {
     addNotification({
-      group: "main",
+      group: 'main',
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
-    captcha.value?.reset();
+      type: 'error',
+    })
+    captcha.value?.reset()
   }
-  stopLoading();
+  stopLoading()
 }
 </script>

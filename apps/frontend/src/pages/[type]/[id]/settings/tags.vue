@@ -113,10 +113,10 @@
 </template>
 
 <script>
-import { SaveIcon,StarIcon } from "@modrinth/assets";
-import { formatCategory, formatCategoryHeader, formatProjectType } from "@modrinth/utils";
+import { SaveIcon, StarIcon } from '@modrinth/assets'
+import { formatCategory, formatCategoryHeader, formatProjectType } from '@modrinth/utils'
 
-import Checkbox from "~/components/ui/Checkbox.vue";
+import Checkbox from '~/components/ui/Checkbox.vue'
 
 export default defineNuxtComponent({
   components: {
@@ -128,19 +128,19 @@ export default defineNuxtComponent({
     project: {
       type: Object,
       default() {
-        return {};
+        return {}
       },
     },
     allMembers: {
       type: Array,
       default() {
-        return [];
+        return []
       },
     },
     currentMember: {
       type: Object,
       default() {
-        return null;
+        return null
       },
     },
     patchProject: {
@@ -148,12 +148,12 @@ export default defineNuxtComponent({
       default() {
         return () => {
           this.$notify({
-            group: "main",
-            title: "An error occurred",
-            text: "Patch project function not found",
-            type: "error",
-          });
-        };
+            group: 'main',
+            title: 'An error occurred',
+            text: 'Patch project function not found',
+            type: 'error',
+          })
+        }
       },
     },
   },
@@ -170,57 +170,57 @@ export default defineNuxtComponent({
           x.project_type === this.project.actualProjectType &&
           this.project.categories.includes(x.name),
       ),
-    };
+    }
   },
   computed: {
     categoryLists() {
-      const lists = {};
+      const lists = {}
       this.$sortedCategories().forEach((x) => {
         if (x.project_type === this.project.actualProjectType) {
-          const header = x.header;
+          const header = x.header
           if (!lists[header]) {
-            lists[header] = [];
+            lists[header] = []
           }
-          lists[header].push(x);
+          lists[header].push(x)
         }
-      });
-      return lists;
+      })
+      return lists
     },
     patchData() {
-      const data = {};
+      const data = {}
       // Promote selected categories to featured if there are less than 3 featured
-      const newFeaturedTags = this.featuredTags.slice();
+      const newFeaturedTags = this.featuredTags.slice()
       if (newFeaturedTags.length < 1 && this.selectedTags.length > newFeaturedTags.length) {
-        const nonFeaturedCategories = this.selectedTags.filter((x) => !newFeaturedTags.includes(x));
+        const nonFeaturedCategories = this.selectedTags.filter((x) => !newFeaturedTags.includes(x))
 
         nonFeaturedCategories
           .slice(0, Math.min(nonFeaturedCategories.length, 3 - newFeaturedTags.length))
-          .forEach((x) => newFeaturedTags.push(x));
+          .forEach((x) => newFeaturedTags.push(x))
       }
       // Convert selected and featured categories to backend-usable arrays
-      const categories = newFeaturedTags.map((x) => x.name);
+      const categories = newFeaturedTags.map((x) => x.name)
       const additionalCategories = this.selectedTags
         .filter((x) => !newFeaturedTags.includes(x))
-        .map((x) => x.name);
+        .map((x) => x.name)
 
       if (
         categories.length !== this.project.categories.length ||
         categories.some((value) => !this.project.categories.includes(value))
       ) {
-        data.categories = categories;
+        data.categories = categories
       }
 
       if (
         additionalCategories.length !== this.project.additional_categories.length ||
         additionalCategories.some((value) => !this.project.additional_categories.includes(value))
       ) {
-        data.additional_categories = additionalCategories;
+        data.additional_categories = additionalCategories
       }
 
-      return data;
+      return data
     },
     hasChanges() {
-      return Object.keys(this.patchData).length > 0;
+      return Object.keys(this.patchData).length > 0
     },
   },
   methods: {
@@ -229,28 +229,28 @@ export default defineNuxtComponent({
     formatCategory,
     toggleCategory(category) {
       if (this.selectedTags.includes(category)) {
-        this.selectedTags = this.selectedTags.filter((x) => x !== category);
+        this.selectedTags = this.selectedTags.filter((x) => x !== category)
         if (this.featuredTags.includes(category)) {
-          this.featuredTags = this.featuredTags.filter((x) => x !== category);
+          this.featuredTags = this.featuredTags.filter((x) => x !== category)
         }
       } else {
-        this.selectedTags.push(category);
+        this.selectedTags.push(category)
       }
     },
     toggleFeaturedCategory(category) {
       if (this.featuredTags.includes(category)) {
-        this.featuredTags = this.featuredTags.filter((x) => x !== category);
+        this.featuredTags = this.featuredTags.filter((x) => x !== category)
       } else {
-        this.featuredTags.push(category);
+        this.featuredTags.push(category)
       }
     },
     saveChanges() {
       if (this.hasChanges) {
-        this.patchProject(this.patchData);
+        this.patchProject(this.patchData)
       }
     },
   },
-});
+})
 </script>
 <style lang="scss" scoped>
 .label__title {

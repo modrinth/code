@@ -117,10 +117,10 @@ import {
   ScaleIcon,
   SendIcon,
   XIcon,
-} from "@modrinth/assets";
-import { formatProjectType } from "@modrinth/utils";
+} from '@modrinth/assets'
+import { formatProjectType } from '@modrinth/utils'
 
-import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
+import { acceptTeamInvite, removeTeamMember } from '~/helpers/teams.js'
 
 const props = defineProps({
   project: {
@@ -130,7 +130,7 @@ const props = defineProps({
   versions: {
     type: Array,
     default() {
-      return [];
+      return []
     },
   },
   currentMember: {
@@ -151,7 +151,7 @@ const props = defineProps({
   },
   routeName: {
     type: String,
-    default: "",
+    default: '',
   },
   auth: {
     type: Object,
@@ -166,12 +166,12 @@ const props = defineProps({
     default() {
       return () => {
         addNotification({
-          group: "main",
-          title: "An error occurred",
-          text: "setProcessing function not found",
-          type: "error",
-        });
-      };
+          group: 'main',
+          title: 'An error occurred',
+          text: 'setProcessing function not found',
+          type: 'error',
+        })
+      }
     },
   },
   toggleCollapsed: {
@@ -179,12 +179,12 @@ const props = defineProps({
     default() {
       return () => {
         addNotification({
-          group: "main",
-          title: "An error occurred",
-          text: "toggleCollapsed function not found",
-          type: "error",
-        });
-      };
+          group: 'main',
+          title: 'An error occurred',
+          text: 'toggleCollapsed function not found',
+          type: 'error',
+        })
+      }
     },
   },
   updateMembers: {
@@ -192,81 +192,81 @@ const props = defineProps({
     default() {
       return () => {
         addNotification({
-          group: "main",
-          title: "An error occurred",
-          text: "updateMembers function not found",
-          type: "error",
-        });
-      };
+          group: 'main',
+          title: 'An error occurred',
+          text: 'updateMembers function not found',
+          type: 'error',
+        })
+      }
     },
   },
-});
+})
 
-const featuredGalleryImage = computed(() => props.project.gallery.find((img) => img.featured));
+const featuredGalleryImage = computed(() => props.project.gallery.find((img) => img.featured))
 
 const nags = computed(() => [
   {
     condition: props.versions.length < 1,
-    title: "Upload a version",
-    id: "upload-version",
-    description: "At least one version is required for a project to be submitted for review.",
-    status: "required",
+    title: 'Upload a version',
+    id: 'upload-version',
+    description: 'At least one version is required for a project to be submitted for review.',
+    status: 'required',
     link: {
-      path: "versions",
-      title: "Visit versions page",
-      hide: props.routeName === "type-id-versions",
+      path: 'versions',
+      title: 'Visit versions page',
+      hide: props.routeName === 'type-id-versions',
     },
   },
   {
     condition:
-      props.project.body === "" || props.project.body.startsWith("# Placeholder description"),
-    title: "Add a description",
-    id: "add-description",
+      props.project.body === '' || props.project.body.startsWith('# Placeholder description'),
+    title: 'Add a description',
+    id: 'add-description',
     description:
       "A description that clearly describes the project's purpose and function is required.",
-    status: "required",
+    status: 'required',
     link: {
-      path: "settings/description",
-      title: "Visit description settings",
-      hide: props.routeName === "type-id-settings-description",
+      path: 'settings/description',
+      title: 'Visit description settings',
+      hide: props.routeName === 'type-id-settings-description',
     },
   },
   {
     condition: !props.project.icon_url,
-    title: "Add an icon",
-    id: "add-icon",
+    title: 'Add an icon',
+    id: 'add-icon',
     description:
-      "Your project should have a nice-looking icon to uniquely identify your project at a glance.",
-    status: "suggestion",
+      'Your project should have a nice-looking icon to uniquely identify your project at a glance.',
+    status: 'suggestion',
     link: {
-      path: "settings",
-      title: "Visit general settings",
-      hide: props.routeName === "type-id-settings",
+      path: 'settings',
+      title: 'Visit general settings',
+      hide: props.routeName === 'type-id-settings',
     },
   },
   {
     condition: props.project.gallery.length === 0 || !featuredGalleryImage.value,
-    title: "Feature a gallery image",
-    id: "feature-gallery-image",
-    description: "Featured gallery images may be the first impression of many users.",
-    status: "suggestion",
+    title: 'Feature a gallery image',
+    id: 'feature-gallery-image',
+    description: 'Featured gallery images may be the first impression of many users.',
+    status: 'suggestion',
     link: {
-      path: "gallery",
-      title: "Visit gallery page",
-      hide: props.routeName === "type-id-gallery",
+      path: 'gallery',
+      title: 'Visit gallery page',
+      hide: props.routeName === 'type-id-gallery',
     },
   },
   {
     hide: props.project.versions.length === 0,
     condition: props.project.categories.length < 1,
-    title: "Select tags",
-    id: "select-tags",
-    description: "Select all tags that apply to your project.",
-    status: "suggestion",
+    title: 'Select tags',
+    id: 'select-tags',
+    description: 'Select all tags that apply to your project.',
+    status: 'suggestion',
     link: {
-      path: "settings/tags",
-      title: "Visit tag settings",
-      hide: props.routeName === "type-id-settings-tags",
+      path: 'settings/tags',
+      title: 'Visit tag settings',
+      hide: props.routeName === 'type-id-settings-tags',
     },
   },
   {
@@ -277,111 +277,111 @@ const nags = computed(() => [
       props.project.discord_url ||
       props.project.donation_urls.length > 0
     ),
-    title: "Add external links",
-    id: "add-links",
+    title: 'Add external links',
+    id: 'add-links',
     description:
-      "Add any relevant links targeted outside of Modrinth, such as sources, issues, or a Discord invite.",
-    status: "suggestion",
+      'Add any relevant links targeted outside of Modrinth, such as sources, issues, or a Discord invite.',
+    status: 'suggestion',
     link: {
-      path: "settings/links",
-      title: "Visit links settings",
-      hide: props.routeName === "type-id-settings-links",
+      path: 'settings/links',
+      title: 'Visit links settings',
+      hide: props.routeName === 'type-id-settings-links',
     },
   },
   {
     hide:
       props.project.versions.length === 0 ||
-      props.project.project_type === "resourcepack" ||
-      props.project.project_type === "plugin" ||
-      props.project.project_type === "shader" ||
-      props.project.project_type === "datapack",
+      props.project.project_type === 'resourcepack' ||
+      props.project.project_type === 'plugin' ||
+      props.project.project_type === 'shader' ||
+      props.project.project_type === 'datapack',
     condition:
-      props.project.client_side === "unknown" ||
-      props.project.server_side === "unknown" ||
-      (props.project.client_side === "unsupported" && props.project.server_side === "unsupported"),
-    title: "Select supported environments",
-    id: "select-environments",
+      props.project.client_side === 'unknown' ||
+      props.project.server_side === 'unknown' ||
+      (props.project.client_side === 'unsupported' && props.project.server_side === 'unsupported'),
+    title: 'Select supported environments',
+    id: 'select-environments',
     description: `Select if the ${formatProjectType(
       props.project.project_type,
     ).toLowerCase()} functions on the client-side and/or server-side.`,
-    status: "required",
+    status: 'required',
     link: {
-      path: "settings",
-      title: "Visit general settings",
-      hide: props.routeName === "type-id-settings",
+      path: 'settings',
+      title: 'Visit general settings',
+      hide: props.routeName === 'type-id-settings',
     },
   },
   {
-    condition: props.project.license.id === "LicenseRef-Unknown",
-    title: "Select license",
-    id: "select-license",
+    condition: props.project.license.id === 'LicenseRef-Unknown',
+    title: 'Select license',
+    id: 'select-license',
     description: `Select the license your ${formatProjectType(
       props.project.project_type,
     ).toLowerCase()} is distributed under.`,
-    status: "required",
+    status: 'required',
     link: {
-      path: "settings/license",
-      title: "Visit license settings",
-      hide: props.routeName === "type-id-settings-license",
+      path: 'settings/license',
+      title: 'Visit license settings',
+      hide: props.routeName === 'type-id-settings-license',
     },
   },
   {
-    condition: props.project.status === "draft",
-    title: "Submit for review",
-    id: "submit-for-review",
+    condition: props.project.status === 'draft',
+    title: 'Submit for review',
+    id: 'submit-for-review',
     description:
-      "Your project is only viewable by members of the project. It must be reviewed by moderators in order to be published.",
-    status: "review",
+      'Your project is only viewable by members of the project. It must be reviewed by moderators in order to be published.',
+    status: 'review',
     link: null,
     action: {
       onClick: submitForReview,
-      title: "Submit for review",
-      disabled: () => nags.value.filter((x) => x.condition && x.status === "required").length > 0,
+      title: 'Submit for review',
+      disabled: () => nags.value.filter((x) => x.condition && x.status === 'required').length > 0,
     },
   },
   {
-    hide: props.project.stats === "draft",
+    hide: props.project.stats === 'draft',
     condition: props.tags.rejectedStatuses.includes(props.project.status),
-    title: "Resubmit for review",
-    id: "resubmit-for-review",
+    title: 'Resubmit for review',
+    id: 'resubmit-for-review',
     description: `Your project has been ${props.project.status} by
             Modrinth's staff. In most cases, you can resubmit for review after
             addressing the staff's message.`,
-    status: "review",
+    status: 'review',
     link: {
-      path: "moderation",
-      title: "Visit moderation page",
-      hide: props.routeName === "type-id-moderation",
+      path: 'moderation',
+      title: 'Visit moderation page',
+      hide: props.routeName === 'type-id-moderation',
     },
   },
-]);
+])
 
 const showInvitation = computed(() => {
   if (props.allMembers && props.auth) {
-    const member = props.allMembers.find((x) => x.user.id === props.auth.user.id);
-    return member && !member.accepted;
+    const member = props.allMembers.find((x) => x.user.id === props.auth.user.id)
+    return member && !member.accepted
   }
-  return false;
-});
+  return false
+})
 
 const acceptInvite = () => {
-  acceptTeamInvite(props.project.team);
-  props.updateMembers();
-};
+  acceptTeamInvite(props.project.team)
+  props.updateMembers()
+}
 
 const declineInvite = () => {
-  removeTeamMember(props.project.team, props.auth.user.id);
-  props.updateMembers();
-};
+  removeTeamMember(props.project.team, props.auth.user.id)
+  props.updateMembers()
+}
 
 const submitForReview = async () => {
   if (
     !props.acknowledgedMessage ||
-    nags.value.filter((x) => x.condition && x.status === "required").length === 0
+    nags.value.filter((x) => x.condition && x.status === 'required').length === 0
   ) {
-    await props.setProcessing();
+    await props.setProcessing()
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

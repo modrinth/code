@@ -126,7 +126,7 @@
             </span>
             <div class="mb-4 mt-2 flex w-full items-center gap-1 text-sm text-secondary">
               {{ formatCategory(subscription.interval) }} ⋅ {{ subscription.status }} ⋅
-              {{ dayjs(subscription.created).format("MMMM D, YYYY [at] h:mma") }} ({{
+              {{ dayjs(subscription.created).format('MMMM D, YYYY [at] h:mma') }} ({{
                 formatRelativeTime(subscription.created)
               }})
             </div>
@@ -194,13 +194,13 @@
                   <span v-else-if="charge.status === 'cancelled'" class="font-bold">Ends:</span>
                   <span v-else-if="charge.type === 'refund'" class="font-bold">Issued:</span>
                   <span v-else class="font-bold">Due:</span>
-                  {{ dayjs(charge.due).format("MMMM D, YYYY [at] h:mma") }}
+                  {{ dayjs(charge.due).format('MMMM D, YYYY [at] h:mma') }}
                   <span class="text-secondary">({{ formatRelativeTime(charge.due) }}) </span>
                 </span>
                 <span v-if="charge.last_attempt != null" class="text-sm text-secondary">
                   <span v-if="charge.status === 'failed'" class="font-bold">Last attempt:</span>
                   <span v-else class="font-bold">Charged:</span>
-                  {{ dayjs(charge.last_attempt).format("MMMM D, YYYY [at] h:mma") }}
+                  {{ dayjs(charge.last_attempt).format('MMMM D, YYYY [at] h:mma') }}
                   <span class="text-secondary"
                     >({{ formatRelativeTime(charge.last_attempt) }})
                   </span>
@@ -212,7 +212,7 @@
                   ⋅
                   {{ formatPrice(vintl.locale, charge.amount, charge.currency_code) }}
                   ⋅
-                  {{ dayjs(charge.due).format("YYYY-MM-DD h:mma") }}
+                  {{ dayjs(charge.due).format('YYYY-MM-DD h:mma') }}
                   <template v-if="charge.subscription_interval">
                     ⋅ {{ charge.subscription_interval }}
                   </template>
@@ -259,7 +259,7 @@ import {
   ServerIcon,
   UserIcon,
   XIcon,
-} from "@modrinth/assets";
+} from '@modrinth/assets'
 import {
   Avatar,
   ButtonStyled,
@@ -268,41 +268,41 @@ import {
   NewModal,
   Toggle,
   useRelativeTime,
-} from "@modrinth/ui";
-import { formatCategory, formatPrice } from "@modrinth/utils";
-import dayjs from "dayjs";
+} from '@modrinth/ui'
+import { formatCategory, formatPrice } from '@modrinth/utils'
+import dayjs from 'dayjs'
 
-import ModrinthServersIcon from "~/components/ui/servers/ModrinthServersIcon.vue";
-import { products } from "~/generated/state.json";
+import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
+import { products } from '~/generated/state.json'
 
-const route = useRoute();
-const vintl = useVIntl();
+const route = useRoute()
+const vintl = useVIntl()
 
-const { formatMessage } = vintl;
-const formatRelativeTime = useRelativeTime();
+const { formatMessage } = vintl
+const formatRelativeTime = useRelativeTime()
 
 const messages = defineMessages({
   userNotFoundError: {
-    id: "admin.billing.error.not-found",
-    defaultMessage: "User not found",
+    id: 'admin.billing.error.not-found',
+    defaultMessage: 'User not found',
   },
-});
+})
 
 const { data: user } = await useAsyncData(`user/${route.params.id}`, () =>
   useBaseFetch(`user/${route.params.id}`),
-);
+)
 
 if (!user.value) {
   throw createError({
     fatal: true,
     statusCode: 404,
     message: formatMessage(messages.userNotFoundError),
-  });
+  })
 }
 
-let subscriptions, charges, refreshCharges;
+let subscriptions, charges, refreshCharges
 try {
-  [{ data: subscriptions }, { data: charges, refresh: refreshCharges }] = await Promise.all([
+  ;[{ data: subscriptions }, { data: charges, refresh: refreshCharges }] = await Promise.all([
     useAsyncData(`billing/subscriptions?user_id=${route.params.id}`, () =>
       useBaseFetch(`billing/subscriptions?user_id=${user.value.id}`, {
         internal: true,
@@ -313,13 +313,13 @@ try {
         internal: true,
       }),
     ),
-  ]);
+  ])
 } catch {
   throw createError({
     fatal: true,
     statusCode: 404,
     message: formatMessage(messages.userNotFoundError),
-  });
+  })
 }
 
 const subscriptionCharges = computed(() => {
@@ -333,103 +333,103 @@ const subscriptionCharges = computed(() => {
       product: products.find((product) =>
         product.prices.some((price) => price.id === subscription.price_id),
       ),
-    };
-  });
-});
+    }
+  })
+})
 
-const refunding = ref(false);
-const refundModal = ref();
-const selectedCharge = ref(null);
-const refundType = ref("full");
-const refundTypes = ref(["full", "partial", "none"]);
-const refundAmount = ref(0);
-const unprovision = ref(true);
+const refunding = ref(false)
+const refundModal = ref()
+const selectedCharge = ref(null)
+const refundType = ref('full')
+const refundTypes = ref(['full', 'partial', 'none'])
+const refundAmount = ref(0)
+const unprovision = ref(true)
 
-const modifying = ref(false);
-const modifyModal = ref();
-const cancel = ref(false);
+const modifying = ref(false)
+const modifyModal = ref()
+const cancel = ref(false)
 
 function showRefundModal(charge) {
-  selectedCharge.value = charge;
-  refundType.value = "full";
-  refundAmount.value = 0;
-  unprovision.value = true;
-  refundModal.value.show();
+  selectedCharge.value = charge
+  refundType.value = 'full'
+  refundAmount.value = 0
+  unprovision.value = true
+  refundModal.value.show()
 }
 
 function showModifyModal(charge) {
-  selectedCharge.value = charge;
-  cancel.value = false;
-  modifyModal.value.show();
+  selectedCharge.value = charge
+  cancel.value = false
+  modifyModal.value.show()
 }
 
 async function refundCharge() {
-  refunding.value = true;
+  refunding.value = true
   try {
     await useBaseFetch(`billing/charge/${selectedCharge.value.id}/refund`, {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify({
         type: refundType.value,
         amount: refundAmount.value,
         unprovision: unprovision.value,
       }),
       internal: true,
-    });
-    await refreshCharges();
-    refundModal.value.hide();
+    })
+    await refreshCharges()
+    refundModal.value.hide()
   } catch (err) {
     addNotification({
-      title: "Error refunding",
+      title: 'Error refunding',
       text: err.data?.description ?? err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  refunding.value = false;
+  refunding.value = false
 }
 
 async function modifyCharge() {
-  modifying.value = true;
+  modifying.value = true
   try {
     await useBaseFetch(`billing/subscription/${selectedCharge.value.id}`, {
-      method: "PATCH",
+      method: 'PATCH',
       body: JSON.stringify({
         cancelled: cancel.value,
       }),
       internal: true,
-    });
+    })
     addNotification({
-      title: "Resubscription request submitted",
-      text: "If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.",
-      type: "success",
-    });
-    await refreshCharges();
+      title: 'Resubscription request submitted',
+      text: 'If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.',
+      type: 'success',
+    })
+    await refreshCharges()
   } catch (err) {
     addNotification({
-      title: "Error reattempting charge",
+      title: 'Error reattempting charge',
       text: err.data?.description ?? err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  modifying.value = false;
+  modifying.value = false
 }
 
 const chargeStatuses = {
   open: {
-    color: "bg-blue",
+    color: 'bg-blue',
   },
   processing: {
-    color: "bg-orange",
+    color: 'bg-orange',
   },
   succeeded: {
-    color: "bg-green",
+    color: 'bg-green',
   },
   failed: {
-    color: "bg-red",
+    color: 'bg-red',
   },
   cancelled: {
-    color: "bg-red",
+    color: 'bg-red',
   },
-};
+}
 </script>
 <style scoped>
 .page {

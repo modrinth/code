@@ -42,20 +42,20 @@
 </template>
 
 <script setup>
-import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { onMounted, onUnmounted,ref } from "vue";
+import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { onMounted, onUnmounted, ref } from 'vue'
 
-const container = ref(null);
-const showLabels = ref(false);
+const container = ref(null)
+const showLabels = ref(false)
 
 const locations = ref([
   // Active locations
-  { name: "New York", lat: 40.7128, lng: -74.006, active: true, clicked: false },
-  { name: "Los Angeles", lat: 34.0522, lng: -118.2437, active: true, clicked: false },
-  { name: "Miami", lat: 25.7617, lng: -80.1918, active: true, clicked: false },
-  { name: "Spokane", lat: 47.667309, lng: -117.411922, active: true, clicked: false },
-  { name: "Dallas", lat: 32.78372, lng: -96.7947, active: true, clicked: false },
+  { name: 'New York', lat: 40.7128, lng: -74.006, active: true, clicked: false },
+  { name: 'Los Angeles', lat: 34.0522, lng: -118.2437, active: true, clicked: false },
+  { name: 'Miami', lat: 25.7617, lng: -80.1918, active: true, clicked: false },
+  { name: 'Spokane', lat: 47.667309, lng: -117.411922, active: true, clicked: false },
+  { name: 'Dallas', lat: 32.78372, lng: -96.7947, active: true, clicked: false },
   // Future Locations
   // { name: "London", lat: 51.5074, lng: -0.1278, active: false, clicked: false },
   // { name: "Frankfurt", lat: 50.1109, lng: 8.6821, active: false, clicked: false },
@@ -66,60 +66,60 @@ const locations = ref([
   // { name: "Sydney", lat: -33.8688, lng: 151.2093, active: false, clicked: false },
   // { name: "São Paulo", lat: -23.5505, lng: -46.6333, active: false, clicked: false },
   // { name: "Toronto", lat: 43.6532, lng: -79.3832, active: false, clicked: false },
-]);
+])
 
 const isLocationVisible = (location) => {
-  if (!location.screenPosition || !globe) return false;
+  if (!location.screenPosition || !globe) return false
 
-  const vector = latLngToVector3(location.lat, location.lng).clone();
-  vector.applyMatrix4(globe.matrixWorld);
+  const vector = latLngToVector3(location.lat, location.lng).clone()
+  vector.applyMatrix4(globe.matrixWorld)
 
-  const cameraVector = new THREE.Vector3();
-  camera.getWorldPosition(cameraVector);
+  const cameraVector = new THREE.Vector3()
+  camera.getWorldPosition(cameraVector)
 
-  const viewVector = vector.clone().sub(cameraVector).normalize();
+  const viewVector = vector.clone().sub(cameraVector).normalize()
 
-  const normal = vector.clone().normalize();
+  const normal = vector.clone().normalize()
 
-  const dotProduct = normal.dot(viewVector);
+  const dotProduct = normal.dot(viewVector)
 
-  return dotProduct < -0.15;
-};
+  return dotProduct < -0.15
+}
 
 const toggleLocationClicked = (location) => {
-  console.log("clicked", location.name);
-  locations.value.find((loc) => loc.name === location.name).clicked = !location.clicked;
-};
+  console.log('clicked', location.name)
+  locations.value.find((loc) => loc.name === location.name).clicked = !location.clicked
+}
 
-let scene, camera, renderer, globe, controls;
-let animationFrame;
+let scene, camera, renderer, globe, controls
+let animationFrame
 
 const init = () => {
-  scene = new THREE.Scene();
+  scene = new THREE.Scene()
   camera = new THREE.PerspectiveCamera(
     45,
     container.value.clientWidth / container.value.clientHeight,
     0.1,
     1000,
-  );
+  )
   renderer = new THREE.WebGLRenderer({
     antialias: true,
     alpha: true,
-    powerPreference: "low-power",
-  });
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(container.value.clientWidth, container.value.clientHeight);
-  container.value.appendChild(renderer.domElement);
+    powerPreference: 'low-power',
+  })
+  renderer.setPixelRatio(window.devicePixelRatio)
+  renderer.setSize(container.value.clientWidth, container.value.clientHeight)
+  container.value.appendChild(renderer.domElement)
 
-  const geometry = new THREE.SphereGeometry(5, 64, 64);
-  const outlineTexture = new THREE.TextureLoader().load("/earth-outline.png");
-  outlineTexture.minFilter = THREE.LinearFilter;
-  outlineTexture.magFilter = THREE.LinearFilter;
+  const geometry = new THREE.SphereGeometry(5, 64, 64)
+  const outlineTexture = new THREE.TextureLoader().load('/earth-outline.png')
+  outlineTexture.minFilter = THREE.LinearFilter
+  outlineTexture.magFilter = THREE.LinearFilter
 
   const material = new THREE.ShaderMaterial({
     uniforms: {
       outlineTexture: { value: outlineTexture },
-      globeColor: { value: new THREE.Color("#60fbb5") },
+      globeColor: { value: new THREE.Color('#60fbb5') },
     },
     vertexShader: `
       varying vec2 vUv;
@@ -141,17 +141,17 @@ const init = () => {
     `,
     transparent: true,
     side: THREE.FrontSide,
-  });
+  })
 
-  globe = new THREE.Mesh(geometry, material);
-  scene.add(globe);
+  globe = new THREE.Mesh(geometry, material)
+  scene.add(globe)
 
-  const atmosphereGeometry = new THREE.SphereGeometry(5.2, 64, 64);
+  const atmosphereGeometry = new THREE.SphereGeometry(5.2, 64, 64)
   const atmosphereMaterial = new THREE.ShaderMaterial({
     transparent: true,
     side: THREE.BackSide,
     uniforms: {
-      color: { value: new THREE.Color("#56f690") },
+      color: { value: new THREE.Color('#56f690') },
       viewVector: { value: camera.position },
     },
     vertexShader: `
@@ -171,92 +171,92 @@ const init = () => {
         gl_FragColor = vec4(color, intensity * 0.4);
       }
     `,
-  });
+  })
 
-  const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
-  scene.add(atmosphere);
+  const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial)
+  scene.add(atmosphere)
 
-  const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
-  scene.add(ambientLight);
+  const ambientLight = new THREE.AmbientLight(0x404040, 0.5)
+  scene.add(ambientLight)
 
-  camera.position.z = 15;
+  camera.position.z = 15
 
-  controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.05;
-  controls.rotateSpeed = 0.3;
-  controls.enableZoom = false;
-  controls.enablePan = false;
-  controls.autoRotate = true;
-  controls.autoRotateSpeed = 0.05;
-  controls.minPolarAngle = Math.PI * 0.3;
-  controls.maxPolarAngle = Math.PI * 0.7;
+  controls = new OrbitControls(camera, renderer.domElement)
+  controls.enableDamping = true
+  controls.dampingFactor = 0.05
+  controls.rotateSpeed = 0.3
+  controls.enableZoom = false
+  controls.enablePan = false
+  controls.autoRotate = true
+  controls.autoRotateSpeed = 0.05
+  controls.minPolarAngle = Math.PI * 0.3
+  controls.maxPolarAngle = Math.PI * 0.7
 
-  globe.rotation.y = Math.PI * 1.9;
-  globe.rotation.x = Math.PI * 0.15;
-};
+  globe.rotation.y = Math.PI * 1.9
+  globe.rotation.x = Math.PI * 0.15
+}
 
 const animate = () => {
-  animationFrame = requestAnimationFrame(animate);
-  controls.update();
+  animationFrame = requestAnimationFrame(animate)
+  controls.update()
 
   locations.value.forEach((location) => {
-    const position = latLngToVector3(location.lat, location.lng);
-    const vector = position.clone();
-    vector.applyMatrix4(globe.matrixWorld);
+    const position = latLngToVector3(location.lat, location.lng)
+    const vector = position.clone()
+    vector.applyMatrix4(globe.matrixWorld)
 
-    const coords = vector.project(camera);
+    const coords = vector.project(camera)
     const screenPosition = {
       x: (coords.x * 0.5 + 0.5) * container.value.clientWidth,
       y: (-coords.y * 0.5 + 0.5) * container.value.clientHeight,
-    };
-    location.screenPosition = screenPosition;
-  });
+    }
+    location.screenPosition = screenPosition
+  })
 
-  renderer.render(scene, camera);
-};
+  renderer.render(scene, camera)
+}
 
 const latLngToVector3 = (lat, lng) => {
-  const phi = (90 - lat) * (Math.PI / 180);
-  const theta = (lng + 180) * (Math.PI / 180);
-  const radius = 5;
+  const phi = (90 - lat) * (Math.PI / 180)
+  const theta = (lng + 180) * (Math.PI / 180)
+  const radius = 5
 
   return new THREE.Vector3(
     -radius * Math.sin(phi) * Math.cos(theta),
     radius * Math.cos(phi),
     radius * Math.sin(phi) * Math.sin(theta),
-  );
-};
+  )
+}
 
 const handleResize = () => {
-  if (!container.value) return;
-  camera.aspect = container.value.clientWidth / container.value.clientHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(container.value.clientWidth, container.value.clientHeight);
-};
+  if (!container.value) return
+  camera.aspect = container.value.clientWidth / container.value.clientHeight
+  camera.updateProjectionMatrix()
+  renderer.setSize(container.value.clientWidth, container.value.clientHeight)
+}
 
 onMounted(() => {
-  init();
-  animate();
-  window.addEventListener("resize", handleResize);
+  init()
+  animate()
+  window.addEventListener('resize', handleResize)
 
   setTimeout(() => {
-    showLabels.value = true;
-  }, 1000);
-});
+    showLabels.value = true
+  }, 1000)
+})
 
 onUnmounted(() => {
   if (animationFrame) {
-    cancelAnimationFrame(animationFrame);
+    cancelAnimationFrame(animationFrame)
   }
-  window.removeEventListener("resize", handleResize);
+  window.removeEventListener('resize', handleResize)
   if (renderer) {
-    renderer.dispose();
+    renderer.dispose()
   }
   if (container.value) {
-    container.value.innerHTML = "";
+    container.value.innerHTML = ''
   }
-});
+})
 </script>
 
 <style scoped>

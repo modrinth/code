@@ -226,28 +226,28 @@ import {
   TransferIcon,
   UserPlusIcon,
   UserXIcon as UserRemoveIcon,
-} from "@modrinth/assets";
-import { Avatar, Badge, Button, Checkbox } from "@modrinth/ui";
-import { ref } from "vue";
+} from '@modrinth/assets'
+import { Avatar, Badge, Button, Checkbox } from '@modrinth/ui'
+import { ref } from 'vue'
 
-import { removeTeamMember } from "~/helpers/teams.js";
-import { isPermission } from "~/utils/permissions.ts";
+import { removeTeamMember } from '~/helpers/teams.js'
+import { isPermission } from '~/utils/permissions.ts'
 
-const { organization, refresh: refreshOrganization, currentMember } = inject("organizationContext");
+const { organization, refresh: refreshOrganization, currentMember } = inject('organizationContext')
 
-const auth = await useAuth();
+const auth = await useAuth()
 
-const currentUsername = ref("");
-const openTeamMembers = ref([]);
+const currentUsername = ref('')
+const openTeamMembers = ref([])
 
-const allTeamMembers = ref(organization.value.members);
+const allTeamMembers = ref(organization.value.members)
 
 watch(
   () => organization.value,
   () => {
-    allTeamMembers.value = organization.value.members;
+    allTeamMembers.value = organization.value.members
   },
-);
+)
 
 const projectPermissions = {
   UPLOAD_VERSION: 1 << 0,
@@ -260,7 +260,7 @@ const projectPermissions = {
   DELETE_PROJECT: 1 << 7,
   VIEW_ANALYTICS: 1 << 8,
   VIEW_PAYOUTS: 1 << 9,
-};
+}
 
 const organizationPermissions = {
   EDIT_DETAILS: 1 << 0,
@@ -271,49 +271,49 @@ const organizationPermissions = {
   REMOVE_PROJECT: 1 << 5,
   DELETE_ORGANIZATION: 1 << 6,
   EDIT_MEMBER_DEFAULT_PERMISSIONS: 1 << 7,
-};
+}
 
 const permToLabel = (key) => {
-  const o = key.split("_").join(" ");
-  return o.charAt(0).toUpperCase() + o.slice(1).toLowerCase();
-};
+  const o = key.split('_').join(' ')
+  return o.charAt(0).toUpperCase() + o.slice(1).toLowerCase()
+}
 
 const leaveProject = async (teamId, uid) => {
-  await removeTeamMember(teamId, uid);
-  await navigateTo(`/organization/${organization.value.id}`);
-};
+  await removeTeamMember(teamId, uid)
+  await navigateTo(`/organization/${organization.value.id}`)
+}
 
-const onLeaveProject = useClientTry(leaveProject);
+const onLeaveProject = useClientTry(leaveProject)
 
 const onInviteTeamMember = useClientTry(async (teamId, username) => {
-  const user = await useBaseFetch(`user/${username}`);
+  const user = await useBaseFetch(`user/${username}`)
   const data = {
     user_id: user.id.trim(),
-  };
+  }
   await useBaseFetch(`team/${teamId}/members`, {
-    method: "POST",
+    method: 'POST',
     body: data,
-  });
-  await refreshOrganization();
-  currentUsername.value = "";
+  })
+  await refreshOrganization()
+  currentUsername.value = ''
   addNotification({
-    group: "main",
-    title: "Member invited",
+    group: 'main',
+    title: 'Member invited',
     text: `${user.username} has been invited to the organization.`,
-    type: "success",
-  });
-});
+    type: 'success',
+  })
+})
 
 const onRemoveMember = useClientTry(async (teamId, member) => {
-  await removeTeamMember(teamId, member.user.id);
-  await refreshOrganization();
+  await removeTeamMember(teamId, member.user.id)
+  await refreshOrganization()
   addNotification({
-    group: "main",
-    title: "Member removed",
+    group: 'main',
+    title: 'Member removed',
     text: `${member.user.username} has been removed from the organization.`,
-    type: "success",
-  });
-});
+    type: 'success',
+  })
+})
 
 const onUpdateTeamMember = useClientTry(async (teamId, member) => {
   const data = !member.is_owner
@@ -326,36 +326,36 @@ const onUpdateTeamMember = useClientTry(async (teamId, member) => {
     : {
         payouts_split: member.payouts_split,
         role: member.role,
-      };
+      }
   await useBaseFetch(`team/${teamId}/members/${member.user.id}`, {
-    method: "PATCH",
+    method: 'PATCH',
     body: data,
-  });
-  await refreshOrganization();
+  })
+  await refreshOrganization()
   addNotification({
-    group: "main",
-    title: "Member updated",
+    group: 'main',
+    title: 'Member updated',
     text: `${member.user.username} has been updated.`,
-    type: "success",
-  });
-});
+    type: 'success',
+  })
+})
 
 const onTransferOwnership = useClientTry(async (teamId, uid) => {
   const data = {
     user_id: uid,
-  };
+  }
   await useBaseFetch(`team/${teamId}/owner`, {
-    method: "PATCH",
+    method: 'PATCH',
     body: data,
-  });
-  await refreshOrganization();
+  })
+  await refreshOrganization()
   addNotification({
-    group: "main",
-    title: "Ownership transferred",
+    group: 'main',
+    title: 'Ownership transferred',
     text: `The ownership of ${organization.value.name} has been successfully transferred.`,
-    type: "success",
-  });
-});
+    type: 'success',
+  })
+})
 </script>
 
 <style lang="scss" scoped>

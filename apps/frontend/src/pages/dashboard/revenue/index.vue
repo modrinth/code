@@ -148,68 +148,68 @@ import {
   TransferIcon,
   UnknownIcon,
   XIcon,
-} from "@modrinth/assets";
-import { formatDate } from "@modrinth/utils";
-import dayjs from "dayjs";
-import { computed } from "vue";
+} from '@modrinth/assets'
+import { formatDate } from '@modrinth/utils'
+import dayjs from 'dayjs'
+import { computed } from 'vue'
 
-const auth = await useAuth();
-const minWithdraw = ref(0.01);
+const auth = await useAuth()
+const minWithdraw = ref(0.01)
 
 const { data: userBalance } = await useAsyncData(`payout/balance`, () =>
   useBaseFetch(`payout/balance`, { apiVersion: 3 }),
-);
+)
 
 const deadlineEnding = computed(() => {
-  let deadline = dayjs().subtract(2, "month").endOf("month").add(60, "days");
-  if (deadline.isBefore(dayjs().startOf("day"))) {
-    deadline = dayjs().subtract(1, "month").endOf("month").add(60, "days");
+  let deadline = dayjs().subtract(2, 'month').endOf('month').add(60, 'days')
+  if (deadline.isBefore(dayjs().startOf('day'))) {
+    deadline = dayjs().subtract(1, 'month').endOf('month').add(60, 'days')
   }
-  return deadline;
-});
+  return deadline
+})
 
 const availableSoonDates = computed(() => {
   // Get the next 3 dates from userBalance.dates that are from now to the deadline + 4 months to make sure we get all the pending ones.
   const dates = Object.keys(userBalance.value.dates)
     .filter((date) => {
-      const dateObj = dayjs(date);
+      const dateObj = dayjs(date)
       return (
-        dateObj.isAfter(dayjs()) && dateObj.isBefore(dayjs(deadlineEnding.value).add(4, "month"))
-      );
+        dateObj.isAfter(dayjs()) && dateObj.isBefore(dayjs(deadlineEnding.value).add(4, 'month'))
+      )
     })
-    .sort((a, b) => dayjs(a).diff(dayjs(b)));
+    .sort((a, b) => dayjs(a).diff(dayjs(b)))
 
   return dates.reduce((acc, date) => {
-    acc[date] = userBalance.value.dates[date];
-    return acc;
-  }, {});
-});
+    acc[date] = userBalance.value.dates[date]
+    return acc
+  }, {})
+})
 
-const availableSoonDateKeys = computed(() => Object.keys(availableSoonDates.value));
+const availableSoonDateKeys = computed(() => Object.keys(availableSoonDates.value))
 
 async function updateVenmo() {
-  startLoading();
+  startLoading()
   try {
     const data = {
       venmo_handle: auth.value.user.payout_data.venmo_handle ?? null,
-    };
+    }
 
     await useBaseFetch(`user/${auth.value.user.id}`, {
-      method: "PATCH",
+      method: 'PATCH',
       body: data,
       apiVersion: 3,
-    });
-    await useAuth(auth.value.token);
+    })
+    await useAuth(auth.value.token)
   } catch (err) {
-    const data = useNuxtApp();
+    const data = useNuxtApp()
     data.$notify({
-      group: "main",
-      title: "An error occurred",
+      group: 'main',
+      title: 'An error occurred',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
-  stopLoading();
+  stopLoading()
 }
 </script>
 <style lang="scss" scoped>
