@@ -1,4 +1,5 @@
 import { BookTextIcon } from '@modrinth/assets'
+
 import type { Stage } from '../../types/stage'
 
 const licensesNotRequiringSource: string[] = [

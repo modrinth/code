@@ -1,6 +1,7 @@
-import type { Stage } from '../../types/stage'
-import type { ButtonAction } from '../../types/actions'
 import { TagsIcon } from '@modrinth/assets'
+
+import type { ButtonAction } from '../../types/actions'
+import type { Stage } from '../../types/stage'
 
 const categories: Stage = {
   title: "Are the project's tags accurate?",
