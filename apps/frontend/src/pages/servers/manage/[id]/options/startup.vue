@@ -217,15 +217,15 @@ async function saveStartup() {
   }
 }
 
-const resetStartup = () => {
+function resetStartup() {
   invocation.value = originalInvocation.value;
   jdkVersion.value = originalJdkVersion.value;
   jdkBuild.value = originalJdkBuild.value;
-};
+}
 
-const resetToDefault = () => {
+function resetToDefault() {
   invocation.value = originalInvocation.value ?? "";
-};
+}
 </script>
 
 <style scoped>
