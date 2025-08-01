@@ -147,7 +147,7 @@ export async function useServersFetch<T>(
           404: "Not Found",
           405: "Method Not Allowed",
           408: "Request Timeout",
-          429: "Too Many Requests",
+          429: "You're making requests too quickly. Please wait a moment and try again.",
           500: "Internal Server Error",
           502: "Bad Gateway",
           503: "Service Unavailable",
@@ -167,11 +167,17 @@ export async function useServersFetch<T>(
           console.error("Fetch error:", error);
 
           const fetchError = new ModrinthServersFetchError(
-            `[Modrinth Servers] ${message}`,
+            `[Modrinth Servers] ${error.message}`,
             statusCode,
             error,
           );
-          throw new ModrinthServerError(error.message, statusCode, fetchError, module, v1Error);
+          throw new ModrinthServerError(
+            `[Modrinth Servers] ${message}`,
+            statusCode,
+            fetchError,
+            module,
+            v1Error,
+          );
         }
 
         const baseDelay = statusCode && statusCode >= 500 ? 5000 : 1000;
