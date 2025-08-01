@@ -1,9 +1,10 @@
 import { createConfigForNuxt } from '@nuxt/eslint-config/flat'
 import { fixupPluginRules } from '@eslint/compat'
 import turboPlugin from 'eslint-plugin-turbo'
-import simpleImportSort from 'eslint-plugin-simple-import-sort'
+import common from './common.mjs'
 
 export const configurationNuxtToAppend = [
+  ...common,
   {
     name: 'turbo',
     plugins: {
@@ -23,20 +24,6 @@ export const configurationNuxtToAppend = [
       parserOptions: {
         warnOnUnsupportedTypeScriptVersion: false,
       },
-    },
-  },
-  {
-    plugins: {
-      'simple-import-sort': simpleImportSort,
-    },
-    rules: {
-      'simple-import-sort/imports': 'error',
-      'simple-import-sort/exports': 'error',
-    },
-  },
-  {
-    rules: {
-      '@typescript-eslint/ban-ts-comment': 'off',
     },
   },
 ]

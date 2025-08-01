@@ -17,11 +17,9 @@ export class ModrinthServersMultiError extends Error {
   }
 
   private buildErrorMessage(): string {
-    return (
-      Array.from(this.errors.entries())
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        .map(([_module, error]) => error.message)
-        .join('\n')
-    )
+    return Array.from(this.errors.entries())
+
+      .map(([_module, error]) => error.message)
+      .join('\n')
   }
 }

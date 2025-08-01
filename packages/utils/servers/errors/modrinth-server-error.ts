@@ -1,5 +1,6 @@
 import { FetchError } from 'ofetch'
-import { V1ErrorInfo } from '../types'
+
+import type { V1ErrorInfo } from '../types'
 
 export class ModrinthServerError extends Error {
   constructor(
