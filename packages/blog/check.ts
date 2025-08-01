@@ -1,9 +1,9 @@
 import { promises as fs } from 'fs'
-import * as path from 'path'
-import { repoPath, toVarName } from './utils'
 import { glob } from 'glob'
+import * as path from 'path'
 
-import { PUBLIC_SRC, PUBLIC_LOCATIONS, ARTICLES_GLOB, COMPILED_DIR } from './blog.config'
+import { ARTICLES_GLOB, COMPILED_DIR, PUBLIC_LOCATIONS, PUBLIC_SRC } from './blog.config'
+import { repoPath, toVarName } from './utils'
 
 async function checkPublicAssets() {
   const srcFiles = await glob('**/*', { cwd: PUBLIC_SRC, dot: true })
