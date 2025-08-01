@@ -71,5 +71,6 @@
     "vue3-apexcharts": "^1.5.2",
     "xss": "^1.0.14"
   },
-  "web-types": "../../web-types.json"
+  "web-types": "../../web-types.json",
+  "prettier": "@modrinth/tooling-config/prettier.nuxt.config.js"
 }
