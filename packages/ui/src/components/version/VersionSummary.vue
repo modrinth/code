@@ -30,9 +30,10 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, VersionChannelIndicator } from '../index'
 import { DownloadIcon, ExternalIcon } from '@modrinth/assets'
 import { computed } from 'vue'
+
+import { ButtonStyled, VersionChannelIndicator } from '../index'
 
 const props = defineProps<{
   version: Version

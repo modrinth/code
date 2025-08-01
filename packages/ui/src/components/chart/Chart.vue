@@ -1,8 +1,9 @@
 <!-- eslint-disable no-console -->
 <script setup>
-import dayjs from 'dayjs'
 import { formatNumber } from '@modrinth/utils'
+import dayjs from 'dayjs'
 import { defineAsyncComponent, ref } from 'vue'
+
 import Button from '../base/Button.vue'
 import Checkbox from '../base/Checkbox.vue'
 

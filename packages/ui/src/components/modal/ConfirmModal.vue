@@ -50,11 +50,12 @@
 </template>
 
 <script setup>
-import { renderString } from '@modrinth/utils'
-import { ref, computed } from 'vue'
 import { TrashIcon, XIcon } from '@modrinth/assets'
-import NewModal from './NewModal.vue'
+import { renderString } from '@modrinth/utils'
+import { computed, ref } from 'vue'
+
 import ButtonStyled from '../base/ButtonStyled.vue'
+import NewModal from './NewModal.vue'
 
 const props = defineProps({
   confirmationText: {
