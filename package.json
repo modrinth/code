@@ -25,6 +25,7 @@
     "intl:extract": "pnpm ui:intl:extract && pnpm web:intl:extract && pnpm app:intl:extract"
   },
   "devDependencies": {
+    "@modrinth/tooling-config": "workspace:*",
     "if-ci": "^3.0.0",
     "prettier": "^3.3.2",
     "turbo": "^2.5.4",
@@ -36,10 +37,5 @@
       "readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
     }
   },
-  "prettier": {
-    "printWidth": 100,
-    "semi": false,
-    "singleQuote": true,
-    "endOfLine": "auto"
-  }
+  "prettier": "@modrinth/tooling-config/prettier.config.js"
 }

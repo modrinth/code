@@ -9,14 +9,12 @@
     "fix": "jiti ./compile.ts && eslint . --fix && prettier --write ."
   },
   "devDependencies": {
+    "@modrinth/tooling-config": "workspace:*",
     "@types/glob": "^9.0.0",
     "@types/html-minifier-terser": "^7.0.2",
     "@types/rss": "^0.0.32",
     "@types/xml2js": "^0.4.14",
-    "eslint": "^8.57.0",
-    "eslint-config-custom": "workspace:*",
-    "jiti": "^2.4.2",
-    "tsconfig": "workspace:*"
+    "jiti": "^2.4.2"
   },
   "dependencies": {
     "@modrinth/utils": "workspace:*",

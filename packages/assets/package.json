@@ -12,10 +12,8 @@
     "icons:generate": "jiti build/generate-exports.ts"
   },
   "devDependencies": {
-    "eslint": "^8.57.0",
-    "eslint-config-custom": "workspace:*",
+    "@modrinth/tooling-config": "workspace:*",
     "jiti": "^2.4.2",
-    "tsconfig": "workspace:*",
     "vue": "^3.5.13"
   }
 }

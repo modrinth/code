@@ -17,8 +17,6 @@
   "devDependencies": {
     "@formatjs/cli": "^6.2.12",
     "@vintl/vintl": "^4.4.1",
-    "eslint": "^8.57.0",
-    "eslint-config-custom": "workspace:*",
-    "tsconfig": "workspace:*"
+    "@modrinth/tooling-config": "workspace:*"
   }
 }
