@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { CpuIcon, DatabaseIcon, MemoryStickIcon, SparklesIcon, UnknownIcon } from '@modrinth/assets'
 import { computed } from 'vue'
+
 import AutoLink from '../base/AutoLink.vue'
-import { MemoryStickIcon, DatabaseIcon, CpuIcon, SparklesIcon, UnknownIcon } from '@modrinth/assets'
 
 const emit = defineEmits<{
   (e: 'click-bursting-link'): void

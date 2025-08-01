@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { ref, computed, useTemplateRef, nextTick, watch } from 'vue'
-import NewModal from '../modal/NewModal.vue'
-import { type MessageDescriptor, useVIntl, defineMessage } from '@vintl/vintl'
 import {
+  CheckCircleIcon,
   ChevronRightIcon,
   LeftArrowIcon,
   RightArrowIcon,
-  XIcon,
-  CheckCircleIcon,
   SpinnerIcon,
+  XIcon,
 } from '@modrinth/assets'
+import { defineMessage, type MessageDescriptor, useVIntl } from '@vintl/vintl'
+import type Stripe from 'stripe'
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
+
+import { useStripe } from '../../composables/stripe'
+import { commonMessages } from '../../utils'
 import type {
   CreatePaymentIntentRequest,
   CreatePaymentIntentResponse,
@@ -21,14 +24,11 @@ import type {
   UpdatePaymentIntentResponse,
 } from '../../utils/billing'
 import { ButtonStyled } from '../index'
-import type Stripe from 'stripe'
-
-import { commonMessages } from '../../utils'
+import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
+import NewModal from '../modal/NewModal.vue'
 import RegionSelector from './ServersPurchase1Region.vue'
 import PaymentMethodSelector from './ServersPurchase2PaymentMethod.vue'
 import ConfirmPurchase from './ServersPurchase3Review.vue'
-import { useStripe } from '../../composables/stripe'
-import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
 
 const { formatMessage } = useVIntl()
 

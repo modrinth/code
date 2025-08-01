@@ -1,6 +1,6 @@
 import { createFormatter, type FormatOptions, type Formatter } from '@vintl/how-ago'
-import type { IntlController } from '@vintl/vintl/controller'
 import { useVIntl } from '@vintl/vintl'
+import type { IntlController } from '@vintl/vintl/controller'
 import { computed } from 'vue'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

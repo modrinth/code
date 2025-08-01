@@ -524,11 +524,7 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick, reactive, watch } from 'vue'
-import NewModal from '../modal/NewModal.vue'
 import {
-  UnknownIcon,
-  SpinnerIcon,
   CardIcon,
   CheckCircleIcon,
   ChevronRightIcon,
@@ -540,16 +536,21 @@ import {
   RadioButtonCheckedIcon,
   RadioButtonIcon,
   RightArrowIcon,
+  SpinnerIcon,
+  UnknownIcon,
   XIcon,
 } from '@modrinth/assets'
-import AnimatedLogo from '../brand/AnimatedLogo.vue'
-import { getCurrency, calculateSavings, formatPrice, createStripeElements } from '@modrinth/utils'
-import { useVIntl, defineMessages } from '@vintl/vintl'
+import { calculateSavings, createStripeElements, formatPrice, getCurrency } from '@modrinth/utils'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+import dayjs from 'dayjs'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { Multiselect } from 'vue-multiselect'
+
+import Admonition from '../base/Admonition.vue'
 import Checkbox from '../base/Checkbox.vue'
 import Slider from '../base/Slider.vue'
-import dayjs from 'dayjs'
-import Admonition from '../base/Admonition.vue'
+import AnimatedLogo from '../brand/AnimatedLogo.vue'
+import NewModal from '../modal/NewModal.vue'
 
 const { locale, formatMessage } = useVIntl()
 

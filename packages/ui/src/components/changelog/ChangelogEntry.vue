@@ -42,13 +42,14 @@
 </template>
 
 <script setup lang="ts">
-import type { VersionEntry } from '@modrinth/utils/changelog'
 import { renderHighlightedString } from '@modrinth/utils'
+import type { VersionEntry } from '@modrinth/utils/changelog'
+import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
-import { useVIntl, defineMessages } from '@vintl/vintl'
 import { computed, ref } from 'vue'
-import AutoLink from '../base/AutoLink.vue'
+
 import { useRelativeTime } from '../../composables'
+import AutoLink from '../base/AutoLink.vue'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()

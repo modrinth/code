@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { CardIcon, CurrencyIcon, PayPalIcon, UnknownIcon } from '@modrinth/assets'
-import { commonMessages, paymentMethodMessages } from '../../utils'
-import type Stripe from 'stripe'
 import { useVIntl } from '@vintl/vintl'
+import type Stripe from 'stripe'
+
+import { commonMessages, paymentMethodMessages } from '../../utils'
 
 const { formatMessage } = useVIntl()
 defineProps<{

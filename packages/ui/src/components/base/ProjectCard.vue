@@ -32,7 +32,7 @@
         :type-only="moderation"
         :client-side="clientSide"
         :server-side="serverSide"
-        :type="projectTypeDisplay"
+        :type="projectTypeDisplay!"
         :search="search"
         :categories="categories"
       />
@@ -67,162 +67,104 @@
   </article>
 </template>
 
-<script setup>
-import { HeartIcon, DownloadIcon, EditIcon, CalendarIcon } from '@modrinth/assets'
+<script setup lang="ts">
+import { CalendarIcon, DownloadIcon, EditIcon, HeartIcon } from '@modrinth/assets'
 import { formatNumber } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime.js'
-import { defineComponent } from 'vue'
-import Categories from '../search/Categories.vue'
-import Badge from './SimpleBadge.vue'
-import Avatar from './Avatar.vue'
-import EnvironmentIndicator from './EnvironmentIndicator.vue'
-</script>
+import { computed } from 'vue'
 
-<script>
 import { useRelativeTime } from '../../composables'
+import Categories from '../search/Categories.vue'
+import Avatar from './Avatar.vue'
+import Badge from './Badge.vue'
+import EnvironmentIndicator from './EnvironmentIndicator.vue'
 
 dayjs.extend(relativeTime)
-export default defineComponent({
-  props: {
-    id: {
-      type: String,
-      default: 'modrinth-0',
-    },
-    type: {
-      type: String,
-      default: 'mod',
-    },
-    name: {
-      type: String,
-      default: 'Project Name',
-    },
-    author: {
-      type: String,
-      default: null,
-    },
-    description: {
-      type: String,
-      default: 'A _type description',
-    },
-    iconUrl: {
-      type: String,
-      default: '#',
-      required: false,
-    },
-    downloads: {
-      type: String,
-      default: null,
-      required: false,
-    },
-    follows: {
-      type: String,
-      default: null,
-      required: false,
-    },
-    createdAt: {
-      type: String,
-      default: '0000-00-00',
-    },
-    updatedAt: {
-      type: String,
-      default: null,
-    },
-    categories: {
-      type: Array,
-      default() {
-        return []
-      },
-    },
-    filteredCategories: {
-      type: Array,
-      default() {
-        return []
-      },
-    },
-    projectTypeDisplay: {
-      type: String,
-      default: null,
-    },
-    projectTypeUrl: {
-      type: String,
-      default: null,
-    },
-    status: {
-      type: String,
-      default: null,
-    },
-    serverSide: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    clientSide: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    moderation: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    search: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    featuredImage: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    showUpdatedDate: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
-    hideLoaders: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    color: {
-      type: Number,
-      required: false,
-      default: null,
-    },
-  },
-  setup(_) {
-    const formatRelativeTime = useRelativeTime()
-    return { formatRelativeTime }
-  },
-  computed: {
-    toColor() {
-      let color = this.color
 
-      color >>>= 0
-      const b = color & 0xff
-      const g = (color & 0xff00) >>> 8
-      const r = (color & 0xff0000) >>> 16
-      return `rgba(${[r, g, b, 1].join(',')})`
-    },
-    createdDate() {
-      return dayjs(this.createdAt).format('MMMM D, YYYY [at] h:mm:ss A')
-    },
-    sinceCreation() {
-      return this.formatRelativeTime(this.createdAt)
-    },
-    updatedDate() {
-      return dayjs(this.updatedAt).format('MMMM D, YYYY [at] h:mm:ss A')
-    },
-    sinceUpdated() {
-      return this.formatRelativeTime(this.updatedAt)
-    },
+const props = withDefaults(
+  defineProps<{
+    id?: string
+    type?: string
+    name?: string
+    author?: string | null
+    description?: string
+    iconUrl?: string
+    downloads?: string | null
+    follows?: string | null
+    createdAt?: string
+    updatedAt?: string | null
+    categories?: string[]
+    filteredCategories?: string[]
+    projectTypeDisplay?: string | null
+    projectTypeUrl?: string | null
+    status?: string | null
+    serverSide?: string
+    clientSide?: string
+    moderation?: boolean
+    search?: boolean
+    featuredImage?: string | null
+    showUpdatedDate?: boolean
+    hideLoaders?: boolean
+    color?: number | null
+  }>(),
+  {
+    id: 'modrinth-0',
+    type: 'mod',
+    name: 'Project Name',
+    author: null,
+    description: 'A _type description',
+    iconUrl: '#',
+    downloads: null,
+    follows: null,
+    createdAt: '0000-00-00',
+    updatedAt: null,
+    categories: () => [],
+    filteredCategories: () => [],
+    projectTypeDisplay: null,
+    projectTypeUrl: null,
+    status: null,
+    serverSide: '',
+    clientSide: '',
+    moderation: false,
+    search: false,
+    featuredImage: null,
+    showUpdatedDate: true,
+    hideLoaders: false,
+    color: null,
   },
-  methods: {
-    formatNumber,
-  },
+)
+
+// Composables
+const formatRelativeTime = useRelativeTime()
+
+// Computed properties
+const toColor = computed((): string => {
+  let color = props.color
+
+  if (color === null) return 'rgba(0, 0, 0, 1)'
+
+  color >>>= 0
+  const b = color & 0xff
+  const g = (color & 0xff00) >>> 8
+  const r = (color & 0xff0000) >>> 16
+  return `rgba(${[r, g, b, 1].join(',')})`
+})
+
+const createdDate = computed((): string => {
+  return dayjs(props.createdAt).format('MMMM D, YYYY [at] h:mm:ss A')
+})
+
+const sinceCreation = computed((): string => {
+  return formatRelativeTime(dayjs(props.createdAt).toDate())
+})
+
+const updatedDate = computed((): string => {
+  return dayjs(props.updatedAt).format('MMMM D, YYYY [at] h:mm:ss A')
+})
+
+const sinceUpdated = computed((): string => {
+  return formatRelativeTime(dayjs(props.updatedAt).toDate())
 })
 </script>
 

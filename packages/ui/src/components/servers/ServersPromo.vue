@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { RightArrowIcon, ModrinthIcon, XIcon } from '@modrinth/assets'
-import ButtonStyled from '../base/ButtonStyled.vue'
+import { ModrinthIcon, RightArrowIcon, XIcon } from '@modrinth/assets'
+
 import AutoLink from '../base/AutoLink.vue'
+import ButtonStyled from '../base/ButtonStyled.vue'
 
 const emit = defineEmits<{
   (e: 'close'): void

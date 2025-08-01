@@ -46,10 +46,11 @@
 </template>
 <script setup lang="ts">
 import { CrownIcon, ExternalIcon, OrganizationIcon } from '@modrinth/assets'
-import { useVIntl, defineMessages } from '@vintl/vintl'
-import Avatar from '../base/Avatar.vue'
-import AutoLink from '../base/AutoLink.vue'
+import { defineMessages, useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
+
+import AutoLink from '../base/AutoLink.vue'
+import Avatar from '../base/Avatar.vue'
 
 const { formatMessage } = useVIntl()
 

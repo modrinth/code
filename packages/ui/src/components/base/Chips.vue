@@ -15,6 +15,7 @@
 
 <script setup lang="ts" generic="T">
 import { CheckIcon } from '@modrinth/assets'
+
 import Button from './Button.vue'
 
 const props = withDefaults(

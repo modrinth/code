@@ -49,6 +49,7 @@
 <script setup lang="ts">
 import { XIcon } from '@modrinth/assets'
 import { ref } from 'vue'
+
 import ButtonStyled from '../base/ButtonStyled.vue'
 
 const props = withDefaults(

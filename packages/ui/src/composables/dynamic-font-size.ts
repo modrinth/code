@@ -1,5 +1,5 @@
-import { computed, onMounted, onUnmounted, type Ref } from 'vue'
 import { useElementSize } from '@vueuse/core'
+import { computed, onMounted, onUnmounted, type Ref } from 'vue'
 
 export interface DynamicFontSizeOptions {
   containerElement: Ref<HTMLElement | null>

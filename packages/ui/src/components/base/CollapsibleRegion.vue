@@ -31,9 +31,10 @@
 </template>
 
 <script setup lang="ts">
-import ButtonStyled from './ButtonStyled.vue'
-import { ExpandIcon, CollapseIcon } from '@modrinth/assets'
+import { CollapseIcon, ExpandIcon } from '@modrinth/assets'
 import { ref } from 'vue'
+
+import ButtonStyled from './ButtonStyled.vue'
 
 const props = withDefaults(
   defineProps<{

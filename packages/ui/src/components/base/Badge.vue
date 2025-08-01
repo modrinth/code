@@ -76,21 +76,21 @@
 
 <script setup lang="ts">
 import {
-  ModrinthIcon,
-  ScaleIcon,
+  ArchiveIcon,
   BoxIcon,
-  ListIcon,
+  CalendarIcon,
+  CheckIcon,
   EyeOffIcon,
   FileTextIcon,
-  XIcon,
-  ArchiveIcon,
-  UpdatedIcon,
-  CheckIcon,
+  ListIcon,
   LockIcon,
-  CalendarIcon,
+  ModrinthIcon,
+  ScaleIcon,
+  UpdatedIcon,
+  XIcon,
 } from '@modrinth/assets'
 import { capitalizeString } from '@modrinth/utils'
-import { useVIntl, defineMessages } from '@vintl/vintl'
+import { defineMessages, useVIntl } from '@vintl/vintl'
 
 const messages = defineMessages({
   acceptedLabel: {

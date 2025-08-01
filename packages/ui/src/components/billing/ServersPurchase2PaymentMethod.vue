@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { defineMessages, useVIntl } from '@vintl/vintl'
 import type Stripe from 'stripe'
-import { useVIntl, defineMessages } from '@vintl/vintl'
+
 import PaymentMethodOption from './PaymentMethodOption.vue'
 
 const { formatMessage } = useVIntl()

@@ -1,10 +1,11 @@
 <script setup lang="ts" generic="T">
-import { ref, computed } from 'vue'
-import type { Ref } from 'vue'
-import Checkbox from '../base/Checkbox.vue'
-import ContentListItem from './ContentListItem.vue'
-import type { ContentItem } from './ContentListItem.vue'
 import { DropdownIcon } from '@modrinth/assets'
+import type { Ref } from 'vue'
+import { computed, ref } from 'vue'
+
+import Checkbox from '../base/Checkbox.vue'
+import type { ContentItem } from './ContentListItem.vue'
+import ContentListItem from './ContentListItem.vue'
 
 const props = withDefaults(
   defineProps<{

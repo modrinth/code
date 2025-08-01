@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { RadioButtonIcon, RadioButtonCheckedIcon, SpinnerIcon } from '@modrinth/assets'
+import { RadioButtonCheckedIcon, RadioButtonIcon, SpinnerIcon } from '@modrinth/assets'
 import type Stripe from 'stripe'
+
 import FormattedPaymentMethod from './FormattedPaymentMethod.vue'
 
 const emit = defineEmits<{

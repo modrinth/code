@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import ServersRegionButton from './ServersRegionButton.vue'
+import { InfoIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
-import { onMounted, ref, computed, watch } from 'vue'
-import type { RegionPing } from './ModrinthServersPurchaseModal.vue'
+import { computed, onMounted, ref, watch } from 'vue'
+
+import { formatPrice } from '../../../../utils'
 import {
   monthsInInterval,
   type ServerBillingInterval,
@@ -11,11 +12,11 @@ import {
   type ServerRegion,
   type ServerStockRequest,
 } from '../../utils/billing'
-import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
 import Slider from '../base/Slider.vue'
-import { SpinnerIcon, XIcon, InfoIcon } from '@modrinth/assets'
+import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
+import type { RegionPing } from './ModrinthServersPurchaseModal.vue'
+import ServersRegionButton from './ServersRegionButton.vue'
 import ServersSpecs from './ServersSpecs.vue'
-import { formatPrice } from '../../../../utils'
 
 const { formatMessage, locale } = useVIntl()
 

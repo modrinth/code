@@ -30,11 +30,12 @@
 </template>
 
 <script setup lang="ts">
-import { XCircleIcon, XIcon, LockIcon, BanIcon } from '@modrinth/assets'
-import { computed, type ComputedRef } from 'vue'
-import TagItem from '../base/TagItem.vue'
-import type { FilterValue, FilterType, FilterOption } from '../../utils/search'
+import { BanIcon, LockIcon, XCircleIcon, XIcon } from '@modrinth/assets'
 import { defineMessage, type MessageDescriptor, useVIntl } from '@vintl/vintl'
+import { computed, type ComputedRef } from 'vue'
+
+import type { FilterOption, FilterType, FilterValue } from '../../utils/search'
+import TagItem from '../base/TagItem.vue'
 
 const { formatMessage } = useVIntl()
 

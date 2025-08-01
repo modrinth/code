@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { useVIntl } from '@vintl/vintl'
-import { getPingLevel } from '@modrinth/utils'
 import { SignalIcon, SpinnerIcon } from '@modrinth/assets'
+import { getPingLevel } from '@modrinth/utils'
+import { useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
+
 import type { ServerRegion } from '../../utils/billing'
 import { regionOverrides } from '../../utils/regions'
 

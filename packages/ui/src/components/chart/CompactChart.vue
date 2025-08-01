@@ -1,8 +1,9 @@
 <!-- eslint-disable eslint-comments/require-description -->
 <script setup>
 import { formatNumber } from '@modrinth/utils'
-import { defineAsyncComponent, ref } from 'vue'
 import dayjs from 'dayjs'
+import { defineAsyncComponent, ref } from 'vue'
+
 import Card from '../base/Card.vue'
 
 const VueApexCharts = defineAsyncComponent(() => import('vue3-apexcharts'))
