@@ -15,16 +15,16 @@
 </template>
 
 <script setup>
-import ChartDisplay from "~/components/ui/charts/ChartDisplay.vue";
+import ChartDisplay from '~/components/ui/charts/ChartDisplay.vue'
 
 const props = defineProps({
   project: {
     type: Object,
     default() {
-      return {};
+      return {}
     },
   },
-});
+})
 </script>
 
 <style scoped lang="scss">

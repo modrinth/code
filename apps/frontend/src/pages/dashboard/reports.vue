@@ -7,10 +7,10 @@
   </div>
 </template>
 <script setup>
-import ReportsList from "~/components/ui/report/ReportsList.vue";
+import ReportsList from '~/components/ui/report/ReportsList.vue'
 
-const auth = await useAuth();
+const auth = await useAuth()
 useHead({
-  title: "Active reports - Modrinth",
-});
+  title: 'Active reports - Modrinth',
+})
 </script>

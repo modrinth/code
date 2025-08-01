@@ -99,76 +99,78 @@
 <script setup>
 import {
   BoxIcon,
-  SearchIcon,
-  XIcon,
-  PlusIcon,
+  GlobeIcon,
   LinkIcon,
   LockIcon,
-  GlobeIcon,
-} from "@modrinth/assets";
-import { Avatar, Button, commonMessages } from "@modrinth/ui";
-import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
+  PlusIcon,
+  SearchIcon,
+  XIcon,
+} from '@modrinth/assets'
+import { Avatar, Button, commonMessages } from '@modrinth/ui'
 
-const { formatMessage } = useVIntl();
-const formatCompactNumber = useCompactNumber();
+import CollectionCreateModal from '~/components/ui/CollectionCreateModal.vue'
+
+const { formatMessage } = useVIntl()
+const formatCompactNumber = useCompactNumber()
 
 const messages = defineMessages({
   createNewButton: {
-    id: "dashboard.collections.button.create-new",
-    defaultMessage: "Create new",
+    id: 'dashboard.collections.button.create-new',
+    defaultMessage: 'Create new',
   },
   collectionsLongTitle: {
-    id: "dashboard.collections.long-title",
-    defaultMessage: "Your collections",
+    id: 'dashboard.collections.long-title',
+    defaultMessage: 'Your collections',
   },
   followingCollectionDescription: {
-    id: "collection.description.following",
+    id: 'collection.description.following',
     defaultMessage: "Auto-generated collection of all the projects you're following.",
   },
   projectsCountLabel: {
-    id: "dashboard.collections.label.projects-count",
-    defaultMessage: "{count, plural, one {{count} project} other {{count} projects}}",
+    id: 'dashboard.collections.label.projects-count',
+    defaultMessage: '{count, plural, one {{count} project} other {{count} projects}}',
   },
   searchInputLabel: {
-    id: "dashboard.collections.label.search-input",
-    defaultMessage: "Search your collections",
+    id: 'dashboard.collections.label.search-input',
+    defaultMessage: 'Search your collections',
   },
-});
+})
 
 definePageMeta({
-  middleware: "auth",
-});
+  middleware: 'auth',
+})
 
 useHead({
   title: () => `${formatMessage(messages.collectionsLongTitle)} - Modrinth`,
-});
+})
 
-const auth = await useAuth();
-const user = await useUser();
+const auth = await useAuth()
+const user = await useUser()
 
 if (import.meta.client) {
-  await initUserFollows();
+  await initUserFollows()
 }
 
-const filterQuery = ref("");
+const filterQuery = ref('')
 
 const { data: collections } = await useAsyncData(`user/${auth.value.user.id}/collections`, () =>
   useBaseFetch(`user/${auth.value.user.id}/collections`, { apiVersion: 3 }),
-);
+)
 
 const orderedCollections = computed(() => {
-  if (!collections.value) return [];
+  if (!collections.value) return []
   return collections.value
+    .slice()
     .sort((a, b) => {
-      const aUpdated = new Date(a.updated);
-      const bUpdated = new Date(b.updated);
-      return bUpdated - aUpdated;
+      const aUpdated = new Date(a.updated)
+      const bUpdated = new Date(b.updated)
+      return bUpdated - aUpdated
     })
     .filter((collection) => {
-      if (!filterQuery.value) return true;
-      return collection.name.toLowerCase().includes(filterQuery.value.toLowerCase());
-    });
-});
+      if (!filterQuery.value) return true
+      return collection.name.toLowerCase().includes(filterQuery.value.toLowerCase())
+    })
+})
 </script>
 <style lang="scss">
 .collections-grid {

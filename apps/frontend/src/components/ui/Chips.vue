@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { CheckIcon } from "@modrinth/assets";
+import { CheckIcon } from '@modrinth/assets'
 
 export default {
   components: {
@@ -42,32 +42,32 @@ export default {
       default: true,
     },
   },
-  emits: ["update:modelValue"],
+  emits: ['update:modelValue'],
   computed: {
     selected: {
       get() {
-        return this.modelValue;
+        return this.modelValue
       },
       set(value) {
-        this.$emit("update:modelValue", value);
+        this.$emit('update:modelValue', value)
       },
     },
   },
   created() {
     if (this.items.length > 0 && this.neverEmpty) {
-      this.selected = this.items[0];
+      this.selected = this.items[0]
     }
   },
   methods: {
     toggleItem(item) {
       if (this.selected === item && !this.neverEmpty) {
-        this.selected = null;
+        this.selected = null
       } else {
-        this.selected = item;
+        this.selected = item
       }
     },
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>

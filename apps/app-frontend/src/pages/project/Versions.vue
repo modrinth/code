@@ -65,9 +65,10 @@
 </template>
 
 <script setup>
-import { ProjectPageVersions, ButtonStyled, OverflowMenu } from '@modrinth/ui'
 import { CheckIcon, DownloadIcon, ExternalIcon, MoreVerticalIcon } from '@modrinth/assets'
+import { ButtonStyled, OverflowMenu, ProjectPageVersions } from '@modrinth/ui'
 import { ref } from 'vue'
+
 import { SwapIcon } from '@/assets/icons/index.js'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'

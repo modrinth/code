@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import { ChevronRightIcon } from "@modrinth/assets";
+import { ChevronRightIcon } from '@modrinth/assets'
 
 defineProps({
   linkStack: {
@@ -26,7 +26,7 @@ defineProps({
     type: String,
     required: true,
   },
-});
+})
 </script>
 
 <style lang="scss" scoped>

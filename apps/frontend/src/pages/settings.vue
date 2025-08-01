@@ -80,23 +80,24 @@
 </template>
 <script setup>
 import {
-  ServerIcon,
+  CardIcon,
   GridIcon,
-  PaintbrushIcon,
-  UserIcon,
-  ShieldIcon,
   KeyIcon,
   LanguagesIcon,
-  CardIcon,
   MonitorSmartphoneIcon,
-} from "@modrinth/assets";
-import { commonMessages, commonSettingsMessages } from "@modrinth/ui";
-import NavStack from "~/components/ui/NavStack.vue";
-import NavStackItem from "~/components/ui/NavStackItem.vue";
+  PaintbrushIcon,
+  ServerIcon,
+  ShieldIcon,
+  UserIcon,
+} from '@modrinth/assets'
+import { commonMessages, commonSettingsMessages } from '@modrinth/ui'
 
-const { formatMessage } = useVIntl();
+import NavStack from '~/components/ui/NavStack.vue'
+import NavStackItem from '~/components/ui/NavStackItem.vue'
 
-const route = useNativeRoute();
-const auth = await useAuth();
-const isStaging = useRuntimeConfig().public.siteUrl !== "https://modrinth.com";
+const { formatMessage } = useVIntl()
+
+const route = useNativeRoute()
+const auth = await useAuth()
+const isStaging = useRuntimeConfig().public.siteUrl !== 'https://modrinth.com'
 </script>

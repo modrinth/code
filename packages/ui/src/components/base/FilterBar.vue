@@ -17,8 +17,8 @@
 
 <script setup lang="ts">
 import { FilterIcon } from '@modrinth/assets'
-import { watch } from 'vue'
 import { type MessageDescriptor, useVIntl } from '@vintl/vintl'
+import { watch } from 'vue'
 
 const { formatMessage } = useVIntl()
 

@@ -1,6 +1,6 @@
 <script setup>
-import { Card } from "@modrinth/ui";
-import VueApexCharts from "vue3-apexcharts";
+import { Card } from '@modrinth/ui'
+import VueApexCharts from 'vue3-apexcharts'
 
 // let VueApexCharts
 // if (import.meta.client) {
@@ -10,11 +10,11 @@ import VueApexCharts from "vue3-apexcharts";
 const props = defineProps({
   value: {
     type: String,
-    default: "",
+    default: '',
   },
   title: {
     type: String,
-    default: "",
+    default: '',
   },
   data: {
     type: Array,
@@ -26,11 +26,11 @@ const props = defineProps({
   },
   prefix: {
     type: String,
-    default: "",
+    default: '',
   },
   suffix: {
     type: String,
-    default: "",
+    default: '',
   },
   isMoney: {
     type: Boolean,
@@ -38,17 +38,17 @@ const props = defineProps({
   },
   color: {
     type: String,
-    default: "var(--color-brand)",
+    default: 'var(--color-brand)',
   },
-});
+})
 
 // no grid lines, no toolbar, no legend, no data labels
 const chartOptions = {
   chart: {
     id: props.title,
     fontFamily:
-      "Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif",
-    foreColor: "var(--color-base)",
+      'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
+    foreColor: 'var(--color-base)',
     toolbar: {
       show: false,
     },
@@ -61,16 +61,16 @@ const chartOptions = {
     parentHeightOffset: 0,
   },
   stroke: {
-    curve: "smooth",
+    curve: 'smooth',
     width: 2,
   },
   fill: {
     colors: [props.color],
-    type: "gradient",
+    type: 'gradient',
     opacity: 1,
     gradient: {
-      shade: "light",
-      type: "vertical",
+      shade: 'light',
+      type: 'vertical',
       shadeIntensity: 0,
       gradientToColors: [props.color],
       inverseColors: true,
@@ -91,7 +91,7 @@ const chartOptions = {
     enabled: false,
   },
   xaxis: {
-    type: "datetime",
+    type: 'datetime',
     categories: props.labels,
     labels: {
       show: false,
@@ -120,23 +120,23 @@ const chartOptions = {
   tooltip: {
     enabled: false,
   },
-};
+}
 
-const chart = ref(null);
+const chart = ref(null)
 
 const resetChart = () => {
-  chart.value?.updateSeries([...props.data]);
+  chart.value?.updateSeries([...props.data])
   chart.value?.updateOptions({
     xaxis: {
       categories: props.labels,
     },
-  });
-  chart.value?.resetSeries();
-};
+  })
+  chart.value?.resetSeries()
+}
 
 defineExpose({
   resetChart,
-});
+})
 </script>
 
 <template>

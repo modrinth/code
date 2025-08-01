@@ -1,11 +1,12 @@
 <script setup>
 import { CheckIcon } from '@modrinth/assets'
-import { Button, Badge } from '@modrinth/ui'
+import { Badge, Button } from '@modrinth/ui'
 import { computed, ref } from 'vue'
-import { update_managed_modrinth_version } from '@/helpers/profile'
-import { releaseColor } from '@/helpers/utils'
+
 import { SwapIcon } from '@/assets/icons/index.js'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { update_managed_modrinth_version } from '@/helpers/profile'
+import { releaseColor } from '@/helpers/utils'
 
 const props = defineProps({
   versions: {

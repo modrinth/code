@@ -415,7 +415,7 @@
   }
 
   &:disabled,
-  &[disabled="true"] {
+  &[disabled='true'] {
     cursor: not-allowed;
     filter: grayscale(50%);
     opacity: 0.5;
@@ -461,7 +461,7 @@ tr.button-transparent {
   }
 
   &:disabled > *,
-  &[disabled="true"] > * {
+  &[disabled='true'] > * {
     cursor: not-allowed;
     filter: grayscale(50%);
     opacity: 0.5;
@@ -492,7 +492,7 @@ tr.button-transparent {
     box-shadow: none;
 
     &disabled,
-    &[disabled="true"] {
+    &[disabled='true'] {
       cursor: not-allowed;
       box-shadow: none;
     }
@@ -678,7 +678,7 @@ tr.button-transparent {
   background: var(--color-button-bg);
 
   &:after {
-    content: "";
+    content: '';
     position: absolute;
     top: 7px;
     left: 7px;

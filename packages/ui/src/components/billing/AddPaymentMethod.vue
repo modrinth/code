@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { createStripeElements } from '@modrinth/utils'
-import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
 import { loadStripe, type Stripe as StripsJs, type StripeElements } from '@stripe/stripe-js'
+import { ref } from 'vue'
+
+import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
 
 const emit = defineEmits<{
   (e: 'startLoading' | 'stopLoading'): void

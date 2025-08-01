@@ -43,24 +43,25 @@
 </template>
 <script setup>
 import {
-  DashboardIcon,
-  CurrencyIcon,
-  ListIcon,
-  ReportIcon,
   BellIcon as NotificationsIcon,
-  OrganizationIcon,
-  LibraryIcon,
   ChartIcon,
-} from "@modrinth/assets";
-import { commonMessages } from "@modrinth/ui";
-import NavStack from "~/components/ui/NavStack.vue";
-import NavStackItem from "~/components/ui/NavStackItem.vue";
+  CurrencyIcon,
+  DashboardIcon,
+  LibraryIcon,
+  ListIcon,
+  OrganizationIcon,
+  ReportIcon,
+} from '@modrinth/assets'
+import { commonMessages } from '@modrinth/ui'
 
-const { formatMessage } = useVIntl();
+import NavStack from '~/components/ui/NavStack.vue'
+import NavStackItem from '~/components/ui/NavStackItem.vue'
+
+const { formatMessage } = useVIntl()
 
 definePageMeta({
-  middleware: "auth",
-});
+  middleware: 'auth',
+})
 
-const route = useNativeRoute();
+const route = useNativeRoute()
 </script>

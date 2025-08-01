@@ -112,137 +112,138 @@
 </template>
 
 <script setup lang="ts">
-import { UpdatedIcon, IssuesIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { IssuesIcon, UpdatedIcon } from '@modrinth/assets'
+import { ButtonStyled } from '@modrinth/ui'
+
+import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const props = defineProps<{
-  server: ModrinthServer;
-}>();
+  server: ModrinthServer
+}>()
 
-const data = computed(() => props.server.general);
-const startupSettings = computed(() => props.server.startup);
-const showAllVersions = ref(false);
+const data = computed(() => props.server.general)
+const startupSettings = computed(() => props.server.startup)
+const showAllVersions = ref(false)
 
 const jdkVersionMap = [
-  { value: "lts8", label: "Java 8" },
-  { value: "lts11", label: "Java 11" },
-  { value: "lts17", label: "Java 17" },
-  { value: "lts21", label: "Java 21" },
-];
+  { value: 'lts8', label: 'Java 8' },
+  { value: 'lts11', label: 'Java 11' },
+  { value: 'lts17', label: 'Java 17' },
+  { value: 'lts21', label: 'Java 21' },
+]
 
 const jdkBuildMap = [
-  { value: "corretto", label: "Corretto" },
-  { value: "temurin", label: "Temurin" },
-  { value: "graal", label: "GraalVM" },
-];
+  { value: 'corretto', label: 'Corretto' },
+  { value: 'temurin', label: 'Temurin' },
+  { value: 'graal', label: 'GraalVM' },
+]
 
-const invocation = ref("");
-const jdkVersion = ref("");
-const jdkBuild = ref("");
+const invocation = ref('')
+const jdkVersion = ref('')
+const jdkBuild = ref('')
 
-const originalInvocation = ref("");
-const originalJdkVersion = ref("");
-const originalJdkBuild = ref("");
+const originalInvocation = ref('')
+const originalJdkVersion = ref('')
+const originalJdkBuild = ref('')
 
 watch(
   startupSettings,
   (newSettings) => {
     if (newSettings) {
-      invocation.value = newSettings.invocation;
-      originalInvocation.value = newSettings.invocation;
+      invocation.value = newSettings.invocation
+      originalInvocation.value = newSettings.invocation
 
       const jdkVersionLabel =
-        jdkVersionMap.find((v) => v.value === newSettings.jdk_version)?.label || "";
-      jdkVersion.value = jdkVersionLabel;
-      originalJdkVersion.value = jdkVersionLabel;
+        jdkVersionMap.find((v) => v.value === newSettings.jdk_version)?.label || ''
+      jdkVersion.value = jdkVersionLabel
+      originalJdkVersion.value = jdkVersionLabel
 
-      const jdkBuildLabel = jdkBuildMap.find((v) => v.value === newSettings.jdk_build)?.label || "";
-      jdkBuild.value = jdkBuildLabel;
-      originalJdkBuild.value = jdkBuildLabel;
+      const jdkBuildLabel = jdkBuildMap.find((v) => v.value === newSettings.jdk_build)?.label || ''
+      jdkBuild.value = jdkBuildLabel
+      originalJdkBuild.value = jdkBuildLabel
     }
   },
   { immediate: true },
-);
+)
 
 const hasUnsavedChanges = computed(
   () =>
     invocation.value !== originalInvocation.value ||
     jdkVersion.value !== originalJdkVersion.value ||
     jdkBuild.value !== originalJdkBuild.value,
-);
+)
 
-const isUpdating = ref(false);
+const isUpdating = ref(false)
 
 const compatibleJavaVersions = computed(() => {
-  const mcVersion = data.value?.mc_version ?? "";
-  if (!mcVersion) return jdkVersionMap.map((v) => v.label);
+  const mcVersion = data.value?.mc_version ?? ''
+  if (!mcVersion) return jdkVersionMap.map((v) => v.label)
 
-  const [major, minor] = mcVersion.split(".").map(Number);
+  const [major, minor] = mcVersion.split('.').map(Number)
 
   if (major >= 1) {
-    if (minor >= 20) return ["Java 21"];
-    if (minor >= 18) return ["Java 17", "Java 21"];
-    if (minor >= 17) return ["Java 16", "Java 17", "Java 21"];
-    if (minor >= 12) return ["Java 8", "Java 11", "Java 17", "Java 21"];
-    if (minor >= 6) return ["Java 8", "Java 11"];
+    if (minor >= 20) return ['Java 21']
+    if (minor >= 18) return ['Java 17', 'Java 21']
+    if (minor >= 17) return ['Java 16', 'Java 17', 'Java 21']
+    if (minor >= 12) return ['Java 8', 'Java 11', 'Java 17', 'Java 21']
+    if (minor >= 6) return ['Java 8', 'Java 11']
   }
 
-  return ["Java 8"];
-});
+  return ['Java 8']
+})
 
 const displayedJavaVersions = computed(() => {
-  return showAllVersions.value ? jdkVersionMap.map((v) => v.label) : compatibleJavaVersions.value;
-});
+  return showAllVersions.value ? jdkVersionMap.map((v) => v.label) : compatibleJavaVersions.value
+})
 
 const saveStartup = async () => {
   try {
-    isUpdating.value = true;
-    const invocationValue = invocation.value ?? "";
-    const jdkVersionKey = jdkVersionMap.find((v) => v.label === jdkVersion.value)?.value;
-    const jdkBuildKey = jdkBuildMap.find((v) => v.label === jdkBuild.value)?.value;
-    await props.server.startup?.update(invocationValue, jdkVersionKey as any, jdkBuildKey as any);
+    isUpdating.value = true
+    const invocationValue = invocation.value ?? ''
+    const jdkVersionKey = jdkVersionMap.find((v) => v.label === jdkVersion.value)?.value
+    const jdkBuildKey = jdkBuildMap.find((v) => v.label === jdkBuild.value)?.value
+    await props.server.startup?.update(invocationValue, jdkVersionKey as any, jdkBuildKey as any)
 
-    await new Promise((resolve) => setTimeout(resolve, 10));
+    await new Promise((resolve) => setTimeout(resolve, 10))
 
-    await props.server.refresh(["startup"]);
+    await props.server.refresh(['startup'])
 
     if (props.server.startup) {
-      invocation.value = props.server.startup.invocation;
+      invocation.value = props.server.startup.invocation
       jdkVersion.value =
-        jdkVersionMap.find((v) => v.value === props.server.startup?.jdk_version)?.label || "";
+        jdkVersionMap.find((v) => v.value === props.server.startup?.jdk_version)?.label || ''
       jdkBuild.value =
-        jdkBuildMap.find((v) => v.value === props.server.startup?.jdk_build)?.label || "";
+        jdkBuildMap.find((v) => v.value === props.server.startup?.jdk_build)?.label || ''
     }
 
     addNotification({
-      group: "serverOptions",
-      type: "success",
-      title: "Server settings updated",
-      text: "Your server settings were successfully changed.",
-    });
+      group: 'serverOptions',
+      type: 'success',
+      title: 'Server settings updated',
+      text: 'Your server settings were successfully changed.',
+    })
   } catch (error) {
-    console.error(error);
+    console.error(error)
     addNotification({
-      group: "serverOptions",
-      type: "error",
-      title: "Failed to update server arguments",
-      text: "Please try again later.",
-    });
+      group: 'serverOptions',
+      type: 'error',
+      title: 'Failed to update server arguments',
+      text: 'Please try again later.',
+    })
   } finally {
-    isUpdating.value = false;
+    isUpdating.value = false
   }
-};
+}
 
 const resetStartup = () => {
-  invocation.value = originalInvocation.value;
-  jdkVersion.value = originalJdkVersion.value;
-  jdkBuild.value = originalJdkBuild.value;
-};
+  invocation.value = originalInvocation.value
+  jdkVersion.value = originalJdkVersion.value
+  jdkBuild.value = originalJdkBuild.value
+}
 
 const resetToDefault = () => {
-  invocation.value = startupSettings.value?.original_invocation ?? "";
-};
+  invocation.value = startupSettings.value?.original_invocation ?? ''
+}
 </script>
 
 <style scoped>

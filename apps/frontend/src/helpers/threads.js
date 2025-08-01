@@ -1,26 +1,26 @@
 export function addReportMessage(thread, report) {
   if (!thread || !report) {
-    return thread;
+    return thread
   }
   if (
     !thread.members.some((user) => {
-      return user.id === report.reporterUser.id;
+      return user.id === report.reporterUser.id
     })
   ) {
-    thread.members.push(report.reporterUser);
+    thread.members.push(report.reporterUser)
   }
-  if (!thread.messages.some((message) => message.id === "original")) {
+  if (!thread.messages.some((message) => message.id === 'original')) {
     thread.messages.push({
-      id: "original",
+      id: 'original',
       author_id: report.reporterUser.id,
       body: {
-        type: "text",
+        type: 'text',
         body: report.body,
         private: false,
         replying_to: null,
       },
       created: report.created,
-    });
+    })
   }
-  return thread;
+  return thread
 }

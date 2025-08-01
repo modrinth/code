@@ -76,10 +76,11 @@
 </template>
 <script setup lang="ts">
 import { ClientIcon, MonitorSmartphoneIcon, ServerIcon, UserIcon } from '@modrinth/assets'
-import { formatCategory, getVersionsToDisplay } from '@modrinth/utils'
 import type { GameVersionTag, PlatformTag } from '@modrinth/utils'
-import { useVIntl, defineMessages } from '@vintl/vintl'
+import { formatCategory, getVersionsToDisplay } from '@modrinth/utils'
+import { defineMessages, useVIntl } from '@vintl/vintl'
 import { useRouter } from 'vue-router'
+
 import TagItem from '../base/TagItem.vue'
 
 const { formatMessage } = useVIntl()

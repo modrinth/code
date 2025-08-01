@@ -30,7 +30,7 @@
           <div class="flex items-center gap-1">
             <Badge :color="charge.status === 'succeeded' ? 'green' : 'red'" :type="charge.status" />
             ⋅
-            {{ $dayjs(charge.due).format("YYYY-MM-DD") }}
+            {{ $dayjs(charge.due).format('YYYY-MM-DD') }}
           </div>
         </div>
       </div>
@@ -38,33 +38,34 @@
   </div>
 </template>
 <script setup>
-import { Breadcrumbs, Badge } from "@modrinth/ui";
-import { formatPrice } from "@modrinth/utils";
-import { products } from "~/generated/state.json";
+import { Badge, Breadcrumbs } from '@modrinth/ui'
+import { formatPrice } from '@modrinth/utils'
+
+import { products } from '~/generated/state.json'
 
 definePageMeta({
-  middleware: "auth",
-});
+  middleware: 'auth',
+})
 
-const vintl = useVIntl();
+const vintl = useVIntl()
 
 const { data: charges } = await useAsyncData(
-  "billing/payments",
-  () => useBaseFetch("billing/payments", { internal: true }),
+  'billing/payments',
+  () => useBaseFetch('billing/payments', { internal: true }),
   {
     transform: (charges) => {
       return charges
-        .filter((charge) => charge.status !== "open" && charge.status !== "cancelled")
+        .filter((charge) => charge.status !== 'open' && charge.status !== 'cancelled')
         .map((charge) => {
           const product = products.find((product) =>
             product.prices.some((price) => price.id === charge.price_id),
-          );
+          )
 
-          charge.product = product;
+          charge.product = product
 
-          return charge;
-        });
+          return charge
+        })
     },
   },
-);
+)
 </script>
