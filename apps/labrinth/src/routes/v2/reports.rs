@@ -43,12 +43,12 @@ pub async fn report_create(
 #[derive(Deserialize)]
 pub struct ReportsRequestOptions {
     #[serde(default = "default_count")]
-    count: i16,
+    count: u16,
     #[serde(default = "default_all")]
     all: bool,
 }
 
-fn default_count() -> i16 {
+fn default_count() -> u16 {
     100
 }
 fn default_all() -> bool {
@@ -60,7 +60,7 @@ pub async fn reports(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    count: web::Query<ReportsRequestOptions>,
+    request_opts: web::Query<ReportsRequestOptions>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::reports::reports(
@@ -68,8 +68,9 @@ pub async fn reports(
         pool,
         redis,
         web::Query(v3::reports::ReportsRequestOptions {
-            count: count.count,
-            all: count.all,
+            count: request_opts.count,
+            offset: 0,
+            all: request_opts.all,
         }),
         session_queue,
     )

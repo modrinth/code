@@ -2,25 +2,46 @@ import * as THREE from 'three'
 import type { Skin, Cape } from '../skins'
 import { get_normalized_skin_texture, determineModelType } from '../skins'
 import { reactive } from 'vue'
-import { setupSkinModel, disposeCaches } from '@modrinth/utils'
+import {
+  setupSkinModel,
+  disposeCaches,
+  loadTexture,
+  applyCapeTexture,
+  createTransparentTexture,
+} from '@modrinth/utils'
 import { skinPreviewStorage } from '../storage/skin-preview-storage'
-import { CapeModel, ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
+import { headStorage } from '../storage/head-storage'
+import { ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
 
 export interface RenderResult {
   forwards: string
   backwards: string
 }
 
+export interface RawRenderResult {
+  forwards: Blob
+  backwards: Blob
+}
+
 class BatchSkinRenderer {
-  private renderer: THREE.WebGLRenderer
-  private readonly scene: THREE.Scene
-  private readonly camera: THREE.PerspectiveCamera
+  private renderer: THREE.WebGLRenderer | null = null
+  private scene: THREE.Scene | null = null
+  private camera: THREE.PerspectiveCamera | null = null
   private currentModel: THREE.Group | null = null
+  private readonly width: number
+  private readonly height: number
 
   constructor(width: number = 360, height: number = 504) {
+    this.width = width
+    this.height = height
+  }
+
+  private initializeRenderer(): void {
+    if (this.renderer) return
+
     const canvas = document.createElement('canvas')
-    canvas.width = width
-    canvas.height = height
+    canvas.width = this.width
+    canvas.height = this.height
 
     this.renderer = new THREE.WebGLRenderer({
       canvas: canvas,
@@ -33,10 +54,10 @@ class BatchSkinRenderer {
     this.renderer.toneMapping = THREE.NoToneMapping
     this.renderer.toneMappingExposure = 10.0
     this.renderer.setClearColor(0x000000, 0)
-    this.renderer.setSize(width, height)
+    this.renderer.setSize(this.width, this.height)
 
     this.scene = new THREE.Scene()
-    this.camera = new THREE.PerspectiveCamera(20, width / height, 0.4, 1000)
+    this.camera = new THREE.PerspectiveCamera(20, this.width / this.height, 0.4, 1000)
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 2)
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2)
@@ -50,9 +71,12 @@ class BatchSkinRenderer {
     textureUrl: string,
     modelUrl: string,
     capeUrl?: string,
-    capeModelUrl?: string,
-  ): Promise<RenderResult> {
-    await this.setupModel(modelUrl, textureUrl, capeModelUrl, capeUrl)
+  ): Promise<RawRenderResult> {
+    this.initializeRenderer()
+
+    this.clearScene()
+
+    await this.setupModel(modelUrl, textureUrl, capeUrl)
 
     const headPart = this.currentModel!.getObjectByName('Head')
     let lookAtTarget: [number, number, number]
@@ -77,35 +101,35 @@ class BatchSkinRenderer {
   private async renderView(
     cameraPosition: [number, number, number],
     lookAtPosition: [number, number, number],
-  ): Promise<string> {
+  ): Promise<Blob> {
+    if (!this.camera || !this.renderer || !this.scene) {
+      throw new Error('Renderer not initialized')
+    }
+
     this.camera.position.set(...cameraPosition)
     this.camera.lookAt(...lookAtPosition)
 
     this.renderer.render(this.scene, this.camera)
 
-    return new Promise<string>((resolve, reject) => {
-      this.renderer.domElement.toBlob((blob) => {
-        if (blob) {
-          const url = URL.createObjectURL(blob)
-          resolve(url)
-        } else {
-          reject(new Error('Failed to create blob from canvas'))
-        }
-      }, 'image/png')
-    })
+    const dataUrl = this.renderer.domElement.toDataURL('image/webp', 0.9)
+    const response = await fetch(dataUrl)
+    return await response.blob()
   }
 
-  private async setupModel(
-    modelUrl: string,
-    textureUrl: string,
-    capeModelUrl?: string,
-    capeUrl?: string,
-  ): Promise<void> {
-    if (this.currentModel) {
-      this.scene.remove(this.currentModel)
+  private async setupModel(modelUrl: string, textureUrl: string, capeUrl?: string): Promise<void> {
+    if (!this.scene) {
+      throw new Error('Renderer not initialized')
     }
 
-    const { model } = await setupSkinModel(modelUrl, textureUrl, capeModelUrl, capeUrl)
+    const { model } = await setupSkinModel(modelUrl, textureUrl)
+
+    if (capeUrl) {
+      const capeTexture = await loadTexture(capeUrl)
+      applyCapeTexture(model, capeTexture)
+    } else {
+      const transparentTexture = createTransparentTexture()
+      applyCapeTexture(model, null, transparentTexture)
+    }
 
     const group = new THREE.Group()
     group.add(model)
@@ -116,8 +140,39 @@ class BatchSkinRenderer {
     this.currentModel = group
   }
 
+  private clearScene(): void {
+    if (!this.scene) return
+
+    while (this.scene.children.length > 0) {
+      const child = this.scene.children[0]
+      this.scene.remove(child)
+
+      if (child instanceof THREE.Mesh) {
+        if (child.geometry) child.geometry.dispose()
+        if (child.material) {
+          if (Array.isArray(child.material)) {
+            child.material.forEach((material) => material.dispose())
+          } else {
+            child.material.dispose()
+          }
+        }
+      }
+    }
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 2)
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2)
+    directionalLight.castShadow = true
+    directionalLight.position.set(2, 4, 3)
+    this.scene.add(ambientLight)
+    this.scene.add(directionalLight)
+
+    this.currentModel = null
+  }
+
   public dispose(): void {
-    this.renderer.dispose()
+    if (this.renderer) {
+      this.renderer.dispose()
+    }
     disposeCaches()
   }
 }
@@ -133,9 +188,24 @@ function getModelUrlForVariant(variant: string): string {
   }
 }
 
-export const map = reactive(new Map<string, RenderResult>())
-export const headMap = reactive(new Map<string, string>())
+export const skinBlobUrlMap = reactive(new Map<string, RenderResult>())
+export const headBlobUrlMap = reactive(new Map<string, string>())
 const DEBUG_MODE = false
+
+let sharedRenderer: BatchSkinRenderer | null = null
+function getSharedRenderer(): BatchSkinRenderer {
+  if (!sharedRenderer) {
+    sharedRenderer = new BatchSkinRenderer()
+  }
+  return sharedRenderer
+}
+
+export function disposeSharedRenderer(): void {
+  if (sharedRenderer) {
+    sharedRenderer.dispose()
+    sharedRenderer = null
+  }
+}
 
 export async function cleanupUnusedPreviews(skins: Skin[]): Promise<void> {
   const validKeys = new Set<string>()
@@ -150,7 +220,7 @@ export async function cleanupUnusedPreviews(skins: Skin[]): Promise<void> {
 
   try {
     await skinPreviewStorage.cleanupInvalidKeys(validKeys)
-    await skinPreviewStorage.cleanupInvalidKeys(validHeadKeys)
+    await headStorage.cleanupInvalidKeys(validHeadKeys)
   } catch (error) {
     console.warn('Failed to cleanup unused skin previews:', error)
   }
@@ -229,13 +299,17 @@ export async function generatePlayerHeadBlob(skinUrl: string, size: number = 64)
           outputCtx.drawImage(hatCanvas, 0, 0, 8, 8, 0, 0, size, size)
         }
 
-        outputCanvas.toBlob((blob) => {
-          if (blob) {
-            resolve(blob)
-          } else {
-            reject(new Error('Failed to create blob from canvas'))
-          }
-        }, 'image/png')
+        outputCanvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(blob)
+            } else {
+              reject(new Error('Failed to create blob from canvas'))
+            }
+          },
+          'image/webp',
+          0.9,
+        )
       } catch (error) {
         reject(error)
       }
@@ -252,35 +326,24 @@ export async function generatePlayerHeadBlob(skinUrl: string, size: number = 64)
 async function generateHeadRender(skin: Skin): Promise<string> {
   const headKey = `${skin.texture_key}-head`
 
-  if (headMap.has(headKey)) {
+  if (headBlobUrlMap.has(headKey)) {
     if (DEBUG_MODE) {
-      const url = headMap.get(headKey)!
+      const url = headBlobUrlMap.get(headKey)!
       URL.revokeObjectURL(url)
-      headMap.delete(headKey)
+      headBlobUrlMap.delete(headKey)
     } else {
-      return headMap.get(headKey)!
+      return headBlobUrlMap.get(headKey)!
     }
-  }
-
-  try {
-    const cached = await skinPreviewStorage.retrieve(headKey)
-    if (cached && typeof cached === 'string') {
-      headMap.set(headKey, cached)
-      return cached
-    }
-  } catch (error) {
-    console.warn('Failed to retrieve cached head render:', error)
   }
 
   const skinUrl = await get_normalized_skin_texture(skin)
   const headBlob = await generatePlayerHeadBlob(skinUrl, 64)
   const headUrl = URL.createObjectURL(headBlob)
 
-  headMap.set(headKey, headUrl)
+  headBlobUrlMap.set(headKey, headUrl)
 
   try {
-    // @ts-expect-error - skinPreviewStorage.store expects a RenderResult, but we are storing a string url.
-    await skinPreviewStorage.store(headKey, headUrl)
+    await headStorage.store(headKey, headBlob)
   } catch (error) {
     console.warn('Failed to store head render in persistent storage:', error)
   }
@@ -293,30 +356,49 @@ export async function getPlayerHeadUrl(skin: Skin): Promise<string> {
 }
 
 export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promise<void> {
-  const renderer = new BatchSkinRenderer()
-
   try {
+    const skinKeys = skins.map(
+      (skin) => `${skin.texture_key}+${skin.variant}+${skin.cape_id ?? 'no-cape'}`,
+    )
+    const headKeys = skins.map((skin) => `${skin.texture_key}-head`)
+
+    const [cachedSkinPreviews, cachedHeadPreviews] = await Promise.all([
+      skinPreviewStorage.batchRetrieve(skinKeys),
+      headStorage.batchRetrieve(headKeys),
+    ])
+
+    for (let i = 0; i < skins.length; i++) {
+      const skinKey = skinKeys[i]
+      const headKey = headKeys[i]
+
+      const rawCached = cachedSkinPreviews[skinKey]
+      if (rawCached) {
+        const cached: RenderResult = {
+          forwards: URL.createObjectURL(rawCached.forwards),
+          backwards: URL.createObjectURL(rawCached.backwards),
+        }
+        skinBlobUrlMap.set(skinKey, cached)
+      }
+
+      const cachedHead = cachedHeadPreviews[headKey]
+      if (cachedHead) {
+        headBlobUrlMap.set(headKey, URL.createObjectURL(cachedHead))
+      }
+    }
+
     for (const skin of skins) {
       const key = `${skin.texture_key}+${skin.variant}+${skin.cape_id ?? 'no-cape'}`
 
-      if (map.has(key)) {
+      if (skinBlobUrlMap.has(key)) {
         if (DEBUG_MODE) {
-          const result = map.get(key)!
+          const result = skinBlobUrlMap.get(key)!
           URL.revokeObjectURL(result.forwards)
           URL.revokeObjectURL(result.backwards)
-          map.delete(key)
+          skinBlobUrlMap.delete(key)
         } else continue
       }
 
-      try {
-        const cached = await skinPreviewStorage.retrieve(key)
-        if (cached) {
-          map.set(key, cached)
-          continue
-        }
-      } catch (error) {
-        console.warn('Failed to retrieve cached skin preview:', error)
-      }
+      const renderer = getSharedRenderer()
 
       let variant = skin.variant
       if (variant === 'UNKNOWN') {
@@ -330,25 +412,35 @@ export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promis
 
       const modelUrl = getModelUrlForVariant(variant)
       const cape: Cape | undefined = capes.find((_cape) => _cape.id === skin.cape_id)
-      const renderResult = await renderer.renderSkin(
+      const rawRenderResult = await renderer.renderSkin(
         await get_normalized_skin_texture(skin),
         modelUrl,
         cape?.texture,
-        CapeModel,
       )
 
-      map.set(key, renderResult)
+      const renderResult: RenderResult = {
+        forwards: URL.createObjectURL(rawRenderResult.forwards),
+        backwards: URL.createObjectURL(rawRenderResult.backwards),
+      }
+
+      skinBlobUrlMap.set(key, renderResult)
 
       try {
-        await skinPreviewStorage.store(key, renderResult)
+        await skinPreviewStorage.store(key, rawRenderResult)
       } catch (error) {
         console.warn('Failed to store skin preview in persistent storage:', error)
       }
 
-      await generateHeadRender(skin)
+      const headKey = `${skin.texture_key}-head`
+      if (!headBlobUrlMap.has(headKey)) {
+        await generateHeadRender(skin)
+      }
     }
   } finally {
-    renderer.dispose()
+    disposeSharedRenderer()
     await cleanupUnusedPreviews(skins)
+
+    await skinPreviewStorage.debugCalculateStorage()
+    await headStorage.debugCalculateStorage()
   }
 }

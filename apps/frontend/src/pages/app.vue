@@ -1421,7 +1421,8 @@ useSeoMeta({
           width: 25rem;
           height: 25rem;
           opacity: 0.75;
-          background: radial-gradient(
+          background:
+            radial-gradient(
               50% 50% at 50% 50%,
               rgba(5, 206, 69, 0.19) 0%,
               rgba(15, 19, 49, 0.25) 100%

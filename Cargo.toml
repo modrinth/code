@@ -67,7 +67,13 @@ heck = "0.5.0"
 hex = "0.4.3"
 hickory-resolver = "0.25.2"
 hmac = "0.12.1"
-hyper-tls = "0.6.0"
+hyper = "1.6.0"
+hyper-rustls = { version = "0.27.7", default-features = false, features = [
+  "http1",
+  "native-tokio",
+  "ring",
+  "tls12",
+] }
 hyper-util = "0.1.14"
 iana-time-zone = "0.1.63"
 image = { version = "0.25.6", default-features = false, features = ["rayon"] }
@@ -93,6 +99,7 @@ notify = { version = "8.0.0", default-features = false }
 notify-debouncer-mini = { version = "0.6.0", default-features = false }
 p256 = "0.13.2"
 paste = "1.0.15"
+phf = { version = "0.12.1", features = ["macros"] }
 png = "0.17.16"
 prometheus = "0.14.0"
 quartz_nbt = "0.2.9"

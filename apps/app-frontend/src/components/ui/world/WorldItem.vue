@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import type { ServerStatus, ServerWorld, SingleplayerWorld, World } from '@/helpers/worlds.ts'
-import { set_world_display_status, getWorldIdentifier } from '@/helpers/worlds.ts'
+import type {
+  ProtocolVersion,
+  ServerStatus,
+  ServerWorld,
+  SingleplayerWorld,
+  World,
+  set_world_display_status,
+  getWorldIdentifier,
+} from '@/helpers/worlds.ts'
 import { formatNumber, getPingLevel } from '@modrinth/utils'
 import {
   useRelativeTime,
@@ -55,7 +62,7 @@ const props = withDefaults(
     playingWorld?: boolean
     startingInstance?: boolean
     supportsQuickPlay?: boolean
-    currentProtocol?: number | null
+    currentProtocol?: ProtocolVersion | null
     highlighted?: boolean
 
     // Server only
@@ -102,7 +109,8 @@ const serverIncompatible = computed(
     !!props.serverStatus &&
     !!props.serverStatus.version?.protocol &&
     !!props.currentProtocol &&
-    props.serverStatus.version.protocol !== props.currentProtocol,
+    (props.serverStatus.version.protocol !== props.currentProtocol.version ||
+      props.serverStatus.version.legacy !== props.currentProtocol.legacy),
 )
 
 const locked = computed(() => props.world.type === 'singleplayer' && props.world.locked)
@@ -127,6 +135,14 @@ const messages = defineMessages({
   gameAlreadyOpen: {
     id: 'instance.worlds.game_already_open',
     defaultMessage: 'Instance is already open',
+  },
+  noContact: {
+    id: 'instance.worlds.no_contact',
+    defaultMessage: "Server couldn't be contacted",
+  },
+  incompatibleServer: {
+    id: 'instance.worlds.incompatible_server',
+    defaultMessage: 'Server is incompatible',
   },
   copyAddress: {
     id: 'instance.worlds.copy_address',
@@ -302,39 +318,33 @@ const messages = defineMessages({
         </template>
       </div>
       <div class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
-        <template v-if="world.type === 'singleplayer' || serverStatus">
-          <ButtonStyled
-            v-if="(playingWorld || (locked && playingInstance)) && !startingInstance"
-            color="red"
-          >
-            <button @click="emit('stop')">
-              <StopCircleIcon aria-hidden="true" />
-              {{ formatMessage(commonMessages.stopButton) }}
-            </button>
-          </ButtonStyled>
-          <ButtonStyled v-else>
-            <button
-              v-tooltip="
-                serverIncompatible
-                  ? 'Server is incompatible'
+        <ButtonStyled
+          v-if="(playingWorld || (locked && playingInstance)) && !startingInstance"
+          color="red"
+        >
+          <button @click="emit('stop')">
+            <StopCircleIcon aria-hidden="true" />
+            {{ formatMessage(commonMessages.stopButton) }}
+          </button>
+        </ButtonStyled>
+        <ButtonStyled v-else>
+          <button
+            v-tooltip="
+              !serverStatus
+                ? formatMessage(messages.noContact)
+                : serverIncompatible
+                  ? formatMessage(messages.incompatibleServer)
                   : !supportsQuickPlay
                     ? formatMessage(messages.noQuickPlay)
                     : playingOtherWorld || locked
                       ? formatMessage(messages.gameAlreadyOpen)
                       : null
-              "
-              :disabled="!supportsQuickPlay || playingOtherWorld || startingInstance"
-              @click="emit('play')"
-            >
-              <SpinnerIcon v-if="startingInstance && playingWorld" class="animate-spin" />
-              <PlayIcon v-else aria-hidden="true" />
-              {{ formatMessage(commonMessages.playButton) }}
-            </button>
-          </ButtonStyled>
-        </template>
-        <ButtonStyled v-else>
-          <button class="invisible">
-            <PlayIcon aria-hidden="true" />
+            "
+            :disabled="!supportsQuickPlay || playingOtherWorld || startingInstance"
+            @click="emit('play')"
+          >
+            <SpinnerIcon v-if="startingInstance && playingWorld" class="animate-spin" />
+            <PlayIcon v-else aria-hidden="true" />
             {{ formatMessage(commonMessages.playButton) }}
           </button>
         </ButtonStyled>

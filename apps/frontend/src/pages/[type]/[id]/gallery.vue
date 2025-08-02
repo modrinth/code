@@ -365,8 +365,10 @@ export default defineNuxtComponent({
         if (e.key === "Escape") {
           this.expandedGalleryItem = null;
         } else if (e.key === "ArrowLeft") {
+          e.stopPropagation();
           this.previousImage();
         } else if (e.key === "ArrowRight") {
+          e.stopPropagation();
           this.nextImage();
         }
       }
@@ -705,9 +707,9 @@ export default defineNuxtComponent({
   }
 
   .gallery-body {
-    flex-grow: 1;
     width: calc(100% - 2 * var(--spacing-card-md));
     padding: var(--spacing-card-sm) var(--spacing-card-md);
+    overflow-wrap: anywhere;
 
     .gallery-info {
       h2 {

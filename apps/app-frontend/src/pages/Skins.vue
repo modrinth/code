@@ -38,7 +38,7 @@ import {
 import { get as getSettings } from '@/helpers/settings.ts'
 import { get_default_user, login as login_flow, users } from '@/helpers/auth'
 import type { RenderResult } from '@/helpers/rendering/batch-skin-renderer.ts'
-import { generateSkinPreviews, map } from '@/helpers/rendering/batch-skin-renderer.ts'
+import { generateSkinPreviews, skinBlobUrlMap } from '@/helpers/rendering/batch-skin-renderer.ts'
 import { handleSevereError } from '@/store/error'
 import { trackEvent } from '@/helpers/analytics'
 import type AccountsCard from '@/components/ui/AccountsCard.vue'
@@ -215,7 +215,7 @@ async function loadCurrentUser() {
 
 function getBakedSkinTextures(skin: Skin): RenderResult | undefined {
   const key = `${skin.texture_key}+${skin.variant}+${skin.cape_id ?? 'no-cape'}`
-  return map.get(key)
+  return skinBlobUrlMap.get(key)
 }
 
 async function login() {

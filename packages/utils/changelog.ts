@@ -11,6 +11,63 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-08-01T21:30:00-04:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed issues with the newsletter subscription checkbox & buttons on news pages. ([#4072](https://github.com/modrinth/code/pull/4072), [#4073](https://github.com/modrinth/code/pull/4073))
+- You can now access the "Moderation" tab on project pages again even if your project is approved. ([#4067](https://github.com/modrinth/code/pull/4067))
+- Fixed issues with collection visibility. ([#4070](https://github.com/modrinth/code/pull/4070))
+- Fixed text issue on collection icon upload dropdown. ([#4069](https://github.com/modrinth/code/pull/4069))`,
+  },
+  {
+    date: `2025-08-01T21:30:00-04:00`,
+    product: 'servers',
+    body: `### Improvements
+- Server status information is now correctly displayed in the 'My Servers' page. ([#4071](https://github.com/modrinth/code/pull/4071))
+- Fixed an error with displaying startup settings.
+- Improved ratelimit error message.`,
+  },
+  {
+    date: `2025-07-19T15:20:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Removed Tumblr icon from footer as we no longer use it.
+- Reverted changes to publishing checklist since they need more work.`,
+  },
+  {
+    date: `2025-07-16T12:40:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed report body overflowing with large images.`,
+  },
+  {
+    date: `2025-07-15T13:55:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Updated language around DDoS protection of Modrinth Servers products.`,
+  },
+  {
+    date: `2025-07-15T12:40:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Added copyright policy and DMCA links to footer.
+- Updated Modrinth Servers FAQ to include the new UK location.`,
+  },
+  {
+    date: `2025-07-15T08:20:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed gallery images from overflowing with long words in their descriptions.`,
+  },
+  {
+    date: `2025-07-09T22:15:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed pasted links being unnecessarily wrapped in Markdown formatting in Markdown editor.
+- Added a security.txt file to the site.
+- Changed the Europe location for Modrinth Servers to show as Central Europe with the flag of Germany to reflect its location better.`,
+  },
+  {
     date: `2025-07-08T14:00:00-07:00`,
     product: 'web',
     body: `### Improvements

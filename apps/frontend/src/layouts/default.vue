@@ -295,7 +295,7 @@
               {
                 id: 'review-projects',
                 color: 'orange',
-                link: '/moderation/review',
+                link: '/moderation/',
               },
               {
                 id: 'review-reports',
@@ -700,7 +700,6 @@ import {
   PackageOpenIcon,
   DiscordIcon,
   BlueskyIcon,
-  TumblrIcon,
   TwitterIcon,
   MastodonIcon,
   GithubIcon,
@@ -982,23 +981,6 @@ const userMenuOptions = computed(() => {
     },
   ];
 
-  if (
-    (auth.value && auth.value.user && auth.value.user.role === "moderator") ||
-    auth.value.user.role === "admin"
-  ) {
-    options = [
-      ...options,
-      {
-        divider: true,
-      },
-      {
-        id: "moderation",
-        color: "orange",
-        link: "/moderation/review",
-      },
-    ];
-  }
-
   options = [
     ...options,
     {
@@ -1186,13 +1168,6 @@ const socialLinks = [
     rel: "me",
   },
   {
-    label: formatMessage(
-      defineMessage({ id: "layout.footer.social.tumblr", defaultMessage: "Tumblr" }),
-    ),
-    href: "https://tumblr.com/modrinth",
-    icon: TumblrIcon,
-  },
-  {
     label: formatMessage(defineMessage({ id: "layout.footer.social.x", defaultMessage: "X" })),
     href: "https://x.com/modrinth",
     icon: TwitterIcon,
@@ -1343,6 +1318,15 @@ const footerLinks = [
           defineMessage({
             id: "layout.footer.legal.security-notice",
             defaultMessage: "Security Notice",
+          }),
+        ),
+      },
+      {
+        href: "/legal/copyright",
+        label: formatMessage(
+          defineMessage({
+            id: "layout.footer.legal.copyright-policy",
+            defaultMessage: "Copyright Policy and DMCA",
           }),
         ),
       },

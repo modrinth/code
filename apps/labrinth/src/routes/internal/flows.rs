@@ -1,5 +1,7 @@
 use crate::auth::email::send_email;
-use crate::auth::validate::get_user_record_from_bearer_token;
+use crate::auth::validate::{
+    get_full_user_from_headers, get_user_record_from_bearer_token,
+};
 use crate::auth::{AuthProvider, AuthenticationError, get_user_from_headers};
 use crate::database::models::DBUser;
 use crate::database::models::flow_item::DBFlow;
@@ -223,8 +225,8 @@ impl TempUser {
                 stripe_customer_id: None,
                 totp_secret: None,
                 username,
-                email: self.email,
-                email_verified: true,
+                email: self.email.clone(),
+                email_verified: self.email.is_some(),
                 avatar_url,
                 raw_avatar_url,
                 bio: self.bio,
@@ -232,6 +234,7 @@ impl TempUser {
                 role: Role::Developer.to_string(),
                 badges: Badges::default(),
                 allow_friend_requests: true,
+                is_subscribed_to_newsletter: false,
             }
             .insert(transaction)
             .await?;
@@ -1291,37 +1294,6 @@ pub async fn delete_auth_provider(
     Ok(HttpResponse::NoContent().finish())
 }
 
-pub async fn sign_up_sendy(email: &str) -> Result<(), AuthenticationError> {
-    let url = dotenvy::var("SENDY_URL")?;
-    let id = dotenvy::var("SENDY_LIST_ID")?;
-    let api_key = dotenvy::var("SENDY_API_KEY")?;
-    let site_url = dotenvy::var("SITE_URL")?;
-
-    if url.is_empty() || url == "none" {
-        tracing::info!("Sendy URL not set, skipping signup");
-        return Ok(());
-    }
-
-    let mut form = HashMap::new();
-
-    form.insert("api_key", &*api_key);
-    form.insert("email", email);
-    form.insert("list", &*id);
-    form.insert("referrer", &*site_url);
-
-    let client = reqwest::Client::new();
-    client
-        .post(format!("{url}/subscribe"))
-        .form(&form)
-        .send()
-        .await?
-        .error_for_status()?
-        .text()
-        .await?;
-
-    Ok(())
-}
-
 pub async fn check_sendy_subscription(
     email: &str,
 ) -> Result<bool, AuthenticationError> {
@@ -1419,15 +1391,15 @@ pub async fn create_account_with_password(
         .hash_password(new_account.password.as_bytes(), &salt)?
         .to_string();
 
-    if crate::database::models::DBUser::get_by_email(
+    if !crate::database::models::DBUser::get_by_case_insensitive_email(
         &new_account.email,
         &**pool,
     )
     .await?
-    .is_some()
+    .is_empty()
     {
         return Err(ApiError::InvalidInput(
-            "Email is already registered on Modrinth!".to_string(),
+            "Email is already registered on Modrinth! Try 'Forgot password' to access your account.".to_string(),
         ));
     }
 
@@ -1456,6 +1428,9 @@ pub async fn create_account_with_password(
         role: Role::Developer.to_string(),
         badges: Badges::default(),
         allow_friend_requests: true,
+        is_subscribed_to_newsletter: new_account
+            .sign_up_newsletter
+            .unwrap_or(false),
     }
     .insert(&mut transaction)
     .await?;
@@ -1475,10 +1450,6 @@ pub async fn create_account_with_password(
         flow,
         &format!("Welcome to Modrinth, {}!", new_account.username),
     )?;
-
-    if new_account.sign_up_newsletter.unwrap_or(false) {
-        sign_up_sendy(&new_account.email).await?;
-    }
 
     transaction.commit().await?;
 
@@ -2220,6 +2191,18 @@ pub async fn set_email(
     .await?
     .1;
 
+    if !crate::database::models::DBUser::get_by_case_insensitive_email(
+        &email.email,
+        &**pool,
+    )
+    .await?
+    .is_empty()
+    {
+        return Err(ApiError::InvalidInput(
+            "Email is already registered on Modrinth! Try 'Forgot password' in incognito to access and delete your other account.".to_string(),
+        ));
+    }
+
     let mut transaction = pool.begin().await?;
 
     sqlx::query!(
@@ -2408,15 +2391,24 @@ pub async fn subscribe_newsletter(
     .await?
     .1;
 
-    if let Some(email) = user.email {
-        sign_up_sendy(&email).await?;
+    sqlx::query!(
+        "
+        UPDATE users
+        SET is_subscribed_to_newsletter = TRUE
+        WHERE id = $1
+        ",
+        user.id.0 as i64,
+    )
+    .execute(&**pool)
+    .await?;
 
-        Ok(HttpResponse::NoContent().finish())
-    } else {
-        Err(ApiError::InvalidInput(
-            "User does not have an email.".to_string(),
-        ))
-    }
+    crate::database::models::DBUser::clear_caches(
+        &[(user.id.into(), None)],
+        &redis,
+    )
+    .await?;
+
+    Ok(HttpResponse::NoContent().finish())
 }
 
 #[get("email/subscribe")]
@@ -2426,7 +2418,7 @@ pub async fn get_newsletter_subscription_status(
     redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let user = get_full_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -2436,16 +2428,16 @@ pub async fn get_newsletter_subscription_status(
     .await?
     .1;
 
-    if let Some(email) = user.email {
-        let is_subscribed = check_sendy_subscription(&email).await?;
-        Ok(HttpResponse::Ok().json(serde_json::json!({
-            "subscribed": is_subscribed
-        })))
-    } else {
-        Ok(HttpResponse::Ok().json(serde_json::json!({
-            "subscribed": false
-        })))
-    }
+    let is_subscribed = user.is_subscribed_to_newsletter
+        || if let Some(email) = user.email {
+            check_sendy_subscription(&email).await?
+        } else {
+            false
+        };
+
+    Ok(HttpResponse::Ok().json(serde_json::json!({
+        "subscribed": is_subscribed
+    })))
 }
 
 fn send_email_verify(

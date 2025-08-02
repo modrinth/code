@@ -1,4 +1,4 @@
-import type { RenderResult } from '../rendering/batch-skin-renderer'
+import type { RawRenderResult } from '../rendering/batch-skin-renderer'
 
 interface StoredPreview {
   forwards: Blob
@@ -30,18 +30,15 @@ export class SkinPreviewStorage {
     })
   }
 
-  async store(key: string, result: RenderResult): Promise<void> {
+  async store(key: string, result: RawRenderResult): Promise<void> {
     if (!this.db) await this.init()
-
-    const forwardsBlob = await fetch(result.forwards).then((r) => r.blob())
-    const backwardsBlob = await fetch(result.backwards).then((r) => r.blob())
 
     const transaction = this.db!.transaction(['previews'], 'readwrite')
     const store = transaction.objectStore('previews')
 
     const storedPreview: StoredPreview = {
-      forwards: forwardsBlob,
-      backwards: backwardsBlob,
+      forwards: result.forwards,
+      backwards: result.backwards,
       timestamp: Date.now(),
     }
 
@@ -53,7 +50,7 @@ export class SkinPreviewStorage {
     })
   }
 
-  async retrieve(key: string): Promise<RenderResult | null> {
+  async retrieve(key: string): Promise<RawRenderResult | null> {
     if (!this.db) await this.init()
 
     const transaction = this.db!.transaction(['previews'], 'readonly')
@@ -70,11 +67,53 @@ export class SkinPreviewStorage {
           return
         }
 
-        const forwards = URL.createObjectURL(result.forwards)
-        const backwards = URL.createObjectURL(result.backwards)
-        resolve({ forwards, backwards })
+        resolve({ forwards: result.forwards, backwards: result.backwards })
       }
       request.onerror = () => reject(request.error)
+    })
+  }
+
+  async batchRetrieve(keys: string[]): Promise<Record<string, RawRenderResult | null>> {
+    if (!this.db) await this.init()
+
+    const transaction = this.db!.transaction(['previews'], 'readonly')
+    const store = transaction.objectStore('previews')
+    const results: Record<string, RawRenderResult | null> = {}
+
+    return new Promise((resolve, _reject) => {
+      let completedRequests = 0
+
+      if (keys.length === 0) {
+        resolve(results)
+        return
+      }
+
+      for (const key of keys) {
+        const request = store.get(key)
+
+        request.onsuccess = () => {
+          const result = request.result as StoredPreview | undefined
+
+          if (result) {
+            results[key] = { forwards: result.forwards, backwards: result.backwards }
+          } else {
+            results[key] = null
+          }
+
+          completedRequests++
+          if (completedRequests === keys.length) {
+            resolve(results)
+          }
+        }
+
+        request.onerror = () => {
+          results[key] = null
+          completedRequests++
+          if (completedRequests === keys.length) {
+            resolve(results)
+          }
+        }
+      }
     })
   }
 
@@ -107,6 +146,67 @@ export class SkinPreviewStorage {
           cursor.continue()
         } else {
           resolve(deletedCount)
+        }
+      }
+
+      request.onerror = () => reject(request.error)
+    })
+  }
+
+  async debugCalculateStorage(): Promise<void> {
+    if (!this.db) await this.init()
+
+    const transaction = this.db!.transaction(['previews'], 'readonly')
+    const store = transaction.objectStore('previews')
+
+    let totalSize = 0
+    let count = 0
+    const entries: Array<{ key: string; size: number }> = []
+
+    return new Promise((resolve, reject) => {
+      const request = store.openCursor()
+
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result
+
+        if (cursor) {
+          const key = cursor.primaryKey as string
+          const value = cursor.value as StoredPreview
+
+          const entrySize = value.forwards.size + value.backwards.size
+          totalSize += entrySize
+          count++
+
+          entries.push({
+            key,
+            size: entrySize,
+          })
+
+          cursor.continue()
+        } else {
+          console.group('🗄️ Skin Preview Storage Debug Info')
+          console.log(`Total entries: ${count}`)
+          console.log(`Total size: ${(totalSize / 1024 / 1024).toFixed(2)} MB`)
+          console.log(
+            `Average size per entry: ${count > 0 ? (totalSize / count / 1024).toFixed(2) : 0} KB`,
+          )
+
+          if (entries.length > 0) {
+            const sortedEntries = entries.sort((a, b) => b.size - a.size)
+            console.log(
+              'Largest entry:',
+              sortedEntries[0].key,
+              '(' + (sortedEntries[0].size / 1024).toFixed(2) + ' KB)',
+            )
+            console.log(
+              'Smallest entry:',
+              sortedEntries[sortedEntries.length - 1].key,
+              '(' + (sortedEntries[sortedEntries.length - 1].size / 1024).toFixed(2) + ' KB)',
+            )
+          }
+
+          console.groupEnd()
+          resolve()
         }
       }
 

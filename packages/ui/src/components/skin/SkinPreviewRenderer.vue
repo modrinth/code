@@ -23,7 +23,7 @@
     <TresCanvas
       shadows
       alpha
-      :antialias="antialias"
+      :antialias="true"
       :renderer-options="{
         outputColorSpace: THREE.SRGBColorSpace,
         toneMapping: THREE.NoToneMapping,
@@ -46,34 +46,37 @@
             <primitive v-if="scene" :object="scene" />
           </Group>
 
-          <TresMesh
+          <!-- <TresMesh
             :position="[0, -0.095 * scale, 2]"
             :rotation="[-Math.PI / 2, 0, 0]"
-            :scale="[0.5 * 0.75 * scale, 0.5 * 0.75 * scale, 0.5 * 0.75 * scale]"
+            :scale="[0.4 * 0.75 * scale, 0.4 * 0.75 * scale, 0.4 * 0.75 * scale]"
           >
             <TresCircleGeometry :args="[1, 128]" />
             <TresMeshBasicMaterial
               color="#000000"
-              :opacity="0.2"
+              :opacity="0.5"
               transparent
               :depth-write="false"
             />
-          </TresMesh>
-
-          <TresMesh
-            :position="[0, -0.1 * scale, 2]"
-            :rotation="[-Math.PI / 2, 0, 0]"
-            :scale="[0.75 * scale, 0.75 * scale, 0.75 * scale]"
-          >
-            <TresCircleGeometry :args="[1, 128]" />
-            <TresMeshBasicMaterial
-              :map="radialTexture"
-              transparent
-              :depth-write="false"
-              :blending="THREE.AdditiveBlending"
-            />
-          </TresMesh>
+          </TresMesh> -->
         </Group>
+      </Suspense>
+
+      <Suspense>
+        <EffectComposerPmndrs>
+          <FXAAPmndrs />
+        </EffectComposerPmndrs>
+      </Suspense>
+
+      <Suspense>
+        <TresMesh
+          :position="[0, -0.1 * scale, 2]"
+          :rotation="[-Math.PI / 2, 0, 0]"
+          :scale="[0.75 * scale, 0.75 * scale, 0.75 * scale]"
+        >
+          <TresCircleGeometry :args="[1, 128]" />
+          <TresShaderMaterial v-bind="radialSpotlightShader" />
+        </TresMesh>
       </Suspense>
 
       <TresPerspectiveCamera
@@ -101,6 +104,7 @@
 import * as THREE from 'three'
 import { useGLTF } from '@tresjs/cientos'
 import { useTexture, TresCanvas, useRenderLoop } from '@tresjs/core'
+import { EffectComposerPmndrs, FXAAPmndrs } from '@tresjs/post-processing'
 import {
   shallowRef,
   ref,
@@ -115,13 +119,11 @@ import {
 import {
   applyTexture,
   applyCapeTexture,
-  attachCapeToBody,
-  findBodyNode,
   createTransparentTexture,
   loadTexture as loadSkinTexture,
 } from '@modrinth/utils'
 import { useDynamicFontSize } from '../../composables'
-import { CapeModel, ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
+import { ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
 
 interface AnimationConfig {
   baseAnimation: string
@@ -136,7 +138,6 @@ const props = withDefaults(
     capeSrc?: string
     variant?: 'SLIM' | 'CLASSIC' | 'UNKNOWN'
     nametag?: string
-    antialias?: boolean
     scale?: number
     fov?: number
     initialRotation?: number
@@ -144,7 +145,6 @@ const props = withDefaults(
   }>(),
   {
     variant: 'CLASSIC',
-    antialias: false,
     scale: 1,
     fov: 40,
     capeSrc: undefined,
@@ -177,9 +177,6 @@ const selectedModelSrc = computed(() =>
 )
 
 const scene = shallowRef<THREE.Object3D | null>(null)
-const capeScene = shallowRef<THREE.Object3D | null>(null)
-const bodyNode = shallowRef<THREE.Object3D | null>(null)
-const capeAttached = ref(false)
 const lastCapeSrc = ref<string | undefined>(undefined)
 const texture = shallowRef<THREE.Texture | null>(null)
 const capeTexture = shallowRef<THREE.Texture | null>(null)
@@ -195,6 +192,54 @@ const clock = new THREE.Clock()
 const currentAnimation = ref<string>('')
 const randomAnimationTimer = ref<number | null>(null)
 const lastRandomAnimation = ref<string>('')
+
+const radialSpotlightShader = computed(() => ({
+  uniforms: {
+    innerColor: { value: new THREE.Color(0x000000) },
+    outerColor: { value: new THREE.Color(0xffffff) },
+    innerOpacity: { value: 0.3 },
+    outerOpacity: { value: 0.0 },
+    falloffPower: { value: 1.2 },
+    shadowRadius: { value: 7 },
+  },
+  vertexShader: `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    uniform vec3 innerColor;
+    uniform vec3 outerColor;
+    uniform float innerOpacity;
+    uniform float outerOpacity;
+    uniform float falloffPower;
+    uniform float shadowRadius;
+    
+    varying vec2 vUv;
+    
+    void main() {
+      vec2 center = vec2(0.5, 0.5);
+      float dist = distance(vUv, center) * 2.0;
+      
+      // Create shadow in the center
+      float shadowFalloff = 1.0 - smoothstep(0.0, shadowRadius, dist);
+      
+      // Create overall spotlight falloff
+      float spotlightFalloff = 1.0 - smoothstep(0.0, 1.0, pow(dist, falloffPower));
+      
+      // Combine both effects
+      vec3 color = mix(outerColor, innerColor, shadowFalloff);
+      float opacity = mix(outerOpacity, innerOpacity * shadowFalloff, spotlightFalloff);
+      
+      gl_FragColor = vec4(color, opacity);
+    }
+  `,
+  transparent: true,
+  depthWrite: false,
+  depthTest: false,
+}))
 
 const { baseAnimation, randomAnimations } = toRefs(props.animationConfig)
 
@@ -400,11 +445,9 @@ async function loadModel(src: string) {
 
     if (texture.value) {
       applyTexture(scene.value, texture.value)
-      texture.value.needsUpdate = true
     }
 
-    bodyNode.value = findBodyNode(loadedScene)
-    capeAttached.value = false
+    applyCapeTexture(scene.value, capeTexture.value, transparentTexture)
 
     if (animations && animations.length > 0) {
       initializeAnimations(loadedScene, animations)
@@ -415,22 +458,6 @@ async function loadModel(src: string) {
   } catch (error) {
     console.error('Failed to load model:', error)
     isModelLoaded.value = false
-  }
-}
-
-async function loadCape() {
-  try {
-    const { scene: loadedCape } = await useGLTF(CapeModel)
-    capeScene.value = markRaw(loadedCape)
-
-    applyCapeTexture(capeScene.value, capeTexture.value, transparentTexture)
-
-    if (bodyNode.value && !capeAttached.value) {
-      attachCapeToBodyWrapper()
-    }
-  } catch (error) {
-    console.error('Failed to load cape:', error)
-    capeScene.value = null
   }
 }
 
@@ -465,25 +492,9 @@ async function loadAndApplyCapeTexture(src: string | undefined) {
     capeTexture.value = null
   }
 
-  if (capeScene.value) {
-    applyCapeTexture(capeScene.value, capeTexture.value, transparentTexture)
+  if (scene.value) {
+    applyCapeTexture(scene.value, capeTexture.value, transparentTexture)
   }
-
-  if (capeScene.value && bodyNode.value) {
-    if (!src && capeAttached.value && capeScene.value.parent) {
-      capeScene.value.parent.remove(capeScene.value)
-      capeAttached.value = false
-    } else if (src && !capeAttached.value) {
-      attachCapeToBodyWrapper()
-    }
-  }
-}
-
-function attachCapeToBodyWrapper() {
-  if (!bodyNode.value || !capeScene.value || capeAttached.value) return
-
-  attachCapeToBody(bodyNode.value, capeScene.value)
-  capeAttached.value = true
 }
 
 const centre = ref<[number, number, number]>([0, 1, 0])
@@ -539,39 +550,6 @@ function onCanvasClick() {
   hasDragged.value = false
 }
 
-const radialTexture = createRadialTexture(512)
-radialTexture.minFilter = THREE.LinearFilter
-radialTexture.magFilter = THREE.LinearFilter
-radialTexture.wrapS = radialTexture.wrapT = THREE.ClampToEdgeWrapping
-
-function createRadialTexture(size: number): THREE.CanvasTexture {
-  const canvas = document.createElement('canvas')
-  canvas.width = canvas.height = size
-  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
-  const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
-  grad.addColorStop(0, 'rgba(119,119,119,0.1)')
-  grad.addColorStop(0.9, 'rgba(255,255,255,0)')
-  ctx.fillStyle = grad
-  ctx.fillRect(0, 0, size, size)
-  return new THREE.CanvasTexture(canvas)
-}
-
-watch(
-  [bodyNode, capeScene, isModelLoaded],
-  ([newBodyNode, newCapeScene, modelLoaded]) => {
-    if (newBodyNode && newCapeScene && modelLoaded && !capeAttached.value) {
-      attachCapeToBodyWrapper()
-    }
-  },
-  { immediate: true },
-)
-
-watch(capeScene, (newCapeScene) => {
-  if (newCapeScene && bodyNode.value && isModelLoaded.value && !capeAttached.value) {
-    attachCapeToBodyWrapper()
-  }
-})
-
 watch(selectedModelSrc, (src) => loadModel(src))
 watch(
   () => props.textureSrc,
@@ -587,7 +565,6 @@ watch(
 watch(
   () => props.capeSrc,
   async (newCapeSrc) => {
-    await loadCape()
     await loadAndApplyCapeTexture(newCapeSrc)
   },
 )
@@ -619,8 +596,6 @@ onBeforeMount(async () => {
     if (props.capeSrc) {
       await loadAndApplyCapeTexture(props.capeSrc)
     }
-
-    await loadCape()
   } catch (error) {
     console.error('Failed to initialize skin preview:', error)
   }

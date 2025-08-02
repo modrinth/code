@@ -197,13 +197,13 @@
   }
 
   > :where(
-      input + *,
-      .input-group + *,
-      .textarea-wrapper + *,
-      .chips + *,
-      .resizable-textarea-wrapper + *,
-      .input-div + *
-    ) {
+    input + *,
+    .input-group + *,
+    .textarea-wrapper + *,
+    .chips + *,
+    .resizable-textarea-wrapper + *,
+    .input-div + *
+  ) {
     &:not(:empty) {
       margin-block-start: var(--spacing-card-md);
     }

@@ -512,11 +512,11 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Review"
   },
+  "servers.region.central-europe": {
+    "defaultMessage": "Central Europe"
+  },
   "servers.region.custom.prompt": {
     "defaultMessage": "How much RAM do you want your server to have?"
-  },
-  "servers.region.europe": {
-    "defaultMessage": "Europe"
   },
   "servers.region.north-america": {
     "defaultMessage": "North America"
@@ -526,6 +526,9 @@
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Region not listed? <link>Let us know where you'd like to see Modrinth Servers next!</link>"
+  },
+  "servers.region.western-europe": {
+    "defaultMessage": "Western Europe"
   },
   "settings.account.title": {
     "defaultMessage": "Account and security"
