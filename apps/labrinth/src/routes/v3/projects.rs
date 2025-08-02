@@ -74,7 +74,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
                         "version/{slug}",
                         web::get().to(super::versions::version_project_get),
                     )
-                    .route("dependencies", web::get().to(dependency_list)),
+                    .route("dependencies", web::get().to(dependency_list))
+                    .route("dependents", web::get().to(dependents_list)),
             ),
     );
 }
@@ -896,9 +897,10 @@ pub async fn project_edit(
         project_item.inner.id,
         project_item.inner.slug,
         None,
-        &redis,
-    )
-    .await?;
+        None,
+                &redis,
+            )
+            .await?;
 
     // Remove no longer searchable projects from search index
     if let (true, Some(false)) = (
@@ -1068,6 +1070,82 @@ pub async fn dependency_list(
         let dep_version_ids = dependencies
             .iter()
             .filter_map(|x| x.0)
+            .unique()
+            .collect::<Vec<db_models::DBVersionId>>();
+        let (projects_result, versions_result) = futures::future::try_join(
+            database::DBProject::get_many_ids(&project_ids, &**pool, &redis),
+            database::DBVersion::get_many(&dep_version_ids, &**pool, &redis),
+        )
+        .await?;
+
+        let mut projects = filter_visible_projects(
+            projects_result,
+            &user_option,
+            &pool,
+            false,
+        )
+        .await?;
+        let mut versions = filter_visible_versions(
+            versions_result,
+            &user_option,
+            &pool,
+            &redis,
+        )
+        .await?;
+
+        projects.sort_by(|a, b| b.published.cmp(&a.published));
+        projects.dedup_by(|a, b| a.id == b.id);
+
+        versions.sort_by(|a, b| b.date_published.cmp(&a.date_published));
+        versions.dedup_by(|a, b| a.id == b.id);
+
+        Ok(HttpResponse::Ok().json(DependencyInfo { projects, versions }))
+    } else {
+        Err(ApiError::NotFound)
+    }
+}
+
+pub async fn dependents_list(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let string = info.into_inner().0;
+
+    let result = db_models::DBProject::get(&string, &**pool, &redis).await?;
+
+    let user_option = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await
+    .map(|x| x.1)
+    .ok();
+
+    if let Some(project) = result {
+        if !is_visible_project(&project.inner, &user_option, &pool, false)
+            .await?
+        {
+            return Err(ApiError::NotFound);
+        }
+
+        let dependents = database::DBProject::get_dependents(
+            project.inner.id,
+            &**pool,
+            &redis,
+        )
+        .await?;
+        let project_ids =
+            dependents.iter().map(|x| x.1).unique().collect::<Vec<_>>();
+
+        let dep_version_ids = dependents
+            .iter()
+            .map(|x| x.0)
             .unique()
             .collect::<Vec<db_models::DBVersionId>>();
         let (projects_result, versions_result) = futures::future::try_join(
@@ -1337,6 +1415,7 @@ pub async fn projects_edit(
             project.inner.id,
             project.inner.slug,
             None,
+            None,
             &redis,
         )
         .await?;
@@ -1532,6 +1611,7 @@ pub async fn project_icon_edit(
         project_item.inner.id,
         project_item.inner.slug,
         None,
+        None,
         &redis,
     )
     .await?;
@@ -1621,6 +1701,7 @@ pub async fn delete_project_icon(
     db_models::DBProject::clear_cache(
         project_item.inner.id,
         project_item.inner.slug,
+        None,
         None,
         &redis,
     )
@@ -1777,6 +1858,7 @@ pub async fn add_gallery_item(
     db_models::DBProject::clear_cache(
         project_item.inner.id,
         project_item.inner.slug,
+        None,
         None,
         &redis,
     )
@@ -1961,6 +2043,7 @@ pub async fn edit_gallery_item(
         project_item.inner.id,
         project_item.inner.slug,
         None,
+        None,
         &redis,
     )
     .await?;
@@ -2075,6 +2158,7 @@ pub async fn delete_gallery_item(
     db_models::DBProject::clear_cache(
         project_item.inner.id,
         project_item.inner.slug,
+        None,
         None,
         &redis,
     )
