@@ -18,7 +18,14 @@ export type DonationPlatform =
   | { short: 'ko-fi'; name: 'Ko-fi' }
   | { short: 'other'; name: 'Other' }
 
-export type ProjectType = 'mod' | 'modpack' | 'resourcepack' | 'shader' | 'plugin' | 'datapack' | 'project'
+export type ProjectType =
+  | 'mod'
+  | 'modpack'
+  | 'resourcepack'
+  | 'shader'
+  | 'plugin'
+  | 'datapack'
+  | 'project'
 export type MonetizationStatus = 'monetized' | 'demonetized' | 'force-demonetized'
 
 export type GameVersion = string

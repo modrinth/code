@@ -1,5 +1,5 @@
 import type { Nag, NagContext } from '../../types/nags'
-import { formatProjectType, type Project } from '@modrinth/utils'
+import { formatProjectType } from '@modrinth/utils'
 import { useVIntl, defineMessage } from '@vintl/vintl'
 
 export const commonLinkDomains = {
