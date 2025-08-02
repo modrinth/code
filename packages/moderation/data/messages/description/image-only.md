@@ -1,6 +1,6 @@
 ## Image Descriptions
 
-In accordance with section 2.2 of [Modrinth's Content Rules](https://modrinth.com/legal/rules) we ask that you provide a text alternative to your current Description.
+In accordance with section 2.2 of %RULES%, we ask that you provide a text alternative to your current Description.
 
 It is important that your Description contains enough detail about your project that a user can have a full understanding of it from text alone.
 
