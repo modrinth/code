@@ -135,11 +135,11 @@ const versions: Stage = {
     {
       id: 'versions_redist_libs',
       type: 'button',
-      label: 'Oversized File',
+      label: 'Packed Libs',
       suggestedStatus: `rejected`,
       severity: `medium`,
       weight: 1003,
-      shouldShow: (project) => project.project_type === 'mod',
+      shouldShow: (project) => project.project_type === 'mod' || project.project_type === 'plugin',
       message: async () => (await import('../messages/versions/redist_libs.md?raw')).default,
     } as ButtonAction,
     {
