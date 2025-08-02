@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { SaveIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, commonMessages } from '@modrinth/ui'
-import { computed, ref } from 'vue'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import HideFromHomeOption from '@/components/ui/world/modal/HideFromHomeOption.vue'
+import ServerModalBody from '@/components/ui/world/modal/ServerModalBody.vue'
 import type { GameInstance } from '@/helpers/types'
 import {
-  type ServerPackStatus,
   edit_server_in_profile,
-  type ServerWorld,
   set_world_display_status,
   type DisplayStatus,
+  type ServerPackStatus,
+  type ServerWorld,
 } from '@/helpers/worlds.ts'
+import { SaveIcon, XIcon } from '@modrinth/assets'
+import { ButtonStyled, commonMessages, injectNotificationManager } from '@modrinth/ui'
 import { defineMessage, useVIntl } from '@vintl/vintl'
-import { handleError } from '@/store/notifications'
-import ServerModalBody from '@/components/ui/world/modal/ServerModalBody.vue'
-import HideFromHomeOption from '@/components/ui/world/modal/HideFromHomeOption.vue'
+import { computed, ref } from 'vue'
 
+const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const emit = defineEmits<{

@@ -28,7 +28,7 @@
                 </nuxt-link>
               </h2>
               <span>
-                {{ $formatNumber(acceptedMembers?.length || 0) }}
+                {{ formatNumber(acceptedMembers?.length || 0) }}
                 member<template v-if="acceptedMembers?.length !== 1">s</template>
               </span>
             </div>
@@ -120,11 +120,11 @@
                   {
                     id: 'manage-projects',
                     action: () =>
-                      navigateTo('/organization/' + organization.slug + '/settings/projects'),
-                    hoverOnly: true,
-                    shown: auth.user && currentMember,
+                      router.push('/organization/' + organization?.slug + '/settings/projects'),
+                    hoverFilledOnly: true,
+                    shown: !!(auth.user && currentMember),
                   },
-                  { divider: true, shown: auth.user && currentMember },
+                  { divider: true, shown: !!(auth?.user && currentMember) },
                   { id: 'copy-id', action: () => copyId() },
                   { id: 'copy-permalink', action: () => copyPermalink() },
                 ]"
@@ -157,20 +157,20 @@
             <template v-for="member in acceptedMembers" :key="member.user.id">
               <nuxt-link
                 class="details-list__item details-list__item--type-large"
-                :to="`/user/${member.user.username}`"
+                :to="`/user/${member?.user?.username}`"
               >
-                <Avatar :src="member.user.avatar_url" circle />
+                <Avatar :src="member?.user.avatar_url" circle />
                 <div class="rows">
                   <span class="flex items-center gap-1">
-                    {{ member.user.username }}
+                    {{ member?.user?.username }}
                     <CrownIcon
-                      v-if="member.is_owner"
+                      v-if="member?.is_owner"
                       v-tooltip="'Organization owner'"
                       class="text-brand-orange"
                     />
                   </span>
                   <span class="details-list__item__text--style-secondary">
-                    {{ member.role ? member.role : "Member" }}
+                    {{ member?.role ? member.role : "Member" }}
                   </span>
                 </div>
               </nuxt-link>
@@ -196,16 +196,21 @@
         <div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
           <NavTabs :links="navLinks" />
         </div>
-        <template v-if="projects?.length > 0">
+        <template v-if="projects && projects.length > 0">
           <div class="project-list display-mode--list">
             <ProjectCard
               v-for="project in (route.params.projectType !== undefined
-                ? projects.filter((x) =>
+                ? (projects ?? []).filter((x) =>
                     x.project_types.includes(
-                      route.params.projectType.substr(0, route.params.projectType.length - 1),
+                      typeof route.params.projectType === 'string'
+                        ? route.params.projectType.slice(0, route.params.projectType.length - 1)
+                        : route.params.projectType[0]?.slice(
+                            0,
+                            route.params.projectType[0].length - 1,
+                          ) || '',
                     ),
                   )
-                : projects
+                : (projects ?? [])
               )
                 .slice()
                 .sort((a, b) => b.downloads - a.downloads)"
@@ -225,9 +230,10 @@
               :client-side="project.client_side"
               :server-side="project.server_side"
               :status="
-                auth.user && (auth.user.id === user.id || tags.staffRoles.includes(auth.user.role))
-                  ? project.status
-                  : null
+                auth.user &&
+                (auth.user.id! === (user as any).id || tags.staffRoles.includes(auth.user.role))
+                  ? (project.status as ProjectStatus)
+                  : undefined
               "
               :type="project.project_types[0] ?? 'project'"
               :color="project.color"
@@ -240,9 +246,9 @@
           <br />
           <span class="preserve-lines text">
             This organization doesn't have any projects yet.
-            <template v-if="isPermission(currentMember?.organization_permissions, 1 << 4)">
+            <template v-if="isPermission(currentMember?.permissions, 1 << 4)">
               Would you like to
-              <a class="link" @click="$refs.modal_creation.show()">create one</a>?
+              <a class="link" @click="($refs as any).modal_creation?.show()">create one</a>?
             </template>
           </span>
         </div>
@@ -251,50 +257,58 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
   BoxIcon,
-  MoreVerticalIcon,
-  UsersIcon,
-  SettingsIcon,
   ChartIcon,
   CheckIcon,
-  XIcon,
   ClipboardCopyIcon,
-  OrganizationIcon,
-  DownloadIcon,
   CrownIcon,
+  DownloadIcon,
+  MoreVerticalIcon,
+  OrganizationIcon,
+  SettingsIcon,
+  UsersIcon,
+  XIcon,
 } from "@modrinth/assets";
 import {
   Avatar,
-  ButtonStyled,
   Breadcrumbs,
+  ButtonStyled,
+  commonMessages,
   ContentPageHeader,
   OverflowMenu,
-  commonMessages,
 } from "@modrinth/ui";
+import type { Organization, ProjectStatus, ProjectType, ProjectV3 } from "@modrinth/utils";
+import { formatNumber } from "@modrinth/utils";
+import UpToDate from "~/assets/images/illustrations/up_to_date.svg?component";
+import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
+import ModalCreation from "~/components/ui/ModalCreation.vue";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
-import ModalCreation from "~/components/ui/ModalCreation.vue";
-import UpToDate from "~/assets/images/illustrations/up_to_date.svg?component";
-import ProjectCard from "~/components/ui/ProjectCard.vue";
-import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
-import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
 import NavTabs from "~/components/ui/NavTabs.vue";
+import ProjectCard from "~/components/ui/ProjectCard.vue";
+import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
+import {
+  OrganizationContext,
+  provideOrganizationContext,
+} from "~/providers/organization-context.ts";
+import { isPermission } from "~/utils/permissions.ts";
 
 const vintl = useVIntl();
 const { formatMessage } = vintl;
 
 const formatCompactNumber = useCompactNumber(true);
 
-const auth = await useAuth();
+const auth: { user: any } & any = await useAuth();
 const user = await useUser();
 const cosmetics = useCosmetics();
 const route = useNativeRoute();
+const router = useRouter();
 const tags = useTags();
 const config = useRuntimeConfig();
 
-let orgId = useRouteId();
+const orgId = useRouteId();
 
 // hacky way to show the edit button on the corner of the card.
 const routeHasSettings = computed(() => route.path.includes("settings"));
@@ -303,12 +317,13 @@ const [
   { data: organization, refresh: refreshOrganization },
   { data: projects, refresh: refreshProjects },
 ] = await Promise.all([
-  useAsyncData(`organization/${orgId}`, () =>
-    useBaseFetch(`organization/${orgId}`, { apiVersion: 3 }),
+  useAsyncData(
+    `organization/${orgId}`,
+    () => useBaseFetch(`organization/${orgId}`, { apiVersion: 3 }) as Promise<Organization>,
   ),
   useAsyncData(
     `organization/${orgId}/projects`,
-    () => useBaseFetch(`organization/${orgId}/projects`, { apiVersion: 3 }),
+    () => useBaseFetch(`organization/${orgId}/projects`, { apiVersion: 3 }) as Promise<ProjectV3[]>,
     {
       transform: (projects) => {
         for (const project of projects) {
@@ -359,7 +374,7 @@ if (!organization.value) {
 
 // Filter accepted, sort by role, then by name and Owner role always goes first
 const acceptedMembers = computed(() => {
-  const acceptedMembers = organization.value.members?.filter((x) => x.accepted);
+  const acceptedMembers = organization.value?.members?.filter((x) => x.accepted) ?? [];
   const owner = acceptedMembers.find((x) => x.is_owner);
   const rest = acceptedMembers.filter((x) => !x.is_owner) || [];
 
@@ -374,43 +389,14 @@ const acceptedMembers = computed(() => {
   return [owner, ...rest];
 });
 
-const currentMember = computed(() => {
-  if (auth.value.user && organization.value) {
-    const member = organization.value.members.find((x) => x.user.id === auth.value.user.id);
-
-    if (member) {
-      return member;
-    }
-
-    if (tags.value.staffRoles.includes(auth.value.user.role)) {
-      return {
-        user: auth.value.user,
-        role: auth.value.user.role,
-        permissions: auth.value.user.role === "admin" ? 1023 : 12,
-        accepted: true,
-        payouts_split: 0,
-        avatar_url: auth.value.user.avatar_url,
-        name: auth.value.user.username,
-      };
-    }
-  }
-
-  return null;
-});
-
-const hasPermission = computed(() => {
-  const EDIT_DETAILS = 1 << 2;
-  return currentMember.value && (currentMember.value.permissions & EDIT_DETAILS) === EDIT_DETAILS;
-});
-
 const isInvited = computed(() => {
   return currentMember.value?.accepted === false;
 });
 
 const projectTypes = computed(() => {
-  const obj = {};
+  const obj: Record<string, boolean> = {};
 
-  for (const project of projects.value) {
+  for (const project of projects.value ?? []) {
     obj[project.project_types[0] ?? "project"] = true;
   }
 
@@ -421,62 +407,27 @@ const projectTypes = computed(() => {
 const sumDownloads = computed(() => {
   let sum = 0;
 
-  for (const project of projects.value) {
+  for (const project of projects.value ?? []) {
     sum += project.downloads;
   }
 
   return sum;
 });
 
-const patchIcon = async (icon) => {
-  const ext = icon.name.split(".").pop();
-  await useBaseFetch(`organization/${organization.value.id}/icon`, {
-    method: "PATCH",
-    body: icon,
-    query: { ext },
-    apiVersion: 3,
-  });
-};
-
-const deleteIcon = async () => {
-  await useBaseFetch(`organization/${organization.value.id}/icon`, {
-    method: "DELETE",
-    apiVersion: 3,
-  });
-};
-
-const patchOrganization = async (id, newData) => {
-  await useBaseFetch(`organization/${id}`, {
-    method: "PATCH",
-    body: newData,
-    apiVersion: 3,
-  });
-
-  if (newData.slug) {
-    orgId = newData.slug;
-  }
-};
-
 const onAcceptInvite = useClientTry(async () => {
-  await acceptTeamInvite(organization.value.team_id);
+  await acceptTeamInvite(organization.value?.team_id);
   await refreshOrganization();
 });
 
 const onDeclineInvite = useClientTry(async () => {
-  await removeTeamMember(organization.value.team_id, auth.value?.user.id);
+  await removeTeamMember(organization.value?.team_id, auth.value?.user?.id);
   await refreshOrganization();
 });
 
-provide("organizationContext", {
-  organization,
-  projects,
-  refresh,
-  currentMember,
-  hasPermission,
-  patchIcon,
-  deleteIcon,
-  patchOrganization,
-});
+const organizationContext = new OrganizationContext(organization, projects, auth, tags, refresh);
+const { currentMember } = organizationContext;
+
+provideOrganizationContext(organizationContext);
 
 const title = `${organization.value.name} - Organization`;
 const description = `${organization.value.description} - View the organization ${organization.value.name} on Modrinth`;
@@ -492,13 +443,13 @@ useSeoMeta({
 const navLinks = computed(() => [
   {
     label: formatMessage(commonMessages.allProjectType),
-    href: `/organization/${organization.value.slug}`,
+    href: `/organization/${organization.value?.slug}`,
   },
   ...projectTypes.value
     .map((x) => {
       return {
-        label: formatMessage(getProjectTypeMessage(x, true)),
-        href: `/organization/${organization.value.slug}/${x}s`,
+        label: formatMessage(getProjectTypeMessage(x as ProjectType, true)),
+        href: `/organization/${organization.value?.slug}/${x}s`,
       };
     })
     .slice()
@@ -506,12 +457,12 @@ const navLinks = computed(() => [
 ]);
 
 async function copyId() {
-  await navigator.clipboard.writeText(organization.value.id);
+  await navigator.clipboard.writeText(organization.value?.id ?? "");
 }
 
 async function copyPermalink() {
   await navigator.clipboard.writeText(
-    `${config.public.siteUrl}/organization/${organization.value.id}`,
+    `${config.public.siteUrl}/organization/${organization.value?.id}`,
   );
 }
 </script>

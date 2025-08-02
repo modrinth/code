@@ -202,26 +202,26 @@
   </div>
 </template>
 <script setup>
-import { PlusIcon, XIcon, TrashIcon, EditIcon, SaveIcon } from "@modrinth/assets";
+import { EditIcon, PlusIcon, SaveIcon, TrashIcon, XIcon } from "@modrinth/assets";
 import {
   Checkbox,
-  CopyCode,
   ConfirmModal,
-  commonSettingsMessages,
+  CopyCode,
   commonMessages,
+  commonSettingsMessages,
+  injectNotificationManager,
   useRelativeTime,
 } from "@modrinth/ui";
-
+import Modal from "~/components/ui/Modal.vue";
 import {
+  getScopeValue,
   hasScope,
   scopeList,
   toggleScope,
   useScopes,
-  getScopeValue,
 } from "~/composables/auth/scopes.ts";
 
-import Modal from "~/components/ui/Modal.vue";
-
+const { addNotification } = injectNotificationManager();
 const { formatMessage } = useVIntl();
 
 const formatRelativeTime = useRelativeTime();
@@ -346,8 +346,7 @@ async function createPat() {
     pats.value.push(res);
     patModal.value.hide();
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: "error",
@@ -372,8 +371,7 @@ async function editPat() {
     await refresh();
     patModal.value.hide();
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: "error",
@@ -392,8 +390,7 @@ async function removePat(id) {
     });
     await refresh();
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: "error",

@@ -135,27 +135,30 @@
 </template>
 <script setup lang="ts">
 import {
-  Avatar,
-  useRelativeTime,
-  OverflowMenu,
-  type OverflowMenuOption,
-  CollapsibleRegion,
-  ButtonStyled,
-} from "@modrinth/ui";
-import {
-  EllipsisVerticalIcon,
-  OrganizationIcon,
-  EyeIcon,
   ClipboardCopyIcon,
+  EllipsisVerticalIcon,
+  EyeIcon,
   LinkIcon,
+  OrganizationIcon,
 } from "@modrinth/assets";
 import {
   type ExtendedReport,
   reportQuickReplies,
   type ReportQuickReply,
 } from "@modrinth/moderation";
+import {
+  Avatar,
+  ButtonStyled,
+  CollapsibleRegion,
+  injectNotificationManager,
+  OverflowMenu,
+  type OverflowMenuOption,
+  useRelativeTime,
+} from "@modrinth/ui";
 import ChevronDownIcon from "../servers/icons/ChevronDownIcon.vue";
 import ReportThread from "../thread/ReportThread.vue";
+
+const { addNotification } = injectNotificationManager();
 
 const props = defineProps<{
   report: ExtendedReport;

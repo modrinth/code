@@ -1,13 +1,13 @@
 <script setup>
-import { Button, Slider } from '@modrinth/ui'
-import { ref, watch } from 'vue'
-import { get, set } from '@/helpers/settings.ts'
-import { purge_cache_types } from '@/helpers/cache.js'
-import { handleError } from '@/store/notifications.js'
-import { BoxIcon, FolderSearchIcon, TrashIcon } from '@modrinth/assets'
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
+import { purge_cache_types } from '@/helpers/cache.js'
+import { get, set } from '@/helpers/settings.ts'
+import { BoxIcon, FolderSearchIcon, TrashIcon } from '@modrinth/assets'
+import { Button, Slider, injectNotificationManager } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
+import { ref, watch } from 'vue'
 
+const { handleError } = injectNotificationManager()
 const settings = ref(await get())
 
 watch(

@@ -1,31 +1,32 @@
 <script setup>
-import {
-  ClipboardCopyIcon,
-  FolderOpenIcon,
-  PlayIcon,
-  PlusIcon,
-  TrashIcon,
-  DownloadIcon,
-  GlobeIcon,
-  StopCircleIcon,
-  ExternalIcon,
-  EyeIcon,
-} from '@modrinth/assets'
-import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
-import Instance from '@/components/ui/Instance.vue'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
+import Instance from '@/components/ui/Instance.vue'
+import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import ProjectCard from '@/components/ui/ProjectCard.vue'
-import { get_by_profile_path } from '@/helpers/process.js'
-import { handleError } from '@/store/notifications.js'
-import { duplicate, kill, remove, run } from '@/helpers/profile.js'
-import { useRouter } from 'vue-router'
-import { showProfileInFolder } from '@/helpers/utils.js'
 import { trackEvent } from '@/helpers/analytics'
+import { get_by_profile_path } from '@/helpers/process.js'
+import { duplicate, kill, remove, run } from '@/helpers/profile.js'
+import { showProfileInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
 import { install as installVersion } from '@/store/install.js'
+import {
+  ClipboardCopyIcon,
+  DownloadIcon,
+  ExternalIcon,
+  EyeIcon,
+  FolderOpenIcon,
+  GlobeIcon,
+  PlayIcon,
+  PlusIcon,
+  StopCircleIcon,
+  TrashIcon,
+} from '@modrinth/assets'
+import { HeadingLink, injectNotificationManager } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { HeadingLink } from '@modrinth/ui'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const { handleError } = injectNotificationManager()
 
 const router = useRouter()
 

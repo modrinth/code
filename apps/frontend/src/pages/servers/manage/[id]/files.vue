@@ -266,26 +266,27 @@
 </template>
 
 <script setup lang="ts">
-import { useInfiniteScroll } from "@vueuse/core";
 import {
-  UnknownIcon,
-  XIcon,
-  SpinnerIcon,
-  PackageOpenIcon,
   CheckIcon,
-  UploadIcon,
   FolderOpenIcon,
+  PackageOpenIcon,
+  SpinnerIcon,
+  UnknownIcon,
+  UploadIcon,
+  XIcon,
 } from "@modrinth/assets";
-import { computed } from "vue";
-import { ButtonStyled, ProgressBar } from "@modrinth/ui";
+import { ButtonStyled, injectNotificationManager, ProgressBar } from "@modrinth/ui";
+import type { DirectoryItem, DirectoryResponse, FilesystemOp, FSQueuedOp } from "@modrinth/utils";
 import { formatBytes, ModrinthServersFetchError } from "@modrinth/utils";
-import type { FilesystemOp, FSQueuedOp, DirectoryItem, DirectoryResponse } from "@modrinth/utils";
-import { handleError, ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { useInfiniteScroll } from "@vueuse/core";
+import { computed } from "vue";
+import FilesUploadConflictModal from "~/components/ui/servers/FilesUploadConflictModal.vue";
 import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
 import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
 import FilesUploadZipUrlModal from "~/components/ui/servers/FilesUploadZipUrlModal.vue";
-import FilesUploadConflictModal from "~/components/ui/servers/FilesUploadConflictModal.vue";
+import { handleError, ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
+const { addNotification } = injectNotificationManager();
 const flags = useFeatureFlags();
 const baseId = useId();
 
@@ -449,7 +450,6 @@ const undoLastOperation = async () => {
 
     refreshList();
     addNotification({
-      group: "files",
       title: `${lastOperation.type === "move" ? "Move" : "Rename"} undone`,
       text: `${lastOperation.fileName} has been restored to its original ${lastOperation.type === "move" ? "location" : "name"}`,
       type: "success",
@@ -457,7 +457,6 @@ const undoLastOperation = async () => {
   } catch (error) {
     console.error(`Error undoing ${lastOperation.type}:`, error);
     addNotification({
-      group: "files",
       title: "Undo failed",
       text: `Failed to undo the last ${lastOperation.type} operation`,
       type: "error",
@@ -489,7 +488,6 @@ const redoLastOperation = async () => {
 
     refreshList();
     addNotification({
-      group: "files",
       title: `${lastOperation.type === "move" ? "Move" : "Rename"} redone`,
       text: `${lastOperation.fileName} has been ${lastOperation.type === "move" ? "moved" : "renamed"} again`,
       type: "success",
@@ -497,7 +495,6 @@ const redoLastOperation = async () => {
   } catch (error) {
     console.error(`Error redoing ${lastOperation.type}:`, error);
     addNotification({
-      group: "files",
       title: "Redo failed",
       text: `Failed to redo the last ${lastOperation.type} operation`,
       type: "error",
@@ -513,7 +510,6 @@ const handleCreateNewItem = async (name: string) => {
     refreshList();
 
     addNotification({
-      group: "files",
       title: `${newItemType.value === "directory" ? "Folder" : "File"} created`,
       text: `New ${newItemType.value === "directory" ? "folder" : "file"} ${name} has been created.`,
       type: "success",
@@ -549,7 +545,6 @@ const handleRenameItem = async (newName: string) => {
     }
 
     addNotification({
-      group: "files",
       title: `${selectedItem.value.type === "directory" ? "Folder" : "File"} renamed`,
       text: `${selectedItem.value.name} has been renamed to ${newName}`,
       type: "success",
@@ -559,7 +554,6 @@ const handleRenameItem = async (newName: string) => {
     if (error instanceof ModrinthServersFetchError) {
       if (error.statusCode === 400) {
         addNotification({
-          group: "files",
           title: "Could not rename",
           text: `An item named "${newName}" already exists in this location`,
           type: "error",
@@ -567,7 +561,6 @@ const handleRenameItem = async (newName: string) => {
         return;
       }
       addNotification({
-        group: "files",
         title: "Could not rename item",
         text: "An unexpected error occurred",
         type: "error",
@@ -625,7 +618,6 @@ const handleMoveItem = async (destination: string) => {
 
     refreshList();
     addNotification({
-      group: "files",
       title: `${itemType === "directory" ? "Folder" : "File"} moved`,
       text: `${selectedItem.value.name} has been moved to ${newPath}`,
       type: "success",
@@ -658,7 +650,6 @@ const handleDirectMove = async (moveData: {
 
     refreshList();
     addNotification({
-      group: "files",
       title: `${moveData.type === "directory" ? "Folder" : "File"} moved`,
       text: `${moveData.name} has been moved to ${newPath}`,
       type: "success",
@@ -675,7 +666,6 @@ const handleDeleteItem = async () => {
 
     refreshList();
     addNotification({
-      group: "files",
       title: "File deleted",
       text: "Your file has been deleted.",
       type: "success",
@@ -717,14 +707,12 @@ const handleCreateError = (error: any) => {
   if (error instanceof ModrinthServersFetchError) {
     if (error.statusCode === 400) {
       addNotification({
-        group: "files",
         title: "Error creating item",
         text: "Invalid file",
         type: "error",
       });
     } else if (error.statusCode === 500) {
       addNotification({
-        group: "files",
         title: "Error creating item",
         text: "Something went wrong. The file may already exist.",
         type: "error",
@@ -1010,7 +998,6 @@ const requestShareLink = async () => {
     if (response.success) {
       await navigator.clipboard.writeText(response.url);
       addNotification({
-        group: "files",
         title: "Log URL copied",
         text: "Your log file URL has been copied to your clipboard.",
         type: "success",
@@ -1080,7 +1067,6 @@ const saveFileContent = async (exit: boolean = true) => {
     }
 
     addNotification({
-      group: "files",
       title: "File saved",
       text: "Your file has been saved.",
       type: "success",
@@ -1095,7 +1081,6 @@ const saveFileContentRestart = async () => {
   await props.server.general?.power("Restart");
 
   addNotification({
-    group: "files",
     title: "Server restarted",
     text: "Your server has been restarted.",
     type: "success",

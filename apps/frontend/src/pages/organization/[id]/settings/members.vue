@@ -220,19 +220,21 @@
 
 <script setup>
 import {
+  CrownIcon,
+  DropdownIcon,
   SaveIcon,
   TransferIcon,
   UserPlusIcon,
   UserXIcon as UserRemoveIcon,
-  DropdownIcon,
-  CrownIcon,
 } from "@modrinth/assets";
-import { Button, Badge, Avatar, Checkbox } from "@modrinth/ui";
+import { Avatar, Badge, Button, Checkbox, injectNotificationManager } from "@modrinth/ui";
 import { ref } from "vue";
 import { removeTeamMember } from "~/helpers/teams.js";
+import { injectOrganizationContext } from "~/providers/organization-context.ts";
 import { isPermission } from "~/utils/permissions.ts";
 
-const { organization, refresh: refreshOrganization, currentMember } = inject("organizationContext");
+const { addNotification } = injectNotificationManager();
+const { organization, refresh: refreshOrganization, currentMember } = injectOrganizationContext();
 
 const auth = await useAuth();
 
@@ -296,7 +298,6 @@ const onInviteTeamMember = useClientTry(async (teamId, username) => {
   await refreshOrganization();
   currentUsername.value = "";
   addNotification({
-    group: "main",
     title: "Member invited",
     text: `${user.username} has been invited to the organization.`,
     type: "success",
@@ -307,7 +308,6 @@ const onRemoveMember = useClientTry(async (teamId, member) => {
   await removeTeamMember(teamId, member.user.id);
   await refreshOrganization();
   addNotification({
-    group: "main",
     title: "Member removed",
     text: `${member.user.username} has been removed from the organization.`,
     type: "success",
@@ -332,7 +332,6 @@ const onUpdateTeamMember = useClientTry(async (teamId, member) => {
   });
   await refreshOrganization();
   addNotification({
-    group: "main",
     title: "Member updated",
     text: `${member.user.username} has been updated.`,
     type: "success",
@@ -349,7 +348,6 @@ const onTransferOwnership = useClientTry(async (teamId, uid) => {
   });
   await refreshOrganization();
   addNotification({
-    group: "main",
     title: "Ownership transferred",
     text: `The ownership of ${organization.value.name} has been successfully transferred.`,
     type: "success",

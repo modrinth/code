@@ -100,37 +100,39 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, useTemplateRef } from 'vue'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
-import {
-  SkinPreviewRenderer,
-  Button,
-  RadioButtons,
-  CapeButton,
-  CapeLikeTextButton,
-  ButtonStyled,
-} from '@modrinth/ui'
+import UploadSkinModal from '@/components/ui/skin/UploadSkinModal.vue'
 import {
   add_and_equip_custom_skin,
+  determineModelType,
+  get_normalized_skin_texture,
   remove_custom_skin,
   unequip_skin,
-  type Skin,
   type Cape,
+  type Skin,
   type SkinModel,
-  get_normalized_skin_texture,
-  determineModelType,
 } from '@/helpers/skins.ts'
-import { handleError } from '@/store/notifications'
 import {
-  UploadIcon,
   CheckIcon,
-  SaveIcon,
-  XIcon,
   ChevronRightIcon,
+  SaveIcon,
   SpinnerIcon,
+  UploadIcon,
+  XIcon,
 } from '@modrinth/assets'
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import UploadSkinModal from '@/components/ui/skin/UploadSkinModal.vue'
+import {
+  Button,
+  ButtonStyled,
+  CapeButton,
+  CapeLikeTextButton,
+  injectNotificationManager,
+  RadioButtons,
+  SkinPreviewRenderer,
+} from '@modrinth/ui'
+import { computed, ref, useTemplateRef, watch } from 'vue'
+
+const { handleError } = injectNotificationManager()
 
 const modal = useTemplateRef('modal')
 const selectCapeModal = useTemplateRef('selectCapeModal')

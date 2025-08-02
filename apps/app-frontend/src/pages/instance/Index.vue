@@ -157,13 +157,18 @@
   </div>
 </template>
 <script setup>
-import {
-  Avatar,
-  ButtonStyled,
-  ContentPageHeader,
-  LoadingIndicator,
-  OverflowMenu,
-} from '@modrinth/ui'
+import ContextMenu from '@/components/ui/ContextMenu.vue'
+import ExportModal from '@/components/ui/ExportModal.vue'
+import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
+import NavTabs from '@/components/ui/NavTabs.vue'
+import { trackEvent } from '@/helpers/analytics'
+import { get_project, get_version_many } from '@/helpers/cache.js'
+import { process_listener, profile_listener } from '@/helpers/events'
+import { get_by_profile_path } from '@/helpers/process'
+import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
+import { showProfileInFolder } from '@/helpers/utils.js'
+import { handleSevereError } from '@/store/error.js'
+import { useBreadcrumbs, useLoading } from '@/store/state'
 import {
   CheckCircleIcon,
   ClipboardCopyIcon,
@@ -187,28 +192,25 @@ import {
   UserPlusIcon,
   XIcon,
 } from '@modrinth/assets'
-import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
-import { get_by_profile_path } from '@/helpers/process'
-import { process_listener, profile_listener } from '@/helpers/events'
-import { useRoute, useRouter } from 'vue-router'
-import { computed, onUnmounted, ref, watch } from 'vue'
-import { handleError, useBreadcrumbs, useLoading } from '@/store/state'
-import { showProfileInFolder } from '@/helpers/utils.js'
-import ContextMenu from '@/components/ui/ContextMenu.vue'
-import NavTabs from '@/components/ui/NavTabs.vue'
-import { trackEvent } from '@/helpers/analytics'
+import {
+  Avatar,
+  ButtonStyled,
+  ContentPageHeader,
+  injectNotificationManager,
+  LoadingIndicator,
+  OverflowMenu,
+} from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { handleSevereError } from '@/store/error.js'
-import { get_project, get_version_many } from '@/helpers/cache.js'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import ExportModal from '@/components/ui/ExportModal.vue'
-import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
 
+const { handleError } = injectNotificationManager()
 const route = useRoute()
 
 const router = useRouter()

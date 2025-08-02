@@ -890,6 +890,7 @@
 </template>
 
 <script setup>
+import { navigateTo } from "#app";
 import {
   BookmarkIcon,
   BookTextIcon,
@@ -906,6 +907,7 @@ import {
   HeartIcon,
   InfoIcon,
   LinkIcon as LinksIcon,
+  ModrinthIcon,
   MoreVerticalIcon,
   PlusIcon,
   ReportIcon,
@@ -917,13 +919,13 @@ import {
   UsersIcon,
   VersionIcon,
   WrenchIcon,
-  ModrinthIcon,
   XIcon,
 } from "@modrinth/assets";
 import {
   Avatar,
   ButtonStyled,
   Checkbox,
+  injectNotificationManager,
   NewModal,
   OverflowMenu,
   PopoutMenu,
@@ -935,36 +937,37 @@ import {
   ProjectSidebarLinks,
   ProjectStatusBadge,
   ScrollablePanel,
-  TagItem,
   ServersPromo,
+  TagItem,
   useRelativeTime,
 } from "@modrinth/ui";
 import VersionSummary from "@modrinth/ui/src/components/version/VersionSummary.vue";
 import { formatCategory, formatProjectType, renderString } from "@modrinth/utils";
+import { useLocalStorage } from "@vueuse/core";
 import dayjs from "dayjs";
 import { Tooltip } from "floating-vue";
-import { useLocalStorage } from "@vueuse/core";
-import { navigateTo } from "#app";
 import Accordion from "~/components/ui/Accordion.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import AutomaticAccordion from "~/components/ui/AutomaticAccordion.vue";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import MessageBanner from "~/components/ui/MessageBanner.vue";
+import ModerationChecklist from "~/components/ui/moderation/checklist/ModerationChecklist.vue";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
 import NavTabs from "~/components/ui/NavTabs.vue";
 import ProjectMemberHeader from "~/components/ui/ProjectMemberHeader.vue";
-import { userCollectProject } from "~/composables/user.js";
-import { reportProject } from "~/utils/report-helpers.ts";
 import { saveFeatureFlags } from "~/composables/featureFlags.ts";
-import ModerationChecklist from "~/components/ui/moderation/checklist/ModerationChecklist.vue";
+import { userCollectProject } from "~/composables/user.js";
 import { useModerationStore } from "~/store/moderation.ts";
+import { reportProject } from "~/utils/report-helpers.ts";
 
 const data = useNuxtApp();
 const route = useNativeRoute();
 const config = useRuntimeConfig();
 const moderationStore = useModerationStore();
+const notifications = injectNotificationManager();
+const { addNotification } = notifications;
 
 const auth = await useAuth();
 const user = await useUser();
@@ -974,7 +977,6 @@ const flags = useFeatureFlags();
 const cosmetics = useCosmetics();
 
 const { formatMessage } = useVIntl();
-const { setVisible } = useNotificationRightwards();
 
 const settingsModal = ref();
 const downloadModal = ref();
@@ -1425,8 +1427,7 @@ async function setProcessing() {
 
     project.value.status = "processing";
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -1459,8 +1460,7 @@ async function patchProject(resData, quiet = false) {
 
     result = true;
     if (!quiet) {
-      data.$notify({
-        group: "main",
+      addNotification({
         title: "Project updated",
         text: "Your project has been updated.",
         type: "success",
@@ -1468,8 +1468,7 @@ async function patchProject(resData, quiet = false) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -1498,15 +1497,13 @@ async function patchIcon(icon) {
     );
     await resetProject();
     result = true;
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "Project icon updated",
       text: "Your project's icon has been updated.",
       type: "success",
     });
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -1555,10 +1552,14 @@ const collapsedModerationChecklist = useLocalStorage("collapsed-moderation-check
 watch(
   showModerationChecklist,
   (newValue) => {
-    setVisible(newValue);
+    notifications.setNotificationLocation(newValue ? "left" : "right");
   },
   { immediate: true },
 );
+
+onUnmounted(() => {
+  notifications.setNotificationLocation("right");
+});
 
 if (import.meta.client && history && history.state && history.state.showChecklist) {
   showModerationChecklist.value = true;

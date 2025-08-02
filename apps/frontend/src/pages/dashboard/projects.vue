@@ -301,17 +301,16 @@
 </template>
 
 <script>
-import { Multiselect } from "vue-multiselect";
 import {
-  SettingsIcon,
-  TrashIcon,
-  PlusIcon,
-  XIcon,
-  IssuesIcon,
   EditIcon,
+  IssuesIcon,
+  PlusIcon,
   SaveIcon,
+  SettingsIcon,
   SortAscIcon,
   SortDescIcon,
+  TrashIcon,
+  XIcon,
 } from "@modrinth/assets";
 import {
   Avatar,
@@ -320,8 +319,10 @@ import {
   CopyCode,
   ProjectStatusBadge,
   commonMessages,
+  injectNotificationManager,
 } from "@modrinth/ui";
 import { formatProjectType } from "@modrinth/utils";
+import { Multiselect } from "vue-multiselect";
 
 import Modal from "~/components/ui/Modal.vue";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
@@ -444,6 +445,8 @@ export default defineNuxtComponent({
       return sortedArray;
     },
     async bulkEditLinks() {
+      const { addNotification } = injectNotificationManager();
+
       try {
         const baseData = {
           issues_url: this.editLinks.issues.clear ? null : this.editLinks.issues.val.trim(),
@@ -477,8 +480,7 @@ export default defineNuxtComponent({
         );
 
         this.$refs.editLinksModal.hide();
-        this.$notify({
-          group: "main",
+        addNotification({
           title: "Success",
           text: "Bulk edited selected project's links.",
           type: "success",
@@ -494,8 +496,7 @@ export default defineNuxtComponent({
         this.editLinks.wiki.clear = false;
         this.editLinks.discord.clear = false;
       } catch (e) {
-        this.$notify({
-          group: "main",
+        addNotification({
           title: "An error occurred",
           text: e,
           type: "error",

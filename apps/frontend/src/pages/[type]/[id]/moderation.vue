@@ -99,8 +99,8 @@
   </div>
 </template>
 <script setup>
-import { XIcon, CheckIcon, IssuesIcon } from "@modrinth/assets";
-import { Badge } from "@modrinth/ui";
+import { CheckIcon, IssuesIcon, XIcon } from "@modrinth/assets";
+import { Badge, injectNotificationManager } from "@modrinth/ui";
 import ConversationThread from "~/components/ui/thread/ConversationThread.vue";
 import {
   getProjectLink,
@@ -111,6 +111,7 @@ import {
   isUnderReview,
 } from "~/helpers/projects.js";
 
+const { addNotification } = injectNotificationManager();
 const props = defineProps({
   project: {
     type: Object,
@@ -131,7 +132,6 @@ const props = defineProps({
   },
 });
 
-const app = useNuxtApp();
 const auth = await useAuth();
 
 const { data: thread } = await useAsyncData(`thread/${props.project.thread_id}`, () =>
@@ -153,8 +153,7 @@ async function setStatus(status) {
     await props.resetProject();
     thread.value = await useBaseFetch(`thread/${thread.value.id}`);
   } catch (err) {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",

@@ -1,8 +1,10 @@
 <script setup>
-import { ref } from 'vue'
-import { get_java_versions, set_java_version } from '@/helpers/jre'
-import { handleError } from '@/store/notifications'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
+import { get_java_versions, set_java_version } from '@/helpers/jre'
+import { injectNotificationManager } from '@modrinth/ui'
+import { ref } from 'vue'
+
+const { handleError } = injectNotificationManager()
 
 const javaVersions = ref(await get_java_versions().catch(handleError))
 async function updateJavaVersion(version) {

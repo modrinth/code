@@ -144,18 +144,20 @@
 </template>
 
 <script setup lang="ts">
-import { BackupWarning, ButtonStyled, NewModal } from "@modrinth/ui";
 import {
-  UploadIcon,
-  RightArrowIcon,
-  XIcon,
-  ServerIcon,
   ArrowBigRightDashIcon,
+  RightArrowIcon,
+  ServerIcon,
+  UploadIcon,
+  XIcon,
 } from "@modrinth/assets";
+import { BackupWarning, ButtonStyled, injectNotificationManager, NewModal } from "@modrinth/ui";
 import { formatBytes, ModrinthServersFetchError } from "@modrinth/utils";
 import { onMounted, onUnmounted } from "vue";
-import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
 import type { ModrinthServer } from "~/composables/servers/modrinth-servers";
+import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
+
+const { addNotification } = injectNotificationManager();
 
 const handleBeforeUnload = (event: BeforeUnloadEvent) => {
   if (isLoading.value) {
@@ -250,7 +252,6 @@ const handleReinstall = async () => {
 
   if (!mrpackFile.value) {
     addNotification({
-      group: "server",
       title: "No file selected",
       text: "Choose a .mrpack file before installing.",
       type: "error",
@@ -301,14 +302,12 @@ const handleReinstall = async () => {
   } catch (error) {
     if (error instanceof ModrinthServersFetchError && error.statusCode === 429) {
       addNotification({
-        group: "server",
         title: "Cannot upload and install modpack to server",
         text: "You are being rate limited. Please try again later.",
         type: "error",
       });
     } else {
       addNotification({
-        group: "server",
         title: "Modpack upload and install failed",
         text: "An unexpected error occurred while uploading/installing. Please try again later.",
         type: "error",

@@ -1,6 +1,6 @@
-import { invoke } from '@tauri-apps/api/core'
-import { handleError } from '@/store/notifications'
+import { injectNotificationManager } from '@modrinth/ui'
 import { arrayBufferToBase64 } from '@modrinth/utils'
+import { invoke } from '@tauri-apps/api/core'
 
 export interface Cape {
   id: string
@@ -39,6 +39,7 @@ export const DEFAULT_MODELS: Record<string, SkinModel> = {
 
 export function filterSavedSkins(list: Skin[]) {
   const customSkins = list.filter((s) => s.source !== 'default')
+  const { handleError } = injectNotificationManager()
   fixUnknownSkins(customSkins).catch(handleError)
   return customSkins
 }

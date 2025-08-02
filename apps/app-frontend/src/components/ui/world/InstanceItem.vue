@@ -1,6 +1,12 @@
 <script setup lang="ts">
-import type { Dayjs } from 'dayjs'
-import dayjs from 'dayjs'
+import { trackEvent } from '@/helpers/analytics'
+import { get_project } from '@/helpers/cache'
+import { process_listener } from '@/helpers/events'
+import { get_by_profile_path } from '@/helpers/process'
+import { kill, run } from '@/helpers/profile'
+import type { GameInstance } from '@/helpers/types'
+import { showProfileInFolder } from '@/helpers/utils'
+import { handleSevereError } from '@/store/error'
 import {
   EyeIcon,
   FolderOpenIcon,
@@ -13,25 +19,20 @@ import {
   Avatar,
   ButtonStyled,
   commonMessages,
+  injectNotificationManager,
   OverflowMenu,
   SmartClickable,
   useRelativeTime,
 } from '@modrinth/ui'
-import { useVIntl } from '@vintl/vintl'
-import { computed, nextTick, ref, onMounted, onUnmounted } from 'vue'
-import { showProfileInFolder } from '@/helpers/utils'
-import { convertFileSrc } from '@tauri-apps/api/core'
-import { useRouter } from 'vue-router'
-import type { GameInstance } from '@/helpers/types'
-import { get_project } from '@/helpers/cache'
 import { capitalizeString } from '@modrinth/utils'
-import { kill, run } from '@/helpers/profile'
-import { handleSevereError } from '@/store/error'
-import { trackEvent } from '@/helpers/analytics'
-import { get_by_profile_path } from '@/helpers/process'
-import { handleError } from '@/store/notifications'
-import { process_listener } from '@/helpers/events'
+import { convertFileSrc } from '@tauri-apps/api/core'
+import { useVIntl } from '@vintl/vintl'
+import type { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
+const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
 

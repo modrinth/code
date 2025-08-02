@@ -57,12 +57,18 @@
 </template>
 <script setup>
 import { XIcon } from "@modrinth/assets";
-import { commonMessages, commonSettingsMessages, useRelativeTime } from "@modrinth/ui";
+import {
+  commonMessages,
+  commonSettingsMessages,
+  injectNotificationManager,
+  useRelativeTime,
+} from "@modrinth/ui";
 
 definePageMeta({
   middleware: "auth",
 });
 
+const { addNotification } = injectNotificationManager();
 const { formatMessage } = useVIntl();
 const formatRelativeTime = useRelativeTime();
 
@@ -102,7 +108,6 @@ useHead({
   title: () => `${formatMessage(commonSettingsMessages.sessions)} - Modrinth`,
 });
 
-const data = useNuxtApp();
 const { data: sessions, refresh } = await useAsyncData("session/list", () =>
   useBaseFetch("session/list"),
 );
@@ -116,8 +121,7 @@ async function revokeSession(id) {
     });
     await refresh();
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: "error",

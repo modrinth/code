@@ -113,7 +113,8 @@
 </template>
 
 <script>
-import { StarIcon, SaveIcon } from "@modrinth/assets";
+import { SaveIcon, StarIcon } from "@modrinth/assets";
+import { injectNotificationManager } from "@modrinth/ui";
 import { formatCategory, formatCategoryHeader, formatProjectType } from "@modrinth/utils";
 import Checkbox from "~/components/ui/Checkbox.vue";
 
@@ -146,8 +147,8 @@ export default defineNuxtComponent({
       type: Function,
       default() {
         return () => {
-          this.$notify({
-            group: "main",
+          const { addNotification } = injectNotificationManager();
+          addNotification({
             title: "An error occurred",
             text: "Patch project function not found",
             type: "error",

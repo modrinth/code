@@ -1,12 +1,13 @@
 <script setup>
-import { Button } from '@modrinth/ui'
-import { ref } from 'vue'
-import SearchCard from '@/components/ui/SearchCard.vue'
-import { get_categories } from '@/helpers/tags.js'
-import { handleError } from '@/store/notifications.js'
-import { get_version, get_project } from '@/helpers/cache.js'
-import { install as installVersion } from '@/store/install.js'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import SearchCard from '@/components/ui/SearchCard.vue'
+import { get_project, get_version } from '@/helpers/cache.js'
+import { get_categories } from '@/helpers/tags.js'
+import { install as installVersion } from '@/store/install.js'
+import { Button, injectNotificationManager } from '@modrinth/ui'
+import { ref } from 'vue'
+
+const { handleError } = injectNotificationManager()
 
 const confirmModal = ref(null)
 const project = ref(null)

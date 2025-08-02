@@ -32,8 +32,10 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ButtonStyled } from "@modrinth/ui";
 import { MailIcon } from "@modrinth/assets";
+import { ButtonStyled, injectNotificationManager } from "@modrinth/ui";
+
+const { addNotification } = injectNotificationManager();
 
 const userEmail = ref("");
 
@@ -50,7 +52,6 @@ async function getUserFromEmail() {
   } catch (err) {
     console.error(err);
     addNotification({
-      group: "main",
       title: "An error occurred",
       text: err.data.description,
       type: "error",

@@ -518,20 +518,29 @@
 </template>
 
 <script setup>
-import { Multiselect } from "vue-multiselect";
 import {
-  TransferIcon,
   CheckIcon,
-  UsersIcon,
-  DropdownIcon,
-  SaveIcon,
-  UserPlusIcon,
-  UserXIcon,
-  OrganizationIcon,
   CrownIcon,
+  DropdownIcon,
+  OrganizationIcon,
+  SaveIcon,
+  TransferIcon,
+  UserPlusIcon,
+  UsersIcon,
+  UserXIcon,
 } from "@modrinth/assets";
-import { Avatar, Badge, Card, Checkbox, ConfirmModal } from "@modrinth/ui";
+import {
+  Avatar,
+  Badge,
+  Card,
+  Checkbox,
+  ConfirmModal,
+  injectNotificationManager,
+} from "@modrinth/ui";
+import { Multiselect } from "vue-multiselect";
 import { removeSelfFromTeam } from "~/helpers/teams.js";
+
+const { addNotification } = injectNotificationManager();
 
 const props = defineProps({
   project: {
@@ -654,7 +663,6 @@ const onAddToOrg = useClientTry(async () => {
   await updateMembers();
 
   addNotification({
-    group: "main",
     title: "Project transferred",
     text: "Your project has been transferred to the organization.",
     type: "success",
@@ -675,7 +683,6 @@ const onRemoveFromOrg = useClientTry(async () => {
   await updateMembers();
 
   addNotification({
-    group: "main",
     title: "Project removed",
     text: "Your project has been removed from the organization.",
     type: "success",
@@ -703,7 +710,6 @@ const inviteTeamMember = async () => {
     await updateMembers();
   } catch (err) {
     addNotification({
-      group: "main",
       title: "An error occurred",
       text: err?.data?.description || err?.message || err || "Unknown error",
       type: "error",
@@ -726,7 +732,6 @@ const removeTeamMember = async (index) => {
     await updateMembers();
   } catch (err) {
     addNotification({
-      group: "main",
       title: "An error occurred",
       text: err?.data?.description || err?.message || err || "Unknown error",
       type: "error",
@@ -760,14 +765,12 @@ const updateTeamMember = async (index) => {
     );
     await updateMembers();
     addNotification({
-      group: "main",
       title: "Member(s) updated",
       text: "Your project's member(s) has been updated.",
       type: "success",
     });
   } catch (err) {
     addNotification({
-      group: "main",
       title: "An error occurred",
       text: err?.data?.description || err?.message || err || "Unknown error",
       type: "error",
@@ -790,7 +793,6 @@ const transferOwnership = async (index) => {
     await updateMembers();
   } catch (err) {
     addNotification({
-      group: "main",
       title: "An error occurred",
       text: err?.data?.description || err?.message || err || "Unknown error",
       type: "error",
@@ -837,7 +839,6 @@ async function updateOrgMember(index) {
     await updateMembers();
   } catch (err) {
     addNotification({
-      group: "main",
       title: "An error occurred",
       text: err?.data?.description || err?.message || err || "Unknown error",
       type: "error",

@@ -109,15 +109,16 @@
 
 <script setup>
 import {
-  ChevronRightIcon,
-  CheckIcon,
-  XIcon,
   AsteriskIcon,
-  LightBulbIcon,
-  SendIcon,
-  ScaleIcon,
+  CheckIcon,
+  ChevronRightIcon,
   DropdownIcon,
+  LightBulbIcon,
+  ScaleIcon,
+  SendIcon,
+  XIcon,
 } from "@modrinth/assets";
+import { injectNotificationManager } from "@modrinth/ui";
 import { formatProjectType } from "@modrinth/utils";
 import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
 
@@ -164,8 +165,8 @@ const props = defineProps({
     type: Function,
     default() {
       return () => {
+        const { addNotification } = injectNotificationManager();
         addNotification({
-          group: "main",
           title: "An error occurred",
           text: "setProcessing function not found",
           type: "error",
@@ -177,8 +178,8 @@ const props = defineProps({
     type: Function,
     default() {
       return () => {
+        const { addNotification } = injectNotificationManager();
         addNotification({
-          group: "main",
           title: "An error occurred",
           text: "toggleCollapsed function not found",
           type: "error",
@@ -190,8 +191,8 @@ const props = defineProps({
     type: Function,
     default() {
       return () => {
+        const { addNotification } = injectNotificationManager();
         addNotification({
-          group: "main",
           title: "An error occurred",
           text: "updateMembers function not found",
           type: "error",

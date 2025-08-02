@@ -239,11 +239,13 @@
 </template>
 
 <script setup>
+import { CheckIcon, IssuesIcon, SaveIcon, TrashIcon, UploadIcon, XIcon } from "@modrinth/assets";
+import { Avatar, ConfirmModal, injectNotificationManager } from "@modrinth/ui";
 import { formatProjectStatus, formatProjectType } from "@modrinth/utils";
-import { UploadIcon, SaveIcon, TrashIcon, XIcon, IssuesIcon, CheckIcon } from "@modrinth/assets";
 import { Multiselect } from "vue-multiselect";
-import { ConfirmModal, Avatar } from "@modrinth/ui";
 import FileInput from "~/components/ui/FileInput.vue";
+
+const { addNotification } = injectNotificationManager();
 
 const props = defineProps({
   project: {
@@ -374,7 +376,6 @@ const deleteProject = async () => {
   await initUserProjects();
   await router.push("/dashboard/projects");
   addNotification({
-    group: "main",
     title: "Project deleted",
     text: "Your project has been deleted.",
     type: "success",
@@ -393,7 +394,6 @@ const deleteIcon = async () => {
   });
   await props.resetProject();
   addNotification({
-    group: "main",
     title: "Project icon removed",
     text: "Your project's icon has been removed.",
     type: "success",

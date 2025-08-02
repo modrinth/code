@@ -1,6 +1,10 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { trackEvent } from '@/helpers/analytics'
+import { process_listener } from '@/helpers/events'
+import { get_by_profile_path } from '@/helpers/process'
+import { finish_install, kill, run } from '@/helpers/profile'
+import { showProfileInFolder } from '@/helpers/utils.js'
+import { handleSevereError } from '@/store/error.js'
 import {
   DownloadIcon,
   GameIcon,
@@ -9,17 +13,13 @@ import {
   StopCircleIcon,
   TimerIcon,
 } from '@modrinth/assets'
-import { Avatar, ButtonStyled, useRelativeTime } from '@modrinth/ui'
+import { Avatar, ButtonStyled, injectNotificationManager, useRelativeTime } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { finish_install, kill, run } from '@/helpers/profile'
-import { get_by_profile_path } from '@/helpers/process'
-import { process_listener } from '@/helpers/events'
-import { handleError } from '@/store/state.js'
-import { showProfileInFolder } from '@/helpers/utils.js'
-import { handleSevereError } from '@/store/error.js'
-import { trackEvent } from '@/helpers/analytics'
 import dayjs from 'dayjs'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
+const { handleError } = injectNotificationManager()
 const formatRelativeTime = useRelativeTime()
 
 const props = defineProps({
