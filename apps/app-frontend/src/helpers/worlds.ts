@@ -311,15 +311,24 @@ export async function refreshWorlds(instancePath: string): Promise<World[]> {
   return worlds ?? []
 }
 
-const FIRST_QUICK_PLAY_VERSION = '23w14a'
+export function hasServerQuickPlaySupport(gameVersions: GameVersion[], currentVersion: string) {
+  if (!gameVersions.length) {
+    return true
+  }
 
-export function hasQuickPlaySupport(gameVersions: GameVersion[], currentVersion: string) {
+  const versionIndex = gameVersions.findIndex((v) => v.version === currentVersion)
+  const targetIndex = gameVersions.findIndex((v) => v.version === 'a1.0.5_01')
+
+  return versionIndex === -1 || targetIndex === -1 || versionIndex <= targetIndex
+}
+
+export function hasWorldQuickPlaySupport(gameVersions: GameVersion[], currentVersion: string) {
   if (!gameVersions.length) {
     return false
   }
 
   const versionIndex = gameVersions.findIndex((v) => v.version === currentVersion)
-  const targetIndex = gameVersions.findIndex((v) => v.version === FIRST_QUICK_PLAY_VERSION)
+  const targetIndex = gameVersions.findIndex((v) => v.version === '23w14a')
 
   return versionIndex !== -1 && targetIndex !== -1 && versionIndex <= targetIndex
 }

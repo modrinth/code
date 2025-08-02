@@ -4,6 +4,7 @@ use enumset::EnumSet;
 use tauri::{AppHandle, Manager, Runtime};
 use theseus::prelude::ProcessMetadata;
 use theseus::profile::{QuickPlayType, get_full_path};
+use theseus::server_address::ServerAddress;
 use theseus::worlds::{
     DisplayStatus, ProtocolVersion, ServerPackStatus, ServerStatus, World,
     WorldType, WorldWithProfile,
@@ -203,7 +204,7 @@ pub async fn start_join_singleplayer_world(
     world: String,
 ) -> Result<ProcessMetadata> {
     let process =
-        profile::run(path, &QuickPlayType::Singleplayer(world)).await?;
+        profile::run(path, QuickPlayType::Singleplayer(world)).await?;
 
     Ok(process)
 }
@@ -213,8 +214,11 @@ pub async fn start_join_server(
     path: &str,
     address: &str,
 ) -> Result<ProcessMetadata> {
-    let process =
-        profile::run(path, &QuickPlayType::Server(address.to_owned())).await?;
+    let process = profile::run(
+        path,
+        QuickPlayType::Server(ServerAddress::Unresolved(address.to_owned())),
+    )
+    .await?;
 
     Ok(process)
 }
