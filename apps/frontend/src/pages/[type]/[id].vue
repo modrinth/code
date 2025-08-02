@@ -244,22 +244,7 @@
           </div>
 
           <div class="mx-auto flex w-fit flex-col gap-2">
-            <ButtonStyled v-if="project.game_versions.length === 1">
-              <div class="disabled button-like">
-                <GameIcon aria-hidden="true" />
-                {{
-                  currentGameVersion
-                    ? `Game version: ${currentGameVersion}`
-                    : "Error: no game versions found"
-                }}
-                <InfoIcon
-                  v-tooltip="`${project.title} is only available for ${currentGameVersion}`"
-                  class="ml-auto size-5"
-                />
-              </div>
-            </ButtonStyled>
             <Accordion
-              v-else
               ref="gameVersionAccordion"
               class="accordion-with-bg"
               @on-open="
@@ -313,7 +298,7 @@
                     }"
                     @click="
                       () => {
-                        userSelectedGameVersion = gameVersion;
+                        setSelectedGameVersion(gameVersion);
                         gameVersionAccordion.close();
                         if (!currentPlatform && platformAccordion) {
                           platformAccordion.open();
@@ -341,26 +326,8 @@
                 :disabled="!!versionFilter"
               />
             </Accordion>
-            <ButtonStyled
-              v-if="project.loaders.length === 1 && project.project_type !== 'resourcepack'"
-            >
-              <div class="disabled button-like">
-                <WrenchIcon aria-hidden="true" />
-                {{
-                  currentPlatform
-                    ? `Platform: ${formatCategory(currentPlatform)}`
-                    : "Error: no platforms found"
-                }}
-                <InfoIcon
-                  v-tooltip="
-                    `${project.title} is only available for ${formatCategory(currentPlatform)}`
-                  "
-                  class="ml-auto size-5"
-                />
-              </div>
-            </ButtonStyled>
             <Accordion
-              v-else-if="project.project_type !== 'resourcepack'"
+              v-if="project.project_type !== 'resourcepack'"
               ref="platformAccordion"
               class="accordion-with-bg"
               @on-open="
@@ -396,7 +363,7 @@
                     }"
                     @click="
                       () => {
-                        userSelectedPlatform = platform;
+                        setSelectedPlatform(platform);
 
                         platformAccordion.close();
                         if (!currentGameVersion && gameVersionAccordion) {
@@ -904,7 +871,6 @@ import {
   ImageIcon as GalleryIcon,
   GameIcon,
   HeartIcon,
-  InfoIcon,
   LinkIcon as LinksIcon,
   MoreVerticalIcon,
   PlusIcon,
@@ -983,6 +949,10 @@ const overTheTopDownloadAnimation = ref();
 const userSelectedGameVersion = ref(null);
 const userSelectedPlatform = ref(null);
 const showAllVersions = ref(false);
+if (import.meta.client) {
+  userSelectedGameVersion.value = localStorage.getItem("selected_game_version");
+  userSelectedPlatform.value = localStorage.getItem("selected_platform");
+}
 
 const gameVersionFilterInput = ref();
 
@@ -1081,7 +1051,18 @@ const licenseIdDisplay = computed(() => {
     return id;
   }
 });
-
+function setSelectedGameVersion(version) {
+  userSelectedGameVersion.value = version;
+  if (import.meta.client) {
+    localStorage.setItem("selected_game_version", version);
+  }
+}
+function setSelectedPlatform(platform) {
+  userSelectedPlatform.value = platform;
+  if (import.meta.client) {
+    localStorage.setItem("selected_platform", platform);
+  }
+}
 async function getLicenseData(event) {
   modalLicense.value.show(event);
 
