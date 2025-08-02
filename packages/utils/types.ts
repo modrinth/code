@@ -107,7 +107,7 @@ export interface ProjectV3 {
   monetization_status: MonetizationStatus
   side_types_migration_review_status: 'reviewed' | 'pending'
 
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export type SideTypesMigrationReviewStatus = 'reviewed' | 'pending'

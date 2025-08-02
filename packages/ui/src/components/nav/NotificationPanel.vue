@@ -86,8 +86,9 @@ import {
   XCircleIcon,
   XIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, type WebNotification } from '@modrinth/ui'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { injectNotificationManager, type WebNotification } from '../../providers'
+import ButtonStyled from '../base/ButtonStyled.vue'
 
 const notificationManager = injectNotificationManager()
 const notifications = computed<WebNotification[]>(() => notificationManager.getNotifications())
