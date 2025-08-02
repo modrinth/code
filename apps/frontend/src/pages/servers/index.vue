@@ -516,6 +516,98 @@
     </section>
 
     <section
+      v-if="flags.showModrinthServersGlobe"
+      class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
+    >
+      <div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
+      <div class="mx-auto flex w-full max-w-7xl flex-col gap-8">
+        <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
+          <div class="flex flex-col gap-8">
+            <div class="flex flex-col gap-4">
+              <div
+                class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+              >
+                Server Locations
+              </div>
+              <h1 class="relative m-0 max-w-2xl text-4xl leading-[120%] md:text-7xl">
+                Global Coverage
+              </h1>
+            </div>
+
+            <div class="flex flex-col gap-8">
+              <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="grid size-8 place-content-center rounded-full bg-highlight-green">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="text-brand"
+                    >
+                      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                      <circle cx="12" cy="10" r="3" />
+                    </svg>
+                  </div>
+                  <h2 class="relative m-0 text-xl font-medium leading-[155%] md:text-2xl">
+                    Strategic Locations
+                  </h2>
+                </div>
+                <p
+                  class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
+                >
+                  With servers strategically placed in Vint Hill (USA), Coventry (UK), and Limburg
+                  (Germany), we provide excellent coverage across North America and Europe. Each
+                  location features high-performance hardware and comprehensive DDoS protection.
+                </p>
+              </div>
+
+              <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="grid size-8 place-content-center rounded-full bg-highlight-blue">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="text-blue"
+                    >
+                      <path d="M12 2a10 10 0 1 0 10 10" />
+                      <path d="M18 13a6 6 0 0 0-6-6" />
+                      <path d="M13 2.05a10 10 0 0 1 2 2" />
+                      <path d="M19.5 8.5a10 10 0 0 1 2 2" />
+                    </svg>
+                  </div>
+                  <h2 class="relative m-0 text-xl font-medium leading-[155%] md:text-2xl">
+                    Low Latency Connectivity
+                  </h2>
+                </div>
+                <p
+                  class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
+                >
+                  Our three carefully chosen locations ensure optimal ping times and reliable
+                  connections for players across multiple continents. Choose the region closest to
+                  you for the best gaming experience.
+                </p>
+              </div>
+            </div>
+          </div>
+          <Globe />
+        </div>
+      </div>
+    </section>
+
+    <section
       id="plan"
       pyro-hash="plan"
       class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
@@ -651,6 +743,7 @@ import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
 import ServerPlanSelector from "~/components/ui/servers/marketing/ServerPlanSelector.vue";
 import OptionGroup from "~/components/ui/OptionGroup.vue";
+import Globe from "~/components/ui/servers/Globe.vue";
 
 const { locale } = useVIntl();
 
@@ -842,6 +935,7 @@ async function fetchPaymentData() {
 const selectedProjectId = ref();
 
 const route = useRoute();
+const flags = useFeatureFlags();
 const isAtCapacity = computed(
   () => isSmallAtCapacity.value && isMediumAtCapacity.value && isLargeAtCapacity.value,
 );
