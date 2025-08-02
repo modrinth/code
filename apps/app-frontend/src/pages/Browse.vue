@@ -7,7 +7,6 @@ import SearchCard from '@/components/ui/SearchCard.vue'
 import { get_search_results } from '@/helpers/cache.js'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
-import type { AppNotificationManager } from '@/providers/app-notifications'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { ClipboardCopyIcon, ExternalIcon, GlobeIcon, SearchIcon, XIcon } from '@modrinth/assets'
 import type { Category, GameVersion, Platform, ProjectType, SortType, Tags } from '@modrinth/ui'
@@ -29,7 +28,7 @@ import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
 import { useRoute, useRouter } from 'vue-router'
 
-const { handleError } = injectNotificationManager() as AppNotificationManager
+const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const router = useRouter()

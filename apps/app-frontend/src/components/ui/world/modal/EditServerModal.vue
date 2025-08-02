@@ -10,13 +10,12 @@ import {
   type ServerPackStatus,
   type ServerWorld,
 } from '@/helpers/worlds.ts'
-import type { AppNotificationManager } from '@/providers/app-notifications'
 import { SaveIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, commonMessages, injectNotificationManager } from '@modrinth/ui'
 import { defineMessage, useVIntl } from '@vintl/vintl'
 import { computed, ref } from 'vue'
 
-const { handleError } = injectNotificationManager() as AppNotificationManager
+const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const emit = defineEmits<{

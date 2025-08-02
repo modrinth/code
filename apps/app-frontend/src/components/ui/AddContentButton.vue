@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { add_project_from_path } from '@/helpers/profile.js'
-import type { AppNotificationManager } from '@/providers/app-notifications'
 import { DropdownIcon, FolderOpenIcon, PlusIcon } from '@modrinth/assets'
 import { ButtonStyled, injectNotificationManager, OverflowMenu } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
 import { useRouter } from 'vue-router'
 
-const { handleError } = injectNotificationManager() as AppNotificationManager
+const { handleError } = injectNotificationManager()
 
 const props = defineProps({
   instance: {

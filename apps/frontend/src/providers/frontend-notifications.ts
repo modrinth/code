@@ -1,25 +1,28 @@
 import { useState } from "#app";
 import {
+  type NotificationPanelLocation,
   type WebNotification,
-  type WebNotificationLocation,
   AbstractWebNotificationManager,
 } from "@modrinth/ui";
 
 export class FrontendNotificationManager extends AbstractWebNotificationManager {
   private readonly state: Ref<WebNotification[]>;
-  private readonly locationState: Ref<WebNotificationLocation>;
+  private readonly locationState: Ref<NotificationPanelLocation>;
 
   public constructor() {
     super();
     this.state = useState<WebNotification[]>("notifications", () => []);
-    this.locationState = useState<WebNotificationLocation>("notifications.location", () => "right");
+    this.locationState = useState<NotificationPanelLocation>(
+      "notifications.location",
+      () => "right",
+    );
   }
 
-  public getNotificationLocation(): WebNotificationLocation {
+  public getNotificationLocation(): NotificationPanelLocation {
     return this.locationState.value;
   }
 
-  public setNotificationLocation(location: WebNotificationLocation): void {
+  public setNotificationLocation(location: NotificationPanelLocation): void {
     this.locationState.value = location;
   }
 

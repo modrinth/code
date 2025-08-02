@@ -18,7 +18,6 @@ import {
   start_join_server,
   start_join_singleplayer_world,
 } from '@/helpers/worlds.ts'
-import type { AppNotificationManager } from '@/providers/app-notifications'
 import { handleSevereError } from '@/store/error'
 import { useTheming } from '@/store/theme.ts'
 import { GAME_MODES, HeadingLink, injectNotificationManager } from '@modrinth/ui'
@@ -26,7 +25,7 @@ import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
-const { handleError } = injectNotificationManager() as AppNotificationManager
+const { handleError } = injectNotificationManager()
 
 const props = defineProps<{
   recentInstances: GameInstance[]

@@ -5,7 +5,6 @@ import { get_search_results } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events'
 import { list } from '@/helpers/profile.js'
 import type { GameInstance } from '@/helpers/types'
-import type { AppNotificationManager } from '@/providers/app-notifications'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { injectNotificationManager } from '@modrinth/ui'
 import type { SearchResult } from '@modrinth/utils'
@@ -13,7 +12,7 @@ import dayjs from 'dayjs'
 import { computed, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-const { handleError } = injectNotificationManager() as AppNotificationManager
+const { handleError } = injectNotificationManager()
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
 

@@ -4,13 +4,12 @@ import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import ServerModalBody from '@/components/ui/world/modal/ServerModalBody.vue'
 import type { GameInstance } from '@/helpers/types'
 import { add_server_to_profile, type ServerPackStatus, type ServerWorld } from '@/helpers/worlds.ts'
-import type { AppNotificationManager } from '@/providers/app-notifications'
 import { PlayIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, commonMessages, injectNotificationManager } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { ref } from 'vue'
 
-const { handleError } = injectNotificationManager() as AppNotificationManager
+const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const emit = defineEmits<{

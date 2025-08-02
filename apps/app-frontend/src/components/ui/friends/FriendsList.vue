@@ -4,7 +4,6 @@ import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { get_user_many } from '@/helpers/cache'
 import { friend_listener } from '@/helpers/events'
 import { add_friend, friend_statuses, friends, remove_friend } from '@/helpers/friends'
-import type { AppNotificationManager } from '@/providers/app-notifications'
 import {
   MailIcon,
   MoreVerticalIcon,
@@ -24,7 +23,7 @@ import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import { computed, onUnmounted, ref, watch } from 'vue'
 
-const { handleError } = injectNotificationManager() as AppNotificationManager
+const { handleError } = injectNotificationManager()
 const formatRelativeTime = useRelativeTime()
 
 const props = defineProps<{

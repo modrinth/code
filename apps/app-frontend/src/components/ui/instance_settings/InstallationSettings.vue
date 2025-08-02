@@ -6,7 +6,6 @@ import { get_project, get_version_many } from '@/helpers/cache'
 import { get_loader_versions } from '@/helpers/metadata'
 import { edit, install, update_repair_modrinth } from '@/helpers/profile'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
-import type { AppNotificationManager } from '@/providers/app-notifications'
 import {
   DownloadIcon,
   HammerIcon,
@@ -42,7 +41,7 @@ import type {
   ManifestLoaderVersion,
 } from '../../../helpers/types'
 
-const { handleError } = injectNotificationManager() as AppNotificationManager
+const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const repairConfirmModal = ref()

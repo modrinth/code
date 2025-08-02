@@ -2,7 +2,6 @@
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { duplicate, edit, edit_icon, list, remove } from '@/helpers/profile'
-import type { AppNotificationManager } from '@/providers/app-notifications'
 import { CopyIcon, EditIcon, PlusIcon, SpinnerIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
 import {
   Avatar,
@@ -18,7 +17,7 @@ import { computed, ref, type Ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import type { GameInstance, InstanceSettingsTabProps } from '../../../helpers/types'
 
-const { handleError } = injectNotificationManager() as AppNotificationManager
+const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const router = useRouter()
 

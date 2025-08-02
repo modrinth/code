@@ -6,7 +6,6 @@ import { get_by_profile_path } from '@/helpers/process'
 import { kill, run } from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
 import { showProfileInFolder } from '@/helpers/utils'
-import type { AppNotificationManager } from '@/providers/app-notifications'
 import { handleSevereError } from '@/store/error'
 import {
   EyeIcon,
@@ -33,7 +32,7 @@ import dayjs from 'dayjs'
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-const { handleError } = injectNotificationManager() as AppNotificationManager
+const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
 

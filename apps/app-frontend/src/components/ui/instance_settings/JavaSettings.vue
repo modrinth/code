@@ -3,14 +3,13 @@ import JavaSelector from '@/components/ui/JavaSelector.vue'
 import useMemorySlider from '@/composables/useMemorySlider'
 import { edit, get_optimal_jre_key } from '@/helpers/profile'
 import { get } from '@/helpers/settings.ts'
-import type { AppNotificationManager } from '@/providers/app-notifications'
 import { CheckCircleIcon, XCircleIcon } from '@modrinth/assets'
 import { Checkbox, injectNotificationManager, Slider } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { computed, readonly, ref, watch } from 'vue'
 import type { AppSettings, InstanceSettingsTabProps, MemorySettings } from '../../../helpers/types'
 
-const { handleError } = injectNotificationManager() as AppNotificationManager
+const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const props = defineProps<InstanceSettingsTabProps>()

@@ -151,7 +151,6 @@ import {
   start_join_server,
   start_join_singleplayer_world,
 } from '@/helpers/worlds.ts'
-import type { AppNotificationManager } from '@/providers/app-notifications'
 import { PlusIcon, SearchIcon, SpinnerIcon, UpdatedIcon, XIcon } from '@modrinth/assets'
 import {
   Button,
@@ -168,7 +167,7 @@ import { defineMessages } from '@vintl/vintl'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
-const { handleError } = injectNotificationManager() as AppNotificationManager
+const { handleError } = injectNotificationManager()
 const route = useRoute()
 
 const addServerModal = ref<InstanceType<typeof AddServerModal>>()

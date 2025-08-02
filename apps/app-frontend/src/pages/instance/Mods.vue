@@ -273,7 +273,6 @@ import {
 } from '@/helpers/profile.js'
 import type { CacheBehaviour, ContentFile, GameInstance } from '@/helpers/types'
 import { highlightModInProfile } from '@/helpers/utils.js'
-import type { AppNotificationManager } from '@/providers/app-notifications'
 import {
   CheckCircleIcon,
   ClipboardCopyIcon,
@@ -311,7 +310,7 @@ import dayjs from 'dayjs'
 import type { ComputedRef } from 'vue'
 import { computed, onUnmounted, ref, watch } from 'vue'
 
-const { handleError } = injectNotificationManager() as AppNotificationManager
+const { handleError } = injectNotificationManager()
 
 const props = defineProps<{
   instance: GameInstance

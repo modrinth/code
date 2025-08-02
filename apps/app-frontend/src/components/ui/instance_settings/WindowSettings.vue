@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { edit } from '@/helpers/profile'
 import { get } from '@/helpers/settings.ts'
-import type { AppNotificationManager } from '@/providers/app-notifications'
 import { Checkbox, injectNotificationManager, Toggle } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { computed, ref, type Ref, watch } from 'vue'
 import type { AppSettings, InstanceSettingsTabProps } from '../../../helpers/types'
 
-const { handleError } = injectNotificationManager() as AppNotificationManager
+const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const props = defineProps<InstanceSettingsTabProps>()

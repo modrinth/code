@@ -1,33 +1,25 @@
 import {
   AbstractWebNotificationManager,
+  type NotificationPanelLocation,
   type WebNotification,
-  type WebNotificationLocation,
 } from '@modrinth/ui'
 import { ref, type Ref } from 'vue'
 
 export class AppNotificationManager extends AbstractWebNotificationManager {
   private readonly state: Ref<WebNotification[]>
-  private readonly locationState: Ref<WebNotificationLocation>
+  private readonly locationState: Ref<NotificationPanelLocation>
 
   public constructor() {
     super()
     this.state = ref<WebNotification[]>([])
-    this.locationState = ref<WebNotificationLocation>('right')
+    this.locationState = ref<NotificationPanelLocation>('right')
   }
 
-  public handleError = (error: Error): void => {
-    this.addNotification({
-      title: 'An error occurred',
-      text: error.message ?? error,
-      type: 'error',
-    })
-  }
-
-  public getNotificationLocation(): WebNotificationLocation {
+  public getNotificationLocation(): NotificationPanelLocation {
     return this.locationState.value
   }
 
-  public setNotificationLocation(location: WebNotificationLocation): void {
+  public setNotificationLocation(location: NotificationPanelLocation): void {
     this.locationState.value = location
   }
 

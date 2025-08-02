@@ -113,7 +113,6 @@ import {
   type Skin,
   type SkinModel,
 } from '@/helpers/skins.ts'
-import type { AppNotificationManager } from '@/providers/app-notifications'
 import {
   CheckIcon,
   ChevronRightIcon,
@@ -133,7 +132,7 @@ import {
 } from '@modrinth/ui'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
-const { handleError } = injectNotificationManager() as AppNotificationManager
+const { handleError } = injectNotificationManager()
 
 const modal = useTemplateRef('modal')
 const selectCapeModal = useTemplateRef('selectCapeModal')

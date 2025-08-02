@@ -20,7 +20,6 @@ import {
   remove_custom_skin,
   set_default_cape,
 } from '@/helpers/skins.ts'
-import type { AppNotificationManager } from '@/providers/app-notifications'
 import { handleSevereError } from '@/store/error'
 import {
   EditIcon,
@@ -48,7 +47,7 @@ const editSkinModal = useTemplateRef('editSkinModal')
 const selectCapeModal = useTemplateRef('selectCapeModal')
 const uploadSkinModal = useTemplateRef('uploadSkinModal')
 
-const notifications = injectNotificationManager() as AppNotificationManager
+const notifications = injectNotificationManager()
 const { handleError } = notifications
 
 const settings = ref(await getSettings())

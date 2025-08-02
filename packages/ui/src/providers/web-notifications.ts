@@ -10,35 +10,47 @@ export interface WebNotification {
   timer?: NodeJS.Timeout
 }
 
-export type WebNotificationLocation = 'left' | 'right'
+export type NotificationPanelLocation = 'left' | 'right'
 
 export abstract class AbstractWebNotificationManager {
   protected readonly AUTO_DISMISS_DELAY_MS = 30 * 1000
 
   abstract getNotifications(): WebNotification[]
-  abstract getNotificationLocation(): WebNotificationLocation
-  abstract setNotificationLocation(location: WebNotificationLocation): void
+  abstract getNotificationLocation(): NotificationPanelLocation
+  abstract setNotificationLocation(location: NotificationPanelLocation): void
 
   protected abstract addNotificationToStorage(notification: WebNotification): void
   protected abstract removeNotificationFromStorage(id: string | number): void
   protected abstract removeNotificationFromStorageByIndex(index: number): void
   protected abstract clearAllNotificationsFromStorage(): void
 
-  addNotification = (notification: Partial<WebNotification>): void => {
+  addNotification = (notification: Partial<WebNotification>): WebNotification => {
     const existingNotif = this.findExistingNotification(notification)
 
     if (existingNotif) {
       this.refreshNotificationTimer(existingNotif)
       existingNotif.count = (existingNotif.count || 0) + 1
-      return
+      return existingNotif
     }
 
     const newNotification = this.createNotification(notification)
     this.setNotificationTimer(newNotification)
     this.addNotificationToStorage(newNotification)
+    return newNotification
   }
 
-  removeNotification = (id: string | number): void => {
+  /**
+   * @deprecated You should use `addNotification` instead to provide a more human-readable error message to the user.
+   */
+  handleError = (error: Error): void => {
+    this.addNotification({
+      title: 'An error occurred',
+      text: error.message ?? error,
+      type: 'error',
+    })
+  }
+
+  removeNotification = (id: string | number): WebNotification | undefined => {
     const notifications = this.getNotifications()
     const notification = notifications.find((n) => n.id === id)
 
@@ -46,16 +58,22 @@ export abstract class AbstractWebNotificationManager {
       this.clearNotificationTimer(notification)
       this.removeNotificationFromStorage(id)
     }
+
+    return notification
   }
 
-  removeNotificationByIndex = (index: number): void => {
+  removeNotificationByIndex = (index: number): WebNotification | null => {
     const notifications = this.getNotifications()
 
     if (index >= 0 && index < notifications.length) {
       const notification = notifications[index]
       this.clearNotificationTimer(notification)
       this.removeNotificationFromStorageByIndex(index)
+
+      return notification
     }
+
+    return null
   }
 
   clearAllNotifications = (): void => {
