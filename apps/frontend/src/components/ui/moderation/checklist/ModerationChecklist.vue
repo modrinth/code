@@ -259,7 +259,7 @@
                 </button>
               </ButtonStyled>
               <ButtonStyled color="green">
-                <button @click="sendMessage('approved')">
+                <button @click="sendMessage(project.requested_status ?? 'approved')">
                   <CheckIcon aria-hidden="true" />
                   Approve
                 </button>
@@ -364,6 +364,7 @@ import {
   type ModerationModpackItem,
   type Project,
   renderHighlightedString,
+  type ProjectStatus,
 } from "@modrinth/utils";
 import { computedAsync, useLocalStorage } from "@vueuse/core";
 import * as prettier from "prettier";
@@ -528,7 +529,7 @@ function handleKeybinds(event: KeyboardEvent) {
         tryResetProgress: resetProgress,
         tryExitModeration: () => emit("exit"),
 
-        tryApprove: () => sendMessage("approved"),
+        tryApprove: () => sendMessage(props.project.requested_status),
         tryReject: () => sendMessage("rejected"),
         tryWithhold: () => sendMessage("withheld"),
         tryEditMessage: goBackToStages,
@@ -1209,7 +1210,7 @@ function generateModpackMessage(allFiles: {
 }
 
 const hasNextProject = ref(false);
-async function sendMessage(status: "approved" | "rejected" | "withheld") {
+async function sendMessage(status: ProjectStatus) {
   try {
     await useBaseFetch(`project/${props.project.id}`, {
       method: "PATCH",
