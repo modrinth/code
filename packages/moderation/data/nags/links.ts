@@ -26,6 +26,7 @@ export const commonLinkDomains = {
     'buymeacoffee.com',
     'google.com',
     'example.com',
+    't.me',
   ],
   linkShorteners: ['bit.ly', 'adf.ly', 'tinyurl.com', 'short.io', 'is.gd'],
 }
