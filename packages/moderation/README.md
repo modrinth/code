@@ -22,7 +22,6 @@ The package is organized as follows:
 │   │   └── ...             # One file per stage
 │   └── nags/               # Publishing checklist (nag system) files
 │       ├── core.ts         # Core nags (required fields, basic validation)
-│       ├── core.i18n.ts    # Internationalization messages for core nags
 │       └── ...
 └── types/                  # Type definitions
     ├── actions.ts          # Action-related types (moderation)
@@ -175,22 +174,7 @@ A nag represents a specific issue or suggestion for improvement. Each nag has:
 
 ### Internationalization
 
-Each nag category has a corresponding `.i18n.ts` file containing message definitions:
-
-```typescript
-// Example from core.i18n.ts
-export default defineMessages({
-  addDescriptionTitle: {
-    id: 'nags.add-description.title',
-    defaultMessage: 'Add a description',
-  },
-  addDescriptionDescription: {
-    id: 'nags.add-description.description',
-    defaultMessage:
-      "A description that clearly describes the project's purpose and function is required.",
-  },
-})
-```
+Use vintl's `defineMessage` syntax.
 
 If you want to use context in the messages, you can do so like this:
 
@@ -198,7 +182,7 @@ If you want to use context in the messages, you can do so like this:
 description: (context: NagContext) => {
   const { formatMessage } = useVIntl()
 
-  return formatMessage(messages.descriptionTooShortDescription, {
+  return formatMessage(defineMessage(...), {
     length: context.project.body?.length || 0,
     minChars: MIN_DESCRIPTION_CHARS,
   })
