@@ -2,6 +2,10 @@ import type { Project } from '@modrinth/utils'
 import type { Nag, NagContext } from '../../types/nags'
 import { useVIntl, defineMessage } from '@vintl/vintl'
 
+const allResolutionTags = ['8x-', '16x', '32x', '48x', '64x', '128x', '256x', '512x+']
+
+const MAX_TAG_COUNT = 8
+
 function getCategories(
   project: Project & { actualProjectType: string },
   tags: {
@@ -22,21 +26,23 @@ export const tagsNags: Nag[] = [
     id: 'too-many-tags',
     title: defineMessage({
       id: 'nags.too-many-tags.title',
-      defaultMessage: 'Too many tags selected',
+      defaultMessage: 'Select accurate tags',
     }),
     description: (context: NagContext) => {
       const { formatMessage } = useVIntl()
       const tagCount =
         context.project.categories.length + (context.project.additional_categories?.length || 0)
+      const maxTagCount = MAX_TAG_COUNT
 
       return formatMessage(
         defineMessage({
           id: 'nags.too-many-tags.description',
           defaultMessage:
-            "You've selected {tagCount} tags. Consider reducing to 5 or fewer to keep your project focused and easier to discover.",
+            "You've selected {tagCount} tags. Consider reducing to {maxTagCount} or fewer to make sure your project appears in relevant search results.",
         }),
         {
           tagCount,
+          maxTagCount,
         },
       )
     },
@@ -44,7 +50,7 @@ export const tagsNags: Nag[] = [
     shouldShow: (context: NagContext) => {
       const tagCount =
         context.project.categories.length + (context.project.additional_categories?.length || 0)
-      return tagCount > 5
+      return tagCount > MAX_TAG_COUNT
     },
     link: {
       path: 'settings/tags',
@@ -59,13 +65,13 @@ export const tagsNags: Nag[] = [
     id: 'multiple-resolution-tags',
     title: defineMessage({
       id: 'nags.multiple-resolution-tags.title',
-      defaultMessage: 'Multiple resolution tags selected',
+      defaultMessage: 'Select correct resolution',
     }),
     description: (context: NagContext) => {
       const { formatMessage } = useVIntl()
-      const resolutionTags = context.project.categories.filter((tag: string) =>
-        ['16x', '32x', '48x', '64x', '128x', '256x', '512x', '1024x'].includes(tag),
-      )
+      const resolutionTags = context.project.categories
+        .concat(context.project.additional_categories)
+        .filter((tag: string) => allResolutionTags.includes(tag))
 
       return formatMessage(
         defineMessage({
@@ -75,7 +81,10 @@ export const tagsNags: Nag[] = [
         }),
         {
           count: resolutionTags.length,
-          tags: resolutionTags.join(', '),
+          tags: resolutionTags
+            .join(', ')
+            .replace('8x-', '8x or lower')
+            .replace('512x+', '512x or higher'),
         },
       )
     },
@@ -83,9 +92,9 @@ export const tagsNags: Nag[] = [
     shouldShow: (context: NagContext) => {
       if (context.project.project_type !== 'resourcepack') return false
 
-      const resolutionTags = context.project.categories.filter((tag: string) =>
-        ['16x', '32x', '48x', '64x', '128x', '256x', '512x', '1024x'].includes(tag),
-      )
+      const resolutionTags = context.project.categories
+        .concat(context.project.additional_categories)
+        .filter((tag: string) => allResolutionTags.includes(tag))
       return resolutionTags.length > 1
     },
     link: {
@@ -101,7 +110,7 @@ export const tagsNags: Nag[] = [
     id: 'all-tags-selected',
     title: defineMessage({
       id: 'nags.all-tags-selected.title',
-      defaultMessage: 'All tags selected',
+      defaultMessage: 'Select accurate tags',
     }),
     description: (context: NagContext) => {
       const { formatMessage } = useVIntl()
@@ -115,7 +124,7 @@ export const tagsNags: Nag[] = [
         defineMessage({
           id: 'nags.all-tags-selected.description',
           defaultMessage:
-            "You've selected all {totalAvailableTags} available tags. This defeats the purpose of tags, which are meant to help users find relevant projects. Please select only the tags that truly apply to your project.",
+            "You've selected all {totalAvailableTags} available tags. This defeats the purpose of tags, which are meant to help users find relevant projects. Please select only the tags that are relevant to your project.",
         }),
         {
           totalAvailableTags,

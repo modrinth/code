@@ -68,7 +68,7 @@ export const linksNags: Nag[] = [
     description: defineMessage({
       id: 'nags.verify-external-links.description',
       defaultMessage:
-        "Some of your external links may be using domains that aren't recognized as common for their link type.",
+        'Some of your external links may be using domains that are inappropriate for that type of link.',
     }),
     status: 'warning',
     shouldShow: (context: NagContext) => {
@@ -91,12 +91,12 @@ export const linksNags: Nag[] = [
     id: 'misused-discord-link',
     title: defineMessage({
       id: 'nags.misused-discord-link.title',
-      defaultMessage: 'Misplaced Discord invite',
+      defaultMessage: 'Move Discord invite',
     }),
     description: defineMessage({
       id: 'nags.misused-discord-link-description',
       defaultMessage:
-        'Discord invites can not be used for other link types. Please put your Discord link in the Discord Invite link field.',
+        'Discord invites can not be used for other link types. Please put your Discord link in the Discord Invite link field only.',
     }),
     status: 'required',
     shouldShow: (context: NagContext) =>
@@ -116,7 +116,7 @@ export const linksNags: Nag[] = [
     id: 'link-shortener-usage',
     title: defineMessage({
       id: 'nags.link-shortener-usage.title',
-      defaultMessage: 'Use of link shorteners is prohibited',
+      defaultMessage: "Don't use link shorteners",
     }),
     description: defineMessage({
       id: 'nags.link-shortener-usage.description',
@@ -134,7 +134,7 @@ export const linksNags: Nag[] = [
     id: 'invalid-license-url',
     title: defineMessage({
       id: 'nags.invalid-license-url.title',
-      defaultMessage: 'Invalid license URL',
+      defaultMessage: 'Add a valid license link',
     }),
     description: (context: NagContext) => {
       const { formatMessage } = useVIntl()
@@ -169,7 +169,7 @@ export const linksNags: Nag[] = [
         )
       }
     },
-    status: 'warning',
+    status: 'required',
     shouldShow: (context: NagContext) => {
       const licenseUrl = context.project.license.url
       if (!licenseUrl) return false
@@ -196,7 +196,7 @@ export const linksNags: Nag[] = [
     id: 'gpl-license-source-required',
     title: defineMessage({
       id: 'nags.gpl-license-source-required.title',
-      defaultMessage: 'License requires source',
+      defaultMessage: 'Provide source code',
     }),
     description: (context: NagContext) => {
       const { formatMessage } = useVIntl()
@@ -205,7 +205,7 @@ export const linksNags: Nag[] = [
         defineMessage({
           id: 'nags.gpl-license-source-required.description',
           defaultMessage:
-            'Your {projectType} uses a license which requires source code to be available. Please provide a source code link or sources file, or consider using a different license.',
+            'Your {projectType} uses a license which requires source code to be available. Please provide a source code link or sources file for each additional version, or consider using a different license.',
         }),
         {
           projectType: formatProjectType(context.project.project_type).toLowerCase(),
