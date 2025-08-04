@@ -42,9 +42,9 @@
         <div v-if="done">
           <p>
             You are done moderating this project!
-            <template v-if="futureProjectCount > 0">
+            <template v-if="moderationStore.hasItems">
               There are
-              {{ futureProjectCount }} left.
+              {{ moderationStore.queueLength }} left.
             </template>
           </p>
         </div>
@@ -98,7 +98,7 @@
             <div v-if="toggleActions.length > 0" class="toggle-actions-group space-y-3">
               <template v-for="action in toggleActions" :key="getActionKey(action)">
                 <Checkbox
-                  :model-value="actionStates[getActionId(action)]?.selected ?? false"
+                  :model-value="isActionSelected(action)"
                   :label="action.label"
                   :description="action.description"
                   :disabled="false"
@@ -215,26 +215,26 @@
           class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
         >
           <div class="flex items-center gap-2">
-            <ButtonStyled v-if="!done && !generatedMessage && futureProjectCount > 0">
-              <button @click="goToNextProject">
+            <ButtonStyled v-if="!done && !generatedMessage && moderationStore.hasItems">
+              <button @click="skipCurrentProject">
                 <XIcon aria-hidden="true" />
-                Skip
+                Skip ({{ moderationStore.queueLength }} left)
               </button>
             </ButtonStyled>
           </div>
 
           <div class="flex items-center gap-2">
             <div v-if="done">
-              <ButtonStyled v-if="futureProjectCount > 0" color="brand">
-                <button @click="goToNextProject">
-                  <RightArrowIcon aria-hidden="true" />
-                  Next Project
-                </button>
-              </ButtonStyled>
-              <ButtonStyled v-else color="brand">
-                <button @click="exitModeration">
-                  <CheckIcon aria-hidden="true" />
-                  Done
+              <ButtonStyled color="brand">
+                <button @click="endChecklist(undefined)">
+                  <template v-if="hasNextProject">
+                    <RightArrowIcon aria-hidden="true" />
+                    Next Project ({{ moderationStore.queueLength }} left)
+                  </template>
+                  <template v-else>
+                    <CheckIcon aria-hidden="true" />
+                    All Done!
+                  </template>
                 </button>
               </ButtonStyled>
             </div>
@@ -259,7 +259,7 @@
                 </button>
               </ButtonStyled>
               <ButtonStyled color="green">
-                <button @click="sendMessage('approved')">
+                <button @click="sendMessage(project.requested_status ?? 'approved')">
                   <CheckIcon aria-hidden="true" />
                   Approve
                 </button>
@@ -355,6 +355,7 @@ import {
   renderHighlightedString,
   type ModerationJudgements,
   type ModerationModpackItem,
+  type ProjectStatus,
 } from "@modrinth/utils";
 import { computedAsync, useLocalStorage } from "@vueuse/core";
 import {
@@ -370,27 +371,19 @@ import {
 import * as prettier from "prettier";
 import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
 import KeybindsModal from "./ChecklistKeybindsModal.vue";
+import { useModerationStore } from "~/store/moderation.ts";
 
 const keybindsModal = ref<InstanceType<typeof KeybindsModal>>();
 
-const props = withDefaults(
-  defineProps<{
-    project: Project;
-    futureProjectIds?: string[];
-    collapsed: boolean;
-  }>(),
-  {
-    futureProjectIds: () => [] as string[],
-  },
-);
+const props = defineProps<{
+  project: Project;
+  collapsed: boolean;
+}>();
+
+const moderationStore = useModerationStore();
 
 const variables = computed(() => {
   return flattenProjectVariables(props.project);
-});
-
-const futureProjectCount = computed(() => {
-  const ids = JSON.parse(localStorage.getItem("moderation-future-projects") || "[]");
-  return ids.length;
 });
 
 const modpackPermissionsComplete = ref(false);
@@ -516,7 +509,7 @@ function handleKeybinds(event: KeyboardEvent) {
         isLoadingMessage: loadingMessage.value,
         isModpackPermissionsStage: isModpackPermissionsStage.value,
 
-        futureProjectCount: futureProjectCount.value,
+        futureProjectCount: moderationStore.queueLength,
         visibleActionsCount: visibleActions.value.length,
 
         focusedActionIndex: focusedActionIndex.value,
@@ -529,13 +522,13 @@ function handleKeybinds(event: KeyboardEvent) {
         tryGoNext: nextStage,
         tryGoBack: previousStage,
         tryGenerateMessage: generateMessage,
-        trySkipProject: goToNextProject,
+        trySkipProject: skipCurrentProject,
 
         tryToggleCollapse: () => emit("toggleCollapsed"),
         tryResetProgress: resetProgress,
         tryExitModeration: () => emit("exit"),
 
-        tryApprove: () => sendMessage("approved"),
+        tryApprove: () => sendMessage(props.project.requested_status),
         tryReject: () => sendMessage("rejected"),
         tryWithhold: () => sendMessage("withheld"),
         tryEditMessage: goBackToStages,
@@ -652,12 +645,17 @@ function initializeStageActions(stage: Stage, stageIndex: number) {
 }
 
 function getActionId(action: Action, index?: number): string {
+  // If index is not provided, find it in the current stage's actions
+  if (index === undefined) {
+    index = currentStageObj.value.actions.indexOf(action);
+  }
   return getActionIdForStage(action, currentStage.value, index);
 }
 
 function getActionKey(action: Action): string {
-  const index = visibleActions.value.indexOf(action);
-  return `${currentStage.value}-${index}-${getActionId(action)}`;
+  // Find the actual index of this action in the current stage's actions array
+  const index = currentStageObj.value.actions.indexOf(action);
+  return `${currentStage.value}-${index}-${getActionId(action, index)}`;
 }
 
 const visibleActions = computed(() => {
@@ -727,7 +725,8 @@ const multiSelectActions = computed(() =>
 );
 
 function getDropdownValue(action: DropdownAction) {
-  const actionId = getActionId(action);
+  const actionIndex = currentStageObj.value.actions.indexOf(action);
+  const actionId = getActionId(action, actionIndex);
   const visibleOptions = getVisibleDropdownOptions(action);
   const currentValue = actionStates.value[actionId]?.value ?? action.defaultOption ?? 0;
 
@@ -742,12 +741,14 @@ function getDropdownValue(action: DropdownAction) {
 }
 
 function isActionSelected(action: Action): boolean {
-  const actionId = getActionId(action);
+  const actionIndex = currentStageObj.value.actions.indexOf(action);
+  const actionId = getActionId(action, actionIndex);
   return actionStates.value[actionId]?.selected || false;
 }
 
 function toggleAction(action: Action) {
-  const actionId = getActionId(action);
+  const actionIndex = currentStageObj.value.actions.indexOf(action);
+  const actionId = getActionId(action, actionIndex);
   const state = actionStates.value[actionId];
   if (state) {
     state.selected = !state.selected;
@@ -756,7 +757,8 @@ function toggleAction(action: Action) {
 }
 
 function selectDropdownOption(action: DropdownAction, selected: any) {
-  const actionId = getActionId(action);
+  const actionIndex = currentStageObj.value.actions.indexOf(action);
+  const actionId = getActionId(action, actionIndex);
   const state = actionStates.value[actionId];
   if (state && selected !== undefined && selected !== null) {
     const optionIndex = action.options.findIndex(
@@ -772,7 +774,8 @@ function selectDropdownOption(action: DropdownAction, selected: any) {
 }
 
 function isChipSelected(action: MultiSelectChipsAction, optionIndex: number): boolean {
-  const actionId = getActionId(action);
+  const actionIndex = currentStageObj.value.actions.indexOf(action);
+  const actionId = getActionId(action, actionIndex);
   const selectedSet = actionStates.value[actionId]?.value as Set<number> | undefined;
 
   const visibleOptions = getVisibleMultiSelectOptions(action);
@@ -783,7 +786,8 @@ function isChipSelected(action: MultiSelectChipsAction, optionIndex: number): bo
 }
 
 function toggleChip(action: MultiSelectChipsAction, optionIndex: number) {
-  const actionId = getActionId(action);
+  const actionIndex = currentStageObj.value.actions.indexOf(action);
+  const actionId = getActionId(action, actionIndex);
   const state = actionStates.value[actionId];
   if (state && state.value instanceof Set) {
     const visibleOptions = getVisibleMultiSelectOptions(action);
@@ -1056,7 +1060,7 @@ function nextStage() {
   if (isModpackPermissionsStage.value && !modpackPermissionsComplete.value) {
     addNotification({
       title: "Modpack permissions stage unfinished",
-      message: "Please complete the modpack permissions stage before proceeding.",
+      text: "Please complete the modpack permissions stage before proceeding.",
       type: "error",
     });
 
@@ -1133,7 +1137,7 @@ async function generateMessage() {
     console.error("Error generating message:", error);
     addNotification({
       title: "Error generating message",
-      message: "Failed to generate moderation message. Please try again.",
+      text: "Failed to generate moderation message. Please try again.",
       type: "error",
     });
   } finally {
@@ -1161,6 +1165,8 @@ function generateModpackMessage(allFiles: {
       attributeMods.push(file.file_name);
     } else if (file.status === "no" && file.approved === "no") {
       noMods.push(file.file_name);
+    } else if (file.status === "permanent-no") {
+      permanentNoMods.push(file.file_name);
     }
   });
 
@@ -1202,7 +1208,8 @@ function generateModpackMessage(allFiles: {
   return issues.join("\n\n");
 }
 
-async function sendMessage(status: "approved" | "rejected" | "withheld") {
+const hasNextProject = ref(false);
+async function sendMessage(status: ProjectStatus) {
   try {
     await useBaseFetch(`project/${props.project.id}`, {
       method: "PATCH",
@@ -1236,55 +1243,73 @@ async function sendMessage(status: "approved" | "rejected" | "withheld") {
 
     done.value = true;
 
-    // Clear local storage for future reviews
-    localStorage.removeItem(`modpack-permissions-${props.project.id}`);
-    localStorage.removeItem(`modpack-permissions-index-${props.project.id}`);
-    localStorage.removeItem(`moderation-actions-${props.project.slug}`);
-    localStorage.removeItem(`moderation-inputs-${props.project.slug}`);
-    actionStates.value = {};
-
-    addNotification({
-      title: "Moderation submitted",
-      message: `Project ${status} successfully.`,
-      type: "success",
-    });
+    hasNextProject.value = await moderationStore.completeCurrentProject(
+      props.project.id,
+      "completed",
+    );
   } catch (error) {
     console.error("Error submitting moderation:", error);
     addNotification({
       title: "Error submitting moderation",
-      message: "Failed to submit moderation decision. Please try again.",
+      text: "Failed to submit moderation decision. Please try again.",
       type: "error",
     });
   }
 }
 
-async function goToNextProject() {
-  const currentIds = JSON.parse(localStorage.getItem("moderation-future-projects") || "[]");
+async function endChecklist(status?: string) {
+  clearProjectLocalStorage();
 
-  if (currentIds.length === 0) {
-    await navigateTo("/moderation/review");
-    return;
+  if (!hasNextProject.value) {
+    await navigateTo({
+      name: "moderation",
+      state: {
+        confetti: true,
+      },
+    });
+
+    await nextTick();
+
+    if (moderationStore.currentQueue.total > 1) {
+      addNotification({
+        title: "Moderation completed",
+        text: `You have completed the moderation queue.`,
+        type: "success",
+      });
+    } else {
+      addNotification({
+        title: "Moderation submitted",
+        text: `Project ${status ?? "completed successfully"}.`,
+        type: "success",
+      });
+    }
+  } else {
+    navigateTo({
+      name: "type-id",
+      params: {
+        type: "project",
+        id: moderationStore.getCurrentProjectId(),
+      },
+      state: {
+        showChecklist: true,
+      },
+    });
   }
-
-  const nextProjectId = currentIds[0];
-  const remainingIds = currentIds.slice(1);
-
-  localStorage.setItem("moderation-future-projects", JSON.stringify(remainingIds));
-
-  await router.push({
-    name: "type-id",
-    params: {
-      type: "project",
-      id: nextProjectId,
-    },
-    state: {
-      showChecklist: true,
-    },
-  });
 }
 
-async function exitModeration() {
-  await navigateTo("/moderation/review");
+async function skipCurrentProject() {
+  hasNextProject.value = await moderationStore.completeCurrentProject(props.project.id, "skipped");
+
+  await endChecklist("skipped");
+}
+
+function clearProjectLocalStorage() {
+  localStorage.removeItem(`modpack-permissions-${props.project.id}`);
+  localStorage.removeItem(`modpack-permissions-index-${props.project.id}`);
+  localStorage.removeItem(`moderation-actions-${props.project.slug}`);
+  localStorage.removeItem(`moderation-inputs-${props.project.slug}`);
+  localStorage.removeItem(`moderation-stage-${props.project.slug}`);
+  actionStates.value = {};
 }
 
 const isLastVisibleStage = computed(() => {

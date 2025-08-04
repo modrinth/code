@@ -1,5 +1,4 @@
----
-
 ## Corrections Applied
 
-I've gone ahead and corrected the issues listed above so your project can be Approved.
+Your submission contained some issues which may have prevented your project from being published.  
+These have been corrected by our Moderation Team so your project can be Approved, be sure to read and understand each issue listed below to ensure a smooth review for your next submission.

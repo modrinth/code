@@ -295,7 +295,7 @@
               {
                 id: 'review-projects',
                 color: 'orange',
-                link: '/moderation/review',
+                link: '/moderation/',
               },
               {
                 id: 'review-reports',
@@ -980,23 +980,6 @@ const userMenuOptions = computed(() => {
       link: "/dashboard/analytics",
     },
   ];
-
-  if (
-    (auth.value && auth.value.user && auth.value.user.role === "moderator") ||
-    auth.value.user.role === "admin"
-  ) {
-    options = [
-      ...options,
-      {
-        divider: true,
-      },
-      {
-        id: "moderation",
-        color: "orange",
-        link: "/moderation/review",
-      },
-    ];
-  }
 
   options = [
     ...options,

@@ -18,7 +18,7 @@ export type DonationPlatform =
   | { short: 'ko-fi'; name: 'Ko-fi' }
   | { short: 'other'; name: 'Other' }
 
-export type ProjectType = 'mod' | 'modpack' | 'resourcepack' | 'shader'
+export type ProjectType = 'mod' | 'modpack' | 'resourcepack' | 'shader' | 'plugin' | 'datapack'
 export type MonetizationStatus = 'monetized' | 'demonetized' | 'force-demonetized'
 
 export type GameVersion = string
@@ -65,7 +65,8 @@ export interface Project {
   client_side: Environment
   server_side: Environment
 
-  team: ModrinthId
+  team?: ModrinthId
+  team_id: ModrinthId
   thread_id: ModrinthId
   organization: ModrinthId
 
@@ -76,6 +77,7 @@ export interface Project {
   donation_urls: DonationLink<DonationPlatform>[]
 
   published: string
+  created?: string
   updated: string
   approved: string
   queued: string
@@ -295,6 +297,60 @@ export type Report = {
   body: string
 }
 
+// Threads
+export interface Thread {
+  id: string
+  type: ThreadType
+  project_id: string | null
+  report_id: string | null
+  messages: ThreadMessage[]
+  members: User[]
+}
+
+export type ThreadType = 'project' | 'report' | 'direct_message'
+
+export interface ThreadMessage {
+  id: string | null
+  author_id: string | null
+  body: MessageBody
+  created: string
+  hide_identity: boolean
+}
+
+export type MessageBody =
+  | TextMessageBody
+  | StatusChangeMessageBody
+  | ThreadClosureMessageBody
+  | ThreadReopenMessageBody
+  | DeletedMessageBody
+
+export interface TextMessageBody {
+  type: 'text'
+  body: string
+  private: boolean
+  replying_to: string | null
+  associated_images: string[]
+}
+
+export interface StatusChangeMessageBody {
+  type: 'status_change'
+  new_status: ProjectStatus
+  old_status: ProjectStatus
+}
+
+export interface ThreadClosureMessageBody {
+  type: 'thread_closure'
+}
+
+export interface ThreadReopenMessageBody {
+  type: 'thread_reopen'
+}
+
+export interface DeletedMessageBody {
+  type: 'deleted'
+  private: boolean
+}
+
 // Moderation
 export interface ModerationModpackPermissionApprovalType {
   id:
@@ -378,4 +434,39 @@ export interface ModerationJudgement {
 
 export interface ModerationJudgements {
   [sha1: string]: ModerationJudgement
+}
+
+// Delphi
+export interface DelphiReport {
+  id: string
+  project: Project
+  version: Version
+  priority_score: number
+  detected_at: string
+  trace_type:
+    | 'reflection_indirection'
+    | 'xor_obfuscation'
+    | 'included_libraries'
+    | 'suspicious_binaries'
+    | 'corrupt_classes'
+    | 'suspicious_classes'
+    | 'url_usage'
+    | 'classloader_usage'
+    | 'processbuilder_usage'
+    | 'runtime_exec_usage'
+    | 'jni_usage'
+    | 'main_method'
+    | 'native_loading'
+    | 'malformed_jar'
+    | 'nested_jar_too_deep'
+    | 'failed_decompilation'
+    | 'analysis_failure'
+    | 'malware_easyforme'
+    | 'malware_simplyloader'
+  file_path: string
+  // pending = not reviewed yet.
+  // approved = approved as malicious, removed from modrinth
+  // rejected = not approved as malicious, remains on modrinth?
+  status: 'pending' | 'approved' | 'rejected'
+  content?: string
 }

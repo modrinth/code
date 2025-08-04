@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref } from "vue";
 import NewModal from "@modrinth/ui/src/components/modal/NewModal.vue";
 import { keybinds, type KeybindListener, normalizeKeybind } from "@modrinth/moderation";
 
@@ -64,7 +64,7 @@ function parseKeybindDisplay(keybind: KeybindListener["keybind"]): string[] {
 }
 
 function isMac() {
-  return navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+  return navigator.platform.toUpperCase().includes("MAC");
 }
 
 function show(event?: MouseEvent) {
