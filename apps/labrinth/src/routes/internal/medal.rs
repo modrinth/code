@@ -45,7 +45,7 @@ pub async fn verify(
     }
 }
 
-#[post("redeem")]
+#[post("redeem", guard = "medal_key_guard")]
 pub async fn redeem(
     _req: HttpRequest,
     _pool: web::Data<PgPool>,
