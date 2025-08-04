@@ -1,6 +1,7 @@
 plugins {
     java
     id("com.diffplug.spotless") version "7.0.4"
+    id("com.gradleup.shadow") version "9.0.0-rc2"
 }
 
 repositories {
@@ -8,6 +9,9 @@ repositories {
 }
 
 dependencies {
+    implementation("org.ow2.asm:asm:9.8")
+    implementation("org.ow2.asm:asm-tree:9.8")
+
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
@@ -31,7 +35,17 @@ spotless {
 }
 
 tasks.jar {
+    enabled = false
+}
+
+tasks.shadowJar {
     archiveFileName = "theseus.jar"
+    manifest {
+        attributes["Premain-Class"] = "com.modrinth.theseus.agent.TheseusAgent"
+    }
+
+    enableRelocation = true
+    relocationPrefix = "com.modrinth.theseus.shadow"
 }
 
 tasks.named<Test>("test") {
