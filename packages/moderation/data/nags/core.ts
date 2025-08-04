@@ -11,7 +11,8 @@ export const coreNags: Nag[] = [
     }),
     description: defineMessage({
       id: 'nags.moderator-feedback.description',
-      defaultMessage: 'Review and address all concerns from Moderation before resubmitting.',
+      defaultMessage:
+        'Review and address all concerns from the moderation team before resubmitting.',
     }),
     status: 'warning',
     shouldShow: (context: NagContext) =>
@@ -124,7 +125,7 @@ export const coreNags: Nag[] = [
     description: defineMessage({
       id: 'nags.select-tags.description',
       defaultMessage:
-        'Select the tags that correctly apply to your project to make sure the right users find it.',
+        'Select the tags that correctly apply to your project to help the right users find it.',
     }),
     status: 'suggestion',
     shouldShow: (context: NagContext) =>
@@ -147,7 +148,7 @@ export const coreNags: Nag[] = [
     description: defineMessage({
       id: 'nags.add-links.description',
       defaultMessage:
-        'Add any relevant links targeted outside of Modrinth, such as sources, issues, or a Discord invite.',
+        'Add any relevant links targeted outside of Modrinth, such as source code, an issue tracker, or a Discord invite.',
     }),
     status: 'suggestion',
     shouldShow: (context: NagContext) =>
@@ -211,7 +212,7 @@ export const coreNags: Nag[] = [
     id: 'select-license',
     title: defineMessage({
       id: 'nags.select-license.title',
-      defaultMessage: 'Select license',
+      defaultMessage: 'Select a license',
     }),
     description: (context: NagContext) => {
       const { formatMessage } = useVIntl()

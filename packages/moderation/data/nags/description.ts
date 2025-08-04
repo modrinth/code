@@ -5,6 +5,7 @@ import { useVIntl, defineMessage } from '@vintl/vintl'
 export const MIN_DESCRIPTION_CHARS = 200
 export const MAX_HEADER_LENGTH = 80
 export const MIN_SUMMARY_CHARS = 30
+export const MIN_CHARS_PER_IMAGE = 60
 
 export function analyzeHeaderLength(markdown: string): {
   hasLongHeaders: boolean
@@ -62,7 +63,10 @@ export function analyzeImageContent(markdown: string): {
     .trim()
 
   const textLength = textWithoutImages.length
-  const imageHeavy = textLength < 100 || (totalImages >= 3 && textLength < 200)
+  const recommendedTextLength = MIN_CHARS_PER_IMAGE * totalImages
+
+  const imageHeavy =
+    recommendedTextLength > MIN_DESCRIPTION_CHARS && textLength < recommendedTextLength
 
   const hasEmptyAltText =
     images.some((match) => !match[1]?.trim()) ||
@@ -98,7 +102,7 @@ export const descriptionNags: Nag[] = [
     id: 'description-too-short',
     title: defineMessage({
       id: 'nags.description-too-short.title',
-      defaultMessage: 'Description may be insufficient',
+      defaultMessage: 'Expand the description',
     }),
     description: (context: NagContext) => {
       const { formatMessage } = useVIntl()
@@ -108,7 +112,7 @@ export const descriptionNags: Nag[] = [
         defineMessage({
           id: 'nags.description-too-short.description',
           defaultMessage:
-            'Your description is {length} readable characters. At least {minChars} characters is recommended to create a clear and informative Description.',
+            'Your description is {length} readable characters. At least {minChars} characters is recommended to create a clear and informative description.',
         }),
         {
           length: readableLength,
@@ -134,7 +138,7 @@ export const descriptionNags: Nag[] = [
     id: 'long-headers',
     title: defineMessage({
       id: 'nags.long-headers.title',
-      defaultMessage: 'Headers are too long',
+      defaultMessage: 'Shorten headers',
     }),
     description: (context: NagContext) => {
       const { formatMessage } = useVIntl()
@@ -170,7 +174,7 @@ export const descriptionNags: Nag[] = [
     id: 'summary-too-short',
     title: defineMessage({
       id: 'nags.summary-too-short.title',
-      defaultMessage: 'Summary may be insufficient',
+      defaultMessage: 'Expand the summary',
     }),
     description: (context: NagContext) => {
       const { formatMessage } = useVIntl()
@@ -179,7 +183,7 @@ export const descriptionNags: Nag[] = [
         defineMessage({
           id: 'nags.summary-too-short.description',
           defaultMessage:
-            'Your summary is {length} characters. At least {minChars} characters is recommended to create an informative and enticing Summary.',
+            'Your summary is {length} characters. At least {minChars} characters is recommended to create an informative and enticing summary.',
         }),
         {
           length: context.project.description?.length || 0,
@@ -205,11 +209,11 @@ export const descriptionNags: Nag[] = [
     id: 'minecraft-title-clause',
     title: defineMessage({
       id: 'nags.minecraft-title-clause.title',
-      defaultMessage: 'Title contains "Minecraft"',
+      defaultMessage: 'Avoid brand infringement',
     }),
     description: defineMessage({
       id: 'nags.minecraft-title-clause.description',
-      defaultMessage: `Projects must not use Minecraft's branding or include "Minecraft" as a significant part of the Name.`,
+      defaultMessage: `Projects must not use Minecraft's branding or include "Minecraft" as a significant part of the name.`,
     }),
     status: 'warning',
     shouldShow: (context: NagContext) => {
@@ -230,7 +234,7 @@ export const descriptionNags: Nag[] = [
     id: 'title-contains-technical-info',
     title: defineMessage({
       id: 'nags.title-contains-technical-info.title',
-      defaultMessage: 'Title contains unnecessary information',
+      defaultMessage: 'Clean up the name',
     }),
     description: defineMessage({
       id: 'nags.title-contains-technical-info.description',
@@ -263,7 +267,7 @@ export const descriptionNags: Nag[] = [
     id: 'summary-same-as-title',
     title: defineMessage({
       id: 'nags.summary-same-as-title.title',
-      defaultMessage: 'Summary is project name',
+      defaultMessage: 'Make the summary unique',
     }),
     description: defineMessage({
       id: 'nags.summary-same-as-title.description',
@@ -286,10 +290,11 @@ export const descriptionNags: Nag[] = [
     },
   },
   {
+    // Don't like this one, is this needed?
     id: 'image-heavy-description',
     title: defineMessage({
       id: 'nags.image-heavy-description.title',
-      defaultMessage: 'Description is mostly images',
+      defaultMessage: 'Ensure accessibility',
     }),
     description: defineMessage({
       id: 'nags.image-heavy-description.description',
@@ -314,7 +319,7 @@ export const descriptionNags: Nag[] = [
     id: 'missing-alt-text',
     title: defineMessage({
       id: 'nags.missing-alt-text.title',
-      defaultMessage: 'Images missing alt text',
+      defaultMessage: 'Add image alt text',
     }),
     description: defineMessage({
       id: 'nags.missing-alt-text.description',
