@@ -43,7 +43,12 @@ import MedalPromoBackground from "~/assets/images/illustrations/medal_promo_back
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, #45311470 50%, var(--medal-promotion-bg) 100%);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--medal-promotion-orange) 25%, transparent),
+    transparent 50%,
+    var(--medal-promotion-bg) 100%
+  );
   z-index: 1;
   border-radius: inherit;
 }
@@ -63,5 +68,9 @@ import MedalPromoBackground from "~/assets/images/illustrations/medal_promo_back
 .clock-glow {
   filter: drop-shadow(0 0 72px var(--color-orange)) drop-shadow(0 0 36px var(--color-orange))
     drop-shadow(0 0 18px var(--color-orange));
+}
+
+.text-orange {
+  color: #ffb84b;
 }
 </style>
