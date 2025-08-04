@@ -9,7 +9,7 @@
       <div class="flex items-center gap-2 text-2xl font-semibold text-contrast">
         <ClockIcon class="clock-glow size-6 text-orange" /><span>
           Try a free
-          <span class="text-orange">3GB Server</span> for 5 days powered by
+          <span class="text-orange">3GB server</span> for 5 days powered by
           <span class="text-orange">Medal</span>
         </span>
       </div>
@@ -34,7 +34,7 @@ import MedalPromoBackground from "~/assets/images/illustrations/medal_promo_back
 <style scoped lang="scss">
 .medal-promotion {
   position: relative;
-  border: 1px solid var(--color-orange);
+  border: 1px solid var(--medal-promotion-orange);
 }
 
 .overlay {
@@ -43,7 +43,7 @@ import MedalPromoBackground from "~/assets/images/illustrations/medal_promo_back
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent 50%, var(--landing-raw-bg) 100%);
+  background: linear-gradient(90deg, #45311470 50%, var(--medal-promotion-bg) 100%);
   z-index: 1;
   border-radius: inherit;
 }
@@ -55,7 +55,7 @@ import MedalPromoBackground from "~/assets/images/illustrations/medal_promo_back
   width: 100%;
   height: 100%;
   z-index: 0;
-  background-color: var(--landing-raw-bg);
+  background-color: var(--medal-promotion-bg);
   border-radius: inherit;
   color: var(--color-orange);
 }
