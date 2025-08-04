@@ -4,22 +4,29 @@
     :to="status === 'suspended' ? '' : `/servers/manage/${props.server_id}`"
   >
     <div
-      class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-button-bg bg-bg-raised p-4 transition-transform duration-100"
+      class="medal-promotion flex flex-row items-center overflow-x-hidden rounded-2xl p-4 shadow-xl transition-transform duration-100"
       :class="status === 'suspended' ? '!rounded-b-none border-b-0 opacity-75' : 'active:scale-95'"
       data-pyro-server-listing
       :data-pyro-server-listing-id="server_id"
     >
-      <UiServersServerIcon v-if="status !== 'suspended'" :image="image" />
+      <div class="overlay"></div>
+      <MedalPromoBackground class="background-pattern" />
+      <MedalServerIcon
+        v-if="status !== 'suspended'"
+        class="z-10 size-16 rounded-xl bg-bg text-orange"
+      />
       <div
         v-else
-        class="bg-bg-secondary flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
+        class="bg-bg-secondary z-10 flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
       >
         <LockIcon class="size-12 text-secondary" />
       </div>
-      <div class="ml-4 flex flex-col gap-2.5">
+      <div class="z-10 ml-4 flex flex-col gap-2.5">
         <div class="flex flex-row items-center gap-2">
           <h2 class="m-0 text-xl font-bold text-contrast">{{ name }}</h2>
           <ChevronRightIcon />
+
+          <span>{{ timeLeftCountdown }}</span>
         </div>
 
         <div
@@ -96,14 +103,11 @@
 import { ChevronRightIcon, LockIcon, SparklesIcon } from "@modrinth/assets";
 import type { Project, Server } from "@modrinth/utils";
 import { Avatar, CopyCode } from "@modrinth/ui";
-import { useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
+import dayjs from "dayjs";
+import MedalServerIcon from "~/assets/images/servers/medal_server_icon.svg?component";
+import MedalPromoBackground from "~/assets/images/illustrations/medal_promo_background.svg?component";
 
 const props = defineProps<Partial<Server>>();
-
-if (props.server_id && props.status === "available") {
-  // Necessary only to get server icon
-  await useModrinthServers(props.server_id, ["general"]);
-}
 
 const showGameLabel = computed(() => !!props.game);
 const showLoaderLabel = computed(() => !!props.loader);
@@ -122,7 +126,42 @@ if (props.upstream) {
   projectData = ref(null);
 }
 
-const image = useState<string | undefined>(`server-icon-${props.server_id}`, () => undefined);
 const iconUrl = computed(() => projectData.value?.icon_url || undefined);
 const isConfiguring = computed(() => props.flows?.intro);
+
+const expiryDate = dayjs().add(5, "day");
+const timeLeftCountdown = computed(() => {
+  const now = dayjs();
+  const diff = expiryDate.diff(now, "day");
+  return diff > 0 ? `${diff} day${diff > 1 ? "s" : ""} left` : "Expired";
+});
 </script>
+
+<style scoped lang="scss">
+.medal-promotion {
+  position: relative;
+  border: 1px solid var(--color-orange);
+  background: inherit; // allows overlay + pattern to take over
+}
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 50%, var(--landing-raw-bg) 100%);
+  z-index: 1;
+  border-radius: inherit;
+}
+.background-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background-color: var(--landing-raw-bg);
+  border-radius: inherit;
+  color: var(--color-orange);
+}
+</style>

@@ -94,7 +94,12 @@
         class="m-0 flex flex-col gap-4 p-0"
       >
         <UiServersServerListing
-          v-for="server in filteredData"
+          v-for="server in filteredData.filter((s) => !s.is_preview)"
+          :key="server.server_id"
+          v-bind="server"
+        />
+        <MedalServerListing
+          v-for="server in filteredData.filter((s) => s.status !== 'suspended')"
           :key="server.server_id"
           v-bind="server"
         />
@@ -115,6 +120,7 @@ import { ButtonStyled, CopyCode } from "@modrinth/ui";
 import type { Server, ModrinthServersFetchError } from "@modrinth/utils";
 import { reloadNuxtApp } from "#app";
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
+import MedalServerListing from "~/components/ui/servers/MedalServerListing.vue";
 
 definePageMeta({
   middleware: "auth",
