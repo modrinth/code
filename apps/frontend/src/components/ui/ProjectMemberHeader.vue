@@ -31,6 +31,22 @@
     <div class="flex max-w-full flex-wrap items-center gap-x-6 gap-y-4">
       <div class="flex flex-auto flex-wrap items-center gap-x-6 gap-y-4">
         <h2 class="my-0 mr-auto">{{ getFormattedMessage(messages.publishingChecklist) }}</h2>
+        <div class="flex flex-row gap-2">
+          <div class="flex items-center gap-1">
+            <AsteriskIcon class="size-4 text-red" />
+            <span class="text-secondary">{{ getFormattedMessage(messages.required) }}</span>
+          </div>
+          |
+          <div class="flex items-center gap-1">
+            <TriangleAlertIcon class="size-4 text-orange" />
+            <span class="text-secondary">{{ getFormattedMessage(messages.warning) }}</span>
+          </div>
+          |
+          <div class="flex items-center gap-1">
+            <LightBulbIcon class="size-4 text-purple" />
+            <span class="text-secondary">{{ getFormattedMessage(messages.suggestion) }}</span>
+          </div>
+        </div>
       </div>
       <div class="input-group">
         <ButtonStyled circular>
@@ -47,7 +63,7 @@
             :is="nag.icon || getDefaultIcon(nag.status)"
             v-tooltip="getStatusTooltip(nag.status)"
             :class="[
-              'h-4 w-4',
+              'size-4',
               nag.status === 'required' && 'text-red',
               nag.status === 'warning' && 'text-orange',
               nag.status === 'suggestion' && 'text-purple',
@@ -98,6 +114,7 @@ import {
   DropdownIcon,
   SendIcon,
   ScaleIcon,
+  InfoIcon,
 } from "@modrinth/assets";
 import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
 import { nags } from "@modrinth/moderation";
@@ -181,6 +198,18 @@ const messages = defineMessages({
     id: "project-member-header.resubmit-for-review-desc",
     defaultMessage:
       "Your project has been {status} by Modrinth's staff. In most cases, you can resubmit for review after addressing the staff's message.",
+  },
+  showKey: {
+    id: "project-member-header.show-key",
+    defaultMessage: "Toggle key",
+  },
+  keyTitle: {
+    id: "project-member-header.key-title",
+    defaultMessage: "Status Key",
+  },
+  action: {
+    id: "project-member-header.action",
+    defaultMessage: "Action",
   },
   visitModerationPage: {
     id: "project-member-header.visit-moderation-page",
@@ -268,6 +297,11 @@ const nagContext = computed<NagContext>(() => ({
   submitProject: submitForReview,
 }));
 
+const showKey = ref(false);
+function toggleKey(): void {
+  showKey.value = !showKey.value;
+}
+
 const canSubmitForReview = computed(() => {
   return (
     applicableNags.value.filter((nag) => nag.status === "required" && !isNagComplete(nag))
@@ -320,6 +354,11 @@ const visibleNags = computed<Nag[]>(() => {
       },
     });
   }
+
+  finalNags.sort((a, b) => {
+    const statusOrder = { required: 0, warning: 1, suggestion: 2, "special-submit-action": 3 };
+    return statusOrder[a.status] - statusOrder[b.status];
+  });
 
   return finalNags;
 });
