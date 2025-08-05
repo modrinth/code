@@ -2,7 +2,7 @@ name: Crowdin (push)
 
 on:
   push:
-    branches: ['cal/crowdin']
+    branches: ['main']
     paths:
       - 'apps/*/src/locales/en-US/**'
       - 'apps/*/locales/en-US/**'
@@ -18,6 +18,7 @@ jobs:
   preflight_check:
     name: 'Pre-flight check'
     runs-on: ubuntu-22.04
+    if: github.ref == 'refs/heads/main'
     concurrency:
       group: i18n-push:${{ github.ref }}
       cancel-in-progress: true
