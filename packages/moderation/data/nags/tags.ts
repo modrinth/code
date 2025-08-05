@@ -73,6 +73,10 @@ export const tagsNags: Nag[] = [
         .concat(context.project.additional_categories)
         .filter((tag: string) => allResolutionTags.includes(tag))
 
+      const sortedTags = resolutionTags.toSorted((a, b) => {
+        return allResolutionTags.indexOf(a) - allResolutionTags.indexOf(b)
+      })
+
       return formatMessage(
         defineMessage({
           id: 'nags.multiple-resolution-tags.description',
@@ -81,7 +85,7 @@ export const tagsNags: Nag[] = [
         }),
         {
           count: resolutionTags.length,
-          tags: resolutionTags
+          tags: sortedTags
             .join(', ')
             .replace('8x-', '8x or lower')
             .replace('512x+', '512x or higher'),
