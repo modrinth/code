@@ -99,14 +99,10 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           title: 'New translations from Crowdin (${{ steps.branch-name.outputs.branch_name }})'
-          body: |-
-            Here is your automated pull request with updated translations from [our Crowdin](https://crowdin.com/project/modrinth) for the `${{ steps.branch-name.outputs.branch_name }}` branch. Merge whenever you ready.
-
-            This pull request is created according to the `.github/workflows/i18n-pull.yml` file.
-
-            Want to update this pull request? [Dispatch this workflow again](https://github.com/${{ github.repository }}/actions/workflows/i18n-pull.yml).
+          body-path: .github/templates/crowdin-pr.md
           commit-message: 'New translations from Crowdin (${{ steps.branch-name.outputs.branch_name }})'
           branch: crowdin-pull/${{ steps.branch-name.outputs.branch_name }}
           author: '${{ steps.git-author.outputs.name }} <${{ steps.git-author.outputs.email }}>'
           committer: '${{ steps.git-author.outputs.name }} <${{ steps.git-author.outputs.email }}>'
+          labels: sync
           token: ${{ secrets.CROWDIN_GH_TOKEN }}
