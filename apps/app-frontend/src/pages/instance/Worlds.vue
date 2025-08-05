@@ -141,18 +141,17 @@ import {
   getWorldIdentifier,
   get_profile_protocol_version,
   handleDefaultProfileUpdateEvent,
-  hasQuickPlaySupport,
+  hasServerQuickPlaySupport,
+  hasWorldQuickPlaySupport,
   refreshServerData,
   refreshServers,
   refreshWorld,
-  hasWorldQuickPlaySupport,
   refreshWorlds,
   remove_server_from_profile,
   showWorldInFolder,
   sortWorlds,
   start_join_server,
   start_join_singleplayer_world,
-  hasServerQuickPlaySupport,
 } from '@/helpers/worlds.ts'
 import { PlusIcon, SearchIcon, SpinnerIcon, UpdatedIcon, XIcon } from '@modrinth/assets'
 import {
@@ -283,7 +282,7 @@ async function editServer(server: ServerWorld) {
       await refreshServer(server.address)
     }
   } else {
-    handleError(`Error refreshing server, refreshing all worlds`)
+    handleError(new Error(`Error refreshing server, refreshing all worlds`))
     await refreshAllWorlds()
   }
 }
@@ -302,7 +301,7 @@ async function editWorld(path: string, name: string, removeIcon: boolean) {
     }
     sortWorlds(worlds.value)
   } else {
-    handleError(`Error finding world in list, refreshing all worlds`)
+    handleError(new Error(`Error finding world in list, refreshing all worlds`))
     await refreshAllWorlds()
   }
 }
@@ -312,7 +311,7 @@ async function deleteWorld(world: SingleplayerWorld) {
   worlds.value = worlds.value.filter((w) => w.type !== 'singleplayer' || w.path !== world.path)
 }
 
-function handleJoinError(err: unknown) {
+function handleJoinError(err: Error) {
   handleError(err)
   startingInstance.value = false
   worldPlaying.value = undefined
@@ -437,7 +436,7 @@ function promptToRemoveWorld(world: World): boolean {
 
 async function proceedRemoveServer() {
   if (!serverToRemove.value) {
-    handleError(`Error removing server, no server marked for removal.`)
+    handleError(new Error(`Error removing server, no server marked for removal.`))
     return
   }
   await removeServer(serverToRemove.value)
@@ -446,7 +445,7 @@ async function proceedRemoveServer() {
 
 async function proceedDeleteWorld() {
   if (!worldToDelete.value) {
-    handleError(`Error deleting world, no world marked for removal.`)
+    handleError(new Error(`Error deleting world, no world marked for removal.`))
     return
   }
   await deleteWorld(worldToDelete.value)
