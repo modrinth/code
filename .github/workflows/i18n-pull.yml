@@ -107,7 +107,9 @@ jobs:
             Want to update this pull request? [Dispatch this workflow again](https://github.com/${{ github.repository }}/actions/workflows/i18n-pull.yml).
           commit-message: 'New translations from Crowdin (${{ steps.branch-name.outputs.branch_name }})'
           branch: crowdin-pull/${{ steps.branch-name.outputs.branch_name }}
-          add-paths: locales
+          add-paths: |
+            apps/*/src/locales
+            packages/*/src/locales
           author: '${{ steps.git-author.outputs.name }} <${{ steps.git-author.outputs.email }}>'
           committer: '${{ steps.git-author.outputs.name }} <${{ steps.git-author.outputs.email }}>'
           token: ${{ secrets.CROWDIN_GH_TOKEN }}
