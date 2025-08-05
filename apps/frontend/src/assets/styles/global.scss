@@ -166,9 +166,9 @@ html {
   --landing-raw-bg: #fff;
 
   --medal-promotion-bg: #fff;
-  --medal-promotion-bg-orange:#c08a3a;
-  --medal-promotion-text-orange: #A86200;
-  --medal-promotion-bg-gradient: linear-gradient(90deg, rgba(255, 184, 75, 0.15) 0%, #FFF 100%);
+  --medal-promotion-bg-orange: #c08a3a;
+  --medal-promotion-text-orange: #a86200;
+  --medal-promotion-bg-gradient: linear-gradient(90deg, rgba(255, 184, 75, 0.15) 0%, #fff 100%);
 
   --banner-error-bg: #fee2e2;
   --banner-error-text: #991b1b;
@@ -307,14 +307,9 @@ html {
   --landing-raw-bg: #000;
 
   --medal-promotion-bg: #000;
-  --medal-promotion-bg-orange: #FFB84B54;
+  --medal-promotion-bg-orange: #ffb84b54;
   --medal-promotion-text-orange: #ffb84b;
-  --medal-promotion-bg-gradient: linear-gradient(
-    90deg,
-    #ffb74b21,
-    transparent 50%,
-    #000 100%
-  );
+  --medal-promotion-bg-gradient: linear-gradient(90deg, #ffb74b21, transparent 50%, #000 100%);
 
   --hover-filter: brightness(120%);
   --active-filter: brightness(140%);
