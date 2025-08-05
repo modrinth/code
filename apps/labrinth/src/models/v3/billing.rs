@@ -24,6 +24,12 @@ pub enum ProductMetadata {
         swap: u32,
         storage: u32,
     },
+    Medal {
+        cpu: u32,
+        ram: u32,
+        swap: u32,
+        storage: u32,
+    },
 }
 
 #[derive(Serialize, Deserialize)]

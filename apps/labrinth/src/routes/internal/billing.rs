@@ -1706,6 +1706,17 @@ pub async fn stripe_webhook(
 
                     // Provision subscription
                     match metadata.product_item.metadata {
+                        ProductMetadata::Medal {
+                            cpu: _,
+                            ram: _,
+                            swap: _,
+                            storage: _,
+                        } => {
+                            todo!(
+                                "Promote Medal subscription to Pyro subscription"
+                            )
+                        }
+
                         ProductMetadata::Midas => {
                             let badges =
                                 metadata.user_item.badges | Badges::MIDAS;
@@ -2186,6 +2197,10 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
             };
 
             let unprovisioned = match product.metadata {
+                ProductMetadata::Medal { .. } => {
+                    todo!("Unprovision Medal subscription")
+                }
+
                 ProductMetadata::Midas => {
                     let badges = user.badges - Badges::MIDAS;
 
