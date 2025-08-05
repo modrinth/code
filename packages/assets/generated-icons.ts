@@ -139,6 +139,7 @@ import _ReplyIcon from './icons/reply.svg?component'
 import _ReportIcon from './icons/report.svg?component'
 import _RestoreIcon from './icons/restore.svg?component'
 import _RightArrowIcon from './icons/right-arrow.svg?component'
+import _RocketIcon from './icons/rocket.svg?component'
 import _RotateClockwiseIcon from './icons/rotate-clockwise.svg?component'
 import _RotateCounterClockwiseIcon from './icons/rotate-counter-clockwise.svg?component'
 import _RssIcon from './icons/rss.svg?component'
@@ -333,6 +334,7 @@ export const ReplyIcon = _ReplyIcon
 export const ReportIcon = _ReportIcon
 export const RestoreIcon = _RestoreIcon
 export const RightArrowIcon = _RightArrowIcon
+export const RocketIcon = _RocketIcon
 export const RotateClockwiseIcon = _RotateClockwiseIcon
 export const RotateCounterClockwiseIcon = _RotateCounterClockwiseIcon
 export const RssIcon = _RssIcon
