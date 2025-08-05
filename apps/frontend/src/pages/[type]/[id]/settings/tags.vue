@@ -217,12 +217,18 @@ const multipleResolutionTagsWarning = computed(() => {
   if (props.project.project_type !== "resourcepack") return null;
 
   const resolutionTags = selectedTags.value.filter((tag) =>
-    ['8x-', '16x', '32x', '48x', '64x', '128x', '256x', '512x+'].includes(tag.name),
+    ["8x-", "16x", "32x", "48x", "64x", "128x", "256x", "512x+"].includes(tag.name),
   );
 
   if (resolutionTags.length > 1) {
-    return `You've selected ${resolutionTags.length} resolution tags (${resolutionTags.map((t) => t.name).join(", ").replace('8x-', '8x or lower')
-            .replace('512x+', '512x or higher')}). Resource packs should typically only have one resolution tag.`;
+    return `You've selected ${resolutionTags.length} resolution tags (${resolutionTags
+      .map((t) => t.name)
+      .join(", ")
+      .replace("8x-", "8x or lower")
+      .replace(
+        "512x+",
+        "512x or higher",
+      )}). Resource packs should typically only have one resolution tag.`;
   }
   return null;
 });

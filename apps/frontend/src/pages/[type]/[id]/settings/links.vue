@@ -174,7 +174,12 @@
 <script setup>
 import { DropdownSelect } from "@modrinth/ui";
 import { SaveIcon, TriangleAlertIcon } from "@modrinth/assets";
-import { isCommonUrl, isDiscordUrl, isLinkShortener, commonLinkDomains } from "@modrinth/moderation";
+import {
+  isCommonUrl,
+  isDiscordUrl,
+  isLinkShortener,
+  commonLinkDomains,
+} from "@modrinth/moderation";
 
 const tags = useTags();
 
@@ -220,29 +225,29 @@ const isDiscordUrlCommon = computed(() => {
 });
 
 const isIssuesDiscordUrl = computed(() => {
-  return isDiscordUrl(issuesUrl.value)
-})
+  return isDiscordUrl(issuesUrl.value);
+});
 
 const isSourceDiscordUrl = computed(() => {
-  return isDiscordUrl(sourceUrl.value)
-})
+  return isDiscordUrl(sourceUrl.value);
+});
 
 const isWikiDiscordUrl = computed(() => {
-  return isDiscordUrl(wikiUrl.value)
-})
+  return isDiscordUrl(wikiUrl.value);
+});
 
 const isIssuesLinkShortner = computed(() => {
-  return isLinkShortener(issuesUrl.value)
-}) 
+  return isLinkShortener(issuesUrl.value);
+});
 const isSourceLinkShortener = computed(() => {
-  return isLinkShortener(sourceUrl.value)
-}) 
+  return isLinkShortener(sourceUrl.value);
+});
 const isWikiLinkShortener = computed(() => {
-  return isLinkShortener(wikiUrl.value)
-}) 
+  return isLinkShortener(wikiUrl.value);
+});
 const isDiscordLinkShortener = computed(() => {
-  return isLinkShortener(discordUrl.value)
-}) 
+  return isLinkShortener(discordUrl.value);
+});
 
 const rawDonationLinks = JSON.parse(JSON.stringify(props.project.donation_urls));
 rawDonationLinks.push({
