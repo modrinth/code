@@ -2,7 +2,7 @@ use crate::event::emit::{emit_process, emit_profile};
 use crate::event::{ProcessPayloadType, ProfilePayloadType};
 use crate::profile;
 use crate::util::io::IOError;
-use chrono::{DateTime, TimeZone, Utc};
+use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
 use dashmap::DashMap;
 use quick_xml::Reader;
 use quick_xml::events::Event;
@@ -493,6 +493,16 @@ impl Process {
                     if let Err(e) = Self::append_to_log_file(&log_path, &line) {
                         tracing::warn!("Failed to write to log file: {}", e);
                     }
+                    if let Err(e) = Self::maybe_handle_old_server_join_logging(
+                        profile_path,
+                        line.trim_ascii_end(),
+                    )
+                    .await
+                    {
+                        tracing::error!(
+                            "Failed to handle old server join logging: {e}"
+                        );
+                    }
                 }
 
                 line.clear();
@@ -540,17 +550,6 @@ impl Process {
         timestamp: &str,
         message: &str,
     ) -> crate::Result<()> {
-        let Some(host_port_string) = message.strip_prefix("Connecting to ")
-        else {
-            return Ok(());
-        };
-        let Some((host, port_string)) = host_port_string.rsplit_once(", ")
-        else {
-            return Ok(());
-        };
-        let Some(port) = port_string.parse::<u16>().ok() else {
-            return Ok(());
-        };
         let timestamp = timestamp
             .parse::<i64>()
             .map(|x| x / 1000)
@@ -566,6 +565,46 @@ impl Process {
                     )
                 })
             })?;
+        Self::parse_and_insert_server_join(profile_path, message, timestamp)
+            .await
+    }
+
+    async fn maybe_handle_old_server_join_logging(
+        profile_path: &str,
+        line: &str,
+    ) -> crate::Result<()> {
+        if let Some((timestamp, message)) = line.split_once(" [CLIENT] [INFO] ")
+        {
+            let timestamp =
+                NaiveDateTime::parse_from_str(timestamp, "%Y-%m-%d %H:%M:%S")?
+                    .and_local_timezone(chrono::Local)
+                    .map(|x| x.to_utc())
+                    .single()
+                    .unwrap_or_else(Utc::now);
+            Self::parse_and_insert_server_join(profile_path, message, timestamp)
+                .await
+        } else {
+            Self::parse_and_insert_server_join(profile_path, line, Utc::now())
+                .await
+        }
+    }
+
+    async fn parse_and_insert_server_join(
+        profile_path: &str,
+        message: &str,
+        timestamp: DateTime<Utc>,
+    ) -> crate::Result<()> {
+        let Some(host_port_string) = message.strip_prefix("Connecting to ")
+        else {
+            return Ok(());
+        };
+        let Some((host, port_string)) = host_port_string.rsplit_once(", ")
+        else {
+            return Ok(());
+        };
+        let Some(port) = port_string.parse::<u16>().ok() else {
+            return Ok(());
+        };
 
         let state = crate::State::get().await?;
         crate::state::server_join_log::JoinLogEntry {

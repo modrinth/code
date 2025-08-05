@@ -23,6 +23,7 @@ use serde_json::json;
 use std::collections::{HashMap, HashSet};
 
 use crate::data::Settings;
+use crate::server_address::ServerAddress;
 use dashmap::DashMap;
 use std::iter::FromIterator;
 use std::{
@@ -40,7 +41,7 @@ pub mod update;
 pub enum QuickPlayType {
     None,
     Singleplayer(String),
-    Server(String),
+    Server(ServerAddress),
 }
 
 /// Remove a profile
@@ -630,7 +631,7 @@ fn pack_get_relative_path(
 #[tracing::instrument]
 pub async fn run(
     path: &str,
-    quick_play_type: &QuickPlayType,
+    quick_play_type: QuickPlayType,
 ) -> crate::Result<ProcessMetadata> {
     let state = State::get().await?;
 
@@ -646,7 +647,7 @@ pub async fn run(
 async fn run_credentials(
     path: &str,
     credentials: &Credentials,
-    quick_play_type: &QuickPlayType,
+    quick_play_type: QuickPlayType,
 ) -> crate::Result<ProcessMetadata> {
     let state = State::get().await?;
     let settings = Settings::get(&state.pool).await?;
