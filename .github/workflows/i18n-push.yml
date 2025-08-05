@@ -18,6 +18,7 @@ jobs:
   preflight_check:
     name: 'Pre-flight check'
     runs-on: ubuntu-22.04
+    if: github.ref == 'refs/heads/cal/crowdin'
     concurrency:
       group: i18n-push:${{ github.ref }}
       cancel-in-progress: true
@@ -48,45 +49,8 @@ jobs:
         env:
           CROWDIN_PROJECT_ID_DEFINED: ${{ vars.CROWDIN_PROJECT_ID != '' }}
           CROWDIN_PERSONAL_TOKEN_DEFINED: ${{ secrets.CROWDIN_PERSONAL_TOKEN != '' }}
-
-      - name: Check that Crowdin branch exists
-        if: github.event_name != 'workflow_dispatch' && github.ref_name != github.event.repository.default_branch
-        id: crowdin-branch-exists
-        uses: GuillaumeFalourd/branch-exists@v1
-        with:
-          branch: ${{ format('crowdin-pull/{0}', github.ref_name) }}
-
-      - name: Checkout
-        id: checkout
-        if: github.event_name != 'workflow_dispatch' && steps.check.outputs.flight_ok == 'true' && (steps.crowdin-branch-exists.outcome == 'skipped' || steps.crowdin-branch-exists.outputs.exists == 'true')
-        uses: actions/checkout@v4
-
-      - name: Confirm push necessity
-        id: changed-files
-        if: steps.checkout.outcome != 'skipped'
-        uses: tj-actions/changed-files@v42
-        with:
-          negation_patterns_first: true
-          files: |
-            **
-            locales/en-US/**
-            crowdin.yml
-          files_ignore: |
-            .{github,vscode,idea}/**
-            {assets,patches,types,public,locales}/**
-            .{editorconfig,gitignore,npmrc,prettierignore}
-            .*.{js,json}
-            *.{md,yml,yaml,json}
-            LICENSE
-
-      - name: Output result
-        if: steps.changed-files.outcome != 'skipped'
-        run: |
-          cat << EOF
-            Changed files are ${{ steps.changed-files.outputs.all_changed_files }}
-          EOF
     outputs:
-      ready: ${{ steps.check.outputs.flight_ok == 'true' && (github.event_name == 'workflow_dispatch' || steps.changed-files.outputs.any_changed == 'true') }}
+      ready: ${{ steps.check.outputs.flight_ok == 'true' }}
 
   push_translations:
     name: Push sources to Crowdin
