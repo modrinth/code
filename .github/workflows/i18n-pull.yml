@@ -91,9 +91,9 @@ jobs:
           CROWDIN_PROJECT_ID: ${{ vars.CROWDIN_PROJECT_ID }}
           CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
 
-      # - name: Fix broken permissions
-      #   shell: bash
-      #   run: sudo chown -R $USER:$USER locales
+      - name: Fix broken permissions
+        shell: bash
+        run: sudo chown -R $USER:$USER .
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
