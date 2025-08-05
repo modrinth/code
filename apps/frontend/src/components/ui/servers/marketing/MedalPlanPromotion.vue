@@ -4,7 +4,7 @@
     class="medal-promotion flex w-full flex-row justify-between rounded-xl p-6 shadow-xl"
   >
     <div class="overlay"></div>
-    <MedalPromoBackground class="background-pattern" />
+    <MedalPromoBackground class="background-pattern shadow-xl" />
     <div class="z-10 flex flex-col gap-2">
       <div class="flex items-center gap-2 text-2xl font-semibold text-contrast">
         <ClockIcon class="clock-glow size-6 text-orange" /><span>
@@ -35,6 +35,7 @@ import MedalPromoBackground from "~/assets/images/illustrations/medal_promo_back
 .medal-promotion {
   position: relative;
   border: 1px solid var(--medal-promotion-bg-orange);
+  overflow: hidden;
 }
 
 .overlay {

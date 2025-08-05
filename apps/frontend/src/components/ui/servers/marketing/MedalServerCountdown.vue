@@ -86,7 +86,8 @@ onUnmounted(() => {
 .medal-promotion {
   position: relative;
   border: 1px solid var(--medal-promotion-bg-orange);
-  background: inherit;
+  background: inherit; // allows overlay + pattern to take over
+  overflow: hidden;
 }
 
 .overlay {
@@ -95,12 +96,7 @@ onUnmounted(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    var(--medal-promotion-bg) 10%,
-    transparent 30%,
-    var(--medal-promotion-bg) 100%
-  );
+  background: var(--medal-promotion-bg-gradient);
   z-index: 1;
   border-radius: inherit;
 }
