@@ -45,6 +45,10 @@ jobs:
             flight_failure "CROWDIN_PERSONAL_TOKEN secret is not defined (required to push)"
           fi
 
+          if [ "$PREFLIGHT_CHECK_RESULT" = false ]; then
+            exit 1
+          fi
+
           echo "flight_ok=$PREFLIGHT_CHECK_RESULT" >> "$GITHUB_OUTPUT"
         env:
           CROWDIN_PROJECT_ID_DEFINED: ${{ vars.CROWDIN_PROJECT_ID != '' }}
