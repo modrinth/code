@@ -557,6 +557,9 @@
   "project-member-header.accept": {
     "message": "Accept"
   },
+  "project-member-header.action": {
+    "message": "Action"
+  },
   "project-member-header.decline": {
     "message": "Decline"
   },
@@ -578,6 +581,9 @@
   "project-member-header.invitation-with-role": {
     "message": "You've been invited be a member of this project with the role of '{role}'."
   },
+  "project-member-header.key-title": {
+    "message": "Status Key"
+  },
   "project-member-header.publishing-checklist": {
     "message": "Publishing checklist"
   },
@@ -589,6 +595,9 @@
   },
   "project-member-header.resubmit-for-review-desc": {
     "message": "Your project has been {status} by Modrinth's staff. In most cases, you can resubmit for review after addressing the staff's message."
+  },
+  "project-member-header.show-key": {
+    "message": "Toggle key"
   },
   "project-member-header.submit-checklist-tooltip": {
     "message": "You must complete the required steps in the publishing checklist!"
