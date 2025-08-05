@@ -59,8 +59,10 @@ pub async fn products(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let products =
-        product_item::QueryProductWithPrices::list(&**pool, &redis).await?;
+    let products = product_item::QueryProductWithPrices::list_purchaseable(
+        &**pool, &redis,
+    )
+    .await?;
 
     let products = products
         .into_iter()
@@ -408,7 +410,7 @@ pub async fn edit_subscription(
 
         let intent = if let Some(product_id) = &edit_subscription.product {
             let product_price =
-                product_item::DBProductPrice::get_all_product_prices(
+                product_item::DBProductPrice::get_all_public_product_prices(
                     (*product_id).into(),
                     &mut *transaction,
                 )
@@ -1187,7 +1189,7 @@ pub async fn initiate_payment(
                         })?;
 
                 let mut product_prices =
-                    product_item::DBProductPrice::get_all_product_prices(
+                    product_item::DBProductPrice::get_all_public_product_prices(
                         product.id, &**pool,
                     )
                     .await?;

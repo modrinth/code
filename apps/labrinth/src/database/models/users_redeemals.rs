@@ -145,7 +145,7 @@ impl RedeemalLookupFields {
     ///
     /// If the returned value is `Ok(Some(fields))`, but `redeemal_status` is `None`,
     /// the user exists and has not redeemed the offer.
-    pub async fn redeemal_status_by_user_username_and_offer<'a, E>(
+    pub async fn redeemal_status_by_username_and_offer<'a, E>(
         exec: E,
         user_username: &str,
         offer: Offer,
@@ -183,7 +183,7 @@ impl RedeemalLookupFields {
             redeemal_status: row
                 .status
                 .as_deref()
-                .map(|s| Status::from_str_or_default(s)),
+                .map(Status::from_str_or_default),
         }))
     }
 }

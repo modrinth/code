@@ -100,7 +100,8 @@ pub struct QueryProductWithPrices {
 }
 
 impl QueryProductWithPrices {
-    pub async fn list<'a, E>(
+    /// Lists products with at least one public price.
+    pub async fn list_purchaseable<'a, E>(
         exec: E,
         redis: &RedisPool,
     ) -> Result<Vec<QueryProductWithPrices>, DatabaseError>
@@ -118,30 +119,32 @@ impl QueryProductWithPrices {
         }
 
         let all_products = product_item::DBProduct::get_all(exec).await?;
-        let prices = product_item::DBProductPrice::get_all_products_prices(
-            &all_products.iter().map(|x| x.id).collect::<Vec<_>>(),
-            exec,
-        )
-        .await?;
+        let prices =
+            product_item::DBProductPrice::get_all_public_products_prices(
+                &all_products.iter().map(|x| x.id).collect::<Vec<_>>(),
+                exec,
+            )
+            .await?;
 
         let products = all_products
             .into_iter()
-            .map(|x| QueryProductWithPrices {
-                id: x.id,
-                metadata: x.metadata,
-                prices: prices
-                    .remove(&x.id)
-                    .map(|x| x.1)
-                    .unwrap_or_default()
-                    .into_iter()
-                    .map(|x| DBProductPrice {
-                        id: x.id,
-                        product_id: x.product_id,
-                        prices: x.prices,
-                        currency_code: x.currency_code,
-                    })
-                    .collect(),
-                unitary: x.unitary,
+            .filter_map(|x| {
+                Some(QueryProductWithPrices {
+                    id: x.id,
+                    metadata: x.metadata,
+                    prices: prices
+                        .remove(&x.id)
+                        .map(|x| x.1)?
+                        .into_iter()
+                        .map(|x| DBProductPrice {
+                            id: x.id,
+                            product_id: x.product_id,
+                            prices: x.prices,
+                            currency_code: x.currency_code,
+                        })
+                        .collect(),
+                    unitary: x.unitary,
+                })
             })
             .collect::<Vec<_>>();
 
@@ -222,16 +225,19 @@ impl DBProductPrice {
             .collect::<Result<Vec<_>, serde_json::Error>>()?)
     }
 
-    pub async fn get_all_product_prices(
+    pub async fn get_all_public_product_prices(
         product_id: DBProductId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBProductPrice>, DatabaseError> {
-        let res = Self::get_all_products_prices(&[product_id], exec).await?;
+        let res =
+            Self::get_all_public_products_prices(&[product_id], exec).await?;
 
         Ok(res.remove(&product_id).map(|x| x.1).unwrap_or_default())
     }
 
-    pub async fn get_all_products_prices(
+    /// Gets all public prices for the given products. If a product has no public price,
+    /// it won't be included in the resulting map.
+    pub async fn get_all_public_products_prices(
         product_ids: &[DBProductId],
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<DashMap<DBProductId, Vec<DBProductPrice>>, DatabaseError> {
@@ -240,7 +246,8 @@ impl DBProductPrice {
 
         use futures_util::TryStreamExt;
         let prices = select_prices_with_predicate!(
-            "WHERE product_id = ANY($1::bigint[])",
+            "WHERE product_id = ANY($1::bigint[])
+            AND public = true",
             ids_ref
         )
         .fetch(exec)
