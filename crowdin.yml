@@ -8,21 +8,8 @@ files:
     translation: /apps/%original_path%/%locale%/%original_file_name%
     skip_untranslated_strings: true
 
-  # apps where locales is in root
-  - source: /apps/*/locales/en-US/*.json
-    dest: /%original_file_name%
-    translation: /apps/%original_path%/%locale%/%original_file_name%
-    skip_untranslated_strings: true
-
   # packages where locales is in src
   - source: /packages/*/src/locales/en-US/*.json
-    dest: /%original_file_name%
-    translation: /packages/%original_path%/%locale%/%original_file_name%
-    skip_untranslated_strings: true
-
-  # packages where locales in root
-  # todo: make sure all are in src folder, not huge priority tho
-  - source: /packages/*/locales/en-US/*.json
     dest: /%original_file_name%
     translation: /packages/%original_path%/%locale%/%original_file_name%
     skip_untranslated_strings: true
