@@ -67,7 +67,8 @@
         :key="`world-${world.type}-${world.type == 'singleplayer' ? world.path : `${world.address}-${world.index}`}`"
         :world="world"
         :highlighted="highlightedWorld === getWorldIdentifier(world)"
-        :supports-quick-play="supportsQuickPlay"
+        :supports-server-quick-play="supportsServerQuickPlay"
+        :supports-world-quick-play="supportsWorldQuickPlay"
         :current-protocol="protocolVersion"
         :playing-instance="playing"
         :playing-world="worldsMatch(world, worldPlaying)"
@@ -144,12 +145,14 @@ import {
   refreshServerData,
   refreshServers,
   refreshWorld,
+  hasWorldQuickPlaySupport,
   refreshWorlds,
   remove_server_from_profile,
   showWorldInFolder,
   sortWorlds,
   start_join_server,
   start_join_singleplayer_world,
+  hasServerQuickPlaySupport,
 } from '@/helpers/worlds.ts'
 import { PlusIcon, SearchIcon, SpinnerIcon, UpdatedIcon, XIcon } from '@modrinth/assets'
 import {
@@ -355,8 +358,11 @@ function worldsMatch(world: World, other: World | undefined) {
 }
 
 const gameVersions = ref<GameVersion[]>(await get_game_versions().catch(() => []))
-const supportsQuickPlay = computed(() =>
-  hasQuickPlaySupport(gameVersions.value, instance.value.game_version),
+const supportsServerQuickPlay = computed(() =>
+  hasServerQuickPlaySupport(gameVersions.value, instance.value.game_version),
+)
+const supportsWorldQuickPlay = computed(() =>
+  hasWorldQuickPlaySupport(gameVersions.value, instance.value.game_version),
 )
 
 const filterOptions = computed(() => {
