@@ -13,8 +13,18 @@
           </span>
         </label>
         <TriangleAlertIcon
-          v-if="!isIssuesUrlCommon"
-          v-tooltip="`You're using a link which isn't common for this link type.`"
+          v-if="isIssuesLinkShortener"
+          v-tooltip="`Use of link shorteners is prohibited.`"
+          class="size-6 animate-pulse text-orange"
+        />
+        <TriangleAlertIcon
+          v-else-if="isIssuesDiscordUrl"
+          v-tooltip="`Discord invites are not appropriate for this link type.`"
+          class="size-6 animate-pulse text-orange"
+        />
+        <TriangleAlertIcon
+          v-else-if="!isIssuesUrlCommon"
+          v-tooltip="`Link includes a domain which isn't common for this link type.`"
           class="size-6 animate-pulse text-orange"
         />
         <input
@@ -37,8 +47,18 @@
           </span>
         </label>
         <TriangleAlertIcon
-          v-if="!isSourceUrlCommon"
-          v-tooltip="`You're using a link which isn't common for this link type.`"
+          v-if="isSourceLinkShortener"
+          v-tooltip="`Use of link shorteners is prohibited.`"
+          class="size-6 animate-pulse text-orange"
+        />
+        <TriangleAlertIcon
+          v-else-if="isSourceDiscordUrl"
+          v-tooltip="`Discord invites are not appropriate for this link type.`"
+          class="size-6 animate-pulse text-orange"
+        />
+        <TriangleAlertIcon
+          v-else-if="!isSourceUrlCommon"
+          v-tooltip="`Link includes a domain which isn't common for this link type.`"
           class="size-6 animate-pulse text-orange"
         />
         <input
@@ -60,6 +80,16 @@
             A page containing information, documentation, and help for the project.
           </span>
         </label>
+        <TriangleAlertIcon
+          v-if="isWikiLinkShortener"
+          v-tooltip="`Use of link shorteners is prohibited.`"
+          class="size-6 animate-pulse text-orange"
+        />
+        <TriangleAlertIcon
+          v-else-if="isWikiDiscordUrl"
+          v-tooltip="`Discord invites are not appropriate for this link type.`"
+          class="size-6 animate-pulse text-orange"
+        />
         <input
           id="project-wiki-page"
           v-model="wikiUrl"
@@ -75,7 +105,12 @@
           <span class="label__description"> An invitation link to your Discord server. </span>
         </label>
         <TriangleAlertIcon
-          v-if="!isDiscordUrlCommon"
+          v-if="isDiscordLinkShortener"
+          v-tooltip="`Use of link shorteners is prohibited.`"
+          class="size-6 animate-pulse text-orange"
+        />
+        <TriangleAlertIcon
+          v-else-if="!isDiscordUrlCommon"
           v-tooltip="`You're using a link which isn't common for this link type.`"
           class="size-6 animate-pulse text-orange"
         />
@@ -139,7 +174,7 @@
 <script setup>
 import { DropdownSelect } from "@modrinth/ui";
 import { SaveIcon, TriangleAlertIcon } from "@modrinth/assets";
-import { isCommonUrl, commonLinkDomains } from "@modrinth/moderation";
+import { isCommonUrl, isDiscordUrl, isLinkShortener, commonLinkDomains } from "@modrinth/moderation";
 
 const tags = useTags();
 
@@ -183,6 +218,31 @@ const isDiscordUrlCommon = computed(() => {
   if (!discordUrl.value || discordUrl.value.trim().length === 0) return true;
   return isCommonUrl(discordUrl.value, commonLinkDomains.discord);
 });
+
+const isIssuesDiscordUrl = computed(() => {
+  return isDiscordUrl(issuesUrl.value)
+})
+
+const isSourceDiscordUrl = computed(() => {
+  return isDiscordUrl(sourceUrl.value)
+})
+
+const isWikiDiscordUrl = computed(() => {
+  return isDiscordUrl(wikiUrl.value)
+})
+
+const isIssuesLinkShortner = computed(() => {
+  return isLinkShortener(issuesUrl.value)
+}) 
+const isSourceLinkShortener = computed(() => {
+  return isLinkShortener(sourceUrl.value)
+}) 
+const isWikiLinkShortener = computed(() => {
+  return isLinkShortener(wikiUrl.value)
+}) 
+const isDiscordLinkShortener = computed(() => {
+  return isLinkShortener(discordUrl.value)
+}) 
 
 const rawDonationLinks = JSON.parse(JSON.stringify(props.project.donation_urls));
 rawDonationLinks.push({

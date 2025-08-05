@@ -207,8 +207,8 @@ const categoryLists = computed(() => {
 
 const tooManyTagsWarning = computed(() => {
   const tagCount = selectedTags.value.length;
-  if (tagCount > 5) {
-    return `You've selected ${tagCount} tags. Consider reducing to 5 or fewer to keep your project focused and easier to discover.`;
+  if (tagCount > 8) {
+    return `You've selected ${tagCount} tags. Consider reducing to 8 or fewer to keep your project focused and easier to discover.`;
   }
   return null;
 });
@@ -217,7 +217,7 @@ const multipleResolutionTagsWarning = computed(() => {
   if (props.project.project_type !== "resourcepack") return null;
 
   const resolutionTags = selectedTags.value.filter((tag) =>
-    ["16x", "32x", "48x", "64x", "128x", "256x", "512x", "1024x"].includes(tag.name),
+    ['8x-', '16x', '32x', '48x', '64x', '128x', '256x', '512x+'].includes(tag.name),
   );
 
   if (resolutionTags.length > 1) {
