@@ -7,10 +7,10 @@
     <MedalPromoBackground class="background-pattern shadow-xl" />
     <div class="z-10 flex flex-col gap-2">
       <div class="flex items-center gap-2 text-2xl font-semibold text-contrast">
-        <ClockIcon class="clock-glow size-6 text-orange" /><span>
+        <ClockIcon class="clock-glow text-medal-orange size-6" /><span>
           Try a free
-          <span class="text-orange">3GB server</span> for 5 days powered by
-          <span class="text-orange">Medal</span>
+          <span class="text-medal-orange">3GB server</span> for 5 days powered by
+          <span class="text-medal-orange">Medal</span>
         </span>
       </div>
       <div class="flex items-center">
@@ -66,7 +66,7 @@ import MedalPromoBackground from "~/assets/images/illustrations/medal_promo_back
     drop-shadow(0 0 18px var(--color-orange));
 }
 
-.text-orange {
+.text-medal-orange {
   color: var(--medal-promotion-text-orange);
 }
 </style>

@@ -16,7 +16,7 @@
       >
         <MedalServerIcon
           v-if="status !== 'suspended'"
-          class="z-10 size-16 shrink-0 rounded-xl bg-bg text-orange"
+          class="border-medal-orange z-10 size-16 shrink-0 rounded-xl border-[1px] border-solid bg-bg text-orange"
         />
         <div
           v-else
@@ -235,5 +235,9 @@ onUnmounted(() => {
 .text-medal-orange {
   color: var(--medal-promotion-text-orange);
   font-weight: bold;
+}
+
+.border-medal-orange {
+  border-color: var(--medal-promotion-bg-orange);
 }
 </style>

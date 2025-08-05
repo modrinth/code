@@ -7,13 +7,13 @@
 
     <div class="z-10 flex flex-col gap-1">
       <div class="flex items-center gap-2 text-lg font-semibold text-contrast">
-        <ClockIcon class="clock-glow size-5 text-orange" />
+        <ClockIcon class="clock-glow text-medal-orange size-5" />
         <span>
-          Your <span class="text-orange">Medal</span> powered Modrinth Server will expire in
-          <span class="font-bold text-orange">{{ timeLeftCountdown.days }}</span> days
-          <span class="font-bold text-orange">{{ timeLeftCountdown.hours }}</span> hours
-          <span class="font-bold text-orange">{{ timeLeftCountdown.minutes }}</span> minutes
-          <span class="font-bold text-orange">{{ timeLeftCountdown.seconds }}</span> seconds.
+          Your <span class="text-medal-orange">Medal</span> powered Modrinth Server will expire in
+          <span class="text-medal-orange font-bold">{{ timeLeftCountdown.days }}</span> days
+          <span class="text-medal-orange font-bold">{{ timeLeftCountdown.hours }}</span> hours
+          <span class="text-medal-orange font-bold">{{ timeLeftCountdown.minutes }}</span> minutes
+          <span class="text-medal-orange font-bold">{{ timeLeftCountdown.seconds }}</span> seconds.
         </span>
       </div>
     </div>
@@ -118,7 +118,7 @@ onUnmounted(() => {
     drop-shadow(0 0 18px var(--color-orange));
 }
 
-.text-orange {
+.text-medal-orange {
   color: var(--medal-promotion-text-orange);
   font-weight: bold;
 }
