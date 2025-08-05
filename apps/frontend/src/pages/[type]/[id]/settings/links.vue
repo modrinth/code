@@ -236,7 +236,7 @@ const isWikiDiscordUrl = computed(() => {
   return isDiscordUrl(wikiUrl.value);
 });
 
-const isIssuesLinkShortner = computed(() => {
+const isIssuesLinkShortener = computed(() => {
   return isLinkShortener(issuesUrl.value);
 });
 const isSourceLinkShortener = computed(() => {
