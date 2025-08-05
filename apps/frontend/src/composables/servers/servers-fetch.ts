@@ -141,18 +141,18 @@ export async function useServersFetch<T>(
         }
 
         const errorMessages: { [key: number]: string } = {
-          400: "Bad Request",
-          401: "Unauthorized",
-          403: "Forbidden",
-          404: "Not Found",
-          405: "Method Not Allowed",
-          408: "Request Timeout",
+          400: 'Bad Request',
+          401: 'Unauthorized',
+          403: 'Forbidden',
+          404: 'Not Found',
+          405: 'Method Not Allowed',
+          408: 'Request Timeout',
           429: "You're making requests too quickly. Please wait a moment and try again.",
-          500: "Internal Server Error",
-          502: "Bad Gateway",
-          503: "Service Unavailable",
-          504: "Gateway Timeout",
-        };
+          500: 'Internal Server Error',
+          502: 'Bad Gateway',
+          503: 'Service Unavailable',
+          504: 'Gateway Timeout',
+        }
 
         const message =
           statusCode && statusCode in errorMessages
@@ -170,14 +170,14 @@ export async function useServersFetch<T>(
             `[Modrinth Servers] ${error.message}`,
             statusCode,
             error,
-          );
+          )
           throw new ModrinthServerError(
             `[Modrinth Servers] ${message}`,
             statusCode,
             fetchError,
             module,
             v1Error,
-          );
+          )
         }
 
         const baseDelay = statusCode && statusCode >= 500 ? 5000 : 1000

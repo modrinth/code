@@ -5,18 +5,18 @@ import { useServersFetch } from '../servers-fetch.ts'
 import { ServerModule } from './base.ts'
 
 export class GeneralModule extends ServerModule implements ServerGeneral {
-  server_id!: string;
-  name!: string;
-  owner_id!: string;
-  net!: { ip: string; port: number; domain: string };
-  game!: string;
-  backup_quota!: number;
-  used_backup_quota!: number;
-  status!: string;
-  suspension_reason!: string;
-  loader!: string;
-  loader_version!: string;
-  mc_version!: string;
+  server_id!: string
+  name!: string
+  owner_id!: string
+  net!: { ip: string; port: number; domain: string }
+  game!: string
+  backup_quota!: number
+  used_backup_quota!: number
+  status!: string
+  suspension_reason!: string
+  loader!: string
+  loader_version!: string
+  mc_version!: string
   upstream!: {
     kind: 'modpack' | 'mod' | 'resourcepack'
     version_id: string
