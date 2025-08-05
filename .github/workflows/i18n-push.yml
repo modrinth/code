@@ -18,7 +18,6 @@ jobs:
   preflight_check:
     name: 'Pre-flight check'
     runs-on: ubuntu-22.04
-    if: github.ref == 'refs/heads/cal/crowdin'
     concurrency:
       group: i18n-push:${{ github.ref }}
       cancel-in-progress: true
