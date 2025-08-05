@@ -7,7 +7,7 @@
       :data-pyro-server-listing-id="server_id"
     >
       <div class="overlay"></div>
-      <MedalPromoBackground class="background-pattern" />
+      <MedalPromoBackground class="background-pattern scale-[125%]" />
 
       <NuxtLink
         :to="status === 'suspended' ? '' : `/servers/manage/${props.server_id}`"
@@ -206,6 +206,7 @@ onUnmounted(() => {
   position: relative;
   border: 1px solid var(--medal-promotion-bg-orange);
   background: inherit; // allows overlay + pattern to take over
+  overflow: hidden;
 }
 
 .overlay {

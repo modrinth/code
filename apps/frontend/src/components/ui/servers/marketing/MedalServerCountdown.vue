@@ -3,7 +3,7 @@
     class="medal-promotion flex w-full flex-row items-center justify-between rounded-2xl p-4 shadow-xl"
   >
     <div class="overlay"></div>
-    <MedalPromoBackground class="background-pattern" />
+    <MedalPromoBackground class="background-pattern scale-[125%]" />
 
     <div class="z-10 flex flex-col gap-1">
       <div class="flex items-center gap-2 text-lg font-semibold text-contrast">
