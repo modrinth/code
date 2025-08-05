@@ -62,11 +62,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.CROWDIN_GH_TOKEN }}
 
-      # Because --all flag of Crowdin CLI is currently broken we need to create a fake source file
-      # so that the CLI won't omit translations for it. See https://github.com/crowdin/crowdin-cli/issues/724
-      - name: Write fake sources
-        shell: bash
-        run: echo "{}" > locales/en-US/index.json
+      # # Because --all flag of Crowdin CLI is currently broken we need to create a fake source file
+      # # so that the CLI won't omit translations for it. See https://github.com/crowdin/crowdin-cli/issues/724
+      # - name: Write fake sources
+      #   shell: bash
+      #   run: echo "{}" > locales/en-US/index.json
 
       - name: Query branch name
         id: branch-name
@@ -79,7 +79,7 @@ jobs:
           echo "safe_branch_name=$SAFE_BRANCH_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Download translations from Crowdin
-        uses: crowdin/github-action@v1
+        uses: crowdin/github-action@v2
         with:
           upload_sources: false
           upload_translations: false
@@ -91,9 +91,9 @@ jobs:
           CROWDIN_PROJECT_ID: ${{ vars.CROWDIN_PROJECT_ID }}
           CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
 
-      - name: Fix broken permissions
-        shell: bash
-        run: sudo chown -R $USER:$USER locales
+      # - name: Fix broken permissions
+      #   shell: bash
+      #   run: sudo chown -R $USER:$USER locales
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
