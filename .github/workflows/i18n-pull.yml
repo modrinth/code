@@ -3,14 +3,14 @@ name: Crowdin (pull)
 on:
   schedule:
     - cron: '0 7 * * MON' # every monday at 7 am
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 concurrency:
   group: i18n-management
 
 jobs:
-  preflight_check:
-    name: 'Pre-flight check'
+  pull_translations:
+    name: 'Pull translations from Crowdin'
     runs-on: ubuntu-22.04
     if: github.ref == 'refs/heads/main'
     concurrency:
@@ -18,7 +18,6 @@ jobs:
       cancel-in-progress: true
     steps:
       - name: Preflight check
-        id: check
         run: |
           PREFLIGHT_CHECK_RESULT=true
 
@@ -43,23 +42,14 @@ jobs:
             flight_failure "CROWDIN_GH_TOKEN secret is not defined (required to make pull requests)"
           fi
 
-          echo "flight_ok=$PREFLIGHT_CHECK_RESULT" >> "$GITHUB_OUTPUT"
+          if [ "$PREFLIGHT_CHECK_RESULT" = false ]; then
+            exit 1
+          fi
         env:
           CROWDIN_PROJECT_ID_DEFINED: ${{ vars.CROWDIN_PROJECT_ID != '' }}
           CROWDIN_PERSONAL_TOKEN_DEFINED: ${{ secrets.CROWDIN_PERSONAL_TOKEN != '' }}
           CROWDIN_GH_TOKEN_DEFINED: ${{ secrets.CROWDIN_GH_TOKEN != '' }}
-    outputs:
-      ready: ${{ steps.check.outputs.flight_ok == 'true' }}
 
-  pull_translations:
-    name: 'Pull translations from Crowdin'
-    needs: preflight_check
-    if: needs.preflight_check.outputs.ready == 'true'
-    runs-on: ubuntu-22.04
-    concurrency:
-      group: i18n-pull:${{ github.ref }}
-      cancel-in-progress: true
-    steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:

@@ -4,19 +4,20 @@ on:
   push:
     branches: ['main']
     paths:
+      - '.github/workflows/i18n.push.yml'
       - 'apps/*/src/locales/en-US/**'
       - 'apps/*/locales/en-US/**'
       - 'packages/*/src/locales/en-US/**'
       - 'packages/*/locales/en-US/**'
       - 'crowdin.yml'
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 concurrency:
   group: i18n-management
 
 jobs:
-  preflight_check:
-    name: 'Pre-flight check'
+  push_translations:
+    name: Push sources to Crowdin
     runs-on: ubuntu-22.04
     if: github.ref == 'refs/heads/main'
     concurrency:
@@ -24,7 +25,6 @@ jobs:
       cancel-in-progress: true
     steps:
       - name: Preflight check
-        id: check
         run: |
           PREFLIGHT_CHECK_RESULT=true
 
@@ -48,57 +48,14 @@ jobs:
           if [ "$PREFLIGHT_CHECK_RESULT" = false ]; then
             exit 1
           fi
-
-          echo "flight_ok=$PREFLIGHT_CHECK_RESULT" >> "$GITHUB_OUTPUT"
         env:
           CROWDIN_PROJECT_ID_DEFINED: ${{ vars.CROWDIN_PROJECT_ID != '' }}
           CROWDIN_PERSONAL_TOKEN_DEFINED: ${{ secrets.CROWDIN_PERSONAL_TOKEN != '' }}
-    outputs:
-      ready: ${{ steps.check.outputs.flight_ok == 'true' }}
 
-  push_translations:
-    name: Push sources to Crowdin
-    needs: preflight_check
-    if: needs.preflight_check.outputs.ready == 'true'
-    concurrency:
-      group: i18n-push:${{ github.ref }}
-      cancel-in-progress: true
-    runs-on: ubuntu-22.04
-    steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18.x
-
-      - name: Install pnpm via corepack
-        shell: bash
-        run: |
-          corepack enable
-          corepack prepare --activate
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Extract translations
-        run: pnpm intl:extract
 
       - name: Query branch name
         id: branch-name
