@@ -54,6 +54,7 @@ pub enum Price {
 #[derive(Serialize, Deserialize, Hash, Eq, PartialEq, Debug, Copy, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub enum PriceDuration {
+    FiveDays,
     Monthly,
     Quarterly,
     Yearly,
@@ -62,6 +63,7 @@ pub enum PriceDuration {
 impl PriceDuration {
     pub fn duration(&self) -> chrono::Duration {
         match self {
+            PriceDuration::FiveDays => chrono::Duration::days(5),
             PriceDuration::Monthly => chrono::Duration::days(30),
             PriceDuration::Quarterly => chrono::Duration::days(90),
             PriceDuration::Yearly => chrono::Duration::days(365),
@@ -70,6 +72,7 @@ impl PriceDuration {
 
     pub fn from_string(string: &str) -> PriceDuration {
         match string {
+            "five-days" => PriceDuration::FiveDays,
             "monthly" => PriceDuration::Monthly,
             "quarterly" => PriceDuration::Quarterly,
             "yearly" => PriceDuration::Yearly,
@@ -82,6 +85,7 @@ impl PriceDuration {
             PriceDuration::Monthly => "monthly",
             PriceDuration::Quarterly => "quarterly",
             PriceDuration::Yearly => "yearly",
+            PriceDuration::FiveDays => "five-days",
         }
     }
 
@@ -90,6 +94,7 @@ impl PriceDuration {
             PriceDuration::Monthly,
             PriceDuration::Quarterly,
             PriceDuration::Yearly,
+            PriceDuration::FiveDays,
         ]
         .into_iter()
     }
@@ -152,6 +157,7 @@ impl SubscriptionStatus {
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum SubscriptionMetadata {
     Pyro { id: String, region: Option<String> },
+    Medal { id: String },
 }
 
 #[derive(Serialize, Deserialize)]

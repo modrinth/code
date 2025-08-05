@@ -950,14 +950,17 @@ pub async fn active_servers(
     let server_ids = servers
         .into_iter()
         .filter_map(|x| {
-            x.metadata.as_ref().map(|metadata| match metadata {
-                SubscriptionMetadata::Pyro { id, region } => ActiveServer {
-                    user_id: x.user_id.into(),
-                    server_id: id.clone(),
-                    price_id: x.price_id.into(),
-                    interval: x.interval,
-                    region: region.clone(),
-                },
+            x.metadata.as_ref().and_then(|metadata| match metadata {
+                SubscriptionMetadata::Pyro { id, region } => {
+                    Some(ActiveServer {
+                        user_id: x.user_id.into(),
+                        server_id: id.clone(),
+                        price_id: x.price_id.into(),
+                        interval: x.interval,
+                        region: region.clone(),
+                    })
+                }
+                SubscriptionMetadata::Medal { .. } => None,
             })
         })
         .collect::<Vec<ActiveServer>>();
@@ -1846,6 +1849,7 @@ pub async fn stripe_webhook(
                                             "region": server_region,
                                             "source": source,
                                             "payment_interval": metadata.charge_item.subscription_interval.map(|x| match x {
+                                                PriceDuration::FiveDays => 1,
                                                 PriceDuration::Monthly => 1,
                                                 PriceDuration::Quarterly => 3,
                                                 PriceDuration::Yearly => 12,

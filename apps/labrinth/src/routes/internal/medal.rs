@@ -4,9 +4,13 @@ use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
+use crate::database::models::generate_user_subscription_id;
+use crate::database::models::product_item;
+use crate::database::models::user_subscription_item::DBUserSubscription;
 use crate::database::models::users_redeemals::{
     Offer, RedeemalLookupFields, Status, UserRedeemal,
 };
+use crate::models::v3::billing::{PriceDuration, SubscriptionStatus};
 use crate::routes::ApiError;
 use crate::util::guards::medal_key_guard;
 
@@ -64,7 +68,7 @@ pub async fn redeem(
         )
         .await?;
 
-    let _redeemal = match maybe_fields {
+    let redeemal = match maybe_fields {
         None => return Err(ApiError::NotFound),
         Some(fields) => {
             if fields.redeemal_status.is_some() {
@@ -85,6 +89,38 @@ pub async fn redeem(
             redeemal
         }
     };
+
+    txn.commit().await?;
+
+    // TODO: Provision server (send archon request) THEN add subscription to DB
+
+    let mut txn = pool.begin().await?;
+
+    // Find the Medal product price
+    let maybe_price_id =
+        product_item::unique_price_id_of_product_by_type(&mut *txn, "medal")
+            .await?;
+
+    let Some(medal_price_id) = maybe_price_id else {
+        return Ok(HttpResponse::NotImplemented()
+            .body("Missing price ID for Medal subscription"));
+    };
+
+    // Build a subscription using this price ID.
+    let subscription = DBUserSubscription {
+        id: generate_user_subscription_id(&mut txn).await?,
+        user_id: redeemal.user_id,
+        price_id: medal_price_id,
+        interval: PriceDuration::FiveDays,
+        created: Utc::now(),
+        status: SubscriptionStatus::Unprovisioned,
+        metadata: None, // TODO: Provision server, then add metadata
+    };
+
+    // TODO: Insert a cancelled charge in 5 days time, `index_subscriptions` will unprovision
+    // the subscription.
+
+    subscription.upsert(&mut txn).await?;
 
     txn.commit().await?;
 

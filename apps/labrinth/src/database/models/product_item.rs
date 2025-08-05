@@ -269,3 +269,29 @@ impl DBProductPrice {
         Ok(prices)
     }
 }
+
+/// Queries a single price ID for a product by type.
+pub async fn unique_price_id_of_product_by_type<'a, E>(
+    exec: E,
+    r#type: &str,
+) -> Result<Option<DBProductPriceId>, DatabaseError>
+where
+    E: sqlx::PgExecutor<'a>,
+{
+    let maybe_row = sqlx::query!(
+        "
+      SELECT
+        products_prices.id
+      FROM
+        products_prices
+      INNER JOIN
+        products ON products.metadata ->> 'type' = $1
+      LIMIT 1
+        ",
+        r#type,
+    )
+    .fetch_optional(exec)
+    .await?;
+
+    Ok(maybe_row.map(|x| DBProductPriceId(x.id)))
+}
