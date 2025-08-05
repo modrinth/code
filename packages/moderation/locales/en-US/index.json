@@ -12,22 +12,22 @@
     "defaultMessage": "Add an icon"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Add any relevant links targeted outside of Modrinth, such as sources, issues, or a Discord invite."
+    "defaultMessage": "Add any relevant links targeted outside of Modrinth, such as source code, an issue tracker, or a Discord invite."
   },
   "nags.add-links.title": {
     "defaultMessage": "Add external links"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "You've selected all {totalAvailableTags} available tags. This defeats the purpose of tags, which are meant to help users find relevant projects. Please select only the tags that truly apply to your project."
+    "defaultMessage": "You've selected all {totalAvailableTags} available tags. This defeats the purpose of tags, which are meant to help users find relevant projects. Please select only the tags that are relevant to your project."
   },
   "nags.all-tags-selected.title": {
-    "defaultMessage": "All tags selected"
+    "defaultMessage": "Select accurate tags"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "Your description is {length} readable characters. At least {minChars} characters is recommended to create a clear and informative Description."
+    "defaultMessage": "Your description is {length} readable characters. At least {minChars} characters is recommended to create a clear and informative description."
   },
   "nags.description-too-short.title": {
-    "defaultMessage": "Description may be insufficient"
+    "defaultMessage": "Expand the description"
   },
   "nags.edit-description.title": {
     "defaultMessage": "Edit description"
@@ -54,16 +54,16 @@
     "defaultMessage": "Visit gallery page"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Your {projectType} uses a license which requires source code to be available. Please provide a source code link or sources file, or consider using a different license."
+    "defaultMessage": "Your {projectType} uses a license which requires source code to be available. Please provide a source code link or sources file for each additional version, or consider using a different license."
   },
   "nags.gpl-license-source-required.title": {
-    "defaultMessage": "License requires source"
+    "defaultMessage": "Provide source code"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Your Description should contain sufficient plain text or image alt-text, keeping it accessible to those using screen readers or with slow internet connections."
   },
   "nags.image-heavy-description.title": {
-    "defaultMessage": "Description is mostly images"
+    "defaultMessage": "Ensure accessibility"
   },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "License URL is invalid."
@@ -75,43 +75,43 @@
     "defaultMessage": "Your license URL appears to be malformed. Please provide a valid URL to your license text."
   },
   "nags.invalid-license-url.title": {
-    "defaultMessage": "Invalid license URL"
+    "defaultMessage": "Add a valid license link"
   },
   "nags.link-shortener-usage.description": {
     "defaultMessage": "Use of link shorteners or other methods to obscure where a link may lead in your external links or license link is prohibited, please only use appropriate full length links."
   },
   "nags.link-shortener-usage.title": {
-    "defaultMessage": "Use of link shorteners is prohibited"
+    "defaultMessage": "Don't use link shorteners"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# header} other {# headers}} in your description {count, plural, one {is} other {are}} too long. Headers should be concise and act as section titles, not full sentences."
   },
   "nags.long-headers.title": {
-    "defaultMessage": "Headers are too long"
+    "defaultMessage": "Shorten headers"
   },
   "nags.minecraft-title-clause.description": {
-    "defaultMessage": "Projects must not use Minecraft's branding or include \"Minecraft\" as a significant part of the Name."
+    "defaultMessage": "Projects must not use Minecraft's branding or include \"Minecraft\" as a significant part of the name."
   },
   "nags.minecraft-title-clause.title": {
-    "defaultMessage": "Title contains \"Minecraft\""
+    "defaultMessage": "Avoid brand infringement"
   },
   "nags.missing-alt-text.description": {
     "defaultMessage": "Some of your images are missing alt text, which is important for accessibility, especially for visually impaired users."
   },
   "nags.missing-alt-text.title": {
-    "defaultMessage": "Images missing alt text"
+    "defaultMessage": "Add image alt text"
   },
   "nags.misused-discord-link-description": {
-    "defaultMessage": "Discord invites can not be used for other link types. Please put your Discord link in the Discord Invite link field."
+    "defaultMessage": "Discord invites can not be used for other link types. Please put your Discord link in the Discord Invite link field only."
   },
   "nags.misused-discord-link.title": {
-    "defaultMessage": "Misplaced Discord invite"
+    "defaultMessage": "Move Discord invite"
   },
   "nags.moderation.title": {
     "defaultMessage": "Visit moderation thread"
   },
   "nags.moderator-feedback.description": {
-    "defaultMessage": "Review and address all concerns from Moderation before resubmitting."
+    "defaultMessage": "Review and address all concerns from the moderation team before resubmitting."
   },
   "nags.moderator-feedback.title": {
     "defaultMessage": "Review moderator feedback"
@@ -120,7 +120,7 @@
     "defaultMessage": "You've selected {count} resolution tags ({tags}). Resource packs should typically only have one resolution tag that matches their primary resolution."
   },
   "nags.multiple-resolution-tags.title": {
-    "defaultMessage": "Multiple resolution tags selected"
+    "defaultMessage": "Select correct resolution"
   },
   "nags.select-environments.description": {
     "defaultMessage": "Select if the {projectType} functions on the client-side and/or server-side."
@@ -132,10 +132,10 @@
     "defaultMessage": "Select the license your {projectType} is distributed under."
   },
   "nags.select-license.title": {
-    "defaultMessage": "Select license"
+    "defaultMessage": "Select a license"
   },
   "nags.select-tags.description": {
-    "defaultMessage": "Select the tags that correctly apply to your project to make sure the right users find it."
+    "defaultMessage": "Select the tags that correctly apply to your project to help the right users find it."
   },
   "nags.select-tags.title": {
     "defaultMessage": "Select tags"
@@ -162,25 +162,25 @@
     "defaultMessage": "Your summary can not be the same as your project's Name. It's important to create an informative and enticing Summary."
   },
   "nags.summary-same-as-title.title": {
-    "defaultMessage": "Summary is project name"
+    "defaultMessage": "Make the summary unique"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "Your summary is {length} characters. At least {minChars} characters is recommended to create an informative and enticing Summary."
+    "defaultMessage": "Your summary is {length} characters. At least {minChars} characters is recommended to create an informative and enticing summary."
   },
   "nags.summary-too-short.title": {
-    "defaultMessage": "Summary may be insufficient"
+    "defaultMessage": "Expand the summary"
   },
   "nags.title-contains-technical-info.description": {
     "defaultMessage": "Keeping your project's Name clean and makes it memorable easier to find. Version and loader information is automatically displayed alongside your project."
   },
   "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Title contains unnecessary information"
+    "defaultMessage": "Clean up the name"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "You've selected {tagCount} tags. Consider reducing to 5 or fewer to keep your project focused and easier to discover."
+    "defaultMessage": "You've selected {tagCount} tags. Consider reducing to {maxTagCount} or fewer to make sure your project appears in relevant search results."
   },
   "nags.too-many-tags.title": {
-    "defaultMessage": "Too many tags selected"
+    "defaultMessage": "Select accurate tags"
   },
   "nags.upload-version.description": {
     "defaultMessage": "At least one version is required for a project to be submitted for review."
@@ -189,7 +189,7 @@
     "defaultMessage": "Upload a version"
   },
   "nags.verify-external-links.description": {
-    "defaultMessage": "Some of your external links may be using domains that aren't recognized as common for their link type."
+    "defaultMessage": "Some of your external links may be using domains that are inappropriate for that type of link."
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "Verify external links"
