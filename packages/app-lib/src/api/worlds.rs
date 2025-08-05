@@ -1,6 +1,7 @@
 use crate::data::ModLoader;
 use crate::launcher::get_loader_version_from_profile;
 use crate::profile::get_full_path;
+use crate::server_address::{parse_server_address, resolve_server_address};
 use crate::state::attached_world_data::AttachedWorldData;
 use crate::state::{
     Profile, ProfileInstallStage, attached_world_data, server_join_log,
@@ -11,7 +12,7 @@ pub use crate::util::server_ping::{
     ServerGameProfile, ServerPlayers, ServerStatus, ServerVersion,
 };
 use crate::util::{io, server_ping};
-use crate::{Error, ErrorKind, Result, State, launcher};
+use crate::{ErrorKind, Result, State, launcher};
 use async_walkdir::WalkDir;
 use async_zip::{Compression, ZipEntryBuilder};
 use chrono::{DateTime, Local, TimeZone, Utc};
@@ -24,11 +25,9 @@ use regex::{Regex, RegexBuilder};
 use serde::{Deserialize, Serialize};
 use std::cmp::Reverse;
 use std::io::Cursor;
-use std::net::{Ipv4Addr, Ipv6Addr};
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 use tokio::io::AsyncWriteExt;
-use tokio::sync::Semaphore;
 use tokio::task::JoinSet;
 use tokio_util::compat::FuturesAsyncWriteCompatExt;
 use url::Url;
@@ -433,9 +432,9 @@ async fn get_server_worlds_in_profile(
         let mut futures = JoinSet::new();
         for (index, world) in worlds.iter().enumerate().skip(first_server_index)
         {
-            if world.last_played.is_some() {
-                continue;
-            }
+            // We can't check for the profile already having a last_played, in case the user joined
+            // the target address directly more recently. This is often the case when using
+            // quick-play before 1.20.
             if let WorldDetails::Server { address, .. } = &world.details
                 && let Ok((host, port)) = parse_server_address(address)
             {
@@ -916,94 +915,4 @@ pub async fn get_server_status(
         protocol_version,
     )
     .await
-}
-
-pub fn parse_server_address(address: &str) -> Result<(&str, u16)> {
-    parse_server_address_inner(address)
-        .map_err(|e| Error::from(ErrorKind::InputError(e)))
-}
-
-// Reimplementation of Guava's HostAndPort#fromString with a default port of 25565
-fn parse_server_address_inner(
-    address: &str,
-) -> std::result::Result<(&str, u16), String> {
-    let (host, port_str) = if address.starts_with("[") {
-        let colon_index = address.find(':');
-        let close_bracket_index = address.rfind(']');
-        if colon_index.is_none() || close_bracket_index.is_none() {
-            return Err(format!("Invalid bracketed host/port: {address}"));
-        }
-        let close_bracket_index = close_bracket_index.unwrap();
-
-        let host = &address[1..close_bracket_index];
-        if close_bracket_index + 1 == address.len() {
-            (host, "")
-        } else {
-            if address.as_bytes().get(close_bracket_index).copied()
-                != Some(b':')
-            {
-                return Err(format!(
-                    "Only a colon may follow a close bracket: {address}"
-                ));
-            }
-            let port_str = &address[close_bracket_index + 2..];
-            for c in port_str.chars() {
-                if !c.is_ascii_digit() {
-                    return Err(format!("Port must be numeric: {address}"));
-                }
-            }
-            (host, port_str)
-        }
-    } else {
-        let colon_pos = address.find(':');
-        if let Some(colon_pos) = colon_pos {
-            (&address[..colon_pos], &address[colon_pos + 1..])
-        } else {
-            (address, "")
-        }
-    };
-
-    let mut port = None;
-    if !port_str.is_empty() {
-        if port_str.starts_with('+') {
-            return Err(format!("Unparseable port number: {port_str}"));
-        }
-        port = port_str.parse::<u16>().ok();
-        if port.is_none() {
-            return Err(format!("Unparseable port number: {port_str}"));
-        }
-    }
-
-    Ok((host, port.unwrap_or(25565)))
-}
-
-async fn resolve_server_address(
-    host: &str,
-    port: u16,
-) -> Result<(String, u16)> {
-    static SIMULTANEOUS_DNS_QUERIES: Semaphore = Semaphore::const_new(24);
-
-    if host.parse::<Ipv4Addr>().is_ok() || host.parse::<Ipv6Addr>().is_ok() {
-        return Ok((host.to_owned(), port));
-    }
-
-    let _permit = SIMULTANEOUS_DNS_QUERIES.acquire().await?;
-    let resolver = hickory_resolver::TokioResolver::builder_tokio()?.build();
-    Ok(
-        match resolver.srv_lookup(format!("_minecraft._tcp.{host}")).await {
-            Err(e)
-                if e.proto()
-                    .filter(|x| x.kind().is_no_records_found())
-                    .is_some() =>
-            {
-                None
-            }
-            Err(e) => return Err(e.into()),
-            Ok(lookup) => lookup
-                .into_iter()
-                .next()
-                .map(|r| (r.target().to_string(), r.port())),
-        }
-        .unwrap_or_else(|| (host.to_owned(), port)),
-    )
 }
