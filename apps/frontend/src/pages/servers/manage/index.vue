@@ -120,7 +120,7 @@ import { ButtonStyled, CopyCode } from "@modrinth/ui";
 import type { Server, ModrinthServersFetchError } from "@modrinth/utils";
 import { reloadNuxtApp } from "#app";
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
-import MedalServerListing from "~/components/ui/servers/MedalServerListing.vue";
+import MedalServerListing from "~/components/ui/servers/marketing/MedalServerListing.vue";
 
 definePageMeta({
   middleware: "auth",

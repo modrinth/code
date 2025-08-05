@@ -140,7 +140,7 @@ const timeLeftCountdown = computed(() => {
 <style scoped lang="scss">
 .medal-promotion {
   position: relative;
-  border: 1px solid var(--medal-promotion-orange);
+  border: 1px solid var(--medal-promotion-bg-orange);
   background: inherit; // allows overlay + pattern to take over
 }
 .overlay {
@@ -167,6 +167,6 @@ const timeLeftCountdown = computed(() => {
   z-index: 0;
   background-color: var(--medal-promotion-bg);
   border-radius: inherit;
-  color: var(--color-orange);
+  color: var(--medal-promotion-text-orange);
 }
 </style>

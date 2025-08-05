@@ -34,7 +34,7 @@ import MedalPromoBackground from "~/assets/images/illustrations/medal_promo_back
 <style scoped lang="scss">
 .medal-promotion {
   position: relative;
-  border: 1px solid var(--medal-promotion-orange);
+  border: 1px solid var(--medal-promotion-bg-orange);
 }
 
 .overlay {
@@ -43,12 +43,7 @@ import MedalPromoBackground from "~/assets/images/illustrations/medal_promo_back
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    color-mix(in srgb, var(--medal-promotion-orange) 25%, transparent),
-    transparent 50%,
-    var(--medal-promotion-bg) 100%
-  );
+  background: var(--medal-promotion-bg-gradient);
   z-index: 1;
   border-radius: inherit;
 }
@@ -71,6 +66,6 @@ import MedalPromoBackground from "~/assets/images/illustrations/medal_promo_back
 }
 
 .text-orange {
-  color: #ffb84b;
+  color: var(--medal-promotion-text-orange);
 }
 </style>
