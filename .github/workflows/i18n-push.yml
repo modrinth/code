@@ -1,0 +1,156 @@
+name: Crowdin (push)
+
+on:
+  push:
+    branches: ['cal/crowdin']
+    paths:
+      - 'apps/*/src/locales/en-US/**'
+      - 'apps/*/locales/en-US/**'
+      - 'packages/*/src/locales/en-US/**'
+      - 'packages/*/locales/en-US/**'
+      - 'crowdin.yml'
+  workflow_dispatch: {}
+
+concurrency:
+  group: i18n-management
+
+jobs:
+  preflight_check:
+    name: 'Pre-flight check'
+    runs-on: ubuntu-22.04
+    concurrency:
+      group: i18n-push:${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Preflight check
+        id: check
+        run: |
+          PREFLIGHT_CHECK_RESULT=true
+
+          function flight_failure () {
+            if [ "$PREFLIGHT_CHECK_RESULT" = true ]; then
+              echo "One or more pre-flight checks failed!"
+              echo ""
+              PREFLIGHT_CHECK_RESULT=false
+            fi
+            echo "- $1"
+          }
+
+          if [ "$CROWDIN_PROJECT_ID_DEFINED" != true ]; then
+            flight_failure "CROWDIN_PROJECT_ID variable is not defined (required to push)"
+          fi
+
+          if [ "$CROWDIN_PERSONAL_TOKEN_DEFINED" != true ]; then
+            flight_failure "CROWDIN_PERSONAL_TOKEN secret is not defined (required to push)"
+          fi
+
+          echo "flight_ok=$PREFLIGHT_CHECK_RESULT" >> "$GITHUB_OUTPUT"
+        env:
+          CROWDIN_PROJECT_ID_DEFINED: ${{ vars.CROWDIN_PROJECT_ID != '' }}
+          CROWDIN_PERSONAL_TOKEN_DEFINED: ${{ secrets.CROWDIN_PERSONAL_TOKEN != '' }}
+
+      - name: Check that Crowdin branch exists
+        if: github.event_name != 'workflow_dispatch' && github.ref_name != github.event.repository.default_branch
+        id: crowdin-branch-exists
+        uses: GuillaumeFalourd/branch-exists@v1
+        with:
+          branch: ${{ format('crowdin-pull/{0}', github.ref_name) }}
+
+      - name: Checkout
+        id: checkout
+        if: github.event_name != 'workflow_dispatch' && steps.check.outputs.flight_ok == 'true' && (steps.crowdin-branch-exists.outcome == 'skipped' || steps.crowdin-branch-exists.outputs.exists == 'true')
+        uses: actions/checkout@v4
+
+      - name: Confirm push necessity
+        id: changed-files
+        if: steps.checkout.outcome != 'skipped'
+        uses: tj-actions/changed-files@v42
+        with:
+          negation_patterns_first: true
+          files: |
+            **
+            locales/en-US/**
+            crowdin.yml
+          files_ignore: |
+            .{github,vscode,idea}/**
+            {assets,patches,types,public,locales}/**
+            .{editorconfig,gitignore,npmrc,prettierignore}
+            .*.{js,json}
+            *.{md,yml,yaml,json}
+            LICENSE
+
+      - name: Output result
+        if: steps.changed-files.outcome != 'skipped'
+        run: |
+          cat << EOF
+            Changed files are ${{ steps.changed-files.outputs.all_changed_files }}
+          EOF
+    outputs:
+      ready: ${{ steps.check.outputs.flight_ok == 'true' && (github.event_name == 'workflow_dispatch' || steps.changed-files.outputs.any_changed == 'true') }}
+
+  push_translations:
+    name: Push sources to Crowdin
+    needs: preflight_check
+    if: needs.preflight_check.outputs.ready == 'true'
+    concurrency:
+      group: i18n-push:${{ github.ref }}
+      cancel-in-progress: true
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+
+      - name: Install pnpm via corepack
+        shell: bash
+        run: |
+          corepack enable
+          corepack prepare --activate
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Extract translations
+        run: pnpm intl:extract
+
+      - name: Query branch name
+        id: branch-name
+        shell: bash
+        run: |
+          BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+          SAFE_BRANCH_NAME=$(echo "$BRANCH_NAME" | sed -e "s/[\\\\/\\:*?\"<>|]/_/g")
+          echo "Branch name is $BRANCH_NAME (escaped as $SAFE_BRANCH_NAME)"
+          echo "branch_name=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
+          echo "safe_branch_name=$SAFE_BRANCH_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Upload translations to Crowdin
+        uses: crowdin/github-action@v1
+        with:
+          upload_sources: true
+          upload_translations: false
+          download_translations: false
+          push_translations: false
+          create_pull_request: false
+          crowdin_branch_name: '[${{ github.repository_owner }}.${{ github.event.repository.name }}] ${{ steps.branch-name.outputs.safe_branch_name }}'
+        env:
+          CROWDIN_PROJECT_ID: ${{ vars.CROWDIN_PROJECT_ID }}
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}

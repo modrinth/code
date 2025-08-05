@@ -1,0 +1,124 @@
+name: Crowdin (pull)
+
+on:
+  schedule:
+    - cron: '0 7 * * MON' # every monday at 7 am
+  workflow_dispatch: {}
+
+concurrency:
+  group: i18n-management
+
+jobs:
+  preflight_check:
+    name: 'Pre-flight check'
+    runs-on: ubuntu-22.04
+    if: github.ref == 'refs/heads/cal/crowdin'
+    concurrency:
+      group: i18n-pull:${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Preflight check
+        id: check
+        run: |
+          PREFLIGHT_CHECK_RESULT=true
+
+          function flight_failure () {
+            if [ "$PREFLIGHT_CHECK_RESULT" = true ]; then
+              echo "One or more pre-flight checks failed!"
+              echo ""
+              PREFLIGHT_CHECK_RESULT=false
+            fi
+            echo "- $1"
+          }
+
+          if [ "$CROWDIN_PROJECT_ID_DEFINED" != true ]; then
+            flight_failure "CROWDIN_PROJECT_ID variable is not defined (required to push)"
+          fi
+
+          if [ "$CROWDIN_PERSONAL_TOKEN_DEFINED" != true ]; then
+            flight_failure "CROWDIN_PERSONAL_TOKEN secret is not defined (required to push)"
+          fi
+
+          if [ "$CROWDIN_GH_TOKEN_DEFINED" != true ]; then
+            flight_failure "CROWDIN_GH_TOKEN secret is not defined (required to make pull requests)"
+          fi
+
+          echo "flight_ok=$PREFLIGHT_CHECK_RESULT" >> "$GITHUB_OUTPUT"
+        env:
+          CROWDIN_PROJECT_ID_DEFINED: ${{ vars.CROWDIN_PROJECT_ID != '' }}
+          CROWDIN_PERSONAL_TOKEN_DEFINED: ${{ secrets.CROWDIN_PERSONAL_TOKEN != '' }}
+          CROWDIN_GH_TOKEN_DEFINED: ${{ secrets.CROWDIN_GH_TOKEN != '' }}
+    outputs:
+      ready: ${{ steps.check.outputs.flight_ok == 'true' }}
+
+  pull_translations:
+    name: 'Pull translations from Crowdin'
+    needs: preflight_check
+    if: needs.preflight_check.outputs.ready == 'true'
+    runs-on: ubuntu-22.04
+    concurrency:
+      group: i18n-pull:${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          token: ${{ secrets.CROWDIN_GH_TOKEN }}
+
+      - name: Configure Git author
+        id: git-author
+        uses: MarcoIeni/git-config@v0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.CROWDIN_GH_TOKEN }}
+
+      # Because --all flag of Crowdin CLI is currently broken we need to create a fake source file
+      # so that the CLI won't omit translations for it. See https://github.com/crowdin/crowdin-cli/issues/724
+      - name: Write fake sources
+        shell: bash
+        run: echo "{}" > locales/en-US/index.json
+
+      - name: Query branch name
+        id: branch-name
+        shell: bash
+        run: |
+          BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+          SAFE_BRANCH_NAME=$(echo "$BRANCH_NAME" | sed -e "s/[\\\\/\\:*?\"<>|]/_/g")
+          echo "Branch name is $BRANCH_NAME (escaped as $SAFE_BRANCH_NAME)"
+          echo "branch_name=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
+          echo "safe_branch_name=$SAFE_BRANCH_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Download translations from Crowdin
+        uses: crowdin/github-action@v1
+        with:
+          upload_sources: false
+          upload_translations: false
+          download_translations: true
+          push_translations: false
+          create_pull_request: false
+          crowdin_branch_name: '[${{ github.repository_owner }}.${{ github.event.repository.name }}] ${{ steps.branch-name.outputs.safe_branch_name }}'
+        env:
+          CROWDIN_PROJECT_ID: ${{ vars.CROWDIN_PROJECT_ID }}
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+
+      - name: Fix broken permissions
+        shell: bash
+        run: sudo chown -R $USER:$USER locales
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          title: 'New translations from Crowdin (${{ steps.branch-name.outputs.branch_name }})'
+          body: |-
+            Here is your automated pull request with updated translations from [our Crowdin](https://crowdin.com/project/modrinth) for the `${{ steps.branch-name.outputs.branch_name }}` branch. Merge whenever you ready.
+
+            This pull request is created according to the `.github/workflows/i18n-pull.yml` file.
+
+            Want to update this pull request? [Dispatch this workflow again](https://github.com/${{ github.repository }}/actions/workflows/i18n-pull.yml).
+          commit-message: 'New translations from Crowdin (${{ steps.branch-name.outputs.branch_name }})'
+          branch: crowdin-pull/${{ steps.branch-name.outputs.branch_name }}
+          add-paths: locales
+          author: '${{ steps.git-author.outputs.name }} <${{ steps.git-author.outputs.email }}>'
+          committer: '${{ steps.git-author.outputs.name }} <${{ steps.git-author.outputs.email }}>'
+          token: ${{ secrets.CROWDIN_GH_TOKEN }}
+          git-token: ${{ secrets.CROWDIN_GH_TOKEN }}
