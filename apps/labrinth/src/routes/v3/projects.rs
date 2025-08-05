@@ -898,9 +898,9 @@ pub async fn project_edit(
         project_item.inner.slug,
         None,
         None,
-                &redis,
-            )
-            .await?;
+        &redis,
+    )
+    .await?;
 
     // Remove no longer searchable projects from search index
     if let (true, Some(false)) = (
