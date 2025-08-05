@@ -1,7 +1,7 @@
 import { BookOpenIcon } from '@modrinth/assets'
+import type { Project } from '@modrinth/utils'
 
 import type { Stage } from '../../types/stage'
-import type { Project } from '@modrinth/utils'
 
 function hasCustomSlug(project: Project): boolean {
   return (

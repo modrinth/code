@@ -121,7 +121,22 @@
   </div>
 </template>
 <script setup lang="ts">
-import ContextMenu from '@/components/ui/ContextMenu.vue'
+import { PlusIcon, SearchIcon, SpinnerIcon, UpdatedIcon, XIcon } from '@modrinth/assets'
+import {
+  Button,
+  ButtonStyled,
+  FilterBar,
+  type FilterBarOption,
+  GAME_MODES,
+  type GameVersion,
+  RadialHeader,
+} from '@modrinth/ui'
+import type { Version } from '@modrinth/utils'
+import { defineMessages } from '@vintl/vintl'
+import { computed, onUnmounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+
+import type ContextMenu from '@/components/ui/ContextMenu.vue'
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import AddServerModal from '@/components/ui/world/modal/AddServerModal.vue'
 import EditServerModal from '@/components/ui/world/modal/EditServerModal.vue'
@@ -154,20 +169,6 @@ import {
   type World,
 } from '@/helpers/worlds.ts'
 import { handleError } from '@/store/notifications'
-import { PlusIcon, SearchIcon, SpinnerIcon, UpdatedIcon, XIcon } from '@modrinth/assets'
-import {
-  Button,
-  ButtonStyled,
-  FilterBar,
-  type FilterBarOption,
-  GAME_MODES,
-  type GameVersion,
-  RadialHeader,
-} from '@modrinth/ui'
-import { Version } from '@modrinth/utils'
-import { defineMessages } from '@vintl/vintl'
-import { computed, onUnmounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
 
 const route = useRoute()
 

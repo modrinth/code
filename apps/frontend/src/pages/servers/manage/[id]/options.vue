@@ -19,7 +19,8 @@ import {
   WrenchIcon,
 } from '@modrinth/assets'
 import { isAdmin as isUserAdmin, type User } from '@modrinth/utils'
-import { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
+
+import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import type { BackupInProgressReason } from '~/pages/servers/manage/[id].vue'
 
 const route = useRoute()

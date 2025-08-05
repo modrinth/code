@@ -1,12 +1,4 @@
 <script setup lang="ts">
-import type {
-  ProtocolVersion,
-  ServerStatus,
-  ServerWorld,
-  SingleplayerWorld,
-  World,
-} from '@/helpers/worlds.ts'
-import { getWorldIdentifier, set_world_display_status } from '@/helpers/worlds.ts'
 import {
   ClipboardCopyIcon,
   EditIcon,
@@ -44,6 +36,14 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { copyToClipboard } from '@/helpers/utils'
+import type {
+  ProtocolVersion,
+  ServerStatus,
+  ServerWorld,
+  SingleplayerWorld,
+  World,
+} from '@/helpers/worlds.ts'
+import { getWorldIdentifier, set_world_display_status } from '@/helpers/worlds.ts'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
