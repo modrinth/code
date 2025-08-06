@@ -368,7 +368,6 @@ import {
   type Stage,
   finalPermissionMessages,
 } from "@modrinth/moderation";
-import * as prettier from "prettier";
 import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
 import KeybindsModal from "./ChecklistKeybindsModal.vue";
 import { useModerationStore } from "~/store/moderation.ts";
@@ -1118,19 +1117,7 @@ async function generateMessage() {
       }
     }
 
-    try {
-      const formattedMessage = await prettier.format(fullMessage, {
-        parser: "markdown",
-        printWidth: 80,
-        proseWrap: "always",
-        tabWidth: 2,
-        useTabs: false,
-      });
-      message.value = formattedMessage;
-    } catch (formattingError) {
-      console.warn("Failed to format markdown, using original:", formattingError);
-      message.value = fullMessage;
-    }
+    message.value = fullMessage;
 
     generatedMessage.value = true;
   } catch (error) {
