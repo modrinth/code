@@ -1,27 +1,5 @@
---
--- PostgreSQL database dump
---
+BEGIN TRANSACTION;
 
--- Dumped from database version 15.12 (Debian 15.12-1.pgdg110+1)
--- Dumped by pg_dump version 17.5 (Debian 17.5-1)
-
--- Started on 2025-08-05 21:43:27 CEST
-
-\connect labrinth
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
-TRUNCATE TABLE public.categories RESTART IDENTITY CASCADE;
 COPY public.categories (id, category, project_type, icon, header, ordering) FROM stdin;
 60	cursed	3	<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7.5" width="10" height="14" rx="5"/><polyline points="2 12.5 4 14.5 7 14.5"/><polyline points="22 12.5 20 14.5 17 14.5"/><polyline points="3 21.5 5 18.5 7 17.5"/><polyline points="21 21.5 19 18.5 17 17.5"/><polyline points="3 8.5 5 10.5 7 11.5"/><polyline points="21 8.5 19 10.5 17 11.5"/><line x1="12" y1="7.5" x2="12" y2="21.5"/><path d="M15.38,8.82A3,3,0,0,0,16,7h0a3,3,0,0,0-3-3H11A3,3,0,0,0,8,7H8a3,3,0,0,0,.61,1.82"/><line x1="9" y1="4.5" x2="8" y2="2.5"/><line x1="15" y1="4.5" x2="16" y2="2.5"/></svg>	categories	0
 61	locale	3	<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>	features	0
@@ -137,24 +115,7 @@ COPY public.loaders (id, loader, icon, hidable, metadata) FROM stdin;
 \.
 
 
-TRUNCATE TABLE public.loader_fields RESTART IDENTITY CASCADE;
-COPY public.loader_fields (id, field, field_type, enum_type, optional, min_val, max_val) FROM stdin;
-4	mrpack_loaders	array_enum	3	f	0	\N
-3	game_versions	array_enum	2	f	1	\N
-9	environment	enum	4	f	\N	\N
-\.
-
-
-TRUNCATE TABLE public.loader_field_enums RESTART IDENTITY CASCADE;
-COPY public.loader_field_enums (id, enum_name, ordering, hidable) FROM stdin;
-1	side_types	\N	t
-2	game_versions	\N	t
-3	mrpack_loaders	\N	t
-4	environment	\N	t
-\.
-
-
-TRUNCATE TABLE public.loader_field_enum_values RESTART IDENTITY CASCADE;
+TRUNCATE table public.loader_field_enum_values RESTART IDENTITY CASCADE;
 COPY public.loader_field_enum_values (id, enum_id, value, ordering, created, metadata) FROM stdin;
 2	1	unsupported	\N	2025-04-03 21:55:46.229944+00	\N
 3	1	unknown	\N	2025-04-03 21:55:46.229944+00	\N
@@ -1000,7 +961,6 @@ COPY public.loader_field_enum_values (id, enum_id, value, ordering, created, met
 \.
 
 
-TRUNCATE TABLE public.loader_fields_loaders RESTART IDENTITY CASCADE;
 COPY public.loader_fields_loaders (loader_id, loader_field_id) FROM stdin;
 1	3
 3	3
@@ -1050,18 +1010,20 @@ COPY public.loader_fields_loaders (loader_id, loader_field_id) FROM stdin;
 \.
 
 
-TRUNCATE TABLE public.project_types RESTART IDENTITY CASCADE;
+-- For some reason, the actual staging DB has different IDs for project types
+-- from ID 3 onwards. For consistency, let's keep them as-is and just add the
+-- new ones from staging not present in new databases
 COPY public.project_types (id, name) FROM stdin;
-1	mod
-2	modpack
-3	resourcepack
-4	shader
-5	plugin
-6	datapack
+5	resourcepack
+6	shader
 \.
 
 
-TRUNCATE TABLE public.loaders_project_types RESTART IDENTITY CASCADE;
+-- Mapping of loader IDs from staging to a new DB:
+-- 3 (resourcepack) -> 5
+-- 4 (shader) -> 6
+-- 5 (plugin) -> 3
+-- 6 (datapack) -> 4
 COPY public.loaders_project_types (joining_loader_id, joining_project_type_id) FROM stdin;
 1	1
 2	1
@@ -1069,23 +1031,23 @@ COPY public.loaders_project_types (joining_loader_id, joining_project_type_id) F
 4	1
 5	1
 6	1
-7	3
-16	4
-17	4
-18	4
-19	4
+7	5
+16	6
+17	6
+18	6
+19	6
 22	1
 23	2
-20	6
-9	5
-15	5
-21	5
-13	5
-10	5
-11	5
-8	5
-12	5
-14	5
+20	4
+9	3
+15	3
+21	3
+13	3
+10	3
+11	3
+8	3
+12	3
+14	3
 24	1
 25	1
 26	1
@@ -1095,7 +1057,6 @@ COPY public.loaders_project_types (joining_loader_id, joining_project_type_id) F
 \.
 
 
-TRUNCATE TABLE public.loaders_project_types_games RESTART IDENTITY CASCADE;
 COPY public.loaders_project_types_games (loader_id, project_type_id, game_id) FROM stdin;
 1	1	1
 2	1	1
@@ -1103,7 +1064,7 @@ COPY public.loaders_project_types_games (loader_id, project_type_id, game_id) FR
 4	1	1
 5	1	1
 6	1	1
-7	3	1
+7	5	1
 8	1	1
 9	1	1
 10	1	1
@@ -1112,24 +1073,24 @@ COPY public.loaders_project_types_games (loader_id, project_type_id, game_id) FR
 13	1	1
 14	1	1
 15	1	1
-16	4	1
-17	4	1
-18	4	1
-19	4	1
+16	6	1
+17	6	1
+18	6	1
+19	6	1
 20	1	1
 21	1	1
 22	1	1
 23	2	1
 20	6	1
-9	5	1
-15	5	1
-21	5	1
-13	5	1
-10	5	1
-11	5	1
-8	5	1
-12	5	1
-14	5	1
+9	3	1
+15	3	1
+21	3	1
+13	3	1
+10	3	1
+11	3	1
+8	3	1
+12	3	1
+14	3	1
 24	1	1
 25	1	1
 26	1	1
@@ -1139,17 +1100,9 @@ COPY public.loaders_project_types_games (loader_id, project_type_id, game_id) FR
 \.
 
 
-TRUNCATE TABLE public.users RESTART IDENTITY CASCADE;
 COPY public.users (id, github_id, username, email, avatar_url, bio, created, role, badges, balance, discord_id, gitlab_id, google_id, steam_id, microsoft_id, password, email_verified, totp_secret, paypal_country, paypal_email, paypal_id, venmo_handle, stripe_customer_id, raw_avatar_url, allow_friend_requests) FROM stdin;
-127155982985829	10137	Ghost	\N	https://avatars2.githubusercontent.com/u/10137	A deleted user	2025-04-03 21:55:45.869997+00	developer	0	0.00000000000000000000	\N	\N	\N	\N	\N	\N	f	\N	\N	\N	\N	\N	\N	https://avatars2.githubusercontent.com/u/10137	t
-0	\N	AutoMod	support@modrinth.com	https://cdn.modrinth.com/user/2REoufqX/6aabaf2d1fca2935662eca4ce451cd9775054c22.png	An automated account performing moderation utilities for Modrinth.	2025-04-03 21:55:46.401337+00	moderator	0	0.00000000000000000000	\N	\N	\N	\N	\N	\N	f	\N	\N	\N	\N	\N	\N	https://cdn.modrinth.com/user/2REoufqX/6aabaf2d1fca2935662eca4ce451cd9775054c22.png	t
 103587649610509	\N	Default admin user	admin@modrinth.invalid	https://avatars.githubusercontent.com/u/106493074	$ chmod 777 labrinth	2020-07-18 16:03:00.000000+00	admin	0	0.00000000000000000000	\N	\N	\N	\N	\N	$argon2i$v=19$m=4096,t=3,p=1$c2FsdEl0V2l0aFNhbHQ$xTGvQNICqetaNA0Wu1GwFmYhQjAreRcjBz6ornhaFXA	t	\N	\N	\N	\N	\N	\N	https://avatars.githubusercontent.com/u/106493074	t
 \.
 
 
--- Completed on 2025-08-05 21:44:30 CEST
-
---
--- PostgreSQL database dump complete
---
-
+COMMIT;
