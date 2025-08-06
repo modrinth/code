@@ -287,8 +287,10 @@ const typeFiltered = computed(() => {
   const projectType = filterMap[currentFilterType.value];
   if (!projectType) return baseFiltered.value;
 
-  return baseFiltered.value.filter((queueItem) =>
-    queueItem.project.project_types.includes(projectType),
+  return baseFiltered.value.filter(
+    (queueItem) =>
+      queueItem.project.project_types.length > 0 &&
+      queueItem.project.project_types[0] === projectType,
   );
 });
 
