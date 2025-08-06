@@ -2131,7 +2131,11 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
         let mut transaction = pool.begin().await?;
         let mut clear_cache_users = Vec::new();
 
-        // If an active subscription has a canceled charge OR a failed charge more than two days ago, it should be cancelled
+        // If an active subscription has:
+        // - A canceled charge due now
+        // - An expiring charge due now
+        // - A failed charge more than two days ago
+        // It should be unprovisioned.
         let all_charges = DBCharge::get_unprovision(&pool).await?;
 
         let mut all_subscriptions =

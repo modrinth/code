@@ -240,6 +240,7 @@ impl DBCharge {
                 charge_type = $1 AND
                 (
                     (status = 'cancelled' AND due < NOW()) OR
+                    (status = 'expiring' AND due < NOW()) OR
                     (status = 'failed' AND last_attempt < NOW() - INTERVAL '2 days')
                 )
             "#,
