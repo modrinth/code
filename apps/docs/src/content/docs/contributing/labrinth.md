@@ -62,18 +62,18 @@ During development, you might notice that changes made directly to entities in t
 
 #### Basic configuration
 
-`DEBUG`: Whether debugging tools should be enabled  
-`RUST_LOG`: Specifies what information to log, from rust's [`env-logger`](https://github.com/env-logger-rs/env_logger); a reasonable default is `info,sqlx::query=warn`  
-`SITE_URL`: The main URL to be used for CORS  
-`CDN_URL`: The publicly accessible base URL for files uploaded to the CDN  
-`MODERATION_DISCORD_WEBHOOK`: The URL for a Discord webhook where projects pending approval will be sent  
-`CLOUDFLARE_INTEGRATION`: Whether labrinth should integrate with Cloudflare's spam protection  
-`DATABASE_URL`: The URL for the PostgreSQL database  
-`DATABASE_MIN_CONNECTIONS`: The minimum number of concurrent connections allowed to the database at the same time  
-`DATABASE_MAX_CONNECTIONS`: The maximum number of concurrent connections allowed to the database at the same time  
-`MEILISEARCH_ADDR`: The URL for the MeiliSearch instance used for search  
-`MEILISEARCH_KEY`: The name that MeiliSearch is given  
-`BIND_ADDR`: The bind address for the server. Supports both IPv4 and IPv6  
+`DEBUG`: Whether debugging tools should be enabled
+`RUST_LOG`: Specifies what information to log, from rust's [`env-logger`](https://github.com/env-logger-rs/env_logger); a reasonable default is `info,sqlx::query=warn`
+`SITE_URL`: The main URL to be used for CORS
+`CDN_URL`: The publicly accessible base URL for files uploaded to the CDN
+`MODERATION_DISCORD_WEBHOOK`: The URL for a Discord webhook where projects pending approval will be sent
+`CLOUDFLARE_INTEGRATION`: Whether Labrinth should integrate with Cloudflare's spam protection
+`DATABASE_URL`: The URL for the PostgreSQL database, including its username, password, host, port, and database name
+`DATABASE_MIN_CONNECTIONS`: The minimum number of concurrent connections allowed to the database at the same time
+`DATABASE_MAX_CONNECTIONS`: The maximum number of concurrent connections allowed to the database at the same time
+`MEILISEARCH_ADDR`: The URL for the MeiliSearch instance used for search
+`MEILISEARCH_KEY`: The name that MeiliSearch is given
+`BIND_ADDR`: The bind address for the server. Supports both IPv4 and IPv6
 `MOCK_FILE_PATH`: The path used to store uploaded files; this has no default value and will panic if unspecified
 `SMTP_USERNAME`: The username used to authenticate with the SMTP server
 `SMTP_PASSWORD`: The password associated with the `SMTP_USERNAME` for SMTP authentication
@@ -90,7 +90,7 @@ The S3 configuration options are fairly self-explanatory in name, so here's simp
 
 #### Search, OAuth, and miscellaneous options
 
-`LOCAL_INDEX_INTERVAL`: The interval, in seconds, at which the local database is reindexed for searching. Defaults to `3600` seconds (1 hour).  
+`LOCAL_INDEX_INTERVAL`: The interval, in seconds, at which the local database is reindexed for searching. Defaults to `3600` seconds (1 hour).
 `VERSION_INDEX_INTERVAL`: The interval, in seconds, at which versions are reindexed for searching. Defaults to `1800` seconds (30 minutes).
 
 The OAuth configuration options are fairly self-explanatory. For help setting up authentication, please contact us on [Discord].
@@ -99,8 +99,8 @@ The OAuth configuration options are fairly self-explanatory. For help setting up
 
 #### Command line options
 
-`--skip-first-index`: Skips indexing the local database on startup. This is useful to prevent doing unnecessary work when frequently restarting.  
-`--reconfigure-indices`: Resets the MeiliSearch settings for the search indices and exits.  
+`--skip-first-index`: Skips indexing the local database on startup. This is useful to prevent doing unnecessary work when frequently restarting.
+`--reconfigure-indices`: Resets the MeiliSearch settings for the search indices and exits.
 `--reset-indices`: Resets the MeiliSearch indices and exits; this clears all previously indexed mods.
 
 </details>
@@ -114,7 +114,7 @@ If you're prepared to contribute by submitting a pull request, ensure you have m
 - `cargo check` has been run.
 - `cargo sqlx prepare` has been run.
 
-> Note: If you encounter issues with `sqlx` saying 'no queries found' after running `cargo sqlx prepare`, you may need to ensure the installed version of `sqlx-cli` matches the current version of `sqlx` used [in labrinth](https://github.com/modrinth/labrinth/blob/master/Cargo.toml).
+> Note: If you encounter issues with `sqlx` saying 'no queries found' after running `cargo sqlx prepare`, you may need to ensure the installed version of `sqlx-cli` matches the current version of `sqlx` used [in Labrinth](https://github.com/modrinth/labrinth/blob/master/Cargo.toml).
 
 [Discord]: https://discord.modrinth.com
 [GitHub]: https://github.com/modrinth
