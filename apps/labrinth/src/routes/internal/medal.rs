@@ -65,9 +65,11 @@ pub async fn redeem(
 ) -> Result<HttpResponse, ApiError> {
     // Check the offer hasn't been redeemed yet, then insert into the table.
 
+    let mut txn = pool.begin().await?;
+
     let maybe_fields =
         RedeemalLookupFields::redeemal_status_by_username_and_offer(
-            &**pool,
+            &mut *txn,
             &username,
             Offer::Medal,
         )
@@ -85,6 +87,19 @@ pub async fn redeem(
             fields.user_id
         }
     };
+
+    // Link user to offer redeemal.
+    let mut redeemal = UserRedeemal {
+        id: 0,
+        user_id,
+        offer: Offer::Medal,
+        redeemed: Utc::now(),
+        status: Status::Pending,
+    };
+
+    redeemal.insert(&mut *txn).await?;
+
+    txn.commit().await?;
 
     let client = reqwest::Client::new();
 
@@ -213,16 +228,9 @@ pub async fn redeem(
     .upsert(&mut txn)
     .await?;
 
-    // Link user to offer redeemal.
-    let mut redeemal = UserRedeemal {
-        id: 0,
-        user_id,
-        offer: Offer::Medal,
-        redeemed: Utc::now(),
-        status: Status::Redeemed,
-    };
-
-    redeemal.insert(&mut *txn).await?;
+    // Update `users_redeemal`, mark subscription as redeemed.
+    redeemal.status = Status::Redeemed;
+    redeemal.update(&mut *txn).await?;
 
     txn.commit().await?;
 

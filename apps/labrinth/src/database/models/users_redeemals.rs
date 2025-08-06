@@ -129,6 +129,30 @@ impl UserRedeemal {
 
         Ok(())
     }
+
+    pub async fn update<'a, E>(&self, exec: E) -> sqlx::Result<()>
+    where
+        E: sqlx::PgExecutor<'a>,
+    {
+        let query = query!(
+            r#"
+          UPDATE users_redeemals
+          SET
+            offer = $2,
+            status = $3,
+            redeemed = $4
+          WHERE id = $1
+          "#,
+            self.id,
+            self.offer.as_str(),
+            self.status.as_str(),
+            self.redeemed,
+        );
+
+        query.execute(exec).await?;
+
+        Ok(())
+    }
 }
 
 #[derive(Debug)]
