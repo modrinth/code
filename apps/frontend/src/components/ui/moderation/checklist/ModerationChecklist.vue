@@ -50,12 +50,34 @@
         </div>
         <div v-else-if="generatedMessage">
           <div>
+            <ButtonStyled>
+              <button class="mb-2" @click="useSimpleEditor = !useSimpleEditor">
+                <template v-if="!useSimpleEditor">
+                  <ToggleLeftIcon aria-hidden="true" />
+                  Use simple mode
+                </template>
+                <template v-else>
+                  <ToggleRightIcon aria-hidden="true" />
+                  Use advanced mode
+                </template>
+              </button>
+            </ButtonStyled>
             <MarkdownEditor
+              v-if="!useSimpleEditor"
               v-model="message"
               :max-height="400"
               placeholder="No message generated."
               :disabled="false"
               :heading-buttons="false"
+            />
+            <textarea
+              v-else
+              v-model="message"
+              type="text"
+              class="bg-bg-input h-[400px] w-full rounded-lg border border-solid border-divider px-3 py-2 font-mono text-base"
+              placeholder="No message generated."
+              autocomplete="off"
+              @input="persistState"
             />
           </div>
         </div>
@@ -324,6 +346,8 @@ import {
   CheckIcon,
   KeyboardIcon,
   EyeOffIcon,
+  ToggleLeftIcon,
+  ToggleRightIcon,
 } from "@modrinth/assets";
 import {
   checklist,
@@ -391,6 +415,7 @@ const isModpackPermissionsStage = computed(() => {
   return currentStageObj.value.id === "modpack-permissions";
 });
 
+const useSimpleEditor = ref(false);
 const message = ref("");
 const generatedMessage = ref(false);
 const loadingMessage = ref(false);
