@@ -1,16 +1,23 @@
 use actix_web::{HttpResponse, post, web};
 use ariadne::ids::UserId;
+use ariadne::ids::base62_impl::to_base62;
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::database::models::generate_user_subscription_id;
+use crate::database::models::charge_item::DBCharge;
 use crate::database::models::product_item;
 use crate::database::models::user_subscription_item::DBUserSubscription;
 use crate::database::models::users_redeemals::{
     Offer, RedeemalLookupFields, Status, UserRedeemal,
 };
-use crate::models::v3::billing::{PriceDuration, SubscriptionStatus};
+use crate::database::models::{
+    generate_charge_id, generate_user_subscription_id,
+};
+use crate::models::v3::billing::{
+    ChargeStatus, ChargeType, PaymentPlatform, Price, PriceDuration,
+    ProductMetadata, SubscriptionMetadata, SubscriptionStatus,
+};
 use crate::routes::ApiError;
 use crate::util::guards::medal_key_guard;
 
@@ -58,17 +65,15 @@ pub async fn redeem(
 ) -> Result<HttpResponse, ApiError> {
     // Check the offer hasn't been redeemed yet, then insert into the table.
 
-    let mut txn = pool.begin().await?;
-
     let maybe_fields =
         RedeemalLookupFields::redeemal_status_by_username_and_offer(
-            &mut *txn,
+            &**pool,
             &username,
             Offer::Medal,
         )
         .await?;
 
-    let redeemal = match maybe_fields {
+    let user_id = match maybe_fields {
         None => return Err(ApiError::NotFound),
         Some(fields) => {
             if fields.redeemal_status.is_some() {
@@ -77,50 +82,147 @@ pub async fn redeem(
                 ));
             }
 
-            let mut redeemal = UserRedeemal {
-                id: 0,
-                user_id: fields.user_id,
-                offer: Offer::Medal,
-                redeemed: Utc::now(),
-                status: Status::Pending,
-            };
-
-            redeemal.insert(&mut *txn).await?;
-            redeemal
+            fields.user_id
         }
     };
 
-    txn.commit().await?;
-
-    // TODO: Provision server (send archon request) THEN add subscription to DB
-
-    let mut txn = pool.begin().await?;
+    let client = reqwest::Client::new();
 
     // Find the Medal product price
-    let maybe_price_id =
-        product_item::unique_price_id_of_product_by_type(&mut *txn, "medal")
-            .await?;
+    let mut medal_products =
+        product_item::QueryProductWithPrices::list_by_product_type(
+            &**pool, "medal",
+        )
+        .await?;
 
-    let Some(medal_price_id) = maybe_price_id else {
+    let Some(product_item::QueryProductWithPrices {
+        id: _product_id,
+        metadata,
+        mut prices,
+        unitary: _,
+    }) = medal_products.pop()
+    else {
         return Ok(HttpResponse::NotImplemented()
-            .body("Missing price ID for Medal subscription"));
+            .body("Missing Medal subscription product"));
     };
+
+    let ProductMetadata::Medal {
+        cpu,
+        ram,
+        swap,
+        storage,
+        region,
+    } = metadata
+    else {
+        return Ok(HttpResponse::NotImplemented()
+            .body("Missing or incorrect metadata for Medal subscription"));
+    };
+
+    let Some(medal_price) = prices.pop() else {
+        return Ok(HttpResponse::NotImplemented()
+            .body("Missing price for Medal subscription"));
+    };
+
+    let (price_duration, price_amount) = match medal_price.prices {
+        Price::OneTime { price: _ } => {
+            return Ok(HttpResponse::NotImplemented()
+                .body("Unexpected metadata for Medal subscription price"));
+        }
+
+        Price::Recurring { intervals } => {
+            let Some((price_duration, price_amount)) =
+                intervals.into_iter().next()
+            else {
+                return Ok(HttpResponse::NotImplemented()
+                    .body("Missing price interval for Medal subscription"));
+            };
+
+            (price_duration, price_amount)
+        }
+    };
+
+    let price_id = medal_price.id;
+
+    #[derive(Deserialize)]
+    struct PyroServerResponse {
+        uuid: uuid::Uuid,
+    }
+
+    // TODO: archon-client module
+    let pyro_response = client
+        .post(format!(
+            "{}/modrinth/v0/servers/create",
+            dotenvy::var("ARCHON_URL")?,
+        ))
+        .header("X-Master-Key", dotenvy::var("PYRO_API_KEY")?)
+        .json(&serde_json::json!({
+            "user_id": to_base62(user_id.0 as u64),
+            "name": format!("{}'s Medal server", username),
+            "specs": {
+                "memory_mb": ram,
+                "cpu": cpu,
+                "swap_mb": swap,
+                "storage_mb": storage,
+            },
+            "region": region,
+            "source": {}, // Don't install anything by default (field is ignored on Archon anyways)
+            "payment_interval": 1, // Doesn't matter, not used on Archon anymore anyways
+        }))
+        .send()
+        .await?
+        .error_for_status()?
+        .json::<PyroServerResponse>()
+        .await?;
+
+    let mut txn = pool.begin().await?;
 
     // Build a subscription using this price ID.
     let subscription = DBUserSubscription {
         id: generate_user_subscription_id(&mut txn).await?,
-        user_id: redeemal.user_id,
-        price_id: medal_price_id,
+        user_id,
+        price_id,
         interval: PriceDuration::FiveDays,
         created: Utc::now(),
-        status: SubscriptionStatus::Unprovisioned,
-        metadata: None, // TODO: Provision server, then add metadata
+        status: SubscriptionStatus::Provisioned,
+        metadata: Some(SubscriptionMetadata::Medal {
+            id: pyro_response.uuid.to_string(),
+        }),
     };
 
-    // TODO: Insert a cancelled charge in 5 days time, `index_subscriptions` will unprovision
-    // the subscription.
-
     subscription.upsert(&mut txn).await?;
+
+    // Insert an expiring charge, `index_subscriptions` will unprovision the
+    // subscription when expired.
+    DBCharge {
+        id: generate_charge_id(&mut txn).await?,
+        user_id,
+        price_id,
+        amount: price_amount.into(),
+        currency_code: medal_price.currency_code,
+        status: ChargeStatus::Expiring,
+        due: Utc::now() + price_duration.duration(),
+        last_attempt: None,
+        type_: ChargeType::Subscription,
+        subscription_id: Some(subscription.id),
+        subscription_interval: Some(subscription.interval),
+        payment_platform: PaymentPlatform::None,
+        payment_platform_id: None,
+        parent_charge_id: None,
+        net: None,
+    }
+    .upsert(&mut txn)
+    .await?;
+
+    // Link user to offer redeemal.
+    let mut redeemal = UserRedeemal {
+        id: 0,
+        user_id,
+        offer: Offer::Medal,
+        redeemed: Utc::now(),
+        status: Status::Redeemed,
+    };
+
+    redeemal.insert(&mut *txn).await?;
 
     txn.commit().await?;
 

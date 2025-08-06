@@ -184,7 +184,9 @@ pub async fn refund_charge(
                 ChargeStatus::Open
                 | ChargeStatus::Processing
                 | ChargeStatus::Succeeded => Some(x.amount),
-                ChargeStatus::Failed | ChargeStatus::Cancelled => None,
+                ChargeStatus::Failed
+                | ChargeStatus::Cancelled
+                | ChargeStatus::Expiring => None,
             })
             .sum::<i64>();
 
@@ -257,6 +259,12 @@ pub async fn refund_charge(
                                 .to_string(),
                         ));
                     }
+                }
+                PaymentPlatform::None => {
+                    return Err(ApiError::InvalidInput(
+                        "This charge was not processed via a payment platform."
+                            .to_owned(),
+                    ));
                 }
             }
         };
@@ -1714,6 +1722,7 @@ pub async fn stripe_webhook(
                             ram: _,
                             swap: _,
                             storage: _,
+                            region: _,
                         } => {
                             todo!(
                                 "Promote Medal subscription to Pyro subscription"

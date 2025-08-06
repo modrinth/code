@@ -29,6 +29,7 @@ pub enum ProductMetadata {
         ram: u32,
         swap: u32,
         storage: u32,
+        region: String,
     },
 }
 
@@ -219,6 +220,10 @@ pub enum ChargeStatus {
     Succeeded,
     Failed,
     Cancelled,
+    // Expiring charges are charges that aren't expected to be processed
+    // but can be promoted to a full charge, like for trials/freebies. When
+    // due, the underlying subscription is unprovisioned.
+    Expiring,
 }
 
 impl ChargeStatus {
@@ -229,6 +234,7 @@ impl ChargeStatus {
             "failed" => ChargeStatus::Failed,
             "open" => ChargeStatus::Open,
             "cancelled" => ChargeStatus::Cancelled,
+            "expiring" => ChargeStatus::Expiring,
             _ => ChargeStatus::Failed,
         }
     }
@@ -240,6 +246,7 @@ impl ChargeStatus {
             ChargeStatus::Failed => "failed",
             ChargeStatus::Open => "open",
             ChargeStatus::Cancelled => "cancelled",
+            ChargeStatus::Expiring => "expiring",
         }
     }
 }
@@ -247,12 +254,14 @@ impl ChargeStatus {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PaymentPlatform {
     Stripe,
+    None,
 }
 
 impl PaymentPlatform {
     pub fn from_string(string: &str) -> PaymentPlatform {
         match string {
             "stripe" => PaymentPlatform::Stripe,
+            "none" => PaymentPlatform::None,
             _ => PaymentPlatform::Stripe,
         }
     }
@@ -260,6 +269,7 @@ impl PaymentPlatform {
     pub fn as_str(&self) -> &'static str {
         match self {
             PaymentPlatform::Stripe => "stripe",
+            PaymentPlatform::None => "none",
         }
     }
 }
