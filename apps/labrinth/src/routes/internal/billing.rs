@@ -2210,10 +2210,6 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
             };
 
             let unprovisioned = match product.metadata {
-                ProductMetadata::Medal { .. } => {
-                    todo!("Unprovision Medal subscription")
-                }
-
                 ProductMetadata::Midas => {
                     let badges = user.badges - Badges::MIDAS;
 
@@ -2231,33 +2227,37 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
 
                     true
                 }
-                ProductMetadata::Pyro { .. } => {
-                    if let Some(SubscriptionMetadata::Pyro { id, region: _ }) =
-                        &subscription.metadata
-                    {
-                        let res = reqwest::Client::new()
-                            .post(format!(
-                                "{}/modrinth/v0/servers/{}/suspend",
-                                dotenvy::var("ARCHON_URL")?,
-                                id
-                            ))
-                            .header("X-Master-Key", dotenvy::var("PYRO_API_KEY")?)
-                            .json(&serde_json::json!({
-                                "reason": if charge.status == ChargeStatus::Cancelled {
-                                    "cancelled"
-                                } else {
-                                    "paymentfailed"
-                                }
-                            }))
-                            .send()
-                            .await;
 
-                        if let Err(e) = res {
-                            warn!("Error suspending pyro server: {:?}", e);
-                            false
-                        } else {
-                            true
+                ProductMetadata::Pyro { .. }
+                | ProductMetadata::Medal { .. } => 'server: {
+                    let server_id = match &subscription.metadata {
+                        Some(SubscriptionMetadata::Pyro { id, region: _ }) => {
+                            id
                         }
+                        Some(SubscriptionMetadata::Medal { id }) => id,
+                        _ => break 'server true,
+                    };
+
+                    let res = reqwest::Client::new()
+                        .post(format!(
+                            "{}/modrinth/v0/servers/{}/suspend",
+                            dotenvy::var("ARCHON_URL")?,
+                            server_id
+                        ))
+                        .header("X-Master-Key", dotenvy::var("PYRO_API_KEY")?)
+                        .json(&serde_json::json!({
+                            "reason": if charge.status == ChargeStatus::Cancelled || charge.status == ChargeStatus::Expiring {
+                                "cancelled"
+                            } else {
+                                "paymentfailed"
+                            }
+                        }))
+                        .send()
+                        .await;
+
+                    if let Err(e) = res {
+                        warn!("Error suspending pyro server: {:?}", e);
+                        false
                     } else {
                         true
                     }
