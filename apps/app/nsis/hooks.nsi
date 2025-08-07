@@ -47,7 +47,7 @@ Var /GLOBAL OldInstallDir
         StrCpy $OldInstallDir $OldInstallDir -1 ""
 
         DetailPrint "Executing $R1"
-        !insertmacro ShellExecWait "runas" '$R1' '/UPDATE /P _?=$4' "" ${SW_SHOW} $3
+        !insertmacro ShellExecWait "runas" '$R1' '/P _?=$4' "" ${SW_SHOW} $3
         ${If} $3 <> 0
             SetErrorLevel $3
             MessageBox MB_ICONEXCLAMATION|MB_OK "Failed to uninstall old global installation"
