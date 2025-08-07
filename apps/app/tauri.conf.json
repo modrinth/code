@@ -15,7 +15,6 @@
     "icon": ["icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
     "windows": {
       "nsis": {
-        "installMode": "perMachine",
         "installerHooks": "./nsis/hooks.nsi"
       }
     },
