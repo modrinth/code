@@ -10,7 +10,7 @@ This project is part of our [monorepo](https://github.com/modrinth/code). You ca
 To get a basic configuration, copy the `.env.local` file to `.env`. Now, you'll have to install the sqlx CLI, which can be done with cargo:
 
 ```sh
-cargo install sqlx-cli --no-default-features --features mysql,sqlite,postgres,rustls,completion
+cargo install sqlx-cli --no-default-features --features mysql,sqlite,postgres,rustls,completions
 ```
 
 From there, you can create the database and set up its schema with one simple command:
