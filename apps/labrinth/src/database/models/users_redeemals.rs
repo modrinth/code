@@ -41,25 +41,25 @@ impl fmt::Display for Offer {
 pub enum Status {
     #[default]
     Pending,
-    Redeemed,
-    Expired,
+    Processing,
+    Processed,
 }
 
 impl Status {
     pub fn as_str(&self) -> &'static str {
         match self {
             Status::Pending => "pending",
-            Status::Redeemed => "redeemed",
-            Status::Expired => "expired",
+            Status::Processing => "processing",
+            Status::Processed => "processed",
         }
     }
 
     pub fn from_str_or_default(s: &str) -> Self {
         match s {
             "pending" => Status::Pending,
-            "redeemed" => Status::Redeemed,
-            "expired" => Status::Expired,
-            _ => Status::Pending,
+            "processing" => Status::Processing,
+            "processed" => Status::Processed,
+            _ => Default::default(),
         }
     }
 }
@@ -76,10 +76,62 @@ pub struct UserRedeemal {
     pub user_id: DBUserId,
     pub offer: Offer,
     pub redeemed: DateTime<Utc>,
+    pub last_attempt: Option<DateTime<Utc>>,
+    pub n_attempts: i32,
     pub status: Status,
 }
 
 impl UserRedeemal {
+    pub async fn get_pending<'a, E>(
+        exec: E,
+        limit: i64,
+    ) -> sqlx::Result<Vec<UserRedeemal>>
+    where
+        E: sqlx::PgExecutor<'a>,
+    {
+        let redeemals = query!(
+            r#"SELECT * FROM users_redeemals WHERE status = $1 LIMIT $2"#,
+            Status::Pending.as_str(),
+            limit
+        )
+        .fetch_all(exec)
+        .await?
+        .into_iter()
+        .map(|row| UserRedeemal {
+            id: row.id,
+            user_id: DBUserId(row.user_id),
+            offer: Offer::from_str_or_default(&row.offer),
+            redeemed: row.redeemed,
+            last_attempt: row.last_attempt,
+            n_attempts: row.n_attempts,
+            status: Status::from_str_or_default(&row.status),
+        })
+        .collect();
+
+        Ok(redeemals)
+    }
+
+    pub async fn update_stuck_5_minutes<'a, E>(exec: E) -> sqlx::Result<()>
+    where
+        E: sqlx::PgExecutor<'a>,
+    {
+        query!(
+            r#"
+            UPDATE users_redeemals
+            SET status = $1
+            WHERE
+              status = $2
+              AND NOW() - last_attempt > INTERVAL '5 minutes'
+            "#,
+            Status::Pending.as_str(),
+            Status::Processing.as_str(),
+        )
+        .execute(exec)
+        .await?;
+
+        Ok(())
+    }
+
     pub async fn exists_by_user_and_offer<'a, E>(
         exec: E,
         user_id: DBUserId,
@@ -114,13 +166,15 @@ impl UserRedeemal {
         let query = query_scalar!(
             r#"
           INSERT INTO users_redeemals
-          (user_id, offer, redeemed, status)
-          VALUES ($1, $2, $3, $4)
+          (user_id, offer, redeemed, status, last_attempt, n_attempts)
+          VALUES ($1, $2, $3, $4, $5, $6)
           RETURNING id"#,
             self.user_id.0,
             self.offer.as_str(),
             self.redeemed,
             self.status.as_str(),
+            self.last_attempt,
+            self.n_attempts,
         );
 
         let id = query.fetch_one(exec).await?;
@@ -128,6 +182,36 @@ impl UserRedeemal {
         self.id = id;
 
         Ok(())
+    }
+
+    /// Updates `status`, `last_attempt`, and `n_attempts` only if `status` is currently pending.
+    /// Returns `true` if the status was updated, `false` otherwise.
+    pub async fn update_status_if_pending<'a, E>(
+        &self,
+        exec: E,
+    ) -> sqlx::Result<bool>
+    where
+        E: sqlx::PgExecutor<'a>,
+    {
+        let query = query!(
+            r#"
+            UPDATE users_redeemals
+            SET
+              status = $3,
+              last_attempt = $4,
+              n_attempts = $5
+            WHERE id = $1 AND status = $2
+            "#,
+            self.id,
+            Status::Pending.as_str(),
+            self.status.as_str(),
+            self.last_attempt,
+            self.n_attempts,
+        );
+
+        let query_result = query.execute(exec).await?;
+
+        Ok(query_result.rows_affected() > 0)
     }
 
     pub async fn update<'a, E>(&self, exec: E) -> sqlx::Result<()>
@@ -140,13 +224,17 @@ impl UserRedeemal {
           SET
             offer = $2,
             status = $3,
-            redeemed = $4
+            redeemed = $4,
+            last_attempt = $5,
+            n_attempts = $6
           WHERE id = $1
           "#,
             self.id,
             self.offer.as_str(),
             self.status.as_str(),
             self.redeemed,
+            self.last_attempt,
+            self.n_attempts,
         );
 
         query.execute(exec).await?;
