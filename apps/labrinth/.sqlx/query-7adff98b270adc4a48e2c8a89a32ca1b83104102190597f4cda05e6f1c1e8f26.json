@@ -1,0 +1,27 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n          INSERT INTO users_redeemals\n          (user_id, offer, redeemed, status, last_attempt, n_attempts)\n          VALUES ($1, $2, $3, $4, $5, $6)\n          RETURNING id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Varchar",
+        "Timestamptz",
+        "Varchar",
+        "Timestamptz",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "7adff98b270adc4a48e2c8a89a32ca1b83104102190597f4cda05e6f1c1e8f26"
+}

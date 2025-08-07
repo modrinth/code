@@ -1,0 +1,18 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE users_redeemals\n            SET\n              status = $3,\n              last_attempt = $4,\n              n_attempts = $5\n            WHERE id = $1 AND status = $2\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Text",
+        "Varchar",
+        "Timestamptz",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e3f6fa7e5ec6dee4fcdff904b3e692dccd55372d9cc827a1d68361fd036bc183"
+}

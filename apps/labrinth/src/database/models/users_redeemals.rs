@@ -59,7 +59,7 @@ impl Status {
             "pending" => Status::Pending,
             "processing" => Status::Processing,
             "processed" => Status::Processed,
-            _ => Default::default(),
+            _ => Status::default(),
         }
     }
 }

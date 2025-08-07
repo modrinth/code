@@ -384,6 +384,7 @@ pub async fn edit_subscription(
         })?;
 
         if let Some(cancelled) = &edit_subscription.cancelled {
+            // Notably, cannot cancel/uncancel expiring charges.
             if !matches!(
                 open_charge.status,
                 ChargeStatus::Open
@@ -408,21 +409,24 @@ pub async fn edit_subscription(
 
         if let Some(interval) = &edit_subscription.interval {
             if let Price::Recurring { intervals } = &current_price.prices {
-                if let Some(price) = intervals.get(interval) {
-                    open_charge.subscription_interval = Some(*interval);
-                    open_charge.amount = *price as i64;
-                } else {
-                    return Err(ApiError::InvalidInput(
-                        "Interval is not valid for this subscription!"
-                            .to_string(),
-                    ));
+                // For expiring charges, the interval is handled in the Product branch.
+                if open_charge.status != ChargeStatus::Expiring {
+                    if let Some(price) = intervals.get(interval) {
+                        open_charge.subscription_interval = Some(*interval);
+                        open_charge.amount = *price as i64;
+                    } else {
+                        return Err(ApiError::InvalidInput(
+                            "Interval is not valid for this subscription!"
+                                .to_string(),
+                        ));
+                    }
                 }
             }
         }
 
         let intent = if let Some(product_id) = &edit_subscription.product {
             let product_price =
-                product_item::DBProductPrice::get_all_public_product_prices(
+                product_item::DBProductPrice::get_all_product_prices(
                     (*product_id).into(),
                     &mut *transaction,
                 )
@@ -443,48 +447,14 @@ pub async fn edit_subscription(
                 ));
             }
 
-            let interval = open_charge.due - Utc::now();
-            let duration = PriceDuration::Monthly;
+            // If the charge is an expiring charge, we need to create a payment
+            // intent as if the user was subscribing to the product, as opposed
+            // to a proration.
+            if open_charge.status == ChargeStatus::Expiring {
+                // We need a new interval when promoting the charge.
+                let interval = edit_subscription.interval
+                    .ok_or_else(|| ApiError::InvalidInput("You need to specify an interval when promoting an expiring charge.".to_owned()))?;
 
-            let current_amount = match &current_price.prices {
-                Price::OneTime { price } => *price,
-                Price::Recurring { intervals } => *intervals.get(&duration).ok_or_else(|| {
-                    ApiError::InvalidInput(
-                        "Could not find a valid price for the user's duration".to_string(),
-                    )
-                })?,
-            };
-
-            let amount = match &product_price.prices {
-                Price::OneTime { price } => *price,
-                Price::Recurring { intervals } => *intervals.get(&duration).ok_or_else(|| {
-                    ApiError::InvalidInput(
-                        "Could not find a valid price for the user's duration".to_string(),
-                    )
-                })?,
-            };
-
-            let complete = Decimal::from(interval.num_seconds())
-                / Decimal::from(duration.duration().num_seconds());
-            let proration = (Decimal::from(amount - current_amount) * complete)
-                .floor()
-                .to_i32()
-                .ok_or_else(|| {
-                    ApiError::InvalidInput(
-                        "Could not convert proration to i32".to_string(),
-                    )
-                })?;
-
-            // First branch: Plan downgrade, update future charge
-            // Second branch: For small transactions (under 30 cents), we make a loss on the
-            // proration due to fees. In these situations, just give it to them for free, because
-            // their next charge will be in a day or two anyway.
-            if current_amount > amount || proration < 30 {
-                open_charge.price_id = product_price.id;
-                open_charge.amount = amount as i64;
-
-                None
-            } else {
                 let charge_id = generate_charge_id(&mut transaction).await?;
 
                 let customer_id = get_or_create_customer(
@@ -497,6 +467,15 @@ pub async fn edit_subscription(
                 )
                 .await?;
 
+                let new_price_value = match product_price.prices {
+                    Price::OneTime { ref price } => *price,
+                    Price::Recurring { ref intervals } => {
+                        *intervals
+                            .get(&interval)
+                            .ok_or_else(|| ApiError::InvalidInput("Could not find a valid price for the specified duration".to_owned()))?
+                    }
+                };
+
                 let currency = Currency::from_str(
                     &current_price.currency_code.to_lowercase(),
                 )
@@ -505,7 +484,7 @@ pub async fn edit_subscription(
                 })?;
 
                 let mut intent =
-                    CreatePaymentIntent::new(proration as i64, currency);
+                    CreatePaymentIntent::new(new_price_value as i64, currency);
 
                 let mut metadata = HashMap::new();
                 metadata.insert(
@@ -526,15 +505,11 @@ pub async fn edit_subscription(
                 );
                 metadata.insert(
                     "modrinth_subscription_interval".to_string(),
-                    open_charge
-                        .subscription_interval
-                        .unwrap_or(PriceDuration::Monthly)
-                        .as_str()
-                        .to_string(),
+                    interval.as_str().to_string(),
                 );
                 metadata.insert(
                     "modrinth_charge_type".to_string(),
-                    ChargeType::Proration.as_str().to_string(),
+                    ChargeType::Subscription.as_str().to_string(),
                 );
 
                 intent.customer = Some(customer_id);
@@ -559,7 +534,133 @@ pub async fn edit_subscription(
                     stripe::PaymentIntent::create(&stripe_client, intent)
                         .await?;
 
-                Some((proration, 0, intent))
+                Some((new_price_value, 0, intent))
+            } else {
+                // The charge is not an expiring charge, need to prorate.
+
+                let interval = open_charge.due - Utc::now();
+                let duration = PriceDuration::Monthly;
+
+                let current_amount = match &current_price.prices {
+                    Price::OneTime { price } => *price,
+                    Price::Recurring { intervals } => *intervals.get(&duration).ok_or_else(|| {
+                        ApiError::InvalidInput(
+                            "Could not find a valid price for the user's duration".to_string(),
+                        )
+                    })?,
+                };
+
+                let amount = match &product_price.prices {
+                    Price::OneTime { price } => *price,
+                    Price::Recurring { intervals } => *intervals.get(&duration).ok_or_else(|| {
+                        ApiError::InvalidInput(
+                            "Could not find a valid price for the user's duration".to_string(),
+                        )
+                    })?,
+                };
+
+                let complete = Decimal::from(interval.num_seconds())
+                    / Decimal::from(duration.duration().num_seconds());
+                let proration = (Decimal::from(amount - current_amount)
+                    * complete)
+                    .floor()
+                    .to_i32()
+                    .ok_or_else(|| {
+                        ApiError::InvalidInput(
+                            "Could not convert proration to i32".to_string(),
+                        )
+                    })?;
+
+                // First condition: Plan downgrade, update future charge
+                // Second condition: For small transactions (under 30 cents), we make a loss on the
+                //  proration due to fees. In these situations, just give it to them for free, because
+                //  their next charge will be in a day or two anyway.
+                if current_amount > amount || proration < 30 {
+                    open_charge.price_id = product_price.id;
+                    open_charge.amount = amount as i64;
+
+                    None
+                } else {
+                    let charge_id =
+                        generate_charge_id(&mut transaction).await?;
+
+                    let customer_id = get_or_create_customer(
+                        user.id,
+                        user.stripe_customer_id.as_deref(),
+                        user.email.as_deref(),
+                        &stripe_client,
+                        &pool,
+                        &redis,
+                    )
+                    .await?;
+
+                    let currency = Currency::from_str(
+                        &current_price.currency_code.to_lowercase(),
+                    )
+                    .map_err(|_| {
+                        ApiError::InvalidInput(
+                            "Invalid currency code".to_string(),
+                        )
+                    })?;
+
+                    let mut intent =
+                        CreatePaymentIntent::new(proration as i64, currency);
+
+                    let mut metadata = HashMap::new();
+                    metadata.insert(
+                        "modrinth_user_id".to_string(),
+                        to_base62(user.id.0),
+                    );
+                    metadata.insert(
+                        "modrinth_charge_id".to_string(),
+                        to_base62(charge_id.0 as u64),
+                    );
+                    metadata.insert(
+                        "modrinth_subscription_id".to_string(),
+                        to_base62(subscription.id.0 as u64),
+                    );
+                    metadata.insert(
+                        "modrinth_price_id".to_string(),
+                        to_base62(product_price.id.0 as u64),
+                    );
+                    metadata.insert(
+                        "modrinth_subscription_interval".to_string(),
+                        open_charge
+                            .subscription_interval
+                            .unwrap_or(PriceDuration::Monthly)
+                            .as_str()
+                            .to_string(),
+                    );
+                    metadata.insert(
+                        "modrinth_charge_type".to_string(),
+                        ChargeType::Proration.as_str().to_string(),
+                    );
+
+                    intent.customer = Some(customer_id);
+                    intent.metadata = Some(metadata);
+                    intent.receipt_email = user.email.as_deref();
+                    intent.setup_future_usage =
+                        Some(PaymentIntentSetupFutureUsage::OffSession);
+
+                    if let Some(payment_method) =
+                        &edit_subscription.payment_method
+                    {
+                        let Ok(payment_method_id) =
+                            PaymentMethodId::from_str(payment_method)
+                        else {
+                            return Err(ApiError::InvalidInput(
+                                "Invalid payment method id".to_string(),
+                            ));
+                        };
+                        intent.payment_method = Some(payment_method_id);
+                    }
+
+                    let intent =
+                        stripe::PaymentIntent::create(&stripe_client, intent)
+                            .await?;
+
+                    Some((proration, 0, intent))
+                }
             }
         } else {
             None
@@ -2292,7 +2393,9 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
         // Try processing it.
         let pending_redeemals = UserRedeemal::get_pending(&pool, 100).await?;
         for redeemal in pending_redeemals {
-            if let Err(error) = try_process_user_redeemal(&pool, &redis, redeemal).await {
+            if let Err(error) =
+                try_process_user_redeemal(&pool, &redis, redeemal).await
+            {
                 warn!(%error, "Failed to process a redeemal.")
             }
         }
@@ -2408,7 +2511,7 @@ pub async fn try_process_user_redeemal(
                 swap_mb: swap,
                 storage_mb: storage,
             },
-            source: Default::default(),
+            source: crate::util::archon::Empty::default(),
             region,
         })
         .await?;

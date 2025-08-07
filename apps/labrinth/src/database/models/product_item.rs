@@ -288,6 +288,15 @@ impl DBProductPrice {
             .collect::<Result<Vec<_>, serde_json::Error>>()?)
     }
 
+    pub async fn get_all_product_prices(
+        product_id: DBProductId,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+    ) -> Result<Vec<DBProductPrice>, DatabaseError> {
+        let res = Self::get_all_products_prices(&[product_id], exec).await?;
+
+        Ok(res.remove(&product_id).map(|x| x.1).unwrap_or_default())
+    }
+
     pub async fn get_all_public_product_prices(
         product_id: DBProductId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
