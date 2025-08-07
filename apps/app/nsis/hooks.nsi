@@ -1,3 +1,4 @@
+; https://nsis.sourceforge.io/ShellExecWait
 !macro ShellExecWait verb app param workdir show exitoutvar ;only app and show must be != "", every thing else is optional
     #define SEE_MASK_NOCLOSEPROCESS 0x40
     System::Store S
