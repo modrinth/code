@@ -143,8 +143,13 @@ export default defineNuxtConfig({
         state.lastGenerated &&
         new Date(state.lastGenerated).getTime() + TTL > new Date().getTime() &&
         // ...but only if the API URL is the same
-        state.apiUrl === API_URL
+        state.apiUrl === API_URL &&
+        // ...and if no errors were caught during the last generation
+        (state.errors ?? []).length === 0
       ) {
+        console.log(
+          "Tags already recently generated. Delete apps/frontend/generated/state.json to force regeneration.",
+        );
         return;
       }
 
