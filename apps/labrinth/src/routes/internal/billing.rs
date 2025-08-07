@@ -2541,6 +2541,7 @@ pub async fn try_process_user_redeemal(
             },
             source: crate::util::archon::Empty::default(),
             region,
+            tags: vec!["medal".to_owned()],
         })
         .await?;
 

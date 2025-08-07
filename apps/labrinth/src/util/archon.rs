@@ -26,6 +26,7 @@ pub struct CreateServerRequest {
     // an empty struct, as a source.
     pub source: Empty,
     pub region: String,
+    pub tags: Vec<String>,
 }
 
 #[derive(Clone)]
