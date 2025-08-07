@@ -36,7 +36,7 @@ Var /GLOBAL OldInstallDir
         UserInfo::GetAccountType
         Pop $0
         ${If} $0 != "Admin"
-            MessageBox MB_ICONINFORMATION|MB_OK "An old installation of the Modrinth App was detected that requires administrator permission to update from. You will be prompted with admin prompt shortly."
+            MessageBox MB_ICONINFORMATION|MB_OK "An old installation of the Modrinth App was detected that requires administrator permission to update from. You will be prompted with an admin prompt shortly."
         ${EndIf}
 
         ReadRegStr $4 SHCTX "${MANUPRODUCTKEY}" ""
