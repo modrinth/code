@@ -238,17 +238,17 @@ pub async fn send_slack_webhook(
             }
         });
 
-        if let Some(icon_url) = metadata.project_icon_url {
-            if let Some(project_block) = project_block.as_object_mut() {
-                project_block.insert(
-                    "accessory".to_string(),
-                    serde_json::json!({
-                        "type": "image",
-                        "image_url": icon_url,
-                        "alt_text": metadata.project_title
-                    }),
-                );
-            }
+        if let Some(icon_url) = metadata.project_icon_url
+            && let Some(project_block) = project_block.as_object_mut()
+        {
+            project_block.insert(
+                "accessory".to_string(),
+                serde_json::json!({
+                    "type": "image",
+                    "image_url": icon_url,
+                    "alt_text": metadata.project_title
+                }),
+            );
         }
 
         blocks.push(project_block);

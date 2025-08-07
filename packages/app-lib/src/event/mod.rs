@@ -192,11 +192,6 @@ pub struct LoadingPayload {
 }
 
 #[derive(Serialize, Clone)]
-pub struct OfflinePayload {
-    pub offline: bool,
-}
-
-#[derive(Serialize, Clone)]
 pub struct WarningPayload {
     pub message: String,
 }

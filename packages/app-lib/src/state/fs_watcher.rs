@@ -100,8 +100,8 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                         let profile_path_str = profile_path_str.clone();
                                         let world = world.clone();
                                         tokio::spawn(async move {
-                                            if let Ok(state) = State::get().await {
-                                                if let Err(e) = attached_world_data::AttachedWorldData::remove_for_world(
+                                            if let Ok(state) = State::get().await
+                                                && let Err(e) = attached_world_data::AttachedWorldData::remove_for_world(
                                                     &profile_path_str,
                                                     WorldType::Singleplayer,
                                                     &world,
@@ -109,7 +109,6 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                                 ).await {
                                                     tracing::warn!("Failed to remove AttachedWorldData for '{world}': {e}")
                                                 }
-                                            }
                                         });
                                     }
                                     Some(ProfilePayloadType::WorldUpdated { world })
@@ -150,14 +149,14 @@ pub(crate) async fn watch_profiles_init(
 ) {
     if let Ok(profiles_dir) = std::fs::read_dir(dirs.profiles_dir()) {
         for profile_dir in profiles_dir {
-            if let Ok(file_name) = profile_dir.map(|x| x.file_name()) {
-                if let Some(file_name) = file_name.to_str() {
-                    if file_name.starts_with(".DS_Store") {
-                        continue;
-                    };
+            if let Ok(file_name) = profile_dir.map(|x| x.file_name())
+                && let Some(file_name) = file_name.to_str()
+            {
+                if file_name.starts_with(".DS_Store") {
+                    continue;
+                };
 
-                    watch_profile(file_name, watcher, dirs).await;
-                }
+                watch_profile(file_name, watcher, dirs).await;
             }
         }
     }

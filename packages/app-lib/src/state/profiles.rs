@@ -629,21 +629,20 @@ impl Profile {
                     {
                         let subdirectory =
                             subdirectory.map_err(io::IOError::from)?.path();
-                        if subdirectory.is_file() {
-                            if let Some(file_name) = subdirectory
+                        if subdirectory.is_file()
+                            && let Some(file_name) = subdirectory
                                 .file_name()
                                 .and_then(|x| x.to_str())
-                            {
-                                let file_size = subdirectory
-                                    .metadata()
-                                    .map_err(io::IOError::from)?
-                                    .len();
+                        {
+                            let file_size = subdirectory
+                                .metadata()
+                                .map_err(io::IOError::from)?
+                                .len();
 
-                                keys.push(format!(
-                                    "{file_size}-{}/{folder}/{file_name}",
-                                    profile.path
-                                ));
-                            }
+                            keys.push(format!(
+                                "{file_size}-{}/{folder}/{file_name}",
+                                profile.path
+                            ));
                         }
                     }
                 }
@@ -901,30 +900,29 @@ impl Profile {
                 {
                     let subdirectory =
                         subdirectory.map_err(io::IOError::from)?.path();
-                    if subdirectory.is_file() {
-                        if let Some(file_name) =
+                    if subdirectory.is_file()
+                        && let Some(file_name) =
                             subdirectory.file_name().and_then(|x| x.to_str())
-                        {
-                            let file_size = subdirectory
-                                .metadata()
-                                .map_err(io::IOError::from)?
-                                .len();
+                    {
+                        let file_size = subdirectory
+                            .metadata()
+                            .map_err(io::IOError::from)?
+                            .len();
 
-                            keys.push(InitialScanFile {
-                                path: format!(
-                                    "{}/{folder}/{}",
-                                    self.path,
-                                    file_name.trim_end_matches(".disabled")
-                                ),
-                                file_name: file_name.to_string(),
-                                project_type,
-                                size: file_size,
-                                cache_key: format!(
-                                    "{file_size}-{}/{folder}/{file_name}",
-                                    self.path
-                                ),
-                            });
-                        }
+                        keys.push(InitialScanFile {
+                            path: format!(
+                                "{}/{folder}/{}",
+                                self.path,
+                                file_name.trim_end_matches(".disabled")
+                            ),
+                            file_name: file_name.to_string(),
+                            project_type,
+                            size: file_size,
+                            cache_key: format!(
+                                "{file_size}-{}/{folder}/{file_name}",
+                                self.path
+                            ),
+                        });
                     }
                 }
             }

@@ -222,10 +222,10 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
                 resp.status().as_u16()
             ));
         }
-        if resp.status() == StatusCode::OK {
-            if let Some(failure_json_check) = &self.failure_json_check {
-                failure_json_check(&test::read_body_json(resp).await);
-            }
+        if resp.status() == StatusCode::OK
+            && let Some(failure_json_check) = &self.failure_json_check
+        {
+            failure_json_check(&test::read_body_json(resp).await);
         }
 
         // Failure test- logged in on a non-team user
@@ -246,10 +246,10 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
                 resp.status().as_u16()
             ));
         }
-        if resp.status() == StatusCode::OK {
-            if let Some(failure_json_check) = &self.failure_json_check {
-                failure_json_check(&test::read_body_json(resp).await);
-            }
+        if resp.status() == StatusCode::OK
+            && let Some(failure_json_check) = &self.failure_json_check
+        {
+            failure_json_check(&test::read_body_json(resp).await);
         }
 
         // Failure test- logged in with EVERY non-relevant permission
@@ -270,10 +270,10 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
                 resp.status().as_u16()
             ));
         }
-        if resp.status() == StatusCode::OK {
-            if let Some(failure_json_check) = &self.failure_json_check {
-                failure_json_check(&test::read_body_json(resp).await);
-            }
+        if resp.status() == StatusCode::OK
+            && let Some(failure_json_check) = &self.failure_json_check
+        {
+            failure_json_check(&test::read_body_json(resp).await);
         }
 
         // Patch user's permissions to success permissions
@@ -300,10 +300,10 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
                 resp.status().as_u16()
             ));
         }
-        if resp.status() == StatusCode::OK {
-            if let Some(success_json_check) = &self.success_json_check {
-                success_json_check(&test::read_body_json(resp).await);
-            }
+        if resp.status() == StatusCode::OK
+            && let Some(success_json_check) = &self.success_json_check
+        {
+            success_json_check(&test::read_body_json(resp).await);
         }
 
         // If the remove_user flag is set, remove the user from the project

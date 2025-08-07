@@ -43,35 +43,33 @@ impl LegacyResultSearchProject {
     pub fn from(result_search_project: ResultSearchProject) -> Self {
         let mut categories = result_search_project.categories;
         categories.extend(result_search_project.loaders.clone());
-        if categories.contains(&"mrpack".to_string()) {
-            if let Some(mrpack_loaders) = result_search_project
+        if categories.contains(&"mrpack".to_string())
+            && let Some(mrpack_loaders) = result_search_project
                 .project_loader_fields
                 .get("mrpack_loaders")
-            {
-                categories.extend(
-                    mrpack_loaders
-                        .iter()
-                        .filter_map(|c| c.as_str())
-                        .map(String::from),
-                );
-                categories.retain(|c| c != "mrpack");
-            }
+        {
+            categories.extend(
+                mrpack_loaders
+                    .iter()
+                    .filter_map(|c| c.as_str())
+                    .map(String::from),
+            );
+            categories.retain(|c| c != "mrpack");
         }
         let mut display_categories = result_search_project.display_categories;
         display_categories.extend(result_search_project.loaders);
-        if display_categories.contains(&"mrpack".to_string()) {
-            if let Some(mrpack_loaders) = result_search_project
+        if display_categories.contains(&"mrpack".to_string())
+            && let Some(mrpack_loaders) = result_search_project
                 .project_loader_fields
                 .get("mrpack_loaders")
-            {
-                categories.extend(
-                    mrpack_loaders
-                        .iter()
-                        .filter_map(|c| c.as_str())
-                        .map(String::from),
-                );
-                display_categories.retain(|c| c != "mrpack");
-            }
+        {
+            categories.extend(
+                mrpack_loaders
+                    .iter()
+                    .filter_map(|c| c.as_str())
+                    .map(String::from),
+            );
+            display_categories.retain(|c| c != "mrpack");
         }
 
         // Sort then remove duplicates

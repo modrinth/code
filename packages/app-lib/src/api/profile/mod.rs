@@ -337,28 +337,26 @@ pub async fn update_project(
             )
             .await?
             .remove(project_path)
+            && let Some(update_version) = &file.update_version_id
         {
-            if let Some(update_version) = &file.update_version_id {
-                let path = Profile::add_project_version(
-                    profile_path,
-                    update_version,
-                    &state.pool,
-                    &state.fetch_semaphore,
-                    &state.io_semaphore,
-                )
-                .await?;
+            let path = Profile::add_project_version(
+                profile_path,
+                update_version,
+                &state.pool,
+                &state.fetch_semaphore,
+                &state.io_semaphore,
+            )
+            .await?;
 
-                if path != project_path {
-                    Profile::remove_project(profile_path, project_path).await?;
-                }
-
-                if !skip_send_event.unwrap_or(false) {
-                    emit_profile(profile_path, ProfilePayloadType::Edited)
-                        .await?;
-                }
-
-                return Ok(path);
+            if path != project_path {
+                Profile::remove_project(profile_path, project_path).await?;
             }
+
+            if !skip_send_event.unwrap_or(false) {
+                emit_profile(profile_path, ProfilePayloadType::Edited).await?;
+            }
+
+            return Ok(path);
         }
 
         Err(crate::ErrorKind::InputError(
@@ -479,10 +477,10 @@ pub async fn export_mrpack(
     let included_export_candidates = included_export_candidates
         .into_iter()
         .filter(|x| {
-            if let Some(f) = PathBuf::from(x).file_name() {
-                if f.to_string_lossy().starts_with(".DS_Store") {
-                    return false;
-                }
+            if let Some(f) = PathBuf::from(x).file_name()
+                && f.to_string_lossy().starts_with(".DS_Store")
+            {
+                return false;
             }
             true
         })
