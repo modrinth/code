@@ -447,8 +447,6 @@ pub async fn edit_subscription(
                 ));
             }
 
-            let mut left_open_charge = None;
-
             // If the charge is an expiring charge, we need to create a payment
             // intent as if the user was subscribing to the product, as opposed
             // to a proration.
@@ -535,6 +533,12 @@ pub async fn edit_subscription(
                 let intent =
                     stripe::PaymentIntent::create(&stripe_client, intent)
                         .await?;
+
+                // We do NOT update the open charge here. It will be patched to be the next
+                // charge of the subscription in the stripe webhook.
+                //
+                // We also shouldn't delete it, because if the payment fails, the expiring
+                // charge will be gone and the preview subscription will never be unprovisioned.
 
                 Some((new_price_value, 0, intent))
             } else {
