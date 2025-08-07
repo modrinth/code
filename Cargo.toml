@@ -77,7 +77,7 @@ hyper-rustls = { version = "0.27.7", default-features = false, features = [
 hyper-util = "0.1.16"
 iana-time-zone = "0.1.63"
 image = { version = "0.25.6", default-features = false, features = ["rayon"] }
-indexmap = "2.9.0"
+indexmap = "2.10.0"
 indicatif = "0.17.11"
 itertools = "0.14.0"
 jemalloc_pprof = "0.7.0"
