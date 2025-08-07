@@ -447,6 +447,8 @@ pub async fn edit_subscription(
                 ));
             }
 
+            let mut left_open_charge = None;
+
             // If the charge is an expiring charge, we need to create a payment
             // intent as if the user was subscribing to the product, as opposed
             // to a proration.
@@ -2005,10 +2007,32 @@ pub async fn stripe_webhook(
                             }
                         };
 
+                        // If the next open charge is actually an expiring charge,
+                        // this means the subscription was promoted from a temporary
+                        // free subscription to a paid subscription.
+                        //
+                        // In this case, we need to modify this expiring charge to be the
+                        // next charge of the subscription, turn it into a normal open charge.
+                        //
+                        // Otherwise, if there *is* an open charge, the subscription was upgraded
+                        // and the just-processed payment was the proration charge. In this case,
+                        // the existing open charge must be updated to reflect the new product's price.
+                        //
+                        // If there are no open charges, the just-processed payment was a recurring
+                        // or initial subscription charge, and we need to create the next charge.
                         if let Some(mut charge) = open_charge {
-                            charge.price_id = metadata.product_price_item.id;
-                            charge.amount = new_price as i64;
-
+                            if charge.status == ChargeStatus::Expiring {
+                                charge.status = ChargeStatus::Open;
+                                charge.due = Utc::now()
+                                    + subscription.interval.duration();
+                                charge.payment_platform =
+                                    PaymentPlatform::Stripe;
+                                charge.last_attempt = None;
+                            } else {
+                                charge.price_id =
+                                    metadata.product_price_item.id;
+                                charge.amount = new_price as i64;
+                            }
                             charge.upsert(&mut transaction).await?;
                         } else if metadata.charge_item.status
                             != ChargeStatus::Cancelled
