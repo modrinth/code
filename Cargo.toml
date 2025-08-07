@@ -25,7 +25,7 @@ actix-ws = "0.3.0"
 argon2 = { version = "0.5.3", features = ["std"] }
 ariadne = { path = "packages/ariadne" }
 async_zip = "0.0.17"
-async-compression = { version = "0.4.25", default-features = false }
+async-compression = { version = "0.4.27", default-features = false }
 async-recursion = "1.1.1"
 async-stripe = { version = "0.41.0", default-features = false, features = [
   "runtime-tokio-hyper-rustls",
