@@ -31,7 +31,7 @@ async-stripe = { version = "0.41.0", default-features = false, features = [
   "runtime-tokio-hyper-rustls",
 ] }
 async-trait = "0.1.88"
-async-tungstenite = { version = "0.29.1", default-features = false, features = [
+async-tungstenite = { version = "0.30.0", default-features = false, features = [
   "futures-03-sink",
 ] }
 async-walkdir = "2.1.0"

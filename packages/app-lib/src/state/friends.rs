@@ -9,7 +9,7 @@ use ariadne::networking::message::{
     ClientToServerMessage, ServerToClientMessage,
 };
 use ariadne::users::UserStatus;
-use async_tungstenite::WebSocketStream;
+use async_tungstenite::WebSocketSender;
 use async_tungstenite::tokio::{ConnectStream, connect_async};
 use async_tungstenite::tungstenite::Message;
 use async_tungstenite::tungstenite::client::IntoClientRequest;
@@ -17,7 +17,6 @@ use bytes::Bytes;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use either::Either;
-use futures::stream::SplitSink;
 use futures::{SinkExt, StreamExt};
 use reqwest::Method;
 use reqwest::header::HeaderValue;
@@ -32,7 +31,7 @@ use tokio::sync::{Mutex, RwLock};
 use uuid::Uuid;
 
 pub(super) type WriteSocket =
-    Arc<RwLock<Option<SplitSink<WebSocketStream<ConnectStream>, Message>>>>;
+    Arc<RwLock<Option<WebSocketSender<ConnectStream>>>>;
 pub(super) type TunnelSockets = Arc<DashMap<Uuid, Arc<InternalTunnelSocket>>>;
 
 pub struct FriendsSocket {
