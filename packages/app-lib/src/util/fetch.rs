@@ -254,7 +254,7 @@ where
 }
 
 #[tracing::instrument(skip(bytes, semaphore))]
-pub async fn write<'a>(
+pub async fn write(
     path: &Path,
     bytes: &[u8],
     semaphore: &IoSemaphore,

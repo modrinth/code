@@ -595,8 +595,8 @@ impl Profile {
     }
 
     #[tracing::instrument(skip(self, semaphore, icon))]
-    pub async fn set_icon<'a>(
-        &'a mut self,
+    pub async fn set_icon(
+        &mut self,
         cache_dir: &Path,
         semaphore: &IoSemaphore,
         icon: bytes::Bytes,
