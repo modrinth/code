@@ -82,7 +82,7 @@ indicatif = "0.18.0"
 itertools = "0.14.0"
 jemalloc_pprof = "0.8.1"
 json-patch = { version = "4.0.0", default-features = false }
-lettre = { version = "0.11.17", default-features = false, features = [
+lettre = { version = "0.11.18", default-features = false, features = [
   "builder",
   "hostname",
   "pool",

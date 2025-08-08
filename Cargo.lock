@@ -4431,9 +4431,9 @@ checksum = "03087c2bad5e1034e8cace5926dec053fb3790248370865f5117a7d0213354c8"
 
 [[package]]
 name = "lettre"
-version = "0.11.17"
+version = "0.11.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cb2a0354e9ece2fcdcf9fa53417f6de587230c0c248068eb058fa26c4a753179"
+checksum = "5cb54db6ff7a89efac87dba5baeac57bb9ccd726b49a9b6f21fb92b3966aaf56"
 dependencies = [
  "base64 0.22.1",
  "chumsky",
@@ -4450,7 +4450,7 @@ dependencies = [
  "quoted_printable",
  "rustls 0.23.27",
  "rustls-native-certs 0.8.1",
- "socket2 0.5.9",
+ "socket2 0.6.0",
  "tokio",
  "url",
 ]
