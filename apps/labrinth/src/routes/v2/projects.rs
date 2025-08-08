@@ -512,6 +512,7 @@ pub async fn project_edit(
         moderation_message_body: v2_new_project.moderation_message_body,
         monetization_status: v2_new_project.monetization_status,
         side_types_migration_review_status: None, // Not to be exposed in v2
+        loader_fields: HashMap::new(), // Loader fields are not a thing in v2
     };
 
     // This returns 204 or failure so we don't need to do anything with it
