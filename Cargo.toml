@@ -121,7 +121,7 @@ rust-s3 = { version = "0.35.1", default-features = false, features = [
   "tokio-rustls-tls",
 ] }
 rusty-money = "0.4.1"
-sentry = { version = "0.41.0", default-features = false, features = [
+sentry = { version = "0.42.0", default-features = false, features = [
   "backtrace",
   "contexts",
   "debug-images",
@@ -129,7 +129,7 @@ sentry = { version = "0.41.0", default-features = false, features = [
   "reqwest",
   "rustls",
 ] }
-sentry-actix = "0.41.0"
+sentry-actix = "0.42.0"
 serde = "1.0.219"
 serde_bytes = "0.11.17"
 serde_cbor = "0.11.2"
