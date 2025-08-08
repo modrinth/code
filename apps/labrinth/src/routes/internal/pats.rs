@@ -185,69 +185,69 @@ pub async fn edit_pat(
     )
     .await?;
 
-    if let Some(pat) = pat {
-        if pat.user_id == user.id.into() {
-            let mut transaction = pool.begin().await?;
+    if let Some(pat) = pat
+        && pat.user_id == user.id.into()
+    {
+        let mut transaction = pool.begin().await?;
 
-            if let Some(scopes) = &info.scopes {
-                if scopes.is_restricted() {
-                    return Err(ApiError::InvalidInput(
-                        "Invalid scopes requested!".to_string(),
-                    ));
-                }
+        if let Some(scopes) = &info.scopes {
+            if scopes.is_restricted() {
+                return Err(ApiError::InvalidInput(
+                    "Invalid scopes requested!".to_string(),
+                ));
+            }
 
-                sqlx::query!(
-                    "
+            sqlx::query!(
+                "
                     UPDATE pats
                     SET scopes = $1
                     WHERE id = $2
                     ",
-                    scopes.bits() as i64,
-                    pat.id.0
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-            if let Some(name) = &info.name {
-                sqlx::query!(
-                    "
+                scopes.bits() as i64,
+                pat.id.0
+            )
+            .execute(&mut *transaction)
+            .await?;
+        }
+        if let Some(name) = &info.name {
+            sqlx::query!(
+                "
                     UPDATE pats
                     SET name = $1
                     WHERE id = $2
                     ",
-                    name,
-                    pat.id.0
-                )
-                .execute(&mut *transaction)
-                .await?;
+                name,
+                pat.id.0
+            )
+            .execute(&mut *transaction)
+            .await?;
+        }
+        if let Some(expires) = &info.expires {
+            if expires < &Utc::now() {
+                return Err(ApiError::InvalidInput(
+                    "Expire date must be in the future!".to_string(),
+                ));
             }
-            if let Some(expires) = &info.expires {
-                if expires < &Utc::now() {
-                    return Err(ApiError::InvalidInput(
-                        "Expire date must be in the future!".to_string(),
-                    ));
-                }
 
-                sqlx::query!(
-                    "
+            sqlx::query!(
+                "
                     UPDATE pats
                     SET expires = $1
                     WHERE id = $2
                     ",
-                    expires,
-                    pat.id.0
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-
-            transaction.commit().await?;
-            database::models::pat_item::DBPersonalAccessToken::clear_cache(
-                vec![(Some(pat.id), Some(pat.access_token), Some(pat.user_id))],
-                &redis,
+                expires,
+                pat.id.0
             )
+            .execute(&mut *transaction)
             .await?;
         }
+
+        transaction.commit().await?;
+        database::models::pat_item::DBPersonalAccessToken::clear_cache(
+            vec![(Some(pat.id), Some(pat.access_token), Some(pat.user_id))],
+            &redis,
+        )
+        .await?;
     }
 
     Ok(HttpResponse::NoContent().finish())
@@ -276,21 +276,21 @@ pub async fn delete_pat(
     )
     .await?;
 
-    if let Some(pat) = pat {
-        if pat.user_id == user.id.into() {
-            let mut transaction = pool.begin().await?;
-            database::models::pat_item::DBPersonalAccessToken::remove(
-                pat.id,
-                &mut transaction,
-            )
-            .await?;
-            transaction.commit().await?;
-            database::models::pat_item::DBPersonalAccessToken::clear_cache(
-                vec![(Some(pat.id), Some(pat.access_token), Some(pat.user_id))],
-                &redis,
-            )
-            .await?;
-        }
+    if let Some(pat) = pat
+        && pat.user_id == user.id.into()
+    {
+        let mut transaction = pool.begin().await?;
+        database::models::pat_item::DBPersonalAccessToken::remove(
+            pat.id,
+            &mut transaction,
+        )
+        .await?;
+        transaction.commit().await?;
+        database::models::pat_item::DBPersonalAccessToken::clear_cache(
+            vec![(Some(pat.id), Some(pat.access_token), Some(pat.user_id))],
+            &redis,
+        )
+        .await?;
     }
 
     Ok(HttpResponse::NoContent().finish())

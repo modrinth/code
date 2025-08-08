@@ -801,24 +801,24 @@ impl VersionField {
         };
 
         if let Some(count) = countable {
-            if let Some(min) = loader_field.min_val {
-                if count < min {
-                    return Err(format!(
-                        "Provided value '{v}' for {field_name} is less than the minimum of {min}",
-                        v = serde_json::to_string(&value).unwrap_or_default(),
-                        field_name = loader_field.field,
-                    ));
-                }
+            if let Some(min) = loader_field.min_val
+                && count < min
+            {
+                return Err(format!(
+                    "Provided value '{v}' for {field_name} is less than the minimum of {min}",
+                    v = serde_json::to_string(&value).unwrap_or_default(),
+                    field_name = loader_field.field,
+                ));
             }
 
-            if let Some(max) = loader_field.max_val {
-                if count > max {
-                    return Err(format!(
-                        "Provided value '{v}' for {field_name} is greater than the maximum of {max}",
-                        v = serde_json::to_string(&value).unwrap_or_default(),
-                        field_name = loader_field.field,
-                    ));
-                }
+            if let Some(max) = loader_field.max_val
+                && count > max
+            {
+                return Err(format!(
+                    "Provided value '{v}' for {field_name} is greater than the maximum of {max}",
+                    v = serde_json::to_string(&value).unwrap_or_default(),
+                    field_name = loader_field.field,
+                ));
             }
         }
 
