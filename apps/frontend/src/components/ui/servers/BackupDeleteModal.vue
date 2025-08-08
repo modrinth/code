@@ -18,24 +18,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { ConfirmModal } from "@modrinth/ui";
-import type { Backup } from "@modrinth/utils";
-import BackupItem from "~/components/ui/servers/BackupItem.vue";
+import { ConfirmModal } from '@modrinth/ui'
+import type { Backup } from '@modrinth/utils'
+import { ref } from 'vue'
+
+import BackupItem from '~/components/ui/servers/BackupItem.vue'
 
 const emit = defineEmits<{
-  (e: "delete", backup: Backup | undefined): void;
-}>();
+  (e: 'delete', backup: Backup | undefined): void
+}>()
 
-const modal = ref<InstanceType<typeof ConfirmModal>>();
-const currentBackup = ref<Backup | undefined>(undefined);
+const modal = ref<InstanceType<typeof ConfirmModal>>()
+const currentBackup = ref<Backup | undefined>(undefined)
 
 function show(backup: Backup) {
-  currentBackup.value = backup;
-  modal.value?.show();
+  currentBackup.value = backup
+  modal.value?.show()
 }
 
 defineExpose({
   show,
-});
+})
 </script>

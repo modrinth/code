@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useVIntl, defineMessages } from '@vintl/vintl'
 import type { VersionChannel } from '@modrinth/utils'
+import { defineMessages, useVIntl } from '@vintl/vintl'
 
 const { formatMessage } = useVIntl()
 

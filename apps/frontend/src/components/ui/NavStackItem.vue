@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { ChevronRightIcon } from "@modrinth/assets";
+import { ChevronRightIcon } from '@modrinth/assets'
 
 export default {
   components: {
@@ -55,7 +55,7 @@ export default {
       type: Boolean,
     },
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>

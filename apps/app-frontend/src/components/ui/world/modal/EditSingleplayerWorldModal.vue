@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { ChevronRightIcon, SaveIcon, XIcon, UndoIcon } from '@modrinth/assets'
+import { ChevronRightIcon, SaveIcon, UndoIcon, XIcon } from '@modrinth/assets'
 import { Avatar, ButtonStyled, commonMessages } from '@modrinth/ui'
+import { defineMessages, useVIntl } from '@vintl/vintl'
 import { computed, ref } from 'vue'
+
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import HideFromHomeOption from '@/components/ui/world/modal/HideFromHomeOption.vue'
 import type { GameInstance } from '@/helpers/types'
 import type { DisplayStatus, SingleplayerWorld } from '@/helpers/worlds.ts'
-import { set_world_display_status, rename_world, reset_world_icon } from '@/helpers/worlds.ts'
-import { defineMessages, useVIntl } from '@vintl/vintl'
+import { rename_world, reset_world_icon, set_world_display_status } from '@/helpers/worlds.ts'
 import { handleError } from '@/store/notifications'
-import HideFromHomeOption from '@/components/ui/world/modal/HideFromHomeOption.vue'
 
 const { formatMessage } = useVIntl()
 

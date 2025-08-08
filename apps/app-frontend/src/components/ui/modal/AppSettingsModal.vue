@@ -1,28 +1,29 @@
 <script setup lang="ts">
 import {
-  ReportIcon,
-  ModrinthIcon,
-  ShieldIcon,
-  SettingsIcon,
-  GaugeIcon,
-  PaintbrushIcon,
-  GameIcon,
   CoffeeIcon,
+  GameIcon,
+  GaugeIcon,
+  ModrinthIcon,
+  PaintbrushIcon,
+  ReportIcon,
+  SettingsIcon,
+  ShieldIcon,
 } from '@modrinth/assets'
 import { TabbedModal } from '@modrinth/ui'
-import { computed, ref, watch } from 'vue'
-import { useVIntl, defineMessage } from '@vintl/vintl'
-import AppearanceSettings from '@/components/ui/settings/AppearanceSettings.vue'
-import JavaSettings from '@/components/ui/settings/JavaSettings.vue'
-import ResourceManagementSettings from '@/components/ui/settings/ResourceManagementSettings.vue'
-import PrivacySettings from '@/components/ui/settings/PrivacySettings.vue'
-import DefaultInstanceSettings from '@/components/ui/settings/DefaultInstanceSettings.vue'
 import { getVersion } from '@tauri-apps/api/app'
-import { version as getOsVersion, platform as getOsPlatform } from '@tauri-apps/plugin-os'
-import { useTheming } from '@/store/state'
-import FeatureFlagSettings from '@/components/ui/settings/FeatureFlagSettings.vue'
+import { platform as getOsPlatform, version as getOsVersion } from '@tauri-apps/plugin-os'
+import { defineMessage, useVIntl } from '@vintl/vintl'
+import { computed, ref, watch } from 'vue'
+
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import AppearanceSettings from '@/components/ui/settings/AppearanceSettings.vue'
+import DefaultInstanceSettings from '@/components/ui/settings/DefaultInstanceSettings.vue'
+import FeatureFlagSettings from '@/components/ui/settings/FeatureFlagSettings.vue'
+import JavaSettings from '@/components/ui/settings/JavaSettings.vue'
+import PrivacySettings from '@/components/ui/settings/PrivacySettings.vue'
+import ResourceManagementSettings from '@/components/ui/settings/ResourceManagementSettings.vue'
 import { get, set } from '@/helpers/settings.ts'
+import { useTheming } from '@/store/state'
 
 const themeStore = useTheming()
 

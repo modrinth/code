@@ -1,8 +1,9 @@
 <script setup lang="ts" generic="T">
+import type { RouteLocationRaw } from 'vue-router'
+
 import AutoLink from '../base/AutoLink.vue'
 import Avatar from '../base/Avatar.vue'
 import Checkbox from '../base/Checkbox.vue'
-import type { RouteLocationRaw } from 'vue-router'
 
 export interface ContentCreator {
   name: string

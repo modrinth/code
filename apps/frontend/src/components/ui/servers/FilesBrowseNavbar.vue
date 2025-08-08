@@ -54,7 +54,7 @@
                       }"
                       @click="$emit('navigate', index)"
                     >
-                      {{ segment || "" }}
+                      {{ segment || '' }}
                     </button>
                   </ButtonStyled>
                   <ChevronRightIcon
@@ -154,60 +154,59 @@
 
 <script setup lang="ts">
 import {
-  LinkIcon,
-  CurseForgeIcon,
-  FileArchiveIcon,
   BoxIcon,
-  PlusIcon,
-  UploadIcon,
-  DropdownIcon,
-  FolderOpenIcon,
-  SearchIcon,
-  HomeIcon,
   ChevronRightIcon,
+  CurseForgeIcon,
+  DropdownIcon,
+  FileArchiveIcon,
   FilterIcon,
-} from "@modrinth/assets";
-import { ButtonStyled, OverflowMenu } from "@modrinth/ui";
-import { ref, computed } from "vue";
-import { useIntersectionObserver } from "@vueuse/core";
+  FolderOpenIcon,
+  HomeIcon,
+  LinkIcon,
+  PlusIcon,
+  SearchIcon,
+  UploadIcon,
+} from '@modrinth/assets'
+import { ButtonStyled, OverflowMenu } from '@modrinth/ui'
+import { useIntersectionObserver } from '@vueuse/core'
+import { computed, ref } from 'vue'
 
 const props = defineProps<{
-  breadcrumbSegments: string[];
-  searchQuery: string;
-  currentFilter: string;
-  baseId: string;
-}>();
+  breadcrumbSegments: string[]
+  searchQuery: string
+  currentFilter: string
+  baseId: string
+}>()
 
 defineEmits<{
-  (e: "navigate", index: number): void;
-  (e: "create", type: "file" | "directory"): void;
-  (e: "upload" | "upload-zip"): void;
-  (e: "unzip-from-url", cf: boolean): void;
-  (e: "update:searchQuery", value: string): void;
-  (e: "filter", type: string): void;
-}>();
+  (e: 'navigate', index: number): void
+  (e: 'create', type: 'file' | 'directory'): void
+  (e: 'upload' | 'upload-zip'): void
+  (e: 'unzip-from-url', cf: boolean): void
+  (e: 'update:searchQuery' | 'filter', value: string): void
+}>()
 
-const pyroFilesSentinel = ref<HTMLElement | null>(null);
-const isStuck = ref(false);
+const pyroFilesSentinel = ref<HTMLElement | null>(null)
+const isStuck = ref(false)
 
 useIntersectionObserver(
   pyroFilesSentinel,
   ([{ isIntersecting }]) => {
-    isStuck.value = !isIntersecting;
+    isStuck.value = !isIntersecting
   },
   { threshold: [0, 1] },
-);
+)
 
 const filterLabel = computed(() => {
   switch (props.currentFilter) {
-    case "filesOnly":
-      return "Files only";
-    case "foldersOnly":
-      return "Folders only";
+    case 'filesOnly':
+      return 'Files only'
+    case 'foldersOnly':
+      return 'Folders only'
     default:
-      return "Show all";
+      return 'Show all'
   }
-});
+})
 </script>
 
 <style scoped>

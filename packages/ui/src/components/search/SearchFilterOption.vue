@@ -34,6 +34,7 @@
 
 <script setup lang="ts">
 import { BanIcon, CheckIcon } from '@modrinth/assets'
+
 import type { FilterOption } from '../../utils/search'
 
 withDefaults(

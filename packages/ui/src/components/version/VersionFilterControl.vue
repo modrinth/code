@@ -80,11 +80,12 @@
 
 <script setup lang="ts">
 import { FilterIcon, XCircleIcon, XIcon } from '@modrinth/assets'
-import { ManySelect, Checkbox } from '../index'
-import { type Version, formatCategory, type GameVersionTag } from '@modrinth/utils'
-import { ref, computed } from 'vue'
+import { formatCategory, type GameVersionTag, type Version } from '@modrinth/utils'
+import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
+
 import TagItem from '../base/TagItem.vue'
+import { Checkbox, ManySelect } from '../index'
 
 const props = defineProps<{
   versions: Version[]

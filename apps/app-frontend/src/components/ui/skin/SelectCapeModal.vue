@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { useTemplateRef, ref, computed } from 'vue'
-import type { Cape, SkinModel } from '@/helpers/skins.ts'
+import { CheckIcon, XIcon } from '@modrinth/assets'
 import {
   ButtonStyled,
-  ScrollablePanel,
   CapeButton,
   CapeLikeTextButton,
+  ScrollablePanel,
   SkinPreviewRenderer,
 } from '@modrinth/ui'
-import { CheckIcon, XIcon } from '@modrinth/assets'
+import { computed, ref, useTemplateRef } from 'vue'
+
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import type { Cape, SkinModel } from '@/helpers/skins.ts'
 
 const modal = useTemplateRef('modal')
 

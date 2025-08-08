@@ -212,7 +212,7 @@
                             id: 'withhold-reply',
                             color: 'danger',
                             action: () => {
-                              sendReply('withheld');
+                              sendReply('withheld')
                             },
                             hoverFilled: true,
                             disabled: project.status === 'withheld',
@@ -223,7 +223,7 @@
                             id: 'withhold',
                             color: 'danger',
                             action: () => {
-                              setStatus('withheld');
+                              setStatus('withheld')
                             },
                             hoverFilled: true,
                             disabled: project.status === 'withheld',
@@ -251,23 +251,24 @@
 </template>
 
 <script setup>
-import { CopyCode, OverflowMenu, MarkdownEditor } from "@modrinth/ui";
 import {
-  DropdownIcon,
-  ReplyIcon,
-  SendIcon,
   CheckCircleIcon,
-  XIcon,
-  EyeOffIcon,
   CheckIcon,
+  DropdownIcon,
+  EyeOffIcon,
+  ReplyIcon,
   ScaleIcon,
-} from "@modrinth/assets";
-import { useImageUpload } from "~/composables/image-upload.ts";
-import ThreadMessage from "~/components/ui/thread/ThreadMessage.vue";
-import { isStaff } from "~/helpers/users.js";
-import { isApproved, isRejected } from "~/helpers/projects.js";
-import Modal from "~/components/ui/Modal.vue";
-import Checkbox from "~/components/ui/Checkbox.vue";
+  SendIcon,
+  XIcon,
+} from '@modrinth/assets'
+import { CopyCode, MarkdownEditor, OverflowMenu } from '@modrinth/ui'
+
+import Checkbox from '~/components/ui/Checkbox.vue'
+import Modal from '~/components/ui/Modal.vue'
+import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'
+import { useImageUpload } from '~/composables/image-upload.ts'
+import { isApproved, isRejected } from '~/helpers/projects.js'
+import { isStaff } from '~/helpers/users.js'
 
 const props = defineProps({
   thread: {
@@ -292,178 +293,178 @@ const props = defineProps({
   currentMember: {
     type: Object,
     default() {
-      return null;
+      return null
     },
   },
   auth: {
     type: Object,
     required: true,
   },
-});
+})
 
-const emit = defineEmits(["update-thread"]);
+const emit = defineEmits(['update-thread'])
 
-const app = useNuxtApp();
-const flags = useFeatureFlags();
+const app = useNuxtApp()
+const flags = useFeatureFlags()
 
 const members = computed(() => {
-  const members = {};
+  const members = {}
   for (const member of props.thread.members) {
-    members[member.id] = member;
+    members[member.id] = member
   }
-  return members;
-});
+  return members
+})
 
-const replyBody = ref("");
+const replyBody = ref('')
 
 const sortedMessages = computed(() => {
   if (props.thread !== null) {
     return props.thread.messages
       .slice()
-      .sort((a, b) => app.$dayjs(a.created) - app.$dayjs(b.created));
+      .sort((a, b) => app.$dayjs(a.created) - app.$dayjs(b.created))
   }
-  return [];
-});
+  return []
+})
 
-const modalSubmit = ref(null);
-const modalReply = ref(null);
+const modalSubmit = ref(null)
+const modalReply = ref(null)
 
 async function updateThreadLocal() {
-  let threadId = null;
+  let threadId = null
   if (props.project) {
-    threadId = props.project.thread_id;
+    threadId = props.project.thread_id
   } else if (props.report) {
-    threadId = props.report.thread_id;
+    threadId = props.report.thread_id
   }
-  let thread = null;
+  let thread = null
   if (threadId) {
-    thread = await useBaseFetch(`thread/${threadId}`);
+    thread = await useBaseFetch(`thread/${threadId}`)
   }
-  emit("update-thread", thread);
+  emit('update-thread', thread)
 }
 
-const imageIDs = ref([]);
+const imageIDs = ref([])
 
 async function onUploadImage(file) {
-  const response = await useImageUpload(file, { context: "thread_message" });
+  const response = await useImageUpload(file, { context: 'thread_message' })
 
-  imageIDs.value.push(response.id);
+  imageIDs.value.push(response.id)
   // Keep the last 10 entries of image IDs
-  imageIDs.value = imageIDs.value.slice(-10);
+  imageIDs.value = imageIDs.value.slice(-10)
 
-  return response.url;
+  return response.url
 }
 
 async function sendReplyFromModal(status = null, privateMessage = false) {
-  modalReply.value.hide();
-  await sendReply(status, privateMessage);
+  modalReply.value.hide()
+  await sendReply(status, privateMessage)
 }
 
 async function sendReply(status = null, privateMessage = false) {
   try {
     const body = {
       body: {
-        type: "text",
+        type: 'text',
         body: replyBody.value,
         private: privateMessage,
       },
-    };
+    }
 
     if (imageIDs.value.length > 0) {
       body.body = {
         ...body.body,
         uploaded_images: imageIDs.value,
-      };
+      }
     }
 
     await useBaseFetch(`thread/${props.thread.id}`, {
-      method: "POST",
+      method: 'POST',
       body,
-    });
+    })
 
-    replyBody.value = "";
+    replyBody.value = ''
 
-    await updateThreadLocal();
+    await updateThreadLocal()
     if (status !== null) {
-      props.setStatus(status);
+      props.setStatus(status)
     }
   } catch (err) {
     app.$notify({
-      group: "main",
-      title: "Error sending message",
+      group: 'main',
+      title: 'Error sending message',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
 }
 
 async function closeReport(reply) {
   if (reply) {
-    await sendReply();
+    await sendReply()
   }
 
   try {
     await useBaseFetch(`report/${props.report.id}`, {
-      method: "PATCH",
+      method: 'PATCH',
       body: {
         closed: true,
       },
-    });
-    await updateThreadLocal();
+    })
+    await updateThreadLocal()
   } catch (err) {
     app.$notify({
-      group: "main",
-      title: "Error closing report",
+      group: 'main',
+      title: 'Error closing report',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
 }
 
 async function reopenReport() {
   try {
     await useBaseFetch(`report/${props.report.id}`, {
-      method: "PATCH",
+      method: 'PATCH',
       body: {
         closed: false,
       },
-    });
-    await updateThreadLocal();
+    })
+    await updateThreadLocal()
   } catch (err) {
     app.$notify({
-      group: "main",
-      title: "Error reopening report",
+      group: 'main',
+      title: 'Error reopening report',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
 }
 
-const replyWithSubmission = ref(false);
-const submissionConfirmation = ref(false);
-const replyConfirmation = ref(false);
+const replyWithSubmission = ref(false)
+const submissionConfirmation = ref(false)
+const replyConfirmation = ref(false)
 
 function openResubmitModal(reply) {
-  submissionConfirmation.value = false;
-  replyWithSubmission.value = reply;
-  modalSubmit.value.show();
+  submissionConfirmation.value = false
+  replyWithSubmission.value = reply
+  modalSubmit.value.show()
 }
 
-function openReplyModal(reply) {
-  replyConfirmation.value = false;
-  modalReply.value.show();
+function openReplyModal() {
+  replyConfirmation.value = false
+  modalReply.value.show()
 }
 
 async function resubmit() {
   if (replyWithSubmission.value) {
-    await sendReply("processing");
+    await sendReply('processing')
   } else {
-    await props.setStatus("processing");
+    await props.setStatus('processing')
   }
-  modalSubmit.value.hide();
+  modalSubmit.value.hide()
 }
 
-const requestedStatus = computed(() => props.project.requested_status ?? "approved");
+const requestedStatus = computed(() => props.project.requested_status ?? 'approved')
 </script>
 
 <style lang="scss" scoped>

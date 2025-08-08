@@ -1,4 +1,4 @@
-import { ModrinthServerError } from '../errors'
+import type { ModrinthServerError } from '../errors'
 
 export interface V1ErrorInfo {
   context?: string

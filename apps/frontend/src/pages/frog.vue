@@ -1,52 +1,52 @@
 <script setup lang="ts">
-import { useRelativeTime } from "@modrinth/ui";
+import { useRelativeTime } from '@modrinth/ui'
 
-const vintl = useVIntl();
-const { formatMessage } = vintl;
+const vintl = useVIntl()
+const { formatMessage } = vintl
 
 const messages = defineMessages({
   frogTitle: {
-    id: "frog.title",
-    defaultMessage: "Frog",
+    id: 'frog.title',
+    defaultMessage: 'Frog',
   },
   frogDescription: {
-    id: "frog",
+    id: 'frog',
     defaultMessage: "You've been frogged! 🐸",
   },
   frogAltText: {
-    id: "frog.altText",
-    defaultMessage: "A photorealistic painting of a frog labyrinth",
+    id: 'frog.altText',
+    defaultMessage: 'A photorealistic painting of a frog labyrinth',
   },
   frogSinceOpened: {
-    id: "frog.sinceOpened",
-    defaultMessage: "This page was opened {ago}",
+    id: 'frog.sinceOpened',
+    defaultMessage: 'This page was opened {ago}',
   },
   frogFroggedPeople: {
-    id: "frog.froggedPeople",
+    id: 'frog.froggedPeople',
     defaultMessage:
-      "{count, plural, one {{count} more person} other {{count} more people}} were also frogged!",
+      '{count, plural, one {{count} more person} other {{count} more people}} were also frogged!',
   },
-});
+})
 
-const formatCompactNumber = useCompactNumber();
+const formatCompactNumber = useCompactNumber()
 
-const formatRelativeTime = useRelativeTime();
+const formatRelativeTime = useRelativeTime()
 
-const pageOpen = useState("frogPageOpen", () => Date.now());
-const peopleFrogged = useState("frogPeopleFrogged", () => Math.round(Math.random() * 100_000_000));
-const peopleFroggedCount = computed(() => formatCompactNumber(peopleFrogged.value));
+const pageOpen = useState('frogPageOpen', () => Date.now())
+const peopleFrogged = useState('frogPeopleFrogged', () => Math.round(Math.random() * 100_000_000))
+const peopleFroggedCount = computed(() => formatCompactNumber(peopleFrogged.value))
 
-let interval: ReturnType<typeof setTimeout>;
+let interval: ReturnType<typeof setTimeout>
 
-const formattedOpenedCounter = ref(formatRelativeTime(Date.now()));
+const formattedOpenedCounter = ref(formatRelativeTime(Date.now()))
 
 onMounted(() => {
   interval = setInterval(() => {
-    formattedOpenedCounter.value = formatRelativeTime(pageOpen.value);
-  }, 1000);
-});
+    formattedOpenedCounter.value = formatRelativeTime(pageOpen.value)
+  }, 1000)
+})
 
-onUnmounted(() => clearInterval(interval));
+onUnmounted(() => clearInterval(interval))
 </script>
 
 <template>

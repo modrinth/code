@@ -101,29 +101,30 @@
 </template>
 
 <script setup lang="ts">
-import * as THREE from 'three'
-import { useGLTF } from '@tresjs/cientos'
-import { useTexture, TresCanvas, useRenderLoop } from '@tresjs/core'
-import { EffectComposerPmndrs, FXAAPmndrs } from '@tresjs/post-processing'
+import { ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
 import {
-  shallowRef,
-  ref,
-  computed,
-  watch,
-  markRaw,
-  onBeforeMount,
-  onUnmounted,
-  toRefs,
-  useTemplateRef,
-} from 'vue'
-import {
-  applyTexture,
   applyCapeTexture,
+  applyTexture,
   createTransparentTexture,
   loadTexture as loadSkinTexture,
 } from '@modrinth/utils'
+import { useGLTF } from '@tresjs/cientos'
+import { TresCanvas, useRenderLoop, useTexture } from '@tresjs/core'
+import { EffectComposerPmndrs, FXAAPmndrs } from '@tresjs/post-processing'
+import * as THREE from 'three'
+import {
+  computed,
+  markRaw,
+  onBeforeMount,
+  onUnmounted,
+  ref,
+  shallowRef,
+  toRefs,
+  useTemplateRef,
+  watch,
+} from 'vue'
+
 import { useDynamicFontSize } from '../../composables'
-import { ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
 
 interface AnimationConfig {
   baseAnimation: string

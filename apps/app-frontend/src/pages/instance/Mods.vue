@@ -276,11 +276,29 @@ import {
   RadialHeader,
   Toggle,
 } from '@modrinth/ui'
+import type { ContentItem } from '@modrinth/ui/src/components/content/ContentListItem.vue'
 import type { Organization, Project, TeamMember, Version } from '@modrinth/utils'
 import { formatProjectType } from '@modrinth/utils'
+import { getCurrentWebview } from '@tauri-apps/api/webview'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+import dayjs from 'dayjs'
 import type { ComputedRef } from 'vue'
 import { computed, onUnmounted, ref, watch } from 'vue'
-import { defineMessages, useVIntl } from '@vintl/vintl'
+
+import { TextInputIcon } from '@/assets/icons'
+import AddContentButton from '@/components/ui/AddContentButton.vue'
+import type ContextMenu from '@/components/ui/ContextMenu.vue'
+import ExportModal from '@/components/ui/ExportModal.vue'
+import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
+import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
+import { trackEvent } from '@/helpers/analytics'
+import {
+  get_organization_many,
+  get_project_many,
+  get_team_many,
+  get_version_many,
+} from '@/helpers/cache.js'
+import { profile_listener } from '@/helpers/events.js'
 import {
   add_project_from_path,
   get_projects,
@@ -289,26 +307,9 @@ import {
   update_all,
   update_project,
 } from '@/helpers/profile.js'
-import { handleError } from '@/store/notifications.js'
-import { trackEvent } from '@/helpers/analytics'
-import { highlightModInProfile } from '@/helpers/utils.js'
-import { TextInputIcon } from '@/assets/icons'
-import ExportModal from '@/components/ui/ExportModal.vue'
-import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
-import AddContentButton from '@/components/ui/AddContentButton.vue'
-import {
-  get_organization_many,
-  get_project_many,
-  get_team_many,
-  get_version_many,
-} from '@/helpers/cache.js'
-import { profile_listener } from '@/helpers/events.js'
-import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
-import { getCurrentWebview } from '@tauri-apps/api/webview'
-import dayjs from 'dayjs'
 import type { CacheBehaviour, ContentFile, GameInstance } from '@/helpers/types'
-import type ContextMenu from '@/components/ui/ContextMenu.vue'
-import type { ContentItem } from '@modrinth/ui/src/components/content/ContentListItem.vue'
+import { highlightModInProfile } from '@/helpers/utils.js'
+import { handleError } from '@/store/notifications.js'
 
 const props = defineProps<{
   instance: GameInstance

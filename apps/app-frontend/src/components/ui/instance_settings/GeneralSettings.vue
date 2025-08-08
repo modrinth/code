@@ -1,16 +1,18 @@
 <script setup lang="ts">
+import { CopyIcon, EditIcon, PlusIcon, SpinnerIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
+import { Avatar, ButtonStyled, Checkbox, OverflowMenu } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { SpinnerIcon, TrashIcon, UploadIcon, PlusIcon, EditIcon, CopyIcon } from '@modrinth/assets'
-import { Avatar, ButtonStyled, OverflowMenu, Checkbox } from '@modrinth/ui'
-import { computed, ref, type Ref, watch } from 'vue'
-import { duplicate, edit, edit_icon, list, remove } from '@/helpers/profile'
-import { handleError } from '@/store/notifications'
-import { trackEvent } from '@/helpers/analytics'
 import { open } from '@tauri-apps/plugin-dialog'
 import { defineMessages, useVIntl } from '@vintl/vintl'
+import { computed, type Ref, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
-import type { InstanceSettingsTabProps, GameInstance } from '../../../helpers/types'
+import { trackEvent } from '@/helpers/analytics'
+import { duplicate, edit, edit_icon, list, remove } from '@/helpers/profile'
+import { handleError } from '@/store/notifications'
+
+import type { GameInstance, InstanceSettingsTabProps } from '../../../helpers/types'
 
 const { formatMessage } = useVIntl()
 const router = useRouter()

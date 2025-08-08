@@ -76,10 +76,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import ButtonStyled from './ButtonStyled.vue'
-import { CopyIcon, CheckIcon } from '@modrinth/assets'
+import { CheckIcon, CopyIcon } from '@modrinth/assets'
 import type { Component } from 'vue'
+import { ref } from 'vue'
+
+import ButtonStyled from './ButtonStyled.vue'
 
 const infoCopied = ref(false)
 

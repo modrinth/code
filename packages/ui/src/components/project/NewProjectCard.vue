@@ -64,10 +64,11 @@
 </template>
 
 <script setup>
-import { TagsIcon, DownloadIcon, HeartIcon, HistoryIcon } from '@modrinth/assets'
-import Avatar from '../base/Avatar.vue'
-import { formatNumber, formatCategory } from '@modrinth/utils'
+import { DownloadIcon, HeartIcon, HistoryIcon, TagsIcon } from '@modrinth/assets'
+import { formatCategory, formatNumber } from '@modrinth/utils'
+
 import { useRelativeTime } from '../../composables'
+import Avatar from '../base/Avatar.vue'
 
 const formatRelativeTime = useRelativeTime()
 

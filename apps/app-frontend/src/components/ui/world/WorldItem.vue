@@ -1,28 +1,10 @@
 <script setup lang="ts">
-import dayjs from 'dayjs'
-import type {
-  ProtocolVersion,
-  ServerStatus,
-  ServerWorld,
-  SingleplayerWorld,
-  World,
-} from '@/helpers/worlds.ts'
-import { set_world_display_status, getWorldIdentifier } from '@/helpers/worlds.ts'
-import { formatNumber, getPingLevel } from '@modrinth/utils'
 import {
-  useRelativeTime,
-  Avatar,
-  ButtonStyled,
-  commonMessages,
-  OverflowMenu,
-  SmartClickable,
-} from '@modrinth/ui'
-import {
-  IssuesIcon,
-  EyeIcon,
   ClipboardCopyIcon,
   EditIcon,
+  EyeIcon,
   FolderOpenIcon,
+  IssuesIcon,
   MoreVerticalIcon,
   NoSignalIcon,
   PlayIcon,
@@ -35,14 +17,33 @@ import {
   UserIcon,
   XIcon,
 } from '@modrinth/assets'
+import {
+  Avatar,
+  ButtonStyled,
+  commonMessages,
+  OverflowMenu,
+  SmartClickable,
+  useRelativeTime,
+} from '@modrinth/ui'
+import { formatNumber, getPingLevel } from '@modrinth/utils'
+import { convertFileSrc } from '@tauri-apps/api/core'
 import type { MessageDescriptor } from '@vintl/vintl'
 import { defineMessages, useVIntl } from '@vintl/vintl'
+import dayjs from 'dayjs'
+import { Tooltip } from 'floating-vue'
 import type { Component } from 'vue'
 import { computed } from 'vue'
-import { copyToClipboard } from '@/helpers/utils'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import { useRouter } from 'vue-router'
-import { Tooltip } from 'floating-vue'
+
+import { copyToClipboard } from '@/helpers/utils'
+import type {
+  ProtocolVersion,
+  ServerStatus,
+  ServerWorld,
+  SingleplayerWorld,
+  World,
+} from '@/helpers/worlds.ts'
+import { getWorldIdentifier, set_world_display_status } from '@/helpers/worlds.ts'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()

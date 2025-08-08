@@ -1,5 +1,5 @@
-import type Stripe from 'stripe'
 import type { Loaders } from '@modrinth/utils'
+import type Stripe from 'stripe'
 
 export type ServerBillingInterval = 'monthly' | 'yearly' | 'quarterly'
 

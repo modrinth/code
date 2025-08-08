@@ -19,30 +19,30 @@
 </template>
 
 <script setup lang="ts">
-import { LinkIcon } from "@modrinth/assets";
-import { useStorage } from "@vueuse/core";
+import { LinkIcon } from '@modrinth/assets'
+import { useStorage } from '@vueuse/core'
 
 const props = defineProps<{
-  subdomain: string;
-  noSeparator?: boolean;
-}>();
+  subdomain: string
+  noSeparator?: boolean
+}>()
 
 const copySubdomain = () => {
-  navigator.clipboard.writeText(props.subdomain + ".modrinth.gg");
+  navigator.clipboard.writeText(props.subdomain + '.modrinth.gg')
   addNotification({
-    group: "servers",
-    title: "Custom URL copied",
+    group: 'servers',
+    title: 'Custom URL copied',
     text: "Your server's URL has been copied to your clipboard.",
-    type: "success",
-  });
-};
+    type: 'success',
+  })
+}
 
-const route = useNativeRoute();
-const serverId = computed(() => route.params.id as string);
+const route = useNativeRoute()
+const serverId = computed(() => route.params.id as string)
 
 const userPreferences = useStorage(`pyro-server-${serverId.value}-preferences`, {
   hideSubdomainLabel: false,
-});
+})
 
-const isHidden = computed(() => userPreferences.value.hideSubdomainLabel);
+const isHidden = computed(() => userPreferences.value.hideSubdomainLabel)
 </script>

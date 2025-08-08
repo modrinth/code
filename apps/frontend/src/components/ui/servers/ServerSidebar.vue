@@ -35,21 +35,22 @@
 </template>
 
 <script setup lang="ts">
-import { RightArrowIcon } from "@modrinth/assets";
-import type { RouteLocationNormalized } from "vue-router";
-import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
-import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { RightArrowIcon } from '@modrinth/assets'
+import type { RouteLocationNormalized } from 'vue-router'
 
-const emit = defineEmits(["reinstall"]);
+import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
+import type { BackupInProgressReason } from '~/pages/servers/manage/[id].vue'
+
+const emit = defineEmits(['reinstall'])
 
 defineProps<{
-  navLinks: { label: string; href: string; icon: Component; external?: boolean; shown?: boolean }[];
-  route: RouteLocationNormalized;
-  server: ModrinthServer;
-  backupInProgress?: BackupInProgressReason;
-}>();
+  navLinks: { label: string; href: string; icon: Component; external?: boolean; shown?: boolean }[]
+  route: RouteLocationNormalized
+  server: ModrinthServer
+  backupInProgress?: BackupInProgressReason
+}>()
 
 const onReinstall = (...args: any[]) => {
-  emit("reinstall", ...args);
-};
+  emit('reinstall', ...args)
+}
 </script>

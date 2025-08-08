@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import Checkbox from "~/components/ui/Checkbox.vue";
+import Checkbox from '~/components/ui/Checkbox.vue'
 
 export default {
   components: {
@@ -25,30 +25,30 @@ export default {
   props: {
     facetName: {
       type: String,
-      default: "",
+      default: '',
     },
     displayName: {
       type: String,
-      default: "",
+      default: '',
     },
     icon: {
       type: String,
-      default: "",
+      default: '',
     },
     activeFilters: {
       type: Array,
       default() {
-        return [];
+        return []
       },
     },
   },
-  emits: ["toggle"],
+  emits: ['toggle'],
   methods: {
     toggle() {
-      this.$emit("toggle", this.facetName);
+      this.$emit('toggle', this.facetName)
     },
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>

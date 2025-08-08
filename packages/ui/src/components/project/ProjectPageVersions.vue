@@ -169,6 +169,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import { CalendarIcon, DownloadIcon, StarIcon } from '@modrinth/assets'
 import {
   formatBytes,
   formatCategory,
@@ -178,16 +179,15 @@ import {
   type PlatformTag,
   type Version,
 } from '@modrinth/utils'
-
-import { commonMessages } from '../../utils/common-messages'
-import { CalendarIcon, DownloadIcon, StarIcon } from '@modrinth/assets'
-import { Pagination, VersionChannelIndicator, VersionFilterControl } from '../index'
 import { useVIntl } from '@vintl/vintl'
-import { type Ref, ref, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { computed, type Ref, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
+import { useRelativeTime } from '../../composables'
+import { commonMessages } from '../../utils/common-messages'
 import AutoLink from '../base/AutoLink.vue'
 import TagItem from '../base/TagItem.vue'
-import { useRelativeTime } from '../../composables'
+import { Pagination, VersionChannelIndicator, VersionFilterControl } from '../index'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()

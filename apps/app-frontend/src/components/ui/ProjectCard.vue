@@ -1,10 +1,10 @@
 <script setup>
-import { Avatar, TagItem } from '@modrinth/ui'
 import { DownloadIcon, HeartIcon, TagIcon } from '@modrinth/assets'
-import { formatNumber, formatCategory } from '@modrinth/utils'
-import { computed } from 'vue'
+import { Avatar, TagItem } from '@modrinth/ui'
+import { formatCategory, formatNumber } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 dayjs.extend(relativeTime)

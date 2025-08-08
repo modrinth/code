@@ -1,6 +1,7 @@
-import { invoke } from '@tauri-apps/api/core'
-import { handleError } from '@/store/notifications'
 import { arrayBufferToBase64 } from '@modrinth/utils'
+import { invoke } from '@tauri-apps/api/core'
+
+import { handleError } from '@/store/notifications'
 
 export interface Cape {
   id: string

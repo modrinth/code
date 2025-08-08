@@ -110,46 +110,48 @@
 </template>
 
 <script setup lang="ts">
-import { CopyCode, MarkdownEditor, ButtonStyled } from "@modrinth/ui";
-import { ReplyIcon, SendIcon, CheckCircleIcon, ScaleIcon } from "@modrinth/assets";
-import type { Thread, Report, User, ThreadMessage as TypeThreadMessage } from "@modrinth/utils";
-import dayjs from "dayjs";
-import ThreadMessage from "./ThreadMessage.vue";
-import { useImageUpload } from "~/composables/image-upload.ts";
-import { isStaff } from "~/helpers/users.js";
+import { CheckCircleIcon, ReplyIcon, ScaleIcon, SendIcon } from '@modrinth/assets'
+import { ButtonStyled, CopyCode, MarkdownEditor } from '@modrinth/ui'
+import type { Report, Thread, ThreadMessage as TypeThreadMessage, User } from '@modrinth/utils'
+import dayjs from 'dayjs'
+
+import { useImageUpload } from '~/composables/image-upload.ts'
+import { isStaff } from '~/helpers/users.js'
+
+import ThreadMessage from './ThreadMessage.vue'
 
 const props = defineProps<{
-  thread: Thread;
-  reporter: User;
-  report: Report;
-}>();
+  thread: Thread
+  reporter: User
+  report: Report
+}>()
 
-const auth = await useAuth();
+defineExpose({
+  setReplyContent,
+})
+
+const auth = await useAuth()
 
 const emit = defineEmits<{
-  updateThread: [thread: Thread];
-}>();
+  updateThread: [thread: Thread]
+}>()
 
-const flags = useFeatureFlags();
+const flags = useFeatureFlags()
 
 const members = computed(() => {
   const membersMap: Record<string, User> = {
     [props.reporter.id]: props.reporter,
-  };
-  for (const member of props.thread.members) {
-    membersMap[member.id] = member;
   }
-  return membersMap;
-});
+  for (const member of props.thread.members) {
+    membersMap[member.id] = member
+  }
+  return membersMap
+})
 
-const replyBody = ref("");
+const replyBody = ref('')
 function setReplyContent(content: string) {
-  replyBody.value = content;
+  replyBody.value = content
 }
-
-defineExpose({
-  setReplyContent,
-});
 
 const sortedMessages = computed(() => {
   const messages: TypeThreadMessage[] = [
@@ -157,8 +159,8 @@ const sortedMessages = computed(() => {
       id: null,
       author_id: props.reporter.id,
       body: {
-        type: "text",
-        body: props.report.body || "Report opened.",
+        type: 'text',
+        body: props.report.body || 'Report opened.',
         private: false,
         replying_to: null,
         associated_images: [],
@@ -166,117 +168,117 @@ const sortedMessages = computed(() => {
       created: props.report.created,
       hide_identity: false,
     },
-  ];
+  ]
   if (props.thread) {
     messages.push(
       ...[...props.thread.messages].sort(
         (a, b) => dayjs(a.created).toDate().getTime() - dayjs(b.created).toDate().getTime(),
       ),
-    );
+    )
   }
 
-  return messages;
-});
+  return messages
+})
 
 async function updateThreadLocal() {
-  const threadId = props.report.thread_id;
+  const threadId = props.report.thread_id
   if (threadId) {
     try {
-      const thread = (await useBaseFetch(`thread/${threadId}`)) as Thread;
-      emit("updateThread", thread);
+      const thread = (await useBaseFetch(`thread/${threadId}`)) as Thread
+      emit('updateThread', thread)
     } catch (error) {
-      console.error("Failed to update thread:", error);
+      console.error('Failed to update thread:', error)
     }
   }
 }
 
-const imageIDs = ref<string[]>([]);
+const imageIDs = ref<string[]>([])
 
 async function onUploadImage(file: File) {
-  const response = await useImageUpload(file, { context: "thread_message" });
+  const response = await useImageUpload(file, { context: 'thread_message' })
 
-  imageIDs.value.push(response.id);
-  imageIDs.value = imageIDs.value.slice(-10);
+  imageIDs.value.push(response.id)
+  imageIDs.value = imageIDs.value.slice(-10)
 
-  return response.url;
+  return response.url
 }
 
 async function sendReply(privateMessage = false) {
   try {
     const body: any = {
       body: {
-        type: "text",
+        type: 'text',
         body: replyBody.value,
         private: privateMessage,
       },
-    };
+    }
 
     if (imageIDs.value.length > 0) {
       body.body = {
         ...body.body,
         uploaded_images: imageIDs.value,
-      };
+      }
     }
 
     await useBaseFetch(`thread/${props.thread.id}`, {
-      method: "POST",
+      method: 'POST',
       body,
-    });
+    })
 
-    replyBody.value = "";
-    await updateThreadLocal();
+    replyBody.value = ''
+    await updateThreadLocal()
   } catch (err: any) {
     addNotification({
-      title: "Error sending message",
+      title: 'Error sending message',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
 }
 
-const didCloseReport = ref(false);
+const didCloseReport = ref(false)
 const reportClosed = computed(() => {
-  return didCloseReport.value || (props.report && props.report.closed);
-});
+  return didCloseReport.value || (props.report && props.report.closed)
+})
 
 async function closeReport(reply = false) {
   if (reply) {
-    await sendReply();
+    await sendReply()
   }
 
   try {
     await useBaseFetch(`report/${props.report.id}`, {
-      method: "PATCH",
+      method: 'PATCH',
       body: {
         closed: true,
       },
-    });
-    await updateThreadLocal();
-    didCloseReport.value = true;
+    })
+    await updateThreadLocal()
+    didCloseReport.value = true
   } catch (err: any) {
     addNotification({
-      title: "Error closing report",
+      title: 'Error closing report',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
 }
 
 async function reopenReport() {
   try {
     await useBaseFetch(`report/${props.report.id}`, {
-      method: "PATCH",
+      method: 'PATCH',
       body: {
         closed: false,
       },
-    });
-    await updateThreadLocal();
+    })
+    await updateThreadLocal()
   } catch (err: any) {
     addNotification({
-      title: "Error reopening report",
+      title: 'Error reopening report',
       text: err.data ? err.data.description : err,
-      type: "error",
-    });
+      type: 'error',
+    })
   }
 }
 </script>

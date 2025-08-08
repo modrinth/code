@@ -8,9 +8,8 @@
 
 import './omorphia.scss'
 
-// Branding
-import _ModrinthIcon from './branding/logo.svg?component'
 import _FourOhFourNotFound from './branding/404.svg?component'
+import _ModrinthIcon from './branding/logo.svg?component'
 import _ModrinthPlusIcon from './branding/modrinth-plus.svg?component'
 import _AngryRinthbot from './branding/rinthbot/angry.webp'
 import _AnnoyedRinthbot from './branding/rinthbot/annoyed.webp'
@@ -22,14 +21,6 @@ import _SleepingRinthbot from './branding/rinthbot/sleeping.webp'
 import _SobbingRinthbot from './branding/rinthbot/sobbing.webp'
 import _ThinkingRinthbot from './branding/rinthbot/thinking.webp'
 import _WavingRinthbot from './branding/rinthbot/waving.webp'
-
-// External Icons
-import _SSODiscordIcon from './external/sso/discord.svg?component'
-import _SSOGitHubIcon from './external/sso/github.svg?component'
-import _SSOGitLabIcon from './external/sso/gitlab.svg?component'
-import _SSOGoogleIcon from './external/sso/google.svg?component'
-import _SSOMicrosoftIcon from './external/sso/microsoft.svg?component'
-import _SSOSteamIcon from './external/sso/steam.svg?component'
 import _AppleIcon from './external/apple.svg?component'
 import _BlueskyIcon from './external/bluesky.svg?component'
 import _BuyMeACoffeeIcon from './external/bmac.svg?component'
@@ -42,6 +33,12 @@ import _OpenCollectiveIcon from './external/opencollective.svg?component'
 import _PatreonIcon from './external/patreon.svg?component'
 import _PayPalIcon from './external/paypal.svg?component'
 import _RedditIcon from './external/reddit.svg?component'
+import _SSODiscordIcon from './external/sso/discord.svg?component'
+import _SSOGitHubIcon from './external/sso/github.svg?component'
+import _SSOGitLabIcon from './external/sso/gitlab.svg?component'
+import _SSOGoogleIcon from './external/sso/google.svg?component'
+import _SSOMicrosoftIcon from './external/sso/microsoft.svg?component'
+import _SSOSteamIcon from './external/sso/steam.svg?component'
 import _TumblrIcon from './external/tumblr.svg?component'
 import _TwitterIcon from './external/twitter.svg?component'
 import _WindowsIcon from './external/windows.svg?component'
@@ -83,8 +80,6 @@ export const TwitterIcon = _TwitterIcon
 export const WindowsIcon = _WindowsIcon
 export const YouTubeIcon = _YouTubeIcon
 
-// Skin Models
+export * from './generated-icons'
 export { default as ClassicPlayerModel } from './models/classic-player.gltf?url'
 export { default as SlimPlayerModel } from './models/slim-player.gltf?url'
-
-export * from './generated-icons'

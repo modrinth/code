@@ -1,4 +1,5 @@
 import type { Project } from '@modrinth/utils'
+
 import type {
   Action,
   AdditionalTextInput,

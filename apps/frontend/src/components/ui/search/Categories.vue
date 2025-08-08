@@ -10,14 +10,14 @@
 </template>
 
 <script>
-import { formatCategory } from "@modrinth/utils";
+import { formatCategory } from '@modrinth/utils'
 
 export default {
   props: {
     categories: {
       type: Array,
       default() {
-        return [];
+        return []
       },
     },
     type: {
@@ -26,9 +26,9 @@ export default {
     },
   },
   setup() {
-    const tags = useTags();
+    const tags = useTags()
 
-    return { tags };
+    return { tags }
   },
   computed: {
     categoriesFiltered() {
@@ -37,11 +37,11 @@ export default {
         .filter(
           (x) =>
             this.categories.includes(x.name) && (!x.project_type || x.project_type === this.type),
-        );
+        )
     },
   },
   methods: { formatCategory },
-};
+}
 </script>
 
 <style lang="scss" scoped>

@@ -21,6 +21,6 @@
 
 <script setup lang="ts">
 defineProps<{
-  image: string | undefined;
-}>();
+  image: string | undefined
+}>()
 </script>
