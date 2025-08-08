@@ -11,7 +11,7 @@ use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models;
-use crate::models::ids::ProjectId;
+use crate::models::ids::{ProjectId, VersionId};
 use crate::models::images::ImageContext;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
@@ -250,6 +250,8 @@ pub struct EditProject {
     pub monetization_status: Option<MonetizationStatus>,
     pub side_types_migration_review_status:
         Option<SideTypesMigrationReviewStatus>,
+    #[serde(flatten)]
+    pub loader_fields: HashMap<String, serde_json::Value>,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -868,6 +870,29 @@ pub async fn project_edit(
         )
         .execute(&mut *transaction)
         .await?;
+    }
+
+    if !new_project.loader_fields.is_empty() {
+        for version in db_models::DBVersion::get_many(
+            &project_item.versions,
+            &**pool,
+            &redis,
+        )
+        .await?
+        {
+            super::versions::version_edit_helper(
+                req.clone(),
+                (VersionId::from(version.inner.id),),
+                pool.clone(),
+                redis.clone(),
+                super::versions::EditVersion {
+                    fields: new_project.loader_fields.clone(),
+                    ..Default::default()
+                },
+                session_queue.clone(),
+            )
+            .await?;
+        }
     }
 
     // check new description and body for links to associated images
