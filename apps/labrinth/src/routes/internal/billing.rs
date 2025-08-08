@@ -1,5 +1,8 @@
 use crate::auth::{get_user_from_headers, send_email};
 use crate::database::models::charge_item::DBCharge;
+use crate::database::models::user_item::DBUser;
+use crate::database::models::user_subscription_item::DBUserSubscription;
+use crate::database::models::users_redeemals::{self, UserRedeemal};
 use crate::database::models::{
     generate_charge_id, generate_user_subscription_id, product_item,
     user_subscription_item,
@@ -14,6 +17,7 @@ use crate::models::pats::Scopes;
 use crate::models::users::Badges;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
+use crate::util::archon::{ArchonClient, CreateServerRequest, Specs};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{Duration, Utc};
@@ -59,8 +63,10 @@ pub async fn products(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let products =
-        product_item::QueryProductWithPrices::list(&**pool, &redis).await?;
+    let products = product_item::QueryProductWithPrices::list_purchaseable(
+        &**pool, &redis,
+    )
+    .await?;
 
     let products = products
         .into_iter()
@@ -182,7 +188,9 @@ pub async fn refund_charge(
                 ChargeStatus::Open
                 | ChargeStatus::Processing
                 | ChargeStatus::Succeeded => Some(x.amount),
-                ChargeStatus::Failed | ChargeStatus::Cancelled => None,
+                ChargeStatus::Failed
+                | ChargeStatus::Cancelled
+                | ChargeStatus::Expiring => None,
             })
             .sum::<i64>();
 
@@ -255,6 +263,12 @@ pub async fn refund_charge(
                                 .to_string(),
                         ));
                     }
+                }
+                PaymentPlatform::None => {
+                    return Err(ApiError::InvalidInput(
+                        "This charge was not processed via a payment platform."
+                            .to_owned(),
+                    ));
                 }
             }
         };
@@ -370,6 +384,7 @@ pub async fn edit_subscription(
         })?;
 
         if let Some(cancelled) = &edit_subscription.cancelled {
+            // Notably, cannot cancel/uncancel expiring charges.
             if !matches!(
                 open_charge.status,
                 ChargeStatus::Open
@@ -394,14 +409,17 @@ pub async fn edit_subscription(
 
         if let Some(interval) = &edit_subscription.interval {
             if let Price::Recurring { intervals } = &current_price.prices {
-                if let Some(price) = intervals.get(interval) {
-                    open_charge.subscription_interval = Some(*interval);
-                    open_charge.amount = *price as i64;
-                } else {
-                    return Err(ApiError::InvalidInput(
-                        "Interval is not valid for this subscription!"
-                            .to_string(),
-                    ));
+                // For expiring charges, the interval is handled in the Product branch.
+                if open_charge.status != ChargeStatus::Expiring {
+                    if let Some(price) = intervals.get(interval) {
+                        open_charge.subscription_interval = Some(*interval);
+                        open_charge.amount = *price as i64;
+                    } else {
+                        return Err(ApiError::InvalidInput(
+                            "Interval is not valid for this subscription!"
+                                .to_string(),
+                        ));
+                    }
                 }
             }
         }
@@ -429,48 +447,14 @@ pub async fn edit_subscription(
                 ));
             }
 
-            let interval = open_charge.due - Utc::now();
-            let duration = PriceDuration::Monthly;
+            // If the charge is an expiring charge, we need to create a payment
+            // intent as if the user was subscribing to the product, as opposed
+            // to a proration.
+            if open_charge.status == ChargeStatus::Expiring {
+                // We need a new interval when promoting the charge.
+                let interval = edit_subscription.interval
+                    .ok_or_else(|| ApiError::InvalidInput("You need to specify an interval when promoting an expiring charge.".to_owned()))?;
 
-            let current_amount = match &current_price.prices {
-                Price::OneTime { price } => *price,
-                Price::Recurring { intervals } => *intervals.get(&duration).ok_or_else(|| {
-                    ApiError::InvalidInput(
-                        "Could not find a valid price for the user's duration".to_string(),
-                    )
-                })?,
-            };
-
-            let amount = match &product_price.prices {
-                Price::OneTime { price } => *price,
-                Price::Recurring { intervals } => *intervals.get(&duration).ok_or_else(|| {
-                    ApiError::InvalidInput(
-                        "Could not find a valid price for the user's duration".to_string(),
-                    )
-                })?,
-            };
-
-            let complete = Decimal::from(interval.num_seconds())
-                / Decimal::from(duration.duration().num_seconds());
-            let proration = (Decimal::from(amount - current_amount) * complete)
-                .floor()
-                .to_i32()
-                .ok_or_else(|| {
-                    ApiError::InvalidInput(
-                        "Could not convert proration to i32".to_string(),
-                    )
-                })?;
-
-            // First branch: Plan downgrade, update future charge
-            // Second branch: For small transactions (under 30 cents), we make a loss on the
-            // proration due to fees. In these situations, just give it to them for free, because
-            // their next charge will be in a day or two anyway.
-            if current_amount > amount || proration < 30 {
-                open_charge.price_id = product_price.id;
-                open_charge.amount = amount as i64;
-
-                None
-            } else {
                 let charge_id = generate_charge_id(&mut transaction).await?;
 
                 let customer_id = get_or_create_customer(
@@ -483,6 +467,15 @@ pub async fn edit_subscription(
                 )
                 .await?;
 
+                let new_price_value = match product_price.prices {
+                    Price::OneTime { ref price } => *price,
+                    Price::Recurring { ref intervals } => {
+                        *intervals
+                            .get(&interval)
+                            .ok_or_else(|| ApiError::InvalidInput("Could not find a valid price for the specified duration".to_owned()))?
+                    }
+                };
+
                 let currency = Currency::from_str(
                     &current_price.currency_code.to_lowercase(),
                 )
@@ -491,7 +484,7 @@ pub async fn edit_subscription(
                 })?;
 
                 let mut intent =
-                    CreatePaymentIntent::new(proration as i64, currency);
+                    CreatePaymentIntent::new(new_price_value as i64, currency);
 
                 let mut metadata = HashMap::new();
                 metadata.insert(
@@ -512,15 +505,11 @@ pub async fn edit_subscription(
                 );
                 metadata.insert(
                     "modrinth_subscription_interval".to_string(),
-                    open_charge
-                        .subscription_interval
-                        .unwrap_or(PriceDuration::Monthly)
-                        .as_str()
-                        .to_string(),
+                    interval.as_str().to_string(),
                 );
                 metadata.insert(
                     "modrinth_charge_type".to_string(),
-                    ChargeType::Proration.as_str().to_string(),
+                    ChargeType::Subscription.as_str().to_string(),
                 );
 
                 intent.customer = Some(customer_id);
@@ -545,7 +534,139 @@ pub async fn edit_subscription(
                     stripe::PaymentIntent::create(&stripe_client, intent)
                         .await?;
 
-                Some((proration, 0, intent))
+                // We do NOT update the open charge here. It will be patched to be the next
+                // charge of the subscription in the stripe webhook.
+                //
+                // We also shouldn't delete it, because if the payment fails, the expiring
+                // charge will be gone and the preview subscription will never be unprovisioned.
+
+                Some((new_price_value, 0, intent))
+            } else {
+                // The charge is not an expiring charge, need to prorate.
+
+                let interval = open_charge.due - Utc::now();
+                let duration = PriceDuration::Monthly;
+
+                let current_amount = match &current_price.prices {
+                    Price::OneTime { price } => *price,
+                    Price::Recurring { intervals } => *intervals.get(&duration).ok_or_else(|| {
+                        ApiError::InvalidInput(
+                            "Could not find a valid price for the user's duration".to_string(),
+                        )
+                    })?,
+                };
+
+                let amount = match &product_price.prices {
+                    Price::OneTime { price } => *price,
+                    Price::Recurring { intervals } => *intervals.get(&duration).ok_or_else(|| {
+                        ApiError::InvalidInput(
+                            "Could not find a valid price for the user's duration".to_string(),
+                        )
+                    })?,
+                };
+
+                let complete = Decimal::from(interval.num_seconds())
+                    / Decimal::from(duration.duration().num_seconds());
+                let proration = (Decimal::from(amount - current_amount)
+                    * complete)
+                    .floor()
+                    .to_i32()
+                    .ok_or_else(|| {
+                        ApiError::InvalidInput(
+                            "Could not convert proration to i32".to_string(),
+                        )
+                    })?;
+
+                // First condition: Plan downgrade, update future charge
+                // Second condition: For small transactions (under 30 cents), we make a loss on the
+                //  proration due to fees. In these situations, just give it to them for free, because
+                //  their next charge will be in a day or two anyway.
+                if current_amount > amount || proration < 30 {
+                    open_charge.price_id = product_price.id;
+                    open_charge.amount = amount as i64;
+
+                    None
+                } else {
+                    let charge_id =
+                        generate_charge_id(&mut transaction).await?;
+
+                    let customer_id = get_or_create_customer(
+                        user.id,
+                        user.stripe_customer_id.as_deref(),
+                        user.email.as_deref(),
+                        &stripe_client,
+                        &pool,
+                        &redis,
+                    )
+                    .await?;
+
+                    let currency = Currency::from_str(
+                        &current_price.currency_code.to_lowercase(),
+                    )
+                    .map_err(|_| {
+                        ApiError::InvalidInput(
+                            "Invalid currency code".to_string(),
+                        )
+                    })?;
+
+                    let mut intent =
+                        CreatePaymentIntent::new(proration as i64, currency);
+
+                    let mut metadata = HashMap::new();
+                    metadata.insert(
+                        "modrinth_user_id".to_string(),
+                        to_base62(user.id.0),
+                    );
+                    metadata.insert(
+                        "modrinth_charge_id".to_string(),
+                        to_base62(charge_id.0 as u64),
+                    );
+                    metadata.insert(
+                        "modrinth_subscription_id".to_string(),
+                        to_base62(subscription.id.0 as u64),
+                    );
+                    metadata.insert(
+                        "modrinth_price_id".to_string(),
+                        to_base62(product_price.id.0 as u64),
+                    );
+                    metadata.insert(
+                        "modrinth_subscription_interval".to_string(),
+                        open_charge
+                            .subscription_interval
+                            .unwrap_or(PriceDuration::Monthly)
+                            .as_str()
+                            .to_string(),
+                    );
+                    metadata.insert(
+                        "modrinth_charge_type".to_string(),
+                        ChargeType::Proration.as_str().to_string(),
+                    );
+
+                    intent.customer = Some(customer_id);
+                    intent.metadata = Some(metadata);
+                    intent.receipt_email = user.email.as_deref();
+                    intent.setup_future_usage =
+                        Some(PaymentIntentSetupFutureUsage::OffSession);
+
+                    if let Some(payment_method) =
+                        &edit_subscription.payment_method
+                    {
+                        let Ok(payment_method_id) =
+                            PaymentMethodId::from_str(payment_method)
+                        else {
+                            return Err(ApiError::InvalidInput(
+                                "Invalid payment method id".to_string(),
+                            ));
+                        };
+                        intent.payment_method = Some(payment_method_id);
+                    }
+
+                    let intent =
+                        stripe::PaymentIntent::create(&stripe_client, intent)
+                            .await?;
+
+                    Some((proration, 0, intent))
+                }
             }
         } else {
             None
@@ -948,14 +1069,17 @@ pub async fn active_servers(
     let server_ids = servers
         .into_iter()
         .filter_map(|x| {
-            x.metadata.as_ref().map(|metadata| match metadata {
-                SubscriptionMetadata::Pyro { id, region } => ActiveServer {
-                    user_id: x.user_id.into(),
-                    server_id: id.clone(),
-                    price_id: x.price_id.into(),
-                    interval: x.interval,
-                    region: region.clone(),
-                },
+            x.metadata.as_ref().and_then(|metadata| match metadata {
+                SubscriptionMetadata::Pyro { id, region } => {
+                    Some(ActiveServer {
+                        user_id: x.user_id.into(),
+                        server_id: id.clone(),
+                        price_id: x.price_id.into(),
+                        interval: x.interval,
+                        region: region.clone(),
+                    })
+                }
+                SubscriptionMetadata::Medal { .. } => None,
             })
         })
         .collect::<Vec<ActiveServer>>();
@@ -1187,7 +1311,7 @@ pub async fn initiate_payment(
                         })?;
 
                 let mut product_prices =
-                    product_item::DBProductPrice::get_all_product_prices(
+                    product_item::DBProductPrice::get_all_public_product_prices(
                         product.id, &**pool,
                     )
                     .await?;
@@ -1704,6 +1828,13 @@ pub async fn stripe_webhook(
 
                     // Provision subscription
                     match metadata.product_item.metadata {
+                        // A payment shouldn't be processed for Medal subscriptions.
+                        ProductMetadata::Medal { .. } => {
+                            warn!(
+                                "A payment processed for a free subscription"
+                            );
+                        }
+
                         ProductMetadata::Midas => {
                             let badges =
                                 metadata.user_item.badges | Badges::MIDAS;
@@ -1833,6 +1964,7 @@ pub async fn stripe_webhook(
                                             "region": server_region,
                                             "source": source,
                                             "payment_interval": metadata.charge_item.subscription_interval.map(|x| match x {
+                                                PriceDuration::FiveDays => 1,
                                                 PriceDuration::Monthly => 1,
                                                 PriceDuration::Quarterly => 3,
                                                 PriceDuration::Yearly => 12,
@@ -1879,10 +2011,32 @@ pub async fn stripe_webhook(
                             }
                         };
 
+                        // If the next open charge is actually an expiring charge,
+                        // this means the subscription was promoted from a temporary
+                        // free subscription to a paid subscription.
+                        //
+                        // In this case, we need to modify this expiring charge to be the
+                        // next charge of the subscription, turn it into a normal open charge.
+                        //
+                        // Otherwise, if there *is* an open charge, the subscription was upgraded
+                        // and the just-processed payment was the proration charge. In this case,
+                        // the existing open charge must be updated to reflect the new product's price.
+                        //
+                        // If there are no open charges, the just-processed payment was a recurring
+                        // or initial subscription charge, and we need to create the next charge.
                         if let Some(mut charge) = open_charge {
-                            charge.price_id = metadata.product_price_item.id;
-                            charge.amount = new_price as i64;
-
+                            if charge.status == ChargeStatus::Expiring {
+                                charge.status = ChargeStatus::Open;
+                                charge.due = Utc::now()
+                                    + subscription.interval.duration();
+                                charge.payment_platform =
+                                    PaymentPlatform::Stripe;
+                                charge.last_attempt = None;
+                            } else {
+                                charge.price_id =
+                                    metadata.product_price_item.id;
+                                charge.amount = new_price as i64;
+                            }
                             charge.upsert(&mut transaction).await?;
                         } else if metadata.charge_item.status
                             != ChargeStatus::Cancelled
@@ -2105,7 +2259,11 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
         let mut transaction = pool.begin().await?;
         let mut clear_cache_users = Vec::new();
 
-        // If an active subscription has a canceled charge OR a failed charge more than two days ago, it should be cancelled
+        // If an active subscription has:
+        // - A canceled charge due now
+        // - An expiring charge due now
+        // - A failed charge more than two days ago
+        // It should be unprovisioned.
         let all_charges = DBCharge::get_unprovision(&pool).await?;
 
         let mut all_subscriptions =
@@ -2201,33 +2359,37 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
 
                     true
                 }
-                ProductMetadata::Pyro { .. } => {
-                    if let Some(SubscriptionMetadata::Pyro { id, region: _ }) =
-                        &subscription.metadata
-                    {
-                        let res = reqwest::Client::new()
-                            .post(format!(
-                                "{}/modrinth/v0/servers/{}/suspend",
-                                dotenvy::var("ARCHON_URL")?,
-                                id
-                            ))
-                            .header("X-Master-Key", dotenvy::var("PYRO_API_KEY")?)
-                            .json(&serde_json::json!({
-                                "reason": if charge.status == ChargeStatus::Cancelled {
-                                    "cancelled"
-                                } else {
-                                    "paymentfailed"
-                                }
-                            }))
-                            .send()
-                            .await;
 
-                        if let Err(e) = res {
-                            warn!("Error suspending pyro server: {:?}", e);
-                            false
-                        } else {
-                            true
+                ProductMetadata::Pyro { .. }
+                | ProductMetadata::Medal { .. } => 'server: {
+                    let server_id = match &subscription.metadata {
+                        Some(SubscriptionMetadata::Pyro { id, region: _ }) => {
+                            id
                         }
+                        Some(SubscriptionMetadata::Medal { id }) => id,
+                        _ => break 'server true,
+                    };
+
+                    let res = reqwest::Client::new()
+                        .post(format!(
+                            "{}/modrinth/v0/servers/{}/suspend",
+                            dotenvy::var("ARCHON_URL")?,
+                            server_id
+                        ))
+                        .header("X-Master-Key", dotenvy::var("PYRO_API_KEY")?)
+                        .json(&serde_json::json!({
+                            "reason": if charge.status == ChargeStatus::Cancelled || charge.status == ChargeStatus::Expiring {
+                                "cancelled"
+                            } else {
+                                "paymentfailed"
+                            }
+                        }))
+                        .send()
+                        .await;
+
+                    if let Err(e) = res {
+                        warn!("Error suspending pyro server: {:?}", e);
+                        false
                     } else {
                         true
                     }
@@ -2252,6 +2414,20 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
         .await?;
         transaction.commit().await?;
 
+        // If an offer redeemal has been processing for over 5 minutes, it should be set pending.
+        UserRedeemal::update_stuck_5_minutes(&pool).await?;
+
+        // If an offer redeemal is pending, try processing it.
+        // Try processing it.
+        let pending_redeemals = UserRedeemal::get_pending(&pool, 100).await?;
+        for redeemal in pending_redeemals {
+            if let Err(error) =
+                try_process_user_redeemal(&pool, &redis, redeemal).await
+            {
+                warn!(%error, "Failed to process a redeemal.")
+            }
+        }
+
         Ok::<(), ApiError>(())
     };
 
@@ -2260,6 +2436,161 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
     }
 
     info!("Done indexing subscriptions");
+}
+
+/// Attempts to process a user redeemal.
+///
+/// Returns `Ok` if the entry has been succesfully processed, or will not be processed.
+pub async fn try_process_user_redeemal(
+    pool: &PgPool,
+    redis: &RedisPool,
+    mut user_redeemal: UserRedeemal,
+) -> Result<(), ApiError> {
+    // Immediately update redeemal row
+    user_redeemal.last_attempt = Some(Utc::now());
+    user_redeemal.n_attempts += 1;
+    user_redeemal.status = users_redeemals::Status::Processing;
+    let updated = user_redeemal.update_status_if_pending(pool).await?;
+
+    if !updated {
+        return Ok(());
+    }
+
+    let user_id = user_redeemal.user_id;
+
+    // Find the Medal product's price & metadata
+
+    let mut medal_products =
+        product_item::QueryProductWithPrices::list_by_product_type(
+            pool, "medal",
+        )
+        .await?;
+
+    let Some(product_item::QueryProductWithPrices {
+        id: _product_id,
+        metadata,
+        mut prices,
+        unitary: _,
+    }) = medal_products.pop()
+    else {
+        return Err(ApiError::Conflict(
+            "Missing Medal subscription product".to_owned(),
+        ));
+    };
+
+    let ProductMetadata::Medal {
+        cpu,
+        ram,
+        swap,
+        storage,
+        region,
+    } = metadata
+    else {
+        return Err(ApiError::Conflict(
+            "Missing or incorrect metadata for Medal subscription".to_owned(),
+        ));
+    };
+
+    let Some(medal_price) = prices.pop() else {
+        return Err(ApiError::Conflict(
+            "Missing price for Medal subscription".to_owned(),
+        ));
+    };
+
+    let (price_duration, price_amount) = match medal_price.prices {
+        Price::OneTime { price: _ } => {
+            return Err(ApiError::Conflict(
+                "Unexpected metadata for Medal subscription price".to_owned(),
+            ));
+        }
+
+        Price::Recurring { intervals } => {
+            let Some((price_duration, price_amount)) =
+                intervals.into_iter().next()
+            else {
+                return Err(ApiError::Conflict(
+                    "Missing price interval for Medal subscription".to_owned(),
+                ));
+            };
+
+            (price_duration, price_amount)
+        }
+    };
+
+    let price_id = medal_price.id;
+
+    // Get the user's username
+
+    let user = DBUser::get_id(user_id, pool, redis)
+        .await?
+        .ok_or(ApiError::NotFound)?;
+
+    // Send the provision request to Archon. On failure, the redeemal will be "stuck" processing,
+    // and moved back to pending by `index_subscriptions`.
+
+    let archon_client = ArchonClient::from_env()?;
+    let server_id = archon_client
+        .create_server(&CreateServerRequest {
+            user_id: to_base62(user_id.0 as u64),
+            name: format!("{}'s Medal server", user.username),
+            specs: Specs {
+                memory_mb: ram,
+                cpu,
+                swap_mb: swap,
+                storage_mb: storage,
+            },
+            source: crate::util::archon::Empty::default(),
+            region,
+            tags: vec!["medal".to_owned()],
+        })
+        .await?;
+
+    let mut txn = pool.begin().await?;
+
+    // Build a subscription using this price ID.
+    let subscription = DBUserSubscription {
+        id: generate_user_subscription_id(&mut txn).await?,
+        user_id,
+        price_id,
+        interval: PriceDuration::FiveDays,
+        created: Utc::now(),
+        status: SubscriptionStatus::Provisioned,
+        metadata: Some(SubscriptionMetadata::Medal {
+            id: server_id.to_string(),
+        }),
+    };
+
+    subscription.upsert(&mut txn).await?;
+
+    // Insert an expiring charge, `index_subscriptions` will unprovision the
+    // subscription when expired.
+    DBCharge {
+        id: generate_charge_id(&mut txn).await?,
+        user_id,
+        price_id,
+        amount: price_amount.into(),
+        currency_code: medal_price.currency_code,
+        status: ChargeStatus::Expiring,
+        due: Utc::now() + price_duration.duration(),
+        last_attempt: None,
+        type_: ChargeType::Subscription,
+        subscription_id: Some(subscription.id),
+        subscription_interval: Some(subscription.interval),
+        payment_platform: PaymentPlatform::None,
+        payment_platform_id: None,
+        parent_charge_id: None,
+        net: None,
+    }
+    .upsert(&mut txn)
+    .await?;
+
+    // Update `users_redeemal`, mark subscription as redeemed.
+    user_redeemal.status = users_redeemals::Status::Processed;
+    user_redeemal.update(&mut *txn).await?;
+
+    txn.commit().await?;
+
+    Ok(())
 }
 
 pub async fn index_billing(

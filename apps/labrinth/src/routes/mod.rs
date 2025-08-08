@@ -137,6 +137,8 @@ pub enum ApiError {
     Io(#[from] std::io::Error),
     #[error("Resource not found")]
     NotFound,
+    #[error("Conflict: {0}")]
+    Conflict(String),
     #[error(
         "You are being rate-limited. Please wait {0} milliseconds. 0/{1} remaining."
     )]
@@ -172,6 +174,7 @@ impl ApiError {
                 ApiError::Clickhouse(..) => "clickhouse_error",
                 ApiError::Reroute(..) => "reroute_error",
                 ApiError::NotFound => "not_found",
+                ApiError::Conflict(..) => "conflict",
                 ApiError::Zip(..) => "zip_error",
                 ApiError::Io(..) => "io_error",
                 ApiError::RateLimitError(..) => "ratelimit_error",
@@ -208,6 +211,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::Mail(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Reroute(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::NotFound => StatusCode::NOT_FOUND,
+            ApiError::Conflict(..) => StatusCode::CONFLICT,
             ApiError::Zip(..) => StatusCode::BAD_REQUEST,
             ApiError::Io(..) => StatusCode::BAD_REQUEST,
             ApiError::RateLimitError(..) => StatusCode::TOO_MANY_REQUESTS,

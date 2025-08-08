@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT\n              EXISTS (\n                SELECT\n                  1\n                FROM\n                  users_redeemals\n                WHERE\n                  user_id = $1\n                  AND offer = $2\n               ) AS \"exists!\"\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "exists!",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "9898e9962ba497ef8482ffa57d6590f7933e9f2465e9458fab005fe33d96ec7a"
+}

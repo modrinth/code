@@ -197,7 +197,7 @@ impl DBCharge {
     ) -> Result<Option<DBCharge>, DatabaseError> {
         let user_subscription_id = user_subscription_id.0;
         let res = select_charges_with_predicate!(
-            "WHERE subscription_id = $1 AND (status = 'open' OR status = 'cancelled' OR status = 'failed')",
+            "WHERE subscription_id = $1 AND (status = 'open' OR status = 'expiring' OR status = 'cancelled' OR status = 'failed')",
             user_subscription_id
         )
         .fetch_optional(exec)
@@ -240,6 +240,7 @@ impl DBCharge {
                 charge_type = $1 AND
                 (
                     (status = 'cancelled' AND due < NOW()) OR
+                    (status = 'expiring' AND due < NOW()) OR
                     (status = 'failed' AND last_attempt < NOW() - INTERVAL '2 days')
                 )
             "#,

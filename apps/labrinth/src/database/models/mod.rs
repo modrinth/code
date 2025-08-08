@@ -25,6 +25,7 @@ pub mod team_item;
 pub mod thread_item;
 pub mod user_item;
 pub mod user_subscription_item;
+pub mod users_redeemals;
 pub mod version_item;
 
 pub use collection_item::DBCollection;
