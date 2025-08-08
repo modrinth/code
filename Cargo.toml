@@ -92,7 +92,7 @@ lettre = { version = "0.11.18", default-features = false, features = [
   "smtp-transport",
 ] }
 maxminddb = "0.26.0"
-meilisearch-sdk = { version = "0.28.0", default-features = false }
+meilisearch-sdk = { version = "0.29.1", default-features = false }
 murmur2 = "0.1.0"
 native-dialog = "0.9.0"
 notify = { version = "8.0.0", default-features = false }
