@@ -461,7 +461,9 @@ impl Process {
                         }
                     }
                     Ok(Event::CData(e)) => {
-                        if (in_message || in_throwable) && let Ok(text) = e.xml_content() {
+                        if (in_message || in_throwable)
+                            && let Ok(text) = e.xml_content()
+                        {
                             current_content.push_str(&text);
                         }
                     }
