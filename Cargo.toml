@@ -109,7 +109,7 @@ rand_chacha = "=0.3.1"  # Locked on 0.3 until we can update rand to 0.9
 redis = "0.32.4"
 regex = "1.11.1"
 reqwest = { version = "0.12.22", default-features = false }
-rgb = "0.8.50"
+rgb = "0.8.52"
 rust_decimal = { version = "1.37.2", features = [
   "serde-with-float",
   "serde-with-str",
