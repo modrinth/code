@@ -363,8 +363,7 @@ impl DBProductPrice {
 
             Some(public) => {
                 select_prices_with_predicate!(
-                    "WHERE product_id = ANY($1::bigint[])
-                AND public = $2",
+                    "WHERE product_id = ANY($1::bigint[]) AND public = $2",
                     ids_ref,
                     public,
                 )

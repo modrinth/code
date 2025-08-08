@@ -164,11 +164,11 @@ impl UserRedeemal {
         E: sqlx::PgExecutor<'a>,
     {
         let query = query_scalar!(
-            r#"
-          INSERT INTO users_redeemals
-          (user_id, offer, redeemed, status, last_attempt, n_attempts)
-          VALUES ($1, $2, $3, $4, $5, $6)
-          RETURNING id"#,
+            r#"INSERT INTO users_redeemals
+            (user_id, offer, redeemed, status, last_attempt, n_attempts)
+            VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING id
+            "#,
             self.user_id.0,
             self.offer.as_str(),
             self.redeemed,
@@ -194,8 +194,7 @@ impl UserRedeemal {
         E: sqlx::PgExecutor<'a>,
     {
         let query = query!(
-            r#"
-            UPDATE users_redeemals
+            r#"UPDATE users_redeemals
             SET
               status = $3,
               last_attempt = $4,
@@ -219,16 +218,15 @@ impl UserRedeemal {
         E: sqlx::PgExecutor<'a>,
     {
         let query = query!(
-            r#"
-          UPDATE users_redeemals
-          SET
-            offer = $2,
-            status = $3,
-            redeemed = $4,
-            last_attempt = $5,
-            n_attempts = $6
-          WHERE id = $1
-          "#,
+            r#"UPDATE users_redeemals
+            SET
+                offer = $2,
+                status = $3,
+                redeemed = $4,
+                last_attempt = $5,
+                n_attempts = $6
+            WHERE id = $1
+            "#,
             self.id,
             self.offer.as_str(),
             self.status.as_str(),
@@ -267,19 +265,19 @@ impl RedeemalLookupFields {
     {
         let maybe_row = query!(
             r#"
-          SELECT
-            users.id,
-            users_redeemals.status AS "status: Option<String>"
-          FROM
-            users
-          LEFT JOIN
-            users_redeemals ON users_redeemals.user_id = users.id
-              AND users_redeemals.offer = $2
-          WHERE
-            users.username = $1
-          ORDER BY
-            users_redeemals.redeemed DESC
-          LIMIT 1
+            SELECT
+                users.id,
+                users_redeemals.status AS "status: Option<String>"
+            FROM
+                users
+            LEFT JOIN
+                users_redeemals ON users_redeemals.user_id = users.id
+                    AND users_redeemals.offer = $2
+            WHERE
+                users.username = $1
+            ORDER BY
+                users_redeemals.redeemed DESC
+            LIMIT 1
           "#,
             user_username,
             offer.as_str(),

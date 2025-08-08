@@ -214,15 +214,15 @@ impl ChargeType {
 #[derive(Serialize, Deserialize, Eq, PartialEq, Copy, Clone, Debug)]
 #[serde(rename_all = "kebab-case")]
 pub enum ChargeStatus {
-    // Open charges are for the next billing interval
+    /// Open charges are for the next billing interval
     Open,
     Processing,
     Succeeded,
     Failed,
     Cancelled,
-    // Expiring charges are charges that aren't expected to be processed
-    // but can be promoted to a full charge, like for trials/freebies. When
-    // due, the underlying subscription is unprovisioned.
+    /// Expiring charges are charges that aren't expected to be processed
+    /// but can be promoted to a full charge, like for trials/freebies. When
+    /// due, the underlying subscription is unprovisioned.
     Expiring,
 }
 

@@ -1,6 +1,4 @@
--- Add migration script here
-
-CREATE TABLE IF NOT EXISTS users_redeemals (
+CREATE TABLE users_redeemals (
     id            SERIAL PRIMARY KEY,
     user_id       BIGINT NOT NULL REFERENCES users(id),
     offer         VARCHAR NOT NULL,
