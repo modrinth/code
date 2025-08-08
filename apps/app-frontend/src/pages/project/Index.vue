@@ -129,46 +129,46 @@
 </template>
 
 <script setup>
+import ContextMenu from '@/components/ui/ContextMenu.vue'
+import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
+import NavTabs from '@/components/ui/NavTabs.vue'
+import { get_project, get_team, get_version_many } from '@/helpers/cache.js'
+import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile'
+import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
+import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { install as installVersion } from '@/store/install.js'
+import { useTheming } from '@/store/state.js'
 import {
   BookmarkIcon,
-  MoreVerticalIcon,
-  DownloadIcon,
-  ReportIcon,
-  HeartIcon,
-  ExternalIcon,
   CheckIcon,
-  GlobeIcon,
   ClipboardCopyIcon,
+  DownloadIcon,
+  ExternalIcon,
+  GlobeIcon,
+  HeartIcon,
+  MoreVerticalIcon,
+  ReportIcon,
 } from '@modrinth/assets'
 import {
-  ProjectHeader,
-  ProjectSidebarCompatibility,
   ButtonStyled,
   OverflowMenu,
-  ProjectSidebarLinks,
+  ProjectBackgroundGradient,
+  ProjectHeader,
+  ProjectSidebarCompatibility,
   ProjectSidebarCreators,
   ProjectSidebarDetails,
-  ProjectBackgroundGradient,
+  ProjectSidebarLinks,
+  injectNotificationManager,
 } from '@modrinth/ui'
-
-import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
-import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { useRoute, useRouter } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { handleError } from '@/store/notifications.js'
-import ContextMenu from '@/components/ui/ContextMenu.vue'
-import { install as installVersion } from '@/store/install.js'
-import { get_project, get_team, get_version_many } from '@/helpers/cache.js'
-import NavTabs from '@/components/ui/NavTabs.vue'
-import { useTheming } from '@/store/state.js'
-import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
-import { openUrl } from '@tauri-apps/plugin-opener'
+import { useRoute, useRouter } from 'vue-router'
 
 dayjs.extend(relativeTime)
 
+const { handleError } = injectNotificationManager()
 const route = useRoute()
 const router = useRouter()
 const breadcrumbs = useBreadcrumbs()

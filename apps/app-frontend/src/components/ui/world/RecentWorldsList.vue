@@ -1,30 +1,31 @@
 <script setup lang="ts">
+import InstanceItem from '@/components/ui/world/InstanceItem.vue'
+import WorldItem from '@/components/ui/world/WorldItem.vue'
+import { trackEvent } from '@/helpers/analytics'
+import { process_listener, profile_listener } from '@/helpers/events'
+import { get_all } from '@/helpers/process'
+import { kill, run } from '@/helpers/profile'
+import type { GameInstance } from '@/helpers/types'
 import {
   type ProtocolVersion,
-  type ServerWorld,
   type ServerData,
+  type ServerWorld,
   type WorldWithProfile,
-  get_recent_worlds,
   getWorldIdentifier,
   get_profile_protocol_version,
+  get_recent_worlds,
   refreshServerData,
   start_join_server,
   start_join_singleplayer_world,
 } from '@/helpers/worlds.ts'
-import { HeadingLink, GAME_MODES } from '@modrinth/ui'
-import WorldItem from '@/components/ui/world/WorldItem.vue'
-import InstanceItem from '@/components/ui/world/InstanceItem.vue'
-import { watch, onMounted, onUnmounted, ref, computed } from 'vue'
+import { handleSevereError } from '@/store/error'
+import { useTheming } from '@/store/theme.ts'
+import { GAME_MODES, HeadingLink, injectNotificationManager } from '@modrinth/ui'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
-import { useTheming } from '@/store/theme.ts'
-import { kill, run } from '@/helpers/profile'
-import { handleError } from '@/store/notifications'
-import { trackEvent } from '@/helpers/analytics'
-import { process_listener, profile_listener } from '@/helpers/events'
-import { get_all } from '@/helpers/process'
-import type { GameInstance } from '@/helpers/types'
-import { handleSevereError } from '@/store/error'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+
+const { handleError } = injectNotificationManager()
 
 const props = defineProps<{
   recentInstances: GameInstance[]

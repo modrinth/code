@@ -80,13 +80,14 @@
 </template>
 
 <script setup>
-import { Button, Avatar, commonMessages } from "@modrinth/ui";
-import { XIcon, CheckIcon } from "@modrinth/assets";
-import { useBaseFetch } from "@/composables/fetch.js";
+import { CheckIcon, XIcon } from "@modrinth/assets";
+import { Avatar, Button, commonMessages, injectNotificationManager } from "@modrinth/ui";
 import { useAuth } from "@/composables/auth.js";
+import { useBaseFetch } from "@/composables/fetch.js";
 
 import { useScopes } from "@/composables/auth/scopes.ts";
 
+const { addNotification } = injectNotificationManager();
 const { formatMessage } = useVIntl();
 
 const messages = defineMessages({
@@ -116,8 +117,6 @@ const messages = defineMessages({
     defaultMessage: "Authorize {appName}",
   },
 });
-
-const data = useNuxtApp();
 
 const router = useNativeRoute();
 const auth = await useAuth();
@@ -196,8 +195,7 @@ const onAuthorize = async () => {
 
     throw new Error(formatMessage(messages.noRedirectUrlError));
   } catch {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: "error",
@@ -223,8 +221,7 @@ const onReject = async () => {
 
     throw new Error(formatMessage(messages.noRedirectUrlError));
   } catch {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: "error",

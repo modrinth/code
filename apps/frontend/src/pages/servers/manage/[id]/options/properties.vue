@@ -143,11 +143,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, inject } from "vue";
-import { EyeIcon, SearchIcon, IssuesIcon } from "@modrinth/assets";
+import { EyeIcon, IssuesIcon, SearchIcon } from "@modrinth/assets";
+import { injectNotificationManager } from "@modrinth/ui";
 import Fuse from "fuse.js";
+import { computed, inject, ref, watch } from "vue";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
+const { addNotification } = injectNotificationManager();
 const props = defineProps<{
   server: ModrinthServer;
 }>();
@@ -281,7 +283,6 @@ const saveProperties = async () => {
     originalProperties.value = JSON.parse(JSON.stringify(liveProperties.value));
     await props.server.refresh();
     addNotification({
-      group: "serverOptions",
       type: "success",
       title: "Server properties updated",
       text: "Your server properties were successfully changed.",
@@ -289,7 +290,6 @@ const saveProperties = async () => {
   } catch (error) {
     console.error("Error updating server properties:", error);
     addNotification({
-      group: "serverOptions",
       type: "error",
       title: "Failed to update server properties",
       text: "An error occurred while attempting to update your server properties.",

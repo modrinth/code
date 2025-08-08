@@ -3,7 +3,9 @@
     class="vue-notification-group experimental-styles-within"
     :class="{
       'intercom-present': isIntercomPresent,
-      rightwards: moveNotificationsRight,
+      'location-left': notificationLocation === 'left',
+      'location-right': notificationLocation === 'right',
+      'has-sidebar': hasSidebar,
     }"
   >
     <transition-group name="notifs">
@@ -53,7 +55,7 @@
                 </button>
               </ButtonStyled>
               <ButtonStyled circular size="small">
-                <button v-tooltip="`Dismiss`" @click="notifications.splice(index, 1)">
+                <button v-tooltip="`Dismiss`" @click="dismissNotification(index)">
                   <XIcon />
                 </button>
               </ButtonStyled>
@@ -73,104 +75,115 @@
     </transition-group>
   </div>
 </template>
-<script setup>
-import { ButtonStyled } from "@modrinth/ui";
+
+<script setup lang="ts">
 import {
-  XCircleIcon,
   CheckCircleIcon,
   CheckIcon,
+  CopyIcon,
   InfoIcon,
   IssuesIcon,
+  XCircleIcon,
   XIcon,
-  CopyIcon,
-} from "@modrinth/assets";
-const notifications = useNotifications();
-const { isVisible: moveNotificationsRight } = useNotificationRightwards();
+} from '@modrinth/assets'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { injectNotificationManager, type WebNotification } from '../../providers'
+import ButtonStyled from '../base/ButtonStyled.vue'
 
-const isIntercomPresent = ref(false);
+const notificationManager = injectNotificationManager()
+const notifications = computed<WebNotification[]>(() => notificationManager.getNotifications())
+const notificationLocation = computed(() => notificationManager.getNotificationLocation())
 
-function stopTimer(notif) {
-  clearTimeout(notif.timer);
+const isIntercomPresent = ref<boolean>(false)
+const copied = ref<Record<string, boolean>>({})
+
+const stopTimer = (n: WebNotification) => notificationManager.stopNotificationTimer(n)
+const setNotificationTimer = (n: WebNotification) => notificationManager.setNotificationTimer(n)
+const dismissNotification = (n: number) => notificationManager.removeNotificationByIndex(n)
+
+function createNotifText(notif: WebNotification): string {
+  return [notif.title, notif.text, notif.errorCode].filter(Boolean).join('\n')
 }
 
-const copied = ref({});
+function checkIntercomPresence(): void {
+  isIntercomPresent.value = !!document.querySelector('.intercom-lightweight-app')
+}
 
-const createNotifText = (notif) => {
-  let text = "";
-  if (notif.title) {
-    text += notif.title;
-  }
-  if (notif.text) {
-    if (text.length > 0) {
-      text += "\n";
-    }
-    text += notif.text;
-  }
-  if (notif.errorCode) {
-    if (text.length > 0) {
-      text += "\n";
-    }
-    text += notif.errorCode;
-  }
-  return text;
-};
+function copyToClipboard(notif: WebNotification): void {
+  const text = createNotifText(notif)
 
-function checkIntercomPresence() {
-  isIntercomPresent.value = !!document.querySelector(".intercom-lightweight-app");
+  copied.value[text] = true
+  navigator.clipboard.writeText(text)
+
+  setTimeout(() => {
+    const { [text]: _, ...rest } = copied.value
+    copied.value = rest
+  }, 2000)
 }
 
 onMounted(() => {
-  checkIntercomPresence();
+  checkIntercomPresence()
 
   const observer = new MutationObserver(() => {
-    checkIntercomPresence();
-  });
+    checkIntercomPresence()
+  })
 
   observer.observe(document.body, {
     childList: true,
     subtree: true,
-  });
+  })
 
   onBeforeUnmount(() => {
-    observer.disconnect();
-  });
-});
+    observer.disconnect()
+  })
+})
 
-function copyToClipboard(notif) {
-  const text = createNotifText(notif);
-
-  copied.value[text] = true;
-  navigator.clipboard.writeText(text);
-  setTimeout(() => {
-    delete copied.value[text];
-  }, 2000);
-}
+withDefaults(
+  defineProps<{
+    hasSidebar?: boolean
+  }>(),
+  {
+    hasSidebar: false,
+  },
+)
 </script>
+
 <style lang="scss" scoped>
 .vue-notification-group {
   position: fixed;
-  right: 1.5rem;
   bottom: 1.5rem;
   z-index: 200;
   width: 450px;
 
+  &.location-right {
+    right: 1.5rem;
+
+    &.has-sidebar {
+      right: 325px;
+    }
+  }
+
+  &.location-left {
+    left: 1.5rem;
+  }
+
   @media screen and (max-width: 500px) {
     width: calc(100% - 0.75rem * 2);
-    right: 0.75rem;
     bottom: 0.75rem;
+
+    &.location-right {
+      right: 0.75rem;
+      left: auto;
+    }
+
+    &.location-left {
+      left: 0.75rem;
+      right: auto;
+    }
   }
 
   &.intercom-present {
     bottom: 5rem;
-  }
-
-  &.rightwards {
-    right: unset !important;
-    left: 1.5rem;
-
-    @media screen and (max-width: 500px) {
-      left: 0.75rem;
-    }
   }
 
   .vue-notification-wrapper {
@@ -208,6 +221,12 @@ function copyToClipboard(notif) {
 }
 
 .notifs-leave-to {
-  transform: translateX(100%) scale(0.8);
+  .location-right & {
+    transform: translateX(100%) scale(0.8);
+  }
+
+  .location-left & {
+    transform: translateX(-100%) scale(0.8);
+  }
 }
 </style>

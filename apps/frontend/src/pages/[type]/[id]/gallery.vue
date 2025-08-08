@@ -278,26 +278,26 @@
 
 <script setup>
 import {
-  PlusIcon,
   CalendarIcon,
+  ContractIcon,
   EditIcon,
-  TrashIcon,
+  ExpandIcon,
+  ExternalIcon,
+  ImageIcon,
+  InfoIcon,
+  LeftArrowIcon,
+  PlusIcon,
+  RightArrowIcon,
   SaveIcon,
   StarIcon,
-  XIcon,
-  RightArrowIcon,
-  LeftArrowIcon,
-  ExternalIcon,
-  ExpandIcon,
-  ContractIcon,
-  UploadIcon,
-  InfoIcon,
-  ImageIcon,
   TransferIcon,
+  TrashIcon,
+  UploadIcon,
+  XIcon,
 } from "@modrinth/assets";
-import { ConfirmModal } from "@modrinth/ui";
-import FileInput from "~/components/ui/FileInput.vue";
+import { ConfirmModal, injectNotificationManager } from "@modrinth/ui";
 import DropArea from "~/components/ui/DropArea.vue";
+import FileInput from "~/components/ui/FileInput.vue";
 import Modal from "~/components/ui/Modal.vue";
 
 import { isPermission } from "~/utils/permissions.ts";
@@ -425,6 +425,8 @@ export default defineNuxtComponent({
       this.shouldPreventActions = true;
       startLoading();
 
+      const { addNotification } = injectNotificationManager();
+
       try {
         let url = `project/${this.project.id}/gallery?ext=${
           this.editFile
@@ -450,8 +452,7 @@ export default defineNuxtComponent({
 
         this.$refs.modal_edit_item.hide();
       } catch (err) {
-        this.$notify({
-          group: "main",
+        addNotification({
           title: "An error occurred",
           text: err.data ? err.data.description : err,
           type: "error",
@@ -464,6 +465,8 @@ export default defineNuxtComponent({
     async editGalleryItem() {
       this.shouldPreventActions = true;
       startLoading();
+
+      const { addNotification } = injectNotificationManager();
 
       try {
         let url = `project/${this.project.id}/gallery?url=${encodeURIComponent(
@@ -487,8 +490,7 @@ export default defineNuxtComponent({
         await this.resetProject();
         this.$refs.modal_edit_item.hide();
       } catch (err) {
-        this.$notify({
-          group: "main",
+        addNotification({
           title: "An error occurred",
           text: err.data ? err.data.description : err,
           type: "error",
@@ -500,6 +502,8 @@ export default defineNuxtComponent({
     },
     async deleteGalleryImage() {
       startLoading();
+
+      const { addNotification } = injectNotificationManager();
 
       try {
         await useBaseFetch(
@@ -513,8 +517,7 @@ export default defineNuxtComponent({
 
         await this.resetProject();
       } catch (err) {
-        this.$notify({
-          group: "main",
+        addNotification({
           title: "An error occurred",
           text: err.data ? err.data.description : err,
           type: "error",

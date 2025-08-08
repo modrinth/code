@@ -51,7 +51,9 @@
 <script setup>
 import { PlusIcon, XIcon } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
+import { injectNotificationManager } from "@modrinth/ui";
 
+const { addNotification } = injectNotificationManager();
 const router = useNativeRouter();
 
 const name = ref("");
@@ -87,7 +89,6 @@ async function create() {
     await router.push(`/collection/${result.id}`);
   } catch (err) {
     addNotification({
-      group: "main",
       title: "An error occurred",
       text: err?.data?.description || err?.message || err,
       type: "error",

@@ -90,8 +90,11 @@
 </template>
 
 <script setup>
-import { UserIcon, SaveIcon, UploadIcon, UndoIcon, XIcon, TrashIcon } from "@modrinth/assets";
-import { Avatar, FileInput, Button, commonMessages } from "@modrinth/ui";
+import { SaveIcon, TrashIcon, UndoIcon, UploadIcon, UserIcon, XIcon } from "@modrinth/assets";
+import { Avatar, Button, commonMessages, FileInput, injectNotificationManager } from "@modrinth/ui";
+
+const { addNotification } = injectNotificationManager();
+const { formatMessage } = useVIntl();
 
 useHead({
   title: "Profile settings - Modrinth",
@@ -100,8 +103,6 @@ useHead({
 definePageMeta({
   middleware: "auth",
 });
-
-const { formatMessage } = useVIntl();
 
 const messages = defineMessages({
   title: {
@@ -222,7 +223,6 @@ async function saveChanges() {
     saved.value = true;
   } catch (err) {
     addNotification({
-      group: "main",
       title: "An error occurred",
       text: err
         ? err.data

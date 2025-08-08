@@ -319,30 +319,21 @@
 </template>
 
 <script setup>
-import { renderString } from "@modrinth/utils";
 import {
-  UserPlusIcon,
-  ScaleIcon,
   BellIcon,
-  CheckCircleIcon,
   CalendarIcon,
-  VersionIcon,
+  CheckCircleIcon,
   CheckIcon,
-  XIcon,
   ExternalIcon,
+  ScaleIcon,
+  UserPlusIcon,
+  VersionIcon,
+  XIcon,
 } from "@modrinth/assets";
-import { Avatar, ProjectStatusBadge, CopyCode, useRelativeTime } from "@modrinth/ui";
-import ThreadSummary from "~/components/ui/thread/ThreadSummary.vue";
-import { getProjectLink, getVersionLink } from "~/helpers/projects.js";
-import { getUserLink } from "~/helpers/users.js";
-import { acceptTeamInvite, removeSelfFromTeam } from "~/helpers/teams.js";
-import { markAsRead } from "~/helpers/notifications.ts";
-import DoubleIcon from "~/components/ui/DoubleIcon.vue";
-import Categories from "~/components/ui/search/Categories.vue";
+import { injectNotificationManager } from "@modrinth/ui";
 
-const app = useNuxtApp();
+const { addNotification } = injectNotificationManager();
 const emit = defineEmits(["update:notifications"]);
-
 const formatRelativeTime = useRelativeTime();
 
 const props = defineProps({
@@ -407,8 +398,7 @@ async function read() {
     const newNotifs = updateNotifs(props.notifications);
     emit("update:notifications", newNotifs);
   } catch (err) {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "Error marking notification as read",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -427,8 +417,7 @@ async function performAction(notification, actionIndex) {
       });
     }
   } catch (err) {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",

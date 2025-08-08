@@ -197,13 +197,20 @@
 </template>
 
 <script setup lang="ts">
-import { BackupWarning, ButtonStyled, NewModal, Toggle } from "@modrinth/ui";
 import { DropdownIcon, RightArrowIcon, ServerIcon, XIcon } from "@modrinth/assets";
-import { $fetch } from "ofetch";
+import {
+  BackupWarning,
+  ButtonStyled,
+  injectNotificationManager,
+  NewModal,
+  Toggle,
+} from "@modrinth/ui";
 import { type Loaders, ModrinthServersFetchError } from "@modrinth/utils";
-import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
+import { $fetch } from "ofetch";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
 
+const { addNotification } = injectNotificationManager();
 const { formatMessage } = useVIntl();
 
 interface LoaderVersion {
@@ -475,14 +482,12 @@ const handleReinstall = async () => {
   } catch (error) {
     if (error instanceof ModrinthServersFetchError && (error as any)?.statusCode === 429) {
       addNotification({
-        group: "server",
         title: "Cannot reinstall server",
         text: "You are being rate limited. Please try again later.",
         type: "error",
       });
     } else {
       addNotification({
-        group: "server",
         title: "Reinstall Failed",
         text: "An unexpected error occurred while reinstalling. Please try again later.",
         type: "error",

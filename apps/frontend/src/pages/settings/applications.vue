@@ -215,26 +215,27 @@
   </div>
 </template>
 <script setup>
-import { UploadIcon, PlusIcon, XIcon, TrashIcon, EditIcon, SaveIcon } from "@modrinth/assets";
+import { EditIcon, PlusIcon, SaveIcon, TrashIcon, UploadIcon, XIcon } from "@modrinth/assets";
 import {
-  CopyCode,
-  ConfirmModal,
+  Avatar,
   Button,
   Checkbox,
-  Avatar,
+  ConfirmModal,
+  CopyCode,
   FileInput,
   commonSettingsMessages,
+  injectNotificationManager,
 } from "@modrinth/ui";
 import Modal from "~/components/ui/Modal.vue";
-
 import {
-  scopeList,
+  getScopeValue,
   hasScope,
+  scopeList,
   toggleScope,
   useScopes,
-  getScopeValue,
 } from "~/composables/auth/scopes.ts";
 
+const { addNotification } = injectNotificationManager();
 const { formatMessage } = useVIntl();
 
 definePageMeta({
@@ -245,7 +246,6 @@ useHead({
   title: "Applications - Modrinth",
 });
 
-const data = useNuxtApp();
 const { scopesToLabels } = useScopes();
 
 const appModal = ref();
@@ -343,8 +343,7 @@ async function onImageSelection(files) {
       setForm(app);
     }
 
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "Icon updated",
       text: "Your application icon has been updated.",
       type: "success",
@@ -374,8 +373,7 @@ async function createApp() {
 
     await refresh();
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -443,8 +441,7 @@ async function editApp() {
 
     appModal.value.hide();
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -467,8 +464,7 @@ async function removeApp() {
     await refresh();
     editingId.value = null;
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",

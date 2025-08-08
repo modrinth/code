@@ -56,16 +56,16 @@
   </div>
 </template>
 <script setup>
-import { Button, Pagination, Chips } from "@modrinth/ui";
-import { HistoryIcon, CheckCheckIcon } from "@modrinth/assets";
+import { CheckCheckIcon, HistoryIcon } from "@modrinth/assets";
+import { Button, Chips, Pagination } from "@modrinth/ui";
 import { formatProjectType } from "@modrinth/utils";
+import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
+import NotificationItem from "~/components/ui/NotificationItem.vue";
 import {
   fetchExtraNotificationData,
   groupNotifications,
   markAsRead,
-} from "~/helpers/notifications.ts";
-import NotificationItem from "~/components/ui/NotificationItem.vue";
-import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
+} from "~/helpers/platform-notifications.ts";
 
 useHead({
   title: "Notifications - Modrinth",

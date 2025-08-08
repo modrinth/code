@@ -120,7 +120,6 @@ export default defineNuxtPlugin((nuxtApp) => {
       return 0;
     });
   });
-  nuxtApp.provide("notify", (notif) => addNotification(notif));
 });
 export const formatNumber = (number, abbreviate = true) => {
   const x = +number;

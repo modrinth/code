@@ -1,11 +1,12 @@
 <script setup>
-import { DownloadIcon, XIcon } from '@modrinth/assets'
-import { Button } from '@modrinth/ui'
-import { create_profile_and_install as pack_install } from '@/helpers/pack'
-import { ref } from 'vue'
-import { trackEvent } from '@/helpers/analytics'
-import { handleError } from '@/store/state.js'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { trackEvent } from '@/helpers/analytics'
+import { create_profile_and_install as pack_install } from '@/helpers/pack'
+import { DownloadIcon, XIcon } from '@modrinth/assets'
+import { Button, injectNotificationManager } from '@modrinth/ui'
+import { ref } from 'vue'
+
+const { handleError } = injectNotificationManager()
 
 const versionId = ref()
 const project = ref()

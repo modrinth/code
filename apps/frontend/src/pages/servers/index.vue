@@ -632,26 +632,31 @@
 </template>
 
 <script setup>
-import { ButtonStyled, ModrinthServersPurchaseModal } from "@modrinth/ui";
 import {
   BoxIcon,
   GameIcon,
   RightArrowIcon,
+  ServerIcon,
   TerminalSquareIcon,
   TransferIcon,
   VersionIcon,
-  ServerIcon,
 } from "@modrinth/assets";
-import { computed } from "vue";
+import {
+  ButtonStyled,
+  injectNotificationManager,
+  ModrinthServersPurchaseModal,
+} from "@modrinth/ui";
 import { monthsInInterval } from "@modrinth/ui/src/utils/billing.ts";
 import { formatPrice } from "@modrinth/utils";
 import { useVIntl } from "@vintl/vintl";
-import { products } from "~/generated/state.json";
-import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
+import { computed } from "vue";
+import OptionGroup from "~/components/ui/OptionGroup.vue";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
 import ServerPlanSelector from "~/components/ui/servers/marketing/ServerPlanSelector.vue";
-import OptionGroup from "~/components/ui/OptionGroup.vue";
+import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
+import { products } from "~/generated/state.json";
 
+const { addNotification } = injectNotificationManager();
 const { locale } = useVIntl();
 
 const billingPeriods = ref(["monthly", "quarterly"]);
@@ -812,7 +817,6 @@ const startTyping = () => {
 
 const handleError = (err) => {
   addNotification({
-    group: "main",
     title: "An error occurred",
     type: "error",
     text: err.message ?? (err.data ? err.data.description : err),
@@ -831,7 +835,6 @@ async function fetchPaymentData() {
   } catch (error) {
     console.error("Error fetching payment data:", error);
     addNotification({
-      group: "main",
       title: "Error fetching payment data",
       type: "error",
       text: error.message || "An unexpected error occurred",
@@ -886,7 +889,6 @@ const selectProduct = async (product) => {
 
   if ((product === "custom" && isCustomAtCapacity.value) || isAtCapacity.value) {
     addNotification({
-      group: "main",
       title: "Server Capacity Full",
       type: "error",
       text: "We are currently at capacity. Please try again later.",
@@ -902,7 +904,6 @@ const selectProduct = async (product) => {
     (product !== "custom" && !selectedPlan.metadata)
   ) {
     addNotification({
-      group: "main",
       title: "Invalid product",
       type: "error",
       text: "The selected product was found but lacks necessary data. Please contact support.",

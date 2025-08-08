@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { Checkbox, Slider } from '@modrinth/ui'
-import { CheckCircleIcon, XCircleIcon } from '@modrinth/assets'
-import { computed, readonly, ref, watch } from 'vue'
-import { edit, get_optimal_jre_key } from '@/helpers/profile'
-import { handleError } from '@/store/notifications'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
-import { get } from '@/helpers/settings.ts'
-import type { InstanceSettingsTabProps, AppSettings, MemorySettings } from '../../../helpers/types'
 import useMemorySlider from '@/composables/useMemorySlider'
+import { edit, get_optimal_jre_key } from '@/helpers/profile'
+import { get } from '@/helpers/settings.ts'
+import { CheckCircleIcon, XCircleIcon } from '@modrinth/assets'
+import { Checkbox, injectNotificationManager, Slider } from '@modrinth/ui'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+import { computed, readonly, ref, watch } from 'vue'
+import type { AppSettings, InstanceSettingsTabProps, MemorySettings } from '../../../helpers/types'
 
+const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const props = defineProps<InstanceSettingsTabProps>()

@@ -1,12 +1,13 @@
 <script setup>
-import { XIcon, PlusIcon } from '@modrinth/assets'
-import { Button, Checkbox } from '@modrinth/ui'
 import { PackageIcon, VersionIcon } from '@/assets/icons'
-import { ref } from 'vue'
-import { export_profile_mrpack, get_pack_export_candidates } from '@/helpers/profile.js'
-import { open } from '@tauri-apps/plugin-dialog'
-import { handleError } from '@/store/notifications.js'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { export_profile_mrpack, get_pack_export_candidates } from '@/helpers/profile.js'
+import { PlusIcon, XIcon } from '@modrinth/assets'
+import { Button, Checkbox, injectNotificationManager } from '@modrinth/ui'
+import { open } from '@tauri-apps/plugin-dialog'
+import { ref } from 'vue'
+
+const { handleError } = injectNotificationManager()
 
 const props = defineProps({
   instance: {

@@ -94,23 +94,24 @@
 </template>
 
 <script setup>
+import ProgressBar from '@/components/ui/ProgressBar.vue'
+import { trackEvent } from '@/helpers/analytics'
+import { loading_listener, process_listener } from '@/helpers/events'
+import { get_all as getRunningProcesses, kill as killProcess } from '@/helpers/process'
+import { get_many } from '@/helpers/profile.js'
+import { progress_bars_list } from '@/helpers/state.js'
 import {
   DownloadIcon,
+  DropdownIcon,
   StopCircleIcon,
   TerminalSquareIcon,
-  DropdownIcon,
   UnplugIcon,
 } from '@modrinth/assets'
-import { Button, ButtonStyled, Card } from '@modrinth/ui'
+import { Button, ButtonStyled, Card, injectNotificationManager } from '@modrinth/ui'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { get_all as getRunningProcesses, kill as killProcess } from '@/helpers/process'
-import { loading_listener, process_listener } from '@/helpers/events'
 import { useRouter } from 'vue-router'
-import { progress_bars_list } from '@/helpers/state.js'
-import ProgressBar from '@/components/ui/ProgressBar.vue'
-import { handleError } from '@/store/notifications.js'
-import { get_many } from '@/helpers/profile.js'
-import { trackEvent } from '@/helpers/analytics'
+
+const { handleError } = injectNotificationManager()
 
 const router = useRouter()
 const card = ref(null)

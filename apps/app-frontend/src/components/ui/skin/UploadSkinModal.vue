@@ -27,14 +27,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onBeforeUnmount, watch } from 'vue'
-import { UploadIcon } from '@modrinth/assets'
-import { useNotifications } from '@/store/state'
-import { getCurrentWebview } from '@tauri-apps/api/webview'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { get_dragged_skin_data } from '@/helpers/skins'
+import { UploadIcon } from '@modrinth/assets'
+import { injectNotificationManager } from '@modrinth/ui'
+import { getCurrentWebview } from '@tauri-apps/api/webview'
+import { onBeforeUnmount, ref, watch } from 'vue'
 
-const notifications = useNotifications()
+const { addNotification } = injectNotificationManager()
 
 const modal = ref()
 const fileInput = ref<HTMLInputElement>()
@@ -99,7 +99,7 @@ async function setupDragDropListener() {
           const data = await get_dragged_skin_data(filePath)
           await processData(data.buffer)
         } catch (error) {
-          notifications.addNotification({
+          addNotification({
             title: 'Error processing file',
             text: error instanceof Error ? error.message : 'Failed to read the dropped file.',
             type: 'error',

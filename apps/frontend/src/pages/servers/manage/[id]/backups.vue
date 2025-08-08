@@ -150,19 +150,20 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, TagItem } from "@modrinth/ui";
-import { useStorage } from "@vueuse/core";
-import { SpinnerIcon, PlusIcon, DownloadIcon, SettingsIcon, IssuesIcon } from "@modrinth/assets";
-import { ref, computed } from "vue";
+import { DownloadIcon, IssuesIcon, PlusIcon, SettingsIcon, SpinnerIcon } from "@modrinth/assets";
+import { ButtonStyled, injectNotificationManager, TagItem } from "@modrinth/ui";
 import type { Backup } from "@modrinth/utils";
+import { useStorage } from "@vueuse/core";
+import { computed, ref } from "vue";
+import BackupCreateModal from "~/components/ui/servers/BackupCreateModal.vue";
+import BackupDeleteModal from "~/components/ui/servers/BackupDeleteModal.vue";
 import BackupItem from "~/components/ui/servers/BackupItem.vue";
 import BackupRenameModal from "~/components/ui/servers/BackupRenameModal.vue";
-import BackupCreateModal from "~/components/ui/servers/BackupCreateModal.vue";
 import BackupRestoreModal from "~/components/ui/servers/BackupRestoreModal.vue";
-import BackupDeleteModal from "~/components/ui/servers/BackupDeleteModal.vue";
 import BackupSettingsModal from "~/components/ui/servers/BackupSettingsModal.vue";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
+const { addNotification } = injectNotificationManager();
 const props = defineProps<{
   server: ModrinthServer;
   isServerRunning: boolean;
@@ -236,7 +237,11 @@ const prepareDownload = async (backupId: string) => {
     await props.server.backups?.prepare(backupId);
   } catch (error) {
     console.error("Failed to prepare download:", error);
-    addNotification({ type: "error", title: "Failed to prepare backup for download", text: error });
+    addNotification({
+      type: "error",
+      title: "Failed to prepare backup for download",
+      text: error as string,
+    });
   }
 };
 

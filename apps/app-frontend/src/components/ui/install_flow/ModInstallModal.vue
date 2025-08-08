@@ -1,29 +1,29 @@
 <script setup>
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { trackEvent } from '@/helpers/analytics'
 import {
+  check_installed,
+  create,
+  get,
+  add_project_from_version as installMod,
+  list,
+} from '@/helpers/profile'
+import { installVersionDependencies } from '@/store/install.js'
+import {
+  CheckIcon,
   DownloadIcon,
   PlusIcon,
+  RightArrowIcon,
   UploadIcon,
   XIcon,
-  RightArrowIcon,
-  CheckIcon,
 } from '@modrinth/assets'
-import { Avatar, Button, Card } from '@modrinth/ui'
-import { computed, ref } from 'vue'
-import {
-  add_project_from_version as installMod,
-  check_installed,
-  get,
-  list,
-  create,
-} from '@/helpers/profile'
-import { open } from '@tauri-apps/plugin-dialog'
-import { installVersionDependencies } from '@/store/install.js'
-import { handleError } from '@/store/notifications.js'
-import { useRouter } from 'vue-router'
+import { Avatar, Button, Card, injectNotificationManager } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { trackEvent } from '@/helpers/analytics'
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { open } from '@tauri-apps/plugin-dialog'
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
+const { handleError } = injectNotificationManager()
 const router = useRouter()
 
 const versions = ref()
