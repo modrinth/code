@@ -91,7 +91,7 @@ The OAuth configuration options are fairly self-explanatory. For help setting up
 
 If you're prepared to contribute by submitting a pull request, ensure you have met the following criteria:
 
-- `cargo fmt --all-targets` has been run.
+- `cargo fmt --all` has been run.
 - `cargo clippy --all-targets` has been run.
 - `cargo sqlx prepare` has been run.
 
