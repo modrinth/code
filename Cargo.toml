@@ -179,7 +179,7 @@ whoami = "1.6.0"
 winreg = "0.55.0"
 woothee = "0.13.0"
 yaserde = "0.12.0"
-zip = { version = "4.2.0", default-features = false, features = [
+zip = { version = "4.3.0", default-features = false, features = [
   "bzip2",
   "deflate",
   "deflate64",
