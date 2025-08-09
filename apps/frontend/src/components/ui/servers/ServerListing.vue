@@ -4,26 +4,19 @@
     :to="status === 'suspended' ? '' : `/servers/manage/${props.server_id}`"
   >
     <div
-      v-tooltip="
-        status === 'suspended'
-          ? suspension_reason === 'upgrading'
-            ? 'This server is being transferred to a new node. It will be unavailable until this process finishes.'
-            : 'This server has been suspended. Please visit your billing settings or contact Modrinth Support for more information.'
-          : ''
-      "
-      class="flex cursor-pointer flex-row items-center overflow-x-hidden rounded-3xl bg-bg-raised p-4 transition-transform duration-100"
-      :class="status === 'suspended' ? '!rounded-b-none opacity-75' : 'active:scale-95'"
+      class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-button-bg bg-bg-raised p-4 transition-transform duration-100"
+      :class="status === 'suspended' ? '!rounded-b-none border-b-0 opacity-75' : 'active:scale-95'"
       data-pyro-server-listing
       :data-pyro-server-listing-id="server_id"
     >
       <UiServersServerIcon v-if="status !== 'suspended'" :image="image" />
       <div
         v-else
-        class="bg-bg-secondary flex size-24 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
+        class="bg-bg-secondary flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
       >
-        <LockIcon class="size-20 text-secondary" />
+        <LockIcon class="size-12 text-secondary" />
       </div>
-      <div class="ml-8 flex flex-col gap-2.5">
+      <div class="ml-4 flex flex-col gap-2.5">
         <div class="flex flex-row items-center gap-2">
           <h2 class="m-0 text-xl font-bold text-contrast">{{ name }}</h2>
           <ChevronRightIcon />
@@ -41,7 +34,6 @@
           />
           Using {{ projectData?.title || "Unknown" }}
         </div>
-        <div v-else class="min-h-[20px]"></div>
 
         <div
           v-if="isConfiguring"
@@ -61,14 +53,14 @@
     </div>
     <div
       v-if="status === 'suspended' && suspension_reason === 'upgrading'"
-      class="relative -mt-4 flex w-full flex-row items-center gap-2 rounded-b-3xl bg-bg-blue p-4 text-sm font-bold text-contrast"
+      class="relative -mt-4 flex w-full flex-row items-center gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-blue bg-bg-blue p-4 text-sm font-bold text-contrast"
     >
       <UiServersPanelSpinner />
       Your server's hardware is currently being upgraded and will be back online shortly.
     </div>
     <div
       v-else-if="status === 'suspended' && suspension_reason === 'cancelled'"
-      class="relative -mt-4 flex w-full flex-col gap-2 rounded-b-3xl bg-bg-red p-4 text-sm font-bold text-contrast"
+      class="relative -mt-4 flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
     >
       <div class="flex flex-row gap-2">
         <UiServersIconsPanelErrorIcon class="!size-5" /> Your server has been cancelled. Please
@@ -78,7 +70,7 @@
     </div>
     <div
       v-else-if="status === 'suspended' && suspension_reason"
-      class="relative -mt-4 flex w-full flex-col gap-2 rounded-b-3xl bg-bg-red p-4 text-sm font-bold text-contrast"
+      class="relative -mt-4 flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
     >
       <div class="flex flex-row gap-2">
         <UiServersIconsPanelErrorIcon class="!size-5" /> Your server has been suspended:
@@ -89,7 +81,7 @@
     </div>
     <div
       v-else-if="status === 'suspended'"
-      class="relative -mt-4 flex w-full flex-col gap-2 rounded-b-3xl bg-bg-red p-4 text-sm font-bold text-contrast"
+      class="relative -mt-4 flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
     >
       <div class="flex flex-row gap-2">
         <UiServersIconsPanelErrorIcon class="!size-5" /> Your server has been suspended. Please
@@ -103,8 +95,8 @@
 <script setup lang="ts">
 import { ChevronRightIcon, LockIcon, SparklesIcon } from "@modrinth/assets";
 import type { Project, Server } from "@modrinth/utils";
-import { useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
 import { Avatar, CopyCode } from "@modrinth/ui";
+import { useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
 
 const props = defineProps<Partial<Server>>();
 

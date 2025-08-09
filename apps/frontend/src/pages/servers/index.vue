@@ -516,12 +516,11 @@
     </section>
 
     <section
-      id="plan"
       pyro-hash="plan"
       class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
     >
       <div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
-      <div class="mx-auto flex w-full max-w-7xl flex-col items-center gap-8 text-center">
+      <div id="plan" class="mx-auto flex w-full max-w-7xl flex-col items-center gap-8 text-center">
         <h1 class="relative m-0 text-4xl leading-[120%] md:text-7xl">
           There's a server for everyone
         </h1>
@@ -550,6 +549,8 @@
           </template>
           <span v-else></span>
         </div>
+
+        <MedalPlanPromotion v-if="flags.enableMedalPromotion" />
 
         <ul class="m-0 flex w-full grid-cols-3 flex-col gap-8 p-0 lg:grid">
           <ServerPlanSelector
@@ -648,11 +649,13 @@ import { formatPrice } from "@modrinth/utils";
 import { useVIntl } from "@vintl/vintl";
 import { products } from "~/generated/state.json";
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
+import MedalPlanPromotion from "~/components/ui/servers/marketing/MedalPlanPromotion.vue";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
 import ServerPlanSelector from "~/components/ui/servers/marketing/ServerPlanSelector.vue";
 import OptionGroup from "~/components/ui/OptionGroup.vue";
 
 const { locale } = useVIntl();
+const flags = useFeatureFlags();
 
 const billingPeriods = ref(["monthly", "quarterly"]);
 const billingPeriod = ref(billingPeriods.value.includes("quarterly") ? "quarterly" : "monthly");
@@ -929,10 +932,14 @@ const selectProduct = async (product) => {
   }
 };
 
-const planQuery = () => {
-  if (route.query.plan) {
-    document.getElementById("plan").scrollIntoView();
-    selectProduct(route.query.plan);
+const planQuery = async () => {
+  if ("plan" in route.query) {
+    await nextTick();
+    const planElement = document.getElementById("plan");
+    if (planElement) {
+      planElement.scrollIntoView({ behavior: "smooth" });
+      await selectProduct(route.query.plan);
+    }
   }
 };
 

@@ -290,6 +290,8 @@
           </div>
         </div>
 
+        <MedalServerCountdown class="mb-4" />
+
         <div
           v-if="!isConnected && !isReconnecting && !isLoading"
           data-pyro-server-ws-error
@@ -380,6 +382,7 @@ import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import { ModrinthServer, useModrinthServers } from "~/composables/servers/modrinth-servers.ts";
 import ServerInstallation from "~/components/ui/servers/ServerInstallation.vue";
 import PanelErrorIcon from "~/components/ui/servers/icons/PanelErrorIcon.vue";
+import MedalServerCountdown from "~/components/ui/servers/marketing/MedalServerCountdown.vue";
 
 const app = useNuxtApp() as unknown as { $notify: any };
 
