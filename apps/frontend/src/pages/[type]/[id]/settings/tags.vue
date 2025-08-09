@@ -6,11 +6,31 @@
           <span class="label__title size-card-header">Tags</span>
         </h3>
       </div>
+
+      <div
+        v-if="tooManyTagsWarning && !allTagsSelectedWarning"
+        class="my-2 flex items-center gap-1.5 text-orange"
+      >
+        <TriangleAlertIcon class="my-auto" />
+        {{ tooManyTagsWarning }}
+      </div>
+
+      <div v-if="multipleResolutionTagsWarning" class="my-2 flex items-center gap-1.5 text-orange">
+        <TriangleAlertIcon class="my-auto" />
+        {{ multipleResolutionTagsWarning }}
+      </div>
+
+      <div v-if="allTagsSelectedWarning" class="my-2 flex items-center gap-1.5 text-red">
+        <TriangleAlertIcon class="my-auto" />
+        <span>{{ allTagsSelectedWarning }}</span>
+      </div>
+
       <p>
         Accurate tagging is important to help people find your
         {{ formatProjectType(project.project_type).toLowerCase() }}. Make sure to select all tags
         that apply.
       </p>
+
       <p v-if="project.versions.length === 0" class="known-errors">
         Please upload a version first in order to select tags!
       </p>
@@ -112,145 +132,188 @@
   </div>
 </template>
 
-<script>
-import { StarIcon, SaveIcon } from "@modrinth/assets";
-import { formatCategory, formatCategoryHeader, formatProjectType } from "@modrinth/utils";
+<script setup lang="ts">
+import { computed, ref } from "vue";
+import { StarIcon, SaveIcon, TriangleAlertIcon } from "@modrinth/assets";
+import {
+  formatCategory,
+  formatCategoryHeader,
+  formatProjectType,
+  sortedCategories,
+  type Project,
+} from "@modrinth/utils";
 import Checkbox from "~/components/ui/Checkbox.vue";
 
-export default defineNuxtComponent({
-  components: {
-    Checkbox,
-    SaveIcon,
-    StarIcon,
-  },
-  props: {
-    project: {
-      type: Object,
-      default() {
-        return {};
-      },
-    },
-    allMembers: {
-      type: Array,
-      default() {
-        return [];
-      },
-    },
-    currentMember: {
-      type: Object,
-      default() {
-        return null;
-      },
-    },
-    patchProject: {
-      type: Function,
-      default() {
-        return () => {
-          this.$notify({
-            group: "main",
-            title: "An error occurred",
-            text: "Patch project function not found",
-            type: "error",
-          });
-        };
-      },
-    },
-  },
-  data() {
-    return {
-      selectedTags: this.$sortedCategories().filter(
-        (x) =>
-          x.project_type === this.project.actualProjectType &&
-          (this.project.categories.includes(x.name) ||
-            this.project.additional_categories.includes(x.name)),
-      ),
-      featuredTags: this.$sortedCategories().filter(
-        (x) =>
-          x.project_type === this.project.actualProjectType &&
-          this.project.categories.includes(x.name),
-      ),
-    };
-  },
-  computed: {
-    categoryLists() {
-      const lists = {};
-      this.$sortedCategories().forEach((x) => {
-        if (x.project_type === this.project.actualProjectType) {
-          const header = x.header;
-          if (!lists[header]) {
-            lists[header] = [];
-          }
-          lists[header].push(x);
-        }
-      });
-      return lists;
-    },
-    patchData() {
-      const data = {};
-      // Promote selected categories to featured if there are less than 3 featured
-      const newFeaturedTags = this.featuredTags.slice();
-      if (newFeaturedTags.length < 1 && this.selectedTags.length > newFeaturedTags.length) {
-        const nonFeaturedCategories = this.selectedTags.filter((x) => !newFeaturedTags.includes(x));
+interface Category {
+  name: string;
+  header: string;
+  icon?: string;
+  project_type: string;
+}
 
-        nonFeaturedCategories
-          .slice(0, Math.min(nonFeaturedCategories.length, 3 - newFeaturedTags.length))
-          .forEach((x) => newFeaturedTags.push(x));
-      }
-      // Convert selected and featured categories to backend-usable arrays
-      const categories = newFeaturedTags.map((x) => x.name);
-      const additionalCategories = this.selectedTags
-        .filter((x) => !newFeaturedTags.includes(x))
-        .map((x) => x.name);
+interface Props {
+  project: Project & {
+    actualProjectType: string;
+  };
+  allMembers?: any[];
+  currentMember?: any;
+  patchProject?: (data: any) => void;
+}
 
-      if (
-        categories.length !== this.project.categories.length ||
-        categories.some((value) => !this.project.categories.includes(value))
-      ) {
-        data.categories = categories;
-      }
+const tags = useTags();
 
-      if (
-        additionalCategories.length !== this.project.additional_categories.length ||
-        additionalCategories.some((value) => !this.project.additional_categories.includes(value))
-      ) {
-        data.additional_categories = additionalCategories;
-      }
-
-      return data;
-    },
-    hasChanges() {
-      return Object.keys(this.patchData).length > 0;
-    },
-  },
-  methods: {
-    formatProjectType,
-    formatCategoryHeader,
-    formatCategory,
-    toggleCategory(category) {
-      if (this.selectedTags.includes(category)) {
-        this.selectedTags = this.selectedTags.filter((x) => x !== category);
-        if (this.featuredTags.includes(category)) {
-          this.featuredTags = this.featuredTags.filter((x) => x !== category);
-        }
-      } else {
-        this.selectedTags.push(category);
-      }
-    },
-    toggleFeaturedCategory(category) {
-      if (this.featuredTags.includes(category)) {
-        this.featuredTags = this.featuredTags.filter((x) => x !== category);
-      } else {
-        this.featuredTags.push(category);
-      }
-    },
-    saveChanges() {
-      if (this.hasChanges) {
-        this.patchProject(this.patchData);
-      }
-    },
+const props = withDefaults(defineProps<Props>(), {
+  allMembers: () => [],
+  currentMember: null,
+  patchProject: () => {
+    addNotification({
+      title: "An error occurred",
+      text: "Patch project function not found",
+      type: "error",
+    });
   },
 });
+
+const selectedTags = ref<Category[]>(
+  sortedCategories(tags.value).filter(
+    (x: Category) =>
+      x.project_type === props.project.actualProjectType &&
+      (props.project.categories.includes(x.name) ||
+        props.project.additional_categories.includes(x.name)),
+  ),
+);
+
+const featuredTags = ref<Category[]>(
+  sortedCategories(tags.value).filter(
+    (x: Category) =>
+      x.project_type === props.project.actualProjectType &&
+      props.project.categories.includes(x.name),
+  ),
+);
+
+const categoryLists = computed(() => {
+  const lists: Record<string, Category[]> = {};
+  sortedCategories(tags.value).forEach((x: Category) => {
+    if (x.project_type === props.project.actualProjectType) {
+      const header = x.header;
+      if (!lists[header]) {
+        lists[header] = [];
+      }
+      lists[header].push(x);
+    }
+  });
+  return lists;
+});
+
+const tooManyTagsWarning = computed(() => {
+  const tagCount = selectedTags.value.length;
+  if (tagCount > 8) {
+    return `You've selected ${tagCount} tags. Consider reducing to 8 or fewer to keep your project focused and easier to discover.`;
+  }
+  return null;
+});
+
+const multipleResolutionTagsWarning = computed(() => {
+  if (props.project.project_type !== "resourcepack") return null;
+
+  const resolutionTags = selectedTags.value.filter((tag) =>
+    ["8x-", "16x", "32x", "48x", "64x", "128x", "256x", "512x+"].includes(tag.name),
+  );
+
+  if (resolutionTags.length > 1) {
+    return `You've selected ${resolutionTags.length} resolution tags (${resolutionTags
+      .map((t) => t.name)
+      .join(", ")
+      .replace("8x-", "8x or lower")
+      .replace(
+        "512x+",
+        "512x or higher",
+      )}). Resource packs should typically only have one resolution tag.`;
+  }
+  return null;
+});
+
+const allTagsSelectedWarning = computed(() => {
+  const categoriesForProjectType = sortedCategories(tags.value).filter(
+    (x: Category) => x.project_type === props.project.actualProjectType,
+  );
+  const totalSelectedTags = selectedTags.value.length;
+
+  if (
+    totalSelectedTags === categoriesForProjectType.length &&
+    categoriesForProjectType.length > 0
+  ) {
+    return `You've selected all ${categoriesForProjectType.length} available tags. Please select only the tags that truly apply to your project.`;
+  }
+  return null;
+});
+
+const patchData = computed(() => {
+  const data: Record<string, string[]> = {};
+
+  // Promote selected categories to featured if there are less than 3 featured
+  const newFeaturedTags = featuredTags.value.slice();
+  if (newFeaturedTags.length < 1 && selectedTags.value.length > newFeaturedTags.length) {
+    const nonFeaturedCategories = selectedTags.value.filter((x) => !newFeaturedTags.includes(x));
+
+    nonFeaturedCategories
+      .slice(0, Math.min(nonFeaturedCategories.length, 3 - newFeaturedTags.length))
+      .forEach((x) => newFeaturedTags.push(x));
+  }
+
+  // Convert selected and featured categories to backend-usable arrays
+  const categories = newFeaturedTags.map((x) => x.name);
+  const additionalCategories = selectedTags.value
+    .filter((x) => !newFeaturedTags.includes(x))
+    .map((x) => x.name);
+
+  if (
+    categories.length !== props.project.categories.length ||
+    categories.some((value) => !props.project.categories.includes(value))
+  ) {
+    data.categories = categories;
+  }
+
+  if (
+    additionalCategories.length !== props.project.additional_categories.length ||
+    additionalCategories.some((value) => !props.project.additional_categories.includes(value))
+  ) {
+    data.additional_categories = additionalCategories;
+  }
+
+  return data;
+});
+
+const hasChanges = computed(() => {
+  return Object.keys(patchData.value).length > 0;
+});
+
+const toggleCategory = (category: Category) => {
+  if (selectedTags.value.includes(category)) {
+    selectedTags.value = selectedTags.value.filter((x) => x !== category);
+    if (featuredTags.value.includes(category)) {
+      featuredTags.value = featuredTags.value.filter((x) => x !== category);
+    }
+  } else {
+    selectedTags.value.push(category);
+  }
+};
+
+const toggleFeaturedCategory = (category: Category) => {
+  if (featuredTags.value.includes(category)) {
+    featuredTags.value = featuredTags.value.filter((x) => x !== category);
+  } else {
+    featuredTags.value.push(category);
+  }
+};
+
+const saveChanges = () => {
+  if (hasChanges.value) {
+    props.patchProject(patchData.value);
+  }
+};
 </script>
+
 <style lang="scss" scoped>
 .label__title {
   display: flex;

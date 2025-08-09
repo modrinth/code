@@ -7,11 +7,26 @@
           id="project-issue-tracker"
           title="A place for users to report bugs, issues, and concerns about your project."
         >
-          <span class="label__title">Issue tracker</span>
+          <span class="label__title">Issue tracker </span>
           <span class="label__description">
             A place for users to report bugs, issues, and concerns about your project.
           </span>
         </label>
+        <TriangleAlertIcon
+          v-if="isIssuesLinkShortener"
+          v-tooltip="`Use of link shorteners is prohibited.`"
+          class="size-6 animate-pulse text-orange"
+        />
+        <TriangleAlertIcon
+          v-else-if="isIssuesDiscordUrl"
+          v-tooltip="`Discord invites are not appropriate for this link type.`"
+          class="size-6 animate-pulse text-orange"
+        />
+        <TriangleAlertIcon
+          v-else-if="!isIssuesUrlCommon"
+          v-tooltip="`Link includes a domain which isn't common for this link type.`"
+          class="size-6 animate-pulse text-orange"
+        />
         <input
           id="project-issue-tracker"
           v-model="issuesUrl"
@@ -26,11 +41,26 @@
           id="project-source-code"
           title="A page/repository containing the source code for your project"
         >
-          <span class="label__title">Source code</span>
+          <span class="label__title">Source code </span>
           <span class="label__description">
             A page/repository containing the source code for your project
           </span>
         </label>
+        <TriangleAlertIcon
+          v-if="isSourceLinkShortener"
+          v-tooltip="`Use of link shorteners is prohibited.`"
+          class="size-6 animate-pulse text-orange"
+        />
+        <TriangleAlertIcon
+          v-else-if="isSourceDiscordUrl"
+          v-tooltip="`Discord invites are not appropriate for this link type.`"
+          class="size-6 animate-pulse text-orange"
+        />
+        <TriangleAlertIcon
+          v-else-if="!isSourceUrlCommon"
+          v-tooltip="`Link includes a domain which isn't common for this link type.`"
+          class="size-6 animate-pulse text-orange"
+        />
         <input
           id="project-source-code"
           v-model="sourceUrl"
@@ -50,6 +80,16 @@
             A page containing information, documentation, and help for the project.
           </span>
         </label>
+        <TriangleAlertIcon
+          v-if="isWikiLinkShortener"
+          v-tooltip="`Use of link shorteners is prohibited.`"
+          class="size-6 animate-pulse text-orange"
+        />
+        <TriangleAlertIcon
+          v-else-if="isWikiDiscordUrl"
+          v-tooltip="`Discord invites are not appropriate for this link type.`"
+          class="size-6 animate-pulse text-orange"
+        />
         <input
           id="project-wiki-page"
           v-model="wikiUrl"
@@ -61,9 +101,19 @@
       </div>
       <div class="adjacent-input">
         <label id="project-discord-invite" title="An invitation link to your Discord server.">
-          <span class="label__title">Discord invite</span>
+          <span class="label__title">Discord invite </span>
           <span class="label__description"> An invitation link to your Discord server. </span>
         </label>
+        <TriangleAlertIcon
+          v-if="isDiscordLinkShortener"
+          v-tooltip="`Use of link shorteners is prohibited.`"
+          class="size-6 animate-pulse text-orange"
+        />
+        <TriangleAlertIcon
+          v-else-if="!isDiscordUrlCommon"
+          v-tooltip="`You're using a link which isn't common for this link type.`"
+          class="size-6 animate-pulse text-orange"
+        />
         <input
           id="project-discord-invite"
           v-model="discordUrl"
@@ -123,7 +173,13 @@
 
 <script setup>
 import { DropdownSelect } from "@modrinth/ui";
-import { SaveIcon } from "@modrinth/assets";
+import { SaveIcon, TriangleAlertIcon } from "@modrinth/assets";
+import {
+  isCommonUrl,
+  isDiscordUrl,
+  isLinkShortener,
+  commonLinkDomains,
+} from "@modrinth/moderation";
 
 const tags = useTags();
 
@@ -152,6 +208,46 @@ const issuesUrl = ref(props.project.issues_url);
 const sourceUrl = ref(props.project.source_url);
 const wikiUrl = ref(props.project.wiki_url);
 const discordUrl = ref(props.project.discord_url);
+
+const isIssuesUrlCommon = computed(() => {
+  if (!issuesUrl.value || issuesUrl.value.trim().length === 0) return true;
+  return isCommonUrl(issuesUrl.value, commonLinkDomains.issues);
+});
+
+const isSourceUrlCommon = computed(() => {
+  if (!sourceUrl.value || sourceUrl.value.trim().length === 0) return true;
+  return isCommonUrl(sourceUrl.value, commonLinkDomains.source);
+});
+
+const isDiscordUrlCommon = computed(() => {
+  if (!discordUrl.value || discordUrl.value.trim().length === 0) return true;
+  return isCommonUrl(discordUrl.value, commonLinkDomains.discord);
+});
+
+const isIssuesDiscordUrl = computed(() => {
+  return isDiscordUrl(issuesUrl.value);
+});
+
+const isSourceDiscordUrl = computed(() => {
+  return isDiscordUrl(sourceUrl.value);
+});
+
+const isWikiDiscordUrl = computed(() => {
+  return isDiscordUrl(wikiUrl.value);
+});
+
+const isIssuesLinkShortener = computed(() => {
+  return isLinkShortener(issuesUrl.value);
+});
+const isSourceLinkShortener = computed(() => {
+  return isLinkShortener(sourceUrl.value);
+});
+const isWikiLinkShortener = computed(() => {
+  return isLinkShortener(wikiUrl.value);
+});
+const isDiscordLinkShortener = computed(() => {
+  return isLinkShortener(discordUrl.value);
+});
 
 const rawDonationLinks = JSON.parse(JSON.stringify(props.project.donation_urls));
 rawDonationLinks.push({
