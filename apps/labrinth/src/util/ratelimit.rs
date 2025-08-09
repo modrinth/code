@@ -133,12 +133,11 @@ pub async fn rate_limit_middleware(
         .expect("Rate limiter not configured properly")
         .clone();
 
-    if let Some(key) = req.headers().get("x-ratelimit-key") {
-        if key.to_str().ok()
+    if let Some(key) = req.headers().get("x-ratelimit-key")
+        && key.to_str().ok()
             == dotenvy::var("RATE_LIMIT_IGNORE_KEY").ok().as_deref()
-        {
-            return Ok(next.call(req).await?.map_into_left_body());
-        }
+    {
+        return Ok(next.call(req).await?.map_into_left_body());
     }
 
     let conn_info = req.connection_info().clone();

@@ -233,10 +233,10 @@ fn main() {
             });
 
             #[cfg(not(target_os = "linux"))]
-            if let Some(window) = app.get_window("main") {
-                if let Err(e) = window.set_shadow(true) {
-                    tracing::warn!("Failed to set window shadow: {e}");
-                }
+            if let Some(window) = app.get_window("main")
+                && let Err(e) = window.set_shadow(true)
+            {
+                tracing::warn!("Failed to set window shadow: {e}");
             }
 
             Ok(())

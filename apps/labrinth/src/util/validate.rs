@@ -22,46 +22,47 @@ pub fn validation_errors_to_string(
 
     let key_option = map.keys().next();
 
-    if let Some(field) = key_option {
-        if let Some(error) = map.get(field) {
-            return match error {
-                ValidationErrorsKind::Struct(errors) => {
-                    validation_errors_to_string(
+    if let Some(field) = key_option
+        && let Some(error) = map.get(field)
+    {
+        return match error {
+            ValidationErrorsKind::Struct(errors) => {
+                validation_errors_to_string(
+                    *errors.clone(),
+                    Some(format!("of item {field}")),
+                )
+            }
+            ValidationErrorsKind::List(list) => {
+                if let Some((index, errors)) = list.iter().next() {
+                    output.push_str(&validation_errors_to_string(
                         *errors.clone(),
-                        Some(format!("of item {field}")),
-                    )
+                        Some(format!("of list {field} with index {index}")),
+                    ));
                 }
-                ValidationErrorsKind::List(list) => {
-                    if let Some((index, errors)) = list.iter().next() {
-                        output.push_str(&validation_errors_to_string(
-                            *errors.clone(),
-                            Some(format!("of list {field} with index {index}")),
-                        ));
-                    }
 
-                    output
-                }
-                ValidationErrorsKind::Field(errors) => {
-                    if let Some(error) = errors.first() {
-                        if let Some(adder) = adder {
-                            write!(
+                output
+            }
+            ValidationErrorsKind::Field(errors) => {
+                if let Some(error) = errors.first() {
+                    if let Some(adder) = adder {
+                        write!(
                                 &mut output,
                                 "Field {field} {adder} failed validation with error: {}",
                                 error.code
                             ).unwrap();
-                        } else {
-                            write!(
-                                &mut output,
-                                "Field {field} failed validation with error: {}",
-                                error.code
-                            ).unwrap();
-                        }
+                    } else {
+                        write!(
+                            &mut output,
+                            "Field {field} failed validation with error: {}",
+                            error.code
+                        )
+                        .unwrap();
                     }
-
-                    output
                 }
-            };
-        }
+
+                output
+            }
+        };
     }
 
     String::new()

@@ -149,13 +149,12 @@ pub async fn install_zipped_mrpack_files(
                 let profile_path = profile_path.clone();
                 async move {
                     //TODO: Future update: prompt user for optional files in a modpack
-                    if let Some(env) = project.env {
-                        if env
+                    if let Some(env) = project.env
+                        && env
                             .get(&EnvType::Client)
                             .is_some_and(|x| x == &SideType::Unsupported)
-                        {
-                            return Ok(());
-                        }
+                    {
+                        return Ok(());
                     }
 
                     let file = fetch_mirrors(
@@ -375,12 +374,12 @@ pub async fn remove_all_related_files(
             )
             .await?
         {
-            if let Some(metadata) = &project.metadata {
-                if to_remove.contains(&metadata.project_id) {
-                    let path = profile_full_path.join(file_path);
-                    if path.exists() {
-                        io::remove_file(&path).await?;
-                    }
+            if let Some(metadata) = &project.metadata
+                && to_remove.contains(&metadata.project_id)
+            {
+                let path = profile_full_path.join(file_path);
+                if path.exists() {
+                    io::remove_file(&path).await?;
                 }
             }
         }

@@ -148,65 +148,55 @@ pub async fn get_update_from_hash(
         &redis,
     )
     .await?
-    {
-        if let Some(project) = database::models::DBProject::get_id(
+        && let Some(project) = database::models::DBProject::get_id(
             file.project_id,
             &**pool,
             &redis,
         )
         .await?
-        {
-            let mut versions = database::models::DBVersion::get_many(
-                &project.versions,
-                &**pool,
-                &redis,
-            )
-            .await?
-            .into_iter()
-            .filter(|x| {
-                let mut bool = true;
-                if let Some(version_types) = &update_data.version_types {
-                    bool &= version_types
-                        .iter()
-                        .any(|y| y.as_str() == x.inner.version_type);
-                }
-                if let Some(loaders) = &update_data.loaders {
-                    bool &= x.loaders.iter().any(|y| loaders.contains(y));
-                }
-                if let Some(loader_fields) = &update_data.loader_fields {
-                    for (key, values) in loader_fields {
-                        bool &= if let Some(x_vf) = x
-                            .version_fields
-                            .iter()
-                            .find(|y| y.field_name == *key)
-                        {
-                            values
-                                .iter()
-                                .any(|v| x_vf.value.contains_json_value(v))
-                        } else {
-                            true
-                        };
-                    }
-                }
-                bool
-            })
-            .sorted();
-
-            if let Some(first) = versions.next_back() {
-                if !is_visible_version(
-                    &first.inner,
-                    &user_option,
-                    &pool,
-                    &redis,
-                )
-                .await?
-                {
-                    return Err(ApiError::NotFound);
-                }
-
-                return Ok(HttpResponse::Ok()
-                    .json(models::projects::Version::from(first)));
+    {
+        let mut versions = database::models::DBVersion::get_many(
+            &project.versions,
+            &**pool,
+            &redis,
+        )
+        .await?
+        .into_iter()
+        .filter(|x| {
+            let mut bool = true;
+            if let Some(version_types) = &update_data.version_types {
+                bool &= version_types
+                    .iter()
+                    .any(|y| y.as_str() == x.inner.version_type);
             }
+            if let Some(loaders) = &update_data.loaders {
+                bool &= x.loaders.iter().any(|y| loaders.contains(y));
+            }
+            if let Some(loader_fields) = &update_data.loader_fields {
+                for (key, values) in loader_fields {
+                    bool &= if let Some(x_vf) =
+                        x.version_fields.iter().find(|y| y.field_name == *key)
+                    {
+                        values.iter().any(|v| x_vf.value.contains_json_value(v))
+                    } else {
+                        true
+                    };
+                }
+            }
+            bool
+        })
+        .sorted();
+
+        if let Some(first) = versions.next_back() {
+            if !is_visible_version(&first.inner, &user_option, &pool, &redis)
+                .await?
+            {
+                return Err(ApiError::NotFound);
+            }
+
+            return Ok(
+                HttpResponse::Ok().json(models::projects::Version::from(first))
+            );
         }
     }
     Err(ApiError::NotFound)
@@ -398,13 +388,12 @@ pub async fn update_files(
         if let Some(version) = versions
             .iter()
             .find(|x| x.inner.project_id == file.project_id)
+            && let Some(hash) = file.hashes.get(&algorithm)
         {
-            if let Some(hash) = file.hashes.get(&algorithm) {
-                response.insert(
-                    hash.clone(),
-                    models::projects::Version::from(version.clone()),
-                );
-            }
+            response.insert(
+                hash.clone(),
+                models::projects::Version::from(version.clone()),
+            );
         }
     }
 
@@ -484,69 +473,59 @@ pub async fn update_individual_files(
 
     for project in projects {
         for file in files.iter().filter(|x| x.project_id == project.inner.id) {
-            if let Some(hash) = file.hashes.get(&algorithm) {
-                if let Some(query_file) =
+            if let Some(hash) = file.hashes.get(&algorithm)
+                && let Some(query_file) =
                     update_data.hashes.iter().find(|x| &x.hash == hash)
-                {
-                    let version = all_versions
-                        .iter()
-                        .filter(|x| x.inner.project_id == file.project_id)
-                        .filter(|x| {
-                            let mut bool = true;
+            {
+                let version = all_versions
+                    .iter()
+                    .filter(|x| x.inner.project_id == file.project_id)
+                    .filter(|x| {
+                        let mut bool = true;
 
-                            if let Some(version_types) =
-                                &query_file.version_types
-                            {
-                                bool &= version_types.iter().any(|y| {
-                                    y.as_str() == x.inner.version_type
-                                });
-                            }
-                            if let Some(loaders) = &query_file.loaders {
-                                bool &= x
-                                    .loaders
-                                    .iter()
-                                    .any(|y| loaders.contains(y));
-                            }
-
-                            if let Some(loader_fields) =
-                                &query_file.loader_fields
-                            {
-                                for (key, values) in loader_fields {
-                                    bool &= if let Some(x_vf) = x
-                                        .version_fields
-                                        .iter()
-                                        .find(|y| y.field_name == *key)
-                                    {
-                                        values.iter().any(|v| {
-                                            x_vf.value.contains_json_value(v)
-                                        })
-                                    } else {
-                                        true
-                                    };
-                                }
-                            }
-                            bool
-                        })
-                        .sorted()
-                        .next_back();
-
-                    if let Some(version) = version {
-                        if is_visible_version(
-                            &version.inner,
-                            &user_option,
-                            &pool,
-                            &redis,
-                        )
-                        .await?
-                        {
-                            response.insert(
-                                hash.clone(),
-                                models::projects::Version::from(
-                                    version.clone(),
-                                ),
-                            );
+                        if let Some(version_types) = &query_file.version_types {
+                            bool &= version_types
+                                .iter()
+                                .any(|y| y.as_str() == x.inner.version_type);
                         }
-                    }
+                        if let Some(loaders) = &query_file.loaders {
+                            bool &=
+                                x.loaders.iter().any(|y| loaders.contains(y));
+                        }
+
+                        if let Some(loader_fields) = &query_file.loader_fields {
+                            for (key, values) in loader_fields {
+                                bool &= if let Some(x_vf) = x
+                                    .version_fields
+                                    .iter()
+                                    .find(|y| y.field_name == *key)
+                                {
+                                    values.iter().any(|v| {
+                                        x_vf.value.contains_json_value(v)
+                                    })
+                                } else {
+                                    true
+                                };
+                            }
+                        }
+                        bool
+                    })
+                    .sorted()
+                    .next_back();
+
+                if let Some(version) = version
+                    && is_visible_version(
+                        &version.inner,
+                        &user_option,
+                        &pool,
+                        &redis,
+                    )
+                    .await?
+                {
+                    response.insert(
+                        hash.clone(),
+                        models::projects::Version::from(version.clone()),
+                    );
                 }
             }
         }

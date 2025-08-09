@@ -341,10 +341,10 @@ pub async fn install_minecraft(
 
             // Forge processors (90-100)
             for (index, processor) in processors.iter().enumerate() {
-                if let Some(sides) = &processor.sides {
-                    if !sides.contains(&String::from("client")) {
-                        continue;
-                    }
+                if let Some(sides) = &processor.sides
+                    && !sides.contains(&String::from("client"))
+                {
+                    continue;
                 }
 
                 let cp = {
