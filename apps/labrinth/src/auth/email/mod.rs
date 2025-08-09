@@ -39,7 +39,8 @@ pub fn send_email_raw(
     let password = dotenvy::var("SMTP_PASSWORD")?;
     let host = dotenvy::var("SMTP_HOST")?;
     let port = dotenvy::var("SMTP_PORT")?.parse::<u16>().unwrap_or(465);
-    let creds = Credentials::new(username, password);
+    let creds =
+        (!username.is_empty()).then(|| Credentials::new(username, password));
     let tls_setting = match dotenvy::var("SMTP_TLS")?.as_str() {
         "none" => Tls::None,
         "opportunistic_start_tls" => {
@@ -55,13 +56,12 @@ pub fn send_email_raw(
         }
     };
 
-    let mailer = SmtpTransport::relay(&host)?
-        .port(port)
-        .tls(tls_setting)
-        .credentials(creds)
-        .build();
+    let mut mailer = SmtpTransport::relay(&host)?.port(port).tls(tls_setting);
+    if let Some(creds) = creds {
+        mailer = mailer.credentials(creds);
+    }
 
-    mailer.send(&email)?;
+    mailer.build().send(&email)?;
 
     Ok(())
 }
