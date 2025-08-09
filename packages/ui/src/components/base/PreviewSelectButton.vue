@@ -2,21 +2,21 @@
 import { RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
 
 withDefaults(
-  defineProps<{
-    checked: boolean
-  }>(),
-  {
-    checked: false,
-  },
+    defineProps<{
+        checked: boolean
+    }>(),
+    {
+        checked: false,
+    },
 )
 </script>
 <template>
-  <div class="" role="button" @click="() => {}">
-    <slot name="preview" />
-    <div>
-      <RadioButtonIcon v-if="!checked" class="w-4 h-4" />
-      <RadioButtonCheckedIcon v-else class="w-4 h-4" />
-      <slot />
+    <div class="" role="button" @click="() => {}">
+        <slot name="preview" />
+        <div>
+            <RadioButtonIcon v-if="!checked" class="w-4 h-4" />
+            <RadioButtonCheckedIcon v-else class="w-4 h-4" />
+            <slot />
+        </div>
     </div>
-  </div>
 </template>

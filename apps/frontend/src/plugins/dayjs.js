@@ -8,9 +8,9 @@ dayjs.extend(advanced)
 dayjs.extend(relativeTime)
 
 export default defineNuxtPlugin(() => {
-  return {
-    provide: {
-      dayjs,
-    },
-  }
+    return {
+        provide: {
+            dayjs,
+        },
+    }
 })

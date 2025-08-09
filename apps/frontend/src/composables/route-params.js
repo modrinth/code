@@ -5,6 +5,6 @@
  * @returns {import('vue').Ref<string | string[] | undefined>}
  */
 export const useRouteId = (key = 'id') => {
-  const route = useNativeRoute()
-  return route.params?.[key] || undefined
+    const route = useNativeRoute()
+    return route.params?.[key] || undefined
 }

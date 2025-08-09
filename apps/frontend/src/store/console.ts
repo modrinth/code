@@ -19,146 +19,146 @@ const initialBatchSize = 256
  * @property {function(): void} clear - Method to clear all console output
  */
 export const useModrinthServersConsole = createGlobalState(() => {
-  /**
-   * Reactive array storing console output lines
-   * @type {Ref<string[]>}
-   */
-  const output: Ref<string[]> = shallowRef<string[]>([])
-  const searchQuery: Ref<string> = shallowRef('')
-  const filteredOutput: Ref<string[]> = shallowRef([])
-  let searchRegex: RegExp | null = null
+    /**
+     * Reactive array storing console output lines
+     * @type {Ref<string[]>}
+     */
+    const output: Ref<string[]> = shallowRef<string[]>([])
+    const searchQuery: Ref<string> = shallowRef('')
+    const filteredOutput: Ref<string[]> = shallowRef([])
+    let searchRegex: RegExp | null = null
 
-  let lineBuffer: string[] = []
-  let batchTimer: NodeJS.Timeout | null = null
-  let isProcessingInitialBatch = false
+    let lineBuffer: string[] = []
+    let batchTimer: NodeJS.Timeout | null = null
+    let isProcessingInitialBatch = false
 
-  let refilterTimer: NodeJS.Timeout | null = null
-  const refilterTimeout = 100 // ms
+    let refilterTimer: NodeJS.Timeout | null = null
+    const refilterTimeout = 100 // ms
 
-  const updateFilter = () => {
-    if (!searchQuery.value) {
-      filteredOutput.value = []
-      return
+    const updateFilter = () => {
+        if (!searchQuery.value) {
+            filteredOutput.value = []
+            return
+        }
+
+        if (!searchRegex) {
+            searchRegex = new RegExp(searchQuery.value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i')
+        }
+
+        filteredOutput.value = output.value.filter((line) => searchRegex?.test(line) ?? false)
     }
 
-    if (!searchRegex) {
-      searchRegex = new RegExp(searchQuery.value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i')
+    const scheduleRefilter = () => {
+        if (refilterTimer) clearTimeout(refilterTimer)
+        refilterTimer = setTimeout(updateFilter, refilterTimeout)
     }
 
-    filteredOutput.value = output.value.filter((line) => searchRegex?.test(line) ?? false)
-  }
+    const flushBuffer = () => {
+        if (lineBuffer.length === 0) return
 
-  const scheduleRefilter = () => {
-    if (refilterTimer) clearTimeout(refilterTimer)
-    refilterTimer = setTimeout(updateFilter, refilterTimeout)
-  }
+        const processedLines = lineBuffer.flatMap((line) => line.split('\n').filter(Boolean))
 
-  const flushBuffer = () => {
-    if (lineBuffer.length === 0) return
+        if (isProcessingInitialBatch && processedLines.length >= initialBatchSize) {
+            isProcessingInitialBatch = false
+            output.value = processedLines.slice(-maxLines)
+        } else {
+            const newOutput = [...output.value, ...processedLines]
+            output.value = newOutput.slice(-maxLines)
+        }
 
-    const processedLines = lineBuffer.flatMap((line) => line.split('\n').filter(Boolean))
+        lineBuffer = []
+        batchTimer = null
 
-    if (isProcessingInitialBatch && processedLines.length >= initialBatchSize) {
-      isProcessingInitialBatch = false
-      output.value = processedLines.slice(-maxLines)
-    } else {
-      const newOutput = [...output.value, ...processedLines]
-      output.value = newOutput.slice(-maxLines)
+        if (searchQuery.value) {
+            scheduleRefilter()
+        }
     }
 
-    lineBuffer = []
-    batchTimer = null
+    /**
+     * Adds a new output line to the console output
+     * Automatically removes the oldest line if max output is exceeded
+     *
+     * @param {string} line - The console output line to add
+     */
+    const addLine = (line: string): void => {
+        lineBuffer.push(line)
 
-    if (searchQuery.value) {
-      scheduleRefilter()
-    }
-  }
-
-  /**
-   * Adds a new output line to the console output
-   * Automatically removes the oldest line if max output is exceeded
-   *
-   * @param {string} line - The console output line to add
-   */
-  const addLine = (line: string): void => {
-    lineBuffer.push(line)
-
-    if (!batchTimer) {
-      batchTimer = setTimeout(flushBuffer, batchTimeout)
-    }
-  }
-
-  /**
-   * Adds multiple output lines to the console output
-   * Automatically removes the oldest lines if max output is exceeded
-   *
-   * @param {string[]} lines - The console output lines to add
-   * @returns {void}
-   */
-  const addLines = (lines: string[]): void => {
-    if (output.value.length === 0 && lines.length >= initialBatchSize) {
-      isProcessingInitialBatch = true
-      lineBuffer = lines
-      flushBuffer()
-      return
+        if (!batchTimer) {
+            batchTimer = setTimeout(flushBuffer, batchTimeout)
+        }
     }
 
-    lineBuffer.push(...lines)
+    /**
+     * Adds multiple output lines to the console output
+     * Automatically removes the oldest lines if max output is exceeded
+     *
+     * @param {string[]} lines - The console output lines to add
+     * @returns {void}
+     */
+    const addLines = (lines: string[]): void => {
+        if (output.value.length === 0 && lines.length >= initialBatchSize) {
+            isProcessingInitialBatch = true
+            lineBuffer = lines
+            flushBuffer()
+            return
+        }
 
-    if (!batchTimer) {
-      batchTimer = setTimeout(flushBuffer, batchTimeout)
+        lineBuffer.push(...lines)
+
+        if (!batchTimer) {
+            batchTimer = setTimeout(flushBuffer, batchTimeout)
+        }
     }
-  }
 
-  /**
-   * Sets the search query and filters the output based on the query
-   *
-   * @param {string} query - The search query
-   */
-  const setSearchQuery = (query: string): void => {
-    searchQuery.value = query
-    searchRegex = null
-    updateFilter()
-  }
-
-  /**
-   * Clears all console output lines
-   */
-  const clear = (): void => {
-    output.value = []
-    filteredOutput.value = []
-    searchQuery.value = ''
-    lineBuffer = []
-    isProcessingInitialBatch = false
-    if (batchTimer) {
-      clearTimeout(batchTimer)
-      batchTimer = null
+    /**
+     * Sets the search query and filters the output based on the query
+     *
+     * @param {string} query - The search query
+     */
+    const setSearchQuery = (query: string): void => {
+        searchQuery.value = query
+        searchRegex = null
+        updateFilter()
     }
-    if (refilterTimer) {
-      clearTimeout(refilterTimer)
-      refilterTimer = null
+
+    /**
+     * Clears all console output lines
+     */
+    const clear = (): void => {
+        output.value = []
+        filteredOutput.value = []
+        searchQuery.value = ''
+        lineBuffer = []
+        isProcessingInitialBatch = false
+        if (batchTimer) {
+            clearTimeout(batchTimer)
+            batchTimer = null
+        }
+        if (refilterTimer) {
+            clearTimeout(refilterTimer)
+            refilterTimer = null
+        }
+        searchRegex = null
     }
-    searchRegex = null
-  }
 
-  /**
-   * Finds the index of a line in the main output
-   *
-   * @param {string} line - The line to find
-   * @returns {number} The index of the line, or -1 if not found
-   */
-  const findLineIndex = (line: string): number => {
-    return output.value.findIndex((l) => l === line)
-  }
+    /**
+     * Finds the index of a line in the main output
+     *
+     * @param {string} line - The line to find
+     * @returns {number} The index of the line, or -1 if not found
+     */
+    const findLineIndex = (line: string): number => {
+        return output.value.findIndex((l) => l === line)
+    }
 
-  return {
-    output,
-    searchQuery,
-    filteredOutput,
-    addLine,
-    addLines,
-    setSearchQuery,
-    clear,
-    findLineIndex,
-  }
+    return {
+        output,
+        searchQuery,
+        filteredOutput,
+        addLine,
+        addLines,
+        setSearchQuery,
+        clear,
+        findLineIndex,
+    }
 })
