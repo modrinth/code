@@ -55,10 +55,10 @@ pub fn jemalloc_memory_stats(
 ) -> Result<(), prometheus::Error> {
     let allocated_mem = IntGauge::new(
         "labrinth_memory_allocated",
-        "Labrinth allocated memory",
+        "labrinth allocated memory",
     )?;
     let resident_mem =
-        IntGauge::new("labrinth_resident_memory", "Labrinth resident memory")?;
+        IntGauge::new("labrinth_resident_memory", "labrinth resident memory")?;
 
     registry.register(Box::new(allocated_mem.clone()))?;
     registry.register(Box::new(resident_mem.clone()))?;

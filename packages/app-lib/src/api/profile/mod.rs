@@ -763,7 +763,7 @@ pub async fn try_update_playtime(path: &str) -> crate::Result<()> {
     let updated_recent_playtime = profile.recent_time_played;
 
     let res = if updated_recent_playtime > 0 {
-        // Create update struct to send to Labrinth
+        // Create update struct to send to labrinth
         let modrinth_pack_version_id =
             profile.linked_data.as_ref().map(|l| l.version_id.clone());
         let playtime_update_json = json!({

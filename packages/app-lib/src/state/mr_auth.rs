@@ -198,7 +198,7 @@ pub async fn finish_login_flow(
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<ModrinthCredentials> {
-    // The authorization code actually is the access token, since Labrinth doesn't
+    // The authorization code actually is the access token, since labrinth doesn't
     // issue separate authorization codes. Therefore, this is equivalent to an
     // implicit OAuth grant flow, and no additional exchanging or finalization is
     // needed. TODO not do this for the reasons outlined at
