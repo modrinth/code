@@ -1,6 +1,8 @@
+name: labrinth
 services:
   postgres_db:
     image: postgres:alpine
+    container_name: labrinth-postgres
     volumes:
       - db-data:/var/lib/postgresql/data
     ports:
@@ -16,6 +18,7 @@ services:
       retries: 3
   meilisearch:
     image: getmeili/meilisearch:v1.12.0
+    container_name: labrinth-meilisearch
     restart: on-failure
     ports:
       - '7700:7700'
@@ -31,6 +34,7 @@ services:
       retries: 3
   redis:
     image: redis:alpine
+    container_name: labrinth-redis
     restart: on-failure
     ports:
       - '6379:6379'
@@ -43,6 +47,7 @@ services:
       retries: 3
   clickhouse:
     image: clickhouse/clickhouse-server
+    container_name: labrinth-clickhouse
     ports:
       - '8123:8123'
     environment:
