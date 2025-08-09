@@ -1,5 +1,12 @@
 import { $fetch } from "ofetch";
-import type { ServerGeneral, Project, PowerAction, JWTAuth } from "@modrinth/utils";
+import type {
+  ServerGeneral,
+  Project,
+  PowerAction,
+  JWTAuth,
+  UserSubscription,
+  Charge,
+} from "@modrinth/utils";
 import { useServersFetch } from "../servers-fetch.ts";
 import { ServerModule } from "./base.ts";
 
@@ -33,6 +40,9 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
   node!: { token: string; instance: string };
   flows?: { intro?: boolean };
 
+  is_medal?: boolean;
+  medal_end_date?: string;
+
   async fetch(): Promise<void> {
     const data = await useServersFetch<ServerGeneral>(`servers/${this.serverId}`, {}, "general");
 
@@ -41,6 +51,31 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
         `https://api.modrinth.com/v2/project/${data.upstream.project_id}`,
       );
       data.project = project as Project;
+    }
+
+    if (data.is_medal) {
+      const subscriptionInformation = (await useBaseFetch("billing/subscriptions", {
+        internal: true,
+      })) as UserSubscription[];
+
+      const charges = (await useBaseFetch("billing/payments", {
+        internal: true,
+      })) as Charge[];
+
+      const medalSubscription = subscriptionInformation.find(
+        (sub) => sub.status === "provisioned" && sub.metadata?.type === "medal",
+      );
+
+      if (medalSubscription) {
+        const medalCharge = charges.find(
+          (charge) =>
+            charge.subscription_id === medalSubscription.id && charge.status === "expiring",
+        );
+
+        if (medalCharge) {
+          this.medal_end_date = medalCharge.due;
+        }
+      }
     }
 
     if (import.meta.client) {
@@ -94,7 +129,11 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
       }
       await useServersFetch(`servers/${this.serverId}/reinstall?hard=${hardResetParam}`, {
         method: "POST",
-        body: { loader: projectId, loader_version: loaderVersionId, game_version: versionId },
+        body: {
+          loader: projectId,
+          loader_version: loaderVersionId,
+          game_version: versionId,
+        },
       });
     } else {
       await useServersFetch(`servers/${this.serverId}/reinstall?hard=${hardResetParam}`, {
