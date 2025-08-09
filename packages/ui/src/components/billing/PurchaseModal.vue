@@ -490,9 +490,7 @@
                 >
                 <br />
                 You'll be charged
-                {{
-                    formatPrice(locale, price.prices.intervals[selectedPlan], price.currency_code)
-                }}
+                {{ formatPrice(locale, price.prices.intervals[selectedPlan], price.currency_code) }}
                 / {{ selectedPlan }} plus applicable taxes starting
                 {{ existingPlan ? dayjs(renewalDate).format('MMMM D, YYYY') : 'today' }}, until you
                 cancel.

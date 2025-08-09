@@ -240,9 +240,7 @@ const messages = defineMessages({
                                 />
                                 <Tooltip :disabled="!hasPlayersTooltip">
                                     <span :class="{ 'cursor-help': hasPlayersTooltip }">
-                                        {{
-                                            formatNumber(serverStatus.players?.online, false)
-                                        }}
+                                        {{ formatNumber(serverStatus.players?.online, false) }}
                                         online
                                     </span>
                                     <template #popper>

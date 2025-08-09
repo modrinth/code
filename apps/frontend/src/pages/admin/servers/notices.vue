@@ -163,9 +163,7 @@
                         </div>
                         <div class="text-sm">
                             <span v-if="notice.announce_at">
-                                {{
-                                    dayjs(notice.announce_at).format('MMM D, YYYY [at] h:mm A')
-                                }}
+                                {{ dayjs(notice.announce_at).format('MMM D, YYYY [at] h:mm A') }}
                                 ({{ formatRelativeTime(notice.announce_at) }})
                             </span>
                             <template v-else> Never begins </template>
@@ -248,16 +246,12 @@
                             </span>
                             <span v-else-if="!notice.assigned.some((n) => n.kind === 'node')">
                                 Assigned to
-                                {{
-                                    notice.assigned.filter((n) => n.kind === 'server').length
-                                }}
+                                {{ notice.assigned.filter((n) => n.kind === 'server').length }}
                                 servers
                             </span>
                             <span v-else>
                                 Assigned to
-                                {{
-                                    notice.assigned.filter((n) => n.kind === 'server').length
-                                }}
+                                {{ notice.assigned.filter((n) => n.kind === 'server').length }}
                                 servers and
                                 {{ notice.assigned.filter((n) => n.kind === 'node').length }} nodes
                             </span>
