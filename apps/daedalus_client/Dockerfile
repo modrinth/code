@@ -17,6 +17,11 @@ RUN --mount=type=cache,target=/usr/src/daedalus/target \
 
 FROM debian:bookworm-slim
 
+LABEL org.opencontainers.image.source=https://github.com/modrinth/code
+LABEL org.opencontainers.image.title=daedalus
+LABEL org.opencontainers.image.description="Modrinth game metadata query client"
+LABEL org.opencontainers.image.licenses=MIT
+
 RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates openssl \
   && rm -rf /var/lib/apt/lists/*
