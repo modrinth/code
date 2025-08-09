@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM rust:1.88.0 AS build
+FROM rust:1.89.0 AS build
 
 WORKDIR /usr/src/labrinth
 COPY . .

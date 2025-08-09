@@ -15,14 +15,12 @@ pub async fn get_user_status(
         return Some(friend_status);
     }
 
-    if let Ok(mut conn) = redis.pool.get().await {
-        if let Ok(mut statuses) =
+    if let Ok(mut conn) = redis.pool.get().await
+        && let Ok(mut statuses) =
             conn.sscan::<_, String>(get_field_name(user)).await
-        {
-            if let Some(status_json) = statuses.next_item().await {
-                return serde_json::from_str::<UserStatus>(&status_json).ok();
-            }
-        }
+        && let Some(status_json) = statuses.next_item().await
+    {
+        return serde_json::from_str::<UserStatus>(&status_json).ok();
     }
 
     None

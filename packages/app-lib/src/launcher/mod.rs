@@ -4,6 +4,9 @@ use crate::event::emit::{emit_loading, init_or_edit_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
 use crate::launcher::download::download_log_config;
 use crate::launcher::io::IOError;
+use crate::launcher::quick_play_version::{
+    QuickPlayServerVersion, QuickPlayVersion,
+};
 use crate::profile::QuickPlayType;
 use crate::state::{
     Credentials, JavaVersion, ProcessMetadata, ProfileInstallStage,
@@ -25,6 +28,7 @@ use tokio::process::Command;
 mod args;
 
 pub mod download;
+pub mod quick_play_version;
 
 // All nones -> disallowed
 // 1+ true -> allowed
@@ -337,10 +341,10 @@ pub async fn install_minecraft(
 
             // Forge processors (90-100)
             for (index, processor) in processors.iter().enumerate() {
-                if let Some(sides) = &processor.sides {
-                    if !sides.contains(&String::from("client")) {
-                        continue;
-                    }
+                if let Some(sides) = &processor.sides
+                    && !sides.contains(&String::from("client"))
+                {
+                    continue;
                 }
 
                 let cp = {
@@ -457,7 +461,7 @@ pub async fn launch_minecraft(
     credentials: &Credentials,
     post_exit_hook: Option<String>,
     profile: &Profile,
-    quick_play_type: &QuickPlayType,
+    mut quick_play_type: QuickPlayType,
 ) -> crate::Result<ProcessMetadata> {
     if profile.install_stage == ProfileInstallStage::PackInstalling
         || profile.install_stage == ProfileInstallStage::MinecraftInstalling
@@ -589,6 +593,18 @@ pub async fn launch_minecraft(
         io::create_dir_all(&natives_dir).await?;
     }
 
+    let quick_play_version =
+        QuickPlayVersion::find_version(version_index, &minecraft.versions);
+    tracing::debug!(
+        "Found QuickPlayVersion for {}: {quick_play_version:?}",
+        profile.game_version
+    );
+    if let QuickPlayType::Server(address) = &mut quick_play_type
+        && quick_play_version.server >= QuickPlayServerVersion::BuiltinLegacy
+    {
+        address.resolve().await?;
+    }
+
     let (main_class_keep_alive, main_class_path) =
         get_resource_file!(env "JAVA_JARS_DIR" / "theseus.jar")?;
 
@@ -606,11 +622,13 @@ pub async fn launch_minecraft(
                 &java_version.architecture,
                 minecraft_updated,
             )?,
+            &main_class_path,
             &version_jar,
             *memory,
             Vec::from(java_args),
             &java_version.architecture,
-            quick_play_type,
+            &quick_play_type,
+            quick_play_version,
             version_info
                 .logging
                 .as_ref()
@@ -646,7 +664,8 @@ pub async fn launch_minecraft(
                 &version.type_,
                 *resolution,
                 &java_version.architecture,
-                quick_play_type,
+                &quick_play_type,
+                quick_play_version,
             )
             .await?
             .into_iter(),

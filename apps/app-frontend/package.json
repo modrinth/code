@@ -9,7 +9,7 @@
     "tsc:check": "vue-tsc --noEmit",
     "lint": "eslint . && prettier --check .",
     "fix": "eslint . --fix && prettier --write .",
-    "intl:extract": "formatjs extract \"{,src/components,src/composables,src/helpers,src/pages,src/store}/**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" --ignore '**/*.d.ts' --ignore 'node_modules' --out-file src/locales/en-US/index.json --format crowdin --preserve-whitespace",
+    "intl:extract": "formatjs extract \"src/**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" --ignore \"**/*.d.ts\" --ignore node_modules --out-file src/locales/en-US/index.json --format crowdin --preserve-whitespace",
     "test": "vue-tsc --noEmit"
   },
   "dependencies": {

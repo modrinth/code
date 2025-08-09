@@ -221,14 +221,14 @@ async fn import_atlauncher_unmanaged(
             .unwrap_or_else(|| backup_name.to_string());
         prof.install_stage = ProfileInstallStage::PackInstalling;
 
-        if let Some(ref project_id) = description.project_id {
-            if let Some(ref version_id) = description.version_id {
-                prof.linked_data = Some(LinkedData {
-                    project_id: project_id.clone(),
-                    version_id: version_id.clone(),
-                    locked: true,
-                })
-            }
+        if let Some(ref project_id) = description.project_id
+            && let Some(ref version_id) = description.version_id
+        {
+            prof.linked_data = Some(LinkedData {
+                project_id: project_id.clone(),
+                version_id: version_id.clone(),
+                locked: true,
+            })
         }
 
         prof.icon_path = description

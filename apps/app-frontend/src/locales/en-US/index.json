@@ -383,11 +383,11 @@
   "instance.worlds.no_contact": {
     "message": "Server couldn't be contacted"
   },
-  "instance.worlds.no_quick_play": {
-    "message": "You can only jump straight into worlds on Minecraft 1.20+"
+  "instance.worlds.no_server_quick_play": {
+    "message": "You can only jump straight into servers on Minecraft Alpha 1.0.5+"
   },
-  "instance.worlds.play_anyway": {
-    "message": "Play anyway"
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "You can only jump straight into singleplayer worlds on Minecraft 1.20+"
   },
   "instance.worlds.play_instance": {
     "message": "Play instance"

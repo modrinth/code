@@ -393,10 +393,9 @@ impl Credentials {
                             ..
                         },
                     ) = *err.raw
+                        && (source.is_connect() || source.is_timeout())
                     {
-                        if source.is_connect() || source.is_timeout() {
-                            return Ok(Some(creds));
-                        }
+                        return Ok(Some(creds));
                     }
 
                     Err(err)
@@ -640,36 +639,31 @@ impl DeviceTokenPair {
             .fetch_optional(exec)
             .await?;
 
-        if let Some(x) = res {
-            if let Ok(uuid) = Uuid::parse_str(&x.uuid) {
-                if let Ok(private_key) =
-                    SigningKey::from_pkcs8_pem(&x.private_key)
-                {
-                    return Ok(Some(Self {
-                        token: DeviceToken {
-                            issue_instant: Utc
-                                .timestamp_opt(x.issue_instant, 0)
-                                .single()
-                                .unwrap_or_else(Utc::now),
-                            not_after: Utc
-                                .timestamp_opt(x.not_after, 0)
-                                .single()
-                                .unwrap_or_else(Utc::now),
-                            token: x.token,
-                            display_claims: serde_json::from_value(
-                                x.display_claims,
-                            )
-                            .unwrap_or_default(),
-                        },
-                        key: DeviceTokenKey {
-                            id: uuid,
-                            key: private_key,
-                            x: x.x,
-                            y: x.y,
-                        },
-                    }));
-                }
-            }
+        if let Some(x) = res
+            && let Ok(uuid) = Uuid::parse_str(&x.uuid)
+            && let Ok(private_key) = SigningKey::from_pkcs8_pem(&x.private_key)
+        {
+            return Ok(Some(Self {
+                token: DeviceToken {
+                    issue_instant: Utc
+                        .timestamp_opt(x.issue_instant, 0)
+                        .single()
+                        .unwrap_or_else(Utc::now),
+                    not_after: Utc
+                        .timestamp_opt(x.not_after, 0)
+                        .single()
+                        .unwrap_or_else(Utc::now),
+                    token: x.token,
+                    display_claims: serde_json::from_value(x.display_claims)
+                        .unwrap_or_default(),
+                },
+                key: DeviceTokenKey {
+                    id: uuid,
+                    key: private_key,
+                    x: x.x,
+                    y: x.y,
+                },
+            }));
         }
 
         Ok(None)
@@ -724,7 +718,7 @@ const MICROSOFT_CLIENT_ID: &str = "00000000402b5328";
 const AUTH_REPLY_URL: &str = "https://login.live.com/oauth20_desktop.srf";
 const REQUESTED_SCOPE: &str = "service::user.auth.xboxlive.com::MBI_SSL";
 
-struct RequestWithDate<T> {
+pub struct RequestWithDate<T> {
     pub date: DateTime<Utc>,
     pub value: T,
 }

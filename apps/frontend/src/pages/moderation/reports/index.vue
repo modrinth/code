@@ -72,7 +72,6 @@
 import { DropdownSelect, Button, Pagination } from "@modrinth/ui";
 import { XIcon, SearchIcon, SortAscIcon, SortDescIcon, FilterIcon } from "@modrinth/assets";
 import { defineMessages, useVIntl } from "@vintl/vintl";
-import { useLocalStorage } from "@vueuse/core";
 import type { Report } from "@modrinth/utils";
 import Fuse from "fuse.js";
 import type { ExtendedReport } from "@modrinth/moderation";
@@ -170,10 +169,10 @@ watch(
   },
 );
 
-const currentFilterType = useLocalStorage("moderation-reports-filter-type", () => "All");
+const currentFilterType = ref("All");
 const filterTypes: readonly string[] = readonly(["All", "Unread", "Read"]);
 
-const currentSortType = useLocalStorage("moderation-reports-sort-type", () => "Oldest");
+const currentSortType = ref("Oldest");
 const sortTypes: readonly string[] = readonly(["Oldest", "Newest"]);
 
 const currentPage = ref(1);
