@@ -64,6 +64,8 @@ services:
     ports:
       - '1025:1025'
       - '8025:8025'
+    environment:
+      MP_ENABLE_SPAMASSASSIN: postmark
     healthcheck:
       test: ['CMD', 'wget', '-q', '-O/dev/null', 'http://localhost:8025/api/v1/info']
       interval: 3s
