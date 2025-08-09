@@ -67,7 +67,7 @@ During development, you might notice that changes made directly to entities in t
 `SITE_URL`: The main URL to be used for CORS
 `CDN_URL`: The publicly accessible base URL for files uploaded to the CDN
 `MODERATION_DISCORD_WEBHOOK`: The URL for a Discord webhook where projects pending approval will be sent
-`CLOUDFLARE_INTEGRATION`: Whether Labrinth should integrate with Cloudflare's spam protection
+`CLOUDFLARE_INTEGRATION`: Whether labrinth should integrate with Cloudflare's spam protection
 `DATABASE_URL`: The URL for the PostgreSQL database, including its username, password, host, port, and database name
 `DATABASE_MIN_CONNECTIONS`: The minimum number of concurrent connections allowed to the database at the same time
 `DATABASE_MAX_CONNECTIONS`: The maximum number of concurrent connections allowed to the database at the same time
@@ -114,7 +114,7 @@ If you're prepared to contribute by submitting a pull request, ensure you have m
 - `cargo check` has been run.
 - `cargo sqlx prepare` has been run.
 
-> Note: If you encounter issues with `sqlx` saying 'no queries found' after running `cargo sqlx prepare`, you may need to ensure the installed version of `sqlx-cli` matches the current version of `sqlx` used [in Labrinth](https://github.com/modrinth/labrinth/blob/master/Cargo.toml).
+> Note: If you encounter issues with `sqlx` saying 'no queries found' after running `cargo sqlx prepare`, you may need to ensure the installed version of `sqlx-cli` matches the current version of `sqlx` used [in labrinth](https://github.com/modrinth/labrinth/blob/master/Cargo.toml).
 
 [Discord]: https://discord.modrinth.com
 [GitHub]: https://github.com/modrinth
