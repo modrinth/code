@@ -14,11 +14,5 @@ max_line_length = 100
 max_line_length = off
 trim_trailing_whitespace = false
 
-[*.json]
-indent_size = 2
-
-[*.yml]
-indent_size = 2
-
-[*.yaml]
+[*.{json,ts,vue,scss,css,html,js,yml,yaml}]
 indent_size = 2
