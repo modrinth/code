@@ -14,7 +14,7 @@ fn main() {
     let git_hash = String::from_utf8(output.stdout)
         .expect("valid UTF-8 output from `git` invocation");
 
-    println!("cargo::rerun-if-changed=.git/HEAD");
+    println!("cargo::rerun-if-changed=../../.git/HEAD");
     println!("cargo::rustc-env=GIT_HASH={}", git_hash.trim());
 
     let timedate_fmt = Local::now().format("%F @ %I:%M %p");
