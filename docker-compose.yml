@@ -58,6 +58,17 @@ services:
       interval: 3s
       timeout: 5s
       retries: 3
+  mail:
+    image: axllent/mailpit:v1.27
+    container_name: labrinth-mail
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+    healthcheck:
+      test: ['CMD', 'curl', '--fail', 'http://localhost:8025/api/v1/info']
+      interval: 3s
+      timeout: 5s
+      retries: 3
   labrinth:
     profiles:
       - with-labrinth
