@@ -5,7 +5,7 @@ description: Guide for contributing to Modrinth's backend
 
 This project is part of our [monorepo](https://github.com/modrinth/code). You can find it in the `apps/labrinth` directory. The instructions below assume that you have switched your working directory to the `apps/labrinth` subdirectory.
 
-[Labrinth] is the Rust-based backend serving Modrinth's API with the help of the [Actix](https://actix.rs) framework. To get started with a labrinth instance, install docker, docker-compose (which comes with Docker), and [Rust]. The initial startup can be done simply with the command `docker-compose up`, or with `docker compose up` (Compose V2 and later). That will deploy a PostgreSQL database on port 5432 and a MeiliSearch instance on port 7700. To run the API itself, you'll need to use the `cargo run` command, this will deploy the API on port 8000.
+[labrinth] is the Rust-based backend serving Modrinth's API with the help of the [Actix](https://actix.rs) framework. To get started with a labrinth instance, install docker, docker-compose (which comes with Docker), and [Rust]. The initial startup can be done simply with the command `docker-compose up`, or with `docker compose up` (Compose V2 and later). That will deploy a PostgreSQL database on port 5432 and a MeiliSearch instance on port 7700. To run the API itself, you'll need to use the `cargo run` command, this will deploy the API on port 8000.
 
 To get a basic configuration, copy the `.env.local` file to `.env`. Now, you'll have to install the sqlx CLI, which can be done with cargo:
 
@@ -19,7 +19,7 @@ From there, you can create the database and set up its schema with one simple co
 cargo sqlx database setup
 ```
 
-To enable Labrinth to create projects and serve useful metadata to the frontend build scripts, you'll need to seed the database with several key entities:
+To enable labrinth to create projects and serve useful metadata to the frontend build scripts, you'll need to seed the database with several key entities:
 
 1. Categories, in the `categories` table.
 2. Loaders and their fields, in the `loaders`, `loader_fields`, `loader_field_enums`, `loader_field_enum_values`, and `loader_fields_loaders` tables.
@@ -37,7 +37,7 @@ You can find more example SQL statements for seeding the database in the `tests/
 
 The majority of configuration is done at runtime using [dotenvy](https://crates.io/crates/dotenvy) and the `.env` file. Each of the variables and what they do can be found in the dropdown below. Additionally, there are three command line options that can be used to specify to MeiliSearch what you want to do.
 
-During development, you might notice that changes made directly to entities in the PostgreSQL database do not seem to take effect. This is often because the Redis cache still holds outdated data. To ensure your updates are reflected, clear the cache by e.g. running `redis-cli FLUSHALL`, which will force Labrinth to fetch the latest data from the database the next time it is needed.
+During development, you might notice that changes made directly to entities in the PostgreSQL database do not seem to take effect. This is often because the Redis cache still holds outdated data. To ensure your updates are reflected, clear the cache by e.g. running `redis-cli FLUSHALL`, which will force labrinth to fetch the latest data from the database the next time it is needed.
 
 <details>
 <summary>.env variables & command line options</summary>
@@ -99,5 +99,5 @@ If you're prepared to contribute by submitting a pull request, ensure you have m
 
 [Discord]: https://discord.modrinth.com
 [GitHub]: https://github.com/modrinth
-[Labrinth]: https://github.com/modrinth/code/tree/main/apps/labrinth
+[labrinth]: https://github.com/modrinth/code/tree/main/apps/labrinth
 [Rust]: https://www.rust-lang.org/tools/install
