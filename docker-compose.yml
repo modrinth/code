@@ -54,7 +54,7 @@ services:
       CLICKHOUSE_USER: default
       CLICKHOUSE_PASSWORD: default
     healthcheck:
-      test: ['CMD', 'clickhouse-client', '--query', 'SELECT 1']
+      test: ['CMD-SHELL', 'clickhouse-client --query "SELECT 1"']
       interval: 3s
       timeout: 5s
       retries: 3
