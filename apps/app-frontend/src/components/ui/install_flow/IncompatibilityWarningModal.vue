@@ -77,10 +77,10 @@ const installing = ref(false)
 const onInstall = ref(() => {})
 
 defineExpose({
-  show: (instanceVal, projectVal, projectVersions, callback) => {
+  show: (instanceVal, projectVal, projectVersions, selected, callback) => {
     instance.value = instanceVal
     versions.value = projectVersions
-    selectedVersion.value = projectVersions[0]
+    selectedVersion.value = selected ?? projectVersions[0]
 
     project.value = projectVal
 

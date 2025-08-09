@@ -353,10 +353,10 @@ impl RedisPool {
             };
 
             for (idx, key) in fetch_ids.into_iter().enumerate() {
-                if let Some(locked) = results.get(idx) {
-                    if locked.is_none() {
-                        continue;
-                    }
+                if let Some(locked) = results.get(idx)
+                    && locked.is_none()
+                {
+                    continue;
                 }
 
                 if let Some((key, raw_key)) = ids.remove(&key) {

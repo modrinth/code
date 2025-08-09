@@ -11,7 +11,7 @@ use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models;
-use crate::models::ids::ProjectId;
+use crate::models::ids::{ProjectId, VersionId};
 use crate::models::images::ImageContext;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
@@ -182,10 +182,10 @@ pub async fn project_get(
     .map(|x| x.1)
     .ok();
 
-    if let Some(data) = project_data {
-        if is_visible_project(&data.inner, &user_option, &pool, false).await? {
-            return Ok(HttpResponse::Ok().json(Project::from(data)));
-        }
+    if let Some(data) = project_data
+        && is_visible_project(&data.inner, &user_option, &pool, false).await?
+    {
+        return Ok(HttpResponse::Ok().json(Project::from(data)));
     }
     Err(ApiError::NotFound)
 }
@@ -250,6 +250,8 @@ pub struct EditProject {
     pub monetization_status: Option<MonetizationStatus>,
     pub side_types_migration_review_status:
         Option<SideTypesMigrationReviewStatus>,
+    #[serde(flatten)]
+    pub loader_fields: HashMap<String, serde_json::Value>,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -403,34 +405,36 @@ pub async fn project_edit(
             .await?;
         }
 
-        if status.is_searchable() && !project_item.inner.webhook_sent {
-            if let Ok(webhook_url) = dotenvy::var("PUBLIC_DISCORD_WEBHOOK") {
-                crate::util::webhook::send_discord_webhook(
-                    project_item.inner.id.into(),
-                    &pool,
-                    &redis,
-                    webhook_url,
-                    None,
-                )
-                .await
-                .ok();
+        if status.is_searchable()
+            && !project_item.inner.webhook_sent
+            && let Ok(webhook_url) = dotenvy::var("PUBLIC_DISCORD_WEBHOOK")
+        {
+            crate::util::webhook::send_discord_webhook(
+                project_item.inner.id.into(),
+                &pool,
+                &redis,
+                webhook_url,
+                None,
+            )
+            .await
+            .ok();
 
-                sqlx::query!(
-                    "
+            sqlx::query!(
+                "
                     UPDATE mods
                     SET webhook_sent = TRUE
                     WHERE id = $1
                     ",
-                    id as db_ids::DBProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
+                id as db_ids::DBProjectId,
+            )
+            .execute(&mut *transaction)
+            .await?;
         }
 
-        if user.role.is_mod() {
-            if let Ok(webhook_url) = dotenvy::var("MODERATION_SLACK_WEBHOOK") {
-                crate::util::webhook::send_slack_webhook(
+        if user.role.is_mod()
+            && let Ok(webhook_url) = dotenvy::var("MODERATION_SLACK_WEBHOOK")
+        {
+            crate::util::webhook::send_slack_webhook(
                     project_item.inner.id.into(),
                     &pool,
                     &redis,
@@ -449,7 +453,6 @@ pub async fn project_edit(
                 )
                 .await
                 .ok();
-            }
         }
 
         if team_member.is_none_or(|x| !x.accepted) {
@@ -692,45 +695,45 @@ pub async fn project_edit(
         .await?;
     }
 
-    if let Some(links) = &new_project.link_urls {
-        if !links.is_empty() {
-            if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-                return Err(ApiError::CustomAuthentication(
+    if let Some(links) = &new_project.link_urls
+        && !links.is_empty()
+    {
+        if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
+            return Err(ApiError::CustomAuthentication(
                     "You do not have the permissions to edit the links of this project!"
                         .to_string(),
                 ));
-            }
+        }
 
-            let ids_to_delete = links.keys().cloned().collect::<Vec<String>>();
-            // Deletes all links from hashmap- either will be deleted or be replaced
-            sqlx::query!(
-                "
+        let ids_to_delete = links.keys().cloned().collect::<Vec<String>>();
+        // Deletes all links from hashmap- either will be deleted or be replaced
+        sqlx::query!(
+            "
                 DELETE FROM mods_links
                 WHERE joining_mod_id = $1 AND joining_platform_id IN (
                     SELECT id FROM link_platforms WHERE name = ANY($2)
                 )
                 ",
-                id as db_ids::DBProjectId,
-                &ids_to_delete
-            )
-            .execute(&mut *transaction)
-            .await?;
+            id as db_ids::DBProjectId,
+            &ids_to_delete
+        )
+        .execute(&mut *transaction)
+        .await?;
 
-            for (platform, url) in links {
-                if let Some(url) = url {
-                    let platform_id =
-                        db_models::categories::LinkPlatform::get_id(
-                            platform,
-                            &mut *transaction,
-                        )
-                        .await?
-                        .ok_or_else(|| {
-                            ApiError::InvalidInput(format!(
-                                "Platform {} does not exist.",
-                                platform.clone()
-                            ))
-                        })?;
-                    sqlx::query!(
+        for (platform, url) in links {
+            if let Some(url) = url {
+                let platform_id = db_models::categories::LinkPlatform::get_id(
+                    platform,
+                    &mut *transaction,
+                )
+                .await?
+                .ok_or_else(|| {
+                    ApiError::InvalidInput(format!(
+                        "Platform {} does not exist.",
+                        platform.clone()
+                    ))
+                })?;
+                sqlx::query!(
                         "
                         INSERT INTO mods_links (joining_mod_id, joining_platform_id, url)
                         VALUES ($1, $2, $3)
@@ -741,7 +744,6 @@ pub async fn project_edit(
                     )
                     .execute(&mut *transaction)
                     .await?;
-                }
             }
         }
     }
@@ -868,6 +870,29 @@ pub async fn project_edit(
         )
         .execute(&mut *transaction)
         .await?;
+    }
+
+    if !new_project.loader_fields.is_empty() {
+        for version in db_models::DBVersion::get_many(
+            &project_item.versions,
+            &**pool,
+            &redis,
+        )
+        .await?
+        {
+            super::versions::version_edit_helper(
+                req.clone(),
+                (VersionId::from(version.inner.id),),
+                pool.clone(),
+                redis.clone(),
+                super::versions::EditVersion {
+                    fields: new_project.loader_fields.clone(),
+                    ..Default::default()
+                },
+                session_queue.clone(),
+            )
+            .await?;
+        }
     }
 
     // check new description and body for links to associated images
@@ -2430,7 +2455,7 @@ pub async fn project_get_organization(
             organization,
             team_members,
         );
-        return Ok(HttpResponse::Ok().json(organization));
+        Ok(HttpResponse::Ok().json(organization))
     } else {
         Err(ApiError::NotFound)
     }

@@ -138,12 +138,11 @@ fn process_image(
     let (orig_width, orig_height) = img.dimensions();
     let aspect_ratio = orig_width as f32 / orig_height as f32;
 
-    if let Some(target_width) = target_width {
-        if img.width() > target_width {
-            let new_height =
-                (target_width as f32 / aspect_ratio).round() as u32;
-            img = img.resize(target_width, new_height, FilterType::Lanczos3);
-        }
+    if let Some(target_width) = target_width
+        && img.width() > target_width
+    {
+        let new_height = (target_width as f32 / aspect_ratio).round() as u32;
+        img = img.resize(target_width, new_height, FilterType::Lanczos3);
     }
 
     if let Some(min_aspect_ratio) = min_aspect_ratio {

@@ -29,8 +29,8 @@ export const useInstall = defineStore('installStore', {
     setIncompatibilityWarningModal(ref) {
       this.incompatibilityWarningModal = ref
     },
-    showIncompatibilityWarningModal(instance, project, versions, onInstall) {
-      this.incompatibilityWarningModal.show(instance, project, versions, onInstall)
+    showIncompatibilityWarningModal(instance, project, versions, selected, onInstall) {
+      this.incompatibilityWarningModal.show(instance, project, versions, selected, onInstall)
     },
     setModInstallModal(ref) {
       this.modInstallModal = ref
@@ -134,7 +134,13 @@ export const install = async (
         callback(version.id)
       } else {
         const install = useInstall()
-        install.showIncompatibilityWarningModal(instance, project, projectVersions, callback)
+        install.showIncompatibilityWarningModal(
+          instance,
+          project,
+          projectVersions,
+          version,
+          callback,
+        )
       }
     } else {
       const versions = (await get_version_many(project.versions).catch(handleError)).sort(

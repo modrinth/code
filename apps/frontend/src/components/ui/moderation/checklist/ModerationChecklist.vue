@@ -50,12 +50,34 @@
         </div>
         <div v-else-if="generatedMessage">
           <div>
+            <ButtonStyled>
+              <button class="mb-2" @click="useSimpleEditor = !useSimpleEditor">
+                <template v-if="!useSimpleEditor">
+                  <ToggleLeftIcon aria-hidden="true" />
+                  Use simple mode
+                </template>
+                <template v-else>
+                  <ToggleRightIcon aria-hidden="true" />
+                  Use advanced mode
+                </template>
+              </button>
+            </ButtonStyled>
             <MarkdownEditor
+              v-if="!useSimpleEditor"
               v-model="message"
               :max-height="400"
               placeholder="No message generated."
               :disabled="false"
               :heading-buttons="false"
+            />
+            <textarea
+              v-else
+              v-model="message"
+              type="text"
+              class="bg-bg-input h-[400px] w-full rounded-lg border border-solid border-divider px-3 py-2 font-mono text-base"
+              placeholder="No message generated."
+              autocomplete="off"
+              @input="persistState"
             />
           </div>
         </div>
@@ -324,6 +346,8 @@ import {
   RightArrowIcon,
   ScaleIcon,
   XIcon,
+  ToggleLeftIcon,
+  ToggleRightIcon,
 } from "@modrinth/assets";
 import {
   type Action,
@@ -368,6 +392,18 @@ import {
 } from "@modrinth/utils";
 import { computedAsync, useLocalStorage } from "@vueuse/core";
 import * as prettier from "prettier";
+import {
+  type Action,
+  type MultiSelectChipsAction,
+  type DropdownAction,
+  type ButtonAction,
+  type ToggleAction,
+  type ConditionalButtonAction,
+  type Stage,
+  finalPermissionMessages,
+} from "@modrinth/moderation";
+import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
+import KeybindsModal from "./ChecklistKeybindsModal.vue";
 import { useModerationStore } from "~/store/moderation.ts";
 import KeybindsModal from "./ChecklistKeybindsModal.vue";
 import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
@@ -393,6 +429,7 @@ const isModpackPermissionsStage = computed(() => {
   return currentStageObj.value.id === "modpack-permissions";
 });
 
+const useSimpleEditor = ref(false);
 const message = ref("");
 const generatedMessage = ref(false);
 const loadingMessage = ref(false);
@@ -1119,19 +1156,7 @@ async function generateMessage() {
       }
     }
 
-    try {
-      const formattedMessage = await prettier.format(fullMessage, {
-        parser: "markdown",
-        printWidth: 80,
-        proseWrap: "always",
-        tabWidth: 2,
-        useTabs: false,
-      });
-      message.value = formattedMessage;
-    } catch (formattingError) {
-      console.warn("Failed to format markdown, using original:", formattingError);
-      message.value = fullMessage;
-    }
+    message.value = fullMessage;
 
     generatedMessage.value = true;
   } catch (error) {

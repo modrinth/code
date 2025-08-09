@@ -59,16 +59,13 @@ pub async fn login<R: Runtime>(
             .url()?
             .as_str()
             .starts_with("https://login.live.com/oauth20_desktop.srf")
-        {
-            if let Some((_, code)) =
+            && let Some((_, code)) =
                 window.url()?.query_pairs().find(|x| x.0 == "code")
-            {
-                window.close()?;
-                let val =
-                    minecraft_auth::finish_login(&code.clone(), flow).await?;
+        {
+            window.close()?;
+            let val = minecraft_auth::finish_login(&code.clone(), flow).await?;
 
-                return Ok(Some(val));
-            }
+            return Ok(Some(val));
         }
 
         tokio::time::sleep(std::time::Duration::from_millis(50)).await;

@@ -32,15 +32,15 @@ pub fn get_class_paths(
     let mut cps = libraries
         .iter()
         .filter_map(|library| {
-            if let Some(rules) = &library.rules {
-                if !parse_rules(
+            if let Some(rules) = &library.rules
+                && !parse_rules(
                     rules,
                     java_arch,
                     &QuickPlayType::None,
                     minecraft_updated,
-                ) {
-                    return None;
-                }
+                )
+            {
+                return None;
             }
 
             if !library.include_in_classpath {
@@ -504,10 +504,10 @@ pub async fn get_processor_main_class(
             let mut line = line.map_err(IOError::from)?;
             line.retain(|c| !c.is_whitespace());
 
-            if line.starts_with("Main-Class:") {
-                if let Some(class) = line.split(':').nth(1) {
-                    return Ok(Some(class.to_string()));
-                }
+            if line.starts_with("Main-Class:")
+                && let Some(class) = line.split(':').nth(1)
+            {
+                return Ok(Some(class.to_string()));
             }
         }
 

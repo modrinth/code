@@ -290,12 +290,11 @@ pub async fn download_libraries(
     loading_try_for_each_concurrent(
         stream::iter(libraries.iter())
             .map(Ok::<&Library, crate::Error>), None, loading_bar,loading_amount,num_files, None,|library| async move {
-                if let Some(rules) = &library.rules {
-                    if !parse_rules(rules, java_arch, &QuickPlayType::None, minecraft_updated) {
+                if let Some(rules) = &library.rules
+                    && !parse_rules(rules, java_arch, &QuickPlayType::None, minecraft_updated) {
                         tracing::trace!("Skipped library {}", &library.name);
                         return Ok(());
                     }
-                }
 
                 if !library.downloadable {
                     tracing::trace!("Skipped non-downloadable library {}", &library.name);
@@ -311,15 +310,14 @@ pub async fn download_libraries(
                             return Ok(());
                         }
 
-                        if let Some(d::minecraft::LibraryDownloads { artifact: Some(ref artifact), ..}) = library.downloads {
-                            if !artifact.url.is_empty(){
+                        if let Some(d::minecraft::LibraryDownloads { artifact: Some(ref artifact), ..}) = library.downloads
+                            && !artifact.url.is_empty(){
                                 let bytes = fetch(&artifact.url, Some(&artifact.sha1), &st.fetch_semaphore, &st.pool)
                                     .await?;
                                 write(&path, &bytes, &st.io_semaphore).await?;
                                 tracing::trace!("Fetched library {} to path {:?}", &library.name, &path);
                                 return Ok::<_, crate::Error>(());
                             }
-                        }
 
                         let url = [
                             library

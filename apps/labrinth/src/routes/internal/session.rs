@@ -185,21 +185,21 @@ pub async fn delete(
 
     let session = DBSession::get(info.into_inner().0, &**pool, &redis).await?;
 
-    if let Some(session) = session {
-        if session.user_id == current_user.id.into() {
-            let mut transaction = pool.begin().await?;
-            DBSession::remove(session.id, &mut transaction).await?;
-            transaction.commit().await?;
-            DBSession::clear_cache(
-                vec![(
-                    Some(session.id),
-                    Some(session.session),
-                    Some(session.user_id),
-                )],
-                &redis,
-            )
-            .await?;
-        }
+    if let Some(session) = session
+        && session.user_id == current_user.id.into()
+    {
+        let mut transaction = pool.begin().await?;
+        DBSession::remove(session.id, &mut transaction).await?;
+        transaction.commit().await?;
+        DBSession::clear_cache(
+            vec![(
+                Some(session.id),
+                Some(session.session),
+                Some(session.user_id),
+            )],
+            &redis,
+        )
+        .await?;
     }
 
     Ok(HttpResponse::NoContent().body(""))

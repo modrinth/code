@@ -9,7 +9,7 @@ use ariadne::networking::message::{
     ClientToServerMessage, ServerToClientMessage,
 };
 use ariadne::users::UserStatus;
-use async_tungstenite::WebSocketStream;
+use async_tungstenite::WebSocketSender;
 use async_tungstenite::tokio::{ConnectStream, connect_async};
 use async_tungstenite::tungstenite::Message;
 use async_tungstenite::tungstenite::client::IntoClientRequest;
@@ -17,7 +17,6 @@ use bytes::Bytes;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use either::Either;
-use futures::stream::SplitSink;
 use futures::{SinkExt, StreamExt};
 use reqwest::Method;
 use reqwest::header::HeaderValue;
@@ -32,7 +31,7 @@ use tokio::sync::{Mutex, RwLock};
 use uuid::Uuid;
 
 pub(super) type WriteSocket =
-    Arc<RwLock<Option<SplitSink<WebSocketStream<ConnectStream>, Message>>>>;
+    Arc<RwLock<Option<WebSocketSender<ConnectStream>>>>;
 pub(super) type TunnelSockets = Arc<DashMap<Uuid, Arc<InternalTunnelSocket>>>;
 
 pub struct FriendsSocket {
@@ -180,27 +179,24 @@ impl FriendsSocket {
                                             ServerToClientMessage::FriendSocketStoppedListening { .. } => {}, // TODO
 
                                             ServerToClientMessage::SocketConnected { to_socket, new_socket } => {
-                                                if let Some(connected_to) = sockets.get(&to_socket) {
-                                                    if let InternalTunnelSocket::Listening(local_addr) = *connected_to.value().clone() {
-                                                        if let Ok(new_stream) = TcpStream::connect(local_addr).await {
+                                                if let Some(connected_to) = sockets.get(&to_socket)
+                                                    && let InternalTunnelSocket::Listening(local_addr) = *connected_to.value().clone()
+                                                        && let Ok(new_stream) = TcpStream::connect(local_addr).await {
                                                             let (read, write) = new_stream.into_split();
                                                             sockets.insert(new_socket, Arc::new(InternalTunnelSocket::Connected(Mutex::new(write))));
                                                             Self::socket_read_loop(write_handle.clone(), read, new_socket);
                                                             continue;
                                                         }
-                                                    }
-                                                }
                                                 let _ = Self::send_message(&write_handle, ClientToServerMessage::SocketClose { socket: new_socket }).await;
                                             },
                                             ServerToClientMessage::SocketClosed { socket } => {
                                                 sockets.remove_if(&socket, |_, x| matches!(*x.clone(), InternalTunnelSocket::Connected(_)));
                                             },
                                             ServerToClientMessage::SocketData { socket, data } => {
-                                                if let Some(mut socket) = sockets.get_mut(&socket) {
-                                                    if let InternalTunnelSocket::Connected(ref stream) = *socket.value_mut().clone() {
+                                                if let Some(mut socket) = sockets.get_mut(&socket)
+                                                    && let InternalTunnelSocket::Connected(ref stream) = *socket.value_mut().clone() {
                                                         let _ = stream.lock().await.write_all(&data).await;
                                                     }
-                                                }
                                             },
                                         }
                                     }
