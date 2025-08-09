@@ -383,18 +383,18 @@ pub async fn set_profile_information(
             .unwrap_or_else(|| backup_name.to_string());
         prof.install_stage = ProfileInstallStage::PackInstalling;
 
-        if let Some(ref project_id) = description.project_id {
-            if let Some(ref version_id) = description.version_id {
-                prof.linked_data = Some(LinkedData {
-                    project_id: project_id.clone(),
-                    version_id: version_id.clone(),
-                    locked: if !ignore_lock {
-                        true
-                    } else {
-                        prof.linked_data.as_ref().is_none_or(|x| x.locked)
-                    },
-                })
-            }
+        if let Some(ref project_id) = description.project_id
+            && let Some(ref version_id) = description.version_id
+        {
+            prof.linked_data = Some(LinkedData {
+                project_id: project_id.clone(),
+                version_id: version_id.clone(),
+                locked: if !ignore_lock {
+                    true
+                } else {
+                    prof.linked_data.as_ref().is_none_or(|x| x.locked)
+                },
+            })
         }
 
         prof.icon_path = description

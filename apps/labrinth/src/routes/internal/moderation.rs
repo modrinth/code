@@ -189,17 +189,16 @@ pub async fn get_project_meta(
                 .iter()
                 .find(|x| Some(x.1.id as i32) == row.flame_project_id)
                 .map(|x| x.0.clone())
+                && let Some(val) = merged.flame_files.remove(&sha1)
             {
-                if let Some(val) = merged.flame_files.remove(&sha1) {
-                    merged.identified.insert(
-                        sha1,
-                        IdentifiedFile {
-                            file_name: val.file_name.clone(),
-                            status: ApprovalType::from_string(&row.status)
-                                .unwrap_or(ApprovalType::Unidentified),
-                        },
-                    );
-                }
+                merged.identified.insert(
+                    sha1,
+                    IdentifiedFile {
+                        file_name: val.file_name.clone(),
+                        status: ApprovalType::from_string(&row.status)
+                            .unwrap_or(ApprovalType::Unidentified),
+                    },
+                );
             }
         }
 

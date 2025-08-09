@@ -100,7 +100,6 @@ import {
   ScaleIcon,
 } from "@modrinth/assets";
 import { defineMessages, useVIntl } from "@vintl/vintl";
-import { useLocalStorage } from "@vueuse/core";
 import ConfettiExplosion from "vue-confetti-explosion";
 import Fuse from "fuse.js";
 import ModerationQueueCard from "~/components/ui/moderation/ModerationQueueCard.vue";
@@ -215,7 +214,7 @@ watch(
   },
 );
 
-const currentFilterType = useLocalStorage("moderation-current-filter-type", () => "All projects");
+const currentFilterType = ref("All projects");
 const filterTypes: readonly string[] = readonly([
   "All projects",
   "Modpacks",
@@ -226,7 +225,7 @@ const filterTypes: readonly string[] = readonly([
   "Shaders",
 ]);
 
-const currentSortType = useLocalStorage("moderation-current-sort-type", () => "Oldest");
+const currentSortType = ref("Oldest");
 const sortTypes: readonly string[] = readonly(["Oldest", "Newest"]);
 
 const currentPage = ref(1);
@@ -287,8 +286,10 @@ const typeFiltered = computed(() => {
   const projectType = filterMap[currentFilterType.value];
   if (!projectType) return baseFiltered.value;
 
-  return baseFiltered.value.filter((queueItem) =>
-    queueItem.project.project_types.includes(projectType),
+  return baseFiltered.value.filter(
+    (queueItem) =>
+      queueItem.project.project_types.length > 0 &&
+      queueItem.project.project_types[0] === projectType,
   );
 });
 

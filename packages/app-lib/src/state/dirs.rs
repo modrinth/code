@@ -385,10 +385,10 @@ impl DirectoryInfo {
                         return Err(e);
                     }
                 } else {
-                    if let Some(disk_usage) = get_disk_usage(&move_dir)? {
-                        if total_size > disk_usage {
-                            return Err(crate::ErrorKind::DirectoryMoveError(format!("Not enough space to move directory to {}: only {} bytes available", app_dir.display(), disk_usage)).into());
-                        }
+                    if let Some(disk_usage) = get_disk_usage(&move_dir)?
+                        && total_size > disk_usage
+                    {
+                        return Err(crate::ErrorKind::DirectoryMoveError(format!("Not enough space to move directory to {}: only {} bytes available", app_dir.display(), disk_usage)).into());
                     }
 
                     let loader_bar_id = Arc::new(&loader_bar_id);

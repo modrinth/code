@@ -257,31 +257,30 @@ impl PayoutsQueue {
             )
         })?;
 
-        if !status.is_success() {
-            if let Some(obj) = value.as_object() {
-                if let Some(array) = obj.get("errors") {
-                    #[derive(Deserialize)]
-                    struct TremendousError {
-                        message: String,
-                    }
-
-                    let err = serde_json::from_value::<TremendousError>(
-                        array.clone(),
-                    )
-                    .map_err(|_| {
-                        ApiError::Payments(
-                            "could not retrieve Tremendous error json body"
-                                .to_string(),
-                        )
-                    })?;
-
-                    return Err(ApiError::Payments(err.message));
+        if !status.is_success()
+            && let Some(obj) = value.as_object()
+        {
+            if let Some(array) = obj.get("errors") {
+                #[derive(Deserialize)]
+                struct TremendousError {
+                    message: String,
                 }
 
-                return Err(ApiError::Payments(
-                    "could not retrieve Tremendous error body".to_string(),
-                ));
+                let err =
+                    serde_json::from_value::<TremendousError>(array.clone())
+                        .map_err(|_| {
+                            ApiError::Payments(
+                                "could not retrieve Tremendous error json body"
+                                    .to_string(),
+                            )
+                        })?;
+
+                return Err(ApiError::Payments(err.message));
             }
+
+            return Err(ApiError::Payments(
+                "could not retrieve Tremendous error body".to_string(),
+            ));
         }
 
         Ok(serde_json::from_value(value)?)
@@ -449,10 +448,10 @@ impl PayoutsQueue {
                 };
 
                 // we do not support interval gift cards with non US based currencies since we cannot do currency conversions properly
-                if let PayoutInterval::Fixed { .. } = method.interval {
-                    if !product.currency_codes.contains(&"USD".to_string()) {
-                        continue;
-                    }
+                if let PayoutInterval::Fixed { .. } = method.interval
+                    && !product.currency_codes.contains(&"USD".to_string())
+                {
+                    continue;
                 }
 
                 methods.push(method);
