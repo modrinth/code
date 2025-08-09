@@ -25,6 +25,7 @@ import type Stripe from 'stripe'
 
 import { commonMessages } from '../../utils'
 import RegionSelector from './ServersPurchase1Region.vue'
+import PlanSelector from './ServersPurchase0Plan.vue'
 import PaymentMethodSelector from './ServersPurchase2PaymentMethod.vue'
 import ConfirmPurchase from './ServersPurchase3Review.vue'
 import { useStripe } from '../../composables/stripe'
@@ -46,6 +47,7 @@ const props = defineProps<{
   pings: RegionPing[]
   regions: ServerRegion[]
   availableProducts: ServerPlan[]
+  planStage?: boolean
   refreshPaymentMethods: () => Promise<void>
   fetchStock: (region: ServerRegion, request: ServerStockRequest) => Promise<number>
   initiatePayment: (
@@ -95,11 +97,14 @@ const customServer = ref<boolean>(false)
 const acceptedEula = ref<boolean>(false)
 const skipPaymentMethods = ref<boolean>(true)
 
-type Step = 'region' | 'payment' | 'review'
+type Step = 'plan' | 'region' | 'payment' | 'review'
 
-const steps: Step[] = ['region', 'payment', 'review']
+const steps: Step[] = props.planStage
+  ? (['plan', 'region', 'payment', 'review'] as Step[])
+  : (['region', 'payment', 'review'] as Step[])
 
 const titles: Record<Step, MessageDescriptor> = {
+  plan: defineMessage({ id: 'servers.purchase.step.plan.title', defaultMessage: 'Plan' }),
   region: defineMessage({ id: 'servers.purchase.step.region.title', defaultMessage: 'Region' }),
   payment: defineMessage({
     id: 'servers.purchase.step.payment.title',
@@ -132,6 +137,8 @@ const nextStep = computed(() =>
 
 const canProceed = computed(() => {
   switch (currentStep.value) {
+    case 'plan':
+      return !!selectedPlan.value
     case 'region':
       return selectedRegion.value && selectedPlan.value && selectedInterval.value
     case 'payment':
@@ -145,6 +152,8 @@ const canProceed = computed(() => {
 
 async function beforeProceed(step: string) {
   switch (step) {
+    case 'plan':
+      return true
     case 'region':
       return true
     case 'payment':
@@ -200,7 +209,8 @@ async function setStep(step: Step | undefined, skipValidation = false) {
 }
 
 watch(selectedPlan, () => {
-  console.log(selectedPlan.value)
+  // Keep custom flag in sync: if a plan is selected, it's not custom
+  customServer.value = !selectedPlan.value
 })
 
 function begin(interval: ServerBillingInterval, plan?: ServerPlan, project?: string) {
@@ -218,6 +228,12 @@ function begin(interval: ServerBillingInterval, plan?: ServerPlan, project?: str
 defineExpose({
   show: begin,
 })
+
+function handleChooseCustom() {
+  customServer.value = true
+  selectedPlan.value = undefined
+  setStep('region', true)
+}
 </script>
 <template>
   <NewModal ref="modal">
@@ -248,8 +264,16 @@ defineExpose({
       </div>
     </template>
     <div class="w-[40rem] max-w-full">
+      <PlanSelector
+        v-if="currentStep === 'plan'"
+        v-model:plan="selectedPlan"
+        :available-products="availableProducts"
+        :currency="currency"
+        v-model:interval="selectedInterval"
+        @choose-custom="handleChooseCustom"
+      />
       <RegionSelector
-        v-if="currentStep === 'region'"
+        v-else-if="currentStep === 'region'"
         v-model:region="selectedRegion"
         v-model:plan="selectedPlan"
         :regions="regions"

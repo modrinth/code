@@ -141,6 +141,7 @@ import MedalPromoBackground from "~/assets/images/illustrations/medal_promo_back
 dayjs.extend(dayjsDuration);
 
 const props = defineProps<Partial<Server>>();
+const emit = defineEmits<{ (e: "upgrade"): void }>();
 
 const showGameLabel = computed(() => !!props.game);
 const showLoaderLabel = computed(() => !!props.loader);
@@ -167,8 +168,7 @@ const timeLeftCountdown = ref({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
 function handleUpgrade(event: Event) {
   event.stopPropagation();
-
-  // TODO: Upgrade logic.
+  emit("upgrade");
 }
 
 function updateCountdown() {

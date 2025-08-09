@@ -3,6 +3,28 @@
     data-pyro-server-list-root
     class="experimental-styles-within relative mx-auto mb-6 flex min-h-screen w-full max-w-[1280px] flex-col px-6"
   >
+    <!-- Purchase modal POC -->
+    <ModrinthServersPurchaseModal
+      v-if="customer"
+      :key="`manage-purchase-modal-${customer?.id}`"
+      ref="purchaseModal"
+      :publishable-key="config.public.stripePublishableKey"
+      :initiate-payment="
+        async (body) =>
+          await useBaseFetch('billing/payment', { internal: true, method: 'POST', body })
+      "
+      :available-products="pyroProducts"
+      :on-error="handleError"
+      :customer="customer"
+      :payment-methods="paymentMethods"
+      :currency="selectedCurrency"
+      :return-url="`${config.public.siteUrl}/servers/manage`"
+      :pings="regionPings"
+      :regions="regions"
+      :refresh-payment-methods="fetchPaymentData"
+      :fetch-stock="fetchStock"
+      :plan-stage="true"
+    />
     <div
       v-if="hasError || fetchError"
       class="mx-auto flex h-full min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 text-left"
@@ -94,7 +116,7 @@
         class="m-0 flex flex-col gap-4 p-0"
       >
         <UiServersServerListing
-          v-for="server in filteredData.filter((s) => !s.is_preview)"
+          v-for="server in filteredData.filter((s) => !s.is_medal)"
           :key="server.server_id"
           v-bind="server"
         />
@@ -102,6 +124,7 @@
           v-for="server in filteredData.filter((s) => s.status !== 'suspended')"
           :key="server.server_id"
           v-bind="server"
+          @upgrade="openUpgradeModal()"
         />
         <LazyUiServersServerListingSkeleton v-if="isPollingForNewServers" />
       </ul>
@@ -116,11 +139,13 @@
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import Fuse from "fuse.js";
 import { HammerIcon, PlusIcon, SearchIcon } from "@modrinth/assets";
-import { ButtonStyled, CopyCode } from "@modrinth/ui";
+import { ButtonStyled, CopyCode, ModrinthServersPurchaseModal } from "@modrinth/ui";
 import type { Server, ModrinthServersFetchError } from "@modrinth/utils";
 import { reloadNuxtApp } from "#app";
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import MedalServerListing from "~/components/ui/servers/marketing/MedalServerListing.vue";
+import { products } from "~/generated/state.json";
+import { useBaseFetch } from "#build/imports";
 
 definePageMeta({
   middleware: "auth",
@@ -133,6 +158,8 @@ useHead({
 interface ServerResponse {
   servers: Server[];
 }
+
+type LocalServer = Server & { is_preview?: boolean; is_medal?: boolean };
 
 const router = useRouter();
 const route = useRoute();
@@ -151,7 +178,7 @@ watch([fetchError, serverResponse], ([error, response]) => {
   hasError.value = !!error || !response;
 });
 
-const serverList = computed(() => {
+const serverList = computed<LocalServer[]>(() => {
   if (!serverResponse.value) return [];
   return serverResponse.value.servers;
 });
@@ -173,7 +200,7 @@ function introToTop(array: Server[]): Server[] {
   });
 }
 
-const filteredData = computed(() => {
+const filteredData = computed<LocalServer[]>(() => {
   if (!searchInput.value.trim()) {
     return introToTop(serverList.value);
   }
@@ -212,5 +239,122 @@ onUnmounted(() => {
   if (intervalId) {
     clearInterval(intervalId);
   }
+});
+
+// (mirrors servers/index.vue)
+const config = useRuntimeConfig();
+const purchaseModal = ref<InstanceType<typeof ModrinthServersPurchaseModal> | null>(null);
+const customer = ref<any>(null);
+const paymentMethods = ref<any[]>([]);
+const selectedCurrency = ref<string>("USD");
+const regions = ref<any[]>([]);
+const regionPings = ref<any[]>([]);
+
+const pyroProducts = (products as any[])
+  .filter((p) => p?.metadata?.type === "pyro")
+  .sort((a, b) => (a?.metadata?.ram ?? 0) - (b?.metadata?.ram ?? 0));
+
+function handleError(err: any) {
+  // todo
+  // eslint-disable-next-line no-console
+  console.error("Purchase modal error:", err);
+}
+
+async function fetchPaymentData() {
+  try {
+    const [customerData, paymentMethodsData] = await Promise.all([
+      useBaseFetch("billing/customer", { internal: true }),
+      useBaseFetch("billing/payment_methods", { internal: true }),
+    ]);
+    customer.value = customerData as any;
+    paymentMethods.value = paymentMethodsData as any[];
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Error fetching payment data:", error);
+  }
+}
+
+function fetchStock(region: any, request: any) {
+  return useServersFetch(`stock?region=${region.shortcode}`, {
+    method: "POST",
+    body: {
+      ...request,
+    },
+    bypassAuth: true,
+  }).then((res: any) => res.available as number);
+}
+
+function pingRegions() {
+  useServersFetch("regions", {
+    method: "GET",
+    version: 1,
+    bypassAuth: true,
+  }).then((res: any) => {
+    regions.value = res as any[];
+    (regions.value as any[]).forEach((region: any) => {
+      runPingTest(region);
+    });
+  });
+}
+
+const PING_COUNT = 20;
+const PING_INTERVAL = 200;
+const MAX_PING_TIME = 1000;
+
+function runPingTest(region: any, index = 1) {
+  if (index > 10) {
+    regionPings.value.push({
+      region: region.shortcode,
+      ping: -1,
+    });
+    return;
+  }
+
+  const wsUrl = `wss://${region.shortcode}${index}.${region.zone}/pingtest`;
+  try {
+    const socket = new WebSocket(wsUrl);
+    const pings: number[] = [];
+
+    socket.onopen = () => {
+      for (let i = 0; i < PING_COUNT; i++) {
+        setTimeout(() => {
+          socket.send(String(performance.now()));
+        }, i * PING_INTERVAL);
+      }
+      setTimeout(
+        () => {
+          socket.close();
+          const median = Math.round([...pings].sort((a, b) => a - b)[Math.floor(pings.length / 2)]);
+          if (median) {
+            regionPings.value.push({
+              region: region.shortcode,
+              ping: median,
+            });
+          }
+        },
+        PING_COUNT * PING_INTERVAL + MAX_PING_TIME,
+      );
+    };
+
+    socket.onmessage = (event) => {
+      const start = Number(event.data);
+      pings.push(performance.now() - start);
+    };
+
+    socket.onerror = () => {
+      runPingTest(region, index + 1);
+    };
+  } catch {
+    // todo
+  }
+}
+
+function openUpgradeModal() {
+  purchaseModal.value?.show("quarterly");
+}
+
+onMounted(() => {
+  fetchPaymentData();
+  pingRegions();
 });
 </script>
