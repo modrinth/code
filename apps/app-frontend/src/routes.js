@@ -3,6 +3,7 @@ import * as Pages from '@/pages'
 import * as Project from '@/pages/project'
 import * as Instance from '@/pages/instance'
 import * as Library from '@/pages/library'
+import * as Screenshots from '@/pages/screenshots'
 
 /**
  * Configures application routing. Add page to pages/index and then add to route table here.
@@ -64,6 +65,31 @@ export default new createRouter({
           path: 'custom',
           name: 'Custom',
           component: Library.Custom,
+        },
+      ],
+    },
+    {
+      path: '/screenshots',
+      name: 'Screenshots',
+      component: Screenshots.Index,
+      meta: {
+        breadcrumb: [{ name: 'Screenshots' }],
+      },
+      children: [
+        {
+          path: '',
+          name: 'ScreenshotsOverview',
+          component: Screenshots.Overview,
+        },
+        {
+          path: 'downloaded',
+          name: 'ScreenshotsDownloaded',
+          component: Screenshots.Downloaded,
+        },
+        {
+          path: 'custom',
+          name: 'ScreenshotsCustom',
+          component: Screenshots.Custom,
         },
       ],
     },
