@@ -345,9 +345,9 @@ import {
   ListBulletedIcon,
   RightArrowIcon,
   ScaleIcon,
-  XIcon,
   ToggleLeftIcon,
   ToggleRightIcon,
+  XIcon,
 } from "@modrinth/assets";
 import {
   type Action,
@@ -387,23 +387,10 @@ import {
   type ModerationJudgements,
   type ModerationModpackItem,
   type Project,
-  renderHighlightedString,
   type ProjectStatus,
+  renderHighlightedString,
 } from "@modrinth/utils";
 import { computedAsync, useLocalStorage } from "@vueuse/core";
-import * as prettier from "prettier";
-import {
-  type Action,
-  type MultiSelectChipsAction,
-  type DropdownAction,
-  type ButtonAction,
-  type ToggleAction,
-  type ConditionalButtonAction,
-  type Stage,
-  finalPermissionMessages,
-} from "@modrinth/moderation";
-import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
-import KeybindsModal from "./ChecklistKeybindsModal.vue";
 import { useModerationStore } from "~/store/moderation.ts";
 import KeybindsModal from "./ChecklistKeybindsModal.vue";
 import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
