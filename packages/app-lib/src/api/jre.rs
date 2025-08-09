@@ -106,13 +106,13 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
             })?;
 
         // removes the old installation of java
-        if let Some(file) = archive.file_names().next() {
-            if let Some(dir) = file.split('/').next() {
-                let path = path.join(dir);
+        if let Some(file) = archive.file_names().next()
+            && let Some(dir) = file.split('/').next()
+        {
+            let path = path.join(dir);
 
-                if path.exists() {
-                    io::remove_dir_all(path).await?;
-                }
+            if path.exists() {
+                io::remove_dir_all(path).await?;
             }
         }
 

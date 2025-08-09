@@ -322,12 +322,11 @@ pub async fn is_visible_collection(
     } else {
         !collection_data.status.is_hidden()
     }) && !collection_data.projects.is_empty();
-    if let Some(user) = &user_option {
-        if !authorized
-            && (user.role.is_mod() || user.id == collection_data.user_id.into())
-        {
-            authorized = true;
-        }
+    if let Some(user) = &user_option
+        && !authorized
+        && (user.role.is_mod() || user.id == collection_data.user_id.into())
+    {
+        authorized = true;
     }
     Ok(authorized)
 }
@@ -356,10 +355,10 @@ pub async fn filter_visible_collections(
 
     for collection in check_collections {
         // Collections are simple- if we are the owner or a mod, we can see it
-        if let Some(user) = user_option {
-            if user.role.is_mod() || user.id == collection.user_id.into() {
-                return_collections.push(collection.into());
-            }
+        if let Some(user) = user_option
+            && (user.role.is_mod() || user.id == collection.user_id.into())
+        {
+            return_collections.push(collection.into());
         }
     }
 

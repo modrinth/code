@@ -71,7 +71,7 @@ async fn main() -> std::io::Result<()> {
 
     if args.run_background_task.is_none() {
         info!(
-            "Starting Labrinth on {}",
+            "Starting labrinth on {}",
             dotenvy::var("BIND_ADDR").unwrap()
         );
 

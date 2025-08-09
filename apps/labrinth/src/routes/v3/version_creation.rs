@@ -522,10 +522,10 @@ async fn version_create_inner(
     .fetch_optional(pool)
     .await?;
 
-    if let Some(project_status) = project_status {
-        if project_status.status == ProjectStatus::Processing.as_str() {
-            moderation_queue.projects.insert(project_id.into());
-        }
+    if let Some(project_status) = project_status
+        && project_status.status == ProjectStatus::Processing.as_str()
+    {
+        moderation_queue.projects.insert(project_id.into());
     }
 
     Ok(HttpResponse::Ok().json(response))
@@ -871,16 +871,16 @@ pub async fn upload_file(
         ref format,
         ref files,
     } = validation_result
+        && dependencies.is_empty()
     {
-        if dependencies.is_empty() {
-            let hashes: Vec<Vec<u8>> = format
-                .files
-                .iter()
-                .filter_map(|x| x.hashes.get(&PackFileHash::Sha1))
-                .map(|x| x.as_bytes().to_vec())
-                .collect();
+        let hashes: Vec<Vec<u8>> = format
+            .files
+            .iter()
+            .filter_map(|x| x.hashes.get(&PackFileHash::Sha1))
+            .map(|x| x.as_bytes().to_vec())
+            .collect();
 
-            let res = sqlx::query!(
+        let res = sqlx::query!(
                 "
                     SELECT v.id version_id, v.mod_id project_id, h.hash hash FROM hashes h
                     INNER JOIN files f on h.file_id = f.id
@@ -892,45 +892,44 @@ pub async fn upload_file(
             .fetch_all(&mut **transaction)
             .await?;
 
-            for file in &format.files {
-                if let Some(dep) = res.iter().find(|x| {
-                    Some(&*x.hash)
-                        == file
-                            .hashes
-                            .get(&PackFileHash::Sha1)
-                            .map(|x| x.as_bytes())
-                }) {
-                    dependencies.push(DependencyBuilder {
-                        project_id: Some(models::DBProjectId(dep.project_id)),
-                        version_id: Some(models::DBVersionId(dep.version_id)),
-                        file_name: None,
-                        dependency_type: DependencyType::Embedded.to_string(),
-                    });
-                } else if let Some(first_download) = file.downloads.first() {
-                    dependencies.push(DependencyBuilder {
-                        project_id: None,
-                        version_id: None,
-                        file_name: Some(
-                            first_download
-                                .rsplit('/')
-                                .next()
-                                .unwrap_or(first_download)
-                                .to_string(),
-                        ),
-                        dependency_type: DependencyType::Embedded.to_string(),
-                    });
-                }
+        for file in &format.files {
+            if let Some(dep) = res.iter().find(|x| {
+                Some(&*x.hash)
+                    == file
+                        .hashes
+                        .get(&PackFileHash::Sha1)
+                        .map(|x| x.as_bytes())
+            }) {
+                dependencies.push(DependencyBuilder {
+                    project_id: Some(models::DBProjectId(dep.project_id)),
+                    version_id: Some(models::DBVersionId(dep.version_id)),
+                    file_name: None,
+                    dependency_type: DependencyType::Embedded.to_string(),
+                });
+            } else if let Some(first_download) = file.downloads.first() {
+                dependencies.push(DependencyBuilder {
+                    project_id: None,
+                    version_id: None,
+                    file_name: Some(
+                        first_download
+                            .rsplit('/')
+                            .next()
+                            .unwrap_or(first_download)
+                            .to_string(),
+                    ),
+                    dependency_type: DependencyType::Embedded.to_string(),
+                });
             }
+        }
 
-            for file in files {
-                if !file.is_empty() {
-                    dependencies.push(DependencyBuilder {
-                        project_id: None,
-                        version_id: None,
-                        file_name: Some(file.to_string()),
-                        dependency_type: DependencyType::Embedded.to_string(),
-                    });
-                }
+        for file in files {
+            if !file.is_empty() {
+                dependencies.push(DependencyBuilder {
+                    project_id: None,
+                    version_id: None,
+                    file_name: Some(file.to_string()),
+                    dependency_type: DependencyType::Embedded.to_string(),
+                });
             }
         }
     }
@@ -974,10 +973,10 @@ pub async fn upload_file(
         ));
     }
 
-    if let ValidationResult::Warning(msg) = validation_result {
-        if primary {
-            return Err(CreateError::InvalidInput(msg.to_string()));
-        }
+    if let ValidationResult::Warning(msg) = validation_result
+        && primary
+    {
+        return Err(CreateError::InvalidInput(msg.to_string()));
     }
 
     let url = format!("{cdn_url}/{file_path_encode}");

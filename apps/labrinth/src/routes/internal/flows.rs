@@ -79,13 +79,12 @@ impl TempUser {
         file_host: &Arc<dyn FileHost + Send + Sync>,
         redis: &RedisPool,
     ) -> Result<crate::database::models::DBUserId, AuthenticationError> {
-        if let Some(email) = &self.email {
-            if crate::database::models::DBUser::get_by_email(email, client)
+        if let Some(email) = &self.email
+            && crate::database::models::DBUser::get_by_email(email, client)
                 .await?
                 .is_some()
-            {
-                return Err(AuthenticationError::DuplicateUser);
-            }
+        {
+            return Err(AuthenticationError::DuplicateUser);
         }
 
         let user_id =
@@ -1269,19 +1268,19 @@ pub async fn delete_auth_provider(
         .update_user_id(user.id.into(), None, &mut transaction)
         .await?;
 
-    if delete_provider.provider != AuthProvider::PayPal {
-        if let Some(email) = user.email {
-            send_email(
-                email,
-                "Authentication method removed",
-                &format!(
-                    "When logging into Modrinth, you can no longer log in using the {} authentication provider.",
-                    delete_provider.provider.as_str()
-                ),
-                "If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).",
-                None,
-            )?;
-        }
+    if delete_provider.provider != AuthProvider::PayPal
+        && let Some(email) = user.email
+    {
+        send_email(
+            email,
+            "Authentication method removed",
+            &format!(
+                "When logging into Modrinth, you can no longer log in using the {} authentication provider.",
+                delete_provider.provider.as_str()
+            ),
+            "If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).",
+            None,
+        )?;
     }
 
     transaction.commit().await?;
