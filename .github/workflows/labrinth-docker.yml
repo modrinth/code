@@ -19,27 +19,48 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: 📥 Check out code
         uses: actions/checkout@v4
-      - name: Set up Docker Buildx
+
+      - name: 🧰 Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      - name: Fetch docker metadata
+
+      - name: ⚙️ Generate Docker image metadata
         id: docker_meta
         uses: docker/metadata-action@v5
+        env:
+          # GitHub Packages requires annotations metadata in at least the index descriptor to show them
+          # up properly in its UI it seems, but it's not clear about it, because the docs refer to the
+          # image manifest only. See:
+          # https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#adding-a-description-to-multi-arch-images
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
         with:
           images: ghcr.io/modrinth/labrinth
-      - name: Login to GitHub Images
+          labels: |
+            org.opencontainers.image.title=labrinth
+            org.opencontainers.image.description=Modrinth API
+            org.opencontainers.image.licenses=AGPL-3.0-or-later
+          annotations: |
+            org.opencontainers.image.title=labrinth
+            org.opencontainers.image.description=Modrinth API
+            org.opencontainers.image.licenses=AGPL-3.0-or-later
+
+      - name: 🔑 Login to GitHub Packages
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push
+
+      - name: 🔨 Build and push
         uses: docker/build-push-action@v6
         with:
           file: ./apps/labrinth/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
+          annotations: ${{ steps.docker_meta.outputs.annotations }}
+          build-args: |
+            GIT_HASH=${{ fromJSON(steps.docker_meta.outputs.json).labels['org.opencontainers.image.revision'] }}
           cache-from: type=registry,ref=ghcr.io/modrinth/labrinth:main
           cache-to: type=inline
