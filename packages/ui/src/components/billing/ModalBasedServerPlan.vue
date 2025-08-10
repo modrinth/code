@@ -1,62 +1,124 @@
 <script setup lang="ts">
+import { inject, computed, type Ref } from 'vue'
+import { useVIntl, type MessageDescriptor } from '@vintl/vintl'
 import { formatPrice } from '@modrinth/utils'
-import { Dropdown } from 'floating-vue'
+import { monthsInInterval, type ServerBillingInterval, type ServerPlan } from '../../utils/billing'
+import { Menu } from 'floating-vue'
 import { DropdownIcon } from '@modrinth/assets'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import ServersSpecs from './ServersSpecs.vue'
-import type { ServerBillingInterval, ServerPlan } from '../../utils/billing'
 
-const props = defineProps<{
-  title: string
-  description: string
-  plan: ServerPlan
-  currency: string
-  interval: ServerBillingInterval
-  locale: string
-  monthlyPrice?: number
+const props = withDefaults(
+  defineProps<{
+    plan: ServerPlan
+    title: MessageDescriptor
+    description: MessageDescriptor
+    buttonColor?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple'
+    mostPopular?: boolean
+    selected?: boolean
+  }>(),
+  {
+    buttonColor: 'standard',
+    mostPopular: false,
+    selected: false,
+  },
+)
+
+const emit = defineEmits<{
+  (e: 'select', plan: ServerPlan): void
 }>()
+
+const { formatMessage, locale } = useVIntl()
+
+// TODO: Use DI framework when merged.
+const selectedInterval = inject<Ref<ServerBillingInterval>>('selectedInterval')
+const currency = inject<string>('currency')
+
+const perMonth = computed(() => {
+  if (!props.plan || !currency || !selectedInterval?.value) return undefined
+  const total = props.plan.prices?.find((x) => x.currency_code === currency)?.prices?.intervals?.[
+    selectedInterval.value
+  ]
+  if (!total) return undefined
+  return total / monthsInInterval[selectedInterval.value]
+})
+
+const mostPopularStyle = computed(() => {
+  if (!props.mostPopular) return undefined
+  const style: Record<string, string> = {
+    backgroundImage:
+      'radial-gradient(86.12% 101.64% at 95.97% 94.07%, rgba(27, 217, 106, 0.23) 0%, rgba(14, 115, 56, 0.2) 100%)',
+    boxShadow: '0px 12px 38.1px rgba(27, 217, 106, 0.13)',
+  }
+
+  if (!props.selected) {
+    style.borderColor = 'rgba(12, 107, 52, 0.55)'
+  }
+  return style
+})
 </script>
 
 <template>
-  <div class="!bg-bg card !p-4">
-    <div class="flex flex-col">
-      <span class="text-2xl font-bold text-contrast">{{ title }}</span>
-      <span class="m-0 text-lg font-bold text-contrast">
-        {{ formatPrice(locale, monthlyPrice, currency, true) }}
-        <span class="text-sm font-semibold text-secondary">
-          / month<template v-if="interval !== 'monthly'">, billed {{ interval }}</template>
-        </span>
-      </span>
-      <span class="text-sm mb-2">{{ description }}</span>
-
-      <Dropdown
-        placement="bottom-start"
-        :triggers="['click', 'focus']"
-        :popper-triggers="['hover']"
-        :distance="8"
-      >
-        <template #default="{ shown }">
-          <ButtonStyled size="small" circular type="outlined">
-            <button class="!px-2">
-              View plan details
-              <DropdownIcon
-                class="ml-auto size-5 transition-transform duration-300 shrink-0"
-                :class="{ 'rotate-180': shown }"
-              />
-            </button>
-          </ButtonStyled>
-        </template>
-
-        <template #popper>
-          <div class="w-72 rounded-md border border-contrast/10 bg-bg p-3 shadow-lg">
-            <ServersSpecs
-              :ram="plan.metadata.ram!"
-              :storage="plan.metadata.storage!"
-              :cpus="plan.metadata.cpu!"
-            />
+  <div
+    class="transition-colors duration-300 !bg-bg card !p-4 experimental-styles-within h-full border-2 border-solid border-transparent"
+    :class="{
+      '!border-brand': selected,
+    }"
+    :style="mostPopularStyle"
+  >
+    <div class="flex h-full flex-col justify-between">
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+          <span class="text-2xl font-semibold text-contrast">
+            {{ formatMessage(title) }}
+          </span>
+          <div
+            v-if="mostPopular"
+            class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+          >
+            Most Popular
           </div>
-        </template>
-      </Dropdown>
+        </div>
+        <span class="m-0 text-lg font-bold text-contrast">
+          {{ formatPrice(locale, perMonth, currency, true) }}
+          <span class="text-sm font-semibold text-secondary">
+            / month{{ selectedInterval !== 'monthly' ? `, billed ${selectedInterval}` : '' }}
+          </span>
+        </span>
+        <span class="text-sm">{{ formatMessage(description) }}</span>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <ButtonStyled size="large" type="highlight-colored-text" :color="buttonColor">
+          <button class="!w-full" @click="emit('select', plan)">
+            {{ selected ? 'Selected' : 'Select plan' }}
+          </button>
+        </ButtonStyled>
+
+        <Menu placement="bottom-start" :triggers="['click']" :autoHide="false" :distance="8">
+          <template #default="{ shown }">
+            <div>
+              <span class="flex justify-between text-sm">
+                View plan details
+                <DropdownIcon
+                  class="ml-auto my-auto size-4 transition-transform duration-300 shrink-0"
+                  :class="{ 'rotate-180': shown }"
+                />
+              </span>
+            </div>
+          </template>
+
+          <template #popper>
+            <div class="w-72 rounded-md border border-contrast/10 bg-bg p-3 shadow-lg">
+              <ServersSpecs
+                :ram="plan.metadata.ram!"
+                :storage="plan.metadata.storage!"
+                :cpus="plan.metadata.cpu!"
+              />
+            </div>
+          </template>
+        </Menu>
+      </div>
     </div>
   </div>
 </template>

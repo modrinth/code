@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, provide } from 'vue'
 import { useVIntl, defineMessages } from '@vintl/vintl'
 import ServersSpecs from './ServersSpecs.vue'
 import { monthsInInterval, type ServerBillingInterval, type ServerPlan } from '../../utils/billing'
 import { formatPrice } from '@modrinth/utils'
-import { DropdownIcon } from '@modrinth/assets'
+import { DropdownIcon, RightArrowIcon } from '@modrinth/assets'
 import { Menu } from 'floating-vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import OptionGroup from '../base/OptionGroup.vue'
+import ModalBasedServerPlan from './ModalBasedServerPlan.vue'
 
 const { formatMessage, locale } = useVIntl()
 
@@ -132,6 +133,9 @@ const customStartingPrice = computed(() => {
   }
   return min
 })
+
+provide('currency', props.currency)
+provide('selectedInterval', selectedInterval)
 </script>
 
 <template>
@@ -147,76 +151,67 @@ const customStartingPrice = computed(() => {
       <span v-else-if="option === 'quarterly'"> Pay quarterly </span>
       <span v-else-if="option === 'yearly'"> Pay yearly </span>
     </OptionGroup>
-  </div>
-  <div class="grid grid-cols-1 place-items-center mb-2">
-    <span class="bg-transparent p-0 text-sm font-medium text-brand">
+    <span
+      class="bg-transparent p-0 text-sm text-xs font-bold text-brand"
+      v-if="selectedInterval !== 'quarterly'"
+    >
       Save 16% with quarterly billing!
     </span>
   </div>
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-    <div
-      class="!bg-bg card !p-4"
+    <ModalBasedServerPlan
       v-if="plansByRam.small"
-      :class="{
-        '!border-brand !border-[2px] border-solid': selectedPlan?.id === plansByRam.small.id,
-      }"
-    >
-      <div class="flex flex-col gap-2">
-        <span class="text-2xl font-semibold text-contrast">Small</span>
-        <span class="m-0 text-lg font-bold text-contrast">
-          {{ formatPrice(locale, pricePerMonth(plansByRam.small), currency, true) }}
-          <span class="text-sm font-semibold text-secondary">
-            / month<template v-if="selectedInterval !== 'monthly'"
-              >, billed {{ selectedInterval }}</template
-            >
+      :plan="plansByRam.small"
+      :title="{ id: 'servers.purchase.step.plan.small', defaultMessage: 'Small' }"
+      :description="messages.smallDesc"
+      :button-color="'blue'"
+      :selected="selectedPlan?.id === plansByRam.small.id"
+      @select="selectedPlan = $event"
+    />
+    <ModalBasedServerPlan
+      v-if="plansByRam.medium"
+      :plan="plansByRam.medium"
+      :title="{ id: 'servers.purchase.step.plan.medium', defaultMessage: 'Medium' }"
+      :description="messages.mediumDesc"
+      most-popular
+      :button-color="'brand'"
+      :selected="selectedPlan?.id === plansByRam.medium.id"
+      @select="selectedPlan = $event"
+    />
+    <ModalBasedServerPlan
+      v-if="plansByRam.large"
+      :plan="plansByRam.large"
+      :title="{ id: 'servers.purchase.step.plan.large', defaultMessage: 'Large' }"
+      :description="messages.largeDesc"
+      :button-color="'purple'"
+      :selected="selectedPlan?.id === plansByRam.large.id"
+      @select="selectedPlan = $event"
+    />
+    <div class="!bg-bg card !p-4 h-full" v-if="customStartingPrice">
+      <div class="flex h-full flex-col justify-between">
+        <div class="flex flex-col gap-3">
+          <span class="text-2xl font-semibold text-contrast">Custom</span>
+          <span class="m-0 text-lg font-bold text-contrast">
+            {{ formatPrice(locale, customStartingPrice, currency, true) }}
+            <span class="text-sm font-semibold text-secondary">
+              / month<template v-if="interval !== 'monthly'">, billed {{ interval }}</template>
+            </span>
           </span>
-        </span>
-        <span class="text-sm">{{ formatMessage(messages.smallDesc) }}</span>
-        <ButtonStyled size="large">
-          <button class="!w-full" @click="selectedPlan = plansByRam.small">Select plan</button>
-        </ButtonStyled>
-        <Menu placement="bottom-start" :distance="8">
-          <template #default="{ shown }">
-            <div>
-              <span class="flex justify-between text-sm">
-                View plan details
-                <DropdownIcon
-                  class="ml-auto my-auto size-4 transition-transform duration-300 shrink-0"
-                  :class="{ 'rotate-180': shown }"
-                />
-              </span>
-            </div>
-          </template>
+          <span class="text-sm mb-2">{{ formatMessage(messages.customDesc) }}</span>
+        </div>
 
-          <template #popper>
-            <div class="w-72 rounded-md border border-contrast/10 bg-bg p-3 shadow-lg">
-              <ServersSpecs
-                :ram="plansByRam.small.metadata.ram!"
-                :storage="plansByRam.small.metadata.storage!"
-                :cpus="plansByRam.small.metadata.cpu!"
-              />
-            </div>
-          </template>
-        </Menu>
-      </div>
-    </div>
-    <div class="!bg-bg card !p-4" v-if="customStartingPrice">
-      <div class="flex flex-col gap-3">
-        <span class="text-2xl font-semibold text-contrast">Custom</span>
-        <span class="m-0 text-lg font-bold text-contrast">
-          {{ formatPrice(locale, customStartingPrice, currency, true) }}
-          <span class="text-sm font-semibold text-secondary">
-            / month<template v-if="interval !== 'monthly'">, billed {{ interval }}</template>
-          </span>
-        </span>
-        <span class="text-sm mb-2">{{ formatMessage(messages.customDesc) }}</span>
-        <ButtonStyled size="large">
-          <button class="!w-full" @click="handleConfigureCustomPlan">Configure</button>
-        </ButtonStyled>
-        <div class="flex items-center gap-3">
-          <span v-if="customPricePerGb" class="text-sm text-secondary">
-            From {{ formatPrice(locale, customPricePerGb, currency, true) }} / GB
-          </span>
+        <div class="flex flex-col gap-2">
+          <ButtonStyled size="large" type="outlined">
+            <button class="!w-full" @click="handleConfigureCustomPlan">
+              Get started <RightArrowIcon />
+            </button>
+          </ButtonStyled>
+
+          <div class="flex items-center gap-3">
+            <span v-if="customPricePerGb" class="text-sm text-secondary">
+              From {{ formatPrice(locale, customPricePerGb, currency, true) }} / GB
+            </span>
+          </div>
         </div>
       </div>
     </div>
