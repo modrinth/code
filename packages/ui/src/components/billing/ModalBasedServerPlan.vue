@@ -54,6 +54,7 @@ const mostPopularStyle = computed(() => {
   if (!props.selected) {
     style.borderColor = 'rgba(12, 107, 52, 0.55)'
   }
+
   return style
 })
 </script>
