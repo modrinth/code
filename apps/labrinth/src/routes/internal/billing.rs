@@ -300,17 +300,17 @@ pub async fn refund_charge(
         .upsert(&mut transaction)
         .await?;
 
-        if body.0.unprovision.unwrap_or(false)
-            && let Some(subscription_id) = charge.subscription_id
-        {
-            let open_charge =
-                DBCharge::get_open_subscription(subscription_id, &**pool)
-                    .await?;
-            if let Some(mut open_charge) = open_charge {
-                open_charge.status = ChargeStatus::Cancelled;
-                open_charge.due = Utc::now();
+        if body.0.unprovision.unwrap_or(false) {
+            if let Some(subscription_id) = charge.subscription_id {
+                let open_charge =
+                    DBCharge::get_open_subscription(subscription_id, &**pool)
+                        .await?;
+                if let Some(mut open_charge) = open_charge {
+                    open_charge.status = ChargeStatus::Cancelled;
+                    open_charge.due = Utc::now();
 
-                open_charge.upsert(&mut transaction).await?;
+                    open_charge.upsert(&mut transaction).await?;
+                }
             }
         }
 
@@ -325,6 +325,8 @@ pub struct SubscriptionEdit {
     pub interval: Option<PriceDuration>,
     pub payment_method: Option<String>,
     pub cancelled: Option<bool>,
+    /// Only supported when changing the product as well.
+    pub region: Option<String>,
     pub product: Option<crate::models::ids::ProductId>,
 }
 
@@ -451,6 +453,14 @@ pub async fn edit_subscription(
             // intent as if the user was subscribing to the product, as opposed
             // to a proration.
             if open_charge.status == ChargeStatus::Expiring {
+                let Some(new_region) =
+                    edit_subscription.region.as_ref().map(String::to_owned)
+                else {
+                    return Err(ApiError::InvalidInput(
+                        "You need to specify a region when promoting an expiring charge.".to_owned(),
+                    ));
+                };
+
                 // We need a new interval when promoting the charge.
                 let interval = edit_subscription.interval
                     .ok_or_else(|| ApiError::InvalidInput("You need to specify an interval when promoting an expiring charge.".to_owned()))?;
@@ -511,6 +521,7 @@ pub async fn edit_subscription(
                     "modrinth_charge_type".to_string(),
                     ChargeType::Subscription.as_str().to_string(),
                 );
+                metadata.insert("modrinth_new_region".to_string(), new_region);
 
                 intent.customer = Some(customer_id);
                 intent.metadata = Some(metadata);
@@ -641,6 +652,12 @@ pub async fn edit_subscription(
                         "modrinth_charge_type".to_string(),
                         ChargeType::Proration.as_str().to_string(),
                     );
+                    if let Some(region) = &edit_subscription.region {
+                        metadata.insert(
+                            "modrinth_new_region".to_string(),
+                            region.to_owned(),
+                        );
+                    }
 
                     intent.customer = Some(customer_id);
                     intent.metadata = Some(metadata);
@@ -1349,36 +1366,38 @@ pub async fn initiate_payment(
                     }
                 };
 
-                if let Price::Recurring { .. } = price_item.prices
-                    && product.unitary
-                {
-                    let user_subscriptions =
+                if let Price::Recurring { .. } = price_item.prices {
+                    if product.unitary {
+                        let user_subscriptions =
                         user_subscription_item::DBUserSubscription::get_all_user(
                             user.id.into(),
                             &**pool,
                         )
                         .await?;
 
-                    let user_products = product_item::DBProductPrice::get_many(
-                        &user_subscriptions
-                            .iter()
-                            .filter(|x| {
-                                x.status == SubscriptionStatus::Provisioned
-                            })
-                            .map(|x| x.price_id)
-                            .collect::<Vec<_>>(),
-                        &**pool,
-                    )
-                    .await?;
+                        let user_products =
+                            product_item::DBProductPrice::get_many(
+                                &user_subscriptions
+                                    .iter()
+                                    .filter(|x| {
+                                        x.status
+                                            == SubscriptionStatus::Provisioned
+                                    })
+                                    .map(|x| x.price_id)
+                                    .collect::<Vec<_>>(),
+                                &**pool,
+                            )
+                            .await?;
 
-                    if user_products
-                        .into_iter()
-                        .any(|x| x.product_id == product.id)
-                    {
-                        return Err(ApiError::InvalidInput(
-                            "You are already subscribed to this product!"
-                                .to_string(),
-                        ));
+                        if user_products
+                            .into_iter()
+                            .any(|x| x.product_id == product.id)
+                        {
+                            return Err(ApiError::InvalidInput(
+                                "You are already subscribed to this product!"
+                                    .to_string(),
+                            ));
+                        }
                     }
                 }
 
@@ -1547,6 +1566,7 @@ pub async fn stripe_webhook(
             pub user_subscription_item:
                 Option<user_subscription_item::DBUserSubscription>,
             pub payment_metadata: Option<PaymentRequestMetadata>,
+            pub new_region: Option<String>,
         }
 
         #[allow(clippy::too_many_arguments)]
@@ -1599,38 +1619,42 @@ pub async fn stripe_webhook(
                     break 'metadata;
                 };
 
-                let (charge, price, product, subscription) = if let Some(
-                    mut charge,
-                ) =
-                    crate::database::models::charge_item::DBCharge::get(
-                        charge_id, pool,
-                    )
-                    .await?
-                {
-                    let Some(price) = product_item::DBProductPrice::get(
-                        charge.price_id,
-                        pool,
-                    )
-                    .await?
-                    else {
-                        break 'metadata;
-                    };
+                let new_region =
+                    metadata.get("modrinth_new_region").map(String::to_owned);
 
-                    let Some(product) =
-                        product_item::DBProduct::get(price.product_id, pool)
-                            .await?
-                    else {
-                        break 'metadata;
-                    };
+                let (charge, price, product, subscription, new_region) =
+                    if let Some(mut charge) =
+                        crate::database::models::charge_item::DBCharge::get(
+                            charge_id, pool,
+                        )
+                        .await?
+                    {
+                        let Some(price) = product_item::DBProductPrice::get(
+                            charge.price_id,
+                            pool,
+                        )
+                        .await?
+                        else {
+                            break 'metadata;
+                        };
 
-                    charge.status = charge_status;
-                    charge.last_attempt = Some(Utc::now());
-                    charge.payment_platform_id =
-                        Some(payment_intent_id.to_string());
-                    charge.upsert(transaction).await?;
+                        let Some(product) = product_item::DBProduct::get(
+                            price.product_id,
+                            pool,
+                        )
+                        .await?
+                        else {
+                            break 'metadata;
+                        };
 
-                    if let Some(subscription_id) = charge.subscription_id {
-                        let Some(mut subscription) =
+                        charge.status = charge_status;
+                        charge.last_attempt = Some(Utc::now());
+                        charge.payment_platform_id =
+                            Some(payment_intent_id.to_string());
+                        charge.upsert(transaction).await?;
+
+                        if let Some(subscription_id) = charge.subscription_id {
+                            let Some(mut subscription) =
                             user_subscription_item::DBUserSubscription::get(
                                 subscription_id,
                                 pool,
@@ -1640,69 +1664,79 @@ pub async fn stripe_webhook(
                             break 'metadata;
                         };
 
-                        match charge.type_ {
-                            ChargeType::OneTime | ChargeType::Subscription => {
-                                if let Some(interval) =
-                                    charge.subscription_interval
-                                {
-                                    subscription.interval = interval;
+                            match charge.type_ {
+                                ChargeType::OneTime
+                                | ChargeType::Subscription => {
+                                    if let Some(interval) =
+                                        charge.subscription_interval
+                                    {
+                                        subscription.interval = interval;
+                                    }
+                                }
+                                ChargeType::Proration => {
+                                    subscription.price_id = charge.price_id;
+                                }
+                                ChargeType::Refund => {
+                                    return Err(ApiError::InvalidInput(
+                                        "Invalid charge type: Refund"
+                                            .to_string(),
+                                    ));
                                 }
                             }
-                            ChargeType::Proration => {
-                                subscription.price_id = charge.price_id;
-                            }
-                            ChargeType::Refund => {
-                                return Err(ApiError::InvalidInput(
-                                    "Invalid charge type: Refund".to_string(),
-                                ));
-                            }
-                        }
 
-                        subscription.upsert(transaction).await?;
+                            subscription.upsert(transaction).await?;
 
-                        (charge, price, product, Some(subscription))
-                    } else {
-                        (charge, price, product, None)
-                    }
-                } else {
-                    let Some(price_id) = metadata
-                        .get("modrinth_price_id")
-                        .and_then(|x| parse_base62(x).ok())
-                        .map(|x| {
-                            crate::database::models::ids::DBProductPriceId(
-                                x as i64,
+                            (
+                                charge,
+                                price,
+                                product,
+                                Some(subscription),
+                                new_region,
                             )
-                        })
-                    else {
-                        break 'metadata;
-                    };
+                        } else {
+                            (charge, price, product, None, new_region)
+                        }
+                    } else {
+                        let Some(price_id) = metadata
+                            .get("modrinth_price_id")
+                            .and_then(|x| parse_base62(x).ok())
+                            .map(|x| {
+                                crate::database::models::ids::DBProductPriceId(
+                                    x as i64,
+                                )
+                            })
+                        else {
+                            break 'metadata;
+                        };
 
-                    let Some(price) =
-                        product_item::DBProductPrice::get(price_id, pool)
-                            .await?
-                    else {
-                        break 'metadata;
-                    };
+                        let Some(price) =
+                            product_item::DBProductPrice::get(price_id, pool)
+                                .await?
+                        else {
+                            break 'metadata;
+                        };
 
-                    let Some(product) =
-                        product_item::DBProduct::get(price.product_id, pool)
-                            .await?
-                    else {
-                        break 'metadata;
-                    };
+                        let Some(product) = product_item::DBProduct::get(
+                            price.product_id,
+                            pool,
+                        )
+                        .await?
+                        else {
+                            break 'metadata;
+                        };
 
-                    let subscription = match &price.prices {
-                        Price::OneTime { .. } => None,
-                        Price::Recurring { intervals } => {
-                            let Some(interval) = metadata
-                                .get("modrinth_subscription_interval")
-                                .map(|x| PriceDuration::from_string(x))
-                            else {
-                                break 'metadata;
-                            };
+                        let subscription = match &price.prices {
+                            Price::OneTime { .. } => None,
+                            Price::Recurring { intervals } => {
+                                let Some(interval) = metadata
+                                    .get("modrinth_subscription_interval")
+                                    .map(|x| PriceDuration::from_string(x))
+                                else {
+                                    break 'metadata;
+                                };
 
-                            if intervals.get(&interval).is_some() {
-                                let Some(subscription_id) = metadata
+                                if intervals.get(&interval).is_some() {
+                                    let Some(subscription_id) = metadata
                                     .get("modrinth_subscription_id")
                                     .and_then(|x| parse_base62(x).ok())
                                     .map(|x| {
@@ -1711,7 +1745,7 @@ pub async fn stripe_webhook(
                                     break 'metadata;
                                 };
 
-                                let subscription = if let Some(mut subscription) = user_subscription_item::DBUserSubscription::get(subscription_id, pool).await? {
+                                    let subscription = if let Some(mut subscription) = user_subscription_item::DBUserSubscription::get(subscription_id, pool).await? {
                                     subscription.status = SubscriptionStatus::Unprovisioned;
                                     subscription.price_id = price_id;
                                     subscription.interval = interval;
@@ -1729,45 +1763,49 @@ pub async fn stripe_webhook(
                                     }
                                 };
 
-                                if charge_status != ChargeStatus::Failed {
-                                    subscription.upsert(transaction).await?;
+                                    if charge_status != ChargeStatus::Failed {
+                                        subscription
+                                            .upsert(transaction)
+                                            .await?;
+                                    }
+
+                                    Some(subscription)
+                                } else {
+                                    break 'metadata;
                                 }
-
-                                Some(subscription)
-                            } else {
-                                break 'metadata;
                             }
+                        };
+
+                        let charge = DBCharge {
+                            id: charge_id,
+                            user_id,
+                            price_id,
+                            amount,
+                            currency_code: currency,
+                            status: charge_status,
+                            due: Utc::now(),
+                            last_attempt: Some(Utc::now()),
+                            type_: charge_type,
+                            subscription_id: subscription
+                                .as_ref()
+                                .map(|x| x.id),
+                            subscription_interval: subscription
+                                .as_ref()
+                                .map(|x| x.interval),
+                            payment_platform: PaymentPlatform::Stripe,
+                            payment_platform_id: Some(
+                                payment_intent_id.to_string(),
+                            ),
+                            parent_charge_id: None,
+                            net: None,
+                        };
+
+                        if charge_status != ChargeStatus::Failed {
+                            charge.upsert(transaction).await?;
                         }
+
+                        (charge, price, product, subscription, new_region)
                     };
-
-                    let charge = DBCharge {
-                        id: charge_id,
-                        user_id,
-                        price_id,
-                        amount,
-                        currency_code: currency,
-                        status: charge_status,
-                        due: Utc::now(),
-                        last_attempt: Some(Utc::now()),
-                        type_: charge_type,
-                        subscription_id: subscription.as_ref().map(|x| x.id),
-                        subscription_interval: subscription
-                            .as_ref()
-                            .map(|x| x.interval),
-                        payment_platform: PaymentPlatform::Stripe,
-                        payment_platform_id: Some(
-                            payment_intent_id.to_string(),
-                        ),
-                        parent_charge_id: None,
-                        net: None,
-                    };
-
-                    if charge_status != ChargeStatus::Failed {
-                        charge.upsert(transaction).await?;
-                    }
-
-                    (charge, price, product, subscription)
-                };
 
                 return Ok(PaymentIntentMetadata {
                     user_item: user,
@@ -1776,6 +1814,7 @@ pub async fn stripe_webhook(
                     charge_item: charge,
                     user_subscription_item: subscription,
                     payment_metadata,
+                    new_region,
                 });
             }
 
@@ -1856,16 +1895,54 @@ pub async fn stripe_webhook(
                             swap,
                             storage,
                         } => {
-                            if let Some(ref subscription) =
+                            if let Some(ref mut subscription) =
                                 metadata.user_subscription_item
                             {
                                 let client = reqwest::Client::new();
 
-                                if let Some(SubscriptionMetadata::Pyro {
-                                    id,
-                                    region: _,
-                                }) = &subscription.metadata
+                                if let Some(
+                                    subscription_metadata @ (
+                                        SubscriptionMetadata::Pyro { id, region: _ }
+                                        | SubscriptionMetadata::Medal { id }
+                                    ),
+                                ) = &subscription.metadata
                                 {
+                                    let region = match subscription_metadata {
+                                        SubscriptionMetadata::Pyro { region, .. } => region.to_owned(),
+                                        SubscriptionMetadata::Medal { .. } => {
+                                            let region = metadata.new_region.clone();
+
+                                            if region.is_none() {
+                                                return Err(ApiError::InvalidInput(
+                                                    "We attempted to promote a subscription with type=medal, which requires specifying \
+                                                    a new region to move the server to. However, no new region was present in the payment \
+                                                    intent metadata.".to_owned()
+                                                ));
+                                            }
+
+                                            region
+                                        }
+                                    };
+
+                                    #[derive(Serialize)]
+                                    struct ReallocateBody<'a> {
+                                        memory_mb: u32,
+                                        cpu: u32,
+                                        swap_mb: u32,
+                                        storage_mb: u32,
+                                        region: Option<&'a str>,
+                                        force_move: Option<bool>,
+                                    }
+
+                                    let body = ReallocateBody {
+                                        memory_mb: ram,
+                                        cpu,
+                                        swap_mb: swap,
+                                        storage_mb: storage,
+                                        force_move: region.is_some().then_some(true),
+                                        region: region.as_deref(),
+                                    };
+
                                     client
                                         .post(format!(
                                             "{}/modrinth/v0/servers/{}/unsuspend",
@@ -1887,15 +1964,15 @@ pub async fn stripe_webhook(
                                             "X-Master-Key",
                                             dotenvy::var("PYRO_API_KEY")?,
                                         )
-                                        .json(&serde_json::json!({
-                                            "memory_mb": ram,
-                                            "cpu": cpu,
-                                            "swap_mb": swap,
-                                            "storage_mb": storage,
-                                        }))
+                                        .json(&body)
                                         .send()
                                         .await?
                                         .error_for_status()?;
+
+                                    // As the subscription has been promoted, this is now a Pyro subscription.
+                                    // Ensure the metadata is properly updated.
+                                    subscription.metadata = Some(SubscriptionMetadata::Pyro { id: id.to_string(), region });
+
                                 } else {
                                     let (server_name, server_region, source) =
                                         if let Some(
@@ -2156,36 +2233,38 @@ pub async fn stripe_webhook(
             EventType::PaymentMethodAttached => {
                 if let EventObject::PaymentMethod(payment_method) =
                     event.data.object
-                    && let Some(customer_id) =
-                        payment_method.customer.map(|x| x.id())
                 {
-                    let customer = stripe::Customer::retrieve(
-                        &stripe_client,
-                        &customer_id,
-                        &[],
-                    )
-                    .await?;
-
-                    if customer
-                        .invoice_settings
-                        .is_none_or(|x| x.default_payment_method.is_none())
+                    if let Some(customer_id) =
+                        payment_method.customer.map(|x| x.id())
                     {
-                        stripe::Customer::update(
+                        let customer = stripe::Customer::retrieve(
                             &stripe_client,
                             &customer_id,
-                            UpdateCustomer {
-                                invoice_settings: Some(
-                                    CustomerInvoiceSettings {
-                                        default_payment_method: Some(
-                                            payment_method.id.to_string(),
-                                        ),
-                                        ..Default::default()
-                                    },
-                                ),
-                                ..Default::default()
-                            },
+                            &[],
                         )
                         .await?;
+
+                        if customer
+                            .invoice_settings
+                            .is_none_or(|x| x.default_payment_method.is_none())
+                        {
+                            stripe::Customer::update(
+                                &stripe_client,
+                                &customer_id,
+                                UpdateCustomer {
+                                    invoice_settings: Some(
+                                        CustomerInvoiceSettings {
+                                            default_payment_method: Some(
+                                                payment_method.id.to_string(),
+                                            ),
+                                            ..Default::default()
+                                        },
+                                    ),
+                                    ..Default::default()
+                                },
+                            )
+                            .await?;
+                        }
                     }
                 }
             }
