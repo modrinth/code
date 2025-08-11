@@ -300,8 +300,8 @@ pub async fn refund_charge(
         .upsert(&mut transaction)
         .await?;
 
-        if body.0.unprovision.unwrap_or(false) {
-            if let Some(subscription_id) = charge.subscription_id {
+        if body.0.unprovision.unwrap_or(false)
+            && let Some(subscription_id) = charge.subscription_id {
                 let open_charge =
                     DBCharge::get_open_subscription(subscription_id, &**pool)
                         .await?;
@@ -312,7 +312,6 @@ pub async fn refund_charge(
                     open_charge.upsert(&mut transaction).await?;
                 }
             }
-        }
 
         transaction.commit().await?;
     }
@@ -409,8 +408,8 @@ pub async fn edit_subscription(
             }
         }
 
-        if let Some(interval) = &edit_subscription.interval {
-            if let Price::Recurring { intervals } = &current_price.prices {
+        if let Some(interval) = &edit_subscription.interval
+            && let Price::Recurring { intervals } = &current_price.prices {
                 // For expiring charges, the interval is handled in the Product branch.
                 if open_charge.status != ChargeStatus::Expiring {
                     if let Some(price) = intervals.get(interval) {
@@ -424,7 +423,6 @@ pub async fn edit_subscription(
                     }
                 }
             }
-        }
 
         let intent = if let Some(product_id) = &edit_subscription.product {
             let product_price =
@@ -1366,8 +1364,8 @@ pub async fn initiate_payment(
                     }
                 };
 
-                if let Price::Recurring { .. } = price_item.prices {
-                    if product.unitary {
+                if let Price::Recurring { .. } = price_item.prices
+                    && product.unitary {
                         let user_subscriptions =
                         user_subscription_item::DBUserSubscription::get_all_user(
                             user.id.into(),
@@ -1399,7 +1397,6 @@ pub async fn initiate_payment(
                             ));
                         }
                     }
-                }
 
                 (
                     price as i64,
@@ -2233,8 +2230,7 @@ pub async fn stripe_webhook(
             EventType::PaymentMethodAttached => {
                 if let EventObject::PaymentMethod(payment_method) =
                     event.data.object
-                {
-                    if let Some(customer_id) =
+                    && let Some(customer_id) =
                         payment_method.customer.map(|x| x.id())
                     {
                         let customer = stripe::Customer::retrieve(
@@ -2266,7 +2262,6 @@ pub async fn stripe_webhook(
                             .await?;
                         }
                     }
-                }
             }
             _ => {}
         }
