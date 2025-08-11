@@ -206,6 +206,44 @@ export const descriptionNags: Nag[] = [
     },
   },
   {
+    id: 'summary-special-formatting',
+    title: defineMessage({
+      id: 'nags.summary-special-formatting.title',
+      defaultMessage: 'Clear up the summary',
+    }),
+    description: defineMessage({
+      id: 'nags.summary-special-formatting.description',
+      defaultMessage: `Your summary should not contain formatting, line breaks, special characters, or links, since the summary will only display plain text.`,
+    }),
+    status: 'warning',
+    shouldShow: (context: NagContext) => {
+      const summary = context.project.description?.trim() || ''
+      return Boolean(
+        summary.match(/https:\/\//g) ||
+          summary.match(/http:\/\//g) ||
+          summary.match(/# .*/g) ||
+          summary.match(/---/g) ||
+          summary.match(/\n/g) ||
+          summary.match(/\[.*\]\(.*\)/g) ||
+          summary.match(/!\[.*\]/g) ||
+          summary.match(/`.*`/g) ||
+          summary.match(/\*.*\*/g) ||
+          summary.match(/_.*_/g) ||
+          summary.match(/~~.*~~/g) ||
+          summary.match(/```/g) ||
+          summary.match(/> /g),
+      )
+    },
+    link: {
+      path: 'settings',
+      title: defineMessage({
+        id: 'nags.edit-summary.title',
+        defaultMessage: 'Edit summary',
+      }),
+      shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
+    },
+  },
+  {
     id: 'minecraft-title-clause',
     title: defineMessage({
       id: 'nags.minecraft-title-clause.title',
