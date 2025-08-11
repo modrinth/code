@@ -5,7 +5,6 @@ import { formatPrice } from '@modrinth/utils'
 import { monthsInInterval, type ServerBillingInterval, type ServerPlan } from '../../utils/billing'
 import { Menu } from 'floating-vue'
 import { DropdownIcon } from '@modrinth/assets'
-import ButtonStyled from '../base/ButtonStyled.vue'
 import ServersSpecs from './ServersSpecs.vue'
 
 const props = withDefaults(
@@ -99,7 +98,7 @@ const mostPopularStyle = computed(() => {
       <span class="text-sm">{{ formatMessage(description) }}</span>
 
       <div class="flex flex-col gap-2">
-        <Menu placement="bottom-start" :triggers="['click']" :autoHide="false" :distance="8">
+        <Menu placement="bottom-start" :triggers="['click']" :auto-hide="false" :distance="8">
           <template #default="{ shown }">
             <div @click.stop @keydown.stop>
               <span class="flex justify-between text-sm">

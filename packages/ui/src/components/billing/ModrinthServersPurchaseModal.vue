@@ -248,7 +248,7 @@ defineExpose({
 })
 
 defineEmits<{
-  hide: void
+  (e: 'hide'): void
 }>()
 
 function handleChooseCustom() {
@@ -288,9 +288,9 @@ function handleChooseCustom() {
       <PlanSelector
         v-if="currentStep === 'plan'"
         v-model:plan="selectedPlan"
+        v-model:interval="selectedInterval"
         :available-products="availableProducts"
         :currency="currency"
-        v-model:interval="selectedInterval"
         @choose-custom="handleChooseCustom"
       />
       <RegionSelector

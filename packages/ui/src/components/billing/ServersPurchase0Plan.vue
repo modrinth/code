@@ -1,12 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, provide } from 'vue'
-import { useVIntl, defineMessages } from '@vintl/vintl'
-import ServersSpecs from './ServersSpecs.vue'
-import { monthsInInterval, type ServerBillingInterval, type ServerPlan } from '../../utils/billing'
 import { formatPrice } from '@modrinth/utils'
-import { DropdownIcon, RightArrowIcon } from '@modrinth/assets'
-import { Menu } from 'floating-vue'
-import ButtonStyled from '../base/ButtonStyled.vue'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+import { computed, provide } from 'vue'
+import { monthsInInterval, type ServerBillingInterval, type ServerPlan } from '../../utils/billing'
 import OptionGroup from '../base/OptionGroup.vue'
 import ModalBasedServerPlan from './ModalBasedServerPlan.vue'
 
@@ -128,8 +124,8 @@ provide('selectedInterval', selectedInterval)
     <span></span>
     <OptionGroup
       v-slot="{ option }"
-      class="!bg-button-bg !shadow-none"
       v-model="selectedInterval"
+      class="!bg-button-bg !shadow-none"
       :options="availableBillingIntervals"
     >
       <template v-if="option === 'monthly'"> Pay monthly </template>
@@ -170,8 +166,8 @@ provide('selectedInterval', selectedInterval)
       @select="selectedPlan = $event"
     />
     <div
-      class="rounded-2xl p-4 font-semibold transition-all duration-300 experimental-styles-within h-full border-2 border-solid cursor-pointer select-none"
       v-if="customStartingPrice"
+      class="rounded-2xl p-4 font-semibold transition-all duration-300 experimental-styles-within h-full border-2 border-solid cursor-pointer select-none"
       :class="!selectedPlan ? 'bg-brand-highlight border-brand' : 'bg-button-bg border-transparent'"
       role="button"
       tabindex="0"
