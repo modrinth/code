@@ -92,6 +92,57 @@ export const coreNags: Nag[] = [
     },
   },
   {
+    id: 'upload-gallery-image',
+    title: defineMessage({
+      id: 'nags.upload-gallery-image.title',
+      defaultMessage: 'Upload a gallery image',
+    }),
+    description: (context: NagContext) => {
+      const { formatMessage } = useVIntl()
+      const projectType = formatProjectType(context.project.project_type).toLowerCase()
+      let msg = ''
+      if (context.project.project_type === 'resourcepack') {
+        msg =
+          ', except for audio or localization packs. If this describes your pack, please select the appropriate tag'
+      }
+      const resourcepackMessage = msg
+
+      return formatMessage(
+        defineMessage({
+          id: 'nags.upload-gallery-image.description',
+          defaultMessage:
+            'At least one gallery image is required to showcase the content of your {type}{resourcepackMessage}.',
+        }),
+        {
+          type: projectType,
+          resourcepackMessage: resourcepackMessage,
+        },
+      )
+    },
+    status: 'required',
+    shouldShow: (context: NagContext) => {
+      return (
+        (context.project.project_type === 'resourcepack' ||
+          context.project.project_type === 'shader') &&
+        (!context.project.gallery || context.project.gallery?.length === 0) &&
+        !(
+          context.project.categories.includes('audio') ||
+          context.project.additional_categories.includes('audio') ||
+          context.project.categories.includes('locale') ||
+          context.project.additional_categories.includes('locale')
+        )
+      )
+    },
+    link: {
+      path: 'gallery',
+      title: defineMessage({
+        id: 'nags.gallery.title',
+        defaultMessage: 'Visit gallery page',
+      }),
+      shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-gallery',
+    },
+  },
+  {
     id: 'feature-gallery-image',
     title: defineMessage({
       id: 'nags.feature-gallery-image.title',
