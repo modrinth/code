@@ -5,7 +5,7 @@ description: Guide for contributing to Modrinth's backend
 
 This project is part of our [monorepo](https://github.com/modrinth/code). You can find it in the `apps/labrinth` directory. The instructions below assume that you have switched your working directory to the `apps/labrinth` subdirectory.
 
-[labrinth] is the Rust-based backend serving Modrinth's API with the help of the [Actix](https://actix.rs) framework. To get started with a labrinth instance, install docker, docker-compose (which comes with Docker), and [Rust]. The initial startup can be done simply with the command `docker-compose up`, or with `docker compose up` (Compose V2 and later). That will deploy a PostgreSQL database on port 5432 and a MeiliSearch instance on port 7700. To run the API itself, you'll need to use the `cargo run` command, this will deploy the API on port 8000.
+[labrinth] is the Rust-based backend serving Modrinth's API with the help of the [Actix](https://actix.rs) framework. To get started with a labrinth instance, install docker, docker-compose (which comes with Docker), and [Rust]. The initial startup can be done simply with the command `docker-compose up`, or with `docker compose up` (Compose V2 and later). That will deploy a PostgreSQL database on port 5432, a MeiliSearch instance on port 7700, and a [Mailpit](https://mailpit.axllent.org/) SMTP server on port 1025, with a web UI to inspect sent emails on port 8025. To run the API itself, you'll need to use the `cargo run` command, this will deploy the API on port 8000.
 
 To get a basic configuration, copy the `.env.local` file to `.env`. Now, you'll have to install the sqlx CLI, which can be done with cargo:
 
@@ -38,6 +38,8 @@ You can find more example SQL statements for seeding the database in the `tests/
 The majority of configuration is done at runtime using [dotenvy](https://crates.io/crates/dotenvy) and the `.env` file. Each of the variables and what they do can be found in the dropdown below. Additionally, there are three command line options that can be used to specify to MeiliSearch what you want to do.
 
 During development, you might notice that changes made directly to entities in the PostgreSQL database do not seem to take effect. This is often because the Redis cache still holds outdated data. To ensure your updates are reflected, clear the cache by e.g. running `redis-cli FLUSHALL`, which will force labrinth to fetch the latest data from the database the next time it is needed.
+
+You can also start labrinth and its backing services at once using `docker compose --profile with-labrinth up`, which will build and start labrinth through its Docker image as if it was yet another service container. To have that container be automatically rebuilt during development as changes to the source code are made, add the `--watch` flag, which enables [Compose Watch](https://docs.docker.com/compose/how-tos/file-watch/). Keep in mind, however, that Compose Watch is bound to be slower than other similar solutions that work outside of a container, particularly on Windows or macOS, where Docker runs in a virtual machine.
 
 <details>
 <summary>.env variables & command line options</summary>

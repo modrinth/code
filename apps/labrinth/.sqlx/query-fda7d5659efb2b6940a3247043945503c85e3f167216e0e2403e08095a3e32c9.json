@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                id, user_id, price_id, amount, currency_code, status, due, last_attempt,\n                charge_type, subscription_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                subscription_interval AS \"subscription_interval?\",\n                payment_platform,\n                payment_platform_id AS \"payment_platform_id?\",\n                parent_charge_id AS \"parent_charge_id?\",\n                net AS \"net?\"\n            FROM charges\n            \n            WHERE\n                charge_type = $1 AND\n                (\n                    (status = 'cancelled' AND due < NOW()) OR\n                    (status = 'failed' AND last_attempt < NOW() - INTERVAL '2 days')\n                )\n            ",
+  "query": "\n            SELECT\n                id, user_id, price_id, amount, currency_code, status, due, last_attempt,\n                charge_type, subscription_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                subscription_interval AS \"subscription_interval?\",\n                payment_platform,\n                payment_platform_id AS \"payment_platform_id?\",\n                parent_charge_id AS \"parent_charge_id?\",\n                net AS \"net?\"\n            FROM charges\n            \n            WHERE\n                charge_type = $1 AND\n                (\n                    (status = 'cancelled' AND due < NOW()) OR\n                    (status = 'expiring' AND due < NOW()) OR\n                    (status = 'failed' AND last_attempt < NOW() - INTERVAL '2 days')\n                )\n            ",
   "describe": {
     "columns": [
       {
@@ -102,5 +102,5 @@
       true
     ]
   },
-  "hash": "bfcbcadda1e323d56b6a21fc060c56bff2f38a54cf65dd1cc21f209240c7091b"
+  "hash": "fda7d5659efb2b6940a3247043945503c85e3f167216e0e2403e08095a3e32c9"
 }

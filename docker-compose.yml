@@ -58,7 +58,48 @@ services:
       interval: 3s
       timeout: 5s
       retries: 3
+  mail:
+    image: axllent/mailpit:v1.27
+    container_name: labrinth-mail
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+    environment:
+      MP_ENABLE_SPAMASSASSIN: postmark
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '-O/dev/null', 'http://localhost:8025/api/v1/info']
+      interval: 3s
+      timeout: 5s
+      retries: 3
+  labrinth:
+    profiles:
+      - with-labrinth
+    build:
+      context: .
+      dockerfile: ./apps/labrinth/Dockerfile
+    container_name: labrinth
+    ports:
+      - '8000:8000'
+    env_file: ./apps/labrinth/.env.docker-compose
+    volumes:
+      - labrinth-cdn-data:/tmp/modrinth
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+      meilisearch:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+      mail:
+        condition: service_healthy
+    develop:
+      watch:
+        - path: ./apps/labrinth
+          action: rebuild
 volumes:
   meilisearch-data:
   db-data:
   redis-data:
+  labrinth-cdn-data:
