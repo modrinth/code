@@ -23,7 +23,7 @@ FROM debian:bookworm-slim
 LABEL org.opencontainers.image.source=https://github.com/modrinth/code
 LABEL org.opencontainers.image.title=labrinth
 LABEL org.opencontainers.image.description="Modrinth API"
-LABEL org.opencontainers.image.licenses=AGPL-3.0-or-later
+LABEL org.opencontainers.image.licenses=AGPL-3.0-only
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates dumb-init curl \
