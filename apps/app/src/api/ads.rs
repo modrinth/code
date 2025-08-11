@@ -197,15 +197,13 @@ pub async fn open_link<R: Runtime>(
 
     if url::Url::parse(&path).is_ok()
         && !state.malicious_origins.contains(&origin)
+        && let Some(last_click) = state.last_click
+        && last_click.elapsed() < Duration::from_millis(100)
     {
-        if let Some(last_click) = state.last_click {
-            if last_click.elapsed() < Duration::from_millis(100) {
-                let _ = app.opener().open_url(&path, None::<String>);
-                state.last_click = None;
+        let _ = app.opener().open_url(&path, None::<String>);
+        state.last_click = None;
 
-                return Ok(());
-            }
-        }
+        return Ok(());
     }
 
     tracing::info!("Malicious click: {path} origin {origin}");

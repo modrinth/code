@@ -536,11 +536,9 @@ pub async fn create_payout(
                         Some(true),
                     )
                     .await
+                    && let Some(data) = res.items.first()
                 {
-                    if let Some(data) = res.items.first() {
-                        payout_item.platform_id =
-                            Some(data.payout_item_id.clone());
-                    }
+                    payout_item.platform_id = Some(data.payout_item_id.clone());
                 }
             }
 

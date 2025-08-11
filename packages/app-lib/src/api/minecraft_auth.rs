@@ -54,11 +54,11 @@ pub async fn remove_user(uuid: uuid::Uuid) -> crate::Result<()> {
     if let Some((uuid, user)) = users.remove(&uuid) {
         Credentials::remove(uuid, &state.pool).await?;
 
-        if user.active {
-            if let Some((_, mut user)) = users.into_iter().next() {
-                user.active = true;
-                user.upsert(&state.pool).await?;
-            }
+        if user.active
+            && let Some((_, mut user)) = users.into_iter().next()
+        {
+            user.active = true;
+            user.upsert(&state.pool).await?;
         }
     }
 

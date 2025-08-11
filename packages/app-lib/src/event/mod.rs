@@ -184,6 +184,7 @@ pub enum LoadingBarType {
 }
 
 #[derive(Serialize, Clone)]
+#[cfg(feature = "tauri")]
 pub struct LoadingPayload {
     pub event: LoadingBarType,
     pub loader_uuid: Uuid,
@@ -192,11 +193,7 @@ pub struct LoadingPayload {
 }
 
 #[derive(Serialize, Clone)]
-pub struct OfflinePayload {
-    pub offline: bool,
-}
-
-#[derive(Serialize, Clone)]
+#[cfg(feature = "tauri")]
 pub struct WarningPayload {
     pub message: String,
 }
@@ -220,12 +217,14 @@ pub enum CommandPayload {
 }
 
 #[derive(Serialize, Clone)]
+#[cfg(feature = "tauri")]
 pub struct ProcessPayload {
     pub profile_path_id: String,
     pub uuid: Uuid,
     pub event: ProcessPayloadType,
     pub message: String,
 }
+
 #[derive(Serialize, Clone, Debug)]
 #[serde(rename_all = "snake_case")]
 pub enum ProcessPayloadType {
@@ -234,11 +233,13 @@ pub enum ProcessPayloadType {
 }
 
 #[derive(Serialize, Clone)]
+#[cfg(feature = "tauri")]
 pub struct ProfilePayload {
     pub profile_path_id: String,
     #[serde(flatten)]
     pub event: ProfilePayloadType,
 }
+
 #[derive(Serialize, Clone)]
 #[serde(tag = "event", rename_all = "snake_case")]
 pub enum ProfilePayloadType {
@@ -257,6 +258,16 @@ pub enum ProfilePayloadType {
     Removed,
 }
 
+#[derive(Serialize, Clone)]
+#[serde(rename_all = "snake_case")]
+#[serde(tag = "event")]
+pub enum FriendPayload {
+    FriendRequest { from: UserId },
+    UserOffline { id: UserId },
+    StatusUpdate { user_status: UserStatus },
+    StatusSync,
+}
+
 #[derive(Debug, thiserror::Error)]
 pub enum EventError {
     #[error("Event state was not properly initialized")]
@@ -268,14 +279,4 @@ pub enum EventError {
     #[cfg(feature = "tauri")]
     #[error("Tauri error: {0}")]
     TauriError(#[from] tauri::Error),
-}
-
-#[derive(Serialize, Clone)]
-#[serde(rename_all = "snake_case")]
-#[serde(tag = "event")]
-pub enum FriendPayload {
-    FriendRequest { from: UserId },
-    UserOffline { id: UserId },
-    StatusUpdate { user_status: UserStatus },
-    StatusSync,
 }

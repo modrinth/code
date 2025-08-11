@@ -106,13 +106,12 @@ pub async fn version_project_get_helper(
                 || x.inner.version_number == id.1
         });
 
-        if let Some(version) = version {
-            if is_visible_version(&version.inner, &user_option, &pool, &redis)
+        if let Some(version) = version
+            && is_visible_version(&version.inner, &user_option, &pool, &redis)
                 .await?
-            {
-                return Ok(HttpResponse::Ok()
-                    .json(models::projects::Version::from(version)));
-            }
+        {
+            return Ok(HttpResponse::Ok()
+                .json(models::projects::Version::from(version)));
         }
     }
 
@@ -190,12 +189,12 @@ pub async fn version_get_helper(
     .map(|x| x.1)
     .ok();
 
-    if let Some(data) = version_data {
-        if is_visible_version(&data.inner, &user_option, &pool, &redis).await? {
-            return Ok(
-                HttpResponse::Ok().json(models::projects::Version::from(data))
-            );
-        }
+    if let Some(data) = version_data
+        && is_visible_version(&data.inner, &user_option, &pool, &redis).await?
+    {
+        return Ok(
+            HttpResponse::Ok().json(models::projects::Version::from(data))
+        );
     }
 
     Err(ApiError::NotFound)

@@ -5,7 +5,7 @@
     "lint": "cargo fmt --check && cargo clippy --all-targets",
     "fix": "cargo clippy --all-targets --fix --allow-dirty && cargo fmt",
     "dev": "cargo run",
-    "//": "Labrinth integration tests require a lot of disk space, so in the standard GitHub Actions",
+    "//": "labrinth integration tests require a lot of disk space, so in the standard GitHub Actions",
     "//": "runners we must remove useless development tools from the base image, which frees up ~20 GiB.",
     "//": "The command commented out below can be used in CI to debug what is taking up space:",
     "//": "sudo du -xh --max-depth=4 / | sort -rh | curl -X POST --data-urlencode content@/dev/fd/0 https://api.mclo.gs/1/log",

@@ -68,7 +68,7 @@ jobs:
       - name: ⚙️ Start services
         run: docker compose up --wait
 
-      - name: ⚙️ Setup Labrinth environment and database
+      - name: ⚙️ Setup labrinth environment and database
         working-directory: apps/labrinth
         run: |
           cp .env.local .env

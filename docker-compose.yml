@@ -1,6 +1,8 @@
+name: labrinth
 services:
   postgres_db:
     image: postgres:alpine
+    container_name: labrinth-postgres
     volumes:
       - db-data:/var/lib/postgresql/data
     ports:
@@ -16,6 +18,7 @@ services:
       retries: 3
   meilisearch:
     image: getmeili/meilisearch:v1.12.0
+    container_name: labrinth-meilisearch
     restart: on-failure
     ports:
       - '7700:7700'
@@ -31,6 +34,7 @@ services:
       retries: 3
   redis:
     image: redis:alpine
+    container_name: labrinth-redis
     restart: on-failure
     ports:
       - '6379:6379'
@@ -43,17 +47,59 @@ services:
       retries: 3
   clickhouse:
     image: clickhouse/clickhouse-server
+    container_name: labrinth-clickhouse
     ports:
       - '8123:8123'
     environment:
       CLICKHOUSE_USER: default
       CLICKHOUSE_PASSWORD: default
     healthcheck:
-      test: ['CMD', 'clickhouse-client', '--query', 'SELECT 1']
+      test: ['CMD-SHELL', 'clickhouse-client --query "SELECT 1"']
       interval: 3s
       timeout: 5s
       retries: 3
+  mail:
+    image: axllent/mailpit:v1.27
+    container_name: labrinth-mail
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+    environment:
+      MP_ENABLE_SPAMASSASSIN: postmark
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '-O/dev/null', 'http://localhost:8025/api/v1/info']
+      interval: 3s
+      timeout: 5s
+      retries: 3
+  labrinth:
+    profiles:
+      - with-labrinth
+    build:
+      context: .
+      dockerfile: ./apps/labrinth/Dockerfile
+    container_name: labrinth
+    ports:
+      - '8000:8000'
+    env_file: ./apps/labrinth/.env.docker-compose
+    volumes:
+      - labrinth-cdn-data:/tmp/modrinth
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+      meilisearch:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+      mail:
+        condition: service_healthy
+    develop:
+      watch:
+        - path: ./apps/labrinth
+          action: rebuild
 volumes:
   meilisearch-data:
   db-data:
   redis-data:
+  labrinth-cdn-data:

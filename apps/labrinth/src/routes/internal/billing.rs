@@ -300,17 +300,17 @@ pub async fn refund_charge(
         .upsert(&mut transaction)
         .await?;
 
-        if body.0.unprovision.unwrap_or(false) {
-            if let Some(subscription_id) = charge.subscription_id {
-                let open_charge =
-                    DBCharge::get_open_subscription(subscription_id, &**pool)
-                        .await?;
-                if let Some(mut open_charge) = open_charge {
-                    open_charge.status = ChargeStatus::Cancelled;
-                    open_charge.due = Utc::now();
+        if body.0.unprovision.unwrap_or(false)
+            && let Some(subscription_id) = charge.subscription_id
+        {
+            let open_charge =
+                DBCharge::get_open_subscription(subscription_id, &**pool)
+                    .await?;
+            if let Some(mut open_charge) = open_charge {
+                open_charge.status = ChargeStatus::Cancelled;
+                open_charge.due = Utc::now();
 
-                    open_charge.upsert(&mut transaction).await?;
-                }
+                open_charge.upsert(&mut transaction).await?;
             }
         }
 
@@ -1349,38 +1349,36 @@ pub async fn initiate_payment(
                     }
                 };
 
-                if let Price::Recurring { .. } = price_item.prices {
-                    if product.unitary {
-                        let user_subscriptions =
+                if let Price::Recurring { .. } = price_item.prices
+                    && product.unitary
+                {
+                    let user_subscriptions =
                         user_subscription_item::DBUserSubscription::get_all_user(
                             user.id.into(),
                             &**pool,
                         )
                         .await?;
 
-                        let user_products =
-                            product_item::DBProductPrice::get_many(
-                                &user_subscriptions
-                                    .iter()
-                                    .filter(|x| {
-                                        x.status
-                                            == SubscriptionStatus::Provisioned
-                                    })
-                                    .map(|x| x.price_id)
-                                    .collect::<Vec<_>>(),
-                                &**pool,
-                            )
-                            .await?;
+                    let user_products = product_item::DBProductPrice::get_many(
+                        &user_subscriptions
+                            .iter()
+                            .filter(|x| {
+                                x.status == SubscriptionStatus::Provisioned
+                            })
+                            .map(|x| x.price_id)
+                            .collect::<Vec<_>>(),
+                        &**pool,
+                    )
+                    .await?;
 
-                        if user_products
-                            .into_iter()
-                            .any(|x| x.product_id == product.id)
-                        {
-                            return Err(ApiError::InvalidInput(
-                                "You are already subscribed to this product!"
-                                    .to_string(),
-                            ));
-                        }
+                    if user_products
+                        .into_iter()
+                        .any(|x| x.product_id == product.id)
+                    {
+                        return Err(ApiError::InvalidInput(
+                            "You are already subscribed to this product!"
+                                .to_string(),
+                        ));
                     }
                 }
 
@@ -2158,38 +2156,36 @@ pub async fn stripe_webhook(
             EventType::PaymentMethodAttached => {
                 if let EventObject::PaymentMethod(payment_method) =
                     event.data.object
-                {
-                    if let Some(customer_id) =
+                    && let Some(customer_id) =
                         payment_method.customer.map(|x| x.id())
+                {
+                    let customer = stripe::Customer::retrieve(
+                        &stripe_client,
+                        &customer_id,
+                        &[],
+                    )
+                    .await?;
+
+                    if customer
+                        .invoice_settings
+                        .is_none_or(|x| x.default_payment_method.is_none())
                     {
-                        let customer = stripe::Customer::retrieve(
+                        stripe::Customer::update(
                             &stripe_client,
                             &customer_id,
-                            &[],
+                            UpdateCustomer {
+                                invoice_settings: Some(
+                                    CustomerInvoiceSettings {
+                                        default_payment_method: Some(
+                                            payment_method.id.to_string(),
+                                        ),
+                                        ..Default::default()
+                                    },
+                                ),
+                                ..Default::default()
+                            },
                         )
                         .await?;
-
-                        if customer
-                            .invoice_settings
-                            .is_none_or(|x| x.default_payment_method.is_none())
-                        {
-                            stripe::Customer::update(
-                                &stripe_client,
-                                &customer_id,
-                                UpdateCustomer {
-                                    invoice_settings: Some(
-                                        CustomerInvoiceSettings {
-                                            default_payment_method: Some(
-                                                payment_method.id.to_string(),
-                                            ),
-                                            ..Default::default()
-                                        },
-                                    ),
-                                    ..Default::default()
-                                },
-                            )
-                            .await?;
-                        }
                     }
                 }
             }

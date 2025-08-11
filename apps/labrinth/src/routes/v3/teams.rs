@@ -767,12 +767,13 @@ pub async fn edit_team_member(
                 ));
             }
 
-            if let Some(new_permissions) = edit_member.permissions {
-                if !permissions.contains(new_permissions) {
-                    return Err(ApiError::InvalidInput(
-                        "The new permissions have permissions that you don't have".to_string(),
-                    ));
-                }
+            if let Some(new_permissions) = edit_member.permissions
+                && !permissions.contains(new_permissions)
+            {
+                return Err(ApiError::InvalidInput(
+                    "The new permissions have permissions that you don't have"
+                        .to_string(),
+                ));
             }
 
             if edit_member.organization_permissions.is_some() {
@@ -800,13 +801,12 @@ pub async fn edit_team_member(
             }
 
             if let Some(new_permissions) = edit_member.organization_permissions
+                && !organization_permissions.contains(new_permissions)
             {
-                if !organization_permissions.contains(new_permissions) {
-                    return Err(ApiError::InvalidInput(
+                return Err(ApiError::InvalidInput(
                         "The new organization permissions have permissions that you don't have"
                             .to_string(),
                     ));
-                }
             }
 
             if edit_member.permissions.is_some()
@@ -822,13 +822,13 @@ pub async fn edit_team_member(
         }
     }
 
-    if let Some(payouts_split) = edit_member.payouts_split {
-        if payouts_split < Decimal::ZERO || payouts_split > Decimal::from(5000)
-        {
-            return Err(ApiError::InvalidInput(
-                "Payouts split must be between 0 and 5000!".to_string(),
-            ));
-        }
+    if let Some(payouts_split) = edit_member.payouts_split
+        && (payouts_split < Decimal::ZERO
+            || payouts_split > Decimal::from(5000))
+    {
+        return Err(ApiError::InvalidInput(
+            "Payouts split must be between 0 and 5000!".to_string(),
+        ));
     }
 
     DBTeamMember::edit_team_member(
@@ -883,13 +883,13 @@ pub async fn transfer_ownership(
         DBTeam::get_association(id.into(), &**pool).await?;
     if let Some(TeamAssociationId::Project(pid)) = team_association_id {
         let result = DBProject::get_id(pid, &**pool, &redis).await?;
-        if let Some(project_item) = result {
-            if project_item.inner.organization_id.is_some() {
-                return Err(ApiError::InvalidInput(
+        if let Some(project_item) = result
+            && project_item.inner.organization_id.is_some()
+        {
+            return Err(ApiError::InvalidInput(
                     "You cannot transfer ownership of a project team that is owend by an organization"
                         .to_string(),
                 ));
-            }
         }
     }
 

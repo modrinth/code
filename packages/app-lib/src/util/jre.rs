@@ -191,22 +191,21 @@ async fn get_all_autoinstalled_jre_path() -> Result<HashSet<PathBuf>, JREError>
         let mut jre_paths = HashSet::new();
         let base_path = state.directories.java_versions_dir();
 
-        if base_path.is_dir() {
-            if let Ok(dir) = std::fs::read_dir(base_path) {
-                for entry in dir.flatten() {
-                    let file_path = entry.path().join("bin");
+        if base_path.is_dir()
+            && let Ok(dir) = std::fs::read_dir(base_path)
+        {
+            for entry in dir.flatten() {
+                let file_path = entry.path().join("bin");
 
-                    if let Ok(contents) =
-                        std::fs::read_to_string(file_path.clone())
+                if let Ok(contents) = std::fs::read_to_string(file_path.clone())
+                {
+                    let entry = entry.path().join(contents);
+                    jre_paths.insert(entry);
+                } else {
+                    #[cfg(not(target_os = "macos"))]
                     {
-                        let entry = entry.path().join(contents);
-                        jre_paths.insert(entry);
-                    } else {
-                        #[cfg(not(target_os = "macos"))]
-                        {
-                            let file_path = file_path.join(JAVA_BIN);
-                            jre_paths.insert(file_path);
-                        }
+                        let file_path = file_path.join(JAVA_BIN);
+                        jre_paths.insert(file_path);
                     }
                 }
             }
@@ -300,20 +299,20 @@ pub async fn check_java_at_filepath(path: &Path) -> crate::Result<JavaVersion> {
     }
 
     // Extract version info from it
-    if let Some(arch) = java_arch {
-        if let Some(version) = java_version {
-            if let Ok(version) = extract_java_version(version) {
-                let path = java.to_string_lossy().to_string();
-                return Ok(JavaVersion {
-                    parsed_version: version,
-                    path,
-                    version: version.to_string(),
-                    architecture: arch.to_string(),
-                });
-            }
-
-            return Err(JREError::InvalidJREVersion(version.to_owned()).into());
+    if let Some(arch) = java_arch
+        && let Some(version) = java_version
+    {
+        if let Ok(version) = extract_java_version(version) {
+            let path = java.to_string_lossy().to_string();
+            return Ok(JavaVersion {
+                parsed_version: version,
+                path,
+                version: version.to_string(),
+                architecture: arch.to_string(),
+            });
         }
+
+        return Err(JREError::InvalidJREVersion(version.to_owned()).into());
     }
 
     Err(JREError::FailedJavaCheck(java).into())

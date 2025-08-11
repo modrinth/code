@@ -387,17 +387,16 @@ pub async fn revenue_get(
         .map(|x| (x.to_string(), HashMap::new()))
         .collect::<HashMap<_, _>>();
     for value in payouts_values {
-        if let Some(mod_id) = value.mod_id {
-            if let Some(amount) = value.amount_sum {
-                if let Some(interval_start) = value.interval_start {
-                    let id_string = to_base62(mod_id as u64);
-                    if !hm.contains_key(&id_string) {
-                        hm.insert(id_string.clone(), HashMap::new());
-                    }
-                    if let Some(hm) = hm.get_mut(&id_string) {
-                        hm.insert(interval_start.timestamp(), amount);
-                    }
-                }
+        if let Some(mod_id) = value.mod_id
+            && let Some(amount) = value.amount_sum
+            && let Some(interval_start) = value.interval_start
+        {
+            let id_string = to_base62(mod_id as u64);
+            if !hm.contains_key(&id_string) {
+                hm.insert(id_string.clone(), HashMap::new());
+            }
+            if let Some(hm) = hm.get_mut(&id_string) {
+                hm.insert(interval_start.timestamp(), amount);
             }
         }
     }

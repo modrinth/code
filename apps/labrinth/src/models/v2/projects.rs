@@ -334,18 +334,14 @@ impl From<Version> for LegacyVersion {
         // the v2 loaders are whatever the corresponding loader fields are
         let mut loaders =
             data.loaders.into_iter().map(|l| l.0).collect::<Vec<_>>();
-        if loaders.contains(&"mrpack".to_string()) {
-            if let Some((_, mrpack_loaders)) = data
+        if loaders.contains(&"mrpack".to_string())
+            && let Some((_, mrpack_loaders)) = data
                 .fields
                 .into_iter()
                 .find(|(key, _)| key == "mrpack_loaders")
-            {
-                if let Ok(mrpack_loaders) =
-                    serde_json::from_value(mrpack_loaders)
-                {
-                    loaders = mrpack_loaders;
-                }
-            }
+            && let Ok(mrpack_loaders) = serde_json::from_value(mrpack_loaders)
+        {
+            loaders = mrpack_loaders;
         }
         let loaders = loaders.into_iter().map(Loader).collect::<Vec<_>>();
 
