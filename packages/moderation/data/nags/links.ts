@@ -73,9 +73,9 @@ export const linksNags: Nag[] = [
     status: 'warning',
     shouldShow: (context: NagContext) => {
       return (
-        !isCommonUrl(context.project.source_url, commonLinkDomains.source) ||
-        !isCommonUrl(context.project.issues_url, commonLinkDomains.issues) ||
-        !isCommonUrl(context.project.discord_url, commonLinkDomains.discord)
+        !isCommonUrl(context.project.source_url ?? null, commonLinkDomains.source) ||
+        !isCommonUrl(context.project.issues_url ?? null, commonLinkDomains.issues) ||
+        !isCommonUrl(context.project.discord_url ?? null, commonLinkDomains.discord)
       )
     },
     link: {
@@ -100,9 +100,9 @@ export const linksNags: Nag[] = [
     }),
     status: 'required',
     shouldShow: (context: NagContext) =>
-      isDiscordUrl(context.project.source_url) ||
-      isDiscordUrl(context.project.issues_url) ||
-      isDiscordUrl(context.project.wiki_url),
+      isDiscordUrl(context.project.source_url ?? null) ||
+      isDiscordUrl(context.project.issues_url ?? null) ||
+      isDiscordUrl(context.project.wiki_url ?? null),
     link: {
       path: 'settings/links',
       title: defineMessage({
@@ -124,11 +124,23 @@ export const linksNags: Nag[] = [
         'Use of link shorteners or other methods to obscure where a link may lead in your external links or license link is prohibited, please only use appropriate full length links.',
     }),
     status: 'required',
-    shouldShow: (context: NagContext) =>
-      isLinkShortener(context.project.source_url) ||
-      isLinkShortener(context.project.issues_url) ||
-      isLinkShortener(context.project.wiki_url) ||
-      Boolean(context.project.license.url && isLinkShortener(context.project.license.url)),
+    shouldShow: (context: NagContext) => {
+      if (context.project.donation_urls) {
+        for (const donation of context.project.donation_urls) {
+          if (isLinkShortener(donation.url ?? null)) {
+            return true
+          }
+        }
+      }
+
+      return (
+        isLinkShortener(context.project.source_url ?? null) ||
+        isLinkShortener(context.project.issues_url ?? null) ||
+        isLinkShortener(context.project.wiki_url ?? null) ||
+        isLinkShortener(context.project.discord_url ?? null) ||
+        Boolean(context.project.license.url && isLinkShortener(context.project.license.url ?? null))
+      )
+    },
   },
   {
     id: 'invalid-license-url',
