@@ -247,13 +247,17 @@ defineExpose({
   show: begin,
 })
 
+defineEmits<{
+  hide: void
+}>()
+
 function handleChooseCustom() {
   customServer.value = true
   selectedPlan.value = undefined
 }
 </script>
 <template>
-  <NewModal ref="modal">
+  <NewModal ref="modal" @hide="$emit('hide')">
     <template #title>
       <div class="flex items-center gap-1 font-bold text-secondary">
         <template v-for="(title, id, index) in titles" :key="id">

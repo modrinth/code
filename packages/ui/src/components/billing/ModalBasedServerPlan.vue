@@ -61,9 +61,11 @@ const mostPopularStyle = computed(() => {
 
 <template>
   <div
-    class="transition-colors duration-300 !bg-bg card !p-4 experimental-styles-within h-full border-2 border-solid border-transparent cursor-pointer select-none"
+    class="rounded-2xl p-4 font-semibold transition-all duration-300 experimental-styles-within h-full border-2 border-solid cursor-pointer select-none"
     :class="{
-      '!border-brand': selected,
+      'bg-brand-highlight border-brand': selected,
+      'bg-button-bg border-transparent': !selected,
+      '!bg-bg': mostPopular,
     }"
     :style="mostPopularStyle"
     role="button"
@@ -73,8 +75,8 @@ const mostPopularStyle = computed(() => {
     @keydown.enter.prevent="emit('select', plan)"
     @keydown.space.prevent="emit('select', plan)"
   >
-    <div class="flex h-full flex-col justify-between">
-      <div class="flex flex-col gap-2">
+    <div class="flex h-full flex-col justify-between gap-2">
+      <div class="flex flex-col">
         <div class="flex items-center justify-between">
           <span class="text-2xl font-semibold text-contrast">
             {{ formatMessage(title) }}
@@ -92,8 +94,9 @@ const mostPopularStyle = computed(() => {
             / month{{ selectedInterval !== 'monthly' ? `, billed ${selectedInterval}` : '' }}
           </span>
         </span>
-        <span class="text-sm">{{ formatMessage(description) }}</span>
       </div>
+
+      <span class="text-sm">{{ formatMessage(description) }}</span>
 
       <div class="flex flex-col gap-2">
         <Menu placement="bottom-start" :triggers="['click']" :autoHide="false" :distance="8">

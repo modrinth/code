@@ -6,13 +6,9 @@
     <!-- Purchase modal POC -->
     <ModrinthServersPurchaseModal
       v-if="customer"
-      :key="`manage-purchase-modal-${customer?.id}`"
       ref="purchaseModal"
       :publishable-key="config.public.stripePublishableKey"
-      :initiate-payment="
-        async (body) =>
-          await useBaseFetch('billing/payment', { internal: true, method: 'POST', body })
-      "
+      :initiate-payment="async (body) => await initiatePayment(body)"
       :available-products="pyroProducts"
       :on-error="handleError"
       :customer="customer"
@@ -24,6 +20,7 @@
       :refresh-payment-methods="fetchPaymentData"
       :fetch-stock="fetchStock"
       :plan-stage="true"
+      @hide="() => (subscriptionId = null)"
     />
     <div
       v-if="hasError || fetchError"
@@ -124,7 +121,7 @@
           v-for="server in filteredData.filter((s) => s.status !== 'suspended')"
           :key="server.server_id"
           v-bind="server"
-          @upgrade="openUpgradeModal()"
+          @upgrade="openUpgradeModal(server.server_id)"
         />
         <LazyUiServersServerListingSkeleton v-if="isPollingForNewServers" />
       </ul>
@@ -349,7 +346,44 @@ function runPingTest(region: any, index = 1) {
   }
 }
 
-function openUpgradeModal() {
+const subscriptionId = ref<string | null>(null);
+
+async function initiatePayment(body: any): Promise<any> {
+  if (subscriptionId.value) {
+    // Transform the POST billing/payment payload to PATCH subscription/{id} format
+    const transformedBody = {
+      interval: body.charge?.interval,
+      payment_method: body.id,
+      product: body.charge?.product_id,
+      // TODO: Uncomment when server region is available to PATCH.
+      // region: body.metadata?.server_region,
+    };
+
+    return await useBaseFetch(`billing/subscription/${subscriptionId.value}`, {
+      internal: true,
+      method: "PATCH",
+      body: transformedBody,
+    });
+  } else {
+    addNotification({
+      title: "Unable to determine subscription ID.",
+      text: "Please contact support.",
+      type: "error",
+    });
+    return Promise.reject(new Error("Unable to determine subscription ID."));
+  }
+}
+
+async function openUpgradeModal(server_id: string) {
+  const subscriptions = (await useBaseFetch(`billing/subscriptions`, { internal: true })) as any[];
+  for (const sub of subscriptions) {
+    console.log(sub);
+    if (sub?.metadata?.type === "pyro" && sub?.metadata?.id === server_id) {
+      subscriptionId.value = sub.id;
+      break;
+    }
+  }
+
   purchaseModal.value?.show("quarterly");
 }
 

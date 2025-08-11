@@ -60,7 +60,7 @@ const messages = defineMessages({
   },
   customDesc: {
     id: 'servers.purchase.step.plan.custom.desc',
-    defaultMessage: 'Pick your own RAM and storage options.',
+    defaultMessage: 'Pick a customized plan with just the specs you need.',
   },
   mostPopular: {
     id: 'servers.purchase.step.plan.most-popular',
@@ -124,11 +124,11 @@ provide('selectedInterval', selectedInterval)
 </script>
 
 <template>
-  <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3 mb-2">
+  <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3 mb-5 !mt-0">
     <span></span>
     <OptionGroup
       v-slot="{ option }"
-      class="!bg-bg"
+      class="!bg-button-bg !shadow-none"
       v-model="selectedInterval"
       :options="availableBillingIntervals"
     >
@@ -140,7 +140,7 @@ provide('selectedInterval', selectedInterval)
       {{ selectedInterval !== 'quarterly' ? 'Save' : 'Saving' }} 16% with quarterly billing!
     </span>
   </div>
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+  <div class="grid grid-cols-1 sm:grid-cols-2 !gap-4">
     <ModalBasedServerPlan
       v-if="plansByRam.small"
       :plan="plansByRam.small"
@@ -170,21 +170,21 @@ provide('selectedInterval', selectedInterval)
       @select="selectedPlan = $event"
     />
     <div
-      class="transition-colors duration-300 !bg-bg card !p-4 h-full border-2 border-solid border-transparent cursor-pointer select-none"
+      class="rounded-2xl p-4 font-semibold transition-all duration-300 experimental-styles-within h-full border-2 border-solid cursor-pointer select-none"
       v-if="customStartingPrice"
-      :class="{
-        '!border-brand': !selectedPlan,
-      }"
+      :class="!selectedPlan ? 'bg-brand-highlight border-brand' : 'bg-button-bg border-transparent'"
       role="button"
       tabindex="0"
-      aria-pressed="false"
+      :aria-pressed="!selectedPlan"
       @click="handleCustomPlan"
       @keydown.enter.prevent="handleCustomPlan"
       @keydown.space.prevent="handleCustomPlan"
     >
       <div class="flex h-full flex-col justify-between">
-        <div class="flex flex-col gap-3">
-          <span class="text-2xl font-semibold text-contrast">Custom</span>
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center justify-between">
+            <span class="text-2xl font-semibold text-contrast">Custom</span>
+          </div>
           <span class="m-0 text-lg font-bold text-contrast">
             {{ formatPrice(locale, customStartingPrice, currency, true) }}
             <span class="text-sm font-semibold text-secondary">
@@ -193,9 +193,8 @@ provide('selectedInterval', selectedInterval)
               >
             </span>
           </span>
-          <span class="text-sm mb-2">{{ formatMessage(messages.customDesc) }}</span>
+          <span class="text-sm">{{ formatMessage(messages.customDesc) }}</span>
         </div>
-
         <div class="flex flex-col gap-2">
           <div class="flex items-center gap-3">
             <span v-if="customPricePerGb" class="text-sm text-secondary">
