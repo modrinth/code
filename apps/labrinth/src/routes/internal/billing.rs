@@ -301,17 +301,18 @@ pub async fn refund_charge(
         .await?;
 
         if body.0.unprovision.unwrap_or(false)
-            && let Some(subscription_id) = charge.subscription_id {
-                let open_charge =
-                    DBCharge::get_open_subscription(subscription_id, &**pool)
-                        .await?;
-                if let Some(mut open_charge) = open_charge {
-                    open_charge.status = ChargeStatus::Cancelled;
-                    open_charge.due = Utc::now();
+            && let Some(subscription_id) = charge.subscription_id
+        {
+            let open_charge =
+                DBCharge::get_open_subscription(subscription_id, &**pool)
+                    .await?;
+            if let Some(mut open_charge) = open_charge {
+                open_charge.status = ChargeStatus::Cancelled;
+                open_charge.due = Utc::now();
 
-                    open_charge.upsert(&mut transaction).await?;
-                }
+                open_charge.upsert(&mut transaction).await?;
             }
+        }
 
         transaction.commit().await?;
     }
@@ -409,20 +410,21 @@ pub async fn edit_subscription(
         }
 
         if let Some(interval) = &edit_subscription.interval
-            && let Price::Recurring { intervals } = &current_price.prices {
-                // For expiring charges, the interval is handled in the Product branch.
-                if open_charge.status != ChargeStatus::Expiring {
-                    if let Some(price) = intervals.get(interval) {
-                        open_charge.subscription_interval = Some(*interval);
-                        open_charge.amount = *price as i64;
-                    } else {
-                        return Err(ApiError::InvalidInput(
-                            "Interval is not valid for this subscription!"
-                                .to_string(),
-                        ));
-                    }
+            && let Price::Recurring { intervals } = &current_price.prices
+        {
+            // For expiring charges, the interval is handled in the Product branch.
+            if open_charge.status != ChargeStatus::Expiring {
+                if let Some(price) = intervals.get(interval) {
+                    open_charge.subscription_interval = Some(*interval);
+                    open_charge.amount = *price as i64;
+                } else {
+                    return Err(ApiError::InvalidInput(
+                        "Interval is not valid for this subscription!"
+                            .to_string(),
+                    ));
                 }
             }
+        }
 
         let intent = if let Some(product_id) = &edit_subscription.product {
             let product_price =
@@ -1365,38 +1367,37 @@ pub async fn initiate_payment(
                 };
 
                 if let Price::Recurring { .. } = price_item.prices
-                    && product.unitary {
-                        let user_subscriptions =
+                    && product.unitary
+                {
+                    let user_subscriptions =
                         user_subscription_item::DBUserSubscription::get_all_user(
                             user.id.into(),
                             &**pool,
                         )
                         .await?;
 
-                        let user_products =
-                            product_item::DBProductPrice::get_many(
-                                &user_subscriptions
-                                    .iter()
-                                    .filter(|x| {
-                                        x.status
-                                            == SubscriptionStatus::Provisioned
-                                    })
-                                    .map(|x| x.price_id)
-                                    .collect::<Vec<_>>(),
-                                &**pool,
-                            )
-                            .await?;
+                    let user_products = product_item::DBProductPrice::get_many(
+                        &user_subscriptions
+                            .iter()
+                            .filter(|x| {
+                                x.status == SubscriptionStatus::Provisioned
+                            })
+                            .map(|x| x.price_id)
+                            .collect::<Vec<_>>(),
+                        &**pool,
+                    )
+                    .await?;
 
-                        if user_products
-                            .into_iter()
-                            .any(|x| x.product_id == product.id)
-                        {
-                            return Err(ApiError::InvalidInput(
-                                "You are already subscribed to this product!"
-                                    .to_string(),
-                            ));
-                        }
+                    if user_products
+                        .into_iter()
+                        .any(|x| x.product_id == product.id)
+                    {
+                        return Err(ApiError::InvalidInput(
+                            "You are already subscribed to this product!"
+                                .to_string(),
+                        ));
                     }
+                }
 
                 (
                     price as i64,
@@ -2232,36 +2233,36 @@ pub async fn stripe_webhook(
                     event.data.object
                     && let Some(customer_id) =
                         payment_method.customer.map(|x| x.id())
+                {
+                    let customer = stripe::Customer::retrieve(
+                        &stripe_client,
+                        &customer_id,
+                        &[],
+                    )
+                    .await?;
+
+                    if customer
+                        .invoice_settings
+                        .is_none_or(|x| x.default_payment_method.is_none())
                     {
-                        let customer = stripe::Customer::retrieve(
+                        stripe::Customer::update(
                             &stripe_client,
                             &customer_id,
-                            &[],
+                            UpdateCustomer {
+                                invoice_settings: Some(
+                                    CustomerInvoiceSettings {
+                                        default_payment_method: Some(
+                                            payment_method.id.to_string(),
+                                        ),
+                                        ..Default::default()
+                                    },
+                                ),
+                                ..Default::default()
+                            },
                         )
                         .await?;
-
-                        if customer
-                            .invoice_settings
-                            .is_none_or(|x| x.default_payment_method.is_none())
-                        {
-                            stripe::Customer::update(
-                                &stripe_client,
-                                &customer_id,
-                                UpdateCustomer {
-                                    invoice_settings: Some(
-                                        CustomerInvoiceSettings {
-                                            default_payment_method: Some(
-                                                payment_method.id.to_string(),
-                                            ),
-                                            ..Default::default()
-                                        },
-                                    ),
-                                    ..Default::default()
-                                },
-                            )
-                            .await?;
-                        }
                     }
+                }
             }
             _ => {}
         }
