@@ -926,7 +926,7 @@ const selectProduct = async (product) => {
   await nextTick();
 
   if (product === "custom") {
-    purchaseModal.value?.show(billingPeriod.value, undefined, selectedProjectId.value);
+    purchaseModal.value?.show(billingPeriod.value, null, selectedProjectId.value);
   } else {
     purchaseModal.value?.show(billingPeriod.value, selectedProduct.value, selectedProjectId.value);
   }

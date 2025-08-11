@@ -138,7 +138,7 @@ const nextStep = computed(() =>
 const canProceed = computed(() => {
   switch (currentStep.value) {
     case 'plan':
-      return !!selectedPlan.value
+      return !!selectedPlan.value || customServer.value
     case 'region':
       return selectedRegion.value && selectedPlan.value && selectedInterval.value
     case 'payment':
@@ -209,13 +209,31 @@ async function setStep(step: Step | undefined, skipValidation = false) {
 }
 
 watch(selectedPlan, () => {
-  // Keep custom flag in sync: if a plan is selected, it's not custom
-  customServer.value = !selectedPlan.value
+  if (currentStep.value === 'plan') {
+    customServer.value = !selectedPlan.value
+  }
+})
+
+const defaultPlan = computed<ServerPlan | undefined>(() => {
+  return (
+    props.availableProducts.find((p) => p?.metadata?.type === 'pyro' && p.metadata.ram === 6144) ??
+    props.availableProducts.find((p) => p?.metadata?.type === 'pyro') ??
+    props.availableProducts[0]
+  )
 })
 
 function begin(interval: ServerBillingInterval, plan?: ServerPlan, project?: string) {
   loading.value = false
-  selectedPlan.value = plan
+
+  if (plan === null) {
+    // Explicitly open in custom mode
+    selectedPlan.value = undefined
+    customServer.value = true
+  } else {
+    selectedPlan.value = plan ?? defaultPlan.value
+    customServer.value = !selectedPlan.value
+  }
+
   selectedInterval.value = interval
   customServer.value = !selectedPlan.value
   selectedPaymentMethod.value = undefined
@@ -232,7 +250,6 @@ defineExpose({
 function handleChooseCustom() {
   customServer.value = true
   selectedPlan.value = undefined
-  setStep('region', true)
 }
 </script>
 <template>

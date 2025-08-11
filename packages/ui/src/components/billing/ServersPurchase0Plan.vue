@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, provide } from 'vue'
+import { computed, onMounted, provide } from 'vue'
 import { useVIntl, defineMessages } from '@vintl/vintl'
 import ServersSpecs from './ServersSpecs.vue'
 import { monthsInInterval, type ServerBillingInterval, type ServerPlan } from '../../utils/billing'
@@ -68,25 +68,6 @@ const messages = defineMessages({
   },
 })
 
-const sortedPlans = computed(() => {
-  return props.availableProducts
-    .slice()
-    .sort((a, b) => (a.metadata?.ram ?? 0) - (b.metadata?.ram ?? 0))
-})
-
-function planName(plan: ServerPlan): string {
-  if (!plan?.metadata || plan.metadata.type !== 'pyro') return 'Custom'
-  const ram = plan.metadata.ram
-  if (ram === 4096) return 'Small'
-  if (ram === 6144) return 'Medium'
-  if (ram === 8192) return 'Large'
-  return 'Custom'
-}
-
-function select(plan: ServerPlan) {
-  selectedPlan.value = plan
-}
-
 const plansByRam = computed(() => {
   const byName: Record<'small' | 'medium' | 'large', ServerPlan | undefined> = {
     small: undefined,
@@ -101,6 +82,10 @@ const plansByRam = computed(() => {
   }
   return byName
 })
+
+function handleCustomPlan() {
+  emit('choose-custom')
+}
 
 function pricePerMonth(plan?: ServerPlan) {
   if (!plan) return undefined
@@ -151,11 +136,8 @@ provide('selectedInterval', selectedInterval)
       <span v-else-if="option === 'quarterly'"> Pay quarterly </span>
       <span v-else-if="option === 'yearly'"> Pay yearly </span>
     </OptionGroup>
-    <span
-      class="bg-transparent p-0 text-sm text-xs font-bold text-brand"
-      v-if="selectedInterval !== 'quarterly'"
-    >
-      Save 16% with quarterly billing!
+    <span class="bg-transparent p-0 text-sm text-xs font-bold text-brand">
+      {{ selectedInterval !== 'quarterly' ? 'Save' : 'Saving' }} 16% with quarterly billing!
     </span>
   </div>
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -187,26 +169,34 @@ provide('selectedInterval', selectedInterval)
       :selected="selectedPlan?.id === plansByRam.large.id"
       @select="selectedPlan = $event"
     />
-    <div class="!bg-bg card !p-4 h-full" v-if="customStartingPrice">
+    <div
+      class="transition-colors duration-300 !bg-bg card !p-4 h-full border-2 border-solid border-transparent cursor-pointer select-none"
+      v-if="customStartingPrice"
+      :class="{
+        '!border-brand': !selectedPlan,
+      }"
+      role="button"
+      tabindex="0"
+      aria-pressed="false"
+      @click="handleCustomPlan"
+      @keydown.enter.prevent="handleCustomPlan"
+      @keydown.space.prevent="handleCustomPlan"
+    >
       <div class="flex h-full flex-col justify-between">
         <div class="flex flex-col gap-3">
           <span class="text-2xl font-semibold text-contrast">Custom</span>
           <span class="m-0 text-lg font-bold text-contrast">
             {{ formatPrice(locale, customStartingPrice, currency, true) }}
             <span class="text-sm font-semibold text-secondary">
-              / month<template v-if="interval !== 'monthly'">, billed {{ interval }}</template>
+              / month<template v-if="selectedInterval !== 'monthly'"
+                >, billed {{ selectedInterval }}</template
+              >
             </span>
           </span>
           <span class="text-sm mb-2">{{ formatMessage(messages.customDesc) }}</span>
         </div>
 
         <div class="flex flex-col gap-2">
-          <ButtonStyled size="large" type="outlined">
-            <button class="!w-full" @click="handleConfigureCustomPlan">
-              Get started <RightArrowIcon />
-            </button>
-          </ButtonStyled>
-
           <div class="flex items-center gap-3">
             <span v-if="customPricePerGb" class="text-sm text-secondary">
               From {{ formatPrice(locale, customPricePerGb, currency, true) }} / GB

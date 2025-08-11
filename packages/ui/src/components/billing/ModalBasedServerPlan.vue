@@ -61,11 +61,17 @@ const mostPopularStyle = computed(() => {
 
 <template>
   <div
-    class="transition-colors duration-300 !bg-bg card !p-4 experimental-styles-within h-full border-2 border-solid border-transparent"
+    class="transition-colors duration-300 !bg-bg card !p-4 experimental-styles-within h-full border-2 border-solid border-transparent cursor-pointer select-none"
     :class="{
       '!border-brand': selected,
     }"
     :style="mostPopularStyle"
+    role="button"
+    tabindex="0"
+    :aria-pressed="selected"
+    @click="emit('select', plan)"
+    @keydown.enter.prevent="emit('select', plan)"
+    @keydown.space.prevent="emit('select', plan)"
   >
     <div class="flex h-full flex-col justify-between">
       <div class="flex flex-col gap-2">
@@ -90,15 +96,9 @@ const mostPopularStyle = computed(() => {
       </div>
 
       <div class="flex flex-col gap-2">
-        <ButtonStyled size="large" type="highlight-colored-text" :color="buttonColor">
-          <button class="!w-full" @click="emit('select', plan)">
-            {{ selected ? 'Selected' : 'Select plan' }}
-          </button>
-        </ButtonStyled>
-
         <Menu placement="bottom-start" :triggers="['click']" :autoHide="false" :distance="8">
           <template #default="{ shown }">
-            <div>
+            <div @click.stop @keydown.stop>
               <span class="flex justify-between text-sm">
                 View plan details
                 <DropdownIcon
