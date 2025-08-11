@@ -290,7 +290,9 @@
           </div>
         </div>
 
-        <MedalServerCountdown class="mb-4" />
+        <div class="mb-4">
+          <MedalServerCountdown />
+        </div>
 
         <div
           v-if="!isConnected && !isReconnecting && !isLoading"
