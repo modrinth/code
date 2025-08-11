@@ -11,6 +11,7 @@ const { formatMessage, locale } = useVIntl()
 const props = defineProps<{
   availableProducts: ServerPlan[]
   currency: string
+  existingPlan?: ServerPlan
 }>()
 
 const availableBillingIntervals = ['monthly', 'quarterly']
@@ -62,6 +63,14 @@ const messages = defineMessages({
     id: 'servers.purchase.step.plan.most-popular',
     defaultMessage: 'Most Popular',
   },
+})
+
+const isSameAsExistingPlan = computed(() => {
+  return !!(
+    props.existingPlan &&
+    selectedPlan.value &&
+    props.existingPlan.id === selectedPlan.value.id
+  )
 })
 
 const plansByRam = computed(() => {
@@ -136,6 +145,18 @@ provide('selectedInterval', selectedInterval)
       {{ selectedInterval !== 'quarterly' ? 'Save' : 'Saving' }} 16% with quarterly billing!
     </span>
   </div>
+  <Transition
+    enter-active-class="transition-all duration-300 ease-out"
+    enter-from-class="opacity-0 max-h-0"
+    enter-to-class="opacity-100 max-h-20"
+    leave-active-class="transition-all duration-200 ease-in"
+    leave-from-class="opacity-100 max-h-20"
+    leave-to-class="opacity-0 max-h-0"
+  >
+    <div v-if="isSameAsExistingPlan" class="text-orange mb-5 text-center" role="alert">
+      Your server is already on this plan, choose a different plan.
+    </div>
+  </Transition>
   <div class="grid grid-cols-1 sm:grid-cols-2 !gap-4">
     <ModalBasedServerPlan
       v-if="plansByRam.small"

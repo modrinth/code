@@ -20,7 +20,8 @@
       :refresh-payment-methods="fetchPaymentData"
       :fetch-stock="fetchStock"
       :plan-stage="true"
-      @hide="() => (subscriptionId = null)"
+      :existing-plan="currentPlanFromSubscription"
+      @hide="() => (subscription = null)"
     />
     <div
       v-if="hasError || fetchError"
@@ -137,12 +138,12 @@ import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import Fuse from "fuse.js";
 import { HammerIcon, PlusIcon, SearchIcon } from "@modrinth/assets";
 import { ButtonStyled, CopyCode, ModrinthServersPurchaseModal } from "@modrinth/ui";
-import type { Server, ModrinthServersFetchError } from "@modrinth/utils";
+import type { Server, ModrinthServersFetchError, UserSubscription } from "@modrinth/utils";
 import { reloadNuxtApp } from "#app";
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import MedalServerListing from "~/components/ui/servers/marketing/MedalServerListing.vue";
 import { products } from "~/generated/state.json";
-import { useBaseFetch } from "#build/imports.ts";
+import type { ServerPlan } from "@modrinth/ui/src/utils/billing";
 
 definePageMeta({
   middleware: "auth",
@@ -345,10 +346,23 @@ function runPingTest(region: any, index = 1) {
   }
 }
 
-const subscriptionId = ref<string | null>(null);
+const subscription = ref<UserSubscription | null>(null);
+const currentPlanFromSubscription = computed<ServerPlan | undefined>(() => {
+  console.log("Current plan from subscription:", {
+    subscription: subscription.value,
+    pyroProducts,
+  });
+  return subscription.value
+    ? (pyroProducts.find(
+        (p) =>
+          p.prices.filter((price: { id: string }) => price.id === subscription.value?.price_id)
+            .length > 0,
+      ) ?? undefined)
+    : undefined;
+});
 
 async function initiatePayment(body: any): Promise<any> {
-  if (subscriptionId.value) {
+  if (subscription.value) {
     // Transform the POST billing/payment payload to PATCH subscription/{id} format
     const transformedBody = {
       interval: body.charge?.interval,
@@ -358,7 +372,7 @@ async function initiatePayment(body: any): Promise<any> {
       // region: body.metadata?.server_region,
     };
 
-    return await useBaseFetch(`billing/subscription/${subscriptionId.value}`, {
+    return await useBaseFetch(`billing/subscription/${subscription.value.id}`, {
       internal: true,
       method: "PATCH",
       body: transformedBody,
@@ -378,7 +392,7 @@ async function openUpgradeModal(serverId: string) {
   for (const sub of subscriptions) {
     console.log(sub);
     if (sub?.metadata?.type === "pyro" && sub?.metadata?.id === serverId) {
-      subscriptionId.value = sub.id;
+      subscription.value = sub;
       break;
     }
   }

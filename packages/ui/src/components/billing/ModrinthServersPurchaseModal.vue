@@ -48,6 +48,7 @@ const props = defineProps<{
   regions: ServerRegion[]
   availableProducts: ServerPlan[]
   planStage?: boolean
+  existingPlan?: ServerPlan
   refreshPaymentMethods: () => Promise<void>
   fetchStock: (region: ServerRegion, request: ServerStockRequest) => Promise<number>
   initiatePayment: (
@@ -80,6 +81,7 @@ const {
   hasPaymentMethod,
   submitPayment,
   completingPurchase,
+  noPaymentRequired,
 } = useStripe(
   props.publishableKey,
   props.customer,
@@ -138,13 +140,25 @@ const nextStep = computed(() =>
 const canProceed = computed(() => {
   switch (currentStep.value) {
     case 'plan':
-      return !!selectedPlan.value || customServer.value
+      console.log('Plan step:', {
+        customServer: customServer.value,
+        selectedPlan: selectedPlan.value,
+        existingPlan: props.existingPlan,
+      })
+      return (
+        customServer.value ||
+        (!!selectedPlan.value &&
+          (!props.existingPlan || selectedPlan.value.id !== props.existingPlan.id))
+      )
     case 'region':
       return selectedRegion.value && selectedPlan.value && selectedInterval.value
     case 'payment':
       return selectedPaymentMethod.value || !loadingElements.value
     case 'review':
-      return acceptedEula.value && hasPaymentMethod.value && !completingPurchase.value
+      return (
+        (noPaymentRequired.value || (acceptedEula.value && hasPaymentMethod.value)) &&
+        !completingPurchase.value
+      )
     default:
       return false
   }
@@ -169,6 +183,9 @@ async function beforeProceed(step: string) {
       }
       return true
     case 'review':
+      if (noPaymentRequired.value) {
+        return true
+      }
       if (selectedPaymentMethod.value) {
         return true
       } else {
@@ -289,6 +306,7 @@ function handleChooseCustom() {
         v-if="currentStep === 'plan'"
         v-model:plan="selectedPlan"
         v-model:interval="selectedInterval"
+        :existing-plan="existingPlan"
         :available-products="availableProducts"
         :currency="currency"
         @choose-custom="handleChooseCustom"
@@ -316,7 +334,7 @@ function handleChooseCustom() {
       <ConfirmPurchase
         v-else-if="
           currentStep === 'review' &&
-          hasPaymentMethod &&
+          (hasPaymentMethod || noPaymentRequired) &&
           currentRegion &&
           selectedInterval &&
           selectedPlan
@@ -331,6 +349,7 @@ function handleChooseCustom() {
         :selected-payment-method="selectedPaymentMethod || inputtedPaymentMethod"
         :tax="tax"
         :total="total"
+        :no-payment-required="noPaymentRequired"
         @change-payment-method="
           () => {
             skipPaymentMethods = false
@@ -374,17 +393,20 @@ function handleChooseCustom() {
       <ButtonStyled color="brand">
         <button
           v-tooltip="
-            currentStep === 'review' && !acceptedEula
+            currentStep === 'review' && !acceptedEula && !noPaymentRequired
               ? 'You must accept the Minecraft EULA to proceed.'
               : undefined
           "
           :disabled="!canProceed"
-          @click="setStep(nextStep)"
+          @click="noPaymentRequired && currentStep === 'review' ? modal?.hide() : setStep(nextStep)"
         >
           <template v-if="currentStep === 'review'">
-            <SpinnerIcon v-if="completingPurchase" class="animate-spin" />
-            <CheckCircleIcon v-else />
-            Subscribe
+            <template v-if="noPaymentRequired"><CheckCircleIcon /> Close</template>
+            <template v-else>
+              <SpinnerIcon v-if="completingPurchase" class="animate-spin" />
+              <CheckCircleIcon v-else />
+              Subscribe
+            </template>
           </template>
           <template v-else>
             {{ formatMessage(commonMessages.nextButton) }} <RightArrowIcon />

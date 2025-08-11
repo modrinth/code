@@ -43,6 +43,7 @@ const props = defineProps<{
   ping?: number
   loading?: boolean
   selectedPaymentMethod: Stripe.PaymentMethod | undefined
+  noPaymentRequired?: boolean
 }>()
 
 const interval = defineModel<ServerBillingInterval>('interval', { required: true })
@@ -196,28 +197,39 @@ function setInterval(newInterval: ServerBillingInterval) {
     </button>
   </div>
   <div class="mt-2">
-    <ExpandableInvoiceTotal
-      :period="period"
-      :currency="currency"
-      :loading="loading"
-      :total="total ?? -1"
-      :billing-items="
-        total !== undefined && tax !== undefined
-          ? [
-              {
-                title: `Modrinth Servers (${planName})`,
-                amount: total - tax,
-              },
-              {
-                title: 'Tax',
-                amount: tax,
-              },
-            ]
-          : []
-      "
-    />
+    <template v-if="!noPaymentRequired">
+      <ExpandableInvoiceTotal
+        :period="period"
+        :currency="currency"
+        :loading="loading"
+        :total="total ?? -1"
+        :billing-items="
+          total !== undefined && tax !== undefined
+            ? [
+                {
+                  title: `Modrinth Servers (${planName})`,
+                  amount: total - tax,
+                },
+                {
+                  title: 'Tax',
+                  amount: tax,
+                },
+              ]
+            : []
+        "
+      />
+    </template>
+    <div
+      v-else
+      class="p-4 rounded-2xl bg-table-alternateRow text-sm text-secondary leading-relaxed"
+    >
+      No payment needed. The change to your subscription will apply on your next billing date.
+    </div>
   </div>
-  <div class="mt-2 flex items-center pl-4 pr-2 py-3 bg-bg rounded-2xl gap-2 text-secondary">
+  <div
+    v-if="!noPaymentRequired"
+    class="mt-2 flex items-center pl-4 pr-2 py-3 bg-bg rounded-2xl gap-2 text-secondary"
+  >
     <template v-if="selectedPaymentMethod">
       <FormattedPaymentMethod :method="selectedPaymentMethod" />
     </template>
@@ -234,7 +246,7 @@ function setInterval(newInterval: ServerBillingInterval) {
       </button>
     </ButtonStyled>
   </div>
-  <p class="m-0 mt-4 text-sm text-secondary">
+  <p v-if="!noPaymentRequired" class="m-0 mt-4 text-sm text-secondary">
     <span class="font-semibold"
       >By clicking "Subscribe", you are purchasing a recurring subscription.</span
     >
@@ -246,7 +258,7 @@ function setInterval(newInterval: ServerBillingInterval) {
     every {{ period }} plus applicable taxes starting today, until you cancel. You can cancel
     anytime from your settings page.
   </p>
-  <div class="mt-2 flex items-center gap-1 text-sm">
+  <div v-if="!noPaymentRequired" class="mt-2 flex items-center gap-1 text-sm">
     <Checkbox
       v-model="acceptedEula"
       label="I acknowledge that I have read and agree to the"
