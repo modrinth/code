@@ -373,11 +373,11 @@ async function initiatePayment(body: any): Promise<any> {
   }
 }
 
-async function openUpgradeModal(server_id: string) {
+async function openUpgradeModal(serverId: string) {
   const subscriptions = (await useBaseFetch(`billing/subscriptions`, { internal: true })) as any[];
   for (const sub of subscriptions) {
     console.log(sub);
-    if (sub?.metadata?.type === "pyro" && sub?.metadata?.id === server_id) {
+    if (sub?.metadata?.type === "pyro" && sub?.metadata?.id === serverId) {
       subscriptionId.value = sub.id;
       break;
     }
