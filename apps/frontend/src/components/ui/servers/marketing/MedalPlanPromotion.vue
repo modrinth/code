@@ -20,7 +20,9 @@
       </div>
     </div>
     <ButtonStyled color="orange" type="outlined" size="large">
-      <nuxt-link to="https://medal.tv/" class="z-10 my-auto">Learn more <ExternalIcon /></nuxt-link>
+      <nuxt-link to="https://medal.tv/modrinth" class="z-10 my-auto"
+        >Learn more <ExternalIcon
+      /></nuxt-link>
     </ButtonStyled>
   </div>
 </template>
