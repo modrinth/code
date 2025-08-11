@@ -142,7 +142,7 @@ import { reloadNuxtApp } from "#app";
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import MedalServerListing from "~/components/ui/servers/marketing/MedalServerListing.vue";
 import { products } from "~/generated/state.json";
-import { useBaseFetch } from "#build/imports";
+import { useBaseFetch } from "#build/imports.ts";
 
 definePageMeta({
   middleware: "auth",
@@ -253,7 +253,7 @@ const pyroProducts = (products as any[])
 
 function handleError(err: any) {
   // todo
-  // eslint-disable-next-line no-console
+
   console.error("Purchase modal error:", err);
 }
 
@@ -266,7 +266,6 @@ async function fetchPaymentData() {
     customer.value = customerData as any;
     paymentMethods.value = paymentMethodsData as any[];
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Error fetching payment data:", error);
   }
 }
