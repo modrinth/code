@@ -311,7 +311,7 @@ export function flattenProjectVariables(project: Project): Record<string, string
   vars[`ADVANCED_MARKDOWN`] =
     `[Markdown Formatting Guide](https://support.modrinth.com/en/articles/8801962-advanced-markdown-formatting)`
   vars[`LICENSING_GUIDE`] =
-    `our guide to [Guide to Licensing your Mods](https://modrinth.com/news/article/licensing-guide)`
+    `our guide to [Licensing your Mods](https://modrinth.com/news/article/licensing-guide)`
 
   // Navigation related variables
   vars[`PROJECT_PERMANENT_LINK`] = `https://modrinth.com/project/${project.id}`
