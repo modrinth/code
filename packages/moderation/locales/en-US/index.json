@@ -164,6 +164,12 @@
   "nags.summary-same-as-title.title": {
     "defaultMessage": "Make the summary unique"
   },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "Your summary should not contain formatting, line breaks, special characters, or links, since the summary will only display plain text."
+  },
+  "nags.summary-special-formatting.title": {
+    "defaultMessage": "Clear up the summary"
+  },
   "nags.summary-too-short.description": {
     "defaultMessage": "Your summary is {length} characters. At least {minChars} characters is recommended to create an informative and enticing summary."
   },
@@ -181,6 +187,12 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Select accurate tags"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "At least one gallery image is required to showcase the content of your {type}{resourcepackMessage}."
+  },
+  "nags.upload-gallery-image.title": {
+    "defaultMessage": "Upload a gallery image"
   },
   "nags.upload-version.description": {
     "defaultMessage": "At least one version is required for a project to be submitted for review."
