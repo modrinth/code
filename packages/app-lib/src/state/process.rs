@@ -2,6 +2,7 @@ use crate::event::emit::{emit_process, emit_profile};
 use crate::event::{ProcessPayloadType, ProfilePayloadType};
 use crate::profile;
 use crate::util::io::IOError;
+use crate::util::rpc::RpcServer;
 use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
 use dashmap::DashMap;
 use quick_xml::Reader;
@@ -17,7 +18,6 @@ use tempfile::TempDir;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::{Child, Command};
 use uuid::Uuid;
-use crate::util::rpc::RpcServer;
 
 const LAUNCHER_LOG_PATH: &str = "launcher_log.txt";
 
@@ -73,11 +73,8 @@ impl ProcessManager {
             _main_class_keep_alive: main_class_keep_alive,
         };
 
-        if let Err(e) = post_process_init(
-            &process.metadata,
-            &process.rpc_server,
-        )
-        .await
+        if let Err(e) =
+            post_process_init(&process.metadata, &process.rpc_server).await
         {
             tracing::error!("Failed to run post-process init: {e}");
             let _ = process.child.kill().await;

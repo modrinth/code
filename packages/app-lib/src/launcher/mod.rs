@@ -12,6 +12,7 @@ use crate::state::{
     Credentials, JavaVersion, ProcessMetadata, ProfileInstallStage,
 };
 use crate::util::io;
+use crate::util::rpc::RpcServerBuilder;
 use crate::{State, get_resource_file, process, state as st};
 use chrono::Utc;
 use daedalus as d;
@@ -23,7 +24,6 @@ use st::Profile;
 use std::fmt::Write;
 use std::path::PathBuf;
 use tokio::process::Command;
-use crate::util::rpc::RpcServerBuilder;
 
 mod args;
 
@@ -794,7 +794,9 @@ pub async fn launch_minecraft(
                     let Some(value) = value else {
                         continue;
                     };
-                    rpc_server.call_method_2::<()>("set_system_property", key, value).await?;
+                    rpc_server
+                        .call_method_2::<()>("set_system_property", key, value)
+                        .await?;
                 }
                 rpc_server.call_method::<()>("launch").await?;
                 Ok(())

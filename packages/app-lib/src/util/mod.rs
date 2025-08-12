@@ -2,8 +2,8 @@
 pub mod fetch;
 pub mod io;
 pub mod jre;
+pub mod json;
 pub mod platform;
 pub mod protocol_version;
-pub mod server_ping;
 pub mod rpc;
-pub mod json;
+pub mod server_ping;

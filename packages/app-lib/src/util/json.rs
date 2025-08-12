@@ -4,12 +4,17 @@ use serde::de::DeserializeOwned;
 use tokio::io::{AsyncRead, AsyncReadExt};
 
 pub async fn parse_object_async_reader<R, T>(reader: &mut R) -> Result<T>
-    where R: AsyncRead + Unpin,
-        T: DeserializeOwned,
+where
+    R: AsyncRead + Unpin,
+    T: DeserializeOwned,
 {
     let first_char = reader.read_u8().await?;
     if first_char != b'{' {
-        return Err(InputError(format!("Expected '{{' to start JSON object, but found '{}'", first_char as char)).into());
+        return Err(InputError(format!(
+            "Expected '{{' to start JSON object, but found '{}'",
+            first_char as char
+        ))
+        .into());
     }
 
     let mut json_data = vec![first_char];
@@ -26,10 +31,10 @@ pub async fn parse_object_async_reader<R, T>(reader: &mut R) -> Result<T>
                 match char {
                     b'\\' => json_data.push(reader.read_u8().await?),
                     b'"' => break,
-                    _ => {},
+                    _ => {}
                 }
-            }
-            _ => {},
+            },
+            _ => {}
         }
     }
 

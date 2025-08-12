@@ -1,22 +1,23 @@
+use crate::util::json::parse_object_async_reader;
+use crate::{ErrorKind, Result};
+use serde::de::DeserializeOwned;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
 use std::pin::Pin;
 use std::sync::{Arc, Mutex};
-use serde::{Deserialize, Serialize};
-use serde::de::DeserializeOwned;
-use serde_json::Value;
 use tokio::io::AsyncWriteExt;
 use tokio::net::TcpListener;
 use tokio::sync::{mpsc, oneshot};
 use tokio::task::AbortHandle;
 use uuid::Uuid;
-use crate::util::json::parse_object_async_reader;
-use crate::{ErrorKind, Result};
 
 type HandlerFuture = Pin<Box<dyn Send + Future<Output = Result<Value>>>>;
 type HandlerMethod = Box<dyn Send + Sync + Fn(Vec<Value>) -> HandlerFuture>;
 type HandlerMap = HashMap<&'static str, HandlerMethod>;
-type WaitingResponsesMap = Arc<Mutex<HashMap<Uuid, oneshot::Sender<Result<Value>>>>>;
+type WaitingResponsesMap =
+    Arc<Mutex<HashMap<Uuid, oneshot::Sender<Result<Value>>>>>;
 
 pub struct RpcServerBuilder {
     handlers: HandlerMap,
@@ -31,7 +32,11 @@ impl RpcServerBuilder {
 
     // We'll use this function in the future. Please remove this #[allow] when we do.
     #[allow(dead_code)]
-    pub fn handler(mut self, function_name: &'static str, handler: HandlerMethod) -> Self {
+    pub fn handler(
+        mut self,
+        function_name: &'static str,
+        handler: HandlerMethod,
+    ) -> Self {
         self.handlers.insert(function_name, Box::new(handler));
         self
     }
@@ -46,7 +51,14 @@ impl RpcServerBuilder {
         let join_handle = {
             let waiting_responses = waiting_responses.clone();
             tokio::spawn(async move {
-                if let Err(e) = RpcServer::run(socket, message_receiver, self.handlers, waiting_responses.clone()).await {
+                if let Err(e) = RpcServer::run(
+                    socket,
+                    message_receiver,
+                    self.handlers,
+                    waiting_responses.clone(),
+                )
+                .await
+                {
                     tracing::error!("Failed to run RPC server: {e}");
                 }
                 waiting_responses.lock().unwrap().clear();
@@ -55,7 +67,7 @@ impl RpcServerBuilder {
         Ok(RpcServer {
             port: addr.port(),
             message_sender,
-            waiting_responses: waiting_responses.clone(),
+            waiting_responses,
             abort_handle: join_handle.abort_handle(),
         })
     }
@@ -74,20 +86,36 @@ impl RpcServer {
         self.port
     }
 
-    pub async fn call_method<R: DeserializeOwned>(&self, method: &str) -> Result<R> {
+    pub async fn call_method<R: DeserializeOwned>(
+        &self,
+        method: &str,
+    ) -> Result<R> {
         self.call_method_any(method, vec![]).await
     }
 
-    pub async fn call_method_2<R: DeserializeOwned>(&self, method: &str, arg1: impl Serialize, arg2: impl Serialize) -> Result<R> {
-        self.call_method_any(method, vec![
-            serde_json::to_value(arg1)?,
-            serde_json::to_value(arg2)?,
-        ]).await
+    pub async fn call_method_2<R: DeserializeOwned>(
+        &self,
+        method: &str,
+        arg1: impl Serialize,
+        arg2: impl Serialize,
+    ) -> Result<R> {
+        self.call_method_any(
+            method,
+            vec![serde_json::to_value(arg1)?, serde_json::to_value(arg2)?],
+        )
+        .await
     }
 
-    async fn call_method_any<R: DeserializeOwned>(&self, method: &str, args: Vec<Value>) -> Result<R> {
+    async fn call_method_any<R: DeserializeOwned>(
+        &self,
+        method: &str,
+        args: Vec<Value>,
+    ) -> Result<R> {
         if self.message_sender.is_closed() {
-            return Err(ErrorKind::RpcError("RPC connection closed".to_string()).into());
+            return Err(ErrorKind::RpcError(
+                "RPC connection closed".to_string(),
+            )
+            .into());
         }
 
         let id = Uuid::new_v4();
@@ -98,18 +126,24 @@ impl RpcServer {
             id,
             body: RpcMessageBody::Call {
                 method: method.to_owned(),
-                args
-            }
+                args,
+            },
         };
-        if let Err(_) = self.message_sender.send(message) {
+        if self.message_sender.send(message).is_err() {
             self.waiting_responses.lock().unwrap().remove(&id);
-            return Err(ErrorKind::RpcError("RPC connection closed while sending".to_string()).into());
+            return Err(ErrorKind::RpcError(
+                "RPC connection closed while sending".to_string(),
+            )
+            .into());
         }
 
         tracing::debug!("Waiting on result for {id}");
         let Ok(result) = recv.await else {
             self.waiting_responses.lock().unwrap().remove(&id);
-            return Err(ErrorKind::RpcError("RPC connection closed while waiting for response".to_string()).into());
+            return Err(ErrorKind::RpcError(
+                "RPC connection closed while waiting for response".to_string(),
+            )
+            .into());
         };
         result.and_then(|x| Ok(serde_json::from_value(x)?))
     }
