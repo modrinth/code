@@ -1,4 +1,5 @@
 <template>
+  <ServersUpgradeModalWrapper ref="upgradeModal" />
   <section class="universal-card experimental-styles-within">
     <h2>{{ formatMessage(messages.subscriptionTitle) }}</h2>
     <p>{{ formatMessage(messages.subscriptionDescription) }}</p>
@@ -479,38 +480,6 @@
       :payment-methods="paymentMethods"
       :return-url="`${config.public.siteUrl}/settings/billing`"
     />
-    <PurchaseModal
-      ref="pyroPurchaseModal"
-      :product="upgradeProducts"
-      :country="country"
-      custom-server
-      :existing-subscription="currentSubscription"
-      :existing-plan="currentProduct"
-      :publishable-key="config.public.stripePublishableKey"
-      :send-billing-request="
-        async (body) =>
-          await useBaseFetch(`billing/subscription/${currentSubscription.id}`, {
-            internal: true,
-            method: `PATCH`,
-            body: body,
-          })
-      "
-      :renewal-date="currentSubRenewalDate"
-      :on-error="
-        (err) =>
-          data.$notify({
-            group: 'main',
-            title: 'An error occurred',
-            type: 'error',
-            text: err.message ?? (err.data ? err.data.description : err),
-          })
-      "
-      :fetch-capacity-statuses="fetchCapacityStatuses"
-      :customer="customer"
-      :payment-methods="paymentMethods"
-      :return-url="`${config.public.siteUrl}/servers/manage`"
-      :server-name="`${auth?.user?.username}'s server`"
-    />
     <AddPaymentMethodModal
       ref="addPaymentMethodModal"
       :publishable-key="config.public.stripePublishableKey"
@@ -630,35 +599,36 @@
 
 <script setup>
 import {
-  ConfirmModal,
+  ArrowBigUpDashIcon,
+  CardIcon,
+  CheckCircleIcon,
+  CurrencyIcon,
+  EditIcon,
+  HistoryIcon,
+  ModrinthPlusIcon,
+  MoreVerticalIcon,
+  PayPalIcon,
+  PlusIcon,
+  RightArrowIcon,
+  SpinnerIcon,
+  StarIcon,
+  TransferIcon,
+  TrashIcon,
+  UpdatedIcon,
+  XIcon,
+} from "@modrinth/assets";
+import {
   AddPaymentMethodModal,
+  ButtonStyled,
+  ConfirmModal,
+  CopyCode,
   OverflowMenu,
   PurchaseModal,
-  ButtonStyled,
-  CopyCode,
   commonMessages,
 } from "@modrinth/ui";
-import {
-  PlusIcon,
-  TransferIcon,
-  SpinnerIcon,
-  ArrowBigUpDashIcon,
-  XIcon,
-  CardIcon,
-  MoreVerticalIcon,
-  TrashIcon,
-  EditIcon,
-  StarIcon,
-  PayPalIcon,
-  CurrencyIcon,
-  CheckCircleIcon,
-  RightArrowIcon,
-  ModrinthPlusIcon,
-  UpdatedIcon,
-  HistoryIcon,
-} from "@modrinth/assets";
 import { calculateSavings, formatPrice, getCurrency } from "@modrinth/utils";
-import { ref, computed } from "vue";
+import { computed, ref } from "vue";
+import ServersUpgradeModalWrapper from "~/components/ui/servers/ServersUpgradeModalWrapper.vue";
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import { products } from "~/generated/state.json";
 
@@ -1021,44 +991,9 @@ const getPlanChangeVerb = (currentProduct, nextProduct) => {
 
 const modalCancel = ref(null);
 
-const pyroPurchaseModal = ref();
-const currentSubscription = ref(null);
-const currentProduct = ref(null);
-const upgradeProducts = ref([]);
-upgradeProducts.value.metadata = { type: "pyro" };
-
-const currentSubRenewalDate = ref();
-
+const upgradeModal = ref(null);
 const showPyroUpgradeModal = async (subscription) => {
-  currentSubscription.value = subscription;
-  currentSubRenewalDate.value = getPyroCharge(subscription).due;
-  currentProduct.value = getPyroProduct(subscription);
-  upgradeProducts.value = products.filter(
-    (p) =>
-      p.metadata.type === "pyro" &&
-      (!currentProduct.value || p.metadata.ram > currentProduct.value.metadata.ram),
-  );
-  upgradeProducts.value.metadata = { type: "pyro" };
-
-  await nextTick();
-
-  if (!currentProduct.value) {
-    console.error("Could not find product for current subscription");
-    data.$notify({
-      group: "main",
-      title: "An error occurred",
-      text: "Could not find product for current subscription",
-      type: "error",
-    });
-    return;
-  }
-
-  if (!pyroPurchaseModal.value) {
-    console.error("pyroPurchaseModal ref is undefined");
-    return;
-  }
-
-  pyroPurchaseModal.value.show();
+  upgradeModal.value?.open(subscription?.metadata?.id);
 };
 
 async function fetchCapacityStatuses(serverId, product) {
