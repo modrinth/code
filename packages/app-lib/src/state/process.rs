@@ -15,8 +15,9 @@ use std::path::{Path, PathBuf};
 use std::process::ExitStatus;
 use tempfile::TempDir;
 use tokio::io::{AsyncBufReadExt, BufReader};
-use tokio::process::{Child, ChildStdin, Command};
+use tokio::process::{Child, Command};
 use uuid::Uuid;
+use crate::util::rpc::RpcServer;
 
 const LAUNCHER_LOG_PATH: &str = "launcher_log.txt";
 
@@ -46,9 +47,10 @@ impl ProcessManager {
         logs_folder: PathBuf,
         xml_logging: bool,
         main_class_keep_alive: TempDir,
+        rpc_server: RpcServer,
         post_process_init: impl AsyncFnOnce(
             &ProcessMetadata,
-            &mut ChildStdin,
+            &RpcServer,
         ) -> crate::Result<()>,
     ) -> crate::Result<ProcessMetadata> {
         mc_command.stdout(std::process::Stdio::piped());
@@ -67,12 +69,13 @@ impl ProcessManager {
                 profile_path: profile_path.to_string(),
             },
             child: mc_proc,
+            rpc_server,
             _main_class_keep_alive: main_class_keep_alive,
         };
 
         if let Err(e) = post_process_init(
             &process.metadata,
-            &mut process.child.stdin.as_mut().unwrap(),
+            &process.rpc_server,
         )
         .await
         {
@@ -165,6 +168,10 @@ impl ProcessManager {
         self.processes.get(&id).map(|x| x.metadata.clone())
     }
 
+    pub fn get_rpc(&self, id: Uuid) -> Option<RpcServer> {
+        self.processes.get(&id).map(|x| x.rpc_server.clone())
+    }
+
     pub fn get_all(&self) -> Vec<ProcessMetadata> {
         self.processes
             .iter()
@@ -215,6 +222,7 @@ struct Process {
     metadata: ProcessMetadata,
     child: Child,
     _main_class_keep_alive: TempDir,
+    rpc_server: RpcServer,
 }
 
 #[derive(Debug, Default)]

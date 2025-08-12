@@ -124,6 +124,7 @@ pub fn get_jvm_arguments(
     quick_play_type: &QuickPlayType,
     quick_play_version: QuickPlayVersion,
     log_config: Option<&LoggingConfiguration>,
+    rpc_port: u16,
 ) -> crate::Result<Vec<String>> {
     let mut parsed_arguments = Vec::new();
 
@@ -180,6 +181,8 @@ pub fn get_jvm_arguments(
             })?
             .to_string_lossy()
     ));
+
+    parsed_arguments.push(format!("-Dmodrinth.internal.rpcPort={rpc_port}"));
 
     parsed_arguments.push(format!(
         "-Dmodrinth.internal.quickPlay.serverVersion={}",
