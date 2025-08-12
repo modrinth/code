@@ -2,7 +2,12 @@ package com.modrinth.theseus.rpc;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import java.io.*;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UncheckedIOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -17,7 +22,7 @@ import java.util.function.Function;
 
 public final class TheseusRpc {
     static final Gson GSON = new GsonBuilder()
-            .setStrictness(Strictness.STRICT)
+            .setStrictness(Strictness.LENIENT)
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .disableHtmlEscaping()
             .create();
@@ -74,7 +79,8 @@ public final class TheseusRpc {
 
     private void mainThread() {
         try {
-            final Writer writer = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);
+            final JsonWriter writer =
+                    GSON.newJsonWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
             while (true) {
                 final RpcMessage message = mainThreadQueue.take();
                 if (message.isForSending) {
@@ -104,9 +110,10 @@ public final class TheseusRpc {
 
     private void readThread() {
         try {
-            final Reader reader = new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8);
+            final JsonReader reader =
+                    GSON.newJsonReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
             while (true) {
-                final RpcMessage message = GSON.fromJson(GSON.newJsonReader(reader), MESSAGE_TYPE);
+                final RpcMessage message = GSON.fromJson(reader, MESSAGE_TYPE);
                 if (message.method == null) {
                     final ResponseWaiter<?> waiter = awaitingResponse.get(message.id);
                     if (waiter != null) {
