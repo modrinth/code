@@ -150,7 +150,7 @@ async function initiatePayment(body: any): Promise<any> {
       interval: body.charge?.interval,
       payment_method: body.id,
       product: body.charge?.product_id,
-      // region: body.metadata?.server_region,
+      region: body.metadata?.server_region,
     };
 
     return await useBaseFetch(`billing/subscription/${subscription.value.id}`, {
