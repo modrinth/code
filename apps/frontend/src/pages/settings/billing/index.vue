@@ -51,18 +51,35 @@
                 {{
                   formatPrice(
                     vintl.locale,
-                    midasSubscriptionPrice.prices.intervals[midasCharge.subscription_interval],
+                    midasSubscriptionPrice.prices.intervals[midasSubscription.interval],
                     midasSubscriptionPrice.currency_code,
                   )
                 }}
                 /
-                {{ midasCharge.subscription_interval }}
+                {{ midasSubscription.interval }}
               </template>
               <template v-else>
                 {{ formatPrice(vintl.locale, price.prices.intervals.monthly, price.currency_code) }}
                 / month
               </template>
             </span>
+            <!-- Next charge preview for Midas when interval is changing -->
+            <div
+              v-if="
+                midasCharge &&
+                midasCharge.status === 'open' &&
+                midasSubscription &&
+                midasSubscription.interval &&
+                midasCharge.subscription_interval !== midasSubscription.interval
+              "
+              class="-mt-1 flex items-baseline gap-2 text-sm text-secondary"
+            >
+              <span class="opacity-70">Next:</span>
+              <span class="font-semibold text-contrast">
+                {{ formatPrice(vintl.locale, midasCharge.amount, midasCharge.currency_code) }}
+              </span>
+              <span>/{{ midasCharge.subscription_interval.replace("ly", "") }}</span>
+            </div>
             <template v-if="midasCharge">
               <span
                 v-if="
@@ -87,6 +104,18 @@
               </span>
               <span v-else-if="midasCharge.status === 'cancelled'" class="text-sm text-secondary">
                 Expires {{ $dayjs(midasCharge.due).format("MMMM D, YYYY") }}
+              </span>
+              <span
+                v-if="
+                  midasCharge.status === 'open' &&
+                  midasSubscription &&
+                  midasSubscription.interval &&
+                  midasCharge.subscription_interval !== midasSubscription.interval
+                "
+                class="text-sm text-secondary"
+              >
+                Switches to {{ midasCharge.subscription_interval }} billing on
+                {{ $dayjs(midasCharge.due).format("MMMM D, YYYY") }}
               </span>
             </template>
 
@@ -209,6 +238,7 @@
               <UiServersServerListing
                 v-if="subscription.serverInfo"
                 v-bind="subscription.serverInfo"
+                :pending-change="getPendingChange(subscription)"
               />
               <div v-else class="w-fit">
                 <p>
@@ -286,6 +316,38 @@
                       </span>
                       <span>/{{ subscription.interval.replace("ly", "") }}</span>
                     </div>
+                    <div
+                      v-if="
+                        getPyroCharge(subscription) &&
+                        getPyroCharge(subscription).status === 'open' &&
+                        ((getPyroCharge(subscription).price_id &&
+                          getPyroCharge(subscription).price_id !== subscription.price_id) ||
+                          (getPyroCharge(subscription).subscription_interval &&
+                            getPyroCharge(subscription).subscription_interval !==
+                              subscription.interval))
+                      "
+                      class="-mt-1 flex items-baseline gap-2 text-sm text-secondary"
+                    >
+                      <span class="opacity-70">Next:</span>
+                      <span class="font-semibold text-contrast">
+                        {{
+                          formatPrice(
+                            vintl.locale,
+                            getPyroCharge(subscription).amount,
+                            getPyroCharge(subscription).currency_code,
+                          )
+                        }}
+                      </span>
+                      <span>
+                        /
+                        {{
+                          (
+                            getPyroCharge(subscription).subscription_interval ||
+                            subscription.interval
+                          ).replace("ly", "")
+                        }}
+                      </span>
+                    </div>
                     <div v-if="getPyroCharge(subscription)" class="mb-4 flex flex-col items-end">
                       <span class="text-sm text-secondary">
                         Since {{ $dayjs(subscription.created).format("MMMM D, YYYY") }}
@@ -295,6 +357,20 @@
                         class="text-sm text-secondary"
                       >
                         Renews {{ $dayjs(getPyroCharge(subscription).due).format("MMMM D, YYYY") }}
+                      </span>
+                      <span
+                        v-if="
+                          getPyroCharge(subscription).status === 'open' &&
+                          getPyroCharge(subscription).subscription_interval &&
+                          getPyroCharge(subscription).subscription_interval !==
+                            subscription.interval
+                        "
+                        class="text-sm text-secondary"
+                      >
+                        Switches to
+                        {{ getPyroCharge(subscription).subscription_interval }}
+                        billing on
+                        {{ $dayjs(getPyroCharge(subscription).due).format("MMMM D, YYYY") }}
                       </span>
                       <span
                         v-else-if="getPyroCharge(subscription).status === 'processing'"
@@ -902,6 +978,12 @@ const getPyroProduct = (subscription) => {
   return productsData.value.find((p) => p.prices?.some((x) => x.id === subscription.price_id));
 };
 
+// Get product by a price ID (useful for pending next-charge changes)
+const getProductFromPriceId = (priceId) => {
+  if (!priceId || !productsData.value) return null;
+  return productsData.value.find((p) => p.prices?.some((x) => x.id === priceId));
+};
+
 const getPyroCharge = (subscription) => {
   if (!subscription || !charges.value) return null;
   return charges.value.find(
@@ -928,6 +1010,13 @@ const getProductPrice = (product, interval) => {
     product.prices.find((p) => p.currency_code === "USD" && p.prices?.intervals?.[interval]) ??
     product.prices[0]
   );
+};
+
+const getPlanChangeVerb = (currentProduct, nextProduct) => {
+  const curRam = currentProduct?.metadata?.ram ?? 0;
+  const nextRam = nextProduct?.metadata?.ram ?? 0;
+
+  return nextRam < curRam ? "downgrade" : "upgrade";
 };
 
 const modalCancel = ref(null);
@@ -1111,4 +1200,50 @@ useHead({
     },
   ],
 });
+
+const getPendingChange = (subscription) => {
+  const charge = getPyroCharge(subscription);
+  if (!charge || charge.status !== "open") return null;
+
+  const nextProduct = getProductFromPriceId(charge.price_id);
+  if (!nextProduct || charge.price_id === subscription.price_id) {
+    // Not a plan change, but interval could change
+    if (charge.subscription_interval && charge.subscription_interval !== subscription.interval) {
+      return {
+        planSize: getProductSize(getPyroProduct(subscription)),
+        cpu: getPyroProduct(subscription)?.metadata?.cpu / 2,
+        cpuBurst: getPyroProduct(subscription)?.metadata?.cpu,
+        ramGb: (getPyroProduct(subscription)?.metadata?.ram || 0) / 1024,
+        swapGb: (getPyroProduct(subscription)?.metadata?.swap || 0) / 1024 || undefined,
+        storageGb: (getPyroProduct(subscription)?.metadata?.storage || 0) / 1024 || undefined,
+        date: charge.due,
+        intervalChange: charge.subscription_interval,
+        verb: "Switches",
+      };
+    }
+    return null;
+  }
+
+  const curProduct = getPyroProduct(subscription);
+  const verb = getPlanChangeVerb(curProduct, nextProduct);
+  const cpu = nextProduct?.metadata?.cpu ?? 0;
+  const ram = nextProduct?.metadata?.ram ?? 0;
+  const swap = nextProduct?.metadata?.swap ?? 0;
+  const storage = nextProduct?.metadata?.storage ?? 0;
+
+  return {
+    planSize: getProductSize(nextProduct),
+    cpu: cpu / 2,
+    cpuBurst: cpu,
+    ramGb: ram / 1024,
+    swapGb: swap ? swap / 1024 : undefined,
+    storageGb: storage ? storage / 1024 : undefined,
+    date: charge.due,
+    intervalChange:
+      charge.subscription_interval && charge.subscription_interval !== subscription.interval
+        ? charge.subscription_interval
+        : null,
+    verb,
+  };
+};
 </script>

@@ -3,26 +3,7 @@
     data-pyro-server-list-root
     class="experimental-styles-within relative mx-auto mb-6 flex min-h-screen w-full max-w-[1280px] flex-col px-6"
   >
-    <ModrinthServersPurchaseModal
-      v-if="customer"
-      ref="purchaseModal"
-      :publishable-key="config.public.stripePublishableKey"
-      :initiate-payment="async (body) => await initiatePayment(body)"
-      :available-products="pyroProducts"
-      :on-error="handleError"
-      :customer="customer"
-      :payment-methods="paymentMethods"
-      :currency="selectedCurrency"
-      :return-url="`${config.public.siteUrl}/servers/manage`"
-      :pings="regionPings"
-      :regions="regions"
-      :refresh-payment-methods="fetchPaymentData"
-      :fetch-stock="fetchStock"
-      :plan-stage="true"
-      :existing-plan="currentPlanFromSubscription"
-      :existing-subscription="subscription || undefined"
-      @hide="() => (subscription = null)"
-    />
+    <ServersUpgradeModalWrapper ref="upgradeModal" />
     <div
       v-if="hasError || fetchError"
       class="mx-auto flex h-full min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 text-left"
@@ -137,13 +118,12 @@
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import Fuse from "fuse.js";
 import { HammerIcon, PlusIcon, SearchIcon } from "@modrinth/assets";
-import { ButtonStyled, CopyCode, ModrinthServersPurchaseModal } from "@modrinth/ui";
-import type { Server, ModrinthServersFetchError, UserSubscription } from "@modrinth/utils";
+import { ButtonStyled, CopyCode } from "@modrinth/ui";
+import type { Server, ModrinthServersFetchError } from "@modrinth/utils";
 import { reloadNuxtApp } from "#app";
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import MedalServerListing from "~/components/ui/servers/marketing/MedalServerListing.vue";
-import { products } from "~/generated/state.json";
-import type { ServerPlan } from "@modrinth/ui/src/utils/billing";
+import ServersUpgradeModalWrapper from "~/components/ui/servers/ServersUpgradeModalWrapper.vue";
 
 definePageMeta({
   middleware: "auth",
@@ -239,169 +219,13 @@ onUnmounted(() => {
   }
 });
 
-// (mirrors servers/index.vue)
-const config = useRuntimeConfig();
-const purchaseModal = ref<InstanceType<typeof ModrinthServersPurchaseModal> | null>(null);
-const customer = ref<any>(null);
-const paymentMethods = ref<any[]>([]);
-const selectedCurrency = ref<string>("USD");
-const regions = ref<any[]>([]);
-const regionPings = ref<any[]>([]);
-
-const pyroProducts = (products as any[])
-  .filter((p) => p?.metadata?.type === "pyro")
-  .sort((a, b) => (a?.metadata?.ram ?? 0) - (b?.metadata?.ram ?? 0));
-
-function handleError(err: any) {
-  // todo
-
-  console.error("Purchase modal error:", err);
-}
-
-async function fetchPaymentData() {
-  try {
-    const [customerData, paymentMethodsData] = await Promise.all([
-      useBaseFetch("billing/customer", { internal: true }),
-      useBaseFetch("billing/payment_methods", { internal: true }),
-    ]);
-    customer.value = customerData as any;
-    paymentMethods.value = paymentMethodsData as any[];
-  } catch (error) {
-    console.error("Error fetching payment data:", error);
-  }
-}
-
-function fetchStock(region: any, request: any) {
-  return useServersFetch(`stock?region=${region.shortcode}`, {
-    method: "POST",
-    body: {
-      ...request,
-    },
-    bypassAuth: true,
-  }).then((res: any) => res.available as number);
-}
-
-function pingRegions() {
-  useServersFetch("regions", {
-    method: "GET",
-    version: 1,
-    bypassAuth: true,
-  }).then((res: any) => {
-    regions.value = res as any[];
-    (regions.value as any[]).forEach((region: any) => {
-      runPingTest(region);
-    });
-  });
-}
-
-const PING_COUNT = 20;
-const PING_INTERVAL = 200;
-const MAX_PING_TIME = 1000;
-
-function runPingTest(region: any, index = 1) {
-  if (index > 10) {
-    regionPings.value.push({
-      region: region.shortcode,
-      ping: -1,
-    });
-    return;
-  }
-
-  const wsUrl = `wss://${region.shortcode}${index}.${region.zone}/pingtest`;
-  try {
-    const socket = new WebSocket(wsUrl);
-    const pings: number[] = [];
-
-    socket.onopen = () => {
-      for (let i = 0; i < PING_COUNT; i++) {
-        setTimeout(() => {
-          socket.send(String(performance.now()));
-        }, i * PING_INTERVAL);
-      }
-      setTimeout(
-        () => {
-          socket.close();
-          const median = Math.round([...pings].sort((a, b) => a - b)[Math.floor(pings.length / 2)]);
-          if (median) {
-            regionPings.value.push({
-              region: region.shortcode,
-              ping: median,
-            });
-          }
-        },
-        PING_COUNT * PING_INTERVAL + MAX_PING_TIME,
-      );
-    };
-
-    socket.onmessage = (event) => {
-      const start = Number(event.data);
-      pings.push(performance.now() - start);
-    };
-
-    socket.onerror = () => {
-      runPingTest(region, index + 1);
-    };
-  } catch {
-    // todo
-  }
-}
-
-const subscription = ref<UserSubscription | null>(null);
-const currentPlanFromSubscription = computed<ServerPlan | undefined>(() => {
-  console.log("Current plan from subscription:", {
-    subscription: subscription.value,
-    pyroProducts,
-  });
-  return subscription.value
-    ? (pyroProducts.find(
-        (p) =>
-          p.prices.filter((price: { id: string }) => price.id === subscription.value?.price_id)
-            .length > 0,
-      ) ?? undefined)
-    : undefined;
-});
-
-async function initiatePayment(body: any): Promise<any> {
-  if (subscription.value) {
-    // Transform the POST billing/payment payload to PATCH subscription/{id} format
-    const transformedBody = {
-      interval: body.charge?.interval,
-      payment_method: body.id,
-      product: body.charge?.product_id,
-      // TODO: Uncomment when server region is available to PATCH.
-      // region: body.metadata?.server_region,
-    };
-
-    return await useBaseFetch(`billing/subscription/${subscription.value.id}`, {
-      internal: true,
-      method: "PATCH",
-      body: transformedBody,
-    });
-  } else {
-    addNotification({
-      title: "Unable to determine subscription ID.",
-      text: "Please contact support.",
-      type: "error",
-    });
-    return Promise.reject(new Error("Unable to determine subscription ID."));
-  }
-}
+import type { ComponentPublicInstance } from "vue";
+type ServersUpgradeModalWrapperRef = ComponentPublicInstance<{
+  open: (id: string) => void | Promise<void>;
+}>;
+const upgradeModal = ref<ServersUpgradeModalWrapperRef | null>(null);
 
 async function openUpgradeModal(serverId: string) {
-  const subscriptions = (await useBaseFetch(`billing/subscriptions`, { internal: true })) as any[];
-  for (const sub of subscriptions) {
-    console.log(sub);
-    if (sub?.metadata?.type === "pyro" && sub?.metadata?.id === serverId) {
-      subscription.value = sub;
-      break;
-    }
-  }
-
-  purchaseModal.value?.show("quarterly");
+  upgradeModal.value?.open(serverId);
 }
-
-onMounted(() => {
-  fetchPaymentData();
-  pingRegions();
-});
 </script>

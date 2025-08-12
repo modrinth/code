@@ -291,7 +291,7 @@
         </div>
 
         <div class="mb-4">
-          <MedalServerCountdown />
+          <MedalServerCountdown :server-id="server.serverId" />
         </div>
 
         <div
