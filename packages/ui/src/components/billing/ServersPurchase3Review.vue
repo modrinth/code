@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import dayjs from 'dayjs'
 import {
   monthsInInterval,
   type ServerBillingInterval,
@@ -8,7 +9,7 @@ import {
 } from '../../utils/billing'
 import TagItem from '../base/TagItem.vue'
 import ServersSpecs from './ServersSpecs.vue'
-import { formatPrice, getPingLevel } from '@modrinth/utils'
+import { formatPrice, getPingLevel, type UserSubscription } from '@modrinth/utils'
 import { useVIntl } from '@vintl/vintl'
 import { regionOverrides } from '../../utils/regions'
 import {
@@ -44,6 +45,8 @@ const props = defineProps<{
   loading?: boolean
   selectedPaymentMethod: Stripe.PaymentMethod | undefined
   noPaymentRequired?: boolean
+  existingPlan?: ServerPlan
+  existingSubscription?: UserSubscription
 }>()
 
 const interval = defineModel<ServerBillingInterval>('interval', { required: true })
@@ -52,6 +55,75 @@ const acceptedEula = defineModel<boolean>('acceptedEula', { required: true })
 const prices = computed(() => {
   return props.plan.prices.find((x) => x.currency_code === props.currency)
 })
+
+const selectedPlanPriceForInterval = computed<number | undefined>(() => {
+  return prices.value?.prices?.intervals?.[interval.value as keyof typeof monthsInInterval]
+})
+
+const existingPlanPriceForInterval = computed<number | undefined>(() => {
+  if (!props.existingPlan) return undefined
+  const p = props.existingPlan.prices.find((x) => x.currency_code === props.currency)
+  return p?.prices?.intervals?.[interval.value as keyof typeof monthsInInterval]
+})
+
+const upgradeDeltaPrice = computed<number | undefined>(() => {
+  if (selectedPlanPriceForInterval.value == null || existingPlanPriceForInterval.value == null)
+    return undefined
+  return selectedPlanPriceForInterval.value - existingPlanPriceForInterval.value
+})
+
+const isUpgrade = computed<boolean>(() => {
+  return (upgradeDeltaPrice.value ?? 0) > 0
+})
+
+const estimatedDaysInInterval = computed<number>(() => {
+  return monthsInInterval[interval.value] * 30
+})
+
+const estimatedProrationDays = computed<number | undefined>(() => {
+  if (!isUpgrade.value) return undefined
+  if (props.total == null || props.tax == null) return undefined
+  const subtotal = props.total - props.tax
+  const delta = upgradeDeltaPrice.value ?? 0
+  if (delta <= 0) return undefined
+  const fraction = Math.max(0, Math.min(1, subtotal / delta))
+  return Math.round(fraction * estimatedDaysInInterval.value)
+})
+
+const isProratedCharge = computed<boolean>(() => {
+  return isUpgrade.value && (props.total ?? 0) > 0
+})
+
+const exactProrationDays = computed<number | undefined>(() => {
+  if (!props.existingSubscription) return undefined
+  const created = dayjs(props.existingSubscription.created)
+  if (!created.isValid()) return undefined
+  let next = created
+  const now = dayjs()
+  if (props.existingSubscription.interval === 'monthly') {
+    const cycles = now.diff(created, 'month')
+    next = created.add(cycles + 1, 'month')
+  } else if (props.existingSubscription.interval === 'quarterly') {
+    const months = now.diff(created, 'month')
+    const cycles = Math.floor(months / 3)
+    next = created.add((cycles + 1) * 3, 'month')
+  } else if (props.existingSubscription.interval === 'yearly') {
+    const cycles = now.diff(created, 'year')
+    next = created.add(cycles + 1, 'year')
+  } else if (props.existingSubscription.interval === 'five-days') {
+    const days = now.diff(created, 'day')
+    const cycles = Math.floor(days / 5)
+    next = created.add((cycles + 1) * 5, 'day')
+  } else {
+    return undefined
+  }
+  const days = next.diff(now, 'day')
+  return Math.max(0, days)
+})
+
+const prorationDays = computed<number | undefined>(
+  () => exactProrationDays.value ?? estimatedProrationDays.value,
+)
 
 const planName = computed(() => {
   if (!props.plan || !props.plan.metadata || props.plan.metadata.type !== 'pyro') return 'Unknown'
@@ -199,7 +271,7 @@ function setInterval(newInterval: ServerBillingInterval) {
   <div class="mt-2">
     <template v-if="!noPaymentRequired">
       <ExpandableInvoiceTotal
-        :period="period"
+        :period="isProratedCharge ? undefined : period"
         :currency="currency"
         :loading="loading"
         :total="total ?? -1"
@@ -207,7 +279,12 @@ function setInterval(newInterval: ServerBillingInterval) {
           total !== undefined && tax !== undefined
             ? [
                 {
-                  title: `Modrinth Servers (${planName})`,
+                  title:
+                    isProratedCharge && prorationDays
+                      ? `Modrinth Servers (${planName}) — prorated for ${prorationDays} day${
+                          prorationDays === 1 ? '' : 's'
+                        }`
+                      : `Modrinth Servers (${planName})`,
                   amount: total - tax,
                 },
                 {
@@ -247,16 +324,26 @@ function setInterval(newInterval: ServerBillingInterval) {
     </ButtonStyled>
   </div>
   <p v-if="!noPaymentRequired" class="m-0 mt-4 text-sm text-secondary">
+    <template v-if="isUpgrade && (total ?? 0) > 0">
+      Today, you will be charged a prorated amount for the remainder of your current billing cycle.
+      <br />
+      Your subscription will renew at
+      {{ formatPrice(locale, selectedPlanPriceForInterval, currency) }} / {{ period }} plus
+      applicable taxes at the end of your current billing interval, until you cancel. You can cancel
+      anytime from your settings page.
+    </template>
+    <template v-else>
+      You'll be charged
+      <SpinnerIcon v-if="loading" class="animate-spin relative top-0.5 mx-2" /><template v-else>{{
+        formatPrice(locale, total, currency)
+      }}</template>
+      every {{ period }} plus applicable taxes starting today, until you cancel. You can cancel
+      anytime from your settings page.
+    </template>
+    <br />
     <span class="font-semibold"
       >By clicking "Subscribe", you are purchasing a recurring subscription.</span
     >
-    <br />
-    You'll be charged
-    <SpinnerIcon v-if="loading" class="animate-spin relative top-0.5 mx-2" /><template v-else>{{
-      formatPrice(locale, total, currency)
-    }}</template>
-    every {{ period }} plus applicable taxes starting today, until you cancel. You can cancel
-    anytime from your settings page.
   </p>
   <div v-if="!noPaymentRequired" class="mt-2 flex items-center gap-1 text-sm">
     <Checkbox

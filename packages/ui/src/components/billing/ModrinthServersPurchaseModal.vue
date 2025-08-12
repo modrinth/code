@@ -30,6 +30,7 @@ import PaymentMethodSelector from './ServersPurchase2PaymentMethod.vue'
 import ConfirmPurchase from './ServersPurchase3Review.vue'
 import { useStripe } from '../../composables/stripe'
 import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
+import type { UserSubscription } from '@modrinth/utils'
 
 const { formatMessage } = useVIntl()
 
@@ -49,6 +50,7 @@ const props = defineProps<{
   availableProducts: ServerPlan[]
   planStage?: boolean
   existingPlan?: ServerPlan
+  existingSubscription?: UserSubscription
   refreshPaymentMethods: () => Promise<void>
   fetchStock: (region: ServerRegion, request: ServerStockRequest) => Promise<number>
   initiatePayment: (
@@ -350,6 +352,8 @@ function handleChooseCustom() {
         :tax="tax"
         :total="total"
         :no-payment-required="noPaymentRequired"
+        :existing-plan="existingPlan"
+        :existing-subscription="existingSubscription"
         @change-payment-method="
           () => {
             skipPaymentMethods = false

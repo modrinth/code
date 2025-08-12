@@ -3,7 +3,6 @@
     data-pyro-server-list-root
     class="experimental-styles-within relative mx-auto mb-6 flex min-h-screen w-full max-w-[1280px] flex-col px-6"
   >
-    <!-- Purchase modal POC -->
     <ModrinthServersPurchaseModal
       v-if="customer"
       ref="purchaseModal"
@@ -21,6 +20,7 @@
       :fetch-stock="fetchStock"
       :plan-stage="true"
       :existing-plan="currentPlanFromSubscription"
+      :existing-subscription="subscription || undefined"
       @hide="() => (subscription = null)"
     />
     <div
