@@ -46,18 +46,17 @@
             :show-labels="false"
           />
           <Checkbox
-            v-if="showAdvanced"
             v-model="showSnapshots"
             class="filter-checkbox"
-            label="Include snapshots"
+            label="Snapshots"
           />
         </div>
       </div>
-      <div v-if="showAdvanced && loader !== 'vanilla'" class="input-row">
+      <div v-if="loader !== 'vanilla'" class="input-row">
         <p class="input-label">Loader version</p>
         <Chips v-model="loader_version" :items="['stable', 'latest', 'other']" />
       </div>
-      <div v-if="showAdvanced && loader_version === 'other' && loader !== 'vanilla'">
+      <div v-if="loader_version === 'other' && loader !== 'vanilla'">
         <div v-if="game_version" class="input-row">
           <p class="input-label">Select version</p>
           <multiselect
@@ -75,10 +74,6 @@
         </div>
       </div>
       <div class="input-group push-right">
-        <Button @click="toggle_advanced">
-          <CodeIcon />
-          {{ showAdvanced ? 'Hide advanced' : 'Show advanced' }}
-        </Button>
         <Button @click="hide()">
           <XIcon />
           Cancel
@@ -234,7 +229,6 @@ const loader_version = ref('stable')
 const specified_loader_version = ref('')
 const icon = ref(null)
 const display_icon = ref(null)
-const showAdvanced = ref(false)
 const creating = ref(false)
 const showSnapshots = ref(false)
 const creationType = ref('custom')
@@ -246,7 +240,6 @@ defineExpose({
     specified_loader_version.value = ''
     profile_name.value = ''
     creating.value = false
-    showAdvanced.value = false
     showSnapshots.value = false
     loader.value = 'vanilla'
     loader_version.value = 'stable'
@@ -414,10 +407,6 @@ const selectable_versions = computed(() => {
   }
   return []
 })
-
-const toggle_advanced = () => {
-  showAdvanced.value = !showAdvanced.value
-}
 
 const openFile = async () => {
   const newProject = await open({ multiple: false })
