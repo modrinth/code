@@ -56,15 +56,8 @@ export function analyzeImageContent(markdown: string): {
   const totalImages = images.length + htmlImages.length
   if (totalImages === 0) return { imageHeavy: false, hasEmptyAltText: false }
 
-  const textWithoutImages = withoutCodeBlocks
-    .replace(/!\[([^\]]*)\]\([^)]+\)/g, '')
-    .replace(/<img[^>]*>/gi, '')
-    .replace(/\s+/g, ' ')
-    .trim()
-
-  const textLength = textWithoutImages.length
+  const textLength = countText(withoutCodeBlocks)
   const recommendedTextLength = MIN_CHARS_PER_IMAGE * totalImages
-
   const imageHeavy =
     recommendedTextLength > MIN_DESCRIPTION_CHARS && textLength < recommendedTextLength
 
@@ -79,22 +72,43 @@ export function analyzeImageContent(markdown: string): {
 }
 
 export function countText(markdown: string): number {
-  const htmlString = renderHighlightedString(markdown)
-  const parser = new DOMParser()
-  const doc = parser.parseFromString(htmlString, 'text/html')
-  const walker = document.createTreeWalker(doc, NodeFilter.SHOW_TEXT)
+  if (!markdown) return 0
 
-  const textList: string[] = []
-  let currentNode: Node | null = walker.currentNode
-
-  while (currentNode) {
-    if (currentNode.textContent !== null) {
-      textList.push(currentNode.textContent)
-    }
-    currentNode = walker.nextNode()
+  const fallback = (md: string): number => {
+    const withoutCode = md.replace(/```[\s\S]*?```/g, '').replace(/`[^`]*`/g, '')
+    const withoutImagesAndLinks = withoutCode
+      .replace(/!\[[^\]]*]\([^)]+\)/g, ' ')
+      .replace(/\[[^\]]*]\([^)]+\)/g, ' ')
+    const withoutHtml = withoutImagesAndLinks.replace(/<[^>]+>/g, ' ')
+    const withoutMdSyntax = withoutHtml
+      .replace(/^>{1}\s?.*$/gm, ' ')
+      .replace(/^#{1,6}\s+/gm, ' ')
+      .replace(/[*_~`>-]/g, ' ')
+      .replace(/\|/g, ' ')
+    return withoutMdSyntax.replace(/\s+/g, ' ').trim().length
   }
 
-  return textList.join(' ').trim().length
+  if (typeof window === 'undefined' || typeof (globalThis as any).DOMParser === 'undefined') {
+    console.warn(`[Moderation] SSR: no window/DOMParser, falling back for countText`)
+    return fallback(markdown)
+  }
+
+  try {
+    const htmlString = renderHighlightedString(markdown)
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(htmlString, 'text/html')
+    const walker = doc.createTreeWalker(doc.body || doc, NodeFilter.SHOW_TEXT)
+
+    const textList: string[] = []
+    let node = walker.nextNode()
+    while (node) {
+      if (node.textContent) textList.push(node.textContent)
+      node = walker.nextNode()
+    }
+    return textList.join(' ').replace(/\s+/g, ' ').trim().length
+  } catch {
+    return fallback(markdown)
+  }
 }
 
 export const descriptionNags: Nag[] = [
