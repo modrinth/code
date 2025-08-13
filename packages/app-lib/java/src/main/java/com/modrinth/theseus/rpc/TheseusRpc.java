@@ -3,7 +3,6 @@ package com.modrinth.theseus.rpc;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import java.io.*;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -35,12 +34,12 @@ public final class TheseusRpc {
         this.handlers = handlers.build();
     }
 
-    public static void connectAndStart(int port, RpcHandlers handlers) throws IOException {
+    public static void connectAndStart(String host, int port, RpcHandlers handlers) throws IOException {
         if (RPC.get() != null) {
             throw new IllegalStateException("Can only connect to RPC once");
         }
 
-        final Socket socket = new Socket(InetAddress.getLoopbackAddress(), port);
+        final Socket socket = new Socket(host, port);
         final TheseusRpc rpc = new TheseusRpc(socket, handlers);
         final Thread mainThread = new Thread(rpc::mainThread, "Theseus RPC Main");
         final Thread readThread = new Thread(rpc::readThread, "Theseus RPC Read");

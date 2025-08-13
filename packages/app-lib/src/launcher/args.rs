@@ -16,6 +16,7 @@ use daedalus::{
 use dunce::canonicalize;
 use hashlink::LinkedHashSet;
 use std::io::{BufRead, BufReader};
+use std::net::SocketAddr;
 use std::{collections::HashMap, path::Path};
 use uuid::Uuid;
 
@@ -124,7 +125,7 @@ pub fn get_jvm_arguments(
     quick_play_type: &QuickPlayType,
     quick_play_version: QuickPlayVersion,
     log_config: Option<&LoggingConfiguration>,
-    rpc_port: u16,
+    ipc_addr: SocketAddr,
 ) -> crate::Result<Vec<String>> {
     let mut parsed_arguments = Vec::new();
 
@@ -182,7 +183,10 @@ pub fn get_jvm_arguments(
             .to_string_lossy()
     ));
 
-    parsed_arguments.push(format!("-Dmodrinth.internal.rpcPort={rpc_port}"));
+    parsed_arguments
+        .push(format!("-Dmodrinth.internal.ipc.host={}", ipc_addr.ip()));
+    parsed_arguments
+        .push(format!("-Dmodrinth.internal.ipc.port={}", ipc_addr.port()));
 
     parsed_arguments.push(format!(
         "-Dmodrinth.internal.quickPlay.serverVersion={}",

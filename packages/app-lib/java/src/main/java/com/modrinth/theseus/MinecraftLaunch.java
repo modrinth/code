@@ -18,7 +18,8 @@ public final class MinecraftLaunch {
 
         final CompletableFuture<Void> waitForLaunch = new CompletableFuture<>();
         TheseusRpc.connectAndStart(
-                Integer.getInteger("modrinth.internal.rpcPort"),
+                System.getProperty("modrinth.internal.ipc.host"),
+                Integer.getInteger("modrinth.internal.ipc.port"),
                 new RpcHandlers()
                         .handler("set_system_property", String.class, String.class, System::setProperty)
                         .handler("launch", () -> waitForLaunch.complete(null)));

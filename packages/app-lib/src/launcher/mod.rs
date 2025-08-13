@@ -635,7 +635,7 @@ pub async fn launch_minecraft(
                 .logging
                 .as_ref()
                 .and_then(|x| x.get(&LoggingSide::Client)),
-            rpc_server.port(),
+            rpc_server.address(),
         )?
         .into_iter(),
     );

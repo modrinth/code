@@ -1,10 +1,11 @@
+use crate::prelude::tcp_listen_any_loopback;
 use crate::{ErrorKind, Result};
 use futures::{SinkExt, StreamExt};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
-use std::net::Ipv4Addr;
+use std::net::SocketAddr;
 use std::pin::Pin;
 use std::sync::{Arc, Mutex};
 use tokio::net::TcpListener;
@@ -42,9 +43,8 @@ impl RpcServerBuilder {
     }
 
     pub async fn launch(self) -> Result<RpcServer> {
-        let socket = TcpListener::bind((Ipv4Addr::LOCALHOST, 0)).await?;
-
-        let addr = socket.local_addr()?;
+        let socket = tcp_listen_any_loopback().await?;
+        let address = socket.local_addr()?;
         let (message_sender, message_receiver) = mpsc::unbounded_channel();
         let waiting_responses = Arc::new(Mutex::new(HashMap::new()));
 
@@ -65,7 +65,7 @@ impl RpcServerBuilder {
             })
         };
         Ok(RpcServer {
-            port: addr.port(),
+            address,
             message_sender,
             waiting_responses,
             abort_handle: join_handle.abort_handle(),
@@ -75,15 +75,15 @@ impl RpcServerBuilder {
 
 #[derive(Debug, Clone)]
 pub struct RpcServer {
-    port: u16,
+    address: SocketAddr,
     message_sender: mpsc::UnboundedSender<RpcMessage>,
     waiting_responses: WaitingResponsesMap,
     abort_handle: AbortHandle,
 }
 
 impl RpcServer {
-    pub fn port(&self) -> u16 {
-        self.port
+    pub fn address(&self) -> SocketAddr {
+        self.address
     }
 
     pub async fn call_method<R: DeserializeOwned>(
