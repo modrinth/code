@@ -112,10 +112,11 @@
 </template>
 
 <script setup lang="ts">
-import { UpdatedIcon, IssuesIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+import { IssuesIcon, UpdatedIcon } from "@modrinth/assets";
+import { ButtonStyled, injectNotificationManager } from "@modrinth/ui";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
+const { addNotification } = injectNotificationManager();
 const props = defineProps<{
   server: ModrinthServer;
 }>();
@@ -199,7 +200,6 @@ async function saveStartup() {
     }
 
     addNotification({
-      group: "serverOptions",
       type: "success",
       title: "Server settings updated",
       text: "Your server settings were successfully changed.",
@@ -207,7 +207,6 @@ async function saveStartup() {
   } catch (error) {
     console.error(error);
     addNotification({
-      group: "serverOptions",
       type: "error",
       title: "Failed to update server arguments",
       text: "Please try again later.",

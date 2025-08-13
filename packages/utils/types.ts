@@ -49,6 +49,76 @@ export interface GalleryImage {
   description?: string
 }
 
+export interface ProjectV3 {
+  id: ModrinthId
+  slug?: string
+  project_types: string[]
+  games: string[]
+  team_id: ModrinthId
+  organization?: ModrinthId
+  name: string
+  summary: string
+  description: string
+
+  published: string
+  updated: string
+  approved?: string
+  queued?: string
+
+  status: ProjectStatus
+  requested_status?: ProjectStatus
+
+  /** @deprecated moved to threads system */
+  moderator_message?: {
+    message: string
+    body?: string
+  }
+
+  license: {
+    id: string
+    name: string
+    url?: string
+  }
+
+  downloads: number
+  followers: number
+
+  categories: string[]
+  additional_categories: string[]
+  loaders: string[]
+
+  versions: ModrinthId[]
+  icon_url?: string
+
+  link_urls: Record<
+    string,
+    {
+      platform: string
+      donation: boolean
+      url: string
+    }
+  >
+
+  gallery: {
+    url: string
+    raw_url: string
+    featured: boolean
+    name?: string
+    description?: string
+    created: string
+    ordering: number
+  }[]
+
+  color?: number
+  thread_id: ModrinthId
+  monetization_status: MonetizationStatus
+  side_types_migration_review_status: 'reviewed' | 'pending'
+
+  [key: string]: unknown
+}
+
+export type SideTypesMigrationReviewStatus = 'reviewed' | 'pending'
+
 export interface Project {
   id: ModrinthId
   project_type: ProjectType

@@ -1,11 +1,18 @@
 <script setup lang="ts">
-import { Accordion, ButtonStyled, NewModal, ServerNotice, TagItem } from "@modrinth/ui";
 import { PlusIcon, XIcon } from "@modrinth/assets";
-import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
+import {
+  Accordion,
+  ButtonStyled,
+  injectNotificationManager,
+  NewModal,
+  ServerNotice,
+  TagItem,
+} from "@modrinth/ui";
+import { type ServerNotice as ServerNoticeType } from "@modrinth/utils";
 import { ref } from "vue";
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 
-const app = useNuxtApp() as unknown as { $notify: any };
+const { addNotification } = injectNotificationManager();
 
 const modal = ref<InstanceType<typeof NewModal>>();
 
@@ -39,16 +46,14 @@ async function assign(server: boolean = true) {
         method: "PUT",
       },
     ).catch((err) => {
-      app.$notify({
-        group: "main",
+      addNotification({
         title: "Error assigning notice",
         text: err,
         type: "error",
       });
     });
   } else {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "Error assigning notice",
       text: "No server or node specified",
       type: "error",
@@ -64,8 +69,7 @@ async function unassignDetect() {
   const node = assignedNodes.value.some((assigned) => assigned.id === input);
 
   if (!server && !node) {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "Error unassigning notice",
       text: "ID is not an assigned server or node",
       type: "error",
@@ -84,8 +88,7 @@ async function unassign(id: string, server: boolean = true) {
         method: "PUT",
       },
     ).catch((err) => {
-      app.$notify({
-        group: "main",
+      addNotification({
         title: "Error unassigning notice",
         text: err,
         type: "error",

@@ -187,20 +187,21 @@
 </template>
 
 <script setup>
-import { Multiselect } from "vue-multiselect";
 import {
   PayPalIcon,
-  SearchIcon,
-  RadioButtonIcon,
   RadioButtonCheckedIcon,
-  XIcon,
+  RadioButtonIcon,
+  SearchIcon,
   TransferIcon,
+  XIcon,
 } from "@modrinth/assets";
-import { Chips, Checkbox, Breadcrumbs } from "@modrinth/ui";
-import { all } from "iso-3166-1";
+import { Breadcrumbs, Checkbox, Chips, injectNotificationManager } from "@modrinth/ui";
 import { formatMoney, formatWallet } from "@modrinth/utils";
+import { all } from "iso-3166-1";
+import { Multiselect } from "vue-multiselect";
 import VenmoIcon from "~/assets/images/external/venmo.svg?component";
 
+const { addNotification } = injectNotificationManager();
 const auth = await useAuth();
 const data = useNuxtApp();
 
@@ -355,8 +356,7 @@ async function withdraw() {
     });
     await useAuth(auth.value.token);
     await navigateTo("/dashboard/revenue");
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "Withdrawal complete",
       text:
         selectedMethod.value.type === "tremendous"
@@ -365,8 +365,7 @@ async function withdraw() {
       type: "success",
     });
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",

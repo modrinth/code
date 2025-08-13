@@ -1,3 +1,5 @@
+import { injectNotificationManager } from "@modrinth/ui";
+
 export const useAuth = async (oldToken = null) => {
   const auth = useState("auth", () => ({
     user: null,
@@ -128,9 +130,8 @@ export const removeAuthProvider = async (provider) => {
     });
     await useAuth(auth.value.token);
   } catch (err) {
-    const data = useNuxtApp();
-    data.$notify({
-      group: "main",
+    const { addNotification } = injectNotificationManager();
+    addNotification({
       title: "An error occurred",
       text: err.data.description,
       type: "error",

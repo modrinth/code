@@ -52,21 +52,22 @@
 </template>
 
 <script setup>
-import {
-  SearchIcon,
-  PlayIcon,
-  CheckIcon,
-  XIcon,
-  FolderSearchIcon,
-  DownloadIcon,
-} from '@modrinth/assets'
-import { Button } from '@modrinth/ui'
-import { auto_install_java, find_filtered_jres, get_jre, test_jre } from '@/helpers/jre.js'
-import { ref } from 'vue'
-import { open } from '@tauri-apps/plugin-dialog'
 import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
-import { handleError } from '@/store/state.js'
 import { trackEvent } from '@/helpers/analytics'
+import { auto_install_java, find_filtered_jres, get_jre, test_jre } from '@/helpers/jre.js'
+import {
+  CheckIcon,
+  DownloadIcon,
+  FolderSearchIcon,
+  PlayIcon,
+  SearchIcon,
+  XIcon,
+} from '@modrinth/assets'
+import { Button, injectNotificationManager } from '@modrinth/ui'
+import { open } from '@tauri-apps/plugin-dialog'
+import { ref } from 'vue'
+
+const { handleError } = injectNotificationManager()
 
 const props = defineProps({
   version: {

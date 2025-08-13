@@ -110,13 +110,15 @@
 </template>
 
 <script setup lang="ts">
-import { CopyCode, MarkdownEditor, ButtonStyled } from "@modrinth/ui";
-import { ReplyIcon, SendIcon, CheckCircleIcon, ScaleIcon } from "@modrinth/assets";
-import type { Thread, Report, User, ThreadMessage as TypeThreadMessage } from "@modrinth/utils";
+import { CheckCircleIcon, ReplyIcon, ScaleIcon, SendIcon } from "@modrinth/assets";
+import { ButtonStyled, CopyCode, injectNotificationManager, MarkdownEditor } from "@modrinth/ui";
+import type { Report, Thread, ThreadMessage as TypeThreadMessage, User } from "@modrinth/utils";
 import dayjs from "dayjs";
-import ThreadMessage from "./ThreadMessage.vue";
 import { useImageUpload } from "~/composables/image-upload.ts";
 import { isStaff } from "~/helpers/users.js";
+import ThreadMessage from "./ThreadMessage.vue";
+
+const { addNotification } = injectNotificationManager();
 
 const props = defineProps<{
   thread: Thread;

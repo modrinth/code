@@ -1,19 +1,14 @@
-import { useNuxtApp } from "#imports";
+import { injectNotificationManager } from "@modrinth/ui";
+import type { Organization, Project, Report, User, Version } from "@modrinth/utils";
 
-// TODO: There needs to be a standardized way to get these types, eg; @modrinth/types generated from api schema. Later problem.
-type Project = { id: string };
-type Version = { id: string; project_id: string };
-type Report = { id: string; item_type: "project" | "user" | "version"; item_id: string };
 type Thread = { id: string };
-type User = { id: string };
-type Organization = { id: string };
 
-export type NotificationAction = {
+export type PlatformNotificationAction = {
   title: string;
   action_route: [string, string];
 };
 
-export type NotificationBody = {
+export type PlatformNotificationBody = {
   project_id?: string;
   version_id?: string;
   report_id?: string;
@@ -22,7 +17,7 @@ export type NotificationBody = {
   organization_id?: string;
 };
 
-export type Notification = {
+export type PlatformNotification = {
   id: string;
   user_id: string;
   type: "project_update" | "team_invite" | "status_change" | "moderator_message";
@@ -31,10 +26,10 @@ export type Notification = {
   link: string;
   read: boolean;
   created: string;
-  actions: NotificationAction[];
-  body?: NotificationBody;
+  actions: PlatformNotificationAction[];
+  body?: PlatformNotificationBody;
   extra_data?: Record<string, unknown>;
-  grouped_notifs?: Notification[];
+  grouped_notifs?: PlatformNotification[];
 };
 
 async function getBulk<T extends { id: string }>(
@@ -55,8 +50,8 @@ async function getBulk<T extends { id: string }>(
 }
 
 export async function fetchExtraNotificationData(
-  notifications: Notification[],
-): Promise<Notification[]> {
+  notifications: PlatformNotification[],
+): Promise<PlatformNotification[]> {
   const bulk = {
     projects: [] as string[],
     reports: [] as string[],
@@ -133,8 +128,8 @@ export async function fetchExtraNotificationData(
   return notifications;
 }
 
-export function groupNotifications(notifications: Notification[]): Notification[] {
-  const grouped: Notification[] = [];
+export function groupNotifications(notifications: PlatformNotification[]): PlatformNotification[] {
+  const grouped: PlatformNotification[] = [];
   for (let i = 0; i < notifications.length; i++) {
     const current = notifications[i];
     const next = notifications[i + 1];
@@ -154,18 +149,18 @@ export function groupNotifications(notifications: Notification[]): Notification[
   return grouped;
 }
 
-function isSimilar(a: Notification, b: Notification | undefined): boolean {
+function isSimilar(a: PlatformNotification, b: PlatformNotification | undefined): boolean {
   return !!a?.body?.project_id && a.body!.project_id === b?.body?.project_id;
 }
 
 export async function markAsRead(
   ids: string[],
-): Promise<(notifications: Notification[]) => Notification[]> {
+): Promise<(notifications: PlatformNotification[]) => PlatformNotification[]> {
   try {
     await useBaseFetch(`notifications?ids=${JSON.stringify([...new Set(ids)])}`, {
       method: "PATCH",
     });
-    return (notifications: Notification[]) => {
+    return (notifications: PlatformNotification[]) => {
       const newNotifs = notifications ?? [];
       newNotifs.forEach((n) => {
         if (ids.includes(n.id)) n.read = true;
@@ -173,9 +168,8 @@ export async function markAsRead(
       return newNotifs;
     };
   } catch (err: any) {
-    const app: any = useNuxtApp();
-    app.$notify({
-      group: "main",
+    const { addNotification } = injectNotificationManager();
+    addNotification({
       title: "Error marking notification as read",
       text: err?.data?.description ?? err,
       type: "error",

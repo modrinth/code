@@ -1,6 +1,35 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref, watch, provide } from 'vue'
-import { RouterView, useRoute, useRouter } from 'vue-router'
+import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
+import ModrinthLoadingIndicator from '@/components/LoadingIndicatorBar.vue'
+import AccountsCard from '@/components/ui/AccountsCard.vue'
+import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
+import ErrorModal from '@/components/ui/ErrorModal.vue'
+import FriendsList from '@/components/ui/friends/FriendsList.vue'
+import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
+import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
+import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
+import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
+import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
+import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
+import NavButton from '@/components/ui/NavButton.vue'
+import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
+import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
+import RunningAppBar from '@/components/ui/RunningAppBar.vue'
+import SplashScreen from '@/components/ui/SplashScreen.vue'
+import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
+import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
+import { hide_ads_window, init_ads_window } from '@/helpers/ads.js'
+import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
+import { get_user } from '@/helpers/cache.js'
+import { command_listener, warning_listener } from '@/helpers/events.js'
+import { useFetch } from '@/helpers/fetch.js'
+import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.js'
+import { get } from '@/helpers/settings.ts'
+import { get_opening_command, initialize_state } from '@/helpers/state'
+import { getOS, isDev, restartApp } from '@/helpers/utils.js'
+import { useError } from '@/store/error.js'
+import { useInstall } from '@/store/install.js'
+import { useLoading, useTheming } from '@/store/state'
 import {
   ArrowBigUpDashIcon,
   ChangeSkinIcon,
@@ -13,69 +42,45 @@ import {
   LogOutIcon,
   MaximizeIcon,
   MinimizeIcon,
+  NewspaperIcon,
   PlusIcon,
   RestoreIcon,
   RightArrowIcon,
   SettingsIcon,
   WorldIcon,
   XIcon,
-  NewspaperIcon,
 } from '@modrinth/assets'
 import {
   Avatar,
   Button,
   ButtonStyled,
-  Notifications,
-  OverflowMenu,
   NewsArticleCard,
+  NotificationPanel,
+  OverflowMenu,
+  provideNotificationManager,
 } from '@modrinth/ui'
-import { useLoading, useTheming } from '@/store/state'
-import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
-import AccountsCard from '@/components/ui/AccountsCard.vue'
-import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
-import { get } from '@/helpers/settings.ts'
-import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
-import RunningAppBar from '@/components/ui/RunningAppBar.vue'
-import SplashScreen from '@/components/ui/SplashScreen.vue'
-import ErrorModal from '@/components/ui/ErrorModal.vue'
-import ModrinthLoadingIndicator from '@/components/LoadingIndicatorBar.vue'
-import { handleError, useNotifications } from '@/store/notifications.js'
-import { command_listener, warning_listener } from '@/helpers/events.js'
-import { type } from '@tauri-apps/plugin-os'
-import { getOS, isDev, restartApp } from '@/helpers/utils.js'
-import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
-import { getCurrentWindow } from '@tauri-apps/api/window'
-import { getVersion } from '@tauri-apps/api/app'
-import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
-import { create_profile_and_install_from_file } from './helpers/pack'
-import { useError } from '@/store/error.js'
-import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
-import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
-import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
-import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
-import { useInstall } from '@/store/install.js'
-import { invoke } from '@tauri-apps/api/core'
-import { get_opening_command, initialize_state } from '@/helpers/state'
-import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { renderString } from '@modrinth/utils'
-import { useFetch } from '@/helpers/fetch.js'
-import { check } from '@tauri-apps/plugin-updater'
-import NavButton from '@/components/ui/NavButton.vue'
-import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.js'
-import { get_user } from '@/helpers/cache.js'
-import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
-import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
-import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
-import { hide_ads_window, init_ads_window } from '@/helpers/ads.js'
-import FriendsList from '@/components/ui/friends/FriendsList.vue'
+import { getVersion } from '@tauri-apps/api/app'
+import { invoke } from '@tauri-apps/api/core'
+import { getCurrentWindow } from '@tauri-apps/api/window'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
-import { get_available_capes, get_available_skins } from './helpers/skins'
+import { type } from '@tauri-apps/plugin-os'
+import { check } from '@tauri-apps/plugin-updater'
+import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
+import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
+import { RouterView, useRoute, useRouter } from 'vue-router'
+import { create_profile_and_install_from_file } from './helpers/pack'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
 import { list } from '@/helpers/profile.js'
 import { $fetch } from 'ofetch'
+import { get_available_capes, get_available_skins } from './helpers/skins'
+import { AppNotificationManager } from './providers/app-notifications'
 
 const themeStore = useTheming()
+
+const notificationManager = new AppNotificationManager()
+provideNotificationManager(notificationManager)
+const { handleError, addNotification } = notificationManager
 
 const news = ref([])
 
@@ -169,7 +174,7 @@ async function setupApp() {
   }
 
   await warning_listener((e) =>
-    notificationsWrapper.value.addNotification({
+    addNotification({
       title: 'Warning',
       text: e.message,
       type: 'warn',
@@ -259,9 +264,6 @@ const route = useRoute()
 const loading = useLoading()
 loading.setEnabled(false)
 
-const notifications = useNotifications()
-const notificationsWrapper = ref()
-
 const error = useError()
 const errorModal = ref()
 
@@ -342,8 +344,6 @@ watch(
 
 onMounted(() => {
   invoke('show_window')
-
-  notifications.setNotifs(notificationsWrapper.value)
 
   error.setErrorModal(errorModal.value)
 
@@ -750,7 +750,7 @@ async function processPendingSurveys() {
     </div>
   </div>
   <URLConfirmModal ref="urlModal" />
-  <Notifications ref="notificationsWrapper" sidebar />
+  <NotificationPanel has-sidebar />
   <ErrorModal ref="errorModal" />
   <ModInstallModal ref="modInstallModal" />
   <IncompatibilityWarningModal ref="incompatibilityWarningModal" />
