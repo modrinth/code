@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import {
-    CoffeeIcon,
-    GameIcon,
-    GaugeIcon,
-    ModrinthIcon,
-    PaintbrushIcon,
-    ReportIcon,
-    SettingsIcon,
-    ShieldIcon,
+	CoffeeIcon,
+	GameIcon,
+	GaugeIcon,
+	ModrinthIcon,
+	PaintbrushIcon,
+	ReportIcon,
+	SettingsIcon,
+	ShieldIcon,
 } from '@modrinth/assets'
 import { TabbedModal } from '@modrinth/ui'
 import { getVersion } from '@tauri-apps/api/app'
@@ -32,66 +32,66 @@ const { formatMessage } = useVIntl()
 const devModeCounter = ref(0)
 
 const developerModeEnabled = defineMessage({
-    id: 'app.settings.developer-mode-enabled',
-    defaultMessage: 'Developer mode enabled.',
+	id: 'app.settings.developer-mode-enabled',
+	defaultMessage: 'Developer mode enabled.',
 })
 
 const tabs = [
-    {
-        name: defineMessage({
-            id: 'app.settings.tabs.appearance',
-            defaultMessage: 'Appearance',
-        }),
-        icon: PaintbrushIcon,
-        content: AppearanceSettings,
-    },
-    {
-        name: defineMessage({
-            id: 'app.settings.tabs.privacy',
-            defaultMessage: 'Privacy',
-        }),
-        icon: ShieldIcon,
-        content: PrivacySettings,
-    },
-    {
-        name: defineMessage({
-            id: 'app.settings.tabs.java-installations',
-            defaultMessage: 'Java installations',
-        }),
-        icon: CoffeeIcon,
-        content: JavaSettings,
-    },
-    {
-        name: defineMessage({
-            id: 'app.settings.tabs.default-instance-options',
-            defaultMessage: 'Default instance options',
-        }),
-        icon: GameIcon,
-        content: DefaultInstanceSettings,
-    },
-    {
-        name: defineMessage({
-            id: 'app.settings.tabs.resource-management',
-            defaultMessage: 'Resource management',
-        }),
-        icon: GaugeIcon,
-        content: ResourceManagementSettings,
-    },
-    {
-        name: defineMessage({
-            id: 'app.settings.tabs.feature-flags',
-            defaultMessage: 'Feature flags',
-        }),
-        icon: ReportIcon,
-        content: FeatureFlagSettings,
-        developerOnly: true,
-    },
+	{
+		name: defineMessage({
+			id: 'app.settings.tabs.appearance',
+			defaultMessage: 'Appearance',
+		}),
+		icon: PaintbrushIcon,
+		content: AppearanceSettings,
+	},
+	{
+		name: defineMessage({
+			id: 'app.settings.tabs.privacy',
+			defaultMessage: 'Privacy',
+		}),
+		icon: ShieldIcon,
+		content: PrivacySettings,
+	},
+	{
+		name: defineMessage({
+			id: 'app.settings.tabs.java-installations',
+			defaultMessage: 'Java installations',
+		}),
+		icon: CoffeeIcon,
+		content: JavaSettings,
+	},
+	{
+		name: defineMessage({
+			id: 'app.settings.tabs.default-instance-options',
+			defaultMessage: 'Default instance options',
+		}),
+		icon: GameIcon,
+		content: DefaultInstanceSettings,
+	},
+	{
+		name: defineMessage({
+			id: 'app.settings.tabs.resource-management',
+			defaultMessage: 'Resource management',
+		}),
+		icon: GaugeIcon,
+		content: ResourceManagementSettings,
+	},
+	{
+		name: defineMessage({
+			id: 'app.settings.tabs.feature-flags',
+			defaultMessage: 'Feature flags',
+		}),
+		icon: ReportIcon,
+		content: FeatureFlagSettings,
+		developerOnly: true,
+	},
 ]
 
 const modal = ref()
 
 function show() {
-    modal.value.show()
+	modal.value.show()
 }
 
 const isOpen = computed(() => modal.value?.isOpen)
@@ -104,62 +104,62 @@ const osVersion = getOsVersion()
 const settings = ref(await get())
 
 watch(
-    settings,
-    async () => {
-        await set(settings.value)
-    },
-    { deep: true },
+	settings,
+	async () => {
+		await set(settings.value)
+	},
+	{ deep: true },
 )
 
 function devModeCount() {
-    devModeCounter.value++
-    if (devModeCounter.value > 5) {
-        themeStore.devMode = !themeStore.devMode
-        settings.value.developer_mode = !!themeStore.devMode
-        devModeCounter.value = 0
+	devModeCounter.value++
+	if (devModeCounter.value > 5) {
+		themeStore.devMode = !themeStore.devMode
+		settings.value.developer_mode = !!themeStore.devMode
+		devModeCounter.value = 0
 
-        if (!themeStore.devMode && tabs[modal.value.selectedTab].developerOnly) {
-            modal.value.setTab(0)
-        }
-    }
+		if (!themeStore.devMode && tabs[modal.value.selectedTab].developerOnly) {
+			modal.value.setTab(0)
+		}
+	}
 }
 </script>
 <template>
-    <ModalWrapper ref="modal">
-        <template #title>
-            <span class="flex items-center gap-2 text-lg font-extrabold text-contrast">
-                <SettingsIcon /> Settings
-            </span>
-        </template>
+	<ModalWrapper ref="modal">
+		<template #title>
+			<span class="flex items-center gap-2 text-lg font-extrabold text-contrast">
+				<SettingsIcon /> Settings
+			</span>
+		</template>
 
-        <TabbedModal :tabs="tabs.filter((t) => !t.developerOnly || themeStore.devMode)">
-            <template #footer>
-                <div class="mt-auto text-secondary text-sm">
-                    <p v-if="themeStore.devMode" class="text-brand font-semibold m-0 mb-2">
-                        {{ formatMessage(developerModeEnabled) }}
-                    </p>
-                    <div class="flex items-center gap-3">
-                        <button
-                            class="p-0 m-0 bg-transparent border-none cursor-pointer button-animation"
-                            :class="{
-                                'text-brand': themeStore.devMode,
-                                'text-secondary': !themeStore.devMode,
-                            }"
-                            @click="devModeCount"
-                        >
-                            <ModrinthIcon class="w-6 h-6" />
-                        </button>
-                        <div>
-                            <p class="m-0">Modrinth App {{ version }}</p>
-                            <p class="m-0">
-                                <span v-if="osPlatform === 'macos'">MacOS</span>
-                                <span v-else class="capitalize">{{ osPlatform }}</span>
-                                {{ osVersion }}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </template>
-        </TabbedModal>
-    </ModalWrapper>
+		<TabbedModal :tabs="tabs.filter((t) => !t.developerOnly || themeStore.devMode)">
+			<template #footer>
+				<div class="mt-auto text-secondary text-sm">
+					<p v-if="themeStore.devMode" class="text-brand font-semibold m-0 mb-2">
+						{{ formatMessage(developerModeEnabled) }}
+					</p>
+					<div class="flex items-center gap-3">
+						<button
+							class="p-0 m-0 bg-transparent border-none cursor-pointer button-animation"
+							:class="{
+								'text-brand': themeStore.devMode,
+								'text-secondary': !themeStore.devMode,
+							}"
+							@click="devModeCount"
+						>
+							<ModrinthIcon class="w-6 h-6" />
+						</button>
+						<div>
+							<p class="m-0">Modrinth App {{ version }}</p>
+							<p class="m-0">
+								<span v-if="osPlatform === 'macos'">MacOS</span>
+								<span v-else class="capitalize">{{ osPlatform }}</span>
+								{{ osVersion }}
+							</p>
+						</div>
+					</div>
+				</div>
+			</template>
+		</TabbedModal>
+	</ModalWrapper>
 </template>
