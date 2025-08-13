@@ -194,7 +194,6 @@
 <script setup>
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import {
-  CodeIcon,
   FolderOpenIcon,
   FolderSearchIcon,
   InfoIcon,
