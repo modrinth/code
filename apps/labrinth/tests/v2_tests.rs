@@ -7,12 +7,12 @@ pub mod common;
 
 // Such V2 tests are exported here
 mod v2 {
-    mod error;
-    mod notifications;
-    mod project;
-    mod scopes;
-    mod search;
-    mod tags;
-    mod teams;
-    mod version;
+	mod error;
+	mod notifications;
+	mod project;
+	mod scopes;
+	mod search;
+	mod tags;
+	mod teams;
+	mod version;
 }

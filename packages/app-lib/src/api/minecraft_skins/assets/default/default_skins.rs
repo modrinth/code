@@ -8,12 +8,12 @@ use super::super::super::Skin;
 
 /// A list of default Minecraft skins to make available to the user, created by Mojang.
 pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
-    //
-    // The skins below are available in the vanilla Minecraft launcher, and were found
-    // by reverse engineering the behavior of the Minecraft launcher. The textures are
-    // publicly available at `https://textures.minecraft.net/texture/<texture_key>`.
-    //
-    vec![Skin {
+	//
+	// The skins below are available in the vanilla Minecraft launcher, and were found
+	// by reverse engineering the behavior of the Minecraft launcher. The textures are
+	// publicly available at `https://textures.minecraft.net/texture/<texture_key>`.
+	//
+	vec![Skin {
         texture_key: Arc::from("46acd06e8483b176e8ea39fc12fe105eb3a2a4970f5100057e9d84d4b60bdfa7"),
         name: Some(Arc::from("Alex")),
         variant: MinecraftSkinVariant::Slim,

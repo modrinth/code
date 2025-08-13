@@ -9,47 +9,46 @@ use serde::Deserialize;
 use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("moderation").service(get_projects));
+	cfg.service(web::scope("moderation").service(get_projects));
 }
 
 #[derive(Deserialize)]
 pub struct ResultCount {
-    #[serde(default = "default_count")]
-    pub count: u16,
+	#[serde(default = "default_count")]
+	pub count: u16,
 }
 
 fn default_count() -> u16 {
-    100
+	100
 }
 
 #[get("projects")]
 pub async fn get_projects(
-    req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    count: web::Query<ResultCount>,
-    session_queue: web::Data<AuthQueue>,
+	req: HttpRequest,
+	pool: web::Data<PgPool>,
+	redis: web::Data<RedisPool>,
+	count: web::Query<ResultCount>,
+	session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let response = internal::moderation::get_projects(
-        req,
-        pool.clone(),
-        redis.clone(),
-        web::Query(internal::moderation::ProjectsRequestOptions {
-            count: count.count,
-            offset: 0,
-        }),
-        session_queue,
-    )
-    .await
-    .or_else(v2_reroute::flatten_404_error)?;
+	let response = internal::moderation::get_projects(
+		req,
+		pool.clone(),
+		redis.clone(),
+		web::Query(internal::moderation::ProjectsRequestOptions {
+			count: count.count,
+			offset: 0,
+		}),
+		session_queue,
+	)
+	.await
+	.or_else(v2_reroute::flatten_404_error)?;
 
-    // Convert to V2 projects
-    match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
-        Ok(project) => {
-            let legacy_projects =
-                LegacyProject::from_many(project, &**pool, &redis).await?;
-            Ok(HttpResponse::Ok().json(legacy_projects))
-        }
-        Err(response) => Ok(response),
-    }
+	// Convert to V2 projects
+	match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
+		Ok(project) => {
+			let legacy_projects = LegacyProject::from_many(project, &**pool, &redis).await?;
+			Ok(HttpResponse::Ok().json(legacy_projects))
+		}
+		Err(response) => Ok(response),
+	}
 }

@@ -1,6 +1,6 @@
 use crate::state::{
-    CacheBehaviour, CacheValueType, CachedEntry, Organization, Project,
-    SearchResults, TeamMember, User, Version,
+	CacheBehaviour, CacheValueType, CachedEntry, Organization, Project, SearchResults, TeamMember,
+	User, Version,
 };
 
 macro_rules! impl_cache_methods {
@@ -35,19 +35,17 @@ macro_rules! impl_cache_methods {
 }
 
 impl_cache_methods!(
-    (Project, Project),
-    (Version, Version),
-    (User, User),
-    (Team, Vec<TeamMember>),
-    (Organization, Organization),
-    (SearchResults, SearchResults)
+	(Project, Project),
+	(Version, Version),
+	(User, User),
+	(Team, Vec<TeamMember>),
+	(Organization, Organization),
+	(SearchResults, SearchResults)
 );
 
-pub async fn purge_cache_types(
-    cache_types: &[CacheValueType],
-) -> crate::Result<()> {
-    let state = crate::State::get().await?;
-    CachedEntry::purge_cache_types(cache_types, &state.pool).await?;
+pub async fn purge_cache_types(cache_types: &[CacheValueType]) -> crate::Result<()> {
+	let state = crate::State::get().await?;
+	CachedEntry::purge_cache_types(cache_types, &state.pool).await?;
 
-    Ok(())
+	Ok(())
 }

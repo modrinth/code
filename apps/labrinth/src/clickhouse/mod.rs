@@ -6,51 +6,48 @@ mod fetch;
 pub use fetch::*;
 
 pub async fn init_client() -> clickhouse::error::Result<clickhouse::Client> {
-    init_client_with_database(&dotenvy::var("CLICKHOUSE_DATABASE").unwrap())
-        .await
+	init_client_with_database(&dotenvy::var("CLICKHOUSE_DATABASE").unwrap()).await
 }
 
 pub async fn init_client_with_database(
-    database: &str,
+	database: &str,
 ) -> clickhouse::error::Result<clickhouse::Client> {
-    let client = {
-        let https_connector = HttpsConnectorBuilder::new()
-            .with_native_roots()?
-            .https_or_http()
-            .enable_all_versions()
-            .build();
-        let hyper_client =
-            hyper_util::client::legacy::Client::builder(TokioExecutor::new())
-                .build(https_connector);
+	let client = {
+		let https_connector = HttpsConnectorBuilder::new()
+			.with_native_roots()?
+			.https_or_http()
+			.enable_all_versions()
+			.build();
+		let hyper_client = hyper_util::client::legacy::Client::builder(TokioExecutor::new())
+			.build(https_connector);
 
-        clickhouse::Client::with_http_client(hyper_client)
-            .with_url(dotenvy::var("CLICKHOUSE_URL").unwrap())
-            .with_user(dotenvy::var("CLICKHOUSE_USER").unwrap())
-            .with_password(dotenvy::var("CLICKHOUSE_PASSWORD").unwrap())
-    };
+		clickhouse::Client::with_http_client(hyper_client)
+			.with_url(dotenvy::var("CLICKHOUSE_URL").unwrap())
+			.with_user(dotenvy::var("CLICKHOUSE_USER").unwrap())
+			.with_password(dotenvy::var("CLICKHOUSE_PASSWORD").unwrap())
+	};
 
-    client
-        .query(&format!("CREATE DATABASE IF NOT EXISTS {database}"))
-        .execute()
-        .await?;
+	client
+		.query(&format!("CREATE DATABASE IF NOT EXISTS {database}"))
+		.execute()
+		.await?;
 
-    let clickhouse_replicated =
-        dotenvy::var("CLICKHOUSE_REPLICATED").unwrap() == "true";
-    let cluster_line = if clickhouse_replicated {
-        "ON cluster '{cluster}'"
-    } else {
-        ""
-    };
+	let clickhouse_replicated = dotenvy::var("CLICKHOUSE_REPLICATED").unwrap() == "true";
+	let cluster_line = if clickhouse_replicated {
+		"ON cluster '{cluster}'"
+	} else {
+		""
+	};
 
-    let engine = if clickhouse_replicated {
-        "ReplicatedMergeTree('/clickhouse/{installation}/{cluster}/tables/{shard}/{database}/{table}', '{replica}')"
-    } else {
-        "MergeTree()"
-    };
+	let engine = if clickhouse_replicated {
+		"ReplicatedMergeTree('/clickhouse/{installation}/{cluster}/tables/{shard}/{database}/{table}', '{replica}')"
+	} else {
+		"MergeTree()"
+	};
 
-    client
-        .query(&format!(
-            "
+	client
+		.query(&format!(
+			"
             CREATE TABLE IF NOT EXISTS {database}.views {cluster_line}
             (
                 recorded DateTime64(4),
@@ -70,13 +67,13 @@ pub async fn init_client_with_database(
             PRIMARY KEY (project_id, recorded, ip)
             SETTINGS index_granularity = 8192
             "
-        ))
-        .execute()
-        .await?;
+		))
+		.execute()
+		.await?;
 
-    client
-        .query(&format!(
-            "
+	client
+		.query(&format!(
+			"
             CREATE TABLE IF NOT EXISTS {database}.downloads {cluster_line}
             (
                 recorded DateTime64(4),
@@ -96,13 +93,13 @@ pub async fn init_client_with_database(
             PRIMARY KEY (project_id, recorded, ip)
             SETTINGS index_granularity = 8192
             "
-        ))
-        .execute()
-        .await?;
+		))
+		.execute()
+		.await?;
 
-    client
-        .query(&format!(
-            "
+	client
+		.query(&format!(
+			"
             CREATE TABLE IF NOT EXISTS {database}.playtime {cluster_line}
             (
                 recorded DateTime64(4),
@@ -120,9 +117,9 @@ pub async fn init_client_with_database(
             PRIMARY KEY (project_id, recorded, user_id)
             SETTINGS index_granularity = 8192
             "
-        ))
-        .execute()
-        .await?;
+		))
+		.execute()
+		.await?;
 
-    Ok(client.with_database(database))
+	Ok(client.with_database(database))
 }
