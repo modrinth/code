@@ -22,6 +22,10 @@
         "
         :on-image-upload="onUploadHandler"
       />
+      <div v-if="descriptionWarning" class="flex items-center gap-1.5 text-orange">
+        <TriangleAlertIcon class="my-auto" />
+        {{ descriptionWarning }}
+      </div>
       <div class="input-group markdown-disclaimer">
         <button
           :disabled="!hasChanges"
@@ -38,7 +42,8 @@
 </template>
 
 <script lang="ts" setup>
-import { SaveIcon } from "@modrinth/assets";
+import { SaveIcon, TriangleAlertIcon } from "@modrinth/assets";
+import { countText, MIN_DESCRIPTION_CHARS } from "@modrinth/moderation";
 import { MarkdownEditor } from "@modrinth/ui";
 import { type Project, type TeamMember, TeamMemberPermission } from "@modrinth/utils";
 import { computed, ref } from "vue";
@@ -52,6 +57,17 @@ const props = defineProps<{
 }>();
 
 const description = ref(props.project.body);
+
+const descriptionWarning = computed(() => {
+  const text = description.value?.trim() || "";
+  const charCount = countText(text);
+
+  if (charCount < MIN_DESCRIPTION_CHARS) {
+    return `It's recommended to have a description with at least ${MIN_DESCRIPTION_CHARS} readable characters. (${charCount}/${MIN_DESCRIPTION_CHARS})`;
+  }
+
+  return null;
+});
 
 const patchRequestPayload = computed(() => {
   const payload: {
