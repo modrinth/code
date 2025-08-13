@@ -1,7 +1,7 @@
 import type { Project } from '../../types'
-import { Allocation } from './server'
-import { ServerBackup } from './backup'
-import { Mod } from './content'
+import type { ServerBackup } from './backup'
+import type { Mod } from './content'
+import type { Allocation } from './server'
 
 export type ServerNotice = {
     id: number
