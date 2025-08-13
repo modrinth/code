@@ -1,7 +1,6 @@
 //! Functions for fetching information from the Internet
 use super::io::{self, IOError};
 use crate::LAUNCHER_USER_AGENT;
-use crate::config::{MODRINTH_API_URL, MODRINTH_API_URL_V3};
 use crate::event::LoadingBarId;
 use crate::event::emit::emit_loading;
 use bytes::Bytes;

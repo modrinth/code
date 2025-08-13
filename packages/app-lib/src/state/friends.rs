@@ -1,5 +1,4 @@
 use crate::LAUNCHER_USER_AGENT;
-use crate::config::{MODRINTH_API_URL_V3, MODRINTH_SOCKET_URL};
 use crate::data::ModrinthCredentials;
 use crate::event::FriendPayload;
 use crate::event::emit::emit_friend;
