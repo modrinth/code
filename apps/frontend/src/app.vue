@@ -1,9 +1,9 @@
 <template>
-    <NuxtLayout>
-        <ModrinthLoadingIndicator />
-        <NotificationPanel />
-        <NuxtPage />
-    </NuxtLayout>
+	<NuxtLayout>
+		<ModrinthLoadingIndicator />
+		<NotificationPanel />
+		<NuxtPage />
+	</NuxtLayout>
 </template>
 <script setup lang="ts">
 import { NotificationPanel, provideNotificationManager } from '@modrinth/ui'

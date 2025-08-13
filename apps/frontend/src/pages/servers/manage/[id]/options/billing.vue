@@ -1,10 +1,10 @@
 <template>
-    <div class="universal-card">
-        <p>You can manage your server's billing from Settings > Billing and subscriptions.</p>
-        <ButtonStyled>
-            <NuxtLink to="/settings/billing">Go to Billing</NuxtLink>
-        </ButtonStyled>
-    </div>
+	<div class="universal-card">
+		<p>You can manage your server's billing from Settings > Billing and subscriptions.</p>
+		<ButtonStyled>
+			<NuxtLink to="/settings/billing">Go to Billing</NuxtLink>
+		</ButtonStyled>
+	</div>
 </template>
 
 <script setup lang="ts">
