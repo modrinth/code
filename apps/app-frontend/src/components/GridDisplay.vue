@@ -1,24 +1,25 @@
 <script setup>
+import ContextMenu from '@/components/ui/ContextMenu.vue'
 import Instance from '@/components/ui/Instance.vue'
-import { computed, ref } from 'vue'
+import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
+import { duplicate, remove } from '@/helpers/profile.js'
 import {
   ClipboardCopyIcon,
+  EyeIcon,
   FolderOpenIcon,
   PlayIcon,
   PlusIcon,
-  TrashIcon,
-  StopCircleIcon,
-  EyeIcon,
   SearchIcon,
+  StopCircleIcon,
+  TrashIcon,
   XIcon,
 } from '@modrinth/assets'
-import { Button, DropdownSelect } from '@modrinth/ui'
+import { Button, DropdownSelect, injectNotificationManager } from '@modrinth/ui'
 import { formatCategoryHeader } from '@modrinth/utils'
-import ContextMenu from '@/components/ui/ContextMenu.vue'
 import dayjs from 'dayjs'
-import { duplicate, remove } from '@/helpers/profile.js'
-import { handleError } from '@/store/notifications.js'
-import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
+import { computed, ref } from 'vue'
+
+const { handleError } = injectNotificationManager()
 
 const props = defineProps({
   instances: {

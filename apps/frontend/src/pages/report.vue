@@ -243,29 +243,32 @@
 
 <script setup lang="ts">
 import {
+  CheckCircleIcon,
+  CheckIcon,
+  ExternalIcon,
+  IssuesIcon,
+  LeftArrowIcon,
+  RightArrowIcon,
+  ScaleIcon,
+  SendIcon,
+  SpinnerIcon,
+  VersionIcon,
+  XCircleIcon,
+} from "@modrinth/assets";
+import {
+  AutoLink,
+  Avatar,
+  ButtonStyled,
+  injectNotificationManager,
   MarkdownEditor,
   RadialHeader,
   RadioButtons,
-  ButtonStyled,
-  Avatar,
-  AutoLink,
 } from "@modrinth/ui";
-import {
-  ExternalIcon,
-  LeftArrowIcon,
-  RightArrowIcon,
-  CheckIcon,
-  SpinnerIcon,
-  SendIcon,
-  IssuesIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  ScaleIcon,
-  VersionIcon,
-} from "@modrinth/assets";
-import type { User, Version, Report } from "@modrinth/utils";
-import { useVIntl, defineMessages, type MessageDescriptor } from "@vintl/vintl";
+import type { Project, Report, User, Version } from "@modrinth/utils";
+import { defineMessages, useVIntl, type MessageDescriptor } from "@vintl/vintl";
 import { useImageUpload } from "~/composables/image-upload.ts";
+
+const { addNotification } = injectNotificationManager();
 
 const tags = useTags();
 const route = useNativeRoute();
@@ -439,7 +442,6 @@ const submitReport = async () => {
 
     if (error instanceof Error) {
       addNotification({
-        group: "main",
         title: "An error occurred",
         text: error.message,
         type: "error",
@@ -465,7 +467,6 @@ const submitReport = async () => {
 
     if (error instanceof Error) {
       addNotification({
-        group: "main",
         title: "An error occurred",
         text: error.message,
         type: "error",

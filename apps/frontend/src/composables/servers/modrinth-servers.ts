@@ -1,18 +1,20 @@
-import { ModrinthServerError } from "@modrinth/utils";
 import type { JWTAuth, ModuleError, ModuleName } from "@modrinth/utils";
+import { ModrinthServerError } from "@modrinth/utils";
+import { injectNotificationManager } from "@modrinth/ui";
 import { useServersFetch } from "./servers-fetch.ts";
 
 import {
-  GeneralModule,
-  ContentModule,
   BackupsModule,
+  ContentModule,
+  FSModule,
+  GeneralModule,
   NetworkModule,
   StartupModule,
   WSModule,
-  FSModule,
 } from "./modules/index.ts";
 
 export function handleError(err: any) {
+  const { addNotification } = injectNotificationManager();
   if (err instanceof ModrinthServerError && err.v1Error) {
     addNotification({
       title: err.v1Error?.context ?? `An error occurred`,

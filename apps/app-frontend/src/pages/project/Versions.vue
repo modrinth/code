@@ -65,12 +65,16 @@
 </template>
 
 <script setup>
-import { ProjectPageVersions, ButtonStyled, OverflowMenu } from '@modrinth/ui'
-import { CheckIcon, DownloadIcon, ExternalIcon, MoreVerticalIcon } from '@modrinth/assets'
-import { ref } from 'vue'
 import { SwapIcon } from '@/assets/icons/index.js'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
-import { handleError } from '@/store/notifications.js'
+import { CheckIcon, DownloadIcon, ExternalIcon, MoreVerticalIcon } from '@modrinth/assets'
+import {
+  ButtonStyled,
+  OverflowMenu,
+  ProjectPageVersions,
+  injectNotificationManager,
+} from '@modrinth/ui'
+import { ref } from 'vue'
 
 defineProps({
   project: {
@@ -102,6 +106,8 @@ defineProps({
     default: null,
   },
 })
+
+const { handleError } = injectNotificationManager()
 
 const [loaders, gameVersions] = await Promise.all([
   get_loaders().catch(handleError).then(ref),

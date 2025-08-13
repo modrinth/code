@@ -408,6 +408,7 @@
 <script setup>
 import {
   CheckIcon,
+  DownloadIcon,
   EditIcon,
   ExternalIcon,
   LeftArrowIcon,
@@ -418,17 +419,16 @@ import {
   TrashIcon,
   UpdatedIcon,
   XIcon,
-  DownloadIcon,
 } from "@modrinth/assets";
+import { ConfirmModal, injectNotificationManager } from "@modrinth/ui";
 import QrcodeVue from "qrcode.vue";
-import { ConfirmModal } from "@modrinth/ui";
-import GithubIcon from "assets/icons/auth/sso-github.svg";
-import MicrosoftIcon from "assets/icons/auth/sso-microsoft.svg";
-import GoogleIcon from "assets/icons/auth/sso-google.svg";
-import SteamIcon from "assets/icons/auth/sso-steam.svg";
-import DiscordIcon from "assets/icons/auth/sso-discord.svg";
 import KeyIcon from "assets/icons/auth/key.svg";
+import DiscordIcon from "assets/icons/auth/sso-discord.svg";
+import GithubIcon from "assets/icons/auth/sso-github.svg";
 import GitLabIcon from "assets/icons/auth/sso-gitlab.svg";
+import GoogleIcon from "assets/icons/auth/sso-google.svg";
+import MicrosoftIcon from "assets/icons/auth/sso-microsoft.svg";
+import SteamIcon from "assets/icons/auth/sso-steam.svg";
 import Modal from "~/components/ui/Modal.vue";
 
 useHead({
@@ -439,7 +439,7 @@ definePageMeta({
   middleware: "auth",
 });
 
-const data = useNuxtApp();
+const { addNotification } = injectNotificationManager();
 const auth = await useAuth();
 
 const changeEmailModal = ref();
@@ -460,8 +460,7 @@ async function saveEmail() {
     changeEmailModal.value.hide();
     await useAuth(auth.value.token);
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -492,8 +491,7 @@ async function savePassword() {
     managePasswordModal.value.hide();
     await useAuth(auth.value.token);
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -529,8 +527,7 @@ async function showTwoFactorModal() {
     twoFactorSecret.value = res.secret;
     twoFactorFlow.value = res.flow;
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -619,8 +616,7 @@ async function deleteAccount() {
       method: "DELETE",
     });
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -649,8 +645,7 @@ async function exportData() {
     const blob = new Blob([jsonString], { type: "application/json" });
     generated.value = URL.createObjectURL(blob);
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",

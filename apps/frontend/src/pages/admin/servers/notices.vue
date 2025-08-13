@@ -258,30 +258,30 @@
   </div>
 </template>
 <script setup lang="ts">
+import { EditIcon, PlusIcon, SaveIcon, SettingsIcon, TrashIcon, XIcon } from "@modrinth/assets";
 import {
-  CopyCode,
-  TagItem,
   ButtonStyled,
-  ServerNotice,
   commonMessages,
+  CopyCode,
+  injectNotificationManager,
   NewModal,
+  ServerNotice,
+  TagItem,
   TeleportDropdownMenu,
   Toggle,
   useRelativeTime,
 } from "@modrinth/ui";
-import { SettingsIcon, PlusIcon, SaveIcon, TrashIcon, EditIcon, XIcon } from "@modrinth/assets";
-import dayjs from "dayjs";
-import { useVIntl } from "@vintl/vintl";
-import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
-import { computed } from "vue";
 import { NOTICE_LEVELS } from "@modrinth/ui/src/utils/notices.ts";
-import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
+import type { ServerNotice as ServerNoticeType } from "@modrinth/utils";
+import { useVIntl } from "@vintl/vintl";
+import dayjs from "dayjs";
+import { computed } from "vue";
 import AssignNoticeModal from "~/components/ui/servers/notice/AssignNoticeModal.vue";
+import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 
+const { addNotification } = injectNotificationManager();
 const { formatMessage } = useVIntl();
 const formatRelativeTime = useRelativeTime();
-
-const app = useNuxtApp() as unknown as { $notify: any };
 
 const notices = ref<ServerNoticeType[]>([]);
 const createNoticeModal = ref<InstanceType<typeof NewModal>>();
@@ -351,15 +351,13 @@ async function deleteNotice(notice: ServerNoticeType) {
     method: "DELETE",
   })
     .then(() => {
-      app.$notify({
-        group: "main",
+      addNotification({
         title: `Successfully deleted notice #${notice.id}`,
         type: "success",
       });
     })
     .catch((err) => {
-      app.$notify({
-        group: "main",
+      addNotification({
         title: "Error deleting notice",
         text: err,
         type: "error",
@@ -386,7 +384,6 @@ const noticeSubmitError = computed(() => {
 function validateSubmission(message: string) {
   if (noticeSubmitError.value) {
     addNotification({
-      group: "main",
       title: message,
       text: noticeSubmitError.value,
       type: "error",
@@ -416,8 +413,7 @@ async function saveChanges() {
         : undefined,
     },
   }).catch((err) => {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "Error saving changes to notice",
       text: err,
       type: "error",
@@ -447,8 +443,7 @@ async function createNotice() {
         : undefined,
     },
   }).catch((err) => {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "Error creating notice",
       text: err,
       type: "error",

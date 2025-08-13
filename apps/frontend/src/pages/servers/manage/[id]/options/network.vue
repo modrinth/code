@@ -264,19 +264,26 @@
 
 <script setup lang="ts">
 import {
-  PlusIcon,
-  TrashIcon,
   EditIcon,
-  VersionIcon,
-  SaveIcon,
   InfoIcon,
-  UploadIcon,
   IssuesIcon,
+  PlusIcon,
+  SaveIcon,
+  TrashIcon,
+  UploadIcon,
+  VersionIcon,
 } from "@modrinth/assets";
-import { ButtonStyled, NewModal, ConfirmModal, CopyCode } from "@modrinth/ui";
-import { ref, computed, nextTick } from "vue";
+import {
+  ButtonStyled,
+  ConfirmModal,
+  CopyCode,
+  injectNotificationManager,
+  NewModal,
+} from "@modrinth/ui";
+import { computed, nextTick, ref } from "vue";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
+const { addNotification } = injectNotificationManager();
 const props = defineProps<{
   server: ModrinthServer;
 }>();
@@ -317,7 +324,6 @@ const addNewAllocation = async () => {
     newAllocationName.value = "";
 
     addNotification({
-      group: "serverOptions",
       type: "success",
       title: "Allocation reserved",
       text: "Your allocation has been reserved.",
@@ -359,7 +365,6 @@ const confirmDeleteAllocation = async () => {
   await props.server.refresh(["network"]);
 
   addNotification({
-    group: "serverOptions",
     type: "success",
     title: "Allocation removed",
     text: "Your allocation has been removed.",
@@ -379,7 +384,6 @@ const editAllocation = async () => {
     newAllocationName.value = "";
 
     addNotification({
-      group: "serverOptions",
       type: "success",
       title: "Allocation updated",
       text: "Your allocation has been updated.",
@@ -397,7 +401,6 @@ const saveNetwork = async () => {
     const available = await props.server.network?.checkSubdomainAvailability(serverSubdomain.value);
     if (!available) {
       addNotification({
-        group: "serverOptions",
         type: "error",
         title: "Subdomain not available",
         text: "The subdomain you entered is already in use.",
@@ -416,7 +419,6 @@ const saveNetwork = async () => {
     await new Promise((resolve) => setTimeout(resolve, 500));
     await props.server.refresh();
     addNotification({
-      group: "serverOptions",
       type: "success",
       title: "Server settings updated",
       text: "Your server settings were successfully changed.",
@@ -424,7 +426,6 @@ const saveNetwork = async () => {
   } catch (error) {
     console.error(error);
     addNotification({
-      group: "serverOptions",
       type: "error",
       title: "Failed to update server settings",
       text: "An error occurred while attempting to update your server settings.",
@@ -483,7 +484,6 @@ const exportDnsRecords = () => {
 const copyText = (text: string) => {
   navigator.clipboard.writeText(text);
   addNotification({
-    group: "serverOptions",
     type: "success",
     title: "Text copied",
     text: `${text} has been copied to your clipboard`,

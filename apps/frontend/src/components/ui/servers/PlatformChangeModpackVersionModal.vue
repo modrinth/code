@@ -67,10 +67,12 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { DownloadIcon, XIcon } from "@modrinth/assets";
+import { ButtonStyled, injectNotificationManager, NewModal } from "@modrinth/ui";
 import { ModrinthServersFetchError } from "@modrinth/utils";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+
+const { addNotification } = injectNotificationManager();
 
 const props = defineProps<{
   server: ModrinthServer;
@@ -112,14 +114,12 @@ const handleReinstall = async () => {
   } catch (error) {
     if (error instanceof ModrinthServersFetchError && error.statusCode === 429) {
       addNotification({
-        group: "server",
         title: "Cannot reinstall server",
         text: "You are being rate limited. Please try again later.",
         type: "error",
       });
     } else {
       addNotification({
-        group: "server",
         title: "Reinstall Failed",
         text: "An unexpected error occurred while reinstalling. Please try again later.",
         type: "error",

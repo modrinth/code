@@ -73,22 +73,23 @@
 </template>
 
 <script setup>
-import { DropdownIcon, PlusIcon, TrashIcon, LogInIcon, SpinnerIcon } from '@modrinth/assets'
-import { Avatar, Button, Card } from '@modrinth/ui'
-import { ref, computed, onMounted, onBeforeUnmount, onUnmounted } from 'vue'
+import { trackEvent } from '@/helpers/analytics'
 import {
-  users,
+  get_default_user,
+  login as login_flow,
   remove_user,
   set_default_user,
-  login as login_flow,
-  get_default_user,
+  users,
 } from '@/helpers/auth'
-import { handleError } from '@/store/state.js'
-import { trackEvent } from '@/helpers/analytics'
 import { process_listener } from '@/helpers/events'
-import { handleSevereError } from '@/store/error.js'
-import { get_available_skins } from '@/helpers/skins'
 import { getPlayerHeadUrl } from '@/helpers/rendering/batch-skin-renderer.ts'
+import { get_available_skins } from '@/helpers/skins'
+import { handleSevereError } from '@/store/error.js'
+import { DropdownIcon, LogInIcon, PlusIcon, SpinnerIcon, TrashIcon } from '@modrinth/assets'
+import { Avatar, Button, Card, injectNotificationManager } from '@modrinth/ui'
+import { computed, onBeforeUnmount, onMounted, onUnmounted, ref } from 'vue'
+
+const { handleError } = injectNotificationManager()
 
 defineProps({
   mode: {

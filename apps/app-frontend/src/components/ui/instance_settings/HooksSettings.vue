@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { Checkbox } from '@modrinth/ui'
-import { computed, ref, watch } from 'vue'
-import { handleError } from '@/store/notifications'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { get } from '@/helpers/settings.ts'
 import { edit } from '@/helpers/profile'
-import type { InstanceSettingsTabProps, AppSettings, Hooks } from '../../../helpers/types'
+import { get } from '@/helpers/settings.ts'
+import { Checkbox, injectNotificationManager } from '@modrinth/ui'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+import { computed, ref, watch } from 'vue'
+import type { AppSettings, Hooks, InstanceSettingsTabProps } from '../../../helpers/types'
 
+const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const props = defineProps<InstanceSettingsTabProps>()

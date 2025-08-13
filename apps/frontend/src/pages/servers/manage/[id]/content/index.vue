@@ -335,28 +335,29 @@
 
 <script setup lang="ts">
 import {
-  SearchIcon,
-  EditIcon,
-  TrashIcon,
-  PackageClosedIcon,
-  FilterIcon,
-  DropdownIcon,
-  PlusIcon,
-  MoreVerticalIcon,
   CompassIcon,
-  WrenchIcon,
-  ListIcon,
+  DropdownIcon,
+  EditIcon,
   FileIcon,
+  FilterIcon,
   IssuesIcon,
+  ListIcon,
+  MoreVerticalIcon,
+  PackageClosedIcon,
+  PlusIcon,
+  SearchIcon,
+  TrashIcon,
+  WrenchIcon,
 } from "@modrinth/assets";
-import { Avatar, ButtonStyled } from "@modrinth/ui";
-import { ref, computed, watch, onMounted, onUnmounted } from "vue";
+import { Avatar, ButtonStyled, injectNotificationManager } from "@modrinth/ui";
 import type { Mod } from "@modrinth/utils";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
 import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
-import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
 
+const { addNotification } = injectNotificationManager();
 const props = defineProps<{
   server: ModrinthServer;
 }>();
