@@ -71,7 +71,7 @@ pub struct FetchedPlaytime {
 }
 pub async fn playtimes_get(
     req: HttpRequest,
-    clickhouse: web::Data<clickhouse::Client>,
+    clickhouse: web::Data<Option<clickhouse::Client>>,
     data: web::Query<GetData>,
     session_queue: web::Data<AuthQueue>,
     pool: web::Data<PgPool>,
@@ -106,14 +106,18 @@ pub async fn playtimes_get(
         filter_allowed_ids(project_ids, user, &pool, &redis, None).await?;
 
     // Get the views
-    let playtimes = crate::clickhouse::fetch_playtimes(
-        project_ids.unwrap_or_default(),
-        start_date,
-        end_date,
-        resolution_minutes,
-        clickhouse.into_inner(),
-    )
-    .await?;
+    let playtimes = if let Some(client) = clickhouse.get_ref().as_ref() {
+        crate::clickhouse::fetch_playtimes(
+            project_ids.unwrap_or_default(),
+            start_date,
+            end_date,
+            resolution_minutes,
+            client,
+        )
+        .await?
+    } else {
+        Vec::new()
+    };
 
     let mut hm = HashMap::new();
     for playtime in playtimes {
@@ -140,7 +144,7 @@ pub async fn playtimes_get(
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
 pub async fn views_get(
     req: HttpRequest,
-    clickhouse: web::Data<clickhouse::Client>,
+    clickhouse: web::Data<Option<clickhouse::Client>>,
     data: web::Query<GetData>,
     session_queue: web::Data<AuthQueue>,
     pool: web::Data<PgPool>,
@@ -175,14 +179,18 @@ pub async fn views_get(
         filter_allowed_ids(project_ids, user, &pool, &redis, None).await?;
 
     // Get the views
-    let views = crate::clickhouse::fetch_views(
-        project_ids.unwrap_or_default(),
-        start_date,
-        end_date,
-        resolution_minutes,
-        clickhouse.into_inner(),
-    )
-    .await?;
+    let views = if let Some(client) = clickhouse.get_ref().as_ref() {
+        crate::clickhouse::fetch_views(
+            project_ids.unwrap_or_default(),
+            start_date,
+            end_date,
+            resolution_minutes,
+            client,
+        )
+        .await?
+    } else {
+        Vec::new()
+    };
 
     let mut hm = HashMap::new();
     for views in views {
@@ -209,7 +217,7 @@ pub async fn views_get(
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
 pub async fn downloads_get(
     req: HttpRequest,
-    clickhouse: web::Data<clickhouse::Client>,
+    clickhouse: web::Data<Option<clickhouse::Client>>,
     data: web::Query<GetData>,
     session_queue: web::Data<AuthQueue>,
     pool: web::Data<PgPool>,
@@ -245,14 +253,18 @@ pub async fn downloads_get(
             .await?;
 
     // Get the downloads
-    let downloads = crate::clickhouse::fetch_downloads(
-        project_ids.unwrap_or_default(),
-        start_date,
-        end_date,
-        resolution_minutes,
-        clickhouse.into_inner(),
-    )
-    .await?;
+    let downloads = if let Some(client) = clickhouse.get_ref().as_ref() {
+        crate::clickhouse::fetch_downloads(
+            project_ids.unwrap_or_default(),
+            start_date,
+            end_date,
+            resolution_minutes,
+            client,
+        )
+        .await?
+    } else {
+        Vec::new()
+    };
 
     let mut hm = HashMap::new();
     for downloads in downloads {
@@ -418,7 +430,7 @@ pub async fn revenue_get(
 /// For this endpoint, provided dates are a range to aggregate over, not specific days to fetch
 pub async fn countries_downloads_get(
     req: HttpRequest,
-    clickhouse: web::Data<clickhouse::Client>,
+    clickhouse: web::Data<Option<clickhouse::Client>>,
     data: web::Query<GetData>,
     session_queue: web::Data<AuthQueue>,
     pool: web::Data<PgPool>,
@@ -450,13 +462,17 @@ pub async fn countries_downloads_get(
         filter_allowed_ids(project_ids, user, &pool, &redis, None).await?;
 
     // Get the countries
-    let countries = crate::clickhouse::fetch_countries_downloads(
-        project_ids.unwrap_or_default(),
-        start_date,
-        end_date,
-        clickhouse.into_inner(),
-    )
-    .await?;
+    let countries = if let Some(client) = clickhouse.get_ref().as_ref() {
+        crate::clickhouse::fetch_countries_downloads(
+            project_ids.unwrap_or_default(),
+            start_date,
+            end_date,
+            client,
+        )
+        .await?
+    } else {
+        Vec::new()
+    };
 
     let mut hm = HashMap::new();
     for views in countries {
@@ -491,7 +507,7 @@ pub async fn countries_downloads_get(
 /// For this endpoint, provided dates are a range to aggregate over, not specific days to fetch
 pub async fn countries_views_get(
     req: HttpRequest,
-    clickhouse: web::Data<clickhouse::Client>,
+    clickhouse: web::Data<Option<clickhouse::Client>>,
     data: web::Query<GetData>,
     session_queue: web::Data<AuthQueue>,
     pool: web::Data<PgPool>,
@@ -523,13 +539,17 @@ pub async fn countries_views_get(
         filter_allowed_ids(project_ids, user, &pool, &redis, None).await?;
 
     // Get the countries
-    let countries = crate::clickhouse::fetch_countries_views(
-        project_ids.unwrap_or_default(),
-        start_date,
-        end_date,
-        clickhouse.into_inner(),
-    )
-    .await?;
+    let countries = if let Some(client) = clickhouse.get_ref().as_ref() {
+        crate::clickhouse::fetch_countries_views(
+            project_ids.unwrap_or_default(),
+            start_date,
+            end_date,
+            client,
+        )
+        .await?
+    } else {
+        Vec::new()
+    };
 
     let mut hm = HashMap::new();
     for views in countries {

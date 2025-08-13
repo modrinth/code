@@ -44,7 +44,7 @@ pub struct Pepper {
 pub struct LabrinthConfig {
     pub pool: sqlx::Pool<Postgres>,
     pub redis_pool: RedisPool,
-    pub clickhouse: Client,
+    pub clickhouse: Option<Client>,
     pub file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
     pub maxmind: Arc<queue::maxmind::MaxMindIndexer>,
     pub scheduler: Arc<scheduler::Scheduler>,
@@ -64,7 +64,7 @@ pub fn app_setup(
     pool: sqlx::Pool<Postgres>,
     redis_pool: RedisPool,
     search_config: search::SearchConfig,
-    clickhouse: &mut Client,
+    clickhouse: Option<Client>,
     file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
     maxmind: Arc<queue::maxmind::MaxMindIndexer>,
     stripe_client: stripe::Client,
@@ -142,15 +142,24 @@ pub fn app_setup(
             }
         });
 
-        let pool_ref = pool.clone();
-        let client_ref = clickhouse.clone();
-        scheduler.run(Duration::from_secs(60 * 60 * 6), move || {
-            let pool_ref = pool_ref.clone();
-            let client_ref = client_ref.clone();
-            async move {
-                background_task::payouts(pool_ref, client_ref).await;
+        match clickhouse.clone() {
+            Some(client) => {
+                let pool_ref = pool.clone();
+                scheduler.run(Duration::from_secs(60 * 60 * 6), move || {
+                    let pool_ref = pool_ref.clone();
+                    let client_ref = client.clone();
+                    async move {
+                        background_task::payouts(pool_ref, Some(client_ref))
+                            .await;
+                    }
+                });
             }
-        });
+            None => {
+                warn!(
+                    "Skipping scheduling payouts task: ClickHouse client unavailable"
+                );
+            }
+        }
 
         let pool_ref = pool.clone();
         let redis_ref = redis_pool.clone();
@@ -224,27 +233,35 @@ pub fn app_setup(
 
     let analytics_queue = Arc::new(AnalyticsQueue::new());
     {
-        let client_ref = clickhouse.clone();
-        let analytics_queue_ref = analytics_queue.clone();
-        let pool_ref = pool.clone();
-        let redis_ref = redis_pool.clone();
-        scheduler.run(Duration::from_secs(15), move || {
-            let client_ref = client_ref.clone();
-            let analytics_queue_ref = analytics_queue_ref.clone();
-            let pool_ref = pool_ref.clone();
-            let redis_ref = redis_ref.clone();
+        match clickhouse.clone() {
+            Some(client) => {
+                let analytics_queue_ref = analytics_queue.clone();
+                let pool_ref = pool.clone();
+                let redis_ref = redis_pool.clone();
+                scheduler.run(Duration::from_secs(15), move || {
+                    let client_ref = client.clone();
+                    let analytics_queue_ref = analytics_queue_ref.clone();
+                    let pool_ref = pool_ref.clone();
+                    let redis_ref = redis_ref.clone();
 
-            async move {
-                info!("Indexing analytics queue");
-                let result = analytics_queue_ref
-                    .index(client_ref, &redis_ref, &pool_ref)
-                    .await;
-                if let Err(e) = result {
-                    warn!("Indexing analytics queue failed: {:?}", e);
-                }
-                info!("Done indexing analytics queue");
+                    async move {
+                        info!("Indexing analytics queue");
+                        let result = analytics_queue_ref
+                            .index(Some(client_ref), &redis_ref, &pool_ref)
+                            .await;
+                        if let Err(e) = result {
+                            warn!("Indexing analytics queue failed: {:?}", e);
+                        }
+                        info!("Done indexing analytics queue");
+                    }
+                });
             }
-        });
+            None => {
+                warn!(
+                    "Skipping scheduling analytics index: ClickHouse client unavailable"
+                );
+            }
+        }
     }
 
     let ip_salt = Pepper {
@@ -285,7 +302,7 @@ pub fn app_setup(
     LabrinthConfig {
         pool,
         redis_pool,
-        clickhouse: clickhouse.clone(),
+        clickhouse,
         file_host,
         maxmind,
         scheduler: Arc::new(scheduler),
