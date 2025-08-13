@@ -82,6 +82,10 @@
       <label for="project-summary">
         <span class="label__title">Summary</span>
       </label>
+      <div v-if="summaryWarning" class="my-2 flex items-center gap-1.5 text-orange">
+        <TriangleAlertIcon class="my-auto" />
+        {{ summaryWarning }}
+      </div>
       <div class="textarea-wrapper summary-input">
         <textarea
           id="project-summary"
@@ -243,6 +247,18 @@ import { CheckIcon, IssuesIcon, SaveIcon, TrashIcon, UploadIcon, XIcon } from "@
 import { Avatar, ConfirmModal, injectNotificationManager } from "@modrinth/ui";
 import { formatProjectStatus, formatProjectType } from "@modrinth/utils";
 import { Multiselect } from "vue-multiselect";
+import {
+  UploadIcon,
+  SaveIcon,
+  TrashIcon,
+  XIcon,
+  IssuesIcon,
+  CheckIcon,
+  TriangleAlertIcon,
+} from "@modrinth/assets";
+import { Multiselect } from "vue-multiselect";
+import { ConfirmModal, Avatar } from "@modrinth/ui";
+import { MIN_SUMMARY_CHARS } from "@modrinth/moderation";
 import FileInput from "~/components/ui/FileInput.vue";
 
 const { addNotification } = injectNotificationManager();
@@ -300,6 +316,17 @@ const hasPermission = computed(() => {
 const hasDeletePermission = computed(() => {
   const DELETE_PROJECT = 1 << 7;
   return (props.currentMember.permissions & DELETE_PROJECT) === DELETE_PROJECT;
+});
+
+const summaryWarning = computed(() => {
+  const text = summary.value?.trim() || "";
+  const charCount = text.length;
+
+  if (charCount < MIN_SUMMARY_CHARS) {
+    return `It's recommended to have a summary with at least ${MIN_SUMMARY_CHARS} characters. (${charCount}/${MIN_SUMMARY_CHARS})`;
+  }
+
+  return null;
 });
 
 const sideTypes = ["required", "optional", "unsupported"];

@@ -16,6 +16,7 @@
     "blog:fix": "turbo run fix --filter=@modrinth/blog",
     "pages:build": "NITRO_PRESET=cloudflare-pages pnpm --filter frontend run build",
     "moderation:fix": "turbo run fix --filter=@modrinth/moderation",
+    "moderation:intl:extract": "pnpm run --filter=@modrinth/moderation intl:extract",
     "build": "turbo run build --continue",
     "lint": "turbo run lint --continue",
     "test": "turbo run test --continue",
