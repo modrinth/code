@@ -2,12 +2,7 @@ package com.modrinth.theseus.rpc;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -22,7 +17,7 @@ import java.util.function.Function;
 
 public final class TheseusRpc {
     static final Gson GSON = new GsonBuilder()
-            .setStrictness(Strictness.LENIENT)
+            .setStrictness(Strictness.STRICT)
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .disableHtmlEscaping()
             .create();
@@ -79,13 +74,12 @@ public final class TheseusRpc {
 
     private void mainThread() {
         try {
-            final JsonWriter writer =
-                    GSON.newJsonWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
+            final Writer writer = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);
             while (true) {
                 final RpcMessage message = mainThreadQueue.take();
+                final RpcMessage toSend;
                 if (message.isForSending) {
-                    GSON.toJson(message, RpcMessage.class, writer);
-                    writer.flush();
+                    toSend = message;
                 } else {
                     final Function<JsonElement[], JsonElement> handler = handlers.get(message.method);
                     if (handler == null) {
@@ -98,9 +92,11 @@ public final class TheseusRpc {
                     } catch (Exception e) {
                         response = new RpcMessage(message.id, e.toString());
                     }
-                    GSON.toJson(response, RpcMessage.class, writer);
-                    writer.flush();
+                    toSend = response;
                 }
+                GSON.toJson(toSend, writer);
+                writer.write('\n');
+                writer.flush();
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -110,10 +106,10 @@ public final class TheseusRpc {
 
     private void readThread() {
         try {
-            final JsonReader reader =
-                    GSON.newJsonReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+            final BufferedReader reader =
+                    new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
             while (true) {
-                final RpcMessage message = GSON.fromJson(reader, MESSAGE_TYPE);
+                final RpcMessage message = GSON.fromJson(reader.readLine(), MESSAGE_TYPE);
                 if (message.method == null) {
                     final ResponseWaiter<?> waiter = awaitingResponse.get(message.id);
                     if (waiter != null) {

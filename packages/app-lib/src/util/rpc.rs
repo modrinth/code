@@ -1,5 +1,5 @@
-use crate::util::json::parse_object_async_reader;
 use crate::{ErrorKind, Result};
+use futures::{SinkExt, StreamExt};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -7,10 +7,10 @@ use std::collections::HashMap;
 use std::net::Ipv4Addr;
 use std::pin::Pin;
 use std::sync::{Arc, Mutex};
-use tokio::io::AsyncWriteExt;
 use tokio::net::TcpListener;
 use tokio::sync::{mpsc, oneshot};
 use tokio::task::AbortHandle;
+use tokio_util::codec::{Decoder, Framed, LinesCodec, LinesCodecError};
 use uuid::Uuid;
 
 type HandlerFuture = Pin<Box<dyn Send + Future<Output = Result<Value>>>>;
@@ -154,21 +154,34 @@ impl RpcServer {
         handlers: HandlerMap,
         waiting_responses: WaitingResponsesMap,
     ) -> Result<()> {
-        let (mut socket, _) = socket.accept().await?;
+        let (socket, _) = socket.accept().await?;
+        let mut socket = LinesCodec::new().framed(socket);
+        let send_message = async |socket: &mut Framed<_, _>,
+                                  message|
+               -> Result<()> {
+            let json = serde_json::to_string(&message)?;
+            match socket.send(json).await {
+                Ok(()) => {}
+                Err(LinesCodecError::Io(e)) => Err(e)?,
+                Err(LinesCodecError::MaxLineLengthExceeded) => unreachable!(),
+            };
+            Ok(())
+        };
         loop {
             tokio::select! {
                 message = message_receiver.recv() => {
                     let Some(message) = message else {
                         break;
                     };
-                    tracing::debug!("Sending RPC message {message:?}");
-                    let json = serde_json::to_vec(&message)?;
-                    socket.write_all(&json).await?;
-                    socket.flush().await?;
+                    send_message(&mut socket, message).await?;
                 },
-                message = parse_object_async_reader(&mut socket) => {
-                    let message: RpcMessage = message?;
-                    tracing::debug!("Received RPC message {message:?}");
+                message = socket.next() => {
+                    let message: RpcMessage = match message {
+                        None => break,
+                        Some(Ok(message)) => serde_json::from_str(&message)?,
+                        Some(Err(LinesCodecError::Io(e))) => Err(e)?,
+                        Some(Err(LinesCodecError::MaxLineLengthExceeded)) => unreachable!(),
+                    };
                     if let RpcMessageBody::Call { method, args } = message.body {
                         let response = match handlers.get(method.as_str()) {
                             Some(handler) => match handler(args).await {
@@ -183,12 +196,10 @@ impl RpcServer {
                                 error: format!("Unknown theseus RPC method {method}"),
                             },
                         };
-                        let json = serde_json::to_vec(&RpcMessage {
+                        send_message(&mut socket, RpcMessage {
                             id: message.id,
                             body: response,
-                        })?;
-                        socket.write_all(&json).await?;
-                        socket.flush().await?;
+                        }).await?;
                     } else if let Some(sender) = waiting_responses.lock().unwrap().remove(&message.id) {
                         let _ = sender.send(match message.body {
                             RpcMessageBody::Respond { response } => Ok(response),
