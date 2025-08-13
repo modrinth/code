@@ -48,7 +48,7 @@
           <Checkbox
             v-model="showSnapshots"
             class="filter-checkbox"
-            label="Snapshots"
+            label="Show all versions"
           />
         </div>
       </div>
