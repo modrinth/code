@@ -243,21 +243,18 @@
 </template>
 
 <script setup>
-import { CheckIcon, IssuesIcon, SaveIcon, TrashIcon, UploadIcon, XIcon } from "@modrinth/assets";
+import {
+  CheckIcon,
+  IssuesIcon,
+  SaveIcon,
+  TrashIcon,
+  UploadIcon,
+  XIcon,
+  TriangleAlertIcon,
+} from "@modrinth/assets";
 import { Avatar, ConfirmModal, injectNotificationManager } from "@modrinth/ui";
 import { formatProjectStatus, formatProjectType } from "@modrinth/utils";
 import { Multiselect } from "vue-multiselect";
-import {
-  UploadIcon,
-  SaveIcon,
-  TrashIcon,
-  XIcon,
-  IssuesIcon,
-  CheckIcon,
-  TriangleAlertIcon,
-} from "@modrinth/assets";
-import { Multiselect } from "vue-multiselect";
-import { ConfirmModal, Avatar } from "@modrinth/ui";
 import { MIN_SUMMARY_CHARS } from "@modrinth/moderation";
 import FileInput from "~/components/ui/FileInput.vue";
 

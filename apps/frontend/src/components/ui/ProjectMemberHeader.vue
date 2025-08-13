@@ -112,23 +112,18 @@ import {
   LightBulbIcon,
   ScaleIcon,
   SendIcon,
+  TriangleAlertIcon,
   XIcon,
 } from "@modrinth/assets";
-import { injectNotificationManager } from "@modrinth/ui";
-import { formatProjectType } from "@modrinth/utils";
-  TriangleAlertIcon,
-  DropdownIcon,
-  SendIcon,
-  ScaleIcon,
-  InfoIcon,
-} from "@modrinth/assets";
-import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
-import { nags } from "@modrinth/moderation";
-import { ButtonStyled } from "@modrinth/ui";
-import { useVIntl, defineMessages, type MessageDescriptor } from "@vintl/vintl";
 import type { Nag, NagContext, NagStatus } from "@modrinth/moderation";
+import { nags } from "@modrinth/moderation";
+import { ButtonStyled, injectNotificationManager } from "@modrinth/ui";
 import type { Project, User, Version } from "@modrinth/utils";
+import { defineMessages, useVIntl, type MessageDescriptor } from "@vintl/vintl";
 import type { Component } from "vue";
+import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
+
+const { addNotification } = injectNotificationManager();
 
 interface Tags {
   rejectedStatuses: string[];
@@ -200,44 +195,6 @@ const messages = defineMessages({
     id: "project-member-header.resubmit-for-review",
     defaultMessage: "Resubmit for review",
   },
-  setProcessing: {
-    type: Function,
-    default() {
-      return () => {
-        const { addNotification } = injectNotificationManager();
-        addNotification({
-          title: "An error occurred",
-          text: "setProcessing function not found",
-          type: "error",
-        });
-      };
-    },
-  },
-  toggleCollapsed: {
-    type: Function,
-    default() {
-      return () => {
-        const { addNotification } = injectNotificationManager();
-        addNotification({
-          title: "An error occurred",
-          text: "toggleCollapsed function not found",
-          type: "error",
-        });
-      };
-    },
-  },
-  updateMembers: {
-    type: Function,
-    default() {
-      return () => {
-        const { addNotification } = injectNotificationManager();
-        addNotification({
-          title: "An error occurred",
-          text: "updateMembers function not found",
-          type: "error",
-        });
-      };
-    },
   resubmitForReviewDesc: {
     id: "project-member-header.resubmit-for-review-desc",
     defaultMessage:
@@ -477,14 +434,12 @@ async function acceptInvite(): Promise<void> {
     await acceptTeamInvite(props.project.team);
     await updateMembers();
     addNotification({
-      group: "main",
       title: formatMessage(messages.success),
       text: formatMessage(messages.successJoin),
       type: "success",
     });
   } catch (error) {
     addNotification({
-      group: "main",
       title: formatMessage(messages.error),
       text: formatMessage(messages.errorJoin),
       type: "error",
@@ -500,14 +455,12 @@ async function declineInvite(): Promise<void> {
     await removeTeamMember(props.project.team, props.auth.user.id);
     await updateMembers();
     addNotification({
-      group: "main",
       title: formatMessage(messages.success),
       text: formatMessage(messages.successDecline),
       type: "success",
     });
   } catch (error) {
     addNotification({
-      group: "main",
       title: formatMessage(messages.error),
       text: formatMessage(messages.errorDecline),
       type: "error",
