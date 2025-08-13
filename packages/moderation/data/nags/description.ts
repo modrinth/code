@@ -88,7 +88,7 @@ export function countText(markdown: string): number {
     return withoutMdSyntax.replace(/\s+/g, ' ').trim().length
   }
 
-  if (typeof window === 'undefined' || typeof (globalThis as any).DOMParser === 'undefined') {
+  if (typeof window === 'undefined' || typeof globalThis.DOMParser === 'undefined') {
     console.warn(`[Moderation] SSR: no window/DOMParser, falling back for countText`)
     return fallback(markdown)
   }
