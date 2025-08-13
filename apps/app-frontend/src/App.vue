@@ -24,6 +24,7 @@ import { get_user } from '@/helpers/cache.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { useFetch } from '@/helpers/fetch.js'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.js'
+import { list } from '@/helpers/profile.js'
 import { get } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
 import { getOS, isDev, restartApp } from '@/helpers/utils.js'
@@ -67,12 +68,11 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
 import { check } from '@tauri-apps/plugin-updater'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
+import { $fetch } from 'ofetch'
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import { create_profile_and_install_from_file } from './helpers/pack'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
-import { list } from '@/helpers/profile.js'
-import { $fetch } from 'ofetch'
 import { get_available_capes, get_available_skins } from './helpers/skins'
 import { AppNotificationManager } from './providers/app-notifications'
 
@@ -450,7 +450,7 @@ async function processPendingSurveys() {
   const userId = creds?.user_id
 
   const instances = await list().catch(handleError)
-  const isActivePlayer = true ||
+  const isActivePlayer =
     instances.findIndex(
       (instance) =>
         isWithinLastTwoWeeks(instance.last_played) && !isWithinLastTwoWeeks(instance.created),
@@ -465,10 +465,12 @@ async function processPendingSurveys() {
 
   const surveyToShow = surveys.find(
     (survey) =>
-      true || localStorage.getItem(`survey-${survey.id}-display`) === null &&
-      survey.type === 'tally_app' &&
-      ((survey.condition === 'active_player' && isActivePlayer) ||
-        (survey.assigned_users?.includes(userId) && !survey.dismissed_users?.includes(userId))),
+      !!(
+        localStorage.getItem(`survey-${survey.id}-display`) === null &&
+        survey.type === 'tally_app' &&
+        ((survey.condition === 'active_player' && isActivePlayer) ||
+          (survey.assigned_users?.includes(userId) && !survey.dismissed_users?.includes(userId)))
+      ),
   )
 
   if (surveyToShow) {
