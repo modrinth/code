@@ -38,6 +38,7 @@ import _CodeIcon from './icons/code.svg?component'
 import _CoffeeIcon from './icons/coffee.svg?component'
 import _CogIcon from './icons/cog.svg?component'
 import _CoinsIcon from './icons/coins.svg?component'
+import _CollapseIcon from './icons/collapse.svg?component'
 import _CollectionIcon from './icons/collection.svg?component'
 import _CompassIcon from './icons/compass.svg?component'
 import _ContractIcon from './icons/contract.svg?component'
@@ -52,6 +53,7 @@ import _DatabaseIcon from './icons/database.svg?component'
 import _DownloadIcon from './icons/download.svg?component'
 import _DropdownIcon from './icons/dropdown.svg?component'
 import _EditIcon from './icons/edit.svg?component'
+import _EllipsisVerticalIcon from './icons/ellipsis-vertical.svg?component'
 import _ExpandIcon from './icons/expand.svg?component'
 import _ExternalIcon from './icons/external.svg?component'
 import _EyeOffIcon from './icons/eye-off.svg?component'
@@ -167,6 +169,8 @@ import _TerminalSquareIcon from './icons/terminal-square.svg?component'
 import _TestIcon from './icons/test.svg?component'
 import _TextQuoteIcon from './icons/text-quote.svg?component'
 import _TimerIcon from './icons/timer.svg?component'
+import _ToggleLeftIcon from './icons/toggle-left.svg?component'
+import _ToggleRightIcon from './icons/toggle-right.svg?component'
 import _TransferIcon from './icons/transfer.svg?component'
 import _TrashIcon from './icons/trash.svg?component'
 import _TriangleAlertIcon from './icons/triangle-alert.svg?component'
@@ -229,6 +233,7 @@ export const CodeIcon = _CodeIcon
 export const CoffeeIcon = _CoffeeIcon
 export const CogIcon = _CogIcon
 export const CoinsIcon = _CoinsIcon
+export const CollapseIcon = _CollapseIcon
 export const CollectionIcon = _CollectionIcon
 export const CompassIcon = _CompassIcon
 export const ContractIcon = _ContractIcon
@@ -243,6 +248,7 @@ export const DatabaseIcon = _DatabaseIcon
 export const DownloadIcon = _DownloadIcon
 export const DropdownIcon = _DropdownIcon
 export const EditIcon = _EditIcon
+export const EllipsisVerticalIcon = _EllipsisVerticalIcon
 export const ExpandIcon = _ExpandIcon
 export const ExternalIcon = _ExternalIcon
 export const EyeOffIcon = _EyeOffIcon
@@ -358,6 +364,8 @@ export const TerminalSquareIcon = _TerminalSquareIcon
 export const TestIcon = _TestIcon
 export const TextQuoteIcon = _TextQuoteIcon
 export const TimerIcon = _TimerIcon
+export const ToggleLeftIcon = _ToggleLeftIcon
+export const ToggleRightIcon = _ToggleRightIcon
 export const TransferIcon = _TransferIcon
 export const TrashIcon = _TrashIcon
 export const TriangleAlertIcon = _TriangleAlertIcon

@@ -1,10 +1,28 @@
 import { BookOpenIcon } from '@modrinth/assets'
 import type { Stage } from '../../types/stage'
+import type { Project } from '@modrinth/utils'
+
+function hasCustomSlug(project: Project): boolean {
+  return (
+    project.slug !==
+    project.title
+      .trim()
+      .toLowerCase()
+      .replaceAll(' ', '-')
+      .replaceAll(/[^a-zA-Z0-9!@$()`.+,_"-]/g, '')
+      .replaceAll(/--+/gm, '-')
+  )
+}
 
 const titleSlug: Stage = {
   title: 'Are the Name and URL accurate and appropriate?',
   id: 'title-&-slug',
-  text: async () => (await import('../messages/checklist-text/title-slug.md?raw')).default,
+  text: async (project) => {
+    let text = (await import('../messages/checklist-text/title-slug/title.md?raw')).default
+    if (hasCustomSlug(project))
+      text += (await import('../messages/checklist-text/title-slug/slug.md?raw')).default
+    return text
+  },
   icon: BookOpenIcon,
   guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
   actions: [
@@ -63,6 +81,7 @@ const titleSlug: Stage = {
       label: 'Slug issues?',
       suggestedStatus: 'rejected',
       severity: 'low',
+      shouldShow: (project) => hasCustomSlug(project),
       options: [
         {
           label: 'Misused',

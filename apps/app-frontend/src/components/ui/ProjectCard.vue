@@ -21,14 +21,11 @@ const props = defineProps({
 })
 
 const featuredCategory = computed(() => {
-  if (props.project.categories.includes('optimization')) {
+  if (props.project.display_categories.includes('optimization')) {
     return 'optimization'
   }
 
-  if (props.project.categories.length > 0) {
-    return props.project.categories[0]
-  }
-  return undefined
+  return props.project.display_categories[0] ?? props.project.categories[0]
 })
 
 const toColor = computed(() => {

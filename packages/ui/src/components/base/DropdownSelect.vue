@@ -163,7 +163,6 @@ const onFocus = () => {
 }
 
 const onBlur = (event) => {
-  console.log(event)
   if (!isChildOfDropdown(event.relatedTarget)) {
     dropdownVisible.value = false
   }

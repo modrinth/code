@@ -689,7 +689,10 @@
                   },
                   {
                     id: 'moderation-checklist',
-                    action: () => (showModerationChecklist = true),
+                    action: () => {
+                      moderationStore.setSingleProject(project.id);
+                      showModerationChecklist = true;
+                    },
                     color: 'orange',
                     hoverOnly: true,
                     shown:
@@ -870,19 +873,6 @@
           @delete-version="deleteVersion"
         />
       </div>
-
-      <div class="normal-page__ultimate-sidebar">
-        <!-- Uncomment this to enable the old moderation checklist. -->
-        <!-- <ModerationChecklist
-          v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
-          :project="project"
-          :future-projects="futureProjects"
-          :reset-project="resetProject"
-          :collapsed="collapsedModerationChecklist"
-          @exit="showModerationChecklist = false"
-          @toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
-        /> -->
-      </div>
     </div>
   </div>
 
@@ -890,9 +880,8 @@
     v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
     class="moderation-checklist"
   >
-    <NewModerationChecklist
+    <ModerationChecklist
       :project="project"
-      :future-project-ids="futureProjectIds"
       :collapsed="collapsedModerationChecklist"
       @exit="showModerationChecklist = false"
       @toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
@@ -951,14 +940,7 @@ import {
   useRelativeTime,
 } from "@modrinth/ui";
 import VersionSummary from "@modrinth/ui/src/components/version/VersionSummary.vue";
-import {
-  formatCategory,
-  formatProjectType,
-  isRejected,
-  isStaff,
-  isUnderReview,
-  renderString,
-} from "@modrinth/utils";
+import { formatCategory, formatProjectType, renderString } from "@modrinth/utils";
 import dayjs from "dayjs";
 import { Tooltip } from "floating-vue";
 import { useLocalStorage } from "@vueuse/core";
@@ -976,11 +958,13 @@ import ProjectMemberHeader from "~/components/ui/ProjectMemberHeader.vue";
 import { userCollectProject } from "~/composables/user.js";
 import { reportProject } from "~/utils/report-helpers.ts";
 import { saveFeatureFlags } from "~/composables/featureFlags.ts";
-import NewModerationChecklist from "~/components/ui/moderation/NewModerationChecklist.vue";
+import ModerationChecklist from "~/components/ui/moderation/checklist/ModerationChecklist.vue";
+import { useModerationStore } from "~/store/moderation.ts";
 
 const data = useNuxtApp();
 const route = useNativeRoute();
 const config = useRuntimeConfig();
+const moderationStore = useModerationStore();
 
 const auth = await useAuth();
 const user = await useUser();
@@ -1568,12 +1552,6 @@ const showModerationChecklist = useLocalStorage(
 );
 const collapsedModerationChecklist = useLocalStorage("collapsed-moderation-checklist", false);
 
-const futureProjectIds = useLocalStorage("moderation-future-projects", []);
-
-watch(futureProjectIds, (newValue) => {
-  console.log("Future project IDs updated:", newValue);
-});
-
 watch(
   showModerationChecklist,
   (newValue) => {
@@ -1646,9 +1624,7 @@ const navLinks = computed(() => {
     {
       label: formatMessage(messages.moderationTab),
       href: `${projectUrl}/moderation`,
-      shown:
-        !!currentMember.value &&
-        (isRejected(project.value) || isUnderReview(project.value) || isStaff(auth.value.user)),
+      shown: !!currentMember.value,
     },
   ];
 });

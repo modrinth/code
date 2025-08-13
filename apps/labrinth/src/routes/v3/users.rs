@@ -1,14 +1,14 @@
 use std::{collections::HashMap, sync::Arc};
 
 use super::{ApiError, oauth_clients::get_user_clients};
-use crate::file_hosting::FileHostPublicity;
-use crate::util::img::delete_old_images;
 use crate::{
-    auth::{filter_visible_projects, get_user_from_headers},
+    auth::{
+        filter_visible_collections, filter_visible_projects,
+        get_user_from_headers,
+    },
     database::{models::DBUser, redis::RedisPool},
-    file_hosting::FileHost,
+    file_hosting::{FileHost, FileHostPublicity},
     models::{
-        collections::{Collection, CollectionStatus},
         notifications::Notification,
         pats::Scopes,
         projects::Project,
@@ -16,7 +16,7 @@ use crate::{
     },
     queue::session::AuthQueue,
     util::{
-        routes::read_limited_from_payload,
+        img::delete_old_images, routes::read_limited_from_payload,
         validate::validation_errors_to_string,
     },
 };
@@ -244,27 +244,19 @@ pub async fn collections_list(
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
-        let user_id: UserId = id.into();
-
-        let can_view_private =
-            user.is_some_and(|y| y.role.is_mod() || y.id == user_id);
-
-        let project_data = DBUser::get_collections(id, &**pool).await?;
+        let collection_data = DBUser::get_collections(id, &**pool).await?;
 
         let response: Vec<_> = crate::database::models::DBCollection::get_many(
-            &project_data,
+            &collection_data,
             &**pool,
             &redis,
         )
-        .await?
-        .into_iter()
-        .filter(|x| {
-            can_view_private || matches!(x.status, CollectionStatus::Listed)
-        })
-        .map(Collection::from)
-        .collect();
+        .await?;
 
-        Ok(HttpResponse::Ok().json(response))
+        let collections =
+            filter_visible_collections(response, &user, true).await?;
+
+        Ok(HttpResponse::Ok().json(collections))
     } else {
         Err(ApiError::NotFound)
     }

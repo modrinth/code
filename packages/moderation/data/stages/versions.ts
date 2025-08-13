@@ -68,7 +68,7 @@ const versions: Stage = {
       message: async () => '',
       enablesActions: [
         {
-          id: 'versions_incorrect_project_type_options',
+          id: 'versions_alternate_versions_options',
           type: 'dropdown',
           label: 'How are the alternate versions distributed?',
           options: [
@@ -135,11 +135,11 @@ const versions: Stage = {
     {
       id: 'versions_redist_libs',
       type: 'button',
-      label: 'Oversized File',
+      label: 'Packed Libs',
       suggestedStatus: `rejected`,
       severity: `medium`,
       weight: 1003,
-      shouldShow: (project) => project.project_type === 'mod',
+      shouldShow: (project) => project.project_type === 'mod' || project.project_type === 'plugin',
       message: async () => (await import('../messages/versions/redist_libs.md?raw')).default,
     } as ButtonAction,
     {
@@ -150,7 +150,24 @@ const versions: Stage = {
       severity: `medium`,
       weight: 1004,
       message: async () => (await import('../messages/versions/broken_version.md?raw')).default,
-    },
+    } as ButtonAction,
+    {
+      id: 'unsupported_project_type',
+      type: 'button',
+      label: `Unsupported`,
+      suggestedStatus: `rejected`,
+      severity: `medium`,
+      weight: 1005,
+      message: async () =>
+        (await import('../messages/versions/unsupported_project.md?raw')).default,
+      relevantExtraInput: [
+        {
+          label: 'Project Type',
+          required: true,
+          variable: 'INVALID_TYPE',
+        },
+      ],
+    } as ButtonAction,
   ],
 }
 

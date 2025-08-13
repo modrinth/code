@@ -2,7 +2,7 @@ use crate::event::emit::{emit_process, emit_profile};
 use crate::event::{ProcessPayloadType, ProfilePayloadType};
 use crate::profile;
 use crate::util::io::IOError;
-use chrono::{DateTime, TimeZone, Utc};
+use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
 use dashmap::DashMap;
 use quick_xml::Reader;
 use quick_xml::events::Event;
@@ -360,18 +360,17 @@ impl Process {
                                     }
 
                                     // Write the throwable if present
-                                    if !current_content.is_empty() {
-                                        if let Err(e) =
+                                    if !current_content.is_empty()
+                                        && let Err(e) =
                                             Process::append_to_log_file(
                                                 &log_path,
                                                 &current_content,
                                             )
-                                        {
-                                            tracing::error!(
-                                                "Failed to write throwable to log file: {}",
-                                                e
-                                            );
-                                        }
+                                    {
+                                        tracing::error!(
+                                            "Failed to write throwable to log file: {}",
+                                            e
+                                        );
                                     }
                                 }
                             }
@@ -429,15 +428,13 @@ impl Process {
 
                                     if let Some(timestamp) =
                                         current_event.timestamp.as_deref()
-                                    {
-                                        if let Err(e) = Self::maybe_handle_server_join_logging(
+                                        && let Err(e) = Self::maybe_handle_server_join_logging(
                                             profile_path,
                                             timestamp,
                                             message
                                         ).await {
                                             tracing::error!("Failed to handle server join logging: {e}");
                                         }
-                                    }
                                 }
                             }
                             _ => {}
@@ -445,35 +442,29 @@ impl Process {
                     }
                     Ok(Event::Text(mut e)) => {
                         if in_message || in_throwable {
-                            if let Ok(text) = e.unescape() {
+                            if let Ok(text) = e.xml_content() {
                                 current_content.push_str(&text);
                             }
                         } else if !in_event
                             && !e.inplace_trim_end()
                             && !e.inplace_trim_start()
+                            && let Ok(text) = e.xml_content()
+                            && let Err(e) = Process::append_to_log_file(
+                                &log_path,
+                                &format!("{text}\n"),
+                            )
                         {
-                            if let Ok(text) = e.unescape() {
-                                if let Err(e) = Process::append_to_log_file(
-                                    &log_path,
-                                    &format!("{text}\n"),
-                                ) {
-                                    tracing::error!(
-                                        "Failed to write to log file: {}",
-                                        e
-                                    );
-                                }
-                            }
+                            tracing::error!(
+                                "Failed to write to log file: {}",
+                                e
+                            );
                         }
                     }
                     Ok(Event::CData(e)) => {
-                        if in_message || in_throwable {
-                            if let Ok(text) = e
-                                .escape()
-                                .map_err(|x| x.into())
-                                .and_then(|x| x.unescape())
-                            {
-                                current_content.push_str(&text);
-                            }
+                        if (in_message || in_throwable)
+                            && let Ok(text) = e.xml_content()
+                        {
+                            current_content.push_str(&text);
                         }
                     }
                     _ => (),
@@ -492,6 +483,16 @@ impl Process {
                 if !line.is_empty() {
                     if let Err(e) = Self::append_to_log_file(&log_path, &line) {
                         tracing::warn!("Failed to write to log file: {}", e);
+                    }
+                    if let Err(e) = Self::maybe_handle_old_server_join_logging(
+                        profile_path,
+                        line.trim_ascii_end(),
+                    )
+                    .await
+                    {
+                        tracing::error!(
+                            "Failed to handle old server join logging: {e}"
+                        );
                     }
                 }
 
@@ -540,17 +541,6 @@ impl Process {
         timestamp: &str,
         message: &str,
     ) -> crate::Result<()> {
-        let Some(host_port_string) = message.strip_prefix("Connecting to ")
-        else {
-            return Ok(());
-        };
-        let Some((host, port_string)) = host_port_string.rsplit_once(", ")
-        else {
-            return Ok(());
-        };
-        let Some(port) = port_string.parse::<u16>().ok() else {
-            return Ok(());
-        };
         let timestamp = timestamp
             .parse::<i64>()
             .map(|x| x / 1000)
@@ -566,6 +556,46 @@ impl Process {
                     )
                 })
             })?;
+        Self::parse_and_insert_server_join(profile_path, message, timestamp)
+            .await
+    }
+
+    async fn maybe_handle_old_server_join_logging(
+        profile_path: &str,
+        line: &str,
+    ) -> crate::Result<()> {
+        if let Some((timestamp, message)) = line.split_once(" [CLIENT] [INFO] ")
+        {
+            let timestamp =
+                NaiveDateTime::parse_from_str(timestamp, "%Y-%m-%d %H:%M:%S")?
+                    .and_local_timezone(chrono::Local)
+                    .map(|x| x.to_utc())
+                    .single()
+                    .unwrap_or_else(Utc::now);
+            Self::parse_and_insert_server_join(profile_path, message, timestamp)
+                .await
+        } else {
+            Self::parse_and_insert_server_join(profile_path, line, Utc::now())
+                .await
+        }
+    }
+
+    async fn parse_and_insert_server_join(
+        profile_path: &str,
+        message: &str,
+        timestamp: DateTime<Utc>,
+    ) -> crate::Result<()> {
+        let Some(host_port_string) = message.strip_prefix("Connecting to ")
+        else {
+            return Ok(());
+        };
+        let Some((host, port_string)) = host_port_string.rsplit_once(", ")
+        else {
+            return Ok(());
+        };
+        let Some(port) = port_string.parse::<u16>().ok() else {
+            return Ok(());
+        };
 
         let state = crate::State::get().await?;
         crate::state::server_join_log::JoinLogEntry {
@@ -681,16 +711,13 @@ impl Process {
         let logs_folder = state.directories.profile_logs_dir(&profile_path);
         let log_path = logs_folder.join(LAUNCHER_LOG_PATH);
 
-        if log_path.exists() {
-            if let Err(e) = Process::append_to_log_file(
+        if log_path.exists()
+            && let Err(e) = Process::append_to_log_file(
                 &log_path,
                 &format!("\n# Process exited with status: {mc_exit_status}\n"),
-            ) {
-                tracing::warn!(
-                    "Failed to write exit status to log file: {}",
-                    e
-                );
-            }
+            )
+        {
+            tracing::warn!("Failed to write exit status to log file: {}", e);
         }
 
         let _ = state.discord_rpc.clear_to_default(true).await;

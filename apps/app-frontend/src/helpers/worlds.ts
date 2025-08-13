@@ -51,6 +51,7 @@ export type ServerStatus = {
   version?: {
     name: string
     protocol: number
+    legacy: boolean
   }
   favicon?: string
   enforces_secure_chat: boolean
@@ -70,9 +71,15 @@ export interface Chat {
 
 export type ServerData = {
   refreshing: boolean
+  lastSuccessfulRefresh?: number
   status?: ServerStatus
   rawMotd?: string | Chat
   renderedMotd?: string
+}
+
+export type ProtocolVersion = {
+  version: number
+  legacy: boolean
 }
 
 export async function get_recent_worlds(
@@ -156,13 +163,13 @@ export async function remove_server_from_profile(path: string, index: number): P
   return await invoke('plugin:worlds|remove_server_from_profile', { path, index })
 }
 
-export async function get_profile_protocol_version(path: string): Promise<number | null> {
+export async function get_profile_protocol_version(path: string): Promise<ProtocolVersion | null> {
   return await invoke('plugin:worlds|get_profile_protocol_version', { path })
 }
 
 export async function get_server_status(
   address: string,
-  protocolVersion: number | null = null,
+  protocolVersion: ProtocolVersion | null = null,
 ): Promise<ServerStatus> {
   return await invoke('plugin:worlds|get_server_status', { address, protocolVersion })
 }
@@ -206,30 +213,39 @@ export function isServerWorld(world: World): world is ServerWorld {
 
 export async function refreshServerData(
   serverData: ServerData,
-  protocolVersion: number | null,
+  protocolVersion: ProtocolVersion | null,
   address: string,
 ): Promise<void> {
+  const refreshTime = Date.now()
   serverData.refreshing = true
   await get_server_status(address, protocolVersion)
     .then((status) => {
+      if (serverData.lastSuccessfulRefresh && serverData.lastSuccessfulRefresh > refreshTime) {
+        // Don't update if there was a more recent successful refresh
+        return
+      }
+      serverData.lastSuccessfulRefresh = Date.now()
       serverData.status = status
       if (status.description) {
         serverData.rawMotd = status.description
         serverData.renderedMotd = autoToHTML(status.description)
       }
     })
-    .catch((err) => {
-      console.error(`Refreshing addr: ${address}`, err)
-    })
     .finally(() => {
       serverData.refreshing = false
     })
+    .catch((err) => {
+      console.error(`Refreshing addr ${address}`, protocolVersion, err)
+      if (!protocolVersion?.legacy) {
+        refreshServerData(serverData, { version: 74, legacy: true }, address)
+      }
+    })
 }
 
-export async function refreshServers(
+export function refreshServers(
   worlds: World[],
   serverData: Record<string, ServerData>,
-  protocolVersion: number | null,
+  protocolVersion: ProtocolVersion | null,
 ) {
   const servers = worlds.filter(isServerWorld)
   servers.forEach((server) => {
@@ -243,10 +259,8 @@ export async function refreshServers(
   })
 
   // noinspection ES6MissingAwait - handled with .then by refreshServerData already
-  Promise.all(
-    Object.keys(serverData).map((address) =>
-      refreshServerData(serverData[address], protocolVersion, address),
-    ),
+  Object.keys(serverData).forEach((address) =>
+    refreshServerData(serverData[address], protocolVersion, address),
   )
 }
 
@@ -297,15 +311,24 @@ export async function refreshWorlds(instancePath: string): Promise<World[]> {
   return worlds ?? []
 }
 
-const FIRST_QUICK_PLAY_VERSION = '23w14a'
+export function hasServerQuickPlaySupport(gameVersions: GameVersion[], currentVersion: string) {
+  if (!gameVersions.length) {
+    return true
+  }
 
-export function hasQuickPlaySupport(gameVersions: GameVersion[], currentVersion: string) {
+  const versionIndex = gameVersions.findIndex((v) => v.version === currentVersion)
+  const targetIndex = gameVersions.findIndex((v) => v.version === 'a1.0.5_01')
+
+  return versionIndex === -1 || targetIndex === -1 || versionIndex <= targetIndex
+}
+
+export function hasWorldQuickPlaySupport(gameVersions: GameVersion[], currentVersion: string) {
   if (!gameVersions.length) {
     return false
   }
 
   const versionIndex = gameVersions.findIndex((v) => v.version === currentVersion)
-  const targetIndex = gameVersions.findIndex((v) => v.version === FIRST_QUICK_PLAY_VERSION)
+  const targetIndex = gameVersions.findIndex((v) => v.version === '23w14a')
 
   return versionIndex !== -1 && targetIndex !== -1 && versionIndex <= targetIndex
 }

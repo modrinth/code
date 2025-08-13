@@ -315,15 +315,18 @@ pub async fn filter_enlisted_version_ids(
 pub async fn is_visible_collection(
     collection_data: &DBCollection,
     user_option: &Option<User>,
+    hide_unlisted: bool,
 ) -> Result<bool, ApiError> {
-    let mut authorized = !collection_data.status.is_hidden()
-        && !collection_data.projects.is_empty();
-    if let Some(user) = &user_option {
-        if !authorized
-            && (user.role.is_mod() || user.id == collection_data.user_id.into())
-        {
-            authorized = true;
-        }
+    let mut authorized = (if hide_unlisted {
+        collection_data.status.is_searchable()
+    } else {
+        !collection_data.status.is_hidden()
+    }) && !collection_data.projects.is_empty();
+    if let Some(user) = &user_option
+        && !authorized
+        && (user.role.is_mod() || user.id == collection_data.user_id.into())
+    {
+        authorized = true;
     }
     Ok(authorized)
 }
@@ -331,12 +334,17 @@ pub async fn is_visible_collection(
 pub async fn filter_visible_collections(
     collections: Vec<DBCollection>,
     user_option: &Option<User>,
+    hide_unlisted: bool,
 ) -> Result<Vec<crate::models::collections::Collection>, ApiError> {
     let mut return_collections = Vec::new();
     let mut check_collections = Vec::new();
 
     for collection in collections {
-        if (!collection.status.is_hidden() && !collection.projects.is_empty())
+        if ((if hide_unlisted {
+            collection.status.is_searchable()
+        } else {
+            !collection.status.is_hidden()
+        }) && !collection.projects.is_empty())
             || user_option.as_ref().is_some_and(|x| x.role.is_mod())
         {
             return_collections.push(collection.into());
@@ -347,10 +355,10 @@ pub async fn filter_visible_collections(
 
     for collection in check_collections {
         // Collections are simple- if we are the owner or a mod, we can see it
-        if let Some(user) = user_option {
-            if user.role.is_mod() || user.id == collection.user_id.into() {
-                return_collections.push(collection.into());
-            }
+        if let Some(user) = user_option
+            && (user.role.is_mod() || user.id == collection.user_id.into())
+        {
+            return_collections.push(collection.into());
         }
     }
 

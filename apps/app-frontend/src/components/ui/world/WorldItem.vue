@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import type { ServerStatus, ServerWorld, SingleplayerWorld, World } from '@/helpers/worlds.ts'
+import type {
+  ProtocolVersion,
+  ServerStatus,
+  ServerWorld,
+  SingleplayerWorld,
+  World,
+} from '@/helpers/worlds.ts'
 import { set_world_display_status, getWorldIdentifier } from '@/helpers/worlds.ts'
 import { formatNumber, getPingLevel } from '@modrinth/utils'
 import {
@@ -54,8 +60,9 @@ const props = withDefaults(
     playingInstance?: boolean
     playingWorld?: boolean
     startingInstance?: boolean
-    supportsQuickPlay?: boolean
-    currentProtocol?: number | null
+    supportsServerQuickPlay?: boolean
+    supportsWorldQuickPlay?: boolean
+    currentProtocol?: ProtocolVersion | null
     highlighted?: boolean
 
     // Server only
@@ -78,7 +85,8 @@ const props = withDefaults(
     playingInstance: false,
     playingWorld: false,
     startingInstance: false,
-    supportsQuickPlay: false,
+    supportsServerQuickPlay: true,
+    supportsWorldQuickPlay: false,
     currentProtocol: null,
 
     refreshing: false,
@@ -102,7 +110,8 @@ const serverIncompatible = computed(
     !!props.serverStatus &&
     !!props.serverStatus.version?.protocol &&
     !!props.currentProtocol &&
-    props.serverStatus.version.protocol !== props.currentProtocol,
+    (props.serverStatus.version.protocol !== props.currentProtocol.version ||
+      props.serverStatus.version.legacy !== props.currentProtocol.legacy),
 )
 
 const locked = computed(() => props.world.type === 'singleplayer' && props.world.locked)
@@ -120,9 +129,13 @@ const messages = defineMessages({
     id: 'instance.worlds.a_minecraft_server',
     defaultMessage: 'A Minecraft Server',
   },
-  noQuickPlay: {
-    id: 'instance.worlds.no_quick_play',
-    defaultMessage: 'You can only jump straight into worlds on Minecraft 1.20+',
+  noServerQuickPlay: {
+    id: 'instance.worlds.no_server_quick_play',
+    defaultMessage: 'You can only jump straight into servers on Minecraft Alpha 1.0.5+',
+  },
+  noSingleplayerQuickPlay: {
+    id: 'instance.worlds.no_singleplayer_quick_play',
+    defaultMessage: 'You can only jump straight into singleplayer worlds on Minecraft 1.20+',
   },
   gameAlreadyOpen: {
     id: 'instance.worlds.game_already_open',
@@ -143,10 +156,6 @@ const messages = defineMessages({
   viewInstance: {
     id: 'instance.worlds.view_instance',
     defaultMessage: 'View instance',
-  },
-  playAnyway: {
-    id: 'instance.worlds.play_anyway',
-    defaultMessage: 'Play anyway',
   },
   playInstance: {
     id: 'instance.worlds.play_instance',
@@ -322,17 +331,24 @@ const messages = defineMessages({
         <ButtonStyled v-else>
           <button
             v-tooltip="
-              !serverStatus
-                ? formatMessage(messages.noContact)
-                : serverIncompatible
-                  ? formatMessage(messages.incompatibleServer)
-                  : !supportsQuickPlay
-                    ? formatMessage(messages.noQuickPlay)
-                    : playingOtherWorld || locked
-                      ? formatMessage(messages.gameAlreadyOpen)
-                      : null
+              world.type == 'server' && !supportsServerQuickPlay
+                ? formatMessage(messages.noServerQuickPlay)
+                : world.type == 'singleplayer' && !supportsWorldQuickPlay
+                  ? formatMessage(messages.noSingleplayerQuickPlay)
+                  : playingOtherWorld || locked
+                    ? formatMessage(messages.gameAlreadyOpen)
+                    : !serverStatus
+                      ? formatMessage(messages.noContact)
+                      : serverIncompatible
+                        ? formatMessage(messages.incompatibleServer)
+                        : null
             "
-            :disabled="!supportsQuickPlay || playingOtherWorld || startingInstance"
+            :disabled="
+              playingOtherWorld ||
+              startingInstance ||
+              (world.type == 'server' && !supportsServerQuickPlay) ||
+              (world.type == 'singleplayer' && !supportsWorldQuickPlay)
+            "
             @click="emit('play')"
           >
             <SpinnerIcon v-if="startingInstance && playingWorld" class="animate-spin" />
@@ -348,11 +364,6 @@ const messages = defineMessages({
                 shown: !!instancePath,
                 disabled: playingInstance,
                 action: () => emit('play-instance'),
-              },
-              {
-                id: 'play-anyway',
-                shown: serverIncompatible && !playingInstance && supportsQuickPlay,
-                action: () => emit('play'),
               },
               {
                 id: 'open-instance',
@@ -418,10 +429,6 @@ const messages = defineMessages({
             <template #play-instance>
               <PlayIcon aria-hidden="true" />
               {{ formatMessage(messages.playInstance) }}
-            </template>
-            <template #play-anyway>
-              <PlayIcon aria-hidden="true" />
-              {{ formatMessage(messages.playAnyway) }}
             </template>
             <template #open-instance>
               <EyeIcon aria-hidden="true" />

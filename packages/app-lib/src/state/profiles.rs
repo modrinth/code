@@ -32,7 +32,7 @@ pub struct Profile {
     pub icon_path: Option<String>,
 
     pub game_version: String,
-    pub protocol_version: Option<i32>,
+    pub protocol_version: Option<u32>,
     pub loader: ModLoader,
     pub loader_version: Option<String>,
 
@@ -320,7 +320,7 @@ impl TryFrom<ProfileQueryResult> for Profile {
             name: x.name,
             icon_path: x.icon_path,
             game_version: x.game_version,
-            protocol_version: x.protocol_version.map(|x| x as i32),
+            protocol_version: x.protocol_version.map(|x| x as u32),
             loader: ModLoader::from_string(&x.mod_loader),
             loader_version: x.mod_loader_version,
             groups: serde_json::from_value(x.groups).unwrap_or_default(),
@@ -595,8 +595,8 @@ impl Profile {
     }
 
     #[tracing::instrument(skip(self, semaphore, icon))]
-    pub async fn set_icon<'a>(
-        &'a mut self,
+    pub async fn set_icon(
+        &mut self,
         cache_dir: &Path,
         semaphore: &IoSemaphore,
         icon: bytes::Bytes,
@@ -629,21 +629,20 @@ impl Profile {
                     {
                         let subdirectory =
                             subdirectory.map_err(io::IOError::from)?.path();
-                        if subdirectory.is_file() {
-                            if let Some(file_name) = subdirectory
+                        if subdirectory.is_file()
+                            && let Some(file_name) = subdirectory
                                 .file_name()
                                 .and_then(|x| x.to_str())
-                            {
-                                let file_size = subdirectory
-                                    .metadata()
-                                    .map_err(io::IOError::from)?
-                                    .len();
+                        {
+                            let file_size = subdirectory
+                                .metadata()
+                                .map_err(io::IOError::from)?
+                                .len();
 
-                                keys.push(format!(
-                                    "{file_size}-{}/{folder}/{file_name}",
-                                    profile.path
-                                ));
-                            }
+                            keys.push(format!(
+                                "{file_size}-{}/{folder}/{file_name}",
+                                profile.path
+                            ));
                         }
                     }
                 }
@@ -901,30 +900,29 @@ impl Profile {
                 {
                     let subdirectory =
                         subdirectory.map_err(io::IOError::from)?.path();
-                    if subdirectory.is_file() {
-                        if let Some(file_name) =
+                    if subdirectory.is_file()
+                        && let Some(file_name) =
                             subdirectory.file_name().and_then(|x| x.to_str())
-                        {
-                            let file_size = subdirectory
-                                .metadata()
-                                .map_err(io::IOError::from)?
-                                .len();
+                    {
+                        let file_size = subdirectory
+                            .metadata()
+                            .map_err(io::IOError::from)?
+                            .len();
 
-                            keys.push(InitialScanFile {
-                                path: format!(
-                                    "{}/{folder}/{}",
-                                    self.path,
-                                    file_name.trim_end_matches(".disabled")
-                                ),
-                                file_name: file_name.to_string(),
-                                project_type,
-                                size: file_size,
-                                cache_key: format!(
-                                    "{file_size}-{}/{folder}/{file_name}",
-                                    self.path
-                                ),
-                            });
-                        }
+                        keys.push(InitialScanFile {
+                            path: format!(
+                                "{}/{folder}/{}",
+                                self.path,
+                                file_name.trim_end_matches(".disabled")
+                            ),
+                            file_name: file_name.to_string(),
+                            project_type,
+                            size: file_size,
+                            cache_key: format!(
+                                "{file_size}-{}/{folder}/{file_name}",
+                                self.path
+                            ),
+                        });
                     }
                 }
             }

@@ -67,7 +67,8 @@
         :key="`world-${world.type}-${world.type == 'singleplayer' ? world.path : `${world.address}-${world.index}`}`"
         :world="world"
         :highlighted="highlightedWorld === getWorldIdentifier(world)"
-        :supports-quick-play="supportsQuickPlay"
+        :supports-server-quick-play="supportsServerQuickPlay"
+        :supports-world-quick-play="supportsWorldQuickPlay"
         :current-protocol="protocolVersion"
         :playing-instance="playing"
         :playing-world="worldsMatch(world, worldPlaying)"
@@ -134,6 +135,7 @@ import {
 } from '@modrinth/ui'
 import { PlusIcon, SpinnerIcon, UpdatedIcon, SearchIcon, XIcon } from '@modrinth/assets'
 import {
+  type ProtocolVersion,
   type SingleplayerWorld,
   type World,
   type ServerWorld,
@@ -149,10 +151,11 @@ import {
   refreshWorld,
   sortWorlds,
   refreshServers,
-  hasQuickPlaySupport,
+  hasWorldQuickPlaySupport,
   refreshWorlds,
   handleDefaultProfileUpdateEvent,
   showWorldInFolder,
+  hasServerQuickPlaySupport,
 } from '@/helpers/worlds.ts'
 import AddServerModal from '@/components/ui/world/modal/AddServerModal.vue'
 import EditServerModal from '@/components/ui/world/modal/EditServerModal.vue'
@@ -210,7 +213,9 @@ const worldPlaying = ref<World>()
 const worlds = ref<World[]>([])
 const serverData = ref<Record<string, ServerData>>({})
 
-const protocolVersion = ref<number | null>(await get_profile_protocol_version(instance.value.path))
+const protocolVersion = ref<ProtocolVersion | null>(
+  await get_profile_protocol_version(instance.value.path),
+)
 
 const unlistenProfile = await profile_listener(async (e: ProfileEvent) => {
   if (e.profile_path_id !== instance.value.path) return
@@ -246,7 +251,7 @@ async function refreshAllWorlds() {
   worlds.value = await refreshWorlds(instance.value.path).finally(
     () => (refreshingAll.value = false),
   )
-  await refreshServers(worlds.value, serverData.value, protocolVersion.value)
+  refreshServers(worlds.value, serverData.value, protocolVersion.value)
 
   const hasNoWorlds = worlds.value.length === 0
 
@@ -352,8 +357,11 @@ function worldsMatch(world: World, other: World | undefined) {
 }
 
 const gameVersions = ref<GameVersion[]>(await get_game_versions().catch(() => []))
-const supportsQuickPlay = computed(() =>
-  hasQuickPlaySupport(gameVersions.value, instance.value.game_version),
+const supportsServerQuickPlay = computed(() =>
+  hasServerQuickPlaySupport(gameVersions.value, instance.value.game_version),
+)
+const supportsWorldQuickPlay = computed(() =>
+  hasWorldQuickPlaySupport(gameVersions.value, instance.value.game_version),
 )
 
 const filterOptions = computed(() => {

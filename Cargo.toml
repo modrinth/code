@@ -25,31 +25,31 @@ actix-ws = "0.3.0"
 argon2 = { version = "0.5.3", features = ["std"] }
 ariadne = { path = "packages/ariadne" }
 async_zip = "0.0.17"
-async-compression = { version = "0.4.25", default-features = false }
+async-compression = { version = "0.4.27", default-features = false }
 async-recursion = "1.1.1"
 async-stripe = { version = "0.41.0", default-features = false, features = [
   "runtime-tokio-hyper-rustls",
 ] }
 async-trait = "0.1.88"
-async-tungstenite = { version = "0.29.1", default-features = false, features = [
+async-tungstenite = { version = "0.30.0", default-features = false, features = [
   "futures-03-sink",
 ] }
 async-walkdir = "2.1.0"
 base64 = "0.22.1"
 bitflags = "2.9.1"
-bytemuck = "1.23.0"
+bytemuck = "1.23.1"
 bytes = "1.10.1"
 censor = "0.3.0"
 chardetng = "0.1.17"
 chrono = "0.4.41"
-clap = "4.5.40"
+clap = "4.5.43"
 clickhouse = "0.13.3"
 color-thief = "0.2.2"
 console-subscriber = "0.4.1"
 daedalus = { path = "packages/daedalus" }
 dashmap = "6.1.0"
 data-url = "0.3.1"
-deadpool-redis = "0.21.1"
+deadpool-redis = "0.22.0"
 dirs = "6.0.0"
 discord-rich-presence = "0.2.5"
 dotenv-build = "0.1.1"
@@ -57,7 +57,7 @@ dotenvy = "0.15.7"
 dunce = "1.0.5"
 either = "1.15.0"
 encoding_rs = "0.8.35"
-enumset = "1.1.6"
+enumset = "1.1.7"
 flate2 = "1.1.2"
 fs4 = { version = "0.13.1", default-features = false }
 futures = { version = "0.3.31", default-features = false }
@@ -74,15 +74,15 @@ hyper-rustls = { version = "0.27.7", default-features = false, features = [
   "ring",
   "tls12",
 ] }
-hyper-util = "0.1.14"
+hyper-util = "0.1.16"
 iana-time-zone = "0.1.63"
 image = { version = "0.25.6", default-features = false, features = ["rayon"] }
-indexmap = "2.9.0"
-indicatif = "0.17.11"
+indexmap = "2.10.0"
+indicatif = "0.18.0"
 itertools = "0.14.0"
-jemalloc_pprof = "0.7.0"
+jemalloc_pprof = "0.8.1"
 json-patch = { version = "4.0.0", default-features = false }
-lettre = { version = "0.11.17", default-features = false, features = [
+lettre = { version = "0.11.18", default-features = false, features = [
   "builder",
   "hostname",
   "pool",
@@ -92,23 +92,24 @@ lettre = { version = "0.11.17", default-features = false, features = [
   "smtp-transport",
 ] }
 maxminddb = "0.26.0"
-meilisearch-sdk = { version = "0.28.0", default-features = false }
+meilisearch-sdk = { version = "0.29.1", default-features = false }
 murmur2 = "0.1.0"
 native-dialog = "0.9.0"
-notify = { version = "8.0.0", default-features = false }
-notify-debouncer-mini = { version = "0.6.0", default-features = false }
+notify = { version = "8.2.0", default-features = false }
+notify-debouncer-mini = { version = "0.7.0", default-features = false }
 p256 = "0.13.2"
 paste = "1.0.15"
+phf = { version = "0.12.1", features = ["macros"] }
 png = "0.17.16"
 prometheus = "0.14.0"
 quartz_nbt = "0.2.9"
-quick-xml = "0.37.5"
+quick-xml = "0.38.1"
 rand = "=0.8.5"  # Locked on 0.8 until argon2 and p256 update to 0.9
 rand_chacha = "=0.3.1"  # Locked on 0.3 until we can update rand to 0.9
-redis = "=0.31.0"  # Locked on 0.31 until deadpool-redis updates to 0.32
+redis = "0.32.4"
 regex = "1.11.1"
-reqwest = { version = "0.12.20", default-features = false }
-rgb = "0.8.50"
+reqwest = { version = "0.12.22", default-features = false }
+rgb = "0.8.52"
 rust_decimal = { version = "1.37.2", features = [
   "serde-with-float",
   "serde-with-str",
@@ -120,7 +121,7 @@ rust-s3 = { version = "0.35.1", default-features = false, features = [
   "tokio-rustls-tls",
 ] }
 rusty-money = "0.4.1"
-sentry = { version = "0.41.0", default-features = false, features = [
+sentry = { version = "0.42.0", default-features = false, features = [
   "backtrace",
   "contexts",
   "debug-images",
@@ -128,45 +129,45 @@ sentry = { version = "0.41.0", default-features = false, features = [
   "reqwest",
   "rustls",
 ] }
-sentry-actix = "0.41.0"
+sentry-actix = "0.42.0"
 serde = "1.0.219"
 serde_bytes = "0.11.17"
 serde_cbor = "0.11.2"
 serde_ini = "0.2.0"
-serde_json = "1.0.140"
-serde_with = "3.13.0"
+serde_json = "1.0.142"
+serde_with = "3.14.0"
 serde-xml-rs = "0.8.1"  # Also an XML (de)serializer, consider dropping yaserde in favor of this
 sha1 = "0.10.6"
 sha1_smol = { version = "1.0.1", features = ["std"] }
 sha2 = "0.10.9"
-spdx = "0.10.8"
+spdx = "0.10.9"
 sqlx = { version = "0.8.6", default-features = false }
-sysinfo = { version = "0.35.2", default-features = false }
+sysinfo = { version = "0.36.1", default-features = false }
 tar = "0.4.44"
-tauri = "2.6.1"
-tauri-build = "2.3.0"
-tauri-plugin-deep-link = "2.4.0"
-tauri-plugin-dialog = "2.3.0"
-tauri-plugin-http = "2.5.0"
+tauri = "2.7.0"
+tauri-build = "2.3.1"
+tauri-plugin-deep-link = "2.4.1"
+tauri-plugin-dialog = "2.3.2"
+tauri-plugin-http = "2.5.1"
 tauri-plugin-opener = "2.4.0"
 tauri-plugin-os = "2.3.0"
-tauri-plugin-single-instance = "2.3.0"
+tauri-plugin-single-instance = "2.3.2"
 tauri-plugin-updater = { version = "2.9.0", default-features = false, features = [
   "rustls-tls",
   "zip",
 ] }
-tauri-plugin-window-state = "2.3.0"
+tauri-plugin-window-state = "2.4.0"
 tempfile = "3.20.0"
 theseus = { path = "packages/app-lib" }
 thiserror = "2.0.12"
 tikv-jemalloc-ctl = "0.6.0"
 tikv-jemallocator = "0.6.0"
-tokio = "1.45.1"
+tokio = "1.47.1"
 tokio-stream = "0.1.17"
-tokio-util = "0.7.15"
+tokio-util = "0.7.16"
 totp-rs = "5.7.0"
 tracing = "0.1.41"
-tracing-actix-web = "0.7.18"
+tracing-actix-web = "0.7.19"
 tracing-error = "0.2.1"
 tracing-subscriber = "0.3.19"
 url = "2.5.4"
@@ -178,7 +179,7 @@ whoami = "1.6.0"
 winreg = "0.55.0"
 woothee = "0.13.0"
 yaserde = "0.12.0"
-zip = { version = "4.2.0", default-features = false, features = [
+zip = { version = "4.3.0", default-features = false, features = [
   "bzip2",
   "deflate",
   "deflate64",
@@ -225,7 +226,7 @@ wildcard_dependencies = "warn"
 warnings = "deny"
 
 [patch.crates-io]
-wry = { git = "https://github.com/modrinth/wry", rev = "21db186" }
+wry = { git = "https://github.com/modrinth/wry", rev = "f2ce0b0" }
 
 # Optimize for speed and reduce size on release builds
 [profile.release]

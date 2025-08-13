@@ -63,11 +63,11 @@ pub async fn should_disable_mouseover() -> bool {
         // We try to match version to 12.2 or higher. If unrecognizable to pattern or lower, we default to the css with disabled mouseover for safety
         if let tauri_plugin_os::Version::Semantic(major, minor, _) =
             tauri_plugin_os::version()
+            && major >= 12
+            && minor >= 3
         {
-            if major >= 12 && minor >= 3 {
-                // Mac os version is 12.3 or higher, we allow mouseover
-                return false;
-            }
+            // Mac os version is 12.3 or higher, we allow mouseover
+            return false;
         }
         true
     } else {

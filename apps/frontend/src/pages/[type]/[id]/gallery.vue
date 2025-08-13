@@ -365,8 +365,10 @@ export default defineNuxtComponent({
         if (e.key === "Escape") {
           this.expandedGalleryItem = null;
         } else if (e.key === "ArrowLeft") {
+          e.stopPropagation();
           this.previousImage();
         } else if (e.key === "ArrowRight") {
+          e.stopPropagation();
           this.nextImage();
         }
       }

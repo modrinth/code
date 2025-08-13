@@ -71,7 +71,7 @@ pub fn app_setup(
     enable_background_tasks: bool,
 ) -> LabrinthConfig {
     info!(
-        "Starting Labrinth on {}",
+        "Starting labrinth on {}",
         dotenvy::var("BIND_ADDR").unwrap()
     );
 

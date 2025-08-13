@@ -259,7 +259,7 @@ export function flattenProjectVariables(project: Project): Record<string, string
   vars['PROJECT_CLIENT_SIDE'] = project.client_side
   vars['PROJECT_SERVER_SIDE'] = project.server_side
 
-  vars['PROJECT_TEAM'] = project.team
+  vars['PROJECT_TEAM'] = project.team || 'None'
   vars['PROJECT_THREAD_ID'] = project.thread_id
   vars['PROJECT_ORGANIZATION'] = project.organization
 
@@ -311,12 +311,17 @@ export function flattenProjectVariables(project: Project): Record<string, string
   vars[`ADVANCED_MARKDOWN`] =
     `[Markdown Formatting Guide](https://support.modrinth.com/en/articles/8801962-advanced-markdown-formatting)`
   vars[`LICENSING_GUIDE`] =
-    `our guide to [Guide to Licensing your Mods](https://modrinth.com/news/article/licensing-guide)`
+    `our guide to [Licensing your Mods](https://modrinth.com/news/article/licensing-guide)`
 
   // Navigation related variables
   vars[`PROJECT_PERMANENT_LINK`] = `https://modrinth.com/project/${project.id}`
   vars[`PROJECT_SETTINGS_LINK`] = `https://modrinth.com/project/${project.id}/settings`
   vars[`PROJECT_SETTINGS_FLINK`] = `[Settings](https://modrinth.com/project/${project.id}/settings)`
+  vars[`PROJECT_TITLE_FLINK`] = `[Name](https://modrinth.com/project/${project.id}/settings)`
+  vars[`PROJECT_SLUG_FLINK`] = `[URL](https://modrinth.com/project/${project.id}/settings)`
+  vars[`PROJECT_SUMMARY_FLINK`] = `[Summary](https://modrinth.com/project/${project.id}/settings)`
+  vars[`PROJECT_ENVIRONMENT_FLINK`] =
+    `[Environment Information](https://modrinth.com/project/${project.id}/settings)`
   vars[`PROJECT_TAGS_LINK`] = `https://modrinth.com/project/${project.id}/settings/tags`
   vars[`PROJECT_TAGS_FLINK`] = `[Tags](https://modrinth.com/project/${project.id}/settings/tags)`
   vars[`PROJECT_DESCRIPTION_LINK`] =
@@ -324,9 +329,10 @@ export function flattenProjectVariables(project: Project): Record<string, string
   vars[`PROJECT_DESCRIPTION_FLINK`] =
     `[Description](https://modrinth.com/project/${project.id}/settings/description)`
   vars[`PROJECT_LICENSE_LINK`] = `https://modrinth.com/project/${project.id}/license`
-  vars[`PROJECT_LICENSE_FLINK`] = `[License](https://modrinth.com/project/${project.id}/license`
+  vars[`PROJECT_LICENSE_FLINK`] = `[License](https://modrinth.com/project/${project.id}/license)`
   vars[`PROJECT_LINKS_LINK`] = `https://modrinth.com/project/${project.id}/settings/links`
-  vars[`PROJECT_LINKS_FLINK`] = `[Links](https://modrinth.com/project/${project.id}/settings/links)`
+  vars[`PROJECT_LINKS_FLINK`] =
+    `[External Links](https://modrinth.com/project/${project.id}/settings/links)`
   vars[`PROJECT_GALLERY_LINK`] = `https://modrinth.com/project/${project.id}/gallery`
   vars[`PROJECT_GALLERY_FLINK`] = `[Gallery](https://modrinth.com/project/${project.id}/gallery)`
   vars[`PROJECT_VERSIONS_LINK`] = `https://modrinth.com/project/${project.id}/versions`

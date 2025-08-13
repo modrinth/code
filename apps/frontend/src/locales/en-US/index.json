@@ -182,9 +182,6 @@
   "collection.button.unfollow-project": {
     "message": "Unfollow project"
   },
-  "collection.button.upload-icon": {
-    "message": "Upload icon"
-  },
   "collection.delete-modal.description": {
     "message": "This will remove this collection forever. This action cannot be undone."
   },
@@ -479,6 +476,30 @@
   "layout.nav.search": {
     "message": "Search"
   },
+  "moderation.filter.by": {
+    "message": "Filter by"
+  },
+  "moderation.moderate": {
+    "message": "Moderate"
+  },
+  "moderation.page.projects": {
+    "message": "Projects"
+  },
+  "moderation.page.reports": {
+    "message": "Reports"
+  },
+  "moderation.page.technicalReview": {
+    "message": "Technical Review"
+  },
+  "moderation.search.placeholder": {
+    "message": "Search..."
+  },
+  "moderation.sort.by": {
+    "message": "Sort by"
+  },
+  "moderation.technical.search.placeholder": {
+    "message": "Search tech reviews..."
+  },
   "profile.button.billing": {
     "message": "Manage user billing"
   },
@@ -532,6 +553,78 @@
   },
   "profile.user-id": {
     "message": "User ID: {id}"
+  },
+  "project-member-header.accept": {
+    "message": "Accept"
+  },
+  "project-member-header.action": {
+    "message": "Action"
+  },
+  "project-member-header.decline": {
+    "message": "Decline"
+  },
+  "project-member-header.error": {
+    "message": "Error"
+  },
+  "project-member-header.error-decline": {
+    "message": "Failed to decline team invitation"
+  },
+  "project-member-header.error-join": {
+    "message": "Failed to accept team invitation"
+  },
+  "project-member-header.invitation-no-role": {
+    "message": "You've been invited to join this project. Please accept or decline the invitation."
+  },
+  "project-member-header.invitation-title": {
+    "message": "Invitation to join project"
+  },
+  "project-member-header.invitation-with-role": {
+    "message": "You've been invited be a member of this project with the role of '{role}'."
+  },
+  "project-member-header.key-title": {
+    "message": "Status Key"
+  },
+  "project-member-header.publishing-checklist": {
+    "message": "Publishing checklist"
+  },
+  "project-member-header.required": {
+    "message": "Required"
+  },
+  "project-member-header.resubmit-for-review": {
+    "message": "Resubmit for review"
+  },
+  "project-member-header.resubmit-for-review-desc": {
+    "message": "Your project has been {status} by Modrinth's staff. In most cases, you can resubmit for review after addressing the staff's message."
+  },
+  "project-member-header.show-key": {
+    "message": "Toggle key"
+  },
+  "project-member-header.submit-checklist-tooltip": {
+    "message": "You must complete the required steps in the publishing checklist!"
+  },
+  "project-member-header.submit-for-review": {
+    "message": "Submit for review"
+  },
+  "project-member-header.submit-for-review-desc": {
+    "message": "Your project is only viewable by members of the project. It must be reviewed by moderators in order to be published."
+  },
+  "project-member-header.success": {
+    "message": "Success"
+  },
+  "project-member-header.success-decline": {
+    "message": "You have declined the team invitation"
+  },
+  "project-member-header.success-join": {
+    "message": "You have joined the project team"
+  },
+  "project-member-header.suggestion": {
+    "message": "Suggestion"
+  },
+  "project-member-header.visit-moderation-page": {
+    "message": "Visit moderation page"
+  },
+  "project-member-header.warning": {
+    "message": "Warning"
   },
   "project-type.collection.plural": {
     "message": "Collections"

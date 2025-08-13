@@ -1,6 +1,6 @@
 use super::AuthProvider;
 use crate::auth::AuthenticationError;
-use crate::database::models::user_item;
+use crate::database::models::{DBUser, user_item};
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::models::users::User;
@@ -44,17 +44,16 @@ where
     Ok(Some((scopes, User::from_full(db_user))))
 }
 
-pub async fn get_user_from_headers<'a, E>(
+pub async fn get_full_user_from_headers<'a, E>(
     req: &HttpRequest,
     executor: E,
     redis: &RedisPool,
     session_queue: &AuthQueue,
     required_scopes: Scopes,
-) -> Result<(Scopes, User), AuthenticationError>
+) -> Result<(Scopes, DBUser), AuthenticationError>
 where
     E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
-    // Fetch DB user record and minos user from headers
     let (scopes, db_user) = get_user_record_from_bearer_token(
         req,
         None,
@@ -65,13 +64,33 @@ where
     .await?
     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
-    let user = User::from_full(db_user);
-
     if !scopes.contains(required_scopes) {
         return Err(AuthenticationError::InvalidCredentials);
     }
 
-    Ok((scopes, user))
+    Ok((scopes, db_user))
+}
+
+pub async fn get_user_from_headers<'a, E>(
+    req: &HttpRequest,
+    executor: E,
+    redis: &RedisPool,
+    session_queue: &AuthQueue,
+    required_scopes: Scopes,
+) -> Result<(Scopes, User), AuthenticationError>
+where
+    E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+{
+    let (scopes, db_user) = get_full_user_from_headers(
+        req,
+        executor,
+        redis,
+        session_queue,
+        required_scopes,
+    )
+    .await?;
+
+    Ok((scopes, User::from_full(db_user)))
 }
 
 pub async fn get_user_record_from_bearer_token<'a, 'b, E>(

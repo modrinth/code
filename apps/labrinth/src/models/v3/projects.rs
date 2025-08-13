@@ -166,10 +166,10 @@ impl From<ProjectQueryResult> for Project {
                     Ok(spdx_expr) => {
                         let mut vec: Vec<&str> = Vec::new();
                         for node in spdx_expr.iter() {
-                            if let spdx::expression::ExprNode::Req(req) = node {
-                                if let Some(id) = req.req.license.id() {
-                                    vec.push(id.full_name);
-                                }
+                            if let spdx::expression::ExprNode::Req(req) = node
+                                && let Some(id) = req.req.license.id()
+                            {
+                                vec.push(id.full_name);
                             }
                         }
                         // spdx crate returns AND/OR operations in postfix order

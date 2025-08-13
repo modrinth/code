@@ -18,12 +18,14 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 }
 
 #[derive(Deserialize)]
-pub struct ResultCount {
+pub struct ProjectsRequestOptions {
     #[serde(default = "default_count")]
-    pub count: i16,
+    pub count: u16,
+    #[serde(default)]
+    pub offset: u32,
 }
 
-fn default_count() -> i16 {
+fn default_count() -> u16 {
     100
 }
 
@@ -31,7 +33,7 @@ pub async fn get_projects(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    count: web::Query<ResultCount>,
+    request_opts: web::Query<ProjectsRequestOptions>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     check_is_moderator_from_headers(
@@ -50,10 +52,12 @@ pub async fn get_projects(
         SELECT id FROM mods
         WHERE status = $1
         ORDER BY queued ASC
-        LIMIT $2;
+        OFFSET $3
+        LIMIT $2
         ",
         ProjectStatus::Processing.as_str(),
-        count.count as i64
+        request_opts.count as i64,
+        request_opts.offset as i64
     )
     .fetch(&**pool)
     .map_ok(|m| database::models::DBProjectId(m.id))
@@ -185,17 +189,16 @@ pub async fn get_project_meta(
                 .iter()
                 .find(|x| Some(x.1.id as i32) == row.flame_project_id)
                 .map(|x| x.0.clone())
+                && let Some(val) = merged.flame_files.remove(&sha1)
             {
-                if let Some(val) = merged.flame_files.remove(&sha1) {
-                    merged.identified.insert(
-                        sha1,
-                        IdentifiedFile {
-                            file_name: val.file_name.clone(),
-                            status: ApprovalType::from_string(&row.status)
-                                .unwrap_or(ApprovalType::Unidentified),
-                        },
-                    );
-                }
+                merged.identified.insert(
+                    sha1,
+                    IdentifiedFile {
+                        file_name: val.file_name.clone(),
+                        status: ApprovalType::from_string(&row.status)
+                            .unwrap_or(ApprovalType::Unidentified),
+                    },
+                );
             }
         }
 
