@@ -1,8 +1,10 @@
-import { createConfigForNuxt } from '@nuxt/eslint-config/flat'
 import { fixupPluginRules } from '@eslint/compat'
+import { createConfigForNuxt } from '@nuxt/eslint-config/flat'
 import turboPlugin from 'eslint-plugin-turbo'
+import common from './common.mjs'
 
 export const configurationNuxtToAppend = [
+  ...common,
   {
     name: 'turbo',
     plugins: {
@@ -24,6 +26,6 @@ export const configurationNuxtToAppend = [
       },
     },
   },
-];
+]
 
-export default createConfigForNuxt().append(configurationNuxtToAppend);
+export default createConfigForNuxt().append(configurationNuxtToAppend)
