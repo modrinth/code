@@ -11,7 +11,7 @@ use std::sync::{Arc, Mutex};
 use tokio::net::TcpListener;
 use tokio::sync::{mpsc, oneshot};
 use tokio::task::AbortHandle;
-use tokio_util::codec::{Decoder, Framed, LinesCodec, LinesCodecError};
+use tokio_util::codec::{Decoder, LinesCodec, LinesCodecError};
 use uuid::Uuid;
 
 type HandlerFuture = Pin<Box<dyn Send + Future<Output = Result<Value>>>>;
@@ -51,14 +51,12 @@ impl RpcServerBuilder {
         let join_handle = {
             let waiting_responses = waiting_responses.clone();
             tokio::spawn(async move {
-                if let Err(e) = RpcServer::run(
-                    socket,
+                let mut server = RunningRpcServer {
                     message_receiver,
-                    self.handlers,
-                    waiting_responses.clone(),
-                )
-                .await
-                {
+                    handlers: self.handlers,
+                    waiting_responses: waiting_responses.clone(),
+                };
+                if let Err(e) = server.run(socket).await {
                     tracing::error!("Failed to run RPC server: {e}");
                 }
                 waiting_responses.lock().unwrap().clear();
@@ -147,33 +145,33 @@ impl RpcServer {
         };
         result.and_then(|x| Ok(serde_json::from_value(x)?))
     }
+}
 
-    async fn run(
-        socket: TcpListener,
-        mut message_receiver: mpsc::UnboundedReceiver<RpcMessage>,
-        handlers: HandlerMap,
-        waiting_responses: WaitingResponsesMap,
-    ) -> Result<()> {
-        let (socket, _) = socket.accept().await?;
+impl Drop for RpcServer {
+    fn drop(&mut self) {
+        self.abort_handle.abort();
+    }
+}
+
+struct RunningRpcServer {
+    message_receiver: mpsc::UnboundedReceiver<RpcMessage>,
+    handlers: HandlerMap,
+    waiting_responses: WaitingResponsesMap,
+}
+
+impl RunningRpcServer {
+    async fn run(&mut self, listener: TcpListener) -> Result<()> {
+        let (socket, _) = listener.accept().await?;
+        drop(listener);
+
         let mut socket = LinesCodec::new().framed(socket);
-        let send_message = async |socket: &mut Framed<_, _>,
-                                  message|
-               -> Result<()> {
-            let json = serde_json::to_string(&message)?;
-            match socket.send(json).await {
-                Ok(()) => {}
-                Err(LinesCodecError::Io(e)) => Err(e)?,
-                Err(LinesCodecError::MaxLineLengthExceeded) => unreachable!(),
-            };
-            Ok(())
-        };
         loop {
-            tokio::select! {
-                message = message_receiver.recv() => {
-                    let Some(message) = message else {
+            let to_send = tokio::select! {
+                message = self.message_receiver.recv() => {
+                    if message.is_none() {
                         break;
-                    };
-                    send_message(&mut socket, message).await?;
+                    }
+                    message
                 },
                 message = socket.next() => {
                     let message: RpcMessage = match message {
@@ -182,41 +180,57 @@ impl RpcServer {
                         Some(Err(LinesCodecError::Io(e))) => Err(e)?,
                         Some(Err(LinesCodecError::MaxLineLengthExceeded)) => unreachable!(),
                     };
-                    if let RpcMessageBody::Call { method, args } = message.body {
-                        let response = match handlers.get(method.as_str()) {
-                            Some(handler) => match handler(args).await {
-                                Ok(result) => RpcMessageBody::Respond {
-                                    response: result,
-                                },
-                                Err(e) => RpcMessageBody::Error {
-                                    error: e.to_string(),
-                                },
-                            }
-                            None => RpcMessageBody::Error {
-                                error: format!("Unknown theseus RPC method {method}"),
-                            },
-                        };
-                        send_message(&mut socket, RpcMessage {
-                            id: message.id,
-                            body: response,
-                        }).await?;
-                    } else if let Some(sender) = waiting_responses.lock().unwrap().remove(&message.id) {
-                        let _ = sender.send(match message.body {
-                            RpcMessageBody::Respond { response } => Ok(response),
-                            RpcMessageBody::Error { error } => Err(ErrorKind::RpcError(error).into()),
-                            _ => unreachable!(),
-                        });
-                    }
+                    self.handle_message(message).await?
                 },
+            };
+            if let Some(message) = to_send {
+                let json = serde_json::to_string(&message)?;
+                match socket.send(json).await {
+                    Ok(()) => {}
+                    Err(LinesCodecError::Io(e)) => Err(e)?,
+                    Err(LinesCodecError::MaxLineLengthExceeded) => {
+                        unreachable!()
+                    }
+                };
             }
         }
         Ok(())
     }
-}
 
-impl Drop for RpcServer {
-    fn drop(&mut self) {
-        self.abort_handle.abort();
+    async fn handle_message(
+        &self,
+        message: RpcMessage,
+    ) -> Result<Option<RpcMessage>> {
+        if let RpcMessageBody::Call { method, args } = message.body {
+            let response = match self.handlers.get(method.as_str()) {
+                Some(handler) => match handler(args).await {
+                    Ok(result) => RpcMessageBody::Respond { response: result },
+                    Err(e) => RpcMessageBody::Error {
+                        error: e.to_string(),
+                    },
+                },
+                None => RpcMessageBody::Error {
+                    error: format!("Unknown theseus RPC method {method}"),
+                },
+            };
+            Ok(Some(RpcMessage {
+                id: message.id,
+                body: response,
+            }))
+        } else if let Some(sender) =
+            self.waiting_responses.lock().unwrap().remove(&message.id)
+        {
+            let _ = sender.send(match message.body {
+                RpcMessageBody::Respond { response } => Ok(response),
+                RpcMessageBody::Error { error } => {
+                    Err(ErrorKind::RpcError(error).into())
+                }
+                _ => unreachable!(),
+            });
+            Ok(None)
+        } else {
+            Ok(None)
+        }
     }
 }
 
