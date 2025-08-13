@@ -223,7 +223,11 @@ async function setupApp() {
     console.warn('Failed to generate skin previews in app setup.', error)
   }
 
-  await processPendingSurveys()
+  if (osType === 'windows') {
+    await processPendingSurveys()
+  } else {
+    console.info('Skipping user surveys on non-Windows platforms')
+  }
 }
 
 const stateFailed = ref(false)
@@ -446,7 +450,7 @@ async function processPendingSurveys() {
   const userId = creds?.user_id
 
   const instances = await list().catch(handleError)
-  const isActivePlayer =
+  const isActivePlayer = true ||
     instances.findIndex(
       (instance) =>
         isWithinLastTwoWeeks(instance.last_played) && !isWithinLastTwoWeeks(instance.created),
@@ -461,7 +465,7 @@ async function processPendingSurveys() {
 
   const surveyToShow = surveys.find(
     (survey) =>
-      localStorage.getItem(`survey-${survey.id}-display`) === null &&
+      true || localStorage.getItem(`survey-${survey.id}-display`) === null &&
       survey.type === 'tally_app' &&
       ((survey.condition === 'active_player' && isActivePlayer) ||
         (survey.assigned_users?.includes(userId) && !survey.dismissed_users?.includes(userId))),
