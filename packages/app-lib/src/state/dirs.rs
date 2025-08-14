@@ -67,11 +67,7 @@ impl DirectoryInfo {
 
         let config_dir = config_dir.map_or_else(|| {
             // In portable mode, use the same directory for both settings and config
-            if Self::get_portable_dir().is_some() {
-                settings_dir.clone()
-            } else {
-                settings_dir.clone()
-            }
+            settings_dir.clone()
         }, PathBuf::from);
 
         Ok(Self {
