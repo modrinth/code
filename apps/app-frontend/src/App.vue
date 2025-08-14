@@ -44,6 +44,7 @@ import {
   MaximizeIcon,
   MinimizeIcon,
   NewspaperIcon,
+  NotepadTextIcon,
   PlusIcon,
   RestoreIcon,
   RightArrowIcon,
@@ -83,6 +84,7 @@ provideNotificationManager(notificationManager)
 const { handleError, addNotification } = notificationManager
 
 const news = ref([])
+const availableSurvey = ref(false)
 
 const urlModal = ref(null)
 
@@ -437,6 +439,51 @@ function cleanupOldSurveyDisplayData() {
   }
 }
 
+async function openSurvey() {
+  if (!availableSurvey.value) {
+    console.error("No survey to open");
+    return;
+  }
+
+  const creds = await getCreds().catch(handleError)
+  const userId = creds?.user_id
+
+  const formId = availableSurvey.value.tally_id
+
+  const popupOptions = {
+    layout: 'modal',
+    width: 700,
+    autoClose: 2000,
+    hideTitle: true,
+    hiddenFields: {
+      user_id: userId,
+    },
+    onOpen: () => console.info('Opened user survey'),
+    onClose: () => console.info('Closed user survey'),
+    onSubmit: () => console.info('Active user survey submitted'),
+  }
+
+  try {
+    if (window.Tally?.openPopup) {
+      console.info(`Opening Tally popup for user survey (form ID: ${formId})`)
+      dismissSurvey()
+      window.Tally.openPopup(formId, popupOptions)
+    } else {
+      console.warn('Tally script not yet loaded')
+    }
+  } catch (e) {
+    console.error('Error opening Tally popup:', e)
+  }
+
+  console.info(`Found user survey to show with tally_id: ${formId}`)
+  window.Tally.openPopup(formId, popupOptions)
+}
+
+function dismissSurvey() {
+  localStorage.setItem(`survey-${availableSurvey.value.id}-display`, new Date())
+  availableSurvey.value = undefined
+}
+
 async function processPendingSurveys() {
   function isWithinLastTwoWeeks(date) {
     const twoWeeksAgo = new Date()
@@ -450,8 +497,7 @@ async function processPendingSurveys() {
   const userId = creds?.user_id
 
   const instances = await list().catch(handleError)
-  const isActivePlayer =
-    instances.findIndex(
+  const isActivePlayer = instances.findIndex(
       (instance) =>
         isWithinLastTwoWeeks(instance.last_played) && !isWithinLastTwoWeeks(instance.created),
     ) >= 0
@@ -469,40 +515,11 @@ async function processPendingSurveys() {
         localStorage.getItem(`survey-${survey.id}-display`) === null &&
         survey.type === 'tally_app' &&
         ((survey.condition === 'active_player' && isActivePlayer) ||
-          (survey.assigned_users?.includes(userId) && !survey.dismissed_users?.includes(userId)))
-      ),
+          (survey.assigned_users?.includes(userId) && !survey.dismissed_users?.includes(userId)))),
   )
 
   if (surveyToShow) {
-    const formId = surveyToShow.tally_id
-
-    const popupOptions = {
-      layout: 'modal',
-      width: 700,
-      autoClose: 2000,
-      hideTitle: true,
-      hiddenFields: {
-        user_id: userId,
-      },
-      onOpen: () => console.info('Opened user survey'),
-      onClose: () => console.info('Closed user survey'),
-      onSubmit: () => console.info('Active user survey submitted'),
-    }
-
-    try {
-      if (window.Tally?.openPopup) {
-        console.info(`Opening Tally popup for user survey (form ID: ${formId})`)
-        localStorage.setItem(`survey-${surveyToShow.id}-display`, new Date())
-        window.Tally.openPopup(formId, popupOptions)
-      } else {
-        console.warn('Tally script not yet loaded')
-      }
-    } catch (e) {
-      console.error('Error opening Tally popup:', e)
-    }
-
-    console.info(`Found user survey to show with tally_id: ${formId}`)
-    window.Tally.openPopup(formId, popupOptions)
+    availableSurvey.value = surveyToShow
   } else {
     console.info('No user survey to show')
   }
@@ -660,6 +677,28 @@ async function processPendingSurveys() {
     :class="{ 'sidebar-enabled': sidebarVisible }"
   >
     <div class="app-viewport flex-grow router-view">
+      <transition name="popup-survey">
+        <div
+          v-if="availableSurvey"
+          class="w-[400px] z-20 fixed -bottom-12 pb-16 right-[--right-bar-width] mr-4 rounded-t-2xl card-shadow bg-bg-raised border-divider border-[1px] border-solid border-b-0 p-4"
+        >
+          <h2 class="text-lg font-extrabold mt-0 mb-2">Hey there Modrinth user!</h2>
+          <p class="m-0 leading-tight">
+            Would you mind answering a few questions about your experience with Modrinth App?
+          </p>
+          <p class="mt-3 mb-4 leading-tight">
+            This feedback will go directly to the Modrinth team and help guide future updates!
+          </p>
+          <div class="flex gap-2">
+            <ButtonStyled color="brand">
+              <button @click="openSurvey"><NotepadTextIcon /> Take survey</button>
+            </ButtonStyled>
+            <ButtonStyled>
+              <button @click="dismissSurvey"><XIcon /> No thanks</button>
+            </ButtonStyled>
+          </div>
+        </div>
+      </transition>
       <div
         class="loading-indicator-container h-8 fixed z-50"
         :style="{
@@ -956,6 +995,22 @@ async function processPendingSurveys() {
 
 .sidebar-teleport-content:empty + .sidebar-default-content.sidebar-enabled {
   display: contents;
+}
+
+.popup-survey-enter-active {
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(.51,1.08,.35,1.15);
+  transform-origin: top center;
+}
+
+.popup-survey-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(.68,-0.17,.23,.11);
+  transform-origin: top center;
+}
+
+.popup-survey-enter-from,
+.popup-survey-leave-to {
+  opacity: 0;
+  transform: translateY(10rem) scale(0.8) scaleY(1.6);
 }
 </style>
 <style>
