@@ -18,7 +18,7 @@ import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
-import { hide_ads_window, init_ads_window } from '@/helpers/ads.js'
+import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
 import { get_user } from '@/helpers/cache.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
@@ -459,20 +459,26 @@ async function openSurvey() {
       user_id: userId,
     },
     onOpen: () => console.info('Opened user survey'),
-    onClose: () => console.info('Closed user survey'),
+    onClose: () => {
+      console.info('Closed user survey')
+      show_ads_window()
+    },
     onSubmit: () => console.info('Active user survey submitted'),
   }
 
   try {
+    hide_ads_window()
     if (window.Tally?.openPopup) {
       console.info(`Opening Tally popup for user survey (form ID: ${formId})`)
       dismissSurvey()
       window.Tally.openPopup(formId, popupOptions)
     } else {
       console.warn('Tally script not yet loaded')
+      show_ads_window()
     }
   } catch (e) {
     console.error('Error opening Tally popup:', e)
+    show_ads_window()
   }
 
   console.info(`Found user survey to show with tally_id: ${formId}`)
