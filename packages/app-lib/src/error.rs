@@ -143,8 +143,13 @@ pub enum ErrorKind {
 	#[error("PNG encoding error: {0}")]
 	PngEncodingError(#[from] png::EncodingError),
 
-	#[error("A skin texture must have a dimension of either 64x64 or 64x32 pixels")]
-	InvalidSkinTexture,
+    #[error(
+        "A skin texture must have a dimension of either 64x64 or 64x32 pixels"
+    )]
+    InvalidSkinTexture,
+
+    #[error("RPC error: {0}")]
+    RpcError(String),
 }
 
 #[derive(Debug)]
