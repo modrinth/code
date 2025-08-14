@@ -11,6 +11,40 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-08-14T17:00:00-07:00`,
+		product: 'app',
+		version: '0.10.4',
+		body: `### Improvements
+- On Windows, the app will now install per-user rather than system-wide.
+	- This allows future versions of Modrinth App to update seamlessly if the user is not an administrator.
+	- When updating to this version, the app will prompt you for Admin elevation in order to remove the old system-wide installation.
+	- Desktop shortcuts should be migrated automatically to the new installation location.
+- Improvements to the Skins page.
+	- Fixed skins being mirrored.
+	- Added automatic detection of arm style from skin file.
+	- Improved performance of skin renderer.
+	- Added anti-aliasing to the skin renderer to make it appear smoother.
+	- Tweaked the rendering of the spotlight below the player model.
+- Allow offline servers to still be joined from Worlds tab.
+	- Some servers display as offline as a privacy measure, or only start up once a player attempts to join.
+- Improved Modrinth user account login to use your default web browser.
+- Updated the appearance and functionality of error notifications to match the Modrinth website.
+- Fixed search not returning to first page when filters are changed.
+- Fixed modpacks showing up with the "Optimization" tag on Home page if it's not a featured category on the project.
+- Improved pinging Minecraft servers for older versions in the Worlds tab to more closely match how the client would ping them.
+- Added Quick Play functionality for Minecraft servers on versions before 1.20.
+- Fixed the tracking of last played time for Minecraft servers on versions before 1.7.2.
+- Fixed the order when sorting Library page by game version.
+- Fixed the incompatibility warning not remembering the version you clicked on.
+- Added common snapping points to memory allocation sliders.
+- Increased the size of the 'Logs' page on instances.
+- Fixed failure when clicking 'Test' on Java versions.
+- Fixed the back/forward buttons appearing with white icons in light mode.
+- Fixed 'Party Alex' skin not using slim character model.
+- Improved resilience of Minecraft launching on Java 8 under certain circumstances.
+- Added system for showing users surveys to provide feedback on their experience with Modrinth App.`,
+	},
+	{
 		date: `2025-08-01T21:30:00-04:00`,
 		product: 'web',
 		body: `### Improvements
