@@ -65,7 +65,7 @@
 
           <div
             v-if="isConfiguring"
-            class="flex min-w-0 items-center gap-2 truncate text-sm font-semibold text-brand"
+            class="text-medal-orange flex min-w-0 items-center gap-2 truncate text-sm font-semibold"
           >
             <SparklesIcon class="size-5 shrink-0" /> New server
           </div>

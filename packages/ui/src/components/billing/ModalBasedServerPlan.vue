@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { inject, computed, type Ref } from 'vue'
-import { useVIntl, type MessageDescriptor } from '@vintl/vintl'
-import { formatPrice } from '@modrinth/utils'
-import { monthsInInterval, type ServerBillingInterval, type ServerPlan } from '../../utils/billing'
-import { Menu } from 'floating-vue'
 import { DropdownIcon } from '@modrinth/assets'
+import { formatPrice } from '@modrinth/utils'
+import { useVIntl, type MessageDescriptor } from '@vintl/vintl'
+import { Menu } from 'floating-vue'
+import { computed, inject, type Ref } from 'vue'
+import { monthsInInterval, type ServerBillingInterval, type ServerPlan } from '../../utils/billing'
 import ServersSpecs from './ServersSpecs.vue'
 
 const props = withDefaults(
@@ -98,16 +98,26 @@ const mostPopularStyle = computed(() => {
       <span class="text-sm">{{ formatMessage(description) }}</span>
 
       <div class="flex flex-col gap-2">
-        <Menu placement="bottom-start" :triggers="['click']" :auto-hide="false" :distance="8">
+        <Menu
+          placement="bottom-start"
+          :triggers="['hover', 'focus']"
+          :auto-hide="true"
+          :delay="{ show: 100, hide: 120 }"
+          :distance="8"
+        >
           <template #default="{ shown }">
-            <div @click.stop @keydown.stop>
-              <span class="flex justify-between text-sm">
-                View plan details
-                <DropdownIcon
-                  class="ml-auto my-auto size-4 transition-transform duration-300 shrink-0"
-                  :class="{ 'rotate-180': shown }"
-                />
-              </span>
+            <div
+              class="flex justify-between text-sm cursor-default select-none outline-none"
+              role="button"
+              tabindex="0"
+              aria-haspopup="true"
+              :aria-expanded="shown"
+            >
+              <span>View plan details</span>
+              <DropdownIcon
+                class="ml-auto my-auto size-4 transition-transform duration-300 shrink-0"
+                :class="{ 'rotate-180': shown }"
+              />
             </div>
           </template>
 
