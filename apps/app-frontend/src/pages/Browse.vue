@@ -1,33 +1,34 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, shallowRef, watch } from 'vue'
-import type { Ref } from 'vue'
-import { SearchIcon, XIcon, ClipboardCopyIcon, GlobeIcon, ExternalIcon } from '@modrinth/assets'
+import ContextMenu from '@/components/ui/ContextMenu.vue'
+import type Instance from '@/components/ui/Instance.vue'
+import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
+import NavTabs from '@/components/ui/NavTabs.vue'
+import SearchCard from '@/components/ui/SearchCard.vue'
+import { get_search_results } from '@/helpers/cache.js'
+import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
+import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
+import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { ClipboardCopyIcon, ExternalIcon, GlobeIcon, SearchIcon, XIcon } from '@modrinth/assets'
 import type { Category, GameVersion, Platform, ProjectType, SortType, Tags } from '@modrinth/ui'
 import {
-  SearchFilterControl,
-  SearchSidebarFilter,
   Button,
   Checkbox,
   DropdownSelect,
+  injectNotificationManager,
   LoadingIndicator,
   Pagination,
+  SearchFilterControl,
+  SearchSidebarFilter,
   useSearch,
 } from '@modrinth/ui'
-import { handleError } from '@/store/state'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
+import { openUrl } from '@tauri-apps/plugin-opener'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+import type { Ref } from 'vue'
+import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
 import { useRoute, useRouter } from 'vue-router'
-import SearchCard from '@/components/ui/SearchCard.vue'
-import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
-import { get_search_results } from '@/helpers/cache.js'
-import NavTabs from '@/components/ui/NavTabs.vue'
-import type Instance from '@/components/ui/Instance.vue'
-import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import ContextMenu from '@/components/ui/ContextMenu.vue'
-import { openUrl } from '@tauri-apps/plugin-opener'
 
+const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const router = useRouter()

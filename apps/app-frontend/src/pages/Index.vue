@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { ref, onUnmounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
 import RowDisplay from '@/components/RowDisplay.vue'
-import { list } from '@/helpers/profile.js'
-import { profile_listener } from '@/helpers/events'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { handleError } from '@/store/notifications.js'
-import dayjs from 'dayjs'
-import { get_search_results } from '@/helpers/cache.js'
-import type { SearchResult } from '@modrinth/utils'
 import RecentWorldsList from '@/components/ui/world/RecentWorldsList.vue'
+import { get_search_results } from '@/helpers/cache.js'
+import { profile_listener } from '@/helpers/events'
+import { list } from '@/helpers/profile.js'
 import type { GameInstance } from '@/helpers/types'
+import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { injectNotificationManager } from '@modrinth/ui'
+import type { SearchResult } from '@modrinth/utils'
+import dayjs from 'dayjs'
+import { computed, onUnmounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 
+const { handleError } = injectNotificationManager()
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
 

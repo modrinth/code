@@ -11,6 +11,7 @@ repositories {
 dependencies {
     implementation("org.ow2.asm:asm:9.8")
     implementation("org.ow2.asm:asm-tree:9.8")
+    implementation("com.google.code.gson:gson:2.13.1")
 
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

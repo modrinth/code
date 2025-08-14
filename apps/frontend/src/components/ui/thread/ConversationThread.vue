@@ -251,23 +251,25 @@
 </template>
 
 <script setup>
-import { CopyCode, OverflowMenu, MarkdownEditor } from "@modrinth/ui";
 import {
-  DropdownIcon,
-  ReplyIcon,
-  SendIcon,
   CheckCircleIcon,
-  XIcon,
-  EyeOffIcon,
   CheckIcon,
+  DropdownIcon,
+  EyeOffIcon,
+  ReplyIcon,
   ScaleIcon,
+  SendIcon,
+  XIcon,
 } from "@modrinth/assets";
-import { useImageUpload } from "~/composables/image-upload.ts";
-import ThreadMessage from "~/components/ui/thread/ThreadMessage.vue";
-import { isStaff } from "~/helpers/users.js";
-import { isApproved, isRejected } from "~/helpers/projects.js";
-import Modal from "~/components/ui/Modal.vue";
+import { CopyCode, MarkdownEditor, OverflowMenu, injectNotificationManager } from "@modrinth/ui";
 import Checkbox from "~/components/ui/Checkbox.vue";
+import Modal from "~/components/ui/Modal.vue";
+import ThreadMessage from "~/components/ui/thread/ThreadMessage.vue";
+import { useImageUpload } from "~/composables/image-upload.ts";
+import { isApproved, isRejected } from "~/helpers/projects.js";
+import { isStaff } from "~/helpers/users.js";
+
+const { addNotification } = injectNotificationManager();
 
 const props = defineProps({
   thread: {
@@ -388,8 +390,7 @@ async function sendReply(status = null, privateMessage = false) {
       props.setStatus(status);
     }
   } catch (err) {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "Error sending message",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -411,8 +412,7 @@ async function closeReport(reply) {
     });
     await updateThreadLocal();
   } catch (err) {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "Error closing report",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -430,8 +430,7 @@ async function reopenReport() {
     });
     await updateThreadLocal();
   } catch (err) {
-    app.$notify({
-      group: "main",
+    addNotification({
       title: "Error reopening report",
       text: err.data ? err.data.description : err,
       type: "error",

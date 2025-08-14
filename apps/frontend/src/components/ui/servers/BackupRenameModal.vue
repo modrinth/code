@@ -45,11 +45,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, computed } from "vue";
-import { ButtonStyled, NewModal } from "@modrinth/ui";
-import { SpinnerIcon, SaveIcon, XIcon, IssuesIcon } from "@modrinth/assets";
+import { IssuesIcon, SaveIcon, SpinnerIcon, XIcon } from "@modrinth/assets";
+import { ButtonStyled, injectNotificationManager, NewModal } from "@modrinth/ui";
 import type { Backup } from "@modrinth/utils";
+import { computed, nextTick, ref } from "vue";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
+
+const { addNotification } = injectNotificationManager();
 
 const props = defineProps<{
   server: ModrinthServer;

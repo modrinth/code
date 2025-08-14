@@ -130,19 +130,20 @@
 
 <script setup>
 import {
-  RightArrowIcon,
-  SSOGitHubIcon,
-  SSOMicrosoftIcon,
-  SSOSteamIcon,
-  SSOGoogleIcon,
-  SSODiscordIcon,
-  SSOGitLabIcon,
   KeyIcon,
   MailIcon,
+  RightArrowIcon,
+  SSODiscordIcon,
+  SSOGitHubIcon,
+  SSOGitLabIcon,
+  SSOGoogleIcon,
+  SSOMicrosoftIcon,
+  SSOSteamIcon,
 } from "@modrinth/assets";
-import { commonMessages } from "@modrinth/ui";
+import { commonMessages, injectNotificationManager } from "@modrinth/ui";
 import HCaptcha from "@/components/ui/HCaptcha.vue";
 
+const { addNotification } = injectNotificationManager();
 const { formatMessage } = useVIntl();
 
 const messages = defineMessages({
@@ -232,7 +233,6 @@ async function beginPasswordSignIn() {
     }
   } catch (err) {
     addNotification({
-      group: "main",
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: "error",
@@ -257,7 +257,6 @@ async function begin2FASignIn() {
     await finishSignIn(res.session);
   } catch (err) {
     addNotification({
-      group: "main",
       title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: "error",

@@ -113,9 +113,11 @@
 
 <script setup lang="ts">
 import { EditIcon, TransferIcon } from "@modrinth/assets";
+import { injectNotificationManager } from "@modrinth/ui";
 import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
 import { ModrinthServer } from "~/composables/servers/modrinth-servers.ts";
 
+const { addNotification } = injectNotificationManager();
 const props = defineProps<{
   server: ModrinthServer;
 }>();
@@ -161,7 +163,6 @@ const saveGeneral = async () => {
 
         if (!available) {
           addNotification({
-            group: "serverOptions",
             type: "error",
             title: "Subdomain not available",
             text: "The subdomain you entered is already in use.",
@@ -173,7 +174,6 @@ const saveGeneral = async () => {
       } catch (error) {
         console.error("Error checking subdomain availability:", error);
         addNotification({
-          group: "serverOptions",
           type: "error",
           title: "Error checking availability",
           text: "Failed to verify if the subdomain is available.",
@@ -184,7 +184,6 @@ const saveGeneral = async () => {
     await new Promise((resolve) => setTimeout(resolve, 500));
     await props.server.refresh();
     addNotification({
-      group: "serverOptions",
       type: "success",
       title: "Server settings updated",
       text: "Your server settings were successfully changed.",
@@ -192,7 +191,6 @@ const saveGeneral = async () => {
   } catch (error) {
     console.error(error);
     addNotification({
-      group: "serverOptions",
       type: "error",
       title: "Failed to update server settings",
       text: "An error occurred while attempting to update your server settings.",
@@ -211,7 +209,6 @@ const uploadFile = async (e: Event) => {
   const file = (e.target as HTMLInputElement).files?.[0];
   if (!file) {
     addNotification({
-      group: "serverOptions",
       type: "error",
       title: "No file selected",
       text: "Please select a file to upload.",
@@ -267,7 +264,6 @@ const uploadFile = async (e: Event) => {
     });
 
     addNotification({
-      group: "serverOptions",
       type: "success",
       title: "Server icon updated",
       text: "Your server icon was successfully changed.",
@@ -275,7 +271,6 @@ const uploadFile = async (e: Event) => {
   } catch (error) {
     console.error("Error uploading icon:", error);
     addNotification({
-      group: "serverOptions",
       type: "error",
       title: "Upload failed",
       text: "Failed to upload server icon.",
@@ -295,7 +290,6 @@ const resetIcon = async () => {
       await props.server.refresh(["general"]);
 
       addNotification({
-        group: "serverOptions",
         type: "success",
         title: "Server icon reset",
         text: "Your server icon was successfully reset.",
@@ -303,7 +297,6 @@ const resetIcon = async () => {
     } catch (error) {
       console.error("Error resetting icon:", error);
       addNotification({
-        group: "serverOptions",
         type: "error",
         title: "Reset failed",
         text: "Failed to reset server icon.",

@@ -15,7 +15,7 @@
           maxlength="64"
           :placeholder="`Enter organization name...`"
           autocomplete="off"
-          @input="updateSlug()"
+          @input="updateSlug"
         />
       </div>
       <div class="flex flex-col gap-2">
@@ -33,7 +33,7 @@
             type="text"
             maxlength="64"
             autocomplete="off"
-            @input="manualSlug = true"
+            @input="setManualSlug"
           />
         </div>
       </div>
@@ -61,7 +61,7 @@
           </button>
         </ButtonStyled>
         <ButtonStyled>
-          <button @click="modal.hide()">
+          <button @click="hide">
             <XIcon aria-hidden="true" />
             Cancel
           </button>
@@ -70,20 +70,22 @@
     </div>
   </NewModal>
 </template>
-<script setup>
-import { XIcon, PlusIcon } from "@modrinth/assets";
-import { ButtonStyled, NewModal } from "@modrinth/ui";
+
+<script setup lang="ts">
+import { PlusIcon, XIcon } from "@modrinth/assets";
+import { ButtonStyled, NewModal, injectNotificationManager } from "@modrinth/ui";
+import { ref } from "vue";
 
 const router = useNativeRouter();
+const { addNotification } = injectNotificationManager();
 
-const name = ref("");
-const slug = ref("");
-const description = ref("");
-const manualSlug = ref(false);
+const name = ref<string>("");
+const slug = ref<string>("");
+const description = ref<string>("");
+const manualSlug = ref<boolean>(false);
+const modal = ref<InstanceType<typeof NewModal>>();
 
-const modal = ref();
-
-async function createOrganization() {
+async function createOrganization(): Promise<void> {
   startLoading();
   try {
     const value = {
@@ -92,19 +94,18 @@ async function createOrganization() {
       slug: slug.value.trim().replace(/ +/g, ""),
     };
 
-    const result = await useBaseFetch("organization", {
+    const result: any = await useBaseFetch("organization", {
       method: "POST",
       body: JSON.stringify(value),
       apiVersion: 3,
     });
 
-    modal.value.hide();
+    modal.value?.hide();
 
     await router.push(`/organization/${result.slug}`);
-  } catch (err) {
+  } catch (err: any) {
     console.error(err);
     addNotification({
-      group: "main",
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -112,13 +113,18 @@ async function createOrganization() {
   }
   stopLoading();
 }
-function show(event) {
+
+function show(event?: MouseEvent): void {
   name.value = "";
   description.value = "";
-  modal.value.show(event);
+  modal.value?.show(event);
 }
 
-function updateSlug() {
+function hide(): void {
+  modal.value?.hide();
+}
+
+function updateSlug(): void {
   if (!manualSlug.value) {
     slug.value = name.value
       .trim()
@@ -127,6 +133,10 @@ function updateSlug() {
       .replaceAll(/[^a-zA-Z0-9!@$()`.+,_"-]/g, "")
       .replaceAll(/--+/gm, "-");
   }
+}
+
+function setManualSlug(): void {
+  manualSlug.value = true;
 }
 
 defineExpose({
