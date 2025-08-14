@@ -2116,7 +2116,7 @@ pub async fn stripe_webhook(
                                 charge.price_id =
                                     metadata.product_price_item.id;
                             } else {
-                                // do NOT update the due date!
+                                // Note: do not update the due date
                                 charge.subscription_interval =
                                     Some(subscription.interval);
                                 charge.price_id =
