@@ -4,20 +4,15 @@
       to="/servers?plan&ref=medal"
       class="flex max-h-[250px] min-h-[250px] min-w-[300px] max-w-[300px] flex-col gap-4 rounded-[inherit]"
     >
-      <!-- <img
-				src="https://cdn-raw.modrinth.com/modrinth-servers-placeholder-light.webp"
-				alt="Host your next server with Modrinth Servers"
-				class="hidden light-image rounded-[inherit]"
-			/>
-			<img
-				src="https://cdn-raw.modrinth.com/modrinth-servers-placeholder-dark.webp"
-				alt="Host your next server with Modrinth Servers"
-				class="dark-image rounded-[inherit]"
-			/> -->
       <img
-        src="https://cdn-raw.modrinth.com/medal-modrinth-servers-ad.webp"
-        alt="Host your next server with Modrinth Servers, get five days free with Medal."
-        class="rounded-[inherit]"
+        src="https://cdn-raw.modrinth.com/medal-modrinth-servers-light.webp"
+        alt="Host your next server with Modrinth Servers"
+        class="light-image hidden rounded-[inherit]"
+      />
+      <img
+        src="https://cdn-raw.modrinth.com/medal-modrinth-servers-dark.webp"
+        alt="Host your next server with Modrinth Servers"
+        class="dark-image rounded-[inherit]"
       />
     </nuxt-link>
     <div
