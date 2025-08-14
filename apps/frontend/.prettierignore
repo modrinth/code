@@ -2,3 +2,4 @@
 **/dist
 **/.output
 src/generated/**
+src/locales/**
