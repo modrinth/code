@@ -150,7 +150,7 @@ const {
 } = await useAsyncData<ServerResponse>("ServerList", async () => {
   const serverResponse = await useServersFetch<ServerResponse>("servers");
 
-  let subscriptions: any[] | undefined = undefined;
+  let subscriptions: any[] | undefined;
 
   for (const server of serverResponse.servers) {
     if (server.is_medal) {
