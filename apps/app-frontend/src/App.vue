@@ -441,8 +441,8 @@ function cleanupOldSurveyDisplayData() {
 
 async function openSurvey() {
   if (!availableSurvey.value) {
-    console.error("No survey to open");
-    return;
+    console.error('No survey to open')
+    return
   }
 
   const creds = await getCreds().catch(handleError)
@@ -497,7 +497,8 @@ async function processPendingSurveys() {
   const userId = creds?.user_id
 
   const instances = await list().catch(handleError)
-  const isActivePlayer = instances.findIndex(
+  const isActivePlayer =
+    instances.findIndex(
       (instance) =>
         isWithinLastTwoWeeks(instance.last_played) && !isWithinLastTwoWeeks(instance.created),
     ) >= 0
@@ -515,7 +516,8 @@ async function processPendingSurveys() {
         localStorage.getItem(`survey-${survey.id}-display`) === null &&
         survey.type === 'tally_app' &&
         ((survey.condition === 'active_player' && isActivePlayer) ||
-          (survey.assigned_users?.includes(userId) && !survey.dismissed_users?.includes(userId)))),
+          (survey.assigned_users?.includes(userId) && !survey.dismissed_users?.includes(userId)))
+      ),
   )
 
   if (surveyToShow) {
@@ -998,12 +1000,16 @@ async function processPendingSurveys() {
 }
 
 .popup-survey-enter-active {
-  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(.51,1.08,.35,1.15);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s cubic-bezier(0.51, 1.08, 0.35, 1.15);
   transform-origin: top center;
 }
 
 .popup-survey-leave-active {
-  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(.68,-0.17,.23,.11);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s cubic-bezier(0.68, -0.17, 0.23, 0.11);
   transform-origin: top center;
 }
 
