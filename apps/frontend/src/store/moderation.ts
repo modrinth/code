@@ -1,98 +1,98 @@
-import { defineStore, createPinia } from "pinia";
-import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
+import { createPinia, defineStore } from 'pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
 export interface ModerationQueue {
-  items: string[];
-  total: number;
-  completed: number;
-  skipped: number;
-  lastUpdated: Date;
+	items: string[]
+	total: number
+	completed: number
+	skipped: number
+	lastUpdated: Date
 }
 
 const EMPTY_QUEUE: Partial<ModerationQueue> = {
-  items: [],
+	items: [],
 
-  // TODO: Consider some form of displaying this in the checklist, maybe at the end
-  total: 0,
-  completed: 0,
-  skipped: 0,
-};
-
-function createEmptyQueue(): ModerationQueue {
-  return { ...EMPTY_QUEUE, lastUpdated: new Date() } as ModerationQueue;
+	// TODO: Consider some form of displaying this in the checklist, maybe at the end
+	total: 0,
+	completed: 0,
+	skipped: 0,
 }
 
-const pinia = createPinia();
-pinia.use(piniaPluginPersistedstate);
+function createEmptyQueue(): ModerationQueue {
+	return { ...EMPTY_QUEUE, lastUpdated: new Date() } as ModerationQueue
+}
 
-export const useModerationStore = defineStore("moderation", {
-  state: () => ({
-    currentQueue: createEmptyQueue(),
-  }),
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
 
-  getters: {
-    queueLength: (state) => state.currentQueue.items.length,
-    hasItems: (state) => state.currentQueue.items.length > 0,
-    progress: (state) => {
-      if (state.currentQueue.total === 0) return 0;
-      return (state.currentQueue.completed + state.currentQueue.skipped) / state.currentQueue.total;
-    },
-  },
+export const useModerationStore = defineStore('moderation', {
+	state: () => ({
+		currentQueue: createEmptyQueue(),
+	}),
 
-  actions: {
-    setQueue(projectIDs: string[]) {
-      this.currentQueue = {
-        items: [...projectIDs],
-        total: projectIDs.length,
-        completed: 0,
-        skipped: 0,
-        lastUpdated: new Date(),
-      };
-    },
+	getters: {
+		queueLength: (state) => state.currentQueue.items.length,
+		hasItems: (state) => state.currentQueue.items.length > 0,
+		progress: (state) => {
+			if (state.currentQueue.total === 0) return 0
+			return (state.currentQueue.completed + state.currentQueue.skipped) / state.currentQueue.total
+		},
+	},
 
-    setSingleProject(projectId: string) {
-      this.currentQueue = {
-        items: [projectId],
-        total: 1,
-        completed: 0,
-        skipped: 0,
-        lastUpdated: new Date(),
-      };
-    },
+	actions: {
+		setQueue(projectIDs: string[]) {
+			this.currentQueue = {
+				items: [...projectIDs],
+				total: projectIDs.length,
+				completed: 0,
+				skipped: 0,
+				lastUpdated: new Date(),
+			}
+		},
 
-    completeCurrentProject(projectId: string, status: "completed" | "skipped" = "completed") {
-      if (status === "completed") {
-        this.currentQueue.completed++;
-      } else {
-        this.currentQueue.skipped++;
-      }
+		setSingleProject(projectId: string) {
+			this.currentQueue = {
+				items: [projectId],
+				total: 1,
+				completed: 0,
+				skipped: 0,
+				lastUpdated: new Date(),
+			}
+		},
 
-      this.currentQueue.items = this.currentQueue.items.filter((id: string) => id !== projectId);
-      this.currentQueue.lastUpdated = new Date();
+		completeCurrentProject(projectId: string, status: 'completed' | 'skipped' = 'completed') {
+			if (status === 'completed') {
+				this.currentQueue.completed++
+			} else {
+				this.currentQueue.skipped++
+			}
 
-      return this.currentQueue.items.length > 0;
-    },
+			this.currentQueue.items = this.currentQueue.items.filter((id: string) => id !== projectId)
+			this.currentQueue.lastUpdated = new Date()
 
-    getCurrentProjectId(): string | null {
-      return this.currentQueue.items[0] || null;
-    },
+			return this.currentQueue.items.length > 0
+		},
 
-    resetQueue() {
-      this.currentQueue = createEmptyQueue();
-    },
-  },
+		getCurrentProjectId(): string | null {
+			return this.currentQueue.items[0] || null
+		},
 
-  persist: {
-    key: "moderation-store",
-    serializer: {
-      serialize: JSON.stringify,
-      deserialize: (value: string) => {
-        const parsed = JSON.parse(value);
-        if (parsed.currentQueue?.lastUpdated) {
-          parsed.currentQueue.lastUpdated = new Date(parsed.currentQueue.lastUpdated);
-        }
-        return parsed;
-      },
-    },
-  },
-});
+		resetQueue() {
+			this.currentQueue = createEmptyQueue()
+		},
+	},
+
+	persist: {
+		key: 'moderation-store',
+		serializer: {
+			serialize: JSON.stringify,
+			deserialize: (value: string) => {
+				const parsed = JSON.parse(value)
+				if (parsed.currentQueue?.lastUpdated) {
+					parsed.currentQueue.lastUpdated = new Date(parsed.currentQueue.lastUpdated)
+				}
+				return parsed
+			},
+		},
+	},
+})

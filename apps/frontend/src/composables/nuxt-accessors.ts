@@ -1,7 +1,7 @@
 export function useTheme() {
-  return useNuxtApp().$theme;
+	return useNuxtApp().$theme
 }
 
 export function useCosmetics() {
-  return useNuxtApp().$cosmetics;
+	return useNuxtApp().$cosmetics
 }

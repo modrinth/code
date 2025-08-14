@@ -1,13 +1,13 @@
-export const useLoading = () => useState("loading", () => false);
+export const useLoading = () => useState('loading', () => false)
 
 export const startLoading = () => {
-  const loading = useLoading();
+	const loading = useLoading()
 
-  loading.value = true;
-};
+	loading.value = true
+}
 
 export const stopLoading = () => {
-  const loading = useLoading();
+	const loading = useLoading()
 
-  loading.value = false;
-};
+	loading.value = false
+}

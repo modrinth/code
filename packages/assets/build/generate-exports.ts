@@ -2,210 +2,210 @@ import fs from 'fs'
 import path from 'path'
 
 function toPascalCase(str: string): string {
-  return str
-    .split(/[-_.]/)
-    .filter((part) => part.length > 0)
-    .map((word) => {
-      if (/^\d/.test(word)) {
-        return word.charAt(0).toUpperCase() + word.slice(1)
-      }
-      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-    })
-    .join('')
+	return str
+		.split(/[-_.]/)
+		.filter((part) => part.length > 0)
+		.map((word) => {
+			if (/^\d/.test(word)) {
+				return word.charAt(0).toUpperCase() + word.slice(1)
+			}
+			return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+		})
+		.join('')
 }
 
 function generateIconExports(): { imports: string; exports: string } {
-  const packageRoot = path.resolve(__dirname, '..')
-  const iconsDir = path.join(packageRoot, 'icons')
+	const packageRoot = path.resolve(__dirname, '..')
+	const iconsDir = path.join(packageRoot, 'icons')
 
-  if (!fs.existsSync(iconsDir)) {
-    throw new Error(`Icons directory not found: ${iconsDir}`)
-  }
+	if (!fs.existsSync(iconsDir)) {
+		throw new Error(`Icons directory not found: ${iconsDir}`)
+	}
 
-  const files = fs
-    .readdirSync(iconsDir)
-    .filter((file) => file.endsWith('.svg'))
-    .sort()
+	const files = fs
+		.readdirSync(iconsDir)
+		.filter((file) => file.endsWith('.svg'))
+		.sort()
 
-  let imports = ''
-  let exports = ''
+	let imports = ''
+	let exports = ''
 
-  files.forEach((file) => {
-    const baseName = path.basename(file, '.svg')
-    let pascalName = toPascalCase(baseName)
+	files.forEach((file) => {
+		const baseName = path.basename(file, '.svg')
+		let pascalName = toPascalCase(baseName)
 
-    if (pascalName === '') {
-      pascalName = 'Unknown'
-    }
+		if (pascalName === '') {
+			pascalName = 'Unknown'
+		}
 
-    if (!pascalName.endsWith('Icon')) {
-      pascalName += 'Icon'
-    }
+		if (!pascalName.endsWith('Icon')) {
+			pascalName += 'Icon'
+		}
 
-    const privateName = `_${pascalName}`
+		const privateName = `_${pascalName}`
 
-    imports += `import ${privateName} from './icons/${file}?component'\n`
-    exports += `export const ${pascalName} = ${privateName}\n`
-  })
+		imports += `import ${privateName} from './icons/${file}?component'\n`
+		exports += `export const ${pascalName} = ${privateName}\n`
+	})
 
-  return { imports, exports }
+	return { imports, exports }
 }
 
 function runTests(): void {
-  console.log('🧪 Running conversion tests...\n')
+	console.log('🧪 Running conversion tests...\n')
 
-  const testCases: Array<{ input: string; expected: string }> = [
-    { input: 'align-left', expected: 'AlignLeftIcon' },
-    { input: 'arrow-big-up-dash', expected: 'ArrowBigUpDashIcon' },
-    { input: 'check-check', expected: 'CheckCheckIcon' },
-    { input: 'chevron-left', expected: 'ChevronLeftIcon' },
-    { input: 'file-archive', expected: 'FileArchiveIcon' },
-    { input: 'heart-handshake', expected: 'HeartHandshakeIcon' },
-    { input: 'monitor-smartphone', expected: 'MonitorSmartphoneIcon' },
-    { input: 'x-circle', expected: 'XCircleIcon' },
-    { input: 'rotate-ccw', expected: 'RotateCcwIcon' },
-    { input: 'bell-ring', expected: 'BellRingIcon' },
-    { input: 'more-horizontal', expected: 'MoreHorizontalIcon' },
-    { input: 'list_bulleted', expected: 'ListBulletedIcon' },
-    { input: 'test.name', expected: 'TestNameIcon' },
-    { input: 'test-name_final.icon', expected: 'TestNameFinalIcon' },
-  ]
+	const testCases: Array<{ input: string; expected: string }> = [
+		{ input: 'align-left', expected: 'AlignLeftIcon' },
+		{ input: 'arrow-big-up-dash', expected: 'ArrowBigUpDashIcon' },
+		{ input: 'check-check', expected: 'CheckCheckIcon' },
+		{ input: 'chevron-left', expected: 'ChevronLeftIcon' },
+		{ input: 'file-archive', expected: 'FileArchiveIcon' },
+		{ input: 'heart-handshake', expected: 'HeartHandshakeIcon' },
+		{ input: 'monitor-smartphone', expected: 'MonitorSmartphoneIcon' },
+		{ input: 'x-circle', expected: 'XCircleIcon' },
+		{ input: 'rotate-ccw', expected: 'RotateCcwIcon' },
+		{ input: 'bell-ring', expected: 'BellRingIcon' },
+		{ input: 'more-horizontal', expected: 'MoreHorizontalIcon' },
+		{ input: 'list_bulleted', expected: 'ListBulletedIcon' },
+		{ input: 'test.name', expected: 'TestNameIcon' },
+		{ input: 'test-name_final.icon', expected: 'TestNameFinalIcon' },
+	]
 
-  let passed = 0
-  let failed = 0
+	let passed = 0
+	let failed = 0
 
-  testCases.forEach(({ input, expected }) => {
-    const result = toPascalCase(input) + (toPascalCase(input).endsWith('Icon') ? '' : 'Icon')
-    const success = result === expected
+	testCases.forEach(({ input, expected }) => {
+		const result = toPascalCase(input) + (toPascalCase(input).endsWith('Icon') ? '' : 'Icon')
+		const success = result === expected
 
-    if (success) {
-      console.log(`✅ ${input} → ${result}`)
-      passed++
-    } else {
-      console.log(`❌ ${input} → ${result} (expected: ${expected})`)
-      failed++
-    }
-  })
+		if (success) {
+			console.log(`✅ ${input} → ${result}`)
+			passed++
+		} else {
+			console.log(`❌ ${input} → ${result} (expected: ${expected})`)
+			failed++
+		}
+	})
 
-  console.log(`\n📊 Test Results: ${passed} passed, ${failed} failed`)
+	console.log(`\n📊 Test Results: ${passed} passed, ${failed} failed`)
 
-  if (failed > 0) {
-    process.exit(1)
-  }
+	if (failed > 0) {
+		process.exit(1)
+	}
 }
 
 function generateFiles(): void {
-  try {
-    console.log('🔄 Generating icon exports...')
+	try {
+		console.log('🔄 Generating icon exports...')
 
-    const { imports, exports } = generateIconExports()
-    const output = `// Auto-generated icon imports and exports
+		const { imports, exports } = generateIconExports()
+		const output = `// Auto-generated icon imports and exports
 // Do not edit this file manually - run 'pnpm run fix' to regenerate
 
 ${imports}
 ${exports}`
 
-    const packageRoot = path.resolve(__dirname, '..')
-    const outputPath = path.join(packageRoot, 'generated-icons.ts')
-    fs.writeFileSync(outputPath, output)
+		const packageRoot = path.resolve(__dirname, '..')
+		const outputPath = path.join(packageRoot, 'generated-icons.ts')
+		fs.writeFileSync(outputPath, output)
 
-    console.log(`✅ Generated icon exports to: ${outputPath}`)
-    console.log(
-      `📦 Generated ${imports.split('\n').filter((line) => line.trim()).length} icon imports/exports`,
-    )
-  } catch (error) {
-    console.error('❌ Error generating icons:', error)
-    process.exit(1)
-  }
+		console.log(`✅ Generated icon exports to: ${outputPath}`)
+		console.log(
+			`📦 Generated ${imports.split('\n').filter((line) => line.trim()).length} icon imports/exports`,
+		)
+	} catch (error) {
+		console.error('❌ Error generating icons:', error)
+		process.exit(1)
+	}
 }
 
 function main(): void {
-  const args = process.argv.slice(2)
+	const args = process.argv.slice(2)
 
-  if (args.includes('--test')) {
-    runTests()
-  } else if (args.includes('--validate')) {
-    validateIconConsistency()
-  } else {
-    generateFiles()
-  }
+	if (args.includes('--test')) {
+		runTests()
+	} else if (args.includes('--validate')) {
+		validateIconConsistency()
+	} else {
+		generateFiles()
+	}
 }
 
 main()
 
 function getExpectedIconExports(iconsDir: string): string[] {
-  if (!fs.existsSync(iconsDir)) {
-    return []
-  }
+	if (!fs.existsSync(iconsDir)) {
+		return []
+	}
 
-  return fs
-    .readdirSync(iconsDir)
-    .filter((file) => file.endsWith('.svg'))
-    .map((file) => {
-      const baseName = path.basename(file, '.svg')
-      let pascalName = toPascalCase(baseName)
+	return fs
+		.readdirSync(iconsDir)
+		.filter((file) => file.endsWith('.svg'))
+		.map((file) => {
+			const baseName = path.basename(file, '.svg')
+			let pascalName = toPascalCase(baseName)
 
-      if (pascalName === '') {
-        pascalName = 'Unknown'
-      }
+			if (pascalName === '') {
+				pascalName = 'Unknown'
+			}
 
-      if (!pascalName.endsWith('Icon')) {
-        pascalName += 'Icon'
-      }
+			if (!pascalName.endsWith('Icon')) {
+				pascalName += 'Icon'
+			}
 
-      return pascalName
-    })
-    .sort()
+			return pascalName
+		})
+		.sort()
 }
 
 function getActualIconExports(indexFile: string): string[] {
-  if (!fs.existsSync(indexFile)) {
-    return []
-  }
+	if (!fs.existsSync(indexFile)) {
+		return []
+	}
 
-  const content = fs.readFileSync(indexFile, 'utf8')
-  const exportMatches = content.match(/export const (\w+Icon) = _\w+Icon/g) || []
+	const content = fs.readFileSync(indexFile, 'utf8')
+	const exportMatches = content.match(/export const (\w+Icon) = _\w+Icon/g) || []
 
-  return exportMatches
-    .map((match) => {
-      const result = match.match(/export const (\w+Icon)/)
-      return result ? result[1] : ''
-    })
-    .filter((name) => name.endsWith('Icon'))
-    .sort()
+	return exportMatches
+		.map((match) => {
+			const result = match.match(/export const (\w+Icon)/)
+			return result ? result[1] : ''
+		})
+		.filter((name) => name.endsWith('Icon'))
+		.sort()
 }
 
 function validateIconConsistency(): void {
-  try {
-    console.log('🔍 Validating icon consistency...')
+	try {
+		console.log('🔍 Validating icon consistency...')
 
-    const packageRoot = path.resolve(__dirname, '..')
-    const iconsDir = path.join(packageRoot, 'icons')
-    const declarationFile = path.join(packageRoot, 'generated-icons.ts')
+		const packageRoot = path.resolve(__dirname, '..')
+		const iconsDir = path.join(packageRoot, 'icons')
+		const declarationFile = path.join(packageRoot, 'generated-icons.ts')
 
-    const expectedExports = getExpectedIconExports(iconsDir)
-    const actualExports = getActualIconExports(declarationFile)
+		const expectedExports = getExpectedIconExports(iconsDir)
+		const actualExports = getActualIconExports(declarationFile)
 
-    const missingExports = expectedExports.filter((name) => !actualExports.includes(name))
-    const extraExports = actualExports.filter((name) => !expectedExports.includes(name))
+		const missingExports = expectedExports.filter((name) => !actualExports.includes(name))
+		const extraExports = actualExports.filter((name) => !expectedExports.includes(name))
 
-    if (missingExports.length > 0) {
-      console.error(`❌ Missing icon exports: ${missingExports.join(', ')}`)
-      console.error("Run 'pnpm run fix' to generate them.")
-      process.exit(1)
-    }
+		if (missingExports.length > 0) {
+			console.error(`❌ Missing icon exports: ${missingExports.join(', ')}`)
+			console.error("Run 'pnpm run fix' to generate them.")
+			process.exit(1)
+		}
 
-    if (extraExports.length > 0) {
-      console.error(
-        `❌ Extra icon exports (no corresponding SVG files): ${extraExports.join(', ')}`,
-      )
-      console.error("Run 'pnpm run fix' to clean them up.")
-      process.exit(1)
-    }
+		if (extraExports.length > 0) {
+			console.error(
+				`❌ Extra icon exports (no corresponding SVG files): ${extraExports.join(', ')}`,
+			)
+			console.error("Run 'pnpm run fix' to clean them up.")
+			process.exit(1)
+		}
 
-    console.log('✅ Icon exports are consistent with SVG files')
-  } catch (error) {
-    console.error('❌ Error validating icons:', error)
-    process.exit(1)
-  }
+		console.log('✅ Icon exports are consistent with SVG files')
+	} catch (error) {
+		console.error('❌ Error validating icons:', error)
+		process.exit(1)
+	}
 }
