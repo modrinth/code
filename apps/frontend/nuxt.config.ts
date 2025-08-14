@@ -276,7 +276,6 @@ export default defineNuxtConfig({
             posix: true,
           })) {
             const tag = basename(localeDir);
-            console.log(`Checking dir ${localeDir}`);
             if (!omorphiaLocales.includes(tag)) {
               omorphiaLocales.push(tag);
             }
@@ -289,7 +288,6 @@ export default defineNuxtConfig({
                 from: pathToFileURL(localeFile).toString(),
                 format: "default",
               });
-              console.log(`Pushing file ${pathToFileURL(localeFile).toString()}`);
             }
           }
         }
