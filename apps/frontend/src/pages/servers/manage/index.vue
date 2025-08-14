@@ -115,16 +115,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from "vue";
-import Fuse from "fuse.js";
+import { reloadNuxtApp } from "#app";
 import { HammerIcon, PlusIcon, SearchIcon } from "@modrinth/assets";
 import { ButtonStyled, CopyCode } from "@modrinth/ui";
-import type { Server, ModrinthServersFetchError } from "@modrinth/utils";
-import { reloadNuxtApp } from "#app";
+import type { ModrinthServersFetchError, Server } from "@modrinth/utils";
+import Fuse from "fuse.js";
 import type { ComponentPublicInstance } from "vue";
-import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import MedalServerListing from "~/components/ui/servers/marketing/MedalServerListing.vue";
 import ServersUpgradeModalWrapper from "~/components/ui/servers/ServersUpgradeModalWrapper.vue";
+import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 
 definePageMeta({
   middleware: "auth",
@@ -219,12 +219,13 @@ onUnmounted(() => {
     clearInterval(intervalId);
   }
 });
+
 type ServersUpgradeModalWrapperRef = ComponentPublicInstance<{
   open: (id: string) => void | Promise<void>;
 }>;
-const upgradeModal = ref<ServersUpgradeModalWrapperRef | null>(null);
 
-async function openUpgradeModal(serverId: string) {
+const upgradeModal = ref<ServersUpgradeModalWrapperRef | null>(null);
+function openUpgradeModal(serverId: string) {
   upgradeModal.value?.open(serverId);
 }
 </script>

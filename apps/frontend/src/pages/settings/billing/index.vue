@@ -624,14 +624,11 @@ import {
   OverflowMenu,
   PurchaseModal,
   commonMessages,
-} from "@modrinth/ui";
-import { calculateSavings, formatPrice, getCurrency } from "@modrinth/utils";
-import { computed, ref } from "vue";
-import ServersUpgradeModalWrapper from "~/components/ui/servers/ServersUpgradeModalWrapper.vue";
   injectNotificationManager,
 } from "@modrinth/ui";
 import { calculateSavings, formatPrice, getCurrency } from "@modrinth/utils";
 import { computed, ref } from "vue";
+import ServersUpgradeModalWrapper from "~/components/ui/servers/ServersUpgradeModalWrapper.vue";
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import { products } from "~/generated/state.json";
 
@@ -991,40 +988,9 @@ const getPlanChangeVerb = (currentProduct, nextProduct) => {
 const modalCancel = ref(null);
 
 const upgradeModal = ref(null);
-const showPyroUpgradeModal = async (subscription) => {
+const showPyroUpgradeModal = (subscription) => {
   upgradeModal.value?.open(subscription?.metadata?.id);
 };
-
-async function fetchCapacityStatuses(serverId, product) {
-  if (product) {
-    try {
-      return {
-        custom: await useServersFetch(`servers/${serverId}/upgrade-stock`, {
-          method: "POST",
-          body: {
-            cpu: product.metadata.cpu,
-            memory_mb: product.metadata.ram,
-            swap_mb: product.metadata.swap,
-            storage_mb: product.metadata.storage,
-          },
-        }),
-      };
-    } catch (error) {
-      console.error("Error checking server capacities:", error);
-      addNotification({
-        title: "Error checking server capacities",
-        text: error,
-        type: "error",
-      });
-      return {
-        custom: { available: 0 },
-        small: { available: 0 },
-        medium: { available: 0 },
-        large: { available: 0 },
-      };
-    }
-  }
-}
 
 const resubscribePyro = async (subscriptionId, wasSuspended) => {
   try {
