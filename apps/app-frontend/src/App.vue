@@ -31,7 +31,6 @@ import { get_opening_command, initialize_state } from '@/helpers/state'
 import { areUpdatesEnabled, getOS, isDev } from '@/helpers/utils.js'
 import { useError } from '@/store/error.js'
 import { useInstall } from '@/store/install.js'
-import { handleError } from '@/store/notifications.js'
 import { useLoading, useTheming } from '@/store/state'
 import {
   ArrowBigUpDashIcon,

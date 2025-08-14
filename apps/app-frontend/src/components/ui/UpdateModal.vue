@@ -67,12 +67,16 @@
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { useTemplateRef, ref, computed } from 'vue'
-import { AppearingProgressBar, ButtonStyled, JoinedButtons } from '@modrinth/ui'
+import {
+  AppearingProgressBar,
+  ButtonStyled,
+  injectNotificationManager,
+  JoinedButtons,
+} from '@modrinth/ui'
 import type { JoinedButtonAction } from '@modrinth/ui'
 import { ExternalIcon, DownloadIcon, RedoIcon, ClipboardCopyIcon, XIcon } from '@modrinth/assets'
 import { enqueueUpdateForInstallation, getUpdateSize } from '@/helpers/utils'
 import { formatBytes } from '@modrinth/utils'
-import { handleError } from '@/store/notifications'
 import { loading_listener } from '@/helpers/events'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -152,6 +156,8 @@ const copiedError = ref(false)
 const downloadError = ref<Error | null>(null)
 
 const enqueuedUpdate = ref<string | null>(null)
+
+const { handleError } = injectNotificationManager()
 
 const installActions = computed<JoinedButtonAction[]>(() => [
   {
