@@ -469,8 +469,7 @@
       "
       :on-error="
         (err) =>
-          data.$notify({
-            group: 'main',
+          addNotification({
             title: 'An error occurred',
             type: 'error',
             text: err.message ?? (err.data ? err.data.description : err),
@@ -629,14 +628,18 @@ import {
 import { calculateSavings, formatPrice, getCurrency } from "@modrinth/utils";
 import { computed, ref } from "vue";
 import ServersUpgradeModalWrapper from "~/components/ui/servers/ServersUpgradeModalWrapper.vue";
+  injectNotificationManager,
+} from "@modrinth/ui";
+import { calculateSavings, formatPrice, getCurrency } from "@modrinth/utils";
+import { computed, ref } from "vue";
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import { products } from "~/generated/state.json";
 
+const { addNotification } = injectNotificationManager();
 definePageMeta({
   middleware: "auth",
 });
 
-const app = useNuxtApp();
 const auth = await useAuth();
 const baseId = useId();
 
@@ -650,7 +653,6 @@ useHead({
   ],
 });
 
-const data = useNuxtApp();
 const config = useRuntimeConfig();
 
 const vintl = useVIntl();
@@ -891,8 +893,7 @@ async function editPaymentMethod(index, primary) {
     });
     await refresh();
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -910,8 +911,7 @@ async function removePaymentMethod(index) {
     });
     await refresh();
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -933,8 +933,7 @@ async function cancelSubscription(id, cancelled) {
     });
     await refresh();
   } catch (err) {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "An error occurred",
       text: err.data ? err.data.description : err,
       type: "error",
@@ -1012,8 +1011,7 @@ async function fetchCapacityStatuses(serverId, product) {
       };
     } catch (error) {
       console.error("Error checking server capacities:", error);
-      app.$notify({
-        group: "main",
+      addNotification({
         title: "Error checking server capacities",
         text: error,
         type: "error",
@@ -1039,23 +1037,20 @@ const resubscribePyro = async (subscriptionId, wasSuspended) => {
     });
     await refresh();
     if (wasSuspended) {
-      data.$notify({
-        group: "main",
+      addNotification({
         title: "Resubscription request submitted",
         text: "If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.",
         type: "success",
       });
     } else {
-      data.$notify({
-        group: "main",
+      addNotification({
         title: "Success",
         text: "Server subscription resubscribed successfully",
         type: "success",
       });
     }
   } catch {
-    data.$notify({
-      group: "main",
+    addNotification({
       title: "Error resubscribing",
       text: "An error occurred while resubscribing to your Modrinth server.",
       type: "error",

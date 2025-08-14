@@ -101,10 +101,12 @@
 </template>
 
 <script setup lang="ts">
-import { FolderOpenIcon, CheckCircleIcon, XCircleIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
-import { ref, computed, watch, nextTick } from "vue";
+import { CheckCircleIcon, FolderOpenIcon, XCircleIcon } from "@modrinth/assets";
+import { ButtonStyled, injectNotificationManager } from "@modrinth/ui";
+import { computed, nextTick, ref, watch } from "vue";
 import { FSModule } from "~/composables/servers/modules/fs.ts";
+
+const { addNotification } = injectNotificationManager();
 
 interface UploadItem {
   file: File;
@@ -282,7 +284,6 @@ const uploadFile = async (file: File) => {
 
     if (error instanceof Error && error.message !== "Upload cancelled") {
       addNotification({
-        group: "files",
         title: "Upload failed",
         text: `Failed to upload ${file.name}`,
         type: "error",

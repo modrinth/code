@@ -99,7 +99,10 @@
 import { ChevronRightIcon, HistoryIcon } from "@modrinth/assets";
 import { Avatar } from "@modrinth/ui";
 import NotificationItem from "~/components/ui/NotificationItem.vue";
-import { fetchExtraNotificationData, groupNotifications } from "~/helpers/notifications.ts";
+import {
+  fetchExtraNotificationData,
+  groupNotifications,
+} from "~/helpers/platform-notifications.ts";
 
 useHead({
   title: "Dashboard - Modrinth",

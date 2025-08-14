@@ -1,510 +1,478 @@
 <template>
-  <div v-if="showInvitation" class="universal-card information invited">
-    <h2>Invitation to join project</h2>
-    <p>
-      You've been invited be a member of this project with the role of '{{ currentMember.role }}'.
+  <div v-if="showInvitation" class="universal-card information invited my-4">
+    <h2>{{ getFormattedMessage(messages.invitationTitle) }}</h2>
+    <p v-if="currentMember?.project_role">
+      {{ formatMessage(messages.invitationWithRole, { role: currentMember.project_role }) }}
     </p>
+    <p v-else>{{ getFormattedMessage(messages.invitationNoRole) }}</p>
     <div class="input-group">
-      <button class="iconified-button brand-button" @click="acceptInvite()">
-        <CheckIcon />
-        Accept
-      </button>
-      <button class="iconified-button danger-button" @click="declineInvite()">
-        <XIcon />
-        Decline
-      </button>
+      <ButtonStyled color="brand">
+        <button class="brand-button" @click="acceptInvite()">
+          <CheckIcon />
+          {{ getFormattedMessage(messages.accept) }}
+        </button>
+      </ButtonStyled>
+      <ButtonStyled color="red">
+        <button @click="declineInvite">
+          <XIcon />
+          {{ getFormattedMessage(messages.decline) }}
+        </button>
+      </ButtonStyled>
     </div>
   </div>
   <div
     v-if="
       currentMember &&
-      nags.filter((x) => x.condition).length > 0 &&
+      visibleNags.length > 0 &&
       (project.status === 'draft' || tags.rejectedStatuses.includes(project.status))
     "
-    class="author-actions universal-card mb-4"
+    class="universal-card my-4"
   >
-    <div class="header__row">
-      <div class="header__title">
-        <h2>Publishing checklist</h2>
-        <div class="checklist">
-          <span class="checklist__title">Progress:</span>
-          <div class="checklist__items">
-            <div
-              v-for="nag in nags"
-              :key="`checklist-${nag.id}`"
-              v-tooltip="nag.title"
-              :aria-label="nag.title"
-              :class="'circle ' + (!nag.condition ? 'done' : '') + nag.status"
-              class="circle"
-            >
-              <CheckIcon v-if="!nag.condition" />
-              <AsteriskIcon v-else-if="nag.status === 'required'" />
-              <LightBulbIcon v-else-if="nag.status === 'suggestion'" />
-              <ScaleIcon v-else-if="nag.status === 'review'" />
-            </div>
+    <div class="flex max-w-full flex-wrap items-center gap-x-6 gap-y-4">
+      <div class="flex flex-auto flex-wrap items-center gap-x-6 gap-y-4">
+        <h2 class="my-0 mr-auto">{{ getFormattedMessage(messages.publishingChecklist) }}</h2>
+        <div class="flex flex-row gap-2">
+          <div class="flex items-center gap-1">
+            <AsteriskIcon class="size-4 text-red" />
+            <span class="text-secondary">{{ getFormattedMessage(messages.required) }}</span>
+          </div>
+          |
+          <div class="flex items-center gap-1">
+            <TriangleAlertIcon class="size-4 text-orange" />
+            <span class="text-secondary">{{ getFormattedMessage(messages.warning) }}</span>
+          </div>
+          |
+          <div class="flex items-center gap-1">
+            <LightBulbIcon class="size-4 text-purple" />
+            <span class="text-secondary">{{ getFormattedMessage(messages.suggestion) }}</span>
           </div>
         </div>
       </div>
       <div class="input-group">
-        <button
-          :class="{ 'not-collapsed': !collapsed }"
-          class="square-button"
-          @click="toggleCollapsed()"
-        >
-          <DropdownIcon />
-        </button>
+        <ButtonStyled circular>
+          <button :class="!collapsed && '[&>svg]:rotate-180'" @click="toggleCollapsed()">
+            <DropdownIcon class="duration-250 transition-transform ease-in-out" />
+          </button>
+        </ButtonStyled>
       </div>
     </div>
-    <div v-if="!collapsed" class="grid-display width-16">
-      <div
-        v-for="nag in nags.filter((x) => x.condition && !x.hide)"
-        :key="nag.id"
-        class="grid-display__item"
-      >
-        <span class="label">
-          <AsteriskIcon
-            v-if="nag.status === 'required'"
-            v-tooltip="'Required'"
-            :class="nag.status"
-            aria-label="Required"
+    <div v-if="!collapsed" class="grid-display width-16 mt-4">
+      <div v-for="nag in visibleNags" :key="nag.id" class="grid-display__item">
+        <span class="flex items-center gap-2 font-semibold">
+          <component
+            :is="nag.icon || getDefaultIcon(nag.status)"
+            v-tooltip="getStatusTooltip(nag.status)"
+            :class="[
+              'size-4',
+              nag.status === 'required' && 'text-red',
+              nag.status === 'warning' && 'text-orange',
+              nag.status === 'suggestion' && 'text-purple',
+            ]"
+            :aria-label="getStatusTooltip(nag.status)"
           />
-          <LightBulbIcon
-            v-else-if="nag.status === 'suggestion'"
-            v-tooltip="'Suggestion'"
-            :class="nag.status"
-            aria-label="Suggestion"
-          />
-          <ScaleIcon
-            v-else-if="nag.status === 'review'"
-            v-tooltip="'Review'"
-            :class="nag.status"
-            aria-label="Review"
-          />{{ nag.title }}</span
-        >
-        {{ nag.description }}
+          {{ getFormattedMessage(nag.title) }}
+        </span>
+        {{ getNagDescription(nag) }}
         <NuxtLink
-          v-if="nag.link"
-          :class="{ invisible: nag.link.hide }"
+          v-if="nag.link && shouldShowLink(nag)"
           :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/${
             nag.link.path
           }`"
           class="goto-link"
         >
-          {{ nag.link.title }}
+          {{ getFormattedMessage(nag.link.title) }}
           <ChevronRightIcon aria-hidden="true" class="featured-header-chevron" />
         </NuxtLink>
-        <button
-          v-else-if="nag.action"
-          :disabled="nag.action.disabled()"
-          class="btn btn-orange"
-          @click="nag.action.onClick"
+        <ButtonStyled
+          v-if="nag.status === 'special-submit-action' && nag.id === 'submit-for-review'"
+          color="orange"
+          @click="submitForReview"
         >
-          <SendIcon />
-          {{ nag.action.title }}
-        </button>
+          <button
+            :disabled="!canSubmitForReview"
+            v-tooltip="
+              !canSubmitForReview ? getFormattedMessage(messages.submitChecklistTooltip) : undefined
+            "
+          >
+            <SendIcon />
+            {{ getFormattedMessage(messages.submitForReview) }}
+          </button>
+        </ButtonStyled>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
-  ChevronRightIcon,
-  CheckIcon,
-  XIcon,
   AsteriskIcon,
-  LightBulbIcon,
-  SendIcon,
-  ScaleIcon,
+  CheckIcon,
+  ChevronRightIcon,
   DropdownIcon,
+  LightBulbIcon,
+  ScaleIcon,
+  SendIcon,
+  TriangleAlertIcon,
+  XIcon,
 } from "@modrinth/assets";
-import { formatProjectType } from "@modrinth/utils";
+import type { Nag, NagContext, NagStatus } from "@modrinth/moderation";
+import { nags } from "@modrinth/moderation";
+import { ButtonStyled, injectNotificationManager } from "@modrinth/ui";
+import type { Project, User, Version } from "@modrinth/utils";
+import { defineMessages, useVIntl, type MessageDescriptor } from "@vintl/vintl";
+import type { Component } from "vue";
 import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
 
-const props = defineProps({
-  project: {
-    type: Object,
-    required: true,
+const { addNotification } = injectNotificationManager();
+
+interface Tags {
+  rejectedStatuses: string[];
+}
+
+interface Auth {
+  user: {
+    id: string;
+  };
+}
+
+interface Member {
+  accepted?: boolean;
+  project_role?: string;
+  user?: Partial<User>;
+}
+
+interface Props {
+  project: Project;
+  versions?: Version[];
+  currentMember?: Member | null;
+  allMembers?: Member[] | null;
+  isSettings?: boolean;
+  collapsed?: boolean;
+  routeName?: string;
+  auth: Auth;
+  tags: Tags;
+  setProcessing?: (processing: boolean) => void;
+  toggleCollapsed?: () => void;
+  updateMembers?: () => void | Promise<void>;
+}
+
+const messages = defineMessages({
+  invitationTitle: {
+    id: "project-member-header.invitation-title",
+    defaultMessage: "Invitation to join project",
   },
-  versions: {
-    type: Array,
-    default() {
-      return [];
-    },
+  invitationWithRole: {
+    id: "project-member-header.invitation-with-role",
+    defaultMessage: "You've been invited be a member of this project with the role of '{role}'.",
   },
-  currentMember: {
-    type: Object,
-    default: null,
+  invitationNoRole: {
+    id: "project-member-header.invitation-no-role",
+    defaultMessage:
+      "You've been invited to join this project. Please accept or decline the invitation.",
   },
-  allMembers: {
-    type: Object,
-    default: null,
+  accept: {
+    id: "project-member-header.accept",
+    defaultMessage: "Accept",
   },
-  isSettings: {
-    type: Boolean,
-    default: false,
+  decline: {
+    id: "project-member-header.decline",
+    defaultMessage: "Decline",
   },
-  collapsed: {
-    type: Boolean,
-    default: false,
+  publishingChecklist: {
+    id: "project-member-header.publishing-checklist",
+    defaultMessage: "Publishing checklist",
   },
-  routeName: {
-    type: String,
-    default: "",
+  submitForReview: {
+    id: "project-member-header.submit-for-review",
+    defaultMessage: "Submit for review",
   },
-  auth: {
-    type: Object,
-    required: true,
+  submitForReviewDesc: {
+    id: "project-member-header.submit-for-review-desc",
+    defaultMessage:
+      "Your project is only viewable by members of the project. It must be reviewed by moderators in order to be published.",
   },
-  tags: {
-    type: Object,
-    required: true,
+  resubmitForReview: {
+    id: "project-member-header.resubmit-for-review",
+    defaultMessage: "Resubmit for review",
   },
-  setProcessing: {
-    type: Function,
-    default() {
-      return () => {
-        addNotification({
-          group: "main",
-          title: "An error occurred",
-          text: "setProcessing function not found",
-          type: "error",
-        });
-      };
-    },
+  resubmitForReviewDesc: {
+    id: "project-member-header.resubmit-for-review-desc",
+    defaultMessage:
+      "Your project has been {status} by Modrinth's staff. In most cases, you can resubmit for review after addressing the staff's message.",
   },
-  toggleCollapsed: {
-    type: Function,
-    default() {
-      return () => {
-        addNotification({
-          group: "main",
-          title: "An error occurred",
-          text: "toggleCollapsed function not found",
-          type: "error",
-        });
-      };
-    },
+  showKey: {
+    id: "project-member-header.show-key",
+    defaultMessage: "Toggle key",
   },
-  updateMembers: {
-    type: Function,
-    default() {
-      return () => {
-        addNotification({
-          group: "main",
-          title: "An error occurred",
-          text: "updateMembers function not found",
-          type: "error",
-        });
-      };
-    },
+  keyTitle: {
+    id: "project-member-header.key-title",
+    defaultMessage: "Status Key",
+  },
+  action: {
+    id: "project-member-header.action",
+    defaultMessage: "Action",
+  },
+  visitModerationPage: {
+    id: "project-member-header.visit-moderation-page",
+    defaultMessage: "Visit moderation page",
+  },
+  submitChecklistTooltip: {
+    id: "project-member-header.submit-checklist-tooltip",
+    defaultMessage: "You must complete the required steps in the publishing checklist!",
+  },
+  successJoin: {
+    id: "project-member-header.success-join",
+    defaultMessage: "You have joined the project team",
+  },
+  errorJoin: {
+    id: "project-member-header.error-join",
+    defaultMessage: "Failed to accept team invitation",
+  },
+  successDecline: {
+    id: "project-member-header.success-decline",
+    defaultMessage: "You have declined the team invitation",
+  },
+  errorDecline: {
+    id: "project-member-header.error-decline",
+    defaultMessage: "Failed to decline team invitation",
+  },
+  success: {
+    id: "project-member-header.success",
+    defaultMessage: "Success",
+  },
+  error: {
+    id: "project-member-header.error",
+    defaultMessage: "Error",
+  },
+  required: {
+    id: "project-member-header.required",
+    defaultMessage: "Required",
+  },
+  warning: {
+    id: "project-member-header.warning",
+    defaultMessage: "Warning",
+  },
+  suggestion: {
+    id: "project-member-header.suggestion",
+    defaultMessage: "Suggestion",
   },
 });
 
-const featuredGalleryImage = computed(() => props.project.gallery.find((img) => img.featured));
+const { formatMessage } = useVIntl();
 
-const nags = computed(() => [
-  {
-    condition: props.versions.length < 1,
-    title: "Upload a version",
-    id: "upload-version",
-    description: "At least one version is required for a project to be submitted for review.",
-    status: "required",
-    link: {
-      path: "versions",
-      title: "Visit versions page",
-      hide: props.routeName === "type-id-versions",
-    },
-  },
-  {
-    condition:
-      props.project.body === "" || props.project.body.startsWith("# Placeholder description"),
-    title: "Add a description",
-    id: "add-description",
-    description:
-      "A description that clearly describes the project's purpose and function is required.",
-    status: "required",
-    link: {
-      path: "settings/description",
-      title: "Visit description settings",
-      hide: props.routeName === "type-id-settings-description",
-    },
-  },
-  {
-    condition: !props.project.icon_url,
-    title: "Add an icon",
-    id: "add-icon",
-    description:
-      "Your project should have a nice-looking icon to uniquely identify your project at a glance.",
-    status: "suggestion",
-    link: {
-      path: "settings",
-      title: "Visit general settings",
-      hide: props.routeName === "type-id-settings",
-    },
-  },
-  {
-    condition: props.project.gallery.length === 0 || !featuredGalleryImage,
-    title: "Feature a gallery image",
-    id: "feature-gallery-image",
-    description: "Featured gallery images may be the first impression of many users.",
-    status: "suggestion",
-    link: {
-      path: "gallery",
-      title: "Visit gallery page",
-      hide: props.routeName === "type-id-gallery",
-    },
-  },
-  {
-    hide: props.project.versions.length === 0,
-    condition: props.project.categories.length < 1,
-    title: "Select tags",
-    id: "select-tags",
-    description: "Select all tags that apply to your project.",
-    status: "suggestion",
-    link: {
-      path: "settings/tags",
-      title: "Visit tag settings",
-      hide: props.routeName === "type-id-settings-tags",
-    },
-  },
-  {
-    condition: !(
-      props.project.issues_url ||
-      props.project.source_url ||
-      props.project.wiki_url ||
-      props.project.discord_url ||
-      props.project.donation_urls.length > 0
-    ),
-    title: "Add external links",
-    id: "add-links",
-    description:
-      "Add any relevant links targeted outside of Modrinth, such as sources, issues, or a Discord invite.",
-    status: "suggestion",
-    link: {
-      path: "settings/links",
-      title: "Visit links settings",
-      hide: props.routeName === "type-id-settings-links",
-    },
-  },
-  {
-    hide:
-      props.project.versions.length === 0 ||
-      props.project.project_type === "resourcepack" ||
-      props.project.project_type === "plugin" ||
-      props.project.project_type === "shader" ||
-      props.project.project_type === "datapack",
-    condition:
-      props.project.client_side === "unknown" ||
-      props.project.server_side === "unknown" ||
-      (props.project.client_side === "unsupported" && props.project.server_side === "unsupported"),
-    title: "Select supported environments",
-    id: "select-environments",
-    description: `Select if the ${formatProjectType(
-      props.project.project_type,
-    ).toLowerCase()} functions on the client-side and/or server-side.`,
-    status: "required",
-    link: {
-      path: "settings",
-      title: "Visit general settings",
-      hide: props.routeName === "type-id-settings",
-    },
-  },
-  {
-    condition: props.project.license.id === "LicenseRef-Unknown",
-    title: "Select license",
-    id: "select-license",
-    description: `Select the license your ${formatProjectType(
-      props.project.project_type,
-    ).toLowerCase()} is distributed under.`,
-    status: "required",
-    link: {
-      path: "settings/license",
-      title: "Visit license settings",
-      hide: props.routeName === "type-id-settings-license",
-    },
-  },
-  {
-    condition: props.project.status === "draft",
-    title: "Submit for review",
-    id: "submit-for-review",
-    description:
-      "Your project is only viewable by members of the project. It must be reviewed by moderators in order to be published.",
-    status: "review",
-    link: null,
-    action: {
-      onClick: submitForReview,
-      title: "Submit for review",
-      disabled: () => nags.value.filter((x) => x.condition && x.status === "required").length > 0,
-    },
-  },
-  {
-    hide: props.project.stats === "draft",
-    condition: props.tags.rejectedStatuses.includes(props.project.status),
-    title: "Resubmit for review",
-    id: "resubmit-for-review",
-    description: `Your project has been ${props.project.status} by
-            Modrinth's staff. In most cases, you can resubmit for review after
-            addressing the staff's message.`,
-    status: "review",
-    link: {
-      path: "moderation",
-      title: "Visit moderation page",
-      hide: props.routeName === "type-id-moderation",
-    },
-  },
-]);
+function getNagDescription(nag: Nag): string {
+  if (typeof nag.description === "function") {
+    return nag.description(nagContext.value);
+  }
+  return formatMessage(nag.description);
+}
 
-const showInvitation = computed(() => {
+function getFormattedMessage(message: string | MessageDescriptor): string {
+  if (typeof message === "string") {
+    return message;
+  }
+  return formatMessage(message);
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  versions: () => [],
+  currentMember: null,
+  allMembers: null,
+  isSettings: false,
+  collapsed: false,
+  routeName: "",
+});
+
+const emit = defineEmits<{
+  toggleCollapsed: [];
+  updateMembers: [];
+  setProcessing: [processing: boolean];
+}>();
+
+const nagContext = computed<NagContext>(() => ({
+  project: props.project,
+  versions: props.versions,
+  currentMember: props.currentMember as User,
+  currentRoute: props.routeName,
+  tags: props.tags,
+  submitProject: submitForReview,
+}));
+
+const showKey = ref(false);
+function toggleKey(): void {
+  showKey.value = !showKey.value;
+}
+
+const canSubmitForReview = computed(() => {
+  return (
+    applicableNags.value.filter((nag) => nag.status === "required" && !isNagComplete(nag))
+      .length === 0
+  );
+});
+
+async function submitForReview() {
+  if (canSubmitForReview) {
+    await setProcessing(true);
+  }
+}
+
+const applicableNags = computed<Nag[]>(() => {
+  return nags.filter((nag) => {
+    return nag.shouldShow(nagContext.value);
+  });
+});
+
+function isNagComplete(nag: Nag): boolean {
+  const context = nagContext.value;
+  return !nag.shouldShow(context);
+}
+
+const visibleNags = computed<Nag[]>(() => {
+  const finalNags = applicableNags.value.filter((nag) => !isNagComplete(nag));
+
+  if (props.project.status === "draft") {
+    finalNags.push({
+      id: "submit-for-review",
+      title: messages.submitForReview,
+      description: () => formatMessage(messages.submitForReviewDesc),
+      status: "special-submit-action",
+      shouldShow: (ctx) => ctx.project.status === "draft",
+    });
+  }
+
+  if (props.tags.rejectedStatuses.includes(props.project.status)) {
+    finalNags.push({
+      id: "resubmit-for-review",
+      title: messages.resubmitForReview,
+      description: (ctx) =>
+        formatMessage(messages.resubmitForReviewDesc, { status: ctx.project.status }),
+      status: "special-submit-action",
+      shouldShow: (ctx) => ctx.tags.rejectedStatuses.includes(ctx.project.status),
+      link: {
+        path: "moderation",
+        title: messages.visitModerationPage,
+        shouldShow: () => props.routeName !== "type-id-moderation",
+      },
+    });
+  }
+
+  finalNags.sort((a, b) => {
+    const statusOrder = { required: 0, warning: 1, suggestion: 2, "special-submit-action": 3 };
+    return statusOrder[a.status] - statusOrder[b.status];
+  });
+
+  return finalNags;
+});
+
+function shouldShowLink(nag: Nag): boolean {
+  return nag.link?.shouldShow ? nag.link.shouldShow(nagContext.value) : false;
+}
+
+function getDefaultIcon(status: NagStatus): Component {
+  switch (status) {
+    case "required":
+      return AsteriskIcon;
+    case "warning":
+      return TriangleAlertIcon;
+    case "suggestion":
+      return LightBulbIcon;
+    case "special-submit-action":
+      return ScaleIcon;
+    default:
+      return AsteriskIcon;
+  }
+}
+
+function getStatusTooltip(status: NagStatus): string {
+  switch (status) {
+    case "required":
+      return formatMessage(messages.required);
+    case "warning":
+      return formatMessage(messages.warning);
+    case "suggestion":
+      return formatMessage(messages.suggestion);
+    default:
+      return formatMessage(messages.required);
+  }
+}
+
+const showInvitation = computed<boolean>(() => {
   if (props.allMembers && props.auth) {
-    const member = props.allMembers.find((x) => x.user.id === props.auth.user.id);
-    return member && !member.accepted;
+    const member = props.allMembers.find((x) => x?.user?.id === props.auth.user.id);
+    return !!member && !member.accepted;
   }
   return false;
 });
 
-const acceptInvite = () => {
-  acceptTeamInvite(props.project.team);
-  props.updateMembers();
-};
-
-const declineInvite = () => {
-  removeTeamMember(props.project.team, props.auth.user.id);
-  props.updateMembers();
-};
-
-const submitForReview = async () => {
-  if (
-    !props.acknowledgedMessage ||
-    nags.value.filter((x) => x.condition && x.status === "required").length === 0
-  ) {
-    await props.setProcessing();
+function toggleCollapsed(): void {
+  if (props.toggleCollapsed) {
+    props.toggleCollapsed();
+  } else {
+    emit("toggleCollapsed");
   }
-};
+}
+
+async function updateMembers(): Promise<void> {
+  if (props.updateMembers) {
+    await props.updateMembers();
+  } else {
+    emit("updateMembers");
+  }
+}
+
+function setProcessing(processing: boolean): void {
+  if (props.setProcessing) {
+    props.setProcessing(processing);
+  } else {
+    emit("setProcessing", processing);
+  }
+}
+
+async function acceptInvite(): Promise<void> {
+  try {
+    setProcessing(true);
+    await acceptTeamInvite(props.project.team);
+    await updateMembers();
+    addNotification({
+      title: formatMessage(messages.success),
+      text: formatMessage(messages.successJoin),
+      type: "success",
+    });
+  } catch (error) {
+    addNotification({
+      title: formatMessage(messages.error),
+      text: formatMessage(messages.errorJoin),
+      type: "error",
+    });
+  } finally {
+    setProcessing(false);
+  }
+}
+
+async function declineInvite(): Promise<void> {
+  try {
+    setProcessing(true);
+    await removeTeamMember(props.project.team, props.auth.user.id);
+    await updateMembers();
+    addNotification({
+      title: formatMessage(messages.success),
+      text: formatMessage(messages.successDecline),
+      type: "success",
+    });
+  } catch (error) {
+    addNotification({
+      title: formatMessage(messages.error),
+      text: formatMessage(messages.errorDecline),
+      type: "error",
+    });
+  } finally {
+    setProcessing(false);
+  }
+}
 </script>
 
 <style lang="scss" scoped>
-.invited {
-}
-
-.author-actions {
-  margin-top: var(--spacing-card-md);
-
-  &:empty {
-    display: none;
-  }
-
-  .invisible {
-    visibility: hidden;
-  }
-
-  .header__row {
-    align-items: center;
-    column-gap: var(--spacing-card-lg);
-    row-gap: var(--spacing-card-md);
-    max-width: 100%;
-
-    .header__title {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      column-gap: var(--spacing-card-lg);
-      row-gap: var(--spacing-card-md);
-      flex-basis: min-content;
-
-      h2 {
-        margin: 0 auto 0 0;
-      }
-    }
-
-    button {
-      svg {
-        transition: transform 0.25s ease-in-out;
-      }
-
-      &.not-collapsed svg {
-        transform: rotate(180deg);
-      }
-    }
-  }
-
-  .grid-display__item .label {
-    display: flex;
-    gap: var(--spacing-card-xs);
-    align-items: center;
-
-    .required {
-      color: var(--color-red);
-    }
-
-    .suggestion {
-      color: var(--color-purple);
-    }
-
-    .review {
-      color: var(--color-orange);
-    }
-  }
-
-  .checklist {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: var(--spacing-card-xs);
-    width: fit-content;
-    flex-wrap: wrap;
-    max-width: 100%;
-
-    .checklist__title {
-      font-weight: bold;
-      margin-right: var(--spacing-card-xs);
-      color: var(--color-text-dark);
-    }
-
-    .checklist__items {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: var(--spacing-card-xs);
-      width: fit-content;
-      max-width: 100%;
-    }
-
-    .circle {
-      --circle-size: 2rem;
-      --background-color: var(--color-bg);
-      --content-color: var(--color-gray);
-      width: var(--circle-size);
-      height: var(--circle-size);
-      border-radius: 50%;
-      background-color: var(--background-color);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      svg {
-        color: var(--content-color);
-        width: calc(var(--circle-size) / 2);
-        height: calc(var(--circle-size) / 2);
-      }
-
-      &.required {
-        --content-color: var(--color-red);
-      }
-
-      &.suggestion {
-        --content-color: var(--color-purple);
-      }
-
-      &.review {
-        --content-color: var(--color-orange);
-      }
-
-      &.done {
-        --background-color: var(--color-green);
-        --content-color: var(--color-brand-inverted);
-      }
-    }
-  }
+.duration-250 {
+  transition-duration: 250ms;
 }
 </style>

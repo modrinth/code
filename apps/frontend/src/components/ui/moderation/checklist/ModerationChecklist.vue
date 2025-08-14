@@ -335,66 +335,67 @@
 
 <script lang="ts" setup>
 import {
-  LeftArrowIcon,
-  RightArrowIcon,
-  DropdownIcon,
-  XIcon,
-  ScaleIcon,
-  ListBulletedIcon,
-  FileTextIcon,
   BrushCleaningIcon,
   CheckIcon,
-  KeyboardIcon,
+  DropdownIcon,
   EyeOffIcon,
+  FileTextIcon,
+  KeyboardIcon,
+  LeftArrowIcon,
+  ListBulletedIcon,
+  RightArrowIcon,
+  ScaleIcon,
   ToggleLeftIcon,
   ToggleRightIcon,
+  XIcon,
 } from "@modrinth/assets";
 import {
+  type Action,
+  type ButtonAction,
+  type ConditionalButtonAction,
+  type DropdownAction,
+  type MultiSelectChipsAction,
+  type Stage,
+  type ToggleAction,
   checklist,
-  getActionIdForStage,
-  initializeActionState,
-  getActionMessage,
-  findMatchingVariant,
-  processMessage,
-  getVisibleInputs,
-  serializeActionStates,
   deserializeActionStates,
-  kebabToTitleCase,
-  flattenProjectVariables,
   expandVariables,
+  finalPermissionMessages,
+  findMatchingVariant,
+  flattenProjectVariables,
+  getActionIdForStage,
+  getActionMessage,
+  getVisibleInputs,
   handleKeybind,
+  initializeActionState,
+  kebabToTitleCase,
   keybinds,
+  processMessage,
+  serializeActionStates,
 } from "@modrinth/moderation";
 import {
   ButtonStyled,
-  Collapsible,
-  OverflowMenu,
-  type OverflowMenuOption,
   Checkbox,
+  Collapsible,
   DropdownSelect,
   MarkdownEditor,
+  OverflowMenu,
+  type OverflowMenuOption,
+  injectNotificationManager,
 } from "@modrinth/ui";
 import {
-  type Project,
-  renderHighlightedString,
   type ModerationJudgements,
   type ModerationModpackItem,
+  type Project,
   type ProjectStatus,
+  renderHighlightedString,
 } from "@modrinth/utils";
 import { computedAsync, useLocalStorage } from "@vueuse/core";
-import {
-  type Action,
-  type MultiSelectChipsAction,
-  type DropdownAction,
-  type ButtonAction,
-  type ToggleAction,
-  type ConditionalButtonAction,
-  type Stage,
-  finalPermissionMessages,
-} from "@modrinth/moderation";
-import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
-import KeybindsModal from "./ChecklistKeybindsModal.vue";
 import { useModerationStore } from "~/store/moderation.ts";
+import KeybindsModal from "./ChecklistKeybindsModal.vue";
+import ModpackPermissionsFlow from "./ModpackPermissionsFlow.vue";
+
+const { addNotification } = injectNotificationManager();
 
 const keybindsModal = ref<InstanceType<typeof KeybindsModal>>();
 
