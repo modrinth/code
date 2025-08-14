@@ -125,6 +125,22 @@ fn is_dev() -> bool {
     cfg!(debug_assertions)
 }
 
+#[tauri::command]
+fn is_portable() -> bool {
+    // Check for portable mode indicators
+    if std::env::var("MODRINTH_PORTABLE").is_ok() {
+        return true;
+    }
+
+    if let Ok(exe_path) = std::env::current_exe() {
+        if let Some(exe_dir) = exe_path.parent() {
+            return exe_dir.join("portable.txt").exists();
+        }
+    }
+
+    false
+}
+
 // Toggles decorations
 #[tauri::command]
 async fn toggle_decorations(b: bool, window: tauri::Window) -> api::Result<()> {
@@ -264,6 +280,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             is_dev,
+            is_portable,
             toggle_decorations,
             show_window,
             restart_app,

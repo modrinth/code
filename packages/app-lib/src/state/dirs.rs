@@ -23,8 +23,31 @@ impl DirectoryInfo {
     // Get the settings directory
     // init() is not needed for this function
     pub fn get_initial_settings_dir() -> Option<PathBuf> {
+        // Check for portable mode first
+        if let Some(portable_dir) = Self::get_portable_dir() {
+            return Some(portable_dir);
+        }
+
         Self::env_path("THESEUS_CONFIG_DIR")
             .or_else(|| Some(dirs::data_dir()?.join("ModrinthApp")))
+    }
+
+    /// Check if we're running in portable mode and return the portable directory
+    fn get_portable_dir() -> Option<PathBuf> {
+        let exe_path = std::env::current_exe().ok()?;
+        let exe_dir = exe_path.parent()?;
+
+        // Check if MODRINTH_PORTABLE environment variable is set
+        if std::env::var("MODRINTH_PORTABLE").is_ok() {
+            return Some(exe_dir.join("ModrinthAppData"));
+        }
+
+        // Check if a "portable.txt" file exists next to the executable
+        if exe_dir.join("portable.txt").exists() {
+            return Some(exe_dir.join("ModrinthAppData"));
+        }
+
+        None
     }
 
     /// Get all paths needed for Theseus to operate properly
@@ -42,8 +65,14 @@ impl DirectoryInfo {
             ))
         })?;
 
-        let config_dir =
-            config_dir.map_or_else(|| settings_dir.clone(), PathBuf::from);
+        let config_dir = config_dir.map_or_else(|| {
+            // In portable mode, use the same directory for both settings and config
+            if Self::get_portable_dir().is_some() {
+                settings_dir.clone()
+            } else {
+                settings_dir.clone()
+            }
+        }, PathBuf::from);
 
         Ok(Self {
             settings_dir,
