@@ -11,9 +11,9 @@
 //! [RFC 8252]: https://datatracker.ietf.org/doc/html/rfc8252
 
 use std::{
-    net::SocketAddr,
-    sync::{LazyLock, Mutex},
-    time::Duration,
+	net::SocketAddr,
+	sync::{LazyLock, Mutex},
+	time::Duration,
 };
 
 use hyper::body::Incoming;
@@ -33,16 +33,16 @@ static SERVER_SHUTDOWN: LazyLock<broadcast::Sender<()>> =
 pub async fn listen(
 	listen_socket_tx: oneshot::Sender<Result<SocketAddr, theseus::Error>>,
 ) -> Result<Option<String>, theseus::Error> {
-    let listener = match tcp_listen_any_loopback().await {
-        Ok(listener) => {
-            listen_socket_tx
-                .send(listener.local_addr().map_err(|e| {
-                    ErrorKind::OtherError(format!(
-                        "Failed to get auth code reply socket address: {e}"
-                    ))
-                    .into()
-                }))
-                .ok();
+	let listener = match tcp_listen_any_loopback().await {
+		Ok(listener) => {
+			listen_socket_tx
+				.send(listener.local_addr().map_err(|e| {
+					ErrorKind::OtherError(format!(
+						"Failed to get auth code reply socket address: {e}"
+					))
+					.into()
+				}))
+				.ok();
 
 			listener
 		}

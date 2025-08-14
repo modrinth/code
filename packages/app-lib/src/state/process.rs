@@ -38,48 +38,43 @@ impl ProcessManager {
 		}
 	}
 
-    #[allow(clippy::too_many_arguments)]
-    pub async fn insert_new_process(
-        &self,
-        profile_path: &str,
-        mut mc_command: Command,
-        post_exit_command: Option<String>,
-        logs_folder: PathBuf,
-        xml_logging: bool,
-        main_class_keep_alive: TempDir,
-        rpc_server: RpcServer,
-        post_process_init: impl AsyncFnOnce(
-            &ProcessMetadata,
-            &RpcServer,
-        ) -> crate::Result<()>,
-    ) -> crate::Result<ProcessMetadata> {
-        mc_command.stdout(std::process::Stdio::piped());
-        mc_command.stderr(std::process::Stdio::piped());
-        mc_command.stdin(std::process::Stdio::piped());
+	#[allow(clippy::too_many_arguments)]
+	pub async fn insert_new_process(
+		&self,
+		profile_path: &str,
+		mut mc_command: Command,
+		post_exit_command: Option<String>,
+		logs_folder: PathBuf,
+		xml_logging: bool,
+		main_class_keep_alive: TempDir,
+		rpc_server: RpcServer,
+		post_process_init: impl AsyncFnOnce(&ProcessMetadata, &RpcServer) -> crate::Result<()>,
+	) -> crate::Result<ProcessMetadata> {
+		mc_command.stdout(std::process::Stdio::piped());
+		mc_command.stderr(std::process::Stdio::piped());
+		mc_command.stdin(std::process::Stdio::piped());
 
 		let mut mc_proc = mc_command.spawn().map_err(IOError::from)?;
 
 		let stdout = mc_proc.stdout.take();
 		let stderr = mc_proc.stderr.take();
 
-        let mut process = Process {
-            metadata: ProcessMetadata {
-                uuid: Uuid::new_v4(),
-                start_time: Utc::now(),
-                profile_path: profile_path.to_string(),
-            },
-            child: mc_proc,
-            rpc_server,
-            _main_class_keep_alive: main_class_keep_alive,
-        };
+		let mut process = Process {
+			metadata: ProcessMetadata {
+				uuid: Uuid::new_v4(),
+				start_time: Utc::now(),
+				profile_path: profile_path.to_string(),
+			},
+			child: mc_proc,
+			rpc_server,
+			_main_class_keep_alive: main_class_keep_alive,
+		};
 
-        if let Err(e) =
-            post_process_init(&process.metadata, &process.rpc_server).await
-        {
-            tracing::error!("Failed to run post-process init: {e}");
-            let _ = process.child.kill().await;
-            return Err(e);
-        }
+		if let Err(e) = post_process_init(&process.metadata, &process.rpc_server).await {
+			tracing::error!("Failed to run post-process init: {e}");
+			let _ = process.child.kill().await;
+			return Err(e);
+		}
 
 		let metadata = process.metadata.clone();
 
@@ -153,16 +148,16 @@ impl ProcessManager {
 		self.processes.get(&id).map(|x| x.metadata.clone())
 	}
 
-    pub fn get_rpc(&self, id: Uuid) -> Option<RpcServer> {
-        self.processes.get(&id).map(|x| x.rpc_server.clone())
-    }
+	pub fn get_rpc(&self, id: Uuid) -> Option<RpcServer> {
+		self.processes.get(&id).map(|x| x.rpc_server.clone())
+	}
 
-    pub fn get_all(&self) -> Vec<ProcessMetadata> {
-        self.processes
-            .iter()
-            .map(|x| x.value().metadata.clone())
-            .collect()
-    }
+	pub fn get_all(&self) -> Vec<ProcessMetadata> {
+		self.processes
+			.iter()
+			.map(|x| x.value().metadata.clone())
+			.collect()
+	}
 
 	pub fn try_wait(&self, id: Uuid) -> crate::Result<Option<Option<ExitStatus>>> {
 		if let Some(mut process) = self.processes.get_mut(&id) {
@@ -201,10 +196,10 @@ pub struct ProcessMetadata {
 
 #[derive(Debug)]
 struct Process {
-    metadata: ProcessMetadata,
-    child: Child,
-    _main_class_keep_alive: TempDir,
-    rpc_server: RpcServer,
+	metadata: ProcessMetadata,
+	child: Child,
+	_main_class_keep_alive: TempDir,
+	rpc_server: RpcServer,
 }
 
 #[derive(Debug, Default)]

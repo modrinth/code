@@ -6,7 +6,7 @@
 	"types": "./index.d.ts",
 	"scripts": {
 		"lint": "eslint . && prettier --check .",
-		"fix": "pnpm run intl:extract && eslint . --fix && prettier --write .",
+		"fix": "eslint . --fix && prettier --write .",
 		"intl:extract": "formatjs extract \"**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" --ignore \"**/*.d.ts\" --ignore \"node_modules/**/*\" --out-file locales/en-US/index.json --preserve-whitespace"
 	},
 	"dependencies": {

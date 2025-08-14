@@ -12,6 +12,7 @@ import {
 	MaximizeIcon,
 	MinimizeIcon,
 	NewspaperIcon,
+	NotepadTextIcon,
 	PlusIcon,
 	RestoreIcon,
 	RightArrowIcon,
@@ -36,6 +37,7 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
 import { check } from '@tauri-apps/plugin-updater'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
+import { $fetch } from 'ofetch'
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
@@ -71,47 +73,7 @@ import { getOS, isDev, restartApp } from '@/helpers/utils.js'
 import { useError } from '@/store/error.js'
 import { useInstall } from '@/store/install.js'
 import { useLoading, useTheming } from '@/store/state'
-import {
-  ArrowBigUpDashIcon,
-  ChangeSkinIcon,
-  CompassIcon,
-  DownloadIcon,
-  HomeIcon,
-  LeftArrowIcon,
-  LibraryIcon,
-  LogInIcon,
-  LogOutIcon,
-  MaximizeIcon,
-  MinimizeIcon,
-  NewspaperIcon,
-  NotepadTextIcon,
-  PlusIcon,
-  RestoreIcon,
-  RightArrowIcon,
-  SettingsIcon,
-  WorldIcon,
-  XIcon,
-} from '@modrinth/assets'
-import {
-  Avatar,
-  Button,
-  ButtonStyled,
-  NewsArticleCard,
-  NotificationPanel,
-  OverflowMenu,
-  provideNotificationManager,
-} from '@modrinth/ui'
-import { renderString } from '@modrinth/utils'
-import { getVersion } from '@tauri-apps/api/app'
-import { invoke } from '@tauri-apps/api/core'
-import { getCurrentWindow } from '@tauri-apps/api/window'
-import { openUrl } from '@tauri-apps/plugin-opener'
-import { type } from '@tauri-apps/plugin-os'
-import { check } from '@tauri-apps/plugin-updater'
-import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
-import { $fetch } from 'ofetch'
-import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
-import { RouterView, useRoute, useRouter } from 'vue-router'
+
 import { create_profile_and_install_from_file } from './helpers/pack'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
 import { get_available_capes, get_available_skins } from './helpers/skins'
@@ -262,19 +224,19 @@ async function setupApp() {
 	checkUpdates()
 	fetchCredentials()
 
-  try {
-    const skins = (await get_available_skins()) ?? []
-    const capes = (await get_available_capes()) ?? []
-    generateSkinPreviews(skins, capes)
-  } catch (error) {
-    console.warn('Failed to generate skin previews in app setup.', error)
-  }
+	try {
+		const skins = (await get_available_skins()) ?? []
+		const capes = (await get_available_capes()) ?? []
+		generateSkinPreviews(skins, capes)
+	} catch (error) {
+		console.warn('Failed to generate skin previews in app setup.', error)
+	}
 
-  if (osType === 'windows') {
-    await processPendingSurveys()
-  } else {
-    console.info('Skipping user surveys on non-Windows platforms')
-  }
+	if (osType === 'windows') {
+		await processPendingSurveys()
+	} else {
+		console.info('Skipping user surveys on non-Windows platforms')
+	}
 }
 
 const stateFailed = ref(false)
@@ -464,386 +426,386 @@ function handleAuxClick(e) {
 }
 
 function cleanupOldSurveyDisplayData() {
-  const threeWeeksAgo = new Date()
-  threeWeeksAgo.setDate(threeWeeksAgo.getDate() - 21)
+	const threeWeeksAgo = new Date()
+	threeWeeksAgo.setDate(threeWeeksAgo.getDate() - 21)
 
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i)
+	for (let i = 0; i < localStorage.length; i++) {
+		const key = localStorage.key(i)
 
-    if (key.startsWith('survey-') && key.endsWith('-display')) {
-      const dateValue = new Date(localStorage.getItem(key))
-      if (dateValue < threeWeeksAgo) {
-        localStorage.removeItem(key)
-      }
-    }
-  }
+		if (key.startsWith('survey-') && key.endsWith('-display')) {
+			const dateValue = new Date(localStorage.getItem(key))
+			if (dateValue < threeWeeksAgo) {
+				localStorage.removeItem(key)
+			}
+		}
+	}
 }
 
 async function openSurvey() {
-  if (!availableSurvey.value) {
-    console.error('No survey to open')
-    return
-  }
+	if (!availableSurvey.value) {
+		console.error('No survey to open')
+		return
+	}
 
-  const creds = await getCreds().catch(handleError)
-  const userId = creds?.user_id
+	const creds = await getCreds().catch(handleError)
+	const userId = creds?.user_id
 
-  const formId = availableSurvey.value.tally_id
+	const formId = availableSurvey.value.tally_id
 
-  const popupOptions = {
-    layout: 'modal',
-    width: 700,
-    autoClose: 2000,
-    hideTitle: true,
-    hiddenFields: {
-      user_id: userId,
-    },
-    onOpen: () => console.info('Opened user survey'),
-    onClose: () => {
-      console.info('Closed user survey')
-      show_ads_window()
-    },
-    onSubmit: () => console.info('Active user survey submitted'),
-  }
+	const popupOptions = {
+		layout: 'modal',
+		width: 700,
+		autoClose: 2000,
+		hideTitle: true,
+		hiddenFields: {
+			user_id: userId,
+		},
+		onOpen: () => console.info('Opened user survey'),
+		onClose: () => {
+			console.info('Closed user survey')
+			show_ads_window()
+		},
+		onSubmit: () => console.info('Active user survey submitted'),
+	}
 
-  try {
-    hide_ads_window()
-    if (window.Tally?.openPopup) {
-      console.info(`Opening Tally popup for user survey (form ID: ${formId})`)
-      dismissSurvey()
-      window.Tally.openPopup(formId, popupOptions)
-    } else {
-      console.warn('Tally script not yet loaded')
-      show_ads_window()
-    }
-  } catch (e) {
-    console.error('Error opening Tally popup:', e)
-    show_ads_window()
-  }
+	try {
+		hide_ads_window()
+		if (window.Tally?.openPopup) {
+			console.info(`Opening Tally popup for user survey (form ID: ${formId})`)
+			dismissSurvey()
+			window.Tally.openPopup(formId, popupOptions)
+		} else {
+			console.warn('Tally script not yet loaded')
+			show_ads_window()
+		}
+	} catch (e) {
+		console.error('Error opening Tally popup:', e)
+		show_ads_window()
+	}
 
-  console.info(`Found user survey to show with tally_id: ${formId}`)
-  window.Tally.openPopup(formId, popupOptions)
+	console.info(`Found user survey to show with tally_id: ${formId}`)
+	window.Tally.openPopup(formId, popupOptions)
 }
 
 function dismissSurvey() {
-  localStorage.setItem(`survey-${availableSurvey.value.id}-display`, new Date())
-  availableSurvey.value = undefined
+	localStorage.setItem(`survey-${availableSurvey.value.id}-display`, new Date())
+	availableSurvey.value = undefined
 }
 
 async function processPendingSurveys() {
-  function isWithinLastTwoWeeks(date) {
-    const twoWeeksAgo = new Date()
-    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14)
-    return date >= twoWeeksAgo
-  }
+	function isWithinLastTwoWeeks(date) {
+		const twoWeeksAgo = new Date()
+		twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14)
+		return date >= twoWeeksAgo
+	}
 
-  cleanupOldSurveyDisplayData()
+	cleanupOldSurveyDisplayData()
 
-  const creds = await getCreds().catch(handleError)
-  const userId = creds?.user_id
+	const creds = await getCreds().catch(handleError)
+	const userId = creds?.user_id
 
-  const instances = await list().catch(handleError)
-  const isActivePlayer =
-    instances.findIndex(
-      (instance) =>
-        isWithinLastTwoWeeks(instance.last_played) && !isWithinLastTwoWeeks(instance.created),
-    ) >= 0
+	const instances = await list().catch(handleError)
+	const isActivePlayer =
+		instances.findIndex(
+			(instance) =>
+				isWithinLastTwoWeeks(instance.last_played) && !isWithinLastTwoWeeks(instance.created),
+		) >= 0
 
-  let surveys = []
-  try {
-    surveys = await $fetch('https://api.modrinth.com/v2/surveys')
-  } catch (e) {
-    console.error('Error fetching surveys:', e)
-  }
+	let surveys = []
+	try {
+		surveys = await $fetch('https://api.modrinth.com/v2/surveys')
+	} catch (e) {
+		console.error('Error fetching surveys:', e)
+	}
 
-  const surveyToShow = surveys.find(
-    (survey) =>
-      !!(
-        localStorage.getItem(`survey-${survey.id}-display`) === null &&
-        survey.type === 'tally_app' &&
-        ((survey.condition === 'active_player' && isActivePlayer) ||
-          (survey.assigned_users?.includes(userId) && !survey.dismissed_users?.includes(userId)))
-      ),
-  )
+	const surveyToShow = surveys.find(
+		(survey) =>
+			!!(
+				localStorage.getItem(`survey-${survey.id}-display`) === null &&
+				survey.type === 'tally_app' &&
+				((survey.condition === 'active_player' && isActivePlayer) ||
+					(survey.assigned_users?.includes(userId) && !survey.dismissed_users?.includes(userId)))
+			),
+	)
 
-  if (surveyToShow) {
-    availableSurvey.value = surveyToShow
-  } else {
-    console.info('No user survey to show')
-  }
+	if (surveyToShow) {
+		availableSurvey.value = surveyToShow
+	} else {
+		console.info('No user survey to show')
+	}
 }
 </script>
 
 <template>
-  <SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
-  <div id="teleports"></div>
-  <div v-if="stateInitialized" class="app-grid-layout experimental-styles-within relative">
-    <Suspense>
-      <AppSettingsModal ref="settingsModal" />
-    </Suspense>
-    <Suspense>
-      <AuthGrantFlowWaitModal ref="modrinthLoginFlowWaitModal" @flow-cancel="cancelLogin" />
-    </Suspense>
-    <Suspense>
-      <InstanceCreationModal ref="installationModal" />
-    </Suspense>
-    <div
-      class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.5rem] w-[--left-bar-width]"
-    >
-      <NavButton v-tooltip.right="'Home'" to="/">
-        <HomeIcon />
-      </NavButton>
-      <NavButton v-if="themeStore.featureFlags.worlds_tab" v-tooltip.right="'Worlds'" to="/worlds">
-        <WorldIcon />
-      </NavButton>
-      <NavButton
-        v-tooltip.right="'Discover content'"
-        to="/browse/modpack"
-        :is-primary="() => route.path.startsWith('/browse') && !route.query.i"
-        :is-subpage="(route) => route.path.startsWith('/project') && !route.query.i"
-      >
-        <CompassIcon />
-      </NavButton>
-      <NavButton v-tooltip.right="'Skins (Beta)'" to="/skins">
-        <ChangeSkinIcon />
-      </NavButton>
-      <NavButton
-        v-tooltip.right="'Library'"
-        to="/library"
-        :is-subpage="
-          () =>
-            route.path.startsWith('/instance') ||
-            ((route.path.startsWith('/browse') || route.path.startsWith('/project')) &&
-              route.query.i)
-        "
-      >
-        <LibraryIcon />
-      </NavButton>
-      <div class="h-px w-6 mx-auto my-2 bg-button-bg"></div>
-      <suspense>
-        <QuickInstanceSwitcher />
-      </suspense>
-      <NavButton
-        v-tooltip.right="'Create new instance'"
-        :to="() => $refs.installationModal.show()"
-        :disabled="offline"
-      >
-        <PlusIcon />
-      </NavButton>
-      <div class="flex flex-grow"></div>
-      <NavButton v-if="updateAvailable" v-tooltip.right="'Install update'" :to="() => restartApp()">
-        <DownloadIcon />
-      </NavButton>
-      <NavButton v-tooltip.right="'Settings'" :to="() => $refs.settingsModal.show()">
-        <SettingsIcon />
-      </NavButton>
-      <ButtonStyled v-if="credentials" type="transparent" circular>
-        <OverflowMenu
-          :options="[
-            {
-              id: 'sign-out',
-              action: () => logOut(),
-              color: 'danger',
-            },
-          ]"
-          direction="left"
-        >
-          <Avatar
-            :src="credentials.user.avatar_url"
-            :alt="credentials.user.username"
-            size="32px"
-            circle
-          />
-          <template #sign-out> <LogOutIcon /> Sign out </template>
-        </OverflowMenu>
-      </ButtonStyled>
-      <NavButton v-else v-tooltip.right="'Sign in'" :to="() => signIn()">
-        <LogInIcon />
-        <template #label>Sign in</template>
-      </NavButton>
-    </div>
-    <div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
-      <div data-tauri-drag-region class="flex p-3">
-        <ModrinthAppLogo class="h-full w-auto text-contrast pointer-events-none" />
-        <div class="flex items-center gap-1 ml-3">
-          <button
-            class="cursor-pointer p-0 m-0 text-contrast border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
-            @click="router.back()"
-          >
-            <LeftArrowIcon />
-          </button>
-          <button
-            class="cursor-pointer p-0 m-0 text-contrast border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
-            @click="router.forward()"
-          >
-            <RightArrowIcon />
-          </button>
-        </div>
-        <Breadcrumbs class="pt-[2px]" />
-      </div>
-      <section class="flex ml-auto items-center">
-        <ButtonStyled
-          v-if="!forceSidebar && themeStore.toggleSidebar"
-          :type="sidebarToggled ? 'standard' : 'transparent'"
-          circular
-        >
-          <button
-            class="mr-3 transition-transform"
-            :class="{ 'rotate-180': !sidebarToggled }"
-            @click="sidebarToggled = !sidebarToggled"
-          >
-            <RightArrowIcon />
-          </button>
-        </ButtonStyled>
-        <div class="flex mr-3">
-          <Suspense>
-            <RunningAppBar />
-          </Suspense>
-        </div>
-        <section v-if="!nativeDecorations" class="window-controls" data-tauri-drag-region-exclude>
-          <Button class="titlebar-button" icon-only @click="() => getCurrentWindow().minimize()">
-            <MinimizeIcon />
-          </Button>
-          <Button
-            class="titlebar-button"
-            icon-only
-            @click="() => getCurrentWindow().toggleMaximize()"
-          >
-            <RestoreIcon v-if="isMaximized" />
-            <MaximizeIcon v-else />
-          </Button>
-          <Button class="titlebar-button close" icon-only @click="handleClose">
-            <XIcon />
-          </Button>
-        </section>
-      </section>
-    </div>
-  </div>
-  <div
-    v-if="stateInitialized"
-    class="app-contents experimental-styles-within"
-    :class="{ 'sidebar-enabled': sidebarVisible }"
-  >
-    <div class="app-viewport flex-grow router-view">
-      <transition name="popup-survey">
-        <div
-          v-if="availableSurvey"
-          class="w-[400px] z-20 fixed -bottom-12 pb-16 right-[--right-bar-width] mr-4 rounded-t-2xl card-shadow bg-bg-raised border-divider border-[1px] border-solid border-b-0 p-4"
-        >
-          <h2 class="text-lg font-extrabold mt-0 mb-2">Hey there Modrinth user!</h2>
-          <p class="m-0 leading-tight">
-            Would you mind answering a few questions about your experience with Modrinth App?
-          </p>
-          <p class="mt-3 mb-4 leading-tight">
-            This feedback will go directly to the Modrinth team and help guide future updates!
-          </p>
-          <div class="flex gap-2">
-            <ButtonStyled color="brand">
-              <button @click="openSurvey"><NotepadTextIcon /> Take survey</button>
-            </ButtonStyled>
-            <ButtonStyled>
-              <button @click="dismissSurvey"><XIcon /> No thanks</button>
-            </ButtonStyled>
-          </div>
-        </div>
-      </transition>
-      <div
-        class="loading-indicator-container h-8 fixed z-50"
-        :style="{
-          top: 'calc(var(--top-bar-height))',
-          left: 'calc(var(--left-bar-width))',
-          width: 'calc(100% - var(--left-bar-width) - var(--right-bar-width))',
-        }"
-      >
-        <ModrinthLoadingIndicator />
-      </div>
-      <div
-        v-if="themeStore.featureFlags.page_path"
-        class="absolute bottom-0 left-0 m-2 bg-tooltip-bg text-tooltip-text font-semibold rounded-full px-2 py-1 text-xs z-50"
-      >
-        {{ route.fullPath }}
-      </div>
-      <div
-        id="background-teleport-target"
-        class="absolute h-full -z-10 rounded-tl-[--radius-xl] overflow-hidden"
-        :style="{
-          width: 'calc(100% - var(--right-bar-width))',
-        }"
-      ></div>
-      <div
-        v-if="criticalErrorMessage"
-        class="m-6 mb-0 flex flex-col border-red bg-bg-red rounded-2xl border-2 border-solid p-4 gap-1 font-semibold text-contrast"
-      >
-        <h1 class="m-0 text-lg font-extrabold">{{ criticalErrorMessage.header }}</h1>
-        <div
-          class="markdown-body text-primary"
-          v-html="renderString(criticalErrorMessage.body ?? '')"
-        ></div>
-      </div>
-      <RouterView v-slot="{ Component }">
-        <template v-if="Component">
-          <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
-            <component :is="Component"></component>
-          </Suspense>
-        </template>
-      </RouterView>
-    </div>
-    <div
-      class="app-sidebar mt-px shrink-0 flex flex-col border-0 border-l-[1px] border-[--brand-gradient-border] border-solid overflow-auto"
-      :class="{ 'has-plus': hasPlus }"
-    >
-      <div
-        class="app-sidebar-scrollable flex-grow shrink overflow-y-auto relative"
-        :class="{ 'pb-12': !hasPlus }"
-      >
-        <div id="sidebar-teleport-target" class="sidebar-teleport-content"></div>
-        <div class="sidebar-default-content" :class="{ 'sidebar-enabled': sidebarVisible }">
-          <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
-            <h3 class="text-lg m-0">Playing as</h3>
-            <suspense>
-              <AccountsCard ref="accounts" mode="small" />
-            </suspense>
-          </div>
-          <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
-            <suspense>
-              <FriendsList :credentials="credentials" :sign-in="() => signIn()" />
-            </suspense>
-          </div>
-          <div v-if="news && news.length > 0" class="pt-4 flex flex-col items-center">
-            <h3 class="px-4 text-lg m-0 text-left w-full">News</h3>
-            <div class="px-4 pt-2 space-y-4 flex flex-col items-center w-full">
-              <NewsArticleCard
-                v-for="(item, index) in news"
-                :key="`news-${index}`"
-                :article="item"
-              />
-              <ButtonStyled color="brand" size="large">
-                <a href="https://modrinth.com/news" target="_blank" class="my-4">
-                  <NewspaperIcon /> View all news
-                </a>
-              </ButtonStyled>
-            </div>
-          </div>
-        </div>
-      </div>
-      <template v-if="showAd">
-        <a
-          href="https://modrinth.plus?app"
-          class="absolute bottom-[250px] w-full flex justify-center items-center gap-1 px-4 py-3 text-purple font-medium hover:underline z-10"
-          target="_blank"
-        >
-          <ArrowBigUpDashIcon class="text-2xl" /> Upgrade to Modrinth+
-        </a>
-        <PromotionWrapper />
-      </template>
-    </div>
-  </div>
-  <URLConfirmModal ref="urlModal" />
-  <NotificationPanel has-sidebar />
-  <ErrorModal ref="errorModal" />
-  <ModInstallModal ref="modInstallModal" />
-  <IncompatibilityWarningModal ref="incompatibilityWarningModal" />
-  <InstallConfirmModal ref="installConfirmModal" />
+	<SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
+	<div id="teleports"></div>
+	<div v-if="stateInitialized" class="app-grid-layout experimental-styles-within relative">
+		<Suspense>
+			<AppSettingsModal ref="settingsModal" />
+		</Suspense>
+		<Suspense>
+			<AuthGrantFlowWaitModal ref="modrinthLoginFlowWaitModal" @flow-cancel="cancelLogin" />
+		</Suspense>
+		<Suspense>
+			<InstanceCreationModal ref="installationModal" />
+		</Suspense>
+		<div
+			class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.5rem] w-[--left-bar-width]"
+		>
+			<NavButton v-tooltip.right="'Home'" to="/">
+				<HomeIcon />
+			</NavButton>
+			<NavButton v-if="themeStore.featureFlags.worlds_tab" v-tooltip.right="'Worlds'" to="/worlds">
+				<WorldIcon />
+			</NavButton>
+			<NavButton
+				v-tooltip.right="'Discover content'"
+				to="/browse/modpack"
+				:is-primary="() => route.path.startsWith('/browse') && !route.query.i"
+				:is-subpage="(route) => route.path.startsWith('/project') && !route.query.i"
+			>
+				<CompassIcon />
+			</NavButton>
+			<NavButton v-tooltip.right="'Skins (Beta)'" to="/skins">
+				<ChangeSkinIcon />
+			</NavButton>
+			<NavButton
+				v-tooltip.right="'Library'"
+				to="/library"
+				:is-subpage="
+					() =>
+						route.path.startsWith('/instance') ||
+						((route.path.startsWith('/browse') || route.path.startsWith('/project')) &&
+							route.query.i)
+				"
+			>
+				<LibraryIcon />
+			</NavButton>
+			<div class="h-px w-6 mx-auto my-2 bg-button-bg"></div>
+			<suspense>
+				<QuickInstanceSwitcher />
+			</suspense>
+			<NavButton
+				v-tooltip.right="'Create new instance'"
+				:to="() => $refs.installationModal.show()"
+				:disabled="offline"
+			>
+				<PlusIcon />
+			</NavButton>
+			<div class="flex flex-grow"></div>
+			<NavButton v-if="updateAvailable" v-tooltip.right="'Install update'" :to="() => restartApp()">
+				<DownloadIcon />
+			</NavButton>
+			<NavButton v-tooltip.right="'Settings'" :to="() => $refs.settingsModal.show()">
+				<SettingsIcon />
+			</NavButton>
+			<ButtonStyled v-if="credentials" type="transparent" circular>
+				<OverflowMenu
+					:options="[
+						{
+							id: 'sign-out',
+							action: () => logOut(),
+							color: 'danger',
+						},
+					]"
+					direction="left"
+				>
+					<Avatar
+						:src="credentials.user.avatar_url"
+						:alt="credentials.user.username"
+						size="32px"
+						circle
+					/>
+					<template #sign-out> <LogOutIcon /> Sign out </template>
+				</OverflowMenu>
+			</ButtonStyled>
+			<NavButton v-else v-tooltip.right="'Sign in'" :to="() => signIn()">
+				<LogInIcon />
+				<template #label>Sign in</template>
+			</NavButton>
+		</div>
+		<div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
+			<div data-tauri-drag-region class="flex p-3">
+				<ModrinthAppLogo class="h-full w-auto text-contrast pointer-events-none" />
+				<div class="flex items-center gap-1 ml-3">
+					<button
+						class="cursor-pointer p-0 m-0 text-contrast border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
+						@click="router.back()"
+					>
+						<LeftArrowIcon />
+					</button>
+					<button
+						class="cursor-pointer p-0 m-0 text-contrast border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
+						@click="router.forward()"
+					>
+						<RightArrowIcon />
+					</button>
+				</div>
+				<Breadcrumbs class="pt-[2px]" />
+			</div>
+			<section class="flex ml-auto items-center">
+				<ButtonStyled
+					v-if="!forceSidebar && themeStore.toggleSidebar"
+					:type="sidebarToggled ? 'standard' : 'transparent'"
+					circular
+				>
+					<button
+						class="mr-3 transition-transform"
+						:class="{ 'rotate-180': !sidebarToggled }"
+						@click="sidebarToggled = !sidebarToggled"
+					>
+						<RightArrowIcon />
+					</button>
+				</ButtonStyled>
+				<div class="flex mr-3">
+					<Suspense>
+						<RunningAppBar />
+					</Suspense>
+				</div>
+				<section v-if="!nativeDecorations" class="window-controls" data-tauri-drag-region-exclude>
+					<Button class="titlebar-button" icon-only @click="() => getCurrentWindow().minimize()">
+						<MinimizeIcon />
+					</Button>
+					<Button
+						class="titlebar-button"
+						icon-only
+						@click="() => getCurrentWindow().toggleMaximize()"
+					>
+						<RestoreIcon v-if="isMaximized" />
+						<MaximizeIcon v-else />
+					</Button>
+					<Button class="titlebar-button close" icon-only @click="handleClose">
+						<XIcon />
+					</Button>
+				</section>
+			</section>
+		</div>
+	</div>
+	<div
+		v-if="stateInitialized"
+		class="app-contents experimental-styles-within"
+		:class="{ 'sidebar-enabled': sidebarVisible }"
+	>
+		<div class="app-viewport flex-grow router-view">
+			<transition name="popup-survey">
+				<div
+					v-if="availableSurvey"
+					class="w-[400px] z-20 fixed -bottom-12 pb-16 right-[--right-bar-width] mr-4 rounded-t-2xl card-shadow bg-bg-raised border-divider border-[1px] border-solid border-b-0 p-4"
+				>
+					<h2 class="text-lg font-extrabold mt-0 mb-2">Hey there Modrinth user!</h2>
+					<p class="m-0 leading-tight">
+						Would you mind answering a few questions about your experience with Modrinth App?
+					</p>
+					<p class="mt-3 mb-4 leading-tight">
+						This feedback will go directly to the Modrinth team and help guide future updates!
+					</p>
+					<div class="flex gap-2">
+						<ButtonStyled color="brand">
+							<button @click="openSurvey"><NotepadTextIcon /> Take survey</button>
+						</ButtonStyled>
+						<ButtonStyled>
+							<button @click="dismissSurvey"><XIcon /> No thanks</button>
+						</ButtonStyled>
+					</div>
+				</div>
+			</transition>
+			<div
+				class="loading-indicator-container h-8 fixed z-50"
+				:style="{
+					top: 'calc(var(--top-bar-height))',
+					left: 'calc(var(--left-bar-width))',
+					width: 'calc(100% - var(--left-bar-width) - var(--right-bar-width))',
+				}"
+			>
+				<ModrinthLoadingIndicator />
+			</div>
+			<div
+				v-if="themeStore.featureFlags.page_path"
+				class="absolute bottom-0 left-0 m-2 bg-tooltip-bg text-tooltip-text font-semibold rounded-full px-2 py-1 text-xs z-50"
+			>
+				{{ route.fullPath }}
+			</div>
+			<div
+				id="background-teleport-target"
+				class="absolute h-full -z-10 rounded-tl-[--radius-xl] overflow-hidden"
+				:style="{
+					width: 'calc(100% - var(--right-bar-width))',
+				}"
+			></div>
+			<div
+				v-if="criticalErrorMessage"
+				class="m-6 mb-0 flex flex-col border-red bg-bg-red rounded-2xl border-2 border-solid p-4 gap-1 font-semibold text-contrast"
+			>
+				<h1 class="m-0 text-lg font-extrabold">{{ criticalErrorMessage.header }}</h1>
+				<div
+					class="markdown-body text-primary"
+					v-html="renderString(criticalErrorMessage.body ?? '')"
+				></div>
+			</div>
+			<RouterView v-slot="{ Component }">
+				<template v-if="Component">
+					<Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
+						<component :is="Component"></component>
+					</Suspense>
+				</template>
+			</RouterView>
+		</div>
+		<div
+			class="app-sidebar mt-px shrink-0 flex flex-col border-0 border-l-[1px] border-[--brand-gradient-border] border-solid overflow-auto"
+			:class="{ 'has-plus': hasPlus }"
+		>
+			<div
+				class="app-sidebar-scrollable flex-grow shrink overflow-y-auto relative"
+				:class="{ 'pb-12': !hasPlus }"
+			>
+				<div id="sidebar-teleport-target" class="sidebar-teleport-content"></div>
+				<div class="sidebar-default-content" :class="{ 'sidebar-enabled': sidebarVisible }">
+					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
+						<h3 class="text-lg m-0">Playing as</h3>
+						<suspense>
+							<AccountsCard ref="accounts" mode="small" />
+						</suspense>
+					</div>
+					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
+						<suspense>
+							<FriendsList :credentials="credentials" :sign-in="() => signIn()" />
+						</suspense>
+					</div>
+					<div v-if="news && news.length > 0" class="pt-4 flex flex-col items-center">
+						<h3 class="px-4 text-lg m-0 text-left w-full">News</h3>
+						<div class="px-4 pt-2 space-y-4 flex flex-col items-center w-full">
+							<NewsArticleCard
+								v-for="(item, index) in news"
+								:key="`news-${index}`"
+								:article="item"
+							/>
+							<ButtonStyled color="brand" size="large">
+								<a href="https://modrinth.com/news" target="_blank" class="my-4">
+									<NewspaperIcon /> View all news
+								</a>
+							</ButtonStyled>
+						</div>
+					</div>
+				</div>
+			</div>
+			<template v-if="showAd">
+				<a
+					href="https://modrinth.plus?app"
+					class="absolute bottom-[250px] w-full flex justify-center items-center gap-1 px-4 py-3 text-purple font-medium hover:underline z-10"
+					target="_blank"
+				>
+					<ArrowBigUpDashIcon class="text-2xl" /> Upgrade to Modrinth+
+				</a>
+				<PromotionWrapper />
+			</template>
+		</div>
+	</div>
+	<URLConfirmModal ref="urlModal" />
+	<NotificationPanel has-sidebar />
+	<ErrorModal ref="errorModal" />
+	<ModInstallModal ref="modInstallModal" />
+	<IncompatibilityWarningModal ref="incompatibilityWarningModal" />
+	<InstallConfirmModal ref="installConfirmModal" />
 </template>
 
 <style lang="scss" scoped>
@@ -1046,23 +1008,23 @@ async function processPendingSurveys() {
 }
 
 .popup-survey-enter-active {
-  transition:
-    opacity 0.25s ease,
-    transform 0.25s cubic-bezier(0.51, 1.08, 0.35, 1.15);
-  transform-origin: top center;
+	transition:
+		opacity 0.25s ease,
+		transform 0.25s cubic-bezier(0.51, 1.08, 0.35, 1.15);
+	transform-origin: top center;
 }
 
 .popup-survey-leave-active {
-  transition:
-    opacity 0.25s ease,
-    transform 0.25s cubic-bezier(0.68, -0.17, 0.23, 0.11);
-  transform-origin: top center;
+	transition:
+		opacity 0.25s ease,
+		transform 0.25s cubic-bezier(0.68, -0.17, 0.23, 0.11);
+	transform-origin: top center;
 }
 
 .popup-survey-enter-from,
 .popup-survey-leave-to {
-  opacity: 0;
-  transform: translateY(10rem) scale(0.8) scaleY(1.6);
+	opacity: 0;
+	transform: translateY(10rem) scale(0.8) scaleY(1.6);
 }
 </style>
 <style>

@@ -574,37 +574,37 @@ pub async fn launch_minecraft(
 	let (main_class_keep_alive, main_class_path) =
 		get_resource_file!(env "JAVA_JARS_DIR" / "theseus.jar")?;
 
-    let rpc_server = RpcServerBuilder::new().launch().await?;
+	let rpc_server = RpcServerBuilder::new().launch().await?;
 
-    command.args(
-        args::get_jvm_arguments(
-            args.get(&d::minecraft::ArgumentType::Jvm)
-                .map(|x| x.as_slice()),
-            &natives_dir,
-            &state.directories.libraries_dir(),
-            &state.directories.log_configs_dir(),
-            &args::get_class_paths(
-                &state.directories.libraries_dir(),
-                version_info.libraries.as_slice(),
-                &[&main_class_path, &client_path],
-                &java_version.architecture,
-                minecraft_updated,
-            )?,
-            &main_class_path,
-            &version_jar,
-            *memory,
-            Vec::from(java_args),
-            &java_version.architecture,
-            &quick_play_type,
-            quick_play_version,
-            version_info
-                .logging
-                .as_ref()
-                .and_then(|x| x.get(&LoggingSide::Client)),
-            rpc_server.address(),
-        )?
-        .into_iter(),
-    );
+	command.args(
+		args::get_jvm_arguments(
+			args.get(&d::minecraft::ArgumentType::Jvm)
+				.map(|x| x.as_slice()),
+			&natives_dir,
+			&state.directories.libraries_dir(),
+			&state.directories.log_configs_dir(),
+			&args::get_class_paths(
+				&state.directories.libraries_dir(),
+				version_info.libraries.as_slice(),
+				&[&main_class_path, &client_path],
+				&java_version.architecture,
+				minecraft_updated,
+			)?,
+			&main_class_path,
+			&version_jar,
+			*memory,
+			Vec::from(java_args),
+			&java_version.architecture,
+			&quick_play_type,
+			quick_play_version,
+			version_info
+				.logging
+				.as_ref()
+				.and_then(|x| x.get(&LoggingSide::Client)),
+			rpc_server.address(),
+		)?
+		.into_iter(),
+	);
 
 	// The java launcher requires access to java.lang.reflect in order to force access in to
 	// whatever module the main class is in
@@ -724,48 +724,48 @@ pub async fn launch_minecraft(
 		.update_status(Some(profile.name.clone()))
 		.await;
 
-    // Create Minecraft child by inserting it into the state
-    // This also spawns the process and prepares the subsequent processes
-    state
-        .process_manager
-        .insert_new_process(
-            &profile.path,
-            command,
-            post_exit_hook,
-            state.directories.profile_logs_dir(&profile.path),
-            version_info.logging.is_some(),
-            main_class_keep_alive,
-            rpc_server,
-            async |process: &ProcessMetadata, rpc_server| {
-                let process_start_time = process.start_time.to_rfc3339();
-                let profile_created_time = profile.created.to_rfc3339();
-                let profile_modified_time = profile.modified.to_rfc3339();
-                let system_properties = [
-                    ("modrinth.process.startTime", Some(&process_start_time)),
-                    ("modrinth.profile.created", Some(&profile_created_time)),
-                    ("modrinth.profile.icon", profile.icon_path.as_ref()),
-                    (
-                        "modrinth.profile.link.project",
-                        profile.linked_data.as_ref().map(|x| &x.project_id),
-                    ),
-                    (
-                        "modrinth.profile.link.version",
-                        profile.linked_data.as_ref().map(|x| &x.version_id),
-                    ),
-                    ("modrinth.profile.modified", Some(&profile_modified_time)),
-                    ("modrinth.profile.name", Some(&profile.name)),
-                ];
-                for (key, value) in system_properties {
-                    let Some(value) = value else {
-                        continue;
-                    };
-                    rpc_server
-                        .call_method_2::<()>("set_system_property", key, value)
-                        .await?;
-                }
-                rpc_server.call_method::<()>("launch").await?;
-                Ok(())
-            },
-        )
-        .await
+	// Create Minecraft child by inserting it into the state
+	// This also spawns the process and prepares the subsequent processes
+	state
+		.process_manager
+		.insert_new_process(
+			&profile.path,
+			command,
+			post_exit_hook,
+			state.directories.profile_logs_dir(&profile.path),
+			version_info.logging.is_some(),
+			main_class_keep_alive,
+			rpc_server,
+			async |process: &ProcessMetadata, rpc_server| {
+				let process_start_time = process.start_time.to_rfc3339();
+				let profile_created_time = profile.created.to_rfc3339();
+				let profile_modified_time = profile.modified.to_rfc3339();
+				let system_properties = [
+					("modrinth.process.startTime", Some(&process_start_time)),
+					("modrinth.profile.created", Some(&profile_created_time)),
+					("modrinth.profile.icon", profile.icon_path.as_ref()),
+					(
+						"modrinth.profile.link.project",
+						profile.linked_data.as_ref().map(|x| &x.project_id),
+					),
+					(
+						"modrinth.profile.link.version",
+						profile.linked_data.as_ref().map(|x| &x.version_id),
+					),
+					("modrinth.profile.modified", Some(&profile_modified_time)),
+					("modrinth.profile.name", Some(&profile.name)),
+				];
+				for (key, value) in system_properties {
+					let Some(value) = value else {
+						continue;
+					};
+					rpc_server
+						.call_method_2::<()>("set_system_property", key, value)
+						.await?;
+				}
+				rpc_server.call_method::<()>("launch").await?;
+				Ok(())
+			},
+		)
+		.await
 }

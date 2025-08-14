@@ -107,20 +107,20 @@ pub fn get_lib_path(
 
 #[allow(clippy::too_many_arguments)]
 pub fn get_jvm_arguments(
-    arguments: Option<&[Argument]>,
-    natives_path: &Path,
-    libraries_path: &Path,
-    log_configs_path: &Path,
-    class_paths: &str,
-    agent_path: &Path,
-    version_name: &str,
-    memory: MemorySettings,
-    custom_args: Vec<String>,
-    java_arch: &str,
-    quick_play_type: &QuickPlayType,
-    quick_play_version: QuickPlayVersion,
-    log_config: Option<&LoggingConfiguration>,
-    ipc_addr: SocketAddr,
+	arguments: Option<&[Argument]>,
+	natives_path: &Path,
+	libraries_path: &Path,
+	log_configs_path: &Path,
+	class_paths: &str,
+	agent_path: &Path,
+	version_name: &str,
+	memory: MemorySettings,
+	custom_args: Vec<String>,
+	java_arch: &str,
+	quick_play_type: &QuickPlayType,
+	quick_play_version: QuickPlayVersion,
+	log_config: Option<&LoggingConfiguration>,
+	ipc_addr: SocketAddr,
 ) -> crate::Result<Vec<String>> {
 	let mut parsed_arguments = Vec::new();
 
@@ -177,26 +177,24 @@ pub fn get_jvm_arguments(
 			.to_string_lossy()
 	));
 
-    parsed_arguments
-        .push(format!("-Dmodrinth.internal.ipc.host={}", ipc_addr.ip()));
-    parsed_arguments
-        .push(format!("-Dmodrinth.internal.ipc.port={}", ipc_addr.port()));
+	parsed_arguments.push(format!("-Dmodrinth.internal.ipc.host={}", ipc_addr.ip()));
+	parsed_arguments.push(format!("-Dmodrinth.internal.ipc.port={}", ipc_addr.port()));
 
-    parsed_arguments.push(format!(
-        "-Dmodrinth.internal.quickPlay.serverVersion={}",
-        serde_json::to_value(quick_play_version.server)?
-            .as_str()
-            .unwrap()
-    ));
-    if let QuickPlayType::Server(server) = quick_play_type
-        && quick_play_version.server == QuickPlayServerVersion::Injected
-    {
-        let (host, port) = server.require_resolved()?;
-        parsed_arguments.extend_from_slice(&[
-            format!("-Dmodrinth.internal.quickPlay.host={host}"),
-            format!("-Dmodrinth.internal.quickPlay.port={port}"),
-        ]);
-    }
+	parsed_arguments.push(format!(
+		"-Dmodrinth.internal.quickPlay.serverVersion={}",
+		serde_json::to_value(quick_play_version.server)?
+			.as_str()
+			.unwrap()
+	));
+	if let QuickPlayType::Server(server) = quick_play_type
+		&& quick_play_version.server == QuickPlayServerVersion::Injected
+	{
+		let (host, port) = server.require_resolved()?;
+		parsed_arguments.extend_from_slice(&[
+			format!("-Dmodrinth.internal.quickPlay.host={host}"),
+			format!("-Dmodrinth.internal.quickPlay.port={port}"),
+		]);
+	}
 
 	for arg in custom_args {
 		if !arg.is_empty() {
