@@ -2,12 +2,11 @@
   "name": "@modrinth/moderation",
   "version": "0.0.0",
   "private": true,
-  "main": "./index.ts",
-  "types": "./index.d.ts",
+  "main": "./src/index.ts",
   "scripts": {
     "lint": "eslint . && prettier --check .",
     "fix": "eslint . --fix && prettier --write . && pnpm run intl:extract",
-    "intl:extract": "formatjs extract \"**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" --ignore \"**/*.d.ts\" --ignore \"node_modules/**/*\" --out-file locales/en-US/index.json --preserve-whitespace"
+    "intl:extract": "formatjs extract \"**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" --ignore \"**/*.d.ts\" --ignore \"node_modules/**/*\" --out-file src/locales/en-US/index.json --preserve-whitespace"
   },
   "dependencies": {
     "@modrinth/assets": "workspace:*",

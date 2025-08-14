@@ -1,12 +1,12 @@
 import { promises as fs } from "fs";
 import { pathToFileURL } from "node:url";
-import svgLoader from "vite-svg-loader";
-import { resolve, basename, relative } from "pathe";
-import { defineNuxtConfig } from "nuxt/config";
-import { $fetch } from "ofetch";
-import { globIterate } from "glob";
 import { match as matchLocale } from "@formatjs/intl-localematcher";
 import { consola } from "consola";
+import { globIterate } from "glob";
+import { defineNuxtConfig } from "nuxt/config";
+import { $fetch } from "ofetch";
+import { basename, relative, resolve } from "pathe";
+import svgLoader from "vite-svg-loader";
 
 const STAGING_API_URL = "https://staging-api.modrinth.com/v2/";
 
@@ -263,23 +263,29 @@ export default defineNuxtConfig({
 
       const resolveOmorphiaLocaleImport = await (async () => {
         const omorphiaLocales: string[] = [];
-        const omorphiaLocaleSets = new Map<string, { files: { from: string }[] }>();
+        const omorphiaLocaleSets = new Map<
+          string,
+          { files: { from: string; format?: string }[] }
+        >();
 
-        for await (const localeDir of globIterate("node_modules/@modrinth/ui/src/locales/*", {
-          posix: true,
-        })) {
-          const tag = basename(localeDir);
-          omorphiaLocales.push(tag);
+        for (const pkgLocales of [`node_modules/@modrinth/**/src/locales/*`]) {
+          for await (const localeDir of globIterate(pkgLocales, {
+            posix: true,
+          })) {
+            const tag = basename(localeDir);
+            if (!omorphiaLocales.includes(tag)) {
+              omorphiaLocales.push(tag);
+            }
 
-          const localeFiles: { from: string; format?: string }[] = [];
+            const entry = omorphiaLocaleSets.get(tag) ?? { files: [] };
+            omorphiaLocaleSets.set(tag, entry);
 
-          omorphiaLocaleSets.set(tag, { files: localeFiles });
-
-          for await (const localeFile of globIterate(`${localeDir}/*`, { posix: true })) {
-            localeFiles.push({
-              from: pathToFileURL(localeFile).toString(),
-              format: "default",
-            });
+            for await (const localeFile of globIterate(`${localeDir}/*`, { posix: true })) {
+              entry.files.push({
+                from: pathToFileURL(localeFile).toString(),
+                format: "default",
+              });
+            }
           }
         }
 
