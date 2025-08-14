@@ -614,7 +614,7 @@ pub async fn edit_subscription(
                     // it doesn't necessarily have much significance.
                     let new_subscription_interval = edit_subscription
                         .interval
-                        .or_else(|| open_charge.subscription_interval);
+                        .or(open_charge.subscription_interval);
 
                     let mut intent =
                         CreatePaymentIntent::new(proration as i64, currency);
