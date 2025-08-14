@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted } from 'vue'
 import { init_ads_window } from '@/helpers/ads.js'
+import { onMounted, ref } from 'vue'
 
 const adsWrapper = ref(null)
 
@@ -33,19 +33,24 @@ function updateAdPosition() {
 <template>
   <div ref="adsWrapper" class="ad-parent relative flex w-full justify-center cursor-pointer bg-bg">
     <a
-      href="https://modrinth.gg?from=app-placeholder"
+      href="https://modrinth.gg/medal?app"
       target="_blank"
       class="flex max-h-[250px] min-h-[250px] min-w-[300px] max-w-[300px] flex-col gap-4 rounded-[inherit]"
     >
+      <!-- <img
+				src="https://cdn-raw.modrinth.com/modrinth-servers-placeholder-light.webp"
+				alt="Host your next server with Modrinth Servers"
+				class="hidden light-image rounded-[inherit]"
+			/>
+			<img
+				src="https://cdn-raw.modrinth.com/modrinth-servers-placeholder-dark.webp"
+				alt="Host your next server with Modrinth Servers"
+				class="dark-image rounded-[inherit]"
+			/> -->
       <img
-        src="https://cdn-raw.modrinth.com/modrinth-servers-placeholder-light.webp"
-        alt="Host your next server with Modrinth Servers"
-        class="hidden light-image rounded-[inherit]"
-      />
-      <img
-        src="https://cdn-raw.modrinth.com/modrinth-servers-placeholder-dark.webp"
-        alt="Host your next server with Modrinth Servers"
-        class="dark-image rounded-[inherit]"
+        src="https://cdn-raw.modrinth.com/medal-modrinth-servers-ad.webp"
+        alt="Host your next server with Modrinth Servers, get five days free with Medal."
+        class="rounded-[inherit]"
       />
     </a>
   </div>
