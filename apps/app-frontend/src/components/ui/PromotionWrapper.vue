@@ -1,6 +1,7 @@
 <script setup>
-import { init_ads_window } from '@/helpers/ads.js'
 import { onMounted, ref } from 'vue'
+
+import { init_ads_window } from '@/helpers/ads.js'
 
 const adsWrapper = ref(null)
 

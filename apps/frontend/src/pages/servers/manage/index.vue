@@ -114,7 +114,6 @@
 </template>
 
 <script setup lang="ts">
-import { reloadNuxtApp } from '#app'
 import { HammerIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
 import { ButtonStyled, CopyCode } from '@modrinth/ui'
 import type { ModrinthServersFetchError, Server } from '@modrinth/utils'
@@ -122,6 +121,8 @@ import dayjs from 'dayjs'
 import Fuse from 'fuse.js'
 import type { ComponentPublicInstance } from 'vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+
+import { reloadNuxtApp } from '#app'
 import MedalServerListing from '~/components/ui/servers/marketing/MedalServerListing.vue'
 import ServersUpgradeModalWrapper from '~/components/ui/servers/ServersUpgradeModalWrapper.vue'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'

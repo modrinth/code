@@ -4,20 +4,20 @@ import { useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import type Stripe from 'stripe'
 import { computed } from 'vue'
+
 import {
 	monthsInInterval,
 	type ServerBillingInterval,
 	type ServerPlan,
 	type ServerRegion,
 } from '../../utils/billing'
-import TagItem from '../base/TagItem.vue'
-import ServersSpecs from './ServersSpecs.vue'
-
 import { regionOverrides } from '../../utils/regions'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import Checkbox from '../base/Checkbox.vue'
+import TagItem from '../base/TagItem.vue'
 import ExpandableInvoiceTotal from './ExpandableInvoiceTotal.vue'
 import FormattedPaymentMethod from './FormattedPaymentMethod.vue'
+import ServersSpecs from './ServersSpecs.vue'
 
 const vintl = useVIntl()
 const { locale, formatMessage } = vintl

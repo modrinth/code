@@ -363,7 +363,6 @@
 </template>
 
 <script setup lang="ts">
-import { reloadNuxtApp } from '#app'
 import { Intercom, shutdown } from '@intercom/messenger-js-sdk'
 import {
 	CheckIcon,
@@ -382,22 +381,25 @@ import {
 	injectNotificationManager,
 	ServerNotice,
 } from '@modrinth/ui'
-import {
-	type Backup,
-	type PowerAction,
-	type ServerState,
-	type Stats,
-	type WSEvent,
-	type WSInstallationResultEvent,
+import type {
+	Backup,
+	PowerAction,
+	ServerState,
+	Stats,
+	WSEvent,
+	WSInstallationResultEvent,
 } from '@modrinth/utils'
 import type { MessageDescriptor } from '@vintl/vintl'
 import DOMPurify from 'dompurify'
-import { computed, onMounted, onUnmounted, ref, type Reactive } from 'vue'
+import { computed, onMounted, onUnmounted, type Reactive, ref } from 'vue'
+
+import { reloadNuxtApp } from '#app'
 import MedalServerIcon from '~/assets/images/servers/medal_server_icon.svg?component'
 import PanelErrorIcon from '~/components/ui/servers/icons/PanelErrorIcon.vue'
 import MedalServerCountdown from '~/components/ui/servers/marketing/MedalServerCountdown.vue'
 import ServerInstallation from '~/components/ui/servers/ServerInstallation.vue'
-import { ModrinthServer, useModrinthServers } from '~/composables/servers/modrinth-servers.ts'
+import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
+import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 import { useModrinthServersConsole } from '~/store/console.ts'
 

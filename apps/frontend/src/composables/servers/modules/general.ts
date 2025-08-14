@@ -1,5 +1,6 @@
 import type { JWTAuth, PowerAction, Project, ServerGeneral } from '@modrinth/utils'
 import { $fetch } from 'ofetch'
+
 import { useServersFetch } from '../servers-fetch.ts'
 import { ServerModule } from './base.ts'
 

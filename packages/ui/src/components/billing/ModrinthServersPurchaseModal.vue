@@ -11,6 +11,7 @@ import type { UserSubscription } from '@modrinth/utils'
 import { defineMessage, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import type Stripe from 'stripe'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
+
 import { useStripe } from '../../composables/stripe'
 import { commonMessages } from '../../utils'
 import type {
