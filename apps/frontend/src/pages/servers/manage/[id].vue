@@ -116,7 +116,15 @@
     }"
   >
     <div class="flex w-full min-w-0 select-none flex-col items-center gap-6 pt-4 sm:flex-row">
-      <UiServersServerIcon :image="serverData.image" class="drop-shadow-lg sm:drop-shadow-none" />
+      <UiServersServerIcon
+        v-if="!serverData.is_medal"
+        :image="serverData.image"
+        class="drop-shadow-lg sm:drop-shadow-none"
+      />
+      <MedalServerIcon
+        v-else
+        class="border-medal-orange z-10 size-16 shrink-0 rounded-xl border-[1px] border-solid bg-bg text-orange"
+      />
       <div
         class="flex min-w-0 flex-1 flex-col-reverse items-center gap-2 sm:flex-col sm:items-start"
       >
@@ -384,6 +392,7 @@ import {
 import type { MessageDescriptor } from "@vintl/vintl";
 import DOMPurify from "dompurify";
 import { computed, onMounted, onUnmounted, ref, type Reactive } from "vue";
+import MedalServerIcon from "~/assets/images/servers/medal_server_icon.svg?component";
 import ServerInstallation from "~/components/ui/servers/ServerInstallation.vue";
 import PanelErrorIcon from "~/components/ui/servers/icons/PanelErrorIcon.vue";
 import MedalServerCountdown from "~/components/ui/servers/marketing/MedalServerCountdown.vue";

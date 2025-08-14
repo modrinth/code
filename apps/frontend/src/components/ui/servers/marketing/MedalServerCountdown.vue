@@ -5,17 +5,30 @@
     <div class="overlay"></div>
     <MedalPromoBackground class="background-pattern scale-[125%]" />
 
-    <div class="z-10 flex flex-col gap-1">
-      <div class="flex items-center gap-2 text-lg font-semibold text-contrast">
-        <ClockIcon class="clock-glow text-medal-orange size-5" />
-        <span>
-          Your <span class="text-medal-orange">Medal</span> powered Modrinth Server will expire in
-          <span class="text-medal-orange font-bold">{{ timeLeftCountdown.days }}</span> days
-          <span class="text-medal-orange font-bold">{{ timeLeftCountdown.hours }}</span> hours
-          <span class="text-medal-orange font-bold">{{ timeLeftCountdown.minutes }}</span> minutes
-          <span class="text-medal-orange font-bold">{{ timeLeftCountdown.seconds }}</span> seconds.
-        </span>
-      </div>
+    <div class="z-10 mr-2 flex flex-col gap-1">
+      <Transition
+        enter-from-class="opacity-0 translate-y-1"
+        enter-active-class="transition-all duration-300"
+        enter-to-class="opacity-100 translate-y-0"
+        leave-from-class="opacity-100 translate-y-0"
+        leave-active-class="transition-all duration-150"
+        leave-to-class="opacity-0 -translate-y-1"
+      >
+        <div
+          v-if="expiryDate"
+          class="flex items-center gap-2 whitespace-nowrap font-semibold text-contrast"
+        >
+          <ClockIcon class="clock-glow text-medal-orange size-5 shrink-0" />
+          <span class="w-full text-wrap text-lg">
+            Your <span class="text-medal-orange">Medal</span> powered Modrinth Server will expire in
+            <span class="text-medal-orange font-bold">{{ timeLeftCountdown.days }}</span> days
+            <span class="text-medal-orange font-bold">{{ timeLeftCountdown.hours }}</span> hours
+            <span class="text-medal-orange font-bold">{{ timeLeftCountdown.minutes }}</span> minutes
+            <span class="text-medal-orange font-bold">{{ timeLeftCountdown.seconds }}</span>
+            seconds.
+          </span>
+        </div>
+      </Transition>
     </div>
 
     <ButtonStyled color="orange" type="outlined" size="large">
@@ -28,10 +41,11 @@
 <script setup lang="ts">
 import { ClockIcon, RocketIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
+import type { UserSubscription } from "@modrinth/utils";
 import dayjs from "dayjs";
 import dayjsDuration from "dayjs/plugin/duration";
-import MedalPromoBackground from "~/assets/images/illustrations/medal_promo_background.svg?component";
 import type { ComponentPublicInstance } from "vue";
+import MedalPromoBackground from "~/assets/images/illustrations/medal_promo_background.svg?component";
 import ServersUpgradeModalWrapper from "../ServersUpgradeModalWrapper.vue";
 
 // eslint-disable-next-line import/no-named-as-default-member
@@ -41,24 +55,39 @@ type UpgradeWrapperRef = ComponentPublicInstance<{ open: (id?: string) => void |
 const upgradeModal = ref<UpgradeWrapperRef | null>(null);
 
 const props = defineProps<{
-  expiryDate?: string | Date;
   serverId?: string;
 }>();
+
+const { data: subscriptions } = await useLazyAsyncData(
+  "countdown-subscriptions",
+  () =>
+    useBaseFetch(`billing/subscriptions`, {
+      internal: true,
+    }) as Promise<UserSubscription[]>,
+);
+
+const expiryDate = computed(() => {
+  for (const subscription of subscriptions.value || []) {
+    if (subscription.metadata?.id === props.serverId) {
+      return dayjs(subscription.created).add(5, "days");
+    }
+  }
+
+  return undefined;
+});
 
 function openUpgradeModal() {
   upgradeModal.value?.open(props.serverId);
 }
 
-const expiryDate = computed(() => {
-  if (props.expiryDate) {
-    return dayjs(props.expiryDate);
-  }
-  return dayjs().add(5, "day");
-});
-
 const timeLeftCountdown = ref({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
 function updateCountdown() {
+  if (!expiryDate.value) {
+    timeLeftCountdown.value = { days: 0, hours: 0, minutes: 0, seconds: 0 };
+    return;
+  }
+
   const now = dayjs();
   const diff = expiryDate.value.diff(now);
 

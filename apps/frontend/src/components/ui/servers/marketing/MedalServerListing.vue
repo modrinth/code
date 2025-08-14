@@ -89,14 +89,14 @@
 
     <div
       v-if="status === 'suspended' && suspension_reason === 'upgrading'"
-      class="relative -mt-4 flex w-full flex-row items-center gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-blue bg-bg-blue p-4 text-sm font-bold text-contrast"
+      class="relative -mt-2 flex w-full flex-row items-center gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-blue bg-bg-blue p-4 text-sm font-bold text-contrast"
     >
       <UiServersPanelSpinner />
       Your server's hardware is currently being upgraded and will be back online shortly.
     </div>
     <div
       v-else-if="status === 'suspended' && suspension_reason === 'cancelled'"
-      class="relative -mt-4 flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
+      class="relative -mt-2 flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
     >
       <div class="flex flex-row gap-2">
         <UiServersIconsPanelErrorIcon class="!size-5" /> Your server has been cancelled. Please
@@ -106,7 +106,7 @@
     </div>
     <div
       v-else-if="status === 'suspended' && suspension_reason"
-      class="relative -mt-4 flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
+      class="relative -mt-2 flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
     >
       <div class="flex flex-row gap-2">
         <UiServersIconsPanelErrorIcon class="!size-5" /> Your server has been suspended:
@@ -117,7 +117,7 @@
     </div>
     <div
       v-else-if="status === 'suspended'"
-      class="relative -mt-4 flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
+      class="relative -mt-2 flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
     >
       <div class="flex flex-row gap-2">
         <UiServersIconsPanelErrorIcon class="!size-5" /> Your server has been suspended. Please
@@ -129,13 +129,13 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronRightIcon, LockIcon, SparklesIcon, RocketIcon } from "@modrinth/assets";
+import { ChevronRightIcon, LockIcon, RocketIcon, SparklesIcon } from "@modrinth/assets";
+import { Avatar, ButtonStyled, CopyCode } from "@modrinth/ui";
 import type { Project, Server } from "@modrinth/utils";
-import { Avatar, CopyCode, ButtonStyled } from "@modrinth/ui";
 import dayjs from "dayjs";
 import dayjsDuration from "dayjs/plugin/duration";
-import MedalServerIcon from "~/assets/images/servers/medal_server_icon.svg?component";
 import MedalPromoBackground from "~/assets/images/illustrations/medal_promo_background.svg?component";
+import MedalServerIcon from "~/assets/images/servers/medal_server_icon.svg?component";
 
 // eslint-disable-next-line import/no-named-as-default-member
 dayjs.extend(dayjsDuration);
@@ -163,8 +163,8 @@ if (props.upstream) {
 const iconUrl = computed(() => projectData.value?.icon_url || undefined);
 const isConfiguring = computed(() => props.flows?.intro);
 
-const expiryDate = dayjs().add(5, "day");
 const timeLeftCountdown = ref({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+const expiryDate = computed(() => (props.medal_expires ? dayjs(props.medal_expires) : null));
 
 function handleUpgrade(event: Event) {
   event.stopPropagation();
@@ -172,8 +172,13 @@ function handleUpgrade(event: Event) {
 }
 
 function updateCountdown() {
+  if (!expiryDate.value) {
+    timeLeftCountdown.value = { days: 0, hours: 0, minutes: 0, seconds: 0 };
+    return;
+  }
+
   const now = dayjs();
-  const diff = expiryDate.diff(now);
+  const diff = expiryDate.value.diff(now);
 
   if (diff <= 0) {
     timeLeftCountdown.value = { days: 0, hours: 0, minutes: 0, seconds: 0 };
@@ -189,7 +194,7 @@ function updateCountdown() {
   };
 }
 
-updateCountdown();
+watch(expiryDate, () => updateCountdown(), { immediate: true });
 
 const intervalId = ref<NodeJS.Timeout | null>(null);
 onMounted(() => {

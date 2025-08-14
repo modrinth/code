@@ -100,12 +100,11 @@
           v-bind="server"
         />
         <MedalServerListing
-          v-for="server in filteredData.filter((s) => s.status !== 'suspended')"
+          v-for="server in filteredData.filter((s) => s.is_medal)"
           :key="server.server_id"
           v-bind="server"
           @upgrade="openUpgradeModal(server.server_id)"
         />
-        <LazyUiServersServerListingSkeleton v-if="isPollingForNewServers" />
       </ul>
       <div v-else class="flex h-full items-center justify-center">
         <p class="text-contrast">No servers found.</p>
@@ -119,6 +118,7 @@ import { reloadNuxtApp } from "#app";
 import { HammerIcon, PlusIcon, SearchIcon } from "@modrinth/assets";
 import { ButtonStyled, CopyCode } from "@modrinth/ui";
 import type { ModrinthServersFetchError, Server } from "@modrinth/utils";
+import dayjs from "dayjs";
 import Fuse from "fuse.js";
 import type { ComponentPublicInstance } from "vue";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
@@ -138,8 +138,6 @@ interface ServerResponse {
   servers: Server[];
 }
 
-type LocalServer = Server & { is_preview?: boolean; is_medal?: boolean };
-
 const router = useRouter();
 const route = useRoute();
 const hasError = ref(false);
@@ -149,15 +147,40 @@ const {
   data: serverResponse,
   error: fetchError,
   refresh,
-} = await useAsyncData<ServerResponse>("ServerList", () =>
-  useServersFetch<ServerResponse>("servers"),
-);
+} = await useAsyncData<ServerResponse>("ServerList", async () => {
+  const serverResponse = await useServersFetch<ServerResponse>("servers");
+
+  let subscriptions: any[] | undefined = undefined;
+
+  for (const server of serverResponse.servers) {
+    if (server.is_medal) {
+      // Inject end date into server object.
+      const serverID = server.server_id;
+
+      if (!subscriptions) {
+        subscriptions = (await useBaseFetch(`billing/subscriptions`, {
+          internal: true,
+        })) as any[];
+      }
+
+      for (const subscription of subscriptions) {
+        if (subscription.metadata?.id === serverID) {
+          server.medal_expires = dayjs(subscription.created as string)
+            .add(5, "days")
+            .toISOString();
+        }
+      }
+    }
+  }
+
+  return serverResponse;
+});
 
 watch([fetchError, serverResponse], ([error, response]) => {
   hasError.value = !!error || !response;
 });
 
-const serverList = computed<LocalServer[]>(() => {
+const serverList = computed<Server[]>(() => {
   if (!serverResponse.value) return [];
   return serverResponse.value.servers;
 });
@@ -179,7 +202,7 @@ function introToTop(array: Server[]): Server[] {
   });
 }
 
-const filteredData = computed<LocalServer[]>(() => {
+const filteredData = computed<Server[]>(() => {
   if (!searchInput.value.trim()) {
     return introToTop(serverList.value);
   }

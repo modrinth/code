@@ -1,7 +1,7 @@
 import type { Project } from '../../types'
-import { Allocation } from './server'
 import { ServerBackup } from './backup'
 import { Mod } from './content'
+import { Allocation } from './server'
 
 export type ServerNotice = {
   id: number
@@ -54,6 +54,7 @@ export interface Server {
   }
 
   is_medal?: boolean
+  medal_expires?: string
 }
 
 export interface Servers {

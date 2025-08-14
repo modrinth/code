@@ -22,12 +22,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
-import { ModrinthServersPurchaseModal } from "@modrinth/ui";
+import { injectNotificationManager, ModrinthServersPurchaseModal } from "@modrinth/ui";
+import type { ServerPlan } from "@modrinth/ui/src/utils/billing";
+import type { UserSubscription } from "@modrinth/utils";
+import { computed, onMounted, ref } from "vue";
 import { useServersFetch } from "~/composables/servers/servers-fetch.ts";
 import { products } from "~/generated/state.json";
-import type { UserSubscription } from "@modrinth/utils";
-import type { ServerPlan } from "@modrinth/ui/src/utils/billing";
+
+const { addNotification } = injectNotificationManager();
 
 const config = useRuntimeConfig();
 const purchaseModal = ref<InstanceType<typeof ModrinthServersPurchaseModal> | null>(null);
@@ -174,7 +176,7 @@ async function open(id?: string) {
       internal: true,
     })) as any[];
     for (const sub of subscriptions) {
-      if (sub?.metadata?.type === "pyro" && sub?.metadata?.id === id) {
+      if (sub?.metadata?.id === id) {
         subscription.value = sub;
         break;
       }
