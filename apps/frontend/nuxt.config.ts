@@ -1,12 +1,12 @@
-import { promises as fs } from "fs";
-import { pathToFileURL } from "node:url";
-import svgLoader from "vite-svg-loader";
-import { resolve, basename, relative } from "pathe";
-import { defineNuxtConfig } from "nuxt/config";
-import { $fetch } from "ofetch";
-import { globIterate } from "glob";
 import { match as matchLocale } from "@formatjs/intl-localematcher";
 import { consola } from "consola";
+import { promises as fs } from "fs";
+import { globIterate } from "glob";
+import { pathToFileURL } from "node:url";
+import { defineNuxtConfig } from "nuxt/config";
+import { $fetch } from "ofetch";
+import { basename, relative, resolve } from "pathe";
+import svgLoader from "vite-svg-loader";
 
 const STAGING_API_URL = "https://staging-api.modrinth.com/v2/";
 
@@ -268,10 +268,7 @@ export default defineNuxtConfig({
           { files: { from: string; format?: string }[] }
         >();
 
-        for (const pkgLocales of [
-          `node_modules/@modrinth/ui/src/locales/*`,
-          "node_modules/@modrinth/moderation/locales/*",
-        ]) {
+        for (const pkgLocales of [`node_modules/@modrinth/**/src/locales/*`]) {
           for await (const localeDir of globIterate(pkgLocales, {
             posix: true,
           })) {
