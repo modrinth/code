@@ -268,11 +268,15 @@ export default defineNuxtConfig({
           { files: { from: string; format?: string }[] }
         >();
 
-        for (const pkg of ["@modrinth/ui", "@modrinth/moderation"]) {
-          for await (const localeDir of globIterate(`node_modules/${pkg}/src/locales/*`, {
+        for (const pkgLocales of [
+          `node_modules/@modrinth/ui/src/locales/*`,
+          "node_modules/@modrinth/moderation/locales/*",
+        ]) {
+          for await (const localeDir of globIterate(pkgLocales, {
             posix: true,
           })) {
             const tag = basename(localeDir);
+            console.log(`Checking dir ${localeDir}`);
             if (!omorphiaLocales.includes(tag)) {
               omorphiaLocales.push(tag);
             }
@@ -285,6 +289,7 @@ export default defineNuxtConfig({
                 from: pathToFileURL(localeFile).toString(),
                 format: "default",
               });
+              console.log(`Pushing file ${pathToFileURL(localeFile).toString()}`);
             }
           }
         }
