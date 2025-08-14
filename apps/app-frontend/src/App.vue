@@ -25,9 +25,8 @@ import { get_user } from '@/helpers/cache.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { useFetch } from '@/helpers/fetch.js'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.js'
-import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { list } from '@/helpers/profile.js'
-import { get } from '@/helpers/settings.ts'
+import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
 import { areUpdatesEnabled, getOS, isDev } from '@/helpers/utils.js'
 import { useError } from '@/store/error.js'
@@ -73,6 +72,7 @@ import { type } from '@tauri-apps/plugin-os'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { createTooltip, destroyTooltip } from 'floating-vue'
+import { $fetch } from 'ofetch'
 import {
   computed,
   nextTick,
@@ -83,8 +83,6 @@ import {
   useTemplateRef,
   watch,
 } from 'vue'
-import { $fetch } from 'ofetch'
-import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import { create_profile_and_install_from_file } from './helpers/pack'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
@@ -271,7 +269,7 @@ async function setupApp() {
       })
     }
   }
-  
+
   if (osType === 'windows') {
     await processPendingSurveys()
   } else {
