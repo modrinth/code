@@ -263,23 +263,29 @@ export default defineNuxtConfig({
 
       const resolveOmorphiaLocaleImport = await (async () => {
         const omorphiaLocales: string[] = [];
-        const omorphiaLocaleSets = new Map<string, { files: { from: string }[] }>();
+        const omorphiaLocaleSets = new Map<
+          string,
+          { files: { from: string; format?: string }[] }
+        >();
 
-        for await (const localeDir of globIterate("node_modules/@modrinth/ui/src/locales/*", {
-          posix: true,
-        })) {
-          const tag = basename(localeDir);
-          omorphiaLocales.push(tag);
+        for (const pkg of ["@modrinth/ui", "@modrinth/moderation"]) {
+          for await (const localeDir of globIterate(`node_modules/${pkg}/src/locales/*`, {
+            posix: true,
+          })) {
+            const tag = basename(localeDir);
+            if (!omorphiaLocales.includes(tag)) {
+              omorphiaLocales.push(tag);
+            }
 
-          const localeFiles: { from: string; format?: string }[] = [];
+            const entry = omorphiaLocaleSets.get(tag) ?? { files: [] };
+            omorphiaLocaleSets.set(tag, entry);
 
-          omorphiaLocaleSets.set(tag, { files: localeFiles });
-
-          for await (const localeFile of globIterate(`${localeDir}/*`, { posix: true })) {
-            localeFiles.push({
-              from: pathToFileURL(localeFile).toString(),
-              format: "default",
-            });
+            for await (const localeFile of globIterate(`${localeDir}/*`, { posix: true })) {
+              entry.files.push({
+                from: pathToFileURL(localeFile).toString(),
+                format: "default",
+              });
+            }
           }
         }
 
