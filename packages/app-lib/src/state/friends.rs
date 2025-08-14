@@ -5,7 +5,9 @@ use crate::state::tunnel::InternalTunnelSocket;
 use crate::state::{ProcessManager, Profile, TunnelSocket};
 use crate::util::fetch::{FetchSemaphore, fetch_advanced, fetch_json};
 use ariadne::ids::UserId;
-use ariadne::networking::message::{ClientToServerMessage, ServerToClientMessage};
+use ariadne::networking::message::{
+    ClientToServerMessage, ServerToClientMessage,
+};
 use ariadne::users::UserStatus;
 use async_tungstenite::WebSocketSender;
 use async_tungstenite::tokio::{ConnectStream, connect_async};
@@ -28,117 +30,131 @@ use tokio::net::tcp::OwnedReadHalf;
 use tokio::sync::{Mutex, RwLock};
 use uuid::Uuid;
 
-pub(super) type WriteSocket = Arc<RwLock<Option<WebSocketSender<ConnectStream>>>>;
+pub(super) type WriteSocket =
+    Arc<RwLock<Option<WebSocketSender<ConnectStream>>>>;
 pub(super) type TunnelSockets = Arc<DashMap<Uuid, Arc<InternalTunnelSocket>>>;
 
 pub struct FriendsSocket {
-	write: WriteSocket,
-	user_statuses: Arc<DashMap<UserId, UserStatus>>,
-	tunnel_sockets: TunnelSockets,
+    write: WriteSocket,
+    user_statuses: Arc<DashMap<UserId, UserStatus>>,
+    tunnel_sockets: TunnelSockets,
 }
 
 #[derive(Deserialize, Serialize)]
 pub struct UserFriend {
-	pub id: String,
-	pub friend_id: String,
-	pub accepted: bool,
-	pub created: DateTime<Utc>,
+    pub id: String,
+    pub friend_id: String,
+    pub accepted: bool,
+    pub created: DateTime<Utc>,
 }
 
 impl Default for FriendsSocket {
-	fn default() -> Self {
-		Self::new()
-	}
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl FriendsSocket {
-	pub fn new() -> Self {
-		Self {
-			write: Arc::new(RwLock::new(None)),
-			user_statuses: Arc::new(DashMap::new()),
-			tunnel_sockets: Arc::new(DashMap::new()),
-		}
-	}
+    pub fn new() -> Self {
+        Self {
+            write: Arc::new(RwLock::new(None)),
+            user_statuses: Arc::new(DashMap::new()),
+            tunnel_sockets: Arc::new(DashMap::new()),
+        }
+    }
 
-	#[tracing::instrument(skip_all)]
-	pub async fn connect(
-		&self,
-		exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
-		semaphore: &FetchSemaphore,
-		process_manager: &ProcessManager,
-	) -> crate::Result<()> {
-		let credentials = ModrinthCredentials::get_and_refresh(exec, semaphore).await?;
+    #[tracing::instrument(skip_all)]
+    pub async fn connect(
+        &self,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+        semaphore: &FetchSemaphore,
+        process_manager: &ProcessManager,
+    ) -> crate::Result<()> {
+        let credentials =
+            ModrinthCredentials::get_and_refresh(exec, semaphore).await?;
 
-		if let Some(credentials) = credentials {
-			let mut request = format!(
-				"{}_internal/launcher_socket?code={}",
-				env!("MODRINTH_SOCKET_URL"),
-				credentials.session
-			)
-			.into_client_request()?;
+        if let Some(credentials) = credentials {
+            let mut request = format!(
+                "{}_internal/launcher_socket?code={}",
+                env!("MODRINTH_SOCKET_URL"),
+                credentials.session
+            )
+            .into_client_request()?;
 
-			let user_agent = format!(
-				"modrinth/theseus/{} (support@modrinth.com)",
-				env!("CARGO_PKG_VERSION")
-			);
-			request
-				.headers_mut()
-				.insert("User-Agent", HeaderValue::from_str(&user_agent).unwrap());
+            let user_agent = format!(
+                "modrinth/theseus/{} (support@modrinth.com)",
+                env!("CARGO_PKG_VERSION")
+            );
+            request.headers_mut().insert(
+                "User-Agent",
+                HeaderValue::from_str(&user_agent).unwrap(),
+            );
 
-			let res = connect_async(request).await;
+            let res = connect_async(request).await;
 
-			match res {
-				Ok((socket, _)) => {
-					tracing::info!("Connected to friends socket");
-					let (write, read) = socket.split();
+            match res {
+                Ok((socket, _)) => {
+                    tracing::info!("Connected to friends socket");
+                    let (write, read) = socket.split();
 
-					{
-						let mut write_lock = self.write.write().await;
-						*write_lock = Some(write);
-					}
+                    {
+                        let mut write_lock = self.write.write().await;
+                        *write_lock = Some(write);
+                    }
 
-					if let Some(process) = process_manager.get_all().first() {
-						let profile = Profile::get(&process.profile_path, exec).await?;
+                    if let Some(process) = process_manager.get_all().first() {
+                        let profile =
+                            Profile::get(&process.profile_path, exec).await?;
 
-						if let Some(profile) = profile {
-							let _ = self.update_status(Some(profile.name)).await;
-						}
-					}
+                        if let Some(profile) = profile {
+                            let _ =
+                                self.update_status(Some(profile.name)).await;
+                        }
+                    }
 
-					let write_handle = self.write.clone();
-					let statuses = self.user_statuses.clone();
-					let sockets = self.tunnel_sockets.clone();
+                    let write_handle = self.write.clone();
+                    let statuses = self.user_statuses.clone();
+                    let sockets = self.tunnel_sockets.clone();
 
-					tokio::spawn(async move {
-						let mut read_stream = read;
-						while let Some(msg_result) = read_stream.next().await {
-							match msg_result {
-								Ok(msg) => {
-									let server_message = match msg {
-										Message::Text(text) => {
-											ServerToClientMessage::deserialize(Either::Left(&text))
-												.ok()
-										}
-										Message::Binary(bytes) => {
-											ServerToClientMessage::deserialize(Either::Right(
-												&bytes,
-											))
-											.ok()
-										}
-										Message::Ping(bytes) => {
-											if let Some(write) = write_handle.write().await.as_mut()
-											{
-												let _ = write.send(Message::Pong(bytes)).await;
-											}
+                    tokio::spawn(async move {
+                        let mut read_stream = read;
+                        while let Some(msg_result) = read_stream.next().await {
+                            match msg_result {
+                                Ok(msg) => {
+                                    let server_message = match msg {
+                                        Message::Text(text) => {
+                                            ServerToClientMessage::deserialize(
+                                                Either::Left(&text),
+                                            )
+                                            .ok()
+                                        }
+                                        Message::Binary(bytes) => {
+                                            ServerToClientMessage::deserialize(
+                                                Either::Right(&bytes),
+                                            )
+                                            .ok()
+                                        }
+                                        Message::Ping(bytes) => {
+                                            if let Some(write) = write_handle
+                                                .write()
+                                                .await
+                                                .as_mut()
+                                            {
+                                                let _ = write
+                                                    .send(Message::Pong(bytes))
+                                                    .await;
+                                            }
 
-											continue;
-										}
-										Message::Pong(_) | Message::Frame(_) => continue,
-										Message::Close(_) => break,
-									};
+                                            continue;
+                                        }
+                                        Message::Pong(_)
+                                        | Message::Frame(_) => continue,
+                                        Message::Close(_) => break,
+                                    };
 
-									if let Some(server_message) = server_message {
-										match server_message {
+                                    if let Some(server_message) = server_message
+                                    {
+                                        match server_message {
                                             ServerToClientMessage::StatusUpdate { status } => {
                                                 statuses.insert(status.user_id, status.clone());
                                                 let _ = emit_friend(FriendPayload::StatusUpdate { user_status: status }).await;
@@ -183,226 +199,239 @@ impl FriendsSocket {
                                                     }
                                             },
                                         }
-									}
-								}
-								Err(e) => {
-									tracing::error!(
-										"Error handling message from websocket server: {:?}",
-										e
-									);
-								}
-							}
-						}
+                                    }
+                                }
+                                Err(e) => {
+                                    tracing::error!(
+                                        "Error handling message from websocket server: {:?}",
+                                        e
+                                    );
+                                }
+                            }
+                        }
 
-						let mut w = write_handle.write().await;
-						*w = None;
-					});
-				}
-				Err(e) => {
-					tracing::error!("Error connecting to friends socket: {e:?}");
+                        let mut w = write_handle.write().await;
+                        *w = None;
+                    });
+                }
+                Err(e) => {
+                    tracing::error!(
+                        "Error connecting to friends socket: {e:?}"
+                    );
 
-					return Err(crate::Error::from(e));
-				}
-			}
-		}
+                    return Err(crate::Error::from(e));
+                }
+            }
+        }
 
-		Ok(())
-	}
+        Ok(())
+    }
 
-	#[tracing::instrument(skip_all)]
-	pub async fn socket_loop() -> crate::Result<()> {
-		let state = crate::State::get().await?;
+    #[tracing::instrument(skip_all)]
+    pub async fn socket_loop() -> crate::Result<()> {
+        let state = crate::State::get().await?;
 
-		tokio::task::spawn(async move {
-			let mut last_connection = Utc::now();
-			let mut last_ping = Utc::now();
+        tokio::task::spawn(async move {
+            let mut last_connection = Utc::now();
+            let mut last_ping = Utc::now();
 
-			loop {
-				let connected = state.friends_socket.is_connected().await;
+            loop {
+                let connected = state.friends_socket.is_connected().await;
 
-				if !connected
-					&& Utc::now().signed_duration_since(last_connection)
-						> chrono::Duration::seconds(30)
-				{
-					last_connection = Utc::now();
-					last_ping = Utc::now();
-					let _ = state
-						.friends_socket
-						.connect(&state.pool, &state.api_semaphore, &state.process_manager)
-						.await;
-				} else if connected
-					&& Utc::now().signed_duration_since(last_ping) > chrono::Duration::seconds(10)
-				{
-					last_ping = Utc::now();
-					let mut write = state.friends_socket.write.write().await;
-					if let Some(write) = write.as_mut() {
-						let _ = write.send(Message::Ping(Bytes::new())).await;
-					}
-				}
+                if !connected
+                    && Utc::now().signed_duration_since(last_connection)
+                        > chrono::Duration::seconds(30)
+                {
+                    last_connection = Utc::now();
+                    last_ping = Utc::now();
+                    let _ = state
+                        .friends_socket
+                        .connect(
+                            &state.pool,
+                            &state.api_semaphore,
+                            &state.process_manager,
+                        )
+                        .await;
+                } else if connected
+                    && Utc::now().signed_duration_since(last_ping)
+                        > chrono::Duration::seconds(10)
+                {
+                    last_ping = Utc::now();
+                    let mut write = state.friends_socket.write.write().await;
+                    if let Some(write) = write.as_mut() {
+                        let _ = write.send(Message::Ping(Bytes::new())).await;
+                    }
+                }
 
-				tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-			}
-		});
+                tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+            }
+        });
 
-		Ok(())
-	}
+        Ok(())
+    }
 
-	#[tracing::instrument(skip(self))]
-	pub async fn disconnect(&self) -> crate::Result<()> {
-		let mut write_lock = self.write.write().await;
-		if let Some(ref mut write_half) = *write_lock {
-			write_half.close().await?;
-			*write_lock = None;
-		}
-		Ok(())
-	}
+    #[tracing::instrument(skip(self))]
+    pub async fn disconnect(&self) -> crate::Result<()> {
+        let mut write_lock = self.write.write().await;
+        if let Some(ref mut write_half) = *write_lock {
+            write_half.close().await?;
+            *write_lock = None;
+        }
+        Ok(())
+    }
 
-	#[tracing::instrument(skip(self))]
-	pub async fn update_status(&self, profile_name: Option<String>) -> crate::Result<()> {
-		Self::send_message(
-			&self.write,
-			ClientToServerMessage::StatusUpdate { profile_name },
-		)
-		.await
-	}
+    #[tracing::instrument(skip(self))]
+    pub async fn update_status(
+        &self,
+        profile_name: Option<String>,
+    ) -> crate::Result<()> {
+        Self::send_message(
+            &self.write,
+            ClientToServerMessage::StatusUpdate { profile_name },
+        )
+        .await
+    }
 
-	#[tracing::instrument(skip_all)]
-	pub async fn friends(
-		exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
-		semaphore: &FetchSemaphore,
-	) -> crate::Result<Vec<UserFriend>> {
-		fetch_json(
-			Method::GET,
-			concat!(env!("MODRINTH_API_URL_V3"), "friends"),
-			None,
-			None,
-			semaphore,
-			exec,
-		)
-		.await
-	}
+    #[tracing::instrument(skip_all)]
+    pub async fn friends(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+        semaphore: &FetchSemaphore,
+    ) -> crate::Result<Vec<UserFriend>> {
+        fetch_json(
+            Method::GET,
+            concat!(env!("MODRINTH_API_URL_V3"), "friends"),
+            None,
+            None,
+            semaphore,
+            exec,
+        )
+        .await
+    }
 
-	#[tracing::instrument(skip(self))]
-	pub fn friend_statuses(&self) -> Vec<UserStatus> {
-		self.user_statuses
-			.iter()
-			.map(|x| x.value().clone())
-			.collect()
-	}
+    #[tracing::instrument(skip(self))]
+    pub fn friend_statuses(&self) -> Vec<UserStatus> {
+        self.user_statuses
+            .iter()
+            .map(|x| x.value().clone())
+            .collect()
+    }
 
-	#[tracing::instrument(skip(exec, semaphore))]
-	pub async fn add_friend(
-		user_id: &str,
-		exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
-		semaphore: &FetchSemaphore,
-	) -> crate::Result<()> {
-		fetch_advanced(
-			Method::POST,
-			&format!("{}friend/{user_id}", env!("MODRINTH_API_URL_V3")),
-			None,
-			None,
-			None,
-			None,
-			semaphore,
-			exec,
-		)
-		.await?;
+    #[tracing::instrument(skip(exec, semaphore))]
+    pub async fn add_friend(
+        user_id: &str,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+        semaphore: &FetchSemaphore,
+    ) -> crate::Result<()> {
+        fetch_advanced(
+            Method::POST,
+            &format!("{}friend/{user_id}", env!("MODRINTH_API_URL_V3")),
+            None,
+            None,
+            None,
+            None,
+            semaphore,
+            exec,
+        )
+        .await?;
 
-		Ok(())
-	}
+        Ok(())
+    }
 
-	#[tracing::instrument(skip(exec, semaphore))]
-	pub async fn remove_friend(
-		user_id: &str,
-		exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
-		semaphore: &FetchSemaphore,
-	) -> crate::Result<()> {
-		fetch_advanced(
-			Method::DELETE,
-			&format!("{}friend/{user_id}", env!("MODRINTH_API_URL_V3")),
-			None,
-			None,
-			None,
-			None,
-			semaphore,
-			exec,
-		)
-		.await?;
+    #[tracing::instrument(skip(exec, semaphore))]
+    pub async fn remove_friend(
+        user_id: &str,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+        semaphore: &FetchSemaphore,
+    ) -> crate::Result<()> {
+        fetch_advanced(
+            Method::DELETE,
+            &format!("{}friend/{user_id}", env!("MODRINTH_API_URL_V3")),
+            None,
+            None,
+            None,
+            None,
+            semaphore,
+            exec,
+        )
+        .await?;
 
-		Ok(())
-	}
+        Ok(())
+    }
 
-	#[tracing::instrument(skip(self))]
-	pub async fn open_port(&self, port: u16) -> crate::Result<TunnelSocket> {
-		let socket_id = Uuid::new_v4();
-		let socket =
-			self.tunnel_sockets
-				.entry(socket_id)
-				.insert(Arc::new(InternalTunnelSocket::Listening(SocketAddr::new(
-					"127.0.0.1".parse().unwrap(),
-					port,
-				))));
-		Self::send_message(
-			&self.write,
-			ClientToServerMessage::SocketListen { socket: socket_id },
-		)
-		.await?;
-		self.create_tunnel_socket(socket_id, socket)
-	}
+    #[tracing::instrument(skip(self))]
+    pub async fn open_port(&self, port: u16) -> crate::Result<TunnelSocket> {
+        let socket_id = Uuid::new_v4();
+        let socket = self.tunnel_sockets.entry(socket_id).insert(Arc::new(
+            InternalTunnelSocket::Listening(SocketAddr::new(
+                "127.0.0.1".parse().unwrap(),
+                port,
+            )),
+        ));
+        Self::send_message(
+            &self.write,
+            ClientToServerMessage::SocketListen { socket: socket_id },
+        )
+        .await?;
+        self.create_tunnel_socket(socket_id, socket)
+    }
 
-	pub async fn is_connected(&self) -> bool {
-		self.write.read().await.is_some()
-	}
+    pub async fn is_connected(&self) -> bool {
+        self.write.read().await.is_some()
+    }
 
-	fn create_tunnel_socket(
-		&self,
-		socket_id: Uuid,
-		socket: impl Deref<Target = Arc<InternalTunnelSocket>>,
-	) -> crate::Result<TunnelSocket> {
-		Ok(TunnelSocket {
-			socket_id,
-			write: self.write.clone(),
-			sockets: self.tunnel_sockets.clone(),
-			internal: socket.clone(),
-		})
-	}
+    fn create_tunnel_socket(
+        &self,
+        socket_id: Uuid,
+        socket: impl Deref<Target = Arc<InternalTunnelSocket>>,
+    ) -> crate::Result<TunnelSocket> {
+        Ok(TunnelSocket {
+            socket_id,
+            write: self.write.clone(),
+            sockets: self.tunnel_sockets.clone(),
+            internal: socket.clone(),
+        })
+    }
 
-	fn socket_read_loop(write: WriteSocket, mut read_half: OwnedReadHalf, socket_id: Uuid) {
-		tokio::spawn(async move {
-			let mut read_buffer = [0u8; 8192];
-			loop {
-				match read_half.read(&mut read_buffer).await {
-					Ok(0) | Err(_) => break,
-					Ok(n) => {
-						let _ = Self::send_message(
-							&write,
-							ClientToServerMessage::SocketSend {
-								socket: socket_id,
-								data: read_buffer[..n].to_vec(),
-							},
-						)
-						.await;
-					}
-				};
-			}
-		});
-	}
+    fn socket_read_loop(
+        write: WriteSocket,
+        mut read_half: OwnedReadHalf,
+        socket_id: Uuid,
+    ) {
+        tokio::spawn(async move {
+            let mut read_buffer = [0u8; 8192];
+            loop {
+                match read_half.read(&mut read_buffer).await {
+                    Ok(0) | Err(_) => break,
+                    Ok(n) => {
+                        let _ = Self::send_message(
+                            &write,
+                            ClientToServerMessage::SocketSend {
+                                socket: socket_id,
+                                data: read_buffer[..n].to_vec(),
+                            },
+                        )
+                        .await;
+                    }
+                };
+            }
+        });
+    }
 
-	#[tracing::instrument(skip(write))]
-	pub(super) async fn send_message(
-		write: &WriteSocket,
-		message: ClientToServerMessage,
-	) -> crate::Result<()> {
-		let serialized = match message.serialize()? {
-			Either::Left(text) => Message::text(text),
-			Either::Right(bytes) => Message::binary(bytes),
-		};
+    #[tracing::instrument(skip(write))]
+    pub(super) async fn send_message(
+        write: &WriteSocket,
+        message: ClientToServerMessage,
+    ) -> crate::Result<()> {
+        let serialized = match message.serialize()? {
+            Either::Left(text) => Message::text(text),
+            Either::Right(bytes) => Message::binary(bytes),
+        };
 
-		let mut write_lock = write.write().await;
-		if let Some(ref mut write_half) = *write_lock {
-			write_half.send(serialized).await?;
-		}
+        let mut write_lock = write.write().await;
+        if let Some(ref mut write_half) = *write_lock {
+            write_half.send(serialized).await?;
+        }
 
-		Ok(())
-	}
+        Ok(())
+    }
 }

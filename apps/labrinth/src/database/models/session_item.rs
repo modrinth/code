@@ -13,28 +13,28 @@ const SESSIONS_IDS_NAMESPACE: &str = "sessions_ids";
 const SESSIONS_USERS_NAMESPACE: &str = "sessions_users";
 
 pub struct SessionBuilder {
-	pub session: String,
-	pub user_id: DBUserId,
+    pub session: String,
+    pub user_id: DBUserId,
 
-	pub os: Option<String>,
-	pub platform: Option<String>,
+    pub os: Option<String>,
+    pub platform: Option<String>,
 
-	pub city: Option<String>,
-	pub country: Option<String>,
+    pub city: Option<String>,
+    pub country: Option<String>,
 
-	pub ip: String,
-	pub user_agent: String,
+    pub ip: String,
+    pub user_agent: String,
 }
 
 impl SessionBuilder {
-	pub async fn insert(
-		&self,
-		transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-	) -> Result<DBSessionId, DatabaseError> {
-		let id = generate_session_id(transaction).await?;
+    pub async fn insert(
+        &self,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<DBSessionId, DatabaseError> {
+        let id = generate_session_id(transaction).await?;
 
-		sqlx::query!(
-			"
+        sqlx::query!(
+            "
             INSERT INTO sessions (
                 id, session, user_id, os, platform,
                 city, country, ip, user_agent
@@ -44,96 +44,108 @@ impl SessionBuilder {
                 $6, $7, $8, $9
             )
             ",
-			id as DBSessionId,
-			self.session,
-			self.user_id as DBUserId,
-			self.os,
-			self.platform,
-			self.city,
-			self.country,
-			self.ip,
-			self.user_agent,
-		)
-		.execute(&mut **transaction)
-		.await?;
+            id as DBSessionId,
+            self.session,
+            self.user_id as DBUserId,
+            self.os,
+            self.platform,
+            self.city,
+            self.country,
+            self.ip,
+            self.user_agent,
+        )
+        .execute(&mut **transaction)
+        .await?;
 
-		Ok(id)
-	}
+        Ok(id)
+    }
 }
 
 #[derive(Deserialize, Serialize)]
 pub struct DBSession {
-	pub id: DBSessionId,
-	pub session: String,
-	pub user_id: DBUserId,
+    pub id: DBSessionId,
+    pub session: String,
+    pub user_id: DBUserId,
 
-	pub created: DateTime<Utc>,
-	pub last_login: DateTime<Utc>,
-	pub expires: DateTime<Utc>,
-	pub refresh_expires: DateTime<Utc>,
+    pub created: DateTime<Utc>,
+    pub last_login: DateTime<Utc>,
+    pub expires: DateTime<Utc>,
+    pub refresh_expires: DateTime<Utc>,
 
-	pub os: Option<String>,
-	pub platform: Option<String>,
-	pub user_agent: String,
+    pub os: Option<String>,
+    pub platform: Option<String>,
+    pub user_agent: String,
 
-	pub city: Option<String>,
-	pub country: Option<String>,
-	pub ip: String,
+    pub city: Option<String>,
+    pub country: Option<String>,
+    pub ip: String,
 }
 
 impl DBSession {
-	pub async fn get<'a, E, T: Display + Hash + Eq + PartialEq + Clone + Debug>(
-		id: T,
-		exec: E,
-		redis: &RedisPool,
-	) -> Result<Option<DBSession>, DatabaseError>
-	where
-		E: sqlx::Executor<'a, Database = sqlx::Postgres>,
-	{
-		Self::get_many(&[id], exec, redis)
-			.await
-			.map(|x| x.into_iter().next())
-	}
+    pub async fn get<
+        'a,
+        E,
+        T: Display + Hash + Eq + PartialEq + Clone + Debug,
+    >(
+        id: T,
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<Option<DBSession>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        Self::get_many(&[id], exec, redis)
+            .await
+            .map(|x| x.into_iter().next())
+    }
 
-	pub async fn get_id<'a, 'b, E>(
-		id: DBSessionId,
-		executor: E,
-		redis: &RedisPool,
-	) -> Result<Option<DBSession>, DatabaseError>
-	where
-		E: sqlx::Executor<'a, Database = sqlx::Postgres>,
-	{
-		DBSession::get_many(&[crate::models::ids::SessionId::from(id)], executor, redis)
-			.await
-			.map(|x| x.into_iter().next())
-	}
+    pub async fn get_id<'a, 'b, E>(
+        id: DBSessionId,
+        executor: E,
+        redis: &RedisPool,
+    ) -> Result<Option<DBSession>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        DBSession::get_many(
+            &[crate::models::ids::SessionId::from(id)],
+            executor,
+            redis,
+        )
+        .await
+        .map(|x| x.into_iter().next())
+    }
 
-	pub async fn get_many_ids<'a, E>(
-		session_ids: &[DBSessionId],
-		exec: E,
-		redis: &RedisPool,
-	) -> Result<Vec<DBSession>, DatabaseError>
-	where
-		E: sqlx::Executor<'a, Database = sqlx::Postgres>,
-	{
-		let ids = session_ids
-			.iter()
-			.map(|x| crate::models::ids::SessionId::from(*x))
-			.collect::<Vec<_>>();
-		DBSession::get_many(&ids, exec, redis).await
-	}
+    pub async fn get_many_ids<'a, E>(
+        session_ids: &[DBSessionId],
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<Vec<DBSession>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let ids = session_ids
+            .iter()
+            .map(|x| crate::models::ids::SessionId::from(*x))
+            .collect::<Vec<_>>();
+        DBSession::get_many(&ids, exec, redis).await
+    }
 
-	pub async fn get_many<'a, E, T: Display + Hash + Eq + PartialEq + Clone + Debug>(
-		session_strings: &[T],
-		exec: E,
-		redis: &RedisPool,
-	) -> Result<Vec<DBSession>, DatabaseError>
-	where
-		E: sqlx::Executor<'a, Database = sqlx::Postgres>,
-	{
-		use futures::TryStreamExt;
+    pub async fn get_many<
+        'a,
+        E,
+        T: Display + Hash + Eq + PartialEq + Clone + Debug,
+    >(
+        session_strings: &[T],
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<Vec<DBSession>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        use futures::TryStreamExt;
 
-		let val = redis.get_cached_keys_with_slug(
+        let val = redis.get_cached_keys_with_slug(
             SESSIONS_NAMESPACE,
             SESSIONS_IDS_NAMESPACE,
             true,
@@ -186,91 +198,101 @@ impl DBSession {
                 Ok(db_sessions)
             }).await?;
 
-		Ok(val)
-	}
+        Ok(val)
+    }
 
-	pub async fn get_user_sessions<'a, E>(
-		user_id: DBUserId,
-		exec: E,
-		redis: &RedisPool,
-	) -> Result<Vec<DBSessionId>, DatabaseError>
-	where
-		E: sqlx::Executor<'a, Database = sqlx::Postgres>,
-	{
-		let mut redis = redis.connect().await?;
+    pub async fn get_user_sessions<'a, E>(
+        user_id: DBUserId,
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<Vec<DBSessionId>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let mut redis = redis.connect().await?;
 
-		let res = redis
-			.get_deserialized_from_json::<Vec<i64>>(
-				SESSIONS_USERS_NAMESPACE,
-				&user_id.0.to_string(),
-			)
-			.await?;
+        let res = redis
+            .get_deserialized_from_json::<Vec<i64>>(
+                SESSIONS_USERS_NAMESPACE,
+                &user_id.0.to_string(),
+            )
+            .await?;
 
-		if let Some(res) = res {
-			return Ok(res.into_iter().map(DBSessionId).collect());
-		}
+        if let Some(res) = res {
+            return Ok(res.into_iter().map(DBSessionId).collect());
+        }
 
-		use futures::TryStreamExt;
-		let db_sessions: Vec<DBSessionId> = sqlx::query!(
-			"
+        use futures::TryStreamExt;
+        let db_sessions: Vec<DBSessionId> = sqlx::query!(
+            "
                 SELECT id
                 FROM sessions
                 WHERE user_id = $1
                 ORDER BY created DESC
                 ",
-			user_id.0,
-		)
-		.fetch(exec)
-		.map_ok(|x| DBSessionId(x.id))
-		.try_collect::<Vec<DBSessionId>>()
-		.await?;
+            user_id.0,
+        )
+        .fetch(exec)
+        .map_ok(|x| DBSessionId(x.id))
+        .try_collect::<Vec<DBSessionId>>()
+        .await?;
 
-		redis
-			.set_serialized_to_json(SESSIONS_USERS_NAMESPACE, user_id.0, &db_sessions, None)
-			.await?;
+        redis
+            .set_serialized_to_json(
+                SESSIONS_USERS_NAMESPACE,
+                user_id.0,
+                &db_sessions,
+                None,
+            )
+            .await?;
 
-		Ok(db_sessions)
-	}
+        Ok(db_sessions)
+    }
 
-	pub async fn clear_cache(
-		clear_sessions: Vec<(Option<DBSessionId>, Option<String>, Option<DBUserId>)>,
-		redis: &RedisPool,
-	) -> Result<(), DatabaseError> {
-		let mut redis = redis.connect().await?;
+    pub async fn clear_cache(
+        clear_sessions: Vec<(
+            Option<DBSessionId>,
+            Option<String>,
+            Option<DBUserId>,
+        )>,
+        redis: &RedisPool,
+    ) -> Result<(), DatabaseError> {
+        let mut redis = redis.connect().await?;
 
-		if clear_sessions.is_empty() {
-			return Ok(());
-		}
+        if clear_sessions.is_empty() {
+            return Ok(());
+        }
 
-		redis
-			.delete_many(
-				clear_sessions
-					.into_iter()
-					.flat_map(|(id, session, user_id)| {
-						[
-							(SESSIONS_NAMESPACE, id.map(|i| i.0.to_string())),
-							(SESSIONS_IDS_NAMESPACE, session),
-							(SESSIONS_USERS_NAMESPACE, user_id.map(|i| i.0.to_string())),
-						]
-					}),
-			)
-			.await?;
-		Ok(())
-	}
+        redis
+            .delete_many(clear_sessions.into_iter().flat_map(
+                |(id, session, user_id)| {
+                    [
+                        (SESSIONS_NAMESPACE, id.map(|i| i.0.to_string())),
+                        (SESSIONS_IDS_NAMESPACE, session),
+                        (
+                            SESSIONS_USERS_NAMESPACE,
+                            user_id.map(|i| i.0.to_string()),
+                        ),
+                    ]
+                },
+            ))
+            .await?;
+        Ok(())
+    }
 
-	pub async fn remove(
-		id: DBSessionId,
-		transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-	) -> Result<Option<()>, sqlx::error::Error> {
-		sqlx::query!(
-			"
+    pub async fn remove(
+        id: DBSessionId,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<Option<()>, sqlx::error::Error> {
+        sqlx::query!(
+            "
             DELETE FROM sessions WHERE id = $1
             ",
-			id as DBSessionId,
-		)
-		.execute(&mut **transaction)
-		.await?;
+            id as DBSessionId,
+        )
+        .execute(&mut **transaction)
+        .await?;
 
-		Ok(Some(()))
-	}
+        Ok(Some(()))
+    }
 }

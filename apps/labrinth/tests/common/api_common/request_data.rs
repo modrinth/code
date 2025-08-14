@@ -6,19 +6,19 @@ use labrinth::util::actix::MultipartSegment;
 use crate::common::dummy_data::TestFile;
 
 pub struct ProjectCreationRequestData {
-	pub slug: String,
-	pub jar: Option<TestFile>,
-	pub segment_data: Vec<MultipartSegment>,
+    pub slug: String,
+    pub jar: Option<TestFile>,
+    pub segment_data: Vec<MultipartSegment>,
 }
 
 pub struct VersionCreationRequestData {
-	pub version: String,
-	pub jar: Option<TestFile>,
-	pub segment_data: Vec<MultipartSegment>,
+    pub version: String,
+    pub jar: Option<TestFile>,
+    pub segment_data: Vec<MultipartSegment>,
 }
 
 pub struct ImageData {
-	pub filename: String,
-	pub extension: String,
-	pub icon: Vec<u8>,
+    pub filename: String,
+    pub extension: String,
+    pub icon: Vec<u8>,
 }

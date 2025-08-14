@@ -1,7 +1,7 @@
 use super::{DBOrganization, DBProject, ids::*};
 use crate::{
-	database::redis::RedisPool,
-	models::teams::{OrganizationPermissions, ProjectPermissions},
+    database::redis::RedisPool,
+    models::teams::{OrganizationPermissions, ProjectPermissions},
 };
 use dashmap::DashMap;
 use futures::TryStreamExt;
@@ -12,80 +12,80 @@ use serde::{Deserialize, Serialize};
 const TEAMS_NAMESPACE: &str = "teams";
 
 pub struct TeamBuilder {
-	pub members: Vec<TeamMemberBuilder>,
+    pub members: Vec<TeamMemberBuilder>,
 }
 pub struct TeamMemberBuilder {
-	pub user_id: DBUserId,
-	pub role: String,
-	pub is_owner: bool,
-	pub permissions: ProjectPermissions,
-	pub organization_permissions: Option<OrganizationPermissions>,
-	pub accepted: bool,
-	pub payouts_split: Decimal,
-	pub ordering: i64,
+    pub user_id: DBUserId,
+    pub role: String,
+    pub is_owner: bool,
+    pub permissions: ProjectPermissions,
+    pub organization_permissions: Option<OrganizationPermissions>,
+    pub accepted: bool,
+    pub payouts_split: Decimal,
+    pub ordering: i64,
 }
 
 impl TeamBuilder {
-	pub async fn insert(
-		self,
-		transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-	) -> Result<DBTeamId, super::DatabaseError> {
-		let team_id = generate_team_id(transaction).await?;
+    pub async fn insert(
+        self,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<DBTeamId, super::DatabaseError> {
+        let team_id = generate_team_id(transaction).await?;
 
-		let team = DBTeam { id: team_id };
+        let team = DBTeam { id: team_id };
 
-		sqlx::query!(
-			"
+        sqlx::query!(
+            "
             INSERT INTO teams (id)
             VALUES ($1)
             ",
-			team.id as DBTeamId,
-		)
-		.execute(&mut **transaction)
-		.await?;
+            team.id as DBTeamId,
+        )
+        .execute(&mut **transaction)
+        .await?;
 
-		let mut team_member_ids = Vec::new();
-		for _ in &self.members {
-			team_member_ids.push(generate_team_member_id(transaction).await?.0);
-		}
-		let TeamBuilder { members } = self;
-		let (
-			team_ids,
-			user_ids,
-			roles,
-			is_owners,
-			permissions,
-			organization_permissions,
-			accepteds,
-			payouts_splits,
-			orderings,
-		): (
-			Vec<_>,
-			Vec<_>,
-			Vec<_>,
-			Vec<_>,
-			Vec<_>,
-			Vec<_>,
-			Vec<_>,
-			Vec<_>,
-			Vec<_>,
-		) = members
-			.into_iter()
-			.map(|m| {
-				(
-					team.id.0,
-					m.user_id.0,
-					m.role,
-					m.is_owner,
-					m.permissions.bits() as i64,
-					m.organization_permissions.map(|p| p.bits() as i64),
-					m.accepted,
-					m.payouts_split,
-					m.ordering,
-				)
-			})
-			.multiunzip();
-		sqlx::query!(
+        let mut team_member_ids = Vec::new();
+        for _ in &self.members {
+            team_member_ids.push(generate_team_member_id(transaction).await?.0);
+        }
+        let TeamBuilder { members } = self;
+        let (
+            team_ids,
+            user_ids,
+            roles,
+            is_owners,
+            permissions,
+            organization_permissions,
+            accepteds,
+            payouts_splits,
+            orderings,
+        ): (
+            Vec<_>,
+            Vec<_>,
+            Vec<_>,
+            Vec<_>,
+            Vec<_>,
+            Vec<_>,
+            Vec<_>,
+            Vec<_>,
+            Vec<_>,
+        ) = members
+            .into_iter()
+            .map(|m| {
+                (
+                    team.id.0,
+                    m.user_id.0,
+                    m.role,
+                    m.is_owner,
+                    m.permissions.bits() as i64,
+                    m.organization_permissions.map(|p| p.bits() as i64),
+                    m.accepted,
+                    m.payouts_split,
+                    m.ordering,
+                )
+            })
+            .multiunzip();
+        sqlx::query!(
             "
             INSERT INTO team_members (id, team_id, user_id, role, is_owner, permissions, organization_permissions, accepted, payouts_split, ordering)
             SELECT * FROM UNNEST ($1::int8[], $2::int8[], $3::int8[], $4::varchar[], $5::bool[], $6::int8[], $7::int8[], $8::bool[], $9::numeric[], $10::int8[])
@@ -104,32 +104,32 @@ impl TeamBuilder {
         .execute(&mut **transaction)
         .await?;
 
-		Ok(team_id)
-	}
+        Ok(team_id)
+    }
 }
 
 /// A team of users who control a project
 pub struct DBTeam {
-	/// The id of the team
-	pub id: DBTeamId,
+    /// The id of the team
+    pub id: DBTeamId,
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug, Copy)]
 pub enum TeamAssociationId {
-	Project(DBProjectId),
-	Organization(DBOrganizationId),
+    Project(DBProjectId),
+    Organization(DBOrganizationId),
 }
 
 impl DBTeam {
-	pub async fn get_association<'a, 'b, E>(
-		id: DBTeamId,
-		executor: E,
-	) -> Result<Option<TeamAssociationId>, super::DatabaseError>
-	where
-		E: sqlx::Executor<'a, Database = sqlx::Postgres>,
-	{
-		let result = sqlx::query!(
-			"
+    pub async fn get_association<'a, 'b, E>(
+        id: DBTeamId,
+        executor: E,
+    ) -> Result<Option<TeamAssociationId>, super::DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let result = sqlx::query!(
+            "
             SELECT m.id AS pid, NULL AS oid
             FROM mods m
             WHERE m.team_id = $1
@@ -140,76 +140,79 @@ impl DBTeam {
             FROM organizations o
             WHERE o.team_id = $1
             ",
-			id as DBTeamId
-		)
-		.fetch_optional(executor)
-		.await?;
+            id as DBTeamId
+        )
+        .fetch_optional(executor)
+        .await?;
 
-		if let Some(t) = result {
-			// Only one of project_id or organization_id will be set
-			let mut team_association_id = None;
-			if let Some(pid) = t.pid {
-				team_association_id = Some(TeamAssociationId::Project(DBProjectId(pid)));
-			}
-			if let Some(oid) = t.oid {
-				team_association_id = Some(TeamAssociationId::Organization(DBOrganizationId(oid)));
-			}
-			return Ok(team_association_id);
-		}
-		Ok(None)
-	}
+        if let Some(t) = result {
+            // Only one of project_id or organization_id will be set
+            let mut team_association_id = None;
+            if let Some(pid) = t.pid {
+                team_association_id =
+                    Some(TeamAssociationId::Project(DBProjectId(pid)));
+            }
+            if let Some(oid) = t.oid {
+                team_association_id = Some(TeamAssociationId::Organization(
+                    DBOrganizationId(oid),
+                ));
+            }
+            return Ok(team_association_id);
+        }
+        Ok(None)
+    }
 }
 
 /// A member of a team
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct DBTeamMember {
-	pub id: DBTeamMemberId,
-	pub team_id: DBTeamId,
+    pub id: DBTeamMemberId,
+    pub team_id: DBTeamId,
 
-	/// The ID of the user associated with the member
-	pub user_id: DBUserId,
-	pub role: String,
-	pub is_owner: bool,
+    /// The ID of the user associated with the member
+    pub user_id: DBUserId,
+    pub role: String,
+    pub is_owner: bool,
 
-	// The permissions of the user in this project team
-	// For an organization team, these are the fallback permissions for any project in the organization
-	pub permissions: ProjectPermissions,
+    // The permissions of the user in this project team
+    // For an organization team, these are the fallback permissions for any project in the organization
+    pub permissions: ProjectPermissions,
 
-	// The permissions of the user in this organization team
-	// For a project team, this is None
-	pub organization_permissions: Option<OrganizationPermissions>,
+    // The permissions of the user in this organization team
+    // For a project team, this is None
+    pub organization_permissions: Option<OrganizationPermissions>,
 
-	pub accepted: bool,
-	pub payouts_split: Decimal,
-	pub ordering: i64,
+    pub accepted: bool,
+    pub payouts_split: Decimal,
+    pub ordering: i64,
 }
 
 impl DBTeamMember {
-	// Lists the full members of a team
-	pub async fn get_from_team_full<'a, 'b, E>(
-		id: DBTeamId,
-		executor: E,
-		redis: &RedisPool,
-	) -> Result<Vec<DBTeamMember>, super::DatabaseError>
-	where
-		E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
-	{
-		Self::get_from_team_full_many(&[id], executor, redis).await
-	}
+    // Lists the full members of a team
+    pub async fn get_from_team_full<'a, 'b, E>(
+        id: DBTeamId,
+        executor: E,
+        redis: &RedisPool,
+    ) -> Result<Vec<DBTeamMember>, super::DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        Self::get_from_team_full_many(&[id], executor, redis).await
+    }
 
-	pub async fn get_from_team_full_many<'a, E>(
-		team_ids: &[DBTeamId],
-		exec: E,
-		redis: &RedisPool,
-	) -> Result<Vec<DBTeamMember>, super::DatabaseError>
-	where
-		E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
-	{
-		if team_ids.is_empty() {
-			return Ok(Vec::new());
-		}
+    pub async fn get_from_team_full_many<'a, E>(
+        team_ids: &[DBTeamId],
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<Vec<DBTeamMember>, super::DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        if team_ids.is_empty() {
+            return Ok(Vec::new());
+        }
 
-		let val = redis.get_cached_keys(
+        let val = redis.get_cached_keys(
             TEAMS_NAMESPACE,
             &team_ids.iter().map(|x| x.0).collect::<Vec<_>>(),
             |team_ids| async move {
@@ -254,41 +257,44 @@ impl DBTeamMember {
             },
         ).await?;
 
-		Ok(val.into_iter().flatten().collect())
-	}
+        Ok(val.into_iter().flatten().collect())
+    }
 
-	pub async fn clear_cache(id: DBTeamId, redis: &RedisPool) -> Result<(), super::DatabaseError> {
-		let mut redis = redis.connect().await?;
-		redis.delete(TEAMS_NAMESPACE, id.0).await?;
-		Ok(())
-	}
+    pub async fn clear_cache(
+        id: DBTeamId,
+        redis: &RedisPool,
+    ) -> Result<(), super::DatabaseError> {
+        let mut redis = redis.connect().await?;
+        redis.delete(TEAMS_NAMESPACE, id.0).await?;
+        Ok(())
+    }
 
-	/// Gets a team member from a user id and team id.  Does not return pending members.
-	pub async fn get_from_user_id<'a, 'b, E>(
-		id: DBTeamId,
-		user_id: DBUserId,
-		executor: E,
-	) -> Result<Option<Self>, super::DatabaseError>
-	where
-		E: sqlx::Executor<'a, Database = sqlx::Postgres>,
-	{
-		Self::get_from_user_id_many(&[id], user_id, executor)
-			.await
-			.map(|x| x.into_iter().next())
-	}
+    /// Gets a team member from a user id and team id.  Does not return pending members.
+    pub async fn get_from_user_id<'a, 'b, E>(
+        id: DBTeamId,
+        user_id: DBUserId,
+        executor: E,
+    ) -> Result<Option<Self>, super::DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        Self::get_from_user_id_many(&[id], user_id, executor)
+            .await
+            .map(|x| x.into_iter().next())
+    }
 
-	/// Gets team members from user ids and team ids.  Does not return pending members.
-	pub async fn get_from_user_id_many<'a, 'b, E>(
-		team_ids: &[DBTeamId],
-		user_id: DBUserId,
-		executor: E,
-	) -> Result<Vec<Self>, super::DatabaseError>
-	where
-		E: sqlx::Executor<'a, Database = sqlx::Postgres>,
-	{
-		let team_ids_parsed: Vec<i64> = team_ids.iter().map(|x| x.0).collect();
+    /// Gets team members from user ids and team ids.  Does not return pending members.
+    pub async fn get_from_user_id_many<'a, 'b, E>(
+        team_ids: &[DBTeamId],
+        user_id: DBUserId,
+        executor: E,
+    ) -> Result<Vec<Self>, super::DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let team_ids_parsed: Vec<i64> = team_ids.iter().map(|x| x.0).collect();
 
-		let team_members = sqlx::query!(
+        let team_members = sqlx::query!(
             "
             SELECT id, team_id, role AS member_role, is_owner, permissions, organization_permissions,
             accepted, payouts_split, role,
@@ -319,19 +325,19 @@ impl DBTeamMember {
         .try_collect::<Vec<DBTeamMember>>()
         .await?;
 
-		Ok(team_members)
-	}
+        Ok(team_members)
+    }
 
-	/// Gets a team member from a user id and team id, including pending members.
-	pub async fn get_from_user_id_pending<'a, 'b, E>(
-		id: DBTeamId,
-		user_id: DBUserId,
-		executor: E,
-	) -> Result<Option<Self>, super::DatabaseError>
-	where
-		E: sqlx::Executor<'a, Database = sqlx::Postgres>,
-	{
-		let result = sqlx::query!(
+    /// Gets a team member from a user id and team id, including pending members.
+    pub async fn get_from_user_id_pending<'a, 'b, E>(
+        id: DBTeamId,
+        user_id: DBUserId,
+        executor: E,
+    ) -> Result<Option<Self>, super::DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let result = sqlx::query!(
             "
             SELECT id, team_id, role AS member_role, is_owner, permissions, organization_permissions,
                 accepted, payouts_split, role,
@@ -347,32 +353,35 @@ impl DBTeamMember {
         .fetch_optional(executor)
         .await?;
 
-		if let Some(m) = result {
-			Ok(Some(DBTeamMember {
-				id: DBTeamMemberId(m.id),
-				team_id: id,
-				user_id,
-				role: m.role,
-				is_owner: m.is_owner,
-				permissions: ProjectPermissions::from_bits(m.permissions as u64)
-					.unwrap_or_default(),
-				organization_permissions: m
-					.organization_permissions
-					.map(|p| OrganizationPermissions::from_bits(p as u64).unwrap_or_default()),
-				accepted: m.accepted,
-				payouts_split: m.payouts_split,
-				ordering: m.ordering,
-			}))
-		} else {
-			Ok(None)
-		}
-	}
+        if let Some(m) = result {
+            Ok(Some(DBTeamMember {
+                id: DBTeamMemberId(m.id),
+                team_id: id,
+                user_id,
+                role: m.role,
+                is_owner: m.is_owner,
+                permissions: ProjectPermissions::from_bits(
+                    m.permissions as u64,
+                )
+                .unwrap_or_default(),
+                organization_permissions: m.organization_permissions.map(|p| {
+                    OrganizationPermissions::from_bits(p as u64)
+                        .unwrap_or_default()
+                }),
+                accepted: m.accepted,
+                payouts_split: m.payouts_split,
+                ordering: m.ordering,
+            }))
+        } else {
+            Ok(None)
+        }
+    }
 
-	pub async fn insert(
-		&self,
-		transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-	) -> Result<(), sqlx::error::Error> {
-		sqlx::query!(
+    pub async fn insert(
+        &self,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<(), sqlx::error::Error> {
+        sqlx::query!(
             "
             INSERT INTO team_members (
                 id, team_id, user_id, role, permissions, organization_permissions, is_owner, accepted, payouts_split
@@ -394,166 +403,166 @@ impl DBTeamMember {
         .execute(&mut **transaction)
         .await?;
 
-		Ok(())
-	}
+        Ok(())
+    }
 
-	pub async fn delete(
-		id: DBTeamId,
-		user_id: DBUserId,
-		transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-	) -> Result<(), super::DatabaseError> {
-		sqlx::query!(
-			"
+    pub async fn delete(
+        id: DBTeamId,
+        user_id: DBUserId,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<(), super::DatabaseError> {
+        sqlx::query!(
+            "
             DELETE FROM team_members
             WHERE (team_id = $1 AND user_id = $2 AND NOT is_owner = TRUE)
             ",
-			id as DBTeamId,
-			user_id as DBUserId,
-		)
-		.execute(&mut **transaction)
-		.await?;
+            id as DBTeamId,
+            user_id as DBUserId,
+        )
+        .execute(&mut **transaction)
+        .await?;
 
-		Ok(())
-	}
+        Ok(())
+    }
 
-	#[allow(clippy::too_many_arguments)]
-	pub async fn edit_team_member(
-		id: DBTeamId,
-		user_id: DBUserId,
-		new_permissions: Option<ProjectPermissions>,
-		new_organization_permissions: Option<OrganizationPermissions>,
-		new_role: Option<String>,
-		new_accepted: Option<bool>,
-		new_payouts_split: Option<Decimal>,
-		new_ordering: Option<i64>,
-		new_is_owner: Option<bool>,
-		transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-	) -> Result<(), super::DatabaseError> {
-		if let Some(permissions) = new_permissions {
-			sqlx::query!(
-				"
+    #[allow(clippy::too_many_arguments)]
+    pub async fn edit_team_member(
+        id: DBTeamId,
+        user_id: DBUserId,
+        new_permissions: Option<ProjectPermissions>,
+        new_organization_permissions: Option<OrganizationPermissions>,
+        new_role: Option<String>,
+        new_accepted: Option<bool>,
+        new_payouts_split: Option<Decimal>,
+        new_ordering: Option<i64>,
+        new_is_owner: Option<bool>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<(), super::DatabaseError> {
+        if let Some(permissions) = new_permissions {
+            sqlx::query!(
+                "
                 UPDATE team_members
                 SET permissions = $1
                 WHERE (team_id = $2 AND user_id = $3)
                 ",
-				permissions.bits() as i64,
-				id as DBTeamId,
-				user_id as DBUserId,
-			)
-			.execute(&mut **transaction)
-			.await?;
-		}
+                permissions.bits() as i64,
+                id as DBTeamId,
+                user_id as DBUserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+        }
 
-		if let Some(organization_permissions) = new_organization_permissions {
-			sqlx::query!(
-				"
+        if let Some(organization_permissions) = new_organization_permissions {
+            sqlx::query!(
+                "
                 UPDATE team_members
                 SET organization_permissions = $1
                 WHERE (team_id = $2 AND user_id = $3)
                 ",
-				organization_permissions.bits() as i64,
-				id as DBTeamId,
-				user_id as DBUserId,
-			)
-			.execute(&mut **transaction)
-			.await?;
-		}
+                organization_permissions.bits() as i64,
+                id as DBTeamId,
+                user_id as DBUserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+        }
 
-		if let Some(role) = new_role {
-			sqlx::query!(
-				"
+        if let Some(role) = new_role {
+            sqlx::query!(
+                "
                 UPDATE team_members
                 SET role = $1
                 WHERE (team_id = $2 AND user_id = $3)
                 ",
-				role,
-				id as DBTeamId,
-				user_id as DBUserId,
-			)
-			.execute(&mut **transaction)
-			.await?;
-		}
+                role,
+                id as DBTeamId,
+                user_id as DBUserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+        }
 
-		if let Some(accepted) = new_accepted
-			&& accepted
-		{
-			sqlx::query!(
-				"
+        if let Some(accepted) = new_accepted
+            && accepted
+        {
+            sqlx::query!(
+                "
                     UPDATE team_members
                     SET accepted = TRUE
                     WHERE (team_id = $1 AND user_id = $2)
                     ",
-				id as DBTeamId,
-				user_id as DBUserId,
-			)
-			.execute(&mut **transaction)
-			.await?;
-		}
+                id as DBTeamId,
+                user_id as DBUserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+        }
 
-		if let Some(payouts_split) = new_payouts_split {
-			sqlx::query!(
-				"
+        if let Some(payouts_split) = new_payouts_split {
+            sqlx::query!(
+                "
                 UPDATE team_members
                 SET payouts_split = $1
                 WHERE (team_id = $2 AND user_id = $3)
                 ",
-				payouts_split,
-				id as DBTeamId,
-				user_id as DBUserId,
-			)
-			.execute(&mut **transaction)
-			.await?;
-		}
+                payouts_split,
+                id as DBTeamId,
+                user_id as DBUserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+        }
 
-		if let Some(ordering) = new_ordering {
-			sqlx::query!(
-				"
+        if let Some(ordering) = new_ordering {
+            sqlx::query!(
+                "
                 UPDATE team_members
                 SET ordering = $1
                 WHERE (team_id = $2 AND user_id = $3)
                 ",
-				ordering,
-				id as DBTeamId,
-				user_id as DBUserId,
-			)
-			.execute(&mut **transaction)
-			.await?;
-		}
+                ordering,
+                id as DBTeamId,
+                user_id as DBUserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+        }
 
-		if let Some(is_owner) = new_is_owner {
-			sqlx::query!(
-				"
+        if let Some(is_owner) = new_is_owner {
+            sqlx::query!(
+                "
                 UPDATE team_members
                 SET is_owner = $1
                 WHERE (team_id = $2 AND user_id = $3)
                 ",
-				is_owner,
-				id as DBTeamId,
-				user_id as DBUserId,
-			)
-			.execute(&mut **transaction)
-			.await?;
-		}
+                is_owner,
+                id as DBTeamId,
+                user_id as DBUserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+        }
 
-		Ok(())
-	}
+        Ok(())
+    }
 
-	pub async fn get_from_user_id_project<'a, 'b, E>(
-		id: DBProjectId,
-		user_id: DBUserId,
-		allow_pending: bool,
-		executor: E,
-	) -> Result<Option<Self>, super::DatabaseError>
-	where
-		E: sqlx::Executor<'a, Database = sqlx::Postgres>,
-	{
-		let accepted = if allow_pending {
-			vec![true, false]
-		} else {
-			vec![true]
-		};
+    pub async fn get_from_user_id_project<'a, 'b, E>(
+        id: DBProjectId,
+        user_id: DBUserId,
+        allow_pending: bool,
+        executor: E,
+    ) -> Result<Option<Self>, super::DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let accepted = if allow_pending {
+            vec![true, false]
+        } else {
+            vec![true]
+        };
 
-		let result = sqlx::query!(
+        let result = sqlx::query!(
             "
             SELECT tm.id, tm.team_id, tm.user_id, tm.role, tm.is_owner, tm.permissions, tm.organization_permissions, tm.accepted, tm.payouts_split, tm.ordering
             FROM mods m
@@ -567,42 +576,45 @@ impl DBTeamMember {
             .fetch_optional(executor)
             .await?;
 
-		if let Some(m) = result {
-			Ok(Some(DBTeamMember {
-				id: DBTeamMemberId(m.id),
-				team_id: DBTeamId(m.team_id),
-				user_id,
-				role: m.role,
-				is_owner: m.is_owner,
-				permissions: ProjectPermissions::from_bits(m.permissions as u64)
-					.unwrap_or_default(),
-				organization_permissions: m
-					.organization_permissions
-					.map(|p| OrganizationPermissions::from_bits(p as u64).unwrap_or_default()),
-				accepted: m.accepted,
-				payouts_split: m.payouts_split,
-				ordering: m.ordering,
-			}))
-		} else {
-			Ok(None)
-		}
-	}
+        if let Some(m) = result {
+            Ok(Some(DBTeamMember {
+                id: DBTeamMemberId(m.id),
+                team_id: DBTeamId(m.team_id),
+                user_id,
+                role: m.role,
+                is_owner: m.is_owner,
+                permissions: ProjectPermissions::from_bits(
+                    m.permissions as u64,
+                )
+                .unwrap_or_default(),
+                organization_permissions: m.organization_permissions.map(|p| {
+                    OrganizationPermissions::from_bits(p as u64)
+                        .unwrap_or_default()
+                }),
+                accepted: m.accepted,
+                payouts_split: m.payouts_split,
+                ordering: m.ordering,
+            }))
+        } else {
+            Ok(None)
+        }
+    }
 
-	pub async fn get_from_user_id_organization<'a, 'b, E>(
-		id: DBOrganizationId,
-		user_id: DBUserId,
-		allow_pending: bool,
-		executor: E,
-	) -> Result<Option<Self>, super::DatabaseError>
-	where
-		E: sqlx::Executor<'a, Database = sqlx::Postgres>,
-	{
-		let accepted = if allow_pending {
-			vec![true, false]
-		} else {
-			vec![true]
-		};
-		let result = sqlx::query!(
+    pub async fn get_from_user_id_organization<'a, 'b, E>(
+        id: DBOrganizationId,
+        user_id: DBUserId,
+        allow_pending: bool,
+        executor: E,
+    ) -> Result<Option<Self>, super::DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let accepted = if allow_pending {
+            vec![true, false]
+        } else {
+            vec![true]
+        };
+        let result = sqlx::query!(
             "
             SELECT tm.id, tm.team_id, tm.user_id, tm.role, tm.is_owner, tm.permissions, tm.organization_permissions, tm.accepted, tm.payouts_split, tm.ordering
             FROM organizations o
@@ -616,36 +628,39 @@ impl DBTeamMember {
             .fetch_optional(executor)
             .await?;
 
-		if let Some(m) = result {
-			Ok(Some(DBTeamMember {
-				id: DBTeamMemberId(m.id),
-				team_id: DBTeamId(m.team_id),
-				user_id,
-				role: m.role,
-				is_owner: m.is_owner,
-				permissions: ProjectPermissions::from_bits(m.permissions as u64)
-					.unwrap_or_default(),
-				organization_permissions: m
-					.organization_permissions
-					.map(|p| OrganizationPermissions::from_bits(p as u64).unwrap_or_default()),
-				accepted: m.accepted,
-				payouts_split: m.payouts_split,
-				ordering: m.ordering,
-			}))
-		} else {
-			Ok(None)
-		}
-	}
+        if let Some(m) = result {
+            Ok(Some(DBTeamMember {
+                id: DBTeamMemberId(m.id),
+                team_id: DBTeamId(m.team_id),
+                user_id,
+                role: m.role,
+                is_owner: m.is_owner,
+                permissions: ProjectPermissions::from_bits(
+                    m.permissions as u64,
+                )
+                .unwrap_or_default(),
+                organization_permissions: m.organization_permissions.map(|p| {
+                    OrganizationPermissions::from_bits(p as u64)
+                        .unwrap_or_default()
+                }),
+                accepted: m.accepted,
+                payouts_split: m.payouts_split,
+                ordering: m.ordering,
+            }))
+        } else {
+            Ok(None)
+        }
+    }
 
-	pub async fn get_from_user_id_version<'a, 'b, E>(
-		id: DBVersionId,
-		user_id: DBUserId,
-		executor: E,
-	) -> Result<Option<Self>, super::DatabaseError>
-	where
-		E: sqlx::Executor<'a, Database = sqlx::Postgres>,
-	{
-		let result = sqlx::query!(
+    pub async fn get_from_user_id_version<'a, 'b, E>(
+        id: DBVersionId,
+        user_id: DBUserId,
+        executor: E,
+    ) -> Result<Option<Self>, super::DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let result = sqlx::query!(
             "
             SELECT tm.id, tm.team_id, tm.user_id, tm.role, tm.is_owner, tm.permissions, tm.organization_permissions, tm.accepted, tm.payouts_split, tm.ordering, v.mod_id
             FROM versions v
@@ -659,50 +674,58 @@ impl DBTeamMember {
             .fetch_optional(executor)
             .await?;
 
-		if let Some(m) = result {
-			Ok(Some(DBTeamMember {
-				id: DBTeamMemberId(m.id),
-				team_id: DBTeamId(m.team_id),
-				user_id,
-				role: m.role,
-				is_owner: m.is_owner,
-				permissions: ProjectPermissions::from_bits(m.permissions as u64)
-					.unwrap_or_default(),
-				organization_permissions: m
-					.organization_permissions
-					.map(|p| OrganizationPermissions::from_bits(p as u64).unwrap_or_default()),
-				accepted: m.accepted,
-				payouts_split: m.payouts_split,
-				ordering: m.ordering,
-			}))
-		} else {
-			Ok(None)
-		}
-	}
+        if let Some(m) = result {
+            Ok(Some(DBTeamMember {
+                id: DBTeamMemberId(m.id),
+                team_id: DBTeamId(m.team_id),
+                user_id,
+                role: m.role,
+                is_owner: m.is_owner,
+                permissions: ProjectPermissions::from_bits(
+                    m.permissions as u64,
+                )
+                .unwrap_or_default(),
+                organization_permissions: m.organization_permissions.map(|p| {
+                    OrganizationPermissions::from_bits(p as u64)
+                        .unwrap_or_default()
+                }),
+                accepted: m.accepted,
+                payouts_split: m.payouts_split,
+                ordering: m.ordering,
+            }))
+        } else {
+            Ok(None)
+        }
+    }
 
-	// Gets both required members for checking permissions of an action on a project
-	// - project team member (a user's membership to a given project)
-	// - organization team member (a user's membership to a given organization that owns a given project)
-	pub async fn get_for_project_permissions<'a, 'b, E>(
-		project: &DBProject,
-		user_id: DBUserId,
-		executor: E,
-	) -> Result<(Option<Self>, Option<Self>), super::DatabaseError>
-	where
-		E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
-	{
-		let project_team_member =
-			Self::get_from_user_id(project.team_id, user_id, executor).await?;
+    // Gets both required members for checking permissions of an action on a project
+    // - project team member (a user's membership to a given project)
+    // - organization team member (a user's membership to a given organization that owns a given project)
+    pub async fn get_for_project_permissions<'a, 'b, E>(
+        project: &DBProject,
+        user_id: DBUserId,
+        executor: E,
+    ) -> Result<(Option<Self>, Option<Self>), super::DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        let project_team_member =
+            Self::get_from_user_id(project.team_id, user_id, executor).await?;
 
-		let organization =
-			DBOrganization::get_associated_organization_project_id(project.id, executor).await?;
+        let organization =
+            DBOrganization::get_associated_organization_project_id(
+                project.id, executor,
+            )
+            .await?;
 
-		let organization_team_member = if let Some(organization) = &organization {
-			Self::get_from_user_id(organization.team_id, user_id, executor).await?
-		} else {
-			None
-		};
+        let organization_team_member = if let Some(organization) = &organization
+        {
+            Self::get_from_user_id(organization.team_id, user_id, executor)
+                .await?
+        } else {
+            None
+        };
 
-		Ok((project_team_member, organization_team_member))
-	}
+        Ok((project_team_member, organization_team_member))
+    }
 }

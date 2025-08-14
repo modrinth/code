@@ -17,26 +17,27 @@ pub mod tags;
 pub mod worlds;
 
 pub mod data {
-	pub use crate::state::{
-		CacheBehaviour, CacheValueType, Credentials, Dependency, DirectoryInfo, Hooks, JavaVersion,
-		LinkedData, MemorySettings, ModLoader, ModrinthCredentials, Organization, ProcessMetadata,
-		ProfileFile, Project, ProjectType, SearchResult, SearchResults, Settings, TeamMember,
-		Theme, User, UserFriend, Version, WindowSize,
-	};
-	pub use ariadne::users::UserStatus;
+    pub use crate::state::{
+        CacheBehaviour, CacheValueType, Credentials, Dependency, DirectoryInfo,
+        Hooks, JavaVersion, LinkedData, MemorySettings, ModLoader,
+        ModrinthCredentials, Organization, ProcessMetadata, ProfileFile,
+        Project, ProjectType, SearchResult, SearchResults, Settings,
+        TeamMember, Theme, User, UserFriend, Version, WindowSize,
+    };
+    pub use ariadne::users::UserStatus;
 }
 
 pub mod prelude {
-	pub use crate::{
-		State,
-		data::*,
-		event::CommandPayload,
-		jre, metadata, minecraft_auth, mr_auth, pack, process,
-		profile::{self, Profile, create},
-		settings,
-		util::{
-			io::{IOError, canonicalize},
-			network::tcp_listen_any_loopback,
-		},
-	};
+    pub use crate::{
+        State,
+        data::*,
+        event::CommandPayload,
+        jre, metadata, minecraft_auth, mr_auth, pack, process,
+        profile::{self, Profile, create},
+        settings,
+        util::{
+            io::{IOError, canonicalize},
+            network::tcp_listen_any_loopback,
+        },
+    };
 }

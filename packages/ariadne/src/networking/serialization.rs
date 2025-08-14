@@ -4,11 +4,11 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum SerializationError {
-	#[error("Failed to (de)serialize message: {0}")]
-	SerializationFailed(#[from] serde_json::Error),
+    #[error("Failed to (de)serialize message: {0}")]
+    SerializationFailed(#[from] serde_json::Error),
 
-	#[error("Failed to (de)serialize binary message: {0}")]
-	BinarySerializationFailed(#[from] serde_cbor::Error),
+    #[error("Failed to (de)serialize binary message: {0}")]
+    BinarySerializationFailed(#[from] serde_cbor::Error),
 }
 
 macro_rules! message_serialization {
@@ -47,10 +47,10 @@ macro_rules! message_serialization {
 }
 
 message_serialization!(
-	ClientToServerMessage,
-	ClientToServerMessage::SocketSend { .. },
+    ClientToServerMessage,
+    ClientToServerMessage::SocketSend { .. },
 );
 message_serialization!(
-	ServerToClientMessage,
-	ServerToClientMessage::SocketData { .. },
+    ServerToClientMessage,
+    ServerToClientMessage::SocketData { .. },
 );

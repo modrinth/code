@@ -8,135 +8,135 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ModrinthCredentials {
-	pub session: String,
-	pub expires: DateTime<Utc>,
-	pub user_id: String,
-	pub active: bool,
+    pub session: String,
+    pub expires: DateTime<Utc>,
+    pub user_id: String,
+    pub active: bool,
 }
 
 impl ModrinthCredentials {
-	pub async fn get_and_refresh(
-		exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
-		semaphore: &FetchSemaphore,
-	) -> crate::Result<Option<Self>> {
-		let creds = Self::get_active(exec).await?;
+    pub async fn get_and_refresh(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+        semaphore: &FetchSemaphore,
+    ) -> crate::Result<Option<Self>> {
+        let creds = Self::get_active(exec).await?;
 
-		if let Some(mut creds) = creds {
-			if creds.expires < Utc::now() {
-				#[derive(Deserialize)]
-				struct Session {
-					session: String,
-				}
+        if let Some(mut creds) = creds {
+            if creds.expires < Utc::now() {
+                #[derive(Deserialize)]
+                struct Session {
+                    session: String,
+                }
 
-				let resp = fetch_advanced(
-					Method::POST,
-					concat!(env!("MODRINTH_API_URL"), "session/refresh"),
-					None,
-					None,
-					Some(("Authorization", &*creds.session)),
-					None,
-					semaphore,
-					exec,
-				)
-				.await
-				.ok()
-				.and_then(|resp| serde_json::from_slice::<Session>(&resp).ok());
+                let resp = fetch_advanced(
+                    Method::POST,
+                    concat!(env!("MODRINTH_API_URL"), "session/refresh"),
+                    None,
+                    None,
+                    Some(("Authorization", &*creds.session)),
+                    None,
+                    semaphore,
+                    exec,
+                )
+                .await
+                .ok()
+                .and_then(|resp| serde_json::from_slice::<Session>(&resp).ok());
 
-				if let Some(value) = resp {
-					creds.session = value.session;
-					creds.expires = Utc::now() + Duration::weeks(2);
-					creds.upsert(exec).await?;
+                if let Some(value) = resp {
+                    creds.session = value.session;
+                    creds.expires = Utc::now() + Duration::weeks(2);
+                    creds.upsert(exec).await?;
 
-					Ok(Some(creds))
-				} else {
-					Self::remove(&creds.user_id, exec).await?;
+                    Ok(Some(creds))
+                } else {
+                    Self::remove(&creds.user_id, exec).await?;
 
-					Ok(None)
-				}
-			} else {
-				Ok(Some(creds))
-			}
-		} else {
-			Ok(None)
-		}
-	}
+                    Ok(None)
+                }
+            } else {
+                Ok(Some(creds))
+            }
+        } else {
+            Ok(None)
+        }
+    }
 
-	pub async fn get_active(
-		exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-	) -> crate::Result<Option<Self>> {
-		let res = sqlx::query!(
-			"
+    pub async fn get_active(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<Option<Self>> {
+        let res = sqlx::query!(
+            "
             SELECT
                 id, active, session_id, expires
             FROM modrinth_users
             WHERE active = TRUE
             "
-		)
-		.fetch_optional(exec)
-		.await?;
+        )
+        .fetch_optional(exec)
+        .await?;
 
-		Ok(res.map(|x| Self {
-			session: x.session_id,
-			expires: Utc
-				.timestamp_opt(x.expires, 0)
-				.single()
-				.unwrap_or_else(Utc::now),
-			user_id: x.id,
-			active: x.active == 1,
-		}))
-	}
+        Ok(res.map(|x| Self {
+            session: x.session_id,
+            expires: Utc
+                .timestamp_opt(x.expires, 0)
+                .single()
+                .unwrap_or_else(Utc::now),
+            user_id: x.id,
+            active: x.active == 1,
+        }))
+    }
 
-	pub async fn get_all(
-		exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-	) -> crate::Result<DashMap<String, Self>> {
-		let res = sqlx::query!(
-			"
+    pub async fn get_all(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<DashMap<String, Self>> {
+        let res = sqlx::query!(
+            "
             SELECT
                 id, active, session_id, expires
             FROM modrinth_users
             "
-		)
-		.fetch(exec)
-		.try_fold(DashMap::new(), |acc, x| {
-			acc.insert(
-				x.id.clone(),
-				Self {
-					session: x.session_id,
-					expires: Utc
-						.timestamp_opt(x.expires, 0)
-						.single()
-						.unwrap_or_else(Utc::now),
-					user_id: x.id,
-					active: x.active == 1,
-				},
-			);
+        )
+        .fetch(exec)
+        .try_fold(DashMap::new(), |acc, x| {
+            acc.insert(
+                x.id.clone(),
+                Self {
+                    session: x.session_id,
+                    expires: Utc
+                        .timestamp_opt(x.expires, 0)
+                        .single()
+                        .unwrap_or_else(Utc::now),
+                    user_id: x.id,
+                    active: x.active == 1,
+                },
+            );
 
-			async move { Ok(acc) }
-		})
-		.await?;
+            async move { Ok(acc) }
+        })
+        .await?;
 
-		Ok(res)
-	}
+        Ok(res)
+    }
 
-	pub async fn upsert(
-		&self,
-		exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
-	) -> crate::Result<()> {
-		let expires = self.expires.timestamp();
+    pub async fn upsert(
+        &self,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+    ) -> crate::Result<()> {
+        let expires = self.expires.timestamp();
 
-		if self.active {
-			sqlx::query!(
-				"
+        if self.active {
+            sqlx::query!(
+                "
                 UPDATE modrinth_users
                 SET active = FALSE
                 "
-			)
-			.execute(exec)
-			.await?;
-		}
+            )
+            .execute(exec)
+            .await?;
+        }
 
-		sqlx::query!(
-			"
+        sqlx::query!(
+            "
             INSERT INTO modrinth_users (id, active, session_id, expires)
             VALUES ($1, $2, $3, $4)
             ON CONFLICT (id) DO UPDATE SET
@@ -144,93 +144,93 @@ impl ModrinthCredentials {
                 session_id = $3,
                 expires = $4
             ",
-			self.user_id,
-			self.active,
-			self.session,
-			expires,
-		)
-		.execute(exec)
-		.await?;
+            self.user_id,
+            self.active,
+            self.session,
+            expires,
+        )
+        .execute(exec)
+        .await?;
 
-		Ok(())
-	}
+        Ok(())
+    }
 
-	pub async fn remove(
-		user_id: &str,
-		exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-	) -> crate::Result<()> {
-		sqlx::query!(
-			"
+    pub async fn remove(
+        user_id: &str,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<()> {
+        sqlx::query!(
+            "
             DELETE FROM modrinth_users WHERE id = $1
             ",
-			user_id,
-		)
-		.execute(exec)
-		.await?;
+            user_id,
+        )
+        .execute(exec)
+        .await?;
 
-		Ok(())
-	}
+        Ok(())
+    }
 
-	pub(crate) async fn refresh_all() -> crate::Result<()> {
-		let state = crate::State::get().await?;
-		let all = Self::get_all(&state.pool).await?;
+    pub(crate) async fn refresh_all() -> crate::Result<()> {
+        let state = crate::State::get().await?;
+        let all = Self::get_all(&state.pool).await?;
 
-		let user_ids = all.into_iter().map(|x| x.0).collect::<Vec<_>>();
+        let user_ids = all.into_iter().map(|x| x.0).collect::<Vec<_>>();
 
-		CachedEntry::get_user_many(
-			&user_ids.iter().map(|x| &**x).collect::<Vec<_>>(),
-			Some(CacheBehaviour::Bypass),
-			&state.pool,
-			&state.fetch_semaphore,
-		)
-		.await?;
+        CachedEntry::get_user_many(
+            &user_ids.iter().map(|x| &**x).collect::<Vec<_>>(),
+            Some(CacheBehaviour::Bypass),
+            &state.pool,
+            &state.fetch_semaphore,
+        )
+        .await?;
 
-		Ok(())
-	}
+        Ok(())
+    }
 }
 
 pub const fn get_login_url() -> &'static str {
-	concat!(env!("MODRINTH_URL"), "auth/sign-in")
+    concat!(env!("MODRINTH_URL"), "auth/sign-in")
 }
 
 pub async fn finish_login_flow(
-	code: &str,
-	semaphore: &FetchSemaphore,
-	exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    code: &str,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<ModrinthCredentials> {
-	// The authorization code actually is the access token, since labrinth doesn't
-	// issue separate authorization codes. Therefore, this is equivalent to an
-	// implicit OAuth grant flow, and no additional exchanging or finalization is
-	// needed. TODO not do this for the reasons outlined at
-	// https://oauth.net/2/grant-types/implicit/
+    // The authorization code actually is the access token, since labrinth doesn't
+    // issue separate authorization codes. Therefore, this is equivalent to an
+    // implicit OAuth grant flow, and no additional exchanging or finalization is
+    // needed. TODO not do this for the reasons outlined at
+    // https://oauth.net/2/grant-types/implicit/
 
-	let info = fetch_info(code, semaphore, exec).await?;
+    let info = fetch_info(code, semaphore, exec).await?;
 
-	Ok(ModrinthCredentials {
-		session: code.to_string(),
-		expires: Utc::now() + Duration::weeks(2),
-		user_id: info.id,
-		active: true,
-	})
+    Ok(ModrinthCredentials {
+        session: code.to_string(),
+        expires: Utc::now() + Duration::weeks(2),
+        user_id: info.id,
+        active: true,
+    })
 }
 
 async fn fetch_info(
-	token: &str,
-	semaphore: &FetchSemaphore,
-	exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    token: &str,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<crate::state::cache::User> {
-	let result = fetch_advanced(
-		Method::GET,
-		concat!(env!("MODRINTH_API_URL"), "user"),
-		None,
-		None,
-		Some(("Authorization", token)),
-		None,
-		semaphore,
-		exec,
-	)
-	.await?;
-	let value = serde_json::from_slice(&result)?;
+    let result = fetch_advanced(
+        Method::GET,
+        concat!(env!("MODRINTH_API_URL"), "user"),
+        None,
+        None,
+        Some(("Authorization", token)),
+        None,
+        semaphore,
+        exec,
+    )
+    .await?;
+    let value = serde_json::from_slice(&result)?;
 
-	Ok(value)
+    Ok(value)
 }

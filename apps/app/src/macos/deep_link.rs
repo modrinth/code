@@ -4,22 +4,24 @@ use tokio::sync::Mutex;
 
 #[derive(Debug, Clone)]
 pub struct InitialPayload {
-	pub payload: Arc<Mutex<Option<String>>>,
+    pub payload: Arc<Mutex<Option<String>>>,
 }
 
-pub fn get_or_init_payload<R: Runtime, M: Manager<R>>(manager: &M) -> InitialPayload {
-	let initial_payload = manager.try_state::<InitialPayload>();
+pub fn get_or_init_payload<R: Runtime, M: Manager<R>>(
+    manager: &M,
+) -> InitialPayload {
+    let initial_payload = manager.try_state::<InitialPayload>();
 
-	if let Some(initial_payload) = initial_payload {
-		initial_payload.inner().clone()
-	} else {
-		tracing::info!("No initial payload found, creating new");
-		let payload = InitialPayload {
-			payload: Arc::new(Mutex::new(None)),
-		};
+    if let Some(initial_payload) = initial_payload {
+        initial_payload.inner().clone()
+    } else {
+        tracing::info!("No initial payload found, creating new");
+        let payload = InitialPayload {
+            payload: Arc::new(Mutex::new(None)),
+        };
 
-		manager.manage(payload.clone());
+        manager.manage(payload.clone());
 
-		payload
-	}
+        payload
+    }
 }
