@@ -41,7 +41,7 @@ import { listen } from '@tauri-apps/api/event'
     }
 */
 export async function loading_listener(callback) {
-  return await listen('loading', (event) => callback(event.payload))
+	return await listen('loading', (event) => callback(event.payload))
 }
 
 /// Payload for the 'process' event
@@ -54,7 +54,7 @@ export async function loading_listener(callback) {
     }
 */
 export async function process_listener(callback) {
-  return await listen('process', (event) => callback(event.payload))
+	return await listen('process', (event) => callback(event.payload))
 }
 
 /// Payload for the 'profile' event
@@ -68,7 +68,7 @@ export async function process_listener(callback) {
     }
 */
 export async function profile_listener(callback) {
-  return await listen('profile', (event) => callback(event.payload))
+	return await listen('profile', (event) => callback(event.payload))
 }
 
 /// Payload for the 'command' event
@@ -79,9 +79,9 @@ export async function profile_listener(callback) {
   }
 */
 export async function command_listener(callback) {
-  return await listen('command', (event) => {
-    callback(event.payload)
-  })
+	return await listen('command', (event) => {
+		callback(event.payload)
+	})
 }
 
 /// Payload for the 'warning' event
@@ -91,9 +91,9 @@ export async function command_listener(callback) {
     }
 */
 export async function warning_listener(callback) {
-  return await listen('warning', (event) => callback(event.payload))
+	return await listen('warning', (event) => callback(event.payload))
 }
 
 export async function friend_listener(callback) {
-  return await listen('friend', (event) => callback(event.payload))
+	return await listen('friend', (event) => callback(event.payload))
 }
