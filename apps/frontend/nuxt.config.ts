@@ -1,8 +1,8 @@
+import { promises as fs } from "fs";
+import { pathToFileURL } from "node:url";
 import { match as matchLocale } from "@formatjs/intl-localematcher";
 import { consola } from "consola";
-import { promises as fs } from "fs";
 import { globIterate } from "glob";
-import { pathToFileURL } from "node:url";
 import { defineNuxtConfig } from "nuxt/config";
 import { $fetch } from "ofetch";
 import { basename, relative, resolve } from "pathe";
