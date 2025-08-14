@@ -1,4 +1,4 @@
 export * from './core'
-export * from './links'
 export * from './description'
+export * from './links'
 export * from './tags'
