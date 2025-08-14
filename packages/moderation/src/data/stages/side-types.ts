@@ -1,6 +1,7 @@
-import type { Stage } from '../../types/stage'
-import type { ButtonAction } from '../../types/actions'
 import { GlobeIcon } from '@modrinth/assets'
+
+import type { ButtonAction } from '../../types/actions'
+import type { Stage } from '../../types/stage'
 
 const sideTypes: Stage = {
 	title: "Is the project's environment information accurate?",

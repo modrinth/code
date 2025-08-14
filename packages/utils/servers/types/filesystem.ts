@@ -1,5 +1,5 @@
 import type { JWTAuth } from './api'
-import type { FSQueuedOp, FilesystemOp } from './websocket'
+import type { FilesystemOp, FSQueuedOp } from './websocket'
 
 export interface DirectoryItem {
 	name: string

@@ -36,6 +36,7 @@ import { XIcon } from '@modrinth/assets'
 import { renderString } from '@modrinth/utils'
 import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
+
 import Admonition from './Admonition.vue'
 import ButtonStyled from './ButtonStyled.vue'
 import CopyCode from './CopyCode.vue'

@@ -1,6 +1,7 @@
-import type { Stage } from '../../types/stage'
-import type { ButtonAction, DropdownAction, DropdownActionOption } from '../../types/actions'
 import { VersionIcon } from '@modrinth/assets'
+
+import type { ButtonAction, DropdownAction, DropdownActionOption } from '../../types/actions'
+import type { Stage } from '../../types/stage'
 
 const versions: Stage = {
 	title: "Are this project's files correct?",

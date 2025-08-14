@@ -1,6 +1,7 @@
 import type { Project } from '@modrinth/utils'
+import { defineMessage, useVIntl } from '@vintl/vintl'
+
 import type { Nag, NagContext } from '../../types/nags'
-import { useVIntl, defineMessage } from '@vintl/vintl'
 
 const allResolutionTags = ['8x-', '16x', '32x', '48x', '64x', '128x', '256x', '512x+']
 

@@ -1,11 +1,10 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
 import { insertNewlineAndIndent } from '@codemirror/commands'
 import { deleteMarkupBackward } from '@codemirror/lang-markdown'
 import { getIndentation, indentString, syntaxTree } from '@codemirror/language'
-import { type EditorState, type Transaction } from '@codemirror/state'
-import { type EditorView, type Command, type KeyBinding } from '@codemirror/view'
+import type { EditorState, Transaction } from '@codemirror/state'
+import type { Command, EditorView, KeyBinding } from '@codemirror/view'
 
 const toggleBold: Command = ({ state, dispatch }) => {
 	return toggleAround(state, dispatch, '**', '**')

@@ -1,6 +1,7 @@
-import type { Stage } from '../../types/stage'
-import type { ButtonAction } from '../../types/actions'
 import { ImageIcon } from '@modrinth/assets'
+
+import type { ButtonAction } from '../../types/actions'
+import type { Stage } from '../../types/stage'
 
 const gallery: Stage = {
 	title: "Are this project's gallery images sufficient?",

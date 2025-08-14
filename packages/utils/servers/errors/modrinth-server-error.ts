@@ -1,4 +1,5 @@
 import { FetchError } from 'ofetch'
+
 import type { V1ErrorInfo } from '../types'
 
 export class ModrinthServerError extends Error {

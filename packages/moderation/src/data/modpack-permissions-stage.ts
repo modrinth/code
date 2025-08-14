@@ -1,6 +1,7 @@
-import type { ModerationModpackPermissionApprovalType, Project } from '@modrinth/utils'
-import type { Stage } from '../types/stage'
 import { PackageOpenIcon } from '@modrinth/assets'
+import type { ModerationModpackPermissionApprovalType, Project } from '@modrinth/utils'
+
+import type { Stage } from '../types/stage'
 
 export default {
 	id: 'modpack-permissions',

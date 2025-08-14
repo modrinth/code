@@ -1,6 +1,7 @@
-import type { Stage } from '../../types/stage'
-import type { ButtonAction, DropdownAction, DropdownActionOption } from '../../types/actions'
 import { TriangleAlertIcon } from '@modrinth/assets'
+
+import type { ButtonAction, DropdownAction, DropdownActionOption } from '../../types/actions'
+import type { Stage } from '../../types/stage'
 
 const statusAlerts: Stage = {
 	title: `Is anything else affecting this project's status?`,

@@ -1,4 +1,4 @@
-import type { WSBackupTask, WSBackupState } from './websocket'
+import type { WSBackupState, WSBackupTask } from './websocket'
 
 export interface Backup {
 	id: string

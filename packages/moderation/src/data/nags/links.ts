@@ -1,6 +1,7 @@
-import type { Nag, NagContext } from '../../types/nags'
 import { formatProjectType } from '@modrinth/utils'
-import { useVIntl, defineMessage } from '@vintl/vintl'
+import { defineMessage, useVIntl } from '@vintl/vintl'
+
+import type { Nag, NagContext } from '../../types/nags'
 
 export const commonLinkDomains = {
 	source: ['github.com', 'gitlab.com', 'bitbucket.org', 'codeberg.org', 'git.sr.ht'],

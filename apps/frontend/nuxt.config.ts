@@ -1,12 +1,4 @@
-import { promises as fs } from "fs";
-import { pathToFileURL } from "node:url";
-import { match as matchLocale } from "@formatjs/intl-localematcher";
-import { consola } from "consola";
-import { globIterate } from "glob";
-import { defineNuxtConfig } from "nuxt/config";
-import { $fetch } from "ofetch";
-import { basename, relative, resolve } from "pathe";
-import svgLoader from "vite-svg-loader";
+import { pathToFileURL } from 'node:url'
 
 import { match as matchLocale } from '@formatjs/intl-localematcher'
 import { consola } from 'consola'
@@ -77,13 +69,7 @@ export default defineNuxtConfig({
 					return { rel: 'icon', type: 'image/x-icon', href, media }
 				}),
 				...Object.entries(favicons).map(([media, href]): object => {
-					return {
-						rel: 'apple-touch-icon',
-						type: 'image/x-icon',
-						href,
-						media,
-						sizes: '64x64',
-					}
+					return { rel: 'apple-touch-icon', type: 'image/x-icon', href, media, sizes: '64x64' }
 				}),
 				{
 					rel: 'search',
@@ -276,33 +262,30 @@ export default defineNuxtConfig({
 				return resolveImport
 			})()
 
-      const resolveOmorphiaLocaleImport = await (async () => {
-        const omorphiaLocales: string[] = [];
-        const omorphiaLocaleSets = new Map<
-          string,
-          { files: { from: string; format?: string }[] }
-        >();
+			const resolveOmorphiaLocaleImport = await (async () => {
+				const omorphiaLocales: string[] = []
+				const omorphiaLocaleSets = new Map<string, { files: { from: string; format?: string }[] }>()
 
-        for (const pkgLocales of [`node_modules/@modrinth/**/src/locales/*`]) {
-          for await (const localeDir of globIterate(pkgLocales, {
-            posix: true,
-          })) {
-            const tag = basename(localeDir);
-            if (!omorphiaLocales.includes(tag)) {
-              omorphiaLocales.push(tag);
-            }
+				for (const pkgLocales of [`node_modules/@modrinth/**/src/locales/*`]) {
+					for await (const localeDir of globIterate(pkgLocales, {
+						posix: true,
+					})) {
+						const tag = basename(localeDir)
+						if (!omorphiaLocales.includes(tag)) {
+							omorphiaLocales.push(tag)
+						}
 
-            const entry = omorphiaLocaleSets.get(tag) ?? { files: [] };
-            omorphiaLocaleSets.set(tag, entry);
+						const entry = omorphiaLocaleSets.get(tag) ?? { files: [] }
+						omorphiaLocaleSets.set(tag, entry)
 
-            for await (const localeFile of globIterate(`${localeDir}/*`, { posix: true })) {
-              entry.files.push({
-                from: pathToFileURL(localeFile).toString(),
-                format: "default",
-              });
-            }
-          }
-        }
+						for await (const localeFile of globIterate(`${localeDir}/*`, { posix: true })) {
+							entry.files.push({
+								from: pathToFileURL(localeFile).toString(),
+								format: 'default',
+							})
+						}
+					}
+				}
 
 				return function resolveLocaleImport(tag: string) {
 					return omorphiaLocaleSets.get(matchLocale([tag], omorphiaLocales, 'en-x-placeholder'))

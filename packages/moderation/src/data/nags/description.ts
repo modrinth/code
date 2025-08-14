@@ -1,6 +1,7 @@
 import { renderHighlightedString } from '@modrinth/utils'
+import { defineMessage, useVIntl } from '@vintl/vintl'
+
 import type { Nag, NagContext } from '../../types/nags'
-import { useVIntl, defineMessage } from '@vintl/vintl'
 
 export const MIN_DESCRIPTION_CHARS = 200
 export const MAX_HEADER_LENGTH = 80

@@ -1,5 +1,5 @@
-import type { Stats } from './stats'
 import type { ServerState } from './server'
+import type { Stats } from './stats'
 
 export interface WSAuth {
 	url: string
