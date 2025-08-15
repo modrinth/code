@@ -36,9 +36,11 @@ pub async fn is_network_metered() -> Result<bool> {
 pub async fn is_network_metered() -> Result<bool> {
     use crate::ErrorKind;
     use cidre::nw::PathMonitor;
-    use std::sync::mpsc;
+    use std::time::Duration;
+    use tokio::sync::oneshot;
+    use tokio_util::future::FutureExt;
 
-    let (sender, receiver) = mpsc::channel();
+    let (sender, receiver) = oneshot::channel();
 
     let mut monitor = PathMonitor::new();
     monitor.set_update_handler(|path| {
@@ -46,12 +48,17 @@ pub async fn is_network_metered() -> Result<bool> {
     });
 
     monitor.start();
-    let result = receiver.recv();
+    let result = receiver
+        .timeout(Duration::from_millis(100))
+        .await
+        .ok()
+        .map(|x| x.ok())
+        .flatten();
     monitor.cancel();
 
-    result.map_err(|_| {
+    result.ok_or_else(|| {
         ErrorKind::OtherError(
-            "NWPathMonitor didn't provide an NWPath".to_string(),
+            "NWPathMonitor didn't provide an NWPath in time".to_string(),
         )
         .into()
     })
