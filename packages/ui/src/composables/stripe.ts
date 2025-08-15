@@ -83,7 +83,7 @@ export const useStripe = (
 			appearance: {
 				variables: {
 					colorPrimary: styles.getPropertyValue('--color-brand'),
-					colorBackground: styles.getPropertyValue('--experimental-color-button-bg'),
+					colorBackground: styles.getPropertyValue('--color-button-bg'),
 					colorText: styles.getPropertyValue('--color-base'),
 					colorTextPlaceholder: styles.getPropertyValue('--color-secondary'),
 					colorDanger: styles.getPropertyValue('--color-red'),
