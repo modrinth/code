@@ -33,6 +33,7 @@ export const configurationNuxtToAppend = [
 						'Head',
 						'Title',
 						'router-link',
+						'RouterView',
 						'RouterLink',
 						'nuxt-link',
 					],
