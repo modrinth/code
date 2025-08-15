@@ -1,4 +1,4 @@
-import { loadStripe, type Stripe as StripeJs, type StripeElements } from '@stripe/stripe-js'
+import { loadStripe, type StripeElements, type Stripe as StripeJs } from '@stripe/stripe-js'
 import type { ContactOption } from '@stripe/stripe-js/dist/stripe-js/elements/address'
 import type Stripe from 'stripe'
 import { computed, type Ref, ref } from 'vue'
@@ -35,7 +35,7 @@ export const useStripe = (
 	project: Ref<string | undefined>,
 	initiatePayment: (
 		body: CreatePaymentIntentRequest | UpdatePaymentIntentRequest,
-	) => Promise<CreatePaymentIntentResponse | UpdatePaymentIntentResponse>,
+	) => Promise<CreatePaymentIntentResponse | UpdatePaymentIntentResponse | null>,
 	onError: (err: Error) => void,
 ) => {
 	const stripe = ref<StripeJs | null>(null)
@@ -63,14 +63,14 @@ export const useStripe = (
 
 	function createIntent(
 		body: CreatePaymentIntentRequest,
-	): Promise<CreatePaymentIntentResponse | undefined> {
-		return initiatePayment(body) as Promise<CreatePaymentIntentResponse | undefined>
+	): Promise<CreatePaymentIntentResponse | null> {
+		return initiatePayment(body) as Promise<CreatePaymentIntentResponse | null>
 	}
 
 	function updateIntent(
 		body: UpdatePaymentIntentRequest,
-	): Promise<UpdatePaymentIntentResponse | undefined> {
-		return initiatePayment(body) as Promise<UpdatePaymentIntentResponse | undefined>
+	): Promise<UpdatePaymentIntentResponse | null> {
+		return initiatePayment(body) as Promise<UpdatePaymentIntentResponse | null>
 	}
 
 	const planPrices = computed(() => {
@@ -227,7 +227,7 @@ export const useStripe = (
 				interval: interval.value,
 			}
 
-			let result: BasePaymentIntentResponse | undefined
+			let result: BasePaymentIntentResponse | null = null
 
 			const metadata: CreatePaymentIntentRequest['metadata'] = {
 				type: 'pyro',

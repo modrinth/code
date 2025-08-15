@@ -55,8 +55,9 @@ const props = defineProps<{
 	fetchStock: (region: ServerRegion, request: ServerStockRequest) => Promise<number>
 	initiatePayment: (
 		body: CreatePaymentIntentRequest | UpdatePaymentIntentRequest,
-	) => Promise<UpdatePaymentIntentResponse | CreatePaymentIntentResponse>
+	) => Promise<UpdatePaymentIntentResponse | CreatePaymentIntentResponse | null>
 	onError: (err: Error) => void
+	onFinalizeNoPaymentChange?: () => Promise<void>
 }>()
 
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
@@ -402,7 +403,20 @@ function handleChooseCustom() {
 							: undefined
 					"
 					:disabled="!canProceed"
-					@click="noPaymentRequired && currentStep === 'review' ? modal?.hide() : setStep(nextStep)"
+					@click="
+						noPaymentRequired && currentStep === 'review'
+							? (async () => {
+									if (props.onFinalizeNoPaymentChange) {
+										try {
+											await props.onFinalizeNoPaymentChange()
+										} catch (e) {
+											return
+										}
+									}
+									modal?.hide()
+								})()
+							: setStep(nextStep)
+					"
 				>
 					<template v-if="currentStep === 'review'">
 						<template v-if="noPaymentRequired"><CheckCircleIcon /> Close</template>

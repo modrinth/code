@@ -17,6 +17,7 @@
 		:plan-stage="true"
 		:existing-plan="currentPlanFromSubscription"
 		:existing-subscription="subscription || undefined"
+		:on-finalize-no-payment-change="finalizeDowngrade"
 		@hide="() => (subscription = null)"
 	/>
 </template>
@@ -137,6 +138,12 @@ function runPingTest(region: any, index = 1) {
 }
 
 const subscription = ref<UserSubscription | null>(null)
+// Dry run state
+const dryRunResponse = ref<{
+	requires_payment: boolean
+	required_payment_is_proration: boolean
+} | null>(null)
+const pendingDowngradeBody = ref<any | null>(null)
 const currentPlanFromSubscription = computed<ServerPlan | undefined>(() => {
 	return subscription.value
 		? (pyroProducts.find(
@@ -156,11 +163,34 @@ async function initiatePayment(body: any): Promise<any> {
 			region: body.metadata?.server_region,
 		}
 
-		return await useBaseFetch(`billing/subscription/${subscription.value.id}`, {
-			internal: true,
-			method: 'PATCH',
-			body: transformedBody,
-		})
+		try {
+			const dry = await useBaseFetch(`billing/subscription/${subscription.value.id}?dry=true`, {
+				internal: true,
+				method: 'PATCH',
+				body: transformedBody,
+			})
+
+			if (dry && typeof dry === 'object' && 'requires_payment' in dry) {
+				dryRunResponse.value = dry as any
+				pendingDowngradeBody.value = transformedBody
+				if (dry.requires_payment) {
+					return await finalizeImmediate(transformedBody)
+				} else {
+					addNotification({
+						title: 'Subscription change pending',
+						text: 'Your subscription will be modified at the end of the current billing interval. Click Close to confirm this downgrade.',
+						type: 'info',
+					})
+					return null
+				}
+			} else {
+				// Fallback if dry run not supported
+				return await finalizeImmediate(transformedBody)
+			}
+		} catch (e) {
+			console.error('Dry run failed, attempting immediate patch', e)
+			return await finalizeImmediate(transformedBody)
+		}
 	} else {
 		addNotification({
 			title: 'Unable to determine subscription ID.',
@@ -168,6 +198,36 @@ async function initiatePayment(body: any): Promise<any> {
 			type: 'error',
 		})
 		return Promise.reject(new Error('Unable to determine subscription ID.'))
+	}
+}
+
+async function finalizeImmediate(body: any) {
+	return await useBaseFetch(`billing/subscription/${subscription.value?.id}`, {
+		internal: true,
+		method: 'PATCH',
+		body,
+	})
+}
+
+async function finalizeDowngrade() {
+	if (!subscription.value || !pendingDowngradeBody.value) return
+	try {
+		await finalizeImmediate(pendingDowngradeBody.value)
+		addNotification({
+			title: 'Subscription updated',
+			text: 'Your plan has been downgraded and will take effect next billing cycle.',
+			type: 'success',
+		})
+	} catch (e) {
+		addNotification({
+			title: 'Failed to apply subscription changes',
+			text: 'Please try again or contact support.',
+			type: 'error',
+		})
+		throw e
+	} finally {
+		dryRunResponse.value = null
+		pendingDowngradeBody.value = null
 	}
 }
 
