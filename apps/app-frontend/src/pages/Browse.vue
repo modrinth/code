@@ -162,6 +162,8 @@ const {
 	createPageParams,
 } = useSearch(projectTypes, tags, instanceFilters)
 
+const previousFilterState = ref('')
+
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
 	offline.value = true
@@ -221,8 +223,21 @@ async function refreshSearch() {
 				)
 		}
 	}
-	results.value = rawResults.result
-	currentPage.value = 1
+		results.value = rawResults.result
+
+	const currentFilterState = JSON.stringify({
+		query: query.value,
+		filters: currentFilters.value,
+		sort: currentSortType.value,
+		maxResults: maxResults.value,
+		projectTypes: projectTypes.value
+	})
+
+	if (previousFilterState.value && previousFilterState.value !== currentFilterState) {
+		currentPage.value = 1
+	}
+
+	previousFilterState.value = currentFilterState
 
 	const persistentParams: LocationQuery = {}
 
@@ -382,6 +397,15 @@ const handleOptionsClick = (args) => {
 }
 
 await refreshSearch()
+
+// Initialize previousFilterState after first search
+previousFilterState.value = JSON.stringify({
+	query: query.value,
+	filters: currentFilters.value,
+	sort: currentSortType.value,
+	maxResults: maxResults.value,
+	projectTypes: projectTypes.value
+})
 </script>
 
 <template>
