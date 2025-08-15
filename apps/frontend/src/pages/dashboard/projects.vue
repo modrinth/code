@@ -350,10 +350,11 @@ export default defineNuxtComponent({
 	},
 	async setup() {
 		const { formatMessage } = useVIntl()
+		const { addNotification } = injectNotificationManager()
 
 		const user = await useUser()
 		await initUserProjects()
-		return { formatMessage, user: ref(user) }
+		return { formatMessage, user: ref(user), addNotification }
 	},
 	data() {
 		return {
@@ -445,8 +446,6 @@ export default defineNuxtComponent({
 			return sortedArray
 		},
 		async bulkEditLinks() {
-			const { addNotification } = injectNotificationManager()
-
 			try {
 				const baseData = {
 					issues_url: this.editLinks.issues.clear ? null : this.editLinks.issues.val.trim(),
@@ -467,7 +466,7 @@ export default defineNuxtComponent({
 				)
 
 				this.$refs.editLinksModal.hide()
-				addNotification({
+				this.addNotification({
 					title: 'Success',
 					text: "Bulk edited selected project's links.",
 					type: 'success',
@@ -483,7 +482,7 @@ export default defineNuxtComponent({
 				this.editLinks.wiki.clear = false
 				this.editLinks.discord.clear = false
 			} catch (e) {
-				addNotification({
+				this.addNotification({
 					title: 'An error occurred',
 					text: e,
 					type: 'error',
