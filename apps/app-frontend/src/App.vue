@@ -28,7 +28,7 @@ import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.j
 import { list } from '@/helpers/profile.js'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
-import { areUpdatesEnabled, getOS, isDev } from '@/helpers/utils.js'
+import {areUpdatesEnabled, getOS, isDev, isNetworkMetered} from '@/helpers/utils.js'
 import { useError } from '@/store/error.js'
 import { useInstall } from '@/store/install.js'
 import { useLoading, useTheming } from '@/store/state'
@@ -647,6 +647,8 @@ async function processPendingSurveys() {
     console.info('No user survey to show')
   }
 }
+
+console.log(`Metered network: ${await isNetworkMetered()}`)
 </script>
 
 <template>

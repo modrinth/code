@@ -26,6 +26,10 @@ export async function getOS() {
   return await invoke('plugin:utils|get_os')
 }
 
+export async function isNetworkMetered() {
+  return await invoke('plugin:utils|is_network_metered')
+}
+
 export async function openPath(path) {
   return await invoke('plugin:utils|open_path', { path })
 }
