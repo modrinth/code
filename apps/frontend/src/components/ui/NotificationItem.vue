@@ -340,6 +340,7 @@ import {
 	ProjectStatusBadge,
 	useRelativeTime,
 } from '@modrinth/ui'
+import { getProjectLink } from '~/helpers/projects'
 
 import ThreadSummary from './thread/ThreadSummary.vue'
 
