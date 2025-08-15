@@ -335,6 +335,13 @@ useSeoMeta({
 
 <script>
 export default defineNuxtComponent({
+	setup() {
+		const { addNotification } = injectNotificationManager()
+
+		return {
+			addNotification,
+		}
+	},
 	data() {
 		return {
 			expandedGalleryItem: null,
@@ -425,8 +432,6 @@ export default defineNuxtComponent({
 			this.shouldPreventActions = true
 			startLoading()
 
-			const { addNotification } = injectNotificationManager()
-
 			try {
 				let url = `project/${this.project.id}/gallery?ext=${
 					this.editFile
@@ -452,7 +457,7 @@ export default defineNuxtComponent({
 
 				this.$refs.modal_edit_item.hide()
 			} catch (err) {
-				addNotification({
+				this.addNotification({
 					title: 'An error occurred',
 					text: err.data ? err.data.description : err,
 					type: 'error',
@@ -465,9 +470,6 @@ export default defineNuxtComponent({
 		async editGalleryItem() {
 			this.shouldPreventActions = true
 			startLoading()
-
-			const { addNotification } = injectNotificationManager()
-
 			try {
 				let url = `project/${this.project.id}/gallery?url=${encodeURIComponent(
 					this.project.gallery[this.editIndex].url,
@@ -490,7 +492,7 @@ export default defineNuxtComponent({
 				await this.resetProject()
 				this.$refs.modal_edit_item.hide()
 			} catch (err) {
-				addNotification({
+				this.addNotification({
 					title: 'An error occurred',
 					text: err.data ? err.data.description : err,
 					type: 'error',
@@ -502,8 +504,6 @@ export default defineNuxtComponent({
 		},
 		async deleteGalleryImage() {
 			startLoading()
-
-			const { addNotification } = injectNotificationManager()
 
 			try {
 				await useBaseFetch(
@@ -517,7 +517,7 @@ export default defineNuxtComponent({
 
 				await this.resetProject()
 			} catch (err) {
-				addNotification({
+				this.addNotification({
 					title: 'An error occurred',
 					text: err.data ? err.data.description : err,
 					type: 'error',

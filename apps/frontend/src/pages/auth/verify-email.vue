@@ -40,7 +40,11 @@
 					</template>
 				</p>
 
-				<button v-if="auth.user" class="btn btn-primary continue-btn" @click="resendVerifyEmail">
+				<button
+					v-if="auth.user"
+					class="btn btn-primary continue-btn"
+					@click="handleResendEmailVerification"
+				>
 					{{ formatMessage(failedVerificationMessages.action) }} <RightArrowIcon />
 				</button>
 
@@ -53,7 +57,9 @@
 </template>
 <script setup>
 import { RightArrowIcon, SettingsIcon } from '@modrinth/assets'
+import { injectNotificationManager } from '@modrinth/ui'
 
+const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
@@ -147,6 +153,23 @@ if (route.query.flow) {
 		}
 	} catch {
 		success.value = false
+	}
+}
+
+async function handleResendEmailVerification() {
+	try {
+		await resendVerifyEmail()
+		addNotification({
+			title: 'Email sent',
+			text: `An email with a link to verify your account has been sent to ${auth.value.user.email}.`,
+			type: 'success',
+		})
+	} catch (err) {
+		addNotification({
+			title: 'An error occurred',
+			text: err.data.description,
+			type: 'error',
+		})
 	}
 }
 </script>

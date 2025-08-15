@@ -1,4 +1,3 @@
-import { injectNotificationManager } from '@modrinth/ui'
 import { getVersion } from '@tauri-apps/api/app'
 import { fetch } from '@tauri-apps/plugin-http'
 
@@ -11,9 +10,9 @@ export const useFetch = async (url, item, isSilent) => {
 		})
 	} catch (err) {
 		if (!isSilent) {
-			const { handleError } = injectNotificationManager()
-			handleError({ message: `Error fetching ${item}` })
+			throw err
+		} else {
+			console.error(err)
 		}
-		console.error(err)
 	}
 }

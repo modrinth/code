@@ -331,7 +331,7 @@ const stopInstance = async (context) => {
 }
 
 const repairInstance = async () => {
-	await finish_install(instance.value)
+	await finish_install(instance.value).catch(handleError)
 }
 
 const handleRightClick = (event) => {

@@ -118,7 +118,7 @@
 
 <script setup>
 import { CheckIcon, DownloadIcon, HeartIcon, PlusIcon, TagsIcon } from '@modrinth/assets'
-import { Avatar, ButtonStyled } from '@modrinth/ui'
+import { Avatar, ButtonStyled, injectNotificationManager } from '@modrinth/ui'
 import { formatCategory, formatNumber } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -127,6 +127,8 @@ import { useRouter } from 'vue-router'
 
 import { install as installVersion } from '@/store/install.js'
 dayjs.extend(relativeTime)
+
+const { handleError } = injectNotificationManager()
 
 const router = useRouter()
 
@@ -175,7 +177,7 @@ async function install() {
 		(profile) => {
 			router.push(`/instance/${profile}`)
 		},
-	)
+	).catch(handleError)
 }
 
 const modpack = computed(() => props.project.project_type === 'modpack')
