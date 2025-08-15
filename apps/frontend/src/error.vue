@@ -52,11 +52,12 @@
 
 <script setup>
 import { SadRinthbot } from '@modrinth/assets'
+import { NotificationPanel, provideNotificationManager } from '@modrinth/ui'
 import { defineMessage, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
 
-import { NotificationPanel, provideNotificationManager } from '@modrinth/ui'
 import Logo404 from '~/assets/images/404.svg'
+
 import ModrinthLoadingIndicator from './components/ui/modrinth-loading-indicator.ts'
 import { FrontendNotificationManager } from './providers/frontend-notifications.ts'
 
