@@ -30,7 +30,7 @@ const VERSIONS: VersionEntry[] = [
 - Improved Modrinth user account login to use your default web browser.
 - Updated the appearance and functionality of error notifications to match the Modrinth website.
 - Fixed search not returning to first page when filters are changed.
-- Fixed modpacks showing up with the "Optimization" tag on Home page if it's not a featured category on the project.
+- Fixed modpacks showing up with the "Optimization" tag on Home page even when it's not a featured category on the project.
 - Improved pinging Minecraft servers for older versions in the Worlds tab to more closely match how the client would ping them.
 - Added Quick Play functionality for Minecraft servers on versions before 1.20.
 - Fixed the tracking of last played time for Minecraft servers on versions before 1.7.2.
