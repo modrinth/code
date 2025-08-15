@@ -62,10 +62,13 @@ const showPreviewImage = (files) => {
 const orgId = useRouteId()
 
 const onSaveChanges = useClientTry(async () => {
-	if (hasChanges.value) {
-		await patchOrganization(orgId, patchData.value)
+	// Only PATCH organization details if there are actual field changes
+	const hasOrgFieldChanges = Object.keys(patchData.value).length > 0
+	if (hasOrgFieldChanges) {
+		await patchOrganization(patchData.value)
 	}
 
+	// Handle icon deletion / upload separately
 	if (deletedIcon.value) {
 		await deleteIcon()
 		deletedIcon.value = false
@@ -74,6 +77,7 @@ const onSaveChanges = useClientTry(async () => {
 		icon.value = null
 	}
 
+	// Always refresh after any change
 	await refreshOrganization()
 
 	addNotification({

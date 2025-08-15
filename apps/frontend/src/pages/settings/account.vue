@@ -267,7 +267,7 @@
 							<button
 								v-if="auth.user.auth_providers.includes(provider.id)"
 								class="btn"
-								@click="removeAuthProvider(provider.id)"
+								@click="handleRemoveAuthProvider(provider.id)"
 							>
 								<TrashIcon /> Remove
 							</button>
@@ -432,6 +432,7 @@ import SteamIcon from 'assets/icons/auth/sso-steam.svg'
 import QrcodeVue from 'qrcode.vue'
 
 import Modal from '~/components/ui/Modal.vue'
+import { removeAuthProvider } from '~/composables/auth.js'
 
 useHead({
 	title: 'Account settings - Modrinth',
@@ -469,6 +470,14 @@ async function saveEmail() {
 		})
 	}
 	stopLoading()
+}
+
+async function handleRemoveAuthProvider(provider) {
+	try {
+		await removeAuthProvider(provider)
+	} catch (error) {
+		handleError(error)
+	}
 }
 
 const managePasswordModal = ref()
