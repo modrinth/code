@@ -118,7 +118,10 @@ export const getAuthUrl = (provider, redirect = '/dashboard') => {
 }
 
 export const removeAuthProvider = async (provider) => {
+	const { addNotification } = injectNotificationManager()
+
 	startLoading()
+
 	try {
 		const auth = await useAuth()
 
@@ -130,7 +133,6 @@ export const removeAuthProvider = async (provider) => {
 		})
 		await useAuth(auth.value.token)
 	} catch (err) {
-		const { addNotification } = injectNotificationManager()
 		addNotification({
 			title: 'An error occurred',
 			text: err.data.description,
