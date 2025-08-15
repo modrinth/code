@@ -165,7 +165,14 @@ const handleOptionsClick = async (args) => {
 			await navigator.clipboard.writeText(args.item.path)
 			break
 		case 'install': {
-			await installVersion(args.item.project_id, null, null, 'ProjectCardContextMenu')
+			await installVersion(
+				args.item.project_id,
+				null,
+				null,
+				'ProjectCardContextMenu',
+				() => {},
+				() => {},
+			).catch(handleError)
 
 			break
 		}

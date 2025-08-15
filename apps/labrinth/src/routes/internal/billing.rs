@@ -409,23 +409,6 @@ pub async fn edit_subscription(
             }
         }
 
-        if let Some(interval) = &edit_subscription.interval
-            && let Price::Recurring { intervals } = &current_price.prices
-        {
-            // For expiring charges, the interval is handled in the Product branch.
-            if open_charge.status != ChargeStatus::Expiring {
-                if let Some(price) = intervals.get(interval) {
-                    open_charge.subscription_interval = Some(*interval);
-                    open_charge.amount = *price as i64;
-                } else {
-                    return Err(ApiError::InvalidInput(
-                        "Interval is not valid for this subscription!"
-                            .to_string(),
-                    ));
-                }
-            }
-        }
-
         let intent = if let Some(product_id) = &edit_subscription.product {
             let product_price =
                 product_item::DBProductPrice::get_all_product_prices(
@@ -444,7 +427,7 @@ pub async fn edit_subscription(
 
             if product_price.id == current_price.id {
                 return Err(ApiError::InvalidInput(
-                    "You may not change the price of this subscription!"
+                    "You cannot use the existing product when modifying a subscription! Modifications to only the billing interval aren't yet supported."
                         .to_string(),
                 ));
             }
@@ -523,6 +506,9 @@ pub async fn edit_subscription(
                 );
                 metadata.insert("modrinth_new_region".to_string(), new_region);
 
+                // No need to specify `modrinth_update_subscription_interval`, the next
+                // charge's interval should be the same at `modrinth_subscription_interval`.
+
                 intent.customer = Some(customer_id);
                 intent.metadata = Some(metadata);
                 intent.receipt_email = user.email.as_deref();
@@ -556,7 +542,7 @@ pub async fn edit_subscription(
                 // The charge is not an expiring charge, need to prorate.
 
                 let interval = open_charge.due - Utc::now();
-                let duration = PriceDuration::Monthly;
+                let duration = subscription.interval;
 
                 let current_amount = match &current_price.prices {
                     Price::OneTime { price } => *price,
@@ -620,6 +606,16 @@ pub async fn edit_subscription(
                         )
                     })?;
 
+                    // Add either the *new* interval or the *current* interval to the metadata.
+                    // Once the proration charge succeeds, the open charge's interval will be updated
+                    // to reflect this attached interval.
+                    //
+                    // The proration charge will also have this interval attached to itself, though
+                    // it doesn't necessarily have much significance.
+                    let new_subscription_interval = edit_subscription
+                        .interval
+                        .or(open_charge.subscription_interval);
+
                     let mut intent =
                         CreatePaymentIntent::new(proration as i64, currency);
 
@@ -642,8 +638,7 @@ pub async fn edit_subscription(
                     );
                     metadata.insert(
                         "modrinth_subscription_interval".to_string(),
-                        open_charge
-                            .subscription_interval
+                        new_subscription_interval
                             .unwrap_or(PriceDuration::Monthly)
                             .as_str()
                             .to_string(),
@@ -656,6 +651,13 @@ pub async fn edit_subscription(
                         metadata.insert(
                             "modrinth_new_region".to_string(),
                             region.to_owned(),
+                        );
+                    }
+
+                    if let Some(interval) = &edit_subscription.interval {
+                        metadata.insert(
+                            "modrinth_update_subscription_interval".to_string(),
+                            interval.as_str().to_string(),
                         );
                     }
 
@@ -1652,15 +1654,16 @@ pub async fn stripe_webhook(
                         charge.upsert(transaction).await?;
 
                         if let Some(subscription_id) = charge.subscription_id {
-                            let Some(mut subscription) =
-                            user_subscription_item::DBUserSubscription::get(
+                            let maybe_subscription = user_subscription_item::DBUserSubscription::get(
                                 subscription_id,
                                 pool,
                             )
-                            .await?
-                        else {
-                            break 'metadata;
-                        };
+                            .await?;
+
+                            let Some(mut subscription) = maybe_subscription
+                            else {
+                                break 'metadata;
+                            };
 
                             match charge.type_ {
                                 ChargeType::OneTime
@@ -1714,12 +1717,13 @@ pub async fn stripe_webhook(
                             break 'metadata;
                         };
 
-                        let Some(product) = product_item::DBProduct::get(
+                        let maybe_product = product_item::DBProduct::get(
                             price.product_id,
                             pool,
                         )
-                        .await?
-                        else {
+                        .await?;
+
+                        let Some(product) = maybe_product else {
                             break 'metadata;
                         };
 
@@ -1735,31 +1739,31 @@ pub async fn stripe_webhook(
 
                                 if intervals.get(&interval).is_some() {
                                     let Some(subscription_id) = metadata
-                                    .get("modrinth_subscription_id")
-                                    .and_then(|x| parse_base62(x).ok())
-                                    .map(|x| {
-                                        crate::database::models::ids::DBUserSubscriptionId(x as i64)
-                                    }) else {
-                                    break 'metadata;
-                                };
+                                        .get("modrinth_subscription_id")
+                                        .and_then(|x| parse_base62(x).ok())
+                                        .map(|x| {
+                                            crate::database::models::ids::DBUserSubscriptionId(x as i64)
+                                        }) else {
+                                        break 'metadata;
+                                    };
 
                                     let subscription = if let Some(mut subscription) = user_subscription_item::DBUserSubscription::get(subscription_id, pool).await? {
-                                    subscription.status = SubscriptionStatus::Unprovisioned;
-                                    subscription.price_id = price_id;
-                                    subscription.interval = interval;
+                                        subscription.status = SubscriptionStatus::Unprovisioned;
+                                        subscription.price_id = price_id;
+                                        subscription.interval = interval;
 
-                                    subscription
-                                } else {
-                                    user_subscription_item::DBUserSubscription {
-                                        id: subscription_id,
-                                        user_id,
-                                        price_id,
-                                        interval,
-                                        created: Utc::now(),
-                                        status: SubscriptionStatus::Unprovisioned,
-                                        metadata: None,
-                                    }
-                                };
+                                        subscription
+                                    } else {
+                                        user_subscription_item::DBUserSubscription {
+                                            id: subscription_id,
+                                            user_id,
+                                            price_id,
+                                            interval,
+                                            created: Utc::now(),
+                                            status: SubscriptionStatus::Unprovisioned,
+                                            metadata: None,
+                                        }
+                                    };
 
                                     if charge_status != ChargeStatus::Failed {
                                         subscription
@@ -2094,6 +2098,7 @@ pub async fn stripe_webhook(
                         // Otherwise, if there *is* an open charge, the subscription was upgraded
                         // and the just-processed payment was the proration charge. In this case,
                         // the existing open charge must be updated to reflect the new product's price.
+                        // The subscription interval was updated above.
                         //
                         // If there are no open charges, the just-processed payment was a recurring
                         // or initial subscription charge, and we need to create the next charge.
@@ -2105,7 +2110,15 @@ pub async fn stripe_webhook(
                                 charge.payment_platform =
                                     PaymentPlatform::Stripe;
                                 charge.last_attempt = None;
+                                charge.subscription_interval =
+                                    Some(subscription.interval);
+                                charge.amount = new_price as i64;
+                                charge.price_id =
+                                    metadata.product_price_item.id;
                             } else {
+                                // Note: do not update the due date
+                                charge.subscription_interval =
+                                    Some(subscription.interval);
                                 charge.price_id =
                                     metadata.product_price_item.id;
                                 charge.amount = new_price as i64;

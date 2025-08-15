@@ -39,7 +39,14 @@ defineExpose({
 
 async function install() {
 	confirmModal.value.hide()
-	await installVersion(project.value.id, version.value.id, null, 'URLConfirmModal')
+	await installVersion(
+		project.value.id,
+		version.value.id,
+		null,
+		'URLConfirmModal',
+		() => {},
+		() => {},
+	).catch(handleError)
 }
 </script>
 
