@@ -35,6 +35,7 @@ pub async fn is_network_metered() -> Result<bool> {
 #[cfg(target_os = "macos")]
 pub async fn is_network_metered() -> Result<bool> {
     use crate::ErrorKind;
+    use cidre::dispatch::Queue;
     use cidre::nw::PathMonitor;
     use std::time::Duration;
     use tokio::sync::mpsc;
@@ -42,7 +43,9 @@ pub async fn is_network_metered() -> Result<bool> {
 
     let (sender, mut receiver) = mpsc::channel(1);
 
+    let queue = Queue::new();
     let mut monitor = PathMonitor::new();
+    monitor.set_queue(&queue);
     monitor.set_update_handler(move |path| {
         let _ = sender.try_send(path.is_constrained() || path.is_expensive());
     });
