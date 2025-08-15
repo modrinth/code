@@ -16,10 +16,10 @@ import { useRouter } from 'vue-router'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
 import {
-	add_project_from_version as installMod,
 	check_installed,
 	create,
 	get,
+	add_project_from_version as installMod,
 	list,
 } from '@/helpers/profile'
 import { installVersionDependencies } from '@/store/install.js'
@@ -185,7 +185,7 @@ const createInstance = async () => {
 	await router.push(`/instance/${encodeURIComponent(id)}/`)
 
 	const instance = await get(id, true)
-	await installVersionDependencies(instance, versions.value[0], (error) => handleError(error))
+	await installVersionDependencies(instance, versions.value[0]).catch(handleError)
 
 	trackEvent('InstanceCreate', {
 		profile_name: name.value,
