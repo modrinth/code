@@ -1,5 +1,7 @@
 <template>
 	<NuxtLayout>
+		<ModrinthLoadingIndicator />
+		<NotificationPanel />
 		<div class="main experimental-styles-within">
 			<div v-if="is404" class="error-graphic">
 				<Logo404 />
@@ -53,8 +55,12 @@ import { SadRinthbot } from '@modrinth/assets'
 import { defineMessage, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
 
+import { NotificationPanel, provideNotificationManager } from '@modrinth/ui'
 import Logo404 from '~/assets/images/404.svg'
+import ModrinthLoadingIndicator from './components/ui/modrinth-loading-indicator.ts'
+import { FrontendNotificationManager } from './providers/frontend-notifications.ts'
 
+provideNotificationManager(new FrontendNotificationManager())
 const { formatMessage } = useVIntl()
 
 const props = defineProps({
