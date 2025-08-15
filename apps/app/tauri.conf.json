@@ -67,7 +67,7 @@
         "width": 1280,
         "minHeight": 700,
         "minWidth": 1100,
-        "visible": true,
+        "visible": false,
         "zoomHotkeysEnabled": false,
         "decorations": false
       }
