@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="experimental-styles-within flex size-24 shrink-0 overflow-hidden rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
+		class="experimental-styles-within flex size-16 shrink-0 overflow-hidden rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
 	>
 		<client-only>
 			<img

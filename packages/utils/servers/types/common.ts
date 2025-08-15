@@ -52,6 +52,9 @@ export interface Server {
 	flows: {
 		intro?: boolean
 	}
+
+	is_medal?: boolean
+	medal_expires?: string
 }
 
 export interface Servers {

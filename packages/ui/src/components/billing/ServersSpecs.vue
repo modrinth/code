@@ -8,17 +8,11 @@ const emit = defineEmits<{
 	(e: 'click-bursting-link'): void
 }>()
 
-const props = withDefaults(
-	defineProps<{
-		ram: number
-		storage: number
-		cpus: number
-		burstingLink?: string
-	}>(),
-	{
-		burstingLink: undefined,
-	},
-)
+const props = defineProps<{
+	ram: number
+	storage: number
+	cpus: number
+}>()
 
 const formattedRam = computed(() => {
 	return props.ram / 1024
@@ -46,12 +40,12 @@ const sharedCpus = computed(() => {
 		<li class="flex items-center gap-2">
 			<SparklesIcon class="h-5 w-5 shrink-0" /> Bursts up to {{ cpus }} CPUs
 			<AutoLink
-				v-if="burstingLink"
 				v-tooltip="
 					`CPU bursting allows your server to temporarily use additional threads to help mitigate TPS spikes. Click for more info.`
 				"
 				class="flex"
-				:to="burstingLink"
+				to="https://modrinth.com/servers#cpu-burst"
+				target="_blank"
 				@click="() => emit('click-bursting-link')"
 			>
 				<UnknownIcon class="h-4 w-4 text-secondary opacity-80" />

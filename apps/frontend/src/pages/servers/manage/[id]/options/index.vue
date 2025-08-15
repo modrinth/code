@@ -61,7 +61,7 @@
 					</div>
 				</div>
 
-				<div class="card flex flex-col gap-4">
+				<div v-if="!data.is_medal" class="card flex flex-col gap-4">
 					<label for="server-icon-field" class="flex flex-col gap-2">
 						<span class="text-lg font-bold text-contrast">Server icon</span>
 						<span> This icon will be visible on the Minecraft server list and on Modrinth. </span>

@@ -1,16 +1,7 @@
 <script setup lang="ts">
-import {
-	EditIcon,
-	ExternalIcon,
-	RadioButtonCheckedIcon,
-	RadioButtonIcon,
-	RightArrowIcon,
-	SignalIcon,
-	SpinnerIcon,
-	XIcon,
-} from '@modrinth/assets'
-import { formatPrice, getPingLevel } from '@modrinth/utils'
+import { formatPrice, getPingLevel, type UserSubscription } from '@modrinth/utils'
 import { useVIntl } from '@vintl/vintl'
+import dayjs from 'dayjs'
 import type Stripe from 'stripe'
 import { computed } from 'vue'
 
@@ -44,6 +35,9 @@ const props = defineProps<{
 	ping?: number
 	loading?: boolean
 	selectedPaymentMethod: Stripe.PaymentMethod | undefined
+	noPaymentRequired?: boolean
+	existingPlan?: ServerPlan
+	existingSubscription?: UserSubscription
 }>()
 
 const interval = defineModel<ServerBillingInterval>('interval', { required: true })
@@ -52,6 +46,75 @@ const acceptedEula = defineModel<boolean>('acceptedEula', { required: true })
 const prices = computed(() => {
 	return props.plan.prices.find((x) => x.currency_code === props.currency)
 })
+
+const selectedPlanPriceForInterval = computed<number | undefined>(() => {
+	return prices.value?.prices?.intervals?.[interval.value as keyof typeof monthsInInterval]
+})
+
+const existingPlanPriceForInterval = computed<number | undefined>(() => {
+	if (!props.existingPlan) return undefined
+	const p = props.existingPlan.prices.find((x) => x.currency_code === props.currency)
+	return p?.prices?.intervals?.[interval.value as keyof typeof monthsInInterval]
+})
+
+const upgradeDeltaPrice = computed<number | undefined>(() => {
+	if (selectedPlanPriceForInterval.value == null || existingPlanPriceForInterval.value == null)
+		return undefined
+	return selectedPlanPriceForInterval.value - existingPlanPriceForInterval.value
+})
+
+const isUpgrade = computed<boolean>(() => {
+	return (upgradeDeltaPrice.value ?? 0) > 0
+})
+
+const estimatedDaysInInterval = computed<number>(() => {
+	return monthsInInterval[interval.value] * 30
+})
+
+const estimatedProrationDays = computed<number | undefined>(() => {
+	if (!isUpgrade.value) return undefined
+	if (props.total == null || props.tax == null) return undefined
+	const subtotal = props.total - props.tax
+	const delta = upgradeDeltaPrice.value ?? 0
+	if (delta <= 0) return undefined
+	const fraction = Math.max(0, Math.min(1, subtotal / delta))
+	return Math.round(fraction * estimatedDaysInInterval.value)
+})
+
+const isProratedCharge = computed<boolean>(() => {
+	return isUpgrade.value && (props.total ?? 0) > 0
+})
+
+const exactProrationDays = computed<number | undefined>(() => {
+	if (!props.existingSubscription) return undefined
+	const created = dayjs(props.existingSubscription.created)
+	if (!created.isValid()) return undefined
+	let next = created
+	const now = dayjs()
+	if (props.existingSubscription.interval === 'monthly') {
+		const cycles = now.diff(created, 'month')
+		next = created.add(cycles + 1, 'month')
+	} else if (props.existingSubscription.interval === 'quarterly') {
+		const months = now.diff(created, 'month')
+		const cycles = Math.floor(months / 3)
+		next = created.add((cycles + 1) * 3, 'month')
+	} else if (props.existingSubscription.interval === 'yearly') {
+		const cycles = now.diff(created, 'year')
+		next = created.add(cycles + 1, 'year')
+	} else if (props.existingSubscription.interval === 'five-days') {
+		const days = now.diff(created, 'day')
+		const cycles = Math.floor(days / 5)
+		next = created.add((cycles + 1) * 5, 'day')
+	} else {
+		return undefined
+	}
+	const days = next.diff(now, 'day')
+	return Math.max(0, days)
+})
+
+const prorationDays = computed<number | undefined>(
+	() => exactProrationDays.value ?? estimatedProrationDays.value,
+)
 
 const planName = computed(() => {
 	if (!props.plan || !props.plan.metadata || props.plan.metadata.type !== 'pyro') return 'Unknown'
@@ -197,28 +260,44 @@ function setInterval(newInterval: ServerBillingInterval) {
 		</button>
 	</div>
 	<div class="mt-2">
-		<ExpandableInvoiceTotal
-			:period="period"
-			:currency="currency"
-			:loading="loading"
-			:total="total ?? -1"
-			:billing-items="
-				total !== undefined && tax !== undefined
-					? [
-							{
-								title: `Modrinth Servers (${planName})`,
-								amount: total - tax,
-							},
-							{
-								title: 'Tax',
-								amount: tax,
-							},
-						]
-					: []
-			"
-		/>
+		<template v-if="!noPaymentRequired">
+			<ExpandableInvoiceTotal
+				:period="isProratedCharge ? undefined : period"
+				:currency="currency"
+				:loading="loading"
+				:total="total ?? -1"
+				:billing-items="
+					total !== undefined && tax !== undefined
+						? [
+								{
+									title:
+										isProratedCharge && prorationDays
+											? `Modrinth Servers (${planName}) — prorated for ${prorationDays} day${
+													prorationDays === 1 ? '' : 's'
+												}`
+											: `Modrinth Servers (${planName})`,
+									amount: total - tax,
+								},
+								{
+									title: 'Tax',
+									amount: tax,
+								},
+							]
+						: []
+				"
+			/>
+		</template>
+		<div
+			v-else
+			class="p-4 rounded-2xl bg-table-alternateRow text-sm text-secondary leading-relaxed"
+		>
+			No payment needed. The change to your subscription will apply on your next billing date.
+		</div>
 	</div>
-	<div class="mt-2 flex items-center pl-4 pr-2 py-3 bg-bg rounded-2xl gap-2 text-secondary">
+	<div
+		v-if="!noPaymentRequired"
+		class="mt-2 flex items-center pl-4 pr-2 py-3 bg-bg rounded-2xl gap-2 text-secondary"
+	>
 		<template v-if="selectedPaymentMethod">
 			<FormattedPaymentMethod :method="selectedPaymentMethod" />
 		</template>
@@ -235,19 +314,29 @@ function setInterval(newInterval: ServerBillingInterval) {
 			</button>
 		</ButtonStyled>
 	</div>
-	<p class="m-0 mt-4 text-sm text-secondary">
+	<p v-if="!noPaymentRequired" class="m-0 mt-4 text-sm text-secondary">
+		<template v-if="isUpgrade && (total ?? 0) > 0">
+			Today, you will be charged a prorated amount for the remainder of your current billing cycle.
+			<br />
+			Your subscription will renew at
+			{{ formatPrice(locale, selectedPlanPriceForInterval, currency) }} / {{ period }} plus
+			applicable taxes at the end of your current billing interval, until you cancel. You can cancel
+			anytime from your settings page.
+		</template>
+		<template v-else>
+			You'll be charged
+			<SpinnerIcon v-if="loading" class="animate-spin relative top-0.5 mx-2" /><template v-else>{{
+				formatPrice(locale, total, currency)
+			}}</template>
+			every {{ period }} plus applicable taxes starting today, until you cancel. You can cancel
+			anytime from your settings page.
+		</template>
+		<br />
 		<span class="font-semibold"
 			>By clicking "Subscribe", you are purchasing a recurring subscription.</span
 		>
-		<br />
-		You'll be charged
-		<SpinnerIcon v-if="loading" class="animate-spin relative top-0.5 mx-2" /><template v-else>{{
-			formatPrice(locale, total, currency)
-		}}</template>
-		every {{ period }} plus applicable taxes starting today, until you cancel. You can cancel
-		anytime from your settings page.
 	</p>
-	<div class="mt-2 flex items-center gap-1 text-sm">
+	<div v-if="!noPaymentRequired" class="mt-2 flex items-center gap-1 text-sm">
 		<Checkbox
 			v-model="acceptedEula"
 			label="I acknowledge that I have read and agree to the"
