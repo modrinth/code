@@ -750,8 +750,6 @@ export default defineNuxtComponent({
 		const data = useNuxtApp()
 		const route = useNativeRoute()
 
-		const { addNotification } = injectNotificationManager()
-
 		const auth = await useAuth()
 		const tags = useTags()
 		const flags = useFeatureFlags()
@@ -917,7 +915,6 @@ export default defineNuxtComponent({
 			alternateFile: ref(alternateFile),
 			replaceFile: ref(replaceFile),
 			uploadedImageIds: ref([]),
-			addNotification,
 		}
 	},
 	data() {
@@ -939,6 +936,10 @@ export default defineNuxtComponent({
 			showKnownErrors: false,
 			shouldPreventActions: false,
 		}
+	},
+	created() {
+		const { addNotification } = injectNotificationManager()
+		this.addNotification = addNotification
 	},
 	computed: {
 		fieldErrors() {
