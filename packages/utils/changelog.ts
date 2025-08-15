@@ -11,7 +11,13 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
-		date: `2025-08-14T14:55:00-07:00`,
+		date: `2025-08-15T12:25:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Fixed notification pages not loading.`,
+	},
+	{
+		date: `2025-08-15T11:55:00-07:00`,
 		product: 'web',
 		body: `### Improvements
 - Fixed project version pages not loading.`,
