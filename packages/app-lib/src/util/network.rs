@@ -37,22 +37,22 @@ pub async fn is_network_metered() -> Result<bool> {
     use crate::ErrorKind;
     use cidre::nw::PathMonitor;
     use std::time::Duration;
-    use tokio::sync::oneshot;
+    use tokio::sync::mpsc;
     use tokio_util::future::FutureExt;
 
-    let (sender, receiver) = oneshot::channel();
+    let (sender, mut receiver) = mpsc::channel(1);
 
     let mut monitor = PathMonitor::new();
-    monitor.set_update_handler(|path| {
-        let _ = sender.send(path.is_constrained() || path.is_expensive());
+    monitor.set_update_handler(move |path| {
+        let _ = sender.try_send(path.is_constrained() || path.is_expensive());
     });
 
     monitor.start();
     let result = receiver
+        .recv()
         .timeout(Duration::from_millis(100))
         .await
         .ok()
-        .map(|x| x.ok())
         .flatten();
     monitor.cancel();
 

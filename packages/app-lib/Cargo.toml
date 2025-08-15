@@ -77,14 +77,14 @@ sqlx = { workspace = true, features = ["runtime-tokio", "sqlite", "macros", "mig
 quartz_nbt = { workspace = true, features = ["serde"] }
 
 hickory-resolver.workspace = true
-windows = { workspace = true, features = ["Networking_Connectivity"] }
-windows-core.workspace = true
 zbus.workspace = true
 
 ariadne.workspace = true
 
 [target.'cfg(windows)'.dependencies]
 winreg.workspace = true
+windows = { workspace = true, features = ["Networking_Connectivity"] }
+windows-core.workspace = true
 
 [target.'cfg(target_os = "macos")'.dependencies]
 cidre = { workspace = true, features = ["nw", "blocks"] }
