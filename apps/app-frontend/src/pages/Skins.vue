@@ -66,7 +66,14 @@ const defaultCape = ref<Cape>()
 const originalSelectedSkin = ref<Skin | null>(null)
 const originalDefaultCape = ref<Cape>()
 
-const savedSkins = computed(() => filterSavedSkins(skins.value))
+const savedSkins = computed(() => {
+	try {
+		return filterSavedSkins(skins.value)
+	} catch (error) {
+		handleError(error as Error)
+		return []
+	}
+})
 const defaultSkins = computed(() => filterDefaultSkins(skins.value))
 
 const currentCape = computed(() => {

@@ -1,5 +1,3 @@
-import { injectNotificationManager } from '@modrinth/ui'
-
 export const useAuth = async (oldToken = null) => {
 	const auth = useState('auth', () => ({
 		user: null,
@@ -118,26 +116,18 @@ export const getAuthUrl = (provider, redirect = '/dashboard') => {
 }
 
 export const removeAuthProvider = async (provider) => {
-	const { addNotification } = injectNotificationManager()
-
 	startLoading()
 
-	try {
-		const auth = await useAuth()
+	const auth = await useAuth()
 
-		await useBaseFetch('auth/provider', {
-			method: 'DELETE',
-			body: {
-				provider,
-			},
-		})
-		await useAuth(auth.value.token)
-	} catch (err) {
-		addNotification({
-			title: 'An error occurred',
-			text: err.data.description,
-			type: 'error',
-		})
-	}
+	await useBaseFetch('auth/provider', {
+		method: 'DELETE',
+		body: {
+			provider,
+		},
+	})
+
+	await useAuth(auth.value.token)
+
 	stopLoading()
 }

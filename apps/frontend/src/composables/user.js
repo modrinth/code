@@ -1,5 +1,3 @@
-import { injectNotificationManager } from '@modrinth/ui'
-
 export const useUser = async (force = false) => {
 	const user = useState('user', () => {})
 
@@ -139,27 +137,10 @@ export const userFollowProject = async (project) => {
 	}
 }
 export const resendVerifyEmail = async () => {
-	const { addNotification } = injectNotificationManager()
-
-	startLoading()
-	try {
-		await useBaseFetch('auth/email/resend_verify', {
-			method: 'POST',
-		})
-
-		const auth = await useAuth()
-		addNotification({
-			title: 'Email sent',
-			text: `An email with a link to verify your account has been sent to ${auth.value.user.email}.`,
-			type: 'success',
-		})
-	} catch (err) {
-		addNotification({
-			title: 'An error occurred',
-			text: err.data.description,
-			type: 'error',
-		})
-	}
+	await useBaseFetch('auth/email/resend_verify', {
+		method: 'POST',
+	})
+	await useAuth()
 	stopLoading()
 }
 

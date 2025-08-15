@@ -101,7 +101,7 @@
 					email
 					{{ auth.user.payout_data.paypal_address }}
 				</p>
-				<button class="btn mt-4" @click="removeAuthProvider('paypal')">
+				<button class="btn mt-4" @click="handleRemoveAuthProvider('paypal')">
 					<XIcon />
 					Disconnect account
 				</button>
@@ -153,8 +153,9 @@ import { injectNotificationManager } from '@modrinth/ui'
 import { formatDate } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
+import { removeAuthProvider } from '~/composables/auth.js'
 
-const { addNotification } = injectNotificationManager()
+const { addNotification, handleError } = injectNotificationManager()
 const auth = await useAuth()
 const minWithdraw = ref(0.01)
 
@@ -169,6 +170,14 @@ const deadlineEnding = computed(() => {
 	}
 	return deadline
 })
+
+async function handleRemoveAuthProvider(provider) {
+	try {
+		await removeAuthProvider(provider)
+	} catch (error) {
+		handleError(error)
+	}
+}
 
 const availableSoonDates = computed(() => {
 	// Get the next 3 dates from userBalance.dates that are from now to the deadline + 4 months to make sure we get all the pending ones.

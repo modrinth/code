@@ -294,9 +294,10 @@ import FilesUploadDragAndDrop from '~/components/ui/servers/FilesUploadDragAndDr
 import FilesUploadDropdown from '~/components/ui/servers/FilesUploadDropdown.vue'
 import FilesUploadZipUrlModal from '~/components/ui/servers/FilesUploadZipUrlModal.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
-import { handleError } from '~/composables/servers/modrinth-servers.ts'
+import { handleServersError } from '~/composables/servers/modrinth-servers.ts'
 
-const { addNotification } = injectNotificationManager()
+const notifications = injectNotificationManager()
+const { addNotification } = notifications
 const flags = useFeatureFlags()
 const baseId = useId()
 
@@ -584,7 +585,7 @@ const extractItem = async (path: string) => {
 		await props.server.fs?.extractFile(path, true, false)
 	} catch (error) {
 		console.error('Error extracting item:', error)
-		handleError(error)
+		handleServersError(error, notifications)
 	}
 }
 
@@ -598,11 +599,11 @@ const handleExtractItem = async (item: { name: string; type: string; path: strin
 				uploadConflictModal.value.show(item.path, dry.conflicting_files)
 			}
 		} else {
-			handleError(new Error('Error running dry run'))
+			handleServersError(new Error('Error running dry run'), notifications)
 		}
 	} catch (error) {
 		console.error('Error extracting item:', error)
-		handleError(error)
+		handleServersError(error, notifications)
 	}
 }
 
