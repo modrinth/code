@@ -11,9 +11,9 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
-		date: `2025-08-14T17:00:00-07:00`,
+		date: `2025-08-15T11:45:00-07:00`,
 		product: 'app',
-		version: '0.10.4',
+		version: '0.10.5',
 		body: `### Improvements
 - On Windows, the app will now install per-user rather than system-wide.
 	- This allows future versions of Modrinth App to update seamlessly if the user is not an administrator.
@@ -42,7 +42,15 @@ const VERSIONS: VersionEntry[] = [
 - Fixed the back/forward buttons appearing with white icons in light mode.
 - Fixed 'Party Alex' skin not using slim character model.
 - Improved resilience of Minecraft launching on Java 8 under certain circumstances.
-- Added system for showing users surveys to provide feedback on their experience with Modrinth App.`,
+- Added system for showing users surveys to provide feedback on their experience with Modrinth App.
+
+**This update was originally launched as 0.10.4, but was pulled due to issues with many functions of the app.**`,
+	},
+	{
+		date: `2025-08-14T14:20:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Added additional items to the publishing checklist to help ensure creators address potential issues before submitting for review.`,
 	},
 	{
 		date: `2025-08-01T21:30:00-04:00`,
