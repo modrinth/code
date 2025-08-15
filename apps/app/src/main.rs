@@ -14,11 +14,29 @@ mod error;
 #[cfg(target_os = "macos")]
 mod macos;
 
+/// Check if we're running in portable mode and return the portable directory
+fn get_portable_dir() -> Option<std::path::PathBuf> {
+    let exe_path = std::env::current_exe().ok()?;
+    let exe_dir = exe_path.parent()?;
+
+    // Method 1: Check if MODRINTH_PORTABLE environment variable is set
+    if std::env::var("MODRINTH_PORTABLE").is_ok() {
+        return Some(exe_dir.join("ModrinthAppData"));
+    }
+
+    // Method 2: Check if a "portable.txt" file exists next to the executable
+    if exe_dir.join("portable.txt").exists() {
+        return Some(exe_dir.join("ModrinthAppData"));
+    }
+
+    None
+}
+
 /// Set up environment variables for portable mode to ensure the window state plugin
 /// respects the portable directory configuration.
 fn setup_portable_env_vars() {
-    // Use the same portable detection logic as DirectoryInfo
-    let portable_dir = match theseus::state::DirectoryInfo::get_portable_dir() {
+    // Check if we're running in portable mode
+    let portable_dir = match get_portable_dir() {
         Some(dir) => dir,
         None => return, // Not in portable mode
     };
@@ -168,8 +186,8 @@ fn is_dev() -> bool {
 
 #[tauri::command]
 fn is_portable() -> bool {
-    // Use the same portable detection logic as DirectoryInfo
-    theseus::state::DirectoryInfo::get_portable_dir().is_some()
+    // Use the same portable detection logic
+    get_portable_dir().is_some()
 }
 
 // Toggles decorations
