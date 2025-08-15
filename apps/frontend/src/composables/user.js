@@ -1,3 +1,5 @@
+import { injectNotificationManager } from '@modrinth/ui'
+
 export const useUser = async (force = false) => {
 	const user = useState('user', () => {})
 
@@ -137,8 +139,7 @@ export const userFollowProject = async (project) => {
 	}
 }
 export const resendVerifyEmail = async () => {
-	// const { injectNotificationManager } = await import("@modrinth/ui");
-	// const { addNotification } = injectNotificationManager();
+	const { addNotification } = injectNotificationManager()
 
 	startLoading()
 	try {

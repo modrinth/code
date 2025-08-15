@@ -1,4 +1,3 @@
-import { injectNotificationManager } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import { defineStore } from 'pinia'
 
@@ -50,12 +49,11 @@ export const install = async (
 	callback = () => {},
 	createInstanceCallback = () => {},
 ) => {
-	const { handleError } = injectNotificationManager()
-	const project = await get_project(projectId, 'must_revalidate').catch(handleError)
+	const project = await get_project(projectId, 'must_revalidate')
 
 	if (project.project_type === 'modpack') {
 		const version = versionId ?? project.versions[project.versions.length - 1]
-		const packs = await list().catch(handleError)
+		const packs = await list()
 
 		if (packs.length === 0 || !packs.find((pack) => pack.linked_data?.project_id === project.id)) {
 			await packInstall(
@@ -64,7 +62,7 @@ export const install = async (
 				project.title,
 				project.icon_url,
 				createInstanceCallback,
-			).catch(handleError)
+			)
 
 			trackEvent('PackInstall', {
 				id: project.id,
@@ -81,8 +79,8 @@ export const install = async (
 	} else {
 		if (instancePath) {
 			const [instance, instanceProjects, versions] = await Promise.all([
-				await get(instancePath).catch(handleError),
-				await get_projects(instancePath).catch(handleError),
+				await get(instancePath),
+				await get_projects(instancePath),
 				await get_version_many(project.versions, 'must_revalidate'),
 			])
 
@@ -119,7 +117,7 @@ export const install = async (
 					}
 				}
 
-				await add_project_from_version(instance.path, version.id).catch(handleError)
+				await add_project_from_version(instance.path, version.id)
 				await installVersionDependencies(instance, version)
 
 				trackEvent('ProjectInstall', {
@@ -144,7 +142,7 @@ export const install = async (
 				)
 			}
 		} else {
-			const versions = (await get_version_many(project.versions).catch(handleError)).sort(
+			const versions = (await get_version_many(project.versions)).sort(
 				(a, b) => dayjs(b.date_published) - dayjs(a.date_published),
 			)
 
@@ -168,36 +166,27 @@ export const install = async (
 }
 
 export const installVersionDependencies = async (profile, version) => {
-	const { handleError } = injectNotificationManager()
 	for (const dep of version.dependencies) {
 		if (dep.dependency_type !== 'required') continue
 		// disallow fabric api install on quilt
 		if (dep.project_id === 'P7dR8mSH' && profile.loader === 'quilt') continue
 		if (dep.version_id) {
-			if (
-				dep.project_id &&
-				(await check_installed(profile.path, dep.project_id).catch(handleError))
-			)
-				continue
+			if (dep.project_id && (await check_installed(profile.path, dep.project_id))) continue
 			await add_project_from_version(profile.path, dep.version_id)
 		} else {
-			if (
-				dep.project_id &&
-				(await check_installed(profile.path, dep.project_id).catch(handleError))
+			if (dep.project_id && (await check_installed(profile.path, dep.project_id))) continue
+
+			const depProject = await get_project(dep.project_id, 'must_revalidate')
+
+			const depVersions = (await get_version_many(depProject.versions, 'must_revalidate')).sort(
+				(a, b) => dayjs(b.date_published) - dayjs(a.date_published),
 			)
-				continue
-
-			const depProject = await get_project(dep.project_id, 'must_revalidate').catch(handleError)
-
-			const depVersions = (
-				await get_version_many(depProject.versions, 'must_revalidate').catch(handleError)
-			).sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published))
 
 			const latest = depVersions.find(
 				(v) => v.game_versions.includes(profile.game_version) && v.loaders.includes(profile.loader),
 			)
 			if (latest) {
-				await add_project_from_version(profile.path, latest.id).catch(handleError)
+				await add_project_from_version(profile.path, latest.id)
 			}
 		}
 	}
