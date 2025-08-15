@@ -153,6 +153,7 @@ import { injectNotificationManager } from '@modrinth/ui'
 import { formatDate } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
+
 import { removeAuthProvider } from '~/composables/auth.js'
 
 const { addNotification, handleError } = injectNotificationManager()

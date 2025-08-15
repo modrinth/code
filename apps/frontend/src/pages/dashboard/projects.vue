@@ -330,21 +330,20 @@ import { getProjectTypeForUrl } from '~/helpers/projects.js'
 
 useHead({ title: 'Projects - Modrinth' })
 
-const UPLOAD_VERSION = 1 << 0
-const DELETE_VERSION = 1 << 1
+// const UPLOAD_VERSION = 1 << 0
+// const DELETE_VERSION = 1 << 1
 const EDIT_DETAILS = 1 << 2
-const EDIT_BODY = 1 << 3
-const MANAGE_INVITES = 1 << 4
-const REMOVE_MEMBER = 1 << 5
-const EDIT_MEMBER = 1 << 6
-const DELETE_PROJECT = 1 << 7
+// const EDIT_BODY = 1 << 3
+// const MANAGE_INVITES = 1 << 4
+// const REMOVE_MEMBER = 1 << 5
+// const EDIT_MEMBER = 1 << 6
+// const DELETE_PROJECT = 1 << 7
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const user = await useUser()
 const projects = ref([])
-const versions = ref([])
 const selectedProjects = ref([])
 const sortBy = ref('Name')
 const descending = ref(false)
@@ -393,27 +392,6 @@ function resort() {
 function updateDescending() {
 	descending.value = !descending.value
 	resort()
-}
-
-const allSelected = computed(
-	() => projects.value.length > 0 && selectedProjects.value.length === projects.value.length,
-)
-
-function toggleSelect(project) {
-	const idx = selectedProjects.value.indexOf(project)
-	if (idx !== -1) {
-		selectedProjects.value = selectedProjects.value.filter((p) => p !== project)
-	} else {
-		selectedProjects.value.push(project)
-	}
-}
-
-function toggleSelectAll() {
-	if (allSelected.value) {
-		selectedProjects.value = []
-	} else {
-		selectedProjects.value = [...projects.value]
-	}
 }
 
 async function bulkEditLinks() {

@@ -916,6 +916,7 @@
 
 <script setup>
 import {
+	AlignLeftIcon as DescriptionIcon,
 	BookmarkIcon,
 	BookTextIcon,
 	CalendarIcon,
@@ -923,12 +924,11 @@ import {
 	CheckIcon,
 	ClipboardCopyIcon,
 	CopyrightIcon,
-	AlignLeftIcon as DescriptionIcon,
 	DownloadIcon,
 	ExternalIcon,
-	ImageIcon as GalleryIcon,
 	GameIcon,
 	HeartIcon,
+	ImageIcon as GalleryIcon,
 	InfoIcon,
 	LinkIcon as LinksIcon,
 	ModrinthIcon,
