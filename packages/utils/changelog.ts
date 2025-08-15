@@ -11,6 +11,14 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-08-15T13:15:00-07:00`,
+		product: 'app',
+		version: '0.10.6',
+		body: `### Improvements
+- Fixed Forge versions between 1.17.1 and 1.20.3 failing to launch.
+- Fixed search page constantly resetting back to page 1.`,
+	},
+	{
 		date: `2025-08-15T12:25:00-07:00`,
 		product: 'web',
 		body: `### Improvements
