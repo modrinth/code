@@ -116,7 +116,7 @@
 		>
 			<div>
 				<NuxtLink to="/" aria-label="Modrinth home page">
-					<BrandTextLogo aria-hidden="true" class="h-7 w-auto text-contrast" />
+					<TextLogo aria-hidden="true" class="h-7 w-auto text-contrast" />
 				</NuxtLink>
 			</div>
 			<div
@@ -590,7 +590,7 @@
 						role="region"
 						aria-label="Modrinth information"
 					>
-						<BrandTextLogo
+						<TextLogo
 							aria-hidden="true"
 							class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
 							@click="developerModeIncrement()"
@@ -716,7 +716,9 @@ import {
 	PagewideBanner,
 } from '@modrinth/ui'
 import { isAdmin, isStaff } from '@modrinth/utils'
+import { IntlFormatted } from '@vintl/vintl/components'
 
+import TextLogo from '~/components/brand/TextLogo.vue'
 import CollectionCreateModal from '~/components/ui/CollectionCreateModal.vue'
 import ModalCreation from '~/components/ui/ModalCreation.vue'
 import OrganizationCreateModal from '~/components/ui/OrganizationCreateModal.vue'

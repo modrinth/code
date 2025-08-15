@@ -331,7 +331,17 @@ import {
 	VersionIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { injectNotificationManager, useRelativeTime } from '@modrinth/ui'
+import {
+	Avatar,
+	Categories,
+	CopyCode,
+	DoubleIcon,
+	injectNotificationManager,
+	ProjectStatusBadge,
+	useRelativeTime,
+} from '@modrinth/ui'
+
+import ThreadSummary from './thread/ThreadSummary.vue'
 
 const { addNotification } = injectNotificationManager()
 const emit = defineEmits(['update:notifications'])
