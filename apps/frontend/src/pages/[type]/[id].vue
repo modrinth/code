@@ -916,7 +916,6 @@
 
 <script setup>
 import {
-	AlignLeftIcon as DescriptionIcon,
 	BookmarkIcon,
 	BookTextIcon,
 	CalendarIcon,
@@ -924,11 +923,12 @@ import {
 	CheckIcon,
 	ClipboardCopyIcon,
 	CopyrightIcon,
+	AlignLeftIcon as DescriptionIcon,
 	DownloadIcon,
 	ExternalIcon,
+	ImageIcon as GalleryIcon,
 	GameIcon,
 	HeartIcon,
-	ImageIcon as GalleryIcon,
 	InfoIcon,
 	LinkIcon as LinksIcon,
 	ModrinthIcon,
@@ -1574,18 +1574,6 @@ const showModerationChecklist = useLocalStorage(
 	false,
 )
 const collapsedModerationChecklist = useLocalStorage('collapsed-moderation-checklist', false)
-
-watch(
-	showModerationChecklist,
-	(newValue) => {
-		notifications.setNotificationLocation(newValue ? 'left' : 'right')
-	},
-	{ immediate: true },
-)
-
-onUnmounted(() => {
-	notifications.setNotificationLocation('right')
-})
 
 if (import.meta.client && history && history.state && history.state.showChecklist) {
 	showModerationChecklist.value = true
