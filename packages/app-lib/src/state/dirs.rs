@@ -51,12 +51,12 @@ impl DirectoryInfo {
             env::set_var("APPDATA", portable_dir);
         }
         #[cfg(target_os = "macos")]
-        {
+        unsafe {
             // macOS typically uses HOME/Library/Application Support, but we can override XDG_DATA_HOME for some libs
             env::set_var("XDG_DATA_HOME", portable_dir);
         }
         #[cfg(target_os = "linux")]
-        {
+        unsafe {
             env::set_var("XDG_DATA_HOME", portable_dir);
         }
     }
