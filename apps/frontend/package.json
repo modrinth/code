@@ -72,5 +72,5 @@
 		"xss": "^1.0.14"
 	},
 	"web-types": "../../web-types.json",
-	"prettier": "@modrinth/tooling-config/prettier.nuxt.config.js"
+	"prettier": "@modrinth/tooling-config/frontend.prettier.config.cjs"
 }

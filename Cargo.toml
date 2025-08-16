@@ -1,13 +1,13 @@
 [workspace]
 resolver = "2"
 members = [
-  "apps/app",
-  "apps/app-playground",
-  "apps/daedalus_client",
-  "apps/labrinth",
-  "packages/app-lib",
-  "packages/ariadne",
-  "packages/daedalus",
+	"apps/app",
+	"apps/app-playground",
+	"apps/daedalus_client",
+	"apps/labrinth",
+	"packages/app-lib",
+	"packages/ariadne",
+	"packages/daedalus",
 ]
 
 [workspace.package]
@@ -28,12 +28,10 @@ async_zip = "0.0.17"
 async-compression = { version = "0.4.27", default-features = false }
 async-recursion = "1.1.1"
 async-stripe = { version = "0.41.0", default-features = false, features = [
-  "runtime-tokio-hyper-rustls",
+	"runtime-tokio-hyper-rustls",
 ] }
 async-trait = "0.1.88"
-async-tungstenite = { version = "0.30.0", default-features = false, features = [
-  "futures-03-sink",
-] }
+async-tungstenite = { version = "0.30.0", default-features = false, features = ["futures-03-sink"] }
 async-walkdir = "2.1.0"
 base64 = "0.22.1"
 bitflags = "2.9.1"
@@ -69,10 +67,10 @@ hickory-resolver = "0.25.2"
 hmac = "0.12.1"
 hyper = "1.6.0"
 hyper-rustls = { version = "0.27.7", default-features = false, features = [
-  "http1",
-  "native-tokio",
-  "ring",
-  "tls12",
+	"http1",
+	"native-tokio",
+	"ring",
+	"tls12",
 ] }
 hyper-util = "0.1.16"
 iana-time-zone = "0.1.63"
@@ -83,13 +81,13 @@ itertools = "0.14.0"
 jemalloc_pprof = "0.8.1"
 json-patch = { version = "4.0.0", default-features = false }
 lettre = { version = "0.11.18", default-features = false, features = [
-  "builder",
-  "hostname",
-  "pool",
-  "ring",
-  "rustls",
-  "rustls-native-certs",
-  "smtp-transport",
+	"builder",
+	"hostname",
+	"pool",
+	"ring",
+	"rustls",
+	"rustls-native-certs",
+	"smtp-transport",
 ] }
 maxminddb = "0.26.0"
 meilisearch-sdk = { version = "0.29.1", default-features = false }
@@ -104,30 +102,27 @@ png = "0.17.16"
 prometheus = "0.14.0"
 quartz_nbt = "0.2.9"
 quick-xml = "0.38.1"
-rand = "=0.8.5"  # Locked on 0.8 until argon2 and p256 update to 0.9
-rand_chacha = "=0.3.1"  # Locked on 0.3 until we can update rand to 0.9
+rand = "=0.8.5" # Locked on 0.8 until argon2 and p256 update to 0.9
+rand_chacha = "=0.3.1" # Locked on 0.3 until we can update rand to 0.9
 redis = "0.32.4"
 regex = "1.11.1"
 reqwest = { version = "0.12.22", default-features = false }
 rgb = "0.8.52"
-rust_decimal = { version = "1.37.2", features = [
-  "serde-with-float",
-  "serde-with-str",
-] }
+rust_decimal = { version = "1.37.2", features = ["serde-with-float", "serde-with-str"] }
 rust_iso3166 = "0.1.14"
 rust-s3 = { version = "0.35.1", default-features = false, features = [
-  "fail-on-err",
-  "tags",
-  "tokio-rustls-tls",
+	"fail-on-err",
+	"tags",
+	"tokio-rustls-tls",
 ] }
 rusty-money = "0.4.1"
 sentry = { version = "0.42.0", default-features = false, features = [
-  "backtrace",
-  "contexts",
-  "debug-images",
-  "panic",
-  "reqwest",
-  "rustls",
+	"backtrace",
+	"contexts",
+	"debug-images",
+	"panic",
+	"reqwest",
+	"rustls",
 ] }
 sentry-actix = "0.42.0"
 serde = "1.0.219"
@@ -136,7 +131,7 @@ serde_cbor = "0.11.2"
 serde_ini = "0.2.0"
 serde_json = "1.0.142"
 serde_with = "3.14.0"
-serde-xml-rs = "0.8.1"  # Also an XML (de)serializer, consider dropping yaserde in favor of this
+serde-xml-rs = "0.8.1" # Also an XML (de)serializer, consider dropping yaserde in favor of this
 sha1 = "0.10.6"
 sha1_smol = { version = "1.0.1", features = ["std"] }
 sha2 = "0.10.9"
@@ -153,8 +148,8 @@ tauri-plugin-opener = "2.4.0"
 tauri-plugin-os = "2.3.0"
 tauri-plugin-single-instance = "2.3.2"
 tauri-plugin-updater = { version = "2.9.0", default-features = false, features = [
-  "rustls-tls",
-  "zip",
+	"rustls-tls",
+	"zip",
 ] }
 tauri-plugin-window-state = "2.4.0"
 tempfile = "3.20.0"
@@ -180,10 +175,10 @@ winreg = "0.55.0"
 woothee = "0.13.0"
 yaserde = "0.12.0"
 zip = { version = "4.3.0", default-features = false, features = [
-  "bzip2",
-  "deflate",
-  "deflate64",
-  "zstd",
+	"bzip2",
+	"deflate",
+	"deflate64",
+	"zstd",
 ] }
 zxcvbn = "3.1.0"
 
@@ -230,11 +225,11 @@ wry = { git = "https://github.com/modrinth/wry", rev = "f2ce0b0" }
 
 # Optimize for speed and reduce size on release builds
 [profile.release]
-opt-level = "s"  # Optimize for binary size
-strip = true  # Remove debug symbols
-lto = true  # Enables link to optimizations
-panic = "abort"  # Strip expensive panic clean-up logic
-codegen-units = 1  # Compile crates one after another so the compiler can optimize better
+opt-level = "s"   # Optimize for binary size
+strip = true      # Remove debug symbols
+lto = true        # Enables link to optimizations
+panic = "abort"   # Strip expensive panic clean-up logic
+codegen-units = 1 # Compile crates one after another so the compiler can optimize better
 
 [profile.dev.package.sqlx-macros]
 opt-level = 3

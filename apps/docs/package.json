@@ -1,22 +1,24 @@
 {
-  "name": "@modrinth/docs",
-  "type": "module",
-  "version": "0.0.1",
-  "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "lint": "astro check",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
-  },
-  "dependencies": {
-    "@astrojs/check": "^0.9.4",
-    "@astrojs/starlight": "^0.32.2",
-    "@modrinth/assets": "workspace:*",
-    "astro": "^5.4.1",
-    "sharp": "^0.33.5",
-    "starlight-openapi": "^0.14.0",
-    "typescript": "^5.8.2"
-  }
+	"name": "@modrinth/docs",
+	"type": "module",
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "astro dev",
+		"start": "astro dev",
+		"lint": "astro check",
+		"lint:ancillary": "prettier --check .",
+		"fix:ancillary": "prettier --write .",
+		"build": "astro build",
+		"preview": "astro preview",
+		"astro": "astro"
+	},
+	"dependencies": {
+		"@astrojs/check": "^0.9.4",
+		"@astrojs/starlight": "^0.32.2",
+		"@modrinth/assets": "workspace:*",
+		"astro": "^5.4.1",
+		"sharp": "^0.33.5",
+		"starlight-openapi": "^0.14.0",
+		"typescript": "^5.8.2"
+	}
 }

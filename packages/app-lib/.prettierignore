@@ -1,0 +1,15 @@
+**/*.rs
+.sqlx
+
+# Migrations existing before Prettier formatted them shall always be ignored,
+# as any changes to them will break existing deployments
+migrations/20240711194701_init.sql
+migrations/20240813205023_drop-active-unique.sql
+migrations/20240930001852_disable-personalized-ads.sql
+migrations/20241222013857_feature-flags.sql
+migrations/20250318160526_protocol-versions.sql
+migrations/20250408181656_add-join-log.sql
+migrations/20250413162050_skin-selector.sql
+migrations/20250428171350_add-profile-feature-version.sql
+migrations/20250429150111_add-attached-world-data.sql
+migrations/20250514181748_skin_nametag_setting.sql

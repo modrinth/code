@@ -1,13 +1,15 @@
 {
-  "name": "@modrinth/daedalus_client",
-  "scripts": {
-    "build": "cargo build --release",
-    "lint": "cargo fmt --check && cargo clippy --all-targets",
-    "fix": "cargo clippy --all-targets --fix --allow-dirty && cargo fmt",
-    "dev": "cargo run",
-    "test": "cargo nextest run --all-targets --no-fail-fast"
-  },
-  "dependencies": {
-    "@modrinth/daedalus": "workspace:*"
-  }
+	"name": "@modrinth/daedalus_client",
+	"scripts": {
+		"build": "cargo build --release",
+		"lint": "cargo fmt --check && cargo clippy --all-targets",
+		"lint:ancillary": "prettier --check .",
+		"fix": "cargo clippy --all-targets --fix --allow-dirty && cargo fmt",
+		"fix:ancillary": "prettier --write .",
+		"dev": "cargo run",
+		"test": "cargo nextest run --all-targets --no-fail-fast"
+	},
+	"dependencies": {
+		"@modrinth/daedalus": "workspace:*"
+	}
 }

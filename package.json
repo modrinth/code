@@ -18,9 +18,11 @@
 		"moderation:fix": "turbo run fix --filter=@modrinth/moderation",
 		"moderation:intl:extract": "pnpm run --filter=@modrinth/moderation intl:extract",
 		"build": "turbo run build --continue",
-		"lint": "turbo run lint --continue",
+		"lint": "turbo run lint lint:ancillary --continue",
+		"lint:ancillary": "prettier --check .github *.*",
 		"test": "turbo run test --continue",
-		"fix": "turbo run fix --continue",
+		"fix": "turbo run fix fix:ancillary --continue",
+		"fix:ancillary": "prettier --write .github *.*",
 		"ci": "turbo run lint test --continue",
 		"intl:extract": "pnpm ui:intl:extract && pnpm web:intl:extract && pnpm app:intl:extract && pnpm moderation:intl:extract"
 	},
@@ -37,5 +39,5 @@
 			"readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
 		}
 	},
-	"prettier": "@modrinth/tooling-config/prettier.config.js"
+	"prettier": "@modrinth/tooling-config/prettier.config.cjs"
 }

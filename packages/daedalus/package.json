@@ -1,9 +1,11 @@
 {
-  "name": "@modrinth/daedalus",
-  "scripts": {
-    "build": "cargo build --release",
-    "lint": "cargo fmt --check && cargo clippy --all-targets",
-    "fix": "cargo clippy --all-targets --fix --allow-dirty && cargo fmt",
-    "test": "cargo nextest run --all-targets --no-fail-fast"
-  }
+	"name": "@modrinth/daedalus",
+	"scripts": {
+		"build": "cargo build --release",
+		"lint": "cargo fmt --check && cargo clippy --all-targets",
+		"lint:ancillary": "prettier --check .",
+		"fix": "cargo clippy --all-targets --fix --allow-dirty && cargo fmt",
+		"fix:ancillary": "prettier --write .",
+		"test": "cargo nextest run --all-targets --no-fail-fast"
+	}
 }

@@ -1,3 +1,4 @@
 **/dist
 *.gltf
 src/locales/
+src/assets/**/*.svg

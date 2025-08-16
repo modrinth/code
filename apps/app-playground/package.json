@@ -1,10 +1,12 @@
 {
-  "name": "@modrinth/app-playground",
-  "scripts": {
-    "build": "cargo build --release",
-    "lint": "cargo fmt --check && cargo clippy --all-targets",
-    "fix": "cargo clippy --all-targets --fix --allow-dirty && cargo fmt",
-    "dev": "cargo run",
-    "test": "cargo nextest run --all-targets --no-fail-fast"
-  }
+	"name": "@modrinth/app-playground",
+	"scripts": {
+		"build": "cargo build --release",
+		"lint": "cargo fmt --check && cargo clippy --all-targets",
+		"lint:ancillary": "prettier --check .",
+		"fix": "cargo clippy --all-targets --fix --allow-dirty && cargo fmt",
+		"fix:ancillary": "prettier --check .",
+		"dev": "cargo run",
+		"test": "cargo nextest run --all-targets --no-fail-fast"
+	}
 }
