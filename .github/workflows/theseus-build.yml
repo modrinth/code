@@ -150,3 +150,4 @@ jobs:
             target/universal-apple-darwin/release/bundle/dmg/Modrinth App_*.dmg*
             target/release/bundle/nsis/Modrinth App_*-setup.exe*
             target/release/bundle/nsis/Modrinth App_*-setup.nsis.zip*
+            target/release/Modrinth App.exe
