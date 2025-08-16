@@ -24,6 +24,7 @@ import { regionOverrides } from '../../utils/regions'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import Checkbox from '../base/Checkbox.vue'
 import TagItem from '../base/TagItem.vue'
+import ModrinthServersIcon from '../servers/ModrinthServersIcon.vue'
 import ExpandableInvoiceTotal from './ExpandableInvoiceTotal.vue'
 import FormattedPaymentMethod from './FormattedPaymentMethod.vue'
 import ServersSpecs from './ServersSpecs.vue'
@@ -93,7 +94,7 @@ function setInterval(newInterval: ServerBillingInterval) {
 	<div class="grid sm:grid-cols-[3fr_2fr] gap-4">
 		<div class="bg-table-alternateRow p-4 rounded-2xl">
 			<div class="flex items-center gap-2 mb-3">
-				<LazyUiServersModrinthServersIcon class="flex h-5 w-fit" />
+				<ModrinthServersIcon class="flex h-5 w-fit" />
 				<TagItem>{{ planName }}</TagItem>
 			</div>
 			<div>
