@@ -25,3 +25,4 @@ pub use event::{
 };
 pub use logger::start_logger;
 pub use state::State;
+pub use state::dirs::DirectoryInfo;
