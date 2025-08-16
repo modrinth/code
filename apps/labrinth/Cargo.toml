@@ -3,7 +3,7 @@ name = "labrinth"
 version = "2.7.0"
 authors = ["geometrically <jai@modrinth.com>"]
 edition.workspace = true
-license = "AGPL-3.0"
+license = "AGPL-3.0-only"
 
 # This seems redundant, but it's necessary for Docker to work
 [[bin]]
