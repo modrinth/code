@@ -6,7 +6,7 @@
 	"main": "./index.js",
 	"scripts": {
 		"lint": "prettier --check .",
-		"format": "prettier --write ."
+		"fix": "prettier --write ."
 	},
 	"exports": {
 		"./eslint/*": "./eslint/*",
