@@ -5,6 +5,8 @@ use crate::state::{JavaVersion, Profile, Settings};
 use crate::util::fetch::IoSemaphore;
 use dashmap::DashSet;
 use std::path::{Path, PathBuf};
+// use std::fs as stdfs; // (removed, unused)
+use std::env;
 use std::sync::Arc;
 use tokio::fs;
 
@@ -22,9 +24,71 @@ pub struct DirectoryInfo {
 impl DirectoryInfo {
     // Get the settings directory
     // init() is not needed for this function
+    /// Returns the settings dir, considering portable mode if enabled.
     pub fn get_initial_settings_dir() -> Option<PathBuf> {
-        Self::env_path("THESEUS_CONFIG_DIR")
-            .or_else(|| Some(dirs::data_dir()?.join("ModrinthApp")))
+        // 1. Check for THESEUS_CONFIG_DIR override
+        if let Some(path) = Self::env_path("THESEUS_CONFIG_DIR") {
+            return Some(path);
+        }
+
+        // 2. Check for portable mode (env or portable.txt)
+        if Self::is_portable_mode() {
+            if let Some(portable_dir) = Self::portable_data_dir() {
+                // Set process env vars for this process to use portable dir
+                Self::set_portable_envs(&portable_dir);
+                return Some(portable_dir);
+            }
+        }
+
+        // 3. Default: system data dir
+        Some(dirs::data_dir()?.join("ModrinthApp"))
+    }
+
+    /// Returns true if portable mode is enabled (env or portable.txt)
+    fn is_portable_mode() -> bool {
+        // Environment variable takes precedence
+        if env::var_os("MODRINTH_PORTABLE").is_some() {
+            return true;
+        }
+        // Check for portable.txt next to the executable
+        if let Ok(exe_path) = env::current_exe() {
+            let portable_txt = exe_path.parent().map(|p| p.join("portable.txt"));
+            if let Some(ref path) = portable_txt {
+                if path.exists() {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
+    /// Returns the portable data dir (next to exe, ModrinthAppData)
+    fn portable_data_dir() -> Option<PathBuf> {
+        let exe_dir = env::current_exe().ok()?.parent()?.to_path_buf();
+        Some(exe_dir.join("ModrinthAppData"))
+    }
+
+    /// Sets process env vars to use the portable data dir for this process
+    fn set_portable_envs(portable_dir: &Path) {
+        // Windows: APPDATA, LOCALAPPDATA
+        // Linux: XDG_DATA_HOME
+        // macOS: HOME/Library/Application Support
+        #[cfg(target_os = "windows")]
+        unsafe {
+            env::set_var("APPDATA", portable_dir);
+            env::set_var("LOCALAPPDATA", portable_dir);
+        }
+        #[cfg(target_os = "linux")]
+        {
+            env::set_var("XDG_DATA_HOME", portable_dir);
+        }
+        #[cfg(target_os = "macos")]
+        {
+            // Not perfect, but set HOME to exe dir for child processes
+            if let Some(parent) = portable_dir.parent() {
+                env::set_var("HOME", parent);
+            }
+        }
     }
 
     /// Get all paths needed for Theseus to operate properly
