@@ -11,7 +11,7 @@
 //! [RFC 8252]: https://datatracker.ietf.org/doc/html/rfc8252
 
 use std::{
-    net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr},
+    net::SocketAddr,
     sync::{LazyLock, Mutex},
     time::Duration,
 };
@@ -19,10 +19,8 @@ use std::{
 use hyper::body::Incoming;
 use hyper_util::rt::{TokioIo, TokioTimer};
 use theseus::ErrorKind;
-use tokio::{
-    net::TcpListener,
-    sync::{broadcast, oneshot},
-};
+use theseus::prelude::tcp_listen_any_loopback;
+use tokio::sync::{broadcast, oneshot};
 
 static SERVER_SHUTDOWN: LazyLock<broadcast::Sender<()>> =
     LazyLock::new(|| broadcast::channel(1024).0);
@@ -35,17 +33,7 @@ static SERVER_SHUTDOWN: LazyLock<broadcast::Sender<()>> =
 pub async fn listen(
     listen_socket_tx: oneshot::Sender<Result<SocketAddr, theseus::Error>>,
 ) -> Result<Option<String>, theseus::Error> {
-    // IPv4 is tried first for the best compatibility and performance with most systems.
-    // IPv6 is also tried in case IPv4 is not available. Resolving "localhost" is avoided
-    // to prevent failures deriving from improper name resolution setup. Any available
-    // ephemeral port is used to prevent conflicts with other services. This is all as per
-    // RFC 8252's recommendations
-    const ANY_LOOPBACK_SOCKET: &[SocketAddr] = &[
-        SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 0),
-        SocketAddr::new(IpAddr::V6(Ipv6Addr::LOCALHOST), 0),
-    ];
-
-    let listener = match TcpListener::bind(ANY_LOOPBACK_SOCKET).await {
+    let listener = match tcp_listen_any_loopback().await {
         Ok(listener) => {
             listen_socket_tx
                 .send(listener.local_addr().map_err(|e| {
