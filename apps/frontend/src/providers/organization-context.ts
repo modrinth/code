@@ -60,7 +60,7 @@ export class OrganizationContext {
 		const EDIT_DETAILS = 1 << 2
 		return (
 			this.currentMember.value &&
-			(this.currentMember.value.permissions & EDIT_DETAILS) === EDIT_DETAILS
+			(this.currentMember.value.permissions! & EDIT_DETAILS) === EDIT_DETAILS
 		)
 	})
 
@@ -89,7 +89,9 @@ export class OrganizationContext {
 		})
 	}
 
-	public patchOrganization = async (newData: { slug: any }) => {
+	public patchOrganization = async (
+		newData: Partial<{ slug: string; name: string; description: string }>,
+	) => {
 		if (this.organization.value === null) {
 			throw new Error('Organization is not set.')
 		}

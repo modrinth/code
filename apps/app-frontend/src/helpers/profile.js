@@ -3,7 +3,6 @@
  * So, for example, addDefaultInstance creates a blank Profile object, where the Rust struct is serialized,
  *  and deserialized into a usable JS object.
  */
-import { injectNotificationManager } from '@modrinth/ui'
 import { invoke } from '@tauri-apps/api/core'
 
 import { install_to_existing_profile } from '@/helpers/pack.js'
@@ -194,7 +193,6 @@ export async function edit_icon(path, iconPath) {
 }
 
 export async function finish_install(instance) {
-	const { handleError } = injectNotificationManager()
 	if (instance.install_stage !== 'pack_installed') {
 		let linkedData = instance.linked_data
 		await install_to_existing_profile(
@@ -202,8 +200,8 @@ export async function finish_install(instance) {
 			linkedData.version_id,
 			instance.name,
 			instance.path,
-		).catch(handleError)
+		)
 	} else {
-		await install(instance.path, false).catch(handleError)
+		await install(instance.path, false)
 	}
 }

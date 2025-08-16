@@ -1575,18 +1575,6 @@ const showModerationChecklist = useLocalStorage(
 )
 const collapsedModerationChecklist = useLocalStorage('collapsed-moderation-checklist', false)
 
-watch(
-	showModerationChecklist,
-	(newValue) => {
-		notifications.setNotificationLocation(newValue ? 'left' : 'right')
-	},
-	{ immediate: true },
-)
-
-onUnmounted(() => {
-	notifications.setNotificationLocation('right')
-})
-
 if (import.meta.client && history && history.state && history.state.showChecklist) {
 	showModerationChecklist.value = true
 }

@@ -110,7 +110,7 @@ async function install(instance) {
 	}
 
 	await installMod(instance.path, version.id).catch(handleError)
-	await installVersionDependencies(instance, version)
+	await installVersionDependencies(instance, version).catch(handleError)
 
 	instance.installedMod = true
 	instance.installing = false
@@ -185,7 +185,7 @@ const createInstance = async () => {
 	await router.push(`/instance/${encodeURIComponent(id)}/`)
 
 	const instance = await get(id, true)
-	await installVersionDependencies(instance, versions.value[0])
+	await installVersionDependencies(instance, versions.value[0]).catch(handleError)
 
 	trackEvent('InstanceCreate', {
 		profile_name: name.value,

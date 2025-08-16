@@ -50,7 +50,7 @@
 				</span>
 			</template>
 			<template #actions>
-				<button v-if="auth?.user?.email" class="btn" @click="resendVerifyEmail">
+				<button v-if="auth?.user?.email" class="btn" @click="handleResendEmailVerification">
 					{{ formatMessage(verifyEmailBannerMessages.action) }}
 				</button>
 				<nuxt-link v-else class="btn" to="/settings/account">
@@ -853,6 +853,23 @@ const footerMessages = defineMessages({
 			'NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.',
 	},
 })
+
+async function handleResendEmailVerification() {
+	try {
+		await resendVerifyEmail()
+		addNotification({
+			title: 'Email sent',
+			text: `An email with a link to verify your account has been sent to ${auth.value.user.email}.`,
+			type: 'success',
+		})
+	} catch (err) {
+		addNotification({
+			title: 'An error occurred',
+			text: err.data.description,
+			type: 'error',
+		})
+	}
+}
 
 useHead({
 	link: [

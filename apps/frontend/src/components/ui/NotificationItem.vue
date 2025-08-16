@@ -331,7 +331,7 @@ import {
 	VersionIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { injectNotificationManager } from '@modrinth/ui'
+import { injectNotificationManager, useRelativeTime } from '@modrinth/ui'
 
 const { addNotification } = injectNotificationManager()
 const emit = defineEmits(['update:notifications'])

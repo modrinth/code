@@ -252,7 +252,7 @@ async function install(version) {
 		(profile) => {
 			router.push(`/instance/${profile}`)
 		},
-	)
+	).catch(handleError)
 }
 
 const options = ref(null)
