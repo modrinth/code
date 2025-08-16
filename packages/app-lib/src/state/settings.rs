@@ -41,6 +41,7 @@ pub struct Settings {
 
     pub skipped_update: Option<String>,
     pub pending_update_toast_for_version: Option<String>,
+    pub auto_download_updates: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, Hash, PartialEq)]
@@ -67,7 +68,7 @@ impl Settings {
                 mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,
                 hook_pre_launch, hook_wrapper, hook_post_exit,
                 custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar,
-                skipped_update, pending_update_toast_for_version
+                skipped_update, pending_update_toast_for_version, auto_download_updates
             FROM settings
             "
         )
@@ -124,6 +125,7 @@ impl Settings {
             skipped_update: res.skipped_update,
             pending_update_toast_for_version: res
                 .pending_update_toast_for_version,
+            auto_download_updates: res.auto_download_updates.map(|x| x == 1),
         })
     }
 
@@ -180,7 +182,8 @@ impl Settings {
                 hide_nametag_skins_page = $28,
 
                 skipped_update = $29,
-                pending_update_toast_for_version = $30
+                pending_update_toast_for_version = $30,
+                auto_download_updates = $31
             ",
             max_concurrent_writes,
             max_concurrent_downloads,
@@ -212,6 +215,7 @@ impl Settings {
             self.hide_nametag_skins_page,
             self.skipped_update,
             self.pending_update_toast_for_version,
+            self.auto_download_updates,
         )
         .execute(exec)
         .await?;

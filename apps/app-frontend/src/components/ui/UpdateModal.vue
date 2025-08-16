@@ -195,11 +195,15 @@ const shouldShowProgress = computed(() => {
 const modal = useTemplateRef('modal')
 const isOpen = ref(false)
 
+async function setUpdate(newUpdate: UpdateData) {
+  update.value = newUpdate
+  updateSize.value = await getUpdateSize(newUpdate.rid).catch(handleError)
+}
+
 async function show(newUpdate: UpdateData) {
   const oldVersion = update.value?.version
 
-  update.value = newUpdate
-  updateSize.value = await getUpdateSize(newUpdate.rid).catch(handleError)
+  await setUpdate(newUpdate)
 
   if (oldVersion !== update.value?.version) {
     downloadProgress.value = 0
@@ -216,8 +220,6 @@ function onHide() {
 function hide() {
   modal.value!.hide()
 }
-
-defineExpose({ show, hide, isOpen })
 
 async function copyError() {
   if (downloadError.value) {
@@ -270,7 +272,11 @@ function installUpdateNow() {
   }
 }
 
-function updateAtNextExit() {
+async function updateAtNextExit(newUpdate?: UpdateData) {
+  if (newUpdate) {
+    await setUpdate(newUpdate)
+  }
+
   enqueuedUpdate.value = update.value!.version
   emit('updateEnqueuedForLater', update.value!.version)
 
@@ -304,6 +310,8 @@ async function downloadUpdate() {
     await getCurrentWindow().close()
   }
 }
+
+defineExpose({ show, hide, isOpen, updateAtNextExit })
 </script>
 
 <style scoped lang="scss"></style>

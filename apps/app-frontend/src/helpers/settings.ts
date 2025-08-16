@@ -65,6 +65,7 @@ export type AppSettings = {
 
   skipped_update: string | null
   pending_update_toast_for_version: string | null
+  auto_download_updates: boolean | null
 }
 
 // Get full settings object

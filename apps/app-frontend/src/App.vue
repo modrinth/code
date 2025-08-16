@@ -28,7 +28,7 @@ import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.j
 import { list } from '@/helpers/profile.js'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
-import {areUpdatesEnabled, getOS, isDev, isNetworkMetered} from '@/helpers/utils.js'
+import { areUpdatesEnabled, getOS, isDev, isNetworkMetered } from '@/helpers/utils.js'
 import { useError } from '@/store/error.js'
 import { useInstall } from '@/store/install.js'
 import { useLoading, useTheming } from '@/store/state'
@@ -87,6 +87,7 @@ import { create_profile_and_install_from_file } from './helpers/pack'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
 import { get_available_capes, get_available_skins } from './helpers/skins'
 import { AppNotificationManager } from './providers/app-notifications'
+import MeteredNetworkModal from '@/components/ui/modal/MeteredNetworkModal.vue'
 
 const themeStore = useTheming()
 
@@ -454,7 +455,12 @@ async function checkUpdates() {
     }
 
     updateSkipped.value = false
-    updateModal.value.show(update)
+
+    if (settings.auto_download_updates) {
+      updateModal.value.updateAtNextExit(update)
+    } else {
+      updateModal.value.show(update)
+    }
   }
 
   await performCheck()
@@ -501,6 +507,19 @@ async function showUpdateButtonTooltip() {
     tooltip.hide()
     destroyTooltip(updateButton.value.$el)
   }, 3500)
+}
+
+const meteredNetworkModal = useTemplateRef('meteredNetworkModal')
+async function checkMeteredNetwork() {
+  const settings = await getSettings()
+  if (settings.auto_download_updates === null) {
+    if (await isNetworkMetered()) {
+      meteredNetworkModal.value.show()
+    } else {
+      settings.auto_download_updates = true
+      await setSettings(settings)
+    }
+  }
 }
 
 function handleClick(e) {
@@ -647,8 +666,6 @@ async function processPendingSurveys() {
     console.info('No user survey to show')
   }
 }
-
-console.log(`Metered network: ${await isNetworkMetered()}`)
 </script>
 
 <template>
@@ -662,6 +679,9 @@ console.log(`Metered network: ${await isNetworkMetered()}`)
         @update-enqueued-for-later="updateEnqueuedForLater"
         @modal-hidden="showUpdateButtonTooltip"
       />
+    </Suspense>
+    <Suspense @resolve="checkMeteredNetwork">
+      <MeteredNetworkModal ref="meteredNetworkModal" :update-modal="updateModal" />
     </Suspense>
     <Suspense>
       <AppSettingsModal ref="settingsModal" />
