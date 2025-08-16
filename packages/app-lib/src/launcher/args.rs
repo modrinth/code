@@ -14,10 +14,10 @@ use daedalus::{
     modded::SidedDataEntry,
 };
 use dunce::canonicalize;
-use hashlink::LinkedHashSet;
 use std::io::{BufRead, BufReader};
 use std::net::SocketAddr;
 use std::{collections::HashMap, path::Path};
+use itertools::Itertools;
 use uuid::Uuid;
 
 // Replaces the space separator with a newline character, as to not split the arguments
@@ -30,47 +30,47 @@ pub fn get_class_paths(
     java_arch: &str,
     minecraft_updated: bool,
 ) -> crate::Result<String> {
-    let mut cps = libraries
-        .iter()
-        .filter_map(|library| {
-            if let Some(rules) = &library.rules
-                && !parse_rules(
-                    rules,
-                    java_arch,
-                    &QuickPlayType::None,
-                    minecraft_updated,
-                )
-            {
-                return None;
-            }
-
-            if !library.include_in_classpath {
-                return None;
-            }
-
-            Some(get_lib_path(libraries_path, &library.name, false))
+    launcher_class_path.iter()
+        .map(|path| {
+            Ok(
+                canonicalize(path)
+                    .map_err(|_| {
+                        crate::ErrorKind::LauncherError(format!(
+                            "Specified class path {} does not exist",
+                            path.to_string_lossy()
+                        ))
+                            .as_error()
+                    })?
+                    .to_string_lossy()
+                    .to_string()
+            )
         })
-        .collect::<Result<LinkedHashSet<_>, _>>()?;
+        .chain(
+            libraries
+                .iter()
+                .filter_map(|library| {
+                    if let Some(rules) = &library.rules
+                        && !parse_rules(
+                        rules,
+                        java_arch,
+                        &QuickPlayType::None,
+                        minecraft_updated,
+                    )
+                    {
+                        return None;
+                    }
 
-    for launcher_path in launcher_class_path {
-        cps.insert(
-            canonicalize(launcher_path)
-                .map_err(|_| {
-                    crate::ErrorKind::LauncherError(format!(
-                        "Specified class path {} does not exist",
-                        launcher_path.to_string_lossy()
-                    ))
-                    .as_error()
-                })?
-                .to_string_lossy()
-                .to_string(),
-        );
-    }
+                    if !library.include_in_classpath {
+                        return None;
+                    }
 
-    Ok(cps
-        .into_iter()
-        .collect::<Vec<_>>()
-        .join(classpath_separator(java_arch)))
+                    Some(get_lib_path(libraries_path, &library.name, false))
+                })
+        )
+        .process_results(|iter| {
+            iter.unique()
+                .join(classpath_separator(java_arch))
+        })
 }
 
 pub fn get_class_paths_jar<T: AsRef<str>>(
