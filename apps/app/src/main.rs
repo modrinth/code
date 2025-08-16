@@ -14,65 +14,6 @@ mod error;
 #[cfg(target_os = "macos")]
 mod macos;
 
-/// Check if we're running in portable mode and return the portable directory
-fn get_portable_dir() -> Option<std::path::PathBuf> {
-    let exe_path = std::env::current_exe().ok()?;
-    let exe_dir = exe_path.parent()?;
-
-    // Method 1: Check if MODRINTH_PORTABLE environment variable is set
-    if std::env::var("MODRINTH_PORTABLE").is_ok() {
-        return Some(exe_dir.join("ModrinthAppData"));
-    }
-
-    // Method 2: Check if a "portable.txt" file exists next to the executable
-    if exe_dir.join("portable.txt").exists() {
-        return Some(exe_dir.join("ModrinthAppData"));
-    }
-
-    None
-}
-
-/// Set up environment variables for portable mode to ensure the window state plugin
-/// respects the portable directory configuration.
-fn setup_portable_env_vars() {
-    // Check if we're running in portable mode
-    let portable_dir = match get_portable_dir() {
-        Some(dir) => dir,
-        None => return, // Not in portable mode
-    };
-
-    // Override the appropriate environment variable for each platform
-    // This ensures both tauri-plugin-window-state and dirs.rs use the portable directory
-    #[cfg(target_os = "windows")]
-    {
-        unsafe {
-            std::env::set_var("APPDATA", &portable_dir);
-        }
-        // Note: We can't use tracing yet since logger isn't initialized
-        eprintln!("Set APPDATA to {} for portable mode", portable_dir.display());
-    }
-
-    #[cfg(target_os = "macos")]
-    {
-        let config_dir = portable_dir.join("Library").join("Application Support");
-        let _ = std::fs::create_dir_all(&config_dir);
-        unsafe {
-            std::env::set_var("HOME", &portable_dir);
-        }
-        eprintln!("Set HOME to {} for portable mode", portable_dir.display());
-    }
-
-    #[cfg(target_os = "linux")]
-    {
-        let config_dir = portable_dir.join(".config");
-        let _ = std::fs::create_dir_all(&config_dir);
-        unsafe {
-            std::env::set_var("XDG_CONFIG_HOME", &config_dir);
-        }
-        eprintln!("Set XDG_CONFIG_HOME to {} for portable mode", config_dir.display());
-    }
-}
-
 // Should be called in launcher initialization
 #[tracing::instrument(skip_all)]
 #[tauri::command]
@@ -184,12 +125,6 @@ fn is_dev() -> bool {
     cfg!(debug_assertions)
 }
 
-#[tauri::command]
-fn is_portable() -> bool {
-    // Use the same portable detection logic
-    get_portable_dir().is_some()
-}
-
 // Toggles decorations
 #[tauri::command]
 async fn toggle_decorations(b: bool, window: tauri::Window) -> api::Result<()> {
@@ -223,11 +158,6 @@ fn main() {
             RUST_LOG="theseus=trace" {run command}
 
     */
-
-    // Set up portable mode environment variables FIRST, before any other initialization
-    // This ensures both dirs.rs and window state plugin use the portable directory consistently
-    setup_portable_env_vars();
-
     let _log_guard = theseus::start_logger();
 
     tracing::info!("Initialized tracing subscriber. Loading Modrinth App!");
@@ -334,7 +264,6 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             is_dev,
-            is_portable,
             toggle_decorations,
             show_window,
             restart_app,
