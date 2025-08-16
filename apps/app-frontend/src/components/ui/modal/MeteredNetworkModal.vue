@@ -30,7 +30,7 @@ import { defineMessages, useVIntl } from '@vintl/vintl'
 import { useTemplateRef } from 'vue'
 import { ButtonStyled } from '@modrinth/ui'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
-import type UpdateModal from '@/components/ui/UpdateModal.vue'
+import type UpdateModal from '@/components/ui/modal/UpdateModal.vue'
 
 const props = defineProps<{
   updateModal: InstanceType<typeof UpdateModal>
