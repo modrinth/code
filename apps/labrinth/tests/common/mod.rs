@@ -30,7 +30,7 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
     let search_config = db.search_config.clone();
     let file_host: Arc<dyn file_hosting::FileHost + Send + Sync> =
         Arc::new(file_hosting::MockHost::new());
-    let mut clickhouse = clickhouse::init_client().await.unwrap();
+    let clickhouse = Some(clickhouse::init_client().await.unwrap());
 
     let maxmind_reader =
         Arc::new(queue::maxmind::MaxMindIndexer::new().await.unwrap());
@@ -42,7 +42,7 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
         pool.clone(),
         redis_pool.clone(),
         search_config,
-        &mut clickhouse,
+        clickhouse,
         file_host.clone(),
         maxmind_reader,
         stripe_client,

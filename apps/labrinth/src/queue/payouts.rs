@@ -736,8 +736,12 @@ pub async fn make_aditude_request(
 
 pub async fn process_payout(
     pool: &PgPool,
-    client: &clickhouse::Client,
+    client: Option<&clickhouse::Client>,
 ) -> Result<(), ApiError> {
+    let Some(client) = client else {
+        return Ok(());
+    };
+
     sqlx::query!(
         "
         UPDATE payouts

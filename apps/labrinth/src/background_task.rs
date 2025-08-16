@@ -24,7 +24,7 @@ impl BackgroundTask {
         pool: sqlx::Pool<Postgres>,
         redis_pool: RedisPool,
         search_config: search::SearchConfig,
-        clickhouse: clickhouse::Client,
+        clickhouse: Option<clickhouse::Client>,
         stripe_client: stripe::Client,
     ) {
         use BackgroundTask::*;
@@ -33,7 +33,13 @@ impl BackgroundTask {
             IndexSearch => index_search(pool, redis_pool, search_config).await,
             ReleaseScheduled => release_scheduled(pool).await,
             UpdateVersions => update_versions(pool, redis_pool).await,
-            Payouts => payouts(pool, clickhouse).await,
+            Payouts => {
+                if let Some(client) = clickhouse {
+                    payouts(pool, Some(client)).await
+                } else {
+                    warn!("Cannot run payouts: ClickHouse client unavailable");
+                }
+            }
             IndexBilling => {
                 crate::routes::internal::billing::index_billing(
                     stripe_client,
@@ -121,14 +127,18 @@ pub async fn update_versions(
 
 pub async fn payouts(
     pool: sqlx::Pool<Postgres>,
-    clickhouse: clickhouse::Client,
+    clickhouse: Option<clickhouse::Client>,
 ) {
-    info!("Started running payouts");
-    let result = process_payout(&pool, &clickhouse).await;
-    if let Err(e) = result {
-        warn!("Payouts run failed: {:?}", e);
+    if let Some(client) = clickhouse {
+        info!("Started running payouts");
+        let result = process_payout(&pool, Some(&client)).await;
+        if let Err(e) = result {
+            warn!("Payouts run failed: {:?}", e);
+        }
+        info!("Done running payouts");
+    } else {
+        warn!("Skipping payouts: ClickHouse client unavailable");
     }
-    info!("Done running payouts");
 }
 
 mod version_updater {
