@@ -5,6 +5,7 @@ use crate::state::{JavaVersion, Profile, Settings};
 use crate::util::fetch::IoSemaphore;
 use dashmap::DashSet;
 use std::path::{Path, PathBuf};
+use std::env;
 use std::sync::Arc;
 use tokio::fs;
 
@@ -20,9 +21,54 @@ pub struct DirectoryInfo {
 }
 
 impl DirectoryInfo {
+    /// Returns the path to the directory containing the running executable, if possible.
+    fn exe_dir() -> Option<PathBuf> {
+        std::env::current_exe().ok().and_then(|p| p.parent().map(|p| p.to_path_buf()))
+    }
+
+    /// Checks if portable mode is enabled (env or portable.txt) and returns the portable data dir if so.
+    fn portable_data_dir() -> Option<PathBuf> {
+        // 1. Environment variable takes precedence
+        if env::var_os("MODRINTH_PORTABLE").is_some() {
+            if let Some(exe_dir) = Self::exe_dir() {
+                return Some(exe_dir.join("ModrinthAppData"));
+            }
+        }
+        // 2. portable.txt file next to executable
+        if let Some(exe_dir) = Self::exe_dir() {
+            let portable_txt = exe_dir.join("portable.txt");
+            if portable_txt.exists() {
+                return Some(exe_dir.join("ModrinthAppData"));
+            }
+        }
+        None
+    }
+
+    /// Sets the process environment variable for app data (e.g., APPDATA) to the portable dir if in portable mode.
+    fn set_portable_env(portable_dir: &Path) {
+        #[cfg(target_os = "windows")]
+        unsafe {
+            env::set_var("APPDATA", portable_dir);
+        }
+        #[cfg(target_os = "macos")]
+        unsafe {
+            // macOS typically uses HOME/Library/Application Support, but we can override XDG_DATA_HOME for some libs
+            env::set_var("XDG_DATA_HOME", portable_dir);
+        }
+        #[cfg(target_os = "linux")]
+        unsafe {
+            env::set_var("XDG_DATA_HOME", portable_dir);
+        }
+    }
+
     // Get the settings directory
     // init() is not needed for this function
     pub fn get_initial_settings_dir() -> Option<PathBuf> {
+        if let Some(portable_dir) = Self::portable_data_dir() {
+            // Set env var for the process so all code uses portable dir
+            Self::set_portable_env(&portable_dir);
+            return Some(portable_dir);
+        }
         Self::env_path("THESEUS_CONFIG_DIR")
             .or_else(|| Some(dirs::data_dir()?.join("ModrinthApp")))
     }
@@ -168,7 +214,7 @@ impl DirectoryInfo {
     /// Get path from environment variable
     #[inline]
     fn env_path(name: &str) -> Option<PathBuf> {
-        std::env::var_os(name).map(PathBuf::from)
+        env::var_os(name).map(PathBuf::from)
     }
 
     #[tracing::instrument(skip(settings, exec, io_semaphore))]
