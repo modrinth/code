@@ -19,6 +19,7 @@ indent_size = 2
 [*.json]
 indent_size = 2
 
+# YAML requires space indentation by spec
 [*.{yml,yaml}]
 indent_size = 2
-indent_style = space # YAML requires space indentation by spec
+indent_style = space
