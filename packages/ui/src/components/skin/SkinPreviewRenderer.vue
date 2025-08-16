@@ -1,4 +1,5 @@
 <template>
+	<!-- eslint-disable vue/no-undef-components -->
 	<div ref="skinPreviewContainer" class="relative w-full h-full cursor-grab" @click="onCanvasClick">
 		<div
 			class="absolute bottom-[18%] left-0 right-0 flex flex-col justify-center items-center mb-2 pointer-events-none z-10 gap-2"
@@ -217,23 +218,23 @@ const radialSpotlightShader = computed(() => ({
     uniform float outerOpacity;
     uniform float falloffPower;
     uniform float shadowRadius;
-    
+
     varying vec2 vUv;
-    
+
     void main() {
       vec2 center = vec2(0.5, 0.5);
       float dist = distance(vUv, center) * 2.0;
-      
+
       // Create shadow in the center
       float shadowFalloff = 1.0 - smoothstep(0.0, shadowRadius, dist);
-      
+
       // Create overall spotlight falloff
       float spotlightFalloff = 1.0 - smoothstep(0.0, 1.0, pow(dist, falloffPower));
-      
+
       // Combine both effects
       vec3 color = mix(outerColor, innerColor, shadowFalloff);
       float opacity = mix(outerOpacity, innerOpacity * shadowFalloff, spotlightFalloff);
-      
+
       gl_FragColor = vec4(color, opacity);
     }
   `,

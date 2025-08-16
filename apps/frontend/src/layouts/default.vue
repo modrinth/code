@@ -116,7 +116,7 @@
 		>
 			<div>
 				<NuxtLink to="/" aria-label="Modrinth home page">
-					<BrandTextLogo aria-hidden="true" class="h-7 w-auto text-contrast" />
+					<TextLogo aria-hidden="true" class="h-7 w-auto text-contrast" />
 				</NuxtLink>
 			</div>
 			<div
@@ -450,8 +450,7 @@
 						</div>
 					</NuxtLink>
 					<nuxt-link v-else class="iconified-button brand-button" to="/auth/sign-in">
-						<LogInIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.signInButton) }}
+						<LogInIcon aria-hidden="true" /> {{ formatMessage(commonMessages.signInButton) }}
 					</nuxt-link>
 				</div>
 				<div class="links">
@@ -590,7 +589,7 @@
 						role="region"
 						aria-label="Modrinth information"
 					>
-						<BrandTextLogo
+						<TextLogo
 							aria-hidden="true"
 							class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
 							@click="developerModeIncrement()"
@@ -716,7 +715,9 @@ import {
 	PagewideBanner,
 } from '@modrinth/ui'
 import { isAdmin, isStaff } from '@modrinth/utils'
+import { IntlFormatted } from '@vintl/vintl/components'
 
+import TextLogo from '~/components/brand/TextLogo.vue'
 import CollectionCreateModal from '~/components/ui/CollectionCreateModal.vue'
 import ModalCreation from '~/components/ui/ModalCreation.vue'
 import OrganizationCreateModal from '~/components/ui/OrganizationCreateModal.vue'
@@ -724,11 +725,12 @@ import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.v
 import { errors as generatedStateErrors } from '~/generated/state.json'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 
-const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const auth = await useAuth()
 const user = await useUser()
+
+const { addNotification } = injectNotificationManager()
 
 const cosmetics = useCosmetics()
 const flags = useFeatureFlags()
@@ -739,6 +741,22 @@ const router = useNativeRouter()
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
 
 const basePopoutId = useId()
+async function handleResendEmailVerification() {
+	try {
+		await resendVerifyEmail()
+		addNotification({
+			title: 'Verification email sent',
+			text: 'Please check your inbox for the verification email.',
+			type: 'success',
+		})
+	} catch (err) {
+		addNotification({
+			title: 'An error occurred',
+			text: err.data.description,
+			type: 'error',
+		})
+	}
+}
 
 const verifyEmailBannerMessages = defineMessages({
 	title: {
@@ -853,23 +871,6 @@ const footerMessages = defineMessages({
 			'NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.',
 	},
 })
-
-async function handleResendEmailVerification() {
-	try {
-		await resendVerifyEmail()
-		addNotification({
-			title: 'Email sent',
-			text: `An email with a link to verify your account has been sent to ${auth.value.user.email}.`,
-			type: 'success',
-		})
-	} catch (err) {
-		addNotification({
-			title: 'An error occurred',
-			text: err.data.description,
-			type: 'error',
-		})
-	}
-}
 
 useHead({
 	link: [
@@ -1211,10 +1212,7 @@ const footerLinks = [
 			{
 				href: '/news/changelog',
 				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.about.changelog',
-						defaultMessage: 'Changelog',
-					}),
+					defineMessage({ id: 'layout.footer.about.changelog', defaultMessage: 'Changelog' }),
 				),
 			},
 			{
@@ -1248,19 +1246,13 @@ const footerLinks = [
 			{
 				href: '/plus',
 				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.products.plus',
-						defaultMessage: 'Modrinth+',
-					}),
+					defineMessage({ id: 'layout.footer.products.plus', defaultMessage: 'Modrinth+' }),
 				),
 			},
 			{
 				href: '/app',
 				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.products.app',
-						defaultMessage: 'Modrinth App',
-					}),
+					defineMessage({ id: 'layout.footer.products.app', defaultMessage: 'Modrinth App' }),
 				),
 			},
 			{
@@ -1291,10 +1283,7 @@ const footerLinks = [
 			{
 				href: 'https://crowdin.com/project/modrinth',
 				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.resources.translate',
-						defaultMessage: 'Translate',
-					}),
+					defineMessage({ id: 'layout.footer.resources.translate', defaultMessage: 'Translate' }),
 				),
 			},
 			{
@@ -1323,19 +1312,13 @@ const footerLinks = [
 			{
 				href: '/legal/rules',
 				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.legal.rules',
-						defaultMessage: 'Content Rules',
-					}),
+					defineMessage({ id: 'layout.footer.legal.rules', defaultMessage: 'Content Rules' }),
 				),
 			},
 			{
 				href: '/legal/terms',
 				label: formatMessage(
-					defineMessage({
-						id: 'layout.footer.legal.terms-of-use',
-						defaultMessage: 'Terms of Use',
-					}),
+					defineMessage({ id: 'layout.footer.legal.terms-of-use', defaultMessage: 'Terms of Use' }),
 				),
 			},
 			{

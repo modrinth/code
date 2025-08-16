@@ -27,7 +27,7 @@
 						>
 							<div class="flex flex-1 items-center gap-2 truncate">
 								<transition-group name="status-icon" mode="out-in">
-									<UiServersPanelSpinner
+									<PanelSpinner
 										v-show="item.status === 'uploading'"
 										key="spinner"
 										class="absolute !size-4"
@@ -106,6 +106,8 @@ import { ButtonStyled, injectNotificationManager } from '@modrinth/ui'
 import { computed, nextTick, ref, watch } from 'vue'
 
 import type { FSModule } from '~/composables/servers/modules/fs.ts'
+
+import PanelSpinner from './PanelSpinner.vue'
 
 const { addNotification } = injectNotificationManager()
 

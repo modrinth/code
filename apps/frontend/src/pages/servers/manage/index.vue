@@ -53,7 +53,7 @@
 			</div>
 		</div>
 
-		<LazyUiServersServerManageEmptyState
+		<ServerManageEmptyState
 			v-else-if="serverList.length === 0 && !isPollingForNewServers && !hasError"
 		/>
 
@@ -93,12 +93,8 @@
 				v-if="filteredData.length > 0 || isPollingForNewServers"
 				class="m-0 flex flex-col gap-4 p-0"
 			>
-				<UiServersServerListing
-					v-for="server in filteredData"
-					:key="server.server_id"
-					v-bind="server"
-				/>
-				<LazyUiServersServerListingSkeleton v-if="isPollingForNewServers" />
+				<ServerListing v-for="server in filteredData" :key="server.server_id" v-bind="server" />
+				<ServerListingSkeleton v-if="isPollingForNewServers" />
 			</ul>
 			<div v-else class="flex h-full items-center justify-center">
 				<p class="text-contrast">No servers found.</p>
@@ -115,6 +111,9 @@ import Fuse from 'fuse.js'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { reloadNuxtApp } from '#app'
+import ServerListing from '~/components/ui/servers/ServerListing.vue'
+import ServerListingSkeleton from '~/components/ui/servers/ServerListingSkeleton.vue'
+import ServerManageEmptyState from '~/components/ui/servers/ServerManageEmptyState.vue'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 
 definePageMeta({

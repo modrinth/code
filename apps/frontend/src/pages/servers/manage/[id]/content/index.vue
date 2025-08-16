@@ -1,5 +1,5 @@
 <template>
-	<UiServersContentVersionEditModal
+	<ContentVersionEditModal
 		v-if="!invalidModal"
 		ref="versionEditModal"
 		:type="type"
@@ -59,7 +59,7 @@
 							/>
 						</div>
 						<ButtonStyled>
-							<UiServersTeleportOverflowMenu
+							<TeleportOverflowMenu
 								position="bottom"
 								direction="left"
 								:aria-label="`Filter ${type}s`"
@@ -77,8 +77,8 @@
 								<template #all> All {{ type.toLocaleLowerCase() }}s </template>
 								<template #enabled> Only enabled </template>
 								<template #disabled> Only disabled </template>
-							</UiServersTeleportOverflowMenu>
-						</ButtonStyled>
+							</TeleportOverflowMenu></ButtonStyled
+						>
 					</div>
 					<div v-if="hasMods" class="flex w-full items-center gap-2 sm:w-fit">
 						<ButtonStyled>
@@ -202,7 +202,7 @@
 													@click="showVersionModal(mod)"
 												>
 													<template v-if="mod.changing">
-														<UiServersIconsLoadingIcon class="animate-spin" />
+														<LoadingIcon class="animate-spin" />
 													</template>
 													<template v-else>
 														<EditIcon />
@@ -212,13 +212,13 @@
 
 											<!-- Dropdown for mobile -->
 											<div class="mr-2 flex items-center sm:hidden">
-												<UiServersIconsLoadingIcon
+												<LoadingIcon
 													v-if="mod.changing"
 													class="mr-2 h-5 w-5 animate-spin"
 													style="color: var(--color-base)"
 												/>
 												<ButtonStyled v-else circular type="transparent">
-													<UiServersTeleportOverflowMenu
+													<TeleportOverflowMenu
 														:options="[
 															{
 																id: 'edit',
@@ -240,8 +240,8 @@
 															<TrashIcon class="h-5 w-5" />
 															<span>Delete</span>
 														</template>
-													</UiServersTeleportOverflowMenu>
-												</ButtonStyled>
+													</TeleportOverflowMenu></ButtonStyled
+												>
 											</div>
 
 											<input
@@ -312,7 +312,7 @@
 					</div>
 				</div>
 				<div v-else class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center">
-					<UiServersIconsLoaderIcon loader="Vanilla" class="size-24" />
+					<LoaderIcon loader="Vanilla" class="size-24" />
 					<p class="m-0 pt-3 font-bold text-contrast">Your server is running Vanilla Minecraft</p>
 					<p class="m-0">
 						Add content to your server by installing a modpack or choosing a different platform that
@@ -359,8 +359,11 @@ import { Avatar, ButtonStyled, injectNotificationManager } from '@modrinth/ui'
 import type { Mod } from '@modrinth/utils'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
+import ContentVersionEditModal from '~/components/ui/servers/ContentVersionEditModal.vue'
 import FilesUploadDragAndDrop from '~/components/ui/servers/FilesUploadDragAndDrop.vue'
 import FilesUploadDropdown from '~/components/ui/servers/FilesUploadDropdown.vue'
+import LoaderIcon from '~/components/ui/servers/icons/LoaderIcon.vue'
+import LoadingIcon from '~/components/ui/servers/icons/LoadingIcon.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import { acceptFileFromProjectType } from '~/helpers/fileUtils.js'
 

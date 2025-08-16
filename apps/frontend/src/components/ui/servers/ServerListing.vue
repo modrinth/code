@@ -16,7 +16,7 @@
 			data-pyro-server-listing
 			:data-pyro-server-listing-id="server_id"
 		>
-			<UiServersServerIcon v-if="status !== 'suspended'" :image="image" />
+			<ServerIcon v-if="status !== 'suspended'" :image="image" />
 			<div
 				v-else
 				class="bg-bg-secondary flex size-24 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
@@ -49,7 +49,7 @@
 				>
 					<SparklesIcon class="size-5 shrink-0" /> New server
 				</div>
-				<UiServersServerInfoLabels
+				<ServerInfoLabels
 					v-else
 					:server-data="{ game, mc_version, loader, loader_version, net }"
 					:show-game-label="showGameLabel"
@@ -63,7 +63,7 @@
 			v-if="status === 'suspended' && suspension_reason === 'upgrading'"
 			class="relative -mt-4 flex w-full flex-row items-center gap-2 rounded-b-3xl bg-bg-blue p-4 text-sm font-bold text-contrast"
 		>
-			<UiServersPanelSpinner />
+			<PanelSpinner />
 			Your server's hardware is currently being upgraded and will be back online shortly.
 		</div>
 		<div
@@ -71,8 +71,8 @@
 			class="relative -mt-4 flex w-full flex-col gap-2 rounded-b-3xl bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
-				<UiServersIconsPanelErrorIcon class="!size-5" /> Your server has been cancelled. Please
-				update your billing information or contact Modrinth Support for more information.
+				<PanelErrorIcon class="!size-5" /> Your server has been cancelled. Please update your
+				billing information or contact Modrinth Support for more information.
 			</div>
 			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
 		</div>
@@ -81,9 +81,8 @@
 			class="relative -mt-4 flex w-full flex-col gap-2 rounded-b-3xl bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
-				<UiServersIconsPanelErrorIcon class="!size-5" /> Your server has been suspended:
-				{{ suspension_reason }}. Please update your billing information or contact Modrinth Support
-				for more information.
+				<PanelErrorIcon class="!size-5" /> Your server has been suspended: {{ suspension_reason }}.
+				Please update your billing information or contact Modrinth Support for more information.
 			</div>
 			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
 		</div>
@@ -92,8 +91,8 @@
 			class="relative -mt-4 flex w-full flex-col gap-2 rounded-b-3xl bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
-				<UiServersIconsPanelErrorIcon class="!size-5" /> Your server has been suspended. Please
-				update your billing information or contact Modrinth Support for more information.
+				<PanelErrorIcon class="!size-5" /> Your server has been suspended. Please update your
+				billing information or contact Modrinth Support for more information.
 			</div>
 			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
 		</div>
@@ -106,6 +105,11 @@ import { Avatar, CopyCode } from '@modrinth/ui'
 import type { Project, Server } from '@modrinth/utils'
 
 import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'
+
+import PanelErrorIcon from './icons/PanelErrorIcon.vue'
+import PanelSpinner from './PanelSpinner.vue'
+import ServerIcon from './ServerIcon.vue'
+import ServerInfoLabels from './ServerInfoLabels.vue'
 
 const props = defineProps<Partial<Server>>()
 

@@ -212,7 +212,7 @@ async function generateJsonFile(articles): Promise<void> {
 	)
 	const json = { articles: sorted }
 	await fs.mkdir(path.dirname(JSON_PATH), { recursive: true })
-	await fs.writeFile(JSON_PATH, JSON.stringify(json, null, 2) + '\n', 'utf8')
+	await fs.writeFile(JSON_PATH, JSON.stringify(json, null, '\t') + '\n', 'utf8')
 	console.log(`📝  Wrote JSON articles to ${JSON_PATH}`)
 }
 

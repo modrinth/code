@@ -28,7 +28,7 @@
 					<div
 						class="grid size-16 place-content-center rounded-2xl border-[2px] border-solid border-button-border bg-button-bg shadow-sm"
 					>
-						<UiServersIconsLoaderIcon class="size-10" :loader="selectedLoader" />
+						<LoaderIcon class="size-10" :loader="selectedLoader" />
 					</div>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -54,7 +54,7 @@
 
 				<div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
 					<div class="text-lg font-bold text-contrast">Minecraft version</div>
-					<UiServersTeleportDropdownMenu
+					<TeleportDropdownMenu
 						v-model="selectedMCVersion"
 						name="mcVersion"
 						:options="mcVersions"
@@ -102,13 +102,13 @@
 							<div
 								class="relative flex h-9 w-full items-center rounded-xl bg-button-bg px-4 opacity-50"
 							>
-								<UiServersIconsLoadingIcon class="mr-2 animate-spin" />
+								<LoadingIcon class="mr-2 animate-spin" />
 								Loading versions...
 								<DropdownIcon class="absolute right-4" />
 							</div>
 						</template>
 						<template v-else-if="selectedLoaderVersions.length > 0">
-							<UiServersTeleportDropdownMenu
+							<TeleportDropdownMenu
 								v-model="selectedLoaderVersion"
 								name="loaderVersion"
 								:options="selectedLoaderVersions"
@@ -210,6 +210,9 @@ import { $fetch } from 'ofetch'
 
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import type { BackupInProgressReason } from '~/pages/servers/manage/[id].vue'
+
+import LoaderIcon from './icons/LoaderIcon.vue'
+import LoadingIcon from './icons/LoadingIcon.vue'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()

@@ -205,12 +205,9 @@
 			>
 				<div class="flex flex-col justify-between gap-4">
 					<div class="flex flex-col gap-4">
-						<LazyUiServersModrinthServersIcon class="flex h-8 w-fit" />
+						<ModrinthServersIcon class="flex h-8 w-fit" />
 						<div class="flex flex-col gap-2">
-							<UiServersServerListing
-								v-if="subscription.serverInfo"
-								v-bind="subscription.serverInfo"
-							/>
+							<ServerListing v-if="subscription.serverInfo" v-bind="subscription.serverInfo" />
 							<div v-else class="w-fit">
 								<p>
 									A linked server couldn't be found for this subscription. There are a few possible
@@ -588,6 +585,8 @@ import {
 import { calculateSavings, formatPrice, getCurrency } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
+import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
+import ServerListing from '~/components/ui/servers/ServerListing.vue'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 import { products } from '~/generated/state.json'
 

@@ -88,7 +88,7 @@
 							>
 								<EditIcon class="h-8 w-8 text-contrast" />
 							</div>
-							<UiServersServerIcon :image="icon" />
+							<ServerIcon :image="icon" />
 						</div>
 						<ButtonStyled>
 							<button v-tooltip="'Synchronize icon with installed modpack'" @click="resetIcon">
@@ -101,7 +101,7 @@
 			</div>
 		</div>
 		<div v-else />
-		<UiServersSaveBanner
+		<SaveBanner
 			:is-visible="!!hasUnsavedChanges && !!isValidServerName"
 			:server="props.server"
 			:is-updating="isUpdating"
@@ -116,6 +116,8 @@ import { EditIcon, TransferIcon } from '@modrinth/assets'
 import { injectNotificationManager } from '@modrinth/ui'
 import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
 
+import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
+import ServerIcon from '~/components/ui/servers/ServerIcon.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const { addNotification } = injectNotificationManager()

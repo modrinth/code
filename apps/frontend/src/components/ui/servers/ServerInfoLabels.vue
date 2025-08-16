@@ -1,24 +1,24 @@
 <template>
 	<div>
-		<UiServersServerGameLabel
+		<ServerGameLabel
 			v-if="showGameLabel"
 			:game="serverData.game"
 			:mc-version="serverData.mc_version ?? ''"
 			:is-link="linked"
 		/>
-		<UiServersServerLoaderLabel
+		<ServerLoaderLabel
 			:loader="serverData.loader"
 			:loader-version="serverData.loader_version ?? ''"
 			:no-separator="column"
 			:is-link="linked"
 		/>
-		<UiServersServerSubdomainLabel
+		<ServerSubdomainLabel
 			v-if="serverData.net?.domain"
 			:subdomain="serverData.net.domain"
 			:no-separator="column"
 			:is-link="linked"
 		/>
-		<UiServersServerUptimeLabel
+		<ServerUptimeLabel
 			v-if="uptimeSeconds"
 			:uptime-seconds="uptimeSeconds"
 			:no-separator="column"
@@ -27,6 +27,11 @@
 </template>
 
 <script setup lang="ts">
+import ServerGameLabel from './ServerGameLabel.vue'
+import ServerLoaderLabel from './ServerLoaderLabel.vue'
+import ServerSubdomainLabel from './ServerSubdomainLabel.vue'
+import ServerUptimeLabel from './ServerUptimeLabel.vue'
+
 interface ServerInfoLabelsProps {
 	serverData: Record<string, any>
 	showGameLabel: boolean

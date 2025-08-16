@@ -151,7 +151,7 @@
 									class="group"
 								>
 									<div class="flex items-center gap-2">
-										<UiServersLogLine :log="item" @show-full-log="showFullLogMessage" />
+										<LogLine :log="item" @show-full-log="showFullLogMessage" />
 										<div @mousedown.stop @click.stop>
 											<button
 												v-if="searchInput"
@@ -223,8 +223,8 @@
 				:class="{ hidden: searchInput || hasSelection || isSingleLineSelected }"
 				@click="toggleFullscreen"
 			>
-				<LazyUiServersIconsMinimizeIconVue v-if="isFullScreen" />
-				<LazyUiServersIconsFullscreenIcon v-else />
+				<MinimizeIconVue v-if="isFullScreen" />
+				<FullscreenIcon v-else />
 			</button>
 
 			<Transition name="fade">
@@ -305,6 +305,10 @@ import DOMPurify from 'dompurify'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { useModrinthServersConsole } from '~/store/console.ts'
+
+import FullscreenIcon from './icons/FullscreenIcon.vue'
+import MinimizeIconVue from './icons/MinimizeIcon.vue.vue'
+import LogLine from './LogLine.vue'
 
 const { $cosmetics } = useNuxtApp()
 const cosmetics = $cosmetics

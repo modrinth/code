@@ -131,7 +131,7 @@
 			</p>
 		</div>
 
-		<UiServersSaveBanner
+		<SaveBanner
 			:is-visible="hasUnsavedChanges"
 			:server="props.server"
 			:is-updating="isUpdating"
@@ -144,10 +144,11 @@
 
 <script setup lang="ts">
 import { EyeIcon, IssuesIcon, SearchIcon } from '@modrinth/assets'
-import { injectNotificationManager } from '@modrinth/ui'
+import { ButtonStyled, injectNotificationManager } from '@modrinth/ui'
 import Fuse from 'fuse.js'
 import { computed, inject, ref, watch } from 'vue'
 
+import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const { addNotification } = injectNotificationManager()

@@ -116,7 +116,7 @@
 		}"
 	>
 		<div class="flex w-full min-w-0 select-none flex-col items-center gap-6 pt-4 sm:flex-row">
-			<UiServersServerIcon :image="serverData.image" class="drop-shadow-lg sm:drop-shadow-none" />
+			<ServerIcon :image="serverData.image" class="drop-shadow-lg sm:drop-shadow-none" />
 			<div
 				class="flex min-w-0 flex-1 flex-col-reverse items-center gap-2 sm:flex-col sm:items-start"
 			>
@@ -137,7 +137,7 @@
 						data-pyro-server-action-buttons
 						class="server-action-buttons-anim flex w-fit flex-shrink-0"
 					>
-						<UiServersPanelServerActionButton
+						<PanelServerActionButton
 							v-if="!serverData.flows?.intro"
 							class="flex-shrink-0"
 							:is-online="isServerRunning"
@@ -158,7 +158,7 @@
 				>
 					<SettingsIcon /> Configuring server...
 				</div>
-				<UiServersServerInfoLabels
+				<ServerInfoLabels
 					v-else
 					:server-data="serverData"
 					:show-game-label="showGameLabel"
@@ -175,7 +175,7 @@
 				v-if="serverData?.status === 'installing'"
 				class="w-50 h-50 flex items-center justify-center gap-2 text-center text-lg font-bold"
 			>
-				<LazyUiServersPanelSpinner class="size-10 animate-spin" /> Setting up your server...
+				<PanelSpinner class="size-10 animate-spin" /> Setting up your server...
 			</div>
 			<div v-else>
 				<h2 class="my-4 text-xl font-extrabold">
@@ -196,7 +196,7 @@
 				data-pyro-navigation
 				class="isolate flex w-full select-none flex-col justify-between gap-4 overflow-auto md:flex-row md:items-center"
 			>
-				<UiNavTabs :links="navLinks" />
+				<NavTabs :links="navLinks" />
 			</div>
 
 			<div data-pyro-mount class="h-full w-full flex-1">
@@ -304,7 +304,7 @@
 					data-pyro-server-ws-reconnecting
 					class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-sm text-contrast"
 				>
-					<UiServersPanelSpinner />
+					<PanelSpinner />
 					Hang on, we're reconnecting to your server.
 				</div>
 
@@ -313,13 +313,13 @@
 					data-pyro-server-installing
 					class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-blue p-4 text-sm text-contrast"
 				>
-					<UiServersServerIcon :image="serverData.image" class="!h-10 !w-10" />
+					<ServerIcon :image="serverData.image" class="!h-10 !w-10" />
 
 					<div class="flex flex-col gap-1">
 						<span class="text-lg font-bold"> We're preparing your server! </span>
 						<div class="flex flex-row items-center gap-2">
-							<UiServersPanelSpinner class="!h-3 !w-3" />
-							<LazyUiServersInstallingTicker />
+							<PanelSpinner class="!h-3 !w-3" />
+							<InstallingTicker />
 						</div>
 					</div>
 				</div>
@@ -382,7 +382,13 @@ import DOMPurify from 'dompurify'
 import { computed, onMounted, onUnmounted, type Reactive, ref } from 'vue'
 
 import { reloadNuxtApp } from '#app'
+import NavTabs from '~/components/ui/NavTabs.vue'
 import PanelErrorIcon from '~/components/ui/servers/icons/PanelErrorIcon.vue'
+import InstallingTicker from '~/components/ui/servers/InstallingTicker.vue'
+import PanelServerActionButton from '~/components/ui/servers/PanelServerActionButton.vue'
+import PanelSpinner from '~/components/ui/servers/PanelSpinner.vue'
+import ServerIcon from '~/components/ui/servers/ServerIcon.vue'
+import ServerInfoLabels from '~/components/ui/servers/ServerInfoLabels.vue'
 import ServerInstallation from '~/components/ui/servers/ServerInstallation.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'
