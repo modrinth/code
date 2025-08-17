@@ -1,5 +1,6 @@
 <template>
 	<div class="experimental-styles-within">
+		<CreatorTaxComplianceAlert />
 		<section class="universal-card">
 			<h2 class="text-2xl">Revenue</h2>
 			<div class="grid-display">
@@ -153,6 +154,7 @@ import { injectNotificationManager } from '@modrinth/ui'
 import { formatDate } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
+import CreatorTaxComplianceAlert from '~/components/ui/CreatorTaxComplianceAlert.vue'
 
 import { removeAuthProvider } from '~/composables/auth.js'
 
