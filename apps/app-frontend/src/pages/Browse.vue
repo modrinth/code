@@ -223,14 +223,14 @@ async function refreshSearch() {
 				)
 		}
 	}
-		results.value = rawResults.result
+	results.value = rawResults.result
 
 	const currentFilterState = JSON.stringify({
 		query: query.value,
 		filters: currentFilters.value,
 		sort: currentSortType.value,
 		maxResults: maxResults.value,
-		projectTypes: projectTypes.value
+		projectTypes: projectTypes.value,
 	})
 
 	if (previousFilterState.value && previousFilterState.value !== currentFilterState) {
@@ -404,7 +404,7 @@ previousFilterState.value = JSON.stringify({
 	filters: currentFilters.value,
 	sort: currentSortType.value,
 	maxResults: maxResults.value,
-	projectTypes: projectTypes.value
+	projectTypes: projectTypes.value,
 })
 </script>
 

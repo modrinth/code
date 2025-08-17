@@ -1,6 +1,6 @@
 [package]
 name = "theseus"
-version = "1.0.0-local" # The actual version is set by the theseus-build workflow on tagging
+version = "1.0.0-local"                # The actual version is set by the theseus-build workflow on tagging
 authors = ["Jai A <jaiagr+gpg@pm.me>"]
 edition.workspace = true
 
@@ -15,7 +15,14 @@ sha2.workspace = true
 url = { workspace = true, features = ["serde"] }
 uuid = { workspace = true, features = ["serde", "v4"] }
 zip.workspace = true
-async_zip = { workspace = true, features = ["chrono", "tokio-fs", "deflate", "bzip2", "zstd", "deflate64"] }
+async_zip = { workspace = true, features = [
+	"chrono",
+	"tokio-fs",
+	"deflate",
+	"bzip2",
+	"zstd",
+	"deflate64",
+] }
 flate2.workspace = true
 tempfile.workspace = true
 dashmap = { workspace = true, features = ["serde"] }
@@ -51,8 +58,27 @@ indicatif = { workspace = true, optional = true }
 
 async-tungstenite = { workspace = true, features = ["tokio-runtime", "tokio-rustls-webpki-roots"] }
 futures = { workspace = true, features = ["async-await", "alloc"] }
-reqwest = { workspace = true, features = ["json", "stream", "deflate", "gzip", "brotli", "rustls-tls-webpki-roots", "charset", "http2", "macos-system-configuration", "multipart"] }
-tokio = { workspace = true, features = ["time", "io-util", "net", "sync", "fs", "macros", "process"] }
+reqwest = { workspace = true, features = [
+	"json",
+	"stream",
+	"deflate",
+	"gzip",
+	"brotli",
+	"rustls-tls-webpki-roots",
+	"charset",
+	"http2",
+	"macos-system-configuration",
+	"multipart",
+] }
+tokio = { workspace = true, features = [
+	"time",
+	"io-util",
+	"net",
+	"sync",
+	"fs",
+	"macros",
+	"process",
+] }
 tokio-util = { workspace = true, features = ["compat", "io", "io-util"] }
 async-recursion.workspace = true
 fs4 = { workspace = true, features = ["tokio"] }
@@ -72,7 +98,14 @@ p256 = { workspace = true, features = ["ecdsa"] }
 rand.workspace = true
 base64.workspace = true
 
-sqlx = { workspace = true, features = ["runtime-tokio", "sqlite", "macros", "migrate", "json", "uuid"] }
+sqlx = { workspace = true, features = [
+	"runtime-tokio",
+	"sqlite",
+	"macros",
+	"migrate",
+	"json",
+	"uuid",
+] }
 
 quartz_nbt = { workspace = true, features = ["serde"] }
 hickory-resolver.workspace = true
