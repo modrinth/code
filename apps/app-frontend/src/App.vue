@@ -257,11 +257,10 @@ initialize_state()
 const handleClose = async () => {
 	let isPortable = false
 	try {
-		isPortable = await invoke('is_portable')
-	} catch (e) {
-		// fallback: assume not portable if command missing
-		console.warn('Error checking if portable:', e)
-		isPortable = false
+		isPortable = !!(await invoke('is_portable_mode'))
+		console.log('Portable mode:', isPortable)
+	} catch (err) {
+		console.warn('Failed to check portable mode:', err)
 	}
 	if (!isPortable) {
 		await saveWindowState(StateFlags.ALL)

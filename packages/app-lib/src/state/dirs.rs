@@ -21,6 +21,11 @@ pub struct DirectoryInfo {
 }
 
 impl DirectoryInfo {
+    /// Returns true if portable mode is enabled (portable.txt next to executable)
+    pub fn is_portable_mode() -> bool {
+        Self::portable_data_dir().is_some()
+    }
+
     /// Call this as early as possible in main() to ensure all dependencies use the correct portable directory.
     ///
     /// Example usage (at the very top of main.rs):
