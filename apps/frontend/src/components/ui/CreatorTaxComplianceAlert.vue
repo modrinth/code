@@ -69,7 +69,6 @@
 		</div>
 	</NewModal>
 	<div
-		v-if="shouldShow"
 		class="mb-4 flex w-full flex-col gap-2 rounded-2xl border-[1px] border-solid border-orange bg-bg-orange p-4 text-sm text-contrast"
 	>
 		<span class="flex gap-2 align-middle text-xl font-bold text-orange"
@@ -98,15 +97,6 @@ console.log(auth.value.user)
 
 const isUSCitizen = ref<'yes' | 'no' | null>(null)
 const entityType = ref<'private-individual' | 'foreign-entity' | null>(null)
-
-const props = defineProps<{
-	totalAnnualWithdrawal: number
-	taxComplianceFilled: 'w9' | 'w8-ben' | 'w8-ben-e' | null
-}>()
-
-const shouldShow = computed(() => {
-	return props.totalAnnualWithdrawal >= 600 && !props.taxComplianceFilled
-})
 
 function hideModal() {
 	taxFormModal.value?.hide()
