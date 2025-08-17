@@ -2,12 +2,20 @@
 	<NewModal ref="taxFormModal" header="Submit Tax Form" :closable="false">
 		<div
 			v-if="!shrinkModalBehindAvalara"
-			class="card flex flex-col rounded-2xl border-[1px] border-solid !bg-button-bg p-2 text-contrast"
+			class="card flex flex-col gap-2 rounded-2xl border-[1px] border-solid !bg-button-bg p-2 text-contrast"
 		>
 			<span>
-				Modrinth has a legal obligation to share these tax forms with the United States Internal
-				Revenue Service (IRS) after you meet the annual withdrawal threshold of $600 USD.
+				Modrinth uses a third-party provider (Track1099) to securely collect and store your tax
+				forms.
 			</span>
+			<a
+				href="https://www.track1099.com/info/security"
+				class="flex flex-row gap-1 align-middle text-link"
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				<InfoIcon class="my-auto" /> Learn more about their security practices here.
+			</a>
 		</div>
 		<div class="mt-2 flex flex-col gap-4" v-if="!shrinkModalBehindAvalara">
 			<div class="flex flex-col gap-2">
@@ -87,7 +95,7 @@
 </template>
 
 <script setup lang="ts">
-import { FileTextIcon, TriangleAlertIcon, XIcon } from '@modrinth/assets'
+import { FileTextIcon, InfoIcon, TriangleAlertIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, Chips, NewModal } from '@modrinth/ui'
 import { useAvalara1099, type FormRequestResponse } from '~/composables/avalara1099'
 
