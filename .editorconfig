@@ -3,7 +3,7 @@ root = true
 
 [*]
 charset = utf-8
-indent_style = "tab"
+indent_style = tab
 end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
@@ -12,7 +12,14 @@ max_line_length = 100
 [*.md]
 indent_size = 2
 max_line_length = off
-trim_trailing_whitespace = false
 
-[*.{json,yml,yaml}]
+[*.toml]
 indent_size = 2
+
+[*.json]
+indent_size = 2
+
+# YAML requires space indentation by spec
+[*.{yml,yaml}]
+indent_size = 2
+indent_style = space
