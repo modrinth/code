@@ -116,7 +116,7 @@
 		}"
 	>
 		<div class="flex w-full min-w-0 select-none flex-col items-center gap-6 pt-4 sm:flex-row">
-			<UiServersServerIcon
+			<ServerIcon
 				v-if="!serverData.is_medal"
 				:image="serverData.image"
 				class="drop-shadow-lg sm:drop-shadow-none"
@@ -395,11 +395,10 @@ import { computed, onMounted, onUnmounted, type Reactive, ref } from 'vue'
 
 import { reloadNuxtApp } from '#app'
 import MedalServerIcon from '~/assets/images/servers/medal_server_icon.svg?component'
-import PanelErrorIcon from '~/components/ui/servers/icons/PanelErrorIcon.vue'
-import MedalServerCountdown from '~/components/ui/servers/marketing/MedalServerCountdown.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
 import PanelErrorIcon from '~/components/ui/servers/icons/PanelErrorIcon.vue'
 import InstallingTicker from '~/components/ui/servers/InstallingTicker.vue'
+import MedalServerCountdown from '~/components/ui/servers/marketing/MedalServerCountdown.vue'
 import PanelServerActionButton from '~/components/ui/servers/PanelServerActionButton.vue'
 import PanelSpinner from '~/components/ui/servers/PanelSpinner.vue'
 import ServerIcon from '~/components/ui/servers/ServerIcon.vue'

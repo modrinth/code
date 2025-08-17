@@ -94,7 +94,7 @@
 				v-if="filteredData.length > 0 || isPollingForNewServers"
 				class="m-0 flex flex-col gap-4 p-0"
 			>
-				<UiServersServerListing
+				<ServerListing
 					v-for="server in filteredData.filter((s) => !s.is_medal)"
 					:key="server.server_id"
 					v-bind="server"
@@ -124,10 +124,9 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { reloadNuxtApp } from '#app'
 import MedalServerListing from '~/components/ui/servers/marketing/MedalServerListing.vue'
-import ServersUpgradeModalWrapper from '~/components/ui/servers/ServersUpgradeModalWrapper.vue'
 import ServerListing from '~/components/ui/servers/ServerListing.vue'
-import ServerListingSkeleton from '~/components/ui/servers/ServerListingSkeleton.vue'
 import ServerManageEmptyState from '~/components/ui/servers/ServerManageEmptyState.vue'
+import ServersUpgradeModalWrapper from '~/components/ui/servers/ServersUpgradeModalWrapper.vue'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 
 definePageMeta({

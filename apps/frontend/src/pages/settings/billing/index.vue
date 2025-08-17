@@ -236,7 +236,7 @@
 					<div class="flex flex-col gap-4">
 						<ModrinthServersIcon class="flex h-8 w-fit" />
 						<div class="flex flex-col gap-2">
-							<UiServersServerListing
+							<ServerListing
 								v-if="subscription.serverInfo"
 								v-bind="subscription.serverInfo"
 								:pending-change="getPendingChange(subscription)"
@@ -629,9 +629,9 @@ import {
 import { calculateSavings, formatPrice, getCurrency } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
-import ServersUpgradeModalWrapper from '~/components/ui/servers/ServersUpgradeModalWrapper.vue'
 import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
 import ServerListing from '~/components/ui/servers/ServerListing.vue'
+import ServersUpgradeModalWrapper from '~/components/ui/servers/ServersUpgradeModalWrapper.vue'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 import { products } from '~/generated/state.json'
 

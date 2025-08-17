@@ -1,4 +1,14 @@
 <script setup lang="ts">
+import {
+	EditIcon,
+	ExternalIcon,
+	RadioButtonCheckedIcon,
+	RadioButtonIcon,
+	RightArrowIcon,
+	SignalIcon,
+	SpinnerIcon,
+	XIcon,
+} from '@modrinth/assets'
 import { formatPrice, getPingLevel, type UserSubscription } from '@modrinth/utils'
 import { useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'

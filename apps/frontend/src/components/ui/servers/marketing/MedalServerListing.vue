@@ -69,7 +69,7 @@
 					>
 						<SparklesIcon class="size-5 shrink-0" /> New server
 					</div>
-					<UiServersServerInfoLabels
+					<ServerInfoLabels
 						v-else
 						:server-data="{ game, mc_version, loader, loader_version, net }"
 						:show-game-label="showGameLabel"
@@ -91,7 +91,7 @@
 			v-if="status === 'suspended' && suspension_reason === 'upgrading'"
 			class="relative -mt-2 flex w-full flex-row items-center gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-blue bg-bg-blue p-4 text-sm font-bold text-contrast"
 		>
-			<UiServersPanelSpinner />
+			<PanelSpinner />
 			Your server's hardware is currently being upgraded and will be back online shortly.
 		</div>
 		<div
@@ -99,8 +99,8 @@
 			class="relative -mt-2 flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
-				<UiServersIconsPanelErrorIcon class="!size-5" /> Your server has been cancelled. Please
-				update your billing information or contact Modrinth Support for more information.
+				<PanelErrorIcon class="!size-5" /> Your server has been cancelled. Please update your
+				billing information or contact Modrinth Support for more information.
 			</div>
 			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
 		</div>
@@ -109,9 +109,8 @@
 			class="relative -mt-2 flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
-				<UiServersIconsPanelErrorIcon class="!size-5" /> Your server has been suspended:
-				{{ suspension_reason }}. Please update your billing information or contact Modrinth Support
-				for more information.
+				<PanelErrorIcon class="!size-5" /> Your server has been suspended: {{ suspension_reason }}.
+				Please update your billing information or contact Modrinth Support for more information.
 			</div>
 			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
 		</div>
@@ -120,8 +119,8 @@
 			class="relative -mt-2 flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
-				<UiServersIconsPanelErrorIcon class="!size-5" /> Your server has been suspended. Please
-				update your billing information or contact Modrinth Support for more information.
+				<PanelErrorIcon class="!size-5" /> Your server has been suspended. Please update your
+				billing information or contact Modrinth Support for more information.
 			</div>
 			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
 		</div>
@@ -137,6 +136,10 @@ import dayjsDuration from 'dayjs/plugin/duration'
 
 import MedalPromoBackground from '~/assets/images/illustrations/medal_promo_background.svg?component'
 import MedalServerIcon from '~/assets/images/servers/medal_server_icon.svg?component'
+
+import PanelErrorIcon from '../icons/PanelErrorIcon.vue'
+import PanelSpinner from '../PanelSpinner.vue'
+import ServerInfoLabels from '../ServerInfoLabels.vue'
 
 dayjs.extend(dayjsDuration)
 
