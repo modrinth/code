@@ -75,7 +75,7 @@
 		</div>
 
 		<div class="flex flex-col-reverse gap-6 md:flex-col">
-			<UiServersServerStats
+			<ServerStats
 				:data="isConnected && !isWsAuthIncorrect ? stats : undefined"
 				:loading="!isConnected || isWsAuthIncorrect"
 			/>
@@ -87,17 +87,11 @@
 				<div class="flex items-center justify-between">
 					<div class="flex items-center gap-4">
 						<h2 class="m-0 text-3xl font-extrabold text-contrast">Console</h2>
-						<UiServersPanelServerStatus
-							v-if="isConnected && !isWsAuthIncorrect"
-							:state="serverPowerState"
-						/>
+						<PanelServerStatus v-if="isConnected && !isWsAuthIncorrect" :state="serverPowerState" />
 					</div>
 				</div>
 
-				<UiServersPanelTerminal
-					:full-screen="fullScreen"
-					:loading="!isConnected || isWsAuthIncorrect"
-				>
+				<PanelTerminal :full-screen="fullScreen" :loading="!isConnected || isWsAuthIncorrect">
 					<div class="relative w-full px-4 pt-4">
 						<ul
 							v-if="suggestions.length && isConnected && !isWsAuthIncorrect"
@@ -169,7 +163,7 @@
 							/>
 						</div>
 					</div>
-				</UiServersPanelTerminal>
+				</PanelTerminal>
 			</div>
 		</div>
 
@@ -191,6 +185,9 @@ import { IssuesIcon, TerminalSquareIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled } from '@modrinth/ui'
 import type { ServerState, Stats } from '@modrinth/utils'
 
+import PanelServerStatus from '~/components/ui/servers/PanelServerStatus.vue'
+import PanelTerminal from '~/components/ui/servers/PanelTerminal.vue'
+import ServerStats from '~/components/ui/servers/ServerStats.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 type ServerProps = {

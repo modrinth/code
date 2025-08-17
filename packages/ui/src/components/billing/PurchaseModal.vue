@@ -86,7 +86,7 @@
 							}"
 							@click="serverLoader = loader"
 						>
-							<UiServersIconsLoaderIcon :loader="loader" class="!h-12 !w-12" />
+							<LoaderIcon :loader="loader" class="!h-12 !w-12" />
 							<p class="text-lg font-bold m-0">{{ loader }}</p>
 						</button>
 					</div>
@@ -552,6 +552,7 @@ import Checkbox from '../base/Checkbox.vue'
 import Slider from '../base/Slider.vue'
 import AnimatedLogo from '../brand/AnimatedLogo.vue'
 import NewModal from '../modal/NewModal.vue'
+import LoaderIcon from '../servers/LoaderIcon.vue'
 
 const { locale, formatMessage } = useVIntl()
 
