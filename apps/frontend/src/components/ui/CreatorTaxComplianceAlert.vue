@@ -1,27 +1,15 @@
 <template>
-	<NewModal ref="taxFormModal" header="Submit Tax Form">
+	<NewModal ref="taxFormModal" header="Submit Tax Form" :closable="false">
 		<div
+			v-if="!shrinkModalBehindAvalara"
 			class="card flex flex-col rounded-2xl border-[1px] border-solid !bg-button-bg p-2 text-contrast"
 		>
 			<span>
-				We need to determine which type of form you need to fill out. There are three types of tax
-				forms:
+				Modrinth has a legal obligation to share these tax forms with the United States Internal
+				Revenue Service (IRS) after you meet the annual withdrawal threshold of $600 USD.
 			</span>
-			<ul>
-				<li>W-9: Used for U.S. citizens to certify their taxpayer status</li>
-				<li>W-8BEN: Used for foreign individuals to certify their foreign status</li>
-				<li>W-8BEN-E: Used for foreign entities* to certify their foreign status</li>
-			</ul>
-			<span>
-				Modrinth has a legal obligation to share these forms with the IRS after you meet the annual
-				threshold of $600 USD.
-			</span>
-			<span class="mt-2 text-xs italic"
-				>* A foreign entity means a business entity organized outside the United States (such as a
-				non-US corporation, partnership, or LLC).</span
-			>
 		</div>
-		<div class="mt-2 flex flex-col gap-4">
+		<div class="mt-2 flex flex-col gap-4" v-if="!shrinkModalBehindAvalara">
 			<div class="flex flex-col gap-2">
 				<label>
 					<span class="text-lg font-semibold text-contrast">
@@ -52,6 +40,10 @@
 							<span class="text-brand-red">*</span>
 						</span>
 					</label>
+					<span class="text-md -mt-2"
+						>A foreign entity means a business entity organized outside the United States (such as a
+						non-US corporation, partnership, or LLC).</span
+					>
 					<Chips
 						v-model="entityType"
 						:items="['private-individual', 'foreign-entity']"
@@ -64,12 +56,15 @@
 				</div>
 			</Transition>
 		</div>
-		<div class="mt-4 flex w-full flex-row justify-between">
+		<div class="mt-4 flex w-full flex-row justify-between gap-2">
 			<ButtonStyled @click="$emit('close')"
-				><button><XIcon /> Cancel</button></ButtonStyled
+				><button @click="hideModal"><XIcon /> Cancel</button></ButtonStyled
 			>
-			<ButtonStyled color="brand" :disabled="!canContinue">
-				<button>Continue</button>
+			<ButtonStyled color="brand">
+				<button :disabled="!canContinue || loading" @click="continueForm">
+					<span v-if="!loading">Continue</span>
+					<span v-else>Loading…</span>
+				</button>
 			</ButtonStyled>
 		</div>
 	</NewModal>
@@ -95,21 +90,27 @@
 <script setup lang="ts">
 import { FileTextIcon, TriangleAlertIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, Chips, NewModal } from '@modrinth/ui'
+import { useAvalara1099, type FormRequestResponse } from '~/composables/avalara1099'
 
 const taxFormModal = ref<InstanceType<typeof NewModal> | null>(null)
+const auth = await useAuth()
+console.log(auth.value.user)
 
 const isUSCitizen = ref<'yes' | 'no' | null>(null)
 const entityType = ref<'private-individual' | 'foreign-entity' | null>(null)
 
-// const props = defineProps<{
-// 	totalAnnualWithdrawal: number
-// 	taxComplianceFilled: 'w9' | 'w8-ben' | 'w8-ben-e' | null
-// }>()
+const props = defineProps<{
+	totalAnnualWithdrawal: number
+	taxComplianceFilled: 'w9' | 'w8-ben' | 'w8-ben-e' | null
+}>()
 
 const shouldShow = computed(() => {
-	return true
-	// return props.totalAnnualWithdrawal >= 600 && !props.taxComplianceFilled
+	return props.totalAnnualWithdrawal >= 600 && !props.taxComplianceFilled
 })
+
+function hideModal() {
+	taxFormModal.value?.hide()
+}
 
 const determinedFormType = computed(() => {
 	if (isUSCitizen.value === 'yes') {
@@ -135,9 +136,80 @@ async function startTaxForm(e: MouseEvent) {
 	taxFormModal.value?.show(e)
 }
 
+const avalaraState = ref<ReturnType<typeof useAvalara1099> | null>(null)
+const loading = computed(() =>
+	avalaraState.value ? ((avalaraState.value as any).loading?.value ?? false) : false,
+)
+
+const shrinkModalBehindAvalara = ref(false)
+
+async function continueForm() {
+	if (!import.meta.client) return
+	if (!determinedFormType.value) return
+
+	shrinkModalBehindAvalara.value = true
+
+	// TODO: Replace with actual response
+	const response: FormRequestResponse = {}
+
+	if (!avalaraState.value) {
+		console.log('epic')
+		avalaraState.value = useAvalara1099(response, {
+			prefill: {
+				name: 'Firstname Middlename Surname',
+				email: (auth.value.user as any)?.email ?? '',
+				account_number: (auth.value.user as any)?.id ?? '',
+			},
+		})
+	}
+
+	try {
+		if (avalaraState.value) {
+			await avalaraState.value.start()
+			console.log(avalaraState.value.status)
+		}
+	} catch (e) {}
+
+	shrinkModalBehindAvalara.value = false
+}
+
 watch(isUSCitizen, (newValue) => {
 	if (newValue === 'yes') {
 		entityType.value = null
 	}
 })
 </script>
+
+<style>
+dialog[open]:has(> iframe[src*='form_embed']) {
+	width: min(960px, calc(100vw - 2rem)) !important;
+	max-width: 100% !important;
+	height: min(95vh, max(640px, 75vh)) !important;
+	background: var(--color-raised-bg) !important;
+	border: 1px solid var(--color-button-border) !important;
+	border-radius: var(--radius-lg) !important;
+	box-shadow: var(--shadow-floating) !important;
+	padding: 0 !important;
+}
+
+dialog[open] > iframe[src*='form_embed'] {
+	position: absolute !important;
+	inset: 0 !important;
+	width: 100% !important;
+	height: 100% !important;
+	display: block !important;
+	border: none !important;
+	border-radius: var(--radius-lg) !important;
+}
+
+@media (max-width: 640px) {
+	dialog[open]:has(> iframe[src*='form_embed']) {
+		width: calc(100vw - 1rem) !important;
+		height: 95vh !important;
+		border-radius: var(--radius-md) !important;
+	}
+	dialog[open] > iframe[src*='form_embed'] {
+		border-radius: var(--radius-md) !important;
+	}
+}
+</style>
