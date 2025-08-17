@@ -54,7 +54,7 @@
 			</div>
 		</div>
 
-		<LazyUiServersServerManageEmptyState
+		<ServerManageEmptyState
 			v-else-if="serverList.length === 0 && !isPollingForNewServers && !hasError"
 		/>
 
@@ -125,6 +125,9 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { reloadNuxtApp } from '#app'
 import MedalServerListing from '~/components/ui/servers/marketing/MedalServerListing.vue'
 import ServersUpgradeModalWrapper from '~/components/ui/servers/ServersUpgradeModalWrapper.vue'
+import ServerListing from '~/components/ui/servers/ServerListing.vue'
+import ServerListingSkeleton from '~/components/ui/servers/ServerListingSkeleton.vue'
+import ServerManageEmptyState from '~/components/ui/servers/ServerManageEmptyState.vue'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 
 definePageMeta({

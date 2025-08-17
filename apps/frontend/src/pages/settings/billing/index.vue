@@ -234,7 +234,7 @@
 			>
 				<div class="flex flex-col justify-between gap-4">
 					<div class="flex flex-col gap-4">
-						<LazyUiServersModrinthServersIcon class="flex h-8 w-fit" />
+						<ModrinthServersIcon class="flex h-8 w-fit" />
 						<div class="flex flex-col gap-2">
 							<UiServersServerListing
 								v-if="subscription.serverInfo"
@@ -630,6 +630,8 @@ import { calculateSavings, formatPrice, getCurrency } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
 import ServersUpgradeModalWrapper from '~/components/ui/servers/ServersUpgradeModalWrapper.vue'
+import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
+import ServerListing from '~/components/ui/servers/ServerListing.vue'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 import { products } from '~/generated/state.json'
 

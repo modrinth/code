@@ -13,7 +13,7 @@
 			data-pyro-server-listing
 			:data-pyro-server-listing-id="server_id"
 		>
-			<UiServersServerIcon v-if="status !== 'suspended'" :image="image" />
+			<ServerIcon v-if="status !== 'suspended'" :image="image" />
 			<div
 				v-else
 				class="bg-bg-secondary flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
@@ -45,7 +45,7 @@
 				>
 					<SparklesIcon class="size-5 shrink-0" /> New server
 				</div>
-				<UiServersServerInfoLabels
+				<ServerInfoLabels
 					v-else
 					:server-data="{ game, mc_version, loader, loader_version, net }"
 					:show-game-label="showGameLabel"
