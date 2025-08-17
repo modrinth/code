@@ -366,6 +366,7 @@ import {
 	OverflowMenu,
 	useRelativeTime,
 } from '@modrinth/ui'
+import { IntlFormatted } from '@vintl/vintl/components'
 
 import TenMClubBadge from '~/assets/images/badges/10m-club.svg?component'
 import AlphaTesterBadge from '~/assets/images/badges/alpha-tester.svg?component'

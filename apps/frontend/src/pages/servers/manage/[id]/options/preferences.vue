@@ -31,7 +31,7 @@
 				</div>
 			</div>
 		</div>
-		<UiServersSaveBanner
+		<SaveBanner
 			:is-visible="hasUnsavedChanges"
 			:server="props.server"
 			:is-updating="false"
@@ -45,6 +45,7 @@
 import { injectNotificationManager } from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'
 
+import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const { addNotification } = injectNotificationManager()

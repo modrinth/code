@@ -18,7 +18,7 @@
 				}"
 				data-pyro-files-virtual-list
 			>
-				<UiServersFileItem
+				<FileItem
 					v-for="item in visibleItems"
 					:key="item.path"
 					:count="item.count"
@@ -44,6 +44,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
+
+import FileItem from './FileItem.vue'
 
 const props = defineProps<{
 	items: any[]
