@@ -16,7 +16,7 @@ const { formatMessage } = useVIntl()
 
 const props = defineProps<InstanceSettingsTabProps>()
 
-const globalSettings = (await get().catch(handleError)) as AppSettings
+const globalSettings = (await get().catch(handleError)) as unknown as AppSettings
 
 const overrideJavaInstall = ref(!!props.instance.java_path)
 const optimalJava = readonly(await get_optimal_jre_key(props.instance.path).catch(handleError))
@@ -36,7 +36,10 @@ const envVars = ref(
 
 const overrideMemorySettings = ref(!!props.instance.memory)
 const memory = ref(props.instance.memory ?? globalSettings.memory)
-const { maxMemory, snapPoints } = await useMemorySlider()
+const { maxMemory, snapPoints } = (await useMemorySlider().catch(handleError)) as unknown as {
+	maxMemory: number
+	snapPoints: number[]
+}
 
 const editProfileObject = computed(() => {
 	const editProfile: {

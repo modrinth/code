@@ -1,66 +1,70 @@
 {
-  "$schema": "./node_modules/turbo/schema.json",
-  "concurrency": "100%",
-  "tasks": {
-    "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".nuxt/**", "dist/**", ".output/**", "$TURBO_ROOT$/target/**"],
-      "env": [
-        "NODE_ENV",
-        "SITE_URL",
-        "BASE_URL",
-        "FLAG_OVERRIDES",
-        "BROWSER_BASE_URL",
-        "RATE_LIMIT_IGNORE_KEY",
-        "VERCEL_*",
-        "CF_PAGES_*",
-        "HEROKU_APP_NAME",
-        "STRIPE_PUBLISHABLE_KEY",
-        "PYRO_BASE_URL",
-        "PROD_OVERRIDE",
-        "PYRO_MASTER_KEY",
-        "PORT",
-        "SQLX_OFFLINE",
-        "DATABASE_URL",
-        "CARGO_*",
-        "RUST_*",
-        "RUSTFLAGS",
-        "FORCE_COLOR",
-        "NEXTEST_*"
-      ]
-    },
-    "lint": {
-      "env": [
-        "DATABASE_URL",
-        "SQLX_OFFLINE",
-        "CARGO_*",
-        "RUST_*",
-        "RUSTFLAGS",
-        "FORCE_COLOR",
-        "NEXTEST_*"
-      ]
-    },
-    "dev": {
-      "cache": false,
-      "persistent": true,
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "env": ["CARGO_*", "RUST_*", "RUSTFLAGS", "FORCE_COLOR", "NEXTEST_*"],
-      "passThroughEnv": ["DISPLAY", "WEBKIT_DISABLE_DMABUF_RENDERER"]
-    },
-    "test": {
-      "env": [
-        "SQLX_OFFLINE",
-        "DATABASE_URL",
-        "CARGO_*",
-        "RUST_*",
-        "RUSTFLAGS",
-        "FORCE_COLOR",
-        "NEXTEST_*"
-      ]
-    },
-    "fix": {
-      "cache": false
-    }
-  }
+	"$schema": "./node_modules/turbo/schema.json",
+	"concurrency": "100%",
+	"tasks": {
+		"build": {
+			"dependsOn": ["^build"],
+			"inputs": ["$TURBO_DEFAULT$", ".env*"],
+			"outputs": [".nuxt/**", "dist/**", ".output/**", "$TURBO_ROOT$/target/**"],
+			"env": [
+				"NODE_ENV",
+				"SITE_URL",
+				"BASE_URL",
+				"FLAG_OVERRIDES",
+				"BROWSER_BASE_URL",
+				"RATE_LIMIT_IGNORE_KEY",
+				"VERCEL_*",
+				"CF_PAGES_*",
+				"HEROKU_APP_NAME",
+				"STRIPE_PUBLISHABLE_KEY",
+				"PYRO_BASE_URL",
+				"PROD_OVERRIDE",
+				"PYRO_MASTER_KEY",
+				"PORT",
+				"SQLX_OFFLINE",
+				"DATABASE_URL",
+				"CARGO_*",
+				"RUST_*",
+				"RUSTFLAGS",
+				"FORCE_COLOR",
+				"NEXTEST_*"
+			]
+		},
+		"lint": {
+			"env": [
+				"DATABASE_URL",
+				"SQLX_OFFLINE",
+				"CARGO_*",
+				"RUST_*",
+				"RUSTFLAGS",
+				"FORCE_COLOR",
+				"NEXTEST_*"
+			]
+		},
+		"lint:ancillary": {},
+		"dev": {
+			"cache": false,
+			"persistent": true,
+			"inputs": ["$TURBO_DEFAULT$", ".env*"],
+			"env": ["CARGO_*", "RUST_*", "RUSTFLAGS", "FORCE_COLOR", "NEXTEST_*"],
+			"passThroughEnv": ["DISPLAY", "WEBKIT_DISABLE_DMABUF_RENDERER"]
+		},
+		"test": {
+			"env": [
+				"SQLX_OFFLINE",
+				"DATABASE_URL",
+				"CARGO_*",
+				"RUST_*",
+				"RUSTFLAGS",
+				"FORCE_COLOR",
+				"NEXTEST_*"
+			]
+		},
+		"fix": {
+			"cache": false
+		},
+		"fix:ancillary": {
+			"cache": false
+		}
+	}
 }

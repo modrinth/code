@@ -397,7 +397,8 @@ import { useModerationStore } from '~/store/moderation.ts'
 import KeybindsModal from './ChecklistKeybindsModal.vue'
 import ModpackPermissionsFlow from './ModpackPermissionsFlow.vue'
 
-const { addNotification } = injectNotificationManager()
+const notifications = injectNotificationManager()
+const { addNotification } = notifications
 
 const keybindsModal = ref<InstanceType<typeof KeybindsModal>>()
 
@@ -626,6 +627,11 @@ function handleKeybinds(event: KeyboardEvent) {
 onMounted(() => {
 	window.addEventListener('keydown', handleKeybinds)
 	initializeAllStages()
+	notifications.setNotificationLocation('left')
+})
+
+onUnmounted(() => {
+	notifications.setNotificationLocation('right')
 })
 
 function initializeAllStages() {

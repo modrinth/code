@@ -12,7 +12,6 @@ use crate::state::{
     Credentials, JavaVersion, ProcessMetadata, ProfileInstallStage,
 };
 use crate::util::io;
-use crate::util::rpc::RpcServerBuilder;
 use crate::{State, get_resource_file, process, state as st};
 use chrono::Utc;
 use daedalus as d;
@@ -23,6 +22,7 @@ use serde::Deserialize;
 use st::Profile;
 use std::fmt::Write;
 use std::path::PathBuf;
+use tokio::io::AsyncWriteExt;
 use tokio::process::Command;
 
 mod args;
@@ -608,8 +608,6 @@ pub async fn launch_minecraft(
     let (main_class_keep_alive, main_class_path) =
         get_resource_file!(env "JAVA_JARS_DIR" / "theseus.jar")?;
 
-    let rpc_server = RpcServerBuilder::new().launch().await?;
-
     command.args(
         args::get_jvm_arguments(
             args.get(&d::minecraft::ArgumentType::Jvm)
@@ -635,7 +633,6 @@ pub async fn launch_minecraft(
                 .logging
                 .as_ref()
                 .and_then(|x| x.get(&LoggingSide::Client)),
-            rpc_server.address(),
         )?
         .into_iter(),
     );
@@ -770,8 +767,7 @@ pub async fn launch_minecraft(
             state.directories.profile_logs_dir(&profile.path),
             version_info.logging.is_some(),
             main_class_keep_alive,
-            rpc_server,
-            async |process: &ProcessMetadata, rpc_server| {
+            async |process: &ProcessMetadata, stdin| {
                 let process_start_time = process.start_time.to_rfc3339();
                 let profile_created_time = profile.created.to_rfc3339();
                 let profile_modified_time = profile.modified.to_rfc3339();
@@ -794,11 +790,14 @@ pub async fn launch_minecraft(
                     let Some(value) = value else {
                         continue;
                     };
-                    rpc_server
-                        .call_method_2::<()>("set_system_property", key, value)
-                        .await?;
+                    stdin.write_all(b"property\t").await?;
+                    stdin.write_all(key.as_bytes()).await?;
+                    stdin.write_u8(b'\t').await?;
+                    stdin.write_all(value.as_bytes()).await?;
+                    stdin.write_u8(b'\n').await?;
                 }
-                rpc_server.call_method::<()>("launch").await?;
+                stdin.write_all(b"launch\n").await?;
+                stdin.flush().await?;
                 Ok(())
             },
         )

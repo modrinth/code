@@ -4,6 +4,7 @@ FROM rust:1.89.0 AS build
 
 WORKDIR /usr/src/labrinth
 COPY . .
+ARG GIT_HASH
 RUN --mount=type=cache,target=/usr/src/labrinth/target \
   --mount=type=cache,target=/usr/local/cargo/git/db \
   --mount=type=cache,target=/usr/local/cargo/registry \
@@ -20,8 +21,9 @@ RUN --mount=type=cache,target=/usr/src/labrinth/target \
 FROM debian:bookworm-slim
 
 LABEL org.opencontainers.image.source=https://github.com/modrinth/code
+LABEL org.opencontainers.image.title=labrinth
 LABEL org.opencontainers.image.description="Modrinth API"
-LABEL org.opencontainers.image.licenses=AGPL-3.0
+LABEL org.opencontainers.image.licenses=AGPL-3.0-only
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates dumb-init curl \

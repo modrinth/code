@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { Slider, Toggle } from '@modrinth/ui'
+import { injectNotificationManager, Slider, Toggle } from '@modrinth/ui'
 import { ref, watch } from 'vue'
 
 import useMemorySlider from '@/composables/useMemorySlider'
 import { get, set } from '@/helpers/settings.ts'
+
+const { handleError } = injectNotificationManager()
 
 const fetchSettings = await get()
 fetchSettings.launchArgs = fetchSettings.extra_launch_args.join(' ')
@@ -11,7 +13,10 @@ fetchSettings.envVars = fetchSettings.custom_env_vars.map((x) => x.join('=')).jo
 
 const settings = ref(fetchSettings)
 
-const { maxMemory, snapPoints } = await useMemorySlider()
+const { maxMemory, snapPoints } = (await useMemorySlider().catch(handleError)) as unknown as {
+	maxMemory: number
+	snapPoints: number[]
+}
 
 watch(
 	settings,
