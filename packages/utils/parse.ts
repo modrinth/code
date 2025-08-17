@@ -87,6 +87,7 @@ export const configuredXss = new FilterXSS({
 
 				if (url.hostname.includes('wsrv.nl')) {
 					url.searchParams.delete('errorredirect')
+					url.searchParams.delete('default')
 				}
 
 				const allowedHostnames = [
