@@ -76,7 +76,7 @@
 		>
 		<span class="text-md text-orange"
 			>You have reached the annual withdrawal threshold of $600 USD and must complete a tax form
-			before you can withdraw additional funds.</span
+			before you can withdraw additional revenue.</span
 		>
 		<div>
 			<ButtonStyled color="orange">

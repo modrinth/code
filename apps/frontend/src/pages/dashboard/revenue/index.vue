@@ -1,6 +1,6 @@
 <template>
 	<div class="experimental-styles-within">
-		<CreatorTaxComplianceAlert />
+		<CreatorTaxComplianceAlert v-if="needTaxForms" />
 		<section class="universal-card">
 			<h2 class="text-2xl">Revenue</h2>
 			<div class="grid-display">
@@ -69,12 +69,12 @@
 				</div>
 			</div>
 			<div class="input-group mt-4">
-				<span :class="{ 'disabled-cursor-wrapper': userBalance.available < minWithdraw }">
+				<span :class="{ 'disabled-cursor-wrapper': shouldPreventWithdrawal }">
 					<nuxt-link
-						:aria-disabled="userBalance.available < minWithdraw ? 'true' : 'false'"
-						:class="{ 'disabled-link': userBalance.available < minWithdraw }"
-						:disabled="userBalance.available < minWithdraw ? 'true' : 'false'"
-						:tabindex="userBalance.available < minWithdraw ? -1 : undefined"
+						:aria-disabled="shouldPreventWithdrawal ? 'true' : 'false'"
+						:class="{ 'disabled-link': shouldPreventWithdrawal }"
+						:disabled="shouldPreventWithdrawal ? 'true' : 'false'"
+						:tabindex="shouldPreventWithdrawal ? -1 : undefined"
 						class="iconified-button brand-button"
 						to="/dashboard/revenue/withdraw"
 					>
@@ -165,6 +165,16 @@ const minWithdraw = ref(0.01)
 const { data: userBalance } = await useAsyncData(`payout/balance`, () =>
 	useBaseFetch(`payout/balance`, { apiVersion: 3 }),
 )
+
+const needTaxForms = computed(() => {
+	return userBalance.value?.totalAnnualWithdrawal >= 600 && !userBalance.value?.taxComplianceFilled
+})
+
+const shouldPreventWithdrawal = computed(() => {
+	const available = userBalance.value?.available ?? 0
+	const balanceTooLow = available < (minWithdraw.value ?? 0)
+	return balanceTooLow || needTaxForms.value
+})
 
 const deadlineEnding = computed(() => {
 	let deadline = dayjs().subtract(2, 'month').endOf('month').add(60, 'days')
