@@ -21,20 +21,23 @@ pub struct DirectoryInfo {
 }
 
 impl DirectoryInfo {
+    /// Call this as early as possible in main() to ensure all dependencies use the correct portable directory.
+    ///
+    /// Example usage (at the very top of main.rs):
+    ///     theseus::DirectoryInfo::setup_portable_env();
+    pub fn setup_portable_env() {
+        if let Some(portable_dir) = Self::portable_data_dir() {
+            Self::set_portable_env(&portable_dir);
+        }
+    }
     /// Returns the path to the directory containing the running executable, if possible.
     fn exe_dir() -> Option<PathBuf> {
         std::env::current_exe().ok().and_then(|p| p.parent().map(|p| p.to_path_buf()))
     }
 
-    /// Checks if portable mode is enabled (env or portable.txt) and returns the portable data dir if so.
+    /// Checks if portable mode is enabled (portable.txt) and returns the portable data dir if so.
     fn portable_data_dir() -> Option<PathBuf> {
-        // 1. Environment variable takes precedence
-        if env::var_os("MODRINTH_PORTABLE").is_some() {
-            if let Some(exe_dir) = Self::exe_dir() {
-                return Some(exe_dir.join("ModrinthAppData"));
-            }
-        }
-        // 2. portable.txt file next to executable
+        // portable.txt file next to executable
         if let Some(exe_dir) = Self::exe_dir() {
             let portable_txt = exe_dir.join("portable.txt");
             if portable_txt.exists() {
@@ -44,8 +47,12 @@ impl DirectoryInfo {
         None
     }
 
-    /// Sets the process environment variable for app data (e.g., APPDATA) to the portable dir if in portable mode.
+    /// Sets the process environment variable for config dir to the portable dir if in portable mode.
     fn set_portable_env(portable_dir: &Path) {
+        // Always set THESEUS_CONFIG_DIR for portable mode
+        unsafe {
+            env::set_var("THESEUS_CONFIG_DIR", portable_dir);
+        }
         #[cfg(target_os = "windows")]
         unsafe {
             env::set_var("APPDATA", portable_dir);
@@ -64,11 +71,12 @@ impl DirectoryInfo {
     // Get the settings directory
     // init() is not needed for this function
     pub fn get_initial_settings_dir() -> Option<PathBuf> {
+        // If portable mode, set env and use portable dir
         if let Some(portable_dir) = Self::portable_data_dir() {
-            // Set env var for the process so all code uses portable dir
             Self::set_portable_env(&portable_dir);
             return Some(portable_dir);
         }
+        // Otherwise, use THESEUS_CONFIG_DIR if set
         Self::env_path("THESEUS_CONFIG_DIR")
             .or_else(|| Some(dirs::data_dir()?.join("ModrinthApp")))
     }

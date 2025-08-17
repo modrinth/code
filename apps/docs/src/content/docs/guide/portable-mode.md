@@ -26,37 +26,13 @@ All data is stored in a `ModrinthAppData` folder right next to the executable, m
 
 ## Enabling Portable Mode
 
-There are two methods to enable portable mode:
-
-### Method 1: portable.txt File (Recommended)
-
-1. Create an empty file named `portable.txt` in the same directory as your Modrinth App executable
-2. Launch the app normally
-3. The app will automatically detect the file and enable portable mode
+To enable portable mode, simply create an empty file named `portable.txt` in the same directory as your Modrinth App executable, then launch the app. The app will automatically detect the file and enable portable mode. All app data will be stored in a `ModrinthAppData` folder next to the executable.
 
 ```
 YourFolder/
 ├── Modrinth App.exe (or modrinth-app on Linux/macOS)
 ├── portable.txt          ← Create this file
-└── ModrinthAppData/       ← Created automatically on first run
-```
-
-### Method 2: Environment Variable
-
-Set the `MODRINTH_PORTABLE` environment variable to any value before launching the app:
-
-```bash
-# Windows (PowerShell)
-$env:MODRINTH_PORTABLE="true"
-.\ModrinthApp.exe
-
-# Windows (Command Prompt)
-set MODRINTH_PORTABLE=true
-ModrinthApp.exe
-
-# Linux/macOS
-export MODRINTH_PORTABLE=true
-./modrinth-app
+└── ModrinthAppData/      ← Created automatically on first run
 ```
 
 ## Directory Structure
@@ -147,11 +123,12 @@ Easily move your entire Minecraft setup to a new computer by copying the portabl
 
 1. Install the app normally
 2. Copy data from `ModrinthAppData/` to the system directory
-3. Remove the `portable.txt` file or unset the environment variable
+3. Remove the `portable.txt` file
 
 ## Technical Notes
 
-- **Detection Priority**: Environment variable takes precedence over `portable.txt` file
+- **Detection**: Portable mode is enabled only by the presence of `portable.txt` next to the executable
+- **Config Directory**: The app sets the `THESEUS_CONFIG_DIR` environment variable automatically when portable mode is detected, ensuring all components use the correct data directory
 - **Performance**: Portable mode has identical performance to regular installations
 - **Platform Support**: Available on Windows, macOS, and Linux
 - **First Launch**: The `ModrinthAppData` directory is created automatically on first run
@@ -163,7 +140,6 @@ Easily move your entire Minecraft setup to a new computer by copying the portabl
 
 - Verify `portable.txt` is in the same directory as the executable
 - Check file permissions on the portable folder
-- Try using the environment variable method instead
 
 ### Data Not Saving
 
