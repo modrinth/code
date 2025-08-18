@@ -144,6 +144,7 @@ import { commonMessages, injectNotificationManager } from '@modrinth/ui'
 import { IntlFormatted } from '@vintl/vintl/components'
 
 import HCaptcha from '@/components/ui/HCaptcha.vue'
+import { getAuthUrl } from '@/composables/auth.js'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()

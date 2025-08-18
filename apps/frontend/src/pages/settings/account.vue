@@ -432,7 +432,7 @@ import SteamIcon from 'assets/icons/auth/sso-steam.svg'
 import QrcodeVue from 'qrcode.vue'
 
 import Modal from '~/components/ui/Modal.vue'
-import { removeAuthProvider } from '~/composables/auth.js'
+import { getAuthUrl, removeAuthProvider } from '~/composables/auth.js'
 
 useHead({
 	title: 'Account settings - Modrinth',

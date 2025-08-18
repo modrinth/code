@@ -1,4 +1,3 @@
-import { injectNotificationManager } from '@modrinth/ui'
 import type { Organization, Project, Report, User, Version } from '@modrinth/utils'
 
 type Thread = { id: string }
@@ -156,24 +155,14 @@ function isSimilar(a: PlatformNotification, b: PlatformNotification | undefined)
 export async function markAsRead(
 	ids: string[],
 ): Promise<(notifications: PlatformNotification[]) => PlatformNotification[]> {
-	try {
-		await useBaseFetch(`notifications?ids=${JSON.stringify([...new Set(ids)])}`, {
-			method: 'PATCH',
+	await useBaseFetch(`notifications?ids=${JSON.stringify([...new Set(ids)])}`, {
+		method: 'PATCH',
+	})
+	return (notifications: PlatformNotification[]) => {
+		const newNotifs = notifications ?? []
+		newNotifs.forEach((n) => {
+			if (ids.includes(n.id)) n.read = true
 		})
-		return (notifications: PlatformNotification[]) => {
-			const newNotifs = notifications ?? []
-			newNotifs.forEach((n) => {
-				if (ids.includes(n.id)) n.read = true
-			})
-			return newNotifs
-		}
-	} catch (err: any) {
-		const { addNotification } = injectNotificationManager()
-		addNotification({
-			title: 'Error marking notification as read',
-			text: err?.data?.description ?? err,
-			type: 'error',
-		})
-		return () => []
+		return newNotifs
 	}
 }

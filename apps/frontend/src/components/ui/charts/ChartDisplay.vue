@@ -312,7 +312,14 @@ import { computed } from 'vue'
 
 import { UiChartsChart as Chart, UiChartsCompactChart as CompactChart } from '#components'
 import PaletteIcon from '~/assets/icons/palette.svg?component'
-import { analyticsSetToCSVString, intToRgba } from '~/utils/analytics.js'
+import {
+	analyticsSetToCSVString,
+	countryCodeToFlag,
+	countryCodeToName,
+	formatPercent,
+	getDefaultColor,
+	intToRgba,
+} from '~/utils/analytics.js'
 
 const router = useNativeRouter()
 const theme = useTheme()
