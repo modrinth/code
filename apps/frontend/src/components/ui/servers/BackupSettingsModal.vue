@@ -27,7 +27,7 @@
 					</p>
 				</div>
 
-				<UiServersTeleportDropdownMenu
+				<TeleportDropdownMenu
 					:id="'interval-field'"
 					v-model="backupIntervalsLabel"
 					:disabled="!autoBackupEnabled || isSaving"
@@ -57,7 +57,12 @@
 
 <script setup lang="ts">
 import { SaveIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, NewModal } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	injectNotificationManager,
+	NewModal,
+	TeleportDropdownMenu,
+} from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
