@@ -51,14 +51,14 @@
 				{{ formattedModifiedDate }}
 			</span>
 			<ButtonStyled circular type="transparent">
-				<UiServersTeleportOverflowMenu :options="menuOptions" direction="left" position="bottom">
+				<TeleportOverflowMenu :options="menuOptions" direction="left" position="bottom">
 					<MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
 					<template #extract><PackageOpenIcon /> Extract</template>
 					<template #rename><EditIcon /> Rename</template>
 					<template #move><RightArrowIcon /> Move</template>
 					<template #download><DownloadIcon /> Download</template>
 					<template #delete><TrashIcon /> Delete</template>
-				</UiServersTeleportOverflowMenu>
+				</TeleportOverflowMenu>
 			</ButtonStyled>
 		</div>
 	</li>
@@ -89,6 +89,8 @@ import {
 	UiServersIconsTextFileIcon,
 } from '#components'
 import PaletteIcon from '~/assets/icons/palette.svg?component'
+
+import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
 
 interface FileItemProps {
 	name: string

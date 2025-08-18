@@ -71,7 +71,7 @@
 				<ShareIcon />
 			</Button>
 			<ButtonStyled type="transparent">
-				<UiServersTeleportOverflowMenu
+				<TeleportOverflowMenu
 					position="bottom"
 					direction="left"
 					aria-label="Save file"
@@ -100,7 +100,7 @@
 						</svg>
 						Save & restart
 					</template>
-				</UiServersTeleportOverflowMenu>
+				</TeleportOverflowMenu>
 			</ButtonStyled>
 		</div>
 	</header>
@@ -111,6 +111,8 @@ import { ChevronRightIcon, DropdownIcon, HomeIcon, SaveIcon, ShareIcon } from '@
 import { Button, ButtonStyled } from '@modrinth/ui'
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
 
 const props = defineProps<{
 	breadcrumbSegments: string[]
