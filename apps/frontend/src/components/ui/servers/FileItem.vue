@@ -51,14 +51,14 @@
 				{{ formattedModifiedDate }}
 			</span>
 			<ButtonStyled circular type="transparent">
-				<UiServersTeleportOverflowMenu :options="menuOptions" direction="left" position="bottom">
+				<TeleportOverflowMenu :options="menuOptions" direction="left" position="bottom">
 					<MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
 					<template #extract><PackageOpenIcon /> Extract</template>
 					<template #rename><EditIcon /> Rename</template>
 					<template #move><RightArrowIcon /> Move</template>
 					<template #download><DownloadIcon /> Download</template>
 					<template #delete><TrashIcon /> Delete</template>
-				</UiServersTeleportOverflowMenu>
+				</TeleportOverflowMenu>
 			</ButtonStyled>
 		</div>
 	</li>
@@ -78,8 +78,9 @@ import {
 } from '@modrinth/assets'
 import { ButtonStyled } from '@modrinth/ui'
 import { computed, ref, shallowRef } from 'vue'
-import { renderToString } from 'vue/server-renderer'
 import { useRoute, useRouter } from 'vue-router'
+import { renderToString } from 'vue/server-renderer'
+import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
 
 import {
 	UiServersIconsCodeFileIcon,

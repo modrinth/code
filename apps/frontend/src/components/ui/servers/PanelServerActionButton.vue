@@ -78,7 +78,7 @@
 				</ButtonStyled>
 
 				<ButtonStyled circular type="transparent">
-					<UiServersTeleportOverflowMenu :options="[...menuOptions]">
+					<TeleportOverflowMenu :options="[...menuOptions]">
 						<MoreVerticalIcon aria-hidden="true" />
 						<template #kill>
 							<SlashIcon class="h-5 w-5" />
@@ -96,7 +96,7 @@
 							<ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" />
 							<span>Copy ID</span>
 						</template>
-					</UiServersTeleportOverflowMenu>
+					</TeleportOverflowMenu>
 				</ButtonStyled>
 			</template>
 		</div>
@@ -125,6 +125,7 @@ import { useRouter } from 'vue-router'
 import LoadingIcon from './icons/LoadingIcon.vue'
 import PanelSpinner from './PanelSpinner.vue'
 import ServerInfoLabels from './ServerInfoLabels.vue'
+import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
 
 const flags = useFeatureFlags()
 
