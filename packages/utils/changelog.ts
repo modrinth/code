@@ -11,12 +11,6 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
-		date: `2025-08-18T11:25:00-07:00`,
-		product: 'web',
-		body: `### Improvements
-- Added Modrinth Servers free trial promotion in partnership with Medal.`,
-	},
-	{
 		date: `2025-08-18T09:10:00-07:00`,
 		product: 'servers',
 		body: `### Improvements
