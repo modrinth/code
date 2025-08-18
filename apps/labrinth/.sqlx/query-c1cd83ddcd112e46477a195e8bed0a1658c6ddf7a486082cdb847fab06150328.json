@@ -1,0 +1,164 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                delphi_report_issues.id AS \"id\", report_id,\n                issue_type AS \"issue_type: DelphiReportIssueType\",\n                delphi_report_issues.status as \"status: DelphiReportIssueStatus\",\n\n                file_id, delphi_version, artifact_url, created,\n                json_array(SELECT to_jsonb(delphi_report_issue_java_classes)\n                    FROM delphi_report_issue_java_classes\n                    WHERE issue_id = delphi_report_issues.id\n                ) AS \"classes: sqlx::types::Json<Vec<DBDelphiReportIssueJavaClass>>\",\n                versions.mod_id AS \"project_id?\", mods.published AS \"project_published?\"\n            FROM delphi_report_issues\n            INNER JOIN delphi_reports ON delphi_reports.id = report_id\n            LEFT OUTER JOIN files ON files.id = file_id\n            LEFT OUTER JOIN versions ON versions.id = files.version_id\n            LEFT OUTER JOIN mods ON mods.id = versions.mod_id\n            WHERE\n                (issue_type = $1 OR $1 IS NULL)\n                AND (delphi_report_issues.status = $2 OR $2 IS NULL)\n            ORDER BY\n                CASE WHEN $3 = 'created_asc' THEN delphi_reports.created ELSE TO_TIMESTAMP(0) END ASC,\n                CASE WHEN $3 = 'created_desc' THEN delphi_reports.created ELSE TO_TIMESTAMP(0) END DESC,\n                CASE WHEN $3 = 'pending_status_first' THEN delphi_report_issues.status ELSE 'pending'::delphi_report_issue_status END ASC\n            OFFSET $5\n            LIMIT $4\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "report_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "issue_type: DelphiReportIssueType",
+        "type_info": {
+          "Custom": {
+            "name": "delphi_report_issue_type",
+            "kind": {
+              "Enum": [
+                "reflection_indirection",
+                "xor_obfuscation",
+                "included_libraries",
+                "suspicious_binaries",
+                "corrupt_classes",
+                "suspicious_classes",
+                "url_usage",
+                "classloader_usage",
+                "processbuilder_usage",
+                "runtime_exec_usage",
+                "jni_usage",
+                "main_method",
+                "native_loading",
+                "malformed_jar",
+                "nested_jar_too_deep",
+                "failed_decompilation",
+                "analysis_failure",
+                "malware_easyforme",
+                "malware_simplyloader",
+                "unknown"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "status: DelphiReportIssueStatus",
+        "type_info": {
+          "Custom": {
+            "name": "delphi_report_issue_status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "approved",
+                "rejected"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "file_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "delphi_version",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "artifact_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "classes: sqlx::types::Json<Vec<DBDelphiReportIssueJavaClass>>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 9,
+        "name": "project_id?",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 10,
+        "name": "project_published?",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        {
+          "Custom": {
+            "name": "delphi_report_issue_type",
+            "kind": {
+              "Enum": [
+                "reflection_indirection",
+                "xor_obfuscation",
+                "included_libraries",
+                "suspicious_binaries",
+                "corrupt_classes",
+                "suspicious_classes",
+                "url_usage",
+                "classloader_usage",
+                "processbuilder_usage",
+                "runtime_exec_usage",
+                "jni_usage",
+                "main_method",
+                "native_loading",
+                "malformed_jar",
+                "nested_jar_too_deep",
+                "failed_decompilation",
+                "analysis_failure",
+                "malware_easyforme",
+                "malware_simplyloader",
+                "unknown"
+              ]
+            }
+          }
+        },
+        {
+          "Custom": {
+            "name": "delphi_report_issue_status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "approved",
+                "rejected"
+              ]
+            }
+          }
+        },
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      null,
+      true,
+      true
+    ]
+  },
+  "hash": "c1cd83ddcd112e46477a195e8bed0a1658c6ddf7a486082cdb847fab06150328"
+}
