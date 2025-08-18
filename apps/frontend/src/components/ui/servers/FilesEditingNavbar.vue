@@ -111,6 +111,7 @@ import { ChevronRightIcon, DropdownIcon, HomeIcon, SaveIcon, ShareIcon } from '@
 import { Button, ButtonStyled } from '@modrinth/ui'
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
 import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
 
 const props = defineProps<{

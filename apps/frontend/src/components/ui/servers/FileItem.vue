@@ -78,9 +78,8 @@ import {
 } from '@modrinth/assets'
 import { ButtonStyled } from '@modrinth/ui'
 import { computed, ref, shallowRef } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import { renderToString } from 'vue/server-renderer'
-import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import {
 	UiServersIconsCodeFileIcon,
@@ -90,6 +89,8 @@ import {
 	UiServersIconsTextFileIcon,
 } from '#components'
 import PaletteIcon from '~/assets/icons/palette.svg?component'
+
+import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
 
 interface FileItemProps {
 	name: string

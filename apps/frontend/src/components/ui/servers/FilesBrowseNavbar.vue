@@ -170,6 +170,7 @@ import {
 import { ButtonStyled, OverflowMenu } from '@modrinth/ui'
 import { useIntersectionObserver } from '@vueuse/core'
 import { computed, ref } from 'vue'
+
 import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
 
 const props = defineProps<{
