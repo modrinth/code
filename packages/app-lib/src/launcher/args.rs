@@ -14,10 +14,10 @@ use daedalus::{
     modded::SidedDataEntry,
 };
 use dunce::canonicalize;
+use itertools::Itertools;
 use std::io::{BufRead, BufReader};
 use std::net::SocketAddr;
 use std::{collections::HashMap, path::Path};
-use itertools::Itertools;
 use uuid::Uuid;
 
 // Replaces the space separator with a newline character, as to not split the arguments
@@ -30,46 +30,40 @@ pub fn get_class_paths(
     java_arch: &str,
     minecraft_updated: bool,
 ) -> crate::Result<String> {
-    launcher_class_path.iter()
+    launcher_class_path
+        .iter()
         .map(|path| {
-            Ok(
-                canonicalize(path)
-                    .map_err(|_| {
-                        crate::ErrorKind::LauncherError(format!(
-                            "Specified class path {} does not exist",
-                            path.to_string_lossy()
-                        ))
-                            .as_error()
-                    })?
-                    .to_string_lossy()
-                    .to_string()
-            )
+            Ok(canonicalize(path)
+                .map_err(|_| {
+                    crate::ErrorKind::LauncherError(format!(
+                        "Specified class path {} does not exist",
+                        path.to_string_lossy()
+                    ))
+                    .as_error()
+                })?
+                .to_string_lossy()
+                .to_string())
         })
-        .chain(
-            libraries
-                .iter()
-                .filter_map(|library| {
-                    if let Some(rules) = &library.rules
-                        && !parse_rules(
-                        rules,
-                        java_arch,
-                        &QuickPlayType::None,
-                        minecraft_updated,
-                    )
-                    {
-                        return None;
-                    }
+        .chain(libraries.iter().filter_map(|library| {
+            if let Some(rules) = &library.rules
+                && !parse_rules(
+                    rules,
+                    java_arch,
+                    &QuickPlayType::None,
+                    minecraft_updated,
+                )
+            {
+                return None;
+            }
 
-                    if !library.include_in_classpath {
-                        return None;
-                    }
+            if !library.include_in_classpath {
+                return None;
+            }
 
-                    Some(get_lib_path(libraries_path, &library.name, false))
-                })
-        )
+            Some(get_lib_path(libraries_path, &library.name, false))
+        }))
         .process_results(|iter| {
-            iter.unique()
-                .join(classpath_separator(java_arch))
+            iter.unique().join(classpath_separator(java_arch))
         })
 }
 
