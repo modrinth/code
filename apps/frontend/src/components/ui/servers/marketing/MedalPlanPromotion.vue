@@ -1,25 +1,33 @@
 <template>
 	<div
 		id="medal"
-		class="medal-promotion flex w-full flex-row justify-between rounded-xl p-6 shadow-xl"
+		class="medal-promotion flex w-full flex-row justify-between rounded-xl py-6 px-8 shadow-xl"
 	>
 		<div class="overlay"></div>
-		<MedalPromoBackground class="background-pattern shadow-xl" />
-		<div class="z-10 flex flex-col gap-2">
-			<div class="flex items-center gap-2 text-2xl font-semibold text-contrast">
-				<ClockIcon class="clock-glow text-medal-orange size-6" /><span>
-					Try a free
-					<span class="text-medal-orange">3GB server</span> for 5 days powered by
-					<span class="text-medal-orange">Medal</span>
-				</span>
+		<img
+			src="https://cdn-raw.modrinth.com/medal-banner-background.webp"
+			class="background-pattern dark-pattern shadow-xl"
+			alt=""
+		/>
+		<img
+			src="https://cdn-raw.modrinth.com/medal-banner-background-light.webp"
+			class="background-pattern light-pattern shadow-xl"
+			alt=""
+		/>
+		<div class="z-10 flex items-center gap-6 text-2xl font-semibold text-contrast">
+				<MedalIcon class="h-10 w-auto text-contrast" />
+				<div class="flex flex-col items-start gap-1">
+					<span>
+						Try a free
+						<span class="text-medal-orange">3GB server</span> for 5 days powered by
+						<span class="text-medal-orange">Medal</span>
+					</span>
+					<span class="text-sm font-medium text-secondary">
+						Limited-time offer. No credit card required. Available for US servers.
+					</span>
+				</div>
 			</div>
-			<div class="flex items-center">
-				<span class="text-sm text-secondary"
-					>Limited-time offer. No credit card required. Available for US servers.</span
-				>
-			</div>
-		</div>
-		<ButtonStyled color="orange" type="outlined" size="large">
+		<ButtonStyled color="medal-promo" type="outlined" size="large">
 			<nuxt-link to="https://medal.tv/modrinth" class="z-10 my-auto"
 				>Learn more <ExternalIcon
 			/></nuxt-link>
@@ -28,10 +36,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ClockIcon, ExternalIcon } from '@modrinth/assets'
+import { ExternalIcon } from '@modrinth/assets'
 import { ButtonStyled } from '@modrinth/ui'
 
-import MedalPromoBackground from '~/assets/images/illustrations/medal_promo_background.svg?component'
+import MedalIcon from '~/assets/images/illustrations/medal_icon.svg?component'
 </script>
 
 <style scoped lang="scss">
@@ -52,6 +60,23 @@ import MedalPromoBackground from '~/assets/images/illustrations/medal_promo_back
 	border-radius: inherit;
 }
 
+.light-mode, .light {
+	.background-pattern.dark-pattern {
+		display: none;
+	}
+	.background-pattern.light-pattern {
+		display: block;
+	}
+}
+
+.background-pattern.dark-pattern {
+	display: block;
+}
+
+.background-pattern.light-pattern {
+	display: none;
+}
+
 .background-pattern {
 	position: absolute;
 	top: 0;
@@ -61,12 +86,13 @@ import MedalPromoBackground from '~/assets/images/illustrations/medal_promo_back
 	z-index: 0;
 	background-color: var(--medal-promotion-bg);
 	border-radius: inherit;
-	color: var(--color-orange);
+	color: var(--medal-promotion-bg-orange);
 }
 
 .clock-glow {
-	filter: drop-shadow(0 0 72px var(--color-orange)) drop-shadow(0 0 36px var(--color-orange))
-		drop-shadow(0 0 18px var(--color-orange));
+	filter: drop-shadow(0 0 72px var(--medal-promotion-bg-orange))
+		drop-shadow(0 0 36px var(--medal-promotion-bg-orange))
+		drop-shadow(0 0 18px var(--medal-promotion-bg-orange));
 }
 
 .text-medal-orange {
