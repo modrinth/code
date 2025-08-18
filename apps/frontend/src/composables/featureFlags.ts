@@ -25,7 +25,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 
 	// Feature toggles
 	projectTypesPrimaryNav: false,
-	enableMedalPromotion: false,
+	enableMedalPromotion: true,
 	hidePlusPromoInUserMenu: false,
 	oldProjectCards: true,
 	newProjectCards: false,
