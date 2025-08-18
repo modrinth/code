@@ -392,7 +392,7 @@
 				<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
 					<h1 class="m-0 text-lg font-bold">Frequently Asked Questions</h1>
 					<div class="details-hide flex flex-col gap-1">
-						<details pyro-hash="cpus" class="group" :open="$route.hash === '#cpus'">
+						<details nav-hash="cpus" class="group" :open="$route.hash === '#cpus'">
 							<summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
 								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
 									<RightArrowIcon />
@@ -404,7 +404,7 @@
 								GHz, paired with DDR5 memory.
 							</p>
 						</details>
-						<details pyro-hash="cpu-burst" class="group" :open="$route.hash === '#cpu-burst'">
+						<details nav-hash="cpu-burst" class="group" :open="$route.hash === '#cpu-burst'">
 							<summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
 								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
 									<RightArrowIcon />
@@ -420,7 +420,7 @@
 							</p>
 						</details>
 
-						<details pyro-hash="ddos" class="group" :open="$route.hash === '#ddos'">
+						<details nav-hash="ddos" class="group" :open="$route.hash === '#ddos'">
 							<summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
 								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
 									<RightArrowIcon />
@@ -433,7 +433,7 @@
 							</p>
 						</details>
 
-						<details pyro-hash="region" class="group" :open="$route.hash === '#region'">
+						<details nav-hash="region" class="group" :open="$route.hash === '#region'">
 							<summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
 								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
 									<RightArrowIcon />
@@ -447,7 +447,7 @@
 							</p>
 						</details>
 
-						<details pyro-hash="storage" class="group" :open="$route.hash === '#storage'">
+						<details nav-hash="storage" class="group" :open="$route.hash === '#storage'">
 							<summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
 								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
 									<RightArrowIcon />
@@ -460,7 +460,7 @@
 							</p>
 						</details>
 
-						<details pyro-hash="performance" class="group" :open="$route.hash === '#performance'">
+						<details nav-hash="performance" class="group" :open="$route.hash === '#performance'">
 							<summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
 								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
 									<RightArrowIcon />
@@ -481,7 +481,7 @@
 							</p>
 						</details>
 
-						<details pyro-hash="prices" class="group" :open="$route.hash === '#prices'">
+						<details nav-hash="prices" class="group" :open="$route.hash === '#prices'">
 							<summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
 								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
 									<RightArrowIcon />
@@ -493,7 +493,7 @@
 							</p>
 						</details>
 
-						<details pyro-hash="versions" class="group" :open="$route.hash === '#versions'">
+						<details nav-hash="versions" class="group" :open="$route.hash === '#versions'">
 							<summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
 								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
 									<RightArrowIcon />
@@ -516,11 +516,13 @@
 		</section>
 
 		<section
-			pyro-hash="plan"
 			class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
 		>
 			<div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
-			<div id="plan" class="mx-auto flex w-full max-w-7xl flex-col items-center gap-8 text-center">
+			<div
+				nav-hash="plan"
+				class="mx-auto flex w-full max-w-7xl flex-col items-center gap-8 text-center"
+			>
 				<h1 class="relative m-0 text-4xl leading-[120%] md:text-7xl">
 					There's a server for everyone
 				</h1>
@@ -852,8 +854,8 @@ const isAtCapacity = computed(
 
 const scrollToFaq = () => {
 	if (route.hash) {
-		// where pyro-hash === route.hash
-		const faq = document.querySelector(`[pyro-hash="${route.hash.slice(1)}"]`)
+		// where nav-hash === route.hash
+		const faq = document.querySelector(`[nav-hash="${route.hash.slice(1)}"]`)
 		if (faq) {
 			faq.open = true
 			const top = faq.getBoundingClientRect().top
@@ -934,7 +936,7 @@ const selectProduct = async (product) => {
 const planQuery = async () => {
 	if ('plan' in route.query) {
 		await nextTick()
-		const planElement = document.getElementById('plan')
+		const planElement = document.querySelector(`[nav-hash="plan"]`)
 		if (planElement) {
 			planElement.scrollIntoView({ behavior: 'smooth' })
 			await selectProduct(route.query.plan)
