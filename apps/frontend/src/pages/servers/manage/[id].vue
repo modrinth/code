@@ -298,7 +298,7 @@
 					</div>
 				</div>
 
-				<div class="mb-4">
+				<div v-if="serverData.is_medal" class="mb-4">
 					<MedalServerCountdown :server-id="server.serverId" />
 				</div>
 
