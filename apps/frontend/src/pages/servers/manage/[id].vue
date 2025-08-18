@@ -116,7 +116,15 @@
 		}"
 	>
 		<div class="flex w-full min-w-0 select-none flex-col items-center gap-6 pt-4 sm:flex-row">
-			<ServerIcon :image="serverData.image" class="drop-shadow-lg sm:drop-shadow-none" />
+			<ServerIcon
+				v-if="!serverData.is_medal"
+				:image="serverData.image"
+				class="drop-shadow-lg sm:drop-shadow-none"
+			/>
+			<MedalServerIcon
+				v-else
+				class="border-medal-orange z-10 size-16 shrink-0 rounded-xl border-[1px] border-solid bg-bg text-orange"
+			/>
 			<div
 				class="flex min-w-0 flex-1 flex-col-reverse items-center gap-2 sm:flex-col sm:items-start"
 			>
@@ -290,6 +298,10 @@
 					</div>
 				</div>
 
+				<div class="mb-4">
+					<MedalServerCountdown :server-id="server.serverId" />
+				</div>
+
 				<div
 					v-if="!isConnected && !isReconnecting && !isLoading"
 					data-pyro-server-ws-error
@@ -382,9 +394,11 @@ import DOMPurify from 'dompurify'
 import { computed, onMounted, onUnmounted, type Reactive, ref } from 'vue'
 
 import { reloadNuxtApp } from '#app'
+import MedalServerIcon from '~/assets/images/servers/medal_server_icon.svg?component'
 import NavTabs from '~/components/ui/NavTabs.vue'
 import PanelErrorIcon from '~/components/ui/servers/icons/PanelErrorIcon.vue'
 import InstallingTicker from '~/components/ui/servers/InstallingTicker.vue'
+import MedalServerCountdown from '~/components/ui/servers/marketing/MedalServerCountdown.vue'
 import PanelServerActionButton from '~/components/ui/servers/PanelServerActionButton.vue'
 import PanelSpinner from '~/components/ui/servers/PanelSpinner.vue'
 import ServerIcon from '~/components/ui/servers/ServerIcon.vue'
