@@ -37,7 +37,6 @@ import { products } from '~/generated/state.json'
 
 const { addNotification } = injectNotificationManager()
 
-const router = useRouter()
 const config = useRuntimeConfig()
 const purchaseModal = ref<InstanceType<typeof ModrinthServersPurchaseModal> | null>(null)
 const customer = ref<any>(null)
