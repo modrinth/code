@@ -648,6 +648,7 @@ import { formatPrice } from '@modrinth/utils'
 import { useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
 
+import { useBaseFetch } from '@/composables/fetch.js'
 import OptionGroup from '~/components/ui/OptionGroup.vue'
 import LoaderIcon from '~/components/ui/servers/icons/LoaderIcon.vue'
 import ServerPlanSelector from '~/components/ui/servers/marketing/ServerPlanSelector.vue'
