@@ -145,6 +145,8 @@ pub enum ApiError {
     RateLimitError(u128, u32),
     #[error("Error while interacting with payment processor: {0}")]
     Stripe(#[from] stripe::StripeError),
+    #[error("Error while interacting with Delphi: {0}")]
+    Delphi(reqwest::Error),
 }
 
 impl ApiError {
@@ -179,6 +181,7 @@ impl ApiError {
                 ApiError::Io(..) => "io_error",
                 ApiError::RateLimitError(..) => "ratelimit_error",
                 ApiError::Stripe(..) => "stripe_error",
+                ApiError::Delphi(..) => "delphi_error",
             },
             description: self.to_string(),
         }
@@ -216,6 +219,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::Io(..) => StatusCode::BAD_REQUEST,
             ApiError::RateLimitError(..) => StatusCode::TOO_MANY_REQUESTS,
             ApiError::Stripe(..) => StatusCode::FAILED_DEPENDENCY,
+            ApiError::Delphi(..) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

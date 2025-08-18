@@ -3,6 +3,7 @@ use thiserror::Error;
 pub mod categories;
 pub mod charge_item;
 pub mod collection_item;
+pub mod delphi_report_item;
 pub mod flow_item;
 pub mod friend_item;
 pub mod ids;

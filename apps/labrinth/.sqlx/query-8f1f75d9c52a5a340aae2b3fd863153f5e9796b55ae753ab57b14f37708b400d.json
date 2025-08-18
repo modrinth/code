@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO delphi_reports (file_id, delphi_version, artifact_url)\n            VALUES ($1, $2, $3)\n            ON CONFLICT (file_id, delphi_version) DO UPDATE SET\n                delphi_version = $2, artifact_url = $3, created = CURRENT_TIMESTAMP\n            RETURNING id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int4",
+        "Varchar"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "8f1f75d9c52a5a340aae2b3fd863153f5e9796b55ae753ab57b14f37708b400d"
+}

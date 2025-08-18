@@ -38,7 +38,6 @@ use sha1::Digest;
 use sqlx::postgres::PgPool;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
-use tracing::error;
 use validator::Validate;
 
 fn default_requested_status() -> VersionStatus {
@@ -158,8 +157,6 @@ async fn version_create_inner(
     session_queue: &AuthQueue,
     moderation_queue: &AutomatedModerationQueue,
 ) -> Result<HttpResponse, CreateError> {
-    let cdn_url = dotenvy::var("CDN_URL")?;
-
     let mut initial_version_data = None;
     let mut version_builder = None;
     let mut selected_loaders = None;
@@ -355,7 +352,6 @@ async fn version_create_inner(
                 uploaded_files,
                 &mut version.files,
                 &mut version.dependencies,
-                &cdn_url,
                 &content_disposition,
                 version.project_id.into(),
                 version.version_id.into(),
@@ -589,8 +585,6 @@ async fn upload_file_to_version_inner(
     version_id: models::DBVersionId,
     session_queue: &AuthQueue,
 ) -> Result<HttpResponse, CreateError> {
-    let cdn_url = dotenvy::var("CDN_URL")?;
-
     let mut initial_file_data: Option<InitialFileData> = None;
     let mut file_builders: Vec<VersionFileBuilder> = Vec::new();
 
@@ -740,7 +734,6 @@ async fn upload_file_to_version_inner(
                 uploaded_files,
                 &mut file_builders,
                 &mut dependencies,
-                &cdn_url,
                 &content_disposition,
                 project_id,
                 version_id.into(),
@@ -794,7 +787,6 @@ pub async fn upload_file(
     uploaded_files: &mut Vec<UploadedFile>,
     version_files: &mut Vec<VersionFileBuilder>,
     dependencies: &mut Vec<DependencyBuilder>,
-    cdn_url: &str,
     content_disposition: &actix_web::http::header::ContentDisposition,
     project_id: ProjectId,
     version_id: VersionId,
@@ -941,21 +933,17 @@ pub async fn upload_file(
         || force_primary
         || total_files_len == 1;
 
-    let file_path_encode = format!(
-        "data/{}/versions/{}/{}",
-        project_id,
-        version_id,
+    let file_path = format!(
+        "data/{project_id}/versions/{version_id}/{}",
         urlencoding::encode(file_name)
     );
-    let file_path =
-        format!("data/{}/versions/{}/{}", project_id, version_id, &file_name);
 
     let upload_data = file_host
         .upload_file(content_type, &file_path, FileHostPublicity::Public, data)
         .await?;
 
     uploaded_files.push(UploadedFile {
-        name: file_path,
+        name: file_path.clone(),
         publicity: FileHostPublicity::Public,
     });
 
@@ -979,33 +967,9 @@ pub async fn upload_file(
         return Err(CreateError::InvalidInput(msg.to_string()));
     }
 
-    let url = format!("{cdn_url}/{file_path_encode}");
-
-    let client = reqwest::Client::new();
-    let delphi_url = dotenvy::var("DELPHI_URL")?;
-    match client
-        .post(delphi_url)
-        .json(&serde_json::json!({
-            "url": url,
-            "project_id": project_id,
-            "version_id": version_id,
-        }))
-        .send()
-        .await
-    {
-        Ok(res) => {
-            if !res.status().is_success() {
-                error!("Failed to upload file to Delphi: {url}");
-            }
-        }
-        Err(e) => {
-            error!("Failed to upload file to Delphi: {url}: {e}");
-        }
-    }
-
     version_files.push(VersionFileBuilder {
         filename: file_name.to_string(),
-        url: format!("{cdn_url}/{file_path_encode}"),
+        url: format!("{}/{file_path}", dotenvy::var("CDN_URL")?),
         hashes: vec![
             models::version_item::HashBuilder {
                 algorithm: "sha1".to_string(),
