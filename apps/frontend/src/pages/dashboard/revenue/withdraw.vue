@@ -175,7 +175,8 @@
 					!amount ||
 					!agreedTransfer ||
 					!agreedTerms ||
-					(fees > 0 && !agreedFees)
+					(fees > 0 && !agreedFees) ||
+					needTaxForms
 				"
 				class="iconified-button brand-button"
 				@click="withdraw"
@@ -227,6 +228,12 @@ const [{ data: userBalance }, { data: payoutMethods, refresh: refreshPayoutMetho
 			useBaseFetch(`payout/methods?country=${country.value.id}`, { apiVersion: 3 }),
 		),
 	])
+
+const needTaxForms = computed(() => {
+	return (
+		userBalance.value?.total_annual_withdrawal >= 600 && !userBalance.value?.tax_compliance_filled
+	)
+})
 
 const selectedMethodId = ref(payoutMethods.value[0].id)
 const selectedMethod = computed(() =>
@@ -345,6 +352,8 @@ watch(selectedMethod, () => {
 async function withdraw() {
 	startLoading()
 	try {
+		if (needTaxForms.value) return
+
 		const auth = await useAuth()
 
 		await useBaseFetch(`payout`, {

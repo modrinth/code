@@ -168,7 +168,9 @@ const { data: userBalance } = await useAsyncData(`payout/balance`, () =>
 
 const needTaxForms = computed(() => {
 	return true
-	//return userBalance.value?.totalAnnualWithdrawal >= 600 && !userBalance.value?.taxComplianceFilled
+	// return (
+	// 	userBalance.value?.total_annual_withdrawal >= 600 && !userBalance.value?.tax_compliance_filled
+	// )
 })
 
 const shouldPreventWithdrawal = computed(() => {
