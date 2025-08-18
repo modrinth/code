@@ -46,6 +46,7 @@ const props = defineProps<{
 	ping?: number
 	loading?: boolean
 	selectedPaymentMethod: Stripe.PaymentMethod | undefined
+	hasPaymentMethod?: boolean
 	noPaymentRequired?: boolean
 	existingPlan?: ServerPlan
 	existingSubscription?: UserSubscription
@@ -313,14 +314,18 @@ function setInterval(newInterval: ServerBillingInterval) {
 			<FormattedPaymentMethod :method="selectedPaymentMethod" />
 		</template>
 		<template v-else>
-			<div class="flex items-center gap-2 text-red">
+			<div v-if="hasPaymentMethod" class="flex items-center gap-2 text-secondary">
+				<RadioButtonCheckedIcon class="text-brand" />
+				Using new payment method
+			</div>
+			<div v-else class="flex items-center gap-2 text-red">
 				<XIcon />
 				No payment method selected
 			</div>
 		</template>
 		<ButtonStyled size="small" type="transparent">
 			<button class="ml-auto" @click="emit('changePaymentMethod')">
-				<template v-if="selectedPaymentMethod"> <EditIcon /> Change </template>
+				<template v-if="selectedPaymentMethod || hasPaymentMethod"> <EditIcon /> Change </template>
 				<template v-else> Select payment method <RightArrowIcon /> </template>
 			</button>
 		</ButtonStyled>
@@ -346,6 +351,7 @@ function setInterval(newInterval: ServerBillingInterval) {
 		<span class="font-semibold"
 			>By clicking "Subscribe", you are purchasing a recurring subscription.</span
 		>
+		<br />
 	</p>
 	<div v-if="!noPaymentRequired" class="mt-2 flex items-center gap-1 text-sm">
 		<Checkbox

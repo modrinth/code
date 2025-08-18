@@ -1086,6 +1086,7 @@ function showCancellationSurvey(subscription) {
 			window.Tally.openPopup(formId, popupOptions)
 		} else {
 			console.warn('Tally script not yet loaded')
+			cancelSubscription(subscription.id, true)
 		}
 	} catch (e) {
 		console.error('Error opening Tally popup:', e)

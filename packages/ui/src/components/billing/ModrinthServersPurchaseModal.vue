@@ -275,6 +275,23 @@ function handleChooseCustom() {
 	customServer.value = true
 	selectedPlan.value = undefined
 }
+
+// When the user explicitly wants to change or add a payment method from Review
+// we must disable the auto-skip behavior, clear any selected method, and
+// navigate to the Payment step so Stripe Elements can mount.
+async function changePaymentMethod() {
+	skipPaymentMethods.value = false
+	selectedPaymentMethod.value = undefined
+	await setStep('payment', true)
+}
+
+function goToBreadcrumbStep(id: string) {
+	if (id === 'payment') {
+		return changePaymentMethod()
+	}
+
+	return setStep(id as Step, true)
+}
 </script>
 <template>
 	<NewModal ref="modal" @hide="$emit('hide')">
@@ -284,7 +301,7 @@ function handleChooseCustom() {
 					<button
 						v-if="index < currentStepIndex"
 						class="bg-transparent active:scale-95 font-bold text-secondary p-0"
-						@click="setStep(id, true)"
+						@click="goToBreadcrumbStep(id as string)"
 					>
 						{{ formatMessage(title) }}
 					</button>
@@ -350,17 +367,13 @@ function handleChooseCustom() {
 				:ping="currentPing"
 				:loading="paymentMethodLoading"
 				:selected-payment-method="selectedPaymentMethod || inputtedPaymentMethod"
+				:has-payment-method="hasPaymentMethod"
 				:tax="tax"
 				:total="total"
 				:no-payment-required="noPaymentRequired"
 				:existing-plan="existingPlan"
 				:existing-subscription="existingSubscription"
-				@change-payment-method="
-					() => {
-						skipPaymentMethods = false
-						setStep('payment', true)
-					}
-				"
+				@change-payment-method="changePaymentMethod"
 				@reload-payment-intent="reloadPaymentIntent"
 			/>
 			<div v-else>Something went wrong</div>
