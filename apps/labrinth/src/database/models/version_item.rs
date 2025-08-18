@@ -6,6 +6,7 @@ use crate::database::models::loader_fields::{
 };
 use crate::database::redis::RedisPool;
 use crate::models::projects::{FileType, VersionStatus};
+use crate::routes::internal::delphi::DelphiRunParameters;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
 use futures::TryStreamExt;
@@ -162,6 +163,15 @@ impl VersionFileBuilder {
             )
             .execute(&mut **transaction)
             .await?;
+        }
+
+        if let Err(err) = crate::routes::internal::delphi::run(
+            &mut **transaction,
+            DelphiRunParameters { file_id },
+        )
+        .await
+        {
+            tracing::error!("Error submitting new file to Delphi: {err}");
         }
 
         Ok(file_id)

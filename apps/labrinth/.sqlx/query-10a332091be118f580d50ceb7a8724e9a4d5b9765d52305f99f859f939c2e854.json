@@ -1,0 +1,63 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                INSERT INTO delphi_report_issues (report_id, issue_type, status)\n                VALUES ($1, $2, $3)\n                ON CONFLICT (report_id, issue_type) DO UPDATE SET status = $3\n                RETURNING id\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        {
+          "Custom": {
+            "name": "delphi_report_issue_type",
+            "kind": {
+              "Enum": [
+                "reflection_indirection",
+                "xor_obfuscation",
+                "included_libraries",
+                "suspicious_binaries",
+                "corrupt_classes",
+                "suspicious_classes",
+                "url_usage",
+                "classloader_usage",
+                "processbuilder_usage",
+                "runtime_exec_usage",
+                "jni_usage",
+                "main_method",
+                "native_loading",
+                "malformed_jar",
+                "nested_jar_too_deep",
+                "failed_decompilation",
+                "analysis_failure",
+                "malware_easyforme",
+                "malware_simplyloader",
+                "unknown"
+              ]
+            }
+          }
+        },
+        {
+          "Custom": {
+            "name": "delphi_report_issue_status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "approved",
+                "rejected"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "10a332091be118f580d50ceb7a8724e9a4d5b9765d52305f99f859f939c2e854"
+}
