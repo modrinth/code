@@ -58,14 +58,14 @@
 	</NuxtLink>
 	<div
 		v-if="status === 'suspended' && suspension_reason === 'upgrading'"
-		class="relative flex w-full flex-row items-center gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-blue bg-bg-blue p-4 text-sm font-bold text-contrast"
+		class="relative -mt-2 flex w-full flex-row items-center gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-blue bg-bg-blue p-4 text-sm font-bold text-contrast"
 	>
 		<PanelSpinner />
 		Your server's hardware is currently being upgraded and will be back online shortly.
 	</div>
 	<div
 		v-else-if="status === 'suspended' && suspension_reason === 'cancelled'"
-		class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
+		class="relative -mt-2 flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 	>
 		<div class="flex flex-row gap-2">
 			<PanelErrorIcon class="!size-5" /> Your server has been cancelled. Please update your billing
@@ -75,7 +75,7 @@
 	</div>
 	<div
 		v-else-if="status === 'suspended' && suspension_reason"
-		class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
+		class="relative -mt-2 flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 	>
 		<div class="flex flex-row gap-2">
 			<PanelErrorIcon class="!size-5" /> Your server has been suspended: {{ suspension_reason }}.
@@ -85,7 +85,7 @@
 	</div>
 	<div
 		v-else-if="status === 'suspended'"
-		class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
+		class="-mt-2flex relative w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 	>
 		<div class="flex flex-row gap-2">
 			<PanelErrorIcon class="!size-5" /> Your server has been suspended. Please update your billing
@@ -95,7 +95,7 @@
 	</div>
 	<div
 		v-if="pendingChange && status !== 'suspended'"
-		class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-orange bg-bg-orange p-4 text-sm font-bold text-contrast"
+		class="relative -mt-2 flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-orange bg-bg-orange p-4 text-sm font-bold text-contrast"
 	>
 		<div>
 			Your server will {{ pendingChange.verb.toLowerCase() }} to the "{{ pendingChange.planSize }}"
