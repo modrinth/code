@@ -89,6 +89,8 @@ import { HeartIcon, ModrinthPlusIcon, SettingsIcon, SparklesIcon, StarIcon } fro
 import { injectNotificationManager, PurchaseModal } from '@modrinth/ui'
 import { calculateSavings, formatPrice, getCurrency } from '@modrinth/utils'
 
+import { useBaseFetch } from '@/composables/fetch.js'
+import { isPermission } from '@/utils/permissions.ts'
 import { products } from '~/generated/state.json'
 
 const { addNotification } = injectNotificationManager()

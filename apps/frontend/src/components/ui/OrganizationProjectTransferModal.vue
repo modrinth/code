@@ -113,6 +113,7 @@ import { BoxIcon, SettingsIcon, TransferIcon, XIcon } from '@modrinth/assets'
 import { Avatar, Button, Checkbox, CopyCode, Modal } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 
+const EDIT_DETAILS = 1 << 2
 const modalOpen = ref(null)
 
 const props = defineProps({
