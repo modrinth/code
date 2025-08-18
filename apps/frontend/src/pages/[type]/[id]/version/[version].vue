@@ -1,3 +1,5 @@
+<!-- eslint-disable vue/no-undef-components -->
+<!-- TODO: Remove this^after converting to composition API. -->
 <template>
 	<div v-if="version" class="version-page">
 		<ConfirmModal
