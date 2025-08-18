@@ -302,7 +302,7 @@ function setInterval(newInterval: ServerBillingInterval) {
 			v-else
 			class="p-4 rounded-2xl bg-table-alternateRow text-sm text-secondary leading-relaxed"
 		>
-			No payment needed. The change to your subscription will apply on your next billing date.
+			No payment required. Your downgrade will apply at the end of the current billing period.
 		</div>
 	</div>
 	<div

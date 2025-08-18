@@ -419,7 +419,7 @@ function handleChooseCustom() {
 					"
 				>
 					<template v-if="currentStep === 'review'">
-						<template v-if="noPaymentRequired"><CheckCircleIcon /> Close</template>
+						<template v-if="noPaymentRequired"><CheckCircleIcon /> Confirm Change</template>
 						<template v-else>
 							<SpinnerIcon v-if="completingPurchase" class="animate-spin" />
 							<CheckCircleIcon v-else />

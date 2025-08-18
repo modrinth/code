@@ -18,7 +18,11 @@
 		:existing-plan="currentPlanFromSubscription"
 		:existing-subscription="subscription || undefined"
 		:on-finalize-no-payment-change="finalizeDowngrade"
-		@hide="() => (subscription = null)"
+		@hide="
+			() => {
+				subscription = null
+			}
+		"
 	/>
 </template>
 
@@ -33,6 +37,7 @@ import { products } from '~/generated/state.json'
 
 const { addNotification } = injectNotificationManager()
 
+const router = useRouter()
 const config = useRuntimeConfig()
 const purchaseModal = ref<InstanceType<typeof ModrinthServersPurchaseModal> | null>(null)
 const customer = ref<any>(null)
@@ -176,11 +181,6 @@ async function initiatePayment(body: any): Promise<any> {
 				if (dry.requires_payment) {
 					return await finalizeImmediate(transformedBody)
 				} else {
-					addNotification({
-						title: 'Subscription change pending',
-						text: 'Your subscription will be modified at the end of the current billing interval. Click Close to confirm this downgrade.',
-						type: 'info',
-					})
 					return null
 				}
 			} else {
@@ -202,11 +202,13 @@ async function initiatePayment(body: any): Promise<any> {
 }
 
 async function finalizeImmediate(body: any) {
-	return await useBaseFetch(`billing/subscription/${subscription.value?.id}`, {
+	const result = await useBaseFetch(`billing/subscription/${subscription.value?.id}`, {
 		internal: true,
 		method: 'PATCH',
 		body,
 	})
+
+	return result
 }
 
 async function finalizeDowngrade() {
