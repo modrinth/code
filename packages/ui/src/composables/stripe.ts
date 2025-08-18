@@ -35,7 +35,7 @@ export const useStripe = (
 	project: Ref<string | undefined>,
 	initiatePayment: (
 		body: CreatePaymentIntentRequest | UpdatePaymentIntentRequest,
-	) => Promise<CreatePaymentIntentResponse | UpdatePaymentIntentResponse | null>,
+	) => Promise<CreatePaymentIntentResponse | UpdatePaymentIntentResponse>,
 	onError: (err: Error) => void,
 ) => {
 	const stripe = ref<StripeJs | null>(null)
@@ -55,22 +55,17 @@ export const useStripe = (
 	const inputtedPaymentMethod = ref<Stripe.PaymentMethod>()
 	const clientSecret = ref<string>()
 	const completingPurchase = ref<boolean>(false)
-	const noPaymentRequired = ref<boolean>(false)
 
 	async function initialize() {
 		stripe.value = await loadStripe(publishableKey)
 	}
 
-	function createIntent(
-		body: CreatePaymentIntentRequest,
-	): Promise<CreatePaymentIntentResponse | null> {
-		return initiatePayment(body) as Promise<CreatePaymentIntentResponse | null>
+	function createIntent(body: CreatePaymentIntentRequest): Promise<CreatePaymentIntentResponse> {
+		return initiatePayment(body) as Promise<CreatePaymentIntentResponse>
 	}
 
-	function updateIntent(
-		body: UpdatePaymentIntentRequest,
-	): Promise<UpdatePaymentIntentResponse | null> {
-		return initiatePayment(body) as Promise<UpdatePaymentIntentResponse | null>
+	function updateIntent(body: UpdatePaymentIntentRequest): Promise<UpdatePaymentIntentResponse> {
+		return initiatePayment(body) as Promise<UpdatePaymentIntentResponse>
 	}
 
 	const planPrices = computed(() => {
@@ -227,7 +222,7 @@ export const useStripe = (
 				interval: interval.value,
 			}
 
-			let result: BasePaymentIntentResponse | null = null
+			let result: BasePaymentIntentResponse
 
 			const metadata: CreatePaymentIntentRequest['metadata'] = {
 				type: 'pyro',
@@ -246,34 +241,26 @@ export const useStripe = (
 					existing_payment_intent: paymentIntentId.value,
 					metadata,
 				})
-				if (result) console.log(`Updated payment intent: ${interval.value} for ${result.total}`)
+				console.log(`Updated payment intent: ${interval.value} for ${result.total}`)
 			} else {
-				const created = await createIntent({
+				;({
+					payment_intent_id: paymentIntentId.value,
+					client_secret: clientSecret.value,
+					...result
+				} = await createIntent({
 					...requestType,
 					charge,
 					metadata: metadata,
-				})
-				if (created) {
-					paymentIntentId.value = created.payment_intent_id
-					clientSecret.value = created.client_secret
-					result = created
-					console.log(`Created payment intent: ${interval.value} for ${created.total}`)
-				}
+				}))
+				console.log(`Created payment intent: ${interval.value} for ${result.total}`)
 			}
 
-			if (!result) {
-				tax.value = 0
-				total.value = 0
-				noPaymentRequired.value = true
-			} else {
-				tax.value = result.tax
-				total.value = result.total
-				noPaymentRequired.value = false
-			}
+			tax.value = result.tax
+			total.value = result.total
 
 			if (confirmation) {
 				confirmationToken.value = id
-				if (result && result.payment_method) {
+				if (result.payment_method) {
 					inputtedPaymentMethod.value = result.payment_method
 				}
 			}
@@ -359,10 +346,6 @@ export const useStripe = (
 	const loadingElements = computed(() => elementsLoaded.value < 2)
 
 	async function submitPayment(returnUrl: string) {
-		if (noPaymentRequired.value) {
-			completingPurchase.value = false
-			return true
-		}
 		completingPurchase.value = true
 		const secert = clientSecret.value
 
@@ -404,9 +387,7 @@ export const useStripe = (
 		}
 	}
 
-	const hasPaymentMethod = computed(
-		() => selectedPaymentMethod.value || confirmationToken.value || noPaymentRequired.value,
-	)
+	const hasPaymentMethod = computed(() => selectedPaymentMethod.value || confirmationToken.value)
 
 	return {
 		initializeStripe: initialize,
@@ -425,6 +406,5 @@ export const useStripe = (
 		total,
 		submitPayment,
 		completingPurchase,
-		noPaymentRequired,
 	}
 }

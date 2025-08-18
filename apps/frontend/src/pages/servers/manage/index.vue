@@ -3,7 +3,6 @@
 		data-pyro-server-list-root
 		class="experimental-styles-within relative mx-auto mb-6 flex min-h-screen w-full max-w-[1280px] flex-col px-6"
 	>
-		<ServersUpgradeModalWrapper ref="upgradeModal" />
 		<div
 			v-if="hasError || fetchError"
 			class="mx-auto flex h-full min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 text-left"
@@ -94,17 +93,8 @@
 				v-if="filteredData.length > 0 || isPollingForNewServers"
 				class="m-0 flex flex-col gap-4 p-0"
 			>
-				<ServerListing
-					v-for="server in filteredData.filter((s) => !s.is_medal)"
-					:key="server.server_id"
-					v-bind="server"
-				/>
-				<MedalServerListing
-					v-for="server in filteredData.filter((s) => s.is_medal)"
-					:key="server.server_id"
-					v-bind="server"
-					@upgrade="openUpgradeModal(server.server_id)"
-				/>
+				<ServerListing v-for="server in filteredData" :key="server.server_id" v-bind="server" />
+				<ServerListingSkeleton v-if="isPollingForNewServers" />
 			</ul>
 			<div v-else class="flex h-full items-center justify-center">
 				<p class="text-contrast">No servers found.</p>
@@ -117,16 +107,13 @@
 import { HammerIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
 import { ButtonStyled, CopyCode } from '@modrinth/ui'
 import type { ModrinthServersFetchError, Server } from '@modrinth/utils'
-import dayjs from 'dayjs'
 import Fuse from 'fuse.js'
-import type { ComponentPublicInstance } from 'vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { reloadNuxtApp } from '#app'
-import MedalServerListing from '~/components/ui/servers/marketing/MedalServerListing.vue'
 import ServerListing from '~/components/ui/servers/ServerListing.vue'
+import ServerListingSkeleton from '~/components/ui/servers/ServerListingSkeleton.vue'
 import ServerManageEmptyState from '~/components/ui/servers/ServerManageEmptyState.vue'
-import ServersUpgradeModalWrapper from '~/components/ui/servers/ServersUpgradeModalWrapper.vue'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 
 definePageMeta({
@@ -150,40 +137,15 @@ const {
 	data: serverResponse,
 	error: fetchError,
 	refresh,
-} = await useAsyncData<ServerResponse>('ServerList', async () => {
-	const serverResponse = await useServersFetch<ServerResponse>('servers')
-
-	let subscriptions: any[] | undefined
-
-	for (const server of serverResponse.servers) {
-		if (server.is_medal) {
-			// Inject end date into server object.
-			const serverID = server.server_id
-
-			if (!subscriptions) {
-				subscriptions = (await useBaseFetch(`billing/subscriptions`, {
-					internal: true,
-				})) as any[]
-			}
-
-			for (const subscription of subscriptions) {
-				if (subscription.metadata?.id === serverID) {
-					server.medal_expires = dayjs(subscription.created as string)
-						.add(5, 'days')
-						.toISOString()
-				}
-			}
-		}
-	}
-
-	return serverResponse
-})
+} = await useAsyncData<ServerResponse>('ServerList', () =>
+	useServersFetch<ServerResponse>('servers'),
+)
 
 watch([fetchError, serverResponse], ([error, response]) => {
 	hasError.value = !!error || !response
 })
 
-const serverList = computed<Server[]>(() => {
+const serverList = computed(() => {
 	if (!serverResponse.value) return []
 	return serverResponse.value.servers
 })
@@ -205,7 +167,7 @@ function introToTop(array: Server[]): Server[] {
 	})
 }
 
-const filteredData = computed<Server[]>(() => {
+const filteredData = computed(() => {
 	if (!searchInput.value.trim()) {
 		return introToTop(serverList.value)
 	}
@@ -245,13 +207,4 @@ onUnmounted(() => {
 		clearInterval(intervalId)
 	}
 })
-
-type ServersUpgradeModalWrapperRef = ComponentPublicInstance<{
-	open: (id: string) => void | Promise<void>
-}>
-
-const upgradeModal = ref<ServersUpgradeModalWrapperRef | null>(null)
-function openUpgradeModal(serverId: string) {
-	upgradeModal.value?.open(serverId)
-}
 </script>
