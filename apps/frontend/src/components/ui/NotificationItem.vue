@@ -340,10 +340,11 @@ import {
 	ProjectStatusBadge,
 	useRelativeTime,
 } from '@modrinth/ui'
+import { getUserLink, renderString } from '@modrinth/utils'
 
-import { renderString } from '@modrinth/utils'
 import { markAsRead } from '~/helpers/platform-notifications'
 import { getProjectLink, getVersionLink } from '~/helpers/projects'
+import { acceptTeamInvite, removeSelfFromTeam } from '~/helpers/teams'
 
 import ThreadSummary from './thread/ThreadSummary.vue'
 

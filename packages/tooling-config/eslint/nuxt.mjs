@@ -39,6 +39,7 @@ export const configurationNuxtToAppend = [
 					],
 				},
 			],
+			'vue/no-undef-properties': 'warn',
 		},
 		languageOptions: {
 			parserOptions: {

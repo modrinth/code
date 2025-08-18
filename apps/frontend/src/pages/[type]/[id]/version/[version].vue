@@ -629,7 +629,7 @@
 		</div>
 	</div>
 </template>
-<script>
+<script setup>
 import {
 	BoxIcon,
 	ChevronRightIcon,
@@ -671,7 +671,8 @@ import { renderHighlightedString } from '~/helpers/highlight.js'
 import { inferVersionInfo } from '~/helpers/infer.js'
 import { createDataPackVersion } from '~/helpers/package.js'
 import { reportVersion } from '~/utils/report-helpers.ts'
-
+</script>
+<script>
 export default defineNuxtComponent({
 	components: {
 		MarkdownEditor,
