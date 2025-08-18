@@ -11,6 +11,18 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-08-18T09:10:00-07:00`,
+		product: 'servers',
+		body: `### Improvements
+- Fixed various dropdowns not appearing.`,
+	},
+	{
+		date: `2025-08-18T09:10:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Fixed a bunch of random NaNs appearing throughout the UI.`,
+	},
+	{
 		date: `2025-08-17T15:35:00-07:00`,
 		product: 'web',
 		body: `### Improvements
