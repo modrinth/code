@@ -364,6 +364,7 @@ import FilesUploadDragAndDrop from '~/components/ui/servers/FilesUploadDragAndDr
 import FilesUploadDropdown from '~/components/ui/servers/FilesUploadDropdown.vue'
 import LoaderIcon from '~/components/ui/servers/icons/LoaderIcon.vue'
 import LoadingIcon from '~/components/ui/servers/icons/LoadingIcon.vue'
+import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import { acceptFileFromProjectType } from '~/helpers/fileUtils.js'
 
