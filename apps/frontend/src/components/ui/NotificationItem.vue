@@ -173,7 +173,7 @@
 					<span class="version-info">
 						for
 						<Categories
-							:categories="notif.extra_data.version.loaders"
+							:categories="loaderCategories"
 							:type="notif.extra_data.project.project_type"
 							class="categories"
 						/>
@@ -341,6 +341,7 @@ import {
 	useRelativeTime,
 } from '@modrinth/ui'
 
+import { renderString } from '@modrinth/utils'
 import { markAsRead } from '~/helpers/platform-notifications'
 import { getProjectLink, getVersionLink } from '~/helpers/projects'
 
@@ -388,6 +389,12 @@ const version = computed(() => props.notification.extra_data.version)
 const user = computed(() => props.notification.extra_data.user)
 const organization = computed(() => props.notification.extra_data.organization)
 const invitedBy = computed(() => props.notification.extra_data.invited_by)
+
+const loaderCategories = computed(() => {
+	return tags.value.loaders.filter((loader) => {
+		return version.value?.loaders?.includes(loader.name)
+	})
+})
 
 const threadLink = computed(() => {
 	if (report.value) {
