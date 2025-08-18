@@ -341,6 +341,7 @@ import {
 	useRelativeTime,
 } from '@modrinth/ui'
 
+import { markAsRead } from '~/helpers/platform-notifications'
 import { getProjectLink, getVersionLink } from '~/helpers/projects'
 
 import ThreadSummary from './thread/ThreadSummary.vue'
