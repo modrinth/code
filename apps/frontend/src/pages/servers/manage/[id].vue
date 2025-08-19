@@ -389,7 +389,6 @@ import DOMPurify from 'dompurify'
 import { computed, onMounted, onUnmounted, type Reactive, ref } from 'vue'
 
 import { reloadNuxtApp } from '#app'
-import MedalServerIcon from '~/assets/images/servers/medal_server_icon.svg?component'
 import NavTabs from '~/components/ui/NavTabs.vue'
 import PanelErrorIcon from '~/components/ui/servers/icons/PanelErrorIcon.vue'
 import InstallingTicker from '~/components/ui/servers/InstallingTicker.vue'
