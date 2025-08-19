@@ -1,4 +1,22 @@
 {
+  "app.meteredNetwork.body": {
+    "message": "You appear to be on a metered network. Would you like to disable automatic file downloads?"
+  },
+  "app.meteredNetwork.disable": {
+    "message": "Disable"
+  },
+  "app.meteredNetwork.keepEnabled": {
+    "message": "Keep Enabled"
+  },
+  "app.meteredNetwork.title": {
+    "message": "Metered Network Detected"
+  },
+  "app.settings.automaticDownloads": {
+    "message": "Automatic downloads"
+  },
+  "app.settings.automaticDownloads.description": {
+    "message": "The Modrinth app download updates automatically in the background, enabling updates to be installed seamlessly. Disable this if you have a metered network and would like to save data."
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."
   },
