@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { GameVersion } from '@modrinth/ui'
 import { GAME_MODES, HeadingLink, injectNotificationManager } from '@modrinth/ui'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
@@ -10,11 +11,14 @@ import { trackEvent } from '@/helpers/analytics'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { get_all } from '@/helpers/process'
 import { kill, run } from '@/helpers/profile'
+import { get_game_versions } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
 import {
 	get_profile_protocol_version,
 	get_recent_worlds,
 	getWorldIdentifier,
+	hasServerQuickPlaySupport,
+	hasWorldQuickPlaySupport,
 	type ProtocolVersion,
 	refreshServerData,
 	type ServerData,
@@ -37,6 +41,7 @@ const theme = useTheming()
 const jumpBackInItems = ref<JumpBackInItem[]>([])
 const serverData = ref<Record<string, ServerData>>({})
 const protocolVersions = ref<Record<string, ProtocolVersion | null>>({})
+const gameVersions = ref<GameVersion[]>(await get_game_versions().catch(() => []))
 
 const MIN_JUMP_BACK_IN = 3
 const MAX_JUMP_BACK_IN = 6
@@ -255,7 +260,14 @@ onUnmounted(() => {
 							? serverData[item.world.address].refreshing && !serverData[item.world.address].status
 							: undefined
 					"
-					supports-quick-play
+					:supports-server-quick-play="
+						item.world.type === 'server' &&
+						hasServerQuickPlaySupport(gameVersions, item.instance.game_version || '')
+					"
+					:supports-world-quick-play="
+						item.world.type === 'singleplayer' &&
+						hasWorldQuickPlaySupport(gameVersions, item.instance.game_version || '')
+					"
 					:server-status="
 						item.world.type === 'server' ? serverData[item.world.address].status : undefined
 					"

@@ -336,17 +336,21 @@ const messages = defineMessages({
 				<ButtonStyled v-else>
 					<button
 						v-tooltip="
-							world.type == 'server' && !supportsServerQuickPlay
-								? formatMessage(messages.noServerQuickPlay)
-								: world.type == 'singleplayer' && !supportsWorldQuickPlay
-									? formatMessage(messages.noSingleplayerQuickPlay)
-									: playingOtherWorld || locked
+							world.type === 'server'
+								? !supportsServerQuickPlay
+									? formatMessage(messages.noServerQuickPlay)
+									: playingOtherWorld
 										? formatMessage(messages.gameAlreadyOpen)
 										: !serverStatus
 											? formatMessage(messages.noContact)
 											: serverIncompatible
 												? formatMessage(messages.incompatibleServer)
 												: null
+								: !supportsWorldQuickPlay
+									? formatMessage(messages.noSingleplayerQuickPlay)
+									: playingOtherWorld || locked
+										? formatMessage(messages.gameAlreadyOpen)
+										: null
 						"
 						:disabled="
 							playingOtherWorld ||
