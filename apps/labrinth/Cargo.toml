@@ -3,7 +3,7 @@ name = "labrinth"
 version = "2.7.0"
 authors = ["geometrically <jai@modrinth.com>"]
 edition.workspace = true
-license = "AGPL-3.0"
+license = "AGPL-3.0-only"
 
 # This seems redundant, but it's necessary for Docker to work
 [[bin]]
@@ -76,19 +76,16 @@ thiserror.workspace = true
 either.workspace = true
 
 sqlx = { workspace = true, features = [
-    "runtime-tokio",
-    "tls-rustls-ring",
-    "postgres",
-    "chrono",
-    "macros",
-    "migrate",
-    "rust_decimal",
-    "json",
+	"runtime-tokio",
+	"tls-rustls-ring",
+	"postgres",
+	"chrono",
+	"macros",
+	"migrate",
+	"rust_decimal",
+	"json",
 ] }
-rust_decimal = { workspace = true, features = [
-    "serde-with-float",
-    "serde-with-str",
-] }
+rust_decimal = { workspace = true, features = ["serde-with-float", "serde-with-str"] }
 redis = { workspace = true, features = ["tokio-comp", "ahash", "r2d2"] }
 deadpool-redis.workspace = true
 clickhouse = { workspace = true, features = ["uuid", "time"] }
@@ -101,7 +98,23 @@ tar.workspace = true
 sentry.workspace = true
 sentry-actix.workspace = true
 
-image = { workspace = true, features = ["avif", "bmp", "dds", "exr", "ff", "gif", "hdr", "ico", "jpeg", "png", "pnm", "qoi", "tga", "tiff", "webp"] }
+image = { workspace = true, features = [
+	"avif",
+	"bmp",
+	"dds",
+	"exr",
+	"ff",
+	"gif",
+	"hdr",
+	"ico",
+	"jpeg",
+	"png",
+	"pnm",
+	"qoi",
+	"tga",
+	"tiff",
+	"webp",
+] }
 color-thief.workspace = true
 webp.workspace = true
 
@@ -120,7 +133,10 @@ ariadne.workspace = true
 clap = { workspace = true, features = ["derive"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
-tikv-jemallocator = { workspace = true, features = ["profiling", "unprefixed_malloc_on_supported_platforms"] }
+tikv-jemallocator = { workspace = true, features = [
+	"profiling",
+	"unprefixed_malloc_on_supported_platforms",
+] }
 tikv-jemalloc-ctl = { workspace = true, features = ["stats"] }
 jemalloc_pprof = { workspace = true, features = ["flamegraph"] }
 

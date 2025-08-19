@@ -1,11 +1,11 @@
 declare module '*.vue' {
-  import type { defineComponent } from 'vue'
+	import type { defineComponent } from 'vue'
 
-  const component: ReturnType<typeof defineComponent>
-  export default component
+	const component: ReturnType<typeof defineComponent>
+	export default component
 }
 
 declare module '*.glsl' {
-  const value: string
-  export default value
+	const value: string
+	export default value
 }
