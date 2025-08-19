@@ -410,6 +410,8 @@ import { isAdmin } from '@modrinth/utils'
 import { IntlFormatted } from '@vintl/vintl/components'
 import UpToDate from 'assets/images/illustrations/up_to_date.svg'
 
+import { getProjectTypeMessage } from '@/utils/i18n-project-type'
+import { normalizeChildren } from '@/utils/vue-children.ts'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import NavRow from '~/components/ui/NavRow.vue'
 import ProjectCard from '~/components/ui/ProjectCard.vue'

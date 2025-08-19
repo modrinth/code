@@ -11,18 +11,30 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-08-18T09:10:00-07:00`,
+		product: 'servers',
+		body: `### Improvements
+- Fixed various dropdowns not appearing.`,
+	},
+	{
+		date: `2025-08-18T09:10:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Fixed a bunch of random NaNs appearing throughout the UI.`,
+	},
+	{
+		date: `2025-08-17T15:35:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Fixed notification pages not loading.`,
+	},
+	{
 		date: `2025-08-15T13:15:00-07:00`,
 		product: 'app',
 		version: '0.10.6',
 		body: `### Improvements
 - Fixed Forge versions between 1.17.1 and 1.20.3 failing to launch.
 - Fixed search page constantly resetting back to page 1.`,
-	},
-	{
-		date: `2025-08-15T12:25:00-07:00`,
-		product: 'web',
-		body: `### Improvements
-- Fixed notification pages not loading.`,
 	},
 	{
 		date: `2025-08-15T11:55:00-07:00`,

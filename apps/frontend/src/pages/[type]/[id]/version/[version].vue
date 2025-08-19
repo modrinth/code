@@ -1,3 +1,5 @@
+<!-- eslint-disable vue/no-undef-components -->
+<!-- TODO: Remove this^after converting to composition API. -->
 <template>
 	<div v-if="version" class="version-page">
 		<ConfirmModal
@@ -9,7 +11,7 @@
 			proceed-label="Delete"
 			@proceed="deleteVersion()"
 		/>
-		<Modal v-if="auth.user && currentMember" ref="modalPackageMod" header="Package data pack">
+		<Modal v-if="auth.user && currentMember" ref="modal_package_mod" header="Package data pack">
 			<div class="modal-package-mod universal-labels">
 				<div class="markdown-body">
 					<p>
@@ -24,7 +26,7 @@
 						The mod loaders you would like to package your data pack for.
 					</span>
 				</label>
-				<Multiselect
+				<multiselect
 					id="package-mod-loaders"
 					v-model="packageLoaders"
 					:options="['fabric', 'forge', 'quilt', 'neoforge']"
@@ -38,13 +40,13 @@
 				/>
 				<div class="button-group">
 					<ButtonStyled>
-						<button @click="modalPackageMod?.hide()">
+						<button @click="$refs.modal_package_mod.hide()">
 							<XIcon aria-hidden="true" />
 							Cancel
 						</button>
 					</ButtonStyled>
 					<ButtonStyled color="brand">
-						<button @click="createDataPackVersionHandler">
+						<button @click="createDataPackVersion">
 							<RightArrowIcon aria-hidden="true" />
 							Begin packaging data pack
 						</button>
@@ -159,7 +161,7 @@
 					</nuxt-link>
 				</ButtonStyled>
 				<ButtonStyled v-else-if="!currentMember">
-					<button @click="reportVersion(version.id)">
+					<button @click="() => reportVersion(version.id)">
 						<ReportIcon aria-hidden="true" />
 						Report
 					</button>
@@ -182,7 +184,7 @@
 							currentMember &&
 							version.loaders.some((x) => tags.loaderData.dataPackLoaders.includes(x))
 						"
-						@click="modalPackageMod?.show()"
+						@click="$refs.modal_package_mod.show()"
 					>
 						<BoxIcon aria-hidden="true" />
 						Package as mod
@@ -339,14 +341,14 @@
 				:key="file.hashes.sha1"
 				:class="{
 					file: true,
-					primary: primaryFile?.hashes?.sha1 === file.hashes.sha1,
+					primary: primaryFile.hashes.sha1 === file.hashes.sha1,
 				}"
 			>
 				<FileIcon aria-hidden="true" />
 				<span class="filename">
 					<strong>{{ file.filename }}</strong>
 					<span class="file-size">({{ formatBytes(file.size) }})</span>
-					<span v-if="primaryFile?.hashes?.sha1 === file.hashes.sha1" class="file-type">
+					<span v-if="primaryFile.hashes.sha1 === file.hashes.sha1" class="file-type">
 						Primary
 					</span>
 					<span
@@ -362,11 +364,11 @@
 						Optional resource pack
 					</span>
 				</span>
-				<Multiselect
+				<multiselect
 					v-if="
 						version.loaders.some((x) => tags.loaderData.dataPackLoaders.includes(x)) &&
 						isEditing &&
-						primaryFile?.hashes?.sha1 !== file.hashes.sha1
+						primaryFile.hashes.sha1 !== file.hashes.sha1
 					"
 					v-model="oldFileTypes[index]"
 					class="raised-multiselect"
@@ -382,7 +384,7 @@
 				<ButtonStyled v-if="isEditing">
 					<button
 						class="raised-button"
-						:disabled="primaryFile?.hashes?.sha1 === file.hashes.sha1"
+						:disabled="primaryFile.hashes.sha1 === file.hashes.sha1"
 						@click="
 							() => {
 								deleteFiles.push(file.hashes.sha1)
@@ -414,7 +416,7 @@
 						<strong>{{ file.name }}</strong>
 						<span class="file-size">({{ formatBytes(file.size) }})</span>
 					</span>
-					<Multiselect
+					<multiselect
 						v-if="version.loaders.some((x) => tags.loaderData.dataPackLoaders.includes(x))"
 						v-model="newFileTypes[index]"
 						class="raised-multiselect"
@@ -549,7 +551,7 @@
 				<div>
 					<h4>Game versions</h4>
 					<template v-if="isEditing">
-						<Multiselect
+						<multiselect
 							v-model="version.game_versions"
 							:options="
 								showSnapshots
@@ -601,6 +603,7 @@
 							size="sm"
 							circle
 						/>
+
 						<div class="member-info">
 							<nuxt-link :to="'/user/' + version.author.user.username" class="name">
 								<p>
@@ -628,10 +631,10 @@
 		</div>
 	</div>
 </template>
-
-<script setup>
+<script>
 import {
 	BoxIcon,
+	ChevronRightIcon,
 	DownloadIcon,
 	EditIcon,
 	FileIcon,
@@ -650,7 +653,6 @@ import {
 	Avatar,
 	Badge,
 	ButtonStyled,
-	Categories,
 	Checkbox,
 	ConfirmModal,
 	CopyCode,
@@ -660,9 +662,11 @@ import {
 import { formatBytes, formatCategory } from '@modrinth/utils'
 import { Multiselect } from 'vue-multiselect'
 
+import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 import FileInput from '~/components/ui/FileInput.vue'
 import Modal from '~/components/ui/Modal.vue'
+import Categories from '~/components/ui/search/Categories.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { acceptFileFromProjectType } from '~/helpers/fileUtils.js'
 import { renderHighlightedString } from '~/helpers/highlight.js'
@@ -670,561 +674,661 @@ import { inferVersionInfo } from '~/helpers/infer.js'
 import { createDataPackVersion } from '~/helpers/package.js'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
-const props = defineProps({
-	project: { type: Object, default: () => ({}) },
-	versions: { type: Array, default: () => [] },
-	featuredVersions: { type: Array, default: () => [] },
-	members: { type: Array, default: () => [{}] },
-	currentMember: { type: Object, default: () => null },
-	dependencies: { type: Object, default: () => ({}) },
-	resetProject: {
-		type: Function,
-		required: true,
-		default: () => {},
+export default defineNuxtComponent({
+	components: {
+		MarkdownEditor,
+		Modal,
+		FileInput,
+		Checkbox,
+		ChevronRightIcon,
+		Categories,
+		DownloadIcon,
+		EditIcon,
+		TrashIcon,
+		StarIcon,
+		FileIcon,
+		ReportIcon,
+		SaveIcon,
+		XIcon,
+		HashIcon,
+		PlusIcon,
+		TransferIcon,
+		UploadIcon,
+		Avatar,
+		Badge,
+		Breadcrumbs,
+		CopyCode,
+		Multiselect,
+		BoxIcon,
+		RightArrowIcon,
+		ConfirmModal,
+		ButtonStyled,
+		AdPlaceholder,
 	},
-})
+	props: {
+		project: {
+			type: Object,
+			default() {
+				return {}
+			},
+		},
+		versions: {
+			type: Array,
+			default() {
+				return []
+			},
+		},
+		featuredVersions: {
+			type: Array,
+			default() {
+				return []
+			},
+		},
+		members: {
+			type: Array,
+			default() {
+				return [{}]
+			},
+		},
+		currentMember: {
+			type: Object,
+			default() {
+				return null
+			},
+		},
+		dependencies: {
+			type: Object,
+			default() {
+				return {}
+			},
+		},
+		resetProject: {
+			type: Function,
+			required: true,
+			default: () => {},
+		},
+	},
+	async setup(props) {
+		const data = useNuxtApp()
+		const route = useNativeRoute()
 
-const emit = defineEmits([
-	'update:dependencies',
-	'update:versions',
-	'update:featuredVersions',
-	'onDownload',
-])
+		const auth = await useAuth()
+		const tags = useTags()
+		const flags = useFeatureFlags()
 
-const nuxtApp = useNuxtApp()
-const router = useRouter()
-const route = typeof useNativeRoute === 'function' ? useNativeRoute() : useRoute()
+		const path = route.name.split('-')
+		const mode = path[path.length - 1]
 
-const auth = await useAuth()
-const tags = useTags()
-const flags = useFeatureFlags()
+		const fileTypes = [
+			{
+				display: 'Required resource pack',
+				value: 'required-resource-pack',
+			},
+			{
+				display: 'Optional resource pack',
+				value: 'optional-resource-pack',
+			},
+		]
+		let oldFileTypes = []
 
-const path = String(route.name || '').split('-')
-const mode = path[path.length - 1]
+		let isCreating = false
+		let isEditing = false
 
-const fileTypesConst = [
-	{ display: 'Required resource pack', value: 'required-resource-pack' },
-	{ display: 'Optional resource pack', value: 'optional-resource-pack' },
-]
+		let version = {}
+		let primaryFile = {}
+		let alternateFile = {}
 
-const fileTypes = ref(fileTypesConst)
-const oldFileTypes = ref([])
+		let replaceFile = null
 
-const isCreating = ref(false)
-const isEditing = ref(false)
-
-const version = ref({})
-const primaryFile = ref({})
-const alternateFile = ref({})
-const replaceFile = ref(null)
-const uploadedImageIds = ref([])
-
-const dependencyAddMode = ref('project')
-const newDependencyType = ref('required')
-const newDependencyId = ref('')
-
-const showSnapshots = ref(false)
-
-const newFiles = ref([])
-const deleteFiles = ref([])
-const newFileTypes = ref([])
-
-const packageLoaders = ref(['forge', 'fabric', 'quilt', 'neoforge'])
-
-const showKnownErrors = ref(false)
-const shouldPreventActions = ref(false)
-
-const { addNotification } = injectNotificationManager()
-
-{
-	if (mode === 'edit') {
-		isEditing.value = true
-	}
-
-	if (route.params.version === 'create') {
-		isCreating.value = true
-		isEditing.value = true
-
-		version.value = {
-			id: 'none',
-			project_id: props.project.id,
-			author_id: props.currentMember?.user?.id,
-			name: '',
-			version_number: '',
-			changelog: '',
-			date_published: Date.now(),
-			downloads: 0,
-			version_type: 'release',
-			files: [],
-			dependencies: [],
-			game_versions: [],
-			loaders: [],
-			featured: false,
+		if (mode === 'edit') {
+			isEditing = true
 		}
 
-		if (import.meta.client && history.state && history.state.newPrimaryFile) {
-			replaceFile.value = history.state.newPrimaryFile
-			try {
-				const inferredData = await inferVersionInfo(
-					replaceFile.value,
-					props.project,
-					tags.value.gameVersions,
-				)
-				version.value = { ...version.value, ...inferredData }
-			} catch (err) {
-				console.error('Error parsing version file data', err)
+		if (route.params.version === 'create') {
+			isCreating = true
+			isEditing = true
+
+			version = {
+				id: 'none',
+				project_id: props.project.id,
+				author_id: props.currentMember.user.id,
+				name: '',
+				version_number: '',
+				changelog: '',
+				date_published: Date.now(),
+				downloads: 0,
+				version_type: 'release',
+				files: [],
+				dependencies: [],
+				game_versions: [],
+				loaders: [],
+				featured: false,
+			}
+			// For navigation from versions page / upload file prompt
+			if (import.meta.client && history.state && history.state.newPrimaryFile) {
+				replaceFile = history.state.newPrimaryFile
+
+				try {
+					const inferredData = await inferVersionInfo(
+						replaceFile,
+						props.project,
+						tags.value.gameVersions,
+					)
+
+					version = {
+						...version,
+						...inferredData,
+					}
+				} catch (err) {
+					console.error('Error parsing version file data', err)
+				}
+			}
+		} else if (route.params.version === 'latest') {
+			let versionList = props.versions
+			if (route.query.loader) {
+				versionList = versionList.filter((x) => x.loaders.includes(route.query.loader))
+			}
+			if (route.query.version) {
+				versionList = versionList.filter((x) => x.game_versions.includes(route.query.version))
+			}
+			if (versionList.length === 0) {
+				throw createError({
+					fatal: true,
+					statusCode: 404,
+					message: 'No version matches the filters',
+				})
+			}
+			version = versionList.reduce((a, b) => (a.date_published > b.date_published ? a : b))
+		} else {
+			version = props.versions.find((x) => x.id === route.params.version)
+
+			if (!version) {
+				version = props.versions.find((x) => x.displayUrlEnding === route.params.version)
 			}
 		}
-	} else if (route.params.version === 'latest') {
-		let versionList = props.versions
-		if (route.query.loader) {
-			versionList = versionList.filter((x) => x.loaders.includes(route.query.loader))
-		}
-		if (route.query.version) {
-			versionList = versionList.filter((x) => x.game_versions.includes(route.query.version))
-		}
-		if (versionList.length === 0) {
+
+		if (!version) {
 			throw createError({
 				fatal: true,
 				statusCode: 404,
-				message: 'No version matches the filters',
+				message: 'Version not found',
 			})
 		}
-		version.value = versionList.reduce((a, b) => (a.date_published > b.date_published ? a : b))
-	} else {
-		version.value = props.versions.find((x) => x.id === route.params.version)
-		if (!version.value) {
-			version.value = props.versions.find((x) => x.displayUrlEnding === route.params.version)
+
+		version = JSON.parse(JSON.stringify(version))
+		primaryFile = version.files.find((file) => file.primary) ?? version.files[0]
+		alternateFile = version.files.find(
+			(file) => file.file_type && file.file_type.includes('resource-pack'),
+		)
+
+		for (const dependency of version.dependencies) {
+			dependency.version = props.dependencies.versions.find((x) => x.id === dependency.version_id)
+
+			if (dependency.version) {
+				dependency.project = props.dependencies.projects.find(
+					(x) => x.id === dependency.version.project_id,
+				)
+			}
+
+			if (!dependency.project) {
+				dependency.project = props.dependencies.projects.find((x) => x.id === dependency.project_id)
+			}
+
+			dependency.link = dependency.project
+				? `/${dependency.project.project_type}/${dependency.project.slug ?? dependency.project.id}${
+						dependency.version ? `/version/${encodeURI(dependency.version.version_number)}` : ''
+					}`
+				: ''
 		}
-	}
 
-	if (!version.value) {
-		throw createError({ fatal: true, statusCode: 404, message: 'Version not found' })
-	}
+		oldFileTypes = version.files.map((x) => fileTypes.find((y) => y.value === x.file_type))
 
-	version.value = JSON.parse(JSON.stringify(version.value))
-	primaryFile.value = version.value.files.find((file) => file.primary) ?? version.value.files[0]
-	alternateFile.value = version.value.files.find(
-		(file) => file.file_type && file.file_type.includes('resource-pack'),
-	)
+		const title = computed(
+			() => `${isCreating ? 'Create Version' : version.name} - ${props.project.title}`,
+		)
+		const description = computed(
+			() =>
+				`Download ${props.project.title} ${
+					version.version_number
+				} on Modrinth. Supports ${data.$formatVersion(version.game_versions)} ${version.loaders
+					.map((x) => x.charAt(0).toUpperCase() + x.slice(1))
+					.join(' & ')}. Published on ${data
+					.$dayjs(version.date_published)
+					.format('MMM D, YYYY')}. ${version.downloads} downloads.`,
+		)
 
-	for (const dependency of version.value.dependencies) {
-		dependency.version = props.dependencies.versions.find((x) => x.id === dependency.version_id)
-		if (dependency.version) {
-			dependency.project = props.dependencies.projects.find(
-				(x) => x.id === dependency.version.project_id,
-			)
+		useSeoMeta({
+			title,
+			description,
+			ogTitle: title,
+			ogDescription: description,
+		})
+
+		return {
+			auth,
+			tags,
+			flags,
+			fileTypes: ref(fileTypes),
+			oldFileTypes: ref(oldFileTypes),
+			isCreating: ref(isCreating),
+			isEditing: ref(isEditing),
+			version: ref(version),
+			primaryFile: ref(primaryFile),
+			alternateFile: ref(alternateFile),
+			replaceFile: ref(replaceFile),
+			uploadedImageIds: ref([]),
 		}
-		if (!dependency.project) {
-			dependency.project = props.dependencies.projects.find((x) => x.id === dependency.project_id)
-		}
-		dependency.link = dependency.project
-			? `/${dependency.project.project_type}/${dependency.project.slug ?? dependency.project.id}${
-					dependency.version ? `/version/${encodeURI(dependency.version.version_number)}` : ''
-				}`
-			: ''
-	}
-
-	oldFileTypes.value = version.value.files.map((x) =>
-		fileTypesConst.find((y) => y.value === x.file_type),
-	)
-}
-
-const title = computed(
-	() => `${isCreating.value ? 'Create Version' : version.value.name} - ${props.project.title}`,
-)
-const description = computed(
-	() =>
-		`Download ${props.project.title} ${version.value.version_number} on Modrinth. Supports ${nuxtApp.$formatVersion(
-			version.value.game_versions,
-		)} ${version.value.loaders
-			.map((x) => x.charAt(0).toUpperCase() + x.slice(1))
-			.join(
-				' & ',
-			)}. Published on ${nuxtApp.$dayjs(version.value.date_published).format('MMM D, YYYY')}. ${
-			version.value.downloads
-		} downloads.`,
-)
-
-useSeoMeta({
-	title,
-	description,
-	ogTitle: title,
-	ogDescription: description,
-})
-
-const fieldErrors = computed(
-	() =>
-		version.value.version_number === '' ||
-		version.value.game_versions.length === 0 ||
-		(version.value.loaders.length === 0 && props.project.project_type !== 'resourcepack') ||
-		(newFiles.value.length === 0 && version.value.files.length === 0 && !replaceFile.value),
-)
-
-const deps = computed(() => {
-	const order = ['required', 'optional', 'incompatible', 'embedded']
-	return [...version.value.dependencies].sort(
-		(a, b) => order.indexOf(a.dependency_type) - order.indexOf(b.dependency_type),
-	)
-})
-
-watch(
-	() => route.path,
-	() => {
-		const p = String(route.name || '').split('-')
-		const m = p[p.length - 1]
-		isEditing.value = m === 'edit' || route.params.version === 'create'
 	},
-)
+	data() {
+		return {
+			dependencyAddMode: 'project',
+			newDependencyType: 'required',
+			newDependencyId: '',
 
-const onImageUpload = async (file) => {
-	const response = await useImageUpload(file, { context: 'version' })
-	uploadedImageIds.value.push(response.id)
-	uploadedImageIds.value = uploadedImageIds.value.slice(-10)
-	return response.url
-}
+			showSnapshots: false,
 
-const getPreviousLink = () => {
-	const back = router.options?.history?.state?.back
-	if (back && back.includes('/versions')) return back
-	return `/${props.project.project_type}/${props.project.slug ? props.project.slug : props.project.id}/versions`
-}
+			newFiles: [],
+			deleteFiles: [],
+			replaceFile: null,
 
-const getPreviousLabel = () => {
-	const back = router.options?.history?.state?.back
-	return back && back.endsWith('/versions') ? 'Back to versions' : 'All versions'
-}
+			newFileTypes: [],
 
-const addDependency = async (modeArg, idArg, typeArg, hideErrors) => {
-	try {
-		if (modeArg === 'project') {
-			const project = await useBaseFetch(`project/${idArg}`)
-			if (version.value.dependencies.some((dep) => project.id === dep.project_id)) {
-				addNotification({
-					title: 'Dependency already added',
-					text: 'You cannot add the same dependency twice.',
-					type: 'error',
-				})
-			} else {
-				version.value.dependencies.push({
-					project,
-					project_id: project.id,
-					dependency_type: typeArg,
-					link: `/${project.project_type}/${project.slug ?? project.id}`,
-				})
-				emit('update:dependencies', {
-					projects: props.dependencies.projects.concat([project]),
-					versions: props.dependencies.versions,
-				})
-			}
-		} else if (modeArg === 'version') {
-			const v = await useBaseFetch(`version/${idArg}`)
-			const project = await useBaseFetch(`project/${v.project_id}`)
+			packageLoaders: ['forge', 'fabric', 'quilt', 'neoforge'],
 
-			if (version.value.dependencies.some((dep) => v.id === dep.version_id)) {
-				addNotification({
-					title: 'Dependency already added',
-					text: 'You cannot add the same dependency twice.',
-					type: 'error',
-				})
-			} else {
-				version.value.dependencies.push({
-					version: v,
-					project,
-					version_id: v.id,
-					project_id: project.id,
-					dependency_type: typeArg,
-					link: `/${project.project_type}/${project.slug ?? project.id}/version/${encodeURI(v.version_number)}`,
-				})
-				emit('update:dependencies', {
-					projects: props.dependencies.projects.concat([project]),
-					versions: props.dependencies.versions.concat([v]),
-				})
-			}
+			showKnownErrors: false,
+			shouldPreventActions: false,
 		}
-		newDependencyId.value = ''
-	} catch {
-		if (!hideErrors) {
-			addNotification({
-				title: 'Invalid Dependency',
-				text: 'The specified dependency could not be found',
-				type: 'error',
-			})
-		}
-	}
-}
-
-const loadingIndicator = typeof useLoadingIndicator === 'function' ? useLoadingIndicator() : null
-const startLoading = () => {
-	try {
-		loadingIndicator?.start?.()
-	} catch {
-		// Ignored
-	}
-}
-const stopLoading = () => {
-	try {
-		loadingIndicator?.finish?.()
-	} catch {
-		// Ignored
-	}
-}
-
-const saveEditedVersion = async () => {
-	startLoading()
-	if (fieldErrors.value) {
-		showKnownErrors.value = true
-		stopLoading()
-		return
-	}
-
-	try {
-		if (newFiles.value.length > 0) {
-			const formData = new FormData()
-			const fileParts = newFiles.value.map((f, idx) => `${f.name}-${idx}`)
-
-			formData.append(
-				'data',
-				JSON.stringify({
-					file_types: newFileTypes.value.reduce(
-						(acc, x, i) => ({
-							...acc,
-							[fileParts[i]]: x ? x.value : null,
-						}),
-						{},
-					),
-				}),
+	},
+	created() {
+		const { addNotification } = injectNotificationManager()
+		this.addNotification = addNotification
+	},
+	computed: {
+		fieldErrors() {
+			return (
+				this.version.version_number === '' ||
+				this.version.game_versions.length === 0 ||
+				(this.version.loaders.length === 0 && this.project.project_type !== 'resourcepack') ||
+				(this.newFiles.length === 0 && this.version.files.length === 0 && !this.replaceFile)
 			)
+		},
+		deps() {
+			const order = ['required', 'optional', 'incompatible', 'embedded']
+			return [...this.version.dependencies].sort(
+				(a, b) => order.indexOf(a.dependency_type) - order.indexOf(b.dependency_type),
+			)
+		},
+	},
+	watch: {
+		'$route.path'() {
+			const path = this.$route.name.split('-')
+			const mode = path[path.length - 1]
 
-			for (let i = 0; i < newFiles.value.length; i++) {
-				formData.append(fileParts[i], new Blob([newFiles.value[i]]), newFiles.value[i].name)
+			this.isEditing = mode === 'edit' || this.$route.params.version === 'create'
+		},
+	},
+	methods: {
+		formatBytes,
+		formatCategory,
+		async onImageUpload(file) {
+			const response = await useImageUpload(file, { context: 'version' })
+
+			this.uploadedImageIds.push(response.id)
+			this.uploadedImageIds = this.uploadedImageIds.slice(-10)
+
+			return response.url
+		},
+		getPreviousLink() {
+			if (this.$router.options.history.state.back) {
+				if (this.$router.options.history.state.back.includes('/versions')) {
+					return this.$router.options.history.state.back
+				}
+			}
+			return `/${this.project.project_type}/${
+				this.project.slug ? this.project.slug : this.project.id
+			}/versions`
+		},
+		getPreviousLabel() {
+			return this.$router.options.history.state.back &&
+				this.$router.options.history.state.back.endsWith('/versions')
+				? 'Back to versions'
+				: 'All versions'
+		},
+		acceptFileFromProjectType,
+		renderHighlightedString,
+		async addDependency(dependencyAddMode, newDependencyId, newDependencyType, hideErrors) {
+			try {
+				if (dependencyAddMode === 'project') {
+					const project = await useBaseFetch(`project/${newDependencyId}`)
+
+					if (this.version.dependencies.some((dep) => project.id === dep.project_id)) {
+						this.addNotification({
+							title: 'Dependency already added',
+							text: 'You cannot add the same dependency twice.',
+							type: 'error',
+						})
+					} else {
+						this.version.dependencies.push({
+							project,
+							project_id: project.id,
+							dependency_type: newDependencyType,
+							link: `/${project.project_type}/${project.slug ?? project.id}`,
+						})
+
+						this.$emit('update:dependencies', {
+							projects: this.dependencies.projects.concat([project]),
+							versions: this.dependencies.versions,
+						})
+					}
+				} else if (dependencyAddMode === 'version') {
+					const version = await useBaseFetch(`version/${this.newDependencyId}`)
+
+					const project = await useBaseFetch(`project/${version.project_id}`)
+
+					if (this.version.dependencies.some((dep) => version.id === dep.version_id)) {
+						this.addNotification({
+							title: 'Dependency already added',
+							text: 'You cannot add the same dependency twice.',
+							type: 'error',
+						})
+					} else {
+						this.version.dependencies.push({
+							version,
+							project,
+							version_id: version.id,
+							project_id: project.id,
+							dependency_type: this.newDependencyType,
+							link: `/${project.project_type}/${project.slug ?? project.id}/version/${encodeURI(
+								version.version_number,
+							)}`,
+						})
+
+						this.$emit('update:dependencies', {
+							projects: this.dependencies.projects.concat([project]),
+							versions: this.dependencies.versions.concat([version]),
+						})
+					}
+				}
+
+				this.newDependencyId = ''
+			} catch {
+				if (!hideErrors) {
+					this.addNotification({
+						title: 'Invalid Dependency',
+						text: 'The specified dependency could not be found',
+						type: 'error',
+					})
+				}
+			}
+		},
+		async saveEditedVersion() {
+			startLoading()
+
+			if (this.fieldErrors) {
+				this.showKnownErrors = true
+
+				stopLoading()
+				return
 			}
 
-			await useBaseFetch(`version/${version.value.id}/file`, {
+			try {
+				if (this.newFiles.length > 0) {
+					const formData = new FormData()
+					const fileParts = this.newFiles.map((f, idx) => `${f.name}-${idx}`)
+
+					formData.append(
+						'data',
+						JSON.stringify({
+							file_types: this.newFileTypes.reduce(
+								(acc, x, i) => ({
+									...acc,
+									[fileParts[i]]: x ? x.value : null,
+								}),
+								{},
+							),
+						}),
+					)
+
+					for (let i = 0; i < this.newFiles.length; i++) {
+						formData.append(fileParts[i], new Blob([this.newFiles[i]]), this.newFiles[i].name)
+					}
+
+					await useBaseFetch(`version/${this.version.id}/file`, {
+						method: 'POST',
+						body: formData,
+						headers: {
+							'Content-Disposition': formData,
+						},
+					})
+				}
+
+				const body = {
+					name: this.version.name || this.version.version_number,
+					version_number: this.version.version_number,
+					changelog: this.version.changelog,
+					version_type: this.version.version_type,
+					dependencies: this.version.dependencies,
+					game_versions: this.version.game_versions,
+					loaders: this.version.loaders,
+					primary_file: ['sha1', this.primaryFile.hashes.sha1],
+					featured: this.version.featured,
+					file_types: this.oldFileTypes.map((x, i) => {
+						return {
+							algorithm: 'sha1',
+							hash: this.version.files[i].hashes.sha1,
+							file_type: x ? x.value : null,
+						}
+					}),
+				}
+
+				if (this.project.project_type === 'modpack') {
+					delete body.dependencies
+				}
+
+				await useBaseFetch(`version/${this.version.id}`, {
+					method: 'PATCH',
+					body,
+				})
+
+				for (const hash of this.deleteFiles) {
+					await useBaseFetch(`version_file/${hash}?version_id=${this.version.id}`, {
+						method: 'DELETE',
+					})
+				}
+
+				await this.resetProjectVersions()
+
+				await this.$router.replace(
+					`/${this.project.project_type}/${
+						this.project.slug ? this.project.slug : this.project.id
+					}/version/${encodeURI(
+						this.versions.find((x) => x.id === this.version.id).displayUrlEnding,
+					)}`,
+				)
+			} catch (err) {
+				this.addNotification({
+					title: 'An error occurred',
+					text: err.data ? err.data.description : err,
+					type: 'error',
+				})
+				window.scrollTo({ top: 0, behavior: 'smooth' })
+			}
+			stopLoading()
+		},
+		reportVersion,
+		async createVersion() {
+			this.shouldPreventActions = true
+			startLoading()
+			if (this.fieldErrors) {
+				this.showKnownErrors = true
+				this.shouldPreventActions = false
+
+				stopLoading()
+				return
+			}
+
+			try {
+				await this.createVersionRaw(this.version)
+			} catch (err) {
+				this.addNotification({
+					title: 'An error occurred',
+					text: err.data ? err.data.description : err,
+					type: 'error',
+				})
+				window.scrollTo({ top: 0, behavior: 'smooth' })
+			}
+
+			stopLoading()
+			this.shouldPreventActions = false
+		},
+		async createVersionRaw(version) {
+			const formData = new FormData()
+
+			const fileParts = this.newFiles.map((f, idx) => `${f.name}-${idx}`)
+			if (this.replaceFile) {
+				fileParts.unshift(this.replaceFile.name.concat('-primary'))
+			}
+
+			if (this.project.project_type === 'resourcepack') {
+				version.loaders = ['minecraft']
+			}
+
+			const newVersion = {
+				project_id: version.project_id,
+				file_parts: fileParts,
+				version_number: version.version_number,
+				version_title: version.name || version.version_number,
+				version_body: version.changelog,
+				dependencies: version.dependencies,
+				game_versions: version.game_versions,
+				loaders: version.loaders,
+				release_channel: version.version_type,
+				featured: version.featured,
+				file_types: this.newFileTypes.reduce(
+					(acc, x, i) => ({
+						...acc,
+						[fileParts[this.replaceFile ? i + 1 : i]]: x ? x.value : null,
+					}),
+					{},
+				),
+			}
+
+			formData.append('data', JSON.stringify(newVersion))
+
+			if (this.replaceFile) {
+				formData.append(
+					this.replaceFile.name.concat('-primary'),
+					new Blob([this.replaceFile]),
+					this.replaceFile.name,
+				)
+			}
+
+			for (let i = 0; i < this.newFiles.length; i++) {
+				formData.append(
+					fileParts[this.replaceFile ? i + 1 : i],
+					new Blob([this.newFiles[i]]),
+					this.newFiles[i].name,
+				)
+			}
+
+			const data = await useBaseFetch('version', {
 				method: 'POST',
 				body: formData,
-				headers: { 'Content-Disposition': formData },
+				headers: {
+					'Content-Disposition': formData,
+				},
 			})
-		}
 
-		const body = {
-			name: version.value.name || version.value.version_number,
-			version_number: version.value.version_number,
-			changelog: version.value.changelog,
-			version_type: version.value.version_type,
-			dependencies: version.value.dependencies,
-			game_versions: version.value.game_versions,
-			loaders: version.value.loaders,
-			primary_file: ['sha1', primaryFile.value.hashes.sha1],
-			featured: version.value.featured,
-			file_types: oldFileTypes.value.map((x, i) => ({
-				algorithm: 'sha1',
-				hash: version.value.files[i].hashes.sha1,
-				file_type: x ? x.value : null,
-			})),
-		}
+			await this.resetProjectVersions()
 
-		if (props.project.project_type === 'modpack') {
-			delete body.dependencies
-		}
+			await this.$router.push(
+				`/${this.project.project_type}/${
+					this.project.slug ? this.project.slug : this.project.project_id
+				}/version/${data.id}`,
+			)
+		},
+		async deleteVersion() {
+			startLoading()
 
-		await useBaseFetch(`version/${version.value.id}`, { method: 'PATCH', body })
-
-		for (const hash of deleteFiles.value) {
-			await useBaseFetch(`version_file/${hash}?version_id=${version.value.id}`, {
+			await useBaseFetch(`version/${this.version.id}`, {
 				method: 'DELETE',
 			})
-		}
 
-		const created = await resetProjectVersions()
+			await this.resetProjectVersions()
+			await this.$router.replace(`/${this.project.project_type}/${this.project.id}/versions`)
+			stopLoading()
+		},
+		async createDataPackVersion() {
+			this.shouldPreventActions = true
+			startLoading()
+			try {
+				const blob = await createDataPackVersion(
+					this.project,
+					this.version,
+					this.primaryFile,
+					this.members,
+					this.tags.gameVersions,
+					this.packageLoaders,
+				)
 
-		await router.replace(
-			`/${props.project.project_type}/${
-				props.project.slug ? props.project.slug : props.project.id
-			}/version/${encodeURI(created.find((x) => x.id === version.value.id).displayUrlEnding)}`,
-		)
-	} catch (err) {
-		addNotification({
-			title: 'An error occurred',
-			text: err?.data ? err.data.description : err,
-			type: 'error',
-		})
-		window.scrollTo({ top: 0, behavior: 'smooth' })
-	}
-	stopLoading()
-}
+				this.newFiles = []
+				this.newFileTypes = []
+				this.replaceFile = new File(
+					[blob],
+					`${this.project.slug}-${this.version.version_number}.jar`,
+				)
 
-const createVersion = async () => {
-	shouldPreventActions.value = true
-	startLoading()
+				await this.createVersionRaw({
+					project_id: this.project.id,
+					author_id: this.currentMember.user.id,
+					name: this.version.name,
+					version_number: `${this.version.version_number}+mod`,
+					changelog: this.version.changelog,
+					version_type: this.version.version_type,
+					dependencies: this.version.dependencies,
+					game_versions: this.version.game_versions,
+					loaders: this.packageLoaders,
+					featured: this.version.featured,
+				})
 
-	if (fieldErrors.value) {
-		showKnownErrors.value = true
-		shouldPreventActions.value = false
-		stopLoading()
-		return
-	}
+				this.$refs.modal_package_mod.hide()
 
-	try {
-		await createVersionRaw(version.value)
-	} catch (err) {
-		addNotification({
-			title: 'An error occurred',
-			text: err?.data ? err.data.description : err,
-			type: 'error',
-		})
-		window.scrollTo({ top: 0, behavior: 'smooth' })
-	}
+				this.addNotification({
+					title: 'Packaging Success',
+					text: 'Your data pack was successfully packaged as a mod! Make sure to playtest to check for errors.',
+					type: 'success',
+				})
+			} catch (err) {
+				this.addNotification({
+					title: 'An error occurred',
+					text: err.data ? err.data.description : err,
+					type: 'error',
+				})
+			}
+			stopLoading()
+			this.shouldPreventActions = false
+		},
+		async resetProjectVersions() {
+			const [versions, featuredVersions, dependencies] = await Promise.all([
+				useBaseFetch(`project/${this.version.project_id}/version`),
+				useBaseFetch(`project/${this.version.project_id}/version?featured=true`),
+				useBaseFetch(`project/${this.version.project_id}/dependencies`),
+				this.resetProject(),
+			])
 
-	stopLoading()
-	shouldPreventActions.value = false
-}
+			const newCreatedVersions = this.$computeVersions(versions, this.members)
+			const featuredIds = featuredVersions.map((x) => x.id)
+			this.$emit('update:versions', newCreatedVersions)
+			this.$emit(
+				'update:featuredVersions',
+				newCreatedVersions.filter((version) => featuredIds.includes(version.id)),
+			)
+			this.$emit('update:dependencies', dependencies)
 
-const createVersionRaw = async (ver) => {
-	const formData = new FormData()
-	const fileParts = newFiles.value.map((f, idx) => `${f.name}-${idx}`)
-	if (replaceFile.value) {
-		fileParts.unshift(replaceFile.value.name.concat('-primary'))
-	}
-
-	if (props.project.project_type === 'resourcepack') {
-		ver.loaders = ['minecraft']
-	}
-
-	const newVersion = {
-		project_id: ver.project_id,
-		file_parts: fileParts,
-		version_number: ver.version_number,
-		version_title: ver.name || ver.version_number,
-		version_body: ver.changelog,
-		dependencies: ver.dependencies,
-		game_versions: ver.game_versions,
-		loaders: ver.loaders,
-		release_channel: ver.version_type,
-		featured: ver.featured,
-		file_types: newFileTypes.value.reduce(
-			(acc, x, i) => ({
-				...acc,
-				[fileParts[replaceFile.value ? i + 1 : i]]: x ? x.value : null,
-			}),
-			{},
-		),
-	}
-
-	formData.append('data', JSON.stringify(newVersion))
-
-	if (replaceFile.value) {
-		formData.append(
-			replaceFile.value.name.concat('-primary'),
-			new Blob([replaceFile.value]),
-			replaceFile.value.name,
-		)
-	}
-
-	for (let i = 0; i < newFiles.value.length; i++) {
-		formData.append(
-			fileParts[replaceFile.value ? i + 1 : i],
-			new Blob([newFiles.value[i]]),
-			newFiles.value[i].name,
-		)
-	}
-
-	const data = await useBaseFetch('version', {
-		method: 'POST',
-		body: formData,
-		headers: { 'Content-Disposition': formData },
-	})
-
-	await resetProjectVersions()
-
-	await router.push(
-		`/${props.project.project_type}/${
-			props.project.slug ? props.project.slug : props.project.id
-		}/version/${data.id}`,
-	)
-}
-
-const deleteVersion = async () => {
-	startLoading()
-	await useBaseFetch(`version/${version.value.id}`, { method: 'DELETE' })
-	await resetProjectVersions()
-	await router.replace(`/${props.project.project_type}/${props.project.id}/versions`)
-	stopLoading()
-}
-
-const modalPackageMod = ref(null)
-
-const createDataPackVersionHandler = async () => {
-	shouldPreventActions.value = true
-	startLoading()
-	try {
-		const blob = await createDataPackVersion(
-			props.project,
-			version.value,
-			primaryFile.value,
-			props.members,
-			tags.value.gameVersions,
-			packageLoaders.value,
-		)
-
-		newFiles.value = []
-		newFileTypes.value = []
-		replaceFile.value = new File(
-			[blob],
-			`${props.project.slug}-${version.value.version_number}.jar`,
-		)
-
-		await createVersionRaw({
-			project_id: props.project.id,
-			author_id: props.currentMember.user.id,
-			name: version.value.name,
-			version_number: `${version.value.version_number}+mod`,
-			changelog: version.value.changelog,
-			version_type: version.value.version_type,
-			dependencies: version.value.dependencies,
-			game_versions: version.value.game_versions,
-			loaders: packageLoaders.value,
-			featured: version.value.featured,
-		})
-
-		modalPackageMod.value?.hide()
-
-		addNotification({
-			title: 'Packaging Success',
-			text: 'Your data pack was successfully packaged as a mod! Make sure to playtest to check for errors.',
-			type: 'success',
-		})
-	} catch (err) {
-		addNotification({
-			title: 'An error occurred',
-			text: err?.data ? err.data.description : err,
-			type: 'error',
-		})
-	}
-	stopLoading()
-	shouldPreventActions.value = false
-}
-
-const resetProjectVersions = async () => {
-	const [versionsRes, featuredVersionsRes, dependenciesRes] = await Promise.all([
-		useBaseFetch(`project/${version.value.project_id}/version`),
-		useBaseFetch(`project/${version.value.project_id}/version?featured=true`),
-		useBaseFetch(`project/${version.value.project_id}/dependencies`),
-		props.resetProject(),
-	])
-
-	const newCreatedVersions = nuxtApp.$computeVersions(versionsRes, props.members)
-	const featuredIds = featuredVersionsRes.map((x) => x.id)
-
-	emit('update:versions', newCreatedVersions)
-	emit(
-		'update:featuredVersions',
-		newCreatedVersions.filter((v) => featuredIds.includes(v.id)),
-	)
-	emit('update:dependencies', dependenciesRes)
-
-	return newCreatedVersions
-}
+			return newCreatedVersions
+		},
+	},
+})
 </script>
 
 <style lang="scss" scoped>
@@ -1423,6 +1527,7 @@ const resetProjectVersions = async () => {
 				margin-top: 0.5rem;
 			}
 
+			// TODO: Make file type editing  work on mobile
 			@media (min-width: 600px) {
 				.raised-multiselect {
 					display: block;

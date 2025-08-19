@@ -203,6 +203,7 @@ import {
 	ButtonStyled,
 	injectNotificationManager,
 	NewModal,
+	TeleportDropdownMenu,
 	Toggle,
 } from '@modrinth/ui'
 import { type Loaders, ModrinthServersFetchError } from '@modrinth/utils'

@@ -118,8 +118,7 @@
 			<p>
 				Tremendous payments are sent to your Modrinth email. To change/set your Modrinth email,
 				visit
-				<nuxt-link class="text-link" to="/settings/account">here</nuxt-link>
-				.
+				<nuxt-link class="text-link" to="/settings/account">here</nuxt-link>.
 			</p>
 			<h3>Venmo</h3>
 			<p>Enter your Venmo username below to enable withdrawing to your Venmo balance.</p>
@@ -156,7 +155,7 @@ import dayjs from 'dayjs'
 import { computed } from 'vue'
 import CreatorTaxComplianceAlert from '~/components/ui/CreatorTaxComplianceAlert.vue'
 
-import { removeAuthProvider } from '~/composables/auth.js'
+import { getAuthUrl, removeAuthProvider } from '~/composables/auth.js'
 
 const { addNotification, handleError } = injectNotificationManager()
 const auth = await useAuth()

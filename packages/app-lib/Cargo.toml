@@ -30,11 +30,11 @@ quick-xml = { workspace = true, features = ["async-tokio"] }
 enumset.workspace = true
 chardetng.workspace = true
 encoding_rs.workspace = true
-hashlink.workspace = true
 png.workspace = true
 bytemuck.workspace = true
 rgb.workspace = true
 phf.workspace = true
+itertools.workspace = true
 
 chrono = { workspace = true, features = ["serde"] }
 daedalus.workspace = true
