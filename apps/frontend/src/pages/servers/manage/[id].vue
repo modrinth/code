@@ -115,58 +115,63 @@
 				: `linear-gradient(180deg, rgba(153,153,153,1) 0%, rgba(87,87,87,1) 100%)`,
 		}"
 	>
-		<div class="flex w-full min-w-0 select-none flex-col items-center gap-6 pt-4 sm:flex-row">
-			<ServerIcon :image="serverData.image" class="drop-shadow-lg sm:drop-shadow-none" />
-			<div
-				class="flex min-w-0 flex-1 flex-col-reverse items-center gap-2 sm:flex-col sm:items-start"
-			>
-				<div class="hidden shrink-0 flex-row items-center gap-1 sm:flex">
-					<NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
-						<LeftArrowIcon />
-						All servers
-					</NuxtLink>
-				</div>
-				<div class="flex w-full flex-col items-center gap-4 sm:flex-row">
-					<h1
-						class="m-0 w-screen flex-shrink gap-3 truncate px-3 text-center text-4xl font-bold text-contrast sm:w-full sm:p-0 sm:text-left"
-					>
-						{{ serverData.name }}
-					</h1>
-					<div
-						v-if="isConnected"
-						data-pyro-server-action-buttons
-						class="server-action-buttons-anim flex w-fit flex-shrink-0"
-					>
-						<PanelServerActionButton
-							v-if="!serverData.flows?.intro"
-							class="flex-shrink-0"
-							:is-online="isServerRunning"
-							:is-actioning="isActioning"
-							:is-installing="serverData.status === 'installing'"
-							:disabled="isActioning || !!error"
-							:server-name="serverData.name"
-							:server-data="serverData"
-							:uptime-seconds="uptimeSeconds"
-							@action="sendPowerAction"
-						/>
-					</div>
-				</div>
-
-				<div
-					v-if="serverData.flows?.intro"
-					class="flex items-center gap-2 font-semibold text-secondary"
-				>
-					<SettingsIcon /> Configuring server...
-				</div>
-				<ServerInfoLabels
-					v-else
-					:server-data="serverData"
-					:show-game-label="showGameLabel"
-					:show-loader-label="showLoaderLabel"
-					:uptime-seconds="uptimeSeconds"
-					:linked="true"
-					class="server-action-buttons-anim flex min-w-0 flex-col flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
+		<div>
+			<NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
+				<LeftArrowIcon />
+				All servers
+			</NuxtLink>
+			<div class="flex w-full min-w-0 select-none flex-col items-center gap-4 pt-4 sm:flex-row">
+				<ServerIcon
+					:image="
+						serverData.is_medal ? 'https://cdn-raw.modrinth.com/medal_icon.webp' : serverData.image
+					"
+					class="drop-shadow-lg sm:drop-shadow-none"
 				/>
+				<div
+					class="flex min-w-0 flex-1 flex-col-reverse items-center gap-2 sm:flex-col sm:items-start"
+				>
+					<div class="flex w-full flex-col items-center gap-4 sm:flex-row">
+						<h1
+							class="m-0 w-screen flex-shrink gap-3 truncate px-3 text-center text-2xl font-bold text-contrast sm:w-full sm:p-0 sm:text-left"
+						>
+							{{ serverData.name }}
+						</h1>
+						<div
+							v-if="isConnected"
+							data-pyro-server-action-buttons
+							class="server-action-buttons-anim flex w-fit flex-shrink-0"
+						>
+							<PanelServerActionButton
+								v-if="!serverData.flows?.intro"
+								class="flex-shrink-0"
+								:is-online="isServerRunning"
+								:is-actioning="isActioning"
+								:is-installing="serverData.status === 'installing'"
+								:disabled="isActioning || !!error"
+								:server-name="serverData.name"
+								:server-data="serverData"
+								:uptime-seconds="uptimeSeconds"
+								@action="sendPowerAction"
+							/>
+						</div>
+					</div>
+
+					<div
+						v-if="serverData.flows?.intro"
+						class="flex items-center gap-2 font-semibold text-secondary"
+					>
+						<SettingsIcon /> Configuring server...
+					</div>
+					<ServerInfoLabels
+						v-else
+						:server-data="serverData"
+						:show-game-label="showGameLabel"
+						:show-loader-label="showLoaderLabel"
+						:uptime-seconds="uptimeSeconds"
+						:linked="true"
+						class="server-action-buttons-anim flex min-w-0 flex-col flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
+					/>
+				</div>
 			</div>
 		</div>
 
@@ -290,6 +295,10 @@
 					</div>
 				</div>
 
+				<div v-if="serverData.is_medal" class="mb-4">
+					<MedalServerCountdown :server-id="server.serverId" />
+				</div>
+
 				<div
 					v-if="!isConnected && !isReconnecting && !isLoading"
 					data-pyro-server-ws-error
@@ -385,6 +394,7 @@ import { reloadNuxtApp } from '#app'
 import NavTabs from '~/components/ui/NavTabs.vue'
 import PanelErrorIcon from '~/components/ui/servers/icons/PanelErrorIcon.vue'
 import InstallingTicker from '~/components/ui/servers/InstallingTicker.vue'
+import MedalServerCountdown from '~/components/ui/servers/marketing/MedalServerCountdown.vue'
 import PanelServerActionButton from '~/components/ui/servers/PanelServerActionButton.vue'
 import PanelSpinner from '~/components/ui/servers/PanelSpinner.vue'
 import ServerIcon from '~/components/ui/servers/ServerIcon.vue'

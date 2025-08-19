@@ -20,7 +20,14 @@
 						class="flex flex-col gap-4 text-primary"
 					>
 						<span class="flex items-center gap-2">
-							<Avatar :src="server.general.image" size="48px" />
+							<Avatar
+								:src="
+									server.general.is_medal
+										? 'https://cdn-raw.modrinth.com/medal_icon.webp'
+										: server.general.image
+								"
+								size="48px"
+							/>
 							<span class="flex flex-col gap-2">
 								<span class="bold font-extrabold text-contrast">
 									{{ server.general.name }}

@@ -1,4 +1,5 @@
 <template>
+	<ServersUpgradeModalWrapper ref="upgradeModal" />
 	<section class="universal-card experimental-styles-within">
 		<h2>{{ formatMessage(messages.subscriptionTitle) }}</h2>
 		<p>{{ formatMessage(messages.subscriptionDescription) }}</p>
@@ -51,18 +52,35 @@
 								{{
 									formatPrice(
 										vintl.locale,
-										midasSubscriptionPrice.prices.intervals[midasCharge.subscription_interval],
+										midasSubscriptionPrice.prices.intervals[midasSubscription.interval],
 										midasSubscriptionPrice.currency_code,
 									)
 								}}
 								/
-								{{ midasCharge.subscription_interval }}
+								{{ midasSubscription.interval }}
 							</template>
 							<template v-else>
 								{{ formatPrice(vintl.locale, price.prices.intervals.monthly, price.currency_code) }}
 								/ month
 							</template>
 						</span>
+						<!-- Next charge preview for Midas when interval is changing -->
+						<div
+							v-if="
+								midasCharge &&
+								midasCharge.status === 'open' &&
+								midasSubscription &&
+								midasSubscription.interval &&
+								midasCharge.subscription_interval !== midasSubscription.interval
+							"
+							class="-mt-1 flex items-baseline gap-2 text-sm text-secondary"
+						>
+							<span class="opacity-70">Next:</span>
+							<span class="font-semibold text-contrast">
+								{{ formatPrice(vintl.locale, midasCharge.amount, midasCharge.currency_code) }}
+							</span>
+							<span>/{{ midasCharge.subscription_interval.replace('ly', '') }}</span>
+						</div>
 						<template v-if="midasCharge">
 							<span
 								v-if="
@@ -88,12 +106,24 @@
 							<span v-else-if="midasCharge.status === 'cancelled'" class="text-sm text-secondary">
 								Expires {{ $dayjs(midasCharge.due).format('MMMM D, YYYY') }}
 							</span>
+							<span
+								v-if="
+									midasCharge.status === 'open' &&
+									midasSubscription &&
+									midasSubscription.interval &&
+									midasCharge.subscription_interval !== midasSubscription.interval
+								"
+								class="text-sm text-secondary"
+							>
+								Switches to {{ midasCharge.subscription_interval }} billing on
+								{{ $dayjs(midasCharge.due).format('MMMM D, YYYY') }}
+							</span>
 						</template>
 
 						<span v-else class="text-sm text-secondary">
 							Or
-							{{ formatPrice(vintl.locale, price.prices.intervals.yearly, price.currency_code) }}
-							/ year (save
+							{{ formatPrice(vintl.locale, price.prices.intervals.yearly, price.currency_code) }} /
+							year (save
 							{{
 								calculateSavings(price.prices.intervals.monthly, price.prices.intervals.yearly)
 							}}%)!
@@ -168,8 +198,7 @@
 								@click="switchMidasInterval(oppositeInterval)"
 							>
 								<SpinnerIcon v-if="changingInterval" class="animate-spin" />
-								<TransferIcon v-else />
-								{{ changingInterval ? 'Switching' : 'Switch' }} to
+								<TransferIcon v-else /> {{ changingInterval ? 'Switching' : 'Switch' }} to
 								{{ oppositeInterval }}
 							</button>
 						</ButtonStyled>
@@ -207,7 +236,11 @@
 					<div class="flex flex-col gap-4">
 						<ModrinthServersIcon class="flex h-8 w-fit" />
 						<div class="flex flex-col gap-2">
-							<ServerListing v-if="subscription.serverInfo" v-bind="subscription.serverInfo" />
+							<ServerListing
+								v-if="subscription.serverInfo"
+								v-bind="subscription.serverInfo"
+								:pending-change="getPendingChange(subscription)"
+							/>
 							<div v-else class="w-fit">
 								<p>
 									A linked server couldn't be found for this subscription. There are a few possible
@@ -233,9 +266,8 @@
 									<div class="flex items-center gap-2">
 										<CheckCircleIcon class="h-5 w-5 text-brand" />
 										<span>
-											{{ getPyroProduct(subscription)?.metadata?.cpu / 2 }}
-											Shared CPUs (Bursts up to
-											{{ getPyroProduct(subscription)?.metadata?.cpu }} CPUs)
+											{{ getPyroProduct(subscription)?.metadata?.cpu / 2 }} Shared CPUs (Bursts up
+											to {{ getPyroProduct(subscription)?.metadata?.cpu }} CPUs)
 										</span>
 									</div>
 									<div class="flex items-center gap-2">
@@ -285,16 +317,60 @@
 											</span>
 											<span>/{{ subscription.interval.replace('ly', '') }}</span>
 										</div>
+										<div
+											v-if="
+												getPyroCharge(subscription) &&
+												getPyroCharge(subscription).status === 'open' &&
+												((getPyroCharge(subscription).price_id &&
+													getPyroCharge(subscription).price_id !== subscription.price_id) ||
+													(getPyroCharge(subscription).subscription_interval &&
+														getPyroCharge(subscription).subscription_interval !==
+															subscription.interval))
+											"
+											class="-mt-1 flex items-baseline gap-2 text-sm text-secondary"
+										>
+											<span class="opacity-70">Next:</span>
+											<span class="font-semibold text-contrast">
+												{{
+													formatPrice(
+														vintl.locale,
+														getPyroCharge(subscription).amount,
+														getPyroCharge(subscription).currency_code,
+													)
+												}}
+											</span>
+											<span>
+												/
+												{{
+													(
+														getPyroCharge(subscription).subscription_interval ||
+														subscription.interval
+													).replace('ly', '')
+												}}
+											</span>
+										</div>
 										<div v-if="getPyroCharge(subscription)" class="mb-4 flex flex-col items-end">
 											<span class="text-sm text-secondary">
-												Since
-												{{ $dayjs(subscription.created).format('MMMM D, YYYY') }}
+												Since {{ $dayjs(subscription.created).format('MMMM D, YYYY') }}
 											</span>
 											<span
 												v-if="getPyroCharge(subscription).status === 'open'"
 												class="text-sm text-secondary"
 											>
-												Renews
+												Renews {{ $dayjs(getPyroCharge(subscription).due).format('MMMM D, YYYY') }}
+											</span>
+											<span
+												v-if="
+													getPyroCharge(subscription).status === 'open' &&
+													getPyroCharge(subscription).subscription_interval &&
+													getPyroCharge(subscription).subscription_interval !==
+														subscription.interval
+												"
+												class="text-sm text-secondary"
+											>
+												Switches to
+												{{ getPyroCharge(subscription).subscription_interval }}
+												billing on
 												{{ $dayjs(getPyroCharge(subscription).due).format('MMMM D, YYYY') }}
 											</span>
 											<span
@@ -308,8 +384,7 @@
 												v-else-if="getPyroCharge(subscription).status === 'cancelled'"
 												class="text-sm text-secondary"
 											>
-												Expires
-												{{ $dayjs(getPyroCharge(subscription).due).format('MMMM D, YYYY') }}
+												Expires {{ $dayjs(getPyroCharge(subscription).due).format('MMMM D, YYYY') }}
 											</span>
 											<span
 												v-else-if="getPyroCharge(subscription).status === 'failed'"
@@ -403,37 +478,6 @@
 			:customer="customer"
 			:payment-methods="paymentMethods"
 			:return-url="`${config.public.siteUrl}/settings/billing`"
-		/>
-		<PurchaseModal
-			ref="pyroPurchaseModal"
-			:product="upgradeProducts"
-			:country="country"
-			custom-server
-			:existing-subscription="currentSubscription"
-			:existing-plan="currentProduct"
-			:publishable-key="config.public.stripePublishableKey"
-			:send-billing-request="
-				async (body) =>
-					await useBaseFetch(`billing/subscription/${currentSubscription.id}`, {
-						internal: true,
-						method: `PATCH`,
-						body: body,
-					})
-			"
-			:renewal-date="currentSubRenewalDate"
-			:on-error="
-				(err) =>
-					addNotification({
-						title: 'An error occurred',
-						type: 'error',
-						text: err.message ?? (err.data ? err.data.description : err),
-					})
-			"
-			:fetch-capacity-statuses="fetchCapacityStatuses"
-			:customer="customer"
-			:payment-methods="paymentMethods"
-			:return-url="`${config.public.siteUrl}/servers/manage`"
-			:server-name="`${auth?.user?.username}'s server`"
 		/>
 		<AddPaymentMethodModal
 			ref="addPaymentMethodModal"
@@ -588,6 +632,7 @@ import { computed, ref } from 'vue'
 import { useBaseFetch } from '@/composables/fetch.js'
 import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
 import ServerListing from '~/components/ui/servers/ServerListing.vue'
+import ServersUpgradeModalWrapper from '~/components/ui/servers/ServersUpgradeModalWrapper.vue'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 import { products } from '~/generated/state.json'
 
@@ -903,6 +948,12 @@ const getPyroProduct = (subscription) => {
 	return productsData.value.find((p) => p.prices?.some((x) => x.id === subscription.price_id))
 }
 
+// Get product by a price ID (useful for pending next-charge changes)
+const getProductFromPriceId = (priceId) => {
+	if (!priceId || !productsData.value) return null
+	return productsData.value.find((p) => p.prices?.some((x) => x.id === priceId))
+}
+
 const getPyroCharge = (subscription) => {
 	if (!subscription || !charges.value) return null
 	return charges.value.find(
@@ -931,76 +982,18 @@ const getProductPrice = (product, interval) => {
 	)
 }
 
-const modalCancel = ref(null)
+const getPlanChangeVerb = (currentProduct, nextProduct) => {
+	const curRam = currentProduct?.metadata?.ram ?? 0
+	const nextRam = nextProduct?.metadata?.ram ?? 0
 
-const pyroPurchaseModal = ref()
-const currentSubscription = ref(null)
-const currentProduct = ref(null)
-const upgradeProducts = ref([])
-upgradeProducts.value.metadata = { type: 'pyro' }
-
-const currentSubRenewalDate = ref()
-
-const showPyroUpgradeModal = async (subscription) => {
-	currentSubscription.value = subscription
-	currentSubRenewalDate.value = getPyroCharge(subscription).due
-	currentProduct.value = getPyroProduct(subscription)
-	upgradeProducts.value = products.filter(
-		(p) =>
-			p.metadata.type === 'pyro' &&
-			(!currentProduct.value || p.metadata.ram > currentProduct.value.metadata.ram),
-	)
-	upgradeProducts.value.metadata = { type: 'pyro' }
-
-	await nextTick()
-
-	if (!currentProduct.value) {
-		console.error('Could not find product for current subscription')
-		addNotification({
-			title: 'An error occurred',
-			text: 'Could not find product for current subscription',
-			type: 'error',
-		})
-		return
-	}
-
-	if (!pyroPurchaseModal.value) {
-		console.error('pyroPurchaseModal ref is undefined')
-		return
-	}
-
-	pyroPurchaseModal.value.show()
+	return nextRam < curRam ? 'downgrade' : 'upgrade'
 }
 
-async function fetchCapacityStatuses(serverId, product) {
-	if (product) {
-		try {
-			return {
-				custom: await useServersFetch(`servers/${serverId}/upgrade-stock`, {
-					method: 'POST',
-					body: {
-						cpu: product.metadata.cpu,
-						memory_mb: product.metadata.ram,
-						swap_mb: product.metadata.swap,
-						storage_mb: product.metadata.storage,
-					},
-				}),
-			}
-		} catch (error) {
-			console.error('Error checking server capacities:', error)
-			addNotification({
-				title: 'Error checking server capacities',
-				text: error,
-				type: 'error',
-			})
-			return {
-				custom: { available: 0 },
-				small: { available: 0 },
-				medium: { available: 0 },
-				large: { available: 0 },
-			}
-		}
-	}
+const modalCancel = ref(null)
+
+const upgradeModal = ref(null)
+const showPyroUpgradeModal = (subscription) => {
+	upgradeModal.value?.open(subscription?.metadata?.id)
 }
 
 const resubscribePyro = async (subscriptionId, wasSuspended) => {
@@ -1093,6 +1086,7 @@ function showCancellationSurvey(subscription) {
 			window.Tally.openPopup(formId, popupOptions)
 		} else {
 			console.warn('Tally script not yet loaded')
+			cancelSubscription(subscription.id, true)
 		}
 	} catch (e) {
 		console.error('Error opening Tally popup:', e)
@@ -1107,4 +1101,50 @@ useHead({
 		},
 	],
 })
+
+const getPendingChange = (subscription) => {
+	const charge = getPyroCharge(subscription)
+	if (!charge || charge.status !== 'open') return null
+
+	const nextProduct = getProductFromPriceId(charge.price_id)
+	if (!nextProduct || charge.price_id === subscription.price_id) {
+		// Not a plan change, but interval could change
+		if (charge.subscription_interval && charge.subscription_interval !== subscription.interval) {
+			return {
+				planSize: getProductSize(getPyroProduct(subscription)),
+				cpu: getPyroProduct(subscription)?.metadata?.cpu / 2,
+				cpuBurst: getPyroProduct(subscription)?.metadata?.cpu,
+				ramGb: (getPyroProduct(subscription)?.metadata?.ram || 0) / 1024,
+				swapGb: (getPyroProduct(subscription)?.metadata?.swap || 0) / 1024 || undefined,
+				storageGb: (getPyroProduct(subscription)?.metadata?.storage || 0) / 1024 || undefined,
+				date: charge.due,
+				intervalChange: charge.subscription_interval,
+				verb: 'Switches',
+			}
+		}
+		return null
+	}
+
+	const curProduct = getPyroProduct(subscription)
+	const verb = getPlanChangeVerb(curProduct, nextProduct)
+	const cpu = nextProduct?.metadata?.cpu ?? 0
+	const ram = nextProduct?.metadata?.ram ?? 0
+	const swap = nextProduct?.metadata?.swap ?? 0
+	const storage = nextProduct?.metadata?.storage ?? 0
+
+	return {
+		planSize: getProductSize(nextProduct),
+		cpu: cpu / 2,
+		cpuBurst: cpu,
+		ramGb: ram / 1024,
+		swapGb: swap ? swap / 1024 : undefined,
+		storageGb: storage ? storage / 1024 : undefined,
+		date: charge.due,
+		intervalChange:
+			charge.subscription_interval && charge.subscription_interval !== subscription.interval
+				? charge.subscription_interval
+				: null,
+		verb,
+	}
+}
 </script>
