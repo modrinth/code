@@ -1,6 +1,6 @@
 <template>
 	<div class="experimental-styles-within">
-		<CreatorTaxComplianceAlert v-if="needTaxForms" />
+		<CreatorTaxComplianceAlert v-if="needTaxForms" class="mb-3"/>
 		<section class="universal-card">
 			<h2 class="text-2xl">Revenue</h2>
 			<div class="grid-display">
@@ -168,9 +168,10 @@ const { data: userBalance } = await useAsyncData(`payout/balance`, () =>
 
 const needTaxForms = computed(() => {
 	if (!flags.value.showCreatorTaxCompliance) return false
-	return (
-		userBalance.value?.total_annual_withdrawal >= 600 && !userBalance.value?.tax_compliance_filled
-	)
+	return true
+	// return (
+	// 	userBalance.value?.total_annual_withdrawal >= 600 && !userBalance.value?.tax_compliance_filled
+	// )
 })
 
 const shouldPreventWithdrawal = computed(() => {

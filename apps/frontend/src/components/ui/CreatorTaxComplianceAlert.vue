@@ -1,23 +1,20 @@
 <template>
 	<NewModal ref="taxFormModal" header="Submit Tax Form" :closable="false">
-		<div
-			class="card flex flex-col gap-2 rounded-2xl border-[1px] border-solid !bg-button-bg p-2 text-contrast"
-		>
-			<span>
-				Modrinth uses a third-party provider (Track1099) to securely collect and store your tax
-				forms.
-			</span>
-			<a
-				href="https://www.track1099.com/info/security"
-				class="flex flex-row gap-1 align-middle text-link"
-				target="_blank"
-				rel="noopener noreferrer"
+		<div class="max-w-[40rem]">
+			<Admonition
+				type="info"
+				header="Modrinth uses third-party provider Track1099 to securely collect and store your tax forms."
 			>
-				<InfoIcon class="my-auto" /> Learn more about their security practices here.
-			</a>
-		</div>
-		<div class="mt-2 flex flex-col gap-4">
-			<div class="flex flex-col gap-2">
+				<a
+					href="https://www.track1099.com/info/security"
+					class="flex w-fit flex-row gap-1 align-middle text-link"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					Learn more about their security practices here. <ExternalIcon class="my-auto" />
+				</a>
+			</Admonition>
+			<div class="mt-4 flex flex-col gap-2">
 				<label>
 					<span class="text-lg font-semibold text-contrast">
 						Are you a US citizen?
@@ -40,62 +37,64 @@
 				leave-from-class="h-auto overflow-visible opacity-100"
 				leave-to-class="h-0 overflow-hidden opacity-0"
 			>
-				<div v-if="isUSCitizen === 'no'" class="flex flex-col gap-2">
-					<label>
+				<div v-if="isUSCitizen === 'no'" class="flex flex-col gap-1">
+					<label class="mt-4">
 						<span class="text-lg font-semibold text-contrast">
 							Are you a private individual or part of a foreign entity?
 							<span class="text-brand-red">*</span>
 						</span>
 					</label>
-					<span class="text-md -mt-2"
-						>A foreign entity means a business entity organized outside the United States (such as a
-						non-US corporation, partnership, or LLC).</span
-					>
+					<span class="text-md leading-tight">
+						A foreign entity means a business entity organized outside the United States (such as a
+						non-US corporation, partnership, or LLC).
+					</span>
 					<Chips
 						v-model="entityType"
 						:items="['private-individual', 'foreign-entity']"
 						:format-label="
-							(item) => (item === 'private-individual' ? 'Private Individual' : 'Foreign Entity')
+							(item) => (item === 'private-individual' ? 'Private individual' : 'Foreign entity')
 						"
 						:never-empty="false"
 						:capitalize="false"
+						class="mt-2"
 					/>
 				</div>
 			</Transition>
-		</div>
-		<div class="mt-4 flex w-full flex-row justify-between gap-2">
-			<ButtonStyled @click="$emit('close')"
-				><button @click="hideModal"><XIcon /> Cancel</button></ButtonStyled
-			>
-			<ButtonStyled color="brand">
-				<button :disabled="!canContinue || loading" @click="continueForm">
-					<span v-if="!loading">Continue</span>
-					<span v-else>Loading…</span>
-				</button>
-			</ButtonStyled>
+			<div class="mt-4 flex w-full flex-row justify-between gap-2">
+				<ButtonStyled @click="$emit('close')">
+					<button @click="hideModal"><XIcon /> Cancel</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button :disabled="!canContinue || loading" @click="continueForm">
+						<template v-if="!loading">Continue <RightArrowIcon /></template>
+						<template v-else><SpinnerIcon /> Loading…</template>
+					</button>
+				</ButtonStyled>
+			</div>
 		</div>
 	</NewModal>
-	<div
-		class="mb-4 flex w-full flex-col gap-2 rounded-2xl border-[1px] border-solid border-orange bg-bg-orange p-4 text-sm text-contrast"
-	>
-		<span class="flex gap-2 align-middle text-xl font-bold text-orange"
-			><TriangleAlertIcon class="my-auto" /> Tax Form Required</span
-		>
-		<span class="text-md text-orange"
-			>You have reached the annual withdrawal threshold of $600 USD and must complete a tax form
-			before you can withdraw additional revenue.</span
-		>
-		<div>
+	<Admonition type="warning" header="Tax form required" v-bind="$attrs">
+		<span class="text-orange">
+			You have reached the annual withdrawal threshold of $600 USD and must complete a tax form
+			before you can withdraw additional revenue.
+		</span>
+		<div class="mt-3">
 			<ButtonStyled color="orange">
-				<button @click="startTaxForm"><FileTextIcon /> Start Tax Form</button>
+				<button @click="startTaxForm"><FileTextIcon /> Start tax form</button>
 			</ButtonStyled>
 		</div>
-	</div>
+	</Admonition>
 </template>
 
 <script setup lang="ts">
-import { FileTextIcon, InfoIcon, TriangleAlertIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, Chips, injectNotificationManager, NewModal } from '@modrinth/ui'
+import {
+	ExternalIcon,
+	FileTextIcon,
+	RightArrowIcon,
+	SpinnerIcon,
+	XIcon,
+} from '@modrinth/assets'
+import { Admonition, ButtonStyled, Chips, injectNotificationManager, NewModal } from '@modrinth/ui'
 
 import { type FormRequestResponse, useAvalara1099 } from '~/composables/avalara1099'
 
@@ -181,6 +180,10 @@ watch(isUSCitizen, (newValue) => {
 	if (newValue === 'yes') {
 		entityType.value = null
 	}
+})
+
+defineOptions({
+	inheritAttrs: false,
 })
 </script>
 
