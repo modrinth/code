@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="medal-promotion flex w-full flex-row items-center justify-between rounded-2xl p-4 shadow-xl relative"
+		class="medal-promotion relative flex w-full flex-row items-center justify-between rounded-2xl p-4 shadow-xl"
 	>
 		<MedalBackgroundImage />
 

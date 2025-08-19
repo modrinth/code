@@ -122,7 +122,9 @@
 			</NuxtLink>
 			<div class="flex w-full min-w-0 select-none flex-col items-center gap-4 pt-4 sm:flex-row">
 				<ServerIcon
-					:image="serverData.is_medal ? 'https://cdn-raw.modrinth.com/medal_icon.webp' : serverData.image"
+					:image="
+						serverData.is_medal ? 'https://cdn-raw.modrinth.com/medal_icon.webp' : serverData.image
+					"
 					class="drop-shadow-lg sm:drop-shadow-none"
 				/>
 				<div
