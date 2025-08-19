@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="taxFormModal" header="Submit Tax Form" :closable="false">
+	<NewModal ref="taxFormModal" header="Submitting tax form" :closable="false">
 		<div class="max-w-[40rem]">
 			<Admonition
 				type="info"
