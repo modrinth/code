@@ -94,16 +94,16 @@
 				v-if="filteredData.length > 0 || isPollingForNewServers"
 				class="m-0 flex flex-col gap-4 p-0"
 			>
-				<ServerListing
-					v-for="server in filteredData.filter((s) => !s.is_medal)"
-					:key="server.server_id"
-					v-bind="server"
-				/>
 				<MedalServerListing
 					v-for="server in filteredData.filter((s) => s.is_medal)"
 					:key="server.server_id"
 					v-bind="server"
 					@upgrade="openUpgradeModal(server.server_id)"
+				/>
+				<ServerListing
+					v-for="server in filteredData.filter((s) => !s.is_medal)"
+					:key="server.server_id"
+					v-bind="server"
 				/>
 			</ul>
 			<div v-else class="flex h-full items-center justify-center">

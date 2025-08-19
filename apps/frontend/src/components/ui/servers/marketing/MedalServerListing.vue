@@ -1,22 +1,33 @@
 <template>
-	<div>
+	<div class="shadow-xl rounded-2xl">
 		<div
-			class="medal-promotion flex flex-row items-center overflow-x-hidden rounded-2xl p-4 shadow-xl transition-transform duration-100"
-			:class="status === 'suspended' ? '!rounded-b-none border-b-0 opacity-75' : ''"
+			class="medal-promotion flex flex-row items-center overflow-x-hidden rounded-t-2xl p-4 transition-transform duration-100"
+			:class="status === 'suspended' ? 'rounded-b-none border-b-0 opacity-75' : 'rounded-b-2xl'"
 			data-pyro-server-listing
 			:data-pyro-server-listing-id="server_id"
 		>
 			<div class="overlay"></div>
-			<MedalPromoBackground class="background-pattern scale-[125%]" />
+			<img
+				src="https://cdn-raw.modrinth.com/medal-banner-background.webp"
+				class="background-pattern dark-pattern"
+				alt=""
+			/>
+			<img
+				src="https://cdn-raw.modrinth.com/medal-banner-background-light.webp"
+				class="background-pattern light-pattern"
+				alt=""
+			/>
 
-			<NuxtLink
+			<AutoLink
 				:to="status === 'suspended' ? '' : `/servers/manage/${props.server_id}`"
 				class="z-10 flex flex-grow flex-row items-center overflow-x-hidden"
 				:class="status !== 'suspended' && 'active:scale-95'"
 			>
-				<MedalServerIcon
+				<Avatar
 					v-if="status !== 'suspended'"
-					class="border-medal-orange z-10 size-16 shrink-0 rounded-xl border-[1px] border-solid bg-bg text-orange"
+					src="https://cdn-raw.modrinth.com/medal_icon.webp"
+					size="64px"
+					class="z-10"
 				/>
 				<div
 					v-else
@@ -78,10 +89,10 @@
 						class="pointer-events-none flex w-full flex-row flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
 					/>
 				</div>
-			</NuxtLink>
+			</AutoLink>
 
 			<div class="z-10 ml-auto mr-6">
-				<ButtonStyled color="orange" type="outlined" size="large">
+				<ButtonStyled color="medal-promo" type="outlined" size="large">
 					<button class="my-auto" @click="handleUpgrade"><RocketIcon /> Upgrade</button>
 				</ButtonStyled>
 			</div>
@@ -89,14 +100,14 @@
 
 		<div
 			v-if="status === 'suspended' && suspension_reason === 'upgrading'"
-			class="relative -mt-2 flex w-full flex-row items-center gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-blue bg-bg-blue p-4 text-sm font-bold text-contrast"
+			class="relative flex w-full flex-row items-center gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-blue bg-bg-blue p-4 text-sm font-bold text-contrast"
 		>
 			<PanelSpinner />
 			Your server's hardware is currently being upgraded and will be back online shortly.
 		</div>
 		<div
 			v-else-if="status === 'suspended' && suspension_reason === 'cancelled'"
-			class="relative -mt-2 flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
+			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
 				<PanelErrorIcon class="!size-5" /> Your server has been cancelled. Please update your
@@ -106,7 +117,7 @@
 		</div>
 		<div
 			v-else-if="status === 'suspended' && suspension_reason"
-			class="relative -mt-2 flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
+			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
 				<PanelErrorIcon class="!size-5" /> Your server has been suspended: {{ suspension_reason }}.
@@ -116,7 +127,7 @@
 		</div>
 		<div
 			v-else-if="status === 'suspended'"
-			class="relative -mt-2 flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
+			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
 				<PanelErrorIcon class="!size-5" /> Your server has been suspended. Please update your
@@ -129,13 +140,10 @@
 
 <script setup lang="ts">
 import { ChevronRightIcon, LockIcon, RocketIcon, SparklesIcon } from '@modrinth/assets'
-import { Avatar, ButtonStyled, CopyCode } from '@modrinth/ui'
+import { AutoLink, Avatar, ButtonStyled, CopyCode } from '@modrinth/ui'
 import type { Project, Server } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import dayjsDuration from 'dayjs/plugin/duration'
-
-import MedalPromoBackground from '~/assets/images/illustrations/medal_promo_background.svg?component'
-import MedalServerIcon from '~/assets/images/servers/medal_server_icon.svg?component'
 
 import PanelErrorIcon from '../icons/PanelErrorIcon.vue'
 import PanelSpinner from '../PanelSpinner.vue'
@@ -226,6 +234,23 @@ onUnmounted(() => {
 	background: var(--medal-promotion-bg-gradient);
 	z-index: 1;
 	border-radius: inherit;
+}
+
+.light-mode, .light {
+	.background-pattern.dark-pattern {
+		display: none;
+	}
+	.background-pattern.light-pattern {
+		display: block;
+	}
+}
+
+.background-pattern.dark-pattern {
+	display: block;
+}
+
+.background-pattern.light-pattern {
+	display: none;
 }
 
 .background-pattern {
