@@ -940,7 +940,9 @@ const planQuery = async () => {
 		const planElement = document.querySelector(`[nav-hash="plan"]`)
 		if (planElement) {
 			planElement.scrollIntoView({ behavior: 'smooth' })
-			await selectProduct(route.query.plan)
+			if (route.query.plan !== null) {
+				await selectProduct(route.query.plan)
+			}
 		}
 	}
 }
