@@ -1,12 +1,12 @@
 <template>
 	<div class="progress-bar">
-    <div
-      class="progress-bar__fill"
-      :style="{
-        width: `${progress}%`,
-        'background-color': error ? 'var(--color-red)' : 'var(--color-brand)',
-      }"
-    ></div>
+		<div
+			class="progress-bar__fill"
+			:style="{
+				width: `${progress}%`,
+				'background-color': error ? 'var(--color-red)' : 'var(--color-brand)',
+			}"
+		></div>
 	</div>
 </template>
 
@@ -19,10 +19,10 @@ defineProps({
 			return value >= 0 && value <= 100
 		},
 	},
-  error: {
-    type: Boolean,
-    default: false,
-  },
+	error: {
+		type: Boolean,
+		default: false,
+	},
 })
 </script>
 

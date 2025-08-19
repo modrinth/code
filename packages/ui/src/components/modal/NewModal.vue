@@ -21,8 +21,8 @@
 		<div class="modal-container experimental-styles-within" :class="{ shown: visible }">
 			<div class="modal-body flex flex-col bg-bg-raised rounded-2xl">
 				<div
+					v-if="!hideHeader"
 					data-tauri-drag-region
-          v-if="!hideHeader"
 					class="grid grid-cols-[auto_min-content] items-center gap-12 p-6 border-solid border-0 border-b-[1px] border-divider max-w-full"
 				>
 					<div class="flex text-wrap break-words items-center gap-3 min-w-0">
@@ -62,7 +62,7 @@ const props = withDefaults(
 		closeOnClickOutside?: boolean
 		warnOnClose?: boolean
 		header?: string
-    hideHeader?: boolean
+		hideHeader?: boolean
 		onHide?: () => void
 		onShow?: () => void
 	}>(),
@@ -74,7 +74,7 @@ const props = withDefaults(
 		closeOnEsc: true,
 		warnOnClose: false,
 		header: undefined,
-    hideHeader: false,
+		hideHeader: false,
 		onHide: () => {},
 		onShow: () => {},
 	},
@@ -138,7 +138,7 @@ function updateMousePosition(event: { clientX: number; clientY: number }) {
 }
 
 function handleKeyDown(event: KeyboardEvent) {
-  if (props.closeOnEsc && event.key === 'Escape' && props.closable) {
+	if (props.closeOnEsc && event.key === 'Escape' && props.closable) {
 		hide()
 		mouseX.value = window.innerWidth / 2
 		mouseY.value = window.innerHeight / 2

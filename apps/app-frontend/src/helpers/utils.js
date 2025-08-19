@@ -7,19 +7,19 @@ export async function isDev() {
 }
 
 export async function areUpdatesEnabled() {
-  return await invoke('are_updates_enabled')
+	return await invoke('are_updates_enabled')
 }
 
 export async function getUpdateSize(updateRid) {
-  return await invoke('get_update_size', { rid: updateRid })
+	return await invoke('get_update_size', { rid: updateRid })
 }
 
 export async function enqueueUpdateForInstallation(updateRid) {
-  return await invoke('enqueue_update_for_installation', { rid: updateRid })
+	return await invoke('enqueue_update_for_installation', { rid: updateRid })
 }
 
 export async function removeEnqueuedUpdate() {
-  return await invoke('remove_enqueued_update')
+	return await invoke('remove_enqueued_update')
 }
 
 // One of 'Windows', 'Linux', 'MacOS'
@@ -28,7 +28,7 @@ export async function getOS() {
 }
 
 export async function isNetworkMetered() {
-  return await invoke('plugin:utils|is_network_metered')
+	return await invoke('plugin:utils|is_network_metered')
 }
 
 export async function openPath(path) {

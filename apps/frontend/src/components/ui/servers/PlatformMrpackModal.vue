@@ -1,7 +1,7 @@
 <template>
 	<NewModal ref="mrpackModal" header="Uploading mrpack" :closable="!isLoading" @show="onShow">
 		<div class="flex flex-col gap-4 md:w-[600px]">
-      <AppearingProgressBar :max-value="totalBytes" :current-value="uploadedBytes" />
+			<AppearingProgressBar :max-value="totalBytes" :current-value="uploadedBytes" />
 
 			<Transition
 				enter-active-class="transition-all duration-300 ease-out"
@@ -123,11 +123,11 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
-  AppearingProgressBar,
-  BackupWarning,
-  ButtonStyled,
-  injectNotificationManager,
-  NewModal,
+	AppearingProgressBar,
+	BackupWarning,
+	ButtonStyled,
+	injectNotificationManager,
+	NewModal,
 } from '@modrinth/ui'
 import { ModrinthServersFetchError } from '@modrinth/utils'
 import { onMounted, onUnmounted } from 'vue'
@@ -161,17 +161,17 @@ const emit = defineEmits<{
 	reinstall: [any?]
 }>()
 
-const mrpackModal = ref();
-const isMrpackModalSecondPhase = ref(false);
-const hardReset = ref(false);
-const isLoading = ref(false);
-const loadingServerCheck = ref(false);
-const mrpackFile = ref<File | null>(null);
-const uploadedBytes = ref(0);
-const totalBytes = ref(0);
+const mrpackModal = ref()
+const isMrpackModalSecondPhase = ref(false)
+const hardReset = ref(false)
+const isLoading = ref(false)
+const loadingServerCheck = ref(false)
+const mrpackFile = ref<File | null>(null)
+const uploadedBytes = ref(0)
+const totalBytes = ref(0)
 
-const isDangerous = computed(() => hardReset.value);
-const canInstall = computed(() => !mrpackFile.value || isLoading.value || loadingServerCheck.value);
+const isDangerous = computed(() => hardReset.value)
+const canInstall = computed(() => !mrpackFile.value || isLoading.value || loadingServerCheck.value)
 
 const uploadMrpack = (event: Event) => {
 	const target = event.target as HTMLInputElement
@@ -196,19 +196,19 @@ const handleReinstall = async () => {
 		return
 	}
 
-  isLoading.value = true;
-  uploadedBytes.value = 0;
-  totalBytes.value = mrpackFile.value.size;
+	isLoading.value = true
+	uploadedBytes.value = 0
+	totalBytes.value = mrpackFile.value.size
 
 	const { onProgress, promise } = props.server.general.reinstallFromMrpack(
 		mrpackFile.value,
 		hardReset.value,
 	)
 
-  onProgress(({ loaded, total }) => {
-    uploadedBytes.value = loaded;
-    totalBytes.value = total;
-  });
+	onProgress(({ loaded, total }) => {
+		uploadedBytes.value = loaded
+		totalBytes.value = total
+	})
 
 	try {
 		await promise
@@ -237,18 +237,18 @@ const handleReinstall = async () => {
 			})
 		}
 	} finally {
-    isLoading.value = false;
+		isLoading.value = false
 	}
 }
 const onShow = () => {
-  hardReset.value = false;
-  isMrpackModalSecondPhase.value = false;
-  loadingServerCheck.value = false;
-  isLoading.value = false;
-  mrpackFile.value = null;
-  uploadedBytes.value = 0;
-  totalBytes.value = 0;
-};
+	hardReset.value = false
+	isMrpackModalSecondPhase.value = false
+	loadingServerCheck.value = false
+	isLoading.value = false
+	mrpackFile.value = null
+	uploadedBytes.value = 0
+	totalBytes.value = 0
+}
 
 const show = () => mrpackModal.value?.show()
 const hide = () => mrpackModal.value?.hide()

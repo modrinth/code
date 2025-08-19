@@ -1,37 +1,4 @@
 <script setup>
-import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
-import ModrinthLoadingIndicator from '@/components/LoadingIndicatorBar.vue'
-import AccountsCard from '@/components/ui/AccountsCard.vue'
-import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
-import ErrorModal from '@/components/ui/ErrorModal.vue'
-import FriendsList from '@/components/ui/friends/FriendsList.vue'
-import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
-import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
-import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
-import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
-import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
-import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
-import NavButton from '@/components/ui/NavButton.vue'
-import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
-import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
-import RunningAppBar from '@/components/ui/RunningAppBar.vue'
-import SplashScreen from '@/components/ui/SplashScreen.vue'
-import UpdateModal from '@/components/ui/modal/UpdateModal.vue'
-import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
-import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
-import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
-import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
-import { get_user } from '@/helpers/cache.js'
-import { command_listener, warning_listener } from '@/helpers/events.js'
-import { useFetch } from '@/helpers/fetch.js'
-import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.js'
-import { list } from '@/helpers/profile.js'
-import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
-import { get_opening_command, initialize_state } from '@/helpers/state'
-import { areUpdatesEnabled, getOS, isDev, isNetworkMetered } from '@/helpers/utils.js'
-import { useError } from '@/store/error.js'
-import { useInstall } from '@/store/install.js'
-import { useLoading, useTheming } from '@/store/state'
 import {
 	ArrowBigUpDashIcon,
 	ChangeSkinIcon,
@@ -73,14 +40,14 @@ import { defineMessages, useVIntl } from '@vintl/vintl'
 import { createTooltip, destroyTooltip } from 'floating-vue'
 import { $fetch } from 'ofetch'
 import {
-  computed,
-  nextTick,
-  onMounted,
-  onUnmounted,
-  provide,
-  ref,
-  useTemplateRef,
-  watch,
+	computed,
+	nextTick,
+	onMounted,
+	onUnmounted,
+	provide,
+	ref,
+	useTemplateRef,
+	watch,
 } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
@@ -96,6 +63,8 @@ import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
+import MeteredNetworkModal from '@/components/ui/modal/MeteredNetworkModal.vue'
+import UpdateModal from '@/components/ui/modal/UpdateModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
@@ -110,9 +79,9 @@ import { command_listener, warning_listener } from '@/helpers/events.js'
 import { useFetch } from '@/helpers/fetch.js'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.js'
 import { list } from '@/helpers/profile.js'
-import { get } from '@/helpers/settings.ts'
+import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
-import { getOS, isDev, restartApp } from '@/helpers/utils.js'
+import { areUpdatesEnabled, getOS, isDev, isNetworkMetered } from '@/helpers/utils.js'
 import { useError } from '@/store/error.js'
 import { useInstall } from '@/store/install.js'
 import { useLoading, useTheming } from '@/store/state'
@@ -121,7 +90,6 @@ import { create_profile_and_install_from_file } from './helpers/pack'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
 import { get_available_capes, get_available_skins } from './helpers/skins'
 import { AppNotificationManager } from './providers/app-notifications'
-import MeteredNetworkModal from '@/components/ui/modal/MeteredNetworkModal.vue'
 
 const themeStore = useTheming()
 
@@ -167,14 +135,14 @@ onUnmounted(() => {
 
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
-  updateInstalledToastTitle: {
-    id: 'app.update.complete-toast.title',
-    defaultMessage: 'Version {version} was successfully installed!',
-  },
-  updateInstalledToastText: {
-    id: 'app.update.complete-toast.text',
-    defaultMessage: 'Click here to view the changelog.',
-  },
+	updateInstalledToastTitle: {
+		id: 'app.update.complete-toast.title',
+		defaultMessage: 'Version {version} was successfully installed!',
+	},
+	updateInstalledToastText: {
+		id: 'app.update.complete-toast.text',
+		defaultMessage: 'Click here to view the changelog.',
+	},
 })
 
 async function setupApp() {
@@ -190,8 +158,8 @@ async function setupApp() {
 		toggle_sidebar,
 		developer_mode,
 		feature_flags,
-    pending_update_toast_for_version,
-  } = await getSettings()
+		pending_update_toast_for_version,
+	} = await getSettings()
 
 	if (default_page === 'Library') {
 		await router.push('/library')
@@ -288,21 +256,21 @@ async function setupApp() {
 		console.warn('Failed to generate skin previews in app setup.', error)
 	}
 
-  if (pending_update_toast_for_version !== null) {
-    const settings = await getSettings()
-    settings.pending_update_toast_for_version = null
-    await setSettings(settings)
+	if (pending_update_toast_for_version !== null) {
+		const settings = await getSettings()
+		settings.pending_update_toast_for_version = null
+		await setSettings(settings)
 
-    const version = await getVersion()
-    if (pending_update_toast_for_version === version) {
-      notifications.addNotification({
-        type: 'success',
-        title: formatMessage(messages.updateInstalledToastTitle, { version }),
-        text: formatMessage(messages.updateInstalledToastText),
-        clickAction: () => openUrl('https://modrinth.com/news/changelog?filter=app'),
-      })
-    }
-  }
+		const version = await getVersion()
+		if (pending_update_toast_for_version === version) {
+			notifications.addNotification({
+				type: 'success',
+				title: formatMessage(messages.updateInstalledToastTitle, { version }),
+				text: formatMessage(messages.updateInstalledToastText),
+				clickAction: () => openUrl('https://modrinth.com/news/changelog?filter=app'),
+			})
+		}
+	}
 
 	if (osType === 'windows') {
 		await processPendingSurveys()
@@ -454,106 +422,106 @@ const updateSkipped = ref(false)
 const enqueuedUpdate = ref(null)
 const updateModal = useTemplateRef('updateModal')
 async function checkUpdates() {
-  if (!(await areUpdatesEnabled())) {
-    console.log('Skipping update check as updates are disabled in this build')
-    return
-  }
+	if (!(await areUpdatesEnabled())) {
+		console.log('Skipping update check as updates are disabled in this build')
+		return
+	}
 
-  async function performCheck() {
-    if (updateModal.value.isOpen) {
-      console.log('Skipping update check because the update modal is already open')
-      return
-    }
+	async function performCheck() {
+		if (updateModal.value.isOpen) {
+			console.log('Skipping update check because the update modal is already open')
+			return
+		}
 
-    const update = await invoke('plugin:updater|check')
-    if (!update) {
-      return
-    }
+		const update = await invoke('plugin:updater|check')
+		if (!update) {
+			return
+		}
 
-    console.log(`Update ${update.version} is available.`)
+		console.log(`Update ${update.version} is available.`)
 
-    if (update.version === availableUpdate.value?.version) {
-      console.log(
-        'Skipping update modal because the new version is the same as the dismissed update',
-      )
-      return
-    }
+		if (update.version === availableUpdate.value?.version) {
+			console.log(
+				'Skipping update modal because the new version is the same as the dismissed update',
+			)
+			return
+		}
 
-    availableUpdate.value = update
+		availableUpdate.value = update
 
-    const settings = await getSettings()
-    if (settings.skipped_update === update.version) {
-      updateSkipped.value = true
-      console.log('Skipping update modal because the user chose to skip this update')
-      return
-    }
+		const settings = await getSettings()
+		if (settings.skipped_update === update.version) {
+			updateSkipped.value = true
+			console.log('Skipping update modal because the user chose to skip this update')
+			return
+		}
 
-    updateSkipped.value = false
+		updateSkipped.value = false
 
-    if (settings.auto_download_updates) {
-      updateModal.value.updateAtNextExit(update)
-    } else {
-      updateModal.value.show(update)
-    }
-  }
+		if (settings.auto_download_updates) {
+			updateModal.value.updateAtNextExit(update)
+		} else {
+			updateModal.value.show(update)
+		}
+	}
 
-  await performCheck()
+	await performCheck()
 	setTimeout(
 		() => {
 			checkUpdates()
 		},
-    5 * 60 * 1000,
+		5 * 60 * 1000,
 	)
 }
 
 async function skipUpdate(version) {
-  enqueuedUpdate.value = null
+	enqueuedUpdate.value = null
 
-  updateSkipped.value = true
-  const settings = await getSettings()
-  settings.skipped_update = version
-  await setSettings(settings)
+	updateSkipped.value = true
+	const settings = await getSettings()
+	settings.skipped_update = version
+	await setSettings(settings)
 }
 
 async function updateEnqueuedForLater(version) {
-  enqueuedUpdate.value = version
+	enqueuedUpdate.value = version
 }
 
 async function forceOpenUpdateModal() {
-  if (updateSkipped.value) {
-    updateSkipped.value = false
-    const settings = await getSettings()
-    settings.skipped_update = null
-    await setSettings(settings)
-  }
-  updateModal.value.show(availableUpdate.value)
+	if (updateSkipped.value) {
+		updateSkipped.value = false
+		const settings = await getSettings()
+		settings.skipped_update = null
+		await setSettings(settings)
+	}
+	updateModal.value.show(availableUpdate.value)
 }
 
 const updateButton = useTemplateRef('updateButton')
 async function showUpdateButtonTooltip() {
-  await nextTick()
-  const tooltip = createTooltip(updateButton.value.$el, {
-    placement: 'right',
-    content: 'Click here to view the update again.',
-  })
-  tooltip.show()
-  setTimeout(() => {
-    tooltip.hide()
-    destroyTooltip(updateButton.value.$el)
-  }, 3500)
+	await nextTick()
+	const tooltip = createTooltip(updateButton.value.$el, {
+		placement: 'right',
+		content: 'Click here to view the update again.',
+	})
+	tooltip.show()
+	setTimeout(() => {
+		tooltip.hide()
+		destroyTooltip(updateButton.value.$el)
+	}, 3500)
 }
 
 const meteredNetworkModal = useTemplateRef('meteredNetworkModal')
 async function checkMeteredNetwork() {
-  const settings = await getSettings()
-  if (settings.auto_download_updates === null) {
-    if (await isNetworkMetered()) {
-      meteredNetworkModal.value.show()
-    } else {
-      settings.auto_download_updates = true
-      await setSettings(settings)
-    }
-  }
+	const settings = await getSettings()
+	if (settings.auto_download_updates === null) {
+		if (await isNetworkMetered()) {
+			meteredNetworkModal.value.show()
+		} else {
+			settings.auto_download_updates = true
+			await setSettings(settings)
+		}
+	}
 }
 
 function handleClick(e) {
@@ -706,17 +674,17 @@ async function processPendingSurveys() {
 	<SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
 	<div id="teleports"></div>
 	<div v-if="stateInitialized" class="app-grid-layout experimental-styles-within relative">
-    <Suspense @resolve="checkUpdates">
-      <UpdateModal
-        ref="updateModal"
-        @update-skipped="skipUpdate"
-        @update-enqueued-for-later="updateEnqueuedForLater"
-        @modal-hidden="showUpdateButtonTooltip"
-      />
-    </Suspense>
-    <Suspense @resolve="checkMeteredNetwork">
-      <MeteredNetworkModal ref="meteredNetworkModal" :update-modal="updateModal" />
-    </Suspense>
+		<Suspense @resolve="checkUpdates">
+			<UpdateModal
+				ref="updateModal"
+				@update-skipped="skipUpdate"
+				@update-enqueued-for-later="updateEnqueuedForLater"
+				@modal-hidden="showUpdateButtonTooltip"
+			/>
+		</Suspense>
+		<Suspense @resolve="checkMeteredNetwork">
+			<MeteredNetworkModal ref="meteredNetworkModal" :update-modal="updateModal" />
+		</Suspense>
 		<Suspense>
 			<AppSettingsModal ref="settingsModal" />
 		</Suspense>
@@ -770,18 +738,18 @@ async function processPendingSurveys() {
 				<PlusIcon />
 			</NavButton>
 			<div class="flex flex-grow"></div>
-      <NavButton
-        v-if="!!availableUpdate"
-        ref="updateButton"
-        v-tooltip.right="
-          enqueuedUpdate === availableUpdate?.version
-            ? 'Update installation queued for next restart'
-            : 'Update available'
-        "
-        :to="forceOpenUpdateModal"
-      >
-        <DownloadIcon v-if="updateSkipped || enqueuedUpdate === availableUpdate?.version" />
-        <DownloadIcon v-else class="text-brand-green" />
+			<NavButton
+				v-if="!!availableUpdate"
+				ref="updateButton"
+				v-tooltip.right="
+					enqueuedUpdate === availableUpdate?.version
+						? 'Update installation queued for next restart'
+						: 'Update available'
+				"
+				:to="forceOpenUpdateModal"
+			>
+				<DownloadIcon v-if="updateSkipped || enqueuedUpdate === availableUpdate?.version" />
+				<DownloadIcon v-else class="text-brand-green" />
 			</NavButton>
 			<NavButton v-tooltip.right="'Settings'" :to="() => $refs.settingsModal.show()">
 				<SettingsIcon />
