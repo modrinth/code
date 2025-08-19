@@ -1,4 +1,5 @@
 <template>
+	<CreatorTaxComplianceAlert v-if="needTaxForms" class="mb-3" />
 	<section class="universal-card">
 		<Breadcrumbs
 			current-title="Withdraw"
@@ -203,6 +204,7 @@ import { all } from 'iso-3166-1'
 import { Multiselect } from 'vue-multiselect'
 
 import VenmoIcon from '~/assets/images/external/venmo.svg?component'
+import CreatorTaxComplianceAlert from '~/components/ui/CreatorTaxComplianceAlert.vue'
 
 const { addNotification } = injectNotificationManager()
 const auth = await useAuth()
@@ -232,10 +234,10 @@ const [{ data: userBalance }, { data: payoutMethods, refresh: refreshPayoutMetho
 
 const needTaxForms = computed(() => {
 	if (!flags.value.showCreatorTaxCompliance) return false
-
-	return (
-		userBalance.value?.total_annual_withdrawal >= 600 && !userBalance.value?.tax_compliance_filled
-	)
+	const total = userBalance.value?.total_annual_withdrawal ?? 590
+	const available = userBalance.value?.available ?? 0
+	const projectedTotal = total + available
+	return projectedTotal >= 600 && !userBalance.value?.tax_compliance_filled
 })
 
 const selectedMethodId = ref(payoutMethods.value[0].id)
@@ -473,7 +475,6 @@ async function withdraw() {
 			-khtml-user-drag: none;
 			-moz-user-drag: none;
 			-o-user-drag: none;
-			user-drag: none;
 			user-select: none;
 			width: 100%;
 			height: auto;
