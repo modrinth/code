@@ -1,6 +1,6 @@
 <template>
 	<div class="experimental-styles-within">
-		<CreatorTaxComplianceAlert v-if="needTaxForms" class="mb-3"/>
+		<CreatorTaxComplianceAlert v-if="needTaxForms" class="mb-3" />
 		<section class="universal-card">
 			<h2 class="text-2xl">Revenue</h2>
 			<div class="grid-display">

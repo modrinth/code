@@ -87,13 +87,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-	ExternalIcon,
-	FileTextIcon,
-	RightArrowIcon,
-	SpinnerIcon,
-	XIcon,
-} from '@modrinth/assets'
+import { ExternalIcon, FileTextIcon, RightArrowIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { Admonition, ButtonStyled, Chips, injectNotificationManager, NewModal } from '@modrinth/ui'
 
 import { type FormRequestResponse, useAvalara1099 } from '~/composables/avalara1099'
