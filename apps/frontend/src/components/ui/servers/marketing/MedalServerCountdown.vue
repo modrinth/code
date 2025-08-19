@@ -1,9 +1,8 @@
 <template>
 	<div
-		class="medal-promotion flex w-full flex-row items-center justify-between rounded-2xl p-4 shadow-xl"
+		class="medal-promotion flex w-full flex-row items-center justify-between rounded-2xl p-4 shadow-xl relative"
 	>
-		<div class="overlay"></div>
-		<MedalPromoBackground class="background-pattern scale-[125%]" />
+		<MedalBackgroundImage />
 
 		<div class="z-10 mr-2 flex flex-col gap-1">
 			<Transition
@@ -20,7 +19,7 @@
 				>
 					<ClockIcon class="clock-glow text-medal-orange size-5 shrink-0" />
 					<span class="w-full text-wrap text-lg">
-						Your <span class="text-medal-orange">Medal</span> powered Modrinth Server will expire in
+						Your <span class="text-medal-orange">Medal</span>-powered Modrinth Server will expire in
 						<span class="text-medal-orange font-bold">{{ timeLeftCountdown.days }}</span> days
 						<span class="text-medal-orange font-bold">{{ timeLeftCountdown.hours }}</span> hours
 						<span class="text-medal-orange font-bold">{{ timeLeftCountdown.minutes }}</span> minutes
@@ -31,7 +30,7 @@
 			</Transition>
 		</div>
 
-		<ButtonStyled color="orange" type="outlined" size="large">
+		<ButtonStyled color="medal-promo" type="outlined" size="large">
 			<button class="z-10 my-auto" @click="openUpgradeModal"><RocketIcon /> Upgrade</button>
 		</ButtonStyled>
 	</div>
@@ -46,7 +45,7 @@ import dayjs from 'dayjs'
 import dayjsDuration from 'dayjs/plugin/duration'
 import type { ComponentPublicInstance } from 'vue'
 
-import MedalPromoBackground from '~/assets/images/illustrations/medal_promo_background.svg?component'
+import MedalBackgroundImage from '~/components/ui/servers/marketing/MedalBackgroundImage.vue'
 
 import ServersUpgradeModalWrapper from '../ServersUpgradeModalWrapper.vue'
 

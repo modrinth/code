@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DropdownIcon } from '@modrinth/assets'
+import { InfoIcon } from '@modrinth/assets'
 import { formatPrice } from '@modrinth/utils'
 import { type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { Menu } from 'floating-vue'
@@ -98,32 +98,30 @@ const mostPopularStyle = computed(() => {
 
 			<span class="text-sm">{{ formatMessage(description) }}</span>
 
-			<div class="flex flex-col gap-2">
+			<div class="w-fit">
 				<Menu
 					placement="bottom-start"
 					:triggers="['hover', 'focus']"
 					:auto-hide="true"
 					:delay="{ show: 100, hide: 120 }"
-					:distance="8"
+					:distance="6"
 				>
 					<template #default="{ shown }">
 						<div
-							class="flex justify-between text-sm cursor-default select-none outline-none"
+							class="flex w-fit items-center gap-2 cursor-help text-sm font-medium cursor-default select-none outline-none"
+							:class="shown ? 'text-primary' : 'text-secondary'"
 							role="button"
 							tabindex="0"
 							aria-haspopup="true"
 							:aria-expanded="shown"
 						>
-							<span>View plan details</span>
-							<DropdownIcon
-								class="ml-auto my-auto size-4 transition-transform duration-300 shrink-0"
-								:class="{ 'rotate-180': shown }"
-							/>
+							<InfoIcon />
+							View plan details
 						</div>
 					</template>
 
 					<template #popper>
-						<div class="w-72 rounded-md border border-contrast/10 bg-bg p-3 shadow-lg">
+						<div class="w-fit rounded-md border border-contrast/10 p-3 shadow-lg">
 							<ServersSpecs
 								:ram="plan.metadata.ram!"
 								:storage="plan.metadata.storage!"

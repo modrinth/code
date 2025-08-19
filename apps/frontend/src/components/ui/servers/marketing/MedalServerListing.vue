@@ -1,23 +1,12 @@
 <template>
-	<div class="shadow-xl rounded-2xl">
+	<div class="rounded-2xl shadow-xl">
 		<div
 			class="medal-promotion flex flex-row items-center overflow-x-hidden rounded-t-2xl p-4 transition-transform duration-100"
 			:class="status === 'suspended' ? 'rounded-b-none border-b-0 opacity-75' : 'rounded-b-2xl'"
 			data-pyro-server-listing
 			:data-pyro-server-listing-id="server_id"
 		>
-			<div class="overlay"></div>
-			<img
-				src="https://cdn-raw.modrinth.com/medal-banner-background.webp"
-				class="background-pattern dark-pattern"
-				alt=""
-			/>
-			<img
-				src="https://cdn-raw.modrinth.com/medal-banner-background-light.webp"
-				class="background-pattern light-pattern"
-				alt=""
-			/>
-
+			<MedalBackgroundImage />
 			<AutoLink
 				:to="status === 'suspended' ? '' : `/servers/manage/${props.server_id}`"
 				class="z-10 flex flex-grow flex-row items-center overflow-x-hidden"
@@ -91,7 +80,7 @@
 				</div>
 			</AutoLink>
 
-			<div class="z-10 ml-auto mr-6">
+			<div class="z-10 ml-auto">
 				<ButtonStyled color="medal-promo" type="outlined" size="large">
 					<button class="my-auto" @click="handleUpgrade"><RocketIcon /> Upgrade</button>
 				</ButtonStyled>
@@ -144,6 +133,8 @@ import { AutoLink, Avatar, ButtonStyled, CopyCode } from '@modrinth/ui'
 import type { Project, Server } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import dayjsDuration from 'dayjs/plugin/duration'
+
+import MedalBackgroundImage from '~/components/ui/servers/marketing/MedalBackgroundImage.vue'
 
 import PanelErrorIcon from '../icons/PanelErrorIcon.vue'
 import PanelSpinner from '../PanelSpinner.vue'
@@ -223,46 +214,6 @@ onUnmounted(() => {
 	border: 1px solid var(--medal-promotion-bg-orange);
 	background: inherit; // allows overlay + pattern to take over
 	overflow: hidden;
-}
-
-.overlay {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: var(--medal-promotion-bg-gradient);
-	z-index: 1;
-	border-radius: inherit;
-}
-
-.light-mode, .light {
-	.background-pattern.dark-pattern {
-		display: none;
-	}
-	.background-pattern.light-pattern {
-		display: block;
-	}
-}
-
-.background-pattern.dark-pattern {
-	display: block;
-}
-
-.background-pattern.light-pattern {
-	display: none;
-}
-
-.background-pattern {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 0;
-	background-color: var(--medal-promotion-bg);
-	border-radius: inherit;
-	color: var(--medal-promotion-text-orange);
 }
 
 .text-medal-orange {

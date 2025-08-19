@@ -4,10 +4,10 @@
 			<div
 				class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-button-bg bg-bg-raised p-4 transition-transform duration-100"
 				:class="{
-				'!rounded-b-none border-b-0': status === 'suspended' || !!pendingChange,
-				'opacity-75': status === 'suspended',
-				'active:scale-95': status !== 'suspended' && !pendingChange,
-			}"
+					'!rounded-b-none border-b-0': status === 'suspended' || !!pendingChange,
+					'opacity-75': status === 'suspended',
+					'active:scale-95': status !== 'suspended' && !pendingChange,
+				}"
 				data-pyro-server-listing
 				:data-pyro-server-listing-id="server_id"
 			>
@@ -66,8 +66,8 @@
 			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
-				<PanelErrorIcon class="!size-5" /> Your server has been cancelled. Please update your billing
-				information or contact Modrinth Support for more information.
+				<PanelErrorIcon class="!size-5" /> Your server has been cancelled. Please update your
+				billing information or contact Modrinth Support for more information.
 			</div>
 			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
 		</div>
@@ -86,8 +86,8 @@
 			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
-				<PanelErrorIcon class="!size-5" /> Your server has been suspended. Please update your billing
-				information or contact Modrinth Support for more information.
+				<PanelErrorIcon class="!size-5" /> Your server has been suspended. Please update your
+				billing information or contact Modrinth Support for more information.
 			</div>
 			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
 		</div>
@@ -96,8 +96,9 @@
 			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-orange bg-bg-orange p-4 text-sm font-bold text-contrast"
 		>
 			<div>
-				Your server will {{ pendingChange.verb.toLowerCase() }} to the "{{ pendingChange.planSize }}"
-				plan on {{ formatDate(pendingChange.date) }}.
+				Your server will {{ pendingChange.verb.toLowerCase() }} to the "{{
+					pendingChange.planSize
+				}}" plan on {{ formatDate(pendingChange.date) }}.
 			</div>
 			<ServersSpecs
 				class="!font-normal !text-contrast"
