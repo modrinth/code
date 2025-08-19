@@ -1,11 +1,13 @@
 package com.modrinth.theseus;
 
-import java.io.ByteArrayOutputStream;
+import com.modrinth.theseus.rpc.RpcHandlers;
+import com.modrinth.theseus.rpc.TheseusRpc;
 import java.io.IOException;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
 
 public final class MinecraftLaunch {
     public static void main(String[] args) throws IOException, ReflectiveOperationException {
@@ -13,43 +15,17 @@ public final class MinecraftLaunch {
         final String[] gameArgs = Arrays.copyOfRange(args, 1, args.length);
 
         System.setProperty("modrinth.process.args", String.join("\u001f", gameArgs));
-        parseInput();
 
+        final CompletableFuture<Void> waitForLaunch = new CompletableFuture<>();
+        TheseusRpc.connectAndStart(
+                System.getProperty("modrinth.internal.ipc.host"),
+                Integer.getInteger("modrinth.internal.ipc.port"),
+                new RpcHandlers()
+                        .handler("set_system_property", String.class, String.class, System::setProperty)
+                        .handler("launch", () -> waitForLaunch.complete(null)));
+
+        waitForLaunch.join();
         relaunch(mainClass, gameArgs);
-    }
-
-    private static void parseInput() throws IOException {
-        final ByteArrayOutputStream line = new ByteArrayOutputStream();
-        while (true) {
-            final int b = System.in.read();
-            if (b < 0) {
-                throw new IllegalStateException("Stdin terminated while parsing");
-            }
-            if (b != '\n') {
-                line.write(b);
-                continue;
-            }
-            if (handleLine(line.toString("UTF-8"))) {
-                break;
-            }
-            line.reset();
-        }
-    }
-
-    private static boolean handleLine(String line) {
-        final String[] parts = line.split("\t", 2);
-        switch (parts[0]) {
-            case "property": {
-                final String[] keyValue = parts[1].split("\t", 2);
-                System.setProperty(keyValue[0], keyValue[1]);
-                return false;
-            }
-            case "launch":
-                return true;
-        }
-
-        System.err.println("Unknown input line " + line);
-        return false;
     }
 
     private static void relaunch(String mainClassName, String[] args) throws ReflectiveOperationException {
