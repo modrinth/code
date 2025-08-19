@@ -361,9 +361,9 @@ const gameVersions = ref<GameVersion[]>(await get_game_versions().catch(() => []
 const supportsServerQuickPlay = computed(() =>
 	hasServerQuickPlaySupport(gameVersions.value, instance.value.game_version),
 )
-const supportsWorldQuickPlay = computed(() =>
-	hasWorldQuickPlaySupport(gameVersions.value, instance.value.game_version),
-)
+const supportsWorldQuickPlay = computed(() => {
+	return hasWorldQuickPlaySupport(gameVersions.value, instance.value.game_version)
+})
 
 const filterOptions = computed(() => {
 	const options: FilterBarOption[] = []
