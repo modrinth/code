@@ -159,6 +159,7 @@ import { getAuthUrl, removeAuthProvider } from '~/composables/auth.js'
 
 const { addNotification, handleError } = injectNotificationManager()
 const auth = await useAuth()
+const flags = useFeatureFlags()
 const minWithdraw = ref(0.01)
 
 const { data: userBalance } = await useAsyncData(`payout/balance`, () =>
@@ -166,10 +167,10 @@ const { data: userBalance } = await useAsyncData(`payout/balance`, () =>
 )
 
 const needTaxForms = computed(() => {
-	return true
-	// return (
-	// 	userBalance.value?.total_annual_withdrawal >= 600 && !userBalance.value?.tax_compliance_filled
-	// )
+	if (!flags.value.showCreatorTaxCompliance) return false
+	return (
+		userBalance.value?.total_annual_withdrawal >= 600 && !userBalance.value?.tax_compliance_filled
+	)
 })
 
 const shouldPreventWithdrawal = computed(() => {

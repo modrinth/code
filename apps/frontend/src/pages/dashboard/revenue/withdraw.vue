@@ -207,6 +207,7 @@ import VenmoIcon from '~/assets/images/external/venmo.svg?component'
 const { addNotification } = injectNotificationManager()
 const auth = await useAuth()
 const data = useNuxtApp()
+const flags = useFeatureFlags()
 
 const countries = computed(() =>
 	all().map((x) => ({
@@ -230,6 +231,8 @@ const [{ data: userBalance }, { data: payoutMethods, refresh: refreshPayoutMetho
 	])
 
 const needTaxForms = computed(() => {
+	if (!flags.value.showCreatorTaxCompliance) return false
+
 	return (
 		userBalance.value?.total_annual_withdrawal >= 600 && !userBalance.value?.tax_compliance_filled
 	)

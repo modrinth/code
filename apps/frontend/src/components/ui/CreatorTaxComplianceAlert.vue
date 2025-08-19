@@ -116,9 +116,9 @@ const determinedFormType = computed(() => {
 	if (isUSCitizen.value === 'yes') {
 		return 'W-9'
 	} else if (isUSCitizen.value === 'no' && entityType.value === 'private-individual') {
-		return 'W-8 BEN'
+		return 'W-8BEN'
 	} else if (isUSCitizen.value === 'no' && entityType.value === 'foreign-entity') {
-		return 'W-8 BEN-E'
+		return 'W-8BEN-E'
 	}
 	return null
 })
@@ -145,8 +145,13 @@ async function continueForm() {
 	if (!import.meta.client) return
 	if (!determinedFormType.value) return
 
-	// TODO: Replace with actual response
-	const response: FormRequestResponse = {}
+	const response = (await useBaseFetch('payout/compliance', {
+		version: 3,
+		method: 'POST',
+		body: {
+			form_type: determinedFormType.value,
+		},
+	})) as FormRequestResponse
 
 	if (!avalaraState.value) {
 		avalaraState.value = useAvalara1099(response, {
