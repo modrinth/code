@@ -70,7 +70,7 @@ declare global {
 const injectedKey = '__avalara1099_script_injected__'
 
 function ensureScriptInjected(origin: string) {
-	if (process.server) return
+	if (import.meta.server) return
 	const w = window as any
 	if (w[injectedKey]) return
 	w[injectedKey] = true
@@ -90,7 +90,7 @@ async function waitForAvalara(opts: {
 	timeoutMs?: number
 	origin: string
 }): Promise<AvalaraGlobal> {
-	if (process.server) throw new Error('Avalara 1099 is client-side only')
+	if (import.meta.server) throw new Error('Avalara 1099 is client-side only')
 	ensureScriptInjected(opts.origin)
 	const start = Date.now()
 	return await new Promise((resolve, reject) => {
@@ -138,7 +138,7 @@ export function useAvalara1099(
 			let safeRequest: any
 			try {
 				safeRequest = JSON.parse(JSON.stringify(request.value))
-			} catch (_) {
+			} catch {
 				// Fallback shallow copy
 				safeRequest = Array.isArray(request.value)
 					? [...(request.value as any)]
@@ -148,7 +148,7 @@ export function useAvalara1099(
 			if (options.prefill) {
 				try {
 					safePrefill = JSON.parse(JSON.stringify(options.prefill))
-				} catch (_) {
+				} catch {
 					safePrefill = { ...options.prefill }
 				}
 			}

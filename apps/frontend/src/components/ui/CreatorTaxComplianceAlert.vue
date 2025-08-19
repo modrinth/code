@@ -1,7 +1,6 @@
 <template>
 	<NewModal ref="taxFormModal" header="Submit Tax Form" :closable="false">
 		<div
-			v-if="!shrinkModalBehindAvalara"
 			class="card flex flex-col gap-2 rounded-2xl border-[1px] border-solid !bg-button-bg p-2 text-contrast"
 		>
 			<span>
@@ -17,7 +16,7 @@
 				<InfoIcon class="my-auto" /> Learn more about their security practices here.
 			</a>
 		</div>
-		<div class="mt-2 flex flex-col gap-4" v-if="!shrinkModalBehindAvalara">
+		<div class="mt-2 flex flex-col gap-4">
 			<div class="flex flex-col gap-2">
 				<label>
 					<span class="text-lg font-semibold text-contrast">
@@ -96,8 +95,11 @@
 
 <script setup lang="ts">
 import { FileTextIcon, InfoIcon, TriangleAlertIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, Chips, NewModal } from '@modrinth/ui'
-import { useAvalara1099, type FormRequestResponse } from '~/composables/avalara1099'
+import { ButtonStyled, Chips, injectNotificationManager, NewModal } from '@modrinth/ui'
+
+import { type FormRequestResponse, useAvalara1099 } from '~/composables/avalara1099'
+
+const { addNotification } = injectNotificationManager()
 
 const taxFormModal = ref<InstanceType<typeof NewModal> | null>(null)
 const auth = await useAuth()
@@ -139,22 +141,16 @@ const loading = computed(() =>
 	avalaraState.value ? ((avalaraState.value as any).loading?.value ?? false) : false,
 )
 
-const shrinkModalBehindAvalara = ref(false)
-
 async function continueForm() {
 	if (!import.meta.client) return
 	if (!determinedFormType.value) return
-
-	shrinkModalBehindAvalara.value = true
 
 	// TODO: Replace with actual response
 	const response: FormRequestResponse = {}
 
 	if (!avalaraState.value) {
-		console.log('epic')
 		avalaraState.value = useAvalara1099(response, {
 			prefill: {
-				name: 'Firstname Middlename Surname',
 				email: (auth.value.user as any)?.email ?? '',
 				account_number: (auth.value.user as any)?.id ?? '',
 			},
@@ -166,9 +162,14 @@ async function continueForm() {
 			await avalaraState.value.start()
 			console.log(avalaraState.value.status)
 		}
-	} catch (e) {}
-
-	shrinkModalBehindAvalara.value = false
+	} catch (error) {
+		console.error('Error occurred while continuing tax form:', error)
+		addNotification({
+			title: 'Error occurred while continuing tax form',
+			text: error instanceof Error ? error.message : String(error),
+			type: 'error',
+		})
+	}
 }
 
 watch(isUSCitizen, (newValue) => {

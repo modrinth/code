@@ -153,8 +153,8 @@ import { injectNotificationManager } from '@modrinth/ui'
 import { formatDate } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
-import CreatorTaxComplianceAlert from '~/components/ui/CreatorTaxComplianceAlert.vue'
 
+import CreatorTaxComplianceAlert from '~/components/ui/CreatorTaxComplianceAlert.vue'
 import { getAuthUrl, removeAuthProvider } from '~/composables/auth.js'
 
 const { addNotification, handleError } = injectNotificationManager()
