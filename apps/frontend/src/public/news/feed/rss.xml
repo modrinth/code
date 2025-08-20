@@ -4,9 +4,17 @@
         <description><![CDATA[Keep up-to-date on the latest news from Modrinth.]]></description>
         <link>https://modrinth.com/news/</link>
         <generator>@modrinth/blog</generator>
-        <lastBuildDate>Tue, 15 Jul 2025 12:02:34 GMT</lastBuildDate>
+        <lastBuildDate>Wed, 20 Aug 2025 22:15:38 GMT</lastBuildDate>
         <atom:link href="https://modrinth.com/news/feed/rss.xml" rel="self" type="application/rss+xml"/>
         <language><![CDATA[en]]></language>
+        <item>
+            <title><![CDATA[Get a Free Modrinth Server]]></title>
+            <description><![CDATA[In partnership with Medal.tv, get a 5-day free trial for Modrinth Servers]]></description>
+            <link>https://modrinth.com/news/article/free-server-medal/</link>
+            <guid isPermaLink="false">https://modrinth.com/news/article/free-server-medal/</guid>
+            <pubDate>Wed, 20 Aug 2025 22:25:00 GMT</pubDate>
+            <content:encoded>&lt;![CDATA[&lt;p&gt;We’re excited to announce we’ve teamed up with &lt;a href=&quot;http://medal.tv/&quot; rel=&quot;noopener nofollow ugc&quot;&gt;Medal.tv&lt;/a&gt;, where millions of gamers share their favorite moments. Starting today, Modrinth users can claim a &lt;strong&gt;free 3GB US server for 5 days&lt;/strong&gt; by completing a Medal quest!&lt;/p&gt;&lt;p&gt;It’s the perfect way to try out Modrinth Servers, completely on us.&lt;/p&gt;&lt;h2&gt;How It Works&lt;/h2&gt;&lt;ol&gt;&lt;li&gt;&lt;a href=&quot;https://quests.medal.tv/modrinth&quot; rel=&quot;noopener nofollow ugc&quot;&gt;Download and install Medal&lt;/a&gt;&lt;/li&gt;&lt;li&gt;Start the Modrinth Quest&lt;/li&gt;&lt;li&gt;Save a clip playing your favourite Mod&lt;/li&gt;&lt;li&gt;Claim your reward&lt;/li&gt;&lt;li&gt;Manage your server on Modrinth&lt;/li&gt;&lt;/ol&gt;&lt;p&gt;No payment required. Just clip, claim, and start playing your favourite mods with your friends! Learn more about how it works &lt;a href=&quot;https://quests.medal.tv/modrinth&quot; rel=&quot;noopener nofollow ugc&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;]]&gt;</content:encoded>
+        </item>
         <item>
             <title><![CDATA[Skins — Now in Modrinth App!]]></title>
             <description><![CDATA[Customize your look, save your favorite skins, and swap them out in a flash, all within Modrinth App.]]></description>
