@@ -513,6 +513,38 @@ export interface ModerationJudgements {
 	[sha1: string]: ModerationJudgement
 }
 
+// Subscriptions
+export interface UserSubscription {
+	id: string
+	user_id: string
+	price_id: string
+	interval: 'five-days' | 'monthly' | 'quarterly' | 'yearly'
+	status: 'provisioned' | 'unprovisioned'
+	created: string // ISO date string
+	metadata?: SubscriptionMetadata
+}
+
+export interface Charge {
+	id: string
+	user_id: string
+	price_id: string
+	amount: number
+	currency_code: string
+	status: 'open' | 'processing' | 'succeeded' | 'failed' | 'cancelled' | 'expiring'
+	due: string // ISO date string
+	last_attempt?: string // ISO date string
+	type: 'one-time' | 'subscription' | 'proration' | 'refund'
+	subscription_id?: string
+	subscription_interval?: 'five-days' | 'monthly' | 'quarterly' | 'yearly'
+	platform: 'stripe' | 'none'
+	parent_charge_id?: string
+	net?: number
+}
+
+export type SubscriptionMetadata =
+	| { type: 'pyro'; id: string; region?: string }
+	| { type: 'medal'; id: string }
+
 // Delphi
 export interface DelphiReport {
 	id: string

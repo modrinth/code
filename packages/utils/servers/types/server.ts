@@ -37,6 +37,7 @@ export interface ServerGeneral {
 	flows?: {
 		intro?: boolean
 	}
+	is_medal?: boolean
 }
 
 export interface Allocation {

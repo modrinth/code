@@ -77,7 +77,7 @@
 							v-if="overrides[index] && overrides[index].type === 'dropdown'"
 							class="mt-2 flex w-full sm:w-[320px] sm:justify-end"
 						>
-							<UiServersTeleportDropdownMenu
+							<TeleportDropdownMenu
 								:id="`server-property-${index}`"
 								v-model="liveProperties[index]"
 								:name="formatPropertyName(index)"
@@ -144,7 +144,7 @@
 
 <script setup lang="ts">
 import { EyeIcon, IssuesIcon, SearchIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager } from '@modrinth/ui'
+import { ButtonStyled, injectNotificationManager, TeleportDropdownMenu } from '@modrinth/ui'
 import Fuse from 'fuse.js'
 import { computed, inject, ref, watch } from 'vue'
 

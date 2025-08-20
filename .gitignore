@@ -9,7 +9,6 @@ tmp
 node_modules
 
 # IDEs and editors
-/.idea
 .project
 .classpath
 .c9/
@@ -23,6 +22,11 @@ node_modules
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# IDE - IntelliJ
+.idea/*
+!.idea/modules.xml
+!.idea/code.iml
 
 # misc
 /.sass-cache
@@ -55,9 +59,5 @@ generated
 
 # app testing dir
 app-playground-data/*
-
-# soley because i need the PORT to be 3002 due to WSL stuff
-.env
-apps/frontend/.env
 
 .astro

@@ -34,6 +34,8 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
 	node!: { token: string; instance: string }
 	flows?: { intro?: boolean }
 
+	is_medal?: boolean
+
 	async fetch(): Promise<void> {
 		const data = await useServersFetch<ServerGeneral>(`servers/${this.serverId}`, {}, 'general')
 
