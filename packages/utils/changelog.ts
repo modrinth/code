@@ -14,7 +14,8 @@ const VERSIONS: VersionEntry[] = [
 		date: `2025-08-19T13:56:00-07:00`,
 		product: 'web',
 		body: `### Improvements
-- Fixed Modrinth Servers marketing page requiring auth.`,
+- Fixed Modrinth Servers marketing page requiring auth.
+- Fixed mobile responsiveness of Modrinth Servers Medal collaboration banner.`,
 	},
 	{
 		date: `2025-08-19T11:10:00-07:00`,
