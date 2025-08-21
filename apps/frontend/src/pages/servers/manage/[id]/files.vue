@@ -393,13 +393,13 @@ const fetchDirectoryContents = async (): Promise<DirectoryResponse> => {
 
 		if (currentPage.value === 1) {
 			return {
-				items: applyDefaultSort(data.items),
+				items: data.items,
 				total: data.total,
 			}
 		}
 
 		return {
-			items: [...(directoryData.value?.items || []), ...applyDefaultSort(data.items)],
+			items: [...(directoryData.value?.items || []), ...data.items],
 			total: data.total,
 		}
 	} catch (error) {
@@ -725,15 +725,6 @@ const handleCreateError = (error: any) => {
 			})
 		}
 	}
-}
-
-const applyDefaultSort = (items: DirectoryItem[]) => {
-	return items.sort((a: any, b: any) => {
-		if (a.type === 'directory' && b.type !== 'directory') return -1
-		if (a.type !== 'directory' && b.type === 'directory') return 1
-
-		return a.name.localeCompare(b.name)
-	})
 }
 
 const handleSort = (field: string) => {
