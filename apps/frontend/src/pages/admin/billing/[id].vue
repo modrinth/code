@@ -116,11 +116,14 @@
 				<div class="mb-4 grid grid-cols-[1fr_auto]">
 					<div>
 						<span class="flex items-center gap-2 font-semibold text-contrast">
-							<template v-if="subscription.product.metadata.type === 'midas'">
+							<template v-if="subscription.metadata?.type === 'midas'">
 								<ModrinthPlusIcon class="h-7 w-min" />
 							</template>
-							<template v-else-if="subscription.product.metadata.type === 'pyro'">
+							<template v-else-if="subscription.metadata?.type === 'pyro'">
 								<ModrinthServersIcon class="h-7 w-min" />
+							</template>
+							<template v-else-if="subscription.metadata?.type === 'medal'">
+								<span>Medal Trial Server</span>
 							</template>
 							<template v-else> Unknown product </template>
 						</span>
@@ -132,7 +135,11 @@
 						</div>
 					</div>
 					<div v-if="subscription.metadata?.id" class="flex flex-col items-end gap-2">
-						<ButtonStyled v-if="subscription.product.metadata.type === 'pyro'">
+						<ButtonStyled
+							v-if="
+								subscription.metadata?.type === 'pyro' || subscription.metadata?.type === 'medal'
+							"
+						>
 							<nuxt-link
 								:to="`/servers/manage/${subscription.metadata.id}`"
 								target="_blank"
@@ -152,7 +159,11 @@
 					>
 						<div
 							class="absolute bottom-0 left-0 top-0 w-1"
-							:class="charge.type === 'refund' ? 'bg-purple' : chargeStatuses[charge.status].color"
+							:class="
+								charge.type === 'refund'
+									? 'bg-purple'
+									: (chargeStatuses[charge.status]?.color ?? 'bg-blue')
+							"
 						/>
 						<div class="grid w-full grid-cols-[1fr_auto] items-center gap-4">
 							<div class="flex flex-col gap-2">
@@ -163,6 +174,7 @@
 										<template v-else-if="charge.status === 'cancelled'"> Cancelled </template>
 										<template v-else-if="charge.status === 'processing'"> Processing </template>
 										<template v-else-if="charge.status === 'open'"> Upcoming </template>
+										<template v-else-if="charge.status === 'expiring'"> Expiring </template>
 										<template v-else> {{ charge.status }} </template>
 									</span>
 									⋅
@@ -274,7 +286,6 @@ import { formatCategory, formatPrice } from '@modrinth/utils'
 import dayjs from 'dayjs'
 
 import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
-import { products } from '~/generated/state.json'
 
 const { addNotification } = injectNotificationManager()
 
@@ -333,9 +344,6 @@ const subscriptionCharges = computed(() => {
 				.filter((charge) => charge.subscription_id === subscription.id)
 				.slice()
 				.sort((a, b) => dayjs(b.due).diff(dayjs(a.due))),
-			product: products.find((product) =>
-				product.prices.some((price) => price.id === subscription.price_id),
-			),
 		}
 	})
 })
@@ -369,13 +377,17 @@ function showModifyModal(charge) {
 async function refundCharge() {
 	refunding.value = true
 	try {
+		const amountParsed = Math.max(0, Math.floor(Number(refundAmount.value) || 0))
+		const payload =
+			refundType.value === 'partial'
+				? { type: 'partial', amount: amountParsed, unprovision: unprovision.value }
+				: refundType.value === 'none'
+					? { type: 'none', unprovision: unprovision.value }
+					: { type: 'full', unprovision: unprovision.value }
+
 		await useBaseFetch(`billing/charge/${selectedCharge.value.id}/refund`, {
 			method: 'POST',
-			body: JSON.stringify({
-				type: refundType.value,
-				amount: refundAmount.value,
-				unprovision: unprovision.value,
-			}),
+			body: JSON.stringify(payload),
 			internal: true,
 		})
 		await refreshCharges()
@@ -431,6 +443,9 @@ const chargeStatuses = {
 	},
 	cancelled: {
 		color: 'bg-red',
+	},
+	expiring: {
+		color: 'bg-orange',
 	},
 }
 </script>

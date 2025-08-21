@@ -15,6 +15,7 @@ import { article as modpacks_alpha } from "./modpacks_alpha";
 import { article as modpack_changes } from "./modpack_changes";
 import { article as licensing_guide } from "./licensing_guide";
 import { article as knossos_v2_1_0 } from "./knossos_v2_1_0";
+import { article as free_server_medal } from "./free_server_medal";
 import { article as download_adjustment } from "./download_adjustment";
 import { article as design_refresh } from "./design_refresh";
 import { article as creator_updates_july_2025 } from "./creator_updates_july_2025";
@@ -43,6 +44,7 @@ export const articles = [
   modpack_changes,
   licensing_guide,
   knossos_v2_1_0,
+  free_server_medal,
   download_adjustment,
   design_refresh,
   creator_updates_july_2025,

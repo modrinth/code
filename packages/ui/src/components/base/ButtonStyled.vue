@@ -3,7 +3,7 @@ import { computed } from 'vue'
 
 const props = withDefaults(
 	defineProps<{
-		color?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple'
+		color?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple' | 'medal-promo'
 		size?: 'standard' | 'large' | 'small'
 		circular?: boolean
 		type?: 'standard' | 'outlined' | 'transparent' | 'highlight' | 'highlight-colored-text'
@@ -34,6 +34,7 @@ const highlightedColorVar = computed(() => {
 			return 'var(--color-orange-highlight)'
 		case 'green':
 			return 'var(--color-green-highlight)'
+		case 'medal-promo':
 		case 'blue':
 			return 'var(--color-blue-highlight)'
 		case 'purple':
@@ -58,6 +59,8 @@ const colorVar = computed(() => {
 			return 'var(--color-blue)'
 		case 'purple':
 			return 'var(--color-purple)'
+		case 'medal-promo':
+			return 'var(--medal-promotion-text-orange)'
 		case 'standard':
 		default:
 			return null

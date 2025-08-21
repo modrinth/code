@@ -237,7 +237,7 @@ onMounted(() => {
 						>{{ formatPrice(locale, selectedPrice, currency, true) }} / month</span
 					><span v-if="interval !== 'monthly'">, billed {{ interval }}</span>
 				</p>
-				<div class="bg-bg rounded-xl p-4 mt-2 text-secondary">
+				<div class="bg-bg rounded-xl p-4 mt-2 text-secondary h-14">
 					<div v-if="checkingCustomStock" class="flex gap-2 items-center">
 						<SpinnerIcon class="size-5 shrink-0 animate-spin" /> Checking availability...
 					</div>
