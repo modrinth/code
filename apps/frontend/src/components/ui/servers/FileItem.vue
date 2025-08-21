@@ -78,8 +78,8 @@ import {
 } from '@modrinth/assets'
 import { ButtonStyled } from '@modrinth/ui'
 import { computed, ref, shallowRef } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import { renderToString } from 'vue/server-renderer'
+import { useRoute, useRouter } from 'vue-router'
 
 import {
 	UiServersIconsCodeFileIcon,
