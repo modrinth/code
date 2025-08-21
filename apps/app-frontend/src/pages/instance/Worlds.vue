@@ -122,15 +122,14 @@
 </template>
 <script setup lang="ts">
 import { PlusIcon, SearchIcon, SpinnerIcon, UpdatedIcon, XIcon } from '@modrinth/assets'
-import type { 	Button,
+import type { FilterBarOption, GameVersion, Version } from '@modrinth/ui'
+import {
+	Button,
 	ButtonStyled,
 	FilterBar,
-	type FilterBarOption,
 	GAME_MODES,
-	type GameVersion,
 	injectNotificationManager,
 	RadialHeader,
-Version ,
 } from '@modrinth/ui'
 import { defineMessages } from '@vintl/vintl'
 import { computed, onUnmounted, ref, watch } from 'vue'
