@@ -140,7 +140,7 @@ import {
 	formatProjectType,
 	type Project,
 	sortedCategories,
-} from '@modrinth/utils'
+} from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import Checkbox from '~/components/ui/Checkbox.vue'

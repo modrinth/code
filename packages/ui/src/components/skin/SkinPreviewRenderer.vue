@@ -108,7 +108,7 @@ import {
 	applyTexture,
 	createTransparentTexture,
 	loadTexture as loadSkinTexture,
-} from '@modrinth/utils'
+} from '@modrinth/ui'
 import { useGLTF } from '@tresjs/cientos'
 import { TresCanvas, useRenderLoop, useTexture } from '@tresjs/core'
 import { EffectComposerPmndrs, FXAAPmndrs } from '@tresjs/post-processing'

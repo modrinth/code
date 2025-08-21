@@ -38,3 +38,32 @@ export function toVarName(file: string): string {
 		.replace(/^_+/, '')
 		.replace(/_+$/, '')
 }
+
+export type ArticleRss = {
+	title: string
+	summary: string
+	date: string
+	slug: string
+	html: string
+}
+
+export type ArticleJson = {
+	title: string
+	summary: string
+	thumbnail: string
+	date: string // ISO string
+	link: string
+}
+
+export type RssItem = {
+	title?: string[]
+	'content:encoded'?: string[]
+}
+
+export type ParsedRss = {
+	rss?: {
+		channel?: Array<{
+			item?: RssItem[]
+		}>
+	}
+}

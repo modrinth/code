@@ -336,11 +336,12 @@ import {
 	Categories,
 	CopyCode,
 	DoubleIcon,
+	getUserLink,
 	injectNotificationManager,
 	ProjectStatusBadge,
+	renderString,
 	useRelativeTime,
 } from '@modrinth/ui'
-import { getUserLink, renderString } from '@modrinth/utils'
 
 import { markAsRead } from '~/helpers/platform-notifications'
 import { getProjectLink, getVersionLink } from '~/helpers/projects'

@@ -28,8 +28,8 @@ import {
 	NotificationPanel,
 	OverflowMenu,
 	provideNotificationManager,
+	renderString,
 } from '@modrinth/ui'
-import { renderString } from '@modrinth/utils'
 import { getVersion } from '@tauri-apps/api/app'
 import { invoke } from '@tauri-apps/api/core'
 import { getCurrentWindow } from '@tauri-apps/api/window'

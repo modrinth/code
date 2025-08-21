@@ -1,6 +1,5 @@
-import type { AbstractWebNotificationManager } from '@modrinth/ui'
-import type { JWTAuth, ModuleError, ModuleName } from '@modrinth/utils'
-import { ModrinthServerError } from '@modrinth/utils'
+import type { AbstractWebNotificationManager, JWTAuth, ModuleError, ModuleName } from '@modrinth/ui'
+import { ModrinthServerError } from '@modrinth/ui'
 
 import {
 	BackupsModule,

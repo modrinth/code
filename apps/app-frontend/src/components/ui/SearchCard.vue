@@ -118,8 +118,13 @@
 
 <script setup>
 import { CheckIcon, DownloadIcon, HeartIcon, PlusIcon, TagsIcon } from '@modrinth/assets'
-import { Avatar, ButtonStyled, injectNotificationManager } from '@modrinth/ui'
-import { formatCategory, formatNumber } from '@modrinth/utils'
+import {
+	Avatar,
+	ButtonStyled,
+	formatCategory,
+	formatNumber,
+	injectNotificationManager,
+} from '@modrinth/ui'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { computed, ref } from 'vue'

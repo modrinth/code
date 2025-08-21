@@ -196,8 +196,14 @@ import {
 	TransferIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Breadcrumbs, Checkbox, Chips, injectNotificationManager } from '@modrinth/ui'
-import { formatMoney, formatWallet } from '@modrinth/utils'
+import {
+	Breadcrumbs,
+	Checkbox,
+	Chips,
+	formatMoney,
+	formatWallet,
+	injectNotificationManager,
+} from '@modrinth/ui'
 import { all } from 'iso-3166-1'
 import { Multiselect } from 'vue-multiselect'
 

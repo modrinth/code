@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { SignalIcon, SpinnerIcon } from '@modrinth/assets'
-import { getPingLevel } from '@modrinth/utils'
+import { getPingLevel } from '@modrinth/ui'
 import { useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
 

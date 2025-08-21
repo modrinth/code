@@ -57,8 +57,7 @@
 
 <script setup>
 import { DownloadIcon, XIcon } from '@modrinth/assets'
-import { Button, injectNotificationManager } from '@modrinth/ui'
-import { formatCategory } from '@modrinth/utils'
+import { Button, formatCategory, injectNotificationManager } from '@modrinth/ui'
 import { ref } from 'vue'
 import Multiselect from 'vue-multiselect'
 

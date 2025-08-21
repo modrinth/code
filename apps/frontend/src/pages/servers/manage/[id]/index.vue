@@ -182,8 +182,8 @@
 
 <script setup lang="ts">
 import { IssuesIcon, TerminalSquareIcon, XIcon } from '@modrinth/assets'
+import type { ServerState, Stats } from '@modrinth/ui'
 import { ButtonStyled } from '@modrinth/ui'
-import type { ServerState, Stats } from '@modrinth/utils'
 
 import PanelServerStatus from '~/components/ui/servers/PanelServerStatus.vue'
 import PanelTerminal from '~/components/ui/servers/PanelTerminal.vue'

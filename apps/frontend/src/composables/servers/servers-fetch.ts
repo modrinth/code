@@ -1,5 +1,5 @@
-import type { V1ErrorInfo } from '@modrinth/utils'
-import { ModrinthServerError, ModrinthServersFetchError } from '@modrinth/utils'
+import type { V1ErrorInfo } from '@modrinth/ui'
+import { ModrinthServerError, ModrinthServersFetchError } from '@modrinth/ui'
 import { $fetch, FetchError } from 'ofetch'
 
 export interface ServersFetchOptions {

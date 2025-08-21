@@ -9,7 +9,7 @@ import {
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { formatPrice, getPingLevel, type UserSubscription } from '@modrinth/utils'
+import { formatPrice, getPingLevel, type UserSubscription } from '@modrinth/ui'
 import { useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import type Stripe from 'stripe'

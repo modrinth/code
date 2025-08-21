@@ -151,8 +151,14 @@ import {
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { BackupWarning, ButtonStyled, injectNotificationManager, NewModal } from '@modrinth/ui'
-import { formatBytes, ModrinthServersFetchError } from '@modrinth/utils'
+import {
+	BackupWarning,
+	ButtonStyled,
+	formatBytes,
+	injectNotificationManager,
+	ModrinthServersFetchError,
+	NewModal,
+} from '@modrinth/ui'
 import { onMounted, onUnmounted } from 'vue'
 
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers'

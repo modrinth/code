@@ -1,6 +1,6 @@
 import * as path from 'path'
 
-import { repoPath } from './utils'
+import { repoPath } from './build/utils.ts'
 
 /**
  * The glob pattern to find all markdown articles which should be compiled.

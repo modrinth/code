@@ -317,10 +317,10 @@ import {
 	Checkbox,
 	commonMessages,
 	CopyCode,
+	formatProjectType,
 	injectNotificationManager,
 	Modal,
 } from '@modrinth/ui'
-import { formatProjectType } from '@modrinth/utils'
 import { Multiselect } from 'vue-multiselect'
 
 import ModalCreation from '~/components/ui/ModalCreation.vue'

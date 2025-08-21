@@ -541,7 +541,7 @@ import {
 	UnknownIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { calculateSavings, createStripeElements, formatPrice, getCurrency } from '@modrinth/utils'
+import { calculateSavings, createStripeElements, formatPrice, getCurrency } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { computed, nextTick, reactive, ref, watch } from 'vue'

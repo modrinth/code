@@ -116,8 +116,8 @@ import {
 	UpdatedIcon,
 	XIcon,
 } from '@modrinth/assets'
+import type { PowerAction as ServerPowerAction, ServerState } from '@modrinth/ui'
 import { ButtonStyled, Checkbox, NewModal } from '@modrinth/ui'
-import type { PowerAction as ServerPowerAction, ServerState } from '@modrinth/utils'
 import { useStorage } from '@vueuse/core'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'

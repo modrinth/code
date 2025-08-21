@@ -27,7 +27,6 @@
 		"@codemirror/state": "^6.3.2",
 		"@codemirror/view": "^6.22.1",
 		"@modrinth/assets": "workspace:*",
-		"@modrinth/utils": "workspace:*",
 		"@tresjs/cientos": "^4.3.0",
 		"@tresjs/core": "^4.3.4",
 		"@tresjs/post-processing": "^2.4.0",

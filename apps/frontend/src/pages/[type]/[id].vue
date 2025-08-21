@@ -949,6 +949,8 @@ import {
 	Avatar,
 	ButtonStyled,
 	Checkbox,
+	formatCategory,
+	formatProjectType,
 	injectNotificationManager,
 	NewModal,
 	OverflowMenu,
@@ -960,13 +962,13 @@ import {
 	ProjectSidebarDetails,
 	ProjectSidebarLinks,
 	ProjectStatusBadge,
+	renderString,
 	ScrollablePanel,
 	ServersPromo,
 	TagItem,
 	useRelativeTime,
 } from '@modrinth/ui'
 import VersionSummary from '@modrinth/ui/src/components/version/VersionSummary.vue'
-import { formatCategory, formatProjectType, renderString } from '@modrinth/utils'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'

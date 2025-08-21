@@ -15,16 +15,14 @@ import {
 	ButtonStyled,
 	Checkbox,
 	Chips,
-	injectNotificationManager,
-	TeleportDropdownMenu,
-} from '@modrinth/ui'
-import {
 	formatCategory,
 	type GameVersionTag,
+	injectNotificationManager,
 	type PlatformTag,
 	type Project,
+	TeleportDropdownMenu,
 	type Version,
-} from '@modrinth/utils'
+} from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { computed, type ComputedRef, type Ref, ref, shallowRef, watch } from 'vue'

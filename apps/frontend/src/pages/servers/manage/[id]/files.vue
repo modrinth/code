@@ -267,9 +267,14 @@ import {
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, ProgressBar } from '@modrinth/ui'
-import type { DirectoryItem, DirectoryResponse, FilesystemOp, FSQueuedOp } from '@modrinth/utils'
-import { formatBytes, ModrinthServersFetchError } from '@modrinth/utils'
+import type { DirectoryItem, DirectoryResponse, FilesystemOp, FSQueuedOp } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	formatBytes,
+	injectNotificationManager,
+	ModrinthServersFetchError,
+	ProgressBar,
+} from '@modrinth/ui'
 import { useInfiniteScroll } from '@vueuse/core'
 import { computed } from 'vue'
 

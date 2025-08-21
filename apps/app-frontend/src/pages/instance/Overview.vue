@@ -1,6 +1,6 @@
 <template>{{ instance.name }} overview</template>
 <script setup lang="ts">
-import type { Version } from '@modrinth/utils'
+import type { Version } from '@modrinth/ui'
 
 import type ContextMenu from '@/components/ui/ContextMenu.vue'
 import type { GameInstance } from '@/helpers/types'

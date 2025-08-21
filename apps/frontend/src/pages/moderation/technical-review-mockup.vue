@@ -78,8 +78,8 @@
 <script setup lang="ts">
 import { FilterIcon, SearchIcon, SortAscIcon, SortDescIcon, XIcon } from '@modrinth/assets'
 import type { ExtendedDelphiReport, OwnershipTarget } from '@modrinth/moderation'
+import type { DelphiReport, Organization, Project, TeamMember, Version } from '@modrinth/ui'
 import { Button, DropdownSelect, Pagination } from '@modrinth/ui'
-import type { DelphiReport, Organization, Project, TeamMember, Version } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { useLocalStorage } from '@vueuse/core'
 import Fuse from 'fuse.js'

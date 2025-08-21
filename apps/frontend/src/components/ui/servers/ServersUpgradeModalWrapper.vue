@@ -27,9 +27,9 @@
 </template>
 
 <script setup lang="ts">
+import type { UserSubscription } from '@modrinth/ui'
 import { injectNotificationManager, ModrinthServersPurchaseModal } from '@modrinth/ui'
 import type { ServerPlan } from '@modrinth/ui/src/utils/billing'
-import type { UserSubscription } from '@modrinth/utils'
 import { computed, onMounted, ref } from 'vue'
 
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'

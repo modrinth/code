@@ -58,9 +58,9 @@
 
 <script setup lang="ts">
 import { FilterIcon } from '@modrinth/assets'
+import { formatCategory, type GameVersionTag, type Version } from '@modrinth/ui'
 import Checkbox from '@modrinth/ui/src/components/base/Checkbox.vue'
 import ManySelect from '@modrinth/ui/src/components/base/ManySelect.vue'
-import { formatCategory, type GameVersionTag, type Version } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 

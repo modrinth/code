@@ -74,8 +74,13 @@
 
 <script setup lang="ts">
 import { DownloadIcon, ExternalIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
-import { BackupWarning, ButtonStyled, injectNotificationManager, NewModal } from '@modrinth/ui'
-import { ModrinthServersFetchError } from '@modrinth/utils'
+import {
+	BackupWarning,
+	ButtonStyled,
+	injectNotificationManager,
+	ModrinthServersFetchError,
+	NewModal,
+} from '@modrinth/ui'
 import { computed, nextTick, ref } from 'vue'
 
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'

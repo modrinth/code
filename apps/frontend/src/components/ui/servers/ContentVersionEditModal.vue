@@ -242,11 +242,14 @@ import {
 	Avatar,
 	ButtonStyled,
 	CopyCode,
+	formatCategory,
+	formatVersionsForDisplay,
+	type Mod,
 	NewModal,
 	TeleportDropdownMenu,
+	type Version,
 } from '@modrinth/ui'
 import TagItem from '@modrinth/ui/src/components/base/TagItem.vue'
-import { formatCategory, formatVersionsForDisplay, type Mod, type Version } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
 import Accordion from '~/components/ui/Accordion.vue'

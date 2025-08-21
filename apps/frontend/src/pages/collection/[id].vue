@@ -403,10 +403,10 @@ import {
 	DropdownSelect,
 	FileInput,
 	injectNotificationManager,
+	isAdmin,
 	PopoutMenu,
 	useRelativeTime,
 } from '@modrinth/ui'
-import { isAdmin } from '@modrinth/utils'
 import { IntlFormatted } from '@vintl/vintl/components'
 import UpToDate from 'assets/images/illustrations/up_to_date.svg'
 

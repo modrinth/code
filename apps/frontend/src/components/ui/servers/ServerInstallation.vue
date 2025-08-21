@@ -159,8 +159,8 @@
 
 <script setup lang="ts">
 import { CompassIcon, InfoIcon, SettingsIcon, TransferIcon, UploadIcon } from '@modrinth/assets'
+import type { Loaders } from '@modrinth/ui'
 import { ButtonStyled, NewProjectCard } from '@modrinth/ui'
-import type { Loaders } from '@modrinth/utils'
 
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import type { BackupInProgressReason } from '~/pages/servers/manage/[id].vue'

@@ -619,14 +619,16 @@ import {
 import {
 	AddPaymentMethodModal,
 	ButtonStyled,
+	calculateSavings,
 	commonMessages,
 	ConfirmModal,
 	CopyCode,
+	formatPrice,
+	getCurrency,
 	injectNotificationManager,
 	OverflowMenu,
 	PurchaseModal,
 } from '@modrinth/ui'
-import { calculateSavings, formatPrice, getCurrency } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
 import { useBaseFetch } from '@/composables/fetch.js'

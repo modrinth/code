@@ -183,8 +183,16 @@
 
 <script setup>
 import { CheckIcon, DownloadIcon, ExternalIcon, FileIcon, ReportIcon } from '@modrinth/assets'
-import { Avatar, Badge, Breadcrumbs, Button, Card, CopyCode } from '@modrinth/ui'
-import { formatBytes, renderString } from '@modrinth/utils'
+import {
+	Avatar,
+	Badge,
+	Breadcrumbs,
+	Button,
+	Card,
+	CopyCode,
+	formatBytes,
+	renderString,
+} from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 

@@ -9,6 +9,7 @@ import {
 	UpdatedIcon,
 } from '@modrinth/assets'
 import {
+	arrayBufferToBase64,
 	Button,
 	ButtonStyled,
 	ConfirmModal,
@@ -17,7 +18,6 @@ import {
 	SkinLikeTextButton,
 	SkinPreviewRenderer,
 } from '@modrinth/ui'
-import { arrayBufferToBase64 } from '@modrinth/utils'
 import { computedAsync } from '@vueuse/core'
 import type { Ref } from 'vue'
 import { computed, inject, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue'

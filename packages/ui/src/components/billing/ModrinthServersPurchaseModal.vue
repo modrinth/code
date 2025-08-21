@@ -7,7 +7,7 @@ import {
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
-import type { UserSubscription } from '@modrinth/utils'
+import type { UserSubscription } from '@modrinth/ui'
 import { defineMessage, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import type Stripe from 'stripe'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'

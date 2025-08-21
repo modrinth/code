@@ -271,16 +271,16 @@ import {
 	UsersIcon,
 	XIcon,
 } from '@modrinth/assets'
+import type { Organization, ProjectStatus, ProjectType, ProjectV3 } from '@modrinth/ui'
 import {
 	Avatar,
 	Breadcrumbs,
 	ButtonStyled,
 	commonMessages,
 	ContentPageHeader,
+	formatNumber,
 	OverflowMenu,
 } from '@modrinth/ui'
-import type { Organization, ProjectStatus, ProjectType, ProjectV3 } from '@modrinth/utils'
-import { formatNumber } from '@modrinth/utils'
 
 import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'

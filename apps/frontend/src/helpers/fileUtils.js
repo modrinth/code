@@ -1,4 +1,4 @@
-import { formatBytes } from '@modrinth/utils'
+import { formatBytes } from '@modrinth/ui'
 
 export const fileIsValid = (file, validationOptions) => {
 	const { maxSize, alertOnInvalid } = validationOptions

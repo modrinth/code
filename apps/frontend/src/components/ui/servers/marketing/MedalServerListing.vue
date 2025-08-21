@@ -129,8 +129,8 @@
 
 <script setup lang="ts">
 import { ChevronRightIcon, LockIcon, RocketIcon, SparklesIcon } from '@modrinth/assets'
+import type { Project, Server } from '@modrinth/ui'
 import { AutoLink, Avatar, ButtonStyled, CopyCode } from '@modrinth/ui'
-import type { Project, Server } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import dayjsDuration from 'dayjs/plugin/duration'
 

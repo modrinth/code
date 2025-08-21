@@ -155,15 +155,16 @@
 
 <script setup lang="ts">
 import { SaveIcon } from '@modrinth/assets'
-import { Checkbox, DropdownSelect } from '@modrinth/ui'
 import {
 	type BuiltinLicense,
 	builtinLicenses,
+	Checkbox,
+	DropdownSelect,
 	formatProjectType,
 	type Project,
 	type TeamMember,
 	TeamMemberPermission,
-} from '@modrinth/utils'
+} from '@modrinth/ui'
 import { computed, type Ref, ref } from 'vue'
 
 const props = defineProps<{

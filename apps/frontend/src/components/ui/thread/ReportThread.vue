@@ -111,8 +111,8 @@
 
 <script setup lang="ts">
 import { CheckCircleIcon, ReplyIcon, ScaleIcon, SendIcon } from '@modrinth/assets'
+import type { Report, Thread, ThreadMessage as TypeThreadMessage, User } from '@modrinth/ui'
 import { ButtonStyled, CopyCode, injectNotificationManager, MarkdownEditor } from '@modrinth/ui'
-import type { Report, Thread, ThreadMessage as TypeThreadMessage, User } from '@modrinth/utils'
 import dayjs from 'dayjs'
 
 import { useImageUpload } from '~/composables/image-upload.ts'

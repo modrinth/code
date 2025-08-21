@@ -80,7 +80,7 @@
 
 <script setup lang="ts">
 import { FilterIcon, XCircleIcon, XIcon } from '@modrinth/assets'
-import { formatCategory, type GameVersionTag, type Version } from '@modrinth/utils'
+import { formatCategory, type GameVersionTag, type Version } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 

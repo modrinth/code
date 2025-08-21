@@ -205,8 +205,7 @@
 
 <script setup lang="ts">
 import { CodeIcon, RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
-import { Button, injectNotificationManager, ThemeSelector } from '@modrinth/ui'
-import { formatProjectType } from '@modrinth/utils'
+import { Button, formatProjectType, injectNotificationManager, ThemeSelector } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
 

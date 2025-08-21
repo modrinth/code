@@ -1,4 +1,4 @@
-import { formatProjectType } from '@modrinth/utils'
+import { formatProjectType } from '@modrinth/ui'
 import { defineMessage, useVIntl } from '@vintl/vintl'
 
 import type { Nag, NagContext } from '../../types/nags'

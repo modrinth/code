@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ServerState } from '@modrinth/utils'
+import type { ServerState } from '@modrinth/ui'
 import { ref } from 'vue'
 
 const STATUS_CLASSES = {

@@ -146,7 +146,6 @@
 
 <script setup lang="ts">
 import { LeftArrowIcon, RightArrowIcon } from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
 import type {
 	ModerationFlameModpackItem,
 	ModerationJudgements,
@@ -155,7 +154,8 @@ import type {
 	ModerationModpackResponse,
 	ModerationPermissionType,
 	ModerationUnknownModpackItem,
-} from '@modrinth/utils'
+} from '@modrinth/ui'
+import { ButtonStyled } from '@modrinth/ui'
 import { useLocalStorage, useSessionStorage } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 

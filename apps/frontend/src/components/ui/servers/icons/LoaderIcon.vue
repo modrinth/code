@@ -224,7 +224,7 @@
 
 <script setup lang="ts">
 import { LoaderIcon } from '@modrinth/assets'
-import type { Loaders } from '@modrinth/utils'
+import type { Loaders } from '@modrinth/ui'
 
 defineProps<{
 	loader: Loaders

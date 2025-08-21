@@ -1,5 +1,5 @@
 import { PackageOpenIcon } from '@modrinth/assets'
-import type { ModerationModpackPermissionApprovalType, Project } from '@modrinth/utils'
+import type { ModerationModpackPermissionApprovalType, Project } from '@modrinth/ui'
 
 import type { Stage } from '../types/stage'
 

@@ -645,9 +645,13 @@ import {
 	TransferIcon,
 	VersionIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, ModrinthServersPurchaseModal } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	formatPrice,
+	injectNotificationManager,
+	ModrinthServersPurchaseModal,
+} from '@modrinth/ui'
 import { monthsInInterval } from '@modrinth/ui/src/utils/billing.ts'
-import { formatPrice } from '@modrinth/utils'
 import { useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
 

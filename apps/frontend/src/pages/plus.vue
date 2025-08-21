@@ -86,8 +86,13 @@
 </template>
 <script setup>
 import { HeartIcon, ModrinthPlusIcon, SettingsIcon, SparklesIcon, StarIcon } from '@modrinth/assets'
-import { injectNotificationManager, PurchaseModal } from '@modrinth/ui'
-import { calculateSavings, formatPrice, getCurrency } from '@modrinth/utils'
+import {
+	calculateSavings,
+	formatPrice,
+	getCurrency,
+	injectNotificationManager,
+	PurchaseModal,
+} from '@modrinth/ui'
 
 import { useBaseFetch } from '@/composables/fetch.js'
 import { isPermission } from '@/utils/permissions.ts'

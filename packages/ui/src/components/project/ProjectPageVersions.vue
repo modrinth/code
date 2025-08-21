@@ -178,13 +178,13 @@ import {
 	type GameVersionTag,
 	type PlatformTag,
 	type Version,
-} from '@modrinth/utils'
+} from '@modrinth/ui'
 import { useVIntl } from '@vintl/vintl'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useRelativeTime } from '../../composables'
-import { commonMessages } from '../../utils/common-messages'
+import { commonMessages } from '../../messages/common-messages'
 import AutoLink from '../base/AutoLink.vue'
 import TagItem from '../base/TagItem.vue'
 import { Pagination, VersionChannelIndicator, VersionFilterControl } from '../index'

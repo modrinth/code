@@ -44,8 +44,7 @@
 <script lang="ts" setup>
 import { SaveIcon, TriangleAlertIcon } from '@modrinth/assets'
 import { countText, MIN_DESCRIPTION_CHARS } from '@modrinth/moderation'
-import { MarkdownEditor } from '@modrinth/ui'
-import { type Project, type TeamMember, TeamMemberPermission } from '@modrinth/utils'
+import { MarkdownEditor, type Project, type TeamMember, TeamMemberPermission } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { useImageUpload } from '~/composables/image-upload.ts'

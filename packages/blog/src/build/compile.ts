@@ -1,4 +1,4 @@
-import { md } from '@modrinth/utils'
+import { md } from '@modrinth/ui/src/utils/parse'
 import { promises as fs } from 'fs'
 import { glob } from 'glob'
 import matter from 'gray-matter'
@@ -16,8 +16,15 @@ import {
 	ROOT_FILE,
 	RSS_PATH,
 	SITE_URL,
-} from './blog.config'
-import { copyDir, toVarName } from './utils'
+} from '../blog.config.ts'
+import {
+	type ArticleJson,
+	type ArticleRss,
+	copyDir,
+	type ParsedRss,
+	type RssItem,
+	toVarName,
+} from './utils.ts'
 
 async function ensureCompiledDir() {
 	await fs.mkdir(COMPILED_DIR, { recursive: true })
@@ -52,8 +59,8 @@ async function compileArticles() {
 	console.log(`🔎  Found ${files.length} markdown articles!`)
 	const articleExports: string[] = []
 	const articlesArray: string[] = []
-	const articlesForRss = []
-	const articlesForJson = []
+	const articlesForRss: ArticleRss[] = []
+	const articlesForJson: ArticleJson[] = []
 
 	for (const file of files) {
 		const src = await fs.readFile(file, 'utf8')
@@ -71,7 +78,11 @@ async function compileArticles() {
 			removeComments: true,
 		})
 
-		const authors = authorsData ? authorsData : []
+		const authors: string[] = Array.isArray(authorsData)
+			? (authorsData as string[])
+			: authorsData
+				? [authorsData as string]
+				: []
 
 		const slug = frontSlug || path.basename(file, '.md')
 		const varName = toVarName(slug)
@@ -111,7 +122,7 @@ export const article = {
 			date,
 			slug,
 			html: minifiedHtml,
-		} as never)
+		})
 
 		articlesForJson.push({
 			title,
@@ -119,7 +130,7 @@ export const article = {
 			thumbnail: getThumbnailUrl(slug, thumbnailPresent),
 			date: new Date(date).toISOString(),
 			link: getArticleLink(slug),
-		} as never)
+		})
 	}
 
 	console.log(`📂  Compiled ${files.length} articles.`)
@@ -140,7 +151,7 @@ export const articles = [
 	await generateJsonFile(articlesForJson)
 }
 
-async function generateRssFeed(articles): Promise<void> {
+async function generateRssFeed(articles: ArticleRss[]): Promise<void> {
 	const sorted = [...articles].sort(
 		(a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
 	)
@@ -148,9 +159,9 @@ async function generateRssFeed(articles): Promise<void> {
 	let currentRssArticles: { title: string; html: string }[] = []
 	try {
 		const xml = await fs.readFile(RSS_PATH, 'utf8')
-		const parsed = await parseStringPromise(xml)
-		const items = parsed.rss?.channel?.[0]?.item || []
-		currentRssArticles = items.map((item) => ({
+		const parsed = (await parseStringPromise(xml)) as ParsedRss
+		const items: RssItem[] = parsed.rss?.channel?.[0]?.item || []
+		currentRssArticles = items.map((item: RssItem) => ({
 			title: (item.title?.[0] ?? '').trim(),
 			html: (item['content:encoded']?.[0] ?? '').replace(/^<!\[CDATA\[|\]\]>$/g, '').trim(),
 		}))
@@ -206,7 +217,7 @@ async function generateRssFeed(articles): Promise<void> {
 	console.log(`📂  RSS feed written to ${RSS_PATH}`)
 }
 
-async function generateJsonFile(articles): Promise<void> {
+async function generateJsonFile(articles: ArticleJson[]): Promise<void> {
 	const sorted = [...articles].sort(
 		(a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
 	)

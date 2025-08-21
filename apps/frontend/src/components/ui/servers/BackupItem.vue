@@ -13,8 +13,8 @@ import {
 	TrashIcon,
 	XIcon,
 } from '@modrinth/assets'
+import type { Backup } from '@modrinth/ui'
 import { ButtonStyled, commonMessages, OverflowMenu, ProgressBar } from '@modrinth/ui'
-import type { Backup } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'

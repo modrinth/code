@@ -380,16 +380,14 @@ import {
 	DropdownSelect,
 	injectNotificationManager,
 	MarkdownEditor,
-	OverflowMenu,
-	type OverflowMenuOption,
-} from '@modrinth/ui'
-import {
 	type ModerationJudgements,
 	type ModerationModpackItem,
+	OverflowMenu,
+	type OverflowMenuOption,
 	type Project,
 	type ProjectStatus,
 	renderHighlightedString,
-} from '@modrinth/utils'
+} from '@modrinth/ui'
 import { computedAsync, useLocalStorage } from '@vueuse/core'
 
 import { useModerationStore } from '~/store/moderation.ts'

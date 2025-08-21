@@ -71,8 +71,8 @@
 <script setup lang="ts">
 import { FilterIcon, SearchIcon, SortAscIcon, SortDescIcon, XIcon } from '@modrinth/assets'
 import type { ExtendedReport } from '@modrinth/moderation'
+import type { Report } from '@modrinth/ui'
 import { Button, DropdownSelect, Pagination } from '@modrinth/ui'
-import type { Report } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import Fuse from 'fuse.js'
 

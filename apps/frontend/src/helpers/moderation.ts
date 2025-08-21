@@ -1,13 +1,5 @@
 import type { ExtendedReport, OwnershipTarget } from '@modrinth/moderation'
-import type {
-	Organization,
-	Project,
-	Report,
-	TeamMember,
-	Thread,
-	User,
-	Version,
-} from '@modrinth/utils'
+import type { Organization, Project, Report, TeamMember, Thread, User, Version } from '@modrinth/ui'
 
 export const useModerationCache = () => ({
 	threads: useState<Map<string, Thread>>('moderation-report-cache-threads', () => new Map()),

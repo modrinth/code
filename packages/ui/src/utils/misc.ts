@@ -1,20 +1,51 @@
-// noinspection JSUnusedGlobalSymbols
-
-// @ts-nocheck
-
 import dayjs from 'dayjs'
 
-export const external = (cosmetics) => (cosmetics.externalLinksNewTab ? '_blank' : '')
+interface VersionFileDetailed {
+	primary?: boolean
+	hashes?: { sha1: string; sha512: string }
+	url?: string
+	filename?: string
+	size?: number
+	file_type?: string | null
+}
+
+interface Member {
+	user: { id: string }
+}
+
+interface ProjectVersion {
+	id: string
+	date_published: string | Date
+	version_number: string
+	files: VersionFileDetailed[]
+	author_id: string
+	displayUrlEnding?: string
+	primaryFile?: VersionFileDetailed
+	author?: Member
+	changelog?: string | null
+}
+
+interface CategoryTag {
+	header: string
+	name: string
+}
+interface GameVersion {
+	version_type: string
+	version: string
+}
+
+export const external = (cosmetics: { externalLinksNewTab: boolean }) =>
+	cosmetics.externalLinksNewTab ? '_blank' : ''
 
 // Only use on the complete list of versions for a project,
 // partial lists will generate the wrong version slugs
-export const computeVersions = (versions, members) => {
-	const visitedVersions = []
-	const returnVersions = []
-	const authorMembers = {}
+export function computeVersions(versions: ProjectVersion[], members: Member[]) {
+	const visitedVersions: string[] = []
+	const returnVersions: ProjectVersion[] = []
+	const authorMembers: Record<string, Member | undefined> = {}
 
 	for (const version of versions.sort(
-		(a, b) => dayjs(a.date_published) - dayjs(b.date_published),
+		(a, b) => dayjs(a.date_published).unix() - dayjs(b.date_published).unix(),
 	)) {
 		if (visitedVersions.includes(version.version_number)) {
 			visitedVersions.push(version.version_number)
@@ -23,7 +54,8 @@ export const computeVersions = (versions, members) => {
 			visitedVersions.push(version.version_number)
 			version.displayUrlEnding = version.version_number
 		}
-		version.primaryFile = version.files.find((file) => file.primary) ?? version.files[0]
+		version.primaryFile =
+			version.files.find((file: VersionFileDetailed) => file.primary === true) ?? version.files[0]
 
 		if (!version.primaryFile) {
 			version.primaryFile = {
@@ -57,27 +89,29 @@ export const computeVersions = (versions, members) => {
 			}
 			return { duplicate: false, ...version }
 		})
-		.sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published))
+		.sort((a, b) => dayjs(b.date_published).unix() - dayjs(a.date_published).unix())
 }
 
-export const sortedCategories = (tags) => {
-	return tags.categories.slice().sort((a, b) => {
-		const headerCompare = a.header.localeCompare(b.header)
-		if (headerCompare !== 0) {
-			return headerCompare
-		}
-		if (a.header === 'resolutions' && b.header === 'resolutions') {
-			return a.name.replace(/\D/g, '') - b.name.replace(/\D/g, '')
-		} else if (a.header === 'performance impact' && b.header === 'performance impact') {
-			const x = ['potato', 'low', 'medium', 'high', 'screenshot']
+export function sortedCategories(tags: { categories: CategoryTag[] }) {
+	return tags.categories
+		.slice()
+		.sort((a: { header: string; name: string }, b: { header: string; name: string }) => {
+			const headerCompare = a.header.localeCompare(b.header)
+			if (headerCompare !== 0) {
+				return headerCompare
+			}
+			if (a.header === 'resolutions' && b.header === 'resolutions') {
+				return Number(a.name.replace(/\D/g, '')) - Number(b.name.replace(/\D/g, ''))
+			} else if (a.header === 'performance impact' && b.header === 'performance impact') {
+				const x = ['potato', 'low', 'medium', 'high', 'screenshot']
 
-			return x.indexOf(a.name) - x.indexOf(b.name)
-		}
-		return 0
-	})
+				return x.indexOf(a.name) - x.indexOf(b.name)
+			}
+			return 0
+		})
 }
 
-export const formatNumber = (number, abbreviate = true) => {
+export function formatNumber(number: number | string, abbreviate = true) {
 	const x = Number(number)
 	if (x >= 1000000 && abbreviate) {
 		return `${(x / 1000000).toFixed(2).toString()}M`
@@ -98,7 +132,7 @@ export function formatDate(
 	return date.toDate().toLocaleDateString(undefined, options)
 }
 
-export function formatMoney(number, abbreviate = false) {
+export function formatMoney(number: number | string, abbreviate = false) {
 	const x = Number(number)
 	if (x >= 1000000 && abbreviate) {
 		return `$${(x / 1000000).toFixed(2).toString()}M`
@@ -111,7 +145,7 @@ export function formatMoney(number, abbreviate = false) {
 		.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
 }
 
-export const formatBytes = (bytes, decimals = 2) => {
+export function formatBytes(bytes: number, decimals = 2) {
 	if (bytes === 0) return '0 Bytes'
 
 	const k = 1024
@@ -123,18 +157,18 @@ export const formatBytes = (bytes, decimals = 2) => {
 	return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
 
-export const capitalizeString = (name) => {
+export function capitalizeString(name: string) {
 	return name ? name.charAt(0).toUpperCase() + name.slice(1) : name
 }
 
-export const formatWallet = (name) => {
+export function formatWallet(name: string) {
 	if (name === 'paypal') {
 		return 'PayPal'
 	}
 	return capitalizeString(name)
 }
 
-export const formatProjectType = (name) => {
+export function formatProjectType(name: string) {
 	if (name === 'resourcepack') {
 		return 'Resource Pack'
 	} else if (name === 'datapack') {
@@ -144,7 +178,7 @@ export const formatProjectType = (name) => {
 	return capitalizeString(name)
 }
 
-export const formatCategory = (name) => {
+export function formatCategory(name: string) {
 	if (name === 'modloader') {
 		return "Risugami's ModLoader"
 	} else if (name === 'bungeecord') {
@@ -195,11 +229,11 @@ export const formatCategory = (name) => {
 	return capitalizeString(name)
 }
 
-export const formatCategoryHeader = (name) => {
+export function formatCategoryHeader(name: string) {
 	return capitalizeString(name)
 }
 
-export const formatProjectStatus = (name) => {
+export function formatProjectStatus(name: string) {
 	if (name === 'approved') {
 		return 'Public'
 	} else if (name === 'processing') {
@@ -209,11 +243,12 @@ export const formatProjectStatus = (name) => {
 	return capitalizeString(name)
 }
 
-export const formatVersions = (versionArray, gameVersions) => {
+export function formatVersions(versionArray: string[], gameVersions: GameVersion[]) {
 	const allVersions = gameVersions.slice().reverse()
 	const allReleases = allVersions.filter((x) => x.version_type === 'release')
 
-	const intervals = []
+	type Triplet = [string, number, number]
+	const intervals: Triplet[][] = []
 	let currentInterval = 0
 
 	for (let i = 0; i < versionArray.length; i++) {
@@ -239,12 +274,12 @@ export const formatVersions = (versionArray, gameVersions) => {
 		}
 	}
 
-	const newIntervals = []
+	const newIntervals: Triplet[][] = []
 	for (let i = 0; i < intervals.length; i++) {
 		const interval = intervals[i]
 
 		if (interval.length === 2 && interval[0][2] !== -1 && interval[1][2] === -1) {
-			let lastSnapshot = null
+			let lastSnapshot: number | null = null
 			for (let j = interval[1][1]; j > interval[0][1]; j--) {
 				if (allVersions[j].version_type === 'release') {
 					newIntervals.push([
@@ -272,7 +307,7 @@ export const formatVersions = (versionArray, gameVersions) => {
 		}
 	}
 
-	const output = []
+	const output: string[] = []
 
 	for (const interval of newIntervals) {
 		if (interval.length === 2) {
@@ -282,15 +317,19 @@ export const formatVersions = (versionArray, gameVersions) => {
 		}
 	}
 
-	return (output.length === 0 ? versionArray : output).join(', ')
+	const returnValue: string[] = output.length === 0 ? versionArray : output
+	return Array.isArray(returnValue) ? returnValue.join(', ') : returnValue
 }
 
-export function cycleValue(value, values) {
-	const index = values.indexOf(value) + 1
+export function cycleValue<T>(value: T, values: readonly T[] | T[]) {
+	const index = (values as T[]).indexOf(value) + 1
 	return values[index % values.length]
 }
 
-export const fileIsValid = (file, validationOptions) => {
+export function fileIsValid(
+	file: { size: number; name: string },
+	validationOptions: { maxSize?: number | null; alertOnInvalid?: boolean },
+) {
 	const { maxSize, alertOnInvalid } = validationOptions
 	if (maxSize !== null && maxSize !== undefined && file.size > maxSize) {
 		if (alertOnInvalid) {
@@ -302,7 +341,7 @@ export const fileIsValid = (file, validationOptions) => {
 	return true
 }
 
-export const acceptFileFromProjectType = (projectType) => {
+export function acceptFileFromProjectType(projectType: string) {
 	switch (projectType) {
 		case 'mod':
 			return '.jar,.zip,.litemod,application/java-archive,application/x-java-archive,application/zip'
@@ -323,8 +362,11 @@ export const acceptFileFromProjectType = (projectType) => {
 
 // Sorts alphabetically, but correctly identifies 8x, 128x, 256x, etc
 // identifier[0], then if it ties, identifier[1], etc
-export const sortByNameOrNumber = (sortable, identifiers) => {
-	sortable.sort((a, b) => {
+export function sortByNameOrNumber(
+	sortable: Array<Record<string, string>>,
+	identifiers: readonly string[] | string[],
+) {
+	sortable.sort((a: Record<string, string>, b: Record<string, string>) => {
 		for (const identifier of identifiers) {
 			const aNum = parseFloat(a[identifier])
 			const bNum = parseFloat(b[identifier])
@@ -339,7 +381,7 @@ export const sortByNameOrNumber = (sortable, identifiers) => {
 			} else {
 				// One is a number and one is a string, numbers go first
 				const numStringComp = isNaN(aNum) ? 1 : -1
-				if (numStringComp != 0) return numStringComp
+				return numStringComp
 			}
 		}
 		return 0
@@ -347,7 +389,7 @@ export const sortByNameOrNumber = (sortable, identifiers) => {
 	return sortable
 }
 
-export const getArrayOrString = (x: string[] | string): string[] => {
+export function getArrayOrString(x: string[] | string): string[] {
 	if (typeof x === 'string') {
 		return [x]
 	} else {

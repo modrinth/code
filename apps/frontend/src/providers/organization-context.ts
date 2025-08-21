@@ -1,5 +1,5 @@
+import type { Organization, OrganizationMember, ProjectV3 } from '@modrinth/ui'
 import { createContext } from '@modrinth/ui'
-import type { Organization, OrganizationMember, ProjectV3 } from '@modrinth/utils'
 
 export class OrganizationContext {
 	public readonly organization: Ref<Organization | null>

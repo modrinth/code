@@ -113,8 +113,8 @@
 
 <script setup lang="ts">
 import { ChevronRightIcon, LockIcon, SparklesIcon } from '@modrinth/assets'
+import type { Project, Server } from '@modrinth/ui'
 import { Avatar, CopyCode, ServersSpecs } from '@modrinth/ui'
-import type { Project, Server } from '@modrinth/utils'
 import dayjs from 'dayjs'
 
 import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'

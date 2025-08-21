@@ -17,9 +17,8 @@
 </template>
 
 <script setup lang="ts">
-import type { NewModal } from '@modrinth/ui'
+import type { Backup, NewModal } from '@modrinth/ui'
 import { ConfirmModal, injectNotificationManager } from '@modrinth/ui'
-import type { Backup } from '@modrinth/utils'
 import { ref } from 'vue'
 
 import BackupItem from '~/components/ui/servers/BackupItem.vue'
