@@ -63,10 +63,10 @@ impl DelphiReport {
             format!("⚠️ Suspicious traces found at {}", self.url);
 
         for (issue, trace) in &self.issues {
-            for (path, code) in trace {
+            for (class, code) in trace {
                 write!(
                     &mut message_header,
-                    "\n issue {issue} found at file {path}:\n```\n{code}\n```"
+                    "\n issue {issue} found at class `{class}`:\n```\n{code}\n```"
                 )
                 .ok();
             }
@@ -227,7 +227,7 @@ async fn issues(
                 .map(|offset| offset.try_into())
                 .transpose()
                 .map_err(|err| {
-                    io::Error::other(format!("Invalid offset: {err}"))
+                    ApiError::InvalidInput(format!("Invalid offset: {err}"))
                 })?,
             &**pool,
         )
