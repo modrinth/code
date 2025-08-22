@@ -21,7 +21,7 @@ const notifications = injectNotificationManager()
 const selectedProject = ref<Project | null>(null)
 const selectedVersion = ref<Version | null>(null)
 const selectedFile = ref<VersionFile | null>(null)
-const fileId = ref<number | null>(null)
+const fileId = ref<string | null>(null)
 
 const projectQuery = ref('')
 const projects = ref<Project[]>([])
@@ -116,7 +116,7 @@ function chooseVersion(version: Version) {
 
 function chooseFile(file: VersionFile) {
 	selectedFile.value = file
-	fileId.value = Number(file.hashes.sha512)
+	fileId.value = file.hashes.sha512
 	setStep('review', true)
 }
 
@@ -178,7 +178,7 @@ defineExpose({ show })
 const emit = defineEmits<{
 	(
 		e: 'started',
-		payload: { fileId: number; project?: Project; version?: Version; file?: VersionFile },
+		payload: { fileId: string; project?: Project; version?: Version; file?: VersionFile },
 	): void
 	(e: 'hide'): void
 }>()
@@ -402,7 +402,7 @@ function formatRelativeTime(date?: string) {
 				>
 					<div
 						v-for="f in files"
-						:key="String(f.id)"
+						:key="f.hashes.sha512"
 						class="flex cursor-pointer items-center justify-between p-3 hover:bg-button-bg"
 						@click="chooseFile(f)"
 					>
