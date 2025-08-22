@@ -103,6 +103,21 @@ services:
       watch:
         - path: ./apps/labrinth
           action: rebuild
+  delphi:
+    profiles:
+      - with-delphi
+    image: ghcr.io/modrinth/delphi:main
+    container_name: labrinth-delphi
+    ports:
+      - '59999:59999'
+    environment:
+      LABRINTH_ENDPOINT: http://labrinth:8000/_internal/delphi/ingest
+      LABRINTH_ADMIN_KEY: feedbeef
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '-O/dev/null', 'http://localhost:59999/health']
+      interval: 3s
+      timeout: 5s
+      retries: 3
 volumes:
   meilisearch-data:
   db-data:
