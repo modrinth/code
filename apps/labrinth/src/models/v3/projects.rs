@@ -716,6 +716,7 @@ impl From<VersionQueryResult> for Version {
                 .files
                 .into_iter()
                 .map(|f| VersionFile {
+                    id: Some(f.id.0),
                     url: f.url,
                     filename: f.filename,
                     hashes: f.hashes,
@@ -840,6 +841,10 @@ impl VersionStatus {
 /// A single project file, with a url for the file and the file's hash
 #[derive(Serialize, Deserialize, Clone)]
 pub struct VersionFile {
+    /// The ID of the file. Every file has an ID once created, but it
+    /// is not known until it indeed has been created.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub id: Option<i64>,
     /// A map of hashes of the file.  The key is the hashing algorithm
     /// and the value is the string version of the hash.
     pub hashes: std::collections::HashMap<String, String>,
