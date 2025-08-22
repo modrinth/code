@@ -1,12 +1,13 @@
 use std::{collections::HashMap, fmt::Write, sync::LazyLock};
 
-use actix_web::{HttpResponse, get, post, put, web};
+use actix_web::{HttpRequest, HttpResponse, get, post, put, web};
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use sqlx::PgPool;
 use tracing::info;
 
 use crate::{
+    auth::check_is_moderator_from_headers,
     database::{
         models::{
             DBFileId, DelphiReportId, DelphiReportIssueId,
@@ -20,6 +21,8 @@ use crate::{
         },
         redis::RedisPool,
     },
+    models::pats::Scopes,
+    queue::session::AuthQueue,
     routes::ApiError,
     util::guards::admin_key_guard,
 };
@@ -184,16 +187,42 @@ pub async fn run(
     Ok(HttpResponse::NoContent().finish())
 }
 
-#[post("run", guard = "admin_key_guard")]
+#[post("run")]
 async fn _run(
+    req: HttpRequest,
     pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
     run_parameters: web::Query<DelphiRunParameters>,
 ) -> Result<HttpResponse, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await?;
+
     run(&**pool, run_parameters.into_inner()).await
 }
 
-#[get("version", guard = "admin_key_guard")]
-async fn version(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
+#[get("version")]
+async fn version(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await?;
+
     Ok(HttpResponse::Ok().json(
         sqlx::query_scalar!("SELECT MAX(delphi_version) FROM delphi_reports")
             .fetch_one(&**pool)
@@ -211,11 +240,23 @@ struct DelphiIssuesSearchOptions {
     offset: Option<u64>,
 }
 
-#[get("issues", guard = "admin_key_guard")]
+#[get("issues")]
 async fn issues(
+    req: HttpRequest,
     pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
     search_options: web::Query<DelphiIssuesSearchOptions>,
 ) -> Result<HttpResponse, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await?;
+
     Ok(HttpResponse::Ok().json(
         DBDelphiReportIssue::find_all_by(
             search_options.ty,
@@ -235,12 +276,24 @@ async fn issues(
     ))
 }
 
-#[put("issue/{issue_id}", guard = "admin_key_guard")]
+#[put("issue/{issue_id}")]
 async fn update_issue(
+    req: HttpRequest,
     pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
     issue_id: web::Path<DelphiReportIssueId>,
     web::Json(update_data): web::Json<DBDelphiReportIssue>,
 ) -> Result<HttpResponse, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await?;
+
     let new_id = issue_id.into_inner();
 
     let mut transaction = pool.begin().await?;
