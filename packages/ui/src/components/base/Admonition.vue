@@ -10,7 +10,7 @@
 			:class="['hidden h-8 w-8 flex-none sm:block', iconClasses[type]]"
 		/>
 		<div class="flex flex-col gap-2">
-			<div class="font-semibold flex justify-between gap-4">
+			<div class="font-semibold flex justify-between gap-4" v-if="header || $slots.header">
 				<slot name="header">{{ header }}</slot>
 			</div>
 			<div class="font-normal">

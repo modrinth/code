@@ -273,7 +273,7 @@ export interface VersionFileHash {
 }
 
 export interface VersionFile {
-	hashes: VersionFileHash[]
+	hashes: VersionFileHash
 	url: string
 	filename: string
 	primary: boolean
@@ -547,35 +547,114 @@ export type SubscriptionMetadata =
 
 // Delphi
 export interface DelphiReport {
-	id: string
-	project: Project
-	version: Version
-	priority_score: number
-	detected_at: string
-	trace_type:
-		| 'reflection_indirection'
-		| 'xor_obfuscation'
-		| 'included_libraries'
-		| 'suspicious_binaries'
-		| 'corrupt_classes'
-		| 'suspicious_classes'
-		| 'url_usage'
-		| 'classloader_usage'
-		| 'processbuilder_usage'
-		| 'runtime_exec_usage'
-		| 'jni_usage'
-		| 'main_method'
-		| 'native_loading'
-		| 'malformed_jar'
-		| 'nested_jar_too_deep'
-		| 'failed_decompilation'
-		| 'analysis_failure'
-		| 'malware_easyforme'
-		| 'malware_simplyloader'
-	file_path: string
-	// pending = not reviewed yet.
-	// approved = approved as malicious, removed from modrinth
-	// rejected = not approved as malicious, remains on modrinth?
-	status: 'pending' | 'approved' | 'rejected'
-	content?: string
+	id: number
+	file_id: number | null
+	delphi_version: number
+	artifact_url: string
+	created: string // ISO 8601 datetime string
+}
+
+export interface DelphiReportIssue {
+	id: number
+	report_id: number
+	issue_type: DelphiReportIssueType
+	status: DelphiReportIssueStatus
+	severity: SeverityLevel // Added severity level
+}
+
+export interface DelphiReportIssueJavaClass {
+	id: number
+	issue_id: number
+	internal_class_name: string
+	decompiled_source: string
+}
+
+export interface DelphiReportIssueResult {
+	issue: DelphiReportIssue
+	report: DelphiReport
+	java_classes: DelphiReportIssueJavaClass[]
+	project_id: number | null
+	project_published: string | null // ISO 8601 datetime string
+}
+
+export type DelphiReportIssueStatus = 'pending' | 'approved' | 'rejected'
+
+export type DelphiReportIssueType =
+	| 'reflection_indirection'
+	| 'xor_obfuscation'
+	| 'included_libraries'
+	| 'suspicious_binaries'
+	| 'corrupt_classes'
+	| 'suspicious_classes'
+	| 'url_usage'
+	| 'classloader_usage'
+	| 'processbuilder_usage'
+	| 'runtime_exec_usage'
+	| 'jni_usage'
+	| 'main_method'
+	| 'native_loading'
+	| 'malformed_jar'
+	| 'nested_jar_too_deep'
+	| 'failed_decompilation'
+	| 'analysis_failure'
+	| 'malware_easyforme'
+	| 'malware_simplyloader'
+	| 'unknown'
+
+export type DelphiReportListOrder = 'created_asc' | 'created_desc' | 'pending_status_first'
+
+// Request/Response types for API endpoints
+
+export interface DelphiIngestRequest {
+	url: string
+	project_id: string
+	version_id: string
+	file_id: string
+	delphi_version: number
+	issues: Record<DelphiReportIssueType, Record<string, string>> // className -> decompiledSource
+}
+
+export interface DelphiRunRequest {
+	file_id: number
+	parameters?: DelphiRunParameters // Added parameters for run request
+}
+
+export interface DelphiIssuesSearchParams {
+	type?: DelphiReportIssueType
+	status?: DelphiReportIssueStatus
+	order_by?: DelphiReportListOrder
+	count?: number
+	offset?: number
+}
+
+export interface DelphiUpdateIssueRequest {
+	report_id: number
+	issue_type: DelphiReportIssueType
+	status: DelphiReportIssueStatus
+}
+
+export interface DelphiRunParameters {
+	query_type: 'projects' | 'time_range' | 'authors' | 'specific'
+	project_types?: string[]
+	date_range?: { start: string; end: string }
+	authors?: string[]
+	specific_projects?: string[]
+	ignore_scanned?: boolean
+}
+
+export interface AllowlistEntry {
+	id: number
+	type: 'url' | 'trace' | 'class_path'
+	pattern: string
+	description: string
+	created: string
+	projects_affected: number
+}
+
+export type SeverityLevel = 'critical' | 'high' | 'medium' | 'low'
+
+export interface ExtendedDelphiReportIssueResult extends DelphiReportIssueResult {
+	severity: SeverityLevel
+	fingerprint?: string
+	duplicate_count?: number
 }
