@@ -195,10 +195,10 @@ async function confirmRunDelphi() {
 
 	submitting.value = true
 	try {
-		await useBaseFetch('internal/delphi/run', {
+		await useBaseFetch('delphi/run', {
 			method: 'POST',
-			apiVersion: 2,
 			body: { file_id: fileId.value },
+			internal: true,
 		})
 
 		notifications.addNotification({
