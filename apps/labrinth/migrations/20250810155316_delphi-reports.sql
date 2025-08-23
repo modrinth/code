@@ -1,3 +1,5 @@
+CREATE TYPE delphi_report_severity AS ENUM ('low', 'medium', 'high', 'severe');
+
 CREATE TYPE delphi_report_issue_status AS ENUM ('pending', 'approved', 'rejected');
 
 CREATE TYPE delphi_report_issue_type AS ENUM (
@@ -32,6 +34,7 @@ CREATE TABLE delphi_reports (
 	delphi_version INTEGER NOT NULL,
 	artifact_url VARCHAR(2048) NOT NULL,
 	created TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	severity DELPHI_REPORT_SEVERITY NOT NULL,
 	UNIQUE (file_id, delphi_version)
 );
 CREATE INDEX delphi_version ON delphi_reports (delphi_version);
