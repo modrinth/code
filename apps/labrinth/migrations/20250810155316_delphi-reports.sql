@@ -59,6 +59,6 @@ CREATE TABLE delphi_report_issue_java_classes (
 		ON DELETE CASCADE
 		ON UPDATE CASCADE,
 	internal_class_name TEXT NOT NULL,
-	decompiled_source TEXT NOT NULL,
+	decompiled_source TEXT,
 	UNIQUE (issue_id, internal_class_name)
 );
