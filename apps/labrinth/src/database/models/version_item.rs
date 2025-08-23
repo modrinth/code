@@ -167,7 +167,9 @@ impl VersionFileBuilder {
 
         if let Err(err) = crate::routes::internal::delphi::run(
             &mut **transaction,
-            DelphiRunParameters { file_id },
+            DelphiRunParameters {
+                file_id: file_id.into(),
+            },
         )
         .await
         {
