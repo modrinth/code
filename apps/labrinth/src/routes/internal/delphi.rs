@@ -50,7 +50,7 @@ struct DelphiReport {
     pub delphi_version: i32,
     pub issues: HashMap<
         DelphiReportIssueType,
-        HashMap<InternalJavaClassName, DecompiledJavaClassSource>,
+        HashMap<InternalJavaClassName, Option<DecompiledJavaClassSource>>,
     >,
 }
 
@@ -67,9 +67,11 @@ impl DelphiReport {
 
         for (issue, trace) in &self.issues {
             for (class, code) in trace {
+                let code = code.as_deref().map(|code| &**code);
                 write!(
                     &mut message_header,
-                    "\n issue {issue} found at class `{class}`:\n```\n{code}\n```"
+                    "\n issue {issue} found at class `{class}`:\n```\n{}\n```",
+                    code.unwrap_or("No decompiled source available")
                 )
                 .ok();
             }
