@@ -25,6 +25,7 @@ pub struct DBDelphiReport {
     pub delphi_version: i32,
     pub artifact_url: String,
     pub created: DateTime<Utc>,
+    pub severity: DelphiReportSeverity,
 }
 
 impl DBDelphiReport {
@@ -34,19 +35,33 @@ impl DBDelphiReport {
     ) -> Result<DelphiReportId, DatabaseError> {
         Ok(DelphiReportId(sqlx::query_scalar!(
             "
-            INSERT INTO delphi_reports (file_id, delphi_version, artifact_url)
-            VALUES ($1, $2, $3)
+            INSERT INTO delphi_reports (file_id, delphi_version, artifact_url, severity)
+            VALUES ($1, $2, $3, $4)
             ON CONFLICT (file_id, delphi_version) DO UPDATE SET
-                delphi_version = $2, artifact_url = $3, created = CURRENT_TIMESTAMP
+                delphi_version = $2, artifact_url = $3, created = CURRENT_TIMESTAMP, severity = $4
             RETURNING id
             ",
             self.file_id as Option<DBFileId>,
             self.delphi_version,
             self.artifact_url,
+            self.severity as DelphiReportSeverity,
         )
         .fetch_one(&mut **transaction)
         .await?))
     }
+}
+
+/// A severity level for a Delphi report.
+#[derive(
+    Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Hash, sqlx::Type,
+)]
+#[serde(rename_all = "UPPERCASE")]
+#[sqlx(type_name = "delphi_report_severity", rename_all = "snake_case")]
+pub enum DelphiReportSeverity {
+    Low,
+    Medium,
+    High,
+    Severe,
 }
 
 /// An issue found in a Delphi report. Every issue belongs to a report,
@@ -64,8 +79,7 @@ pub struct DBDelphiReportIssue {
     Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Hash, sqlx::Type,
 )]
 #[serde(rename_all = "snake_case")]
-#[sqlx(type_name = "delphi_report_issue_status")]
-#[sqlx(rename_all = "snake_case")]
+#[sqlx(type_name = "delphi_report_issue_status", rename_all = "snake_case")]
 pub enum DelphiReportIssueStatus {
     /// The issue is pending review by the moderation team.
     Pending,
@@ -91,6 +105,8 @@ pub enum DelphiReportListOrder {
     CreatedAsc,
     CreatedDesc,
     PendingStatusFirst,
+    SeverityAsc,
+    SeverityDesc,
 }
 
 impl Display for DelphiReportListOrder {
@@ -146,9 +162,9 @@ impl DBDelphiReportIssue {
             SELECT
                 delphi_report_issues.id AS "id", report_id,
                 issue_type AS "issue_type: DelphiReportIssueType",
-                delphi_report_issues.status as "status: DelphiReportIssueStatus",
+                delphi_report_issues.status AS "status: DelphiReportIssueStatus",
 
-                file_id, delphi_version, artifact_url, created,
+                file_id, delphi_version, artifact_url, created, severity AS "severity: DelphiReportSeverity",
                 json_array(SELECT to_jsonb(delphi_report_issue_java_classes)
                     FROM delphi_report_issue_java_classes
                     WHERE issue_id = delphi_report_issues.id
@@ -165,7 +181,9 @@ impl DBDelphiReportIssue {
             ORDER BY
                 CASE WHEN $3 = 'created_asc' THEN delphi_reports.created ELSE TO_TIMESTAMP(0) END ASC,
                 CASE WHEN $3 = 'created_desc' THEN delphi_reports.created ELSE TO_TIMESTAMP(0) END DESC,
-                CASE WHEN $3 = 'pending_status_first' THEN delphi_report_issues.status ELSE 'pending'::delphi_report_issue_status END ASC
+                CASE WHEN $3 = 'pending_status_first' THEN delphi_report_issues.status ELSE 'pending'::delphi_report_issue_status END ASC,
+                CASE WHEN $3 = 'severity_asc' THEN delphi_reports.severity ELSE 'low'::delphi_report_severity END ASC,
+                CASE WHEN $3 = 'severity_desc' THEN delphi_reports.severity ELSE 'low'::delphi_report_severity END DESC
             OFFSET $5
             LIMIT $4
             "#,
@@ -188,6 +206,7 @@ impl DBDelphiReportIssue {
                 delphi_version: row.delphi_version,
                 artifact_url: row.artifact_url,
                 created: row.created,
+                severity: row.severity,
             },
             java_classes: row
                 .classes
@@ -207,8 +226,7 @@ impl DBDelphiReportIssue {
     Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Hash, sqlx::Type,
 )]
 #[serde(rename_all = "snake_case")]
-#[sqlx(type_name = "delphi_report_issue_type")]
-#[sqlx(rename_all = "snake_case")]
+#[sqlx(type_name = "delphi_report_issue_type", rename_all = "snake_case")]
 pub enum DelphiReportIssueType {
     ReflectionIndirection,
     XorObfuscation,
