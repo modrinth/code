@@ -231,7 +231,6 @@ pub enum DelphiReportIssueType {
     MalformedJar,
     NestedJarTooDeep,
     FailedDecompilation,
-    #[serde(alias = "ANALYSIS FAILURE!")]
     AnalysisFailure,
 
     MalwareEasyforme,
@@ -257,7 +256,7 @@ pub struct DBDelphiReportIssueJavaClass {
     pub id: DelphiReportIssueJavaClassId,
     pub issue_id: DelphiReportIssueId,
     pub internal_class_name: InternalJavaClassName,
-    pub decompiled_source: DecompiledJavaClassSource,
+    pub decompiled_source: Option<DecompiledJavaClassSource>,
 }
 
 impl DBDelphiReportIssueJavaClass {
@@ -274,7 +273,7 @@ impl DBDelphiReportIssueJavaClass {
             ",
             self.issue_id as DelphiReportIssueId,
             self.internal_class_name.0,
-            self.decompiled_source.0,
+            self.decompiled_source.as_ref().map(|decompiled_source| &decompiled_source.0),
         )
         .fetch_one(&mut **transaction)
         .await?))
