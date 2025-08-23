@@ -21,7 +21,10 @@ use crate::{
         },
         redis::RedisPool,
     },
-    models::pats::Scopes,
+    models::{
+        ids::{ProjectId, VersionId},
+        pats::Scopes,
+    },
     queue::session::AuthQueue,
     routes::ApiError,
     util::guards::admin_key_guard,
@@ -90,7 +93,7 @@ impl DelphiReport {
 
 #[derive(Deserialize)]
 pub struct DelphiRunParameters {
-    pub file_id: crate::database::models::ids::DBFileId,
+    pub file_id: crate::models::ids::FileId,
 }
 
 #[post("ingest", guard = "admin_key_guard")]
@@ -158,7 +161,7 @@ pub async fn run(
         FROM files INNER JOIN versions ON files.version_id = versions.id
         WHERE files.id = $1
         "#,
-        run_parameters.file_id.0
+        run_parameters.file_id.0 as i64
     )
     .fetch_one(exec)
     .await?;
@@ -177,8 +180,8 @@ pub async fn run(
         .post(dotenvy::var("DELPHI_URL")?)
         .json(&serde_json::json!({
             "url": file_data.url,
-            "project_id": file_data.project_id,
-            "version_id": file_data.version_id,
+            "project_id": ProjectId(file_data.project_id.0 as u64),
+            "version_id": VersionId(file_data.version_id.0 as u64),
             "file_id": run_parameters.file_id,
         }))
         .send()
