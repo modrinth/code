@@ -5,7 +5,7 @@ use crate::database::models::loader_fields::VersionField;
 use crate::database::models::project_item::{LinkUrl, ProjectQueryResult};
 use crate::database::models::version_item::VersionQueryResult;
 use crate::models::ids::{
-    OrganizationId, ProjectId, TeamId, ThreadId, VersionId,
+    FileId, OrganizationId, ProjectId, TeamId, ThreadId, VersionId,
 };
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
@@ -716,7 +716,7 @@ impl From<VersionQueryResult> for Version {
                 .files
                 .into_iter()
                 .map(|f| VersionFile {
-                    id: Some(f.id.0),
+                    id: Some(FileId(f.id.0 as u64)),
                     url: f.url,
                     filename: f.filename,
                     hashes: f.hashes,
@@ -844,7 +844,7 @@ pub struct VersionFile {
     /// The ID of the file. Every file has an ID once created, but it
     /// is not known until it indeed has been created.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub id: Option<i64>,
+    pub id: Option<FileId>,
     /// A map of hashes of the file.  The key is the hashing algorithm
     /// and the value is the string version of the hash.
     pub hashes: std::collections::HashMap<String, String>,
