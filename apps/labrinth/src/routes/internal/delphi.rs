@@ -16,7 +16,8 @@ use crate::{
                 DBDelphiReport, DBDelphiReportIssue,
                 DBDelphiReportIssueJavaClass, DecompiledJavaClassSource,
                 DelphiReportIssueStatus, DelphiReportIssueType,
-                DelphiReportListOrder, InternalJavaClassName,
+                DelphiReportListOrder, DelphiReportSeverity,
+                InternalJavaClassName,
             },
         },
         redis::RedisPool,
@@ -55,6 +56,7 @@ struct DelphiReport {
         DelphiReportIssueType,
         HashMap<InternalJavaClassName, Option<DecompiledJavaClassSource>>,
     >,
+    pub severity: DelphiReportSeverity,
 }
 
 impl DelphiReport {
@@ -117,6 +119,7 @@ async fn ingest_report(
         delphi_version: report.delphi_version,
         artifact_url: report.url.clone(),
         created: DateTime::<Utc>::MIN_UTC, // This will be set by the database
+        severity: report.severity,
     }
     .upsert(&mut transaction)
     .await?;
