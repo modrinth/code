@@ -483,22 +483,12 @@ pub async fn create_payout(
     .fetch_optional(&mut *transaction)
     .await?;
 
-    /*
     let balance = get_user_balance(user.id, &pool).await?;
     if balance.available < body.amount || body.amount < Decimal::ZERO {
         return Err(ApiError::InvalidInput(
             "You do not have enough funds to make this payout!".to_string(),
         ));
     }
-    */
-
-    let balance = UserBalance {
-        available: Decimal::from(100),
-        withdrawn_lifetime: Decimal::from(100),
-        withdrawn_ytd: Decimal::from(100),
-        pending: Decimal::from(100),
-        dates: HashMap::new(),
-    };
 
     let maybe_compliance = update_compliance_status(&**pool, user.id).await?;
 
