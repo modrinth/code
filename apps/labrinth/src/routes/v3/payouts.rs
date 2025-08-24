@@ -490,7 +490,7 @@ pub async fn create_payout(
         ));
     }
 
-    let maybe_compliance = update_compliance_status(&**pool, user.id).await?;
+    let maybe_compliance = update_compliance_status(&pool, user.id).await?;
 
     let (tin_matched, signed, requested, api_check_failed) =
         match maybe_compliance {
@@ -1001,21 +1001,20 @@ async fn update_compliance_status(
     user_id: crate::database::models::ids::DBUserId,
 ) -> Result<Option<ComplianceCheck>, ApiError> {
     let maybe_compliance =
-        users_compliance::UserCompliance::get_by_user_id(&*pg, user_id).await?;
+        users_compliance::UserCompliance::get_by_user_id(pg, user_id).await?;
 
-    let mut compliance = match maybe_compliance {
-        None => return Ok(None),
-        Some(c) => c,
+    let Some(mut compliance) = maybe_compliance else {
+        return Ok(None);
     };
 
     if compliance.signed.is_some()
         || Utc::now().signed_duration_since(compliance.last_checked)
             < COMPLIANCE_CHECK_INTERVAL
     {
-        return Ok(Some(ComplianceCheck {
+        Ok(Some(ComplianceCheck {
             model: compliance,
             compliance_api_check_failed: false,
-        }));
+        }))
     } else {
         let result = avalara1099::check_form(&compliance.reference_id).await?;
         let mut compliance_api_check_failed = false;
@@ -1036,7 +1035,7 @@ async fn update_compliance_status(
                 // It's unclear what timezone the DateTime is in (as it returns a naive RFC-3339 timestamp)
                 // so we can just say it was signed now
                 compliance.signed =
-                    (&attributes.entry_status == "signed").then(|| Utc::now());
+                    (&attributes.entry_status == "signed").then(Utc::now);
                 compliance.e_delivery_consented =
                     attributes.e_delivery_consented_at.is_some();
 
@@ -1059,7 +1058,7 @@ async fn update_compliance_status(
             }
         }
 
-        compliance.update(&*pg).await?;
+        compliance.update(pg).await?;
 
         Ok(Some(ComplianceCheck {
             model: compliance,
