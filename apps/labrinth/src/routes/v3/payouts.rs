@@ -523,7 +523,7 @@ pub async fn create_payout(
 
         return Err(ApiError::InvalidInput(match (tin_matched, signed, requested) {
             (_, false, true) => "Tax form isn't signed yet!",
-            (false, true, true) => "Tax form is signed, but the Tax Identification Number didn't match the IRS records. Withdrawals are blocked until the TIN matches.",
+            (false, true, true) => "Tax form is signed, but the Tax Identification Number/SSN didn't match the IRS records. Withdrawals are blocked until the TIN/SSN matches.",
             _ => "Tax compliance form is required to withdraw more!",
         }.to_owned()));
     }
