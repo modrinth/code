@@ -23,8 +23,7 @@ use sqlx::PgPool;
 use std::collections::HashMap;
 use tracing::error;
 
-const MAX_NONCOMPLIANT_YEAR_PAYOUT_AMOUNT: i64 = 600;
-const COMPLIANCE_CHECK_INTERVAL: chrono::Duration =
+const COMPLIANCE_CHECK_DEBOUNCE: chrono::Duration =
     chrono::Duration::seconds(15);
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -80,7 +79,7 @@ pub async fn post_compliance_form(
             user_id,
             requested: Utc::now(),
             signed: None,
-            last_checked: Utc::now() - COMPLIANCE_CHECK_INTERVAL,
+            last_checked: Utc::now() - COMPLIANCE_CHECK_DEBOUNCE,
             external_request_id: String::new(),
             reference_id: String::new(),
             e_delivery_consented: false,
@@ -110,7 +109,7 @@ pub async fn post_compliance_form(
             compliance.tin_matched = false;
             compliance.signed = None;
             compliance.form_type = body.0.form_type;
-            compliance.last_checked = Utc::now() - COMPLIANCE_CHECK_INTERVAL;
+            compliance.last_checked = Utc::now() - COMPLIANCE_CHECK_DEBOUNCE;
 
             compliance.upsert(&mut *txn).await?;
             txn.commit().await?;
@@ -490,42 +489,43 @@ pub async fn create_payout(
         ));
     }
 
-    let maybe_compliance = update_compliance_status(&pool, user.id).await?;
+    if let Some(threshold) = tax_compliance_payout_threshold() {
+        let maybe_compliance = update_compliance_status(&pool, user.id).await?;
 
-    let (tin_matched, signed, requested, api_check_failed) =
-        match maybe_compliance {
-            Some(ComplianceCheck {
-                model,
-                compliance_api_check_failed,
-            }) => {
-                let tin = model.tin_matched;
-                let signed = model.signed.is_some();
+        let (tin_matched, signed, requested, api_check_failed) =
+            match maybe_compliance {
+                Some(ComplianceCheck {
+                    model,
+                    compliance_api_check_failed,
+                }) => {
+                    let tin = model.tin_matched;
+                    let signed = model.signed.is_some();
 
-                (tin, signed, true, compliance_api_check_failed)
+                    (tin, signed, true, compliance_api_check_failed)
+                }
+                None => (false, false, false, false),
+            };
+
+        if !(tin_matched && signed)
+            && balance.withdrawn_ytd + body.amount >= threshold
+        {
+            // We propagate the error this way because we don't want to block payouts
+            // that would be acceptable regardless of the tax form submission status
+            // if the compliance API is down.
+
+            // In this case the payout is going to be blocked, so do return that we hit an
+            // error with the API, as this is more accurate than saying the form wasn't completed
+            // properly as this might be wrong!
+            if api_check_failed {
+                return Err(ApiError::TaxComplianceApi);
             }
-            None => (false, false, false, false),
-        };
 
-    if !(tin_matched && signed)
-        && balance.withdrawn_ytd + body.amount
-            >= Decimal::from(MAX_NONCOMPLIANT_YEAR_PAYOUT_AMOUNT)
-    {
-        // We propagate the error this way because we don't want to block payouts
-        // that would be acceptable regardless of the tax form submission status
-        // if the compliance API is down.
-
-        // In this case the payout is going to be blocked, so do return that we hit an
-        // error with the API, as this is more accurate than saying the form wasn't completed
-        // properly as this might be wrong!
-        if api_check_failed {
-            return Err(ApiError::TaxComplianceApi);
+            return Err(ApiError::InvalidInput(match (tin_matched, signed, requested) {
+                (_, false, true) => "Tax form isn't signed yet!",
+                (false, true, true) => "Tax form is signed, but the Tax Identification Number/SSN didn't match the IRS records. Withdrawals are blocked until the TIN/SSN matches.",
+                _ => "Tax compliance form is required to withdraw more!",
+            }.to_owned()));
         }
-
-        return Err(ApiError::InvalidInput(match (tin_matched, signed, requested) {
-            (_, false, true) => "Tax form isn't signed yet!",
-            (false, true, true) => "Tax form is signed, but the Tax Identification Number/SSN didn't match the IRS records. Withdrawals are blocked until the TIN/SSN matches.",
-            _ => "Tax compliance form is required to withdraw more!",
-        }.to_owned()));
     }
 
     let payout_method = payouts_queue
@@ -1009,7 +1009,7 @@ async fn update_compliance_status(
 
     if compliance.signed.is_some()
         || Utc::now().signed_duration_since(compliance.last_checked)
-            < COMPLIANCE_CHECK_INTERVAL
+            < COMPLIANCE_CHECK_DEBOUNCE
     {
         Ok(Some(ComplianceCheck {
             model: compliance,
@@ -1065,6 +1065,12 @@ async fn update_compliance_status(
             compliance_api_check_failed,
         }))
     }
+}
+
+fn tax_compliance_payout_threshold() -> Option<Decimal> {
+    dotenvy::var("COMPLIANCE_PAYOUT_THRESHOLD")
+        .ok()
+        .and_then(|s| s.parse().ok())
 }
 
 #[derive(Deserialize)]
