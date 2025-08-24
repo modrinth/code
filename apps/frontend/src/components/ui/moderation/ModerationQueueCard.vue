@@ -78,7 +78,7 @@
 						props.queueEntry.project.project_types.map(formatProjectType).join(', ')
 					}}</span>
 					<span class="sm:hidden">{{
-						formatProjectType(props.queueEntry.project.project_type ?? 'project').substring(0, 3)
+						props.queueEntry.project.project_types.map(formatProjectType).join(', ')
 					}}</span>
 				</span>
 
