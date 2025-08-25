@@ -1,5 +1,6 @@
 <template>
 	<div class="experimental-styles-within">
+		<CreatorTaxComplianceAlert v-if="needTaxForms" class="mb-3" />
 		<section class="universal-card">
 			<h2 class="text-2xl">Revenue</h2>
 			<div class="grid-display">
@@ -68,12 +69,12 @@
 				</div>
 			</div>
 			<div class="input-group mt-4">
-				<span :class="{ 'disabled-cursor-wrapper': userBalance.available < minWithdraw }">
+				<span :class="{ 'disabled-cursor-wrapper': shouldPreventWithdrawal }">
 					<nuxt-link
-						:aria-disabled="userBalance.available < minWithdraw ? 'true' : 'false'"
-						:class="{ 'disabled-link': userBalance.available < minWithdraw }"
-						:disabled="userBalance.available < minWithdraw ? 'true' : 'false'"
-						:tabindex="userBalance.available < minWithdraw ? -1 : undefined"
+						:aria-disabled="shouldPreventWithdrawal ? 'true' : 'false'"
+						:class="{ 'disabled-link': shouldPreventWithdrawal }"
+						:disabled="shouldPreventWithdrawal ? 'true' : 'false'"
+						:tabindex="shouldPreventWithdrawal ? -1 : undefined"
 						class="iconified-button brand-button"
 						to="/dashboard/revenue/withdraw"
 					>
@@ -153,15 +154,29 @@ import { formatDate } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
+import CreatorTaxComplianceAlert from '~/components/ui/CreatorTaxComplianceAlert.vue'
 import { getAuthUrl, removeAuthProvider } from '~/composables/auth.js'
 
 const { addNotification, handleError } = injectNotificationManager()
 const auth = await useAuth()
+const flags = useFeatureFlags()
 const minWithdraw = ref(0.01)
 
 const { data: userBalance } = await useAsyncData(`payout/balance`, () =>
 	useBaseFetch(`payout/balance`, { apiVersion: 3 }),
 )
+
+const needTaxForms = computed(() => {
+	if (!flags.value.showCreatorTaxCompliance) return false
+	const totalWithdrawn = userBalance.value?.total_annual_withdrawal ?? 0
+	return totalWithdrawn >= 600 && !userBalance.value?.tax_compliance_filled
+})
+
+const shouldPreventWithdrawal = computed(() => {
+	const available = userBalance.value?.available ?? 0
+	const balanceTooLow = available < (minWithdraw.value ?? 0)
+	return balanceTooLow || needTaxForms.value
+})
 
 const deadlineEnding = computed(() => {
 	let deadline = dayjs().subtract(2, 'month').endOf('month').add(60, 'days')

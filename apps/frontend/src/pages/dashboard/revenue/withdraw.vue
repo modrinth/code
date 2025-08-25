@@ -1,4 +1,5 @@
 <template>
+	<CreatorTaxComplianceAlert v-if="needTaxForms" class="mb-3" />
 	<section class="universal-card">
 		<Breadcrumbs
 			current-title="Withdraw"
@@ -92,7 +93,7 @@
 		<p>
 			You are initiating a transfer of your revenue from Modrinth's Creator Monetization Program.
 			How much of your
-			<strong>{{ $formatMoney(userBalance.available) }}</strong> balance would you like to transfer
+			<strong>{{ $formatMoney(availableBalance) }}</strong> balance would you like to transfer
 			transfer to {{ selectedMethod.name }}?
 		</p>
 		<div class="confirmation-input">
@@ -164,6 +165,12 @@
 				</span>
 			</template>
 		</div>
+		<template v-if="taxFeatureEnabled && !taxComplianceFilled">
+			<p class="text-xs text-secondary" role="note">
+				Tax form required after <strong>$600</strong> in annual withdrawals. You have
+				<strong>{{ $formatMoney(remainingBeforeTaxForms) }}</strong> remaining.
+			</p>
+		</template>
 		<div class="button-group">
 			<nuxt-link to="/dashboard/revenue" class="iconified-button">
 				<XIcon />
@@ -175,7 +182,8 @@
 					!amount ||
 					!agreedTransfer ||
 					!agreedTerms ||
-					(fees > 0 && !agreedFees)
+					(fees > 0 && !agreedFees) ||
+					needTaxForms
 				"
 				class="iconified-button brand-button"
 				@click="withdraw"
@@ -202,10 +210,34 @@ import { all } from 'iso-3166-1'
 import { Multiselect } from 'vue-multiselect'
 
 import VenmoIcon from '~/assets/images/external/venmo.svg?component'
+import CreatorTaxComplianceAlert from '~/components/ui/CreatorTaxComplianceAlert.vue'
 
 const { addNotification } = injectNotificationManager()
 const auth = await useAuth()
 const data = useNuxtApp()
+const flags = useFeatureFlags()
+
+// TESTING PURPOSES ONLY
+// Toggle tax feature flag for testing (true/false). Null uses the actual flag.
+const DEV_TAX_FEATURE_FLAG = true
+// Override total amount withdrawn this year (number). Null uses the actual value.
+const DEV_TOTAL_ANNUAL_WITHDRAWN = 520
+// Override whether tax compliance is already filled (true/false). Null uses the actual value.
+const DEV_TAX_COMPLIANCE_FILLED = false
+// Override available balance (number). Null uses the actual value.
+const DEV_AVAILABLE = 125
+
+const taxFeatureEnabled = computed(
+	() => DEV_TAX_FEATURE_FLAG ?? flags.value.showCreatorTaxCompliance,
+)
+const totalWithdrawnForTax = computed(
+	() => DEV_TOTAL_ANNUAL_WITHDRAWN ?? userBalance.value?.total_annual_withdrawal ?? 0,
+)
+const taxComplianceFilled = computed(
+	() => DEV_TAX_COMPLIANCE_FILLED ?? userBalance.value?.tax_compliance_filled,
+)
+
+const availableBalance = computed(() => DEV_AVAILABLE ?? userBalance.value?.available ?? 0)
 
 const countries = computed(() =>
 	all().map((x) => ({
@@ -227,6 +259,12 @@ const [{ data: userBalance }, { data: payoutMethods, refresh: refreshPayoutMetho
 			useBaseFetch(`payout/methods?country=${country.value.id}`, { apiVersion: 3 }),
 		),
 	])
+
+const needTaxForms = computed(() => {
+	if (!taxFeatureEnabled.value) return false
+	const totalWithdrawn = totalWithdrawnForTax.value
+	return totalWithdrawn >= 600 && !taxComplianceFilled.value
+})
 
 const selectedMethodId = ref(payoutMethods.value[0].id)
 const selectedMethod = computed(() =>
@@ -267,9 +305,20 @@ const getRangeOfMethod = (method) => {
 	return getIntervalRange(method.interval?.fixed || method.interval?.standard)
 }
 
+const remainingBeforeTaxForms = computed(() => Math.max(0, 600 - totalWithdrawnForTax.value))
+
+const taxCap = computed(() => {
+	if (!taxFeatureEnabled.value) return Infinity
+	if (taxComplianceFilled.value) return Infinity
+	return remainingBeforeTaxForms.value
+})
+
 const maxWithdrawAmount = computed(() => {
 	const interval = selectedMethod.value.interval
-	return interval?.standard ? interval.standard.max : (interval?.fixed?.values.slice(-1)[0] ?? 0)
+	const methodMax = interval?.standard
+		? interval.standard.max
+		: (interval?.fixed?.values.slice(-1)[0] ?? 0)
+	return Math.min(methodMax, taxCap.value)
 })
 
 const minWithdrawAmount = computed(() => {
@@ -286,8 +335,10 @@ const withdrawAccount = computed(() => {
 		return auth.value.user.email
 	}
 })
+
 const knownErrors = computed(() => {
 	const errors = []
+
 	if (selectedMethod.value.type === 'paypal' && !auth.value.user.payout_data.paypal_address) {
 		errors.push('Please link your PayPal account in the dashboard to proceed.')
 	}
@@ -306,11 +357,18 @@ const knownErrors = computed(() => {
 	if (!parsedAmount.value && amount.value.length > 0) {
 		errors.push(`${amount.value} is not a valid amount`)
 	} else if (
-		parsedAmount.value > userBalance.value.available ||
+		parsedAmount.value > availableBalance.value ||
 		parsedAmount.value > maxWithdrawAmount.value
 	) {
-		const maxAmount = Math.min(userBalance.value.available, maxWithdrawAmount.value)
-		errors.push(`The amount must be no more than ${data.$formatMoney(maxAmount)}`)
+		const exceededTaxCap = isFinite(taxCap.value) && parsedAmount.value > taxCap.value
+		const maxAmount = Math.min(availableBalance.value, maxWithdrawAmount.value)
+		if (exceededTaxCap && parsedAmount.value <= availableBalance.value) {
+			errors.push(
+				`This amount exceeds the $600 tax reporting threshold. You have ${data.$formatMoney(Math.min(availableBalance.value, taxCap.value))} before you reach it. Once you reach the $600 threshold, you must complete a tax form to unlock all future withdrawals.`,
+			)
+		} else {
+			errors.push(`The amount must be no more than ${data.$formatMoney(availableBalance.value)}`)
+		}
 	} else if (parsedAmount.value <= fees.value || parsedAmount.value < minWithdrawAmount.value) {
 		const minAmount = Math.max(fees.value + 0.01, minWithdrawAmount.value)
 		errors.push(`The amount must be at least ${data.$formatMoney(minAmount)}`)
@@ -345,6 +403,8 @@ watch(selectedMethod, () => {
 async function withdraw() {
 	startLoading()
 	try {
+		if (needTaxForms.value) return
+
 		const auth = await useAuth()
 
 		await useBaseFetch(`payout`, {
@@ -461,7 +521,6 @@ async function withdraw() {
 			-khtml-user-drag: none;
 			-moz-user-drag: none;
 			-o-user-drag: none;
-			user-drag: none;
 			user-select: none;
 			width: 100%;
 			height: auto;
