@@ -2,118 +2,28 @@
 	<Teleport v-if="flags.projectBackground" to="#fixed-background-teleport">
 		<ProjectBackgroundGradient :project="project" />
 	</Teleport>
-	<div v-if="route.name.startsWith('type-id-settings')" class="normal-page">
-		<div class="normal-page__sidebar">
-			<aside class="universal-card">
-				<Breadcrumbs
-					current-title="Settings"
-					:link-stack="[
-						{
-							href: organization
-								? `/organization/${organization.slug}/settings/projects`
-								: `/dashboard/projects`,
-							label: 'Projects',
-						},
-						{
-							href: `/${project.project_type}/${project.slug ? project.slug : project.id}`,
-							label: project.title,
-							allowTrimming: true,
-						},
-					]"
-				/>
-				<div class="settings-header">
-					<Avatar
-						:src="project.icon_url"
-						:alt="project.title"
-						size="sm"
-						class="settings-header__icon"
-					/>
-					<div class="settings-header__text">
-						<h1 class="wrap-as-needed">{{ project.title }}</h1>
-						<ProjectStatusBadge :status="project.status" />
-					</div>
+	<div v-if="route.name.startsWith('type-id-settings')" class="normal-page no-sidebar">
+		<div class="normal-page__header">
+			<div
+				class="mb-4 flex items-center gap-2 border-0 border-b-[1px] border-solid border-divider pb-4 text-lg font-semibold"
+			>
+				<nuxt-link
+					:to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
+					class="flex items-center gap-2 hover:underline hover:brightness-[--hover-brightness]"
+				>
+					<Avatar :src="project.icon_url" size="32px" />
+					{{ project.title }}
+				</nuxt-link>
+				<ChevronRightIcon />
+				<span class="flex grow font-extrabold text-contrast">Settings</span>
+				<div class="flex gap-2">
+					<ButtonStyled>
+						<nuxt-link to="/dashboard/projects"><ListIcon /> Visit projects dashboard </nuxt-link>
+					</ButtonStyled>
 				</div>
-
-				<h2>Project settings</h2>
-				<NavStack>
-					<NavStackItem
-						:link="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
-						label="General"
-					>
-						<SettingsIcon aria-hidden="true" />
-					</NavStackItem>
-					<NavStackItem
-						:link="`/${project.project_type}/${
-							project.slug ? project.slug : project.id
-						}/settings/tags`"
-						label="Tags"
-					>
-						<TagsIcon aria-hidden="true" />
-					</NavStackItem>
-					<NavStackItem
-						:link="`/${project.project_type}/${
-							project.slug ? project.slug : project.id
-						}/settings/description`"
-						label="Description"
-					>
-						<DescriptionIcon aria-hidden="true" />
-					</NavStackItem>
-					<NavStackItem
-						:link="`/${project.project_type}/${
-							project.slug ? project.slug : project.id
-						}/settings/license`"
-						label="License"
-					>
-						<CopyrightIcon aria-hidden="true" />
-					</NavStackItem>
-					<NavStackItem
-						:link="`/${project.project_type}/${
-							project.slug ? project.slug : project.id
-						}/settings/links`"
-						label="Links"
-					>
-						<LinksIcon aria-hidden="true" />
-					</NavStackItem>
-					<NavStackItem
-						:link="`/${project.project_type}/${
-							project.slug ? project.slug : project.id
-						}/settings/members`"
-						label="Members"
-					>
-						<UsersIcon aria-hidden="true" />
-					</NavStackItem>
-					<h3>View</h3>
-					<NavStackItem
-						:link="`/${project.project_type}/${
-							project.slug ? project.slug : project.id
-						}/settings/analytics`"
-						label="Analytics"
-						chevron
-					>
-						<ChartIcon aria-hidden="true" />
-					</NavStackItem>
-					<h3>Upload</h3>
-					<NavStackItem
-						:link="`/${project.project_type}/${project.slug ? project.slug : project.id}/gallery`"
-						label="Gallery"
-						chevron
-					>
-						<GalleryIcon aria-hidden="true" />
-					</NavStackItem>
-					<NavStackItem
-						:link="`/${project.project_type}/${project.slug ? project.slug : project.id}/versions`"
-						label="Versions"
-						chevron
-					>
-						<VersionIcon aria-hidden="true" />
-					</NavStackItem>
-				</NavStack>
-			</aside>
-		</div>
-
-		<div class="normal-page__content">
+			</div>
 			<ProjectMemberHeader
-				v-if="currentMember"
+				v-if="currentMember && false"
 				:project="project"
 				:versions="versions"
 				:current-member="currentMember"
@@ -127,8 +37,11 @@
 				:auth="auth"
 				:tags="tags"
 			/>
+		</div>
+		<div class="normal-page__content">
 			<NuxtPage
 				v-model:project="project"
+				v-model:project-v3="projectV3"
 				v-model:versions="versions"
 				v-model:featured-versions="featuredVersions"
 				v-model:members="members"
@@ -769,6 +682,7 @@
 				<ProjectSidebarCompatibility
 					:project="project"
 					:tags="tags"
+					:v3-metadata="projectV3"
 					class="card flex-card experimental-styles-within"
 				/>
 				<AdPlaceholder v-if="!auth.user && tags.approvedStatuses.includes(project.status)" />
@@ -916,21 +830,19 @@
 
 <script setup>
 import {
-	AlignLeftIcon as DescriptionIcon,
 	BookmarkIcon,
 	BookTextIcon,
 	CalendarIcon,
 	ChartIcon,
 	CheckIcon,
+	ChevronRightIcon,
 	ClipboardCopyIcon,
-	CopyrightIcon,
 	DownloadIcon,
 	ExternalIcon,
 	GameIcon,
 	HeartIcon,
-	ImageIcon as GalleryIcon,
 	InfoIcon,
-	LinkIcon as LinksIcon,
+	ListIcon,
 	ModrinthIcon,
 	MoreVerticalIcon,
 	PlusIcon,
@@ -939,8 +851,6 @@ import {
 	SearchIcon,
 	ServerPlusIcon,
 	SettingsIcon,
-	TagsIcon,
-	UsersIcon,
 	VersionIcon,
 	WrenchIcon,
 	XIcon,
@@ -959,7 +869,7 @@ import {
 	ProjectSidebarCreators,
 	ProjectSidebarDetails,
 	ProjectSidebarLinks,
-	ProjectStatusBadge,
+	provideProjectPageContext,
 	ScrollablePanel,
 	ServersPromo,
 	TagItem,
@@ -975,12 +885,9 @@ import { navigateTo } from '#app'
 import Accordion from '~/components/ui/Accordion.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import AutomaticAccordion from '~/components/ui/AutomaticAccordion.vue'
-import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 import CollectionCreateModal from '~/components/ui/CollectionCreateModal.vue'
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
-import NavStack from '~/components/ui/NavStack.vue'
-import NavStackItem from '~/components/ui/NavStackItem.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
@@ -990,6 +897,7 @@ import { reportProject } from '~/utils/report-helpers.ts'
 
 const data = useNuxtApp()
 const route = useNativeRoute()
+const router = useRouter()
 const config = useRuntimeConfig()
 const moderationStore = useModerationStore()
 const notifications = injectNotificationManager()
@@ -1203,8 +1111,12 @@ if (
 	})
 }
 
+const projectId = ref(route.params.id)
+
 let project,
-	resetProject,
+	projectV3,
+	resetProjectV2,
+	resetProjectV3,
 	allMembers,
 	resetMembers,
 	dependencies,
@@ -1212,21 +1124,23 @@ let project,
 	versions,
 	organization,
 	resetOrganization,
-	projectError,
+	projectV2Error,
+	projectV3Error,
 	membersError,
 	dependenciesError,
 	featuredVersionsError,
 	versionsError
 try {
 	;[
-		{ data: project, error: projectError, refresh: resetProject },
+		{ data: project, error: projectV2Error, refresh: resetProjectV2 },
+		{ data: projectV3, error: projectV3Error, refresh: resetProjectV3 },
 		{ data: allMembers, error: membersError, refresh: resetMembers },
 		{ data: dependencies, error: dependenciesError },
 		{ data: featuredVersions, error: featuredVersionsError },
 		{ data: versions, error: versionsError },
 		{ data: organization, refresh: resetOrganization },
 	] = await Promise.all([
-		useAsyncData(`project/${route.params.id}`, () => useBaseFetch(`project/${route.params.id}`), {
+		useAsyncData(`project/${projectId.value}`, () => useBaseFetch(`project/${projectId.value}`), {
 			transform: (project) => {
 				if (project) {
 					project.actualProjectType = JSON.parse(JSON.stringify(project.project_type))
@@ -1235,11 +1149,28 @@ try {
 						project.loaders,
 						tags.value,
 					)
+					projectId.value = project.id
+					if (route.params.id !== project.slug) {
+						router.replace({
+							name: route.name,
+							params: {
+								...route.params,
+								id: project.slug,
+							},
+							query: route.query,
+							hash: route.hash,
+						})
+					}
 				}
 
 				return project
 			},
 		}),
+		useAsyncData(`projectV3/${route.params.id}`, () =>
+			useBaseFetch(`project/${route.params.id}`, {
+				apiVersion: 3,
+			}),
+		),
 		useAsyncData(
 			`project/${route.params.id}/members`,
 			() => useBaseFetch(`project/${route.params.id}/members`, { apiVersion: 3 }),
@@ -1278,6 +1209,11 @@ try {
 	})
 }
 
+async function resetProject() {
+	await resetProjectV2()
+	await resetProjectV3()
+}
+
 function handleError(err, project = false) {
 	if (err.value && err.value.statusCode) {
 		throw createError({
@@ -1288,7 +1224,8 @@ function handleError(err, project = false) {
 	}
 }
 
-handleError(projectError, true)
+handleError(projectV2Error, true)
+handleError(projectV3Error)
 handleError(membersError)
 handleError(dependenciesError)
 handleError(featuredVersionsError)
@@ -1642,6 +1579,12 @@ const navLinks = computed(() => {
 			shown: !!currentMember.value,
 		},
 	]
+})
+
+provideProjectPageContext({
+	projectV2: project,
+	projectV3,
+	refreshProject: resetProject,
 })
 </script>
 
