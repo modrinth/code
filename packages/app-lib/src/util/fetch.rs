@@ -108,25 +108,17 @@ pub async fn fetch_advanced(
 
         let result = req.send().await;
         match result {
-            Ok(x) => {
-                if x.status().is_server_error() {
-                    if attempt <= FETCH_ATTEMPTS {
-                        continue;
-                    } else {
-                        return Err(crate::Error::from(
-                            crate::ErrorKind::OtherError(
-                                "Server error when fetching content"
-                                    .to_string(),
-                            ),
-                        ));
-                    }
+            Ok(resp) => {
+                if resp.status().is_server_error() && attempt <= FETCH_ATTEMPTS {
+                    continue;
                 }
+                let resp = resp.error_for_status()?;
 
                 let bytes = if let Some((bar, total)) = &loading_bar {
-                    let length = x.content_length();
+                    let length = resp.content_length();
                     if let Some(total_size) = length {
                         use futures::StreamExt;
-                        let mut stream = x.bytes_stream();
+                        let mut stream = resp.bytes_stream();
                         let mut bytes = Vec::new();
                         while let Some(item) = stream.next().await {
                             let chunk = item.or(Err(
@@ -145,10 +137,10 @@ pub async fn fetch_advanced(
 
                         Ok(bytes::Bytes::from(bytes))
                     } else {
-                        x.bytes().await
+                        resp.bytes().await
                     }
                 } else {
-                    x.bytes().await
+                    resp.bytes().await
                 };
 
                 if let Ok(bytes) = bytes {
