@@ -149,7 +149,7 @@ export default defineNuxtConfig({
 				(state.errors ?? []).length === 0
 			) {
 				console.log(
-					'Tags already recently generated. Delete apps/frontend/generated/state.json to force regeneration.',
+					'Tags already recently generated. Delete apps/src/frontend/generated/state.json to force regeneration.',
 				)
 				return
 			}
