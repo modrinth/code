@@ -1,3 +1,4 @@
+use crate::ErrorKind;
 use crate::data::ModrinthCredentials;
 use crate::event::FriendPayload;
 use crate::event::emit::emit_friend;
@@ -18,8 +19,8 @@ use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use either::Either;
 use futures::{SinkExt, StreamExt};
-use reqwest::{Method, StatusCode};
 use reqwest::header::HeaderValue;
+use reqwest::{Method, StatusCode};
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 use std::ops::Deref;
@@ -29,7 +30,6 @@ use tokio::net::TcpStream;
 use tokio::net::tcp::OwnedReadHalf;
 use tokio::sync::{Mutex, RwLock};
 use uuid::Uuid;
-use crate::ErrorKind;
 
 pub(super) type WriteSocket =
     Arc<RwLock<Option<WebSocketSender<ConnectStream>>>>;
@@ -335,11 +335,14 @@ impl FriendsSocket {
         )
         .await;
 
-        if let Err(ref e) = result &&
-            let ErrorKind::FetchError(e) = &*e.raw &&
-            e.status() == Some(StatusCode::NOT_FOUND)
+        if let Err(ref e) = result
+            && let ErrorKind::FetchError(e) = &*e.raw
+            && e.status() == Some(StatusCode::NOT_FOUND)
         {
-            return Err(ErrorKind::OtherError(format!("No user found with username \"{user_id}\"")).into());
+            return Err(ErrorKind::OtherError(format!(
+                "No user found with username \"{user_id}\""
+            ))
+            .into());
         }
         result?;
 

@@ -1,5 +1,6 @@
 use crate::auth::get_user_from_headers;
-use crate::database::models::DBUserId;
+use crate::database::models::friend_item::DBFriend;
+use crate::database::models::{DBUser, DBUserId};
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::models::users::UserFriend;
@@ -42,19 +43,14 @@ pub async fn add_friend(
     .1;
 
     let string = info.into_inner().0;
-    let Some(friend) = crate::database::models::DBUser::get(&string, &**pool, &redis).await? else {
+    let Some(friend) = DBUser::get(&string, &**pool, &redis).await? else {
         return Err(ApiError::NotFound);
     };
 
     let mut transaction = pool.begin().await?;
 
     if let Some(friend) =
-        crate::database::models::friend_item::DBFriend::get_friend(
-            user.id.into(),
-            friend.id,
-            &**pool,
-        )
-        .await?
+        DBFriend::get_friend(user.id.into(), friend.id, &**pool).await?
     {
         if friend.accepted {
             return Err(ApiError::InvalidInput(
@@ -68,7 +64,7 @@ pub async fn add_friend(
             ));
         }
 
-        crate::database::models::friend_item::DBFriend::update_friend(
+        DBFriend::update_friend(
             friend.user_id,
             friend.friend_id,
             true,
@@ -115,7 +111,7 @@ pub async fn add_friend(
             ));
         }
 
-        crate::database::models::friend_item::DBFriend {
+        DBFriend {
             user_id: user.id.into(),
             friend_id: friend.id,
             created: Utc::now(),
@@ -157,18 +153,12 @@ pub async fn remove_friend(
     .1;
 
     let string = info.into_inner().0;
-    let friend =
-        crate::database::models::DBUser::get(&string, &**pool, &redis).await?;
+    let friend = DBUser::get(&string, &**pool, &redis).await?;
 
     if let Some(friend) = friend {
         let mut transaction = pool.begin().await?;
 
-        crate::database::models::friend_item::DBFriend::remove(
-            user.id.into(),
-            friend.id,
-            &mut transaction,
-        )
-        .await?;
+        DBFriend::remove(user.id.into(), friend.id, &mut transaction).await?;
 
         send_message_to_user(
             &db,
@@ -202,12 +192,7 @@ pub async fn friends(
     .await?
     .1;
 
-    let friends =
-        crate::database::models::friend_item::DBFriend::get_user_friends(
-            user.id.into(),
-            None,
-            &**pool,
-        )
+    let friends = DBFriend::get_user_friends(user.id.into(), None, &**pool)
         .await?
         .into_iter()
         .map(UserFriend::from)

@@ -109,7 +109,8 @@ pub async fn fetch_advanced(
         let result = req.send().await;
         match result {
             Ok(resp) => {
-                if resp.status().is_server_error() && attempt <= FETCH_ATTEMPTS {
+                if resp.status().is_server_error() && attempt <= FETCH_ATTEMPTS
+                {
                     continue;
                 }
                 let resp = resp.error_for_status()?;
