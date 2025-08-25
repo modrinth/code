@@ -28,6 +28,7 @@ node_modules
 !.idea/code.iml
 !.idea/gradle.xml
 !.idea/modules.xml
+!.idea/vcs.xml
 
 # misc
 /.sass-cache
