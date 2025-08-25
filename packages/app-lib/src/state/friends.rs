@@ -18,7 +18,7 @@ use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use either::Either;
 use futures::{SinkExt, StreamExt};
-use reqwest::Method;
+use reqwest::{Method, StatusCode};
 use reqwest::header::HeaderValue;
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
@@ -29,6 +29,7 @@ use tokio::net::TcpStream;
 use tokio::net::tcp::OwnedReadHalf;
 use tokio::sync::{Mutex, RwLock};
 use uuid::Uuid;
+use crate::ErrorKind;
 
 pub(super) type WriteSocket =
     Arc<RwLock<Option<WebSocketSender<ConnectStream>>>>;
@@ -322,7 +323,7 @@ impl FriendsSocket {
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
         semaphore: &FetchSemaphore,
     ) -> crate::Result<()> {
-        fetch_advanced(
+        let result = fetch_advanced(
             Method::POST,
             &format!("{}friend/{user_id}", env!("MODRINTH_API_URL_V3")),
             None,
@@ -332,7 +333,15 @@ impl FriendsSocket {
             semaphore,
             exec,
         )
-        .await?;
+        .await;
+
+        if let Err(ref e) = result &&
+            let ErrorKind::FetchError(e) = &*e.raw &&
+            e.status() == Some(StatusCode::NOT_FOUND)
+        {
+            return Err(ErrorKind::OtherError(format!("No user found with username \"{user_id}\"")).into());
+        }
+        result?;
 
         Ok(())
     }

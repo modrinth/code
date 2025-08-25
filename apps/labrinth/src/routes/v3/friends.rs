@@ -42,102 +42,99 @@ pub async fn add_friend(
     .1;
 
     let string = info.into_inner().0;
-    let friend =
-        crate::database::models::DBUser::get(&string, &**pool, &redis).await?;
+    let Some(friend) = crate::database::models::DBUser::get(&string, &**pool, &redis).await? else {
+        return Err(ApiError::NotFound);
+    };
 
-    if let Some(friend) = friend {
-        let mut transaction = pool.begin().await?;
+    let mut transaction = pool.begin().await?;
 
-        if let Some(friend) =
-            crate::database::models::friend_item::DBFriend::get_friend(
-                user.id.into(),
-                friend.id,
-                &**pool,
-            )
-            .await?
-        {
-            if friend.accepted {
-                return Err(ApiError::InvalidInput(
-                    "You are already friends with this user!".to_string(),
-                ));
-            }
-
-            if !friend.accepted && user.id != friend.friend_id.into() {
-                return Err(ApiError::InvalidInput(
-                    "You cannot accept your own friend request!".to_string(),
-                ));
-            }
-
-            crate::database::models::friend_item::DBFriend::update_friend(
-                friend.user_id,
-                friend.friend_id,
-                true,
-                &mut transaction,
-            )
-            .await?;
-
-            async fn send_friend_status(
-                user_id: DBUserId,
-                friend_id: DBUserId,
-                sockets: &ActiveSockets,
-                redis: &RedisPool,
-            ) -> Result<(), ApiError> {
-                if let Some(friend_status) =
-                    get_user_status(user_id.into(), sockets, redis).await
-                {
-                    broadcast_friends_message(
-                        redis,
-                        RedisFriendsMessage::DirectStatusUpdate {
-                            to_user: friend_id.into(),
-                            status: friend_status,
-                        },
-                    )
-                    .await?;
-                }
-
-                Ok(())
-            }
-
-            send_friend_status(friend.user_id, friend.friend_id, &db, &redis)
-                .await?;
-            send_friend_status(friend.friend_id, friend.user_id, &db, &redis)
-                .await?;
-        } else {
-            if friend.id == user.id.into() {
-                return Err(ApiError::InvalidInput(
-                    "You cannot add yourself as a friend!".to_string(),
-                ));
-            }
-
-            if !friend.allow_friend_requests {
-                return Err(ApiError::InvalidInput(
-                    "Friend requests are disabled for this user!".to_string(),
-                ));
-            }
-
-            crate::database::models::friend_item::DBFriend {
-                user_id: user.id.into(),
-                friend_id: friend.id,
-                created: Utc::now(),
-                accepted: false,
-            }
-            .insert(&mut transaction)
-            .await?;
-
-            send_message_to_user(
-                &db,
-                friend.id.into(),
-                &ServerToClientMessage::FriendRequest { from: user.id },
-            )
-            .await?;
+    if let Some(friend) =
+        crate::database::models::friend_item::DBFriend::get_friend(
+            user.id.into(),
+            friend.id,
+            &**pool,
+        )
+        .await?
+    {
+        if friend.accepted {
+            return Err(ApiError::InvalidInput(
+                "You are already friends with this user!".to_string(),
+            ));
         }
 
-        transaction.commit().await?;
+        if !friend.accepted && user.id != friend.friend_id.into() {
+            return Err(ApiError::InvalidInput(
+                "You cannot accept your own friend request!".to_string(),
+            ));
+        }
 
-        Ok(HttpResponse::NoContent().body(""))
+        crate::database::models::friend_item::DBFriend::update_friend(
+            friend.user_id,
+            friend.friend_id,
+            true,
+            &mut transaction,
+        )
+        .await?;
+
+        async fn send_friend_status(
+            user_id: DBUserId,
+            friend_id: DBUserId,
+            sockets: &ActiveSockets,
+            redis: &RedisPool,
+        ) -> Result<(), ApiError> {
+            if let Some(friend_status) =
+                get_user_status(user_id.into(), sockets, redis).await
+            {
+                broadcast_friends_message(
+                    redis,
+                    RedisFriendsMessage::DirectStatusUpdate {
+                        to_user: friend_id.into(),
+                        status: friend_status,
+                    },
+                )
+                .await?;
+            }
+
+            Ok(())
+        }
+
+        send_friend_status(friend.user_id, friend.friend_id, &db, &redis)
+            .await?;
+        send_friend_status(friend.friend_id, friend.user_id, &db, &redis)
+            .await?;
     } else {
-        Err(ApiError::NotFound)
+        if friend.id == user.id.into() {
+            return Err(ApiError::InvalidInput(
+                "You cannot add yourself as a friend!".to_string(),
+            ));
+        }
+
+        if !friend.allow_friend_requests {
+            return Err(ApiError::InvalidInput(
+                "Friend requests are disabled for this user!".to_string(),
+            ));
+        }
+
+        crate::database::models::friend_item::DBFriend {
+            user_id: user.id.into(),
+            friend_id: friend.id,
+            created: Utc::now(),
+            accepted: false,
+        }
+        .insert(&mut transaction)
+        .await?;
+
+        send_message_to_user(
+            &db,
+            friend.id.into(),
+            &ServerToClientMessage::FriendRequest { from: user.id },
+        )
+        .await?;
     }
+
+    transaction.commit().await?;
+
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 #[delete("friend/{id}")]
