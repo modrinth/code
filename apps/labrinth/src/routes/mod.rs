@@ -215,7 +215,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::Reroute(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::NotFound => StatusCode::NOT_FOUND,
             ApiError::Conflict(..) => StatusCode::CONFLICT,
-            ApiError::TaxComplianceApi => StatusCode::BAD_GATEWAY,
+            ApiError::TaxComplianceApi => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Zip(..) => StatusCode::BAD_REQUEST,
             ApiError::Io(..) => StatusCode::BAD_REQUEST,
             ApiError::RateLimitError(..) => StatusCode::TOO_MANY_REQUESTS,
