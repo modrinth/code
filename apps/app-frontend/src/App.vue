@@ -627,7 +627,7 @@ async function processPendingSurveys() {
 		<div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
 			<div data-tauri-drag-region class="flex p-3">
 				<ModrinthAppLogo class="h-full w-auto text-contrast pointer-events-none" />
-				<div class="flex items-center gap-1 ml-3">
+				<div data-tauri-drag-region class="flex items-center gap-1 ml-3">
 					<button
 						class="cursor-pointer p-0 m-0 text-contrast border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
 						@click="router.back()"
@@ -643,7 +643,7 @@ async function processPendingSurveys() {
 				</div>
 				<Breadcrumbs class="pt-[2px]" />
 			</div>
-			<section class="flex ml-auto items-center">
+			<section data-tauri-drag-region class="flex ml-auto items-center">
 				<ButtonStyled
 					v-if="!forceSidebar && themeStore.toggleSidebar"
 					:type="sidebarToggled ? 'standard' : 'transparent'"
@@ -899,10 +899,6 @@ async function processPendingSurveys() {
 
 .app-grid-statusbar {
 	grid-area: status;
-}
-
-[data-tauri-drag-region] {
-	-webkit-app-region: drag;
 }
 
 [data-tauri-drag-region-exclude] {
