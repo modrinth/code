@@ -26,7 +26,7 @@ bitflags::bitflags! {
         // read a user's payouts data
         const PAYOUTS_READ = 1 << 7;
         // withdraw money from a user's account
-        const PAYOUTS_WRITE = 1<< 8;
+        const PAYOUTS_WRITE = 1 << 8;
         // access user analytics (payout analytics at the moment)
         const ANALYTICS = 1 << 9;
 
