@@ -11,7 +11,7 @@ use labrinth::util::ratelimit::rate_limit_middleware;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
 use std::ffi::CStr;
 use std::sync::Arc;
-use tracing::{error, info};
+use tracing::{error, info, warn};
 use tracing_actix_web::TracingLogger;
 
 #[cfg(target_os = "linux")]
@@ -126,8 +126,19 @@ async fn main() -> std::io::Result<()> {
             _ => panic!("Invalid storage backend specified. Aborting startup!"),
         };
 
-    info!("Initializing clickhouse connection");
-    let mut clickhouse = clickhouse::init_client().await.unwrap();
+    info!("Initializing ClickHouse connection");
+    let clickhouse = clickhouse::init_client()
+        .await
+        .inspect_err(|err| {
+            warn!("ClickHouse connection unavailable: {err}.");
+
+            let hard_fail = dotenvy::var("CLICKHOUSE_HARD_FAIL").is_ok_and(|v| !v.is_empty());
+
+            if hard_fail {
+                panic!("Aborting because a ClickHouse connection couldn't be established, and CLICKHOUSE_HAIL_FAIL is set.")
+            }
+        })
+        .ok();
 
     let search_config = search::SearchConfig::new(None);
 
@@ -136,8 +147,14 @@ async fn main() -> std::io::Result<()> {
 
     if let Some(task) = args.run_background_task {
         info!("Running task {task:?} and exiting");
-        task.run(pool, redis_pool, search_config, clickhouse, stripe_client)
-            .await;
+        task.run(
+            pool,
+            redis_pool,
+            search_config,
+            clickhouse.clone(),
+            stripe_client,
+        )
+        .await;
         return Ok(());
     }
 
@@ -169,7 +186,7 @@ async fn main() -> std::io::Result<()> {
         pool.clone(),
         redis_pool.clone(),
         search_config.clone(),
-        &mut clickhouse,
+        clickhouse,
         file_host.clone(),
         maxmind_reader.clone(),
         stripe_client,

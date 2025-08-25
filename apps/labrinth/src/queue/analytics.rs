@@ -52,7 +52,7 @@ impl AnalyticsQueue {
 
     pub async fn index(
         &self,
-        client: clickhouse::Client,
+        client: Option<clickhouse::Client>,
         redis: &RedisPool,
         pool: &PgPool,
     ) -> Result<(), ApiError> {
@@ -64,6 +64,11 @@ impl AnalyticsQueue {
 
         let playtime_queue = self.playtime_queue.clone();
         self.playtime_queue.clear();
+
+        let Some(client) = client else {
+            // If ClickHouse isn't available, skip indexing silently
+            return Ok(());
+        };
 
         if !playtime_queue.is_empty() {
             let mut playtimes = client.insert("playtime")?;
