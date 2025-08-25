@@ -96,7 +96,7 @@
 							label: 'Versions',
 							href: {
 								path: `/project/${$route.params.id}/versions`,
-								query: { l: instance?.loader, g: instance?.game_version },
+								query: instanceFilters,
 							},
 							subpages: ['version'],
 						},
@@ -154,7 +154,7 @@ import {
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { ref, shallowRef, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
@@ -185,6 +185,24 @@ const instanceProjects = ref(null)
 
 const installed = ref(false)
 const installedVersion = ref(null)
+
+const instanceFilters = computed(() => {
+	if (!instance.value) {
+		return {}
+	}
+
+	const loaders = []
+	if (data.value.project_type === 'mod') {
+		if (instance.value.loader !== 'vanilla') {
+			loaders.push(instance.value.loader)
+		}
+		if (instance.value.loader === 'vanilla' || data.value.loaders.includes('datapack')) {
+			loaders.push('datapack')
+		}
+	}
+
+	return { l: loaders, g: instance.value.game_version }
+})
 
 const [allLoaders, allGameVersions] = await Promise.all([
 	get_loaders().catch(handleError).then(ref),
