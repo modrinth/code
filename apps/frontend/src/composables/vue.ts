@@ -4,11 +4,11 @@
  * @returns A computed reference that changes when component becomes mounted or unmounted.
  */
 export function useMountedValue<T>(getter: (isMounted: boolean) => T) {
-  const mounted = ref(getCurrentInstance()?.isMounted ?? false);
+	const mounted = ref(getCurrentInstance()?.isMounted ?? false)
 
-  onMounted(() => (mounted.value = true));
+	onMounted(() => (mounted.value = true))
 
-  onUnmounted(() => (mounted.value = false));
+	onUnmounted(() => (mounted.value = false))
 
-  return computed(() => getter(mounted.value));
+	return computed(() => getter(mounted.value))
 }

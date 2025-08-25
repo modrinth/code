@@ -4,7 +4,7 @@
  * @param {string?} key The key of the route param to extract.
  * @returns {import('vue').Ref<string | string[] | undefined>}
  */
-export const useRouteId = (key = "id") => {
-  const route = useNativeRoute();
-  return route.params?.[key] || undefined;
-};
+export const useRouteId = (key = 'id') => {
+	const route = useNativeRoute()
+	return route.params?.[key] || undefined
+}

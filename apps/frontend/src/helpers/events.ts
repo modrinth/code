@@ -4,7 +4,7 @@
  * @returns Whether any of the modifier keys is pressed.
  */
 export function isModifierKeyDown(
-  e: Pick<KeyboardEvent, "ctrlKey" | "altKey" | "metaKey" | "shiftKey">,
+	e: Pick<KeyboardEvent, 'ctrlKey' | 'altKey' | 'metaKey' | 'shiftKey'>,
 ) {
-  return e.ctrlKey || e.altKey || e.metaKey || e.shiftKey;
+	return e.ctrlKey || e.altKey || e.metaKey || e.shiftKey
 }

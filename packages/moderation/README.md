@@ -147,14 +147,14 @@ Text inputs can be conditionally shown based on selected actions:
 
 ```typescript
 relevantExtraInput: [
-  {
-    label: 'Additional Information',
-    variable: 'INFO',
-    showWhen: {
-      requiredActions: ['specific_action_id'],
-      excludedActions: ['incompatible_action_id'],
-    },
-  },
+	{
+		label: 'Additional Information',
+		variable: 'INFO',
+		showWhen: {
+			requiredActions: ['specific_action_id'],
+			excludedActions: ['incompatible_action_id'],
+		},
+	},
 ]
 ```
 

@@ -1,16 +1,16 @@
 declare module '*.svg?component' {
-  import type { FunctionalComponent, SVGAttributes } from 'vue'
+	import type { FunctionalComponent, SVGAttributes } from 'vue'
 
-  const src: FunctionalComponent<SVGAttributes>
-  export default src
+	const src: FunctionalComponent<SVGAttributes>
+	export default src
 }
 
 declare module '*.webp' {
-  const src: string
-  export default src
+	const src: string
+	export default src
 }
 
 declare module '*?url' {
-  const src: string
-  export default src
+	const src: string
+	export default src
 }
