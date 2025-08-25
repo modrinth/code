@@ -69,7 +69,7 @@ pub async fn is_network_metered() -> Result<bool> {
 
 #[cfg(target_os = "linux")]
 pub async fn is_network_metered() -> Result<bool> {
-    // Thanks tohttps://github.com/Hakanbaban53/rclone-manager for showing how to do this
+    // Thanks to https://github.com/Hakanbaban53/rclone-manager for showing how to do this
     use zbus::{Connection, Proxy};
 
     let connection = Connection::system().await?;
