@@ -19,8 +19,8 @@ use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use either::Either;
 use futures::{SinkExt, StreamExt};
+use reqwest::Method;
 use reqwest::header::HeaderValue;
-use reqwest::{Method, StatusCode};
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 use std::ops::Deref;
@@ -336,8 +336,8 @@ impl FriendsSocket {
         .await;
 
         if let Err(ref e) = result
-            && let ErrorKind::FetchError(e) = &*e.raw
-            && e.status() == Some(StatusCode::NOT_FOUND)
+            && let ErrorKind::LabrinthError(e) = &*e.raw
+            && e.error == "not_found"
         {
             return Err(ErrorKind::OtherError(format!(
                 "No user found with username \"{user_id}\""

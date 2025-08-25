@@ -189,7 +189,7 @@ impl Role {
 pub struct UserFriend {
     // The user who accepted the friend request
     pub id: UserId,
-    /// THe user who sent the friend request
+    /// The user who sent the friend request
     pub friend_id: UserId,
     pub accepted: bool,
     pub created: DateTime<Utc>,
