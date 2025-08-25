@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                delphi_report_issues.id AS \"id\", report_id,\n                issue_type AS \"issue_type: DelphiReportIssueType\",\n                delphi_report_issues.status as \"status: DelphiReportIssueStatus\",\n\n                file_id, delphi_version, artifact_url, created,\n                json_array(SELECT to_jsonb(delphi_report_issue_java_classes)\n                    FROM delphi_report_issue_java_classes\n                    WHERE issue_id = delphi_report_issues.id\n                ) AS \"classes: sqlx::types::Json<Vec<DBDelphiReportIssueJavaClass>>\",\n                versions.mod_id AS \"project_id?\", mods.published AS \"project_published?\"\n            FROM delphi_report_issues\n            INNER JOIN delphi_reports ON delphi_reports.id = report_id\n            LEFT OUTER JOIN files ON files.id = file_id\n            LEFT OUTER JOIN versions ON versions.id = files.version_id\n            LEFT OUTER JOIN mods ON mods.id = versions.mod_id\n            WHERE\n                (issue_type = $1 OR $1 IS NULL)\n                AND (delphi_report_issues.status = $2 OR $2 IS NULL)\n            ORDER BY\n                CASE WHEN $3 = 'created_asc' THEN delphi_reports.created ELSE TO_TIMESTAMP(0) END ASC,\n                CASE WHEN $3 = 'created_desc' THEN delphi_reports.created ELSE TO_TIMESTAMP(0) END DESC,\n                CASE WHEN $3 = 'pending_status_first' THEN delphi_report_issues.status ELSE 'pending'::delphi_report_issue_status END ASC\n            OFFSET $5\n            LIMIT $4\n            ",
+  "query": "\n            SELECT\n                delphi_report_issues.id AS \"id\", report_id,\n                issue_type AS \"issue_type: DelphiReportIssueType\",\n                delphi_report_issues.status AS \"status: DelphiReportIssueStatus\",\n\n                file_id, delphi_version, artifact_url, created, severity AS \"severity: DelphiReportSeverity\",\n                json_array(SELECT to_jsonb(delphi_report_issue_java_classes)\n                    FROM delphi_report_issue_java_classes\n                    WHERE issue_id = delphi_report_issues.id\n                ) AS \"classes: sqlx::types::Json<Vec<DBDelphiReportIssueJavaClass>>\",\n                versions.mod_id AS \"project_id?\", mods.published AS \"project_published?\"\n            FROM delphi_report_issues\n            INNER JOIN delphi_reports ON delphi_reports.id = report_id\n            LEFT OUTER JOIN files ON files.id = file_id\n            LEFT OUTER JOIN versions ON versions.id = files.version_id\n            LEFT OUTER JOIN mods ON mods.id = versions.mod_id\n            WHERE\n                (issue_type = $1 OR $1 IS NULL)\n                AND (delphi_report_issues.status = $2 OR $2 IS NULL)\n            ORDER BY\n                CASE WHEN $3 = 'created_asc' THEN delphi_reports.created ELSE TO_TIMESTAMP(0) END ASC,\n                CASE WHEN $3 = 'created_desc' THEN delphi_reports.created ELSE TO_TIMESTAMP(0) END DESC,\n                CASE WHEN $3 = 'pending_status_first' THEN delphi_report_issues.status ELSE 'pending'::delphi_report_issue_status END ASC,\n                CASE WHEN $3 = 'severity_asc' THEN delphi_reports.severity ELSE 'low'::delphi_report_severity END ASC,\n                CASE WHEN $3 = 'severity_desc' THEN delphi_reports.severity ELSE 'low'::delphi_report_severity END DESC\n            OFFSET $5\n            LIMIT $4\n            ",
   "describe": {
     "columns": [
       {
@@ -84,16 +84,33 @@
       },
       {
         "ordinal": 8,
+        "name": "severity: DelphiReportSeverity",
+        "type_info": {
+          "Custom": {
+            "name": "delphi_report_severity",
+            "kind": {
+              "Enum": [
+                "low",
+                "medium",
+                "high",
+                "severe"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 9,
         "name": "classes: sqlx::types::Json<Vec<DBDelphiReportIssueJavaClass>>",
         "type_info": "Jsonb"
       },
       {
-        "ordinal": 9,
+        "ordinal": 10,
         "name": "project_id?",
         "type_info": "Int8"
       },
       {
-        "ordinal": 10,
+        "ordinal": 11,
         "name": "project_published?",
         "type_info": "Timestamptz"
       }
@@ -155,10 +172,11 @@
       false,
       false,
       false,
+      false,
       null,
       true,
       true
     ]
   },
-  "hash": "c1cd83ddcd112e46477a195e8bed0a1658c6ddf7a486082cdb847fab06150328"
+  "hash": "2fd9af40467ca5c7ac81d921ca0a87c2db6cf840fc9284a8d8b47f42be741b03"
 }
