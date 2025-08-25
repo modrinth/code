@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { InfoIcon } from '@modrinth/assets'
-import { formatPrice } from '@modrinth/utils'
+import { formatPrice } from '@modrinth/ui'
 import { type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { Menu } from 'floating-vue'
 import { computed, inject, type Ref } from 'vue'

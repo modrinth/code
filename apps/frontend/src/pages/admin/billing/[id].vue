@@ -277,12 +277,13 @@ import {
 	ButtonStyled,
 	CopyCode,
 	DropdownSelect,
+	formatCategory,
+	formatPrice,
 	injectNotificationManager,
 	NewModal,
 	Toggle,
 	useRelativeTime,
 } from '@modrinth/ui'
-import { formatCategory, formatPrice } from '@modrinth/utils'
 import dayjs from 'dayjs'
 
 import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'

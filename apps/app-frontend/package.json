@@ -16,7 +16,6 @@
 		"@geometrically/minecraft-motd-parser": "^1.1.4",
 		"@modrinth/assets": "workspace:*",
 		"@modrinth/ui": "workspace:*",
-		"@modrinth/utils": "workspace:*",
 		"@sentry/vue": "^8.27.0",
 		"@tauri-apps/api": "^2.5.0",
 		"@tauri-apps/plugin-dialog": "^2.2.1",

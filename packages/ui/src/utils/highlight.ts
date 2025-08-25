@@ -1,3 +1,4 @@
+import { configuredXss, md } from '@modrinth/ui/parse'
 import hljs from 'highlight.js/lib/core'
 // Configs
 import gradle from 'highlight.js/lib/languages/gradle'
@@ -15,8 +16,6 @@ import python from 'highlight.js/lib/languages/python'
 import scala from 'highlight.js/lib/languages/scala'
 import xml from 'highlight.js/lib/languages/xml'
 import yaml from 'highlight.js/lib/languages/yaml'
-
-import { configuredXss, md } from './parse'
 
 /* REGISTRATION */
 // Scripting

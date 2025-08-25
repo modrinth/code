@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { SpinnerIcon } from '@modrinth/assets'
-import { formatPrice } from '@modrinth/utils'
+import { formatPrice } from '@modrinth/ui'
 import { useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
 

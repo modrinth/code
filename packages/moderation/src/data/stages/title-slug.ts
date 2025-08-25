@@ -1,5 +1,5 @@
 import { BookOpenIcon } from '@modrinth/assets'
-import type { Project } from '@modrinth/utils'
+import type { Project } from '@modrinth/ui'
 
 import type { Stage } from '../../types/stage'
 

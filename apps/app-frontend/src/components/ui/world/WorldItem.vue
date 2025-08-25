@@ -21,11 +21,12 @@ import {
 	Avatar,
 	ButtonStyled,
 	commonMessages,
+	formatNumber,
+	getPingLevel,
 	OverflowMenu,
 	SmartClickable,
 	useRelativeTime,
 } from '@modrinth/ui'
-import { formatNumber, getPingLevel } from '@modrinth/utils'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import type { MessageDescriptor } from '@vintl/vintl'
 import { defineMessages, useVIntl } from '@vintl/vintl'

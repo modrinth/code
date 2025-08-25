@@ -1,4 +1,4 @@
-import type { Project } from '../../types'
+import type { Project } from '..'
 import type { ServerBackup } from './backup'
 import type { Mod } from './content'
 import type { Allocation } from './server'

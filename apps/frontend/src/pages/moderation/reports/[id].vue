@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Report } from '@modrinth/utils'
+import type { Report } from '@modrinth/ui'
 
 import ModerationReportCard from '~/components/ui/moderation/ModerationReportCard.vue'
 import { enrichReportBatch } from '~/helpers/moderation.ts'

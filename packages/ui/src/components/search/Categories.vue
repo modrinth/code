@@ -9,7 +9,7 @@
 	</div>
 </template>
 <script setup>
-import { formatCategory } from '@modrinth/utils'
+import { formatCategory } from '@modrinth/ui'
 
 defineProps({
 	categories: {

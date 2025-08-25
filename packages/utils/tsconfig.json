@@ -1,3 +1,0 @@
-{
-	"extends": "@modrinth/tooling-config/typescript/vue.json"
-}

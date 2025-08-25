@@ -83,8 +83,12 @@ import {
 	MoreVerticalIcon,
 	ShareIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, VersionChannelIndicator } from '@modrinth/ui'
-import { formatBytes, renderHighlightedString } from '@modrinth/utils'
+import {
+	ButtonStyled,
+	formatBytes,
+	renderHighlightedString,
+	VersionChannelIndicator,
+} from '@modrinth/ui'
 
 const router = useRouter()
 

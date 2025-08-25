@@ -1,4 +1,4 @@
-import type { Allocation } from '@modrinth/utils'
+import type { Allocation } from '@modrinth/ui'
 
 import { useServersFetch } from '../servers-fetch.ts'
 import { ServerModule } from './base.ts'

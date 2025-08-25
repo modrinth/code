@@ -202,11 +202,12 @@ import {
 	BackupWarning,
 	ButtonStyled,
 	injectNotificationManager,
+	type Loaders,
+	ModrinthServersFetchError,
 	NewModal,
 	TeleportDropdownMenu,
 	Toggle,
 } from '@modrinth/ui'
-import { type Loaders, ModrinthServersFetchError } from '@modrinth/utils'
 import { $fetch } from 'ofetch'
 
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'

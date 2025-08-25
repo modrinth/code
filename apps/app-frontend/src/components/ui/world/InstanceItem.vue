@@ -10,13 +10,13 @@ import {
 import {
 	Avatar,
 	ButtonStyled,
+	capitalizeString,
 	commonMessages,
 	injectNotificationManager,
 	OverflowMenu,
 	SmartClickable,
 	useRelativeTime,
 } from '@modrinth/ui'
-import { capitalizeString } from '@modrinth/utils'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { useVIntl } from '@vintl/vintl'
 import type { Dayjs } from 'dayjs'

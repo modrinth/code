@@ -103,8 +103,7 @@ import {
 	ScaleIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { AutoLink, Avatar, Badge, OverflowMenu, useRelativeTime } from '@modrinth/ui'
-import { renderString } from '@modrinth/utils'
+import { AutoLink, Avatar, Badge, OverflowMenu, renderString, useRelativeTime } from '@modrinth/ui'
 
 import { isStaff } from '~/helpers/users.js'
 

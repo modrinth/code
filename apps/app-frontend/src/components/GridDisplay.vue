@@ -10,8 +10,12 @@ import {
 	TrashIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Button, DropdownSelect, injectNotificationManager } from '@modrinth/ui'
-import { formatCategoryHeader } from '@modrinth/utils'
+import {
+	Button,
+	DropdownSelect,
+	formatCategoryHeader,
+	injectNotificationManager,
+} from '@modrinth/ui'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 

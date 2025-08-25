@@ -8,7 +8,6 @@ import {
 	ServerNotice,
 	TagItem,
 } from '@modrinth/ui'
-import type { ServerNotice as ServerNoticeType } from '@modrinth/utils'
 import { ref } from 'vue'
 
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'

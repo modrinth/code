@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { GitGraphIcon, RssIcon } from '@modrinth/assets'
 import { articles as rawArticles } from '@modrinth/blog'
+import type { User } from '@modrinth/ui'
 import { Avatar, ButtonStyled } from '@modrinth/ui'
-import type { User } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 

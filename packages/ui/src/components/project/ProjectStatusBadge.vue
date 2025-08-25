@@ -14,7 +14,7 @@ import {
 	UpdatedIcon,
 	XIcon,
 } from '@modrinth/assets'
-import type { ProjectStatus } from '@modrinth/utils'
+import type { ProjectStatus } from '@modrinth/ui'
 import { defineMessage, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import type { Component } from 'vue'
 import { computed } from 'vue'

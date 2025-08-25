@@ -1,4 +1,4 @@
-import type { JDKBuild, JDKVersion, Startup } from '@modrinth/utils'
+import type { JDKBuild, JDKVersion, Startup } from '@modrinth/ui'
 
 import { useServersFetch } from '../servers-fetch.ts'
 import { ServerModule } from './base.ts'

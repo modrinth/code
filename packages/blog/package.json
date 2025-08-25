@@ -3,10 +3,9 @@
 	"version": "0.0.0",
 	"private": true,
 	"main": "./index.ts",
-	"types": "./index.d.ts",
 	"scripts": {
-		"lint": "jiti ./check.ts && eslint . && prettier --check .",
-		"fix": "jiti ./compile.ts && eslint . --fix && prettier --write ."
+		"lint": "jiti ./src/build/check.ts && eslint . && prettier --check .",
+		"fix": "jiti ./src/build/compile.ts && eslint . --fix && prettier --write ."
 	},
 	"devDependencies": {
 		"@modrinth/tooling-config": "workspace:*",
@@ -17,7 +16,7 @@
 		"jiti": "^2.4.2"
 	},
 	"dependencies": {
-		"@modrinth/utils": "workspace:*",
+		"@modrinth/ui": "workspace:*",
 		"glob": "^10.2.7",
 		"gray-matter": "^4.0.3",
 		"html-minifier-terser": "^7.2.0",

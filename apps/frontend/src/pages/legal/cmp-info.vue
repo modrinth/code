@@ -162,7 +162,7 @@
 </template>
 
 <script lang="ts" setup>
-import { formatDate, formatMoney } from '@modrinth/utils'
+import { formatDate, formatMoney } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 

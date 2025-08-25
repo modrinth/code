@@ -1,4 +1,6 @@
 export * from './src/components'
 export * from './src/composables'
+export * from './src/messages'
 export * from './src/providers'
+export * from './src/types'
 export * from './src/utils'

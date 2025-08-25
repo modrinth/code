@@ -97,8 +97,14 @@
 </template>
 <script setup>
 import { PayPalIcon, UnknownIcon, XIcon } from '@modrinth/assets'
-import { Badge, Breadcrumbs, DropdownSelect, injectNotificationManager } from '@modrinth/ui'
-import { capitalizeString, formatWallet } from '@modrinth/utils'
+import {
+	Badge,
+	Breadcrumbs,
+	capitalizeString,
+	DropdownSelect,
+	formatWallet,
+	injectNotificationManager,
+} from '@modrinth/ui'
 import dayjs from 'dayjs'
 
 import TremendousIcon from '~/assets/images/external/tremendous.svg?component'

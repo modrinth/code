@@ -148,8 +148,7 @@ import {
 	UnknownIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { injectNotificationManager } from '@modrinth/ui'
-import { formatDate } from '@modrinth/utils'
+import { formatDate, injectNotificationManager } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 

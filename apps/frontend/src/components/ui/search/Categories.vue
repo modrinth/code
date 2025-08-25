@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { formatCategory } from '@modrinth/utils'
+import { formatCategory } from '@modrinth/ui'
 
 export default {
 	props: {

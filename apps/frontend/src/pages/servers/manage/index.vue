@@ -115,8 +115,8 @@
 
 <script setup lang="ts">
 import { HammerIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
+import type { ModrinthServersFetchError, Server } from '@modrinth/ui'
 import { ButtonStyled, CopyCode } from '@modrinth/ui'
-import type { ModrinthServersFetchError, Server } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import Fuse from 'fuse.js'
 import type { ComponentPublicInstance } from 'vue'

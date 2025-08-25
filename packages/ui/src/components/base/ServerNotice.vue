@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 import { XIcon } from '@modrinth/assets'
-import { renderString } from '@modrinth/utils'
+import { renderString } from '@modrinth/ui'
 import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
 

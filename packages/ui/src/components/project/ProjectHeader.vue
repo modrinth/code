@@ -54,7 +54,7 @@
 </template>
 <script setup lang="ts">
 import { DownloadIcon, HeartIcon, TagsIcon } from '@modrinth/assets'
-import { formatCategory, formatNumber, type Project } from '@modrinth/utils'
+import { formatCategory, formatNumber, type Project } from '@modrinth/ui'
 import { useRouter } from 'vue-router'
 
 import Avatar from '../base/Avatar.vue'

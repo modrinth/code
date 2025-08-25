@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { formatPrice } from '@modrinth/utils'
+import { formatPrice } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { computed, provide } from 'vue'
 

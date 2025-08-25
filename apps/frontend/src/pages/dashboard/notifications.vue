@@ -57,8 +57,7 @@
 </template>
 <script setup>
 import { CheckCheckIcon, HistoryIcon } from '@modrinth/assets'
-import { Button, Chips, Pagination } from '@modrinth/ui'
-import { formatProjectType } from '@modrinth/utils'
+import { Button, Chips, formatProjectType, Pagination } from '@modrinth/ui'
 
 import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 import NotificationItem from '~/components/ui/NotificationItem.vue'

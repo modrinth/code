@@ -104,8 +104,7 @@
 
 <script setup>
 import { ReportIcon, UnknownIcon, VersionIcon } from '@modrinth/assets'
-import { Avatar, Badge, CopyCode, useRelativeTime } from '@modrinth/ui'
-import { formatProjectType } from '@modrinth/utils'
+import { Avatar, Badge, CopyCode, formatProjectType, useRelativeTime } from '@modrinth/ui'
 
 import ThreadSummary from '~/components/ui/thread/ThreadSummary.vue'
 import { renderHighlightedString } from '~/helpers/highlight.js'

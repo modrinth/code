@@ -711,10 +711,11 @@ import {
 	ButtonStyled,
 	commonMessages,
 	injectNotificationManager,
+	isAdmin,
+	isStaff,
 	OverflowMenu,
 	PagewideBanner,
 } from '@modrinth/ui'
-import { isAdmin, isStaff } from '@modrinth/utils'
 import { IntlFormatted } from '@vintl/vintl/components'
 
 import TextLogo from '~/components/brand/TextLogo.vue'

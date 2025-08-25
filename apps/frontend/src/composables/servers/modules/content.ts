@@ -1,4 +1,4 @@
-import type { ContentType, Mod } from '@modrinth/utils'
+import type { ContentType, Mod } from '@modrinth/ui'
 
 import { useServersFetch } from '../servers-fetch.ts'
 import { ServerModule } from './base.ts'

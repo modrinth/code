@@ -137,8 +137,7 @@ import {
 	PlugIcon,
 	ScaleIcon,
 } from '@modrinth/assets'
-import { Avatar, Badge, ButtonStyled, useRelativeTime } from '@modrinth/ui'
-import { formatProjectType } from '@modrinth/utils'
+import { Avatar, Badge, ButtonStyled, formatProjectType, useRelativeTime } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 

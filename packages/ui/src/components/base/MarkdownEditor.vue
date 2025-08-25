@@ -292,8 +292,8 @@ import {
 	XIcon,
 	YouTubeIcon,
 } from '@modrinth/assets'
-import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/utils/codemirror'
-import { renderHighlightedString } from '@modrinth/utils/highlight'
+import { renderHighlightedString } from '@modrinth/ui/highlight'
+import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/ui/src/utils/codemirror'
 import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, watch } from 'vue'
 
 import Modal from '../modal/Modal.vue'

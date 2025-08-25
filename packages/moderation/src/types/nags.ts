@@ -1,4 +1,4 @@
-import type { Project, User, Version } from '@modrinth/utils'
+import type { Project, User, Version } from '@modrinth/ui'
 import type { MessageDescriptor } from '@vintl/vintl'
 import type { FunctionalComponent, SVGAttributes } from 'vue'
 

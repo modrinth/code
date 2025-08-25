@@ -151,8 +151,8 @@
 
 <script setup lang="ts">
 import { DownloadIcon, IssuesIcon, PlusIcon, SettingsIcon, SpinnerIcon } from '@modrinth/assets'
+import type { Backup } from '@modrinth/ui'
 import { ButtonStyled, injectNotificationManager, TagItem } from '@modrinth/ui'
-import type { Backup } from '@modrinth/utils'
 import { useStorage } from '@vueuse/core'
 import { computed, ref } from 'vue'
 

@@ -372,12 +372,6 @@ import {
 	SettingsIcon,
 	TransferIcon,
 } from '@modrinth/assets'
-import {
-	ButtonStyled,
-	ErrorInformationCard,
-	injectNotificationManager,
-	ServerNotice,
-} from '@modrinth/ui'
 import type {
 	Backup,
 	PowerAction,
@@ -385,7 +379,13 @@ import type {
 	Stats,
 	WSEvent,
 	WSInstallationResultEvent,
-} from '@modrinth/utils'
+} from '@modrinth/ui'
+import {
+	ButtonStyled,
+	ErrorInformationCard,
+	injectNotificationManager,
+	ServerNotice,
+} from '@modrinth/ui'
 import type { MessageDescriptor } from '@vintl/vintl'
 import DOMPurify from 'dompurify'
 import { computed, onMounted, onUnmounted, type Reactive, ref } from 'vue'

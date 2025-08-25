@@ -76,8 +76,8 @@
 </template>
 <script setup lang="ts">
 import { ClientIcon, MonitorSmartphoneIcon, ServerIcon, UserIcon } from '@modrinth/assets'
-import type { GameVersionTag, PlatformTag } from '@modrinth/utils'
-import { formatCategory, getVersionsToDisplay } from '@modrinth/utils'
+import type { GameVersionTag, PlatformTag } from '@modrinth/ui'
+import { formatCategory, getVersionsToDisplay } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { useRouter } from 'vue-router'
 

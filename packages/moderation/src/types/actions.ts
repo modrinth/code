@@ -1,4 +1,4 @@
-import type { Project } from '@modrinth/utils'
+import type { Project } from '@modrinth/ui'
 
 import type { WeightedMessage } from './messages'
 

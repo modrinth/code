@@ -1,4 +1,4 @@
-import type { Organization, Project, Report, User, Version } from '@modrinth/utils'
+import type { Organization, Project, Report, User, Version } from '@modrinth/ui'
 
 type Thread = { id: string }
 

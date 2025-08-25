@@ -71,10 +71,10 @@ import { DownloadIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	injectNotificationManager,
+	ModrinthServersFetchError,
 	NewModal,
 	TeleportDropdownMenu,
 } from '@modrinth/ui'
-import { ModrinthServersFetchError } from '@modrinth/utils'
 
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 

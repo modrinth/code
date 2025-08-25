@@ -1,5 +1,5 @@
 <script setup>
-import { formatMoney, formatNumber } from '@modrinth/utils'
+import { formatMoney, formatNumber } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import VueApexCharts from 'vue3-apexcharts'
 

@@ -38,8 +38,7 @@
 	</div>
 </template>
 <script setup>
-import { Badge, Breadcrumbs } from '@modrinth/ui'
-import { formatPrice } from '@modrinth/utils'
+import { Badge, Breadcrumbs, formatPrice } from '@modrinth/ui'
 
 import { products } from '~/generated/state.json'
 

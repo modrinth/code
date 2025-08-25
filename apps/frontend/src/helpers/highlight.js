@@ -1,5 +1,5 @@
 // Configs
-import { configuredXss, md } from '@modrinth/utils'
+import { configuredXss, md } from '@modrinth/ui'
 import hljs from 'highlight.js/lib/core'
 import gradle from 'highlight.js/lib/languages/gradle'
 // Coding

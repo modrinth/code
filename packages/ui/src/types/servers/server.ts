@@ -1,4 +1,4 @@
-import type { Project } from '../../types'
+import type { Project } from '..'
 import type { ServerNotice } from './common'
 
 export interface ServerGeneral {

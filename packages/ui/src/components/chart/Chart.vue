@@ -1,6 +1,6 @@
 <!-- eslint-disable no-console -->
 <script setup>
-import { formatNumber } from '@modrinth/utils'
+import { formatNumber } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import { defineAsyncComponent, ref } from 'vue'
 

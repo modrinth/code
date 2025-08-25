@@ -4,8 +4,8 @@ import type {
 	FileUploadQuery,
 	FSQueuedOp,
 	JWTAuth,
-} from '@modrinth/utils'
-import { ModrinthServerError } from '@modrinth/utils'
+} from '@modrinth/ui'
+import { ModrinthServerError } from '@modrinth/ui'
 
 import { useServersFetch } from '../servers-fetch.ts'
 import { ServerModule } from './base.ts'

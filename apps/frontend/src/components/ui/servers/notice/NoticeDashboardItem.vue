@@ -8,7 +8,6 @@ import {
 	TagItem,
 	useRelativeTime,
 } from '@modrinth/ui'
-import type { ServerNotice as ServerNoticeType } from '@modrinth/utils'
 import { useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 

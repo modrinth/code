@@ -46,8 +46,8 @@
 
 <script setup lang="ts">
 import { IssuesIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import type { Backup } from '@modrinth/ui'
 import { ButtonStyled, injectNotificationManager, NewModal } from '@modrinth/ui'
-import type { Backup } from '@modrinth/utils'
 import { computed, nextTick, ref } from 'vue'
 
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'

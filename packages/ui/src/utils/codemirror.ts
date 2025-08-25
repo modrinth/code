@@ -1,78 +1,77 @@
-// @ts-nocheck
-
 import { insertNewlineAndIndent } from '@codemirror/commands'
 import { deleteMarkupBackward } from '@codemirror/lang-markdown'
 import { getIndentation, indentString, syntaxTree } from '@codemirror/language'
 import type { EditorState, Transaction } from '@codemirror/state'
-import type { Command, EditorView, KeyBinding } from '@codemirror/view'
+import type { EditorView, KeyBinding } from '@codemirror/view'
+import type { SyntaxNode } from '@lezer/common'
 
-const toggleBold: Command = ({ state, dispatch }) => {
+function toggleBold({ state, dispatch }) {
 	return toggleAround(state, dispatch, '**', '**')
 }
 
-const toggleItalic: Command = ({ state, dispatch }) => {
+function toggleItalic({ state, dispatch }) {
 	return toggleAround(state, dispatch, '_', '_')
 }
 
-const toggleStrikethrough: Command = ({ state, dispatch }) => {
+function toggleStrikethrough({ state, dispatch }) {
 	return toggleAround(state, dispatch, '~~', '~~')
 }
 
-const toggleCodeBlock: Command = ({ state, dispatch }) => {
+function toggleCodeBlock({ state, dispatch }) {
 	const lineBreak = state.lineBreak
 	const codeBlockMark = `${lineBreak}\`\`\`${lineBreak}`
 	return toggleAround(state, dispatch, codeBlockMark, codeBlockMark)
 }
 
-const toggleSpoiler: Command = ({ state, dispatch }) => {
+function toggleSpoiler({ state, dispatch }) {
 	// Insert details tag with a summary tag at the start
 	const detailsTags = ['\n<details>\n<summary>Spoiler</summary>\n\n', '\n\n</details>\n\n']
 	return toggleAround(state, dispatch, detailsTags[0], detailsTags[1])
 }
 
-const toggleHeader: Command = ({ state, dispatch }) => {
+function toggleHeader({ state, dispatch }) {
 	return toggleLineStart(state, dispatch, '# ')
 }
 
-const toggleHeader2: Command = ({ state, dispatch }) => {
+function toggleHeader2({ state, dispatch }) {
 	return toggleLineStart(state, dispatch, '## ')
 }
 
-const toggleHeader3: Command = ({ state, dispatch }) => {
+function toggleHeader3({ state, dispatch }) {
 	return toggleLineStart(state, dispatch, '### ')
 }
 
-const toggleHeader4: Command = ({ state, dispatch }) => {
+function toggleHeader4({ state, dispatch }) {
 	return toggleLineStart(state, dispatch, '#### ')
 }
 
-const toggleHeader5: Command = ({ state, dispatch }) => {
+function toggleHeader5({ state, dispatch }) {
 	return toggleLineStart(state, dispatch, '##### ')
 }
 
-const toggleHeader6: Command = ({ state, dispatch }) => {
+function toggleHeader6({ state, dispatch }) {
 	return toggleLineStart(state, dispatch, '###### ')
 }
 
-const toggleQuote: Command = ({ state, dispatch }) => {
+function toggleQuote({ state, dispatch }) {
 	return toggleLineStart(state, dispatch, '> ')
 }
 
-const toggleBulletList: Command = ({ state, dispatch }) => {
+function toggleBulletList({ state, dispatch }) {
 	return toggleLineStart(state, dispatch, '- ')
 }
 
-const toggleOrderedList: Command = ({ state, dispatch }) => {
+function toggleOrderedList({ state, dispatch }) {
 	return toggleLineStart(state, dispatch, '1. ')
 }
 
-const yankSelection = ({ state }: EditorView): string => {
+function yankSelection({ state }: EditorView): string {
 	const { from, to } = state.selection.main
 	const selectedText = state.doc.sliceString(from, to)
 	return selectedText
 }
 
-const replaceSelection = ({ state, dispatch }: EditorView, text: string) => {
+function replaceSelection({ state, dispatch }: EditorView, text: string) {
 	const { from, to } = state.selection.main
 	const transaction = state.update({
 		changes: { from, to, insert: text },
@@ -84,11 +83,11 @@ const replaceSelection = ({ state, dispatch }: EditorView, text: string) => {
 
 type Dispatch = (tr: Transaction) => void
 
-const surroundedByText = (
+function surroundedByText(
 	state: EditorState,
 	open: string,
 	close: string,
-): 'inclusive' | 'exclusive' | 'none' => {
+): 'inclusive' | 'exclusive' | 'none' {
 	const { from, to } = state.selection.main
 
 	// Check for inclusive surrounding first
@@ -109,12 +108,12 @@ const surroundedByText = (
 }
 
 // TODO: Node based toggleAround so that we can support nested delimiters
-const toggleAround = (
+function toggleAround(
 	state: EditorState,
 	dispatch: Dispatch,
 	open: string,
 	close: string,
-): boolean => {
+): boolean {
 	const { from, to } = state.selection.main
 
 	const isSurrounded = surroundedByText(state, open, close)
@@ -158,7 +157,7 @@ const toggleAround = (
 	return true
 }
 
-const toggleLineStart = (state: EditorState, dispatch: Dispatch, text: string): boolean => {
+function toggleLineStart(state: EditorState, dispatch: Dispatch, text: string): boolean {
 	const lines = state.doc.lineAt(state.selection.main.from)
 	const lineBreak = state.lineBreak
 
@@ -203,10 +202,10 @@ const toggleLineStart = (state: EditorState, dispatch: Dispatch, text: string): 
 const continueNodeTypes = ['ListItem', 'Blockquote']
 const blackListedNodeTypes = ['CodeBlock']
 
-const getListStructure = (state: EditorState, head: number) => {
+function getListStructure(state: EditorState, head: number) {
 	const tree = syntaxTree(state)
 	const headNode = tree.resolve(head, -1)
-	const stack = []
+	const stack: SyntaxNode[] = []
 
 	let node: typeof headNode.parent = headNode
 	while (node) {
@@ -226,7 +225,7 @@ const getListStructure = (state: EditorState, head: number) => {
 	return stack
 }
 
-const insertNewlineContinueMark: Command = (view): boolean => {
+function insertNewlineContinueMark(view): boolean {
 	const { state, dispatch } = view
 	const {
 		selection: {
@@ -287,7 +286,7 @@ const insertNewlineContinueMark: Command = (view): boolean => {
 }
 
 // Creates a transaction for a simple line break
-const createSimpleTransaction = (state: EditorState) => {
+function createSimpleTransaction(state: EditorState) {
 	const {
 		lineBreak,
 		selection: {
@@ -305,7 +304,7 @@ const createSimpleTransaction = (state: EditorState) => {
 }
 
 // Creates a transaction for continuing a list item
-const createListTransaction = (state: EditorState, indentStr: string, from: number, to: number) => {
+function createListTransaction(state: EditorState, indentStr: string, from: number, to: number) {
 	const {
 		lineBreak,
 		selection: {
@@ -321,7 +320,7 @@ const createListTransaction = (state: EditorState, indentStr: string, from: numb
 }
 
 // Creates a transaction for continuing a blockquote
-const createBlockquoteTransaction = (state: EditorState, indentStr: string) => {
+function createBlockquoteTransaction(state: EditorState, indentStr: string) {
 	const {
 		lineBreak,
 		selection: {
@@ -335,7 +334,7 @@ const createBlockquoteTransaction = (state: EditorState, indentStr: string) => {
 	})
 }
 
-const incrementMark = (mark: string): string => {
+function incrementMark(mark: string): string {
 	const numberedListRegex = /^(\d+)\.$/
 	const match = numberedListRegex.exec(mark)
 	if (match) {
@@ -345,7 +344,7 @@ const incrementMark = (mark: string): string => {
 	return mark
 }
 
-const commands = {
+export const markdownCommands = {
 	toggleBold,
 	toggleItalic,
 	toggleStrikethrough,
@@ -367,7 +366,6 @@ const commands = {
 	replaceSelection,
 }
 
-export const markdownCommands = commands
 export const modrinthMarkdownEditorKeymap: KeyBinding[] = [
 	{ key: 'Enter', run: insertNewlineContinueMark },
 	{ key: 'Backspace', run: deleteMarkupBackward },

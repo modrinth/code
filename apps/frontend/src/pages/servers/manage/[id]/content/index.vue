@@ -355,8 +355,8 @@ import {
 	TrashIcon,
 	WrenchIcon,
 } from '@modrinth/assets'
+import type { Mod } from '@modrinth/ui'
 import { Avatar, ButtonStyled, injectNotificationManager } from '@modrinth/ui'
-import type { Mod } from '@modrinth/utils'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import ContentVersionEditModal from '~/components/ui/servers/ContentVersionEditModal.vue'

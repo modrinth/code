@@ -39,8 +39,8 @@
 
 <script setup lang="ts">
 import { ClockIcon, RocketIcon } from '@modrinth/assets'
+import type { UserSubscription } from '@modrinth/ui'
 import { ButtonStyled } from '@modrinth/ui'
-import type { UserSubscription } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import dayjsDuration from 'dayjs/plugin/duration'
 import type { ComponentPublicInstance } from 'vue'

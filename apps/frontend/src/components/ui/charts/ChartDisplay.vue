@@ -305,8 +305,14 @@
 
 <script setup lang="ts">
 import { DownloadIcon, UpdatedIcon } from '@modrinth/assets'
-import { Button, Card, DropdownSelect } from '@modrinth/ui'
-import { formatCategoryHeader, formatMoney, formatNumber } from '@modrinth/utils'
+import {
+	Button,
+	Card,
+	DropdownSelect,
+	formatCategoryHeader,
+	formatMoney,
+	formatNumber,
+} from '@modrinth/ui'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 

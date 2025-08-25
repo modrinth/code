@@ -69,7 +69,7 @@
 
 <script setup>
 import { CalendarIcon, DownloadIcon, EditIcon, HeartIcon } from '@modrinth/assets'
-import { formatNumber } from '@modrinth/utils'
+import { formatNumber } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime.js'
 import { computed } from 'vue'

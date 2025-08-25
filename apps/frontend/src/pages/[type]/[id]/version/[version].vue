@@ -656,10 +656,11 @@ import {
 	Checkbox,
 	ConfirmModal,
 	CopyCode,
+	formatBytes,
+	formatCategory,
 	injectNotificationManager,
 	MarkdownEditor,
 } from '@modrinth/ui'
-import { formatBytes, formatCategory } from '@modrinth/utils'
 import { Multiselect } from 'vue-multiselect'
 
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
