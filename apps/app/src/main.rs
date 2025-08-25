@@ -7,6 +7,7 @@ use native_dialog::{DialogBuilder, MessageLevel};
 use std::env;
 use tauri::{Listener, Manager};
 use theseus::prelude::*;
+use theseus::DirectoryInfo;
 
 mod api;
 mod error;
@@ -141,9 +142,16 @@ fn restart_app(app: tauri::AppHandle) {
     app.restart();
 }
 
+#[tauri::command]
+fn is_portable_mode() -> bool {
+    theseus::DirectoryInfo::is_portable_mode()
+}
+
 // if Tauri app is called with arguments, then those arguments will be treated as commands
 // ie: deep links or filepaths for .mrpacks
 fn main() {
+    // Set up portable environment as early as possible (before any other initialization)
+    DirectoryInfo::setup_portable_env();
     /*
         tracing is set basd on the environment variable RUST_LOG=xxx, depending on the amount of logs to show
             ERROR > WARN > INFO > DEBUG > TRACE
@@ -187,13 +195,18 @@ fn main() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_deep_link::init())
-        .plugin(tauri_plugin_opener::init())
-        .plugin(
+        .plugin(tauri_plugin_opener::init());
+
+    // Only add window state plugin if not portable
+    if !theseus::DirectoryInfo::is_portable_mode() {
+        builder = builder.plugin(
             tauri_plugin_window_state::Builder::default()
                 .with_filename("app-window-state.json")
                 .build(),
-        )
-        .setup(|app| {
+        );
+    }
+
+    builder = builder.setup(|app| {
             #[cfg(target_os = "macos")]
             {
                 let payload = macos::deep_link::get_or_init_payload(app);
@@ -267,6 +280,7 @@ fn main() {
             toggle_decorations,
             show_window,
             restart_app,
+            is_portable_mode,
         ]);
 
     tracing::info!("Initializing app...");
