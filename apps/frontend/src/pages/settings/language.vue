@@ -290,7 +290,7 @@ function getItemLabel(locale: Locale) {
 			<div class="card-description">
 				<IntlFormatted :message-id="messages.languagesDescription">
 					<template #crowdin-link="{ children }">
-						<a href="https://crowdin.com/project/modrinth">
+						<a href="https://translate.modrinth.com">
 							<component :is="() => children" />
 						</a>
 					</template>
