@@ -8,6 +8,7 @@ members = [
 	"packages/app-lib",
 	"packages/ariadne",
 	"packages/daedalus",
+	"packages/labrinth-macros",
 ]
 
 [workspace.package]
@@ -79,6 +80,7 @@ indicatif = "0.18.0"
 itertools = "0.14.0"
 jemalloc_pprof = "0.8.1"
 json-patch = { version = "4.0.0", default-features = false }
+labrinth-macros = { path = "packages/labrinth-macros" }
 lettre = { version = "0.11.18", default-features = false, features = [
 	"builder",
 	"hostname",
@@ -101,6 +103,7 @@ png = "0.17.16"
 prometheus = "0.14.0"
 quartz_nbt = "0.2.9"
 quick-xml = "0.38.1"
+quote = "1.0.40"
 rand = "=0.8.5" # Locked on 0.8 until argon2 and p256 update to 0.9
 rand_chacha = "=0.3.1" # Locked on 0.3 until we can update rand to 0.9
 redis = "0.32.4"
@@ -136,6 +139,7 @@ sha1_smol = { version = "1.0.1", features = ["std"] }
 sha2 = "0.10.9"
 spdx = "0.10.9"
 sqlx = { version = "0.8.6", default-features = false }
+syn = { version = "2.0.106", features = ["full"] }
 sysinfo = { version = "0.36.1", default-features = false }
 tar = "0.4.44"
 tauri = "2.7.0"

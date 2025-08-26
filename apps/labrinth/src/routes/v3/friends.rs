@@ -14,6 +14,7 @@ use crate::sync::status::get_user_status;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use ariadne::networking::message::ServerToClientMessage;
 use chrono::Utc;
+use labrinth_macros::localized_api_error;
 use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -23,6 +24,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 }
 
 #[post("friend/{id}")]
+#[localized_api_error]
 pub async fn add_friend(
     req: HttpRequest,
     info: web::Path<(String,)>,

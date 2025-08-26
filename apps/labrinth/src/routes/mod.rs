@@ -5,7 +5,10 @@ use crate::util::env::parse_strings_from_var;
 use actix_cors::Cors;
 use actix_files::Files;
 use actix_web::http::StatusCode;
-use actix_web::{HttpResponse, web};
+use actix_web::http::header::{
+    AcceptLanguage, ContentLanguage, Header, LanguageTag, QualityItem,
+};
+use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use futures::FutureExt;
 
 pub mod internal;
@@ -151,6 +154,25 @@ pub enum ApiError {
 
 impl ApiError {
     pub fn as_api_error<'a>(&self) -> crate::models::error::ApiError<'a> {
+        self.as_api_error_with_description(self.to_string())
+    }
+
+    pub fn as_localized_api_error<'a>(
+        &self,
+        language: &LanguageTag,
+    ) -> crate::models::error::ApiError<'a> {
+        let description = if language.primary_language() == "en" {
+            self.to_string()
+        } else {
+            format!("In language {language}! {self}")
+        };
+        self.as_api_error_with_description(description)
+    }
+
+    fn as_api_error_with_description<'a>(
+        &self,
+        description: String,
+    ) -> crate::models::error::ApiError<'a> {
         crate::models::error::ApiError {
             error: match self {
                 ApiError::Env(..) => "environment_error",
@@ -183,12 +205,24 @@ impl ApiError {
                 ApiError::RateLimitError(..) => "ratelimit_error",
                 ApiError::Stripe(..) => "stripe_error",
             },
-            description: self.to_string(),
+            description,
         }
+    }
+
+    pub fn localized_error_response(&self, req: &HttpRequest) -> HttpResponse {
+        let language = AcceptLanguage::parse(req)
+            .ok()
+            .and_then(|x| x.preference().into_item())
+            .unwrap_or_else(|| LanguageTag::parse("en-US").unwrap());
+        let body = self.as_localized_api_error(&language);
+
+        HttpResponse::build(self.status_code())
+            .insert_header(ContentLanguage(vec![QualityItem::max(language)]))
+            .json(body)
     }
 }
 
-impl actix_web::ResponseError for ApiError {
+impl ResponseError for ApiError {
     fn status_code(&self) -> StatusCode {
         match self {
             ApiError::Env(..) => StatusCode::INTERNAL_SERVER_ERROR,

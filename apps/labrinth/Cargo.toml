@@ -129,6 +129,7 @@ rusty-money.workspace = true
 json-patch.workspace = true
 
 ariadne.workspace = true
+labrinth-macros.workspace = true
 
 clap = { workspace = true, features = ["derive"] }
 
