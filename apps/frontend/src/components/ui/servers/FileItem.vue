@@ -143,7 +143,7 @@ const codeExtensions = Object.freeze([
 	'go',
 ])
 
-const textExtensions = Object.freeze(['txt', 'md', 'log', 'cfg', 'conf', 'properties', 'ini'])
+const textExtensions = Object.freeze(['txt', 'md', 'log', 'cfg', 'conf', 'properties', 'ini', 'sk'])
 const imageExtensions = Object.freeze(['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'])
 const supportedArchiveExtensions = Object.freeze(['zip'])
 const units = Object.freeze(['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'])

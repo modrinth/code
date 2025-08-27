@@ -170,38 +170,22 @@ pub(crate) async fn watch_profile(
     let profile_path = dirs.profiles_dir().join(profile_path);
 
     if profile_path.exists() && profile_path.is_dir() {
-        for sub_path in ProjectType::iterator().map(|x| x.get_folder()).chain([
-            "crash-reports",
-            "saves",
-            "servers.dat",
-        ]) {
+        for sub_path in ProjectType::iterator()
+            .map(|x| x.get_folder())
+            .chain(["crash-reports", "saves"])
+        {
             let full_path = profile_path.join(sub_path);
 
-            if !full_path.exists() && !full_path.is_symlink() {
-                if !sub_path.contains(".") {
-                    if let Err(e) =
-                        crate::util::io::create_dir_all(&full_path).await
-                    {
-                        tracing::error!(
-                            "Failed to create directory for watcher {full_path:?}: {e}"
-                        );
-                        return;
-                    }
-                } else if sub_path == "servers.dat" {
-                    const EMPTY_NBT: &[u8] = &[
-                        10, // Compound tag
-                        0, 0, // Empty name
-                        0, // End of compound tag
-                    ];
-                    if let Err(e) =
-                        crate::util::io::write(&full_path, EMPTY_NBT).await
-                    {
-                        tracing::error!(
-                            "Failed to create file for watcher {full_path:?}: {e}"
-                        );
-                        return;
-                    }
-                }
+            if !full_path.exists()
+                && !full_path.is_symlink()
+                && !sub_path.contains(".")
+                && let Err(e) =
+                    crate::util::io::create_dir_all(&full_path).await
+            {
+                tracing::error!(
+                    "Failed to create directory for watcher {full_path:?}: {e}"
+                );
+                return;
             }
 
             let mut watcher = watcher.write().await;
@@ -214,6 +198,16 @@ pub(crate) async fn watch_profile(
                 );
                 return;
             }
+        }
+
+        let mut watcher = watcher.write().await;
+        if let Err(e) = watcher
+            .watcher()
+            .watch(&profile_path, RecursiveMode::NonRecursive)
+        {
+            tracing::error!(
+                "Failed to watch root profile directory for watcher {profile_path:?}: {e}"
+            );
         }
     }
 }

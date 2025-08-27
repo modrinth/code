@@ -1281,7 +1281,7 @@ const footerLinks = [
 				),
 			},
 			{
-				href: 'https://crowdin.com/project/modrinth',
+				href: 'https://translate.modrinth.com',
 				label: formatMessage(
 					defineMessage({ id: 'layout.footer.resources.translate', defaultMessage: 'Translate' }),
 				),
