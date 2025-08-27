@@ -971,7 +971,7 @@ pub async fn get_balance(
         );
     }
 
-    Ok(HttpResponse::Ok().json(&Response {
+    Ok(HttpResponse::Ok().json(Response {
         balance,
         requested_form_type,
         form_completion_status,
