@@ -22,7 +22,11 @@ import {
 	get,
 	list,
 } from '@/helpers/profile'
-import { isVersionCompatible, findPreferredVersion, installVersionDependencies } from '@/store/install.js'
+import {
+	findPreferredVersion,
+	installVersionDependencies,
+	isVersionCompatible,
+} from '@/store/install.js'
 
 const { handleError } = injectNotificationManager()
 const router = useRouter()

@@ -41,14 +41,13 @@ export const useInstall = defineStore('installStore', {
 	},
 })
 
-export const findPreferredVersion = (
-	versions,
-	project,
-	instance,
-) => {
+export const findPreferredVersion = (versions, project, instance) => {
 	// If we can find a version using strictly the instance loader then prefer that
-	let version = versions.find((v) => v.game_versions.includes(instance.game_version) &&
-		(project.project_type === 'mod' ? v.loaders.includes(instance.loader) : true))
+	let version = versions.find(
+		(v) =>
+			v.game_versions.includes(instance.game_version) &&
+			(project.project_type === 'mod' ? v.loaders.includes(instance.loader) : true),
+	)
 
 	if (!version) {
 		// Otherwise use first compatible version (in addition to versions with the instance loader this includes datapacks)
@@ -58,15 +57,13 @@ export const findPreferredVersion = (
 	return version
 }
 
-export const isVersionCompatible = (
-	version,
-	project,
-	instance,
-) => {
-	return version.game_versions.includes(instance.game_version) &&
+export const isVersionCompatible = (version, project, instance) => {
+	return (
+		version.game_versions.includes(instance.game_version) &&
 		(project.project_type === 'mod'
 			? version.loaders.includes(instance.loader) || version.loaders.includes('datapack')
 			: true)
+	)
 }
 
 export const install = async (
