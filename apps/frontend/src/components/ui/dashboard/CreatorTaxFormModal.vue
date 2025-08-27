@@ -73,21 +73,10 @@
 			</div>
 		</div>
 	</NewModal>
-	<Admonition type="warning" header="Tax form required" v-bind="$attrs">
-		<span class="text-orange">
-			You have reached the annual withdrawal threshold of $600 USD and must complete a tax form
-			before you can withdraw additional revenue.
-		</span>
-		<div class="mt-3">
-			<ButtonStyled color="orange">
-				<button @click="startTaxForm"><FileTextIcon /> Start tax form</button>
-			</ButtonStyled>
-		</div>
-	</Admonition>
 </template>
 
 <script setup lang="ts">
-import { ExternalIcon, FileTextIcon, RightArrowIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import { ExternalIcon, RightArrowIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { Admonition, ButtonStyled, Chips, injectNotificationManager, NewModal } from '@modrinth/ui'
 
 import { type FormRequestResponse, useAvalara1099 } from '~/composables/avalara1099'

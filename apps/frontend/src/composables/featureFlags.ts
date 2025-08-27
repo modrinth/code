@@ -35,7 +35,6 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	showProjectPageDownloadModalServersPromo: false,
 	showProjectPageCreateServersTooltip: true,
 	showProjectPageQuickServerButton: false,
-	showCreatorTaxCompliance: false,
 	// advancedRendering: true,
 	// externalLinksNewTab: true,
 	// notUsingBlockers: false,
