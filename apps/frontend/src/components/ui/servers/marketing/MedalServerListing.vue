@@ -99,10 +99,9 @@
 			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
-				<PanelErrorIcon class="!size-5" /> Your server has been cancelled. Please update your
-				billing information or contact Modrinth Support for more information.
+				<PanelErrorIcon class="!size-5" /> Your Medal server trial has ended and your server has
+				been suspended. Please upgrade to continue to use your server.
 			</div>
-			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
 		</div>
 		<div
 			v-else-if="status === 'suspended' && suspension_reason"
