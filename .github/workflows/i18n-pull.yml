@@ -1,0 +1,108 @@
+name: Crowdin (pull)
+
+on:
+  schedule:
+    - cron: '0 7 * * MON' # every monday at 7 am
+  workflow_dispatch:
+
+concurrency:
+  group: i18n-management
+
+jobs:
+  pull_translations:
+    name: 'Pull translations from Crowdin'
+    runs-on: ubuntu-22.04
+    if: github.ref == 'refs/heads/main'
+    concurrency:
+      group: i18n-pull:${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Preflight check
+        run: |
+          PREFLIGHT_CHECK_RESULT=true
+
+          function flight_failure () {
+            if [ "$PREFLIGHT_CHECK_RESULT" = true ]; then
+              echo "One or more pre-flight checks failed!"
+              echo ""
+              PREFLIGHT_CHECK_RESULT=false
+            fi
+            echo "- $1"
+          }
+
+          if [ "$CROWDIN_PROJECT_ID_DEFINED" != true ]; then
+            flight_failure "CROWDIN_PROJECT_ID variable is not defined (required to push)"
+          fi
+
+          if [ "$CROWDIN_PERSONAL_TOKEN_DEFINED" != true ]; then
+            flight_failure "CROWDIN_PERSONAL_TOKEN secret is not defined (required to push)"
+          fi
+
+          if [ "$CROWDIN_GH_TOKEN_DEFINED" != true ]; then
+            flight_failure "CROWDIN_GH_TOKEN secret is not defined (required to make pull requests)"
+          fi
+
+          if [ "$PREFLIGHT_CHECK_RESULT" = false ]; then
+            exit 1
+          fi
+        env:
+          CROWDIN_PROJECT_ID_DEFINED: ${{ vars.CROWDIN_PROJECT_ID != '' }}
+          CROWDIN_PERSONAL_TOKEN_DEFINED: ${{ secrets.CROWDIN_PERSONAL_TOKEN != '' }}
+          CROWDIN_GH_TOKEN_DEFINED: ${{ secrets.CROWDIN_GH_TOKEN != '' }}
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          token: ${{ secrets.CROWDIN_GH_TOKEN }}
+
+      - name: Configure Git author
+        id: git-author
+        uses: MarcoIeni/git-config@v0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.CROWDIN_GH_TOKEN }}
+
+      # # Because --all flag of Crowdin CLI is currently broken we need to create a fake source file
+      # # so that the CLI won't omit translations for it. See https://github.com/crowdin/crowdin-cli/issues/724
+      # - name: Write fake sources
+      #   shell: bash
+      #   run: echo "{}" > locales/en-US/index.json
+
+      - name: Query branch name
+        id: branch-name
+        shell: bash
+        run: |
+          BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+          SAFE_BRANCH_NAME=$(echo "$BRANCH_NAME" | sed -e "s/[\\\\/\\:*?\"<>|]/_/g")
+          echo "Branch name is $BRANCH_NAME (escaped as $SAFE_BRANCH_NAME)"
+          echo "branch_name=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
+          echo "safe_branch_name=$SAFE_BRANCH_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Download translations from Crowdin
+        uses: crowdin/github-action@v2
+        with:
+          upload_sources: false
+          upload_translations: false
+          download_translations: true
+          push_translations: false
+          create_pull_request: false
+          crowdin_branch_name: '[${{ github.repository_owner }}.${{ github.event.repository.name }}] ${{ steps.branch-name.outputs.safe_branch_name }}'
+        env:
+          CROWDIN_PROJECT_ID: ${{ vars.CROWDIN_PROJECT_ID }}
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+
+      - name: Fix broken permissions
+        shell: bash
+        run: sudo chown -R $USER:$USER .
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          title: 'New translations from Crowdin (${{ steps.branch-name.outputs.branch_name }})'
+          body-path: .github/templates/crowdin-pr.md
+          commit-message: 'New translations from Crowdin (${{ steps.branch-name.outputs.branch_name }})'
+          branch: crowdin-pull/${{ steps.branch-name.outputs.branch_name }}
+          author: '${{ steps.git-author.outputs.name }} <${{ steps.git-author.outputs.email }}>'
+          committer: '${{ steps.git-author.outputs.name }} <${{ steps.git-author.outputs.email }}>'
+          labels: sync
+          token: ${{ secrets.CROWDIN_GH_TOKEN }}
