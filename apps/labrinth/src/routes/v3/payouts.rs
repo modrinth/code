@@ -953,7 +953,7 @@ pub async fn get_balance(
         form_completion_status = Some(
             update_compliance_status(&pool, user.id.into())
                 .await?
-                .map(|compliance| {
+                .map_or(FormCompletionStatus::Unrequested, |compliance| {
                     requested_form_type = Some(compliance.model.form_type);
 
                     if compliance.compliance_api_check_failed {
@@ -967,8 +967,7 @@ pub async fn get_balance(
                     } else {
                         FormCompletionStatus::Unsigned
                     }
-                })
-                .unwrap_or(FormCompletionStatus::Unrequested),
+                }),
         );
     }
 
