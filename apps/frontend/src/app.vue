@@ -16,7 +16,8 @@ import { FrontendNotificationManager } from './providers/frontend-notifications.
 
 provideNotificationManager(new FrontendNotificationManager())
 
-provideApi(new RestModrinthApi((url: string, options?: object) => {
+provideApi(
+	new RestModrinthApi((url: string, options?: object) => {
 		const match = url.match(/^\/v(\d+)\/(.+)$/)
 
 		if (match) {
@@ -30,6 +31,6 @@ provideApi(new RestModrinthApi((url: string, options?: object) => {
 		} else {
 			throw new Error('Invalid format')
 		}
-	})
+	}),
 )
 </script>

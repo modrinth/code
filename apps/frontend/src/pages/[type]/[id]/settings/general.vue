@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
-	IconSelect, injectNotificationManager,
+	IconSelect,
+	injectNotificationManager,
 	injectProjectPageContext,
 	SettingsLabel,
 	UnsavedChangesPopup,

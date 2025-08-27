@@ -96,7 +96,7 @@
 			</div>
 			<template
 				v-if="
-				!flags.newProjectEnvironmentSettings &&
+					!flags.newProjectEnvironmentSettings &&
 					project.versions?.length !== 0 &&
 					project.project_type !== 'resourcepack' &&
 					project.project_type !== 'plugin' &&
