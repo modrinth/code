@@ -1056,7 +1056,7 @@ async fn update_compliance_status(
         return Ok(None);
     };
 
-    if compliance.signed.is_some()
+    if (compliance.signed.is_some() && compliance.tin_matched)
         || Utc::now().signed_duration_since(compliance.last_checked)
             < COMPLIANCE_CHECK_DEBOUNCE
     {
