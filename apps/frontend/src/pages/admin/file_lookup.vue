@@ -37,7 +37,7 @@
 					</div>
 
 					<template v-if="fileHashes">
-						<h3 class="text-lg font-extrabold text-contrast mb-0">File hashes:</h3>
+						<h3 class="mb-0 text-lg font-extrabold text-contrast">File hashes:</h3>
 						<div class="flex flex-col gap-2">
 							<span class="text-xs text-secondary">SHA512:</span>
 							<CopyCode :text="fileHashes.sha512" />

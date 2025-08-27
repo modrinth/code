@@ -311,7 +311,7 @@
 							},
 							{
 								divider: true,
-								shown: isAdmin(auth.user)
+								shown: isAdmin(auth.user),
 							},
 							{
 								id: 'user-lookup',
