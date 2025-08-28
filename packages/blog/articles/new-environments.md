@@ -7,7 +7,7 @@ authors: ['Dc7EYhxG']
 
 **Hey creators!**
 
-Over the years, we've taken in lots of feedback regarding how we identify client-side and server-side mods and modpacks on Modrinth. It's a surprisingly nuanced issue, and careful consideration has finally led us to implementing the new system.
+Over the years, we've taken in lots of feedback regarding how we identify client-side and server-side mods and modpacks on Modrinth. It's a surprisingly nuanced issue, and careful consideration has finally led us to implementing a new system that fixes many of the issues with the old one.
 
 ## What do I need to do?
 
