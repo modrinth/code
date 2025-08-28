@@ -133,13 +133,11 @@ type EnvironmentTag = {
 	environments: EnvironmentV3[]
 }
 
-const baseId = 'project.about.compatibility'
-
 const environmentTags: EnvironmentTag[] = [
 	{
 		icon: ClientIcon,
 		message: defineMessage({
-			id: `${baseId}.environments.client-side`,
+			id: `project.about.compatibility.environments.client-side`,
 			defaultMessage: 'Client-side',
 		}),
 		environments: [
@@ -152,7 +150,7 @@ const environmentTags: EnvironmentTag[] = [
 	{
 		icon: ServerIcon,
 		message: defineMessage({
-			id: `${baseId}.environments.server-side`,
+			id: `project.about.compatibility.environments.server-side`,
 			defaultMessage: 'Server-side',
 		}),
 		environments: [
@@ -165,7 +163,7 @@ const environmentTags: EnvironmentTag[] = [
 	{
 		icon: ServerIcon,
 		message: defineMessage({
-			id: `${baseId}.environments.dedicated-servers-only`,
+			id: `project.about.compatibility.environments.dedicated-servers-only`,
 			defaultMessage: 'Dedicated servers only',
 		}),
 		environments: ['dedicated_server_only'],
@@ -173,7 +171,7 @@ const environmentTags: EnvironmentTag[] = [
 	{
 		icon: UserIcon,
 		message: defineMessage({
-			id: `${baseId}.environments.singleplayer-only`,
+			id: `project.about.compatibility.environments.singleplayer-only`,
 			defaultMessage: 'Singleplayer only',
 		}),
 		environments: ['singleplayer_only'],
@@ -181,7 +179,7 @@ const environmentTags: EnvironmentTag[] = [
 	{
 		icon: UserIcon,
 		message: defineMessage({
-			id: `${baseId}.environments.singleplayer`,
+			id: `project.about.compatibility.environments.singleplayer`,
 			defaultMessage: 'Singleplayer',
 		}),
 		environments: ['server_only'],
@@ -189,7 +187,7 @@ const environmentTags: EnvironmentTag[] = [
 	{
 		icon: MonitorSmartphoneIcon,
 		message: defineMessage({
-			id: `${baseId}.environments.client-and-server`,
+			id: `project.about.compatibility.environments.client-and-server`,
 			defaultMessage: 'Client and server',
 		}),
 		environments: [
@@ -209,19 +207,19 @@ const primaryEnvironmentTags = computed(() => {
 
 const messages = defineMessages({
 	title: {
-		id: `${baseId}.title`,
+		id: `project.about.compatibility.title`,
 		defaultMessage: 'Compatibility',
 	},
 	minecraftJava: {
-		id: `${baseId}.game.minecraftJava`,
+		id: `project.about.compatibility.game.minecraftJava`,
 		defaultMessage: 'Minecraft: Java Edition',
 	},
 	platforms: {
-		id: `${baseId}.platforms`,
+		id: `project.about.compatibility.platforms`,
 		defaultMessage: 'Platforms',
 	},
 	environments: {
-		id: `${baseId}.environments`,
+		id: `project.about.compatibility.environments`,
 		defaultMessage: 'Supported environments',
 	},
 })

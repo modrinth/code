@@ -2,6 +2,7 @@
 import { CheckIcon } from '@modrinth/assets'
 import {
 	Admonition,
+	commonProjectSettingsMessages,
 	injectNotificationManager,
 	injectProjectPageContext,
 	ProjectSettingsEnvSelector,
@@ -9,6 +10,9 @@ import {
 	useSavable,
 } from '@modrinth/ui'
 import { injectApi } from '@modrinth/ui/src/providers/api.ts'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+
+const { formatMessage } = useVIntl()
 
 const { projectV2, projectV3, refreshProject } = injectProjectPageContext()
 const { handleError } = injectNotificationManager()
@@ -61,6 +65,40 @@ const messages = defineMessages({
 		id: 'project.settings.environment.verification.verify-text',
 		defaultMessage: `Verify that this project's environment is set correctly.`,
 	},
+	wrongProjectTypeTitle: {
+		id: 'project.settings.environment.notice.wrong-project-type.title',
+		defaultMessage: `This project type does not support environment metadata`,
+	},
+	wrongProjectTypeDescription: {
+		id: 'project.settings.environment.notice.wrong-project-type.description',
+		defaultMessage: `Only mod or modpack projects can have environment metadata.`,
+	},
+	missingEnvTitle: {
+		id: 'project.settings.environment.notice.missing-env.title',
+		defaultMessage: `Please select an environment for your project`,
+	},
+	missingEnvDescription: {
+		id: 'project.settings.environment.notice.missing-env.description',
+		defaultMessage: `Your project is missing environment metadata, please select the appropriate option below.`,
+	},
+	multipleEnvironmentsTitle: {
+		id: 'project.settings.environment.notice.multiple-environments.title',
+		defaultMessage: 'Your project has multiple environments',
+	},
+	multipleEnvironmentsDescription: {
+		id: 'project.settings.environment.notice.multiple-environments.description',
+		defaultMessage:
+			"Different versions of your project have different environments selected, so you can't edit them globally at this time.",
+	},
+	reviewOptionsTitle: {
+		id: 'project.settings.environment.notice.review-options.title',
+		defaultMessage: 'Please review the options below',
+	},
+	reviewOptionsDescription: {
+		id: 'project.settings.environment.notice.review-options.description',
+		defaultMessage:
+			"We've just overhauled the Environments system on Modrinth and new options are now available. Please ensure the correct option is selected below and then click 'Verify' when you're done!",
+	},
 })
 </script>
 <template>
@@ -78,14 +116,16 @@ const messages = defineMessages({
 			@save="save"
 		/>
 		<div class="card experimental-styles-within">
-			<h2 class="m-0 mb-2 block text-lg font-extrabold text-contrast">Environment</h2>
+			<h2 class="m-0 mb-2 block text-lg font-extrabold text-contrast">
+				{{ formatMessage(commonProjectSettingsMessages.environment) }}
+			</h2>
 			<Admonition
 				v-if="!supportsEnvironment"
 				type="critical"
-				header="This project type does not support environment metadata"
+				:header="formatMessage(messages.wrongProjectTypeTitle)"
 				class="mb-3"
 			>
-				Only mod or modpack projects can have environment metadata.
+				{{ formatMessage(messages.wrongProjectTypeDescription) }}
 			</Admonition>
 			<template v-else>
 				<Admonition
@@ -95,29 +135,26 @@ const messages = defineMessages({
 						projectV3.environment[0] === 'unknown'
 					"
 					type="critical"
-					header="Please select an environment for your project"
+					:header="formatMessage(messages.missingEnvTitle)"
 					class="mb-3"
 				>
-					Your project is missing environment metadata, please select the appropriate option below.
+					{{ formatMessage(messages.missingEnvDescription) }}
 				</Admonition>
 				<Admonition
 					v-else-if="projectV3.environment.length > 1"
 					type="info"
-					header="Your project has multiple environments."
+					:header="formatMessage(messages.multipleEnvironmentsTitle)"
 					class="mb-3"
 				>
-					Different versions of your project have different environments selected, so you can't edit
-					them globally at this time.
+					{{ formatMessage(messages.multipleEnvironmentsDescription) }}
 				</Admonition>
 				<Admonition
 					v-else-if="needsToVerify"
 					type="warning"
-					header="Please review the options below"
+					:header="formatMessage(messages.reviewOptionsTitle)"
 					class="mb-3"
 				>
-					We've just overhauled the Environments system on Modrinth and new options are now
-					available. Please ensure the correct option is selected below and then click 'Verify' when
-					you're done!
+					{{ formatMessage(messages.reviewOptionsDescription) }}
 				</Admonition>
 				<ProjectSettingsEnvSelector v-model="current.environment" />
 			</template>

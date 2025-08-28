@@ -11,10 +11,14 @@ import {
 	UsersIcon,
 	VersionIcon,
 } from '@modrinth/assets'
+import { commonMessages, commonProjectSettingsMessages } from '@modrinth/ui'
 import type { Project, ProjectV3Partial } from '@modrinth/utils'
+import { useVIntl } from '@vintl/vintl'
 
 import NavStack from '~/components/ui/NavStack.vue'
 import NavStackItem from '~/components/ui/NavStackItem.vue'
+
+const { formatMessage } = useVIntl()
 
 defineProps<{
 	currentMember: any
@@ -43,15 +47,15 @@ const organization = defineModel<any>('organization')
 				<NavStack>
 					<NavStackItem
 						:link="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
-						label="General"
+						:label="formatMessage(commonProjectSettingsMessages.general)"
 					>
 						<InfoIcon aria-hidden="true" />
 					</NavStackItem>
 					<NavStackItem
 						v-if="flags.newProjectGeneralSettings"
 						:link="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings/general`"
-						label="General"
-						badge="New"
+						:label="formatMessage(commonProjectSettingsMessages.general)"
+						:badge="formatMessage(commonMessages.newBadge)"
 					>
 						<InfoIcon aria-hidden="true" />
 					</NavStackItem>
@@ -63,8 +67,8 @@ const organization = defineModel<any>('organization')
 						:link="`/${project.project_type}/${
 							project.slug ? project.slug : project.id
 						}/settings/environment`"
-						label="Environment"
-						badge="New"
+						:label="formatMessage(commonProjectSettingsMessages.environment)"
+						:badge="formatMessage(commonMessages.newBadge)"
 					>
 						<GlobeIcon aria-hidden="true" />
 					</NavStackItem>
@@ -72,7 +76,7 @@ const organization = defineModel<any>('organization')
 						:link="`/${project.project_type}/${
 							project.slug ? project.slug : project.id
 						}/settings/tags`"
-						label="Tags"
+						:label="formatMessage(commonProjectSettingsMessages.tags)"
 					>
 						<TagsIcon aria-hidden="true" />
 					</NavStackItem>
@@ -80,7 +84,7 @@ const organization = defineModel<any>('organization')
 						:link="`/${project.project_type}/${
 							project.slug ? project.slug : project.id
 						}/settings/description`"
-						label="Description"
+						:label="formatMessage(commonProjectSettingsMessages.description)"
 					>
 						<AlignLeftIcon aria-hidden="true" />
 					</NavStackItem>
@@ -88,7 +92,7 @@ const organization = defineModel<any>('organization')
 						:link="`/${project.project_type}/${
 							project.slug ? project.slug : project.id
 						}/settings/license`"
-						label="License"
+						:label="formatMessage(commonProjectSettingsMessages.license)"
 					>
 						<BookTextIcon aria-hidden="true" />
 					</NavStackItem>
@@ -96,7 +100,7 @@ const organization = defineModel<any>('organization')
 						:link="`/${project.project_type}/${
 							project.slug ? project.slug : project.id
 						}/settings/links`"
-						label="Links"
+						:label="formatMessage(commonProjectSettingsMessages.links)"
 					>
 						<LinkIcon aria-hidden="true" />
 					</NavStackItem>
@@ -104,31 +108,31 @@ const organization = defineModel<any>('organization')
 						:link="`/${project.project_type}/${
 							project.slug ? project.slug : project.id
 						}/settings/members`"
-						label="Members"
+						:label="formatMessage(commonProjectSettingsMessages.members)"
 					>
 						<UsersIcon aria-hidden="true" />
 					</NavStackItem>
-					<h3>View</h3>
+					<h3>{{ formatMessage(commonProjectSettingsMessages.view) }}</h3>
 					<NavStackItem
 						:link="`/${project.project_type}/${
 							project.slug ? project.slug : project.id
 						}/settings/analytics`"
-						label="Analytics"
+						:label="formatMessage(commonProjectSettingsMessages.analytics)"
 						chevron
 					>
 						<ChartIcon aria-hidden="true" />
 					</NavStackItem>
-					<h3>Upload</h3>
+					<h3>{{ formatMessage(commonProjectSettingsMessages.upload) }}</h3>
 					<NavStackItem
 						:link="`/${project.project_type}/${project.slug ? project.slug : project.id}/gallery`"
-						label="Gallery"
+						:label="formatMessage(commonProjectSettingsMessages.gallery)"
 						chevron
 					>
 						<ImageIcon aria-hidden="true" />
 					</NavStackItem>
 					<NavStackItem
 						:link="`/${project.project_type}/${project.slug ? project.slug : project.id}/versions`"
-						label="Versions"
+						:label="formatMessage(commonProjectSettingsMessages.versions)"
 						chevron
 					>
 						<VersionIcon aria-hidden="true" />

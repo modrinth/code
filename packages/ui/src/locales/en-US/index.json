@@ -1,18 +1,9 @@
 {
-  "1ZbGtB": {
-    "defaultMessage": "Supported environments"
+  "badge.new": {
+    "defaultMessage": "New"
   },
-  "6GGPoo": {
-    "defaultMessage": "Platforms"
-  },
-  "DlrBFy": {
-    "defaultMessage": "Singleplayer"
-  },
-  "I/VpTy": {
-    "defaultMessage": "Client and server"
-  },
-  "QLSJZl": {
-    "defaultMessage": "Singleplayer only"
+  "button.analytics": {
+    "defaultMessage": "Analytics"
   },
   "button.back": {
     "defaultMessage": "Back"
@@ -40,6 +31,12 @@
   },
   "button.edit": {
     "defaultMessage": "Edit"
+  },
+  "button.follow": {
+    "defaultMessage": "Follow"
+  },
+  "button.more-options": {
+    "defaultMessage": "More options"
   },
   "button.next": {
     "defaultMessage": "Next"
@@ -83,6 +80,9 @@
   "button.stop": {
     "defaultMessage": "Stop"
   },
+  "button.unfollow": {
+    "defaultMessage": "Unfollow"
+  },
   "button.upload-image": {
     "defaultMessage": "Upload image"
   },
@@ -104,9 +104,6 @@
   "collection.label.private": {
     "defaultMessage": "Private"
   },
-  "cqyH4+": {
-    "defaultMessage": "Minecraft: Java Edition"
-  },
   "icon-select.edit": {
     "defaultMessage": "Edit icon"
   },
@@ -118,6 +115,9 @@
   },
   "icon-select.select": {
     "defaultMessage": "Select icon"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "Search..."
   },
   "input.view.gallery": {
     "defaultMessage": "Gallery view"
@@ -142,9 +142,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Unknown game mode"
-  },
-  "jx3A4P": {
-    "defaultMessage": "Server-side"
   },
   "label.changes-saved": {
     "defaultMessage": "Changes saved"
@@ -179,6 +176,9 @@
   "label.notifications": {
     "defaultMessage": "Notifications"
   },
+  "label.or": {
+    "defaultMessage": "or"
+  },
   "label.password": {
     "defaultMessage": "Password"
   },
@@ -190,6 +190,9 @@
   },
   "label.rejected": {
     "defaultMessage": "Rejected"
+  },
+  "label.saved": {
+    "defaultMessage": "Saved"
   },
   "label.scopes": {
     "defaultMessage": "Scopes"
@@ -347,6 +350,36 @@
   "project-type.all": {
     "defaultMessage": "All"
   },
+  "project.about.compatibility.environments": {
+    "defaultMessage": "Supported environments"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Client and server"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "Client-side"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "Dedicated servers only"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "Server-side"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Singleplayer"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Singleplayer only"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "Minecraft: Java Edition"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "Platforms"
+  },
+  "project.about.compatibility.title": {
+    "defaultMessage": "Compatibility"
+  },
   "project.about.creators.owner": {
     "defaultMessage": "Project owner"
   },
@@ -404,6 +437,12 @@
   "project.about.links.wiki": {
     "defaultMessage": "Visit wiki"
   },
+  "project.settings.analytics.title": {
+    "defaultMessage": "Analytics"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "Description"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Has some functionality on both the client and server, even if only partially."
   },
@@ -449,6 +488,36 @@
   "project.settings.environment.singleplayer.title": {
     "defaultMessage": "Singleplayer only"
   },
+  "project.settings.environment.title": {
+    "defaultMessage": "Environment"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "Gallery"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "General"
+  },
+  "project.settings.license.title": {
+    "defaultMessage": "License"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "Links"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "Members"
+  },
+  "project.settings.tags.title": {
+    "defaultMessage": "Tags"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "Upload"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "Versions"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "View"
+  },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
   },
@@ -487,9 +556,6 @@
   },
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Unlisted by staff"
-  },
-  "sNTynp": {
-    "defaultMessage": "Dedicated servers only"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Filter locked"
@@ -697,11 +763,5 @@
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "You have unsaved changes."
-  },
-  "vGcdQ5": {
-    "defaultMessage": "Client-side"
-  },
-  "zug5DJ": {
-    "defaultMessage": "Compatibility"
   }
 }
