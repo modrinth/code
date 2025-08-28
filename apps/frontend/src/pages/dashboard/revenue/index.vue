@@ -279,4 +279,18 @@ $striped-colors: 'green', 'blue', 'purple', 'orange', 'red';
 	background-position: unset !important;
 	background-attachment: unset !important;
 }
+
+:deep(.v-popper--theme-dismissable-prompt) {
+	.v-popper__inner {
+		border: none !important;
+	}
+
+	.v-popper__arrow-outer {
+		border-color: transparent !important;
+	}
+
+	.v-popper__arrow-inner {
+		border-color: var(--color-raised-bg) !important;
+	}
+}
 </style>
