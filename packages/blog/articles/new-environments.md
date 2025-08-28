@@ -1,7 +1,7 @@
 ---
 title: 'Creators: Verify Your Environment Metadata'
 summary: We've overhauled the environment metadata on Modrinth, and all creators must verify their settings.
-date: 2025-08-28T00:00:00-07:00
+date: 2025-08-28T16:50:00-07:00
 authors: ['Dc7EYhxG']
 ---
 

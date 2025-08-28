@@ -11,6 +11,21 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-08-28T16:50:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Overhauled creator-facing project environment metadata
+	- This is part of a larger project to make environment data across Modrinth more reliable. Read [this blog post](/news/article/new-environments) for more information.
+- Improved performance of project pages.`,
+	},
+	{
+		date: `2025-08-28T16:50:00-07:00`,
+		product: 'servers',
+		body: `### Improvements
+- Fixed issue with Files page not showing files in the correct order sometimes.
+- Fixed Medal servers showing a confusing cancellation/suspension notice.`,
+	},
+	{
 		date: `2025-08-20T13:30:00-07:00`,
 		product: 'app',
 		version: '0.10.7',
