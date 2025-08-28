@@ -631,8 +631,8 @@
 								<ButtonStyled size="large" circular>
 									<button
 										v-if="auth.user"
-										:v-tooltip="formatMessage(messages.follow)"
-										:aria-label="formatMessage(messages.follow)"
+										:v-tooltip="formatMessage(commonMessages.followButton)"
+										:aria-label="formatMessage(commonMessages.followButton)"
 										@click="userFollowProject(project)"
 									>
 										<HeartIcon aria-hidden="true" />
