@@ -2,71 +2,66 @@
 	<div class="flex flex-col gap-8 p-2">
 		<div class="flex flex-col gap-5">
 			<div class="flex flex-col">
-				<span class="text-2xl text-contrast">Revenue</span>
+				<span class="text-2xl font-semibold text-contrast">Balance</span>
 				<span
-					class="via-bg-brand-button bg-gradient-to-r from-brand-green via-20% to-brand-blue bg-clip-text text-4xl font-extrabold text-transparent"
+					class="bg-gradient-to-r from-brand-purple via-brand-orange via-20% to-brand-orange bg-clip-text text-4xl font-extrabold text-transparent"
 					>{{ formatMoney(grandTotal) }}</span
 				>
 			</div>
-			<div class="flex h-3 w-full overflow-hidden rounded-full">
+			<div class="flex h-3 w-full gap-2 overflow-hidden rounded-full bg-bg-raised">
 				<span
-					class="zone zone--green h-full flex-none bg-brand-green"
-					:style="{ width: zoneGreenPct }"
-				></span>
-				<span
-					class="zone zone--striped--green h-full flex-none bg-highlight"
-					:style="{ width: zoneStripedPct }"
-				></span>
-				<span
-					class="zone zone--striped--gray h-full flex-none bg-button-bg"
-					:style="{ width: zoneBgPct }"
+					v-for="seg in segments"
+					:key="seg.key"
+					class="h-full flex-none"
+					:class="seg.class"
+					:style="{ width: seg.widthPct }"
 				></span>
 			</div>
-			<div class="grid grid-cols-3 gap-4">
-				<div class="border-0 !border-r-[2px] border-solid border-button-bg">
-					<span class="flex flex-row gap-2 align-middle text-xl"
-						><span class="my-auto block size-4 rounded-full bg-brand-green px-2"></span> Available
+			<div class="flex flex-col">
+				<div
+					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-button-bg p-2"
+				>
+					<span class="text-md flex flex-row gap-2 align-middle"
+						><span class="my-auto block size-4 rounded-full bg-brand-green"></span> Available
 						now</span
 					>
-					<span class="text-2xl font-bold text-contrast">{{ formatMoney(totalAvailable) }}</span>
+					<span class="text-md font-bold text-contrast">{{ formatMoney(totalAvailable) }}</span>
 				</div>
-				<div class="border-0 !border-r-[2px] border-solid border-button-bg">
-					<span class="flex flex-row gap-2 align-middle text-xl"
+				<div
+					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-button-bg p-2"
+					v-for="date in dateSegments"
+					:key="date.date"
+				>
+					<span class="text-md flex flex-row gap-2 align-middle"
 						><span
-							class="zone--striped--green zone--striped-small my-auto block size-4 rounded-full bg-highlight px-2"
+							class="zone--striped-small my-auto block size-4 rounded-full"
+							:class="[date.stripeClass, date.highlightClass]"
 						></span>
-						Available {{ nextDate?.date ? dayjs(nextDate.date).format('MMM D, YYYY') : '' }}</span
+						Available {{ date.date ? dayjs(date.date).format('MMM D, YYYY') : '' }}</span
 					>
-					<span class="text-2xl font-bold text-contrast">{{
-						formatMoney(nextDate?.amount ?? 0)
+					<span class="text-md font-bold text-contrast">{{ formatMoney(date?.amount ?? 0) }}</span>
+				</div>
+				<div
+					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-button-bg p-2"
+				>
+					<span class="text-md flex flex-row gap-2 align-middle"
+						><span
+							class="zone--striped-small zone--striped--gray my-auto block size-4 rounded-full bg-button-bg"
+						></span>
+						Processing</span
+					>
+					<span class="text-md font-bold text-contrast">{{
+						formatMoney(processingDate?.amount ?? 0)
 					}}</span>
 				</div>
-				<div>
-					<div class="flex flex-row justify-between">
-						<span class="flex flex-row gap-2 align-middle text-xl"
-							><span
-								class="zone--striped--gray zone--striped-small my-auto block size-4 rounded-full bg-button-bg px-2"
-							></span>
-							Processing</span
-						>
-						<span class="my-auto block size-5">
-							<nuxt-link
-								v-tooltip="`Click to read about how Modrinth handles your revenue.`"
-								class="align-middle text-link"
-								to="/legal/cmp-info#pending"
-							>
-								<UnknownIcon class="size-5" />
-							</nuxt-link>
-						</span>
-					</div>
-					<span class="text-2xl font-bold text-contrast">{{ formatMoney(remainingPending) }}</span>
-				</div>
 			</div>
+		</div>
+		<div>
+			<span class="text-3xl font-semibold text-contrast">Withdraw</span>
 		</div>
 	</div>
 </template>
 <script setup lang="ts">
-import { UnknownIcon } from '@modrinth/assets'
 import { formatMoney } from '@modrinth/utils'
 import dayjs from 'dayjs'
 
@@ -83,61 +78,148 @@ const { data: userBalance } = await useAsyncData(
 )
 
 const totalAvailable = computed(() => (userBalance.value ? Number(userBalance.value.available) : 0))
-const nextDate = computed<{ date: string; amount: number } | null>(() => {
+const nextDate = computed<{ date: string; amount: number }[]>(() => {
 	const dates = userBalance.value?.dates
-	if (!dates) return null
+	if (!dates) return []
 
 	const now = Date.now()
 
-	const upcoming = Object.entries(dates)
+	return Object.entries(dates)
 		.map(([date, amount]) => ({ date, amount: Number(amount) }))
 		.filter(({ date }) => new Date(date).getTime() > now)
-		.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0]
+		.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+})
 
-	return upcoming ?? null
+const processingDate = computed<{ date: string; amount: number }>(() => {
+	const nextDates = nextDate.value
+	if (!nextDates.length) return { date: '', amount: 0 }
+
+	return nextDates[nextDates.length - 1]
 })
-const remainingPending = computed(() => {
-	return userBalance.value ? Number(userBalance.value.pending) - (nextDate.value?.amount ?? 0) : 0
-})
-const grandTotal = computed(
-	() => totalAvailable.value + (nextDate.value?.amount ?? 0) + remainingPending.value,
+
+const grandTotal = computed(() =>
+	userBalance.value ? Number(userBalance.value.available) + Number(userBalance.value.pending) : 0,
 )
 
-const zoneGreen = ref(40)
-const zoneStriped = ref(20)
-const zoneGreenPct = computed(() => `${zoneGreen.value}%`)
-const zoneStripedPct = computed(() => `${zoneStriped.value}%`)
-const zoneBgPct = computed(() => `${Math.max(0, 100 - zoneGreen.value - zoneStriped.value)}%`)
+const dateStripeClasses = [
+	'zone--striped--blue',
+	'zone--striped--purple',
+	'zone--striped--orange',
+	'zone--striped--red',
+] as const
+
+const dateHighlightClasses = [
+	'bg-highlight-blue',
+	'bg-highlight-purple',
+	'bg-highlight-orange',
+	'bg-highlight-red',
+] as const
+
+const dateSegments = computed(() => {
+	const dates = nextDate.value
+	if (!dates?.length)
+		return [] as Array<{
+			date: string
+			amount: number
+			stripeClass: string
+			highlightClass: string
+		}>
+
+	return dates.slice(0, -1).map((d, i) => ({
+		...d,
+		stripeClass: dateStripeClasses[i % dateStripeClasses.length],
+		highlightClass: dateHighlightClasses[i % dateHighlightClasses.length],
+	}))
+})
+
+const segments = computed(() => {
+	const available = totalAvailable.value || 0
+	const dates = nextDate.value || []
+	const processing = processingDate.value
+
+	const upcoming = dates.slice(0, Math.max(0, dates.length - 1))
+	const totalPending = dates.reduce((sum, d) => sum + (Number(d.amount) || 0), 0)
+	const total = available + totalPending
+
+	if (total <= 0) return [] as Array<{ key: string; class: string; widthPct: string }>
+
+	const segs: Array<{ key: string; class: string; width: number }> = []
+
+	if (available > 0) {
+		segs.push({ key: 'available', class: 'bg-brand-green', width: available / total })
+	}
+
+	upcoming.forEach((d, i) => {
+		const amt = Number(d.amount) || 0
+		if (amt <= 0) return
+		const stripe = dateStripeClasses[i % dateStripeClasses.length]
+		const hi = dateHighlightClasses[i % dateHighlightClasses.length]
+		segs.push({
+			key: `upcoming-${d.date}-${i}`,
+			class: `${stripe} ${hi}`,
+			width: amt / total,
+		})
+	})
+
+	if (processing?.amount) {
+		segs.push({
+			key: 'processing',
+			class: 'zone--striped--gray bg-button-bg',
+			width: (Number(processing.amount) || 0) / total,
+		})
+	}
+
+	let acc = 0
+	// normalize widths to sum to 100%, then drop any that are 0% and re-adjust the last
+	const normalized = segs.map((s, idx) => {
+		let pct = Math.round(s.width * 10000) / 100 // keep 2 decimals
+		if (idx === segs.length - 1) {
+			pct = Math.max(0, 100 - acc)
+		}
+		acc += pct
+		return { key: s.key, class: s.class, pct }
+	})
+
+	const filtered = normalized.filter((s) => s.pct > 0)
+	if (!filtered.length) return []
+
+	const sumExceptLast = filtered.slice(0, -1).reduce((sum, s) => sum + s.pct, 0)
+	filtered[filtered.length - 1].pct = Math.max(0, 100 - sumExceptLast)
+
+	return filtered.map((s) => ({ key: s.key, class: s.class, widthPct: `${s.pct}%` }))
+})
 </script>
 
 <style scoped lang="scss">
-.zone--striped--green,
-.zone--striped--gray {
+%zone--striped-common {
 	background-attachment: fixed;
 	background-position: 0 0;
 	background-size: 9.38px 9.38px;
 }
 
-.zone--striped-small {
-	background-size: 6.19px 6.19px !important;
-	background-position: unset !important;
-	background-attachment: unset !important;
-}
-
-.zone--striped--green {
+@mixin striped-background($color-variable) {
 	background-image: linear-gradient(
 		135deg,
-		var(--color-green) 11.54%,
+		$color-variable 11.54%,
 		transparent 11.54%,
 		transparent 50%,
-		var(--color-green) 50%,
-		var(--color-green) 61.54%,
+		$color-variable 50%,
+		$color-variable 61.54%,
 		transparent 61.54%,
 		transparent 100%
 	);
 }
 
+$striped-colors: 'green', 'blue', 'purple', 'orange', 'red';
+@each $color in $striped-colors {
+	.zone--striped--#{$color} {
+		@include striped-background(var(--color-#{$color}));
+		@extend %zone--striped-common;
+	}
+}
+
 .zone--striped--gray {
+	@extend %zone--striped-common;
 	background-image: linear-gradient(
 		135deg,
 		var(--color-button-bg-hover) 11.54%,
@@ -148,5 +230,11 @@ const zoneBgPct = computed(() => `${Math.max(0, 100 - zoneGreen.value - zoneStri
 		transparent 61.54%,
 		transparent 100%
 	);
+}
+
+.zone--striped-small {
+	background-size: 6.19px 6.19px !important;
+	background-position: unset !important;
+	background-attachment: unset !important;
 }
 </style>
