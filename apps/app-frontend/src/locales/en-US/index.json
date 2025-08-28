@@ -1,4 +1,22 @@
 {
+  "app.meteredNetwork.body": {
+    "message": "You appear to be on a metered network. Would you like to disable automatic file downloads?"
+  },
+  "app.meteredNetwork.disable": {
+    "message": "Disable"
+  },
+  "app.meteredNetwork.keepEnabled": {
+    "message": "Keep Enabled"
+  },
+  "app.meteredNetwork.title": {
+    "message": "Metered Network Detected"
+  },
+  "app.settings.automaticDownloads": {
+    "message": "Automatic downloads"
+  },
+  "app.settings.automaticDownloads.description": {
+    "message": "The Modrinth app download updates automatically in the background, enabling updates to be installed seamlessly. Disable this if you have a metered network and would like to save data."
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."
   },
@@ -19,6 +37,45 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Resource management"
+  },
+  "app.update.changelog": {
+    "message": "View changelog"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Click here to view the changelog."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Version {version} was successfully installed!"
+  },
+  "app.update.copied-error": {
+    "message": "Copied to clipboard!"
+  },
+  "app.update.copy-error": {
+    "message": "Copy error"
+  },
+  "app.update.download-error": {
+    "message": "An error occurred while downloading the update. Please try again later. Contact support if the issue persists."
+  },
+  "app.update.download-size": {
+    "message": "The update is {size}."
+  },
+  "app.update.hide": {
+    "message": "Hide update reminder"
+  },
+  "app.update.later": {
+    "message": "Update on exit"
+  },
+  "app.update.modal-body-version": {
+    "message": "We recommend updating as soon as possible so you can enjoy the latest features, fixes, and improvements."
+  },
+  "app.update.modal-header": {
+    "message": "Update available - "
+  },
+  "app.update.restart": {
+    "message": "Update now"
+  },
+  "app.update.try-again": {
+    "message": "Try again"
   },
   "instance.add-server.add-and-play": {
     "message": "Add and play"

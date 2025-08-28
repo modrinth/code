@@ -1,7 +1,8 @@
 <script setup>
 import { BoxIcon, FolderSearchIcon, TrashIcon } from '@modrinth/assets'
-import { Button, injectNotificationManager, Slider } from '@modrinth/ui'
+import { Button, injectNotificationManager, Slider, Toggle } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
+import { defineMessages, useVIntl } from '@vintl/vintl'
 import { ref, watch } from 'vue'
 
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
@@ -10,6 +11,19 @@ import { get, set } from '@/helpers/settings.ts'
 
 const { handleError } = injectNotificationManager()
 const settings = ref(await get())
+
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	automaticDownloads: {
+		id: 'app.settings.automaticDownloads',
+		defaultMessage: 'Automatic downloads',
+	},
+	automaticDownloadsDescription: {
+		id: 'app.settings.automaticDownloads.description',
+		defaultMessage:
+			'The Modrinth app download updates automatically in the background, enabling updates to be installed seamlessly. Disable this if you have a metered network and would like to save data.',
+	},
+})
 
 watch(
 	settings,
@@ -115,4 +129,16 @@ async function findLauncherDir() {
 		value if you are frequently getting I/O errors. (app restart required to take effect)
 	</p>
 	<Slider id="max-writes" v-model="settings.max_concurrent_writes" :min="1" :max="50" :step="1" />
+
+	<div class="flex items-center justify-between gap-4">
+		<div>
+			<h2 class="mt-4 m-0 text-lg font-extrabold text-contrast">
+				{{ formatMessage(messages.automaticDownloads) }}
+			</h2>
+			<p class="m-0 mt-1 mb-2 leading-tight text-secondary">
+				{{ formatMessage(messages.automaticDownloadsDescription) }}
+			</p>
+		</div>
+		<Toggle id="personalized-ads" v-model="settings.auto_download_updates" />
+	</div>
 </template>
