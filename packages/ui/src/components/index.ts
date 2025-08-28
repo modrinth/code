@@ -83,7 +83,7 @@ export { default as NotificationPanel } from './nav/NotificationPanel.vue'
 export { default as PagewideBanner } from './nav/PagewideBanner.vue'
 
 // Project
-export * from './project/_project'
+export * from './project'
 
 // Search
 export { default as BrowseFiltersPanel } from './search/BrowseFiltersPanel.vue'

@@ -1,5 +1,5 @@
 // Settings
-export * from './settings/_settings'
+export * from './settings'
 
 // Other
 export { default as NewProjectCard } from './NewProjectCard.vue'
