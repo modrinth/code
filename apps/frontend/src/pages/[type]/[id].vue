@@ -861,7 +861,6 @@ import {
 	MoreVerticalIcon,
 	PlusIcon,
 	ReportIcon,
-	RightArrowIcon,
 	ScaleIcon,
 	SearchIcon,
 	ServerPlusIcon,

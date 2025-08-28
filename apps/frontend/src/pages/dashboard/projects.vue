@@ -314,7 +314,6 @@
 <script setup>
 import {
 	EditIcon,
-	GlobeIcon,
 	IssuesIcon,
 	PlusIcon,
 	SaveIcon,
