@@ -14,8 +14,9 @@ use daedalus::{
     modded::SidedDataEntry,
 };
 use dunce::canonicalize;
-use hashlink::LinkedHashSet;
+use itertools::Itertools;
 use std::io::{BufRead, BufReader};
+use std::net::SocketAddr;
 use std::{collections::HashMap, path::Path};
 use uuid::Uuid;
 
@@ -29,9 +30,21 @@ pub fn get_class_paths(
     java_arch: &str,
     minecraft_updated: bool,
 ) -> crate::Result<String> {
-    let mut cps = libraries
+    launcher_class_path
         .iter()
-        .filter_map(|library| {
+        .map(|path| {
+            Ok(canonicalize(path)
+                .map_err(|_| {
+                    crate::ErrorKind::LauncherError(format!(
+                        "Specified class path {} does not exist",
+                        path.to_string_lossy()
+                    ))
+                    .as_error()
+                })?
+                .to_string_lossy()
+                .to_string())
+        })
+        .chain(libraries.iter().filter_map(|library| {
             if let Some(rules) = &library.rules
                 && !parse_rules(
                     rules,
@@ -48,28 +61,10 @@ pub fn get_class_paths(
             }
 
             Some(get_lib_path(libraries_path, &library.name, false))
+        }))
+        .process_results(|iter| {
+            iter.unique().join(classpath_separator(java_arch))
         })
-        .collect::<Result<LinkedHashSet<_>, _>>()?;
-
-    for launcher_path in launcher_class_path {
-        cps.insert(
-            canonicalize(launcher_path)
-                .map_err(|_| {
-                    crate::ErrorKind::LauncherError(format!(
-                        "Specified class path {} does not exist",
-                        launcher_path.to_string_lossy()
-                    ))
-                    .as_error()
-                })?
-                .to_string_lossy()
-                .to_string(),
-        );
-    }
-
-    Ok(cps
-        .into_iter()
-        .collect::<Vec<_>>()
-        .join(classpath_separator(java_arch)))
 }
 
 pub fn get_class_paths_jar<T: AsRef<str>>(
@@ -124,6 +119,7 @@ pub fn get_jvm_arguments(
     quick_play_type: &QuickPlayType,
     quick_play_version: QuickPlayVersion,
     log_config: Option<&LoggingConfiguration>,
+    ipc_addr: SocketAddr,
 ) -> crate::Result<Vec<String>> {
     let mut parsed_arguments = Vec::new();
 
@@ -180,6 +176,11 @@ pub fn get_jvm_arguments(
             })?
             .to_string_lossy()
     ));
+
+    parsed_arguments
+        .push(format!("-Dmodrinth.internal.ipc.host={}", ipc_addr.ip()));
+    parsed_arguments
+        .push(format!("-Dmodrinth.internal.ipc.port={}", ipc_addr.port()));
 
     parsed_arguments.push(format!(
         "-Dmodrinth.internal.quickPlay.serverVersion={}",

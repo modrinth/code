@@ -501,6 +501,13 @@ pub fn check_env_vars() -> bool {
 
     failed |= check_var::<String>("DELPHI_URL");
 
+    failed |= check_var::<String>("AVALARA_1099_API_URL");
+    failed |= check_var::<String>("AVALARA_1099_API_KEY");
+    failed |= check_var::<String>("AVALARA_1099_API_TEAM_ID");
+    failed |= check_var::<String>("AVALARA_1099_COMPANY_ID");
+
+    failed |= check_var::<String>("COMPLIANCE_PAYOUT_THRESHOLD");
+
     failed |= check_var::<String>("ARCHON_URL");
 
     failed

@@ -53,7 +53,6 @@ fn build_java_jars() {
         .arg("build")
         .arg("--no-daemon")
         .arg("--console=rich")
-        .arg("--info")
         .current_dir(dunce::canonicalize("java").unwrap())
         .status()
         .expect("Failed to wait on Gradle build");

@@ -1,0 +1,26 @@
+preserve_hierarchy: true
+commit_message: '[ci skip]'
+
+files:
+  - source: /apps/app-frontend/src/locales/en-US/*.json
+    dest: /app/%original_file_name%
+    translation: /apps/app-frontend/src/locales/%locale%/%original_file_name%
+    skip_untranslated_strings: true
+
+  - source: /apps/frontend/src/locales/en-US/*.json
+    dest: /web/%original_file_name%
+    translation: /apps/frontend/src/locales/%locale%/%original_file_name%
+    skip_untranslated_strings: true
+
+  - source: /packages/ui/src/locales/en-US/*.json
+    dest: /ui/%original_file_name%
+    translation: /packages/ui/src/locales/%locale%/%original_file_name%
+    skip_untranslated_strings: true
+
+  - source: /packages/moderation/src/locales/en-US/*.json
+    dest: /moderation/%original_file_name%
+    translation: /packages/moderation/src/locales/%locale%/%original_file_name%
+    skip_untranslated_strings: true
+
+project_id_env: CROWDIN_PROJECT_ID
+api_token_env: CROWDIN_PERSONAL_TOKEN

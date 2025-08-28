@@ -1,237 +1,236 @@
-import { getProjectTypeForUrlShorthand } from "~/helpers/projects.js";
+import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
 
 export default defineNuxtPlugin((nuxtApp) => {
-  const tagStore = useTags();
+	const tagStore = useTags()
 
-  nuxtApp.provide("formatNumber", formatNumber);
-  nuxtApp.provide("capitalizeString", capitalizeString);
-  nuxtApp.provide("formatMoney", formatMoney);
-  nuxtApp.provide("formatVersion", (versionsArray) => formatVersions(tagStore, versionsArray));
-  nuxtApp.provide("orElse", (first, otherwise) => first ?? otherwise);
-  nuxtApp.provide("external", () => {
-    const cosmeticsStore = useCosmetics().value;
+	nuxtApp.provide('formatNumber', formatNumber)
+	nuxtApp.provide('capitalizeString', capitalizeString)
+	nuxtApp.provide('formatMoney', formatMoney)
+	nuxtApp.provide('formatVersion', (versionsArray) => formatVersions(tagStore, versionsArray))
+	nuxtApp.provide('orElse', (first, otherwise) => first ?? otherwise)
+	nuxtApp.provide('external', () => {
+		const cosmeticsStore = useCosmetics().value
 
-    return cosmeticsStore.externalLinksNewTab ? "_blank" : "";
-  });
+		return cosmeticsStore.externalLinksNewTab ? '_blank' : ''
+	})
 
-  /*
+	/*
     Only use on the complete list of versions for a project, partial lists will generate
     the wrong version slugs
   */
-  nuxtApp.provide("computeVersions", (versions, members) => {
-    const visitedVersions = [];
-    const returnVersions = [];
+	nuxtApp.provide('computeVersions', (versions, members) => {
+		const visitedVersions = []
+		const returnVersions = []
 
-    const authorMembers = {};
+		const authorMembers = {}
 
-    for (const version of versions.sort(
-      (a, b) => nuxtApp.$dayjs(a.date_published) - nuxtApp.$dayjs(b.date_published),
-    )) {
-      if (visitedVersions.includes(version.version_number)) {
-        visitedVersions.push(version.version_number);
-        version.displayUrlEnding = version.id;
-      } else {
-        visitedVersions.push(version.version_number);
-        version.displayUrlEnding = version.version_number;
-      }
-      version.primaryFile = version.files.find((file) => file.primary) ?? version.files[0];
+		for (const version of versions.sort(
+			(a, b) => nuxtApp.$dayjs(a.date_published) - nuxtApp.$dayjs(b.date_published),
+		)) {
+			if (visitedVersions.includes(version.version_number)) {
+				visitedVersions.push(version.version_number)
+				version.displayUrlEnding = version.id
+			} else {
+				visitedVersions.push(version.version_number)
+				version.displayUrlEnding = version.version_number
+			}
+			version.primaryFile = version.files.find((file) => file.primary) ?? version.files[0]
 
-      if (!version.primaryFile) {
-        version.primaryFile = {
-          hashes: {
-            sha1: "",
-            sha512: "",
-          },
-          url: "#",
-          filename: "unknown",
-          primary: false,
-          size: 0,
-          file_type: null,
-        };
-      }
+			if (!version.primaryFile) {
+				version.primaryFile = {
+					hashes: {
+						sha1: '',
+						sha512: '',
+					},
+					url: '#',
+					filename: 'unknown',
+					primary: false,
+					size: 0,
+					file_type: null,
+				}
+			}
 
-      version.author = authorMembers[version.author_id];
-      if (!version.author) {
-        version.author = members.find((x) => x.user.id === version.author_id);
-        authorMembers[version.author_id] = version.author;
-      }
+			version.author = authorMembers[version.author_id]
+			if (!version.author) {
+				version.author = members.find((x) => x.user.id === version.author_id)
+				authorMembers[version.author_id] = version.author
+			}
 
-      returnVersions.push(version);
-    }
+			returnVersions.push(version)
+		}
 
-    return returnVersions
-      .reverse()
-      .map((version, index) => {
-        const nextVersion = returnVersions[index + 1];
-        if (nextVersion && version.changelog && nextVersion.changelog === version.changelog) {
-          return { duplicate: true, ...version };
-        } else {
-          return { duplicate: false, ...version };
-        }
-      })
-      .sort((a, b) => nuxtApp.$dayjs(b.date_published) - nuxtApp.$dayjs(a.date_published));
-  });
-  nuxtApp.provide("getProjectTypeForDisplay", (type, categories) => {
-    if (type === "mod") {
-      const isPlugin = categories.some((category) => {
-        return tagStore.value.loaderData.allPluginLoaders.includes(category);
-      });
-      const isMod = categories.some((category) => {
-        return tagStore.value.loaderData.modLoaders.includes(category);
-      });
-      const isDataPack = categories.some((category) => {
-        return tagStore.value.loaderData.dataPackLoaders.includes(category);
-      });
+		return returnVersions
+			.reverse()
+			.map((version, index) => {
+				const nextVersion = returnVersions[index + 1]
+				if (nextVersion && version.changelog && nextVersion.changelog === version.changelog) {
+					return { duplicate: true, ...version }
+				} else {
+					return { duplicate: false, ...version }
+				}
+			})
+			.sort((a, b) => nuxtApp.$dayjs(b.date_published) - nuxtApp.$dayjs(a.date_published))
+	})
+	nuxtApp.provide('getProjectTypeForDisplay', (type, categories) => {
+		if (type === 'mod') {
+			const isPlugin = categories.some((category) => {
+				return tagStore.value.loaderData.allPluginLoaders.includes(category)
+			})
+			const isMod = categories.some((category) => {
+				return tagStore.value.loaderData.modLoaders.includes(category)
+			})
+			const isDataPack = categories.some((category) => {
+				return tagStore.value.loaderData.dataPackLoaders.includes(category)
+			})
 
-      if (isMod && isPlugin && isDataPack) {
-        return "mod, plugin, and data pack";
-      } else if (isMod && isPlugin) {
-        return "mod and plugin";
-      } else if (isMod && isDataPack) {
-        return "mod and data pack";
-      } else if (isPlugin && isDataPack) {
-        return "plugin and data pack";
-      } else if (isDataPack) {
-        return "data pack";
-      } else if (isPlugin) {
-        return "plugin";
-      }
-    }
+			if (isMod && isPlugin && isDataPack) {
+				return 'mod, plugin, and data pack'
+			} else if (isMod && isPlugin) {
+				return 'mod and plugin'
+			} else if (isMod && isDataPack) {
+				return 'mod and data pack'
+			} else if (isPlugin && isDataPack) {
+				return 'plugin and data pack'
+			} else if (isDataPack) {
+				return 'data pack'
+			} else if (isPlugin) {
+				return 'plugin'
+			}
+		}
 
-    return type;
-  });
-  nuxtApp.provide("getProjectTypeForUrl", (type, loaders, tags) =>
-    getProjectTypeForUrlShorthand(type, loaders, tags),
-  );
-  nuxtApp.provide("cycleValue", cycleValue);
-  nuxtApp.provide("sortedCategories", () => {
-    return tagStore.value.categories.slice().sort((a, b) => {
-      const headerCompare = a.header.localeCompare(b.header);
-      if (headerCompare !== 0) {
-        return headerCompare;
-      }
-      if (a.header === "resolutions" && b.header === "resolutions") {
-        return a.name.replace(/\D/g, "") - b.name.replace(/\D/g, "");
-      } else if (a.header === "performance impact" && b.header === "performance impact") {
-        const x = ["potato", "low", "medium", "high", "screenshot"];
+		return type
+	})
+	nuxtApp.provide('getProjectTypeForUrl', (type, loaders, tags) =>
+		getProjectTypeForUrlShorthand(type, loaders, tags),
+	)
+	nuxtApp.provide('cycleValue', cycleValue)
+	nuxtApp.provide('sortedCategories', () => {
+		return tagStore.value.categories.slice().sort((a, b) => {
+			const headerCompare = a.header.localeCompare(b.header)
+			if (headerCompare !== 0) {
+				return headerCompare
+			}
+			if (a.header === 'resolutions' && b.header === 'resolutions') {
+				return a.name.replace(/\D/g, '') - b.name.replace(/\D/g, '')
+			} else if (a.header === 'performance impact' && b.header === 'performance impact') {
+				const x = ['potato', 'low', 'medium', 'high', 'screenshot']
 
-        return x.indexOf(a.name) - x.indexOf(b.name);
-      }
-      return 0;
-    });
-  });
-  nuxtApp.provide("notify", (notif) => addNotification(notif));
-});
+				return x.indexOf(a.name) - x.indexOf(b.name)
+			}
+			return 0
+		})
+	})
+})
 export const formatNumber = (number, abbreviate = true) => {
-  const x = +number;
-  if (x >= 1000000 && abbreviate) {
-    return (x / 1000000).toFixed(2).toString() + "M";
-  } else if (x >= 10000 && abbreviate) {
-    return (x / 1000).toFixed(1).toString() + "k";
-  } else {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  }
-};
+	const x = +number
+	if (x >= 1000000 && abbreviate) {
+		return (x / 1000000).toFixed(2).toString() + 'M'
+	} else if (x >= 10000 && abbreviate) {
+		return (x / 1000).toFixed(1).toString() + 'k'
+	} else {
+		return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+	}
+}
 
 export const formatMoney = (number, abbreviate = false) => {
-  number = Math.floor(number * 100) / 100;
-  const x = +number;
-  if (x >= 1000000 && abbreviate) {
-    return "$" + (x / 1000000).toFixed(2).toString() + "M";
-  } else if (x >= 10000 && abbreviate) {
-    return "$" + (x / 1000).toFixed(2).toString() + "k";
-  } else {
-    return (
-      "$" +
-      x
-        .toFixed(2)
-        .toString()
-        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-    );
-  }
-};
+	number = Math.floor(number * 100) / 100
+	const x = +number
+	if (x >= 1000000 && abbreviate) {
+		return '$' + (x / 1000000).toFixed(2).toString() + 'M'
+	} else if (x >= 10000 && abbreviate) {
+		return '$' + (x / 1000).toFixed(2).toString() + 'k'
+	} else {
+		return (
+			'$' +
+			x
+				.toFixed(2)
+				.toString()
+				.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+		)
+	}
+}
 
 export const capitalizeString = (name) => {
-  return name ? name.charAt(0).toUpperCase() + name.slice(1) : name;
-};
+	return name ? name.charAt(0).toUpperCase() + name.slice(1) : name
+}
 
 export const formatVersions = (tag, versionArray) => {
-  const allVersions = tag.value.gameVersions.slice().reverse();
-  const allReleases = allVersions.filter((x) => x.version_type === "release");
+	const allVersions = tag.value.gameVersions.slice().reverse()
+	const allReleases = allVersions.filter((x) => x.version_type === 'release')
 
-  const intervals = [];
-  let currentInterval = 0;
+	const intervals = []
+	let currentInterval = 0
 
-  for (let i = 0; i < versionArray.length; i++) {
-    const index = allVersions.findIndex((x) => x.version === versionArray[i]);
-    const releaseIndex = allReleases.findIndex((x) => x.version === versionArray[i]);
+	for (let i = 0; i < versionArray.length; i++) {
+		const index = allVersions.findIndex((x) => x.version === versionArray[i])
+		const releaseIndex = allReleases.findIndex((x) => x.version === versionArray[i])
 
-    if (i === 0) {
-      intervals.push([[versionArray[i], index, releaseIndex]]);
-    } else {
-      const intervalBase = intervals[currentInterval];
+		if (i === 0) {
+			intervals.push([[versionArray[i], index, releaseIndex]])
+		} else {
+			const intervalBase = intervals[currentInterval]
 
-      if (
-        (index - intervalBase[intervalBase.length - 1][1] === 1 ||
-          releaseIndex - intervalBase[intervalBase.length - 1][2] === 1) &&
-        (allVersions[intervalBase[0][1]].version_type === "release" ||
-          allVersions[index].version_type !== "release")
-      ) {
-        intervalBase[1] = [versionArray[i], index, releaseIndex];
-      } else {
-        currentInterval += 1;
-        intervals[currentInterval] = [[versionArray[i], index, releaseIndex]];
-      }
-    }
-  }
+			if (
+				(index - intervalBase[intervalBase.length - 1][1] === 1 ||
+					releaseIndex - intervalBase[intervalBase.length - 1][2] === 1) &&
+				(allVersions[intervalBase[0][1]].version_type === 'release' ||
+					allVersions[index].version_type !== 'release')
+			) {
+				intervalBase[1] = [versionArray[i], index, releaseIndex]
+			} else {
+				currentInterval += 1
+				intervals[currentInterval] = [[versionArray[i], index, releaseIndex]]
+			}
+		}
+	}
 
-  const newIntervals = [];
-  for (let i = 0; i < intervals.length; i++) {
-    const interval = intervals[i];
+	const newIntervals = []
+	for (let i = 0; i < intervals.length; i++) {
+		const interval = intervals[i]
 
-    if (interval.length === 2 && interval[0][2] !== -1 && interval[1][2] === -1) {
-      let lastSnapshot = null;
-      for (let j = interval[1][1]; j > interval[0][1]; j--) {
-        if (allVersions[j].version_type === "release") {
-          newIntervals.push([
-            interval[0],
-            [
-              allVersions[j].version,
-              j,
-              allReleases.findIndex((x) => x.version === allVersions[j].version),
-            ],
-          ]);
+		if (interval.length === 2 && interval[0][2] !== -1 && interval[1][2] === -1) {
+			let lastSnapshot = null
+			for (let j = interval[1][1]; j > interval[0][1]; j--) {
+				if (allVersions[j].version_type === 'release') {
+					newIntervals.push([
+						interval[0],
+						[
+							allVersions[j].version,
+							j,
+							allReleases.findIndex((x) => x.version === allVersions[j].version),
+						],
+					])
 
-          if (lastSnapshot !== null && lastSnapshot !== j + 1) {
-            newIntervals.push([[allVersions[lastSnapshot].version, lastSnapshot, -1], interval[1]]);
-          } else {
-            newIntervals.push([interval[1]]);
-          }
+					if (lastSnapshot !== null && lastSnapshot !== j + 1) {
+						newIntervals.push([[allVersions[lastSnapshot].version, lastSnapshot, -1], interval[1]])
+					} else {
+						newIntervals.push([interval[1]])
+					}
 
-          break;
-        } else {
-          lastSnapshot = j;
-        }
-      }
-    } else {
-      newIntervals.push(interval);
-    }
-  }
+					break
+				} else {
+					lastSnapshot = j
+				}
+			}
+		} else {
+			newIntervals.push(interval)
+		}
+	}
 
-  const output = [];
+	const output = []
 
-  for (const interval of newIntervals) {
-    if (interval.length === 2) {
-      output.push(`${interval[0][0]}–${interval[1][0]}`);
-    } else {
-      output.push(interval[0][0]);
-    }
-  }
+	for (const interval of newIntervals) {
+		if (interval.length === 2) {
+			output.push(`${interval[0][0]}–${interval[1][0]}`)
+		} else {
+			output.push(interval[0][0])
+		}
+	}
 
-  return (output.length === 0 ? versionArray : output).join(", ");
-};
+	return (output.length === 0 ? versionArray : output).join(', ')
+}
 
 export const cycleValue = (value, values) => {
-  const index = values.indexOf(value) + 1;
-  return values[index % values.length];
-};
+	const index = values.indexOf(value) + 1
+	return values[index % values.length]
+}

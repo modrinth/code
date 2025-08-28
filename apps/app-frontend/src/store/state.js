@@ -1,7 +1,6 @@
-import { useTheming } from './theme.ts'
 import { useBreadcrumbs } from './breadcrumbs'
-import { useLoading } from './loading'
-import { useNotifications, handleError } from './notifications'
 import { useInstall } from './install'
+import { useLoading } from './loading'
+import { useTheming } from './theme.ts'
 
-export { useTheming, useBreadcrumbs, useLoading, useNotifications, handleError, useInstall }
+export { useBreadcrumbs, useInstall, useLoading, useTheming }
