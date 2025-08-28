@@ -112,12 +112,10 @@ export interface ProjectV3 {
 	color?: number
 	thread_id: ModrinthId
 	monetization_status: MonetizationStatus
-	side_types_migration_review_status: 'reviewed' | 'pending'
+	side_types_migration_review_status: EnvironmentMigrationReviewStatus
 
 	[key: string]: unknown
 }
-
-export type SideTypesMigrationReviewStatus = 'reviewed' | 'pending'
 
 export interface Project {
 	id: ModrinthId

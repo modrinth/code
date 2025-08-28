@@ -1,4 +1,19 @@
 {
+  "1ZbGtB": {
+    "defaultMessage": "Supported environments"
+  },
+  "6GGPoo": {
+    "defaultMessage": "Platforms"
+  },
+  "DlrBFy": {
+    "defaultMessage": "Singleplayer"
+  },
+  "I/VpTy": {
+    "defaultMessage": "Client and server"
+  },
+  "QLSJZl": {
+    "defaultMessage": "Singleplayer only"
+  },
   "button.back": {
     "defaultMessage": "Back"
   },
@@ -47,11 +62,17 @@
   "button.report": {
     "defaultMessage": "Report"
   },
+  "button.reset": {
+    "defaultMessage": "Reset"
+  },
   "button.save": {
     "defaultMessage": "Save"
   },
   "button.save-changes": {
     "defaultMessage": "Save changes"
+  },
+  "button.saving": {
+    "defaultMessage": "Saving"
   },
   "button.sign-in": {
     "defaultMessage": "Sign in"
@@ -83,6 +104,21 @@
   "collection.label.private": {
     "defaultMessage": "Private"
   },
+  "cqyH4+": {
+    "defaultMessage": "Minecraft: Java Edition"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "Edit icon"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "Remove icon"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "Replace icon"
+  },
+  "icon-select.select": {
+    "defaultMessage": "Select icon"
+  },
   "input.view.gallery": {
     "defaultMessage": "Gallery view"
   },
@@ -106,6 +142,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Unknown game mode"
+  },
+  "jx3A4P": {
+    "defaultMessage": "Server-side"
   },
   "label.changes-saved": {
     "defaultMessage": "Changes saved"
@@ -308,18 +347,6 @@
   "project-type.all": {
     "defaultMessage": "All"
   },
-  "project.about.compatibility.environments": {
-    "defaultMessage": "Supported environments"
-  },
-  "project.about.compatibility.game.minecraftJava": {
-    "defaultMessage": "Minecraft: Java Edition"
-  },
-  "project.about.compatibility.platforms": {
-    "defaultMessage": "Platforms"
-  },
-  "project.about.compatibility.title": {
-    "defaultMessage": "Compatibility"
-  },
   "project.about.creators.owner": {
     "defaultMessage": "Project owner"
   },
@@ -377,6 +404,51 @@
   "project.about.links.wiki": {
     "defaultMessage": "Visit wiki"
   },
+  "project.settings.environment.client_and_server.description": {
+    "defaultMessage": "Has some functionality on both the client and server, even if only partially."
+  },
+  "project.settings.environment.client_and_server.optional_both.title": {
+    "defaultMessage": "Optional on both, works the same if installed on either side"
+  },
+  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+    "defaultMessage": "Optional on both, works best when installed on both sides"
+  },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "Optional on client"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "Optional on server"
+  },
+  "project.settings.environment.client_and_server.required_both.title": {
+    "defaultMessage": "Required on both"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "Client and server"
+  },
+  "project.settings.environment.client_only.description": {
+    "defaultMessage": "All functionality is done client-side and is compatible with vanilla servers."
+  },
+  "project.settings.environment.client_only.title": {
+    "defaultMessage": "Client-side only"
+  },
+  "project.settings.environment.server_only.dedicated_only.title": {
+    "defaultMessage": "Dedicated server only"
+  },
+  "project.settings.environment.server_only.description": {
+    "defaultMessage": "All functionality is done server-side and is compatible with vanilla clients."
+  },
+  "project.settings.environment.server_only.supports_singleplayer.title": {
+    "defaultMessage": "Works in singleplayer too"
+  },
+  "project.settings.environment.server_only.title": {
+    "defaultMessage": "Server-side only"
+  },
+  "project.settings.environment.singleplayer.description": {
+    "defaultMessage": "Only functions in Singleplayer or when not connected to a Multiplayer server."
+  },
+  "project.settings.environment.singleplayer.title": {
+    "defaultMessage": "Singleplayer only"
+  },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
   },
@@ -415,6 +487,9 @@
   },
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Unlisted by staff"
+  },
+  "sNTynp": {
+    "defaultMessage": "Dedicated servers only"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Filter locked"
@@ -619,5 +694,14 @@
   },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long} at {time, time, short}"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "You have unsaved changes."
+  },
+  "vGcdQ5": {
+    "defaultMessage": "Client-side"
+  },
+  "zug5DJ": {
+    "defaultMessage": "Compatibility"
   }
 }

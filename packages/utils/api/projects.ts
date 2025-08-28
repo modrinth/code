@@ -2,6 +2,7 @@ import type {
 	DonationLink,
 	DonationPlatform,
 	Environment,
+	EnvironmentMigrationReviewStatus,
 	EnvironmentV3,
 	Project,
 	ProjectStatus,
@@ -29,6 +30,7 @@ export type ProjectEditBody = {
 }
 export type ProjectV3EditBodyPartial = {
 	environment?: EnvironmentV3
+	side_types_migration_review_status: EnvironmentMigrationReviewStatus
 }
 
 export interface ModrinthApiProjects {

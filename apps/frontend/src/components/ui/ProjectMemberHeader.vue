@@ -35,17 +35,17 @@
 				</h2>
 				<div class="flex flex-row gap-2">
 					<div class="flex items-center gap-1">
-						<AsteriskIcon class="size-4 text-red" />
+						<AsteriskIcon class="size-4 text-red shrink-0" />
 						<span class="text-secondary">{{ getFormattedMessage(messages.required) }}</span>
 					</div>
 					|
 					<div class="flex items-center gap-1">
-						<TriangleAlertIcon class="size-4 text-orange" />
+						<TriangleAlertIcon class="size-4 text-orange shrink-0" />
 						<span class="text-secondary">{{ getFormattedMessage(messages.warning) }}</span>
 					</div>
 					|
 					<div class="flex items-center gap-1">
-						<LightBulbIcon class="size-4 text-purple" />
+						<LightBulbIcon class="size-4 text-purple shrink-0" />
 						<span class="text-secondary">{{ getFormattedMessage(messages.suggestion) }}</span>
 					</div>
 				</div>

@@ -153,6 +153,10 @@ export const commonMessages = defineMessages({
 		id: 'button.save',
 		defaultMessage: 'Save',
 	},
+	savingButton: {
+		id: 'button.saving',
+		defaultMessage: 'Saving',
+	},
 	saveChangesButton: {
 		id: 'button.save-changes',
 		defaultMessage: 'Save changes',
@@ -204,6 +208,10 @@ export const commonMessages = defineMessages({
 	removeImageButton: {
 		id: 'button.remove-image',
 		defaultMessage: 'Remove image',
+	},
+	resetButton: {
+		id: 'button.reset',
+		defaultMessage: 'Reset',
 	},
 	visibilityLabel: {
 		id: 'label.visibility',

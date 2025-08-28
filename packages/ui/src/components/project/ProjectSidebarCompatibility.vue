@@ -27,53 +27,25 @@
 			</div>
 		</section>
 		<section v-if="showEnvironments" class="flex flex-col gap-2">
-			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.environments) }} (v3)</h3>
+			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.environments) }}</h3>
 			<div class="flex flex-wrap gap-1">
 				<TagItem
-					v-if="
-						(project.client_side === 'required' && project.server_side !== 'required') ||
-						(project.client_side === 'optional' && project.server_side === 'optional')
-					"
+					v-for="tag in primaryEnvironmentTags"
+					:key="`environment-tag-${tag.message.id}`"
 				>
-					<ClientIcon aria-hidden="true" />
-					Client-side
-				</TagItem>
-				<TagItem
-					v-if="
-						(project.server_side === 'required' && project.client_side !== 'required') ||
-						(project.client_side === 'optional' && project.server_side === 'optional')
-					"
-				>
-					<ServerIcon aria-hidden="true" />
-					Server-side
-				</TagItem>
-				<TagItem v-if="false">
-					<UserIcon aria-hidden="true" />
-					Singleplayer
-				</TagItem>
-				<TagItem
-					v-if="
-						project.project_type !== 'datapack' &&
-						project.client_side !== 'unsupported' &&
-						project.server_side !== 'unsupported' &&
-						project.client_side !== 'unknown' &&
-						project.server_side !== 'unknown'
-					"
-				>
-					<MonitorSmartphoneIcon aria-hidden="true" />
-					Client and server
-				</TagItem>
-			</div>
+					<component :is="tag.icon" />
+					{{ formatMessage(tag.message) }}
+			</tagitem></div>
 		</section>
 		<section
-			v-if="
+			v-else-if="
 				(project.project_type === 'mod' || project.project_type === 'modpack') &&
 				!(project.client_side === 'unsupported' && project.server_side === 'unsupported') &&
 				!(project.client_side === 'unknown' && project.server_side === 'unknown')
 			"
 			class="flex flex-col gap-2"
 		>
-			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.environments) }} (v2)</h3>
+			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.environments) }}</h3>
 			<div class="flex flex-wrap gap-1">
 				<TagItem
 					v-if="
@@ -165,7 +137,7 @@ type EnvironmentTag = {
 
 const baseId = 'project.about.compatibility'
 
-const environmentTags = [
+const environmentTags: EnvironmentTag[] = [
 	{
 		icon: ClientIcon,
 		message: defineMessage({
@@ -229,15 +201,11 @@ const environmentTags = [
 			'client_or_server_prefers_both',
 		],
 	},
-] satisfies EnvironmentTag[]
+]
 
-// const primaryEnvironmentTags = computed(() => {
-// 	const tags: EnvironmentTag[] = []
-// 	if ([].includes(primaryEnvironment.value)) {
-// 		tags.push(environmentTags.clientAndServer)
-// 	}
-// 	return tags
-// })
+const primaryEnvironmentTags = computed(() => {
+	return primaryEnvironment.value ? environmentTags.filter((x) => x.environments.includes(primaryEnvironment.value ?? 'unknown')) : []
+})
 
 const messages = defineMessages({
 	title: {

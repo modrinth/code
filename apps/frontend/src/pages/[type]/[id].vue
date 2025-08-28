@@ -672,6 +672,20 @@
 					:auth="auth"
 					:tags="tags"
 				/>
+				<Admonition
+					v-if="currentMember && projectV3.side_types_migration_review_status === 'pending' && projectV3.environment?.length > 0 && projectV3.environment[0] !== 'unknown'"
+					type="warning"
+					header="Please review environment metadata"
+					class="mt-3"
+				>
+					We've just overhauled the Environments system on Modrinth and new options are now
+					available. Please visit your project's settings and verify that the metadata is correct.
+					<ButtonStyled color="orange">
+						<nuxt-link :to="`/project/${project.id}/settings/environment`" class="w-fit mt-3">
+							<SettingsIcon /> Review environment settings
+						</nuxt-link>
+					</ButtonStyled>
+				</Admonition>
 				<MessageBanner v-if="project.status === 'archived'" message-type="warning" class="my-4">
 					{{ project.title }} has been archived. {{ project.title }} will not receive any further
 					updates unless the author decides to unarchive the project.
@@ -847,6 +861,7 @@ import {
 	MoreVerticalIcon,
 	PlusIcon,
 	ReportIcon,
+	RightArrowIcon,
 	ScaleIcon,
 	SearchIcon,
 	ServerPlusIcon,
@@ -856,6 +871,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
+	Admonition,
 	Avatar,
 	ButtonStyled,
 	Checkbox,

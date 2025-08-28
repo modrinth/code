@@ -701,6 +701,57 @@
   "project.moderation.title": {
     "message": "Moderation"
   },
+  "project.settings.environment.verification.verify-button": {
+    "message": "Verify"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "message": "Verify that this project's environment is set correctly."
+  },
+  "project.settings.general.name.description": {
+    "message": "Avoid prefixes, suffixes, parentheticals, or added descriptions—just the project's actual name."
+  },
+  "project.settings.general.name.placeholder.1": {
+    "message": "e.g. Nether Overhaul 2"
+  },
+  "project.settings.general.name.placeholder.2": {
+    "message": "e.g. Construction Equipment"
+  },
+  "project.settings.general.name.placeholder.3": {
+    "message": "e.g. Better than Caving"
+  },
+  "project.settings.general.name.placeholder.4": {
+    "message": "e.g. Enhanced Portals"
+  },
+  "project.settings.general.name.placeholder.5": {
+    "message": "e.g. Dangerous Mobs"
+  },
+  "project.settings.general.name.title": {
+    "message": "Name"
+  },
+  "project.settings.general.tagline.description": {
+    "message": "Summarize your project in no more than one sentence."
+  },
+  "project.settings.general.tagline.placeholder.1": {
+    "message": "e.g. Overhauls game progression to revolve around the Nether."
+  },
+  "project.settings.general.tagline.placeholder.2": {
+    "message": "e.g. Adds wearable construction gear."
+  },
+  "project.settings.general.tagline.placeholder.3": {
+    "message": "e.g. Adds realistic mineshaft-building mechanics."
+  },
+  "project.settings.general.tagline.placeholder.4": {
+    "message": "e.g. Improves how Nether portals link to each other."
+  },
+  "project.settings.general.tagline.placeholder.5": {
+    "message": "e.g. Adds powerful boss versions of the normal mobs to encounter in the night."
+  },
+  "project.settings.general.tagline.title": {
+    "message": "Tagline"
+  },
+  "project.settings.general.url.title": {
+    "message": "URL"
+  },
   "project.stats.downloads-label": {
     "message": "download{count, plural, one {} other {s}}"
   },
