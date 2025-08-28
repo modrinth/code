@@ -9,13 +9,14 @@
 				>
 			</div>
 			<div class="flex h-3 w-full gap-2 overflow-hidden rounded-full bg-bg-raised">
-				<span
-					v-for="seg in segments"
-					:key="seg.key"
-					class="h-full flex-none"
-					:class="seg.class"
-					:style="{ width: seg.widthPct }"
-				></span>
+				<template v-for="seg in segments" :key="seg.key">
+					<span
+						v-tooltip="formatMoney(seg.amount)"
+						class="block h-full"
+						:class="seg.class"
+						:style="{ width: seg.widthPct }"
+					></span>
+				</template>
 			</div>
 			<div class="flex flex-col">
 				<div
@@ -37,8 +38,19 @@
 							class="zone--striped-small my-auto block size-4 rounded-full"
 							:class="[date.stripeClass, date.highlightClass]"
 						></span>
-						Available {{ date.date ? dayjs(date.date).format('MMM D, YYYY') : '' }}</span
-					>
+						Estimated {{ date.date ? dayjs(date.date).format('MMM D, YYYY') : '' }}
+						<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']">
+							<nuxt-link class="align-middle text-link" to="/legal/cmp-info#pending">
+								<UnknownIcon />
+							</nuxt-link>
+							<template #popper>
+								<div class="w-[250px] font-normal text-primary">
+									Estimated revenue may be subject to change until it is made available.<br /><br />Click
+									to read about how Modrinth handles your revenue.
+								</div>
+							</template>
+						</Tooltip>
+					</span>
 					<span class="text-md font-bold text-contrast">{{ formatMoney(date?.amount ?? 0) }}</span>
 				</div>
 				<div
@@ -48,8 +60,17 @@
 						><span
 							class="zone--striped-small zone--striped--gray my-auto block size-4 rounded-full bg-button-bg"
 						></span>
-						Processing</span
-					>
+						Processing
+						<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']">
+							<InProgressIcon class="my-auto" />
+							<template #popper>
+								<div class="w-[250px] font-normal text-primary">
+									Revenue stays in processing until the end of the month, then becomes available 60
+									days later.
+								</div>
+							</template>
+						</Tooltip>
+					</span>
 					<span class="text-md font-bold text-contrast">{{
 						formatMoney(processingDate?.amount ?? 0)
 					}}</span>
@@ -62,14 +83,23 @@
 	</div>
 </template>
 <script setup lang="ts">
+import { InProgressIcon, UnknownIcon } from '@modrinth/assets'
 import { formatMoney } from '@modrinth/utils'
 import dayjs from 'dayjs'
+import { Tooltip } from 'floating-vue'
 
 interface UserBalanceResponse {
 	available: number
 	pending: number
 	// ISO 8601 date string: number
 	dates: Record<string, number>
+}
+
+type RevenueBarSegment = {
+	key: string
+	class: string
+	widthPct: string
+	amount: number
 }
 
 const { data: userBalance } = await useAsyncData(
@@ -132,7 +162,7 @@ const dateSegments = computed(() => {
 	}))
 })
 
-const segments = computed(() => {
+const segments = computed<RevenueBarSegment[]>(() => {
 	const available = totalAvailable.value || 0
 	const dates = nextDate.value || []
 	const processing = processingDate.value
@@ -141,12 +171,17 @@ const segments = computed(() => {
 	const totalPending = dates.reduce((sum, d) => sum + (Number(d.amount) || 0), 0)
 	const total = available + totalPending
 
-	if (total <= 0) return [] as Array<{ key: string; class: string; widthPct: string }>
+	if (total <= 0) return [] as RevenueBarSegment[]
 
-	const segs: Array<{ key: string; class: string; width: number }> = []
+	const segs: Array<{ key: string; class: string; width: number; amount: number }> = []
 
 	if (available > 0) {
-		segs.push({ key: 'available', class: 'bg-brand-green', width: available / total })
+		segs.push({
+			key: 'available',
+			class: 'bg-brand-green',
+			width: available / total,
+			amount: available,
+		})
 	}
 
 	upcoming.forEach((d, i) => {
@@ -158,6 +193,7 @@ const segments = computed(() => {
 			key: `upcoming-${d.date}-${i}`,
 			class: `${stripe} ${hi}`,
 			width: amt / total,
+			amount: amt,
 		})
 	})
 
@@ -166,6 +202,7 @@ const segments = computed(() => {
 			key: 'processing',
 			class: 'zone--striped--gray bg-button-bg',
 			width: (Number(processing.amount) || 0) / total,
+			amount: Number(processing.amount) || 0,
 		})
 	}
 
@@ -177,16 +214,21 @@ const segments = computed(() => {
 			pct = Math.max(0, 100 - acc)
 		}
 		acc += pct
-		return { key: s.key, class: s.class, pct }
+		return { key: s.key, class: s.class, pct, amount: s.amount }
 	})
 
 	const filtered = normalized.filter((s) => s.pct > 0)
-	if (!filtered.length) return []
+	if (!filtered.length) return [] as RevenueBarSegment[]
 
 	const sumExceptLast = filtered.slice(0, -1).reduce((sum, s) => sum + s.pct, 0)
 	filtered[filtered.length - 1].pct = Math.max(0, 100 - sumExceptLast)
 
-	return filtered.map((s) => ({ key: s.key, class: s.class, widthPct: `${s.pct}%` }))
+	return filtered.map((s) => ({
+		key: s.key,
+		class: s.class,
+		widthPct: `${s.pct}%`,
+		amount: s.amount,
+	})) as RevenueBarSegment[]
 })
 </script>
 
