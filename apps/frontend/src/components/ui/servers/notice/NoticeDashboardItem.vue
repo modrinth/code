@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { EditIcon, SettingsIcon, TrashIcon } from '@modrinth/assets'
+import { SettingsIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
-	commonMessages,
 	CopyCode,
 	getDismissableMetadata,
 	NOTICE_LEVELS,
@@ -73,7 +71,7 @@ defineProps<{
 				</TagItem>
 			</div>
 			<div class="col-span-2 flex gap-2 md:col-span-1">
-				<ButtonStyled>
+				<!-- <ButtonStyled>
 					<button @click="() => startEditing(notice)">
 						<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
 					</button>
@@ -82,7 +80,7 @@ defineProps<{
 					<button @click="() => deleteNotice(notice)">
 						<TrashIcon /> {{ formatMessage(commonMessages.deleteLabel) }}
 					</button>
-				</ButtonStyled>
+				</ButtonStyled> -->
 			</div>
 		</div>
 		<div class="col-span-full grid">

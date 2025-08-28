@@ -1,5 +1,5 @@
 <template>
-	<LazyUiServersPlatformVersionSelectModal
+	<PlatformVersionSelectModal
 		ref="versionSelectModal"
 		:server="props.server"
 		:current-loader="ignoreCurrentInstallation ? undefined : (data?.loader as Loaders)"
@@ -8,13 +8,13 @@
 		@reinstall="emit('reinstall', $event)"
 	/>
 
-	<LazyUiServersPlatformMrpackModal
+	<PlatformMrpackModal
 		ref="mrpackModal"
 		:server="props.server"
 		@reinstall="emit('reinstall', $event)"
 	/>
 
-	<LazyUiServersPlatformChangeModpackVersionModal
+	<PlatformChangeModpackVersionModal
 		ref="modpackVersionModal"
 		:server="props.server"
 		:project="data?.project"
@@ -137,7 +137,7 @@
 					}"
 					:tabindex="props.server.general?.status === 'installing' ? -1 : 0"
 				>
-					<UiServersLoaderSelector
+					<LoaderSelector
 						:data="
 							ignoreCurrentInstallation
 								? {
@@ -164,6 +164,11 @@ import type { Loaders } from '@modrinth/utils'
 
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import type { BackupInProgressReason } from '~/pages/servers/manage/[id].vue'
+
+import LoaderSelector from './LoaderSelector.vue'
+import PlatformChangeModpackVersionModal from './PlatformChangeModpackVersionModal.vue'
+import PlatformMrpackModal from './PlatformMrpackModal.vue'
+import PlatformVersionSelectModal from './PlatformVersionSelectModal.vue'
 
 const { formatMessage } = useVIntl()
 

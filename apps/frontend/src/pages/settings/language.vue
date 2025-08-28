@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { IssuesIcon, RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
 import { commonSettingsMessages } from '@modrinth/ui'
+import { IntlFormatted } from '@vintl/vintl/components'
 import Fuse from 'fuse.js/dist/fuse.basic'
 
 import { isModifierKeyDown } from '~/helpers/events.ts'
@@ -289,7 +290,7 @@ function getItemLabel(locale: Locale) {
 			<div class="card-description">
 				<IntlFormatted :message-id="messages.languagesDescription">
 					<template #crowdin-link="{ children }">
-						<a href="https://crowdin.com/project/modrinth">
+						<a href="https://translate.modrinth.com">
 							<component :is="() => children" />
 						</a>
 					</template>

@@ -506,6 +506,39 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Payment method"
   },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "billed {interval}"
+  },
+  "servers.purchase.step.plan.custom.desc": {
+    "defaultMessage": "Pick a customized plan with just the specs you need."
+  },
+  "servers.purchase.step.plan.get-started": {
+    "defaultMessage": "Get started"
+  },
+  "servers.purchase.step.plan.large.desc": {
+    "defaultMessage": "Ideal for 15–25 players, modpacks, or heavy modding."
+  },
+  "servers.purchase.step.plan.medium.desc": {
+    "defaultMessage": "Great for 6–15 players and multiple mods."
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "defaultMessage": "Most Popular"
+  },
+  "servers.purchase.step.plan.prompt": {
+    "defaultMessage": "Choose a plan"
+  },
+  "servers.purchase.step.plan.select": {
+    "defaultMessage": "Select Plan"
+  },
+  "servers.purchase.step.plan.small.desc": {
+    "defaultMessage": "Perfect for 1–5 friends with a few light mods."
+  },
+  "servers.purchase.step.plan.subtitle": {
+    "defaultMessage": "Pick the amount of RAM and specs that fit your needs."
+  },
+  "servers.purchase.step.plan.title": {
+    "defaultMessage": "Plan"
+  },
   "servers.purchase.step.region.title": {
     "defaultMessage": "Region"
   },

@@ -212,6 +212,7 @@ import {
 	injectNotificationManager,
 	useRelativeTime,
 } from '@modrinth/ui'
+import { IntlFormatted } from '@vintl/vintl/components'
 
 import Modal from '~/components/ui/Modal.vue'
 import {

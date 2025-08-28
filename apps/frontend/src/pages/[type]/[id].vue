@@ -984,7 +984,7 @@ import NavStackItem from '~/components/ui/NavStackItem.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
-import { userCollectProject } from '~/composables/user.js'
+import { userCollectProject, userFollowProject } from '~/composables/user.js'
 import { useModerationStore } from '~/store/moderation.ts'
 import { reportProject } from '~/utils/report-helpers.ts'
 
@@ -1574,18 +1574,6 @@ const showModerationChecklist = useLocalStorage(
 	false,
 )
 const collapsedModerationChecklist = useLocalStorage('collapsed-moderation-checklist', false)
-
-watch(
-	showModerationChecklist,
-	(newValue) => {
-		notifications.setNotificationLocation(newValue ? 'left' : 'right')
-	},
-	{ immediate: true },
-)
-
-onUnmounted(() => {
-	notifications.setNotificationLocation('right')
-})
 
 if (import.meta.client && history && history.state && history.state.showChecklist) {
 	showModerationChecklist.value = true

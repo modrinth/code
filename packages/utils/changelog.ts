@@ -11,9 +11,69 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
-		date: `2025-08-14T17:00:00-07:00`,
+		date: `2025-08-20T13:30:00-07:00`,
 		product: 'app',
-		version: '0.10.4',
+		version: '0.10.7',
+		body: `### Improvements
+- Fixed Quick Play not working with Singleplayer worlds.
+- Updated ad fallback to Medal promo.`,
+	},
+	{
+		date: `2025-08-19T13:56:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Fixed Modrinth Servers marketing page requiring auth.
+- Fixed mobile responsiveness of Modrinth Servers Medal collaboration banner.`,
+	},
+	{
+		date: `2025-08-19T11:10:00-07:00`,
+		product: 'servers',
+		body: `### Improvements
+- Improved upgrading experience.`,
+	},
+	{
+		date: `2025-08-19T11:10:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Added Modrinth Servers free trial promotion in partnership with Medal.
+- Fixed typo in revenue page.`,
+	},
+	{
+		date: `2025-08-18T09:10:00-07:00`,
+		product: 'servers',
+		body: `### Improvements
+- Fixed various dropdowns not appearing.`,
+	},
+	{
+		date: `2025-08-18T09:10:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Fixed a bunch of random NaNs appearing throughout the UI.`,
+	},
+	{
+		date: `2025-08-17T15:35:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Fixed notification pages not loading.`,
+	},
+	{
+		date: `2025-08-15T13:15:00-07:00`,
+		product: 'app',
+		version: '0.10.6',
+		body: `### Improvements
+- Fixed Forge versions between 1.17.1 and 1.20.3 failing to launch.
+- Fixed search page constantly resetting back to page 1.`,
+	},
+	{
+		date: `2025-08-15T11:55:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Fixed project version pages not loading.`,
+	},
+	{
+		date: `2025-08-15T11:45:00-07:00`,
+		product: 'app',
+		version: '0.10.5',
 		body: `### Improvements
 - On Windows, the app will now install per-user rather than system-wide.
 	- This allows future versions of Modrinth App to update seamlessly if the user is not an administrator.
@@ -42,7 +102,15 @@ const VERSIONS: VersionEntry[] = [
 - Fixed the back/forward buttons appearing with white icons in light mode.
 - Fixed 'Party Alex' skin not using slim character model.
 - Improved resilience of Minecraft launching on Java 8 under certain circumstances.
-- Added system for showing users surveys to provide feedback on their experience with Modrinth App.`,
+- Added system for showing users surveys to provide feedback on their experience with Modrinth App.
+
+**This update was originally launched as 0.10.4, but was pulled due to issues with many functions of the app.**`,
+	},
+	{
+		date: `2025-08-14T14:20:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Added additional items to the publishing checklist to help ensure creators address potential issues before submitting for review.`,
 	},
 	{
 		date: `2025-08-01T21:30:00-04:00`,

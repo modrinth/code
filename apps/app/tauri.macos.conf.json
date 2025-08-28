@@ -1,24 +1,24 @@
 {
-  "app": {
-    "windows": [
-      {
-        "titleBarStyle": "Overlay",
-        "hiddenTitle": true,
-        "fullscreen": false,
-        "height": 800,
-        "resizable": true,
-        "title": "Modrinth App",
-        "width": 1280,
-        "minHeight": 700,
-        "minWidth": 1100,
-        "visible": false,
-        "zoomHotkeysEnabled": false,
-        "decorations": true,
-        "trafficLightPosition": {
-          "x": 15.0,
-          "y": 22.0
-        }
-      }
-    ]
-  }
+	"app": {
+		"windows": [
+			{
+				"titleBarStyle": "Overlay",
+				"hiddenTitle": true,
+				"fullscreen": false,
+				"height": 800,
+				"resizable": true,
+				"title": "Modrinth App",
+				"width": 1280,
+				"minHeight": 700,
+				"minWidth": 1100,
+				"visible": false,
+				"zoomHotkeysEnabled": false,
+				"decorations": true,
+				"trafficLightPosition": {
+					"x": 15.0,
+					"y": 22.0
+				}
+			}
+		]
+	}
 }

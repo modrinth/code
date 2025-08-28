@@ -5,7 +5,7 @@
 				class="grid size-10 place-content-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
 				:class="isCurrentLoader ? '[&&]:bg-bg-green' : ''"
 			>
-				<UiServersIconsLoaderIcon
+				<LoaderIcon
 					:loader="loader.name"
 					class="[&&]:size-6"
 					:class="isCurrentLoader ? 'text-brand' : ''"
@@ -42,6 +42,8 @@
 <script setup lang="ts">
 import { CheckIcon, DownloadIcon } from '@modrinth/assets'
 import { ButtonStyled } from '@modrinth/ui'
+
+import LoaderIcon from './icons/LoaderIcon.vue'
 
 interface LoaderInfo {
 	name: 'Vanilla' | 'Fabric' | 'Forge' | 'Quilt' | 'Paper' | 'NeoForge' | 'Purpur'

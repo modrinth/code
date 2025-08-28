@@ -94,7 +94,7 @@ const stop = async (e, context) => {
 const repair = async (e) => {
 	e?.stopPropagation()
 
-	await finish_install(props.instance)
+	await finish_install(props.instance).catch(handleError)
 }
 
 const openFolder = async () => {

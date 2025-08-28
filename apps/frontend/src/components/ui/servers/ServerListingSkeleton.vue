@@ -9,7 +9,7 @@
 				src="~/assets/images/servers/minecraft_server_icon.png"
 			/>
 			<div class="absolute inset-0 grid place-content-center">
-				<UiServersIconsLoadingIcon class="size-8 animate-spin text-contrast" />
+				<LoadingIcon class="size-8 animate-spin text-contrast" />
 			</div>
 		</div>
 		<div class="flex flex-col gap-4">
@@ -18,3 +18,7 @@
 		</div>
 	</div>
 </template>
+
+<script lang="ts" setup>
+import LoadingIcon from './icons/LoadingIcon.vue'
+</script>

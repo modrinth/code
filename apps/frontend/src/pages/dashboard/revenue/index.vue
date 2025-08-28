@@ -101,7 +101,7 @@
 					email
 					{{ auth.user.payout_data.paypal_address }}
 				</p>
-				<button class="btn mt-4" @click="removeAuthProvider('paypal')">
+				<button class="btn mt-4" @click="handleRemoveAuthProvider('paypal')">
 					<XIcon />
 					Disconnect account
 				</button>
@@ -117,8 +117,7 @@
 			<p>
 				Tremendous payments are sent to your Modrinth email. To change/set your Modrinth email,
 				visit
-				<nuxt-link class="text-link" to="/settings/account">here</nuxt-link>
-				.
+				<nuxt-link class="text-link" to="/settings/account">here</nuxt-link>.
 			</p>
 			<h3>Venmo</h3>
 			<p>Enter your Venmo username below to enable withdrawing to your Venmo balance.</p>
@@ -154,7 +153,9 @@ import { formatDate } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
-const { addNotification } = injectNotificationManager()
+import { getAuthUrl, removeAuthProvider } from '~/composables/auth.js'
+
+const { addNotification, handleError } = injectNotificationManager()
 const auth = await useAuth()
 const minWithdraw = ref(0.01)
 
@@ -169,6 +170,14 @@ const deadlineEnding = computed(() => {
 	}
 	return deadline
 })
+
+async function handleRemoveAuthProvider(provider) {
+	try {
+		await removeAuthProvider(provider)
+	} catch (error) {
+		handleError(error)
+	}
+}
 
 const availableSoonDates = computed(() => {
 	// Get the next 3 dates from userBalance.dates that are from now to the deadline + 4 months to make sure we get all the pending ones.

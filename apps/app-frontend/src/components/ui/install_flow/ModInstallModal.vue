@@ -22,7 +22,11 @@ import {
 	get,
 	list,
 } from '@/helpers/profile'
-import { installVersionDependencies } from '@/store/install.js'
+import {
+	findPreferredVersion,
+	installVersionDependencies,
+	isVersionCompatible,
+} from '@/store/install.js'
 
 const { handleError } = injectNotificationManager()
 const router = useRouter()
@@ -49,14 +53,11 @@ const shownProfiles = computed(() =>
 			return profile.name.toLowerCase().includes(searchFilter.value.toLowerCase())
 		})
 		.filter((profile) => {
-			const loaders = versions.value.flatMap((v) => v.loaders)
-
-			return (
-				versions.value.flatMap((v) => v.game_versions).includes(profile.game_version) &&
-				(project.value.project_type === 'mod'
-					? loaders.includes(profile.loader) || loaders.includes('minecraft')
-					: true)
-			)
+			const version = {
+				game_versions: versions.value.flatMap((v) => v.game_versions),
+				loaders: versions.value.flatMap((v) => v.loaders),
+			}
+			return isVersionCompatible(version, project.value, profile)
 		}),
 )
 
@@ -94,14 +95,7 @@ defineExpose({
 
 async function install(instance) {
 	instance.installing = true
-	const version = versions.value.find((v) => {
-		return (
-			v.game_versions.includes(instance.game_version) &&
-			(project.value.project_type === 'mod'
-				? v.loaders.includes(instance.loader) || v.loaders.includes('minecraft')
-				: true)
-		)
-	})
+	const version = findPreferredVersion(versions.value, project.value, instance)
 
 	if (!version) {
 		instance.installing = false
@@ -110,7 +104,7 @@ async function install(instance) {
 	}
 
 	await installMod(instance.path, version.id).catch(handleError)
-	await installVersionDependencies(instance, version)
+	await installVersionDependencies(instance, version).catch(handleError)
 
 	instance.installedMod = true
 	instance.installing = false
@@ -185,7 +179,7 @@ const createInstance = async () => {
 	await router.push(`/instance/${encodeURIComponent(id)}/`)
 
 	const instance = await get(id, true)
-	await installVersionDependencies(instance, versions.value[0])
+	await installVersionDependencies(instance, versions.value[0]).catch(handleError)
 
 	trackEvent('InstanceCreate', {
 		profile_name: name.value,

@@ -1,4 +1,3 @@
-import { injectNotificationManager } from '@modrinth/ui'
 import { arrayBufferToBase64 } from '@modrinth/utils'
 import { invoke } from '@tauri-apps/api/core'
 
@@ -39,8 +38,7 @@ export const DEFAULT_MODELS: Record<string, SkinModel> = {
 
 export function filterSavedSkins(list: Skin[]) {
 	const customSkins = list.filter((s) => s.source !== 'default')
-	const { handleError } = injectNotificationManager()
-	fixUnknownSkins(customSkins).catch(handleError)
+	fixUnknownSkins(customSkins)
 	return customSkins
 }
 

@@ -292,6 +292,7 @@ import {
 } from '@modrinth/ui'
 import type { Project, Report, User, Version } from '@modrinth/utils'
 import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
+import { IntlFormatted } from '@vintl/vintl/components'
 
 import { useImageUpload } from '~/composables/image-upload.ts'
 

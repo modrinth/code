@@ -6,7 +6,7 @@
 					Are you sure you want to
 					<span class="lowercase">{{ confirmActionText }}</span> the server?
 				</p>
-				<UiCheckbox
+				<Checkbox
 					v-model="dontAskAgain"
 					label="Don't ask me again"
 					class="text-sm"
@@ -34,7 +34,7 @@
 			:header="`All of ${serverName || 'Server'} info`"
 			@close="closeDetailsModal"
 		>
-			<UiServersServerInfoLabels
+			<ServerInfoLabels
 				:server-data="serverData"
 				:show-game-label="true"
 				:show-loader-label="true"
@@ -53,7 +53,7 @@
 		<div class="flex flex-row items-center gap-2 rounded-lg">
 			<ButtonStyled v-if="isInstalling" type="standard" color="brand">
 				<button disabled class="flex-shrink-0">
-					<UiServersPanelSpinner class="size-5" /> Installing...
+					<PanelSpinner class="size-5" /> Installing...
 				</button>
 			</ButtonStyled>
 
@@ -70,7 +70,7 @@
 				<ButtonStyled type="standard" color="brand">
 					<button :disabled="!canTakeAction" @click="handlePrimaryAction">
 						<div v-if="isTransitionState" class="grid place-content-center">
-							<UiServersIconsLoadingIcon />
+							<LoadingIcon />
 						</div>
 						<component :is="isRunning ? UpdatedIcon : PlayIcon" v-else />
 						<span>{{ primaryActionText }}</span>
@@ -78,7 +78,7 @@
 				</ButtonStyled>
 
 				<ButtonStyled circular type="transparent">
-					<UiServersTeleportOverflowMenu :options="[...menuOptions]">
+					<TeleportOverflowMenu :options="[...menuOptions]">
 						<MoreVerticalIcon aria-hidden="true" />
 						<template #kill>
 							<SlashIcon class="h-5 w-5" />
@@ -96,7 +96,7 @@
 							<ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" />
 							<span>Copy ID</span>
 						</template>
-					</UiServersTeleportOverflowMenu>
+					</TeleportOverflowMenu>
 				</ButtonStyled>
 			</template>
 		</div>
@@ -116,11 +116,16 @@ import {
 	UpdatedIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, NewModal } from '@modrinth/ui'
+import { ButtonStyled, Checkbox, NewModal } from '@modrinth/ui'
 import type { PowerAction as ServerPowerAction, ServerState } from '@modrinth/utils'
 import { useStorage } from '@vueuse/core'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+
+import LoadingIcon from './icons/LoadingIcon.vue'
+import PanelSpinner from './PanelSpinner.vue'
+import ServerInfoLabels from './ServerInfoLabels.vue'
+import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
 
 const flags = useFeatureFlags()
 

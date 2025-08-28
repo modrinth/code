@@ -300,7 +300,7 @@
 	</div>
 </template>
 
-<script>
+<script setup>
 import {
 	EditIcon,
 	IssuesIcon,
@@ -328,170 +328,116 @@ import Modal from '~/components/ui/Modal.vue'
 import ModalCreation from '~/components/ui/ModalCreation.vue'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
 
-export default defineNuxtComponent({
-	components: {
-		Avatar,
-		ButtonStyled,
-		ProjectStatusBadge,
-		SettingsIcon,
-		TrashIcon,
-		Checkbox,
-		IssuesIcon,
-		PlusIcon,
-		XIcon,
-		EditIcon,
-		SaveIcon,
-		Modal,
-		ModalCreation,
-		Multiselect,
-		CopyCode,
-		SortAscIcon,
-		SortDescIcon,
-	},
-	async setup() {
-		const { formatMessage } = useVIntl()
+useHead({ title: 'Projects - Modrinth' })
 
-		const user = await useUser()
-		await initUserProjects()
-		return { formatMessage, user: ref(user) }
-	},
-	data() {
-		return {
-			projects: this.updateSort(this.user.projects, 'Name'),
-			versions: [],
-			selectedProjects: [],
-			sortBy: 'Name',
-			descending: false,
-			editLinks: {
-				showAffected: false,
-				source: {
-					val: '',
-					clear: false,
-				},
-				discord: {
-					val: '',
-					clear: false,
-				},
-				wiki: {
-					val: '',
-					clear: false,
-				},
-				issues: {
-					val: '',
-					clear: false,
-				},
-			},
-			commonMessages,
-		}
-	},
-	head: {
-		title: 'Projects - Modrinth',
-	},
-	created() {
-		this.UPLOAD_VERSION = 1 << 0
-		this.DELETE_VERSION = 1 << 1
-		this.EDIT_DETAILS = 1 << 2
-		this.EDIT_BODY = 1 << 3
-		this.MANAGE_INVITES = 1 << 4
-		this.REMOVE_MEMBER = 1 << 5
-		this.EDIT_MEMBER = 1 << 6
-		this.DELETE_PROJECT = 1 << 7
-	},
-	methods: {
-		getProjectTypeForUrl,
-		formatProjectType,
-		updateDescending() {
-			this.descending = !this.descending
-			this.projects = this.updateSort(this.projects, this.sortBy, this.descending)
-		},
-		updateSort(projects, sort, descending) {
-			let sortedArray = projects
-			switch (sort) {
-				case 'Name':
-					sortedArray = projects.slice().sort((a, b) => {
-						return a.title.localeCompare(b.title)
-					})
-					break
-				case 'Status':
-					sortedArray = projects.slice().sort((a, b) => {
-						if (a.status < b.status) {
-							return -1
-						}
-						if (a.status > b.status) {
-							return 1
-						}
-						return 0
-					})
-					break
-				case 'Type':
-					sortedArray = projects.slice().sort((a, b) => {
-						if (a.project_type < b.project_type) {
-							return -1
-						}
-						if (a.project_type > b.project_type) {
-							return 1
-						}
-						return 0
-					})
-					break
-				default:
-					break
-			}
+// const UPLOAD_VERSION = 1 << 0
+// const DELETE_VERSION = 1 << 1
+const EDIT_DETAILS = 1 << 2
+// const EDIT_BODY = 1 << 3
+// const MANAGE_INVITES = 1 << 4
+// const REMOVE_MEMBER = 1 << 5
+// const EDIT_MEMBER = 1 << 6
+// const DELETE_PROJECT = 1 << 7
 
-			if (descending) {
-				sortedArray = sortedArray.reverse()
-			}
+const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
 
-			return sortedArray
-		},
-		async bulkEditLinks() {
-			const { addNotification } = injectNotificationManager()
-
-			try {
-				const baseData = {
-					issues_url: this.editLinks.issues.clear ? null : this.editLinks.issues.val.trim(),
-					source_url: this.editLinks.source.clear ? null : this.editLinks.source.val.trim(),
-					wiki_url: this.editLinks.wiki.clear ? null : this.editLinks.wiki.val.trim(),
-					discord_url: this.editLinks.discord.clear ? null : this.editLinks.discord.val.trim(),
-				}
-				const filteredData = Object.fromEntries(
-					Object.entries(baseData).filter(([, v]) => v !== ''),
-				)
-
-				await useBaseFetch(
-					`projects?ids=${JSON.stringify(this.selectedProjects.map((x) => x.id))}`,
-					{
-						method: 'PATCH',
-						body: filteredData,
-					},
-				)
-
-				this.$refs.editLinksModal.hide()
-				addNotification({
-					title: 'Success',
-					text: "Bulk edited selected project's links.",
-					type: 'success',
-				})
-				this.selectedProjects = []
-
-				this.editLinks.issues.val = ''
-				this.editLinks.source.val = ''
-				this.editLinks.wiki.val = ''
-				this.editLinks.discord.val = ''
-				this.editLinks.issues.clear = false
-				this.editLinks.source.clear = false
-				this.editLinks.wiki.clear = false
-				this.editLinks.discord.clear = false
-			} catch (e) {
-				addNotification({
-					title: 'An error occurred',
-					text: e,
-					type: 'error',
-				})
-			}
-		},
-	},
+const user = await useUser()
+const projects = ref([])
+const selectedProjects = ref([])
+const sortBy = ref('Name')
+const descending = ref(false)
+const editLinks = reactive({
+	showAffected: false,
+	source: { val: '', clear: false },
+	discord: { val: '', clear: false },
+	wiki: { val: '', clear: false },
+	issues: { val: '', clear: false },
 })
+
+const editLinksModal = ref(null)
+const modal_creation = ref(null)
+
+function updateSort(list, sort, desc) {
+	let sortedArray = list
+	switch (sort) {
+		case 'Name':
+			sortedArray = list.slice().sort((a, b) => a.title.localeCompare(b.title))
+			break
+		case 'Status':
+			sortedArray = list.slice().sort((a, b) => {
+				if (a.status < b.status) return -1
+				if (a.status > b.status) return 1
+				return 0
+			})
+			break
+		case 'Type':
+			sortedArray = list.slice().sort((a, b) => {
+				if (a.project_type < b.project_type) return -1
+				if (a.project_type > b.project_type) return 1
+				return 0
+			})
+			break
+		default:
+			break
+	}
+	if (desc) sortedArray = sortedArray.reverse()
+	return sortedArray
+}
+
+function resort() {
+	projects.value = updateSort(projects.value, sortBy.value, descending.value)
+}
+
+function updateDescending() {
+	descending.value = !descending.value
+	resort()
+}
+
+async function bulkEditLinks() {
+	try {
+		const baseData = {
+			issues_url: editLinks.issues.clear ? null : editLinks.issues.val.trim(),
+			source_url: editLinks.source.clear ? null : editLinks.source.val.trim(),
+			wiki_url: editLinks.wiki.clear ? null : editLinks.wiki.val.trim(),
+			discord_url: editLinks.discord.clear ? null : editLinks.discord.val.trim(),
+		}
+		const filteredData = Object.fromEntries(Object.entries(baseData).filter(([, v]) => v !== ''))
+
+		await useBaseFetch(`projects?ids=${JSON.stringify(selectedProjects.value.map((x) => x.id))}`, {
+			method: 'PATCH',
+			body: filteredData,
+		})
+
+		editLinksModal.value?.hide()
+		addNotification({
+			title: 'Success',
+			text: "Bulk edited selected project's links.",
+			type: 'success',
+		})
+		selectedProjects.value = []
+
+		editLinks.issues.val = ''
+		editLinks.source.val = ''
+		editLinks.wiki.val = ''
+		editLinks.discord.val = ''
+		editLinks.issues.clear = false
+		editLinks.source.clear = false
+		editLinks.wiki.clear = false
+		editLinks.discord.clear = false
+	} catch (e) {
+		addNotification({
+			title: 'An error occurred',
+			text: e,
+			type: 'error',
+		})
+	}
+}
+
+await initUserProjects()
+if (user.value?.projects) {
+	projects.value = updateSort(user.value.projects, 'Name', false)
+}
 </script>
 <style lang="scss" scoped>
 .grid-table {

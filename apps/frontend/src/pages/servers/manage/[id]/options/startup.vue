@@ -77,7 +77,7 @@
 							/>
 							<label for="show-all-versions" class="text-sm">Show all Java versions</label>
 						</div>
-						<UiServersTeleportDropdownMenu
+						<TeleportDropdownMenu
 							:id="'java-version-field'"
 							v-model="jdkVersion"
 							name="java-version"
@@ -90,7 +90,7 @@
 							<span class="text-lg font-bold text-contrast">Runtime</span>
 							<span> The Java runtime your server will use. </span>
 						</div>
-						<UiServersTeleportDropdownMenu
+						<TeleportDropdownMenu
 							:id="'runtime-field'"
 							v-model="jdkBuild"
 							name="runtime"
@@ -101,7 +101,7 @@
 				</div>
 			</div>
 		</div>
-		<UiServersSaveBanner
+		<SaveBanner
 			:is-visible="!!hasUnsavedChanges"
 			:server="props.server"
 			:is-updating="isUpdating"
@@ -113,8 +113,9 @@
 
 <script setup lang="ts">
 import { IssuesIcon, UpdatedIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager } from '@modrinth/ui'
+import { ButtonStyled, injectNotificationManager, TeleportDropdownMenu } from '@modrinth/ui'
 
+import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const { addNotification } = injectNotificationManager()

@@ -1,16 +1,16 @@
 <template>
 	<div class="ad-parent relative mb-3 flex w-full justify-center rounded-2xl bg-bg-raised">
 		<nuxt-link
-			to="/servers"
+			:to="flags.enableMedalPromotion ? '/servers?plan&ref=medal' : '/servers'"
 			class="flex max-h-[250px] min-h-[250px] min-w-[300px] max-w-[300px] flex-col gap-4 rounded-[inherit]"
 		>
 			<img
-				src="https://cdn-raw.modrinth.com/modrinth-servers-placeholder-light.webp"
+				:src="`https://cdn-raw.modrinth.com/${flags.enableMedalPromotion ? 'medal-modrinth-servers' : 'modrinth-servers-placeholder'}-light.webp`"
 				alt="Host your next server with Modrinth Servers"
 				class="light-image hidden rounded-[inherit]"
 			/>
 			<img
-				src="https://cdn-raw.modrinth.com/modrinth-servers-placeholder-dark.webp"
+				:src="`https://cdn-raw.modrinth.com/${flags.enableMedalPromotion ? 'medal-modrinth-servers' : 'modrinth-servers-placeholder'}-dark.webp`"
 				alt="Host your next server with Modrinth Servers"
 				class="dark-image rounded-[inherit]"
 			/>
@@ -23,6 +23,8 @@
 	</div>
 </template>
 <script setup>
+const flags = useFeatureFlags()
+
 useHead({
 	script: [
 		// {

@@ -1,0 +1,76 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT * FROM users_compliance WHERE user_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "requested",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 3,
+        "name": "signed",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 4,
+        "name": "e_delivery_consented",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "tin_matched",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 6,
+        "name": "last_checked",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "external_request_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "reference_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "form_type",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "23fed658506cab399009f2e9ff8d092020ac9a06582a2c183c1b430b5919c6ce"
+}

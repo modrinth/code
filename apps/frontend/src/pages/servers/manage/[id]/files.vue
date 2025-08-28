@@ -1,31 +1,19 @@
 <template>
 	<div data-pyro-file-manager-root class="contents">
-		<LazyUiServersFilesCreateItemModal
-			ref="createItemModal"
-			:type="newItemType"
-			@create="handleCreateNewItem"
-		/>
+		<FilesCreateItemModal ref="createItemModal" :type="newItemType" @create="handleCreateNewItem" />
 		<FilesUploadZipUrlModal ref="uploadZipModal" :server="server" />
 		<FilesUploadConflictModal ref="uploadConflictModal" @proceed="extractItem" />
 
-		<LazyUiServersFilesRenameItemModal
-			ref="renameItemModal"
-			:item="selectedItem"
-			@rename="handleRenameItem"
-		/>
+		<FilesRenameItemModal ref="renameItemModal" :item="selectedItem" @rename="handleRenameItem" />
 
-		<LazyUiServersFilesMoveItemModal
+		<FilesMoveItemModal
 			ref="moveItemModal"
 			:item="selectedItem"
 			:current-path="currentPath"
 			@move="handleMoveItem"
 		/>
 
-		<LazyUiServersFilesDeleteItemModal
-			ref="deleteItemModal"
-			:item="selectedItem"
-			@delete="handleDeleteItem"
-		/>
+		<FilesDeleteItemModal ref="deleteItemModal" :item="selectedItem" @delete="handleDeleteItem" />
 
 		<FilesUploadDragAndDrop
 			class="relative flex w-full flex-col rounded-2xl border border-solid border-bg-raised"
@@ -33,7 +21,7 @@
 		>
 			<div ref="mainContent" class="relative isolate flex w-full flex-col">
 				<div v-if="!isEditing" class="contents">
-					<UiServersFilesBrowseNavbar
+					<FilesBrowseNavbar
 						:breadcrumb-segments="breadcrumbSegments"
 						:search-query="searchQuery"
 						:current-filter="viewFilter"
@@ -46,11 +34,7 @@
 						@filter="handleFilter"
 						@update:search-query="searchQuery = $event"
 					/>
-					<UiServersFilesLabelBar
-						:sort-field="sortMethod"
-						:sort-desc="sortDesc"
-						@sort="handleSort"
-					/>
+					<FilesLabelBar :sort-field="sortMethod" :sort-desc="sortDesc" @sort="handleSort" />
 					<div
 						v-for="op in ops"
 						:key="`fs-op-${op.op}-${op.src}`"
@@ -172,7 +156,7 @@
 						@upload-complete="refreshList()"
 					/>
 				</div>
-				<UiServersFilesEditingNavbar
+				<FilesEditingNavbar
 					v-else
 					:file-name="editingFile?.name"
 					:is-image="isEditingImage"
@@ -211,10 +195,10 @@
 						class="ace_editor ace_hidpi ace-one-dark ace_dark rounded-b-lg"
 						@init="onInit"
 					/>
-					<UiServersFilesImageViewer v-else :image-blob="imagePreview" />
+					<FilesImageViewer v-else :image-blob="imagePreview" />
 				</div>
 				<div v-else-if="items.length > 0" class="h-full w-full overflow-hidden rounded-b-2xl">
-					<UiServersFileVirtualList
+					<FileVirtualList
 						:items="filteredItems"
 						@extract="handleExtractItem"
 						@delete="showDeleteModal"
@@ -239,7 +223,7 @@
 					</div>
 				</div>
 
-				<LazyUiServersFileManagerError
+				<FileManagerError
 					v-else-if="loadError"
 					title="Unable to load files"
 					message="The folder may not exist."
@@ -259,7 +243,7 @@
 			</div>
 		</FilesUploadDragAndDrop>
 
-		<UiServersFilesContextMenu
+		<FilesContextMenu
 			ref="contextMenu"
 			:item="contextMenuInfo.item"
 			:x="contextMenuInfo.x"
@@ -289,14 +273,26 @@ import { formatBytes, ModrinthServersFetchError } from '@modrinth/utils'
 import { useInfiniteScroll } from '@vueuse/core'
 import { computed } from 'vue'
 
+import FileManagerError from '~/components/ui/servers/FileManagerError.vue'
+import FilesBrowseNavbar from '~/components/ui/servers/FilesBrowseNavbar.vue'
+import FilesContextMenu from '~/components/ui/servers/FilesContextMenu.vue'
+import FilesCreateItemModal from '~/components/ui/servers/FilesCreateItemModal.vue'
+import FilesDeleteItemModal from '~/components/ui/servers/FilesDeleteItemModal.vue'
+import FilesEditingNavbar from '~/components/ui/servers/FilesEditingNavbar.vue'
+import FilesImageViewer from '~/components/ui/servers/FilesImageViewer.vue'
+import FilesLabelBar from '~/components/ui/servers/FilesLabelBar.vue'
+import FilesMoveItemModal from '~/components/ui/servers/FilesMoveItemModal.vue'
+import FilesRenameItemModal from '~/components/ui/servers/FilesRenameItemModal.vue'
 import FilesUploadConflictModal from '~/components/ui/servers/FilesUploadConflictModal.vue'
 import FilesUploadDragAndDrop from '~/components/ui/servers/FilesUploadDragAndDrop.vue'
 import FilesUploadDropdown from '~/components/ui/servers/FilesUploadDropdown.vue'
 import FilesUploadZipUrlModal from '~/components/ui/servers/FilesUploadZipUrlModal.vue'
+import FileVirtualList from '~/components/ui/servers/FileVirtualList.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
-import { handleError } from '~/composables/servers/modrinth-servers.ts'
+import { handleServersError } from '~/composables/servers/modrinth-servers.ts'
 
-const { addNotification } = injectNotificationManager()
+const notifications = injectNotificationManager()
+const { addNotification } = notifications
 const flags = useFeatureFlags()
 const baseId = useId()
 
@@ -397,13 +393,13 @@ const fetchDirectoryContents = async (): Promise<DirectoryResponse> => {
 
 		if (currentPage.value === 1) {
 			return {
-				items: applyDefaultSort(data.items),
+				items: data.items,
 				total: data.total,
 			}
 		}
 
 		return {
-			items: [...(directoryData.value?.items || []), ...applyDefaultSort(data.items)],
+			items: [...(directoryData.value?.items || []), ...data.items],
 			total: data.total,
 		}
 	} catch (error) {
@@ -584,7 +580,7 @@ const extractItem = async (path: string) => {
 		await props.server.fs?.extractFile(path, true, false)
 	} catch (error) {
 		console.error('Error extracting item:', error)
-		handleError(error)
+		handleServersError(error, notifications)
 	}
 }
 
@@ -598,11 +594,11 @@ const handleExtractItem = async (item: { name: string; type: string; path: strin
 				uploadConflictModal.value.show(item.path, dry.conflicting_files)
 			}
 		} else {
-			handleError(new Error('Error running dry run'))
+			handleServersError(new Error('Error running dry run'), notifications)
 		}
 	} catch (error) {
 		console.error('Error extracting item:', error)
-		handleError(error)
+		handleServersError(error, notifications)
 	}
 }
 
@@ -729,15 +725,6 @@ const handleCreateError = (error: any) => {
 			})
 		}
 	}
-}
-
-const applyDefaultSort = (items: DirectoryItem[]) => {
-	return items.sort((a: any, b: any) => {
-		if (a.type === 'directory' && b.type !== 'directory') return -1
-		if (a.type !== 'directory' && b.type === 'directory') return 1
-
-		return a.name.localeCompare(b.name)
-	})
 }
 
 const handleSort = (field: string) => {
