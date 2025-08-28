@@ -181,7 +181,8 @@ useSeoMeta({
 		padding: 0;
 	}
 
-	ul > li:not(:last-child) {
+	ul,
+	ol > li:not(:last-child) {
 		margin-bottom: 0.5rem;
 	}
 
@@ -203,7 +204,7 @@ useSeoMeta({
 	h1,
 	h2,
 	h3 {
-		margin-bottom: 0.25rem;
+		margin-bottom: 0.5rem;
 	}
 
 	h1 {
