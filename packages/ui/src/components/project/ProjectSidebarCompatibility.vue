@@ -29,13 +29,11 @@
 		<section v-if="showEnvironments" class="flex flex-col gap-2">
 			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.environments) }}</h3>
 			<div class="flex flex-wrap gap-1">
-				<TagItem
-					v-for="tag in primaryEnvironmentTags"
-					:key="`environment-tag-${tag.message.id}`"
-				>
+				<TagItem v-for="tag in primaryEnvironmentTags" :key="`environment-tag-${tag.message.id}`">
 					<component :is="tag.icon" />
 					{{ formatMessage(tag.message) }}
-			</tagitem></div>
+				</TagItem>
+			</div>
 		</section>
 		<section
 			v-else-if="
@@ -204,7 +202,9 @@ const environmentTags: EnvironmentTag[] = [
 ]
 
 const primaryEnvironmentTags = computed(() => {
-	return primaryEnvironment.value ? environmentTags.filter((x) => x.environments.includes(primaryEnvironment.value ?? 'unknown')) : []
+	return primaryEnvironment.value
+		? environmentTags.filter((x) => x.environments.includes(primaryEnvironment.value ?? 'unknown'))
+		: []
 })
 
 const messages = defineMessages({

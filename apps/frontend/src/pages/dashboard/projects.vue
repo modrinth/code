@@ -282,8 +282,12 @@
 							<ProjectStatusBadge v-if="project.status" :status="project.status" />
 						</div>
 
-						<div class="flex gap-2 !flex-row !justify-end items-center">
-							<ButtonStyled v-if="projectsWithMigrationWarning.includes(project.id)" circular color="orange">
+						<div class="flex !flex-row items-center !justify-end gap-2">
+							<ButtonStyled
+								v-if="projectsWithMigrationWarning.includes(project.id)"
+								circular
+								color="orange"
+							>
 								<nuxt-link
 									v-tooltip="'Please review environment metadata'"
 									:to="`/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
@@ -450,8 +454,12 @@ async function bulkEditLinks() {
 await initUserProjects()
 if (user.value?.projects) {
 	projects.value = updateSort(user.value.projects, 'Name', false)
-	user.value?.projectsV3?.forEach(project => {
-		if (project.side_types_migration_review_status === 'pending' && project.project_types.includes('mod') || project.project_types.includes('modpack')) {
+	user.value?.projectsV3?.forEach((project) => {
+		if (
+			(project.side_types_migration_review_status === 'pending' &&
+				project.project_types.includes('mod')) ||
+			project.project_types.includes('modpack')
+		) {
 			projectsWithMigrationWarning.value.push(project.id)
 		}
 	})

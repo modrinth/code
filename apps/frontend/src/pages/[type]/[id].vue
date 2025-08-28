@@ -673,7 +673,12 @@
 					:tags="tags"
 				/>
 				<Admonition
-					v-if="currentMember && projectV3.side_types_migration_review_status === 'pending' && projectV3.environment?.length > 0 && projectV3.environment[0] !== 'unknown'"
+					v-if="
+						currentMember &&
+						projectV3.side_types_migration_review_status === 'pending' &&
+						projectV3.environment?.length > 0 &&
+						projectV3.environment[0] !== 'unknown'
+					"
 					type="warning"
 					header="Please review environment metadata"
 					class="mt-3"
@@ -681,7 +686,7 @@
 					We've just overhauled the Environments system on Modrinth and new options are now
 					available. Please visit your project's settings and verify that the metadata is correct.
 					<ButtonStyled color="orange">
-						<nuxt-link :to="`/project/${project.id}/settings/environment`" class="w-fit mt-3">
+						<nuxt-link :to="`/project/${project.id}/settings/environment`" class="mt-3 w-fit">
 							<SettingsIcon /> Review environment settings
 						</nuxt-link>
 					</ButtonStyled>
