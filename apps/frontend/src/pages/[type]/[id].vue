@@ -2,118 +2,32 @@
 	<Teleport v-if="flags.projectBackground" to="#fixed-background-teleport">
 		<ProjectBackgroundGradient :project="project" />
 	</Teleport>
-	<div v-if="route.name.startsWith('type-id-settings')" class="normal-page">
-		<div class="normal-page__sidebar">
-			<aside class="universal-card">
-				<Breadcrumbs
-					current-title="Settings"
-					:link-stack="[
-						{
-							href: organization
-								? `/organization/${organization.slug}/settings/projects`
-								: `/dashboard/projects`,
-							label: 'Projects',
-						},
-						{
-							href: `/${project.project_type}/${project.slug ? project.slug : project.id}`,
-							label: project.title,
-							allowTrimming: true,
-						},
-					]"
-				/>
-				<div class="settings-header">
-					<Avatar
-						:src="project.icon_url"
-						:alt="project.title"
-						size="sm"
-						class="settings-header__icon"
-					/>
-					<div class="settings-header__text">
-						<h1 class="wrap-as-needed">{{ project.title }}</h1>
-						<ProjectStatusBadge :status="project.status" />
-					</div>
+	<div v-if="route.name.startsWith('type-id-settings')" class="normal-page no-sidebar">
+		<div class="normal-page__header">
+			<div
+				class="mb-4 flex items-center gap-2 border-0 border-b-[1px] border-solid border-divider pb-4 text-lg font-semibold"
+			>
+				<nuxt-link
+					:to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
+					class="flex items-center gap-2 hover:underline hover:brightness-[--hover-brightness]"
+				>
+					<Avatar :src="project.icon_url" size="32px" />
+					{{ project.title }}
+				</nuxt-link>
+				<ChevronRightIcon />
+				<span class="flex grow font-extrabold text-contrast">{{
+					formatMessage(messages.settingsTitle)
+				}}</span>
+				<div class="flex gap-2">
+					<ButtonStyled>
+						<nuxt-link to="/dashboard/projects"
+							><ListIcon /> {{ formatMessage(messages.visitProjectsDashboard) }}
+						</nuxt-link>
+					</ButtonStyled>
 				</div>
-
-				<h2>Project settings</h2>
-				<NavStack>
-					<NavStackItem
-						:link="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
-						label="General"
-					>
-						<SettingsIcon aria-hidden="true" />
-					</NavStackItem>
-					<NavStackItem
-						:link="`/${project.project_type}/${
-							project.slug ? project.slug : project.id
-						}/settings/tags`"
-						label="Tags"
-					>
-						<TagsIcon aria-hidden="true" />
-					</NavStackItem>
-					<NavStackItem
-						:link="`/${project.project_type}/${
-							project.slug ? project.slug : project.id
-						}/settings/description`"
-						label="Description"
-					>
-						<DescriptionIcon aria-hidden="true" />
-					</NavStackItem>
-					<NavStackItem
-						:link="`/${project.project_type}/${
-							project.slug ? project.slug : project.id
-						}/settings/license`"
-						label="License"
-					>
-						<CopyrightIcon aria-hidden="true" />
-					</NavStackItem>
-					<NavStackItem
-						:link="`/${project.project_type}/${
-							project.slug ? project.slug : project.id
-						}/settings/links`"
-						label="Links"
-					>
-						<LinksIcon aria-hidden="true" />
-					</NavStackItem>
-					<NavStackItem
-						:link="`/${project.project_type}/${
-							project.slug ? project.slug : project.id
-						}/settings/members`"
-						label="Members"
-					>
-						<UsersIcon aria-hidden="true" />
-					</NavStackItem>
-					<h3>View</h3>
-					<NavStackItem
-						:link="`/${project.project_type}/${
-							project.slug ? project.slug : project.id
-						}/settings/analytics`"
-						label="Analytics"
-						chevron
-					>
-						<ChartIcon aria-hidden="true" />
-					</NavStackItem>
-					<h3>Upload</h3>
-					<NavStackItem
-						:link="`/${project.project_type}/${project.slug ? project.slug : project.id}/gallery`"
-						label="Gallery"
-						chevron
-					>
-						<GalleryIcon aria-hidden="true" />
-					</NavStackItem>
-					<NavStackItem
-						:link="`/${project.project_type}/${project.slug ? project.slug : project.id}/versions`"
-						label="Versions"
-						chevron
-					>
-						<VersionIcon aria-hidden="true" />
-					</NavStackItem>
-				</NavStack>
-			</aside>
-		</div>
-
-		<div class="normal-page__content">
+			</div>
 			<ProjectMemberHeader
-				v-if="currentMember"
+				v-if="currentMember && false"
 				:project="project"
 				:versions="versions"
 				:current-member="currentMember"
@@ -127,8 +41,11 @@
 				:auth="auth"
 				:tags="tags"
 			/>
+		</div>
+		<div class="normal-page__content">
 			<NuxtPage
 				v-model:project="project"
+				v-model:project-v3="projectV3"
 				v-model:versions="versions"
 				v-model:featured-versions="featuredVersions"
 				v-model:members="members"
@@ -150,20 +67,27 @@
 		<NewModal ref="settingsModal">
 			<template #title>
 				<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
-				<span class="text-lg font-extrabold text-contrast"> Settings </span>
+				<span class="text-lg font-extrabold text-contrast">
+					{{ formatMessage(messages.settingsTitle) }}
+				</span>
 			</template>
 		</NewModal>
-		<NewModal ref="modalLicense" :header="project.license.name ? project.license.name : 'License'">
+		<NewModal
+			ref="modalLicense"
+			:header="project.license.name ? project.license.name : formatMessage(messages.licenseTitle)"
+		>
 			<template #title>
 				<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" no-shadow />
 				<span class="text-lg font-extrabold text-contrast">
-					{{ project.license.name ? project.license.name : 'License' }}
+					{{ project.license.name ? project.license.name : formatMessage(messages.licenseTitle) }}
 				</span>
 			</template>
 			<div
 				class="markdown-body"
 				v-html="
-					renderString(licenseText).isEmpty ? 'Loading license text...' : renderString(licenseText)
+					renderString(licenseText).isEmpty
+						? formatMessage(messages.loadingLicenseText)
+						: renderString(licenseText)
 				"
 			/>
 		</NewModal>
@@ -203,7 +127,7 @@
 			<template #title>
 				<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
 				<div class="truncate text-lg font-extrabold text-contrast">
-					Download {{ project.title }}
+					{{ formatMessage(messages.downloadTitle, { title: project.title }) }}
 				</div>
 			</template>
 			<template #default>
@@ -222,7 +146,8 @@
 									:href="`modrinth://mod/${project.slug}`"
 									@click="() => installWithApp()"
 								>
-									<ModrinthIcon aria-hidden="true" /> Install with Modrinth App
+									<ModrinthIcon aria-hidden="true" />
+									{{ formatMessage(messages.installWithModrinthApp) }}
 									<ExternalIcon aria-hidden="true" />
 								</a>
 							</ButtonStyled>
@@ -231,14 +156,16 @@
 									class="mt-2 flex justify-center text-brand-blue hover:underline"
 									to="/app"
 								>
-									Don't have Modrinth App?
+									{{ formatMessage(messages.dontHaveModrinthApp) }}
 								</nuxt-link>
 							</Accordion>
 						</div>
 
 						<div class="flex items-center gap-4 px-4">
 							<div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
-							<span class="flex-shrink-0 text-sm font-semibold text-secondary"> or </span>
+							<span class="flex-shrink-0 text-sm font-semibold text-secondary">
+								{{ formatMessage(commonMessages.orLabel) }}
+							</span>
 							<div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
 						</div>
 					</div>
@@ -249,11 +176,16 @@
 								<GameIcon aria-hidden="true" />
 								{{
 									currentGameVersion
-										? `Game version: ${currentGameVersion}`
-										: 'Error: no game versions found'
+										? formatMessage(messages.gameVersionLabel, { version: currentGameVersion })
+										: formatMessage(messages.gameVersionError)
 								}}
 								<InfoIcon
-									v-tooltip="`${project.title} is only available for ${currentGameVersion}`"
+									v-tooltip="
+										formatMessage(messages.gameVersionTooltip, {
+											title: project.title,
+											version: currentGameVersion,
+										})
+									"
 									class="ml-auto size-5"
 								/>
 							</div>
@@ -273,11 +205,15 @@
 							<template #title>
 								<GameIcon aria-hidden="true" />
 								{{
-									currentGameVersion ? `Game version: ${currentGameVersion}` : 'Select game version'
+									currentGameVersion
+										? formatMessage(messages.gameVersionLabel, { version: currentGameVersion })
+										: formatMessage(messages.selectGameVersion)
 								}}
 							</template>
 							<div class="iconified-input mb-2 flex w-full">
-								<label for="game-versions-filtering" hidden>Search game versions...</label>
+								<label for="game-versions-filtering" hidden>{{
+									formatMessage(messages.searchGameVersionsLabel)
+								}}</label>
 								<SearchIcon aria-hidden="true" />
 								<input
 									id="game-versions-filtering"
@@ -285,7 +221,7 @@
 									v-model="versionFilter"
 									type="search"
 									autocomplete="off"
-									placeholder="Search game versions..."
+									:placeholder="formatMessage(messages.searchGameVersions)"
 								/>
 							</div>
 							<ScrollablePanel :class="project.game_versions.length > 4 ? 'h-[15rem]' : ''">
@@ -305,7 +241,11 @@
 									<button
 										v-tooltip="
 											!possibleGameVersions.includes(gameVersion)
-												? `${project.title} does not support ${gameVersion} for ${formatCategory(currentPlatform)}`
+												? formatMessage(messages.gameVersionUnsupportedTooltip, {
+														title: project.title,
+														gameVersion: gameVersion,
+														platform: formatCategory(currentPlatform),
+													})
 												: null
 										"
 										:class="{
@@ -342,7 +282,7 @@
 							<Checkbox
 								v-model="showAllVersions"
 								class="mx-1"
-								:label="`Show all versions`"
+								:label="formatMessage(messages.showAllVersions)"
 								:disabled="!!versionFilter"
 							/>
 						</Accordion>
@@ -353,12 +293,17 @@
 								<WrenchIcon aria-hidden="true" />
 								{{
 									currentPlatform
-										? `Platform: ${formatCategory(currentPlatform)}`
-										: 'Error: no platforms found'
+										? formatMessage(messages.platformLabel, {
+												platform: formatCategory(currentPlatform),
+											})
+										: formatMessage(messages.platformError)
 								}}
 								<InfoIcon
 									v-tooltip="
-										`${project.title} is only available for ${formatCategory(currentPlatform)}`
+										formatMessage(messages.platformTooltip, {
+											title: project.title,
+											platform: formatCategory(currentPlatform),
+										})
 									"
 									class="ml-auto size-5"
 								/>
@@ -380,8 +325,10 @@
 								<WrenchIcon aria-hidden="true" />
 								{{
 									currentPlatform
-										? `Platform: ${formatCategory(currentPlatform)}`
-										: 'Select platform'
+										? formatMessage(messages.platformLabel, {
+												platform: formatCategory(currentPlatform),
+											})
+										: formatMessage(messages.selectPlatform)
 								}}
 							</template>
 							<ScrollablePanel :class="project.loaders.length > 4 ? 'h-[15rem]' : ''">
@@ -393,7 +340,11 @@
 									<button
 										v-tooltip="
 											!possiblePlatforms.includes(platform)
-												? `${project.title} does not support ${formatCategory(platform)} for ${currentGameVersion}`
+												? formatMessage(messages.platformUnsupportedTooltip, {
+														title: project.title,
+														platform: formatCategory(platform),
+														gameVersion: currentGameVersion,
+													})
 												: null
 										"
 										:class="{
@@ -458,8 +409,12 @@
 								!filteredAlpha
 							"
 						>
-							No versions available for {{ currentGameVersion }} and
-							{{ formatCategory(currentPlatform) }}.
+							{{
+								formatMessage(messages.noVersionsAvailable, {
+									gameVersion: currentGameVersion,
+									platform: formatCategory(currentPlatform),
+								})
+							}}
 						</p>
 					</AutomaticAccordion>
 					<ServersPromo
@@ -499,7 +454,8 @@
 								:color="route.name === 'type-id-version-version' ? `standard` : `brand`"
 							>
 								<button @click="(event) => downloadModal.show(event)">
-									<DownloadIcon aria-hidden="true" /> Download
+									<DownloadIcon aria-hidden="true" />
+									{{ formatMessage(commonMessages.downloadButton) }}
 								</button>
 							</ButtonStyled>
 						</div>
@@ -511,7 +467,7 @@
 								:color="route.name === 'type-id-version-version' ? `standard` : `brand`"
 							>
 								<button
-									aria-label="Download"
+									:aria-label="formatMessage(commonMessages.downloadButton)"
 									class="flex sm:hidden"
 									@click="(event) => downloadModal.show(event)"
 								>
@@ -529,7 +485,7 @@
 						>
 							<ButtonStyled size="large" circular>
 								<nuxt-link
-									v-tooltip="'Create a server'"
+									v-tooltip="formatMessage(messages.createServerTooltip)"
 									:to="`/servers?project=${project.id}#plan`"
 									@click="
 										() => {
@@ -545,18 +501,18 @@
 								<div class="experimental-styles-within flex max-w-60 flex-col gap-1">
 									<div class="flex items-center justify-between gap-4">
 										<h3 class="m-0 flex items-center gap-2 text-base font-bold text-contrast">
-											Create a server
+											{{ formatMessage(messages.serversPromoTitle) }}
 											<TagItem
 												:style="{
 													'--_color': 'var(--color-brand)',
 													'--_bg-color': 'var(--color-brand-highlight)',
 												}"
-												>New</TagItem
+												>{{ formatMessage(commonMessages.newBadge) }}</TagItem
 											>
 										</h3>
 										<ButtonStyled size="small" circular>
 											<button
-												v-tooltip="`Don't show again`"
+												v-tooltip="formatMessage(messages.dontShowAgain)"
 												@click="
 													() => {
 														flags.showProjectPageCreateServersTooltip = false
@@ -570,11 +526,13 @@
 									</div>
 
 									<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
-										Modrinth Servers is the easiest way to play with your friends without hassle!
+										{{ formatMessage(messages.serversPromoDescription) }}
 									</p>
 
 									<p class="m-0 text-wrap text-sm font-bold text-primary">
-										Starting at $5<span class="text-xs"> / month</span>
+										{{ formatMessage(messages.serversPromoPricing, { monthly: `<span class="text-xs"
+											>${formatMessage(projectPageMessages.monthly)}</span
+										>` }) }}
 									</p>
 								</div>
 							</template>
@@ -589,13 +547,26 @@
 							>
 								<button
 									v-if="auth.user"
-									v-tooltip="following ? `Unfollow` : `Follow`"
-									:aria-label="following ? `Unfollow` : `Follow`"
+									v-tooltip="
+										following
+											? formatMessage(commonMessages.unfollowButton)
+											: formatMessage(commonMessages.followButton)
+									"
+									:aria-label="
+										following
+											? formatMessage(commonMessages.unfollowButton)
+											: formatMessage(commonMessages.followButton)
+									"
 									@click="userFollowProject(project)"
 								>
 									<HeartIcon :fill="following ? 'currentColor' : 'none'" aria-hidden="true" />
 								</button>
-								<nuxt-link v-else v-tooltip="'Follow'" to="/auth/sign-in" aria-label="Follow">
+								<nuxt-link
+									v-else
+									v-tooltip="formatMessage(commonMessages.followButton)"
+									to="/auth/sign-in"
+									:aria-label="formatMessage(commonMessages.followButton)"
+								>
 									<HeartIcon aria-hidden="true" />
 								</nuxt-link>
 							</ButtonStyled>
@@ -603,10 +574,12 @@
 								<PopoutMenu
 									v-if="auth.user"
 									:tooltip="
-										collections.some((x) => x.projects.includes(project.id)) ? 'Saved' : 'Save'
+										collections.some((x) => x.projects.includes(project.id))
+											? formatMessage(commonMessages.savedLabel)
+											: formatMessage(commonMessages.saveButton)
 									"
 									from="top-right"
-									aria-label="Save"
+									:aria-label="formatMessage(commonMessages.saveButton)"
 									:dropdown-id="`${baseId}-save`"
 								>
 									<BookmarkIcon
@@ -621,7 +594,7 @@
 										<input
 											v-model="displayCollectionsSearch"
 											type="text"
-											placeholder="Search collections..."
+											:placeholder="formatMessage(commonMessages.searchPlaceholder)"
 											class="search-input menu-search"
 										/>
 										<div v-if="collections.length > 0" class="collections-list text-primary">
@@ -639,13 +612,14 @@
 										</div>
 
 										<div v-else class="menu-text">
-											<p class="popout-text">No collections found.</p>
+											<p class="popout-text">{{ formatMessage(messages.noCollectionsFound) }}</p>
 										</div>
 										<button
 											class="btn collection-button"
 											@click="(event) => $refs.modal_collection.show(event)"
 										>
-											<PlusIcon aria-hidden="true" /> Create new collection
+											<PlusIcon aria-hidden="true" />
+											{{ formatMessage(messages.createNewCollection) }}
 										</button>
 									</template>
 								</PopoutMenu>
@@ -657,18 +631,27 @@
 								<ButtonStyled size="large" circular>
 									<button
 										v-if="auth.user"
-										v-tooltip="`Follow`"
-										:aria-label="`Follow`"
+										:v-tooltip="formatMessage(commonMessages.followButton)"
+										:aria-label="formatMessage(commonMessages.followButton)"
 										@click="userFollowProject(project)"
 									>
 										<HeartIcon aria-hidden="true" />
 									</button>
-									<nuxt-link v-else v-tooltip="'Follow'" to="/auth/sign-in" aria-label="Follow">
+									<nuxt-link
+										v-else
+										v-tooltip="formatMessage(commonMessages.followButton)"
+										to="/auth/sign-in"
+										:aria-label="formatMessage(commonMessages.followButton)"
+									>
 										<HeartIcon aria-hidden="true" />
 									</nuxt-link>
 								</ButtonStyled>
 								<ButtonStyled size="large" circular>
-									<nuxt-link v-tooltip="'Save'" to="/auth/sign-in" aria-label="Save">
+									<nuxt-link
+										v-tooltip="formatMessage(commonMessages.saveButton)"
+										to="/auth/sign-in"
+										:aria-label="formatMessage(commonMessages.saveButton)"
+									>
 										<BookmarkIcon aria-hidden="true" />
 									</nuxt-link>
 								</ButtonStyled>
@@ -676,7 +659,7 @@
 						</ClientOnly>
 						<ButtonStyled v-if="auth.user && currentMember" size="large" circular>
 							<nuxt-link
-								v-tooltip="'Settings'"
+								v-tooltip="formatMessage(commonMessages.settingsLabel)"
 								:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
 							>
 								<SettingsIcon aria-hidden="true" />
@@ -684,7 +667,7 @@
 						</ButtonStyled>
 						<ButtonStyled size="large" circular type="transparent">
 							<OverflowMenu
-								:tooltip="'More options'"
+								:tooltip="formatMessage(commonMessages.moreOptionsButton)"
 								:options="[
 									{
 										id: 'analytics',
@@ -727,18 +710,27 @@
 									{ id: 'copy-id', action: () => copyId() },
 									{ id: 'copy-permalink', action: () => copyPermalink() },
 								]"
-								aria-label="More options"
+								:aria-label="formatMessage(commonMessages.moreOptionsButton)"
 								:dropdown-id="`${baseId}-more-options`"
 							>
 								<MoreVerticalIcon aria-hidden="true" />
-								<template #analytics> <ChartIcon aria-hidden="true" /> Analytics </template>
-								<template #moderation-checklist>
-									<ScaleIcon aria-hidden="true" /> Review project
+								<template #analytics>
+									<ChartIcon aria-hidden="true" />
+									{{ formatMessage(commonMessages.analyticsButton) }}
 								</template>
-								<template #report> <ReportIcon aria-hidden="true" /> Report </template>
-								<template #copy-id> <ClipboardCopyIcon aria-hidden="true" /> Copy ID </template>
+								<template #moderation-checklist>
+									<ScaleIcon aria-hidden="true" /> {{ formatMessage(messages.reviewProject) }}
+								</template>
+								<template #report>
+									<ReportIcon aria-hidden="true" /> {{ formatMessage(commonMessages.reportButton) }}
+								</template>
+								<template #copy-id>
+									<ClipboardCopyIcon aria-hidden="true" />
+									{{ formatMessage(commonMessages.copyIdButton) }}
+								</template>
 								<template #copy-permalink>
-									<ClipboardCopyIcon aria-hidden="true" /> Copy permanent link
+									<ClipboardCopyIcon aria-hidden="true" />
+									{{ formatMessage(commonMessages.copyPermalinkButton) }}
 								</template>
 							</OverflowMenu>
 						</ButtonStyled>
@@ -759,9 +751,26 @@
 					:auth="auth"
 					:tags="tags"
 				/>
+				<Admonition
+					v-if="
+						currentMember &&
+						projectV3.side_types_migration_review_status === 'pending' &&
+						projectV3.environment?.length > 0 &&
+						projectV3.environment[0] !== 'unknown'
+					"
+					type="warning"
+					:header="formatMessage(messages.environmentMigrationTitle)"
+					class="mt-3"
+				>
+					{{ formatMessage(messages.environmentMigrationMessage) }}
+					<ButtonStyled color="orange">
+						<nuxt-link :to="`/project/${project.id}/settings/environment`" class="mt-3 w-fit">
+							<SettingsIcon /> {{ formatMessage(messages.reviewEnvironmentSettings) }}
+						</nuxt-link>
+					</ButtonStyled>
+				</Admonition>
 				<MessageBanner v-if="project.status === 'archived'" message-type="warning" class="my-4">
-					{{ project.title }} has been archived. {{ project.title }} will not receive any further
-					updates unless the author decides to unarchive the project.
+					{{ formatMessage(messages.archivedMessage, { title: project.title }) }}
 				</MessageBanner>
 			</div>
 
@@ -769,6 +778,7 @@
 				<ProjectSidebarCompatibility
 					:project="project"
 					:tags="tags"
+					:v3-metadata="projectV3"
 					class="card flex-card experimental-styles-within"
 				/>
 				<AdPlaceholder v-if="!auth.user && tags.approvedStatuses.includes(project.status)" />
@@ -799,7 +809,7 @@
 						<div class="details-list__item">
 							<BookTextIcon aria-hidden="true" />
 							<div>
-								Licensed
+								{{ formatMessage(messages.licensedLabel) }}
 								<a
 									v-if="project.license.url"
 									class="text-link hover:underline"
@@ -916,21 +926,19 @@
 
 <script setup>
 import {
-	AlignLeftIcon as DescriptionIcon,
 	BookmarkIcon,
 	BookTextIcon,
 	CalendarIcon,
 	ChartIcon,
 	CheckIcon,
+	ChevronRightIcon,
 	ClipboardCopyIcon,
-	CopyrightIcon,
 	DownloadIcon,
 	ExternalIcon,
 	GameIcon,
 	HeartIcon,
-	ImageIcon as GalleryIcon,
 	InfoIcon,
-	LinkIcon as LinksIcon,
+	ListIcon,
 	ModrinthIcon,
 	MoreVerticalIcon,
 	PlusIcon,
@@ -939,16 +947,16 @@ import {
 	SearchIcon,
 	ServerPlusIcon,
 	SettingsIcon,
-	TagsIcon,
-	UsersIcon,
 	VersionIcon,
 	WrenchIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
+	Admonition,
 	Avatar,
 	ButtonStyled,
 	Checkbox,
+	commonMessages,
 	injectNotificationManager,
 	NewModal,
 	OverflowMenu,
@@ -959,7 +967,7 @@ import {
 	ProjectSidebarCreators,
 	ProjectSidebarDetails,
 	ProjectSidebarLinks,
-	ProjectStatusBadge,
+	provideProjectPageContext,
 	ScrollablePanel,
 	ServersPromo,
 	TagItem,
@@ -975,12 +983,9 @@ import { navigateTo } from '#app'
 import Accordion from '~/components/ui/Accordion.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import AutomaticAccordion from '~/components/ui/AutomaticAccordion.vue'
-import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 import CollectionCreateModal from '~/components/ui/CollectionCreateModal.vue'
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
-import NavStack from '~/components/ui/NavStack.vue'
-import NavStackItem from '~/components/ui/NavStackItem.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
@@ -990,6 +995,7 @@ import { reportProject } from '~/utils/report-helpers.ts'
 
 const data = useNuxtApp()
 const route = useNativeRoute()
+const router = useRouter()
 const config = useRuntimeConfig()
 const moderationStore = useModerationStore()
 const notifications = injectNotificationManager()
@@ -1082,6 +1088,215 @@ const detailsMessages = defineMessages({
 	},
 })
 
+const messages = defineMessages({
+	archivedMessage: {
+		id: 'project.status.archived.message',
+		defaultMessage:
+			'{title} has been archived. {title} will not receive any further updates unless the author decides to unarchive the project.',
+	},
+	changelogTab: {
+		id: 'project.navigation.changelog',
+		defaultMessage: 'Changelog',
+	},
+	createNewCollection: {
+		id: 'project.collections.create-new',
+		defaultMessage: 'Create new collection',
+	},
+	createServer: {
+		id: 'project.actions.create-server',
+		defaultMessage: 'Create a server',
+	},
+	createServerTooltip: {
+		id: 'project.actions.create-server-tooltip',
+		defaultMessage: 'Create a server',
+	},
+	descriptionTab: {
+		id: 'project.description.title',
+		defaultMessage: 'Description',
+	},
+	dontHaveModrinthApp: {
+		id: 'project.download.no-app',
+		defaultMessage: "Don't have Modrinth App?",
+	},
+	dontShowAgain: {
+		id: 'project.actions.dont-show-again',
+		defaultMessage: "Don't show again",
+	},
+	downloadTitle: {
+		id: 'project.download.title',
+		defaultMessage: 'Download {title}',
+	},
+	downloadsStat: {
+		id: 'project.stats.downloads-label',
+		defaultMessage: 'download{count, plural, one {} other {s}}',
+	},
+	errorLoadingProject: {
+		id: 'project.error.loading',
+		defaultMessage: 'Error loading project data{message}',
+	},
+	environmentMigrationMessage: {
+		id: 'project.environment.migration.message',
+		defaultMessage:
+			"We've just overhauled the Environments system on Modrinth and new options are now available. Please visit your project's settings and verify that the metadata is correct.",
+	},
+	environmentMigrationTitle: {
+		id: 'project.environment.migration.title',
+		defaultMessage: 'Please review environment metadata',
+	},
+	followersStat: {
+		id: 'project.stats.followers-label',
+		defaultMessage: 'follower{count, plural, one {} other {s}}',
+	},
+	galleryTab: {
+		id: 'project.gallery.title',
+		defaultMessage: 'Gallery',
+	},
+	gameVersionError: {
+		id: 'project.download.game-version-error',
+		defaultMessage: 'Error: no game versions found',
+	},
+	gameVersionLabel: {
+		id: 'project.download.game-version',
+		defaultMessage: 'Game version: {version}',
+	},
+	gameVersionTooltip: {
+		id: 'project.download.game-version-tooltip',
+		defaultMessage: '{title} is only available for {version}',
+	},
+	gameVersionUnsupportedTooltip: {
+		id: 'project.download.game-version-unsupported-tooltip',
+		defaultMessage: '{title} does not support {gameVersion} for {platform}',
+	},
+	installWithModrinthApp: {
+		id: 'project.download.install-with-app',
+		defaultMessage: 'Install with Modrinth App',
+	},
+	licenseErrorMessage: {
+		id: 'project.license.error',
+		defaultMessage: 'License text could not be retrieved.',
+	},
+	licenseTitle: {
+		id: 'project.license.title',
+		defaultMessage: 'License',
+	},
+	licensedLabel: {
+		id: 'project.details.licensed',
+		defaultMessage: 'Licensed',
+	},
+	loadingLicenseText: {
+		id: 'project.license.loading',
+		defaultMessage: 'Loading license text...',
+	},
+	moderationTab: {
+		id: 'project.moderation.title',
+		defaultMessage: 'Moderation',
+	},
+	monthly: {
+		id: 'project.actions.servers-promo.monthly',
+		defaultMessage: ' / month',
+	},
+	noCollectionsFound: {
+		id: 'project.collections.none-found',
+		defaultMessage: 'No collections found.',
+	},
+	noVersionsAvailable: {
+		id: 'project.download.no-versions-available',
+		defaultMessage: 'No versions available for {gameVersion} and {platform}.',
+	},
+	pageNotFound: {
+		id: 'project.error.page-not-found',
+		defaultMessage: 'The page could not be found',
+	},
+	platformError: {
+		id: 'project.download.platform-error',
+		defaultMessage: 'Error: no platforms found',
+	},
+	platformLabel: {
+		id: 'project.download.platform',
+		defaultMessage: 'Platform: {platform}',
+	},
+	platformTooltip: {
+		id: 'project.download.platform-tooltip',
+		defaultMessage: '{title} is only available for {platform}',
+	},
+	platformUnsupportedTooltip: {
+		id: 'project.download.platform-unsupported-tooltip',
+		defaultMessage: '{title} does not support {platform} for {gameVersion}',
+	},
+	projectIconUpdated: {
+		id: 'project.notification.icon-updated.title',
+		defaultMessage: 'Project icon updated',
+	},
+	projectIconUpdatedMessage: {
+		id: 'project.notification.icon-updated.message',
+		defaultMessage: "Your project's icon has been updated.",
+	},
+	projectNotFound: {
+		id: 'project.error.project-not-found',
+		defaultMessage: 'Project not found',
+	},
+	projectUpdated: {
+		id: 'project.notification.updated.title',
+		defaultMessage: 'Project updated',
+	},
+	projectUpdatedMessage: {
+		id: 'project.notification.updated.message',
+		defaultMessage: 'Your project has been updated.',
+	},
+	reviewEnvironmentSettings: {
+		id: 'project.environment.migration.review-button',
+		defaultMessage: 'Review environment settings',
+	},
+	reviewProject: {
+		id: 'project.actions.review-project',
+		defaultMessage: 'Review project',
+	},
+	searchGameVersions: {
+		id: 'project.download.search-game-versions',
+		defaultMessage: 'Search game versions...',
+	},
+	searchGameVersionsLabel: {
+		id: 'project.download.search-game-versions-label',
+		defaultMessage: 'Search game versions...',
+	},
+	selectGameVersion: {
+		id: 'project.download.select-game-version',
+		defaultMessage: 'Select game version',
+	},
+	selectPlatform: {
+		id: 'project.download.select-platform',
+		defaultMessage: 'Select platform',
+	},
+	serversPromoDescription: {
+		id: 'project.actions.servers-promo.description',
+		defaultMessage: 'Modrinth Servers is the easiest way to play with your friends without hassle!',
+	},
+	serversPromoPricing: {
+		id: 'project.actions.servers-promo.pricing',
+		defaultMessage: 'Starting at $5{monthly}',
+	},
+	serversPromoTitle: {
+		id: 'project.actions.servers-promo.title',
+		defaultMessage: 'Create a server',
+	},
+	settingsTitle: {
+		id: 'project.settings.title',
+		defaultMessage: 'Settings',
+	},
+	showAllVersions: {
+		id: 'project.download.show-all-versions',
+		defaultMessage: 'Show all versions',
+	},
+	versionsTab: {
+		id: 'project.versions.title',
+		defaultMessage: 'Versions',
+	},
+	visitProjectsDashboard: {
+		id: 'project.settings.visit-dashboard',
+		defaultMessage: 'Visit projects dashboard',
+	},
+})
+
 const modalLicense = ref(null)
 const licenseText = ref('')
 
@@ -1115,9 +1330,9 @@ async function getLicenseData(event) {
 
 	try {
 		const text = await useBaseFetch(`tag/license/${project.value.license.id}`)
-		licenseText.value = text.body || 'License text could not be retrieved.'
+		licenseText.value = text.body || formatMessage(messages.licenseErrorMessage)
 	} catch {
-		licenseText.value = 'License text could not be retrieved.'
+		licenseText.value = formatMessage(messages.licenseErrorMessage)
 	}
 }
 
@@ -1153,33 +1368,6 @@ const filteredAlpha = computed(() => {
 	)
 })
 
-const messages = defineMessages({
-	downloadsStat: {
-		id: 'project.stats.downloads-label',
-		defaultMessage: 'download{count, plural, one {} other {s}}',
-	},
-	followersStat: {
-		id: 'project.stats.followers-label',
-		defaultMessage: 'follower{count, plural, one {} other {s}}',
-	},
-	descriptionTab: {
-		id: 'project.description.title',
-		defaultMessage: 'Description',
-	},
-	galleryTab: {
-		id: 'project.gallery.title',
-		defaultMessage: 'Gallery',
-	},
-	versionsTab: {
-		id: 'project.versions.title',
-		defaultMessage: 'Versions',
-	},
-	moderationTab: {
-		id: 'project.moderation.title',
-		defaultMessage: 'Moderation',
-	},
-})
-
 const displayCollectionsSearch = ref('')
 const collections = computed(() =>
 	user.value && user.value.collections
@@ -1199,12 +1387,16 @@ if (
 	throw createError({
 		fatal: true,
 		statusCode: 404,
-		message: 'The page could not be found',
+		message: formatMessage(messages.pageNotFound),
 	})
 }
 
+const projectId = ref(route.params.id)
+
 let project,
-	resetProject,
+	projectV3,
+	resetProjectV2,
+	resetProjectV3,
 	allMembers,
 	resetMembers,
 	dependencies,
@@ -1212,21 +1404,23 @@ let project,
 	versions,
 	organization,
 	resetOrganization,
-	projectError,
+	projectV2Error,
+	projectV3Error,
 	membersError,
 	dependenciesError,
 	featuredVersionsError,
 	versionsError
 try {
 	;[
-		{ data: project, error: projectError, refresh: resetProject },
+		{ data: project, error: projectV2Error, refresh: resetProjectV2 },
+		{ data: projectV3, error: projectV3Error, refresh: resetProjectV3 },
 		{ data: allMembers, error: membersError, refresh: resetMembers },
 		{ data: dependencies, error: dependenciesError },
 		{ data: featuredVersions, error: featuredVersionsError },
 		{ data: versions, error: versionsError },
 		{ data: organization, refresh: resetOrganization },
 	] = await Promise.all([
-		useAsyncData(`project/${route.params.id}`, () => useBaseFetch(`project/${route.params.id}`), {
+		useAsyncData(`project/${projectId.value}`, () => useBaseFetch(`project/${projectId.value}`), {
 			transform: (project) => {
 				if (project) {
 					project.actualProjectType = JSON.parse(JSON.stringify(project.project_type))
@@ -1235,11 +1429,28 @@ try {
 						project.loaders,
 						tags.value,
 					)
+					projectId.value = project.id
+					if (route.params.id !== project.slug) {
+						router.replace({
+							name: route.name,
+							params: {
+								...route.params,
+								id: project.slug,
+							},
+							query: route.query,
+							hash: route.hash,
+						})
+					}
 				}
 
 				return project
 			},
 		}),
+		useAsyncData(`projectV3/${route.params.id}`, () =>
+			useBaseFetch(`project/${route.params.id}`, {
+				apiVersion: 3,
+			}),
+		),
 		useAsyncData(
 			`project/${route.params.id}/members`,
 			() => useBaseFetch(`project/${route.params.id}/members`, { apiVersion: 3 }),
@@ -1274,8 +1485,15 @@ try {
 	throw createError({
 		fatal: true,
 		statusCode: err.statusCode ?? 500,
-		message: 'Error loading project data' + (err.message ? `: ${err.message}` : ''),
+		message: formatMessage(messages.errorLoadingProject, {
+			message: err.message ? `: ${err.message}` : '',
+		}),
 	})
+}
+
+async function resetProject() {
+	await resetProjectV2()
+	await resetProjectV3()
 }
 
 function handleError(err, project = false) {
@@ -1283,12 +1501,16 @@ function handleError(err, project = false) {
 		throw createError({
 			fatal: true,
 			statusCode: err.value.statusCode,
-			message: err.value.statusCode === 404 && project ? 'Project not found' : err.value.message,
+			message:
+				err.value.statusCode === 404 && project
+					? formatMessage(messages.projectNotFound)
+					: err.value.message,
 		})
 	}
 }
 
-handleError(projectError, true)
+handleError(projectV2Error, true)
+handleError(projectV3Error)
 handleError(membersError)
 handleError(dependenciesError)
 handleError(featuredVersionsError)
@@ -1298,7 +1520,7 @@ if (!project.value) {
 	throw createError({
 		fatal: true,
 		statusCode: 404,
-		message: 'Project not found',
+		message: formatMessage(messages.projectNotFound),
 	})
 }
 
@@ -1400,7 +1622,7 @@ const description = computed(
 	() =>
 		`${project.value.description} - Download the Minecraft ${projectTypeDisplay.value} ${
 			project.value.title
-		} by ${members.value.find((x) => x.is_owner)?.user?.username || 'a Creator'} on Modrinth`,
+		} by ${members.value.find((x) => x.is_owner)?.user?.username || 'a creator'} on Modrinth`,
 )
 
 const canCreateServerFrom = computed(() => {
@@ -1454,7 +1676,7 @@ async function setProcessing() {
 		project.value.status = 'processing'
 	} catch (err) {
 		addNotification({
-			title: 'An error occurred',
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
@@ -1487,15 +1709,15 @@ async function patchProject(resData, quiet = false) {
 		result = true
 		if (!quiet) {
 			addNotification({
-				title: 'Project updated',
-				text: 'Your project has been updated.',
+				title: formatMessage(messages.projectUpdated),
+				text: formatMessage(messages.projectUpdatedMessage),
 				type: 'success',
 			})
 			window.scrollTo({ top: 0, behavior: 'smooth' })
 		}
 	} catch (err) {
 		addNotification({
-			title: 'An error occurred',
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
@@ -1524,13 +1746,13 @@ async function patchIcon(icon) {
 		await resetProject()
 		result = true
 		addNotification({
-			title: 'Project icon updated',
-			text: "Your project's icon has been updated.",
+			title: formatMessage(messages.projectIconUpdated),
+			text: formatMessage(messages.projectIconUpdatedMessage),
 			type: 'success',
 		})
 	} catch (err) {
 		addNotification({
-			title: 'An error occurred',
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
@@ -1626,7 +1848,7 @@ const navLinks = computed(() => {
 			shown: project.value.gallery.length > 0 || !!currentMember.value,
 		},
 		{
-			label: 'Changelog',
+			label: formatMessage(messages.changelogTab),
 			href: `${projectUrl}/changelog`,
 			shown: versions.value.length > 0,
 		},
@@ -1642,6 +1864,12 @@ const navLinks = computed(() => {
 			shown: !!currentMember.value,
 		},
 	]
+})
+
+provideProjectPageContext({
+	projectV2: project,
+	projectV3,
+	refreshProject: resetProject,
 })
 </script>
 
