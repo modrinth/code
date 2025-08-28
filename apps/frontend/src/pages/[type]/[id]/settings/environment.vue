@@ -32,12 +32,13 @@ const needsToVerify = computed(
 		supportsEnvironment.value,
 )
 
-const originalEnv =
-	projectV3.value.environment?.length === 1 ? projectV3.value.environment[0] : undefined
+function getInitialEnv() {
+	return projectV3.value.environment?.length === 1 ? projectV3.value.environment[0] : undefined
+}
 
 const { saved, current, reset, save } = useSavable(
 	() => ({
-		environment: originalEnv,
+		environment: getInitialEnv(),
 		side_types_migration_review_status: projectV3.value.side_types_migration_review_status,
 	}),
 	({ environment, side_types_migration_review_status }) => {
@@ -52,6 +53,7 @@ const { saved, current, reset, save } = useSavable(
 )
 // Set current to reviewed, which will trigger unsaved changes popup.
 // It should not be possible to save without reviewing it.
+const originalEnv = getInitialEnv()
 if (originalEnv && originalEnv !== 'unknown') {
 	current.value.side_types_migration_review_status = 'reviewed'
 }
