@@ -45,18 +45,14 @@
 						open-direction="top"
 						:show-labels="false"
 					/>
-					<Checkbox
-						v-model="showSnapshots"
-						class="filter-checkbox"
-            label="Show all versions"
-					/>
+					<Checkbox v-model="showSnapshots" class="filter-checkbox" label="Show all versions" />
 				</div>
 			</div>
-      <div v-if="loader !== 'vanilla'" class="input-row">
+			<div v-if="loader !== 'vanilla'" class="input-row">
 				<p class="input-label">Loader version</p>
 				<Chips v-model="loader_version" :items="['stable', 'latest', 'other']" />
 			</div>
-      <div v-if="loader_version === 'other' && loader !== 'vanilla'">
+			<div v-if="loader_version === 'other' && loader !== 'vanilla'">
 				<div v-if="game_version" class="input-row">
 					<p class="input-label">Select version</p>
 					<multiselect
