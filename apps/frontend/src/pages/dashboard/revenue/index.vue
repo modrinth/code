@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-8 p-2">
+	<div class="mb-6 flex flex-col gap-8 p-2">
 		<div class="flex flex-col gap-5">
 			<div class="flex flex-col">
 				<span class="text-2xl font-semibold text-contrast">Balance</span>
@@ -39,12 +39,12 @@
 							:class="[date.stripeClass, date.highlightClass]"
 						></span>
 						Estimated {{ date.date ? dayjs(date.date).format('MMM D, YYYY') : '' }}
-						<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']">
+						<Tooltip :triggers="['hover', 'focus']">
 							<nuxt-link class="align-middle text-link" to="/legal/cmp-info#pending">
 								<UnknownIcon />
 							</nuxt-link>
 							<template #popper>
-								<div class="w-[250px] font-normal text-primary">
+								<div class="w-[250px] font-semibold text-contrast">
 									Estimated revenue may be subject to change until it is made available.<br /><br />Click
 									to read about how Modrinth handles your revenue.
 								</div>
@@ -61,10 +61,10 @@
 							class="zone--striped-small zone--striped--gray my-auto block size-4 rounded-full bg-button-bg"
 						></span>
 						Processing
-						<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']">
+						<Tooltip :triggers="['hover', 'focus']">
 							<InProgressIcon class="my-auto" />
 							<template #popper>
-								<div class="w-[250px] font-normal text-primary">
+								<div class="w-[250px] font-semibold text-contrast">
 									Revenue stays in processing until the end of the month, then becomes available 60
 									days later.
 								</div>
@@ -77,14 +77,79 @@
 				</div>
 			</div>
 		</div>
-		<div>
+		<div class="flex flex-col gap-4">
 			<span class="text-3xl font-semibold text-contrast">Withdraw</span>
+			<div class="grid grid-cols-3 gap-x-4 gap-y-2">
+				<button
+					class="flex flex-col rounded-2xl bg-brand p-5 text-inverted shadow-xl brightness-90 transition-all duration-200 hover:brightness-105"
+				>
+					<div class="flex flex-row justify-between">
+						<span class="text-lg font-semibold">Withdraw</span>
+						<ArrowUpRightIcon class="my-auto size-4" />
+					</div>
+					<div class="text-left">Withdraw from your available balance to any payout method.</div>
+				</button>
+				<button
+					class="flex flex-col rounded-2xl bg-button-bg p-5 shadow-xl brightness-90 transition-all duration-200 hover:brightness-105"
+				>
+					<div class="flex flex-row justify-between">
+						<span class="text-lg font-semibold text-contrast">PayPal</span>
+						<ArrowUpRightIcon class="my-auto size-4" />
+					</div>
+					<div class="text-left text-primary">
+						Withdraw from your available balance to PayPal again.
+					</div>
+				</button>
+			</div>
+			<span class="text-sm text-secondary"
+				>By uploading projects to Modrinth and withdrawing money from your account, you agree to the
+				<nuxt-link class="text-link" to="/legal/cmp">Rewards Program Terms</nuxt-link>. Learn more
+				about the
+				<nuxt-link class="text-link" to="/legal/cmp-info">Reward Program</nuxt-link>.</span
+			>
+		</div>
+		<div class="flex flex-col gap-4">
+			<div class="flex flex-row justify-between">
+				<span class="text-3xl font-semibold text-contrast">Transactions</span>
+				<nuxt-link
+					class="my-auto font-semibold text-contrast underline underline-offset-2"
+					to="/dashboard/revenue/transfers"
+					>See all</nuxt-link
+				>
+			</div>
+			<div v-for="transaction in sortedPayouts.slice(0, 3)" class="flex flex-row gap-3">
+				<div
+					class="flex size-12 justify-center rounded-full border-[1px] border-solid border-button-bg bg-bg-raised shadow-md"
+				>
+					<ArrowUpIcon class="my-auto size-8 text-contrast" />
+				</div>
+				<div class="flex w-full flex-row justify-between">
+					<div class="flex flex-col">
+						<span class="text-lg font-semibold text-contrast">{{
+							formatMethodName(transaction.method)
+						}}</span>
+						<span class="text-secondary"
+							>{{ formatTransactionStatus(transaction.status) }} |
+							{{ dayjs(transaction.created).format('MMM DD YYYY') }}</span
+						>
+					</div>
+					<span class="my-auto text-2xl font-bold text-contrast">{{
+						formatMoney(transaction.amount)
+					}}</span>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
 <script setup lang="ts">
-import { InProgressIcon, UnknownIcon } from '@modrinth/assets'
-import { formatMoney } from '@modrinth/utils'
+import { ArrowUpIcon, ArrowUpRightIcon, InProgressIcon, UnknownIcon } from '@modrinth/assets'
+import {
+	capitalizeString,
+	formatMoney,
+	type PayoutList,
+	type PayoutMethodType,
+	type PayoutStatus,
+} from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
 
@@ -102,10 +167,51 @@ type RevenueBarSegment = {
 	amount: number
 }
 
+function formatTransactionStatus(status: PayoutStatus) {
+	switch (status) {
+		case 'in-transit':
+			return 'In Transit'
+		default:
+			return capitalizeString(status)
+	}
+}
+
+function formatMethodName(method: PayoutMethodType | null) {
+	if (!method) return 'Unknown'
+	switch (method) {
+		case 'paypal':
+			return 'PayPal'
+		case 'venmo':
+			return 'Venmo'
+		case 'tremendous':
+			return 'Tremendous'
+		default:
+			return capitalizeString(method)
+	}
+}
+
+const flags = useFeatureFlags()
+
 const { data: userBalance } = await useAsyncData(
 	`payout/balance`,
 	() => useBaseFetch(`payout/balance`, { apiVersion: 3 }) as Promise<UserBalanceResponse>,
 )
+
+const { data: payouts } = await useAsyncData<PayoutList>(
+	`payout`,
+	() =>
+		useBaseFetch(`payout`, {
+			apiVersion: 3,
+		}) as Promise<PayoutList>,
+)
+
+const sortedPayouts = computed<PayoutList>(() => {
+	if (!payouts.value) return []
+
+	return payouts.value.sort((a, b) => {
+		return new Date(b.created).getTime() - new Date(a.created).getTime()
+	})
+})
 
 const totalAvailable = computed(() => (userBalance.value ? Number(userBalance.value.available) : 0))
 const nextDate = computed<{ date: string; amount: number }[]>(() => {
@@ -278,19 +384,5 @@ $striped-colors: 'green', 'blue', 'purple', 'orange', 'red';
 	background-size: 6.19px 6.19px !important;
 	background-position: unset !important;
 	background-attachment: unset !important;
-}
-
-:deep(.v-popper--theme-dismissable-prompt) {
-	.v-popper__inner {
-		border: none !important;
-	}
-
-	.v-popper__arrow-outer {
-		border-color: transparent !important;
-	}
-
-	.v-popper__arrow-inner {
-		border-color: var(--color-raised-bg) !important;
-	}
 }
 </style>
