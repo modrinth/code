@@ -15,7 +15,7 @@
 							class="iconified-button raised-button"
 							prompt="Replace"
 							:accept="acceptFileTypes"
-							:max-size="524288000"
+							:max-size="5242880"
 							should-always-reset
 							aria-label="Replace image"
 							@change="
@@ -197,7 +197,7 @@
 		</div>
 		<div v-if="currentMember" class="card header-buttons">
 			<FileInput
-				:max-size="524288000"
+				:max-size="5242880"
 				:accept="acceptFileTypes"
 				prompt="Upload an image"
 				aria-label="Upload an image"
