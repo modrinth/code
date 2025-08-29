@@ -1,9 +1,10 @@
 use proc_macro::TokenStream;
-use quote::{quote, ToTokens, TokenStreamExt};
+use quote::{format_ident, quote, quote_spanned, IdentFragment, ToTokens, TokenStreamExt};
 use std::collections::HashMap;
 use std::mem;
+use proc_macro2::Span;
 use syn::parse::{Parse, ParseStream};
-use syn::{parenthesized, Attribute, Data, DeriveInput, Error, Fields, Ident, LitStr, Member, Result, Token, Variant};
+use syn::{parenthesized, Attribute, Data, DeriveInput, Error, Fields, Ident, Index, LitStr, Member, Result, Token, Variant};
 
 pub fn generate_impls(input: DeriveInput) -> Result<TokenStream> {
     let enum_name = input.ident;
@@ -19,7 +20,7 @@ pub fn generate_impls(input: DeriveInput) -> Result<TokenStream> {
 
     let translation_id_cases = variants.iter().map(|variant| {
         let name = &variant.name;
-        let pattern_format = variant.pattern_format;
+        let pattern_format = &variant.pattern_format;
         let id = variant.translation_id.as_ref().unwrap();
         quote! {
             Self::#name #pattern_format => #id,
@@ -28,7 +29,7 @@ pub fn generate_impls(input: DeriveInput) -> Result<TokenStream> {
 
     let message_cases = variants.iter().map(|variant| {
         let name = &variant.name;
-        let pattern_format = variant.pattern_format;
+        let pattern_format = &variant.pattern_format;
         let message_key = format!("{i18n_root_key}.{}", variant.translation_id.as_ref().unwrap().value());
         let params = variant.translate_fields
             .as_ref()
@@ -37,7 +38,7 @@ pub fn generate_impls(input: DeriveInput) -> Result<TokenStream> {
             .iter()
             .map(|(param_name, field)| quote! { #param_name = #field });
         quote! {
-            x @ Self::#name #pattern_format =>
+            Self::#name #pattern_format =>
                 ::rust_i18n::t!(#message_key, locale = locale, #(#params),*),
         }
     });
@@ -59,7 +60,7 @@ pub fn generate_impls(input: DeriveInput) -> Result<TokenStream> {
 
         impl ::std::fmt::Display for #enum_name {
             fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-                write!(f, "{}", self.translated_message("en"))
+                f.write_str(&self.translated_message("en"))
             }
         }
     }
@@ -116,23 +117,24 @@ impl VariantData {
             translate_fields: translate_fields.unwrap_or_else(|| Ok(Default::default())),
 
             name,
-            pattern_format: PatternFormat::from_variant(&variant.fields),
+            pattern_format: PatternFormat::from_fields(variant.fields),
         }
     }
 }
 
-#[derive(Copy, Clone)]
 enum PatternFormat {
-    Named,
-    Tuple,
+    Named(Vec<Ident>),
+    Tuple(usize),
     Unit,
 }
 
 impl PatternFormat {
-    fn from_variant(fields: &Fields) -> Self {
+    fn from_fields(fields: Fields) -> Self {
         match fields {
-            Fields::Named(_) => Self::Named,
-            Fields::Unnamed(_) => Self::Tuple,
+            Fields::Named(named) => Self::Named(
+                named.named.into_iter().map(|x| x.ident.unwrap()).collect()
+            ),
+            Fields::Unnamed(unnamed) => Self::Tuple(unnamed.unnamed.len()),
             Fields::Unit => Self::Unit,
         }
     }
@@ -141,8 +143,15 @@ impl PatternFormat {
 impl ToTokens for PatternFormat {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         match self {
-            PatternFormat::Named => tokens.append_all(quote! { { .. } }),
-            PatternFormat::Tuple => tokens.append_all(quote! { (..) }),
+            PatternFormat::Named(names) => tokens.append_all(quote! {
+                { #(#names),* }
+            }),
+            PatternFormat::Tuple(length) => {
+                let names = (0..*length).map(|x| format_ident!("_{x}"));
+                tokens.append_all(quote! {
+                    ( #(#names),* )
+                });
+            },
             PatternFormat::Unit => {}
         }
     }
@@ -166,21 +175,23 @@ impl Parse for TranslateFields {
 struct TranslateField {
     member: Member,
     translated: bool,
+    span: Span,
 }
 
 impl ToTokens for TranslateField {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
-        let member = &self.member;
-        let new_tokens = if self.translated {
-            quote! {
-                ::ariadne::i18n::I18nEnum::translated_message(&self.#member, locale)
-            }
-        } else {
-            quote! {
-                self.#member
-            }
+        let member = match &self.member {
+            Member::Named(ident) => ident.to_token_stream(),
+            Member::Unnamed(Index { index, span }) => format_ident!("_{index}", span = *span).to_token_stream(),
         };
-        tokens.append_all(new_tokens);
+        let span = self.span;
+        if self.translated {
+            tokens.append_all(quote_spanned! {span=>
+                ::ariadne::i18n::I18nEnum::translated_message(&#member, locale)
+            });
+        } else {
+            member.to_tokens(tokens)
+        }
     }
 }
 
@@ -190,17 +201,24 @@ impl Parse for TranslateField {
             syn::custom_keyword!(translate);
         }
         let translated = input.peek(kw::translate);
-        let member = if translated {
-            input.parse::<kw::translate>()?;
+        let member: Member;
+        let span: Span;
+        if translated {
+            let keyword = input.parse::<kw::translate>()?;
             let content;
-            parenthesized!(content in input);
-            content.parse()
+            let parens = parenthesized!(content in input);
+            member = content.parse()?;
+            span = keyword.span.join(parens.span.join())
+                .or_else(|| member.span())
+                .unwrap();
         } else {
-            input.parse()
-        }?;
+            member = input.parse()?;
+            span = member.span().unwrap();
+        }
         Ok(Self {
             member,
             translated,
+            span,
         })
     }
 }
