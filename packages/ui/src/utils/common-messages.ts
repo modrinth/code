@@ -331,6 +331,14 @@ export const commonProjectSettingsMessages = defineMessages({
 		id: 'project.settings.members.title',
 		defaultMessage: 'Members',
 	},
+	noPermissionDescription: {
+		id: 'project.settings.notice.no-permission.description',
+		defaultMessage: `You don't have permission to edit this.`,
+	},
+	noPermissionTitle: {
+		id: 'project.settings.notice.no-permission.title',
+		defaultMessage: 'No permission',
+	},
 	tags: {
 		id: 'project.settings.tags.title',
 		defaultMessage: 'Tags',

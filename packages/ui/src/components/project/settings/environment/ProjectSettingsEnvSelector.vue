@@ -9,6 +9,15 @@ const { formatMessage } = useVIntl()
 
 const value = defineModel<EnvironmentV3 | undefined>({ required: true })
 
+withDefaults(
+	defineProps<{
+		disabled?: boolean
+	}>(),
+	{
+		disabled: false,
+	},
+)
+
 type EnvironmentRadioOption = {
 	title: MessageDescriptor
 	description?: MessageDescriptor
@@ -224,6 +233,7 @@ const simulateSave = ref(false)
 			class="!w-full"
 			:class="{ 'mt-2': index > 0 }"
 			:selected="currentOuterOption === key"
+			:disabled="disabled"
 			@select="
 				() => {
 					if (currentOuterOption !== key) {
@@ -252,6 +262,7 @@ const simulateSave = ref(false)
 					'opacity-50': currentOuterOption !== key,
 				}"
 				:selected="currentSubOption === suboptionKey"
+				:disabled="disabled"
 				@select="
 					() => {
 						currentOuterOption = key

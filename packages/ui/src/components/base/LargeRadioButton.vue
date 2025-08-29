@@ -1,7 +1,13 @@
 <template>
 	<button
-		class="px-4 py-3 text-left border-0 font-medium border-2 border-button-bg border-solid flex gap-2 transition-all cursor-pointer active:scale-[0.98] hover:bg-button-bg hover:brightness-[--hover-brightness] rounded-xl"
-		:class="selected ? 'text-contrast bg-button-bg' : 'text-primary bg-transparent'"
+		class="px-4 py-3 text-left border-0 font-medium border-2 border-button-bg border-solid flex gap-2 transition-all cursor-pointer rounded-xl"
+		:class="
+			(selected ? 'text-contrast bg-button-bg' : 'text-primary bg-transparent') +
+			(disabled
+				? ' opacity-50'
+				: ' active:scale-[0.98] hover:bg-button-bg hover:brightness-[--hover-brightness]')
+		"
+		:disabled="disabled"
 		@click="emit('select')"
 	>
 		<RadioButtonCheckedIcon v-if="selected" class="text-brand h-5 w-5 shrink-0" />
@@ -16,7 +22,13 @@ const emit = defineEmits<{
 	(e: 'select'): void
 }>()
 
-defineProps<{
-	selected: boolean
-}>()
+withDefaults(
+	defineProps<{
+		selected: boolean
+		disabled?: boolean
+	}>(),
+	{
+		disabled: false,
+	},
+)
 </script>

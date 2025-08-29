@@ -14,7 +14,7 @@ import { defineMessages, useVIntl } from '@vintl/vintl'
 
 const { formatMessage } = useVIntl()
 
-const { projectV2, projectV3, refreshProject } = injectProjectPageContext()
+const { currentMember, projectV2, projectV3, refreshProject } = injectProjectPageContext()
 const { handleError } = injectNotificationManager()
 const api = injectApi()
 
@@ -31,6 +31,11 @@ const needsToVerify = computed(
 		projectV3.value.environment?.[0] !== 'unknown' &&
 		supportsEnvironment.value,
 )
+
+const hasPermission = computed(() => {
+	const EDIT_DETAILS = 1 << 2
+	return (currentMember.value?.permissions & EDIT_DETAILS) === EDIT_DETAILS
+})
 
 function getInitialEnv() {
 	return projectV3.value.environment?.length === 1 ? projectV3.value.environment[0] : undefined
@@ -106,7 +111,7 @@ const messages = defineMessages({
 <template>
 	<div>
 		<UnsavedChangesPopup
-			v-if="supportsEnvironment"
+			v-if="supportsEnvironment && hasPermission"
 			:original="saved"
 			:modified="current"
 			:saving="saving"
@@ -125,40 +130,43 @@ const messages = defineMessages({
 				v-if="!supportsEnvironment"
 				type="critical"
 				:header="formatMessage(messages.wrongProjectTypeTitle)"
+				:body="formatMessage(messages.wrongProjectTypeDescription)"
 				class="mb-3"
-			>
-				{{ formatMessage(messages.wrongProjectTypeDescription) }}
-			</Admonition>
+			/>
 			<template v-else>
 				<Admonition
-					v-if="
+					v-if="!hasPermission"
+					type="critical"
+					:header="formatMessage(commonProjectSettingsMessages.noPermissionTitle)"
+					:body="formatMessage(commonProjectSettingsMessages.noPermissionDescription)"
+					class="mb-3"
+				/>
+				<Admonition
+					v-else-if="
 						!projectV3.environment ||
 						projectV3.environment.length === 0 ||
 						projectV3.environment[0] === 'unknown'
 					"
 					type="critical"
 					:header="formatMessage(messages.missingEnvTitle)"
+					:body="formatMessage(messages.missingEnvDescription)"
 					class="mb-3"
-				>
-					{{ formatMessage(messages.missingEnvDescription) }}
-				</Admonition>
+				/>
 				<Admonition
 					v-else-if="projectV3.environment.length > 1"
 					type="info"
 					:header="formatMessage(messages.multipleEnvironmentsTitle)"
+					:body="formatMessage(messages.multipleEnvironmentsDescription)"
 					class="mb-3"
-				>
-					{{ formatMessage(messages.multipleEnvironmentsDescription) }}
-				</Admonition>
+				/>
 				<Admonition
 					v-else-if="needsToVerify"
 					type="warning"
 					:header="formatMessage(messages.reviewOptionsTitle)"
+					:body="formatMessage(messages.reviewOptionsDescription)"
 					class="mb-3"
-				>
-					{{ formatMessage(messages.reviewOptionsDescription) }}
-				</Admonition>
-				<ProjectSettingsEnvSelector v-model="current.environment" />
+				/>
+				<ProjectSettingsEnvSelector v-model="current.environment" :disabled="!hasPermission" />
 			</template>
 		</div>
 	</div>

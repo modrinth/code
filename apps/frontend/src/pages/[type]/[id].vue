@@ -764,7 +764,16 @@
 				>
 					{{ formatMessage(messages.environmentMigrationMessage) }}
 					<ButtonStyled color="orange">
-						<nuxt-link :to="`/project/${project.id}/settings/environment`" class="mt-3 w-fit">
+						<nuxt-link
+							v-tooltip="
+								hasEditDetailsPermission
+									? undefined
+									: formatMessage(commonProjectSettingsMessages.noPermissionDescription)
+							"
+							:to="`/project/${project.id}/settings/environment`"
+							class="mt-3 w-fit"
+							:disabled="!hasEditDetailsPermission"
+						>
 							<SettingsIcon /> {{ formatMessage(messages.reviewEnvironmentSettings) }}
 						</nuxt-link>
 					</ButtonStyled>
@@ -957,6 +966,7 @@ import {
 	ButtonStyled,
 	Checkbox,
 	commonMessages,
+	commonProjectSettingsMessages,
 	injectNotificationManager,
 	NewModal,
 	OverflowMenu,
@@ -1589,6 +1599,11 @@ const currentMember = computed(() => {
 	return val
 })
 
+const hasEditDetailsPermission = computed(() => {
+	const EDIT_DETAILS = 1 << 2
+	return (currentMember.value?.permissions & EDIT_DETAILS) === EDIT_DETAILS
+})
+
 versions.value = data.$computeVersions(versions.value, allMembers.value)
 
 // Q: Why do this instead of computing the versions of featuredVersions?
@@ -1870,6 +1885,7 @@ provideProjectPageContext({
 	projectV2: project,
 	projectV3,
 	refreshProject: resetProject,
+	currentMember,
 })
 </script>
 

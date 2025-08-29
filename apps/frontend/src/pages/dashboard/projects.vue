@@ -456,9 +456,8 @@ if (user.value?.projects) {
 	projects.value = updateSort(user.value.projects, 'Name', false)
 	user.value?.projectsV3?.forEach((project) => {
 		if (
-			(project.side_types_migration_review_status === 'pending' &&
-				project.project_types.includes('mod')) ||
-			project.project_types.includes('modpack')
+			project.side_types_migration_review_status === 'pending' &&
+			(project.project_types.includes('mod') || project.project_types.includes('modpack'))
 		) {
 			projectsWithMigrationWarning.value.push(project.id)
 		}

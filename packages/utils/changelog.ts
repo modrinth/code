@@ -11,6 +11,13 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-08-28T18:45:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Fixed modpacks showing an environment migration warning perpetually.
+- Fixed environment settings being unclear about permissions.`,
+	},
+	{
 		date: `2025-08-28T16:50:00-07:00`,
 		product: 'web',
 		body: `### Improvements
