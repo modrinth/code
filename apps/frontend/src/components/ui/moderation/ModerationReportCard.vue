@@ -259,7 +259,7 @@ const reportItemUrl = computed(() => {
 		case 'project':
 			return `/${props.report.project?.project_type}/${props.report.project?.slug}`
 		case 'version':
-			return `/${props.report.project?.project_type}/${props.report.project?.slug}/versions/${props.report.version?.id}`
+			return `/${props.report.project?.project_type}/${props.report.project?.slug}/version/${props.report.version?.id}`
 		default:
 			return `/${props.report.item_type}/${props.report.id}`
 	}
