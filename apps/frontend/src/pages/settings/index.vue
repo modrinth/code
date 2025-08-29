@@ -294,7 +294,7 @@ const toggleFeatures = defineMessages({
   advancedRenderingDescription: {
     id: "settings.display.sidebar.advanced-rendering.description",
     defaultMessage:
-      "Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering.",
+      "Enables advanced rendering such as blur-sm effects that may cause performance issues without hardware-accelerated rendering.",
   },
   externalLinksNewTabTitle: {
     id: "settings.display.sidebar.external-links-new-tab.title",

@@ -91,7 +91,7 @@ function setInterval(newInterval: ServerBillingInterval) {
 
 <template>
   <div class="grid sm:grid-cols-[3fr_2fr] gap-4">
-    <div class="bg-table-alternateRow p-4 rounded-2xl">
+    <div class="bg-table-alternate-row p-4 rounded-2xl">
       <div class="flex items-center gap-2 mb-3">
         <LazyUiServersModrinthServersIcon class="flex h-5 w-fit" />
         <TagItem>{{ planName }}</TagItem>
@@ -99,7 +99,7 @@ function setInterval(newInterval: ServerBillingInterval) {
       <div>
         <ServersSpecs
           v-if="plan.metadata && plan.metadata.ram && plan.metadata.storage && plan.metadata.cpu"
-          class="!grid sm:grid-cols-2"
+          class="grid! sm:grid-cols-2"
           :ram="plan.metadata.ram"
           :storage="plan.metadata.storage"
           :cpus="plan.metadata.cpu"
@@ -107,11 +107,11 @@ function setInterval(newInterval: ServerBillingInterval) {
       </div>
     </div>
     <div
-      class="bg-table-alternateRow p-4 rounded-2xl flex flex-col gap-2 items-center justify-center"
+      class="bg-table-alternate-row p-4 rounded-2xl flex flex-col gap-2 items-center justify-center"
     >
       <img
         v-if="flag"
-        class="aspect-[16/10] max-w-12 w-full object-cover rounded-md border-1 border-button-border border-solid"
+        class="aspect-16/10 max-w-12 w-full object-cover rounded-md border border-button-border border-solid"
         :src="flag"
         alt=""
         aria-hidden="true"
@@ -149,7 +149,7 @@ function setInterval(newInterval: ServerBillingInterval) {
           ? 'bg-button-bg border-transparent'
           : 'bg-transparent  border-button-border'
       "
-      class="rounded-2xl active:scale-[0.98] transition-transform duration-100 border-2 border-solid p-4 flex items-center gap-2"
+      class="rounded-2xl active:scale-[0.98] transition-transform duration-100 border-2 p-4 flex items-center gap-2"
       @click="setInterval('monthly')"
     >
       <RadioButtonCheckedIcon v-if="interval === 'monthly'" class="size-6 text-brand" />
@@ -170,7 +170,7 @@ function setInterval(newInterval: ServerBillingInterval) {
           ? 'bg-button-bg border-transparent'
           : 'bg-transparent  border-button-border'
       "
-      class="rounded-2xl active:scale-[0.98] transition-transform duration-100 border-2 border-solid p-4 flex items-center gap-2"
+      class="rounded-2xl active:scale-[0.98] transition-transform duration-100 border-2 p-4 flex items-center gap-2"
       @click="setInterval('quarterly')"
     >
       <RadioButtonCheckedIcon v-if="interval === 'quarterly'" class="size-6 text-brand" />
@@ -178,7 +178,7 @@ function setInterval(newInterval: ServerBillingInterval) {
       <div class="flex flex-col items-start gap-1 font-medium text-primary">
         <span class="flex items-center gap-1" :class="{ 'text-contrast': interval === 'quarterly' }"
           >Pay quarterly
-          <span class="text-xs font-bold text-brand px-1.5 py-0.5 rounded-full bg-brand-highlight"
+          <span class="text-xs font-bold text-brand px-1.5 py-0.5 rounded-full bg-highlight-brand"
             >{{ interval === 'quarterly' ? 'Saving' : 'Save' }} 16%</span
           ></span
         >
@@ -256,7 +256,7 @@ function setInterval(newInterval: ServerBillingInterval) {
     <a
       href="https://www.minecraft.net/en-us/eula"
       target="_blank"
-      class="text-brand underline hover:brightness-[--hover-brightness]"
+      class="text-brand underline hover:brightness-(--hover-brightness)"
       >Minecraft EULA<ExternalIcon class="size-3 shrink-0 ml-0.5 mb-0.5"
     /></a>
   </div>

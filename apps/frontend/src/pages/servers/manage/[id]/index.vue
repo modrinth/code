@@ -1,13 +1,13 @@
 <template>
-  <div class="relative flex select-none flex-col gap-6" data-pyro-server-manager-root>
+  <div class="relative flex flex-col gap-6 select-none" data-pyro-server-manager-root>
     <div
       v-if="inspectingError && isConnected && !isWsAuthIncorrect"
       data-pyro-servers-inspecting-error
-      class="flex justify-between rounded-2xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
+      class="border-red bg-bg-red text-contrast flex justify-between rounded-2xl border-2 p-4 font-semibold"
     >
       <div class="flex w-full justify-between gap-2">
         <div v-if="inspectingError.analysis.problems.length" class="flex flex-row gap-4">
-          <IssuesIcon class="hidden h-8 w-8 text-red sm:block" />
+          <IssuesIcon class="text-red hidden h-8 w-8 sm:block" />
 
           <div class="flex flex-col gap-2">
             <div class="font-semibold">
@@ -32,7 +32,7 @@
           </div>
         </div>
         <div v-else-if="props.serverPowerState === 'crashed'" class="flex flex-row gap-4">
-          <IssuesIcon class="hidden h-8 w-8 text-red sm:block" />
+          <IssuesIcon class="text-red hidden h-8 w-8 sm:block" />
 
           <div class="flex flex-col gap-2">
             <div class="font-semibold">{{ serverData?.name }} shut down unexpectedly.</div>
@@ -57,7 +57,7 @@
           </div>
         </div>
         <div v-else class="flex flex-row gap-4">
-          <IssuesIcon class="hidden h-8 w-8 text-red sm:block" />
+          <IssuesIcon class="text-red hidden h-8 w-8 sm:block" />
 
           <div class="flex flex-col gap-2">
             <div class="font-semibold">{{ serverData?.name }} shut down unexpectedly.</div>
@@ -81,12 +81,12 @@
       />
 
       <div
-        class="relative flex h-[700px] w-full flex-col gap-3 overflow-hidden rounded-2xl border border-divider bg-bg-raised p-4 transition-all duration-300 ease-in-out md:p-8"
+        class="border-divider bg-bg-raised relative flex h-[700px] w-full flex-col gap-3 overflow-hidden rounded-2xl border p-4 transition-all duration-300 ease-in-out md:p-8"
         :class="{ 'border-0': !isConnected || isWsAuthIncorrect }"
       >
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-4">
-            <h2 class="m-0 text-3xl font-extrabold text-contrast">Console</h2>
+            <h2 class="text-contrast m-0 text-3xl font-extrabold">Console</h2>
             <UiServersPanelServerStatus
               v-if="isConnected && !isWsAuthIncorrect"
               :state="serverPowerState"
@@ -103,7 +103,7 @@
               v-if="suggestions.length && isConnected && !isWsAuthIncorrect"
               id="command-suggestions"
               ref="suggestionsList"
-              class="mt-1 max-h-60 w-full list-none overflow-auto rounded-md border border-divider bg-bg-raised p-0 shadow-lg"
+              class="border-divider bg-bg-raised mt-1 max-h-60 w-full list-none overflow-auto rounded-md border p-0 shadow-lg"
               role="listbox"
             >
               <li
@@ -125,14 +125,14 @@
             <div class="relative flex items-center">
               <span
                 v-if="bestSuggestion && isConnected && !isWsAuthIncorrect"
-                class="pointer-events-none absolute left-[26px] transform select-none text-gray-400"
+                class="pointer-events-none absolute left-[26px] transform text-gray-400 select-none"
               >
                 <span class="ml-[23.5px] whitespace-pre">{{
                   " ".repeat(commandInput.length - 1)
                 }}</span>
                 <span> {{ bestSuggestion }} </span>
                 <button
-                  class="text pointer-events-auto ml-2 cursor-pointer rounded-md border-none bg-white text-sm focus:outline-none dark:bg-highlight"
+                  class="text dark:bg-highlight pointer-events-auto ml-2 cursor-pointer rounded-md border-none bg-white text-sm focus:outline-hidden"
                   aria-label="Accept suggestion"
                   style="transform: translateY(-1px)"
                   @click="acceptSuggestion"
@@ -141,7 +141,7 @@
                 </button>
               </span>
               <div
-                class="pointer-events-none absolute left-0 top-0 flex h-full w-full items-center"
+                class="pointer-events-none absolute top-0 left-0 flex h-full w-full items-center"
               >
                 <TerminalSquareIcon class="ml-3 h-5 w-5" />
               </div>
@@ -150,7 +150,7 @@
                 v-model="commandInput"
                 type="text"
                 placeholder="Send a command"
-                class="w-full rounded-md !pl-10 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
+                class="[&&]:border-bg-raised [&&]:bg-bg w-full rounded-md pt-4 pl-10! focus:border-none [&&]:border [&&]:border-solid"
                 aria-autocomplete="list"
                 aria-controls="command-suggestions"
                 spellcheck="false"
@@ -165,7 +165,7 @@
                 disabled
                 type="text"
                 placeholder="Send a command"
-                class="w-full rounded-md !pl-10 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
+                class="[&&]:border-bg-raised [&&]:bg-bg w-full rounded-md pl-10! focus:border-none [&&]:border [&&]:border-solid"
               />
             </div>
           </div>
@@ -175,7 +175,7 @@
 
     <div
       v-if="isWsAuthIncorrect"
-      class="absolute inset-0 flex flex-col items-center justify-center bg-bg"
+      class="bg-bg absolute inset-0 flex flex-col items-center justify-center"
     >
       <h2>Could not connect to the server.</h2>
       <p>

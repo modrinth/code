@@ -2,7 +2,7 @@
   <div>
     <div class="landing-hero">
       <ModrinthIcon class="modrinth-icon text-brand" />
-      <h1 class="main-header">
+      <h1 class="main-header text-red!important">
         The place for Minecraft
         <div class="animate-strong">
           <span>
@@ -64,7 +64,7 @@
           </div>
         </div>
       </div>
-      <div v-else class="relative z-[10] w-full text-center text-xl font-bold text-contrast">
+      <div v-else class="text-contrast relative z-10 w-full text-center text-xl font-bold">
         Failed to load random projects :(
       </div>
       <div class="projects-transition" />

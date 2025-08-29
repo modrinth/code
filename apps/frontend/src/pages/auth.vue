@@ -88,7 +88,7 @@ definePageMeta({
   display: flex;
   justify-content: center;
   overflow: hidden;
-  border-radius: var(--radius-md);
+  border-radius: 0.75rem;
   border: 2px solid var(--color-button-bg);
   height: 65px;
   width: 100%;

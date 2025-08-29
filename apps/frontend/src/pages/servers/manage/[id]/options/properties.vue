@@ -1,25 +1,25 @@
 <template>
-  <div class="relative h-full w-full select-none overflow-y-auto">
+  <div class="relative h-full w-full overflow-y-auto select-none">
     <div
       v-if="server.moduleErrors.fs"
       class="flex w-full flex-col items-center justify-center gap-4 p-4"
     >
-      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+      <div class="bg-bg-raised flex max-w-lg flex-col items-center rounded-3xl p-6 shadow-xl">
         <div class="flex flex-col items-center text-center">
           <div class="flex flex-col items-center gap-4">
-            <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-              <IssuesIcon class="size-12 text-orange" />
+            <div class="bg-bg-orange grid place-content-center rounded-full p-4">
+              <IssuesIcon class="text-orange size-12" />
             </div>
             <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Failed to load properties</h1>
           </div>
-          <p class="text-lg text-secondary">
+          <p class="text-secondary text-lg">
             We couldn't access your server's properties. Here's what we know:
-            <span class="break-all font-mono">{{
+            <span class="font-mono break-all">{{
               JSON.stringify(server.moduleErrors.fs.error)
             }}</span>
           </p>
           <ButtonStyled size="large" color="brand" @click="() => server.refresh(['fs'])">
-            <button class="mt-6 !w-full">Retry</button>
+            <button class="mt-6 w-full!">Retry</button>
           </ButtonStyled>
         </div>
       </div>
@@ -31,12 +31,12 @@
     >
       <div class="card flex flex-col gap-4">
         <div class="flex flex-col gap-2">
-          <h2 class="m-0 text-lg font-bold text-contrast">Server properties</h2>
+          <h2 class="text-contrast m-0 text-lg font-bold">Server properties</h2>
           <div class="m-0">
             Edit the Minecraft server properties file. If you're unsure about a specific property,
             the
             <NuxtLink
-              class="goto-link !inline-block"
+              class="goto-link inline-block!"
               to="https://minecraft.wiki/w/Server.properties"
               external
             >
@@ -45,11 +45,11 @@
             has more detailed information.
           </div>
         </div>
-        <div class="flex flex-col gap-4 rounded-2xl bg-table-alternateRow p-4">
+        <div class="bg-table-alternate-row flex flex-col gap-4 rounded-2xl p-4">
           <div class="relative w-full text-sm">
             <label for="search-server-properties" class="sr-only">Search server properties</label>
             <SearchIcon
-              class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+              class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2"
               aria-hidden="true"
             />
             <input

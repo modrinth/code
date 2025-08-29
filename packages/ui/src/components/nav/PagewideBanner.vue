@@ -1,23 +1,23 @@
 <template>
   <div
-    :class="['banner-grid relative border-b-2 border-solid border-0', containerClasses[variant]]"
+    :class="['banner-grid relative border-b-2 border-0', containerClasses[variant]]"
   >
     <div
       :class="[
-        'grid-area-[title] flex items-center gap-2 font-bold text-[var(--font-size-md)]',
+        'grid-area-[title] flex items-center gap-2 font-bold text-(--font-size-md)',
         iconClasses[variant],
       ]"
     >
       <IssuesIcon
         v-if="variant === 'warning' || variant === 'error'"
         aria-hidden="true"
-        class="w-6 h-6 flex-shrink-0"
+        class="w-6 h-6 shrink-0"
       />
-      <InfoIcon v-if="variant === 'info'" aria-hidden="true" class="w-6 h-6 flex-shrink-0" />
+      <InfoIcon v-if="variant === 'info'" aria-hidden="true" class="w-6 h-6 shrink-0" />
       <slot name="title" />
     </div>
 
-    <div class="grid-area-[description] flex flex-col gap-[var(--gap-md)]">
+    <div class="grid-area-[description] flex flex-col gap-(--gap-md)">
       <slot name="description" />
     </div>
 
@@ -45,9 +45,9 @@ const containerClasses = {
 }
 
 const iconClasses = {
-  error: 'text-brand-red',
-  warning: 'text-brand-orange',
-  info: 'text-brand-blue',
+  error: 'text-red',
+  warning: 'text-orange',
+  info: 'text-blue',
 }
 </script>
 

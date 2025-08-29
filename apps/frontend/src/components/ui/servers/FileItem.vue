@@ -4,7 +4,7 @@
     data-pyro-file
     :class="[
       containerClasses,
-      isDragOver && type === 'directory' ? 'bg-brand-highlight' : '',
+      isDragOver && type === 'directory' ? 'bg-highlight-brand' : '',
       isDragging ? 'opacity-50' : '',
     ]"
     tabindex="0"
@@ -24,30 +24,30 @@
       class="pointer-events-none flex w-full items-center gap-4 truncate"
     >
       <div
-        class="pointer-events-none flex size-8 items-center justify-center rounded-full bg-bg-raised p-[6px] group-hover:bg-brand-highlight group-hover:text-brand group-focus:bg-brand-highlight group-focus:text-brand"
+        class="bg-bg-raised group-hover:bg-highlight-brand group-hover:text-brand group-focus:bg-highlight-brand group-focus:text-brand pointer-events-none flex size-8 items-center justify-center rounded-full p-[6px]"
         :class="isEditableFile ? 'group-active:scale-[0.8]' : ''"
       >
         <component :is="iconComponent" class="size-6" />
       </div>
       <div class="pointer-events-none flex w-full flex-col truncate">
         <span
-          class="pointer-events-none w-[98%] truncate font-bold group-hover:text-contrast group-focus:text-contrast"
+          class="group-hover:text-contrast group-focus:text-contrast pointer-events-none w-[98%] truncate font-bold"
         >
           {{ name }}
         </span>
-        <span class="pointer-events-none text-xs text-secondary group-hover:text-primary">
+        <span class="text-secondary group-hover:text-primary pointer-events-none text-xs">
           {{ subText }}
         </span>
       </div>
     </div>
     <div
       data-pyro-file-actions
-      class="pointer-events-auto flex w-fit flex-shrink-0 items-center gap-4 md:gap-12"
+      class="pointer-events-auto flex w-fit shrink-0 items-center gap-4 md:gap-12"
     >
-      <span class="hidden w-[160px] text-nowrap font-mono text-sm text-secondary md:flex">
+      <span class="text-secondary hidden w-[160px] font-mono text-sm text-nowrap md:flex">
         {{ formattedCreationDate }}
       </span>
-      <span class="w-[160px] text-nowrap font-mono text-sm text-secondary">
+      <span class="text-secondary w-[160px] font-mono text-sm text-nowrap">
         {{ formattedModifiedDate }}
       </span>
       <ButtonStyled circular type="transparent">
@@ -152,9 +152,9 @@ const route = shallowRef(useRoute());
 const router = useRouter();
 
 const containerClasses = computed(() => [
-  "group m-0 p-0 focus:!outline-none flex w-full select-none items-center justify-between overflow-hidden border-0 border-b border-solid border-bg-raised p-3 last:border-none hover:bg-bg-raised focus:bg-bg-raised",
+  "group m-0 p-0 focus:outline-hidden! flex w-full select-none items-center justify-between overflow-hidden border-b border-bg-raised p-3 last:border-none hover:bg-bg-raised focus:bg-bg-raised",
   isEditableFile.value ? "cursor-pointer" : props.type === "directory" ? "cursor-pointer" : "",
-  isDragOver.value ? "bg-brand-highlight" : "",
+  isDragOver.value ? "bg-highlight-brand" : "",
 ]);
 
 const fileExtension = computed(() => props.name.split(".").pop()?.toLowerCase() || "");

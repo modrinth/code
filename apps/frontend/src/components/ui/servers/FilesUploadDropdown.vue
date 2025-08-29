@@ -5,7 +5,7 @@
         <div
           ref="statusContentRef"
           v-bind="$attrs"
-          :class="['flex flex-col p-4 text-sm text-contrast']"
+          :class="['text-contrast flex flex-col p-4 text-sm']"
         >
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2 font-bold">
@@ -30,12 +30,12 @@
                   <UiServersPanelSpinner
                     v-show="item.status === 'uploading'"
                     key="spinner"
-                    class="absolute !size-4"
+                    class="absolute size-4!"
                   />
                   <CheckCircleIcon
                     v-show="item.status === 'completed'"
                     key="check"
-                    class="absolute size-4 text-green"
+                    class="text-green absolute size-4"
                   />
                   <XCircleIcon
                     v-show="
@@ -44,7 +44,7 @@
                       item.status === 'incorrect-type'
                     "
                     key="error"
-                    class="absolute size-4 text-red"
+                    class="text-red absolute size-4"
                   />
                 </transition-group>
                 <span class="ml-6 truncate">{{ item.file.name }}</span>
@@ -63,9 +63,9 @@
                 <template v-else>
                   <template v-if="item.status === 'uploading'">
                     <span>{{ item.progress }}%</span>
-                    <div class="h-1 w-20 overflow-hidden rounded-full bg-bg">
+                    <div class="bg-bg h-1 w-20 overflow-hidden rounded-full">
                       <div
-                        class="h-full bg-contrast transition-all duration-200"
+                        class="bg-contrast h-full transition-all duration-200"
                         :style="{ width: item.progress + '%' }"
                       />
                     </div>
@@ -78,9 +78,9 @@
                   </template>
                   <template v-else>
                     <span>{{ item.progress }}%</span>
-                    <div class="h-1 w-20 overflow-hidden rounded-full bg-bg">
+                    <div class="bg-bg h-1 w-20 overflow-hidden rounded-full">
                       <div
-                        class="h-full bg-contrast transition-all duration-200"
+                        class="bg-contrast h-full transition-all duration-200"
                         :style="{ width: item.progress + '%' }"
                       />
                     </div>

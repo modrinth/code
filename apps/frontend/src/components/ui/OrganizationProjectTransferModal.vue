@@ -147,7 +147,7 @@ const onSubmitHandler = () => {
 <style lang="scss" scoped>
 .table {
   display: grid;
-  border-radius: var(--radius-md);
+  border-radius: 0.75rem;
   overflow: hidden;
   margin-top: var(--gap-md);
   border: 1px solid var(--color-button-bg);

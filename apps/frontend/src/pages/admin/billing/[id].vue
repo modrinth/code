@@ -1,14 +1,14 @@
 <template>
   <NewModal ref="refundModal">
     <template #title>
-      <span class="text-lg font-extrabold text-contrast">Refund charge</span>
+      <span class="text-contrast text-lg font-extrabold">Refund charge</span>
     </template>
     <div class="flex flex-col gap-3">
       <div class="flex flex-col gap-2">
         <label for="visibility" class="flex flex-col gap-1">
-          <span class="text-lg font-semibold text-contrast">
+          <span class="text-contrast text-lg font-semibold">
             Refund type
-            <span class="text-brand-red">*</span>
+            <span class="text-red">*</span>
           </span>
           <span> The type of refund to issue. </span>
         </label>
@@ -21,9 +21,9 @@
       </div>
       <div v-if="refundType === 'partial'" class="flex flex-col gap-2">
         <label for="amount" class="flex flex-col gap-1">
-          <span class="text-lg font-semibold text-contrast">
+          <span class="text-contrast text-lg font-semibold">
             Amount
-            <span class="text-brand-red">*</span>
+            <span class="text-red">*</span>
           </span>
           <span>
             Enter the amount in cents of USD. For example for $2, enter 200. (net
@@ -34,9 +34,9 @@
       </div>
       <div class="flex flex-col gap-2">
         <label for="unprovision" class="flex flex-col gap-1">
-          <span class="text-lg font-semibold text-contrast">
+          <span class="text-contrast text-lg font-semibold">
             Unprovision
-            <span class="text-brand-red">*</span>
+            <span class="text-red">*</span>
           </span>
           <span> Whether or not the subscription should be unprovisioned on refund. </span>
         </label>
@@ -59,9 +59,7 @@
     </div>
   </NewModal>
   <div class="page experimental-styles-within">
-    <div
-      class="mb-4 flex items-center justify-between border-0 border-b border-solid border-divider pb-4"
-    >
+    <div class="border-divider mb-4 flex items-center justify-between border-b pb-4">
       <div class="flex items-center gap-2">
         <Avatar :src="user.avatar_url" :alt="user.username" size="32px" circle />
         <h1 class="m-0 text-2xl font-extrabold">{{ user.username }}'s subscriptions</h1>
@@ -80,7 +78,7 @@
       <div v-for="subscription in subscriptionCharges" :key="subscription.id" class="card">
         <div class="mb-4 grid grid-cols-[1fr_auto]">
           <div>
-            <span class="flex items-center gap-2 font-semibold text-contrast">
+            <span class="text-contrast flex items-center gap-2 font-semibold">
               <template v-if="subscription.product.metadata.type === 'midas'">
                 <ModrinthPlusIcon class="h-7 w-min" />
               </template>
@@ -89,7 +87,7 @@
               </template>
               <template v-else> Unknown product </template>
             </span>
-            <div class="mb-4 mt-2 flex w-full items-center gap-1 text-sm text-secondary">
+            <div class="text-secondary mt-2 mb-4 flex w-full items-center gap-1 text-sm">
               {{ formatCategory(subscription.interval) }} ⋅ {{ subscription.status }} ⋅
               {{ dayjs(subscription.created).format("MMMM D, YYYY [at] h:mma") }} ({{
                 formatRelativeTime(subscription.created)
@@ -113,16 +111,16 @@
           <div
             v-for="(charge, index) in subscription.charges"
             :key="charge.id"
-            class="relative overflow-clip rounded-xl bg-bg px-4 py-3"
+            class="bg-bg relative overflow-clip rounded-xl px-4 py-3"
           >
             <div
-              class="absolute bottom-0 left-0 top-0 w-1"
+              class="absolute top-0 bottom-0 left-0 w-1"
               :class="charge.type === 'refund' ? 'bg-purple' : chargeStatuses[charge.status].color"
             />
             <div class="grid w-full grid-cols-[1fr_auto] items-center gap-4">
               <div class="flex flex-col gap-2">
                 <span>
-                  <span class="font-bold text-contrast">
+                  <span class="text-contrast font-bold">
                     <template v-if="charge.status === 'succeeded'"> Succeeded </template>
                     <template v-else-if="charge.status === 'failed'"> Failed </template>
                     <template v-else-if="charge.status === 'cancelled'"> Cancelled </template>
@@ -149,13 +147,13 @@
                     {{ formatPrice(vintl.locale, charge.amount, charge.currency_code) }}
                   </template>
                 </span>
-                <span class="text-sm text-secondary">
+                <span class="text-secondary text-sm">
                   {{ dayjs(charge.due).format("MMMM D, YYYY [at] h:mma") }}
                   <span class="text-secondary">({{ formatRelativeTime(charge.due) }}) </span>
                 </span>
                 <div
                   v-if="flags.developerMode"
-                  class="flex w-full items-center gap-1 text-xs text-secondary"
+                  class="text-secondary flex w-full items-center gap-1 text-xs"
                 >
                   {{ charge.status }}
                   ⋅

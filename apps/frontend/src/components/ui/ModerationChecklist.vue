@@ -1,10 +1,10 @@
 <template>
   <div
-    class="moderation-checklist flex w-[600px] max-w-full flex-col rounded-2xl border-[1px] border-solid border-orange bg-bg-raised p-4 transition-all delay-200 duration-200 ease-in-out"
+    class="moderation-checklist border-orange bg-bg-raised flex w-[600px] max-w-full flex-col rounded-2xl border p-4 transition-all delay-200 duration-200 ease-in-out"
     :class="collapsed ? `sm:max-w-[300px]` : 'sm:max-w-[600px]'"
   >
     <div class="flex grow-0 items-center gap-2">
-      <h1 class="m-0 mr-auto flex items-center gap-2 text-2xl font-extrabold text-contrast">
+      <h1 class="text-contrast m-0 mr-auto flex items-center gap-2 text-2xl font-extrabold">
         <ScaleIcon class="text-orange" /> Moderation
       </h1>
       <ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
@@ -19,7 +19,7 @@
       </ButtonStyled>
     </div>
     <Collapsible base-class="grow" class="flex grow flex-col" :collapsed="collapsed">
-      <div class="my-4 h-[1px] w-full bg-divider" />
+      <div class="bg-divider my-4 h-px w-full" />
       <div v-if="done">
         <p>You are done moderating this project! There are {{ futureProjects.length }} left.</p>
       </div>
@@ -183,7 +183,7 @@
         <h2 class="m-0 mb-2 text-lg font-extrabold">{{ steps[currentStepIndex].question }}</h2>
         <template v-if="steps[currentStepIndex].rules && steps[currentStepIndex].rules.length > 0">
           <strong>Guidance:</strong>
-          <ul class="mb-3 mt-2 leading-tight">
+          <ul class="mt-2 mb-3 leading-tight">
             <li v-for="(rule, index) in steps[currentStepIndex].rules" :key="index">
               {{ rule }}
             </li>
@@ -193,7 +193,7 @@
           v-if="steps[currentStepIndex].examples && steps[currentStepIndex].examples.length > 0"
         >
           <strong>Reject things like:</strong>
-          <ul class="mb-3 mt-2 leading-tight">
+          <ul class="mt-2 mb-3 leading-tight">
             <li v-for="(example, index) in steps[currentStepIndex].examples" :key="index">
               {{ example }}
             </li>
@@ -203,7 +203,7 @@
           v-if="steps[currentStepIndex].exceptions && steps[currentStepIndex].exceptions.length > 0"
         >
           <strong>Exceptions:</strong>
-          <ul class="mb-3 mt-2 leading-tight">
+          <ul class="mt-2 mb-3 leading-tight">
             <li v-for="(exception, index) in steps[currentStepIndex].exceptions" :key="index">
               {{ exception }}
             </li>
@@ -300,9 +300,7 @@
         </div>
       </div>
       <div class="mt-auto">
-        <div
-          class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
-        >
+        <div class="border-divider mt-4 flex grow justify-between gap-2 border-t pt-4">
           <div class="flex items-center gap-2">
             <ButtonStyled v-if="!done">
               <button aria-label="Skip" @click="goToNextProject">

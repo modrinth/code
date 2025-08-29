@@ -220,7 +220,7 @@ const messages = defineMessages({
         />
         <div class="absolute top-0 right-0 m-2">
           <div
-            class="p-2 m-0 text-primary flex items-center justify-center aspect-square bg-button-bg rounded-full border-button-border border-solid border-[1px] hovering-icon-shadow"
+            class="p-2 m-0 text-primary flex items-center justify-center aspect-square bg-button-bg rounded-full border-button-border border-[1px] hovering-icon-shadow"
           >
             <EditIcon aria-hidden="true" class="h-4 w-4 text-primary" />
           </div>

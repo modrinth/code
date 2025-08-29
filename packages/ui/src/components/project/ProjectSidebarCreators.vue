@@ -34,7 +34,7 @@
             <CrownIcon
               v-if="member.is_owner"
               v-tooltip="formatMessage(messages.owner)"
-              class="text-brand-orange"
+              class="text-orange"
             />
             <ExternalIcon v-if="linkTarget === '_blank'" />
           </span>

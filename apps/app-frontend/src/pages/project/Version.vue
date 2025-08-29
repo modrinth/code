@@ -459,7 +459,7 @@ await refreshDisplayDependencies()
   vertical-align: center;
   align-items: center;
   cursor: not-allowed;
-  border-radius: var(--radius-lg);
+  border-radius: 1rem;
 
   .text {
     filter: brightness(0.5);

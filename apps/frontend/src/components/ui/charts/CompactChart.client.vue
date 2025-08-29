@@ -160,7 +160,7 @@ defineExpose({
 
   gap: var(--gap-xs);
   border: 1px solid var(--color-button-bg);
-  border-radius: var(--radius-md);
+  border-radius: 0.75rem;
   background-color: var(--color-raised-bg);
   box-shadow: var(--shadow-floating);
 
@@ -191,7 +191,7 @@ svg {
 :deep(.apexcharts-tooltip),
 :deep(.apexcharts-yaxistooltip) {
   background: var(--color-raised-bg) !important;
-  border-radius: var(--radius-sm) !important;
+  border-radius: 0.5rem !important;
   border: 1px solid var(--color-button-bg) !important;
   box-shadow: var(--shadow-floating) !important;
   font-size: var(--font-size-nm) !important;

@@ -147,7 +147,7 @@ defineExpose({
   .modal-body {
     position: fixed;
     box-shadow: var(--shadow-raised), var(--shadow-inset);
-    border-radius: var(--radius-lg);
+    border-radius: 1rem;
     background-color: var(--color-raised-bg);
     max-height: calc(100% - 2 * var(--gap-lg));
     overflow-y: visible;

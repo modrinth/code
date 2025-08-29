@@ -31,22 +31,22 @@
           <div class="flex flex-col gap-2">
             <span class="font-bold">Benefits</span>
             <div class="flex items-center gap-2">
-              <CheckCircleIcon class="h-5 w-5 text-brand" />
+              <CheckCircleIcon class="text-brand h-5 w-5" />
               <span> Ad-free browsing on modrinth.com and Modrinth App </span>
             </div>
             <div class="flex items-center gap-2">
-              <CheckCircleIcon class="h-5 w-5 text-brand" />
+              <CheckCircleIcon class="text-brand h-5 w-5" />
               <span>Modrinth+ badge on your profile</span>
             </div>
             <div class="flex items-center gap-2">
-              <CheckCircleIcon class="h-5 w-5 text-brand" />
+              <CheckCircleIcon class="text-brand h-5 w-5" />
               <span>Support Modrinth and creators directly</span>
             </div>
           </div>
         </div>
         <div class="flex w-full flex-wrap justify-between gap-4 xl:w-auto xl:flex-col">
           <div class="flex flex-col gap-1 xl:ml-auto xl:text-right">
-            <span class="text-2xl font-bold text-dark">
+            <span class="text-dark text-2xl font-bold">
               <template v-if="midasCharge">
                 {{
                   formatPrice(
@@ -68,7 +68,7 @@
                 v-if="
                   midasCharge.status === 'open' && midasCharge.subscription_interval === 'monthly'
                 "
-                class="text-sm text-purple"
+                class="text-purple text-sm"
               >
                 Save
                 {{
@@ -79,18 +79,18 @@
                   )
                 }}/year by switching to yearly billing!
               </span>
-              <span class="text-sm text-secondary">
+              <span class="text-secondary text-sm">
                 Since {{ $dayjs(midasSubscription.created).format("MMMM D, YYYY") }}
               </span>
-              <span v-if="midasCharge.status === 'open'" class="text-sm text-secondary">
+              <span v-if="midasCharge.status === 'open'" class="text-secondary text-sm">
                 Renews {{ $dayjs(midasCharge.due).format("MMMM D, YYYY") }}
               </span>
-              <span v-else-if="midasCharge.status === 'cancelled'" class="text-sm text-secondary">
+              <span v-else-if="midasCharge.status === 'cancelled'" class="text-secondary text-sm">
                 Expires {{ $dayjs(midasCharge.due).format("MMMM D, YYYY") }}
               </span>
             </template>
 
-            <span v-else class="text-sm text-secondary">
+            <span v-else class="text-secondary text-sm">
               Or
               {{ formatPrice(vintl.locale, price.prices.intervals.yearly, price.currency_code) }} /
               year (save
@@ -235,20 +235,20 @@
                   <CopyCode class="whitespace-nowrap" :text="'Stripe ID: ' + subscription.id" />
                 </div>
               </div>
-              <h3 class="m-0 mt-4 text-xl font-semibold leading-none text-contrast">
+              <h3 class="text-contrast m-0 mt-4 text-xl leading-none font-semibold">
                 {{ getProductSize(getPyroProduct(subscription)) }} Plan
               </h3>
               <div class="flex flex-row justify-between">
                 <div class="mt-2 flex flex-col gap-2">
                   <div class="flex items-center gap-2">
-                    <CheckCircleIcon class="h-5 w-5 text-brand" />
+                    <CheckCircleIcon class="text-brand h-5 w-5" />
                     <span>
                       {{ getPyroProduct(subscription)?.metadata?.cpu / 2 }} Shared CPUs (Bursts up
                       to {{ getPyroProduct(subscription)?.metadata?.cpu }} CPUs)
                     </span>
                   </div>
                   <div class="flex items-center gap-2">
-                    <CheckCircleIcon class="h-5 w-5 text-brand" />
+                    <CheckCircleIcon class="text-brand h-5 w-5" />
                     <span>
                       {{
                         getPyroProduct(subscription)?.metadata?.ram
@@ -258,7 +258,7 @@
                     </span>
                   </div>
                   <div class="flex items-center gap-2">
-                    <CheckCircleIcon class="h-5 w-5 text-brand" />
+                    <CheckCircleIcon class="text-brand h-5 w-5" />
                     <span>
                       {{
                         getPyroProduct(subscription)?.metadata?.swap
@@ -268,7 +268,7 @@
                     </span>
                   </div>
                   <div class="flex items-center gap-2">
-                    <CheckCircleIcon class="h-5 w-5 text-brand" />
+                    <CheckCircleIcon class="text-brand h-5 w-5" />
                     <span>
                       {{
                         getPyroProduct(subscription)?.metadata?.storage
@@ -280,7 +280,7 @@
                 </div>
                 <div class="flex flex-col items-end justify-between">
                   <div class="flex flex-col items-end gap-2">
-                    <div class="flex text-2xl font-bold text-contrast">
+                    <div class="text-contrast flex text-2xl font-bold">
                       <span class="text-contrast">
                         {{
                           formatPrice(
@@ -295,31 +295,31 @@
                       <span>/{{ subscription.interval.replace("ly", "") }}</span>
                     </div>
                     <div v-if="getPyroCharge(subscription)" class="mb-4 flex flex-col items-end">
-                      <span class="text-sm text-secondary">
+                      <span class="text-secondary text-sm">
                         Since {{ $dayjs(subscription.created).format("MMMM D, YYYY") }}
                       </span>
                       <span
                         v-if="getPyroCharge(subscription).status === 'open'"
-                        class="text-sm text-secondary"
+                        class="text-secondary text-sm"
                       >
                         Renews {{ $dayjs(getPyroCharge(subscription).due).format("MMMM D, YYYY") }}
                       </span>
                       <span
                         v-else-if="getPyroCharge(subscription).status === 'processing'"
-                        class="text-sm text-orange"
+                        class="text-orange text-sm"
                       >
                         Your payment is being processed. Your server will activate once payment is
                         complete.
                       </span>
                       <span
                         v-else-if="getPyroCharge(subscription).status === 'cancelled'"
-                        class="text-sm text-secondary"
+                        class="text-secondary text-sm"
                       >
                         Expires {{ $dayjs(getPyroCharge(subscription).due).format("MMMM D, YYYY") }}
                       </span>
                       <span
                         v-else-if="getPyroCharge(subscription).status === 'failed'"
-                        class="text-sm text-red"
+                        class="text-red text-sm"
                       >
                         Your subscription payment failed. Please update your payment method, then
                         resubscribe.
@@ -464,7 +464,7 @@
     </div>
     <div
       v-if="!paymentMethods || paymentMethods.length === 0"
-      class="universal-card recessed !mb-0"
+      class="universal-card recessed mb-0!"
     >
       {{ formatMessage(messages.paymentMethodNone) }}
     </div>
@@ -472,7 +472,7 @@
       <div
         v-for="(method, index) in paymentMethods"
         :key="index"
-        class="universal-card recessed !mb-0 flex items-center justify-between"
+        class="universal-card recessed mb-0! flex items-center justify-between"
       >
         <div class="flex gap-2">
           <CardIcon v-if="method.type === 'card'" class="h-8 w-8" />
@@ -480,7 +480,7 @@
           <PayPalIcon v-else-if="method.type === 'paypal'" class="h-8 w-8" />
           <div class="flex flex-col">
             <div class="flex items-center gap-2">
-              <div class="font-bold text-contrast">
+              <div class="text-contrast font-bold">
                 <template v-if="method.type === 'card'">
                   {{
                     formatMessage(messages.paymentMethodCardDisplay, {
@@ -500,7 +500,7 @@
               </div>
               <div
                 v-if="primaryPaymentMethodId === method.id"
-                class="border-r-ma rounded-full bg-button-bg px-2 py-0.5 text-sm font-bold text-secondary"
+                class="border-r-ma bg-button-bg text-secondary rounded-full px-2 py-0.5 text-sm font-bold"
               >
                 {{ formatMessage(messages.paymentMethodPrimary) }}
               </div>

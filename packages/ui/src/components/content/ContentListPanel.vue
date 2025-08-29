@@ -47,9 +47,9 @@ const paginatedItems = computed(() =>
 </script>
 
 <template>
-  <div class="flex flex-col grid-cols-[min-content,auto,auto,auto,auto]">
+  <div class="flex flex-col grid-cols-[min-content_auto_auto_auto_auto]">
     <div
-      :class="`${$slots.headers ? 'flex' : 'grid'} grid-cols-[min-content,4fr,3fr,2fr] gap-3 items-center px-2 pt-1 h-10 mb-3 text-contrast font-bold`"
+      :class="`${$slots.headers ? 'flex' : 'grid'} grid-cols-[min-content_4fr_3fr_2fr] gap-3 items-center px-2 pt-1 h-10 mb-3 text-contrast font-bold`"
     >
       <Checkbox
         v-model="allSelected"

@@ -2,7 +2,7 @@
   <div
     v-if="game"
     v-tooltip="'Change server version'"
-    class="min-w-0 flex-none flex-row items-center gap-2 first:!flex"
+    class="min-w-0 flex-none flex-row items-center gap-2 first:flex!"
   >
     <GameIcon aria-hidden="true" class="size-5 shrink-0" />
     <NuxtLink
@@ -14,13 +14,13 @@
       <div class="flex flex-row items-center gap-1">
         {{ game[0].toUpperCase() + game.slice(1) }}
         <span v-if="mcVersion">{{ mcVersion }}</span>
-        <span v-else class="inline-block h-3 w-12 animate-pulse rounded bg-button-border"></span>
+        <span v-else class="bg-button-border inline-block h-3 w-12 animate-pulse rounded-sm"></span>
       </div>
     </NuxtLink>
     <div v-else class="flex min-w-0 flex-row items-center gap-1 truncate text-sm font-semibold">
       {{ game[0].toUpperCase() + game.slice(1) }}
       <span v-if="mcVersion">{{ mcVersion }}</span>
-      <span v-else class="inline-block h-3 w-16 animate-pulse rounded bg-button-border"></span>
+      <span v-else class="bg-button-border inline-block h-3 w-16 animate-pulse rounded-sm"></span>
     </div>
   </div>
 </template>

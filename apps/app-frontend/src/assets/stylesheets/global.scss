@@ -89,7 +89,7 @@ input {
 
 .badge {
   display: flex;
-  border-radius: var(--radius-md);
+  border-radius: 0.75rem;
   white-space: nowrap;
   align-items: center;
   background-color: var(--color-bg);
@@ -132,7 +132,7 @@ input {
 
 *::-webkit-scrollbar-thumb {
   background-color: var(--color-scrollbar);
-  border-radius: var(--radius-lg);
+  border-radius: 1rem;
   border: 5px solid transparent;
   background-clip: content-box;
 }

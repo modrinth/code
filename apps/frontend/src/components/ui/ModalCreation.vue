@@ -3,9 +3,9 @@
     <div class="flex flex-col gap-3">
       <div class="flex flex-col gap-2">
         <label for="name">
-          <span class="text-lg font-semibold text-contrast">
+          <span class="text-contrast text-lg font-semibold">
             Name
-            <span class="text-brand-red">*</span>
+            <span class="text-red">*</span>
           </span>
         </label>
         <input
@@ -20,9 +20,9 @@
       </div>
       <div class="flex flex-col gap-2">
         <label for="slug">
-          <span class="text-lg font-semibold text-contrast">
+          <span class="text-contrast text-lg font-semibold">
             URL
-            <span class="text-brand-red">*</span>
+            <span class="text-red">*</span>
           </span>
         </label>
         <div class="text-input-wrapper">
@@ -39,9 +39,9 @@
       </div>
       <div class="flex flex-col gap-2">
         <label for="visibility" class="flex flex-col gap-1">
-          <span class="text-lg font-semibold text-contrast">
+          <span class="text-contrast text-lg font-semibold">
             Visibility
-            <span class="text-brand-red">*</span>
+            <span class="text-red">*</span>
           </span>
           <span> The visibility of your project after it has been approved. </span>
         </label>
@@ -55,9 +55,9 @@
       </div>
       <div class="flex flex-col gap-2">
         <label for="additional-information" class="flex flex-col gap-1">
-          <span class="text-lg font-semibold text-contrast">
+          <span class="text-contrast text-lg font-semibold">
             Summary
-            <span class="text-brand-red">*</span>
+            <span class="text-red">*</span>
           </span>
           <span> A sentence or two that describes your project. </span>
         </label>

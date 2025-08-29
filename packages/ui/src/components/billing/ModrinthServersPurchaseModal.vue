@@ -244,7 +244,7 @@ defineExpose({
         </template>
       </div>
     </template>
-    <div class="w-[40rem] max-w-full">
+    <div class="w-160 max-w-full">
       <RegionSelector
         v-if="currentStep === 'region'"
         v-model:region="selectedRegion"
@@ -297,7 +297,7 @@ defineExpose({
           selectedPlan &&
           selectedInterval
         "
-        class="min-h-[16rem] flex flex-col gap-2 mt-2 p-4 bg-table-alternateRow rounded-xl justify-center items-center"
+        class="min-h-64 flex flex-col gap-2 mt-2 p-4 bg-table-alternate-row rounded-xl justify-center items-center"
       >
         <div v-show="loadingElements">
           <ModalLoadingIndicator :error="loadingElementsFailed">

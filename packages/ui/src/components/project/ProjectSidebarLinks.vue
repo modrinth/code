@@ -11,48 +11,36 @@
   >
     <h2 class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
     <div
-      class="flex flex-col gap-3 font-semibold [&>a]:flex [&>a]:gap-2 [&>a]:items-center [&>a]:w-fit [&>a]:text-primary [&>a]:leading-[1.2] [&>a:hover]:underline"
+      class="flex flex-col gap-3 font-semibold"
     >
-      <a
-        v-if="project.issues_url"
-        :href="project.issues_url"
-        :target="linkTarget"
-        rel="noopener nofollow ugc"
+      <ProjectSidebarLinksLink
+        :url="project.issues_url"
+        :link-target="linkTarget"
       >
         <IssuesIcon aria-hidden="true" />
         {{ formatMessage(messages.issues) }}
-        <ExternalIcon aria-hidden="true" class="external-icon" />
-      </a>
-      <a
-        v-if="project.source_url"
-        :href="project.source_url"
-        :target="linkTarget"
-        rel="noopener nofollow ugc"
+      </ProjectSidebarLinksLink>
+      <ProjectSidebarLinksLink
+        :url="project.source_url"
+        :link-target="linkTarget"
       >
         <CodeIcon aria-hidden="true" />
         {{ formatMessage(messages.source) }}
-        <ExternalIcon aria-hidden="true" class="external-icon" />
-      </a>
-      <a
-        v-if="project.wiki_url"
-        :href="project.wiki_url"
-        :target="linkTarget"
-        rel="noopener nofollow ugc"
+      </ProjectSidebarLinksLink>
+      <ProjectSidebarLinksLink
+        :url="project.wiki_url"
+        :link-target="linkTarget"
       >
         <WikiIcon aria-hidden="true" />
         {{ formatMessage(messages.wiki) }}
-        <ExternalIcon aria-hidden="true" class="external-icon" />
-      </a>
-      <a
-        v-if="project.discord_url"
-        :href="project.discord_url"
-        :target="linkTarget"
-        rel="noopener nofollow ugc"
+      </ProjectSidebarLinksLink>
+      <ProjectSidebarLinksLink
+        :url="project.discord_url"
+        :link-target="linkTarget"
       >
-        <DiscordIcon class="shrink" aria-hidden="true" />
+        <DiscordIcon aria-hidden="true" />
         {{ formatMessage(messages.discord) }}
-        <ExternalIcon aria-hidden="true" class="external-icon" />
-      </a>
+      </ProjectSidebarLinksLink>
       <hr
         v-if="
           (project.issues_url || project.source_url || project.wiki_url || project.discord_url) &&
@@ -103,6 +91,7 @@ import {
   WikiIcon,
 } from '@modrinth/assets'
 import { useVIntl, defineMessages } from '@vintl/vintl'
+import ProjectSidebarLinksLink from './ProjectSidebarLinksLink.vue'
 
 const { formatMessage } = useVIntl()
 

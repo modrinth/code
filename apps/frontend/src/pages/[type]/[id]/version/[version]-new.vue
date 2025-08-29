@@ -2,7 +2,7 @@
   <div class="normal-page__content flex flex-col gap-4">
     <nuxt-link
       :to="versionsListLink"
-      class="flex w-fit items-center gap-1 text-brand-blue hover:underline"
+      class="text-blue flex w-fit items-center gap-1 hover:underline"
     >
       <ChevronLeftIcon />
       {{
@@ -12,10 +12,10 @@
     <div class="flex gap-3">
       <VersionChannelIndicator :channel="version.version_type" large />
       <div class="flex flex-col gap-1">
-        <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">
+        <h1 class="text-contrast m-0 text-xl leading-none font-extrabold">
           {{ version.version_number }}
         </h1>
-        <span class="text-sm font-semibold text-secondary"> {{ version.name }} </span>
+        <span class="text-secondary text-sm font-semibold"> {{ version.name }} </span>
       </div>
     </div>
     <div class="flex gap-2">
@@ -32,23 +32,23 @@
       </ButtonStyled>
     </div>
     <div>
-      <h2 class="text-lg font-extrabold text-contrast">Files</h2>
+      <h2 class="text-contrast text-lg font-extrabold">Files</h2>
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div
           v-for="(file, index) in version.files"
           :key="index"
-          class="flex gap-2 rounded-2xl bg-bg-raised p-4"
+          class="bg-bg-raised flex gap-2 rounded-2xl p-4"
         >
           <div
-            :class="`flex h-9 w-9 items-center justify-center rounded-full ${file.primary ? 'bg-brand-highlight text-brand' : 'bg-button-bg text-secondary'}`"
+            :class="`flex h-9 w-9 items-center justify-center rounded-full ${file.primary ? 'bg-highlight-brand text-brand' : 'bg-button-bg text-secondary'}`"
           >
             <FileIcon />
           </div>
-          <div class="flex flex-grow flex-col">
-            <span class="font-extrabold text-contrast">{{
+          <div class="flex grow flex-col">
+            <span class="text-contrast font-extrabold">{{
               file.primary ? "Primary file" : "Supplementary resource"
             }}</span>
-            <span class="text-sm font-semibold text-secondary"
+            <span class="text-secondary text-sm font-semibold"
               >{{ file.filename }} • {{ formatBytes(file.size) }}</span
             >
           </div>
@@ -61,9 +61,9 @@
           </div>
         </div>
       </div>
-      <h2 class="text-lg font-extrabold text-contrast">Dependencies</h2>
-      <h2 class="text-lg font-extrabold text-contrast">Changes</h2>
-      <div class="rounded-2xl bg-bg-raised px-6 py-4">
+      <h2 class="text-contrast text-lg font-extrabold">Dependencies</h2>
+      <h2 class="text-contrast text-lg font-extrabold">Changes</h2>
+      <div class="bg-bg-raised rounded-2xl px-6 py-4">
         <div
           class="markdown-body"
           v-html="renderHighlightedString(version.changelog ?? 'No changelog provided')"
@@ -72,7 +72,7 @@
     </div>
   </div>
   <div class="normal-page__sidebar">
-    <div class="padding-lg h-[250px] rounded-2xl bg-bg-raised"></div>
+    <div class="padding-lg bg-bg-raised h-[250px] rounded-2xl"></div>
   </div>
 </template>
 <script setup lang="ts">

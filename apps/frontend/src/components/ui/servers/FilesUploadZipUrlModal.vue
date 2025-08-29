@@ -5,14 +5,14 @@
   >
     <form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleSubmit">
       <div class="flex flex-col gap-2">
-        <div class="font-bold text-contrast">
+        <div class="text-contrast font-bold">
           {{ cf ? `How to get the modpack version's URL` : "URL of .zip file" }}
         </div>
-        <ol v-if="cf" class="mb-1 mt-0 flex flex-col gap-1 pl-8 leading-normal text-secondary">
+        <ol v-if="cf" class="text-secondary mt-0 mb-1 flex flex-col gap-1 pl-8 leading-normal">
           <li>
             <a
               href="https://www.curseforge.com/minecraft/search?page=1&pageSize=40&sortBy=relevancy&class=modpacks"
-              class="inline-flex font-semibold text-[#F16436] transition-all hover:underline active:brightness-[--hover-brightness]"
+              class="inline-flex font-semibold text-[#F16436] transition-all hover:underline active:brightness-(--hover-brightness)"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -23,16 +23,16 @@
           </li>
           <li>
             On the modpack's page, go to the
-            <span class="font-semibold text-primary">"Files"</span> tab, and
-            <span class="font-semibold text-primary">select the version</span> of the modpack you
+            <span class="text-primary font-semibold">"Files"</span> tab, and
+            <span class="text-primary font-semibold">select the version</span> of the modpack you
             want to install.
           </li>
           <li>
-            <span class="font-semibold text-primary">Copy the URL</span> of the version you want to
+            <span class="text-primary font-semibold">Copy the URL</span> of the version you want to
             install, and paste it in the box below.
           </li>
         </ol>
-        <p v-else class="mb-1 mt-0">Copy and paste the direct download URL of a .zip file.</p>
+        <p v-else class="mt-0 mb-1">Copy and paste the direct download URL of a .zip file.</p>
         <input
           ref="urlInput"
           v-model="url"

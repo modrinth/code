@@ -505,7 +505,7 @@ onUnmounted(() => {
   font-family: var(--mono-font);
   background-color: var(--color-accent-contrast);
   color: var(--color-contrast);
-  border-radius: var(--radius-lg);
+  border-radius: 1rem;
   padding: 1.5rem;
   overflow-x: auto; /* Enables horizontal scrolling */
   overflow-y: hidden; /* Disables vertical scrolling on this wrapper */

@@ -89,7 +89,7 @@ defineExpose({
 </script>
 
 <template>
-  <div class="min-h-[16rem] flex flex-col gap-2 justify-center items-center">
+  <div class="min-h-64 flex flex-col gap-2 justify-center items-center">
     <div v-show="elementsLoaded < 2">
       <ModalLoadingIndicator :error="error">
         Loading...

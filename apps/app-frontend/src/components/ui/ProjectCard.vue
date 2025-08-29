@@ -96,13 +96,13 @@ const toTransparent = computed(() => {
       </p>
       <div class="flex items-center gap-2 text-sm text-secondary font-semibold mt-auto">
         <div
-          class="flex items-center gap-1 pr-2 border-0 border-r-[1px] border-solid border-button-border"
+          class="flex items-center gap-1 pr-2 border-r-[1px] border-button-border"
         >
           <DownloadIcon />
           {{ formatNumber(project.downloads) }}
         </div>
         <div
-          class="flex items-center gap-1 pr-2 border-0 border-r-[1px] border-solid border-button-border"
+          class="flex items-center gap-1 pr-2 border-r-[1px] border-button-border"
         >
           <HeartIcon />
           {{ formatNumber(project.follows) }}

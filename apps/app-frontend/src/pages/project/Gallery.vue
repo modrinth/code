@@ -259,7 +259,7 @@ document.addEventListener('keypress', keyListener)
       transform: translate(-50%, -50%);
       max-width: calc(100vw - 2 * var(--gap-lg));
       max-height: calc(100vh - 2 * var(--gap-lg));
-      border-radius: var(--radius-lg);
+      border-radius: 1rem;
 
       &.zoomed-in {
         object-fit: cover;
@@ -318,7 +318,7 @@ document.addEventListener('keypress', keyListener)
       .controls {
         background-color: var(--color-raised-bg);
         padding: var(--gap-md);
-        border-radius: var(--radius-md);
+        border-radius: 0.75rem;
         transition:
           opacity 0.25s ease-in-out,
           transform 0.25s ease-in-out;

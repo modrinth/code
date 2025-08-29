@@ -23,18 +23,18 @@
     :return-url="`${config.public.siteUrl}/settings/billing`"
   />
   <div class="main-hero">
-    <div class="flex max-w-screen-lg flex-col items-center gap-4 text-center">
-      <ModrinthPlusIcon class="h-8 w-max text-contrast" />
+    <div class="flex max-w-(--breakpoint-lg) flex-col items-center gap-4 text-center">
+      <ModrinthPlusIcon class="text-contrast h-8 w-max" />
       <h1 class="m-0 text-[4rem]">Support creators and go ad-free</h1>
       <p class="m-0 mb-4 text-[18px] leading-relaxed">
         Subscribe to Modrinth Plus to go ad-free, support Modrinth's development, and get an
         exclusive profile badge! Half your subscription goes directly to Modrinth creators. Cancel
         anytime.
       </p>
-      <p class="m-0 text-[2rem] font-bold text-purple">
+      <p class="text-purple m-0 text-[2rem] font-bold">
         {{ formatPrice(vintl.locale, price.prices.intervals.monthly, price.currency_code) }}/mo
       </p>
-      <p class="m-0 mb-4 text-secondary">
+      <p class="text-secondary m-0 mb-4">
         or save
         {{ calculateSavings(price.prices.intervals.monthly, price.prices.intervals.yearly) }}% with
         annual billing!
@@ -61,28 +61,28 @@
   </div>
   <div class="perks-hero">
     <h2>What you get with Modrinth Plus!</h2>
-    <div class="mt-8 grid max-w-screen-lg gap-8 lg:grid-cols-3">
-      <div class="flex flex-col gap-4 rounded-xl bg-bg-raised p-4">
-        <HeartIcon class="h-8 w-8 text-purple" />
+    <div class="mt-8 grid max-w-(--breakpoint-lg) gap-8 lg:grid-cols-3">
+      <div class="bg-bg-raised flex flex-col gap-4 rounded-xl p-4">
+        <HeartIcon class="text-purple h-8 w-8" />
         <span class="text-lg font-bold">Support Modrinth creators</span>
-        <span class="leading-5 text-secondary">
+        <span class="text-secondary leading-5">
           50% of your subscription goes directly to Modrinth creators.
         </span>
       </div>
-      <div class="flex flex-col gap-4 rounded-xl bg-bg-raised p-4">
-        <SparklesIcon class="h-8 w-8 text-purple" />
+      <div class="bg-bg-raised flex flex-col gap-4 rounded-xl p-4">
+        <SparklesIcon class="text-purple h-8 w-8" />
         <span class="text-lg font-bold">Remove all ads</span>
-        <span class="leading-5 text-secondary">
+        <span class="text-secondary leading-5">
           Never see an advertisement again on the Modrinth app or the website.
         </span>
       </div>
-      <div class="flex flex-col gap-4 rounded-xl bg-bg-raised p-4">
-        <StarIcon class="h-8 w-8 text-purple" />
+      <div class="bg-bg-raised flex flex-col gap-4 rounded-xl p-4">
+        <StarIcon class="text-purple h-8 w-8" />
         <span class="text-lg font-bold">Profile badge</span>
-        <span class="leading-5 text-secondary">Get an exclusive badge on your user page.</span>
+        <span class="text-secondary leading-5">Get an exclusive badge on your user page.</span>
       </div>
     </div>
-    <span class="mt-4 text-secondary">...and much more coming soon!</span>
+    <span class="text-secondary mt-4">...and much more coming soon!</span>
   </div>
 </template>
 <script setup>

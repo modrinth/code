@@ -13,7 +13,7 @@
   >
     <div
       data-pyro-dropdown-trigger
-      class="duration-50 flex h-full w-full cursor-pointer select-none items-center justify-between gap-4 rounded-xl bg-button-bg px-4 py-2 shadow-sm transition-all ease-in-out"
+      class="duration-50 flex h-full w-full cursor-pointer select-none items-center justify-between gap-4 rounded-xl bg-button-bg px-4 py-2 shadow-xs transition-all ease-in-out"
       :class="triggerClasses"
       @click="toggleDropdown"
     >
@@ -68,7 +68,7 @@
                   :ref="(el) => handleOptionRef(el as HTMLElement, item.index)"
                   role="option"
                   :tabindex="focusedOptionIndex === item.index ? 0 : -1"
-                  class="hover:brightness-85 flex h-full cursor-pointer select-none items-center px-4 transition-colors duration-150 ease-in-out focus:border-none focus:outline-none"
+                  class="hover:brightness-85 flex h-full cursor-pointer select-none items-center px-4 transition-colors duration-150 ease-in-out focus:border-none focus:outline-hidden"
                   :class="{
                     'bg-brand font-bold text-brand-inverted': selectedValue === item.option,
                     'bg-bg-raised': focusedOptionIndex === item.index,

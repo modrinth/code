@@ -2,7 +2,7 @@
   <div class="page">
     <div class="experimental-styles-within flex flex-col gap-2">
       <RadialHeader class="top-box mb-2 flex flex-col items-center justify-center" color="orange">
-        <ScaleIcon class="h-12 w-12 text-brand-orange" />
+        <ScaleIcon class="text-orange h-12 w-12" />
         <h1 class="m-3 gap-2 text-3xl font-extrabold">
           {{
             prefilled && itemName
@@ -15,7 +15,7 @@
       </RadialHeader>
       <div
         v-if="prefilled && itemName && existingReport"
-        class="mx-auto flex max-w-[35rem] flex-col items-center gap-4 text-center"
+        class="mx-auto flex max-w-140 flex-col items-center gap-4 text-center"
       >
         {{ formatMessage(messages.alreadyReportedDescription, { item: reportItem || "content" }) }}
         <div class="flex gap-2">
@@ -36,8 +36,8 @@
         <div class="mb-3 grid grid-cols-1 gap-4 px-6 md:grid-cols-2">
           <div class="flex flex-col gap-2">
             <h2 class="m-0 text-lg font-extrabold">{{ formatMessage(messages.pleaseReport) }}</h2>
-            <div class="text-md flex items-center gap-2 font-semibold text-contrast">
-              <CheckCircleIcon class="h-8 w-8 shrink-0 text-brand-green" />
+            <div class="text-md text-contrast flex items-center gap-2 font-semibold">
+              <CheckCircleIcon class="text-green h-8 w-8 shrink-0" />
               <div class="flex flex-col">
                 <span>
                   <IntlFormatted :message-id="messages.violation">
@@ -53,7 +53,7 @@
                     </template>
                   </IntlFormatted>
                 </span>
-                <span class="text-sm font-medium text-secondary">
+                <span class="text-secondary text-sm font-medium">
                   {{ formatMessage(messages.violationDescription) }}
                 </span>
               </div>
@@ -61,12 +61,12 @@
           </div>
           <div class="flex flex-col gap-2">
             <h2 class="m-0 text-lg font-extrabold">{{ formatMessage(messages.formNotFor) }}</h2>
-            <div class="text-md flex items-center gap-2 font-semibold text-contrast">
-              <XCircleIcon class="h-8 w-8 shrink-0 text-brand-red" />
+            <div class="text-md text-contrast flex items-center gap-2 font-semibold">
+              <XCircleIcon class="text-red h-8 w-8 shrink-0" />
 
               <div class="flex flex-col">
                 <span>{{ formatMessage(messages.bugReports) }}</span>
-                <span v-if="itemIssueTracker" class="text-sm font-medium text-secondary">
+                <span v-if="itemIssueTracker" class="text-secondary text-sm font-medium">
                   <IntlFormatted :message-id="messages.bugReportsDescription">
                     <template #issues-link="{ children }">
                       <a class="text-link" :href="itemIssueTracker" target="_blank">
@@ -78,11 +78,11 @@
                 </span>
               </div>
             </div>
-            <div class="text-md flex items-center gap-2 font-semibold text-contrast">
-              <XCircleIcon class="h-8 w-8 shrink-0 text-brand-red" />
+            <div class="text-md text-contrast flex items-center gap-2 font-semibold">
+              <XCircleIcon class="text-red h-8 w-8 shrink-0" />
               <div class="flex flex-col">
                 <span>{{ formatMessage(messages.dmcaTakedown) }}</span>
-                <span class="text-sm font-medium text-secondary">
+                <span class="text-secondary text-sm font-medium">
                   <IntlFormatted :message-id="messages.dmcaTakedownDescription">
                     <template #policy-link="{ children }">
                       <nuxt-link class="text-link" :to="`/legal/copyright`">
@@ -95,10 +95,10 @@
             </div>
           </div>
         </div>
-        <div class="flex flex-col gap-4 rounded-xl bg-bg-raised p-6">
+        <div class="bg-bg-raised flex flex-col gap-4 rounded-xl p-6">
           <template v-if="!prefilled || !currentItemValid">
             <div class="flex flex-col gap-2">
-              <span class="text-lg font-bold text-contrast">
+              <span class="text-contrast text-lg font-bold">
                 {{ formatMessage(messages.whatContentType) }}
               </span>
               <RadioButtons
@@ -116,7 +116,7 @@
               </RadioButtons>
             </div>
             <div class="flex flex-col gap-2" :class="{ hidden: !reportItem }">
-              <span class="text-lg font-bold text-contrast">
+              <span class="text-contrast text-lg font-bold">
                 {{ formatMessage(messages.whatContentId, { item: reportItem || "content" }) }}
               </span>
               <div class="flex gap-4">
@@ -145,7 +145,7 @@
                     <AutoLink
                       :to="itemLink"
                       target="_blank"
-                      class="flex items-center gap-1 font-bold text-contrast hover:underline"
+                      class="text-contrast flex items-center gap-1 font-bold hover:underline"
                     >
                       <Avatar
                         v-if="typeof itemIcon === 'string'"
@@ -157,9 +157,9 @@
                       <component :is="itemIcon" v-else-if="itemIcon" />
                       <span>{{ itemName }}</span>
                     </AutoLink>
-                    <CheckIcon class="text-brand-green" />
+                    <CheckIcon class="text-green" />
                   </template>
-                  <span v-else-if="checkedId" class="contents text-brand-red">
+                  <span v-else-if="checkedId" class="text-red contents">
                     <IssuesIcon />
                     {{ formatMessage(messages.couldNotFind, { item: reportItem }) }}
                   </span>
@@ -179,7 +179,7 @@
           </template>
           <template v-else>
             <div class="flex flex-col gap-2" :class="{ hidden: !reportItemID }">
-              <span class="text-lg font-bold text-contrast">
+              <span class="text-contrast text-lg font-bold">
                 {{ formatMessage(messages.whatReportReason, { item: reportItem || "content" }) }}
               </span>
               <RadioButtons v-slot="{ item }" v-model="reportType" :items="reportTypes">
@@ -188,9 +188,9 @@
             </div>
             <div
               v-if="warnings[reportType]"
-              class="flex gap-2 rounded-xl border-2 border-solid border-brand-orange bg-highlight-orange p-4 text-contrast"
+              class="border-orange bg-highlight-orange text-contrast flex gap-2 rounded-xl border-2 p-4"
             >
-              <IssuesIcon class="h-5 w-5 shrink-0 text-orange" />
+              <IssuesIcon class="text-orange h-5 w-5 shrink-0" />
               <div class="flex flex-col gap-2">
                 <p
                   v-for="(warning, index) in warnings[reportType]"
@@ -208,10 +208,10 @@
               </div>
             </div>
             <div :class="{ hidden: !reportType }">
-              <span class="text-lg font-bold text-contrast">
+              <span class="text-contrast text-lg font-bold">
                 {{ formatMessage(messages.reportBodyTitle) }}
               </span>
-              <p class="m-0 leading-tight text-secondary">
+              <p class="text-secondary m-0 leading-tight">
                 {{ formatMessage(messages.reportBodyDescription) }}
               </p>
             </div>

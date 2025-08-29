@@ -4,7 +4,7 @@
       <div class="gap-2">
         <div class="card flex flex-col gap-4">
           <label for="server-name-field" class="flex flex-col gap-2">
-            <span class="text-lg font-bold text-contrast">Server name</span>
+            <span class="text-contrast text-lg font-bold">Server name</span>
             <span> This name is only visible on Modrinth.</span>
           </label>
           <div class="flex flex-col gap-2">
@@ -38,7 +38,7 @@
 
         <div class="card flex flex-col gap-4">
           <label for="server-subdomain" class="flex flex-col gap-2">
-            <span class="text-lg font-bold text-contrast">Custom URL</span>
+            <span class="text-contrast text-lg font-bold">Custom URL</span>
             <span> Your friends can connect to your server using this URL. </span>
           </label>
           <div class="flex w-full items-center gap-2 md:w-[60%]">
@@ -63,13 +63,13 @@
 
         <div class="card flex flex-col gap-4">
           <label for="server-icon-field" class="flex flex-col gap-2">
-            <span class="text-lg font-bold text-contrast">Server icon</span>
+            <span class="text-contrast text-lg font-bold">Server icon</span>
             <span> This icon will be visible on the Minecraft server list and on Modrinth. </span>
           </label>
           <div class="flex gap-4">
             <div
               v-tooltip="'Upload a custom Icon'"
-              class="group relative flex w-fit cursor-pointer items-center gap-2 rounded-xl bg-table-alternateRow"
+              class="group bg-table-alternate-row relative flex w-fit cursor-pointer items-center gap-2 rounded-xl"
               @dragover.prevent="onDragOver"
               @dragleave.prevent="onDragLeave"
               @drop.prevent="onDrop"
@@ -84,9 +84,9 @@
                 @change="uploadFile"
               />
               <div
-                class="absolute top-0 hidden size-[6rem] flex-col items-center justify-center rounded-xl bg-button-bg p-2 opacity-80 group-hover:flex"
+                class="bg-button-bg absolute top-0 hidden size-24 flex-col items-center justify-center rounded-xl p-2 opacity-80 group-hover:flex"
               >
-                <EditIcon class="h-8 w-8 text-contrast" />
+                <EditIcon class="text-contrast h-8 w-8" />
               </div>
               <UiServersServerIcon :image="icon" />
             </div>

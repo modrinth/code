@@ -21,7 +21,7 @@ defineProps({
   width: 100%;
   height: 0.5rem;
   background-color: var(--color-button-bg);
-  border-radius: var(--radius-lg);
+  border-radius: 1rem;
   overflow: hidden;
 }
 

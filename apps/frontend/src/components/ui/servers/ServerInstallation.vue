@@ -28,12 +28,12 @@
   <div class="flex h-full w-full flex-col">
     <div v-if="data && versions" class="flex w-full flex-col">
       <div class="card flex flex-col gap-4">
-        <div class="flex select-none flex-col items-center justify-between gap-2 lg:flex-row">
+        <div class="flex flex-col items-center justify-between gap-2 select-none lg:flex-row">
           <div class="flex flex-row items-center gap-2">
-            <h2 class="m-0 text-lg font-bold text-contrast">Modpack</h2>
+            <h2 class="text-contrast m-0 text-lg font-bold">Modpack</h2>
             <div
               v-if="updateAvailable"
-              class="rounded-full bg-bg-orange px-2 py-1 text-xs font-medium text-orange"
+              class="bg-bg-orange text-orange rounded-full px-2 py-1 text-xs font-medium"
             >
               <span>Update available</span>
             </div>
@@ -41,7 +41,7 @@
           <div v-if="data.upstream" class="flex gap-4">
             <ButtonStyled>
               <button
-                class="!w-full sm:!w-auto"
+                class="w-full! sm:w-auto!"
                 :disabled="isInstalling"
                 @click="mrpackModal.show()"
               >
@@ -66,10 +66,10 @@
         <div v-if="data.upstream" class="flex flex-col gap-2">
           <div
             v-if="versionsError || currentVersionError"
-            class="rounded-2xl border border-solid border-red p-4 text-contrast"
+            class="border-red text-contrast rounded-2xl border p-4"
           >
             <p class="m-0 font-bold">Something went wrong while loading your modpack.</p>
-            <p class="m-0 mb-2 mt-1 text-sm">
+            <p class="m-0 mt-1 mb-2 text-sm">
               {{ versionsError || currentVersionError }}
             </p>
             <ButtonStyled>
@@ -79,7 +79,7 @@
 
           <NewProjectCard
             v-if="!versionsError && !currentVersionError"
-            class="!cursor-default !bg-bg !filter-none"
+            class="bg-bg! cursor-default! filter-none!"
             :project="projectCardData"
             :categories="data.project?.categories || []"
           >
@@ -98,7 +98,7 @@
             <nuxt-link
               v-tooltip="backupInProgress ? formatMessage(backupInProgress.tooltip) : undefined"
               :class="{ disabled: backupInProgress }"
-              class="!w-full sm:!w-auto"
+              class="w-full! sm:w-auto!"
               :to="`/modpacks?sid=${props.server.serverId}`"
             >
               <CompassIcon class="size-4" /> Find a modpack
@@ -109,7 +109,7 @@
             <button
               v-tooltip="backupInProgress ? formatMessage(backupInProgress.tooltip) : undefined"
               :disabled="!!backupInProgress"
-              class="!w-full sm:!w-auto"
+              class="w-full! sm:w-auto!"
               @click="mrpackModal.show()"
             >
               <UploadIcon class="size-4" /> Upload .mrpack file
@@ -120,11 +120,11 @@
 
       <div class="card flex flex-col gap-4">
         <div class="flex flex-col gap-2">
-          <h2 class="m-0 text-lg font-bold text-contrast">Platform</h2>
+          <h2 class="text-contrast m-0 text-lg font-bold">Platform</h2>
           <p class="m-0">Your server's platform is the software that runs mods and plugins.</p>
           <div v-if="data.upstream" class="mt-2 flex items-center gap-2">
             <InfoIcon class="hidden sm:block" />
-            <span class="text-sm text-secondary">
+            <span class="text-secondary text-sm">
               The current platform was automatically selected based on your modpack.
             </span>
           </div>
@@ -132,7 +132,7 @@
         <div
           class="flex w-full flex-col gap-1 rounded-2xl"
           :class="{
-            'pointer-events-none cursor-not-allowed select-none opacity-50':
+            'pointer-events-none cursor-not-allowed opacity-50 select-none':
               props.server.general?.status === 'installing',
           }"
           :tabindex="props.server.general?.status === 'installing' ? -1 : 0"

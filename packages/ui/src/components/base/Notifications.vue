@@ -107,7 +107,7 @@ function stopTimer(notif) {
     margin-bottom: 10px;
 
     .vue-notification-template {
-      border-radius: var(--radius-md);
+      border-radius: 0.75rem;
       margin: 0;
 
       .notification-title {

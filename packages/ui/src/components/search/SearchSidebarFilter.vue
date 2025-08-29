@@ -34,7 +34,7 @@
           :key="`excluded-filter-${filterType.id}-${option}`"
           class="flex gap-1 text-xs bg-button-bg px-2 py-0.5 rounded-full font-bold text-secondary w-fit shrink-0 items-center"
         >
-          <BanIcon class="text-brand-red" /> {{ option.formatted_name ?? option.id }}
+          <BanIcon class="text-red" /> {{ option.formatted_name ?? option.id }}
         </div>
       </div>
     </template>
@@ -64,12 +64,12 @@
       </div>
     </template>
     <template v-else #default>
-      <div v-if="filterType.searchable" class="iconified-input mx-2 my-1 !flex">
+      <div v-if="filterType.searchable" class="iconified-input mx-2 my-1 flex!">
         <SearchIcon aria-hidden="true" />
         <input
           :id="`search-${filterType.id}`"
           v-model="query"
-          class="!min-h-9 text-sm"
+          class="min-h-9! text-sm"
           type="text"
           :placeholder="`Search...`"
           autocomplete="off"
@@ -79,7 +79,7 @@
         </Button>
       </div>
 
-      <ScrollablePanel :class="{ 'h-[16rem]': scrollable }" :disable-scrolling="!scrollable">
+      <ScrollablePanel :class="{ 'h-64': scrollable }" :disable-scrolling="!scrollable">
         <div :class="innerPanelClass ? innerPanelClass : ''" class="flex flex-col gap-1">
           <SearchFilterOption
             v-for="option in visibleOptions"
@@ -102,7 +102,7 @@
           </SearchFilterOption>
           <button
             v-if="filterType.display === 'expandable'"
-            class="flex bg-transparent text-secondary border-none cursor-pointer !w-full items-center gap-2 truncate rounded-xl px-2 py-1 text-sm font-semibold transition-all hover:text-contrast focus-visible:text-contrast active:scale-[0.98]"
+            class="flex bg-transparent text-secondary border-none cursor-pointer w-full! items-center gap-2 truncate rounded-xl px-2 py-1 text-sm font-semibold transition-all hover:text-contrast focus-visible:text-contrast active:scale-[0.98]"
             @click="showMore = !showMore"
           >
             <DropdownIcon

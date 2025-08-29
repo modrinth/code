@@ -169,10 +169,10 @@ const messages = defineMessages({
         ? 'grid-cols-[min-content_1fr_1fr] sm:grid-cols-[min-content_3fr_2fr_1fr] md:grid-cols-[auto_3fr_2fr_1fr]'
         : 'grid-cols-[min-content_1fr_1fr] sm:grid-cols-[min-content_3fr_2fr_1fr] md:grid-cols-[auto_3fr_2fr_1fr_2fr]'
     "
-    class="grid items-center gap-4 rounded-2xl bg-bg-raised px-4 py-3"
+    class="bg-bg-raised grid items-center gap-4 rounded-2xl px-4 py-3"
   >
     <div
-      class="flex h-12 w-12 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg"
+      class="border-button-border bg-button-bg flex h-12 w-12 items-center justify-center rounded-xl border border-solid"
     >
       <SpinnerIcon
         v-if="creating"
@@ -182,21 +182,21 @@ const messages = defineMessages({
       <FolderArchiveIcon v-else class="h-6 w-6" />
     </div>
     <div class="col-span-2 flex flex-col gap-1 sm:col-span-1">
-      <span class="font-bold text-contrast">
+      <span class="text-contrast font-bold">
         {{ backup.name }}
       </span>
       <div class="flex flex-wrap items-center gap-2 text-sm">
-        <span v-if="backup.locked" class="flex items-center gap-1 text-sm text-secondary">
+        <span v-if="backup.locked" class="text-secondary flex items-center gap-1 text-sm">
           <LockIcon /> {{ formatMessage(messages.locked) }}
         </span>
         <span v-if="automated && backup.locked">•</span>
-        <span v-if="automated" class="flex items-center gap-1 text-secondary">
+        <span v-if="automated" class="text-secondary flex items-center gap-1">
           <BotIcon /> {{ formatMessage(messages.automated) }}
         </span>
         <span v-if="(failedToCreate || failedToRestore) && (automated || backup.locked)">•</span>
         <span
           v-if="failedToCreate || failedToRestore || failedToPrepareFile"
-          class="flex items-center gap-1 text-sm text-red"
+          class="text-red flex items-center gap-1 text-sm"
         >
           <XIcon />
           {{
@@ -223,7 +223,7 @@ const messages = defineMessages({
         class="max-w-full"
       />
     </div>
-    <div v-else-if="restoring" class="col-span-2 flex flex-col gap-3 text-purple">
+    <div v-else-if="restoring" class="text-purple col-span-2 flex flex-col gap-3">
       {{ formatMessage(messages.restoringBackup) }}
       <ProgressBar
         :progress="restoring.progress"
@@ -333,7 +333,7 @@ const messages = defineMessages({
     </div>
     <pre
       v-if="!preview && flags.advancedDebugInfo"
-      class="col-span-full m-0 rounded-xl bg-button-bg text-xs"
+      class="bg-button-bg col-span-full m-0 rounded-xl text-xs"
       >{{ backup }}</pre
     >
   </div>

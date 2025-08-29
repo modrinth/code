@@ -182,14 +182,14 @@ onUnmounted(() => {
 <style scoped lang="scss">
 .selected {
   background: var(--color-brand-highlight);
-  border-radius: var(--radius-lg);
+  border-radius: 1rem;
   color: var(--color-contrast);
   gap: 1rem;
 }
 
 .logged-out {
   background: var(--color-bg);
-  border-radius: var(--radius-lg);
+  border-radius: 1rem;
   gap: 1rem;
 }
 
@@ -305,7 +305,7 @@ onUnmounted(() => {
   gap: 0.5rem;
   color: var(--color-base);
   background-color: var(--color-button-bg);
-  border-radius: var(--radius-md);
+  border-radius: 0.75rem;
   width: 100%;
   padding: 0.5rem 0.75rem;
   text-align: left;
@@ -338,7 +338,7 @@ onUnmounted(() => {
 
 .qr-code {
   background-color: white !important;
-  border-radius: var(--radius-md);
+  border-radius: 0.75rem;
 }
 
 .modal-body {
@@ -367,7 +367,7 @@ onUnmounted(() => {
 
       .code {
         background-color: var(--color-bg);
-        border-radius: var(--radius-md);
+        border-radius: 0.75rem;
         border: solid 1px var(--color-button-bg);
         font-family: var(--mono-font);
         letter-spacing: var(--gap-md);

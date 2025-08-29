@@ -356,197 +356,200 @@ html {
   --color-gray-highlight: rgba(113, 128, 150, 0.25);
 }
 
-body {
-  // Defaults
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  --font-standard: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto,
-    Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  --mono-font: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
-  font-family: var(--font-standard);
-  font-size: 16px;
-  font-weight: var(--font-weight-regular);
-  margin: 0;
-  padding: 0;
+@layer base {
+  body {
+    // Defaults
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    --font-standard: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto,
+      Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    --mono-font: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+    font-family: var(--font-standard);
+    font-size: 16px;
+    font-weight: var(--font-weight-regular);
+    margin: 0;
+    padding: 0;
 
-  // Rounding sizes
-  --size-rounded-xs: 0.5rem;
-  --size-rounded-sm: 0.75rem;
-  --size-rounded-md: 1rem;
-  --size-rounded-lg: 1.25rem;
+    // Rounding sizes
+    --size-rounded-xs: 0.5rem;
+    --size-rounded-sm: 0.75rem;
+    --size-rounded-md: 1rem;
+    --size-rounded-lg: 1.25rem;
 
-  --size-rounded-max: 999999999px;
-  --size-rounded-card: 1rem;
-  --size-rounded-icon: 1rem;
-  --size-rounded-control: 0.25rem;
-  --size-rounded-tooltip: 0.25rem;
+    --size-rounded-max: 999999999px;
+    --size-rounded-card: 1rem;
+    --size-rounded-icon: 1rem;
+    --size-rounded-control: 0.25rem;
+    --size-rounded-tooltip: 0.25rem;
 
-  --size-navbar-height: 3.5rem;
-  --size-mobile-navbar-height: 3.5rem;
-  --size-mobile-navbar-height-expanded: 13.75rem;
+    --size-navbar-height: 3.5rem;
+    --size-mobile-navbar-height: 3.5rem;
+    --size-mobile-navbar-height-expanded: 13.75rem;
 
-  --spacing-card-lg: 1.5rem;
-  --spacing-card-bg: 1rem;
-  --spacing-card-md: 0.75rem;
-  --spacing-card-sm: 0.5rem;
-  --spacing-card-xs: 0.25rem;
+    --spacing-card-lg: 1.5rem;
+    --spacing-card-bg: 1rem;
+    --spacing-card-md: 0.75rem;
+    --spacing-card-sm: 0.5rem;
+    --spacing-card-xs: 0.25rem;
 
-  // Font Sizes
-  --font-size-xxs: 0.625rem; //10px
-  --font-size-xs: 0.75rem; //12px
-  --font-size-sm: 0.875rem; //14px
-  --font-size-nm: 1rem; //16px
-  --font-size-md: 1.125rem; //18px
-  --font-size-lg: 1.25rem; //20px
-  --font-size-xl: 1.5rem; //24px
-  --font-size-2xl: 2rem; //32px
-  --font-size-3xl: 3rem; //48px
+    // Font Sizes
+    --font-size-xxs: 0.625rem; //10px
+    --font-size-xs: 0.75rem; //12px
+    --font-size-sm: 0.875rem; //14px
+    --font-size-nm: 1rem; //16px
+    --font-size-md: 1.125rem; //18px
+    --font-size-lg: 1.25rem; //20px
+    --font-size-xl: 1.5rem; //24px
+    --font-size-2xl: 2rem; //32px
+    --font-size-3xl: 3rem; //48px
 
-  // Font Weights
-  --font-weight-regular: 400;
-  --font-weight-medium: 500;
-  --font-weight-bold: 700;
-  --font-weight-extrabold: 800;
+    // Font Weights
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
 
-  --font-weight-text: var(--font-weight-medium);
-  --font-weight-heading: var(--font-weight-extrabold);
-  --font-weight-title: var(--font-weight-extrabold);
+    --font-weight-text: var(--font-weight-medium);
+    --font-weight-heading: var(--font-weight-extrabold);
+    --font-weight-title: var(--font-weight-extrabold);
 
-  @media screen and (min-width: 320px) {
-    --size-mobile-navbar-height-expanded: 11.5rem;
+    @media screen and (min-width: 320px) {
+      --size-mobile-navbar-height-expanded: 11.5rem;
+    }
+
+    @media screen and (min-width: 432px) {
+      --size-mobile-navbar-height-expanded: 9.25rem;
+    }
+
+    @media screen and (min-width: 765px) {
+      --size-mobile-navbar-height-expanded: 7rem;
+    }
   }
 
-  @media screen and (min-width: 432px) {
-    --size-mobile-navbar-height-expanded: 9.25rem;
+  //svg {
+  //  height: 1em;
+  //  width: 1em;
+  //}
+
+  //a {
+  //  color: inherit;
+  //  text-decoration: none;
+  //}
+
+  h1 {
+    color: var(--color-text-dark);
   }
 
-  @media screen and (min-width: 765px) {
-    --size-mobile-navbar-height-expanded: 7rem;
+  h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--color-text-dark);
   }
-}
 
-svg {
-  height: 1em;
-  width: 1em;
-}
+  h3 {
+    margin-block: var(--spacing-card-md) var(--spacing-card-sm);
+    color: var(--color-text-dark);
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+  input {
+    border-radius: var(--size-rounded-sm);
+    box-sizing: border-box;
+    border: 2px solid transparent;
+    // safari iOS rounds inputs by default
+    // set the appearance to none to prevent this
+    appearance: none !important;
+  }
 
-h1 {
-  color: var(--color-text-dark);
-}
+  pre {
+    font-weight: var(--font-weight-regular);
+  }
 
-h2 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  color: var(--color-text-dark);
-}
-
-h3 {
-  margin-block: var(--spacing-card-md) var(--spacing-card-sm);
-  color: var(--color-text-dark);
-}
-
-input {
-  border-radius: var(--size-rounded-sm);
-  box-sizing: border-box;
-  border: 2px solid transparent;
-  // safari iOS rounds inputs by default
-  // set the appearance to none to prevent this
-  appearance: none !important;
-}
-
-pre {
-  font-weight: var(--font-weight-regular);
-}
-
-input,
-textarea {
-  background: var(--color-button-bg);
-  color: var(--color-text);
-  padding: 0.5rem 1rem;
-  font-weight: var(--font-weight-medium);
-  border: none;
-  outline: 2px solid transparent;
-  box-shadow:
-    var(--shadow-inset-sm),
-    0 0 0 0 transparent;
-  transition: box-shadow 0.1s ease-in-out;
-  min-height: 36px;
-
-  &:focus,
-  &:focus-visible {
+  input,
+  textarea {
+    background: var(--color-button-bg);
+    color: var(--color-text);
+    padding: 0.5rem 1rem;
+    font-weight: var(--font-weight-medium);
+    border: none;
+    outline: 2px solid transparent;
     box-shadow:
-      inset 0 0 0 transparent,
-      0 0 0 0.25rem var(--color-brand-shadow);
-    color: var(--color-button-text-active);
+      var(--shadow-inset-sm),
+      0 0 0 0 transparent;
+    transition: box-shadow 0.1s ease-in-out;
+    min-height: 36px;
+
+    &:focus,
+    &:focus-visible {
+      box-shadow:
+        inset 0 0 0 transparent,
+        0 0 0 0.25rem var(--color-brand-shadow);
+      color: var(--color-button-text-active);
+    }
+
+    &:disabled,
+    &[disabled="true"] {
+      opacity: 0.6;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
+
+    &:focus::placeholder {
+      opacity: 0.8;
+    }
+
+    &::placeholder {
+      color: var(--color-button-text);
+      opacity: 0.6;
+    }
   }
 
-  &:disabled,
-  &[disabled="true"] {
-    opacity: 0.6;
-    pointer-events: none;
-    cursor: not-allowed;
+  button,
+  input[type="button"] {
+    cursor: pointer;
+    border: none;
+    outline: 2px solid transparent;
   }
 
-  &:focus::placeholder {
-    opacity: 0.8;
+  kbd {
+    background-color: var(--color-code-bg);
+    color: var(--color-code-text);
+    box-shadow: 0 2px 1px var(--color-kbd-shadow);
+    padding: 0.2em 0.5em 0.1em;
+    border-radius: 3px;
+    line-height: 1;
+    font-size: 0.85em !important;
   }
 
-  &::placeholder {
-    color: var(--color-button-text);
-    opacity: 0.6;
+  @import "~/assets/styles/layout.scss";
+  @import "~/assets/styles/utils.scss";
+  @import "~/assets/styles/components.scss";
+
+  button:focus-visible,
+  a:focus-visible,
+  [tabindex="0"]:focus-visible {
+    outline: 0.25rem solid #ea80ff;
+    border-radius: 0.25rem;
+  }
+
+  // OMORPHIA FIXES
+  .card {
+    outline-offset: -2px;
+  }
+
+  input {
+    outline: 2px solid transparent !important;
+  }
+
+  .button-animation {
+    transition:
+      opacity 0.5s ease-in-out,
+      filter 0.2s ease-in-out,
+      transform 0.05s ease-in-out,
+      outline-width 0.2s ease-in-out;
+  }
+
+  .button-transparent {
+    box-shadow: none;
   }
 }
 
-button,
-input[type="button"] {
-  cursor: pointer;
-  border: none;
-  outline: 2px solid transparent;
-}
-
-kbd {
-  background-color: var(--color-code-bg);
-  color: var(--color-code-text);
-  box-shadow: 0 2px 1px var(--color-kbd-shadow);
-  padding: 0.2em 0.5em 0.1em;
-  border-radius: 3px;
-  line-height: 1;
-  font-size: 0.85em !important;
-}
-
-@import "~/assets/styles/layout.scss";
-@import "~/assets/styles/utils.scss";
-@import "~/assets/styles/components.scss";
-
-button:focus-visible,
-a:focus-visible,
-[tabindex="0"]:focus-visible {
-  outline: 0.25rem solid #ea80ff;
-  border-radius: 0.25rem;
-}
-
-// OMORPHIA FIXES
-.card {
-  outline-offset: -2px;
-}
-
-input {
-  outline: 2px solid transparent !important;
-}
-
-.button-animation {
-  transition:
-    opacity 0.5s ease-in-out,
-    filter 0.2s ease-in-out,
-    transform 0.05s ease-in-out,
-    outline-width 0.2s ease-in-out;
-}
-
-.button-transparent {
-  box-shadow: none;
-}

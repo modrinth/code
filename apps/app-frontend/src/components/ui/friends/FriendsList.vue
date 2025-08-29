@@ -177,7 +177,7 @@ onUnmounted(() => {
           <Avatar :src="friend.avatar" class="w-12 h-12 rounded-full" size="2.25rem" circle />
           <span
             v-if="friend.online"
-            class="bottom-1 right-0 absolute w-3 h-3 bg-brand border-2 border-black border-solid rounded-full"
+            class="bottom-1 right-0 absolute w-3 h-3 bg-brand border-2 border-black rounded-full"
           />
         </div>
         <div>{{ friend.username }}</div>
@@ -346,7 +346,7 @@ onUnmounted(() => {
           <Avatar :src="friend.avatar" class="w-12 h-12 rounded-full" size="2.25rem" circle />
           <span
             v-if="friend.online"
-            class="bottom-1 right-0 absolute w-3 h-3 bg-brand border-2 border-black border-solid rounded-full"
+            class="bottom-1 right-0 absolute w-3 h-3 bg-brand border-2 border-black rounded-full"
           />
         </div>
         <div class="flex flex-col">

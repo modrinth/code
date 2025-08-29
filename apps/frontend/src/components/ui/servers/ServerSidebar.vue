@@ -1,11 +1,11 @@
 <template>
   <div class="static w-full grid-cols-1 md:relative md:flex">
-    <div class="static h-full flex-col pb-4 md:flex md:pb-0 md:pr-4">
-      <div class="z-10 flex select-none flex-col gap-2 rounded-2xl bg-bg-raised p-4 md:w-[16rem]">
+    <div class="static h-full flex-col pb-4 md:flex md:pr-4 md:pb-0">
+      <div class="bg-bg-raised z-10 flex flex-col gap-2 rounded-2xl p-4 select-none md:w-[16rem]">
         <div v-for="link in navLinks" :key="link.label">
           <NuxtLink
             :to="link.href"
-            class="flex items-center gap-2 rounded-xl p-2 hover:bg-button-bg"
+            class="hover:bg-button-bg flex items-center gap-2 rounded-xl p-2"
             :class="{ 'bg-button-bg text-contrast': route.path === link.href }"
           >
             <div class="flex items-center gap-2 font-bold">
@@ -13,7 +13,7 @@
               {{ link.label }}
             </div>
 
-            <div class="flex-grow" />
+            <div class="grow" />
             <RightArrowIcon v-if="link.external" class="size-4" />
           </NuxtLink>
         </div>

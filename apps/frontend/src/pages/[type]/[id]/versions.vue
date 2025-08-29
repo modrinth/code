@@ -48,7 +48,7 @@
           <a
             v-tooltip="`Download`"
             :href="getPrimaryFile(version).url"
-            class="group-hover:!bg-brand group-hover:[&>svg]:!text-brand-inverted"
+            class="group-hover:bg-brand! [&>svg]:group-hover:text-brand-inverted!"
             aria-label="Download"
             @click="emit('onDownload')"
           >
@@ -57,7 +57,7 @@
         </ButtonStyled>
         <ButtonStyled circular type="transparent">
           <OverflowMenu
-            class="group-hover:!bg-button-bg"
+            class="group-hover:bg-button-bg!"
             :dropdown-id="`${baseDropdownId}-${version.id}`"
             :options="[
               {

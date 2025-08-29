@@ -26,7 +26,7 @@
       <div v-if="!isSecondPhase" class="flex flex-col gap-4">
         <div class="mx-auto flex flex-row items-center gap-4">
           <div
-            class="grid size-16 place-content-center rounded-2xl border-[2px] border-solid border-button-border bg-button-bg shadow-sm"
+            class="border-button-border bg-button-bg grid size-16 place-content-center rounded-2xl border-2 shadow-xs"
           >
             <UiServersIconsLoaderIcon class="size-10" :loader="selectedLoader" />
           </div>
@@ -46,19 +46,19 @@
             <path d="M9 9h3V5l7 7-7 7v-4H9V9z" />
           </svg>
           <div
-            class="grid size-16 place-content-center rounded-2xl border-[2px] border-solid border-button-border bg-table-alternateRow shadow-sm"
+            class="border-button-border bg-table-alternate-row grid size-16 place-content-center rounded-2xl border-2 shadow-xs"
           >
             <ServerIcon class="size-10" />
           </div>
         </div>
 
-        <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
-          <div class="text-lg font-bold text-contrast">Minecraft version</div>
+        <div class="bg-table-alternate-row flex w-full flex-col gap-2 rounded-2xl p-4">
+          <div class="text-contrast text-lg font-bold">Minecraft version</div>
           <UiServersTeleportDropdownMenu
             v-model="selectedMCVersion"
             name="mcVersion"
             :options="mcVersions"
-            class="w-full max-w-[100%]"
+            class="w-full max-w-full"
             placeholder="Select Minecraft version..."
           />
           <div class="mt-2 flex items-center justify-between gap-2">
@@ -81,18 +81,18 @@
           v-if="selectedLoader.toLowerCase() !== 'vanilla'"
           class="flex w-full flex-col gap-2 rounded-2xl p-4"
           :class="{
-            'bg-table-alternateRow':
+            'bg-table-alternate-row':
               !selectedMCVersion || isLoading || selectedLoaderVersions.length > 0,
             'bg-highlight-red':
               selectedMCVersion && !isLoading && selectedLoaderVersions.length === 0,
           }"
         >
           <div class="flex flex-col gap-2">
-            <div class="text-lg font-bold text-contrast">{{ selectedLoader }} version</div>
+            <div class="text-contrast text-lg font-bold">{{ selectedLoader }} version</div>
 
             <template v-if="!selectedMCVersion">
               <div
-                class="relative flex h-9 w-full select-none items-center rounded-xl bg-button-bg px-4 opacity-50"
+                class="bg-button-bg relative flex h-9 w-full items-center rounded-xl px-4 opacity-50 select-none"
               >
                 Select a Minecraft version to see available versions
                 <DropdownIcon class="absolute right-4" />
@@ -100,7 +100,7 @@
             </template>
             <template v-else-if="isLoading">
               <div
-                class="relative flex h-9 w-full items-center rounded-xl bg-button-bg px-4 opacity-50"
+                class="bg-button-bg relative flex h-9 w-full items-center rounded-xl px-4 opacity-50"
               >
                 <UiServersIconsLoadingIcon class="mr-2 animate-spin" />
                 Loading versions...
@@ -112,7 +112,7 @@
                 v-model="selectedLoaderVersion"
                 name="loaderVersion"
                 :options="selectedLoaderVersions"
-                class="w-full max-w-[100%]"
+                class="w-full max-w-full"
                 :placeholder="
                   selectedLoader.toLowerCase() === 'paper' ||
                   selectedLoader.toLowerCase() === 'purpur'
@@ -129,10 +129,10 @@
 
         <div
           v-if="!initialSetup"
-          class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4"
+          class="bg-table-alternate-row flex w-full flex-col gap-2 rounded-2xl p-4"
         >
           <div class="flex w-full flex-row items-center justify-between">
-            <label class="w-full text-lg font-bold text-contrast" for="hard-reset">
+            <label class="text-contrast w-full text-lg font-bold" for="hard-reset">
               Erase all data
             </label>
             <input

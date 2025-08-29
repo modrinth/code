@@ -112,7 +112,7 @@ onBeforeUnmount(() => {
 <style lang="scss" scoped>
 .context-menu {
   background-color: var(--color-raised-bg);
-  border-radius: var(--radius-md);
+  border-radius: 0.75rem;
   box-shadow: var(--shadow-floating);
   border: 1px solid var(--color-button-bg);
   margin: 0;
@@ -128,7 +128,7 @@ onBeforeUnmount(() => {
     display: flex;
     gap: var(--gap-sm);
     padding: var(--gap-sm);
-    border-radius: var(--radius-sm);
+    border-radius: 0.5rem;
 
     &:hover,
     &:active {

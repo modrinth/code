@@ -3,20 +3,20 @@
     <template #title>
       <div class="flex min-w-full items-center gap-2 md:w-[calc(420px-5.5rem)]">
         <UiAvatar :src="modDetails?.icon_url" size="48px" :alt="`${modDetails?.name} Icon`" />
-        <span class="truncate text-xl font-extrabold text-contrast">{{ modDetails?.name }}</span>
+        <span class="text-contrast truncate text-xl font-extrabold">{{ modDetails?.name }}</span>
       </div>
     </template>
     <div class="flex flex-col gap-2 md:w-[420px]">
       <div class="flex flex-col gap-2">
         <template v-if="versionsLoading">
           <div class="flex items-center gap-2">
-            <div class="w-fit animate-pulse select-none rounded-md bg-button-bg font-semibold">
+            <div class="bg-button-bg w-fit animate-pulse rounded-md font-semibold select-none">
               <span class="opacity-0" aria-hidden="true">{{ type }} version</span>
             </div>
-            <div class="min-h-[22px] min-w-[140px] animate-pulse rounded-full bg-button-bg" />
+            <div class="bg-button-bg min-h-[22px] min-w-[140px] animate-pulse rounded-full" />
           </div>
-          <div class="min-h-9 w-full animate-pulse rounded-xl bg-button-bg" />
-          <div class="w-fit animate-pulse select-none rounded-md bg-button-bg">
+          <div class="bg-button-bg min-h-9 w-full animate-pulse rounded-xl" />
+          <div class="bg-button-bg w-fit animate-pulse rounded-md select-none">
             <span class="ml-6 opacity-0" aria-hidden="true">
               Show any beta and alpha releases
             </span>
@@ -26,7 +26,7 @@
         <template v-else>
           <div class="flex justify-between">
             <div class="flex items-center gap-2">
-              <div class="font-semibold text-contrast">{{ type }} version</div>
+              <div class="text-contrast font-semibold">{{ type }} version</div>
               <NuxtLink
                 class="flex cursor-pointer items-center gap-1 bg-transparent p-0"
                 @click="
@@ -65,7 +65,7 @@
             name="Project"
             :options="filteredVersions"
             placeholder="No valid versions found"
-            class="!min-w-full"
+            class="min-w-full!"
             :disabled="filteredVersions.length === 0"
             :display-name="
               (version) => (typeof version === 'object' ? version?.version_number : version)
@@ -79,8 +79,8 @@
         ref="unlockFilterAccordion"
         :open-by-default="!versionFilter"
         :class="[
-          versionFilter ? '' : '!border-solid border-orange bg-bg-orange !text-contrast',
-          'flex flex-col gap-2 rounded-2xl border-2 border-dashed border-divider p-3 transition-all',
+          versionFilter ? '' : 'border-orange bg-bg-orange text-contrast! border-solid!',
+          'border-divider flex flex-col gap-2 rounded-2xl border-2 border-dashed p-3 transition-all',
         ]"
       >
         <p class="m-0 items-center font-bold">
@@ -185,7 +185,7 @@
             Something went wrong trying to load versions for this {{ type.toLocaleLowerCase() }}.
             Please try again later or contact support if the issue persists.
           </span>
-          <LazyUiCopyCode class="!mt-2 !break-all" :text="versionsError" />
+          <LazyUiCopyCode class="mt-2! break-all!" :text="versionsError" />
         </div>
       </Admonition>
 

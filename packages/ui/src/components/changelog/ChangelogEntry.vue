@@ -2,7 +2,7 @@
   <div>
     <div class="flex items-center gap-4">
       <div
-        class="h-4 w-4 rounded-full border-2 border-solid border-button-border"
+        class="h-4 w-4 rounded-full border-2 border-button-border"
         :class="recent || first ? 'bg-brand' : 'bg-button-bg'"
       />
       <div class="flex flex-wrap items-center gap-2">
@@ -161,7 +161,7 @@ const messages = defineMessages({
 
   img {
     max-width: 100%;
-    border-radius: var(--radius-md);
+    border-radius: 0.75rem;
   }
 }
 </style>

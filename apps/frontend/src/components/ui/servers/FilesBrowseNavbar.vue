@@ -2,7 +2,7 @@
   <div ref="pyroFilesSentinel" class="sentinel" data-pyro-files-sentinel />
   <header
     :class="[
-      'duration-20 top-0 flex select-none flex-col justify-between gap-2 bg-table-alternateRow p-3 transition-[border-radius] sm:h-12 sm:flex-row',
+      'bg-table-alternate-row top-0 flex flex-col justify-between gap-2 p-3 transition-[border-radius] duration-20 select-none sm:h-12 sm:flex-row',
       !isStuck ? 'rounded-t-2xl' : 'sticky top-0 z-20',
     ]"
     data-pyro-files-state="browsing"
@@ -10,19 +10,19 @@
   >
     <nav
       aria-label="Breadcrumb navigation"
-      class="m-0 flex min-w-0 flex-shrink items-center p-0 text-contrast"
+      class="text-contrast m-0 flex min-w-0 shrink items-center p-0"
     >
-      <ol class="m-0 flex min-w-0 flex-shrink list-none items-center p-0">
-        <li class="-ml-1 flex-shrink-0">
+      <ol class="m-0 flex min-w-0 shrink list-none items-center p-0">
+        <li class="-ml-1 shrink-0">
           <ButtonStyled type="transparent">
             <button
               v-tooltip="'Back to home'"
               type="button"
-              class="mr-2 grid h-12 w-10 place-content-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+              class="focus-visible:outline-brand mr-2 grid h-12 w-10 place-content-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid"
               @click="$emit('navigate', -1)"
             >
               <span
-                class="grid size-8 place-content-center rounded-full bg-button-bg p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
+                class="bg-button-bg group-hover:bg-highlight-brand group-hover:text-brand grid size-8 place-content-center rounded-full p-[6px]"
               >
                 <HomeIcon class="h-5 w-5" />
                 <span class="sr-only">Home</span>
@@ -30,27 +30,27 @@
             </button>
           </ButtonStyled>
         </li>
-        <li class="m-0 -ml-2 min-w-0 flex-shrink p-0">
-          <ol class="m-0 flex min-w-0 flex-shrink items-center overflow-hidden p-0">
+        <li class="m-0 -ml-2 min-w-0 shrink p-0">
+          <ol class="m-0 flex min-w-0 shrink items-center overflow-hidden p-0">
             <TransitionGroup
               name="breadcrumb"
               tag="span"
-              class="relative flex min-w-0 flex-shrink items-center"
+              class="relative flex min-w-0 shrink items-center"
             >
               <li
                 v-for="(segment, index) in breadcrumbSegments"
                 :key="`${segment || index}-group`"
-                class="relative flex min-w-0 flex-shrink items-center text-sm"
+                class="relative flex min-w-0 shrink items-center text-sm"
               >
-                <div class="flex min-w-0 flex-shrink items-center">
+                <div class="flex min-w-0 shrink items-center">
                   <ButtonStyled type="transparent">
                     <button
-                      class="cursor-pointer truncate focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+                      class="focus-visible:outline-brand cursor-pointer truncate focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid"
                       :aria-current="
                         index === breadcrumbSegments.length - 1 ? 'location' : undefined
                       "
                       :class="{
-                        '!text-contrast': index === breadcrumbSegments.length - 1,
+                        'text-contrast!': index === breadcrumbSegments.length - 1,
                       }"
                       @click="$emit('navigate', index)"
                     >
@@ -59,7 +59,7 @@
                   </ButtonStyled>
                   <ChevronRightIcon
                     v-if="index < breadcrumbSegments.length - 1"
-                    class="size-4 flex-shrink-0 text-secondary"
+                    class="text-secondary size-4 shrink-0"
                     aria-hidden="true"
                   />
                 </div>
@@ -70,7 +70,7 @@
       </ol>
     </nav>
 
-    <div class="flex flex-shrink-0 items-center gap-1">
+    <div class="flex shrink-0 items-center gap-1">
       <div class="flex w-full flex-row-reverse sm:flex-row">
         <ButtonStyled type="transparent">
           <UiServersTeleportOverflowMenu
@@ -89,7 +89,7 @@
                 {{ filterLabel }}
               </span>
             </div>
-            <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+            <DropdownIcon aria-hidden="true" class="text-secondary h-5 w-5" />
             <template #all>Show all</template>
             <template #filesOnly>Files only</template>
             <template #foldersOnly>Folders only</template>
@@ -99,7 +99,7 @@
           <label for="search-folder" class="sr-only">Search folder</label>
           <div class="relative">
             <SearchIcon
-              class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+              class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2"
               aria-hidden="true"
             />
             <input
@@ -108,7 +108,7 @@
               type="search"
               name="search"
               autocomplete="off"
-              class="h-8 min-h-[unset] w-full border-[1px] border-solid border-divider bg-transparent py-2 pl-9"
+              class="border-divider h-8 min-h-[unset] w-full border bg-transparent py-2 pl-9"
               placeholder="Search..."
               @input="$emit('update:searchQuery', ($event.target as HTMLInputElement).value)"
             />
@@ -133,7 +133,7 @@
           ]"
         >
           <PlusIcon aria-hidden="true" />
-          <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+          <DropdownIcon aria-hidden="true" class="text-secondary h-5 w-5" />
           <template #file> <BoxIcon aria-hidden="true" /> New file </template>
           <template #directory> <FolderOpenIcon aria-hidden="true" /> New folder </template>
           <template #upload> <UploadIcon aria-hidden="true" /> Upload file </template>

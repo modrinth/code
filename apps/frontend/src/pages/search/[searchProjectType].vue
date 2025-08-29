@@ -11,22 +11,20 @@
     </Teleport>
     <section class="normal-page__header mb-4 flex flex-col gap-4">
       <template v-if="server">
-        <div
-          class="flex flex-wrap items-center justify-between gap-3 border-0 border-b border-solid border-divider pb-4"
-        >
+        <div class="border-divider flex flex-wrap items-center justify-between gap-3 border-b pb-4">
           <nuxt-link
             :to="`/servers/manage/${server.serverId}/content`"
             tabindex="-1"
-            class="flex flex-col gap-4 text-primary"
+            class="text-primary flex flex-col gap-4"
           >
             <span class="flex items-center gap-2">
               <Avatar :src="server.general.image" size="48px" />
               <span class="flex flex-col gap-2">
-                <span class="bold font-extrabold text-contrast">
+                <span class="bold text-contrast font-extrabold">
                   {{ server.general.name }}
                 </span>
-                <span class="flex items-center gap-2 font-semibold text-secondary">
-                  <GameIcon class="h-5 w-5 text-secondary" />
+                <span class="text-secondary flex items-center gap-2 font-semibold">
+                  <GameIcon class="text-secondary h-5 w-5" />
                   {{ server.general.loader }} {{ server.general.mc_version }}
                 </span>
               </span>
@@ -39,7 +37,7 @@
             </nuxt-link>
           </ButtonStyled>
         </div>
-        <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">
+        <h1 class="text-contrast m-0 text-xl leading-none font-extrabold">
           Install content to server
         </h1>
       </template>
@@ -61,18 +59,18 @@
           !server
         "
       />
-      <div v-if="filtersMenuOpen" class="fixed inset-0 z-40 bg-bg"></div>
+      <div v-if="filtersMenuOpen" class="bg-bg fixed inset-0 z-40"></div>
       <div
         class="flex flex-col gap-3"
         :class="{
-          'fixed inset-0 z-50 m-4 mb-0 overflow-auto rounded-t-3xl bg-bg-raised': filtersMenuOpen,
+          'bg-bg-raised fixed inset-0 z-50 m-4 mb-0 overflow-auto rounded-t-3xl': filtersMenuOpen,
         }"
       >
         <div
           v-if="filtersMenuOpen"
-          class="sticky top-0 z-10 mx-1 flex items-center justify-between gap-3 border-0 border-b-[1px] border-solid border-divider bg-bg-raised px-6 py-4"
+          class="border-divider bg-bg-raised sticky top-0 z-10 mx-1 flex items-center justify-between gap-3 border-b px-6 py-4"
         >
-          <h3 class="m-0 text-lg text-contrast">Filters</h3>
+          <h3 class="text-contrast m-0 text-lg">Filters</h3>
           <ButtonStyled circular>
             <button
               @click="
@@ -86,8 +84,8 @@
             </button>
           </ButtonStyled>
         </div>
-        <div v-if="server && projectType.id === 'modpack'" class="rounded-2xl bg-bg-raised">
-          <div class="flex flex-row items-center gap-2 px-6 py-4 text-contrast">
+        <div v-if="server && projectType.id === 'modpack'" class="bg-bg-raised rounded-2xl">
+          <div class="text-contrast flex flex-row items-center gap-2 px-6 py-4">
             <h3 class="m-0 text-lg">Options</h3>
           </div>
           <div class="flex flex-row items-center justify-between gap-2 px-6">
@@ -105,7 +103,7 @@
             the selected modpack.
           </div>
         </div>
-        <div v-if="server && projectType.id !== 'modpack'" class="rounded-2xl bg-bg-raised p-4">
+        <div v-if="server && projectType.id !== 'modpack'" class="bg-bg-raised rounded-2xl p-4">
           <Checkbox
             v-model="serverHideInstalled"
             label="Hide installed content"
@@ -122,9 +120,7 @@
           :provided-filters="serverFilters"
           :filter-type="filter"
           :class="
-            filtersMenuOpen
-              ? 'border-0 border-b-[1px] border-solid border-divider last:border-b-0'
-              : 'rounded-2xl bg-bg-raised'
+            filtersMenuOpen ? 'border-divider border-b last:border-b-0' : 'bg-bg-raised rounded-2xl'
           "
           button-class="button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none"
           content-class="mb-4 mx-3"
@@ -165,14 +161,14 @@
           <DropdownSelect
             v-slot="{ selected }"
             v-model="currentSortType"
-            class="!w-auto flex-grow md:flex-grow-0"
+            class="w-auto! grow md:grow-0"
             name="Sort by"
             :options="sortTypes"
             :display-name="(option) => option?.display"
             @change="updateSearchResults()"
           >
-            <span class="font-semibold text-primary">Sort by: </span>
-            <span class="font-semibold text-secondary">{{ selected }}</span>
+            <span class="text-primary font-semibold">Sort by: </span>
+            <span class="text-secondary font-semibold">{{ selected }}</span>
           </DropdownSelect>
           <DropdownSelect
             v-slot="{ selected }"
@@ -181,11 +177,11 @@
             :options="currentMaxResultsOptions"
             :default-value="maxResults"
             :model-value="maxResults"
-            class="!w-auto flex-grow md:flex-grow-0"
+            class="w-auto! grow md:grow-0"
             @change="updateSearchResults()"
           >
-            <span class="font-semibold text-primary">View: </span>
-            <span class="font-semibold text-secondary">{{ selected }}</span>
+            <span class="text-primary font-semibold">View: </span>
+            <span class="text-secondary font-semibold">{{ selected }}</span>
           </DropdownSelect>
           <div class="lg:hidden">
             <ButtonStyled>
@@ -209,7 +205,7 @@
           <Pagination
             :page="currentPage"
             :count="pageCount"
-            class="mx-auto sm:ml-auto sm:mr-0"
+            class="mx-auto sm:mr-0 sm:ml-auto"
             @switch-page="updateSearchResults"
           />
         </div>

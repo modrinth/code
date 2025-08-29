@@ -18,7 +18,7 @@ const props = withDefaults(
 const colors = {
   brand: {
     fg: 'bg-brand',
-    bg: 'bg-brand-highlight',
+    bg: 'bg-highlight-brand',
   },
   green: {
     fg: 'bg-green',
@@ -50,7 +50,7 @@ const percent = computed(() => props.progress / props.max)
 </script>
 <template>
   <div
-    class="flex w-full max-w-[15rem] h-1 rounded-full overflow-hidden"
+    class="flex w-full max-w-60 h-1 rounded-full overflow-hidden"
     :class="colors[props.color].bg"
   >
     <div

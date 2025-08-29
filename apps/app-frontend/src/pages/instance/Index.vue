@@ -16,7 +16,7 @@
         <template #summary> </template>
         <template #stats>
           <div
-            class="flex items-center gap-2 font-semibold transform capitalize border-0 border-solid border-divider pr-4 md:border-r"
+            class="flex items-center gap-2 font-semibold transform capitalize border-divider pr-4 md:border-r"
           >
             <GameIcon class="h-6 w-6 text-secondary" />
             {{ instance.loader }} {{ instance.game_version }}

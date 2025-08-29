@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-1 gap-x-8 gap-y-6 border-0 border-b border-solid border-divider pb-4 lg:grid-cols-[1fr_auto]"
+    class="grid grid-cols-1 gap-x-8 gap-y-6 border-b border-divider pb-4 lg:grid-cols-[1fr_auto]"
   >
     <div class="flex gap-4">
       <slot name="icon" />
@@ -11,7 +11,7 @@
           </h1>
           <slot name="title-suffix" />
         </div>
-        <p v-if="$slots.summary" class="m-0 line-clamp-2 max-w-[40rem] empty:hidden">
+        <p v-if="$slots.summary" class="m-0 line-clamp-2 max-w-160 empty:hidden">
           <slot name="summary" />
         </p>
         <div v-if="$slots.stats" class="mt-auto flex flex-wrap gap-4 empty:hidden">

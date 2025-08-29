@@ -279,7 +279,7 @@ defineExpose({
 
 .qr-code {
   background-color: white !important;
-  border-radius: var(--radius-md);
+  border-radius: 0.75rem;
 }
 
 .copy-button {

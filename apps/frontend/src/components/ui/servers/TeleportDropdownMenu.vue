@@ -7,7 +7,7 @@
       :aria-expanded="dropdownVisible"
       :aria-controls="listboxId"
       :aria-labelledby="listboxId"
-      class="duration-50 flex h-full w-full cursor-pointer select-none appearance-none items-center justify-between gap-4 rounded-xl border-none bg-button-bg px-4 py-2 shadow-sm !outline-none transition-all ease-in-out"
+      class="bg-button-bg flex h-full w-full cursor-pointer appearance-none items-center justify-between gap-4 rounded-xl border-none px-4 py-2 shadow-xs outline-hidden! transition-all duration-50 ease-in-out select-none"
       :class="triggerClasses"
       @click="toggleDropdown"
       @keydown="handleTriggerKeyDown"
@@ -35,7 +35,7 @@
           role="listbox"
           tabindex="-1"
           :aria-activedescendant="activeDescendant"
-          class="experimental-styles-within fixed z-50 bg-button-bg shadow-lg outline-none"
+          class="experimental-styles-within bg-button-bg fixed z-50 shadow-lg outline-hidden"
           :class="{
             'rounded-b-xl': !isRenderingUp,
             'rounded-t-xl': isRenderingUp,
@@ -64,9 +64,9 @@
                   :id="`${listboxId}-option-${item.index}`"
                   role="option"
                   :aria-selected="selectedValue === item.option"
-                  class="hover:brightness-85 flex h-full cursor-pointer select-none items-center px-4 transition-colors duration-150 ease-in-out"
+                  class="flex h-full cursor-pointer items-center px-4 transition-colors duration-150 ease-in-out select-none hover:brightness-85"
                   :class="{
-                    'bg-brand font-bold text-brand-inverted': selectedValue === item.option,
+                    'bg-brand text-brand-inverted font-bold': selectedValue === item.option,
                     'bg-bg-raised': focusedOptionIndex === item.index,
                     'rounded-b-xl': item.index === props.options.length - 1 && !isRenderingUp,
                     'rounded-t-xl': item.index === 0 && isRenderingUp,
@@ -177,7 +177,7 @@ const radioValue = computed<OptionValue>({
 });
 
 const triggerClasses = computed(() => ({
-  "!cursor-not-allowed opacity-50 grayscale": props.disabled,
+  "cursor-not-allowed! opacity-50 grayscale": props.disabled,
   "rounded-b-none": dropdownVisible.value && !isRenderingUp.value && !props.disabled,
   "rounded-t-none": dropdownVisible.value && isRenderingUp.value && !props.disabled,
 }));

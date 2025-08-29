@@ -28,7 +28,7 @@
     />
 
     <FilesUploadDragAndDrop
-      class="relative flex w-full flex-col rounded-2xl border border-solid border-bg-raised"
+      class="border-bg-raised relative flex w-full flex-col rounded-2xl border border-solid"
       @files-dropped="handleDroppedFiles"
     >
       <div ref="mainContent" class="relative isolate flex w-full flex-col">
@@ -54,13 +54,13 @@
           <div
             v-for="op in ops"
             :key="`fs-op-${op.op}-${op.src}`"
-            class="sticky top-20 z-20 grid grid-cols-[auto_1fr_auto] items-center gap-2 border-0 border-b-[1px] border-solid border-button-bg bg-table-alternateRow px-4 py-2 md:grid-cols-[auto_1fr_1fr_2fr_auto]"
+            class="border-button-bg bg-table-alternate-row sticky top-20 z-20 grid grid-cols-[auto_1fr_auto] items-center gap-2 border-b px-4 py-2 md:grid-cols-[auto_1fr_1fr_2fr_auto]"
           >
             <div>
-              <PackageOpenIcon class="h-5 w-5 text-secondary" />
+              <PackageOpenIcon class="text-secondary h-5 w-5" />
             </div>
             <div class="flex flex-wrap gap-x-4 gap-y-1 md:contents">
-              <div class="flex items-center text-wrap break-all text-sm font-bold text-contrast">
+              <div class="text-contrast flex items-center text-sm font-bold text-wrap break-all">
                 Extracting {{ op.src.includes("https://") ? "modpack from URL" : op.src }}
               </div>
               <span
@@ -97,11 +97,11 @@
                 </template>
               </span>
               <div class="col-span-2 flex grow flex-col gap-1 md:col-span-1 md:items-end">
-                <div class="text-xs font-semibold text-contrast opacity-80">
+                <div class="text-contrast text-xs font-semibold opacity-80">
                   <span :class="{ invisible: 'current_file' in op && !op.current_file }">
                     {{
                       "current_file" in op
-                        ? op.current_file?.split("/")?.pop() ?? "unknown"
+                        ? (op.current_file?.split("/")?.pop() ?? "unknown")
                         : "unknown"
                     }}
                   </span>
@@ -121,7 +121,7 @@
                   :waiting="op.state === 'queued' || !op.progress || op.progress === 0"
                 />
                 <div
-                  class="text-xs text-secondary opacity-80"
+                  class="text-secondary text-xs opacity-80"
                   :class="{ invisible: 'bytes_processed' in op && !op.bytes_processed }"
                 >
                   {{ "bytes_processed" in op ? formatBytes(op.bytes_processed) : "0 B" }} extracted
@@ -151,14 +151,14 @@
             </div>
             <pre
               v-if="flags.advancedDebugInfo"
-              class="markdown-body col-span-full m-0 rounded-xl bg-button-bg text-xs"
+              class="markdown-body bg-button-bg col-span-full m-0 rounded-xl text-xs"
               >{{ op }}</pre
             >
           </div>
           <FilesUploadDropdown
             v-if="props.server.fs"
             ref="uploadDropdownRef"
-            class="rounded-b-xl border-0 border-t border-solid border-bg bg-table-alternateRow"
+            class="border-bg bg-table-alternate-row rounded-b-xl border-t border-solid"
             :current-path="currentPath"
             :fs="props.server.fs"
             @upload-complete="refreshList()"
@@ -178,7 +178,7 @@
           @navigate="navigateToSegment"
         />
 
-        <div v-if="isEditing" class="h-full w-full flex-grow">
+        <div v-if="isEditing" class="h-full w-full grow">
           <component
             :is="VAceEditor"
             v-if="!isEditingImage"
@@ -225,9 +225,9 @@
           class="flex h-full w-full items-center justify-center p-20"
         >
           <div class="flex flex-col items-center gap-4 text-center">
-            <FolderOpenIcon class="h-16 w-16 text-secondary" />
-            <h3 class="m-0 text-2xl font-bold text-contrast">This folder is empty</h3>
-            <p class="m-0 text-sm text-secondary">There are no files or folders.</p>
+            <FolderOpenIcon class="text-secondary h-16 w-16" />
+            <h3 class="text-contrast m-0 text-2xl font-bold">This folder is empty</h3>
+            <p class="text-secondary m-0 text-sm">There are no files or folders.</p>
           </div>
         </div>
 
@@ -242,7 +242,7 @@
 
       <div
         v-if="isDragging"
-        class="absolute inset-0 flex items-center justify-center rounded-2xl bg-black bg-opacity-50 text-white"
+        class="bg-opacity-50 absolute inset-0 flex items-center justify-center rounded-2xl bg-black text-white"
       >
         <div class="text-center">
           <UploadIcon class="mx-auto h-16 w-16" />

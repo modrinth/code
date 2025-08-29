@@ -2,7 +2,7 @@
   <NewModal ref="modal" header="Creating backup" @show="focusInput">
     <div class="flex flex-col gap-2 md:w-[600px]">
       <label for="backup-name-input">
-        <span class="text-lg font-semibold text-contrast"> Name </span>
+        <span class="text-contrast text-lg font-semibold"> Name </span>
       </label>
       <input
         id="backup-name-input"
@@ -14,13 +14,13 @@
         maxlength="48"
       />
       <div v-if="nameExists && !isCreating" class="flex items-center gap-1">
-        <IssuesIcon class="hidden text-orange sm:block" />
-        <span class="text-sm text-orange">
+        <IssuesIcon class="text-orange hidden sm:block" />
+        <span class="text-orange text-sm">
           You already have a backup named '<span class="font-semibold">{{ trimmedName }}</span
           >'
         </span>
       </div>
-      <div v-if="isRateLimited" class="mt-2 text-sm text-red">
+      <div v-if="isRateLimited" class="text-red mt-2 text-sm">
         You're creating backups too fast. Please wait a moment before trying again.
       </div>
     </div>

@@ -52,7 +52,7 @@
 
     <div class="flex flex-row items-center gap-2 rounded-lg">
       <ButtonStyled v-if="isInstalling" type="standard" color="brand">
-        <button disabled class="flex-shrink-0">
+        <button disabled class="shrink-0">
           <UiServersPanelSpinner class="size-5" /> Installing...
         </button>
       </ButtonStyled>

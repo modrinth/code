@@ -289,7 +289,7 @@ onBeforeUnmount(() => {
   flex-direction: row;
   align-items: center;
   gap: 0.5rem;
-  border-radius: var(--radius-md);
+  border-radius: 0.75rem;
   border: 1px solid var(--color-button-bg);
   padding: var(--gap-sm) var(--gap-lg);
 }

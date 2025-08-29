@@ -17,9 +17,9 @@
     >
       <img v-if="featuredImage" :src="featuredImage" alt="gallery image" loading="lazy" />
     </nuxt-link>
-    <div class="title">
+    <div class="title leading-tight">
       <nuxt-link :to="`/${$getProjectTypeForUrl(type, categories)}/${id}`">
-        <h2 class="name !text-2xl">
+        <h2 class="name text-2xl!">
           {{ name }}
         </h2>
       </nuxt-link>
@@ -31,7 +31,7 @@
       </p>
       <Badge v-if="status && status !== 'approved'" :type="status" class="status" />
     </div>
-    <p class="description">
+    <p class="description leading-tight">
       {{ description }}
     </p>
     <Categories
@@ -51,7 +51,7 @@
         :categories="categories"
       />
     </Categories>
-    <div class="stats">
+    <div class="stats leading-tight">
       <div v-if="downloads" class="stat">
         <DownloadIcon aria-hidden="true" />
         <p>
@@ -91,11 +91,11 @@
 
 <script>
 import { CalendarIcon, UpdatedIcon, DownloadIcon, HeartIcon } from "@modrinth/assets";
+import { useRelativeTime } from "@modrinth/ui";
 import Categories from "~/components/ui/search/Categories.vue";
 import Badge from "~/components/ui/Badge.vue";
 import EnvironmentIndicator from "~/components/ui/EnvironmentIndicator.vue";
 import Avatar from "~/components/ui/Avatar.vue";
-import { useRelativeTime } from "@modrinth/ui";
 
 export default {
   components: {

@@ -8,7 +8,7 @@ defineProps<{
 </script>
 <template>
   <div
-    class="flex gap-3 rounded-2xl border-2 border-solid border-orange bg-bg-orange px-4 py-3 font-medium text-contrast"
+    class="flex gap-3 rounded-2xl border-2 border-orange bg-bg-orange px-4 py-3 font-medium text-contrast"
   >
     <IssuesIcon class="mt-1 h-5 w-5 shrink-0 text-orange" />
     <span class="leading-normal">

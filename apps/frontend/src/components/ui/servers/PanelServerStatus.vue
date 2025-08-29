@@ -1,7 +1,7 @@
 <template>
   <div
     :aria-label="`Server is ${getStatusText(state)}`"
-    class="relative inline-flex select-none items-center"
+    class="relative inline-flex items-center select-none"
     @mouseenter="isExpanded = true"
     @mouseleave="isExpanded = false"
   >
@@ -28,7 +28,7 @@
       <div class="h-3 w-3 rounded-full"></div>
       <span
         :class="[
-          'origin-left whitespace-nowrap text-sm font-semibold text-contrast transition-all duration-[200ms] ease-in-out',
+          'text-contrast origin-left text-sm font-semibold whitespace-nowrap transition-all duration-200 ease-in-out',
           isExpanded ? 'translate-x-0 scale-100' : '-translate-x-1 scale-x-75',
         ]"
       >
@@ -45,7 +45,7 @@ import type { ServerState } from "@modrinth/utils";
 const STATUS_CLASSES = {
   running: { main: "bg-brand", bg: "bg-bg-green" },
   stopped: { main: "", bg: "" },
-  crashed: { main: "bg-brand-red", bg: "bg-bg-red" },
+  crashed: { main: "bg-red", bg: "bg-bg-red" },
   unknown: { main: "", bg: "" },
 } as const;
 

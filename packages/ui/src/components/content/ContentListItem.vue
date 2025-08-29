@@ -49,8 +49,8 @@ const model = defineModel<boolean>()
 </script>
 <template>
   <div
-    class="grid grid-cols-[min-content,4fr,3fr,2fr] gap-3 items-center p-2 h-[64px] border-solid border-0 border-b-button-bg relative"
-    :class="{ 'border-b-[1px]': !last }"
+    class="grid grid-cols-[min-content_4fr_3fr_2fr] gap-3 items-center p-2 h-[64px] border-b-button-bg relative"
+    :class="{ 'border-b': !last }"
   >
     <Checkbox v-model="model" :description="``" class="select-checkbox" />
     <div

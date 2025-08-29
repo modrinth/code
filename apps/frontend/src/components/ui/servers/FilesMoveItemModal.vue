@@ -14,7 +14,7 @@
       </div>
       <div class="flex items-center gap-2 text-nowrap">
         New location:
-        <div class="w-full rounded-lg bg-table-alternateRow p-2 font-bold text-contrast">
+        <div class="bg-table-alternate-row text-contrast w-full rounded-lg p-2 font-bold">
           <span class="text-secondary">/root</span>{{ newpath }}
         </div>
       </div>

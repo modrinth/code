@@ -21,7 +21,7 @@ withDefaults(
 
 <template>
   <button
-    class="flex items-center w-full gap-2 border-none p-3 text-primary rounded-xl transition-all duration-200 hover:bg-button-bg hover:brightness-[--hover-brightness] active:scale-[0.98] hover:cursor-pointer"
+    class="flex items-center w-full gap-2 border-none p-3 text-primary rounded-xl transition-all duration-200 hover:bg-button-bg hover:brightness-(--hover-brightness) active:scale-[0.98] hover:cursor-pointer"
     :class="selected ? 'bg-button-bg' : 'bg-transparent'"
     @click="emit('select')"
   >

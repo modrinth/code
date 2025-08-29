@@ -25,7 +25,7 @@
           v-if="isOpen"
           ref="menuRef"
           data-pyro-telepopover-root
-          class="experimental-styles-within fixed isolate z-[9999] flex w-fit flex-col gap-2 overflow-hidden rounded-2xl border-[1px] border-solid border-divider bg-bg-raised p-2 shadow-lg"
+          class="experimental-styles-within border-divider bg-bg-raised fixed isolate z-9999 flex w-fit flex-col gap-2 overflow-hidden rounded-2xl border p-2 shadow-lg"
           :style="menuStyle"
           role="menu"
           tabindex="-1"
@@ -36,7 +36,7 @@
             v-for="(option, index) in filteredOptions"
             :key="isDivider(option) ? `divider-${index}` : option.id"
           >
-            <div v-if="isDivider(option)" class="h-px w-full bg-button-bg"></div>
+            <div v-if="isDivider(option)" class="bg-button-bg h-px w-full"></div>
             <ButtonStyled v-else type="transparent" role="menuitem" :color="option.color">
               <button
                 v-if="typeof option.action === 'function'"
@@ -45,7 +45,7 @@
                     if (el) menuItemsRef[index] = el as HTMLElement;
                   }
                 "
-                class="w-full !justify-start !whitespace-nowrap focus-visible:!outline-none"
+                class="w-full justify-start! whitespace-nowrap! focus-visible:outline-hidden!"
                 :aria-selected="index === selectedIndex"
                 :style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
                 @click="handleItemClick(option, index)"
@@ -62,7 +62,7 @@
                   }
                 "
                 :to="option.action"
-                class="w-full !justify-start !whitespace-nowrap focus-visible:!outline-none"
+                class="w-full justify-start! whitespace-nowrap! focus-visible:outline-hidden!"
                 :aria-selected="index === selectedIndex"
                 :style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
                 @click="handleItemClick(option, index)"
@@ -80,7 +80,7 @@
                 "
                 :href="option.action"
                 target="_blank"
-                class="w-full !justify-start !whitespace-nowrap focus-visible:!outline-none"
+                class="w-full justify-start! whitespace-nowrap! focus-visible:outline-hidden!"
                 :aria-selected="index === selectedIndex"
                 :style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
                 @click="handleItemClick(option, index)"

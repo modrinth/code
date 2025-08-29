@@ -4,13 +4,13 @@
       <div class="flex flex-col gap-4">
         <div class="flex flex-col justify-between gap-4 sm:flex-row">
           <label class="flex flex-col gap-2">
-            <span class="text-lg font-bold text-contrast">SFTP</span>
+            <span class="text-contrast text-lg font-bold">SFTP</span>
             <span> SFTP allows you to access your server's files from outside of Modrinth. </span>
           </label>
           <ButtonStyled>
             <button
               v-tooltip="'This button only works with compatible SFTP clients (e.g. WinSCP)'"
-              class="!w-full sm:!w-auto"
+              class="w-full! sm:w-auto!"
               @click="openSftp"
             >
               <ExternalIcon class="h-5 w-5" />
@@ -20,14 +20,14 @@
         </div>
 
         <div
-          class="flex w-full flex-row justify-between gap-2 rounded-xl bg-table-alternateRow p-4"
+          class="bg-table-alternate-row flex w-full flex-row justify-between gap-2 rounded-xl p-4"
         >
           <div class="flex flex-col gap-2">
-            <span class="cursor-pointer font-bold text-contrast">
+            <span class="text-contrast cursor-pointer font-bold">
               {{ data?.sftp_host }}
             </span>
 
-            <span class="text-xs text-secondary">Server Address</span>
+            <span class="text-secondary text-xs">Server Address</span>
           </div>
 
           <ButtonStyled type="transparent">
@@ -41,10 +41,10 @@
         </div>
         <div class="-mt-2 flex flex-col gap-2 sm:mt-0 sm:flex-row">
           <div
-            class="flex w-full flex-col justify-center gap-2 rounded-xl bg-table-alternateRow px-4 py-2"
+            class="bg-table-alternate-row flex w-full flex-col justify-center gap-2 rounded-xl px-4 py-2"
           >
             <div class="flex h-8 items-center justify-between">
-              <span class="font-bold text-contrast">
+              <span class="text-contrast font-bold">
                 {{ data?.sftp_username }}
               </span>
 
@@ -57,13 +57,13 @@
                 </button>
               </ButtonStyled>
             </div>
-            <span class="text-xs text-secondary">Username</span>
+            <span class="text-secondary text-xs">Username</span>
           </div>
           <div
-            class="flex w-full flex-col justify-center gap-2 rounded-xl bg-table-alternateRow p-4"
+            class="bg-table-alternate-row flex w-full flex-col justify-center gap-2 rounded-xl p-4"
           >
             <div class="flex h-8 items-center justify-between">
-              <span class="font-bold text-contrast">
+              <span class="text-contrast font-bold">
                 {{
                   showPassword ? data?.sftp_password : "*".repeat(data?.sftp_password?.length ?? 0)
                 }}
@@ -89,14 +89,14 @@
                 </ButtonStyled>
               </div>
             </div>
-            <span class="text-xs text-secondary">Password</span>
+            <span class="text-secondary text-xs">Password</span>
           </div>
         </div>
       </div>
     </div>
     <div class="card">
       <h2 class="text-xl font-bold">Info</h2>
-      <div class="rounded-xl bg-table-alternateRow p-4">
+      <div class="bg-table-alternate-row rounded-xl p-4">
         <table
           class="min-w-full border-collapse overflow-hidden rounded-lg border-2 border-gray-300"
         >

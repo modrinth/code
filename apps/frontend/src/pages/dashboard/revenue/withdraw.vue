@@ -265,12 +265,12 @@ const getRangeOfMethod = (method) => {
 
 const maxWithdrawAmount = computed(() => {
   const interval = selectedMethod.value.interval;
-  return interval?.standard ? interval.standard.max : interval?.fixed?.values.slice(-1)[0] ?? 0;
+  return interval?.standard ? interval.standard.max : (interval?.fixed?.values.slice(-1)[0] ?? 0);
 });
 
 const minWithdrawAmount = computed(() => {
   const interval = selectedMethod.value.interval;
-  return interval?.standard ? interval.standard.min : interval?.fixed?.values?.[0] ?? fees.value;
+  return interval?.standard ? interval.standard.min : (interval?.fixed?.values?.[0] ?? fees.value);
 });
 
 const withdrawAccount = computed(() => {
@@ -394,7 +394,7 @@ async function withdraw() {
 
   &::-webkit-scrollbar-thumb {
     background-color: var(--color-raised-bg);
-    border-radius: var(--radius-lg);
+    border-radius: 1rem;
     border: 3px solid var(--color-bg);
   }
 }
@@ -416,7 +416,7 @@ async function withdraw() {
 
 .withdraw-option {
   width: 100%;
-  border-radius: var(--radius-md);
+  border-radius: 0.75rem;
   padding: 0;
   overflow: hidden;
   border: 1px solid var(--color-divider);
@@ -446,7 +446,7 @@ async function withdraw() {
 
       .badge {
         background-color: var(--color-button-bg);
-        border-radius: var(--radius-xs);
+        border-radius: 0.25rem;
         padding: var(--gap-xs) var(--gap-sm);
         font-size: var(--font-size-xs);
       }

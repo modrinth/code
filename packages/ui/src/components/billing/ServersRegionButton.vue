@@ -40,19 +40,19 @@ function setRegion() {
 <template>
   <button
     :disabled="outOfStock"
-    class="rounded-2xl p-4 font-semibold transition-all border-2 border-solid flex flex-col items-center gap-3"
+    class="rounded-2xl p-4 font-semibold transition-all border-2 flex flex-col items-center gap-3"
     :class="{
       'bg-button-bg border-transparent text-primary': !isCurrentRegion,
-      'bg-brand-highlight border-brand text-contrast': isCurrentRegion,
+      'bg-highlight-brand border-brand text-contrast': isCurrentRegion,
       'opacity-50 cursor-not-allowed': outOfStock,
-      'hover:text-contrast active:scale-95 hover:brightness-[--hover-brightness] focus-visible:brightness-[--hover-brightness] ':
+      'hover:text-contrast active:scale-95 hover:brightness-(--hover-brightness) focus-visible:brightness-(--hover-brightness) ':
         !outOfStock,
     }"
     @click="setRegion"
   >
     <img
       v-if="flag"
-      class="aspect-[16/10] max-w-16 w-full object-cover rounded-md border-1 border-solid"
+      class="aspect-16/10 max-w-16 w-full object-cover rounded-md border border-solid"
       :class="[
         isCurrentRegion ? 'border-brand' : 'border-button-border',
         { 'saturate-[0.25]': outOfStock },

@@ -43,7 +43,7 @@ defineExpose({
         {{ formatMessage(messages.addingPaymentMethod) }}
       </span>
     </template>
-    <div class="w-[40rem] max-w-full">
+    <div class="w-160 max-w-full">
       <AddPaymentMethod
         ref="addPaymentMethod"
         :publishable-key="props.publishableKey"

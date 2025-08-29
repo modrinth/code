@@ -23,7 +23,7 @@
           <button
             v-for="filter in filterOptions"
             :key="`content-filter-${filter.id}`"
-            :class="`px-2 py-1 rounded-full font-semibold leading-none border-none cursor-pointer active:scale-[0.97] duration-100 transition-all ${selectedFilters.includes(filter.id) ? 'bg-brand-highlight text-brand' : 'bg-bg-raised text-secondary'}`"
+            :class="`px-2 py-1 rounded-full font-semibold leading-none border-none cursor-pointer active:scale-[0.97] duration-100 transition-all ${selectedFilters.includes(filter.id) ? 'bg-highlight-brand text-brand' : 'bg-bg-raised text-secondary'}`"
             @click="toggleArray(selectedFilters, filter.id)"
           >
             {{ filter.formattedName }}
@@ -837,7 +837,7 @@ onUnmounted(() => {
 
 .table {
   margin-block-start: 0;
-  border-radius: var(--radius-lg);
+  border-radius: 1rem;
   border: 2px solid var(--color-bg);
 }
 
@@ -915,7 +915,7 @@ onUnmounted(() => {
       width: unset;
 
       :deep(.selected) {
-        border-radius: var(--radius-md) 0 0 var(--radius-md);
+        border-radius: 0.75rem 0 0 0.75rem;
       }
     }
 
@@ -929,17 +929,17 @@ onUnmounted(() => {
 
     :deep(.animated-dropdown) {
       .render-down {
-        border-radius: var(--radius-md) 0 0 var(--radius-md) !important;
+        border-radius: 0.75rem 0 0 0.75rem !important;
       }
 
       .options-wrapper {
         margin-top: 0.25rem;
         width: unset;
-        border-radius: var(--radius-md);
+        border-radius: 0.75rem;
       }
 
       .options {
-        border-radius: var(--radius-md);
+        border-radius: 0.75rem;
         border: 1px solid var(--color);
       }
     }

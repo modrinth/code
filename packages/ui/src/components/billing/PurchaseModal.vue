@@ -80,13 +80,13 @@
                 'Purpur',
               ]"
               :key="loader"
-              class="!h-24 btn flex !flex-col !items-center !justify-between !pt-4 !pb-3 !w-full"
+              class="h-24! btn flex flex-col! items-center! justify-between! pt-4! pb-3! w-full!"
               :style="{
                 filter: serverLoader === loader ? 'brightness(1.5)' : '',
               }"
               @click="serverLoader = loader"
             >
-              <UiServersIconsLoaderIcon :loader="loader" class="!h-12 !w-12" />
+              <UiServersIconsLoaderIcon :loader="loader" class="h-12! w-12!" />
               <p class="text-lg font-bold m-0">{{ loader }}</p>
             </button>
           </div>
@@ -231,7 +231,7 @@
             </span>
           </div>
         </div>
-        <div class="mt-4 flex justify-between border-0 border-t border-solid border-code-bg pt-4">
+        <div class="mt-4 flex justify-between border-t border-code-bg pt-4">
           <span class="text-xl text-secondary">Total</span>
           <div class="flex items-baseline gap-2">
             <span class="text-2xl font-extrabold text-primary">
@@ -254,11 +254,11 @@
     >
       <div
         v-show="loadingPaymentMethodModal !== 2"
-        class="flex min-h-[16rem] items-center justify-center md:w-[600px]"
+        class="flex min-h-64 items-center justify-center md:w-[600px]"
       >
         <AnimatedLogo class="w-[80px]" />
       </div>
-      <div v-show="loadingPaymentMethodModal === 2" class="min-h-[16rem] p-1 md:w-[600px]">
+      <div v-show="loadingPaymentMethodModal === 2" class="min-h-64 p-1 md:w-[600px]">
         <div id="address-element"></div>
         <div id="payment-element" class="mt-4"></div>
       </div>
@@ -277,7 +277,7 @@
             v-if="projectImage"
             :src="projectImage"
             alt="Project image"
-            class="w-16 h-16 rounded"
+            class="w-16 h-16 rounded-sm"
           />
           <div>
             <p v-if="projectName" class="font-bold">{{ projectName }}</p>
@@ -312,7 +312,7 @@
               formatPrice(locale, tax, price.currency_code)
             }}</span>
           </div>
-          <div class="mt-4 flex justify-between border-0 border-t border-solid border-code-bg pt-4">
+          <div class="mt-4 flex justify-between border-t border-code-bg pt-4">
             <span class="text-lg font-bold">Today's total</span>
             <span class="text-lg font-extrabold text-primary text-end">
               {{ formatPrice(locale, total, price.currency_code) }}

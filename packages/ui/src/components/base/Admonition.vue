@@ -1,7 +1,7 @@
 <template>
   <div
     :class="[
-      'flex rounded-2xl border-2 border-solid p-4 gap-4 font-semibold text-contrast',
+      'flex rounded-2xl border-2 p-4 gap-4 font-semibold text-contrast',
       typeClasses[type],
     ]"
   >
@@ -42,15 +42,15 @@ defineProps({
 })
 
 const typeClasses = {
-  info: 'border-brand-blue bg-bg-blue',
-  warning: 'border-brand-orange bg-bg-orange',
-  critical: 'border-brand-red bg-bg-red',
+  info: 'border-blue bg-bg-blue',
+  warning: 'border-orange bg-bg-orange',
+  critical: 'border-red bg-bg-red',
 }
 
 const iconClasses = {
-  info: 'text-brand-blue',
-  warning: 'text-brand-orange',
-  critical: 'text-brand-red',
+  info: 'text-blue',
+  warning: 'text-orange',
+  critical: 'text-red',
 }
 
 const icons = {

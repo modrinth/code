@@ -3,24 +3,24 @@
     v-if="server.moduleErrors.backups"
     class="flex w-full flex-col items-center justify-center gap-4 p-4"
   >
-    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+    <div class="bg-bg-raised flex max-w-lg flex-col items-center rounded-3xl p-6 shadow-xl">
       <div class="flex flex-col items-center text-center">
         <div class="flex flex-col items-center gap-4">
-          <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-            <IssuesIcon class="size-12 text-orange" />
+          <div class="bg-bg-orange grid place-content-center rounded-full p-4">
+            <IssuesIcon class="text-orange size-12" />
           </div>
           <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Failed to load backups</h1>
         </div>
-        <p class="text-lg text-secondary">
+        <p class="text-secondary text-lg">
           We couldn't load your server's backups. Here's what went wrong:
         </p>
         <p>
-          <span class="break-all font-mono">{{
+          <span class="font-mono break-all">{{
             JSON.stringify(server.moduleErrors.backups.error)
           }}</span>
         </p>
         <ButtonStyled size="large" color="brand" @click="() => server.refresh(['backups'])">
-          <button class="mt-6 !w-full">Retry</button>
+          <button class="mt-6 w-full!">Retry</button>
         </ButtonStyled>
       </div>
     </div>
@@ -35,7 +35,7 @@
     <div class="mb-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
       <div class="flex flex-col gap-2">
         <div class="flex items-center gap-2">
-          <h1 class="m-0 text-2xl font-extrabold text-contrast">Backups</h1>
+          <h1 class="text-contrast m-0 text-2xl font-extrabold">Backups</h1>
           <TagItem
             v-tooltip="`${data.backup_quota - data.used_backup_quota} backup slots remaining`"
             class="cursor-help"
@@ -62,7 +62,7 @@
         </p>
       </div>
       <div
-        class="grid w-full grid-cols-[repeat(auto-fit,_minmax(180px,1fr))] gap-2 sm:flex sm:w-fit sm:flex-row"
+        class="grid w-full grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-2 sm:flex sm:w-fit sm:flex-row"
       >
         <ButtonStyled type="standard">
           <button
@@ -93,7 +93,7 @@
     <div class="flex w-full flex-col gap-2">
       <div
         v-if="backups.length === 0"
-        class="mt-6 flex items-center justify-center gap-2 text-center text-secondary"
+        class="text-secondary mt-6 flex items-center justify-center gap-2 text-center"
       >
         <template v-if="data.used_backup_quota">
           <SpinnerIcon class="animate-spin" />
@@ -134,15 +134,15 @@
     >
       <div>
         <div
-          class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
+          class="animation-ring-3 border-brand bg-highlight-brand flex items-center justify-center rounded-full border-4 opacity-40"
         ></div>
         <div
-          class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
+          class="animation-ring-2 border-brand bg-highlight-brand flex items-center justify-center rounded-full border-4 opacity-60"
         ></div>
         <div
-          class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight"
+          class="animation-ring-1 border-brand bg-highlight-brand flex items-center justify-center rounded-full border-4 border-solid"
         >
-          <DownloadIcon class="h-20 w-20 text-contrast" />
+          <DownloadIcon class="text-contrast h-20 w-20" />
         </div>
       </div>
     </div>

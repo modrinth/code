@@ -303,7 +303,7 @@ async function copyToClipboard(text) {
       <template v-if="hasDebugInfo">
         <div class="bg-button-bg rounded-xl mt-2 overflow-clip">
           <button
-            class="flex items-center justify-between w-full bg-transparent border-0 px-4 py-3 cursor-pointer"
+            class="flex items-center justify-between w-full bg-transparent px-4 py-3 cursor-pointer"
             @click="errorCollapsed = !errorCollapsed"
           >
             <span class="text-contrast font-extrabold m-0">Debug information:</span>
@@ -348,7 +348,7 @@ async function copyToClipboard(text) {
   padding: var(--gap-lg);
   background-color: var(--color-orange-bg);
   border: 2px solid var(--color-orange);
-  border-radius: var(--radius-md);
+  border-radius: 0.75rem;
   margin-bottom: 1rem;
 }
 

@@ -2,7 +2,7 @@
   <div class="flex h-[calc(100vh-12rem)] w-full flex-col items-center">
     <div
       ref="container"
-      class="relative w-full flex-grow cursor-grab overflow-hidden rounded-b-2xl bg-black active:cursor-grabbing"
+      class="relative w-full grow cursor-grab overflow-hidden rounded-b-2xl bg-black active:cursor-grabbing"
       @mousedown="startPan"
       @mousemove="handlePan"
       @mouseup="stopPan"
@@ -21,7 +21,7 @@
         v-show="isReady"
         ref="imageRef"
         :src="imageObjectUrl"
-        class="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform"
+        class="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform"
         :style="imageStyle"
         alt="Viewed image"
         @load="handleImageLoad"
@@ -30,7 +30,7 @@
     </div>
     <div
       v-if="!state.hasError"
-      class="absolute bottom-0 mb-2 flex w-fit justify-center gap-2 space-x-4 rounded-2xl bg-bg p-2"
+      class="bg-bg absolute bottom-0 mb-2 flex w-fit justify-center gap-2 space-x-4 rounded-2xl p-2"
     >
       <ButtonStyled type="transparent" @click="zoom(ZOOM_IN_FACTOR)">
         <button v-tooltip="'Zoom in'">
@@ -45,7 +45,7 @@
       <ButtonStyled type="transparent" @click="reset">
         <button>
           <span class="font-mono">{{ Math.round(state.scale * 100) }}%</span>
-          <span class="ml-4 text-sm text-blue">Reset</span>
+          <span class="text-blue ml-4 text-sm">Reset</span>
         </button>
       </ButtonStyled>
     </div>

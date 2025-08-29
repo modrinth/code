@@ -542,7 +542,7 @@ function handleAuxClick(e) {
       ></div>
       <div
         v-if="criticalErrorMessage"
-        class="m-6 mb-0 flex flex-col border-red bg-bg-red rounded-2xl border-2 border-solid p-4 gap-1 font-semibold text-contrast"
+        class="m-6 mb-0 flex flex-col border-red bg-bg-red rounded-2xl border-2 p-4 gap-1 font-semibold text-contrast"
       >
         <h1 class="m-0 text-lg font-extrabold">{{ criticalErrorMessage.header }}</h1>
         <div
@@ -559,7 +559,7 @@ function handleAuxClick(e) {
       </RouterView>
     </div>
     <div
-      class="app-sidebar mt-px shrink-0 flex flex-col border-0 border-l-[1px] border-[--brand-gradient-border] border-solid overflow-auto"
+      class="app-sidebar mt-px shrink-0 flex flex-col border-l-[1px] border-[--brand-gradient-border] overflow-auto"
       :class="{ 'has-plus': hasPlus }"
     >
       <div
@@ -568,13 +568,13 @@ function handleAuxClick(e) {
       >
         <div id="sidebar-teleport-target" class="sidebar-teleport-content"></div>
         <div class="sidebar-default-content" :class="{ 'sidebar-enabled': sidebarVisible }">
-          <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
+          <div class="p-4 border-b-[1px] border-[--brand-gradient-border] border-solid">
             <h3 class="text-lg m-0">Playing as</h3>
             <suspense>
               <AccountsCard ref="accounts" mode="small" />
             </suspense>
           </div>
-          <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
+          <div class="p-4 border-b-[1px] border-[--brand-gradient-border] border-solid">
             <suspense>
               <FriendsList :credentials="credentials" :sign-in="() => signIn()" />
             </suspense>
@@ -592,7 +592,7 @@ function handleAuxClick(e) {
                   :src="item.thumbnail"
                   alt="News thumbnail"
                   aria-hidden="true"
-                  class="w-full aspect-[3/1] object-cover rounded-2xl border-[1px] border-solid border-[--brand-gradient-border]"
+                  class="w-full aspect-[3/1] object-cover rounded-2xl border-[1px] border-[--brand-gradient-border]"
                 />
                 <h4 class="mt-2 mb-0 text-sm leading-none text-contrast font-semibold">
                   {{ item.title }}
@@ -604,7 +604,7 @@ function handleAuxClick(e) {
               </a>
               <hr
                 v-if="index !== news.length - 1"
-                class="h-px my-[-2px] mx-4 border-0 m-0 bg-[--brand-gradient-border]"
+                class="h-px my-[-2px] mx-4 m-0 bg-[--brand-gradient-border]"
               />
             </template>
           </div>
@@ -740,7 +740,7 @@ function handleAuxClick(e) {
   bottom: 0;
   height: calc(100vh - var(--top-bar-height));
   background-color: var(--color-bg);
-  border-top-left-radius: var(--radius-xl);
+  border-top-left-radius: 1.25rem;
 
   display: grid;
   grid-template-columns: 1fr 0px;
@@ -752,7 +752,7 @@ function handleAuxClick(e) {
 }
 
 .loading-indicator-container {
-  border-top-left-radius: var(--radius-xl);
+  border-top-left-radius: 1.25rem;
   overflow: hidden;
 }
 
@@ -810,7 +810,7 @@ function handleAuxClick(e) {
   top: var(--top-bar-height);
   right: calc(-1 * var(--left-bar-width));
   bottom: calc(-1 * var(--left-bar-width));
-  border-radius: var(--radius-xl);
+  border-radius: 1.25rem;
   box-shadow:
     1px 1px 15px rgba(0, 0, 0, 0.2) inset,
     inset 1px 1px 1px rgba(255, 255, 255, 0.23);

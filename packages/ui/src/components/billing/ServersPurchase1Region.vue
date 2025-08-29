@@ -222,7 +222,7 @@ onMounted(() => {
           </div>
           <div v-else-if="selectedPlan">
             <ServersSpecs
-              class="!flex-row justify-between"
+              class="flex-row! justify-between"
               :ram="selectedPlan.metadata.ram ?? 0"
               :storage="selectedPlan.metadata.storage ?? 0"
               :cpus="selectedPlan.metadata.cpu ?? 0"

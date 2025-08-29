@@ -14,7 +14,7 @@
       >
         <div class="flex flex-col gap-1">
           <div class="flex items-center gap-1">
-            <span class="font-bold text-primary">
+            <span class="text-primary font-bold">
               <template v-if="charge.product.metadata.type === 'midas'"> Modrinth Plus </template>
               <template v-else-if="charge.product.metadata.type === 'pyro'">
                 Modrinth Servers

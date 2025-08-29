@@ -504,7 +504,7 @@ const messages = defineMessages({
       <UnplugIcon class="top-[3px] relative" /> {{ formatMessage(messages.noConnection) }}
     </div>
     <div v-else-if="!modpackProject && instance.linked_data && !fetching" class="mb-2">
-      <p class="text-brand-red font-medium mt-0">
+      <p class="text-red font-medium mt-0">
         <IssuesIcon class="top-[3px] relative" /> {{ formatMessage(messages.noModpackFound) }}
       </p>
       <p>{{ formatMessage(messages.debugInformation) }}</p>
@@ -522,7 +522,7 @@ const messages = defineMessages({
           <Avatar v-if="modpackProject" :src="modpackProject?.icon_url" size="40px" />
           <div
             v-else
-            class="w-10 h-10 flex items-center justify-center rounded-full bg-button-bg border-solid border-[1px] border-button-border p-2 [&_svg]:h-full [&_svg]:w-full"
+            class="w-10 h-10 flex items-center justify-center rounded-full bg-button-bg border-[1px] border-button-border p-2 [&_svg]:h-full [&_svg]:w-full"
           >
             <div v-if="!!currentLoaderIcon" class="contents" v-html="currentLoaderIcon" />
             <WrenchIcon v-else />
@@ -660,7 +660,7 @@ const messages = defineMessages({
           class="mt-2"
           @change="(value) => (loaderVersionIndex = value.index)"
         />
-        <div v-else class="mt-2 text-brand-red flex gap-2 items-center">
+        <div v-else class="mt-2 text-red flex gap-2 items-center">
           <IssuesIcon />
           {{ formatMessage(messages.noLoaderVersions, { loader: loader, version: gameVersion }) }}
         </div>

@@ -9,7 +9,7 @@
     </div>
     <button
       v-if="isOverflowing"
-      class="ml-2 flex h-6 items-center rounded-md bg-bg px-2 text-xs text-contrast opacity-50 transition-opacity hover:opacity-100"
+      class="bg-bg text-contrast ml-2 flex h-6 items-center rounded-md px-2 text-xs opacity-50 transition-opacity hover:opacity-100"
       type="button"
       @click.stop="$emit('show-full-log', props.log)"
     >

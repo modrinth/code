@@ -1200,7 +1200,7 @@
     "message": "Collection"
   },
   "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering."
+    "message": "Enables advanced rendering such as blur-sm effects that may cause performance issues without hardware-accelerated rendering."
   },
   "settings.display.sidebar.advanced-rendering.title": {
     "message": "Advanced rendering"

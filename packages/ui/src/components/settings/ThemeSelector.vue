@@ -110,14 +110,14 @@ function asString(theme: T): string {
       width: 2rem;
       height: 2rem;
       background-color: var(--color-button-bg);
-      border-radius: var(--radius-sm);
+      border-radius: 0.5rem;
       outline: 2px solid transparent;
     }
 
     .example-text-1,
     .example-text-2 {
       height: 0.5rem;
-      border-radius: var(--radius-sm);
+      border-radius: 0.5rem;
       outline: 2px solid transparent;
     }
 

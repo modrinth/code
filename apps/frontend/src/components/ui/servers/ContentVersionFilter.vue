@@ -15,7 +15,7 @@
       @change="updateFilters"
     >
       <slot name="platform">
-        <FilterIcon class="h-5 w-5 text-secondary" />
+        <FilterIcon class="text-secondary h-5 w-5" />
         Platform
       </slot>
       <template #option="{ option }">
@@ -46,7 +46,7 @@
       @change="updateFilters"
     >
       <slot name="game-versions">
-        <FilterIcon class="h-5 w-5 text-secondary" />
+        <FilterIcon class="text-secondary h-5 w-5" />
         Game versions
       </slot>
       <template v-if="hasAnySnapshots" #footer>

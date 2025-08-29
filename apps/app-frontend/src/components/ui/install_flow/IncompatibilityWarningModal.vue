@@ -118,7 +118,7 @@ const install = async () => {
 
 table {
   width: 100%;
-  border-radius: var(--radius-lg);
+  border-radius: 1rem;
   border-collapse: collapse;
   box-shadow: 0 0 0 1px var(--color-button-bg);
 }
@@ -132,12 +132,12 @@ th {
 }
 
 th:first-child {
-  border-top-left-radius: var(--radius-lg);
+  border-top-left-radius: 1rem;
   border-right: 1px solid var(--color-button-bg);
 }
 
 th:last-child {
-  border-top-right-radius: var(--radius-lg);
+  border-top-right-radius: 1rem;
 }
 
 td {

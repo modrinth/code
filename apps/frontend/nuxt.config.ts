@@ -7,6 +7,7 @@ import { $fetch } from "ofetch";
 import { globIterate } from "glob";
 import { match as matchLocale } from "@formatjs/intl-localematcher";
 import { consola } from "consola";
+import tailwindcss from "@tailwindcss/vite";
 
 const STAGING_API_URL = "https://staging-api.modrinth.com/v2/";
 
@@ -107,6 +108,7 @@ export default defineNuxtConfig({
           ],
         },
       }),
+      tailwindcss(),
     ],
   },
   hooks: {
@@ -380,7 +382,7 @@ export default defineNuxtConfig({
       },
     },
   },
-  modules: ["@vintl/nuxt", "@pinia/nuxt"],
+  modules: ["@vintl/nuxt", "@pinia/nuxt", "floating-vue/nuxt"],
   vintl: {
     defaultLocale: "en-US",
     locales: [
@@ -430,13 +432,7 @@ export default defineNuxtConfig({
   devtools: {
     enabled: true,
   },
-  css: ["~/assets/styles/tailwind.css"],
-  postcss: {
-    plugins: {
-      tailwindcss: {},
-      autoprefixer: {},
-    },
-  },
+  css: ["@modrinth/assets/styles/tailwind.css"],
   routeRules: {
     "/**": {
       headers: {

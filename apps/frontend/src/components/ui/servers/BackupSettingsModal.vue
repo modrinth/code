@@ -2,14 +2,14 @@
   <NewModal ref="modal" header="Editing auto backup settings">
     <div class="flex flex-col gap-4 md:w-[600px]">
       <div class="flex flex-col gap-2">
-        <div class="font-semibold text-contrast">Auto backup</div>
+        <div class="text-contrast font-semibold">Auto backup</div>
         <p class="m-0">
           Automatically create a backup of your server
           <strong>{{ backupIntervalsLabel.toLowerCase() }}</strong>
         </p>
       </div>
 
-      <div v-if="isLoadingSettings" class="py-2 text-sm text-secondary">Loading settings...</div>
+      <div v-if="isLoadingSettings" class="text-secondary py-2 text-sm">Loading settings...</div>
       <template v-else>
         <input
           id="auto-backup-toggle"
@@ -20,7 +20,7 @@
         />
 
         <div class="flex flex-col gap-2">
-          <div class="font-semibold text-contrast">Interval</div>
+          <div class="text-contrast font-semibold">Interval</div>
           <p class="m-0">
             The amount of time between each backup. This will only backup your server if it has been
             modified since the last backup.

@@ -11,7 +11,7 @@
           Select the version of {{ props.project?.title || "the modpack" }} you want to install on
           your server.
         </p>
-        <p v-if="props.currentVersion" class="m-0 text-sm text-secondary">
+        <p v-if="props.currentVersion" class="text-secondary m-0 text-sm">
           Currently installed: {{ props.currentVersion.version_number }}
         </p>
       </div>
@@ -26,9 +26,9 @@
           class="w-full max-w-full"
         />
 
-        <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
+        <div class="bg-table-alternate-row flex w-full flex-col gap-2 rounded-2xl p-4">
           <div class="flex w-full flex-row items-center justify-between">
-            <label class="w-full text-lg font-bold text-contrast" for="modpack-hard-reset">
+            <label class="text-contrast w-full text-lg font-bold" for="modpack-hard-reset">
               Erase all data
             </label>
             <input

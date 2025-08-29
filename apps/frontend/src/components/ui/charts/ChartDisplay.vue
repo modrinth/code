@@ -198,7 +198,7 @@
                 <div class="country-flag-container">
                   <template v-if="name.toLowerCase() === 'xx' || !name">
                     <div
-                      class="country-flag flex select-none items-center justify-center bg-bg-raised font-extrabold text-secondary"
+                      class="country-flag bg-bg-raised text-secondary flex items-center justify-center font-extrabold select-none"
                     >
                       ?
                     </div>
@@ -257,7 +257,7 @@
                 <div class="country-flag-container">
                   <template v-if="name.toLowerCase() === 'xx' || !name">
                     <div
-                      class="country-flag flex select-none items-center justify-center bg-bg-raised font-extrabold text-secondary"
+                      class="country-flag bg-bg-raised text-secondary flex items-center justify-center font-extrabold select-none"
                     >
                       ?
                     </div>
@@ -782,7 +782,7 @@ const defaultRanges: RangeObject[] = [
         .legend__item__color {
           height: var(--font-size-xs);
           width: var(--font-size-xs);
-          border-radius: var(--radius-sm);
+          border-radius: 0.5rem;
           background-color: var(--color-brand);
 
           flex-grow: 0;
@@ -850,7 +850,7 @@ const defaultRanges: RangeObject[] = [
   overflow: hidden;
 
   border: 1px solid var(--color-divider);
-  border-radius: var(--radius-xs);
+  border-radius: 0.5rem;
 }
 
 .country-flag {
@@ -876,7 +876,7 @@ const defaultRanges: RangeObject[] = [
   display: flex;
   flex-direction: column;
   background-color: var(--color-bg);
-  border-radius: var(--radius-sm);
+  border-radius: 0.5rem;
   border: 1px solid var(--color-button-bg);
   gap: var(--gap-md);
   padding: var(--gap-md);
@@ -907,7 +907,7 @@ const defaultRanges: RangeObject[] = [
     height: 1rem;
     background-color: var(--color-raised-bg);
     border: 1px solid var(--color-button-bg);
-    border-radius: var(--radius-sm);
+    border-radius: 0.5rem;
     overflow: hidden;
 
     span {

@@ -1,15 +1,15 @@
 <template>
   <nav
     ref="scrollContainer"
-    class="card-shadow experimental-styles-within relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold"
+    class="card-shadow experimental-styles-within bg-bg-raised relative flex w-fit overflow-x-auto rounded-full p-1 text-sm font-bold"
   >
     <button
       v-for="(option, index) in options"
       :key="`option-group-${index}`"
       ref="optionButtons"
-      class="button-animation z-[1] flex flex-row items-center gap-2 rounded-full bg-transparent px-4 py-2 font-semibold"
+      class="button-animation z-1 flex flex-row items-center gap-2 rounded-full bg-transparent px-4 py-2 font-semibold"
       :class="{
-        'text-button-textSelected': modelValue === option,
+        'text-button-text-selected': modelValue === option,
         'text-primary': modelValue !== option,
       }"
       @click="setOption(option)"
@@ -17,7 +17,7 @@
       <slot :option="option" :selected="modelValue === option" />
     </button>
     <div
-      class="navtabs-transition pointer-events-none absolute h-[calc(100%-0.5rem)] overflow-hidden rounded-full bg-button-bgSelected p-1"
+      class="navtabs-transition bg-button-bg-selected pointer-events-none absolute h-[calc(100%-0.5rem)] overflow-hidden rounded-full p-1"
       :style="{
         left: sliderLeftPx,
         top: sliderTopPx,

@@ -2,7 +2,7 @@
   <img
     v-if="src"
     ref="img"
-    class="`experimental-styles-within avatar"
+    class="`experimental-styles-within avatar min-size-(--_size) size-(--_size) max-w-none"
     :style="`--_size: ${cssSize}`"
     :class="{
       circle: circle,
@@ -17,7 +17,7 @@
   />
   <svg
     v-else
-    class="`experimental-styles-within avatar"
+    class="`experimental-styles-within avatar min-size-(--_size) size-(--_size) max-w-none"
     :style="`--_size: ${cssSize}${tint ? `;--_tint:oklch(50% 75% ${tint})` : ''}`"
     :class="{
       tint: tint,
@@ -122,9 +122,8 @@ function hash(str) {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .avatar {
-  @apply min-w-[--_size] min-h-[--_size] w-[--_size] h-[--_size];
   --_size: 2rem;
 
   border: 1px solid var(--color-button-border);

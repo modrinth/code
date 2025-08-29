@@ -384,7 +384,7 @@ await refreshSearch()
   <Teleport v-if="filters" to="#sidebar-teleport-target">
     <div
       v-if="instance"
-      class="border-0 border-b-[1px] p-4 last:border-b-0 border-[--brand-gradient-border] border-solid"
+      class="border-b-[1px] p-4 last:border-b-0 border-[--brand-gradient-border] border-solid"
     >
       <Checkbox
         v-model="instanceHideInstalled"
@@ -402,7 +402,7 @@ await refreshSearch()
       v-model:overridden-provided-filter-types="overriddenProvidedFilterTypes"
       :provided-filters="instanceFilters"
       :filter-type="filter"
-      class="border-0 border-b-[1px] [&:first-child>button]:pt-4 last:border-b-0 border-[--brand-gradient-border] border-solid"
+      class="border-b-[1px] [&:first-child>button]:pt-4 last:border-b-0 border-[--brand-gradient-border] border-solid"
       button-class="button-animation flex flex-col gap-1 px-4 py-3 w-full bg-transparent cursor-pointer border-none hover:bg-button-bg"
       content-class="mb-3"
       inner-panel-class="ml-2 mr-3"

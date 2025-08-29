@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="filteredNotices.length > 0"
-    class="experimental-styles-within relative mx-auto flex w-full min-w-0 max-w-[1280px] flex-col gap-3 px-6"
+    class="experimental-styles-within relative mx-auto flex w-full max-w-[1280px] min-w-0 flex-col gap-3 px-6"
   >
     <ServerNotice
       v-for="notice in filteredNotices"
@@ -16,17 +16,17 @@
   </div>
   <div
     v-if="serverData?.status === 'suspended' && serverData.suspension_reason === 'upgrading'"
-    class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+    class="text-contrast flex min-h-[calc(100vh-4rem)] items-center justify-center"
   >
-    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+    <div class="bg-bg-raised flex max-w-lg flex-col items-center rounded-3xl p-6 shadow-xl">
       <div class="flex flex-col items-center text-center">
         <div class="flex flex-col items-center gap-4">
-          <div class="grid place-content-center rounded-full bg-bg-blue p-4">
-            <TransferIcon class="size-12 text-blue" />
+          <div class="bg-bg-blue grid place-content-center rounded-full p-4">
+            <TransferIcon class="text-blue size-12" />
           </div>
           <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server upgrading</h1>
         </div>
-        <p class="text-lg text-secondary">
+        <p class="text-secondary text-lg">
           Your server's hardware is currently being upgraded and will be back online shortly!
         </p>
       </div>
@@ -34,17 +34,17 @@
   </div>
   <div
     v-else-if="serverData?.status === 'suspended'"
-    class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+    class="text-contrast flex min-h-[calc(100vh-4rem)] items-center justify-center"
   >
-    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+    <div class="bg-bg-raised flex max-w-lg flex-col items-center rounded-3xl p-6 shadow-xl">
       <div class="flex flex-col items-center text-center">
         <div class="flex flex-col items-center gap-4">
-          <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-            <LockIcon class="size-12 text-orange" />
+          <div class="bg-bg-orange grid place-content-center rounded-full p-4">
+            <LockIcon class="text-orange size-12" />
           </div>
           <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server suspended</h1>
         </div>
-        <p class="text-lg text-secondary">
+        <p class="text-secondary text-lg">
           {{
             serverData.suspension_reason === "cancelled"
               ? "Your subscription has been cancelled."
@@ -57,7 +57,7 @@
         </p>
       </div>
       <ButtonStyled size="large" color="brand" @click="() => router.push('/settings/billing')">
-        <button class="mt-6 !w-full">Go to billing settings</button>
+        <button class="mt-6 w-full!">Go to billing settings</button>
       </ButtonStyled>
     </div>
   </div>
@@ -66,17 +66,17 @@
       server.moduleErrors?.general?.error.statusCode === 403 ||
       server.moduleErrors?.general?.error.statusCode === 404
     "
-    class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+    class="text-contrast flex min-h-[calc(100vh-4rem)] items-center justify-center"
   >
-    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+    <div class="bg-bg-raised flex max-w-lg flex-col items-center rounded-3xl p-6 shadow-xl">
       <div class="flex flex-col items-center text-center">
         <div class="flex flex-col items-center gap-4">
-          <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-            <TransferIcon class="size-12 text-orange" />
+          <div class="bg-bg-orange grid place-content-center rounded-full p-4">
+            <TransferIcon class="text-orange size-12" />
           </div>
           <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server not found</h1>
         </div>
-        <p class="text-lg text-secondary">
+        <p class="text-secondary text-lg">
           You don't have permission to view this server or it no longer exists. If you believe this
           is an error, please contact Modrinth Support.
         </p>
@@ -84,31 +84,31 @@
       <UiCopyCode :text="JSON.stringify(server.moduleErrors?.general?.error)" />
 
       <ButtonStyled size="large" color="brand" @click="() => router.push('/servers/manage')">
-        <button class="mt-6 !w-full">Go back to all servers</button>
+        <button class="mt-6 w-full!">Go back to all servers</button>
       </ButtonStyled>
     </div>
   </div>
   <div
     v-else-if="server.moduleErrors?.general?.error.statusCode === 503"
-    class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+    class="text-contrast flex min-h-[calc(100vh-4rem)] items-center justify-center"
   >
-    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+    <div class="bg-bg-raised flex max-w-lg flex-col items-center rounded-3xl p-6 shadow-xl">
       <div class="flex flex-col items-center text-center">
         <div class="flex flex-col items-center gap-4">
-          <div class="grid place-content-center rounded-full bg-bg-red p-4">
-            <UiServersIconsPanelErrorIcon class="size-12 text-red" />
+          <div class="bg-bg-red grid place-content-center rounded-full p-4">
+            <UiServersIconsPanelErrorIcon class="text-red size-12" />
           </div>
           <h1 class="m-0 mb-4 w-fit text-4xl font-bold">Server Node Unavailable</h1>
         </div>
-        <p class="m-0 mb-4 leading-[170%] text-secondary">
+        <p class="text-secondary m-0 mb-4 leading-[170%]">
           Your server's node, where your Modrinth Server is physically hosted, is experiencing
           issues. We are working with our datacenter to resolve the issue as quickly as possible.
         </p>
-        <p class="m-0 mb-4 leading-[170%] text-secondary">
+        <p class="text-secondary m-0 mb-4 leading-[170%]">
           Your data is safe and will not be lost, and your server will be back online as soon as the
           issue is resolved.
         </p>
-        <p class="m-0 mb-4 leading-[170%] text-secondary">
+        <p class="text-secondary m-0 mb-4 leading-[170%]">
           For updates, please join the Modrinth Discord or contact Modrinth Support via the chat
           bubble in the bottom right corner and we'll be happy to help.
         </p>
@@ -128,7 +128,7 @@
             })
         "
       >
-        <button class="mt-6 !w-full">Join Modrinth Discord</button>
+        <button class="mt-6 w-full!">Join Modrinth Discord</button>
       </ButtonStyled>
       <ButtonStyled
         :disabled="formattedTime !== '00'"
@@ -136,28 +136,28 @@
         color="standard"
         @click="() => reloadNuxtApp()"
       >
-        <button class="mt-3 !w-full">Reload</button>
+        <button class="mt-3 w-full!">Reload</button>
       </ButtonStyled>
     </div>
   </div>
   <div
     v-else-if="server.moduleErrors?.general?.error"
-    class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+    class="text-contrast flex min-h-[calc(100vh-4rem)] items-center justify-center"
   >
-    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+    <div class="bg-bg-raised flex max-w-lg flex-col items-center rounded-3xl p-6 shadow-xl">
       <div class="flex flex-col items-center text-center">
         <div class="flex flex-col items-center gap-4">
-          <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-            <TransferIcon class="size-12 text-orange" />
+          <div class="bg-bg-orange grid place-content-center rounded-full p-4">
+            <TransferIcon class="text-orange size-12" />
           </div>
           <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Connection lost</h1>
-          <div class="text-center text-secondary">
+          <div class="text-secondary text-center">
             {{
               formattedTime == "00" ? "Reconnecting..." : `Retrying in ${formattedTime} seconds...`
             }}
           </div>
         </div>
-        <p class="text-lg text-secondary">
+        <p class="text-secondary text-lg">
           Something went wrong, and we couldn't connect to your server. This is likely due to a
           temporary network issue. You'll be reconnected automatically.
         </p>
@@ -169,7 +169,7 @@
         color="brand"
         @click="() => reloadNuxtApp()"
       >
-        <button class="mt-6 !w-full">Reload</button>
+        <button class="mt-6 w-full!">Reload</button>
       </ButtonStyled>
     </div>
   </div>
@@ -177,14 +177,14 @@
   <div
     v-else-if="serverData"
     data-pyro-server-manager-root
-    class="experimental-styles-within mobile-blurred-servericon relative mx-auto mb-6 box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-6 transition-all duration-300"
+    class="experimental-styles-within mobile-blurred-servericon relative mx-auto mb-6 box-border flex min-h-screen w-full max-w-[1280px] min-w-0 flex-col gap-6 px-6 transition-all duration-300"
     :style="{
       '--server-bg-image': serverData.image
         ? `url(${serverData.image})`
         : `linear-gradient(180deg, rgba(153,153,153,1) 0%, rgba(87,87,87,1) 100%)`,
     }"
   >
-    <div class="flex w-full min-w-0 select-none flex-col items-center gap-6 pt-4 sm:flex-row">
+    <div class="flex w-full min-w-0 flex-col items-center gap-6 pt-4 select-none sm:flex-row">
       <UiServersServerIcon :image="serverData.image" class="drop-shadow-lg sm:drop-shadow-none" />
       <div
         class="flex min-w-0 flex-1 flex-col-reverse items-center gap-2 sm:flex-col sm:items-start"
@@ -197,18 +197,18 @@
         </div>
         <div class="flex w-full flex-col items-center gap-4 sm:flex-row">
           <h1
-            class="m-0 w-screen flex-shrink gap-3 truncate px-3 text-center text-4xl font-bold text-contrast sm:w-full sm:p-0 sm:text-left"
+            class="text-contrast m-0 w-screen shrink gap-3 truncate px-3 text-center text-4xl font-bold sm:w-full sm:p-0 sm:text-left"
           >
             {{ serverData.name }}
           </h1>
           <div
             v-if="isConnected"
             data-pyro-server-action-buttons
-            class="server-action-buttons-anim flex w-fit flex-shrink-0"
+            class="server-action-buttons-anim flex w-fit shrink-0"
           >
             <UiServersPanelServerActionButton
               v-if="!serverData.flows?.intro"
-              class="flex-shrink-0"
+              class="shrink-0"
               :is-online="isServerRunning"
               :is-actioning="isActioning"
               :is-installing="serverData.status === 'installing'"
@@ -223,7 +223,7 @@
 
         <div
           v-if="serverData.flows?.intro"
-          class="flex items-center gap-2 font-semibold text-secondary"
+          class="text-secondary flex items-center gap-2 font-semibold"
         >
           <SettingsIcon /> Configuring server...
         </div>
@@ -234,7 +234,7 @@
           :show-loader-label="showLoaderLabel"
           :uptime-seconds="uptimeSeconds"
           :linked="true"
-          class="server-action-buttons-anim flex min-w-0 flex-col flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
+          class="server-action-buttons-anim text-secondary flex min-w-0 flex-col flex-wrap items-center gap-4 *:hidden sm:flex-row sm:*:flex"
         />
       </div>
     </div>
@@ -242,7 +242,7 @@
     <template v-if="serverData.flows?.intro">
       <div
         v-if="serverData?.status === 'installing'"
-        class="w-50 h-50 flex items-center justify-center gap-2 text-center text-lg font-bold"
+        class="flex h-50 w-50 items-center justify-center gap-2 text-center text-lg font-bold"
       >
         <LazyUiServersPanelSpinner class="size-10 animate-spin" /> Setting up your server...
       </div>
@@ -263,7 +263,7 @@
     <template v-else>
       <div
         data-pyro-navigation
-        class="isolate flex w-full select-none flex-col justify-between gap-4 overflow-auto md:flex-row md:items-center"
+        class="isolate flex w-full flex-col justify-between gap-4 overflow-auto select-none md:flex-row md:items-center"
       >
         <UiNavTabs :links="navLinks" />
       </div>
@@ -271,13 +271,13 @@
       <div data-pyro-mount class="h-full w-full flex-1">
         <div
           v-if="error"
-          class="mx-auto mb-4 flex justify-between gap-2 rounded-2xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
+          class="border-red bg-bg-red text-contrast mx-auto mb-4 flex justify-between gap-2 rounded-2xl border-2 p-4 font-semibold"
         >
           <div class="flex flex-row gap-4">
-            <IssuesIcon class="hidden h-8 w-8 shrink-0 text-red sm:block" />
+            <IssuesIcon class="text-red hidden h-8 w-8 shrink-0 sm:block" />
             <div class="flex flex-col gap-2 leading-[150%]">
               <div class="flex items-center gap-3">
-                <IssuesIcon class="flex h-8 w-8 shrink-0 text-red sm:hidden" />
+                <IssuesIcon class="text-red flex h-8 w-8 shrink-0 sm:hidden" />
                 <div class="flex gap-2 text-2xl font-bold">{{ errorTitle }}</div>
               </div>
 
@@ -362,16 +362,16 @@
         <div
           v-if="!isConnected && !isReconnecting && !isLoading"
           data-pyro-server-ws-error
-          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-red p-4 text-contrast"
+          class="bg-bg-red text-contrast mb-4 flex w-full flex-row items-center gap-4 rounded-2xl p-4"
         >
-          <IssuesIcon class="size-5 text-red" />
+          <IssuesIcon class="text-red size-5" />
           Something went wrong...
         </div>
 
         <div
           v-if="isReconnecting"
           data-pyro-server-ws-reconnecting
-          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-sm text-contrast"
+          class="bg-bg-orange text-contrast mb-4 flex w-full flex-row items-center gap-4 rounded-2xl p-4 text-sm"
         >
           <UiServersPanelSpinner />
           Hang on, we're reconnecting to your server.
@@ -380,14 +380,14 @@
         <div
           v-if="serverData.status === 'installing'"
           data-pyro-server-installing
-          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-blue p-4 text-sm text-contrast"
+          class="bg-bg-blue text-contrast mb-4 flex w-full flex-row items-center gap-4 rounded-2xl p-4 text-sm"
         >
-          <UiServersServerIcon :image="serverData.image" class="!h-10 !w-10" />
+          <UiServersServerIcon :image="serverData.image" class="h-10! w-10!" />
 
           <div class="flex flex-col gap-1">
             <span class="text-lg font-bold"> We're preparing your server! </span>
             <div class="flex flex-row items-center gap-2">
-              <UiServersPanelSpinner class="!h-3 !w-3" /> <LazyUiServersInstallingTicker />
+              <UiServersPanelSpinner class="h-3! w-3!" /> <LazyUiServersInstallingTicker />
             </div>
           </div>
         </div>
@@ -409,10 +409,10 @@
   </div>
   <div
     v-if="flags.advancedDebugInfo"
-    class="experimental-styles-within relative mx-auto mt-6 box-border w-full min-w-0 max-w-[1280px] px-6"
+    class="experimental-styles-within relative mx-auto mt-6 box-border w-full max-w-[1280px] min-w-0 px-6"
   >
-    <h2 class="m-0 text-lg font-extrabold text-contrast">Server data</h2>
-    <pre class="markdown-body w-full overflow-auto rounded-2xl bg-bg-raised p-4 text-sm">{{
+    <h2 class="text-contrast m-0 text-lg font-extrabold">Server data</h2>
+    <pre class="markdown-body bg-bg-raised w-full overflow-auto rounded-2xl p-4 text-sm">{{
       JSON.stringify(server, null, "  ")
     }}</pre>
   </div>
@@ -1298,7 +1298,8 @@ useHead({
   background-repeat: no-repeat;
   filter: blur(1rem);
   content: "";
-  background-image: linear-gradient(
+  background-image:
+    linear-gradient(
       to bottom,
       rgba(from var(--color-raised-bg) r g b / 0.2),
       rgb(from var(--color-raised-bg) r g b / 0.8)

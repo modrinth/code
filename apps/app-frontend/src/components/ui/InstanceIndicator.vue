@@ -19,7 +19,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="flex justify-between items-center border-0 border-b border-solid border-divider pb-4">
+  <div class="flex justify-between items-center border-b border-divider pb-4">
     <router-link
       :to="`/instance/${encodeURIComponent(instance.path)}`"
       tabindex="-1"

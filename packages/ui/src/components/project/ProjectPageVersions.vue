@@ -52,7 +52,7 @@
       <div
         class="versions-grid-row h-px w-full bg-button-bg"
         :class="{
-          'max-sm:!hidden': index === 0,
+          'max-sm:hidden!': index === 0,
         }"
       ></div>
       <div class="versions-grid-row group relative">
@@ -64,7 +64,7 @@
         <div class="flex flex-col justify-center gap-2 sm:contents">
           <div class="flex flex-row items-center gap-2 sm:contents">
             <div class="self-center">
-              <div class="relative z-[1] cursor-pointer">
+              <div class="relative z-1 cursor-pointer">
                 <VersionChannelIndicator
                   v-tooltip="`Toggle filter for ${version.version_type}`"
                   :channel="version.version_type"
@@ -73,7 +73,7 @@
               </div>
             </div>
             <div
-              class="pointer-events-none relative z-[1] flex flex-col justify-center"
+              class="pointer-events-none relative z-1 flex flex-col justify-center"
               :class="{
                 'group-hover:underline': !!versionLink,
               }"
@@ -93,7 +93,7 @@
                     )"
                     :key="`version-tag-${gameVersion}`"
                     v-tooltip="`Toggle filter for ${gameVersion}`"
-                    class="z-[1]"
+                    class="z-1"
                     :action="
                       () => versionFilters?.toggleFilters('gameVersion', version.game_versions)
                     "
@@ -108,7 +108,7 @@
                     v-for="platform in version.loaders"
                     :key="`platform-tag-${platform}`"
                     v-tooltip="`Toggle filter for ${platform}`"
-                    class="z-[1]"
+                    class="z-1"
                     :style="`--_color: var(--color-platform-${platform})`"
                     :action="() => versionFilters?.toggleFilter('platform', platform)"
                   >
@@ -129,13 +129,13 @@
                     time: new Date(version.date_published),
                   })
                 "
-                class="z-[1] flex cursor-help items-center gap-1 text-nowrap font-medium xl:self-center"
+                class="z-1 flex cursor-help items-center gap-1 text-nowrap font-medium xl:self-center"
               >
                 <CalendarIcon class="xl:hidden" />
                 {{ formatRelativeTime(version.date_published) }}
               </div>
               <div
-                class="pointer-events-none z-[1] flex items-center gap-1 font-medium xl:self-center"
+                class="pointer-events-none z-1 flex items-center gap-1 font-medium xl:self-center"
               >
                 <DownloadIcon class="xl:hidden" />
                 {{ formatNumber(version.downloads) }}
@@ -143,14 +143,14 @@
             </div>
           </div>
         </div>
-        <div class="flex items-start justify-end gap-1 sm:items-center z-[1]">
+        <div class="flex items-start justify-end gap-1 sm:items-center z-1">
           <slot name="actions" :version="version"></slot>
         </div>
-        <div v-if="showFiles" class="tag-list pointer-events-none relative z-[1] col-span-full">
+        <div v-if="showFiles" class="tag-list pointer-events-none relative z-1 col-span-full">
           <div
             v-for="(file, fileIdx) in version.files"
             :key="`platform-tag-${fileIdx}`"
-            :class="`flex items-center gap-1 text-wrap rounded-full bg-button-bg px-2 py-0.5 text-xs font-medium ${file.primary || fileIdx === 0 ? 'bg-brand-highlight text-contrast' : 'text-primary'}`"
+            :class="`flex items-center gap-1 text-wrap rounded-full bg-button-bg px-2 py-0.5 text-xs font-medium ${file.primary || fileIdx === 0 ? 'bg-highlight-brand text-contrast' : 'text-primary'}`"
           >
             <StarIcon v-if="file.primary || fileIdx === 0" class="shrink-0" />
             {{ file.filename }} - {{ formatBytes(file.size) }}
@@ -290,8 +290,5 @@ function updateQuery(newQueries: Record<string, string | string[] | undefined | 
   })
 }
 </script>
-<style scoped>
-.versions-grid-row {
-  @apply grid grid-cols-[1fr_min-content] gap-4 supports-[grid-template-columns:subgrid]:col-span-full supports-[grid-template-columns:subgrid]:!grid-cols-subgrid sm:grid-cols-[min-content_1fr_1fr_1fr_min-content] xl:grid-cols-[min-content_1fr_1fr_1fr_1fr_1fr_min-content];
-}
+<style scoped lang="scss">
 </style>

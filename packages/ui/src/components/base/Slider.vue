@@ -140,7 +140,7 @@ const onInput = (value: string) => {
   appearance: none;
   position: relative;
 
-  border-radius: var(--radius-sm);
+  border-radius: 0.5rem;
   height: 0.25rem;
   width: 100%;
   padding: 0;
@@ -216,7 +216,7 @@ const onInput = (value: string) => {
 
       width: 0.25rem;
       height: 100%;
-      border-radius: var(--radius-sm);
+      border-radius: 0.5rem;
 
       background-color: var(--color-base);
 

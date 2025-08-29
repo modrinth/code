@@ -2,7 +2,7 @@
   <NewModal ref="modal" :header="`Renaming ${item?.type}`">
     <form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleSubmit">
       <div class="flex flex-col gap-2">
-        <div class="font-semibold text-contrast">Name</div>
+        <div class="text-contrast font-semibold">Name</div>
         <input
           ref="renameInput"
           v-model="itemName"

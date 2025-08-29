@@ -305,7 +305,7 @@ export default defineComponent({
 
     img,
     svg {
-      border-radius: var(--radius-lg);
+      border-radius: 1rem;
       box-shadow:
         -2px -2px 0 2px var(--color-raised-bg),
         2px -2px 0 2px var(--color-raised-bg);
@@ -548,7 +548,7 @@ export default defineComponent({
   min-height: 2rem;
 
   background-color: var(--color-raised-bg);
-  border-radius: var(--radius-lg);
+  border-radius: 1rem;
 
   outline: 2px solid transparent;
 

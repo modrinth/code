@@ -8,7 +8,7 @@
         @mouseenter="stopTimer(item)"
         @mouseleave="setNotificationTimer(item)"
       >
-        <div class="flex w-full gap-2 overflow-hidden rounded-lg bg-bg-raised shadow-xl">
+        <div class="bg-bg-raised flex w-full gap-2 overflow-hidden rounded-lg shadow-xl">
           <div
             class="w-2"
             :class="{
@@ -19,7 +19,7 @@
             }"
           ></div>
           <div
-            class="grid w-full grid-cols-[auto_1fr_auto] items-center gap-x-2 gap-y-1 py-2 pl-1 pr-3"
+            class="grid w-full grid-cols-[auto_1fr_auto] items-center gap-x-2 gap-y-1 py-2 pr-3 pl-1"
           >
             <div
               class="flex items-center"
@@ -35,9 +35,9 @@
               <XCircleIcon v-else-if="item.type === 'error'" class="h-6 w-6" />
               <InfoIcon v-else class="h-6 w-6" />
             </div>
-            <div class="m-0 text-wrap font-bold text-contrast" v-html="item.title"></div>
+            <div class="text-contrast m-0 font-bold text-wrap" v-html="item.title"></div>
             <div class="flex items-center gap-1">
-              <div v-if="item.count && item.count > 1" class="text-xs font-bold text-contrast">
+              <div v-if="item.count && item.count > 1" class="text-contrast text-xs font-bold">
                 x{{ item.count }}
               </div>
               <ButtonStyled circular size="small">
@@ -53,11 +53,11 @@
               </ButtonStyled>
             </div>
             <div></div>
-            <div class="col-span-2 text-sm text-primary" v-html="item.text"></div>
+            <div class="text-primary col-span-2 text-sm" v-html="item.text"></div>
             <template v-if="item.errorCode">
               <div></div>
               <div
-                class="m-0 text-wrap text-xs font-medium text-secondary"
+                class="text-secondary m-0 text-xs font-medium text-wrap"
                 v-html="item.errorCode"
               ></div>
             </template>

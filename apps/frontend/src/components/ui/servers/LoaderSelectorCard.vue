@@ -2,7 +2,7 @@
   <div class="flex w-full items-center justify-between">
     <div class="flex items-center gap-4">
       <div
-        class="grid size-10 place-content-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
+        class="border-button-border bg-button-bg grid size-10 place-content-center rounded-xl border shadow-xs"
         :class="isCurrentLoader ? '[&&]:bg-bg-green' : ''"
       >
         <UiServersIconsLoaderIcon
@@ -13,18 +13,18 @@
       </div>
       <div class="flex flex-col gap-0.5">
         <div class="flex flex-row items-center gap-2">
-          <h1 class="m-0 text-xl font-bold leading-none text-contrast">
+          <h1 class="text-contrast m-0 text-xl leading-none font-bold">
             {{ loader.displayName }}
           </h1>
           <span
             v-if="isCurrentLoader"
-            class="hidden items-center gap-1 rounded-full bg-bg-green p-1 px-1.5 text-xs font-semibold text-brand sm:flex"
+            class="bg-bg-green text-brand hidden items-center gap-1 rounded-full p-1 px-1.5 text-xs font-semibold sm:flex"
           >
             <CheckIcon class="h-4 w-4" />
             Current
           </span>
         </div>
-        <p v-if="isCurrentLoader" class="m-0 text-xs text-secondary">
+        <p v-if="isCurrentLoader" class="text-secondary m-0 text-xs">
           {{ loaderVersion }}
         </p>
       </div>

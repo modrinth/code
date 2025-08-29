@@ -119,18 +119,18 @@ const messages = defineMessages({
     <template v-if="!overrideJavaInstall">
       <div class="flex my-2 items-center gap-2 font-semibold">
         <template v-if="javaInstall">
-          <CheckCircleIcon class="text-brand-green h-4 w-4" />
+          <CheckCircleIcon class="text-green h-4 w-4" />
           <span>Using default Java {{ optimalJava.major_version }} installation:</span>
         </template>
         <template v-else-if="optimalJava">
-          <XCircleIcon class="text-brand-red h-5 w-5" />
+          <XCircleIcon class="text-red h-5 w-5" />
           <span
             >Could not find a default Java {{ optimalJava.major_version }} installation. Please set
             one below:</span
           >
         </template>
         <template v-else>
-          <XCircleIcon class="text-brand-red h-5 w-5" />
+          <XCircleIcon class="text-red h-5 w-5" />
           <span
             >Could not automatically determine a Java installation to use. Please set one
             below:</span

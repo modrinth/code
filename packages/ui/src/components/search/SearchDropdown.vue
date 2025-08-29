@@ -200,7 +200,7 @@ const isChildOfDropdown = (element) => {
     gap: var(--gap-md);
     cursor: pointer;
     user-select: none;
-    border-radius: var(--radius-md);
+    border-radius: 0.75rem;
     box-shadow:
       var(--shadow-inset-sm),
       0 0 0 0 transparent;
@@ -212,11 +212,11 @@ const isChildOfDropdown = (element) => {
     }
 
     &.render-up {
-      border-radius: 0 0 var(--radius-md) var(--radius-md);
+      border-radius: 0 0 0.75rem 0.75rem;
     }
 
     &.render-down {
-      border-radius: var(--radius-md) var(--radius-md) 0 0;
+      border-radius: 0.75rem 0.75rem 0 0;
     }
 
     &:focus {
@@ -296,11 +296,11 @@ const isChildOfDropdown = (element) => {
   &.up {
     top: 0;
     transform: translateY(-99.999%);
-    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    border-radius: 0.75rem 0.75rem 0 0;
   }
 
   &.down {
-    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    border-radius: 0 0 0.75rem 0.75rem;
   }
 }
 
@@ -330,11 +330,11 @@ const isChildOfDropdown = (element) => {
 
   &:focus {
     &.down {
-      border-radius: var(--radius-md) var(--radius-md) 0 0 !important;
+      border-radius: 0.75rem 0.75rem 0 0 !important;
     }
 
     &.up {
-      border-radius: 0 0 var(--radius-md) var(--radius-md) !important;
+      border-radius: 0 0 0.75rem 0.75rem !important;
     }
   }
 

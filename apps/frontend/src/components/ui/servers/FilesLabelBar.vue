@@ -1,11 +1,11 @@
 <template>
   <div
     aria-hidden="true"
-    class="sticky top-12 z-20 flex h-8 w-full select-none flex-row items-center border-0 border-b border-solid border-bg-raised bg-bg px-3 text-xs font-bold uppercase"
+    class="border-bg-raised bg-bg sticky top-12 z-20 flex h-8 w-full flex-row items-center border-b px-3 text-xs font-bold uppercase select-none"
   >
     <div class="min-w-[48px]"></div>
     <button
-      class="flex h-full w-full appearance-none items-center gap-1 bg-transparent text-left hover:text-brand"
+      class="hover:text-brand flex h-full w-full appearance-none items-center gap-1 bg-transparent text-left"
       @click="$emit('sort', 'name')"
     >
       <span>Name</span>
@@ -14,7 +14,7 @@
     </button>
     <div class="flex shrink-0 gap-4 text-right md:gap-12">
       <button
-        class="hidden min-w-[160px] appearance-none items-center justify-start gap-1 bg-transparent hover:text-brand md:flex"
+        class="hover:text-brand hidden min-w-[160px] appearance-none items-center justify-start gap-1 bg-transparent md:flex"
         @click="$emit('sort', 'created')"
       >
         <span>Created</span>
@@ -30,7 +30,7 @@
         />
       </button>
       <button
-        class="mr-4 hidden min-w-[160px] appearance-none items-center justify-start gap-1 bg-transparent hover:text-brand md:flex"
+        class="hover:text-brand mr-4 hidden min-w-[160px] appearance-none items-center justify-start gap-1 bg-transparent md:flex"
         @click="$emit('sort', 'modified')"
       >
         <span>Modified</span>

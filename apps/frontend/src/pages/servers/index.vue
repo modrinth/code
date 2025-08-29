@@ -31,19 +31,19 @@
     <section
       class="mx-auto mt-32 flex min-h-[calc(80vh-0px)] max-w-7xl flex-col justify-center px-5 sm:mt-20 sm:min-h-[calc(100vh-0px)] sm:pl-10 lg:pl-3"
     >
-      <div class="z-[5] flex w-full flex-col gap-8">
+      <div class="z-5 flex w-full flex-col gap-8">
         <div class="flex flex-col gap-4">
           <div
-            class="relative h-fit w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+            class="bg-highlight-green text-brand relative h-fit w-fit rounded-full px-3 py-1 text-sm font-bold backdrop-blur-lg"
           >
             Beta Release
           </div>
-          <h1 class="relative m-0 max-w-3xl text-3xl font-bold !leading-[110%] md:text-6xl">
+          <h1 class="relative m-0 max-w-3xl text-3xl leading-[110%]! font-bold md:text-6xl">
             Host your next server with Modrinth Servers
           </h1>
         </div>
         <h2
-          class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[1.2rem]"
+          class="text-secondary relative m-0 max-w-2xl text-base leading-[155%] font-normal md:text-[1.2rem]"
         >
           Modrinth Servers is the easiest way to host your own Minecraft server. Seamlessly install
           and play your favorite mods and modpacks, all within the Modrinth platform.
@@ -68,7 +68,7 @@
       </div>
 
       <div
-        class="absolute left-[55%] top-56 z-[5] hidden h-full max-h-[calc(100vh-10rem)] w-full rotate-1 xl:block"
+        class="absolute top-56 left-[55%] z-5 hidden h-full max-h-[calc(100vh-10rem)] w-full rotate-1 xl:block"
       >
         <img
           src="https://cdn.modrinth.com/servers/panel-right-dark.webp"
@@ -79,17 +79,17 @@
       </div>
 
       <div
-        class="top-26 pointer-events-none absolute left-0 z-[4] flex h-screen w-full flex-row items-end gap-24 sm:-right-1/4 sm:top-14"
+        class="pointer-events-none absolute top-26 left-0 z-4 flex h-screen w-full flex-row items-end gap-24 sm:top-14 sm:-right-1/4"
       >
         <div
-          class="pointer-events-none absolute left-0 right-0 top-8 max-h-[90%] overflow-hidden sm:top-28 sm:mt-0"
+          class="pointer-events-none absolute top-8 right-0 left-0 max-h-[90%] overflow-hidden sm:top-28 sm:mt-0"
           style="mask-image: linear-gradient(black, transparent 80%)"
         >
           <img
             src="https://cdn.modrinth.com/servers/bigrinth.webp"
             alt=""
             aria-hidden="true"
-            class="pointer-events-none w-full animate-spin select-none p-4 opacity-50"
+            class="pointer-events-none w-full animate-spin p-4 opacity-50 select-none"
             style="
               animation-duration: 172s !important;
               animation-timing-function: linear;
@@ -103,10 +103,10 @@
     <section
       class="relative flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:pt-48"
     >
-      <div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
+      <div class="faded-brand-line absolute top-0 left-0 h-px w-full"></div>
       <div class="relative mx-auto flex w-full max-w-7xl flex-col gap-8">
         <div
-          class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+          class="bg-highlight-green text-brand relative w-fit rounded-full px-3 py-1 text-sm font-bold backdrop-blur-lg"
         >
           Why Modrinth Servers?
         </div>
@@ -114,7 +114,7 @@
           Find a modpack. Now it's a server.
         </h1>
         <h2
-          class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
+          class="text-secondary relative m-0 max-w-2xl text-base leading-[155%] font-normal md:text-[18px]"
         >
           Choose from the thousands of modpacks on Modrinth or create your own. Invite your friends
           when you're ready to play.
@@ -122,10 +122,10 @@
         <img
           src="https://cdn.modrinth.com/servers/excitement.webp"
           alt=""
-          class="absolute right-14 top-0 hidden max-w-[360px] lg:block"
+          class="absolute top-0 right-14 hidden max-w-[360px] lg:block"
         />
         <div class="relative grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
-          <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
+          <div class="bg-bg relative flex flex-col gap-4 rounded-2xl p-6 text-left md:p-12">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -136,7 +136,7 @@
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="size-8 text-brand"
+              class="text-brand size-8"
             >
               <path
                 d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"
@@ -145,16 +145,16 @@
               <circle cx="17.5" cy="17.5" r="3.5" />
             </svg>
             <h2 class="m-0 text-lg font-bold">Play where your mods are</h2>
-            <h3 class="m-0 text-base font-normal text-secondary">
+            <h3 class="text-secondary m-0 text-base font-normal">
               Modrinth Servers seamlessly integrates the mod and modpack installation process into
               your server.
             </h3>
           </div>
 
-          <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-            <LoaderIcon loader="fabric" class="size-8 text-brand" />
+          <div class="bg-bg relative flex flex-col gap-4 rounded-2xl p-6 text-left md:p-12">
+            <LoaderIcon loader="fabric" class="text-brand size-8" />
             <h2 class="m-0 text-lg font-bold">All your favorite mods</h2>
-            <h3 class="m-0 text-base font-normal text-secondary">
+            <h3 class="text-secondary m-0 text-base font-normal">
               Choose between Vanilla, Fabric, Forge, Quilt and NeoForge. If it's on Modrinth, it can
               run on your server.
             </h3>
@@ -168,7 +168,7 @@
           />
         </div>
         <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-3">
-          <div class="flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
+          <div class="bg-bg flex flex-col gap-4 rounded-2xl p-6 text-left md:p-12">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -179,7 +179,7 @@
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="size-8 text-brand"
+              class="text-brand size-8"
             >
               <rect width="20" height="16" x="2" y="4" rx="2" />
               <path d="M6 8h.01" />
@@ -187,13 +187,13 @@
               <path d="M14 8h.01" />
             </svg>
             <h2 class="m-0 text-lg font-bold">Manage it all on Modrinth</h2>
-            <h3 class="m-0 text-base font-normal text-secondary">
+            <h3 class="text-secondary m-0 text-base font-normal">
               Your server, mods, players, and more are all on Modrinth. No need to switch between
               platforms.
             </h3>
           </div>
 
-          <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
+          <div class="bg-bg relative flex flex-col gap-4 rounded-2xl p-6 text-left md:p-12">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -204,23 +204,23 @@
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="size-8 text-brand"
+              class="text-brand size-8"
             >
               <polygon points="13 19 22 12 13 5 13 19" />
               <polygon points="2 19 11 12 2 5 2 19" />
             </svg>
             <h2 class="m-0 text-lg font-bold">Experience modern, reliable hosting</h2>
-            <h3 class="m-0 text-base font-normal text-secondary">
+            <h3 class="text-secondary m-0 text-base font-normal">
               Modrinth Servers are hosted on
               <span class="text-contrast">high-performance AMD CPUs with DDR5 RAM</span>, running on
               custom-built software to ensure your server performs smoothly.
             </h3>
           </div>
 
-          <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-            <ServerIcon class="size-8 text-brand" />
+          <div class="bg-bg relative flex flex-col gap-4 rounded-2xl p-6 text-left md:p-12">
+            <ServerIcon class="text-brand size-8" />
             <h2 class="m-0 text-lg font-bold">Consistently fast</h2>
-            <h3 class="m-0 text-base font-normal text-secondary">
+            <h3 class="text-secondary m-0 text-base font-normal">
               Our infrastructure is never overloaded, meaning each server hosted with Modrinth
               always runs at its full performance.
             </h3>
@@ -232,10 +232,10 @@
     <section
       class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
     >
-      <div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
+      <div class="faded-brand-line absolute top-0 left-0 h-px w-full"></div>
       <div class="relative mx-auto flex w-full max-w-7xl flex-col gap-8">
         <div
-          class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+          class="bg-highlight-green text-brand relative w-fit rounded-full px-3 py-1 text-sm font-bold backdrop-blur-lg"
         >
           Included with your server
         </div>
@@ -243,7 +243,7 @@
           Comes with all the features you need.
         </h1>
         <h2
-          class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
+          class="text-secondary relative m-0 max-w-xl text-base leading-[155%] font-normal md:text-[18px]"
         >
           Included with every server is a suite of features designed to provide a hosting experience
           that only Modrinth can offer.
@@ -251,11 +251,11 @@
         <img
           src="https://cdn.modrinth.com/servers/waving.webp"
           alt=""
-          class="absolute right-8 top-40 hidden max-w-[480px] lg:block"
+          class="absolute top-40 right-8 hidden max-w-[480px] lg:block"
         />
         <div class="grid grid-cols-1 gap-9 lg:grid-cols-2">
           <div class="grid w-full grid-cols-1 gap-8">
-            <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
+            <div class="bg-bg relative flex flex-col gap-4 rounded-2xl p-6 text-left md:p-12">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -266,26 +266,26 @@
                 stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                class="size-8 text-brand"
+                class="text-brand size-8"
               >
                 <circle cx="12" cy="12" r="10" />
                 <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
                 <path d="M2 12h20" />
               </svg>
               <h2 class="m-0 text-lg font-bold">Custom URL</h2>
-              <h3 class="m-0 text-base font-normal text-secondary">
+              <h3 class="text-secondary m-0 text-base font-normal">
                 Share your server with a custom
                 <span class="text-contrast">modrinth.gg</span> URL.
               </h3>
               <div
                 aria-hidden="true"
-                class="ooh-shiny absolute right-4 top-4 flex items-center justify-center rounded-full bg-bg-raised p-4"
+                class="ooh-shiny bg-bg-raised absolute top-4 right-4 flex items-center justify-center rounded-full p-4"
               >
-                <span class="font-bold text-contrast">{{ currentText }}</span
+                <span class="text-contrast font-bold">{{ currentText }}</span
                 >.modrinth.gg
               </div>
             </div>
-            <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
+            <div class="bg-bg relative flex flex-col gap-4 rounded-2xl p-6 text-left md:p-12">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -296,14 +296,14 @@
                 stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                class="size-8 text-brand"
+                class="text-brand size-8"
               >
                 <path d="M12 13v8" />
                 <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
                 <path d="m8 17 4-4 4 4" />
               </svg>
               <h2 class="m-0 text-lg font-bold">Backups included</h2>
-              <h3 class="m-0 text-base font-normal text-secondary">
+              <h3 class="text-secondary m-0 text-base font-normal">
                 Every server comes with 15 backups stored securely off-site.
               </h3>
             </div>
@@ -328,21 +328,21 @@
             <img
               src="https://cdn.modrinth.com/servers/content-dark.webp"
               alt=""
-              class="absolute -bottom-12 -right-[15%] hidden max-w-2xl rounded-2xl bg-brand p-4 lg:block"
+              class="bg-brand absolute -right-[15%] -bottom-12 hidden max-w-2xl rounded-2xl p-4 lg:block"
             />
           </div>
         </div>
         <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
-          <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-            <TerminalSquareIcon class="size-8 text-brand" />
+          <div class="bg-bg relative flex flex-col gap-4 rounded-2xl p-6 text-left md:p-12">
+            <TerminalSquareIcon class="text-brand size-8" />
             <h2 class="m-0 text-lg font-bold">
               A powerful console, server properties manager, and more
             </h2>
-            <h3 class="m-0 text-base font-normal text-secondary">
+            <h3 class="text-secondary m-0 text-base font-normal">
               Modrinth Servers come with powerful tools to manage your server.
             </h3>
           </div>
-          <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
+          <div class="bg-bg relative flex flex-col gap-4 rounded-2xl p-6 text-left md:p-12">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -353,7 +353,7 @@
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="size-8 text-brand"
+              class="text-brand size-8"
             >
               <path
                 d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
@@ -365,34 +365,34 @@
               <path d="m15 18-2-2" />
             </svg>
             <h2 class="m-0 text-lg font-bold">Help when you need it</h2>
-            <h3 class="m-0 text-base font-normal text-secondary">
+            <h3 class="text-secondary m-0 text-base font-normal">
               Reach out to the Modrinth team for help with your server at any time.
             </h3>
           </div>
         </div>
 
         <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
-          <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-            <TransferIcon class="size-8 text-brand" />
+          <div class="bg-bg relative flex flex-col gap-4 rounded-2xl p-6 text-left md:p-12">
+            <TransferIcon class="text-brand size-8" />
             <h2 class="m-0 text-lg font-bold">SFTP access</h2>
-            <h3 class="m-0 text-base font-normal text-secondary">
+            <h3 class="text-secondary m-0 text-base font-normal">
               Access your server files directly with SFTP built into Modrinth Servers.
             </h3>
           </div>
-          <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-            <VersionIcon class="size-8 text-brand" />
+          <div class="bg-bg relative flex flex-col gap-4 rounded-2xl p-6 text-left md:p-12">
+            <VersionIcon class="text-brand size-8" />
             <h2 class="m-0 text-lg font-bold">Advanced networking management</h2>
-            <h3 class="m-0 text-base font-normal text-secondary">
+            <h3 class="text-secondary m-0 text-base font-normal">
               Add your own domain to your server, reserve up to 15 ports for mods that require them,
               and more.
             </h3>
           </div>
         </div>
-        <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
+        <div class="bg-bg relative flex flex-col gap-4 rounded-2xl p-6 text-left md:p-12">
           <h1 class="m-0 text-lg font-bold">Frequently Asked Questions</h1>
           <div class="details-hide flex flex-col gap-1">
             <details pyro-hash="cpus" class="group" :open="$route.hash === '#cpus'">
-              <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
+              <summary class="text-contrast flex cursor-pointer items-center py-3 font-medium">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
                 </span>
@@ -404,7 +404,7 @@
               </p>
             </details>
             <details pyro-hash="cpu-burst" class="group" :open="$route.hash === '#cpu-burst'">
-              <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
+              <summary class="text-contrast flex cursor-pointer items-center py-3 font-medium">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
                 </span>
@@ -420,7 +420,7 @@
             </details>
 
             <details pyro-hash="ddos" class="group" :open="$route.hash === '#ddos'">
-              <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
+              <summary class="text-contrast flex cursor-pointer items-center py-3 font-medium">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
                 </span>
@@ -436,7 +436,7 @@
             </details>
 
             <details pyro-hash="region" class="group" :open="$route.hash === '#region'">
-              <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
+              <summary class="text-contrast flex cursor-pointer items-center py-3 font-medium">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
                 </span>
@@ -449,7 +449,7 @@
             </details>
 
             <details pyro-hash="storage" class="group" :open="$route.hash === '#storage'">
-              <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
+              <summary class="text-contrast flex cursor-pointer items-center py-3 font-medium">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
                 </span>
@@ -462,7 +462,7 @@
             </details>
 
             <details pyro-hash="players" class="group" :open="$route.hash === '#players'">
-              <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
+              <summary class="text-contrast flex cursor-pointer items-center py-3 font-medium">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
                 </span>
@@ -474,7 +474,7 @@
                 there are so many factors that affect it, such as the mods, data packs, or plugins
                 you're running on your server, and even user behavior.
               </p>
-              <p class="mb-0 ml-6 mt-3 leading-[160%]">
+              <p class="mt-3 mb-0 ml-6 leading-[160%]">
                 Most performance issues that arise tend to be the fault of an unoptimized modpack,
                 mod, data pack, or plugin that causes the server to lag. Since our servers are very
                 high-end, you shouldn't run into much trouble as long as you pick an appropriate
@@ -483,7 +483,7 @@
             </details>
 
             <details pyro-hash="players" class="group" :open="$route.hash === '#prices'">
-              <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
+              <summary class="text-contrast flex cursor-pointer items-center py-3 font-medium">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
                 </span>
@@ -502,7 +502,7 @@
       id="plan"
       class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
     >
-      <div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
+      <div class="faded-brand-line absolute top-0 left-0 h-px w-full"></div>
       <div class="mx-auto flex w-full max-w-7xl flex-col items-center gap-8 text-center">
         <h1 class="relative m-0 text-4xl leading-[120%] md:text-7xl">
           There's a server for everyone
@@ -521,12 +521,12 @@
           <template v-if="billingPeriods.includes('quarterly')">
             <button
               v-if="billingPeriod !== 'quarterly'"
-              class="bg-transparent p-0 text-sm font-medium text-brand hover:underline active:scale-95"
+              class="text-brand bg-transparent p-0 text-sm font-medium hover:underline active:scale-95"
               @click="billingPeriod = 'quarterly'"
             >
               Save 16% with quarterly billing!
             </button>
-            <span v-else class="bg-transparent p-0 text-sm font-medium text-brand">
+            <span v-else class="text-brand bg-transparent p-0 text-sm font-medium">
               Save 16% with quarterly billing!
             </span>
           </template>
@@ -585,11 +585,11 @@
         </ul>
 
         <div
-          class="mb-24 flex w-full flex-col items-start justify-between gap-4 rounded-2xl bg-bg p-8 text-left lg:flex-row lg:gap-0"
+          class="bg-bg mb-24 flex w-full flex-col items-start justify-between gap-4 rounded-2xl p-8 text-left lg:flex-row lg:gap-0"
         >
           <div class="flex flex-col gap-4">
-            <h1 class="m-0">Know exactly what you need?</h1>
-            <h2 class="m-0 text-base font-normal text-primary">
+            <h1 class="m-0 text-3xl">Know exactly what you need?</h1>
+            <h2 class="text-primary m-0 text-base font-normal">
               Pick a customized plan with just the specs you need.
             </h2>
           </div>

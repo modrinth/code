@@ -14,7 +14,7 @@ const props = defineProps<{
 }>();
 </script>
 <template>
-  <div class="col-span-full grid grid-cols-subgrid gap-4 rounded-2xl bg-bg-raised p-4">
+  <div class="bg-bg-raised col-span-full grid grid-cols-subgrid gap-4 rounded-2xl p-4">
     <div class="col-span-full grid grid-cols-subgrid items-center gap-4">
       <div>
         <CopyCode :text="`${notice.id}`" />
@@ -104,7 +104,7 @@ const props = defineProps<{
         </span>
         •
         <button
-          class="m-0 flex items-center gap-1 border-none bg-transparent p-0 text-blue hover:underline hover:brightness-125 active:scale-95 active:brightness-150"
+          class="text-blue m-0 flex items-center gap-1 border-none bg-transparent p-0 hover:underline hover:brightness-125 active:scale-95 active:brightness-150"
           @click="() => startEditing(notice, true)"
         >
           <SettingsIcon />

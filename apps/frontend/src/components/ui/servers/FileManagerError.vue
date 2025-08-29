@@ -2,8 +2,8 @@
   <div class="flex h-full w-full items-center justify-center gap-6 p-20">
     <FileIcon class="size-28" />
     <div class="flex flex-col gap-2">
-      <h3 class="text-red-500 m-0 text-2xl font-bold">{{ title }}</h3>
-      <p class="m-0 text-sm text-secondary">
+      <h3 class="m-0 text-2xl font-bold text-red-500">{{ title }}</h3>
+      <p class="text-secondary m-0 text-sm">
         {{ message }}
       </p>
       <div class="flex gap-2">

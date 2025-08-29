@@ -35,7 +35,7 @@ if (!changelogEntry.value) {
   <div v-if="changelogEntry">
     <nuxt-link
       :to="`/news/changelog?filter=${changelogEntry.product}`"
-      class="mb-4 mt-4 flex w-fit items-center gap-2 text-link"
+      class="text-link mt-4 mb-4 flex w-fit items-center gap-2"
     >
       <ChevronLeftIcon /> View full changelog
     </nuxt-link>

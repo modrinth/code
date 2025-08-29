@@ -1,0 +1,68 @@
+@import 'tailwindcss' source("../../..");
+/*@import './variables-new.css';*/
+
+@theme {
+  --color-*: initial;
+
+  --color-brand: var(--color-brand);
+  --color-red: var(--color-red);
+  --color-orange: var(--color-orange);
+  --color-green: var(--color-green);
+  --color-blue: var(--color-blue);
+  --color-purple: var(--color-purple);
+
+  --color-bg-brand: var(--color-brand-highlight);
+  --color-bg-red: var(--color-red-bg);
+  --color-bg-orange: var(--color-orange-bg);
+  --color-bg-green: var(--color-green-bg);
+  --color-bg-blue: var(--color-blue-bg);
+  --color-bg-purple: var(--color-purple-bg);
+
+  --color-highlight-brand: var(--color-brand-highlight);
+  --color-highlight-red: var(--color-red-highlight);
+  --color-highlight-orange: var(--color-orange-highlight);
+  --color-highlight-green: var(--color-green-highlight);
+  --color-highlight-blue: var(--color-blue-highlight);
+  --color-highlight-purple: var(--color-purple-highlight);
+
+  --color-bg: var(--color-bg);
+  --color-bg-300: var(--color-table-alternate-row);
+  --color-button-bg: var(--color-button-bg);
+  --color-bg-raised: var(--color-raised-bg);
+
+  --color-button-border: var(--color-button-border);
+  --color-divider: var(--color-divider);
+
+  --color-button-bg-selected: var(--color-button-bg-selected);
+  --color-button-text-selected: var(--color-button-text-selected);
+
+  --color-contrast: var(--color-contrast);
+  --color-primary: var(--color-text);
+  --color-secondary: var(--color-secondary);
+}
+
+@custom-variant supports-hover {
+  @media (any-hover: hover) {
+    @slot;
+  }
+}
+
+@custom-variant primary-supports-hover {
+  @media (hover: hover) {
+    @slot;
+  }
+}
+
+@custom-variant theme-midnight {
+  &:where([data-theme='midnight'] *) {
+    @slot;
+  }
+}
+
+@layer base {
+  h1,
+  h2,
+  h3 {
+    @apply font-bold;
+  }
+}

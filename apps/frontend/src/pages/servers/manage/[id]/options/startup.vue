@@ -4,32 +4,30 @@
       v-if="server.moduleErrors.startup"
       class="flex w-full flex-col items-center justify-center gap-4 p-4"
     >
-      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+      <div class="bg-bg-raised flex max-w-lg flex-col items-center rounded-3xl p-6 shadow-xl">
         <div class="flex flex-col items-center text-center">
           <div class="flex flex-col items-center gap-4">
-            <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-              <IssuesIcon class="size-12 text-orange" />
+            <div class="bg-bg-orange grid place-content-center rounded-full p-4">
+              <IssuesIcon class="text-orange size-12" />
             </div>
             <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Failed to load startup settings</h1>
           </div>
-          <p class="text-lg text-secondary">
+          <p class="text-secondary text-lg">
             We couldn't load your server's startup settings. Here's what we know:
           </p>
           <p>
-            <span class="break-all font-mono">{{
+            <span class="font-mono break-all">{{
               JSON.stringify(server.moduleErrors.startup.error)
             }}</span>
           </p>
           <ButtonStyled size="large" color="brand" @click="() => server.refresh(['startup'])">
-            <button class="mt-6 !w-full">Retry</button>
+            <button class="mt-6 w-full!">Retry</button>
           </ButtonStyled>
         </div>
       </div>
     </div>
     <div v-else-if="data" class="flex h-full w-full flex-col gap-4">
-      <div
-        class="rounded-2xl border-[1px] border-solid border-orange bg-bg-orange p-4 text-contrast"
-      >
+      <div class="border-orange bg-bg-orange text-contrast rounded-2xl border p-4">
         These settings are for advanced users. Changing them can break your server.
       </div>
 
@@ -37,13 +35,13 @@
         <div class="card flex flex-col gap-4">
           <div class="flex flex-col justify-between gap-4 sm:flex-row">
             <label for="startup-command-field" class="flex flex-col gap-2">
-              <span class="text-lg font-bold text-contrast">Startup command</span>
+              <span class="text-contrast text-lg font-bold">Startup command</span>
               <span> The command that runs when your server is started. </span>
             </label>
             <ButtonStyled>
               <button
                 :disabled="invocation === startupSettings?.original_invocation"
-                class="!w-full sm:!w-auto"
+                class="w-full! sm:w-auto!"
                 @click="resetToDefault"
               >
                 <UpdatedIcon class="h-5 w-5" />
@@ -54,14 +52,14 @@
           <textarea
             id="startup-command-field"
             v-model="invocation"
-            class="min-h-[270px] w-full resize-y font-[family-name:var(--mono-font)]"
+            class="min-h-[270px] w-full resize-y font-(family-name:--mono-font)"
           />
         </div>
 
         <div class="card flex flex-col gap-8">
           <div class="flex flex-col gap-4">
             <div class="flex flex-col gap-2">
-              <span class="text-lg font-bold text-contrast">Java version</span>
+              <span class="text-contrast text-lg font-bold">Java version</span>
               <span>
                 The version of Java that your server will run on. By default, only the Java versions
                 compatible with this version of Minecraft are shown. Some mods may require a
@@ -87,7 +85,7 @@
           </div>
           <div class="flex flex-col gap-4">
             <div class="flex flex-col gap-2">
-              <span class="text-lg font-bold text-contrast">Runtime</span>
+              <span class="text-contrast text-lg font-bold">Runtime</span>
               <span> The Java runtime your server will use. </span>
             </div>
             <UiServersTeleportDropdownMenu

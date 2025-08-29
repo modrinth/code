@@ -601,7 +601,7 @@ const next = async () => {
 .path-selection {
   padding: var(--gap-xl);
   background-color: var(--color-bg);
-  border-radius: var(--radius-lg);
+  border-radius: 1rem;
   display: flex;
   flex-direction: column;
   gap: var(--gap-md);

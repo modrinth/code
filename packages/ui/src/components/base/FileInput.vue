@@ -98,7 +98,7 @@ label {
     align-items: center;
     grid-gap: 0.5rem;
     background-color: var(--color-button-bg);
-    border-radius: var(--radius-sm);
+    border-radius: 0.5rem;
     border: dashed 0.3rem var(--color-contrast);
     cursor: pointer;
     color: var(--color-contrast);

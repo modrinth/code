@@ -1,24 +1,24 @@
 <template>
   <header
     data-pyro-files-state="editing"
-    class="flex h-12 select-none items-center justify-between rounded-t-2xl bg-table-alternateRow p-3"
+    class="bg-table-alternate-row flex h-12 items-center justify-between rounded-t-2xl p-3 select-none"
     aria-label="File editor navigation"
   >
     <nav
       aria-label="Breadcrumb navigation"
-      class="m-0 flex min-w-0 flex-shrink items-center p-0 text-contrast"
+      class="text-contrast m-0 flex min-w-0 shrink items-center p-0"
     >
-      <ol class="m-0 flex min-w-0 flex-shrink list-none items-center p-0">
-        <li class="-ml-1 flex-shrink-0">
+      <ol class="m-0 flex min-w-0 shrink list-none items-center p-0">
+        <li class="-ml-1 shrink-0">
           <ButtonStyled type="transparent">
             <button
               v-tooltip="'Back to home'"
               type="button"
-              class="mr-2 grid h-12 w-10 place-content-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+              class="focus-visible:outline-brand mr-2 grid h-12 w-10 place-content-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid"
               @click="goHome"
             >
               <span
-                class="grid size-8 place-content-center rounded-full bg-button-bg p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
+                class="bg-button-bg group-hover:bg-highlight-brand group-hover:text-brand grid size-8 place-content-center rounded-full p-[6px]"
               >
                 <HomeIcon class="h-5 w-5" />
                 <span class="sr-only">Home</span>
@@ -35,8 +35,8 @@
             >
               <ButtonStyled type="transparent">
                 <button
-                  class="cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-                  :class="{ '!text-contrast': index === breadcrumbSegments.length - 1 }"
+                  class="focus-visible:outline-brand cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid"
+                  :class="{ 'text-contrast!': index === breadcrumbSegments.length - 1 }"
                   @click="$emit('navigate', index)"
                 >
                   {{ segment || "" }}
@@ -44,12 +44,12 @@
               </ButtonStyled>
               <ChevronRightIcon
                 v-if="index < breadcrumbSegments.length"
-                class="size-4 text-secondary"
+                class="text-secondary size-4"
                 aria-hidden="true"
               />
             </li>
             <li class="flex items-center px-3 text-sm">
-              <span class="font-semibold !text-contrast" aria-current="location">{{
+              <span class="text-contrast! font-semibold" aria-current="location">{{
                 fileName
               }}</span>
             </li>
@@ -80,7 +80,7 @@
           ]"
         >
           <SaveIcon aria-hidden="true" />
-          <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+          <DropdownIcon aria-hidden="true" class="text-secondary h-5 w-5" />
           <template #save> <SaveIcon aria-hidden="true" /> Save </template>
           <template #save-as> <SaveIcon aria-hidden="true" /> Save as... </template>
           <template #save&restart>

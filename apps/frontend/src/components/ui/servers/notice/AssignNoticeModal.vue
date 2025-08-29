@@ -110,7 +110,7 @@ defineExpose({ show, hide });
 <template>
   <NewModal ref="modal" :on-hide="() => emit('close')">
     <template #title>
-      <span class="text-lg font-extrabold text-contrast">
+      <span class="text-contrast text-lg font-extrabold">
         Editing assignments of notice #{{ notice?.id }}
       </span>
     </template>
@@ -125,7 +125,7 @@ defineExpose({ show, hide });
       />
       <div class="flex flex-col gap-2">
         <label for="server-assign-field" class="flex flex-col gap-1">
-          <span class="text-lg font-semibold text-contrast"> Assigned servers </span>
+          <span class="text-contrast text-lg font-semibold"> Assigned servers </span>
         </label>
         <Accordion
           v-if="assignedServers.length > 0"
@@ -149,7 +149,7 @@ defineExpose({ show, hide });
 
         <div class="flex flex-col gap-2">
           <label for="server-assign-field" class="flex flex-col gap-1">
-            <span class="text-lg font-semibold text-contrast"> Assigned nodes </span>
+            <span class="text-contrast text-lg font-semibold"> Assigned nodes </span>
           </label>
           <Accordion
             v-if="assignedNodes.length > 0"
@@ -175,7 +175,7 @@ defineExpose({ show, hide });
           </Accordion>
           <span v-else class="mb-2"> No nodes assigned yet </span>
         </div>
-        <div class="flex w-[45rem] items-center gap-2">
+        <div class="flex w-180 items-center gap-2">
           <input
             id="server-assign-field"
             v-model="inputField"

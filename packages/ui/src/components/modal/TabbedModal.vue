@@ -27,12 +27,12 @@ defineExpose({ selectedTab, setTab })
 <template>
   <div class="grid grid-cols-[auto_1fr]">
     <div
-      class="flex flex-col gap-1 border-solid pr-4 border-0 border-r-[1px] border-divider min-w-[200px]"
+      class="flex flex-col gap-1 pr-4 border-r border-divider min-w-[200px]"
     >
       <button
         v-for="(tab, index) in tabs"
         :key="index"
-        :class="`flex gap-2 items-center text-left rounded-xl px-4 py-2 border-none text-nowrap font-semibold cursor-pointer active:scale-[0.97] transition-all ${selectedTab === index ? 'bg-button-bgSelected text-button-textSelected' : 'bg-transparent text-button-text hover:bg-button-bg hover:text-contrast'}`"
+        :class="`flex gap-2 items-center text-left rounded-xl px-4 py-2 border-none text-nowrap font-semibold cursor-pointer active:scale-[0.97] transition-all ${selectedTab === index ? 'bg-button-bg-selected text-button-text-selected' : 'bg-transparent text-button-text hover:bg-button-bg hover:text-contrast'}`"
         @click="() => (selectedTab = index)"
       >
         <component :is="tab.icon" class="w-4 h-4" />

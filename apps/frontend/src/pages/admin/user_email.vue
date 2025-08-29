@@ -5,9 +5,9 @@
       <div class="card flex flex-col gap-3">
         <div class="flex flex-col gap-2">
           <label for="name">
-            <span class="text-lg font-semibold text-contrast">
+            <span class="text-contrast text-lg font-semibold">
               User email
-              <span class="text-brand-red">*</span>
+              <span class="text-red">*</span>
             </span>
           </label>
           <input

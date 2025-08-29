@@ -17,7 +17,7 @@
         v-tooltip="
           `${formatNumber(project.downloads, false)} download${project.downloads !== 1 ? 's' : ''}`
         "
-        class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold cursor-help"
+        class="flex items-center gap-2 border-r border-divider pr-4 font-semibold cursor-help"
       >
         <DownloadIcon class="h-6 w-6 text-secondary" />
         {{ formatNumber(project.downloads) }}
@@ -26,7 +26,7 @@
         v-tooltip="
           `${formatNumber(project.followers, false)} follower${project.downloads !== 1 ? 's' : ''}`
         "
-        class="flex items-center gap-2 border-0 border-solid border-divider pr-4 cursor-help"
+        class="flex items-center gap-2 border-divider pr-4 cursor-help"
         :class="{ 'md:border-r': project.categories.length > 0 }"
       >
         <HeartIcon class="h-6 w-6 text-secondary" />

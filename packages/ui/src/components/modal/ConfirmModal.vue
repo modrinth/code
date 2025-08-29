@@ -9,10 +9,10 @@
       <template v-if="description">
         <div
           v-if="markdown"
-          class="markdown-body max-w-[35rem]"
+          class="markdown-body max-w-140"
           v-html="renderString(description)"
         />
-        <p v-else class="max-w-[35rem] m-0">
+        <p v-else class="max-w-140 m-0">
           {{ description }}
         </p>
       </template>

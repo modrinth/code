@@ -9,7 +9,7 @@
       <Pagination
         :page="currentPage"
         :count="Math.ceil(filteredVersions.length / 20)"
-        class="ml-auto mt-auto"
+        class="mt-auto ml-auto"
         :link-function="(page) => `?page=${page}`"
         @switch-page="switchPage"
       />

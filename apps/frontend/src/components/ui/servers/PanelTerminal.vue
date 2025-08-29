@@ -6,19 +6,19 @@
           v-model="searchInput"
           type="text"
           placeholder="Search logs"
-          class="h-12 !w-full !pl-10 !pr-48"
+          class="h-12 w-full! pr-48! pl-10!"
           :disabled="loading"
           @keydown.escape="clearSearch"
         />
-        <SearchIcon class="absolute left-4 top-1/2 -translate-y-1/2" />
+        <SearchIcon class="absolute top-1/2 left-4 -translate-y-1/2" />
         <ButtonStyled v-if="searchInput && !loading" @click="clearSearch">
-          <button class="absolute right-2 top-1/2 -translate-y-1/2">
+          <button class="absolute top-1/2 right-2 -translate-y-1/2">
             <XIcon class="h-5 w-5" />
           </button>
         </ButtonStyled>
         <span
           v-if="pyroConsole.filteredOutput.value.length && searchInput && !loading"
-          class="pointer-events-none absolute right-12 top-1/2 -translate-y-1/2 select-none whitespace-pre text-sm"
+          class="pointer-events-none absolute top-1/2 right-12 -translate-y-1/2 text-sm whitespace-pre select-none"
         >
           {{ pyroConsole.filteredOutput.value.length }}
           {{ pyroConsole.filteredOutput.value.length === 1 ? "result" : "results" }}
@@ -28,8 +28,8 @@
     <div
       data-pyro-terminal
       :class="[
-        'terminal-font console relative z-[1] flex h-full w-full flex-col items-center justify-between overflow-hidden rounded-t-xl px-1 text-sm transition-transform duration-300',
-        { 'scale-fullscreen screen-fixed inset-0 z-50 !rounded-none': isFullScreen },
+        'terminal-font console relative z-1 flex h-full w-full flex-col items-center justify-between overflow-hidden rounded-t-xl px-1 text-sm transition-transform duration-300',
+        { 'scale-fullscreen screen-fixed inset-0 z-50 rounded-none!': isFullScreen },
         { 'pointer-events-none': loading },
       ]"
       :aria-hidden="loading"
@@ -37,7 +37,7 @@
     >
       <div
         v-if="cosmetics.advancedRendering && !loading"
-        class="progressive-gradient pointer-events-none absolute -bottom-6 left-0 z-[2] h-[10rem] w-full overflow-hidden rounded-xl"
+        class="progressive-gradient pointer-events-none absolute -bottom-6 left-0 z-2 h-40 w-full overflow-hidden rounded-xl"
         :style="`--transparency: ${Math.max(0, lerp(100, 0, bottomThreshold * 8))}%`"
         aria-hidden="true"
       >
@@ -45,13 +45,13 @@
           v-for="i in progressiveBlurIterations"
           :key="i"
           aria-hidden="true"
-          class="absolute left-0 top-0 h-full w-full"
+          class="absolute top-0 left-0 h-full w-full"
           :style="getBlurStyle(i)"
         />
       </div>
       <div
         v-else-if="!loading"
-        class="pointer-events-none absolute bottom-0 left-0 right-0 z-[2] h-[196px] w-full"
+        class="pointer-events-none absolute right-0 bottom-0 left-0 z-2 h-[196px] w-full"
         :style="
           bottomThreshold > 0
             ? { background: 'linear-gradient(transparent 30%, var(--console-bg) 70%)' }
@@ -60,14 +60,14 @@
       ></div>
       <div
         aria-hidden="true"
-        class="pointer-events-none absolute left-0 top-0 z-[60] h-full w-full"
+        class="pointer-events-none absolute top-0 left-0 z-60 h-full w-full"
         :style="{
           visibility: isFullScreen ? 'hidden' : 'visible',
         }"
       >
         <div
           aria-hidden="true"
-          class="absolute -bottom-2 -right-2 h-7 w-7"
+          class="absolute -right-2 -bottom-2 h-7 w-7"
           :style="{
             background: `radial-gradient(circle at 0% 0%, transparent 50%, var(--color-raised-bg) 52%)`,
           }"
@@ -85,7 +85,7 @@
           v-if="!loading"
           ref="scrollbarTrack"
           data-pyro-terminal-scrollbar-track
-          class="absolute -right-1 bottom-16 top-4 z-[4] w-4 overflow-hidden"
+          class="absolute top-4 -right-1 bottom-16 z-4 w-4 overflow-hidden"
           @mousedown="handleTrackClick"
         >
           <div
@@ -107,7 +107,7 @@
             <div
               ref="scrollbarThumb"
               data-pyro-terminal-scrollbar-thumb
-              class="absolute w-1.5 cursor-default rounded-full bg-button-bg"
+              class="bg-button-bg absolute w-1.5 cursor-default rounded-full"
               :style="{
                 height: `${getThumbHeight()}px`,
                 transform: `translateY(${getThumbPosition()}px)`,
@@ -119,7 +119,7 @@
         <div
           ref="scrollContainer"
           data-pyro-terminal-root
-          class="scrollbar-none absolute left-0 top-0 h-full w-full select-text overflow-x-auto overflow-y-auto py-6 pb-[72px]"
+          class="scrollbar-none absolute top-0 left-0 h-full w-full overflow-x-auto overflow-y-auto py-6 pb-[72px] select-text"
           @scroll.passive="() => handleListScroll()"
         >
           <div v-if="loading" class="h-full w-full" />
@@ -153,7 +153,7 @@
                     <div @mousedown.stop @click.stop>
                       <button
                         v-if="searchInput"
-                        class="jump-button mr-4 flex items-center gap-1 rounded-md bg-bg-blue px-2 py-1 text-xs text-blue transition-all hover:scale-105 active:scale-95"
+                        class="jump-button bg-bg-blue text-blue mr-4 flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-all hover:scale-105 active:scale-95"
                         @mousedown.stop
                         @click.stop="() => jumpToLine(item)"
                       >
@@ -169,17 +169,17 @@
                     shouldShowSeparator(visibleStartIndex + index, visibleStartIndex + index + 1)
                   "
                   data-pyro-terminal-separator
-                  class="flex h-8 select-none items-center justify-center opacity-50"
+                  class="flex h-8 items-center justify-center opacity-50 select-none"
                   aria-hidden="true"
                 >
-                  <div class="h-[1px] w-full bg-contrast opacity-50"></div>
+                  <div class="bg-contrast h-px w-full opacity-50"></div>
                   <div class="mx-4 flex flex-row items-center gap-4">
                     <div class="flex flex-row items-center gap-1">
-                      <div class="size-1 rounded-full bg-contrast opacity-70"></div>
-                      <div class="size-1 rounded-full bg-contrast opacity-70"></div>
-                      <div class="size-1 rounded-full bg-contrast opacity-70"></div>
+                      <div class="bg-contrast size-1 rounded-full opacity-70"></div>
+                      <div class="bg-contrast size-1 rounded-full opacity-70"></div>
+                      <div class="bg-contrast size-1 rounded-full opacity-70"></div>
                     </div>
-                    <span class="select-none whitespace-pre text-xs text-contrast">
+                    <span class="text-contrast text-xs whitespace-pre select-none">
                       {{
                         shouldShowSeparator(
                           visibleStartIndex + index,
@@ -197,7 +197,7 @@
                       between
                     </span>
                   </div>
-                  <div class="h-[1px] w-full bg-contrast opacity-50"></div>
+                  <div class="bg-contrast h-px w-full opacity-50"></div>
                 </li>
               </template>
             </ul>
@@ -206,7 +206,7 @@
       </div>
 
       <div
-        class="absolute bottom-4 z-[3] w-full"
+        class="absolute bottom-4 z-3 w-full"
         :style="{
           filter: `drop-shadow(0 8px 12px rgba(0, 0, 0, ${lerp(0.1, 0.5, bottomThreshold)}))`,
         }"
@@ -217,7 +217,7 @@
         v-if="!loading"
         data-pyro-fullscreen
         :label="isFullScreen ? 'Exit full screen' : 'Enter full screen'"
-        class="experimental-styles-within absolute right-4 top-4 z-[3] grid h-12 w-12 place-content-center rounded-full border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
+        class="experimental-styles-within border-button-border bg-bg-raised text-contrast absolute top-4 right-4 z-3 grid h-12 w-12 place-content-center rounded-full border transition-all duration-200 hover:scale-110 active:scale-95"
         :class="{ hidden: searchInput || hasSelection || isSingleLineSelected }"
         @click="toggleFullscreen"
       >
@@ -228,13 +228,13 @@
       <Transition name="fade">
         <div
           v-if="(hasSelection || isSingleLineSelected) && !loading"
-          class="absolute right-20 top-4 z-[3] flex flex-row items-center"
-          :class="{ '!right-4': searchInput || hasSelection || isSingleLineSelected }"
+          class="absolute top-4 right-20 z-3 flex flex-row items-center"
+          :class="{ 'right-4!': searchInput || hasSelection || isSingleLineSelected }"
         >
           <button
             data-pyro-copy
             label="Copy selected lines"
-            class="experimental-styles-within flex h-12 flex-row items-center justify-center gap-2 rounded-full border-[1px] border-solid border-button-border bg-bg-raised px-4 text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
+            class="experimental-styles-within border-button-border bg-bg-raised text-contrast flex h-12 flex-row items-center justify-center gap-2 rounded-full border px-4 transition-all duration-200 hover:scale-110 active:scale-95"
             @click="copySelectedLines"
           >
             <CopyIcon class="h-5 w-5" />
@@ -245,7 +245,7 @@
               v-if="hasSelection"
               data-pyro-view
               label="View selected lines"
-              class="experimental-styles-within ml-2 flex h-12 w-[100px] flex-row items-center justify-center gap-2 rounded-full border-[1px] border-solid border-button-border bg-bg-raised px-4 text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
+              class="experimental-styles-within border-button-border bg-bg-raised text-contrast ml-2 flex h-12 w-[100px] flex-row items-center justify-center gap-2 rounded-full border px-4 transition-all duration-200 hover:scale-110 active:scale-95"
               @click="showSelectedLines"
             >
               <EyeIcon class="h-5 w-5" />
@@ -260,7 +260,7 @@
           v-if="bottomThreshold > 0 && !isScrolledToBottom && !loading"
           data-pyro-scrolltobottom
           label="Scroll to bottom"
-          class="scroll-to-bottom-btn experimental-styles-within absolute bottom-[4.5rem] right-4 z-[3] grid h-12 w-12 place-content-center rounded-full border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
+          class="scroll-to-bottom-btn experimental-styles-within border-button-border bg-bg-raised text-contrast absolute right-4 bottom-18 z-3 grid h-12 w-12 place-content-center rounded-full border transition-all duration-200 hover:scale-110 active:scale-95"
           @click="scrollToBottom"
         >
           <RightArrowIcon class="rotate-90" />
@@ -268,10 +268,10 @@
         </button>
       </Transition>
     </div>
-    <NewModal ref="viewLogModal" class="z-[9999]" header="Viewing selected logs">
+    <NewModal ref="viewLogModal" class="z-9999" header="Viewing selected logs">
       <div class="text-contrast">
         <pre
-          class="select-text overflow-x-auto whitespace-pre rounded-lg bg-bg font-mono"
+          class="bg-bg overflow-x-auto rounded-lg font-mono whitespace-pre select-text"
           v-html="processedLogWithLinks"
         ></pre>
         <div v-if="detectedLinks.length" class="border-contrast/20 mt-4 border-t pt-4">
@@ -282,7 +282,7 @@
                 :href="link"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-sm text-blue hover:underline"
+                class="text-blue text-sm hover:underline"
               >
                 {{ link }}
               </a>

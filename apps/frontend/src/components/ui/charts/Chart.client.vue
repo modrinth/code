@@ -183,7 +183,7 @@ const chartOptions = computed(() => {
       categories: props.labels,
       labels: {
         style: {
-          borderRadius: "var(--radius-sm)",
+          borderRadius: "0.5rem",
         },
       },
       axisTicks: {
@@ -237,7 +237,7 @@ const chartOptions = computed(() => {
       bar: {
         horizontal: props.horizontalBar,
         columnWidth: "80%",
-        endingShape: "rounded",
+        endingShape: "rounded-sm",
         borderRadius: 5,
         borderRadiusApplication: "end",
         borderRadiusWhenStacked: "last",
@@ -355,7 +355,7 @@ svg {
 :deep(.apexcharts-tooltip),
 :deep(.apexcharts-yaxistooltip) {
   background: var(--color-raised-bg) !important;
-  border-radius: var(--radius-sm) !important;
+  border-radius: 0.5rem !important;
   border: 1px solid var(--color-button-bg) !important;
   box-shadow: var(--shadow-floating) !important;
   font-size: var(--font-size-nm) !important;
@@ -370,7 +370,7 @@ svg {
 :deep(.apexcharts-yaxistooltip),
 :deep(.apexcharts-xaxistooltip) {
   background: var(--color-raised-bg) !important;
-  border-radius: var(--radius-sm) !important;
+  border-radius: 0.5rem !important;
   border: 1px solid var(--color-button-bg) !important;
   font-size: var(--font-size-nm) !important;
   color: var(--color-base) !important;
@@ -398,7 +398,7 @@ svg {
 }
 
 :deep(.apexcharts-menu-item) {
-  border-radius: var(--radius-sm) !important;
+  border-radius: 0.5rem !important;
   padding: var(--gap-xs) var(--gap-sm) !important;
 
   &:hover {

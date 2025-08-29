@@ -14,7 +14,7 @@
       :action="() => removeFilter(selectedItem)"
     >
       <XIcon />
-      <BanIcon v-if="selectedItem.negative" class="text-brand-red" />
+      <BanIcon v-if="selectedItem.negative" class="text-red" />
       {{ selectedItem.formatted_name ?? selectedItem.option }}
     </TagItem>
     <TagItem

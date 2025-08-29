@@ -12,7 +12,7 @@
       v-if="currentBackup"
       :backup="currentBackup"
       preview
-      class="border-px border-solid border-button-border"
+      class="border-px border-button-border border-solid"
     />
   </ConfirmModal>
 </template>

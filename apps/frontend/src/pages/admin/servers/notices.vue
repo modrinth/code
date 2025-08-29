@@ -1,20 +1,20 @@
 <template>
   <NewModal ref="createNoticeModal">
     <template #title>
-      <span class="text-lg font-extrabold text-contrast">{{
+      <span class="text-contrast text-lg font-extrabold">{{
         editingNotice ? `Editing notice #${editingNotice?.id}` : "Creating a notice"
       }}</span>
     </template>
     <div class="flex w-[700px] flex-col gap-3">
       <div class="flex items-center justify-between gap-2">
         <label for="level-selector" class="flex flex-col gap-1">
-          <span class="text-lg font-semibold text-contrast"> Level </span>
+          <span class="text-contrast text-lg font-semibold"> Level </span>
           <span>Determines how the notice should be styled.</span>
         </label>
         <TeleportDropdownMenu
           id="level-selector"
           v-model="newNoticeLevel"
-          class="max-w-[10rem]"
+          class="max-w-40"
           :options="levelOptions"
           :display-name="(x) => formatMessage(x.name)"
           name="Level"
@@ -22,7 +22,7 @@
       </div>
       <div v-if="!newNoticeSurvey" class="flex flex-col gap-2">
         <label for="notice-title" class="flex flex-col gap-1">
-          <span class="text-lg font-semibold text-contrast"> Title </span>
+          <span class="text-contrast text-lg font-semibold"> Title </span>
         </label>
         <input
           id="notice-title"
@@ -34,9 +34,9 @@
       </div>
       <div class="flex flex-col gap-2">
         <label for="notice-message" class="flex flex-col gap-1">
-          <span class="text-lg font-semibold text-contrast">
+          <span class="text-contrast text-lg font-semibold">
             {{ newNoticeSurvey ? "Survey ID" : "Message" }}
-            <span class="text-brand-red">*</span>
+            <span class="text-red">*</span>
           </span>
         </label>
         <input
@@ -53,14 +53,14 @@
       </div>
       <div v-if="!newNoticeSurvey" class="flex items-center justify-between gap-2">
         <label for="dismissable-toggle" class="flex flex-col gap-1">
-          <span class="text-lg font-semibold text-contrast"> Dismissable </span>
+          <span class="text-contrast text-lg font-semibold"> Dismissable </span>
           <span>Allow users to dismiss the notice from their panel.</span>
         </label>
         <Toggle id="dismissable-toggle" v-model="newNoticeDismissable" />
       </div>
       <div class="flex items-center justify-between gap-2">
         <label for="scheduled-date" class="flex flex-col gap-1">
-          <span class="text-lg font-semibold text-contrast"> Announcement date </span>
+          <span class="text-contrast text-lg font-semibold"> Announcement date </span>
           <span>Leave blank for notice to be available immediately.</span>
         </label>
         <input
@@ -72,7 +72,7 @@
       </div>
       <div class="flex items-center justify-between gap-2">
         <label for="expiration-date" class="flex flex-col gap-1">
-          <span class="text-lg font-semibold text-contrast"> Expiration date </span>
+          <span class="text-contrast text-lg font-semibold"> Expiration date </span>
           <span>The notice will automatically be deleted after this date.</span>
         </label>
         <input
@@ -84,7 +84,7 @@
       </div>
 
       <div v-if="!newNoticeSurvey" class="flex flex-col gap-2">
-        <span class="text-lg font-semibold text-contrast"> Preview </span>
+        <span class="text-contrast text-lg font-semibold"> Preview </span>
         <ServerNotice
           :level="newNoticeLevel.id"
           :message="
@@ -119,9 +119,7 @@
   </NewModal>
   <AssignNoticeModal ref="assignNoticeModal" @close="refreshNotices" />
   <div class="page experimental-styles-within">
-    <div
-      class="mb-6 flex items-end justify-between border-0 border-b border-solid border-divider pb-4"
-    >
+    <div class="border-divider mb-6 flex items-end justify-between border-b border-solid pb-4">
       <h1 class="m-0 text-2xl">Servers notices</h1>
       <ButtonStyled color="brand">
         <button @click="openNewNoticeModal">
@@ -136,7 +134,7 @@
         v-else
         class="grid grid-cols-[auto_auto_auto] gap-4 md:grid-cols-[min-content_auto_auto_auto_auto_min-content]"
       >
-        <div class="col-span-full grid grid-cols-subgrid gap-4 px-4 font-bold text-contrast">
+        <div class="text-contrast col-span-full grid grid-cols-subgrid gap-4 px-4 font-bold">
           <div>{{ formatMessage(messages.id) }}</div>
           <div>{{ formatMessage(messages.begins) }}</div>
           <div>{{ formatMessage(messages.expires) }}</div>
@@ -147,7 +145,7 @@
         <div
           v-for="notice in notices"
           :key="`notice-${notice.id}`"
-          class="col-span-full grid grid-cols-subgrid gap-4 rounded-2xl bg-bg-raised p-4"
+          class="bg-bg-raised col-span-full grid grid-cols-subgrid gap-4 rounded-2xl p-4"
         >
           <div class="col-span-full grid grid-cols-subgrid items-center gap-4">
             <div>
@@ -240,7 +238,7 @@
               </span>
               •
               <button
-                class="m-0 flex items-center gap-1 border-none bg-transparent p-0 text-blue hover:underline hover:brightness-125 active:scale-95 active:brightness-150"
+                class="text-blue m-0 flex items-center gap-1 border-none bg-transparent p-0 hover:underline hover:brightness-125 active:scale-95 active:brightness-150"
                 @click="() => startEditing(notice, true)"
               >
                 <SettingsIcon />

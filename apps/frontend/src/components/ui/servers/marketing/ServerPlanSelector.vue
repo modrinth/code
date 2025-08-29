@@ -108,22 +108,22 @@ const billingMonths = computed(() => {
             }
           : undefined
       "
-      class="flex w-full flex-col justify-between gap-4 rounded-2xl bg-bg p-8 text-left"
+      class="bg-bg flex w-full flex-col justify-between gap-4 rounded-2xl p-8 text-left"
     >
       <div class="flex flex-col gap-2">
         <div class="flex flex-row flex-wrap items-center gap-3">
-          <h1 class="m-0">{{ formatMessage(plans[plan].name) }}</h1>
+          <h1 class="m-0 text-3xl">{{ formatMessage(plans[plan].name) }}</h1>
           <div
             v-if="plans[plan].mostPopular"
-            class="rounded-full bg-brand-highlight px-2 py-1 text-xs font-bold text-brand"
+            class="bg-highlight-brand text-brand rounded-full px-2 py-1 text-xs font-bold"
           >
             Most popular
           </div>
         </div>
-        <span class="m-0 text-2xl font-bold text-contrast">
+        <span class="text-contrast m-0 text-2xl font-bold">
           {{ formatPrice(locale, price / billingMonths, currency, true) }}
           {{ isUsa ? "" : currency }}
-          <span class="text-lg font-semibold text-secondary">
+          <span class="text-secondary text-lg font-semibold">
             / month<template v-if="interval !== 'monthly'">, billed {{ interval }}</template>
           </span>
         </span>

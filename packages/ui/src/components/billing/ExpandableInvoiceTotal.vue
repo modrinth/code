@@ -43,7 +43,7 @@ const periodSuffix = computed(() => {
         </div>
       </div>
     </template>
-    <div class="p-4 flex flex-col gap-4 bg-table-alternateRow">
+    <div class="p-4 flex flex-col gap-4 bg-table-alternate-row">
       <div
         v-for="{ title, amount } in billingItems"
         :key="title"

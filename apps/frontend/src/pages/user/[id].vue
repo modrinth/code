@@ -5,26 +5,26 @@
     <NewModal v-if="auth.user && isStaff(auth.user)" ref="userDetailsModal" header="User details">
       <div class="flex flex-col gap-3">
         <div class="flex flex-col gap-1">
-          <span class="text-lg font-bold text-primary">Email</span>
+          <span class="text-primary text-lg font-bold">Email</span>
           <div>
             <span
               v-tooltip="user.email_verified ? 'Email verified' : 'Email not verified'"
               class="flex w-fit items-center gap-1"
             >
               <span>{{ user.email }}</span>
-              <CheckIcon v-if="user.email_verified" class="h-4 w-4 text-brand" />
-              <XIcon v-else class="h-4 w-4 text-red" />
+              <CheckIcon v-if="user.email_verified" class="text-brand h-4 w-4" />
+              <XIcon v-else class="text-red h-4 w-4" />
             </span>
           </div>
         </div>
 
         <div class="flex flex-col gap-1">
-          <span class="text-lg font-bold text-primary"> Auth providers </span>
+          <span class="text-primary text-lg font-bold"> Auth providers </span>
           <span>{{ user.auth_providers.join(", ") }}</span>
         </div>
 
         <div class="flex flex-col gap-1">
-          <span class="text-lg font-bold text-primary"> Payment methods</span>
+          <span class="text-primary text-lg font-bold"> Payment methods</span>
           <span>
             <template v-if="user.payout_data?.paypal_address">
               Paypal ({{ user.payout_data.paypal_address }} - {{ user.payout_data.paypal_country }})
@@ -39,14 +39,14 @@
         </div>
 
         <div class="flex flex-col gap-1">
-          <span class="text-lg font-bold text-primary"> Has password </span>
+          <span class="text-primary text-lg font-bold"> Has password </span>
           <span>
             {{ user.has_password ? "Yes" : "No" }}
           </span>
         </div>
 
         <div class="flex flex-col gap-1">
-          <span class="text-lg font-bold text-primary"> Has TOTP </span>
+          <span class="text-primary text-lg font-bold"> Has TOTP </span>
           <span>
             {{ user.has_totp ? "Yes" : "No" }}
           </span>
@@ -72,17 +72,13 @@
             }}
           </template>
           <template #stats>
-            <div
-              class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
-            >
-              <BoxIcon class="h-6 w-6 text-secondary" />
+            <div class="border-divider flex items-center gap-2 border-r pr-4 font-semibold">
+              <BoxIcon class="text-secondary h-6 w-6" />
               {{ formatCompactNumber(projects?.length || 0) }}
               projects
             </div>
-            <div
-              class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
-            >
-              <DownloadIcon class="h-6 w-6 text-secondary" />
+            <div class="border-divider flex items-center gap-2 border-r pr-4 font-semibold">
+              <DownloadIcon class="text-secondary h-6 w-6" />
               {{ formatCompactNumber(sumDownloads) }}
               downloads
             </div>
@@ -95,7 +91,7 @@
               "
               class="flex items-center gap-2 font-semibold"
             >
-              <CalendarIcon class="h-6 w-6 text-secondary" />
+              <CalendarIcon class="text-secondary h-6 w-6" />
               Joined
               {{ formatRelativeTime(user.created) }}
             </div>
@@ -300,7 +296,7 @@
       </div>
       <div class="normal-page__sidebar">
         <div v-if="organizations.length > 0" class="card flex-card">
-          <h2 class="text-lg text-contrast">{{ formatMessage(messages.profileOrganizations) }}</h2>
+          <h2 class="text-contrast text-lg">{{ formatMessage(messages.profileOrganizations) }}</h2>
           <div class="flex flex-wrap gap-2">
             <nuxt-link
               v-for="org in sortedOrgs"
@@ -314,7 +310,7 @@
           </div>
         </div>
         <div v-if="badges.length > 0" class="card flex-card">
-          <h2 class="text-lg text-contrast">{{ formatMessage(messages.profileBadges) }}</h2>
+          <h2 class="text-contrast text-lg">{{ formatMessage(messages.profileBadges) }}</h2>
           <div class="flex flex-wrap gap-2">
             <div v-for="badge in badges" :key="badge">
               <StaffBadge v-if="badge === 'staff'" class="h-14 w-14" />

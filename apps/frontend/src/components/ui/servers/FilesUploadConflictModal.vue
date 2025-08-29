@@ -6,8 +6,8 @@
     :proceed-icon="CheckIcon"
     @proceed="proceed"
   >
-    <div class="flex max-w-[30rem] flex-col gap-4">
-      <p class="m-0 font-semibold leading-normal">
+    <div class="flex max-w-120 flex-col gap-4">
+      <p class="m-0 leading-normal font-semibold">
         <template v-if="hasMany">
           Over 100 files will be overwritten if you proceed with extraction; here is just some of
           them:
@@ -17,9 +17,9 @@
           overwritten if you proceed with extraction:
         </template>
       </p>
-      <ul class="m-0 max-h-80 list-none overflow-auto rounded-2xl bg-bg px-4 py-3">
+      <ul class="bg-bg m-0 max-h-80 list-none overflow-auto rounded-2xl px-4 py-3">
         <li v-for="file in files" :key="file" class="flex items-center gap-1 py-1 font-medium">
-          <XIcon class="shrink-0 text-red" /> {{ file }}
+          <XIcon class="text-red shrink-0" /> {{ file }}
         </li>
       </ul>
     </div>

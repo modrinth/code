@@ -781,7 +781,7 @@ function openVideoModal() {
   padding-left: 2.5rem;
   background: var(--color-button-bg);
   border: 2px dashed var(--color-gray);
-  border-radius: var(--radius-md);
+  border-radius: 0.75rem;
   cursor: pointer;
   transition:
     opacity 0.5s ease-in-out,
@@ -883,9 +883,9 @@ function openVideoModal() {
 
 .markdown-body-wrapper {
   border: 1px solid var(--color-button-bg);
-  border-radius: var(--radius-md);
+  border-radius: 0.75rem;
   width: 100%;
-  padding: var(--radius-md);
+  padding: 0.75rem;
   min-height: 6rem;
 }
 

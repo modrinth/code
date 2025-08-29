@@ -84,22 +84,18 @@
             {{ organization.description }}
           </template>
           <template #stats>
-            <div
-              class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
-            >
-              <UsersIcon class="h-6 w-6 text-secondary" />
+            <div class="border-divider flex items-center gap-2 border-r pr-4 font-semibold">
+              <UsersIcon class="text-secondary h-6 w-6" />
               {{ formatCompactNumber(acceptedMembers?.length || 0) }}
               members
             </div>
-            <div
-              class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
-            >
-              <BoxIcon class="h-6 w-6 text-secondary" />
+            <div class="border-divider flex items-center gap-2 border-r pr-4 font-semibold">
+              <BoxIcon class="text-secondary h-6 w-6" />
               {{ formatCompactNumber(projects?.length || 0) }}
               projects
             </div>
             <div class="flex items-center gap-2 font-semibold">
-              <DownloadIcon class="h-6 w-6 text-secondary" />
+              <DownloadIcon class="text-secondary h-6 w-6" />
               {{ formatCompactNumber(sumDownloads) }}
               downloads
             </div>
@@ -165,7 +161,7 @@
                     <CrownIcon
                       v-if="member.is_owner"
                       v-tooltip="'Organization owner'"
-                      class="text-brand-orange"
+                      class="text-orange"
                     />
                   </span>
                   <span class="details-list__item__text--style-secondary">
@@ -561,7 +557,7 @@ async function copyPermalink() {
     background-color: var(--color-raised-bg);
     padding: var(--gap-sm);
     margin-left: -0.5rem;
-    border-radius: var(--radius-lg);
+    border-radius: 1rem;
     grid-template:
       "avatar name" auto
       "avatar role" auto

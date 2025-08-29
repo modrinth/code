@@ -40,7 +40,7 @@
             :key="`option-${index}`"
             :transparent="!manyValues.includes(option)"
             :action="() => toggleOption(option)"
-            class="!w-full"
+            class="w-full!"
             :color="manyValues.includes(option) ? 'secondary' : 'default'"
           >
             <slot name="option" :option="option">{{ getOptionLabel(option) }}</slot>
@@ -56,7 +56,7 @@
             :key="`option-${index}`"
             :transparent="!manyValues.includes(option)"
             :action="() => toggleOption(option)"
-            class="!w-full"
+            class="w-full!"
             :color="manyValues.includes(option) ? 'secondary' : 'default'"
           >
             <slot name="option" :option="option">{{ getOptionLabel(option) }}</slot>

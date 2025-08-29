@@ -38,7 +38,7 @@
 }
 
 .placeholder {
-  border-radius: var(--radius-lg);
+  border-radius: 1rem;
   width: 100%;
   height: 4rem;
   opacity: 0.25;

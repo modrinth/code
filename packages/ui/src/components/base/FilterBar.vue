@@ -7,7 +7,7 @@
     <button
       v-for="filter in options"
       :key="`filter-${filter.id}`"
-      :class="`px-2 py-1 rounded-full font-semibold leading-none border-none cursor-pointer active:scale-[0.97] duration-100 transition-all ${selectedFilters.includes(filter.id) ? 'bg-brand-highlight text-brand' : 'bg-bg-raised text-secondary'}`"
+      :class="`px-2 py-1 rounded-full font-semibold leading-none border-none cursor-pointer active:scale-[0.97] duration-100 transition-all ${selectedFilters.includes(filter.id) ? 'bg-highlight-brand text-brand' : 'bg-bg-raised text-secondary'}`"
       @click="toggleFilter(filter.id)"
     >
       {{ formatMessage(filter.message) }}

@@ -3,11 +3,11 @@
     <div
       v-if="props.isVisible"
       data-pyro-save-banner
-      class="fixed bottom-16 left-0 right-0 z-[6] mx-auto h-fit w-full max-w-4xl transition-all duration-300 sm:bottom-8"
+      class="fixed right-0 bottom-16 left-0 z-6 mx-auto h-fit w-full max-w-4xl transition-all duration-300 sm:bottom-8"
     >
-      <div class="mx-2 rounded-2xl border-2 border-solid border-button-border bg-bg-raised p-4">
+      <div class="border-button-border bg-bg-raised mx-2 rounded-2xl border-2 p-4">
         <div class="flex flex-col items-center justify-between gap-2 md:flex-row">
-          <span class="font-bold text-contrast">Careful, you have unsaved changes!</span>
+          <span class="text-contrast font-bold">Careful, you have unsaved changes!</span>
           <div class="flex gap-2">
             <ButtonStyled type="transparent" color="standard">
               <button :disabled="props.isUpdating" @click="props.reset">Reset</button>

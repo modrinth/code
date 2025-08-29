@@ -13,7 +13,7 @@
         left: `${location.screenPosition?.x || 0}px`,
         top: `${location.screenPosition?.y || 0}px`,
       }"
-      class="location-button center-on-top-left flex transform cursor-pointer items-center rounded-full bg-bg px-3 outline-1 outline-red transition-opacity duration-200 hover:z-50"
+      class="location-button center-on-top-left bg-bg outline-red flex transform cursor-pointer items-center rounded-full px-3 outline-1 transition-opacity duration-200 hover:z-50"
       @click="toggleLocationClicked(location)"
     >
       <div
@@ -32,9 +32,9 @@
           expanded: location.clicked,
         }"
       >
-        <div class="whitespace-nowrap text-sm">
+        <div class="text-sm whitespace-nowrap">
           <span class="ml-2"> {{ location.name }} </span>
-          <span v-if="!location.active" class="ml-1 text-xs text-secondary">(Coming Soon)</span>
+          <span v-if="!location.active" class="text-secondary ml-1 text-xs">(Coming Soon)</span>
         </div>
       </div>
     </div>

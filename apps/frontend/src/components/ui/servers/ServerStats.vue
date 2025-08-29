@@ -2,22 +2,22 @@
   <div
     data-pyro-server-stats
     style="font-variant-numeric: tabular-nums"
-    class="flex select-none flex-col items-center gap-6 md:flex-row"
+    class="flex flex-col items-center gap-6 select-none md:flex-row"
     :class="{ 'pointer-events-none': loading }"
     :aria-hidden="loading"
   >
     <div
       v-for="(metric, index) in metrics"
       :key="index"
-      class="relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+      class="bg-bg-raised relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl p-8"
     >
       <div class="relative z-10 -ml-3 w-fit rounded-xl px-3 py-1">
         <div class="relative z-10">
-          <div class="-mb-0.5 mt-0.5 flex flex-row items-center gap-2">
-            <h2 class="m-0 -ml-0.5 text-3xl font-extrabold text-contrast">{{ metric.value }}</h2>
-            <h3 class="text-sm font-normal text-secondary">/ {{ metric.max }}</h3>
+          <div class="mt-0.5 -mb-0.5 flex flex-row items-center gap-2">
+            <h2 class="text-contrast m-0 -ml-0.5 text-3xl font-extrabold">{{ metric.value }}</h2>
+            <h3 class="text-secondary text-sm font-normal">/ {{ metric.max }}</h3>
           </div>
-          <h3 class="flex items-center gap-2 text-base font-normal text-secondary">
+          <h3 class="text-secondary flex items-center gap-2 text-base font-normal">
             {{ metric.title }}
             <IssuesIcon
               v-if="metric.warning && !loading"
@@ -27,12 +27,12 @@
             />
           </h3>
         </div>
-        <div class="absolute -left-8 -top-4 h-28 w-56 rounded-full bg-bg-raised blur-lg" />
+        <div class="bg-bg-raised absolute -top-4 -left-8 h-28 w-56 rounded-full blur-lg" />
       </div>
 
       <component
         :is="metric.icon"
-        class="absolute right-10 top-10 z-10 size-8"
+        class="absolute top-10 right-10 z-10 size-8"
         style="width: 2rem; height: 2rem"
       />
 
@@ -54,16 +54,16 @@
     <component
       :is="loading ? 'div' : 'NuxtLink'"
       :to="loading ? undefined : `/servers/manage/${serverId}/files`"
-      class="relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+      class="bg-bg-raised relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl p-8"
       :class="loading ? '' : 'transition-transform duration-100 hover:scale-105 active:scale-100'"
     >
       <div class="flex flex-row items-center gap-2">
-        <h2 class="m-0 -ml-0.5 mt-1 text-3xl font-extrabold text-contrast">
+        <h2 class="text-contrast m-0 mt-1 -ml-0.5 text-3xl font-extrabold">
           {{ loading ? "0 B" : formatBytes(stats.storage_usage_bytes) }}
         </h2>
       </div>
-      <h3 class="text-base font-normal text-secondary">Storage usage</h3>
-      <FolderOpenIcon class="absolute right-10 top-10 size-8" />
+      <h3 class="text-secondary text-base font-normal">Storage usage</h3>
+      <FolderOpenIcon class="absolute top-10 right-10 size-8" />
     </component>
   </div>
 </template>

@@ -13,13 +13,13 @@
     >
       <div>
         <div
-          class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
+          class="animation-ring-3 border-brand bg-highlight-brand flex items-center justify-center rounded-full border-4 opacity-40"
         ></div>
         <div
-          class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
+          class="animation-ring-2 border-brand bg-highlight-brand flex items-center justify-center rounded-full border-4 opacity-60"
         ></div>
         <div
-          class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight text-9xl font-extrabold text-contrast"
+          class="animation-ring-1 border-brand bg-highlight-brand text-contrast flex items-center justify-center rounded-full border-4 text-9xl font-extrabold"
         >
           ?
         </div>
@@ -112,11 +112,11 @@
       </template>
     </PagewideBanner>
     <header
-      class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
+      class="experimental-styles-within desktop-only relative z-5 mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
     >
       <div>
         <NuxtLink to="/" aria-label="Modrinth home page">
-          <BrandTextLogo aria-hidden="true" class="h-7 w-auto text-contrast" />
+          <BrandTextLogo aria-hidden="true" class="text-contrast h-7 w-auto" />
         </NuxtLink>
       </div>
       <div
@@ -246,7 +246,7 @@
               <CompassIcon v-else aria-hidden="true" />
               <span class="hidden md:contents">Discover content</span>
               <span class="contents md:hidden">Discover</span>
-              <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+              <DropdownIcon aria-hidden="true" class="text-secondary h-5 w-5" />
 
               <template #mods> <BoxIcon aria-hidden="true" /> Mods </template>
               <template #resourcepacks>
@@ -321,7 +321,7 @@
             ]"
           >
             <ModrinthIcon aria-hidden="true" />
-            <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+            <DropdownIcon aria-hidden="true" class="text-secondary h-5 w-5" />
             <template #review-projects> <ScaleIcon aria-hidden="true" /> Review projects </template>
             <template #review-reports> <ReportIcon aria-hidden="true" /> Reports </template>
             <template #user-lookup> <UserIcon aria-hidden="true" /> Lookup by email </template>
@@ -355,7 +355,7 @@
             ]"
           >
             <PlusIcon aria-hidden="true" />
-            <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+            <DropdownIcon aria-hidden="true" class="text-secondary h-5 w-5" />
             <template #new-project> <BoxIcon aria-hidden="true" /> New project </template>
             <!-- <template #import-project> <BoxImportIcon /> Import project </template>-->
             <template #new-collection>
@@ -373,7 +373,7 @@
           :options="userMenuOptions"
         >
           <Avatar :src="auth.user.avatar_url" aria-hidden="true" circle />
-          <DropdownIcon class="h-5 w-5 text-secondary" />
+          <DropdownIcon class="text-secondary h-5 w-5" />
           <template #profile> <UserIcon aria-hidden="true" /> Profile </template>
           <template #notifications> <BellIcon aria-hidden="true" /> Notifications </template>
           <template #saved> <BookmarkIcon aria-hidden="true" /> Saved projects </template>
@@ -577,12 +577,10 @@
       <OrganizationCreateModal ref="modal_organization_creation" />
       <slot id="main" />
     </main>
-    <footer
-      class="footer-brand-background experimental-styles-within border-0 border-t-[1px] border-solid"
-    >
-      <div class="mx-auto flex max-w-screen-xl flex-col gap-6 p-6 pb-20 sm:px-12 md:py-12">
+    <footer class="footer-brand-background experimental-styles-within border-t border-solid">
+      <div class="mx-auto flex max-w-(--breakpoint-xl) flex-col gap-6 p-6 pb-20 sm:px-12 md:py-12">
         <div
-          class="grid grid-cols-1 gap-4 text-primary md:grid-cols-[1fr_2fr] lg:grid-cols-[auto_auto_auto_auto_auto]"
+          class="text-primary grid grid-cols-1 gap-4 md:grid-cols-[1fr_2fr] lg:grid-cols-[auto_auto_auto_auto_auto]"
         >
           <div
             class="flex flex-col items-center gap-3 md:items-start"
@@ -591,7 +589,7 @@
           >
             <BrandTextLogo
               aria-hidden="true"
-              class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
+              class="text-logo button-base text-contrast h-6 w-auto lg:h-8"
               @click="developerModeIncrement()"
             />
             <div class="flex flex-wrap justify-center gap-px sm:-mx-2">
@@ -635,7 +633,7 @@
               :key="group.label"
               class="flex flex-col items-center gap-3 sm:items-start"
             >
-              <h3 class="m-0 text-base text-contrast">{{ group.label }}</h3>
+              <h3 class="text-contrast m-0 text-base">{{ group.label }}</h3>
               <template v-for="item in group.links" :key="item.label">
                 <nuxt-link
                   v-if="item.href.startsWith('/')"
@@ -657,7 +655,7 @@
             </div>
           </div>
         </div>
-        <div class="flex justify-center text-center text-xs font-medium text-secondary opacity-50">
+        <div class="text-secondary flex justify-center text-center text-xs font-medium opacity-50">
           {{ formatMessage(footerMessages.legalDisclaimer) }}
         </div>
       </div>
@@ -1354,6 +1352,7 @@ const footerLinks = [
 <style lang="scss">
 @import "~/assets/styles/global.scss";
 // @import '@modrinth/assets';
+//@import "~/assets/styles/tailwind.css";
 
 .layout {
   min-height: 100vh;

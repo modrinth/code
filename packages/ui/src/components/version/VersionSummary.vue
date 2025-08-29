@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-[min-content_auto_min-content_min-content] items-center gap-2 rounded-2xl border-[1px] border-divider bg-bg p-2"
+    class="grid grid-cols-[min-content_auto_min-content_min-content] items-center gap-2 rounded-2xl border border-divider bg-bg p-2"
   >
     <VersionChannelIndicator :channel="version.version_type" />
     <div class="flex min-w-0 flex-col gap-1">

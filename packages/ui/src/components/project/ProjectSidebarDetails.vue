@@ -14,7 +14,7 @@
             rel="noopener nofollow ugc"
           >
             {{ licenseIdDisplay }}
-            <ExternalIcon aria-hidden="true" class="external-icon ml-1 mt-[-1px] inline" />
+            <ExternalIcon aria-hidden="true" class="external-icon ml-1 -mt-px inline" />
           </a>
           <span
             v-else-if="

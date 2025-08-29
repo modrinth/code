@@ -2,7 +2,7 @@
   <NewModal ref="modal" header="Renaming backup" @show="focusInput">
     <div class="flex flex-col gap-2 md:w-[600px]">
       <label for="backup-name-input">
-        <span class="text-lg font-semibold text-contrast"> Name </span>
+        <span class="text-contrast text-lg font-semibold"> Name </span>
       </label>
       <input
         id="backup-name-input"
@@ -14,8 +14,8 @@
         maxlength="48"
       />
       <div v-if="nameExists" class="flex items-center gap-1">
-        <IssuesIcon class="hidden text-orange sm:block" />
-        <span class="text-sm text-orange">
+        <IssuesIcon class="text-orange hidden sm:block" />
+        <span class="text-orange text-sm">
           You already have a backup named '<span class="font-semibold">{{ trimmedName }}</span
           >'
         </span>

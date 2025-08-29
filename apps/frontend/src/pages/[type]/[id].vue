@@ -149,13 +149,13 @@
     <NewModal ref="settingsModal">
       <template #title>
         <Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
-        <span class="text-lg font-extrabold text-contrast"> Settings </span>
+        <span class="text-contrast text-lg font-extrabold"> Settings </span>
       </template>
     </NewModal>
     <NewModal ref="modalLicense" :header="project.license.name ? project.license.name : 'License'">
       <template #title>
         <Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" no-shadow />
-        <span class="text-lg font-extrabold text-contrast">
+        <span class="text-contrast text-lg font-extrabold">
           {{ project.license.name ? project.license.name : "License" }}
         </span>
       </template>
@@ -172,15 +172,15 @@
     >
       <div>
         <div
-          class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
+          class="animation-ring-3 border-brand bg-highlight-brand flex items-center justify-center rounded-full border-4 opacity-40"
         ></div>
         <div
-          class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
+          class="animation-ring-2 border-brand bg-highlight-brand flex items-center justify-center rounded-full border-4 opacity-60"
         ></div>
         <div
-          class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight"
+          class="animation-ring-1 border-brand bg-highlight-brand flex items-center justify-center rounded-full border-4 border-solid"
         >
-          <DownloadIcon class="h-20 w-20 text-contrast" />
+          <DownloadIcon class="text-contrast h-20 w-20" />
         </div>
       </div>
     </div>
@@ -199,12 +199,12 @@
     >
       <template #title>
         <Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
-        <div class="truncate text-lg font-extrabold text-contrast">
+        <div class="text-contrast truncate text-lg font-extrabold">
           Download {{ project.title }}
         </div>
       </template>
       <template #default>
-        <div class="mx-auto flex max-w-[40rem] flex-col gap-4 md:w-[30rem]">
+        <div class="mx-auto flex max-w-160 flex-col gap-4 md:w-120">
           <div
             v-if="
               project.project_type !== 'plugin' ||
@@ -225,19 +225,16 @@
                 </a>
               </ButtonStyled>
               <Accordion ref="getModrinthAppAccordion">
-                <nuxt-link
-                  class="mt-2 flex justify-center text-brand-blue hover:underline"
-                  to="/app"
-                >
+                <nuxt-link class="text-blue mt-2 flex justify-center hover:underline" to="/app">
                   Don't have Modrinth App?
                 </nuxt-link>
               </Accordion>
             </div>
 
             <div class="flex items-center gap-4 px-4">
-              <div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
-              <span class="flex-shrink-0 text-sm font-semibold text-secondary"> or </span>
-              <div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
+              <div class="bg-button-bg flex h-[2px] w-full rounded-2xl"></div>
+              <span class="text-secondary shrink-0 text-sm font-semibold"> or </span>
+              <div class="bg-button-bg flex h-[2px] w-full rounded-2xl"></div>
             </div>
           </div>
           <div class="mx-auto flex w-fit flex-col gap-2">
@@ -285,7 +282,7 @@
                   placeholder="Search game versions..."
                 />
               </div>
-              <ScrollablePanel :class="project.game_versions.length > 4 ? 'h-[15rem]' : ''">
+              <ScrollablePanel :class="project.game_versions.length > 4 ? 'h-60' : ''">
                 <ButtonStyled
                   v-for="gameVersion in project.game_versions
                     .filter(
@@ -306,7 +303,7 @@
                         : null
                     "
                     :class="{
-                      'looks-disabled !text-brand-red': !possibleGameVersions.includes(gameVersion),
+                      'looks-disabled text-red!': !possibleGameVersions.includes(gameVersion),
                     }"
                     @click="
                       () => {
@@ -377,7 +374,7 @@
                     : "Select platform"
                 }}
               </template>
-              <ScrollablePanel :class="project.loaders.length > 4 ? 'h-[15rem]' : ''">
+              <ScrollablePanel :class="project.loaders.length > 4 ? 'h-60' : ''">
                 <ButtonStyled
                   v-for="platform in project.loaders.slice().reverse()"
                   :key="platform"
@@ -390,7 +387,7 @@
                         : null
                     "
                     :class="{
-                      'looks-disabled !text-brand-red': !possiblePlatforms.includes(platform),
+                      'looks-disabled text-red!': !possiblePlatforms.includes(platform),
                     }"
                     @click="
                       () => {
@@ -735,7 +732,7 @@
                   rel="noopener nofollow ugc"
                 >
                   {{ licenseIdDisplay }}
-                  <ExternalIcon aria-hidden="true" class="external-icon ml-1 mt-[-1px] inline" />
+                  <ExternalIcon aria-hidden="true" class="external-icon -mt-px ml-1 inline" />
                 </a>
                 <span
                   v-else-if="
@@ -1603,7 +1600,7 @@ const navLinks = computed(() => {
   max-height: 40rem;
   overflow-y: auto;
   background-color: var(--color-bg);
-  border-radius: var(--radius-md);
+  border-radius: 0.75rem;
   margin: var(--gap-sm) var(--gap-md);
   padding: var(--gap-sm);
 }
@@ -1613,7 +1610,7 @@ const navLinks = computed(() => {
 }
 
 :deep(.accordion-with-bg) {
-  @apply rounded-2xl bg-bg p-2;
+  @apply bg-bg rounded-2xl p-2;
   --scrollable-pane-bg: var(--color-bg);
 }
 

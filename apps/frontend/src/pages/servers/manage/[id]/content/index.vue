@@ -14,22 +14,22 @@
     v-if="server.moduleErrors.content"
     class="flex w-full flex-col items-center justify-center gap-4 p-4"
   >
-    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+    <div class="bg-bg-raised flex max-w-lg flex-col items-center rounded-3xl p-6 shadow-xl">
       <div class="flex flex-col items-center text-center">
         <div class="flex flex-col items-center gap-4">
-          <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-            <IssuesIcon class="size-12 text-orange" />
+          <div class="bg-bg-orange grid place-content-center rounded-full p-4">
+            <IssuesIcon class="text-orange size-12" />
           </div>
           <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Failed to load content</h1>
         </div>
-        <p class="text-lg text-secondary">
+        <p class="text-secondary text-lg">
           We couldn't load your server's {{ type.toLowerCase() }}s. Here's what we know:
-          <span class="break-all font-mono">{{
+          <span class="font-mono break-all">{{
             JSON.stringify(server.moduleErrors.content.error)
           }}</span>
         </p>
         <ButtonStyled size="large" color="brand" @click="() => server.refresh(['content'])">
-          <button class="mt-6 !w-full">Retry</button>
+          <button class="mt-6 w-full!">Retry</button>
         </ButtonStyled>
       </div>
     </div>
@@ -38,19 +38,19 @@
   <div v-else-if="server.general && localMods" class="relative isolate flex h-full w-full flex-col">
     <div ref="pyroContentSentinel" class="sentinel" data-pyro-content-sentinel />
     <div class="relative flex h-full w-full flex-col">
-      <div class="sticky top-0 z-20 -mt-3 flex items-center justify-between bg-bg py-3">
+      <div class="bg-bg sticky top-0 z-20 -mt-3 flex items-center justify-between py-3">
         <div class="flex w-full flex-col-reverse items-center gap-2 sm:flex-row">
           <div class="flex w-full items-center gap-2">
             <div class="relative flex-1 text-sm">
               <label class="sr-only" for="search">Search</label>
               <SearchIcon
-                class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2"
+                class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
                 aria-hidden="true"
               />
               <input
                 id="search"
                 v-model="searchInput"
-                class="!h-9 !min-h-0 w-full border-[1px] border-solid border-button-border pl-9"
+                class="border-button-border h-9! min-h-0! w-full border pl-9"
                 type="search"
                 name="search"
                 autocomplete="off"
@@ -73,7 +73,7 @@
                   {{ filterMethodLabel }}
                 </span>
                 <FilterIcon aria-hidden="true" />
-                <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+                <DropdownIcon aria-hidden="true" class="text-secondary h-5 w-5" />
                 <template #all> All {{ type.toLocaleLowerCase() }}s </template>
                 <template #enabled> Only enabled </template>
                 <template #disabled> Only disabled </template>
@@ -102,7 +102,7 @@
       <FilesUploadDropdown
         v-if="props.server.fs"
         ref="uploadDropdownRef"
-        class="rounded-xl bg-bg-raised"
+        class="bg-bg-raised rounded-xl"
         :margin-bottom="16"
         :file-type="type"
         :current-path="`/${type.toLocaleLowerCase()}s`"
@@ -123,8 +123,8 @@
               <div :style="{ position: 'absolute', top: `${visibleTop}px`, width: '100%' }">
                 <template v-for="mod in visibleItems.items" :key="mod.filename">
                   <div
-                    class="relative mb-2 flex w-full items-center justify-between rounded-xl bg-bg-raised"
-                    :class="mod.disabled ? 'bg-table-alternateRow text-secondary' : ''"
+                    class="bg-bg-raised relative mb-2 flex w-full items-center justify-between rounded-xl"
+                    :class="mod.disabled ? 'bg-table-alternate-row text-secondary' : ''"
                     style="height: 64px"
                   >
                     <NuxtLink
@@ -144,14 +144,14 @@
                       />
                       <div class="flex min-w-0 flex-col gap-1">
                         <span class="text-md flex min-w-0 items-center gap-2 font-bold">
-                          <span class="truncate text-contrast">{{ friendlyModName(mod) }}</span>
+                          <span class="text-contrast truncate">{{ friendlyModName(mod) }}</span>
                           <span
                             v-if="mod.disabled"
-                            class="hidden rounded-full bg-button-bg p-1 px-2 text-xs text-contrast sm:block"
+                            class="bg-button-bg text-contrast hidden rounded-full p-1 px-2 text-xs sm:block"
                             >Disabled</span
                           >
                         </span>
-                        <div class="min-w-0 text-xs text-secondary">
+                        <div class="text-secondary min-w-0 text-xs">
                           <span v-if="mod.owner" class="hidden sm:block"> by {{ mod.owner }} </span>
                           <span class="block font-semibold sm:hidden">
                             {{ mod.version_number || `External ${type.toLocaleLowerCase()}` }}
@@ -160,7 +160,7 @@
                       </div>
                     </NuxtLink>
                     <div class="ml-2 hidden min-w-0 flex-1 flex-col text-sm sm:flex">
-                      <div class="truncate font-semibold text-contrast">
+                      <div class="text-contrast truncate font-semibold">
                         <span v-tooltip="`${type} version`">{{
                           mod.version_number || `External ${type.toLocaleLowerCase()}`
                         }}</span>
@@ -172,13 +172,13 @@
                       </div>
                     </div>
                     <div
-                      class="flex items-center justify-end gap-2 pr-4 font-semibold text-contrast sm:min-w-44"
+                      class="text-contrast flex items-center justify-end gap-2 pr-4 font-semibold sm:min-w-44"
                     >
                       <ButtonStyled color="red" type="transparent">
                         <button
                           v-tooltip="`Delete ${type.toLocaleLowerCase()}`"
                           :disabled="mod.changing"
-                          class="!hidden sm:!block"
+                          class="hidden! sm:block!"
                           @click="removeMod(mod)"
                         >
                           <TrashIcon />
@@ -192,7 +192,7 @@
                               : `External ${type.toLocaleLowerCase()}s cannot be edited`
                           "
                           :disabled="mod.changing || !mod.project_id"
-                          class="!hidden sm:!block"
+                          class="hidden! sm:block!"
                           @click="showVersionModal(mod)"
                         >
                           <template v-if="mod.changing">
@@ -266,7 +266,7 @@
             class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center"
           >
             <SearchIcon class="size-24" />
-            <p class="m-0 font-bold text-contrast">
+            <p class="text-contrast m-0 font-bold">
               No {{ type.toLocaleLowerCase() }}s found for your query!
             </p>
             <p class="m-0">Try another query, or show everything.</p>
@@ -282,7 +282,7 @@
             class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center"
           >
             <PackageClosedIcon class="size-24" />
-            <p class="m-0 font-bold text-contrast">No {{ type.toLocaleLowerCase() }}s found!</p>
+            <p class="text-contrast m-0 font-bold">No {{ type.toLocaleLowerCase() }}s found!</p>
             <p class="m-0">
               Add some {{ type.toLocaleLowerCase() }}s to your server to manage them here.
             </p>
@@ -307,7 +307,7 @@
         </div>
         <div v-else class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center">
           <UiServersIconsLoaderIcon loader="Vanilla" class="size-24" />
-          <p class="m-0 pt-3 font-bold text-contrast">Your server is running Vanilla Minecraft</p>
+          <p class="text-contrast m-0 pt-3 font-bold">Your server is running Vanilla Minecraft</p>
           <p class="m-0">
             Add content to your server by installing a modpack or choosing a different platform that
             supports {{ type }}s.

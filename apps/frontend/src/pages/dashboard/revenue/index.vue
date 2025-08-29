@@ -14,7 +14,7 @@
             Total pending
             <nuxt-link
               v-tooltip="`Click to read about how Modrinth handles your revenue.`"
-              class="align-middle text-link"
+              class="text-link align-middle"
               to="/legal/cmp-info#pending"
             >
               <UnknownIcon />
@@ -29,7 +29,7 @@
             Available soon
             <nuxt-link
               v-tooltip="`Click to read about how Modrinth handles your revenue.`"
-              class="align-middle text-link"
+              class="text-link align-middle"
               to="/legal/cmp-info#pending"
             >
               <UnknownIcon />
@@ -39,7 +39,7 @@
             <li
               v-for="date in availableSoonDateKeys"
               :key="date"
-              class="flex items-center justify-between border-0 border-solid border-b-divider p-0 [&:not(:last-child)]:mb-1 [&:not(:last-child)]:border-b-[1px] [&:not(:last-child)]:pb-1"
+              class="border-b-divider flex items-center justify-between p-0 not-last:mb-1 not-last:border-b not-last:pb-1"
             >
               <span
                 v-tooltip="
@@ -60,7 +60,7 @@
                   <InProgressIcon />
                 </template>
               </span>
-              <span class="text-sm text-secondary">
+              <span class="text-secondary text-sm">
                 {{ formatDate(dayjs(date)) }}
               </span>
             </li>
@@ -85,7 +85,7 @@
           View transfer history
         </NuxtLink>
       </div>
-      <p class="text-sm text-secondary">
+      <p class="text-secondary text-sm">
         By uploading projects to Modrinth and withdrawing money from your account, you agree to the
         <nuxt-link class="text-link" to="/legal/cmp">Rewards Program Terms</nuxt-link>. For more
         information on how the rewards system works, see our information page

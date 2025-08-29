@@ -90,7 +90,7 @@ function toggle() {
 
   color: var(--color-contrast);
   background-color: var(--color-button-bg);
-  border-radius: var(--radius-xs);
+  border-radius: 0.25rem;
   box-shadow:
     var(--shadow-inset-sm),
     0 0 0 0 transparent;

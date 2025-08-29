@@ -2,7 +2,7 @@
   <div class="h-full w-full">
     <div class="h-full w-full gap-2 overflow-y-auto">
       <div class="card flex flex-col gap-4">
-        <h1 class="m-0 text-lg font-bold text-contrast">Server preferences</h1>
+        <h1 class="text-contrast m-0 text-lg font-bold">Server preferences</h1>
         <p class="m-0">Preferences apply per server and changes are only saved in your browser.</p>
         <div
           v-for="(prefConfig, key) in preferences"
@@ -11,10 +11,10 @@
         >
           <label :for="`pref-${key}`" class="flex flex-col gap-2">
             <div class="flex flex-row gap-2">
-              <span class="text-lg font-bold text-contrast">{{ prefConfig.displayName }}</span>
+              <span class="text-contrast text-lg font-bold">{{ prefConfig.displayName }}</span>
               <div
                 v-if="prefConfig.implemented === false"
-                class="hidden items-center gap-1 rounded-full bg-table-alternateRow p-1 px-1.5 text-xs font-semibold sm:flex"
+                class="bg-table-alternate-row hidden items-center gap-1 rounded-full p-1 px-1.5 text-xs font-semibold sm:flex"
               >
                 Coming Soon
               </div>

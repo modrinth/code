@@ -15,7 +15,7 @@
       <div v-if="!isMrpackModalSecondPhase" class="flex flex-col gap-4">
         <div class="mx-auto flex flex-row items-center gap-4">
           <div
-            class="grid size-16 place-content-center rounded-2xl border-[2px] border-solid border-button-border bg-button-bg shadow-sm"
+            class="border-button-border bg-button-bg grid size-16 place-content-center rounded-2xl border-2 shadow-xs"
           >
             <UploadIcon class="size-10" />
           </div>
@@ -35,13 +35,13 @@
             <path d="M9 9h3V5l7 7-7 7v-4H9V9z" />
           </svg>
           <div
-            class="grid size-16 place-content-center rounded-2xl border-[2px] border-solid border-button-border bg-table-alternateRow shadow-sm"
+            class="border-button-border bg-table-alternate-row grid size-16 place-content-center rounded-2xl border-2 shadow-xs"
           >
             <ServerIcon class="size-10" />
           </div>
         </div>
-        <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
-          <div class="text-sm font-bold text-contrast">Upload mrpack</div>
+        <div class="bg-table-alternate-row flex w-full flex-col gap-2 rounded-2xl p-4">
+          <div class="text-contrast text-sm font-bold">Upload mrpack</div>
           <input
             type="file"
             accept=".mrpack"
@@ -51,9 +51,9 @@
           />
         </div>
 
-        <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
+        <div class="bg-table-alternate-row flex w-full flex-col gap-2 rounded-2xl p-4">
           <div class="flex w-full flex-row items-center justify-between">
-            <label class="w-full text-lg font-bold text-contrast" for="hard-reset">
+            <label class="text-contrast w-full text-lg font-bold" for="hard-reset">
               Erase all data
             </label>
             <input

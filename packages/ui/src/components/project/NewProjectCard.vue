@@ -18,7 +18,7 @@
         <div
           v-for="tag in categories"
           :key="tag"
-          class="text-sm font-semibold text-secondary flex gap-1 px-[0.375rem] py-0.5 bg-button-bg rounded-full"
+          class="text-sm font-semibold text-secondary flex gap-1 px-1.5 py-0.5 bg-button-bg rounded-full"
         >
           {{ formatCategory(tag) }}
         </div>
