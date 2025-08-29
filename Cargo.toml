@@ -48,6 +48,7 @@ daedalus = { path = "packages/daedalus" }
 dashmap = "6.1.0"
 data-url = "0.3.1"
 deadpool-redis = "0.22.0"
+derive_more = "2.0.1"
 dirs = "6.0.0"
 discord-rich-presence = "0.2.5"
 dotenv-build = "0.1.1"
