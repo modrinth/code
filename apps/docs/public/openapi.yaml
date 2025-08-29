@@ -1933,8 +1933,10 @@ paths:
             - `license`
             - `downloads`
             - `color`
-            - `created_timestamp`
-            - `modified_timestamp`
+            - `created_timestamp` (uses Unix timestamp)
+            - `modified_timestamp` (uses Unix timestamp)
+            - `date_created` (uses ISO-8601 timestamp)
+            - `date_modified` (uses ISO-8601 timestamp)
 
             In order to then use these facets, you need a value to filter by, as well as an operation to perform on this value.
             The most common operation is `:` (same as `=`), though you can also use `!=`, `>=`, `>`, `<=`, and `<`.
