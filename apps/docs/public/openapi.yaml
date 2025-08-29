@@ -1053,6 +1053,19 @@ components:
           items:
             $ref: '#/components/schemas/Version'
           description: Versions that the project depends upon
+    ProjectDependentsList:
+      type: object
+      properties:
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/Project'
+          description: Projects that that depend on the project
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Version'
+          description: Versions that depend on the project
     PatchProjectsBody:
       type: object
       properties:
@@ -2394,6 +2407,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectDependencyList'
+        '404':
+          description: The requested item(s) were not found or no authorization to access the requested item(s)
+  /project/{id|slug}/dependents:
+    parameters:
+      - $ref: '#/components/parameters/ProjectIdentifier'
+    get:
+      summary: Get all dependents for a project
+      operationId: getDependents
+      tags:
+        - projects
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectDependentsList'
         '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /project/{id|slug}/follow:
