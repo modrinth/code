@@ -12,10 +12,10 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::{auth::get_user_from_headers, database};
 use actix_web::{HttpRequest, HttpResponse, get, route, web};
+use ariadne::i18n::localized_labrinth_error;
 use sqlx::PgPool;
 use std::collections::HashSet;
 use yaserde::YaSerialize;
-use ariadne::i18n::localized_labrinth_error;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(maven_metadata);

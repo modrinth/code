@@ -12,10 +12,10 @@ use crate::routes::internal::statuses::{
 use crate::sync::friends::RedisFriendsMessage;
 use crate::sync::status::get_user_status;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
+use ariadne::i18n::localized_labrinth_error;
 use ariadne::networking::message::ServerToClientMessage;
 use chrono::Utc;
 use sqlx::PgPool;
-use ariadne::i18n::localized_labrinth_error;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(add_friend);

@@ -6,8 +6,8 @@ use actix_cors::Cors;
 use actix_files::Files;
 use actix_web::http::StatusCode;
 use actix_web::{HttpResponse, ResponseError, web};
-use futures::FutureExt;
 use ariadne::i18n::I18nEnum;
+use futures::FutureExt;
 
 pub mod internal;
 pub mod v2;
@@ -119,7 +119,8 @@ pub enum ApiError {
     Clickhouse(#[from] clickhouse::error::Error),
 
     #[translation_id("xml_error")]
-    #[translate_fields(cause = 0)] // TODO: Use an I18nEnum instead of a String
+    #[translate_fields(cause = 0)]
+    // TODO: Use an I18nEnum instead of a String
     // #[error("Internal server error: {0}")]
     Xml(String),
 
@@ -134,12 +135,14 @@ pub enum ApiError {
     Authentication(#[from] crate::auth::AuthenticationError),
 
     #[translation_id("unauthorized")]
-    #[translate_fields(cause = 0)] // TODO: Use an I18nEnum instead of a String
+    #[translate_fields(cause = 0)]
+    // TODO: Use an I18nEnum instead of a String
     // #[error("Authentication Error: {0}")]
     CustomAuthentication(String),
 
     #[translation_id("invalid_input")]
-    #[translate_fields(cause = 0)] // TODO: Use an I18nEnum instead of a String
+    #[translate_fields(cause = 0)]
+    // TODO: Use an I18nEnum instead of a String
     // #[error("Invalid Input: {0}")]
     InvalidInput(String),
 
@@ -160,12 +163,14 @@ pub enum ApiError {
     Indexing(#[from] crate::search::indexing::IndexingError),
 
     #[translation_id("payments_error")]
-    #[translate_fields(cause = 0)] // TODO: Use an I18nEnum instead of a String
+    #[translate_fields(cause = 0)]
+    // TODO: Use an I18nEnum instead of a String
     // #[error("Payments Error: {0}")]
     Payments(String),
 
     #[translation_id("discord_error")]
-    #[translate_fields(cause = 0)] // TODO: Use an I18nEnum instead of a String
+    #[translate_fields(cause = 0)]
+    // TODO: Use an I18nEnum instead of a String
     // #[error("Discord Error: {0}")]
     Discord(String),
 
@@ -214,7 +219,8 @@ pub enum ApiError {
     NotFound,
 
     #[translation_id("conflict")]
-    #[translate_fields(cause = 0)] // TODO: Use an I18nEnum instead of a String
+    #[translate_fields(cause = 0)]
+    // TODO: Use an I18nEnum instead of a String
     // #[error("Conflict: {0}")]
     Conflict(String),
 
@@ -239,7 +245,9 @@ pub enum ApiError {
 macro_rules! labrinth_error_type {
     ($error_enum:ty) => {
         impl $error_enum {
-            pub fn as_api_error<'a>(&self) -> crate::models::error::ApiError<'a> {
+            pub fn as_api_error<'a>(
+                &self,
+            ) -> crate::models::error::ApiError<'a> {
                 self.as_localized_api_error("en")
             }
 
@@ -253,9 +261,13 @@ macro_rules! labrinth_error_type {
                 }
             }
 
-            pub fn localized_error_response(&self, req: &actix_web::HttpRequest) -> actix_web::HttpResponse {
+            pub fn localized_error_response(
+                &self,
+                req: &actix_web::HttpRequest,
+            ) -> actix_web::HttpResponse {
                 use actix_web::http::header::{
-                    AcceptLanguage, ContentLanguage, Header, LanguageTag, QualityItem,
+                    AcceptLanguage, ContentLanguage, Header, LanguageTag,
+                    QualityItem,
                 };
                 let language = AcceptLanguage::parse(req)
                     .ok()
@@ -264,7 +276,9 @@ macro_rules! labrinth_error_type {
                 let body = self.as_localized_api_error(language.as_str());
 
                 actix_web::HttpResponse::build(self.status_code())
-                    .append_header(ContentLanguage(vec![QualityItem::max(language)]))
+                    .append_header(ContentLanguage(vec![QualityItem::max(
+                        language,
+                    )]))
                     .json(body)
             }
         }

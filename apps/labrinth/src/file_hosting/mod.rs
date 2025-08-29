@@ -4,8 +4,8 @@ use thiserror::Error;
 mod mock;
 mod s3_host;
 
-use bytes::Bytes;
 use ariadne::i18n::I18nEnum;
+use bytes::Bytes;
 pub use mock::MockHost;
 pub use s3_host::{S3BucketConfig, S3Host};
 
@@ -13,7 +13,8 @@ pub use s3_host::{S3BucketConfig, S3Host};
 #[i18n_root_key("error.file_hosting_error")]
 pub enum FileHostingError {
     #[translation_id("s3")]
-    #[translate_fields(action = 0, cause = 1)] // TODO: Use an I18nEnum instead of a String
+    #[translate_fields(action = 0, cause = 1)]
+    // TODO: Use an I18nEnum instead of a String
     // #[error("S3 error when {0}: {1}")]
     S3Error(&'static str, s3::error::S3Error),
 

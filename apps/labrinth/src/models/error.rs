@@ -1,5 +1,5 @@
-use std::borrow::Cow;
 use serde::{Deserialize, Serialize};
+use std::borrow::Cow;
 
 /// An error returned by the API
 #[derive(Serialize, Deserialize)]

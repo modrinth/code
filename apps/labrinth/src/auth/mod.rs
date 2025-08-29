@@ -14,11 +14,11 @@ use serde::{Deserialize, Serialize};
 pub use validate::{check_is_moderator_from_headers, get_user_from_headers};
 
 use crate::file_hosting::FileHostingError;
-use actix_web::{HttpResponse, ResponseError};
-use actix_web::http::StatusCode;
-use thiserror::Error;
-use ariadne::i18n::I18nEnum;
 use crate::labrinth_error_type;
+use actix_web::http::StatusCode;
+use actix_web::{HttpResponse, ResponseError};
+use ariadne::i18n::I18nEnum;
+use thiserror::Error;
 
 // TODO add fields
 #[derive(Error, I18nEnum, Debug)]
