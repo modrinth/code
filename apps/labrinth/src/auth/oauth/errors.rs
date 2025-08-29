@@ -104,12 +104,13 @@ impl actix_web::ResponseError for OAuthError {
         } else {
             HttpResponse::build(self.status_code()).json(ApiError {
                 error: &self.error_type.error_name(),
-                description: self.error_type.to_string(),
+                description: self.error_type.to_string().into(),
             })
         }
     }
 }
 
+// TODO: Reference in an ApiError variant
 #[derive(thiserror::Error, Debug)]
 pub enum OAuthErrorType {
     #[error(transparent)]

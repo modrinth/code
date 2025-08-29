@@ -14,46 +14,78 @@ use serde::{Deserialize, Serialize};
 pub use validate::{check_is_moderator_from_headers, get_user_from_headers};
 
 use crate::file_hosting::FileHostingError;
-use crate::models::error::ApiError;
-use actix_web::HttpResponse;
+use actix_web::{HttpResponse, ResponseError};
 use actix_web::http::StatusCode;
 use thiserror::Error;
+use ariadne::i18n::I18nEnum;
+use crate::labrinth_error_type;
 
-#[derive(Error, Debug)]
+// TODO add fields
+#[derive(Error, I18nEnum, Debug)]
+#[i18n_root_key("error.unauthorized")]
 pub enum AuthenticationError {
-    #[error("Environment Error")]
+    #[translation_id("environment_error")]
+    // #[error("Environment Error")]
     Env(#[from] dotenvy::Error),
-    #[error("An unknown database error occurred: {0}")]
+
+    #[translation_id("database_error")]
+    // #[error("An unknown database error occurred: {0}")]
     Sqlx(#[from] sqlx::Error),
-    #[error("Database Error: {0}")]
+
+    #[translation_id("database_error")]
+    // #[error("Database Error: {0}")]
     Database(#[from] crate::database::models::DatabaseError),
-    #[error("Error while parsing JSON: {0}")]
+
+    #[translation_id("invalid_input")]
+    // #[error("Error while parsing JSON: {0}")]
     SerDe(#[from] serde_json::Error),
-    #[error("Error while communicating to external provider")]
+
+    #[translation_id("network_error")]
+    // #[error("Error while communicating to external provider")]
     Reqwest(#[from] reqwest::Error),
-    #[error("Error uploading user profile picture")]
+
+    #[translation_id("file_hosting")]
+    // #[error("Error uploading user profile picture")]
     FileHosting(#[from] FileHostingError),
-    #[error("Error while decoding PAT: {0}")]
+
+    #[translation_id("decoding_error")]
+    // #[error("Error while decoding PAT: {0}")]
     Decoding(#[from] ariadne::ids::DecodingError),
-    #[error("{0}")]
+
+    #[translation_id("mail_error")]
+    // #[error("{0}")]
     Mail(#[from] email::MailError),
-    #[error("Invalid Authentication Credentials")]
+
+    #[translation_id("invalid_credentials")]
+    // #[error("Invalid Authentication Credentials")]
     InvalidCredentials,
-    #[error("Authentication method was not valid")]
+
+    #[translation_id("invalid_auth_method")]
+    // #[error("Authentication method was not valid")]
     InvalidAuthMethod,
-    #[error("GitHub Token from incorrect Client ID")]
+
+    #[translation_id("invalid_client_id")]
+    // #[error("GitHub Token from incorrect Client ID")]
     InvalidClientId,
-    #[error(
-        "User email is already registered on Modrinth. Try 'Forgot password' to access your account."
-    )]
+
+    #[translation_id("duplicate_user")]
+    // #[error(
+    //     "User email is already registered on Modrinth. Try 'Forgot password' to access your account."
+    // )]
     DuplicateUser,
-    #[error("Invalid state sent, you probably need to get a new websocket")]
+
+    #[translation_id("socket")]
+    // #[error("Invalid state sent, you probably need to get a new websocket")]
     SocketError,
-    #[error("Invalid callback URL specified")]
+
+    #[translation_id("url_error")]
+    // #[error("Invalid callback URL specified")]
     Url,
 }
 
-impl actix_web::ResponseError for AuthenticationError {
+labrinth_error_type!(AuthenticationError);
+
+impl ResponseError for AuthenticationError {
     fn status_code(&self) -> StatusCode {
         match self {
             AuthenticationError::Env(..) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -80,31 +112,7 @@ impl actix_web::ResponseError for AuthenticationError {
     }
 
     fn error_response(&self) -> HttpResponse {
-        HttpResponse::build(self.status_code()).json(ApiError {
-            error: self.error_name(),
-            description: self.to_string(),
-        })
-    }
-}
-
-impl AuthenticationError {
-    pub fn error_name(&self) -> &'static str {
-        match self {
-            AuthenticationError::Env(..) => "environment_error",
-            AuthenticationError::Sqlx(..) => "database_error",
-            AuthenticationError::Database(..) => "database_error",
-            AuthenticationError::SerDe(..) => "invalid_input",
-            AuthenticationError::Reqwest(..) => "network_error",
-            AuthenticationError::InvalidCredentials => "invalid_credentials",
-            AuthenticationError::Decoding(..) => "decoding_error",
-            AuthenticationError::Mail(..) => "mail_error",
-            AuthenticationError::InvalidAuthMethod => "invalid_auth_method",
-            AuthenticationError::InvalidClientId => "invalid_client_id",
-            AuthenticationError::Url => "url_error",
-            AuthenticationError::FileHosting(..) => "file_hosting",
-            AuthenticationError::DuplicateUser => "duplicate_user",
-            AuthenticationError::SocketError => "socket",
-        }
+        HttpResponse::build(self.status_code()).json(self.as_api_error())
     }
 }
 

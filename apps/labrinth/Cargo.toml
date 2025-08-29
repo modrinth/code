@@ -124,12 +124,13 @@ lettre.workspace = true
 
 rust_iso3166.workspace = true
 
+rust-i18n.workspace = true
+
 async-stripe = { workspace = true, features = ["billing", "checkout", "connect", "webhook-events"] }
 rusty-money.workspace = true
 json-patch.workspace = true
 
-ariadne.workspace = true
-labrinth-macros.workspace = true
+ariadne = { workspace = true, features = ["labrinth"] }
 
 clap = { workspace = true, features = ["derive"] }
 

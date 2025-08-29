@@ -1,11 +1,6 @@
-use crate::models::error::ApiError;
-use actix_web::{HttpResponse, Responder};
+use actix_web::{HttpRequest, HttpResponse};
+use crate::routes::ApiError;
 
-pub async fn not_found() -> impl Responder {
-    let data = ApiError {
-        error: "not_found",
-        description: "the requested route does not exist".to_string(),
-    };
-
-    HttpResponse::NotFound().json(data)
+pub async fn not_found(req: HttpRequest) -> HttpResponse {
+    ApiError::NotFound.localized_error_response(&req)
 }

@@ -1,5 +1,5 @@
 [package]
-name = "labrinth-macros"
+name = "ariadne-macros"
 version = "0.1.0"
 edition.workspace = true
 
@@ -9,6 +9,10 @@ proc-macro = true
 [dependencies]
 syn.workspace = true
 quote.workspace = true
+proc-macro2.workspace = true
+
+[features]
+labrinth = []
 
 [lints]
 workspace = true

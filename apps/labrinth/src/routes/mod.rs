@@ -5,11 +5,10 @@ use crate::util::env::parse_strings_from_var;
 use actix_cors::Cors;
 use actix_files::Files;
 use actix_web::http::StatusCode;
-use actix_web::http::header::{
-    AcceptLanguage, ContentLanguage, Header, LanguageTag, QualityItem,
-};
-use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
+use actix_web::http::header::Header;
+use actix_web::{HttpResponse, ResponseError, web};
 use futures::FutureExt;
+use ariadne::i18n::I18nEnum;
 
 pub mod internal;
 pub mod v2;
@@ -88,139 +87,200 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
     );
 }
 
-#[derive(thiserror::Error, Debug)]
+#[derive(thiserror::Error, I18nEnum, Debug)]
+#[i18n_root_key("error")]
 pub enum ApiError {
-    #[error("Environment Error")]
+    #[translation_id("environment_error")]
+    // #[error("Environment Error")]
     Env(#[from] dotenvy::Error),
-    #[error("Error while uploading file: {0}")]
+
+    #[translation_id("file_hosting_error")]
+    #[translate_fields(cause = translate(0))]
+    // #[error("Error while uploading file: {0}")]
     FileHosting(#[from] FileHostingError),
-    #[error("Database Error: {0}")]
+
+    #[translation_id("database_error")]
+    #[translate_fields(cause = translate(0))]
+    // #[error("Database Error: {0}")]
     Database(#[from] crate::database::models::DatabaseError),
-    #[error("Database Error: {0}")]
+
+    #[translation_id("database_error")]
+    #[translate_fields(cause = 0)]
+    // #[error("Database Error: {0}")]
     SqlxDatabase(#[from] sqlx::Error),
-    #[error("Database Error: {0}")]
+
+    #[translation_id("database_error")]
+    #[translate_fields(cause = 0)]
+    // #[error("Database Error: {0}")]
     RedisDatabase(#[from] redis::RedisError),
-    #[error("Clickhouse Error: {0}")]
+
+    #[translation_id("clickhouse_error")]
+    #[translate_fields(cause = 0)]
+    // #[error("Clickhouse Error: {0}")]
     Clickhouse(#[from] clickhouse::error::Error),
-    #[error("Internal server error: {0}")]
+
+    #[translation_id("xml_error")]
+    #[translate_fields(cause = 0)] // TODO: Use an I18nEnum instead of a String
+    // #[error("Internal server error: {0}")]
     Xml(String),
-    #[error("Deserialization error: {0}")]
+
+    #[translation_id("json_error")]
+    #[translate_fields(cause = 0)]
+    // #[error("Deserialization error: {0}")]
     Json(#[from] serde_json::Error),
-    #[error("Authentication Error: {0}")]
+
+    #[translation_id("unauthorized")]
+    #[translate_fields(cause = translate(0))]
+    // #[error("Authentication Error: {0}")]
     Authentication(#[from] crate::auth::AuthenticationError),
-    #[error("Authentication Error: {0}")]
+
+    #[translation_id("unauthorized")]
+    #[translate_fields(cause = 0)] // TODO: Use an I18nEnum instead of a String
+    // #[error("Authentication Error: {0}")]
     CustomAuthentication(String),
-    #[error("Invalid Input: {0}")]
+
+    #[translation_id("invalid_input")]
+    #[translate_fields(cause = 0)] // TODO: Use an I18nEnum instead of a String
+    // #[error("Invalid Input: {0}")]
     InvalidInput(String),
-    #[error("Error while validating input: {0}")]
+
+    // TODO: Perhaps remove this in favor of InvalidInput?
+    #[translation_id("invalid_input")]
+    #[translate_fields(cause = 0)]
+    // #[error("Error while validating input: {0}")]
     Validation(String),
-    #[error("Search Error: {0}")]
+
+    #[translation_id("search_error")]
+    #[translate_fields(cause = 0)]
+    // #[error("Search Error: {0}")]
     Search(#[from] meilisearch_sdk::errors::Error),
-    #[error("Indexing Error: {0}")]
+
+    #[translation_id("indexing_error")]
+    #[translate_fields(cause = translate(0))]
+    // #[error("Indexing Error: {0}")]
     Indexing(#[from] crate::search::indexing::IndexingError),
-    #[error("Payments Error: {0}")]
+
+    #[translation_id("payments_error")]
+    #[translate_fields(cause = 0)] // TODO: Use an I18nEnum instead of a String
+    // #[error("Payments Error: {0}")]
     Payments(String),
-    #[error("Discord Error: {0}")]
+
+    #[translation_id("discord_error")]
+    #[translate_fields(cause = 0)] // TODO: Use an I18nEnum instead of a String
+    // #[error("Discord Error: {0}")]
     Discord(String),
-    #[error("Captcha Error. Try resubmitting the form.")]
+
+    #[translation_id("turnstile_error")]
+    // #[error("Captcha Error. Try resubmitting the form.")]
     Turnstile,
-    #[error("Error while decoding Base62: {0}")]
+
+    #[translation_id("decoding_error")]
+    #[translate_fields(cause = translate(0))]
+    // #[error("Error while decoding Base62: {0}")]
     Decoding(#[from] ariadne::ids::DecodingError),
-    #[error("Image Parsing Error: {0}")]
+
+    #[translation_id("invalid_image")]
+    #[translate_fields(cause = 0)]
+    // #[error("Image Parsing Error: {0}")]
     ImageParse(#[from] image::ImageError),
-    #[error("Password Hashing Error: {0}")]
+
+    #[translation_id("password_hashing_error")]
+    #[translate_fields(cause = 0)]
+    // #[error("Password Hashing Error: {0}")]
     PasswordHashing(#[from] argon2::password_hash::Error),
-    #[error("{0}")]
+
+    #[translation_id("mail_error")]
+    #[translate_fields(cause = translate(0))]
+    // #[error("{0}")]
     Mail(#[from] crate::auth::email::MailError),
-    #[error("Error while rerouting request: {0}")]
+
+    #[translation_id("reroute_error")]
+    #[translate_fields(cause = 0)]
+    // #[error("Error while rerouting request: {0}")]
     Reroute(#[from] reqwest::Error),
-    #[error("Unable to read Zip Archive: {0}")]
+
+    #[translation_id("zip_error")]
+    #[translate_fields(cause = 0)]
+    // #[error("Unable to read Zip Archive: {0}")]
     Zip(#[from] zip::result::ZipError),
-    #[error("IO Error: {0}")]
+
+    #[translation_id("io_error")]
+    #[translate_fields(cause = 0)]
+    // #[error("IO Error: {0}")]
     Io(#[from] std::io::Error),
-    #[error("Resource not found")]
+
+    // TODO: Add route not found
+    #[translation_id("not_found")]
+    // #[error("Resource not found")]
     NotFound,
-    #[error("Conflict: {0}")]
+
+    #[translation_id("conflict")]
+    #[translate_fields(cause = 0)] // TODO: Use an I18nEnum instead of a String
+    // #[error("Conflict: {0}")]
     Conflict(String),
-    #[error("External tax compliance API Error")]
+
+    #[translation_id("tax_compliance_api_error")]
+    // #[error("External tax compliance API Error")]
     TaxComplianceApi,
-    #[error(
-        "You are being rate-limited. Please wait {0} milliseconds. 0/{1} remaining."
-    )]
+
+    #[translation_id("ratelimit_error")]
+    #[translate_fields(wait_ms = 0, total_allowed_requests = 1)]
+    // #[error(
+    //     "You are being rate-limited. Please wait {0} milliseconds. 0/{1} remaining."
+    // )]
     RateLimitError(u128, u32),
-    #[error("Error while interacting with payment processor: {0}")]
+
+    #[translation_id("stripe_error")]
+    #[translate_fields(cause = 0)]
+    // #[error("Error while interacting with payment processor: {0}")]
     Stripe(#[from] stripe::StripeError),
 }
 
-impl ApiError {
-    pub fn as_api_error<'a>(&self) -> crate::models::error::ApiError<'a> {
-        self.as_api_error_with_description(self.to_string())
-    }
+#[macro_export]
+macro_rules! labrinth_error_type {
+    ($error_enum:ty) => {
+        impl $error_enum {
+            pub fn as_api_error<'a>(&self) -> crate::models::error::ApiError<'a> {
+                self.as_api_error_with_description(self.to_string().into())
+            }
 
-    pub fn as_localized_api_error<'a>(
-        &self,
-        language: &LanguageTag,
-    ) -> crate::models::error::ApiError<'a> {
-        let description = if language.primary_language() == "en" {
-            self.to_string()
-        } else {
-            format!("In language {language}! {self}")
-        };
-        self.as_api_error_with_description(description)
-    }
+            pub fn as_localized_api_error<'a>(
+                &self,
+                language: &actix_web::http::header::LanguageTag,
+            ) -> crate::models::error::ApiError<'a> {
+                let description = self.translated_message(language.as_str());
+                self.as_api_error_with_description(description)
+            }
 
-    fn as_api_error_with_description<'a>(
-        &self,
-        description: String,
-    ) -> crate::models::error::ApiError<'a> {
-        crate::models::error::ApiError {
-            error: match self {
-                ApiError::Env(..) => "environment_error",
-                ApiError::Database(..) => "database_error",
-                ApiError::SqlxDatabase(..) => "database_error",
-                ApiError::RedisDatabase(..) => "database_error",
-                ApiError::Authentication(..) => "unauthorized",
-                ApiError::CustomAuthentication(..) => "unauthorized",
-                ApiError::Xml(..) => "xml_error",
-                ApiError::Json(..) => "json_error",
-                ApiError::Search(..) => "search_error",
-                ApiError::Indexing(..) => "indexing_error",
-                ApiError::FileHosting(..) => "file_hosting_error",
-                ApiError::InvalidInput(..) => "invalid_input",
-                ApiError::Validation(..) => "invalid_input",
-                ApiError::Payments(..) => "payments_error",
-                ApiError::Discord(..) => "discord_error",
-                ApiError::Turnstile => "turnstile_error",
-                ApiError::Decoding(..) => "decoding_error",
-                ApiError::ImageParse(..) => "invalid_image",
-                ApiError::PasswordHashing(..) => "password_hashing_error",
-                ApiError::Mail(..) => "mail_error",
-                ApiError::Clickhouse(..) => "clickhouse_error",
-                ApiError::Reroute(..) => "reroute_error",
-                ApiError::NotFound => "not_found",
-                ApiError::Conflict(..) => "conflict",
-                ApiError::TaxComplianceApi => "tax_compliance_api_error",
-                ApiError::Zip(..) => "zip_error",
-                ApiError::Io(..) => "io_error",
-                ApiError::RateLimitError(..) => "ratelimit_error",
-                ApiError::Stripe(..) => "stripe_error",
-            },
-            description,
+            fn as_api_error_with_description<'a>(
+                &self,
+                description: std::borrow::Cow<'a, str>,
+            ) -> crate::models::error::ApiError<'a> {
+                crate::models::error::ApiError {
+                    error: self.translation_id(),
+                    description,
+                }
+            }
+
+            pub fn localized_error_response(&self, req: &actix_web::HttpRequest) -> actix_web::HttpResponse {
+                use actix_web::http::header::{
+                    AcceptLanguage, ContentLanguage, Header, LanguageTag, QualityItem,
+                };
+                let language = AcceptLanguage::parse(req)
+                    .ok()
+                    .and_then(|x| x.preference().into_item())
+                    .unwrap_or_else(|| LanguageTag::parse("en-US").unwrap());
+                let body = self.as_localized_api_error(&language);
+
+                actix_web::HttpResponse::build(self.status_code())
+                    .insert_header(ContentLanguage(vec![QualityItem::max(language)]))
+                    .json(body)
+            }
         }
-    }
-
-    pub fn localized_error_response(&self, req: &HttpRequest) -> HttpResponse {
-        let language = AcceptLanguage::parse(req)
-            .ok()
-            .and_then(|x| x.preference().into_item())
-            .unwrap_or_else(|| LanguageTag::parse("en-US").unwrap());
-        let body = self.as_localized_api_error(&language);
-
-        HttpResponse::build(self.status_code())
-            .insert_header(ContentLanguage(vec![QualityItem::max(language)]))
-            .json(body)
-    }
+    };
 }
+
+labrinth_error_type!(ApiError);
 
 impl ResponseError for ApiError {
     fn status_code(&self) -> StatusCode {

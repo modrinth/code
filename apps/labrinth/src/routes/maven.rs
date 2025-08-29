@@ -15,6 +15,7 @@ use actix_web::{HttpRequest, HttpResponse, get, route, web};
 use sqlx::PgPool;
 use std::collections::HashSet;
 use yaserde::YaSerialize;
+use ariadne::i18n::localized_labrinth_error;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(maven_metadata);
@@ -69,6 +70,7 @@ pub struct MavenPom {
 }
 
 #[get("maven/modrinth/{id}/maven-metadata.xml")]
+#[localized_labrinth_error]
 pub async fn maven_metadata(
     req: HttpRequest,
     params: web::Path<(String,)>,

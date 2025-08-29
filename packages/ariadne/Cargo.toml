@@ -14,5 +14,10 @@ either.workspace = true
 chrono = { workspace = true, features = ["serde"] }
 serde_cbor.workspace = true
 
+ariadne-macros.workspace = true
+
+[features]
+labrinth = ["ariadne-macros/labrinth"]
+
 [lints]
 workspace = true
