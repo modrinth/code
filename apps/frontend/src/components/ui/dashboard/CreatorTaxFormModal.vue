@@ -118,6 +118,10 @@ async function startTaxForm(e: MouseEvent) {
 	taxFormModal.value?.show(e)
 }
 
+defineExpose({
+	startTaxForm,
+})
+
 const avalaraState = ref<ReturnType<typeof useAvalara1099> | null>(null)
 const loading = computed(() =>
 	avalaraState.value ? ((avalaraState.value as any).loading?.value ?? false) : false,
@@ -166,7 +170,7 @@ watch(isUSCitizen, (newValue) => {
 })
 
 defineOptions({
-	inheritAttrs: false,
+	inheritAttrs: true,
 })
 </script>
 

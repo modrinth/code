@@ -5,10 +5,12 @@
 			typeClasses[type],
 		]"
 	>
-		<component
-			:is="icons[type]"
-			:class="['hidden h-8 w-8 flex-none sm:block', iconClasses[type]]"
-		/>
+		<slot name="icon" :iconClass="['hidden h-8 w-8 flex-none sm:block', iconClasses[type]]">
+			<component
+				:is="icons[type]"
+				:class="['hidden h-8 w-8 flex-none sm:block', iconClasses[type]]"
+			/>
+		</slot>
 		<div class="flex flex-col gap-2">
 			<div class="font-semibold flex justify-between gap-4">
 				<slot name="header">{{ header }}</slot>
@@ -16,8 +18,11 @@
 			<div class="font-normal">
 				<slot>{{ body }}</slot>
 			</div>
+			<div v-if="showActionsUnderneath">
+				<slot name="actions" />
+			</div>
 		</div>
-		<div class="ml-auto w-fit">
+		<div v-if="!showActionsUnderneath" class="ml-auto w-fit">
 			<slot name="actions" />
 		</div>
 	</div>
@@ -26,20 +31,20 @@
 <script setup lang="ts">
 import { InfoIcon, IssuesIcon, XCircleIcon } from '@modrinth/assets'
 
-defineProps({
-	type: {
-		type: String as () => 'info' | 'warning' | 'critical',
-		default: 'info',
+withDefaults(
+	defineProps<{
+		type?: 'info' | 'warning' | 'critical'
+		header?: string
+		body?: string
+		showActionsUnderneath?: boolean
+	}>(),
+	{
+		type: 'info',
+		header: '',
+		body: '',
+		showActionsUnderneath: false,
 	},
-	header: {
-		type: String,
-		default: '',
-	},
-	body: {
-		type: String,
-		default: '',
-	},
-})
+)
 
 const typeClasses = {
 	info: 'border-brand-blue bg-bg-blue',

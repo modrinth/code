@@ -1,4 +1,5 @@
 <template>
+	<CreatorWithdrawModal ref="withdrawModal" :balance="userBalance" />
 	<div class="mb-6 flex flex-col gap-8 p-2">
 		<div class="flex flex-col gap-5">
 			<div class="flex flex-col">
@@ -81,6 +82,7 @@
 			<span class="text-3xl font-semibold text-contrast">Withdraw</span>
 			<div class="grid grid-cols-3 gap-x-4 gap-y-2">
 				<button
+					@click="openWithdrawModal"
 					class="flex flex-col rounded-2xl bg-brand p-5 text-inverted shadow-xl brightness-90 transition-all duration-200 hover:brightness-105"
 				>
 					<div class="flex flex-row justify-between">
@@ -152,12 +154,21 @@ import {
 } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
+import CreatorWithdrawModal from '~/components/ui/dashboard/CreatorWithdrawModal.vue'
+
+// TODO: Deduplicate in @modrinth/api-client PR.
+type FormCompletionStatus = 'unknown' | 'unrequested' | 'unsigned' | 'tin-mismatch' | 'complete'
 
 interface UserBalanceResponse {
 	available: number
+	withdrawn_lifetime: number
+	withdrawn_ytd: number
 	pending: number
-	// ISO 8601 date string: number
+	// ISO 8601 date string -> amount
 	dates: Record<string, number>
+	// backend returns null when not applicable
+	requested_form_type: string | null
+	form_completion_status: FormCompletionStatus | null
 }
 
 type RevenueBarSegment = {
@@ -165,6 +176,11 @@ type RevenueBarSegment = {
 	class: string
 	widthPct: string
 	amount: number
+}
+
+const withdrawModal = ref<InstanceType<typeof CreatorWithdrawModal> | null>(null)
+function openWithdrawModal() {
+	withdrawModal.value?.show()
 }
 
 function formatTransactionStatus(status: PayoutStatus) {
