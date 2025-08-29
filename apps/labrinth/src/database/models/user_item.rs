@@ -670,6 +670,16 @@ impl DBUser {
 
             sqlx::query!(
                 "
+                DELETE FROM uploaded_images
+                WHERE owner_id = $1
+                ",
+                id as DBUserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+
+            sqlx::query!(
+                "
                 DELETE FROM sessions
                 WHERE user_id = $1
                 ",
