@@ -96,6 +96,7 @@
 			</div>
 			<template
 				v-if="
+					!flags.newProjectEnvironmentSettings &&
 					project.versions?.length !== 0 &&
 					project.project_type !== 'resourcepack' &&
 					project.project_type !== 'plugin' &&
@@ -258,11 +259,19 @@ import { formatProjectStatus, formatProjectType } from '@modrinth/utils'
 import { Multiselect } from 'vue-multiselect'
 
 import FileInput from '~/components/ui/FileInput.vue'
+import { useFeatureFlags } from '~/composables/featureFlags.ts'
 
 const { addNotification } = injectNotificationManager()
 
+const flags = useFeatureFlags()
+
 const props = defineProps({
 	project: {
+		type: Object,
+		required: true,
+		default: () => ({}),
+	},
+	projectV3: {
 		type: Object,
 		required: true,
 		default: () => ({}),

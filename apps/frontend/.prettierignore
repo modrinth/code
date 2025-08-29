@@ -1,6 +1,7 @@
 **/.nuxt
 **/dist
 **/.output
+**/.data
 src/generated/**
 src/locales/**
 src/public/news/feed

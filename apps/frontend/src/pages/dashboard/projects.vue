@@ -282,9 +282,24 @@
 							<ProjectStatusBadge v-if="project.status" :status="project.status" />
 						</div>
 
-						<div>
+						<div class="flex !flex-row items-center !justify-end gap-2">
+							<ButtonStyled
+								v-if="projectsWithMigrationWarning.includes(project.id)"
+								circular
+								color="orange"
+							>
+								<nuxt-link
+									v-tooltip="'Please review environment metadata'"
+									:to="`/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
+										project.slug ? project.slug : project.id
+									}/settings/environment`"
+								>
+									<TriangleAlertIcon />
+								</nuxt-link>
+							</ButtonStyled>
 							<ButtonStyled circular>
 								<nuxt-link
+									v-tooltip="formatMessage(commonMessages.settingsLabel)"
 									:to="`/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
 										project.slug ? project.slug : project.id
 									}/settings`"
@@ -310,6 +325,7 @@ import {
 	SortAscIcon,
 	SortDescIcon,
 	TrashIcon,
+	TriangleAlertIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
@@ -344,6 +360,7 @@ const { formatMessage } = useVIntl()
 
 const user = await useUser()
 const projects = ref([])
+const projectsWithMigrationWarning = ref([])
 const selectedProjects = ref([])
 const sortBy = ref('Name')
 const descending = ref(false)
@@ -437,6 +454,14 @@ async function bulkEditLinks() {
 await initUserProjects()
 if (user.value?.projects) {
 	projects.value = updateSort(user.value.projects, 'Name', false)
+	user.value?.projectsV3?.forEach((project) => {
+		if (
+			project.side_types_migration_review_status === 'pending' &&
+			(project.project_types.includes('mod') || project.project_types.includes('modpack'))
+		) {
+			projectsWithMigrationWarning.value.push(project.id)
+		}
+	})
 }
 </script>
 <style lang="scss" scoped>
