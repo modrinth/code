@@ -7,7 +7,7 @@ use crate::state::fs_watcher::FileWatcher;
 use sqlx::SqlitePool;
 
 // Submodules
-mod dirs;
+pub mod dirs;
 pub use self::dirs::*;
 
 mod profiles;
