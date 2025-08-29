@@ -35,6 +35,7 @@ use std::str::FromStr;
 use std::sync::Arc;
 use validator::Validate;
 use zxcvbn::Score;
+use crate::auth::templates::ErrorPage;
 
 pub fn config(cfg: &mut ServiceConfig) {
     cfg.service(
@@ -1109,14 +1110,13 @@ pub async fn auth_callback(
     client: Data<PgPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     redis: Data<RedisPool>,
-) -> Result<HttpResponse, crate::auth::templates::ErrorPage> {
-    let state_string = query
-        .get("state")
-        .ok_or_else(|| AuthenticationError::InvalidCredentials)?
-        .clone();
+) -> Result<HttpResponse, ErrorPage> {
+    let res = async || {
+        let state = query
+            .get("state")
+            .ok_or_else(|| AuthenticationError::InvalidCredentials)?
+            .clone();
 
-    let state = state_string.clone();
-    let res: Result<HttpResponse, AuthenticationError> = async move {
         let flow = DBFlow::get(&state, &redis).await?;
 
         // Extract cookie header from request
@@ -1203,7 +1203,7 @@ pub async fn auth_callback(
                     oauth_user.create_account(provider, &mut transaction, &client, &file_host, &redis).await?
                 };
 
-                let session = issue_session(req, user_id, &mut transaction, &redis).await?;
+                let session = issue_session(&req, user_id, &mut transaction, &redis).await?;
                 transaction.commit().await?;
 
                 let redirect_url = format!(
@@ -1225,9 +1225,9 @@ pub async fn auth_callback(
         } else {
             Err::<HttpResponse, AuthenticationError>(AuthenticationError::InvalidCredentials)
         }
-    }.await;
+    };
 
-    Ok(res?)
+    res().await.map_err(|e| ErrorPage::new(e, &req))
 }
 
 #[derive(Deserialize)]
@@ -1434,7 +1434,7 @@ pub async fn create_account_with_password(
     .insert(&mut transaction)
     .await?;
 
-    let session = issue_session(req, user_id, &mut transaction, &redis).await?;
+    let session = issue_session(&req, user_id, &mut transaction, &redis).await?;
     let res = crate::models::sessions::Session::from(session, true, None);
 
     let flow = DBFlow::ConfirmEmail {
@@ -1520,7 +1520,7 @@ pub async fn login_password(
     } else {
         let mut transaction = pool.begin().await?;
         let session =
-            issue_session(req, user.id, &mut transaction, &redis).await?;
+            issue_session(&req, user.id, &mut transaction, &redis).await?;
         let res = crate::models::sessions::Session::from(session, true, None);
         transaction.commit().await?;
 
@@ -1650,7 +1650,7 @@ pub async fn login_2fa(
         DBFlow::remove(&login.flow, &redis).await?;
 
         let session =
-            issue_session(req, user_id, &mut transaction, &redis).await?;
+            issue_session(&req, user_id, &mut transaction, &redis).await?;
         let res = crate::models::sessions::Session::from(session, true, None);
         transaction.commit().await?;
 

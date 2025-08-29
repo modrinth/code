@@ -44,6 +44,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.route("project", web::post().to(project_create));
 }
 
+// TODO: Migrate to I18nEnum
 #[derive(Error, Debug)]
 pub enum CreateError {
     #[error("Environment Error")]

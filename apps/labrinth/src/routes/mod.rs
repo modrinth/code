@@ -5,7 +5,6 @@ use crate::util::env::parse_strings_from_var;
 use actix_cors::Cors;
 use actix_files::Files;
 use actix_web::http::StatusCode;
-use actix_web::http::header::Header;
 use actix_web::{HttpResponse, ResponseError, web};
 use futures::FutureExt;
 use ariadne::i18n::I18nEnum;
@@ -241,24 +240,16 @@ macro_rules! labrinth_error_type {
     ($error_enum:ty) => {
         impl $error_enum {
             pub fn as_api_error<'a>(&self) -> crate::models::error::ApiError<'a> {
-                self.as_api_error_with_description(self.to_string().into())
+                self.as_localized_api_error("en")
             }
 
             pub fn as_localized_api_error<'a>(
                 &self,
-                language: &actix_web::http::header::LanguageTag,
-            ) -> crate::models::error::ApiError<'a> {
-                let description = self.translated_message(language.as_str());
-                self.as_api_error_with_description(description)
-            }
-
-            fn as_api_error_with_description<'a>(
-                &self,
-                description: std::borrow::Cow<'a, str>,
+                language: &str,
             ) -> crate::models::error::ApiError<'a> {
                 crate::models::error::ApiError {
                     error: self.translation_id(),
-                    description,
+                    description: self.translated_message(language),
                 }
             }
 
@@ -269,11 +260,11 @@ macro_rules! labrinth_error_type {
                 let language = AcceptLanguage::parse(req)
                     .ok()
                     .and_then(|x| x.preference().into_item())
-                    .unwrap_or_else(|| LanguageTag::parse("en-US").unwrap());
-                let body = self.as_localized_api_error(&language);
+                    .unwrap_or_else(|| LanguageTag::parse("en").unwrap());
+                let body = self.as_localized_api_error(language.as_str());
 
                 actix_web::HttpResponse::build(self.status_code())
-                    .insert_header(ContentLanguage(vec![QualityItem::max(language)]))
+                    .append_header(ContentLanguage(vec![QualityItem::max(language)]))
                     .json(body)
             }
         }

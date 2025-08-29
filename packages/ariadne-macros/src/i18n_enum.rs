@@ -51,7 +51,7 @@ pub fn generate_impls(input: DeriveInput) -> Result<TokenStream> {
                 }
             }
 
-            fn translated_message(&self, locale: &str) -> ::std::borrow::Cow<'_, str> {
+            fn translated_message<'a>(&self, locale: &str) -> ::std::borrow::Cow<'a, str> {
                 match self {
                     #(#message_cases)*
                 }
@@ -187,7 +187,7 @@ impl ToTokens for TranslateField {
         let span = self.span;
         if self.translated {
             tokens.append_all(quote_spanned! {span=>
-                ::ariadne::i18n::I18nEnum::translated_message(&#member, locale)
+                ::ariadne::i18n::I18nEnum::translated_message(#member, locale)
             });
         } else {
             member.to_tokens(tokens)

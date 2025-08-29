@@ -14,6 +14,7 @@ use thiserror::Error;
 
 pub mod indexing;
 
+// TODO: Migrate to I18nEnum
 #[derive(Error, Debug)]
 pub enum SearchError {
     #[error("MeiliSearch Error: {0}")]

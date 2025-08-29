@@ -84,12 +84,12 @@ pub async fn get_session_metadata(
 }
 
 pub async fn issue_session(
-    req: HttpRequest,
+    req: &HttpRequest,
     user_id: DBUserId,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     redis: &RedisPool,
 ) -> Result<DBSession, AuthenticationError> {
-    let metadata = get_session_metadata(&req).await?;
+    let metadata = get_session_metadata(req).await?;
 
     let session = ChaCha20Rng::from_entropy()
         .sample_iter(&Alphanumeric)
@@ -244,7 +244,7 @@ pub async fn refresh(
 
         DBSession::remove(session.id, &mut transaction).await?;
         let new_session =
-            issue_session(req, session.user_id, &mut transaction, &redis)
+            issue_session(&req, session.user_id, &mut transaction, &redis)
                 .await?;
         transaction.commit().await?;
         DBSession::clear_cache(
