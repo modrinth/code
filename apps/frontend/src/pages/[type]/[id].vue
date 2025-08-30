@@ -1005,7 +1005,6 @@ import { reportProject } from '~/utils/report-helpers.ts'
 
 const data = useNuxtApp()
 const route = useNativeRoute()
-const router = useRouter()
 const config = useRuntimeConfig()
 const moderationStore = useModerationStore()
 const notifications = injectNotificationManager()
@@ -1440,30 +1439,18 @@ try {
 						tags.value,
 					)
 					projectId.value = project.id
-					if (route.params.id !== project.slug) {
-						router.replace({
-							name: route.name,
-							params: {
-								...route.params,
-								id: project.slug,
-							},
-							query: route.query,
-							hash: route.hash,
-						})
-					}
 				}
-
 				return project
 			},
 		}),
-		useAsyncData(`projectV3/${route.params.id}`, () =>
-			useBaseFetch(`project/${route.params.id}`, {
+		useAsyncData(`projectV3/${projectId.value}`, () =>
+			useBaseFetch(`project/${projectId.value}`, {
 				apiVersion: 3,
 			}),
 		),
 		useAsyncData(
-			`project/${route.params.id}/members`,
-			() => useBaseFetch(`project/${route.params.id}/members`, { apiVersion: 3 }),
+			`project/${projectId.value}/members`,
+			() => useBaseFetch(`project/${projectId.value}/members`, { apiVersion: 3 }),
 			{
 				transform: (members) => {
 					members.forEach((it, index) => {
@@ -1475,19 +1462,34 @@ try {
 				},
 			},
 		),
-		useAsyncData(`project/${route.params.id}/dependencies`, () =>
-			useBaseFetch(`project/${route.params.id}/dependencies`, {}),
+		useAsyncData(`project/${projectId.value}/dependencies`, () =>
+			useBaseFetch(`project/${projectId.value}/dependencies`, {}),
 		),
-		useAsyncData(`project/${route.params.id}/version?featured=true`, () =>
-			useBaseFetch(`project/${route.params.id}/version?featured=true`),
+		useAsyncData(`project/${projectId.value}/version?featured=true`, () =>
+			useBaseFetch(`project/${projectId.value}/version?featured=true`),
 		),
-		useAsyncData(`project/${route.params.id}/version`, () =>
-			useBaseFetch(`project/${route.params.id}/version`),
+		useAsyncData(`project/${projectId.value}/version`, () =>
+			useBaseFetch(`project/${projectId.value}/version`),
 		),
-		useAsyncData(`project/${route.params.id}/organization`, () =>
-			useBaseFetch(`project/${route.params.id}/organization`, { apiVersion: 3 }),
+		useAsyncData(`project/${projectId.value}/organization`, () =>
+			useBaseFetch(`project/${projectId.value}/organization`, { apiVersion: 3 }),
 		),
 	])
+
+	if (project.value && route.params.id !== project.value.slug) {
+		await navigateTo(
+			{
+				name: route.name,
+				params: {
+					...route.params,
+					id: project.value.slug,
+				},
+				query: route.query,
+				hash: route.hash,
+			},
+			{ replace: true },
+		)
+	}
 
 	versions = shallowRef(toRaw(versions))
 	featuredVersions = shallowRef(toRaw(featuredVersions))
@@ -1781,8 +1783,8 @@ async function patchIcon(icon) {
 
 async function updateMembers() {
 	allMembers.value = await useAsyncData(
-		`project/${route.params.id}/members`,
-		() => useBaseFetch(`project/${route.params.id}/members`),
+		`project/${projectId.value}/members`,
+		() => useBaseFetch(`project/${projectId.value}/members`),
 		{
 			transform: (members) => {
 				members.forEach((it, index) => {
