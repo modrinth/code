@@ -1476,6 +1476,21 @@ try {
 		),
 	])
 
+	await updateProjectRoute()
+
+	versions = shallowRef(toRaw(versions))
+	featuredVersions = shallowRef(toRaw(featuredVersions))
+} catch (err) {
+	throw createError({
+		fatal: true,
+		statusCode: err.statusCode ?? 500,
+		message: formatMessage(messages.errorLoadingProject, {
+			message: err.message ? `: ${err.message}` : '',
+		}),
+	})
+}
+
+async function updateProjectRoute() {
 	if (project.value && route.params.id !== project.value.slug) {
 		await navigateTo(
 			{
@@ -1491,16 +1506,6 @@ try {
 		)
 	}
 
-	versions = shallowRef(toRaw(versions))
-	featuredVersions = shallowRef(toRaw(featuredVersions))
-} catch (err) {
-	throw createError({
-		fatal: true,
-		statusCode: err.statusCode ?? 500,
-		message: formatMessage(messages.errorLoadingProject, {
-			message: err.message ? `: ${err.message}` : '',
-		}),
-	})
 }
 
 async function resetProject() {
@@ -1715,6 +1720,8 @@ async function patchProject(resData, quiet = false) {
 		for (const key in resData) {
 			project.value[key] = resData[key]
 		}
+
+		await updateProjectRoute()
 
 		if (resData.license_id) {
 			project.value.license.id = resData.license_id
