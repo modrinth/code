@@ -457,7 +457,8 @@ if (user.value?.projects) {
 	user.value?.projectsV3?.forEach((project) => {
 		if (
 			project.side_types_migration_review_status === 'pending' &&
-			(project.project_types.includes('mod') || project.project_types.includes('modpack'))
+			(project.project_types.includes('mod') || project.project_types.includes('modpack')) &&
+			project.environment?.length === 1
 		) {
 			projectsWithMigrationWarning.value.push(project.id)
 		}

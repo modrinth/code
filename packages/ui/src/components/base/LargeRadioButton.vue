@@ -1,5 +1,8 @@
 <template>
 	<button
+		role="radio"
+		:aria-checked="selected"
+		:aria-disabled="disabled"
 		class="px-4 py-3 text-left border-0 font-medium border-2 border-button-bg border-solid flex gap-2 transition-all cursor-pointer rounded-xl"
 		:class="
 			(selected ? 'text-contrast bg-button-bg' : 'text-primary bg-transparent') +
@@ -10,8 +13,12 @@
 		:disabled="disabled"
 		@click="emit('select')"
 	>
-		<RadioButtonCheckedIcon v-if="selected" class="text-brand h-5 w-5 shrink-0" />
-		<RadioButtonIcon v-else class="h-5 w-5 shrink-0" />
+		<RadioButtonCheckedIcon
+			v-if="selected"
+			class="text-brand h-5 w-5 shrink-0"
+			aria-hidden="true"
+		/>
+		<RadioButtonIcon v-else class="h-5 w-5 shrink-0" aria-hidden="true" />
 		<slot />
 	</button>
 </template>

@@ -880,7 +880,7 @@ pub async fn project_edit(
         )
         .await?
         {
-            super::versions::version_edit_helper(
+            match super::versions::version_edit_helper(
                 req.clone(),
                 (VersionId::from(version.inner.id),),
                 pool.clone(),
@@ -891,7 +891,16 @@ pub async fn project_edit(
                 },
                 session_queue.clone(),
             )
-            .await?;
+            .await
+            {
+                // An `InvalidInput` error being returned from this route when only
+                // editing the loader fields means that such fields are not valid for
+                // the loaders defined for this version, which is a common case for
+                // projects with heterogeneous loaders across versions and is best
+                // handled with opportunistic update semantics
+                Ok(_) | Err(ApiError::InvalidInput(_)) => continue,
+                err => return err,
+            }
         }
     }
 

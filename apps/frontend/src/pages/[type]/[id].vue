@@ -5,7 +5,7 @@
 	<div v-if="route.name.startsWith('type-id-settings')" class="normal-page no-sidebar">
 		<div class="normal-page__header">
 			<div
-				class="mb-4 flex items-center gap-2 border-0 border-b-[1px] border-solid border-divider pb-4 text-lg font-semibold"
+				class="mb-4 flex flex-wrap items-center gap-x-2 gap-y-3 border-0 border-b-[1px] border-solid border-divider pb-4 text-lg font-semibold"
 			>
 				<nuxt-link
 					:to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
@@ -755,25 +755,35 @@
 					v-if="
 						currentMember &&
 						projectV3.side_types_migration_review_status === 'pending' &&
-						projectV3.environment?.length > 0 &&
+						projectV3.environment?.length === 1 &&
 						projectV3.environment[0] !== 'unknown'
 					"
 					type="warning"
-					:header="formatMessage(messages.environmentMigrationTitle)"
+					:header="
+						formatMessage(
+							hasEditDetailsPermission
+								? messages.environmentMigrationTitle
+								: messages.environmentMigrationNoPermissionTitle,
+						)
+					"
 					class="mt-3"
 				>
-					{{ formatMessage(messages.environmentMigrationMessage) }}
-					<ButtonStyled color="orange">
-						<nuxt-link
-							v-tooltip="
-								hasEditDetailsPermission
-									? undefined
-									: formatMessage(commonProjectSettingsMessages.noPermissionDescription)
-							"
-							:to="`/project/${project.id}/settings/environment`"
-							class="mt-3 w-fit"
-							:disabled="!hasEditDetailsPermission"
-						>
+					{{
+						formatMessage(
+							hasEditDetailsPermission
+								? messages.environmentMigrationMessage
+								: messages.environmentMigrationNoPermissionMessage,
+						)
+					}}
+					<nuxt-link
+						to="/news/article/new-environments"
+						target="_blank"
+						class="mt-1 block w-fit font-semibold text-orange hover:underline"
+					>
+						{{ formatMessage(messages.environmentMigrationLink) }}
+					</nuxt-link>
+					<ButtonStyled v-if="hasEditDetailsPermission" color="orange">
+						<nuxt-link :to="`/project/${project.id}/settings/environment`" class="mt-3 w-fit">
 							<SettingsIcon /> {{ formatMessage(messages.reviewEnvironmentSettings) }}
 						</nuxt-link>
 					</ButtonStyled>
@@ -966,7 +976,6 @@ import {
 	ButtonStyled,
 	Checkbox,
 	commonMessages,
-	commonProjectSettingsMessages,
 	injectNotificationManager,
 	NewModal,
 	OverflowMenu,
@@ -1005,7 +1014,6 @@ import { reportProject } from '~/utils/report-helpers.ts'
 
 const data = useNuxtApp()
 const route = useNativeRoute()
-const router = useRouter()
 const config = useRuntimeConfig()
 const moderationStore = useModerationStore()
 const notifications = injectNotificationManager()
@@ -1152,6 +1160,19 @@ const messages = defineMessages({
 	environmentMigrationTitle: {
 		id: 'project.environment.migration.title',
 		defaultMessage: 'Please review environment metadata',
+	},
+	environmentMigrationNoPermissionMessage: {
+		id: 'project.environment.migration-no-permission.message',
+		defaultMessage:
+			"We've just overhauled the Environments system on Modrinth and new options are now available. You don't have permission to modify these settings, but please let another member of the project know that the environment metadata needs to be verified.",
+	},
+	environmentMigrationNoPermissionTitle: {
+		id: 'project.environment.migration-no-permission.title',
+		defaultMessage: 'Environment metadata needs to be reviewed',
+	},
+	environmentMigrationLink: {
+		id: 'project.environment.migration.learn-more',
+		defaultMessage: 'Learn more about this change',
 	},
 	followersStat: {
 		id: 'project.stats.followers-label',
@@ -1440,30 +1461,18 @@ try {
 						tags.value,
 					)
 					projectId.value = project.id
-					if (route.params.id !== project.slug) {
-						router.replace({
-							name: route.name,
-							params: {
-								...route.params,
-								id: project.slug,
-							},
-							query: route.query,
-							hash: route.hash,
-						})
-					}
 				}
-
 				return project
 			},
 		}),
-		useAsyncData(`projectV3/${route.params.id}`, () =>
-			useBaseFetch(`project/${route.params.id}`, {
+		useAsyncData(`projectV3/${projectId.value}`, () =>
+			useBaseFetch(`project/${projectId.value}`, {
 				apiVersion: 3,
 			}),
 		),
 		useAsyncData(
-			`project/${route.params.id}/members`,
-			() => useBaseFetch(`project/${route.params.id}/members`, { apiVersion: 3 }),
+			`project/${projectId.value}/members`,
+			() => useBaseFetch(`project/${projectId.value}/members`, { apiVersion: 3 }),
 			{
 				transform: (members) => {
 					members.forEach((it, index) => {
@@ -1475,19 +1484,21 @@ try {
 				},
 			},
 		),
-		useAsyncData(`project/${route.params.id}/dependencies`, () =>
-			useBaseFetch(`project/${route.params.id}/dependencies`, {}),
+		useAsyncData(`project/${projectId.value}/dependencies`, () =>
+			useBaseFetch(`project/${projectId.value}/dependencies`, {}),
 		),
-		useAsyncData(`project/${route.params.id}/version?featured=true`, () =>
-			useBaseFetch(`project/${route.params.id}/version?featured=true`),
+		useAsyncData(`project/${projectId.value}/version?featured=true`, () =>
+			useBaseFetch(`project/${projectId.value}/version?featured=true`),
 		),
-		useAsyncData(`project/${route.params.id}/version`, () =>
-			useBaseFetch(`project/${route.params.id}/version`),
+		useAsyncData(`project/${projectId.value}/version`, () =>
+			useBaseFetch(`project/${projectId.value}/version`),
 		),
-		useAsyncData(`project/${route.params.id}/organization`, () =>
-			useBaseFetch(`project/${route.params.id}/organization`, { apiVersion: 3 }),
+		useAsyncData(`project/${projectId.value}/organization`, () =>
+			useBaseFetch(`project/${projectId.value}/organization`, { apiVersion: 3 }),
 		),
 	])
+
+	await updateProjectRoute()
 
 	versions = shallowRef(toRaw(versions))
 	featuredVersions = shallowRef(toRaw(featuredVersions))
@@ -1499,6 +1510,23 @@ try {
 			message: err.message ? `: ${err.message}` : '',
 		}),
 	})
+}
+
+async function updateProjectRoute() {
+	if (project.value && route.params.id !== project.value.slug) {
+		await navigateTo(
+			{
+				name: route.name,
+				params: {
+					...route.params,
+					id: project.value.slug,
+				},
+				query: route.query,
+				hash: route.hash,
+			},
+			{ replace: true },
+		)
+	}
 }
 
 async function resetProject() {
@@ -1714,6 +1742,8 @@ async function patchProject(resData, quiet = false) {
 			project.value[key] = resData[key]
 		}
 
+		await updateProjectRoute()
+
 		if (resData.license_id) {
 			project.value.license.id = resData.license_id
 		}
@@ -1781,8 +1811,8 @@ async function patchIcon(icon) {
 
 async function updateMembers() {
 	allMembers.value = await useAsyncData(
-		`project/${route.params.id}/members`,
-		() => useBaseFetch(`project/${route.params.id}/members`),
+		`project/${projectId.value}/members`,
+		() => useBaseFetch(`project/${projectId.value}/members`),
 		{
 			transform: (members) => {
 				members.forEach((it, index) => {
