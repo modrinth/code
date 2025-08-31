@@ -770,6 +770,15 @@
   "project.download.title": {
     "message": "Download {title}"
   },
+  "project.environment.migration-no-permission.message": {
+    "message": "We've just overhauled the Environments system on Modrinth and new options are now available. You don't have permission to modify these settings, but please let another member of the project know that the environment metadata needs to be verified."
+  },
+  "project.environment.migration-no-permission.title": {
+    "message": "Environment metadata needs to be reviewed"
+  },
+  "project.environment.migration.learn-more": {
+    "message": "Learn more about this change"
+  },
   "project.environment.migration.message": {
     "message": "We've just overhauled the Environments system on Modrinth and new options are now available. Please visit your project's settings and verify that the metadata is correct."
   },

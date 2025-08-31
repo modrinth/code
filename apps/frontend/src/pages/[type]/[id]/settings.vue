@@ -41,7 +41,7 @@ const dependencies = defineModel<any>('dependencies')
 const organization = defineModel<any>('organization')
 </script>
 <template>
-	<div class="experimental-styles-within grid grid-cols-[1fr_3fr] gap-4">
+	<div class="experimental-styles-within grid gap-4 lg:grid-cols-[1fr_3fr]">
 		<div>
 			<aside class="universal-card">
 				<NavStack>
@@ -140,7 +140,7 @@ const organization = defineModel<any>('organization')
 				</NavStack>
 			</aside>
 		</div>
-		<div>
+		<div class="min-w-0">
 			<NuxtPage
 				v-model:project="project"
 				v-model:project-v3="projectV3"

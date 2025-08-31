@@ -5,7 +5,7 @@
 	<div v-if="route.name.startsWith('type-id-settings')" class="normal-page no-sidebar">
 		<div class="normal-page__header">
 			<div
-				class="mb-4 flex items-center gap-2 border-0 border-b-[1px] border-solid border-divider pb-4 text-lg font-semibold"
+				class="mb-4 flex flex-wrap items-center gap-x-2 gap-y-3 border-0 border-b-[1px] border-solid border-divider pb-4 text-lg font-semibold"
 			>
 				<nuxt-link
 					:to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
@@ -759,21 +759,31 @@
 						projectV3.environment[0] !== 'unknown'
 					"
 					type="warning"
-					:header="formatMessage(messages.environmentMigrationTitle)"
+					:header="
+						formatMessage(
+							hasEditDetailsPermission
+								? messages.environmentMigrationTitle
+								: messages.environmentMigrationNoPermissionTitle,
+						)
+					"
 					class="mt-3"
 				>
-					{{ formatMessage(messages.environmentMigrationMessage) }}
-					<ButtonStyled color="orange">
-						<nuxt-link
-							v-tooltip="
-								hasEditDetailsPermission
-									? undefined
-									: formatMessage(commonProjectSettingsMessages.noPermissionDescription)
-							"
-							:to="`/project/${project.id}/settings/environment`"
-							class="mt-3 w-fit"
-							:disabled="!hasEditDetailsPermission"
-						>
+					{{
+						formatMessage(
+							hasEditDetailsPermission
+								? messages.environmentMigrationMessage
+								: messages.environmentMigrationNoPermissionMessage,
+						)
+					}}
+					<nuxt-link
+						to="/news/article/new-environments"
+						target="_blank"
+						class="mt-1 block w-fit font-semibold text-orange hover:underline"
+					>
+						{{ formatMessage(messages.environmentMigrationLink) }}
+					</nuxt-link>
+					<ButtonStyled v-if="hasEditDetailsPermission" color="orange">
+						<nuxt-link :to="`/project/${project.id}/settings/environment`" class="mt-3 w-fit">
 							<SettingsIcon /> {{ formatMessage(messages.reviewEnvironmentSettings) }}
 						</nuxt-link>
 					</ButtonStyled>
@@ -966,7 +976,6 @@ import {
 	ButtonStyled,
 	Checkbox,
 	commonMessages,
-	commonProjectSettingsMessages,
 	injectNotificationManager,
 	NewModal,
 	OverflowMenu,
@@ -1151,6 +1160,19 @@ const messages = defineMessages({
 	environmentMigrationTitle: {
 		id: 'project.environment.migration.title',
 		defaultMessage: 'Please review environment metadata',
+	},
+	environmentMigrationNoPermissionMessage: {
+		id: 'project.environment.migration-no-permission.message',
+		defaultMessage:
+			"We've just overhauled the Environments system on Modrinth and new options are now available. You don't have permission to modify these settings, but please let another member of the project know that the environment metadata needs to be verified.",
+	},
+	environmentMigrationNoPermissionTitle: {
+		id: 'project.environment.migration-no-permission.title',
+		defaultMessage: 'Environment metadata needs to be reviewed',
+	},
+	environmentMigrationLink: {
+		id: 'project.environment.migration.learn-more',
+		defaultMessage: 'Learn more about this change',
 	},
 	followersStat: {
 		id: 'project.stats.followers-label',
