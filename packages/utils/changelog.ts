@@ -11,6 +11,17 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-08-31T10:35:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Fixed screen reader accessibility of the new project environments settings page.
+- Fixed mobile responsiveness of project settings page.
+- Fixed error loading project pages when using the project ID in the URL.
+- Updated the message for unverified environments when the user does not have permission to update the environment.
+- Improved handling of projects with multiple environments.
+- Fixed blog posts not loading images when missing a slash at the end of the URL.`,
+	},
+	{
 		date: `2025-08-28T18:45:00-07:00`,
 		product: 'web',
 		body: `### Improvements

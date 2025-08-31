@@ -13,7 +13,11 @@
 		:disabled="disabled"
 		@click="emit('select')"
 	>
-		<RadioButtonCheckedIcon v-if="selected" class="text-brand h-5 w-5 shrink-0" aria-hidden="true" />
+		<RadioButtonCheckedIcon
+			v-if="selected"
+			class="text-brand h-5 w-5 shrink-0"
+			aria-hidden="true"
+		/>
 		<RadioButtonIcon v-else class="h-5 w-5 shrink-0" aria-hidden="true" />
 		<slot />
 	</button>

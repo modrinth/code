@@ -245,7 +245,12 @@ const simulateSave = ref(false)
 				:class="{ 'mt-2': index > 0 }"
 				:selected="currentOuterOption === key"
 				:disabled="disabled"
-				:aria-label="formatMessage(optionLabelFormat, { title: formatMessage(title), description: formatMessage(description)})"
+				:aria-label="
+					formatMessage(optionLabelFormat, {
+						title: formatMessage(title),
+						description: formatMessage(description),
+					})
+				"
 				@select="
 					() => {
 						if (currentOuterOption !== key) {

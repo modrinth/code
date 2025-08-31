@@ -161,7 +161,7 @@ const messages = defineMessages({
 			</template>
 		</div>
 		<UnsavedChangesPopup
-			v-if="supportsEnvironment && hasPermission"
+			v-if="supportsEnvironment && hasPermission && projectV3?.environment?.length <= 1"
 			:original="saved"
 			:modified="current"
 			:saving="saving"

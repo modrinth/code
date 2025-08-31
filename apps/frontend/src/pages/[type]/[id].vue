@@ -755,7 +755,7 @@
 					v-if="
 						currentMember &&
 						projectV3.side_types_migration_review_status === 'pending' &&
-						projectV3.environment?.length > 0 &&
+						projectV3.environment?.length === 1 &&
 						projectV3.environment[0] !== 'unknown'
 					"
 					type="warning"
