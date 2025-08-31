@@ -11,6 +11,13 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-08-31T11:50:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Fixed mods with datapack or plugin versions being unable to set environment.
+- Fixed users getting empty notifications for messages they can't see.`,
+	},
+	{
 		date: `2025-08-31T10:35:00-07:00`,
 		product: 'web',
 		body: `### Improvements
