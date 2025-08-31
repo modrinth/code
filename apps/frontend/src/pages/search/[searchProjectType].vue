@@ -54,6 +54,7 @@
 				v-if="!server && !flags.projectTypesPrimaryNav"
 				:links="selectableProjectTypes"
 				class="hidden md:flex"
+				@click="query = ''"
 			/>
 		</section>
 		<aside
@@ -385,6 +386,9 @@ await updateServerContext()
 
 watch(route, () => {
 	updateServerContext()
+	if (!route.params.q) {
+		query.value = ''
+	}
 })
 
 async function updateServerContext() {
