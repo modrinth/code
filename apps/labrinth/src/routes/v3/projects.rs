@@ -1739,8 +1739,8 @@ pub async fn add_gallery_item(
 
     let bytes = read_limited_from_payload(
         &mut payload,
-        2 * (1 << 20),
-        "Gallery image exceeds the maximum of 2MiB.",
+        5 * (1 << 20),
+        "Gallery image exceeds the maximum of 5MiB.",
     )
     .await?;
 
