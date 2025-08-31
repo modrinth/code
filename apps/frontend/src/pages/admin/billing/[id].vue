@@ -71,8 +71,12 @@
 					</span>
 					<span>
 						Whether or not the subscription should be cancelled. Submitting this as "true" will
-						cancel the subscription, while submitting it as "false" will force another charge
-						attempt to be made.
+						cancel the subscription, while submitting it as "false" will
+						{{
+							selectedCharge.status === 'open'
+								? 'keep it as-is'
+								: 'force another charge attempt to be made'
+						}}.
 					</span>
 				</label>
 				<Toggle id="cancel" v-model="cancel" />
@@ -116,7 +120,8 @@
 				<div class="mb-4 grid grid-cols-[1fr_auto]">
 					<div>
 						<span class="flex items-center gap-2 font-semibold text-contrast">
-							<template v-if="subscription.metadata?.type === 'midas'">
+							<!-- TODO(backend): provide proper metadata for midas (MR+) subscriptions -->
+							<template v-if="subscription.price_id === 'a6eRm92L'">
 								<ModrinthPlusIcon class="h-7 w-min" />
 							</template>
 							<template v-else-if="subscription.metadata?.type === 'pyro'">
@@ -248,8 +253,12 @@
 										Refund options
 									</button>
 								</ButtonStyled>
-								<ButtonStyled v-else-if="charge.status === 'failed'" color="red" color-fill="text">
-									<button @click="showModifyModal(subscription)">
+								<ButtonStyled
+									v-else-if="charge.status === 'failed' || charge.status === 'open'"
+									color="red"
+									color-fill="text"
+								>
+									<button @click="showModifyModal(charge, subscription)">
 										<CurrencyIcon />
 										Modify charge
 									</button>
@@ -351,6 +360,7 @@ const subscriptionCharges = computed(() => {
 const refunding = ref(false)
 const refundModal = ref()
 const selectedCharge = ref(null)
+const selectedSubscription = ref(null)
 const refundType = ref('full')
 const refundTypes = ref(['full', 'partial', 'none'])
 const refundAmount = ref(0)
@@ -368,8 +378,9 @@ function showRefundModal(charge) {
 	refundModal.value.show()
 }
 
-function showModifyModal(charge) {
+function showModifyModal(charge, subscription) {
 	selectedCharge.value = charge
+	selectedSubscription.value = subscription
 	cancel.value = false
 	modifyModal.value.show()
 }
@@ -405,7 +416,7 @@ async function refundCharge() {
 async function modifyCharge() {
 	modifying.value = true
 	try {
-		await useBaseFetch(`billing/subscription/${selectedCharge.value.id}`, {
+		await useBaseFetch(`billing/subscription/${selectedSubscription.value.id}`, {
 			method: 'PATCH',
 			body: JSON.stringify({
 				cancelled: cancel.value,
@@ -413,14 +424,14 @@ async function modifyCharge() {
 			internal: true,
 		})
 		addNotification({
-			title: 'Resubscription request submitted',
+			title: 'Modifications made',
 			text: 'If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.',
 			type: 'success',
 		})
 		await refreshCharges()
 	} catch (err) {
 		addNotification({
-			title: 'Error reattempting charge',
+			title: 'Error while sending request',
 			text: err.data?.description ?? err,
 			type: 'error',
 		})
