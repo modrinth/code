@@ -8,7 +8,7 @@ const sideTypes: Stage = {
 	id: 'environment',
 	icon: GlobeIcon,
 	guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
-	navigate: '/settings',
+	navigate: '/settings/environment',
 	text: async () => (await import('../messages/checklist-text/side_types.md?raw')).default,
 	actions: [
 		{

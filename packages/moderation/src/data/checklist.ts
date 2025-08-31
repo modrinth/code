@@ -5,6 +5,7 @@ import description from './stages/description'
 import gallery from './stages/gallery'
 import license from './stages/license'
 import links from './stages/links'
+import postApproval from './stages/post-approval'
 import reupload from './stages/reupload'
 import ruleFollowing from './stages/rule-following'
 import sideTypes from './stages/side-types'
@@ -29,4 +30,5 @@ export default [
 	modpackPermissionsStage,
 	statusAlerts,
 	undefinedProject,
+	postApproval,
 ] as ReadonlyArray<Stage>
