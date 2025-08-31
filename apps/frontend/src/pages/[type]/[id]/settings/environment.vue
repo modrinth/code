@@ -154,7 +154,10 @@ const messages = defineMessages({
 					:body="formatMessage(messages.reviewOptionsDescription)"
 					class="mb-3"
 				/>
-				<ProjectSettingsEnvSelector v-model="current.environment" :disabled="!hasPermission" />
+				<ProjectSettingsEnvSelector
+					v-model="current.environment"
+					:disabled="!hasPermission || projectV3?.environment?.length > 1"
+				/>
 			</template>
 		</div>
 		<UnsavedChangesPopup

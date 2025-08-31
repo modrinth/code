@@ -3,7 +3,7 @@ import type { EnvironmentV3 } from '@modrinth/utils'
 import { defineMessage, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { computed, ref, watch } from 'vue'
 
-import { commonMessages, commonProjectSettingsMessages } from '../../../../utils'
+import { commonProjectSettingsMessages } from '../../../../utils'
 import LargeRadioButton from '../../../base/LargeRadioButton.vue'
 
 const { formatMessage } = useVIntl()
