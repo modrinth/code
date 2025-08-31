@@ -232,7 +232,7 @@ export const coreNags: Nag[] = [
 			return formatMessage(
 				defineMessage({
 					id: 'nags.select-environments.description',
-					defaultMessage: `Select whether the {projectType} functions on the client and/or server-side.`,
+					defaultMessage: `Select the environments your {projectType} functions on.`,
 				}),
 				{
 					projectType: formatProjectType(context.project.project_type).toLowerCase(),
