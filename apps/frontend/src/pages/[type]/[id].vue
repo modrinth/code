@@ -1505,7 +1505,6 @@ async function updateProjectRoute() {
 			{ replace: true },
 		)
 	}
-
 }
 
 async function resetProject() {
