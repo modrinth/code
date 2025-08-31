@@ -488,6 +488,12 @@
   "project.settings.environment.singleplayer.title": {
     "defaultMessage": "Singleplayer only"
   },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}: {description}"
+  },
+  "project.settings.environment.suboption.accessibility-suboption-group-label": {
+    "defaultMessage": "Suboptions of {option}"
+  },
   "project.settings.environment.title": {
     "defaultMessage": "Environment"
   },

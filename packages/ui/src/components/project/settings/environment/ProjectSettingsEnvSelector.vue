@@ -3,6 +3,7 @@ import type { EnvironmentV3 } from '@modrinth/utils'
 import { defineMessage, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { computed, ref, watch } from 'vue'
 
+import { commonProjectSettingsMessages } from '../../../../utils'
 import LargeRadioButton from '../../../base/LargeRadioButton.vue'
 
 const { formatMessage } = useVIntl()
@@ -22,6 +23,15 @@ type EnvironmentRadioOption = {
 	title: MessageDescriptor
 	description?: MessageDescriptor
 }
+
+const subOptionLabel = defineMessage({
+	id: 'project.settings.environment.suboption.accessibility-suboption-group-label',
+	defaultMessage: 'Suboptions of {option}',
+})
+const optionLabelFormat = defineMessage({
+	id: 'project.settings.environment.suboption.accessibility-option-label',
+	defaultMessage: '{title}: {description}',
+})
 
 const OUTER_OPTIONS = {
 	client: {
@@ -225,58 +235,68 @@ const simulateSave = ref(false)
 </script>
 
 <template>
-	<template
-		v-for="({ title, description, suboptions }, key, index) in OUTER_OPTIONS"
-		:key="`env-option-${key}`"
-	>
-		<LargeRadioButton
-			class="!w-full"
-			:class="{ 'mt-2': index > 0 }"
-			:selected="currentOuterOption === key"
-			:disabled="disabled"
-			@select="
-				() => {
-					if (currentOuterOption !== key) {
-						currentSubOption = suboptions ? (Object.keys(suboptions)[0] as SubOptionKey) : undefined
-					}
-					currentOuterOption = key
-					simulateSave = false
-				}
-			"
+	<div role="radiogroup" :aria-label="formatMessage(commonProjectSettingsMessages.environment)">
+		<template
+			v-for="({ title, description, suboptions }, key, index) in OUTER_OPTIONS"
+			:key="`env-option-${key}`"
 		>
-			<span class="flex flex-col">
-				<span>{{ formatMessage(title) }}</span>
-				<span v-if="description" class="text-sm text-secondary">{{
-					formatMessage(description)
-				}}</span>
-			</span>
-		</LargeRadioButton>
-		<div v-if="suboptions" class="pl-8">
 			<LargeRadioButton
-				v-for="(
-					{ title: suboptionTitle, description: suboptionDescription }, suboptionKey
-				) in suboptions"
-				:key="`env-option-${key}-${suboptionKey}`"
-				class="!w-full mt-2"
-				:class="{
-					'opacity-50': currentOuterOption !== key,
-				}"
-				:selected="currentSubOption === suboptionKey"
+				class="!w-full"
+				:class="{ 'mt-2': index > 0 }"
+				:selected="currentOuterOption === key"
 				:disabled="disabled"
+				:aria-label="formatMessage(optionLabelFormat, { title: formatMessage(title), description: formatMessage(description)})"
 				@select="
 					() => {
+						if (currentOuterOption !== key) {
+							currentSubOption = suboptions
+								? (Object.keys(suboptions)[0] as SubOptionKey)
+								: undefined
+						}
 						currentOuterOption = key
-						currentSubOption = suboptionKey
+						simulateSave = false
 					}
 				"
 			>
 				<span class="flex flex-col">
-					<span>{{ formatMessage(suboptionTitle) }}</span>
-					<span v-if="suboptionDescription" class="text-sm text-secondary">{{
-						formatMessage(suboptionDescription)
+					<span>{{ formatMessage(title) }}</span>
+					<span v-if="description" class="text-sm text-secondary">{{
+						formatMessage(description)
 					}}</span>
 				</span>
 			</LargeRadioButton>
-		</div>
-	</template>
+			<div
+				v-if="suboptions"
+				class="pl-8"
+				role="radiogroup"
+				:aria-label="formatMessage(subOptionLabel, { option: formatMessage(title) })"
+			>
+				<LargeRadioButton
+					v-for="(
+						{ title: suboptionTitle, description: suboptionDescription }, suboptionKey
+					) in suboptions"
+					:key="`env-option-${key}-${suboptionKey}`"
+					class="!w-full mt-2"
+					:class="{
+						'opacity-50': currentOuterOption !== key,
+					}"
+					:selected="currentSubOption === suboptionKey"
+					:disabled="disabled"
+					@select="
+						() => {
+							currentOuterOption = key
+							currentSubOption = suboptionKey
+						}
+					"
+				>
+					<span class="flex flex-col">
+						<span>{{ formatMessage(suboptionTitle) }}</span>
+						<span v-if="suboptionDescription" class="text-sm text-secondary">{{
+							formatMessage(suboptionDescription)
+						}}</span>
+					</span>
+				</LargeRadioButton>
+			</div>
+		</template>
+	</div>
 </template>

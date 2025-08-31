@@ -110,18 +110,6 @@ const messages = defineMessages({
 </script>
 <template>
 	<div>
-		<UnsavedChangesPopup
-			v-if="supportsEnvironment && hasPermission"
-			:original="saved"
-			:modified="current"
-			:saving="saving"
-			:can-reset="!needsToVerify"
-			:text="needsToVerify ? messages.verifyLabel : undefined"
-			:save-label="needsToVerify ? messages.verifyButton : undefined"
-			:save-icon="needsToVerify ? CheckIcon : undefined"
-			@reset="reset"
-			@save="save"
-		/>
 		<div class="card experimental-styles-within">
 			<h2 class="m-0 mb-2 block text-lg font-extrabold text-contrast">
 				{{ formatMessage(commonProjectSettingsMessages.environment) }}
@@ -166,8 +154,23 @@ const messages = defineMessages({
 					:body="formatMessage(messages.reviewOptionsDescription)"
 					class="mb-3"
 				/>
-				<ProjectSettingsEnvSelector v-model="current.environment" :disabled="!hasPermission" />
+				<ProjectSettingsEnvSelector
+					v-model="current.environment"
+					:disabled="!hasPermission || projectV3?.environment?.length > 1"
+				/>
 			</template>
 		</div>
+		<UnsavedChangesPopup
+			v-if="supportsEnvironment && hasPermission"
+			:original="saved"
+			:modified="current"
+			:saving="saving"
+			:can-reset="!needsToVerify"
+			:text="needsToVerify ? messages.verifyLabel : undefined"
+			:save-label="needsToVerify ? messages.verifyButton : undefined"
+			:save-icon="needsToVerify ? CheckIcon : undefined"
+			@reset="reset"
+			@save="save"
+		/>
 	</div>
 </template>
