@@ -115,6 +115,18 @@
 						Save
 					</button>
 				</ButtonStyled>
+				<ButtonStyled v-if="usesFeaturedVersions">
+					<button
+						v-tooltip="
+							`Featured versions are being phased out. If you're still using this for something in the API, seek an alternative soon.`
+						"
+						@click="version.featured = !version.featured"
+					>
+						<StarIcon aria-hidden="true" />
+						<template v-if="!version.featured"> Feature version (deprecated)</template>
+						<template v-else> Unfeature version (deprecated)</template>
+					</button>
+				</ButtonStyled>
 				<ButtonStyled>
 					<nuxt-link
 						v-if="currentMember"
@@ -876,6 +888,8 @@ export default defineNuxtComponent({
 					.format('MMM D, YYYY')}. ${version.downloads} downloads.`,
 		)
 
+		const usesFeaturedVersions = computed(() => props.versions.some((v) => v.featured))
+
 		useSeoMeta({
 			title,
 			description,
@@ -887,6 +901,7 @@ export default defineNuxtComponent({
 			auth,
 			tags,
 			flags,
+			usesFeaturedVersions,
 			fileTypes: ref(fileTypes),
 			oldFileTypes: ref(oldFileTypes),
 			isCreating: ref(isCreating),
