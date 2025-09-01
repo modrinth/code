@@ -11,6 +11,14 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-09-01T16:20:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Significantly improved the performance of certain project pages.
+- Strings in Markdown descriptions that look like domain names or IP addresses will no longer automatically be converted to links, such as \`README.md\`.
+- Fixed project environment settings sometimes showing the wrong warning/info message.`,
+	},
+	{
 		date: `2025-08-31T17:15:00-07:00`,
 		product: 'web',
 		body: `### Improvements
