@@ -228,8 +228,13 @@ wry = { git = "https://github.com/modrinth/wry", rev = "f2ce0b0" }
 opt-level = "s"   # Optimize for binary size
 strip = true      # Remove debug symbols
 lto = true        # Enables link to optimizations
-panic = "unwind"   # Strip expensive panic clean-up logic
+panic = "abort"   # Strip expensive panic clean-up logic
 codegen-units = 1 # Compile crates one after another so the compiler can optimize better
+
+# Specific profile for labrinth production builds
+[profile.release-labrinth]
+inherits = "release"
+panic = "unwind" # Don't exit the whole app on panic in production
 
 [profile.dev.package.sqlx-macros]
 opt-level = 3

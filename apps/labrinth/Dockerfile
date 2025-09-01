@@ -8,7 +8,7 @@ ARG GIT_HASH
 RUN --mount=type=cache,target=/usr/src/labrinth/target \
   --mount=type=cache,target=/usr/local/cargo/git/db \
   --mount=type=cache,target=/usr/local/cargo/registry \
-  SQLX_OFFLINE=true cargo build --release --package labrinth
+  SQLX_OFFLINE=true cargo build --profile release-labrinth --package labrinth
 
 FROM build AS artifacts
 
