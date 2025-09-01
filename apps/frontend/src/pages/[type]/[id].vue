@@ -47,7 +47,6 @@
 				v-model:project="project"
 				v-model:project-v3="projectV3"
 				v-model:versions="versions"
-				v-model:featured-versions="featuredVersions"
 				v-model:members="members"
 				v-model:all-members="allMembers"
 				v-model:dependencies="dependencies"
@@ -913,7 +912,6 @@
 				<NuxtPage
 					v-model:project="project"
 					v-model:versions="versions"
-					v-model:featured-versions="featuredVersions"
 					v-model:members="members"
 					v-model:all-members="allMembers"
 					v-model:dependencies="dependencies"
@@ -1431,7 +1429,6 @@ let project,
 	allMembers,
 	resetMembers,
 	dependencies,
-	featuredVersions,
 	versions,
 	organization,
 	resetOrganization,
@@ -1439,7 +1436,6 @@ let project,
 	projectV3Error,
 	membersError,
 	dependenciesError,
-	featuredVersionsError,
 	versionsError
 try {
 	;[
@@ -1447,7 +1443,6 @@ try {
 		{ data: projectV3, error: projectV3Error, refresh: resetProjectV3 },
 		{ data: allMembers, error: membersError, refresh: resetMembers },
 		{ data: dependencies, error: dependenciesError },
-		{ data: featuredVersions, error: featuredVersionsError },
 		{ data: versions, error: versionsError },
 		{ data: organization, refresh: resetOrganization },
 	] = await Promise.all([
@@ -1487,9 +1482,6 @@ try {
 		useAsyncData(`project/${projectId.value}/dependencies`, () =>
 			useBaseFetch(`project/${projectId.value}/dependencies`, {}),
 		),
-		useAsyncData(`project/${projectId.value}/version?featured=true`, () =>
-			useBaseFetch(`project/${projectId.value}/version?featured=true`),
-		),
 		useAsyncData(`project/${projectId.value}/version`, () =>
 			useBaseFetch(`project/${projectId.value}/version`),
 		),
@@ -1501,7 +1493,6 @@ try {
 	await updateProjectRoute()
 
 	versions = shallowRef(toRaw(versions))
-	featuredVersions = shallowRef(toRaw(featuredVersions))
 } catch (err) {
 	throw createError({
 		fatal: true,
@@ -1551,7 +1542,6 @@ handleError(projectV2Error, true)
 handleError(projectV3Error)
 handleError(membersError)
 handleError(dependenciesError)
-handleError(featuredVersionsError)
 handleError(versionsError)
 
 if (!project.value) {
@@ -1633,21 +1623,6 @@ const hasEditDetailsPermission = computed(() => {
 })
 
 versions.value = data.$computeVersions(versions.value, allMembers.value)
-
-// Q: Why do this instead of computing the versions of featuredVersions?
-// A: It will incorrectly generate the version slugs because it doesn't have the full context of
-//    all the versions. For example, if version 1.1.0 for Forge is featured but 1.1.0 for Fabric
-//    is not, but the Fabric one was uploaded first, the Forge version would link to the Fabric
-///   version
-const featuredIds = featuredVersions.value.map((x) => x.id)
-featuredVersions.value = versions.value.filter((version) => featuredIds.includes(version.id))
-
-featuredVersions.value.sort((a, b) => {
-	const aLatest = a.game_versions[a.game_versions.length - 1]
-	const bLatest = b.game_versions[b.game_versions.length - 1]
-	const gameVersions = tags.value.gameVersions.map((e) => e.version)
-	return gameVersions.indexOf(aLatest) - gameVersions.indexOf(bLatest)
-})
 
 const projectTypeDisplay = computed(() =>
 	formatProjectType(
