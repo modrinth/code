@@ -1,0 +1,419 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "˙pǝlqɐuǝ ǝpoɯ ɹǝdolǝʌǝᗡ"
+  },
+  "app.settings.tabs.appearance": {
+    "message": "ǝɔuɐɹɐǝddⱯ"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "suoᴉʇdo ǝɔuɐʇsuᴉ ʇlnɐɟǝᗡ"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "sɓɐlɟ ǝɹnʇɐǝℲ"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "suoᴉʇɐllɐʇsuᴉ ɐʌɐſ"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "ʎɔɐʌᴉɹԀ"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "ʇuǝɯǝɓɐuɐɯ ǝɔɹnosǝᴚ"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "ʎɐld puɐ ppⱯ"
+  },
+  "instance.add-server.add-server": {
+    "message": "ɹǝʌɹǝs ppⱯ"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "pǝlqɐsᴉᗡ"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "pǝlqɐuƎ"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "ʇdɯoɹԀ"
+  },
+  "instance.add-server.title": {
+    "message": "ɹǝʌɹǝs ɐ ppⱯ"
+  },
+  "instance.edit-server.title": {
+    "message": "ɹǝʌɹǝs ʇᴉpƎ"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "ǝɓɐd ǝɯoH ǝɥʇ ɯoɹɟ ǝpᴉH"
+  },
+  "instance.edit-world.name": {
+    "message": "ǝɯɐN"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "plɹoM ʇɟɐɹɔǝuᴉW"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "uoɔᴉ ʇǝsǝᴚ"
+  },
+  "instance.edit-world.title": {
+    "message": "plɹoʍ ʇᴉpƎ"
+  },
+  "instance.filter.disabled": {
+    "message": "sʇɔǝſoɹd pǝlqɐsᴉᗡ"
+  },
+  "instance.filter.updates-available": {
+    "message": "ǝlqɐlᴉɐʌɐ sǝʇɐpd∩"
+  },
+  "instance.server-modal.address": {
+    "message": "ssǝɹppⱯ"
+  },
+  "instance.server-modal.name": {
+    "message": "ǝɯɐN"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "ɹǝʌɹǝS ʇɟɐɹɔǝuᴉW"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "ʞɔɐd ǝɔɹnosǝᴚ"
+  },
+  "instance.settings.tabs.general": {
+    "message": "lɐɹǝuǝ⅁"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "ǝɔuɐʇsuᴉ ǝʇǝlǝᗡ"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "ǝɔuɐʇsuᴉ ǝʇǝlǝᗡ"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "˙ʇᴉ ɹǝʌoɔǝɹ oʇ ʎɐʍ ou sᴉ ǝɹǝɥʇ ǝɔuɐʇsuᴉ ɐ ǝʇǝlǝp noʎ ǝɔuo sɐ ˋlnɟǝɹɐɔ ǝᗺ ˙ʇuǝʇuoɔ pǝllɐʇsuᴉ llɐ puɐ ˋsɓᴉɟuoɔ ˋsplɹoʍ ɹnoʎ ɓuᴉpnlɔuᴉ ˋǝɔᴉʌǝp ɹnoʎ ɯoɹɟ ǝɔuɐʇsuᴉ uɐ sǝʇǝlǝp ʎlʇuǝuɐɯɹǝԀ"
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "˙˙˙ɓuᴉʇǝlǝᗡ"
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "ǝʇɐɔᴉldnᗡ"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "˙ɓuᴉllɐʇsuᴉ ǝlᴉɥʍ ǝʇɐɔᴉldnp ʇouuɐƆ"
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "ǝɔuɐʇsuᴉ ǝʇɐɔᴉldnᗡ"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "˙ɔʇǝ ˋspoɯ ˋsɓᴉɟuoɔ ˋsplɹoʍ ɓuᴉpnlɔuᴉ ˋǝɔuɐʇsuᴉ sᴉɥʇ ɟo ʎdoɔ ɐ sǝʇɐǝɹƆ"
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "uoɔᴉ ʇᴉpƎ"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "uoɔᴉ ǝʌoɯǝᴚ"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "uoɔᴉ ǝɔɐldǝᴚ"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "uoɔᴉ ʇɔǝlǝS"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "Sǝlǝɔʇ ᴉɔon"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "dnoɹɓ ʍǝu ǝʇɐǝɹƆ"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "˙ʎɹɐɹqᴉl ɹnoʎ uᴉ suoᴉʇɔǝs ʇuǝɹǝɟɟᴉp oʇuᴉ sǝɔuɐʇsuᴉ ɹnoʎ ǝzᴉuɐɓɹo oʇ noʎ ʍollɐ sdnoɹɓ ʎɹɐɹqᴉꞀ"
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "ǝɯɐu dnoɹɓ ɹǝʇuƎ"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "ǝɯɐN"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "sʞooɥ ɥɔunɐꞀ"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "sʞooɥ ɥɔunɐl ɯoʇsnƆ"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "˙ǝɯɐɓ ǝɥʇ ɓuᴉɥɔunɐl ɹǝʇɟɐ puɐ ǝɹoɟǝq spuɐɯɯoɔ ɯǝʇsʎs uᴉɐʇɹǝɔ unɹ oʇ sɹǝsn pǝɔuɐʌpɐ ʍollɐ sʞooH"
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "ʇᴉxǝ-ʇsoԀ"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "˙sǝsolɔ ǝɯɐɓ ǝɥʇ ɹǝʇɟɐ uɐᴚ"
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "˙˙˙puɐɯɯoɔ ʇᴉxǝ-ʇsod ɹǝʇuƎ"
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "ɥɔunɐl-ǝɹԀ"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "˙pǝɥɔunɐl sᴉ ǝɔuɐʇsuᴉ ǝɥʇ ǝɹoɟǝq uɐᴚ"
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "˙˙˙puɐɯɯoɔ ɥɔunɐl-ǝɹd ɹǝʇuƎ"
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "sʞooɥ ɥɔunɐl ǝɯɐ⅁"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "ɹǝddɐɹM"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "˙ʇɟɐɹɔǝuᴉW ɓuᴉɥɔunɐl ɹoɟ puɐɯɯoɔ ɹǝddɐɹM"
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "˙˙˙puɐɯɯoɔ ɹǝddɐɹʍ ɹǝʇuƎ"
+  },
+  "instance.settings.tabs.installation": {
+    "message": "uoᴉʇɐllɐʇsuI"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "pǝllɐʇsuᴉ ʎpɐǝɹlɐ {game_version} ʇɟɐɹɔǝuᴉW ɹoɟ {version} {platform}"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "pǝllɐʇsuᴉ ʎpɐǝɹlɐ {game_version} ɐllᴉuɐΛ"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "uoᴉsɹǝʌ ǝɓuɐɥƆ"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "llɐʇsuI"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "ɓuᴉllɐʇsuI"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "suoᴉsɹǝʌ ʞɔɐdpoɯ ɓuᴉɥɔʇǝℲ"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "uoᴉsɹǝʌ ʍǝu ɓuᴉllɐʇsuI"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "pǝllɐʇsuᴉ ʎlʇuǝɹɹnƆ"
+  },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": ":uoᴉʇɐɯɹoɟuᴉ ɓnqǝᗡ"
+  },
+  "instance.settings.tabs.installation.fetching-modpack-details": {
+    "message": "slᴉɐʇǝp ʞɔɐdpoɯ ɓuᴉɥɔʇǝℲ"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "uoᴉsɹǝʌ ǝɯɐ⅁"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "llɐʇsuI"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "ssǝɹɓoɹd uᴉ uoᴉʇɐllɐʇsuI"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "uoᴉsɹǝʌ {loader}"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "{version} ʇɟɐɹɔǝuᴉW"
+  },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "˙uoᴉʇɔǝuuoɔ ʇǝuɹǝʇuᴉ ɹnoʎ ʞɔǝɥɔ ǝsɐǝlԀ ˙slᴉɐʇǝp ʞɔɐdpoɯ pǝʞuᴉl ɥɔʇǝɟ ʇouuɐƆ"
+  },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "˙ɹǝpɐol poɯ ɹǝɥʇouɐ ʎɹ⟘ ˙{version} ʇɟɐɹɔǝuᴉW ɹoɟ ǝlqɐlᴉɐʌɐ ʇou sᴉ {loader}"
+  },
+  "instance.settings.tabs.installation.no-modpack-found": {
+    "message": "˙ɥʇuᴉɹpoW uo punoɟ ǝq ʇou plnoɔ ʞɔɐdpoɯ ǝɥʇ ʇnq ˋʞɔɐdpoɯ ɐ oʇ pǝʞuᴉl sᴉ ǝɔuɐʇsuᴉ sᴉɥ⟘"
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "ɯɹoɟʇɐlԀ"
+  },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "ʞɔɐdpoɯ llɐʇsuᴉǝᴚ"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "ʞɔɐdpoɯ ɓuᴉllɐʇsuᴉǝᴚ"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "˙splɹoʍ ɓuᴉʇsᴉxǝ ʞɐǝɹq ʎɐɯ ʇᴉ ˋʇuǝʇuoɔ pǝllɐʇsuᴉ lɐuoᴉʇᴉppɐ uo puǝdǝp ʍou splɹoʍ ɹnoʎ ɟᴉ ʇnq ˋǝɔuɐʇsuᴉ ǝɥʇ oʇ ǝpɐɯ uǝǝq ǝʌɐɥ sǝɓuɐɥɔ ɟᴉ ɹoᴉʌɐɥǝq pǝʇɔǝdxǝun xᴉɟ ʎɐɯ sᴉɥ⟘ ˙uoᴉʇɐllɐʇsuᴉ lɐuᴉɓᴉɹo ǝɥʇ ɟo doʇ uo pǝppɐ ǝʌɐɥ noʎ ʇuǝʇuoɔ ɹo spoɯ ʎuɐ ɓuᴉʌoɯǝɹ ˋʞɔɐdpoɯ ǝɥʇ ʎq pǝpᴉʌoɹd sᴉ ʇɐɥʍ oʇ ʇuǝʇuoɔ pǝᴉɟᴉpoɯ ɹo pǝllɐʇsuᴉ llɐ ʇǝsǝɹ llᴉʍ ɓuᴉllɐʇsuᴉǝᴚ"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "¿ǝɔuɐʇsuᴉ sᴉɥʇ llɐʇsuᴉǝɹ oʇ ʇuɐʍ noʎ ǝɹns noʎ ǝɹⱯ"
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "˙ʞɔɐdpoɯ lɐuᴉɓᴉɹo ǝɥʇ ɟo doʇ uo pǝppɐ ǝʌɐɥ noʎ ʇuǝʇuoɔ ɹo spoɯ ʎuɐ ɓuᴉʌoɯǝɹ ˋǝʇɐʇs lɐuᴉɓᴉɹo sʇᴉ oʇ ʇuǝʇuoɔ s,ǝɔuɐʇsuᴉ ǝɥʇ sʇǝsǝᴚ"
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "ʞɔɐdpoɯ llɐʇsuᴉǝᴚ"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "ɹᴉɐdǝᴚ"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "ɓuᴉɹᴉɐdǝᴚ"
+  },
+  "instance.settings.tabs.installation.repair.confirm.description": {
+    "message": "˙spoɯ pǝllɐʇsuᴉ oʇ pǝʇɐlǝɹ sǝɥsɐɹɔ ɹo sǝnssᴉ ǝʌlosǝɹ ʇou llᴉʍ ʇnq ˋsɹoɹɹǝ pǝʇɐlǝɹ-ɹǝɥɔunɐl oʇ ǝnp ɓuᴉɥɔunɐl ʇou sᴉ ǝɯɐɓ ɹnoʎ ɟᴉ sǝnssᴉ ǝʌlosǝɹ ʎɐɯ sᴉɥ⟘ ˙uoᴉʇdnɹɹoɔ ɹoɟ sʞɔǝɥɔ puɐ sǝᴉɔuǝpuǝdǝp ʇɟɐɹɔǝuᴉW sllɐʇsuᴉǝɹ ɓuᴉɹᴉɐdǝᴚ"
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "¿ǝɔuɐʇsuᴉ ɹᴉɐdǝᴚ"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "ssǝɹɓoɹd uᴉ ɹᴉɐdǝᴚ"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "ʇuǝɹɹnɔ oʇ ʇǝsǝᴚ"
+  },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "suoᴉsɹǝʌ llɐ ʍoɥS"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "uoᴉsɹǝʌ ǝɓuɐɥɔ"
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "llɐʇsuᴉ"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "llɐʇsuᴉǝɹ"
+  },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "ɹᴉɐdǝɹ"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "ɓuᴉllɐʇsuᴉ ǝlᴉɥʍ {action} ʇouuɐƆ"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "ǝuᴉlɟɟo ǝlᴉɥʍ {action} ʇouuɐƆ"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "ɓuᴉɹᴉɐdǝɹ ǝlᴉɥʍ {action} ʇouuɐƆ"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(uoᴉsɹǝʌ uʍouʞun)"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "ǝɔuɐʇsuᴉ ʞuᴉlu∩"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": "˙lɐɯɹou ɐ ǝɯoɔǝq llᴉʍ ʇᴉ puɐ sǝʇɐpdn ʞɔɐdpoɯ ǝʌᴉǝɔǝɹ ɹǝɓuol ou llᴉʍ no⅄ ˙ǝɔuɐʇsuᴉ ʍǝu ʎlǝɹᴉʇuǝ uɐ ɓuᴉʇɐǝɹɔ ʇnoɥʇᴉʍ ʇᴉ ʞuᴉl-ǝɹ oʇ ǝlqɐ ǝq ʇou llᴉʍ noʎ ˋpǝǝɔoɹd noʎ ɟI"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.title": {
+    "message": "¿ǝɔuɐʇsuᴉ sᴉɥʇ ʞuᴉlun oʇ ʇuɐʍ noʎ ǝɹns noʎ ǝɹⱯ"
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "˙ʞɔɐdpoɯ ǝɥʇ ɯoɹɟ ǝɔuɐʇsuᴉ sᴉɥʇ ʇɔǝuuoɔsᴉp ʎlʇuǝuɐɯɹǝd llᴉʍ ɓuᴉʞuᴉlu∩ ˙uoᴉsɹǝʌ ʇɟɐɹɔǝuᴉW ɹo ɹǝpɐol poɯ ǝɥʇ ǝɓuɐɥɔ ʇ,uɐɔ noʎ puɐ pǝʇɐpdn ǝq ʇ,uɐɔ spoɯ suɐǝɯ ɥɔᴉɥʍ ˋʞɔɐdpoɯ ɐ oʇ pǝʞuᴉl sᴉ ǝɔuɐʇsuᴉ sᴉɥ⟘"
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "ʞɔɐdpoɯ ɯoɹɟ ʞuᴉlu∩"
+  },
+  "instance.settings.tabs.java": {
+    "message": "ʎɹoɯǝɯ puɐ ɐʌɐſ"
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "sǝlqɐᴉɹɐʌ ʇuǝɯuoɹᴉʌuƎ"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "sʞooH"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "sʇuǝɯnɓɹɐ ɐʌɐſ"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "uoᴉʇɐllɐʇsuᴉ ɐʌɐſ"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "pǝʇɐɔollɐ ʎɹoɯǝW"
+  },
+  "instance.settings.tabs.window": {
+    "message": "ʍopuᴉM"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "sɓuᴉʇʇǝs ʍopuᴉʍ ɯoʇsnƆ"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "uǝǝɹɔsllnℲ"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "˙(ʇxʇ˙suoᴉʇdo ɓuᴉsn) pǝɥɔunɐl uǝɥʍ uǝǝɹɔs llnɟ uᴉ ʇɹɐʇs ǝɯɐɓ ǝɥʇ ǝʞɐW"
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "ʇɥɓᴉǝH"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "˙pǝɥɔunɐl uǝɥʍ ʍopuᴉʍ ǝɯɐɓ ǝɥʇ ɟo ʇɥɓᴉǝɥ ǝɥ⟘"
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "˙˙˙ʇɥɓᴉǝɥ ɹǝʇuƎ"
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "ɥʇpᴉM"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "˙pǝɥɔunɐl uǝɥʍ ʍopuᴉʍ ǝɯɐɓ ǝɥʇ ɟo ɥʇpᴉʍ ǝɥ⟘"
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "˙˙˙ɥʇpᴉʍ ɹǝʇuƎ"
+  },
+  "instance.settings.title": {
+    "message": "sɓuᴉʇʇǝS"
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "ɹǝʌɹǝS ʇɟɐɹɔǝuᴉW Ɐ"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "ɹǝʌɹǝs oʇ ʇɔǝuuoɔ ʇ,uɐƆ"
+  },
+  "instance.worlds.copy_address": {
+    "message": "ssǝɹppɐ ʎdoƆ"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "ǝɯoH uo ʍoɥs ʇ,uoᗡ"
+  },
+  "instance.worlds.filter.available": {
+    "message": "ǝlqɐlᴉɐʌⱯ"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "uǝdo ʎpɐǝɹlɐ sᴉ ǝɔuɐʇsuI"
+  },
+  "instance.worlds.hardcore": {
+    "message": "ǝpoɯ ǝɹoɔpɹɐH"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "ǝlqᴉʇɐdɯoɔuᴉ sᴉ ɹǝʌɹǝS"
+  },
+  "instance.worlds.no_contact": {
+    "message": "pǝʇɔɐʇuoɔ ǝq ʇ,uplnoɔ ɹǝʌɹǝS"
+  },
+  "instance.worlds.no_server_quick_play": {
+    "message": "+૨˙0˙⇂ ɐɥdlⱯ ʇɟɐɹɔǝuᴉW uo sɹǝʌɹǝs oʇuᴉ ʇɥɓᴉɐɹʇs dɯnſ ʎluo uɐɔ no⅄"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "+0ᘕ˙⇂ ʇɟɐɹɔǝuᴉW uo splɹoʍ ɹǝʎɐldǝlɓuᴉs oʇuᴉ ʇɥɓᴉɐɹʇs dɯnſ ʎluo uɐɔ no⅄"
+  },
+  "instance.worlds.play_instance": {
+    "message": "ǝɔuɐʇsuᴉ ʎɐlԀ"
+  },
+  "instance.worlds.type.server": {
+    "message": "ɹǝʌɹǝS"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "ɹǝʎɐldǝlɓuᴉS"
+  },
+  "instance.worlds.view_instance": {
+    "message": "ǝɔuɐʇsuᴉ ʍǝᴉΛ"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "ǝsn uᴉ sᴉ plɹoM"
+  },
+  "search.filter.locked.instance": {
+    "message": "ǝɔuɐʇsuᴉ ǝɥʇ ʎq pǝpᴉʌoɹԀ"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "ǝɔuɐʇsuᴉ ǝɥʇ ʎq pǝpᴉʌoɹd sᴉ uoᴉsɹǝʌ ǝɯɐ⅁"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "ǝɔuɐʇsuᴉ ǝɥʇ ʎq pǝpᴉʌoɹd sᴉ ɹǝpɐoꞀ"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "ǝɔuɐʇsuᴉ ɥʇᴉʍ ɔuʎS"
+  }
+}

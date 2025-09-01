@@ -1,0 +1,30 @@
+{
+  "nags.add-description.title": {
+    "defaultMessage": "Añadir una descripción"
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "Añadir un icono"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "Editar descripción"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "Editar licencia"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "Editar resumen"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "Editar etiquetas"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "Editar título"
+  },
+  "nags.select-license.title": {
+    "defaultMessage": "Seleccionar una licencia"
+  },
+  "nags.select-tags.title": {
+    "defaultMessage": "Seleccionar etiquetas"
+  }
+}
+

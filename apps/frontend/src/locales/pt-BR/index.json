@@ -1,0 +1,509 @@
+{
+  "admin.billing.error.not-found": {
+    "message": "Usuário não encontrado"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "Autorizar"
+  },
+  "auth.authorize.action.decline": {
+    "message": "Negar"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> por <creator-link>{create}</creator-link> vai poder:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "Autorizar {appName}"
+  },
+  "auth.authorize.error.no-redirect-url": {
+    "message": "Nenhum redirecionamento encontrado na resposta"
+  },
+  "auth.authorize.redirect-url": {
+    "message": "Você vai ser redirecionado para <redirect-url>{url}</redirect-url>"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "Enviar email de recuperação"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "Insira seu email abaixo e enviaremos um link de recuperação para que você recupere sua conta"
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "Email ou nome de usuário"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "Email"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "Um email com instruções foi enviado para você se o email foi salvo anteriormente em sua conta"
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "Email enviado"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "Agora você pode se conectar com sua nova senha"
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "Sua senha foi redefinida com sucesso"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "Redefenir senha"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "Confirmar senha"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "Entre com sua nova senha para ter acesso a sua conta."
+  },
+  "auth.reset-password.title": {
+    "message": "Redefinir senha"
+  },
+  "auth.reset-password.title.long": {
+    "message": "Redefina sua senha"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "Por favor insira seu código de dois fatores para continuar"
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "Insira o código de dois fatores"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "Digite o código..."
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-link>Esqueceu sua senha?</forgot-password-link> • <create-account-link>Criar uma conta</create-account-link>"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "Email ou nome de usuário"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Senha"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Entrar com"
+  },
+  "auth.sign-in.title": {
+    "message": "Entrar"
+  },
+  "auth.sign-in.use-password": {
+    "message": "Ou use a senha"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Criar conta"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "Confirmar senha"
+  },
+  "auth.sign-up.email.label": {
+    "message": "Email"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Nome de usuário"
+  },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "Ao criar uma conta você concorda com os <terms-link>Termos</terms-link> e <privacy-policy-link>Política de Privacidade</privacy-policy-link>."
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "As senhas não estão iguais!"
+  },
+  "auth.sign-up.password.label": {
+    "message": "Senha"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "Já possui uma conta?"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "Se inscreva para receber atualizações sobre Modrinth"
+  },
+  "auth.sign-up.title": {
+    "message": "Entrar"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "Ou crie uma conta você mesmo"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Entrar com"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Configuração da conta"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Entrar"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "Seu email já está verificado!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "Email já verificado"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "Reenviar verificação de email"
+  },
+  "auth.verify-email.failed-verification.description.logged-in": {
+    "message": "Não estamos conseguindo verificar seu email, tente reenviar o email apertando o botão abaixo."
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "Verificação de email falhou"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "Seu email foi verificado com sucesso!"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "Verificação de E-mail"
+  },
+  "auth.verify-email.title": {
+    "message": "Verificar email"
+  },
+  "auth.welcome.checkbox.subscribe": {
+    "message": "Inscreva-se para receber atualizações sobre Modrinth"
+  },
+  "auth.welcome.description": {
+    "message": "Você agora faz parte da comunidade incrível"
+  },
+  "auth.welcome.long-title": {
+    "message": "Bem-vindo ao Modrinth!"
+  },
+  "auth.welcome.title": {
+    "message": "Bem-vindo"
+  },
+  "collection.delete-modal.description": {
+    "message": "Isso irá deletar esta coleção para sempre. Essa ação não pode ser desfeita."
+  },
+  "collection.delete-modal.title": {
+    "message": "Você tem certeza de que deseja excluir esta coleção?"
+  },
+  "collection.error.not-found": {
+    "message": "Coleção não encontrada"
+  },
+  "collection.label.collection": {
+    "message": "Coleção"
+  },
+  "collection.label.created-at": {
+    "message": "Criado em {ago}"
+  },
+  "collection.label.no-projects": {
+    "message": "Esta coleção não tem projetos!"
+  },
+  "collection.label.owner": {
+    "message": "Dono"
+  },
+  "collection.label.updated-at": {
+    "message": "Atualizado em {ago}"
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "Criar nova"
+  },
+  "dashboard.collections.label.search-input": {
+    "message": "Pesquisar nas suas coleções"
+  },
+  "dashboard.collections.long-title": {
+    "message": "Suas coleções"
+  },
+  "error.collection.404.list_title": {
+    "message": "Por que?"
+  },
+  "error.collection.404.title": {
+    "message": "Coleção não encontrada"
+  },
+  "error.generic.404.subtitle": {
+    "message": "Parece que a página que você estava procurando não existe."
+  },
+  "error.generic.404.title": {
+    "message": "Página não encontrada"
+  },
+  "error.generic.default.list_item.1": {
+    "message": "Veja se o Modrinth caiu em nossa <status-link>página de status</status-link>"
+  },
+  "error.generic.default.list_item.2": {
+    "message": "Se isso continuar, avise a equipe do Modrinth entrando no nosso <discord-link>servidor do Discord</discord-link>."
+  },
+  "error.generic.default.list_title": {
+    "message": "Por favor tente novamente em alguns minutos."
+  },
+  "error.generic.default.subtitle": {
+    "message": "Algo deu errado."
+  },
+  "error.generic.default.title": {
+    "message": "Eita!"
+  },
+  "error.project.404.title": {
+    "message": "Projeto não encontrado"
+  },
+  "error.user.404.title": {
+    "message": "Usuário não encontrado"
+  },
+  "frog.sinceOpened": {
+    "message": "Essa página foi aberta há {ago}"
+  },
+  "frog.title": {
+    "message": "Sapo"
+  },
+  "layout.action.change-theme": {
+    "message": "Mudar tema"
+  },
+  "layout.avatar.alt": {
+    "message": "Seu avatar"
+  },
+  "layout.footer.about": {
+    "message": "Sobre"
+  },
+  "layout.footer.about.changelog": {
+    "message": "Mudanças"
+  },
+  "layout.footer.legal.privacy-policy": {
+    "message": "Política de privacidade"
+  },
+  "layout.footer.products": {
+    "message": "Produtos"
+  },
+  "layout.footer.products.app": {
+    "message": "Modrinth App"
+  },
+  "layout.footer.products.plus": {
+    "message": "Modrinth+"
+  },
+  "layout.footer.resources": {
+    "message": "Recursos"
+  },
+  "layout.footer.resources.help-center": {
+    "message": "Centro de ajuda"
+  },
+  "layout.footer.resources.report-issues": {
+    "message": "Reportar problemas"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluesky"
+  },
+  "layout.footer.social.discord": {
+    "message": "Discord"
+  },
+  "layout.footer.social.github": {
+    "message": "GitHub"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "Mastodon"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
+  },
+  "layout.nav.home": {
+    "message": "Início"
+  },
+  "layout.nav.search": {
+    "message": "Pesquisar"
+  },
+  "moderation.page.projects": {
+    "message": "Projetos"
+  },
+  "moderation.search.placeholder": {
+    "message": "Pesquisar..."
+  },
+  "moderation.sort.by": {
+    "message": "Ordenar por"
+  },
+  "profile.button.manage-projects": {
+    "message": "Gerenciar projetos"
+  },
+  "profile.error.not-found": {
+    "message": "Usuário não encontrado"
+  },
+  "profile.label.details": {
+    "message": "Detalhes"
+  },
+  "profile.label.no-collections": {
+    "message": "Este usuário não possui coleções!"
+  },
+  "profile.label.no-collections-auth": {
+    "message": "Você não tem nenhuma coleção.\nQue tal <create-link>criar uma</create-link>?"
+  },
+  "profile.label.no-projects-auth": {
+    "message": "Você não tem nenhum projeto.\nGostaria de <create-link>criar um</create-link>?"
+  },
+  "profile.label.organizations": {
+    "message": "Organizações"
+  },
+  "profile.meta.description": {
+    "message": "Baixe os projetos de {username} no Modrinth"
+  },
+  "profile.meta.description-with-bio": {
+    "message": "{bio} — Baixe os projetos de {username} no Modrinth"
+  },
+  "profile.user-id": {
+    "message": "ID de usuário: {id}"
+  },
+  "project-member-header.accept": {
+    "message": "Aceitar"
+  },
+  "project-member-header.error": {
+    "message": "Erro"
+  },
+  "project-type.mod.plural": {
+    "message": "Mods"
+  },
+  "project-type.mod.singular": {
+    "message": "Mod"
+  },
+  "project-type.modpack.plural": {
+    "message": "Modpacks"
+  },
+  "project-type.modpack.singular": {
+    "message": "Modpack"
+  },
+  "project.about.details.created": {
+    "message": "Criado em {date}"
+  },
+  "project.about.details.updated": {
+    "message": "Atualizado em {date}"
+  },
+  "project.description.title": {
+    "message": "Descrição"
+  },
+  "project.gallery.title": {
+    "message": "Galeria"
+  },
+  "project.moderation.title": {
+    "message": "Moderação"
+  },
+  "project.versions.title": {
+    "message": "Versões"
+  },
+  "scopes.organizationCreate.description": {
+    "message": "Criar organizações"
+  },
+  "scopes.organizationCreate.label": {
+    "message": "Criar organizações"
+  },
+  "scopes.organizationDelete.description": {
+    "message": "Excluir organizações"
+  },
+  "scopes.organizationDelete.label": {
+    "message": "Excluir organizações"
+  },
+  "servers.backups.item.rename": {
+    "message": "Renomear"
+  },
+  "servers.backups.item.restore": {
+    "message": "Restaurar"
+  },
+  "servers.notice.expires": {
+    "message": "Expira em"
+  },
+  "servers.notice.id": {
+    "message": "ID"
+  },
+  "servers.notice.level": {
+    "message": "Nível"
+  },
+  "settings.billing.payment_method.primary": {
+    "message": "Primário"
+  },
+  "settings.billing.payment_method.title": {
+    "message": "Métodos de pagamento"
+  },
+  "settings.billing.payment_method_type.amazon_pay": {
+    "message": "Amazon Pay"
+  },
+  "settings.billing.payment_method_type.amex": {
+    "message": "American Express"
+  },
+  "settings.billing.payment_method_type.cashapp": {
+    "message": "Cash App"
+  },
+  "settings.billing.payment_method_type.diners": {
+    "message": "Diners Club"
+  },
+  "settings.billing.payment_method_type.discover": {
+    "message": "Discover"
+  },
+  "settings.billing.payment_method_type.eftpos": {
+    "message": "EFTPOS"
+  },
+  "settings.billing.payment_method_type.jcb": {
+    "message": "JCB"
+  },
+  "settings.billing.payment_method_type.mastercard": {
+    "message": "MasterCard"
+  },
+  "settings.billing.payment_method_type.paypal": {
+    "message": "PayPal"
+  },
+  "settings.billing.payment_method_type.unionpay": {
+    "message": "UnionPay"
+  },
+  "settings.billing.payment_method_type.unknown": {
+    "message": "Metódo de pagamento desconhecido"
+  },
+  "settings.billing.payment_method_type.visa": {
+    "message": "Visa"
+  },
+  "settings.display.flags.title": {
+    "message": "Alternar recursos"
+  },
+  "settings.display.sidebar.advanced-rendering.title": {
+    "message": "Renderização Avançada"
+  },
+  "settings.language.categories.auto": {
+    "message": "Automático"
+  },
+  "settings.language.categories.default": {
+    "message": "Idiomas padrões"
+  },
+  "settings.language.languages.load-failed": {
+    "message": "Não foi possível carregar este idioma. Tente novamente mais tarde."
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "message": "Buscar um idioma..."
+  },
+  "settings.pats.modal.create.name.label": {
+    "message": "Nome"
+  },
+  "settings.pats.token.action.edit": {
+    "message": "Editar token"
+  },
+  "settings.pats.token.action.revoke": {
+    "message": "Revogar token"
+  },
+  "settings.pats.token.expired-ago": {
+    "message": "Expirou {ago}"
+  },
+  "settings.pats.token.never-used": {
+    "message": "Nunca usado"
+  },
+  "settings.profile.bio.title": {
+    "message": "Bio"
+  },
+  "settings.profile.description": {
+    "message": "As informações do seu perfil são visíveis publicamente no Modrinth e por meio da <docs-link>Modrinth API</docs-link>."
+  },
+  "settings.profile.profile-info": {
+    "message": "Informação do perfil"
+  },
+  "settings.profile.profile-picture.reset": {
+    "message": "Redefinir"
+  },
+  "settings.profile.profile-picture.title": {
+    "message": "Foto de perfil"
+  },
+  "settings.profile.username.description": {
+    "message": "Um nome único sem distinção de maiúsculas de minúsculas para identificar o seu perfil."
+  },
+  "settings.profile.username.title": {
+    "message": "Nome de usuário"
+  },
+  "settings.sessions.action.revoke-session": {
+    "message": "Revogar sessão"
+  },
+  "settings.sessions.created-ago": {
+    "message": "Criado em {ago}"
+  },
+  "settings.sessions.current-session": {
+    "message": "Sessão atual"
+  },
+  "settings.sessions.description": {
+    "message": "Aqui estão todos os dispositivos que estão logados em sua conta Modrinth no momento. Você pode sair de cada um individualmente.\n\nSe você não reconhece algo nesta lista, revogue a sessão e mude a senha da sua conta Modrinth imediatamente."
+  },
+  "settings.sessions.last-accessed-ago": {
+    "message": "Último acesso {ago}"
+  },
+  "settings.sessions.unknown-platform": {
+    "message": "Plataforma desconhecida"
+  }
+}

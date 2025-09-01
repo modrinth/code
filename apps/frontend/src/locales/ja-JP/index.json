@@ -1,0 +1,419 @@
+{
+  "admin.billing.error.not-found": {
+    "message": "ユーザーが見つかりませんでした"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "認証"
+  },
+  "auth.authorize.action.decline": {
+    "message": "拒否"
+  },
+  "auth.authorize.app-info": {
+    "message": "<creator-link>{creator}</creator-link> による <strong>{appName}</strong> は以下のことができるようになります："
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "{appName} を承認する"
+  },
+  "auth.authorize.error.no-redirect-url": {
+    "message": "応答にリダイレクト先が見つかりません"
+  },
+  "auth.authorize.redirect-url": {
+    "message": "<redirect-url>{url}</redirect-url> に自動的に転送されます"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "再設定用メールを送信"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "以下にメールアドレスを入力してください。再設定のためのメールを送信します。"
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "メールアドレスまたはユーザー名"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "メールアドレス"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "アカウントに登録されていたメールアドレス宛に、手順を記載したメールを送信しました。"
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "メールを送信しました"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "新しく設定されたパスワードでアカウントにログインできるようになりました。"
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "パスワードの再設定に成功しました"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "パスワードを再設定する"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "パスワード（確認のためもう一度入力）"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "アカウントにアクセスできるようにするため、新たに設定したいパスワードを入力してください。"
+  },
+  "auth.reset-password.title": {
+    "message": "パスワードを再設定する"
+  },
+  "auth.reset-password.title.long": {
+    "message": "パスワードを再設定する"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "続行するには二要素認証コードを入力してください。"
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "二要素認証コードを入力"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "コードを入力..."
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-link>パスワードをお忘れですか?</forgot-password-link> • <create-account-link>アカウントを作成する</create-account-link>"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "メールアドレスまたはユーザー名"
+  },
+  "auth.sign-in.password.label": {
+    "message": "パスワード"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "外部アカウントでログイン"
+  },
+  "auth.sign-in.title": {
+    "message": "ログイン"
+  },
+  "auth.sign-in.use-password": {
+    "message": "パスワードでログイン"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "アカウントを作成"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "パスワード（確認のためもう一度入力）"
+  },
+  "auth.sign-up.email.label": {
+    "message": "メールアドレス"
+  },
+  "auth.sign-up.label.username": {
+    "message": "ユーザー名"
+  },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "アカウントを作成すると、Modrinthの <terms-link>利用規約</terms-link> および <privacy-policy-link>プライバシーポリシー</privacy-policy-link>に同意したものとみなされます。"
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "パスワードが一致しません！"
+  },
+  "auth.sign-up.password.label": {
+    "message": "パスワード"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "すでにアカウントをお持ちですか?"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "Modrinthのアップデートを受け取る"
+  },
+  "auth.sign-up.title": {
+    "message": "アカウント作成"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "メールアドレスで作成"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "外部アカウントで作成"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "アカウント設定"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "ログイン"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "確認済みのメールアドレス！"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "確認済みのメールアドレス"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "確認メールを再送信する"
+  },
+  "auth.verify-email.failed-verification.description": {
+    "message": "メールアドレスを確認できませんでした。ログインして、ダッシュボードから確認メールを再送信してください。"
+  },
+  "auth.verify-email.failed-verification.description.logged-in": {
+    "message": "メールアドレスを確認できませんでした。ログインして、ダッシュボードから確認メールを再送信してください。"
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "メールアドレスの確認に失敗しました"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "メールアドレスが正常に確認されました！"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "メールアドレスの確認完了"
+  },
+  "auth.verify-email.title": {
+    "message": "メールアドレスを確認"
+  },
+  "auth.welcome.checkbox.subscribe": {
+    "message": "Modrinthのアップデートを受け取る"
+  },
+  "auth.welcome.description": {
+    "message": "あなたは今、素晴らしい Mod を構築、ダウンロードし、最新情報を入手している素晴らしいクリエイターと探検家のコミュニティの一員です。"
+  },
+  "auth.welcome.label.tos": {
+    "message": "アカウントを作成すると、Modrinthの <terms-link>利用規約</terms-link> および <privacy-policy-link>プライバシーポリシー</privacy-policy-link>に同意したものとみなされます。"
+  },
+  "auth.welcome.long-title": {
+    "message": "Modrinthへようこそ！"
+  },
+  "auth.welcome.title": {
+    "message": "ようこそ"
+  },
+  "collection.button.delete-icon": {
+    "message": "アイコンを削除"
+  },
+  "collection.button.edit-icon": {
+    "message": "アイコンを編集"
+  },
+  "collection.button.remove-project": {
+    "message": "プロジェクトを削除"
+  },
+  "collection.button.unfollow-project": {
+    "message": "フォロー解除"
+  },
+  "collection.delete-modal.description": {
+    "message": "このコレクションは永久に削除されます。この操作は元に戻せません。"
+  },
+  "collection.delete-modal.title": {
+    "message": "本当にこのコレクションを削除しますか？"
+  },
+  "collection.description": {
+    "message": "{description} - Modrinth の {username} によるコレクション {name} を表示します"
+  },
+  "collection.description.following": {
+    "message": "あなたがフォローしているプロジェクトがすべて含まれた自動生成のコレクションです。"
+  },
+  "collection.error.not-found": {
+    "message": "コレクションが見つかりません"
+  },
+  "collection.label.collection": {
+    "message": "コレクション"
+  },
+  "collection.label.created-at": {
+    "message": "{ago} に作成"
+  },
+  "collection.label.curated-by": {
+    "message": "作成者"
+  },
+  "collection.label.no-projects": {
+    "message": "このコレクションにはプロジェクトがありません！"
+  },
+  "collection.label.no-projects-auth": {
+    "message": "プロジェクトがありません\nプロジェクトを<create-link>作成しますか</create-link>？"
+  },
+  "collection.label.owner": {
+    "message": "オーナー"
+  },
+  "collection.label.projects-count": {
+    "message": "{count, plural, other {<stat>{count}</stat> プロジェクト}}"
+  },
+  "collection.label.updated-at": {
+    "message": "{ago} に更新"
+  },
+  "collection.title": {
+    "message": "{name} - コレクション"
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "新規作成"
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count, plural, other {{count} プロジェクト}}"
+  },
+  "dashboard.collections.label.search-input": {
+    "message": "コレクションを検索"
+  },
+  "dashboard.collections.long-title": {
+    "message": "コレクション"
+  },
+  "error.collection.404.list_item.1": {
+    "message": "コレクションの URL を誤って入力した可能性があります。"
+  },
+  "error.collection.404.list_title": {
+    "message": "なぜ？"
+  },
+  "error.collection.404.title": {
+    "message": "コレクションが見つかりません"
+  },
+  "error.generic.404.title": {
+    "message": "ページが見つかりません"
+  },
+  "error.generic.default.title": {
+    "message": "おっと！"
+  },
+  "error.organization.404.list_item.1": {
+    "message": "組織の URL を誤って入力した可能性があります。"
+  },
+  "error.organization.404.list_title": {
+    "message": "なぜ？"
+  },
+  "error.project.404.list_item.1": {
+    "message": "プロジェクトのURLを誤って入力した可能性があります。"
+  },
+  "error.project.404.list_title": {
+    "message": "なぜ？"
+  },
+  "error.project.404.title": {
+    "message": "プロジェクトが見つかりません"
+  },
+  "error.user.404.list_title": {
+    "message": "なぜ？"
+  },
+  "error.user.404.title": {
+    "message": "ユーザーが見つかりませんでした"
+  },
+  "frog": {
+    "message": "カエルにされてしまった！ 🐸"
+  },
+  "frog.altText": {
+    "message": "カエルの迷宮の写実的な絵画"
+  },
+  "frog.froggedPeople": {
+    "message": "これまでに {count, plural, other {{count} 人}}がカエルにされました！"
+  },
+  "frog.sinceOpened": {
+    "message": "このページは{ago}に開かれました"
+  },
+  "frog.title": {
+    "message": "蛙"
+  },
+  "layout.action.change-theme": {
+    "message": "テーマを変える"
+  },
+  "layout.action.get-modrinth-app": {
+    "message": "Modrinth Appを入手する"
+  },
+  "layout.avatar.alt": {
+    "message": "あなたのアバター"
+  },
+  "layout.banner.account-action": {
+    "message": "アカウント操作が必要"
+  },
+  "layout.banner.add-email.button": {
+    "message": "アカウント設定にアクセス"
+  },
+  "layout.banner.add-email.description": {
+    "message": "セキュリティ上の理由から、Modrinth ではアカウントに電子メール アドレスを登録する必要があります。"
+  },
+  "layout.footer.about": {
+    "message": "このサイトについて"
+  },
+  "layout.footer.about.careers": {
+    "message": "キャリア"
+  },
+  "layout.footer.about.changelog": {
+    "message": "変更履歴"
+  },
+  "layout.footer.about.news": {
+    "message": "ニュース"
+  },
+  "layout.footer.about.rewards-program": {
+    "message": "報酬プログラム"
+  },
+  "layout.footer.about.status": {
+    "message": "ステータス"
+  },
+  "layout.footer.legal.security-notice": {
+    "message": "セキュリティに関するお知らせ"
+  },
+  "layout.footer.legal.terms-of-use": {
+    "message": "利用規約"
+  },
+  "layout.footer.products": {
+    "message": "製品"
+  },
+  "layout.footer.products.app": {
+    "message": "Modrinth App"
+  },
+  "layout.footer.products.plus": {
+    "message": "Modrinth+"
+  },
+  "layout.footer.products.servers": {
+    "message": "Modrinth サーバー"
+  },
+  "layout.footer.resources": {
+    "message": "リソース"
+  },
+  "layout.footer.resources.api-docs": {
+    "message": "APIドキュメント"
+  },
+  "layout.footer.resources.help-center": {
+    "message": "ヘルプセンター"
+  },
+  "layout.footer.resources.translate": {
+    "message": "翻訳"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluesky"
+  },
+  "layout.footer.social.discord": {
+    "message": "Discord"
+  },
+  "layout.footer.social.github": {
+    "message": "Github"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "Mastodon"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
+  },
+  "layout.menu-toggle.action": {
+    "message": "メニューを切り替える"
+  },
+  "layout.meta.description": {
+    "message": "ModrinthでMinecraftのMOD、プラグイン、データパック、シェーダー、リソースパック、そしてModパックをダウンロードしましょう。Modrinthでは、モダンで使いやすいインターフェースとAPIを使って、プロジェクトを発見したり公開したりできます。"
+  },
+  "layout.nav.home": {
+    "message": "ホーム"
+  },
+  "layout.nav.search": {
+    "message": "検索"
+  },
+  "moderation.filter.by": {
+    "message": "フィルター"
+  },
+  "moderation.moderate": {
+    "message": "適度"
+  },
+  "moderation.page.projects": {
+    "message": "プロジェクト"
+  },
+  "moderation.page.reports": {
+    "message": "レポート"
+  },
+  "moderation.page.technicalReview": {
+    "message": "技術的レビュー"
+  },
+  "moderation.search.placeholder": {
+    "message": "検索…"
+  },
+  "moderation.sort.by": {
+    "message": "並べ替え"
+  },
+  "moderation.technical.search.placeholder": {
+    "message": "技術レビューを検索…"
+  },
+  "profile.label.no-projects": {
+    "message": "このユーザーのプロジェクトはありません！"
+  },
+  "profile.label.no-projects-auth": {
+    "message": "プロジェクトがありません\nプロジェクトを<create-link>作成しますか</create-link>？"
+  },
+  "profile.label.organizations": {
+    "message": "組織"
+  },
+  "profile.meta.description": {
+    "message": "Modrinthで {username} のプロジェクトをダウンロードする"
+  }
+}

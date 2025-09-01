@@ -1,0 +1,14 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "กำลังอยู่ในโหมดผู้พัฒนา"
+  },
+  "app.settings.tabs.appearance": {
+    "message": "รูปลักษณ์"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "ความเป็นส่วนตัว"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "การจัดการทรัพยากร"
+  }
+}

@@ -1,0 +1,149 @@
+{
+  "admin.billing.error.not-found": {
+    "message": "Användaren hittades inte"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "Auktorisera"
+  },
+  "auth.authorize.action.decline": {
+    "message": "Neka"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> av <creator-link>{creator}</creator-link> kommer kunna:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "Auktorisera {appName}"
+  },
+  "auth.authorize.error.no-redirect-url": {
+    "message": "Ingen direkt position hittad i respons"
+  },
+  "auth.authorize.redirect-url": {
+    "message": "Du kommer bli flyttad till <redirect-url>{url}</redirect-url>"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "Skicka ett email"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "Skriv in din email nedan och vi kommer skicka en länk som tillåter dig att gå tillbaka ditt konto."
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "Email eller användarnamn"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "Email"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "Ett email med instruktioner har skickats till dig om emailen redan var sparad på ditt konto."
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "Email skickat"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "Nu kan du logga in till ditt konto med ditt nya lösenord."
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "Lösenordet är uppdaterat"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "Gör om lösenordet"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "Konfirmera lösenord"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "Ange ditt nya lösenord för att få tillgång till ditt konto."
+  },
+  "auth.reset-password.title": {
+    "message": "Återställ lösenord"
+  },
+  "auth.reset-password.title.long": {
+    "message": "Återställ ditt lösenord"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "Ange din tvåfaktorskod för att fortsätta."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "Ange tvåfaktorskod"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "Ange kod..."
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-link>Har du glömt lösenordet?</forgot-password-link> • <create-account-link>Skapa ett konto</create-account-link>"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "E-post eller användarnamn"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Lösenord"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Logga in med"
+  },
+  "auth.sign-in.title": {
+    "message": "Logga in"
+  },
+  "auth.sign-in.use-password": {
+    "message": "Eller använd ett lösenord"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Skapa konto"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "Bekräfta lösenord"
+  },
+  "auth.sign-up.email.label": {
+    "message": "E-post"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Användarnamn"
+  },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "Genom att skapa ett konto godkänner du Modrinths <terms-link>Villkor</terms-link> och <privacy-policy-link>sekretesspolicy</privacy-policy-link>."
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "Lösenorden stämmer inte överens!"
+  },
+  "auth.sign-up.password.label": {
+    "message": "Lösenord"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "Har du redan ett konto?"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "Jag vill få uppdateringar om Modrinth"
+  },
+  "auth.sign-up.title": {
+    "message": "Registrera dig"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "Eller skapa ett konto själv"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Registrera dig med"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Kontoinställningar"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Logga in"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "Din e-post är redan verifierad!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "E-posten är redan verifierad"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "Skicka ny bekräftelsemejl"
+  },
+  "auth.verify-email.failed-verification.description": {
+    "message": "Vi kunde inte verifiera din e-post. Försök att skicka en ny bekräftelsemejl via kontrollpanelen genom att logga in."
+  },
+  "auth.verify-email.title": {
+    "message": "Verifiera Email"
+  },
+  "auth.welcome.checkbox.subscribe": {
+    "message": "Prenumerera För Uppdateringar om MODRINTH"
+  }
+}

@@ -1,0 +1,1667 @@
+{
+  "admin.billing.error.not-found": {
+    "message": "Utilisateur non trouvé"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "Autoriser"
+  },
+  "auth.authorize.action.decline": {
+    "message": "Décliner"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> par <creator-link>{creator}</creator-link> sera capable de :"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "Autoriser {appName}"
+  },
+  "auth.authorize.error.no-redirect-url": {
+    "message": "Pas d'adresse de redirection trouvée dans la réponse"
+  },
+  "auth.authorize.redirect-url": {
+    "message": "Vous serez redirigé vers <redirect-url>{url}</redirect-url>"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "Envoyer email de récupération"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "Entrez votre email ci-dessous et nous enverrons un lien de récupération pour vous permettre de récupérer votre compte."
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "Email ou pseudonyme"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "Email"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "Un email avec les instructions vous a été envoyé si cet email était précédemment sauvegardé sur votre compte."
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "Email envoyé"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "Vous pouvez maintenant vous connecter à votre compte avec votre nouveau mot de passe."
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "Mot de passe réinitialisé avec succès"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "Réinitialiser mot de passe"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "Confirmer mot de passe"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "Entrez ci-dessous votre nouveau mot de passe pour récupérer l'accès à votre compte."
+  },
+  "auth.reset-password.title": {
+    "message": "Réinitialiser le mot de passe"
+  },
+  "auth.reset-password.title.long": {
+    "message": "Réinitialiser votre mot de passe"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "Veuillez entrer un code à doubles facteurs pour continuer."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "Saisir le code à doubles facteurs"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "Saisir le code..."
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-link>Mot de passe oublié ?</forgot-password-link> • <create-account-link>Créer un compte</create-account-link>"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "Email ou nom d'utilisateur"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Mot de passe"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Se connecter avec"
+  },
+  "auth.sign-in.title": {
+    "message": "Se connecter"
+  },
+  "auth.sign-in.use-password": {
+    "message": "Ou utiliser un mot de passe"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Créer un compte"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "Confirmer le mot de passe"
+  },
+  "auth.sign-up.email.label": {
+    "message": "E-mail"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Nom d'utilisateur"
+  },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "En créant un compte, vous acceptez les <terms-link>Conditions d'utilisation</terms-link> et la <privacy-policy-link>Politique de confidentialité</privacy-policy-link> de Modrinth."
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "Les mots de passe ne correspondent pas !"
+  },
+  "auth.sign-up.password.label": {
+    "message": "Mot de passe"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "Avez-vous déjà un compte ?"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "S'abonner aux mises à jour de Modrinth"
+  },
+  "auth.sign-up.title": {
+    "message": "S'inscrire"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "Ou créez vous-même un compte"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "S'inscrire avec"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Paramètres du compte"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Se connecter"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "Votre adresse e-mail est déjà vérifiée !"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "Adresse e-mail déjà vérifiée"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "Renvoyer un e-mail de vérification"
+  },
+  "auth.verify-email.failed-verification.description": {
+    "message": "Nous n'avons pas pu vérifier votre courriel. Essayez d'envoyer à nouveau l'e-mail de vérification via votre tableau de bord en vous connectant."
+  },
+  "auth.verify-email.failed-verification.description.logged-in": {
+    "message": "Nous n'avons pas pu vérifier votre e-mail. Essayez de renvoyer l'e-mail de vérification via le bouton ci-dessous."
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "La vérification de l'e-mail a échoué"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "Votre adresse e-mail a été vérifiée avec succès !"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "Vérification de l'adresse e-mail"
+  },
+  "auth.verify-email.title": {
+    "message": "Vérifier l'adresse e-mail"
+  },
+  "auth.welcome.checkbox.subscribe": {
+    "message": "S'abonner aux mises à jour de Modrinth"
+  },
+  "auth.welcome.description": {
+    "message": "Vous faites maintenant partie de la formidable communauté de créateurs et d'explorateurs qui construisent, téléchargent et se tiennent au courant des incroyables mods."
+  },
+  "auth.welcome.label.tos": {
+    "message": "En créant un compte, vous acceptez les <terms-link>Conditions d'utilisation</terms-link> et la <privacy-policy-link>Politique de confidentialité</privacy-policy-link> de Modrinth."
+  },
+  "auth.welcome.long-title": {
+    "message": "Bienvenue sur Modrinth !"
+  },
+  "auth.welcome.title": {
+    "message": "Bienvenue"
+  },
+  "collection.button.delete-icon": {
+    "message": "Supprimer l'icône"
+  },
+  "collection.button.edit-icon": {
+    "message": "Éditer l'icône"
+  },
+  "collection.button.remove-project": {
+    "message": "Supprimer le projet"
+  },
+  "collection.button.unfollow-project": {
+    "message": "Ne plus suivre le projet"
+  },
+  "collection.delete-modal.description": {
+    "message": "Cette action supprimera définitivement cette collection. Cette action ne peut être annulée."
+  },
+  "collection.delete-modal.title": {
+    "message": "Êtes-vous sûr de vouloir supprimer cette collection ?"
+  },
+  "collection.description": {
+    "message": "{description} - Voir la collection {name} par {username} sur Modrinth"
+  },
+  "collection.description.following": {
+    "message": "Collection générée automatiquement de tous les projets que vous suivez."
+  },
+  "collection.error.not-found": {
+    "message": "Collection introuvable"
+  },
+  "collection.label.collection": {
+    "message": "Collection"
+  },
+  "collection.label.created-at": {
+    "message": "Créée {ago}"
+  },
+  "collection.label.curated-by": {
+    "message": "Organisée par"
+  },
+  "collection.label.no-projects": {
+    "message": "Cette collection ne comporte aucun projet !"
+  },
+  "collection.label.no-projects-auth": {
+    "message": "Vous n'avez aucun projet.\nSouhaitez-vous <create-link>en ajouter un</create-link> ?"
+  },
+  "collection.label.owner": {
+    "message": "Propriétaire"
+  },
+  "collection.label.projects-count": {
+    "message": "{count, plural, one {<stat>{count}</stat> projet} other {<stat>{count}</stat> projets}}"
+  },
+  "collection.label.updated-at": {
+    "message": "Mis à jour {ago}"
+  },
+  "collection.title": {
+    "message": "{name} - Collection"
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "Créer un nouveau"
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count, plural, one {{count} projet} other {{count} projets}}"
+  },
+  "dashboard.collections.label.search-input": {
+    "message": "Rechercher dans vos collections"
+  },
+  "dashboard.collections.long-title": {
+    "message": "Vos collections"
+  },
+  "error.collection.404.list_item.1": {
+    "message": "Vous avez peut-être mal tapé l'URL de la collection."
+  },
+  "error.collection.404.list_item.2": {
+    "message": "La collection est peut-être privée."
+  },
+  "error.collection.404.list_item.3": {
+    "message": "La collection a peut-être été retirée par l’équipe de modération de Modrinth pour violation de nos <tou-link>Conditions d’utilisation</tou-link>."
+  },
+  "error.collection.404.list_title": {
+    "message": "Pourquoi ?"
+  },
+  "error.collection.404.title": {
+    "message": "Collection introuvable"
+  },
+  "error.generic.404.subtitle": {
+    "message": "La page que vous recherchez ne semble pas exister."
+  },
+  "error.generic.404.title": {
+    "message": "Page introuvable"
+  },
+  "error.generic.default.list_item.1": {
+    "message": "Vérifiez si Modrinth est hors ligne sur notre <status-link>page de statut</status-link>."
+  },
+  "error.generic.default.list_item.2": {
+    "message": "Si cela continue, vous pouvez informer l’équipe de Modrinth en rejoignant notre <discord-link>serveur Discord</discord-link>."
+  },
+  "error.generic.default.list_title": {
+    "message": "Veuillez réessayer dans quelques minutes."
+  },
+  "error.generic.default.subtitle": {
+    "message": "Une erreur est survenue."
+  },
+  "error.generic.default.title": {
+    "message": "Oups !"
+  },
+  "error.organization.404.list_item.1": {
+    "message": "Vous avez peut-être mal tapé l'URL de l'organisation."
+  },
+  "error.organization.404.list_item.2": {
+    "message": "Le propriétaire de l’organisation a peut-être changé l’URL ou l’a supprimée."
+  },
+  "error.organization.404.list_item.3": {
+    "message": "L’organisation a peut-être été supprimée par l’équipe de modération de Modrinth pour violation de nos <tou-link>Conditions d’utilisation</tou-link>."
+  },
+  "error.organization.404.list_title": {
+    "message": "Pourquoi ?"
+  },
+  "error.organization.404.title": {
+    "message": "Organisation introuvable"
+  },
+  "error.project.404.list_item.1": {
+    "message": "Vous avez peut-être mal tapé l'URL du projet."
+  },
+  "error.project.404.list_item.2": {
+    "message": "Le propriétaire du projet a peut-être changé l’URL, rendu le projet privé ou l’a supprimé."
+  },
+  "error.project.404.list_item.3": {
+    "message": "Le projet a peut-être été retiré par l’équipe de modération de Modrinth pour violation de nos <tou-link>Conditions d’utilisation</tou-link>."
+  },
+  "error.project.404.list_title": {
+    "message": "Pourquoi ?"
+  },
+  "error.project.404.title": {
+    "message": "Projet introuvable"
+  },
+  "error.user.404.list_item.1": {
+    "message": "Vous avez peut-être mal tapé le nom d'utilisateur."
+  },
+  "error.user.404.list_item.2": {
+    "message": "L’utilisateur a peut-être changé de nom d’utilisateur ou supprimé son compte."
+  },
+  "error.user.404.list_item.3": {
+    "message": "Le compte de l’utilisateur a peut-être été supprimé pour violation des <tou-link>Conditions d’utilisation</tou-link> de Modrinth."
+  },
+  "error.user.404.list_title": {
+    "message": "Pourquoi ?"
+  },
+  "error.user.404.title": {
+    "message": "Utilisateur introuvable"
+  },
+  "frog": {
+    "message": "Vous avez été grenouillé ! 🐸"
+  },
+  "frog.altText": {
+    "message": "Un tableau photoréaliste d'un labyrinthe amphibien"
+  },
+  "frog.froggedPeople": {
+    "message": "{count, plural, one {{count} autre personne a été grenouillée !} other {{count} autres personnes ont été grenouillées !}}"
+  },
+  "frog.sinceOpened": {
+    "message": "Cette page a été ouverte {ago}"
+  },
+  "frog.title": {
+    "message": "Grenouille"
+  },
+  "layout.action.change-theme": {
+    "message": "Changer le thème"
+  },
+  "layout.action.get-modrinth-app": {
+    "message": "Obtenir l’application Modrinth"
+  },
+  "layout.avatar.alt": {
+    "message": "Votre avatar"
+  },
+  "layout.banner.account-action": {
+    "message": "Action requise sur le compte"
+  },
+  "layout.banner.add-email.button": {
+    "message": "Consulter les paramètres du compte"
+  },
+  "layout.banner.add-email.description": {
+    "message": "Pour des raisons de sécurité, Modrinth a besoin que vous enregistriez une adresse e-mail sur votre compte."
+  },
+  "layout.banner.build-fail.description": {
+    "message": "Ce déploiement du frontend de Modrinth n’a pas pu générer l’état à partir de l’API. Cela peut être dû à une panne ou à une erreur de configuration. Rebuild lorsque l’API sera disponible. Codes d’erreur : {errors} ; L’URL actuelle de l’API est : {url}"
+  },
+  "layout.banner.build-fail.title": {
+    "message": "Erreur lors de la génération de l’état à partir de l’API pendant la construction."
+  },
+  "layout.banner.staging.description": {
+    "message": "L'environnement d'essai fonctionne sur une copie de la base de données en production de Modrinth. Il est utilisé à des fins de test et de débogage, et peut exécuter des versions en cours de développement du backend ou du frontend de Modrinth plus récentes que l'instance en production."
+  },
+  "layout.banner.staging.title": {
+    "message": "Vous êtes en train de visualiser l'environnement d'essai de Modrinth"
+  },
+  "layout.banner.subscription-payment-failed.button": {
+    "message": "Mettre à jour les informations de facturation"
+  },
+  "layout.banner.subscription-payment-failed.description": {
+    "message": "Un ou plusieurs abonnements n'ont pas pu être renouvelés. Veuillez mettre à jour votre mode de paiement pour éviter de perdre votre accès !"
+  },
+  "layout.banner.subscription-payment-failed.title": {
+    "message": "Action de facturation requise."
+  },
+  "layout.banner.verify-email.action": {
+    "message": "Renvoyer un e-mail de vérification"
+  },
+  "layout.banner.verify-email.description": {
+    "message": "Pour des raisons de sécurité, Modrinth a besoin que vous vérifiiez l'adresse e-mail associée à votre compte."
+  },
+  "layout.footer.about": {
+    "message": "À propos"
+  },
+  "layout.footer.about.careers": {
+    "message": "Carrières"
+  },
+  "layout.footer.about.changelog": {
+    "message": "Journal des modifications"
+  },
+  "layout.footer.about.news": {
+    "message": "Actualités"
+  },
+  "layout.footer.about.rewards-program": {
+    "message": "Programme de fidélité"
+  },
+  "layout.footer.about.status": {
+    "message": "Statut"
+  },
+  "layout.footer.legal": {
+    "message": "Aspects légaux"
+  },
+  "layout.footer.legal-disclaimer": {
+    "message": "PAS UN SERVICE OFFICIEL DE MINECRAFT. NON APPROUVÉ NI ASSOCIÉ À MOJANG OU MICROSOFT."
+  },
+  "layout.footer.legal.copyright-policy": {
+    "message": "Politique de droits d’auteur et DMCA"
+  },
+  "layout.footer.legal.privacy-policy": {
+    "message": "Politique de confidentialité"
+  },
+  "layout.footer.legal.rules": {
+    "message": "Règles de contenu"
+  },
+  "layout.footer.legal.security-notice": {
+    "message": "Avis de sécurité"
+  },
+  "layout.footer.legal.terms-of-use": {
+    "message": "Conditions d’utilisation"
+  },
+  "layout.footer.open-source": {
+    "message": "Modrinth est <github-link>open source</github-link>."
+  },
+  "layout.footer.products": {
+    "message": "Produits"
+  },
+  "layout.footer.products.app": {
+    "message": "App Modrinth"
+  },
+  "layout.footer.products.plus": {
+    "message": "Modrinth+"
+  },
+  "layout.footer.products.servers": {
+    "message": "Serveurs Modrinth"
+  },
+  "layout.footer.resources": {
+    "message": "Ressources"
+  },
+  "layout.footer.resources.api-docs": {
+    "message": "Documentation de l’API"
+  },
+  "layout.footer.resources.help-center": {
+    "message": "Centre d’aide"
+  },
+  "layout.footer.resources.report-issues": {
+    "message": "Signaler des problèmes"
+  },
+  "layout.footer.resources.translate": {
+    "message": "Traduire"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluesky"
+  },
+  "layout.footer.social.discord": {
+    "message": "Discord"
+  },
+  "layout.footer.social.github": {
+    "message": "GitHub"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "Mastodon"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
+  },
+  "layout.menu-toggle.action": {
+    "message": "Basculer le menu"
+  },
+  "layout.meta.description": {
+    "message": "Téléchargez des mods, plugins, datapacks, shaders, packs de ressources et modpacks Minecraft sur Modrinth. Découvrez et publiez des projets sur Modrinth avec une interface moderne, facile à utiliser, et une API."
+  },
+  "layout.meta.og-description": {
+    "message": "Découvrez et publiez du contenu Minecraft !"
+  },
+  "layout.nav.home": {
+    "message": "Accueil"
+  },
+  "layout.nav.search": {
+    "message": "Rechercher"
+  },
+  "moderation.filter.by": {
+    "message": "Filtrer par"
+  },
+  "moderation.moderate": {
+    "message": "Modérer"
+  },
+  "moderation.page.projects": {
+    "message": "Projets"
+  },
+  "moderation.page.reports": {
+    "message": "Signalements"
+  },
+  "moderation.page.technicalReview": {
+    "message": "Revue technique"
+  },
+  "moderation.search.placeholder": {
+    "message": "Rechercher..."
+  },
+  "moderation.sort.by": {
+    "message": "Trier par"
+  },
+  "moderation.technical.search.placeholder": {
+    "message": "Rechercher des revues techniques…"
+  },
+  "profile.button.billing": {
+    "message": "Gérer la facturation de l’utilisateur"
+  },
+  "profile.button.info": {
+    "message": "Afficher les détails de l’utilisateur"
+  },
+  "profile.button.manage-projects": {
+    "message": "Gérer les projets"
+  },
+  "profile.error.not-found": {
+    "message": "Utilisateur introuvable"
+  },
+  "profile.joined-at": {
+    "message": "Inscrit le <date>{ago}</date>"
+  },
+  "profile.label.badges": {
+    "message": "Badges"
+  },
+  "profile.label.details": {
+    "message": "Détails"
+  },
+  "profile.label.no-collections": {
+    "message": "Cet utilisateur n'a aucune collection !"
+  },
+  "profile.label.no-collections-auth": {
+    "message": "Vous n'avez aucune collection.\nVoulez-vous en <create-link>créer une</create-link> ?"
+  },
+  "profile.label.no-projects": {
+    "message": "Cet utilisateur n'a aucun projet !"
+  },
+  "profile.label.no-projects-auth": {
+    "message": "Vous n'avez aucun projet.\nVoulez-vous en <create-link>créer un</create-link> ?"
+  },
+  "profile.label.organizations": {
+    "message": "Organisations"
+  },
+  "profile.meta.description": {
+    "message": "Téléchargez les projets de {username} sur Modrinth"
+  },
+  "profile.meta.description-with-bio": {
+    "message": "{bio} - Téléchargez les projets de {username} sur Modrinth"
+  },
+  "profile.stats.downloads": {
+    "message": "{count, plural, one {<stat>{count}</stat> téléchargement} other {<stat>{count}</stat> téléchargements}}"
+  },
+  "profile.stats.projects": {
+    "message": "{count, plural, one {<stat>{count}</stat> projet} other {<stat>{count}</stat> projets}}"
+  },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, one {<stat>{count}</stat> abonné} other {<stat>{count}</stat> abonnés}} aux projets"
+  },
+  "profile.user-id": {
+    "message": "ID utilisateur : {id}"
+  },
+  "project-member-header.accept": {
+    "message": "Accepter"
+  },
+  "project-member-header.decline": {
+    "message": "Refuser"
+  },
+  "project-member-header.error": {
+    "message": "Erreur"
+  },
+  "project-member-header.error-decline": {
+    "message": "Échec du refus de l’invitation à l’équipe"
+  },
+  "project-member-header.error-join": {
+    "message": "Échec de l'acceptation de l’invitation à l’équipe"
+  },
+  "project-member-header.invitation-no-role": {
+    "message": "Vous avez été invité à rejoindre ce projet. Veuillez accepter ou refuser l’invitation."
+  },
+  "project-member-header.invitation-title": {
+    "message": "Invitation à rejoindre un projet"
+  },
+  "project-member-header.invitation-with-role": {
+    "message": "Vous avez été invité à être membre de ce projet sous le rôle de '{role}'."
+  },
+  "project-member-header.success": {
+    "message": "Succès"
+  },
+  "project-member-header.success-decline": {
+    "message": "Vous avez refusé l’invitation à rejoindre l’équipe."
+  },
+  "project-member-header.success-join": {
+    "message": "Vous avez rejoint l’équipe du projet."
+  },
+  "project-moderation-nags.publishing-checklist": {
+    "message": "Liste de contrôle de publication"
+  },
+  "project-moderation-nags.required": {
+    "message": "Requis"
+  },
+  "project-moderation-nags.resubmit-for-review": {
+    "message": "Soumettre à nouveau pour révision"
+  },
+  "project-moderation-nags.resubmit-for-review-desc": {
+    "message": "Ton projet a été {status} par le personnel de Modrinth. Tu peux soumettre à nouveau pour examen après avoir adressé le message du personnel."
+  },
+  "project-moderation-nags.submit-checklist-tooltip": {
+    "message": "Vous devez compléter les étapes obligatoires dans la liste de contrôle de publication !"
+  },
+  "project-moderation-nags.submit-for-review": {
+    "message": "Soumettre pour examen"
+  },
+  "project-moderation-nags.submit-for-review-desc": {
+    "message": "Votre projet n’est visible que par les membres du projet. Il doit être examiné par des modérateurs avant d’être publié."
+  },
+  "project-moderation-nags.suggestion": {
+    "message": "Suggestion"
+  },
+  "project-moderation-nags.visit-moderation-page": {
+    "message": "Visiter la page de modération"
+  },
+  "project-moderation-nags.warning": {
+    "message": "Avertissement"
+  },
+  "project-type.collection.plural": {
+    "message": "Collections"
+  },
+  "project-type.collection.singular": {
+    "message": "Collection"
+  },
+  "project-type.datapack.plural": {
+    "message": "Datapacks"
+  },
+  "project-type.datapack.singular": {
+    "message": "Datapack"
+  },
+  "project-type.mod.plural": {
+    "message": "Mods"
+  },
+  "project-type.mod.singular": {
+    "message": "Mod"
+  },
+  "project-type.modpack.plural": {
+    "message": "Modpacks"
+  },
+  "project-type.modpack.singular": {
+    "message": "Modpack"
+  },
+  "project-type.plugin.plural": {
+    "message": "Plugins"
+  },
+  "project-type.plugin.singular": {
+    "message": "Plugin"
+  },
+  "project-type.project.plural": {
+    "message": "Projets"
+  },
+  "project-type.project.singular": {
+    "message": "Projet"
+  },
+  "project-type.resourcepack.plural": {
+    "message": "Packs de ressources"
+  },
+  "project-type.resourcepack.singular": {
+    "message": "Pack de ressources"
+  },
+  "project-type.shader.plural": {
+    "message": "Shaders"
+  },
+  "project-type.shader.singular": {
+    "message": "Shader"
+  },
+  "project.about.details.created": {
+    "message": "Créé le {date}"
+  },
+  "project.about.details.licensed": {
+    "message": "Sous licence {license}"
+  },
+  "project.about.details.published": {
+    "message": "Publié le {date}"
+  },
+  "project.about.details.submitted": {
+    "message": "Soumis le {date}"
+  },
+  "project.about.details.title": {
+    "message": "Détails"
+  },
+  "project.about.details.updated": {
+    "message": "Mise à jour le {date}"
+  },
+  "project.actions.create-server": {
+    "message": "Créer un serveur"
+  },
+  "project.actions.create-server-tooltip": {
+    "message": "Créer un serveur"
+  },
+  "project.actions.dont-show-again": {
+    "message": "Ne pas montrer à nouveau"
+  },
+  "project.actions.review-project": {
+    "message": "Vérifier le projet"
+  },
+  "project.actions.servers-promo.description": {
+    "message": "Les serveurs Modrinth sont la solution la plus facile pour jouer entre amis sans ennuis !"
+  },
+  "project.actions.servers-promo.monthly": {
+    "message": " / mois"
+  },
+  "project.actions.servers-promo.pricing": {
+    "message": "À partir de $5{monthly}"
+  },
+  "project.actions.servers-promo.title": {
+    "message": "Créer un serveur"
+  },
+  "project.collections.create-new": {
+    "message": "Créer une collection"
+  },
+  "project.collections.none-found": {
+    "message": "Aucune collection trouvée."
+  },
+  "project.description.title": {
+    "message": "Description"
+  },
+  "project.details.licensed": {
+    "message": "License"
+  },
+  "project.download.game-version": {
+    "message": "Version du jeu : {version}"
+  },
+  "project.download.game-version-error": {
+    "message": "Erreur : pas de versions du jeu trouvées"
+  },
+  "project.download.game-version-tooltip": {
+    "message": "{title} est que disponible pour {version}"
+  },
+  "project.download.game-version-unsupported-tooltip": {
+    "message": "{title} ne supporte pas {gameVersion} pour {platform}"
+  },
+  "project.download.install-with-app": {
+    "message": "Télécharger avec l'application Modrinth"
+  },
+  "project.download.no-app": {
+    "message": "Vous n'avez pas l'appli Modrinth ?"
+  },
+  "project.download.no-versions-available": {
+    "message": "Aucune version disponible pour {gameVersion} et {platform}."
+  },
+  "project.download.platform": {
+    "message": "Plateforme : {platform}"
+  },
+  "project.download.platform-error": {
+    "message": "Erreur : pas de plateformes trouvées"
+  },
+  "project.download.platform-tooltip": {
+    "message": "{title} est que disponible pour {platform}"
+  },
+  "project.download.platform-unsupported-tooltip": {
+    "message": "{title} ne supporte pas {platform} pour {gameVersion}"
+  },
+  "project.download.search-game-versions": {
+    "message": "Recherche des versions du jeu ..."
+  },
+  "project.download.search-game-versions-label": {
+    "message": "Recherche des versions du jeu ..."
+  },
+  "project.download.select-game-version": {
+    "message": "Sélectionne la version du jeu"
+  },
+  "project.download.select-platform": {
+    "message": "Sélectionne la plateforme"
+  },
+  "project.download.show-all-versions": {
+    "message": "Montre toutes les versions"
+  },
+  "project.download.title": {
+    "message": "Télécharger {title}"
+  },
+  "project.environment.migration-no-permission.message": {
+    "message": "Nous venons de remanier le système d'Environnements sur Modrinth et de nouvelles options sont désormais disponibles. Vous n'avez pas l'autorisation de modifier ces paramètres, veuillez informer un autre membre du projet que les métadonnées de l'environnement doivent être vérifiées."
+  },
+  "project.environment.migration-no-permission.title": {
+    "message": "Les métadonnées de l'environnement doivent être examinées"
+  },
+  "project.environment.migration.learn-more": {
+    "message": "En apprendre davantage au sujet de cette modification"
+  },
+  "project.environment.migration.message": {
+    "message": "Nous venons de remanier le système d'Environnement sur Modrinth et de nouvelles options sont désormais disponibles. Veuillez consulter les paramètres de votre projet et vérifier que les métadonnées sont correctes."
+  },
+  "project.environment.migration.review-button": {
+    "message": "Vérifier les paramètres d'environnement"
+  },
+  "project.environment.migration.title": {
+    "message": "Merci de vérifier les métadonnées d'environnement"
+  },
+  "project.error.loading": {
+    "message": "Erreur durant le chargement du projet : {message}"
+  },
+  "project.error.page-not-found": {
+    "message": "La page n'a pas pu être trouvée"
+  },
+  "project.error.project-not-found": {
+    "message": "Projet non trouvé"
+  },
+  "project.gallery.title": {
+    "message": "Galerie"
+  },
+  "project.license.error": {
+    "message": "Le texte de la license n'a pas pu être obtenu"
+  },
+  "project.license.loading": {
+    "message": "Chargement du texte de la license..."
+  },
+  "project.license.title": {
+    "message": "License"
+  },
+  "project.moderation.title": {
+    "message": "Modération"
+  },
+  "project.navigation.changelog": {
+    "message": "Journal des modifications"
+  },
+  "project.notification.icon-updated.message": {
+    "message": "."
+  },
+  "project.notification.icon-updated.title": {
+    "message": "Icône du projet mis à jour"
+  },
+  "project.notification.updated.message": {
+    "message": "Votre projet a été mis à jour."
+  },
+  "project.notification.updated.title": {
+    "message": "Projet mis à jour"
+  },
+  "project.settings.environment.notice.missing-env.description": {
+    "message": "Il manque des métadonnées d'environnements à votre projet, merci de sélectionner l'option appropriée ci-dessous."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "message": "Merci de sélectionner un environnement pour votre projet"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "message": "Différentes versions de votre projet ont différents environnements sélectionnés, donc vous ne pouvez pas les modifier globalement pour l'instant."
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "message": "Votre projet a plusieurs environnements"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "message": "Nous venons de remanier le système d'Environnement sur Modrinth et de nouvelles options sont désormais disponibles. Veuillez vous assurer que la bonne option est sélectionnée ci-dessous, puis cliquez sur « Vérifier » lorsque vous avez terminé !"
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "message": "Merci de vérifier les options ci-dessous"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "message": "Seul les mods ou les modpacks peuvent avoir des métadonnées d'environnements."
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "message": "Ce type de projet ne supporte pas les métadonnées d'environnements"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "message": "Vérifier"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "message": "Vérifier que l'environnement de projet est correctement défini."
+  },
+  "project.settings.general.name.description": {
+    "message": "Évitez les préfixes, suffixes, parenthèses, ou les descriptions - juste le nom actuel du projet"
+  },
+  "project.settings.general.name.placeholder.2": {
+    "message": "ex. Équipement de construction"
+  },
+  "project.settings.general.name.placeholder.4": {
+    "message": "ex. Portails améliorés"
+  },
+  "project.settings.general.name.placeholder.5": {
+    "message": "ex. Mobs dangereux"
+  },
+  "project.settings.general.name.title": {
+    "message": "Nom"
+  },
+  "project.settings.general.tagline.description": {
+    "message": "Résumez votre projet en moins d'une phrase."
+  },
+  "project.settings.general.tagline.placeholder.1": {
+    "message": "ex. Révise la progression du jeu pour la centrer autour du Nether."
+  },
+  "project.settings.general.tagline.placeholder.3": {
+    "message": "ex. Ajoute des mécaniques réalistes de construction de mineshaft."
+  },
+  "project.settings.general.tagline.placeholder.4": {
+    "message": "ex. Améliore la connexion entre les portails du Nether."
+  },
+  "project.settings.general.tagline.placeholder.5": {
+    "message": "ex. Ajoute des versions boss plus puissantes des mobs normaux rencontrés la nuit."
+  },
+  "project.settings.general.url.title": {
+    "message": "URL"
+  },
+  "project.settings.title": {
+    "message": "Paramètres"
+  },
+  "project.settings.visit-dashboard": {
+    "message": "Visiter le tableau de contrôle des projets"
+  },
+  "project.stats.downloads-label": {
+    "message": "Téléchargement{count, plural, one {} other {s}}"
+  },
+  "project.stats.followers-label": {
+    "message": "Abonné{count, plural, one {} other {s}}"
+  },
+  "project.status.archived.message": {
+    "message": "{title} a été archivé. {title} ne recevra plus de mises à jour jusqu'à ce que l'auteur du projet décide de désarchiver le projet."
+  },
+  "project.version.all-versions": {
+    "message": "Toutes les versions"
+  },
+  "project.version.back-to-versions": {
+    "message": "Retour aux versions"
+  },
+  "project.versions.title": {
+    "message": "Versions"
+  },
+  "report.already-reported": {
+    "message": "Vous avez déjà signalé {title}"
+  },
+  "report.already-reported-description": {
+    "message": "Vous avez déjà un signalement ouvert pour {item}. Vous pouvez ajouter des détails supplémentaires à votre rapport si vous avez plus d’informations à fournir."
+  },
+  "report.back-to-item": {
+    "message": "Retour à {item}"
+  },
+  "report.body.description": {
+    "message": "Incluez des liens et des images si possible et pertinentes. Les signalements vides ou insuffisants seront fermés et ignorés."
+  },
+  "report.body.title": {
+    "message": "Veuillez fournir des informations supplémentaires concernant votre signalement."
+  },
+  "report.checking": {
+    "message": "Vérification de {item}…"
+  },
+  "report.could-not-find": {
+    "message": "Impossible de trouver {item}"
+  },
+  "report.for.violation": {
+    "message": "Violation des <rules-link>Règles</rules-link> ou des <terms-link>Conditions d’utilisation</terms-link> de Modrinth"
+  },
+  "report.for.violation.description": {
+    "message": "Exemples : contenu malveillant, spam, offensant, trompeur, mensonger ou illégal."
+  },
+  "report.form-not-for": {
+    "message": "Ce formulaire n’est pas destiné à :"
+  },
+  "report.go-to-report": {
+    "message": "Aller au signalement"
+  },
+  "report.not-for.bug-reports": {
+    "message": "Rapports de bugs"
+  },
+  "report.not-for.bug-reports.description": {
+    "message": "Vous pouvez signaler des bugs dans leur <issues-link>suivi des problèmes</issues-link>."
+  },
+  "report.not-for.dmca": {
+    "message": "Retraits DMCA"
+  },
+  "report.not-for.dmca.description": {
+    "message": "Consultez notre <policy-link>Politique de droits d’auteur</policy-link>."
+  },
+  "report.note.copyright.1": {
+    "message": "Veuillez noter que vous ne soumettez pas une demande de retrait DMCA, mais plutôt un signalement de contenu re-téléchargé."
+  },
+  "report.note.copyright.2": {
+    "message": "Si vous souhaitiez déposer une demande de retrait DMCA (qui est une action légale), veuillez consulter notre <copyright-policy-link>Politique de droits d’auteur</copyright-policy-link>."
+  },
+  "report.note.malicious.1": {
+    "message": "Les signalements de contenu malveillant ou trompeur doivent inclure des preuves substantielles du comportement, comme des exemples de code."
+  },
+  "report.note.malicious.2": {
+    "message": "Les résumés de Microsoft Defender, VirusTotal ou la détection de logiciels malveillants par IA ne constituent pas des preuves suffisantes et ne seront pas acceptés."
+  },
+  "report.please-report": {
+    "message": "Veuillez signaler :"
+  },
+  "report.question.content-id": {
+    "message": "Quel est l’ID de {item} ?"
+  },
+  "report.question.content-type": {
+    "message": "Quel type de contenu signalez-vous ?"
+  },
+  "report.question.report-reason": {
+    "message": "Quelle règle de Modrinth {item} viole-t-il ?"
+  },
+  "report.report-content": {
+    "message": "Signaler le contenu aux modérateurs"
+  },
+  "report.report-item": {
+    "message": "Signaler {title} aux modérateurs"
+  },
+  "report.submit": {
+    "message": "Soumettre le signalement"
+  },
+  "revenue.transfers.total": {
+    "message": "Vous avez retiré {amount} au total."
+  },
+  "revenue.transfers.total.method": {
+    "message": "Vous avez retiré {amount} via {method}."
+  },
+  "revenue.transfers.total.year": {
+    "message": "Vous avez retiré {amount} en {year}."
+  },
+  "revenue.transfers.total.year_method": {
+    "message": "Vous avez retiré {amount} en {year} via {method}."
+  },
+  "scopes.analytics.description": {
+    "message": "Accéder à vos données analytiques"
+  },
+  "scopes.analytics.label": {
+    "message": "Lire les analyses"
+  },
+  "scopes.collectionCreate.description": {
+    "message": "Créer des collections"
+  },
+  "scopes.collectionCreate.label": {
+    "message": "Créer des collections"
+  },
+  "scopes.collectionDelete.description": {
+    "message": "Supprimer des collections"
+  },
+  "scopes.collectionDelete.label": {
+    "message": "Supprimer des collections"
+  },
+  "scopes.collectionRead.description": {
+    "message": "Lire les collections"
+  },
+  "scopes.collectionRead.label": {
+    "message": "Lire les collections"
+  },
+  "scopes.collectionWrite.description": {
+    "message": "Écrire dans les collections"
+  },
+  "scopes.collectionWrite.label": {
+    "message": "Écrire des collections"
+  },
+  "scopes.notificationRead.description": {
+    "message": "Lire vos notifications"
+  },
+  "scopes.notificationRead.label": {
+    "message": "Lire les notifications"
+  },
+  "scopes.notificationWrite.description": {
+    "message": "Supprimer/visualiser vos notifications"
+  },
+  "scopes.notificationWrite.label": {
+    "message": "Écrire des notifications"
+  },
+  "scopes.organizationCreate.description": {
+    "message": "Créer des organisations"
+  },
+  "scopes.organizationCreate.label": {
+    "message": "Créer des organisations"
+  },
+  "scopes.organizationDelete.description": {
+    "message": "Supprimer des organisations"
+  },
+  "scopes.organizationDelete.label": {
+    "message": "Supprimer des organisations"
+  },
+  "scopes.organizationRead.description": {
+    "message": "Lire des organisations"
+  },
+  "scopes.organizationRead.label": {
+    "message": "Lire des organisations"
+  },
+  "scopes.organizationWrite.description": {
+    "message": "Écrire à des organisations"
+  },
+  "scopes.organizationWrite.label": {
+    "message": "Écrire des organisations"
+  },
+  "scopes.patCreate.description": {
+    "message": "Créer des jetons d'API personnels"
+  },
+  "scopes.patCreate.label": {
+    "message": "Créer des PATs"
+  },
+  "scopes.patDelete.description": {
+    "message": "Supprimer vos jetons d'API personnels"
+  },
+  "scopes.patDelete.label": {
+    "message": "Supprimer des PATs"
+  },
+  "scopes.patRead.description": {
+    "message": "Voir les jetons d'API créés"
+  },
+  "scopes.patRead.label": {
+    "message": "Lire des PATs"
+  },
+  "scopes.patWrite.description": {
+    "message": "Modifier les jetons d'API personnels"
+  },
+  "scopes.patWrite.label": {
+    "message": "Créer des PATs"
+  },
+  "scopes.payoutsRead.description": {
+    "message": "Lire les données de vos paiements"
+  },
+  "scopes.payoutsRead.label": {
+    "message": "Lire les paiements"
+  },
+  "scopes.payoutsWrite.description": {
+    "message": "Retirer de l'argent"
+  },
+  "scopes.payoutsWrite.label": {
+    "message": "Écrire des paiements"
+  },
+  "scopes.performAnalytics.description": {
+    "message": "Exécuter des actions analytiques"
+  },
+  "scopes.performAnalytics.label": {
+    "message": "Effectuer des analyses"
+  },
+  "scopes.projectCreate.description": {
+    "message": "Créer de nouveaux projets"
+  },
+  "scopes.projectCreate.label": {
+    "message": "Créer des projets"
+  },
+  "scopes.projectDelete.description": {
+    "message": "Supprimer vos projets"
+  },
+  "scopes.projectDelete.label": {
+    "message": "Supprimer des projets"
+  },
+  "scopes.projectRead.description": {
+    "message": "Consulter tous vos projets"
+  },
+  "scopes.projectRead.label": {
+    "message": "Lire des projets"
+  },
+  "scopes.projectWrite.description": {
+    "message": "Écrire dans les données du projet"
+  },
+  "scopes.projectWrite.label": {
+    "message": "Créer des projets"
+  },
+  "scopes.reportCreate.description": {
+    "message": "Créer des rapports"
+  },
+  "scopes.reportCreate.label": {
+    "message": "Créer des rapports"
+  },
+  "scopes.reportDelete.description": {
+    "message": "Supprimer des rapports"
+  },
+  "scopes.reportDelete.label": {
+    "message": "Supprimer des rapports"
+  },
+  "scopes.reportRead.description": {
+    "message": "Lire des rapports"
+  },
+  "scopes.reportRead.label": {
+    "message": "Lire des rapports"
+  },
+  "scopes.reportWrite.description": {
+    "message": "Modifier des rapports"
+  },
+  "scopes.reportWrite.label": {
+    "message": "Créer des rapports"
+  },
+  "scopes.sessionAccess.description": {
+    "message": "Accéder aux sessions émises par Modrinth"
+  },
+  "scopes.sessionAccess.label": {
+    "message": "Accéder aux sessions"
+  },
+  "scopes.sessionDelete.description": {
+    "message": "Supprimer des sessions"
+  },
+  "scopes.sessionDelete.label": {
+    "message": "Supprimer des sessions"
+  },
+  "scopes.sessionRead.description": {
+    "message": "Lire les sessions actives"
+  },
+  "scopes.sessionRead.label": {
+    "message": "Lire les sessions"
+  },
+  "scopes.threadRead.description": {
+    "message": "Lire les fils"
+  },
+  "scopes.threadRead.label": {
+    "message": "Lire les fils"
+  },
+  "scopes.threadWrite.description": {
+    "message": "Écrire dans les fils"
+  },
+  "scopes.threadWrite.label": {
+    "message": "Écrire des fils"
+  },
+  "scopes.userAuthWrite.description": {
+    "message": "Modifier vos données d'authentification"
+  },
+  "scopes.userAuthWrite.label": {
+    "message": "Écrire les données d'authentification"
+  },
+  "scopes.userDelete.description": {
+    "message": "Supprimer votre compte"
+  },
+  "scopes.userDelete.label": {
+    "message": "Supprimer votre compte"
+  },
+  "scopes.userRead.description": {
+    "message": "Accéder aux informations de votre profil public"
+  },
+  "scopes.userRead.label": {
+    "message": "Lire les données de l'utilisateur"
+  },
+  "scopes.userReadEmail.description": {
+    "message": "Lire votre adresse e-mail"
+  },
+  "scopes.userReadEmail.label": {
+    "message": "Lire l'adresse e-mail de l'utilisateur"
+  },
+  "scopes.userWrite.description": {
+    "message": "Écrire sur votre profil"
+  },
+  "scopes.userWrite.label": {
+    "message": "Écrire les données utilisateur"
+  },
+  "scopes.versionCreate.description": {
+    "message": "Créer de nouvelles versions"
+  },
+  "scopes.versionCreate.label": {
+    "message": "Créer des versions"
+  },
+  "scopes.versionDelete.description": {
+    "message": "Supprimer une version"
+  },
+  "scopes.versionDelete.label": {
+    "message": "Supprimer des versions"
+  },
+  "scopes.versionRead.description": {
+    "message": "Lire les versions"
+  },
+  "scopes.versionRead.label": {
+    "message": "Lire les versions"
+  },
+  "scopes.versionWrite.description": {
+    "message": "Écrire les données de la version"
+  },
+  "scopes.versionWrite.label": {
+    "message": "Créer des versions"
+  },
+  "search.filter.locked.server": {
+    "message": "Fournis par le serveur"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "La version du jeu est fournis par l'instance"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Le chargeur est fourni par le serveur"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "Synchroniser avec le serveur"
+  },
+  "servers.backup.create.in-progress.tooltip": {
+    "message": "Création d'une sauvegarde en cours"
+  },
+  "servers.backup.restore.in-progress.tooltip": {
+    "message": "Restauration de sauvegarde en cours"
+  },
+  "servers.backups.item.already-preparing": {
+    "message": "Préparation de la sauvegarde pour le téléchargement déjà en cours "
+  },
+  "servers.backups.item.automated": {
+    "message": "Automatisé"
+  },
+  "servers.backups.item.creating-backup": {
+    "message": "Création de sauvegarde..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "message": "Échec de la création de la sauvegarde"
+  },
+  "servers.backups.item.failed-to-prepare-backup": {
+    "message": "Échec de la préparation du téléchargement"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "message": "Échec de la restauration à partir de la sauvegarde"
+  },
+  "servers.backups.item.lock": {
+    "message": "Verrouille"
+  },
+  "servers.backups.item.locked": {
+    "message": "Verrouillé"
+  },
+  "servers.backups.item.prepare-download": {
+    "message": "Préparer le téléchargement"
+  },
+  "servers.backups.item.prepare-download-again": {
+    "message": "Réessayer la préparation"
+  },
+  "servers.backups.item.preparing-download": {
+    "message": "Préparation du téléchargement…"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "message": "En file pour sauvegarde"
+  },
+  "servers.backups.item.rename": {
+    "message": "Renommer"
+  },
+  "servers.backups.item.restore": {
+    "message": "Restaurer"
+  },
+  "servers.backups.item.restoring-backup": {
+    "message": "Restauration à partir de la sauvegarde…"
+  },
+  "servers.backups.item.retry": {
+    "message": "Réessayer"
+  },
+  "servers.backups.item.unlock": {
+    "message": "Déverrouiller"
+  },
+  "servers.notice.actions": {
+    "message": "Actions"
+  },
+  "servers.notice.begins": {
+    "message": "Commence"
+  },
+  "servers.notice.dismissable": {
+    "message": "Rejetable"
+  },
+  "servers.notice.expires": {
+    "message": "Expire"
+  },
+  "servers.notice.id": {
+    "message": "ID"
+  },
+  "servers.notice.level": {
+    "message": "Niveau"
+  },
+  "servers.notice.undismissable": {
+    "message": "Non  rejetable"
+  },
+  "servers.notices.create-notice": {
+    "message": "Créer un avis"
+  },
+  "servers.notices.no-notices": {
+    "message": "Aucun avis"
+  },
+  "servers.plan.large.description": {
+    "message": "Idéal pour 15–25 joueurs, des modpacks, ou le modding intensif."
+  },
+  "servers.plan.large.name": {
+    "message": "Grand"
+  },
+  "servers.plan.medium.description": {
+    "message": "Parfait pour 6–15 joueurs et plusieurs mods."
+  },
+  "servers.plan.medium.name": {
+    "message": "Moyen"
+  },
+  "servers.plan.small.description": {
+    "message": "Parfait pour 1–5 amis et quelques mods légers."
+  },
+  "servers.plan.small.name": {
+    "message": "Petit"
+  },
+  "settings.billing.modal.cancel.action": {
+    "message": "Annuler l’abonnement"
+  },
+  "settings.billing.modal.cancel.description": {
+    "message": "Cela annulera votre abonnement. Vous conserverez vos avantages jusqu’à la fin du cycle de facturation en cours."
+  },
+  "settings.billing.modal.cancel.title": {
+    "message": "Êtes-vous sûr de vouloir annuler votre abonnement ?"
+  },
+  "settings.billing.modal.delete.action": {
+    "message": "Supprimer ce mode de paiement"
+  },
+  "settings.billing.modal.delete.description": {
+    "message": "Cela supprimera définitivement ce mode paiement. (vraiment toujours)."
+  },
+  "settings.billing.modal.delete.title": {
+    "message": "Êtes-vous sûr de vouloir supprimer ce mode de paiement ?"
+  },
+  "settings.billing.payment_method.action.add": {
+    "message": "Ajouter un mode de paiement"
+  },
+  "settings.billing.payment_method.action.history": {
+    "message": "Voir les charges précédentes"
+  },
+  "settings.billing.payment_method.action.primary": {
+    "message": "Définir comme primaire"
+  },
+  "settings.billing.payment_method.card_display": {
+    "message": "{card_brand} se terminant par {last_four}"
+  },
+  "settings.billing.payment_method.card_expiry": {
+    "message": "Expire le {month}/{year}"
+  },
+  "settings.billing.payment_method.none": {
+    "message": "Vous n’avez ajouté aucun moyen de paiement."
+  },
+  "settings.billing.payment_method.primary": {
+    "message": "Primaire"
+  },
+  "settings.billing.payment_method.title": {
+    "message": "Mode de paiement"
+  },
+  "settings.billing.payment_method_type.amazon_pay": {
+    "message": "Amazon Pay"
+  },
+  "settings.billing.payment_method_type.amex": {
+    "message": "American Express"
+  },
+  "settings.billing.payment_method_type.cashapp": {
+    "message": "Cash App"
+  },
+  "settings.billing.payment_method_type.diners": {
+    "message": "Diners Club"
+  },
+  "settings.billing.payment_method_type.discover": {
+    "message": "Discover"
+  },
+  "settings.billing.payment_method_type.eftpos": {
+    "message": "EFTPOS"
+  },
+  "settings.billing.payment_method_type.jcb": {
+    "message": "JCB"
+  },
+  "settings.billing.payment_method_type.mastercard": {
+    "message": "MasterCard"
+  },
+  "settings.billing.payment_method_type.paypal": {
+    "message": "PayPal"
+  },
+  "settings.billing.payment_method_type.unionpay": {
+    "message": "UnionPay"
+  },
+  "settings.billing.payment_method_type.unknown": {
+    "message": "Mode de paiement inconnue"
+  },
+  "settings.billing.payment_method_type.visa": {
+    "message": "Visa"
+  },
+  "settings.billing.pyro_subscription.description": {
+    "message": "Gérer vos abonnements au serveur Modrinth."
+  },
+  "settings.billing.pyro_subscription.title": {
+    "message": "Abonnements au serveur Modrinth"
+  },
+  "settings.billing.subscription.description": {
+    "message": "Gérer vos abonnements Modrinth."
+  },
+  "settings.billing.subscription.title": {
+    "message": "Abonnements"
+  },
+  "settings.display.banner.developer-mode.button": {
+    "message": "Désactiver le mode développeur"
+  },
+  "settings.display.banner.developer-mode.description": {
+    "message": "<strong>Le mode développeur</strong> est actif. Cela vous permettra de voir les ID internes de diverses choses dans Modrinth qui peuvent être utiles si vous êtes un développeur utilisant l'API de Modrinth. Cliquez 5 fois sur le logo Modrinth en bas de la page pour basculer en mode développeur."
+  },
+  "settings.display.flags.description": {
+    "message": "Activer ou désactiver certaines fonctionnalités sur cet appareil."
+  },
+  "settings.display.flags.title": {
+    "message": "Activer/désactiver les fonctionnalités"
+  },
+  "settings.display.project-list-layouts.datapack": {
+    "message": "Page des data packs"
+  },
+  "settings.display.project-list-layouts.description": {
+    "message": "Sélectionnez votre mise en page préférée pour chaque page qui affiche les listes de projets sur cet appareil."
+  },
+  "settings.display.project-list-layouts.mod": {
+    "message": "Page des mods"
+  },
+  "settings.display.project-list-layouts.modpack": {
+    "message": "Page des modpacks"
+  },
+  "settings.display.project-list-layouts.plugin": {
+    "message": "Page des plugins"
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "message": "Page des packs de ressources"
+  },
+  "settings.display.project-list-layouts.shader": {
+    "message": "Page des shaders"
+  },
+  "settings.display.project-list-layouts.title": {
+    "message": "Mises en pages de la liste de projet"
+  },
+  "settings.display.project-list-layouts.user": {
+    "message": "Pages de profil utilisateur"
+  },
+  "settings.display.project-list.layouts.collection": {
+    "message": "Collection"
+  },
+  "settings.display.sidebar.advanced-rendering.description": {
+    "message": "Permet un rendu avancé tel que les effets de flou qui pourrait causer des problèmes de performance si le rendu n'est pas accéléré par le matériel."
+  },
+  "settings.display.sidebar.advanced-rendering.title": {
+    "message": "Rendu avancé"
+  },
+  "settings.display.sidebar.external-links-new-tab.description": {
+    "message": "Les liens qui vont en dehors de Modrinth s'ouvrent dans un nouvel onglet. Peu importe ce paramètre, les liens sur le même domaine et dans les descriptions Markdown s'ouvriront dans le même onglet, et les liens sur les publicités et les pages d'édition s'ouvriront dans un nouvel onglet."
+  },
+  "settings.display.sidebar.external-links-new-tab.title": {
+    "message": "Ouvre les liens externes dans un nouvel onglet"
+  },
+  "settings.display.sidebar.hide-app-promos.description": {
+    "message": "Cache les boutons \"Obtenir l'Application Modrinth\" de la navigation principale. La page de l'Application Modrinth peut toujours être trouvée sur la page d'accueil ou dans le pied de page."
+  },
+  "settings.display.sidebar.hide-app-promos.title": {
+    "message": "Cache les publicités de l'Application Modrinth"
+  },
+  "settings.display.sidebar.left-aligned-content-sidebar.title": {
+    "message": "Barre latérale alignée à gauche sur les pages de contenus"
+  },
+  "settings.display.sidebar.right-aligned-content-sidebar.description": {
+    "message": "Aligne la barre latérale à gauche du contenu de la page."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
+    "message": "Aligne les filtres de la barre latérale à droite des résultats de recherche."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
+    "message": "Filtres de la barre latérale alignés à droite sur les pages de recherche"
+  },
+  "settings.display.theme.description": {
+    "message": "Sélectionnez votre thème de couleur préféré pour Modrinth sur cet appareil."
+  },
+  "settings.display.theme.title": {
+    "message": "Thème de couleur"
+  },
+  "settings.language.categories.auto": {
+    "message": "Automatique"
+  },
+  "settings.language.categories.default": {
+    "message": "Langages standards"
+  },
+  "settings.language.categories.experimental": {
+    "message": "Langages expérimentaux"
+  },
+  "settings.language.categories.fun": {
+    "message": "Langages amusants"
+  },
+  "settings.language.categories.search-result": {
+    "message": "Résultats de recherche"
+  },
+  "settings.language.description": {
+    "message": "Choisissez votre langage préféré pour ce site. Les traductions ont été effectuées par des volontaires <crowdin-link>sur Crowdin</crowdin-link>."
+  },
+  "settings.language.languages.automatic": {
+    "message": "Synchroniser avec le langage du système"
+  },
+  "settings.language.languages.language-label-applying": {
+    "message": "{label}. Enregistrement des préférences..."
+  },
+  "settings.language.languages.language-label-error": {
+    "message": "{label}. Erreur"
+  },
+  "settings.language.languages.load-failed": {
+    "message": "Impossible de charger ce langage. Réessayez plus tard."
+  },
+  "settings.language.languages.search-field.description": {
+    "message": "Soumettre une recherche pour cibler le premier résultat"
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "message": "Rechercher un langage..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "message": "{matches, plural, =0 {Aucune langue ne correspond} one {# langue correspond} other {# langues correspondent}} à votre recherche."
+  },
+  "settings.language.languages.search.no-results": {
+    "message": "Aucun langage correspond à votre recherche."
+  },
+  "settings.pats.action.create": {
+    "message": "Créer un PAT"
+  },
+  "settings.pats.description": {
+    "message": "Des jetons d'accès personnels peuvent être utilisés pour accéder à l'API de Modrinth. Pour plus d'informations, consultez la <doc-link>documentation de l'API de Modrinth</doc-link>. Ils peuvent être créés et révoqués à tout moment."
+  },
+  "settings.pats.modal.create.action": {
+    "message": "Créer un PAT"
+  },
+  "settings.pats.modal.create.expires.label": {
+    "message": "Expire"
+  },
+  "settings.pats.modal.create.name.label": {
+    "message": "Nom"
+  },
+  "settings.pats.modal.create.name.placeholder": {
+    "message": "Entrer le nom du PAT..."
+  },
+  "settings.pats.modal.create.title": {
+    "message": "Créer un jeton d'accès personnel"
+  },
+  "settings.pats.modal.delete.action": {
+    "message": "Supprimer ce jeton"
+  },
+  "settings.pats.modal.delete.description": {
+    "message": "Ceci supprimera définitivement ce jeton (pour toujours)."
+  },
+  "settings.pats.modal.delete.title": {
+    "message": "Êtes-vous sûr de vouloir supprimer ce jeton ?"
+  },
+  "settings.pats.modal.edit.title": {
+    "message": "Modifier le jeton d'accès personnel"
+  },
+  "settings.pats.token.action.edit": {
+    "message": "Modifier le jeton"
+  },
+  "settings.pats.token.action.revoke": {
+    "message": "Révoquer le jeton"
+  },
+  "settings.pats.token.expired-ago": {
+    "message": "Expiré {ago}"
+  },
+  "settings.pats.token.expires-in": {
+    "message": "Expire {inTime}"
+  },
+  "settings.pats.token.last-used": {
+    "message": "Dernière utilisation {ago}"
+  },
+  "settings.pats.token.never-used": {
+    "message": "Jamais utilisé"
+  },
+  "settings.profile.bio.description": {
+    "message": "Une courte description pour indiquer à tout le monde un peu à propos de vous."
+  },
+  "settings.profile.bio.title": {
+    "message": "À propos"
+  },
+  "settings.profile.description": {
+    "message": "Votre information de profil est visible publiquement sur Modrinth et sur la <docs-link>Modrinth API</docs-link>."
+  },
+  "settings.profile.profile-info": {
+    "message": "Information du profil"
+  },
+  "settings.profile.profile-picture.reset": {
+    "message": "Réinitialiser"
+  },
+  "settings.profile.profile-picture.title": {
+    "message": "Photo de profil"
+  },
+  "settings.profile.username.description": {
+    "message": "Un nom unique insensible à la casse pour identifier votre profil."
+  },
+  "settings.profile.username.title": {
+    "message": "Nom d'utilisateur"
+  },
+  "settings.sessions.action.revoke-session": {
+    "message": "Révoquer la session"
+  },
+  "settings.sessions.created-ago": {
+    "message": "Créé {ago}"
+  },
+  "settings.sessions.current-session": {
+    "message": "Session actuelle"
+  },
+  "settings.sessions.description": {
+    "message": "Voici tous les appareils actuellement connectés à votre compte Modrinth. Vous pouvez vous déconnecter de chacun d'eux individuellement.\n\nSi vous voyez une connexion inconnue sur un appareil, déconnectez-vous de celui-ci et changez le mot de passe de votre compte Modrinth immédiatement."
+  },
+  "settings.sessions.last-accessed-ago": {
+    "message": "Dernier accès {ago}"
+  },
+  "settings.sessions.unknown-os": {
+    "message": "OS inconnu"
+  },
+  "settings.sessions.unknown-platform": {
+    "message": "Plateforme inconnue"
+  }
+}

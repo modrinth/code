@@ -1,0 +1,11 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Arendusrežiim lubatud."
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Privaatsus"
+  },
+  "instance.settings.title": {
+    "message": "Sätted"
+  }
+}

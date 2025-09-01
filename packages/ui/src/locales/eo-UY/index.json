@@ -1,0 +1,207 @@
+{
+  "button.back": {
+    "defaultMessage": "Reen"
+  },
+  "button.cancel": {
+    "defaultMessage": "Nuligi"
+  },
+  "button.continue": {
+    "defaultMessage": "Daŭri"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Krei projekton"
+  },
+  "button.download": {
+    "defaultMessage": "Elŝuti"
+  },
+  "button.downloading": {
+    "defaultMessage": "Elŝutado"
+  },
+  "button.edit": {
+    "defaultMessage": "Redakti"
+  },
+  "button.next": {
+    "defaultMessage": "Sekve"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Malfermi dosieron"
+  },
+  "button.play": {
+    "defaultMessage": "Ludi"
+  },
+  "button.refresh": {
+    "defaultMessage": "Aktualigi"
+  },
+  "button.remove": {
+    "defaultMessage": "Forigi"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Forigi bildon"
+  },
+  "button.report": {
+    "defaultMessage": "Raporti"
+  },
+  "button.save": {
+    "defaultMessage": "Konservi"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Konservi ŝanĝojn"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Ensaluti"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Elsaluti"
+  },
+  "button.stop": {
+    "defaultMessage": "Ĉesi"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Alŝuti bildon"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "Ĵustempe"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "Aplikaĵo"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Serviloj"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Retejo"
+  },
+  "collection.label.private": {
+    "defaultMessage": "Privata"
+  },
+  "input.view.gallery": {
+    "defaultMessage": "Galeria vido"
+  },
+  "input.view.grid": {
+    "defaultMessage": "Krada vido"
+  },
+  "input.view.list": {
+    "defaultMessage": "Vica vido"
+  },
+  "label.delete": {
+    "defaultMessage": "Forigi"
+  },
+  "label.description": {
+    "defaultMessage": "Priskribo"
+  },
+  "label.error": {
+    "defaultMessage": "Eraro"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "Sekvantaj projektoj"
+  },
+  "label.loading": {
+    "defaultMessage": "Ŝarĝado..."
+  },
+  "label.moderation": {
+    "defaultMessage": "Kontroleco"
+  },
+  "label.notifications": {
+    "defaultMessage": "Sciigoj"
+  },
+  "label.password": {
+    "defaultMessage": "Pasvorto"
+  },
+  "label.public": {
+    "defaultMessage": "Publika"
+  },
+  "label.server": {
+    "defaultMessage": "Servilo"
+  },
+  "label.servers": {
+    "defaultMessage": "Serviloj"
+  },
+  "label.settings": {
+    "defaultMessage": "Agordoj"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "Unu ludanto"
+  },
+  "label.title": {
+    "defaultMessage": "Titolo"
+  },
+  "label.unlisted": {
+    "defaultMessage": "Ne listita"
+  },
+  "label.visibility": {
+    "defaultMessage": "Videbleco"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "Akceptita"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "Arĥivita"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "Fermita"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "Kreinto"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "Malsukcesis"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Listita"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "Kontrolanto"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "Teamo de Modrinth"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "Atendata"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "Privata"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "Servilo"
+  },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "{type}"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "Detaloj"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "Ĝisdatigita {date}"
+  },
+  "project.about.links.discord": {
+    "defaultMessage": "Ensaluti en servilo de Discord"
+  },
+  "project.about.links.donate.bmac": {
+    "defaultMessage": "Aĉeti al Mi Kafon"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "Donaci"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "Sponsori per GitHub"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "Donaci per Ko-fi"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "Donaci per Patreon"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "Donaci per PayPal"
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "Raporti problemojn"
+  },
+  "project.about.links.title": {
+    "defaultMessage": "Ligiloj"
+  }
+}
+

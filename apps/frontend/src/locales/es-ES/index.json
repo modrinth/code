@@ -1,0 +1,365 @@
+{
+  "admin.billing.error.not-found": {
+    "message": "Usuario no encontrado"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "Autorizar"
+  },
+  "auth.authorize.action.decline": {
+    "message": "Rechazar"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> de <creator-link>{creator}</creator-link> podrá:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "Autorizar {appName}"
+  },
+  "auth.authorize.error.no-redirect-url": {
+    "message": "Ninguna localización de redirección se encontró en la respuesta"
+  },
+  "auth.authorize.redirect-url": {
+    "message": "Serás redirigido a <redirect-url>{url}</redirect-url>"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "Enviar correo de recuperación"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "Introduce tu correo electrónico a continuación y te enviaremos un enlace para que puedas recuperar tu cuenta."
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "Correo electrónico o nombre de usuario"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "Correo electrónico"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "Se te ha enviado un correo electrónico con instrucciones si el correo electrónico está asociado a tu cuenta."
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "Correo enviado"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "Ahora puedes iniciar sesión en tu cuenta con tu nueva contraseña."
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "Contraseña restablecida correctamente"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "Restablecer contraseña"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "Confirmar contraseña"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "Introduce tu nueva contraseña para acceder a su cuenta."
+  },
+  "auth.reset-password.title": {
+    "message": "Restablecer contraseña"
+  },
+  "auth.reset-password.title.long": {
+    "message": "Restablecer tu contraseña"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "Por favor introduce el código de autenticación de dos factores para continuar."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "Introduce el código de autenticación de dos factores"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "Introducir código..."
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-link>¿Olvidaste tu contraseña?</forgot-password-link> • <create-account-link>Crear una cuenta</create-account-link>"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "Correo electrónico o nombre de usuario"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Contraseña"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Iniciar sesión con"
+  },
+  "auth.sign-in.title": {
+    "message": "Iniciar sesión"
+  },
+  "auth.sign-in.use-password": {
+    "message": "O usa una contraseña"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Crear cuenta"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "Confirmar contraseña"
+  },
+  "auth.sign-up.email.label": {
+    "message": "Correo electrónico"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Nombre de usuario"
+  },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "Al crear una cuenta, tú aceptas los <terms-link>Términos</terms-link> y <privacy-policy-link>Política de Privacidad</privacy-policy-link> de Modrinth."
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "¡Las contraseñas no coinciden!"
+  },
+  "auth.sign-up.password.label": {
+    "message": "Contraseña"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "¿Ya tienes una cuenta?"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "Suscríbete para recibir actualizaciones sobre Modrinth"
+  },
+  "auth.sign-up.title": {
+    "message": "Registro"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "O crea una cuenta tú mismo"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Registrarse con"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Ajustes de cuenta"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Iniciar sesión"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "¡Tu correo electrónico ya está verificado!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "Correo electrónico ya verificado"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "Reenviar verificación de correo electrónico"
+  },
+  "auth.verify-email.failed-verification.description": {
+    "message": "No pudimos verificar su correo electrónico. Intente volver a enviar el correo electrónico de verificación a través de su panel de control iniciando sesión."
+  },
+  "auth.verify-email.failed-verification.description.logged-in": {
+    "message": "No pudimos verificar su correo electrónico. Intente volver a enviar la verificación del correo electrónico a través del botón de abajo."
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "Verificación de correo electrónico fallida"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "¡Tu correo electrónico ha sido verificado correctamente!"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "Verificación del correo electrónico"
+  },
+  "auth.verify-email.title": {
+    "message": "Verificar correo electrónico"
+  },
+  "auth.welcome.checkbox.subscribe": {
+    "message": "Suscríbete a las novedades sobre Modrinth"
+  },
+  "auth.welcome.long-title": {
+    "message": "¡Bienvenido a Modrinth!"
+  },
+  "auth.welcome.title": {
+    "message": "Bienvenido"
+  },
+  "collection.button.delete-icon": {
+    "message": "Eliminar icono"
+  },
+  "collection.button.edit-icon": {
+    "message": "Editar icono"
+  },
+  "collection.button.remove-project": {
+    "message": "Eliminar proyecto"
+  },
+  "collection.button.unfollow-project": {
+    "message": "Dejar de seguir proyecto"
+  },
+  "collection.error.not-found": {
+    "message": "Colección no encontrada"
+  },
+  "collection.label.collection": {
+    "message": "Colección"
+  },
+  "collection.label.owner": {
+    "message": "Propietario"
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "Crear nuevo"
+  },
+  "dashboard.collections.long-title": {
+    "message": "Tus colecciones"
+  },
+  "error.collection.404.list_item.2": {
+    "message": "La colección puede ser privada."
+  },
+  "error.collection.404.list_title": {
+    "message": "¿Por qué?"
+  },
+  "error.collection.404.title": {
+    "message": "Colección no encontrada"
+  },
+  "error.generic.404.title": {
+    "message": "Página no encontrada"
+  },
+  "error.generic.default.subtitle": {
+    "message": "Algo salió mal."
+  },
+  "error.organization.404.list_title": {
+    "message": "¿Por qué?"
+  },
+  "error.project.404.list_title": {
+    "message": "¿Por qué?"
+  },
+  "error.user.404.list_title": {
+    "message": "¿Por qué?"
+  },
+  "error.user.404.title": {
+    "message": "Usuario no encontrado"
+  },
+  "frog.title": {
+    "message": "Rana"
+  },
+  "layout.action.change-theme": {
+    "message": "Cambiar tema"
+  },
+  "layout.action.get-modrinth-app": {
+    "message": "Conseguir aplicación de Modrinth"
+  },
+  "layout.avatar.alt": {
+    "message": "Tu avatar"
+  },
+  "layout.banner.subscription-payment-failed.button": {
+    "message": "Actualizar información de facturación"
+  },
+  "layout.banner.verify-email.action": {
+    "message": "Reenviar verificación de correo electrónico"
+  },
+  "layout.footer.about": {
+    "message": "Acerca de"
+  },
+  "layout.footer.about.careers": {
+    "message": "Empleos"
+  },
+  "layout.footer.about.changelog": {
+    "message": "Historial de cambios"
+  },
+  "layout.footer.about.news": {
+    "message": "Noticias"
+  },
+  "layout.footer.about.rewards-program": {
+    "message": "Programa de Recompensas"
+  },
+  "layout.footer.about.status": {
+    "message": "Estado"
+  },
+  "layout.footer.legal": {
+    "message": "Legal"
+  },
+  "layout.footer.legal-disclaimer": {
+    "message": "NO ES UN SERVICIO OFICIAL DE MINECRAFT. NO ESTÁ APROBADO NI ASOCIADO CON MOJANG O MICROSOFT."
+  },
+  "layout.footer.legal.copyright-policy": {
+    "message": "Política de Derechos de autor y DMCA"
+  },
+  "layout.footer.legal.privacy-policy": {
+    "message": "Política de Privacidad"
+  },
+  "layout.footer.legal.rules": {
+    "message": "Reglas de Contenido"
+  },
+  "layout.footer.legal.security-notice": {
+    "message": "Aviso de Seguridad"
+  },
+  "layout.footer.legal.terms-of-use": {
+    "message": "Términos de Uso"
+  },
+  "layout.footer.open-source": {
+    "message": "Modrinth es <github-link>código abierto</github-link>."
+  },
+  "layout.footer.products": {
+    "message": "Productos"
+  },
+  "layout.footer.products.plus": {
+    "message": "Modrinth+"
+  },
+  "layout.footer.products.servers": {
+    "message": "Servidores Modrinth"
+  },
+  "layout.footer.resources": {
+    "message": "Recursos"
+  },
+  "layout.footer.resources.api-docs": {
+    "message": "Documentación API"
+  },
+  "layout.footer.resources.help-center": {
+    "message": "Centro de Ayuda"
+  },
+  "layout.footer.resources.report-issues": {
+    "message": "Informar de problemas"
+  },
+  "layout.footer.resources.translate": {
+    "message": "Traducir"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluesky"
+  },
+  "layout.footer.social.discord": {
+    "message": "Discord"
+  },
+  "layout.footer.social.github": {
+    "message": "GitHub"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "Mastodon"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
+  },
+  "layout.menu-toggle.action": {
+    "message": "Desplegar menú"
+  },
+  "layout.nav.home": {
+    "message": "Inicio"
+  },
+  "layout.nav.search": {
+    "message": "Buscar"
+  },
+  "moderation.filter.by": {
+    "message": "Filtrar por"
+  },
+  "moderation.page.projects": {
+    "message": "Proyectos"
+  },
+  "moderation.page.reports": {
+    "message": "Informes"
+  },
+  "moderation.search.placeholder": {
+    "message": "Buscar..."
+  },
+  "project-member-header.accept": {
+    "message": "Aceptar"
+  },
+  "project-member-header.error": {
+    "message": "Error"
+  },
+  "project-member-header.success": {
+    "message": "Éxito"
+  },
+  "project-moderation-nags.required": {
+    "message": "Obligatorio"
+  },
+  "project.description.title": {
+    "message": "Descripción"
+  },
+  "project.gallery.title": {
+    "message": "Galería"
+  },
+  "project.moderation.title": {
+    "message": "Moderación"
+  },
+  "project.versions.title": {
+    "message": "Versiones"
+  }
+}

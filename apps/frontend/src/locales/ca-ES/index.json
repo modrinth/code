@@ -1,0 +1,59 @@
+{
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> per <creator-link>{creator}</creator-link> podrà:"
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "Correu electrònic o nom d’usuari"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "Correu electrònic"
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "Correu electrònic enviat"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Contrasenya"
+  },
+  "auth.sign-up.email.label": {
+    "message": "Correu electrònic"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Nom d'usuari"
+  },
+  "auth.sign-up.password.label": {
+    "message": "Contrasenya"
+  },
+  "auth.welcome.title": {
+    "message": "Us donem la benvinguda"
+  },
+  "error.collection.404.list_title": {
+    "message": "Per què?"
+  },
+  "error.generic.404.title": {
+    "message": "Pàgina no trobada"
+  },
+  "error.organization.404.list_title": {
+    "message": "Per què?"
+  },
+  "error.project.404.list_title": {
+    "message": "Per què?"
+  },
+  "error.project.404.title": {
+    "message": "Projecte no trobat"
+  },
+  "error.user.404.list_title": {
+    "message": "Per què?"
+  },
+  "error.user.404.title": {
+    "message": "Usuari no trobat"
+  },
+  "frog": {
+    "message": "Has estat granotejat! 🐸"
+  },
+  "frog.title": {
+    "message": "Granota"
+  },
+  "layout.action.change-theme": {
+    "message": "Canviar tema"
+  }
+}
