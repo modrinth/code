@@ -44,7 +44,8 @@ const postApproval: Stage = {
 			weight: 0,
 			suggestedStatus: 'approved',
 			severity: 'low',
-			message: async () => (await import('../messages/gallery/insufficient.md?raw')).default,
+			message: async () =>
+				(await import('../messages/post-approval/metadata-issue.md?raw')).default,
 			enablesActions: [
 				{
 					id: 'dependencies',
