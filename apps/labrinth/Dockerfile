@@ -8,13 +8,13 @@ ARG GIT_HASH
 RUN --mount=type=cache,target=/usr/src/labrinth/target \
   --mount=type=cache,target=/usr/local/cargo/git/db \
   --mount=type=cache,target=/usr/local/cargo/registry \
-  SQLX_OFFLINE=true cargo build --release --package labrinth
+  SQLX_OFFLINE=true cargo build --profile release-labrinth --package labrinth
 
 FROM build AS artifacts
 
 RUN --mount=type=cache,target=/usr/src/labrinth/target \
   mkdir /labrinth \
-  && cp /usr/src/labrinth/target/release/labrinth /labrinth/labrinth \
+  && cp /usr/src/labrinth/target/release-labrinth/labrinth /labrinth/labrinth \
   && cp -r /usr/src/labrinth/apps/labrinth/migrations /labrinth \
   && cp -r /usr/src/labrinth/apps/labrinth/assets /labrinth
 
