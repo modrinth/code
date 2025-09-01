@@ -76,14 +76,6 @@
 				<h2 :class="{ 'sr-only': isEditing }">
 					{{ version.name }}
 				</h2>
-				<div v-if="version.featured" class="featured">
-					<StarIcon aria-hidden="true" />
-					Featured
-				</div>
-				<div v-else-if="featuredVersions.find((x) => x.id === version.id)" class="featured">
-					<StarIcon aria-hidden="true" />
-					Auto-featured
-				</div>
 			</div>
 			<div v-if="fieldErrors && showKnownErrors" class="known-errors">
 				<ul>
@@ -123,11 +115,16 @@
 						Save
 					</button>
 				</ButtonStyled>
-				<ButtonStyled>
-					<button @click="version.featured = !version.featured">
+				<ButtonStyled v-if="usesFeaturedVersions">
+					<button
+						v-tooltip="
+							`Featured versions are being phased out. If you're still using this for something in the API, seek an alternative soon.`
+						"
+						@click="version.featured = !version.featured"
+					>
 						<StarIcon aria-hidden="true" />
-						<template v-if="!version.featured"> Feature version</template>
-						<template v-else> Unfeature version</template>
+						<template v-if="!version.featured"> Feature version (deprecated)</template>
+						<template v-else> Unfeature version (deprecated)</template>
 					</button>
 				</ButtonStyled>
 				<ButtonStyled>
@@ -718,12 +715,6 @@ export default defineNuxtComponent({
 				return []
 			},
 		},
-		featuredVersions: {
-			type: Array,
-			default() {
-				return []
-			},
-		},
 		members: {
 			type: Array,
 			default() {
@@ -897,6 +888,8 @@ export default defineNuxtComponent({
 					.format('MMM D, YYYY')}. ${version.downloads} downloads.`,
 		)
 
+		const usesFeaturedVersions = computed(() => props.versions.some((v) => v.featured))
+
 		useSeoMeta({
 			title,
 			description,
@@ -908,6 +901,7 @@ export default defineNuxtComponent({
 			auth,
 			tags,
 			flags,
+			usesFeaturedVersions,
 			fileTypes: ref(fileTypes),
 			oldFileTypes: ref(oldFileTypes),
 			isCreating: ref(isCreating),
@@ -1309,20 +1303,14 @@ export default defineNuxtComponent({
 			this.shouldPreventActions = false
 		},
 		async resetProjectVersions() {
-			const [versions, featuredVersions, dependencies] = await Promise.all([
+			const [versions, dependencies] = await Promise.all([
 				useBaseFetch(`project/${this.version.project_id}/version`),
-				useBaseFetch(`project/${this.version.project_id}/version?featured=true`),
 				useBaseFetch(`project/${this.version.project_id}/dependencies`),
 				this.resetProject(),
 			])
 
 			const newCreatedVersions = this.$computeVersions(versions, this.members)
-			const featuredIds = featuredVersions.map((x) => x.id)
 			this.$emit('update:versions', newCreatedVersions)
-			this.$emit(
-				'update:featuredVersions',
-				newCreatedVersions.filter((version) => featuredIds.includes(version.id)),
-			)
 			this.$emit('update:dependencies', dependencies)
 
 			return newCreatedVersions
