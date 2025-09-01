@@ -133,7 +133,7 @@ const messages = defineMessages({
 					v-else-if="
 						!projectV3.environment ||
 						projectV3.environment.length === 0 ||
-						projectV3.environment[0] === 'unknown'
+						(projectV3.environment.length === 1 && projectV3.environment[0] === 'unknown')
 					"
 					type="critical"
 					:header="formatMessage(messages.missingEnvTitle)"
