@@ -11,6 +11,13 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-08-31T17:15:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Updated some of the publishing checklist messages.
+- Fixed certain buttons having the wrong focus effect in Firefox browsers.`,
+	},
+	{
 		date: `2025-08-31T11:50:00-07:00`,
 		product: 'web',
 		body: `### Improvements
