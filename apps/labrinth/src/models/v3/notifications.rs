@@ -24,6 +24,19 @@ pub struct Notification {
     pub actions: Vec<NotificationAction>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Copy, Eq, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum NotificationType {
+    // If adding a notification type, add a variant in `NotificationBody` of the same name!
+    ProjectUpdate,
+    TeamInvite,
+    OrganizationInvite,
+    StatusChange,
+    ModeratorMessage,
+    LegacyMarkdown,
+    Unknown,
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum NotificationBody {
@@ -206,6 +219,30 @@ impl From<DBNotification> for Notification {
     }
 }
 
+impl Notification {
+    pub fn notification_type(&self) -> NotificationType {
+        match &self.body {
+            NotificationBody::ProjectUpdate { .. } => {
+                NotificationType::ProjectUpdate
+            }
+            NotificationBody::TeamInvite { .. } => NotificationType::TeamInvite,
+            NotificationBody::OrganizationInvite { .. } => {
+                NotificationType::OrganizationInvite
+            }
+            NotificationBody::StatusChange { .. } => {
+                NotificationType::StatusChange
+            }
+            NotificationBody::ModeratorMessage { .. } => {
+                NotificationType::ModeratorMessage
+            }
+            NotificationBody::LegacyMarkdown { .. } => {
+                NotificationType::LegacyMarkdown
+            }
+            NotificationBody::Unknown => NotificationType::Unknown,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 pub struct NotificationAction {
     pub name: String,
@@ -218,6 +255,68 @@ impl From<DBNotificationAction> for NotificationAction {
         Self {
             name: act.name,
             action_route: (act.action_route_method, act.action_route),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum NotificationChannel {
+    Email,
+}
+
+impl NotificationChannel {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            NotificationChannel::Email => "email",
+        }
+    }
+
+    pub fn from_str_or_default(s: &str) -> Self {
+        match s {
+            "email" => NotificationChannel::Email,
+            _ => NotificationChannel::Email,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum NotificationDeliveryStatus {
+    Pending,
+    SkippedPreferences,
+    SkippedDefault,
+    Delivered,
+    PermanentlyFailed,
+}
+
+impl NotificationDeliveryStatus {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            NotificationDeliveryStatus::Pending => "pending",
+            NotificationDeliveryStatus::SkippedPreferences => {
+                "skipped_preferences"
+            }
+            NotificationDeliveryStatus::SkippedDefault => "skipped_default",
+            NotificationDeliveryStatus::Delivered => "delivered",
+            NotificationDeliveryStatus::PermanentlyFailed => {
+                "permanently_failed"
+            }
+        }
+    }
+
+    pub fn from_str_or_default(s: &str) -> Self {
+        match s {
+            "pending" => NotificationDeliveryStatus::Pending,
+            "skipped_preferences" => {
+                NotificationDeliveryStatus::SkippedPreferences
+            }
+            "skipped_default" => NotificationDeliveryStatus::SkippedDefault,
+            "delivered" => NotificationDeliveryStatus::Delivered,
+            "permanently_failed" => {
+                NotificationDeliveryStatus::PermanentlyFailed
+            }
+            _ => NotificationDeliveryStatus::Pending,
         }
     }
 }
