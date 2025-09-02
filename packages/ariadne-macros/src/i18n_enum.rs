@@ -48,7 +48,7 @@ pub fn generate_impls(input: DeriveInput) -> Result<TokenStream> {
             .map(|(param_name, field)| quote! { #param_name = #field });
         quote! {
             Self::#name #pattern_format =>
-                ::rust_i18n::t!(#message_key, locale = locale, #(#params),*),
+                ::rust_i18n::t!(#message_key, locale = locale #(, #params)*),
         }
     });
 

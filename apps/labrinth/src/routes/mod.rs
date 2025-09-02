@@ -5,7 +5,8 @@ use crate::util::env::parse_strings_from_var;
 use actix_cors::Cors;
 use actix_files::Files;
 use actix_web::http::StatusCode;
-use actix_web::{HttpResponse, ResponseError, web};
+use actix_web::http::header::{AcceptLanguage, Header, LanguageTag};
+use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use ariadne::i18n::I18nEnum;
 use futures::FutureExt;
 
@@ -247,7 +248,7 @@ macro_rules! labrinth_error_type {
         impl $error_enum {
             pub fn as_api_error<'a>(
                 &self,
-            ) -> crate::models::error::ApiError<'a> {
+            ) -> $crate::models::error::ApiError<'a> {
                 self.as_localized_api_error("en")
             }
 
@@ -255,8 +256,8 @@ macro_rules! labrinth_error_type {
                 &self,
                 language: &str,
             ) -> crate::models::error::ApiError<'a> {
-                crate::models::error::ApiError {
-                    error: self.translation_id(),
+                $crate::models::error::ApiError {
+                    error: $crate::routes::error_id_for_error(self),
                     description: self.translated_message(language),
                 }
             }
@@ -265,14 +266,9 @@ macro_rules! labrinth_error_type {
                 &self,
                 req: &actix_web::HttpRequest,
             ) -> actix_web::HttpResponse {
-                use actix_web::http::header::{
-                    AcceptLanguage, ContentLanguage, Header, LanguageTag,
-                    QualityItem,
-                };
-                let language = AcceptLanguage::parse(req)
-                    .ok()
-                    .and_then(|x| x.preference().into_item())
-                    .unwrap_or_else(|| LanguageTag::parse("en").unwrap());
+                use actix_web::http::header::{ContentLanguage, QualityItem};
+
+                let language = $crate::routes::parse_accept_language(req);
                 let body = self.as_localized_api_error(language.as_str());
 
                 actix_web::HttpResponse::build(self.status_code())
@@ -325,4 +321,18 @@ impl ResponseError for ApiError {
     fn error_response(&self) -> HttpResponse {
         HttpResponse::build(self.status_code()).json(self.as_api_error())
     }
+}
+
+pub fn parse_accept_language(req: &HttpRequest) -> LanguageTag {
+    AcceptLanguage::parse(req)
+        .ok()
+        .and_then(|x| x.preference().into_item())
+        .unwrap_or_else(|| LanguageTag::parse("en").unwrap())
+}
+
+pub fn error_id_for_error(error: &impl I18nEnum) -> &'static str {
+    let translation_id = error.translation_id();
+    translation_id
+        .split_once('.')
+        .map_or(translation_id, |(base, _)| base)
 }

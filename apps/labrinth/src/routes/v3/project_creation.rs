@@ -7,7 +7,7 @@ use crate::database::models::thread_item::ThreadBuilder;
 use crate::database::models::{self, DBUser, image_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity, FileHostingError};
-use crate::models::error::ApiError;
+use crate::labrinth_error_type;
 use crate::models::ids::{ImageId, OrganizationId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
@@ -26,6 +26,7 @@ use actix_multipart::{Field, Multipart};
 use actix_web::http::StatusCode;
 use actix_web::web::{self, Data};
 use actix_web::{HttpRequest, HttpResponse};
+use ariadne::i18n::I18nEnum;
 use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::to_base62;
 use chrono::Utc;
@@ -44,50 +45,109 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.route("project", web::post().to(project_create));
 }
 
-// TODO: Migrate to I18nEnum
-#[derive(Error, Debug)]
+#[derive(Error, I18nEnum, Debug)]
+#[i18n_root_key("error.project_creation")]
 pub enum CreateError {
-    #[error("Environment Error")]
+    #[translation_id("environment_error")]
+    // #[error("Environment Error")]
     EnvError(#[from] dotenvy::Error),
-    #[error("An unknown database error occurred")]
+
+    #[translation_id("database_error.unknown")]
+    // #[error("An unknown database error occurred")]
     SqlxDatabaseError(#[from] sqlx::Error),
-    #[error("Database Error: {0}")]
+
+    #[translation_id("database_error")]
+    #[translate_fields(cause = 0)]
+    // #[error("Database Error: {0}")]
     DatabaseError(#[from] models::DatabaseError),
-    #[error("Indexing Error: {0}")]
+
+    #[translation_id("indexing_error")]
+    #[translate_fields(cause = 0)]
+    // #[error("Indexing Error: {0}")]
     IndexingError(#[from] IndexingError),
-    #[error("Error while parsing multipart payload: {0}")]
+
+    #[translation_id("invalid_input.multipart")]
+    #[translate_fields(cause = 0)]
+    // #[error("Error while parsing multipart payload: {0}")]
     MultipartError(#[from] actix_multipart::MultipartError),
-    #[error("Error while parsing JSON: {0}")]
+
+    #[translation_id("invalid_input.parsing")]
+    #[translate_fields(cause = 0)]
+    // #[error("Error while parsing JSON: {0}")]
     SerDeError(#[from] serde_json::Error),
-    #[error("Error while validating input: {0}")]
+
+    #[translation_id("invalid_input.validation")]
+    #[translate_fields(cause = 0)]
+    // #[error("Error while validating input: {0}")]
     ValidationError(String),
-    #[error("Error while uploading file: {0}")]
+
+    #[translation_id("file_hosting_error")]
+    #[translate_fields(cause = translate(0))]
+    // #[error("Error while uploading file: {0}")]
     FileHostingError(#[from] FileHostingError),
-    #[error("Error while validating uploaded file: {0}")]
+
+    #[translation_id("invalid_input.file")]
+    #[translate_fields(cause = translate(0))]
+    // #[error("Error while validating uploaded file: {0}")]
     FileValidationError(#[from] crate::validate::ValidationError),
-    #[error("{}", .0)]
+
+    #[translation_id("invalid_input.missing_value")]
+    #[translate_fields(cause = 0)]
+    // #[error("{}", .0)]
     MissingValueError(String),
-    #[error("Invalid format for image: {0}")]
+
+    #[translation_id("invalid_input.icon")]
+    #[translate_fields(cause = 0)]
+    // #[error("Invalid format for image: {0}")]
     InvalidIconFormat(String),
-    #[error("Error with multipart data: {0}")]
+
+    #[translation_id("invalid_input")]
+    #[translate_fields(cause = 0)]
+    // #[error("Error with multipart data: {0}")]
     InvalidInput(String),
-    #[error("Invalid game version: {0}")]
+
+    #[translation_id("invalid_input.game_version")]
+    #[translate_fields(cause = 0)]
+    // #[error("Invalid game version: {0}")]
     InvalidGameVersion(String),
-    #[error("Invalid loader: {0}")]
+
+    #[translation_id("invalid_input.loader")]
+    #[translate_fields(cause = 0)]
+    // #[error("Invalid loader: {0}")]
     InvalidLoader(String),
-    #[error("Invalid category: {0}")]
+
+    #[translation_id("invalid_input.category")]
+    #[translate_fields(cause = 0)]
+    // #[error("Invalid category: {0}")]
     InvalidCategory(String),
-    #[error("Invalid file type for version file: {0}")]
+
+    #[translation_id("invalid_input.file_type")]
+    #[translate_fields(cause = 0)]
+    // #[error("Invalid file type for version file: {0}")]
     InvalidFileType(String),
-    #[error("Slug is already taken!")]
+
+    #[translation_id("invalid_input.slug_collision")]
+    // #[error("Slug is already taken!")]
     SlugCollision,
-    #[error("Authentication Error: {0}")]
+
+    #[translation_id("unauthorized")]
+    #[translate_fields(cause = translate(0))]
+    // #[error("Authentication Error: {0}")]
     Unauthorized(#[from] AuthenticationError),
-    #[error("Authentication Error: {0}")]
+
+    #[translation_id("unauthorized")]
+    #[translate_fields(cause = 0)]
+    // TODO: Use an I18nEnum instead of a String
+    // #[error("Authentication Error: {0}")]
     CustomAuthenticationError(String),
-    #[error("Image Parsing Error: {0}")]
+
+    #[translation_id("invalid_image")]
+    #[translate_fields(cause = 0)]
+    // #[error("Image Parsing Error: {0}")]
     ImageError(#[from] ImageError),
 }
+
+labrinth_error_type!(CreateError);
 
 impl actix_web::ResponseError for CreateError {
     fn status_code(&self) -> StatusCode {
@@ -122,31 +182,7 @@ impl actix_web::ResponseError for CreateError {
     }
 
     fn error_response(&self) -> HttpResponse {
-        HttpResponse::build(self.status_code()).json(ApiError {
-            error: match self {
-                CreateError::EnvError(..) => "environment_error",
-                CreateError::SqlxDatabaseError(..) => "database_error",
-                CreateError::DatabaseError(..) => "database_error",
-                CreateError::IndexingError(..) => "indexing_error",
-                CreateError::FileHostingError(..) => "file_hosting_error",
-                CreateError::SerDeError(..) => "invalid_input",
-                CreateError::MultipartError(..) => "invalid_input",
-                CreateError::MissingValueError(..) => "invalid_input",
-                CreateError::InvalidIconFormat(..) => "invalid_input",
-                CreateError::InvalidInput(..) => "invalid_input",
-                CreateError::InvalidGameVersion(..) => "invalid_input",
-                CreateError::InvalidLoader(..) => "invalid_input",
-                CreateError::InvalidCategory(..) => "invalid_input",
-                CreateError::InvalidFileType(..) => "invalid_input",
-                CreateError::Unauthorized(..) => "unauthorized",
-                CreateError::CustomAuthenticationError(..) => "unauthorized",
-                CreateError::SlugCollision => "invalid_input",
-                CreateError::ValidationError(..) => "invalid_input",
-                CreateError::FileValidationError(..) => "invalid_input",
-                CreateError::ImageError(..) => "invalid_image",
-            },
-            description: self.to_string(),
-        })
+        HttpResponse::build(self.status_code()).json(self.as_api_error())
     }
 }
 
