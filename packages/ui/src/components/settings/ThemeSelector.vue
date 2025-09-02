@@ -83,7 +83,7 @@ function asString(theme: T): string {
 				<MoonIcon
 					v-else-if="'dark' === option"
 					v-tooltip="formatMessage(colorTheme.preferredDark)"
-					class="theme-icon shrinkx-0"
+					class="theme-icon shrink-0"
 				/>
 			</div>
 		</button>
