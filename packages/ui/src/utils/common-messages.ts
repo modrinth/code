@@ -225,6 +225,10 @@ export const commonMessages = defineMessages({
 		id: 'button.sign-out',
 		defaultMessage: 'Sign out',
 	},
+	signUpButton: {
+		id: 'button.sign-up',
+		defaultMessage: 'Sign up',
+	},
 	singleplayerLabel: {
 		id: 'label.singleplayer',
 		defaultMessage: 'Singleplayer',
