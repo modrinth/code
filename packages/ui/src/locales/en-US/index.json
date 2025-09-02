@@ -77,6 +77,9 @@
   "button.sign-out": {
     "defaultMessage": "Sign out"
   },
+  "button.sign-up": {
+    "defaultMessage": "Sign up"
+  },
   "button.stop": {
     "defaultMessage": "Stop"
   },
