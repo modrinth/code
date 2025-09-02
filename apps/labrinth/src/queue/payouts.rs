@@ -3,7 +3,7 @@ use crate::models::payouts::{
     PayoutMethodType,
 };
 use crate::models::projects::MonetizationStatus;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use base64::Engine;
 use chrono::{DateTime, Datelike, Duration, NaiveTime, TimeZone, Utc};
 use dashmap::DashMap;

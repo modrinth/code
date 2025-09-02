@@ -1,4 +1,3 @@
-use super::ApiError;
 use crate::auth::checks::{filter_visible_versions, is_visible_version};
 use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::redis::RedisPool;
@@ -7,6 +6,7 @@ use crate::models::pats::Scopes;
 use crate::models::projects::VersionType;
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
+use crate::routes::error::ApiError;
 use crate::{database, models};
 use actix_web::{HttpRequest, HttpResponse, web};
 use dashmap::DashMap;

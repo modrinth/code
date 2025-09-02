@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use super::ApiError;
 use crate::database::redis::RedisPool;
 use crate::models;
 use crate::models::ids::VersionId;
@@ -9,6 +8,7 @@ use crate::models::projects::{
 };
 use crate::models::v2::projects::LegacyVersion;
 use crate::queue::session::AuthQueue;
+use crate::routes::error::ApiError;
 use crate::routes::{v2_reroute, v3};
 use crate::search::SearchConfig;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};

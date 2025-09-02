@@ -16,7 +16,7 @@ use crate::models::billing::{
 use crate::models::pats::Scopes;
 use crate::models::users::Badges;
 use crate::queue::session::AuthQueue;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::util::archon::{ArchonClient, CreateServerRequest, Specs};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::base62_impl::{parse_base62, to_base62};

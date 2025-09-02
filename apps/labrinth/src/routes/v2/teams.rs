@@ -5,7 +5,8 @@ use crate::models::teams::{
 };
 use crate::models::v2::teams::LegacyTeamMember;
 use crate::queue::session::AuthQueue;
-use crate::routes::{ApiError, v2_reroute, v3};
+use crate::routes::error::ApiError;
+use crate::routes::{v2_reroute, v3};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::UserId;
 use rust_decimal::Decimal;

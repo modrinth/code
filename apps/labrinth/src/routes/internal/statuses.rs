@@ -8,7 +8,7 @@ use crate::queue::session::AuthQueue;
 use crate::queue::socket::{
     ActiveSocket, ActiveSockets, SocketId, TunnelSocketType,
 };
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::sync::friends::{FRIENDS_CHANNEL_NAME, RedisFriendsMessage};
 use crate::sync::status::{
     get_user_status, push_back_user_expiry, replace_user_status,

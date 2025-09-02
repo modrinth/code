@@ -1,6 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 
-use super::{ApiError, oauth_clients::get_user_clients};
+use super::oauth_clients::get_user_clients;
+use crate::routes::error::ApiError;
 use crate::{
     auth::{
         filter_visible_collections, filter_visible_projects,

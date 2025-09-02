@@ -2,7 +2,7 @@ use crate::auth::get_user_from_headers;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use actix_web::{HttpRequest, HttpResponse, post, web};
 use sqlx::PgPool;
 

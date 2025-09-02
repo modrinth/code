@@ -10,7 +10,7 @@ use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::queue::session::AuthQueue;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::UserId;
 use rust_decimal::Decimal;

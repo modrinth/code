@@ -1,4 +1,4 @@
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::routes::v3::project_creation::CreateError;
 use crate::util::validate::validation_errors_to_string;
 use actix_multipart::Field;

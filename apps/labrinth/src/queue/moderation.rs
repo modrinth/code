@@ -8,7 +8,7 @@ use crate::models::notifications::NotificationBody;
 use crate::models::pack::{PackFile, PackFileHash, PackFormat};
 use crate::models::projects::ProjectStatus;
 use crate::models::threads::MessageBody;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use dashmap::DashSet;
 use hex::ToHex;
 use itertools::Itertools;

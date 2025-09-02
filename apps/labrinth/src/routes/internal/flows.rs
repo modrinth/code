@@ -11,7 +11,7 @@ use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::pats::Scopes;
 use crate::models::users::{Badges, Role};
 use crate::queue::session::AuthQueue;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::routes::internal::session::issue_session;
 use crate::util::captcha::check_hcaptcha;
 use crate::util::env::parse_strings_from_var;

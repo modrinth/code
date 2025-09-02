@@ -1,8 +1,8 @@
 use std::{collections::HashSet, fmt::Display, sync::Arc};
 
-use super::ApiError;
 use crate::file_hosting::FileHostPublicity;
 use crate::models::ids::OAuthClientId;
+use crate::routes::error::ApiError;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::{
     auth::{checks::ValidateAuthorized, get_user_from_headers},

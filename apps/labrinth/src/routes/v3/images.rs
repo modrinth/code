@@ -12,7 +12,7 @@ use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::{ReportId, ThreadMessageId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::queue::session::AuthQueue;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::util::img::upload_image_optimized;
 use crate::util::routes::read_limited_from_payload;
 use actix_web::{HttpRequest, HttpResponse, web};

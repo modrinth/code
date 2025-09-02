@@ -1,7 +1,7 @@
-use super::ApiError;
 use crate::models::projects::Project;
 use crate::models::v2::projects::LegacyProject;
 use crate::queue::session::AuthQueue;
+use crate::routes::error::ApiError;
 use crate::routes::internal;
 use crate::{database::redis::RedisPool, routes::v2_reroute};
 use actix_web::{HttpRequest, HttpResponse, get, web};

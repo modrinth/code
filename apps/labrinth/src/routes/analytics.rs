@@ -5,7 +5,7 @@ use crate::models::pats::Scopes;
 use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::maxmind::MaxMindIndexer;
 use crate::queue::session::AuthQueue;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::util::date::get_current_tenths_of_ms;
 use crate::util::env::parse_strings_from_var;
 use actix_web::{HttpRequest, HttpResponse};

@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
-use crate::{models::ids::ProjectId, routes::ApiError};
+use crate::models::ids::ProjectId;
+use crate::routes::error::ApiError;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -61,7 +62,7 @@ pub async fn fetch_views(
     let query = client
         .query(
             "
-            SELECT  
+            SELECT
                 toUnixTimestamp(toStartOfInterval(recorded, toIntervalMinute(?))) AS time,
                 project_id AS id,
                 count(1) AS total
@@ -91,7 +92,7 @@ pub async fn fetch_downloads(
     let query = client
         .query(
             "
-            SELECT  
+            SELECT
                 toUnixTimestamp(toStartOfInterval(recorded, toIntervalMinute(?))) AS time,
                 project_id as id,
                 count(1) AS total

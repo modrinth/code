@@ -1,7 +1,7 @@
-use super::ApiError;
 use crate::database;
 use crate::database::redis::RedisPool;
 use crate::models::teams::ProjectPermissions;
+use crate::routes::error::ApiError;
 use crate::{
     auth::get_user_from_headers,
     database::models::user_item,

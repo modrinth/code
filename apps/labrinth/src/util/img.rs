@@ -3,7 +3,7 @@ use crate::database::models::image_item;
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::images::ImageContext;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use color_thief::ColorFormat;
 use hex::ToHex;
 use image::imageops::FilterType;

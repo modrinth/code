@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use super::ApiError;
 use super::v3::project_creation::CreateError;
 use crate::models::v2::projects::LegacySideType;
+use crate::routes::error::ApiError;
 use crate::util::actix::{
     MultipartSegment, MultipartSegmentData, generate_multipart,
 };

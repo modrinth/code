@@ -9,7 +9,7 @@ use crate::database::redis::RedisPool;
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::{auth::get_user_from_headers, database};
 use actix_web::{HttpRequest, HttpResponse, get, route, web};
 use ariadne::i18n::localized_labrinth_error;

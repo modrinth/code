@@ -5,7 +5,7 @@ use crate::models::pats::Scopes;
 use crate::models::users::UserFriend;
 use crate::queue::session::AuthQueue;
 use crate::queue::socket::ActiveSockets;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::routes::internal::statuses::{
     broadcast_friends_message, send_message_to_user,
 };

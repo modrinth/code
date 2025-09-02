@@ -6,7 +6,7 @@ use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::models::sessions::Session;
 use crate::queue::session::AuthQueue;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::util::env::parse_var;
 use actix_web::http::header::AUTHORIZATION;
 use actix_web::web::{Data, ServiceConfig, scope};

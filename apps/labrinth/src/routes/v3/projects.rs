@@ -23,7 +23,7 @@ use crate::models::teams::ProjectPermissions;
 use crate::models::threads::MessageBody;
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::search::indexing::remove_documents;
 use crate::search::{SearchConfig, SearchError, search_for_project};
 use crate::util::img;

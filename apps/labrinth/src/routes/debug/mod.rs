@@ -1,4 +1,4 @@
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::util::cors::default_cors;
 use crate::util::guards::admin_key_guard;
 use actix_web::{HttpResponse, get};

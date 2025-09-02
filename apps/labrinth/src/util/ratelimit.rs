@@ -1,5 +1,5 @@
 use crate::database::redis::RedisPool;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::util::env::parse_var;
 use actix_web::{
     Error,

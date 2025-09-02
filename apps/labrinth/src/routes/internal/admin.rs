@@ -9,7 +9,7 @@ use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::maxmind::MaxMindIndexer;
 use crate::queue::moderation::AUTOMOD_ID;
 use crate::queue::session::AuthQueue;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::search::SearchConfig;
 use crate::util::date::get_current_tenths_of_ms;
 use crate::util::guards::admin_key_guard;

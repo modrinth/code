@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use super::ApiError;
 use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::models::team_item::DBTeamMember;
 use crate::database::models::{
@@ -13,6 +12,7 @@ use crate::models::ids::OrganizationId;
 use crate::models::pats::Scopes;
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::queue::session::AuthQueue;
+use crate::routes::error::ApiError;
 use crate::routes::v3::project_creation::CreateError;
 use crate::util::img::delete_old_images;
 use crate::util::routes::read_limited_from_payload;
