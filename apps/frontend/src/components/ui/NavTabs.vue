@@ -14,7 +14,6 @@
 				'text-button-textSelected': activeIndex === index && !subpageSelected,
 				'text-contrast': activeIndex === index && subpageSelected,
 			}"
-			@click="(e) => emit('click', e)"
 		>
 			<component :is="link.icon" v-if="link.icon" class="size-5" />
 			<span class="text-nowrap">{{ link.label }}</span>
@@ -39,9 +38,6 @@
 import { computed, onMounted, ref, watch } from 'vue'
 
 const route = useNativeRoute()
-const emit = defineEmits<{
-	(e: 'click', event: MouseEvent): void
-}>()
 
 interface Tab {
 	label: string
