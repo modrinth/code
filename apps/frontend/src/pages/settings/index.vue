@@ -56,9 +56,9 @@
 							<div class="label">
 								<RadioButtonCheckedIcon
 									v-if="cosmetics.searchDisplayMode[projectType.id] === 'list'"
-									class="radio"
+									class="radio shrink-0"
 								/>
-								<RadioButtonIcon v-else class="radio" />
+								<RadioButtonIcon v-else class="radio shrink-0" />
 								Rows
 							</div>
 						</button>
@@ -82,9 +82,9 @@
 							<div class="label">
 								<RadioButtonCheckedIcon
 									v-if="cosmetics.searchDisplayMode[projectType.id] === 'grid'"
-									class="radio"
+									class="radio shrink-0"
 								/>
-								<RadioButtonIcon v-else class="radio" />
+								<RadioButtonIcon v-else class="radio shrink-0" />
 								Grid
 							</div>
 						</button>
@@ -106,9 +106,9 @@
 							<div class="label">
 								<RadioButtonCheckedIcon
 									v-if="cosmetics.searchDisplayMode[projectType.id] === 'gallery'"
-									class="radio"
+									class="radio shrink-0"
 								/>
-								<RadioButtonIcon v-else class="radio" />
+								<RadioButtonIcon v-else class="radio shrink-0" />
 								Gallery
 							</div>
 						</button>
