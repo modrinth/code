@@ -4,9 +4,6 @@ use crate::database::redis::RedisPool;
 use crate::models::v3::notifications::{NotificationChannel, NotificationType};
 use serde::{Deserialize, Serialize};
 
-const USER_NOTIFICATION_PREFERENCES_NAMESPACE: &str =
-    "user_notification_preferences";
-
 #[derive(Serialize, Deserialize)]
 pub struct UserNotificationPreference {
     pub id: i64,
@@ -41,24 +38,49 @@ impl From<UserNotificationPreferenceQueryResult>
 }
 
 impl UserNotificationPreference {
+    pub async fn get_many_users_or_default(
+        user_ids: &[DBUserId],
+        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+    ) -> Result<Vec<UserNotificationPreference>, DatabaseError> {
+        let results = sqlx::query!(
+            r#"
+            SELECT
+              COALESCE(unp.id, dnp.id) "id!",
+              unp.user_id,
+              dnp.channel "channel!",
+              dnp.notification_type "notification_type!",
+              COALESCE(unp.enabled, COALESCE(dnp.enabled, false)) "enabled!"
+            FROM users_notifications_preferences dnp
+            LEFT JOIN users_notifications_preferences unp
+              ON unp.channel = dnp.channel
+              AND unp.notification_type = dnp.notification_type
+              AND unp.user_id = ANY($1::bigint[])
+            "#,
+            &user_ids.iter().map(|x| x.0).collect::<Vec<_>>(),
+        )
+        .fetch_all(exec)
+        .await?;
+
+        let preferences = results
+            .into_iter()
+            .map(|r| UserNotificationPreference {
+                id: r.id,
+                user_id: r.user_id.map(DBUserId),
+                channel: NotificationChannel::from_str_or_default(&r.channel),
+                notification_type: NotificationType::from_str_or_default(
+                    &r.notification_type,
+                ),
+                enabled: r.enabled,
+            })
+            .collect();
+
+        Ok(preferences)
+    }
+
     pub async fn get_user_or_default(
         user_id: DBUserId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-        redis: &RedisPool,
     ) -> Result<Vec<UserNotificationPreference>, DatabaseError> {
-        let mut redis = redis.connect().await?;
-
-        let cached_preferences = redis
-            .get_deserialized_from_json(
-                USER_NOTIFICATION_PREFERENCES_NAMESPACE,
-                &user_id.0.to_string(),
-            )
-            .await?;
-
-        if let Some(preferences) = cached_preferences {
-            return Ok(preferences);
-        }
-
         let results = sqlx::query!(
             r#"
             SELECT
@@ -91,15 +113,6 @@ impl UserNotificationPreference {
             })
             .collect();
 
-        redis
-            .set_serialized_to_json(
-                USER_NOTIFICATION_PREFERENCES_NAMESPACE,
-                &user_id.0.to_string(),
-                &preferences,
-                None,
-            )
-            .await?;
-
         Ok(preferences)
     }
 
@@ -107,7 +120,6 @@ impl UserNotificationPreference {
     pub async fn insert(
         &mut self,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-        redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let id = sqlx::query_scalar!(
             "
@@ -125,28 +137,7 @@ impl UserNotificationPreference {
         .fetch_one(exec)
         .await?;
 
-        if let Some(user_id) = self.user_id {
-            Self::clear_user_notification_preferences_cache(user_id, redis)
-                .await?;
-        }
-
         self.id = id;
-
-        Ok(())
-    }
-
-    pub async fn clear_user_notification_preferences_cache(
-        user_id: DBUserId,
-        redis: &RedisPool,
-    ) -> Result<(), DatabaseError> {
-        let mut redis = redis.connect().await?;
-
-        redis
-            .delete(
-                USER_NOTIFICATION_PREFERENCES_NAMESPACE,
-                &user_id.0.to_string(),
-            )
-            .await?;
 
         Ok(())
     }
