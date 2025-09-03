@@ -16,7 +16,6 @@ use util::cors::default_cors;
 
 use crate::background_task::update_versions;
 use crate::queue::moderation::AutomatedModerationQueue;
-use crate::queue::payouts::insert_bank_balances;
 use crate::util::env::{parse_strings_from_var, parse_var};
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use sync::friends::handle_pubsub;
@@ -252,24 +251,6 @@ pub fn app_setup(
             .to_string(),
     };
 
-    let payouts_queue = web::Data::new(PayoutsQueue::new());
-
-    let payouts_queue_ref = payouts_queue.clone();
-    let pool_ref = pool.clone();
-    scheduler.run(Duration::from_secs(60 * 60 * 6), move || {
-        let payouts_queue_ref = payouts_queue_ref.clone();
-        let pool_ref = pool_ref.clone();
-        async move {
-            info!("Started updating bank balances");
-            let result =
-                insert_bank_balances(&payouts_queue_ref, &pool_ref).await;
-            if let Err(e) = result {
-                warn!("Bank balance update failed: {:?}", e);
-            }
-            info!("Done updating bank balances");
-        }
-    });
-
     let active_sockets = web::Data::new(ActiveSockets::default());
 
     {
@@ -292,7 +273,7 @@ pub fn app_setup(
         ip_salt,
         search_config,
         session_queue,
-        payouts_queue,
+        payouts_queue: web::Data::new(PayoutsQueue::new()),
         analytics_queue,
         active_sockets,
         automated_moderation_queue,

@@ -1,10 +1,12 @@
 use crate::database::redis::RedisPool;
-use crate::queue::payouts::process_payout;
+use crate::queue::payouts::{
+    PayoutsQueue, insert_bank_balances, process_payout,
+};
 use crate::search::indexing::index_projects;
 use crate::{database, search};
 use clap::ValueEnum;
 use sqlx::Postgres;
-use tracing::{info, warn};
+use tracing::{error, info, warn};
 
 #[derive(ValueEnum, Debug, Copy, Clone, PartialEq, Eq)]
 #[clap(rename_all = "kebab_case")]
@@ -37,10 +39,12 @@ impl BackgroundTask {
             IndexBilling => {
                 crate::routes::internal::billing::index_billing(
                     stripe_client,
-                    pool,
+                    pool.clone(),
                     redis_pool,
                 )
-                .await
+                .await;
+
+                update_bank_balances(pool).await;
             }
             IndexSubscriptions => {
                 crate::routes::internal::billing::index_subscriptions(
@@ -49,6 +53,15 @@ impl BackgroundTask {
                 .await
             }
         }
+    }
+}
+
+pub async fn update_bank_balances(pool: sqlx::Pool<Postgres>) {
+    let payouts_queue = PayoutsQueue::new();
+
+    match insert_bank_balances(&payouts_queue, &pool).await {
+        Ok(_) => info!("Bank balances updated successfully"),
+        Err(error) => error!(%error, "Bank balances update failed"),
     }
 }
 

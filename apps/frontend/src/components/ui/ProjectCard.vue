@@ -478,6 +478,7 @@ export default {
 	margin-block: 0;
 	display: flex;
 	justify-content: flex-start;
+	word-break: break-word;
 }
 
 .tags {

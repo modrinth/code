@@ -11,6 +11,15 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-09-02T10:30:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Fixed text animation timing on landing page.
+- Fixed file upload buttons on gallery and version pages not being selectable with the keyboard.
+- Fixed long creator names overflowing on project pages.
+- Fixed project summaries with long words in search results causing overflow issues.`,
+	},
+	{
 		date: `2025-09-01T16:20:00-07:00`,
 		product: 'web',
 		body: `### Improvements

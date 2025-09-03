@@ -295,11 +295,14 @@ import {
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ConfirmModal, injectNotificationManager } from '@modrinth/ui'
+import {
+	ConfirmModal,
+	DropArea,
+	FileInput,
+	injectNotificationManager,
+	NewModal as Modal,
+} from '@modrinth/ui'
 
-import DropArea from '~/components/ui/DropArea.vue'
-import FileInput from '~/components/ui/FileInput.vue'
-import Modal from '~/components/ui/Modal.vue'
 import { isPermission } from '~/utils/permissions.ts'
 
 const props = defineProps({
@@ -765,7 +768,6 @@ export default defineNuxtComponent({
 }
 
 .modal-gallery {
-	padding: var(--spacing-card-bg);
 	display: flex;
 	flex-direction: column;
 
