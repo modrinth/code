@@ -5,6 +5,10 @@ export const commonMessages = defineMessages({
 		id: 'button.analytics',
 		defaultMessage: 'Analytics',
 	},
+	betaRelease: {
+		id: 'badge.beta-release',
+		defaultMessage: 'Beta Release',
+	},
 	allProjectType: {
 		id: 'project-type.all',
 		defaultMessage: 'All',
