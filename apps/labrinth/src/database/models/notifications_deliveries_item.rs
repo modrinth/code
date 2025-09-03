@@ -1,10 +1,9 @@
 use super::ids::*;
 use crate::database::models::DatabaseError;
 use crate::models::v3::notifications::{
-    NotificationChannel, NotificationDeliveryState,
+    NotificationChannel, NotificationDeliveryStatus,
 };
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
 
 pub struct NotificationDelivery {
     pub id: i64,

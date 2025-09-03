@@ -1,8 +1,6 @@
 use super::ids::*;
 use crate::database::models::DatabaseError;
 use crate::models::v3::notifications::{NotificationChannel, NotificationType};
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
 
 pub struct UserNotificationPreference {
     pub id: i64,
@@ -14,7 +12,7 @@ pub struct UserNotificationPreference {
 
 struct UserNotificationPreferenceQueryResult {
     id: i64,
-    user_id: i64,
+    user_id: Option<i64>,
     channel: String,
     notification_type: String,
     enabled: bool,
@@ -41,7 +39,7 @@ impl From<UserNotificationPreferenceQueryResult>
     fn from(r: UserNotificationPreferenceQueryResult) -> Self {
         UserNotificationPreference {
             id: r.id,
-            user_id: DBUserId(r.user_id),
+            user_id: r.user_id.map(DBUserId),
             channel: NotificationChannel::from_str_or_default(&r.channel),
             notification_type: NotificationType::from_str_or_default(
                 &r.notification_type,
@@ -52,30 +50,55 @@ impl From<UserNotificationPreferenceQueryResult>
 }
 
 impl UserNotificationPreference {
+    pub async fn get_id(
+        id: i64,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+    ) -> Result<Option<UserNotificationPreference>, DatabaseError> {
+        let results = select_user_notification_preferences_with_predicate!(
+            "WHERE id = $1",
+            id
+        )
+        .fetch_optional(exec)
+        .await?;
+
+        Ok(results.map(|r| r.into()))
+    }
+
     pub async fn get_user_or_default(
         user_id: DBUserId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<UserNotificationPreference>, DatabaseError> {
-        let user_id = user_id.0;
-        sqlx::query!(
-            "
+        let results = sqlx::query!(
+            r#"
             SELECT
+              COALESCE(unp.id, dnp.id) "id!",
               unp.user_id,
-              unp.channel,
-              unp.notification_type,
-              COALESCE(unp.enabled, COALESCE(dnp.enabled, false)) enabled
+              dnp.channel "channel!",
+              dnp.notification_type "notification_type!",
+              COALESCE(unp.enabled, COALESCE(dnp.enabled, false)) "enabled!"
             FROM users_notifications_preferences dnp
             LEFT JOIN users_notifications_preferences unp
               ON unp.channel = dnp.channel
               AND unp.notification_type = dnp.notification_type
               AND unp.user_id = $1
-            ",
+            "#,
             user_id.0
         )
         .fetch_all(exec)
         .await?;
 
-        Ok(results.into_iter().map(Into::into).collect())
+        Ok(results
+            .into_iter()
+            .map(|r| UserNotificationPreference {
+                id: r.id,
+                user_id: r.user_id.map(DBUserId),
+                channel: NotificationChannel::from_str_or_default(&r.channel),
+                notification_type: NotificationType::from_str_or_default(
+                    &r.notification_type,
+                ),
+                enabled: r.enabled,
+            })
+            .collect())
     }
 
     /// Inserts the row into the table and updates its ID.
@@ -86,18 +109,15 @@ impl UserNotificationPreference {
         let id = sqlx::query_scalar!(
             "
             INSERT INTO users_notifications_preferences (
-                notification_id, user_id, channel, delivery_priority, status, next_attempt, attempt_count
+                user_id, channel, notification_type, enabled
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            VALUES ($1, $2, $3, $4)
             RETURNING id
             ",
-            self.notification_id.0,
-            self.user_id.0,
+            self.user_id.map(|x| x.0),
             self.channel.as_str(),
-            self.delivery_priority,
-            self.status.as_str(),
-            self.next_attempt,
-            self.attempt_count,
+            self.notification_type.as_str(),
+            self.enabled,
         )
         .fetch_one(exec)
         .await?;
@@ -114,19 +134,19 @@ impl UserNotificationPreference {
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "
-            UPDATE notifications_deliveries
+            UPDATE users_notifications_preferences
             SET
-              delivery_priority = $2,
-              status = $3,
-              next_attempt = $4,
-              attempt_count = $5
+              user_id = $2,
+              channel = $3,
+              notification_type = $4,
+              enabled = $5
             WHERE id = $1
             ",
             self.id,
-            self.delivery_priority,
-            self.status.as_str(),
-            self.next_attempt,
-            self.attempt_count,
+            self.user_id.map(|x| x.0),
+            self.channel.as_str(),
+            self.notification_type.as_str(),
+            self.enabled,
         )
         .execute(exec)
         .await?;

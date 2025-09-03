@@ -37,6 +37,33 @@ pub enum NotificationType {
     Unknown,
 }
 
+impl NotificationType {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            NotificationType::ProjectUpdate => "project_update",
+            NotificationType::TeamInvite => "team_invite",
+            NotificationType::OrganizationInvite => "organization_invite",
+            NotificationType::StatusChange => "status_change",
+            NotificationType::ModeratorMessage => "moderator_message",
+            NotificationType::LegacyMarkdown => "legacy_markdown",
+            NotificationType::Unknown => "unknown",
+        }
+    }
+
+    pub fn from_str_or_default(s: &str) -> Self {
+        match s {
+            "project_update" => NotificationType::ProjectUpdate,
+            "team_invite" => NotificationType::TeamInvite,
+            "organization_invite" => NotificationType::OrganizationInvite,
+            "status_change" => NotificationType::StatusChange,
+            "moderator_message" => NotificationType::ModeratorMessage,
+            "legacy_markdown" => NotificationType::LegacyMarkdown,
+            "unknown" => NotificationType::Unknown,
+            _ => NotificationType::Unknown,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum NotificationBody {
