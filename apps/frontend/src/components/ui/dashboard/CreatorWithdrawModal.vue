@@ -51,16 +51,45 @@
 					</div>
 				</template>
 			</template>
+			<template v-if="currentStage === 'withdraw-details'">
+				<span class="font-semibold text-contrast">Withdraw from</span>
+				<div class="flex flex-col rounded-xl bg-bg p-4">
+					<span class="text-sm text-primary">Available balance</span>
+					<span class="font-semibold text-contrast">{{ formatMoney(balance?.available) }}</span>
+				</div>
+				<div class="flex gap-1 align-middle text-lg font-semibold text-contrast">
+					<span class="text-brand-red">*</span> <span>Region</span>
+					<span class="my-auto text-blue"
+						><UnknownIcon v-tooltip="`something here`" class="size-5"
+					/></span>
+				</div>
+				<Multiselect
+					id="country-multiselect"
+					v-model="country"
+					class="country-multiselect"
+					placeholder="Select country..."
+					track-by="id"
+					label="name"
+					:options="countries"
+					:searchable="true"
+					:close-on-select="true"
+					:show-labels="false"
+					:allow-empty="false"
+					:use-teleport="true"
+					open-direction="below"
+				/>
+			</template>
 		</div>
 	</NewModal>
 </template>
 <script lang="ts" setup>
-import { FileTextIcon } from '@modrinth/assets'
+import { FileTextIcon, UnknownIcon } from '@modrinth/assets'
 import { Admonition, ButtonStyled, NewModal } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
+import { all } from 'iso-3166-1'
+import { Multiselect } from 'vue-multiselect'
 import CreatorTaxFormModal from './CreatorTaxFormModal.vue'
-
-type Stage = 'withdraw-limit' | 'payment-method' | 'withdraw-amount' | 'confirmation'
+type Stage = 'withdraw-limit' | 'withdraw-details' | 'confirmation'
 
 // TODO: Deduplicate in @modrinth/api-client PR.
 type FormCompletionStatus = 'unknown' | 'unrequested' | 'unsigned' | 'tin-mismatch' | 'complete'
@@ -76,6 +105,15 @@ interface UserBalanceResponse {
 	requested_form_type: string | null
 	form_completion_status: FormCompletionStatus | null
 }
+
+const countries = computed(() =>
+	all().map((x) => ({
+		id: x.alpha2,
+		name: x.alpha2 === 'TW' ? 'Taiwan' : x.country,
+	})),
+)
+
+const country = ref<string | null>(null)
 
 const props = defineProps<{
 	balance: UserBalanceResponse | null
@@ -97,8 +135,7 @@ function reopenAfterTaxForm() {
 
 const stageLabels = readonly<Record<Stage, string | undefined>>({
 	'withdraw-limit': 'Withdraw Limit',
-	'payment-method': 'Payment Method',
-	'withdraw-amount': 'Withdraw Amount',
+	'withdraw-details': 'Withdraw Details',
 	confirmation: undefined,
 })
 
@@ -134,7 +171,7 @@ function show(preferred?: Stage) {
 		return
 	}
 
-	open('payment-method')
+	open('withdraw-details')
 }
 
 defineExpose({
