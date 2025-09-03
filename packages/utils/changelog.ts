@@ -11,6 +11,17 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-09-03T15:40:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Fixed a number of bugs with the Modrinth App marketing page
+- Added clearer notices about Modrinth App's beta status on marketing page.
+- Added disclaimer about Modrinth App's issues on Linux to marketing page.
+- Fixed certain icons in settings shrinking size on mobile.
+- In project settings, the description page no longer refers to all projects as "mods"
+- Fixed spelling error during sign up.`,
+	},
+	{
 		date: `2025-09-02T10:30:00-07:00`,
 		product: 'web',
 		body: `### Improvements
