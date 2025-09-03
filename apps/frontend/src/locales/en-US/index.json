@@ -585,7 +585,7 @@
     "message": "Find what you want, quickly and easily"
   },
   "landing.heading.the-place-for-minecraft": {
-    "message": "The place for Minecraft <content></content>"
+    "message": "The place for Minecraft {content}"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
     "message": "data packs"
