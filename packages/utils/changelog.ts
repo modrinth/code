@@ -18,7 +18,7 @@ const VERSIONS: VersionEntry[] = [
 - Added clearer notices about Modrinth App's beta status on marketing page.
 - Added disclaimer about Modrinth App's issues on Linux to marketing page.
 - Fixed certain icons in settings shrinking size on mobile.
-- In project settings, the description page no longer refers to all projects as "mods"
+- In project settings, the description page no longer refers to all projects as mods.
 - Fixed spelling error during sign up.`,
 	},
 	{
