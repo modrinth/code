@@ -2,6 +2,195 @@
   "admin.billing.error.not-found": {
     "message": "User not found"
   },
+  "app-marketing.download.description": {
+    "message": "Our desktop app is available across all platforms, choose your desired version."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "Download the AppImage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Download the beta"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Download the DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Download the RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "The Linux versions of Modrinth App are <issues-link>known to have issues</issues-link> on certain systems and configurations. If Modrinth App is unstable on your system, we encourage you to try other apps like <prism-link>Prism Launcher</prism-link> to easily install Modrinth content."
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Download options"
+  },
+  "app-marketing.download.terms": {
+    "message": "By downloading Modrinth App you agree to our <terms-link>Terms</terms-link> and <privacy-link>Privacy Policy</privacy-link>."
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "Third-party packages"
+  },
+  "app-marketing.download.title": {
+    "message": "Download Modrinth App (Beta)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.follow.description": {
+    "message": "Save content you love and receive updates with one click."
+  },
+  "app-marketing.features.follow.title": {
+    "message": "Follow projects"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "Import all your favorite profiles from the launcher you were using before, and get started with Modrinth App in seconds!"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Profile importing"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "Actions"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "by {author}"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "Modrinth makes it easy to manage all your mods in one place. You can install, uninstall, and update mods with a single click."
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "Installed mods"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Name"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "Search mods"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "Mod management"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "Version"
+  },
+  "app-marketing.features.offline.description": {
+    "message": "Play your mods, whether you are connected to the internet, or not."
+  },
+  "app-marketing.features.offline.title": {
+    "message": "Offline mode"
+  },
+  "app-marketing.features.open-source.description": {
+    "message": "Modrinth's launcher is fully open source. You can view the source code on our <github-link>GitHub</github-link>!"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Open source"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "Activity monitor"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth App performs better than many of the leading mod managers, using just 150mb of RAM!"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "Good performance"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 billion %"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "Process name"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "RAM"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Small"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "Performant"
+  },
+  "app-marketing.features.play.description": {
+    "message": "Use Modrinth App to download and play with your favorite mods and modpacks."
+  },
+  "app-marketing.features.play.title": {
+    "message": "Play with your favorite mods"
+  },
+  "app-marketing.features.sharing.description": {
+    "message": "Build, share, and play modpacks with any of the thousands of mods and modpacks hosted here on Modrinth."
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "Modpack"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "Share"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "Share modpacks"
+  },
+  "app-marketing.features.unlike-any-launcher": {
+    "message": "Unlike any launcher"
+  },
+  "app-marketing.features.website.description": {
+    "message": "Modrinth App is fully integrated with the website, so you can access all your favorite projects from the app!"
+  },
+  "app-marketing.features.website.title": {
+    "message": "Website integration"
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "you've used before"
+  },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "Screenshot of Modrinth App with a Cobblemon instance opened to the 'Content' page."
+  },
+  "app-marketing.hero.description": {
+    "message": "Modrinth App is a unique, open source launcher that allows you to play your favorite mods, and keep them up to date, all in one neat little package."
+  },
+  "app-marketing.hero.download-button": {
+    "message": "Download Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "Download Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "Download Modrinth App for {os}"
+  },
+  "app-marketing.hero.minecraft-screenshot-alt": {
+    "message": "Screenshot of the Cobblemon instance's main menu screen."
+  },
+  "app-marketing.hero.more-download-options": {
+    "message": "More Download Options"
+  },
   "auth.authorize.action.authorize": {
     "message": "Authorize"
   },
@@ -396,7 +585,7 @@
     "message": "Find what you want, quickly and easily"
   },
   "landing.heading.the-place-for-minecraft": {
-    "message": "The place for Minecraft <content></content>"
+    "message": "The place for Minecraft {content}"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
     "message": "data packs"

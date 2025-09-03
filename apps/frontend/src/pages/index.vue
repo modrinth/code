@@ -4,7 +4,7 @@
 			<ModrinthIcon class="modrinth-icon text-brand" />
 			<h1 class="main-header">
 				<IntlFormatted :message-id="messages.thePlaceForMinecraft">
-					<template #content>
+					<template #~content>
 						<div class="animate-strong">
 							<span>
 								<strong
@@ -488,7 +488,7 @@ async function updateSearchProjects() {
 const messages = defineMessages({
 	thePlaceForMinecraft: {
 		id: 'landing.heading.the-place-for-minecraft',
-		defaultMessage: 'The place for Minecraft <content></content>',
+		defaultMessage: 'The place for Minecraft {content}',
 	},
 	discoverHeading: {
 		id: 'landing.subheading',
