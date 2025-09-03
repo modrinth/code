@@ -32,15 +32,15 @@
 					<div class="flex flex-col gap-2">
 						<span class="font-bold">Benefits</span>
 						<div class="flex items-center gap-2">
-							<CheckCircleIcon class="h-5 w-5 text-brand" />
+							<CheckCircleIcon class="h-5 w-5 shrink-0 text-brand" />
 							<span> Ad-free browsing on modrinth.com and Modrinth App </span>
 						</div>
 						<div class="flex items-center gap-2">
-							<CheckCircleIcon class="h-5 w-5 text-brand" />
+							<CheckCircleIcon class="h-5 w-5 shrink-0 text-brand" />
 							<span>Modrinth+ badge on your profile</span>
 						</div>
 						<div class="flex items-center gap-2">
-							<CheckCircleIcon class="h-5 w-5 text-brand" />
+							<CheckCircleIcon class="h-5 w-5 shrink-0 text-brand" />
 							<span>Support Modrinth and creators directly</span>
 						</div>
 					</div>
