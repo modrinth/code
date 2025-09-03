@@ -338,7 +338,7 @@ body {
 
 	--size-navbar-height: 3.5rem;
 	--size-mobile-navbar-height: 3.5rem;
-	--size-mobile-navbar-height-expanded: 13.75rem;
+	--size-mobile-navbar-height-expanded: 26.5rem;
 
 	--spacing-card-lg: 1.5rem;
 	--spacing-card-bg: 1rem;
@@ -367,16 +367,8 @@ body {
 	--font-weight-heading: var(--font-weight-extrabold);
 	--font-weight-title: var(--font-weight-extrabold);
 
-	@media screen and (min-width: 320px) {
-		--size-mobile-navbar-height-expanded: 11.5rem;
-	}
-
-	@media screen and (min-width: 432px) {
-		--size-mobile-navbar-height-expanded: 9.25rem;
-	}
-
-	@media screen and (min-width: 765px) {
-		--size-mobile-navbar-height-expanded: 7rem;
+	@media screen and (min-width: 354px) {
+		--size-mobile-navbar-height-expanded: 15.5rem;
 	}
 }
 
@@ -480,7 +472,8 @@ kbd {
 
 button:focus-visible,
 a:focus-visible,
-[tabindex='0']:focus-visible {
+[tabindex='0']:focus-visible,
+[type='button']:focus-visible {
 	outline: 0.25rem solid #ea80ff;
 	border-radius: 0.25rem;
 }

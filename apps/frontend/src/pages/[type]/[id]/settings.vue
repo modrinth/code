@@ -34,14 +34,13 @@ const flags = useFeatureFlags()
 const project = defineModel<Project>('project', { required: true })
 const projectV3 = defineModel<ProjectV3Partial>('projectV3', { required: true })
 const versions = defineModel<any>('versions')
-const featuredVersions = defineModel<any>('featuredVersions')
 const members = defineModel<any>('members')
 const allMembers = defineModel<any>('allMembers')
 const dependencies = defineModel<any>('dependencies')
 const organization = defineModel<any>('organization')
 </script>
 <template>
-	<div class="experimental-styles-within grid grid-cols-[1fr_3fr] gap-4">
+	<div class="experimental-styles-within grid gap-4 lg:grid-cols-[1fr_3fr]">
 		<div>
 			<aside class="universal-card">
 				<NavStack>
@@ -140,12 +139,11 @@ const organization = defineModel<any>('organization')
 				</NavStack>
 			</aside>
 		</div>
-		<div>
+		<div class="min-w-0">
 			<NuxtPage
 				v-model:project="project"
 				v-model:project-v3="projectV3"
 				v-model:versions="versions"
-				v-model:featured-versions="featuredVersions"
 				v-model:members="members"
 				v-model:all-members="allMembers"
 				v-model:dependencies="dependencies"

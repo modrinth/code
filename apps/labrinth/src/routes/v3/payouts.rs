@@ -1028,7 +1028,9 @@ async fn get_user_balance(
         });
 
     Ok(UserBalance {
-        available: (available - withdrawn - fees).round_dp(16),
+        available: available.round_dp(16)
+            - withdrawn.round_dp(16)
+            - fees.round_dp(16),
         withdrawn_lifetime: withdrawn.round_dp(16),
         withdrawn_ytd: withdrawn_this_year.round_dp(16),
         pending,

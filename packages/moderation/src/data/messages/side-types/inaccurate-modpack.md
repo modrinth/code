@@ -1,10 +1,5 @@
-## Incorrect Environment Information
+## Environment Metadata
 
-Per section 5.1 of %RULES%, it is important that the metadata of your projects is accurate, including whether the project runs on the client or server side.
+Per section 5.1 of %RULES%, it is important that the metadata of your projects is accurate, including %PROJECT_ENVIRONMENT_FLINK%.
 
-For a brief rundown of how this works:
-
-- Some modpacks can be client-side, usually aimed at providing utility and optimization while allowing the player to join an unmodded server, for instance, [Fabulously Optimized](https://modrinth.com/project/1KVo5zza).
-- Most other modpacks that change how the game is played are going to be required on both the client and server, like the modpack [Aged](https://modrinth.com/project/i4XHCd7Q).
-
-When in doubt, test for yourself or check the requirements of the mods in your pack.
+We've recently overhauled how environment metadata works on Modrinth, please [Read this blogpost](%NEW_ENVIRONMENTS_LINK%) for full details and information on how to ensure your project is labeled correctly.

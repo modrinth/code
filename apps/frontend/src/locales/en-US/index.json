@@ -332,6 +332,147 @@
   "frog.title": {
     "message": "Frog"
   },
+  "landing.button.discover-mods": {
+    "message": "Discover mods"
+  },
+  "landing.button.go-to-dashboard": {
+    "message": "Go to dashboard"
+  },
+  "landing.creator.feature.constantly-evolving.description": {
+    "message": "Get the best modding experience possible with constant updates from the Modrinth team"
+  },
+  "landing.creator.feature.constantly-evolving.title": {
+    "message": "Constantly Evolving"
+  },
+  "landing.creator.feature.data-statistics.description": {
+    "message": "Get detailed reports on page views, download counts, and revenue"
+  },
+  "landing.creator.feature.data-statistics.title": {
+    "message": "Data and Statistics"
+  },
+  "landing.creator.feature.discovery.description": {
+    "message": "Get your project discovered by thousands of users through search, our home page, Discord server, and more ways to come in the future!"
+  },
+  "landing.creator.feature.discovery.title": {
+    "message": "Discovery"
+  },
+  "landing.creator.feature.diverse-ecosystem.description": {
+    "message": "Integrate with your build tools through Minotaur for automatic uploads right when you release a new version"
+  },
+  "landing.creator.feature.diverse-ecosystem.title": {
+    "message": "Diverse Ecosystem"
+  },
+  "landing.creator.feature.monetization.description": {
+    "message": "Get paid ad revenue from your project pages and withdraw your funds at any time"
+  },
+  "landing.creator.feature.monetization.title": {
+    "message": "Monetization"
+  },
+  "landing.creator.feature.team-management.description": {
+    "message": "Invite your teammates and manage roles and permissions with ease"
+  },
+  "landing.creator.feature.team-management.title": {
+    "message": "Team Management"
+  },
+  "landing.error.failedToLoadRandomProjects": {
+    "message": "Failed to load random projects :("
+  },
+  "landing.feature.follow.description": {
+    "message": "Get notified every time your favorite projects update and stay in the loop"
+  },
+  "landing.feature.follow.heading": {
+    "message": "Follow projects you love"
+  },
+  "landing.feature.launcher.description": {
+    "message": "Modrinth's open-source API lets launchers add deep integration with Modrinth. You can use Modrinth through <link>our own app</link> and some of the most popular launchers like ATLauncher, MultiMC, and Prism Launcher."
+  },
+  "landing.feature.launcher.heading": {
+    "message": "Play with your favorite launcher"
+  },
+  "landing.feature.search.description": {
+    "message": "Modrinth's lightning-fast search and powerful filters let you find what you want as you type."
+  },
+  "landing.feature.search.heading": {
+    "message": "Find what you want, quickly and easily"
+  },
+  "landing.heading.the-place-for-minecraft": {
+    "message": "The place for Minecraft <content></content>"
+  },
+  "landing.heading.the-place-for-minecraft.data-packs": {
+    "message": "data packs"
+  },
+  "landing.heading.the-place-for-minecraft.modpacks": {
+    "message": "modpacks"
+  },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "mods"
+  },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "plugins"
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "resource packs"
+  },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "servers"
+  },
+  "landing.heading.the-place-for-minecraft.shaders": {
+    "message": "shaders"
+  },
+  "landing.launcher.atlauncher-label": {
+    "message": "ATLauncher"
+  },
+  "landing.launcher.graphic-alt": {
+    "message": "A simplified representation of a Minecraft window, with the Mojang Studios logo in Modrinth green."
+  },
+  "landing.launcher.modrinth-app-label": {
+    "message": "Modrinth App"
+  },
+  "landing.launcher.prism-launcher-label": {
+    "message": "Prism Launcher"
+  },
+  "landing.notifications.has-been-updated": {
+    "message": "{title} has been updated!"
+  },
+  "landing.notifications.heading": {
+    "message": "Notifications"
+  },
+  "landing.notifications.received-time": {
+    "message": "Received {time}"
+  },
+  "landing.notifications.version-released": {
+    "message": "Version {version} has been released for {gameVersion}"
+  },
+  "landing.search.label": {
+    "message": "Search"
+  },
+  "landing.search.placeholder": {
+    "message": "Search..."
+  },
+  "landing.search.sort-by.label": {
+    "message": "Sort by"
+  },
+  "landing.section.for-creators.description": {
+    "message": "Give an online home to your creations and reach a massive audience of dedicated players"
+  },
+  "landing.section.for-creators.label": {
+    "message": "For Creators"
+  },
+  "landing.section.for-creators.tagline": {
+    "message": "Share your content with the world"
+  },
+  "landing.section.for-players.description": {
+    "message": "From magical biomes to cursed dungeons, you can be sure to find content to bring your gameplay to the next level."
+  },
+  "landing.section.for-players.label": {
+    "message": "For Players"
+  },
+  "landing.section.for-players.tagline": {
+    "message": "Discover over {count} creations"
+  },
+  "landing.subheading": {
+    "message": "Discover, play, and share Minecraft content through our open-source platform built for the community."
+  },
   "layout.action.change-theme": {
     "message": "Change theme"
   },
@@ -769,6 +910,15 @@
   },
   "project.download.title": {
     "message": "Download {title}"
+  },
+  "project.environment.migration-no-permission.message": {
+    "message": "We've just overhauled the Environments system on Modrinth and new options are now available. You don't have permission to modify these settings, but please let another member of the project know that the environment metadata needs to be verified."
+  },
+  "project.environment.migration-no-permission.title": {
+    "message": "Environment metadata needs to be reviewed"
+  },
+  "project.environment.migration.learn-more": {
+    "message": "Learn more about this change"
   },
   "project.environment.migration.message": {
     "message": "We've just overhauled the Environments system on Modrinth and new options are now available. Please visit your project's settings and verify that the metadata is correct."
@@ -1666,5 +1816,11 @@
   },
   "settings.sessions.unknown-platform": {
     "message": "Unknown platform"
+  },
+  "ui.latest-news-row.latest-news": {
+    "message": "Latest news from Modrinth"
+  },
+  "ui.latest-news-row.view-all": {
+    "message": "View all news"
   }
 }

@@ -48,6 +48,7 @@ daedalus = { path = "packages/daedalus" }
 dashmap = "6.1.0"
 data-url = "0.3.1"
 deadpool-redis = "0.22.0"
+derive_more = "2.0.1"
 dirs = "6.0.0"
 discord-rich-presence = "0.2.5"
 dotenv-build = "0.1.1"
@@ -229,6 +230,11 @@ strip = true      # Remove debug symbols
 lto = true        # Enables link to optimizations
 panic = "abort"   # Strip expensive panic clean-up logic
 codegen-units = 1 # Compile crates one after another so the compiler can optimize better
+
+# Specific profile for labrinth production builds
+[profile.release-labrinth]
+inherits = "release"
+panic = "unwind" # Don't exit the whole app on panic in production
 
 [profile.dev.package.sqlx-macros]
 opt-level = 3

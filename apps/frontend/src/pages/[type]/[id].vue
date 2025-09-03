@@ -5,7 +5,7 @@
 	<div v-if="route.name.startsWith('type-id-settings')" class="normal-page no-sidebar">
 		<div class="normal-page__header">
 			<div
-				class="mb-4 flex items-center gap-2 border-0 border-b-[1px] border-solid border-divider pb-4 text-lg font-semibold"
+				class="mb-4 flex flex-wrap items-center gap-x-2 gap-y-3 border-0 border-b-[1px] border-solid border-divider pb-4 text-lg font-semibold"
 			>
 				<nuxt-link
 					:to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
@@ -47,7 +47,6 @@
 				v-model:project="project"
 				v-model:project-v3="projectV3"
 				v-model:versions="versions"
-				v-model:featured-versions="featuredVersions"
 				v-model:members="members"
 				v-model:all-members="allMembers"
 				v-model:dependencies="dependencies"
@@ -755,25 +754,35 @@
 					v-if="
 						currentMember &&
 						projectV3.side_types_migration_review_status === 'pending' &&
-						projectV3.environment?.length > 0 &&
+						projectV3.environment?.length === 1 &&
 						projectV3.environment[0] !== 'unknown'
 					"
 					type="warning"
-					:header="formatMessage(messages.environmentMigrationTitle)"
+					:header="
+						formatMessage(
+							hasEditDetailsPermission
+								? messages.environmentMigrationTitle
+								: messages.environmentMigrationNoPermissionTitle,
+						)
+					"
 					class="mt-3"
 				>
-					{{ formatMessage(messages.environmentMigrationMessage) }}
-					<ButtonStyled color="orange">
-						<nuxt-link
-							v-tooltip="
-								hasEditDetailsPermission
-									? undefined
-									: formatMessage(commonProjectSettingsMessages.noPermissionDescription)
-							"
-							:to="`/project/${project.id}/settings/environment`"
-							class="mt-3 w-fit"
-							:disabled="!hasEditDetailsPermission"
-						>
+					{{
+						formatMessage(
+							hasEditDetailsPermission
+								? messages.environmentMigrationMessage
+								: messages.environmentMigrationNoPermissionMessage,
+						)
+					}}
+					<nuxt-link
+						to="/news/article/new-environments"
+						target="_blank"
+						class="mt-1 block w-fit font-semibold text-orange hover:underline"
+					>
+						{{ formatMessage(messages.environmentMigrationLink) }}
+					</nuxt-link>
+					<ButtonStyled v-if="hasEditDetailsPermission" color="orange">
+						<nuxt-link :to="`/project/${project.id}/settings/environment`" class="mt-3 w-fit">
 							<SettingsIcon /> {{ formatMessage(messages.reviewEnvironmentSettings) }}
 						</nuxt-link>
 					</ButtonStyled>
@@ -903,7 +912,6 @@
 				<NuxtPage
 					v-model:project="project"
 					v-model:versions="versions"
-					v-model:featured-versions="featuredVersions"
 					v-model:members="members"
 					v-model:all-members="allMembers"
 					v-model:dependencies="dependencies"
@@ -966,7 +974,6 @@ import {
 	ButtonStyled,
 	Checkbox,
 	commonMessages,
-	commonProjectSettingsMessages,
 	injectNotificationManager,
 	NewModal,
 	OverflowMenu,
@@ -1005,7 +1012,6 @@ import { reportProject } from '~/utils/report-helpers.ts'
 
 const data = useNuxtApp()
 const route = useNativeRoute()
-const router = useRouter()
 const config = useRuntimeConfig()
 const moderationStore = useModerationStore()
 const notifications = injectNotificationManager()
@@ -1152,6 +1158,19 @@ const messages = defineMessages({
 	environmentMigrationTitle: {
 		id: 'project.environment.migration.title',
 		defaultMessage: 'Please review environment metadata',
+	},
+	environmentMigrationNoPermissionMessage: {
+		id: 'project.environment.migration-no-permission.message',
+		defaultMessage:
+			"We've just overhauled the Environments system on Modrinth and new options are now available. You don't have permission to modify these settings, but please let another member of the project know that the environment metadata needs to be verified.",
+	},
+	environmentMigrationNoPermissionTitle: {
+		id: 'project.environment.migration-no-permission.title',
+		defaultMessage: 'Environment metadata needs to be reviewed',
+	},
+	environmentMigrationLink: {
+		id: 'project.environment.migration.learn-more',
+		defaultMessage: 'Learn more about this change',
 	},
 	followersStat: {
 		id: 'project.stats.followers-label',
@@ -1410,7 +1429,6 @@ let project,
 	allMembers,
 	resetMembers,
 	dependencies,
-	featuredVersions,
 	versions,
 	organization,
 	resetOrganization,
@@ -1418,7 +1436,6 @@ let project,
 	projectV3Error,
 	membersError,
 	dependenciesError,
-	featuredVersionsError,
 	versionsError
 try {
 	;[
@@ -1426,7 +1443,6 @@ try {
 		{ data: projectV3, error: projectV3Error, refresh: resetProjectV3 },
 		{ data: allMembers, error: membersError, refresh: resetMembers },
 		{ data: dependencies, error: dependenciesError },
-		{ data: featuredVersions, error: featuredVersionsError },
 		{ data: versions, error: versionsError },
 		{ data: organization, refresh: resetOrganization },
 	] = await Promise.all([
@@ -1440,30 +1456,18 @@ try {
 						tags.value,
 					)
 					projectId.value = project.id
-					if (route.params.id !== project.slug) {
-						router.replace({
-							name: route.name,
-							params: {
-								...route.params,
-								id: project.slug,
-							},
-							query: route.query,
-							hash: route.hash,
-						})
-					}
 				}
-
 				return project
 			},
 		}),
-		useAsyncData(`projectV3/${route.params.id}`, () =>
-			useBaseFetch(`project/${route.params.id}`, {
+		useAsyncData(`projectV3/${projectId.value}`, () =>
+			useBaseFetch(`project/${projectId.value}`, {
 				apiVersion: 3,
 			}),
 		),
 		useAsyncData(
-			`project/${route.params.id}/members`,
-			() => useBaseFetch(`project/${route.params.id}/members`, { apiVersion: 3 }),
+			`project/${projectId.value}/members`,
+			() => useBaseFetch(`project/${projectId.value}/members`, { apiVersion: 3 }),
 			{
 				transform: (members) => {
 					members.forEach((it, index) => {
@@ -1475,22 +1479,20 @@ try {
 				},
 			},
 		),
-		useAsyncData(`project/${route.params.id}/dependencies`, () =>
-			useBaseFetch(`project/${route.params.id}/dependencies`, {}),
+		useAsyncData(`project/${projectId.value}/dependencies`, () =>
+			useBaseFetch(`project/${projectId.value}/dependencies`, {}),
 		),
-		useAsyncData(`project/${route.params.id}/version?featured=true`, () =>
-			useBaseFetch(`project/${route.params.id}/version?featured=true`),
+		useAsyncData(`project/${projectId.value}/version`, () =>
+			useBaseFetch(`project/${projectId.value}/version`),
 		),
-		useAsyncData(`project/${route.params.id}/version`, () =>
-			useBaseFetch(`project/${route.params.id}/version`),
-		),
-		useAsyncData(`project/${route.params.id}/organization`, () =>
-			useBaseFetch(`project/${route.params.id}/organization`, { apiVersion: 3 }),
+		useAsyncData(`project/${projectId.value}/organization`, () =>
+			useBaseFetch(`project/${projectId.value}/organization`, { apiVersion: 3 }),
 		),
 	])
 
+	await updateProjectRoute()
+
 	versions = shallowRef(toRaw(versions))
-	featuredVersions = shallowRef(toRaw(featuredVersions))
 } catch (err) {
 	throw createError({
 		fatal: true,
@@ -1499,6 +1501,23 @@ try {
 			message: err.message ? `: ${err.message}` : '',
 		}),
 	})
+}
+
+async function updateProjectRoute() {
+	if (project.value && route.params.id !== project.value.slug) {
+		await navigateTo(
+			{
+				name: route.name,
+				params: {
+					...route.params,
+					id: project.value.slug,
+				},
+				query: route.query,
+				hash: route.hash,
+			},
+			{ replace: true },
+		)
+	}
 }
 
 async function resetProject() {
@@ -1523,7 +1542,6 @@ handleError(projectV2Error, true)
 handleError(projectV3Error)
 handleError(membersError)
 handleError(dependenciesError)
-handleError(featuredVersionsError)
 handleError(versionsError)
 
 if (!project.value) {
@@ -1605,21 +1623,6 @@ const hasEditDetailsPermission = computed(() => {
 })
 
 versions.value = data.$computeVersions(versions.value, allMembers.value)
-
-// Q: Why do this instead of computing the versions of featuredVersions?
-// A: It will incorrectly generate the version slugs because it doesn't have the full context of
-//    all the versions. For example, if version 1.1.0 for Forge is featured but 1.1.0 for Fabric
-//    is not, but the Fabric one was uploaded first, the Forge version would link to the Fabric
-///   version
-const featuredIds = featuredVersions.value.map((x) => x.id)
-featuredVersions.value = versions.value.filter((version) => featuredIds.includes(version.id))
-
-featuredVersions.value.sort((a, b) => {
-	const aLatest = a.game_versions[a.game_versions.length - 1]
-	const bLatest = b.game_versions[b.game_versions.length - 1]
-	const gameVersions = tags.value.gameVersions.map((e) => e.version)
-	return gameVersions.indexOf(aLatest) - gameVersions.indexOf(bLatest)
-})
 
 const projectTypeDisplay = computed(() =>
 	formatProjectType(
@@ -1714,6 +1717,8 @@ async function patchProject(resData, quiet = false) {
 			project.value[key] = resData[key]
 		}
 
+		await updateProjectRoute()
+
 		if (resData.license_id) {
 			project.value.license.id = resData.license_id
 		}
@@ -1781,8 +1786,8 @@ async function patchIcon(icon) {
 
 async function updateMembers() {
 	allMembers.value = await useAsyncData(
-		`project/${route.params.id}/members`,
-		() => useBaseFetch(`project/${route.params.id}/members`),
+		`project/${projectId.value}/members`,
+		() => useBaseFetch(`project/${projectId.value}/members`),
 		{
 			transform: (members) => {
 				members.forEach((it, index) => {

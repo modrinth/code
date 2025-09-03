@@ -11,6 +11,48 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-09-02T10:30:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Fixed text animation timing on landing page.
+- Fixed file upload buttons on gallery and version pages not being selectable with the keyboard.
+- Fixed long creator names overflowing on project pages.
+- Fixed project summaries with long words in search results causing overflow issues.`,
+	},
+	{
+		date: `2025-09-01T16:20:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Significantly improved the performance of certain project pages.
+- Strings in Markdown descriptions that look like domain names or IP addresses will no longer automatically be converted to links, such as \`README.md\`.
+- Fixed project environment settings sometimes showing the wrong warning/info message.`,
+	},
+	{
+		date: `2025-08-31T17:15:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Updated some of the publishing checklist messages.
+- Fixed certain buttons having the wrong focus effect in Firefox browsers.`,
+	},
+	{
+		date: `2025-08-31T11:50:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Fixed mods with datapack or plugin versions being unable to set environment.
+- Fixed users getting empty notifications for messages they can't see.`,
+	},
+	{
+		date: `2025-08-31T10:35:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Fixed screen reader accessibility of the new project environments settings page.
+- Fixed mobile responsiveness of project settings page.
+- Fixed error loading project pages when using the project ID in the URL.
+- Updated the message for unverified environments when the user does not have permission to update the environment.
+- Improved handling of projects with multiple environments.
+- Fixed blog posts not loading images when missing a slash at the end of the URL.`,
+	},
+	{
 		date: `2025-08-28T18:45:00-07:00`,
 		product: 'web',
 		body: `### Improvements

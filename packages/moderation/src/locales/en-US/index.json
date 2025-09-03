@@ -123,7 +123,7 @@
     "defaultMessage": "Select correct resolution"
   },
   "nags.select-environments.description": {
-    "defaultMessage": "Select whether the {projectType} functions on the client and/or server-side."
+    "defaultMessage": "Select the environments your {projectType} functions on."
   },
   "nags.select-environments.title": {
     "defaultMessage": "Select environments"
