@@ -11,6 +11,8 @@ pub mod legacy_loader_fields;
 pub mod loader_fields;
 pub mod notification_item;
 pub mod notifications_deliveries_item;
+pub mod notifications_template_item;
+pub mod notifications_type_item;
 pub mod oauth_client_authorization_item;
 pub mod oauth_client_item;
 pub mod oauth_token_item;
@@ -26,8 +28,8 @@ pub mod team_item;
 pub mod thread_item;
 pub mod user_item;
 pub mod user_subscription_item;
-pub mod users_notifications_preferences_item;
 pub mod users_compliance;
+pub mod users_notifications_preferences_item;
 pub mod users_redeemals;
 pub mod version_item;
 

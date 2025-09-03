@@ -1,7 +1,13 @@
 use super::ids::*;
 use crate::database::models::DatabaseError;
+use crate::database::redis::RedisPool;
 use crate::models::v3::notifications::{NotificationChannel, NotificationType};
+use serde::{Deserialize, Serialize};
 
+const USER_NOTIFICATION_PREFERENCES_NAMESPACE: &str =
+    "user_notification_preferences";
+
+#[derive(Serialize, Deserialize)]
 pub struct UserNotificationPreference {
     pub id: i64,
     pub user_id: Option<DBUserId>,
@@ -16,21 +22,6 @@ struct UserNotificationPreferenceQueryResult {
     channel: String,
     notification_type: String,
     enabled: bool,
-}
-
-macro_rules! select_user_notification_preferences_with_predicate {
-    ($predicate:literal $(, $($param0:expr $(, $param:expr)* $(,)?)?)?) => {
-        sqlx::query_as!(
-            UserNotificationPreferenceQueryResult,
-            r#"
-            SELECT
-                id, user_id, channel, notification_type, enabled
-            FROM users_notifications_preferences
-            "#
-                + $predicate
-            $($(, $param0 $(, $param)* )?)?
-        )
-    };
 }
 
 impl From<UserNotificationPreferenceQueryResult>
@@ -50,24 +41,24 @@ impl From<UserNotificationPreferenceQueryResult>
 }
 
 impl UserNotificationPreference {
-    pub async fn get_id(
-        id: i64,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Option<UserNotificationPreference>, DatabaseError> {
-        let results = select_user_notification_preferences_with_predicate!(
-            "WHERE id = $1",
-            id
-        )
-        .fetch_optional(exec)
-        .await?;
-
-        Ok(results.map(|r| r.into()))
-    }
-
     pub async fn get_user_or_default(
         user_id: DBUserId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        redis: &RedisPool,
     ) -> Result<Vec<UserNotificationPreference>, DatabaseError> {
+        let mut redis = redis.connect().await?;
+
+        let cached_preferences = redis
+            .get_deserialized_from_json(
+                USER_NOTIFICATION_PREFERENCES_NAMESPACE,
+                &user_id.0.to_string(),
+            )
+            .await?;
+
+        if let Some(preferences) = cached_preferences {
+            return Ok(preferences);
+        }
+
         let results = sqlx::query!(
             r#"
             SELECT
@@ -87,7 +78,7 @@ impl UserNotificationPreference {
         .fetch_all(exec)
         .await?;
 
-        Ok(results
+        let preferences = results
             .into_iter()
             .map(|r| UserNotificationPreference {
                 id: r.id,
@@ -98,13 +89,25 @@ impl UserNotificationPreference {
                 ),
                 enabled: r.enabled,
             })
-            .collect())
+            .collect();
+
+        redis
+            .set_serialized_to_json(
+                USER_NOTIFICATION_PREFERENCES_NAMESPACE,
+                &user_id.0.to_string(),
+                &preferences,
+                None,
+            )
+            .await?;
+
+        Ok(preferences)
     }
 
     /// Inserts the row into the table and updates its ID.
     pub async fn insert(
         &mut self,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let id = sqlx::query_scalar!(
             "
@@ -122,34 +125,28 @@ impl UserNotificationPreference {
         .fetch_one(exec)
         .await?;
 
+        if let Some(user_id) = self.user_id {
+            Self::clear_user_notification_preferences_cache(user_id, redis)
+                .await?;
+        }
+
         self.id = id;
 
         Ok(())
     }
 
-    /// Updates semantically mutable columns of the row.
-    pub async fn update(
-        &self,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+    pub async fn clear_user_notification_preferences_cache(
+        user_id: DBUserId,
+        redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
-        sqlx::query!(
-            "
-            UPDATE users_notifications_preferences
-            SET
-              user_id = $2,
-              channel = $3,
-              notification_type = $4,
-              enabled = $5
-            WHERE id = $1
-            ",
-            self.id,
-            self.user_id.map(|x| x.0),
-            self.channel.as_str(),
-            self.notification_type.as_str(),
-            self.enabled,
-        )
-        .execute(exec)
-        .await?;
+        let mut redis = redis.connect().await?;
+
+        redis
+            .delete(
+                USER_NOTIFICATION_PREFERENCES_NAMESPACE,
+                &user_id.0.to_string(),
+            )
+            .await?;
 
         Ok(())
     }
