@@ -1,6 +1,6 @@
 use super::ids::*;
 use crate::database::{models::DatabaseError, redis::RedisPool};
-use crate::models::notifications::NotificationBody;
+use crate::models::notifications::{NotificationBody, NotificationChannel};
 use chrono::{DateTime, Utc};
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
@@ -55,6 +55,10 @@ impl NotificationBuilder {
             .map(|_| body.clone())
             .collect::<Vec<_>>();
 
+        let users_raw_ids = users.iter().map(|x| x.0).collect::<Vec<_>>();
+        let notification_ids =
+            notification_ids.iter().map(|x| x.0).collect::<Vec<_>>();
+
         sqlx::query!(
             "
             INSERT INTO notifications (
@@ -62,15 +66,71 @@ impl NotificationBuilder {
             )
             SELECT * FROM UNNEST($1::bigint[], $2::bigint[], $3::jsonb[])
             ",
-            &notification_ids
-                .into_iter()
-                .map(|x| x.0)
-                .collect::<Vec<_>>()[..],
-            &users.iter().map(|x| x.0).collect::<Vec<_>>()[..],
+            &notification_ids[..],
+            &users_raw_ids[..],
             &bodies[..],
         )
         .execute(&mut **transaction)
         .await?;
+
+        let notification_types = notification_ids
+            .iter()
+            .map(|_| self.body.notification_type().as_str())
+            .collect::<Vec<_>>();
+
+        let query = sqlx::query!(
+            r#"
+            WITH
+              channels AS (
+                SELECT channel FROM UNNEST($1::varchar[]) AS t(channel)
+              ),
+              delivery_candidates AS (
+                SELECT
+                  ids.notification_id,
+                  ids.user_id,
+                  channels.channel,
+                  nt.delivery_priority,
+                  COALESCE(uprefs.enabled, dprefs.enabled, false) include
+                FROM
+                  UNNEST(
+                    $2::bigint[],
+                    $3::bigint[],
+                    $4::varchar[]
+                  ) AS ids(notification_id, user_id, notification_type)
+                CROSS JOIN channels
+                INNER JOIN
+                  notifications_types nt ON nt.name = ids.notification_type
+                LEFT JOIN users_notifications_preferences uprefs
+                  ON uprefs.user_id = ids.user_id
+                  AND uprefs.channel = channels.channel
+                  AND uprefs.notification_type = ids.notification_type
+                LEFT JOIN users_notifications_preferences dprefs
+                  ON dprefs.user_id IS NULL
+                  AND dprefs.channel = channels.channel
+                  AND dprefs.notification_type = ids.notification_type
+              )
+            INSERT INTO notifications_deliveries
+            (notification_id, user_id, channel, delivery_priority, status, next_attempt, attempt_count)
+            SELECT
+              dc.notification_id,
+              dc.user_id,
+              dc.channel,
+              dc.delivery_priority,
+              'pending' status,
+              NOW() next_attempt,
+              0 attempt_count
+            FROM
+              delivery_candidates dc
+            WHERE
+              include = TRUE
+            "#,
+            &[NotificationChannel::Email.as_str().to_string()],
+            &notification_ids[..],
+            &users_raw_ids[..],
+            &notification_types[..] as &[&str],
+        );
+
+        query.execute(&mut **transaction).await?;
 
         DBNotification::clear_user_notifications_cache(&users, redis).await?;
 

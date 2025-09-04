@@ -1,5 +1,5 @@
 CREATE TABLE notifications_deliveries (
-    id BIGINT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     notification_id BIGINT NOT NULL REFERENCES notifications(id),
     channel VARCHAR(32) NOT NULL,
     user_id BIGINT NOT NULL REFERENCES users(id),
@@ -19,7 +19,7 @@ CREATE INDEX idx_notifications_deliveries_user_id
 ON notifications_deliveries(user_id);
 
 CREATE TABLE users_notifications_preferences (
-    id BIGINT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     user_id BIGINT REFERENCES users(id),
     channel VARCHAR(32) NOT NULL,
     notification_type VARCHAR(32) NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE notifications_types (
 );
 
 CREATE TABLE notifications_templates (
-    id BIGINT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     channel VARCHAR(32) NOT NULL,
     notification_type VARCHAR(32) NOT NULL REFERENCES notifications_types(name),
     subject_line TEXT NOT NULL,

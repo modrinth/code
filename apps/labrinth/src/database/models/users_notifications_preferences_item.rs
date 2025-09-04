@@ -1,6 +1,5 @@
 use super::ids::*;
 use crate::database::models::DatabaseError;
-use crate::database::redis::RedisPool;
 use crate::models::v3::notifications::{NotificationChannel, NotificationType};
 use serde::{Deserialize, Serialize};
 
@@ -38,6 +37,13 @@ impl From<UserNotificationPreferenceQueryResult>
 }
 
 impl UserNotificationPreference {
+    pub async fn get_user_or_default(
+        user_id: DBUserId,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+    ) -> Result<Vec<UserNotificationPreference>, DatabaseError> {
+        Self::get_many_users_or_default(&[user_id], exec).await
+    }
+
     pub async fn get_many_users_or_default(
         user_ids: &[DBUserId],
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
@@ -57,45 +63,6 @@ impl UserNotificationPreference {
               AND unp.user_id = ANY($1::bigint[])
             "#,
             &user_ids.iter().map(|x| x.0).collect::<Vec<_>>(),
-        )
-        .fetch_all(exec)
-        .await?;
-
-        let preferences = results
-            .into_iter()
-            .map(|r| UserNotificationPreference {
-                id: r.id,
-                user_id: r.user_id.map(DBUserId),
-                channel: NotificationChannel::from_str_or_default(&r.channel),
-                notification_type: NotificationType::from_str_or_default(
-                    &r.notification_type,
-                ),
-                enabled: r.enabled,
-            })
-            .collect();
-
-        Ok(preferences)
-    }
-
-    pub async fn get_user_or_default(
-        user_id: DBUserId,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<UserNotificationPreference>, DatabaseError> {
-        let results = sqlx::query!(
-            r#"
-            SELECT
-              COALESCE(unp.id, dnp.id) "id!",
-              unp.user_id,
-              dnp.channel "channel!",
-              dnp.notification_type "notification_type!",
-              COALESCE(unp.enabled, COALESCE(dnp.enabled, false)) "enabled!"
-            FROM users_notifications_preferences dnp
-            LEFT JOIN users_notifications_preferences unp
-              ON unp.channel = dnp.channel
-              AND unp.notification_type = dnp.notification_type
-              AND unp.user_id = $1
-            "#,
-            user_id.0
         )
         .fetch_all(exec)
         .await?;

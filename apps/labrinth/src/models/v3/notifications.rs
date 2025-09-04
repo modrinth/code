@@ -105,6 +105,30 @@ pub enum NotificationBody {
     Unknown,
 }
 
+impl NotificationBody {
+    pub fn notification_type(&self) -> NotificationType {
+        match &self {
+            NotificationBody::ProjectUpdate { .. } => {
+                NotificationType::ProjectUpdate
+            }
+            NotificationBody::TeamInvite { .. } => NotificationType::TeamInvite,
+            NotificationBody::OrganizationInvite { .. } => {
+                NotificationType::OrganizationInvite
+            }
+            NotificationBody::StatusChange { .. } => {
+                NotificationType::StatusChange
+            }
+            NotificationBody::ModeratorMessage { .. } => {
+                NotificationType::ModeratorMessage
+            }
+            NotificationBody::LegacyMarkdown { .. } => {
+                NotificationType::LegacyMarkdown
+            }
+            NotificationBody::Unknown => NotificationType::Unknown,
+        }
+    }
+}
+
 impl From<DBNotification> for Notification {
     fn from(notif: DBNotification) -> Self {
         let (name, text, link, actions) = {
@@ -242,30 +266,6 @@ impl From<DBNotification> for Notification {
             text,
             link,
             actions,
-        }
-    }
-}
-
-impl Notification {
-    pub fn notification_type(&self) -> NotificationType {
-        match &self.body {
-            NotificationBody::ProjectUpdate { .. } => {
-                NotificationType::ProjectUpdate
-            }
-            NotificationBody::TeamInvite { .. } => NotificationType::TeamInvite,
-            NotificationBody::OrganizationInvite { .. } => {
-                NotificationType::OrganizationInvite
-            }
-            NotificationBody::StatusChange { .. } => {
-                NotificationType::StatusChange
-            }
-            NotificationBody::ModeratorMessage { .. } => {
-                NotificationType::ModeratorMessage
-            }
-            NotificationBody::LegacyMarkdown { .. } => {
-                NotificationType::LegacyMarkdown
-            }
-            NotificationBody::Unknown => NotificationType::Unknown,
         }
     }
 }
