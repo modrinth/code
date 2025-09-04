@@ -25,7 +25,7 @@
 						<b>{{ formatMoney(usedLimit) }}</b> now, but you'll need to complete a tax form to
 						withdraw more.</span
 					>
-					<Admonition type="info" show-actions-underneath header="Tax form required">
+					<Admonition type="warning" show-actions-underneath header="Tax form required">
 						To withdraw your full <b>{{ formatMoney(balance?.available) }}</b> available balance
 						please complete the form below. It is required for tax reporting and only needs to be
 						done once.
@@ -58,10 +58,8 @@
 					<span class="font-semibold text-contrast">{{ formatMoney(balance?.available) }}</span>
 				</div>
 				<div class="flex gap-1 align-middle text-lg font-semibold text-contrast">
-					<span class="text-brand-red">*</span> <span>Region</span>
-					<span class="my-auto text-blue"
-						><UnknownIcon v-tooltip="`something here`" class="size-5"
-					/></span>
+					<span>Region</span><span class="text-brand-red">*</span>
+					<UnknownIcon v-tooltip="`something here`" class="my-auto size-4 text-secondary" />
 				</div>
 				<Multiselect
 					id="country-multiselect"
@@ -78,6 +76,27 @@
 					:use-teleport="true"
 					open-direction="below"
 				/>
+				<div class="flex gap-1 align-middle text-lg font-semibold text-contrast">
+					<span>Withdraw to</span><span class="text-brand-red">*</span>
+				</div>
+				<Multiselect
+					id="payment-method"
+					v-model="paymentMethod"
+					class="country-multiselect"
+					placeholder="Select method..."
+					track-by="id"
+					label="name"
+					:options="paymentMethods"
+					:searchable="true"
+					:close-on-select="true"
+					:show-labels="false"
+					:allow-empty="false"
+					:use-teleport="true"
+					open-direction="below"
+				/>
+				<div class="flex gap-1 align-middle text-lg font-semibold text-contrast">
+					<span>Amount</span><span class="text-brand-red">*</span>
+				</div>
 			</template>
 		</div>
 	</NewModal>
@@ -106,6 +125,12 @@ interface UserBalanceResponse {
 	form_completion_status: FormCompletionStatus | null
 }
 
+interface PayoutMethod {
+	id: string
+	name: string
+	type: string
+}
+
 const countries = computed(() =>
 	all().map((x) => ({
 		id: x.alpha2,
@@ -113,7 +138,20 @@ const countries = computed(() =>
 	})),
 )
 
-const country = ref<string | null>(null)
+const country = ref<{ id: string; name: string } | null>(null)
+const paymentMethod = ref<PayoutMethod | null>(null)
+
+const {
+	data: payoutMethods,
+	refresh: refreshPayoutMethods,
+	pending: payoutMethodsPending,
+} = await useAsyncData(
+	'payout-methods',
+	() => useBaseFetch(`payout/methods?country=${country.value?.id ?? 'US'}`, { apiVersion: 3 }),
+	{ default: () => [] as PayoutMethod[], watch: [country] },
+)
+
+const paymentMethods = computed<PayoutMethod[]>(() => (payoutMethods.value as PayoutMethod[]) ?? [])
 
 const props = defineProps<{
 	balance: UserBalanceResponse | null
@@ -173,6 +211,28 @@ function show(preferred?: Stage) {
 
 	open('withdraw-details')
 }
+
+// Initialize default country (fallback to US if available)
+if (!country.value) {
+	const us = countries.value.find((c) => c.id === 'US')
+	country.value = us ?? countries.value[0] ?? null
+}
+
+// Keep selected method in sync with fetched options
+watch(
+	() => paymentMethods.value,
+	(list) => {
+		if (!list?.length) {
+			paymentMethod.value = null
+			return
+		}
+		// Reset selection if current selection is not in the new list
+		if (!paymentMethod.value || !list.some((m) => m.id === paymentMethod.value?.id)) {
+			paymentMethod.value = list[0]
+		}
+	},
+	{ immediate: true },
+)
 
 defineExpose({
 	show,
