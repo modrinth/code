@@ -651,8 +651,8 @@ impl PayoutsQueue {
     ) -> Result<Option<AccountBalance>, ApiError> {
         #[derive(Deserialize)]
         struct FundingSourceMeta {
-            available_cents: u64,
-            pending_cents: u64,
+            available_cents: Option<u64>,
+            pending_cents: Option<u64>,
         }
 
         #[derive(Deserialize)]
@@ -679,9 +679,9 @@ impl PayoutsQueue {
             .into_iter()
             .find(|x| x.method == "balance")
             .map(|x| AccountBalance {
-                available: Decimal::from(x.meta.available_cents)
+                available: Decimal::from(x.meta.available_cents.unwrap_or(0))
                     / Decimal::from(100),
-                pending: Decimal::from(x.meta.pending_cents)
+                pending: Decimal::from(x.meta.pending_cents.unwrap_or(0))
                     / Decimal::from(100),
             }))
     }
