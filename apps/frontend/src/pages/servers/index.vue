@@ -36,7 +36,7 @@
 					<div
 						class="relative h-fit w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
 					>
-						Beta Release
+						{{ formatMessage(commonMessages.betaRelease) }}
 					</div>
 					<h1 class="relative m-0 max-w-3xl text-3xl font-bold !leading-[110%] md:text-6xl">
 						Host your next server with Modrinth Servers
@@ -645,7 +645,12 @@ import {
 	TransferIcon,
 	VersionIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, ModrinthServersPurchaseModal } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	commonMessages,
+	injectNotificationManager,
+	ModrinthServersPurchaseModal,
+} from '@modrinth/ui'
 import { monthsInInterval } from '@modrinth/ui/src/utils/billing.ts'
 import { formatPrice } from '@modrinth/utils'
 import { useVIntl } from '@vintl/vintl'
@@ -660,7 +665,7 @@ import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 import { products } from '~/generated/state.json'
 
 const { addNotification } = injectNotificationManager()
-const { locale } = useVIntl()
+const { locale, formatMessage } = useVIntl()
 const flags = useFeatureFlags()
 
 const billingPeriods = ref(['monthly', 'quarterly'])

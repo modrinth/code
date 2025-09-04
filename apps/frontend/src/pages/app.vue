@@ -8,7 +8,9 @@ import {
 	SendIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { Avatar, Badge, Checkbox } from '@modrinth/ui'
+import { Avatar, Badge, Checkbox, commonMessages } from '@modrinth/ui'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+import { IntlFormatted } from '@vintl/vintl/components'
 
 import ATLauncher from '~/assets/images/external/atlauncher.svg?component'
 import CurseForge from '~/assets/images/external/curseforge.svg?component'
@@ -32,7 +34,7 @@ interface LauncherUpdates {
 type OSType = 'Mac' | 'Windows' | 'Linux' | null
 
 const downloadWindows = ref<HTMLAnchorElement | null>(null)
-const downloadLinux = ref<HTMLAnchorElement | null>(null)
+const downloadMac = ref<HTMLAnchorElement | null>(null)
 const downloadSection = ref<HTMLElement | null>(null)
 const windowsLink = ref<string | null>(null)
 
@@ -103,14 +105,87 @@ const os = computed<OSType>(() => {
 		return null
 	}
 })
+
+const osName = computed(() => {
+	switch (os.value) {
+		case 'Mac':
+			return formatMessage(messages.mac)
+		case 'Windows':
+			return formatMessage(messages.windows)
+		case 'Linux':
+			return formatMessage(messages.linux)
+	}
+	return 'unknown'
+})
+
+const modManagementData = [
+	{
+		id: 'P7dR8mSH', // Todo: fetch name + author + icon from api
+		name: 'Fabric API',
+		author: 'modmuss50',
+		version: '0.86.1+1.20.1',
+		iconUrl: 'https://cdn.modrinth.com/data/P7dR8mSH/icon.png',
+	},
+	{
+		id: 'AANobbMI',
+		name: 'Sodium',
+		author: 'jellysquid3',
+		version: 'mc1.20.1-0.5.0',
+		iconUrl: 'https://cdn.modrinth.com/data/AANobbMI/icon.png',
+	},
+	{
+		id: 'YL57xq9U',
+		name: 'Iris Shaders',
+		author: 'coderbot',
+		version: '1.6.5+1.20.1',
+		iconUrl: 'https://cdn.modrinth.com/data/YL57xq9U/dc558eece920db435f9823ce86de0c4cde89800b.png',
+	},
+	{
+		id: 'gvQqBUqZ',
+		name: 'Lithium',
+		author: 'jellysquid3',
+		version: 'mc1.20.1-0.11.2',
+		iconUrl: 'https://cdn.modrinth.com/data/gvQqBUqZ/icon.png',
+	},
+	{
+		id: 'mOgUt4GM',
+		name: 'Mod Menu',
+		author: 'Prospector',
+		version: '7.2.1',
+		iconUrl:
+			'https://cdn.modrinth.com/data/mOgUt4GM/1bfe2006b38340e9d064700e41adf84a8abb1bd4_96.webp',
+	},
+	{
+		id: '9s6osm5g',
+		name: 'Cloth Config API',
+		author: 'shedaniel',
+		version: '11.1.106+fabric',
+		iconUrl: 'https://cdn.modrinth.com/data/9s6osm5g/icon.png',
+	},
+	{
+		id: 'lhGA9TYQ',
+		name: 'Architectury API',
+		author: 'shedaniel',
+		version: '9.1.12+fabric',
+		iconUrl: 'https://cdn.modrinth.com/data/lhGA9TYQ/icon.png',
+	},
+	{
+		id: 'nrJ2NpD0',
+		name: 'Craftify',
+		author: 'ThatGravyBoat',
+		version: '8.5.2023',
+		iconUrl: 'https://cdn.modrinth.com/data/nrJ2NpD0/4f21214db060ed4542b1f3983c4113d293480a1b.webp',
+	},
+]
+
 const downloadLauncher = computed(() => {
 	if (os.value === 'Windows') {
 		return () => {
 			downloadWindows.value?.click()
 		}
-	} else if (os.value === 'Linux') {
+	} else if (os.value === 'Mac') {
 		return () => {
-			downloadLinux.value?.click()
+			downloadMac.value?.click()
 		}
 	} else {
 		return () => {
@@ -148,9 +223,276 @@ const scrollToSection = () => {
 	})
 }
 
-const title = 'Download the Modrinth App!'
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	downloadModrinthApp: {
+		id: 'app-marketing.hero.download-modrinth-app',
+		defaultMessage: 'Download Modrinth App',
+	},
+	downloadModrinthAppForOs: {
+		id: 'app-marketing.hero.download-modrinth-app-for-os',
+		defaultMessage: 'Download Modrinth App for {os}',
+	},
+	description: {
+		id: 'app-marketing.hero.description',
+		defaultMessage:
+			'Modrinth App is a unique, open source launcher that allows you to play your favorite mods, and keep them up to date, all in one neat little package.',
+	},
+	downloadModrinthAppButton: {
+		id: 'app-marketing.hero.download-button',
+		defaultMessage: 'Download Modrinth App',
+	},
+	moreDownloadOptions: {
+		id: 'app-marketing.hero.more-download-options',
+		defaultMessage: 'More Download Options',
+	},
+	unlikeAnyLauncher: {
+		id: 'app-marketing.features.unlike-any-launcher',
+		defaultMessage: 'Unlike any launcher',
+	},
+	youveUsedBefore: {
+		id: 'app-marketing.features.youve-used-before',
+		defaultMessage: "you've used before",
+	},
+	installedMods: {
+		id: 'app-marketing.features.mod-management.installed-mods',
+		defaultMessage: 'Installed mods',
+	},
+	searchMods: {
+		id: 'app-marketing.features.mod-management.search-mods',
+		defaultMessage: 'Search mods',
+	},
+	name: {
+		id: 'app-marketing.features.mod-management.name',
+		defaultMessage: 'Name',
+	},
+	version: {
+		id: 'app-marketing.features.mod-management.version',
+		defaultMessage: 'Version',
+	},
+	actions: {
+		id: 'app-marketing.features.mod-management.actions',
+		defaultMessage: 'Actions',
+	},
+	byAuthor: {
+		id: 'app-marketing.features.mod-management.byAuthor',
+		defaultMessage: 'by {author}',
+	},
+	modManagement: {
+		id: 'app-marketing.features.mod-management.title',
+		defaultMessage: 'Mod management',
+	},
+	modManagementDescription: {
+		id: 'app-marketing.features.mod-management.description',
+		defaultMessage:
+			'Modrinth makes it easy to manage all your mods in one place. You can install, uninstall, and update mods with a single click.',
+	},
+	playWithFavoriteMods: {
+		id: 'app-marketing.features.play.title',
+		defaultMessage: 'Play with your favorite mods',
+	},
+	playWithFavoriteModsDescription: {
+		id: 'app-marketing.features.play.description',
+		defaultMessage: 'Use Modrinth App to download and play with your favorite mods and modpacks.',
+	},
+	shareModpacks: {
+		id: 'app-marketing.features.sharing.title',
+		defaultMessage: 'Share modpacks',
+	},
+	shareModpacksDescription: {
+		id: 'app-marketing.features.sharing.description',
+		defaultMessage:
+			'Build, share, and play modpacks with any of the thousands of mods and modpacks hosted here on Modrinth.',
+	},
+	share: {
+		id: 'app-marketing.features.sharing.share-button',
+		defaultMessage: 'Share',
+	},
+	modpack: {
+		id: 'app-marketing.features.sharing.modpack',
+		defaultMessage: 'Modpack',
+	},
+	activityMonitor: {
+		id: 'app-marketing.features.performance.activity-monitor',
+		defaultMessage: 'Activity monitor',
+	},
+	goodPerformance: {
+		id: 'app-marketing.features.performance.good-performance',
+		defaultMessage: 'Good performance',
+	},
+	processName: {
+		id: 'app-marketing.features.performance.process-name',
+		defaultMessage: 'Process name',
+	},
+	cpuPercent: {
+		id: 'app-marketing.features.performance.cpu-percent',
+		defaultMessage: '% CPU',
+	},
+	ram: {
+		id: 'app-marketing.features.performance.ram',
+		defaultMessage: 'RAM',
+	},
+	modrinthApp: {
+		id: 'app-marketing.features.performance.modrinth-app',
+		defaultMessage: 'Modrinth App',
+	},
+	small: {
+		id: 'app-marketing.features.performance.small',
+		defaultMessage: 'Small',
+	},
+	lessThan150MB: {
+		id: 'app-marketing.features.performance.less-than-150mb',
+		defaultMessage: '< 150 MB',
+	},
+	googleChrome: {
+		id: 'app-marketing.features.performance.google-chrome',
+		defaultMessage: 'Google Chrome',
+	},
+	discord: {
+		id: 'app-marketing.features.performance.discord',
+		defaultMessage: 'Discord',
+	},
+	infiniteMB: {
+		id: 'app-marketing.features.performance.infinite-mb',
+		defaultMessage: '∞ MB',
+	},
+	oneBillionPercent: {
+		id: 'app-marketing.features.performance.one-billion-percent',
+		defaultMessage: '1 billion %',
+	},
+	infiniteTimesInfiniteMB: {
+		id: 'app-marketing.features.performance.infinite-times-infinite-mb',
+		defaultMessage: '∞ * ∞ MB',
+	},
+	performant: {
+		id: 'app-marketing.features.performance.title',
+		defaultMessage: 'Performant',
+	},
+	performantDescription: {
+		id: 'app-marketing.features.performance.description',
+		defaultMessage:
+			'Modrinth App performs better than many of the leading mod managers, using just 150mb of RAM!',
+	},
+	websiteIntegration: {
+		id: 'app-marketing.features.website.title',
+		defaultMessage: 'Website integration',
+	},
+	websiteIntegrationDescription: {
+		id: 'app-marketing.features.website.description',
+		defaultMessage:
+			'Modrinth App is fully integrated with the website, so you can access all your favorite projects from the app!',
+	},
+	profileImporting: {
+		id: 'app-marketing.features.importing.title',
+		defaultMessage: 'Profile importing',
+	},
+	profileImportingDescription: {
+		id: 'app-marketing.features.importing.description',
+		defaultMessage:
+			'Import all your favorite profiles from the launcher you were using before, and get started with Modrinth App in seconds!',
+	},
+	openSource: {
+		id: 'app-marketing.features.open-source.title',
+		defaultMessage: 'Open source',
+	},
+	openSourceDescription: {
+		id: 'app-marketing.features.open-source.description',
+		defaultMessage:
+			"Modrinth's launcher is fully open source. You can view the source code on our <github-link>GitHub</github-link>!",
+	},
+	offlineMode: {
+		id: 'app-marketing.features.offline.title',
+		defaultMessage: 'Offline mode',
+	},
+	offlineModeDescription: {
+		id: 'app-marketing.features.offline.description',
+		defaultMessage: 'Play your mods, whether you are connected to the internet, or not.',
+	},
+	followProjects: {
+		id: 'app-marketing.features.follow.title',
+		defaultMessage: 'Follow projects',
+	},
+	followProjectsDescription: {
+		id: 'app-marketing.features.follow.description',
+		defaultMessage: 'Save content you love and receive updates with one click.',
+	},
+	downloadOptions: {
+		id: 'app-marketing.download.options-title',
+		defaultMessage: 'Download options',
+	},
+	downloadModrinthAppBeta: {
+		id: 'app-marketing.download.title',
+		defaultMessage: 'Download Modrinth App (Beta)',
+	},
+	downloadDescription: {
+		id: 'app-marketing.download.description',
+		defaultMessage:
+			'Our desktop app is available across all platforms, choose your desired version.',
+	},
+	windows: {
+		id: 'app-marketing.download.windows',
+		defaultMessage: 'Windows',
+	},
+	mac: {
+		id: 'app-marketing.download.mac',
+		defaultMessage: 'Mac',
+	},
+	linux: {
+		id: 'app-marketing.download.linux',
+		defaultMessage: 'Linux',
+	},
+	downloadTheBeta: {
+		id: 'app-marketing.download.download-beta',
+		defaultMessage: 'Download the beta',
+	},
+	downloadTheAppImage: {
+		id: 'app-marketing.download.download-appimage',
+		defaultMessage: 'Download the AppImage',
+	},
+	downloadTheDEB: {
+		id: 'app-marketing.download.download-deb',
+		defaultMessage: 'Download the DEB',
+	},
+	downloadTheRPM: {
+		id: 'app-marketing.download.download-rpm',
+		defaultMessage: 'Download the RPM',
+	},
+	thirdPartyPackages: {
+		id: 'app-marketing.download.third-party-packages',
+		defaultMessage: 'Third-party packages',
+	},
+	downloadTerms: {
+		id: 'app-marketing.download.terms',
+		defaultMessage:
+			'By downloading Modrinth App you agree to our <terms-link>Terms</terms-link> and <privacy-link>Privacy Policy</privacy-link>.',
+	},
+	linuxDisclaimer: {
+		id: 'app-marketing.download.linux-disclaimer',
+		defaultMessage:
+			'The Linux versions of Modrinth App are <issues-link>known to have issues</issues-link> on certain systems and configurations. If Modrinth App is unstable on your system, we encourage you to try other apps like <prism-link>Prism Launcher</prism-link> to easily install Modrinth content.',
+	},
+	appScreenshotAlt: {
+		id: 'app-marketing.hero.app-screenshot-alt',
+		defaultMessage: `Screenshot of Modrinth App with a Cobblemon instance opened to the 'Content' page.`,
+	},
+	minecraftScreenshotAlt: {
+		id: 'app-marketing.hero.minecraft-screenshot-alt',
+		defaultMessage: `Screenshot of the Cobblemon instance's main menu screen.`,
+	},
+	gdlauncherAlt: {
+		id: 'app-marketing.features.importing.gdlauncher-alt',
+		defaultMessage: 'GDLauncher',
+	},
+	multimcAlt: {
+		id: 'app-marketing.features.importing.multimc-alt',
+		defaultMessage: 'MultiMC',
+	},
+})
+
+const title = 'Download Modrinth App!'
 const description =
-	'The Modrinth App is a unique, open source launcher that allows you to play your favorite mods, and keep them up to date, all in one neat little package.'
+	'Modrinth App is a unique, open source launcher that allows you to play your favorite mods, and keep them up to date, all in one neat little package.'
 
 useSeoMeta({
 	title,
@@ -163,14 +505,20 @@ useSeoMeta({
 <template>
 	<div>
 		<div class="landing-hero">
-			<h1 class="main-header">
-				Download Modrinth <br v-if="os" />
-				App
-				{{ os ? `for ${os}` : '' }}
+			<div
+				class="relative mt-4 h-fit w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+			>
+				{{ formatMessage(commonMessages.betaRelease) }}
+			</div>
+			<h1 class="main-header max-w-[60rem]">
+				{{
+					os
+						? formatMessage(messages.downloadModrinthAppForOs, { os: osName })
+						: formatMessage(messages.downloadModrinthApp)
+				}}
 			</h1>
 			<h2 class="main-subheader">
-				The Modrinth App is a unique, open source launcher that allows you to play your favorite
-				mods, and keep them up to date, all in one neat little package.
+				{{ formatMessage(messages.description) }}
 			</h2>
 			<div class="button-group">
 				<button
@@ -229,163 +577,51 @@ useSeoMeta({
 							fill="currentColor"
 						/>
 					</svg>
-					Download the Modrinth App
+					{{ formatMessage(messages.downloadModrinthAppButton) }}
 				</button>
 				<button class="iconified-button outline-button btn btn-large" @click="scrollToSection">
-					More Download Options
+					{{ formatMessage(messages.moreDownloadOptions) }}
 				</button>
 			</div>
-			<img src="https://cdn-raw.modrinth.com/app-landing/app-screenshot.webp" alt="cube maze" />
+			<img src="https://cdn-raw.modrinth.com/app-landing/app-screenshot.webp" alt="" />
 			<div class="bottom-transition" />
 		</div>
 		<div class="features">
 			<h1 class="subheader">
-				Unlike any launcher <br />
-				you've used before
+				{{ formatMessage(messages.unlikeAnyLauncher) }} <br />
+				{{ formatMessage(messages.youveUsedBefore) }}
 			</h1>
 			<div class="feature-grid">
 				<div class="feature gradient-border mods">
 					<div class="search-bar">
-						<h4>Installed mods</h4>
+						<h4>{{ formatMessage(messages.installedMods) }}</h4>
 						<div class="mini-input">
 							<SearchIcon aria-hidden="true" />
-							<div class="search">Search mods</div>
+							<div class="search">{{ formatMessage(messages.searchMods) }}</div>
 						</div>
 					</div>
 					<div class="header row">
 						<div />
-						<div class="cell">Name</div>
-						<div class="cell">Version</div>
-						<div class="cell">Actions</div>
+						<div class="cell">{{ formatMessage(messages.name) }}</div>
+						<div class="cell">{{ formatMessage(messages.version) }}</div>
+						<div class="cell">{{ formatMessage(messages.actions) }}</div>
 					</div>
 					<div class="table">
-						<div class="row first">
+						<div
+							v-for="(mod, index) in modManagementData"
+							:key="mod.id"
+							:class="['row', { first: index === 0 }]"
+						>
 							<div class="cell">
-								<Avatar size="sm" src="https://cdn.modrinth.com/data/P7dR8mSH/icon.png" />
-							</div>
-							<div class="cell">
-								<div class="name">Fabric API</div>
-								<div class="description">by modmuss</div>
-							</div>
-							<div class="cell important">0.86.1+1.20.1</div>
-							<div class="cell check">
-								<Checkbox :model-value="true" tabindex="-1" />
-								<button class="btn icon-only transparent" tabindex="-1">
-									<TrashIcon />
-								</button>
-							</div>
-						</div>
-						<div class="row">
-							<div class="cell">
-								<Avatar size="sm" src="https://cdn.modrinth.com/data/AANobbMI/icon.png" />
+								<Avatar size="sm" :src="mod.iconUrl" />
 							</div>
 							<div class="cell">
-								<div class="name">Sodium</div>
-								<div class="description">by jellysquid3</div>
+								<div class="name">{{ mod.name }}</div>
+								<div class="description">
+									{{ formatMessage(messages.byAuthor, { author: mod.author }) }}
+								</div>
 							</div>
-							<div class="cell">mc1.20.1-0.5.0</div>
-							<div class="cell check">
-								<Checkbox :model-value="true" tabindex="-1" />
-								<button class="btn icon-only transparent" tabindex="-1">
-									<TrashIcon />
-								</button>
-							</div>
-						</div>
-						<div class="row">
-							<div class="cell">
-								<Avatar
-									size="sm"
-									src="https://cdn.modrinth.com/data/YL57xq9U/dc558eece920db435f9823ce86de0c4cde89800b.png"
-								/>
-							</div>
-							<div class="cell">
-								<div class="name">Iris Shaders</div>
-								<div class="description">by coderbot</div>
-							</div>
-							<div class="cell">1.6.5+1.20.1</div>
-							<div class="cell check">
-								<Checkbox :model-value="true" tabindex="-1" />
-								<button class="btn icon-only transparent" tabindex="-1">
-									<TrashIcon />
-								</button>
-							</div>
-						</div>
-						<div class="row">
-							<div class="cell">
-								<Avatar size="sm" src="https://cdn.modrinth.com/data/gvQqBUqZ/icon.png" />
-							</div>
-							<div class="cell">
-								<div class="name">Lithium</div>
-								<div class="description">by jellysquid3</div>
-							</div>
-							<div class="cell">mc1.20.1-0.11.2</div>
-							<div class="cell check">
-								<Checkbox :model-value="true" tabindex="-1" />
-								<button class="btn icon-only transparent" tabindex="-1">
-									<TrashIcon />
-								</button>
-							</div>
-						</div>
-						<div class="row">
-							<div class="cell">
-								<Avatar size="sm" src="https://cdn.modrinth.com/data/mOgUt4GM/icon.png" />
-							</div>
-							<div class="cell">
-								<div class="name">Mod Menu</div>
-								<div class="description">by Prospector</div>
-							</div>
-							<div class="cell">7.2.1</div>
-							<div class="cell check">
-								<Checkbox :model-value="true" tabindex="-1" />
-								<button class="btn icon-only transparent" tabindex="-1">
-									<TrashIcon />
-								</button>
-							</div>
-						</div>
-						<div class="row">
-							<div class="cell">
-								<Avatar size="sm" src="https://cdn.modrinth.com/data/9s6osm5g/icon.png" />
-							</div>
-							<div class="cell">
-								<div class="name">Cloth Config API</div>
-								<div class="description">by shedaniel</div>
-							</div>
-							<div class="cell">11.1.106+fabric</div>
-							<div class="cell check">
-								<Checkbox :model-value="true" tabindex="-1" />
-								<button class="btn icon-only transparent" tabindex="-1">
-									<TrashIcon />
-								</button>
-							</div>
-						</div>
-						<div class="row">
-							<div class="cell">
-								<Avatar size="sm" src="https://cdn.modrinth.com/data/lhGA9TYQ/icon.png" />
-							</div>
-							<div class="cell">
-								<div class="name">Architectury API</div>
-								<div class="description">by shedaniel</div>
-							</div>
-							<div class="cell">9.1.12+fabric</div>
-							<div class="cell check">
-								<Checkbox :model-value="true" tabindex="-1" />
-								<button class="btn icon-only transparent" tabindex="-1">
-									<TrashIcon />
-								</button>
-							</div>
-						</div>
-						<div class="row">
-							<div class="cell">
-								<Avatar
-									size="sm"
-									src="https://cdn.modrinth.com/data/nrJ2NpD0/0efcf28eb5c18bed0cc47d786879e32550861ca4.png"
-								/>
-							</div>
-							<div class="cell">
-								<div class="name">Craftify</div>
-								<div class="description">by ThatGravyBoat</div>
-							</div>
-							<div class="cell">8.5.2023</div>
+							<div class="cell">{{ mod.version }}</div>
 							<div class="cell check">
 								<Checkbox :model-value="true" tabindex="-1" />
 								<button class="btn icon-only transparent" tabindex="-1">
@@ -394,25 +630,24 @@ useSeoMeta({
 							</div>
 						</div>
 					</div>
-					<h3>Mod management</h3>
+					<h3>{{ formatMessage(messages.modManagement) }}</h3>
 					<p>
-						Modrinth makes it easy to manage all your mods in one place. You can install, uninstall,
-						and update mods with a single click.
+						{{ formatMessage(messages.modManagementDescription) }}
 					</p>
 				</div>
 				<div class="feature gradient-border playing">
 					<div class="text">
-						<h3>Play with your favorite mods</h3>
-						<p>Use the Modrinth App to download and play with your favorite mods and modpacks.</p>
+						<h3>{{ formatMessage(messages.playWithFavoriteMods) }}</h3>
+						<p>{{ formatMessage(messages.playWithFavoriteModsDescription) }}</p>
 					</div>
 					<img
 						src="https://cdn-raw.modrinth.com/app-landing/cobblemon-launcher.webp"
-						alt="The Modrinth App playing Cobblemon for Fabric"
+						:alt="formatMessage(messages.appScreenshotAlt)"
 						class="launcher"
 					/>
 					<img
 						src="https://cdn-raw.modrinth.com/app-landing/cobblemon.webp"
-						alt="Minecraft playing Cobblemon for Fabric"
+						:alt="formatMessage(messages.minecraftScreenshotAlt)"
 						class="minecraft"
 					/>
 				</div>
@@ -456,10 +691,9 @@ useSeoMeta({
 							<div class="cell">A mod which overhauls the vanilla creepers!</div>
 						</div>
 					</div>
-					<h3>Share Modpacks</h3>
+					<h3>{{ formatMessage(messages.shareModpacks) }}</h3>
 					<p>
-						Build, share, and play modpacks with any of the thousands of mods and modpacks hosted
-						here on Modrinth.
+						{{ formatMessage(messages.shareModpacksDescription) }}
 					</p>
 					<div class="export-card">
 						<Avatar
@@ -467,9 +701,9 @@ useSeoMeta({
 						/>
 						<div class="info">
 							<div class="exporting">
-								<div class="tag"><BoxIcon /> Modpack</div>
+								<div class="tag"><BoxIcon /> {{ formatMessage(messages.modpack) }}</div>
 								<div class="small-button">
-									Share
+									{{ formatMessage(messages.share) }}
 									<SendIcon />
 								</div>
 							</div>
@@ -480,14 +714,14 @@ useSeoMeta({
 				</div>
 				<div class="feature gradient-border performance">
 					<div class="title">
-						<h4>Activity monitor</h4>
-						<Badge color="green" type="Good performance" />
+						<h4>{{ formatMessage(messages.activityMonitor) }}</h4>
+						<Badge color="green" :type="formatMessage(messages.goodPerformance)" />
 					</div>
 					<div class="header row">
 						<div />
-						<div class="cell">Process name</div>
-						<div class="cell">% CPU</div>
-						<div class="cell">RAM</div>
+						<div class="cell">{{ formatMessage(messages.processName) }}</div>
+						<div class="cell">{{ formatMessage(messages.cpuPercent) }}</div>
+						<div class="cell">{{ formatMessage(messages.ram) }}</div>
 					</div>
 					<div class="table">
 						<div class="row first">
@@ -498,9 +732,9 @@ useSeoMeta({
 									</div>
 								</div>
 							</div>
-							<div class="cell important">Modrinth App</div>
-							<div class="cell important">Small</div>
-							<div class="cell important">{{ '< 150 MB' }}</div>
+							<div class="cell important">{{ formatMessage(messages.modrinthApp) }}</div>
+							<div class="cell important">{{ formatMessage(messages.small) }}</div>
+							<div class="cell important">{{ formatMessage(messages.lessThan150MB) }}</div>
 						</div>
 						<div class="row">
 							<div class="cell">
@@ -508,9 +742,9 @@ useSeoMeta({
 									<div class="icon-logo"></div>
 								</div>
 							</div>
-							<div class="cell">Google Chrome</div>
+							<div class="cell">{{ formatMessage(messages.googleChrome) }}</div>
 							<div class="cell">150%</div>
-							<div class="cell">∞ MB</div>
+							<div class="cell">{{ formatMessage(messages.infiniteMB) }}</div>
 						</div>
 						<div class="row">
 							<div class="cell">
@@ -518,15 +752,14 @@ useSeoMeta({
 									<div class="icon-logo"></div>
 								</div>
 							</div>
-							<div class="cell">Discord</div>
-							<div class="cell">1 billion %</div>
-							<div class="cell">∞ * ∞ MB</div>
+							<div class="cell">{{ formatMessage(messages.discord) }}</div>
+							<div class="cell">{{ formatMessage(messages.oneBillionPercent) }}</div>
+							<div class="cell">{{ formatMessage(messages.infiniteTimesInfiniteMB) }}</div>
 						</div>
 					</div>
-					<h3>Performant</h3>
+					<h3>{{ formatMessage(messages.performant) }}</h3>
 					<p>
-						The Modrinth App performs better than many of the leading mod managers, using just 150mb
-						of RAM!
+						{{ formatMessage(messages.performantDescription) }}
 					</p>
 				</div>
 				<div class="feature gradient-border website">
@@ -543,7 +776,7 @@ useSeoMeta({
 									class="project button-animation gradient-border"
 									:to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
 								>
-									<Avatar :src="project.icon_url!" :alt="project.title" size="sm" />
+									<Avatar :src="project.icon_url!" alt="" size="sm" />
 									<div class="project-info">
 										<span class="title">
 											{{ project.title }}
@@ -556,29 +789,33 @@ useSeoMeta({
 							</div>
 						</div>
 					</div>
-					<h3>Website Integration</h3>
+					<h3>{{ formatMessage(messages.websiteIntegration) }}</h3>
 					<p>
-						The Modrinth App is fully integrated with the website, so you can access all your
-						favorite projects from the app!
+						{{ formatMessage(messages.websiteIntegrationDescription) }}
 					</p>
 				</div>
 				<div class="feature gradient-border importing">
 					<div class="text">
-						<h3>Profile importing</h3>
+						<h3>{{ formatMessage(messages.profileImporting) }}</h3>
 						<p>
-							Import all your favorite profiles from the launcher you were using before, and get
-							started with the Modrinth App in seconds!
+							{{ formatMessage(messages.profileImportingDescription) }}
 						</p>
 					</div>
-					<div class="inner-ring ring">
+					<div class="inner-circle circle">
 						<div class="icon-logo">
 							<LogoAnimated class="icon" />
 						</div>
 						<div class="launcher-badge top-left">
-							<img src="~/assets/images/external/gdlauncher.png" alt="GDLauncher" />
+							<img
+								src="~/assets/images/external/gdlauncher.png"
+								:alt="formatMessage(messages.gdlauncherAlt)"
+							/>
 						</div>
 						<div class="launcher-badge top-right">
-							<img src="~/assets/images/external/multimc.webp" alt="MultiMC" />
+							<img
+								src="~/assets/images/external/multimc.webp"
+								:alt="formatMessage(messages.multimcAlt)"
+							/>
 						</div>
 						<div class="launcher-badge bottom-left">
 							<PrismIcon />
@@ -589,9 +826,9 @@ useSeoMeta({
 						<div class="launcher-badge bottom-middle">
 							<CurseForge />
 						</div>
-						<div class="first-ring" />
-						<div class="second-ring" />
-						<div class="third-ring" />
+						<div class="first-circle" />
+						<div class="second-circle" />
+						<div class="third-circle" />
 					</div>
 				</div>
 			</div>
@@ -650,11 +887,16 @@ useSeoMeta({
 								</linearGradient>
 							</defs>
 						</svg>
-						<h3>Open source</h3>
+						<h3>{{ formatMessage(messages.openSource) }}</h3>
 					</div>
 					<div class="description">
-						Modrinth’s launcher is fully open source. You can view the source code on our
-						<a href="https://github.com/modrinth/theseus" rel="noopener" target="_blank">GitHub</a>!
+						<IntlFormatted :message-id="messages.openSourceDescription">
+							<template #github-link="{ children }">
+								<a href="https://github.com/modrinth/code" rel="noopener" target="_blank">
+									<component :is="() => children" />
+								</a>
+							</template>
+						</IntlFormatted>
 					</div>
 				</div>
 				<div class="point">
@@ -758,10 +1000,10 @@ useSeoMeta({
 								</linearGradient>
 							</defs>
 						</svg>
-						<h3>Offline mode</h3>
+						<h3>{{ formatMessage(messages.offlineMode) }}</h3>
 					</div>
 					<div class="description">
-						Play your mods, whether you are connected to the internet, or not.
+						{{ formatMessage(messages.offlineModeDescription) }}
 					</div>
 				</div>
 				<div class="point">
@@ -818,19 +1060,20 @@ useSeoMeta({
 								</linearGradient>
 							</defs>
 						</svg>
-						<h3>Follow projects</h3>
+						<h3>{{ formatMessage(messages.followProjects) }}</h3>
 					</div>
-					<div class="description">Save content you love and receive updates with one click.</div>
+					<div class="description">{{ formatMessage(messages.followProjectsDescription) }}</div>
 				</div>
 			</div>
 		</div>
 		<div ref="downloadSection" class="footer">
-			<div class="section-badge">Download options</div>
+			<div class="section-badge">{{ formatMessage(messages.downloadOptions) }}</div>
 			<div class="section-subheader">
-				<div class="section-subheader-title">Download the Modrinth App</div>
+				<div class="section-subheader-title">
+					{{ formatMessage(messages.downloadModrinthAppBeta) }}
+				</div>
 				<div class="section-subheader-description">
-					Our desktop app is available across all platforms, <br />
-					choose your desired version.
+					{{ formatMessage(messages.downloadDescription) }}
 				</div>
 			</div>
 			<div class="download-section">
@@ -841,12 +1084,12 @@ useSeoMeta({
 								d="M0 0h2311v2310H0zm2564 0h2311v2310H2564zM0 2564h2311v2311H0zm2564 0h2311v2311H2564"
 							/>
 						</svg>
-						Windows
+						{{ formatMessage(messages.windows) }}
 					</div>
 					<div class="description">
 						<a ref="downloadWindows" :href="windowsLink || undefined" download="">
 							<DownloadIcon />
-							<span> Download the beta </span>
+							<span>{{ formatMessage(messages.downloadTheBeta) }}</span>
 						</a>
 					</div>
 				</div>
@@ -865,12 +1108,12 @@ useSeoMeta({
 								fill="currentColor"
 							/>
 						</svg>
-						Mac
+						{{ formatMessage(messages.mac) }}
 					</div>
 					<div class="description apple">
-						<a :href="macLinks.universal || undefined" download="">
+						<a ref="downloadMac" :href="macLinks.universal || undefined" download="">
 							<DownloadIcon />
-							<span> Download the beta </span>
+							<span>{{ formatMessage(messages.downloadTheBeta) }}</span>
 						</a>
 					</div>
 				</div>
@@ -902,32 +1145,65 @@ useSeoMeta({
 								d="M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 00-.11.135c-.26.268-.45.6-.663.839-.199.199-.485.267-.797.4-.313.136-.658.269-.864.68-.09.189-.136.394-.132.602 0 .199.027.4.055.536.058.399.116.728.04.97-.249.68-.28 1.145-.106 1.484.174.334.535.47.94.601.81.2 1.91.135 2.774.6.926.466 1.866.67 2.616.47.526-.116.97-.464 1.208-.946.587-.003 1.23-.269 2.26-.334.699-.058 1.574.267 2.577.2.025.134.063.198.114.333l.003.003c.391.778 1.113 1.132 1.884 1.071.771-.06 1.592-.536 2.257-1.306.631-.765 1.683-1.084 2.378-1.503.348-.199.629-.469.649-.853.023-.4-.2-.811-.714-1.376v-.097l-.003-.003c-.17-.2-.25-.535-.338-.926-.085-.401-.182-.786-.492-1.046h-.003c-.059-.054-.123-.067-.188-.135a.357.357 0 00-.19-.064c.431-1.278.264-2.55-.173-3.694-.533-1.41-1.465-2.638-2.175-3.483-.796-1.005-1.576-1.957-1.56-3.368.026-2.152.236-6.133-3.544-6.139zm.529 3.405h.013c.213 0 .396.062.584.198.19.135.33.332.438.533.105.259.158.459.166.724 0-.02.006-.04.006-.06v.105a.086.086 0 01-.004-.021l-.004-.024a1.807 1.807 0 01-.15.706.953.953 0 01-.213.335.71.71 0 00-.088-.042c-.104-.045-.198-.064-.284-.133a1.312 1.312 0 00-.22-.066c.05-.06.146-.133.183-.198.053-.128.082-.264.088-.402v-.02a1.21 1.21 0 00-.061-.4c-.045-.134-.101-.2-.183-.333-.084-.066-.167-.132-.267-.132h-.016c-.093 0-.176.03-.262.132a.8.8 0 00-.205.334 1.18 1.18 0 00-.09.4v.019c.002.089.008.179.02.267-.193-.067-.438-.135-.607-.202a1.635 1.635 0 01-.018-.2v-.02a1.772 1.772 0 01.15-.768c.082-.22.232-.406.43-.533a.985.985 0 01.594-.2zm-2.962.059h.036c.142 0 .27.048.399.135.146.129.264.288.344.465.09.199.14.4.153.667v.004c.007.134.006.2-.002.266v.08c-.03.007-.056.018-.083.024-.152.055-.274.135-.393.2.012-.09.013-.18.003-.267v-.015c-.012-.133-.04-.2-.082-.333a.613.613 0 00-.166-.267.248.248 0 00-.183-.064h-.021c-.071.006-.13.04-.186.132a.552.552 0 00-.12.27.944.944 0 00-.023.33v.015c.012.135.037.2.08.334.046.134.098.2.166.268.01.009.02.018.034.024-.07.057-.117.07-.176.136a.304.304 0 01-.131.068 2.62 2.62 0 01-.275-.402 1.772 1.772 0 01-.155-.667 1.759 1.759 0 01.08-.668 1.43 1.43 0 01.283-.535c.128-.133.26-.2.418-.2zm1.37 1.706c.332 0 .733.065 1.216.399.293.2.523.269 1.052.468h.003c.255.136.405.266.478.399v-.131a.571.571 0 01.016.47c-.123.31-.516.643-1.063.842v.002c-.268.135-.501.333-.775.465-.276.135-.588.292-1.012.267a1.139 1.139 0 01-.448-.067 3.566 3.566 0 01-.322-.198c-.195-.135-.363-.332-.612-.465v-.005h-.005c-.4-.246-.616-.512-.686-.71-.07-.268-.005-.47.193-.6.224-.135.38-.271.483-.336.104-.074.143-.102.176-.131h.002v-.003c.169-.202.436-.47.839-.601.139-.036.294-.065.466-.065zm2.8 2.142c.358 1.417 1.196 3.475 1.735 4.473.286.534.855 1.659 1.102 3.024.156-.005.33.018.513.064.646-1.671-.546-3.467-1.089-3.966-.22-.2-.232-.335-.123-.335.59.534 1.365 1.572 1.646 2.757.13.535.16 1.104.021 1.67.067.028.135.06.205.067 1.032.534 1.413.938 1.23 1.537v-.043c-.06-.003-.12 0-.18 0h-.016c.151-.467-.182-.825-1.065-1.224-.915-.4-1.646-.336-1.77.465-.008.043-.013.066-.018.135-.068.023-.139.053-.209.064-.43.268-.662.669-.793 1.187-.13.533-.17 1.156-.205 1.869v.003c-.02.334-.17.838-.319 1.35-1.5 1.072-3.58 1.538-5.348.334a2.645 2.645 0 00-.402-.533 1.45 1.45 0 00-.275-.333c.182 0 .338-.03.465-.067a.615.615 0 00.314-.334c.108-.267 0-.697-.345-1.163-.345-.467-.931-.995-1.788-1.521-.63-.4-.986-.87-1.15-1.396-.165-.534-.143-1.085-.015-1.645.245-1.07.873-2.11 1.274-2.763.107-.065.037.135-.408.974-.396.751-1.14 2.497-.122 3.854a8.123 8.123 0 01.647-2.876c.564-1.278 1.743-3.504 1.836-5.268.048.036.217.135.289.202.218.133.38.333.59.465.21.201.477.335.876.335.039.003.075.006.11.006.412 0 .73-.134.997-.268.29-.134.52-.334.74-.4h.005c.467-.135.835-.402 1.044-.7zm2.185 8.958c.037.6.343 1.245.882 1.377.588.134 1.434-.333 1.791-.765l.211-.01c.315-.007.577.01.847.268l.003.003c.208.199.305.53.391.876.085.4.154.78.409 1.066.486.527.645.906.636 1.14l.003-.007v.018l-.003-.012c-.015.262-.185.396-.498.595-.63.401-1.746.712-2.457 1.57-.618.737-1.37 1.14-2.036 1.191-.664.053-1.237-.2-1.574-.898l-.005-.003c-.21-.4-.12-1.025.056-1.69.176-.668.428-1.344.463-1.897.037-.714.076-1.335.195-1.814.12-.465.308-.797.641-.984l.045-.022zm-10.814.049h.01c.053 0 .105.005.157.014.376.055.706.333 1.023.752l.91 1.664.003.003c.243.533.754 1.064 1.189 1.637.434.598.77 1.131.729 1.57v.006c-.057.744-.48 1.148-1.125 1.294-.645.135-1.52.002-2.395-.464-.968-.536-2.118-.469-2.857-.602-.369-.066-.61-.2-.723-.4-.11-.2-.113-.602.123-1.23v-.004l.002-.003c.117-.334.03-.752-.027-1.118-.055-.401-.083-.71.043-.94.16-.334.396-.4.69-.533.294-.135.64-.202.915-.47h.002v-.002c.256-.268.445-.601.668-.838.19-.201.38-.336.663-.336zm7.159-9.074c-.435.201-.945.535-1.488.535-.542 0-.97-.267-1.28-.466-.154-.134-.28-.268-.373-.335-.164-.134-.144-.333-.074-.333.109.016.129.134.199.2.096.066.215.2.36.333.292.2.68.467 1.167.467.485 0 1.053-.267 1.398-.466.195-.135.445-.334.648-.467.156-.136.149-.267.279-.267.128.016.034.134-.147.332a8.097 8.097 0 01-.69.468zm-1.082-1.583V5.64c-.006-.02.013-.042.029-.05.074-.043.18-.027.26.004.063 0 .16.067.15.135-.006.049-.085.066-.135.066-.055 0-.092-.043-.141-.068-.052-.018-.146-.008-.163-.065zm-.551 0c-.02.058-.113.049-.166.066-.047.025-.086.068-.14.068-.05 0-.13-.02-.136-.068-.01-.066.088-.133.15-.133.08-.031.184-.047.259-.005.019.009.036.03.03.05v.02h.003z"
 							/>
 						</svg>
-						Linux
+						<div class="flex">
+							{{ formatMessage(messages.linux) }}<span class="text-sm text-secondary">*</span>
+						</div>
 					</div>
 					<div class="description apple">
-						<a ref="downloadLinux" :href="linuxLinks.appImage || undefined" download="">
+						<a :href="linuxLinks.appImage || undefined" download="">
 							<DownloadIcon />
-							<span> Download the AppImage </span>
+							<span>{{ formatMessage(messages.downloadTheAppImage) }}</span>
 						</a>
 						<a :href="linuxLinks.deb || undefined" download="">
 							<DownloadIcon />
-							<span> Download the DEB </span>
+							<span>{{ formatMessage(messages.downloadTheDEB) }}</span>
 						</a>
 						<a :href="linuxLinks.rpm || undefined" download="">
 							<DownloadIcon />
-							<span> Download the RPM </span>
+							<span>{{ formatMessage(messages.downloadTheRPM) }}</span>
 						</a>
 						<a :href="linuxLinks.thirdParty || undefined" download="">
 							<LinkIcon />
-							<span> Third-party packages </span>
+							<span>{{ formatMessage(messages.thirdPartyPackages) }}</span>
 						</a>
 					</div>
 				</div>
 			</div>
 			<p class="terms">
-				By downloading the Modrinth App you agree to our
-				<nuxt-link to="/legal/terms"> Terms</nuxt-link> and
-				<nuxt-link to="/legal/privacy">Privacy Policy.</nuxt-link>
+				<IntlFormatted :message-id="messages.downloadTerms">
+					<template #terms-link="{ children }">
+						<nuxt-link to="/legal/terms">
+							<component :is="() => children" />
+						</nuxt-link>
+					</template>
+					<template #privacy-link="{ children }">
+						<nuxt-link to="/legal/privacy">
+							<component :is="() => children" />
+						</nuxt-link>
+					</template>
+				</IntlFormatted>
+			</p>
+			<p class="max-w-[50rem] text-xs text-secondary">
+				*<IntlFormatted :message-id="messages.linuxDisclaimer">
+					<template #issues-link="{ children }">
+						<a
+							class="underline hover:brightness-[--hover-brightness]"
+							href="https://github.com/modrinth/code/issues/3057"
+							target="_blank"
+						>
+							<component :is="() => children" />
+						</a>
+					</template>
+					<template #prism-link="{ children }">
+						<a
+							class="underline hover:brightness-[--hover-brightness]"
+							href="https://prismlauncher.org/"
+							target="_blank"
+						>
+							<component :is="() => children" />
+						</a>
+					</template>
+				</IntlFormatted>
 			</p>
 		</div>
 		<div class="bg-[var(--landing-raw-bg)]">
@@ -995,7 +1271,7 @@ useSeoMeta({
 	font-size: 5.25rem;
 	font-weight: 600;
 	line-height: 100%;
-	margin: 2rem 0;
+	margin: 1rem 0 2rem;
 }
 
 .subheader {
@@ -1380,14 +1656,14 @@ useSeoMeta({
 				border-radius: 100%;
 			}
 
-			.outer-ring {
+			.outer-circle {
 				position: absolute;
 				top: 4rem;
 				left: 50%;
 				transform: translate(-50%, -50%);
 			}
 
-			.ring {
+			.circle {
 				position: relative;
 				display: flex;
 				justify-content: center;
@@ -1395,7 +1671,7 @@ useSeoMeta({
 				width: 100%;
 				height: 100%;
 
-				.base-ring {
+				.base-circle {
 					position: absolute;
 					border-radius: 100%;
 					top: 4rem;
@@ -1405,8 +1681,8 @@ useSeoMeta({
 					border: 1px solid rgba(#a8b1ddbf, 0.25);
 				}
 
-				.first-ring {
-					@extend .base-ring;
+				.first-circle {
+					@extend .base-circle;
 					width: 15rem;
 					height: 15rem;
 					background: radial-gradient(
@@ -1416,8 +1692,8 @@ useSeoMeta({
 					);
 				}
 
-				.second-ring {
-					@extend .base-ring;
+				.second-circle {
+					@extend .base-circle;
 					width: 25rem;
 					height: 25rem;
 					opacity: 0.75;
@@ -1434,8 +1710,8 @@ useSeoMeta({
 						);
 				}
 
-				.third-ring {
-					@extend .base-ring;
+				.third-circle {
+					@extend .base-circle;
 					width: 35rem;
 					height: 35rem;
 					opacity: 0.5;
@@ -1447,7 +1723,7 @@ useSeoMeta({
 				}
 			}
 
-			.inner-ring {
+			.inner-circle {
 				position: relative;
 			}
 
@@ -2128,11 +2404,11 @@ useSeoMeta({
 		background-size: cover;
 	}
 
-	.base-ring {
+	.base-circle {
 		border: 1px solid rgba(#a8b1ddbf, 0.25) !important;
 	}
 
-	.first-ring {
+	.first-circle {
 		background: linear-gradient(
 			180deg,
 			rgba(5, 206, 69, 0.15) 0%,
@@ -2140,7 +2416,7 @@ useSeoMeta({
 		) !important;
 	}
 
-	.second-ring {
+	.second-circle {
 		background: linear-gradient(
 			180deg,
 			rgba(5, 206, 69, 0.15) 0%,
@@ -2148,7 +2424,7 @@ useSeoMeta({
 		) !important;
 	}
 
-	.third-ring {
+	.third-circle {
 		background: linear-gradient(
 			180deg,
 			rgba(5, 206, 69, 0.15) 0%,
