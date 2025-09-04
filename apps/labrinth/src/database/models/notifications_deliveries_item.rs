@@ -83,7 +83,7 @@ impl NotificationDelivery {
         // This follows the `idx_notifications_deliveries_composite_queue` index.
         Ok(select_notification_deliveries_with_predicate!(
             "WHERE
-              status = 'pending'
+              status = $3
               AND channel = $1
               AND next_attempt <= NOW()
             ORDER BY
@@ -94,7 +94,8 @@ impl NotificationDelivery {
             SKIP LOCKED
             ",
             channel.as_str(),
-            limit
+            limit,
+            NotificationDeliveryStatus::Pending.as_str()
         )
         .fetch_all(exec)
         .await?

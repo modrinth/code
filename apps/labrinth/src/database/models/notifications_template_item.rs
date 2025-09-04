@@ -1,6 +1,7 @@
 use crate::database::models::DatabaseError;
 use crate::models::v3::notifications::{NotificationChannel, NotificationType};
 
+#[derive(Clone)]
 pub struct NotificationTemplate {
     pub id: i64,
     pub channel: NotificationChannel,
@@ -35,7 +36,7 @@ impl From<NotificationTemplateQueryResult> for NotificationTemplate {
 }
 
 impl NotificationTemplate {
-    pub async fn get_channel(
+    pub async fn list_channel(
         channel: NotificationChannel,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<NotificationTemplate>, DatabaseError> {

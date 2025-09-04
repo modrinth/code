@@ -1,0 +1,351 @@
+use crate::database::models::DatabaseError;
+use crate::database::models::ids::*;
+use crate::database::models::notification_item::DBNotification;
+use crate::database::models::notifications_deliveries_item::NotificationDelivery;
+use crate::database::models::notifications_template_item::NotificationTemplate;
+use crate::database::redis::RedisPool;
+use crate::models::v3::notifications::{
+    NotificationChannel, NotificationDeliveryStatus,
+};
+use crate::routes::ApiError;
+use chrono::Utc;
+use futures::stream::{FuturesUnordered, StreamExt};
+use lettre::transport::smtp::authentication::Credentials;
+use lettre::transport::smtp::client::{Tls, TlsParameters};
+use lettre::{AsyncSmtpTransport, AsyncTransport, Tokio1Executor};
+use reqwest::Client;
+use sqlx::PgPool;
+use std::convert::Infallible;
+use std::sync::Arc;
+use thiserror::Error;
+use tokio::time::{Duration, MissedTickBehavior, interval};
+use tracing::{error, instrument, warn};
+
+#[derive(Error, Debug)]
+pub enum MailError {
+    #[error("Environment Error")]
+    Env(#[from] dotenvy::Error),
+    #[error("Mail Error: {0}")]
+    Mail(#[from] lettre::error::Error),
+    #[error("Address Parse Error: {0}")]
+    Address(#[from] lettre::address::AddressError),
+    #[error("SMTP Error: {0}")]
+    Smtp(#[from] lettre::transport::smtp::Error),
+    #[error("HTTP error fetching template: {0}")]
+    HttpTemplate(#[from] reqwest::Error),
+    #[error("Error initializing HTTP backend: {0}")]
+    HttpInit(reqwest::Error),
+}
+
+#[derive(Clone)]
+pub struct EmailQueue {
+    pg: PgPool,
+    client: reqwest::Client,
+    redis: RedisPool,
+    mailer: Option<Arc<AsyncSmtpTransport<Tokio1Executor>>>,
+    from_name: String,
+    from_address: String,
+}
+
+impl EmailQueue {
+    /// Initializes the email queue from environment variables, and tests the SMTP connection.
+    pub async fn init(pg: PgPool, redis: RedisPool) -> Result<Self, MailError> {
+        const DEFAULT_SENDER_NAME: &str = "Modrinth";
+        const DEFAULT_SENDER_ADDRESS: &str = "no-reply@mail.modrinth.com";
+
+        let from_name = dotenvy::var("SMTP_FROM_NAME")
+            .unwrap_or_else(|_| DEFAULT_SENDER_NAME.to_string());
+        let from_address = dotenvy::var("SMTP_FROM_ADDRESS")
+            .unwrap_or_else(|_| DEFAULT_SENDER_ADDRESS.to_string());
+
+        let mut this = Self {
+            pg,
+            redis,
+            mailer: None,
+            from_name,
+            from_address,
+            client: Client::builder()
+                .user_agent("Modrinth")
+                .build()
+                .map_err(MailError::HttpInit)?,
+        };
+
+        this.try_init_mailer().await?;
+
+        Ok(this)
+    }
+
+    /// Tries to initialize the mailer. Returns an error for missing environment variables,
+    /// but does nothing if the connection fails (besides emitting logs.)
+    async fn try_init_mailer(&mut self) -> Result<(), MailError> {
+        let username = dotenvy::var("SMTP_USERNAME")?;
+        let password = dotenvy::var("SMTP_PASSWORD")?;
+        let host = dotenvy::var("SMTP_HOST")?;
+        let port = dotenvy::var("SMTP_PORT")?.parse::<u16>().unwrap_or(465);
+        let creds = (!username.is_empty())
+            .then(|| Credentials::new(username, password));
+
+        let tls_setting = match dotenvy::var("SMTP_TLS")?.as_str() {
+            "none" => Tls::None,
+            "opportunistic_start_tls" => {
+                Tls::Opportunistic(TlsParameters::new(host.to_string())?)
+            }
+            "requires_start_tls" => {
+                Tls::Required(TlsParameters::new(host.to_string())?)
+            }
+            "tls" => Tls::Wrapper(TlsParameters::new(host.to_string())?),
+            _ => {
+                warn!("Unrecognized SMTP TLS setting. Defaulting to TLS.");
+                Tls::Wrapper(TlsParameters::new(host.to_string())?)
+            }
+        };
+
+        let mut mailer = AsyncSmtpTransport::<Tokio1Executor>::relay(&host)?
+            .port(port)
+            .tls(tls_setting);
+        if let Some(creds) = creds {
+            mailer = mailer.credentials(creds);
+        }
+
+        let mailer = mailer.build();
+
+        let result = mailer.test_connection().await;
+
+        match &result {
+            Ok(true) => self.mailer = Some(Arc::new(mailer)),
+            Ok(false) => error!("SMTP NOOP failed, disabling mailer"),
+            Err(error) => {
+                error!(%error, "Failed to test SMTP connection, disabling mailer")
+            }
+        }
+
+        Ok(())
+    }
+
+    #[instrument(name = "EmailQueue::index", skip_all)]
+    pub async fn index(self) {
+        let (mailer, pg, redis, client, from_name, from_address) = match self {
+            mut mail_queue @ Self { mailer: None, .. } => {
+                // Retry initializing the mailer every 5 seconds.
+
+                let mut interval = interval(Duration::from_secs(5));
+
+                loop {
+                    interval.tick().await;
+
+                    // This only fails due to incorrect environment variables. This is called
+                    // in `EmailQueue::init`, so we wouldn't even have an instance of the queue
+                    // if this was returning errors. We can then safely ignore errors here.
+                    let _ = mail_queue.try_init_mailer().await;
+
+                    if let Self {
+                        mailer: Some(mailer),
+                        pg,
+                        redis,
+                        client,
+                        from_name,
+                        from_address,
+                    } = mail_queue
+                    {
+                        break (
+                            mailer,
+                            pg,
+                            redis,
+                            client,
+                            from_name,
+                            from_address,
+                        );
+                    }
+                }
+            }
+
+            Self {
+                mailer: Some(mailer),
+                pg,
+                redis,
+                client,
+                from_name,
+                from_address,
+            } => (mailer, pg, redis, client, from_name, from_address),
+        };
+
+        loop {
+            let Err(error) = poll_queue(
+                Arc::clone(&mailer),
+                &pg,
+                &redis,
+                &client,
+                from_name.clone(),
+                from_address.clone(),
+            )
+            .await;
+
+            error!(%error, "Database error in email queue");
+        }
+    }
+}
+
+async fn poll_queue(
+    mailer: Arc<AsyncSmtpTransport<Tokio1Executor>>,
+    pg: &PgPool,
+    redis: &RedisPool,
+    client: &Client,
+    from_name: String,
+    from_address: String,
+) -> Result<Infallible, DatabaseError> {
+    let mut interval = interval(Duration::from_secs(5));
+    interval.set_missed_tick_behavior(MissedTickBehavior::Skip);
+
+    loop {
+        interval.tick().await;
+
+        let mut txn = pg.begin().await?;
+
+        let mut deliveries = NotificationDelivery::lock_channel_processable(
+            NotificationChannel::Email,
+            5,
+            &mut *txn,
+        )
+        .await?;
+
+        if deliveries.is_empty() {
+            continue;
+        }
+
+        // We hold a FOR UPDATE lock on the rows here, so no other workers are accessing them
+        // at the same time.
+
+        let templates = NotificationTemplate::list_channel(
+            NotificationChannel::Email,
+            &mut *txn,
+        )
+        .await?;
+
+        let notification_ids = deliveries
+            .iter()
+            .map(|d| d.notification_id)
+            .collect::<Vec<_>>();
+        let notifications =
+            DBNotification::get_many(&notification_ids, &mut *txn).await?;
+
+        struct DeliveryResult {
+            notification_id: DBNotificationId,
+            update_status: NotificationDeliveryStatus,
+            advance_next_attempt_time: bool,
+        }
+
+        // For all notifications we collected, fill out the template
+        // and send it via SMTP in parallel.
+
+        let mut futures = FuturesUnordered::new();
+
+        for notification in notifications {
+            let redis = redis.clone();
+            let pg = pg.clone();
+            let client = client.clone();
+            let from_name = from_name.clone();
+            let from_address = from_address.clone();
+            let mailer = Arc::clone(&mailer);
+
+            let maybe_template = templates
+                .iter()
+                .find(|t| {
+                    t.notification_type == notification.body.notification_type()
+                })
+                .cloned();
+
+            futures.push(async move {
+                let mut result = DeliveryResult {
+                    notification_id: notification.id,
+                    update_status: NotificationDeliveryStatus::Pending,
+                    advance_next_attempt_time: false,
+                };
+
+                // If there isn't any template present in the database for the
+                // notification type, skip it.
+
+                let Some(template) = maybe_template else {
+                    result.update_status = NotificationDeliveryStatus::SkippedDefault;
+                    return Ok(result);
+                };
+
+                let maybe_message = templates::build_email(
+                    &pg,
+                    &redis,
+                    &client,
+                    &notification,
+                    &template,
+                    from_name,
+                    from_address,
+                )
+                .await?;
+
+                let Some(message) = maybe_message else {
+                    // User has no email--skip it.
+                    result.update_status = NotificationDeliveryStatus::SkippedDefault;
+                    return Ok(result);
+                };
+
+                let send_result = mailer.send(message).await;
+
+                match send_result {
+                    Ok(_) => {
+                        result.update_status = NotificationDeliveryStatus::Delivered;
+                    }
+
+                    Err(error) => {
+                        error!(%error, smtp.code = ?extract_smtp_code(&error), "Error sending email");
+
+                        if error.is_permanent() {
+                            result.update_status =
+                                NotificationDeliveryStatus::PermanentlyFailed;
+                        }
+                    }
+                };
+
+                Result::<DeliveryResult, ApiError>::Ok(result)
+            });
+        }
+
+        while let Some(result) = futures.next().await {
+            match result {
+                Ok(result) => {
+                    // Find the matching delivery row
+
+                    if let Some(idx) = deliveries.iter().position(|d| {
+                        d.notification_id == result.notification_id
+                    }) {
+                        let mut delivery = deliveries.remove(idx);
+                        delivery.status = result.update_status;
+                        delivery.next_attempt = result
+                            .advance_next_attempt_time
+                            .then(|| Utc::now() + chrono::Duration::seconds(10))
+                            .unwrap_or(delivery.next_attempt);
+
+                        delivery.attempt_count += 1;
+                        delivery.update(&mut *txn).await?;
+                    }
+                }
+
+                Err(error) => error!(%error, "Error building email"),
+            }
+        }
+
+        for mut delivery in deliveries {
+            // For these, there was an error building the email, like a
+            // database error. Retry them after 30 seconds.
+
+            delivery.next_attempt = Utc::now() + chrono::Duration::seconds(30);
+
+            delivery.update(&mut *txn).await?;
+        }
+
+        txn.commit().await?;
+    }
+}
+
+fn extract_smtp_code(e: &lettre::transport::smtp::Error) -> Option<u16> {
+    e.status().map(|x| x.into())
+}
+
+mod templates;

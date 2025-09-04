@@ -2443,7 +2443,7 @@ fn send_email_verify(
     email: String,
     flow: String,
     opener: &str,
-) -> Result<(), crate::auth::email::MailError> {
+) -> Result<(), crate::queue::email::MailError> {
     send_email(
         email,
         "Verify your email",

@@ -1,22 +1,10 @@
+use crate::queue::email::MailError;
 use lettre::message::Mailbox;
 use lettre::message::header::ContentType;
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::transport::smtp::client::{Tls, TlsParameters};
 use lettre::{Message, SmtpTransport, Transport};
-use thiserror::Error;
 use tracing::warn;
-
-#[derive(Error, Debug)]
-pub enum MailError {
-    #[error("Environment Error")]
-    Env(#[from] dotenvy::Error),
-    #[error("Mail Error: {0}")]
-    Mail(#[from] lettre::error::Error),
-    #[error("Address Parse Error: {0}")]
-    Address(#[from] lettre::address::AddressError),
-    #[error("SMTP Error: {0}")]
-    Smtp(#[from] lettre::transport::smtp::Error),
-}
 
 pub fn send_email_raw(
     to: String,

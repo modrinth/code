@@ -128,7 +128,7 @@ pub enum ApiError {
     #[error("Password Hashing Error: {0}")]
     PasswordHashing(#[from] argon2::password_hash::Error),
     #[error("{0}")]
-    Mail(#[from] crate::auth::email::MailError),
+    Mail(#[from] crate::queue::email::MailError),
     #[error("Error while rerouting request: {0}")]
     Reroute(#[from] reqwest::Error),
     #[error("Unable to read Zip Archive: {0}")]

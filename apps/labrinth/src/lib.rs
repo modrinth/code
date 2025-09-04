@@ -88,7 +88,7 @@ pub fn app_setup(
         });
     }
 
-    let mut scheduler = scheduler::Scheduler::new();
+    let scheduler = scheduler::Scheduler::new();
 
     let limiter = web::Data::new(AsyncRateLimiter::new(
         redis_pool.clone(),

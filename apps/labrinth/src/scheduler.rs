@@ -18,7 +18,7 @@ impl Scheduler {
         }
     }
 
-    pub fn run<F, R>(&mut self, interval: std::time::Duration, mut task: F)
+    pub fn run<F, R>(&self, interval: std::time::Duration, mut task: F)
     where
         F: FnMut() -> R + Send + 'static,
         R: std::future::Future<Output = ()> + Send + 'static,
@@ -27,6 +27,13 @@ impl Scheduler {
             .for_each_concurrent(2, move |_| task());
 
         self.arbiter.spawn(future);
+    }
+
+    pub fn run_raw<F>(&self, fut: F)
+    where
+        F: std::future::Future<Output = ()> + Send + 'static,
+    {
+        self.arbiter.spawn(fut);
     }
 }
 

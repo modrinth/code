@@ -1,6 +1,8 @@
 use super::ids::*;
 use crate::database::{models::DatabaseError, redis::RedisPool};
-use crate::models::notifications::{NotificationBody, NotificationChannel};
+use crate::models::notifications::{
+    NotificationBody, NotificationChannel, NotificationDeliveryStatus,
+};
 use chrono::{DateTime, Utc};
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
@@ -90,7 +92,8 @@ impl NotificationBuilder {
                   ids.user_id,
                   channels.channel,
                   nt.delivery_priority,
-                  COALESCE(uprefs.enabled, dprefs.enabled, false) include
+                  uprefs.enabled user_enabled,
+                  dprefs.enabled default_enabled
                 FROM
                   UNNEST(
                     $2::bigint[],
@@ -116,18 +119,35 @@ impl NotificationBuilder {
               dc.user_id,
               dc.channel,
               dc.delivery_priority,
-              'pending' status,
+              CASE
+                -- User explicitly enabled
+                WHEN user_enabled = TRUE THEN $5
+
+                -- Is enabled by default, no preference by user
+                WHEN user_enabled IS NULL AND default_enabled = TRUE THEN $5
+
+                -- User explicitly disabled (regardless of default)
+                WHEN user_enabled = FALSE THEN $6
+
+                -- User set no preference, default disabled
+                WHEN user_enabled IS NULL AND default_enabled = FALSE THEN $7
+
+                -- At this point, user set no preference and there is no
+                -- default set, so treat as disabled-by-default.
+                ELSE $7
+              END status,
               NOW() next_attempt,
               0 attempt_count
             FROM
               delivery_candidates dc
-            WHERE
-              include = TRUE
             "#,
             &[NotificationChannel::Email.as_str().to_string()],
             &notification_ids[..],
             &users_raw_ids[..],
             &notification_types[..] as &[&str],
+            NotificationDeliveryStatus::Pending.as_str(),
+            NotificationDeliveryStatus::SkippedPreferences.as_str(),
+            NotificationDeliveryStatus::SkippedDefault.as_str(),
         );
 
         query.execute(&mut **transaction).await?;
@@ -156,7 +176,7 @@ impl DBNotification {
         exec: E,
     ) -> Result<Vec<DBNotification>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         let notification_ids_parsed: Vec<i64> =
             notification_ids.iter().map(|x| x.0).collect();

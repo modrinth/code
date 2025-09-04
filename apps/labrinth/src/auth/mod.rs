@@ -36,7 +36,7 @@ pub enum AuthenticationError {
     #[error("Error while decoding PAT: {0}")]
     Decoding(#[from] ariadne::ids::DecodingError),
     #[error("{0}")]
-    Mail(#[from] email::MailError),
+    Mail(#[from] crate::queue::email::MailError),
     #[error("Invalid Authentication Credentials")]
     InvalidCredentials,
     #[error("Authentication method was not valid")]
