@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                SELECT\n                  users.username AS \"user_name!\",\n                  users.email \"user_email\",\n                  project.name AS \"project_name!\"\n                FROM users\n                INNER JOIN mods project ON project.id = $1\n                WHERE users.id = $2\n                ",
+  "query": "\n                SELECT\n                  users.username \"user_name!\",\n                  users.email \"user_email\",\n                  project.name \"project_name!\"\n                FROM users\n                INNER JOIN mods project ON project.id = $1\n                WHERE users.id = $2\n                ",
   "describe": {
     "columns": [
       {
@@ -31,5 +31,5 @@
       false
     ]
   },
-  "hash": "93627df8c5e1dde3dc4f8cec9e902cdc51616e836b04ccd7b4961ded2cc86783"
+  "hash": "0e29dad2b228ca4922811bb45f05f39145489302a4e9bc25eeed49c97d3dc01e"
 }

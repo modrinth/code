@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                SELECT\n                  users.username AS \"user_name!\",\n                  users.email \"user_email\",\n                  inviter.username AS \"inviter_name!\",\n                  organization.name AS \"organization_name!\"\n                FROM users\n                INNER JOIN users inviter ON inviter.id = $1\n                INNER JOIN organizations organization ON organization.id = $2\n                WHERE users.id = $3\n                ",
+  "query": "\n                SELECT\n                  users.username \"user_name!\",\n                  users.email \"user_email\",\n                  inviter.username \"inviter_name!\",\n                  organization.name \"organization_name!\"\n                FROM users\n                INNER JOIN users inviter ON inviter.id = $1\n                INNER JOIN organizations organization ON organization.id = $2\n                WHERE users.id = $3\n                ",
   "describe": {
     "columns": [
       {
@@ -38,5 +38,5 @@
       false
     ]
   },
-  "hash": "3ae944bb620c69b706a779ca3282b81097155373250faf5e86321455c11e74b1"
+  "hash": "971bbd54f168da93b39b8550776157ff82a679798ea198e52091c75d31bc5e7c"
 }

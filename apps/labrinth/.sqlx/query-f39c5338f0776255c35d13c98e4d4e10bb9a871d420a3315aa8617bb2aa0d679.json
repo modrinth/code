@@ -15,7 +15,12 @@
       },
       {
         "ordinal": 2,
-        "name": "always_enabled",
+        "name": "expose_in_user_preferences",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 3,
+        "name": "expose_in_site_notifications",
         "type_info": "Bool"
       }
     ],
@@ -23,6 +28,7 @@
       "Left": []
     },
     "nullable": [
+      false,
       false,
       false,
       false
