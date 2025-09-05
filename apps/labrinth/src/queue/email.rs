@@ -187,6 +187,7 @@ async fn poll_queue(
     let templates = NotificationTemplate::list_channel(
         NotificationChannel::Email,
         &mut *txn,
+        redis,
     )
     .await?;
 

@@ -39,10 +39,41 @@ pub async fn build_email(
     from_name: String,
     from_address: String,
 ) -> Result<Option<Message>, ApiError> {
+    let get_html_body = async {
+        let result: Result<Result<String, reqwest::Error>, DatabaseError> =
+            match template.get_cached_html_data(redis).await? {
+                Some(html_body) => Ok(Ok(html_body)),
+                None => {
+                    let result = client
+                        .get(&template.body_fetch_url)
+                        .timeout(Duration::from_secs(3))
+                        .send()
+                        .and_then(|res| async move { res.error_for_status() })
+                        .and_then(|res| res.text())
+                        .await;
+
+                    if let Ok(ref body) = result {
+                        template
+                            .set_cached_html_data(body.clone(), redis)
+                            .await?;
+                    }
+
+                    Ok(result)
+                }
+            };
+
+        result
+    };
+
+    let (html_body_result, template_variables_result) = futures::join!(
+        get_html_body,
+        collect_template_variables(exec, redis, notification)
+    );
+
     let TemplateVariables {
         user_email,
         variables,
-    } = collect_template_variables(exec, redis, notification).await?;
+    } = template_variables_result?;
 
     let Some(target_email) = user_email else {
         return Ok(None);
@@ -56,18 +87,10 @@ pub async fn build_email(
         .to(target_email.parse().map_err(MailError::from)?)
         .subject(&template.subject_line);
 
-    let result = client
-        .get(&template.body_fetch_url)
-        .timeout(Duration::from_secs(3))
-        .send()
-        .and_then(|res| async move { res.error_for_status() })
-        .and_then(|res| res.text())
-        .await;
-
     let plaintext_filled_body =
         fill_template(&template.plaintext_fallback, &variables);
 
-    let email_message = match result {
+    let email_message = match html_body_result? {
         Ok(html_body) => {
             let html_filled_body = fill_template(&html_body, &variables);
             message_builder
@@ -177,10 +200,10 @@ async fn collect_template_variables(
             let result = query!(
                 r#"
                 SELECT
-                  users.username AS "user_name!",
+                  users.username "user_name!",
                   users.email "user_email",
-                  inviter.username AS "inviter_name!",
-                  project.name AS "project_name!"
+                  inviter.username "inviter_name!",
+                  project.name "project_name!"
                 FROM users
                 INNER JOIN users inviter ON inviter.id = $1
                 INNER JOIN mods project ON project.id = $2
@@ -211,10 +234,10 @@ async fn collect_template_variables(
             let result = query!(
                 r#"
                 SELECT
-                  users.username AS "user_name!",
+                  users.username "user_name!",
                   users.email "user_email",
-                  inviter.username AS "inviter_name!",
-                  organization.name AS "organization_name!"
+                  inviter.username "inviter_name!",
+                  organization.name "organization_name!"
                 FROM users
                 INNER JOIN users inviter ON inviter.id = $1
                 INNER JOIN organizations organization ON organization.id = $2
@@ -244,9 +267,9 @@ async fn collect_template_variables(
             let result = query!(
                 r#"
                 SELECT
-                  users.username AS "user_name!",
+                  users.username "user_name!",
                   users.email "user_email",
-                  project.name AS "project_name!"
+                  project.name "project_name!"
                 FROM users
                 INNER JOIN mods project ON project.id = $1
                 WHERE users.id = $2
