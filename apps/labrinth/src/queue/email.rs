@@ -288,10 +288,12 @@ async fn poll_queue(
                 {
                     let mut delivery = deliveries.remove(idx);
                     delivery.status = result.update_status;
-                    delivery.next_attempt = result
-                        .advance_next_attempt_time
-                        .then(|| Utc::now() + chrono::Duration::seconds(10))
-                        .unwrap_or(delivery.next_attempt);
+                    delivery.next_attempt = if result.advance_next_attempt_time
+                    {
+                        Utc::now() + chrono::Duration::seconds(10)
+                    } else {
+                        delivery.next_attempt
+                    };
 
                     delivery.attempt_count += 1;
                     delivery.update(&mut *txn).await?;
