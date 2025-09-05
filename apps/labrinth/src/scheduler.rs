@@ -1,5 +1,6 @@
 use actix_rt::Arbiter;
 use futures::StreamExt;
+use tokio_stream::wrappers::IntervalStream;
 
 pub struct Scheduler {
     arbiter: Arbiter,
@@ -42,5 +43,3 @@ impl Drop for Scheduler {
         self.arbiter.stop();
     }
 }
-
-use tokio_stream::wrappers::IntervalStream;

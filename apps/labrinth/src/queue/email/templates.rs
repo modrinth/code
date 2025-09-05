@@ -12,6 +12,7 @@ use lettre::Message;
 use lettre::message::{Mailbox, MultiPart, SinglePart};
 use sqlx::query;
 use std::collections::HashMap;
+use std::time::Duration;
 use tracing::{error, warn};
 
 const USER_NAME: &str = "user.name";
@@ -57,6 +58,7 @@ pub async fn build_email(
 
     let result = client
         .get(&template.body_fetch_url)
+        .timeout(Duration::from_secs(3))
         .send()
         .and_then(|res| async move { res.error_for_status() })
         .and_then(|res| res.text())

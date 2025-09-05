@@ -4,8 +4,8 @@ use std::time::Duration;
 use actix_web::web;
 use database::redis::RedisPool;
 use queue::{
-    analytics::AnalyticsQueue, payouts::PayoutsQueue, session::AuthQueue,
-    socket::ActiveSockets,
+    analytics::AnalyticsQueue, email::EmailQueue, payouts::PayoutsQueue,
+    session::AuthQueue, socket::ActiveSockets,
 };
 use sqlx::Postgres;
 use tracing::{info, warn};
@@ -244,6 +244,15 @@ pub fn app_setup(
                 info!("Done indexing analytics queue");
             }
         });
+    }
+
+    {
+        let pool_ref = pool.clone();
+        let redis_ref = redis_pool.clone();
+
+        let email_queue = EmailQueue::init(pool_ref, redis_ref);
+        scheduler
+            .run(Duration::from_secs(5), move || email_queue.clone().index());
     }
 
     let ip_salt = Pepper {

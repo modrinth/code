@@ -80,6 +80,8 @@ impl NotificationBuilder {
             .map(|_| self.body.notification_type().as_str())
             .collect::<Vec<_>>();
 
+        // Insert required rows into `notifications_deliveries` by channel
+        // and notification type, based on the user's preferences.
         let query = sqlx::query!(
             r#"
             WITH
