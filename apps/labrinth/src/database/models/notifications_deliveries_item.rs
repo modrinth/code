@@ -5,7 +5,7 @@ use crate::models::v3::notifications::{
 };
 use chrono::{DateTime, Utc};
 
-pub struct NotificationDelivery {
+pub struct DBNotificationDelivery {
     pub id: i64,
     pub notification_id: DBNotificationId,
     pub user_id: DBUserId,
@@ -42,9 +42,9 @@ macro_rules! select_notification_deliveries_with_predicate {
     };
 }
 
-impl From<NotificationDeliveryQueryResult> for NotificationDelivery {
+impl From<NotificationDeliveryQueryResult> for DBNotificationDelivery {
     fn from(r: NotificationDeliveryQueryResult) -> Self {
-        NotificationDelivery {
+        DBNotificationDelivery {
             id: r.id,
             notification_id: DBNotificationId(r.notification_id),
             user_id: DBUserId(r.user_id),
@@ -57,11 +57,11 @@ impl From<NotificationDeliveryQueryResult> for NotificationDelivery {
     }
 }
 
-impl NotificationDelivery {
-    pub async fn get_user(
+impl DBNotificationDelivery {
+    pub async fn get_all_user(
         user_id: DBUserId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<NotificationDelivery>, DatabaseError> {
+    ) -> Result<Vec<DBNotificationDelivery>, DatabaseError> {
         let user_id = user_id.0;
         let results = select_notification_deliveries_with_predicate!(
             "WHERE user_id = $1",
@@ -79,7 +79,7 @@ impl NotificationDelivery {
         channel: NotificationChannel,
         limit: i64,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<NotificationDelivery>, DatabaseError> {
+    ) -> Result<Vec<DBNotificationDelivery>, DatabaseError> {
         // This follows the `idx_notifications_deliveries_composite_queue` index.
         Ok(select_notification_deliveries_with_predicate!(
             "WHERE

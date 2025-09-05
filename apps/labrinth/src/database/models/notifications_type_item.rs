@@ -9,13 +9,15 @@ const NOTIFICATION_TYPES_NAMESPACE: &str = "notification_types";
 pub struct NotificationTypeItem {
     pub name: NotificationType,
     pub delivery_priority: i32,
-    pub always_enabled: bool,
+    pub expose_in_user_preferences: bool,
+    pub expose_in_site_notifications: bool,
 }
 
 struct NotificationTypeQueryResult {
     name: String,
     delivery_priority: i32,
-    always_enabled: bool,
+    expose_in_user_preferences: bool,
+    expose_in_site_notifications: bool,
 }
 
 impl From<NotificationTypeQueryResult> for NotificationTypeItem {
@@ -23,7 +25,8 @@ impl From<NotificationTypeQueryResult> for NotificationTypeItem {
         NotificationTypeItem {
             name: NotificationType::from_str_or_default(&r.name),
             delivery_priority: r.delivery_priority,
-            always_enabled: r.always_enabled,
+            expose_in_user_preferences: r.expose_in_user_preferences,
+            expose_in_site_notifications: r.expose_in_site_notifications,
         }
     }
 }

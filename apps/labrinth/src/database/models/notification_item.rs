@@ -226,7 +226,60 @@ impl DBNotification {
             .await
     }
 
-    pub async fn get_many_user<'a, E>(
+    pub async fn get_all_user<'a, E>(
+        user_id: DBUserId,
+        exec: E,
+    ) -> Result<Vec<DBNotification>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        let db_notifications = sqlx::query!(
+            "
+            SELECT n.id, n.user_id, n.name, n.text, n.link, n.created, n.read, n.type notification_type, n.body,
+            JSONB_AGG(DISTINCT jsonb_build_object('id', na.id, 'notification_id', na.notification_id, 'name', na.name, 'action_route_method', na.action_route_method, 'action_route', na.action_route)) filter (where na.id is not null) actions
+            FROM notifications n
+            LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
+            WHERE n.user_id = $1
+            GROUP BY n.id, n.user_id
+            ",
+            user_id as DBUserId
+        )
+            .fetch(exec)
+            .map_ok(|row| {
+                let id = DBNotificationId(row.id);
+
+                DBNotification {
+                    id,
+                    user_id: DBUserId(row.user_id),
+                    read: row.read,
+                    created: row.created,
+                    body: row.body.clone().and_then(|x| serde_json::from_value(x).ok()).unwrap_or_else(|| {
+                        if let Some(name) = row.name {
+                            NotificationBody::LegacyMarkdown {
+                                notification_type: row.notification_type,
+                                name,
+                                text: row.text.unwrap_or_default(),
+                                link: row.link.unwrap_or_default(),
+                                actions: serde_json::from_value(
+                                    row.actions.unwrap_or_default(),
+                                )
+                                    .ok()
+                                    .unwrap_or_default(),
+                            }
+                        } else {
+                            NotificationBody::Unknown
+                        }
+                    }),
+                }
+            })
+            .try_collect::<Vec<DBNotification>>()
+            .await?;
+
+        Ok(db_notifications)
+    }
+
+    /// Returns user notifications that are configured to be exposed on the website.
+    pub async fn get_many_user_exposed_on_site<'a, E>(
         user_id: DBUserId,
         exec: E,
         redis: &RedisPool,
@@ -253,8 +306,10 @@ impl DBNotification {
             JSONB_AGG(DISTINCT jsonb_build_object('id', na.id, 'notification_id', na.notification_id, 'name', na.name, 'action_route_method', na.action_route_method, 'action_route', na.action_route)) filter (where na.id is not null) actions
             FROM notifications n
             LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
+            INNER JOIN notifications_types nt on nt.name = n.type
             WHERE n.user_id = $1
-            GROUP BY n.id, n.user_id;
+              AND nt.expose_in_site_notifications = TRUE
+            GROUP BY n.id, n.user_id
             ",
             user_id as DBUserId
         )

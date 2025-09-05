@@ -1,6 +1,7 @@
-use super::ids::OrganizationId;
+use super::ids::*;
 use crate::database::models::notification_item::DBNotification;
 use crate::database::models::notification_item::DBNotificationAction;
+use crate::database::models::notifications_deliveries_item::DBNotificationDelivery;
 use crate::models::ids::{
     NotificationId, ProjectId, ReportId, TeamId, ThreadId, ThreadMessageId,
     VersionId,
@@ -34,6 +35,7 @@ pub enum NotificationType {
     StatusChange,
     ModeratorMessage,
     LegacyMarkdown,
+    ResetPassword,
     Unknown,
 }
 
@@ -46,6 +48,7 @@ impl NotificationType {
             NotificationType::StatusChange => "status_change",
             NotificationType::ModeratorMessage => "moderator_message",
             NotificationType::LegacyMarkdown => "legacy_markdown",
+            NotificationType::ResetPassword => "reset_password",
             NotificationType::Unknown => "unknown",
         }
     }
@@ -58,6 +61,7 @@ impl NotificationType {
             "status_change" => NotificationType::StatusChange,
             "moderator_message" => NotificationType::ModeratorMessage,
             "legacy_markdown" => NotificationType::LegacyMarkdown,
+            "reset_password" => NotificationType::ResetPassword,
             "unknown" => NotificationType::Unknown,
             _ => NotificationType::Unknown,
         }
@@ -102,6 +106,9 @@ pub enum NotificationBody {
         link: String,
         actions: Vec<NotificationAction>,
     },
+    ResetPassword {
+        flow: String,
+    },
     Unknown,
 }
 
@@ -123,6 +130,9 @@ impl NotificationBody {
             }
             NotificationBody::LegacyMarkdown { .. } => {
                 NotificationType::LegacyMarkdown
+            }
+            NotificationBody::ResetPassword { .. } => {
+                NotificationType::ResetPassword
             }
             NotificationBody::Unknown => NotificationType::Unknown,
         }
@@ -237,6 +247,12 @@ impl From<DBNotification> for Notification {
                     },
                     vec![],
                 ),
+                NotificationBody::ResetPassword { .. } => (
+                    "Password reset requested".to_string(),
+                    "You've requested to reset your password. Please check your email for a reset link.".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
                 NotificationBody::LegacyMarkdown {
                     name,
                     text,
@@ -344,6 +360,31 @@ impl NotificationDeliveryStatus {
                 NotificationDeliveryStatus::PermanentlyFailed
             }
             _ => NotificationDeliveryStatus::Pending,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct NotificationDelivery {
+    pub notification_id: NotificationId,
+    pub user_id: UserId,
+    pub channel: NotificationChannel,
+    pub delivery_priority: i32,
+    pub status: NotificationDeliveryStatus,
+    pub next_attempt: DateTime<Utc>,
+    pub attempt_count: i32,
+}
+
+impl From<DBNotificationDelivery> for NotificationDelivery {
+    fn from(delivery: DBNotificationDelivery) -> Self {
+        Self {
+            notification_id: delivery.notification_id.into(),
+            user_id: delivery.user_id.into(),
+            channel: delivery.channel,
+            delivery_priority: delivery.delivery_priority,
+            status: delivery.status,
+            next_attempt: delivery.next_attempt,
+            attempt_count: delivery.attempt_count,
         }
     }
 }

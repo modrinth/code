@@ -35,7 +35,14 @@ ON users_notifications_preferences(COALESCE(user_id, -1), channel, notification_
 CREATE TABLE notifications_types (
     name VARCHAR(32) PRIMARY KEY,
     delivery_priority INTEGER NOT NULL,
-    always_enabled BOOL NOT NULL
+    expose_in_user_preferences BOOL NOT NULL,
+    expose_in_site_notifications BOOL NOT NULL
+);
+
+CREATE TABLE notifications_types_preference_restrictions (
+    notification_type VARCHAR(32) NOT NULL REFERENCES notifications_types(name),
+    channel VARCHAR(32) NOT NULL,
+    forced_value BOOL NOT NULL
 );
 
 CREATE TABLE notifications_templates (
@@ -46,3 +53,13 @@ CREATE TABLE notifications_templates (
     body_fetch_url TEXT NOT NULL,
     plaintext_fallback TEXT NOT NULL
 );
+
+-- Add existing notification types
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('project_update', 1, TRUE, TRUE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('team_invite', 1, TRUE, TRUE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('organization_invite', 1, TRUE, TRUE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('status_change', 1, TRUE, TRUE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('moderator_message', 1, TRUE, TRUE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('legacy_markdown', 1, TRUE, TRUE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('unknown', 1, TRUE, TRUE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('reset_password', 3, FALSE, FALSE);

@@ -1,7 +1,7 @@
 use crate::database::models::DatabaseError;
 use crate::database::models::ids::*;
 use crate::database::models::notification_item::DBNotification;
-use crate::database::models::notifications_deliveries_item::NotificationDelivery;
+use crate::database::models::notifications_deliveries_item::DBNotificationDelivery;
 use crate::database::models::notifications_template_item::NotificationTemplate;
 use crate::database::redis::RedisPool;
 use crate::models::v3::notifications::{
@@ -168,7 +168,7 @@ async fn poll_queue(
 
     let begin = std::time::Instant::now();
 
-    let mut deliveries = NotificationDelivery::lock_channel_processable(
+    let mut deliveries = DBNotificationDelivery::lock_channel_processable(
         NotificationChannel::Email,
         5,
         &mut *txn,
