@@ -1,5 +1,10 @@
 <template>
-	<NewModal ref="taxFormModal" header="Submitting tax form" :closable="false">
+	<NewModal
+		ref="taxFormModal"
+		header="Submitting tax form"
+		@on-hide="emit('onHide')"
+		:closable="false"
+	>
 		<div class="max-w-[40rem]">
 			<Admonition
 				type="info"
@@ -61,7 +66,7 @@
 				</div>
 			</Transition>
 			<div class="mt-4 flex w-full flex-row justify-between gap-2">
-				<ButtonStyled @click="$emit('close')">
+				<ButtonStyled @click="emit('close')">
 					<button @click="hideModal"><XIcon /> Cancel</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand">
@@ -122,6 +127,11 @@ defineExpose({
 	startTaxForm,
 })
 
+const emit = defineEmits<{
+	(event: 'onHide'): void
+	(event: 'close'): void
+}>()
+
 const avalaraState = ref<ReturnType<typeof useAvalara1099> | null>(null)
 const loading = computed(() =>
 	avalaraState.value ? ((avalaraState.value as any).loading?.value ?? false) : false,
@@ -167,10 +177,6 @@ watch(isUSCitizen, (newValue) => {
 	if (newValue === 'yes') {
 		entityType.value = null
 	}
-})
-
-defineOptions({
-	inheritAttrs: true,
 })
 </script>
 

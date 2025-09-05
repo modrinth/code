@@ -1,5 +1,11 @@
 <template>
-	<CreatorWithdrawModal ref="withdrawModal" :balance="userBalance" />
+	<CreatorWithdrawModal
+		ref="withdrawModal"
+		:balance="userBalance"
+		v-model:country="withdrawCountry"
+		:payout-methods="paymentMethods"
+		:payout-methods-pending="payoutMethodsPending"
+	/>
 	<div class="mb-6 flex flex-col gap-8 p-2">
 		<div class="flex flex-col gap-5">
 			<div class="flex flex-col">
@@ -154,6 +160,7 @@ import {
 } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
+import { all } from 'iso-3166-1'
 import CreatorWithdrawModal from '~/components/ui/dashboard/CreatorWithdrawModal.vue'
 
 // TODO: Deduplicate in @modrinth/api-client PR.
@@ -171,6 +178,36 @@ interface UserBalanceResponse {
 	form_completion_status: FormCompletionStatus | null
 }
 
+// Types for payout methods and related shapes
+type PayoutInterval = { fixed: { values: number[] } } | { standard: { min: number; max: number } }
+interface PayoutMethodFee {
+	percentage: number
+	min: number
+	max?: number | null
+}
+interface PayoutMethod {
+	id: string
+	name: string
+	type: PayoutMethodType
+	supported_countries: string[]
+	image_url?: string | null
+	interval: PayoutInterval
+	fee: PayoutMethodFee
+}
+
+const countries = computed(() =>
+	all().map((x) => ({
+		id: x.alpha2,
+		name: x.alpha2 === 'TW' ? 'Taiwan' : x.country,
+	})),
+)
+const withdrawCountry = ref<{ id: string; name: string } | null>(null)
+
+if (!withdrawCountry.value) {
+	const us = countries.value.find((c) => c.id === 'US')
+	withdrawCountry.value = us ?? countries.value[0] ?? null
+}
+
 type RevenueBarSegment = {
 	key: string
 	class: string
@@ -178,9 +215,10 @@ type RevenueBarSegment = {
 	amount: number
 }
 
-const withdrawModal = ref<InstanceType<typeof CreatorWithdrawModal> | null>(null)
-function openWithdrawModal() {
-	withdrawModal.value?.show()
+const withdrawModal = ref<InstanceType<typeof CreatorWithdrawModal>>()
+async function openWithdrawModal() {
+	withdrawModal.value?.show?.()
+	console.log(withdrawModal.value?.show)
 }
 
 function formatTransactionStatus(status: PayoutStatus) {
@@ -228,6 +266,16 @@ const sortedPayouts = computed<PayoutList>(() => {
 		return new Date(b.created).getTime() - new Date(a.created).getTime()
 	})
 })
+
+// Fetch payout methods based on selected country
+const { data: payoutMethods, pending: payoutMethodsPending } = await useAsyncData(
+	'payout-methods',
+	() =>
+		useBaseFetch(`payout/methods?country=${withdrawCountry.value?.id ?? 'US'}`, { apiVersion: 3 }),
+	{ default: () => [] as PayoutMethod[], watch: [withdrawCountry] },
+)
+
+const paymentMethods = computed<PayoutMethod[]>(() => (payoutMethods.value as PayoutMethod[]) ?? [])
 
 const totalAvailable = computed(() => (userBalance.value ? Number(userBalance.value.available) : 0))
 const nextDate = computed<{ date: string; amount: number }[]>(() => {

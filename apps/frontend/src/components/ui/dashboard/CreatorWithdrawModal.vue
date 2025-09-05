@@ -1,5 +1,4 @@
 <template>
-	<CreatorTaxFormModal ref="taxFormModal" :on-hide="reopenAfterTaxForm" />
 	<NewModal
 		ref="withdrawModal"
 		:header="currentStageLabel"
@@ -61,52 +60,43 @@
 					<span>Region</span><span class="text-brand-red">*</span>
 					<UnknownIcon v-tooltip="`something here`" class="my-auto size-4 text-secondary" />
 				</div>
-				<Multiselect
+				<TeleportDropdownMenu
 					id="country-multiselect"
-					v-model="country"
+					v-model="countryProxy"
 					class="country-multiselect"
-					placeholder="Select country..."
-					track-by="id"
-					label="name"
+					name="country"
 					:options="countries"
-					:searchable="true"
-					:close-on-select="true"
-					:show-labels="false"
-					:allow-empty="false"
-					:use-teleport="true"
-					open-direction="below"
+					:display-name="(o: { id: string; name: string }) => o.name"
+					placeholder="Select country..."
 				/>
 				<div class="flex gap-1 align-middle text-lg font-semibold text-contrast">
 					<span>Withdraw to</span><span class="text-brand-red">*</span>
 				</div>
-				<Multiselect
+				<TeleportDropdownMenu
 					id="payment-method"
 					v-model="paymentMethod"
 					class="country-multiselect"
-					placeholder="Select method..."
-					track-by="id"
-					label="name"
+					name="payment-method"
 					:options="paymentMethods"
-					:searchable="true"
-					:close-on-select="true"
-					:show-labels="false"
-					:allow-empty="false"
-					:use-teleport="true"
-					open-direction="below"
+					:display-name="(m: PayoutMethod) => m.name"
+					placeholder="Select method..."
 				/>
 				<div class="flex gap-1 align-middle text-lg font-semibold text-contrast">
 					<span>Amount</span><span class="text-brand-red">*</span>
 				</div>
+				<span class="text-secondary"
+					>The minimum transfer amount is {{ formatMoney(minWithdrawAmount) }}.</span
+				>
 			</template>
 		</div>
 	</NewModal>
+	<CreatorTaxFormModal ref="taxFormModal" @on-hide="reopenAfterTaxForm" />
 </template>
 <script lang="ts" setup>
 import { FileTextIcon, UnknownIcon } from '@modrinth/assets'
-import { Admonition, ButtonStyled, NewModal } from '@modrinth/ui'
+import { Admonition, ButtonStyled, NewModal, TeleportDropdownMenu } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { all } from 'iso-3166-1'
-import { Multiselect } from 'vue-multiselect'
 import CreatorTaxFormModal from './CreatorTaxFormModal.vue'
 type Stage = 'withdraw-limit' | 'withdraw-details' | 'confirmation'
 
@@ -125,10 +115,24 @@ interface UserBalanceResponse {
 	form_completion_status: FormCompletionStatus | null
 }
 
+type PayoutMethodType = 'venmo' | 'paypal' | 'tremendous' | 'unknown'
+
+type PayoutInterval = { fixed: { values: number[] } } | { standard: { min: number; max: number } }
+
+interface PayoutMethodFee {
+	percentage: number
+	min: number
+	max?: number | null
+}
+
 interface PayoutMethod {
 	id: string
 	name: string
-	type: string
+	type: PayoutMethodType
+	supported_countries: string[]
+	image_url?: string | null
+	interval: PayoutInterval
+	fee: PayoutMethodFee
 }
 
 const countries = computed(() =>
@@ -137,25 +141,41 @@ const countries = computed(() =>
 		name: x.alpha2 === 'TW' ? 'Taiwan' : x.country,
 	})),
 )
-
-const country = ref<{ id: string; name: string } | null>(null)
 const paymentMethod = ref<PayoutMethod | null>(null)
-
-const {
-	data: payoutMethods,
-	refresh: refreshPayoutMethods,
-	pending: payoutMethodsPending,
-} = await useAsyncData(
-	'payout-methods',
-	() => useBaseFetch(`payout/methods?country=${country.value?.id ?? 'US'}`, { apiVersion: 3 }),
-	{ default: () => [] as PayoutMethod[], watch: [country] },
-)
-
-const paymentMethods = computed<PayoutMethod[]>(() => (payoutMethods.value as PayoutMethod[]) ?? [])
 
 const props = defineProps<{
 	balance: UserBalanceResponse | null
+	payoutMethods?: PayoutMethod[]
+	payoutMethodsPending?: boolean
+	country: { id: string; name: string } | null
 }>()
+
+const emit = defineEmits<{
+	(e: 'update:country', value: { id: string; name: string } | null): void
+}>()
+
+const countryProxy = computed({
+	get: () => props.country,
+	set: (v) => emit('update:country', v),
+})
+
+const paymentMethods = computed<PayoutMethod[]>(() => props.payoutMethods ?? [])
+
+const maxWithdrawAmount = computed(() => {
+	if (!paymentMethod.value) return props.balance?.available ?? 0
+
+	const interval = paymentMethod.value.interval
+	return 'standard' in interval
+		? interval.standard.max
+		: (interval?.fixed?.values.slice(-1)[0] ?? 0)
+})
+
+const minWithdrawAmount = computed(() => {
+	if (!paymentMethod.value) return 0.25
+
+	const interval = paymentMethod.value.interval
+	return 'standard' in interval ? interval.standard.min : (interval?.fixed?.values?.[0] ?? 0.25)
+})
 
 const usedLimit = computed(() => {
 	return 600 - (props.balance?.withdrawn_ytd ?? 0)
@@ -212,13 +232,6 @@ function show(preferred?: Stage) {
 	open('withdraw-details')
 }
 
-// Initialize default country (fallback to US if available)
-if (!country.value) {
-	const us = countries.value.find((c) => c.id === 'US')
-	country.value = us ?? countries.value[0] ?? null
-}
-
-// Keep selected method in sync with fetched options
 watch(
 	() => paymentMethods.value,
 	(list) => {
@@ -226,7 +239,6 @@ watch(
 			paymentMethod.value = null
 			return
 		}
-		// Reset selection if current selection is not in the new list
 		if (!paymentMethod.value || !list.some((m) => m.id === paymentMethod.value?.id)) {
 			paymentMethod.value = list[0]
 		}
