@@ -599,8 +599,20 @@ impl DBUser {
             sqlx::query!(
                 "
                 DELETE FROM reports
-                WHERE user_id = $1 OR reporter = $1
+                WHERE reporter = $1
                 ",
+                id as DBUserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                UPDATE reports
+                SET user_id = $1
+                WHERE reporter = $2
+                ",
+                deleted_user as DBUserId,
                 id as DBUserId,
             )
             .execute(&mut **transaction)
@@ -638,9 +650,11 @@ impl DBUser {
 
             sqlx::query!(
                 "
-                DELETE FROM payouts
-                WHERE user_id = $1
+                UPDATE payouts
+                SET user_id = $1
+                WHERE user_id = $2
                 ",
+                deleted_user as DBUserId,
                 id as DBUserId,
             )
             .execute(&mut **transaction)
@@ -670,9 +684,11 @@ impl DBUser {
 
             sqlx::query!(
                 "
-                DELETE FROM uploaded_images
-                WHERE owner_id = $1
+                UPDATE uploaded_images
+                SET owner_id = $1
+                WHERE owner_id = $2
                 ",
+                deleted_user as DBUserId,
                 id as DBUserId,
             )
             .execute(&mut **transaction)
