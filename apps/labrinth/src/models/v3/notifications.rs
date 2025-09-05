@@ -247,6 +247,7 @@ impl From<DBNotification> for Notification {
                     },
                     vec![],
                 ),
+                // Don't expose the `flow` field
                 NotificationBody::ResetPassword { .. } => (
                     "Password reset requested".to_string(),
                     "You've requested to reset your password. Please check your email for a reset link.".to_string(),

@@ -18,6 +18,8 @@ use tracing::{error, warn};
 const USER_NAME: &str = "user.name";
 const USER_EMAIL: &str = "user.email";
 
+const RESETPASSWORD_URL: &str = "resetpassword.url";
+
 const TEAMINVITE_INVITER_NAME: &str = "teaminvite.inviter.name";
 const TEAMINVITE_PROJECT_NAME: &str = "teaminvite.project.name";
 const TEAMINVITE_ROLE_NAME: &str = "teaminvite.role.name";
@@ -170,12 +172,12 @@ async fn collect_template_variables(
     exec: impl sqlx::PgExecutor<'_>,
     redis: &RedisPool,
     n: &DBNotification,
-) -> Result<TemplateVariables, DatabaseError> {
+) -> Result<TemplateVariables, ApiError> {
     async fn only_select_default_variables(
         exec: impl sqlx::PgExecutor<'_>,
         redis: &RedisPool,
         user_id: DBUserId,
-    ) -> Result<TemplateVariables, DatabaseError> {
+    ) -> Result<TemplateVariables, ApiError> {
         let mut map = HashMap::new();
 
         let user = DBUser::get_id(user_id, exec, redis)
@@ -187,10 +189,6 @@ async fn collect_template_variables(
     }
 
     match &n.body {
-        NotificationBody::ProjectUpdate { .. } => {
-            only_select_default_variables(exec, redis, n.user_id).await
-        }
-
         NotificationBody::TeamInvite {
             team_id: _,
             project_id,
@@ -289,6 +287,25 @@ async fn collect_template_variables(
             Ok(TemplateVariables::with_email(map, result.user_email))
         }
 
-        _ => only_select_default_variables(exec, redis, n.user_id).await,
+        NotificationBody::ResetPassword { flow } => {
+            let url = format!(
+                "{}/{}?flow={}",
+                dotenvy::var("SITE_URL")?,
+                dotenvy::var("SITE_RESET_PASSWORD_PATH")?,
+                flow
+            );
+
+            let mut map = HashMap::new();
+            map.insert(RESETPASSWORD_URL, url);
+
+            Ok(TemplateVariables::with_email(map, None))
+        }
+
+        NotificationBody::ProjectUpdate { .. }
+        | NotificationBody::LegacyMarkdown { .. }
+        | NotificationBody::ModeratorMessage { .. }
+        | NotificationBody::Unknown => {
+            only_select_default_variables(exec, redis, n.user_id).await
+        }
     }
 }

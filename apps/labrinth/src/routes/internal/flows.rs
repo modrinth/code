@@ -5,8 +5,10 @@ use crate::auth::validate::{
 use crate::auth::{AuthProvider, AuthenticationError, get_user_from_headers};
 use crate::database::models::DBUser;
 use crate::database::models::flow_item::DBFlow;
+use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity};
+use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::users::{Badges, Role};
 use crate::queue::session::AuthQueue;
@@ -1930,10 +1932,12 @@ pub async fn reset_password_begin(
         return Err(ApiError::Turnstile);
     }
 
+    let mut txn = pool.begin().await?;
+
     let user =
         match crate::database::models::DBUser::get_by_case_insensitive_email(
             &reset_password.username_or_email,
-            &**pool,
+            &mut *txn,
         )
         .await?[..]
         {
@@ -1941,7 +1945,7 @@ pub async fn reset_password_begin(
                 // Try finding by username or ID
                 crate::database::models::DBUser::get(
                     &reset_password.username_or_email,
-                    &**pool,
+                    &mut *txn,
                     &redis,
                 )
                 .await?
@@ -1950,7 +1954,7 @@ pub async fn reset_password_begin(
                 // If there is only one user with the given email, ignoring case,
                 // we can assume it's the user we want to reset the password for
                 crate::database::models::DBUser::get_id(
-                    user_id, &**pool, &redis,
+                    user_id, &mut *txn, &redis,
                 )
                 .await?
             }
@@ -1962,12 +1966,12 @@ pub async fn reset_password_begin(
                 if let Some(user_id) =
                     crate::database::models::DBUser::get_by_email(
                         &reset_password.username_or_email,
-                        &**pool,
+                        &mut *txn,
                     )
                     .await?
                 {
                     crate::database::models::DBUser::get_id(
-                        user_id, &**pool, &redis,
+                        user_id, &mut *txn, &redis,
                     )
                     .await?
                 } else {
@@ -1976,32 +1980,19 @@ pub async fn reset_password_begin(
             }
         };
 
-    if let Some(DBUser {
-        id: user_id,
-        email: Some(email),
-        ..
-    }) = user
-    {
+    if let Some(DBUser { id: user_id, .. }) = user {
         let flow = DBFlow::ForgotPassword { user_id }
             .insert(Duration::hours(24), &redis)
             .await?;
 
-        send_email(
-            email,
-            "Reset your password",
-            "Please visit the following link below to reset your password. If the button does not work, you can copy the link and paste it into your browser.",
-            "If you did not request for your password to be reset, you can safely ignore this email.",
-            Some((
-                "Reset password",
-                &format!(
-                    "{}/{}?flow={}",
-                    dotenvy::var("SITE_URL")?,
-                    dotenvy::var("SITE_RESET_PASSWORD_PATH")?,
-                    flow
-                ),
-            )),
-        )?;
+        NotificationBuilder {
+            body: NotificationBody::ResetPassword { flow },
+        }
+        .insert(user_id, &mut txn, &redis)
+        .await?;
     }
+
+    txn.commit().await?;
 
     Ok(HttpResponse::Ok().finish())
 }

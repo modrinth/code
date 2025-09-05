@@ -55,6 +55,7 @@ CREATE TABLE notifications_templates (
 );
 
 -- Add existing notification types
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('reset_password', 3, FALSE, FALSE);
 INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('project_update', 1, TRUE, TRUE);
 INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('team_invite', 1, TRUE, TRUE);
 INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('organization_invite', 1, TRUE, TRUE);
@@ -62,4 +63,46 @@ INSERT INTO notifications_types (name, delivery_priority, expose_in_user_prefere
 INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('moderator_message', 1, TRUE, TRUE);
 INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('legacy_markdown', 1, TRUE, TRUE);
 INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('unknown', 1, TRUE, TRUE);
-INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('reset_password', 3, FALSE, FALSE);
+
+INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
+VALUES (NULL, 'email', 'reset_password', TRUE);
+
+INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
+VALUES (NULL, 'email', 'project_update', FALSE);
+
+INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
+VALUES (NULL, 'email', 'team_invite', FALSE);
+
+INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
+VALUES (NULL, 'email', 'organization_invite', FALSE);
+
+INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
+VALUES (NULL, 'email', 'status_change', FALSE);
+
+INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
+VALUES (NULL, 'email', 'moderator_message', FALSE);
+
+INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
+VALUES (NULL, 'email', 'legacy_markdown', FALSE);
+
+INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
+VALUES (NULL, 'email', 'unknown', FALSE);
+
+-- Pre-insert any templates
+INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
+VALUES (
+    'email', 'reset_password', 'Reset your Modrinth password', 'https://modrinth.com/mail/resetpassword.html',
+    CONCAT(
+        'Hi {user.name},',
+        CHR(10),
+        CHR(10),
+        'Please visit the below link below to reset your password. If you did not request for your password to be reset, you can safely ignore this email.',
+        CHR(10),
+        'Reset your password: {resetpassword.url}',
+        CHR(10),
+        CHR(10),
+        '- The Modrinth Team',
+        CHR(10),
+        'modrinth.com'
+    )
+);
