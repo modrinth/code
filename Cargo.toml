@@ -87,7 +87,9 @@ lettre = { version = "0.11.18", default-features = false, features = [
 	"ring",
 	"rustls",
 	"rustls-native-certs",
+        "tokio1-rustls",
 	"smtp-transport",
+        "tokio1",
 ] }
 maxminddb = "0.26.0"
 meilisearch-sdk = { version = "0.29.1", default-features = false }

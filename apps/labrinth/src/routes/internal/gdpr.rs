@@ -69,12 +69,20 @@ pub async fn export(
         .map(|x| crate::models::organizations::Organization::from(x, vec![]))
         .collect::<Vec<_>>();
 
-    let notifs = crate::database::models::notification_item::DBNotification::get_many_user(
-        user_id, &**pool, &redis,
+    let notifs = crate::database::models::notification_item::DBNotification::get_all_user(
+        user_id, &**pool,
     )
     .await?
     .into_iter()
     .map(crate::models::notifications::Notification::from)
+    .collect::<Vec<_>>();
+
+    let notifs_deliveries = crate::database::models::notifications_deliveries_item::DBNotificationDelivery::get_all_user(
+        user_id, &**pool,
+    )
+    .await?
+    .into_iter()
+    .map(crate::models::notifications::NotificationDelivery::from)
     .collect::<Vec<_>>();
 
     let oauth_clients =
@@ -195,6 +203,7 @@ pub async fn export(
         "projects": projects,
         "orgs": orgs,
         "notifs": notifs,
+        "notifs_deliveries": notifs_deliveries,
         "oauth_clients": oauth_clients,
         "oauth_authorizations": oauth_authorizations,
         "pats": pats,

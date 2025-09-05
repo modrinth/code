@@ -779,7 +779,7 @@ pub async fn user_notifications(
         }
 
         let mut notifications: Vec<Notification> =
-            crate::database::models::notification_item::DBNotification::get_many_user(
+            crate::database::models::notification_item::DBNotification::get_many_user_exposed_on_site(
                 id, &**pool, &redis,
             )
             .await?

@@ -1,6 +1,7 @@
-use super::ids::OrganizationId;
+use super::ids::*;
 use crate::database::models::notification_item::DBNotification;
 use crate::database::models::notification_item::DBNotificationAction;
+use crate::database::models::notifications_deliveries_item::DBNotificationDelivery;
 use crate::models::ids::{
     NotificationId, ProjectId, ReportId, TeamId, ThreadId, ThreadMessageId,
     VersionId,
@@ -22,6 +23,49 @@ pub struct Notification {
     pub text: String,
     pub link: String,
     pub actions: Vec<NotificationAction>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Eq, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum NotificationType {
+    // If adding a notification type, add a variant in `NotificationBody` of the same name!
+    ProjectUpdate,
+    TeamInvite,
+    OrganizationInvite,
+    StatusChange,
+    ModeratorMessage,
+    LegacyMarkdown,
+    ResetPassword,
+    Unknown,
+}
+
+impl NotificationType {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            NotificationType::ProjectUpdate => "project_update",
+            NotificationType::TeamInvite => "team_invite",
+            NotificationType::OrganizationInvite => "organization_invite",
+            NotificationType::StatusChange => "status_change",
+            NotificationType::ModeratorMessage => "moderator_message",
+            NotificationType::LegacyMarkdown => "legacy_markdown",
+            NotificationType::ResetPassword => "reset_password",
+            NotificationType::Unknown => "unknown",
+        }
+    }
+
+    pub fn from_str_or_default(s: &str) -> Self {
+        match s {
+            "project_update" => NotificationType::ProjectUpdate,
+            "team_invite" => NotificationType::TeamInvite,
+            "organization_invite" => NotificationType::OrganizationInvite,
+            "status_change" => NotificationType::StatusChange,
+            "moderator_message" => NotificationType::ModeratorMessage,
+            "legacy_markdown" => NotificationType::LegacyMarkdown,
+            "reset_password" => NotificationType::ResetPassword,
+            "unknown" => NotificationType::Unknown,
+            _ => NotificationType::Unknown,
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -62,7 +106,37 @@ pub enum NotificationBody {
         link: String,
         actions: Vec<NotificationAction>,
     },
+    ResetPassword {
+        flow: String,
+    },
     Unknown,
+}
+
+impl NotificationBody {
+    pub fn notification_type(&self) -> NotificationType {
+        match &self {
+            NotificationBody::ProjectUpdate { .. } => {
+                NotificationType::ProjectUpdate
+            }
+            NotificationBody::TeamInvite { .. } => NotificationType::TeamInvite,
+            NotificationBody::OrganizationInvite { .. } => {
+                NotificationType::OrganizationInvite
+            }
+            NotificationBody::StatusChange { .. } => {
+                NotificationType::StatusChange
+            }
+            NotificationBody::ModeratorMessage { .. } => {
+                NotificationType::ModeratorMessage
+            }
+            NotificationBody::LegacyMarkdown { .. } => {
+                NotificationType::LegacyMarkdown
+            }
+            NotificationBody::ResetPassword { .. } => {
+                NotificationType::ResetPassword
+            }
+            NotificationBody::Unknown => NotificationType::Unknown,
+        }
+    }
 }
 
 impl From<DBNotification> for Notification {
@@ -173,6 +247,13 @@ impl From<DBNotification> for Notification {
                     },
                     vec![],
                 ),
+                // Don't expose the `flow` field
+                NotificationBody::ResetPassword { .. } => (
+                    "Password reset requested".to_string(),
+                    "You've requested to reset your password. Please check your email for a reset link.".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
                 NotificationBody::LegacyMarkdown {
                     name,
                     text,
@@ -218,6 +299,93 @@ impl From<DBNotificationAction> for NotificationAction {
         Self {
             name: act.name,
             action_route: (act.action_route_method, act.action_route),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum NotificationChannel {
+    Email,
+}
+
+impl NotificationChannel {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            NotificationChannel::Email => "email",
+        }
+    }
+
+    pub fn from_str_or_default(s: &str) -> Self {
+        match s {
+            "email" => NotificationChannel::Email,
+            _ => NotificationChannel::Email,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum NotificationDeliveryStatus {
+    Pending,
+    SkippedPreferences,
+    SkippedDefault,
+    Delivered,
+    PermanentlyFailed,
+}
+
+impl NotificationDeliveryStatus {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            NotificationDeliveryStatus::Pending => "pending",
+            NotificationDeliveryStatus::SkippedPreferences => {
+                "skipped_preferences"
+            }
+            NotificationDeliveryStatus::SkippedDefault => "skipped_default",
+            NotificationDeliveryStatus::Delivered => "delivered",
+            NotificationDeliveryStatus::PermanentlyFailed => {
+                "permanently_failed"
+            }
+        }
+    }
+
+    pub fn from_str_or_default(s: &str) -> Self {
+        match s {
+            "pending" => NotificationDeliveryStatus::Pending,
+            "skipped_preferences" => {
+                NotificationDeliveryStatus::SkippedPreferences
+            }
+            "skipped_default" => NotificationDeliveryStatus::SkippedDefault,
+            "delivered" => NotificationDeliveryStatus::Delivered,
+            "permanently_failed" => {
+                NotificationDeliveryStatus::PermanentlyFailed
+            }
+            _ => NotificationDeliveryStatus::Pending,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct NotificationDelivery {
+    pub notification_id: NotificationId,
+    pub user_id: UserId,
+    pub channel: NotificationChannel,
+    pub delivery_priority: i32,
+    pub status: NotificationDeliveryStatus,
+    pub next_attempt: DateTime<Utc>,
+    pub attempt_count: i32,
+}
+
+impl From<DBNotificationDelivery> for NotificationDelivery {
+    fn from(delivery: DBNotificationDelivery) -> Self {
+        Self {
+            notification_id: delivery.notification_id.into(),
+            user_id: delivery.user_id.into(),
+            channel: delivery.channel,
+            delivery_priority: delivery.delivery_priority,
+            status: delivery.status,
+            next_attempt: delivery.next_attempt,
+            attempt_count: delivery.attempt_count,
         }
     }
 }

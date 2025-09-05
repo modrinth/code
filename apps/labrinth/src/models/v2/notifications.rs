@@ -72,6 +72,10 @@ pub enum LegacyNotificationBody {
         link: String,
         actions: Vec<NotificationAction>,
     },
+    // In `NotificationBody`, this has the `flow` field, however, don't
+    // include it here, to be 100% certain we don't end up leaking it
+    // in site notifications.
+    ResetPassword,
     Unknown,
 }
 
@@ -92,6 +96,9 @@ impl LegacyNotification {
             }
             NotificationBody::ModeratorMessage { .. } => {
                 Some("moderator_message".to_string())
+            }
+            NotificationBody::ResetPassword { .. } => {
+                Some("reset_password".to_string())
             }
             NotificationBody::LegacyMarkdown {
                 notification_type, ..
@@ -162,6 +169,9 @@ impl LegacyNotification {
                 link,
                 actions,
             },
+            NotificationBody::ResetPassword { .. } => {
+                LegacyNotificationBody::ResetPassword
+            }
             NotificationBody::Unknown => LegacyNotificationBody::Unknown,
         };
 
