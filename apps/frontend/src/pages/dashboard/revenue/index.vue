@@ -116,7 +116,7 @@
 				<nuxt-link class="text-link" to="/legal/cmp-info">Reward Program</nuxt-link>.</span
 			>
 		</div>
-		<div class="flex flex-col gap-4">
+		<div class="flex flex-col gap-4" v-if="sortedPayouts.length > 0">
 			<div class="flex flex-row justify-between">
 				<span class="text-3xl font-semibold text-contrast">Transactions</span>
 				<nuxt-link
