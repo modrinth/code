@@ -70,7 +70,7 @@ pub enum DelphiReportSeverity {
 pub struct DBDelphiReportIssue {
     pub id: DelphiReportIssueId,
     pub report_id: DelphiReportId,
-    pub issue_type: DelphiReportIssueType,
+    pub issue_type: String,
     pub status: DelphiReportIssueStatus,
 }
 
@@ -141,7 +141,7 @@ impl DBDelphiReportIssue {
                 RETURNING id
                 ",
                 self.report_id as DelphiReportId,
-                self.issue_type as DelphiReportIssueType,
+                self.issue_type,
                 self.status as DelphiReportIssueStatus,
             )
             .fetch_one(&mut **transaction)
@@ -150,7 +150,7 @@ impl DBDelphiReportIssue {
     }
 
     pub async fn find_all_by(
-        ty: Option<DelphiReportIssueType>,
+        ty: Option<String>,
         status: Option<DelphiReportIssueStatus>,
         order_by: Option<DelphiReportListOrder>,
         count: Option<u16>,
@@ -161,7 +161,7 @@ impl DBDelphiReportIssue {
             r#"
             SELECT
                 delphi_report_issues.id AS "id", report_id,
-                issue_type AS "issue_type: DelphiReportIssueType",
+                issue_type,
                 delphi_report_issues.status AS "status: DelphiReportIssueStatus",
 
                 file_id, delphi_version, artifact_url, created, severity AS "severity: DelphiReportSeverity",
@@ -187,7 +187,7 @@ impl DBDelphiReportIssue {
             OFFSET $5
             LIMIT $4
             "#,
-            ty as Option<DelphiReportIssueType>,
+            ty,
             status as Option<DelphiReportIssueStatus>,
             order_by.map(|order_by| order_by.to_string()),
             count.map(|count| count as i64),
@@ -218,50 +218,6 @@ impl DBDelphiReportIssue {
         })
         .fetch_all(exec)
         .await?)
-    }
-}
-
-/// A type of issue found by Delphi for an artifact.
-#[derive(
-    Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Hash, sqlx::Type,
-)]
-#[serde(rename_all = "snake_case")]
-#[sqlx(type_name = "delphi_report_issue_type", rename_all = "snake_case")]
-pub enum DelphiReportIssueType {
-    ReflectionIndirection,
-    XorObfuscation,
-    IncludedLibraries,
-    SuspiciousBinaries,
-    CorruptClasses,
-    SuspiciousClasses,
-
-    UrlUsage,
-    ClassloaderUsage,
-    ProcessbuilderUsage,
-    RuntimeExecUsage,
-    #[serde(rename = "jni_usage")]
-    #[sqlx(rename = "jni_usage")]
-    JNIUsage,
-
-    MainMethod,
-    NativeLoading,
-
-    MalformedJar,
-    NestedJarTooDeep,
-    FailedDecompilation,
-    AnalysisFailure,
-
-    MalwareEasyforme,
-    MalwareSimplyloader,
-
-    /// An issue reported by Delphi but not known by labrinth yet.
-    #[serde(other)]
-    Unknown,
-}
-
-impl Display for DelphiReportIssueType {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        self.serialize(f)
     }
 }
 
