@@ -137,8 +137,8 @@ macro_rules! db_id_interface {
     };
 }
 
-macro_rules! short_id_type {
-    ($name:ident) => {
+macro_rules! id_type {
+    ($name:ident as $type:ty) => {
         #[derive(
             Copy,
             Clone,
@@ -151,7 +151,7 @@ macro_rules! short_id_type {
             Hash,
         )]
         #[sqlx(transparent)]
-        pub struct $name(pub i32);
+        pub struct $name(pub $type);
     };
 }
 
@@ -261,14 +261,17 @@ db_id_interface!(
     generator: generate_version_id @ "versions",
 );
 
-short_id_type!(CategoryId);
-short_id_type!(GameId);
-short_id_type!(LinkPlatformId);
-short_id_type!(LoaderFieldEnumId);
-short_id_type!(LoaderFieldEnumValueId);
-short_id_type!(LoaderFieldId);
-short_id_type!(LoaderId);
-short_id_type!(NotificationActionId);
-short_id_type!(ProjectTypeId);
-short_id_type!(ReportTypeId);
-short_id_type!(StatusId);
+id_type!(CategoryId as i32);
+id_type!(GameId as i32);
+id_type!(LinkPlatformId as i32);
+id_type!(LoaderFieldEnumId as i32);
+id_type!(LoaderFieldEnumValueId as i32);
+id_type!(LoaderFieldId as i32);
+id_type!(LoaderId as i32);
+id_type!(NotificationActionId as i32);
+id_type!(ProjectTypeId as i32);
+id_type!(ReportTypeId as i32);
+id_type!(StatusId as i32);
+id_type!(DelphiReportId as i64);
+id_type!(DelphiReportIssueId as i64);
+id_type!(DelphiReportIssueJavaClassId as i64);
