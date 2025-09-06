@@ -144,7 +144,7 @@ import { commonMessages, injectNotificationManager } from '@modrinth/ui'
 import { IntlFormatted } from '@vintl/vintl/components'
 
 import HCaptcha from '@/components/ui/HCaptcha.vue'
-import { getAuthUrl } from '@/composables/auth.js'
+import { getAuthUrl, getLauncherRedirectUrl } from '@/composables/auth.js'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -275,15 +275,14 @@ async function finishSignIn(token) {
 			token = auth.value.token
 		}
 
-		const usesLocalhostRedirectionScheme =
-			['4', '6'].includes(route.query.ipver) && Number(route.query.port) < 65536
+		const redirectUrl = `${getLauncherRedirectUrl(route)}/?code=${token}`
 
-		const redirectUrl = usesLocalhostRedirectionScheme
-			? `http://${route.query.ipver === '4' ? '127.0.0.1' : '[::1]'}:${route.query.port}/?code=${token}`
-			: `https://launcher-files.modrinth.com/?code=${token}`
-
-		if (usesLocalhostRedirectionScheme) {
-			// When using this redirection scheme, the auth token is very visible in the URL to the user.
+		if (redirectUrl.startsWith('https://launcher-files.modrinth.com/')) {
+			await navigateTo(redirectUrl, {
+				external: true,
+			})
+		} else {
+			// When redirecting to localhost, the auth token is very visible in the URL to the user.
 			// While we could make it harder to find with a POST request, such is security by obscurity:
 			// the user and other applications would still be able to sniff the token in the request body.
 			// So, to make the UX a little better by not changing the displayed URL, while keeping the
@@ -291,10 +290,6 @@ async function finishSignIn(token) {
 			// standard flows as possible, let's execute the redirect within an iframe that visually
 			// covers the entire page.
 			subtleLauncherRedirectUri.value = redirectUrl
-		} else {
-			await navigateTo(redirectUrl, {
-				external: true,
-			})
 		}
 
 		return
