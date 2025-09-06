@@ -48,6 +48,13 @@ pub async fn init_client_with_database(
         "MergeTree()"
     };
 
+    // For the Clickhouse database on the staging environment, set a TTL to avoid accumulating too much data
+    let ttl = if database == "staging_analytics" {
+        "TTL toDateTime(recorded) + INTERVAL 1 DAY"
+    } else {
+        ""
+    };
+
     client
         .query(&format!(
             "
@@ -69,6 +76,7 @@ pub async fn init_client_with_database(
             ENGINE = {engine}
             PRIMARY KEY (project_id, recorded, ip)
             SETTINGS index_granularity = 8192
+            {ttl}
             "
         ))
         .execute()
@@ -95,6 +103,7 @@ pub async fn init_client_with_database(
             ENGINE = {engine}
             PRIMARY KEY (project_id, recorded, ip)
             SETTINGS index_granularity = 8192
+            {ttl}
             "
         ))
         .execute()
@@ -119,6 +128,7 @@ pub async fn init_client_with_database(
             ENGINE = {engine}
             PRIMARY KEY (project_id, recorded, user_id)
             SETTINGS index_granularity = 8192
+            {ttl}
             "
         ))
         .execute()
