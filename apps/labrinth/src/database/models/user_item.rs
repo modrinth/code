@@ -610,7 +610,7 @@ impl DBUser {
                 "
                 UPDATE reports
                 SET user_id = $1
-                WHERE reporter = $2
+                WHERE user_id = $2
                 ",
                 deleted_user as DBUserId,
                 id as DBUserId,
