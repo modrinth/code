@@ -12,35 +12,7 @@
     "parameters": {
       "Left": [
         "Int8",
-        {
-          "Custom": {
-            "name": "delphi_report_issue_type",
-            "kind": {
-              "Enum": [
-                "reflection_indirection",
-                "xor_obfuscation",
-                "included_libraries",
-                "suspicious_binaries",
-                "corrupt_classes",
-                "suspicious_classes",
-                "url_usage",
-                "classloader_usage",
-                "processbuilder_usage",
-                "runtime_exec_usage",
-                "jni_usage",
-                "main_method",
-                "native_loading",
-                "malformed_jar",
-                "nested_jar_too_deep",
-                "failed_decompilation",
-                "analysis_failure",
-                "malware_easyforme",
-                "malware_simplyloader",
-                "unknown"
-              ]
-            }
-          }
-        },
+        "Text",
         {
           "Custom": {
             "name": "delphi_report_issue_status",
