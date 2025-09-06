@@ -1,0 +1,72 @@
+{
+  "nags.add-description.description": {
+    "defaultMessage": "Insira uma descrição que descreve claramente o propósito e funcionamento do projeto."
+  },
+  "nags.add-description.title": {
+    "defaultMessage": "Adicionar uma descrição"
+  },
+  "nags.add-icon.description": {
+    "defaultMessage": "Adicionar ícone único e relevante ajuda seu projeto ser identificável e também a se destacar."
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "Adicionar um ícone"
+  },
+  "nags.add-links.description": {
+    "defaultMessage": "Adicionar links relevantes direcionados para fora da Modrinth, como código-fonte, rastreador de problemas ou convite para o Discord."
+  },
+  "nags.add-links.title": {
+    "defaultMessage": "Adicionar links externos"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Você selecionou todas as {totalAvailableTags} etiquetas disponíveis. Isso desvia do propósito das etiquetas, cujo intuito é o de ajudar os usuários a encontrar projetos relevantes. Por favor, selecione somente as etiquetas relevantes para o seu projeto."
+  },
+  "nags.all-tags-selected.title": {
+    "defaultMessage": "Selecionar etiquetas específicas"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Sua descrição possui {length} caracteres legíveis. É recomendado ao menos {minChars} caracteres para criar uma descrição clara e informativa."
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "Expandir a descrição"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "Editar descrição"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "Editar licença"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "Editar sumário"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "Editar etiquetas"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "Editar título"
+  },
+  "nags.feature-gallery-image.description": {
+    "defaultMessage": "A imagem da galeria em destaque é geralmente a primeira impressão que seu projeto causa."
+  },
+  "nags.feature-gallery-image.title": {
+    "defaultMessage": "Destacar uma imagem da galeria"
+  },
+  "nags.gallery.title": {
+    "defaultMessage": "Abrir galeria"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Seu {projectType} utiliza uma licença que exige um código-fonte para ser disponibilizado. Por favor, forneça um link de código-fonte ou seus arquivos de origem para cada versão adicional, ou considere utilizar outra licença."
+  },
+  "nags.gpl-license-source-required.title": {
+    "defaultMessage": "Fornecer código-fonte"
+  },
+  "nags.image-heavy-description.description": {
+    "defaultMessage": "Sua descrição deve conter texto sem formatação ou texto alternativo de imagem suficiente, mantendo ela acessível àqueles utilizando leitores de tela ou com conexão de internet lenta."
+  },
+  "nags.image-heavy-description.title": {
+    "defaultMessage": "Garantir acessibilidade"
+  },
+  "nags.invalid-license-url.description.default": {
+    "defaultMessage": "O URL da licença é invalido."
+  }
+}
+

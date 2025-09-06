@@ -1,0 +1,81 @@
+{
+  "button.back": {
+    "defaultMessage": "Înapoi"
+  },
+  "button.cancel": {
+    "defaultMessage": "Anulează"
+  },
+  "button.continue": {
+    "defaultMessage": "Continuă"
+  },
+  "button.copy-id": {
+    "defaultMessage": "Copiază ID-ul"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "Copiază link-ul permanent"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Creează un proiect"
+  },
+  "button.download": {
+    "defaultMessage": "Descarcă"
+  },
+  "button.downloading": {
+    "defaultMessage": "Descărcare"
+  },
+  "button.edit": {
+    "defaultMessage": "Editează"
+  },
+  "button.next": {
+    "defaultMessage": "Următorul"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Deschide folder-ul"
+  },
+  "button.play": {
+    "defaultMessage": "Joacă"
+  },
+  "button.refresh": {
+    "defaultMessage": "Reîmprospătează"
+  },
+  "button.remove": {
+    "defaultMessage": "Elimină"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Elimină imagine"
+  },
+  "button.report": {
+    "defaultMessage": "Raportează"
+  },
+  "button.save": {
+    "defaultMessage": "Salvează"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Salvează schimbări"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Conectează-te"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Deconectează-te"
+  },
+  "button.stop": {
+    "defaultMessage": "Stop"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Încarcă o imagine"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "Doar acum"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "Aplicație"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Server"
+  }
+}
+

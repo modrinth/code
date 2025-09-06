@@ -1,0 +1,45 @@
+{
+  "nags.add-description.description": {
+    "defaultMessage": "프로젝트의 목적과 기능을 명확하게 소개하는 설명이 필요합니다."
+  },
+  "nags.add-description.title": {
+    "defaultMessage": "설명 추가"
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "아이콘 추가"
+  },
+  "nags.add-links.title": {
+    "defaultMessage": "외부 링크 추가"
+  },
+  "nags.all-tags-selected.title": {
+    "defaultMessage": "올바른 태그를 선택해주세요"
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "설명 펼치기"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "설명 수정"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "라이선스 수정"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "소개 수정"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "태그 수정"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "제목 수정"
+  },
+  "nags.gallery.title": {
+    "defaultMessage": "갤러리 페이지 보기"
+  },
+  "nags.invalid-license-url.title": {
+    "defaultMessage": "올바른 라이선스 링크를 넣어주세요"
+  },
+  "nags.select-tags.title": {
+    "defaultMessage": "태그 선택"
+  }
+}
+

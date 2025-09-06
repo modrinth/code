@@ -1,0 +1,327 @@
+{
+  "badge.new": {
+    "defaultMessage": "Nuevo"
+  },
+  "button.analytics": {
+    "defaultMessage": "Analíticas"
+  },
+  "button.back": {
+    "defaultMessage": "Volver"
+  },
+  "button.cancel": {
+    "defaultMessage": "Cancelar"
+  },
+  "button.continue": {
+    "defaultMessage": "Continuar"
+  },
+  "button.copy-id": {
+    "defaultMessage": "Copiar ID"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "Copiar url permanente"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Crear un proyecto"
+  },
+  "button.download": {
+    "defaultMessage": "Descargar"
+  },
+  "button.downloading": {
+    "defaultMessage": "Descargando"
+  },
+  "button.edit": {
+    "defaultMessage": "Editar"
+  },
+  "button.follow": {
+    "defaultMessage": "Seguir"
+  },
+  "button.more-options": {
+    "defaultMessage": "Más opciones"
+  },
+  "button.next": {
+    "defaultMessage": "Siguiente"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Abrir carpeta"
+  },
+  "button.play": {
+    "defaultMessage": "Jugar"
+  },
+  "button.refresh": {
+    "defaultMessage": "Recargar"
+  },
+  "button.remove": {
+    "defaultMessage": "Eliminar"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Eliminar imagen"
+  },
+  "button.report": {
+    "defaultMessage": "Informar"
+  },
+  "button.reset": {
+    "defaultMessage": "Reiniciar"
+  },
+  "button.save": {
+    "defaultMessage": "Guardar"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Guardar cambios"
+  },
+  "button.saving": {
+    "defaultMessage": "Guardando"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Iniciar sesión"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Cerrar sesión"
+  },
+  "button.stop": {
+    "defaultMessage": "Parar"
+  },
+  "button.unfollow": {
+    "defaultMessage": "Dejar de seguir"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Subir imagen"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "Ahora mismo"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "Aplicación"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Servidores"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Sitio web"
+  },
+  "collection.label.private": {
+    "defaultMessage": "Privado"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "Editar icono"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "Eliminar icono"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "Reemplazar icono"
+  },
+  "icon-select.select": {
+    "defaultMessage": "Seleccionar icono"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "Buscar..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "Modo galería"
+  },
+  "input.view.grid": {
+    "defaultMessage": "Modo cuadrícula"
+  },
+  "input.view.list": {
+    "defaultMessage": "Modo filas"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "Modo aventura"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "Modo creativo"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "Modo espectador"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "Modo supervivencia"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "Modo desconocido"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "Cambios guardados"
+  },
+  "label.collections": {
+    "defaultMessage": "Colecciones"
+  },
+  "label.description": {
+    "defaultMessage": "Descripción"
+  },
+  "label.moderation": {
+    "defaultMessage": "Moderación"
+  },
+  "label.notifications": {
+    "defaultMessage": "Notificaciones"
+  },
+  "label.settings": {
+    "defaultMessage": "Ajustes"
+  },
+  "project-type.all": {
+    "defaultMessage": "Todos"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "Plataformas"
+  },
+  "project.about.compatibility.title": {
+    "defaultMessage": "Compatibilidad"
+  },
+  "project.about.creators.owner": {
+    "defaultMessage": "Propietario del proyecto"
+  },
+  "project.about.creators.title": {
+    "defaultMessage": "Creadores"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "Detalles"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "Donar"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "Patrocinar en GitHub"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "Donar en Ko-fi"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "Donar en Patreon"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "Donar en PayPal"
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "Informar problemas"
+  },
+  "project.about.links.source": {
+    "defaultMessage": "Ver fuente"
+  },
+  "project.settings.analytics.title": {
+    "defaultMessage": "Analíticas"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "Descripción"
+  },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "Opcional en cliente"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "Opcional en servidor"
+  },
+  "project.settings.environment.client_and_server.required_both.title": {
+    "defaultMessage": "Requerido en ambos"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "Cliente y servidor"
+  },
+  "project.settings.tags.title": {
+    "defaultMessage": "Etiquetas"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "Subir"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "Versiones"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "Vista"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "A"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "R"
+  },
+  "project.visibility.archived": {
+    "defaultMessage": "Archivado"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "Borrador"
+  },
+  "project.visibility.private": {
+    "defaultMessage": "Privado"
+  },
+  "project.visibility.public": {
+    "defaultMessage": "Público"
+  },
+  "project.visibility.unknown": {
+    "defaultMessage": "Desconocido"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "Entorno"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "Cliente"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "Servidor"
+  },
+  "servers.notice.level.critical.name": {
+    "defaultMessage": "Critico"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "Información"
+  },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "Encuesta"
+  },
+  "servers.notice.level.warn.name": {
+    "defaultMessage": "Advertencia"
+  },
+  "servers.notice.undismissable": {
+    "defaultMessage": "Inadmisible"
+  },
+  "servers.purchase.step.payment.prompt": {
+    "defaultMessage": "Seleccionar un método de pago"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "Método de pago"
+  },
+  "servers.purchase.step.plan.get-started": {
+    "defaultMessage": "Empezar"
+  },
+  "servers.purchase.step.plan.large.desc": {
+    "defaultMessage": "Ideal para 15–25 jugadores, modpacks, o modding pesado."
+  },
+  "servers.purchase.step.plan.medium.desc": {
+    "defaultMessage": "Genial para 6–15 jugadores y múltiples mods."
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "defaultMessage": "Lo más popular"
+  },
+  "servers.purchase.step.plan.prompt": {
+    "defaultMessage": "Elegir un plan"
+  },
+  "servers.purchase.step.plan.select": {
+    "defaultMessage": "Seleccionar Plan"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "Oscuro"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "Selecciona tu tema de color preferido para Modrinth en este dispositivo."
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "Luz"
+  },
+  "settings.language.title": {
+    "defaultMessage": "Idioma"
+  },
+  "settings.profile.title": {
+    "defaultMessage": "Perfil público"
+  },
+  "settings.sessions.title": {
+    "defaultMessage": "Sesiones"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "Tienes cambios sin guardar."
+  }
+}
+

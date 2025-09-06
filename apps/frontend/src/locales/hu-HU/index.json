@@ -1,0 +1,86 @@
+{
+  "auth.sign-up.label.username": {
+    "message": "Felhasználónév"
+  },
+  "collection.label.created-at": {
+    "message": "Létrehozva {ago}"
+  },
+  "collection.label.updated-at": {
+    "message": "Frissítve {ago}"
+  },
+  "layout.action.change-theme": {
+    "message": "Kinézet"
+  },
+  "layout.footer.about": {
+    "message": "Rólunk"
+  },
+  "layout.footer.about.changelog": {
+    "message": "Változtatások"
+  },
+  "layout.footer.legal": {
+    "message": "Jogi megjegyzések"
+  },
+  "layout.footer.resources": {
+    "message": "Források"
+  },
+  "layout.footer.social.discord": {
+    "message": "Discord"
+  },
+  "layout.footer.social.github": {
+    "message": "GitHub"
+  },
+  "moderation.page.reports": {
+    "message": "Jelentések"
+  },
+  "moderation.sort.by": {
+    "message": "Rendezés"
+  },
+  "profile.user-id": {
+    "message": "Felhasználói ID: {id}"
+  },
+  "project-type.mod.plural": {
+    "message": "Modok"
+  },
+  "project-type.mod.singular": {
+    "message": "Mod"
+  },
+  "project-type.modpack.plural": {
+    "message": "Modpackek"
+  },
+  "project-type.modpack.singular": {
+    "message": "Modpack"
+  },
+  "project.about.details.created": {
+    "message": "Létrehozva {date}"
+  },
+  "project.about.details.updated": {
+    "message": "Frissítve {date}"
+  },
+  "project.description.title": {
+    "message": "Leírás"
+  },
+  "project.gallery.title": {
+    "message": "Galéria"
+  },
+  "project.moderation.title": {
+    "message": "Moderáció"
+  },
+  "project.versions.title": {
+    "message": "Verziók"
+  },
+  "settings.billing.payment_method_type.paypal": {
+    "message": "PayPal"
+  },
+  "settings.pats.token.action.revoke": {
+    "message": "Tokened visszavonása"
+  },
+  "settings.profile.bio.title": {
+    "message": "Bemutatkozás"
+  },
+  "settings.profile.username.title": {
+    "message": "Felhasználónév"
+  },
+  "settings.sessions.created-ago": {
+    "message": "Létrehozva {ago}"
+  }
+}

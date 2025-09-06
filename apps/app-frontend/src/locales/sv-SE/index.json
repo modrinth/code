@@ -1,0 +1,419 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Utvecklarläge aktiverat."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Utseende"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Standardinställningar för instanser"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Funktionsflaggor"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Java installationer"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Integritet"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Resurshantering"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Lägg till och spela"
+  },
+  "instance.add-server.add-server": {
+    "message": "Lägg till server"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Avaktiverat"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Aktiverat"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Fråga"
+  },
+  "instance.add-server.title": {
+    "message": "Lägg till en server"
+  },
+  "instance.edit-server.title": {
+    "message": "Redigera server"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Göm från Hem sidan"
+  },
+  "instance.edit-world.name": {
+    "message": "Namn"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft värld"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Återställ ikon"
+  },
+  "instance.edit-world.title": {
+    "message": "Redigera värld"
+  },
+  "instance.filter.disabled": {
+    "message": "Avaktiverade projekt"
+  },
+  "instance.filter.updates-available": {
+    "message": "Uppdateringar tillgängliga"
+  },
+  "instance.server-modal.address": {
+    "message": "Adress"
+  },
+  "instance.server-modal.name": {
+    "message": "Namn"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft Server"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Resurs pack"
+  },
+  "instance.settings.tabs.general": {
+    "message": "Allmänt"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Radera instans"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Radera instans"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Raderar permanent en instans från din enhet, inklusive dina världar, konfigurationer och allt installerat innehåll. Var försiktig, eftersom när du har raderat en instans går det inte att återställa den."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Raderar..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Duplicera"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "Kan inte duplicera under installationen."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "Duplicera instans"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Skapa en kopia av denna instans, inklusive världar, konfigurationer, mods och mera."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Redigera ikon"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Ta bort ikon"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Ändra ikon"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Välj ikon"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "Biblioteksgrupper"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "Skapa ny grupp"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "Biblioteksgrupper tillåter dig att organisera dina instanser till olika sektioner i ditt bibliotek."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "Ange grupp namn"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Namn"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "Startkrokar"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "Egendefinierade startkrokar"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "Krokar gör det möjligt för avancerade användare att köra vissa systemkommandon före och efter att spelet startas."
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "Efter avslut"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "Kördes efter spelet stängdes."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "Ange kommando efter avslut..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Före start"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Kördes innan instansen är startad."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "Ange kommando före start..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "Startkrokar för spelet"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "Omslag"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "Omslagskommando för att starta Minecraft."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "Ange omslagskommando..."
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Installation"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "{platform} {version} för Minecraft {game_version} är redan installerat"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "Vanilla {game_version} är redan installerad"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "Ändra version"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "Installera"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "Installerar"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "Hämtar modpack versioner"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "Installerar ny version"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "För närvarande installerat"
+  },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": "Felsökningsinformation:"
+  },
+  "instance.settings.tabs.installation.fetching-modpack-details": {
+    "message": "Hämtar modpack detaljer"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Spel version"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "Installera"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "Installation pågår"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "{loader} version"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecraft {version}"
+  },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "Kan inte hämta länkade modpack detaljer. Vänligen kolla din internetanslutning."
+  },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "{loader} är inte tillgänglig för Minecraft {version}. Prova en annan mod laddare."
+  },
+  "instance.settings.tabs.installation.no-modpack-found": {
+    "message": "Denna instans är länkad till ett modpack, men modpacket kunde inte hittas på Modrinth."
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "Plattform"
+  },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "Ominstallera modpack"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Ominstallerar modpack"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "Ominstallation kommer att återställa allt installerat eller modifierat innehåll till det som tillhandahålls av modpacket, och ta bort eventuella mods eller innehåll som du har lagt till ovanpå den ursprungliga installationen. Detta kan åtgärda oväntat beteende om ändringar har gjorts i instansen, men om dina världar nu är beroende av ytterligare installerat innehåll kan det skada befintliga världar."
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "Är du säker att du vill ominstallera denna instans?"
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "Återställer instansens innehåll till dess ursprungliga tillstånd och tar bort eventuella mods eller innehåll som du har lagt till ovanpå det ursprungliga modpacket."
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "Ominstallera modpack"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "Reparera"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "Reparerar"
+  },
+  "instance.settings.tabs.installation.repair.confirm.description": {
+    "message": "Reparation installerar om Minecraft-beroenden och kontrollerar efter korruption. Detta kan åtgärda problem om spelet inte startar på grund av launcher-relaterade fel, men löser inte problem eller krascher som är relaterade till installerade mods."
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "Reparera instans?"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "Reparation pågår"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "Återställ till nuvarande"
+  },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "Visa alla versioner"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "ändra version"
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "installera"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "ominstallera"
+  },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "reparera"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "Kan inte {action} medans installationen pågår"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "Kan inte {action} medans offline"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "Kan inte {action} medans reparationen pågår"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(okänd version)"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "Ta bort koppling till instans"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": "Om du fortsätter kommer du inte kunna länka om den utan att skapa en helt ny instans. Du kommer inte längre att ta emot uppdateringar för modpacket och det kommer att bli en vanlig instans."
+  },
+  "instance.settings.tabs.installation.unlink.confirm.title": {
+    "message": "Är du säker att du vill ta bort koppling till denna instans?"
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "Denna instans är kopplad till ett modpack, vilket menas att mods kan inte bli uppdaterade och du kan inte ändra mod-loader eller Minecraft version. Att ta bort kopplingen kommer permanent att koppla bort denna instans från modpacket."
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "Ta bort koppling från modpack"
+  },
+  "instance.settings.tabs.java": {
+    "message": "Java och minne"
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "Miljövariabler"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "Krokar"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Java argument"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Java installation"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "Tilldelat minne"
+  },
+  "instance.settings.tabs.window": {
+    "message": "Fönster"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Egendefinierade fönsterinställningar"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Helskärm"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "Få spelet att starta i helskärm vid uppstart (använder options.txt)."
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "Höjd"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "Höjden på spel-fönstret vid uppstart."
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "Ange höjd..."
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "Bredd"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "Bredden på spel-fönstret vid uppstart."
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "Ange bredd..."
+  },
+  "instance.settings.title": {
+    "message": "Inställningar"
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "En Minecraft Server"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "Kan inte ansluta till server"
+  },
+  "instance.worlds.copy_address": {
+    "message": "Kopiera adress"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "Visa inte på Startsidan"
+  },
+  "instance.worlds.filter.available": {
+    "message": "Tillgängliga"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "Instans är redan öppen"
+  },
+  "instance.worlds.hardcore": {
+    "message": "Hardcore läge"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "Servern är inkompatibel"
+  },
+  "instance.worlds.no_contact": {
+    "message": "Servern kunde inte kontaktas"
+  },
+  "instance.worlds.no_server_quick_play": {
+    "message": "Du kan bara hoppa rakt in till servers på Minecraft Alfa 1.0.5+"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "Du kan bara hoppa rakt in till enspelarläge världar på Minecraft 1,20+"
+  },
+  "instance.worlds.play_instance": {
+    "message": "Spela instans"
+  },
+  "instance.worlds.type.server": {
+    "message": "Server"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "Enspelarläge"
+  },
+  "instance.worlds.view_instance": {
+    "message": "Visa instans"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "Värld används"
+  },
+  "search.filter.locked.instance": {
+    "message": "Tillhandahållet av instansen"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "Spel version är tillhandahållet av instansen"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "Laddaren tillhandahålls av instansen"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "Synkronisera med instansen"
+  }
+}

@@ -1,0 +1,1430 @@
+{
+  "admin.billing.error.not-found": {
+    "message": "Korisnik nije pronađen"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "Odobri"
+  },
+  "auth.authorize.action.decline": {
+    "message": "Odbi"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> od <creator-link>{creator}</creator-link> će moći da:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "Odobri {appName}"
+  },
+  "auth.authorize.error.no-redirect-url": {
+    "message": "Nije pronađena lokacija za preusmeravanje u odgovoru"
+  },
+  "auth.authorize.redirect-url": {
+    "message": "Bićete preusmereni na <redirect-url>{url}</redirect-url>"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "Pošalji email za oporavak"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "Unesite vaš email ispod i poslaćemo vam link za oporavak kako biste povratili svoj nalog."
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "Email ili korisničko ime"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "Email"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "Poslat vam je email sa uputstvima ako je email već povezan sa vašim nalogom."
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "Email poslat"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "Sada se možete prijaviti na svoj nalog koristeći novu lozinku."
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "Lozinka je uspješno resetovana"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "Resetuj lozinku"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "Potvrdi lozinku"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "Unesite novu lozinku ispod kako biste pristupili svom nalogu."
+  },
+  "auth.reset-password.title": {
+    "message": "Resetuj Lozinku"
+  },
+  "auth.reset-password.title.long": {
+    "message": "Resetujte svoju lozinku"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "Unesite kod za dvofaktorsku autentifikaciju da biste nastavili."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "Unesite kod za dvofaktorsku autentifikaciju"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "Unesite kod..."
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-link>Zaboravili ste lozinku?</forgot-password-link> • <create-account-link>Kreirajte nalog</create-account-link>"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "Email ili korisničko ime"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Lozinka"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Prijavi se sa"
+  },
+  "auth.sign-in.title": {
+    "message": "Prijavi se"
+  },
+  "auth.sign-in.use-password": {
+    "message": "Ili koristite lozinku"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Kreirajte nalog"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "Potvrdite lozinku"
+  },
+  "auth.sign-up.email.label": {
+    "message": "Email"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Korisničko ime"
+  },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "Kreiranjem naloga prihvatate <terms-link>Uslove</terms-link> i <privacy-policy-link>Pravila privatnosti</privacy-policy-link> Modrintha."
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "Lozinke se ne poklapaju!"
+  },
+  "auth.sign-up.password.label": {
+    "message": "Lozinka"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "Već imate nalog?"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "Pretplatite se za novosti o Modrinthu"
+  },
+  "auth.sign-up.title": {
+    "message": "Registracija"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "Ili kreirajte nalog sami"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Prijavite se sa"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Podešavanja naloga"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Prijavite se"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "Vaš email je već verifikovan!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "Email već verifikovan"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "Ponovo pošalji email za verifikaciju"
+  },
+  "auth.verify-email.failed-verification.description": {
+    "message": "Nismo mogli da verifikujemo vaš email. Pokušajte ponovo da pošaljete email za verifikaciju preko vašeg kontrolnog panela tako što ćete se prijaviti."
+  },
+  "auth.verify-email.failed-verification.description.logged-in": {
+    "message": "Nismo mogli da verifikujemo vaš email. Pokušajte ponovo da pošaljete email za verifikaciju pomoću dugmeta ispod."
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "Verifikacija email-a nije uspela"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "Vaša email adresa je uspešno verifikovana!"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "Verifikacija email-a"
+  },
+  "auth.verify-email.title": {
+    "message": "Verifikujte email"
+  },
+  "auth.welcome.checkbox.subscribe": {
+    "message": "Pretplatite se za novosti o Modrinthu"
+  },
+  "auth.welcome.description": {
+    "message": "Sada ste deo sjajne zajednice kreatora i istraživača koji već kreiraju, preuzimaju i prate najnovije modove."
+  },
+  "auth.welcome.label.tos": {
+    "message": "Kreiranjem naloga pristali ste na <terms-link>Uslove</terms-link> i <privacy-policy-link>Pravila privatnosti</privacy-policy-link> Modrintha."
+  },
+  "auth.welcome.long-title": {
+    "message": "Dobrodošli na Modrinth!"
+  },
+  "auth.welcome.title": {
+    "message": "Dobrodošli"
+  },
+  "collection.button.delete-icon": {
+    "message": "Ikona za brisanje"
+  },
+  "collection.button.edit-icon": {
+    "message": "Ikona za izmenu"
+  },
+  "collection.button.remove-project": {
+    "message": "Ukloni projekat"
+  },
+  "collection.button.unfollow-project": {
+    "message": "Prestani da pratite projekat"
+  },
+  "collection.delete-modal.description": {
+    "message": "Ovo će zauvek ukloniti ovu kolekciju. Ova akcija se ne može poništiti."
+  },
+  "collection.delete-modal.title": {
+    "message": "Da li ste sigurni da želite da obrišete ovu kolekciju?"
+  },
+  "collection.description": {
+    "message": "{description} - Pogledajte kolekciju {name} korisnika {username} na Modrinthu"
+  },
+  "collection.description.following": {
+    "message": "Automatski generisana kolekcija svih projekata koje pratite."
+  },
+  "collection.error.not-found": {
+    "message": "Kolekcija nije pronađena"
+  },
+  "collection.label.collection": {
+    "message": "Kolekcija"
+  },
+  "collection.label.created-at": {
+    "message": "Kreirano pre {ago}"
+  },
+  "collection.label.curated-by": {
+    "message": "Kreirano od strane"
+  },
+  "collection.label.no-projects": {
+    "message": "Ova kolekcija nema projekte!"
+  },
+  "collection.label.no-projects-auth": {
+    "message": "Nemate nijedan projekat.\nDa li želite da <create-link>dodatе jedan</create-link>?"
+  },
+  "collection.label.owner": {
+    "message": "Vlasnik"
+  },
+  "collection.label.projects-count": {
+    "message": "{count, plural, one {<stat>{count}</stat> projekat} other {<stat>{count}</stat> projekata}}"
+  },
+  "collection.label.updated-at": {
+    "message": "Ažurirano pre {ago}"
+  },
+  "collection.title": {
+    "message": "{name} - Kolekcija"
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "Kreiraj novo"
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count, plural, one {{count} projekat} other {{count} projekata}}"
+  },
+  "dashboard.collections.label.search-input": {
+    "message": "Pretražite svoje kolekcije"
+  },
+  "dashboard.collections.long-title": {
+    "message": "Vaše kolekcije"
+  },
+  "error.collection.404.list_item.1": {
+    "message": "Možda ste pogrešno uneli URL kolekcije."
+  },
+  "error.collection.404.list_item.2": {
+    "message": "Kolekcija može biti privatna."
+  },
+  "error.collection.404.list_item.3": {
+    "message": "Kolekcija je možda uklonjena od strane Modrinth tima za moderaciju zbog kršenja naših <tou-link>Uslova korišćenja</tou-link>."
+  },
+  "error.collection.404.list_title": {
+    "message": "Zašto?"
+  },
+  "error.collection.404.title": {
+    "message": "Kolekcija nije pronađena"
+  },
+  "error.generic.404.subtitle": {
+    "message": "Izgleda da stranica koju tražite ne postoji."
+  },
+  "error.generic.404.title": {
+    "message": "Stranica nije pronađena"
+  },
+  "error.generic.default.list_item.1": {
+    "message": "Proverite da li je Modrinth nedostupan na našoj <status-link>stranici statusa</status-link>."
+  },
+  "error.generic.default.list_item.2": {
+    "message": "Ako se ovo nastavi dešavati, možete obavestiti Modrinth tim pridruživši se našem <discord-link>Discord serveru</discord-link>."
+  },
+  "error.generic.default.list_title": {
+    "message": "Molimo pokušajte ponovo za nekoliko minuta."
+  },
+  "error.generic.default.subtitle": {
+    "message": "Nešto je pošlo po zlu."
+  },
+  "error.generic.default.title": {
+    "message": "Ups!"
+  },
+  "error.organization.404.list_item.1": {
+    "message": "Moguće je da ste pogrešno uneli URL organizacije."
+  },
+  "error.organization.404.list_item.2": {
+    "message": "Vlasnik organizacije je možda promenio URL ili ga obrisao."
+  },
+  "error.organization.404.list_item.3": {
+    "message": "Organizacija je možda uklonjena od strane Modrinthovog tima za moderaciju zbog kršenja naših <tou-link>Uslova korišćenja</tou-link>."
+  },
+  "error.organization.404.list_title": {
+    "message": "Zašto?"
+  },
+  "error.organization.404.title": {
+    "message": "Organizacija nije pronađena"
+  },
+  "error.project.404.list_item.1": {
+    "message": "Moguće je da ste pogrešno uneli URL projekta."
+  },
+  "error.project.404.list_item.2": {
+    "message": "Vlasnik projekta je možda promenio URL, postavio projekat kao privatan ili ga obrisao."
+  },
+  "error.project.404.list_item.3": {
+    "message": "Projekat je možda uklonjen od strane Modrinthovog tima za moderaciju zbog kršenja naših <tou-link>Uslova korišćenja</tou-link>."
+  },
+  "error.project.404.list_title": {
+    "message": "Zašto?"
+  },
+  "error.project.404.title": {
+    "message": "Projekat nije pronađen"
+  },
+  "error.user.404.list_item.1": {
+    "message": "Moguće je da ste pogrešno uneli korisničko ime."
+  },
+  "error.user.404.list_item.2": {
+    "message": "Korisnik je možda promenio korisničko ime ili obrisao nalog."
+  },
+  "error.user.404.list_item.3": {
+    "message": "Nalog korisnika je možda ugašen zbog kršenja Modrinthovih <tou-link>Uslova korišćenja</tou-link>."
+  },
+  "error.user.404.list_title": {
+    "message": "Zašto?"
+  },
+  "error.user.404.title": {
+    "message": "Korisnik nije pronađen"
+  },
+  "frog": {
+    "message": "Pretvoren si u žabu! 🐸"
+  },
+  "frog.altText": {
+    "message": "Fotorealistična slika sa žabama"
+  },
+  "frog.froggedPeople": {
+    "message": "{count, plural, one {{count} osoba je takođe pretvorena u žabu} few {{count} osobe su takođe pretvorene u žabe} other {{count} ljudi su takođe pretvoreni u žabe}}!"
+  },
+  "frog.sinceOpened": {
+    "message": "Ova stranica je otvorena pre {ago}"
+  },
+  "frog.title": {
+    "message": "Žaba"
+  },
+  "layout.action.change-theme": {
+    "message": "Promeni temu"
+  },
+  "layout.action.get-modrinth-app": {
+    "message": "Preuzmite Modrinth aplikaciju"
+  },
+  "layout.avatar.alt": {
+    "message": "Vaš avatar"
+  },
+  "layout.banner.account-action": {
+    "message": "Potrebna akcija na nalogu"
+  },
+  "layout.banner.add-email.button": {
+    "message": "Posetite podešavanja naloga"
+  },
+  "layout.banner.add-email.description": {
+    "message": "Iz sigurnosnih razloga, Modrinth traži da registrujete email adresu na svom nalogu."
+  },
+  "layout.banner.build-fail.description": {
+    "message": "Ovo izdanje Modrinth frontend-a nije uspelo da generiše stanje iz API-ja. To može biti zbog prekida rada ili greške u konfiguraciji. Ponovo izgradite kada API bude dostupan. Kodovi grešaka: {errors}; Trenutni API URL je: {url}"
+  },
+  "layout.banner.build-fail.title": {
+    "message": "Pregledate testno okruženje Modrintha."
+  },
+  "layout.banner.staging.description": {
+    "message": "Staging okruženje je potpuno odvojeno od produkcione Modrinth baze podataka. Koristi se za testiranje i debagovanje i može pokretati razvojne verzije backend-a ili frontend-a koje su novije od produkcije."
+  },
+  "layout.banner.staging.title": {
+    "message": "Pregledate testno okruženje Modrintha"
+  },
+  "layout.banner.subscription-payment-failed.button": {
+    "message": "Ažurirajte podatke za plaćanje"
+  },
+  "layout.banner.subscription-payment-failed.description": {
+    "message": "Jedna ili više pretplata nije obnovljeno. Molimo ažurirajte način plaćanja kako biste izbegli gubitak pristupa!"
+  },
+  "layout.banner.subscription-payment-failed.title": {
+    "message": "Potrebna radnja vezana za naplatu."
+  },
+  "layout.banner.verify-email.action": {
+    "message": "Ponovo pošaljite email za verifikaciju"
+  },
+  "layout.banner.verify-email.description": {
+    "message": "Iz sigurnosnih razloga, Modrinth zahteva da verifikujete email adresu povezanu sa vašim nalogom."
+  },
+  "layout.footer.about": {
+    "message": "O nama"
+  },
+  "layout.footer.about.careers": {
+    "message": "Poslovi"
+  },
+  "layout.footer.about.changelog": {
+    "message": "Dnevnik promena"
+  },
+  "layout.footer.about.news": {
+    "message": "Novosti"
+  },
+  "layout.footer.about.rewards-program": {
+    "message": "Program nagrađivanja"
+  },
+  "layout.footer.about.status": {
+    "message": "Status"
+  },
+  "layout.footer.legal": {
+    "message": "Pravno"
+  },
+  "layout.footer.legal-disclaimer": {
+    "message": "NIJE ZVANIČNA MINECRAFT USLUGA. NIJE ODOBRENO NITI POVEZANO SA MOJANG-om ILI MICROSOFT-om."
+  },
+  "layout.footer.legal.copyright-policy": {
+    "message": "Politika autorskih prava i DMCA"
+  },
+  "layout.footer.legal.privacy-policy": {
+    "message": "Politika privatnosti"
+  },
+  "layout.footer.legal.rules": {
+    "message": "Pravila sadržaja"
+  },
+  "layout.footer.legal.security-notice": {
+    "message": "Bezbednosno obaveštenje"
+  },
+  "layout.footer.legal.terms-of-use": {
+    "message": "Uslovi korištenja"
+  },
+  "layout.footer.open-source": {
+    "message": "Modrinth je <github-link>otvorenog koda</github-link>."
+  },
+  "layout.footer.products": {
+    "message": "Proizvodi"
+  },
+  "layout.footer.products.app": {
+    "message": "Modrinth App"
+  },
+  "layout.footer.products.plus": {
+    "message": "Modrinth+"
+  },
+  "layout.footer.products.servers": {
+    "message": "Modrinth serveri"
+  },
+  "layout.footer.resources": {
+    "message": "Resursi"
+  },
+  "layout.footer.resources.api-docs": {
+    "message": "API dokumentacija"
+  },
+  "layout.footer.resources.help-center": {
+    "message": "Centar za pomoć"
+  },
+  "layout.footer.resources.report-issues": {
+    "message": "Prijavite probleme"
+  },
+  "layout.footer.resources.translate": {
+    "message": "Prevedi"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluesky"
+  },
+  "layout.footer.social.discord": {
+    "message": "Discord"
+  },
+  "layout.footer.social.github": {
+    "message": "GitHub"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "Mastodon"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
+  },
+  "layout.menu-toggle.action": {
+    "message": "Prebaci meni"
+  },
+  "layout.meta.description": {
+    "message": "Preuzimajte Minecraft modove, plugine, datapackove, shadere, resourcepackove i modpackove na Modrinthu. Otkrijte i objavite projekte na Modrinthu koristeći moderan, jednostavan interfejs i API."
+  },
+  "layout.meta.og-description": {
+    "message": "Otkrijte i objavite Minecraft sadržaj!"
+  },
+  "layout.nav.home": {
+    "message": "Početna"
+  },
+  "layout.nav.search": {
+    "message": "Pretraga"
+  },
+  "moderation.filter.by": {
+    "message": "Filtriraj po"
+  },
+  "moderation.moderate": {
+    "message": "Moderiraj"
+  },
+  "moderation.page.projects": {
+    "message": "Projekti"
+  },
+  "moderation.page.reports": {
+    "message": "Izvještaji"
+  },
+  "moderation.page.technicalReview": {
+    "message": "Tehnička recenzija"
+  },
+  "moderation.search.placeholder": {
+    "message": "Pretraži..."
+  },
+  "moderation.sort.by": {
+    "message": "Sortiraj po"
+  },
+  "moderation.technical.search.placeholder": {
+    "message": "Pretraži tehničke recenzije..."
+  },
+  "profile.button.billing": {
+    "message": "Upravljaj naplatom korisnika"
+  },
+  "profile.button.info": {
+    "message": "Prikaži podatke o korisniku"
+  },
+  "profile.button.manage-projects": {
+    "message": "Upravljaj projektima"
+  },
+  "profile.error.not-found": {
+    "message": "Korisnik nije pronađen"
+  },
+  "profile.joined-at": {
+    "message": "Pridružio/la se <date>{ago}</date>"
+  },
+  "profile.label.badges": {
+    "message": "Bedževi"
+  },
+  "profile.label.details": {
+    "message": "Detalji"
+  },
+  "profile.label.no-collections": {
+    "message": "Ovaj korisnik nema kolekcija!"
+  },
+  "profile.label.no-collections-auth": {
+    "message": "Nemate nijednu kolekciju.\nDa li želite da <create-link>kreirate jednu</create-link>?"
+  },
+  "profile.label.no-projects": {
+    "message": "Ovaj korisnik nema projekata!"
+  },
+  "profile.label.no-projects-auth": {
+    "message": "Nemate nijedan projekat.\nDa li želite da <create-link>kreirate jedan</create-link>?"
+  },
+  "profile.label.organizations": {
+    "message": "Organizacije"
+  },
+  "profile.meta.description": {
+    "message": "Preuzmite projekte korisnika {username} na Modrinthu"
+  },
+  "profile.meta.description-with-bio": {
+    "message": "{bio} - Preuzmite projekte korisnika {username} na Modrinthu"
+  },
+  "profile.stats.downloads": {
+    "message": "{count, plural, one {<stat>{count}</stat> preuzimanje projekta} few {<stat>{count}</stat> preuzimanja projekta} other {<stat>{count}</stat> preuzimanja projekata}}"
+  },
+  "profile.stats.projects": {
+    "message": "{count, plural, one {<stat>{count}</stat> projekat} few {<stat>{count}</stat> projekta} other {<stat>{count}</stat> projekata}}"
+  },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, one {<stat>{count}</stat> pratilac projekta} few {<stat>{count}</stat> pratioca projekta} other {<stat>{count}</stat> pratilaca projekta}}"
+  },
+  "profile.user-id": {
+    "message": "ID korisnika: {id}"
+  },
+  "project-member-header.accept": {
+    "message": "Prihvati"
+  },
+  "project-member-header.decline": {
+    "message": "Odbij"
+  },
+  "project-member-header.error": {
+    "message": "Greška"
+  },
+  "project-member-header.error-decline": {
+    "message": "Neuspešno odbijanje poziva tima"
+  },
+  "project-member-header.error-join": {
+    "message": "Neuspešno prihvatanje poziva tima"
+  },
+  "project-member-header.invitation-no-role": {
+    "message": "Pozvani ste da se pridružite ovom projektu. Molimo prihvatite ili odbijte poziv."
+  },
+  "project-member-header.invitation-title": {
+    "message": "Poziv za pridruživanje projektu"
+  },
+  "project-member-header.invitation-with-role": {
+    "message": "Pozvani ste da postanete član ovog projekta za ulogom '{role}'."
+  },
+  "project-member-header.success": {
+    "message": "Uspešno"
+  },
+  "project-member-header.success-decline": {
+    "message": "Odbili ste poziv tima"
+  },
+  "project-member-header.success-join": {
+    "message": "Pridružili ste se timu projekta"
+  },
+  "project-type.collection.plural": {
+    "message": "Kolekcije"
+  },
+  "project-type.collection.singular": {
+    "message": "Kolekcija"
+  },
+  "project-type.datapack.plural": {
+    "message": "Data Packovi"
+  },
+  "project-type.datapack.singular": {
+    "message": "Data Pack"
+  },
+  "project-type.mod.plural": {
+    "message": "Modovi"
+  },
+  "project-type.mod.singular": {
+    "message": "Mod"
+  },
+  "project-type.modpack.plural": {
+    "message": "Modpackovi"
+  },
+  "project-type.modpack.singular": {
+    "message": "Modpack"
+  },
+  "project-type.plugin.plural": {
+    "message": "Plugini"
+  },
+  "project-type.plugin.singular": {
+    "message": "Plugin"
+  },
+  "project-type.project.plural": {
+    "message": "Projekti"
+  },
+  "project-type.project.singular": {
+    "message": "Projekat"
+  },
+  "project-type.resourcepack.plural": {
+    "message": "Resource Packovi"
+  },
+  "project-type.resourcepack.singular": {
+    "message": "Resource Pack"
+  },
+  "project-type.shader.plural": {
+    "message": "Shaderi"
+  },
+  "project-type.shader.singular": {
+    "message": "Shader"
+  },
+  "project.about.details.created": {
+    "message": "Kreirano {date}"
+  },
+  "project.about.details.licensed": {
+    "message": "Licencirano {license}"
+  },
+  "project.about.details.published": {
+    "message": "Objavljeno {date}"
+  },
+  "project.about.details.submitted": {
+    "message": "Poslato {date}"
+  },
+  "project.about.details.title": {
+    "message": "Detalji"
+  },
+  "project.about.details.updated": {
+    "message": "Ažurirano {date}"
+  },
+  "project.description.title": {
+    "message": "Opis"
+  },
+  "project.gallery.title": {
+    "message": "Galerija"
+  },
+  "project.moderation.title": {
+    "message": "Moderacija"
+  },
+  "project.stats.downloads-label": {
+    "message": "{count, plural, one {{count} preuzimanje} other {{count} preuzimanja}}"
+  },
+  "project.stats.followers-label": {
+    "message": "{count, plural, one {{count} pratilac} few {{count} pratioca} other {{count} pratilaca}}"
+  },
+  "project.version.all-versions": {
+    "message": "Sve verzije"
+  },
+  "project.version.back-to-versions": {
+    "message": "Nazad na verzije"
+  },
+  "project.versions.title": {
+    "message": "Verzije"
+  },
+  "report.already-reported": {
+    "message": "Već ste prijavili {title}"
+  },
+  "report.already-reported-description": {
+    "message": "Već imate otvorenu prijavu za ovaj {item}. Ako imate dodatne informacije, možete dodati detalje toj prijavi."
+  },
+  "report.back-to-item": {
+    "message": "Nazad na {item}"
+  },
+  "report.body.description": {
+    "message": "Uključite linkove i slike kad je moguće i relevantno. Prazne ili nedovoljne prijave biće zatvorene i ignorisane."
+  },
+  "report.body.title": {
+    "message": "Molimo navedite dodatni kontekst za vašu prijavu"
+  },
+  "report.checking": {
+    "message": "Proveravam {item}..."
+  },
+  "report.could-not-find": {
+    "message": "Nije moguće pronaći {item}"
+  },
+  "report.for.violation": {
+    "message": "Kršenje Modrinth-ovih <rules-link>Pravila</rules-link> ili <terms-link>Uslova korišćenja</terms-link>"
+  },
+  "report.for.violation.description": {
+    "message": "Primeri uključuju maliciozan, spam, uvredljiv, obmanjujući i nezakonit sadržaj."
+  },
+  "report.form-not-for": {
+    "message": "Ovaj obrazac nije za:"
+  },
+  "report.go-to-report": {
+    "message": "Idi na prijavu"
+  },
+  "report.not-for.bug-reports": {
+    "message": "Prijave grešaka"
+  },
+  "report.not-for.bug-reports.description": {
+    "message": "Greške možete prijaviti na njihovom <issues-link>issue tracker-u</issues-link>."
+  },
+  "report.not-for.dmca": {
+    "message": "DMCA zahtevi za uklanjanje"
+  },
+  "report.not-for.dmca.description": {
+    "message": "Pogledajte našu <policy-link>Politiku autorskih prava</policy-link>."
+  },
+  "report.note.copyright.1": {
+    "message": "Imajte na umu da *ne* podnosite DMCA zahtev za uklanjanje ovom prijavom, nego prijavljujete ponovo postavljen sadržaj."
+  },
+  "report.note.copyright.2": {
+    "message": "Ako ste hteli da podnesete DMCA zahtev (što je pravna radnja), pogledajte našu <copyright-policy-link>Politiku autorskih prava</copyright-policy-link>."
+  },
+  "report.note.malicious.1": {
+    "message": "Prijave za maliciozan ili obmanjujući sadržaj moraju sadržati značajne dokaze, kao što su primeri koda."
+  },
+  "report.note.malicious.2": {
+    "message": "Sažeci iz Microsoft Defender-a, VirusTotal-a ili AI detekcije malvera nisu dovoljni i neće biti prihvaćeni."
+  },
+  "report.please-report": {
+    "message": "Molimo prijavite:"
+  },
+  "report.question.content-id": {
+    "message": "Koji je ID {item}?"
+  },
+  "report.question.content-type": {
+    "message": "Koju vrstu sadržaja prijavljujete?"
+  },
+  "report.question.report-reason": {
+    "message": "Koje pravilo Modrintha krši ovaj {item}?"
+  },
+  "report.report-content": {
+    "message": "Prijavi sadržaj moderatorima"
+  },
+  "report.report-item": {
+    "message": "Prijavi {title} moderatorima"
+  },
+  "report.submit": {
+    "message": "Pošaljite prijavu"
+  },
+  "revenue.transfers.total": {
+    "message": "Isplatili ste ukupno {amount}."
+  },
+  "revenue.transfers.total.method": {
+    "message": "Isplatili ste {amount} putem {method}."
+  },
+  "revenue.transfers.total.year": {
+    "message": "Isplatili ste {amount} u {year}."
+  },
+  "revenue.transfers.total.year_method": {
+    "message": "Isplatili ste {amount} u {year} putem {method}."
+  },
+  "scopes.analytics.description": {
+    "message": "Pristupite svojim analitičkim podacima"
+  },
+  "scopes.analytics.label": {
+    "message": "Pristup analitici"
+  },
+  "scopes.collectionCreate.description": {
+    "message": "Omogućava kreiranje kolekcija"
+  },
+  "scopes.collectionCreate.label": {
+    "message": "Kreiranje kolekcija"
+  },
+  "scopes.collectionDelete.description": {
+    "message": "Omogućava brisanje kolekcija"
+  },
+  "scopes.collectionDelete.label": {
+    "message": "Brisanje kolekcija"
+  },
+  "scopes.collectionRead.description": {
+    "message": "Omogućava čitanje kolekcija"
+  },
+  "scopes.collectionRead.label": {
+    "message": "Čitanje kolekcija"
+  },
+  "scopes.collectionWrite.description": {
+    "message": "Omogućava uređivanje i dodavanje stavki u kolekcije"
+  },
+  "scopes.collectionWrite.label": {
+    "message": "Uređivanje kolekcija"
+  },
+  "scopes.notificationRead.description": {
+    "message": "Omogućava čitanje vaših obavještenja"
+  },
+  "scopes.notificationRead.label": {
+    "message": "Čitanje obavještenja"
+  },
+  "scopes.notificationWrite.description": {
+    "message": "Omogućava brisanje i pregled vaših obavještenja"
+  },
+  "scopes.notificationWrite.label": {
+    "message": "Uređivanje obavještenja"
+  },
+  "scopes.organizationCreate.description": {
+    "message": "Omogućava kreiranje organizacija"
+  },
+  "scopes.organizationCreate.label": {
+    "message": "Kreiranje organizacija"
+  },
+  "scopes.organizationDelete.description": {
+    "message": "Omogućava brisanje organizacija"
+  },
+  "scopes.organizationDelete.label": {
+    "message": "Brisanje organizacija"
+  },
+  "scopes.organizationRead.description": {
+    "message": "Omogućava čitanje organizacija"
+  },
+  "scopes.organizationRead.label": {
+    "message": "Čitanje organizacija"
+  },
+  "scopes.organizationWrite.description": {
+    "message": "Omogućava izmene podataka o organizacijama"
+  },
+  "scopes.organizationWrite.label": {
+    "message": "Uređivanje organizacija"
+  },
+  "scopes.patCreate.description": {
+    "message": "Omogućava kreiranje ličnih API tokena"
+  },
+  "scopes.patCreate.label": {
+    "message": "Kreiranje PAT-ova"
+  },
+  "scopes.patDelete.description": {
+    "message": "Omogućava brisanje vaših ličnih API tokena"
+  },
+  "scopes.patDelete.label": {
+    "message": "Brisanje PAT-ova"
+  },
+  "scopes.patRead.description": {
+    "message": "Omogućava pregled kreiranih API tokena"
+  },
+  "scopes.patRead.label": {
+    "message": "Čitanje PAT-ova"
+  },
+  "scopes.patWrite.description": {
+    "message": "Omogućava izmenu ličnih API tokena"
+  },
+  "scopes.patWrite.label": {
+    "message": "Uređivanje PAT-ova"
+  },
+  "scopes.payoutsRead.description": {
+    "message": "Omogućava čitanje podataka o vašim isplatama"
+  },
+  "scopes.payoutsRead.label": {
+    "message": "Čitanje isplata"
+  },
+  "scopes.payoutsWrite.description": {
+    "message": "Omogućava upravljanje isplatama"
+  },
+  "scopes.payoutsWrite.label": {
+    "message": "Upravljanje isplatama"
+  },
+  "scopes.performAnalytics.description": {
+    "message": "Omogućava izvođenje analitičkih radnji"
+  },
+  "scopes.performAnalytics.label": {
+    "message": "Izvođenje analitike"
+  },
+  "scopes.projectCreate.description": {
+    "message": "Omogućava kreiranje novih projekata"
+  },
+  "scopes.projectCreate.label": {
+    "message": "Kreiranje projekata"
+  },
+  "scopes.projectDelete.description": {
+    "message": "Omogućava brisanje vaših projekata"
+  },
+  "scopes.projectDelete.label": {
+    "message": "Brisanje projekata"
+  },
+  "scopes.projectRead.description": {
+    "message": "Omogućava čitanje svih vaših projekata"
+  },
+  "scopes.projectRead.label": {
+    "message": "Čitanje projekata"
+  },
+  "scopes.projectWrite.description": {
+    "message": "Omogućava izmene podataka o projektima"
+  },
+  "scopes.projectWrite.label": {
+    "message": "Uređivanje projekata"
+  },
+  "scopes.reportCreate.description": {
+    "message": "Omogućava kreiranje prijava"
+  },
+  "scopes.reportCreate.label": {
+    "message": "Kreiranje prijava"
+  },
+  "scopes.reportDelete.description": {
+    "message": "Omogućava brisanje prijava"
+  },
+  "scopes.reportDelete.label": {
+    "message": "Brisanje prijava"
+  },
+  "scopes.reportRead.description": {
+    "message": "Omogućava čitanje prijava"
+  },
+  "scopes.reportRead.label": {
+    "message": "Čitanje prijava"
+  },
+  "scopes.reportWrite.description": {
+    "message": "Omogućava izmenu prijava"
+  },
+  "scopes.reportWrite.label": {
+    "message": "Uređivanje prijava"
+  },
+  "scopes.sessionAccess.description": {
+    "message": "Omogućava pristup Modrinth-izdatim sesijama"
+  },
+  "scopes.sessionAccess.label": {
+    "message": "Pristup sesijama"
+  },
+  "scopes.sessionDelete.description": {
+    "message": "Omogućava brisanje sesija"
+  },
+  "scopes.sessionDelete.label": {
+    "message": "Brisanje sesija"
+  },
+  "scopes.sessionRead.description": {
+    "message": "Omogućava čitanje aktivnih sesija"
+  },
+  "scopes.sessionRead.label": {
+    "message": "Čitanje sesija"
+  },
+  "scopes.threadRead.description": {
+    "message": "Omogućava čitanje diskusija"
+  },
+  "scopes.threadRead.label": {
+    "message": "Čitanje diskusija"
+  },
+  "scopes.threadWrite.description": {
+    "message": "Omogućava pisanje diskusija"
+  },
+  "scopes.threadWrite.label": {
+    "message": "Pisanje diskusija"
+  },
+  "scopes.userAuthWrite.description": {
+    "message": "Omogućava izmenu podataka za autentifikaciju"
+  },
+  "scopes.userAuthWrite.label": {
+    "message": "Izmena auth podataka"
+  },
+  "scopes.userDelete.description": {
+    "message": "Omogućava brisanje vašeg naloga"
+  },
+  "scopes.userDelete.label": {
+    "message": "Brisanje naloga"
+  },
+  "scopes.userRead.description": {
+    "message": "Omogućava pristup javnim podacima profila"
+  },
+  "scopes.userRead.label": {
+    "message": "Čitanje podataka korisnika"
+  },
+  "scopes.userReadEmail.description": {
+    "message": "Omogućava čitanje email adrese korisnika"
+  },
+  "scopes.userReadEmail.label": {
+    "message": "Čitanje email-a korisnika"
+  },
+  "scopes.userWrite.description": {
+    "message": "Omogućava izmene profila"
+  },
+  "scopes.userWrite.label": {
+    "message": "Izmena podataka korisnika"
+  },
+  "scopes.versionCreate.description": {
+    "message": "Omogućava kreiranje novih verzija"
+  },
+  "scopes.versionCreate.label": {
+    "message": "Kreiranje verzija"
+  },
+  "scopes.versionDelete.description": {
+    "message": "Omogućava brisanje verzija"
+  },
+  "scopes.versionDelete.label": {
+    "message": "Brisanje verzija"
+  },
+  "scopes.versionRead.description": {
+    "message": "Omogućava čitanje svih verzija"
+  },
+  "scopes.versionRead.label": {
+    "message": "Čitanje verzija"
+  },
+  "scopes.versionWrite.description": {
+    "message": "Omogućava izmene podataka o verzijama"
+  },
+  "scopes.versionWrite.label": {
+    "message": "Izmene verzija"
+  },
+  "search.filter.locked.server": {
+    "message": "Obezbeđeno od strane servera"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Verzija igre obezbeđena od strane servera"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Loader obezbeđen od strane servera"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "Sinhronizuj sa serverom"
+  },
+  "servers.backup.create.in-progress.tooltip": {
+    "message": "Kreiranje backupa u toku"
+  },
+  "servers.backup.restore.in-progress.tooltip": {
+    "message": "Vraćanje iz backupa u toku"
+  },
+  "servers.backups.item.already-preparing": {
+    "message": "Već se priprema backup za preuzimanje"
+  },
+  "servers.backups.item.automated": {
+    "message": "Automatski"
+  },
+  "servers.backups.item.creating-backup": {
+    "message": "Pravljenje backupa..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "message": "Neuspešno kreiranje backupa"
+  },
+  "servers.backups.item.failed-to-prepare-backup": {
+    "message": "Neuspešno pripremanje za preuzimanje"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "message": "Neuspešno vraćanje iz backupa"
+  },
+  "servers.backups.item.lock": {
+    "message": "Zaključaj"
+  },
+  "servers.backups.item.locked": {
+    "message": "Zaključano"
+  },
+  "servers.backups.item.prepare-download": {
+    "message": "Pripremi preuzimanje"
+  },
+  "servers.backups.item.prepare-download-again": {
+    "message": "Pokušajte ponovo da pripremite"
+  },
+  "servers.backups.item.preparing-download": {
+    "message": "Pripremanje preuzimanja..."
+  },
+  "servers.backups.item.queued-for-backup": {
+    "message": "U redu za backup"
+  },
+  "servers.backups.item.rename": {
+    "message": "Preimenuj"
+  },
+  "servers.backups.item.restore": {
+    "message": "Vrati"
+  },
+  "servers.backups.item.restoring-backup": {
+    "message": "Vraćanje iz backupa..."
+  },
+  "servers.backups.item.retry": {
+    "message": "Pokušaj ponovo"
+  },
+  "servers.backups.item.unlock": {
+    "message": "Otključaj"
+  },
+  "servers.notice.actions": {
+    "message": "Radnje"
+  },
+  "servers.notice.begins": {
+    "message": "Počinje"
+  },
+  "servers.notice.dismissable": {
+    "message": "Odbacivo"
+  },
+  "servers.notice.expires": {
+    "message": "Ističe"
+  },
+  "servers.notice.id": {
+    "message": "ID"
+  },
+  "servers.notice.level": {
+    "message": "Nivo"
+  },
+  "servers.notice.undismissable": {
+    "message": "Neodbacivo"
+  },
+  "servers.notices.create-notice": {
+    "message": "Kreiraj obaveštenje"
+  },
+  "servers.notices.no-notices": {
+    "message": "Nema obaveštenja"
+  },
+  "servers.plan.large.description": {
+    "message": "Idealno za 15–25 igrača, modpackove ili intenzivno modovanje."
+  },
+  "servers.plan.large.name": {
+    "message": "Veliki"
+  },
+  "servers.plan.medium.description": {
+    "message": "Odlično za 6–15 igrača i više modova."
+  },
+  "servers.plan.medium.name": {
+    "message": "Srednje"
+  },
+  "servers.plan.small.description": {
+    "message": "Savršeno za 1–5 prijatelja sa nekoliko lakih modova."
+  },
+  "servers.plan.small.name": {
+    "message": "Mali"
+  },
+  "settings.billing.modal.cancel.action": {
+    "message": "Otkaži pretplatu"
+  },
+  "settings.billing.modal.cancel.description": {
+    "message": "Ovo će otkazati vašu pretplatu. Zadržaćete pogodnosti do kraja tekućeg obračunskog ciklusa."
+  },
+  "settings.billing.modal.cancel.title": {
+    "message": "Da li ste sigurni da želite otkazati pretplatu?"
+  },
+  "settings.billing.modal.delete.action": {
+    "message": "Uklonite ovaj način plaćanja"
+  },
+  "settings.billing.modal.delete.description": {
+    "message": "Ovo će zauvek ukloniti ovaj način plaćanja (ozbiljno — zauvek)."
+  },
+  "settings.billing.modal.delete.title": {
+    "message": "Da li ste sigurni da želite ukloniti ovaj način plaćanja?"
+  },
+  "settings.billing.payment_method.action.add": {
+    "message": "Dodaj način plaćanja"
+  },
+  "settings.billing.payment_method.action.history": {
+    "message": "Pregled prethodnih naplata"
+  },
+  "settings.billing.payment_method.action.primary": {
+    "message": "Postavi kao primarni"
+  },
+  "settings.billing.payment_method.card_display": {
+    "message": "{card_brand} koja se završava na {last_four}"
+  },
+  "settings.billing.payment_method.card_expiry": {
+    "message": "Ističe {month}/{year}"
+  },
+  "settings.billing.payment_method.none": {
+    "message": "Niste dodali nijedan način plaćanja."
+  },
+  "settings.billing.payment_method.primary": {
+    "message": "Primarni"
+  },
+  "settings.billing.payment_method.title": {
+    "message": "Načini plaćanja"
+  },
+  "settings.billing.payment_method_type.amazon_pay": {
+    "message": "Amazon Pay"
+  },
+  "settings.billing.payment_method_type.amex": {
+    "message": "American Express"
+  },
+  "settings.billing.payment_method_type.cashapp": {
+    "message": "Cash App"
+  },
+  "settings.billing.payment_method_type.diners": {
+    "message": "Diners Club"
+  },
+  "settings.billing.payment_method_type.discover": {
+    "message": "Discover"
+  },
+  "settings.billing.payment_method_type.eftpos": {
+    "message": "EFTPOS"
+  },
+  "settings.billing.payment_method_type.jcb": {
+    "message": "JCB"
+  },
+  "settings.billing.payment_method_type.mastercard": {
+    "message": "MasterCard"
+  },
+  "settings.billing.payment_method_type.paypal": {
+    "message": "PayPal"
+  },
+  "settings.billing.payment_method_type.unionpay": {
+    "message": "UnionPay"
+  },
+  "settings.billing.payment_method_type.unknown": {
+    "message": "Nepoznati način plaćanja"
+  },
+  "settings.billing.payment_method_type.visa": {
+    "message": "Visa"
+  },
+  "settings.billing.pyro_subscription.description": {
+    "message": "Upravljajte svojim Modrinth Server pretplatama."
+  },
+  "settings.billing.pyro_subscription.title": {
+    "message": "Modrinth Server Pretplate"
+  },
+  "settings.billing.subscription.description": {
+    "message": "Upravljate svojim Modrinth pretplatama."
+  },
+  "settings.billing.subscription.title": {
+    "message": "Pretplate"
+  },
+  "settings.display.banner.developer-mode.button": {
+    "message": "Deaktiviraj developerski režim"
+  },
+  "settings.display.banner.developer-mode.description": {
+    "message": "<strong>Developerski režim</strong> je aktivan. Ovo će vam omogućiti da vidite interne ID-je raznih stvari na Modrinthu, što može biti korisno ako ste developer koji koristi Modrinth API. Kliknite na Modrinth logo na dnu stranice 5 puta da biste uključili/isključili developerski režim."
+  },
+  "settings.display.flags.description": {
+    "message": "Uključite ili isključite određene funkcije na ovom uređaju."
+  },
+  "settings.display.flags.title": {
+    "message": "Prebaci funkcije"
+  },
+  "settings.display.project-list-layouts.datapack": {
+    "message": "Stranica Data Packova"
+  },
+  "settings.display.project-list-layouts.description": {
+    "message": "Izaberite željeni raspored za svaku stranicu koja prikazuje liste projekata na ovom uređaju."
+  },
+  "settings.display.project-list-layouts.mod": {
+    "message": "Stranica Modova"
+  },
+  "settings.display.project-list-layouts.modpack": {
+    "message": "Stranica Modpackova"
+  },
+  "settings.display.project-list-layouts.plugin": {
+    "message": "Stranica Plugina"
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "message": "Stranica Resource Packova"
+  },
+  "settings.display.project-list-layouts.shader": {
+    "message": "Stranica Shadera"
+  },
+  "settings.display.project-list-layouts.title": {
+    "message": "Rasporedi liste projekata"
+  },
+  "settings.display.project-list-layouts.user": {
+    "message": "Stranica profila korisnika"
+  },
+  "settings.display.project-list.layouts.collection": {
+    "message": "Kolekcija"
+  },
+  "settings.display.sidebar.advanced-rendering.description": {
+    "message": "Omogućava napredno renderovanje, poput efekata zamagljenja, koje bez hardverski ubrzanog renderovanja može izazvati probleme sa performansama."
+  },
+  "settings.display.sidebar.advanced-rendering.title": {
+    "message": "Napredno renderovanje"
+  },
+  "settings.display.sidebar.external-links-new-tab.description": {
+    "message": "Otvarajte linkove koji vode izvan Modrintha u novom tabu. Bez obzira na ovo podešavanje, linkovi na istoj domeni i u Markdown opisima otvaraju se u istom tabu, a linkovi u oglasima i na stranicama za uređivanje otvaraju se u novom tabu."
+  },
+  "settings.display.sidebar.external-links-new-tab.title": {
+    "message": "Otvaraj spoljne linkove u novom tabu"
+  },
+  "settings.display.sidebar.hide-app-promos.description": {
+    "message": "Sakriva dugmad \"Preuzmite Modrinth App\" iz primarne navigacije. Stranicu Modrinth App i dalje možete naći na početnoj strani ili u footeru."
+  },
+  "settings.display.sidebar.hide-app-promos.title": {
+    "message": "Sakrij promocije Modrinth App-a"
+  },
+  "settings.display.sidebar.left-aligned-content-sidebar.title": {
+    "message": "Levo poravnata bočna traka na stranicama sa sadržajem"
+  },
+  "settings.display.sidebar.right-aligned-content-sidebar.description": {
+    "message": "Poravnava bočnu traku levo od sadržaja stranice."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
+    "message": "Poravnava bočnu traku filtera na desnu stranu rezultata pretrage."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
+    "message": "Desno poravnata bočna traka filtera na stranicama za pretragu"
+  },
+  "settings.display.theme.description": {
+    "message": "Izaberite željenu temu boja za Modrinth na ovom uređaju."
+  },
+  "settings.display.theme.title": {
+    "message": "Tema boja"
+  },
+  "settings.language.categories.auto": {
+    "message": "Automatski"
+  },
+  "settings.language.categories.default": {
+    "message": "Standardni jezici"
+  },
+  "settings.language.categories.experimental": {
+    "message": "Eksperimentalni jezici"
+  },
+  "settings.language.categories.fun": {
+    "message": "Zabavni jezici"
+  },
+  "settings.language.categories.search-result": {
+    "message": "Rezultati pretrage"
+  },
+  "settings.language.description": {
+    "message": "Izaberite željeni jezik za sajt. Prevode doprinose volonteri <crowdin-link>na Crowdin-u</crowdin-link>."
+  },
+  "settings.language.languages.automatic": {
+    "message": "Sinhronizuj sa sistemskim jezikom"
+  },
+  "settings.language.languages.language-label-applying": {
+    "message": "{label}. Primenjuje se..."
+  },
+  "settings.language.languages.language-label-error": {
+    "message": "{label}. Greška"
+  },
+  "settings.language.languages.load-failed": {
+    "message": "Ovaj jezik se ne može učitati. Pokušajte ponovo za malo."
+  },
+  "settings.language.languages.search-field.description": {
+    "message": "Pošaljite da biste fokusirali prvi rezultat pretrage"
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "message": "Pretraži jezik..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "message": "{matches, plural, =0 {Nijedan jezik ne odgovara vašoj pretrazi} one {# jezik odgovara vašoj pretrazi} other {# jezika odgovara vašoj pretrazi}}."
+  },
+  "settings.language.languages.search.no-results": {
+    "message": "Nijedan jezik ne odgovara vašoj pretrazi."
+  },
+  "settings.pats.action.create": {
+    "message": "Kreirajte PAT"
+  },
+  "settings.pats.description": {
+    "message": "PAT-ovi se mogu koristiti za pristup Modrinth API-ju. Za više informacija, pogledajte <doc-link>dokumentaciju Modrinth API-ja</doc-link>. Mogu se kreirati i opozvati u bilo kom trenutku."
+  },
+  "settings.pats.modal.create.action": {
+    "message": "Kreirajte PAT"
+  },
+  "settings.pats.modal.create.expires.label": {
+    "message": "Ističe"
+  },
+  "settings.pats.modal.create.name.label": {
+    "message": "Naziv"
+  },
+  "settings.pats.modal.create.name.placeholder": {
+    "message": "Unesite ime PAT-a..."
+  },
+  "settings.pats.modal.create.title": {
+    "message": "Kreirajte lični pristupni token"
+  },
+  "settings.pats.modal.delete.action": {
+    "message": "Obriši ovaj token"
+  },
+  "settings.pats.modal.delete.description": {
+    "message": "Ovo će zauvek ukloniti ovaj token (ozbiljno — zauvek)."
+  },
+  "settings.pats.modal.delete.title": {
+    "message": "Da li ste sigurni da želite obrisati ovaj token?"
+  },
+  "settings.pats.modal.edit.title": {
+    "message": "Izmeni lični pristupni token"
+  },
+  "settings.pats.token.action.edit": {
+    "message": "Izmeni token"
+  },
+  "settings.pats.token.action.revoke": {
+    "message": "Opozovi token"
+  },
+  "settings.pats.token.expired-ago": {
+    "message": "Istekao pre {ago}"
+  },
+  "settings.pats.token.expires-in": {
+    "message": "Ističe za {inTime}"
+  },
+  "settings.pats.token.last-used": {
+    "message": "Posljednji put korišćen {ago}"
+  },
+  "settings.pats.token.never-used": {
+    "message": "Nikada korišćen"
+  },
+  "settings.profile.bio.description": {
+    "message": "Kratak opis kojim ćete drugima reći nešto o sebi."
+  },
+  "settings.profile.bio.title": {
+    "message": "Bio"
+  },
+  "settings.profile.description": {
+    "message": "Informacije na vašem profilu su javno vidljive na Modrinthu i putem <docs-link>Modrinth API-ja</docs-link>."
+  },
+  "settings.profile.profile-info": {
+    "message": "Informacije o profilu"
+  },
+  "settings.profile.profile-picture.reset": {
+    "message": "Resetuj"
+  },
+  "settings.profile.profile-picture.title": {
+    "message": "Profilna slika"
+  },
+  "settings.profile.username.description": {
+    "message": "Jedinstveno ime, bez razlikovanja velikih i malih slova, koje identifikuje vaš profil."
+  },
+  "settings.profile.username.title": {
+    "message": "Korisničko ime"
+  },
+  "settings.sessions.action.revoke-session": {
+    "message": "Opozovi sesiju"
+  },
+  "settings.sessions.created-ago": {
+    "message": "Kreirano {ago}"
+  },
+  "settings.sessions.current-session": {
+    "message": "Trenutna sesija"
+  },
+  "settings.sessions.description": {
+    "message": "Ovo su svi uređaji koji su trenutno prijavljeni na vaš Modrinth nalog. Možete se odjaviti sa svakog pojedinačno.\n\nAko vidite unos koji ne prepoznajete, odjavite se sa tog uređaja i odmah promenite lozinku za svoj Modrinth nalog."
+  },
+  "settings.sessions.last-accessed-ago": {
+    "message": "Posljednji pristup {ago}"
+  },
+  "settings.sessions.unknown-os": {
+    "message": "Nepoznat OS"
+  },
+  "settings.sessions.unknown-platform": {
+    "message": "Nepoznata platforma"
+  }
+}

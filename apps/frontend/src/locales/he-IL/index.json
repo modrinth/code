@@ -1,0 +1,200 @@
+{
+  "admin.billing.error.not-found": {
+    "message": "משתמש אינו מצוי"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "אישור"
+  },
+  "auth.authorize.action.decline": {
+    "message": "לא הרשה"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> מ<creator-link>{creator}</creator-link> יוכל לעשות:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "לאשר {appName}"
+  },
+  "auth.authorize.error.no-redirect-url": {
+    "message": "לא מצוי מקום לנתב בתגובה"
+  },
+  "auth.authorize.redirect-url": {
+    "message": "אתם תנתבו ל<redirect-url>{url}</redirect-url>"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "שלח דואר שחזור לאימייל"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "כתבו את הדואר אלקטרוני ואנו נשלח דואר שחזור כדי שאתם תוכלו להכנס לחשבונכם."
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "דואר אלקטרוני או שם משתמש"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "דואר אלקטרוני"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "דואר אם הוראות היו שלחו לכם אם הדואר אלקטרוני שלכם היה שמור בחשבונכם."
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "דואר שלוח"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "אתם יכולים להיכנס לחשבונכם עכשיו אם הסיסמה החדשה."
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "סיסמה היתה מאופסת"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "הפס את הסיסמה"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "אשר סיסמה"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "כתבו את הסיסמתכם כלהשיג גישה לחשבונכם."
+  },
+  "auth.reset-password.title": {
+    "message": "הפס סיסמה"
+  },
+  "auth.reset-password.title.long": {
+    "message": "הפס סיסמתכם"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "כתבו את הקוד אימות דו-שלבי שלכם כדי להמשיך."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "כתבו את האימות דו-שלבי"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "כתבו קוד..."
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-link>שככו את הסיסמה?</forgot-password-link>\n<create-account-link>ליצור חשבון</create-account-link>"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "דואר אלקטרוני או שם משתמש"
+  },
+  "auth.sign-in.password.label": {
+    "message": "סיסמה"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "הכנס אם"
+  },
+  "auth.sign-in.title": {
+    "message": "הכנס"
+  },
+  "auth.sign-in.use-password": {
+    "message": "או להשתמש בסיסמה"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "ליצור חשבון"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "המת סיסמה"
+  },
+  "auth.sign-up.email.label": {
+    "message": "אימייל"
+  },
+  "auth.sign-up.label.username": {
+    "message": "שם משתמש"
+  },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "כליצור את החשבון, אתם מסכימים ל<terms-link>תנאים</terms-link> ו<privacy-policy-link>מדיניות פרטיות</privacy-policy-link> של Modrinth."
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "סיסמאות לא תואמות!"
+  },
+  "auth.sign-up.password.label": {
+    "message": "סיסמה"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "כבר יש לכם חשבון?"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "להרשם לעדכונים על Modrinth"
+  },
+  "auth.sign-up.title": {
+    "message": "הרשם"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "או עצרו חשבון בעצמכם"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "הרשם אם"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "הגדרות חשבון"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "הכנס"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "דואר אלקטרוני שלכם הוא כבר מאומת!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "דואר אלקטרוני הוא כבר מאומת"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "שלח דואר שחזור עוד פעם"
+  },
+  "auth.verify-email.failed-verification.description": {
+    "message": "אנכנו לא נוכלנו לאמת דוארכם. נסו לשלוח את הדואר שחזור עוד פעם מהלוח בקרה כלכנס."
+  },
+  "auth.verify-email.failed-verification.description.logged-in": {
+    "message": "אנכנו לא נוכלנו לאמת דוארכם. נסו לשלוח את הדואר שחזור עוד פעם מהכפתור למתה."
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "אמת של הדואר אלקטרוני נכשל"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "דואר אלקטרוני שלכם היה מאומת בהצלחה!"
+  },
+  "error.project.404.title": {
+    "message": "פרויקט אינו מצוי"
+  },
+  "error.user.404.list_item.1": {
+    "message": "אולי הקלדת בטעות את השם משתמש של המשתמש."
+  },
+  "error.user.404.list_item.2": {
+    "message": "אולי משתמש זה שונה את השם המשתמש או מחק את החשבון."
+  },
+  "error.user.404.list_item.3": {
+    "message": "אולי חשבון של משתמש זה היה מושעה בגלל <tou-link>תנאי שימוש</tou-link> של Modrinth."
+  },
+  "error.user.404.list_title": {
+    "message": "למה?"
+  },
+  "error.user.404.title": {
+    "message": "משתמש אינו מצוי"
+  },
+  "frog": {
+    "message": "הפכו אותך לצפרדע! 🐸"
+  },
+  "frog.altText": {
+    "message": "ציור פוטוריאליסטי של מבוך צפרדעים"
+  },
+  "frog.froggedPeople": {
+    "message": "{count, plural, one {עוד {count} אדם} other {עוד {count} אנשים}} גם הוצפרדע!"
+  },
+  "frog.sinceOpened": {
+    "message": "עמוד זה היה פתוח {ago}"
+  },
+  "frog.title": {
+    "message": "צפרדע"
+  },
+  "layout.action.change-theme": {
+    "message": "לשנות מצב צבע"
+  },
+  "layout.action.get-modrinth-app": {
+    "message": "להוריד אפליקציאת Modrinth"
+  },
+  "layout.avatar.alt": {
+    "message": "אוותר חשבון"
+  },
+  "layout.banner.account-action": {
+    "message": "נדרשת פעולה על החשבון"
+  },
+  "layout.banner.add-email.button": {
+    "message": "בקר הגדרות חשבון"
+  }
+}

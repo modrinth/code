@@ -1,0 +1,419 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Modo desenvolvedor ativo."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Aparência"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Opções de Instância Padrão"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Sinalização de Recursos"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Instalações Java"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Privacidade"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Gerenciamento de recursos"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Adicionar e Jogar"
+  },
+  "instance.add-server.add-server": {
+    "message": "Adicionar servidor"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Desativado"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Ativado"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Perguntar"
+  },
+  "instance.add-server.title": {
+    "message": "Adicionar um servidor"
+  },
+  "instance.edit-server.title": {
+    "message": "Editar servidor"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Esconder da Página Inicial"
+  },
+  "instance.edit-world.name": {
+    "message": "Nome"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Mundo Minecraft"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Redefinir ícone"
+  },
+  "instance.edit-world.title": {
+    "message": "Editar Mundo"
+  },
+  "instance.filter.disabled": {
+    "message": "Projetos Desativados"
+  },
+  "instance.filter.updates-available": {
+    "message": "Atualizações Disponíveis"
+  },
+  "instance.server-modal.address": {
+    "message": "Endereço"
+  },
+  "instance.server-modal.name": {
+    "message": "Nome"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Servidor Minecraft"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Pacote de Recursos"
+  },
+  "instance.settings.tabs.general": {
+    "message": "Informação Geral"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Excluir instância"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Excluir instância"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Deleta permanente a instância de seu dispositivo, incluindo seus mundos, configurações e conteúdos instalados. Cuidado, uma vez deletado, não é possível recuperar."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Excluindo..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Duplicar"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "Não posso duplicar durante a instalação."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "Duplicar instância"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Cria uma cópia desta instância, incluindo mundos, configurações, mods, etc."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Modificar ícone"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Remover ícone"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Substituir ícone"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Escolher ícone"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "Coleções"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "Criar um novo grupo"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "Grupos da biblioteca permitem que você organize suas instâncias em diferentes seções da sua biblioteca."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "Insira o nome do grupo"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Nome"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "Gatilho de Inicialização"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "Gatilho de inicialização customizado"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "Ganchos permitem que usuários avançados executem comandos do sistema antes e após executar o jogo."
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "Pós-saída"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "Executado após o jogo fechar."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "Insira comando de Pós-saída..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Pré-lançamento"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Executa antes da instância ser iniciada."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "Insira comando de pré-lançamento..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "Gatilhos de inicialização do Jogo"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "Wrapper"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "Comando Wrapper para inicialização Minecraft."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "Insira um comando wrapper para iniciar Minecraft..."
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Instalação"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "{platform} {version} para Minecraft {game_version} já está instalado"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "Vanilla {game_version} já está instalado"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "Alterar Versão"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "Instalar"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "Instalando"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "Buscando versões do Modpack"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "Instalando nova versão"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "Atualmente Instalado"
+  },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": "Informação de Depuração:"
+  },
+  "instance.settings.tabs.installation.fetching-modpack-details": {
+    "message": "Buscando detalhes do Modpack"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Versão do jogo"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "Instalar"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "Instalação em progresso"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "versão {loader}"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecraft {version}"
+  },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "Não foi possível carregar detalhes do modpack, verifique sua conexão com a Internet."
+  },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "{loader} não está disponível para Minecraft {version}. Tente outro carregador de mod."
+  },
+  "instance.settings.tabs.installation.no-modpack-found": {
+    "message": "Está instância está vinculada a um modpack, mas o modpack não pode ser encontrado no Modrinth."
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "Plataforma"
+  },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "Re-instalar modpack"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Re-instalando o modpack"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "Re-instalando vai redefinir todo conteúdo instalado ou modificado para o que é fornecido pelo modpack, removendo mods e outros conteúdos que você tenha adicionado além da instalação original. Isso talvez arrume problemas se você fez alguma alteração na instância, mas se seus mundos dependem de conteúdo adicional que você instalou, isto pode quebrar os mundos."
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "Você tem certeza que quer re-instalar esta instância?"
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "Volta ao estado original da instância, removendo qualquer mods ou conteúdo que você tenha adicionado além do que já havia no modpack original."
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "Re-instalar Modpack"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "Reparar"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "Reparando"
+  },
+  "instance.settings.tabs.installation.repair.confirm.description": {
+    "message": "A reparação re-instala as dependências do Minecraft e verifica se há corrupção. Isto pode resolver problemas se o seu jogo não estiver iniciando devido a erros relacionados ao lançador, mas não resolverá problemas ou falhas relacionadas com mods instalados."
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "Reparar Instância?"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "Reparação em progresso"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "Retornar ao Padrão"
+  },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "Mostrar todas as versões"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "mudar versão"
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "instalar"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "reinstalar"
+  },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "reparar"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "Não pode {action} durante a instalação"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "Não pode {action} enquanto estiver offline"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "Não pode {action} enquanto repara"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(versão desconhecida)"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "Desvincular instância"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": "Se prosseguir, você não será capaz de reenvincula-la sem criar uma instância totalmente nova. Você não receberá atualizações do modpack e se tornará uma instância normal."
+  },
+  "instance.settings.tabs.installation.unlink.confirm.title": {
+    "message": "Você tem certeza que deseja deslinkar esta instância?"
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "Esta instância está vinculada a um modpack, o que siginifica que mods não podem serem atualizados e você não pode alterar o mod loader ou versão do Minecraft. Desvincular siginifca disconectar permanentemente esta instância do modpack."
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "Desvincular do modpack"
+  },
+  "instance.settings.tabs.java": {
+    "message": "Java e memória"
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "Variáveis de ambiente"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "Ganchos"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Argumentos Java"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Instalação Java"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "Memória alocada"
+  },
+  "instance.settings.tabs.window": {
+    "message": "Janela"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Configurações de janela customizada"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Tela cheia"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "Faz com que o jogo inicie em tela cheia (usando options.txt)."
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "Altura"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "Altura da janela do jogo ao abrir."
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "Insira a altura..."
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "Largura"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "Largura da janela do jogo ao abrir."
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "Insira a largura..."
+  },
+  "instance.settings.title": {
+    "message": "Configurações"
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "Servidor Minecraft"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "Não pode se conectar ao servidor"
+  },
+  "instance.worlds.copy_address": {
+    "message": "Copiar endereço"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "Não mostrar na tela inicial"
+  },
+  "instance.worlds.filter.available": {
+    "message": "Disponível"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "A instância já está aberta"
+  },
+  "instance.worlds.hardcore": {
+    "message": "Modo Hardcore"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "Servidor incompatível"
+  },
+  "instance.worlds.no_contact": {
+    "message": "Não foi possível conectar-se ao servidor"
+  },
+  "instance.worlds.no_server_quick_play": {
+    "message": "Só é possível entrar diretamente nos servidores em Minecraft Alpha 1.0.5+"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "Você só pode entrar diretamente em mundos de um jogador no Minecraft 1.20+"
+  },
+  "instance.worlds.play_instance": {
+    "message": "Jogar na Instância"
+  },
+  "instance.worlds.type.server": {
+    "message": "Servidor"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "Um Jogador"
+  },
+  "instance.worlds.view_instance": {
+    "message": "Ver instância"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "Mundo em uso"
+  },
+  "search.filter.locked.instance": {
+    "message": "Fornecido pela instância"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "A versão do jogo é fornecida pela instância"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "O Lançador é fornecido pela instância"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "Sincronizar com instância"
+  }
+}
