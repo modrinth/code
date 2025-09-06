@@ -1,9 +1,11 @@
-use std::{collections::HashMap, fmt::Write, sync::LazyLock};
+use std::{collections::HashMap, fmt::Write, sync::LazyLock, time::Instant};
 
 use actix_web::{HttpRequest, HttpResponse, get, post, put, web};
 use chrono::{DateTime, Utc};
+use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
 use serde::Deserialize;
 use sqlx::PgPool;
+use tokio::sync::Mutex;
 use tracing::info;
 
 use crate::{
@@ -15,9 +17,8 @@ use crate::{
             delphi_report_item::{
                 DBDelphiReport, DBDelphiReportIssue,
                 DBDelphiReportIssueJavaClass, DecompiledJavaClassSource,
-                DelphiReportIssueStatus, DelphiReportIssueType,
-                DelphiReportListOrder, DelphiReportSeverity,
-                InternalJavaClassName,
+                DelphiReportIssueStatus, DelphiReportListOrder,
+                DelphiReportSeverity, InternalJavaClassName,
             },
         },
         redis::RedisPool,
@@ -38,9 +39,25 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(_run)
             .service(version)
             .service(issues)
-            .service(update_issue),
+            .service(update_issue)
+            .service(issue_type_schema),
     );
 }
+
+static DELPHI_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
+    reqwest::Client::builder()
+        .default_headers({
+            HeaderMap::from_iter([(
+                USER_AGENT,
+                HeaderValue::from_static(concat!(
+                    "Labrinth/",
+                    env!("COMPILATION_DATE")
+                )),
+            )])
+        })
+        .build()
+        .unwrap()
+});
 
 #[derive(Deserialize)]
 struct DelphiReport {
@@ -53,7 +70,7 @@ struct DelphiReport {
     /// Delphi version that generated this report.
     pub delphi_version: i32,
     pub issues: HashMap<
-        DelphiReportIssueType,
+        String,
         HashMap<InternalJavaClassName, Option<DecompiledJavaClassSource>>,
     >,
     pub severity: DelphiReportSeverity,
@@ -169,9 +186,6 @@ pub async fn run(
     .fetch_one(exec)
     .await?;
 
-    static DELPHI_CLIENT: LazyLock<reqwest::Client> =
-        LazyLock::new(reqwest::Client::new);
-
     tracing::debug!(
         "Running Delphi for project {}, version {}, file {}",
         file_data.project_id.0,
@@ -241,7 +255,7 @@ async fn version(
 #[derive(Deserialize)]
 struct DelphiIssuesSearchOptions {
     #[serde(rename = "type")]
-    ty: Option<DelphiReportIssueType>,
+    ty: Option<String>,
     status: Option<DelphiReportIssueStatus>,
     order_by: Option<DelphiReportListOrder>,
     count: Option<u16>,
@@ -254,7 +268,7 @@ async fn issues(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    search_options: web::Query<DelphiIssuesSearchOptions>,
+    web::Query(search_options): web::Query<DelphiIssuesSearchOptions>,
 ) -> Result<HttpResponse, ApiError> {
     check_is_moderator_from_headers(
         &req,
@@ -322,5 +336,52 @@ async fn update_issue(
         Ok(HttpResponse::NoContent().finish())
     } else {
         Ok(HttpResponse::Created().finish())
+    }
+}
+
+#[get("issue_type/schema")]
+async fn issue_type_schema(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await?;
+
+    // This route is expected to be called often by the frontend, and Delphi is not necessarily
+    // built to scale beyond malware analysis, so cache the result of its quasi-constant-valued
+    // schema route to alleviate the load on it
+
+    static CACHED_ISSUE_TYPE_SCHEMA: Mutex<
+        Option<(serde_json::Map<String, serde_json::Value>, Instant)>,
+    > = Mutex::const_new(None);
+
+    match &mut *CACHED_ISSUE_TYPE_SCHEMA.lock().await {
+        Some((schema, last_fetch)) if last_fetch.elapsed().as_secs() < 60 => {
+            Ok(HttpResponse::Ok().json(schema))
+        }
+        cache_entry => Ok(HttpResponse::Ok().json(
+            &cache_entry
+                .insert((
+                    DELPHI_CLIENT
+                        .get(format!("{}/schema", dotenvy::var("DELPHI_URL")?))
+                        .send()
+                        .await
+                        .and_then(|res| res.error_for_status())
+                        .map_err(ApiError::Delphi)?
+                        .json::<serde_json::Map<String, serde_json::Value>>()
+                        .await
+                        .map_err(ApiError::Delphi)?,
+                    Instant::now(),
+                ))
+                .0,
+        )),
     }
 }
