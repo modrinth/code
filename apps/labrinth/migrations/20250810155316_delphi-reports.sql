@@ -2,29 +2,6 @@ CREATE TYPE delphi_report_severity AS ENUM ('low', 'medium', 'high', 'severe');
 
 CREATE TYPE delphi_report_issue_status AS ENUM ('pending', 'approved', 'rejected');
 
-CREATE TYPE delphi_report_issue_type AS ENUM (
-	'reflection_indirection',
-	'xor_obfuscation',
-	'included_libraries',
-	'suspicious_binaries',
-	'corrupt_classes',
-	'suspicious_classes',
-	'url_usage',
-	'classloader_usage',
-	'processbuilder_usage',
-	'runtime_exec_usage',
-	'jni_usage',
-	'main_method',
-	'native_loading',
-	'malformed_jar',
-	'nested_jar_too_deep',
-	'failed_decompilation',
-	'analysis_failure',
-	'malware_easyforme',
-	'malware_simplyloader',
-	'unknown'
-);
-
 -- A Delphi analysis report for a project version
 CREATE TABLE delphi_reports (
 	id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -46,7 +23,7 @@ CREATE TABLE delphi_report_issues (
 	report_id BIGINT NOT NULL REFERENCES delphi_reports (id)
 		ON DELETE CASCADE
 		ON UPDATE CASCADE,
-	issue_type DELPHI_REPORT_ISSUE_TYPE NOT NULL,
+	issue_type TEXT NOT NULL,
 	status DELPHI_REPORT_ISSUE_STATUS NOT NULL,
 	UNIQUE (report_id, issue_type)
 );
