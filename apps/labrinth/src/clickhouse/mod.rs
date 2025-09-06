@@ -74,9 +74,9 @@ pub async fn init_client_with_database(
                 headers Array(Tuple(String, String))
             )
             ENGINE = {engine}
+            {ttl}
             PRIMARY KEY (project_id, recorded, ip)
             SETTINGS index_granularity = 8192
-            {ttl}
             "
         ))
         .execute()
@@ -101,9 +101,9 @@ pub async fn init_client_with_database(
                 headers Array(Tuple(String, String))
             )
             ENGINE = {engine}
+            {ttl}
             PRIMARY KEY (project_id, recorded, ip)
             SETTINGS index_granularity = 8192
-            {ttl}
             "
         ))
         .execute()
@@ -126,9 +126,9 @@ pub async fn init_client_with_database(
                 parent UInt64
             )
             ENGINE = {engine}
+            {ttl}
             PRIMARY KEY (project_id, recorded, user_id)
             SETTINGS index_granularity = 8192
-            {ttl}
             "
         ))
         .execute()
