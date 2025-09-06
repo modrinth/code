@@ -23,6 +23,15 @@ const config: Config = {
 				dark: 'var(--color-text-dark)',
 				inverted: 'var(--color-text-inverted)',
 				heading: 'var(--color-heading)',
+				surface: {
+					DEFAULT: 'var(--color-surface)',
+					0: 'var(--color-surface-0)',
+					1: 'var(--color-surface-1)',
+					2: 'var(--color-surface-2)',
+					3: 'var(--color-surface-3)',
+					4: 'var(--color-surface-4)',
+					5: 'var(--color-surface-5)',
+				},
 				red: {
 					DEFAULT: 'var(--color-red)',
 					50: 'var(--color-red-50)',
