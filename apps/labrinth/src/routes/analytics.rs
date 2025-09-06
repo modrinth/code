@@ -69,17 +69,18 @@ pub async fn page_view_ingest(
     let url = Url::parse(&url_input.url).map_err(|_| {
         ApiError::InvalidInput("invalid page view URL specified!".to_string())
     })?;
-
     let domain = url.host_str().ok_or_else(|| {
         ApiError::InvalidInput("invalid page view URL specified!".to_string())
     })?;
+    let url_origin = url.origin().ascii_serialization();
 
-    let allowed_origins =
-        parse_strings_from_var("CORS_ALLOWED_ORIGINS").unwrap_or_default();
-    if !(domain.ends_with(".modrinth.com")
-        || domain == "modrinth.com"
-        || allowed_origins.contains(&"*".to_string()))
-    {
+    let is_valid_url_origin =
+        parse_strings_from_var("ANALYTICS_ALLOWED_ORIGINS")
+            .unwrap_or_default()
+            .iter()
+            .any(|origin| origin == "*" || url_origin == *origin);
+
+    if !is_valid_url_origin {
         return Err(ApiError::InvalidInput(
             "invalid page view URL specified!".to_string(),
         ));
