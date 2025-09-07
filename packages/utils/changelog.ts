@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-09-07T15:55:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Fixed Modrinth App sign in redirect when using SSO.`,
+	},
+	{
 		date: `2025-09-03T15:40:00-07:00`,
 		product: 'web',
 		body: `### Improvements
