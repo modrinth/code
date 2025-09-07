@@ -4,7 +4,7 @@
         <description><![CDATA[Keep up-to-date on the latest news from Modrinth.]]></description>
         <link>https://modrinth.com/news/</link>
         <generator>@modrinth/blog</generator>
-        <lastBuildDate>Sun, 07 Sep 2025 23:15:48 GMT</lastBuildDate>
+        <lastBuildDate>Sun, 07 Sep 2025 23:23:28 GMT</lastBuildDate>
         <atom:link href="https://modrinth.com/news/feed/rss.xml" rel="self" type="application/rss+xml"/>
         <language><![CDATA[en]]></language>
         <item>
@@ -13,7 +13,7 @@
             <link>https://modrinth.com/news/article/modrinth-servers-southeast-asia/</link>
             <guid isPermaLink="false">https://modrinth.com/news/article/modrinth-servers-southeast-asia/</guid>
             <pubDate>Mon, 08 Sep 2025 22:00:00 GMT</pubDate>
-            <content:encoded>&lt;![CDATA[&lt;p&gt;We&apos;re happy to announce that we have just launched &lt;a href=&quot;https://modrinth.gg/&quot; rel=&quot;noopener nofollow ugc&quot;&gt;Modrinth Servers&lt;/a&gt; in one of the most highly anticipated regions: Southeast Asia.&lt;/p&gt;&lt;p&gt;Located in Singapore, this new region available for Modrinth Servers will be a great choice for anyone in that part of the globe.&lt;/p&gt;&lt;p&gt;What region should be next? &lt;a href=&quot;https://surveys.modrinth.com/servers-region-waitlist&quot; rel=&quot;noopener nofollow ugc&quot;&gt;Let us know here&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;&lt;strong data-contrast-text&gt;Host your next server with &lt;a href=&quot;https://modrinth.gg/&quot; rel=&quot;noopener nofollow ugc&quot;&gt;Modrinth Servers&lt;/a&gt; today!&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Get a 5-day free trial (no credit card required) with &lt;a href=&quot;https://quests.medal.tv/modrinth&quot; rel=&quot;noopener nofollow ugc&quot;&gt;Medal.tv&lt;/a&gt; for a limited time only.&lt;/p&gt;]]&gt;</content:encoded>
+            <content:encoded>&lt;![CDATA[&lt;p&gt;We&apos;re happy to announce that we have just launched &lt;a href=&quot;https://modrinth.gg/&quot; rel=&quot;noopener nofollow ugc&quot;&gt;Modrinth Servers&lt;/a&gt; in one of the most highly anticipated regions: Southeast Asia.&lt;/p&gt;&lt;p&gt;Located in Singapore, this new region available for Modrinth Servers will be a great choice for anyone in that part of the globe.&lt;/p&gt;&lt;p&gt;What region should be next? &lt;a href=&quot;https://surveys.modrinth.com/servers-region-waitlist&quot; rel=&quot;noopener nofollow ugc&quot;&gt;Let us know here&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;&lt;strong data-contrast-text&gt;Host your next server with &lt;a href=&quot;https://modrinth.gg/&quot; rel=&quot;noopener nofollow ugc&quot;&gt;Modrinth Servers&lt;/a&gt; today!&lt;/strong&gt;&lt;/p&gt;]]&gt;</content:encoded>
         </item>
         <item>
             <title><![CDATA[Creators: Verify Your Environment Metadata]]></title>

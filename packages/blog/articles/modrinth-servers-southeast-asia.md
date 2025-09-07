@@ -12,5 +12,3 @@ Located in Singapore, this new region available for Modrinth Servers will be a g
 What region should be next? [Let us know here](https://surveys.modrinth.com/servers-region-waitlist).
 
 <strong data-contrast-text>Host your next server with [Modrinth Servers](https://modrinth.gg) today!</span>
-
-Get a 5-day free trial (no credit card required) with [Medal.tv](https://quests.medal.tv/modrinth) for a limited time only.
