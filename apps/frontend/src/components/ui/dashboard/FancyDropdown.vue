@@ -1,0 +1,457 @@
+<template>
+	<div ref="containerRef" class="relative inline-block w-full max-w-[496px]">
+		<div
+			v-if="$slots.extra && isOpen"
+			class="absolute left-0 right-0 z-[9998] px-4 pb-2.5 pt-10"
+			:class="extraPosition === 'top' ? 'bottom-full' : 'top-full'"
+		>
+			<div
+				class="flex items-end justify-between rounded-b-xl bg-[#1d1f23] px-4 py-2.5"
+				@mousedown.stop
+			>
+				<slot name="extra"></slot>
+			</div>
+		</div>
+
+		<button
+			ref="triggerRef"
+			type="button"
+			class="relative flex h-11 w-full items-center justify-between overflow-hidden rounded-xl bg-[#34363c] px-4 py-2.5 text-left outline outline-1 outline-offset-[-1px] outline-[#42444a] transition-all duration-200"
+			:class="[
+				triggerClasses,
+				{
+					'z-[9999] rounded-b-none': isOpen,
+					'cursor-not-allowed opacity-50': disabled,
+				},
+			]"
+			:aria-expanded="isOpen"
+			:aria-haspopup="listbox ? 'listbox' : 'menu'"
+			:disabled="disabled"
+			@click="handleTriggerClick"
+			@keydown="handleTriggerKeydown"
+		>
+			<div class="flex items-center gap-2">
+				<slot name="prefix"></slot>
+				<span class="text-base font-semibold leading-tight text-white">
+					<slot name="selected">{{ displayValue }}</slot>
+				</span>
+			</div>
+			<div class="flex items-center gap-1">
+				<slot name="suffix"></slot>
+				<svg
+					v-if="showChevron"
+					width="20"
+					height="20"
+					viewBox="0 0 20 20"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+					class="transition-transform duration-200"
+					:class="{ 'rotate-180': isOpen }"
+				>
+					<path
+						d="M5 7.5L10 12.5L15 7.5"
+						stroke="#B0BAC5"
+						stroke-width="1.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					/>
+				</svg>
+			</div>
+		</button>
+
+		<Teleport to="#teleports">
+			<div
+				v-if="isOpen"
+				ref="dropdownRef"
+				class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] rounded-t-none bg-[#34363c] outline outline-1 outline-offset-[-1px] outline-[#42444a]"
+				:style="dropdownStyle"
+				:role="listbox ? 'listbox' : 'menu'"
+				@mousedown.stop
+				@keydown="handleDropdownKeydown"
+			>
+				<div v-if="searchable" class="p-4">
+					<div
+						class="flex items-center gap-2 overflow-hidden rounded-xl bg-[#34363c] px-4 py-2.5 outline outline-1 outline-offset-[-1px] outline-[#42444a] focus-within:shadow-[0px_0px_0px_2px_rgba(52,54,60,1.00)] focus-within:shadow-[0px_0px_0px_4px_rgba(27,217,106,1.00)]"
+					>
+						<SearchIcon class="size-5" />
+						<input
+							ref="searchInputRef"
+							v-model="searchQuery"
+							type="text"
+							:placeholder="searchPlaceholder"
+							class="flex-1 bg-transparent text-sm font-medium leading-[18px] text-white placeholder-[#7e868e] !shadow-none !outline-none"
+							@keydown.stop="handleSearchKeydown"
+						/>
+					</div>
+				</div>
+
+				<div v-if="searchable && filteredOptions.length > 0" class="h-px bg-[#4b4f59]"></div>
+
+				<div
+					v-if="filteredOptions.length > 0"
+					ref="optionsContainerRef"
+					class="flex flex-col gap-2 overflow-y-auto p-3"
+					:style="{ maxHeight: `${maxHeight}px` }"
+				>
+					<template v-for="(item, index) in filteredOptions" :key="item.key">
+						<div v-if="item.type === 'divider'" class="h-px bg-[#4b4f59]"></div>
+						<component
+							:is="item.type === 'link' ? 'a' : 'button'"
+							v-else
+							:ref="(el: HTMLElement) => setOptionRef(el as HTMLElement, index)"
+							:href="item.type === 'link' ? item.href : undefined"
+							:target="item.type === 'link' ? item.target : undefined"
+							type="button"
+							:role="listbox ? 'option' : 'menuitem'"
+							:aria-selected="listbox && item.value === modelValue"
+							:data-focused="focusedIndex === index"
+							class="flex items-center gap-2.5 rounded-xl bg-transparent px-4 py-3 text-left transition-colors duration-150"
+							:class="[
+								item.class,
+								{
+									'bg-[#42444a]': focusedIndex === index || (listbox && item.value === modelValue),
+									'cursor-not-allowed opacity-50': item.disabled,
+								},
+							]"
+							:disabled="item.disabled"
+							@click="handleOptionClick(item, index)"
+							@mouseenter="focusedIndex = index"
+						>
+							<slot :name="`option-${item.value}`" :item="item">
+								<div class="flex items-center gap-2">
+									<component :is="item.icon" v-if="item.icon" class="h-5 w-5" />
+									<span class="text-base font-semibold leading-tight text-white">
+										{{ item.label }}
+									</span>
+								</div>
+							</slot>
+						</component>
+					</template>
+				</div>
+
+				<div v-else-if="searchQuery" class="p-4 text-center text-sm text-[#7e868e]">
+					No results found
+				</div>
+			</div>
+		</Teleport>
+	</div>
+</template>
+
+<script setup lang="ts" generic="T">
+import { SearchIcon } from '@modrinth/assets'
+import { onClickOutside } from '@vueuse/core'
+import { computed, nextTick, onMounted, onUnmounted, ref, useSlots, watch } from 'vue'
+
+export interface DropdownOption<T> {
+	value: T
+	label: string
+	icon?: any
+	disabled?: boolean
+	class?: string
+	type?: 'button' | 'link' | 'divider'
+	href?: string
+	target?: string
+	action?: () => void
+}
+
+interface Props {
+	modelValue?: T
+	options: (DropdownOption<T> | { type: 'divider' })[]
+	placeholder?: string
+	disabled?: boolean
+	searchable?: boolean
+	searchPlaceholder?: string
+	listbox?: boolean
+	showChevron?: boolean
+	maxHeight?: number
+	displayValue?: string
+	extraPosition?: 'top' | 'bottom'
+	triggerClass?: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+	placeholder: 'Select an option',
+	disabled: false,
+	searchable: false,
+	searchPlaceholder: 'Search...',
+	listbox: true,
+	showChevron: true,
+	maxHeight: 300,
+	extraPosition: 'bottom',
+})
+
+const emit = defineEmits<{
+	'update:modelValue': [value: T]
+	select: [option: DropdownOption<T>]
+	open: []
+	close: []
+}>()
+
+const slots = useSlots()
+
+const isOpen = ref(false)
+const searchQuery = ref('')
+const focusedIndex = ref(-1)
+const containerRef = ref<HTMLElement>()
+const triggerRef = ref<HTMLElement>()
+const dropdownRef = ref<HTMLElement>()
+const searchInputRef = ref<HTMLInputElement>()
+const optionsContainerRef = ref<HTMLElement>()
+const optionRefs = ref<(HTMLElement | null)[]>([])
+
+const dropdownStyle = ref({
+	top: '0px',
+	left: '0px',
+	width: '0px',
+})
+
+const triggerClasses = computed(() => {
+	const classes = [props.triggerClass]
+	if (isOpen.value) {
+		if (props.extraPosition === 'bottom' && slots?.extra) {
+			classes.push('!rounded-b-none')
+		} else if (props.extraPosition === 'top' && slots?.extra) {
+			classes.push('!rounded-t-none')
+		}
+	}
+	return classes
+})
+
+const filteredOptions = computed(() => {
+	const opts = props.options.map((opt, index) => ({
+		...opt,
+		key: opt.type === 'divider' ? `divider-${index}` : `option-${(opt as DropdownOption<T>).value}`,
+	}))
+
+	if (!searchQuery.value || !props.searchable) {
+		return opts
+	}
+
+	const query = searchQuery.value.toLowerCase()
+	return opts.filter((opt) => {
+		if (opt.type === 'divider') return false
+		return (opt as DropdownOption<T>).label.toLowerCase().includes(query)
+	})
+})
+
+function setOptionRef(el: HTMLElement | null, index: number) {
+	optionRefs.value[index] = el
+}
+
+async function updateDropdownPosition() {
+	if (!triggerRef.value || !dropdownRef.value) return
+
+	await nextTick()
+
+	const triggerRect = triggerRef.value.getBoundingClientRect()
+	const dropdownRect = dropdownRef.value.getBoundingClientRect()
+	const viewportHeight = window.innerHeight
+	const viewportWidth = window.innerWidth
+	const margin = 8
+
+	let top = triggerRect.bottom
+	let left = triggerRect.left
+
+	if (triggerRect.bottom + dropdownRect.height + margin > viewportHeight) {
+		if (triggerRect.top - dropdownRect.height - margin > 0) {
+			top = triggerRect.top - dropdownRect.height
+		}
+	}
+
+	if (left + dropdownRect.width > viewportWidth - margin) {
+		left = Math.max(margin, viewportWidth - dropdownRect.width - margin)
+	}
+
+	dropdownStyle.value = {
+		top: `${top}px`,
+		left: `${left}px`,
+		width: `${triggerRect.width}px`,
+	}
+}
+
+async function open() {
+	if (props.disabled || isOpen.value) return
+
+	isOpen.value = true
+	searchQuery.value = ''
+	focusedIndex.value = props.listbox
+		? props.options.findIndex((opt) => opt.type !== 'divider' && opt.value === props.modelValue)
+		: -1
+
+	emit('open')
+
+	await nextTick()
+	await updateDropdownPosition()
+
+	if (props.searchable && searchInputRef.value) {
+		searchInputRef.value.focus()
+	}
+}
+
+function close() {
+	if (!isOpen.value) return
+
+	isOpen.value = false
+	searchQuery.value = ''
+	focusedIndex.value = -1
+	emit('close')
+
+	nextTick(() => {
+		triggerRef.value?.focus()
+	})
+}
+
+function handleTriggerClick() {
+	if (isOpen.value) {
+		close()
+	} else {
+		open()
+	}
+}
+
+function handleOptionClick(option: DropdownOption<T>, index: number) {
+	if (option.disabled || option.type === 'divider') return
+
+	focusedIndex.value = index
+
+	if (option.action) {
+		option.action()
+	}
+
+	if (props.listbox && option.value !== undefined) {
+		emit('update:modelValue', option.value)
+	}
+
+	emit('select', option)
+
+	if (option.type !== 'link') {
+		close()
+	}
+}
+
+function focusOption(index: number) {
+	if (index < 0 || index >= filteredOptions.value.length) return
+
+	const option = filteredOptions.value[index]
+	if (option.type === 'divider' || (option as DropdownOption<T>).disabled) return
+
+	focusedIndex.value = index
+	optionRefs.value[index]?.focus()
+	optionRefs.value[index]?.scrollIntoView({ block: 'nearest' })
+}
+
+function focusNextOption() {
+	let nextIndex = focusedIndex.value
+	do {
+		nextIndex = (nextIndex + 1) % filteredOptions.value.length
+	} while (
+		filteredOptions.value[nextIndex].type === 'divider' ||
+		(filteredOptions.value[nextIndex] as DropdownOption<T>).disabled
+	)
+	focusOption(nextIndex)
+}
+
+function focusPreviousOption() {
+	let prevIndex = focusedIndex.value
+	do {
+		prevIndex = (prevIndex - 1 + filteredOptions.value.length) % filteredOptions.value.length
+	} while (
+		filteredOptions.value[prevIndex].type === 'divider' ||
+		(filteredOptions.value[prevIndex] as DropdownOption<T>).disabled
+	)
+	focusOption(prevIndex)
+}
+
+function handleTriggerKeydown(event: KeyboardEvent) {
+	switch (event.key) {
+		case 'Enter':
+		case ' ':
+		case 'ArrowDown':
+			event.preventDefault()
+			open()
+			break
+		case 'ArrowUp':
+			event.preventDefault()
+			open()
+			break
+	}
+}
+
+function handleDropdownKeydown(event: KeyboardEvent) {
+	switch (event.key) {
+		case 'Escape':
+			event.preventDefault()
+			close()
+			break
+		case 'ArrowDown':
+			event.preventDefault()
+			focusNextOption()
+			break
+		case 'ArrowUp':
+			event.preventDefault()
+			focusPreviousOption()
+			break
+		case 'Enter':
+		case ' ':
+			event.preventDefault()
+			if (focusedIndex.value >= 0) {
+				const option = filteredOptions.value[focusedIndex.value]
+				if (option.type !== 'divider') {
+					handleOptionClick(option as DropdownOption<T>, focusedIndex.value)
+				}
+			}
+			break
+		case 'Tab':
+			event.preventDefault()
+			if (event.shiftKey) {
+				focusPreviousOption()
+			} else {
+				focusNextOption()
+			}
+			break
+	}
+}
+
+function handleSearchKeydown(event: KeyboardEvent) {
+	if (event.key === 'Escape') {
+		event.preventDefault()
+		close()
+	} else if (event.key === 'ArrowDown') {
+		event.preventDefault()
+		focusNextOption()
+	} else if (event.key === 'ArrowUp') {
+		event.preventDefault()
+		focusPreviousOption()
+	}
+}
+
+function handleResize() {
+	if (isOpen.value) {
+		updateDropdownPosition()
+	}
+}
+
+onClickOutside(
+	dropdownRef,
+	() => {
+		close()
+	},
+	{ ignore: [triggerRef] },
+)
+
+onMounted(() => {
+	window.addEventListener('resize', handleResize)
+	window.addEventListener('scroll', handleResize, true)
+})
+
+onUnmounted(() => {
+	window.removeEventListener('resize', handleResize)
+	window.removeEventListener('scroll', handleResize, true)
+})
+
+watch(isOpen, (value) => {
+	if (value) {
+		updateDropdownPosition()
+	}
+})
+</script>

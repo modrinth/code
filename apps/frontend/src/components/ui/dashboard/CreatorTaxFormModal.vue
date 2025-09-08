@@ -142,7 +142,7 @@ async function continueForm() {
 	if (!determinedFormType.value) return
 
 	const response = (await useBaseFetch('payout/compliance', {
-		version: 3,
+		apiVersion: 3,
 		method: 'POST',
 		body: {
 			form_type: determinedFormType.value,
@@ -161,7 +161,17 @@ async function continueForm() {
 	try {
 		if (avalaraState.value) {
 			await avalaraState.value.start()
-			console.log(avalaraState.value.status)
+			if (avalaraState.value.status === 'signed') {
+				hideModal()
+				emit('close')
+				return
+			}
+
+			addNotification({
+				title: 'Tax form incomplete',
+				text: 'You have not completed the tax form. Please try again.',
+				type: 'warning',
+			})
 		}
 	} catch (error) {
 		console.error('Error occurred while continuing tax form:', error)

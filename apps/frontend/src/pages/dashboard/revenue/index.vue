@@ -1,6 +1,7 @@
 <template>
 	<CreatorWithdrawModal
 		ref="withdrawModal"
+		:auth="auth"
 		:balance="userBalance"
 		v-model:country="withdrawCountry"
 		:payout-methods="paymentMethods"
@@ -165,6 +166,8 @@ import CreatorWithdrawModal from '~/components/ui/dashboard/CreatorWithdrawModal
 
 // TODO: Deduplicate in @modrinth/api-client PR.
 type FormCompletionStatus = 'unknown' | 'unrequested' | 'unsigned' | 'tin-mismatch' | 'complete'
+
+const auth = await useAuth()
 
 interface UserBalanceResponse {
 	available: number
