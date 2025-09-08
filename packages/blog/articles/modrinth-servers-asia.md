@@ -1,7 +1,7 @@
 ---
 title: Modrinth Servers Launches in Asia
 summary: Our latest Modrinth Servers datacenter is in Singapore.
-date: 2025-09-08T18:00:00-07:00
+date: 2025-09-08T14:45:00-07:00
 authors: ['AJfd8YH6', 'Dc7EYhxG']
 ---
 
