@@ -62,84 +62,7 @@ pub enum NotificationBody {
         link: String,
         actions: Vec<NotificationAction>,
     },
-    ResetPassword {
-        flow: String,
-    },
-    VerifyEmail {
-        flow: String,
-    },
-    AuthProviderAdded {
-        provider: String,
-    },
-    AuthProviderRemoved {
-        provider: String,
-    },
-    TwoFactorEnabled,
-    TwoFactorRemoved,
-    PasswordChanged,
-    PasswordRemoved,
-    EmailChanged {
-        new_email: String,
-        to_email: String,
-    },
-    PaymentFailed {
-        amount: String,
-    },
     Unknown,
-}
-
-impl NotificationBody {
-    pub fn notification_type(&self) -> NotificationType {
-        match &self {
-            NotificationBody::ProjectUpdate { .. } => {
-                NotificationType::ProjectUpdate
-            }
-            NotificationBody::TeamInvite { .. } => NotificationType::TeamInvite,
-            NotificationBody::OrganizationInvite { .. } => {
-                NotificationType::OrganizationInvite
-            }
-            NotificationBody::StatusChange { .. } => {
-                NotificationType::StatusChange
-            }
-            NotificationBody::ModeratorMessage { .. } => {
-                NotificationType::ModeratorMessage
-            }
-            NotificationBody::LegacyMarkdown { .. } => {
-                NotificationType::LegacyMarkdown
-            }
-            NotificationBody::ResetPassword { .. } => {
-                NotificationType::ResetPassword
-            }
-            NotificationBody::VerifyEmail { .. } => {
-                NotificationType::VerifyEmail
-            }
-            NotificationBody::AuthProviderAdded { .. } => {
-                NotificationType::AuthProviderAdded
-            }
-            NotificationBody::AuthProviderRemoved { .. } => {
-                NotificationType::AuthProviderRemoved
-            }
-            NotificationBody::TwoFactorEnabled => {
-                NotificationType::TwoFactorEnabled
-            }
-            NotificationBody::TwoFactorRemoved => {
-                NotificationType::TwoFactorRemoved
-            }
-            NotificationBody::PasswordChanged => {
-                NotificationType::PasswordChanged
-            }
-            NotificationBody::PasswordRemoved => {
-                NotificationType::PasswordRemoved
-            }
-            NotificationBody::EmailChanged { .. } => {
-                NotificationType::EmailChanged
-            }
-            NotificationBody::PaymentFailed { .. } => {
-                NotificationType::PaymentFailed
-            }
-            NotificationBody::Unknown => NotificationType::Unknown,
-        }
-    }
 }
 
 impl From<DBNotification> for Notification {
@@ -261,64 +184,6 @@ impl From<DBNotification> for Notification {
                     text.clone(),
                     link.clone(),
                     actions.clone().into_iter().collect(),
-                ),
-                // The notifications from here to down below are listed with messages for completeness' sake,
-                // though they should never be sent via site notifications. This should be disabled via database
-                // options. Messages should be reviewed and worded better if we want to distribute these notifications
-                // via the site.
-                NotificationBody::PaymentFailed { .. } => (
-                    "Payment failed".to_string(),
-                    "A payment on your account failed. Please update your billing information.".to_string(),
-                    "/settings/billing".to_string(),
-                    vec![],
-                ),
-                NotificationBody::VerifyEmail { .. } => (
-                    "Verify your email".to_string(),
-                    "You've requested to verify your email. Please check your email for a verification link.".to_string(),
-                    "#".to_string(),
-                    vec![],
-                ),
-                NotificationBody::AuthProviderAdded { .. } => (
-                    "Auth provider added".to_string(),
-                    "You've added a new authentication provider to your account.".to_string(),
-                    "#".to_string(),
-                    vec![],
-                ),
-                NotificationBody::AuthProviderRemoved { .. } => (
-                    "Auth provider removed".to_string(),
-                    "You've removed a authentication provider from your account.".to_string(),
-                    "#".to_string(),
-                    vec![],
-                ),
-                NotificationBody::TwoFactorEnabled => (
-                    "Two-factor authentication enabled".to_string(),
-                    "You've enabled two-factor authentication on your account.".to_string(),
-                    "#".to_string(),
-                    vec![],
-                ),
-                NotificationBody::TwoFactorRemoved => (
-                    "Two-factor authentication removed".to_string(),
-                    "You've removed two-factor authentication from your account.".to_string(),
-                    "#".to_string(),
-                    vec![],
-                ),
-                NotificationBody::PasswordChanged => (
-                    "Password changed".to_string(),
-                    "You've changed your account password.".to_string(),
-                    "#".to_string(),
-                    vec![],
-                ),
-                NotificationBody::PasswordRemoved => (
-                    "Password removed".to_string(),
-                    "You've removed your account password.".to_string(),
-                    "#".to_string(),
-                    vec![],
-                ),
-                NotificationBody::EmailChanged { .. } => (
-                    "Email changed".to_string(),
-                    "Your account email was changed.".to_string(),
-                    "#".to_string(),
-                    vec![],
                 ),
                 NotificationBody::Unknown => {
                     ("".to_string(), "".to_string(), "#".to_string(), vec![])
