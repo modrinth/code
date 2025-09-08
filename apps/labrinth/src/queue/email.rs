@@ -67,7 +67,7 @@ impl EmailQueue {
             client: Client::builder()
                 .user_agent("Modrinth")
                 .build()
-                .expect("Failed to buidl HTTP client"),
+                .expect("Failed to build HTTP client"),
         }
     }
 
