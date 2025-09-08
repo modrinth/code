@@ -278,7 +278,7 @@ impl DBUser {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let ids = user_ids.iter().map(|x| x.0 as i64).collect::<Vec<_>>();
+        let ids = user_ids.iter().map(|x| x.0).collect::<Vec<_>>();
         let count = sqlx::query_scalar!(
             r#"SELECT COUNT(1) "count!" FROM users WHERE id = ANY($1)"#,
             &ids
