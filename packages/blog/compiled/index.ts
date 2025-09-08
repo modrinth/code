@@ -16,8 +16,8 @@ import { article as modpack_changes } from "./modpack_changes";
 import { article as modpacks_alpha } from "./modpacks_alpha";
 import { article as modrinth_app_beta } from "./modrinth_app_beta";
 import { article as modrinth_beta } from "./modrinth_beta";
+import { article as modrinth_servers_asia } from "./modrinth_servers_asia";
 import { article as modrinth_servers_beta } from "./modrinth_servers_beta";
-import { article as modrinth_servers_southeast_asia } from "./modrinth_servers_southeast_asia";
 import { article as new_environments } from "./new_environments";
 import { article as new_site_beta } from "./new_site_beta";
 import { article as plugins_resource_packs } from "./plugins_resource_packs";
@@ -40,8 +40,8 @@ export const articles = [
   plugins_resource_packs,
   new_site_beta,
   new_environments,
-  modrinth_servers_southeast_asia,
   modrinth_servers_beta,
+  modrinth_servers_asia,
   modrinth_beta,
   modrinth_app_beta,
   modpacks_alpha,
