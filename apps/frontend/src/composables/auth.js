@@ -109,7 +109,7 @@ export const getAuthUrl = (provider, redirect = '/dashboard') => {
 	const route = useNativeRoute()
 
 	const fullURL = route.query.launcher
-		? 'https://launcher-files.modrinth.com'
+		? getLauncherRedirectUrl(route)
 		: `${config.public.siteUrl}/auth/sign-in?redirect=${redirect}`
 
 	return `${config.public.apiBaseUrl}auth/init?provider=${provider}&url=${encodeURIComponent(fullURL)}`
@@ -130,4 +130,13 @@ export const removeAuthProvider = async (provider) => {
 	await useAuth(auth.value.token)
 
 	stopLoading()
+}
+
+export const getLauncherRedirectUrl = (route) => {
+	const usesLocalhostRedirectionScheme =
+		['4', '6'].includes(route.query.ipver) && Number(route.query.port) < 65536
+
+	return usesLocalhostRedirectionScheme
+		? `http://${route.query.ipver === '4' ? '127.0.0.1' : '[::1]'}:${route.query.port}`
+		: `https://launcher-files.modrinth.com`
 }
