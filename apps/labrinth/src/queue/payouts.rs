@@ -4,12 +4,16 @@ use crate::models::payouts::{
 };
 use crate::models::projects::MonetizationStatus;
 use crate::routes::ApiError;
+use crate::util::webhook::{
+    PayoutSourceAlertType, send_slack_payout_source_alert_webhook,
+};
 use base64::Engine;
 use chrono::{DateTime, Datelike, Duration, NaiveTime, TimeZone, Utc};
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use reqwest::Method;
 use rust_decimal::Decimal;
+use rust_decimal::prelude::ToPrimitive;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -1080,29 +1084,31 @@ pub async fn insert_payouts(
     .await
 }
 
-pub async fn insert_bank_balances(
+pub async fn insert_bank_balances_and_webhook(
     payouts: &PayoutsQueue,
     pool: &PgPool,
 ) -> Result<(), ApiError> {
     let mut transaction = pool.begin().await?;
 
-    let paypal = PayoutsQueue::get_paypal_balance()
-        .await
-        .inspect_err(|error| error!(%error, "Failure getting PayPal balance"))
-        .ok();
+    let paypal_result = PayoutsQueue::get_paypal_balance().await;
+    let brex_result = PayoutsQueue::get_brex_balance().await;
+    let tremendous_result = payouts.get_tremendous_balance().await;
 
-    let brex = PayoutsQueue::get_brex_balance()
-        .await
-        .inspect_err(|error| error!(%error, "Failure getting Brex balance"))
-        .ok();
-
-    let tremendous = payouts
-        .get_tremendous_balance()
-        .await
-        .inspect_err(
-            |error| error!(%error, "Failure getting Tremendous balance"),
-        )
-        .ok();
+    let paypal = check_balance_with_webhook(
+        "paypal",
+        "PAYPAL_ALERT_THRESHOLD",
+        paypal_result,
+    )
+    .await?;
+    let brex =
+        check_balance_with_webhook("brex", "BREX_ALERT_THRESHOLD", brex_result)
+            .await?;
+    let tremendous = check_balance_with_webhook(
+        "tremendous",
+        "TREMENDOUS_ALERT_THRESHOLD",
+        tremendous_result,
+    )
+    .await?;
 
     let mut insert_account_types = Vec::new();
     let mut insert_amounts = Vec::new();
@@ -1112,29 +1118,26 @@ pub async fn insert_bank_balances(
     let now = Utc::now();
     let today = now.date_naive().and_time(NaiveTime::MIN).and_utc();
 
-    let mut add_balance =
-        |account_type: &str, balance: Option<AccountBalance>| {
-            if let Some(balance) = balance {
-                insert_account_types.push(account_type.to_string());
-                insert_amounts.push(balance.available);
-                insert_pending.push(false);
-                insert_recorded.push(today);
+    let mut add_balance = |account_type: &str, balance: &AccountBalance| {
+        insert_account_types.push(account_type.to_string());
+        insert_amounts.push(balance.available);
+        insert_pending.push(false);
+        insert_recorded.push(today);
 
-                insert_account_types.push(account_type.to_string());
-                insert_amounts.push(balance.pending);
-                insert_pending.push(true);
-                insert_recorded.push(today);
-            }
-        };
+        insert_account_types.push(account_type.to_string());
+        insert_amounts.push(balance.pending);
+        insert_pending.push(true);
+        insert_recorded.push(today);
+    };
 
     if let Some(paypal) = paypal {
-        add_balance("paypal", paypal);
+        add_balance("paypal", &paypal);
     }
     if let Some(brex) = brex {
-        add_balance("brex", brex);
+        add_balance("brex", &brex);
     }
     if let Some(tremendous) = tremendous {
-        add_balance("tremendous", tremendous);
+        add_balance("tremendous", &tremendous);
     }
 
     sqlx::query!(
@@ -1155,4 +1158,46 @@ pub async fn insert_bank_balances(
     transaction.commit().await?;
 
     Ok(())
+}
+
+async fn check_balance_with_webhook(
+    source: &str,
+    threshold_env_var_name: &str,
+    result: Result<Option<AccountBalance>, ApiError>,
+) -> Result<Option<AccountBalance>, ApiError> {
+    let maybe_threshold = dotenvy::var(threshold_env_var_name)
+        .ok()
+        .and_then(|x| x.parse::<u64>().ok())
+        .filter(|x| *x != 0);
+    let payout_alert_webhook = dotenvy::var("PAYOUT_ALERT_SLACK_WEBHOOK")?;
+
+    match &result {
+        Ok(Some(account_balance)) => {
+            if let Some(threshold) = maybe_threshold {
+                if let Some(available) =
+                    account_balance.available.trunc().to_u64()
+                {
+                    if available <= threshold {
+                        send_slack_payout_source_alert_webhook(
+                            PayoutSourceAlertType::UnderThreshold {
+                                source: source.to_owned(),
+                                threshold,
+                                current_balance: available,
+                            },
+                            &payout_alert_webhook,
+                        )
+                        .await?;
+                    }
+                }
+            }
+        }
+
+        Err(error) => {
+            error!(%error, "Failure getting balance for payout source '{source}'");
+        }
+
+        _ => {}
+    }
+
+    Ok(result.ok().flatten())
 }
