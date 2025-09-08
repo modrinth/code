@@ -1,4 +1,7 @@
 {
+  "badge.beta-release": {
+    "defaultMessage": "Beta Release"
+  },
   "badge.new": {
     "defaultMessage": "New"
   },
@@ -715,6 +718,9 @@
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Region not listed? <link>Let us know where you'd like to see Modrinth Servers next!</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "Southeast Asia"
   },
   "servers.region.western-europe": {
     "defaultMessage": "Western Europe"

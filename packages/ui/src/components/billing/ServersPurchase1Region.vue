@@ -12,6 +12,7 @@ import {
 	type ServerRegion,
 	type ServerStockRequest,
 } from '../../utils/billing'
+import { regionOverrides } from '../../utils/regions.ts'
 import Slider from '../base/Slider.vue'
 import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
 import type { RegionPing } from './ModrinthServersPurchaseModal.vue'
@@ -41,7 +42,7 @@ const selectedPrice = computed(() => {
 	return amount ? amount / monthsInInterval[props.interval] : undefined
 })
 
-const regionOrder: string[] = ['us-vin', 'eu-cov', 'eu-lim']
+const regionOrder: string[] = Object.keys(regionOverrides)
 
 const sortedRegions = computed(() => {
 	return props.regions.slice().sort((a, b) => {

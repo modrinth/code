@@ -17,6 +17,7 @@ use sqlx::PgPool;
 use sqlx::postgres::PgQueryResult;
 use std::collections::HashMap;
 use tokio::sync::RwLock;
+use tracing::error;
 
 pub struct PayoutsQueue {
     credential: RwLock<Option<PayPalCredentials>>,
@@ -650,8 +651,8 @@ impl PayoutsQueue {
     ) -> Result<Option<AccountBalance>, ApiError> {
         #[derive(Deserialize)]
         struct FundingSourceMeta {
-            available_cents: u64,
-            pending_cents: u64,
+            available_cents: Option<u64>,
+            pending_cents: Option<u64>,
         }
 
         #[derive(Deserialize)]
@@ -678,9 +679,9 @@ impl PayoutsQueue {
             .into_iter()
             .find(|x| x.method == "balance")
             .map(|x| AccountBalance {
-                available: Decimal::from(x.meta.available_cents)
+                available: Decimal::from(x.meta.available_cents.unwrap_or(0))
                     / Decimal::from(100),
-                pending: Decimal::from(x.meta.pending_cents)
+                pending: Decimal::from(x.meta.pending_cents.unwrap_or(0))
                     / Decimal::from(100),
             }))
     }
@@ -1078,12 +1079,23 @@ pub async fn insert_bank_balances(
 ) -> Result<(), ApiError> {
     let mut transaction = pool.begin().await?;
 
-    let (paypal, brex, tremendous) = futures::future::try_join3(
-        PayoutsQueue::get_paypal_balance(),
-        PayoutsQueue::get_brex_balance(),
-        payouts.get_tremendous_balance(),
-    )
-    .await?;
+    let paypal = PayoutsQueue::get_paypal_balance()
+        .await
+        .inspect_err(|error| error!(%error, "Failure getting PayPal balance"))
+        .ok();
+
+    let brex = PayoutsQueue::get_brex_balance()
+        .await
+        .inspect_err(|error| error!(%error, "Failure getting Brex balance"))
+        .ok();
+
+    let tremendous = payouts
+        .get_tremendous_balance()
+        .await
+        .inspect_err(
+            |error| error!(%error, "Failure getting Tremendous balance"),
+        )
+        .ok();
 
     let mut insert_account_types = Vec::new();
     let mut insert_amounts = Vec::new();
@@ -1108,9 +1120,15 @@ pub async fn insert_bank_balances(
             }
         };
 
-    add_balance("paypal", paypal);
-    add_balance("brex", brex);
-    add_balance("tremendous", tremendous);
+    if let Some(paypal) = paypal {
+        add_balance("paypal", paypal);
+    }
+    if let Some(brex) = brex {
+        add_balance("brex", brex);
+    }
+    if let Some(tremendous) = tremendous {
+        add_balance("tremendous", tremendous);
+    }
 
     sqlx::query!(
         "
