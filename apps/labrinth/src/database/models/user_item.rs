@@ -270,6 +270,25 @@ impl DBUser {
         Ok(users)
     }
 
+    // Returns `false` if any of the specified user IDs do not exist.
+    pub async fn exists_many<'a, E>(
+        user_ids: &[DBUserId],
+        exec: E,
+    ) -> Result<bool, sqlx::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let ids = user_ids.iter().map(|x| x.0 as i64).collect::<Vec<_>>();
+        let count = sqlx::query_scalar!(
+            r#"SELECT COUNT(1) "count!" FROM users WHERE id = ANY($1)"#,
+            &ids
+        )
+        .fetch_one(exec)
+        .await?;
+
+        Ok(count as usize == user_ids.len())
+    }
+
     pub async fn get_projects<'a, E>(
         user_id: DBUserId,
         exec: E,
