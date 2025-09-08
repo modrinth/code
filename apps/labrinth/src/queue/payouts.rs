@@ -1176,11 +1176,10 @@ async fn check_balance_with_webhook(
 
     match &result {
         Ok(Some(account_balance)) => {
-            if let Some(threshold) = maybe_threshold {
-                if let Some(available) =
+            if let Some(threshold) = maybe_threshold
+                && let Some(available) =
                     account_balance.available.trunc().to_u64()
-                {
-                    if available <= threshold {
+                    && available <= threshold {
                         send_slack_payout_source_alert_webhook(
                             PayoutSourceAlertType::UnderThreshold {
                                 source: source.to_owned(),
@@ -1191,8 +1190,6 @@ async fn check_balance_with_webhook(
                         )
                         .await?;
                     }
-                }
-            }
         }
 
         Err(error) => {
