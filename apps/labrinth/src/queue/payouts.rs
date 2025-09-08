@@ -1096,16 +1096,19 @@ pub async fn insert_bank_balances_and_webhook(
 
     let paypal = check_balance_with_webhook(
         "paypal",
-        "PAYPAL_ALERT_THRESHOLD",
+        "PAYPAL_BALANCE_ALERT_THRESHOLD",
         paypal_result,
     )
     .await?;
-    let brex =
-        check_balance_with_webhook("brex", "BREX_ALERT_THRESHOLD", brex_result)
-            .await?;
+    let brex = check_balance_with_webhook(
+        "brex",
+        "BREX_BALANCE_ALERT_THRESHOLD",
+        brex_result,
+    )
+    .await?;
     let tremendous = check_balance_with_webhook(
         "tremendous",
-        "TREMENDOUS_ALERT_THRESHOLD",
+        "TREMENDOUS_BALANCE_ALERT_THRESHOLD",
         tremendous_result,
     )
     .await?;
@@ -1194,6 +1197,16 @@ async fn check_balance_with_webhook(
 
         Err(error) => {
             error!(%error, "Failure getting balance for payout source '{source}'");
+
+            if maybe_threshold.is_some() {
+                send_slack_payout_source_alert_webhook(
+                    PayoutSourceAlertType::CheckFailure {
+                        source: source.to_owned(),
+                        display_error: error.to_string(),
+                    },
+                )
+                .await?;
+            }
         }
 
         _ => {}
