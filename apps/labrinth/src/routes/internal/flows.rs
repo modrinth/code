@@ -2409,25 +2409,3 @@ pub async fn get_newsletter_subscription_status(
         "subscribed": is_subscribed
     })))
 }
-
-fn send_email_verify(
-    email: String,
-    flow: String,
-    opener: &str,
-) -> Result<(), crate::queue::email::MailError> {
-    send_email(
-        email,
-        "Verify your email",
-        opener,
-        "Please visit the following link below to verify your email. If the button does not work, you can copy the link and paste it into your browser. This link expires in 24 hours.",
-        Some((
-            "Verify email",
-            &format!(
-                "{}/{}?flow={}",
-                dotenvy::var("SITE_URL")?,
-                dotenvy::var("SITE_VERIFY_EMAIL_PATH")?,
-                flow
-            ),
-        )),
-    )
-}

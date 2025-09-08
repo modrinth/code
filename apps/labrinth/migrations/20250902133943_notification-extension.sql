@@ -61,17 +61,17 @@ INSERT INTO notifications_types (name, delivery_priority, expose_in_user_prefere
 INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('organization_invite', 1, TRUE, TRUE);
 INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('status_change', 1, TRUE, TRUE);
 INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('moderator_message', 1, TRUE, TRUE);
-INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('legacy_markdown', 1, TRUE, TRUE);
-INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('unknown', 1, TRUE, TRUE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('legacy_markdown', 1, FALSE, TRUE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('unknown', 1, FALSE, TRUE);
 INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('verify_email', 3, FALSE, FALSE);
-INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('auth_provider_added', 2, TRUE, FALSE);
-INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('auth_provider_removed', 2, TRUE, FALSE);
-INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('two_factor_enabled', 2, TRUE, FALSE);
-INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('two_factor_removed', 2, TRUE, FALSE);
-INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('password_changed', 2, TRUE, FALSE);
-INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('password_removed', 2, TRUE, FALSE);
-INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('email_changed', 2, TRUE, FALSE);
-INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('payment_failed', 2, TRUE, FALSE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('auth_provider_added', 2, FALSE, FALSE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('auth_provider_removed', 2, FALSE, FALSE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('two_factor_enabled', 2, FALSE, FALSE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('two_factor_removed', 2, FALSE, FALSE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('password_changed', 2, FALSE, FALSE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('password_removed', 2, FALSE, FALSE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('email_changed', 2, FALSE, FALSE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('payment_failed', 2, FALSE, FALSE);
 
 INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
 VALUES (NULL, 'email', 'reset_password', TRUE);
@@ -137,19 +137,14 @@ VALUES (
 
 INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
 VALUES (
-    'email', 'verify_email', 'Verify your email', 'https://modrinth.com/mail/verifyemail.html',
+    'email', 'verify_email', 'Verify your Modrinth email', 'https://modrinth.com/mail/verifyemail.html',
     CONCAT(
         'Hi {user.name},',
         CHR(10),
         CHR(10),
-        'Please visit the link below to verify your email. If the button does not work, you can copy the link and paste it into your browser. This link expires in 24 hours.',
+        'Please visit the link below to verify your Modrinth email. If the button does not work, you can copy the link and paste it into your browser. This link expires in 24 hours.',
         CHR(10),
-        'Verify your email: {verifyemail.url}',
-        CHR(10),
-        CHR(10),
-        '- The Modrinth Team',
-        CHR(10),
-        'modrinth.com'
+        'Verify your email: {verifyemail.url}'
     )
 );
 
@@ -207,7 +202,7 @@ VALUES (
 
 INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
 VALUES (
-    'email', 'password_changed', 'Password changed', 'https://modrinth.com/mail/passwordchanged.html',
+    'email', 'password_changed', 'Your Modrinth password was changed', 'https://modrinth.com/mail/passwordchanged.html',
     CONCAT(
         'Hi {user.name},',
         CHR(10),
@@ -220,7 +215,7 @@ VALUES (
 
 INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
 VALUES (
-    'email', 'password_removed', 'Password removed', 'https://modrinth.com/mail/passwordremoved.html',
+    'email', 'password_removed', 'Your Modrinth password was removed', 'https://modrinth.com/mail/passwordremoved.html',
     CONCAT(
         'Hi {user.name},',
         CHR(10),
@@ -233,7 +228,7 @@ VALUES (
 
 INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
 VALUES (
-    'email', 'email_changed', 'Email changed', 'https://modrinth.com/mail/emailchanged.html',
+    'email', 'email_changed', 'Your Modrinth email was changed', 'https://modrinth.com/mail/emailchanged.html',
     CONCAT(
         'Hi {user.name},',
         CHR(10),
