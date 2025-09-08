@@ -1204,6 +1204,7 @@ async fn check_balance_with_webhook(
                         source: source.to_owned(),
                         display_error: error.to_string(),
                     },
+                    &payout_alert_webhook,
                 )
                 .await?;
             }
