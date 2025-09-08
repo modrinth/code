@@ -441,9 +441,9 @@
 								Where are Modrinth Servers located? Can I choose a region?
 							</summary>
 							<p class="m-0 ml-6 leading-[160%]">
-								We have servers available in North America and Europe at the moment that you can
-								choose upon purchase. More regions to come in the future! If you'd like to switch
-								your region, please contact support.
+								We have servers available in North America, Europe, and Southeast Asia at the moment
+								that you can choose upon purchase. More regions to come in the future! If you'd like
+								to switch your region, please contact support.
 							</p>
 						</details>
 
@@ -527,7 +527,7 @@
 					There's a server for everyone
 				</h1>
 				<p class="m-0 flex items-center gap-1">
-					Available in North America and Europe for wide coverage.
+					Available in North America, Europe, and Southeast Asia for wide coverage.
 				</p>
 
 				<div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
