@@ -19,6 +19,11 @@ const USER_NAME: &str = "user.name";
 const USER_EMAIL: &str = "user.email";
 
 const RESETPASSWORD_URL: &str = "resetpassword.url";
+const VERIFYEMAIL_URL: &str = "verifyemail.url";
+const AUTHPROVIDER_NAME: &str = "authprovider.name";
+const EMAILCHANGED_NEW_EMAIL: &str = "emailchanged.new_email";
+const BILLING_URL: &str = "billing.url";
+const PAYMENTFAILED_AMOUNT: &str = "paymentfailed.amount";
 
 const TEAMINVITE_INVITER_NAME: &str = "teaminvite.inviter.name";
 const TEAMINVITE_PROJECT_NAME: &str = "teaminvite.project.name";
@@ -303,6 +308,83 @@ async fn collect_template_variables(
             let mut map = HashMap::new();
             map.insert(RESETPASSWORD_URL, url);
             map.insert(USER_NAME, user.username);
+
+            Ok(TemplateVariables::with_email(map, user.email))
+        }
+
+        NotificationBody::VerifyEmail { flow } => {
+            let url = format!(
+                "{}/{}?flow={}",
+                dotenvy::var("SITE_URL")?,
+                dotenvy::var("SITE_VERIFY_EMAIL_PATH")?,
+                flow
+            );
+
+            let user =
+                DBUser::get_id(n.user_id, exec, redis).await?.ok_or_else(
+                    || DatabaseError::Database(sqlx::Error::RowNotFound),
+                )?;
+
+            let mut map = HashMap::new();
+            map.insert(VERIFYEMAIL_URL, url);
+            map.insert(USER_NAME, user.username);
+
+            Ok(TemplateVariables::with_email(map, user.email))
+        }
+
+        NotificationBody::AuthProviderAdded { provider }
+        | NotificationBody::AuthProviderRemoved { provider } => {
+            let user =
+                DBUser::get_id(n.user_id, exec, redis).await?.ok_or_else(
+                    || DatabaseError::Database(sqlx::Error::RowNotFound),
+                )?;
+
+            let mut map = HashMap::new();
+            map.insert(USER_NAME, user.username);
+            map.insert(AUTHPROVIDER_NAME, provider.clone());
+
+            Ok(TemplateVariables::with_email(map, user.email))
+        }
+
+        NotificationBody::TwoFactorEnabled
+        | NotificationBody::TwoFactorRemoved
+        | NotificationBody::PasswordChanged
+        | NotificationBody::PasswordRemoved => {
+            only_select_default_variables(exec, redis, n.user_id).await
+        }
+
+        NotificationBody::EmailChanged {
+            new_email,
+            to_email,
+        } => {
+            let user =
+                DBUser::get_id(n.user_id, exec, redis).await?.ok_or_else(
+                    || DatabaseError::Database(sqlx::Error::RowNotFound),
+                )?;
+
+            let mut map = HashMap::new();
+            map.insert(USER_NAME, user.username);
+            map.insert(EMAILCHANGED_NEW_EMAIL, new_email.clone());
+
+            Ok(TemplateVariables::with_email(map, Some(to_email.clone())))
+        }
+
+        NotificationBody::PaymentFailed { amount } => {
+            let user =
+                DBUser::get_id(n.user_id, exec, redis).await?.ok_or_else(
+                    || DatabaseError::Database(sqlx::Error::RowNotFound),
+                )?;
+
+            let url = format!(
+                "{}/{}",
+                dotenvy::var("SITE_URL")?,
+                dotenvy::var("SITE_BILLING_PATH")?,
+            );
+
+            let mut map = HashMap::new();
+            map.insert(USER_NAME, user.username);
+            map.insert(PAYMENTFAILED_AMOUNT, amount.clone());
+            map.insert(BILLING_URL, url);
 
             Ok(TemplateVariables::with_email(map, user.email))
         }

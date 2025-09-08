@@ -76,6 +76,25 @@ pub enum LegacyNotificationBody {
     // include it here, to be 100% certain we don't end up leaking it
     // in site notifications.
     ResetPassword,
+    // Idem as ResetPassword
+    VerifyEmail,
+    AuthProviderAdded {
+        provider: String,
+    },
+    AuthProviderRemoved {
+        provider: String,
+    },
+    TwoFactorEnabled,
+    TwoFactorRemoved,
+    PasswordChanged,
+    PasswordRemoved,
+    EmailChanged {
+        new_email: String,
+        to_email: String,
+    },
+    PaymentFailed {
+        amount: String,
+    },
     Unknown,
 }
 
@@ -99,6 +118,33 @@ impl LegacyNotification {
             }
             NotificationBody::ResetPassword { .. } => {
                 Some("reset_password".to_string())
+            }
+            NotificationBody::VerifyEmail { .. } => {
+                Some("verify_email".to_string())
+            }
+            NotificationBody::AuthProviderAdded { .. } => {
+                Some("auth_provider_added".to_string())
+            }
+            NotificationBody::AuthProviderRemoved { .. } => {
+                Some("auth_provider_removed".to_string())
+            }
+            NotificationBody::TwoFactorEnabled { .. } => {
+                Some("two_factor_enabled".to_string())
+            }
+            NotificationBody::TwoFactorRemoved { .. } => {
+                Some("two_factor_removed".to_string())
+            }
+            NotificationBody::PasswordChanged { .. } => {
+                Some("password_changed".to_string())
+            }
+            NotificationBody::PasswordRemoved { .. } => {
+                Some("password_removed".to_string())
+            }
+            NotificationBody::EmailChanged { .. } => {
+                Some("email_changed".to_string())
+            }
+            NotificationBody::PaymentFailed { .. } => {
+                Some("payment_failed".to_string())
             }
             NotificationBody::LegacyMarkdown {
                 notification_type, ..
@@ -171,6 +217,37 @@ impl LegacyNotification {
             },
             NotificationBody::ResetPassword { .. } => {
                 LegacyNotificationBody::ResetPassword
+            }
+            NotificationBody::VerifyEmail { .. } => {
+                LegacyNotificationBody::VerifyEmail
+            }
+            NotificationBody::AuthProviderAdded { provider } => {
+                LegacyNotificationBody::AuthProviderAdded { provider }
+            }
+            NotificationBody::AuthProviderRemoved { provider } => {
+                LegacyNotificationBody::AuthProviderRemoved { provider }
+            }
+            NotificationBody::TwoFactorEnabled => {
+                LegacyNotificationBody::TwoFactorEnabled
+            }
+            NotificationBody::TwoFactorRemoved => {
+                LegacyNotificationBody::TwoFactorRemoved
+            }
+            NotificationBody::PasswordChanged => {
+                LegacyNotificationBody::PasswordChanged
+            }
+            NotificationBody::PasswordRemoved => {
+                LegacyNotificationBody::PasswordRemoved
+            }
+            NotificationBody::EmailChanged {
+                new_email,
+                to_email,
+            } => LegacyNotificationBody::EmailChanged {
+                new_email,
+                to_email,
+            },
+            NotificationBody::PaymentFailed { amount } => {
+                LegacyNotificationBody::PaymentFailed { amount }
             }
             NotificationBody::Unknown => LegacyNotificationBody::Unknown,
         };

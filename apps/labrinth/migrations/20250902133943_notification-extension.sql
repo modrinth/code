@@ -63,6 +63,15 @@ INSERT INTO notifications_types (name, delivery_priority, expose_in_user_prefere
 INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('moderator_message', 1, TRUE, TRUE);
 INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('legacy_markdown', 1, TRUE, TRUE);
 INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('unknown', 1, TRUE, TRUE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('verify_email', 3, FALSE, FALSE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('auth_provider_added', 2, TRUE, FALSE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('auth_provider_removed', 2, TRUE, FALSE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('two_factor_enabled', 2, TRUE, FALSE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('two_factor_removed', 2, TRUE, FALSE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('password_changed', 2, TRUE, FALSE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('password_removed', 2, TRUE, FALSE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('email_changed', 2, TRUE, FALSE);
+INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('payment_failed', 2, TRUE, FALSE);
 
 INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
 VALUES (NULL, 'email', 'reset_password', TRUE);
@@ -88,6 +97,25 @@ VALUES (NULL, 'email', 'legacy_markdown', FALSE);
 INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
 VALUES (NULL, 'email', 'unknown', FALSE);
 
+INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
+VALUES (NULL, 'email', 'verify_email', TRUE);
+INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
+VALUES (NULL, 'email', 'auth_provider_added', TRUE);
+INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
+VALUES (NULL, 'email', 'auth_provider_removed', TRUE);
+INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
+VALUES (NULL, 'email', 'two_factor_enabled', TRUE);
+INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
+VALUES (NULL, 'email', 'two_factor_removed', TRUE);
+INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
+VALUES (NULL, 'email', 'password_changed', TRUE);
+INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
+VALUES (NULL, 'email', 'password_removed', TRUE);
+INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
+VALUES (NULL, 'email', 'email_changed', TRUE);
+INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
+VALUES (NULL, 'email', 'payment_failed', TRUE);
+
 -- Pre-insert any templates
 INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
 VALUES (
@@ -104,5 +132,127 @@ VALUES (
         '- The Modrinth Team',
         CHR(10),
         'modrinth.com'
+    )
+);
+
+INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
+VALUES (
+    'email', 'verify_email', 'Verify your email', 'https://modrinth.com/mail/verifyemail.html',
+    CONCAT(
+        'Hi {user.name},',
+        CHR(10),
+        CHR(10),
+        'Please visit the link below to verify your email. If the button does not work, you can copy the link and paste it into your browser. This link expires in 24 hours.',
+        CHR(10),
+        'Verify your email: {verifyemail.url}',
+        CHR(10),
+        CHR(10),
+        '- The Modrinth Team',
+        CHR(10),
+        'modrinth.com'
+    )
+);
+
+INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
+VALUES (
+    'email', 'auth_provider_added', 'Authentication method added', 'https://modrinth.com/mail/authprovideradded.html',
+    CONCAT(
+        'Hi {user.name},',
+        CHR(10),
+        CHR(10),
+        'When logging into Modrinth, you can now log in using the ', '{authprovider.name}', ' authentication provider.',
+        CHR(10),
+        'If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).'
+    )
+);
+
+INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
+VALUES (
+    'email', 'auth_provider_removed', 'Authentication method removed', 'https://modrinth.com/mail/authproviderremoved.html',
+    CONCAT(
+        'Hi {user.name},',
+        CHR(10),
+        CHR(10),
+        'When logging into Modrinth, you can no longer log in using the ', '{authprovider.name}', ' authentication provider.',
+        CHR(10),
+        'If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).'
+    )
+);
+
+INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
+VALUES (
+    'email', 'two_factor_enabled', 'Two-factor authentication enabled', 'https://modrinth.com/mail/twofactorenabled.html',
+    CONCAT(
+        'Hi {user.name},',
+        CHR(10),
+        CHR(10),
+        'When logging into Modrinth, you can now enter a code generated by your authenticator app in addition to entering your usual email address and password.',
+        CHR(10),
+        'If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).'
+    )
+);
+
+INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
+VALUES (
+    'email', 'two_factor_removed', 'Two-factor authentication removed', 'https://modrinth.com/mail/twofactorremoved.html',
+    CONCAT(
+        'Hi {user.name},',
+        CHR(10),
+        CHR(10),
+        'When logging into Modrinth, you no longer need two-factor authentication to gain access.',
+        CHR(10),
+        'If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).'
+    )
+);
+
+INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
+VALUES (
+    'email', 'password_changed', 'Password changed', 'https://modrinth.com/mail/passwordchanged.html',
+    CONCAT(
+        'Hi {user.name},',
+        CHR(10),
+        CHR(10),
+        'Your password has been changed on your account.',
+        CHR(10),
+        'If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).'
+    )
+);
+
+INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
+VALUES (
+    'email', 'password_removed', 'Password removed', 'https://modrinth.com/mail/passwordremoved.html',
+    CONCAT(
+        'Hi {user.name},',
+        CHR(10),
+        CHR(10),
+        'Your password has been removed on your account.',
+        CHR(10),
+        'If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).'
+    )
+);
+
+INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
+VALUES (
+    'email', 'email_changed', 'Email changed', 'https://modrinth.com/mail/emailchanged.html',
+    CONCAT(
+        'Hi {user.name},',
+        CHR(10),
+        CHR(10),
+        'Your email has been updated to ', '{emailchanged.new_email}', ' on your account.',
+        CHR(10),
+        'If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).'
+    )
+);
+
+INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
+VALUES (
+    'email', 'payment_failed', 'Payment Failed for Modrinth', 'https://modrinth.com/mail/paymentfailed.html',
+    CONCAT(
+        'Hi {user.name},',
+        CHR(10),
+        CHR(10),
+        'Our attempt to collect payment for ', '{paymentfailed.amount}', ' from the payment card on file was unsuccessful.',
+        CHR(10),
+        'Update billing settings: {billing.url}'
     )
 );
