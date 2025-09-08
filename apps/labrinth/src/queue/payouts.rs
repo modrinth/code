@@ -408,6 +408,11 @@ impl PayoutsQueue {
                         .into_iter()
                         .map(|x| x.abbr)
                         .collect(),
+                    image_logo_url: product
+                        .images
+                        .iter()
+                        .find(|x| x.type_ == ProductImageType::Logo)
+                        .map(|x| x.src.clone()),
                     image_url: product
                         .images
                         .into_iter()
@@ -486,6 +491,7 @@ impl PayoutsQueue {
                     name: "PayPal".to_string(),
                     supported_countries: vec!["US".to_string()],
                     image_url: None,
+                    image_logo_url: None,
                     interval: PayoutInterval::Standard {
                         min: Decimal::from(1) / Decimal::from(4),
                         max: Decimal::from(100_000),
@@ -518,6 +524,7 @@ impl PayoutsQueue {
                         .map(|x| x.alpha2.to_string())
                         .collect(),
                     image_url: None,
+                    image_logo_url: None,
                     interval: PayoutInterval::Standard {
                         min: Decimal::from(1) / Decimal::from(4),
                         max: Decimal::from(100_000),

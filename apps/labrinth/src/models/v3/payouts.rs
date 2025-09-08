@@ -121,6 +121,7 @@ pub struct PayoutMethod {
     pub name: String,
     pub supported_countries: Vec<String>,
     pub image_url: Option<String>,
+    pub image_logo_url: Option<String>,
     pub interval: PayoutInterval,
     pub fee: PayoutMethodFee,
 }
