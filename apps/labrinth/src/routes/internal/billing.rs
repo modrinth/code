@@ -2474,11 +2474,7 @@ pub async fn stripe_webhook(
                                 amount: money.to_string(),
                             },
                         }
-                        .insert(
-                            metadata.user_item.id,
-                            &mut transaction,
-                            &redis,
-                        )
+                        .insert(metadata.user_item.id, &mut transaction, &redis)
                         .await?;
                     }
 
