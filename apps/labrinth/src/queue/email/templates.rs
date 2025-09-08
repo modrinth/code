@@ -1,9 +1,9 @@
 use super::MailError;
+use crate::database::models::DBUser;
 use crate::database::models::DatabaseError;
 use crate::database::models::ids::*;
 use crate::database::models::notification_item::DBNotification;
 use crate::database::models::notifications_template_item::NotificationTemplate;
-use crate::database::models::user_item::DBUser;
 use crate::database::redis::RedisPool;
 use crate::models::v3::notifications::NotificationBody;
 use crate::routes::ApiError;
@@ -295,10 +295,16 @@ async fn collect_template_variables(
                 flow
             );
 
+            let user =
+                DBUser::get_id(n.user_id, exec, redis).await?.ok_or_else(
+                    || DatabaseError::Database(sqlx::Error::RowNotFound),
+                )?;
+
             let mut map = HashMap::new();
             map.insert(RESETPASSWORD_URL, url);
+            map.insert(USER_NAME, user.username);
 
-            Ok(TemplateVariables::with_email(map, None))
+            Ok(TemplateVariables::with_email(map, user.email))
         }
 
         NotificationBody::ProjectUpdate { .. }

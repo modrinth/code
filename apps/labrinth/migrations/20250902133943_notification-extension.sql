@@ -96,7 +96,7 @@ VALUES (
         'Hi {user.name},',
         CHR(10),
         CHR(10),
-        'Please visit the below link below to reset your password. If you did not request for your password to be reset, you can safely ignore this email.',
+        'Please visit the link below to reset your password. If you did not request for your password to be reset, you can safely ignore this email.',
         CHR(10),
         'Reset your password: {resetpassword.url}',
         CHR(10),

@@ -17,7 +17,7 @@ use reqwest::Client;
 use sqlx::PgPool;
 use std::sync::Arc;
 use thiserror::Error;
-use tracing::{error, info, instrument, warn};
+use tracing::{error, info, instrument, trace, warn};
 
 #[derive(Error, Debug)]
 pub enum MailError {
@@ -235,6 +235,8 @@ async fn poll_queue(
             // notification type, skip it.
 
             let Some(template) = maybe_template else {
+                trace!("No template was found for notification type.");
+
                 result.update_status = NotificationDeliveryStatus::SkippedDefault;
                 return Ok(result);
             };
@@ -252,6 +254,7 @@ async fn poll_queue(
 
             let Some(message) = maybe_message else {
                 // User has no email--skip it.
+                trace!("Attempted to send email to user without email");
                 result.update_status = NotificationDeliveryStatus::SkippedDefault;
                 return Ok(result);
             };
