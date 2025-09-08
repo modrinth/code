@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y mold
 RUN --mount=type=cache,target=/usr/src/labrinth/target \
   --mount=type=cache,target=/usr/local/cargo/git/db \
   --mount=type=cache,target=/usr/local/cargo/registry \
-  SQLX_OFFLINE=true RUSTFLAGS="-C link-arg=-fuse-ld=mold" cargo build --profile release-labrinth --package labrinth
+  SQLX_OFFLINE=true RUSTFLAGS="-C link-arg=-fuse-ld=lld" cargo build --profile release-labrinth --package labrinth
 
 FROM build AS artifacts
 
