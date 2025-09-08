@@ -1886,7 +1886,7 @@ pub async fn remove_2fa(
     NotificationBuilder {
         body: NotificationBody::TwoFactorRemoved,
     }
-    .insert(user.id.into(), &mut transaction, &redis)
+    .insert(user.id, &mut transaction, &redis)
     .await?;
 
     transaction.commit().await?;
@@ -2115,13 +2115,13 @@ pub async fn change_password(
         NotificationBuilder {
             body: NotificationBody::PasswordChanged,
         }
-        .insert(user.id.into(), &mut transaction, &redis)
+        .insert(user.id, &mut transaction, &redis)
         .await?;
     } else {
         NotificationBuilder {
             body: NotificationBody::PasswordRemoved,
         }
-        .insert(user.id.into(), &mut transaction, &redis)
+        .insert(user.id, &mut transaction, &redis)
         .await?;
     }
 

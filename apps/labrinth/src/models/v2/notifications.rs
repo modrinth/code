@@ -128,16 +128,16 @@ impl LegacyNotification {
             NotificationBody::AuthProviderRemoved { .. } => {
                 Some("auth_provider_removed".to_string())
             }
-            NotificationBody::TwoFactorEnabled { .. } => {
+            NotificationBody::TwoFactorEnabled => {
                 Some("two_factor_enabled".to_string())
             }
-            NotificationBody::TwoFactorRemoved { .. } => {
+            NotificationBody::TwoFactorRemoved => {
                 Some("two_factor_removed".to_string())
             }
-            NotificationBody::PasswordChanged { .. } => {
+            NotificationBody::PasswordChanged => {
                 Some("password_changed".to_string())
             }
-            NotificationBody::PasswordRemoved { .. } => {
+            NotificationBody::PasswordRemoved => {
                 Some("password_removed".to_string())
             }
             NotificationBody::EmailChanged { .. } => {
