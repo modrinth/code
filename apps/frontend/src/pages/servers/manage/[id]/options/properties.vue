@@ -107,7 +107,6 @@
 								:aria-labelledby="`property-label-${index}`"
 							/>
 						</div>
-						<!-- Seed-like properties should always be text inputs to preserve precision -->
 						<div
 							v-else-if="index === 'level-seed' || index === 'seed'"
 							class="mt-2 w-full sm:w-[320px]"
