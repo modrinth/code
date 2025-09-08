@@ -19,6 +19,8 @@ use std::sync::Arc;
 use thiserror::Error;
 use tracing::{error, info, instrument, trace, warn};
 
+const EMAIL_RETRY_DELAY_SECONDS: u64 = 10;
+
 #[derive(Error, Debug)]
 pub enum MailError {
     #[error("Environment Error")]
@@ -293,7 +295,10 @@ async fn poll_queue(
                     delivery.status = result.update_status;
                     delivery.next_attempt = if result.advance_next_attempt_time
                     {
-                        Utc::now() + chrono::Duration::seconds(10)
+                        Utc::now()
+                            + chrono::Duration::seconds(
+                                EMAIL_RETRY_DELAY_SECONDS,
+                            )
                     } else {
                         delivery.next_attempt
                     };
@@ -311,7 +316,8 @@ async fn poll_queue(
         // For these, there was an error building the email, like a
         // database error. Retry them after 30 seconds.
 
-        delivery.next_attempt = Utc::now() + chrono::Duration::seconds(30);
+        delivery.next_attempt =
+            Utc::now() + chrono::Duration::seconds(EMAIL_RETRY_DELAY_SECONDS);
 
         delivery.update(&mut *txn).await?;
     }
