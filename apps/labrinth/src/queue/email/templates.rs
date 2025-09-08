@@ -91,6 +91,10 @@ pub async fn build_email(
             Some(from_name),
             from_address.parse().map_err(MailError::from)?,
         ))
+        .reply_to(Mailbox::new(
+            Some("Modrinth Support".to_owned()),
+            "support@modrinth.com".parse().map_err(MailError::from)?,
+        ))
         .to(target_email.parse().map_err(MailError::from)?)
         .subject(&template.subject_line);
 
