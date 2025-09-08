@@ -222,7 +222,10 @@ pub async fn send_slack_payout_source_alert_webhook(
             "blocks": [
                 {
                     "type": "section",
-                    "text": alert.message()
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": alert.message()
+                    }
                 },
                 {
                     "type": "context",
