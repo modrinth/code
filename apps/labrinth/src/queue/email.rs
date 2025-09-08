@@ -19,7 +19,7 @@ use std::sync::Arc;
 use thiserror::Error;
 use tracing::{error, info, instrument, trace, warn};
 
-const EMAIL_RETRY_DELAY_SECONDS: u64 = 10;
+const EMAIL_RETRY_DELAY_SECONDS: i64 = 10;
 
 #[derive(Error, Debug)]
 pub enum MailError {
