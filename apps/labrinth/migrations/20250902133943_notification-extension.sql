@@ -39,12 +39,6 @@ CREATE TABLE notifications_types (
     expose_in_site_notifications BOOL NOT NULL
 );
 
-CREATE TABLE notifications_types_preference_restrictions (
-    notification_type VARCHAR(32) NOT NULL REFERENCES notifications_types(name),
-    channel VARCHAR(32) NOT NULL,
-    forced_value BOOL NOT NULL
-);
-
 CREATE TABLE notifications_templates (
     id BIGSERIAL PRIMARY KEY,
     channel VARCHAR(32) NOT NULL,
@@ -99,20 +93,28 @@ VALUES (NULL, 'email', 'unknown', FALSE);
 
 INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
 VALUES (NULL, 'email', 'verify_email', TRUE);
+
 INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
 VALUES (NULL, 'email', 'auth_provider_added', TRUE);
+
 INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
 VALUES (NULL, 'email', 'auth_provider_removed', TRUE);
+
 INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
 VALUES (NULL, 'email', 'two_factor_enabled', TRUE);
+
 INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
 VALUES (NULL, 'email', 'two_factor_removed', TRUE);
+
 INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
 VALUES (NULL, 'email', 'password_changed', TRUE);
+
 INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
 VALUES (NULL, 'email', 'password_removed', TRUE);
+
 INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
 VALUES (NULL, 'email', 'email_changed', TRUE);
+
 INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
 VALUES (NULL, 'email', 'payment_failed', TRUE);
 
