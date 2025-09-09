@@ -1,0 +1,419 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Ontwikkelaarsmodus ingeschakeld."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Uiterlijk"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Standaardopties voor instantie"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Functie vlaggen"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Java installaties"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Privacy"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Bronnenbeheer"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Toevoegen en spelen"
+  },
+  "instance.add-server.add-server": {
+    "message": "Server toevoegen"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Uitgeschakeld"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Ingeschakeld"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Vragen"
+  },
+  "instance.add-server.title": {
+    "message": "Voeg een server toe"
+  },
+  "instance.edit-server.title": {
+    "message": "Server bewerken"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Verbergen van de startpagina"
+  },
+  "instance.edit-world.name": {
+    "message": "Naam"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft Wereld"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Herstel icoon"
+  },
+  "instance.edit-world.title": {
+    "message": "Wereld bewerken"
+  },
+  "instance.filter.disabled": {
+    "message": "Uitgeschakelde projecten"
+  },
+  "instance.filter.updates-available": {
+    "message": "Updates beschikbaar"
+  },
+  "instance.server-modal.address": {
+    "message": "Adres"
+  },
+  "instance.server-modal.name": {
+    "message": "Naam"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft Server"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Bronpakket"
+  },
+  "instance.settings.tabs.general": {
+    "message": "Algemeen"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Verwijder instantie"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Verwijder instantie"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Verwijdert permanent een instantie van je apparaat, inclusief je werelden, instellingen en alle geïnstalleerde inhoud. Wees voorzichtig, want zodra je een instantie verwijdert, is het niet meer mogelijk om deze te herstellen."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Verwijderen..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Dupliceren"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "Kan niet dupliceren tijdens installatie."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "Instantie dupliceren"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Creëert een kopie van deze instantie, inclusief werelden, instellingen, mods, etc."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Pictogram aanpassen"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Verwijder pictogram"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Vervang pictogram"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Selecteer pictogram"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "Bibliotheekgroepen"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "Nieuwe groep creëren"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "Bibliotheekgroepen stellen je in staat om je instanties in verschillende secties in je bibliotheek te organiseren."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "Voer groepsnaam in"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Naam"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "Opstart haakjes"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "Aangepaste opstart haakjes"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "Haakjes maken het mogelijk voor gevorderde gebruikers om bepaalde systeemcommando's uit te voeren voor en na het opstarten van het spel."
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "Na het afsluiten"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "Uitgevoerd nadat het spel is afgesloten."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "Voer na-afsluitcommando in..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Voor het opstarten"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Uitgevoerd voor de instantie wordt opgestart."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "Voer commando voor het opstarten in..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "Game opstart haakjes"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "Wrapper"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "Wrapper-commando voor het opstarten van Minecraft."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "Voer wrapper commando in..."
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Installatie"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "{platform} {version} voor Minecraft {game_version} is al geïnstalleerd"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "Vanilla {game_version} is al geïnstalleerd"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "Verander versie"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "Installeer"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "Aan het installeren"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "Modpack versies ophalen"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "Nieuwe versie aan het installeren"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "Huidig geïnstalleerd"
+  },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": "Fout opsporingsinformatie:"
+  },
+  "instance.settings.tabs.installation.fetching-modpack-details": {
+    "message": "Modpack details ophalen"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Spel versie"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "Installeer"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "Bezig met installeren"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "Versie {loader}"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecraft versie {version}"
+  },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "Kan de gekoppelde modpack details niet ophalen. Controleer je internetverbinding."
+  },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "{loader} is niet beschikbaar voor Minecraft {version}. Probeer een andere mod loader."
+  },
+  "instance.settings.tabs.installation.no-modpack-found": {
+    "message": "Deze instantie is gekoppeld aan een modpack, maar de modpack kon niet worden gevonden op Modrinth."
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "Platform"
+  },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "Herinstalleer modpack"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Modpack aan het herinstalleren"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "Het opnieuw installeren zal alle geïnstalleerde of gewijzigde inhoud resetten naar de inhoud die door de modpack wordt geleverd, en alle mods of inhoud die je bovenop de oorspronkelijke installatie hebt toegevoegd, verwijderen. Dit kan onverwacht gedrag oplossen als er wijzigingen zijn aangebracht in de instantie, maar als je werelden nu afhankelijk zijn van extra geïnstalleerde inhoud, kan dit bestaande werelden beschadigen."
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "Ben je zeker dat je deze instantie wilt herinstalleren?"
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "Herstelt de inhoud van het exemplaar naar zijn oorspronkelijke staat. Mods en inhoud die bovenop het oorspronkelijke modpack zijn toegevoegd worden verwijderd."
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "Modpack opnieuw installeren"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "Repareer"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "Repareren"
+  },
+  "instance.settings.tabs.installation.repair.confirm.description": {
+    "message": "Repareren installeert Minecraft-dependencies opnieuw en controleert op corruptie. Dit kan problemen oplossen als uw spel niet start vanwege problemen met de launcher, maar niet problemen of crashes oplossen die te maken hebben met geïnstalleerde mods."
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "Exemplaar repareren?"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "Reparatie in behandeling"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "Herstel naar huidige"
+  },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "Toon alle versies"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "verander versie"
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "installeer"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "herinstalleer"
+  },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "repareer"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "Kan niet {action} tijdens installatie"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "Kan niet {action} terwijl u offline bent"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "Kan niet {action} tijdens reparatie"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(Onherkende versie)"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "Ontkoppel exemplaar"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": "Als u doorgaat, kunt u het niet opnieuw koppelen zonder een compleet nieuwe exemplaar aan te maken. U ontvangt geen modpack updates meer en het wordt een normaal exemplaar."
+  },
+  "instance.settings.tabs.installation.unlink.confirm.title": {
+    "message": "Weet u zeker dat u dit exemplaar wilt ontkoppelen?"
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "Dit exemplaar is gekoppeld aan een modpack, wat betekent dat mods niet bijgewerkt kunnen worden en de mod loader of Minecraft versie kan niet gewijzigd worden."
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "Ontkoppel van modpack"
+  },
+  "instance.settings.tabs.java": {
+    "message": "Java en geheugen"
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "Environment variabelen"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "Haakjes"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Java argumenten"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Java installatie"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "Voorgeschreven geheugen"
+  },
+  "instance.settings.tabs.window": {
+    "message": "Venster"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Aangepaste venster instellingen"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Volledig scherm"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "Laat het spel in volledige scherm starten (door middel van options.txt)."
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "Hoogte"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "De hoogte van het spelvenster wanneer opgestart."
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "Vul hoogte in..."
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "Breedte"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "De breedte van het spelvenster wanneer opgestart."
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "Voer breedte in..."
+  },
+  "instance.settings.title": {
+    "message": "Instellingen"
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "Een Minecraft server"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "Kan niet met server verbinden"
+  },
+  "instance.worlds.copy_address": {
+    "message": "Kopieer adres"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "Niet tonen op de startpagina"
+  },
+  "instance.worlds.filter.available": {
+    "message": "Beschikbaar"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "Instantie is al open"
+  },
+  "instance.worlds.hardcore": {
+    "message": "Hardcore modus"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "Server is niet compatibel"
+  },
+  "instance.worlds.no_contact": {
+    "message": "Server kon niet worden bereikt"
+  },
+  "instance.worlds.no_server_quick_play": {
+    "message": "Je kan alleen direct de servers in springen in Minecraft Alpha 1.0.5+"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "Je kan alleen direct je eigen werelden in springen in Minecraft 1.20+"
+  },
+  "instance.worlds.play_instance": {
+    "message": "Speel instantie"
+  },
+  "instance.worlds.type.server": {
+    "message": "Server"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "Alleen spelen"
+  },
+  "instance.worlds.view_instance": {
+    "message": "Bekijk instantie"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "Wereld wordt gebruikt"
+  },
+  "search.filter.locked.instance": {
+    "message": "Aangeboden door de instantie"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "Game versie is aangeboden door de instantie"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "Loader is aangeboden door de instantie"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "Synchroniseer installatie"
+  }
+}

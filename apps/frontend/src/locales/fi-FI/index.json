@@ -1,0 +1,98 @@
+{
+  "admin.billing.error.not-found": {
+    "message": "Käyttäjää ei löydetty"
+  },
+  "auth.authorize.action.decline": {
+    "message": "Kieltäydy"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "Lähetä palautus sähköposti"
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "Sähköposti tai käyttäjänimi"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "Sähköposti"
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "Sähköposti lähetetty"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "Anna koodi..."
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "Sähköposti tai käyttäjänimi"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Salasana"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Kirjaudu sisään käyttäen"
+  },
+  "auth.sign-in.title": {
+    "message": "Kirjaudu sisään"
+  },
+  "auth.sign-in.use-password": {
+    "message": "Tai käytä salasanaa"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Luo tili"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "Vahvista salasana"
+  },
+  "auth.sign-up.email.label": {
+    "message": "Sähköposti"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Käyttäjänimi"
+  },
+  "auth.sign-up.password.label": {
+    "message": "Salasana"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "Tilaa päivityksiä Modrinthista"
+  },
+  "auth.sign-up.title": {
+    "message": "Rekisteröidy"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Reskiteröidy käyttäen"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Kirjaudu sisään"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "Sähköpostisi on jo vahvistettu!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "Sähköposti on jo vahvistettu"
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "Sähköpostin vahvistus epäonnistui"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "Sähköpostiosoitteesi on vahvistettu onnistuneesti!"
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "Luo uusi"
+  },
+  "error.collection.404.list_title": {
+    "message": "Miksi?"
+  },
+  "error.generic.404.title": {
+    "message": "Sivua ei löytynyt"
+  },
+  "error.generic.default.subtitle": {
+    "message": "Jokin meni pieleen."
+  },
+  "error.generic.default.title": {
+    "message": "Voi ei!"
+  },
+  "error.organization.404.list_title": {
+    "message": "Miksi?"
+  },
+  "error.project.404.list_title": {
+    "message": "Miksi?"
+  }
+}

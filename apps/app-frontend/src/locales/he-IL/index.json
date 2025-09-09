@@ -1,0 +1,161 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "מצב מפתח מופעל."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "מראה"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "אפשרויות ברירת מחדל של מראה"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "התקנות java"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "פרטיות"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "ניהול משאבים"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "הוסף ושחק"
+  },
+  "instance.add-server.add-server": {
+    "message": "הוסף שרת"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "מכובה"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "מופעל"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "שאל"
+  },
+  "instance.add-server.title": {
+    "message": "הוסף שרת"
+  },
+  "instance.edit-server.title": {
+    "message": "ערוך שרת"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "הסתר מדף הבית"
+  },
+  "instance.edit-world.name": {
+    "message": "שם"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "עולם המיינקראפט"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "אפס אייקון"
+  },
+  "instance.edit-world.title": {
+    "message": "ערוך עולם"
+  },
+  "instance.filter.disabled": {
+    "message": "כבה פרויקטים"
+  },
+  "instance.filter.updates-available": {
+    "message": "עדכונים זמינים"
+  },
+  "instance.server-modal.address": {
+    "message": "כתובת"
+  },
+  "instance.server-modal.name": {
+    "message": "שם"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "שרת מיינקראפט"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "חבילת משאבים"
+  },
+  "instance.settings.tabs.general": {
+    "message": "כללי"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "מחק התקנה"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "מחק התקנה"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "מוחק לצמיתות את ההתקנה הזו מהמכשיר שלך, כולל העולמות שלך, הגדרות, וכל התוכן המותקן. זהירות לאחר שאתה מוחק התקנה אין דרך להחזיר אותה."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "מוחק..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "משכפל"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "לא יכול לשכפל בזמן התקנה."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "שכפל התקנה"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "יוצר עותק של ההתקנה הזו, כולל עולם, הגדרות, מודים, וכו."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "ערוך תמונה"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "מחק תמונה"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "החלף תמונה"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "בחר תמונה"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "קבוצות ספרייה"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "צור קבוצה חדשה"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "קבוצות ספרייה מאפשרות לך לארגן את ההתקנות שלך לפי חקלים שונים."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "הכנס שם קבוצה"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "שם"
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "לאחר יציאה"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "רץ לאחר שהמשחק נסגר."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "הכנס פקודה לאחר יציאה..."
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "שנה גרסה"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "מותקן כעת"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "תיקון"
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "תקן"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "תיקון בתהליך"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "לא יכול {action} בזמן תיקון"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(גרסה לא ידועה)"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "לבטל את הקישור של ההתקנה הזו"
+  }
+}

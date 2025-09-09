@@ -1,0 +1,30 @@
+{
+  "nags.add-description.description": {
+    "defaultMessage": "Kinakailangan ang malinaw na paglalarawan sa layunin at paggana ng panukala."
+  },
+  "nags.add-description.title": {
+    "defaultMessage": "Magdagdag ng paglalarawan"
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "Maglagay ng lambana"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "Baguhin ang paglalarawan"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "Baguhin ang lisensya"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "Baguhin ang buod"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "Baguhin ang mga pananda"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "Baguhin ang pamagat"
+  },
+  "nags.summary-same-as-title.description": {
+    "defaultMessage": "Hindi maaaring magkapareho ang iyong buod sa Pangalan ng iyong panukala. Mahalagang gumawa ng isang nagbibigay-kaalaman at nakakaakit na Buod."
+  }
+}
+

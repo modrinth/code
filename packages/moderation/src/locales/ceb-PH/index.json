@@ -1,0 +1,30 @@
+{
+  "nags.add-description.description": {
+    "defaultMessage": "Gikinahanglan ang klaro nga paghulagway sa katuyoan ug kalihokan sa proyekto."
+  },
+  "nags.add-description.title": {
+    "defaultMessage": "Pagdugang og paghulagway"
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "Pagbutang og amoy"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "Usba ang paghulagway"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "Usba sa lisensya"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "Usba ang kalangkoban"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "Usba ang mga timailhan"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "Usba ang titulo"
+  },
+  "nags.summary-same-as-title.description": {
+    "defaultMessage": "Dili mahimong mopareho ang imong kalangkoban sa Ngalan sa imong proyekto. Hinungdanon ang paghimo sa mapahibaloon ug madanihon nga Kalangkoban."
+  }
+}
+

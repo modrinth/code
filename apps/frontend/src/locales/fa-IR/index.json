@@ -1,0 +1,98 @@
+{
+  "admin.billing.error.not-found": {
+    "message": "کاربر یافت نشد"
+  },
+  "app-marketing.features.play.title": {
+    "message": "با ماد های موردعلاقه خود بازی کنید"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "اجازه دادن"
+  },
+  "auth.authorize.action.decline": {
+    "message": "رد"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> از <creator-link>{creator}</creator-link> مجاز خواهد بود تا:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "اجازه دادن {appName}"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "ایمیل خود را در زیر وارد کنید و ما یک لینک بازیابی ارسال خواهیم کرد تا به شما امکان بازیابی حساب خود را بدهیم."
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "ایمیل یا نام کاربری"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "ایمیل"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "اگر ایمیل قبلاً در حساب شما ذخیره شده بود ، ایمیلی با دستورالعمل برای شما ارسال شده است."
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "ایمیل ارسال شد"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "اکنون میتوانید با رمز عبور جدید وارد حساب خود شوید."
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "رمز عبور با موفقیت بازنشانی شد"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "بازنشانی رمز عبور"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "تایید رمز عبور"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "رمز عبور جدید را وارد کنید تا به حساب خود دسترسی پیدا کنید"
+  },
+  "auth.reset-password.title": {
+    "message": "بازنشانی رمز عبور"
+  },
+  "auth.reset-password.title.long": {
+    "message": "رمز عبور خود را بازنشانی کنید"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "لطفاً برای ادامه یک کد دو عاملی وارد کنید."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "کد دو عاملی را وارد کنید"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "کد را وارد کنید..."
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "ایمیل یا نام کاربری"
+  },
+  "auth.sign-in.password.label": {
+    "message": "رمز عبور"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "ورود با"
+  },
+  "auth.sign-in.title": {
+    "message": "ورود"
+  },
+  "auth.sign-in.use-password": {
+    "message": "یا از رمز عبور استفاده کنید"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "ایجاد حساب"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "تأیید رمز عبور"
+  },
+  "auth.sign-up.email.label": {
+    "message": "ایمیل"
+  },
+  "auth.sign-up.label.username": {
+    "message": "نام کاربری"
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "رمز های عبور مطابقت ندارند!"
+  },
+  "auth.sign-up.password.label": {
+    "message": "رمز عبور"
+  }
+}
