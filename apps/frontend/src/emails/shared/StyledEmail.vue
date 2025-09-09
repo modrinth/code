@@ -1,11 +1,8 @@
-<!-- EmailCardSlots.vue -->
 <script setup lang="ts">
 import {
-	Button,
 	Column,
 	Container,
 	Head,
-	Heading,
 	Html,
 	Img,
 	Row,
@@ -14,11 +11,6 @@ import {
 	Text,
 	Link as VLink,
 } from '@vue-email/components'
-
-const props = defineProps<{
-	link?: string
-	buttonText?: string
-}>()
 </script>
 
 <template>
@@ -106,33 +98,7 @@ const props = defineProps<{
 
 				<Section class="bg-white px-8 py-8">
 					<Container class="max-w-[600px]">
-						<Heading as="h1" class="mb-2 text-2xl font-bold">
-							<slot name="title" />
-						</Heading>
-
-						<Text class="text-muted mb-2 text-base">
-							<slot name="subtitle" />
-						</Text>
-
-						<div class="text-muted text-base">
-							<slot />
-						</div>
-
-						<div v-if="link && buttonText" class="mt-4">
-							<Button
-								:href="link"
-								target="_blank"
-								class="text-accentContrast inline-block rounded-[12px] bg-brand px-4 py-3 text-[14px] font-bold"
-							>
-								{{ buttonText }}
-							</Button>
-
-							<VLink :href="link">
-								<Text class="text-muted mt-2 break-words text-xs font-bold">
-									{{ link }}
-								</Text>
-							</VLink>
-						</div>
+						<slot />
 					</Container>
 				</Section>
 
