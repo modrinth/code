@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO delphi_report_issue_java_classes (issue_id, internal_class_name, decompiled_source)\n            VALUES ($1, $2, $3)\n            ON CONFLICT (issue_id, internal_class_name) DO UPDATE SET decompiled_source = $3\n            RETURNING id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "0080a101c9ae040adbaadf9e46fbc457a08e70dcde320c6852074819e41f8ad9"
+}
