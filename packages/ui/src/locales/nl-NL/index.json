@@ -1,0 +1,741 @@
+{
+  "badge.beta-release": {
+    "defaultMessage": "Bètaversie"
+  },
+  "badge.new": {
+    "defaultMessage": "Nieuw"
+  },
+  "button.analytics": {
+    "defaultMessage": "Analytica"
+  },
+  "button.back": {
+    "defaultMessage": "Terug"
+  },
+  "button.cancel": {
+    "defaultMessage": "Annuleren"
+  },
+  "button.continue": {
+    "defaultMessage": "Doorgaan"
+  },
+  "button.copy-id": {
+    "defaultMessage": "Kopieer ID"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "Kopieer permanente link"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Creëer een project"
+  },
+  "button.download": {
+    "defaultMessage": "Downloaden"
+  },
+  "button.downloading": {
+    "defaultMessage": "Downloading"
+  },
+  "button.edit": {
+    "defaultMessage": "Bewerk"
+  },
+  "button.follow": {
+    "defaultMessage": "Volg"
+  },
+  "button.more-options": {
+    "defaultMessage": "Meer opties"
+  },
+  "button.next": {
+    "defaultMessage": "Volgende"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Open folder"
+  },
+  "button.play": {
+    "defaultMessage": "Speel"
+  },
+  "button.refresh": {
+    "defaultMessage": "Ververs"
+  },
+  "button.remove": {
+    "defaultMessage": "Verwijder"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Verwijder afbeelding"
+  },
+  "button.report": {
+    "defaultMessage": "Rapporteer"
+  },
+  "button.reset": {
+    "defaultMessage": "Herstel"
+  },
+  "button.save": {
+    "defaultMessage": "Opslaan"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Wijzigingen opslaan"
+  },
+  "button.saving": {
+    "defaultMessage": "Opslaan"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Log in"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Log uit"
+  },
+  "button.sign-up": {
+    "defaultMessage": "Aanmelden"
+  },
+  "button.stop": {
+    "defaultMessage": "Stop"
+  },
+  "button.unfollow": {
+    "defaultMessage": "Niet meer volgen"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Afbeelding uploaden"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "Zojuist"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "App"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Servers"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Website"
+  },
+  "collection.label.private": {
+    "defaultMessage": "Privé"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "Wijzig icoon"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "Verwijder icoon"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "Vervang icoon"
+  },
+  "icon-select.select": {
+    "defaultMessage": "Selecteer icoon"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "Zoeken..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "Galerij weergave"
+  },
+  "input.view.grid": {
+    "defaultMessage": "Raster weergave"
+  },
+  "input.view.list": {
+    "defaultMessage": "Rijen weergave"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "Avontuurmodus"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "Creative modus"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "Toeschouwermodus"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "Overlevingsmodus"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "Onbekende spelmodus"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "Wijzigingen opgeslagen"
+  },
+  "label.collections": {
+    "defaultMessage": "Collecties"
+  },
+  "label.created-ago": {
+    "defaultMessage": "Gemaakt {ago}"
+  },
+  "label.dashboard": {
+    "defaultMessage": "Dashboard"
+  },
+  "label.delete": {
+    "defaultMessage": "Verwijder"
+  },
+  "label.description": {
+    "defaultMessage": "Beschrijving"
+  },
+  "label.error": {
+    "defaultMessage": "Fout"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "Gevolgde projecten"
+  },
+  "label.loading": {
+    "defaultMessage": "Aan het laden..."
+  },
+  "label.moderation": {
+    "defaultMessage": "Moderatie"
+  },
+  "label.notifications": {
+    "defaultMessage": "Notificaties"
+  },
+  "label.or": {
+    "defaultMessage": "of"
+  },
+  "label.password": {
+    "defaultMessage": "Wachtwoord"
+  },
+  "label.played": {
+    "defaultMessage": "Gespeeld voor {time}"
+  },
+  "label.public": {
+    "defaultMessage": "Openbaar"
+  },
+  "label.rejected": {
+    "defaultMessage": "Afgewezen"
+  },
+  "label.saved": {
+    "defaultMessage": "Opgeslagen"
+  },
+  "label.scopes": {
+    "defaultMessage": "Permissiebereik"
+  },
+  "label.server": {
+    "defaultMessage": "Server"
+  },
+  "label.servers": {
+    "defaultMessage": "Servers"
+  },
+  "label.settings": {
+    "defaultMessage": "Instellingen"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "Alleen spelen"
+  },
+  "label.title": {
+    "defaultMessage": "Titel"
+  },
+  "label.unlisted": {
+    "defaultMessage": "Verborgen"
+  },
+  "label.visibility": {
+    "defaultMessage": "Zichtbaarheid"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "Bezoek jouw profiel"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "Voeg betaalmethode toe"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "Betaalmethode toevoegen"
+  },
+  "notification.error.title": {
+    "defaultMessage": "Er is een fout opgetreden"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "Geaccepteerd"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "Goedgekeurd"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "Gearchiveerd"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "Gesloten"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "Maker"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "Concept"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "Mislukt"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Publiek"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "Toezichthouder"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "Modrinth team"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "In behandeling"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "Privé"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "Verwerkt"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "Afgewezen"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "Teruggestuurd"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "Gepland"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "Wordt beoordeeld"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "Verborgen"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Weerhouden"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "Kopieer code naar klembord"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "Client"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "Client en server"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "Client of server"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "Server"
+  },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "Een {type}"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "Niet ondersteund"
+  },
+  "omorphia.component.purchase_modal.payment_method_card_display": {
+    "defaultMessage": "{card_brand} eindigend op {last_four}"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "American Express"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "Discover"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+    "defaultMessage": "Onbekende betaalmethode"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-type.all": {
+    "defaultMessage": "Alles"
+  },
+  "project.about.compatibility.environments": {
+    "defaultMessage": "Ondersteunde omgevingen"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Cliënt en server"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "Clientzijde"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "Alleen voor toegewijde server"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "Serverzijde"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Eén speler"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Alleen één speler"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "Minecraft: Java Editie"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "Platformen"
+  },
+  "project.about.compatibility.title": {
+    "defaultMessage": "Compatibiliteit"
+  },
+  "project.about.creators.owner": {
+    "defaultMessage": "Projecteigenaar"
+  },
+  "project.about.creators.title": {
+    "defaultMessage": "Makers"
+  },
+  "project.about.details.created": {
+    "defaultMessage": "Gemaakt op {date}"
+  },
+  "project.about.details.licensed": {
+    "defaultMessage": "Gelicentieerd met {license}"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "Gepubliceerd op {date}"
+  },
+  "project.about.details.submitted": {
+    "defaultMessage": "Ingediend op {date}"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "Details"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "Geüpdatet op {date}"
+  },
+  "project.about.links.discord": {
+    "defaultMessage": "Wordt lid van de Discord server"
+  },
+  "project.about.links.donate.bmac": {
+    "defaultMessage": "Buy Me a Coffee"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "Doneer"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "Sponsor via GitHub"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "Doneer via Ko-fi"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "Doneer via Patreon"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "Doneer via PayPal"
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "Rapporteer een probleem "
+  },
+  "project.about.links.source": {
+    "defaultMessage": "Bekijk broncode"
+  },
+  "project.about.links.title": {
+    "defaultMessage": "Links"
+  },
+  "project.about.links.wiki": {
+    "defaultMessage": "Wiki bezoeken"
+  },
+  "project.settings.analytics.title": {
+    "defaultMessage": "Analytica"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "Omschrijving "
+  },
+  "project.settings.environment.client_and_server.description": {
+    "defaultMessage": "Heeft enig functionaliteit op client en server, al is het minder compleet."
+  },
+  "project.settings.environment.client_and_server.optional_both.title": {
+    "defaultMessage": "Optioneel op beide kanten, werkt hoe dan ook gelijk"
+  },
+  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+    "defaultMessage": "Optioneel op beide kanten, werkt het beste wanneer geïnstalleerd is op beide kanten"
+  },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "Optioneel op clientzijde"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "Optioneel op serverzijde"
+  },
+  "project.settings.environment.client_and_server.required_both.title": {
+    "defaultMessage": "Vereist op beide kanten"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "Client- en serverzijde"
+  },
+  "project.settings.environment.client_only.description": {
+    "defaultMessage": "Alle functionaliteit ligt op clientzijde, en is volledig bruikbaar op vanilla-servers."
+  },
+  "project.settings.environment.client_only.title": {
+    "defaultMessage": "Slechts clientzijde"
+  },
+  "project.settings.environment.server_only.dedicated_only.title": {
+    "defaultMessage": "Slechts toegewijde server"
+  },
+  "project.settings.environment.server_only.description": {
+    "defaultMessage": "Alle functionaliteit ligt op serverzijde, en is volledig bruikbaar met vanilla-clienten."
+  },
+  "project.settings.environment.server_only.supports_singleplayer.title": {
+    "defaultMessage": "Werkt ook met één speler sessies"
+  },
+  "project.settings.environment.server_only.title": {
+    "defaultMessage": "Slechts serverzijde"
+  },
+  "project.settings.environment.singleplayer.description": {
+    "defaultMessage": "Werkt alleen in één speler sessies, of wanneer er niet verbonden is met een online server met meerdere spelers."
+  },
+  "project.settings.environment.singleplayer.title": {
+    "defaultMessage": "Slechts één speler"
+  },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}: {description}"
+  },
+  "project.settings.environment.suboption.accessibility-suboption-group-label": {
+    "defaultMessage": "Subopties van {option}"
+  },
+  "project.settings.environment.title": {
+    "defaultMessage": "Functionele omgeving"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "Foto's "
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "Algemene info"
+  },
+  "project.settings.license.title": {
+    "defaultMessage": "Licentie "
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "Koppelingen"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "Deelnemers"
+  },
+  "project.settings.notice.no-permission.description": {
+    "defaultMessage": "Er is geen toestemming om dit te wijzigen."
+  },
+  "project.settings.notice.no-permission.title": {
+    "defaultMessage": "Geen toestemming"
+  },
+  "project.settings.tags.title": {
+    "defaultMessage": "Trefwoorden "
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "A"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "R"
+  },
+  "project.visibility.archived": {
+    "defaultMessage": "Gearchiveerd"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "Concept"
+  },
+  "project.visibility.private": {
+    "defaultMessage": "Privé"
+  },
+  "project.visibility.public": {
+    "defaultMessage": "Openbaar"
+  },
+  "project.visibility.rejected": {
+    "defaultMessage": "Afgewezen"
+  },
+  "project.visibility.unknown": {
+    "defaultMessage": "Onbekend"
+  },
+  "project.visibility.unlisted-by-staff": {
+    "defaultMessage": "Verborgen door toezichthouders"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "Omgeving"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "Client"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "Server"
+  },
+  "search.filter_type.game_version": {
+    "defaultMessage": "Game versie"
+  },
+  "search.filter_type.game_version.all_versions": {
+    "defaultMessage": "Toon alle versies"
+  },
+  "search.filter_type.license": {
+    "defaultMessage": "Licentie"
+  },
+  "search.filter_type.license.open_source": {
+    "defaultMessage": "Open source"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "Platform"
+  },
+  "search.filter_type.project_id": {
+    "defaultMessage": "Project ID"
+  },
+  "servers.notice.dismiss": {
+    "defaultMessage": "Negeer"
+  },
+  "servers.notice.dismissable": {
+    "defaultMessage": "Negeerbaar"
+  },
+  "servers.notice.heading.attention": {
+    "defaultMessage": "Aandacht"
+  },
+  "servers.notice.heading.info": {
+    "defaultMessage": "Info"
+  },
+  "servers.notice.level.critical.name": {
+    "defaultMessage": "Kritisch"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "Info"
+  },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "Vragenlijst"
+  },
+  "servers.notice.level.warn.name": {
+    "defaultMessage": "Waarschuwing"
+  },
+  "servers.notice.undismissable": {
+    "defaultMessage": "Niet negeerbaar"
+  },
+  "servers.purchase.step.payment.description": {
+    "defaultMessage": "Het wordt nog niet aan geslagen."
+  },
+  "servers.purchase.step.payment.prompt": {
+    "defaultMessage": "Selecteer een betaalmethode"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "Betaalmethode"
+  },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "afgeschreven per {interval}"
+  },
+  "servers.purchase.step.plan.custom.desc": {
+    "defaultMessage": "Configureer je eigen plan met de specs die je nodig hebt."
+  },
+  "servers.purchase.step.plan.get-started": {
+    "defaultMessage": "Aan de slag"
+  },
+  "servers.purchase.step.plan.large.desc": {
+    "defaultMessage": "Ideaal voor vijftien tot vijfentwintig spelers, of intensieve mod-gebruik."
+  },
+  "servers.purchase.step.plan.medium.desc": {
+    "defaultMessage": "Geschikt voor zes tot vijftien spelers met meerdere mods."
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "defaultMessage": "Meest populair"
+  },
+  "servers.purchase.step.plan.prompt": {
+    "defaultMessage": "Kies een plan"
+  },
+  "servers.purchase.step.plan.select": {
+    "defaultMessage": "Selecteer deze plan"
+  },
+  "servers.purchase.step.plan.small.desc": {
+    "defaultMessage": "Perfect voor één tot vijf vrienden, met enkele mods."
+  },
+  "servers.purchase.step.plan.subtitle": {
+    "defaultMessage": "Kies hoeveel geheugen en snelheid je wil."
+  },
+  "servers.purchase.step.plan.title": {
+    "defaultMessage": "Plan"
+  },
+  "servers.purchase.step.region.title": {
+    "defaultMessage": "Regio"
+  },
+  "servers.purchase.step.review.title": {
+    "defaultMessage": "Overzicht"
+  },
+  "servers.region.central-europe": {
+    "defaultMessage": "Centraal Europa"
+  },
+  "servers.region.custom.prompt": {
+    "defaultMessage": "Hoeveel geheugen (RAM) moet jouw server krijgen?"
+  },
+  "servers.region.north-america": {
+    "defaultMessage": "Noord America"
+  },
+  "servers.region.prompt": {
+    "defaultMessage": "Uit welk regio wil je een server?"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "Staat jouw regio hier niet bij? <link>Laat ons weten waar onze volgende Modrinth servers terecht moeten!</link>"
+  },
+  "servers.region.western-europe": {
+    "defaultMessage": "West Europa"
+  },
+  "settings.account.title": {
+    "defaultMessage": "Account en beveiliging"
+  },
+  "settings.appearance.title": {
+    "defaultMessage": "Uiterlijk"
+  },
+  "settings.applications.title": {
+    "defaultMessage": "Jouw applicaties"
+  },
+  "settings.authorized-apps.title": {
+    "defaultMessage": "Geautoriseerde applicaties"
+  },
+  "settings.billing.title": {
+    "defaultMessage": "Facturen en abonnementen"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "Donker"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "Selecteer je gewenste kleurschema voor Modrinth op dit apparaat."
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "Licht"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLED"
+  },
+  "settings.display.theme.preferred-dark-theme": {
+    "defaultMessage": "Voorkeur donker thema"
+  },
+  "settings.display.theme.preferred-light-theme": {
+    "defaultMessage": "Voorkeur lichtthema"
+  },
+  "settings.display.theme.retro": {
+    "defaultMessage": "Retro"
+  },
+  "settings.display.theme.system": {
+    "defaultMessage": "Synchroniseren met systeem"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "Kleurschema"
+  },
+  "settings.language.title": {
+    "defaultMessage": "Taal"
+  },
+  "settings.pats.title": {
+    "defaultMessage": "Persoonlijke toegangstokens"
+  },
+  "settings.profile.title": {
+    "defaultMessage": "Openbaar profiel"
+  },
+  "settings.sessions.title": {
+    "defaultMessage": "Sessies"
+  },
+  "tooltip.date-at-time": {
+    "defaultMessage": "{date, date, long} om {time, time, short}"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "Sommigen wijzigingen zijn nog niet opgeslagen."
+  }
+}
+

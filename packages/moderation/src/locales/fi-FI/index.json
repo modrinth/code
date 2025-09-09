@@ -1,0 +1,54 @@
+{
+  "nags.add-description.description": {
+    "defaultMessage": "Kuvaus joka selittää selkeästi mikä on projektin tarkoitus ja toiminto on vaadittu."
+  },
+  "nags.add-description.title": {
+    "defaultMessage": "Lisää kuvaus"
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "Lisää kuvake"
+  },
+  "nags.add-links.title": {
+    "defaultMessage": "Lisää ulkoisia linkkejä"
+  },
+  "nags.all-tags-selected.title": {
+    "defaultMessage": "Valitse sopivat tagit"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "Muokkaa kuvausta"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "Muokkaa lisenssiä"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "Muokkaa tiivistelmää"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "Muokkaa tageja"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "Muokkaa nimeä"
+  },
+  "nags.gallery.title": {
+    "defaultMessage": "Käy galleria sivulla"
+  },
+  "nags.invalid-license-url.description.default": {
+    "defaultMessage": "Lisenssin URL-osoite on virheellinen."
+  },
+  "nags.minecraft-title-clause.description": {
+    "defaultMessage": "Projektit eivät saa käyttää Minecraftin brändäystä tai sisältää \"Minecraft\" sanaa suurena osana nimeä."
+  },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "Tarkasta moderaattorien palaute"
+  },
+  "nags.multiple-resolution-tags.title": {
+    "defaultMessage": "Valitse oikea resoluutio"
+  },
+  "nags.select-license.title": {
+    "defaultMessage": "Valitse lisenssi"
+  },
+  "nags.select-tags.title": {
+    "defaultMessage": "Valitse tagit"
+  }
+}
+

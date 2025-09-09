@@ -1,0 +1,131 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Режим за разработчици активиран."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Външен вид"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Опции по подразбиране"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Java инсталации"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Поверителност"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Контрол на ресурси"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Добави и играй"
+  },
+  "instance.add-server.add-server": {
+    "message": "Добави сървър"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Деактивирано"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Активирано"
+  },
+  "instance.add-server.title": {
+    "message": "Добавяне на сървър"
+  },
+  "instance.edit-server.title": {
+    "message": "Редактиране на сървър"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "Намиране на версиите на modpack-овете"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "Инсталиране на нова версия"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "В момента инсталирано"
+  },
+  "instance.settings.tabs.installation.fetching-modpack-details": {
+    "message": "Намиране на детайли на modpack"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Версия на играта"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "Инсталиране"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "Инсталира се в момента"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "{loader} версия"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecraft {version}"
+  },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "Не може да се намери този modpack. Моля проверете интернет връзката си."
+  },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "{loader} не е наличен за Minecraft версия {version}. Моля пробвайте друг mod loader."
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "Платформа"
+  },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "Преинсталирай"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Преинсталиране"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "Сигурни ли сте, че искате да преинсталирате това?"
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "Повторно инсталиране на modpack"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "Поправи"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "Поправяне"
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "Поправи?"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "Поправка..."
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "Нулирай до в моменташен"
+  },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "Покажи всички версии"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "променяте версията"
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "инсталирате"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "преинсталирате"
+  },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "поправяте"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "Не можете да {action} докато се инсталира."
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "Не можете да {action} докато нямате достъп до Интернет"
+  },
+  "instance.settings.tabs.window": {
+    "message": "Прозорец"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Различни настройки на прозорец"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Пълен екран"
+  }
+}
