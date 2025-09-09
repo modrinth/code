@@ -1,13 +1,9 @@
-use crate::file_hosting::FileHostingError;
 use crate::routes::analytics::{page_view_ingest, playtime_ingest};
 use crate::util::cors::default_cors;
 use crate::util::env::parse_strings_from_var;
 use actix_cors::Cors;
 use actix_files::Files;
-use actix_web::http::StatusCode;
-use actix_web::http::header::{AcceptLanguage, Header, LanguageTag};
-use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
-use ariadne::i18n::I18nEnum;
+use actix_web::{HttpResponse, web};
 use futures::FutureExt;
 
 pub mod error;

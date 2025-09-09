@@ -486,6 +486,7 @@ dependencies = [
  "chrono",
  "either",
  "rand 0.8.5",
+ "rust-i18n",
  "serde",
  "serde_bytes",
  "serde_cbor",

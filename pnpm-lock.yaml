@@ -377,6 +377,8 @@ importers:
 
   packages/app-lib: {}
 
+  packages/ariadne: {}
+
   packages/assets:
     devDependencies:
       '@modrinth/tooling-config':

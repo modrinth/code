@@ -1,164 +1,144 @@
 use crate::file_hosting::FileHostingError;
-use actix_http::StatusCode;
-use actix_http::header::{Header, LanguageTag};
+use actix_web::http::StatusCode;
 use actix_web::http::header::AcceptLanguage;
+use actix_web::http::header::{Header, LanguageTag};
 use actix_web::{HttpRequest, HttpResponse, ResponseError};
 use ariadne::i18n::I18nEnum;
+use ariadne::i18n_enum;
 
-#[derive(thiserror::Error, I18nEnum, Debug)]
-#[i18n_root_key("error")]
+#[derive(thiserror::Error, Debug)]
 pub enum ApiError {
-    #[translation_id("environment_error")]
     // #[error("Environment Error")]
     Env(#[from] dotenvy::Error),
 
-    #[translation_id("file_hosting_error")]
-    #[translate_fields(cause = translate(0))]
     // #[error("Error while uploading file: {0}")]
     FileHosting(#[from] FileHostingError),
 
-    #[translation_id("database_error")]
-    #[translate_fields(cause = translate(0))]
     // #[error("Database Error: {0}")]
     Database(#[from] crate::database::models::DatabaseError),
 
-    #[translation_id("database_error")]
-    #[translate_fields(cause = 0)]
     // #[error("Database Error: {0}")]
     SqlxDatabase(#[from] sqlx::Error),
 
-    #[translation_id("database_error")]
-    #[translate_fields(cause = 0)]
     // #[error("Database Error: {0}")]
     RedisDatabase(#[from] redis::RedisError),
 
-    #[translation_id("clickhouse_error")]
-    #[translate_fields(cause = 0)]
     // #[error("Clickhouse Error: {0}")]
     Clickhouse(#[from] clickhouse::error::Error),
 
-    #[translation_id("xml_error")]
-    #[translate_fields(cause = 0)]
     // TODO: Use an I18nEnum instead of a String
     // #[error("Internal server error: {0}")]
     Xml(String),
 
-    #[translation_id("json_error")]
-    #[translate_fields(cause = 0)]
     // #[error("Deserialization error: {0}")]
     Json(#[from] serde_json::Error),
 
-    #[translation_id("unauthorized")]
-    #[translate_fields(cause = translate(0))]
     // #[error("Authentication Error: {0}")]
     Authentication(#[from] crate::auth::AuthenticationError),
 
-    #[translation_id("unauthorized")]
-    #[translate_fields(cause = 0)]
     // TODO: Use an I18nEnum instead of a String
     // #[error("Authentication Error: {0}")]
     CustomAuthentication(String),
 
-    #[translation_id("invalid_input")]
-    #[translate_fields(cause = 0)]
     // TODO: Use an I18nEnum instead of a String
     // #[error("Invalid Input: {0}")]
     InvalidInput(String),
 
     // TODO: Perhaps remove this in favor of InvalidInput?
-    #[translation_id("invalid_input")]
-    #[translate_fields(cause = 0)]
     // #[error("Error while validating input: {0}")]
     Validation(String),
 
-    #[translation_id("search_error")]
-    #[translate_fields(cause = 0)]
     // #[error("Search Error: {0}")]
     Search(#[from] meilisearch_sdk::errors::Error),
 
-    #[translation_id("indexing_error")]
-    #[translate_fields(cause = translate(0))]
     // #[error("Indexing Error: {0}")]
     Indexing(#[from] crate::search::indexing::IndexingError),
 
-    #[translation_id("payments_error")]
-    #[translate_fields(cause = 0)]
     // TODO: Use an I18nEnum instead of a String
     // #[error("Payments Error: {0}")]
     Payments(String),
 
-    #[translation_id("discord_error")]
-    #[translate_fields(cause = 0)]
     // TODO: Use an I18nEnum instead of a String
     // #[error("Discord Error: {0}")]
     Discord(String),
 
-    #[translation_id("turnstile_error")]
     // #[error("Captcha Error. Try resubmitting the form.")]
     Turnstile,
 
-    #[translation_id("decoding_error")]
-    #[translate_fields(cause = translate(0))]
     // #[error("Error while decoding Base62: {0}")]
     Decoding(#[from] ariadne::ids::DecodingError),
 
-    #[translation_id("invalid_image")]
-    #[translate_fields(cause = 0)]
     // #[error("Image Parsing Error: {0}")]
     ImageParse(#[from] image::ImageError),
 
-    #[translation_id("password_hashing_error")]
-    #[translate_fields(cause = 0)]
     // #[error("Password Hashing Error: {0}")]
     PasswordHashing(#[from] argon2::password_hash::Error),
 
-    #[translation_id("mail_error")]
-    #[translate_fields(cause = translate(0))]
     // #[error("{0}")]
     Mail(#[from] crate::auth::email::MailError),
 
-    #[translation_id("reroute_error")]
-    #[translate_fields(cause = 0)]
     // #[error("Error while rerouting request: {0}")]
     Reroute(#[from] reqwest::Error),
 
-    #[translation_id("zip_error")]
-    #[translate_fields(cause = 0)]
     // #[error("Unable to read Zip Archive: {0}")]
     Zip(#[from] zip::result::ZipError),
 
-    #[translation_id("io_error")]
-    #[translate_fields(cause = 0)]
     // #[error("IO Error: {0}")]
     Io(#[from] std::io::Error),
 
     // TODO: Add route not found
-    #[translation_id("not_found")]
     // #[error("Resource not found")]
     NotFound,
 
-    #[translation_id("conflict")]
-    #[translate_fields(cause = 0)]
     // TODO: Use an I18nEnum instead of a String
     // #[error("Conflict: {0}")]
     Conflict(String),
 
-    #[translation_id("tax_compliance_api_error")]
     // #[error("External tax compliance API Error")]
     TaxComplianceApi,
 
-    #[translation_id("ratelimit_error")]
-    #[translate_fields(wait_ms = 0, total_allowed_requests = 1)]
     // #[error(
     //     "You are being rate-limited. Please wait {0} milliseconds. 0/{1} remaining."
     // )]
     RateLimitError(u128, u32),
 
-    #[translation_id("stripe_error")]
-    #[translate_fields(cause = 0)]
     // #[error("Error while interacting with payment processor: {0}")]
     Stripe(#[from] stripe::StripeError),
 }
+
+i18n_enum!(
+    ApiError,
+    root_key: "error",
+    Env(..) => "environment_error",
+    FileHosting(cause) => "file_hosting_error",
+    Database(cause) => "database_error",
+    SqlxDatabase(cause) => "database_error",
+    RedisDatabase(cause) => "database_error",
+    Clickhouse(cause) => "clickhouse_error",
+    Xml(cause) => "xml_error",
+    Json(cause) => "json_error",
+    Authentication(cause) => "unauthorized",
+    CustomAuthentication(cause) => "unauthorized",
+    InvalidInput(cause) => "invalid_input",
+    Validation(cause) => "invalid_input.validation",
+    Search(cause) => "search_error",
+    Indexing(cause) => "indexing_error",
+    Payments(cause) => "payments_error",
+    Discord(cause) => "discord_error",
+    Turnstile! => "turnstile_error",
+    Decoding(cause) => "decoding_error",
+    ImageParse(cause) => "invalid_image",
+    PasswordHashing(cause) => "password_hashing_error",
+    Mail(cause) => "mail_error",
+    Reroute(cause) => "reroute_error",
+    Zip(cause) => "zip_error",
+    Io(cause) => "io_error",
+    NotFound! => "not_found",
+    Conflict(cause) => "conflict",
+    TaxComplianceApi! => "tax_compliance_api_error",
+    RateLimitError(wait_ms, total_allowed_requests) => "ratelimit_error",
+    Stripe(cause) => "stripe_error",
+);
 
 impl ResponseError for ApiError {
     fn status_code(&self) -> StatusCode {
@@ -224,6 +204,7 @@ macro_rules! labrinth_error_type {
                 &self,
                 req: &actix_web::HttpRequest,
             ) -> actix_web::HttpResponse {
+                use actix_web::ResponseError;
                 use actix_web::http::header::{ContentLanguage, QualityItem};
 
                 let language =

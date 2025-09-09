@@ -5,28 +5,31 @@ mod mock;
 mod s3_host;
 
 use ariadne::i18n::I18nEnum;
+use ariadne::i18n_enum;
 use bytes::Bytes;
 pub use mock::MockHost;
 pub use s3_host::{S3BucketConfig, S3Host};
 
-#[derive(Error, I18nEnum, Debug)]
-#[i18n_root_key("error.file_hosting_error")]
+#[derive(Error, Debug)]
 pub enum FileHostingError {
-    #[translation_id("s3")]
-    #[translate_fields(action = 0, cause = 1)]
     // TODO: Use an I18nEnum instead of a String
     // #[error("S3 error when {0}: {1}")]
     S3Error(&'static str, s3::error::S3Error),
 
-    #[translation_id("file_system")]
-    #[translate_fields(cause = 0)]
     // #[error("File system error in file hosting: {0}")]
     FileSystemError(#[from] std::io::Error),
 
-    #[translation_id("invalid_filename")]
     // #[error("Invalid Filename")]
     InvalidFilename,
 }
+
+i18n_enum!(
+    FileHostingError,
+    root_key: "error.file_hosting_error",
+    S3Error(action, cause) => "s3",
+    FileSystemError(cause) => "file_system",
+    InvalidFilename! => "invalid_filename",
+);
 
 #[derive(Debug, Clone)]
 pub struct UploadFileData {

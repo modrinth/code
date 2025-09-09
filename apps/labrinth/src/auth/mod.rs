@@ -18,70 +18,75 @@ use crate::labrinth_error_type;
 use actix_web::http::StatusCode;
 use actix_web::{HttpResponse, ResponseError};
 use ariadne::i18n::I18nEnum;
+use ariadne::i18n_enum;
 use thiserror::Error;
 
 // TODO add fields
-#[derive(Error, I18nEnum, Debug)]
-#[i18n_root_key("error.unauthorized")]
+#[derive(Error, Debug)]
 pub enum AuthenticationError {
-    #[translation_id("environment_error")]
     // #[error("Environment Error")]
     Env(#[from] dotenvy::Error),
 
-    #[translation_id("database_error")]
     // #[error("An unknown database error occurred: {0}")]
     Sqlx(#[from] sqlx::Error),
 
-    #[translation_id("database_error")]
     // #[error("Database Error: {0}")]
     Database(#[from] crate::database::models::DatabaseError),
 
-    #[translation_id("invalid_input")]
     // #[error("Error while parsing JSON: {0}")]
     SerDe(#[from] serde_json::Error),
 
-    #[translation_id("network_error")]
     // #[error("Error while communicating to external provider")]
     Reqwest(#[from] reqwest::Error),
 
-    #[translation_id("file_hosting")]
     // #[error("Error uploading user profile picture")]
     FileHosting(#[from] FileHostingError),
 
-    #[translation_id("decoding_error")]
     // #[error("Error while decoding PAT: {0}")]
     Decoding(#[from] ariadne::ids::DecodingError),
 
-    #[translation_id("mail_error")]
     // #[error("{0}")]
     Mail(#[from] email::MailError),
 
-    #[translation_id("invalid_credentials")]
     // #[error("Invalid Authentication Credentials")]
     InvalidCredentials,
 
-    #[translation_id("invalid_auth_method")]
     // #[error("Authentication method was not valid")]
     InvalidAuthMethod,
 
-    #[translation_id("invalid_client_id")]
     // #[error("GitHub Token from incorrect Client ID")]
     InvalidClientId,
 
-    #[translation_id("duplicate_user")]
     // #[error(
     //     "User email is already registered on Modrinth. Try 'Forgot password' to access your account."
     // )]
     DuplicateUser,
 
-    #[translation_id("socket")]
     // #[error("Invalid state sent, you probably need to get a new websocket")]
     SocketError,
 
-    #[translation_id("url_error")]
     // #[error("Invalid callback URL specified")]
     Url,
 }
+
+i18n_enum!(
+    AuthenticationError,
+    root_key: "error.unauthorized",
+    Env(..) => "environment_error",
+    Sqlx(cause) => "database_error.unknown",
+    Database(cause) => "database_error",
+    SerDe(cause) => "invalid_input",
+    Reqwest(..) => "network_error",
+    FileHosting(..) => "file_hosting",
+    Decoding(cause) => "decoding_error",
+    Mail(cause) => "mail_error",
+    InvalidCredentials! => "invalid_credentials",
+    InvalidAuthMethod! => "invalid_auth_method",
+    InvalidClientId! => "invalid_client_id",
+    DuplicateUser! => "duplicate_user",
+    SocketError! => "socket",
+    Url! => "url_error",
+);
 
 labrinth_error_type!(AuthenticationError);
 
