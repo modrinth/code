@@ -5,11 +5,11 @@ import {
 	Head,
 	Html,
 	Img,
+	Link as VLink,
 	Row,
 	Section,
 	Tailwind,
 	Text,
-	Link as VLink,
 } from '@vue-email/components'
 
 defineProps<{

@@ -1,5 +1,6 @@
 import { render } from '@vue-email/render'
 import type { Component } from 'vue'
+
 import emails from '~/emails'
 
 export default defineEventHandler(async (event) => {
