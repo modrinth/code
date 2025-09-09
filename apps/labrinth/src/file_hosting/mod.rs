@@ -4,7 +4,6 @@ use thiserror::Error;
 mod mock;
 mod s3_host;
 
-use ariadne::i18n::I18nEnum;
 use ariadne::i18n_enum;
 use bytes::Bytes;
 pub use mock::MockHost;

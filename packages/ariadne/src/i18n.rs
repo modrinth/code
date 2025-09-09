@@ -2,7 +2,6 @@ use std::borrow::Cow;
 
 #[cfg(feature = "labrinth")]
 pub use ariadne_macros::localized_labrinth_error;
-pub use rust_i18n::{i18n, t};
 
 pub trait I18nEnum {
     const ROOT_TRANSLATION_ID: &'static str;
@@ -34,7 +33,7 @@ macro_rules! i18n_enum {
             }
 
             fn translated_message<'a>(&self, locale: &str) -> ::std::borrow::Cow<'a, str> {
-                $crate::i18n::t!(concat!($root_key, ".", $key), locale = locale)
+                ::rust_i18n::t!(concat!($root_key, ".", $key), locale = locale)
             }
         }
 
@@ -73,7 +72,7 @@ macro_rules! i18n_enum {
                 }
                 impl<T: $crate::i18n::I18nEnum> __TranslatableEnum for T {
                     fn __maybe_translate<'a>(&self, locale: &str) -> ::std::borrow::Cow<'a, str> {
-                        self.translated_message(locale)
+                        $crate::i18n::I18nEnum::translated_message(self, locale)
                     }
                 }
                 trait __NonTranslatableValue {
@@ -81,7 +80,7 @@ macro_rules! i18n_enum {
                 }
                 impl<T: ::std::fmt::Display> __NonTranslatableValue for &T {
                     fn __maybe_translate<'a>(&self, _locale: &str) -> ::std::borrow::Cow<'a, str> {
-                        ::std::borrow::Cow::Owned(self.to_string())
+                        ::std::borrow::Cow::Owned(::std::string::ToString::to_string(self))
                     }
                 }
                 use $for_enum::*;
@@ -96,7 +95,7 @@ macro_rules! i18n_enum {
 
         impl ::std::fmt::Display for $for_enum {
             fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-                f.write_str(&self.translated_message("en"))
+                f.write_str(&$crate::i18n::I18nEnum::translated_message(self, "en"))
             }
         }
     };
@@ -134,19 +133,19 @@ macro_rules! __i18n_enum_variant_parameters {
 #[doc(hidden)]
 macro_rules! __i18n_enum_variant_values {
     ($root_key:literal, $key:literal, $locale:ident, !) => {
-        $crate::i18n::t!(concat!($root_key, ".", $key), locale = $locale)
+        ::rust_i18n::t!(concat!($root_key, ".", $key), locale = $locale)
     };
     ($root_key:literal, $key:literal, $locale:ident, (..)) => {
-        $crate::i18n::t!(concat!($root_key, ".", $key), locale = $locale)
+        ::rust_i18n::t!(concat!($root_key, ".", $key), locale = $locale)
     };
     ($root_key:literal, $key:literal, $locale:ident, {..}) => {
-        $crate::i18n::t!(concat!($root_key, ".", $key), locale = $locale)
+        ::rust_i18n::t!(concat!($root_key, ".", $key), locale = $locale)
     };
     ($root_key:literal, $key:literal, $locale:ident, ($($field:ident),*)) => {
-        $crate::i18n::t!(concat!($root_key, ".", $key), locale = $locale $(, $field = $field.__maybe_translate($locale))*)
+        ::rust_i18n::t!(concat!($root_key, ".", $key), locale = $locale $(, $field = $field.__maybe_translate($locale))*)
     };
     ($root_key:literal, $key:literal, $locale:ident, {$($field:ident),*}) => {
-        $crate::i18n::t!(concat!($root_key, ".", $key), locale = $locale $(, $field = $field.__maybe_translate($locale))*)
+        ::rust_i18n::t!(concat!($root_key, ".", $key), locale = $locale $(, $field = $field.__maybe_translate($locale))*)
     };
 }
 
