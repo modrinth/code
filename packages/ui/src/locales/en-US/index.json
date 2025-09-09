@@ -1,4 +1,7 @@
 {
+  "badge.beta": {
+    "defaultMessage": "Beta"
+  },
   "badge.beta-release": {
     "defaultMessage": "Beta Release"
   },
