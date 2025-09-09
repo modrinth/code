@@ -11,12 +11,16 @@ import {
 	Text,
 	Link as VLink,
 } from '@vue-email/components'
+
+defineProps<{
+	title?: string
+}>()
 </script>
 
 <template>
 	<Html lang="en">
 		<Head>
-			<title><slot name="title" /></title>
+			<title>{{ title }}</title>
 			<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 			<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 			<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -115,57 +119,56 @@ import {
 									/>
 								</VLink>
 
-								<Text class="mt-2 text-xs" :style="{ color: '#4d4d4d' }"> Rinth, Inc. </Text>
+								<Row class="text-right align-middle">
+									<div class="inline-block">
+										<VLink href="https://discord.modrinth.com" class="mr-4 inline-block">
+											<Img
+												width="20"
+												height="20"
+												alt="Discord"
+												src="https://cdn.modrinth.com/email/e089a3a07be91c2940beff1fb191b247.png"
+											/>
+										</VLink>
+										<VLink href="https://twitter.com/modrinth" class="mr-4 inline-block">
+											<Img
+												width="20"
+												height="20"
+												alt="Twitter/X"
+												src="https://cdn.modrinth.com/email/363985aad91cab53854276e12f267b0b.png"
+											/>
+										</VLink>
+										<VLink href="https://floss.social/@modrinth" class="mr-4 inline-block">
+											<Img
+												width="20"
+												height="20"
+												alt="Mastodon"
+												src="https://cdn.modrinth.com/email/e25c30d5707744f31dcf18651a67d3d5.png"
+											/>
+										</VLink>
+										<VLink href="https://github.com/modrinth/" class="mr-4 inline-block">
+											<Img
+												width="20"
+												height="20"
+												alt="GitHub"
+												src="https://cdn.modrinth.com/email/45993023966d64e6138fd65a530a5d03.png"
+											/>
+										</VLink>
+										<VLink href="https://www.youtube.com/@modrinth" class="inline-block">
+											<Img
+												width="20"
+												height="20"
+												alt="YouTube"
+												src="https://cdn.modrinth.com/email/a15afae9fc94e105caeb1bb4d33a0a13.png"
+											/>
+										</VLink>
+									</div>
+								</Row>
 
-								<div class="mt-2">
-									<Text class="text-xs text-secondary">410 N Scottsdale Road</Text>
-									<Text class="text-xs text-secondary">Suite 1000</Text>
-									<Text class="text-xs text-secondary">Tempe, AZ 85281</Text>
-								</div>
-							</Column>
-
-							<Column class="text-right align-middle">
-								<div class="inline-block">
-									<VLink href="https://discord.modrinth.com" class="mr-4 inline-block">
-										<Img
-											width="20"
-											height="20"
-											alt="Discord"
-											src="https://cdn.modrinth.com/email/e089a3a07be91c2940beff1fb191b247.png"
-										/>
-									</VLink>
-									<VLink href="https://twitter.com/modrinth" class="mr-4 inline-block">
-										<Img
-											width="20"
-											height="20"
-											alt="Twitter/X"
-											src="https://cdn.modrinth.com/email/363985aad91cab53854276e12f267b0b.png"
-										/>
-									</VLink>
-									<VLink href="https://floss.social/@modrinth" class="mr-4 inline-block">
-										<Img
-											width="20"
-											height="20"
-											alt="Mastodon"
-											src="https://cdn.modrinth.com/email/e25c30d5707744f31dcf18651a67d3d5.png"
-										/>
-									</VLink>
-									<VLink href="https://github.com/modrinth/" class="mr-4 inline-block">
-										<Img
-											width="20"
-											height="20"
-											alt="GitHub"
-											src="https://cdn.modrinth.com/email/45993023966d64e6138fd65a530a5d03.png"
-										/>
-									</VLink>
-									<VLink href="https://www.youtube.com/@modrinth" class="inline-block">
-										<Img
-											width="20"
-											height="20"
-											alt="YouTube"
-											src="https://cdn.modrinth.com/email/a15afae9fc94e105caeb1bb4d33a0a13.png"
-										/>
-									</VLink>
+								<Text class="mb-0 mt-2 text-xs" :style="{ color: '#4d4d4d' }"> Rinth, Inc. </Text>
+								<div>
+									<Text class="m-0 text-xs text-secondary">410 N Scottsdale Road</Text>
+									<Text class="m-0 text-xs text-secondary">Suite 1000</Text>
+									<Text class="m-0 text-xs text-secondary">Tempe, AZ 85281</Text>
 								</div>
 							</Column>
 						</Row>
