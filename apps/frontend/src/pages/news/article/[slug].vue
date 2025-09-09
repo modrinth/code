@@ -193,6 +193,10 @@ useSeoMeta({
 		}
 	}
 
+	[data-contrast-text] {
+		color: var(--color-contrast);
+	}
+
 	ul,
 	ol {
 		strong {

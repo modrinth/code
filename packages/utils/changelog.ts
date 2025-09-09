@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-09-08T14:45:00-07:00`,
+		product: 'servers',
+		body: `### Improvements
+- Fixed world seed being rounded in options.`,
+	},
+	{
 		date: `2025-09-07T15:55:00-07:00`,
 		product: 'web',
 		body: `### Improvements
