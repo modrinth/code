@@ -113,24 +113,14 @@ export default defineNuxtConfig({
 	},
 	hooks: {
 		async 'nitro:config'(nitroConfig) {
-			let files: string[] = []
-			try {
-				files = await fs.readdir('./src/emails')
-			} catch (err: any) {
-				if (err?.code !== 'ENOENT') {
-					console.warn('Unable to read ./src/emails for prerendering:', err)
-				}
-				return
-			}
-
-			const emailTemplates = files
-				.filter((file) => file.endsWith('.vue'))
-				.map((file) => file.replace('.vue', ''))
+			const emailTemplates = Object.keys(
+				await import('./src/emails/index.ts').then((m) => m.default),
+			)
 
 			nitroConfig.prerender = nitroConfig.prerender || {}
 			nitroConfig.prerender.routes = nitroConfig.prerender.routes || []
 			for (const template of emailTemplates) {
-				nitroConfig.prerender.routes.push(`/email/${template}.html`)
+				nitroConfig.prerender.routes.push(`/email/${template}`)
 			}
 		},
 		async 'build:before'() {

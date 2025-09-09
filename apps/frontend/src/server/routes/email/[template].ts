@@ -6,7 +6,7 @@ import emails from '~/emails'
 export default defineEventHandler(async (event) => {
 	const template = event.context.params?.template as string
 	try {
-		const component = emails[template] as Component | undefined
+		const component = (await emails[template]()) as Component | undefined
 
 		if (!component) {
 			throw createError({
@@ -16,7 +16,6 @@ export default defineEventHandler(async (event) => {
 		}
 
 		const html = await render(component, {})
-		console.log('Rendered HTML length:', html.length)
 
 		return html
 	} catch (error) {
