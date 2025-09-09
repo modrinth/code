@@ -6,7 +6,7 @@ import emails from '~/emails'
 export default defineEventHandler(async (event) => {
 	const template = event.context.params?.template as string
 	try {
-		const component = (await emails[template]()) as Component | undefined
+		const component = (await emails[template]()).default as Component | undefined
 
 		if (!component) {
 			throw createError({

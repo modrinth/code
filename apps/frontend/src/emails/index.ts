@@ -11,4 +11,4 @@ export default {
 	'two-factor-added': () => import('./templates/TwoFactorAdded.vue'),
 	'two-factor-removed': () => import('./templates/TwoFactorRemoved.vue'),
 	'verify-email': () => import('./templates/VerifyEmail.vue'),
-} as Record<string, () => Promise<Component>>
+} as Record<string, () => Promise<{ default: Component }>>
