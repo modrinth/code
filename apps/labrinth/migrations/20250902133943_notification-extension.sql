@@ -117,7 +117,6 @@ VALUES (NULL, 'email', 'email_changed', TRUE);
 INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
 VALUES (NULL, 'email', 'payment_failed', TRUE);
 
--- Pre-insert any templates
 INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
 VALUES (
     'email', 'reset_password', 'Reset your Modrinth password', 'https://modrinth.com/email/resetpassword',
