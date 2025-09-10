@@ -17,6 +17,7 @@ pub mod organization_item;
 pub mod pat_item;
 pub mod payout_item;
 pub mod product_item;
+pub mod products_tax_identifier_item;
 pub mod project_item;
 pub mod report_item;
 pub mod session_item;
