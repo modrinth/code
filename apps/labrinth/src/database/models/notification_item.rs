@@ -306,7 +306,7 @@ impl DBNotification {
             JSONB_AGG(DISTINCT jsonb_build_object('id', na.id, 'notification_id', na.notification_id, 'name', na.name, 'action_route_method', na.action_route_method, 'action_route', na.action_route)) filter (where na.id is not null) actions
             FROM notifications n
             LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
-            INNER JOIN notifications_types nt on nt.name = n.type
+            INNER JOIN notifications_types nt on nt.name = n.body ->> 'type'
             WHERE n.user_id = $1
               AND nt.expose_in_site_notifications = TRUE
             GROUP BY n.id, n.user_id
