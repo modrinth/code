@@ -61,7 +61,7 @@ pub enum AttachedCharge {
 impl AttachedCharge {
     pub fn as_charge(&self) -> Option<&DBCharge> {
         if let AttachedCharge::UseExisting { charge } = self {
-            Some(&charge)
+            Some(charge)
         } else {
             None
         }
@@ -179,12 +179,12 @@ pub async fn create_or_update_payment_intent(
     }: PaymentBootstrapOptions<'_>,
 ) -> Result<PaymentBootstrapResults, ApiError> {
     let customer_id = get_or_create_customer(
-        user.id.into(),
+        user.id,
         user.stripe_customer_id.as_deref(),
         user.email.as_deref(),
-        &stripe_client,
-        &pg,
-        &redis,
+        stripe_client,
+        pg,
+        redis,
     )
     .await?;
 
@@ -193,20 +193,20 @@ pub async fn create_or_update_payment_intent(
             payment_request_type: PaymentRequestType::PaymentMethod { id },
         } => {
             let payment_method_id =
-                PaymentMethodId::from_str(&id).map_err(|_| {
+                PaymentMethodId::from_str(id).map_err(|_| {
                     ApiError::InvalidInput(
                         "Invalid payment method id".to_string(),
                     )
                 })?;
 
-            let payment_method = PaymentMethod::retrieve(
-                &stripe_client,
+            
+
+            PaymentMethod::retrieve(
+                stripe_client,
                 &payment_method_id,
                 &[],
             )
-            .await?;
-
-            payment_method
+            .await?
         }
         PaymentSession::Interactive {
             payment_request_type:
@@ -232,15 +232,14 @@ pub async fn create_or_update_payment_intent(
             let confirmation: ConfirmationToken =
                 serde_json::from_value(confirmation)?;
 
-            let payment_method =
-                confirmation.payment_method_preview.ok_or_else(|| {
+            
+
+            confirmation.payment_method_preview.ok_or_else(|| {
                     ApiError::InvalidInput(
                         "Confirmation token is missing payment method!"
                             .to_string(),
                     )
-                })?;
-
-            payment_method
+                })?
         }
         PaymentSession::AutomatedRenewal => {
             if attached_charge.as_charge().is_none() {
@@ -250,7 +249,7 @@ pub async fn create_or_update_payment_intent(
             }
 
             let customer =
-                stripe::Customer::retrieve(&stripe_client, &customer_id, &[])
+                stripe::Customer::retrieve(stripe_client, &customer_id, &[])
                     .await?;
 
             let maybe_payment_method_id = customer
@@ -259,14 +258,14 @@ pub async fn create_or_update_payment_intent(
 
             match maybe_payment_method_id {
                 Some(payment_method_id) => {
-                    let payment_method = stripe::PaymentMethod::retrieve(
-                        &stripe_client,
+                    
+
+                    stripe::PaymentMethod::retrieve(
+                        stripe_client,
                         &payment_method_id,
                         &[],
                     )
-                    .await?;
-
-                    payment_method
+                    .await?
                 }
                 None => {
                     return Err(ApiError::InvalidInput(
@@ -300,7 +299,7 @@ pub async fn create_or_update_payment_intent(
         AttachedCharge::UseExisting { ref charge } => ChargeData {
             amount: charge.amount,
             currency_code: charge.currency_code.clone(),
-            interval: charge.subscription_interval.clone(),
+            interval: charge.subscription_interval,
             price_id: charge.price_id.into(),
             charge_type: charge.type_,
         },
@@ -434,7 +433,7 @@ pub async fn create_or_update_payment_intent(
         } = &payment_session
         {
             update_payment_intent.payment_method =
-                Some(PaymentMethodId::from_str(&id).map_err(|_| {
+                Some(PaymentMethodId::from_str(id).map_err(|_| {
                     ApiError::InvalidInput(
                         "Invalid payment method id".to_string(),
                     )
@@ -442,7 +441,7 @@ pub async fn create_or_update_payment_intent(
         }
 
         stripe::PaymentIntent::update(
-            &stripe_client,
+            stripe_client,
             &payment_intent_id,
             update_payment_intent,
         )
@@ -472,7 +471,7 @@ pub async fn create_or_update_payment_intent(
         } = &payment_session
         {
             intent.payment_method =
-                Some(PaymentMethodId::from_str(&id).map_err(|_| {
+                Some(PaymentMethodId::from_str(id).map_err(|_| {
                     ApiError::InvalidInput(
                         "Invalid payment method id".to_string(),
                     )
@@ -480,7 +479,7 @@ pub async fn create_or_update_payment_intent(
         }
 
         let payment_intent =
-            stripe::PaymentIntent::create(&stripe_client, intent).await?;
+            stripe::PaymentIntent::create(stripe_client, intent).await?;
 
         Ok(PaymentBootstrapResults {
             new_payment_intent: Some(payment_intent),

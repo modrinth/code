@@ -1578,7 +1578,7 @@ pub async fn stripe_webhook(
                 let Some(customer_address) = pi
                     .payment_method
                     .and_then(|x| x.into_object())
-                    .and_then(|x| x.billing_details.address.clone())
+                    .and_then(|x| x.billing_details.address)
                 else {
                     return Err(ApiError::InvalidInput(
                         "Missing customer address".to_string(),

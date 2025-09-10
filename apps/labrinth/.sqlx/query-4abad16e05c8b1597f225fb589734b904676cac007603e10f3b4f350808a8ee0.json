@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                id, user_id, price_id, amount, currency_code, status, due, last_attempt,\n                charge_type, subscription_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                subscription_interval AS \"subscription_interval?\",\n                payment_platform,\n                payment_platform_id AS \"payment_platform_id?\",\n                parent_charge_id AS \"parent_charge_id?\",\n                net AS \"net?\"\n            FROM charges\n            WHERE subscription_id = $1 AND (status = 'open' OR status = 'expiring' OR status = 'cancelled' OR status = 'failed')",
+  "query": "\n            SELECT\n                id, user_id, price_id, amount, currency_code, status, due, last_attempt,\n                charge_type, subscription_id, tax_amount, tax_platform_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                subscription_interval AS \"subscription_interval?\",\n                payment_platform,\n                payment_platform_id AS \"payment_platform_id?\",\n                parent_charge_id AS \"parent_charge_id?\",\n                net AS \"net?\"\n            FROM charges\n            \n            WHERE\n                charge_type = $1 AND\n                status = 'failed' AND due < NOW() - INTERVAL '30 days'\n            ",
   "describe": {
     "columns": [
       {
@@ -55,33 +55,43 @@
       },
       {
         "ordinal": 10,
-        "name": "subscription_interval?",
-        "type_info": "Text"
+        "name": "tax_amount",
+        "type_info": "Int8"
       },
       {
         "ordinal": 11,
-        "name": "payment_platform",
+        "name": "tax_platform_id",
         "type_info": "Text"
       },
       {
         "ordinal": 12,
-        "name": "payment_platform_id?",
+        "name": "subscription_interval?",
         "type_info": "Text"
       },
       {
         "ordinal": 13,
+        "name": "payment_platform",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 14,
+        "name": "payment_platform_id?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 15,
         "name": "parent_charge_id?",
         "type_info": "Int8"
       },
       {
-        "ordinal": 14,
+        "ordinal": 16,
         "name": "net?",
         "type_info": "Int8"
       }
     ],
     "parameters": {
       "Left": [
-        "Int8"
+        "Text"
       ]
     },
     "nullable": [
@@ -95,6 +105,8 @@
       true,
       false,
       true,
+      false,
+      true,
       true,
       false,
       true,
@@ -102,5 +114,5 @@
       true
     ]
   },
-  "hash": "2e18682890f7ec5a618991c2a4c77ca9546970f314f902a5197eb2d189cf81f7"
+  "hash": "4abad16e05c8b1597f225fb589734b904676cac007603e10f3b4f350808a8ee0"
 }
