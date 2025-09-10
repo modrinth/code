@@ -8,14 +8,12 @@ on:
       - .github/workflows/labrinth-docker.yml
       - 'apps/labrinth/**'
       - 'packages/ariadne/**'
-      - 'packages/ariadne-macros/**'
   pull_request:
     types: [opened, synchronize]
     paths:
       - .github/workflows/labrinth-docker.yml
       - 'apps/labrinth/**'
       - 'packages/ariadne/**'
-      - 'packages/ariadne-macros/**'
   merge_group:
     types: [checks_requested]
 

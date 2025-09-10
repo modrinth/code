@@ -1252,7 +1252,7 @@ pub async fn auth_callback(
         }
     };
 
-    res().await.map_err(|e| ErrorPage::new(e, &req))
+    Ok(res().await?)
 }
 
 #[derive(Deserialize)]

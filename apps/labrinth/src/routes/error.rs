@@ -1,108 +1,108 @@
 use crate::file_hosting::FileHostingError;
+use crate::models::error::AsApiError;
 use actix_web::http::StatusCode;
-use actix_web::http::header::AcceptLanguage;
-use actix_web::http::header::{Header, LanguageTag};
-use actix_web::{HttpRequest, HttpResponse, ResponseError};
-use ariadne::i18n::I18nEnum;
+use actix_web::{HttpResponse, ResponseError};
 use ariadne::i18n_enum;
 
 #[derive(thiserror::Error, Debug)]
 pub enum ApiError {
-    // #[error("Environment Error")]
+    #[error("Environment Error")]
     Env(#[from] dotenvy::Error),
 
-    // #[error("Error while uploading file: {0}")]
+    #[error("Error while uploading file: {0}")]
     FileHosting(#[from] FileHostingError),
 
-    // #[error("Database Error: {0}")]
+    #[error("Database Error: {0}")]
     Database(#[from] crate::database::models::DatabaseError),
 
-    // #[error("Database Error: {0}")]
+    #[error("Database Error: {0}")]
     SqlxDatabase(#[from] sqlx::Error),
 
-    // #[error("Database Error: {0}")]
+    #[error("Database Error: {0}")]
     RedisDatabase(#[from] redis::RedisError),
 
-    // #[error("Clickhouse Error: {0}")]
+    #[error("Clickhouse Error: {0}")]
     Clickhouse(#[from] clickhouse::error::Error),
 
     // TODO: Use an I18nEnum instead of a String
-    // #[error("Internal server error: {0}")]
+    #[error("Internal server error: {0}")]
     Xml(String),
 
-    // #[error("Deserialization error: {0}")]
+    #[error("Deserialization error: {0}")]
     Json(#[from] serde_json::Error),
 
-    // #[error("Authentication Error: {0}")]
+    #[error("Authentication Error: {0}")]
     Authentication(#[from] crate::auth::AuthenticationError),
 
     // TODO: Use an I18nEnum instead of a String
-    // #[error("Authentication Error: {0}")]
+    #[error("Authentication Error: {0}")]
     CustomAuthentication(String),
 
     // TODO: Use an I18nEnum instead of a String
-    // #[error("Invalid Input: {0}")]
+    #[error("Invalid Input: {0}")]
     InvalidInput(String),
 
     // TODO: Perhaps remove this in favor of InvalidInput?
-    // #[error("Error while validating input: {0}")]
+    #[error("Error while validating input: {0}")]
     Validation(String),
 
-    // #[error("Search Error: {0}")]
+    #[error("Search Error: {0}")]
     Search(#[from] meilisearch_sdk::errors::Error),
 
-    // #[error("Indexing Error: {0}")]
+    #[error("Indexing Error: {0}")]
     Indexing(#[from] crate::search::indexing::IndexingError),
 
     // TODO: Use an I18nEnum instead of a String
-    // #[error("Payments Error: {0}")]
+    #[error("Payments Error: {0}")]
     Payments(String),
 
     // TODO: Use an I18nEnum instead of a String
-    // #[error("Discord Error: {0}")]
+    #[error("Discord Error: {0}")]
     Discord(String),
 
-    // #[error("Captcha Error. Try resubmitting the form.")]
+    #[error("Captcha Error. Try resubmitting the form.")]
     Turnstile,
 
-    // #[error("Error while decoding Base62: {0}")]
+    #[error("Error while decoding Base62: {0}")]
     Decoding(#[from] ariadne::ids::DecodingError),
 
-    // #[error("Image Parsing Error: {0}")]
+    #[error("Image Parsing Error: {0}")]
     ImageParse(#[from] image::ImageError),
 
-    // #[error("Password Hashing Error: {0}")]
+    #[error("Password Hashing Error: {0}")]
     PasswordHashing(#[from] argon2::password_hash::Error),
 
-    // #[error("{0}")]
+    #[error("{0}")]
     Mail(#[from] crate::auth::email::MailError),
 
-    // #[error("Error while rerouting request: {0}")]
+    #[error("Error while rerouting request: {0}")]
     Reroute(#[from] reqwest::Error),
 
-    // #[error("Unable to read Zip Archive: {0}")]
+    #[error("Unable to read Zip Archive: {0}")]
     Zip(#[from] zip::result::ZipError),
 
-    // #[error("IO Error: {0}")]
+    #[error("IO Error: {0}")]
     Io(#[from] std::io::Error),
 
-    // TODO: Add route not found
-    // #[error("Resource not found")]
+    #[error("Resource not found")]
     NotFound,
 
+    #[error("The requested route does not exist")]
+    RouteNotFound,
+
     // TODO: Use an I18nEnum instead of a String
-    // #[error("Conflict: {0}")]
+    #[error("Conflict: {0}")]
     Conflict(String),
 
-    // #[error("External tax compliance API Error")]
+    #[error("External tax compliance API Error")]
     TaxComplianceApi,
 
-    // #[error(
-    //     "You are being rate-limited. Please wait {0} milliseconds. 0/{1} remaining."
-    // )]
+    #[error(
+        "You are being rate-limited. Please wait {0} milliseconds. 0/{1} remaining."
+    )]
     RateLimitError(u128, u32),
 
-    // #[error("Error while interacting with payment processor: {0}")]
+    #[error("Error while interacting with payment processor: {0}")]
     Stripe(#[from] stripe::StripeError),
 }
 
@@ -134,6 +134,7 @@ i18n_enum!(
     Zip(cause) => "zip_error",
     Io(cause) => "io_error",
     NotFound! => "not_found",
+    RouteNotFound! => "not_found.route",
     Conflict(cause) => "conflict",
     TaxComplianceApi! => "tax_compliance_api_error",
     RateLimitError(wait_ms, total_allowed_requests) => "ratelimit_error",
@@ -166,6 +167,7 @@ impl ResponseError for ApiError {
             ApiError::Mail(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Reroute(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::NotFound => StatusCode::NOT_FOUND,
+            ApiError::RouteNotFound => StatusCode::NOT_FOUND,
             ApiError::Conflict(..) => StatusCode::CONFLICT,
             ApiError::TaxComplianceApi => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Zip(..) => StatusCode::BAD_REQUEST,
@@ -178,61 +180,4 @@ impl ResponseError for ApiError {
     fn error_response(&self) -> HttpResponse {
         HttpResponse::build(self.status_code()).json(self.as_api_error())
     }
-}
-
-#[macro_export]
-macro_rules! labrinth_error_type {
-    ($error_enum:ty) => {
-        impl $error_enum {
-            pub fn as_api_error<'a>(
-                &self,
-            ) -> $crate::models::error::ApiError<'a> {
-                self.as_localized_api_error("en")
-            }
-
-            pub fn as_localized_api_error<'a>(
-                &self,
-                language: &str,
-            ) -> crate::models::error::ApiError<'a> {
-                $crate::models::error::ApiError {
-                    error: $crate::routes::error::error_id_for_error(self),
-                    description: self.translated_message(language),
-                }
-            }
-
-            pub fn localized_error_response(
-                &self,
-                req: &actix_web::HttpRequest,
-            ) -> actix_web::HttpResponse {
-                use actix_web::ResponseError;
-                use actix_web::http::header::{ContentLanguage, QualityItem};
-
-                let language =
-                    $crate::routes::error::parse_accept_language(req);
-                let body = self.as_localized_api_error(language.as_str());
-
-                actix_web::HttpResponse::build(self.status_code())
-                    .append_header(ContentLanguage(vec![QualityItem::max(
-                        language,
-                    )]))
-                    .json(body)
-            }
-        }
-    };
-}
-
-labrinth_error_type!(ApiError);
-
-pub fn error_id_for_error(error: &impl I18nEnum) -> &'static str {
-    let translation_id = error.translation_id();
-    translation_id
-        .split_once('.')
-        .map_or(translation_id, |(base, _)| base)
-}
-
-pub fn parse_accept_language(req: &HttpRequest) -> LanguageTag {
-    AcceptLanguage::parse(req)
-        .ok()
-        .and_then(|x| x.preference().into_item())
-        .unwrap_or_else(|| LanguageTag::parse("en").unwrap())
 }

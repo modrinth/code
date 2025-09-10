@@ -1,7 +1,5 @@
-use std::borrow::Cow;
-
-#[cfg(feature = "labrinth")]
-pub use ariadne_macros::localized_labrinth_error;
+use serde::Serialize;
+use std::collections::HashMap;
 
 pub trait I18nEnum {
     const ROOT_TRANSLATION_ID: &'static str;
@@ -10,7 +8,18 @@ pub trait I18nEnum {
 
     fn full_translation_id(&self) -> &'static str;
 
-    fn translated_message<'a>(&self, locale: &str) -> Cow<'a, str>;
+    fn translation_data(&self) -> TranslationData;
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(untagged)]
+pub enum TranslationData {
+    Literal(String),
+    Translatable {
+        key: &'static str,
+        #[serde(skip_serializing_if = "HashMap::is_empty")]
+        values: HashMap<&'static str, TranslationData>,
+    },
 }
 
 #[macro_export]
@@ -29,17 +38,11 @@ macro_rules! i18n_enum {
             }
 
             fn full_translation_id(&self) -> &'static str {
-                concat!($root_key, ".", $key)
+                ::core::concat!($root_key, ".", $key)
             }
 
-            fn translated_message<'a>(&self, locale: &str) -> ::std::borrow::Cow<'a, str> {
-                ::rust_i18n::t!(concat!($root_key, ".", $key), locale = locale)
-            }
-        }
-
-        impl ::std::fmt::Display for $for_enum {
-            fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-                f.write_str(&self.translated_message("en"))
+            fn translation_data(&self) -> $crate::i18n::TranslationData {
+                $crate::__i18n_enum_variant_values!($root_key, $key, !)
             }
         }
     };
@@ -62,40 +65,34 @@ macro_rules! i18n_enum {
             fn full_translation_id(&self) -> &'static str {
                 use $for_enum::*;
                 match self {
-                    $($crate::__i18n_enum_variant_parameters_no_store!($variant_name, $variant_pat) => concat!($root_key, ".", $key),)*
+                    $($crate::__i18n_enum_variant_parameters_no_store!($variant_name, $variant_pat) => ::core::concat!($root_key, ".", $key),)*
                 }
             }
 
-            fn translated_message<'a>(&self, locale: &str) -> ::std::borrow::Cow<'a, str> {
+            fn translation_data(&self) -> $crate::i18n::TranslationData {
                 trait __TranslatableEnum {
-                    fn __maybe_translate<'a>(&self, locale: &str) -> ::std::borrow::Cow<'a, str>;
+                    fn __maybe_translate(&self) -> $crate::i18n::TranslationData;
                 }
                 impl<T: $crate::i18n::I18nEnum> __TranslatableEnum for T {
-                    fn __maybe_translate<'a>(&self, locale: &str) -> ::std::borrow::Cow<'a, str> {
-                        $crate::i18n::I18nEnum::translated_message(self, locale)
+                    fn __maybe_translate(&self) -> $crate::i18n::TranslationData {
+                        $crate::i18n::I18nEnum::translation_data(self)
                     }
                 }
                 trait __NonTranslatableValue {
-                    fn __maybe_translate<'a>(&self, _locale: &str) -> ::std::borrow::Cow<'a, str>;
+                    fn __maybe_translate(&self) -> $crate::i18n::TranslationData;
                 }
                 impl<T: ::std::fmt::Display> __NonTranslatableValue for &T {
-                    fn __maybe_translate<'a>(&self, _locale: &str) -> ::std::borrow::Cow<'a, str> {
-                        ::std::borrow::Cow::Owned(::std::string::ToString::to_string(self))
+                    fn __maybe_translate(&self) -> $crate::i18n::TranslationData {
+                        $crate::i18n::TranslationData::Literal(::std::string::ToString::to_string(self))
                     }
                 }
                 use $for_enum::*;
                 match self {
                     $(
                         $crate::__i18n_enum_variant_parameters!($variant_name, $variant_pat) =>
-                            $crate::__i18n_enum_variant_values!($root_key, $key, locale, $variant_pat),
+                            $crate::__i18n_enum_variant_values!($root_key, $key, $variant_pat),
                     )*
                 }
-            }
-        }
-
-        impl ::std::fmt::Display for $for_enum {
-            fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-                f.write_str(&$crate::i18n::I18nEnum::translated_message(self, "en"))
             }
         }
     };
@@ -132,20 +129,28 @@ macro_rules! __i18n_enum_variant_parameters {
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __i18n_enum_variant_values {
-    ($root_key:literal, $key:literal, $locale:ident, !) => {
-        ::rust_i18n::t!(concat!($root_key, ".", $key), locale = $locale)
+    ($root_key:literal, $key:literal, !) => {
+        $crate::i18n::TranslationData::Translatable {
+            key: ::core::concat!($root_key, ".", $key),
+            values: ::std::collections::HashMap::new(),
+        }
     };
-    ($root_key:literal, $key:literal, $locale:ident, (..)) => {
-        ::rust_i18n::t!(concat!($root_key, ".", $key), locale = $locale)
+    ($root_key:literal, $key:literal, (..)) => {
+        $crate::__i18n_enum_variant_values!($root_key, $key, !)
     };
-    ($root_key:literal, $key:literal, $locale:ident, {..}) => {
-        ::rust_i18n::t!(concat!($root_key, ".", $key), locale = $locale)
+    ($root_key:literal, $key:literal, {..}) => {
+        $crate::__i18n_enum_variant_values!($root_key, $key, !)
     };
-    ($root_key:literal, $key:literal, $locale:ident, ($($field:ident),*)) => {
-        ::rust_i18n::t!(concat!($root_key, ".", $key), locale = $locale $(, $field = $field.__maybe_translate($locale))*)
+    ($root_key:literal, $key:literal, ($($field:ident),*)) => {
+        $crate::i18n::TranslationData::Translatable {
+            key: ::core::concat!($root_key, ".", $key),
+            values: ::std::collections::HashMap::from([
+                $((::core::stringify!($field), $field.__maybe_translate()),)*
+            ]),
+        }
     };
-    ($root_key:literal, $key:literal, $locale:ident, {$($field:ident),*}) => {
-        ::rust_i18n::t!(concat!($root_key, ".", $key), locale = $locale $(, $field = $field.__maybe_translate($locale))*)
+    ($root_key:literal, $key:literal, {$($field:ident),*}) => {
+        $crate::__i18n_enum_variant_values!($root_key, $key, ($($field),*))
     };
 }
 
@@ -153,38 +158,7 @@ macro_rules! __i18n_enum_variant_values {
 #[doc(hidden)]
 pub mod test {
     use super::*;
-
-    pub struct TestingBackend;
-
-    impl rust_i18n::Backend for TestingBackend {
-        fn available_locales(&self) -> Vec<&str> {
-            vec!["en", "ja"]
-        }
-
-        fn translate(&self, locale: &str, key: &str) -> Option<&str> {
-            let value = match locale {
-                "en" => match key {
-                    "unit_translatable.unit" => "Unit Translatable",
-                    "base.unit" => "Unit",
-                    "base.tuple" => "Tuple: %{value}",
-                    "base.translatable_tuple" => "Translatable Tuple: %{unit}",
-                    "base.named" => "Named: %{subfield}",
-                    _ => panic!("No translation for {key}"),
-                },
-                "ja" => match key {
-                    "unit_translatable.unit" => "この単位は翻訳できる",
-                    "base.unit" => "単位",
-                    "base.tuple" => "組：　%{value}",
-                    "base.translatable_tuple" => {
-                        "この組は翻訳できる：　%{unit}"
-                    }
-                    _ => self.translate("en", key)?,
-                },
-                _ => panic!("No translations for {locale}"),
-            };
-            Some(value)
-        }
-    }
+    use serde_json::json;
 
     struct UnitTranslatable;
 
@@ -210,38 +184,57 @@ pub mod test {
         Named { subfield } => "named",
     );
 
-    fn assert_i18n_eq(x: impl I18nEnum, lang: &str, should_be: &str) {
-        assert_eq!(x.translated_message(lang), should_be);
+    fn assert_i18n_eq(x: impl I18nEnum, should_be: serde_json::Value) {
+        assert_eq!(
+            serde_json::to_value(x.translation_data()).unwrap(),
+            should_be
+        );
     }
 
     #[test]
-    fn test_en() {
-        assert_i18n_eq(UnitTranslatable, "en", "Unit Translatable");
-        assert_i18n_eq(TestEnum::Unit, "en", "Unit");
-        assert_i18n_eq(TestEnum::Tuple("hello"), "en", "Tuple: hello");
+    fn test() {
+        assert_i18n_eq(
+            UnitTranslatable,
+            json!({
+                "key": "unit_translatable.unit",
+            }),
+        );
+        assert_i18n_eq(
+            TestEnum::Unit,
+            json!({
+                "key": "base.unit",
+            }),
+        );
+        assert_i18n_eq(
+            TestEnum::Tuple("hello"),
+            json!({
+                "key": "base.tuple",
+                "values": {
+                    "value": "hello",
+                },
+            }),
+        );
         assert_i18n_eq(
             TestEnum::TranslatableTuple(UnitTranslatable),
-            "en",
-            "Translatable Tuple: Unit Translatable",
+            json!({
+                "key": "base.translatable_tuple",
+                "values": {
+                    "unit": {
+                        "key": "unit_translatable.unit",
+                    },
+                },
+            }),
         );
         assert_i18n_eq(
             TestEnum::Named {
                 subfield: "Subfield",
             },
-            "en",
-            "Named: Subfield",
-        );
-    }
-
-    #[test]
-    fn test_ja() {
-        assert_i18n_eq(UnitTranslatable, "ja", "この単位は翻訳できる");
-        assert_i18n_eq(TestEnum::Unit, "ja", "単位");
-        assert_i18n_eq(TestEnum::Tuple("こんにちは"), "ja", "組：　こんにちは");
-        assert_i18n_eq(
-            TestEnum::TranslatableTuple(UnitTranslatable),
-            "ja",
-            "この組は翻訳できる：　この単位は翻訳できる",
+            json!({
+                "key": "base.named",
+                "values": {
+                    "subfield": "Subfield",
+                }
+            }),
         );
     }
 }

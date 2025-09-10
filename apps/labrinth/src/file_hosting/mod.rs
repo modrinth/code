@@ -12,13 +12,13 @@ pub use s3_host::{S3BucketConfig, S3Host};
 #[derive(Error, Debug)]
 pub enum FileHostingError {
     // TODO: Use an I18nEnum instead of a String
-    // #[error("S3 error when {0}: {1}")]
+    #[error("S3 error when {0}: {1}")]
     S3Error(&'static str, s3::error::S3Error),
 
-    // #[error("File system error in file hosting: {0}")]
+    #[error("File system error in file hosting: {0}")]
     FileSystemError(#[from] std::io::Error),
 
-    // #[error("Invalid Filename")]
+    #[error("Invalid Filename")]
     InvalidFilename,
 }
 

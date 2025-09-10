@@ -13,7 +13,6 @@ use tracing::{info, warn};
 extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
 use routes::error;
-use rust_i18n::i18n;
 use util::cors::default_cors;
 
 use crate::background_task::update_versions;
@@ -36,8 +35,6 @@ pub mod search;
 pub mod sync;
 pub mod util;
 pub mod validate;
-
-i18n!();
 
 #[derive(Clone)]
 pub struct Pepper {

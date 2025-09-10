@@ -111,6 +111,7 @@ impl actix_web::ResponseError for OAuthError {
 }
 
 // TODO: Reference in an ApiError variant
+// TODO: I18nEnum
 #[derive(thiserror::Error, Debug)]
 pub enum OAuthErrorType {
     #[error(transparent)]

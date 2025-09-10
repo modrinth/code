@@ -13,12 +13,6 @@ rand.workspace = true
 either.workspace = true
 chrono = { workspace = true, features = ["serde"] }
 serde_cbor.workspace = true
-rust-i18n.workspace = true
-
-ariadne-macros.workspace = true
-
-[features]
-labrinth = ["ariadne-macros/labrinth"]
 
 [lints]
 workspace = true

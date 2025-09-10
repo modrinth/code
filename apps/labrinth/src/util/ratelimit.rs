@@ -2,7 +2,7 @@ use crate::database::redis::RedisPool;
 use crate::routes::error::ApiError;
 use crate::util::env::parse_var;
 use actix_web::{
-    Error,
+    Error, ResponseError,
     body::{EitherBody, MessageBody},
     dev::{ServiceRequest, ServiceResponse},
     middleware::Next,
@@ -187,7 +187,7 @@ pub async fn rate_limit_middleware(
                 decision.retry_after_ms.unwrap_or(0) as u128,
                 decision.limit,
             )
-            .localized_error_response(req.request());
+            .error_response();
 
             // Add rate limit headers
             let headers = response.headers_mut();
@@ -228,7 +228,7 @@ pub async fn rate_limit_middleware(
         let response = ApiError::CustomAuthentication(
             "Unable to obtain user IP address!".to_string(),
         )
-        .localized_error_response(req.request());
+        .error_response();
 
         Ok(req.into_response(response.map_into_right_body()))
     }

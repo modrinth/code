@@ -1,6 +1,6 @@
 use crate::routes::error::ApiError;
-use actix_web::{HttpRequest, HttpResponse};
+use actix_web::{HttpResponse, ResponseError};
 
-pub async fn not_found(req: HttpRequest) -> HttpResponse {
-    ApiError::NotFound.localized_error_response(&req)
+pub async fn not_found() -> HttpResponse {
+    ApiError::RouteNotFound.error_response()
 }

@@ -14,58 +14,56 @@ use serde::{Deserialize, Serialize};
 pub use validate::{check_is_moderator_from_headers, get_user_from_headers};
 
 use crate::file_hosting::FileHostingError;
-use crate::labrinth_error_type;
+use crate::models::error::AsApiError;
 use actix_web::http::StatusCode;
 use actix_web::{HttpResponse, ResponseError};
-use ariadne::i18n::I18nEnum;
 use ariadne::i18n_enum;
 use thiserror::Error;
 
-// TODO add fields
 #[derive(Error, Debug)]
 pub enum AuthenticationError {
-    // #[error("Environment Error")]
+    #[error("Environment Error")]
     Env(#[from] dotenvy::Error),
 
-    // #[error("An unknown database error occurred: {0}")]
+    #[error("An unknown database error occurred: {0}")]
     Sqlx(#[from] sqlx::Error),
 
-    // #[error("Database Error: {0}")]
+    #[error("Database Error: {0}")]
     Database(#[from] crate::database::models::DatabaseError),
 
-    // #[error("Error while parsing JSON: {0}")]
+    #[error("Error while parsing JSON: {0}")]
     SerDe(#[from] serde_json::Error),
 
-    // #[error("Error while communicating to external provider")]
+    #[error("Error while communicating to external provider")]
     Reqwest(#[from] reqwest::Error),
 
-    // #[error("Error uploading user profile picture")]
+    #[error("Error uploading user profile picture")]
     FileHosting(#[from] FileHostingError),
 
-    // #[error("Error while decoding PAT: {0}")]
+    #[error("Error while decoding PAT: {0}")]
     Decoding(#[from] ariadne::ids::DecodingError),
 
-    // #[error("{0}")]
+    #[error("{0}")]
     Mail(#[from] email::MailError),
 
-    // #[error("Invalid Authentication Credentials")]
+    #[error("Invalid Authentication Credentials")]
     InvalidCredentials,
 
-    // #[error("Authentication method was not valid")]
+    #[error("Authentication method was not valid")]
     InvalidAuthMethod,
 
-    // #[error("GitHub Token from incorrect Client ID")]
+    #[error("GitHub Token from incorrect Client ID")]
     InvalidClientId,
 
-    // #[error(
-    //     "User email is already registered on Modrinth. Try 'Forgot password' to access your account."
-    // )]
+    #[error(
+        "User email is already registered on Modrinth. Try 'Forgot password' to access your account."
+    )]
     DuplicateUser,
 
-    // #[error("Invalid state sent, you probably need to get a new websocket")]
+    #[error("Invalid state sent, you probably need to get a new websocket")]
     SocketError,
 
-    // #[error("Invalid callback URL specified")]
+    #[error("Invalid callback URL specified")]
     Url,
 }
 
@@ -87,8 +85,6 @@ i18n_enum!(
     SocketError! => "socket",
     Url! => "url_error",
 );
-
-labrinth_error_type!(AuthenticationError);
 
 impl ResponseError for AuthenticationError {
     fn status_code(&self) -> StatusCode {

@@ -12,7 +12,6 @@ use crate::queue::session::AuthQueue;
 use crate::routes::error::ApiError;
 use crate::{auth::get_user_from_headers, database};
 use actix_web::{HttpRequest, HttpResponse, get, route, web};
-use ariadne::i18n::localized_labrinth_error;
 use sqlx::PgPool;
 use std::collections::HashSet;
 use yaserde::YaSerialize;
@@ -70,7 +69,6 @@ pub struct MavenPom {
 }
 
 #[get("maven/modrinth/{id}/maven-metadata.xml")]
-#[localized_labrinth_error]
 pub async fn maven_metadata(
     req: HttpRequest,
     params: web::Path<(String,)>,

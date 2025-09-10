@@ -7,7 +7,6 @@ members = [
 	"apps/labrinth",
 	"packages/app-lib",
 	"packages/ariadne",
-	"packages/ariadne-macros",
 	"packages/daedalus",
 ]
 
@@ -80,7 +79,6 @@ indicatif = "0.18.0"
 itertools = "0.14.0"
 jemalloc_pprof = "0.8.1"
 json-patch = { version = "4.0.0", default-features = false }
-ariadne-macros = { path = "packages/ariadne-macros" }
 lettre = { version = "0.11.18", default-features = false, features = [
 	"builder",
 	"hostname",
@@ -113,7 +111,6 @@ reqwest = { version = "0.12.22", default-features = false }
 rgb = "0.8.52"
 rust_decimal = { version = "1.37.2", features = ["serde-with-float", "serde-with-str"] }
 rust_iso3166 = "0.1.14"
-rust-i18n = "3.1.5"
 rust-s3 = { version = "0.35.1", default-features = false, features = [
 	"fail-on-err",
 	"tags",

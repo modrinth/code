@@ -1,10 +1,6 @@
 use crate::auth::AuthenticationError;
 use actix_web::http::StatusCode;
-use actix_web::http::header::{
-    AcceptLanguage, ContentLanguage, Header, LanguageTag, QualityItem,
-};
-use actix_web::{HttpRequest, HttpResponse, ResponseError};
-use ariadne::i18n::I18nEnum;
+use actix_web::{HttpResponse, ResponseError};
 use std::fmt::{Debug, Display, Formatter};
 
 pub struct Success<'a> {
@@ -29,7 +25,6 @@ impl Success<'_> {
 pub struct ErrorPage {
     pub code: StatusCode,
     pub message: String,
-    pub language: LanguageTag,
 }
 
 impl Display for ErrorPage {
@@ -44,25 +39,9 @@ impl Display for ErrorPage {
 }
 
 impl ErrorPage {
-    pub fn new(error: AuthenticationError, req: &HttpRequest) -> Self {
-        let language = AcceptLanguage::parse(req)
-            .ok()
-            .and_then(|x| x.preference().into_item())
-            .unwrap_or_else(|| LanguageTag::parse("en").unwrap());
-        let message = error.translated_message(language.as_str());
-        Self {
-            code: error.status_code(),
-            message: message.into_owned(),
-            language,
-        }
-    }
-
     pub fn render(&self) -> HttpResponse {
         HttpResponse::Ok()
             .append_header(("Content-Type", "text/html; charset=utf-8"))
-            .append_header(ContentLanguage(vec![QualityItem::max(
-                self.language.to_owned(),
-            )]))
             .body(self.to_string())
     }
 }
@@ -74,5 +53,14 @@ impl ResponseError for ErrorPage {
 
     fn error_response(&self) -> HttpResponse {
         self.render()
+    }
+}
+
+impl From<AuthenticationError> for ErrorPage {
+    fn from(item: AuthenticationError) -> Self {
+        ErrorPage {
+            code: item.status_code(),
+            message: item.to_string(),
+        }
     }
 }
