@@ -38,7 +38,19 @@ pub const MODRINTH_CHARGE_ID: &str = "modrinth_charge_id";
 pub const MODRINTH_TAX_AMOUNT: &str = "modrinth_tax_amount";
 pub const MODRINTH_PAYMENT_METADATA: &str = "modrinth_payment_metadata";
 
+// TODO: CHECKLIST
+// - Check callsites of create_or_update_payment_intent if they handle the charge properly (update it when needed etc)
+// - Preinsert products_tax_identifiers rows
+// - Use create_or_update_payment_intent in index_billing
+// - Use create_or_update_payment_intent in refunds
+
 pub enum AttachedCharge {
+    /// Create a proration charge.
+    Proration {
+        next_product_id: ProductId,
+        next_interval: PriceDuration,
+        amount: i64,
+    },
     /// Base the payment intent amount and tax on the product's price at this interval,
     /// but don't actually create a charge item until the payment intent is confirmed.
     ///
@@ -144,6 +156,8 @@ pub struct PaymentBootstrapOptions<'a> {
     /// Some products have additional provisioning metadata that should be attached to the payment
     /// intent.
     pub attach_payment_metadata: Option<PaymentRequestMetadata>,
+    /// Attach the modrinth_new_region field to payment intent for region switching
+    pub change_region: Option<String>,
 }
 
 pub struct PaymentBootstrapResults {
@@ -176,6 +190,7 @@ pub async fn create_or_update_payment_intent(
         attached_charge,
         currency_mode,
         attach_payment_metadata,
+        change_region,
     }: PaymentBootstrapOptions<'_>,
 ) -> Result<PaymentBootstrapResults, ApiError> {
     let customer_id = get_or_create_customer(
@@ -292,6 +307,32 @@ pub async fn create_or_update_payment_intent(
             price_id: charge.price_id.into(),
             charge_type: charge.type_,
         },
+        AttachedCharge::Proration {
+            amount,
+            next_product_id,
+            next_interval,
+        } => {
+            // Use the same data as we would use when basing the charge data on
+            // a product/interval pair, except override the amount and charge type
+            // to the proration values.
+            //
+            // Then, the tax will be based on the next product, and the metadata
+            // will be inserted as is desired for proration charges, except
+            // the actual payment intent amount will be the proration amount.
+
+            let mut charge_data = derive_charge_data_from_product_selector(
+                pg,
+                user.id,
+                next_product_id,
+                Some(next_interval),
+                inferred_stripe_currency,
+            )
+            .await?;
+
+            charge_data.amount = amount;
+            charge_data.charge_type = ChargeType::Proration;
+            charge_data
+        }
         AttachedCharge::BaseUpon {
             product_id,
             interval,
@@ -361,6 +402,10 @@ pub async fn create_or_update_payment_intent(
         MODRINTH_CHARGE_TYPE.to_owned(),
         charge_data.charge_type.as_str().to_owned(),
     );
+
+    if let Some(change_region) = change_region {
+        metadata.insert(MODRINTH_NEW_REGION.to_owned(), change_region);
+    }
 
     if let Some(payment_metadata) = attach_payment_metadata {
         metadata.insert(
