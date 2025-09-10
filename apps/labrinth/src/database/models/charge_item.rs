@@ -26,6 +26,9 @@ pub struct DBCharge {
 
     pub parent_charge_id: Option<DBChargeId>,
 
+    pub tax_amount: i64,
+    pub tax_platform_id: Option<String>,
+
     // Net is always in USD
     pub net: Option<i64>,
 }
@@ -45,6 +48,8 @@ struct ChargeQueryResult {
     payment_platform: String,
     payment_platform_id: Option<String>,
     parent_charge_id: Option<i64>,
+    tax_amount: i64,
+    tax_platform_id: Option<String>,
     net: Option<i64>,
 }
 
@@ -69,6 +74,8 @@ impl TryFrom<ChargeQueryResult> for DBCharge {
             payment_platform: PaymentPlatform::from_string(&r.payment_platform),
             payment_platform_id: r.payment_platform_id,
             parent_charge_id: r.parent_charge_id.map(DBChargeId),
+            tax_amount: r.tax_amount,
+            tax_platform_id: r.tax_platform_id,
             net: r.net,
         })
     }
@@ -81,7 +88,7 @@ macro_rules! select_charges_with_predicate {
             r#"
             SELECT
                 id, user_id, price_id, amount, currency_code, status, due, last_attempt,
-                charge_type, subscription_id,
+                charge_type, subscription_id, tax_amount, tax_platform_id,
                 -- Workaround for https://github.com/launchbadge/sqlx/issues/3336
                 subscription_interval AS "subscription_interval?",
                 payment_platform,
@@ -103,8 +110,8 @@ impl DBCharge {
     ) -> Result<DBChargeId, DatabaseError> {
         sqlx::query!(
             r#"
-            INSERT INTO charges (id, user_id, price_id, amount, currency_code, charge_type, status, due, last_attempt, subscription_id, subscription_interval, payment_platform, payment_platform_id, parent_charge_id, net)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+            INSERT INTO charges (id, user_id, price_id, amount, currency_code, charge_type, status, due, last_attempt, subscription_id, subscription_interval, payment_platform, payment_platform_id, parent_charge_id, net, tax_amount, tax_platform_id)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
             ON CONFLICT (id)
             DO UPDATE
                 SET status = EXCLUDED.status,
@@ -116,6 +123,8 @@ impl DBCharge {
                     payment_platform_id = EXCLUDED.payment_platform_id,
                     parent_charge_id = EXCLUDED.parent_charge_id,
                     net = EXCLUDED.net,
+                    tax_amount = EXCLUDED.tax_amount,
+                    tax_platform_id = EXCLUDED.tax_platform_id,
                     price_id = EXCLUDED.price_id,
                     amount = EXCLUDED.amount,
                     currency_code = EXCLUDED.currency_code,
@@ -136,6 +145,8 @@ impl DBCharge {
             self.payment_platform_id.as_deref(),
             self.parent_charge_id.map(|x| x.0),
             self.net,
+            self.tax_amount,
+            self.tax_platform_id.as_deref(),
         )
             .execute(&mut **transaction)
         .await?;
