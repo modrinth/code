@@ -17,6 +17,7 @@ use crate::validate::rift::RiftValidator;
 use crate::validate::shader::{
     CanvasShaderValidator, CoreShaderValidator, ShaderValidator,
 };
+use ariadne::i18n_enum;
 use bytes::Bytes;
 use chrono::{DateTime, Utc};
 use std::io::{self, Cursor};
@@ -41,18 +42,29 @@ mod shader;
 #[derive(Error, Debug)]
 pub enum ValidationError {
     #[error("Unable to read Zip Archive: {0}")]
-    Zip(#[from] zip::result::ZipError),
+    Zip(#[from] ZipError),
     #[error("IO Error: {0}")]
-    Io(#[from] std::io::Error),
+    Io(#[from] io::Error),
     #[error("Error while validating JSON for uploaded file: {0}")]
     SerDe(#[from] serde_json::Error),
     #[error("Invalid Input: {0}")]
-    InvalidInput(std::borrow::Cow<'static, str>),
+    InvalidInput(std::borrow::Cow<'static, str>), // TODO: Use I18nEnum
     #[error("Error while managing threads")]
     Blocking(#[from] actix_web::error::BlockingError),
     #[error("Error while querying database")]
     Database(#[from] DatabaseError),
 }
+
+i18n_enum!(
+    ValidationError,
+    root_key: "error.file_validation",
+    Zip(cause) => "zip",
+    Io(cause) => "io",
+    SerDe(cause) => "serialization",
+    InvalidInput(cause) => "invalid_input",
+    Blocking(..) => "blocking",
+    Database(..) => "database",
+);
 
 #[derive(Eq, PartialEq, Debug)]
 pub enum ValidationResult {
@@ -64,7 +76,7 @@ pub enum ValidationResult {
     /// File should be marked as primary
     Pass,
     /// File should not be marked primary, the reason for which is inside the String
-    Warning(&'static str),
+    Warning(&'static str), // TODO: Use an I18nEnum
 }
 
 impl ValidationResult {
@@ -96,7 +108,7 @@ pub trait Validator: Sync {
 
     fn validate(
         &self,
-        archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
+        archive: &mut ZipArchive<Cursor<Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
         // By default, any non-protected ZIP archive is valid
         let _ = archive;
@@ -172,7 +184,7 @@ static PLAUSIBLE_PACK_REGEX: LazyLock<regex::bytes::Regex> =
 /// The return value is whether this file should be marked as primary or not, based on the analysis of the file
 #[allow(clippy::too_many_arguments)]
 pub async fn validate_file(
-    data: bytes::Bytes,
+    data: Bytes,
     file_extension: String,
     loaders: Vec<Loader>,
     file_type: Option<FileType>,
@@ -314,7 +326,7 @@ fn game_version_supported(
 }
 
 pub fn filter_out_packs(
-    archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
+    archive: &mut ZipArchive<Cursor<Bytes>>,
 ) -> Result<ValidationResult, ValidationError> {
     if (archive.by_name("modlist.html").is_ok()
         && archive.by_name("manifest.json").is_ok())

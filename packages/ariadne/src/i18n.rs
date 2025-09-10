@@ -24,12 +24,29 @@ pub enum TranslationData {
 
 #[macro_export]
 macro_rules! i18n_enum {
+    (transparent $for_enum:ty[$field:ident: $field_type:ty]) => {
+        impl $crate::i18n::I18nEnum for $for_enum {
+            const ROOT_TRANSLATION_ID: &'static str = <$field_type as $crate::i18n::I18nEnum>::ROOT_TRANSLATION_ID;
+
+            fn translation_id(&self) -> &'static str {
+                $crate::i18n::I18nEnum::translation_id(&*self.$field)
+            }
+
+            fn full_translation_id(&self) -> &'static str {
+                $crate::i18n::I18nEnum::full_translation_id(&*self.$field)
+            }
+
+            fn translation_data(&self) -> $crate::i18n::TranslationData {
+                $crate::i18n::I18nEnum::translation_data(&*self.$field)
+            }
+        }
+    };
+
     (
         $for_enum:ty,
         root_key: $root_key:literal,
         _ => $key:literal,
     ) => {
-        #[allow(unused_variables)] // Rust doesn't see the variables from $variant get used for some rason
         impl $crate::i18n::I18nEnum for $for_enum {
             const ROOT_TRANSLATION_ID: &'static str = $root_key;
 
@@ -104,6 +121,9 @@ macro_rules! __i18n_enum_variant_parameters_no_store {
     ($variant_name:ident, !) => {
         $variant_name
     };
+    ($variant_name:ident, (transparent $_:ident)) => {
+        $variant_name(_)
+    };
     ($variant_name:ident, ($($_:tt)+)) => {
         $variant_name(..)
     };
@@ -117,6 +137,9 @@ macro_rules! __i18n_enum_variant_parameters_no_store {
 macro_rules! __i18n_enum_variant_parameters {
     ($variant_name:ident, !) => {
         $variant_name
+    };
+    ($variant_name:ident, (transparent $field:ident)) => {
+        $variant_name($field)
     };
     ($variant_name:ident, ($($field:tt)+)) => {
         $variant_name($($field)+)
@@ -140,6 +163,9 @@ macro_rules! __i18n_enum_variant_values {
     };
     ($root_key:literal, $key:literal, {..}) => {
         $crate::__i18n_enum_variant_values!($root_key, $key, !)
+    };
+    ($root_key:literal, $key:literal, (transparent $field:ident)) => {
+        $field.__maybe_translate()
     };
     ($root_key:literal, $key:literal, ($($field:ident),*)) => {
         $crate::i18n::TranslationData::Translatable {
@@ -173,6 +199,7 @@ pub mod test {
         Tuple(&'static str),
         TranslatableTuple(UnitTranslatable),
         Named { subfield: &'static str },
+        DirectUnit(UnitTranslatable),
     }
 
     i18n_enum!(
@@ -182,6 +209,7 @@ pub mod test {
         Tuple(value) => "tuple",
         TranslatableTuple(unit) => "translatable_tuple",
         Named { subfield } => "named",
+        DirectUnit(transparent unit) => "direct_unit",
     );
 
     fn assert_i18n_eq(x: impl I18nEnum, should_be: serde_json::Value) {
@@ -236,5 +264,11 @@ pub mod test {
                 }
             }),
         );
+        assert_i18n_eq(
+            TestEnum::DirectUnit(UnitTranslatable),
+            json!({
+                "key": "unit_translatable.unit",
+            }),
+        )
     }
 }

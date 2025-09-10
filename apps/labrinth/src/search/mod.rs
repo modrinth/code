@@ -1,7 +1,8 @@
-use crate::models::error::ApiError;
+use crate::models::error::AsApiError;
 use crate::models::projects::SearchRequest;
 use actix_web::HttpResponse;
 use actix_web::http::StatusCode;
+use ariadne::i18n_enum;
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use meilisearch_sdk::client::Client;
@@ -14,7 +15,6 @@ use thiserror::Error;
 
 pub mod indexing;
 
-// TODO: Migrate to I18nEnum
 #[derive(Error, Debug)]
 pub enum SearchError {
     #[error("MeiliSearch Error: {0}")]
@@ -31,6 +31,17 @@ pub enum SearchError {
     InvalidIndex(String),
 }
 
+i18n_enum!(
+    SearchError,
+    root_key: "error.search",
+    MeiliSearch(cause) => "meilisearch_error",
+    Serde(cause) => "invalid_input.serialization",
+    IntParsing(cause) => "invalid_input.int_parsing",
+    FormatError(cause) => "invalid_input.formatting",
+    Env(..) => "environment_error",
+    InvalidIndex(index) => "invalid_input.index",
+);
+
 impl actix_web::ResponseError for SearchError {
     fn status_code(&self) -> StatusCode {
         match self {
@@ -44,17 +55,7 @@ impl actix_web::ResponseError for SearchError {
     }
 
     fn error_response(&self) -> HttpResponse {
-        HttpResponse::build(self.status_code()).json(ApiError {
-            error: match self {
-                SearchError::Env(..) => "environment_error",
-                SearchError::MeiliSearch(..) => "meilisearch_error",
-                SearchError::Serde(..) => "invalid_input",
-                SearchError::IntParsing(..) => "invalid_input",
-                SearchError::InvalidIndex(..) => "invalid_input",
-                SearchError::FormatError(..) => "invalid_input",
-            },
-            description: self.to_string(),
-        })
+        HttpResponse::build(self.status_code()).json(self.as_api_error())
     }
 }
 
@@ -127,10 +128,10 @@ pub struct UploadSearchProject {
 
     // Hidden fields to get the Project model out of the search results.
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
-    pub project_loader_fields: HashMap<String, Vec<serde_json::Value>>, // Aggregation of loader_fields from all versions of the project, allowing for reconstruction of the Project model.
+    pub project_loader_fields: HashMap<String, Vec<Value>>, // Aggregation of loader_fields from all versions of the project, allowing for reconstruction of the Project model.
 
     #[serde(flatten)]
-    pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
+    pub loader_fields: HashMap<String, Vec<Value>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -166,10 +167,10 @@ pub struct ResultSearchProject {
 
     // Hidden fields to get the Project model out of the search results.
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
-    pub project_loader_fields: HashMap<String, Vec<serde_json::Value>>, // Aggregation of loader_fields from all versions of the project, allowing for reconstruction of the Project model.
+    pub project_loader_fields: HashMap<String, Vec<Value>>, // Aggregation of loader_fields from all versions of the project, allowing for reconstruction of the Project model.
 
     #[serde(flatten)]
-    pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
+    pub loader_fields: HashMap<String, Vec<Value>>,
 }
 
 pub fn get_sort_index(

@@ -5,6 +5,7 @@ use std::time::Duration;
 
 use crate::database::redis::RedisPool;
 use crate::search::{SearchConfig, UploadSearchProject};
+use ariadne::i18n_enum;
 use ariadne::ids::base62_impl::to_base62;
 use futures::StreamExt;
 use futures::stream::FuturesUnordered;
@@ -32,11 +33,22 @@ pub enum IndexingError {
     Task,
 }
 
+i18n_enum!(
+    IndexingError,
+    root_key: "error.indexing",
+    Indexing(..) => "meilisearch",
+    Serde(cause) => "serialization",
+    Sqlx(cause) => "sqlx",
+    Database(cause) => "database",
+    Env(..) => "environment",
+    Task! => "task",
+);
+
 // The chunk size for adding projects to the indexing database. If the request size
 // is too large (>10MiB) then the request fails with an error.  This chunk size
 // assumes a max average size of 4KiB per project to avoid this cap.
 const MEILISEARCH_CHUNK_SIZE: usize = 10000000;
-const TIMEOUT: std::time::Duration = std::time::Duration::from_secs(60);
+const TIMEOUT: Duration = Duration::from_secs(60);
 
 pub async fn remove_documents(
     ids: &[crate::models::ids::VersionId],
@@ -244,11 +256,7 @@ async fn add_to_index(
         index
             .add_or_replace(chunk, Some("version_id"))
             .await?
-            .wait_for_completion(
-                client,
-                None,
-                Some(std::time::Duration::from_secs(3600)),
-            )
+            .wait_for_completion(client, None, Some(Duration::from_secs(3600)))
             .await?;
         info!("Added chunk of {} projects to index", chunk.len());
     }

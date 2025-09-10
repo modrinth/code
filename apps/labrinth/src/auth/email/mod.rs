@@ -1,3 +1,4 @@
+use ariadne::i18n_enum;
 use lettre::message::Mailbox;
 use lettre::message::header::ContentType;
 use lettre::transport::smtp::authentication::Credentials;
@@ -17,6 +18,15 @@ pub enum MailError {
     #[error("SMTP Error: {0}")]
     Smtp(#[from] lettre::transport::smtp::Error),
 }
+
+i18n_enum!(
+    MailError,
+    root_key: "error.mail",
+    Env(..) => "environment",
+    Mail(cause) => "email",
+    Address(cause) => "address",
+    Smtp(cause) => "smtp",
+);
 
 pub fn send_email_raw(
     to: String,

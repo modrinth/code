@@ -1,8 +1,10 @@
 use super::ValidatedRedirectUri;
 use crate::auth::AuthenticationError;
-use crate::models::error::ApiError;
+use crate::models::error::AsApiError;
 use actix_web::HttpResponse;
 use actix_web::http::{StatusCode, header::LOCATION};
+use ariadne::i18n::I18nEnum;
+use ariadne::i18n_enum;
 use ariadne::ids::DecodingError;
 
 #[derive(thiserror::Error, Debug)]
@@ -14,6 +16,8 @@ pub struct OAuthError {
     pub state: Option<String>,
     pub valid_redirect_uri: Option<ValidatedRedirectUri>,
 }
+
+i18n_enum!(transparent OAuthError[error_type: OAuthErrorType]);
 
 impl<T> From<T> for OAuthError
 where
@@ -90,7 +94,13 @@ impl actix_web::ResponseError for OAuthError {
             redirect_uri = format!(
                 "{}?error={}&error_description={}",
                 redirect_uri,
-                self.error_type.error_name(),
+                self.error_type
+                    .translation_id()
+                    .split_once('.')
+                    .map_or_else(
+                        || self.error_type.translation_id(),
+                        |(base, _)| base
+                    ),
                 self.error_type,
             );
 
@@ -102,21 +112,17 @@ impl actix_web::ResponseError for OAuthError {
                 .append_header((LOCATION, redirect_uri.clone()))
                 .body(redirect_uri)
         } else {
-            HttpResponse::build(self.status_code()).json(ApiError {
-                error: &self.error_type.error_name(),
-                description: self.error_type.to_string().into(),
-            })
+            HttpResponse::build(self.status_code()).json(self.as_api_error())
         }
     }
 }
 
 // TODO: Reference in an ApiError variant
-// TODO: I18nEnum
 #[derive(thiserror::Error, Debug)]
 pub enum OAuthErrorType {
     #[error(transparent)]
     AuthenticationError(#[from] AuthenticationError),
-    #[error("Client {} has no redirect URIs specified", .client_id.0)]
+    #[error("Client {client_id} has no redirect URIs specified")]
     ClientMissingRedirectURI {
         client_id: crate::database::models::DBOAuthClientId,
     },
@@ -156,6 +162,28 @@ pub enum OAuthErrorType {
     AccessDenied,
 }
 
+// The names before the first period match
+// IETF RFC 6749 4.1.2.1 (https://datatracker.ietf.org/doc/html/rfc6749#autoid-38)
+// and 5.2 (https://datatracker.ietf.org/doc/html/rfc6749#section-5.2)
+i18n_enum!(
+    OAuthErrorType,
+    root_key: "error.oauth",
+    AuthenticationError(transparent cause) => "server_error",
+    ClientMissingRedirectURI { client_id } => "invalid_uri.none_specified",
+    RedirectUriNotConfigured(..) => "invalid_uri.none_configured",
+    FailedScopeParse(cause) => "invalid_scope.parse",
+    ScopesTooBroad! => "invalid_scope.too_broad",
+    InvalidAcceptFlowId! => "server_error.invalid_flow_id",
+    InvalidClientId(..) => "invalid_client.invalid_id",
+    MalformedId(cause) => "invalid_request.malformed_id",
+    ClientAuthenticationFailed! => "invalid_client.auth_failed",
+    InvalidAuthCode! => "invalid_grant.invalid_auth_code",
+    UnauthorizedClient! => "unauthorized_client",
+    RedirectUriChanged(..) => "invalid_request.redirect_uri_mismatch",
+    OnlySupportsAuthorizationCodeGrant(grant_type) => "invalid_grant.invalid_grant_type",
+    AccessDenied! => "access_denied",
+);
+
 impl From<crate::database::models::DatabaseError> for OAuthErrorType {
     fn from(value: crate::database::models::DatabaseError) -> Self {
         OAuthErrorType::AuthenticationError(value.into())
@@ -165,31 +193,5 @@ impl From<crate::database::models::DatabaseError> for OAuthErrorType {
 impl From<sqlx::Error> for OAuthErrorType {
     fn from(value: sqlx::Error) -> Self {
         OAuthErrorType::AuthenticationError(value.into())
-    }
-}
-
-impl OAuthErrorType {
-    pub fn error_name(&self) -> String {
-        // IETF RFC 6749 4.1.2.1 (https://datatracker.ietf.org/doc/html/rfc6749#autoid-38)
-        // And 5.2 (https://datatracker.ietf.org/doc/html/rfc6749#section-5.2)
-        match self {
-            Self::RedirectUriNotConfigured(_)
-            | Self::ClientMissingRedirectURI { client_id: _ } => "invalid_uri",
-            Self::AuthenticationError(_) | Self::InvalidAcceptFlowId => {
-                "server_error"
-            }
-            Self::RedirectUriChanged(_) | Self::MalformedId(_) => {
-                "invalid_request"
-            }
-            Self::FailedScopeParse(_) | Self::ScopesTooBroad => "invalid_scope",
-            Self::InvalidClientId(_) | Self::ClientAuthenticationFailed => {
-                "invalid_client"
-            }
-            Self::InvalidAuthCode
-            | Self::OnlySupportsAuthorizationCodeGrant(_) => "invalid_grant",
-            Self::UnauthorizedClient => "unauthorized_client",
-            Self::AccessDenied => "access_denied",
-        }
-        .to_string()
     }
 }

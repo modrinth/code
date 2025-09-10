@@ -15,6 +15,7 @@ use rand::SeedableRng;
 use rand_chacha::ChaCha20Rng;
 use serde::{Deserialize, Serialize};
 use sqlx::sqlx_macros::Type;
+use std::fmt::{Display, Formatter};
 
 const ID_RETRY_COUNT: usize = 20;
 
@@ -104,6 +105,12 @@ macro_rules! impl_db_id_interface {
         impl From<$db_id_struct> for $id_struct {
             fn from(id: $db_id_struct) -> Self {
                 Self(id.0 as u64)
+            }
+        }
+
+        impl Display for $db_id_struct {
+            fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+                Display::fmt(&$id_struct(self.0 as u64), f)
             }
         }
 
