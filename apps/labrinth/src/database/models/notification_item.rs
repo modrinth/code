@@ -413,6 +413,16 @@ impl DBNotification {
 
         sqlx::query!(
             "
+            DELETE FROM notifications_deliveries
+            WHERE notification_id = ANY($1)
+            ",
+            &notification_ids_parsed
+        )
+        .execute(&mut **transaction)
+        .await?;
+
+        sqlx::query!(
+            "
             DELETE FROM notifications_actions
             WHERE notification_id = ANY($1)
             ",
