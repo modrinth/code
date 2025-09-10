@@ -36,8 +36,7 @@ use stripe::{
     CreateSetupIntentAutomaticPaymentMethodsAllowRedirects, Currency,
     CustomerId, CustomerInvoiceSettings, CustomerPaymentMethodRetrieval,
     EventObject, EventType, PaymentIntentId, PaymentIntentOffSession,
-    PaymentIntentSetupFutureUsage, PaymentMethodId, SetupIntent,
-    UpdateCustomer, Webhook,
+    PaymentMethodId, SetupIntent, UpdateCustomer, Webhook,
 };
 use tracing::{info, warn};
 
@@ -349,6 +348,7 @@ pub async fn edit_subscription(
     edit_subscription: web::Json<SubscriptionEdit>,
     query: web::Query<SubscriptionEditQuery>,
     stripe_client: web::Data<stripe::Client>,
+    anrok_client: web::Data<anrok::Client>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -488,216 +488,6 @@ pub async fn edit_subscription(
         ))
     }
 
-    struct IntentMetadata {
-        pi: stripe::PaymentIntent,
-        amount: i64,
-        tax: i64,
-    }
-
-    #[allow(clippy::too_many_arguments)]
-    async fn create_intent_for_charge_promotion(
-        pg: &PgPool,
-        redis: &RedisPool,
-        txn: &mut sqlx::PgTransaction<'_>,
-        stripe_client: &stripe::Client,
-        user: &crate::models::v3::users::User,
-        subscription: &user_subscription_item::DBUserSubscription,
-        current_product_price: &product_item::DBProductPrice,
-        new_product_price: product_item::DBProductPrice,
-        new_region: String,
-        new_interval: PriceDuration,
-        payment_method: Option<String>,
-    ) -> Result<IntentMetadata, ApiError> {
-        let charge_id = generate_charge_id(txn).await?;
-
-        let customer_id = get_or_create_customer(
-            user.id,
-            user.stripe_customer_id.as_deref(),
-            user.email.as_deref(),
-            stripe_client,
-            pg,
-            redis,
-        )
-        .await?;
-
-        let new_price_value = match new_product_price.prices {
-            Price::OneTime { ref price } => *price,
-            Price::Recurring { ref intervals } => {
-                *intervals
-                    .get(&new_interval)
-                    .ok_or_else(|| ApiError::InvalidInput("Could not find a valid price for the specified duration".to_owned()))?
-            }
-        } as i64;
-
-        let currency = Currency::from_str(
-            &current_product_price.currency_code.to_lowercase(),
-        )
-        .map_err(|_| {
-            ApiError::InvalidInput("Invalid currency code".to_string())
-        })?;
-
-        let mut intent = CreatePaymentIntent::new(new_price_value, currency);
-
-        let mut metadata = HashMap::new();
-        metadata.insert("modrinth_user_id".to_string(), to_base62(user.id.0));
-        metadata.insert(
-            "modrinth_charge_id".to_string(),
-            to_base62(charge_id.0 as u64),
-        );
-        metadata.insert(
-            "modrinth_subscription_id".to_string(),
-            to_base62(subscription.id.0 as u64),
-        );
-        metadata.insert(
-            "modrinth_price_id".to_string(),
-            to_base62(new_product_price.id.0 as u64),
-        );
-        metadata.insert(
-            "modrinth_subscription_interval".to_string(),
-            new_interval.as_str().to_string(),
-        );
-        metadata.insert(
-            "modrinth_charge_type".to_string(),
-            ChargeType::Subscription.as_str().to_string(),
-        );
-        metadata.insert("modrinth_new_region".to_string(), new_region);
-
-        intent.customer = Some(customer_id);
-        intent.metadata = Some(metadata);
-        intent.receipt_email = user.email.as_deref();
-        intent.setup_future_usage =
-            Some(PaymentIntentSetupFutureUsage::OffSession);
-
-        if let Some(ref payment_method) = payment_method {
-            let Ok(payment_method_id) =
-                PaymentMethodId::from_str(payment_method)
-            else {
-                return Err(ApiError::InvalidInput(
-                    "Invalid payment method id".to_string(),
-                ));
-            };
-            intent.payment_method = Some(payment_method_id);
-        }
-
-        let intent =
-            stripe::PaymentIntent::create(stripe_client, intent).await?;
-
-        // Note: we do not want to update the open charge here. It will be modified to
-        // be the next charge of the subscription in the stripe webhook, after the payment
-        // intent succeeds.
-        //
-        // We also shouldn't delete it, because if the payment fails, the expiring
-        // charge will be gone and the preview subscription will never be unprovisioned.
-
-        Ok(IntentMetadata {
-            pi: intent,
-            amount: new_price_value,
-            tax: 0,
-        })
-    }
-
-    #[allow(clippy::too_many_arguments)]
-    async fn create_intent_for_charge_proration(
-        pg: &PgPool,
-        redis: &RedisPool,
-        txn: &mut sqlx::PgTransaction<'_>,
-        stripe_client: &stripe::Client,
-        open_charge: &mut charge_item::DBCharge,
-        user: &crate::models::v3::users::User,
-        subscription: &user_subscription_item::DBUserSubscription,
-        current_price: &product_item::DBProductPrice,
-        new_product_price: &product_item::DBProductPrice,
-        new_region: Option<String>,
-        new_interval: Option<PriceDuration>,
-        payment_method: Option<String>,
-        proration: i64,
-    ) -> Result<IntentMetadata, ApiError> {
-        let charge_id = generate_charge_id(txn).await?;
-
-        let customer_id = get_or_create_customer(
-            user.id,
-            user.stripe_customer_id.as_deref(),
-            user.email.as_deref(),
-            stripe_client,
-            pg,
-            redis,
-        )
-        .await?;
-
-        let currency =
-            Currency::from_str(&current_price.currency_code.to_lowercase())
-                .map_err(|_| {
-                    ApiError::InvalidInput("Invalid currency code".to_string())
-                })?;
-
-        // Add either the *new* interval or the *current* interval to the metadata.
-        // Once the proration charge succeeds, the open charge's interval will be updated
-        // to reflect this attached interval.
-        //
-        // The proration charge will also have this interval attached to itself, though
-        // it doesn't necessarily have much significance.
-        let new_subscription_interval =
-            new_interval.or(open_charge.subscription_interval);
-
-        let mut intent = CreatePaymentIntent::new(proration, currency);
-
-        let mut metadata = HashMap::new();
-        metadata.insert("modrinth_user_id".to_string(), to_base62(user.id.0));
-        metadata.insert(
-            "modrinth_charge_id".to_string(),
-            to_base62(charge_id.0 as u64),
-        );
-        metadata.insert(
-            "modrinth_subscription_id".to_string(),
-            to_base62(subscription.id.0 as u64),
-        );
-        metadata.insert(
-            "modrinth_price_id".to_string(),
-            to_base62(new_product_price.id.0 as u64),
-        );
-        metadata.insert(
-            "modrinth_subscription_interval".to_string(),
-            new_subscription_interval
-                .unwrap_or(PriceDuration::Monthly)
-                .as_str()
-                .to_string(),
-        );
-        metadata.insert(
-            "modrinth_charge_type".to_string(),
-            ChargeType::Proration.as_str().to_string(),
-        );
-        if let Some(region) = &new_region {
-            metadata
-                .insert("modrinth_new_region".to_string(), region.to_owned());
-        }
-
-        intent.customer = Some(customer_id);
-        intent.metadata = Some(metadata);
-        intent.receipt_email = user.email.as_deref();
-        intent.setup_future_usage =
-            Some(PaymentIntentSetupFutureUsage::OffSession);
-
-        if let Some(payment_method) = &payment_method {
-            let Ok(payment_method_id) =
-                PaymentMethodId::from_str(payment_method)
-            else {
-                return Err(ApiError::InvalidInput(
-                    "Invalid payment method id".to_string(),
-                ));
-            };
-            intent.payment_method = Some(payment_method_id);
-        }
-
-        let intent =
-            stripe::PaymentIntent::create(stripe_client, intent).await?;
-
-        Ok(IntentMetadata {
-            pi: intent,
-            amount: proration,
-            tax: 0,
-        })
-    }
-
     let (id,) = info.into_inner();
 
     let dry = query.dry.unwrap_or_default();
@@ -774,7 +564,7 @@ pub async fn edit_subscription(
             product: Some(product_id),
             region,
             interval,
-            payment_method,
+            payment_method: Some(payment_method),
             ..
         } => {
             // Find the new product's price item based on the current currency.
@@ -807,6 +597,13 @@ pub async fn edit_subscription(
                 pub required_payment_is_proration: bool,
             }
 
+            let currency = stripe::Currency::from_str(
+                &current_price.currency_code.to_lowercase(),
+            )
+            .map_err(|_| {
+                ApiError::InvalidInput("Invalid currency code".to_string())
+            })?;
+
             // The next charge is an expiring charge, so we are promoting the subscription to a paid product.
             // Instead of doing a proration (since the product is likely free) we either:
             //
@@ -837,22 +634,38 @@ pub async fn edit_subscription(
                 }
 
                 if req == PaymentRequirement::RequiresPayment {
-                    let intent = create_intent_for_charge_promotion(
+                    let results = payments::create_or_update_payment_intent(
                         &pool,
                         &redis,
-                        &mut transaction,
                         &stripe_client,
-                        &user,
-                        &subscription,
-                        &current_price,
-                        new_product_price,
-                        new_region,
-                        new_interval,
-                        payment_method,
+                        &anrok_client,
+                        payments::PaymentBootstrapOptions {
+                            user: &user,
+                            existing_payment_intent: None,
+                            payment_session:
+                                payments::PaymentSession::Interactive {
+                                    payment_request_type:
+                                        PaymentRequestType::PaymentMethod {
+                                            id: payment_method,
+                                        },
+                                },
+                            attached_charge:
+                                payments::AttachedCharge::BaseUpon {
+                                    product_id: new_product_price
+                                        .product_id
+                                        .into(),
+                                    interval: Some(new_interval),
+                                },
+                            currency_mode: payments::CurrencyMode::UseSpecified(
+                                currency,
+                            ),
+                            attach_payment_metadata: None,
+                            change_region: Some(new_region),
+                        },
                     )
                     .await?;
 
-                    Some(intent)
+                    Some(results)
                 } else {
                     None
                 }
@@ -897,24 +710,40 @@ pub async fn edit_subscription(
                     }
 
                     Proration::Required(proration) => {
-                        let intent = create_intent_for_charge_proration(
+                        let next_interval = interval
+                            .or(open_charge.subscription_interval)
+                            .unwrap_or(PriceDuration::Monthly);
+
+                        let results = payments::create_or_update_payment_intent(
                             &pool,
                             &redis,
-                            &mut transaction,
                             &stripe_client,
-                            &mut open_charge,
-                            &user,
-                            &subscription,
-                            &current_price,
-                            &new_product_price,
-                            region,
-                            interval,
-                            payment_method,
-                            proration as i64,
+                            &anrok_client,
+                            payments::PaymentBootstrapOptions {
+                                user: &user,
+                                existing_payment_intent: None,
+                                payment_session:
+                                    payments::PaymentSession::Interactive {
+                                        payment_request_type:
+                                            PaymentRequestType::PaymentMethod {
+                                                id: payment_method,
+                                            },
+                                    },
+                                attached_charge:
+                                    payments::AttachedCharge::Proration {
+                                        amount: proration as i64,
+                                        next_product_id: new_product_price.product_id.into(),
+                                        next_interval,
+                                    },
+                                currency_mode:
+                                    payments::CurrencyMode::UseSpecified(currency),
+                                attach_payment_metadata: None,
+                                change_region: None, // We don't support region switch here yet
+                            },
                         )
                         .await?;
 
-                        Some(intent)
+                        Some(results)
                     }
                 }
             }
@@ -928,6 +757,15 @@ pub async fn edit_subscription(
         } if region.is_some() || interval.is_some() => {
             return Err(ApiError::InvalidInput(
                 "It is not currently possible to only modify the region or interval of a subscription".to_owned(),
+            ));
+        }
+
+        SubscriptionEdit {
+            payment_method: None,
+            ..
+        } => {
+            return Err(ApiError::InvalidInput(
+                "A known payment method is required at this point to calculate tax information".to_owned(),
             ));
         }
 
@@ -949,12 +787,19 @@ pub async fn edit_subscription(
         transaction.commit().await?;
     }
 
-    if let Some(IntentMetadata { pi, amount, tax }) = maybe_intent_metadata {
+    if let Some(payments::PaymentBootstrapResults {
+        new_payment_intent: Some(pi),
+        subtotal,
+        tax,
+        payment_method: _,
+        price_id: _,
+    }) = maybe_intent_metadata
+    {
         Ok(HttpResponse::Ok().json(serde_json::json!({
             "payment_intent_id": pi.id,
             "client_secret": pi.client_secret,
             "tax": tax,
-            "total": amount
+            "total": subtotal + tax,
         })))
     } else {
         Ok(HttpResponse::NoContent().finish())
@@ -1498,6 +1343,7 @@ pub async fn initiate_payment(
                 .await?,
             currency_mode: payments::CurrencyMode::InferFromBillingDetails,
             attach_payment_metadata: payment_request.metadata,
+            change_region: None,
         },
     )
     .await?;

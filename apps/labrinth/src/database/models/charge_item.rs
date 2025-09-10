@@ -7,6 +7,7 @@ use crate::models::billing::{
 use chrono::{DateTime, Utc};
 use std::convert::{TryFrom, TryInto};
 
+#[derive(Clone)]
 pub struct DBCharge {
     pub id: DBChargeId,
     pub user_id: DBUserId,
