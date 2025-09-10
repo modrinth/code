@@ -48,7 +48,6 @@ CREATE TABLE notifications_templates (
     plaintext_fallback TEXT NOT NULL
 );
 
--- Add existing notification types
 INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('reset_password', 3, FALSE, FALSE);
 INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('project_update', 1, TRUE, TRUE);
 INSERT INTO notifications_types (name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications) VALUES ('team_invite', 1, TRUE, TRUE);
