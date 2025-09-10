@@ -23,7 +23,9 @@ const VERIFYEMAIL_URL: &str = "verifyemail.url";
 const AUTHPROVIDER_NAME: &str = "authprovider.name";
 const EMAILCHANGED_NEW_EMAIL: &str = "emailchanged.new_email";
 const BILLING_URL: &str = "billing.url";
+
 const PAYMENTFAILED_AMOUNT: &str = "paymentfailed.amount";
+const PAYMENTFAILED_SERVICE: &str = "paymentfailed.service";
 
 const TEAMINVITE_INVITER_NAME: &str = "teaminvite.inviter.name";
 const TEAMINVITE_PROJECT_NAME: &str = "teaminvite.project.name";
@@ -373,7 +375,7 @@ async fn collect_template_variables(
             Ok(TemplateVariables::with_email(map, Some(to_email.clone())))
         }
 
-        NotificationBody::PaymentFailed { amount } => {
+        NotificationBody::PaymentFailed { amount, service } => {
             let user =
                 DBUser::get_id(n.user_id, exec, redis).await?.ok_or_else(
                     || DatabaseError::Database(sqlx::Error::RowNotFound),
@@ -388,6 +390,7 @@ async fn collect_template_variables(
             let mut map = HashMap::new();
             map.insert(USER_NAME, user.username);
             map.insert(PAYMENTFAILED_AMOUNT, amount.clone());
+            map.insert(PAYMENTFAILED_SERVICE, service.clone());
             map.insert(BILLING_URL, url);
 
             Ok(TemplateVariables::with_email(map, user.email))

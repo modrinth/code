@@ -2472,6 +2472,22 @@ pub async fn stripe_webhook(
                         NotificationBuilder {
                             body: NotificationBody::PaymentFailed {
                                 amount: money.to_string(),
+                                service: if metadata
+                                    .product_item
+                                    .metadata
+                                    .is_midas()
+                                {
+                                    "Modrinth+"
+                                } else if metadata
+                                    .product_item
+                                    .metadata
+                                    .is_pyro()
+                                {
+                                    "Modrinth Servers"
+                                } else {
+                                    "a Modrinth product"
+                                }
+                                .to_owned(),
                             },
                         }
                         .insert(metadata.user_item.id, &mut transaction, &redis)

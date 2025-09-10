@@ -155,6 +155,7 @@ pub enum NotificationBody {
     },
     PaymentFailed {
         amount: String,
+        service: String,
     },
     Unknown,
 }
