@@ -50,61 +50,40 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 pub enum CreateError {
     #[error("Environment Error")]
     EnvError(#[from] dotenvy::Error),
-
     #[error("An unknown database error occurred")]
     SqlxDatabaseError(#[from] sqlx::Error),
-
     #[error("Database Error: {0}")]
     DatabaseError(#[from] models::DatabaseError),
-
     #[error("Indexing Error: {0}")]
     IndexingError(#[from] IndexingError),
-
     #[error("Error while parsing multipart payload: {0}")]
     MultipartError(#[from] actix_multipart::MultipartError),
-
     #[error("Error while parsing JSON: {0}")]
     SerDeError(#[from] serde_json::Error),
-
     #[error("Error while validating input: {0}")]
     ValidationError(String),
-
     #[error("Error while uploading file: {0}")]
     FileHostingError(#[from] FileHostingError),
-
     #[error("Error while validating uploaded file: {0}")]
     FileValidationError(#[from] crate::validate::ValidationError),
-
-    // TODO: Use an I18nEnum instead of a String
     #[error("{}", .0)]
-    MissingValueError(String),
-
+    MissingValueError(String), // TODO: Use an I18nEnum instead of a String
     #[error("Invalid format for image: {0}")]
     InvalidIconFormat(ApiError),
-
-    // TODO: Use an I18nEnum instead of a String
     #[error("Error with multipart data: {0}")]
-    InvalidInput(String),
-
+    InvalidInput(String), // TODO: Use an I18nEnum instead of a String
     #[error("Invalid loader: {0}")]
     InvalidLoader(String),
-
     #[error("Invalid category: {0}")]
     InvalidCategory(String),
-
     #[error("Invalid file type for version file: {0}")]
     InvalidFileType(String),
-
     #[error("Slug is already taken!")]
     SlugCollision,
-
     #[error("Authentication Error: {0}")]
     Unauthorized(#[from] AuthenticationError),
-
-    // TODO: Use an I18nEnum instead of a String
     #[error("Authentication Error: {0}")]
-    CustomAuthenticationError(String),
-
+    CustomAuthenticationError(String), // TODO: Use an I18nEnum instead of a String
     #[error("Image Parsing Error: {0}")]
     ImageError(#[from] ImageError),
 }

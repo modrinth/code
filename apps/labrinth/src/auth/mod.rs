@@ -24,45 +24,32 @@ use thiserror::Error;
 pub enum AuthenticationError {
     #[error("Environment Error")]
     Env(#[from] dotenvy::Error),
-
     #[error("An unknown database error occurred: {0}")]
     Sqlx(#[from] sqlx::Error),
-
     #[error("Database Error: {0}")]
     Database(#[from] crate::database::models::DatabaseError),
-
     #[error("Error while parsing JSON: {0}")]
     SerDe(#[from] serde_json::Error),
-
     #[error("Error while communicating to external provider")]
     Reqwest(#[from] reqwest::Error),
-
     #[error("Error uploading user profile picture")]
     FileHosting(#[from] FileHostingError),
-
     #[error("Error while decoding PAT: {0}")]
     Decoding(#[from] ariadne::ids::DecodingError),
-
     #[error("{0}")]
     Mail(#[from] email::MailError),
-
     #[error("Invalid Authentication Credentials")]
     InvalidCredentials,
-
     #[error("Authentication method was not valid")]
     InvalidAuthMethod,
-
     #[error("GitHub Token from incorrect Client ID")]
     InvalidClientId,
-
     #[error(
         "User email is already registered on Modrinth. Try 'Forgot password' to access your account."
     )]
     DuplicateUser,
-
     #[error("Invalid state sent, you probably need to get a new websocket")]
     SocketError,
-
     #[error("Invalid callback URL specified")]
     Url,
 }
