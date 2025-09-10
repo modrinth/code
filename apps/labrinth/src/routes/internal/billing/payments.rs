@@ -199,14 +199,8 @@ pub async fn create_or_update_payment_intent(
                     )
                 })?;
 
-            
-
-            PaymentMethod::retrieve(
-                stripe_client,
-                &payment_method_id,
-                &[],
-            )
-            .await?
+            PaymentMethod::retrieve(stripe_client, &payment_method_id, &[])
+                .await?
         }
         PaymentSession::Interactive {
             payment_request_type:
@@ -232,14 +226,11 @@ pub async fn create_or_update_payment_intent(
             let confirmation: ConfirmationToken =
                 serde_json::from_value(confirmation)?;
 
-            
-
             confirmation.payment_method_preview.ok_or_else(|| {
-                    ApiError::InvalidInput(
-                        "Confirmation token is missing payment method!"
-                            .to_string(),
-                    )
-                })?
+                ApiError::InvalidInput(
+                    "Confirmation token is missing payment method!".to_string(),
+                )
+            })?
         }
         PaymentSession::AutomatedRenewal => {
             if attached_charge.as_charge().is_none() {
@@ -258,8 +249,6 @@ pub async fn create_or_update_payment_intent(
 
             match maybe_payment_method_id {
                 Some(payment_method_id) => {
-                    
-
                     stripe::PaymentMethod::retrieve(
                         stripe_client,
                         &payment_method_id,
